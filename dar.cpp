@@ -18,7 +18,7 @@
 //
 // to contact the author by email : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar.cpp,v 1.34.1.1 2002/04/24 20:37:47 denis Rel $
+// $Id: dar.cpp,v 1.34.1.2 2002/05/06 19:43:43 denis Rel $
 //
 /*********************************************************************/
 //
@@ -57,7 +57,7 @@ using namespace std;
 #define EXTENSION "dar"
 
 const version supported_version = "01";
-const char *application_version = "1.0.1";
+const char *application_version = "1.0.2";
 
 static void op_create(const path &fs_root, const path &sauv_path, const path *ref_path,
 		      const mask &selection, const mask &subtree, 
@@ -446,7 +446,7 @@ static void op_listing(const path &sauv_path, const string &filename, bool info_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar.cpp,v 1.34.1.1 2002/04/24 20:37:47 denis Rel $";
+    static char id[]="$Id: dar.cpp,v 1.34.1.2 2002/05/06 19:43:43 denis Rel $";
     dummy_call(id);
 }
 

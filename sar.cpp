@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.28 2002/04/25 17:59:36 denis Rel $
+// $Id: sar.cpp,v 1.30 2002/05/06 19:43:43 denis Rel $
 //
 /*********************************************************************/
 
@@ -155,7 +155,7 @@ bool sar::skip_forward(unsigned int x)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: sar.cpp,v 1.28 2002/04/25 17:59:36 denis Rel $";
+    static char id[]="$Id: sar.cpp,v 1.30 2002/05/06 19:43:43 denis Rel $";
     dummy_call(id);
 }
 
@@ -424,6 +424,7 @@ void sar::open_writeonly(char *fic, const infinint &num)
 		throw Erange("sar::open_writeonly", "file exists, and DONT_ERASE option is set");
 	    if(opt_warn_overwrite)
 		user_interaction_pause(string(fic) + " is about to be overwritten");
+	    open_flag |= O_TRUNC;
 	}
     }	 
    

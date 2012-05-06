@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.13 2002/03/18 11:00:54 denis Rel $
+// $Id: generic_file.hpp,v 1.17 2002/05/06 19:43:43 denis Stab $
 //
 /*********************************************************************/
 
@@ -28,6 +28,12 @@
 #include <unistd.h>
 #include "infinint.hpp"
 #include "path.hpp"
+
+#define CRC_SIZE 2
+typedef char crc[CRC_SIZE];
+extern void clear(crc & value);
+extern void copy_crc(crc & dst, const crc & src);
+extern bool same_crc(const crc &a, const crc &b);
 
 enum gf_mode { gf_read_only, gf_write_only, gf_read_write };
 
@@ -56,8 +62,11 @@ public :
     virtual infinint get_position() = 0;
     
     void copy_to(generic_file &ref);
+    void copy_to(generic_file &ref, crc & value);
+	// generates CRC on copied data
     unsigned long copy_to(generic_file &ref, unsigned long int size); // returns the number of byte effectively copied
     infinint copy_to(generic_file &ref, infinint size); // returns the number of byte effectively copied
+    bool diff(generic_file & f); // return true if arg differs from "this"
 
 protected :
     void set_mode(gf_mode x) { rw = x; };

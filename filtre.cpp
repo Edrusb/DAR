@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.25.1.1 2002/04/24 20:44:47 denis Rel $
+// $Id: filtre.cpp,v 1.25.1.2 2002/05/06 20:47:05 denis Rel $
 //
 /*********************************************************************/
 
@@ -237,8 +237,10 @@ void filtre_sauvegarde(const mask &filtre,
 			inode *e_ino = dynamic_cast<inode *>(e);
 			bool known = ref.compare(e, f);
 			const inode *f_ino = known ? dynamic_cast<const inode *>(f) : NULL;
+			known = f_ino != NULL ? true : false;
 			bool tosave = known ? e_ino->is_more_recent_than(*f_ino) : true;
 
+			ref.compare(&tmp_eod, f); // we do not inspect this directory
 			ignode->set_saved_status(tosave);
 			filesystem_skip_read_to_parent_dir();
 			juillet.enfile(&tmp_eod);
@@ -299,7 +301,7 @@ void filtre_difference(const mask &filtre,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: filtre.cpp,v 1.25.1.1 2002/04/24 20:44:47 denis Rel $";
+    static char id[]="$Id: filtre.cpp,v 1.25.1.2 2002/05/06 20:47:05 denis Rel $";
     dummy_call(id);
 }
 

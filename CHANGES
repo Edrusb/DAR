@@ -2,5 +2,8 @@ from version 1.0.0 to version 1.0.1
 - correction of few mistakes that lead the compilation to fail with certain C++ compilers
 - bug #1 fixed.
 
+from version 1.0.1 to version 1.0.2
+- bug #2 fixed
+- bug #3 fixed
 
 

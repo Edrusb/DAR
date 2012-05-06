@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.17 2002/03/18 11:00:54 denis Rel $
+// $Id: generic_file.cpp,v 1.23 2002/05/07 17:18:05 denis Rel $
 //
 /*********************************************************************/
 
@@ -32,6 +32,26 @@
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "user_interaction.hpp"
+
+void clear(crc & value)
+{
+    for(int i = 0; i < CRC_SIZE; i++)
+	value[i] = '\0';
+}
+
+bool same_crc(const crc &a, const crc &b)
+{
+    int i = 0;
+    while(i < CRC_SIZE && a[i] == b[i])
+	i++;
+    return i == CRC_SIZE;
+}
+
+void copy_crc(crc & dst, const crc & src)
+{
+    for(int i = 0; i < CRC_SIZE; i++)
+	dst[i] = src[i];
+}
 
 #define BUFFER_SIZE 102400
 
@@ -66,12 +86,33 @@ int generic_file::read_back(char &a)
 void generic_file::copy_to(generic_file & ref)
 {
     char buffer[BUFFER_SIZE];
-    int lu, ret;
+    int lu, ret = 0;
+
+    do 
+    {
+	lu = this->read(buffer, BUFFER_SIZE);
+	if(lu > 0)
+	    ret = ref.write(buffer, lu);
+    } 
+    while(lu > 0 && ret > 0);
+}
+
+void generic_file::copy_to(generic_file & ref, crc & value)
+{
+    char buffer[BUFFER_SIZE];
+    int lu, ret = 0;
+    clear(value);
+    int crc_offset = 0;
 
     do {
 	lu = this->read(buffer, BUFFER_SIZE);
 	if(lu > 0)
+	{
 	    ret = ref.write(buffer, lu);
+	    for(int i = 0; i < lu; i++)
+		value[(i+crc_offset)%CRC_SIZE] ^= buffer[i];
+	    crc_offset = lu % CRC_SIZE;
+	}
     } while(lu > 0 && ret > 0);
 }
 
@@ -112,26 +153,56 @@ infinint generic_file::copy_to(generic_file & ref, infinint size)
 
     return wrote;
 }
+
+bool generic_file::diff(generic_file & f)
+{
+    char buffer1[BUFFER_SIZE];
+    char buffer2[BUFFER_SIZE];
+    int lu1 = 0, lu2 = 0;
+    bool diff = false;
+
+    if(get_mode() == gf_write_only || f.get_mode() == gf_write_only)
+	throw Erange("generic_file::diff", "cannot compare files in write only mode");
+    skip(0);
+    f.skip(0);
+    do
+    {
+	lu1 = read(buffer1, BUFFER_SIZE);
+	lu2 = f.read(buffer2, BUFFER_SIZE);
+	if(lu1 == lu2)
+	{
+	    register int i = 0;
+	    while(i < lu1 && buffer1[i] == buffer2[i])
+		i++;
+	    if(i < lu1)
+		diff = true;
+	}
+	else
+	    diff = true;
+    }
+    while(!diff && lu1 > 0);
+    
+    return diff;
+}
     
 fichier::fichier(int fd) : generic_file(gf_read_write)
 {
     int flags;
 
     filedesc = fd;
-    flags = fcntl(fd, F_GETFL) & ~O_CREAT & ~O_EXCL & ~O_NOCTTY & ~O_TRUNC & ~O_APPEND 
-	& ~O_NDELAY & ~O_SYNC;
+    flags = fcntl(fd, F_GETFL) & O_ACCMODE;
     switch(flags)
     {
-    case O_RDONLY :
+    case O_RDONLY:
 	set_mode(gf_read_only);
 	break;
-    case O_WRONLY :
+    case O_WRONLY:
 	set_mode(gf_write_only);
 	break;
-    case O_RDWR :
+    case O_RDWR:
 	set_mode(gf_read_write);
 	break;
-    default :
+    default:
 	throw Erange("fichier::fichier", "file mode is neither read nor write");
     }
 }
@@ -226,7 +297,7 @@ bool fichier::skip_relative(signed int x)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: generic_file.cpp,v 1.17 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: generic_file.cpp,v 1.23 2002/05/07 17:18:05 denis Rel $";
     dummy_call(id);
 }
 
@@ -235,7 +306,7 @@ infinint fichier::get_position()
     off_t ret = lseek(filedesc, 0, SEEK_CUR);
 
     if(ret == -1)
-	throw Erange("fichier::get_position");
+	throw Erange("fichier::get_position", string("error getting file position : ") + strerror(errno));
     
     return (unsigned long int)ret;
 }
@@ -281,7 +352,7 @@ int fichier::inherited_write(char *a, size_t size)
 	    case EINTR:
 		break;
 	    case EIO:
-		throw Ehardware("fichier::inherited_write");
+		throw Ehardware("fichier::inherited_write", strerror(errno));
 	    case ENOSPC:
 		user_interaction_pause("no space left on device, you have the oportunity to make room now. When ready : can we continue ?");
 		break;

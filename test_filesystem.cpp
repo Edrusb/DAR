@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.12 2002/03/25 22:02:38 denis Rel $
+// $Id: test_filesystem.cpp,v 1.12.1.1 2002/05/06 21:03:29 denis Rel $
 //
 /*********************************************************************/
 
@@ -138,7 +138,7 @@ static void test()
 
 static void re_test()
 {
-    entree *e;
+    const entree *e;
     detruit det1 = detruit("lien", 'l' | 0x80);
     detruit det2 = detruit("dev1", 'd');
 
