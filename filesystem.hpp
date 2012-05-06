@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.12 2002/03/18 11:00:54 denis Rel $
+// $Id: filesystem.hpp,v 1.19 2002/06/18 21:16:06 denis Rel $
 //
 /*********************************************************************/
 
@@ -27,17 +27,49 @@
 
 #include "catalogue.hpp"
 
-extern void filesystem_set_root(const path &root, bool allow_overwrite, bool warn_overwrite, bool info_details);
+extern void filesystem_set_root(const path &root, bool allow_overwrite, bool warn_overwrite, bool info_details, bool root_ea, bool user_ea);
+extern void filesystem_ignore_owner(bool mode);
 extern void filesystem_freemem();
 
-extern void filesystem_reset_read();	
+extern void filesystem_reset_read();
+    // reset reading. for both filesystem_read() and filesystem_read_filename() methods
 extern bool filesystem_read(entree * &ref);
 extern void filesystem_skip_read_to_parent_dir();
+    // to use with filesystem_read() to continue reading in parent directory and
+    // ignore all entry not yet read of current directory
+
+extern bool filesystem_read_filename(const string & name, nomme * &ref);
+    // looks a file of name given in argument, in current reading directory 
+    // WARNING : cannot mix fileystem_read() and filesystem_read_filename()
+    // filesystem_reset_read() must be called before changing of 
+    // reading method
+extern void filesystem_skip_read_filename_in_parent_dir();
+    // must be called when using filesystem_read_filename() to explore parent dir
+
 
 extern void filesystem_reset_write();
-extern void filesystem_write(const entree *x);	// the argument may be an object from class destroy 
-    // in this case the target is removed from the filesystem
-extern void filesystem_pseudo_write(const directory *dir); // do not restore the directory, just stores that we are now 
+extern bool filesystem_write(const entree *x);	
+    // the argument may be an object from class destroy
+    // return true upon success, 
+    // false if overwriting not allowed or refused 
+    // throw exception on other errors
+extern nomme *filesystem_get_before_write(const nomme *x);
+    // in this case the target has to be removed from the filesystem
+extern void filesystem_pseudo_write(const directory *dir);
+    // do not restore the directory, just stores that we are now 
     // inspecting its contents
+
+extern bool filesystem_ea_has_been_restored(const hard_link *h);
+    // true if the inode pointed to by the arg has already got its EA restored
+extern bool filesystem_set_ea(const nomme *e, const ea_attributs & l);
+    // check the inode for which to restore EA, is not a hard link to
+    // an already restored inode, else call the proper ea_filesystem call
+
+extern void filesystem_write_hard_linked_target_if_not_set(const etiquette *ref, const string & chemin);
+    // if a hard linked inode has not been restored (no change, or less recent than the one on filesystem)
+    // it is necessary to inform filesystem, where to hard link on, any future hard_link 
+    // that could be necessary to restore.
+extern bool filesystem_known_etiquette(const infinint & eti);
+    // return true if an inode in filesystem has been seen for that hard linked inode
 
 #endif

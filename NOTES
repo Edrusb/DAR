@@ -1,0 +1,514 @@
+
+ CONTENTS
+----------------
+   I - EA & differential backup
+  II - dar and remote backup server
+ III - bytes, bits, kilo, mega, etc. 
+  IV - archive structure in brief
+   V - EA Support & Compilation Problems
+
+
+I- EA & differential backup
+============================
+
+brief presentation of EA:
+--------------------------
+EA stands for Extended Attributes. In Unix filesystem a regular file is 
+composed of a set of byte (the data) and an inode. The inode add properties to
+the file, such as owner, group, permission, dates (last modification date of 
+the data [mtime], last access date to data [atime], and last inode change date
+[ctime]), etc). Last, the name of the file is not contained in the inode, but
+in the directory(ies) it is linked to. When a file is linked more than once
+in the directory tree, we speak about "hard links". This way the same data and
+associated inode appreas several time in the same or different directories.
+This is not the same as a symbolic links, which is a file that contains the 
+path to another file (which may or may not exist). A symbolic link has its own
+inode. OK, now let's talk about EA:
+
+Extended attributes is a recent feature of Unix file system. They extend 
+attributes provided by the inode and associated to a data. They are not part of
+the inode, nor part of the data, nor part of a given directory. They are are 
+stored beside the inode and are a set of pair of key and value. The owner
+of the file can add or define any key and eventually associate data to it. It 
+can also 
+list and remove a particular key. What they are used for ? A way to associate
+information to a file.
+
+One particular interesting use of EA, is ACL: Access Control List. ACL can be 
+implemented using EA and add a more fine grain in assigning access permission
+to file. For more information one EA and ACL, see the site of 
+Andreas Grunbacher: 
+
+	http://acl.bestbits.at/ 
+
+EA & Differential Backup 
+--------------------------
+to determine that an EA has changed dar looks at the ctime value. 
+if ctime has changed, (due to EA change, but also to permission or owner 
+change) dar saves the EA. ctime also changes, if atime or mtime changes. So if
+you access a file or modify it, dar will consider that the EA have changed 
+also. This is not really fair, I admit.
+
+Something better would be to compare EA one by one, and record those that have
+changed or have been deleted. But to be able to compare all EA and their value
+reference EA must reside in memory. As EA can grow up to 64 KB by file, this
+can lead to a quick saturation of the virtual memory, which is already enough
+solicited by the catalogue
+
+Theses two schemes implies a different pattern for saving EA in archive. In the
+first case (no EA in memory except at time of operation on it), to avoid 
+skipping in the archive (and ask the user to change of disks too often), EA 
+must be stored beside the data of the file (if present). Thus they must be 
+distributed all along the archive (except at the end that only contains the 
+catalogue).
+
+In the second case (EA are loaded in memory for comparison), EA must reside 
+beside or within the catalogue, in any case at the end of the archive, not 
+to have to user to need all disks to just take an archive as reference.
+
+As the catalogue, grows already fast with the number of file to save (from a
+few bytes for hard_link to 400 bytes around per directory inode), the memory 
+saving option has been adopted. 
+
+Thus, EA changes are based on the ctime change. Unfortunately, no system call 
+permits to restore ctime. Thus, restoring an differential backup after its 
+reference has been restored, will present restored inode as more recent than 
+those in the differential archive, thus the -r option would prevent any EA 
+restoration. In consequence, -r has been disabled for EA, it does only concern
+data contents. If you don't want to restore any EA but just more recent data, 
+you can use the following : -r -u -U 
+
+
+II - dar and remote backup server
+=================================
+
+The situation is the following:
+you have a host (called local in the following), on which resides an 
+operational system, which you want to backup regularly, without perturbing
+users. For security reasons you want to store the backup on another host 
+(called remote host in the following), only used for backup. Of course you have
+not much space on local host to store the archive.
+ 
+Between theses two hosts, you could use NFS and nothing special would be
+necessary to add, to use dar as usually. but if for security reasons you don't
+want to use NFS (insecure network, local user must not have access to backups),
+but prefer to communicate through an encrypted session, (using ssh for example)
+then you need to use dar features brought by version 1.1.0:
+
+- dar can now output its archive to stdout instead of a given file. To activate
+it, use "-" as basename. Here is an example :
+	
+	dar -c - -R / -z | some_program
+or
+	dar -c - -R / -z > named_pipe_or_file
+
+Note, that file splitting is not available as it has not much meaning when 
+writing to a pipe. (a pipe has no name, there is no way to skip (or seek) in a
+pipe, and what would mean changing of file ? changing of pipe ?).
+
+At the other end of the pipe (on the remote host), the data can be redirected 
+to a file, with proper filename (something that matches "*.1.dar").
+
+	some_other_program > backup_name.1.dar
+
+It is also possible to redirect the output to dar_xform which can in turn on 
+the remote host split the data flow in several files, pausing between them, 
+exactly as dar is able to do:
+
+	some_other_program | dar_xform -s 100M - backup_name
+
+this will create backup_name.1.dar and so on. The resulting archive is totally
+compatible with those directly generated by dar. 
+
+OK, you are happy, you can backup the local filesystem to a remote server 
+through a secure socket session, in a full featured dar archive without
+using NFS. But, now you want to make a differential backup taking this archive
+as reference. How to do that ? 
+
+The simplest way is to use the new feature called "isolation", which extracts
+the catalogue from the archive and stores it in a little file. On the remote 
+backup server you would type:
+
+	dar -A backup_name -C CAT_backup_name -z
+
+if the catalogue is too big to fit on a floppy, you can slit it as usually 
+using dar:
+	
+	dar -A backup_name -C CAT_backup_name -z -s 1440k 
+
+the generated archive (CAT_backup_name.1.dar, and so on), only contains the 
+catalogue, but can still be used as reference for a new backup. You just need
+to transfer it back to the local host, either using floppies, or through a 
+secured socket session, or even directly isolating the catalogue to a pipe
+that goes from the remote host to the local host:
+
+on remote host:
+	dar -A backup_name -C - -z | some_program
+
+on local host:
+	some_other_program > CAT_backup_name.1.dar
+
+or use dar_xform as previously if you need splitting :
+
+	some_other_program | dar_xform -s 1440k CAT_backup_name
+
+then you can make your differential backup as usual:
+
+	dar -A CAT_backup_name -c - -z -R / | some_program
+
+or if this time you prefer to save the archive locally:
+
+	dar -A CAT_backup_name -c backup_diff -z -R /
+
+For differential backups instead of isolating the catalogue, it is also 
+possible to read an archive or its extracted catalogue through pipes. Yes, two
+pipes are required for dar to be able to read an archive. 
+The first goes from dar to the external program "dar_slave" and carries orders
+(asking some portions of the archive), and the other pipe, goes from 
+"dar_slave" back to "dar" and carries the asked data for reading.
+
+By default, if you specify "-" as basename for -l, -t, -d, -x, or to -A (used 
+with -C or -c), dar and dar_slave will use their standard input and output to 
+communicate. Thus you need additional program to make the input of the first 
+going to the output to the second, and vice versa. 
+Warning: you cannot use named pipe that way, because dar and dar_slave would 
+get blocked upon opening of the first named pipe, waiting for the peer to
+open it also, even before they has started (dead lock at shell level).
+For named pipes, there is -i and -o options that helps, they receive a 
+filename as argument, which may be a named pipe. The -i argument is used 
+instead of stdin and -o instead of stdout. Note that -i and -o are only 
+available if "-" is used as basename. Let's take an example:
+
+You now want to restore an archive from your remote backup server. Thus on it
+you have to run dar_slave this way
+
+on remote server:
+	some_prog | dar_slave backup_name | some_other_prog
+or
+	dar_slave -o /tmp/pipe_todar -i /tmp/pipe_toslave backup_name
+
+and on the local host you have to run dar this way
+
+	some_prog | dar -x - -v ... | some_other_prog
+or
+	dar -x - -i /tmp/pipe_todar -o /tmp/pipe_toslave -v ...
+
+there is no order to run dar or dar_slave first, dar can use -i and/or -o, 
+while dar_slave does not. What is important here is to connect in a way or in
+an other their input and output, it does not matter how. The only restriction 
+is that communication support must be perfect: no data loss, no duplication,
+no order change, thus communication over TCP should be fine.
+
+Of course, you can also isolate a catalogue through pipes, test an archive, 
+make difference, use a reference catalogue this way etc, and even then, output
+the resulting archive to pipe ! If using -C or -c with "-" while using -A also 
+with "-", it is then mandatory to use -o: The output catalogue will be provided
+to standard output, thus to send order to dar_slave you must use another 
+channel with -o:
+
+       LOCAL HOST                                   REMOTE HOST
+   +-----------------+                     +-----------------------------+
+   |   filesystem    |                     |     backup of reference     |
+   |       |         |                     |            |                |
+   |       |         |                     |            |                |
+   |       V         |                     |            V                |
+   |    +-----+      | backup of reference |      +-----------+          | 
+   |    | DAR |--<-]=========================[-<--| DAR_SLAVE |          |
+   |    |     |-->-]=========================[->--|           |          |
+   |    +-----+      | orders to dar_slave |      +-----------+          |
+   |       |         |                     |      +-----------+          |
+   |       +--->---]=========================[->--| DAR_XFORM |--> backup|
+   |                 |        saved data   |      +-----------+ to slices|
+   +-----------------+                     +-----------------------------+  
+
+on local host :
+	dar -c - -A - -i /tmp/pipe_todar -o /tmp/pipe_toslave | some_prog
+
+on the remote host :
+	
+	dar_slave -i /tmp/pipe_toslave -o /tmp/pipe_todar full_backup
+ //dar_slave provides the full_backup for -A option
+
+	some_other_prog | dar_xform - diff -s 140M -p ...
+ //while dar_xform make slice of the output archive provided by dar
+
+Last, if you don't want to mess with pipe, you have still the possibility to 
+create a VPN and mount a NFS partition over it. In some cases it may be
+sufficient for what you want to do. See VPN-HOWTO for simple implementation 
+using sshd and pppd.
+
+
+ III - bytes, bits, kilo, mega etc. 
+====================================
+
+you probably know a bit the metric system, where a dimension is expressed by a
+base unit (the meter for distance, the litre for volume, the joule for energy,
+the volt for electrical potential, the bar for pressure, the watt for 
+power, the second for time, etc.), and declined using prefixes:
+
+deci  (d) = 0.1 
+centi (c) = 0.01
+milli (m) = 0.001
+micro (u) = 0.000,001 (symbol is not "u" but the "mu" grec letter)
+nano  (n) = 0.000,000,001
+pico  (p) = 0.000,000,000,001
+femto (f) = 0.000,000,000,000,001
+atto  (a) = 0.000,000,000,000,000,001
+zepto (z) = 0.000,000,000,000,000,000,001
+yocto (y) = 0.000,000,000,000,000,000,000,001
+deca (da) = 10
+hecto (h) = 100 
+kilo  (k) = 1,000
+mega  (M) = 1,000,000
+giga  (G) = 1,000,000,000
+tera  (T) = 1,000,000,000,000
+peta  (P) = 1,000,000,000,000,000
+exa   (E) = 1,000,000,000,000,000,000
+zetta (Z) = 1,000,000,000,000,000,000,000
+yotta (Y) = 1,000,000,000,000,000,000,000,000
+
+This way two milliseconds are 0.002 second, and 5 kilometres are 5,000 meters. 
+All was fine and nice up to the recent time when computer science appeared:
+In this discipline, the need to measure the size of information storage raised.
+The smallest size, is the bit (contraction of binary digit), binary because it
+has two possible states: "0" and "1". Grouping bits by 8 computer scientists 
+called it a "byte". A byte has 256 different states, (2 power 8). The ASCII 
+(American Standard Code for Information Interchange) code arrived and assigned
+a letter or more generally a character to some value of a byte, (A is assigned
+to 65, space to 32, etc). And as most text is composed of a set of character, 
+they started to count size in byte. Time after time, following technology 
+evolution, memory size approached 1000 bytes, but for some obscure reason it 
+was decided that a "kilobyte" would be 1024 bytes not 1000 bytes. Some time 
+after, and by extension, a megabyte has been defined to be 1024 kilobytes, 
+a terabyte to be 1024 megabytes, etc.
+
+In parallel, in the telecommunications domain, going from analogical to 
+digital signal made the bit to be used also. In place of the analogical signal,
+took place a flow of bits, representing the samples of the original signal. 
+For telecommunications the problem was more a problem of size of flow: 
+how much bit could be transmitted by second. At some ancient time appeared 
+the 1200 bit by second, then 64000, also designed as 64 Kbit/s. Thus here, 
+kilo stays in the usual meaning of 1000 time the base unit. You can also find 
+ethernet 10 Mbit/s which is 10,000 bits by seconds, same thing with Token-Ring
+that had 4, 16 or 100 Mbits by seconds (4,000, 16,000 or 100,000 bits/s). But,
+even for telecommunications, kilo is not always 1000 times the base unit: 
+the E1 bandwidth at 2Mbits/s for example, is in fact 32*64Kbit/s thus 
+2048 Kbit/s ... not 2000 Kbit/s
+
+Anyway, back to dar, you have to possibility to give the size in byte or using
+a single letter as suffix (k or K, M, T, P, E, Z, Y) the possibility to 
+provide a size in kilo, mega, tera, peta, exa, zetta or yotta byte, with the 
+computer science definition of theses terms (power of 1024). 
+ 
+Theses suffixes are for simplicity and not to have to computer
+how much make powers of 1024. For example, if you want to fill a CD-R you will
+have to use the "-s 650M" option which is equivalent to "-s 6815744400", choose
+the one you prefer, the result is the same :-). Now, if you want 2 megabytes 
+slices in the usual sense in metric system use "-s 2000000".
+
+Yes, and to make things more confuse, marketing arrived and made sellers count
+gigagits a third way: I remember the last hard disk I bought, was described 
+as "2.1 GB", (OK, that's several couple of years ago), but in fact it had only
+2097152 bytes available. This is far from 2202009 bytes (= 2.1 GB for computer 
+science meaning). OK, if it had theses 2202009 bytes, this hard disk would 
+have been sold under the lable "2.5 GB"! ... just kidding :-)
+
+
+  IV - archive structure in brief
+===================================
+
+Slice level
+-----------------
+
+a slice is composed of a header and data
+
++--------+-------------------------------------------+
+| header |  Data                                     |
+|	 |		                             |
++--------+-------------------------------------------+
+
+the slice header is composed of
+- a magic number that tells this is a dar slice
+- a internal_name which is unique to a given archive
+- a flag that tells if the slice is the last of the archive
+- a extension flag, that says if some extension field is present
+  possible extension field is the size of the slices (-s option) when 
+  -S is used
+
++-------+----------+------+-----------+
+| Magic | internal | flag | extension |
+| Num.  | name     | byte | byte      |
++-------+----------+------+-----------+
+
+or for the first slice if -s and -S are used together
++-------+----------+------+-----------+-------------------+
+| Magic | internal | flag | extension | following slices  |
+| Num.  | name     | byte | byte      | size              |
++-------+----------+------+-----------+-------------------+
+
+the header is the first thing to be written, and if it is not the last slice,
+the flag field is overwritten. The header is also the first part to be read.
+
+To know where a given position takes place in the archive, dar must first read 
+the first archive, to know the size of the first slice, and if extension is 
+present, the size of following slices is read. This is why at start-up dar 
+always asks the first slice.
+
+Archive Level
+----------------
+
+the archive level describes the structure of the slice's data field, 
+when they are stick together across slices.
+
++---------+-----------------------------------------+-----------+------+
+| version |	Data				    | catalogue | term |
+| header  |					    |           |      |
++---------+-----------------------------------------+-----------+------+
+
+the header version is composed of:
+- edition version of the archive
+- compression algorithm used
+- command line used for creating the archive
+- flag that tells if root or user EA have been saved
+
++---------+------+---------------+------+
+| edition | algo | command line  | flag |
+|         |      |               |      |
++---------+------+---------------+------+
+
+the data is a suite of file contents, with EA if present
+
+  ....--+---------------------+----+------------+-----------+----+---....
+        |  file data          | EA | file data  | file data | EA |
+        | (may be compressed) |    | (no EA)    |           |    |
+  ....--+---------------------+----+------------+-----------+----+---....
+
+the catalogue, contains all inode, directory structure and hard_links 
+information. The directory structure is stored in a simple way:
+the inode of a directory comes, then the inode of the files it contains, then
+a special entry named "EOD" for End of Directory.
+
+considering the following tree:
+
+ - toto
+    | titi
+    | tutu
+    | tata
+    |   | blup
+    |   +--
+    | boum
+    | coucou
+    +---
+
+it would generate the following sequence for catalogue storage:
+
++-------+------+------+------+------+-----+------+--------+-----+
+|  toto | titi | tutu | tata | blup | EOD | boum | coucou | EOD |
+|       |      |      |      |      |     |      |        |     |
++-------+------+------+------+------+-----+------+--------+-----+
+
+EOD takes on byte, and this way no need to store the full path of 
+each file, just the filename is recorded.
+
+the terminator stores the position of the beginning of the catalogue, it is the
+last thing to be written. Thus dar first reads the terminator, then the 
+catalogue.
+
+ALL together:
+---------------------
+
+here is an example of how data can be structured in a four slice archive:
+
++-------------+--------+------------------------+
+| slice + ext | version|  file data + EA        |
+| header      | header |	                |
++-------------+--------+------------------------+
+the first slice has been defined smaller using the -S option
+
++--------+--------------------------------------------+
+| slice  |           file data + EA                   |
+| header | 	                                      |
++--------+--------------------------------------------+
+
++--------+--------------------------------------------+
+| slice  |           file data + EA                   |
+| header | 	                                      |
++--------+--------------------------------------------+
+
++--------+---------------------+-----------+------+
+| slice  |   file data + EA    | catalogue | term |
+| header | 	               |           |      |
++--------+---------------------+-----------+------+
+the last slice is smaller because there was not enough data to make it full.
+
+The archive is written quite sequentially, except when creating a new
+slice, the flag in the slice header has to be changed to non terminal.
+
+Else, Dar read first the slice header of the first slice, then the version
+header, then the terminator and catalogue (located on the last slice) and then
+proceed to the operation. If it is extracting the whole archive, dar goes
+back to the first slice and asks for all slices one by one.
+
+QUESTION:
+why not having put the slices information at the end, for dar not to ask
+the first then the last slice ? 
+
+slicing and archiving are approached in two independent ways. For slicing,
+making header at the end of the file would require much more complicated and
+heavy code, because, slice have variable size, and header too. Then it would
+have cost more memory and process to manage the end of slice, when reading 
+data you must not provide the header as data.
+
+keeping slicing and archiving as two independent classes, is really necessary
+for dar to evaluate. Without this, it would not have been so easy to create
+dar_xform, which is only concerned by sar class (the C++ class that implements
+slicing). So putting the slicing information in the catalogue or terminator
+is really a bad idea for long term evolution and maintenance point of view.
+
+maybe the sar class will receive a new implementation one day in that way that
+header get stored at the end of slices, and overall slicing information would
+be stored at the end of the last slice. This way, dar would not ask the first
+slice before asking for the last one, in the meanwhile, you will have to first
+provide the first slice in any case.
+
+
+
+   V - EA Support & Compilation Problems
+=========================================
+
+if you just want to compile DAR with EA support you just need
+the attr-x.x.x.src.tar.gz package. (I've been using attr-2.0.5.src.tar.gz).
+if you want to use EA, then you need to change your kernel upgrade a few 
+commands. I will just detail the DAR compilation here. 
+
+I personally got some problem to compile dar with EA support, due to EA package
+installation problem:
+
+when installing EA package, the /usr/include/attr directory is not created
+nor the xattr.h file put in it. To solve this problem, create it manually,
+and copy the xattr.h (and also attributes.h even if it is not required by dar)
+to it, giving it proper permission (world readable). These include files can be
+found in the "include" subdir of the xattr package:
+
+as root type the following replacing <package> by the path where your package
+has been compiled:
+
+cd /usr/include
+mkdir attr
+chmod 0755 attr
+cp <package>/include/xattr.h <package>/include/attributes.h attr
+cd attr
+chmod 0644 *
+
+the second problem is while linking, the static library version does not exist.
+you can built it using the following command (after package compilation):
+
+as previously as root type:
+
+chdir <package>/libattr
+ar r libattr.a syscalls.o libattr.o
+mv libattr.a /usr/lib
+chmod 0644 /usr/lib/libattr.a
+
+dar should now be able to compile with EA_SUPPORT activated in its makefile.
+

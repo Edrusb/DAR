@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.hpp,v 1.11 2002/03/18 11:00:54 denis Rel $
+// $Id: command_line.hpp,v 1.19 2002/06/18 21:16:06 denis Rel $
 //
 /*********************************************************************/
 
@@ -34,14 +34,18 @@
 
 using namespace std;
 
-enum operation { extract, create, diff, test, listing };
+enum operation { extract, create, diff, test, listing, isolate };
 
 extern bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path *&sauv_root, path *&ref_root, 
-		     infinint &file_size, infinint &first_file_size, mask *&selection, mask *&subtree,
+		     infinint &file_size, infinint &first_file_size, 
+		     mask *&selection, mask *&subtree,
 		     string &filename, string *&ref_filename,
 		     bool &allow_over, bool &warn_over, bool &info_details,
-		     compression &algo, bool &detruire, bool &pause, bool &beep);
-
-extern void usage(char *command_name);
+		     compression &algo, bool &detruire, 
+		     bool &pause, bool &beep,
+		     bool & make_empty_dir, bool & only_more_recent, 
+		     bool & ea_root, bool & ea_user,
+		     string & input_pipe, string &output_pipe,
+		     bool &ignore_owner);
     
 #endif

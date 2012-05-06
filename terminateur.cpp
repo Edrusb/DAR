@@ -18,9 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.9 2002/03/18 11:00:54 denis Rel $
+// $Id: terminateur.cpp,v 1.10 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
+
+#pragma implementation
 
 #include "terminateur.hpp"
 
@@ -74,7 +76,7 @@ void terminateur::dump(generic_file & f)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: terminateur.cpp,v 1.9 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: terminateur.cpp,v 1.10 2002/05/15 21:56:01 denis Rel $";
     dummy_call(id);
 }
 

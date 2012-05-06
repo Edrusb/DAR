@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.hpp,v 1.12 2002/03/18 11:00:54 denis Rel $
+// $Id: filtre.hpp,v 1.21 2002/05/16 21:50:51 denis Rel $
 //
 /*********************************************************************/
 
@@ -34,37 +34,62 @@
 struct statistics
 {
     infinint treated; // saved | restored
+    infinint hard_links; // hard linked stored
     infinint skipped; // not changed since last backup | file not restored because not saved in backup
     infinint ignored; // ignored due to filter
+    infinint tooold; // ignored because less recent than the filesystem entry
     infinint errored; // could not be saved | could not be restored (filesystem access wrights)
     infinint deleted; // deleted file seen | number of files deleted
+    infinint ea_treated; // number of EA saved | number of EA restored
 
-    void clear() { treated = skipped = ignored = errored = deleted = 0; };
+    void clear() { treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = 0; };
+    infinint total() const
+	{ 
+	    return treated+skipped+ignored+tooold+errored+deleted; 
+		// hard_link are also counted in other counters 
+	};
 };
 
-void filtre_restore(const mask &filtre, 
-		    const mask & subtree,
-		    compressor *stockage, 
-		    catalogue & cat, 
-		    bool detruire, 
-		    const path & fs_racine,
-		    bool fs_allow_overwrite,
-		    bool fs_warn_overwrite,
-		    bool info_details, statistics & st);
+extern void filtre_restore(const mask &filtre, 
+			   const mask & subtree,
+			   catalogue & cat, 
+			   bool detruire, 
+			   const path & fs_racine,
+			   bool fs_allow_overwrite,
+			   bool fs_warn_overwrite,
+			   bool info_details, statistics & st,
+			   bool only_if_more_recent,
+			   bool restore_ea_root,
+			   bool restore_ea_user);
 
-void filtre_sauvegarde(const mask &filtre,
-		       const mask &subtree,
-		       compressor *stockage, 
-		       catalogue & cat,
-		       catalogue &ref,
-		       const path & fs_racine,
-		       bool info_details, statistics & st);
+extern void filtre_sauvegarde(const mask &filtre,
+			      const mask &subtree,
+			      compressor *stockage, 
+			      catalogue & cat,
+			      catalogue &ref,
+			      const path & fs_racine,
+			      bool info_details, 
+			      statistics & st,
+			      bool make_empty_dir,
+			      bool save_ea_root,
+			      bool save_ea_user);
 
-void filtre_difference(const mask &filtre,
-		       const mask &subtree,
-		       compressor *stockage,
-		       const catalogue & cat,
-		       const path & fs_racine,
-		       bool info_details, statistics & st);
+extern void filtre_difference(const mask &filtre,
+			      const mask &subtree,
+			      catalogue & cat,
+			      const path & fs_racine,
+			      bool info_details, statistics & st,
+			      bool check_ea_root,
+			      bool check_ea_user);
+
+extern void filtre_test(const mask &filtre,
+			const mask &subtree,
+			catalogue & cat,
+			bool info_details,
+			statistics & st);
+
+extern void filtre_isolate(catalogue & cat,
+			   catalogue & ref,
+			   bool info_details);
 
 #endif

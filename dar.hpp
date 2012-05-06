@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar.hpp,v 1.7 2002/03/18 11:00:54 denis Rel $
+// $Id: dar.hpp,v 1.8 2002/05/15 18:57:56 denis Rel $
 //
 /*********************************************************************/
 
@@ -26,7 +26,6 @@
 #define DAR_HPP
 
 extern int main(int argc, char *argv[]);
-extern const char *get_application_version();
 
 #endif
 

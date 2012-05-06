@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.hpp,v 1.15 2002/03/18 11:00:54 denis Rel $
+// $Id: path.hpp,v 1.17 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
 
 #ifndef PATH_HPP
 #define PATH_HPP
+
+#pragma interface
 
 #include <list>
 #include <string>
@@ -35,7 +37,7 @@ class path
 {
 public :
     path(string s); // empty string is not a valid string (exception thrown)
-    path(char *s) { *this = path(string(s)); };
+    path(const char *s) { *this = path(string(s)); };
     path(const path & ref);
     path & operator = (const path & ref);
     bool operator == (const path & ref) const;

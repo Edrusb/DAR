@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.hpp,v 1.8 2002/03/18 11:00:54 denis Rel $
+// $Id: terminateur.hpp,v 1.9 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
 
 #ifndef TERMINATEUR_HPP
 #define TERMINATEUR_HPP
+
+#pragma interface
 
 #include "generic_file.hpp"
 

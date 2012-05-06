@@ -18,9 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.26 2002/03/18 11:00:54 denis Rel $
+// $Id: sar.cpp,v 1.35 2002/06/26 22:04:13 denis Rel $
 //
 /*********************************************************************/
+
+#pragma implementation
 
 #include <time.h>
 #include <sys/stat.h>
@@ -33,6 +35,7 @@
 #include "deci.hpp"
 #include "user_interaction.hpp"
 #include "tools.hpp"
+#include "erreurs.hpp"
 
 static bool sar_extract_num(string filename, string base_name, string ext, infinint & ret);
 static bool sar_get_higher_number_in_dir(path dir ,string base_name, string ext, infinint & ret);
@@ -75,8 +78,12 @@ bool sar::skip(infinint pos)
     infinint byte_per_file = size - header::size();
     infinint dest_file, offset;
 
+    
+    if(get_position() == pos)
+	return true; // no need to skip
+
 	///////////////////////////
-	// termination of the file to go and its offset to seek
+	// determination of the file to go and its offset to seek
 	//
     if(pos < byte_in_first_file)
     {
@@ -155,7 +162,7 @@ bool sar::skip_forward(unsigned int x)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: sar.cpp,v 1.26 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: sar.cpp,v 1.35 2002/06/26 22:04:13 denis Rel $";
     dummy_call(id);
 }
 
@@ -261,7 +268,7 @@ int sar::inherited_write(char *a, size_t sz)
 	    throw Erange("sar::inherited_write", strerror(errno));
 	if(tmp == 0)
 	{
-	    user_interaction_pause("can't write any byte to file, filesystem is full ? Please check");
+	    user_interaction_pause("Can't write any byte to file, filesystem is full? Please check!");
 	    continue;
 	}
 	to_write -= tmp;
@@ -293,7 +300,7 @@ void sar::open_readonly(char *fic, const infinint &num)
 	if(fd < 0)
 	    if(errno == ENOENT)
 	    {
-		user_interaction_pause(string(fic) + " is required for furthur operation, please provide the file");
+		user_interaction_pause(string(fic) + " is required for furthur operation, please provide the file.");
 		continue; 
 	    }
 	    else
@@ -310,7 +317,7 @@ void sar::open_readonly(char *fic, const infinint &num)
 	catch(Egeneric & e)
 	{
 	    close_file();
-	    user_interaction_pause(string(fic) + string("has a bad or corrupted header, please provide the correct file"));
+	    user_interaction_pause(string(fic) + string(" has a bad or corrupted header, please provide the correct file."));
 	    continue; 
 	}
 		
@@ -319,7 +326,7 @@ void sar::open_readonly(char *fic, const infinint &num)
 	if(h.magic != SAUV_MAGIC_NUMBER)
 	{
 	    close_file();
-	    user_interaction_pause(string(fic) + " is not a valid file (wrong magic number), please provide the good file");
+	    user_interaction_pause(string(fic) + " is not a valid file (wrong magic number), please provide the good file.");
 	    continue; 
 	}
 		
@@ -327,7 +334,7 @@ void sar::open_readonly(char *fic, const infinint &num)
 	    //
 	if(num == 1 && first_file_offset == 0)
 	{
-	    of_internal_name = h.internal_name;
+	    label_copy(of_internal_name, h.internal_name);
 	    try
 	    {
 		first_size = of_fd->get_size();
@@ -339,14 +346,14 @@ void sar::open_readonly(char *fic, const infinint &num)
 	    }
 	    catch(Erange & e)
 	    {
-		user_interaction_pause(string("error openning ") + fic + " : " + e.get_message());
+		user_interaction_pause(string("Error openning ") + fic + ": " + e.get_message());
 	    }
 	}
 	else
 	    if(! header_label_is_equal(of_internal_name, h.internal_name))
 	    {
 		close_file();
-		user_interaction_pause(string(fic) + " is a file from another set of backup file, please provide the correct file");
+		user_interaction_pause(string(fic) + " is a file from another set of backup file, please provide the correct file.");
 		continue;
 	    }
 
@@ -363,7 +370,7 @@ void sar::open_readonly(char *fic, const infinint &num)
 	    break;
 	default :
 	    close_file();
-	    user_interaction_pause(string(fic) + " has an unknown flag (neither terminal nor non_terminal file)");
+	    user_interaction_pause(string(fic) + " has an unknown flag (neither terminal nor non_terminal file).");
 	    continue;
 	}
 	of_flag = h.flag;
@@ -398,7 +405,7 @@ void sar::open_writeonly(char *fic, const infinint &num)
 		}
 		catch(Erange & e)
 		{
-		    h.internal_name = of_internal_name;
+		    label_copy(h.internal_name, of_internal_name);
 		    h.internal_name[0] = ~h.internal_name[0];
 			// this way we are shure that the file is not considered as part of the SAR
 		}
@@ -406,9 +413,9 @@ void sar::open_writeonly(char *fic, const infinint &num)
 		{
 		    open_flag |= O_TRUNC;
 		    if(opt_dont_erase)
-			throw Erange("sar::open_writeonly", "file exists, and DONT_ERASE option is set");
+			throw Erange("sar::open_writeonly", "file exists, and DONT_ERASE option is set.");
 		    if(opt_warn_overwrite)
-			user_interaction_pause(string(fic) + " is about to be overwritten");
+			user_interaction_pause(string(fic) + " is about to be overwritten.");
 		}
 	    }
 	    catch(Egeneric & e)
@@ -424,6 +431,7 @@ void sar::open_writeonly(char *fic, const infinint &num)
 		throw Erange("sar::open_writeonly", "file exists, and DONT_ERASE option is set");
 	    if(opt_warn_overwrite)
 		user_interaction_pause(string(fic) + " is about to be overwritten");
+	    open_flag |= O_TRUNC;
 	}
     }	 
    
@@ -479,7 +487,7 @@ void sar::open_file(infinint num)
 		    if(!initial)
 		    {
 			deci conv = of_current;
-			user_interaction_pause(string("finished writing to file ") + conv.human() + " ready to continue ? ");
+			user_interaction_pause(string("Finished writing to file ") + conv.human() + ", ready to continue ? ");
 		    }
 		    else
 			initial = false;
@@ -535,13 +543,13 @@ void sar::open_last_file()
 		if(of_flag != FLAG_TERMINAL)
 		{
 		    close_file();
-		    user_interaction_pause(string("the last file of the set is not present in ") + archive_dir.display() + " , please provide it");
+		    user_interaction_pause(string("The last file of the set is not present in ") + archive_dir.display() + " , please provide it.");
 		}
 	    }
 	    else
 	    {
 		close_file();
-		user_interaction_pause(string("no backup file is present in ") + archive_dir.display() + " , please provide the last file of the set");
+		user_interaction_pause(string("No backup file is present in ") + archive_dir.display() + " , please provide the last file of the set.");
 	    }
 	}
     }
@@ -551,7 +559,7 @@ header sar::make_write_header(const infinint & num, char flag)
 {
     header h;
 
-    h.internal_name = of_internal_name;
+    label_copy(h.internal_name, of_internal_name);
     h.magic = SAUV_MAGIC_NUMBER;
     h.flag = flag;
     h.extension = EXTENSION_NO;
@@ -560,7 +568,7 @@ header sar::make_write_header(const infinint & num, char flag)
 	if(first_file_offset == 0)
 	{
 	    header_generate_internal_filename(of_internal_name);
-	    h.internal_name = of_internal_name;
+	    label_copy(h.internal_name, of_internal_name);
 	}
 	if(size != first_size)
 	{
@@ -639,14 +647,49 @@ static bool sar_get_higher_number_in_dir(path dir, string base_name, string ext,
     return somme;
 }
 
-trivial_sar::trivial_sar(int fd) : fichier(fd)
+trivial_sar::trivial_sar(generic_file *ref) : generic_file(gf_read_write)
 {
     header tete;
 
-    tete.magic = SAUV_MAGIC_NUMBER;
-    header_generate_internal_filename(tete.internal_name);
-    tete.flag = FLAG_TERMINAL;
-    tete.extension = EXTENSION_NO;
-    tete.write(*this);
+    if(ref == NULL)
+	throw SRC_BUG;
+    if(ref->get_mode() == gf_read_write)
+	throw Efeature("read_write mode not supported for trivial_sar");
+    reference = ref;
+    set_mode(ref->get_mode());
+    if(get_mode() == gf_write_only)
+    {
+	tete.magic = SAUV_MAGIC_NUMBER;
+	header_generate_internal_filename(tete.internal_name);
+	tete.flag = FLAG_TERMINAL;
+	tete.extension = EXTENSION_NO;
+	tete.write(*reference);
+	offset = reference->get_position();
+    }
+    else
+	if(get_mode() == gf_read_only)
+	{
+	    tete.read(*reference);
+	    if(tete.flag == FLAG_NON_TERMINAL)
+		throw Erange("trivial_sar::trivial_sar", "this archive has slices and is not suited to be read from a pipe");
+	    offset = reference->get_position();
+	}
+	else
+	    throw SRC_BUG; // not implemented ! I said ! ;-) (Efeature)
 }
 
+bool trivial_sar::skip_relative(signed int x)
+{
+    if(x > 0 || reference->get_position() > offset - x) // -x is positive
+	return reference->skip_relative(x);
+    else
+	return reference->skip(offset); // start of file
+}
+
+infinint trivial_sar::get_position()
+{
+    if(reference->get_position() >= offset)
+	return reference->get_position() - offset; 
+    else
+	throw Erange("trivial_sar::get_position", "position out of range, call skip from trivial_sar object not from its reference");
+}

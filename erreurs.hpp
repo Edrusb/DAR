@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.hpp,v 1.22 2002/03/18 11:00:54 denis Rel $
+// $Id: erreurs.hpp,v 1.26 2002/06/12 18:38:00 denis Rel $
 //
 /*********************************************************************/
 
 #ifndef ERREURS_HPP
 #define ERREURS_HPP
+
+#pragma interface
 
 #include <string>
 #include <list>
@@ -110,7 +112,7 @@ protected :
 class Erange : public Egeneric 
 {
 public :
-    Erange(string source, string message = "") : Egeneric(source, message) {};
+    Erange(string source, string message) : Egeneric(source, message) {};
     ~Erange() { if(!zombie) add_to_last_destroyed(new Erange(*this)); };
 
 protected : 
@@ -121,7 +123,7 @@ protected :
 class Edeci : public Egeneric 
 {
 public :
-    Edeci(string source, string message = "") : Egeneric(source, message) {};
+    Edeci(string source, string message) : Egeneric(source, message) {};
     ~Edeci() { if(!zombie) add_to_last_destroyed(new Edeci(*this)); };
 
 protected :
@@ -143,7 +145,7 @@ protected :
 class Ehardware : public Egeneric
 {
 public :
-    Ehardware(string source, string message = "") : Egeneric(source, message) {};
+    Ehardware(string source, string message) : Egeneric(source, message) {};
     ~Ehardware() { if(!zombie) add_to_last_destroyed(new Ehardware(*this)); };
 
 protected :
@@ -160,6 +162,18 @@ public :
 protected :
     string exceptionID() const { return "USER ABORTED OPERATION"; };
     Euser_abort *dup() const { return new Euser_abort(*this); };
+};
+
+
+class Edata : public Egeneric
+{
+public :
+    Edata(string msg) : Egeneric("", msg) {};
+    ~Edata() { if(!zombie) add_to_last_destroyed(new Edata(*this)); };
+
+protected :
+    string exceptionID() const { return "ERROR IN TREATED DATA"; };
+    Edata *dup() const { return new Edata(*this); };
 };
 
 #endif

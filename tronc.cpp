@@ -18,9 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.cpp,v 1.10 2002/03/18 11:00:54 denis Rel $
+// $Id: tronc.cpp,v 1.14 2002/06/12 18:38:00 denis Rel $
 //
 /*********************************************************************/
+
+#pragma implementation
 
 #include "tronc.hpp"
 #include <errno.h>
@@ -30,7 +32,7 @@ tronc::tronc(generic_file *f, const infinint & offset, const infinint &size) : g
     ref = f; 
     sz = size;
     start = offset;
-    current = 0;
+    current = size; // forces skipping the first time
 }
 
 tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(mode) 
@@ -38,11 +40,14 @@ tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_
     ref = f; 
     sz = size;
     start = offset;
-    current = 0;
+    current = size; // forces skipping the firt time
 }
 
 bool tronc::skip(infinint pos)
 {
+    if(current == pos)
+	return true;
+
     if(pos > sz)
     {
 	current = sz;
@@ -110,7 +115,7 @@ bool tronc::skip_relative(signed int x)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: tronc.cpp,v 1.10 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: tronc.cpp,v 1.14 2002/06/12 18:38:00 denis Rel $";
     dummy_call(id);
 }
 
@@ -121,15 +126,6 @@ int tronc::inherited_read(char *a, size_t size)
     unsigned long lu = 0;
     int ret;
 
-	// due to the specific implementation of compressor
-	// and in particular of its call get_position()
-	// the following test must not be performed here,
-	// 
-	//    if(ref->get_position() != start + current)
-	//      ref->skip(start + current);
-	//
-	// thus we assume that the cursor is at the good position
-	// 
     do
     {
 	avail.unstack(macro_pas);

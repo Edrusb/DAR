@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.hpp,v 1.11 2002/03/18 11:00:54 denis Rel $
+// $Id: compressor.hpp,v 1.15 2002/05/28 20:17:29 denis Rel $
 //
 /*********************************************************************/
 
-#ifndef COMPRESSION_HPP
-#define COMPRESSION_HPP
+#ifndef COMPRESSOR_HPP
+#define COMPRESSOR_HPP
+
+#pragma interface
 
 #include <zlib.h>
 #include "generic_file.hpp"
@@ -38,6 +40,11 @@ class compressor : public generic_file
 {
 public :
     compressor(compression algo, generic_file & compressed_side);
+	// compressed_side is not owned by the object and will remains
+	// after the objet destruction
+    compressor(compression algo, generic_file *compressed_side);
+	// compressed_side is owned by the object and will be 
+	// deleted a destructor time
     ~compressor();
     
     void flush_write(); // flush all data to compressed_side, and reset the compressor 
@@ -71,7 +78,9 @@ private :
     xfer *compr, *decompr;
     generic_file *compressed;
     int tube[2];
+    bool compressed_owner;
 
+    void init(compression algo, generic_file *compressed_side);
     int (compressor::*read_ptr) (char *a, size_t size);
     int none_read(char *a, size_t size);
     int gzip_read(char *a, size_t size);

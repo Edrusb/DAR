@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.hpp,v 1.15 2002/03/25 22:02:38 denis Rel $
+// $Id: user_interaction.hpp,v 1.19 2002/05/17 16:17:48 denis Rel $
 //
 /*********************************************************************/
 
@@ -29,10 +29,17 @@
 
 using namespace std;
 
-extern void user_interaction_init(int input_filedesc, ostream &out);
+extern void user_interaction_init(int input_filedesc, ostream *out, ostream *interact);
+    // arg are the input file descriptor, output ostream object (on which are sent non interactive messages)
+    // and intereact ostream object on which are sent message that require a user interaction
+extern void user_interaction_change_non_interactive_output(ostream *out);
 extern void user_interaction_pause(string message);
 extern void user_interaction_warning(string message);
+extern ostream &user_interaction_stream();
 extern void user_interaction_set_beep(bool mode);
+extern void ui_printf(char *format, ...);
+    // sometimes easier to use printf-like call than iostream (cout << etc.)
+    //////
 extern void user_interaction_close();
 
 #endif

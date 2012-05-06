@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.11 2002/03/18 11:00:54 denis Rel $
+// $Id: tools.hpp,v 1.18 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
 
@@ -27,14 +27,28 @@
 
 #include <string>
 #include "path.hpp"
-#include "catalogue.hpp"
 #include "generic_file.hpp"
+#include "tuyau.hpp"
 
 using namespace std;
 
 extern char *tools_str2charptr(string x);
-extern void tools_write_string(generic_file & f, const string & s);
-extern void tools_read_string(generic_file & f, string & s);
+extern void tools_write_string(generic_file & f, const string & s); 
+    // add a '\0' at the end
+extern void tools_read_string(generic_file & f, string & s); 
+    // read up to '\0' char
+extern void tools_write_string_all(generic_file & f, const string & s); 
+    // '\0' has no special meaning no '\0' at the end
+extern void tools_read_string_size(generic_file & f, string & s, infinint taille); 
+    // '\0' has no special meaning
 extern infinint tools_get_filesize(const path &p);
+extern infinint tools_get_extended_size(string s);
+extern char *tools_extract_basename(const char *command_name); 
+extern void tools_split_path_basename(const char *all, path * &chemin, string & base);
+extern void tools_open_pipes(const string &input, const string & output, tuyau *&in, tuyau *&out);
+extern void tools_blocking_read(int fd, bool mode);
 
 #endif
+
+
+

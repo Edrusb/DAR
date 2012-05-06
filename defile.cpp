@@ -18,9 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: defile.cpp,v 1.7 2002/03/18 11:00:54 denis Rel $
+// $Id: defile.cpp,v 1.8 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
+
+#pragma implementation
 
 #include "defile.hpp"
 
@@ -49,7 +51,7 @@ void defile::enfile(const entree *e)
 	    
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: defile.cpp,v 1.7 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: defile.cpp,v 1.8 2002/05/15 21:56:01 denis Rel $";
     dummy_call(id);
 }
 	    

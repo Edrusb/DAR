@@ -18,13 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: testtools.cpp,v 1.8 2002/03/18 11:00:54 denis Rel $
+// $Id: testtools.cpp,v 1.9 2002/05/17 16:17:48 denis Rel $
 //
 /*********************************************************************/
 
 #include <iostream.h>
 #include "deci.hpp"
 #include "testtools.hpp"
+#include "user_interaction.hpp"
 
 void display(const infinint & x)
 {
@@ -41,7 +42,7 @@ void display_read(generic_file & f)
 	buffer[lu] = '\0';
     else
 	buffer[size-1] = '\0';
-    printf("lu = %d : [%s]\n", lu, buffer);
+    ui_printf("lu = %d : [%s]\n", lu, buffer);
 }
 
 void display_back_read(generic_file & f)
@@ -55,5 +56,5 @@ void display_back_read(generic_file & f)
 	buffer[lu] = '\0';
     else
 	buffer[size-1] = '\0';
-    printf("lu = %d : [%s]\n", lu, buffer);
+    ui_printf("lu = %d : [%s]\n", lu, buffer);
 }

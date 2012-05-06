@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.12 2002/03/25 22:02:38 denis Rel $
+// $Id: test_filesystem.cpp,v 1.14 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
 
@@ -30,6 +30,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <string.h>
+#include <iostream.h>
 #include "filesystem.hpp"
 #include "user_interaction.hpp"
 #include "test_memory.hpp"
@@ -44,7 +45,7 @@ static catalogue *cat;
 int main()
 {
     MEM_IN;
-    user_interaction_init(0, cout);
+    user_interaction_init(0, &cout, &cerr);
     cat = new catalogue();
     MEM_OUT;
     build();
@@ -110,7 +111,7 @@ static void test()
 {
     entree *p;
     
-    filesystem_set_root(path("arbo"), false, true, true);
+    filesystem_set_root(path("arbo"), false, true, true, false, false);
     filesystem_reset_read();
     while(filesystem_read(p))
     {
@@ -138,12 +139,12 @@ static void test()
 
 static void re_test()
 {
-    entree *e;
+    const entree *e;
     detruit det1 = detruit("lien", 'l' | 0x80);
     detruit det2 = detruit("dev1", 'd');
 
     cat->reset_read();
-    filesystem_set_root("algi", true, true, true);
+    filesystem_set_root("algi", true, true, true, false, false);
     filesystem_reset_write();
     
     

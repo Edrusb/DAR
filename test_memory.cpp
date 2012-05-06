@@ -18,11 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_memory.cpp,v 1.6 2002/03/18 11:00:54 denis Rel $
+// $Id: test_memory.cpp,v 1.9 2002/05/17 16:17:48 denis Rel $
 //
 /*********************************************************************/
 
 #include <list>
+#include "user_interaction.hpp"
 #include "test_memory.hpp"
 #include "erreurs.hpp"
 
@@ -39,6 +40,8 @@ struct my_alloc
 };
 
 static unsigned long total_size = 0;
+static unsigned long initial_offset = 0;
+static unsigned long initial_size = 0;
 static list <my_alloc> liste;
 
 void * operator new(size_t size) throw (bad_alloc)
@@ -82,15 +85,23 @@ unsigned long get_total_alloc_size()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: test_memory.cpp,v 1.6 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: test_memory.cpp,v 1.9 2002/05/17 16:17:48 denis Rel $";
     dummy_call(id);
+}
+
+void record_offset()
+{
+    initial_offset = liste.size();
+    initial_size = total_size;
 }
 
 void all_delete_done()
 {
-    if(liste.size() > 0)
-	cout << liste.size() << " memory allocation(s) not released ! " << " total size = " << total_size << endl;
-
+    if(liste.size() > initial_offset)
+	user_interaction_stream() << liste.size() - initial_offset << " memory allocation(s) not released ! " << " total size = " << total_size - initial_size << endl;
+    else
+	if(liste.size() < initial_offset)
+	    throw SRC_BUG;
 }
 
 void memory_check(unsigned long ref, const char *fichier, int ligne)
@@ -100,7 +111,7 @@ void memory_check(unsigned long ref, const char *fichier, int ligne)
     unsigned long current = get_total_alloc_size();
     signed long diff = current - ref;
     if(diff != 0)
-	cout << "file " << fichier << " line " << ligne << " : memory leakage detected : initial = " << ref << "   final = " << current << "  DELTA =  " << diff << endl;
+	user_interaction_stream() << "file " << fichier << " line " << ligne << " : memory leakage detected : initial = " << ref << "   final = " << current << "  DELTA =  " << diff << endl;
 }
 
 #endif

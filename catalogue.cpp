@@ -18,32 +18,146 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.30 2002/03/30 15:59:19 denis Rel $
+// $Id: catalogue.cpp,v 1.54 2002/06/27 17:42:35 denis Rel $
 //
 /*********************************************************************/
+
+#pragma implementation
 
 #include <netinet/in.h>
 #include <iostream.h>
 #include <ctype.h>
 #include <algorithm>
+#include <map>
 #include "tools.hpp"
 #include "catalogue.hpp"
 #include "tronc.hpp"
 #include "user_interaction.hpp"
 #include "deci.hpp"
+#include "header.hpp"
 
-static string local_perm(inode &ref);
-static string local_uid(inode & ref);
-static string local_gid(inode & ref);
-static string local_size(inode & ref);
-static string local_date(inode & ref);
-static string local_flag(inode & ref);
+#define INODE_FLAG_EA_MASK  0x03
+#define INODE_FLAG_EA_FULL  0x01
+#define INODE_FLAG_EA_PART  0x02
+#define INODE_FLAG_EA_NONE  0x03
+
+static version reading_ver = "00"; // version not set here
+
+static string local_perm(const inode & ref);
+static string local_uid(const inode & ref);
+static string local_gid(const inode & ref);
+static string local_size(const inode & ref);
+static string local_date(const inode & ref);
+static string local_flag(const inode & ref);
+
+void catalogue_set_reading_version(const version &ver)
+{
+    version_copy(reading_ver, ver);
+}
+
+void entree_stats::add(const entree *ref)
+{
+    if(dynamic_cast<const eod *>(ref) == NULL) // we ignore eod
+    {
+	const inode *ino = dynamic_cast<const inode *>(ref);
+	const hard_link *h = dynamic_cast<const hard_link *>(ref);
+	const detruit *x = dynamic_cast<const detruit *>(ref);
+				    
+	if(ino != NULL && h == NULL) // won't count twice the same inode if it is referenced with hard_link
+	{
+	    if(ino->get_saved_status())
+		saved++;
+	    total++;
+	}
+
+	if(x != NULL)
+	    num_x++;
+	else 
+	{ 
+	    const directory *d = dynamic_cast<const directory*>(ref);
+	    if(d != NULL)
+		num_d++;
+	    else
+	    {
+		const chardev *c = dynamic_cast<const chardev *>(ref);
+		if(c != NULL)
+		    num_c++;
+		else
+		{
+		    const blockdev *b = dynamic_cast<const blockdev *>(ref);
+		    if(b != NULL)
+			num_b++;
+		    else
+		    {
+			const tube *p = dynamic_cast<const tube *>(ref);
+			if(p != NULL)
+			    num_p++;
+			else
+			{
+			    const prise *s = dynamic_cast<const prise *>(ref);
+			    if(s != NULL)
+				num_s++;
+			    else
+			    {
+				const lien *l = dynamic_cast<const lien *>(ref);
+				if(l != NULL)
+				    num_l++;
+				else
+				{
+				    const file *f = dynamic_cast<const file *>(ref);
+				    const file_etiquette *e = dynamic_cast<const file_etiquette *>(ref);
+
+				    if(f != NULL)
+					num_f++;
+					// no else, because a "file_etiquette" is also a "file"
+				    if(e != NULL)
+					num_hard_linked_inodes++;
+				    if(h != NULL)
+					num_hard_link_entries++;
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}	
+    }
+}
+			
+void entree_stats::listing(ostream & flux) const
+{
+    flux << endl << "CATALOGUE CONTENTS :" << endl << endl;
+    flux << "total number of inode : " << total << endl;
+    flux << "saved inode           : " << saved << endl;
+    flux << "distribution of inodes" << endl;
+    flux << " - directories        : " << num_d << endl;
+    flux << " - plain files        : " << num_f << endl;
+    flux << " - symbolic links     : " << num_l << endl;
+    flux << " - named pipes        : " << num_p << endl;
+    flux << " - unix sockets       : " << num_s << endl;
+    flux << " - character devices  : " << num_c << endl;
+    flux << " - block devices      : " << num_b << endl;
+    flux << "hard links informations" << endl;
+    flux << "   number of file inode with hard links : " << num_hard_linked_inodes << endl;
+    flux << "   total number of hard links           : " << num_hard_link_entries << endl;
+    flux << "destroyed entries informations" <<endl;
+    flux << "   " << num_x << " file(s) have been record as destroyed since backup of reference" << endl;
+    flux << endl;
+}
+
+map <infinint, file_etiquette *> entree::corres;
+entree_stats entree::stats;
 
 entree *entree::read(generic_file & f)
 {
     char type;
     bool saved;
     entree *ret = NULL;
+    map <infinint, file_etiquette *>::iterator it;
+    infinint tmp;
+    hard_link *ptr_l = NULL;
+    file_etiquette *ptr_e = NULL;
+    
     int lu =  f.read(&type, 1);
 
     if(lu == 0)
@@ -85,14 +199,29 @@ entree *entree::read(generic_file & f)
 	    throw Erange("entree::read", "corrupted file");
 	ret = new detruit(f);
 	break;
-    case 'i':
-	if(!saved)
+    case 'h':
+	ret = ptr_l = new hard_link(f, tmp);
+	if(ptr_l == NULL)
+	    throw Ememory("entree::read");
+	it = corres.find(tmp);
+	if(it != corres.end())
+	    ptr_l->set_reference(it->second);
+	else
 	    throw Erange("entree::read", "corrupted file");
-	ret = new ignored(f);
+	break;
+    case 'e':
+	ret = ptr_e = new file_etiquette(f, saved);
+	if(ret == NULL)
+	    throw Ememory("entree::read");
+	if(corres.find(ptr_e->get_etiquette()) != corres.end())
+	    throw SRC_BUG;
+	corres[ptr_e->get_etiquette()] = ptr_e;
+	break;
     default :
 	throw Erange("entree::read", "unknown type of data in catalogue");
     }
 
+    stats.add(ret);
     return ret;
 }
 
@@ -100,6 +229,21 @@ void entree::dump(generic_file & f) const
 { 
     char s = signature();
     f.write(&s, 1);
+}
+
+bool compatible_signature(unsigned char a, unsigned char b)
+{
+    a = tolower(a);
+    b = tolower(b);
+
+    switch(a)
+    {
+    case 'e':
+    case 'f':
+	return b == 'e' || b == 'f';
+    default:
+	return b == a;
+    }
 }
 
 nomme::nomme(generic_file & f)
@@ -113,6 +257,10 @@ void nomme::dump(generic_file & f) const
     tools_write_string(f, xname);
 }
 
+generic_file *inode::storage = NULL;
+
+bool inode::ignore_owner = false;
+
 inode::inode(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
 	     const infinint & last_access, 
 	     const infinint & last_modif, 
@@ -124,14 +272,43 @@ inode::inode(unsigned short int xuid, unsigned short int xgid, unsigned short in
     last_acc = last_access;
     last_mod = last_modif;
     xsaved = false;
+	// ea
+    ea_saved = ea_none;
+    ea_offset = 0;
+    ea = NULL;
+    last_cha = 0;
+    clear(ea_crc);
 }
 
 inode::inode(generic_file & f, bool saved) : nomme(f)
 {
     unsigned short int tmp;
+    unsigned char flag;
 
     xsaved = saved;
 
+    if(version_greater(reading_ver, "01"))
+    {
+	f.read((char *)(&flag), 1);
+	flag &= INODE_FLAG_EA_MASK;
+	switch(flag)
+	{
+	case INODE_FLAG_EA_FULL:
+	    ea_saved = ea_full;
+	    break;
+	case INODE_FLAG_EA_PART:
+	    ea_saved = ea_partial;
+	    break;
+	case INODE_FLAG_EA_NONE:
+	    ea_saved = ea_none;
+	    break;
+	default:
+	    throw Erange("inode::inode", "badly structured inode: unknown inode flag");
+	}
+    }
+    else 
+	ea_saved = ea_none;
+	
     if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
 	throw Erange("inode::inode", "missing data to build an inode");
     uid = ntohs(tmp);
@@ -143,27 +320,161 @@ inode::inode(generic_file & f, bool saved) : nomme(f)
     perm = ntohs(tmp);
     last_acc.read_from_file(f);
     last_mod.read_from_file(f);
+    switch(ea_saved)
+    {
+    case ea_full:
+	ea_offset.read_from_file(f);
+	f.read((char *)ea_crc, CRC_SIZE);
+	last_cha.read_from_file(f);
+	break;
+    case ea_partial:
+	ea_offset = 0;
+	clear(ea_crc);
+	last_cha.read_from_file(f);
+	break;
+    case ea_none:
+	ea_offset = 0;
+	clear(ea_crc);
+	last_cha = 0;
+	break;
+    default:
+	throw SRC_BUG;
+    }
+    ea = NULL; // in any case
+
+	// to be able later to read EA from file
+    storage = &f;
+}
+
+inode::inode(const inode & ref) : nomme(ref)
+{
+    uid = ref.uid;
+    gid = ref.gid;
+    perm = ref.perm;
+    last_acc = ref.last_acc;
+    last_mod = ref.last_mod;
+    xsaved = ref.xsaved;
+    ea_saved = ref.ea_saved;
+    switch(ea_saved)
+    {
+    case ea_full:
+	ea_offset = ref.ea_offset;	
+	copy_crc(ea_crc, ref.ea_crc);
+	if(ref.ea != NULL) // might be NULL if build from a file
+	{
+	    ea = new ea_attributs(*ref.ea);
+	    if(ea == NULL)
+		throw Ememory("inode::inode(const inode &)");
+	}
+	else
+	    ea = NULL;
+	last_cha = ref.last_cha;
+	break;
+    case ea_partial:
+	last_cha = ref.last_cha;
+	ea_offset = 0;
+	ea = NULL;
+	break;
+    case ea_none:
+	ea_offset = 0;
+	last_cha = 0;
+	ea = NULL;
+	break;
+    default:
+	throw SRC_BUG;
+    }
 }
  
 bool inode::same_as(const inode & ref) const
 {
-    return nomme::same_as(ref) && (tolower(ref.signature()) == tolower(signature()));
+    return nomme::same_as(ref) && compatible_signature(ref.signature(), signature());
 }
 
 bool inode::is_more_recent_than(const inode & ref) const
 {
-    if(same_as(ref))
-	return ref.last_mod != last_mod || uid != ref.uid || gid != ref.gid || perm != ref.perm;
-    else
-	throw SRC_BUG; // not the same inode !
+    return ref.last_mod < last_mod 
+	|| (!ignore_owner && uid != ref.uid)
+	|| (!ignore_owner && gid != ref.gid)
+	|| perm != ref.perm;
 }
     
+bool inode::has_changed_since(const inode & ref) const
+{
+    return ref.last_mod != last_mod 
+	|| (!ignore_owner && uid != ref.uid)
+	|| (!ignore_owner && gid != ref.gid)
+	|| perm != ref.perm;
+}
+
+void inode::compare(const inode &other, bool root_ea, bool user_ea) const
+{
+    if(!same_as(other))
+	throw Erange("inode::compare","different file type");
+    if(!ignore_owner && get_uid() != other.get_uid())
+	throw Erange("inode.compare", "different owner");
+    if(!ignore_owner && get_gid() != other.get_gid())
+	throw Erange("inode.compare", "different owner group");
+    if(get_perm() != other.get_perm())
+	throw Erange("inode.compare", "different permission");
+    sub_compare(other);
+    if(root_ea || user_ea)
+    {
+	switch(ea_get_saved_status())
+	{
+	case ea_full:
+	    if(other.ea_get_saved_status() == ea_full)
+	    {
+		const ea_attributs *me = get_ea(); // this pointer must not be freed
+		const ea_attributs *you = other.get_ea(); // this pointer must not be freed too
+		if(me->diff(*you, root_ea, user_ea))
+		    throw Erange("inode::compare", "different Extended Attributes");
+	    }
+	    else
+		throw Erange("inode::compare", "no Extended Attributs to compare with");
+		// else we ignore the EA present in the argument, 
+		// this is not a symetrical comparison
+		// we check that all data in current object are the same in the argument
+		// but additional data can reside in the argument
+	    break;
+	case ea_partial:
+	    if(other.ea_get_saved_status() != ea_none)
+	    {
+		if(get_last_change() < other.get_last_change())
+		    throw Erange("inode::compare", "inode last change date (ctime) greater, EA might be different");
+	    }
+	    else
+		throw Erange("inode::compare", "No extended Attributs to compare with");
+	    break;
+	case ea_none:
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+    }
+}
+
 void inode::dump(generic_file & r) const
 {
     unsigned short int tmp;
+    unsigned char flag = 0;
 
+    switch(ea_saved)
+    {
+    case ea_none:
+	flag |= INODE_FLAG_EA_NONE;
+	break;
+    case ea_partial:
+	flag |= INODE_FLAG_EA_PART;
+	break;
+    case ea_full:
+	flag |= INODE_FLAG_EA_FULL;
+	break;
+    default:
+	throw SRC_BUG; // unknown value for ea_saved
+    }
     nomme::dump(r);
 
+    r.write((char *)(&flag), 1);
     tmp = htons(uid);
     r.write((char *)&tmp, sizeof(tmp));
     tmp = htons(gid);
@@ -172,7 +483,124 @@ void inode::dump(generic_file & r) const
     r.write((char *)&tmp, sizeof(tmp));
     last_acc.dump(r);
     last_mod.dump(r);
+    switch(ea_saved)
+    {
+    case ea_full:
+	ea_offset.dump(r);
+	r.write((char *)ea_crc, CRC_SIZE);
+	    // no break
+    case ea_partial:
+	last_cha.dump(r);
+	break;
+    case ea_none:
+	break;
+    default:
+	throw SRC_BUG;
+    }
 }
+
+void inode::ea_set_saved_status(ea_status status)
+{
+    if(status == ea_saved)
+	return;
+    switch(status)
+    {
+    case ea_none:
+	if(ea != NULL)
+	{
+	    delete ea;
+	    ea = NULL;
+	}
+	break;
+    case ea_full:
+	if(ea != NULL)
+	    throw SRC_BUG;
+	ea_offset = 0;
+	last_cha = 0;	
+	break;
+    case ea_partial:
+	if(ea != NULL)
+	{
+	    delete ea;
+	    ea = NULL;
+	}
+	break;
+    default:
+	throw SRC_BUG;
+    }
+    ea_saved = status;
+}
+
+void inode::ea_attach(ea_attributs *ref)
+{ 
+    if(ref != NULL && ea == NULL) 
+	ea = ref; 
+    else 
+	throw SRC_BUG; 
+    if(ea_saved != ea_full)
+	throw SRC_BUG;
+}
+
+const ea_attributs *inode::get_ea() const 
+{ 
+    if(ea_saved == ea_full)
+	if(ea != NULL)
+	    return ea; 
+	else
+	    if(ea_offset != 0 && storage != NULL)
+	    {
+		crc val;
+		storage->skip(ea_offset);
+		storage->reset_crc();
+		try
+		{
+		    const_cast<ea_attributs *&>(ea) = new ea_attributs(*storage);
+		    if(ea == NULL)
+			throw Ememory("inode::get_ea");
+		}
+		catch(...)
+		{
+		    storage->get_crc(val); // keeps storage in coherent status
+		    throw;
+		}
+		storage->get_crc(val);
+		if(!same_crc(val, ea_crc))
+		    throw Erange("inode::get_ea", "CRC error detected while reading EA");
+		return ea;
+	    }
+	    else
+		throw SRC_BUG;
+    else 
+	throw SRC_BUG; 
+}
+
+void inode::ea_detach() const
+{ 
+    if(ea != NULL) 
+    { 
+	delete ea; 
+	const_cast<ea_attributs *&>(ea) = NULL; 
+    } 
+}
+
+infinint inode::get_last_change() const
+{ 
+    if(ea_saved != ea_none) 
+	return last_cha; 
+    else 
+	throw SRC_BUG; 
+}
+
+void inode::set_last_change(const infinint & x_time) 
+{ 
+    if(ea_saved != ea_none) 
+	last_cha = x_time; 
+    else 
+	throw SRC_BUG; 
+}
+
+compression file::algo = none;
+generic_file *file::loc = NULL;
 
 file::file(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
 	   const infinint & last_access, 
@@ -181,22 +609,37 @@ file::file(unsigned short int xuid, unsigned short int xgid, unsigned short int 
 	   const path & che,
 	   const infinint & taille) : inode(xuid, xgid, xperm, last_access, last_modif, src), chemin(che + src)
 {
-    from_path = true;
+    status = from_path;
     offset = 0;
     size = taille;
-    loc = NULL;
+    storage_size = 0;
     set_saved_status(true);
 }
 
 file::file(generic_file & f, bool saved) : inode(f, saved), chemin("vide")
 {
-    from_path = false;
+    status = from_cat;
     size.read_from_file(f);
     if(saved)
+    {
 	offset.read_from_file(f);
+	if(version_greater(reading_ver, "01"))
+	    storage_size.read_from_file(f);
+	else
+	    storage_size = 2*size; 
+	    // compressed file should be less twice 
+	    // larger than original file 
+	    // (in case the compression is very bad
+	    // and takes more place than no compression !)
+    }
     else
+    {
 	offset = 0;
-    loc = &f;
+	storage_size = 0;
+    }
+    if(version_greater(reading_ver, "01"))
+	if(f.read(check, CRC_SIZE) != CRC_SIZE)
+	    throw Erange("file::file", "can't read CRC data");
 }    
 
 void file::dump(generic_file & f) const
@@ -204,7 +647,12 @@ void file::dump(generic_file & f) const
     inode::dump(f);
     size.dump(f);
     if(get_saved_status())
+    {
 	offset.dump(f);
+	storage_size.dump(f);
+    }
+    if(f.write((char *)check, CRC_SIZE) != CRC_SIZE)
+	throw Erange("file::dump", "cannot dump CRC data to file");
 }
 
 bool file::is_more_recent_than(const inode & ref) const
@@ -216,6 +664,15 @@ bool file::is_more_recent_than(const inode & ref) const
 	throw SRC_BUG;
 }
 
+bool file::has_changed_since(const inode & ref) const
+{
+    const file *tmp = dynamic_cast<const file *>(&ref);
+    if(tmp != NULL)
+	return inode::has_changed_since(*tmp) || size != tmp->size;
+    else
+	throw SRC_BUG;
+}
+
 generic_file *file::get_data() const
 {
     generic_file *ret;
@@ -223,13 +680,31 @@ generic_file *file::get_data() const
     if(!get_saved_status())
 	throw Erange("file::get_data", "cannot provide data from a \"not saved\" file object");
     
-    if(from_path)
+    if(status == empty)
+	throw Erange("file::get_data", "data has been cleaned, object is now empty");
+    
+    if(status == from_path)
 	ret = new fichier(chemin, gf_read_only);
     else
-	if(loc->get_mode() == gf_write_only)
-	    throw SRC_BUG; // cannot get data from a write-only file !!!
+	if(loc == NULL)
+	    throw SRC_BUG; // set_archive_localisation never called or with a bad argument
 	else
-	    ret = new tronc(loc, offset, size, gf_read_only);
+	    if(loc->get_mode() == gf_write_only)
+		throw SRC_BUG; // cannot get data from a write-only file !!! 
+	    else
+	    {
+		tronc *tmp = new tronc(loc, offset, storage_size, gf_read_only);
+		if(tmp == NULL)
+		    throw Ememory("file::get_data");
+		if(size > 0)
+		{
+		    ret = new compressor(get_compression_algo_used(), tmp);
+		    if(ret == NULL)
+			delete tmp;
+		}
+		else
+		    ret = tmp;
+	    }
 
     if(ret == NULL)
 	throw Ememory("file::get_data");
@@ -237,10 +712,120 @@ generic_file *file::get_data() const
 	return ret;
 }
 
+void file::clean_data()
+{
+    switch(status)
+    {
+    case from_path:
+	chemin = "/"; // smallest possible memory allocation
+	break;
+    case from_cat:
+	offset = 0; // smallest possible memory allocation
+	    // warning, cannot change "size", as it is dump() in catalogue later
+	break;
+    case empty:
+	    // nothing to do
+	break;
+    default:
+	throw SRC_BUG;
+    }
+    status = empty;
+}
+
 void file::set_offset(const infinint & r)
 {
+    if(status != from_path)
+	throw SRC_BUG;
     set_saved_status(true);
     offset = r;
+}
+
+bool file::get_crc(crc & c) const
+{ 
+    if(version_greater(reading_ver, "01"))
+    {
+	copy_crc(c, check);
+	return true;
+    }
+    else
+	return false;
+}
+
+void file::sub_compare(const inode & other) const
+{
+    const file *f_other = dynamic_cast<const file *>(&other);
+    if(f_other == NULL)
+	throw SRC_BUG; // inode::compare should have called us with a correct argument
+
+    if(get_size() != f_other->get_size())
+	throw Erange("file::sub_compare", "not same size");
+    if(get_saved_status() && f_other->get_saved_status())
+    {
+	generic_file *me = get_data();
+	if(me == NULL)
+	    throw SRC_BUG;
+	try
+	{
+	    generic_file *you = f_other->get_data();
+	    if(you == NULL)
+		throw SRC_BUG;
+	    try
+	    {
+		if(me->diff(*you))
+		    throw Erange("file::sub_compare", "different file data");
+	    }
+	    catch(...)
+	    {
+		delete you;
+		throw;
+	    }
+	    delete you;
+	}
+	catch(...)
+	{
+	    delete me;
+	    throw;
+	}
+	delete me;
+    }
+}
+
+infinint file_etiquette::compteur = 0;
+
+file_etiquette::file_etiquette(generic_file &f, bool saved) : file(f, saved)
+{
+    etiquette.read_from_file(f);
+    if(etiquette >= compteur)
+	compteur = etiquette + 1;
+}
+
+void file_etiquette::dump(generic_file &f) const
+{
+    file::dump(f);
+    etiquette.dump(f);
+}
+
+hard_link::hard_link(const string & name, file_etiquette *ref) : nomme(name) 
+{
+    set_reference(ref);
+}
+
+hard_link::hard_link(generic_file & f, infinint & etiquette) : nomme(f)
+{
+    etiquette.read_from_file(f);
+}
+
+void hard_link::dump(generic_file &f) const
+{
+    nomme::dump(f);
+    get_etiquette().dump(f);
+}
+ 
+void hard_link::set_reference(file_etiquette *ref)
+{   
+    if(ref == NULL) 
+	throw SRC_BUG;
+    x_ref = ref; 
 }
 
 lien::lien(short int uid, short int gid, short int perm, 
@@ -270,6 +855,17 @@ void lien::set_target(string x)
 {
     set_saved_status(true);
     points_to = x; 
+}
+
+void lien::sub_compare(const inode & other) const
+{
+    const lien *l_other = dynamic_cast<const lien *>(&other);
+    if(l_other == NULL)
+	throw SRC_BUG; // bad argument inode::compare has a bug
+
+    if(get_saved_status() && l_other->get_saved_status())
+	if(get_target() != l_other->get_target())
+	    throw Erange("lien:sub_compare", "symbolic link does not point to the same target");
 }
 
 void lien::dump(generic_file & f) const
@@ -414,18 +1010,23 @@ void directory::clear()
     it = fils.begin();
 }
 
-void directory::listing(ostream & flux, string marge)
+void directory::listing(ostream & flux, string marge) const
 {
-    vector<nomme *>::iterator it = fils.begin();
+    vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
     while(it != fils.end())
     {
-	directory *d = dynamic_cast<directory *>(*it);
-	detruit *det = dynamic_cast<detruit *>(*it);
-	inode *ino = dynamic_cast<inode *>(*it);
+	const directory *d = dynamic_cast<directory *>(*it);
+	const detruit *det = dynamic_cast<detruit *>(*it);
+	const inode *ino = dynamic_cast<inode *>(*it);
+	const hard_link *hard = dynamic_cast<hard_link *>(*it);
 
 	if(det != NULL)
-	    flux << marge << "[ destroyed file or directory ]    " << (*it++)->get_name() << endl; 
+	    flux << marge << "[ destroyed file or directory ]    " << (*it)->get_name() << endl; 
 	else
+	{
+	    if(hard != NULL)
+		ino = hard->get_inode();
+
 	    if(ino == NULL)
 		throw SRC_BUG;
 	    else
@@ -435,12 +1036,15 @@ void directory::listing(ostream & flux, string marge)
 		     << "   " << local_size(*ino) 
 		     << "   " << local_date(*ino)
 		     << "   " << local_flag(*ino)
-		     << "   " << (*it++)->get_name() << endl; 
+		     << "   " << (*it)->get_name() << endl; 
+	}
+
 	if(d != NULL)
 	{
 	    d->listing(flux, marge + "|  ");
-	    cout << marge << "+--- " <<endl;
+	    user_interaction_stream() << marge << "+--- " <<endl;
 	}
+	it++;
     }
 }
 
@@ -501,6 +1105,20 @@ void device::dump(generic_file & f) const
     }
 }
 
+void device::sub_compare(const inode & other) const
+{
+    const device *d_other = dynamic_cast<const device *>(&other);
+    if(d_other == NULL)
+	throw SRC_BUG; // bug in inode::compare 
+    if(get_saved_status() && d_other->get_saved_status())
+    {
+	if(get_major() != d_other->get_major())
+	    throw Erange("device::sub_compare", "devices have not the same major number");
+	if(get_minor() != d_other->get_minor())
+	    throw Erange("device::sub_compare", "devices have not the same minor number");
+    }
+}
+
 void ignored_dir::dump(generic_file & f) const
 {
     directory tmp = directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_name());
@@ -517,6 +1135,7 @@ catalogue::catalogue() : out_compare("/")
     current_add = contenu;
     current_read = contenu;
     sub_tree = NULL;
+    stats.clear();
 }
 
 catalogue::catalogue(generic_file & f) : out_compare("/")
@@ -526,8 +1145,9 @@ catalogue::catalogue(generic_file & f) : out_compare("/")
 
     f.read(&a, 1); // need to read the signature before constructing "contenu"
     if(tolower(a) != 'd')
-	throw Erange("catalogue::catalogue(generic_file &)", "Incoherent catalogue structure");
+	throw Erange("catalogue::catalogue(generic_file &)", "incoherent catalogue structure");
 
+    entree::reset_read();
     contenu = new directory(f, islower(a));
     if(contenu == NULL)
 	throw Ememory("catalogue::catalogue(path)");
@@ -535,6 +1155,8 @@ catalogue::catalogue(generic_file & f) : out_compare("/")
     current_add = contenu;
     current_read = contenu;
     sub_tree = NULL;
+    stats = entree::get_stats();
+    entree::freemem(); // free memory from hard_link map
 }
 
 catalogue & catalogue::operator = (const catalogue &ref)
@@ -742,6 +1364,7 @@ void catalogue::add(entree *ref)
 	current_add->add_children(n);
 	if(t != NULL) // ref is a directory
 	    current_add = t;
+	stats.add(ref);
     }
     else // ref is an eod
     {
@@ -791,7 +1414,7 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 	
 	return false;
     }
-    else
+    else // scanning an existing directory
     {
 	nomme *found;
 
@@ -814,6 +1437,14 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 	    const detruit *dst_det = dynamic_cast<const detruit *>(found);
 	    const inode *src_ino = dynamic_cast<const inode *>(nom);
 	    const inode *dst_ino = dynamic_cast<const inode *>(found);
+	    const etiquette *src_eti = dynamic_cast<const etiquette *>(nom);
+	    const etiquette *dst_eti = dynamic_cast<const etiquette *>(found);
+	    
+		// extracting inode from hard links
+	    if(src_eti != NULL)
+		src_ino = src_eti->get_inode();
+	    if(dst_eti != NULL)
+		dst_ino = dst_eti->get_inode();
 	 
 		// updating internal structure to follow directory tree :
 	    if(dir != NULL)
@@ -826,7 +1457,7 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 	    }
 
 		// now comparing the objects :
-	    if(src_ino != NULL) // thus dst_ino != NULL but let's double check :
+	    if(src_ino != NULL) 
 		if(dst_ino != NULL)
 		{
 		    if(!src_ino->same_as(*dst_ino))
@@ -846,7 +1477,10 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 		else
 		    throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a nomme which is neither detruit nor inode !
 	    
-	    extracted = found;
+	    if(dst_eti != NULL)
+		extracted = dst_eti->get_inode();
+	    else
+		extracted = found;
 	    return true;
 	}
 	else
@@ -914,9 +1548,16 @@ infinint catalogue::update_destroyed_with(catalogue & ref)
     return count;
 }
 
+void catalogue::listing(ostream & flux, string marge)
+{
+    flux << "access mode | uid | gid | size |          date         |  status [data][EA] |   filename" << endl;
+    flux << "------------+-----+-----+------+-----------------------+--------------------+-----------" << endl;
+    contenu->listing(flux, marge); 
+}
+
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: catalogue.cpp,v 1.30 2002/03/30 15:59:19 denis Rel $";
+    static char id[]="$Id: catalogue.cpp,v 1.54 2002/06/27 17:42:35 denis Rel $";
     dummy_call(id);
 }
 
@@ -940,6 +1581,7 @@ void catalogue::partial_copy_from(const catalogue & ref)
     else
 	sub_tree = NULL;
     sub_count = ref.sub_count;
+    stats = ref.stats;
 }
 
 void catalogue::detruire()
@@ -950,10 +1592,11 @@ void catalogue::detruire()
 	delete sub_tree;
 }
 
+
 const eod catalogue::r_eod;
 
 
-static string local_perm(inode &ref)
+static string local_perm(const inode &ref)
 {
     string ret = "";
     unsigned int perm = ref.get_perm();
@@ -961,6 +1604,8 @@ static string local_perm(inode &ref)
     char type = tolower(ref.signature());
     if(type == 'f')
 	type = '-';
+    if(type == 'e')
+	type = 'h';
     ret += type;
     if((perm & 0400) != 0)
 	ret += 'r';
@@ -1020,7 +1665,7 @@ static string local_perm(inode &ref)
     return ret;
 }
 
-static string local_uid(inode & ref)
+static string local_uid(const inode & ref)
 {
     string ret = "";
     infinint tmp = ref.get_uid();
@@ -1030,7 +1675,7 @@ static string local_uid(inode & ref)
     return ret;
 }
 
-static string local_gid(inode & ref)
+static string local_gid(const inode & ref)
 {
     string ret = "";
     infinint tmp = ref.get_gid();
@@ -1040,11 +1685,11 @@ static string local_gid(inode & ref)
     return ret;
 }
 
-static string local_size(inode & ref)
+static string local_size(const inode & ref)
 {
     string ret;
 
-    file *fic = dynamic_cast<file *>(&ref);
+    const file *fic = dynamic_cast<const file *>(&ref);
     if(fic != NULL)
     {
 	deci d = fic->get_size();
@@ -1056,7 +1701,7 @@ static string local_size(inode & ref)
     return ret;
 }
 
-static string local_date(inode & ref)
+static string local_date(const inode & ref)
 {
     string ret;
     infinint quand = ref.get_last_modif();
@@ -1065,10 +1710,10 @@ static string local_date(inode & ref)
     quand.unstack(pas);
     ret = ctime((time_t *) &pas);
 
-    return string(ret.begin(), ret.end() - 1);
+    return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n' 
 }
     
-static string local_flag(inode & ref)
+static string local_flag(const inode & ref)
 {
     string ret;
 
@@ -1076,8 +1721,19 @@ static string local_flag(inode & ref)
 	ret = "[Saved]";
     else
 	ret = "[     ]";
-
+    switch(ref.ea_get_saved_status())
+    {
+    case inode::ea_full:
+	ret += "[Saved]";
+	break;
+    case inode::ea_partial:
+	ret += "[NoChg]";
+	break;
+    case inode::ea_none:
+	ret += "[     ]";
+	break;
+    default:
+	throw SRC_BUG;
+    }
     return ret;
 }
-
-

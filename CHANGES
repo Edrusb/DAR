@@ -1,0 +1,52 @@
+from version 1.0.0 to version 1.0.1 
+- correction of few mistakes that lead the compilation to fail with certain 
+      C++ compilers
+- bug #1 fixed.
+
+from version 1.0.1 to version 1.0.2
+- bug #2 fixed
+- bug #3 fixed
+
+from version 1.0.2 to version 1.0.3
+- bug #5 fixed
+
+from version 1.0.0 to version 1.1.0
+- added feature: now ignored directory are not stored at all in the archive
+      unless -D option is used, in which case ignored directory are recorded as
+      empty dir (as it was in 1.0.x)
+- added support for hard links. Generated archive format version is now 02, but
+      format 01 can still be read, and use as reference.
+- fixed bug #1
+- fixed bug #2
+- fixed bug #3
+- added feature: restore only more recent file than existing one (-r option)
+- added feature: support for Extended Attributes (activated at compilation)
+- added feature: verbose option (-v) with -l (add archive contents)
+- modified behaviour: -l option without -v is no more interactive
+- added feature: archive integrity test (option -t). CRC have been added in
+      the archive (format 02), thus even without compression Dar is able to 
+      detect errors.
+- added feature: comparison with filesystem (difference) (option -d)
+- modified behaviour: non interactive messages goes to stdout, while those
+      asking user, goes to stderr (all goes to stderr if stdout is used for
+      producing the archive, or for sending orders do dar_slave.
+- added feature: DAR automatically goes in non interactive mode if no terminal
+      is found on standart input (for example when run from crontab). In that
+      case any question make DAR to abort.
+- added feature: catalogue extraction to small file: "isolation" (-C option)
+- added feature: archive produced on stdout when using -c or -C with "-" as 
+      filename
+- added feature: -V option summarises version of the binary
+- added feature: additional command "dar_xform" to "re-slice" an archive
+- added feature: read archive trough a pair of pipes with the help of dar_slave
+- added feature: long option are now available (see man page)
+- fixed bug #5
+- a lot of speed optimisation in algorithm
+- changed exit codes to positive values in case of error
+- dar returns an new error code when an operation is partially successful 
+  (some filed missed to be saved / restored / tested / compared).
+- replace the use of vform() method by a customised simple implementation 
+  in the ui_printf() routine, this should now allow compilation with gcc-3
+- changed long option that used an underscore character (`_') by a dash ('-')
+- added -O option to have a better behaviour when used with non root user
+- added 'make doc' option in the makefile

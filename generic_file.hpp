@@ -18,16 +18,24 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.13 2002/03/18 11:00:54 denis Rel $
+// $Id: generic_file.hpp,v 1.22 2002/06/11 17:46:32 denis Rel $
 //
 /*********************************************************************/
 
 #ifndef GENERIC_FILE_HPP
 #define GENERIC_FILE_HPP
 
+#pragma interface
+
 #include <unistd.h>
 #include "infinint.hpp"
 #include "path.hpp"
+
+#define CRC_SIZE 2
+typedef char crc[CRC_SIZE];
+extern void clear(crc & value);
+extern void copy_crc(crc & dst, const crc & src);
+extern bool same_crc(const crc &a, const crc &b);
 
 enum gf_mode { gf_read_only, gf_write_only, gf_read_write };
 
@@ -40,10 +48,13 @@ enum gf_mode { gf_read_only, gf_write_only, gf_read_write };
 // this it is blocked until all bytes are written or occures an exception
 // thus the returned value is always the value of the size argument.
 
+extern gf_mode generic_file_get_mode(int fd);
+extern const string generic_file_get_name(gf_mode mode);
+
 class generic_file
 {
 public :
-    generic_file(gf_mode m) { rw = m; };
+    generic_file(gf_mode m) { rw = m; clear(value); crc_offset = 0; enable_crc(false); };
     virtual ~generic_file() {};
     
     gf_mode get_mode() const { return rw; };
@@ -56,16 +67,37 @@ public :
     virtual infinint get_position() = 0;
     
     void copy_to(generic_file &ref);
+    void copy_to(generic_file &ref, crc & value);
+	// generates CRC on copied data
     unsigned long copy_to(generic_file &ref, unsigned long int size); // returns the number of byte effectively copied
     infinint copy_to(generic_file &ref, infinint size); // returns the number of byte effectively copied
+    bool diff(generic_file & f); // return true if arg differs from "this"
+
+	// CRC on read or writen data
+    void reset_crc();
+    void get_crc(crc & val) { enable_crc(false); copy_crc(val, value); };
 
 protected :
     void set_mode(gf_mode x) { rw = x; };
     virtual int inherited_read(char *a, size_t size) = 0;
+	// must provide as much byte as requested up to end of file
+	// stay blocked if not enough available
+	// returning zero or less than requested means end of file
     virtual int inherited_write(char *a, size_t size) = 0;
+	// must write all data or block or throw exceptions
+	// thus always returns the second argument
 
 private :
     gf_mode rw;
+    crc value;
+    int crc_offset;
+    int (generic_file::* active_read)(char *a, size_t size);
+    int (generic_file::* active_write)(char *a, size_t size);
+
+    void enable_crc(bool mode);
+    void compute_crc(char *a, int size);
+    int read_crc(char *a, size_t size);
+    int write_crc(char *a, size_t size);
 };
 
 class fichier : public generic_file

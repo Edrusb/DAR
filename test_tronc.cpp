@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tronc.cpp,v 1.9 2002/03/18 11:00:54 denis Rel $
+// $Id: test_tronc.cpp,v 1.11 2002/06/12 18:38:00 denis Rel $
 //
 /*********************************************************************/
 
@@ -29,11 +29,14 @@
 #include "tronc.hpp"
 #include "deci.hpp"
 #include "testtools.hpp"
+#include "user_interaction.hpp"
 
 int main()
 {
     path p = "test/source.txt";
     fichier h = fichier(p, gf_read_only);
+
+    user_interaction_init(0,&cout, &cerr);
     display_read(h);
     
     try
@@ -42,35 +45,26 @@ int main()
 	tronc *t;
 	
 	t = new tronc(&f, 0, 10);
-	deci d = t->get_position();
-	cout << d.human() << endl;
-	d = f.get_position();
-	cout << d.human() << endl;
+	t->skip(0);
+	cout << t->get_position() << endl;
+	cout << f.get_position() << endl;
 	
 	display_read(*t);
-	d = t->get_position();
-	cout << d.human() << endl;
-	d = f.get_position();
-	cout << d.human() << endl;
+	cout << t->get_position() << endl;
+	cout << f.get_position() << endl;
 	
 	display_read(*t);
-	d = t->get_position();
-	cout << d.human() << endl;
-	d = f.get_position();
-	cout << d.human() << endl;
+	cout << t->get_position() << endl;
+	cout << f.get_position() << endl;
 	
 	delete t;
 	t = new tronc(&f, 50, 5);
-	d = t->get_position();
-	cout << d.human() << endl;
-	d = f.get_position();
-	cout << d.human() << endl;
+	cout << t->get_position() << endl;
+	cout << f.get_position() << endl;
 
 	display_read(*t);
-	d = t->get_position();
-	cout << d.human() << endl;
-	d = f.get_position();
-	cout << d.human() << endl;
+	cout << t->get_position() << endl;
+	cout << f.get_position() << endl;
 
 	delete t;
 	int fd = open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC);
@@ -110,6 +104,3 @@ int main()
 	f.dump();
     }
 }
-
-    
-    

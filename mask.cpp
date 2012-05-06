@@ -18,9 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.cpp,v 1.11 2002/03/18 11:00:54 denis Rel $
+// $Id: mask.cpp,v 1.13 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
+
+#pragma implementation
 
 #include <fnmatch.h>
 #include "tools.hpp"
@@ -90,29 +92,31 @@ void et_mask::add_mask(const mask& toadd)
 
 bool et_mask::is_covered(const string & expression) const 
 {
-    vector<mask *const>::iterator it = lst.begin();
+    vector<mask *>::iterator it = const_cast<et_mask &>(*this).lst.begin();
+    vector<mask *>::iterator fin = const_cast<et_mask &>(*this).lst.end();
  
     if(lst.size() == 0)
 	throw Erange("et_mask::is_covered", "no mask in the list of mask to AND");
 
-    while(it != lst.end() && (*it)->is_covered(expression))
+    while(it != fin && (*it)->is_covered(expression))
 	it++;
 
-    return it == lst.end();
+    return it == fin;
 }
 
 void et_mask::copy_from(const et_mask &m)
 {
-    vector<mask *const>::iterator it = m.lst.begin();
+    vector<mask *>::iterator it = const_cast<et_mask &>(m).lst.begin();
+    vector<mask *>::iterator fin = const_cast<et_mask &>(m).lst.end();
     mask *tmp;
 
-    while(it != m.lst.end() && (tmp = (*it)->clone()) != NULL)
+    while(it != fin && (tmp = (*it)->clone()) != NULL)
     {
 	lst.push_back(tmp);
 	it++;
     }
 
-    if(it != m.lst.end())
+    if(it != fin)
     {
 	detruit();
 	throw Ememory("et_mask::copy_from");
@@ -133,21 +137,22 @@ void et_mask::detruit()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: mask.cpp,v 1.11 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: mask.cpp,v 1.13 2002/05/15 21:56:01 denis Rel $";
     dummy_call(id);
 }
 
 bool ou_mask::is_covered(const string & expression) const 
 {
-    vector<mask *const>::iterator it = lst.begin();
+    vector<mask *>::iterator it = const_cast<ou_mask &>(*this).lst.begin();
+    vector<mask *>::iterator fin = const_cast<ou_mask &>(*this).lst.end();
     
     if(lst.size() == 0)
 	throw Erange("et_mask::is_covered", "no mask in the list of mask to OR");
 
-    while(it != lst.end() && ! (*it)->is_covered(expression))
+    while(it != fin && ! (*it)->is_covered(expression))
 	it++;
 
-    return it != lst.end();
+    return it != fin;
 }
 
 bool simple_path_mask::is_covered(const string &ch) const

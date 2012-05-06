@@ -18,9 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.cpp,v 1.13 2002/03/18 11:00:54 denis Rel $
+// $Id: header.cpp,v 1.17 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
+
+#pragma implementation
 
 #include <netinet/in.h>
 #include <strstream.h>
@@ -82,7 +84,7 @@ void header::write(int fd)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: header.cpp,v 1.13 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: header.cpp,v 1.17 2002/05/15 21:56:01 denis Rel $";
     dummy_call(id);
 }
 
@@ -105,3 +107,27 @@ void header_generate_internal_filename(label &ret)
     delete p;
 }
 
+header::header()
+{
+    magic = 0;
+    for(int i = 0; i < LABEL_SIZE; i++)
+	internal_name[i] = '\0';
+    extension = flag = '\0';
+    size_ext = 0;
+}
+
+void header::copy_from(const header & ref)
+{
+    magic = ref.magic;
+    label_copy(internal_name,ref.internal_name);
+    flag = ref.flag;
+    extension = ref.extension;
+    size_ext = ref.size_ext;
+}
+
+void label_copy(label & left, const label & right)
+{
+    for(int i = 0; i < LABEL_SIZE; i++)
+	left[i] = right[i];
+
+}

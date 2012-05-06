@@ -18,9 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.14 2002/03/25 22:02:38 denis Rel $
+// $Id: erreurs.cpp,v 1.16 2002/05/17 16:17:48 denis Rel $
 //
 /*********************************************************************/
+
+#pragma implementation
 
 #include "erreurs.hpp"
 #include <iostream.h>
@@ -76,15 +78,15 @@ void Egeneric::dump() const
 
     it = tmp.begin();
 
-    cout << "---- exception nature = [" << (zombie ? "zombie" : "alive") << "]  exception type = ["  << exceptionID() << "] ----------" << endl;
-    cout << "[source]" << endl;
+    cerr << "---- exception nature = [" << (zombie ? "zombie" : "alive") << "]  exception type = ["  << exceptionID() << "] ----------" << endl;
+    cerr << "[source]" << endl;
     while(it != tmp.end())
     {
-	cout << '\t' << it->lieu << " : " << it->objet << endl;
+	cerr << '\t' << it->lieu << " : " << it->objet << endl;
 	it++;
     }
-    cout << "[most outside call]" << endl;
-    cout << "-----------------------------------" << endl << endl;
+    cerr << "[most outside call]" << endl;
+    cerr << "-----------------------------------" << endl << endl;
 }
 
 unsigned int Egeneric::alive()
@@ -144,60 +146,60 @@ static void init()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: erreurs.cpp,v 1.14 2002/03/25 22:02:38 denis Rel $";
+    static char id[]="$Id: erreurs.cpp,v 1.16 2002/05/17 16:17:48 denis Rel $";
     dummy_call(id);
 }
 
 static void status()
 {
-    cout << endl <<" Exceptions : " << endl;
-    cout << "\t alive  = " << Egeneric::alive() << endl;
-    cout << "\t zombie = " << Egeneric::zombies() << endl;
-    cout << "\t --------------------" << endl;
-    cout << "\t total  = " << Egeneric::total() << endl <<endl;
+    cerr << endl <<" Exceptions : " << endl;
+    cerr << "\t alive  = " << Egeneric::alive() << endl;
+    cerr << "\t zombie = " << Egeneric::zombies() << endl;
+    cerr << "\t --------------------" << endl;
+    cerr << "\t total  = " << Egeneric::total() << endl <<endl;
 }
 
 static void inattendue()
 {
-    cout << "###############################################" << endl;
-    cout << "#   UNEXPECTED EXCEPTION,                     #" << endl;
-    cout << "#                         E X I T I N G !     #" << endl;
-    cout << "#                                             #" << endl;
-    cout << "###############################################" << endl;
+    cerr << "###############################################" << endl;
+    cerr << "#   UNEXPECTED EXCEPTION,                     #" << endl;
+    cerr << "#                         E X I T I N G !     #" << endl;
+    cerr << "#                                             #" << endl;
+    cerr << "###############################################" << endl;
     status();
-    cout << "###############################################" << endl;
-    cout << "#                                             #" << endl;
-    cout << "#     LIST OF STILL ALIVE EXCEPTIONS :        #" << endl;
-    cout << "#                                             #" << endl;
-    cout << "###############################################" << endl;
+    cerr << "###############################################" << endl;
+    cerr << "#                                             #" << endl;
+    cerr << "#     LIST OF STILL ALIVE EXCEPTIONS :        #" << endl;
+    cerr << "#                                             #" << endl;
+    cerr << "###############################################" << endl;
     Egeneric::display_alive();
-    cout << "###############################################" << endl;
-    cout << "#                                             #" << endl;
-    cout << "#     LIST OF LAST DESTROYED EXCEPTIONS :     #" << endl;
-    cout << "#                                             #" << endl;
-    cout << "###############################################" << endl;
+    cerr << "###############################################" << endl;
+    cerr << "#                                             #" << endl;
+    cerr << "#     LIST OF LAST DESTROYED EXCEPTIONS :     #" << endl;
+    cerr << "#                                             #" << endl;
+    cerr << "###############################################" << endl;
     Egeneric::display_last_destroyed();
 }
 
 static void notcatched()
 {
-    cout << "###############################################" << endl;
-    cout << "#   NOT CAUGHT EXCEPTION,                     #" << endl;
-    cout << "#                         E X I T I N G !     #" << endl;
-    cout << "#                                             #" << endl;
-    cout << "###############################################" << endl;
+    cerr << "###############################################" << endl;
+    cerr << "#   NOT CAUGHT EXCEPTION,                     #" << endl;
+    cerr << "#                         E X I T I N G !     #" << endl;
+    cerr << "#                                             #" << endl;
+    cerr << "###############################################" << endl;
     status();
-    cout << "###############################################" << endl;
-    cout << "#                                             #" << endl;
-    cout << "#     LIST OF STILL ALIVE EXCEPTIONS :        #" << endl;
-    cout << "#                                             #" << endl;
-    cout << "###############################################" << endl;
+    cerr << "###############################################" << endl;
+    cerr << "#                                             #" << endl;
+    cerr << "#     LIST OF STILL ALIVE EXCEPTIONS :        #" << endl;
+    cerr << "#                                             #" << endl;
+    cerr << "###############################################" << endl;
     Egeneric::display_alive();
-    cout << "###############################################" << endl;
-    cout << "#                                             #" << endl;
-    cout << "#     LIST OF LAST DESTROYED EXCEPTIONS :     #" << endl;
-    cout << "#                                             #" << endl;
-    cout << "###############################################" << endl;
+    cerr << "###############################################" << endl;
+    cerr << "#                                             #" << endl;
+    cerr << "#     LIST OF LAST DESTROYED EXCEPTIONS :     #" << endl;
+    cerr << "#                                             #" << endl;
+    cerr << "###############################################" << endl;
     Egeneric::display_last_destroyed();
 }
 

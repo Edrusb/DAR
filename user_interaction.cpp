@@ -18,59 +18,91 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.cpp,v 1.18 2002/03/25 22:02:38 denis Rel $
+// $Id: user_interaction.cpp,v 1.31 2002/06/26 22:04:13 denis Rel $
 //
 /*********************************************************************/
 
 #include <iostream.h>
-#include <stdio.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdarg.h>
+#include <string.h>
 #include "user_interaction.hpp"
 #include "erreurs.hpp"
+#include "tools.hpp"
 
 using namespace std;
 
 static int input = -1;
 static ostream *output = NULL;
+static ostream *inter = NULL;
 static bool beep = false;
 static termio initial;
+static termio interaction;
+static bool has_terminal = false;
 
-static void blocking_read(int fd, bool mode);
+static void set_term_mod(const struct termio & etat);
 
-void user_interaction_init(int input_filedesc, ostream &out)
+void user_interaction_init(int input_filedesc, ostream *out, ostream *interact)
 {
     struct termio term;
+    has_terminal = false;
 
     if(input_filedesc < 0)
 	throw SRC_BUG;
 
-    output = &out;
+    if(out != NULL)
+	output = out;
+    else 
+	throw SRC_BUG;
+    if(interact != NULL)
+	inter = interact;
+    else
+	throw SRC_BUG;
+    
+	// preparing input for swaping between char mode and line mode (terminal settings)
     if(ioctl(input_filedesc, TCGETA, &term) >= 0)
     {
 	initial = term;
 	term.c_lflag &= ~ICANON;
 	term.c_lflag &= ~ECHO;
 	term.c_lflag &= ~ECHOE;
-	if(ioctl(input_filedesc, TCSETA, &term) >= 0)
-	{
-	    if(input < 0)
-		close(input);
-	    input = input_filedesc;
-	}
-	else
-	    throw Erange("user_interaction_init", string("error while setting user terminal to character mode : ") + strerror(errno));
+	interaction = term;
+	if(input < 0)
+	    close(input);
+	input = input_filedesc;
+
+	    // checking now that we can change to character mode
+	set_term_mod(interaction);
+	set_term_mod(initial);
+	    // but we don't need it right now, so swapping back to line mode
+	has_terminal = true;
     }
     else
-	throw Erange("user_interaction_init", string("can't get informations from user terminal : ") + strerror(errno));
+        user_interaction_warning("No terminal found for user interaction. All questions will abort the program.");
+}
+
+void user_interaction_change_non_interactive_output(ostream *out)
+{
+    if(out != NULL)
+	output = out;
+    else 
+	throw SRC_BUG;
+}
+
+static void set_term_mod(const struct termio & etat)
+{
+    if(ioctl(input, TCSETA, &etat) < 0)
+	throw Erange("user_interaction : set_term_mod", string("Error while changing user terminal properties: ") + strerror(errno));
 }
 
 void user_interaction_close()
 {
-    ioctl(input, TCSETA, &initial);
+    if(has_terminal)
+	ioctl(input, TCSETA, &initial);
 }
 
 void user_interaction_pause(string message)
@@ -79,33 +111,55 @@ void user_interaction_pause(string message)
     char buffer[bufsize];
     char & a = buffer[0];
 
-    if(input < 0)
-	throw SRC_BUG; 
-
-	// flushing any character remaining in the input stream
-    blocking_read(input, true);
-    while(read(input, buffer, bufsize) >= 0)
-	;
-    blocking_read(input, false);
-
-	// now asking the user
-    do
+    if(!has_terminal) 
     {
-	*output << message << " [return = OK | esc = cancel]" << (beep ? "\007\007\007" : "") << endl;
-	if(read(input, &a, 1) < 0)
-	    throw Erange("user_interaction_pause", string("error while reading user answer from terminal : ") + strerror(errno));
-    }
-    while(a != 27 && a != '\n');
-
-    if(a == 27) // escape key
+	user_interaction_warning("No terminal found and user interaction needed, aborting.");
 	throw Euser_abort(message);
-    else
-	*output << "continuing ..." << endl;
+    }
+
+    if(input < 0)
+	throw SRC_BUG;
+
+    set_term_mod(interaction);
+    try
+    {
+	    // flushing any character remaining in the input stream
+	tools_blocking_read(input, false);
+	while(read(input, buffer, bufsize) >= 0)
+	    ;
+	tools_blocking_read(input, true);
+	
+	    // now asking the user
+	do
+	{
+	    *inter << message << " [return = OK | esc = cancel]" << (beep ? "\007\007\007" : "") << endl;
+	    if(read(input, &a, 1) < 0)
+		throw Erange("user_interaction_pause", string("Error while reading user answer from terminal: ") + strerror(errno));
+	}
+	while(a != 27 && a != '\n');
+	
+	if(a == 27) // escape key
+	    throw Euser_abort(message);
+	else
+	    *inter << "Continuing..." << endl;
+    }
+    catch(...)
+    {
+	set_term_mod(initial);
+	throw;
+    }
 }
 
 void user_interaction_warning(string message)
 {
+    if(output == NULL)
+	throw SRC_BUG; // user_interaction has not been properly initialized
     *output << message << endl;
+}
+
+ostream &user_interaction_stream()
+{
+    return *output; 
 }
 
 void user_interaction_set_beep(bool mode)
@@ -115,16 +169,76 @@ void user_interaction_set_beep(bool mode)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: user_interaction.cpp,v 1.18 2002/03/25 22:02:38 denis Rel $";
+    static char id[]="$Id: user_interaction.cpp,v 1.31 2002/06/26 22:04:13 denis Rel $";
     dummy_call(id);
 }
 
-static void blocking_read(int fd, bool mode)
+void ui_printf(char *format, ...)
 {
-    int flags = fcntl(fd, F_GETFL, 0);
-    if(mode)
-	flags |= O_NDELAY;
-    else
-	flags &= ~O_NDELAY;
-    fcntl(fd, F_SETFL, flags);
+    va_list ap;
+    bool end;
+    unsigned long taille = strlen(format)+1;
+    char *copie;
+    
+    if(output == NULL)
+	throw Erange("ui_printf", "user_interaction  module is not initialized");
+
+    copie = new char[taille];
+    if(copie == NULL)
+	throw Ememory("ui_printf");
+
+    va_start(ap, format);
+    try
+    {
+	char *ptr = copie, *start = copie;
+
+	strcpy(copie, format);
+	copie[taille-1] = '\0';
+
+	do
+	{
+	    while(*ptr != '%' && *ptr != '\0')
+		ptr++;
+	    if(*ptr == '%')
+	    {
+		*ptr = '\0';
+		end = false;
+	    }
+	    else 
+		end = true;
+	    *output << start;
+	    if(!end)
+	    {
+		ptr++;
+		switch(*ptr)
+		{
+		case '%':
+		    *output << "%";
+		    break;
+		case 'd':
+		    *output << va_arg(ap, int);
+		    break;
+		case 's':
+		    *output << va_arg(ap, char *);
+		    break;
+		case 'c':
+		    *output << static_cast<char>(va_arg(ap, int));
+		    break;
+		default:
+		    throw Efeature(string("%") + (*ptr) + " is not implemented in ui_printf format argument");
+		}
+		ptr++;
+		start = ptr;
+	    }
+	}
+	while(!end);
+    }
+    catch(...)
+    {
+	va_end(ap);
+	delete copie;
+	throw;
+    }
+    delete copie;
+    va_end(ap);
 }

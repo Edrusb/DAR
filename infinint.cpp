@@ -18,9 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: infinint.cpp,v 1.17 2002/03/18 11:00:54 denis Rel $
+// $Id: infinint.cpp,v 1.21 2002/06/05 21:32:26 denis Rel $
 //
 /*********************************************************************/
+
+#pragma implementation
 
 #include <unistd.h>
 #include "infinint.hpp"
@@ -52,7 +54,7 @@ void infinint::read_from_file(generic_file & x) throw(Erange, Ememory, Ebug)
 {
     E_BEGIN;
     unsigned char a;
-    bool fin = false, known_size = false;
+    bool fin = false;
     infinint skip = 0;
     infinint size = 0;
     storage::iterator it;
@@ -63,54 +65,50 @@ void infinint::read_from_file(generic_file & x) throw(Erange, Ememory, Ebug)
 	lu = x.read((char *)&a, 1);
 
 	if(lu <= 0)
-	{
-	    if(known_size)
-	    {
-		delete field;
-		field = NULL;
-	    }
 	    throw Erange("infinint::read_from_file(generic_file)", "reached end of file before all data could be read");
-	}
 	
-	if(! known_size)
-	    if(a == 0)
-		skip++;
-	    else
-	    {
-		bitfield bf;
-		unsigned int pos = 0;
-
-		expand_byte(a, bf);
-		for(int i = 0; i < 8; i++)
-		    pos = pos + bf[i];
-		if(pos != 1)
-		    throw Erange("infinint::read_from_file(generic_file)", "badly formed infinint or not supported format"); // more than 1 bit is set to 1
-
-		pos = 0;
-		while(bf[pos] == 0)
-		    pos++;
-		pos += 1; // bf starts at zero, or bit zero means 1 TG of length
-
-		size = (skip * 8 + pos)*TG;
-		detruit();
-		field = new storage(size);
-
-		if(field != NULL)
-		{		
-		    it = field->begin();
-		    known_size = true;
-		}
-		else
-		    throw Ememory("infinint::read_from_file(generic_file)");
-	    }
-	else /* known_size */
+	if(a == 0)
+	    skip++;
+	else // end of size field
 	{
-	    *(it++) = a;
-	    if(it == field->end())
+		// computing the size to read
+	    bitfield bf;
+	    unsigned int pos = 0;
+	    
+	    expand_byte(a, bf);
+	    for(int i = 0; i < 8; i++)
+		pos = pos + bf[i];
+	    if(pos != 1)
+		throw Erange("infinint::read_from_file(generic_file)", "badly formed infinint or not supported format"); // more than 1 bit is set to 1
+	    
+	    pos = 0;
+	    while(bf[pos] == 0)
+		pos++;
+	    pos += 1; // bf starts at zero, or bit zero means 1 TG of length
+	    
+	    size = (skip * 8 + pos)*TG;
+	    detruit();
+
+	    try
+	    {
+		field = new storage(x, size);
+	    }
+	    catch(...)
+	    {
+		field = NULL;
+		throw;
+	    }
+
+	    if(field != NULL)
+	    {		
+		it = field->begin();
 		fin = true;
+	    }
+	    else
+		throw Ememory("infinint::read_from_file(generic_file)");		
 	}
     }
-    reduce();
+    reduce(); // necessary to reduce due to TG storage
     E_END("infinint::read_from_file", "generic_file");
 }
 
@@ -118,44 +116,51 @@ void infinint::read_from_file(generic_file & x) throw(Erange, Ememory, Ebug)
 void infinint::dump(generic_file & x) const throw(Einfinint, Ememory, Erange, Ebug)
 {
     E_BEGIN;
-    int ecrit;
-    storage::iterator it;
     infinint width;
-    unsigned int pos;
+    infinint pos;
     unsigned char last_width;
-    unsigned int justification;
+    infinint justification;
+    unsigned long tmp;
     
     if(! is_valid())
 	throw SRC_BUG;
 
     width = field->size();    // this is the informational field size in byte
-    justification = width % TG; // which may not be a multiple of TG bytes
-    width /= TG;              // this is the width en TG, thus the number of bit that must have the preamble
-    if(justification != 0)    // in case we need to add some bytes to have a width multiple of TG
-	width++;              // we need then one more group to have a width multiple of TG
+	// TG is the width in TG, thus the number of bit that must have 
+	// the preamble
+    euclide(width, TG, width, justification);
+    if(justification != 0)
+	    // in case we need to add some bytes to have a width multiple of TG
+	width++;  // we need then one more group to have a width multiple of TG
 
-    pos = (width-1) % 8;      // this is the position of the bit set to 1 in the last byte of the preamble
-    last_width = 0x80 >> pos; // here we generate the last byte of the preamble
-    width /= 8;               // width is now the number of byte that must have the preamble
-    if(pos == 7)              // this is when the preambule length is not a multiple of byte
-	width--;              // as the last byte is added separately we reduce the count by one
-	// in the other cases, the division makes some rest and adding the last byte separately makes the correct count
-    
+    euclide(width, 8, width, pos);
+    if(pos == 0)
+    {
+	width--; // division is exact, only last bit of the preambule is set
+	last_width = 0x80 >> 7;
+	    // as we add the last byte separately width gets shorter by 1 byte
+    }
+    else // division non exact, the last_width (last byte), make the rounding
+    {
+	unsigned short pos_s = 0;
+	pos.unstack(pos_s);
+	last_width = 0x80 >> (pos_s - 1);
+    }
 
 	// now we write the preamble except the last byte. All theses are zeros.
 
-    pos = 0;
+    tmp = 0;
     unsigned char u = 0x00;
-    width.unstack(pos);
+    width.unstack(tmp);
     do
     {
-	while(pos-- > 0)
+	while(tmp-- > 0)
 	    if(x.write((char *)(&u), 1) < 1)
 		throw Erange("infinint::dump(generic_file)", "can't write data to file");
-	pos = 0;
-	width.unstack(pos);
+	tmp = 0;
+	width.unstack(tmp);
     }
-    while(pos > 0);
+    while(tmp > 0);
 
 	// now we write the last byte of the preambule, which as only one bit set
 
@@ -166,21 +171,17 @@ void infinint::dump(generic_file & x) const throw(Einfinint, Ememory, Erange, Eb
 
     if(justification != 0)
     {
-	justification = TG - justification;
-	while(justification-- > 0)
+	unsigned short tmp = 0;
+	justification.unstack(tmp);
+	tmp = TG - tmp;
+	while(tmp-- > 0)
 	    if(x.write((char *)(&u), 1) < 1)
 		throw Erange("infinint::dump(generic_file)", "can't write data to file");
     }
 
 	// now we continue dumping the informational bytes :
+    field->dump(x);
 
-    it = field->begin();    
-    while(it != field->end())
-    {
-	ecrit = x.write((char *)(&(*(it++))), 1);
-	if(ecrit <= 0)
-	    throw Erange("infinint::dump(generic_file)", "can't write data to file");
-    }
     E_END("infinint::dump", "generic_file");
 }
 
@@ -199,7 +200,7 @@ infinint & infinint::operator += (const infinint & arg) throw(Ememory, Erange, E
     storage::iterator it_res = field->rbegin();
     unsigned int retenue = 0, somme;
 
-    while(it_res != field->rend())
+    while(it_res != field->rend() && (it_a != arg.field->rend() || retenue != 0))
     {
 	somme = *it_res;
 	if(it_a != arg.field->rend())
@@ -223,7 +224,8 @@ infinint & infinint::operator += (const infinint & arg) throw(Ememory, Erange, E
 	(*field)[0] = retenue;
     }
 
-    reduce();
+	// reduce(); // not necessary here, as the resulting filed is
+	// not smaller than the one of the two infinint in presence
 
     return *this;
     E_END("infinint::operator +=", "");
@@ -245,7 +247,7 @@ infinint & infinint::operator -= (const infinint & arg) throw(Ememory, Erange, E
     unsigned int retenue = 0;
     signed int somme;
 
-    while(it_res != field->rend())
+    while(it_res != field->rend() && (it_a != arg.field->rend() || retenue != 0))
     {
 	somme = *it_res;
 	if(it_a != arg.field->rend())
@@ -262,7 +264,7 @@ infinint & infinint::operator -= (const infinint & arg) throw(Ememory, Erange, E
 	*(it_res--) = somme;
     }
 
-    reduce();
+    reduce(); // it is necessary here !
     
     return *this;
     E_END("infinint::operator -=", "");
@@ -295,7 +297,8 @@ infinint & infinint::operator *= (unsigned char arg) throw(Ememory, Erange, Ebug
 	(*field)[0] = retenue;
     }
 
-    reduce();
+    if(arg == 0)
+	reduce(); // only necessary in that case
     
     return *this;
     E_END("infinint::operator *=", "unsigned char");
@@ -317,10 +320,11 @@ infinint & infinint::operator *= (const infinint & arg) throw(Ememory, Erange, E
 	ret += arg * (*(it_t++));
     } 
 
-    ret.reduce();
+	//  ret.reduce();  // not necessary because all operations
+	// done on ret, provide reduced infinint
     *this = ret;
 
-    return *this;
+    return *this; // copy constructor
     E_END("infinint::operator *=", "infinint");
 }
 
@@ -334,7 +338,7 @@ infinint & infinint::operator >>= (unsigned long bit) throw(Ememory, Erange, Ebu
     storage::iterator it = field->rbegin() - byte + 1;
     bitfield bf;
     unsigned char mask, r1 = 0, r2 = 0;
-    int shift_retenue;
+    unsigned int shift_retenue;
 
     bit = bit % 8;
     shift_retenue = 8 - bit;
@@ -342,12 +346,14 @@ infinint & infinint::operator >>= (unsigned long bit) throw(Ememory, Erange, Ebu
 	*this = 0;
     else
     {
+	    // shift right by "byte" bytes
 	field->remove_bytes_at_iterator(it, byte);
     
+	    // shift right by "bit" bits
 	if(bit != 0)
 	{
 	    for(register unsigned int i = 0; i < 8; i++)
-		bf[i] = i < 8 - bit ? 0 : 1;
+		bf[i] = i < shift_retenue ? 0 : 1;
 	    contract_byte(bf, mask);
 	    
 	    it = field->begin();
@@ -360,7 +366,7 @@ infinint & infinint::operator >>= (unsigned long bit) throw(Ememory, Erange, Ebu
 		r2 = r1;
 		it++;
 	    }
-	    reduce();
+	    reduce(); // necessary here
 	}
     }
 
@@ -530,7 +536,7 @@ bool infinint::is_valid() const throw()
 void infinint::reduce() throw(Erange, Ememory, Ebug)
 {
     E_BEGIN;
-    static unsigned int max_a_time = ~ (unsigned int)(0); // this is the argument type of remove_bytes_at_iterator
+    static const unsigned int max_a_time = ~ (unsigned int)(0); // this is the argument type of remove_bytes_at_iterator
     
     unsigned int count = 0;
     storage::iterator it = field->begin();
@@ -548,7 +554,10 @@ void infinint::reduce() throw(Erange, Ememory, Ebug)
 	    if(count == 0) // empty storage;
 		field->insert_null_bytes_at_iterator(field->begin(), 1); // field width is at least one byte
 	    else
-		field->remove_bytes_at_iterator(field->begin(), count - 1);
+		if(count > 1)
+		    field->remove_bytes_at_iterator(field->begin(), count - 1);
+
+		// it == field->end()  is still true
 	}
 	else
 	{
@@ -590,8 +599,10 @@ void infinint::detruit() throw(Ebug)
 void infinint::make_at_least_as_wider_as(const infinint & ref) throw(Erange, Ememory, Ebug)
 {
     E_BEGIN;
-    while(*ref.field > *field)
-	field->insert_null_bytes_at_iterator(field->begin(), TG);
+    if(! is_valid() || ! ref.is_valid())
+	throw SRC_BUG;
+
+    field->insert_as_much_as_necessary_const_byte_to_be_as_wider_as(*ref.field, field->begin(), 0x00);
     E_END("infinint::make_at_least_as_wider_as", "");
 }
 
@@ -599,38 +610,59 @@ template <class T> void infinint::infinint_from(T a) throw(Ememory, Erange, Ebug
 {
     E_BEGIN;
     unsigned int size = sizeof(a);
+    signed int direction = +1;
+    unsigned char *ptr, *fin;
 
     if(used_endian == not_initialized)
 	setup_endian();
-    
+
+    if(used_endian == big_endian)
+    {
+	direction = -1;
+	ptr = (unsigned char *)(&a) + (size - 1);
+	fin = (unsigned char *)(&a) - 1;
+    }
+    else
+    {
+	direction = +1;
+	ptr = (unsigned char *)(&a);
+	fin = (unsigned char *)(&a) + size;
+    }
+
+    while(ptr != fin && *ptr == 0)
+    {
+	ptr += direction;
+	size--;
+    }
+
+    if(size == 0)
+    {
+	size = 1;
+	ptr -= direction;
+    }
+
     field = new storage(size);
     if(field != NULL)
     {
-	unsigned char *ptr = (unsigned char *)(&a);
-	storage::iterator it;
-	unsigned char *rev_ptr = ptr+sizeof(a)-1;
+	storage::iterator it = field->begin();
 
-	if(used_endian == big_endian)
-	    swap_bytes(ptr, sizeof(a));
-
-	it = field->begin();
-	while(it != field->end())
-	    *(it++) = 0x00;
-
-	it = field->rbegin();
-	while(it != field->rend())
-	    *(it--) = *(rev_ptr--);
+	while(ptr != fin)
+	{
+	    *(it++) = *ptr;
+	    ptr += direction;
+	}
+	if(it != field->end())
+	    throw SRC_BUG; // size mismatch in this algorithm
     }
     else
 	throw Ememory("template infinint::infinint_from");
 
-    reduce();
     E_END("infinint::infinint_from", "");
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: infinint.cpp,v 1.17 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: infinint.cpp,v 1.21 2002/06/05 21:32:26 denis Rel $";
     dummy_call(id);
 }
 

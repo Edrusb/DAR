@@ -1,48 +1,49 @@
-.TH DAR 8 "FEB 23, 2002"
+.TH DAR 1 "MAY 2, 2002"
 .UC 8
 .SH NAME
 dar \- disk archive
 .SH SYNOPSIS
-.B dar [-c | -x | -l | -d | -t] [<path>/]<basename> [options] [list of path]
+.B dar [-c | -x | -l | -d | -t | -C] [<path>/]<basename> [options] [list of paths]
 .P
-.B dar -h 
+.B dar -h
+.P
+.B dar -V 
 .SH DESCRIPTION
 .B dar 
 is a full featured backup tool, aimed for disks (floppy, CD-R(W), DVD-R(W), zip, jazz, etc.)
 
 .PP
 .B dar
-can store a backup in several files (call "slices" in the following) of a given size, eventually pausing before starting the next slice. This can allow for example, the burning of the last generated slice on a CD-R, or changing of floppy disk before continuing on the next one. 
-Like its grand-brother the great "tar" command, 
+can store a backup in several files (called "slices" in the following) of a given size, eventually pausing before starting the next slice. This can allow for example, the burning of the last generated slice on a CD-R, or changing a floppy disk before continuing on the next one. 
+Like its grand-brother, the great "tar" command, 
 .B dar
-may also uses compression, at the difference that compression is used inside the archive to be able to have compressed slices of the defined size. But the most important feature of
+may also use compression, at the difference that compression is used inside the archive to be able to have compressed slices of the defined size. But the most important feature of
 .B dar 
-is its ability to make differential backup. In other words, backups that contain only new files or files that have changed from a backup of reference. 
+is its ability to make differential backups. In other words, backups that contain only new files or files that have changed from a backup of reference. 
 Moreover with differential backup,
 .B dar
-also stores files that have been deleted since the backup of reference. Thus, when restoring, first a full backup, then additional differential backups, at each restoration you get the exact state of the filesystem at the time of the backup. And of course, the reference backup may be a full or a differential backup.
+also stores files that have been deleted since the backup of reference. Thus, when restoring, first a full backup, then additional differential backups, at each restoration you get the exact state of the filesystem at the time of the backup. And of course, the reference backup may be a full or a differential backup itself.
 .PP
 .B dar
-is the first backup program I know that can also remove files during restoration ! By the way, in this document, "archive" and "backup" design the same thing, and are used interchangeably.
+is the first backup program I know that can also remove files during restoration! By the way, in this document, "archive" and "backup" design the same thing, and are used interchangeably.
 .PP
 At the difference of the 
 .B tar
 command, 
 .B dar
-is not suited to directly use tapes. So keep using tar for Tape Archive. Because, even using tar to write a slice on a tape, you will loose all the interest of another feature of 
+is not suited to directly use tapes. So keep using tar for tape archives. Because, even using tar to write a slice on a tape, you will loose all the interest of another feature of 
 .B dar
-which is its ability to directly access the data of saved file even when compression is used. This way and at the difference of the tar command, dar is able to extract much faster a given file from a backup and to also recover files that follow a data corruption (loosing just the file in which data corruption occurred).
+which is its ability to directly access the data of saved file even when compression is used. This way and in contrast to the tar command, dar is able to extract a given file much faster from a backup and to also recover files that follow a data corruption (loosing just the file in which data corruption occurred).
 .PP
- This has of course its limitations, in particular when a data corruption occurs in the vital part of the backup : the few first bytes of each slice, and the last part of the archive (the catalogue).
+ This has of course its limitations, in particular when a data corruption occurs in the vital part of the backup, i.e. the few first bytes of each slice, and the last part of the archive (the catalogue).
 .PP
-Slices have a base name given on command line, which is completed by a dot, number, a dot and an extension (dar). On command line you will never have to give the full file name of a slice.
+Slices have a base name given on the command line, which is completed by a dot, a number, a dot and the extension (dar) to form a filename. On command line you will never have to give the full file name of a slice.
 .RS
 .TP 20
 Let's take an example :
 
-considering the base name "joe", dar will make one or several slices during backup. Theses are files which name is :
-joe.1.dar joe.2.dar ... joe.10.dar ... etc.
-If you want to extract, list, or use these backup as reference, you will only have to use the base name which here is the string "joe".
+considering the base name "joe", dar will make one or several slices during backup. Theses are files with the names joe.1.dar joe.2.dar ... joe.10.dar ... etc.
+If you want to extract, list, or use these backup as reference, you will only have to use the base name which is the string "joe" here.
 .RE
 
 .SH OPTIONS
@@ -51,93 +52,166 @@ If you want to extract, list, or use these backup as reference, you will only ha
 COMMANDS :
 .RS
 .TP 20
--c [<path>/]<basename>
-creates a backup with the name based on <basename>. All the slices will be created in the directory <path> if specified, else in the current directory. If the destination filesystem is too narrow to contain all the slices of the backup, the -p option (pausing between slices writing) might be of interest
+-c, --create [<path>/]<basename> 
+creates a backup with the name based on <basename>. All the slices will be created in the directory <path> if specified, else in the current directory. If the destination filesystem is too small to contain all the slices of the backup, the -p option (pausing before starting new slices) might be of interest. Else, in the case the filesystem is full, dar will suspend the operation, asking for the user to make free space, then continue its operation. To make free space, the only thing you cannot do is to touch the slice being written. If the filename is "-" *and* no slice is asked for (no -s) the archive is produced on the standard output.
 .TP 20
--x [<path>/]<basename>
-extracts files from the given backup. Slices are expected to be in the current directory or in the directory given with <path>. It is also possible to use symbolic links to gather slices that are not in the same directory. Path may also point to a removable device (floppy, CD, etc), in this case, to be able to mount/unmount the device, you must not launch dar from that directory (see tutorial for details).
+-x, --extract [<path>/]<basename>
+extracts files from the given backup. Slices are expected to be in the current directory or in the directory given by <path>. It is also possible to use symbolic links to gather slices that are not in the same directory. Path may also point to a removable device (floppy, CD, etc.), in this case, to be able to mount/unmount the device, you must not launch dar from that directory. In other words, the current directory must not be that directory (see tutorial for details).
 .TP 20
--l [<path>/]<basename>
-lists the content of the given backup. In general
+-l, --list [<path>/]<basename>
+lists the contents of the given backup. In general
 .B dar 
 will only require the first and the last slice of the archive.
 .TP 20
--t [<path>/]<basename>
-checks the backup integrity (NOT YET IMPLEMENTED)
+-t, --test [<path>/]<basename>
+checks the backup integrity. Even without compression, dar is able to detect at least one error by data file, thanks to a 16 bits CRC recorded in the catalogue. If one error occurred in file's data stored the archive, dar will report it in 100% of all cases. If two error occurred, dar will see them in 93,8% of all cases. If three error occurred, dar will see them in 100% of all cases. If four errors occurred, dar will see them in 90.6% of all cases, etc. 
 .TP 20
--d [<path>/]<basename>
-compares saved files in the backup with those in the filesystem (NOT YET IMPLEMENTED)
+-d, --diff [<path>/]<basename>
+compares saved files in the backup with those in the filesystem.
 .TP 20
--h
-displays help usage
+-C, --isolate [<path>/]<basename>
+isolate a catalogue from its archive. The argument is the basename of the file that will contain the catalogue. The -A option is mandatory here to give the name of the archive to extract the catalogue from. Slicing is available (-s -S -p -b etc.). If the filename is "-" *and* no slice is asked (no -s) the catalogue is produced on the standard output, allowing to send the resulting catalogue through a pipe. Note that there is no difference in concept between a catalogue and an archive. Thus you can do all operation on a catalogue, in particular take it as reference for a differential archive. A catalogue produced with -C is just like a differential archive done right after a full backup, (no data in it).
+.TP 20
+-h, --help
+displays help usage.
+.TP 20
+-V, --version
+displays version information.
 .PP
 .RE
 GENERAL OPTIONS:
 .RS
 .TP 20
--v 
+-v, --verbose
 verbose output
 .TP 20
--b 
-make the terminal ring when user action is required (like for example the creaction of a new slice using the -p option)
+-b, --beep
+makes the terminal ring when user action is required (like for example the creation of a new slice using the -p option)
 .TP 20
--n
-do not allow overwriting of any file of slice
+-n, --no-overwrite
+do not allow overwriting of any file of slice.
 .TP 20
--w
-do not warn before overwriting file or slice. By default (no -n and no -w) overwriting is allowed but a warning is issued before proceeding.
+-w, --no-warn
+Do not warn before overwriting file or slice. By default (no -n and no -w) overwriting is allowed but a warning is issued before proceeding.
 .TP 20
--X <mask>
-the mask is a string with wild cards (like * and ?) which is applied to filenames (except directories). If a given file matches the mask, it is excluded from the operation (backup or restoration). By default (no -X on the command line), no file is excluded from the operation. -X may be present several times on the command line.
+-X, --exclude <mask>
+The mask is a string with wild cards (like * and ?) which is applied to filenames which are not directories. If a given file matches the mask, it is excluded from the operation. By default (no -X on the command line), no file is excluded from the operation. -X may be present several times on the command line.
 .TP 20
--I <mask>
-the mask is applied to filenames (except directories). If a given file matches the mask and does not match any mask given with -X, the file is elected for the operation. By default (no -I and no -X on the command line), all files are included for the operation. -I may be present several times on the command line.
+-I, --include <mask>
+The mask is applied to filenames which are not directories. If a given file matches the mask and does not match any mask given with -X, the file is selected for the operation. By default (no -I and no -X on the command line), all files are included for the operation. -I may be present several times on the command line.
 .TP 20
--R <path>
-the path points to the directory tree containing all the files that will be enrolled in the operation (backup or restoration). By default the current directory is used. All other paths used in -P option or in the [list of path] on the command line are and must be relative to this path (or to current directory if -R is not present).
+-R, --fs-root <path>
+The path points to the directory tree containing all the files that will be enrolled in the operation (backup or restoration). By default the current directory is used. All other paths used in -P option or in the [list of paths] on the command line are and must be relative to this path (or to current directory if -R is not present).
 .TP 20
--P <path>
-do not consider file or directory sub-tree designed by the path. -P may be present several time on the command line. By default no sub-tree of file is excluded from the operation, and all the directory tree as indicated by -R is considered.
+-P, --prune <path>
+Do not consider file or directory sub-tree given by the path. -P may be present several time on the command line. By default no sub-tree of file is excluded from the operation, and all the directory tree as indicated by -R is considered.
 .TP 20
-[list of path]
-files or directory to only take in account, as opposed to -P. By default all files under the -R directory are considered. Else, if one or more file is given, just those are elected (for backup or restoration) and if they do not match a -P option. All path given this way must be relative to the -R directory. 
+[list of paths]
+files or directory to only take in account, as opposed to -P. By default all files under the -R directory are considered. Else, if one or more file are given, just those are selected (if they do not match any -P option). All paths given this way must be relative to the -R directory. 
+.TP 20
+-u, --no-user-EA
+Do not consider the Extended Attributes (EA) of the user namespace. By default, they are saved and restored, if the support for EA has been activated at compilation time. If not, this option is forced internally (you need not specify it).
+.TP 20
+-U, --no-system-EA
+Do not consider the EA of the root (or system) namespace. By default, they are saved and restored, if the support for EA has been activated at compilation time. If not, this option is forced internally (you need not specify it).
+.P
+Note concerning Extended Attributes (EA): support for EA must be activated at compilation time, if your system supports it. Thus you can get two binaries of dar (of the same version), one supporting EA and another which does not (dar -h to see whether EA support is activated). The archives they produce are the same and can be read by each other. The only difference is that the binary without EA support is not able to save or restore EAs, but is still able to test them and list their presence.
+.TP 20
+-i, --input <path>
+is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c or -C is used). When reading from pipe, standard input is used, but with this option, the file <path> (usually a named pipe) is used instead. This option can also be used to keep standard input for interacting with dar, while feeding dar with a remote archive. This option is to receive output from dar_slave program.
+.TP 20
+-o, --output <path>
+iq available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c or -C is used). When reading from pipe, standard output is used to send request to dar_slave, but with this option, the file <path> (usually a named pipe) is used instead. When standard output is used, all messages goes to standard error (not only interactive messages). 
+.TP 20 
+-O, --ignore-owner
+Do not consider user ID (uid) or group ID (gid), when comparing with archive of reference (-c -A) while doing a differential backup, when extracting (-x) or when comparing (-d). This is useful when dar is used by a non-priviledged user. It will then not display tons of messages that it could not restore original user and group ownership, it will not consider a file has changed just because it has only the uid or gid changed, nor report a comparison mismatch if only
+uid or gid is different.
+
+
 .PP
 .RE
-SAVING OPTIONS (to use with -c)
+SAVING AND ISOLATION OPTIONS (to use with -c or -C)
 .RS
 .PP
 .TP 20
--z
-compress within slices using gzip algorithm (by default, no compression is performed).
+-z, --gzip
+compresses within slices using gzip algorithm (by default, no compression is performed).
 .TP 20
--y 
-compress using bzip2 algorithm (NOT IMPLEMENTED)
+-y, --bzip2
+compresses using bzip2 algorithm (NOT IMPLEMENTED)
 .TP 20
--s <number>
-Size of the slices in byte. if the number is followed by K or k, M, G, T or P the size is in kilobyte, megabyte, gigabyte, terabyte or petabyte respectively. Examples : "20M" means 20 megabytes, while "20" means 20 bytes. If -s is not present the backup will stay in one slice whatever the size of the backup is (there is probably some filesystem limitations, you can thus expect some problems over 4 gigabytes depending on your filesystem).
+-s, --slice <number>
+Size of the slices in bytes. If the number is followed by k (or K), M, G, T or P the size is in kilobytes, megabytes, gigabytes, terabytes or petabytes respectively. Example: "20M" means 20 megabytes it is the same as giving 20971520 as argument. If -s is not present the backup will be written to a single slice whatever the size of the backup may be (there is probably some filesystem limitation, thus you might expect problems for file size over 2 gigabytes, depending on your filesystem).
 .TP 20
--S <number>
+-S, --first-slice <number>
 -S gives the size of the first slice which may be chosen independently of the size of following slices. This option needs -s and by default, the size of the first slice is the same as the one of the following slices.
 .TP 20
--p 
-pauses before writing to a new slice (this requires -s) By default there is no pause, all slices are output in the same directory, up to the end of the backup or to the filesystem fulfillment. In this later case, the user is advised of the lack of disk space and the application stops for user action. As soon as some disk space is available, the user can continue the backup.
+-p, --pause 
+pauses before writing to a new slice (this requires -s). By default there is no pause, all slices are written in the same directory, up to the end of the backup or until the filesystem is full. In this later case, the user is informed of the lack of disk space and dar stops for user action. As soon as some disk space is available, the user can continue the backup.
 .TP 20
--A [<path>]/<basebame>
-specifies the archive to use as reference. By default no archive is used and all files are saved (in regards to -I -X -P and the list of path). All slices of the reference backup are expected to be on the same directory given by <path> or the current directory by default. Usually only the first and the last slice are required to extract the catalogue of reference and the use of symbolic links is also possible here to gather slices that do not reside in the same directory. You can also point <path> to a floppy or any other mounted directory, 
+-A, --ref [<path>]/<basebame>
+specifies the archive to use as reference (mandatory with -C). By default no archive is used and all files are saved (in regards to -I -X -P and the "list of paths"). All slices of the reference backup are expected to be on the same directory given by <path> or the current directory by default. Usually only the first and the last slice are required to extract the catalogue of reference and the use of symbolic links is also possible here to gather slices that do not reside in the same directory. You can also point <path> to a floppy or any other mounted directory, because
 .B dar
 will pause and ask the user for required slices if they are not present.
+.TP 20
+-D, --empty-dir
+When excluding directories either explicitly using -P option, or implicitly giving a [list of paths], 
+.B dar
+does not store anything about theses. But with -D option, dar stores them as empty directories. This can be useful, if excluding a mount point (like /proc or /dev/pts). At restoration time, dar will then recreate theses directories (if necessary). This option has no meaning with -C and is ignored in that case.
 .PP
 .PP
 .RE
 RESTORATION OPTIONS (to use with -x)
 .RS
 .TP 20
--k
-do not delete files that have been deleted since the backup of reference (file overwriting can still occur). By default, files that have been destroyed since the backup of reference are deleted during restoration, but a warning is issued before proceeding, except if -w is used. If -n is used, no file will be deleted (nor overwritten), thus -k is useless when using -n.
+-k, --no-deleted
+Do not delete files that have been deleted since the backup of reference (file overwriting can still occur). By default, files that have been destroyed since the backup of reference are deleted during restoration, but a warning is issued before proceeding, except if -w is used. If -n is used, no file will be deleted (nor overwritten), thus -k is useless when using -n.
+.TP 20
+-r, --recent
+restore only files that are absent or more recent than those present in filesystem. -r is useless if -n is present.
 .RE
 .PP
-.SH BUGS
-No one known at this time ; feedback is welcome. 
+.RE
+TESTING AND DIFFERENCE OPTIONS (to use with -t or -d)
+.RS
+.PP
+No specific option, but all general options are available except -n and -w which are useless, as testing and comparing only read data.
+.PP
+.RE
+LISTING OPTIONS (to use with -l)
+.RS
+.PP
+No specific options, and only -v and -b from general options are useful.
+
+.SH EXIT CODES
+.B dar
+exits with the following code:
+.TP 10
+0
+Operation successful.
+.TP 10
+1
+Syntax error on command-line.
+.TP 10
+2
+Error due to a hardware problem or a lack of memory.
+.TP 10
+3
+Detection of a condition that should never happen, and which is considered as a bug of the application.
+.TP 10
+4
+Code issued when the user has aborted the program upon dar question from dar. This also happens when dar is not run from a terminal (for example launched from crontab) and dar has a question to the user. In that case, dar aborts the same way as if the user pressed the escape key at the question prompt.
+.TP 10
+5
+is returned when an error concerning the treated data has been detected. While saving, this is the case when a file could not be opened or read. While restoring, it is the case when a file could not be created or replaced. While comparing, it is the case when a file in the archive does not match the one in the filesystem. While testing, it is the case when a file is corrupted in the archive.
+
+.SH SEE ALSO
+dar_xform(1), dar_slave(1)
+
+.SH KNOWN BUGS
+dar cannot restore time of symbolic links. Many (all ?) UNIX do not provide any way to do that, the utime() system call changes the file pointed to by the link rather than the date of the link itself.
+.P
+dar saves and restore atime and mtime, but cannot restore ctime (last inode change), there does not seems to be a standard call to do that under UNIX.
 
 .SH AUTHOR
 .nf
@@ -145,4 +219,3 @@ http://dar.linux.free.fr/
 Denis Corbin (dar.linux@free.fr)
 France
 Europe
-

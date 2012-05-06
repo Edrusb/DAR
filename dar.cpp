@@ -16,18 +16,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author by email : dar.linux@free.fr
+// to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar.cpp,v 1.34 2002/03/25 22:02:38 denis Rel $
+// $Id: dar.cpp,v 1.71 2002/06/27 17:42:35 denis Rel $
 //
 /*********************************************************************/
 //
-#include <iostream.h>
 #include <string>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
+#include <iostream.h>
 #include "erreurs.hpp"
 #include "generic_file.hpp"
 #include "infinint.hpp"
@@ -42,115 +38,135 @@
 #include "filtre.hpp"
 #include "tools.hpp"
 #include "header.hpp"
+#include "header_version.hpp"
 #include "defile.hpp"
 #include "deci.hpp"
 #include "test_memory.hpp"
 #include "dar.hpp"
+#include "sar_tools.hpp"
+#include "dar_suite.hpp"
+#include "zapette.hpp"
+#include "tuyau.hpp"
+#include "filesystem.hpp"
 
 using namespace std;
 
-#define EXIT_OK 0
-#define EXIT_BUG -1
-#define EXIT_SYNTAX -2
-#define EXIT_ERROR -3
+const version supported_version = "02";
 
-#define EXTENSION "dar"
-
-const version supported_version = "01";
-const char *application_version = "1.0.0";
-
-static void op_create(const path &fs_root, const path &sauv_path, const path *ref_path,
+static void op_create(const operation op, const path &fs_root, const path &sauv_path, 
+		      const path *ref_path,
 		      const mask &selection, const mask &subtree, 
-		      string filename, string *ref_filename,
-		      bool allow_over, bool warn_over, bool info_details, bool pause,
-		      compression algo, const infinint &file_size, 
+		      const string &filename, string *ref_filename,
+
+		      bool allow_over, bool warn_over, bool info_details, 
+		      bool pause, bool empty_dir, compression algo, 
+		      const infinint &file_size, 
 		      const infinint &first_file_size,
-		      int argc, char *argv[]);
+		      int argc, char *argv[],
+		      bool root_ea, bool user_ea,
+		      const string &input_pipe, const string &output_pipe);
 static void op_extract(const path &fs_root, const path &sauv_path,
 		       const mask &selection, const mask &subtree, 
-		       string filename, bool allow_over, bool warn_over, 
-		       bool info_details, bool detruire);
-static void op_listing(const path &sauv_path, const string &filename, bool info_details);
+		       const string &filename, bool allow_over, bool warn_over, 
+		       bool info_details, bool detruire,
+		       bool only_more_recent, bool restore_ea_root, 
+		       bool restore_ea_user,
+		       const string &input_pipe, const string &output_pipe);
+static void op_diff(const path & fs_root, const path &sauv_path,
+		    const mask &selection, const mask &subtree,
+		    const string &filename, bool info_details,
+		    bool check_ea_root, bool check_ea_user,
+		    const string &input_pipe, const string &output_pipe);
+static void op_listing(const path &sauv_path, const string &filename, 
+		       bool info_details,
+		       const string &input_pipe, const string &output_pipe);
+static void op_test(const path &sauv_path, const mask &selection, 
+		    const mask &subtree, const string &filename, 
+		    bool info_details,
+		    const string &input_pipe, const string &output_pipe);
 static catalogue *get_catalogue_from(generic_file & decoupe, compressor &zip, bool info_details, infinint &cat_size);
-static fichier *open_archive_fichier(const string &filename, bool allow_over, bool warn_over);
-static void open_archive(const path &sauv_path, const string &basename, const string &extension, int options, sar *&ret1, compressor *&ret2, header_version &ver);
+static void open_archive(const path &sauv_path, const string &basename, 
+			 const string &extension, int options, 
+			 generic_file *&ret1, compressor *&ret2, 
+			 header_version &ver, const string &input_pipe, 
+			 const string &output_pipe);
 static string make_string_from(int argc, char *argv[]);
 static void display_sauv_stat(const statistics & st);
 static void display_rest_stat(const statistics & st);
+static void display_diff_stat(const statistics &st);
+static void display_test_stat(const statistics & st);
 static void version_check(const header_version & ver);
-
-const char *get_application_version()
-{
-    return application_version;
-}
+static int little_main(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
-    int ret = EXIT_OK;
+    return dar_suite_global(argc, argv, &little_main);
+}
 
-    MEM_IN;
-    try
+static int little_main(int argc, char *argv[])
+{
+    operation op;
+    path *fs_root;
+    path *sauv_root;
+    path *ref_root;
+    infinint file_size;
+    infinint first_file_size;
+    mask *selection, *subtree;
+    string filename, *ref_filename;
+    bool allow_over, warn_over, info_details, detruire, pause, beep, empty_dir, only_more_recent, ea_user, ea_root;
+    compression algo;
+    string input_pipe, output_pipe;
+    bool ignore_owner;
+    
+    if(! get_args(argc, argv, op, fs_root, sauv_root, ref_root,
+		  file_size, first_file_size, selection, 
+		  subtree, filename, ref_filename, 
+		  allow_over, warn_over, info_details, algo, detruire, 
+		  pause, beep, empty_dir, only_more_recent, 
+		  ea_root, ea_user,
+		  input_pipe, output_pipe, 
+		  ignore_owner))
+	return EXIT_SYNTAX;
+    else
     {
-	operation op;
-	path *fs_root;
-	path *sauv_root;
-	path *ref_root;
-	infinint file_size;
-	infinint first_file_size;
-	mask *selection, *subtree;
-	string filename, *ref_filename;
-	bool allow_over, warn_over, info_details, detruire, pause, beep;
-	compression algo;
+	user_interaction_set_beep(beep);
+	inode::set_ignore_owner(ignore_owner);
+	filesystem_ignore_owner(ignore_owner);
 
-	user_interaction_init(0, cerr);
-	if(! get_args(argc, argv, op, fs_root, sauv_root, ref_root,
-		      file_size, first_file_size, selection, 
-		      subtree, filename, ref_filename, 
-		      allow_over, warn_over, info_details, algo, detruire, pause, beep))
-	    ret = EXIT_SYNTAX;
-	else
+	if(filename != "-"  || (output_pipe != "" && op != create && op != isolate))
+	    user_interaction_change_non_interactive_output(&cout);
+	    // standart output can be used to send non interactive
+	    // messages
+	
+	try
 	{
-	    user_interaction_set_beep(beep);
-	    
-	    try
+	    switch(op)
 	    {
-		switch(op)
-		{
-		case create:
-		    op_create(*fs_root, *sauv_root, ref_root, *selection, *subtree, filename, ref_filename, 
-			      allow_over, warn_over, info_details, pause, algo, file_size, 
-			      first_file_size, argc, argv);
-		    break;
-		case extract:
-		    op_extract(*fs_root, *sauv_root, *selection, *subtree, filename, allow_over, warn_over,
-			       info_details, detruire);
-		    break;
-		case diff:
-		case test:
-		    throw Efeature("archive testing is not yet implemented");
-		case listing:
-		    op_listing(*sauv_root, filename, info_details);
-		    break;
-		default:
-		    throw SRC_BUG;
-		}
+	    case create:
+	    case isolate:
+		op_create(op, *fs_root, *sauv_root, ref_root, *selection, *subtree, filename, ref_filename, 
+			  allow_over, warn_over, info_details, pause, empty_dir, algo, file_size, 
+			  first_file_size, argc, argv, ea_root, ea_user, input_pipe, output_pipe);
+		break;
+	    case extract:
+		op_extract(*fs_root, *sauv_root, *selection, *subtree, filename, allow_over, warn_over,
+			   info_details, detruire, only_more_recent, ea_root, ea_user, input_pipe, output_pipe);
+		break;
+	    case diff:
+		op_diff(*fs_root, *sauv_root, *selection, *subtree, filename, info_details, ea_root, ea_user, input_pipe, output_pipe);
+		break;
+	    case test:
+		op_test(*sauv_root, *selection, *subtree, filename, info_details, input_pipe, output_pipe);
+		break;
+	    case listing:
+		op_listing(*sauv_root, filename, info_details, input_pipe, output_pipe);
+		break;
+	    default:
+		throw SRC_BUG;
 	    }
-	    catch(...)
-	    {
-		if(fs_root != NULL)
-		    delete fs_root;
-		if(sauv_root != NULL)
-		    delete sauv_root;
-		if(selection != NULL)
-		    delete selection;
-		if(subtree != NULL)
-		    delete subtree;
-		if(ref_root != NULL)
-		    delete ref_root;
-		if(ref_filename != NULL)
-		    delete ref_filename;
-		throw;
-	    }
+	}
+	catch(...)
+	{
 	    if(fs_root != NULL)
 		delete fs_root;
 	    if(sauv_root != NULL)
@@ -158,62 +174,39 @@ int main(int argc, char *argv[])
 	    if(selection != NULL)
 		delete selection;
 	    if(subtree != NULL)
-	    delete subtree;
+		delete subtree;
 	    if(ref_root != NULL)
 		delete ref_root;
 	    if(ref_filename != NULL)
 		delete ref_filename;
+	    throw;
 	}
+	if(fs_root != NULL)
+	    delete fs_root;
+	if(sauv_root != NULL)
+	    delete sauv_root;
+	if(selection != NULL)
+	    delete selection;
+	if(subtree != NULL)
+	    delete subtree;
+	if(ref_root != NULL)
+	    delete ref_root;
+	if(ref_filename != NULL)
+	    delete ref_filename;
+
+	return EXIT_OK;
     }
-    catch(Efeature &e)
-    {
-	user_interaction_warning(string("NOT YET IMPLEMENTED FEATURE has been used : ") + e.get_message());
-	user_interaction_warning("please check documentation or upgrade your software if available");
-	ret = EXIT_SYNTAX;
-    }
-    catch(Ehardware & e)
-    {
-	user_interaction_warning(string("SEEMS TO BE A HARDWARE PROBLEM"));
-	e.dump();
-	user_interaction_warning("please check your hardware");
-	ret = EXIT_ERROR;
-    }
-    catch(Ememory & e)
-    {
-	user_interaction_warning("lack of memory to achieve the operation, aborting operation");
-	ret = EXIT_ERROR;
-    }
-    catch(Erange & e)
-    {
-	user_interaction_warning("FATAL error, aborting operation");
-	user_interaction_warning(e.get_message());
-	ret = EXIT_SYNTAX;
-    }
-    catch(Euser_abort & e)
-    {
-	user_interaction_warning(string("aborting program. User refused to continue while asking : ") + e.get_message());
-	ret = EXIT_ERROR;
-    }
-    catch(Egeneric & e)
-    {
-	e.dump();
-	user_interaction_warning("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER");
-	ret = EXIT_BUG;
-    }
-    
-    user_interaction_close();
-    MEM_OUT;
-    MEM_END;
-    return ret;
 }
 
-static void op_create(const path &fs_root, const path &sauv_path, const path *ref_path,
+static void op_create(const operation op, const path &fs_root, const path &sauv_path, const path *ref_path,
 		      const mask &selection, const mask &subtree, 
-		      string filename, string *ref_filename,
+		      const string &filename, string *ref_filename,
 		      bool allow_over, bool warn_over, bool info_details, bool pause,
+		      bool empty_dir,
 		      compression algo, const infinint &file_size, 
 		      const infinint &first_file_size, 
-		      int argc, char *argv[])
+		      int argc, char *argv[], bool root_ea, bool user_ea,
+		      const string &input_pipe, const string &output_pipe)
 {
     MEM_IN;
     try
@@ -225,20 +218,20 @@ static void op_create(const path &fs_root, const path &sauv_path, const path *re
 	compressor *zip = NULL;
 	int sar_opt = 0;
 
-	if(sauv_path.is_subdir_of(fs_root)
+	if(op == create && sauv_path.is_subdir_of(fs_root)
 	   && selection.is_covered(filename+".1."+EXTENSION)
 	   && subtree.is_covered((sauv_path + (filename+".1."+EXTENSION)).display()))
-	    user_interaction_pause(string("WARNING ! the archive is located in the directory to backup, this may create endless loop when the archive will try to save itself. You can either add -X \"")+ filename + ".*." + EXTENSION +"\" on the command line, or change the location of the archive (see -h for help). Do you really want to continue ?");
+	    user_interaction_pause(string("WARNING! The archive is located in the directory to backup, this may create an endless loop when the archive will try to save itself. You can either add -X \"")+ filename + ".*." + EXTENSION +"\" on the command line, or change the location of the archive (see -h for help). Do you really want to continue?");
 
 	    // building the reference catalogue
 	if(ref_filename != NULL) // from a existing archive
 	{
-	    sar *tmp;
+	    generic_file *tmp;
 	    header_version v;
 
 	    if(ref_path == NULL)
 		throw SRC_BUG; // ref_filename != NULL but ref_path == NULL;
-	    open_archive(*ref_path, *ref_filename, EXTENSION, SAR_OPT_DONT_ERASE, tmp, zip, v);
+	    open_archive(*ref_path, *ref_filename, EXTENSION, SAR_OPT_DONT_ERASE, tmp, zip, v, input_pipe, output_pipe);
 	    try
 	    {
 		infinint tmp2;
@@ -278,38 +271,72 @@ static void op_create(const path &fs_root, const path &sauv_path, const path *re
 	    else
 		sar_opt &= ~SAR_OPT_PAUSE;
 	    if(pause && ref_path != NULL && *ref_path == sauv_path)
-		user_interaction_pause("ready to start writing archive ? ");
-
-	    if(file_size == 0)
-		decoupe = open_archive_fichier((sauv_path + sar_make_filename(filename, 1, EXTENSION)).display(), allow_over, warn_over);
+		user_interaction_pause("Ready to start writing the archive? ");
+	    
+	    if(file_size == 0) // one SLICE
+		if(filename == "-") // output to stdout
+		    decoupe = sar_tools_open_archive_tuyau(1, gf_write_only); //archive goes to stdout
+		else
+		    decoupe = sar_tools_open_archive_fichier((sauv_path + sar_make_filename(filename, 1, EXTENSION)).display(), allow_over, warn_over);
 	    else
 		decoupe = new sar(filename, EXTENSION, file_size, first_file_size, sar_opt, sauv_path);
 	    if(decoupe == NULL)
 		throw Ememory("op_create");
 
-	    ver.edition = supported_version;
+	    version_copy(ver.edition, supported_version);
 	    ver.algo_zip = compression2char(algo);
 	    ver.cmd_line = make_string_from(argc-1, argv+1); // argv[0] is the command itself, we don't need it (where from `+1')
+	    ver.flag = 0;
+	    if(root_ea)
+		ver.flag |= VERSION_FLAG_SAVED_EA_ROOT;
+	    if(user_ea)
+		ver.flag |= VERSION_FLAG_SAVED_EA_USER;
 	    ver.write(*decoupe);
 	    
 	    zip = new compressor(algo, *decoupe);
 	    if(zip == NULL)
 		throw Ememory("op_create");
-	    filtre_sauvegarde(selection, subtree, zip, current, *ref, fs_root, info_details, st);
+	    switch(op)
+	    {
+	    case create:
+		filtre_sauvegarde(selection, subtree, zip, current, *ref, fs_root, info_details, st, empty_dir, root_ea, user_ea);
+		break;
+	    case isolate:
+		st.clear(); // used for Edata diagnostics
+		filtre_isolate(current, *ref, info_details);
+		break;
+	    default:
+		throw SRC_BUG; // op_create must only be called for creation or isolation
+	    }
 	    zip->flush_write();
 	    coord.set_catalogue_start(zip->get_position());
-	    if(info_details && ref_filename != NULL)
-		user_interaction_warning("adding reference to files that has been destroyed since reference backup");
-	    st.deleted = current.update_destroyed_with(*ref);
+	    if(ref_filename != NULL && op == create)
+	    {
+		if(info_details)
+		    user_interaction_warning("Adding reference to files that have been destroyed since reference backup...");
+		st.deleted = current.update_destroyed_with(*ref);
+	    }
+
+		// making some place in memory
+	    if(ref != NULL)
+	    {
+		delete ref;
+		ref = NULL;
+	    }
+
 	    if(info_details)
-		user_interaction_warning("writting archive content");
+		user_interaction_warning("Writing archive contents...");
 	    current.dump(*zip);
 	    zip->flush_write();
 	    delete zip; 
 	    zip = NULL;
 	    coord.dump(*decoupe);
 	    delete decoupe;
-	    display_sauv_stat(st);
+	    decoupe = NULL;
+	    if(op == create)
+		display_sauv_stat(st);
+	    if(st.errored > 0) // st is not used for isolation
+		throw Edata("some file could not be saved");
 	}
 	catch(...)
 	{
@@ -324,27 +351,37 @@ static void op_create(const path &fs_root, const path &sauv_path, const path *re
 		delete decoupe;
 	    throw;
 	}
-	delete ref;
+	if(ref != NULL)
+	    delete ref;
     }
     catch(Erange &e)
     {
-	user_interaction_warning(string("Error while saving data : ") + e.get_message());
+	string msg = string("error while saving data: ") + e.get_message();
+	user_interaction_warning(msg);
+	throw Edata(msg);
     }
     MEM_OUT;
 }
 
 static void op_extract(const path &fs_root, const path &sauv_path,
 		       const mask &selection, const mask &subtree, 
-		       string filename, bool allow_over, bool warn_over, 
-		       bool info_details,  bool detruire)
+		       const string &filename, bool allow_over, bool warn_over, 
+		       bool info_details,  bool detruire, 
+		       bool only_more_recent, bool restore_ea_root, 
+		       bool restore_ea_user,
+		       const string &input_pipe, const string &output_pipe)
 {
     try
     {
-	sar *decoupe;
+	generic_file *decoupe;
 	compressor *zip;
 	header_version ver;
 
-	open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver);
+	open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver, input_pipe, output_pipe);
+	if((ver.flag & VERSION_FLAG_SAVED_EA_ROOT) == 0)
+	    restore_ea_root = false; // not restoring something not saved
+	if((ver.flag & VERSION_FLAG_SAVED_EA_USER) == 0)
+	    restore_ea_user = false; // not restoring something not saved
 	try
 	{
 	    infinint tmp;
@@ -353,8 +390,15 @@ static void op_extract(const path &fs_root, const path &sauv_path,
 	    try
 	    {
 		statistics st;
-		filtre_restore(selection, subtree, zip, *cat, detruire, fs_root, allow_over, warn_over, info_details, st);
+		MEM_IN;
+		filtre_restore(selection, subtree, *cat, detruire, 
+			       fs_root, allow_over, warn_over, info_details,
+			       st, only_more_recent, restore_ea_root,
+			       restore_ea_user);
+		MEM_OUT;
 		display_rest_stat(st);
+		if(st.errored > 0)
+		    throw Edata("all file asked could not be restored");
 	    }
 	    catch(...)
 	    {
@@ -374,19 +418,24 @@ static void op_extract(const path &fs_root, const path &sauv_path,
     }
     catch(Erange &e)
     {
-	user_interaction_warning(string("Error while restoring data : ") + e.get_message());
+	string msg = string("error while restoring data: ") + e.get_message();
+	user_interaction_warning(msg);
+	throw Edata(msg);
     }
 }
 
-static void op_listing(const path &sauv_path, const string &filename, bool info_details)
+static void op_listing(const path &sauv_path, const string &filename, 
+		       bool info_details,		       
+		       const string &input_pipe, const string &output_pipe)
 {
     try
     {
-	sar *decoupe;
+	generic_file *decoupe;
 	compressor *zip;
 	header_version ver;
-	
-	open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver);
+
+	MEM_IN;	
+	open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver, input_pipe, output_pipe);
 	try
 	{
 	    infinint cat_size;
@@ -394,33 +443,53 @@ static void op_listing(const path &sauv_path, const string &filename, bool info_
 	    catalogue *cat = get_catalogue_from(*decoupe, *zip, info_details, cat_size);
 	    try
 	    {
-		infinint sub_file_size = decoupe->get_sub_file_size();
-		infinint first_file_size = decoupe->get_first_sub_file_size();
-		infinint last_file_size, file_number;
-		cout << "archive version format               : " << ver.edition << endl;
-		cout << "compression algorithm used           : " << compression2string(char2compression(ver.algo_zip)) << endl;
-		cout << "catalogue size in archive            : " << deci(cat_size).human() << " bytes" << endl;
-		cout << "command line options used for backup : " << ver.cmd_line << endl;
-		if(decoupe->get_total_file_number(file_number) 
-		   && decoupe->get_last_file_size(last_file_size))
+		if(info_details)
 		{
-		    cout << "archive is composed of " << deci(file_number).human() << " file" <<endl;
-		    if(file_number == 1)
-			cout << "file size : " <<  deci(last_file_size).human() + " bytes" << endl;
-		    else
+		    sar *real_decoupe = dynamic_cast<sar *>(decoupe);
+		    infinint sub_file_size;
+		    infinint first_file_size;
+		    infinint last_file_size, file_number;
+		    
+		    user_interaction_stream() << "Archive version format               : " << ver.edition << endl;
+		    user_interaction_stream() << "Compression algorithm used           : " << compression2string(char2compression(ver.algo_zip)) << endl;
+		    user_interaction_stream() << "Catalogue size in archive            : " << deci(cat_size).human() << " bytes" << endl;
+		    user_interaction_stream() << "Command line options used for backup : " << ver.cmd_line << endl;
+		    
+		    if(real_decoupe != NULL)
 		    {
-			if(first_file_size != sub_file_size)
-			    cout << "first file size       : " << deci(first_file_size).human() + " bytes" << endl;
-			cout << "file size             : " << deci(sub_file_size).human() + " bytes" << endl;
-			cout << "last file size        : " << deci(last_file_size).human() + " bytes" << endl;
+			infinint sub_file_size = real_decoupe->get_sub_file_size();
+			infinint first_file_size = real_decoupe->get_first_sub_file_size();
+			if(real_decoupe->get_total_file_number(file_number) 
+			   && real_decoupe->get_last_file_size(last_file_size))
+			{
+			    user_interaction_stream() << "Archive is composed of " << file_number << " file" << endl;
+			    if(file_number == 1)
+				user_interaction_stream() << "File size: " <<  last_file_size << " bytes" << endl;
+			    else
+			    {
+				if(first_file_size != sub_file_size)
+				    user_interaction_stream() << "First file size       : " << first_file_size << " bytes" << endl;
+				user_interaction_stream() << "File size             : " << sub_file_size << " bytes" << endl;
+				user_interaction_stream() << "Last file size        : " << last_file_size << " bytes" << endl;
+			    }
+			    if(file_number > 1)
+				user_interaction_stream() << "Archive total size is : " << (first_file_size + (file_number-2)*sub_file_size + last_file_size ) << " bytes" << endl;
+			}
+			else // could not read size parameters
+			    user_interaction_stream() << "Sorry, file size is unknown at this step of the program." << endl;
 		    }
-		    if(file_number > 1)
-			cout << "archive total size is : " << deci( first_file_size + (file_number-2)*sub_file_size + last_file_size ).human() << " bytes" << endl;
+		    else // not reading from a sar
+		    {
+			decoupe->skip_to_eof();
+			user_interaction_stream() << "Archive size is: " << decoupe->get_position() << " bytes" << endl;
+			user_interaction_stream() << "Previous archive size does not include headers present in each slice" << endl;
+		    }
+		    
+		    entree_stats stats = cat->get_stats();
+		    stats.listing(user_interaction_stream());
+		    user_interaction_pause("Continue listing archive contents?");
 		}
-		else
-		    cout << "Sorry, file size is unknown at this step of the program" << endl; 
-		user_interaction_pause("continue listing archive contents ?");
-		cat->listing(cout);
+		cat->listing(user_interaction_stream());
 	    }
 	    catch(...)
 	    {
@@ -437,27 +506,165 @@ static void op_listing(const path &sauv_path, const string &filename, bool info_
 	}
 	delete zip;
 	delete decoupe;
+	MEM_OUT;
     }
     catch(Erange &e)
     {
-	user_interaction_warning(string("Error while listing archive contents : ") + e.get_message());
+	string msg = string("error while listing archive contents: ") + e.get_message();
+	user_interaction_warning(msg);
+	throw Edata(msg);
     }
+}
+
+static void op_diff(const path & fs_root, const path &sauv_path,
+		    const mask &selection, const mask &subtree,
+		    const string &filename, bool info_details,
+		    bool check_ea_root, bool check_ea_user,
+		    const string &input_pipe, const string &output_pipe)
+{
+    MEM_IN;
+    try
+    {
+	generic_file *decoupe = NULL;
+	compressor *zip = NULL;
+	header_version ver;
+	catalogue *cat = NULL;
+	
+	try
+	{
+	    infinint cat_size;
+	    statistics st;
+	    
+	    open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver, input_pipe, output_pipe);
+	    cat = get_catalogue_from(*decoupe, *zip, info_details, cat_size);
+	    filtre_difference(selection, subtree, *cat, fs_root, info_details, st, check_ea_root, check_ea_user);
+	    display_diff_stat(st);
+	    if(st.errored > 0 || st.deleted > 0)
+		throw Edata("some file comparisons failed");
+	}
+	catch(...)
+	{
+	    if(cat != NULL)
+		delete cat;
+	    if(zip != NULL)
+		delete zip;
+	    if(decoupe != NULL)
+		delete decoupe;
+	    throw;
+	}
+	if(cat != NULL)
+	    delete cat;
+	if(zip != NULL)
+	    delete zip;
+	if(decoupe != NULL)
+	    delete decoupe;
+    }
+    catch(Erange & e)
+    {
+	string msg = string("error while comparing archive with filesystem: ")+e.get_message();
+	user_interaction_warning(msg);
+	throw Edata(msg);
+    }
+    MEM_OUT;
+}
+
+
+static void op_test(const path &sauv_path, const mask &selection, 
+		    const mask &subtree, const string &filename, 
+		    bool info_details,
+		    const string &input_pipe, const string &output_pipe)
+{
+    MEM_IN;
+    try
+    {
+	generic_file *decoupe = NULL;
+	compressor *zip = NULL;
+	header_version ver;
+	catalogue *cat = NULL;
+	
+	try
+	{
+	    infinint cat_size;
+	    statistics st;
+	    
+	    open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver, input_pipe, output_pipe);
+	    cat = get_catalogue_from(*decoupe, *zip, info_details, cat_size);
+	    filtre_test(selection, subtree, *cat, info_details, st);
+	    display_test_stat(st);
+	    if(st.errored > 0)
+		throw Edata("some files are corrupted in the archive and it will not be possible to restore them");
+	}
+	catch(...)
+	{
+	    if(cat != NULL)
+		delete cat;
+	    if(zip != NULL)
+		delete zip;
+	    if(decoupe != NULL)
+		delete decoupe;
+	    throw;
+	}
+	if(cat != NULL)
+	    delete cat;
+	if(zip != NULL)
+	    delete zip;
+	if(decoupe != NULL)
+	    delete decoupe;
+    }
+    catch(Erange & e)
+    {
+	string msg = string("error while testing archive: ")+e.get_message();
+	user_interaction_warning(msg);
+	throw Edata(msg);
+    }
+    MEM_OUT;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar.cpp,v 1.34 2002/03/25 22:02:38 denis Rel $";
+    static char id[]="$Id: dar.cpp,v 1.71 2002/06/27 17:42:35 denis Rel $";
     dummy_call(id);
 }
 
-static void open_archive(const path &sauv_path, const string &basename, const string &extension, int options, sar *&ret1, compressor *&ret2, header_version &ver)
+static void open_archive(const path &sauv_path, const string &basename, const string &extension, int options, generic_file *&ret1, compressor *&ret2, header_version &ver, const string &input_pipe, const string &output_pipe)
 {
-    ret1 = new sar(basename, extension, options, sauv_path);
+    if(basename == "-")
+    {
+	tuyau *in = NULL;
+	tuyau *out = NULL;
+	
+	try
+	{
+	    tools_open_pipes(input_pipe, output_pipe, in, out);
+	    ret1 = new zapette(in, out);
+	    if(ret1 == NULL)
+	    {
+		delete in;
+		delete out;
+	    }
+	    else
+		in = out = NULL; // now managed by the zapette
+	}
+	catch(...)
+	{
+	    if(in != NULL)
+		delete in;
+	    if(out != NULL)
+		delete out;
+	    throw;
+	}
+    }
+    else
+	ret1 = new sar(basename, extension, options, sauv_path);
     if(ret1 == NULL)
 	throw Ememory("open_archive");
     ver.read(*ret1);
     version_check(ver);
+    catalogue_set_reading_version(ver.edition);
+    file::set_compression_algo_used(char2compression(ver.algo_zip));
+    file::set_archive_localisation(ret1);
     ret2 = new compressor(char2compression(ver.algo_zip), *ret1);
+
     if(ret2 == NULL)
     {
 	delete ret1;
@@ -471,16 +678,23 @@ static catalogue *get_catalogue_from(generic_file & f, compressor & zip, bool in
     catalogue *ret;
 	
     if(info_details)
-	user_interaction_warning("extracting contents of the archive");
+	user_interaction_warning("Extracting contents of the archive...");
 
     term.read_catalogue(f);
     if(zip.skip(term.get_catalogue_start()))
     {
-	ret = new catalogue(zip);
+	try
+	{
+	    ret = new catalogue(zip);
+	}
+	catch(Egeneric & e)
+	{
+	    throw Erange("get_catalogue_from", string("cannot open catalogue: ") + e.get_message());
+	}
 	cat_size = zip.get_position() - term.get_catalogue_start();
     }
     else
-	throw Erange("get_catalogue_from", "missing catalogue in file");
+	throw Erange("get_catalogue_from", "missing catalogue in file.");
 
     if(ret == NULL)
 	throw Ememory("get_catalogue_from");
@@ -488,49 +702,67 @@ static catalogue *get_catalogue_from(generic_file & f, compressor & zip, bool in
     return ret;
 }
 
-static fichier *open_archive_fichier(const string &filename, bool allow_over, bool warn_over)
+
+static void display_sauv_stat(const statistics & st)
 {
-    char *name = tools_str2charptr(filename);
-    fichier *ret = NULL;
-    
-    try
-    {
-	int fd;
+    user_interaction_stream() << endl << endl << " -------------------------------------------- " << endl;
+    user_interaction_stream() << " " << st.treated << " inode(s) saved" << endl;
+    user_interaction_stream() << " with " << st.hard_links << " hard link(s) recorded" << endl;
+    user_interaction_stream() << " " << st.skipped << " inode(s) not saved (no file change)" << endl;
+    user_interaction_stream() << " " << st.errored << " inode(s) failed to save (filesystem error)" << endl;
+    user_interaction_stream() << " " << st.ignored << " files(s) ignored (excluded by filters)" << endl;
+    user_interaction_stream() << " " << st.deleted << " files(s) recorded as deleted from reference backup" << endl;
+    user_interaction_stream() << " -------------------------------------------- " << endl;
+    user_interaction_stream() << " Total number of file considered: " << st.total() << endl;
+#ifdef EA_SUPPORT
+    user_interaction_stream() << " -------------------------------------------- " << endl;
+    user_interaction_stream() << " EA saved for " << st.ea_treated << " file(s)" << endl;
+    user_interaction_stream() << " -------------------------------------------- " << endl;
+#endif
+}
 
-	if(!allow_over || warn_over)
-	{
-	    struct stat buf;
-	    if(lstat(name, &buf) < 0)
-	    {
-		if(errno != ENOENT)
-		    throw Erange("open_archive_fichier", strerror(errno));
-	    }
-	    else
-	    {
-		if(!allow_over)
-		    throw Erange("open_archive_fichier", filename + " already exists, and overwritten is forbidden, aborting");
-		if(warn_over)
-		    user_interaction_pause(filename + " is about to be overwritten, continue ?");
-	    }
-	}
-	    
-	fd = open(name, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-	if(fd < 0)
-	    throw Erange("open_archive_fichier", strerror(errno));
+static void display_rest_stat(const statistics & st)
+{
 
-	ret = new trivial_sar(fd);
-	if(ret == NULL) 
-	    throw Ememory("open_archive_fichier");
-    }
-    catch(...)
-    {
-	delete name;
-	if(ret != NULL)
-	    delete ret;
-	throw;
-    }
-    delete name;
-    return ret;
+    user_interaction_stream() << endl << endl << " -------------------------------------------- " << endl;
+    user_interaction_stream() << " " << st.treated << " file(s) restored" << endl;
+    user_interaction_stream() << " " << st.skipped << " file(s) not restored (not saved in archive)" << endl;
+    user_interaction_stream() << " " << st.ignored << " file(s) ignored (excluded by filters)" << endl;
+    user_interaction_stream() << " " << st.tooold  << " file(s) less recent than the one on filesystem" << endl;
+    user_interaction_stream() << " " << st.errored << " file(s) failed to restore (filesystem error)" << endl;
+    user_interaction_stream() << " " << st.deleted << " file(s) deleted" << endl;
+    user_interaction_stream() << " -------------------------------------------- " << endl;
+    user_interaction_stream() << " Total number of file considered: " << st.total() << endl;
+#ifdef EA_SUPPORT
+    user_interaction_stream() << " -------------------------------------------- " << endl;
+    user_interaction_stream() << " EA restored for " << st.ea_treated << " file(s)" << endl;
+    user_interaction_stream() << " -------------------------------------------- " << endl;
+#endif
+}
+
+static void display_diff_stat(const statistics &st)
+{
+    user_interaction_stream() << endl;
+    user_interaction_stream() << " " << st.errored << " file(s) do not match those on filesystem" << endl;
+    user_interaction_stream() << " " << st.deleted << " file(s) failed to be read" << endl;
+    user_interaction_stream() << " " << st.ignored << " file(s) ignored (excluded by filters)" << endl;
+    user_interaction_stream() << " -------------------------------------------- " << endl;
+    user_interaction_stream() << " Total number of file considered: " << st.total() << endl;
+}
+
+static void display_test_stat(const statistics & st)
+{
+    user_interaction_stream() << endl;
+    user_interaction_stream() << " " << st.errored << " file(s) with error" << endl;
+    user_interaction_stream() << " " << st.ignored << " file(s) ignored (excluded by filters)" << endl;
+    user_interaction_stream() << " -------------------------------------------- " << endl;
+    user_interaction_stream() << " Total number of file considered: " << st.total() << endl;
+}
+
+static void version_check(const header_version & ver)
+{
+    if(atoi(ver.edition) > atoi(supported_version))
+	user_interaction_pause("The archive format version of the archive is too high for that software version, try reading anyway?");
 }
 
 static string make_string_from(int argc, char *argv[])
@@ -545,35 +777,4 @@ static string make_string_from(int argc, char *argv[])
     }
 
     return ret;
-}
-
-static void display_sauv_stat(const statistics & st)
-{
-    cout << endl << endl << " -------------------------------------------- " << endl;
-    cout << deci(st.treated).human() << " file(s) saved" << endl;
-    cout << deci(st.skipped).human() << " file(s) not saved (no file change)" << endl;
-    cout << deci(st.ignored).human() << " file(s) ignored filed (excluded by filters)" << endl;
-    cout << deci(st.errored).human() << " file(s) failed to save (filesystem error)" << endl;
-    cout << deci(st.deleted).human() << " file(s) recorded as deleted from reference backup" << endl;
-    cout << " -------------------------------------------- " << endl;
-    cout << deci(st.treated+st.skipped+st.ignored+st.errored+st.deleted).human() << " total number of file considered" << endl;
-}
-
-static void display_rest_stat(const statistics & st)
-{
-
-    cout << endl << endl << " -------------------------------------------- " << endl;
-    cout << deci(st.treated).human() << " file(s) restored" << endl;
-    cout << deci(st.skipped).human() << " file(s) not restored (not saved in archive)" << endl;
-    cout << deci(st.ignored).human() << " file(s) ignored (excluded by filters)" << endl;
-    cout << deci(st.errored).human() << " file(s) failed to restore (filesystem error)" << endl;
-    cout << deci(st.deleted).human() << " file(s) deleted" << endl;
-    cout << " -------------------------------------------- " << endl;
-    cout << deci(st.treated+st.skipped+st.ignored+st.errored+st.deleted).human() << " total number of file considered" << endl;
-}
-
-static void version_check(const header_version & ver)
-{
-    if(atoi(ver.edition) > atoi(supported_version))
-	user_interaction_pause("the file version of the archive is too high for that software version, try reading anyway ?");
 }

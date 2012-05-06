@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.hpp,v 1.18 2002/03/18 11:00:54 denis Rel $
+// $Id: sar.hpp,v 1.22 2002/05/17 16:17:48 denis Rel $
 //
 /*********************************************************************/
 
 #ifndef SAR_HPP
 #define SAR_HPP
+
+#pragma interface
 
 #include <string>
 #include "generic_file.hpp"
@@ -97,13 +99,24 @@ private :
 };
 
 
-class trivial_sar : public fichier
+class trivial_sar : public generic_file
 {
 public:
-    trivial_sar(int fd);
+    trivial_sar(generic_file *ref); // trivial_sar own the argument
+    ~trivial_sar() { if(reference != NULL) delete reference; };
 
-    bool skip(infinint pos) { return fichier::skip(pos + header::size()); };
-    infinint get_position() { return fichier::get_position() - header::size(); };
+    bool skip(infinint pos) { return reference->skip(pos + offset); };
+    bool skip_to_eof() { return reference->skip_to_eof(); };
+    bool skip_relative(signed int x);
+    infinint get_position();
+
+protected:
+    int inherited_read(char *a, size_t size) { return reference->read(a, size); };
+    int inherited_write(char *a, size_t size) { return reference->write(a, size); };
+    
+private:
+    generic_file *reference;
+    infinint offset;
 };
 
 extern string sar_make_filename(string base_name, infinint num, string ext);

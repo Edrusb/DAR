@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_memory.hpp,v 1.5 2002/03/18 11:00:54 denis Rel $
+// $Id: test_memory.hpp,v 1.6 2002/04/14 16:12:50 denis Rel $
 //
 /*********************************************************************/
 
@@ -29,20 +29,24 @@
 
 #ifdef TEST_MEMORY
 
+#define MEM_BEGIN record_offset()
+
 #define MEM_IN unsigned long local_total_alloc_size = get_total_alloc_size()
 #define MEM_OUT memory_check(local_total_alloc_size, __FILE__, __LINE__)
 
 #define MEM_END all_delete_done()
 
+extern void record_offset();
 extern unsigned long get_total_alloc_size();
 extern void all_delete_done();
 extern void memory_check(unsigned long ref, const char *fichier, int ligne);
 
 #else
 
-#define MEM_IN  // does nothing 
-#define MEM_OUT // does nothing
-#define MEM_END // does nothing
+#define MEM_BEGIN // does nothing
+#define MEM_IN    // does nothing 
+#define MEM_OUT   // does nothing
+#define MEM_END   // does nothing
 
 #endif
 

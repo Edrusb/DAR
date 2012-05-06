@@ -1,3 +1,4 @@
+
 PRESENTATION
 ================
 
@@ -5,28 +6,33 @@ dar is a shell command, that makes backup of a directory tree and files.
 Actually it has been tested only under Linux, but future issue is planed 
 for windows. A GUI for Linux will also follow, for version 2.0.0
 
+
 PACKAGE CONTENT
 ===============
 
 for functional description see the following "FEATURES" paragraph below
 for actual limitations see below "LIMITATIONS" paragraph below
-for installation instructions see INSTALL
-for a brief tutorial see TUTORIAL
+for installation instructions see INSTALL file
+for a brief tutorial see TUTORIAL file
 for complete usage help see man page (type 'man dar' after installation)
+for notes on miscellaneous topics see NOTES
 for future features see TODO
+for license information see LICENSE
 
 
 FEATURES
 ================
 
-FILTERS :
+
+FILTERS:
 dar is able to backup from total file system to a single file. Additionally a 
 mechanism of filters permits, based on the filename, to exclude or include 
 some files while backing up or restoring a directory tree. In the other
 side, a secondary filter mechanism permits to exclude some branches of a 
 directory tree, or to only include some branches.
 
-DIFFERENTIAL BACKUP :
+
+DIFFERENTIAL BACKUP:
 When making a backup with dar, you have the possibility to make a full backup
 or a differential backup. A full backup, as expected makes backup of all
 files as specified on the command line (with or without filters). Instead, a
@@ -40,7 +46,8 @@ Note that the reference backup can be a full backup or another differential
 backup. This way you can make a first full backup, then many differential 
 backup, each taking as reference the last backup made.
 
-SLICES :
+
+SLICES:
 Dar stands for Disk ARchive. From the beginning it was designed to be able
 to split an archive over several removable media whatever their number is
 and whatever their size is. Thus dar is able to save over old floppy disk,
@@ -52,11 +59,12 @@ to un/mount a medium, burn the file on CD-R, send it by email (if your mail
 system does not allow huge file in emails, dar can help you here also).
 By default, (no size specified), dar will make one slice whatever its size is.
 Additionally, the size of the first slice can be specified separately, if for
-example you want first to fulfil an partially filled disk before starting
+example you want first to fulfil a partially filled disk before starting
 using empty ones. Last, at restoration time, dar will just pause and prompt 
 the user asking a slice only if it is missing.
 
-COMPRESSION :
+
+COMPRESSION:
 last, dar can use compression. By default no compression is used. Actually 
 only gzip algorithm is implemented, but some room has been done for bzip2 and
 any other compression algorithm. Note that, compression is made before slices,
@@ -64,7 +72,7 @@ which means that using compression with slices, will not make slices smaller,
 but will probably make less slices in the backup.
 
 
-DIRECT ACCESS :
+DIRECT ACCESS:
 even using compression dar has not to read the whole backup to extract one 
 file. This way if you just want to restore one file from a huge backup, the 
 process will be much faster than using tar. Dar first reads the catalogue 
@@ -74,20 +82,60 @@ particular using slices dar will ask only for the slice(s) containing the
 file(s) to restore.
 
 
+HARD LINK CONSIDERATION:
+hard links are now properly saved. They are properly restored if possible. If 
+for example restoring across a mounted filesystem, hard linking will fail, but
+dar will then duplicate the inode and file content, issuing a warning.
+
+
+EXTENDED ATTRIBUTES:
+support for extended attributes have to be activated at compilation time 
+(see INSTALL). Dar is able to save and restore EA, all or just those of a
+given namespace (system or user). If no EA have been saved and restoration
+occurs over a file that has EA, they will be preserved. But if they have 
+been saved empty for a given file, any existing EA for that file will be 
+removed at restoration time, unless -u and/or -U is given on command-line.
+
+
+ARCHIVE TESTING
+thanks to CRC (cyclic redundancy checks), dar is able to detect data corruption
+in the archive. Only the file where data corruption occurred will not be 
+possible to restore, but dar will restore the other even when compression is 
+used.
+
+
+USING PIPES
+dar is now able to produce an archive to its standard output or named pipe. it
+is also able to read an archive through a pair of pipes, to take a remote 
+archive as reference, or even to restore data from a remote archive. This way 
+it is now possible to store an archive remotely and in total security (if using
+encrypted means)
+
+
+ISOLATION
+the catalogue (i.e.: the contents of an archive), can be extracted (this 
+operation is called isolation) to a small file, that can in turn be used
+as reference for differential archive. There is no more need to provide an 
+archive to be able to create a differential backup over it, just its
+catalogue is necessary.
+
+
+RE-SHAPE SLICES OF AN EXISTING ARCHIVE
+the external program named "dar_xform" is able to change the size of slices
+of a given archive. The resulting archive is totally identical to archives
+directly created by dar. Source archive can be taken from a set of slice, 
+from standard input or even a named pipe.
+
+
 LIMITATIONS :
 ==============
-dar does not restore hard linked files correctly. But, no data loss will
-occur just data duplication, but instead of two directory entries pointing 
-to the same file content, dar will restore two directories pointing on two 
-copies of the original file.
-
-The size of SLICES may be limited by the file system (ext2 maximum file size
-is 4 GByte), the number of SLICES is only limited by the size of the filenames,
-thus using a base name of 10 chars, considering your file system can support
-256 char per filename at most, you could already get up to  10^241 SLICES,
-1 followed by 241 zero. As soon as your file system will support bigger files
-or longer filename, dar will follow without change.
-
+The size of SLICES may be limited by the file system or kernel (maximum
+file size is 2 GByte with Linux kernel 2.2.x), the number of SLICES is 
+only limited by the size of the filenames, thus using a base name of 10 
+chars, considering your file system can support 256 char per filename at 
+most, you could already get up to  10^241 SLICES, 1 followed by 241 zero. 
+But as soon as your file system will support bigger files or longer filename, 
+dar will follow without change.
 
 
 CONTACT :
@@ -95,5 +143,4 @@ CONTACT :
 Denis Corbin
 http://dar.linux.free.fr
 dar.linux@free.fr
-
 

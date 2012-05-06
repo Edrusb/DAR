@@ -18,11 +18,10 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_sar.cpp,v 1.13 2002/03/25 22:02:38 denis Rel $
+// $Id: test_sar.cpp,v 1.16 2002/05/17 16:17:48 denis Rel $
 //
 /*********************************************************************/
-
-#include <stdio.h>
+#include <iostream.h>
 #include "sar.hpp"
 #include "deci.hpp"
 #include "testtools.hpp"
@@ -41,7 +40,7 @@ int main()
 
 static void f1()
 {
-    user_interaction_init(0, cout);
+    user_interaction_init(0, &cout, &cerr);
     try
     {
 	sar sar1 = sar("destination", ".txt", 100, 110, SAR_OPT_DEFAULT/*&~SAR_OPT_DONT_ERASE&~SAR_OPT_WARN_OVERWRITE*/, path("./test"));

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.14 2002/03/18 11:00:54 denis Rel $
+// $Id: tools.cpp,v 1.22 2002/06/11 17:46:32 denis Rel $
 //
 /*********************************************************************/
 
@@ -26,10 +26,13 @@
 #include <strstream.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include "tools.hpp"
 #include "erreurs.hpp"
+#include "deci.hpp"
 
 char *tools_str2charptr(string x)
 {
@@ -44,26 +47,8 @@ char *tools_str2charptr(string x)
 
 void tools_write_string(generic_file & f, const string & s)
 {
-    char *tmp = tools_str2charptr(s);
-
-    if(tmp == NULL)
-	throw Ememory("tools_write_string");
-    try
-    {
-	unsigned int len;
-	unsigned int wrote = 0;
-	
-	if(tmp == NULL)
-	    throw Ememory("tools_write_string");
-	len = strlen(tmp) + 1;
-	while(wrote < len)
-	    wrote += f.write(tmp+wrote, len-wrote);
-    }
-    catch(...)
-    {
-	delete tmp;
-    }
-    delete tmp;
+    tools_write_string_all(f, s);
+    f.write("", 1); // adding a '\0' at the end;
 }
 
 void tools_read_string(generic_file & f, string & s)
@@ -82,6 +67,50 @@ void tools_read_string(generic_file & f, string & s)
 
     if(lu != 1 || a[0] != '\0')
 	throw Erange("tools_read_string", "not a zero terminated string in file");
+}
+
+void tools_write_string_all(generic_file & f, const string & s)
+{
+    char *tmp = tools_str2charptr(s);
+
+    if(tmp == NULL)
+	throw Ememory("tools_write_string_all");
+    try
+    {
+	unsigned int len = s.size();
+	unsigned int wrote = 0;
+
+	while(wrote < len)
+	    wrote += f.write(tmp+wrote, len-wrote);
+    }
+    catch(...)
+    {
+	delete tmp;
+    }
+    delete tmp;
+}
+
+void tools_read_string_size(generic_file & f, string & s, infinint taille)
+{
+    unsigned short small_read = 0;
+    size_t max_read = 0;
+    int lu = 0;
+    const unsigned int buf_size = 10240;
+    char buffer[buf_size];
+    
+    s = "";
+    do
+    {
+	if(small_read > 0)
+	{
+	    max_read = small_read > buf_size ? buf_size : small_read;
+	    lu = f.read(buffer, max_read);
+	    small_read -= lu;
+	    s += string((char *)buffer, (char *)buffer+lu);
+	}
+	taille.unstack(small_read);
+    }
+    while(small_read > 0);
 }
 
 infinint tools_get_filesize(const path &p)
@@ -106,8 +135,146 @@ infinint tools_get_filesize(const path &p)
     return (unsigned long int)buf.st_size;
 }
 
+infinint tools_get_extended_size(string s)
+{
+    unsigned int len = s.size();
+    infinint factor = 1;
+
+    if(len < 1)
+	return false;
+    switch(s[len-1])
+    {
+    case 'K':
+    case 'k': // kilobyte
+	factor = 1024;
+	break;
+    case 'M': // megabyte
+	factor = infinint(1024)*infinint(1024);
+	break;
+    case 'G': // gigabyte
+	factor = infinint(1024)*infinint(1024)*infinint(1024);
+	break;
+    case 'T': // terabyte
+	factor = infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024);
+	break;
+    case 'P': // petabyte
+	factor = infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024);
+	break;
+    case 'E': // exabyte
+	factor = infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024);
+	break;
+    case 'Z': // zettabyte
+	factor = infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024);
+	break;
+    case 'Y':  // yottabyte
+	factor = infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024);
+	break;
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+	break;
+    default :
+	throw Erange("command_line get_extended_size", string("unknown sufix in string : ")+s);
+    }
+
+    if(factor != 1)
+	s = string(s.begin(), s.end()-1);
+
+    deci tmp = s;
+    factor *= tmp.computer();
+
+    return factor;
+}
+
+char *tools_extract_basename(const char *command_name)
+{
+    path commande = command_name;
+    string tmp = commande.basename();
+    char *name = tools_str2charptr(tmp);
+    
+    return name;
+}
+
+
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: tools.cpp,v 1.14 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: tools.cpp,v 1.22 2002/06/11 17:46:32 denis Rel $";
     dummy_call(id);
+}
+
+void tools_split_path_basename(const char *all, path * &chemin, string & base)
+{
+    chemin = new path(all);
+    if(chemin == NULL)
+	throw Ememory("tools_split_path_basename");
+
+    try
+    {
+	if(chemin->degre() > 1)
+	{
+	    if(!chemin->pop(base))
+		throw SRC_BUG; // a path of degree > 1 should be able to pop()
+	}
+	else
+	{
+	    delete chemin;
+	    base = all;
+	    chemin = new path(".");
+	    if(chemin == NULL)
+		throw Ememory("tools_split_path_basename");
+	}
+    }
+    catch(...)
+    {
+	if(chemin != NULL)
+	    delete chemin;
+	throw;
+    }
+}
+
+void tools_open_pipes(const string &input, const string & output, tuyau *&in, tuyau *&out)
+{
+    in = out = NULL;
+    try
+    {
+	if(input != "")
+	    in = new tuyau(input, gf_read_only);
+	else
+	    in = new tuyau(0, gf_read_only); // stdin by default
+	if(in == NULL)
+	    throw Ememory("tools_open_pipes");
+	
+	if(output != "")
+	    out = new tuyau(output, gf_write_only);
+	else
+	    out = new tuyau(1, gf_write_only); // stdout by default
+	if(out == NULL)
+	    throw Ememory("tools_open_pipes");
+
+    }
+    catch(...)
+    {
+	if(in != NULL)
+	    delete in;
+	if(out != NULL)
+	    delete out;
+	throw;
+    }
+}
+
+void tools_blocking_read(int fd, bool mode)
+{
+    int flags = fcntl(fd, F_GETFL, 0);
+    if(!mode)
+	flags |= O_NDELAY;
+    else
+	flags &= ~O_NDELAY;
+    fcntl(fd, F_SETFL, flags);
 }

@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: infinint.hpp,v 1.14 2002/03/18 11:00:54 denis Rel $
+// $Id: infinint.hpp,v 1.17 2002/06/20 20:44:30 denis Rel $
 //
 /*********************************************************************/
 
 #ifndef INFININT_HPP
 #define INFININT_HPP
+
+#pragma interface
 
 #include "storage.hpp"
 class generic_file;
@@ -31,8 +33,9 @@ class generic_file;
 class infinint
 {
 public :
-    infinint(unsigned long int a = 0) throw(Ememory, Erange, Ebug) 
-	{ E_BEGIN; infinint_from(a); E_END("infinint::infinint", "unsigned long"); };
+
+    infinint(off_t a = 0) throw(Ememory, Erange, Ebug)
+	{ E_BEGIN; infinint_from(a); E_END("infinint::infinint", "off_t"); };
     infinint(const infinint & ref) throw(Ememory, Ebug) 
 	{ E_BEGIN; copy_from(ref); E_END("infinint::infinint", "const infinint &"); };
     ~infinint() throw(Ebug) 
@@ -80,6 +83,8 @@ public :
 	{ E_BEGIN; infinint_unstack_to(v); E_END("infinint::unstack", "unsignd long int"); }; 
     void unstack(unsigned int &v) throw(Ememory, Erange, Ebug) 
 	{ E_BEGIN; infinint_unstack_to(v); E_END("infinint::unstack", "unsignd int"); };
+    void unstack(off_t &v) throw(Ememory, Erange, Ebug) 
+	{ E_BEGIN; infinint_unstack_to(v); E_END("infinint::unstack", "off_t"); };
     
 
     friend bool operator < (const infinint &, const infinint &) throw(Erange, Ebug);

@@ -1,18 +1,18 @@
 TODO (order is not significant)
 ===========
-- save/restore hard links (actually the hard linked 
-  files are duplicated in the archive)
 - add encryption capability
 - bzip2 compression
-- catalogue extraction to small file
 - Graphical User Interface for Linux
 - Windows Port
-- archive integrity test feature
-- archive difference feature
-- multi language support (selection at compilation time)
-- new option for restoration :
-  do not restore files if they exist in file system and are 
-  more recent than those in the archive
-
-
-
+- multi-language support (selection at compilation time)
+- understand when a filename is given in place of a basename and take out 
+  the base name asking the user for processing
+- mask feature to not compress certain files base on filename mask
+- add time shift for differential backup, when daylight saving causes problem
+- support for reading configuration from a file instead of command-line
+- bootable Linux image with what's necessary to restore a system from a dar
+  archive
+- add a hook to launch a given shell command/script when a slice has been written
+- add a mode in which dar does not change the atime of directory it is openning 
+  for reading during a backup (some software like "leafnode" --- a NNTP proxy, 
+  rely on the atime of directories for proper operation).

@@ -1,0 +1,57 @@
+.TH DAR_SLAVE 1 "MAY 15, 2002"
+.UC 8
+.SH NAME
+dar_slave \- disk archive slave
+.SH SYNOPSIS
+.B dar_slave [options] [<path>/]source
+.P
+.B dar_slave -h
+.P
+.B dar_slave -V
+.SH DESCRIPTION
+.B dar_slave  
+reads an archive and listens for 
+.B dar
+orders on standard input, sending asked parts of the archive on standard output.
+.PP
+Source is the basename of the archive to read. By default, 
+.B dar_slave 
+uses standard input and output to communicate with a
+.B dar
+process, which may be running on the local host or on a remote host. It is possible to change the behaviour of
+.B dar_slave
+to use named pipe instead of standard input and output
+
+.SH OPTIONS
+
+.PP
+.TP 20
+-h
+Displays help usage.
+.TP 20
+-V 
+Displays version information.
+.TP 20
+-i <filename> 
+reads the orders from the named file instead of standard input. In most cases the filename will be a named pipe.
+.TP 20
+-o <filename>
+sends the data to the named file <filename> instead of standard output. In most cases the filename will be a named pipe.
+
+.SH EXIT CODES
+.B dar_slaves 
+exists with the same codes as dar does, see dar(1) man page.
+
+.SH SEE ALSO
+dar(1), dar_xform(1)
+
+.SH KNOWN BUGS
+None actually.
+
+.SH AUTHOR
+.nf
+http://dar.linux.free.fr/
+Denis Corbin (dar.linux@free.fr)
+France
+Europe
+

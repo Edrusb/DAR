@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: defile.hpp,v 1.6 2002/03/18 11:00:54 denis Rel $
+// $Id: defile.hpp,v 1.7 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
 
 #ifndef DEFILE_HPP
 #define DEFILE_HPP
+
+#pragma interface
 
 #include "catalogue.hpp"
 #include "path.hpp"

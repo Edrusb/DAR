@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.hpp,v 1.12 2002/03/18 11:00:54 denis Rel $
+// $Id: mask.hpp,v 1.13 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
 
 #ifndef MASK_HPP
 #define MASK_HPP
+
+#pragma interface
 
 #include <string.h>
 #include <string>

@@ -18,9 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: deci.cpp,v 1.14 2002/03/18 11:00:54 denis Rel $
+// $Id: deci.cpp,v 1.17 2002/06/05 21:32:26 denis Rel $
 //
 /*********************************************************************/
+
+#pragma implementation
 
 #include "deci.hpp"
 #include "erreurs.hpp"
@@ -55,9 +57,9 @@ template <class T> void decicoupe(storage * &decimales, T x) throw(Ememory, Eran
     E_BEGIN;
     try 
     {
-	chiffre d = 10;
 	chiffre r;
-	T d_t, r_t;
+	const T d_t = 10;
+	T r_t;
 	storage::iterator it;
 	bool recule = false;
 	unsigned char tmp;
@@ -73,9 +75,9 @@ template <class T> void decicoupe(storage * &decimales, T x) throw(Ememory, Eran
 	{
 	    if(x > 0)
 	    {
-		d_t = d;
 		euclide(x,d_t,x,r_t);
-		r = r_t % 10;
+		r = 0;
+		r_t.unstack(r);
 	    }
 	    else
 		r = 0xF; // not significative information
@@ -146,14 +148,6 @@ deci::deci(string s) throw(Edeci, Ememory, Erange, Ebug)
 
     reduce();
     E_END("deci::deci", "string");
-}
-
-deci::deci(unsigned long int x) throw(Ememory, Erange, Ebug) 
-{ 
-    E_BEGIN; 
-    decicoupe(decimales, x); 
-    reduce();
-    E_END("deci::deci", "unsigned long"); 
 }
 
 deci::deci(const infinint & x) throw(Ememory, Erange, Ebug)
@@ -246,7 +240,7 @@ void deci::reduce() throw(Ememory, Erange, Ebug)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: deci.cpp,v 1.14 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: deci.cpp,v 1.17 2002/06/05 21:32:26 denis Rel $";
     dummy_call(id);
 }
 
@@ -308,3 +302,12 @@ infinint deci::computer() const throw(Ememory, Erange, Ebug)
     return r;
     E_END("deci::computer", "");
 }
+
+ostream & operator << (ostream & ref, const infinint & arg)
+{
+    deci tmp = arg;
+    ref << tmp.human();
+
+    return ref;
+}
+    

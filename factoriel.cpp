@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: factoriel.cpp,v 1.10 2002/03/18 11:00:54 denis Rel $
+// $Id: factoriel.cpp,v 1.13 2002/06/20 20:43:52 denis Rel $
 //
 /*********************************************************************/
 
@@ -28,16 +28,20 @@
 #include <unistd.h>
 #include <string>
 #include <iostream.h>
+#include <errno.h>
 #include "infinint.hpp"
 #include "deci.hpp"
 #include "erreurs.hpp"
 #include "test_memory.hpp"
+#include "generic_file.hpp"
 
 int main(int argc, char *argv[]) throw()
 {
+    MEM_BEGIN;
+    MEM_IN;
     try
     {
-	if(argc != 2)
+	if(argc != 2 && argc != 3)
 	    exit(1);
 	
 	string s = argv[1];
@@ -52,6 +56,22 @@ int main(int argc, char *argv[]) throw()
 	cout << "calcul finished, now computing the decimal representation ... " << endl;
 	f = deci(p);
 	cout << f.human() << endl;
+	if(argc == 3)
+	{
+	    int fd = open(argv[2], O_RDWR|O_CREAT|O_TRUNC, 0644);
+	    if(fd < 0)
+		cout << "cannot open file for test ! " << strerror(errno) << endl;
+	    else
+	    {
+		fichier fic = fd;
+		infinint cp;
+
+		p.dump(fic);
+		fic.skip(0);
+		cp.read_from_file(fic);
+		cout << "read from file: " << cp << endl;
+	    }
+	}
     }
     catch(Egeneric & e)
     {
@@ -59,9 +79,18 @@ int main(int argc, char *argv[]) throw()
     }
 
     infinint *tmp;
-    MEM_IN;
-    tmp = new infinint(19237);
-    delete tmp;
-    MEM_OUT;
+    {
+	MEM_IN;
+	tmp = new infinint(19237);
+	delete tmp;
+	MEM_OUT;
+    }
+    MEM_OUT; // matches the MEM_IN at the beginning of main
     MEM_END;
 }    
+
+static void dummy_call(char *x)
+{
+    static char id[]="$Id: factoriel.cpp,v 1.13 2002/06/20 20:43:52 denis Rel $";
+    dummy_call(id);
+}

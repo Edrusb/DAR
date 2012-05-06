@@ -1,0 +1,91 @@
+KNOWN BUGS:
+
+#1: description: files pointed to by a symbolic links get their times
+        (mtime & atime) not properly restored
+	   
+    problem: when restoring time of a symbolic link the utime() system call
+	does not change the inode of the symbolic link itself but the one of 
+	the file pointed to by the symbolic link
+
+    solution: as the utime() call behaves the same on many Unix platforms,
+	(HP-UX, solaris, Linux, etc.), the times for the symbolic links are
+	no more restored, thus files pointed to by symbolic links are not 
+	affected by the utime() strange behaviour. Dar, behaves not the 
+	same as touch, tar, etc.
+
+    affects version: 1.0.0
+    fixed in version: 1.0.1
+
+
+#2: description: dar immediately exits with message "file mode is neither
+        read nor write" while creating an archive on 64 bits platforms.
+
+    problem: missing mask with O_ACCMODE for flags returned by fcntl()
+        system call
+
+    solution: O_ACCMODE mask added
+
+    affects versions: 1.0.0, 1.0.1
+    fixed in version: 1.0.2
+
+	
+#3: description: making differential backup with some directory implicitly or 
+        explicitly (-P) excluded, sometime lead to full backup. 
+
+    problem: when entering a directory that was ignored, the comparison in the
+        catalogue of reference was not going back to the parent directory,
+	leading the comparison to be no more synchronised with the file being
+	read.
+
+    solution: added a line to go back to parent directory when treating an
+        ignored directory
+
+    affects versions: 1.0.0, 1.0.1
+    fixed in version: 1.0.2
+
+
+#4: description: on Linux 64 bits, when an interaction from the user is
+	required, (escape or return key), the keys have to be pressed four
+	time before dar can read a character.
+
+    problem:
+	unknown, same code works fine on other platforms, and if bad character
+	remains in the pipe, the message would be displayed several time,
+	which is not the case, here. It seems that the user has to press four
+	key for	the first one to be accessible to dar.
+
+    solution: none actually
+
+    affects versions: 1.0.0, 1.0.1 , 1.0.2 and probably also 1.1.0
+    fixed in version: none
+
+#5: description: Dar stops one of the two following error:
+   --- exception nature = [alive]  exception type = [BUG] ----------
+   [source]
+           file compressor.cpp line 244 : it seems to be a bug here
+   [most outside call]
+   -----------------------------------
+	
+       or
+ 
+   --- exception nature = [alive]  exception type = [BUG] ----------
+   [source]
+           file compressor.cpp line 254 : it seems to be a bug here
+   [most outside call]
+   -----------------------------------
+
+    problem:
+	the zlib deflate() calls returned an unexpected value (Z_STREAM_END).
+	and inflate() in some rare cases was called without data to process,
+	when reaching end of file, which made inflate() to return Z_BUF_ERROR 
+	code.
+
+    solution:
+	adding code for taking care of the returned code Z_STREAM_END by 
+	deflate(), and code for taking care of Z_BUF_ERROR returned at end
+ 	of file.
+
+    affects version: 1.0.0, 1.0.1, 1.0.2
+    fixed in version: 1.0.3
+     
+

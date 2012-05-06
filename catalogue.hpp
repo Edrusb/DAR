@@ -18,28 +18,71 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.27 2002/03/30 15:59:19 denis Rel $
+// $Id: catalogue.hpp,v 1.45 2002/06/18 21:16:06 denis Rel $
 //
 /*********************************************************************/
 
 #ifndef CATALOGUE_HPP
 #define CATALOGUE_HPP
 
+#pragma interface
+
 #include <unistd.h>
 #include <vector>
+#include <map>
 #include "infinint.hpp"
 #include "path.hpp"
 #include "generic_file.hpp"
+#include "header_version.hpp"
+#include "ea.hpp"
+#include "compressor.hpp"
+
+extern void catalogue_set_reading_version(const version &ver);
+
+class file_etiquette;
+class entree;
+
+struct entree_stats
+{
+    infinint num_x;                  // number of file referenced as destroyed since last backup
+    infinint num_d;                  // number of directories
+    infinint num_f;                  // number of plain files (hard link or not, thus file directory entries)
+    infinint num_c;                  // number of char devices
+    infinint num_b;                  // number of block devices
+    infinint num_p;                  // number of named pipes
+    infinint num_s;                  // number of unix sockets
+    infinint num_l;                  // number of symbolic links
+    infinint num_hard_linked_inodes; // number of inode that have more than one link (inode with "hard links")
+    infinint num_hard_link_entries;  // total number of hard links (file directory entry pointing to an
+	// inode already linked in the same or another directory (i.e. hard linked))
+    infinint saved; // total number of saved inode (unix inode, not inode class) hard links do not count here
+    infinint total; // total number of inode in archive (unix inode, not inode class) hard links do not count here
+    void clear() { num_x = num_d = num_f = num_c = num_b = num_p 
+		  = num_s = num_l = num_hard_linked_inodes 
+		  = num_hard_link_entries = saved = total = 0; };
+    void add(const entree *ref);
+    void listing(ostream & flux) const;
+};
 
 class entree
 {
 public :
+    static void reset_read() { corres.clear(); stats.clear(); };
     static entree *read(generic_file & f);
+    static entree_stats get_stats() { return stats; };
+    static void freemem() { stats.clear(); corres.clear(); };
+
     virtual ~entree() {};
     virtual void dump(generic_file & f) const;
     virtual unsigned char signature() const = 0;
+    virtual entree *clone() const = 0;
 
+private :
+    static map <infinint, file_etiquette *> corres;
+    static entree_stats stats;
 };
+
+extern bool compatible_signature(unsigned char a, unsigned char b);
 
 class eod : public entree
 {
@@ -48,6 +91,7 @@ public :
     eod(generic_file & f) {};
 	// dump defined by entree
     unsigned char signature() const { return 'z'; };
+    entree *clone() const { return new eod(); };
 };
 
 class nomme : public entree
@@ -58,11 +102,13 @@ public :
     void dump(generic_file & f) const;
 
     string get_name() const { return xname; };
+    void change_name(const string &x) { xname = x; };
     bool same_as(const nomme & ref) const { return xname == ref.xname; };
 	// no need to have a virtual method, as signature will differ in inherited classes (argument type changes)
 
 	// signature() is kept as an abstract method
-
+	// clone() is abstract
+    
 private :
     string xname;
 };
@@ -75,6 +121,8 @@ public:
 	  const infinint & last_modif, 
 	  const string & xname);
     inode(generic_file & f, bool saved);
+    inode(const inode & ref);
+    ~inode() { if(ea != NULL) delete ea; };
 
     void dump(generic_file & f) const;
     short int get_uid() const { return uid; };
@@ -83,14 +131,55 @@ public:
     infinint get_last_access() const { return last_acc; };
     infinint get_last_modif() const { return last_mod; };
     void set_last_access(const infinint & x_time) { last_acc = x_time; };
-    void set_last_modif(const infinint & x_time) { last_mod = x_time; };
-    
+    void set_last_modif(const infinint & x_time) { last_mod = x_time; };    
     bool get_saved_status() const { return xsaved; };
     void set_saved_status(bool x) { xsaved = x; };
 	
     bool same_as(const inode & ref) const;
     virtual bool is_more_recent_than(const inode & ref) const;
-	// signature left as an abstract method
+    virtual bool has_changed_since(const inode & ref) const;
+	// signature() left as an abstract method
+	// clone is abstract
+    void compare(const inode &other, bool root_ea, bool user_ea) const;
+	// throw Erange exception if a difference has been detected
+	// this is not a symetrical comparison, but all what is present
+	// in the current object is compared against the argument
+	// which may contain supplementary informations
+
+
+
+	//////////////////////////////////
+	// EXTENDED ATTRIBUTS Methods
+	//
+
+    enum ea_status { ea_none, ea_partial, ea_full };
+	// ea_none    : no EA present to this inode in filesystem
+	// ea_partial : EA present in filesystem but not stored (ctime used to check changes)
+	// ea_full    : EA present in filesystem and attached to this inode
+
+	// I : to know whether EA data is present or not for this object
+    void ea_set_saved_status(ea_status status); 
+    ea_status ea_get_saved_status() const { return ea_saved; };
+
+	// II : to associate EA list to an inode object (mainly for backup operation) #EA_FULL only#
+    void ea_attach(ea_attributs *ref);
+    const ea_attributs *get_ea() const;
+    void ea_detach() const; //discards any future call to get_ea() ! 
+
+	// III : to record where is dump the EA in the archive #EA_FULL only#
+    void ea_set_offset(const infinint & pos) { ea_offset = pos; };
+    void ea_set_crc(const crc & val) { copy_crc(ea_crc, val); };
+
+	// IV : to know/record if EA have been modified #EA_FULL or EA_PARTIAL#
+    infinint get_last_change() const;
+    void set_last_change(const infinint & x_time);
+
+	////////////////////////
+
+    static void set_ignore_owner(bool mode) { ignore_owner = mode; };
+    
+protected:
+    virtual void sub_compare(const inode & other) const {};
 
 private :
     unsigned short int uid;
@@ -98,6 +187,20 @@ private :
     unsigned short int perm;
     infinint last_acc, last_mod;
     bool xsaved;
+    ea_status ea_saved;
+	//  the following is used only if ea_saved == full
+    infinint ea_offset;
+    ea_attributs *ea;
+	// the following is used if ea_saved == full or ea_saved == partial
+    infinint last_cha;
+    crc ea_crc;
+
+    static generic_file *storage; // where are stored EA
+	// this is a static variable (shared amoung all objects)
+	// because it is not efficient to have many copies of the same value
+	// if in the future, all inode have to their EA stored in the same
+	// generic_file, this will be changed.
+    static bool ignore_owner;
 };
 
 class file : public inode
@@ -113,18 +216,93 @@ public :
     
     void dump(generic_file & f) const;
     bool is_more_recent_than(const inode & ref) const;
+    bool has_changed_since(const inode & ref) const;
     infinint get_size() const { return size; };
+    infinint get_storage_size() const { return storage_size; };
+    void set_storage_size(const infinint & s) { storage_size = s; };
     generic_file *get_data() const; // return a newly alocated object in read_only mode
+    void clean_data(); // partially free memory (but get_data() becomes disabled)
     void set_offset(const infinint & r);
     unsigned char signature() const { return get_saved_status() ? 'f' : 'F'; };
 
+    void set_crc(const crc &c) { copy_crc(check, c); };
+    bool get_crc(crc & c) const;
+    entree *clone() const { return new file(*this); };
+
+    static void set_compression_algo_used(compression a) { algo = a; };
+    static compression get_compression_algo_used() { return algo; };
+    static void set_archive_localisation(generic_file *f) { loc = f; };
+
+protected :
+    void sub_compare(const inode & other) const;
+
 private :	
-    bool from_path;
+    enum { empty, from_path, from_cat } status;
     path chemin;
     infinint offset;
     infinint size;
-    generic_file *loc;
+    infinint storage_size;
+    crc check;
+
+    static generic_file *loc;
+    static compression algo;
 };
+
+class etiquette
+{
+public:
+    virtual infinint get_etiquette() const = 0;
+    virtual const file *get_inode() const = 0;
+};
+
+class file_etiquette : public file, public etiquette
+{
+public :
+    file_etiquette(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
+		   const infinint & last_access, 
+		   const infinint & last_modif, 
+		   const string & src,
+		   const path & che,
+		   const infinint & taille) : file(xuid, xgid, xperm, last_access, last_modif, src, che, taille) 
+	{ etiquette = compteur++; };
+    file_etiquette(generic_file & f, bool saved);
+
+    void dump(generic_file &f) const;
+    unsigned char signature() const { return get_saved_status() ? 'e' : 'E'; };
+    entree *clone() const { return new file_etiquette(*this); };
+
+    static void reset_etiquette_counter() { compteur = 0; };
+    
+	// inherited from etiquette
+    infinint get_etiquette() const { return etiquette; };
+    void change_etiquette() { etiquette = compteur++; };
+    const file *get_inode() const { return this; };
+
+private :
+    infinint etiquette;
+
+    static infinint compteur;
+};
+
+class hard_link : public nomme, public etiquette
+{
+public :
+    hard_link(const string & name, file_etiquette *ref);
+    hard_link(generic_file & f, infinint & etiquette); // with etiquette, a call to set_reference() follows
+
+    void dump(generic_file &f) const;
+    unsigned char signature() const { return 'h'; };
+    entree *clone() const { return new hard_link(*this); };
+    void set_reference(file_etiquette *ref);
+
+	// inherited from etiquette
+    infinint get_etiquette() const { return x_ref->get_etiquette(); };
+    const file *get_inode() const { return x_ref; };
+
+private :
+    file_etiquette *x_ref;
+};
+
 
 class lien : public inode
 {
@@ -140,7 +318,12 @@ public :
     void set_target(string x);
 
 	// using the method is_more_recent_than() from inode
+	// using method has_changed_since() from inode class
     unsigned char signature() const { return get_saved_status() ? 'l' : 'L'; };
+    entree *clone() const { return new lien(*this); };
+
+protected :
+    void sub_compare(const inode & other) const;
 
 private :
     string points_to;
@@ -153,7 +336,7 @@ public :
 	      const infinint & last_access, 
 	      const infinint & last_modif, 
 	      const string & xname);
-    directory(const directory &ref);
+    directory(const directory &ref); // only the inode part is build, no children is duplicated (empty dir)
     directory(generic_file & f, bool saved);
     ~directory(); // detruit aussi tous les fils et se supprime de son 'parent'
 
@@ -161,12 +344,14 @@ public :
     void add_children(nomme *r); // when r is a directory, 'parent' is set to 'this'
     void reset_read_children() { it = fils.begin(); }; 
     bool read_children(nomme * &r); // read the direct children of the directory, returns false if no more is available
-    void listing(ostream & flux, string marge = "");
+    void listing(ostream & flux, string marge = "") const;
     directory * get_parent() const { return parent; };
     bool search_children(const string &name, nomme *&ref);
 
 	// using is_more_recent_than() from inode class
+	// using method has_changed_since() from inode class
     unsigned char signature() const { return get_saved_status() ? 'd' : 'D'; };
+    entree *clone() const { return new directory(*this); };
 
 private :
     directory *parent;
@@ -194,7 +379,11 @@ public :
     void set_minor(int x) { xminor = x; };
 
 	// using method is_more_recent_than() from inode class
+	// using method has_changed_since() from inode class
 	// signature is left pure abstract
+
+protected :
+    void sub_compare(const inode & other) const;
 
 private :
     unsigned short int xmajor, xminor;
@@ -215,7 +404,9 @@ public:
 
 	// using dump from device class
 	// using method is_more_recent_than() from device class
+	// using method has_changed_since() from device class
     unsigned char signature() const { return get_saved_status() ? 'c' : 'C'; };
+    entree *clone() const { return new chardev(*this); };
 };
 
 class blockdev : public device
@@ -233,7 +424,9 @@ public:
     
 	// using dump from device class
 	// using method is_more_recent_than() from device class
+	// using method has_changed_since() from device class
     unsigned char signature() const { return get_saved_status() ? 'b' : 'B'; };
+    entree *clone() const { return new blockdev(*this); };
 };
 
 class tube : public inode
@@ -247,7 +440,9 @@ public :
     
     	// using dump from inode class
 	// using method is_more_recent_than() from inode class
+	// using method has_changed_since() from inode class
     unsigned char signature() const { return get_saved_status() ? 'p' : 'P'; };
+    entree *clone() const { return new tube(*this); };
 };
 
 class prise : public inode
@@ -261,7 +456,9 @@ public :
 
     	// using dump from inode class
 	// using method is_more_recent_than() from inode class
+	// using method has_changed_since() from inode class
     unsigned char signature() const { return get_saved_status() ? 's' : 'S'; };
+    entree *clone() const { return new prise(*this); };
 };
 
 class detruit : public nomme
@@ -274,6 +471,7 @@ public :
     unsigned char get_signature() const { return signe; };
     void set_signature(unsigned char x) { signe = x; };
     unsigned char signature() const { return 'x'; };
+    entree *clone() const { return new detruit(*this); };
 
 private :
     unsigned char signe;
@@ -287,6 +485,7 @@ public :
 
     void dump(generic_file & f) const { throw SRC_BUG; };
     unsigned char signature() const { return 'i'; };
+    entree *clone() const { return new ignored(*this); };
 };
 
 class ignored_dir : public inode
@@ -297,6 +496,7 @@ public:
 
     void dump(generic_file & f) const; // behaves like an empty directory
     unsigned char signature() const { return 'j'; }; 
+    entree *clone() const { return new ignored_dir(*this); };
 };
 
 class catalogue
@@ -349,7 +549,8 @@ public :
 	// ref must have the same root, else the operation generates a exception
     
     void dump(generic_file & ref) const;
-    void listing(ostream & flux, string marge = "") { contenu->listing(flux, marge); };
+    void listing(ostream & flux, string marge = "");
+    entree_stats get_stats() const { return stats; };
 
 private :
     directory *contenu;
@@ -359,6 +560,7 @@ private :
     directory *current_read;          // points to the directory where the next item will be read
     path *sub_tree;                   // path to sub_tree
     signed int sub_count;             // count the depth in of read routine in the sub_tree
+    entree_stats stats;               // statistics catalogue contents
 
     void partial_copy_from(const catalogue &ref);
     void detruire();

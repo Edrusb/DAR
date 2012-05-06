@@ -18,16 +18,17 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.hpp,v 1.15 2002/03/18 11:00:54 denis Rel $
+// $Id: header.hpp,v 1.19 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
 
 #ifndef HEADER_H
 #define HEADER_H
 
+#pragma interface
+
 #include "infinint.hpp"
 #include "generic_file.hpp"
-#include "tools.hpp"
 
 #define LABEL_SIZE 10
 
@@ -41,6 +42,10 @@
 typedef unsigned long int magic_number;
 typedef char label[LABEL_SIZE];
 
+extern void label_copy(label & left, const label & right);
+extern bool header_label_is_equal(const label &a, const label &b);
+extern void header_generate_internal_filename(label & ret);
+
 struct header
 {
     magic_number magic;
@@ -49,40 +54,18 @@ struct header
     char extension; // extension rules the use of the following fields
     infinint size_ext; // if EXTENSION_SIZE
 
+    header();
+    header(const header & ref) { copy_from(ref); };
+    struct header & operator = (const header & ref) { copy_from(ref); return *this; };
+
     void read(generic_file & f);
     void write(generic_file & f);
     void read(int fd);
     void write(int fd);
 
     static unsigned int size() { return sizeof(magic_number) + sizeof(label) + 2*sizeof(char); };
+    void copy_from(const header & ref);
 };
-
-typedef char version[3];
-
-struct header_version
-{
-    version edition;
-    char algo_zip;
-    string cmd_line;
-    
-    void read(generic_file &f) 
-	{ 
-	    f.read(edition, sizeof(edition)); 
-	    f.read(&algo_zip, sizeof(algo_zip)); 
-	    tools_read_string(f, cmd_line); 
-	};
-    void write(generic_file &f) 
-	{ 
-	    f.write(edition, sizeof(edition)); 
-	    f.write(&algo_zip, sizeof(algo_zip)); 
-	    tools_write_string(f, cmd_line);
-	};
-};
-
-
-extern bool header_label_is_equal(const label &a, const label &b);
-extern void header_generate_internal_filename(label & ret);
-
         
 #endif
 

@@ -18,13 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_terminateur.cpp,v 1.7 2002/03/18 11:00:54 denis Rel $
+// $Id: test_terminateur.cpp,v 1.8 2002/05/15 21:56:01 denis Rel $
 //
 /*********************************************************************/
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <iostream.h>
 #include "terminateur.hpp"
 #include "generic_file.hpp"
 #include "deci.hpp"
@@ -32,7 +33,7 @@
 
 static void f1();
 
-main()
+int main()
 {
     MEM_IN;
     f1();

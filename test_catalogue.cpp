@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_catalogue.cpp,v 1.12 2002/03/25 22:02:38 denis Rel $
+// $Id: test_catalogue.cpp,v 1.13 2002/05/02 19:51:44 denis Rel $
 //
 /*********************************************************************/
 
@@ -39,7 +39,7 @@ void f3();
 int main()
 {
     MEM_IN;
-    user_interaction_init(0, cout);
+    user_interaction_init(0, &cout, &cerr);
     try
     {
 	MEM_IN;

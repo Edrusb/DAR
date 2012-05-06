@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_deci.cpp,v 1.7 2002/03/18 11:00:54 denis Rel $
+// $Id: test_deci.cpp,v 1.9 2002/06/05 21:32:26 denis Rel $
 //
 /*********************************************************************/
 
@@ -41,7 +41,7 @@ static void f1()
     deci d1 = string("00001");
     infinint t = 3;
     deci d2 = t;
-    deci d3 = 125;
+    deci d3 = infinint(125);
     unsigned int c;
     
     cout << d1.human() << endl;

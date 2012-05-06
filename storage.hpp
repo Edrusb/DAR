@@ -18,16 +18,18 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.hpp,v 1.13 2002/03/18 11:00:54 denis Rel $
+// $Id: storage.hpp,v 1.19 2002/06/11 17:46:32 denis Rel $
 //
 /*********************************************************************/
 
 #ifndef STORAGE_HPP
 #define STORAGE_HPP
 
-#include <stdio.h>
+#pragma interface
+
 #include "erreurs.hpp"
 class infinint;
+class generic_file;
 
 class storage
 {
@@ -44,7 +46,8 @@ public:
 	{ E_BEGIN; make_alloc(size, first, last); E_END("storage::storage","unsigned long int"); };
     storage(const infinint & size) throw(Ememory, Erange, Ebug);
     storage(const storage & ref) throw(Ememory, Ebug) 
-	{ E_BEGIN; copy_from(ref); E_END("toto", "titi"); };
+	{ E_BEGIN; copy_from(ref); E_END("storage::storage", "storage &"); };
+    storage(generic_file & f, const infinint &size);
     ~storage() throw(Ebug) 
 	{ E_BEGIN; detruit(first); E_END("storage::~storage", ""); };
 
@@ -67,6 +70,7 @@ public:
     unsigned char operator [](const infinint & position) const throw(Ememory, Erange, Ebug); 
     infinint size() const throw(Ememory, Erange, Ebug);
     void clear(unsigned char val = 0) throw();
+    void dump(generic_file & f) const;
 
     class iterator
     {
@@ -76,20 +80,19 @@ public:
 	    // default destructor is OK
 	    // default operator = is OK
 
-	iterator operator ++ (int x) throw() 
-	    { E_BEGIN; iterator ret = *this; skip_to(+1); return ret; E_END("storage::iterator::operator++", "(int)"); }; 
+	iterator operator ++ (int x) throw()
+	    { E_BEGIN; iterator ret = *this; skip_plus_one(); return ret;  E_END("storage::iterator::operator++", "(int)"); };
 	iterator operator -- (int x) throw() 
-	    { E_BEGIN; iterator ret = *this; skip_to(-1); return ret; E_END("storage::iterator::operator--", "(int)");}; 
+	    { E_BEGIN; iterator ret = *this; skip_less_one(); return ret; E_END("storage::iterator::operator--", "(int)");}; 
 	iterator & operator ++ () throw() 
-	    { E_BEGIN; skip_to(+1); return *this; E_END("storage::iterator::operator++", "()"); }; 
+	    { E_BEGIN; skip_plus_one(); return *this; E_END("storage::iterator::operator++", "()"); }; 
 	iterator & operator -- () throw()
-	    { E_BEGIN; skip_to(-1); return *this; E_END("storage::iterator::operator--", "()"); }; 
+	    { E_BEGIN; skip_less_one(); return *this; E_END("storage::iterator::operator--", "()"); }; 
 	iterator operator + (unsigned long s) const throw() 
 	    { E_BEGIN; iterator ret = *this; ret += s; return ret; E_END("storage::iterator::operator +", ""); }; 
 	iterator operator - (unsigned long s) const throw()
 	    { E_BEGIN; iterator ret = *this; ret -= s; return ret; E_END("storage::iterator::operator -", ""); };
-	iterator & operator += (unsigned long s) throw ()
-	    { E_BEGIN; skip_to(s/2); skip_to(s/2+s%2); return *this; E_END("storage::iterator::operator +=", ""); }; 
+	iterator & operator += (unsigned long s) throw();
 	iterator & operator -= (unsigned long s) throw();
 	unsigned char &operator *() const throw(Erange);
 
@@ -109,9 +112,12 @@ public:
 	struct cellule *cell;
 	unsigned long int offset; 
 
-	void skip_to(signed long int val) throw();
+	void relative_skip_to(signed long int val) throw();
 	bool points_on_data() const throw()
 	    { E_BEGIN; return ref != NULL && cell != NULL && offset < cell->size; E_END("storage::iterator::point_on_data", "");};
+
+	inline void skip_plus_one();
+	inline void skip_less_one();
 	
 	friend class storage;
     };
@@ -125,7 +131,7 @@ public:
 
 	// WARNING for the two following methods :
 	// there is no "reverse_iterator" type, unlike the standart lib, 
-	// this when going from rbegin() to rend(), you must use the -- operator 
+	// thus when going from rbegin() to rend(), you must use the -- operator 
 	// unlike the stdlib, that uses the ++ operator. this is the only difference in use with stdlib.
     iterator rbegin() const throw()
 	{ E_BEGIN; iterator ret; ret.cell = last; ret.offset = last != NULL ? last->size-1 : 0; ret.ref = this; return ret; E_END("storage::rbegin", ""); };
@@ -143,6 +149,7 @@ public:
     void insert_null_bytes_at_iterator(iterator it, unsigned int size) throw(Erange, Ememory, Ebug);
     void insert_const_bytes_at_iterator(iterator it, unsigned char a, unsigned int size) throw(Erange, Ememory, Ebug);
     void insert_bytes_at_iterator(iterator it, unsigned char *a, unsigned int size) throw(Erange, Ememory, Ebug); 
+    void insert_as_much_as_necessary_const_byte_to_be_as_wider_as(const storage & ref, const iterator & it, unsigned char value);
     void remove_bytes_at_iterator(iterator it, unsigned int number) throw(Ememory, Ebug);
     void remove_bytes_at_iterator(iterator it, infinint number) throw(Ememory, Erange, Ebug);
 private:
@@ -159,7 +166,7 @@ private:
 	// STATIC statments :
 	//
 
-    static unsigned long alloc_size;
+    static unsigned long alloc_size; // stores the last biggest memory allocation successfully realized
 
     static void detruit(struct cellule *c) throw(Ebug);
     static void make_alloc(unsigned long int size, struct cellule * & begin, struct cellule * & end) throw(Ememory, Ebug);
@@ -167,6 +174,38 @@ private:
 
     friend class storage::iterator;
 };
+
+inline void storage::iterator::skip_plus_one()
+{
+    E_BEGIN;
+    if(cell != NULL)
+	if(++offset >= cell->size)
+	{ 
+	    cell = cell->next;
+	    if(cell != NULL)
+		offset = 0;
+	    else
+		offset = OFF_END;
+	}
+    E_END("storage::iterator::slik_plus_one", "");
+}
+
+inline void storage::iterator::skip_less_one()
+{
+    E_BEGIN;
+    if(cell != NULL)
+	if(offset > 0)
+	    offset--;
+	else
+	{ 
+	    cell = cell->prev;
+	    if(cell != NULL)
+		offset = cell->size - 1;
+	    else
+		offset = OFF_BEGIN;
+	}
+    E_END("storage::iterator::slik_plus_one", "");
+}
 
 #endif
 
