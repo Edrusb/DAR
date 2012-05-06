@@ -18,9 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.12 2002/03/18 11:00:54 denis Rel $
+// $Id: compressor.cpp,v 1.19 2002/05/28 20:17:29 denis Rel $
 //
 /*********************************************************************/
+
+#pragma implementation
 
 #include <zlib.h>
 #include <signal.h>
@@ -30,6 +32,18 @@
 #define BUFFER_SIZE 102400
 
 compressor::compressor(compression algo, generic_file & compressed_side) : generic_file(compressed_side.get_mode())
+{
+    init(algo, &compressed_side);
+    compressed_owner = false;
+}
+
+compressor::compressor(compression algo, generic_file *compressed_side) : generic_file(compressed_side->get_mode())
+{
+    init(algo, compressed_side);
+    compressed_owner = true;
+}
+
+void compressor::init(compression algo, generic_file *compressed_side)
 {
     compr = decompr = NULL;
     switch(algo)
@@ -104,7 +118,7 @@ compressor::compressor(compression algo, generic_file & compressed_side) : gener
 	throw SRC_BUG;
     }
 
-    compressed = &compressed_side;
+    compressed = compressed_side;
 }
 
 compressor::~compressor()
@@ -147,6 +161,8 @@ compressor::~compressor()
 	    throw SRC_BUG;
 	}
     }
+    if(compressed_owner)
+	delete compressed;
 }
 
 compressor::xfer::xfer(unsigned int sz)
@@ -209,8 +225,6 @@ int compressor::gzip_read(char *a, size_t size)
 	    decompr->strm->next_in = (Bytef *)decompr->buffer;
 	    decompr->strm->avail_in = compressed->read(decompr->buffer, 
 						       decompr->size);
-	    if(decompr->strm->avail_in == 0) // EOF reached
-		flag = Z_FINISH;
 	}
 
 	ret = inflate(decompr->strm, flag);
@@ -225,7 +239,15 @@ int compressor::gzip_read(char *a, size_t size)
 	case Z_MEM_ERROR:
 	    throw Ememory("compressor::gzip_read");
 	case Z_BUF_ERROR:
-	    throw SRC_BUG;
+		// no process is possible:
+	    if(decompr->strm->avail_in == 0) // because we reached EOF
+		ret = Z_STREAM_END; // zlib did not returned Z_STREAM_END (why ?) 
+	    else // nothing explains why no process is possible:
+		if(decompr->strm->avail_out == 0)
+		    throw SRC_BUG; // bug from DAR: no output possible
+		else
+		    throw SRC_BUG; // unexpected comportment from zlib
+	    break;
 	default:
 	    throw SRC_BUG;
 	}
@@ -240,6 +262,9 @@ int compressor::gzip_write(char *a, size_t size)
     compr->strm->next_in = (Bytef *)a;
     compr->strm->avail_in = size;
 
+    if(a == NULL)
+	throw SRC_BUG;
+
     while(compr->strm->avail_in > 0)
     {
 	    // making room for output
@@ -249,7 +274,12 @@ int compressor::gzip_write(char *a, size_t size)
 	switch(deflate(compr->strm, Z_NO_FLUSH))
 	{
 	case Z_OK:
+	case Z_STREAM_END:
 	    break;
+	case Z_STREAM_ERROR:
+	    throw SRC_BUG;
+	case Z_BUF_ERROR:
+	    throw SRC_BUG;
 	default :
 	    throw SRC_BUG;
 	}
@@ -315,7 +345,7 @@ void compressor::clean_read()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: compressor.cpp,v 1.12 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: compressor.cpp,v 1.19 2002/05/28 20:17:29 denis Rel $";
     dummy_call(id);
 }
 
