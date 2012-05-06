@@ -1,0 +1,99 @@
+PRESENTATION
+================
+
+dar is a shell command, that makes backup of a directory tree and files. 
+Actually it has been tested only under Linux, but future issue is planed 
+for windows. A GUI for Linux will also follow, for version 2.0.0
+
+PACKAGE CONTENT
+===============
+
+for functional description see the following "FEATURES" paragraph below
+for actual limitations see below "LIMITATIONS" paragraph below
+for installation instructions see INSTALL
+for a brief tutorial see TUTORIAL
+for complete usage help see man page (type 'man dar' after installation)
+for future features see TODO
+
+
+FEATURES
+================
+
+FILTERS :
+dar is able to backup from total file system to a single file. Additionally a 
+mechanism of filters permits, based on the filename, to exclude or include 
+some files while backing up or restoring a directory tree. In the other
+side, a secondary filter mechanism permits to exclude some branches of a 
+directory tree, or to only include some branches.
+
+DIFFERENTIAL BACKUP :
+When making a backup with dar, you have the possibility to make a full backup
+or a differential backup. A full backup, as expected makes backup of all
+files as specified on the command line (with or without filters). Instead, a
+differential backup, (over filter mechanism), saves only files that have 
+changed since a given reference backup. Additionally, files that existed in 
+the reference backup and which do no more exist at the time of the 
+differential backup are recorded in the backup. At recovery time, (unless you
+deactivate it), restoring a differential backup will update changed files
+and new files, but also remove files that have been recorded as deleted. 
+Note that the reference backup can be a full backup or another differential
+backup. This way you can make a first full backup, then many differential 
+backup, each taking as reference the last backup made.
+
+SLICES :
+Dar stands for Disk ARchive. From the beginning it was designed to be able
+to split an archive over several removable media whatever their number is
+and whatever their size is. Thus dar is able to save over old floppy disk,
+CD-R, DVD-R, CD-RW, DVD-RW, Zip, Jazz, etc... Dar is not concerned by 
+un/mounting a removable medium, instead it is independent of hardware. 
+Given the size, it will split the archive in several files (called SLICES),
+eventually pausing before creating the next one, allowing this way, the user
+to un/mount a medium, burn the file on CD-R, send it by email (if your mail
+system does not allow huge file in emails, dar can help you here also).
+By default, (no size specified), dar will make one slice whatever its size is.
+Additionally, the size of the first slice can be specified separately, if for
+example you want first to fulfil an partially filled disk before starting
+using empty ones. Last, at restoration time, dar will just pause and prompt 
+the user asking a slice only if it is missing.
+
+COMPRESSION :
+last, dar can use compression. By default no compression is used. Actually 
+only gzip algorithm is implemented, but some room has been done for bzip2 and
+any other compression algorithm. Note that, compression is made before slices,
+which means that using compression with slices, will not make slices smaller, 
+but will probably make less slices in the backup.
+
+
+DIRECT ACCESS :
+even using compression dar has not to read the whole backup to extract one 
+file. This way if you just want to restore one file from a huge backup, the 
+process will be much faster than using tar. Dar first reads the catalogue 
+(i.e. the contents of the backup), then it goes directly to the location of
+the saved file(s) you want to restore and proceed to restoration. In 
+particular using slices dar will ask only for the slice(s) containing the
+file(s) to restore.
+
+
+LIMITATIONS :
+==============
+dar does not restore hard linked files correctly. But, no data loss will
+occur just data duplication, but instead of two directory entries pointing 
+to the same file content, dar will restore two directories pointing on two 
+copies of the original file.
+
+The size of SLICES may be limited by the file system (ext2 maximum file size
+is 4 GByte), the number of SLICES is only limited by the size of the filenames,
+thus using a base name of 10 chars, considering your file system can support
+256 char per filename at most, you could already get up to  10^241 SLICES,
+1 followed by 241 zero. As soon as your file system will support bigger files
+or longer filename, dar will follow without change.
+
+
+
+CONTACT :
+============
+Denis Corbin
+http://dar.linux.free.fr
+dar.linux@free.fr
+
+

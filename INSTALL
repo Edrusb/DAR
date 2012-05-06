@@ -1,0 +1,57 @@
+
+REQUIREMENTS (only if you plan to compile)
+================
+you need a c++ compiler (source tested with gcc-2.91.66)
+zlib must be installed (at least version 1.1.3)
+
+
+
+INSTALLATION 
+================
+
+1. first edit the Makefile to suite your needs 
+	you should only have to change 
+	INSTALL_ROOT_DIR 
+	if you don't want to install dar binary in /usr/local/bin
+	and a man page in /usr/local/man
+
+2. if you don't have pre-built binaries, compile dar with :
+
+	make
+
+3. as root install it with :
+	
+	make install
+(it will install the dar binary as well its manual page)
+
+
+Optionally :
+----------------
+
+to uninstall :
+
+	make uninstall
+
+to clean the package source tree after :
+	
+	make clean
+
+if you want to debug or to play with the factoriel program (which is a little software used for testing the infini-integer used in dar),  
+
+	make factoriel
+
+to use factoriel :
+
+	./factoriel 100
+	the argument is a decimal number as huge as you want, all depends on the time want to
+	spend to compute the decimal representation of the factoriel ( "n!" in math. ).
+
+if you've planed to debug, you can build the several test program aimed to quite each module
+
+	make test
+
+
+have fun !
+
+
+

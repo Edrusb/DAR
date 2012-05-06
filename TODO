@@ -1,0 +1,18 @@
+TODO (order is not significant)
+===========
+- save/restore hard links (actually the hard linked 
+  files are duplicated in the archive)
+- add encryption capability
+- bzip2 compression
+- catalogue extraction to small file
+- Graphical User Interface for Linux
+- Windows Port
+- archive integrity test feature
+- archive difference feature
+- multi language support (selection at compilation time)
+- new option for restoration :
+  do not restore files if they exist in file system and are 
+  more recent than those in the archive
+
+
+
