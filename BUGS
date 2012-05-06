@@ -1,0 +1,18 @@
+KNOWN BUGS :
+
+#1 : Description : files pointed to by a symbolic links get their times
+	 (mtime & atime) not properly restored
+	   
+     problem : when restoring time of a symbolic link the utime() system call
+	does not change the inode of the symbolic link itself but the one of 
+	the file pointed to by the symbolic link
+
+     solution : as the utime() call behaves the same on many Unix plateforms,
+	(HP-UX, solaris, Linux, etc.), the times for the symbolic links are
+	no more restored, thus files pointed to by symbolic links are not 
+	affected by the utime() strange behaviour. Dar, behaves not the 
+	same as touch, tar, etc.
+
+     fixed in : version 1.0.1
+
+
