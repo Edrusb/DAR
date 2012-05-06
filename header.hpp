@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.hpp,v 1.15 2002/03/18 11:00:54 denis Rel $
+// $Id: header.hpp,v 1.17 2002/04/24 21:07:33 denis Rel $
 //
 /*********************************************************************/
 
@@ -41,6 +41,8 @@
 typedef unsigned long int magic_number;
 typedef char label[LABEL_SIZE];
 
+extern void label_copy(label & left, const label & right);
+
 struct header
 {
     magic_number magic;
@@ -49,15 +51,23 @@ struct header
     char extension; // extension rules the use of the following fields
     infinint size_ext; // if EXTENSION_SIZE
 
+    header();
+    header(const header & ref) { copy_from(ref); };
+    struct header & operator = (const header & ref) { copy_from(ref); return *this; };
+
     void read(generic_file & f);
     void write(generic_file & f);
     void read(int fd);
     void write(int fd);
 
     static unsigned int size() { return sizeof(magic_number) + sizeof(label) + 2*sizeof(char); };
+    void copy_from(const header & ref);
 };
 
-typedef char version[3];
+#define VERSION_SIZE 3
+
+typedef char version[VERSION_SIZE];
+extern void version_copy(version & left, const version & right);
 
 struct header_version
 {

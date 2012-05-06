@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.26 2002/03/18 11:00:54 denis Rel $
+// $Id: sar.cpp,v 1.28 2002/04/25 17:59:36 denis Rel $
 //
 /*********************************************************************/
 
@@ -155,7 +155,7 @@ bool sar::skip_forward(unsigned int x)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: sar.cpp,v 1.26 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: sar.cpp,v 1.28 2002/04/25 17:59:36 denis Rel $";
     dummy_call(id);
 }
 
@@ -327,7 +327,7 @@ void sar::open_readonly(char *fic, const infinint &num)
 	    //
 	if(num == 1 && first_file_offset == 0)
 	{
-	    of_internal_name = h.internal_name;
+	    label_copy(of_internal_name, h.internal_name);
 	    try
 	    {
 		first_size = of_fd->get_size();
@@ -398,7 +398,7 @@ void sar::open_writeonly(char *fic, const infinint &num)
 		}
 		catch(Erange & e)
 		{
-		    h.internal_name = of_internal_name;
+		    label_copy(h.internal_name, of_internal_name);
 		    h.internal_name[0] = ~h.internal_name[0];
 			// this way we are shure that the file is not considered as part of the SAR
 		}
@@ -551,7 +551,7 @@ header sar::make_write_header(const infinint & num, char flag)
 {
     header h;
 
-    h.internal_name = of_internal_name;
+    label_copy(h.internal_name, of_internal_name);
     h.magic = SAUV_MAGIC_NUMBER;
     h.flag = flag;
     h.extension = EXTENSION_NO;
@@ -560,7 +560,7 @@ header sar::make_write_header(const infinint & num, char flag)
 	if(first_file_offset == 0)
 	{
 	    header_generate_internal_filename(of_internal_name);
-	    h.internal_name = of_internal_name;
+	    label_copy(h.internal_name, of_internal_name);
 	}
 	if(size != first_size)
 	{

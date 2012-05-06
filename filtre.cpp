@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.25 2002/03/30 15:59:19 denis Rel $
+// $Id: filtre.cpp,v 1.25.1.1 2002/04/24 20:44:47 denis Rel $
 //
 /*********************************************************************/
 
@@ -149,7 +149,8 @@ void filtre_sauvegarde(const mask &filtre,
 		       bool info_details,
 		       statistics & st)
 {
-    entree *e, *f;
+    entree *e = NULL;
+    const entree *f = NULL;
     defile juillet = fs_racine;
     const eod tmp_eod;
     st.clear();
@@ -298,7 +299,7 @@ void filtre_difference(const mask &filtre,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: filtre.cpp,v 1.25 2002/03/30 15:59:19 denis Rel $";
+    static char id[]="$Id: filtre.cpp,v 1.25.1.1 2002/04/24 20:44:47 denis Rel $";
     dummy_call(id);
 }
 

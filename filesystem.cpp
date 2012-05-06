@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.26 2002/04/01 21:28:25 denis Rel $
+// $Id: filesystem.cpp,v 1.26.1.2 2002/04/25 19:37:17 denis Rel $
 //
 /*********************************************************************/
 
@@ -565,7 +565,7 @@ static void supprime(const path & ref)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: filesystem.cpp,v 1.26 2002/04/01 21:28:25 denis Rel $";
+    static char id[]="$Id: filesystem.cpp,v 1.26.1.2 2002/04/25 19:37:17 denis Rel $";
     dummy_call(id);
 }
 
@@ -712,8 +712,9 @@ static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm)
 	ref.get_last_modif().unstack(tmp);
 	temps.modtime = tmp;
 
-	if(utime(name, &temps) < 0)
-	    Erange("make_owner_perm (date&time)", strerror(errno));	
+	if(ref_lie == NULL) // not restoring atime & ctime for symbolic links
+	    if(utime(name, &temps) < 0)
+		Erange("make_owner_perm (date&time)", strerror(errno));	
 
     }
     catch(...)

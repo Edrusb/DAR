@@ -18,7 +18,7 @@
 //
 // to contact the author by email : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar.cpp,v 1.34 2002/03/25 22:02:38 denis Rel $
+// $Id: dar.cpp,v 1.34.1.1 2002/04/24 20:37:47 denis Rel $
 //
 /*********************************************************************/
 //
@@ -57,7 +57,7 @@ using namespace std;
 #define EXTENSION "dar"
 
 const version supported_version = "01";
-const char *application_version = "1.0.0";
+const char *application_version = "1.0.1";
 
 static void op_create(const path &fs_root, const path &sauv_path, const path *ref_path,
 		      const mask &selection, const mask &subtree, 
@@ -287,7 +287,7 @@ static void op_create(const path &fs_root, const path &sauv_path, const path *re
 	    if(decoupe == NULL)
 		throw Ememory("op_create");
 
-	    ver.edition = supported_version;
+	    version_copy(ver.edition, supported_version);
 	    ver.algo_zip = compression2char(algo);
 	    ver.cmd_line = make_string_from(argc-1, argv+1); // argv[0] is the command itself, we don't need it (where from `+1')
 	    ver.write(*decoupe);
@@ -446,7 +446,7 @@ static void op_listing(const path &sauv_path, const string &filename, bool info_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar.cpp,v 1.34 2002/03/25 22:02:38 denis Rel $";
+    static char id[]="$Id: dar.cpp,v 1.34.1.1 2002/04/24 20:37:47 denis Rel $";
     dummy_call(id);
 }
 

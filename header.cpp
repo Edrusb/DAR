@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.cpp,v 1.13 2002/03/18 11:00:54 denis Rel $
+// $Id: header.cpp,v 1.15 2002/04/24 21:07:33 denis Rel $
 //
 /*********************************************************************/
 
@@ -82,7 +82,7 @@ void header::write(int fd)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: header.cpp,v 1.13 2002/03/18 11:00:54 denis Rel $";
+    static char id[]="$Id: header.cpp,v 1.15 2002/04/24 21:07:33 denis Rel $";
     dummy_call(id);
 }
 
@@ -103,5 +103,36 @@ void header_generate_internal_filename(label &ret)
     p = tmp.str();
     strncpy(ret, p, LABEL_SIZE);
     delete p;
+}
+
+header::header()
+{
+    magic = 0;
+    for(int i = 0; i < LABEL_SIZE; i++)
+	internal_name[i] = '\0';
+    extension = flag = '\0';
+    size_ext = 0;
+}
+
+void header::copy_from(const header & ref)
+{
+    magic = ref.magic;
+    label_copy(internal_name,ref.internal_name);
+    flag = ref.flag;
+    extension = ref.extension;
+    size_ext = ref.size_ext;
+}
+
+void label_copy(label & left, const label & right)
+{
+    for(int i = 0; i < LABEL_SIZE; i++)
+	left[i] = right[i];
+
+}
+
+void version_copy(version & left, const version & right)
+{
+    for(int i = 0; i < VERSION_SIZE; i++)
+	left[i] = right[i];
 }
 
