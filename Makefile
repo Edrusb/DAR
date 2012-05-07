@@ -18,7 +18,7 @@
 ##
 ## to contact the author : dar.linux@free.fr
 #######################################################################
-## $Id: Makefile,v 1.16 2002/11/04 20:25:35 edrusb Rel $
+## $Id: Makefile,v 1.21 2003/01/10 17:33:27 edrusb Rel $
 ##
 #######################################################################
 
@@ -54,8 +54,10 @@ DOC_DIR = share/doc/dar-$(DAR_VERSION)
 USE_SYS_SIGLIST = "yes"
 
 ####
-#### compilation for 64 bits OS (Alpha, etc.), uncomment the following
+#### force compilation to think CPU register's size to be 64 bits or 32 bits
+#### if not specified dar will use <stdint.h> to automatically adapt to system
 # OS_BITS = 64
+# OS_BITS = 32
 
 ### choose your C++ compiler/linker
 CXX = g++
@@ -66,15 +68,31 @@ CC = gcc
 OPTIMIZATION = -O # -pg # -pg is for profiling using gprof (=debugging)
 # OPTIMIZATION = -O2 # -pg 
 #### note about the different optimizations. 
-#### if you need a small dar binary use -O. or even no optimization
+#### if you need a small dar binary use -O. or even don't use any optimization
 #### -O2 makes a bigger but little faster executable. 
 #### -pg is for profiling (with gprof) use it if you want to modify dar code 
 #### to have a more optimized and faster binary. :-) do not use -pg for
 #### normal use !
 
+### it is strongly recommended to have a dar binary available beside your 
+### backup in case something goes wrong you will then be able to restore. If 
+### you put the "dar" binary you would also need to put the library that it 
+### relies on which may be complex (zlib, stdlib, etc.) thus, a static version
+### can be built by uncommenting the following line. Static version has all 
+### library integrated in the binary and is called "dar_static" it will stay 
+### in the current directory (not installed in the system like other binaries)
+### it is thus your responsibility to copy it where it will be needed.
+#
+BUILD_STATIC = "yes"
+# BUILD_STATIC = "no" 
+# if BUILD_STATIC is not defined it is equivalent to "no"
+
 ##############
 # NOTHING TO CHANGE BELOW, EXCEPT FOR DEVELOPMENT or DEBUGGING
 #######################################################################
+
+### install command
+INSTALL = install -o root -g root
 
 # this is to re-generate from XML files the usage text displayed with -h option
 LIBXML_ROOT = /opt/gnome
@@ -96,16 +114,28 @@ else
 USE_SYS_SIGLIST = 
 endif
 
-ifndef OS_BITS
-OS_BITS = 32
+ifdef OS_BITS
+FORCE_OS_BITS = -DOS_BITS=$(OS_BITS)
+else
+FORCE_OS_BITS = 
 endif
 
-CPPFLAGS_COMMON = $(OPTIMIZATION) $(FILEOFFSET) $(USE_SYS_SIGLIST) -DOS_BITS=$(OS_BITS) -Wall # -pedantic -DTEST_MEMORY 
+ifndef BUILD_STATIC
+BUILD_STATIC = "no"
+endif
+
+ifeq ($(BUILD_STATIC), "yes")
+BUILD_STATIC = dar_static
+else
+BUILD_STATIC =
+endif
+
+CPPFLAGS_COMMON = $(OPTIMIZATION) $(FILEOFFSET) $(USE_SYS_SIGLIST) $(FORCE_OS_BITS) -Wall # -pedantic -DTEST_MEMORY 
 # the -DTEST_MEMORY option is for memory leakage detection.
 # It makes the execution very slow, so don't add it for normal use
 
 
-LDFLAGS = $(OPTIMIZATION) $(FILEOFFSET) -Wall -static
+LDFLAGS = $(OPTIMIZATION) $(FILEOFFSET) -Wall
 # note : static link has been chosen to be able to restore an achive
 # in a very simple environment, without having to look for 
 # a particular dynamic library and version. This makes of course the
@@ -129,12 +159,15 @@ OBJ_MANAGER = data_tree.o database.o database_header.o dar_manager.o generic_fil
 LIBS_MANAGER = $(LIBS_COMMON)
 ALL_SRC = storage.cpp infinint.cpp deci.cpp erreurs.cpp generic_file.cpp compressor.cpp user_interaction.cpp sar.cpp header.cpp tools.cpp path.cpp mask.cpp tronc.cpp catalogue.cpp filesystem.cpp filtre.cpp dar.cpp command_line.cpp terminateur.cpp defile.cpp test_memory.cpp ea.cpp ea_filesystem.cpp header_version.cpp test_deci.cpp test_infinint.cpp factoriel.cpp test_erreurs.cpp test_compressor.cpp test_sar.cpp test_path.cpp test_mask.cpp test_tronc.cpp test_catalogue.cpp test_filesystem.cpp testtools.cpp test_terminateur.cpp dar_xform.cpp sar_tools.cpp dar_suite.cpp tuyau.cpp dar_slave.cpp zapette.cpp test_tuyau.cpp scrambler.cpp test_scrambler.cpp etage.cpp data_tree.cpp macro_tools.cpp database.cpp database_header.cpp dar_manager.cpp prime.cpp
 
-CIBLE = dar dar_xform dar_slave dar_manager
+CIBLE = dar dar_xform dar_slave dar_manager $(BUILD_STATIC)
 
 default : $(CIBLE)
 
 dar : $(OBJ)
 	$(CXX) $(LDFLAGS) $(OBJ) $(LIBS) -o $@
+
+dar_static : $(OBJ)
+	$(CXX) $(LDFLAGS) $(OBJ) $(LIBS) -static -o $@
 
 all : $(CIBLE) test
 
@@ -143,17 +176,17 @@ depend : $(ALL_SRC) usage
 	rm Makefile.bak
 
 install : $(CIBLE)
-	install -g root -o root -d $(INSTALL_ROOT_DIR)/$(BIN_DIR)
-	install -g root -o root -m 0555 -s $(CIBLE) $(INSTALL_ROOT_DIR)/$(BIN_DIR)
-	install -g root -o root -d $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
-	install -g root -o root -m 0444 dar.1 $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
-	install -g root -o root -m 0444 dar_xform.1 $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
-	install -g root -o root -m 0444 dar_slave.1 $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
-	install -g root -o root -m 0444 dar_manager.1 $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
+	$(INSTALL) -d $(INSTALL_ROOT_DIR)/$(BIN_DIR)
+	$(INSTALL) -m 0555 -s $(CIBLE) $(INSTALL_ROOT_DIR)/$(BIN_DIR)
+	$(INSTALL) -d $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
+	$(INSTALL) -m 0444 dar.1 $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
+	$(INSTALL) -m 0444 dar_xform.1 $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
+	$(INSTALL) -m 0444 dar_slave.1 $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
+	$(INSTALL) -m 0444 dar_manager.1 $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
 
 install-doc: BUGS CHANGES INSTALL LICENSE NOTES README TODO TUTORIAL
-	install -g root -o root -d $(INSTALL_ROOT_DIR)/$(DOC_DIR)
-	install -g root -o root -m 0444 BUGS CHANGES INSTALL LICENSE NOTES README TODO TUTORIAL $(INSTALL_ROOT_DIR)/$(DOC_DIR)
+	$(INSTALL) -d $(INSTALL_ROOT_DIR)/$(DOC_DIR)
+	$(INSTALL) -m 0444 BUGS CHANGES INSTALL LICENSE NOTES README TODO TUTORIAL $(INSTALL_ROOT_DIR)/$(DOC_DIR)
 
 uninstall : 
 	cd $(INSTALL_ROOT_DIR)/$(BIN_DIR); rm -f $(CIBLE)
@@ -167,7 +200,7 @@ test : test_storage test_deci test_infinint factoriel test_erreurs test_compress
 clean_all : clean clean_usage
 
 clean :
-	rm -f $(OBJ) $(OBJ_XFORM) $(OBJ_SLAVE) $(OBJ_MANAGER) $(OBJ_XFORM) $(CIBLE) test_storage.o test_storage test_deci.o test_deci test_infinint.o test_infinint factoriel.o factoriel test_erreurs.o test_erreurs test_compressor.o test_compressor test_sar.o test_sar test_path.o test_path test_mask test_mask.o test_tronc.o test_tronc test_catalogue test_catalogue.o test_filesystem.o test_filesystem testtools.o test_terminateur test_terminateur.o test_generic_file test_generic_file.o test_tuyau.o test_tuyau test_scrambler.o test_scrambler prime prime.o
+	rm -f $(OBJ) $(OBJ_XFORM) $(OBJ_SLAVE) $(OBJ_MANAGER) $(OBJ_XFORM) $(CIBLE) test_storage.o test_storage test_deci.o test_deci test_infinint.o test_infinint factoriel.o factoriel test_erreurs.o test_erreurs test_compressor.o test_compressor test_sar.o test_sar test_path.o test_path test_mask test_mask.o test_tronc.o test_tronc test_catalogue test_catalogue.o test_filesystem.o test_filesystem testtools.o test_terminateur test_terminateur.o test_generic_file test_generic_file.o test_tuyau.o test_tuyau test_scrambler.o test_scrambler prime prime.o dar_static
 
 test_storage : storage.o deci.o test_storage.o erreurs.o infinint.o generic_file.o tools.o path.o user_interaction.o test_memory.o tuyau.o
 	$(CXX) $(LDFLAGS) path.o deci.o tools.o generic_file.o infinint.o erreurs.o storage.o user_interaction.o test_storage.o test_memory.o tuyau.o $(LIBS) -o $@

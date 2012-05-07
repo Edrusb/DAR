@@ -18,13 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.5 2002/10/31 21:02:35 edrusb Rel $
+// $Id: dar_slave.cpp,v 1.6 2002/12/08 20:03:06 edrusb Rel $
 //
 /*********************************************************************/
 //
 #include <string>
 #include <string.h>
-#include <iostream.h>
+#include <iostream>
 #include <getopt.h>
 #include "user_interaction.hpp"
 #include "zapette.hpp"
@@ -183,7 +183,7 @@ static bool command_line(S_I argc,char *argv[], path * &chemin, string & filenam
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_slave.cpp,v 1.5 2002/10/31 21:02:35 edrusb Rel $";
+    static char id[]="$Id: dar_slave.cpp,v 1.6 2002/12/08 20:03:06 edrusb Rel $";
     dummy_call(id);
 }
 

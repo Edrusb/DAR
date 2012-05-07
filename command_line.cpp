@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.10 2002/10/31 21:02:34 edrusb Rel $
+// $Id: command_line.cpp,v 1.11 2002/12/10 20:54:23 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -41,7 +41,7 @@
 #include "etage.hpp"
 #include "integers.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:vzynwpkR:s:S:X:I:P:bhLWDruUVC:i:o:OTE:F:K:J:Y:Z:B:"
+#define OPT_STRING "c:A:x:d:t:l:vz::y::nwpkR:s:S:X:I:P:bhLWDruUVC:i:o:OTE:F:K:J:Y:Z:B:"
 
 using namespace std;
 
@@ -56,7 +56,8 @@ static bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv
 			       deque<string> & path_inclus, deque<string> & l_path_exclus,
 			       string & filename, string *& ref_filename,
 			       bool &allow_over, bool &warn_over, bool &info_details,
-			       compression &algo, bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
+			       compression &algo, U_I & compression_level,
+			       bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
 			       bool & only_more_recent, bool & ea_root, bool & ea_user,
 			       string & input_pipe, string &output_pipe,
 			       bool & ignore_owner, 
@@ -81,7 +82,8 @@ bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path * &sa
 	      infinint &file_size, infinint &first_file_size, mask *&selection, mask *&subtree,
 	      string &filename, string *&ref_filename,
 	      bool &allow_over, bool &warn_over, bool &info_details,
-	      compression &algo, bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
+	      compression &algo, U_I & compression_level,
+	      bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
 	      bool & only_more_recent, bool & ea_root, bool & ea_user,
 	      string & input_pipe, string &output_pipe,
 	      bool & ignore_owner, 
@@ -102,6 +104,7 @@ bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path * &sa
     warn_over = true;
     info_details = false;
     algo = none;
+    compression_level = 9;
     detruire = true;
     pause = false;
     beep = false;
@@ -143,10 +146,10 @@ bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path * &sa
 				   l_path_inclus, l_path_exclus,
 				   filename, ref_filename, 
 				   allow_over, warn_over, info_details,
-				   algo, detruire, pause, beep, make_empty_dir,
+				   algo, compression_level, detruire, pause, beep, make_empty_dir,
 				   only_more_recent, ea_root, ea_user,
 				   input_pipe, output_pipe,
-				  ignore_owner,
+				   ignore_owner,
 				   execute,
 				   execute_ref,
 				   pass, pass_ref,
@@ -304,7 +307,8 @@ bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], ope
 			deque<string> & l_path_inclus, deque<string> & l_path_exclus,
 			string & filename, string *& ref_filename,
 			bool &allow_over, bool &warn_over, bool &info_details,
-			compression &algo, bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
+			compression &algo, U_I & compression_level,
+			bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
 			bool & only_more_recent, bool & ea_root, bool & ea_user,
 			string & input_pipe, string &output_pipe,
 			bool & ignore_owner, 
@@ -389,12 +393,30 @@ bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], ope
 		algo = gzip;
 	    else
 		throw Erange("get_args", "choose either -z or -y not both");
+	    if(optarg != NULL)
+	    {
+		S_I tmp = atoi(optarg);
+          
+		if(tmp < 0 || tmp > 9)
+		    throw Erange("get_args", "gzip compression level must be inbetween 0 and 9");
+		else
+		    compression_level = tmp;
+	    } 
 	    break;
 	case 'y':
 	    if(algo == none)
 		algo = bzip2;
 	    else
 		throw Erange("get_args", "choose either -z or -y not both");
+	    if(optarg != NULL)
+	    {
+		S_I tmp = atoi(optarg);
+		
+		if(tmp < 0 || tmp > 9)
+		    throw Erange("get_args", "bzip2 compression level must be inbetween 0 and 9");
+		else
+		    compression_level = tmp;
+	    } 
 	    break;
 	case 'n':
 	    allow_over = false;
@@ -615,9 +637,9 @@ bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], ope
 	    {
 		bool ret;
 		make_args_from_file(optarg, rec_c, rec_v);
-		#ifdef DEBOGGAGE
+#ifdef DEBOGGAGE
 		show_args(rec_c, rec_v);
-		#endif
+#endif
 		S_I optind_mem = optind; // save the external variable to use recursivity (see getopt)
 		optind = 0; // reset getopt module
 
@@ -629,7 +651,8 @@ bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], ope
 					     l_path_inclus, l_path_exclus,
 					     filename, ref_filename, 
 					     allow_over, warn_over, info_details,
-					     algo, detruire, pause, beep, make_empty_dir,
+					     algo, compression_level, detruire, pause, 
+					     beep, make_empty_dir,
 					     only_more_recent, ea_root, ea_user,
 					     input_pipe, output_pipe,
 					     ignore_owner,
@@ -688,7 +711,7 @@ static void usage(const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.10 2002/10/31 21:02:34 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.11 2002/12/10 20:54:23 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -1087,8 +1110,8 @@ static const struct option *get_long_opt()
 	{"verbose", no_argument, NULL, 'v'},
 	{"no-warn", no_argument, NULL, 'w'},
 	{"extract", required_argument, NULL, 'x'},
-	{"bzip2", no_argument, NULL, 'y'},
-	{"gzip", no_argument, NULL, 'z'},
+	{"bzip2", optional_argument, NULL, 'y'},
+	{"gzip", optional_argument, NULL, 'z'},
 	{"ref", required_argument, NULL, 'A'},
 	{"isolate", required_argument, NULL, 'C'},
 	{"empty-dir", no_argument, NULL, 'D'},

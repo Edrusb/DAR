@@ -18,12 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.5 2002/10/31 21:02:35 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.6 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 //
 #include <unistd.h>
-#include <iostream.h>
+#include <iostream>
 #include "sar.hpp"
 #include "sar_tools.hpp"
 #include "user_interaction.hpp"
@@ -329,7 +329,7 @@ static bool command_line(S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.5 2002/10/31 21:02:35 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.6 2002/12/08 20:03:07 edrusb Rel $";
     dummy_call(id);
 }
 

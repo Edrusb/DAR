@@ -200,13 +200,15 @@
     </desc>
   </arg>
 
-  <arg flag="-z">
+  <arg flag="-z" opt="level">
     <desc>
-      compress data in archive using gzip algorithm
+      compress data in archive using gzip algorithm. The optionnal argument is the gzip 
+      compression to use: it ranges from 0 (no compression, fast processing) to 9 
+      (max compression, slow processing). Note: there is no space ! Example: -z6 
     </desc>
   </arg>
 
-  <arg flag="-y">
+  <arg flag="-y" opt="level">
     <desc>
       compress data in archive using bzip2 algorithm (NOT IMPLEMENTED)
       <p/> by default the archive is not compressed
@@ -312,6 +314,9 @@
 
 <!--
 $Log: dar.xml,v $
+Revision 1.4  2002/12/10 20:54:24  edrusb
+patch integration : adding optional compression level on command line
+
 Revision 1.3  2002/10/28 20:39:27  edrusb
 updated CVS with last development version
 

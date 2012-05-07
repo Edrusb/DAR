@@ -18,17 +18,17 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.9 2002/11/04 20:25:35 edrusb Rel $
+// $Id: dar_suite.cpp,v 1.11 2003/01/08 21:27:37 edrusb Rel $
 //
 /*********************************************************************/
 //
-#include <iostream.h>
+#include <iostream>
 #include "dar_suite.hpp"
 #include "user_interaction.hpp"
 #include "erreurs.hpp"
 #include "test_memory.hpp"
 
-const char *application_version = "1.2.0";
+const char *application_version = "1.2.1";
 
 const char *dar_suite_version()
 {
@@ -98,6 +98,6 @@ int dar_suite_global(int argc, char *argv[], int (*call)(int, char *[]))
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.9 2002/11/04 20:25:35 edrusb Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.11 2003/01/08 21:27:37 edrusb Rel $";
     dummy_call(id);
 }

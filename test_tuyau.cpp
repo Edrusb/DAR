@@ -18,11 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tuyau.cpp,v 1.6 2002/11/02 20:03:25 edrusb Rel $
+// $Id: test_tuyau.cpp,v 1.7 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 //
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>

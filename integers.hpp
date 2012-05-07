@@ -1,4 +1,4 @@
-/*********************************************************************/
+ /*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002 Denis Corbin
 //
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: integers.hpp,v 1.1 2002/10/31 21:02:36 edrusb Rel $
+// $Id: integers.hpp,v 1.2 2003/01/03 21:34:45 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -26,25 +26,45 @@
 #ifndef INTEGERS_HPP
 #define INTEGERS_HPP
 
-#if OS_BITS == 32
-  #define U_16 unsigned short
-  #define U_32 unsigned long
-  #define U_I unsigned int 
-  #define S_16 signed short
-  #define S_32 signed long
+#ifndef OS_BITS
+  #include <stdint.h>
+  #define U_16 uint16_t
+  #define U_32 uint32_t
+  #define U_64 uint64_t
+  #define U_I  unsigned int
+  #define S_16 int16_t
+  #define S_32 int32_t
+  #define S_64 int64_t
   #define S_I signed int
-#else
-  #if OS_BITS == 64
+#else  //  OS_BITS not defined
+  #if OS_BITS == 32
     #define U_16 unsigned short
-    #define U_32 unsigned int
-    #define U_I  unsigned int
+    #define U_32 unsigned long
+    #define U_64 unsigned long long
+    #define U_I unsigned int 
     #define S_16 signed short
-    #define S_32 signed int
+    #define S_32 signed long
+    #define S_64 signed long long
     #define S_I signed int
   #else
-    #error // unknown OS_BITS value
-    // #error does not exists and is here to force the compilation to fail
-  #endif // OS_BITS == 64
-#endif // OS_BITS == 32
+    #if "OS_BITS" == 64
+      #define U_16 unsigned short
+      #define U_32 unsigned int
+      #define U_64 unsigned long long
+      #define U_I  unsigned int
+      #define S_16 signed short
+      #define S_32 signed int
+      #define S_64 signed long long
+      #define S_I signed int
+    #else
+      #error // unknown OS_BITS value
+    // the previous line will not compile, this is the expected behaviour
+    #endif // OS_BITS == 64
+  #endif // OS_BITS == 32
+#endif // OS_BITS not defined
 
 #endif // ifndef
+
+
+
+

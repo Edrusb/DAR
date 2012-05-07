@@ -18,14 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: header.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #pragma implementation
 
 #include <netinet/in.h>
-#include <strstream.h>
+#include <sstream>
 #include <time.h>
 #include "header.hpp"
 
@@ -85,7 +85,7 @@ void header::write(S_I fd)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: header.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: header.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -99,13 +99,13 @@ bool header_label_is_equal(const label &a, const label &b)
 
 void header_generate_internal_filename(label &ret)
 {
-    ostrstream tmp;
-    char *p;
+    ostringstream tmp;
+    string p;
 
     tmp << getpid() << time(NULL);
     p = tmp.str();
-    strncpy(ret, p, LABEL_SIZE);
-    delete p;
+    for(register unsigned int i = 0; i < LABEL_SIZE && i < p.size(); i++)
+	ret[i] = p[i];
 }
 
 header::header()

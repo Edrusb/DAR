@@ -18,13 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database.cpp,v 1.2 2002/11/02 20:03:25 edrusb Rel $
+// $Id: database.cpp,v 1.3 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #include <stdlib.h>
 #include <errno.h>
-#include <iomanip.h>
+#include <iomanip>
+#include <iostream>
 #include "database.hpp"
 #include "user_interaction.hpp"
 #include "deci.hpp"
@@ -154,7 +155,7 @@ void database::set_permutation(archive_num src, archive_num dst)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: database.cpp,v 1.2 2002/11/02 20:03:25 edrusb Rel $";
+    static char id[]="$Id: database.cpp,v 1.3 2002/12/08 20:03:07 edrusb Rel $";
     dummy_call(id);
 }
 

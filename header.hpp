@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.hpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: header.hpp,v 1.10 2002/12/07 17:59:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -39,7 +39,7 @@
 
 #define SAUV_MAGIC_NUMBER 123
 
-typedef U_I magic_number;
+typedef U_32 magic_number;
 typedef char label[LABEL_SIZE];
 
 extern void label_copy(label & left, const label & right);

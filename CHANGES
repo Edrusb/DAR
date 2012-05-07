@@ -51,7 +51,7 @@ from version 1.0.0 to version 1.1.0
 - added -O option to have a better behaviour when used with non root user
 - added 'make doc' option in the makefile
 
-from version 1.1.0 to version 1.2.0	
+from version 1.1.0 to version 1.2.0
 - -P option can now accept wild cards
 - changed dar output format when listing archive contents to have something 
   more similar to the output of tar. -T is provided to get the previous tree 
@@ -88,3 +88,18 @@ from version 1.1.0 to version 1.2.0
 - added dar_manager command-line program
 - replaced integer types by macro that can be adapted to have correct behavior
   on 64 bits plateform (in particular to read archive from other platforms).
+
+from version 1.2.0 to version 1.2.1
+- minor change to have backward compatiblity with old archive (dar < 1.2.0) 
+generated on 64 bits OS (have ot use OS_BITS=32 in Makefile on 64 bits OS).
+- adapted Axel Kohlmeyer's patch for RPMS
+- adapted Dietrich Rothe's patch for compression level : -z has an optional
+  argument which is compression level to use.
+- I and -X now available while listing archive contents (-l)
+- based on Brian May's patch, dar with EA_SUPPORT avoids complaining when 
+  reading a filesystem that do not supports EA.
+- based on Brian May's other patch, dar now uses by default the <stdint.h> 
+  integers.
+- dar is now built with dynamic linking, and a special verision named 
+  dar_static which is statically linked is also available
+- fixed problem on Windows NT & 2000 (fixed by first change above)

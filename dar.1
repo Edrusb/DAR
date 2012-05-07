@@ -164,10 +164,10 @@ SAVING AND ISOLATION OPTIONS (to use with -c or -C)
 .RS
 .PP
 .TP 20
--z, --gzip
-compresses within slices using gzip algorithm (by default, no compression is performed).
+-z, --gzip[level]
+compresses within slices using gzip algorithm (if not specified, no compression is performed). The compression level (an integer from 0 to 9) is optional. -z is equivalent to -z9 which is max compression/slow processing. At the oposit, 0 is equivalent to no compression, which is also the case when no -z and no -y is given on the command line.
 .TP 20
--y, --bzip2
+-y, --bzip2[level]
 compresses using bzip2 algorithm (NOT IMPLEMENTED)
 .TP 20
 -s, --slice <number>
@@ -218,8 +218,11 @@ LISTING OPTIONS (to use with -l)
 .RS
 .PP
 .TP 20
- -T, --tar-format 
-can be used to have an output more *similar* the one of 'tar -tv' command. By the way DAR is not TAR and does not have any compatibility to respect with it. This feature is provided because it is sometimes more useful to have the full path to each file in the archive listing (to be used with grep for example) instead of the directory tree structure.
+ -T, --tar-format
+can be used to have a listing that displays the tree structure.
+.TP 20
+-I and -X
+can be used to filter file to list base on their name. With -T the tree structure is not filtered unlike without -T. Note that -P and [list of path] is not available while listing.
 .P
 Else only -v and -b from general options are useful.
 .TP 10
@@ -231,7 +234,7 @@ fields
 possible values are [     ] or [Saved] or [InRef] . [     ] means that the data has been saved because there is no change since backup of reference. [Saved] means that the data has been saved, and thus this archive is able to restore the file. [InRef] is used when isolating a catalogue from an archive, and means the file was saved in the reference archive.
 .TP 10
 [EA]
-possible values are " " (empty string) or [Saved] or [     ]. Shows if Extended Attributes are present and saved ([Saved]), are present but not saved ([NoChg] when there is no change since backup of reference), or if they are absent ("").
+possible values are " " (empty string) or [Saved] or [     ]. It Shows if Extended Attributes are present and saved ([Saved]), are present but not saved ([     ]) which means there is no change since backup of reference, or if there is no EA saved for this file (empty string).
 .TP 10
 [compr]
 possible values are [....%] or [-----] or [     ] or [worse]. Shows if the file has been compressed and the compression rate reached ([...%]), or if the file is stored without compression ([    ] see -Y and -Z options) or if the file is not subject to compression because it is not a saved regular file ([----]), or if the file takes more space compressed than its original size ([worse]), due to compression overhead.

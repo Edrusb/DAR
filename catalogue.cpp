@@ -18,14 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $
+// $Id: catalogue.cpp,v 1.11 2002/12/14 19:29:53 edrusb Rel $
 //
 /*********************************************************************/
 
 #pragma implementation
 
 #include <netinet/in.h>
-#include <iostream.h>
+#include <iostream>
 #include <ctype.h>
 #include <algorithm>
 #include <map>
@@ -1044,7 +1044,7 @@ void directory::clear()
     it = fils.begin();
 }
 
-void directory::listing(ostream & flux, string marge) const
+void directory::listing(ostream & flux,const mask &m, string marge) const
 {
     vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
     while(it != fils.end())
@@ -1054,35 +1054,41 @@ void directory::listing(ostream & flux, string marge) const
 	const inode *ino = dynamic_cast<inode *>(*it);
 	const hard_link *hard = dynamic_cast<hard_link *>(*it);
 
-	if(det != NULL)
-	    flux << marge << "[ REMOVED ]    " << (*it)->get_name() << endl; 
-	else
+	if(*it == NULL)
+	    throw SRC_BUG; // NULL entry ! should not be
+	if(m.is_covered((*it)->get_name()) || d != NULL)
 	{
-	    if(hard != NULL)
-		ino = hard->get_inode();
-
-	    if(ino == NULL)
-		throw SRC_BUG;
+	    if(det != NULL)
+		flux << marge << "[ REMOVED ]    " << (*it)->get_name() << endl; 
 	    else
-		flux <<  marge << local_perm(*ino)
-		     << "\t" << local_uid(*ino)
-		     << "\t" << local_gid(*ino)
-		     << "\t" << local_size(*ino) 
-		     << "\t" << local_date(*ino)
-		     << "\t" << local_flag(*ino)
-		     << "   " << (*it)->get_name() << endl; 
+	    {
+		if(hard != NULL)
+		    ino = hard->get_inode();
+		
+		if(ino == NULL)
+		    throw SRC_BUG;
+		else
+		    flux <<  marge << local_perm(*ino)
+			 << "\t" << local_uid(*ino)
+			 << "\t" << local_gid(*ino)
+			 << "\t" << local_size(*ino) 
+			 << "\t" << local_date(*ino)
+			 << "\t" << local_flag(*ino)
+			 << "   " << (*it)->get_name() << endl; 
+	    }
+
+	    if(d != NULL)
+	    {
+		d->listing(flux, m, marge + "|  ");
+		user_interaction_stream() << marge << "+--- " <<endl;
+	    }
 	}
 
-	if(d != NULL)
-	{
-	    d->listing(flux, marge + "|  ");
-	    user_interaction_stream() << marge << "+--- " <<endl;
-	}
 	it++;
     }
 }
 
-void directory::tar_listing(ostream & flux, const string & beginning) const
+void directory::tar_listing(ostream & flux, const mask &m, const string & beginning) const
 {
     vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
     string sep = beginning == "" ? "" : "/";
@@ -1094,27 +1100,33 @@ void directory::tar_listing(ostream & flux, const string & beginning) const
 	const inode *ino = dynamic_cast<inode *>(*it);
 	const hard_link *hard = dynamic_cast<hard_link *>(*it);
 
-	if(det != NULL)
-	    flux << "[     REMOVED       ] "<< beginning << sep << (*it)->get_name() << endl; 
-	else
+	if(*it == NULL)
+	    throw SRC_BUG; // NULL entry ! should not be
+	if(m.is_covered((*it)->get_name()))
 	{
-	    if(hard != NULL)
-		ino = hard->get_inode();
-
-	    if(ino == NULL)
-		throw SRC_BUG;
+	    if(det != NULL)
+		flux << "[     REMOVED       ] "<< beginning << sep << (*it)->get_name() << endl; 
 	    else
-		flux << local_flag(*ino) << "   "
-		     << local_perm(*ino) << "   "
-		     << local_uid(*ino) << " \t"
-		     << local_gid(*ino) << "\t"
-		     << local_size(*ino) << "\t"
-		     << local_date(*ino) << "\t"
-		     << beginning << sep << ino->get_name() << "   " << endl; 
-
-	    if(d != NULL)
-		d->tar_listing(flux, beginning + sep + (*it)->get_name());
+	    {
+		if(hard != NULL)
+		    ino = hard->get_inode();
+		
+		if(ino == NULL)
+		    throw SRC_BUG;
+		else
+		    flux << local_flag(*ino) << "   "
+			 << local_perm(*ino) << "   "
+			 << local_uid(*ino) << " \t"
+			 << local_gid(*ino) << "\t"
+			 << local_size(*ino) << "\t"
+			 << local_date(*ino) << "\t"
+			 << beginning << sep << ino->get_name() << "   " << endl; 
+	    }
 	}
+
+	if(d != NULL)
+	    d->tar_listing(flux, m, beginning + sep + (*it)->get_name());
+
 	it++;
     }
 }
@@ -1623,23 +1635,23 @@ infinint catalogue::update_destroyed_with(catalogue & ref)
     return count;
 }
 
-void catalogue::listing(ostream & flux, string marge) const
+void catalogue::listing(ostream & flux, const mask &m, string marge) const
 {
     flux << "access mode    | user | group | size  |          date                 | [data ][ EA  ][compr] |   filename" << endl;
     flux << "---------------+------+-------+-------+-------------------------------+-----------------------+-----------" << endl;
-    contenu->listing(flux, marge); 
+    contenu->listing(flux, m, marge); 
 }
 
-void catalogue::tar_listing(ostream & flux, const string & beginning) const 
+void catalogue::tar_listing(ostream & flux, const mask &m, const string & beginning) const 
 { 
     flux << "[data ][ EA  ][compr] | permission | user  | group | size  |          date                 |    filename" << endl;
     flux << "----------------------+------------+-------+-------+-------+-------------------------------+------------" << endl;
-    contenu->tar_listing(flux, beginning); 
+    contenu->tar_listing(flux, m, beginning); 
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: catalogue.cpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $";
+    static char id[]="$Id: catalogue.cpp,v 1.11 2002/12/14 19:29:53 edrusb Rel $";
     dummy_call(id);
 }
 

@@ -1,3 +1,9 @@
+version 1.2.1
+---------------
+Thanks to Axel Kohlmeyer for his patch about RPMS, Dietrich Rothe for its 
+patch on compression level, Brian May for his patches to comply with Debian 
+distro, Ulrich Hagen D.A.M Revok, Jahn Wells, Juhana Sadeharju, for their 
+feedback and John Little for compiling the FAQ and man pages on the web.
 
 version 1.2.0
 ---------------

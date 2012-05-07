@@ -18,12 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.cpp,v 1.1 2002/10/28 20:39:28 edrusb Rel $
+// $Id: data_tree.cpp,v 1.2 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #include <netinet/in.h>
-#include <iomanip.h>
+#include <iomanip>
 #include "data_tree.hpp"
 #include "tools.hpp"
 #include "user_interaction.hpp"
@@ -684,7 +684,7 @@ static data_tree *read_from_file(generic_file & f)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: data_tree.cpp,v 1.1 2002/10/28 20:39:28 edrusb Rel $";
+    static char id[]="$Id: data_tree.cpp,v 1.2 2002/12/08 20:03:07 edrusb Rel $";
     dummy_call(id);
 }
 

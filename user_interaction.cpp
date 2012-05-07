@@ -18,11 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $
+// $Id: user_interaction.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
-#include <iostream.h>
+#include <iostream>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <errno.h>
@@ -189,7 +189,7 @@ void user_interaction_set_beep(bool mode)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: user_interaction.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $";
+    static char id[]="$Id: user_interaction.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $";
     dummy_call(id);
 }
 

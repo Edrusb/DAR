@@ -16,8 +16,20 @@ files with a size of at most 100 Megabytes.
 
 But on your first ZIP drive you want to copy the dar binary outside the
 backup to be able to restore it in case of hard disk failure for example.
+IMPORTANT : dar binary relies on several libraries which must also be available
+in the rescue system or copied with the dar binary. But, if you don't want to
+worry about needed libraries, there is a static version of dar which only 
+difference is that it has all required library included in the binary (thus it
+is a bit larger binary). Its name is "dar_static", and its main reason of 
+existance is to be placed beside backups in case something goes wrong in your
+system. Note that dar_static is useless for windows, you will always need 
+the cygwin dll.
+
 (you could also add man pages, if you are scared not to be able to remember
-all the many feature of dar ;-) and find the -h option too sparse). 
+all the many feature of dar ;-) and find the -h option too sparse). Note
+that man pages are available on the web. OK you need an Internet access to
+read them.
+
 This make the free space on the first ZIP floppy a bit smaller: 95 MB. 
 *** Here comes the option: -S 95M  
 (note that '-s' is lowercase for all the slices, and '-S' is UPPERCASE meaning 

@@ -18,12 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.12 2002/11/02 20:03:25 edrusb Rel $
+// $Id: tools.cpp,v 1.13 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
-#include <iostream.h>
-#include <strstream.h>
+#include <iostream>
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -46,12 +45,15 @@ static void deadson(S_I sig);
 
 char *tools_str2charptr(string x)
 {
-    char *ret;
-
-    ostrstream buf;
-    buf << x << '\0';
-    ret = buf.str();
-
+    U_I size = x.size();
+    char *ret = new char[size+1];
+ 
+    if(ret == NULL)
+	throw Ememory("tools_str2charptr");
+    for(register unsigned int i = 0; i < size; i++)
+	ret[i] = x[i];
+    ret[size] = '\0';
+    
     return ret;
 }
 
@@ -215,7 +217,7 @@ char *tools_extract_basename(const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: tools.cpp,v 1.12 2002/11/02 20:03:25 edrusb Rel $";
+    static char id[]="$Id: tools.cpp,v 1.13 2002/12/08 20:03:07 edrusb Rel $";
     dummy_call(id);
 }
 

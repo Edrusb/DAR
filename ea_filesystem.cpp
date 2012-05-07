@@ -18,13 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $
+// $Id: ea_filesystem.cpp,v 1.6 2003/01/03 22:34:16 edrusb Rel $
 //
 /*********************************************************************/
 
 #ifdef EA_SUPPORT
 #include <sys/types.h>
 #include <attr/xattr.h>
+#include <errno.h>
 #endif
 #include "ea.hpp"
 #include "tools.hpp"
@@ -246,7 +247,7 @@ static void read_ea(const string & name, ea_attributs & val, bool read_ea_root, 
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: ea_filesystem.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: ea_filesystem.cpp,v 1.6 2003/01/03 22:34:16 edrusb Rel $";
 
     dummy_call(id);
 }
@@ -259,7 +260,11 @@ static vector<string> ea_filesystem_get_ea_list_for(const char *filename)
     char *liste = NULL;
 
     if(taille < 0)
+    {
+	if(errno == ENOSYS || errno == ENOTSUP)
+	    return ret;
 	throw Erange("ea_filesystem_get_ea_list_for", string("error retreiving EA list for ")+filename+ " : " + strerror(errno));
+    }
     
     liste = new char[taille+MARGIN];
     if(liste == NULL)

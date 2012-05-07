@@ -32,7 +32,10 @@ and zlib must be installed (at least version 1.1.3, but 1.1.4 is recommended).
       * uncomment EA_SUPPORT if your platform supports extended attributes
       * uncomment FILEOFFSET if you need support for large files
       * comment out USE_SYS_SIGLIST if you are going to compile under Cygwin
-      * uncomment the "OS_BITS = 64" if you are compiling for alpha (64 bits)
+      * for Cygwin, you will probably need to uncomment one of the OS_BITS
+        because the <stdint.h> header may be missing in the distro. Try first
+	without change, then try uncomment OS_BITS that match you system 
+	(most system are still actually 32 bits).
       * if you need a special compiler set CXX and CC accordingly
     NOTE that there will be one day a "configure" script, which will simplify
     this setup step 1, I hope. ;-)
@@ -96,7 +99,8 @@ the compilation requires Cygwin ( http://cygwin.com/ )
 "Cygwin is a UNIX environment, developed by Red Hat, for Windows"
 you need from Cygwin the "gcc", "make" and "zlib" packages at least. If you
 need to edit the Makefile, install a text editor (such as vi or vim).
-Then, all steps described above for Linux apply here.
+Then, all steps described above for Linux apply here. And read the note at 
+the end of this file !
 
 
 
@@ -111,18 +115,22 @@ in autoexec.bat:
 
 	set PATH=%PATH%;C:\Dar
 
-then you have to reboot 
-(This is just to respect the Windows usage and way of life ;-) )
+then you have to reboot. 
+(Just kidding ! This was to respect the Windows usage and way of life ;-) )
 
 Else if you don't setup the PATH variable, you need to specify the full 
 path to dar executables to use them from the Windows command-line prompt.
+Read the note below !
+
+	IMPORTANT NOTE FOR USE UNDER CYGWIN !
 
 Note that path given to dar suite's program must respect the UNIX way (use
-slashes "/" not back slashes "\") the root path "/" is C:\Cygwin. Thus this
-directory must exist. This binary for Windows is more or less experimental for
-what concern the interaction with the system through Cygwin (I don't see how
-dar can access to floppy of other disks ... any suggestions, or tricks are
-welcome for feedback ! :-)
+slashes "/" not back slashes "\") thus you have to have to use c:/temp in 
+place of c:\temp for example.
+
+
+
+
 
 
 

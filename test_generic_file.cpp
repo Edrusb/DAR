@@ -18,11 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_generic_file.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $
+// $Id: test_generic_file.cpp,v 1.6 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 //
-#include <iostream.h>
+#include <iostream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

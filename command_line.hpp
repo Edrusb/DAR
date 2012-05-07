@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.hpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $
+// $Id: command_line.hpp,v 1.10 2002/12/10 20:54:23 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -41,7 +41,8 @@ extern bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, pat
 		     mask *&selection, mask *&subtree,
 		     string &filename, string *&ref_filename,
 		     bool &allow_over, bool &warn_over, bool &info_details,
-		     compression &algo, bool &detruire, 
+		     compression &algo, U_I & compression_level,
+		     bool &detruire, 
 		     bool &pause, bool &beep,
 		     bool & make_empty_dir, bool & only_more_recent, 
 		     bool & ea_root, bool & ea_user,

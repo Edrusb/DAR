@@ -148,3 +148,11 @@ KNOWN BUGS:
     fixed in version: 1.2.0
 
 
+#9  description
+	failed to read an archive under windows NT and 2000
+
+    problem
+	error concerning the integer macro definition (module integer.hpp)
+
+    solution
+	replaced the macro by a proper definition.

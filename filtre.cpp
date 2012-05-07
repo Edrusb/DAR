@@ -18,11 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: filtre.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
-#include <map.h>
+#include <map>
 #include "user_interaction.hpp"
 #include "erreurs.hpp"
 #include "filtre.hpp"
@@ -767,7 +767,7 @@ void filtre_isolate(catalogue & cat,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: filtre.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: filtre.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $";
     dummy_call(id);
 }
 

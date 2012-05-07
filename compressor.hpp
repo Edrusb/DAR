@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.hpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $
+// $Id: compressor.hpp,v 1.10 2002/12/10 20:54:23 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -40,10 +40,10 @@ extern string compression2string(compression c);
 class compressor : public generic_file
 {
 public :
-    compressor(compression algo, generic_file & compressed_side);
+    compressor(compression algo, generic_file & compressed_side, U_I compression_level = 9);
 	// compressed_side is not owned by the object and will remains
 	// after the objet destruction
-    compressor(compression algo, generic_file *compressed_side);
+    compressor(compression algo, generic_file *compressed_side, U_I compression_level = 9);
 	// compressed_side is owned by the object and will be 
 	// deleted a destructor time
     ~compressor();
@@ -56,7 +56,7 @@ public :
     void clean_write(); // discard any byte buffered and not yet wrote to compressed_side;
 
     compression get_algo() const;
-    void change_algo(compression new_algo);
+    void change_algo(compression new_algo, U_I new_compression_level = 9);
     
 	// inherited from generic file	 
     bool skip(const infinint & position) { flush_write(); flush_read(); clean_read(); return compressed->skip(position); };
@@ -83,7 +83,7 @@ private :
     generic_file *compressed;
     bool compressed_owner;
 
-    void init(compression algo, generic_file *compressed_side);
+    void init(compression algo, generic_file *compressed_side, U_I compression_level);
     S_I (compressor::*read_ptr) (char *a, size_t size);
     S_I none_read(char *a, size_t size);
     S_I gzip_read(char *a, size_t size);

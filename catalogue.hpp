@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $
+// $Id: catalogue.hpp,v 1.10 2002/12/14 19:29:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -37,6 +37,7 @@
 #include "ea.hpp"
 #include "compressor.hpp"
 #include "integers.hpp"
+#include "mask.hpp"
 
 class file_etiquette;
 class entree;
@@ -348,8 +349,8 @@ public :
     void add_children(nomme *r); // when r is a directory, 'parent' is set to 'this'
     void reset_read_children() const;
     bool read_children(const nomme * &r) const; // read the direct children of the directory, returns false if no more is available
-    void listing(ostream & flux, string marge = "") const;
-    void tar_listing(ostream & flux, const string & beginning = "") const;
+    void listing(ostream & flux, const mask &m, string marge = "") const;
+    void tar_listing(ostream & flux, const mask &m, const string & beginning = "") const;
     directory * get_parent() const { return parent; };
     bool search_children(const string &name, nomme *&ref);
 
@@ -554,8 +555,8 @@ public :
 	// ref must have the same root, else the operation generates a exception
     
     void dump(generic_file & ref) const;
-    void listing(ostream & flux, string marge = "") const;
-    void tar_listing(ostream & flux, const string & beginning = "") const;
+    void listing(ostream & flux, const mask &m, string marge = "") const;
+    void tar_listing(ostream & flux, const mask & m, const string & beginning = "") const;
     entree_stats get_stats() const { return stats; };
 
     const directory *get_contenu() const { return contenu; }; // used by data_tree

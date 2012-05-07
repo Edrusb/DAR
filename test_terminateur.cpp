@@ -18,14 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_terminateur.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $
+// $Id: test_terminateur.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <iostream.h>
+#include <iostream>
 #include "terminateur.hpp"
 #include "generic_file.hpp"
 #include "deci.hpp"

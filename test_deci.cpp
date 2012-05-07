@@ -18,12 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_deci.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: test_deci.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "deci.hpp"
-#include <iostream.h>
+#include <iostream>
 #include "test_memory.hpp"
 
 static void f1();

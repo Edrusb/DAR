@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: test_filesystem.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,7 +30,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <string.h>
-#include <iostream.h>
+#include <iostream>
 #include "filesystem.hpp"
 #include "user_interaction.hpp"
 #include "test_memory.hpp"

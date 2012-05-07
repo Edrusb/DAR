@@ -18,15 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.cpp,v 1.8 2002/10/28 20:39:34 edrusb Rel $
+// $Id: path.cpp,v 1.9 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #pragma implementation
 
 #include "path.hpp"
-#include <iostream.h>
-#include <strstream>
+#include <iostream>
+#include <sstream>
 
 static bool path_get_root(string & p, string & root);
 
@@ -176,7 +176,7 @@ bool path::is_subdir_of(const path & p) const
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: path.cpp,v 1.8 2002/10/28 20:39:34 edrusb Rel $";
+    static char id[]="$Id: path.cpp,v 1.9 2002/12/08 20:03:07 edrusb Rel $";
     dummy_call(id);
 }
 

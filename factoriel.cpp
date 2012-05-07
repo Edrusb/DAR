@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: factoriel.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: factoriel.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,7 +27,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string>
-#include <iostream.h>
+#include <iostream>
 #include <errno.h>
 #include "infinint.hpp"
 #include "deci.hpp"
@@ -92,6 +92,6 @@ S_I main(S_I argc, char *argv[]) throw()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: factoriel.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: factoriel.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $";
     dummy_call(id);
 }

@@ -18,14 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: erreurs.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #pragma implementation
 
-#include <iostream.h>
-#include <strstream>
+#include <iostream>
+#include <sstream>
 #include "erreurs.hpp"
 
 static bool initialized = false;
@@ -146,7 +146,7 @@ static void init()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: erreurs.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: erreurs.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -205,18 +205,9 @@ static void notcatched()
 
 static string int_to_string(S_I i)
 {
-    ostrstream r;
-    string s;
-    char *t;
-    r << i << '\0';
-    t = r.str();
-    if(t != NULL)
-    {
-	s = t;
-	delete t;
-    }
-    else
-	s = "number is impossible to display";
+    ostringstream r;
 
-    return s;
+    r << i;
+
+    return r.str();
 }

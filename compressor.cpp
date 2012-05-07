@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $
+// $Id: compressor.cpp,v 1.10 2002/12/10 20:54:23 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -31,19 +31,19 @@
 
 #define BUFFER_SIZE 102400
 
-compressor::compressor(compression algo, generic_file & compressed_side) : generic_file(compressed_side.get_mode())
+compressor::compressor(compression algo, generic_file & compressed_side, U_I compression_level) : generic_file(compressed_side.get_mode())
 {
-    init(algo, &compressed_side);
+    init(algo, &compressed_side, compression_level);
     compressed_owner = false;
 }
 
-compressor::compressor(compression algo, generic_file *compressed_side) : generic_file(compressed_side->get_mode())
+compressor::compressor(compression algo, generic_file *compressed_side, U_I compression_level) : generic_file(compressed_side->get_mode())
 {
-    init(algo, compressed_side);
+    init(algo, compressed_side, compression_level);
     compressed_owner = true;
 }
 
-void compressor::init(compression algo, generic_file *compressed_side)
+void compressor::init(compression algo, generic_file *compressed_side, U_I compression_level)
 {
     compr = decompr = NULL;
     switch(algo)
@@ -68,7 +68,10 @@ void compressor::init(compression algo, generic_file *compressed_side)
 	    throw Ememory("compressor::compressor");
 	}
 
-	switch(deflateInit(compr->strm, 9))
+	if(compression_level > 9)
+	    throw SRC_BUG;
+	
+	switch(deflateInit(compr->strm, compression_level))
 	{
 	case Z_OK:
 	    break;
@@ -174,7 +177,7 @@ compression compressor::get_algo() const
     throw SRC_BUG;
 }
 
-void compressor::change_algo(compression new_algo)
+void compressor::change_algo(compression new_algo, U_I new_compression_level)
 {
     if(new_algo == get_algo())
 	return;
@@ -198,7 +201,7 @@ void compressor::change_algo(compression new_algo)
     }
 
 	// change to new algorithm
-    init(new_algo, compressed);
+    init(new_algo, compressed, new_compression_level);
 }
 
 
@@ -382,7 +385,7 @@ void compressor::clean_read()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: compressor.cpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $";
+    static char id[]="$Id: compressor.cpp,v 1.10 2002/12/10 20:54:23 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -454,4 +457,3 @@ string compression2string(compression c)
 	throw Erange("compresion2char", "unknown compression");
     }
 }
-

@@ -18,12 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar.cpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $
+// $Id: dar.cpp,v 1.12 2002/12/14 19:29:53 edrusb Rel $
 //
 /*********************************************************************/
 //
 #include <string>
-#include <iostream.h>
+#include <iostream>
 #include "erreurs.hpp"
 #include "generic_file.hpp"
 #include "infinint.hpp"
@@ -59,7 +59,7 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 		      const mask &selection, const mask &subtree, 
 		      const string &filename, string *ref_filename,
 		      bool allow_over, bool warn_over, bool info_details, 
-		      bool pause, bool empty_dir, compression algo, 
+		      bool pause, bool empty_dir, compression algo, U_I compression_level,
 		      const infinint &file_size, 
 		      const infinint &first_file_size,
 		      S_I argc, char *argv[],
@@ -88,7 +88,8 @@ static void op_listing(const path &sauv_path, const string &filename,
 		       bool info_details, bool tar_format,
 		       const string &input_pipe, const string &output_pipe,
 		       const string & execute,
-		       const string & pass);
+		       const string & pass,
+		       const mask &selection);
 static void op_test(const path &sauv_path, const mask &selection, 
 		    const mask &subtree, const string &filename, 
 		    bool info_details,
@@ -119,16 +120,18 @@ static S_I little_main(S_I argc, char *argv[])
     string filename, *ref_filename;
     bool allow_over, warn_over, info_details, detruire, pause, beep, empty_dir, only_more_recent, ea_user, ea_root;
     compression algo;
+    U_I compression_level;
     string input_pipe, output_pipe;
     bool ignore_owner;
     string execute, execute_ref;
     string pass;
     string pass_ref;
-    
+
     if(! get_args(argc, argv, op, fs_root, sauv_root, ref_root,
 		  file_size, first_file_size, selection, 
 		  subtree, filename, ref_filename, 
-		  allow_over, warn_over, info_details, algo, detruire, 
+		  allow_over, warn_over, info_details, algo, 
+		  compression_level, detruire, 
 		  pause, beep, empty_dir, only_more_recent, 
 		  ea_root, ea_user,
 		  input_pipe, output_pipe, 
@@ -157,7 +160,7 @@ static S_I little_main(S_I argc, char *argv[])
 	    case create:
 	    case isolate:
 		op_create(op, *fs_root, *sauv_root, ref_root, *selection, *subtree, filename, ref_filename, 
-			  allow_over, warn_over, info_details, pause, empty_dir, algo, file_size, 
+			  allow_over, warn_over, info_details, pause, empty_dir, algo, compression_level, file_size, 
 			  first_file_size, argc, argv, ea_root, ea_user, input_pipe, output_pipe,
 			  execute, execute_ref, pass, pass_ref, *compr_mask);
 		break;
@@ -176,7 +179,7 @@ static S_I little_main(S_I argc, char *argv[])
 		break;
 	    case listing:
 		op_listing(*sauv_root, filename, info_details, only_more_recent, input_pipe, output_pipe,
-			   execute, pass);
+			   execute, pass, *selection);
 		    // only_more_recent is set to true when listing and -T (--tar-format) is asked
 		break;
 	    default:
@@ -225,8 +228,8 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 		      const mask &selection, const mask &subtree, 
 		      const string &filename, string *ref_filename,
 		      bool allow_over, bool warn_over, bool info_details, bool pause,
-		      bool empty_dir,
-		      compression algo, const infinint &file_size, 
+		      bool empty_dir, compression algo, U_I compression_level,
+		      const infinint &file_size, 
 		      const infinint &first_file_size, 
 		      S_I argc, char *argv[], bool root_ea, bool user_ea,
 		      const string &input_pipe, const string &output_pipe,
@@ -344,7 +347,7 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 		zip_base = decoupe;
 
 
-	    zip = new compressor(algo, *zip_base);
+	    zip = new compressor(algo, *zip_base, compression_level);
 	    if(zip == NULL)
 		throw Ememory("op_create");
 	    switch(op)
@@ -498,7 +501,8 @@ static void op_listing(const path &sauv_path, const string &filename,
 		       bool info_details, bool tar_format,  
 		       const string &input_pipe, const string &output_pipe,
 		       const string & execute,
-		       const string & pass)
+		       const string & pass,
+		       const mask &selection)
 {
     try
     {
@@ -565,9 +569,9 @@ static void op_listing(const path &sauv_path, const string &filename,
 		    user_interaction_pause("Continue listing archive contents?");
 		}
 		if(tar_format)
-		    cat->tar_listing(user_interaction_stream());
+		    cat->tar_listing(user_interaction_stream(), selection);
 		else
-		    cat->listing(user_interaction_stream());
+		    cat->listing(user_interaction_stream(), selection);
 	    }
 	    catch(...)
 	    {
@@ -722,7 +726,7 @@ static void op_test(const path &sauv_path, const mask &selection,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar.cpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $";
+    static char id[]="$Id: dar.cpp,v 1.12 2002/12/14 19:29:53 edrusb Rel $";
     dummy_call(id);
 }
 

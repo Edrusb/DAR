@@ -4,21 +4,16 @@ PRESENTATION
 dar is a shell command, that makes backup of a directory tree and files.
 It has been tested under Linux, and now under Windows 95 (using Cygwin).
 A GUI for Linux and Windows will also follow, probably as a separated tool.
-Actually dar is a set of four commands:
+Actually dar is a set of five commands:
 	dar
 	dar_xform
 	dar_slave
 	dar_manager
-
+	dar_static (statically linked version of dar, it does not exist for
+		    cygwin, you always need the cygwin dll)
 
 PACKAGE CONTENT
 ===============
-
-I am looking for a new job, thus I have actually less free time for DAR, 
-but that's temporary. If you are interested in my skills, please have
-a look at the "RESUME" file. Thanks.
-
-else you can find the following:
 
 for functional description see the following "FEATURES" paragraph below
 for actual limitations see below "LIMITATIONS" paragraph below
