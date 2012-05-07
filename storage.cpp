@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -28,23 +28,23 @@
 unsigned long storage::alloc_size = 120000;
     // must be less than the third of the maxmimum value of a unsigned long
 
-storage::storage(const infinint & size) throw(Ememory, Erange, Ebug) 
-{ 
-    E_BEGIN; 
-    make_alloc(size, first, last); 
-    E_END("storage::storage","infinint"); 
+storage::storage(const infinint & size) throw(Ememory, Erange, Ebug)
+{
+    E_BEGIN;
+    make_alloc(size, first, last);
+    E_END("storage::storage","infinint");
 }
 
 unsigned char storage::operator [](const infinint &position) const throw(Ememory, Erange, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     return (storage(*this))[position];
-    E_END("storage::operator []","const"); 
+    E_END("storage::operator []","const");
 }
 
 unsigned char & storage::operator [](infinint position) throw(Ememory, Erange, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     unsigned long offset = 0;
     struct cellule *ptr = first;
 
@@ -57,16 +57,16 @@ unsigned char & storage::operator [](infinint position) throw(Ememory, Erange, E
 	    ptr = ptr->next;
         }
         else
-	    position.unstack(offset); 
+	    position.unstack(offset);
     } while(offset > ptr->size);
 
     return ptr->data[offset];
-    E_END("storage::operator []",""); 
+    E_END("storage::operator []","");
 }
-      
+
 infinint storage::size() const throw(Ememory, Erange, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     infinint ret = 0;
     struct cellule *ptr = first;
 
@@ -76,13 +76,13 @@ infinint storage::size() const throw(Ememory, Erange, Ebug)
 	ptr = ptr->next;
     }
 
-    return ret;    
-    E_END("storage::size",""); 
+    return ret;
+    E_END("storage::size","");
 }
 
 void storage::clear(unsigned char val) throw()
 {
-    E_BEGIN; 
+    E_BEGIN;
     struct cellule *cur = first;
     unsigned long int i;
 
@@ -93,12 +93,12 @@ void storage::clear(unsigned char val) throw()
 	    cur->data[i++] = val;
 	cur = cur->next;
     }
-    E_END("storage::clear",""); 
+    E_END("storage::clear","");
 }
 
 unsigned int storage::write(iterator & it, unsigned char *a, unsigned int size) throw(Erange)
 {
-    E_BEGIN; 
+    E_BEGIN;
     register unsigned int i;
 
     if(it.ref != this)
@@ -108,14 +108,14 @@ unsigned int storage::write(iterator & it, unsigned char *a, unsigned int size) 
 	*(it++) = a[i];
 
     return i;
-    E_END("storage::write",""); 
-} 
+    E_END("storage::write","");
+}
 
 unsigned int storage::read(iterator & it, unsigned char *a, unsigned int size) const throw(Erange)
 {
-    E_BEGIN; 
+    E_BEGIN;
     register unsigned int i;
-    
+
     if(it.ref != this)
 	throw Erange("storage::read", "the iterator is not indexing the object it has been asked to read from");
 
@@ -123,45 +123,45 @@ unsigned int storage::read(iterator & it, unsigned char *a, unsigned int size) c
 	a[i] = *(it++);
 
     return i;
-    E_END("storage::read",""); 
-} 
+    E_END("storage::read","");
+}
 
 void storage::insert_null_bytes_at_iterator(iterator it, unsigned int size) throw(Erange, Ememory, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     unsigned char a = 0;
 
     insert_bytes_at_iterator_cmn(it, true, &a, size);
-    E_END("storage::insert_null_bytes_at_iterator",""); 
+    E_END("storage::insert_null_bytes_at_iterator","");
 }
 
 void storage::insert_const_bytes_at_iterator(iterator it, unsigned char a, unsigned int size) throw(Erange, Ememory, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     insert_bytes_at_iterator_cmn(it, true, &a, size);
-    E_END("storage::insert_const_bytes_at_iterator",""); 
+    E_END("storage::insert_const_bytes_at_iterator","");
 }
 
 void storage::insert_bytes_at_iterator(iterator it, unsigned char *a, unsigned int size) throw(Erange, Ememory, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     insert_bytes_at_iterator_cmn(it, false, a, size);
-    E_END("storage::insert_bytes_at_iterator",""); 
+    E_END("storage::insert_bytes_at_iterator","");
 }
 
 void storage::remove_bytes_at_iterator(iterator it, unsigned int number) throw(Ememory, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     while(number > 0 && it.cell != NULL)
     {
 	unsigned int can_rem = it.cell->size - it.offset;
-        
+
         if(can_rem < number)
         {
 	    if(it.offset > 0)
             {
   	        unsigned char *p = new unsigned char[it.offset];
-     
+
   	        if(p != NULL)
     	        {
 		    for(register unsigned int i = 0; i < it.offset; i++)
@@ -179,7 +179,7 @@ void storage::remove_bytes_at_iterator(iterator it, unsigned int number) throw(E
             else
             {
                 struct cellule *t = it.cell->next;
- 		
+
 		if(it.cell->next != NULL)
  		    it.cell->next->prev = it.cell->prev;
 		else
@@ -189,7 +189,7 @@ void storage::remove_bytes_at_iterator(iterator it, unsigned int number) throw(E
 		    it.cell->prev->next = it.cell->next;
 		else
 		    first = it.cell->next;
-		
+
 		number -= it.cell->size;
 		it.cell->next = NULL;
 		it.cell->prev = NULL;
@@ -205,7 +205,7 @@ void storage::remove_bytes_at_iterator(iterator it, unsigned int number) throw(E
 	    {
   	    	for(register unsigned int i = 0; i < it.offset; i++)
 		    p[i] = it.cell->data[i];
-		for(register unsigned int i = it.offset+number ; i < it.cell->size ; i++)	
+		for(register unsigned int i = it.offset+number ; i < it.cell->size ; i++)
 		    p[i-number] = it.cell->data[i];
 		delete it.cell->data;
 		it.cell->data = p;
@@ -217,12 +217,12 @@ void storage::remove_bytes_at_iterator(iterator it, unsigned int number) throw(E
 	}
     }
     reduce();
-    E_END("storage::remove_bytes_at_iterator","unsigned int"); 
+    E_END("storage::remove_bytes_at_iterator","unsigned int");
 }
 
 void storage::remove_bytes_at_iterator(iterator it, infinint number) throw(Ememory, Erange, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     unsigned long int sz = 0;
     number.unstack(sz);
 
@@ -232,17 +232,17 @@ void storage::remove_bytes_at_iterator(iterator it, infinint number) throw(Ememo
 	sz = 0;
 	number.unstack(sz);
     }
-    E_END("storage::remove_bytes_at_iterator","infinint"); 
+    E_END("storage::remove_bytes_at_iterator","infinint");
 }
 
-void storage::fusionne(struct cellule *a_first, struct cellule *a_last, struct cellule *b_first, struct cellule *b_last, 
+void storage::fusionne(struct cellule *a_first, struct cellule *a_last, struct cellule *b_first, struct cellule *b_last,
 		       struct cellule *&res_first, struct cellule * & res_last) throw(Ebug)
 {
-    E_BEGIN; 
-    if(a_first == NULL ^ a_last == NULL)
+    E_BEGIN;
+    if((a_first == NULL) ^ (a_last == NULL))
 	throw SRC_BUG;
 
-    if(b_first == NULL ^ b_last == NULL)
+    if((b_first == NULL) ^ (b_last == NULL))
 	throw SRC_BUG;
 
     if(a_last != NULL && b_first != NULL)
@@ -263,17 +263,17 @@ void storage::fusionne(struct cellule *a_first, struct cellule *a_last, struct c
 	    res_first = a_first;
 	    res_last = a_last;
 	}
-    E_END("storage::fusionne",""); 
+    E_END("storage::fusionne","");
 }
 
 void storage::copy_from(const storage & ref) throw(Ememory, Erange, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     unsigned long int pas = 0, delta;
     struct cellule *ptr = ref.first;
     first = last = NULL;
-    
-    try 
+
+    try
     {
 	while(ptr != NULL || pas > 0)
 	{
@@ -301,13 +301,13 @@ void storage::copy_from(const storage & ref) throw(Ememory, Erange, Ebug)
 	first = last = NULL;
 	throw;
     }
-    
+
     iterator i_ref = ref.begin();
     iterator i_new = begin();
-    
+
     while(i_ref != ref.end())
 	*(i_new++) = *(i_ref++);
-    E_END("storage::copy_from",""); 
+    E_END("storage::copy_from","");
 }
 
 static void dummy_call(char *x)
@@ -318,7 +318,7 @@ static void dummy_call(char *x)
 
 signed long int storage::difference(const storage & ref) const throw()
 {
-    E_BEGIN; 
+    E_BEGIN;
     struct cellule *b = last, *a = ref.last;
     signed long int superior = 0;
 
@@ -336,12 +336,12 @@ signed long int storage::difference(const storage & ref) const throw()
 	}
     }
     return superior;
-    E_END("storage::difference",""); 
+    E_END("storage::difference","");
 }
 
 void storage::reduce() throw(Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     struct cellule *glisseur = first;
 
     while(glisseur != NULL)
@@ -349,31 +349,31 @@ void storage::reduce() throw(Ebug)
 	if(glisseur->next != NULL)
 	{
 	    unsigned int somme = glisseur->next->size + glisseur->size;
-	    
+
 	    if(somme < alloc_size)
 	    {
 		unsigned char *p = new unsigned char[somme];
-		
+
 		if(p != NULL)
 		{
 		    struct cellule *tmp = glisseur->next;
-		    
+
 		    for(register unsigned int i = 0; i < glisseur->size; i++)
 			p[i] = glisseur->data[i];
-		    
+
 		    for(register unsigned int i = glisseur->size; i < somme; i++)
 			p[i] = tmp->data[i - glisseur->size];
-		    
+
 		    delete glisseur->data;
 		    glisseur->data = p;
 		    glisseur->size = somme;
-		    
+
 		    glisseur->next = tmp->next;
 		    if(glisseur->next != NULL)
 			glisseur->next->prev = glisseur;
 		    else
 			last = glisseur;
-		    
+
 		    tmp->next = tmp->prev = NULL;
 		    detruit(tmp);
 		}
@@ -386,12 +386,12 @@ void storage::reduce() throw(Ebug)
 	else
 	    glisseur = glisseur->next;
     }
-    E_END("storage::reduce",""); 
+    E_END("storage::reduce","");
 }
 
 void storage::insert_bytes_at_iterator_cmn(iterator it, bool constant, unsigned char *a, unsigned int size) throw(Erange, Ememory, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     if(it.ref != this)
 	throw Erange("storage::insert_bytes_at_iterator_cmn", "the iterator is not indexing the object it has been asked to insert byte into");
 
@@ -471,18 +471,18 @@ void storage::insert_bytes_at_iterator_cmn(iterator it, bool constant, unsigned 
 	default:
 	    throw SRC_BUG;
 	}
-	
+
 	temp.last = temp.first = NULL;
     }
     reduce();
-    E_END("storage::insert_bytes_at_iterator_cmn",""); 
+    E_END("storage::insert_bytes_at_iterator_cmn","");
 }
 
 void storage::detruit(struct cellule *c) throw(Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     struct cellule *t;
-	
+
     while(c != NULL)
     {
 	if(c->size == 0 && c->data != NULL)
@@ -495,15 +495,15 @@ void storage::detruit(struct cellule *c) throw(Ebug)
 	delete c;
 	c = t;
     }
-    E_END("storage::detruit",""); 
-}	
+    E_END("storage::detruit","");
+}
 
 void storage::make_alloc(unsigned long int size, struct cellule * & begin, struct cellule * & end) throw (Ememory, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     struct cellule *newone;
     struct cellule *previous = NULL;
-	
+
     do{
 	unsigned long dsize = alloc_size < size ? alloc_size : size;
 
@@ -515,14 +515,14 @@ void storage::make_alloc(unsigned long int size, struct cellule * & begin, struc
 	    if(previous != NULL)
 		previous->next = newone;
 	    else
-		begin = newone; 
+		begin = newone;
 	}
 	else
 	{
-	    detruit(begin); 
+	    detruit(begin);
 	    throw Ememory("storage::make_alloc");
 	}
-	   
+
 	newone->data = new unsigned char[dsize];
 	if(newone->data != NULL)
 	{
@@ -533,21 +533,21 @@ void storage::make_alloc(unsigned long int size, struct cellule * & begin, struc
 	else
 	    if(alloc_size > 2)
 		alloc_size /= 2;
-	    else 
+	    else
 	    {
 		newone->size = 0;
 		detruit(begin);
 		throw Ememory("storage::make_alloc");
 	    }
     } while (size > 0);
-    
+
     end = newone;
-    E_END("storage::make_alloc","unsigned long int"); 
+    E_END("storage::make_alloc","unsigned long int");
 }
 
 void storage::make_alloc(infinint size, struct cellule * & begin, struct cellule * &end) throw(Ememory, Erange, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     struct cellule *debut;
     struct cellule *fin;
     unsigned long int sz = 0;
@@ -583,7 +583,7 @@ void storage::make_alloc(infinint size, struct cellule * & begin, struct cellule
 	sz = 0;
 	size.unstack(sz);
     } while(sz > 0);
-    E_END("storage::make_alloc","infinint"); 
+    E_END("storage::make_alloc","infinint");
 }
 
 ///////////////////////////////////////////////////////////
@@ -591,54 +591,54 @@ void storage::make_alloc(infinint size, struct cellule * & begin, struct cellule
 ///////////////////////////////////////////////////////////
 
 storage::iterator & storage::iterator::operator -= (unsigned long s) throw()
-{ 
-    E_BEGIN; 
+{
+    E_BEGIN;
     static const unsigned long max = (unsigned long)(~0) >> 1;  // maximum unsigned long that can also be signed long
     if(s > max)
     {
 	signed long t = s/2;
 	signed long r = s%2;
-	skip_to(-t); 
-	skip_to(-t); 
-	skip_to(-r); 
+	skip_to(-t);
+	skip_to(-t);
+	skip_to(-r);
     }
     else
 	skip_to(-(signed long)(s));
 
-    return *this; 
-    E_END("storage::iterator::operator -=",""); 
+    return *this;
+    E_END("storage::iterator::operator -=","");
 };
 
 unsigned char & storage::iterator::operator *() const throw(Erange)
 {
-    E_BEGIN; 
+    E_BEGIN;
     if(points_on_data())
 	return cell->data[offset];
     else
 	throw Erange("storage::iterator::operator *()", "iterator does not point on data");
-    E_END("storage::iterator::operator *","unary operator"); 
+    E_END("storage::iterator::operator *","unary operator");
 }
 
 void storage::iterator::skip_to(const storage & st, infinint val) throw()
 {
-    E_BEGIN; 
+    E_BEGIN;
     unsigned long pas = 0;
 
     *this = st.begin();
     val.unstack(pas);
-    do 
+    do
     {
 	skip_to(pas);
 	pas = 0;
 	val.unstack(pas);
-    } 
+    }
     while(pas > 0);
-    E_END("storage::iterator::skip_to","infinint"); 
+    E_END("storage::iterator::skip_to","infinint");
 }
-        
+
 void storage::iterator::skip_to(signed long int val) throw()
 {
-    E_BEGIN; 
+    E_BEGIN;
     if(val >= 0)
     {
 	while(val > 0 && cell != NULL)
@@ -648,7 +648,7 @@ void storage::iterator::skip_to(signed long int val) throw()
 		val -= cell->size - offset;
 		cell = cell->next;
 		offset = 0;
-	    } 
+	    }
 	    else
 	    {
 		offset += val;
@@ -660,7 +660,7 @@ void storage::iterator::skip_to(signed long int val) throw()
     }
     else
 	while(val < 0 && cell != NULL)
-	{         
+	{
 	    val += offset;
 	    if(val < 0)
 	    {
@@ -673,12 +673,12 @@ void storage::iterator::skip_to(signed long int val) throw()
 	    else
 		offset = val;
 	}
-    E_END("storage::iterator::skip_to","signed long int"); 
+    E_END("storage::iterator::skip_to","signed long int");
 }
 
 infinint storage::iterator::get_position() const throw(Erange, Ememory, Ebug)
 {
-    E_BEGIN; 
+    E_BEGIN;
     if(ref == NULL || ref->first == NULL)
 	throw Erange("storage::iterator::get_position", "reference storage of the iterator is empty or non existant");
 
@@ -700,7 +700,7 @@ infinint storage::iterator::get_position() const throw(Erange, Ememory, Ebug)
 	throw Erange("storage::iterator::get_position", "the iterator position is not inside the storage of reference");
 
     return ret;
-    E_END("storage::iterator::get_position",""); 
+    E_END("storage::iterator::get_position","");
 }
 
 

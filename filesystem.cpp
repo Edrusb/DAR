@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -55,11 +55,11 @@ struct etage
 
 	    fichier.clear();
 	    while((ret = readdir(tmp)) != NULL)
-		if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0) 
+		if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
 		    fichier.push_back(string(ret->d_name));
 	    closedir(tmp);
 	}
-    
+
     bool read(string & ref)
 	{
 	    if(fichier.size() > 0)
@@ -68,7 +68,7 @@ struct etage
 		fichier.pop_front();
 		return true;
 	    }
-	    else 
+	    else
 		return false;
 	}
 
@@ -88,7 +88,7 @@ static inode *make_read_entree(path & lieu, const string & name);
 static void make_file(const inode & ref, const path & ou, bool dir_perm);
 static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm);
 static void supprime(const path & ref);
-    
+
 void filesystem_set_root(const path &root, bool allow_overwrite, bool warn_overwrite, bool info_details)
 {
     char *ptr = tools_str2charptr(root.display());
@@ -103,7 +103,7 @@ void filesystem_set_root(const path &root, bool allow_overwrite, bool warn_overw
 	filesystem_allow_overwrite = allow_overwrite;
 	filesystem_warn_overwrite = warn_overwrite;
 	filesystem_info_details = info_details;
-	
+
 	struct stat buf;
 	if(stat(ptr, &buf) < 0)
 	    throw Erange("filesystem_set_root", strerror(errno));
@@ -138,7 +138,7 @@ void filesystem_freemem()
     }
     write_stack_dir.clear();
 }
- 
+
 void filesystem_reset_read()
 {
     char *tmp;
@@ -169,7 +169,7 @@ bool filesystem_read(entree * & ref)
 
     if(read_current_dir == NULL)
 	throw Erange("filesystem_read", "filesystem module not initialized, call filesystem_set_root first then filesystem_reset_read");
-    
+
     do
     {
 	once_again = false;
@@ -180,11 +180,11 @@ bool filesystem_read(entree * & ref)
 	{
 	    etage & inner = read_pile.back();
 	    string name;
-	    
+
 	    if(!inner.read(name))
 	    {
 		string tmp;
-		
+
 		read_pile.pop_back();
 		if(read_pile.size() > 0)
 		{
@@ -203,7 +203,7 @@ bool filesystem_read(entree * & ref)
 		    char *ptr_name;
 		    *read_current_dir += name;
 		    ptr_name = tools_str2charptr(read_current_dir->display());
-		    
+
 		    try
 		    {
 			read_pile.push_back(etage(ptr_name));
@@ -211,7 +211,7 @@ bool filesystem_read(entree * & ref)
 		    catch(Erange & e)
 		    {
 			string tmp;
-			
+
 			user_interaction_warning(string("error openning ") + ptr_name + " : " + e.get_message());
 			try
 			{
@@ -260,11 +260,11 @@ void filesystem_skip_read_to_parent_dir()
 	throw SRC_BUG;
     else
 	read_pile.pop_back();
-    
+
     if(! read_current_dir->pop(tmp))
 	throw SRC_BUG;
 }
-	
+
 void filesystem_reset_write()
 {
     write_stack_dir.clear();
@@ -272,14 +272,14 @@ void filesystem_reset_write()
 	delete write_current_dir;
     write_current_dir = new path(*fs_root);
     if(write_current_dir == NULL)
-	throw Ememory("filesystem_reset_write"); 
+	throw Ememory("filesystem_reset_write");
 }
- 
+
 static inode *make_read_entree(path & lieu, const string & name)
 {
     char *ptr_name = tools_str2charptr((lieu + path(name)).display());
     inode *ref = NULL;
-    
+
     try
     {
 	struct stat buf;
@@ -291,12 +291,12 @@ static inode *make_read_entree(path & lieu, const string & name)
 		// else function returns NULL (meaning file does not exists)
 	}
 	else
-	{ 
+	{
 	    if(S_ISLNK(buf.st_mode))
 	    {
 		const int buf_size = 4096;
 		char buffer[buf_size];
-		
+
 		int sz = readlink(ptr_name, buffer, buf_size);
 		if(sz < 0)
 		    throw Erange("filesystem_read", strerror(errno));
@@ -304,7 +304,7 @@ static inode *make_read_entree(path & lieu, const string & name)
 		    throw Erange("filesystem_read", string("link target name too long, increase buffer size in source code file ") + __FILE__);
 		else
 		    buffer[sz] = '\0';
-		
+
 		ref = new lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 			       buf.st_atime,
 			       buf.st_mtime,
@@ -371,7 +371,7 @@ void filesystem_write(const entree *x)
     const eod *x_eod = dynamic_cast<const eod *>(x);
     const directory *x_dir = dynamic_cast<const directory *>(x);
     const nomme *x_nom = dynamic_cast<const nomme *>(x);
-    
+
     if(x_eod != NULL)
     {
 	string tmp;
@@ -379,11 +379,11 @@ void filesystem_write(const entree *x)
 	make_owner_perm(write_stack_dir.back(), *write_current_dir, true);
 	write_stack_dir.pop_back();
     }
-    else 
+    else
 	if(x_nom == NULL)
 	    throw SRC_BUG; // neither "nomme" nor "eod"
 	else
-	{ 
+	{
 	    path spot = *write_current_dir + x_nom->get_name();
 	    const detruit *x_det = dynamic_cast<const detruit *>(x);
 	    const inode *x_ino = dynamic_cast<const inode *>(x);
@@ -394,7 +394,7 @@ void filesystem_write(const entree *x)
 	    {
 		if(x_ino == NULL && x_det == NULL)
 		    throw SRC_BUG; // should be either inode or detruit
-		
+
 		if(x_det != NULL) // this is an object of class "detruit"
 		{
 		    if(exists != NULL) // the file to destroy exists
@@ -422,10 +422,10 @@ void filesystem_write(const entree *x)
 		    {
 			const inode *x_ino = dynamic_cast<const inode *>(x);
 			inode *exists_ino = dynamic_cast<inode *>(exists);
-			
+
 			if(x_ino == NULL || exists_ino == NULL)
 			    throw SRC_BUG; // should be both of class inode
-			
+
 			if(filesystem_allow_overwrite)
 			{
 			    if(filesystem_warn_overwrite && x_dir == NULL)
@@ -450,13 +450,13 @@ void filesystem_write(const entree *x)
 			    if(filesystem_info_details)
 				user_interaction_warning(spot.display() + " has not been overwritten (action not allowed)");
 		    }
-		    
+
 		    if(x_dir != NULL)
 		    {
 			*write_current_dir += x_dir->get_name();
 			write_stack_dir.push_back(directory(*x_dir));
 		    }
-		}		
+		}
 	    }
 	    catch(...)
 	    {
@@ -476,7 +476,7 @@ void filesystem_pseudo_write(const directory *dir)
 
     path spot = *write_current_dir + dir->get_name();
     inode *exists = make_read_entree(*write_current_dir, dir->get_name());
-    
+
     try
     {
 	if(exists == NULL)
@@ -484,7 +484,7 @@ void filesystem_pseudo_write(const directory *dir)
 	else
 	{
 	    const directory *e_dir = dynamic_cast<const directory *>(exists);
-	    
+
 	    if(e_dir == NULL) // an inode of that name exists, but it is not a directory
 	    {
 		if(filesystem_allow_overwrite)
@@ -495,8 +495,8 @@ void filesystem_pseudo_write(const directory *dir)
 		    make_file(*dir, *write_current_dir, false);
 		}
 		else
-		    throw Erange("filesystem_pseudo_write", 
-				 spot.display() + 
+		    throw Erange("filesystem_pseudo_write",
+				 spot.display() +
 				 " could not be restored, because a file of that name exists and overwrite is not allowed");
 	    }
 	    else // just setting permission to allow creation of any sub-dir or sub_file
@@ -521,10 +521,10 @@ void filesystem_pseudo_write(const directory *dir)
 	if(exists != NULL)
 	    delete exists;
 	throw;
-    }    
+    }
     if(exists != NULL)
 	delete exists;
-		
+
     *write_current_dir += dir->get_name();
     write_stack_dir.push_back(directory(*dir));
 }
@@ -543,10 +543,10 @@ static void supprime(const path & ref)
 	{
 	    etage fils = s;
 	    string tmp;
-	    
+
 	    while(fils.read(tmp))
 		supprime(ref+tmp);
-	    
+
 	    if(rmdir(s) < 0)
 		throw Erange("supprime (dir)", strerror(errno));
 	}
@@ -584,18 +584,18 @@ static void make_file(const inode & ref, const path & ou, bool dir_perm)
     try
     {
 	int ret;
-	
+
 	do
 	{
 	    if(ref_dir != NULL)
 	    {
 		ret = mkdir(name, 0777);
-	    } 
+	    }
 	    else if(ref_fil != NULL)
 	    {
 		generic_file *ou;
 		infinint seek;
-		
+
 		ret = open(name, O_WRONLY|O_CREAT, 0777);
 		if(ret >= 0)
 		{
@@ -634,7 +634,7 @@ static void make_file(const inode & ref, const path & ou, bool dir_perm)
 		    int sd = ret;
 		    struct sockaddr_un addr;
 		    addr.sun_family = AF_UNIX;
-		    
+
 		    try
 		    {
 			strncpy(addr.sun_path, name, UNIX_PATH_MAX - 1);
@@ -654,15 +654,17 @@ static void make_file(const inode & ref, const path & ou, bool dir_perm)
 	    }
 	    else
 		throw SRC_BUG; // unknown inode type
-	    
+
 	    if(ret < 0)
+	    {
 		if(ret != ENOSPC)
 		    throw Erange("make_file (directory)", strerror(errno));
 		else
 		    user_interaction_pause(string("can't create inode : ") + strerror(errno) + " Ready to continue ? ");
+	    }
 	}
 	while(ret == ENOSPC);
-	
+
 	make_owner_perm(ref, ou, dir_perm);
     }
     catch(...)
@@ -684,7 +686,7 @@ static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm)
 	permission = 0777;
     else
 	permission = ref.get_perm();
-    
+
     try
     {
 	if(lchown(name, ref.get_uid(), ref.get_gid()) < 0)
@@ -693,7 +695,7 @@ static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm)
 
 	try
 	{
-	    if(ref_lie == NULL) // not restoring permission for symbolic links 
+	    if(ref_lie == NULL) // not restoring permission for symbolic links
 		if(chmod(name, permission) < 0)
 		    throw Erange("make_owner_perm (permission)", strerror(errno));
 	}
@@ -703,7 +705,7 @@ static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm)
 		throw;
 		// else (the inode is a symlink), we simply ignore this error
 	}
-	
+
 	struct utimbuf temps;
 	unsigned long tmp = 0;
 	ref.get_last_access().unstack(tmp);
@@ -714,7 +716,7 @@ static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm)
 
 	if(ref_lie == NULL) // not restoring atime & ctime for symbolic links
 	    if(utime(name, &temps) < 0)
-		Erange("make_owner_perm (date&time)", strerror(errno));	
+		Erange("make_owner_perm (date&time)", strerror(errno));
 
     }
     catch(...)

@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -23,7 +23,7 @@
 /*********************************************************************/
 
 #include <netinet/in.h>
-#include <iostream.h>
+#include <iostream>
 #include <ctype.h>
 #include <algorithm>
 #include "tools.hpp"
@@ -96,8 +96,8 @@ entree *entree::read(generic_file & f)
     return ret;
 }
 
-void entree::dump(generic_file & f) const 
-{ 
+void entree::dump(generic_file & f) const
+{
     char s = signature();
     f.write(&s, 1);
 }
@@ -113,9 +113,9 @@ void nomme::dump(generic_file & f) const
     tools_write_string(f, xname);
 }
 
-inode::inode(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
-	     const infinint & last_access, 
-	     const infinint & last_modif, 
+inode::inode(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm,
+	     const infinint & last_access,
+	     const infinint & last_modif,
 	     const string & xname) : nomme(xname)
 {
     uid = xuid;
@@ -144,7 +144,7 @@ inode::inode(generic_file & f, bool saved) : nomme(f)
     last_acc.read_from_file(f);
     last_mod.read_from_file(f);
 }
- 
+
 bool inode::same_as(const inode & ref) const
 {
     return nomme::same_as(ref) && (tolower(ref.signature()) == tolower(signature()));
@@ -157,7 +157,7 @@ bool inode::is_more_recent_than(const inode & ref) const
     else
 	throw SRC_BUG; // not the same inode !
 }
-    
+
 void inode::dump(generic_file & r) const
 {
     unsigned short int tmp;
@@ -174,10 +174,10 @@ void inode::dump(generic_file & r) const
     last_mod.dump(r);
 }
 
-file::file(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
-	   const infinint & last_access, 
-	   const infinint & last_modif, 
-	   const string & src, 
+file::file(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm,
+	   const infinint & last_access,
+	   const infinint & last_modif,
+	   const string & src,
 	   const path & che,
 	   const infinint & taille) : inode(xuid, xgid, xperm, last_access, last_modif, src), chemin(che + src)
 {
@@ -197,7 +197,7 @@ file::file(generic_file & f, bool saved) : inode(f, saved), chemin("vide")
     else
 	offset = 0;
     loc = &f;
-}    
+}
 
 void file::dump(generic_file & f) const
 {
@@ -222,7 +222,7 @@ generic_file *file::get_data() const
 
     if(!get_saved_status())
 	throw Erange("file::get_data", "cannot provide data from a \"not saved\" file object");
-    
+
     if(from_path)
 	ret = new fichier(chemin, gf_read_only);
     else
@@ -243,10 +243,10 @@ void file::set_offset(const infinint & r)
     offset = r;
 }
 
-lien::lien(short int uid, short int gid, short int perm, 
-	   const infinint & last_access, 
-	   const infinint & last_modif, 
-	   const string & name, 
+lien::lien(short int uid, short int gid, short int perm,
+	   const infinint & last_access,
+	   const infinint & last_modif,
+	   const string & name,
 	   const string & target) : inode(uid, gid, perm, last_access, last_modif, name)
 {
     points_to = target;
@@ -266,10 +266,10 @@ string lien::get_target() const
     return points_to;
 }
 
-void lien::set_target(string x) 
+void lien::set_target(string x)
 {
     set_saved_status(true);
-    points_to = x; 
+    points_to = x;
 }
 
 void lien::dump(generic_file & f) const
@@ -279,9 +279,9 @@ void lien::dump(generic_file & f) const
 	tools_write_string(f, points_to);
 }
 
-directory::directory(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
-		     const infinint & last_access, 
-		     const infinint & last_modif, 
+directory::directory(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm,
+		     const infinint & last_access,
+		     const infinint & last_modif,
 		     const string & xname) : inode(xuid, xgid, xperm, last_access, last_modif, xname)
 {
     parent = NULL;
@@ -307,7 +307,7 @@ directory::directory(generic_file & f, bool saved) : inode(f, saved)
     parent = NULL;
     fils.clear();
     it = fils.begin();
-    
+
     try
     {
 	while(fin == NULL)
@@ -318,7 +318,7 @@ directory::directory(generic_file & f, bool saved) : inode(f, saved)
 		d = dynamic_cast<directory *>(p);
 		fin = dynamic_cast<eod *>(p);
 		t = dynamic_cast<nomme *>(p);
-		
+
 		if(t != NULL) // p is a "nomme"
 		    fils.push_back(t);
 		if(d != NULL) // p is a directory
@@ -348,21 +348,21 @@ void directory::dump(generic_file & f) const
     vector<nomme *>::iterator x = const_cast<directory *>(this)->fils.begin();
     inode::dump(f);
     eod fin;
-    
+
     while(x != fils.end())
 	if(dynamic_cast<ignored *>(*x) != NULL)
 	    x++; // "ignored" need not to be saved, they are only useful when updating_destroyed
 	else
 	    (*x++)->dump(f);
 
-    fin.dump(f); // end of "this" directory   
+    fin.dump(f); // end of "this" directory
 }
-	
+
 void directory::add_children(nomme *r)
 {
     directory *d = dynamic_cast<directory *>(r);
     nomme *ancien;
-    
+
     if(search_children(r->get_name(), ancien))
     {
 	directory *a_dir = const_cast<directory *>(dynamic_cast<const directory *>(ancien));
@@ -424,7 +424,7 @@ void directory::listing(ostream & flux, string marge)
 	inode *ino = dynamic_cast<inode *>(*it);
 
 	if(det != NULL)
-	    flux << marge << "[ destroyed file or directory ]    " << (*it++)->get_name() << endl; 
+	    flux << marge << "[ destroyed file or directory ]    " << (*it++)->get_name() << endl;
 	else
 	    if(ino == NULL)
 		throw SRC_BUG;
@@ -432,10 +432,10 @@ void directory::listing(ostream & flux, string marge)
 		flux <<  marge << local_perm(*ino)
 		     << "   " << local_uid(*ino)
 		     << "   " << local_gid(*ino)
-		     << "   " << local_size(*ino) 
+		     << "   " << local_size(*ino)
 		     << "   " << local_date(*ino)
 		     << "   " << local_flag(*ino)
-		     << "   " << (*it++)->get_name() << endl; 
+		     << "   " << (*it++)->get_name() << endl;
 	if(d != NULL)
 	{
 	    d->listing(flux, marge + "|  ");
@@ -460,11 +460,11 @@ bool directory::search_children(const string &name, nomme *&ref)
 	return false;
 }
 
-device::device(short int uid, short int gid, short int perm, 
-	       const infinint & last_access, 
-	       const infinint & last_modif, 
-	       const string & name, 
-	       unsigned short int major, 
+device::device(short int uid, short int gid, short int perm,
+	       const infinint & last_access,
+	       const infinint & last_modif,
+	       const string & name,
+	       unsigned short int major,
 	       unsigned short int minor) : inode(uid, gid, perm, last_access, last_modif, name)
 {
     xmajor = major;
@@ -493,7 +493,7 @@ void device::dump(generic_file & f) const
 
     inode::dump(f);
     if(get_saved_status())
-    {	
+    {
 	tmp = htons(xmajor);
 	f.write((char *)&tmp, (size_t)sizeof(tmp));
 	tmp = htons(xminor);
@@ -505,7 +505,7 @@ void ignored_dir::dump(generic_file & f) const
 {
     directory tmp = directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_name());
     tmp.set_saved_status(get_saved_status());
-    tmp.dump(f); // dump an empty directory 
+    tmp.dump(f); // dump an empty directory
 }
 
 catalogue::catalogue() : out_compare("/")
@@ -538,11 +538,11 @@ catalogue::catalogue(generic_file & f) : out_compare("/")
 }
 
 catalogue & catalogue::operator = (const catalogue &ref)
-{ 
-    detruire(); 
-    out_compare = ref.out_compare; 
-    partial_copy_from(ref); 
-    return *this; 
+{
+    detruire();
+    out_compare = ref.out_compare;
+    partial_copy_from(ref);
+    return *this;
 }
 
 void catalogue::reset_read()
@@ -620,7 +620,7 @@ void catalogue::reset_sub_read(const path &sub)
 {
     if(! sub.is_relative())
 	throw SRC_BUG;
-    
+
     if(sub_tree != NULL)
 	delete sub_tree;
     sub_tree = new path(sub);
@@ -664,14 +664,14 @@ bool catalogue::sub_read(const entree * &ref)
 	    {
 		ref = xtmp;
 		directory *dir = dynamic_cast<directory *>(xtmp);
-		
+
 		if(dir != NULL)
 		{
 		    current_read = dir;
 		    return true;
 		}
 		else
-		    if(sub_tree->read_subdir(tmp)) 
+		    if(sub_tree->read_subdir(tmp))
 		    {
 			user_interaction_warning(sub_tree->display() + " is not present in the archive");
 			delete sub_tree;
@@ -707,7 +707,7 @@ bool catalogue::sub_read(const entree * &ref)
 	{
 	    const directory *dir = dynamic_cast<const directory *>(ref);
 	    const eod *fin = dynamic_cast<const eod *>(ref);
-	    
+
 	    if(dir != NULL)
 		sub_count++;
 	    if(fin != NULL)
@@ -717,7 +717,7 @@ bool catalogue::sub_read(const entree * &ref)
 	}
 	else
 	    throw SRC_BUG;
-    }	    
+    }
 }
 
 void catalogue::reset_add()
@@ -772,7 +772,7 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
     const directory *dir = dynamic_cast<const directory *>(target);
     const eod *fin = dynamic_cast<const eod *>(target);
     const nomme *nom = dynamic_cast<const nomme *>(target);
-	
+
     if(out_compare.degre() > 1) // actually scanning a inexisting directory
     {
 	if(dir != NULL)
@@ -783,12 +783,14 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 		string tmp_s;
 
 		if(!out_compare.pop(tmp_s))
+		{
 		    if(out_compare.is_relative())
 			throw SRC_BUG; // should not be a relative path !!!
 		    else // both cases are bugs, but need to know which case is generating a bug
 			throw SRC_BUG; // out_compare.degre() > 0 but cannot pop !
+		}
 	    }
-	
+
 	return false;
     }
     else
@@ -804,7 +806,7 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 	    extracted = target;
 	    return true;
 	}
-	    
+
 	if(nom == NULL)
 	    throw SRC_BUG; // ref, is neither a eod nor a nomme ! what's that ???
 
@@ -814,7 +816,7 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 	    const detruit *dst_det = dynamic_cast<const detruit *>(found);
 	    const inode *src_ino = dynamic_cast<const inode *>(nom);
 	    const inode *dst_ino = dynamic_cast<const inode *>(found);
-	 
+
 		// updating internal structure to follow directory tree :
 	    if(dir != NULL)
 	    {
@@ -845,7 +847,7 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 			return false;
 		else
 		    throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a nomme which is neither detruit nor inode !
-	    
+
 	    extracted = found;
 	    return true;
 	}
@@ -868,7 +870,7 @@ infinint catalogue::update_destroyed_with(catalogue & ref)
     const detruit *pro_det;
     const nomme *pro_nom;
     infinint count = 0;
-    
+
     ref.reset_read();
     while(ref.read(projo))
     {
@@ -876,7 +878,7 @@ infinint catalogue::update_destroyed_with(catalogue & ref)
 	pro_dir = dynamic_cast<const directory *>(projo);
 	pro_det = dynamic_cast<const detruit *>(projo);
 	pro_nom = dynamic_cast<const nomme *>(projo);
-	
+
 	if(pro_eod != NULL)
 	{
 	    directory *tmp = current->get_parent();
@@ -885,7 +887,7 @@ infinint catalogue::update_destroyed_with(catalogue & ref)
 	    current = tmp;
 	    continue;
 	}
-	
+
 	if(pro_det != NULL)
 	    continue;
 
@@ -1016,7 +1018,7 @@ static string local_perm(inode &ref)
 	    ret += 'T';
 	else
 	    ret += '-';
-    
+
     return ret;
 }
 
@@ -1061,13 +1063,13 @@ static string local_date(inode & ref)
     string ret;
     infinint quand = ref.get_last_modif();
     unsigned int pas = 0;
- 
+
     quand.unstack(pas);
     ret = ctime((time_t *) &pas);
 
     return string(ret.begin(), ret.end() - 1);
 }
-    
+
 static string local_flag(inode & ref)
 {
     string ret;

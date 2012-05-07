@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -55,20 +55,20 @@ void copy_crc(crc & dst, const crc & src)
 
 #define BUFFER_SIZE 102400
 
-int generic_file::read(char *a, size_t size) 
+int generic_file::read(char *a, size_t size)
 {
-    if(rw == gf_write_only) 
+    if(rw == gf_write_only)
 	throw Erange("generic_file::read", "reading a write only generic_file");
-    else 
-	return inherited_read(a, size); 
+    else
+	return inherited_read(a, size);
 }
 
 int generic_file::write(char *a, size_t size)
-{ 
-    if(rw == gf_read_only) 
+{
+    if(rw == gf_read_only)
 	throw Erange("generic_file::write", "writing to a read only generic_file");
-    else 
-	return inherited_write(a, size); 
+    else
+	return inherited_write(a, size);
 }
 
 int generic_file::read_back(char &a)
@@ -88,12 +88,12 @@ void generic_file::copy_to(generic_file & ref)
     char buffer[BUFFER_SIZE];
     int lu, ret = 0;
 
-    do 
+    do
     {
 	lu = this->read(buffer, BUFFER_SIZE);
 	if(lu > 0)
 	    ret = ref.write(buffer, lu);
-    } 
+    }
     while(lu > 0 && ret > 0);
 }
 
@@ -181,10 +181,10 @@ bool generic_file::diff(generic_file & f)
 	    diff = true;
     }
     while(!diff && lu1 > 0);
-    
+
     return diff;
 }
-    
+
 fichier::fichier(int fd) : generic_file(gf_read_write)
 {
     int flags;
@@ -249,7 +249,7 @@ bool fichier::skip(infinint pos)
     unsigned int delta;
     if(lseek(filedesc, 0, SEEK_SET) < 0)
 	return false;
-    
+
     do {
 	delta = 0;
 	pos.unstack(delta);
@@ -269,10 +269,12 @@ bool fichier::skip_to_eof()
 bool fichier::skip_relative(signed int x)
 {
     if(x > 0)
+    {
 	if(lseek(filedesc, x, SEEK_CUR) < 0)
 	    return false;
 	else
 	    return true;
+    }
 
     if(x < 0)
     {
@@ -307,7 +309,7 @@ infinint fichier::get_position()
 
     if(ret == -1)
 	throw Erange("fichier::get_position", string("error getting file position : ") + strerror(errno));
-    
+
     return (unsigned long int)ret;
 }
 
@@ -391,10 +393,12 @@ void fichier::open(const char *name, gf_mode m)
     {
 	filedesc = ::open(name, mode, perm);
 	if(filedesc < 0)
+	{
 	    if(filedesc == ENOSPC)
 		user_interaction_pause("no space left for inode, you have the oportunity to make some room now. When done : can we continue ?");
 	    else
 		throw Erange("fichier::open", string("can't open file : ") + strerror(errno));
+	}
     }
     while(filedesc == ENOSPC);
 }

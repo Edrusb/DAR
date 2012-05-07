@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -22,7 +22,7 @@
 //
 /*********************************************************************/
 //
-#include <iostream.h>
+#include <iostream>
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -60,15 +60,15 @@ const version supported_version = "01";
 const char *application_version = "1.0.3";
 
 static void op_create(const path &fs_root, const path &sauv_path, const path *ref_path,
-		      const mask &selection, const mask &subtree, 
+		      const mask &selection, const mask &subtree,
 		      string filename, string *ref_filename,
 		      bool allow_over, bool warn_over, bool info_details, bool pause,
-		      compression algo, const infinint &file_size, 
+		      compression algo, const infinint &file_size,
 		      const infinint &first_file_size,
 		      int argc, char *argv[]);
 static void op_extract(const path &fs_root, const path &sauv_path,
-		       const mask &selection, const mask &subtree, 
-		       string filename, bool allow_over, bool warn_over, 
+		       const mask &selection, const mask &subtree,
+		       string filename, bool allow_over, bool warn_over,
 		       bool info_details, bool detruire);
 static void op_listing(const path &sauv_path, const string &filename, bool info_details);
 static catalogue *get_catalogue_from(generic_file & decoupe, compressor &zip, bool info_details, infinint &cat_size);
@@ -104,21 +104,21 @@ int main(int argc, char *argv[])
 
 	user_interaction_init(0, cerr);
 	if(! get_args(argc, argv, op, fs_root, sauv_root, ref_root,
-		      file_size, first_file_size, selection, 
-		      subtree, filename, ref_filename, 
+		      file_size, first_file_size, selection,
+		      subtree, filename, ref_filename,
 		      allow_over, warn_over, info_details, algo, detruire, pause, beep))
 	    ret = EXIT_SYNTAX;
 	else
 	{
 	    user_interaction_set_beep(beep);
-	    
+
 	    try
 	    {
 		switch(op)
 		{
 		case create:
-		    op_create(*fs_root, *sauv_root, ref_root, *selection, *subtree, filename, ref_filename, 
-			      allow_over, warn_over, info_details, pause, algo, file_size, 
+		    op_create(*fs_root, *sauv_root, ref_root, *selection, *subtree, filename, ref_filename,
+			      allow_over, warn_over, info_details, pause, algo, file_size,
 			      first_file_size, argc, argv);
 		    break;
 		case extract:
@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
 	user_interaction_warning("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER");
 	ret = EXIT_BUG;
     }
-    
+
     user_interaction_close();
     MEM_OUT;
     MEM_END;
@@ -208,11 +208,11 @@ int main(int argc, char *argv[])
 }
 
 static void op_create(const path &fs_root, const path &sauv_path, const path *ref_path,
-		      const mask &selection, const mask &subtree, 
+		      const mask &selection, const mask &subtree,
 		      string filename, string *ref_filename,
 		      bool allow_over, bool warn_over, bool info_details, bool pause,
-		      compression algo, const infinint &file_size, 
-		      const infinint &first_file_size, 
+		      compression algo, const infinint &file_size,
+		      const infinint &first_file_size,
 		      int argc, char *argv[])
 {
     MEM_IN;
@@ -291,7 +291,7 @@ static void op_create(const path &fs_root, const path &sauv_path, const path *re
 	    ver.algo_zip = compression2char(algo);
 	    ver.cmd_line = make_string_from(argc-1, argv+1); // argv[0] is the command itself, we don't need it (where from `+1')
 	    ver.write(*decoupe);
-	    
+
 	    zip = new compressor(algo, *decoupe);
 	    if(zip == NULL)
 		throw Ememory("op_create");
@@ -305,7 +305,7 @@ static void op_create(const path &fs_root, const path &sauv_path, const path *re
 		user_interaction_warning("writting archive content");
 	    current.dump(*zip);
 	    zip->flush_write();
-	    delete zip; 
+	    delete zip;
 	    zip = NULL;
 	    coord.dump(*decoupe);
 	    delete decoupe;
@@ -334,8 +334,8 @@ static void op_create(const path &fs_root, const path &sauv_path, const path *re
 }
 
 static void op_extract(const path &fs_root, const path &sauv_path,
-		       const mask &selection, const mask &subtree, 
-		       string filename, bool allow_over, bool warn_over, 
+		       const mask &selection, const mask &subtree,
+		       string filename, bool allow_over, bool warn_over,
 		       bool info_details,  bool detruire)
 {
     try
@@ -385,12 +385,12 @@ static void op_listing(const path &sauv_path, const string &filename, bool info_
 	sar *decoupe;
 	compressor *zip;
 	header_version ver;
-	
+
 	open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver);
 	try
 	{
 	    infinint cat_size;
- 
+
 	    catalogue *cat = get_catalogue_from(*decoupe, *zip, info_details, cat_size);
 	    try
 	    {
@@ -401,7 +401,7 @@ static void op_listing(const path &sauv_path, const string &filename, bool info_
 		cout << "compression algorithm used           : " << compression2string(char2compression(ver.algo_zip)) << endl;
 		cout << "catalogue size in archive            : " << deci(cat_size).human() << " bytes" << endl;
 		cout << "command line options used for backup : " << ver.cmd_line << endl;
-		if(decoupe->get_total_file_number(file_number) 
+		if(decoupe->get_total_file_number(file_number)
 		   && decoupe->get_last_file_size(last_file_size))
 		{
 		    cout << "archive is composed of " << deci(file_number).human() << " file" <<endl;
@@ -418,7 +418,7 @@ static void op_listing(const path &sauv_path, const string &filename, bool info_
 			cout << "archive total size is : " << deci( first_file_size + (file_number-2)*sub_file_size + last_file_size ).human() << " bytes" << endl;
 		}
 		else
-		    cout << "Sorry, file size is unknown at this step of the program" << endl; 
+		    cout << "Sorry, file size is unknown at this step of the program" << endl;
 		user_interaction_pause("continue listing archive contents ?");
 		cat->listing(cout);
 	    }
@@ -469,7 +469,7 @@ static catalogue *get_catalogue_from(generic_file & f, compressor & zip, bool in
 {
     terminateur term;
     catalogue *ret;
-	
+
     if(info_details)
 	user_interaction_warning("extracting contents of the archive");
 
@@ -492,7 +492,7 @@ static fichier *open_archive_fichier(const string &filename, bool allow_over, bo
 {
     char *name = tools_str2charptr(filename);
     fichier *ret = NULL;
-    
+
     try
     {
 	int fd;
@@ -513,13 +513,13 @@ static fichier *open_archive_fichier(const string &filename, bool allow_over, bo
 		    user_interaction_pause(filename + " is about to be overwritten, continue ?");
 	    }
 	}
-	    
+
 	fd = open(name, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	if(fd < 0)
 	    throw Erange("open_archive_fichier", strerror(errno));
 
 	ret = new trivial_sar(fd);
-	if(ret == NULL) 
+	if(ret == NULL)
 	    throw Ememory("open_archive_fichier");
     }
     catch(...)

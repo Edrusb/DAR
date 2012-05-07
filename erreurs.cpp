@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -23,8 +23,8 @@
 /*********************************************************************/
 
 #include "erreurs.hpp"
-#include <iostream.h>
-#include <strstream>
+#include <iostream>
+#include <sstream>
 
 static bool initialized = false;
 
@@ -91,7 +91,7 @@ unsigned int Egeneric::alive()
 {
     unsigned int ret = 0;
     list<Egeneric *>::iterator it = all_instances.begin();
-    
+
     while(it != all_instances.end())
 	if(! (*it++)->zombie)
 	    ret++;
@@ -101,7 +101,7 @@ unsigned int Egeneric::alive()
 
 void Egeneric::clear_last_destroyed()
 {
-    list<Egeneric *>::iterator it = destroyed.begin(); 
+    list<Egeneric *>::iterator it = destroyed.begin();
 
     while(it != destroyed.end())
 	delete (*it++);
@@ -111,7 +111,7 @@ void Egeneric::clear_last_destroyed()
 
 void Egeneric::display_last_destroyed()
 {
-    list<Egeneric *>::iterator it = destroyed.begin(); 
+    list<Egeneric *>::iterator it = destroyed.begin();
 
     while(it != destroyed.end())
 	(*it++)->dump();
@@ -120,7 +120,7 @@ void Egeneric::display_last_destroyed()
 void Egeneric::display_alive()
 {
     list<Egeneric *>::iterator it = all_instances.begin();
-    
+
     while(it != all_instances.end())
     {
 	if(! (*it)->zombie)
@@ -130,7 +130,7 @@ void Egeneric::display_alive()
 }
 
 Ebug::Ebug(string file, int line) : Egeneric(string("file ") + file + " line " + int_to_string(line), "it seems to be a bug here") {};
-void Ebug::stack(string passage, string file, string line) 
+void Ebug::stack(string passage, string file, string line)
 {
     Egeneric::stack(passage, string("in file ") + file + " line " + string(line));
 }
@@ -203,18 +203,10 @@ static void notcatched()
 
 static string int_to_string(int i)
 {
-    ostrstream r;
+    ostringstream r;
     string s;
-    char *t;
     r << i << '\0';
-    t = r.str();
-    if(t != NULL)
-    {
-	s = t;
-	delete t;
-    }
-    else
-	s = "number is impossible to display";
+    s = r.str();
 
     return s;
 }

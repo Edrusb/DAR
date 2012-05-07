@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -38,7 +38,7 @@ bool simple_mask::is_covered(const string &expression) const
 {
     char *tmp = tools_str2charptr(expression);
     bool ret;
-    
+
     if(tmp == NULL)
 	throw Ememory("simple_mask::is_covered");
 
@@ -88,10 +88,10 @@ void et_mask::add_mask(const mask& toadd)
 	throw Ememory("et_mask::et_mask");
 }
 
-bool et_mask::is_covered(const string & expression) const 
+bool et_mask::is_covered(const string & expression) const
 {
-    vector<mask *const>::iterator it = lst.begin();
- 
+    vector<mask *>::const_iterator it = lst.begin();
+
     if(lst.size() == 0)
 	throw Erange("et_mask::is_covered", "no mask in the list of mask to AND");
 
@@ -103,7 +103,7 @@ bool et_mask::is_covered(const string & expression) const
 
 void et_mask::copy_from(const et_mask &m)
 {
-    vector<mask *const>::iterator it = m.lst.begin();
+    vector<mask *>::const_iterator it = m.lst.begin();
     mask *tmp;
 
     while(it != m.lst.end() && (tmp = (*it)->clone()) != NULL)
@@ -122,7 +122,7 @@ void et_mask::copy_from(const et_mask &m)
 void et_mask::detruit()
 {
     vector<mask *>::iterator it = lst.begin();
-    
+
     while(it != lst.end())
     {
 	delete *it;
@@ -137,10 +137,10 @@ static void dummy_call(char *x)
     dummy_call(id);
 }
 
-bool ou_mask::is_covered(const string & expression) const 
+bool ou_mask::is_covered(const string & expression) const
 {
-    vector<mask *const>::iterator it = lst.begin();
-    
+    vector<mask *>::const_iterator it = lst.begin();
+
     if(lst.size() == 0)
 	throw Erange("et_mask::is_covered", "no mask in the list of mask to OR");
 
