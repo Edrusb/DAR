@@ -1,4 +1,4 @@
-.TH DAR_XFORM 1 "MAY 2, 2002"
+.TH DAR_XFORM 1 "SEPT 28, 2002"
 .UC 8
 .SH NAME
 dar_xform \- disk archive "re-slicer"
@@ -12,7 +12,7 @@ dar_xform \- disk archive "re-slicer"
 .B dar_xform  
 changes the size of slices of an existing archive.
 .PP
-Source is the basename of the existing archive, destination is the basename of the archive to be created. If source basename is "-", the archive is read from standard input. If the destination basename is "-", the archive is written to standard output and (-s option) is not available.
+Source is the basename of the existing archive, destination is the basename of the archive to be created. If source basename is "-", the archive is read from standard input. If the destination basename is "-", the archive is written to standard output and -s option is not available.
 
 .SH OPTIONS
 
@@ -41,6 +41,15 @@ Do not allow overwriting of any slice.
 .TP 20
 -w
 Do not warn before overwriting slice. By default (no -n and no -w) overwriting is allowed but a warning is issued before proceeding.
+.TP 20
+-E <string>
+the string is a command-line to be launched between the slices of the destination archive. See dar(1) man page (same option) for more informations.
+.TP
+-F <string>
+the string is a command-line to be launched between the slices of the source archive. See dar(1) man page (same option) for more informations.
+
+.SH NOTES
+Dar is not concerned by scrambling. It does not need to be aware of it to be able to change the slice scheme. Thus, it is not able to scramble a clear archive or unscramble an already scrambled archive.
 
 .SH EXIT CODES
 
@@ -48,7 +57,7 @@ Do not warn before overwriting slice. By default (no -n and no -w) overwriting i
 uses the same exit status as dar does, see dar(1) man page.
 
 .SH SEE ALSO
-dar(1), dar_slave(1)
+dar(1), dar_slave(1), dar_manager(1)
 
 .SH KNOWN BUGS
 None actually.

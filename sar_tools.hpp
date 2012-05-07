@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.hpp,v 1.5 2002/06/26 22:20:20 denis Rel $
+// $Id: sar_tools.hpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -26,7 +26,9 @@
 #ifndef SAR_TOOLS_HPP
 #define SAR_TOOLS_HPP
 
+#include "integers.hpp"
+
 extern generic_file *sar_tools_open_archive_fichier(const string &filename, bool allow_over, bool warn_over);
-extern generic_file *sar_tools_open_archive_tuyau(int fd, gf_mode mode);
+extern generic_file *sar_tools_open_archive_tuyau(S_I fd, gf_mode mode);
 
 #endif

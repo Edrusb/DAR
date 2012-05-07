@@ -1,0 +1,350 @@
+<?xml  version="1.0"  standalone="yes"?>
+<!DOCTYPE help [
+<!ELEMENT help (indents | hdr | arg )*>
+<!ELEMENT indents EMPTY>
+<!ATTLIST indents
+  flag CDATA #IMPLIED
+  desc CDATA #IMPLIED
+  cont CDATA #IMPLIED
+  wrap CDATA #IMPLIED>
+<!ELEMENT hdr (#PCDATA)>
+<!ATTLIST hdr
+  vspace CDATA #IMPLIED>
+<!ELEMENT arg (desc)>
+<!ATTLIST arg 
+  vspace CDATA #IMPLIED
+  flag 	 CDATA #IMPLIED
+  opt  	 CDATA #IMPLIED
+  repl 	 CDATA #IMPLIED>
+<!ELEMENT desc (#PCDATA | p | repl)*>
+<!ELEMENT repl (#PCDATA)>
+<!ELEMENT p EMPTY>
+]>
+<help>
+
+  <indents flag="4" desc="8" cont="1" wrap="79"/>
+
+  <hdr vspace="1">Commands are:</hdr>
+
+  <arg flag="-c">
+    <desc>
+      creates an archive
+    </desc>
+  </arg>
+
+  <arg flag=" -x">
+    <desc>
+      extracts files from the archive
+    </desc>
+  </arg>
+
+  <arg flag="-d">
+    <desc>
+      compares the archive with the existing filesystem
+    </desc>
+  </arg>
+
+  <arg flag="-t">
+    <desc>
+      tests the archive integrity
+    </desc>
+  </arg>
+
+  <arg flag="-l">
+    <desc>
+      lists the contents of the archive
+    </desc>
+  </arg>
+
+  <arg flag="-C">
+    <desc>
+      isolates the catalogue from an archive
+    </desc>
+  </arg>
+
+  <arg vspace="1" flag="-h">
+    <desc>
+      displays this help information
+    </desc>
+  </arg>
+
+  <arg flag="-V">
+    <desc>
+      displays version information
+    </desc>
+  </arg>
+
+  <indents desc="20"/>
+
+  <hdr vspace="1">Common options:</hdr>
+
+  <arg flag="-v"> <desc> verbose output </desc> </arg>
+
+  <arg flag="-R" repl="path">
+    <desc>
+      filesystem root directory for saving or restoring (current dir by
+      default) 
+    </desc>
+  </arg>
+
+  <arg flag="-X" repl=" mask ">
+    <desc>
+      files to exclude from the operation (none by default)
+    </desc>
+  </arg>
+
+  <arg flag="-I" repl="mask">
+    <desc>
+      files to include in the operation (all by default)
+      <p/>
+      -X and -I do not affect directories (see -P and the path list for
+      that)
+      <p/>
+      -X, -I and -P may appear more than once on the command line
+    </desc>
+  </arg>
+
+  <arg flag="-P" repl="path">
+    <desc>
+       subdirectory of the filesystem root (-R) to exclude from the
+       operation
+    </desc>
+  </arg>
+
+  <arg flag="-n">
+    <desc>
+      don't overwrite files
+    </desc>
+  </arg>
+
+  <arg flag="-w">
+    <desc>
+       don't warn before overwriting files
+       <p/> 
+       by default overwriting is allowed but a warning is issued first
+    </desc>
+  </arg>
+
+  <arg flag="-b">
+    <desc>
+       ring the terminal bell when user action is required
+    </desc>
+  </arg>
+
+  <arg flag="-O">
+    <desc>
+       do not consider user and group ownership
+    </desc>
+  </arg>
+
+  <arg flag="-E" repl="string">
+    <desc>
+       command line to execute between slices
+    </desc>
+  </arg>
+
+  <arg flag="-F" repl="string">
+    <desc>
+       command line to execute between the slices of the archive of reference
+    </desc>
+  </arg>
+
+  <arg vspace="1" flag="-u">
+    <desc>
+      do not save/restore EA of the user namespace. 
+    </desc>
+  </arg>
+
+  <arg flag="-U">
+    <desc>
+      do not save/restore EA of the root namespace
+      (needs root privileges).
+      <p/>
+      -U and -u are only available if EA_SUPPORT has been set at compilation time.
+      Check with -V to know compilation option used.
+    </desc>
+  </arg>
+
+  <arg flag="-K" repl="string">
+    <desc>
+       use the <repl>string</repl> to scramble/unscramble (i.e.: hide/decode) the contents of the archive. 
+    </desc>   
+  </arg>
+
+  <arg flag="-J" repl="string">
+    <desc>
+       same as -K but it does concern the archive of reference (given with -A option)
+    </desc>
+  </arg>
+
+  <arg flag="-B" repl="filename">
+    <desc>
+       you can put any command line option or arguments in the given file, that will be parsed as if they were in place of
+       the -B option.
+    </desc>
+  </arg>
+
+  <arg vspace="1" opt="path list">
+    <desc>
+      subdirectories of the filesystem root (-R) to consider (all by
+      default) -- see also -P
+    </desc>
+  </arg>
+
+  <hdr vspace="1">
+    Saving or Isolation options (to use with -c or -C) :
+  </hdr>
+
+  <arg flag="-A" opt="path/" repl="basename">
+    <desc> archive to take as reference (mandatory with -C)
+    </desc>
+  </arg>
+
+  <arg flag="-z">
+    <desc>
+      compress data in archive using gzip algorithm
+    </desc>
+  </arg>
+
+  <arg flag="-y">
+    <desc>
+      compress data in archive using bzip2 algorithm (NOT IMPLEMENTED)
+      <p/> by default the archive is not compressed
+    </desc>
+  </arg>
+
+  <arg flag="-s" repl="integer">
+    <desc>
+      split the archive in several files of size <repl>integer</repl>
+    </desc>
+  </arg>
+
+  <arg flag="-S" repl="integer">
+    <desc>
+      first file size (if different from following ones) -- requires -s
+    </desc>
+  </arg>
+
+  <arg flag="-p">
+    <desc>
+      pauses before writing to a new file -- requires -s
+    </desc>
+  </arg>
+
+  <arg flag="-D">
+    <desc>
+      stores directories excluded by the -P option or absent 
+      from <repl>path list</repl> as empty directories
+    </desc>
+  </arg>
+
+  <arg flag="-Z" repl="mask">
+    <desc>
+      Filenames covered by this <repl>mask</repl> are not compressed. By default all 
+      files are compressed (if compression is used)
+    </desc>  
+  </arg>
+
+  <arg flag="-Y" repl="mask">
+    <desc>
+       Filenames covered by this <repl>mask</repl> and not covered by -Z <repl>mask</repl>
+       are the only to be compressed. By default all files are compressed.
+    </desc>
+  </arg>
+
+  <hdr vspace="1">
+  Restoring options (to use with -x) :
+  </hdr>
+
+  <arg flag="-k">
+    <desc>
+      do not remove files marked as destroyed since the reference backup
+      (see also -A)
+      <p/>
+      -k has no effect when used with -n
+    </desc>
+  </arg>
+
+  <arg flag="-r">
+    <desc>
+      restores files only if they are absent or more recent than those on
+      the filesystem
+    </desc>
+  </arg>
+
+  <hdr vspace="1">
+    Reading options (to use with -x, -d, -t, -l, -C, -c)
+  </hdr>
+
+  <arg flag="-i" repl="named pipe">
+    <desc>
+      use the given pipe instead of standard input to read data from dar_slave 
+    </desc>
+  </arg>
+
+  <arg flag="-o" repl="named pipe">
+    <desc>
+      use the given pipe instead of standard output to send orders to dar_slave. 
+      <p/>
+      These two options are only 
+      available if the
+      basename of the archive to read is -, which means reading the
+      archive from a pipe. For -C and -c options the archive to read 
+      is the one given with -A option: the archive of reference
+    </desc>
+  </arg>
+
+  <hdr vspace="1">
+    Listing options (to use with -l):
+  </hdr>
+
+  <arg flag="-T">
+    <desc>
+        tree output format. This was the default format used before version 1.2.0
+    </desc>
+  </arg>
+
+
+  <hdr vspace="2">
+    See man page for more details, not all common options are available
+    for each mode of operation.
+  </hdr>
+
+<!--
+$Log: dar.xml,v $
+Revision 1.3  2002/10/28 20:39:27  edrusb
+updated CVS with last development version
+
+Revision 1.7  2002/09/28 14:56:29  denis
+mise a jour pour release.
+
+Revision 1.6  2002/09/12 13:53:46  denis
+-B option
+
+Revision 1.5  2002/09/06 17:02:20  denis
+correction fuite memoire, cosmetique
+
+Revision 1.4  2002/09/05 21:02:11  denis
+options -Y -Z
+
+Revision 1.3  2002/08/23 10:21:52  denis
+mise a jour doc pour scrambling
+
+Revision 1.2  2002/08/22 20:27:59  denis
+mise en place de dar-help
+
+Revision 1.3  2002/08/20 13:44:08  cs1cwm
+Added DTD and removed the #ifdef and #endif.
+
+It now passes xmllint validation.
+
+Revision 1.2  2002/08/17 13:41:48  cs1cwm
+Changed to use arg flag, opt and repl attributes.
+
+Some changes to text.
+
+Revision 1.1  2002/08/17 13:13:31  cs1cwm
+Initial revision
+
+-->
+</help>

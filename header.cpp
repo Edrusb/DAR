@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.cpp,v 1.17 2002/05/15 21:56:01 denis Rel $
+// $Id: header.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,7 @@
 
 #include <netinet/in.h>
 #include <strstream.h>
+#include <time.h>
 #include "header.hpp"
 
 void header::read(generic_file & f)
@@ -70,13 +71,13 @@ void header::write(generic_file & f)
     }
 }
 
-void header::read(int fd)
+void header::read(S_I fd)
 {
     fichier fic = dup(fd);
     read(fic);
 }
 
-void header::write(int fd)
+void header::write(S_I fd)
 {
     fichier fic = dup(fd);
     write(fic);
@@ -84,13 +85,13 @@ void header::write(int fd)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: header.cpp,v 1.17 2002/05/15 21:56:01 denis Rel $";
+    static char id[]="$Id: header.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }
 
 bool header_label_is_equal(const label &a, const label &b)
 {
-    register int i = 0;
+    register S_I i = 0;
     while(i < LABEL_SIZE && a[i] == b[i])
 	i++;
     return i >= LABEL_SIZE;
@@ -110,7 +111,7 @@ void header_generate_internal_filename(label &ret)
 header::header()
 {
     magic = 0;
-    for(int i = 0; i < LABEL_SIZE; i++)
+    for(S_I i = 0; i < LABEL_SIZE; i++)
 	internal_name[i] = '\0';
     extension = flag = '\0';
     size_ext = 0;
@@ -127,7 +128,7 @@ void header::copy_from(const header & ref)
 
 void label_copy(label & left, const label & right)
 {
-    for(int i = 0; i < LABEL_SIZE; i++)
+    for(S_I i = 0; i < LABEL_SIZE; i++)
 	left[i] = right[i];
 
 }

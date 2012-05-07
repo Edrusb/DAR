@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: infinint.cpp,v 1.21 2002/06/05 21:32:26 denis Rel $
+// $Id: infinint.cpp,v 1.12 2002/11/03 18:18:22 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -32,19 +32,19 @@
 typedef unsigned char bitfield[8];
 
 static void swap_bytes(unsigned char &a, unsigned char &b) throw();
-static void swap_bytes(unsigned char *a, unsigned int size) throw();
+static void swap_bytes(unsigned char *a, U_I size) throw();
 static void expand_byte(unsigned char a, bitfield &bit) throw();
 static void contract_byte(const bitfield &b, unsigned char & a) throw(Erange);
 
 infinint::endian infinint::used_endian = not_initialized;
 
-void infinint::read_from_file(int fd) throw(Erange, Ememory, Ebug)
+void infinint::read_from_file(S_I fd) throw(Erange, Ememory, Ebug)
 {
     fichier f = dup(fd);
     read_from_file(f);
 }
 
-void infinint::dump(int fd) const throw(Einfinint, Ememory, Erange, Ebug)
+void infinint::dump(S_I fd) const throw(Einfinint, Ememory, Erange, Ebug)
 {
     fichier f = dup(fd);
     dump(f);
@@ -58,7 +58,7 @@ void infinint::read_from_file(generic_file & x) throw(Erange, Ememory, Ebug)
     infinint skip = 0;
     infinint size = 0;
     storage::iterator it;
-    int lu;
+    S_I lu;
     
     while(!fin)
     {
@@ -73,10 +73,10 @@ void infinint::read_from_file(generic_file & x) throw(Erange, Ememory, Ebug)
 	{
 		// computing the size to read
 	    bitfield bf;
-	    unsigned int pos = 0;
+	    U_I pos = 0;
 	    
 	    expand_byte(a, bf);
-	    for(int i = 0; i < 8; i++)
+	    for(S_I i = 0; i < 8; i++)
 		pos = pos + bf[i];
 	    if(pos != 1)
 		throw Erange("infinint::read_from_file(generic_file)", "badly formed infinint or not supported format"); // more than 1 bit is set to 1
@@ -120,7 +120,7 @@ void infinint::dump(generic_file & x) const throw(Einfinint, Ememory, Erange, Eb
     infinint pos;
     unsigned char last_width;
     infinint justification;
-    unsigned long tmp;
+    U_32 tmp;
     
     if(! is_valid())
 	throw SRC_BUG;
@@ -142,7 +142,7 @@ void infinint::dump(generic_file & x) const throw(Einfinint, Ememory, Erange, Eb
     }
     else // division non exact, the last_width (last byte), make the rounding
     {
-	unsigned short pos_s = 0;
+	U_16 pos_s = 0;
 	pos.unstack(pos_s);
 	last_width = 0x80 >> (pos_s - 1);
     }
@@ -171,7 +171,7 @@ void infinint::dump(generic_file & x) const throw(Einfinint, Ememory, Erange, Eb
 
     if(justification != 0)
     {
-	unsigned short tmp = 0;
+	U_16 tmp = 0;
 	justification.unstack(tmp);
 	tmp = TG - tmp;
 	while(tmp-- > 0)
@@ -198,7 +198,7 @@ infinint & infinint::operator += (const infinint & arg) throw(Ememory, Erange, E
 
     storage::iterator it_a = arg.field->rbegin();
     storage::iterator it_res = field->rbegin();
-    unsigned int retenue = 0, somme;
+    U_I retenue = 0, somme;
 
     while(it_res != field->rend() && (it_a != arg.field->rend() || retenue != 0))
     {
@@ -207,13 +207,8 @@ infinint & infinint::operator += (const infinint & arg) throw(Ememory, Erange, E
 	    somme += *(it_a--);
 	somme += retenue;
 
-	retenue = 0;
-
-	while(somme >= 256)
-	{
-	    retenue++;
-	    somme -= 256;
-	}
+	retenue = somme >> 8;
+	somme = somme & 0xFF;
 
 	*(it_res--) = somme;
     }
@@ -244,8 +239,9 @@ infinint & infinint::operator -= (const infinint & arg) throw(Ememory, Erange, E
 
     storage::iterator it_a = arg.field->rbegin();
     storage::iterator it_res = field->rbegin();
-    unsigned int retenue = 0;
-    signed int somme;
+    U_I retenue = 0;
+    S_I somme;
+    U_I tmp;
 
     while(it_res != field->rend() && (it_a != arg.field->rend() || retenue != 0))
     {
@@ -253,13 +249,23 @@ infinint & infinint::operator -= (const infinint & arg) throw(Ememory, Erange, E
 	if(it_a != arg.field->rend())
 	    somme -= *(it_a--);
 	somme -= retenue;
-	retenue = 0;
 
-	while(somme < 0)
+	if(somme < 0)
 	{
-	    somme += 256;
-	    retenue++;
+	    somme = -somme;
+	    
+	    tmp = somme & 0xFF;
+	    retenue = somme >> 8;
+	    if(tmp != 0)
+	    {
+		somme = 0x100 - tmp;
+		retenue++;
+	    }
+	    else
+		somme = 0;
 	}
+	else
+	    retenue = 0;
 	
 	*(it_res--) = somme;
     }
@@ -277,17 +283,16 @@ infinint & infinint::operator *= (unsigned char arg) throw(Ememory, Erange, Ebug
 	throw SRC_BUG;
 
     storage::iterator it = field->rbegin();
-    unsigned int produit, retenue = 0;
+    U_I produit, retenue = 0;
 
     while(it != field->rend())
     {
 	produit = (*it) * arg + retenue;
 	retenue = 0;
-	while(produit >= 256)
-	{
-	    retenue++;
-	    produit -= 256;
-	}
+	
+	retenue = produit >> 8;
+	produit = produit & 0xFF;
+
 	*(it--) = produit;
     }
 
@@ -328,17 +333,17 @@ infinint & infinint::operator *= (const infinint & arg) throw(Ememory, Erange, E
     E_END("infinint::operator *=", "infinint");
 }
 
-infinint & infinint::operator >>= (unsigned long bit) throw(Ememory, Erange, Ebug)
+infinint & infinint::operator >>= (U_32 bit) throw(Ememory, Erange, Ebug)
 {
     E_BEGIN;
     if(! is_valid())
 	throw SRC_BUG;
 
-    unsigned long byte = bit/8;
+    U_32 byte = bit/8;
     storage::iterator it = field->rbegin() - byte + 1;
     bitfield bf;
     unsigned char mask, r1 = 0, r2 = 0;
-    unsigned int shift_retenue;
+    U_I shift_retenue;
 
     bit = bit % 8;
     shift_retenue = 8 - bit;
@@ -352,7 +357,7 @@ infinint & infinint::operator >>= (unsigned long bit) throw(Ememory, Erange, Ebu
 	    // shift right by "bit" bits
 	if(bit != 0)
 	{
-	    for(register unsigned int i = 0; i < 8; i++)
+	    for(register U_I i = 0; i < 8; i++)
 		bf[i] = i < shift_retenue ? 0 : 1;
 	    contract_byte(bf, mask);
 	    
@@ -371,7 +376,7 @@ infinint & infinint::operator >>= (unsigned long bit) throw(Ememory, Erange, Ebu
     }
 
     return *this;
-    E_END("infinint::operator >>=", "unsigned long");
+    E_END("infinint::operator >>=", "U_32");
 }
 
 infinint & infinint::operator >>= (infinint bit) throw(Ememory, Erange, Ebug)
@@ -380,7 +385,7 @@ infinint & infinint::operator >>= (infinint bit) throw(Ememory, Erange, Ebug)
     if(! is_valid() || ! bit.is_valid())
 	throw SRC_BUG;
 
-    unsigned long int delta_bit = 0;
+    U_32 delta_bit = 0;
     bit.unstack(delta_bit);
 
     do 
@@ -395,15 +400,15 @@ infinint & infinint::operator >>= (infinint bit) throw(Ememory, Erange, Ebug)
     E_END("infinint::operator >>=", "infinint");
 }
 
-infinint & infinint::operator <<= (unsigned long bit) throw(Ememory, Erange, Ebug)
+infinint & infinint::operator <<= (U_32 bit) throw(Ememory, Erange, Ebug)
 {
     E_BEGIN;
     if(! is_valid())
 	throw SRC_BUG;
 
-    unsigned long byte = bit/8;
+    U_32 byte = bit/8;
     storage::iterator it = field->end();
-    unsigned int shift_retenue, r1 = 0, r2 = 0;
+    U_I shift_retenue, r1 = 0, r2 = 0;
     bitfield bf;
     unsigned char mask;
 
@@ -425,7 +430,7 @@ infinint & infinint::operator <<= (unsigned long bit) throw(Ememory, Erange, Ebu
 	it = field->rbegin();
 	
 	    // the mask for selecting the retenue
-	for(register int unsigned i = 0; i < 8; i++)
+	for(register U_I i = 0; i < 8; i++)
 	    bf[i] = i < bit ? 1 : 0;
 	contract_byte(bf, mask);
 	
@@ -442,13 +447,13 @@ infinint & infinint::operator <<= (unsigned long bit) throw(Ememory, Erange, Ebu
     }
 
     return *this;
-    E_END("infinint::operator <<=", "unsigned long");
+    E_END("infinint::operator <<=", "U_32");
 }
 
 infinint & infinint::operator <<= (infinint bit) throw(Ememory, Erange, Ebug)
 {
     E_BEGIN;
-    unsigned long int delta_bit = 0;
+    U_32 delta_bit = 0;
     bit.unstack(delta_bit);
 
     do 
@@ -485,7 +490,7 @@ template <class T> T infinint::modulo(T arg) const throw(Einfinint, Ememory, Era
     E_END("infinint::modulo", "");
 }
 
-signed int infinint::difference(const infinint & b) const throw(Erange, Ebug)
+S_I infinint::difference(const infinint & b) const throw(Erange, Ebug)
 {
     E_BEGIN;
     storage::iterator ita;
@@ -536,9 +541,9 @@ bool infinint::is_valid() const throw()
 void infinint::reduce() throw(Erange, Ememory, Ebug)
 {
     E_BEGIN;
-    static const unsigned int max_a_time = ~ (unsigned int)(0); // this is the argument type of remove_bytes_at_iterator
+    static const U_I max_a_time = ~ (U_I)(0); // this is the argument type of remove_bytes_at_iterator
     
-    unsigned int count = 0;
+    U_I count = 0;
     storage::iterator it = field->begin();
 
     do
@@ -609,8 +614,8 @@ void infinint::make_at_least_as_wider_as(const infinint & ref) throw(Erange, Eme
 template <class T> void infinint::infinint_from(T a) throw(Ememory, Erange, Ebug)
 {
     E_BEGIN;
-    unsigned int size = sizeof(a);
-    signed int direction = +1;
+    U_I size = sizeof(a);
+    S_I direction = +1;
     unsigned char *ptr, *fin;
 
     if(used_endian == not_initialized)
@@ -662,9 +667,22 @@ template <class T> void infinint::infinint_from(T a) throw(Ememory, Erange, Ebug
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: infinint.cpp,v 1.21 2002/06/05 21:32:26 denis Rel $";
+    static char id[]="$Id: infinint.cpp,v 1.12 2002/11/03 18:18:22 edrusb Rel $";
     dummy_call(id);
 }
+
+    // argument must be a regular interger (a bit field).
+template <class T> T rotate_right_one_bit(T v)
+{
+    bool retenue = (v & 1) != 0;
+
+    v >>= 1;
+    if(retenue)
+	v |= 1 << sizeof(v);
+
+    return v;
+}
+
 
 template <class T> void infinint::infinint_unstack_to(T &a) throw(Ememory, Erange, Ebug)
 {
@@ -672,7 +690,8 @@ template <class T> void infinint::infinint_unstack_to(T &a) throw(Ememory, Erang
 	// T is supposed to be an unsigned "integer" 
 	// (ie.: sizeof returns the width of the storage bit field  and no sign bit is present)
 	// Note : static here avoids the recalculation of max_T at each call
-    static const T max_T = ~ T(0); // negation bit by bit of zero gives max possible value of T (all bits set)
+//    static const T max_T = ~ T(0); // negation bit by bit of zero gives max possible value of T (all bits set)
+    static const T max_T = ~T(0) > 0 ? ~ T(0) : ~rotate_right_one_bit(T(1));
     infinint step = max_T - a;
     
     if(*this < step)
@@ -701,7 +720,7 @@ template <class T> void infinint::infinint_unstack_to(T &a) throw(Ememory, Erang
 void infinint::setup_endian()
 {
     E_BEGIN;
-    unsigned short int u = 1;
+    U_16 u = 1;
     unsigned char *ptr = (unsigned char *)(&u);
 
     if(ptr[0] == 1)
@@ -724,7 +743,7 @@ static void swap_bytes(unsigned char &a, unsigned char &b) throw()
     E_END("infinint.cpp : swap_bytes", "unsigned char &, unsigned char &");
 }
 
-static void swap_bytes(unsigned char *a, unsigned int size) throw()
+static void swap_bytes(unsigned char *a, U_I size) throw()
 {
     E_BEGIN;
     if(size <= 1)
@@ -742,7 +761,7 @@ static void expand_byte(unsigned char a, bitfield &bit) throw()
     E_BEGIN;
     unsigned char mask = 0x80;
 
-    for(register int i = 0; i < 8; i++)
+    for(register S_I i = 0; i < 8; i++)
     {
         bit[i] = (a & mask) >> 7 - i;
 	mask >>= 1;
@@ -755,7 +774,7 @@ static void contract_byte(const bitfield &b, unsigned char & a) throw(Erange)
     E_BEGIN;
     a = 0;
     
-    for(register int i = 0; i < 8; i++)
+    for(register S_I i = 0; i < 8; i++)
     {
 	a <<= 1;
 	if(b[i] > 1)
@@ -839,13 +858,13 @@ infinint operator % (const infinint & a, const infinint & b) throw(Einfinint, Er
     E_END("operator %", "infinint");
 }
 
-infinint operator >> (const infinint & a, unsigned long bit) throw(Erange, Ememory, Ebug)
+infinint operator >> (const infinint & a, U_32 bit) throw(Erange, Ememory, Ebug)
 { 
     E_BEGIN;
     infinint ret = a;
     ret >>= bit; 
     return ret; 
-    E_END("operator >>", "infinint, unsigned long");
+    E_END("operator >>", "infinint, U_32");
 }
 
 infinint operator >> (const infinint & a, const infinint & bit) throw(Erange, Ememory, Ebug)
@@ -857,13 +876,13 @@ infinint operator >> (const infinint & a, const infinint & bit) throw(Erange, Em
     E_END("operator >>", "infinint");
 }
 
-infinint operator << (const infinint & a, unsigned long bit) throw(Erange, Ememory, Ebug)
+infinint operator << (const infinint & a, U_32 bit) throw(Erange, Ememory, Ebug)
 { 
     E_BEGIN;
     infinint ret = a; 
     ret <<= bit; 
     return ret;
-    E_END("operator <<", "infinint, unsigned long");
+    E_END("operator <<", "infinint, U_32");
 }
 
 infinint operator << (const infinint & a, const infinint & bit) throw(Erange, Ememory, Ebug)
@@ -906,4 +925,31 @@ void euclide(infinint a, const infinint &b, infinint &q, infinint &r) throw(Einf
 
     r = a;
     E_END("euclide", "infinint");
+}
+
+
+static void template_instance()
+{
+    infinint t;
+    unsigned char a = 0;
+    U_16 b = 0;
+    U_32 c = 0;
+    U_I d = 0;
+    U_32 e = 0;
+    off_t f = 0;
+    size_t g = 0;
+    time_t h = 0;
+ 
+	// this forces template instanciation
+    t.unstack(a);
+    t.unstack(b);
+    t.unstack(c);
+    t.unstack(d);
+    t.unstack(e);
+    t.unstack(f);
+    t.unstack(g);
+    t.unstack(h);
+    template_instance(); // this call is never used, 
+	// this line is only to avoid compilation warning
+	// of ... never used function :-)
 }

@@ -18,10 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tuyau.cpp,v 1.2 2002/06/26 22:20:20 denis Rel $
+// $Id: test_tuyau.cpp,v 1.6 2002/11/02 20:03:25 edrusb Rel $
 //
 /*********************************************************************/
 //
+#include <iostream.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
@@ -35,7 +36,7 @@ static const unsigned int buffer_size = 10000;
 static bool xmit = true;
 
 static int little_main(int argc, char *argv[]);
-static void action_xmit(tuyau *in, tuyau *out, unsigned long duration);
+static void action_xmit(tuyau *in, tuyau *out, U_32 duration);
 static void action_loop(tuyau *in, tuyau *out);
 static void stop_xmit(int l);
 
@@ -47,7 +48,7 @@ int main(int argc, char *argv[])
 static int little_main(int argc, char *argv[])
 {
     tuyau *in = NULL, *out = NULL;
-    unsigned long duration;
+    U_32 duration;
 
     user_interaction_change_non_interactive_output(&cout);
     if(argc != 4)
@@ -69,7 +70,7 @@ static int little_main(int argc, char *argv[])
     return 0;
 }
 
-static void action_xmit(tuyau *in, tuyau *out, unsigned long duration)
+static void action_xmit(tuyau *in, tuyau *out, U_32 duration)
 {
     char out_buffer[buffer_size];
     char in_buffer[buffer_size];
@@ -123,7 +124,7 @@ static void stop_xmit(int l)
 static void action_loop(tuyau *in, tuyau *out)
 {
     char buffer[buffer_size];
-    unsigned long lu;
+    U_32 lu;
 
     while(1)
     {

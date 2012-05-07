@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.hpp,v 1.19 2002/05/15 21:56:01 denis Rel $
+// $Id: header.hpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -39,7 +39,7 @@
 
 #define SAUV_MAGIC_NUMBER 123
 
-typedef unsigned long int magic_number;
+typedef U_I magic_number;
 typedef char label[LABEL_SIZE];
 
 extern void label_copy(label & left, const label & right);
@@ -60,10 +60,10 @@ struct header
 
     void read(generic_file & f);
     void write(generic_file & f);
-    void read(int fd);
-    void write(int fd);
+    void read(S_I fd);
+    void write(S_I fd);
 
-    static unsigned int size() { return sizeof(magic_number) + sizeof(label) + 2*sizeof(char); };
+    static U_I size() { return sizeof(magic_number) + sizeof(label) + 2*sizeof(char); };
     void copy_from(const header & ref);
 };
         

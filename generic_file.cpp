@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.29 2002/06/20 20:44:14 denis Rel $
+// $Id: generic_file.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -37,13 +37,13 @@
 
 void clear(crc & value)
 {
-    for(int i = 0; i < CRC_SIZE; i++)
+    for(S_I i = 0; i < CRC_SIZE; i++)
 	value[i] = '\0';
 }
 
 bool same_crc(const crc &a, const crc &b)
 {
-    int i = 0;
+    S_I i = 0;
     while(i < CRC_SIZE && a[i] == b[i])
 	i++;
     return i == CRC_SIZE;
@@ -51,13 +51,13 @@ bool same_crc(const crc &a, const crc &b)
 
 void copy_crc(crc & dst, const crc & src)
 {
-    for(int i = 0; i < CRC_SIZE; i++)
+    for(S_I i = 0; i < CRC_SIZE; i++)
 	dst[i] = src[i];
 }
 
 #define BUFFER_SIZE 102400
 
-int generic_file::read(char *a, size_t size) 
+S_I generic_file::read(char *a, size_t size) 
 {
     if(rw == gf_write_only) 
 	throw Erange("generic_file::read", "reading a write only generic_file");
@@ -65,7 +65,7 @@ int generic_file::read(char *a, size_t size)
 	return (this->*active_read)(a, size); 
 }
 
-int generic_file::write(char *a, size_t size)
+S_I generic_file::write(char *a, size_t size)
 { 
     if(rw == gf_read_only) 
 	throw Erange("generic_file::write", "writing to a read only generic_file");
@@ -73,11 +73,11 @@ int generic_file::write(char *a, size_t size)
 	return (this->*active_write)(a, size); 
 }
 
-int generic_file::read_back(char &a)
+S_I generic_file::read_back(char &a)
 {
     if(skip_relative(-1))
     {
-	int ret = read(&a,1);
+	S_I ret = read(&a,1);
 	skip_relative(-1);
 	return ret;
     }
@@ -88,7 +88,7 @@ int generic_file::read_back(char &a)
 void generic_file::copy_to(generic_file & ref)
 {
     char buffer[BUFFER_SIZE];
-    int lu, ret = 0;
+    S_I lu, ret = 0;
 
     do 
     {
@@ -106,11 +106,11 @@ void generic_file::copy_to(generic_file & ref, crc & value)
     get_crc(value);
 }
 
-unsigned long generic_file::copy_to(generic_file & ref, unsigned long int size)
+U_32 generic_file::copy_to(generic_file & ref, U_32 size)
 {
     char buffer[BUFFER_SIZE];
-    int lu = 1, ret = 1, pas;
-    unsigned long wrote = 0;
+    S_I lu = 1, ret = 1, pas;
+    U_32 wrote = 0;
 
     while(wrote < size && ret > 0 && lu > 0)
     {
@@ -128,7 +128,7 @@ unsigned long generic_file::copy_to(generic_file & ref, unsigned long int size)
 
 infinint generic_file::copy_to(generic_file & ref, infinint size)
 {
-    unsigned long int tmp = 0, delta;
+    U_32 tmp = 0, delta;
     infinint wrote = 0;
 
     size.unstack(tmp);
@@ -150,7 +150,7 @@ bool generic_file::diff(generic_file & f)
 {
     char buffer1[BUFFER_SIZE];
     char buffer2[BUFFER_SIZE];
-    int lu1 = 0, lu2 = 0;
+    S_I lu1 = 0, lu2 = 0;
     bool diff = false;
 
     if(get_mode() == gf_write_only || f.get_mode() == gf_write_only)
@@ -163,7 +163,7 @@ bool generic_file::diff(generic_file & f)
 	lu2 = f.read(buffer2, BUFFER_SIZE);
 	if(lu1 == lu2)
 	{
-	    register int i = 0;
+	    register S_I i = 0;
 	    while(i < lu1 && buffer1[i] == buffer2[i])
 		i++;
 	    if(i < lu1)
@@ -200,28 +200,28 @@ void generic_file::enable_crc(bool mode)
     }
 }
 
-void generic_file::compute_crc(char *a, int size)
+void generic_file::compute_crc(char *a, S_I size)
 {
-    for(register int i = 0; i < size; i++)
+    for(register S_I i = 0; i < size; i++)
 	value[(i+crc_offset)%CRC_SIZE] ^= a[i];
     crc_offset = (crc_offset + size) % CRC_SIZE;
 }
 
-int generic_file::read_crc(char *a, size_t size)
+S_I generic_file::read_crc(char *a, size_t size)
 {
-    int ret = inherited_read(a, size);
+    S_I ret = inherited_read(a, size);
     compute_crc(a, ret);
     return ret;
 }
 
-int generic_file::write_crc(char *a, size_t size)
+S_I generic_file::write_crc(char *a, size_t size)
 {
-    int ret = inherited_write(a, size);
+    S_I ret = inherited_write(a, size);
     compute_crc(a, ret);
     return ret;
 }
 
-fichier::fichier(int fd) : generic_file(generic_file_get_mode(fd))
+fichier::fichier(S_I fd) : generic_file(generic_file_get_mode(fd))
 {
     filedesc = fd;
 }
@@ -263,9 +263,10 @@ infinint fichier::get_size() const
     return filesize;
 }
 
-bool fichier::skip(infinint pos)
+bool fichier::skip(const infinint &q)
 {
     off_t delta;
+    infinint pos = q;
     if(lseek(filedesc, 0, SEEK_SET) < 0)
 	return false;
     
@@ -285,7 +286,7 @@ bool fichier::skip_to_eof()
     return lseek(filedesc, 0, SEEK_END) >= 0;
 }
 
-bool fichier::skip_relative(signed int x)
+bool fichier::skip_relative(S_I x)
 {
     if(x > 0)
 	if(lseek(filedesc, x, SEEK_CUR) < 0)
@@ -316,7 +317,7 @@ bool fichier::skip_relative(signed int x)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: generic_file.cpp,v 1.29 2002/06/20 20:44:14 denis Rel $";
+    static char id[]="$Id: generic_file.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -330,10 +331,10 @@ infinint fichier::get_position()
     return ret;
 }
 
-int fichier::inherited_read(char *a, size_t size)
+S_I fichier::inherited_read(char *a, size_t size)
 {
-    int ret;
-    unsigned int lu = 0;
+    S_I ret;
+    U_I lu = 0;
 
     do
     {
@@ -361,9 +362,9 @@ int fichier::inherited_read(char *a, size_t size)
     return lu;
 }
 
-int fichier::inherited_write(char *a, size_t size)
+S_I fichier::inherited_write(char *a, size_t size)
 {
-    int ret;
+    S_I ret;
     size_t total = 0;
     while(total < size)
     {
@@ -392,8 +393,8 @@ int fichier::inherited_write(char *a, size_t size)
 
 void fichier::open(const char *name, gf_mode m)
 {
-    int mode;
-    int perm = 0777;
+    S_I mode;
+    S_I perm = 0777;
 
     switch(m)
     {
@@ -422,9 +423,9 @@ void fichier::open(const char *name, gf_mode m)
     while(filedesc == ENOSPC);
 }
 
-gf_mode generic_file_get_mode(int fd)
+gf_mode generic_file_get_mode(S_I fd)
 {
-    int flags = fcntl(fd, F_GETFL) & O_ACCMODE;
+    S_I flags = fcntl(fd, F_GETFL) & O_ACCMODE;
     gf_mode ret;
 
     switch(flags)

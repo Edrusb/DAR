@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_memory.cpp,v 1.9 2002/05/17 16:17:48 denis Rel $
+// $Id: test_memory.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -34,14 +34,14 @@ using namespace std;
 struct my_alloc
 {
     void *address;
-    unsigned long size;
+    U_32 size;
 
     bool operator == (const struct my_alloc & x) { return x.address == address; };
 };
 
-static unsigned long total_size = 0;
-static unsigned long initial_offset = 0;
-static unsigned long initial_size = 0;
+static U_32 total_size = 0;
+static U_32 initial_offset = 0;
+static U_32 initial_size = 0;
 static list <my_alloc> liste;
 
 void * operator new(size_t size) throw (bad_alloc)
@@ -77,7 +77,7 @@ void operator delete(void *p) throw ()
     free(p);
 }
 
-unsigned long get_total_alloc_size() 
+U_32 get_total_alloc_size() 
 { 
     Egeneric::clear_last_destroyed();
     return total_size; 
@@ -85,7 +85,7 @@ unsigned long get_total_alloc_size()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: test_memory.cpp,v 1.9 2002/05/17 16:17:48 denis Rel $";
+    static char id[]="$Id: test_memory.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -104,12 +104,12 @@ void all_delete_done()
 	    throw SRC_BUG;
 }
 
-void memory_check(unsigned long ref, const char *fichier, int ligne)
+void memory_check(U_32 ref, const char *fichier, S_I ligne)
 {
     Egeneric::clear_last_destroyed();
     
-    unsigned long current = get_total_alloc_size();
-    signed long diff = current - ref;
+    U_32 current = get_total_alloc_size();
+    S_32 diff = current - ref;
     if(diff != 0)
 	user_interaction_stream() << "file " << fichier << " line " << ligne << " : memory leakage detected : initial = " << ref << "   final = " << current << "  DELTA =  " << diff << endl;
 }

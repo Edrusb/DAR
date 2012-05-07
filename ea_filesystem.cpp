@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.7 2002/06/27 17:42:35 denis Rel $
+// $Id: ea_filesystem.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -104,7 +104,7 @@ bool ea_filesystem_is_present(const string & name, ea_domain dom)
 static bool write_ea(const string & chemin, const ea_attributs & val, bool rest_ea_root, bool rest_ea_user)
 {
     char *p_chemin = NULL;
-    unsigned int num = 0;
+    U_I num = 0;
 
     if(!ea_root && !ea_user)
 	return false; // no EA can be restored
@@ -128,7 +128,7 @@ static bool write_ea(const string & chemin, const ea_attributs & val, bool rest_
 	    try
 	    {
 		char *v = tools_str2charptr(ea_ent.value);
-		unsigned long v_size = ea_ent.value.size();
+		U_32 v_size = ea_ent.value.size();
 		try
 		{
 				// now, action !
@@ -199,9 +199,9 @@ static void read_ea(const string & name, ea_attributs & val, bool read_ea_root, 
 		throw Ememory("filesystem : read_ea_from");
 	    try
 	    {
-		const unsigned int MARGIN = 10;
+		const U_I MARGIN = 10;
 		ea_entry ea_ent;
-		long taille = lgetxattr(n_ptr, a_name, NULL, 0);
+		S_32 taille = lgetxattr(n_ptr, a_name, NULL, 0);
 		char *value = NULL;
 		if(taille < 0)
 		    throw Erange("ea_filesystem read_ea", string("error reading attribut ") + a_name + " of file " + n_ptr + "  : " + strerror(errno));
@@ -246,7 +246,7 @@ static void read_ea(const string & name, ea_attributs & val, bool read_ea_root, 
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: ea_filesystem.cpp,v 1.7 2002/06/27 17:42:35 denis Rel $";
+    static char id[]="$Id: ea_filesystem.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $";
 
     dummy_call(id);
 }
@@ -254,7 +254,7 @@ static void dummy_call(char *x)
 static vector<string> ea_filesystem_get_ea_list_for(const char *filename)
 {
     vector<string> ret;
-    const unsigned int MARGIN = 20;
+    const U_I MARGIN = 20;
     ssize_t taille = llistxattr(filename, NULL, 0);
     char *liste = NULL;
 
@@ -266,7 +266,7 @@ static vector<string> ea_filesystem_get_ea_list_for(const char *filename)
 	throw Ememory("filesystem : get_ea_list_for");
     try
     {
-	long cursor = 0;
+	S_32 cursor = 0;
 	taille = llistxattr(filename, liste, taille+MARGIN);
 	if(taille < 0)
 	    throw Erange("ea_filesystem_get_ea_list_for", string("error retreiving EA list for ")+filename+ " : " + strerror(errno));
@@ -302,7 +302,7 @@ static ea_domain string2ea_domain(const string & x)
 
 static void split_ea_name(const string & src, ea_domain & d, string & key)
 {
-    unsigned int cesure = src.find_first_of(".");
+    U_I cesure = src.find_first_of(".");
 
     if(cesure >= src.size() || cesure < 0)
 	throw Erange("ea_filesystem split_ea_name", string("unknown EA attribute name format : ") + src);

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: infinint.hpp,v 1.17 2002/06/20 20:44:30 denis Rel $
+// $Id: infinint.hpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,7 +27,12 @@
 
 #pragma interface
 
+#include <sys/types.h>
+#include <typeinfo>
+
 #include "storage.hpp"
+#include "integers.hpp"
+
 class generic_file;
 
 class infinint
@@ -36,6 +41,10 @@ public :
 
     infinint(off_t a = 0) throw(Ememory, Erange, Ebug)
 	{ E_BEGIN; infinint_from(a); E_END("infinint::infinint", "off_t"); };
+#if time_t != off_t
+    infinint(time_t a = 0) throw(Ememory, Erange, Ebug)
+	{ E_BEGIN; infinint_from(a); E_END("infinint::infinint", "off_t"); };
+#endif
     infinint(const infinint & ref) throw(Ememory, Ebug) 
 	{ E_BEGIN; copy_from(ref); E_END("infinint::infinint", "const infinint &"); };
     ~infinint() throw(Ebug) 
@@ -56,9 +65,9 @@ public :
     infinint & operator *= (const infinint & ref) throw(Ememory, Erange, Ebug);
     inline infinint & operator /= (const infinint & ref) throw(Einfinint, Erange, Ememory, Ebug);
     inline infinint & operator %= (const infinint & ref) throw(Einfinint, Erange, Ememory, Ebug);
-    infinint & operator >>= (unsigned long bit) throw(Ememory, Erange, Ebug);
+    infinint & operator >>= (U_32 bit) throw(Ememory, Erange, Ebug);
     infinint & operator >>= (infinint bit) throw(Ememory, Erange, Ebug);
-    infinint & operator <<= (unsigned long bit) throw(Ememory, Erange, Ebug);
+    infinint & operator <<= (U_32 bit) throw(Ememory, Erange, Ebug);
     infinint & operator <<= (infinint bit) throw(Ememory, Erange, Ebug);
     infinint operator ++(int a) throw(Ememory, Erange, Ebug) 
 	{ E_BEGIN; infinint ret = *this; ++(*this); return ret; E_END("infinint::operator ++", "int"); };
@@ -69,23 +78,14 @@ public :
     infinint & operator --() throw(Ememory, Erange, Ebug) 
 	{ E_BEGIN; return *this -= 1; E_END("infinint::operator --", "()"); };
 
-    unsigned long int operator % (unsigned long int arg) const throw(Einfinint, Ememory, Erange, Ebug) 
+    U_32 operator % (U_32 arg) const throw(Einfinint, Ememory, Erange, Ebug) 
 	{ E_BEGIN; return modulo(arg); E_END("infinint::operator %",""); };
 
 	// increment the argument up to a legal value for its storage type and decrement the object in consequence
 	// note that the initial value of the argument is not ignored !
 	// when the object is null the value of the argument stays the same as before
-    void unstack(unsigned char &v) throw(Ememory, Erange, Ebug) 
-	{ E_BEGIN; infinint_unstack_to(v); E_END("infinint::unstack", "unsigned char"); }; 
-    void unstack(unsigned short int &v) throw(Ememory, Erange, Ebug) 
-	{ E_BEGIN; infinint_unstack_to(v); E_END("infinint::unstack", "unsigned short"); }; 
-    void unstack(unsigned long int &v) throw(Ememory, Erange, Ebug) 
-	{ E_BEGIN; infinint_unstack_to(v); E_END("infinint::unstack", "unsignd long int"); }; 
-    void unstack(unsigned int &v) throw(Ememory, Erange, Ebug) 
-	{ E_BEGIN; infinint_unstack_to(v); E_END("infinint::unstack", "unsignd int"); };
-    void unstack(off_t &v) throw(Ememory, Erange, Ebug) 
-	{ E_BEGIN; infinint_unstack_to(v); E_END("infinint::unstack", "off_t"); };
-    
+    template <class T>void unstack(T &v) throw(Ememory, Erange, Ebug) 
+	{ E_BEGIN; infinint_unstack_to(v); E_END("infinint::unstack", typeid(v).name()); };
 
     friend bool operator < (const infinint &, const infinint &) throw(Erange, Ebug);
     friend bool operator == (const infinint &, const infinint &) throw(Erange, Ebug);
@@ -141,9 +141,9 @@ infinint operator * (const infinint &, const unsigned char) throw(Erange, Ememor
 infinint operator * (const unsigned char, const infinint &) throw(Erange, Ememory, Ebug);
 infinint operator / (const infinint &, const infinint &) throw(Einfinint, Erange, Ememory, Ebug);
 infinint operator % (const infinint &, const infinint &) throw(Einfinint, Erange, Ememory, Ebug);
-infinint operator >> (const infinint & a, unsigned long bit) throw(Erange, Ememory, Ebug);
+infinint operator >> (const infinint & a, U_32 bit) throw(Erange, Ememory, Ebug);
 infinint operator >> (const infinint & a, const infinint & bit) throw(Erange, Ememory, Ebug);
-infinint operator << (const infinint & a, unsigned long bit) throw(Erange, Ememory, Ebug);
+infinint operator << (const infinint & a, U_32 bit) throw(Erange, Ememory, Ebug);
 infinint operator << (const infinint & a, const infinint & bit) throw(Erange, Ememory, Ebug);
 void euclide(infinint a, const infinint &b, infinint &q, infinint &r) throw(Einfinint, Erange, Ememory, Ebug);
 template <class T> inline void euclide(T a, T b, T & q, T &r) 

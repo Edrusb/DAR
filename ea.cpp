@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.cpp,v 1.9 2002/06/26 22:20:20 denis Rel $
+// $Id: ea.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -27,6 +27,7 @@
 
 #include "ea.hpp"
 #include "tools.hpp"
+#include "integers.hpp"
 
 // theses MACRO to are used when dump in file only
 #define EA_ROOT 0x80
@@ -72,7 +73,7 @@ void ea_entry::dump(generic_file & f) const
 ea_attributs::ea_attributs(generic_file & f)
 {
     infinint tmp;
-    unsigned long int tmp2 = 0;
+    U_32 tmp2 = 0;
 
     tmp.read_from_file(f);
     tmp.unstack(tmp2);
@@ -93,7 +94,7 @@ ea_attributs::ea_attributs(generic_file & f)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: ea.cpp,v 1.9 2002/06/26 22:20:20 denis Rel $";
+    static char id[]="$Id: ea.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }
 

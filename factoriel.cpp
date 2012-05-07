@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: factoriel.cpp,v 1.13 2002/06/20 20:43:52 denis Rel $
+// $Id: factoriel.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -34,8 +34,9 @@
 #include "erreurs.hpp"
 #include "test_memory.hpp"
 #include "generic_file.hpp"
+#include "integers.hpp"
 
-int main(int argc, char *argv[]) throw()
+S_I main(S_I argc, char *argv[]) throw()
 {
     MEM_BEGIN;
     MEM_IN;
@@ -58,7 +59,7 @@ int main(int argc, char *argv[]) throw()
 	cout << f.human() << endl;
 	if(argc == 3)
 	{
-	    int fd = open(argv[2], O_RDWR|O_CREAT|O_TRUNC, 0644);
+	    S_I fd = open(argv[2], O_RDWR|O_CREAT|O_TRUNC, 0644);
 	    if(fd < 0)
 		cout << "cannot open file for test ! " << strerror(errno) << endl;
 	    else
@@ -91,6 +92,6 @@ int main(int argc, char *argv[]) throw()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: factoriel.cpp,v 1.13 2002/06/20 20:43:52 denis Rel $";
+    static char id[]="$Id: factoriel.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }

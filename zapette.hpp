@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.hpp,v 1.4 2002/06/26 22:20:20 denis Rel $
+// $Id: zapette.hpp,v 1.5 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -29,6 +29,7 @@
 #pragma interface
 
 #include "generic_file.hpp"
+#include "integers.hpp"
 
 class zapette: public generic_file
 {
@@ -38,21 +39,21 @@ public:
     ~zapette();
 
 	// inherited methods
-    bool skip(infinint pos);
+    bool skip(const infinint &pos);
     bool skip_to_eof() { position = file_size; return true; };
-    bool skip_relative(signed int x);
+    bool skip_relative(S_I x);
     infinint get_position() { return position; };
 
 protected:
-    int inherited_read(char *a, size_t size);
-    int inherited_write(char *a, size_t size);
+    S_I inherited_read(char *a, size_t size);
+    S_I inherited_write(char *a, size_t size);
 
 private:
     generic_file *in, *out;
     infinint position, file_size;
     char serial_counter;
 
-    void make_transfert(unsigned short size, const infinint &offset, char *data, int & lu, infinint & arg);
+    void make_transfert(U_16 size, const infinint &offset, char *data, S_I & lu, infinint & arg);
 };
 
 class slave_zapette

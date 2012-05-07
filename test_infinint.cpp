@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_infinint.cpp,v 1.11 2002/05/28 20:17:29 denis Rel $
+// $Id: test_infinint.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,10 +30,11 @@
 #include <unistd.h>
 #include <iostream.h>
 #include "test_memory.hpp"
+#include "integers.hpp"
 
 static void routine1();
 
-int main()
+S_I main()
 {
     MEM_IN;
     routine1();
@@ -53,7 +54,7 @@ static void routine1()
 
     cout << d1.human() << " " << d2.human() << " " << d3.human() << endl;
 
-    int fd = open("toto", O_RDWR | O_CREAT | O_TRUNC, 0644);
+    S_I fd = open("toto", O_RDWR | O_CREAT | O_TRUNC, 0644);
     if(fd >= 0)
     {
 	f1.dump(fd);

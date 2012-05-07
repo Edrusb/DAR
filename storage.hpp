@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.hpp,v 1.19 2002/06/11 17:46:32 denis Rel $
+// $Id: storage.hpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -28,6 +28,8 @@
 #pragma interface
 
 #include "erreurs.hpp"
+#include "integers.hpp"
+
 class infinint;
 class generic_file;
 
@@ -38,12 +40,12 @@ private:
     {
 	struct cellule *next, *prev;
 	unsigned char *data;
-	unsigned long int size;
+	U_32 size;
     };
 
 public:
-    storage(unsigned long int size) throw(Ememory, Ebug)
-	{ E_BEGIN; make_alloc(size, first, last); E_END("storage::storage","unsigned long int"); };
+    storage(U_32 size) throw(Ememory, Ebug)
+	{ E_BEGIN; make_alloc(size, first, last); E_END("storage::storage","U_32"); };
     storage(const infinint & size) throw(Ememory, Erange, Ebug);
     storage(const storage & ref) throw(Ememory, Ebug) 
 	{ E_BEGIN; copy_from(ref); E_END("storage::storage", "storage &"); };
@@ -80,20 +82,20 @@ public:
 	    // default destructor is OK
 	    // default operator = is OK
 
-	iterator operator ++ (int x) throw()
-	    { E_BEGIN; iterator ret = *this; skip_plus_one(); return ret;  E_END("storage::iterator::operator++", "(int)"); };
-	iterator operator -- (int x) throw() 
-	    { E_BEGIN; iterator ret = *this; skip_less_one(); return ret; E_END("storage::iterator::operator--", "(int)");}; 
+	iterator operator ++ (S_I x) throw()
+	    { E_BEGIN; iterator ret = *this; skip_plus_one(); return ret;  E_END("storage::iterator::operator++", "(S_I)"); };
+	iterator operator -- (S_I x) throw() 
+	    { E_BEGIN; iterator ret = *this; skip_less_one(); return ret; E_END("storage::iterator::operator--", "(S_I)");}; 
 	iterator & operator ++ () throw() 
 	    { E_BEGIN; skip_plus_one(); return *this; E_END("storage::iterator::operator++", "()"); }; 
 	iterator & operator -- () throw()
 	    { E_BEGIN; skip_less_one(); return *this; E_END("storage::iterator::operator--", "()"); }; 
-	iterator operator + (unsigned long s) const throw() 
+	iterator operator + (U_32 s) const throw() 
 	    { E_BEGIN; iterator ret = *this; ret += s; return ret; E_END("storage::iterator::operator +", ""); }; 
-	iterator operator - (unsigned long s) const throw()
+	iterator operator - (U_32 s) const throw()
 	    { E_BEGIN; iterator ret = *this; ret -= s; return ret; E_END("storage::iterator::operator -", ""); };
-	iterator & operator += (unsigned long s) throw();
-	iterator & operator -= (unsigned long s) throw();
+	iterator & operator += (U_32 s) throw();
+	iterator & operator -= (U_32 s) throw();
 	unsigned char &operator *() const throw(Erange);
 
 	void skip_to(const storage & st, infinint val) throw(); // absolute position in st
@@ -105,14 +107,14 @@ public:
 	    { E_BEGIN; return ! (*this == cmp); E_END("storage::iterator::operator !=", ""); };
 
     private:
-	static const unsigned long OFF_BEGIN = 1;
-	static const unsigned long OFF_END = 2;
+	static const U_32 OFF_BEGIN = 1;
+	static const U_32 OFF_END = 2;
 
 	const storage *ref;
 	struct cellule *cell;
-	unsigned long int offset; 
+	U_32 offset; 
 
-	void relative_skip_to(signed long int val) throw();
+	void relative_skip_to(S_32 val) throw();
 	bool points_on_data() const throw()
 	    { E_BEGIN; return ref != NULL && cell != NULL && offset < cell->size; E_END("storage::iterator::point_on_data", "");};
 
@@ -138,27 +140,27 @@ public:
     iterator rend() const throw()
 	{ E_BEGIN; iterator ret; ret.cell = NULL, ret.offset = iterator::OFF_BEGIN; ret.ref = this; return ret; E_END("storage::rend", ""); };
     
-    unsigned int write(iterator & it, unsigned char *a, unsigned int size) throw(Erange);
-    unsigned int read(iterator & it, unsigned char *a, unsigned int size) const throw(Erange);
+    U_I write(iterator & it, unsigned char *a, U_I size) throw(Erange);
+    U_I read(iterator & it, unsigned char *a, U_I size) const throw(Erange);
     bool write(iterator & it, unsigned char a) throw(Erange) 
 	{ E_BEGIN; return write(it, &a, 1) == 1; E_END("storage::write", "unsigned char"); };
     bool read(iterator & it, unsigned char &a) const throw(Erange) 
 	{ E_BEGIN; return read(it, &a, 1) == 1; E_END("storage::read", "unsigned char"); }; 
 
 	// after one of theses 3 calls, the iterator given in argument are undefined (they may point nowhere)
-    void insert_null_bytes_at_iterator(iterator it, unsigned int size) throw(Erange, Ememory, Ebug);
-    void insert_const_bytes_at_iterator(iterator it, unsigned char a, unsigned int size) throw(Erange, Ememory, Ebug);
-    void insert_bytes_at_iterator(iterator it, unsigned char *a, unsigned int size) throw(Erange, Ememory, Ebug); 
+    void insert_null_bytes_at_iterator(iterator it, U_I size) throw(Erange, Ememory, Ebug);
+    void insert_const_bytes_at_iterator(iterator it, unsigned char a, U_I size) throw(Erange, Ememory, Ebug);
+    void insert_bytes_at_iterator(iterator it, unsigned char *a, U_I size) throw(Erange, Ememory, Ebug); 
     void insert_as_much_as_necessary_const_byte_to_be_as_wider_as(const storage & ref, const iterator & it, unsigned char value);
-    void remove_bytes_at_iterator(iterator it, unsigned int number) throw(Ememory, Ebug);
+    void remove_bytes_at_iterator(iterator it, U_I number) throw(Ememory, Ebug);
     void remove_bytes_at_iterator(iterator it, infinint number) throw(Ememory, Erange, Ebug);
 private:
     struct cellule *first, *last;   
 
     void copy_from(const storage & ref) throw(Ememory, Erange, Ebug);
-    signed long int difference(const storage & ref) const throw();
+    S_32 difference(const storage & ref) const throw();
     void reduce() throw(Ebug); // heuristic that tries to free some memory;
-    void insert_bytes_at_iterator_cmn(iterator it, bool constant, unsigned char *a, unsigned int size) throw(Erange, Ememory, Ebug); 
+    void insert_bytes_at_iterator_cmn(iterator it, bool constant, unsigned char *a, U_I size) throw(Erange, Ememory, Ebug); 
     void fusionne(struct cellule *a_first, struct cellule *a_last, struct cellule *b_first, struct cellule *b_last, 
 		  struct cellule *&res_first, struct cellule * & res_last) throw(Ebug);
 
@@ -166,10 +168,10 @@ private:
 	// STATIC statments :
 	//
 
-    static unsigned long alloc_size; // stores the last biggest memory allocation successfully realized
+    static U_32 alloc_size; // stores the last biggest memory allocation successfully realized
 
     static void detruit(struct cellule *c) throw(Ebug);
-    static void make_alloc(unsigned long int size, struct cellule * & begin, struct cellule * & end) throw(Ememory, Ebug);
+    static void make_alloc(U_32 size, struct cellule * & begin, struct cellule * & end) throw(Ememory, Ebug);
     static void make_alloc(infinint size, cellule * & begin, struct cellule * & end) throw(Ememory, Erange, Ebug);
 
     friend class storage::iterator;

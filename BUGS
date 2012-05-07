@@ -89,3 +89,62 @@ KNOWN BUGS:
     fixed in version: 1.0.3
      
 
+#6: description: Dar does not properly display dates on Linux 64 bits 
+        systems.
+
+    problem:
+	non portable cast from 'time_t' to 'unsigned long int'
+
+    solution:
+	changed code not to have to use 'unsigned long int'
+
+    affects version: 1.0.x, 1.1.x
+    fixed in version: 1.2.0
+
+
+#7: description: while saving, Dar stops when a given inode could not be read,
+        even if the inode had not to be saved
+
+    problem:
+	Dar reads all file in the directory to save, and then applies filters
+	to their filename. Error appears before the filter, leading to a 
+	global saving error.
+
+    solution:
+        read error are now caught sooner a message is displayed that the file
+        or directory will be ignored, and saving process continues. As 
+	this error occurs before testing filename against filters, an error 
+	message is still displayed (which may seems strange when the file was
+	about to be excluded by filter mechanism)  
+		Just reminds that dar reads a directory contents first, and 
+	then check filenames against filter. At the time of the message, Dar 
+	does not know the file would not to be saved. Thus, don't worry if 
+	you see this kind of message, they don't mean that dar was about to 
+	save the given file but rather exactly what the message says, that 
+	the file or directory could not be read. ;-)
+
+    affects version: 1.0.x, 1.1.x
+    fixed in version: 1.2.0
+
+
+#8: description: when saving hard linked file using filter that does not save
+	the first hard link, dar stops with SEGFAULT.
+
+    problem:
+	The first hard link is used as reference for the following occurences.
+	As it is not covered by the filter it is destroyed in filter module,
+	but filesystem module keeps using it as reference for following 
+	hard links on that inode.
+
+    solution:
+	added a call in filesystem module to "forget" a given reference. This
+	way, if a file_etiquette is not covered, filter module can inform 
+	filesystem module to delete the corresponding entry on the hard link
+	map. Subsequent hard link on that inode will generate first a new
+	file_etiquette, which will be used as reference (unless it is not 
+	covered by filter too).
+
+    affects version: 1.1.x
+    fixed in version: 1.2.0
+
+

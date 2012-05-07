@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.5 2002/06/26 22:20:20 denis Rel $
+// $Id: sar_tools.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -35,7 +35,7 @@
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: sar_tools.cpp,v 1.5 2002/06/26 22:20:20 denis Rel $";
+    static char id[]="$Id: sar_tools.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -47,7 +47,7 @@ generic_file *sar_tools_open_archive_fichier(const string &filename, bool allow_
     
     try
     {
-	int fd;
+	S_I fd;
 
 	if(!allow_over || warn_over)
 	{
@@ -91,7 +91,7 @@ generic_file *sar_tools_open_archive_fichier(const string &filename, bool allow_
     return ret;
 }
 
-generic_file *sar_tools_open_archive_tuyau(int fd, gf_mode mode)
+generic_file *sar_tools_open_archive_tuyau(S_I fd, gf_mode mode)
 {
     generic_file *tmp = NULL;
     generic_file *ret = NULL;

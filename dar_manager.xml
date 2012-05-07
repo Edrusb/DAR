@@ -1,0 +1,157 @@
+<?xml  version="1.0"  standalone="yes"?>
+<!DOCTYPE help [
+<!ELEMENT help (indents | hdr | arg )*>
+<!ELEMENT indents EMPTY>
+<!ATTLIST indents
+  flag CDATA #IMPLIED
+  desc CDATA #IMPLIED
+  cont CDATA #IMPLIED
+  wrap CDATA #IMPLIED>
+<!ELEMENT hdr (#PCDATA)>
+<!ATTLIST hdr
+  vspace CDATA #IMPLIED>
+<!ELEMENT arg (desc)>
+<!ATTLIST arg 
+  vspace CDATA #IMPLIED
+  flag 	 CDATA #IMPLIED
+  opt  	 CDATA #IMPLIED
+  repl 	 CDATA #IMPLIED>
+<!ELEMENT desc (#PCDATA | p | repl)*>
+<!ELEMENT repl (#PCDATA)>
+<!ELEMENT p EMPTY>
+]>
+<help>
+
+  <indents flag="4" desc="20" cont="1" wrap="79"/>
+
+  <hdr vspace="1">options:</hdr>
+
+  <arg flag="-C" repl="database">
+    <desc>
+        creates an empty database
+    </desc>
+  </arg>
+
+  <arg flag="-B" repl="database">
+    <desc>
+        specify the database to use (read or modify)
+    </desc>
+  </arg>
+
+  <arg flag="-A" repl="archive">
+    <desc>
+        add an archive to the database
+    </desc>
+  </arg>
+
+  <arg flag="-l">
+    <desc>
+        give informations about the archive compiled in the database
+    </desc>
+  </arg>
+
+  <arg flag="-D" repl="number">
+    <desc>
+        delete an archive from the database (use -l to get archive numbers)
+    </desc>
+  </arg>
+
+  <arg flag="-b" repl="number">
+    <desc>
+        change the basename to use for the give archive number
+    </desc>
+  </arg>
+
+  <arg flag="-p" repl="number">
+    <desc>
+        change the path to use for the given archive number
+    </desc>
+  </arg>
+
+  <arg flag="-o" repl="options">
+    <desc>
+        specify a list of option to always pass to dar
+    </desc>
+  </arg>
+
+  <arg flag="-d" repl="dar's path">
+    <desc>
+       specify the path to dar (else dar must be located in a directory covered by the PATH variable)   
+    </desc>
+  </arg>
+
+  <arg flag="-r" repl="files">
+    <desc>
+       restores the given files
+    </desc>
+  </arg>
+
+  <arg flag="-u" repl="number">
+    <desc>
+        list the most recent files contained in the given archive
+    </desc>
+  </arg>
+
+  <arg flag="-f" repl="file">
+    <desc>
+        list the archives where is saved the data and/or EA of that file
+    </desc>
+  </arg>
+
+  <arg flag="-s" repl="number">
+    <desc>
+        shows the number of most recent file by archive
+    </desc>
+  </arg>
+
+  <arg flag="-m" repl="number">
+    <desc>
+        change an archive position within a given database. First <repl>number</repl> 
+        is the archive to move, second <repl>number</repl> is where to move it.
+    </desc>
+  </arg>
+
+  <arg flag="-h">
+    <desc>
+        displays this help information
+    </desc>
+  </arg>
+
+  <arg flag="-V">
+    <desc>
+        displays software version
+    </desc>
+  </arg>
+
+   <hdr vspace="1">
+    See man page for more details.
+  </hdr>
+<!--
+$Log: dar_manager.xml,v $
+Revision 1.1  2002/10/28 20:39:27  edrusb
+updated CVS with last development version
+
+Revision 1.2  2002/10/24 16:11:40  denis
+dar_manager officiel
+
+Revision 1.1  2002/10/16 22:04:37  denis
+Initial revision
+
+Revision 1.2  2002/08/22 20:27:59  denis
+mise en place de dar-help
+
+Revision 1.3  2002/08/20 13:44:08  cs1cwm
+Added DTD and removed the #ifdef and #endif.
+
+It now passes xmllint validation.
+
+Revision 1.2  2002/08/17 13:41:48  cs1cwm
+Changed to use arg flag, opt and repl attributes.
+
+Some changes to text.
+
+Revision 1.1  2002/08/17 13:13:31  cs1cwm
+Initial revision
+
+-->
+</help>

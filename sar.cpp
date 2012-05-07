@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.35 2002/06/26 22:04:13 denis Rel $
+// $Id: sar.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -31,27 +31,30 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <dirent.h>
+#include <stdlib.h>
 #include "sar.hpp"
 #include "deci.hpp"
 #include "user_interaction.hpp"
 #include "tools.hpp"
 #include "erreurs.hpp"
+#include "test_memory.hpp"
 
 static bool sar_extract_num(string filename, string base_name, string ext, infinint & ret);
 static bool sar_get_higher_number_in_dir(path dir ,string base_name, string ext, infinint & ret);
 
-sar::sar(const string & base_name, const string & extension, int options, const path & dir) : generic_file(gf_read_only), archive_dir(dir)
+sar::sar(const string & base_name, const string & extension, S_I options, const path & dir, const string & execute) : generic_file(gf_read_only), archive_dir(dir)
 {
     set_options(options);
     
     base = base_name;
     ext = extension;
     initial = true;
+    hook = execute;
     open_file_init();
     open_file(1);
 }
 
-sar::sar(const string & base_name, const string & extension, const infinint & file_size, const infinint & first_file_size, int options, const path & dir) : generic_file(gf_write_only), archive_dir(dir)
+sar::sar(const string & base_name, const string & extension, const infinint & file_size, const infinint & first_file_size, S_I options, const path & dir, const string & execute) : generic_file(gf_write_only), archive_dir(dir)
 {
     if(file_size < header::size() + 1)
 	throw Erange("sar::sar", "file size too small");
@@ -62,6 +65,7 @@ sar::sar(const string & base_name, const string & extension, const infinint & fi
     ext = extension;
     size = file_size;
     first_size = first_file_size;
+    hook = execute;
 
     open_file_init();
     open_file(1);
@@ -70,9 +74,11 @@ sar::sar(const string & base_name, const string & extension, const infinint & fi
 sar::~sar()
 {
     close_file();
+    if(get_mode() == gf_write_only)
+	hook_execute(of_current);
 }
 
-bool sar::skip(infinint pos)
+bool sar::skip(const infinint &pos)
 {
     infinint byte_in_first_file = first_size - first_file_offset;
     infinint byte_per_file = size - header::size();
@@ -136,7 +142,7 @@ bool sar::skip_to_eof()
     return ret;
 }
 
-bool sar::skip_forward(unsigned int x)
+bool sar::skip_forward(U_I x)
 {
     infinint number = of_current;
     infinint offset = file_offset + x;
@@ -162,11 +168,11 @@ bool sar::skip_forward(unsigned int x)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: sar.cpp,v 1.35 2002/06/26 22:04:13 denis Rel $";
+    static char id[]="$Id: sar.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }
 
-bool sar::skip_backward(unsigned int x)
+bool sar::skip_backward(U_I x)
 {
     infinint number = of_current;
     infinint offset = file_offset;
@@ -197,7 +203,7 @@ bool sar::skip_backward(unsigned int x)
     }
 }
           
-bool sar::skip_relative(signed int x)
+bool sar::skip_relative(S_I x)
 {
     if(x > 0)
 	return skip_forward(x);
@@ -216,14 +222,14 @@ infinint sar::get_position()
 	return file_offset - first_file_offset;
 }
 
-int sar::inherited_read(char *a, size_t sz)
+S_I sar::inherited_read(char *a, size_t sz)
 {
     size_t lu = 0;
     bool loop = true;
     
     while(lu < sz && loop)
     {
-	int tmp = of_fd->read(a+lu, sz-lu);
+	S_I tmp = of_fd->read(a+lu, sz-lu);
 	if(tmp < 0)
 	    throw Erange("sar::inherited_read", strerror(errno));
 	if(tmp == 0)
@@ -241,13 +247,13 @@ int sar::inherited_read(char *a, size_t sz)
     return lu;
 }
 
-int sar::inherited_write(char *a, size_t sz)
+S_I sar::inherited_write(char *a, size_t sz)
 {
     infinint to_write = sz;
     infinint max_at_once;
     infinint tmp_wrote;
-    int tmp;
-    unsigned int micro_wrote;
+    S_I tmp;
+    U_I micro_wrote;
 
     while(to_write > 0)
     {
@@ -296,7 +302,7 @@ void sar::open_readonly(char *fic, const infinint &num)
     {
 	    // trying to open the file
 	    //
-	int fd = open(fic, O_RDONLY);
+	S_I fd = open(fic, O_RDONLY);
 	if(fd < 0)
 	    if(errno == ENOENT)
 	    {
@@ -381,9 +387,9 @@ void sar::open_writeonly(char *fic, const infinint &num)
 {
     struct stat buf;
     header h;
-    int open_flag = O_WRONLY;
-    int open_mode = 0666; // umask will unset some bits while calling open
-    int fd;
+    S_I open_flag = O_WRONLY;
+    S_I open_mode = 0666; // umask will unset some bits while calling open
+    S_I fd;
 
 	// check if that the file exists
     if(stat(fic, &buf) < 0)
@@ -393,7 +399,7 @@ void sar::open_writeonly(char *fic, const infinint &num)
 	    open_flag |= O_CREAT;
     else // file exists
     {
-	int fd_tmp = open(fic, O_RDONLY);
+	S_I fd_tmp = open(fic, O_RDONLY);
 
 	if(fd_tmp >= 0)
 	{
@@ -471,6 +477,8 @@ void sar::open_file(infinint num)
 	    {
 	    case gf_read_only :
 		close_file();
+		    // launch the shell command before reading a slice
+		hook_execute(num);
 		open_readonly(fic, num);
 		break;
 	    case gf_write_only :
@@ -482,16 +490,21 @@ void sar::open_file(infinint num)
 		    h.write(*of_fd);
 		}
 		close_file();
-		if(opt_pause)
+
+		if(!initial)
 		{
-		    if(!initial)
+
+			// launch the shell command after the slice has been written
+		    hook_execute(of_current);
+		    if(opt_pause)
 		    {
 			deci conv = of_current;
 			user_interaction_pause(string("Finished writing to file ") + conv.human() + ", ready to continue ? ");
 		    }
-		    else
-			initial = false;
 		}
+		else
+		    initial = false;
+		
 		open_writeonly(fic, num);
 		break;
 	    default :
@@ -512,7 +525,7 @@ void sar::open_file(infinint num)
     }
 }
 
-void sar::set_options(int opt)
+void sar::set_options(S_I opt)
 {
     opt_warn_overwrite = (opt & SAR_OPT_WARN_OVERWRITE) != 0;
     opt_dont_erase = (opt & SAR_OPT_DONT_ERASE) != 0;
@@ -533,24 +546,38 @@ void sar::open_last_file()
 
     if(of_last_file_known)
 	open_file(of_last_file_num);
-    else
+    else // last slice number is not known
     {
+	bool ask_user = false; 
+
 	while(of_flag != FLAG_TERMINAL)
 	{
 	    if(sar_get_higher_number_in_dir(archive_dir, base, ext, num))
 	    {
 		open_file(num);
 		if(of_flag != FLAG_TERMINAL)
+		    if(!ask_user)
+		    {
+			hook_execute(0); // %n replaced by 0 means last file is about to be requested
+			ask_user = true;
+		    }
+		    else
+		    {
+			close_file();
+			user_interaction_pause(string("The last file of the set is not present in ") + archive_dir.display() + " , please provide it.");
+		    }
+	    }
+	    else // not slice available in the directory
+		if(!ask_user)
+		{
+		    hook_execute(0); // %n replaced by 0 means last file is about to be requested
+		    ask_user = true;
+		}
+		else
 		{
 		    close_file();
-		    user_interaction_pause(string("The last file of the set is not present in ") + archive_dir.display() + " , please provide it.");
+		    user_interaction_pause(string("No backup file is present in ") + archive_dir.display() + " , please provide the last file of the set.");
 		}
-	    }
-	    else
-	    {
-		close_file();
-		user_interaction_pause(string("No backup file is present in ") + archive_dir.display() + " , please provide the last file of the set.");
-	    }
 	}
     }
 }
@@ -579,6 +606,129 @@ header sar::make_write_header(const infinint & num, char flag)
 
     return h;
 }
+
+string sar::hook_substitute(const string & path, const string & basename, const string & num)
+{
+    string ret = "";
+    string::iterator it = hook.begin();
+
+    while(it != hook.end())
+    {
+	if(*it == '%')
+	{
+	    it++;
+	    if(it != hook.end())
+	    {
+		switch(*it)
+		{
+		case '%': // the % character
+		    ret += '%';
+		    break;
+		case 'p': // path to slices
+		    ret += path;
+		    break;
+		case 'b': // slice basename
+		    ret += basename;
+		    break;
+		case 'n': // slice number
+		    ret += num;
+		    break;
+		default:
+		    try
+		    {
+			user_interaction_pause(string("unknown substitution string in user command-line: %")+ *it + " . Ignore it and continue ?");
+		    }
+		    catch(Euser_abort & e)
+		    {
+			throw Escript("sar::hook_substitute", string("unknown substitution string: %")+ *it);
+		    }
+		}
+		it++;
+	    }
+	    else
+	    {
+		try
+		{
+		    user_interaction_pause("last char of user command-line to execute is '%', (use '%%' instead to avoid this message). Ignore it and continue ?");
+		}
+		catch(Euser_abort)
+		{
+		    throw Escript("sar::hook_substitute","unknown substitution string at end of string: %");
+		}
+	    }
+	}
+	else
+	{
+	    ret += *it;
+	    it++;
+	}
+    }
+
+    return ret;
+}
+
+void sar::hook_execute(const infinint &num)
+{
+    MEM_IN;
+    if(hook != "")
+    {
+	string cmd_line = hook_substitute(archive_dir.display(), base, deci(num).human());
+	char *ptr = tools_str2charptr(cmd_line);
+	try
+	{
+	    bool loop = false;
+	    do
+	    {
+		try
+		{
+		    S_I code = system(ptr);
+		    switch(code)
+		    {
+		    case 0:
+			loop = false;
+			break; // All is fine, script did not report error
+		    case 127:
+			throw Erange("sar::hook_execute", "execve() failed. (process table is full ?)");
+		    case -1:
+			throw Erange("sar::hook_execute", string("system() call failed: ") + strerror(errno));
+		    default:
+			throw Erange("sar::hook_execute", string("execution of [") + cmd_line + "] returned error code: " + tools_int2str(code));
+		    }
+		}
+		catch(Erange & e)
+		{
+		    try
+		    {
+			user_interaction_pause(string("Erreur during user command-line execution: ") + e.get_message() + " . Retry command-line ?");
+			loop = true;
+		    }
+		    catch(Euser_abort & f)
+		    {
+			try
+			{
+			    user_interaction_pause("Ignore previous error on user command-line and continue ?");
+			    loop = false;
+			}
+			catch(Euser_abort & g)
+			{
+			    throw Escript("sar::hook_execute", string("Fatal error on user command-line: ") + e.get_message());
+			}
+		    }
+		}
+	    }
+	    while(loop);    
+	}
+	catch(...)
+	{
+	    delete ptr;
+	    MEM_OUT;
+	    throw;
+	}
+	delete ptr;
+    }
+    MEM_OUT;
+}
+	
 
 string sar_make_filename(string base_name, infinint num, string ext)
 {
@@ -678,7 +828,7 @@ trivial_sar::trivial_sar(generic_file *ref) : generic_file(gf_read_write)
 	    throw SRC_BUG; // not implemented ! I said ! ;-) (Efeature)
 }
 
-bool trivial_sar::skip_relative(signed int x)
+bool trivial_sar::skip_relative(S_I x)
 {
     if(x > 0 || reference->get_position() > offset - x) // -x is positive
 	return reference->skip_relative(x);

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.hpp,v 1.13 2002/05/15 21:56:01 denis Rel $
+// $Id: mask.hpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,6 +30,7 @@
 #include <string.h>
 #include <string>
 #include <vector>
+#include <regex.h>
 #include "path.hpp"
 
 using namespace std;
@@ -73,6 +74,20 @@ private :
     void detruit() { if(the_mask != NULL) delete the_mask; the_mask = NULL; };
 };
 
+
+class regular_mask : public mask
+{
+public :
+    regular_mask(const string & wild_card_expression);
+    virtual ~regular_mask() { regfree(&preg); };
+
+    bool is_covered(const string & expression) const;
+    mask *clone() const { return new regular_mask(*this); };
+
+private :
+    regex_t preg;
+};
+
 class not_mask : public mask
 {
 public :
@@ -104,7 +119,7 @@ public :
 
     bool is_covered(const string & expression) const;
     mask *clone() const { return new et_mask(*this); };
-    unsigned int size() const { return lst.size(); };
+    U_I size() const { return lst.size(); };
 protected :
     vector<mask *> lst;
     
@@ -134,7 +149,7 @@ private :
 
 class same_path_mask : public mask
 {
-public :
+public : 
     same_path_mask(const string &p) { chemin = p; };
     
     bool is_covered(const string &ch) const { return ch == chemin; };

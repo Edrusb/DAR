@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_sar.cpp,v 1.16 2002/05/17 16:17:48 denis Rel $
+// $Id: test_sar.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 #include <iostream.h>
@@ -27,10 +27,11 @@
 #include "testtools.hpp"
 #include "user_interaction.hpp"
 #include "test_memory.hpp"
+#include "integers.hpp"
 
 static void f1();
 
-int main()
+S_I main()
 {
     MEM_IN;
     f1();
@@ -40,7 +41,7 @@ int main()
 
 static void f1()
 {
-    user_interaction_init(0, &cout, &cerr);
+    user_interaction_init(&cout, &cerr);
     try
     {
 	sar sar1 = sar("destination", ".txt", 100, 110, SAR_OPT_DEFAULT/*&~SAR_OPT_DONT_ERASE&~SAR_OPT_WARN_OVERWRITE*/, path("./test"));

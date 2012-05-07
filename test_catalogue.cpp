@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_catalogue.cpp,v 1.13 2002/05/02 19:51:44 denis Rel $
+// $Id: test_catalogue.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -28,6 +28,7 @@
 #include "catalogue.hpp"
 #include "user_interaction.hpp"
 #include "test_memory.hpp"
+#include "integers.hpp"
 
 #define FIC1 "test/dump.bin"
 #define FIC2 "test/dump2.bin"
@@ -36,10 +37,10 @@ void f1();
 void f2();
 void f3();
 
-int main()
+S_I main()
 {
     MEM_IN;
-    user_interaction_init(0, &cout, &cerr);
+    user_interaction_init(&cout, &cerr);
     try
     {
 	MEM_IN;
@@ -83,18 +84,18 @@ void f1()
 	
 	entree *liste[] = { &v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, NULL };
 	
-	for(int i = 0; liste[i] != NULL; i++)
+	for(S_I i = 0; liste[i] != NULL; i++)
 	{
 	    inode *ino = dynamic_cast<inode *>(liste[i]);
 
 	    if(ino != NULL)
-		ino->set_saved_status(true);
+		ino->set_saved_status(s_saved);
 	    liste[i]->dump(*dump);
 	}
 
 	dump->skip(0);
 	entree *ref = (entree *)1; // != NULL
-	for(int i = 0; ref != NULL; i++)
+	for(S_I i = 0; ref != NULL; i++)
 	{
 	    ref = entree::read(*dump);
 	    if(ref != NULL)

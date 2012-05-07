@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.hpp,v 1.21 2002/05/16 21:50:51 denis Rel $
+// $Id: filtre.hpp,v 1.8 2002/10/28 20:39:33 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -72,7 +72,8 @@ extern void filtre_sauvegarde(const mask &filtre,
 			      statistics & st,
 			      bool make_empty_dir,
 			      bool save_ea_root,
-			      bool save_ea_user);
+			      bool save_ea_user,
+			      const mask &compr_mask);
 
 extern void filtre_difference(const mask &filtre,
 			      const mask &subtree,

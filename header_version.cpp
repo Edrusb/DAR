@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header_version.cpp,v 1.4 2002/06/26 22:20:20 denis Rel $
+// $Id: header_version.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -26,22 +26,23 @@
 #pragma implementation
 
 #include "header_version.hpp"
+#include "integers.hpp"
 
 void version_copy(version & left, const version & right)
 {
-    for(int i = 0; i < VERSION_SIZE; i++)
+    for(S_I i = 0; i < VERSION_SIZE; i++)
 	left[i] = right[i];
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: header_version.cpp,v 1.4 2002/06/26 22:20:20 denis Rel $";
+    static char id[]="$Id: header_version.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }
 
 bool version_greater(const version & left, const version & right)
 {
-    int i = 0;
+    S_I i = 0;
 
     while(i < VERSION_SIZE && left[i] == right[i])
 	i++;

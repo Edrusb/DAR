@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.14 2002/05/15 21:56:01 denis Rel $
+// $Id: test_filesystem.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -34,6 +34,7 @@
 #include "filesystem.hpp"
 #include "user_interaction.hpp"
 #include "test_memory.hpp"
+#include "integers.hpp"
 
 static void build();
 static void test();
@@ -42,10 +43,10 @@ static void re_test();
 
 static catalogue *cat;
 
-int main()
+S_I main()
 {
     MEM_IN;
-    user_interaction_init(0, &cout, &cerr);
+    user_interaction_init(&cout, &cerr);
     cat = new catalogue();
     MEM_OUT;
     build();
@@ -69,7 +70,7 @@ int main()
 
 static void build()
 {
-    int fd;
+    S_I fd;
     char phrase[] = "bonjour les amis il fait chaud il fait beau !";
     struct sockaddr_un name;
     name.sun_family = AF_UNIX;

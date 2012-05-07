@@ -1,0 +1,9 @@
+	ui_printf("\n");
+	ui_printf("options:\n");
+	ui_printf("   -i <named pipe> use the given pipe instead of standard input to read orders\n");
+	ui_printf("\t\t   from dar\n");
+	ui_printf("   -o <named pipe> use the given pipe instead of standard output to write data\n");
+	ui_printf("\t\t   to dar\n");
+	ui_printf("   -E <string>\t   command line to execute between slices of the archive\n");
+	ui_printf("\n");
+	ui_printf("See man page for more details.\n");

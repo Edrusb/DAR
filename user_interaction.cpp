@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.cpp,v 1.31 2002/06/26 22:04:13 denis Rel $
+// $Id: user_interaction.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,13 +30,15 @@
 #include <fcntl.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdio.h>
 #include "user_interaction.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
+#include "integers.hpp"
 
 using namespace std;
 
-static int input = -1;
+static S_I input = -1;
 static ostream *output = NULL;
 static ostream *inter = NULL;
 static bool beep = false;
@@ -46,14 +48,11 @@ static bool has_terminal = false;
 
 static void set_term_mod(const struct termio & etat);
 
-void user_interaction_init(int input_filedesc, ostream *out, ostream *interact)
+void user_interaction_init(ostream *out, ostream *interact)
 {
-    struct termio term;
     has_terminal = false;
 
-    if(input_filedesc < 0)
-	throw SRC_BUG;
-
+	// checking and recording parameters to static variable
     if(out != NULL)
 	output = out;
     else 
@@ -62,27 +61,48 @@ void user_interaction_init(int input_filedesc, ostream *out, ostream *interact)
 	inter = interact;
     else
 	throw SRC_BUG;
-    
-	// preparing input for swaping between char mode and line mode (terminal settings)
-    if(ioctl(input_filedesc, TCGETA, &term) >= 0)
-    {
-	initial = term;
-	term.c_lflag &= ~ICANON;
-	term.c_lflag &= ~ECHO;
-	term.c_lflag &= ~ECHOE;
-	interaction = term;
-	if(input < 0)
-	    close(input);
-	input = input_filedesc;
 
-	    // checking now that we can change to character mode
-	set_term_mod(interaction);
-	set_term_mod(initial);
-	    // but we don't need it right now, so swapping back to line mode
-	has_terminal = true;
+	// looking for an input terminal
+	//
+	// we do not use anymore standart input but open a new descriptor 
+	// from the controlling terminal. This allow in some case to use
+	// standart input for piping data while keeping user interaction
+	// possible.
+    
+    if(input < 0)
+	close(input);
+
+    char *tty = ctermid(NULL);
+    if(tty == NULL)
+	user_interaction_warning("No terminal found for user interaction. All questions will abort the program.");
+    else // no filesystem path to tty
+    {
+	struct termio term;
+	
+	input = open(tty, O_RDONLY);
+	if(input < 0)
+	    user_interaction_warning("No terminal found for user interaction. All questions will abort the program.");
+	else
+	{
+		// preparing input for swaping between char mode and line mode (terminal settings)
+	    if(ioctl(input, TCGETA, &term) >= 0)
+	    {
+		initial = term;
+		term.c_lflag &= ~ICANON;
+		term.c_lflag &= ~ECHO;
+		term.c_lflag &= ~ECHOE;
+		interaction = term;
+		
+		    // checking now that we can change to character mode
+		set_term_mod(interaction); 
+		set_term_mod(initial);
+		    // but we don't need it right now, so swapping back to line mode
+		has_terminal = true;
+	    }
+	    else // failed to retrieve parameters from tty
+		user_interaction_warning("No terminal found for user interaction. All questions will abort the program.");
+	}
     }
-    else
-        user_interaction_warning("No terminal found for user interaction. All questions will abort the program.");
 }
 
 void user_interaction_change_non_interactive_output(ostream *out)
@@ -107,7 +127,7 @@ void user_interaction_close()
 
 void user_interaction_pause(string message)
 {
-    const int bufsize = 1024;
+    const S_I bufsize = 1024;
     char buffer[bufsize];
     char & a = buffer[0];
 
@@ -169,7 +189,7 @@ void user_interaction_set_beep(bool mode)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: user_interaction.cpp,v 1.31 2002/06/26 22:04:13 denis Rel $";
+    static char id[]="$Id: user_interaction.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -177,7 +197,7 @@ void ui_printf(char *format, ...)
 {
     va_list ap;
     bool end;
-    unsigned long taille = strlen(format)+1;
+    U_32 taille = strlen(format)+1;
     char *copie;
     
     if(output == NULL)
@@ -216,13 +236,13 @@ void ui_printf(char *format, ...)
 		    *output << "%";
 		    break;
 		case 'd':
-		    *output << va_arg(ap, int);
+		    *output << va_arg(ap, S_I);
 		    break;
 		case 's':
 		    *output << va_arg(ap, char *);
 		    break;
 		case 'c':
-		    *output << static_cast<char>(va_arg(ap, int));
+		    *output << static_cast<char>(va_arg(ap, S_I));
 		    break;
 		default:
 		    throw Efeature(string("%") + (*ptr) + " is not implemented in ui_printf format argument");

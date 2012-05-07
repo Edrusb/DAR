@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.hpp,v 1.15 2002/05/28 20:17:29 denis Rel $
+// $Id: compressor.hpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,6 +29,7 @@
 
 #include <zlib.h>
 #include "generic_file.hpp"
+#include "integers.hpp"
 
 enum compression { none = 'n', zip = 'p', gzip = 'z', bzip2 = 'y' };
 
@@ -53,45 +54,47 @@ public :
 	// if not called, furthur read return EOF
     void clean_read(); // discard any byte buffered and not yet returned by read()
     void clean_write(); // discard any byte buffered and not yet wrote to compressed_side;
+
+    compression get_algo() const;
+    void change_algo(compression new_algo);
     
 	// inherited from generic file	 
-    bool skip(infinint position) { flush_write(); flush_read(); clean_read(); return compressed->skip(position); };
+    bool skip(const infinint & position) { flush_write(); flush_read(); clean_read(); return compressed->skip(position); };
     bool skip_to_eof()  { flush_write(); flush_read(); clean_read(); return compressed->skip_to_eof(); };
-    bool skip_relative(signed int x) { flush_write(); flush_read(); clean_read(); return compressed->skip_relative(x); };
+    bool skip_relative(S_I x) { flush_write(); flush_read(); clean_read(); return compressed->skip_relative(x); };
     infinint get_position() { return compressed->get_position(); };
 
 protected :
-    int inherited_read(char *a, size_t size) { return (this->*read_ptr)(a, size); };
-    int inherited_write(char *a, size_t size) { return (this->*write_ptr)(a, size); };
+    S_I inherited_read(char *a, size_t size) { return (this->*read_ptr)(a, size); };
+    S_I inherited_write(char *a, size_t size) { return (this->*write_ptr)(a, size); };
 
 private :
     struct xfer 
     {
 	z_streamp strm;
 	char *buffer;
-	unsigned int size;
+	U_I size;
 
-	xfer(unsigned int sz);
+	xfer(U_I sz);
 	~xfer();
     };
     
     xfer *compr, *decompr;
     generic_file *compressed;
-    int tube[2];
     bool compressed_owner;
 
     void init(compression algo, generic_file *compressed_side);
-    int (compressor::*read_ptr) (char *a, size_t size);
-    int none_read(char *a, size_t size);
-    int gzip_read(char *a, size_t size);
-	// int zip_read(char *a, size_t size);
-	// int bzip2_read(char *a, size_t size);
+    S_I (compressor::*read_ptr) (char *a, size_t size);
+    S_I none_read(char *a, size_t size);
+    S_I gzip_read(char *a, size_t size);
+	// S_I zip_read(char *a, size_t size);
+	// S_I bzip2_read(char *a, size_t size);
     
-    int (compressor::*write_ptr) (char *a, size_t size);
-    int none_write(char *a, size_t size);
-    int gzip_write(char *a, size_t size);
-	// int zip_write(char *a, size_t size);
-	// int bzip2_write(char *a, size_t size);
+    S_I (compressor::*write_ptr) (char *a, size_t size);
+    S_I none_write(char *a, size_t size);
+    S_I gzip_write(char *a, size_t size);
+	// S_I zip_write(char *a, size_t size);
+	// S_I bzip2_write(char *a, size_t size);
 };
 
 #endif

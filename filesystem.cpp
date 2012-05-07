@@ -18,12 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.49 2002/06/18 21:16:06 denis Rel $
+// $Id: filesystem.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
 #include <errno.h>
-#include <dirent.h>
 #include <utime.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -31,7 +30,6 @@
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <list>
 #include <map>
 #include <ctype.h>
 #include "tools.hpp"
@@ -40,47 +38,21 @@
 #include "user_interaction.hpp"
 #include "catalogue.hpp"
 #include "ea_filesystem.hpp"
+#include "etage.hpp"
 
 #ifndef UNIX_PATH_MAX
 #define UNIX_PATH_MAX 108
 #endif
 
-struct etage
+struct read_filename_struct
 {
-    etage() { fichier.clear(); };
-    etage(char *dirname)
-	{
-	    struct dirent *ret;
-	    DIR *tmp = opendir(dirname);
-
-	    if(tmp == NULL)
-		throw Erange("filesystem etage::etage" , strerror(errno));
-
-	    fichier.clear();
-	    while((ret = readdir(tmp)) != NULL)
-		if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0) 
-		    fichier.push_back(string(ret->d_name));
-	    closedir(tmp);
-	}
-    
-    bool read(string & ref)
-	{
-	    if(fichier.size() > 0)
-	    {
-		ref = fichier.front();
-		fichier.pop_front();
-		return true;
-	    }
-	    else 
-		return false;
-	}
-
-    list<string> fichier;
+    infinint last_acc;
+    infinint last_mod;
 };
 
 static vector<etage> read_pile;
 static path *read_current_dir = NULL;
-static infinint read_filename_degree = 0;
+static vector<read_filename_struct> read_filename_pile;
 static path *fs_root = NULL;
 static path *write_current_dir = NULL;
 static vector<directory> write_stack_dir;
@@ -94,9 +66,11 @@ static bool filesystem_ignore_ownership = false;
 static nomme *make_read_entree(path & lieu, const string & name, bool see_hard_link);
 static void make_file(const nomme * ref, const path & ou, bool dir_perm);
 static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm);
+static void make_date(const string & chemin, infinint access, infinint modif);
 static void supprime(const path & ref);
 static void attach_ea(const string &chemin, inode *ino);
 static void clear_corres_write(const infinint & ligne);
+static void set_back_dir_dates(const string & chem, const infinint & last_acc, const infinint & last_mod);
 
 ///////////////// structure and variable for hard links managment
 struct couple
@@ -176,7 +150,7 @@ void filesystem_freemem()
     write_stack_dir.clear();
     corres_read.clear();
     corres_write.clear();
-    read_filename_degree = 0;
+    read_filename_pile.clear();
 }
  
 void filesystem_reset_read()
@@ -188,14 +162,37 @@ void filesystem_reset_read()
     if(read_current_dir != NULL)
 	delete read_current_dir;
     read_current_dir = new path(*fs_root);
-    read_filename_degree = 0;
+    read_filename_pile.clear();
     if(read_current_dir == NULL)
 	throw Ememory("reset_read");
     read_pile.clear();
     tmp = tools_str2charptr(read_current_dir->display());
     try
     {
-	read_pile.push_back(etage(tmp));
+	entree *ref = make_read_entree(*read_current_dir, ".", true);
+	directory *ref_dir = dynamic_cast<directory *>(ref);
+	try
+	{
+	    read_pile.push_back(etage(tmp));
+	    if(ref_dir != NULL)
+	    {
+		read_filename_struct rfst;
+		
+		rfst.last_acc = read_pile.back().last_acc = ref_dir->get_last_access();
+		rfst.last_mod = read_pile.back().last_mod = ref_dir->get_last_modif();
+		read_filename_pile.push_back(rfst);
+	    }
+	    else
+		throw SRC_BUG;
+	}
+	catch(...)
+	{
+	    if(ref != NULL)
+		delete ref;
+	    throw;
+	}
+	if(ref != NULL)
+	    delete ref;
     }
     catch(...)
     {
@@ -219,7 +216,7 @@ bool filesystem_read(entree * & ref)
 
 	if(read_pile.size() == 0)
 	    return false; // end of filesystem reading
-	else
+	else // at least one directory to read
 	{
 	    etage & inner = read_pile.back();
 	    string name;
@@ -228,6 +225,7 @@ bool filesystem_read(entree * & ref)
 	    {
 		string tmp;
 		
+		set_back_dir_dates(read_current_dir->display(), inner.last_acc, inner.last_mod);
 		read_pile.pop_back();
 		if(read_pile.size() > 0)
 		{
@@ -238,54 +236,68 @@ bool filesystem_read(entree * & ref)
 		else
 		    return false; // end of filesystem
 	    }
-	    else
+	    else // could read a filename in directory
 	    {
-		ref = make_read_entree(*read_current_dir, name, true);
-
-		if(dynamic_cast<directory *>(ref) != NULL)
+		try
 		{
-		    char *ptr_name;
-		    *read_current_dir += name;
-		    ptr_name = tools_str2charptr(read_current_dir->display());
-		    
-		    try
+		    ref = make_read_entree(*read_current_dir, name, true);
+		    directory *ref_dir = dynamic_cast<directory *>(ref);
+			    
+		    if(ref_dir != NULL)
 		    {
-			read_pile.push_back(etage(ptr_name));
-		    }
-		    catch(Erange & e)
-		    {
-			string tmp;
+			char *ptr_name;
+
+			*read_current_dir += name;
+			ptr_name = tools_str2charptr(read_current_dir->display());
 			
-			user_interaction_warning(string("error openning ") + ptr_name + " : " + e.get_message());
 			try
 			{
-			    read_pile.push_back(etage());
+			    read_pile.push_back(etage(ptr_name));
+			    read_pile.back().last_acc = ref_dir->get_last_access();
+			    read_pile.back().last_mod = ref_dir->get_last_modif();
 			}
 			catch(Erange & e)
 			{
-			    delete ref;
-			    once_again = true;
-			    ref = NULL;
-			    if(! read_current_dir->pop(tmp))
-				throw SRC_BUG;
+			    string tmp;
+			    
+			    user_interaction_warning(string("error openning ") + ptr_name + " : " + e.get_message());
+			    try
+			    {
+				read_pile.push_back(etage());
+				read_pile.back().last_acc = 0;
+				read_pile.back().last_mod = 0;
+			    }
+			    catch(Erange & e)
+			    {
+				delete ref;
+				once_again = true;
+				ref = NULL;
+				if(! read_current_dir->pop(tmp))
+				    throw SRC_BUG;
+			    }
 			}
-		    }
-		    catch(Egeneric & e)
-		    {
+			catch(Egeneric & e)
+			{
+			    delete ptr_name;
+			    delete ref;
+			    throw;
+			}
+
 			delete ptr_name;
-			delete ref;
-			throw;
 		    }
-
-		    delete ptr_name;
+		    
+		    
+		    if(ref == NULL)
+			once_again = true;
+			// the file has been removed between the time
+			// the directory has been openned, and the time
+			// we try to read it, so we ignore it.
 		}
-		
-
-		if(ref == NULL)
+		catch(Erange & e)
+		{
+		    user_interaction_warning("error reading directory contents : " + e.get_message() + " . Ignoring file or directory");
 		    once_again = true;
-		    // the file has been removed between the time
-		    // the directory has been openned, and the time
-		    // we try to read it, so we ignore it.
+		}
 	    }
 	}
     }
@@ -304,7 +316,10 @@ void filesystem_skip_read_to_parent_dir()
     if(read_pile.size() == 0)
 	throw SRC_BUG;
     else
+    {
+	set_back_dir_dates(read_current_dir->display(), read_pile.back().last_acc, read_pile.back().last_mod);
 	read_pile.pop_back();
+    }
     
     if(! read_current_dir->pop(tmp))
 	throw SRC_BUG;
@@ -321,8 +336,12 @@ extern bool filesystem_read_filename(const string & name, nomme * &ref)
 	ref_dir = dynamic_cast<directory *>(ref);
 	if(ref_dir != NULL)
 	{
+	    read_filename_struct rfst;
+
+	    rfst.last_acc = ref_dir->get_last_access();
+	    rfst.last_mod = ref_dir->get_last_modif();
+	    read_filename_pile.push_back(rfst);
 	    *read_current_dir += ref_dir->get_name();
-	    read_filename_degree++;
 	}
 	return true;
     }
@@ -330,11 +349,12 @@ extern bool filesystem_read_filename(const string & name, nomme * &ref)
 
 extern void filesystem_skip_read_filename_in_parent_dir()
 {
-    if(read_filename_degree != 0)
+    if(read_filename_pile.size() > 0)
     {
 	string tmp;
+	set_back_dir_dates(read_current_dir->display(), read_filename_pile.back().last_acc, read_filename_pile.back().last_mod);
+	read_filename_pile.pop_back();
 	read_current_dir->pop(tmp);
-	read_filename_degree--;
     }
     else
 	throw SRC_BUG;
@@ -379,10 +399,10 @@ static nomme *make_read_entree(path & lieu, const string & name, bool see_hard_l
 	{ 
 	    if(S_ISLNK(buf.st_mode))
 	    {
-		const int buf_size = 4096;
+		const S_I buf_size = 4096;
 		char buffer[buf_size];
 		
-		int sz = readlink(ptr_name, buffer, buf_size);
+		S_I sz = readlink(ptr_name, buffer, buf_size);
 		if(sz < 0)
 		    throw Erange("filesystem_read", strerror(errno));
 		if(sz == buf_size)
@@ -842,7 +862,18 @@ bool filesystem_known_etiquette(const infinint & eti)
 {
     return corres_write.find(eti) != corres_write.end();
 }
+
+void filesystem_forget_etiquette(file_etiquette *obj)
+{
+    map<ino_t, couple>::iterator it = corres_read.begin();
     
+    while(it != corres_read.end() && it->second.obj != obj)
+	it++;
+
+    if(it != corres_read.end())
+	corres_read.erase(it);
+}
+
 static void supprime(const path & ref)
 {
     char *s = tools_str2charptr(ref.display());
@@ -880,7 +911,7 @@ static void supprime(const path & ref)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: filesystem.cpp,v 1.49 2002/06/18 21:16:06 denis Rel $";
+    static char id[]="$Id: filesystem.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -903,7 +934,7 @@ static void make_file(const nomme * ref, const path & ou, bool dir_perm)
 
     try
     {
-	int ret;
+	S_I ret;
 	
 	do
 	{
@@ -939,7 +970,7 @@ static void make_file(const nomme * ref, const path & ou, bool dir_perm)
 				    // to restore EA for other copies
 				break;
 			    case ENOENT:
-				if(ref_eti->get_inode()->get_saved_status())
+				if(ref_eti->get_inode()->get_saved_status() == s_saved)
 				{
 				    create_file = true;
 				    clear_corres_write(ref_eti->get_etiquette());
@@ -1030,7 +1061,7 @@ static void make_file(const nomme * ref, const path & ou, bool dir_perm)
 		ret = socket(PF_UNIX, SOCK_STREAM, 0);
 		if(ret >= 0)
 		{
-		    int sd = ret;
+		    S_I sd = ret;
 		    struct sockaddr_un addr;
 		    addr.sun_family = AF_UNIX;
 		    
@@ -1075,9 +1106,10 @@ static void make_file(const nomme * ref, const path & ou, bool dir_perm)
 
 static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm)
 {
-    char *name = tools_str2charptr((ou + ref.get_name()).display());
+    string chem = (ou + ref.get_name()).display();
+    char *name = tools_str2charptr(chem);
     const lien *ref_lie = dynamic_cast<const lien *>(&ref);
-    int permission;
+    S_I permission;
 
     if(dynamic_cast<const directory *>(&ref) != NULL && !dir_perm)
 	permission = 0777;
@@ -1087,7 +1119,7 @@ static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm)
     try
     {
 	if(!filesystem_ignore_ownership)
-	    if(ref.get_saved_status())
+	    if(ref.get_saved_status() == s_saved)
 		if(lchown(name, ref.get_uid(), ref.get_gid()) < 0)
 		    user_interaction_warning(string(name) + string(" could not restore original ownership of file : ") + strerror(errno));
 	
@@ -1104,17 +1136,9 @@ static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm)
 		// else (the inode is a symlink), we simply ignore this error
 	}
 	
-	struct utimbuf temps;
-	unsigned long tmp = 0;
-	ref.get_last_access().unstack(tmp);
-	temps.actime = tmp;
-	tmp = 0;
-	ref.get_last_modif().unstack(tmp);
-	temps.modtime = tmp;
+	if(ref_lie == NULL) // not restoring atime & ctime for symbolic links	
+	    make_date(chem, ref.get_last_access(), ref.get_last_modif());
 
-	if(ref_lie == NULL) // not restoring atime & ctime for symbolic links
-	    if(utime(name, &temps) < 0)
-		Erange("make_owner_perm (date&time)", strerror(errno));	
     }
     catch(...)
     {
@@ -1122,6 +1146,32 @@ static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm)
 	throw;
     }
     delete name;
+}
+
+static void make_date(const string & chemin, infinint access, infinint modif)
+{
+    struct utimbuf temps;
+    time_t tmp = 0;
+    char *filename;
+    
+    access.unstack(tmp);
+    temps.actime = tmp;
+    tmp = 0;
+    modif.unstack(tmp);
+    temps.modtime = tmp;
+    
+    filename = tools_str2charptr(chemin);
+    try
+    {
+	if(utime(filename , &temps) < 0)
+	    Erange("make_date", strerror(errno));
+    }
+    catch(...)
+    {
+	delete filename;
+	throw;
+    }
+    delete filename;
 }
 
 static void attach_ea(const string &chemin, inode *ino)
@@ -1160,3 +1210,21 @@ static void clear_corres_write(const infinint & ligne)
     if(it != corres_write.end())
 	corres_write.erase(it);
 }
+
+
+static void set_back_dir_dates(const string & chem, const infinint & last_acc, const infinint & last_mod)
+{
+    try
+    {
+	if(last_acc != 0 || last_mod != 0)
+	    make_date(chem, last_acc, last_mod);
+	    // else the directory could not be openned properly
+	    // and time could not be retrieved, so we don't try
+	    // to restore them
+    }
+    catch(Erange & e)
+    {
+	    // cannot restore dates, ignoring
+    }
+}
+

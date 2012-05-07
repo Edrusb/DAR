@@ -18,13 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.8 2002/06/26 22:20:20 denis Rel $
+// $Id: dar_slave.cpp,v 1.5 2002/10/31 21:02:35 edrusb Rel $
 //
 /*********************************************************************/
 //
 #include <string>
 #include <string.h>
 #include <iostream.h>
+#include <getopt.h>
 #include "user_interaction.hpp"
 #include "zapette.hpp"
 #include "sar.hpp"
@@ -33,34 +34,40 @@
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "dar_suite.hpp"
+#include "integers.hpp"
 
-#define DAR_SLAVE_VERSION "1.0.0"
+#define DAR_SLAVE_VERSION "1.1.0"
 
-static bool command_line(int argc, char *argv[], path * &chemin, string & filename, string &input_pipe, string &output_pipe);
+static bool command_line(S_I argc, char *argv[], path * &chemin, string & filename, 
+			 string &input_pipe, string &output_pipe, string & execute);
 static void show_usage(const char *command);
 static void show_version(const char *command);
-static int little_main(int argc, char *argv[]);
+static S_I little_main(S_I argc, char *argv[]);
 
-int main(int argc, char *argv[])
+S_I main(S_I argc, char *argv[])
 {
     return dar_suite_global(argc, argv, &little_main);
 }
 
-static int little_main(int argc, char *argv[])
+static S_I little_main(S_I argc, char *argv[])
 {
     path *chemin = NULL;
     string filename;
     string input_pipe;
     string output_pipe;
+    string execute;
 
-    if(command_line(argc, argv, chemin, filename, input_pipe, output_pipe))
+    if(command_line(argc, argv, chemin, filename, input_pipe, output_pipe, execute))
     {
 	tuyau *input = NULL;
 	tuyau *output = NULL;
 	sar *source = NULL;
 	try
 	{
-	    source = new sar(filename, EXTENSION, SAR_OPT_DONT_ERASE, *chemin);
+	    source = new sar(filename, EXTENSION, SAR_OPT_DONT_ERASE, *chemin, execute);
+	    if(source == NULL)
+		throw Ememory("little_main");
+
 	    tools_open_pipes(input_pipe, output_pipe, input, output);
 
 	    slave_zapette zap = slave_zapette(input, output, source);
@@ -102,9 +109,11 @@ static int little_main(int argc, char *argv[])
 	return EXIT_SYNTAX;
 }
 
-static bool command_line(int argc,char *argv[], path * &chemin, string & filename, string &input_pipe, string &output_pipe)
+static bool command_line(S_I argc,char *argv[], path * &chemin, string & filename, 
+			 string &input_pipe, string &output_pipe, string & execute)
 {
-    int lu;
+    S_I lu;
+    execute = "";
 
     if(argc < 1)
     {
@@ -112,7 +121,7 @@ static bool command_line(int argc,char *argv[], path * &chemin, string & filenam
 	return false;
     }
 
-    while((lu = getopt(argc, argv, "i:o:hV")) != EOF)
+    while((lu = getopt(argc, argv, "i:o:hVE:")) != EOF)
     {
 	switch(lu)
 	{
@@ -138,6 +147,14 @@ static bool command_line(int argc,char *argv[], path * &chemin, string & filenam
 	case 'V':
 	    show_version(argv[0]);
 	    return false;
+	case 'E':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -E");
+	    if(execute == "")
+		execute = optarg;
+	    else
+		user_interaction_warning("only one -E option is allowed, ignoring other instances");
+	    break;
 	case ':':
 	    throw Erange("get_args", string("missing parameter to option ") + char(optopt));
 	case '?':
@@ -166,7 +183,7 @@ static bool command_line(int argc,char *argv[], path * &chemin, string & filenam
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_slave.cpp,v 1.8 2002/06/26 22:20:20 denis Rel $";
+    static char id[]="$Id: dar_slave.cpp,v 1.5 2002/10/31 21:02:35 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -177,12 +194,13 @@ static void show_usage(const char *command)
     char *cmd = tools_extract_basename(command);
     try
     {
+	out << endl;
 	out << "usage : " << endl;
-	out << "  " << cmd << " [<path>/]basename > named_pipe1 < named_pipe2" << endl;
-	out << "  command1 | " << cmd << " [<path>/]basename | command2" << endl;
-	out  << "  " << cmd << "[-i input_named_pipe] [-o output_named_pipe] [<path>/]basename" << endl;
+	out << "  command1 | " << cmd << " [options] [<path>/]basename | command2" << endl;
+	out  << "  " << cmd << "[options] [-i input_pipe] [-o output_pipe] [<path>/]basename" << endl;
 	out << "  " << cmd << " -h" << endl;
-	out << "  " << cmd << " -V" << endl;
+	out << "  " << cmd << " -V" << endl << endl;
+#include "dar_slave.usage"
     }
     catch(...)
     {

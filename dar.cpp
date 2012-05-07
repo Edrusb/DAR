@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar.cpp,v 1.71 2002/06/27 17:42:35 denis Rel $
+// $Id: dar.cpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -48,62 +48,66 @@
 #include "zapette.hpp"
 #include "tuyau.hpp"
 #include "filesystem.hpp"
+#include "scrambler.hpp"
+#include "macro_tools.hpp"
+#include "integers.hpp"
 
 using namespace std;
-
-const version supported_version = "02";
 
 static void op_create(const operation op, const path &fs_root, const path &sauv_path, 
 		      const path *ref_path,
 		      const mask &selection, const mask &subtree, 
 		      const string &filename, string *ref_filename,
-
 		      bool allow_over, bool warn_over, bool info_details, 
 		      bool pause, bool empty_dir, compression algo, 
 		      const infinint &file_size, 
 		      const infinint &first_file_size,
-		      int argc, char *argv[],
+		      S_I argc, char *argv[],
 		      bool root_ea, bool user_ea,
-		      const string &input_pipe, const string &output_pipe);
+		      const string &input_pipe, const string &output_pipe,
+		      const string & execute, const string & execute_ref,
+		      const string & pass, const string & pass_ref,
+		      const mask &compr_mask);
 static void op_extract(const path &fs_root, const path &sauv_path,
 		       const mask &selection, const mask &subtree, 
 		       const string &filename, bool allow_over, bool warn_over, 
 		       bool info_details, bool detruire,
 		       bool only_more_recent, bool restore_ea_root, 
 		       bool restore_ea_user,
-		       const string &input_pipe, const string &output_pipe);
+		       const string &input_pipe, const string &output_pipe,
+		       const string & execute,
+		       const string & pass);
 static void op_diff(const path & fs_root, const path &sauv_path,
 		    const mask &selection, const mask &subtree,
 		    const string &filename, bool info_details,
 		    bool check_ea_root, bool check_ea_user,
-		    const string &input_pipe, const string &output_pipe);
+		    const string &input_pipe, const string &output_pipe,
+		    const string & execute,
+		    const string & pass);
 static void op_listing(const path &sauv_path, const string &filename, 
-		       bool info_details,
-		       const string &input_pipe, const string &output_pipe);
+		       bool info_details, bool tar_format,
+		       const string &input_pipe, const string &output_pipe,
+		       const string & execute,
+		       const string & pass);
 static void op_test(const path &sauv_path, const mask &selection, 
 		    const mask &subtree, const string &filename, 
 		    bool info_details,
-		    const string &input_pipe, const string &output_pipe);
-static catalogue *get_catalogue_from(generic_file & decoupe, compressor &zip, bool info_details, infinint &cat_size);
-static void open_archive(const path &sauv_path, const string &basename, 
-			 const string &extension, int options, 
-			 generic_file *&ret1, compressor *&ret2, 
-			 header_version &ver, const string &input_pipe, 
-			 const string &output_pipe);
-static string make_string_from(int argc, char *argv[]);
+		    const string &input_pipe, const string &output_pipe,
+		    const string & execute,
+		    const string & pass);
+static string make_string_from(S_I argc, char *argv[]);
 static void display_sauv_stat(const statistics & st);
 static void display_rest_stat(const statistics & st);
 static void display_diff_stat(const statistics &st);
 static void display_test_stat(const statistics & st);
-static void version_check(const header_version & ver);
-static int little_main(int argc, char *argv[]);
+static S_I little_main(S_I argc, char *argv[]);
 
-int main(int argc, char *argv[])
+S_I main(S_I argc, char *argv[])
 {
     return dar_suite_global(argc, argv, &little_main);
 }
 
-static int little_main(int argc, char *argv[])
+static S_I little_main(S_I argc, char *argv[])
 {
     operation op;
     path *fs_root;
@@ -111,12 +115,15 @@ static int little_main(int argc, char *argv[])
     path *ref_root;
     infinint file_size;
     infinint first_file_size;
-    mask *selection, *subtree;
+    mask *selection, *subtree, *compr_mask;
     string filename, *ref_filename;
     bool allow_over, warn_over, info_details, detruire, pause, beep, empty_dir, only_more_recent, ea_user, ea_root;
     compression algo;
     string input_pipe, output_pipe;
     bool ignore_owner;
+    string execute, execute_ref;
+    string pass;
+    string pass_ref;
     
     if(! get_args(argc, argv, op, fs_root, sauv_root, ref_root,
 		  file_size, first_file_size, selection, 
@@ -125,10 +132,15 @@ static int little_main(int argc, char *argv[])
 		  pause, beep, empty_dir, only_more_recent, 
 		  ea_root, ea_user,
 		  input_pipe, output_pipe, 
-		  ignore_owner))
+		  ignore_owner,
+		  execute, execute_ref,
+		  pass, pass_ref,
+		  compr_mask))
 	return EXIT_SYNTAX;
     else
     {
+	MEM_IN;
+
 	user_interaction_set_beep(beep);
 	inode::set_ignore_owner(ignore_owner);
 	filesystem_ignore_owner(ignore_owner);
@@ -146,20 +158,26 @@ static int little_main(int argc, char *argv[])
 	    case isolate:
 		op_create(op, *fs_root, *sauv_root, ref_root, *selection, *subtree, filename, ref_filename, 
 			  allow_over, warn_over, info_details, pause, empty_dir, algo, file_size, 
-			  first_file_size, argc, argv, ea_root, ea_user, input_pipe, output_pipe);
+			  first_file_size, argc, argv, ea_root, ea_user, input_pipe, output_pipe,
+			  execute, execute_ref, pass, pass_ref, *compr_mask);
 		break;
 	    case extract:
 		op_extract(*fs_root, *sauv_root, *selection, *subtree, filename, allow_over, warn_over,
-			   info_details, detruire, only_more_recent, ea_root, ea_user, input_pipe, output_pipe);
+			   info_details, detruire, only_more_recent, ea_root, ea_user, input_pipe, output_pipe,
+			   execute, pass);
 		break;
 	    case diff:
-		op_diff(*fs_root, *sauv_root, *selection, *subtree, filename, info_details, ea_root, ea_user, input_pipe, output_pipe);
+		op_diff(*fs_root, *sauv_root, *selection, *subtree, filename, info_details, ea_root, ea_user, 
+			input_pipe, output_pipe, execute, pass);
 		break;
 	    case test:
-		op_test(*sauv_root, *selection, *subtree, filename, info_details, input_pipe, output_pipe);
+		op_test(*sauv_root, *selection, *subtree, filename, info_details, input_pipe, output_pipe,
+			execute, pass);
 		break;
 	    case listing:
-		op_listing(*sauv_root, filename, info_details, input_pipe, output_pipe);
+		op_listing(*sauv_root, filename, info_details, only_more_recent, input_pipe, output_pipe,
+			   execute, pass);
+		    // only_more_recent is set to true when listing and -T (--tar-format) is asked
 		break;
 	    default:
 		throw SRC_BUG;
@@ -179,6 +197,8 @@ static int little_main(int argc, char *argv[])
 		delete ref_root;
 	    if(ref_filename != NULL)
 		delete ref_filename;
+	    if(compr_mask != NULL)
+		delete compr_mask;
 	    throw;
 	}
 	if(fs_root != NULL)
@@ -193,7 +213,10 @@ static int little_main(int argc, char *argv[])
 	    delete ref_root;
 	if(ref_filename != NULL)
 	    delete ref_filename;
+	if(compr_mask != NULL)
+	    delete compr_mask;
 
+	MEM_OUT;
 	return EXIT_OK;
     }
 }
@@ -205,8 +228,11 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 		      bool empty_dir,
 		      compression algo, const infinint &file_size, 
 		      const infinint &first_file_size, 
-		      int argc, char *argv[], bool root_ea, bool user_ea,
-		      const string &input_pipe, const string &output_pipe)
+		      S_I argc, char *argv[], bool root_ea, bool user_ea,
+		      const string &input_pipe, const string &output_pipe,
+		      const string & execute, const string & execute_ref,
+		      const string & pass, const string & pass_ref,
+		      const mask &compr_mask)
 {
     MEM_IN;
     try
@@ -216,7 +242,9 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 	catalogue *ref = NULL;
 	generic_file *decoupe = NULL;
 	compressor *zip = NULL;
-	int sar_opt = 0;
+	scrambler *scram = NULL;
+	S_I sar_opt = 0;
+	generic_file *zip_base = NULL;
 
 	if(op == create && sauv_path.is_subdir_of(fs_root)
 	   && selection.is_covered(filename+".1."+EXTENSION)
@@ -226,26 +254,35 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 	    // building the reference catalogue
 	if(ref_filename != NULL) // from a existing archive
 	{
-	    generic_file *tmp;
+	    generic_file *tmp = NULL;
+	    scrambler *scram_ref = NULL;
 	    header_version v;
 
 	    if(ref_path == NULL)
 		throw SRC_BUG; // ref_filename != NULL but ref_path == NULL;
-	    open_archive(*ref_path, *ref_filename, EXTENSION, SAR_OPT_DONT_ERASE, tmp, zip, v, input_pipe, output_pipe);
 	    try
 	    {
 		infinint tmp2;
 
-		ref = get_catalogue_from(*tmp, *zip, info_details, tmp2);
+		macro_tools_open_archive(*ref_path, *ref_filename, EXTENSION, SAR_OPT_DONT_ERASE, pass_ref, tmp, scram_ref, zip, v, input_pipe, output_pipe, execute_ref);
+		ref = macro_tools_get_catalogue_from(*tmp, *zip, info_details, tmp2);
 	    }
 	    catch(...)
 	    {
-		delete zip;
-		delete tmp;
+		if(zip != NULL)
+		    delete zip;
+		if(scram_ref != NULL)
+		    delete scram_ref;
+		if(tmp != NULL)
+		    delete tmp;
 		throw;
 	    }
-	    delete zip;
-	    delete tmp;
+	    if(zip != NULL)
+		delete zip;
+	    if(scram_ref != NULL)
+		delete scram_ref;
+	    if(tmp != NULL)
+		delete tmp;
 	    zip = NULL;
 	}
 	else // building reference catalogue from scratch (empty catalogue)
@@ -279,11 +316,12 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 		else
 		    decoupe = sar_tools_open_archive_fichier((sauv_path + sar_make_filename(filename, 1, EXTENSION)).display(), allow_over, warn_over);
 	    else
-		decoupe = new sar(filename, EXTENSION, file_size, first_file_size, sar_opt, sauv_path);
+		decoupe = new sar(filename, EXTENSION, file_size, first_file_size, sar_opt, sauv_path, execute);
+		
 	    if(decoupe == NULL)
 		throw Ememory("op_create");
 
-	    version_copy(ver.edition, supported_version);
+	    version_copy(ver.edition, macro_tools_supported_version);
 	    ver.algo_zip = compression2char(algo);
 	    ver.cmd_line = make_string_from(argc-1, argv+1); // argv[0] is the command itself, we don't need it (where from `+1')
 	    ver.flag = 0;
@@ -291,18 +329,31 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 		ver.flag |= VERSION_FLAG_SAVED_EA_ROOT;
 	    if(user_ea)
 		ver.flag |= VERSION_FLAG_SAVED_EA_USER;
+	    if(pass != "")
+		ver.flag |= VERSION_FLAG_SCRAMBLED;
 	    ver.write(*decoupe);
-	    
-	    zip = new compressor(algo, *decoupe);
+
+	    if(pass != "")
+	    {
+		scram = new scrambler(pass, *decoupe);
+		if(scram == NULL)
+		    throw Ememory("op_create");
+		zip_base = scram;
+	    }
+	    else
+		zip_base = decoupe;
+
+
+	    zip = new compressor(algo, *zip_base);
 	    if(zip == NULL)
 		throw Ememory("op_create");
 	    switch(op)
 	    {
 	    case create:
-		filtre_sauvegarde(selection, subtree, zip, current, *ref, fs_root, info_details, st, empty_dir, root_ea, user_ea);
+		filtre_sauvegarde(selection, subtree, zip, current, *ref, fs_root, info_details, st, empty_dir, root_ea, user_ea, compr_mask);
 		break;
 	    case isolate:
-		st.clear(); // used for Edata diagnostics
+		st.clear(); // used for not to have Edata exception thrown at the final checkpoint
 		filtre_isolate(current, *ref, info_details);
 		break;
 	    default:
@@ -318,7 +369,7 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 	    }
 
 		// making some place in memory
-	    if(ref != NULL)
+	    if(ref != NULL) 
 	    {
 		delete ref;
 		ref = NULL;
@@ -330,11 +381,18 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 	    zip->flush_write();
 	    delete zip; 
 	    zip = NULL;
+	    if(scram != NULL)
+	    {
+		delete scram;
+		scram = NULL;
+	    }
 	    coord.dump(*decoupe);
 	    delete decoupe;
 	    decoupe = NULL;
 	    if(op == create)
 		display_sauv_stat(st);
+
+		// final checkpoint:
 	    if(st.errored > 0) // st is not used for isolation
 		throw Edata("some file could not be saved");
 	}
@@ -347,12 +405,12 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 		zip->clean_write();
 		delete zip;
 	    }
+	    if(scram != NULL)
+		delete scram;
 	    if(decoupe != NULL)
 		delete decoupe;
 	    throw;
 	}
-	if(ref != NULL)
-	    delete ref;
     }
     catch(Erange &e)
     {
@@ -369,24 +427,28 @@ static void op_extract(const path &fs_root, const path &sauv_path,
 		       bool info_details,  bool detruire, 
 		       bool only_more_recent, bool restore_ea_root, 
 		       bool restore_ea_user,
-		       const string &input_pipe, const string &output_pipe)
+		       const string &input_pipe, const string &output_pipe,
+		       const string & execute,
+		       const string & pass)
 {
     try
     {
-	generic_file *decoupe;
-	compressor *zip;
+	generic_file *decoupe = NULL;
+	compressor *zip = NULL;
+	scrambler *scram = NULL;
 	header_version ver;
 
-	open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver, input_pipe, output_pipe);
-	if((ver.flag & VERSION_FLAG_SAVED_EA_ROOT) == 0)
-	    restore_ea_root = false; // not restoring something not saved
-	if((ver.flag & VERSION_FLAG_SAVED_EA_USER) == 0)
-	    restore_ea_user = false; // not restoring something not saved
 	try
 	{
 	    infinint tmp;
 
-	    catalogue *cat = get_catalogue_from(*decoupe, *zip, info_details, tmp);
+	    macro_tools_open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, pass, decoupe, scram, zip, ver, input_pipe, output_pipe, execute);
+	    if((ver.flag & VERSION_FLAG_SAVED_EA_ROOT) == 0)
+		restore_ea_root = false; // not restoring something not saved
+	    if((ver.flag & VERSION_FLAG_SAVED_EA_USER) == 0)
+		restore_ea_user = false; // not restoring something not saved
+	    
+	    catalogue *cat = macro_tools_get_catalogue_from(*decoupe, *zip, info_details, tmp);
 	    try
 	    {
 		statistics st;
@@ -409,12 +471,20 @@ static void op_extract(const path &fs_root, const path &sauv_path,
 	}
 	catch(...)
 	{
-	    delete zip;
-	    delete decoupe;
+	    if(zip != NULL)
+		delete zip;	    
+	    if(scram != NULL)
+		delete scram;
+	    if(decoupe != NULL)
+		delete decoupe;
 	    throw;
 	}
-	delete zip;
-	delete decoupe;
+	if(zip != NULL)
+	    delete zip;	    
+	if(scram != NULL)
+	    delete scram;
+	if(decoupe != NULL)
+	    delete decoupe;
     }
     catch(Erange &e)
     {
@@ -425,22 +495,26 @@ static void op_extract(const path &fs_root, const path &sauv_path,
 }
 
 static void op_listing(const path &sauv_path, const string &filename, 
-		       bool info_details,		       
-		       const string &input_pipe, const string &output_pipe)
+		       bool info_details, bool tar_format,  
+		       const string &input_pipe, const string &output_pipe,
+		       const string & execute,
+		       const string & pass)
 {
     try
     {
-	generic_file *decoupe;
-	compressor *zip;
+	generic_file *decoupe = NULL;
+	compressor *zip = NULL;
+	scrambler *scram = NULL;
 	header_version ver;
 
 	MEM_IN;	
-	open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver, input_pipe, output_pipe);
 	try
 	{
 	    infinint cat_size;
+
+	    macro_tools_open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, pass, decoupe, scram, zip, ver, input_pipe, output_pipe, execute);
  
-	    catalogue *cat = get_catalogue_from(*decoupe, *zip, info_details, cat_size);
+	    catalogue *cat = macro_tools_get_catalogue_from(*decoupe, *zip, info_details, cat_size);
 	    try
 	    {
 		if(info_details)
@@ -452,6 +526,7 @@ static void op_listing(const path &sauv_path, const string &filename,
 		    
 		    user_interaction_stream() << "Archive version format               : " << ver.edition << endl;
 		    user_interaction_stream() << "Compression algorithm used           : " << compression2string(char2compression(ver.algo_zip)) << endl;
+		    user_interaction_stream() << "Scrambling                           : " << ((ver.flag & VERSION_FLAG_SCRAMBLED) != 0 ? "yes" : "no") << endl;
 		    user_interaction_stream() << "Catalogue size in archive            : " << deci(cat_size).human() << " bytes" << endl;
 		    user_interaction_stream() << "Command line options used for backup : " << ver.cmd_line << endl;
 		    
@@ -489,7 +564,10 @@ static void op_listing(const path &sauv_path, const string &filename,
 		    stats.listing(user_interaction_stream());
 		    user_interaction_pause("Continue listing archive contents?");
 		}
-		cat->listing(user_interaction_stream());
+		if(tar_format)
+		    cat->tar_listing(user_interaction_stream());
+		else
+		    cat->listing(user_interaction_stream());
 	    }
 	    catch(...)
 	    {
@@ -500,12 +578,20 @@ static void op_listing(const path &sauv_path, const string &filename,
 	}
 	catch(...)
 	{
-	    delete zip;
-	    delete decoupe;
+	    if(zip != NULL)
+		delete zip;
+	    if(scram != NULL)
+		delete scram;
+	    if(decoupe != NULL)
+		delete decoupe;
 	    throw;
 	}
-	delete zip;
-	delete decoupe;
+	if(zip != NULL)
+	    delete zip;
+	if(scram != NULL)
+	    delete scram;
+	if(decoupe != NULL)
+	    delete decoupe;
 	MEM_OUT;
     }
     catch(Erange &e)
@@ -520,12 +606,15 @@ static void op_diff(const path & fs_root, const path &sauv_path,
 		    const mask &selection, const mask &subtree,
 		    const string &filename, bool info_details,
 		    bool check_ea_root, bool check_ea_user,
-		    const string &input_pipe, const string &output_pipe)
+		    const string &input_pipe, const string &output_pipe,
+		    const string & execute,
+		    const string & pass)
 {
     MEM_IN;
     try
     {
 	generic_file *decoupe = NULL;
+	scrambler *scram = NULL;
 	compressor *zip = NULL;
 	header_version ver;
 	catalogue *cat = NULL;
@@ -535,8 +624,8 @@ static void op_diff(const path & fs_root, const path &sauv_path,
 	    infinint cat_size;
 	    statistics st;
 	    
-	    open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver, input_pipe, output_pipe);
-	    cat = get_catalogue_from(*decoupe, *zip, info_details, cat_size);
+	    macro_tools_open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, pass, decoupe, scram, zip, ver, input_pipe, output_pipe, execute);
+	    cat = macro_tools_get_catalogue_from(*decoupe, *zip, info_details, cat_size);
 	    filtre_difference(selection, subtree, *cat, fs_root, info_details, st, check_ea_root, check_ea_user);
 	    display_diff_stat(st);
 	    if(st.errored > 0 || st.deleted > 0)
@@ -548,6 +637,8 @@ static void op_diff(const path & fs_root, const path &sauv_path,
 		delete cat;
 	    if(zip != NULL)
 		delete zip;
+	    if(scram != NULL)
+		delete scram;
 	    if(decoupe != NULL)
 		delete decoupe;
 	    throw;
@@ -556,6 +647,8 @@ static void op_diff(const path & fs_root, const path &sauv_path,
 	    delete cat;
 	if(zip != NULL)
 	    delete zip;
+	if(scram != NULL)
+	    delete scram;
 	if(decoupe != NULL)
 	    delete decoupe;
     }
@@ -572,12 +665,15 @@ static void op_diff(const path & fs_root, const path &sauv_path,
 static void op_test(const path &sauv_path, const mask &selection, 
 		    const mask &subtree, const string &filename, 
 		    bool info_details,
-		    const string &input_pipe, const string &output_pipe)
+		    const string &input_pipe, const string &output_pipe,
+		    const string & execute,
+		    const string & pass)
 {
     MEM_IN;
     try
     {
 	generic_file *decoupe = NULL;
+	scrambler *scram = NULL;
 	compressor *zip = NULL;
 	header_version ver;
 	catalogue *cat = NULL;
@@ -587,8 +683,8 @@ static void op_test(const path &sauv_path, const mask &selection,
 	    infinint cat_size;
 	    statistics st;
 	    
-	    open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver, input_pipe, output_pipe);
-	    cat = get_catalogue_from(*decoupe, *zip, info_details, cat_size);
+	    macro_tools_open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, pass, decoupe, scram, zip, ver, input_pipe, output_pipe, execute);
+	    cat = macro_tools_get_catalogue_from(*decoupe, *zip, info_details, cat_size);
 	    filtre_test(selection, subtree, *cat, info_details, st);
 	    display_test_stat(st);
 	    if(st.errored > 0)
@@ -600,6 +696,8 @@ static void op_test(const path &sauv_path, const mask &selection,
 		delete cat;
 	    if(zip != NULL)
 		delete zip;
+	    if(scram != NULL)
+		delete scram;
 	    if(decoupe != NULL)
 		delete decoupe;
 	    throw;
@@ -608,6 +706,8 @@ static void op_test(const path &sauv_path, const mask &selection,
 	    delete cat;
 	if(zip != NULL)
 	    delete zip;
+	if(scram != NULL)
+	    delete scram;
 	if(decoupe != NULL)
 	    delete decoupe;
     }
@@ -622,84 +722,8 @@ static void op_test(const path &sauv_path, const mask &selection,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar.cpp,v 1.71 2002/06/27 17:42:35 denis Rel $";
+    static char id[]="$Id: dar.cpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $";
     dummy_call(id);
-}
-
-static void open_archive(const path &sauv_path, const string &basename, const string &extension, int options, generic_file *&ret1, compressor *&ret2, header_version &ver, const string &input_pipe, const string &output_pipe)
-{
-    if(basename == "-")
-    {
-	tuyau *in = NULL;
-	tuyau *out = NULL;
-	
-	try
-	{
-	    tools_open_pipes(input_pipe, output_pipe, in, out);
-	    ret1 = new zapette(in, out);
-	    if(ret1 == NULL)
-	    {
-		delete in;
-		delete out;
-	    }
-	    else
-		in = out = NULL; // now managed by the zapette
-	}
-	catch(...)
-	{
-	    if(in != NULL)
-		delete in;
-	    if(out != NULL)
-		delete out;
-	    throw;
-	}
-    }
-    else
-	ret1 = new sar(basename, extension, options, sauv_path);
-    if(ret1 == NULL)
-	throw Ememory("open_archive");
-    ver.read(*ret1);
-    version_check(ver);
-    catalogue_set_reading_version(ver.edition);
-    file::set_compression_algo_used(char2compression(ver.algo_zip));
-    file::set_archive_localisation(ret1);
-    ret2 = new compressor(char2compression(ver.algo_zip), *ret1);
-
-    if(ret2 == NULL)
-    {
-	delete ret1;
-	throw Ememory("open_archive");
-    }
-}
-
-static catalogue *get_catalogue_from(generic_file & f, compressor & zip, bool info_details, infinint &cat_size)
-{
-    terminateur term;
-    catalogue *ret;
-	
-    if(info_details)
-	user_interaction_warning("Extracting contents of the archive...");
-
-    term.read_catalogue(f);
-    if(zip.skip(term.get_catalogue_start()))
-    {
-	try
-	{
-	    ret = new catalogue(zip);
-	}
-	catch(Egeneric & e)
-	{
-	    throw Erange("get_catalogue_from", string("cannot open catalogue: ") + e.get_message());
-	}
-	cat_size = zip.get_position() - term.get_catalogue_start();
-    }
-    else
-	throw Erange("get_catalogue_from", "missing catalogue in file.");
-
-    if(ret == NULL)
-	throw Ememory("get_catalogue_from");
-
-    return ret;
 }
 
 
@@ -759,20 +783,23 @@ static void display_test_stat(const statistics & st)
     user_interaction_stream() << " Total number of file considered: " << st.total() << endl;
 }
 
-static void version_check(const header_version & ver)
-{
-    if(atoi(ver.edition) > atoi(supported_version))
-	user_interaction_pause("The archive format version of the archive is too high for that software version, try reading anyway?");
-}
-
-static string make_string_from(int argc, char *argv[])
+static string make_string_from(S_I argc, char *argv[])
 {
     string ret = "";
-    int i;
+    S_I i;
+    bool hide = false;
 
     for(i = 0; i < argc; i++)
     {
-	ret += argv[i];
+	if(!hide)
+	    ret += argv[i];
+	else
+	{
+	    ret += "...";
+	    hide = false;
+	}
+	if(strcmp(argv[i], "-K") == 0 || strcmp(argv[i], "-J") == 0)
+	    hide = true;
 	ret += " ";
     }
 

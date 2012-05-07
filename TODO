@@ -1,18 +1,17 @@
 TODO (order is not significant)
 ===========
-- add encryption capability
 - bzip2 compression
-- Graphical User Interface for Linux
-- Windows Port
+- API for Graphical User Interface(s) 
 - multi-language support (selection at compilation time)
-- understand when a filename is given in place of a basename and take out 
-  the base name asking the user for processing
-- mask feature to not compress certain files base on filename mask
-- add time shift for differential backup, when daylight saving causes problem
-- support for reading configuration from a file instead of command-line
 - bootable Linux image with what's necessary to restore a system from a dar
   archive
-- add a hook to launch a given shell command/script when a slice has been written
-- add a mode in which dar does not change the atime of directory it is openning 
-  for reading during a backup (some software like "leafnode" --- a NNTP proxy, 
-  rely on the atime of directories for proper operation).
+- provide minimum file size parameter below which no compression is performed
+- change the packaging to have a "configure" script (thanks to Tim Doerzbacher)
+- rethink the behaviour of dar when virtual memory is exhausted 
+  (do not fail stop asking the user whether to retry or stop, thus the routine
+   must not need extra memory to work) 
+- add a feature that skips directory structure while restoring a 
+  "--flat" option as suggested by Rgbtxus.
+- be able to use -I and -X while listing archive contents.
+
+

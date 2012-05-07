@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_terminateur.cpp,v 1.8 2002/05/15 21:56:01 denis Rel $
+// $Id: test_terminateur.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,10 +30,11 @@
 #include "generic_file.hpp"
 #include "deci.hpp"
 #include "test_memory.hpp"
+#include "integers.hpp"
 
 static void f1();
 
-int main()
+S_I main()
 {
     MEM_IN;
     f1();
@@ -48,7 +49,7 @@ static void f1()
     
     infinint grand = 1;
     
-    for(int i=2;i<30;i++)
+    for(S_I i=2;i<30;i++)
 	grand *= i;
 
     deci conv = grand;

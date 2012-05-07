@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.hpp,v 1.4 2002/06/11 17:46:32 denis Rel $
+// $Id: tuyau.hpp,v 1.4 2002/10/28 20:39:43 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -38,7 +38,7 @@ public:
     ~tuyau() { close(filedesc); };
     
 	// inherited from generic_file
-    bool skip(infinint pos);
+    bool skip(const infinint & pos);
     bool skip_to_eof();
     bool skip_relative(signed int x);
     infinint get_position() { return position; };

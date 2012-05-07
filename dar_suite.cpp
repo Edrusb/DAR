@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.12 2002/06/26 22:20:20 denis Rel $
+// $Id: dar_suite.cpp,v 1.9 2002/11/04 20:25:35 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -28,7 +28,7 @@
 #include "erreurs.hpp"
 #include "test_memory.hpp"
 
-const char *application_version = "1.1.0";
+const char *application_version = "1.2.0";
 
 const char *dar_suite_version()
 {
@@ -43,7 +43,7 @@ int dar_suite_global(int argc, char *argv[], int (*call)(int, char *[]))
 
     try
     {
-	user_interaction_init(0, &cerr, &cerr);
+	user_interaction_init(&cerr, &cerr);
 	ret = (*call)(argc, argv);
     }
     catch(Efeature &e)
@@ -71,13 +71,18 @@ int dar_suite_global(int argc, char *argv[], int (*call)(int, char *[]))
     }
     catch(Euser_abort & e)
     {
-	user_interaction_warning(string("aborting program. User refused to continue while asking : ") + e.get_message());
+	user_interaction_warning(string("aborting program. User refused to continue while asking: ") + e.get_message());
 	ret = EXIT_USER_ABORT;
     }
     catch(Edata & e)
     {
 	    // no output just the exit code is set
 	ret = EXIT_DATA_ERROR;
+    }
+    catch(Escript & e)
+    {
+	user_interaction_warning(string("aborting program. An error occured concerning user command execution: ") + e.get_message());
+	ret = EXIT_SCRIPT_ERROR;
     }
     catch(Egeneric & e)
     {
@@ -93,6 +98,6 @@ int dar_suite_global(int argc, char *argv[], int (*call)(int, char *[]))
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.12 2002/06/26 22:20:20 denis Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.9 2002/11/04 20:25:35 edrusb Rel $";
     dummy_call(id);
 }

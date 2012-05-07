@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.22 2002/06/11 17:46:32 denis Rel $
+// $Id: tools.cpp,v 1.12 2002/11/02 20:03:25 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -28,11 +28,21 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <pwd.h>
+#include <grp.h>
+#include <signal.h>
 #include "tools.hpp"
 #include "erreurs.hpp"
 #include "deci.hpp"
+#include "user_interaction.hpp"
+#include "dar_suite.hpp"
+#include "integers.hpp"
+
+static void runson(char *argv[]);
+static void deadson(S_I sig);
 
 char *tools_str2charptr(string x)
 {
@@ -54,7 +64,7 @@ void tools_write_string(generic_file & f, const string & s)
 void tools_read_string(generic_file & f, string & s)
 {
     char a[2] = { 0, 0 };
-    int lu;
+    S_I lu;
     
     s = "";
     do
@@ -77,8 +87,8 @@ void tools_write_string_all(generic_file & f, const string & s)
 	throw Ememory("tools_write_string_all");
     try
     {
-	unsigned int len = s.size();
-	unsigned int wrote = 0;
+	U_I len = s.size();
+	U_I wrote = 0;
 
 	while(wrote < len)
 	    wrote += f.write(tmp+wrote, len-wrote);
@@ -92,10 +102,10 @@ void tools_write_string_all(generic_file & f, const string & s)
 
 void tools_read_string_size(generic_file & f, string & s, infinint taille)
 {
-    unsigned short small_read = 0;
+    U_16 small_read = 0;
     size_t max_read = 0;
-    int lu = 0;
-    const unsigned int buf_size = 10240;
+    S_I lu = 0;
+    const U_I buf_size = 10240;
     char buffer[buf_size];
     
     s = "";
@@ -132,12 +142,12 @@ infinint tools_get_filesize(const path &p)
     }
 
     delete name;
-    return (unsigned long int)buf.st_size;
+    return (U_32)buf.st_size;
 }
 
 infinint tools_get_extended_size(string s)
 {
-    unsigned int len = s.size();
+    U_I len = s.size();
     infinint factor = 1;
 
     if(len < 1)
@@ -205,7 +215,7 @@ char *tools_extract_basename(const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: tools.cpp,v 1.22 2002/06/11 17:46:32 denis Rel $";
+    static char id[]="$Id: tools.cpp,v 1.12 2002/11/02 20:03:25 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -239,6 +249,19 @@ void tools_split_path_basename(const char *all, path * &chemin, string & base)
     }
 }
 
+void tools_split_path_basename(const string & all, string & chemin, string & base)
+{
+    path tmp = all;
+
+    if(!tmp.pop(base))
+    {
+	chemin = "";
+	base = all;
+    }
+    else
+	chemin = tmp.display();
+}
+
 void tools_open_pipes(const string &input, const string & output, tuyau *&in, tuyau *&out)
 {
     in = out = NULL;
@@ -269,12 +292,232 @@ void tools_open_pipes(const string &input, const string & output, tuyau *&in, tu
     }
 }
 
-void tools_blocking_read(int fd, bool mode)
+void tools_blocking_read(S_I fd, bool mode)
 {
-    int flags = fcntl(fd, F_GETFL, 0);
+    S_I flags = fcntl(fd, F_GETFL, 0);
     if(!mode)
 	flags |= O_NDELAY;
     else
 	flags &= ~O_NDELAY;
     fcntl(fd, F_SETFL, flags);
+}
+
+string tools_name_of_uid(U_16 uid)
+{
+    struct passwd *pwd = getpwuid(uid);
+
+    if(pwd == NULL) // uid not associated with a name
+    {
+	infinint tmp = uid;
+	deci d = tmp;
+	return d.human();
+    }
+    else
+	return pwd->pw_name;
+}
+
+string tools_name_of_gid(U_16 gid)
+{
+    struct group *gr = getgrgid(gid);
+
+    if(gr == NULL) // uid not associated with a name
+    {
+	infinint tmp = gid;
+	deci d = tmp;
+	return d.human();
+    }
+    else
+	return gr->gr_name;
+}
+
+string tools_int2str(S_I x)
+{
+    infinint tmp = x >= 0 ? x : -x;
+    deci d = tmp;
+    
+    return (x >= 0 ? string("") : string("-")) + d.human();
+}    
+
+U_32 tools_str2int(const string & x)
+{
+    deci d = x;
+    infinint t = d.computer();
+    U_32 ret = 0;
+    
+    t.unstack(ret);
+    if(t != 0)
+	throw Erange("tools_str2int", "cannot convert the string to integer, overflow");
+
+    return ret;
+}
+
+string tools_addspacebefore(string s, U_I expected_size)
+{
+    while(s.size() < expected_size)
+	s = string(" ") + s;
+
+    return s;
+}
+
+string tools_display_date(infinint date)
+{
+    time_t pas = 0;
+    string ret;
+ 
+    date.unstack(pas);
+    ret = ctime(&pas);
+
+    return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n' 
+}
+
+void tools_system(const vector<string> & argvector)
+{
+    if(argvector.size() == 0)
+	return; // nothing to do
+    else
+    {
+	char **argv = new char *[argvector.size()+1];
+	
+	if(argv == NULL)
+	    throw Ememory("tools_system");
+	try
+	{
+		// make an (S_I, char *[]) couple
+	    for(register U_I i = 0; i <= argvector.size(); i++)
+		argv[i] = NULL;
+	    
+	    try
+	    {
+		S_I status;
+		bool loop;
+		
+		for(register U_I i = 0; i < argvector.size(); i++)
+		    argv[i] = tools_str2charptr(argvector[i]);
+		
+		do
+		{
+		    deadson(0);
+		    loop = false;
+		    S_I pid = fork();
+		    
+		    switch(pid)
+		    {
+		    case -1:
+			throw Erange("tools_system", string("Error while calling fork() to launch dar: ") + strerror(errno));
+		    case 0: // fork has succeeded, we are the child process
+			runson(argv);
+			    // function that never returns
+		    default:
+			if(wait(&status) <= 0)
+			    throw Erange("tools_system", 
+					 string("Unexpected error while waiting for dar to terminate: ") + strerror(errno));
+			else // checking the way dar has exit
+			    if(!WIFEXITED(status)) // not a normal ending
+				if(WIFSIGNALED(status)) // exited because of a signal
+				{
+				    try
+				    {
+					user_interaction_pause(string("DAR terminated upon signal reception: ")
+#ifdef USE_SYS_SIGLIST 
+							       + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
+#else
+							       + tools_int2str(WTERMSIG(status))
+#endif
+							       + " . Retry to launch dar as previously ?");
+					loop = true;
+				    }
+				    catch(Euser_abort & e)
+				    {
+					user_interaction_pause("Continue anyway ?");
+				    }
+				}
+				else // normal terminaison but exit code not zero
+				    user_interaction_pause(string("DAR has terminated with exit code ")
+							   + tools_int2str(WEXITSTATUS(status))
+							   + " Continue anyway ?");
+		    }
+		}
+		while(loop);
+	    }
+	    catch(...)
+	    {
+		for(register U_I i = 0; i < argvector.size(); i++)
+		    if(argv[i] != NULL)
+			delete argv[i];
+		throw;
+	    }
+	    for(register U_I i = 0; i < argvector.size(); i++)
+		if(argv[i] != NULL)
+		    delete argv[i];
+	}
+	catch(...)
+	{
+	    delete argv;
+	    throw;
+	}
+	delete argv;
+    }
+}
+
+void tools_write_vector(generic_file & f, const vector<string> & x)
+{
+    infinint tmp = x.size();
+    vector<string>::iterator it = const_cast<vector<string> *>(&x)->begin();
+    vector<string>::iterator fin = const_cast<vector<string> *>(&x)->end();
+
+    tmp.dump(f);
+    while(it != fin)
+	tools_write_string(f, *it++);
+}
+
+void tools_read_vector(generic_file & f, vector<string> & x)
+{
+    infinint tmp;
+    string elem;
+
+    x.clear();
+    tmp.read_from_file(f);
+    while(tmp > 0)
+    {
+	tools_read_string(f, elem);
+	x.push_back(elem);
+	tmp--;
+    }
+}
+
+string tools_concat_vector(const string & separator, const vector<string> & x)
+{
+    string ret = separator;
+    vector<string>::iterator it = const_cast<vector<string> *>(&x)->begin();
+    vector<string>::iterator fin = const_cast<vector<string> *>(&x)->end();
+
+    while(it != fin)
+	ret += *it++ + separator;
+    
+    return ret;
+}
+
+vector<string> operator + (vector<string> a, vector<string> b)
+{
+    vector<string>::iterator it = b.begin();
+
+    while(it != b.end())
+	a.push_back(*it++);
+
+    return a;
+}
+
+
+static void deadson(S_I sig)
+{
+    signal(SIGCHLD, &deadson);
+}
+
+static void runson(char *argv[])
+{
+    if(execvp(argv[0], argv) < 0)
+	user_interaction_warning(string("Error while calling execvp:") + strerror(errno));
+    else
+	user_interaction_warning("execvp failed but did not returned error code");
+    exit(EXIT_SYNTAX);
 }

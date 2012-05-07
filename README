@@ -1,21 +1,31 @@
-
 PRESENTATION
 ================
 
-dar is a shell command, that makes backup of a directory tree and files. 
-Actually it has been tested only under Linux, but future issue is planed 
-for windows. A GUI for Linux will also follow, for version 2.0.0
+dar is a shell command, that makes backup of a directory tree and files.
+It has been tested under Linux, and now under Windows 95 (using Cygwin).
+A GUI for Linux and Windows will also follow, probably as a separated tool.
+Actually dar is a set of four commands:
+	dar
+	dar_xform
+	dar_slave
+	dar_manager
 
 
 PACKAGE CONTENT
 ===============
+
+I am looking for a new job, thus I have actually less free time for DAR, 
+but that's temporary. If you are interested in my skills, please have
+a look at the "RESUME" file. Thanks.
+
+else you can find the following:
 
 for functional description see the following "FEATURES" paragraph below
 for actual limitations see below "LIMITATIONS" paragraph below
 for installation instructions see INSTALL file
 for a brief tutorial see TUTORIAL file
 for complete usage help see man page (type 'man dar' after installation)
-for notes on miscellaneous topics see NOTES
+for detailed information on miscellaneous topics see the NOTES file
 for future features see TODO
 for license information see LICENSE
 
@@ -84,7 +94,7 @@ file(s) to restore.
 
 HARD LINK CONSIDERATION:
 hard links are now properly saved. They are properly restored if possible. If 
-for example restoring across a mounted filesystem, hard linking will fail, but
+for example restoring across a mounted file system, hard linking will fail, but
 dar will then duplicate the inode and file content, issuing a warning.
 
 
@@ -104,12 +114,12 @@ possible to restore, but dar will restore the other even when compression is
 used.
 
 
-USING PIPES
+USING PIPES / REMOTE OPERATIONS
 dar is now able to produce an archive to its standard output or named pipe. it
 is also able to read an archive through a pair of pipes, to take a remote 
-archive as reference, or even to restore data from a remote archive. This way 
-it is now possible to store an archive remotely and in total security (if using
-encrypted means)
+archive as reference, or even to restore data from an archive ona remote host. 
+This way it is now possible to store an archive remotely and in total security 
+(if using encrypted means, like ssh sessions)
 
 
 ISOLATION
@@ -126,21 +136,55 @@ of a given archive. The resulting archive is totally identical to archives
 directly created by dar. Source archive can be taken from a set of slice, 
 from standard input or even a named pipe.
 
+USER COMMAND BETWEEN SLICES
+several hooks are provided for dar to call a given command once a slice has 
+been written or before reading a slice. Severak macros allow the user command
+or script to know the slice number, path and archive basename.
+
+SCRAMBLING
+the archive can be "scrambled" given a pass phrase. The same 
+pass phrase must be given to retrieve or extract the archive contents. Of 
+course this is not a very strong encryption, and its use is against simple
+user that do not have much mean to crack this scheme. 
+
+CONFIGURATION FILE
+dar can now read parameter from file. This is a way to extends the 
+command-line length limited length input. A configuration file can ask dar to 
+read (to include) other configuration files. A simple but efficient mechanism 
+forbids a file to include itself directly or not, and there is no limitation 
+in the degree of recursion for the inclusion of configuration files.
+
+DAR MANAGER
+The advantage of differential backup is that it takes much less space to store
+and time to complete than always making full backup. But, in the other hand, 
+you can have a lot of them. If you want to restore a particular file, you can 
+thus spend time to find in which backup is located the most recent version. 
+This is solved using dar_manager. This little command-line program, will 
+gather contents information of all your backups. At restoration time, it will 
+call dar for you to restore the asked file(s) from the proper backup. 
+dar_manager is actually stable but is in its first release. I thus, expect a 
+lot of comments about its (slow) speed, which I will try to improve in future.
+But anyway, the more you will have file in a backup (whatever the amount of 
+data is), the more it will take time to execute. Still remains the advantage 
+of the automatic processing of the restoration that allows you to do 
+something else during that time.
+
 
 LIMITATIONS :
 ==============
 The size of SLICES may be limited by the file system or kernel (maximum
 file size is 2 GByte with Linux kernel 2.2.x), the number of SLICES is 
-only limited by the size of the filenames, thus using a base name of 10 
+only limited by the size of the filenames, thus using a basename of 10 
 chars, considering your file system can support 256 char per filename at 
 most, you could already get up to  10^241 SLICES, 1 followed by 241 zero. 
 But as soon as your file system will support bigger files or longer filename, 
 dar will follow without change.
 
+dar_manager can gather up to 65534 different backups. This limit should be 
+high enough to not be a problem.
 
 CONTACT :
 ============
 Denis Corbin
 http://dar.linux.free.fr
 dar.linux@free.fr
-

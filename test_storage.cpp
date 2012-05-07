@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_storage.cpp,v 1.12 2002/05/28 20:17:29 denis Rel $
+// $Id: test_storage.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,17 +27,17 @@
 #include "infinint.hpp"
 #include "erreurs.hpp"
 #include "test_memory.hpp"
-
+#include "integers.hpp"
 
 void f1();
 void f2();
 
 void affiche(infinint x)
 {
-    unsigned long l = 0;
+    U_32 l = 0;
     x.unstack(l);
     do {
-	cout <<  "+" << (unsigned int)l ;
+	cout <<  "+" << (U_I)l ;
 	l = 0;
 	x.unstack(l);
     } while( l > 0);
@@ -52,7 +52,7 @@ void affiche(const storage & ref)
     cout << endl;
 }
 
-int main(int argc, char *argv[])
+S_I main(S_I argc, char *argv[])
 {
     MEM_IN;
     f1();
@@ -104,7 +104,7 @@ void f1()
 	unsigned char b = 'a' + 3;
 	cout << b << endl;
 
-	for(int i = 0; i < st1.size(); i++)
+	for(S_I i = 0; i < st1.size(); i++)
 	    st1[i] = 'a' + i;
 	affiche(st1);
 
@@ -166,7 +166,7 @@ void f2()
 {
     infinint u = 1;
     infinint s, size;
-    int i;
+    S_I i;
 
     for(i = 2; i < 10; i++)
 	u *= i;

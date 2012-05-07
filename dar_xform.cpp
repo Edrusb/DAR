@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.13 2002/06/26 22:20:20 denis Rel $
+// $Id: dar_xform.cpp,v 1.5 2002/10/31 21:02:35 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -30,11 +30,12 @@
 #include "tools.hpp"
 #include "tuyau.hpp"
 #include "dar_suite.hpp"
+#include "integers.hpp"
 
 #define EXTENSION "dar"
-#define DAR_XFORM_VERSION "1.0.0"
+#define DAR_XFORM_VERSION "1.1.0"
 
-static bool command_line(int argc, char *argv[], 
+static bool command_line(S_I argc, char *argv[], 
 			 path * & src_dir, string & src, 
 			 path * & dst_dir, string & dst,
 			 infinint & first_file_size,
@@ -42,26 +43,29 @@ static bool command_line(int argc, char *argv[],
 			 bool & warn,
 			 bool & allow,
 			 bool & pause,
-			 bool & beep);
+			 bool & beep,
+			 string & execute_src,
+			 string & execute_dst);
 static void show_usage(const char *command_name);
 static void show_version(const char *command_name);
-static int sub_main(int argc, char *argv[]);
+static S_I sub_main(S_I argc, char *argv[]);
 
-int main(int argc, char *argv[])
+S_I main(S_I argc, char *argv[])
 {
     return dar_suite_global(argc, argv, &sub_main);
 }
 
-static int sub_main(int argc, char *argv[])
+static S_I sub_main(S_I argc, char *argv[])
 {
     path *src_dir = NULL;
     path *dst_dir = NULL;
     string src, dst;
     infinint first, size;
     bool warn, allow, pause, beep;
+    string execute_src, execute_dst;
 
     if(command_line(argc, argv, src_dir, src, dst_dir, dst, first, size,
-		    warn, allow, pause, beep))
+		    warn, allow, pause, beep, execute_src, execute_dst))
     {
 	try
 	{
@@ -72,7 +76,7 @@ static int sub_main(int argc, char *argv[])
 		user_interaction_change_non_interactive_output(&cout);
 	    try
 	    {
-		int dst_opt = 
+		S_I dst_opt = 
 		    (allow ? 0 : SAR_OPT_DONT_ERASE) 
 		    | (warn ? SAR_OPT_WARN_OVERWRITE : 0)
 		    | (pause ? SAR_OPT_PAUSE : 0);
@@ -98,7 +102,7 @@ static int sub_main(int argc, char *argv[])
 		    }
 		}
 		else 
-		    src_sar = new sar(src, EXTENSION, SAR_OPT_DEFAULT, *src_dir);
+		    src_sar = new sar(src, EXTENSION, SAR_OPT_DEFAULT, *src_dir, execute_src);
 		if(src_sar == NULL)
 		    throw Ememory("main");
 		
@@ -108,12 +112,25 @@ static int sub_main(int argc, char *argv[])
 		    else
 			dst_sar = sar_tools_open_archive_fichier((*dst_dir + sar_make_filename(dst, 1, EXTENSION)).display(), allow, warn);
 		else
-		    dst_sar = new sar(dst, EXTENSION, size, first, dst_opt, *dst_dir);
+		    dst_sar = new sar(dst, EXTENSION, size, first, dst_opt, *dst_dir, execute_dst);
 		if(dst_sar == NULL)
 		    throw Ememory("main");
+
 		try
 		{
 		    src_sar->copy_to(*dst_sar);
+		}
+		catch(Escript & e)
+		{
+		    throw;
+		}
+		catch(Euser_abort & e)
+		{
+		    throw;
+		}
+		catch(Ebug & e)
+		{
+		    throw;
 		}
 		catch(Egeneric & e)
 		{
@@ -148,7 +165,7 @@ static int sub_main(int argc, char *argv[])
 	return EXIT_SYNTAX;
 }
 
-static bool command_line(int argc, char *argv[], 
+static bool command_line(S_I argc, char *argv[], 
 			 path * & src_dir, string & src, 
 			 path * & dst_dir, string & dst,
 			 infinint & first_file_size,
@@ -156,9 +173,11 @@ static bool command_line(int argc, char *argv[],
 			 bool & warn,
 			 bool & allow,
 			 bool & pause,
-			 bool & beep)
+			 bool & beep,
+			 string & execute_src,
+			 string & execute_dst)
 {
-    int lu;
+    S_I lu;
     src_dir = NULL;
     dst_dir = NULL;
     warn = true;
@@ -168,10 +187,11 @@ static bool command_line(int argc, char *argv[],
     first_file_size = 0;
     file_size = 0;
     src = dst = "";
+    execute_src = execute_dst = "";
 
     try
     {
-	while((lu = getopt(argc, argv, "s:S:pwnhbV")) != EOF)
+	while((lu = getopt(argc, argv, "s:S:pwnhbVE:F:")) != EOF)
 	{
 	    switch(lu)
 	    {
@@ -240,6 +260,22 @@ static bool command_line(int argc, char *argv[],
 	    case 'V':
 		show_version(argv[0]);
 		return false;
+	    case 'E':
+		if(optarg == NULL)
+		    throw Erange("get_args", "missing argument to -E");
+		if(execute_dst == "")
+		    execute_dst = optarg;
+		else
+		    user_interaction_warning("only one -E option is allowed, ignoring other instances");
+		break;
+	    case 'F':
+		if(optarg == NULL)
+		    throw Erange("get_args", "missing argument to -F");
+		if(execute_src == "")
+		    execute_src = optarg;
+		else
+		    user_interaction_warning("only one -F option is allowed, ignoring other instances");
+		break;
 	    case ':':
 		throw Erange("command_line", string("missing parameter to option ") + char(optopt));
 	    case '?':
@@ -293,7 +329,7 @@ static bool command_line(int argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.13 2002/06/26 22:20:20 denis Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.5 2002/10/31 21:02:35 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -306,19 +342,7 @@ static void show_usage(const char *command_name)
 	ui_printf("usage :\t %s [options] [<path>/]<basename> [<path>/]<basename>\n", name);
 	ui_printf("       \t %s -h\n",name);
 	ui_printf("       \t %s -V\n",name);
-	ui_printf("\n");
-	ui_printf("\t   \t\tfirst argument after options is the name of the archive to read\n");
-	ui_printf("\t   \t\tsecond argument after options is the name of the new archive to create\n");
-	ui_printf("options:\n");
-	ui_printf("\t-h \t\tshow this help information\n");
-	ui_printf("\t-V \t\tshow version information\n");
-	ui_printf("\t-s \t\tsize of the slices for new archive (by default archive is in one slice)\n");
-	ui_printf("\t-S \t\tsize of the first slice, needs -s (by default first slice is same as other slices)\n");
-	ui_printf("\t-p \t\tpause before writing a new slice\n");
-	ui_printf("\t-n \t\tdo not overwrite existing slices (by default overwriting allowed but warned)\n");
-	ui_printf("\t-w \t\tdo not warn before overwriting (-n and -w cannot be used together)\n");
-	ui_printf("\t-b \t\tring the terminal if a user action is required\n");
-	ui_printf("\n");
+#include "dar_xform.usage"
     }
     catch(...)
     {

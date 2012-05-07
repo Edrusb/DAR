@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.cpp,v 1.13 2002/05/15 21:56:01 denis Rel $
+// $Id: mask.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -44,7 +44,7 @@ bool simple_mask::is_covered(const string &expression) const
     if(tmp == NULL)
 	throw Ememory("simple_mask::is_covered");
 
-    ret = fnmatch(the_mask, tmp, FNM_NOESCAPE|FNM_PATHNAME) == 0;
+    ret = fnmatch(the_mask, tmp, FNM_PERIOD) == 0;
     delete tmp;
 
     return ret;
@@ -56,6 +56,50 @@ void simple_mask::copy_from(const simple_mask & m)
     if(the_mask == NULL)
 	throw Ememory("simple_mask::copy_from");
     strcpy(the_mask, m.the_mask);
+}
+
+regular_mask::regular_mask(const string & wild_card_expression)
+{
+    char *tmp = tools_str2charptr(wild_card_expression);
+
+    try
+    {	
+	S_I ret;
+
+	if((ret = regcomp(&preg, tmp, REG_NOSUB)) != 0)
+	{
+	    const S_I msg_size = 1024;
+	    char msg[msg_size];
+	    regerror(ret, &preg, msg, msg_size);
+	    throw Erange("regular_mask::regular_mask", msg);
+	}
+
+    }
+    catch(...)
+    {
+	delete tmp;
+	throw;
+    }
+    delete tmp;
+}
+
+bool regular_mask::is_covered(const string & expression) const
+{
+    char *tmp = tools_str2charptr(expression);
+    bool matches;
+
+    try
+    {
+	matches = regexec(&preg, tmp, 0, NULL, 0) != REG_NOMATCH;
+    }
+    catch(...)
+    {
+	delete tmp;
+	throw;
+    }
+    delete tmp;
+
+    return matches;
 }
 
 void not_mask::copy_from(const not_mask &m)
@@ -137,7 +181,7 @@ void et_mask::detruit()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: mask.cpp,v 1.13 2002/05/15 21:56:01 denis Rel $";
+    static char id[]="$Id: mask.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }
 

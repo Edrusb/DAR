@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.45 2002/06/18 21:16:06 denis Rel $
+// $Id: catalogue.hpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -36,11 +36,15 @@
 #include "header_version.hpp"
 #include "ea.hpp"
 #include "compressor.hpp"
-
-extern void catalogue_set_reading_version(const version &ver);
+#include "integers.hpp"
 
 class file_etiquette;
 class entree;
+
+enum saved_status { s_saved, s_fake, s_not_saved };
+
+extern void catalogue_set_reading_version(const version &ver);
+extern unsigned char mk_signature(unsigned char base, saved_status state);
 
 struct entree_stats
 {
@@ -116,24 +120,24 @@ private :
 class inode : public nomme
 {
 public:
-    inode(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
+    inode(U_16 xuid, U_16 xgid, U_16 xperm, 
 	  const infinint & last_access, 
 	  const infinint & last_modif, 
 	  const string & xname);
-    inode(generic_file & f, bool saved);
+    inode(generic_file & f, saved_status saved);
     inode(const inode & ref);
     ~inode() { if(ea != NULL) delete ea; };
 
     void dump(generic_file & f) const;
-    short int get_uid() const { return uid; };
-    short int get_gid() const { return gid; };
-    short int get_perm() const { return perm; };
+    U_16 get_uid() const { return uid; };
+    U_16 get_gid() const { return gid; };
+    U_16 get_perm() const { return perm; };
     infinint get_last_access() const { return last_acc; };
     infinint get_last_modif() const { return last_mod; };
     void set_last_access(const infinint & x_time) { last_acc = x_time; };
     void set_last_modif(const infinint & x_time) { last_mod = x_time; };    
-    bool get_saved_status() const { return xsaved; };
-    void set_saved_status(bool x) { xsaved = x; };
+    saved_status get_saved_status() const { return xsaved; };
+    void set_saved_status(saved_status x) { xsaved = x; };
 	
     bool same_as(const inode & ref) const;
     virtual bool is_more_recent_than(const inode & ref) const;
@@ -182,11 +186,11 @@ protected:
     virtual void sub_compare(const inode & other) const {};
 
 private :
-    unsigned short int uid;
-    unsigned short int gid;
-    unsigned short int perm;
+    U_16 uid;
+    U_16 gid;
+    U_16 perm;
     infinint last_acc, last_mod;
-    bool xsaved;
+    saved_status xsaved;
     ea_status ea_saved;
 	//  the following is used only if ea_saved == full
     infinint ea_offset;
@@ -206,13 +210,13 @@ private :
 class file : public inode
 {
 public :
-    file(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
+    file(U_16 xuid, U_16 xgid, U_16 xperm, 
 	 const infinint & last_access, 
 	 const infinint & last_modif, 
 	 const string & src,
 	 const path & che,
 	 const infinint & taille);
-    file(generic_file & f, bool saved);
+    file(generic_file & f, saved_status saved);
     
     void dump(generic_file & f) const;
     bool is_more_recent_than(const inode & ref) const;
@@ -223,7 +227,7 @@ public :
     generic_file *get_data() const; // return a newly alocated object in read_only mode
     void clean_data(); // partially free memory (but get_data() becomes disabled)
     void set_offset(const infinint & r);
-    unsigned char signature() const { return get_saved_status() ? 'f' : 'F'; };
+    unsigned char signature() const { return mk_signature('f', get_saved_status()); };
 
     void set_crc(const crc &c) { copy_crc(check, c); };
     bool get_crc(crc & c) const;
@@ -258,17 +262,17 @@ public:
 class file_etiquette : public file, public etiquette
 {
 public :
-    file_etiquette(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
+    file_etiquette(U_16 xuid, U_16 xgid, U_16 xperm, 
 		   const infinint & last_access, 
 		   const infinint & last_modif, 
 		   const string & src,
 		   const path & che,
 		   const infinint & taille) : file(xuid, xgid, xperm, last_access, last_modif, src, che, taille) 
 	{ etiquette = compteur++; };
-    file_etiquette(generic_file & f, bool saved);
+    file_etiquette(generic_file & f, saved_status saved);
 
     void dump(generic_file &f) const;
-    unsigned char signature() const { return get_saved_status() ? 'e' : 'E'; };
+    unsigned char signature() const { return mk_signature('e', get_saved_status()); };
     entree *clone() const { return new file_etiquette(*this); };
 
     static void reset_etiquette_counter() { compteur = 0; };
@@ -307,11 +311,11 @@ private :
 class lien : public inode
 {
 public :
-    lien(short int uid, short int gid, short int perm, 
+    lien(U_16 uid, U_16 gid, U_16 perm, 
 	 const infinint & last_access, 
 	 const infinint & last_modif, 
 	 const string & name, const string & target);
-    lien(generic_file & f, bool saved);
+    lien(generic_file & f, saved_status saved);
 
     void dump(generic_file & f) const;
     string get_target() const;
@@ -319,7 +323,7 @@ public :
 
 	// using the method is_more_recent_than() from inode
 	// using method has_changed_since() from inode class
-    unsigned char signature() const { return get_saved_status() ? 'l' : 'L'; };
+    unsigned char signature() const { return mk_signature('l', get_saved_status()); };
     entree *clone() const { return new lien(*this); };
 
 protected :
@@ -332,25 +336,26 @@ private :
 class directory : public inode
 {
 public :
-    directory(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
+    directory(U_16 xuid, U_16 xgid, U_16 xperm, 
 	      const infinint & last_access, 
 	      const infinint & last_modif, 
 	      const string & xname);
     directory(const directory &ref); // only the inode part is build, no children is duplicated (empty dir)
-    directory(generic_file & f, bool saved);
+    directory(generic_file & f, saved_status saved);
     ~directory(); // detruit aussi tous les fils et se supprime de son 'parent'
 
     void dump(generic_file & f) const;
     void add_children(nomme *r); // when r is a directory, 'parent' is set to 'this'
-    void reset_read_children() { it = fils.begin(); }; 
-    bool read_children(nomme * &r); // read the direct children of the directory, returns false if no more is available
+    void reset_read_children() const;
+    bool read_children(const nomme * &r) const; // read the direct children of the directory, returns false if no more is available
     void listing(ostream & flux, string marge = "") const;
+    void tar_listing(ostream & flux, const string & beginning = "") const;
     directory * get_parent() const { return parent; };
     bool search_children(const string &name, nomme *&ref);
 
 	// using is_more_recent_than() from inode class
 	// using method has_changed_since() from inode class
-    unsigned char signature() const { return get_saved_status() ? 'd' : 'D'; };
+    unsigned char signature() const { return mk_signature('d', get_saved_status()); };
     entree *clone() const { return new directory(*this); };
 
 private :
@@ -364,17 +369,17 @@ private :
 class device : public inode
 {
 public :
-    device(short int uid, short int gid, short int perm, 
+    device(U_16 uid, U_16 gid, U_16 perm, 
 	   const infinint & last_access, 
 	   const infinint & last_modif, 
 	   const string & name, 
-	   unsigned short int major, 
-	   unsigned short int minor);
-    device(generic_file & f, bool saved);
+	   U_16 major,
+	   U_16 minor);
+    device(generic_file & f, saved_status saved);
     
     void dump(generic_file & f) const;
-    int get_major() const { if(!get_saved_status()) throw SRC_BUG; else return xmajor; };
-    int get_minor() const { if(!get_saved_status()) throw SRC_BUG; else return xminor; };
+    int get_major() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xmajor; };
+    int get_minor() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xminor; };
     void set_major(int x) { xmajor = x; };
     void set_minor(int x) { xminor = x; };
 
@@ -386,78 +391,78 @@ protected :
     void sub_compare(const inode & other) const;
 
 private :
-    unsigned short int xmajor, xminor;
+    U_16 xmajor, xminor;
 };
 
 class chardev : public device
 {
 public:
-    chardev(short int uid, short int gid, short int perm, 
+    chardev(U_16 uid, U_16 gid, U_16 perm, 
 	    const infinint & last_access, 
 	    const infinint & last_modif, 
 	    const string & name, 
-	    unsigned short int major, 
-	    unsigned short int minor) : device(uid, gid, perm, last_access, 
-					       last_modif, name,
-					       major, minor) {};
-    chardev(generic_file & f, bool saved) : device(f, saved) {};
-
+	    U_16 major, 
+	    U_16 minor) : device(uid, gid, perm, last_access, 
+				 last_modif, name,
+				 major, minor) {};
+    chardev(generic_file & f, saved_status saved) : device(f, saved) {};
+    
 	// using dump from device class
 	// using method is_more_recent_than() from device class
 	// using method has_changed_since() from device class
-    unsigned char signature() const { return get_saved_status() ? 'c' : 'C'; };
+    unsigned char signature() const { return mk_signature('c', get_saved_status()); };
     entree *clone() const { return new chardev(*this); };
 };
 
 class blockdev : public device
 {
 public:
-    blockdev(short int uid, short int gid, short int perm, 
+    blockdev(U_16 uid, U_16 gid, U_16 perm, 
 	     const infinint & last_access, 
 	     const infinint & last_modif, 
 	     const string & name, 
-	     unsigned short int major, 
-	     unsigned short int minor) : device(uid, gid, perm, last_access, 
-						last_modif, name,
-						major, minor) {};
-    blockdev(generic_file & f, bool saved) : device(f, saved) {};
+	     U_16 major, 
+	     U_16 minor) : device(uid, gid, perm, last_access, 
+				  last_modif, name,
+				  major, minor) {};
+    blockdev(generic_file & f, saved_status saved) : device(f, saved) {};
     
 	// using dump from device class
 	// using method is_more_recent_than() from device class
 	// using method has_changed_since() from device class
-    unsigned char signature() const { return get_saved_status() ? 'b' : 'B'; };
+    unsigned char signature() const { return mk_signature('b', get_saved_status()); };
     entree *clone() const { return new blockdev(*this); };
 };
 
 class tube : public inode
 {
 public :
-    tube(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
+    tube(U_16 xuid, U_16 xgid, U_16 xperm, 
 	 const infinint & last_access, 
 	 const infinint & last_modif, 
-	 const string & xname) : inode(xuid, xgid, xperm, last_access, last_modif, xname) { set_saved_status(true); };
-    tube(generic_file & f, bool saved) : inode(f, saved) {};
+	 const string & xname) : inode(xuid, xgid, xperm, last_access, last_modif, xname) { set_saved_status(s_saved); };
+    tube(generic_file & f, saved_status saved) : inode(f, saved) {};
     
     	// using dump from inode class
 	// using method is_more_recent_than() from inode class
 	// using method has_changed_since() from inode class
-    unsigned char signature() const { return get_saved_status() ? 'p' : 'P'; };
+    unsigned char signature() const { return mk_signature('p', get_saved_status()); };
     entree *clone() const { return new tube(*this); };
 };
 
 class prise : public inode
 {
 public :
-    prise(unsigned short int xuid, unsigned short int xgid, unsigned short int xperm, 
+    prise(U_16 xuid, U_16 xgid, U_16 xperm, 
 	  const infinint & last_access, 
 	  const infinint & last_modif, 
-	  const string & xname) : inode(xuid, xgid, xperm, last_access, last_modif, xname) { set_saved_status(true); };
-    prise(generic_file & f, bool saved) : inode(f, saved) {};
+	  const string & xname) : inode(xuid, xgid, xperm, last_access, last_modif, xname) { set_saved_status(s_saved); };
+    prise(generic_file & f, saved_status saved) : inode(f, saved) {};
 
     	// using dump from inode class
 	// using method is_more_recent_than() from inode class
 	// using method has_changed_since() from inode class
-    unsigned char signature() const { return get_saved_status() ? 's' : 'S'; };
+    unsigned char signature() const { return mk_signature('s', get_saved_status()); };
     entree *clone() const { return new prise(*this); };
 };
 
@@ -492,7 +497,7 @@ class ignored_dir : public inode
 {
 public:
     ignored_dir(const directory &target) : inode(target) {};
-    ignored_dir(generic_file & f) : inode(f, false) { throw SRC_BUG; };
+    ignored_dir(generic_file & f) : inode(f, s_not_saved) { throw SRC_BUG; };
 
     void dump(generic_file & f) const; // behaves like an empty directory
     unsigned char signature() const { return 'j'; }; 
@@ -549,8 +554,11 @@ public :
 	// ref must have the same root, else the operation generates a exception
     
     void dump(generic_file & ref) const;
-    void listing(ostream & flux, string marge = "");
+    void listing(ostream & flux, string marge = "") const;
+    void tar_listing(ostream & flux, const string & beginning = "") const;
     entree_stats get_stats() const { return stats; };
+
+    const directory *get_contenu() const { return contenu; }; // used by data_tree
 
 private :
     directory *contenu;

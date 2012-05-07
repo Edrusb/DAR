@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.19 2002/05/28 20:17:29 denis Rel $
+// $Id: compressor.cpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -125,7 +125,7 @@ compressor::~compressor()
 {
     if(compr != NULL)
     {
-	int ret;
+	S_I ret;
 
 	    // flushing the pending data
 	flush_write();
@@ -151,7 +151,7 @@ compressor::~compressor()
 	    // flushing data
 	flush_read();
 
-	int ret = inflateEnd(decompr->strm);
+	S_I ret = inflateEnd(decompr->strm);
 	delete decompr;
 	switch(ret)
 	{
@@ -165,7 +165,44 @@ compressor::~compressor()
 	delete compressed;
 }
 
-compressor::xfer::xfer(unsigned int sz)
+compression compressor::get_algo() const
+{
+    if(read_ptr == &compressor::none_read)
+	return none;
+    if(read_ptr == &compressor::gzip_read)
+	return gzip;
+    throw SRC_BUG;
+}
+
+void compressor::change_algo(compression new_algo)
+{
+    if(new_algo == get_algo())
+	return;
+
+	// flush data
+    flush_write(); 
+    flush_read();
+    clean_read();
+    clean_write();
+    
+	// clean existing data structures
+    if(compr != NULL)
+    {
+	delete compr;
+	compr = NULL;
+    }
+    if(decompr != NULL)
+    {
+	delete decompr;
+	decompr = NULL;
+    }
+
+	// change to new algorithm
+    init(new_algo, compressed);
+}
+
+
+compressor::xfer::xfer(U_I sz)
 {
     try 
     {
@@ -196,20 +233,20 @@ compressor::xfer::~xfer()
     delete strm;
 }
 
-int compressor::none_read(char *a, size_t size)
+S_I compressor::none_read(char *a, size_t size)
 {
     return compressed->read(a, size);
 }
 
-int compressor::none_write(char *a, size_t size)
+S_I compressor::none_write(char *a, size_t size)
 {
     return compressed->write(a, size);
 }
 
-int compressor::gzip_read(char *a, size_t size)
+S_I compressor::gzip_read(char *a, size_t size)
 {
-    int ret;
-    int flag = Z_NO_FLUSH;
+    S_I ret;
+    S_I flag = Z_NO_FLUSH;
 
     if(size == 0)
 	return 0;
@@ -257,7 +294,7 @@ int compressor::gzip_read(char *a, size_t size)
     return (char *)decompr->strm->next_out - a;
 }
 
-int compressor::gzip_write(char *a, size_t size)
+S_I compressor::gzip_write(char *a, size_t size)
 {
     compr->strm->next_in = (Bytef *)a;
     compr->strm->avail_in = size;
@@ -293,7 +330,7 @@ int compressor::gzip_write(char *a, size_t size)
 
 void compressor::flush_write()
 {
-    int ret;
+    S_I ret;
 
     if(compr != NULL && compr->strm->total_in != 0)  // zlib
     {
@@ -345,7 +382,7 @@ void compressor::clean_read()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: compressor.cpp,v 1.19 2002/05/28 20:17:29 denis Rel $";
+    static char id[]="$Id: compressor.cpp,v 1.9 2002/10/31 21:02:34 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -353,7 +390,7 @@ void compressor::clean_write()
 {
     if(compr != NULL)
     {
-	int ret;
+	S_I ret;
 
 	do
 	{

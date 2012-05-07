@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header_version.hpp,v 1.2 2002/05/15 21:56:01 denis Rel $
+// $Id: header_version.hpp,v 1.4 2002/10/28 20:39:33 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -32,6 +32,7 @@
 
 #define VERSION_FLAG_SAVED_EA_ROOT 0x80
 #define VERSION_FLAG_SAVED_EA_USER 0x40
+#define VERSION_FLAG_SCRAMBLED     0x20
 
 #define VERSION_SIZE 3
 typedef char version[VERSION_SIZE];

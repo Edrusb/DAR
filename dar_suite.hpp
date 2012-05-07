@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.hpp,v 1.5 2002/06/26 22:20:20 denis Rel $
+// $Id: dar_suite.hpp,v 1.4 2002/10/28 20:39:28 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -35,6 +35,8 @@
 #define EXIT_DATA_ERROR 5   // error in data treated (could not save/restore/
     // compare all data due for example to bad access permission.  Comparison
     // mismatch of some files, archive testing failed etc...)
+#define EXIT_SCRIPT_ERROR 6 // error around the execution of a user command 
+    // using -E or -F options
 
 #define EXTENSION "dar"
 

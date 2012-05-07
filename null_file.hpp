@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: null_file.hpp,v 1.2 2002/05/15 21:56:01 denis Rel $
+// $Id: null_file.hpp,v 1.4 2002/10/28 20:39:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -33,7 +33,7 @@ class null_file : public generic_file
 {
 public :
     null_file(gf_mode m) : generic_file(m) {};
-    bool skip(infinint pos) { return pos == 0; };
+    bool skip(const infinint &pos) { return pos == 0; };
     bool skip_to_eof() { return true; };
     bool skip_relative(signed int x) { return false; };
     infinint get_position() { return 0; };

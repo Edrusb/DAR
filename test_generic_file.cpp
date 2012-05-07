@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_generic_file.cpp,v 1.4 2002/06/26 22:20:20 denis Rel $
+// $Id: test_generic_file.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -28,8 +28,9 @@
 #include <fcntl.h>
 #include "generic_file.hpp"
 #include "null_file.hpp"
+#include "integers.hpp"
 
-int main(int argc, char *argv[])
+S_I main(S_I argc, char *argv[])
 {
     if(argc < 3)
     {
@@ -38,7 +39,7 @@ int main(int argc, char *argv[])
     }
     
     fichier f1 = fichier(argv[1], gf_read_only);
-    int fd = open(argv[2], O_WRONLY|O_CREAT|O_TRUNC);
+    S_I fd = open(argv[2], O_WRONLY|O_CREAT|O_TRUNC);
     if(fd < 0)
     {
 	cout << "cannot open "<< argv[2] << endl;

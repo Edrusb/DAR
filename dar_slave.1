@@ -1,4 +1,4 @@
-.TH DAR_SLAVE 1 "MAY 15, 2002"
+.TH DAR_SLAVE 1 "SEPT 28, 2002"
 .UC 8
 .SH NAME
 dar_slave \- disk archive slave
@@ -37,13 +37,16 @@ reads the orders from the named file instead of standard input. In most cases th
 .TP 20
 -o <filename>
 sends the data to the named file <filename> instead of standard output. In most cases the filename will be a named pipe.
+.TP 20
+-E <string>
+string is a command to be launched between slices. See dar(1) man page (same option) for more informations.
 
 .SH EXIT CODES
 .B dar_slaves 
 exists with the same codes as dar does, see dar(1) man page.
 
 .SH SEE ALSO
-dar(1), dar_xform(1)
+dar(1), dar_xform(1), dar_manager(1)
 
 .SH KNOWN BUGS
 None actually.

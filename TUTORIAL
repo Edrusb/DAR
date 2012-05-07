@@ -15,16 +15,18 @@ this tells dar to not create a single backup file but to split it in several
 files with a size of at most 100 Megabytes.
 
 But on your first ZIP drive you want to copy the dar binary outside the
-backup to be able to restore it in case of hard disk failure for example. 
-This make the free space on the first ZIP floppy a bit smaller: 97MB. 
-*** Here comes the option: -S 97M  
+backup to be able to restore it in case of hard disk failure for example.
+(you could also add man pages, if you are scared not to be able to remember
+all the many feature of dar ;-) and find the -h option too sparse). 
+This make the free space on the first ZIP floppy a bit smaller: 95 MB. 
+*** Here comes the option: -S 95M  
 (note that '-s' is lowercase for all the slices, and '-S' is UPPERCASE meaning 
-for the initial slice only).
+the initial slice only).
 
 we need to pause between slices to change the ZIP floppy when it is full
 *** here comes the option: -p -b
 telling dar to pause before writing a new slice (-p) and to ring the terminal
-bell (-b) 
+bell (-b) when user action is needed. 
 
 we will compress data inside the backup
 *** here comes the option: -z
@@ -78,19 +80,19 @@ put an empty ZIP floppy in the device, and mount it according to your
 /etc/fstab file.
 	mount /mnt/zip
 copy the dar binary to the zip drive (to be able to restore in case of big 
-problem, like a crash disk)
+problem, like a crash disk) and eventually man pages
 	cp `which dar` /mnt/zip
 then, type the following
 	cd /
-	dar -c /mnt/zip/linux_full -s 100M -S 97M -p -b -z -R / -X "*~" -X ".*~" -P dev/pts -P proc -P mnt/zip -D
+	dar -c /mnt/zip/linux_full -s 100M -S 95M -p -b -z -R / -X "*~" -X ".*~" -P dev/pts -P proc -P mnt/zip -D
 
 note that option order has no importance.
-when the first slice will be done DAR, will pause, ring and display a message.
+when the first slice will be done, DAR will pause, ring and display a message.
 you will have to unmount the floppy
 	umount /mnt/zip
 eject and replace the floppy by an empty new one and mount it
 	mount /mnt/zip
-then proceed with dar pressing the <enter> key.
+then proceed with dar, pressing the <enter> key.
 
 dar will label slices this way:
 slice 1: linux_full.1.dar
@@ -100,8 +102,8 @@ and so on.
 That's it we finished the first step, it may take a long time depending on the
 size of the data to backup, but, for the following step (differential backup)
 it can be done often it will stay fast every time (OK, except if a big part of
-you system that have changed, in that case you may consider making another
-full backup).
+you system have changed, in that case you can consider making another full 
+backup).
 
 Just a little check on the archive you've just made:
 suppose you want to read the content of the backup you made, you would have 
@@ -110,20 +112,31 @@ to run:
 	dar -l /mnt/zip/linux_full
 
 optionally if you don't trust your zip floppies, you can either check the 
-archive contents, or compare what's stored in it, which the current file
+archive contents, or compare what's stored in it with the current file
 system.
 
 	dar -t /mnt/zip/linux_full
-will check the directory contents, 
+will check the directory contents,
  
 it is recommended to first unmount it and remount it, this to flush the cache.
-Else you may read data from cache (in memory) and do not detect a error on you
-floppy
+Else you may read data from cache (in memory) and do not detect an error on you
+floppy. dar -t cannot check a single slice, it checks all the archive. If you 
+need to check use the diff command. For example, you burn slices on CD-R, but
+have just enough free space to store one slice on disk. After burning check the
+slice is correct using for example
+
+	diff /mnt/cdrom/slice.x.dar /tmp/slice.x.dar
+
+if all is ok, you can delete the slice from the hard disk (/tmp/slice.x.dar),
+and continue with dar. Else, you will have to burn again the slice on a new
+CD-R.
+
 
 	dar -d /mnt/zip/linux_full -R /
+
 will compare the archive with filesystem tree located at /
-same remark as previously, it is recommended to first unmount and mount 
-the floppy.
+Same remark as previously, it is recommended to first unmount and mount 
+the floppy to flush the cache.
 
 STEP 2: DIFFERENTIAL BACKUP
 -------------------------------
@@ -162,13 +175,17 @@ on your patient if one day you have to recover the whole data after a disk
 crash: you would then have to restore the full backup, then all the following
 differential backup up to the most recent one. This requires more user 
 intervention than restoring a single full backup, all is a matter of balance,
-between the time it takes to backup and the time it takes to restore. 
+between the time it takes to backup and the time it takes to restore.
+
+Note, that starting release 1.2.0 a new command appeared that helps restoring
+a small set of file from a lot a differential backup. Its name is dar_manager.
+See man page for more. 
 
 Another solution, is when you have too much differential backup, is to make 
 the next differential backup taking the last full_backup as reference, instead
 of the last differential backup done. This way, it will take less time than 
 doing a full backup, and you will not have to restore all intermediate
-differential backup, upon disk failure. 
+differential backup. 
 Some people make difference between "incremental" backup and "differential"
 backup, here they are the same, all depends on the nature of the reference
 backup you take.
@@ -190,9 +207,9 @@ But if the last backup you made is recent, then keep smiling !
 OK, you have installed your new hard disk and configured you BIOS to it (if 
 necessary).
 You will need a bootable floppy, with a minimum Linux system on it, that
-allows you to access your zip drive and you new empty hard disk 
-(in the case your backup resided on ZIP disk). For example the Slackware 
-floppy disks, they are nicely done. You don't need to install any thing on 
+allows you to access your zip drive and your new empty hard disk 
+(in the case your backup resided on ZIP disk). For example use the Slackware 
+floppy disks, they are nicely done. You don't need to install something on 
 your brand-new disk, just make partitions and format as you want:
 We suppose your new disk is /dev/hda and /dev/sga is your ZIP drive.
 
@@ -233,20 +250,21 @@ change the floppy and mount it:
 then press <enter> to proceed with dar
 you can type theses last command either using another virtual console 
 (pressing ALT-F1, etc. under Linux), or suspending dar with Control-Z. 
-You will have then to reactive it with the "fg" command once the floppy 
+You will have then to reactive it with the "fg" shell command once the floppy 
 is changed and mounted.
 
 7. Once finished with the restoration of linux_full, we have to do the same 
 with any following backup, but, this way, dar will warn you any time it 
-restores a more recent file or any time a file that has been removed since
-the backup of reference has to be removed from file system. If you don't want
-to press the <enter> key several thousand times,
+restores a more recent file (file overwriting) or any time a file that has been
+removed since the backup of reference, has to be removed from file system 
+(suppression). If you don't want to press the <enter> key several thousand 
+times,
 *** here comes the option: -w
 (don't warn)
 all file will be overwritten without warning, but you may also use the -r 
 option, that will avoid trying to overwrite more recent files than those
 on filesystem. It might not be of a great use, if you restore a differential
-backup after a its reference backup on an initially empty disk (file stored
+backup after its reference backup on an initially empty disk (file stored
 in the differential archive are more recent than those in the reference). 
 But, it might be useful in some other situations. 
 
@@ -265,7 +283,7 @@ then any additional archive:
 	lilo -r /disk
 
 10. you can reboot you machine and be happy with you brand-new hard disk with
-your data on it:
+your old precious data on it:
 	shutdown -r now
 
 OK, one day, I will make something like a bootable floppy image with dar 
@@ -276,7 +294,7 @@ done it, you can forward it to me to be published on the dar web site.
 STEP 4(bis): recover only some files
 --------------------------------------
 Gosh, you have remove a important file by error. Thus, you just need to restore
-it not the whole full and differential backups. 
+it, not the rest of the full and differential backups. 
 
 a) first method:
 '''''''''''''''''''
@@ -309,7 +327,7 @@ b) second method (more efficient):
 We will restore our lost file, starting from the most recent differential 
 backup and *maybe* up to the full backup. Our file may or may not be present 
 in the each differential archive as it may have changed or not since the 
-previous version, thus we have to check if our file is restored using the
+previous version, thus we have to check if our file is restored, using the
 -v option:
 
 	dar -x /zip/linux_diff29 -R / -v home/denis/my_precious_file
@@ -318,12 +336,13 @@ if we can see a line like
 
 	restore file: /home/denis/my_precious_file
 
-thus we stop here, because we got the most recent backup version of or lost 
-file. Else, we have to go continue with the previous differential backup, up
+thus we stop here, because we got the most recent backup version of our lost 
+file. Else, we have to continue with the previous differential backup, up
 to the full backup if it is necessary. 
-This method has an advantage over first one, which is not to have *in any case*
+This method has an advantage over first one, which is not to have *in all case*
 the need to use all the backup done since the full backup.
 
+but if you are lazy, have a look at dar_manager man page !
 '''''''''''''''''''''''''''''''
 
 OK, now you have two files to restore ? No problem, just do the second method
@@ -334,16 +353,23 @@ previous step:
 
 check the output to see if one or both of your files got restored. If not, 
 continue with the previous backup, up to the time you have seen for each file
-a line indicating it been restored. Note that the most recent  version of each 
+a line indicating it been restored. Note that the most recent version of each 
 files may not be located in the same archive, thus you might get /etc/fstab
 restored from linux_diff28, and /home/denis/my_precious_file restored at 
 linux_diff27. In the case /etc/fstab is also present in linux_diff27 it would
-not have been overwitten by an older version, thanks to the -r option. Thus,
+not have been overwritten by an older version, thanks to the -r option. Thus,
 this option is very important where restoring more than one file using the
 second method. Instead, in the first method (restoring first from
 the full backup, then from all the following differential backups), -r option
 is not so important as if overwriting occurs when you restore lost files, 
 you would only overwrite an older version by a newer.
+
+same thing here, even if you are not lazy, dar_manager can help you much here,
+to automate the restoration of a set of file.
+How much can you restore with dar_manager ? as much as you can give to 
+dar_manager as argument on command line. dar_manager, the last children of dar
+suite, will certainly be improved in the future.
+
 
 
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.10 2002/05/15 21:56:01 denis Rel $
+// $Id: terminateur.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -31,7 +31,7 @@
 void terminateur::dump(generic_file & f)
 {
     infinint size = f.get_position(), nbbit, reste;
-    int last_byte;
+    S_I last_byte;
     unsigned char a;
 
     pos.dump(f);
@@ -42,9 +42,9 @@ void terminateur::dump(generic_file & f)
     if(reste != 0)
     {
 	    // adding some non informational bytes to get a multiple of BLOCK_SIZE
-	int bourrage = reste % BLOCK_SIZE;
+	S_I bourrage = reste % BLOCK_SIZE;
 	a = 0;
-	for(int i = bourrage; i < BLOCK_SIZE; i++)
+	for(S_I i = bourrage; i < BLOCK_SIZE; i++)
 	    f.write((char *)&a, 1);
 
 	    // one more for remaing bytes and non informational bytes.
@@ -57,7 +57,7 @@ void terminateur::dump(generic_file & f)
     if(last_byte != 0)
     {                // making the last byte (starting eof) of the terminator string
 	a = 0;
-	for(int i = 0; i < last_byte; i++)
+	for(S_I i = 0; i < last_byte; i++)
 	{
 	    a >>= 1;
 	    a |= 0x80;
@@ -76,13 +76,13 @@ void terminateur::dump(generic_file & f)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: terminateur.cpp,v 1.10 2002/05/15 21:56:01 denis Rel $";
+    static char id[]="$Id: terminateur.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }
 
 void terminateur::read_catalogue(generic_file & f)
 {
-    signed int offset = 0;
+    S_I offset = 0;
     unsigned char a;
 
     f.skip_to_eof();

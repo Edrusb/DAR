@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.cpp,v 1.14 2002/06/12 18:38:00 denis Rel $
+// $Id: tronc.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -43,7 +43,7 @@ tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_
     current = size; // forces skipping the firt time
 }
 
-bool tronc::skip(infinint pos)
+bool tronc::skip(const infinint & pos)
 {
     if(current == pos)
 	return true;
@@ -67,7 +67,7 @@ bool tronc::skip_to_eof()
     return ref->skip(start + sz);
 }
 
-bool tronc::skip_relative(signed int x)
+bool tronc::skip_relative(S_I x)
 {
     if(x < 0)
 	if(current < -x)
@@ -115,16 +115,16 @@ bool tronc::skip_relative(signed int x)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: tronc.cpp,v 1.14 2002/06/12 18:38:00 denis Rel $";
+    static char id[]="$Id: tronc.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $";
     dummy_call(id);
 }
 
-int tronc::inherited_read(char *a, size_t size)
+S_I tronc::inherited_read(char *a, size_t size)
 {
     infinint avail = sz - current;
-    unsigned long int macro_pas = 0, micro_pas;
-    unsigned long lu = 0;
-    int ret;
+    U_32 macro_pas = 0, micro_pas;
+    U_32 lu = 0;
+    S_I ret;
 
     do
     {
@@ -150,12 +150,12 @@ int tronc::inherited_read(char *a, size_t size)
     return lu;
 }
 
-int tronc::inherited_write(char *a, size_t size)
+S_I tronc::inherited_write(char *a, size_t size)
 {
     infinint avail = sz - current;
-    unsigned long int macro_pas = 0, micro_pas;
-    unsigned long int wrote = 0;
-    int ret;
+    U_32 macro_pas = 0, micro_pas;
+    U_32 wrote = 0;
+    S_I ret;
 
     ref->skip(start + current);
     do

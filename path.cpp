@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.cpp,v 1.20 2002/05/15 21:56:01 denis Rel $
+// $Id: path.cpp,v 1.8 2002/10/28 20:39:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -176,7 +176,7 @@ bool path::is_subdir_of(const path & p) const
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: path.cpp,v 1.20 2002/05/15 21:56:01 denis Rel $";
+    static char id[]="$Id: path.cpp,v 1.8 2002/10/28 20:39:34 edrusb Rel $";
     dummy_call(id);
 }
 

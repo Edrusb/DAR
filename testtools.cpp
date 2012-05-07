@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: testtools.cpp,v 1.9 2002/05/17 16:17:48 denis Rel $
+// $Id: testtools.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,7 @@
 #include "deci.hpp"
 #include "testtools.hpp"
 #include "user_interaction.hpp"
+#include "integers.hpp"
 
 void display(const infinint & x)
 {
@@ -35,9 +36,9 @@ void display(const infinint & x)
 
 void display_read(generic_file & f)
 {
-    const int size = 10;
+    const S_I size = 10;
     char buffer[size];
-    int lu = f.read(buffer, size);
+    S_I lu = f.read(buffer, size);
     if(lu < size)
 	buffer[lu] = '\0';
     else
@@ -47,9 +48,9 @@ void display_read(generic_file & f)
 
 void display_back_read(generic_file & f)
 {
-    const int size = 10;
+    const S_I size = 10;
     char buffer[size];
-    int lu = 0;
+    S_I lu = 0;
     while(lu < size && f.read_back(buffer[lu]) == 1 )
 	lu++;
     if(lu < size)

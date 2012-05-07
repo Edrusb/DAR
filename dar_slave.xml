@@ -1,0 +1,72 @@
+<?xml  version="1.0"  standalone="yes"?>
+<!DOCTYPE help [
+<!ELEMENT help (indents | hdr | arg )*>
+<!ELEMENT indents EMPTY>
+<!ATTLIST indents
+  flag CDATA #IMPLIED
+  desc CDATA #IMPLIED
+  cont CDATA #IMPLIED
+  wrap CDATA #IMPLIED>
+<!ELEMENT hdr (#PCDATA)>
+<!ATTLIST hdr
+  vspace CDATA #IMPLIED>
+<!ELEMENT arg (desc)>
+<!ATTLIST arg 
+  vspace CDATA #IMPLIED
+  flag 	 CDATA #IMPLIED
+  opt  	 CDATA #IMPLIED
+  repl 	 CDATA #IMPLIED>
+<!ELEMENT desc (#PCDATA | p | repl)*>
+<!ELEMENT repl (#PCDATA)>
+<!ELEMENT p EMPTY>
+]>
+<help>
+
+  <indents flag="4" desc="20" cont="1" wrap="79"/>
+
+  <hdr vspace="1">options:</hdr>
+
+  <arg flag="-i" repl="named pipe">
+    <desc>
+      use the given pipe instead of standard input to read orders from dar 
+    </desc>
+  </arg>
+
+  <arg flag="-o" repl="named pipe">
+    <desc>
+      use the given pipe instead of standard output to write data to dar 
+    </desc>
+  </arg>
+
+  <arg flag="-E" repl="string">
+    <desc>
+       command line to execute between slices of the archive
+    </desc>
+  </arg>
+
+   <hdr vspace="1">
+    See man page for more details.
+  </hdr>
+<!--
+$Log: dar_slave.xml,v $
+Revision 1.3  2002/10/28 20:39:28  edrusb
+updated CVS with last development version
+
+Revision 1.2  2002/08/22 20:27:59  denis
+mise en place de dar-help
+
+Revision 1.3  2002/08/20 13:44:08  cs1cwm
+Added DTD and removed the #ifdef and #endif.
+
+It now passes xmllint validation.
+
+Revision 1.2  2002/08/17 13:41:48  cs1cwm
+Changed to use arg flag, opt and repl attributes.
+
+Some changes to text.
+
+Revision 1.1  2002/08/17 13:13:31  cs1cwm
+Initial revision
+
+-->
+</help>

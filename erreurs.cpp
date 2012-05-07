@@ -18,22 +18,22 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.16 2002/05/17 16:17:48 denis Rel $
+// $Id: erreurs.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
 #pragma implementation
 
-#include "erreurs.hpp"
 #include <iostream.h>
 #include <strstream>
+#include "erreurs.hpp"
 
 static bool initialized = false;
 
 static void init();
 static void inattendue();
 static void notcatched();
-static string int_to_string(int i);
+static string int_to_string(S_I i);
 
 list<Egeneric *> Egeneric::destroyed;
 list<Egeneric *> Egeneric::all_instances;
@@ -89,9 +89,9 @@ void Egeneric::dump() const
     cerr << "-----------------------------------" << endl << endl;
 }
 
-unsigned int Egeneric::alive()
+U_I Egeneric::alive()
 {
-    unsigned int ret = 0;
+    U_I ret = 0;
     list<Egeneric *>::iterator it = all_instances.begin();
     
     while(it != all_instances.end())
@@ -131,8 +131,8 @@ void Egeneric::display_alive()
     }
 }
 
-Ebug::Ebug(string file, int line) : Egeneric(string("file ") + file + " line " + int_to_string(line), "it seems to be a bug here") {};
-void Ebug::stack(string passage, string file, string line) 
+Ebug::Ebug(const string & file, S_I line) : Egeneric(string("file ") + file + " line " + int_to_string(line), "it seems to be a bug here") {};
+void Ebug::stack(const string & passage, const string & file, const string & line) 
 {
     Egeneric::stack(passage, string("in file ") + file + " line " + string(line));
 }
@@ -146,7 +146,7 @@ static void init()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: erreurs.cpp,v 1.16 2002/05/17 16:17:48 denis Rel $";
+    static char id[]="$Id: erreurs.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -203,7 +203,7 @@ static void notcatched()
     Egeneric::display_last_destroyed();
 }
 
-static string int_to_string(int i)
+static string int_to_string(S_I i)
 {
     ostrstream r;
     string s;

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_path.cpp,v 1.11 2002/05/28 20:17:29 denis Rel $
+// $Id: test_path.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -28,7 +28,7 @@
 
 void f2();
 
-int main()
+S_I main()
 {
     MEM_IN;
     try
@@ -43,7 +43,7 @@ int main()
 	
 	path *p[5] = { &p1, &p2, &p3, &p4, &p5 };
 
-	for(int i = 0; i < 5; i++)
+	for(S_I i = 0; i < 5; i++)
 	{
 	    string s;
 
@@ -110,7 +110,7 @@ void f2()
 		    NULL };
     path conv = "/";
 
-    for(int i = 0; src[i] != NULL; i++)
+    for(S_I i = 0; src[i] != NULL; i++)
     {
 	conv = path(src[i]);
 	cout << string(src[i]) << " --> " << conv.display() << endl;

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.19 2002/06/18 21:16:06 denis Rel $
+// $Id: filesystem.hpp,v 1.8 2002/10/28 20:39:32 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,10 +27,13 @@
 
 #include "catalogue.hpp"
 
+//// set of function for initialization
 extern void filesystem_set_root(const path &root, bool allow_overwrite, bool warn_overwrite, bool info_details, bool root_ea, bool user_ea);
 extern void filesystem_ignore_owner(bool mode);
 extern void filesystem_freemem();
 
+
+//// set of functions for filesystem reading (backup)
 extern void filesystem_reset_read();
     // reset reading. for both filesystem_read() and filesystem_read_filename() methods
 extern bool filesystem_read(entree * &ref);
@@ -38,6 +41,7 @@ extern void filesystem_skip_read_to_parent_dir();
     // to use with filesystem_read() to continue reading in parent directory and
     // ignore all entry not yet read of current directory
 
+//// set of functions for filesystem reading (comparision with existing archive)
 extern bool filesystem_read_filename(const string & name, nomme * &ref);
     // looks a file of name given in argument, in current reading directory 
     // WARNING : cannot mix fileystem_read() and filesystem_read_filename()
@@ -47,6 +51,7 @@ extern void filesystem_skip_read_filename_in_parent_dir();
     // must be called when using filesystem_read_filename() to explore parent dir
 
 
+//// set of functions for writing (restoration)
 extern void filesystem_reset_write();
 extern bool filesystem_write(const entree *x);	
     // the argument may be an object from class destroy
@@ -59,17 +64,22 @@ extern void filesystem_pseudo_write(const directory *dir);
     // do not restore the directory, just stores that we are now 
     // inspecting its contents
 
+//// set of functions to manage EA (trapped and redirected to ea.hpp module) 
 extern bool filesystem_ea_has_been_restored(const hard_link *h);
     // true if the inode pointed to by the arg has already got its EA restored
 extern bool filesystem_set_ea(const nomme *e, const ea_attributs & l);
     // check the inode for which to restore EA, is not a hard link to
     // an already restored inode, else call the proper ea_filesystem call
 
+//// set of functions to manage hard links
 extern void filesystem_write_hard_linked_target_if_not_set(const etiquette *ref, const string & chemin);
     // if a hard linked inode has not been restored (no change, or less recent than the one on filesystem)
     // it is necessary to inform filesystem, where to hard link on, any future hard_link 
     // that could be necessary to restore.
 extern bool filesystem_known_etiquette(const infinint & eti);
     // return true if an inode in filesystem has been seen for that hard linked inode
+extern void filesystem_forget_etiquette(file_etiquette *obj);
+    // tell the filesystem module that the reference of that etiquette does not
+    // exist anymore (not covered by filter for example)
 
 #endif

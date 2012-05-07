@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: deci.cpp,v 1.17 2002/06/05 21:32:26 denis Rel $
+// $Id: deci.cpp,v 1.9 2002/10/31 21:02:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,10 +26,11 @@
 
 #include "deci.hpp"
 #include "erreurs.hpp"
+#include "integers.hpp"
 
 typedef unsigned char chiffre;
 
-static const unsigned int PAS = 5;
+static const U_I PAS = 5;
 static inline chiffre get_left(unsigned char a) { return (a & 0xF0) >> 4; };
 static inline chiffre get_right(unsigned char a) { return a & 0x0F; };
 static inline void set_left(unsigned char & a, chiffre val) { val <<= 4; a &= 0x0F; a |= val; };
@@ -113,7 +114,7 @@ deci::deci(string s) throw(Edeci, Ememory, Erange, Ebug)
     bool recule = false;
     unsigned char tmp = 0xFF;
 
-    unsigned int size = s.size() / 2;
+    U_I size = s.size() / 2;
     if(s.size() % 2 != 0)
 	size++;
 
@@ -240,7 +241,7 @@ void deci::reduce() throw(Ememory, Erange, Ebug)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: deci.cpp,v 1.17 2002/06/05 21:32:26 denis Rel $";
+    static char id[]="$Id: deci.cpp,v 1.9 2002/10/31 21:02:35 edrusb Rel $";
     dummy_call(id);
 }
 

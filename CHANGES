@@ -31,22 +31,60 @@ from version 1.0.0 to version 1.1.0
       asking user, goes to stderr (all goes to stderr if stdout is used for
       producing the archive, or for sending orders do dar_slave.
 - added feature: DAR automatically goes in non interactive mode if no terminal
-      is found on standart input (for example when run from crontab). In that
+      is found on standard input (for example when run from crontab). In that
       case any question make DAR to abort.
 - added feature: catalogue extraction to small file: "isolation" (-C option)
 - added feature: archive produced on stdout when using -c or -C with "-" as 
       filename
-- added feature: -V option summarises version of the binary
+- added feature: -V option summarizes version of the binary
 - added feature: additional command "dar_xform" to "re-slice" an archive
 - added feature: read archive trough a pair of pipes with the help of dar_slave
 - added feature: long option are now available (see man page)
 - fixed bug #5
-- a lot of speed optimisation in algorithm
+- a lot of speed optimization in algorithm
 - changed exit codes to positive values in case of error
 - dar returns an new error code when an operation is partially successful 
   (some filed missed to be saved / restored / tested / compared).
-- replace the use of vform() method by a customised simple implementation 
+- replace the use of vform() method by a customized simple implementation 
   in the ui_printf() routine, this should now allow compilation with gcc-3
 - changed long option that used an underscore character (`_') by a dash ('-')
 - added -O option to have a better behaviour when used with non root user
 - added 'make doc' option in the makefile
+
+from version 1.1.0 to version 1.2.0	
+- -P option can now accept wild cards
+- changed dar output format when listing archive contents to have something 
+  more similar to the output of tar. -T is provided to get the previous tree 
+  listing
+- fixed bug #6
+- user interaction is now possible even if standard input is used (for pipe)
+- fixed bug #7
+- added some missing #include files for compilation under Windows using Cygwin
+- added feature to display name of user and group (when possible) in place of
+  uid and gid while listing archive contents.
+- added the possibility to launch command between slices (-E and -F options)
+  for dar, dar_xform and dar_slave.
+- when saving or comparing a directory tree, DAR goes transparently in 
+  subdirectory not modifying the last_access date of each directory.
+- usage text (displayed by -h option) is now generated from xml file
+  thanks to Chris Martin's little software named dar-help
+- fixed bug concerning the uninstallation of man pages
+- changed the place where man pages and documentation go /usr/share/doc 
+  usr/share/man 
+  in place of /usr/doc and /usr/man for the RPM package (conform to Filesystem
+  Hierarchy Standard)
+- changed the place where documentation goes for /usr/local/doc to 
+  /usr/local/share/doc by default. (Thanks to Jerome Zago)
+  (conform to Filesystem Hierarchy Standard)
+- added scrambling features (-J and -K options)
+- added selective compression (-Y and -Z options)
+- added third state for saved data to keep trace in an extracted catalogue of
+  what is saved in the reference archive (this opens the door to the archive 
+  manager)
+- added the ability to read configuration file (-B option, -B like "batch").
+- if a slice name is given in place of a base name, dar proposes to change
+  to the correct base name (strips the extension number and dots).
+- fixed bug #8
+- added dar_manager command-line program
+- replaced integer types by macro that can be adapted to have correct behavior
+  on 64 bits plateform (in particular to read archive from other platforms).

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_compressor.cpp,v 1.9 2002/05/28 20:17:29 denis Rel $
+// $Id: test_compressor.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,10 +27,11 @@
 #include <fcntl.h>
 #include "compressor.hpp"
 #include "test_memory.hpp"
+#include "integers.hpp"
 
 static void f1();
 
-int main()
+S_I main()
 {
     MEM_IN;
     f1();

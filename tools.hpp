@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.18 2002/05/15 21:56:01 denis Rel $
+// $Id: tools.hpp,v 1.10 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,9 +26,11 @@
 #define TOOLS_HPP
 
 #include <string>
+#include <vector>
 #include "path.hpp"
 #include "generic_file.hpp"
 #include "tuyau.hpp"
+#include "integers.hpp"
 
 using namespace std;
 
@@ -45,10 +47,25 @@ extern infinint tools_get_filesize(const path &p);
 extern infinint tools_get_extended_size(string s);
 extern char *tools_extract_basename(const char *command_name); 
 extern void tools_split_path_basename(const char *all, path * &chemin, string & base);
+extern void tools_split_path_basename(const string &all, string & chemin, string & base);
 extern void tools_open_pipes(const string &input, const string & output, tuyau *&in, tuyau *&out);
 extern void tools_blocking_read(int fd, bool mode);
+extern string tools_name_of_uid(U_16 uid);
+extern string tools_name_of_gid(U_16 gid);
+extern string tools_int2str(int x);
+extern U_32 tools_str2int(const string & x);
+extern string tools_addspacebefore(string s, unsigned int expected_size);
+extern string tools_display_date(infinint date);
+extern void tools_system(const vector<string> & argvector);
+extern void tools_write_vector(generic_file & f, const vector<string> & x);
+extern void tools_read_vector(generic_file & f, vector<string> & x);
+extern string tools_concat_vector(const string & separator, const vector<string> & x);
+vector<string> operator + (vector<string> a, vector<string> b);
+
+template <class T> vector<T> operator +=(vector<T> & a, const vector<T> & b)
+{
+    a = a + b;
+    return a;
+}
 
 #endif
-
-
-

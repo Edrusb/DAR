@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.hpp,v 1.8 2002/05/15 21:56:01 denis Rel $
+// $Id: tronc.hpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -35,14 +35,14 @@ public :
     tronc(generic_file *f, const infinint &offset, const infinint &size);
     tronc(generic_file *f, const infinint &offset, const infinint &size, gf_mode mode);
     
-    bool skip(infinint pos);
+    bool skip(const infinint & pos);
     bool skip_to_eof();
-    bool skip_relative(signed int x);
+    bool skip_relative(S_I x);
     infinint get_position() { return current; };
 
 protected :
-    int inherited_read(char *a, size_t size);
-    int inherited_write(char *a, size_t size);
+    S_I inherited_read(char *a, size_t size);
+    S_I inherited_write(char *a, size_t size);
 
 private :
     infinint start, sz;

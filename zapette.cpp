@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.cpp,v 1.10 2002/06/26 22:20:20 denis Rel $
+// $Id: zapette.cpp,v 1.5 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -39,7 +39,7 @@
 struct request
 {
     char serial_num;
-    unsigned short size; // size or REQUEST_SIZE_SPECIAL_ORDER
+    U_16 size; // size or REQUEST_SIZE_SPECIAL_ORDER
     infinint offset; // offset or REQUEST_OFFSET_END_TRANSMIT or REQUEST_OFFSET_GET_FILESIZE
  
     void write(generic_file *f); // master side
@@ -50,16 +50,16 @@ struct answer
 {
     char serial_num;
     char type;
-    unsigned short size;
+    U_16 size;
     infinint arg;
     
     void write(generic_file *f, char *data); // slave side
-    void read(generic_file *f, char *data, unsigned short max);  // master side
+    void read(generic_file *f, char *data, U_16 max);  // master side
 };
 
 void request::write(generic_file *f)
 {
-    unsigned short tmp = htons(size);
+    U_16 tmp = htons(size);
 
     f->write(&serial_num, 1);
     offset.dump(*f);
@@ -68,8 +68,8 @@ void request::write(generic_file *f)
 
 void request::read(generic_file *f)
 {
-    unsigned short tmp;
-    unsigned short pas;
+    U_16 tmp;
+    U_16 pas;
 
     if(f->read(&serial_num, 1) == 0)
 	throw Erange("request::read", "uncompleted request received, aborting\n");
@@ -82,7 +82,7 @@ void request::read(generic_file *f)
 
 void answer::write(generic_file *f, char *data)
 {
-    unsigned short tmp = htons(size);
+    U_16 tmp = htons(size);
 
     f->write(&serial_num, 1);
     f->write(&type, 1);
@@ -104,10 +104,10 @@ void answer::write(generic_file *f, char *data)
     }
 }
 
-void answer::read(generic_file *f, char *data, unsigned short max)
+void answer::read(generic_file *f, char *data, U_16 max)
 {
-    unsigned short tmp;
-    unsigned short pas;
+    U_16 tmp;
+    U_16 pas;
 
     f->read(&serial_num, 1);
     f->read(&type, 1);
@@ -176,7 +176,7 @@ void slave_zapette::action()
     request req;
     answer ans;
     char *buffer = NULL;
-    unsigned short buf_size = 0;
+    U_16 buf_size = 0;
 
     try
     {
@@ -262,13 +262,13 @@ zapette::zapette(generic_file *input, generic_file *output) : generic_file(gf_re
 	//////////////////////////////
 	// retreiving the file size
 	//
-    int tmp = 0;
+    S_I tmp = 0;
     make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_GET_FILESIZE, NULL, tmp, file_size);
 }
     
 zapette::~zapette()
 {
-    int tmp = 0;
+    S_I tmp = 0;
     make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_END_TRANSMIT, NULL, tmp, file_size);
 
     delete in;
@@ -277,11 +277,11 @@ zapette::~zapette()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: zapette.cpp,v 1.10 2002/06/26 22:20:20 denis Rel $";
+    static char id[]="$Id: zapette.cpp,v 1.5 2002/10/31 21:02:37 edrusb Rel $";
     dummy_call(id);
 }
 
-bool zapette::skip(infinint pos)
+bool zapette::skip(const infinint & pos)
 {
     if(pos >= file_size)
     {
@@ -295,7 +295,7 @@ bool zapette::skip(infinint pos)
     }
 }
 
-bool zapette::skip_relative(signed int x)
+bool zapette::skip_relative(S_I x)
 {
     if(x >= 0)
     {
@@ -321,16 +321,16 @@ bool zapette::skip_relative(signed int x)
 	}
 }
 
-int zapette::inherited_read(char *a, size_t size)
+S_I zapette::inherited_read(char *a, size_t size)
 {
-    static unsigned short int max_short = ~0;
-    unsigned int lu = 0;
+    static U_16 max_short = ~0;
+    U_I lu = 0;
     
     if(size > 0)
     {
 	infinint not_used;
-	unsigned short pas;
-	int ret;
+	U_16 pas;
+	S_I ret;
 
 	do
 	{
@@ -348,12 +348,12 @@ int zapette::inherited_read(char *a, size_t size)
     return lu;
 }
 
-int zapette::inherited_write(char *a, size_t size)
+S_I zapette::inherited_write(char *a, size_t size)
 {
     throw SRC_BUG; // zapette is read-only
 }
 
-void zapette::make_transfert(unsigned short size, const infinint &offset, char *data, int & lu, infinint & arg)
+void zapette::make_transfert(U_16 size, const infinint &offset, char *data, S_I & lu, infinint & arg)
 {
     request req;
     answer ans;

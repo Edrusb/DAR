@@ -18,22 +18,23 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_erreurs.cpp,v 1.12 2002/05/28 20:17:29 denis Rel $
+// $Id: test_erreurs.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
 #include <iostream.h>
 #include "erreurs.hpp"
+#include "integers.hpp"
 
-void f1(int i);
-void f2(int i, int j) throw(Erange);
+void f1(S_I i);
+void f2(S_I i, S_I j) throw(Erange);
 
 void status()
 {
     cout << "nombre total d'exceptions : " << Egeneric::total() << "   dont  " << Egeneric::alive() << " vivante(s) " << " et " << Egeneric::zombies() << " zombie(s) " << endl;
 }
 
-void f1(int i) 
+void f1(S_I i) 
 {
     try
     {
@@ -49,7 +50,7 @@ void f1(int i)
     }
 }
 
-void f2(int i, int j) throw(Erange)
+void f2(S_I i, S_I j) throw(Erange)
 {
     try
     {
@@ -112,7 +113,7 @@ void f4()
     Egeneric::display_last_destroyed();
 }
 
-int main()
+S_I main()
 {
     status();
     f4();

@@ -18,19 +18,20 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_mask.cpp,v 1.9 2002/05/28 20:17:29 denis Rel $
+// $Id: test_mask.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
 #include <iostream.h>
 #include "mask.hpp"
+#include "integers.hpp"
 
 static void display_res(mask *m, string s)
 {
     cout << s << " : " << (m->is_covered(s) ? "OUI" : "non") << endl;
 }
 
-int main()
+S_I main()
 {
     simple_mask m1 = string("*.toto");
     simple_mask m2 = string("a?.toto");

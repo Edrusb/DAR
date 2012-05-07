@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_deci.cpp,v 1.9 2002/06/05 21:32:26 denis Rel $
+// $Id: test_deci.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -28,7 +28,7 @@
 
 static void f1();
 
-int main()
+S_I main()
 {
     MEM_IN;
     f1();
@@ -42,7 +42,7 @@ static void f1()
     infinint t = 3;
     deci d2 = t;
     deci d3 = infinint(125);
-    unsigned int c;
+    U_I c;
     
     cout << d1.human() << endl;
     cout << d2.human() << endl;

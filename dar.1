@@ -1,4 +1,4 @@
-.TH DAR 1 "MAY 2, 2002"
+.TH DAR 1 "SEPT 28, 2002"
 .UC 8
 .SH NAME
 dar \- disk archive
@@ -118,16 +118,46 @@ Do not consider the EA of the root (or system) namespace. By default, they are s
 Note concerning Extended Attributes (EA): support for EA must be activated at compilation time, if your system supports it. Thus you can get two binaries of dar (of the same version), one supporting EA and another which does not (dar -h to see whether EA support is activated). The archives they produce are the same and can be read by each other. The only difference is that the binary without EA support is not able to save or restore EAs, but is still able to test them and list their presence.
 .TP 20
 -i, --input <path>
-is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c or -C is used). When reading from pipe, standard input is used, but with this option, the file <path> (usually a named pipe) is used instead. This option can also be used to keep standard input for interacting with dar, while feeding dar with a remote archive. This option is to receive output from dar_slave program.
+is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c or -C is used). When reading from pipe, standard input is used, but with this option, the file <path> (usually a named pipe) is used instead.  This option is to receive output from dar_slave program.
 .TP 20
 -o, --output <path>
 iq available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c or -C is used). When reading from pipe, standard output is used to send request to dar_slave, but with this option, the file <path> (usually a named pipe) is used instead. When standard output is used, all messages goes to standard error (not only interactive messages). 
 .TP 20 
 -O, --ignore-owner
-Do not consider user ID (uid) or group ID (gid), when comparing with archive of reference (-c -A) while doing a differential backup, when extracting (-x) or when comparing (-d). This is useful when dar is used by a non-priviledged user. It will then not display tons of messages that it could not restore original user and group ownership, it will not consider a file has changed just because it has only the uid or gid changed, nor report a comparison mismatch if only
+Do not consider user ID (uid) or group ID (gid), when comparing with archive of reference (-c -A) while doing a differential backup, when extracting (-x) or when comparing (-d). This is useful when dar is used by a non-priviledged user. It will not consider a file has changed just because it has only the uid or gid changed, nor report a comparison mismatch if only
 uid or gid is different.
+.TP 20
+-E, --execute <string>
+the string is a
+.B user command-line
+to be launched between slices. For reading (thus using -t, -d, -l or -x options), the command is executed before the slice is read or even asked, for writing, (thus using -c or -C option), the command is executed once the slice has been completed. Some substitution string can be used in the string:
+.RS
+.TP 10 
+%%
+will be replaced by %
+.TP 10
+%p
+will be replaced by the slice path
+.TP 10
+%b
+will be replaced by the slice basename
+.TP 10
+%n
+will be replaced by the slice number (to be read or just written). For reading, dar often needs the last slice, but initially it does not know its number. If it cannot be found in the current directory, the user command-line is then called with %n equal to 0 askin the user (via the user command-line to provide the last slice). If after it is still not present, dar asks the user (as usually) with a message on the terminal. Once the last slice is found, the user command-line is called a second time, with %n equal to the value of the last slice number.
+.RE
+.TP 20
+-F, --execute-ref <string>
+same as -E but is applied between slices of the reference archive (-A option).
+.TP 20
+-K, --key <string>
+scramble or unscramble the archive using <string> as pass phrase. A scrambled archive can only be read if the same pass phrase is given. OK, that's a very weak scheme, I don't even speak about encryption. So why this feature ? Because I needed it. Without any tool, it is really difficult for a human to crack the scramble (if the key is long enough and is not the repetition of a shorter sequence. For not very important data you it might be useful to avoid unexperimented people to have a look at you data.
 
-
+.TP 20
+-J, --key-ref <string>
+same as -K but the given key is used to unscramble the archive of reference (given with -A option).
+.TP 20
+-B, --batch <filename>
+You can put in the file any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occures in case of loop (a file includes itself) and DAR aborts immediately. Actually no comment is allowed in configuration files. 
 .PP
 .RE
 SAVING AND ISOLATION OPTIONS (to use with -c or -C)
@@ -158,6 +188,12 @@ will pause and ask the user for required slices if they are not present.
 When excluding directories either explicitly using -P option, or implicitly giving a [list of paths], 
 .B dar
 does not store anything about theses. But with -D option, dar stores them as empty directories. This can be useful, if excluding a mount point (like /proc or /dev/pts). At restoration time, dar will then recreate theses directories (if necessary). This option has no meaning with -C and is ignored in that case.
+.TP 20
+-Z, --exclude-compression <mask>
+Filenames covered by this mask are not compressed. It is only useful with -z or -y. By default, all file are compressed (if compression is used).
+.TP 20
+-Y, --include-compression <mask>
+Filenames covered by this mask (and not covered by -Z) are the only to be compressed. It is only available with -z no -y. By default all files are compressed.
 .PP
 .PP
 .RE
@@ -181,7 +217,43 @@ No specific option, but all general options are available except -n and -w which
 LISTING OPTIONS (to use with -l)
 .RS
 .PP
-No specific options, and only -v and -b from general options are useful.
+.TP 20
+ -T, --tar-format 
+can be used to have an output more *similar* the one of 'tar -tv' command. By the way DAR is not TAR and does not have any compatibility to respect with it. This feature is provided because it is sometimes more useful to have the full path to each file in the archive listing (to be used with grep for example) instead of the directory tree structure.
+.P
+Else only -v and -b from general options are useful.
+.TP 10
+displayed 
+fields
+.RS
+.TP 10
+[data]
+possible values are [     ] or [Saved] or [InRef] . [     ] means that the data has been saved because there is no change since backup of reference. [Saved] means that the data has been saved, and thus this archive is able to restore the file. [InRef] is used when isolating a catalogue from an archive, and means the file was saved in the reference archive.
+.TP 10
+[EA]
+possible values are " " (empty string) or [Saved] or [     ]. Shows if Extended Attributes are present and saved ([Saved]), are present but not saved ([NoChg] when there is no change since backup of reference), or if they are absent ("").
+.TP 10
+[compr]
+possible values are [....%] or [-----] or [     ] or [worse]. Shows if the file has been compressed and the compression rate reached ([...%]), or if the file is stored without compression ([    ] see -Y and -Z options) or if the file is not subject to compression because it is not a saved regular file ([----]), or if the file takes more space compressed than its original size ([worse]), due to compression overhead.
+.TP 10
+permission
+see ls man page
+.TP 10
+user
+owner of the file
+.TP 10
+group
+group owner of the file
+.TP 10
+size
+size in byte of the file (if compression is enabled, the real size in the archive is compression rate smaller).
+.TP 10
+date
+the last modification date of the file. The last access time is also saved and restored, but not displayed.
+.TP 10
+filename
+The name of the file.
+.RE
 
 .SH EXIT CODES
 .B dar
@@ -204,14 +276,17 @@ Code issued when the user has aborted the program upon dar question from dar. Th
 .TP 10
 5
 is returned when an error concerning the treated data has been detected. While saving, this is the case when a file could not be opened or read. While restoring, it is the case when a file could not be created or replaced. While comparing, it is the case when a file in the archive does not match the one in the filesystem. While testing, it is the case when a file is corrupted in the archive.
+.TP 10
+6
+an error occured while executing user command (given with -E or -F option). Mainly because the creation of a new process is not possible (process table is full) or the user command returned an error code (exit status different of zero).
 
 .SH SEE ALSO
-dar_xform(1), dar_slave(1)
+dar_xform(1), dar_slave(1), dar_manager(1)
 
 .SH KNOWN BUGS
 dar cannot restore time of symbolic links. Many (all ?) UNIX do not provide any way to do that, the utime() system call changes the file pointed to by the link rather than the date of the link itself.
 .P
-dar saves and restore atime and mtime, but cannot restore ctime (last inode change), there does not seems to be a standard call to do that under UNIX.
+dar saves and restores atime and mtime, but cannot restore ctime (last inode change), there does not seems to be a standard call to do that under UNIX.
 
 .SH AUTHOR
 .nf

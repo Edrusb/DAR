@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.hpp,v 1.26 2002/06/12 18:38:00 denis Rel $
+// $Id: erreurs.hpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,6 +29,7 @@
 
 #include <string>
 #include <list>
+#include "integers.hpp"
 
 using namespace std;
 
@@ -42,13 +43,13 @@ public :
     Egeneric(const Egeneric & ref);
     virtual ~Egeneric() { all_instances.remove(this); };
 
-    virtual void stack(string passage, string message = "") { pile.push_back(niveau(passage, message)); };
+    virtual void stack(const string & passage, const string & message = "") { pile.push_back(niveau(passage, message)); };
     string get_message() const { return pile.front().objet; };
     void dump() const;
 
-    static unsigned int total() { return all_instances.size(); };
-    static unsigned int zombies() { return destroyed.size(); };
-    static unsigned int alive();
+    static U_I total() { return all_instances.size(); };
+    static U_I zombies() { return destroyed.size(); };
+    static U_I alive();
     static void clear_last_destroyed();
     static void display_last_destroyed(); // displays and clear the last destroyed exceptions fifo
     static void display_alive();
@@ -67,7 +68,7 @@ private :
     };
     list<niveau> pile;
 
-    static const unsigned int fifo_size = 10; // number of last destroyed exceptions recorded
+    static const U_I fifo_size = 10; // number of last destroyed exceptions recorded
     static list<Egeneric *> destroyed; // copies of destroyed last execeptions 
     static list<Egeneric *> all_instances;
 };
@@ -75,7 +76,7 @@ private :
 class Ememory : public Egeneric
 {
 public:
-    Ememory(string source) : Egeneric(source, "Lack of Memory") {};
+    Ememory(const string &source) : Egeneric(source, "Lack of Memory") {};
     ~Ememory() { if(!zombie) add_to_last_destroyed(new Ememory(*this)); };
 
 protected :
@@ -89,10 +90,10 @@ protected :
 class Ebug : public Egeneric 
 {
 public :
-    Ebug(string file, int line);
+    Ebug(const string & file, S_I line);
     ~Ebug() { if(!zombie) add_to_last_destroyed(new Ebug(*this)); };
     
-    void stack(string passage, string file, string line);
+    void stack(const string & passage, const string & file, const string & line);
 protected :
     string exceptionID() const { return "BUG"; };
     Ebug *dup() const { return new Ebug(*this); };
@@ -101,7 +102,7 @@ protected :
 class Einfinint : public Egeneric 
 {
 public :
-    Einfinint(string source, string message) : Egeneric(source, message) {};
+    Einfinint(const string & source, const string & message) : Egeneric(source, message) {};
     ~Einfinint() { if(!zombie) add_to_last_destroyed(new Einfinint(*this)); };
 
 protected :
@@ -112,7 +113,7 @@ protected :
 class Erange : public Egeneric 
 {
 public :
-    Erange(string source, string message) : Egeneric(source, message) {};
+    Erange(const string & source, const string & message) : Egeneric(source, message) {};
     ~Erange() { if(!zombie) add_to_last_destroyed(new Erange(*this)); };
 
 protected : 
@@ -123,7 +124,7 @@ protected :
 class Edeci : public Egeneric 
 {
 public :
-    Edeci(string source, string message) : Egeneric(source, message) {};
+    Edeci(const string & source, const string & message) : Egeneric(source, message) {};
     ~Edeci() { if(!zombie) add_to_last_destroyed(new Edeci(*this)); };
 
 protected :
@@ -134,7 +135,7 @@ protected :
 class Efeature : public Egeneric
 {
 public :
-    Efeature(string message) : Egeneric("", message) {};
+    Efeature(const string & message) : Egeneric("", message) {};
     ~Efeature() { if(!zombie) add_to_last_destroyed(new Efeature(*this)); };
 
 protected :
@@ -145,7 +146,7 @@ protected :
 class Ehardware : public Egeneric
 {
 public :
-    Ehardware(string source, string message) : Egeneric(source, message) {};
+    Ehardware(const string & source, const string & message) : Egeneric(source, message) {};
     ~Ehardware() { if(!zombie) add_to_last_destroyed(new Ehardware(*this)); };
 
 protected :
@@ -156,7 +157,7 @@ protected :
 class Euser_abort : public Egeneric
 {
 public :
-    Euser_abort(string msg) : Egeneric("",msg) {};
+    Euser_abort(const string & msg) : Egeneric("",msg) {};
     ~Euser_abort() { if(!zombie) add_to_last_destroyed(new Euser_abort(*this)); };
 
 protected :
@@ -168,12 +169,24 @@ protected :
 class Edata : public Egeneric
 {
 public :
-    Edata(string msg) : Egeneric("", msg) {};
+    Edata(const string & msg) : Egeneric("", msg) {};
     ~Edata() { if(!zombie) add_to_last_destroyed(new Edata(*this)); };
 
 protected :
     string exceptionID() const { return "ERROR IN TREATED DATA"; };
     Edata *dup() const { return new Edata(*this); };
+};
+
+
+class Escript : public Egeneric
+{
+public :
+    Escript(const string & source, const string & msg) : Egeneric(source ,msg) {};
+    ~Escript() { if(!zombie) add_to_last_destroyed(new Escript(*this)); };
+
+protected :
+    string exceptionID() const { return "USER ABORTED OPERATION"; };
+    Escript *dup() const { return new Escript(*this); };
 };
 
 #endif

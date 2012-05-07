@@ -18,20 +18,30 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.52 2002/06/27 17:42:35 denis Rel $
+// $Id: command_line.cpp,v 1.10 2002/10/31 21:02:34 edrusb Rel $
 //
 /*********************************************************************/
 
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <getopt.h>
 #include <string>
+#include <errno.h>
+#include <algorithm>
+#include <vector>
+#include <deque>
 #include "deci.hpp"
 #include "command_line.hpp"
 #include "user_interaction.hpp"
 #include "tools.hpp"
 #include "dar.hpp"
 #include "dar_suite.hpp"
+#include "etage.hpp"
+#include "integers.hpp"
+
+#define OPT_STRING "c:A:x:d:t:l:vzynwpkR:s:S:X:I:P:bhLWDruUVC:i:o:OTE:F:K:J:Y:Z:B:"
 
 using namespace std;
 
@@ -41,15 +51,43 @@ static void show_warranty();
 static void show_version(const char *command_name);
 static void usage(const char *command_name);
 static const struct option *get_long_opt();
+static bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], operation &op, path * &fs_root, path * &sauv_root, path * &ref_root,
+			       infinint &file_size, infinint &first_file_size, ou_mask & inclus, ou_mask & exclus, 
+			       deque<string> & path_inclus, deque<string> & l_path_exclus,
+			       string & filename, string *& ref_filename,
+			       bool &allow_over, bool &warn_over, bool &info_details,
+			       compression &algo, bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
+			       bool & only_more_recent, bool & ea_root, bool & ea_user,
+			       string & input_pipe, string &output_pipe,
+			       bool & ignore_owner, 
+			       string & execute, string & execute_ref,
+			       string & pass, string & pass_ref,
+			       ou_mask & compr_inclus, ou_mask & compr_exclus,
+			       bool &tar_format);
+static void make_args_from_file(const char *filename, S_I & argc, char **&argv);
+static void destroy(S_I argc, char **argv);
+static char * make_word(S_I fd, off_t start, off_t end);
+static void skip_getopt(S_I argc, char *argv[], S_I next_to_read);
+static void check_basename(string & base);
+static bool is_a_slice_available(const string & base);
+static string retreive_basename(const string & base);
 
-bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sauv_root, path * &ref_root,
+// #define DEBOGGAGE
+#ifdef DEBOGGAGE
+static void show_args(S_I argc, char *argv[]);
+#endif
+
+bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path * &sauv_root, path * &ref_root,
 	      infinint &file_size, infinint &first_file_size, mask *&selection, mask *&subtree,
 	      string &filename, string *&ref_filename,
 	      bool &allow_over, bool &warn_over, bool &info_details,
 	      compression &algo, bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
 	      bool & only_more_recent, bool & ea_root, bool & ea_user,
 	      string & input_pipe, string &output_pipe,
-	      bool & ignore_owner)
+	      bool & ignore_owner, 
+	      string & execute, string & execute_ref,
+	      string & pass, string & pass_ref,
+	      mask *& compress_mask)
 {
     fs_root = NULL;
     sauv_root = NULL;
@@ -68,10 +106,15 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
     pause = false;
     beep = false;
     make_empty_dir = false;
-    only_more_recent = false;
+    only_more_recent = false; // when listing, it is set to true, if tar-format is asked
     input_pipe = "";
     output_pipe = "";
     ignore_owner = false;
+    execute = "";
+    execute_ref = "";
+    pass = "";
+    pass_ref = "";
+    compress_mask = NULL;
 #ifdef EA_SUPPORT
     ea_user = true;
     ea_root = true;
@@ -79,273 +122,47 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
     ea_user = false;
     ea_root = false;
 #endif
-    int lu;
     ou_mask inclus, exclus;
     ou_mask path_inclus, path_exclus;
-    vector<string> l_path_exclus;
+    ou_mask compr_inclus, compr_exclus;
+    deque<string> l_path_exclus;
+    deque<string> l_path_inclus;
     et_mask *tmp_mask;
-
+    bool tar_format = true;
+    vector<string> inclusions;
+    
     try
     {
 	try
 	{
 	    opterr = 0;
 	    
-	    while((lu = getopt_long(argc, argv, "c:A:x:d:t:l:vzynwpkR:s:S:X:I:P:bhLWDruUVC:i:o:O", get_long_opt(), NULL)) != EOF)
-	    {
-		switch(lu)
-		{
-		case 'c':
-		case 'x':
-		case 'd':
-		case 't':
-		case 'l':
-		case 'C':
-		    if(optarg == NULL)
-			throw Erange("get_args", string(" missing argument to -")+char(lu));
-		    if(filename != "" || sauv_root != NULL)
-			throw Erange("get_args", " only one option of -c -d -t -l -C or -x is allowed");
-		    if(optarg != "")
-			tools_split_path_basename(optarg, sauv_root, filename);
-		    else
-			throw Erange("get_args", string(" invalid argument for option -") + char(lu));
-		    switch(lu)
-		    {
-		    case 'c':
-			op = create;
-			break;
-		    case 'x':
-			op = extract;
-			break;
-		    case 'd':
-			op = diff;
-			break;
-		    case 't':
-			op = test;
-			break;
-		    case 'l':
-			op = listing;
-			break;
-		    case 'C':
-			op = isolate;
-			break;
-		    default:
-			throw SRC_BUG;
-		    }
-		    break;
-		case 'A':
-		    if(ref_filename != NULL || ref_root != NULL)
-			throw Erange("get_args", "only one -A option is allowed");
-		    if(optarg == NULL)
-			throw Erange("get_args", "missing argument to -A");
-		    if(optarg == "")
-			throw Erange("get_args", "invalid argument for option -A");
-		    if(optarg == "-")
-			throw Erange("get_args", "- not allowed with -A option");
-		    ref_filename = new string();
-		    if(ref_filename == NULL)
-			throw Ememory("get_args");
-		    try
-		    {
-			tools_split_path_basename(optarg, ref_root, *ref_filename);
-		    }
-		    catch(...)
-		    {
-			delete ref_filename;
-			throw;
-		    }
-		    break;
-		case 'v':
-		    info_details = true;
-		    break;
-		case 'z':
-		    if(algo == none)
-			algo = gzip;
-		    else
-			throw Erange("get_args", "choose either -z or -y not both");
-		    break;
-		case 'y':
-		    if(algo == none)
-			algo = bzip2;
-		    else
-			throw Erange("get_args", "choose either -z or -y not both");
-		    break;
-		case 'n':
-		    allow_over = false;
-		    if(!warn_over)
-		    {
-			user_interaction_warning("-w option is useless with -n");
-			warn_over = false;
-		    }
-		    break;
-		case 'w':
-		    warn_over = false;
-		    break;
-		case 'p':
-		    pause = true;
-		    break;
-		case 'k':
-		    detruire = false;
-		    break;
-		case 'R':
-		    if(fs_root != NULL)
-			throw Erange("get_args", "only one -R option is allowed");
-		    if(optarg == NULL)
-			throw Erange("get_args", "missing argument to -R");
-		    else
-			fs_root = new path(optarg);
-		    if(fs_root == NULL)
-			throw Ememory("get_args");
-		    break;
-		case 's':
-		    if(file_size != 0)
-			throw Erange("get_args", "only one -s option is allowed");
-		    if(optarg == NULL)
-			throw Erange("get_args", "missing argument to -s");
-		    else
-		    {
-			try
-			{
-			    file_size = tools_get_extended_size(optarg);
-			    if(first_file_size == 0)
-				first_file_size = file_size;
-			}
-			catch(Edeci &e)
-			{
-			    user_interaction_warning("invalid size for option -s");
-			    return false;
-			}
-		    }
-		    break;
-		case 'S':
-		    if(optarg == NULL)
-			throw Erange("get_args", "missing argument to -S");
-		    if(first_file_size == 0)
-			first_file_size = tools_get_extended_size(optarg);
-		    else
-			if(file_size == 0)
-			    throw Erange("get_args", "only one -S option is allowed");
-			else
-			    if(file_size == first_file_size)
-			    {
-				try
-				{
-				    first_file_size = tools_get_extended_size(optarg);
-				    if(first_file_size == file_size)
-					user_interaction_warning("specifying -S with the same value as the one given in -s is useless");
-				}
-				catch(Egeneric &e)
-				{
-				    user_interaction_warning("invalid size for option -S");
-				    return false;
-				}
-
-			    }
-			    else
-				throw Erange("get_args", "only one -S option is allowed");
-		    break;
-		case 'X':
-		    if(optarg == NULL)
-			throw Erange("get_args", "missiong argument to -X");
-		    exclus.add_mask(simple_mask(string(optarg)));
-		    break;
-		case 'I':
-		    if(optarg == NULL)
-			throw Erange("get_args", "missing argument to -X");
-		    inclus.add_mask(simple_mask(string(optarg)));
-		    break;
-		case 'P':
-		    if(optarg == NULL)
-			throw Erange("get_args", "missing argument to -P");
-		    l_path_exclus.push_back(optarg);
-		    break;
-		case 'b':
-		    beep = true;
-		    break;
-		case 'h':
-		    usage(argv[0]);
-		    return false;
-		case 'L':
-		    show_license();
-		    return false;
-		case 'W':
-		    show_warranty();
-		    return false;
-		case 'D':
-		    if(make_empty_dir)
-			user_interaction_warning("syntax error: -D option has not to be present only once, ignoring additional -D");
-		    else
-			make_empty_dir = true;
-		    break;
-		case 'r':
-		    if(!allow_over)
-			user_interaction_warning("NOTE : -r is useless with -n\n");
-		    if(only_more_recent)
-			user_interaction_warning("syntax error: -r is only necessary once, ignoring other occurences\n");
-		    else
-			only_more_recent = true;
-		    break;
-		case 'u':
-#ifdef EA_SUPPORT
-		    if(!ea_user)
-			user_interaction_warning("syntax error: -u is only necessary once, ignoring other occurences\n");
-		    else
-			ea_user = false;
-#else
-		    user_interaction_warning("WARNING! Extended Attributs Support has not been activated at compilation time, thus -u option does nothing");
-#endif 
-		    break;
-		case 'U':
-#ifdef EA_SUPPORT
-		    if(!ea_root)
-			user_interaction_warning("syntax error : -U is only necessary once, ignoring other occurences\n");
-		    else
-			ea_root = false;
-#else
-		    user_interaction_warning("WARNING! Extended Attributs Support has not been activated at compilation time, thus -U option does nothing.");
-#endif
-		    break;
-		case 'V':
-		    show_version(argv[0]);
-		    return false;
-		case ':':
-		    throw Erange("get_args", string("missing parameter to option ") + char(optopt));
-		case 'i':
-		    if(optarg == NULL)
-			throw Erange("get_args", "missing argument to -i");
-		    if(input_pipe == "")
-			input_pipe = optarg;
-		    else
-			user_interaction_warning("only one -i option is allowed, considering the first one");
-		    break;
-		case 'o':
-		    if(optarg == NULL)
-			throw Erange("get_args", "missing argument to -o");
-		    if(output_pipe == "")
-			output_pipe = optarg;
-		    else
-			user_interaction_warning("only one -o option is allowed, considering the first one");
-		    break;
-		case 'O':
-		    if(ignore_owner)
-			user_interaction_warning("only one -O option is necessary, ignoring other instances");
-		    else
-			ignore_owner = true;
-		    break;
-		case '?':
-		    user_interaction_warning(string("ignoring unknown option ") + char(optopt)); 
-		    break;
-		default:
-		    user_interaction_warning(string("ignoring unknown option ") + char(lu)); 
-		}
-	    }
-
+	    
+	    if(!get_args_recursive(inclusions, argc, argv, op, fs_root, sauv_root, ref_root, 
+				   file_size, first_file_size, inclus, exclus,
+				   l_path_inclus, l_path_exclus,
+				   filename, ref_filename, 
+				   allow_over, warn_over, info_details,
+				   algo, detruire, pause, beep, make_empty_dir,
+				   only_more_recent, ea_root, ea_user,
+				   input_pipe, output_pipe,
+				  ignore_owner,
+				   execute,
+				   execute_ref,
+				   pass, pass_ref,
+				   compr_inclus, compr_exclus,
+				   tar_format))
+		return false;
+		
+	    
 		// some sanity checks
 
 	    if(filename == "" || sauv_root == NULL)
 		throw Erange("get_args", string("missing -c -x -d -t -l -C option, see `") + path(argv[0]).basename() + " -h' for help");
 	    if(filename == "-" && file_size != 0)
 		throw Erange("get_args", "slicing (-s option), is not compatible with archive on standart output (\"-\" as filename)");
+	    if(filename != "-" && (op != create || op != isolate))
+		check_basename(filename);
 	    if(fs_root == NULL)
 		fs_root = new path(".");
 	    if(ref_filename != NULL && op != create && op != isolate)
@@ -355,6 +172,8 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 	    if(filename == "-" && ref_filename != NULL && *ref_filename == "-"
 	       && output_pipe == "")
 		throw Erange("get_args", "-o is mandatory when using \"-A -\" with \"-c -\" or \"-C -\"");
+	    if(ref_filename != NULL && *ref_filename != "-")
+		check_basename(*ref_filename);
 	    if(algo != none && op != create && op != isolate)
 		user_interaction_warning("-z or -y need only to be used with -c\n");
 	    if(first_file_size != 0 && file_size == 0)
@@ -378,12 +197,21 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 		}
 		delete name;
 	    }
+	    if(op == listing && tar_format)
+		only_more_recent = true; 
+	    if(execute != "" && file_size == 0 && (op == create || op == isolate))
+		user_interaction_warning("-E is not possible (and useless) with -c or -C and without slicing (-s option), -E will be ignored");
+	    if(execute_ref != "" && ref_filename == NULL)
+		user_interaction_warning("-F is only useful with -A option, for the archive of reference");
+	    if(pass_ref != "" && ref_filename == NULL)
+		user_interaction_warning("-J is only useful with -A option, for the archive of reference");
+	    
 
 		// generating masks
 		// for filenames
-
+		//
 	    tmp_mask = new et_mask();
-	    selection = tmp_mask;
+	    selection = tmp_mask; // tmp_mask is a pointer on et_mask which "selection" is not
 	    if(tmp_mask == NULL)
 		throw Ememory("get_args");
 	    if(inclus.size() > 0)
@@ -395,12 +223,14 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 
 		// generating masks for
 		// directory tree
-
+		//
 		// reading arguments remaining on the command line
-
-	    if(optind < argc)
-		for(int i = optind; i < argc; i++)
-		    path_inclus.add_mask(simple_path_mask((*fs_root + path(argv[i])).display()));
+	    if(l_path_inclus.size() > 0)
+		while(l_path_inclus.size() > 0)
+		{
+		    path_inclus.add_mask(simple_path_mask((*fs_root + path(l_path_inclus.front())).display()));
+		    l_path_inclus.pop_front();
+		}				  
 	    else
 		path_inclus.add_mask(bool_mask(true));
 
@@ -408,8 +238,8 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 
 	    while(l_path_exclus.size() > 0)
 	    {
-		path_exclus.add_mask(same_path_mask((*fs_root + path(l_path_exclus.back())).display()));
-		l_path_exclus.pop_back();
+		path_exclus.add_mask(simple_mask((*fs_root + path(l_path_exclus.front())).display()));
+		l_path_exclus.pop_front();
 	    }
 
 	    tmp_mask = new et_mask();
@@ -422,6 +252,27 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 		tmp_mask->add_mask(bool_mask(true));
 	    if(path_exclus.size() > 0)
 		tmp_mask->add_mask(not_mask(path_exclus));
+
+		// generating mask for 
+		// compression selected files
+		//
+	    if(algo == none)
+	    {
+		if(compr_inclus.size() > 0)
+		    user_interaction_warning("-Y is only useful with -z or -y option, ignoring -Y");
+		if(compr_exclus.size() > 0)
+		    user_interaction_warning("-Z is only useful with -z or -y option, ignoring -Z");
+	    }
+	    tmp_mask = new et_mask();
+	    compress_mask = tmp_mask;  // tmp_mask is a pointer on et_mask which "compress_mask" is not
+	    if(tmp_mask == NULL)
+		throw Ememory("get_args");
+	    if(compr_inclus.size() > 0 && algo != none)
+		tmp_mask->add_mask(compr_inclus);
+	    else
+		tmp_mask->add_mask(bool_mask(true));
+	    if(compr_exclus.size() > 0 && algo != none)
+		tmp_mask->add_mask(not_mask(compr_exclus));
 	}
 	catch(...)
 	{
@@ -435,6 +286,8 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 		delete subtree;
 	    if(ref_filename != NULL)
 		delete ref_filename;
+	    if(compress_mask != NULL)
+		delete compress_mask;
 	    throw;
 	}
     }
@@ -446,76 +299,396 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
     return true;
 }
 
+bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], operation &op, path * &fs_root, path * &sauv_root, path * &ref_root,
+			infinint &file_size, infinint &first_file_size, ou_mask & inclus, ou_mask & exclus, 
+			deque<string> & l_path_inclus, deque<string> & l_path_exclus,
+			string & filename, string *& ref_filename,
+			bool &allow_over, bool &warn_over, bool &info_details,
+			compression &algo, bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
+			bool & only_more_recent, bool & ea_root, bool & ea_user,
+			string & input_pipe, string &output_pipe,
+			bool & ignore_owner, 
+			string & execute, string & execute_ref,
+			string & pass, string & pass_ref,
+			ou_mask & compr_inclus, ou_mask & compr_exclus,
+			bool &tar_format)
+{ 
+    S_I lu;
+    S_I rec_c;
+    char **rec_v = NULL;
+   
+    while((lu = getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL)) != EOF)
+    {
+	switch(lu)
+	{
+	case 'c':
+	case 'x':
+	case 'd':
+	case 't':
+	case 'l':
+	case 'C':
+	    if(optarg == NULL)
+		throw Erange("get_args", string(" missing argument to -")+char(lu));
+	    if(filename != "" || sauv_root != NULL)
+		throw Erange("get_args", " only one option of -c -d -t -l -C or -x is allowed");
+	    if(optarg != "")
+		tools_split_path_basename(optarg, sauv_root, filename);
+	    else
+		throw Erange("get_args", string(" invalid argument for option -") + char(lu));
+	    switch(lu)
+	    {
+	    case 'c':
+		op = create;
+		break;
+	    case 'x':
+		op = extract;
+		break;
+	    case 'd':
+		op = diff;
+		break;
+	    case 't':
+		op = test;
+		break;
+	    case 'l':
+		op = listing;
+		break;
+	    case 'C':
+		op = isolate;
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+	    break;
+	case 'A':
+	    if(ref_filename != NULL || ref_root != NULL)
+		throw Erange("get_args", "only one -A option is allowed");
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -A");
+	    if(optarg == "")
+		throw Erange("get_args", "invalid argument for option -A");
+	    if(optarg == "-")
+		throw Erange("get_args", "- not allowed with -A option");
+	    ref_filename = new string();
+	    if(ref_filename == NULL)
+		throw Ememory("get_args");
+	    try
+	    {
+		tools_split_path_basename(optarg, ref_root, *ref_filename);
+	    }
+	    catch(...)
+	    {
+		delete ref_filename;
+		throw;
+	    }
+	    break;
+	case 'v':
+	    info_details = true;
+	    break;
+	case 'z':
+	    if(algo == none)
+		algo = gzip;
+	    else
+		throw Erange("get_args", "choose either -z or -y not both");
+	    break;
+	case 'y':
+	    if(algo == none)
+		algo = bzip2;
+	    else
+		throw Erange("get_args", "choose either -z or -y not both");
+	    break;
+	case 'n':
+	    allow_over = false;
+	    if(!warn_over)
+	    {
+		user_interaction_warning("-w option is useless with -n");
+		warn_over = false;
+	    }
+	    break;
+	case 'w':
+	    warn_over = false;
+	    break;
+	case 'p':
+	    pause = true;
+	    break;
+	case 'k':
+	    detruire = false;
+	    break;
+	case 'R':
+	    if(fs_root != NULL)
+		throw Erange("get_args", "only one -R option is allowed");
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -R");
+	    else
+		fs_root = new path(optarg);
+	    if(fs_root == NULL)
+		throw Ememory("get_args");
+	    break;
+	case 's':
+	    if(file_size != 0)
+		throw Erange("get_args", "only one -s option is allowed");
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -s");
+	    else
+	    {
+		try
+		{
+		    file_size = tools_get_extended_size(optarg);
+		    if(first_file_size == 0)
+			first_file_size = file_size;
+		}
+		catch(Edeci &e)
+		{
+		    user_interaction_warning("invalid size for option -s");
+		    return false;
+		}
+	    }
+	    break;
+	case 'S':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -S");
+	    if(first_file_size == 0)
+		first_file_size = tools_get_extended_size(optarg);
+	    else
+		if(file_size == 0)
+		    throw Erange("get_args", "only one -S option is allowed");
+		else
+		    if(file_size == first_file_size)
+		    {
+			try
+			{
+			    first_file_size = tools_get_extended_size(optarg);
+			    if(first_file_size == file_size)
+				user_interaction_warning("specifying -S with the same value as the one given in -s is useless");
+			}
+			catch(Egeneric &e)
+			{
+			    user_interaction_warning("invalid size for option -S");
+			    return false;
+			}
+
+		    }
+		    else
+			throw Erange("get_args", "only one -S option is allowed");
+	    break;
+	case 'X':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missiong argument to -X");
+	    exclus.add_mask(simple_mask(string(optarg)));
+	    break;
+	case 'I':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -X");
+	    inclus.add_mask(simple_mask(string(optarg)));
+	    break;
+	case 'P':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -P");
+	    l_path_exclus.push_back(optarg);
+	    break;
+	case 'b':
+	    beep = true;
+	    break;
+	case 'h':
+	    usage(argv[0]);
+	    return false;
+	case 'L':
+	    show_license();
+	    return false;
+	case 'W':
+	    show_warranty();
+	    return false;
+	case 'D':
+	    if(make_empty_dir)
+		user_interaction_warning("syntax error: -D option has not to be present only once, ignoring additional -D");
+	    else
+		make_empty_dir = true;
+	    break;
+	case 'r':
+	    if(!allow_over)
+		user_interaction_warning("NOTE : -r is useless with -n\n");
+	    if(only_more_recent)
+		user_interaction_warning("syntax error: -r is only necessary once, ignoring other occurences\n");
+	    else
+		only_more_recent = true;
+	    break;
+	case 'u':
+#ifdef EA_SUPPORT
+	    if(!ea_user)
+		user_interaction_warning("syntax error: -u is only necessary once, ignoring other occurences\n");
+	    else
+		ea_user = false;
+#else
+	    user_interaction_warning("WARNING! Extended Attributs Support has not been activated at compilation time, thus -u option does nothing");
+#endif 
+	    break;
+	case 'U':
+#ifdef EA_SUPPORT
+	    if(!ea_root)
+		user_interaction_warning("syntax error : -U is only necessary once, ignoring other occurences\n");
+	    else
+		ea_root = false;
+#else
+	    user_interaction_warning("WARNING! Extended Attributs Support has not been activated at compilation time, thus -U option does nothing.");
+#endif
+	    break;
+	case 'V':
+	    show_version(argv[0]);
+	    return false;
+	case ':':
+	    throw Erange("get_args", string("missing parameter to option ") + char(optopt));
+	case 'i':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -i");
+	    if(input_pipe == "")
+		input_pipe = optarg;
+	    else
+		user_interaction_warning("only one -i option is allowed, considering the first one");
+	    break;
+	case 'o':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -o");
+	    if(output_pipe == "")
+		output_pipe = optarg;
+	    else
+		user_interaction_warning("only one -o option is allowed, considering the first one");
+	    break;
+	case 'O':
+	    if(ignore_owner)
+		user_interaction_warning("only one -O option is necessary, ignoring other instances");
+	    else
+		ignore_owner = true;
+	    break;
+	case 'T': // long option --tar-format
+	    if(!tar_format)
+		user_interaction_warning("only one -T option is necessary, ignoring other instances");
+	    else
+		tar_format = false;
+	    break;
+	case 'E':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -E");
+	    if(execute == "")
+		execute = optarg;
+	    else
+		user_interaction_warning("only one -E option is allowed, ignoring other instances");
+	    break;
+	case 'F':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -F");
+	    if(execute_ref == "")
+		execute_ref = optarg;
+	    else
+		user_interaction_warning("only one -F option is allowed, ignoring other instances");
+	    break;
+	case 'J':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -J");
+	    if(pass_ref == "")
+		pass_ref = optarg;
+	    else
+		user_interaction_warning("only one -J option is allowed, ignoring other instances");
+	    break;
+	case 'K':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -K");
+	    if(pass == "")
+		pass = optarg;
+	    else
+		user_interaction_warning("only one -K option is allowed, ignoring other instances");
+	    break;
+	case 'Y':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missiong argument to -Y");
+	    compr_inclus.add_mask(simple_mask(string(optarg)));
+	    break;
+	case 'Z':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -Z");
+	    compr_exclus.add_mask(simple_mask(string(optarg)));
+	    break;
+	case 'B':
+	    if(optarg == NULL)
+		throw Erange("get_args", "missing argument to -B");
+	    if(find(inclusions.begin(), inclusions.end(), string(optarg)) != inclusions.end())
+		throw Erange("geta_args", string("file inclusion loop detected. The file ") + optarg  + " includes itslef directly or through other files (-B option)");
+	    else
+	    {
+		bool ret;
+		make_args_from_file(optarg, rec_c, rec_v);
+		#ifdef DEBOGGAGE
+		show_args(rec_c, rec_v);
+		#endif
+		S_I optind_mem = optind; // save the external variable to use recursivity (see getopt)
+		optind = 0; // reset getopt module
+
+		try
+		{
+		    inclusions.push_back(optarg);
+		    ret = get_args_recursive(inclusions, rec_c, rec_v, op, fs_root, sauv_root, ref_root, 
+					     file_size, first_file_size, inclus, exclus,
+					     l_path_inclus, l_path_exclus,
+					     filename, ref_filename, 
+					     allow_over, warn_over, info_details,
+					     algo, detruire, pause, beep, make_empty_dir,
+					     only_more_recent, ea_root, ea_user,
+					     input_pipe, output_pipe,
+					     ignore_owner,
+					     execute,
+					     execute_ref,
+					     pass, pass_ref,
+					     compr_inclus, compr_exclus,
+					     tar_format);
+		    inclusions.pop_back();
+		}
+		catch(...)
+		{
+		    destroy(rec_c, rec_v);
+		    optind = optind_mem;
+		    throw;
+		}
+		destroy(rec_c, rec_v);
+		skip_getopt(argc, argv, optind_mem); // restores getopt after recursion
+
+		if(!ret)
+		    return false;
+	    }
+	    break;
+	case '?':
+	    user_interaction_warning(string("ignoring unknown option ") + char(optopt));
+	    break;
+	default:
+	    user_interaction_warning(string("ignoring unknown option ") + char(lu)); 
+	}
+    }
+    for(S_I i = optind; i < argc; i++)
+	l_path_inclus.push_back(argv[i]);
+
+    return true;
+}
+
 static void usage(const char *command_name)
 {
     char *name = tools_extract_basename(command_name);
 
     try
     {
-	ui_printf("usage :\t %s [-c|-x|-d|-t|-l|-C] [<path>/]<basename> [options...] [list of paths]\n", name);
-	ui_printf("       \t %s -h\n", name);
-	ui_printf("       \t %s -V\n", name);
-	ui_printf("\ncommands are:\n");
-	ui_printf("\t-c creates an archive\n");
-	ui_printf("\t-x extracts files from the archive\n");
-	ui_printf("\t-d compares archive with existing filesystem\n");
-	ui_printf("\t-t tests the archive integrity\n");
-	ui_printf("\t-l lists the contents of the archive\n");
-	ui_printf("\t-C isolates the catalogue from an archive\n");
-	ui_printf("\n");
-	ui_printf("\t-h displays this help information\n");
-	ui_printf("\t-V displays version information\n");
-	ui_printf("\ncommon options:\n");
-	ui_printf("\t-v \t\t verbose output\n");
-	ui_printf("\t-R <path> \t filesystem root directory for saving or restoring (current dir by default)\n");
-	ui_printf("\t-X <mask> \t files to exclude from operation (none by default)\n");
-	ui_printf("\t-I <mask> \t files to include in the operation (all by default)\n");
-	ui_printf("\t\t\t -X and -I do not concern directories [see -P and list of paths for that]\n");
-	ui_printf("\t \t\t -X, -I and -P may be present several time on the command line\n");
-	ui_printf("\t-P <path> \t sub tree of filesystem root [-R] to exclude from operation\n");
-	ui_printf("\t-n \t\t don't overwrite files\n");
-	ui_printf("\t-w \t\t don't warn before overwriting files\n");
-	ui_printf("\t \t\t by default overwriting is allowed but a warning is issued before\n");
-	ui_printf("\t-b \t\t make terminal ringing when user action is required\n");
-	ui_printf("\t-O \t\t do not consider user and group ownership\n");
-#ifdef EA_SUPPORT
-	ui_printf("\t-u \t\t do not save/restore Extended Attributes of the user namespace\n");
-	ui_printf("\t-U \t\t do not save/restore Extended Attributes of the root namespace (need root priviledges\n");
-#endif
-	ui_printf("\t [list of paths] sub-trees of the filesystem root [-R] to consider (all by default) [see also -P]\n");
-	ui_printf("\nsaving or isolation options (to use with -c or -C) :\n");
-	ui_printf("\t-A [<path>/]<basename> archive to take as reference (mandatory with -C)\n");
-	ui_printf("\t-z \t\t compress data in archive using gzip algorithm\n");
-	ui_printf("\t-y \t\t compress data in archive using bzip2 algorithm (NOT IMPLEMENTED)\n");
-	ui_printf("\t \t\t by default the archive is not compressed\n");
-	ui_printf("\t-s <integer> \t split the archive in several files of size <integer>\n");
-	ui_printf("\t-S <integer> \t first file size (if different from following ones) [requires -s]\n");
-	ui_printf("\t-p \t\t pause before writing to a new file [requires -s]\n");
-	ui_printf("\t-D \t\t store as empty directory those that have been excluded by filters (using -P option)\n");
-	ui_printf("\nrestoring options (to use with -x) :\n");
-	ui_printf("\t-k \t\t do not remove files stored as destroyed since the reference backup [see also -A]\n");
-	ui_printf("\t \t\t -k is useless with -n\n");
-	ui_printf("\t-r \t\t restore files only if they are absent or more recent than thoses on filesystem\n");
-	ui_printf("\nreading options (to use with -x, -d, -t, -l, -C, -c)\n");
-	ui_printf("\t-i <filename>\t use the given filename to read data from dar_slave instead of standart input\n");
-	ui_printf("\t-o <filename>\t use the given filename to write orders to dar_slave instead of standart output\n");
-	ui_printf("\t\t\t theses two options are only available if the basename of the archive to read is \"-\", which means\n");
-	ui_printf("\t\t\t reading the archive from a pipe. For -C and -c options the archive to read is the one\n");
-	ui_printf("\t\t\t given with -A option: the archive of reference\n");
-	ui_printf("\n");
-	ui_printf("see man page for more details, not all common option are available for each option\n\n"); 
+	ui_printf("usage: %s [-c|-x|-d|-t|-l|-C] [<path>/]<basename> [options...] [list of paths]\n", name);
+	ui_printf("       %s -h\n", name);
+	ui_printf("       %s -V\n", name);
+#include "dar.usage"
     }
     catch(...)
     {
 	delete name;
 	throw;
     }
+
     delete name;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.52 2002/06/27 17:42:35 denis Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.10 2002/10/31 21:02:34 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -927,8 +1100,292 @@ static const struct option *get_long_opt()
 	{"version", no_argument, NULL, 'V'},
 	{"exclude", required_argument, NULL, 'X'},
 	{"ignore-owner", no_argument, NULL, 'O'},
+	{"tree-format", no_argument, NULL, 'T'},
+	{"execute", required_argument, NULL, 'E'},
+	{"execute-ref",required_argument, NULL, 'F'},
+	{"key", required_argument, NULL, 'K'},
+	{"key-ref", required_argument, NULL, 'J'},
+	{"include-compression", required_argument, NULL, 'Y'},
+	{"exclude-compression", required_argument, NULL, 'Z'},
+	{"batch", required_argument, NULL, 'B'},
 	{ NULL, 0, NULL, 0 }
     };
 
     return ret;
+}
+
+static void make_args_from_file(const char *filename, S_I & argc, char **&argv)
+{
+    vector <char> quotes;
+    vector <char *> mots;
+    argv = NULL;
+
+    S_I fd = open(filename, O_RDONLY);
+    if(fd < 0)
+	throw Erange("make_args_from_file", string("cannot open file ") + filename + " : " + strerror(errno));
+    
+    try
+    {
+	char a;
+	off_t start = 0;
+	off_t end = 0;
+	bool loop = true;
+	const char *command = "dar";
+	char *pseudo_command = new char[strlen(command)+1];
+
+	if(pseudo_command == NULL)
+	    throw Ememory("make_args_from_file");
+	strncpy(pseudo_command, command, strlen(command));
+	pseudo_command[strlen(command)] = '\0';
+	mots.push_back(pseudo_command);
+
+	while(loop)
+	{
+	    if(read(fd, &a, 1) != 1)
+	    {
+		loop = false;
+		a = ' '; // to close the last word
+	    }
+
+	    if(quotes.size() == 0) // outside a word
+		switch(a)
+		{
+		case ' ':
+		case '\t':
+		case '\n':
+		case '\r':
+		    start++;
+		    break;
+		case '"':
+		case '\'':
+		case '`':
+		    quotes.push_back(a);
+		    end = start;
+		    start++;
+		    break;
+		default:
+		    quotes.push_back(' ');
+		    end = start;
+		    break;
+		}
+	    else // inside a word
+		switch(a)
+		{
+		case '\t':
+		    if(quotes.back() != ' ')
+		    {
+			end++;
+			break;
+		    }
+			// no break !
+		case '\n':
+		case '\r':
+		    a = ' ';
+			// no break !
+		case ' ':
+		case '"':
+		case '\'':
+		case '`':
+		    if(a == quotes.back())
+		    {
+			quotes.pop_back();
+			if(quotes.size() == 0)
+			{
+			    mots.push_back(make_word(fd, start, end));
+			    if(a != ' ') 
+				end++;  // skip the trailing quote
+			    if(lseek(fd, end+1, SEEK_SET) < 0)
+				throw Erange("make_args_from_file", string("Error seeking into config file ") + filename + " : " + strerror(errno));
+			    start = end+1;
+			}
+			else 
+			    end++;
+		    }
+		    else
+		    {
+			if(a != ' ')
+			    quotes.push_back(a);
+			end++;
+		    }
+		    break;
+		default:
+		    end++;
+		}
+	}
+	if(quotes.size() > 0)
+	    throw Erange("make_args_from_file", string("Parse error reading config file ") + filename + " : Unmatched " + quotes.back());
+
+	argc = mots.size();
+	argv = new char *[argc];
+	if(argv == NULL)
+	    throw Ememory("make_args_from_file");
+	for(S_I i = 0; i < argc; i++)
+	    argv[i] = mots[i]; // copy of the address of each string
+    }
+    catch(...)
+    {
+	while(mots.size() > 0)
+	{
+	    delete mots.back();
+	    mots.pop_back();
+	}
+	close(fd);
+	throw;
+    }
+    close(fd);
+	// all (char *) addresses in "mots" are now known by argv, 
+	// thus they must be preserved.
+}
+
+static void destroy(S_I argc, char **argv)
+{
+    register S_I i = 0;
+    for(i = 0; i < argc; i++)
+	delete argv[i];
+    delete argv;
+}
+
+static char * make_word(S_I fd, off_t start, off_t end)
+{
+    off_t longueur = end - start + 1;
+    S_I lu = 0, tmp;
+    char *ret = new char[longueur+1];
+
+    if(ret == NULL)
+	throw Ememory("make_word");
+    try
+    {
+	if(lseek(fd, start, SEEK_SET) < 0)
+	    throw Erange("make_word", string("lseek(): ") + strerror(errno));
+	
+	do
+	{
+	    tmp = read(fd, ret+lu, longueur-lu);
+	    if(tmp > 0)
+		lu += tmp;
+	    else
+		if(tmp < 0)
+		    throw Erange("make_word", string("read(): ") + strerror(errno));
+		else // tmp == 0
+		    throw Erange("make_word", "read(): reached EOF");
+	}
+	while(lu < longueur);
+	ret[longueur] = '\0';
+    }
+    catch(...)
+    {
+	delete ret;
+	throw;
+    }
+
+    return ret;
+}
+
+static void skip_getopt(S_I argc, char *argv[], S_I next_to_read)
+{
+    optind = 0; // reset getopt
+    while(getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL) != EOF && optind < next_to_read)
+	;
+}
+
+#ifdef DEBOGGAGE
+static void show_args(S_I argc, char *argv[])
+{
+    register S_I i;
+    for(i = 0; i < argc; i++)
+	ui_printf("[%s]\n", argv[i]);
+}
+#endif
+
+
+static void check_basename(string & base)
+{
+    regular_mask suspect = string(".\\.[1-9][0-9]*\\.")+EXTENSION;
+
+    	// is basename is suspect ?
+    if(!suspect.is_covered(base))
+	return; // not a suspect basename
+    
+	// is there a slice available ?
+    if(is_a_slice_available(base))
+	return; // yes, thus basename is not a mistake
+
+	// removing the suspicious end (.<number>.EXTENSION)
+	// and checking the avaibility of such a slice
+
+    string new_base = retreive_basename(base);
+    if(is_a_slice_available(new_base))
+    {
+	try
+	{
+	    user_interaction_pause(string("Warning, ") + base + " seems more to be a slice name than a base name. Do you want to replace it by " + new_base + " ?");
+	    base = new_base;
+	}
+	catch(Euser_abort & e)
+	{
+	    user_interaction_warning(string("OK, keeping ") + base + " as basename");
+	}
+    }
+}
+
+static bool is_a_slice_available(const string & base)
+{
+    char *name = tools_str2charptr(base);
+    path *chem = NULL;
+    bool ret = false;
+
+    try
+    {
+	char *char_chem = NULL;
+	string rest;
+	
+	tools_split_path_basename(name, chem, rest);
+	char_chem = tools_str2charptr(chem->display());
+	
+	try
+	{
+	    etage contents = char_chem;
+	    regular_mask slice = rest + "\\.[1-9][0-9]*\\."+ EXTENSION;
+	    
+	    while(!ret && contents.read(rest))
+		ret = slice.is_covered(rest);
+	}
+	catch(Erange & e)
+	{
+	    ret = false;
+	}
+	catch(...)
+	{
+	    delete char_chem;
+	    throw;
+	}
+	delete char_chem;
+    }
+    catch(...)
+    {
+	delete name;
+	if(chem != NULL)
+	    delete chem;
+	throw;
+    }
+    delete name;
+    if(chem != NULL)
+	delete chem;
+
+    return ret;
+}
+
+static string retreive_basename(const string & base)
+{
+    string new_base = base;
+    S_I index;
+
+    if(new_base.size() < 2+1+strlen(EXTENSION))
+	throw SRC_BUG; // must be a slice filename
+    index = new_base.find_last_not_of(string(".")+EXTENSION);
+    new_base = string(new_base.begin(), new_base.begin()+index);
+    index = new_base.find_last_not_of("0123456789");
+    new_base = string(new_base.begin(), new_base.begin()+index);
+    
+    return new_base;
 }

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_memory.hpp,v 1.6 2002/04/14 16:12:50 denis Rel $
+// $Id: test_memory.hpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,20 +26,21 @@
 #define TEST_MEMORY_HPP
 
 #include <stdlib.h>
+#include "integers.hpp"
 
 #ifdef TEST_MEMORY
 
 #define MEM_BEGIN record_offset()
 
-#define MEM_IN unsigned long local_total_alloc_size = get_total_alloc_size()
+#define MEM_IN U_32 local_total_alloc_size = get_total_alloc_size()
 #define MEM_OUT memory_check(local_total_alloc_size, __FILE__, __LINE__)
 
 #define MEM_END all_delete_done()
 
 extern void record_offset();
-extern unsigned long get_total_alloc_size();
+extern U_32 get_total_alloc_size();
 extern void all_delete_done();
-extern void memory_check(unsigned long ref, const char *fichier, int ligne);
+extern void memory_check(U_32 ref, const char *fichier, S_I ligne);
 
 #else
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tronc.cpp,v 1.11 2002/06/12 18:38:00 denis Rel $
+// $Id: test_tronc.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,13 +30,14 @@
 #include "deci.hpp"
 #include "testtools.hpp"
 #include "user_interaction.hpp"
+#include "integers.hpp"
 
-int main()
+S_I main()
 {
     path p = "test/source.txt";
     fichier h = fichier(p, gf_read_only);
 
-    user_interaction_init(0,&cout, &cerr);
+    user_interaction_init(&cout, &cerr);
     display_read(h);
     
     try
@@ -67,7 +68,7 @@ int main()
 	cout << f.get_position() << endl;
 
 	delete t;
-	int fd = open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC);
+	S_I fd = open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC);
 	fichier g = fd;
 	f.skip(0);
 	f.copy_to(g);

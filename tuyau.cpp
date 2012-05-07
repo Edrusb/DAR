@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.cpp,v 1.5 2002/06/11 17:46:32 denis Rel $
+// $Id: tuyau.cpp,v 1.5 2002/10/31 21:02:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -32,8 +32,9 @@
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "user_interaction.hpp"
+#include "integers.hpp"
 
-tuyau::tuyau(int fd) : generic_file(generic_file_get_mode(fd))
+tuyau::tuyau(S_I fd) : generic_file(generic_file_get_mode(fd))
 {
     if(filedesc < 0)
 	throw Erange("tuyau::tuyau", "bad file descriptor given");
@@ -42,7 +43,7 @@ tuyau::tuyau(int fd) : generic_file(generic_file_get_mode(fd))
     chemin = "";
 }
 
-tuyau::tuyau(int fd, gf_mode mode) : generic_file(mode)
+tuyau::tuyau(S_I fd, gf_mode mode) : generic_file(mode)
 {
     gf_mode tmp;
 
@@ -63,7 +64,7 @@ tuyau::tuyau(const string & filename, gf_mode mode) : generic_file(mode)
     filedesc = -1; // not yet openned
 }
 
-bool tuyau::skip(infinint pos)
+bool tuyau::skip(const infinint & pos)
 {
     if(pos != position)
 	throw Erange("tuyau::skip", "skipping is not possible on a tuyau (= pipe)");
@@ -75,17 +76,17 @@ bool tuyau::skip_to_eof()
     throw Erange("tuyau::skip", "skipping is not possible on a tuyau (= pipe)");
 }
 
-bool tuyau::skip_relative(signed int x)
+bool tuyau::skip_relative(S_I x)
 {
     if(x != 0)
 	throw Erange("tuyau::skip", "skipping is not possible on a tuyau (= pipe)");
     return true;
 }
 
-int tuyau::inherited_read(char *a, size_t size)
+S_I tuyau::inherited_read(char *a, size_t size)
 {
-    int ret;
-    unsigned int lu = 0;
+    S_I ret;
+    U_I lu = 0;
 
     if(filedesc < 0)
 	ouverture();
@@ -115,7 +116,7 @@ int tuyau::inherited_read(char *a, size_t size)
     return lu;
 }
 
-int tuyau::inherited_write(char *a, size_t size)
+S_I tuyau::inherited_write(char *a, size_t size)
 {
     size_t total = 0;
 
@@ -124,7 +125,7 @@ int tuyau::inherited_write(char *a, size_t size)
 
     while(total < size)
     {
-	int ret = ::write(filedesc, a+total, size-total);
+	S_I ret = ::write(filedesc, a+total, size-total);
 	if(ret < 0)
 	{
 	    switch(errno)
@@ -141,7 +142,7 @@ int tuyau::inherited_write(char *a, size_t size)
 	    }
 	}
 	else
-	    total += (unsigned int)ret;
+	    total += (U_I)ret;
     }
 
     position += total;
@@ -150,7 +151,7 @@ int tuyau::inherited_write(char *a, size_t size)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: tuyau.cpp,v 1.5 2002/06/11 17:46:32 denis Rel $";
+    static char id[]="$Id: tuyau.cpp,v 1.5 2002/10/31 21:02:37 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -161,7 +162,7 @@ void tuyau::ouverture()
 	char *ch = tools_str2charptr(chemin);
 	try
 	{
-	    int flag;
+	    S_I flag;
 
 	    switch(get_mode())
 	    {

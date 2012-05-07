@@ -1,6 +1,24 @@
+
+version 1.2.0
+---------------
+Thanks to Chris Martin, Jerome Zago, Tim Doerzbacher, Sebastien Robart, 
+Kurt Palmer, Bernd Storsberg, Egor Cheshkov, Richard Bratt for feedback
+and suggestions.
+
+I must add a special Thanks to Chris Martin who realized a simple and 
+efficient tool that generates the usage C++ code from files writen in XML 
+syntax, making automatic word wrapping and indentation. This power tool
+named "dar-help" is licensed as part of DAR, but has been totally designed 
+and written by Chris.
+
+
+version 1.1.0
+---------------
+
 Thanks to Moritz Franosch for intensive testing, for finding several bugs and 
 proposing patches, to John Little for testing dar and for providing a forum 
 area, to Ulrich Hagen, Francois Botha, Tobias Jahn for feedback, and to 
 Andreas Gruenbacher for its Extended Attributes software, and its useful 
 answers to my questions. Thanks to the many other people that just encouraged 
 me by their remarks and compliments.
+
