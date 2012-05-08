@@ -1056,6 +1056,7 @@ static void make_file(const nomme * ref, const path & ou, bool dir_perm)
 		throw SRC_BUG; // unknown inode type
 
 	    if(ret < 0)
+	    {
 		if(errno != ENOSPC)
 		    throw Erange("make_file", strerror(errno));
 		else

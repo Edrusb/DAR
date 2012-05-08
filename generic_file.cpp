@@ -65,7 +65,7 @@ int generic_file::read(char *a, size_t size)
 	return (this->*active_read)(a, size);
 }
 
-int generic_file::write(char *a, size_t size)
+int generic_file::write(const char *a, size_t size)
 {
     if(rw == gf_read_only)
 	throw Erange("generic_file::write", "writing to a read only generic_file");
@@ -200,7 +200,7 @@ void generic_file::enable_crc(bool mode)
     }
 }
 
-void generic_file::compute_crc(char *a, int size)
+void generic_file::compute_crc(const char *a, int size)
 {
     for(register int i = 0; i < size; i++)
 	value[(i+crc_offset)%CRC_SIZE] ^= a[i];
@@ -214,7 +214,7 @@ int generic_file::read_crc(char *a, size_t size)
     return ret;
 }
 
-int generic_file::write_crc(char *a, size_t size)
+int generic_file::write_crc(const char *a, size_t size)
 {
     int ret = inherited_write(a, size);
     compute_crc(a, ret);
@@ -363,7 +363,7 @@ int fichier::inherited_read(char *a, size_t size)
     return lu;
 }
 
-int fichier::inherited_write(char *a, size_t size)
+int fichier::inherited_write(const char *a, size_t size)
 {
     int ret;
     size_t total = 0;

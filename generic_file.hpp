@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -56,16 +56,16 @@ class generic_file
 public :
     generic_file(gf_mode m) { rw = m; clear(value); crc_offset = 0; enable_crc(false); };
     virtual ~generic_file() {};
-    
+
     gf_mode get_mode() const { return rw; };
     int read(char *a, size_t size);
-    int write(char *a, size_t size);
+    int write(const char *a, size_t size);
     int read_back(char &a);
     virtual bool skip(infinint pos) = 0;
     virtual bool skip_to_eof() = 0;
     virtual bool skip_relative(signed int x) = 0;
     virtual infinint get_position() = 0;
-    
+
     void copy_to(generic_file &ref);
     void copy_to(generic_file &ref, crc & value);
 	// generates CRC on copied data
@@ -83,7 +83,7 @@ protected :
 	// must provide as much byte as requested up to end of file
 	// stay blocked if not enough available
 	// returning zero or less than requested means end of file
-    virtual int inherited_write(char *a, size_t size) = 0;
+    virtual int inherited_write(const char *a, size_t size) = 0;
 	// must write all data or block or throw exceptions
 	// thus always returns the second argument
 
@@ -92,12 +92,12 @@ private :
     crc value;
     int crc_offset;
     int (generic_file::* active_read)(char *a, size_t size);
-    int (generic_file::* active_write)(char *a, size_t size);
+    int (generic_file::* active_write)(const char *a, size_t size);
 
     void enable_crc(bool mode);
-    void compute_crc(char *a, int size);
+    void compute_crc(const char *a, int size);
     int read_crc(char *a, size_t size);
-    int write_crc(char *a, size_t size);
+    int write_crc(const char *a, size_t size);
 };
 
 class fichier : public generic_file
@@ -118,7 +118,7 @@ public :
 
 protected :
     int inherited_read(char *a, size_t size);
-    int inherited_write(char *a, size_t size);
+    int inherited_write(const char *a, size_t size);
 
 private :
     int filedesc;

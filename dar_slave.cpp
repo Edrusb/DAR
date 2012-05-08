@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -24,7 +24,8 @@
 //
 #include <string>
 #include <string.h>
-#include <iostream.h>
+#include <iostream>
+#include <stdio.h>
 #include "user_interaction.hpp"
 #include "zapette.hpp"
 #include "sar.hpp"
@@ -66,7 +67,7 @@ static int little_main(int argc, char *argv[])
 	    slave_zapette zap = slave_zapette(input, output, source);
 	    input = output = NULL; // now managed by zap;
 	    source = NULL;  // now managed by zap;
-	    
+
 	    try
 	    {
 		zap.action();
@@ -95,7 +96,7 @@ static int little_main(int argc, char *argv[])
 	    delete output;
 	if(source != NULL)
 	    delete source;
-	
+
 	return EXIT_OK;
     }
     else
@@ -141,25 +142,25 @@ static bool command_line(int argc,char *argv[], path * &chemin, string & filenam
 	case ':':
 	    throw Erange("get_args", string("missing parameter to option ") + char(optopt));
 	case '?':
-	    user_interaction_warning(string("ignoring unknown option ") + char(optopt)); 
+	    user_interaction_warning(string("ignoring unknown option ") + char(optopt));
 	    break;
 	default:
-	    user_interaction_warning(string("ignoring unknown option ") + char(lu)); 
+	    user_interaction_warning(string("ignoring unknown option ") + char(lu));
 	}
     }
-	
+
     if(optind + 1 > argc)
     {
 	user_interaction_warning("missing archive basename, see -h option for help");
 	return false;
     }
-    
+
     if(optind + 1 < argc)
     {
 	user_interaction_warning("too many argument on command line, see -h option for help");
 	return false;
     }
-    
+
     tools_split_path_basename(argv[optind], chemin, filename);
     return true;
 }
@@ -191,7 +192,7 @@ static void show_usage(const char *command)
     }
     delete cmd;
 }
-    
+
 static void show_version(const char *command)
 {
     ostream & out = user_interaction_stream(); // for readability

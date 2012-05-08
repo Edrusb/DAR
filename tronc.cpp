@@ -155,7 +155,7 @@ int tronc::inherited_read(char *a, size_t size)
     return lu;
 }
 
-int tronc::inherited_write(char *a, size_t size)
+int tronc::inherited_write(const char *a, size_t size)
 {
     infinint avail = sz - current;
     unsigned long int macro_pas = 0, micro_pas;

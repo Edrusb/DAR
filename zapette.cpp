@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -41,7 +41,7 @@ struct request
     char serial_num;
     unsigned short size; // size or REQUEST_SIZE_SPECIAL_ORDER
     infinint offset; // offset or REQUEST_OFFSET_END_TRANSMIT or REQUEST_OFFSET_GET_FILESIZE
- 
+
     void write(generic_file *f); // master side
     void read(generic_file *f);  // slave side
 };
@@ -52,7 +52,7 @@ struct answer
     char type;
     unsigned short size;
     infinint arg;
-    
+
     void write(generic_file *f, char *data); // slave side
     void read(generic_file *f, char *data, unsigned short max);  // master side
 };
@@ -121,13 +121,13 @@ void answer::read(generic_file *f, char *data, unsigned short max)
 	pas = 0;
 	while(pas < size)
 	    pas += f->read(data+pas, size-pas);
-	
+
 	if(size > max) // need to drop the remaining data
 	{
 	    char black_hole;
-	    
+
 	    for(tmp = max; tmp < size; tmp++)
-		f->read(&black_hole, 1); 
+		f->read(&black_hole, 1);
 		// might not be very performant code
 	}
 	arg = 0;
@@ -162,11 +162,11 @@ slave_zapette::slave_zapette(generic_file *input, generic_file *output, generic_
 }
 
 slave_zapette::~slave_zapette()
-{ 
+{
     if(in != NULL)
-	delete in; 
+	delete in;
     if(out != NULL)
-	delete out; 
+	delete out;
     if(src != NULL)
 	delete src;
 }
@@ -184,14 +184,14 @@ void slave_zapette::action()
 	{
 	    req.read(in);
 	    ans.serial_num = req.serial_num;
-	    
+
 	    if(req.size != REQUEST_SIZE_SPECIAL_ORDER)
 	    {
 		ans.type = ANSWER_TYPE_DATA;
 		if(src->skip(req.offset))
 		{
 			// enlarge buffer if necessary
-		    if(req.size > buf_size) 
+		    if(req.size > buf_size)
 		    {
 			if(buffer != NULL)
 			    delete buffer;
@@ -200,7 +200,7 @@ void slave_zapette::action()
 			    throw Ememory("slave_zapette::action");
 			else
 			    buf_size = req.size;
-		    }   
+		    }
 
 		    ans.size = src->read(buffer, req.size);
 		    ans.write(out, buffer);
@@ -227,7 +227,7 @@ void slave_zapette::action()
 		    ans.arg = src->get_position();
 		    ans.write(out, NULL);
 		}
-		else 
+		else
 		    throw Erange("zapette::action", "received unkown special order");
 	    }
 	}
@@ -258,14 +258,14 @@ zapette::zapette(generic_file *input, generic_file *output) : generic_file(gf_re
     out = output;
     position = 0;
     serial_counter = 0;
-    
+
 	//////////////////////////////
 	// retreiving the file size
 	//
     int tmp = 0;
     make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_GET_FILESIZE, NULL, tmp, file_size);
 }
-    
+
 zapette::~zapette()
 {
     int tmp = 0;
@@ -305,7 +305,7 @@ bool zapette::skip_relative(signed int x)
 	    position = file_size;
 	    return false;
 	}
-	else 
+	else
 	    return true;
     }
     else
@@ -316,7 +316,7 @@ bool zapette::skip_relative(signed int x)
 	}
 	else
 	{
-	    position -= (-x); // implicit conversion of "-x" to infinint (positive)	    
+	    position -= (-x); // implicit conversion of "-x" to infinint (positive)
 	    return true;
 	}
 }
@@ -325,7 +325,7 @@ int zapette::inherited_read(char *a, size_t size)
 {
     static unsigned short int max_short = ~0;
     unsigned int lu = 0;
-    
+
     if(size > 0)
     {
 	infinint not_used;
@@ -348,7 +348,7 @@ int zapette::inherited_read(char *a, size_t size)
     return lu;
 }
 
-int zapette::inherited_write(char *a, size_t size)
+int zapette::inherited_write(const char *a, size_t size)
 {
     throw SRC_BUG; // zapette is read-only
 }
@@ -386,7 +386,7 @@ void zapette::make_transfert(unsigned short size, const infinint &offset, char *
     default:  // might be a transmission error do to weak transport layer
 	throw Erange("zapette::make_transfert", "incoherent answer from peer");
     }
-    
+
 	// sanity checks
     if(req.size == REQUEST_SIZE_SPECIAL_ORDER)
     {

@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -23,7 +23,9 @@
 /*********************************************************************/
 //
 #include <unistd.h>
-#include <iostream.h>
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
 #include "sar.hpp"
 #include "sar_tools.hpp"
 #include "user_interaction.hpp"
@@ -34,8 +36,8 @@
 #define EXTENSION "dar"
 #define DAR_XFORM_VERSION "1.0.0"
 
-static bool command_line(int argc, char *argv[], 
-			 path * & src_dir, string & src, 
+static bool command_line(int argc, char *argv[],
+			 path * & src_dir, string & src,
 			 path * & dst_dir, string & dst,
 			 infinint & first_file_size,
 			 infinint & file_size,
@@ -67,20 +69,20 @@ static int sub_main(int argc, char *argv[])
 	{
 	    generic_file *dst_sar = NULL;
 	    generic_file *src_sar = NULL;
-	    
+
 	    if(dst != "-")
 		user_interaction_change_non_interactive_output(&cout);
 	    try
 	    {
-		int dst_opt = 
-		    (allow ? 0 : SAR_OPT_DONT_ERASE) 
+		int dst_opt =
+		    (allow ? 0 : SAR_OPT_DONT_ERASE)
 		    | (warn ? SAR_OPT_WARN_OVERWRITE : 0)
 		    | (pause ? SAR_OPT_PAUSE : 0);
 		user_interaction_set_beep(beep);
 		if(src == "-")
 		{
 		    generic_file *tmp = new tuyau(0, gf_read_only);
-		    
+
 		    if(tmp == NULL)
 			throw Ememory("main");
 		    try
@@ -97,11 +99,11 @@ static int sub_main(int argc, char *argv[])
 			throw;
 		    }
 		}
-		else 
+		else
 		    src_sar = new sar(src, EXTENSION, SAR_OPT_DEFAULT, *src_dir);
 		if(src_sar == NULL)
 		    throw Ememory("main");
-		
+
 		if(size == 0)
 		    if(dst == "-")
 			dst_sar = sar_tools_open_archive_tuyau(1, gf_write_only);
@@ -141,15 +143,15 @@ static int sub_main(int argc, char *argv[])
 	}
 	delete src_dir;
 	delete dst_dir;
-	
+
 	return EXIT_OK;
     }
     else
 	return EXIT_SYNTAX;
 }
 
-static bool command_line(int argc, char *argv[], 
-			 path * & src_dir, string & src, 
+static bool command_line(int argc, char *argv[],
+			 path * & src_dir, string & src,
 			 path * & dst_dir, string & dst,
 			 infinint & first_file_size,
 			 infinint & file_size,
@@ -217,7 +219,7 @@ static bool command_line(int argc, char *argv[],
 				user_interaction_warning("invalid size for option -S");
 				return false;
 			    }
-			    
+
 			}
 			else
 			    throw Erange("command_line", "only one -S option is allowed");
@@ -243,14 +245,14 @@ static bool command_line(int argc, char *argv[],
 	    case ':':
 		throw Erange("command_line", string("missing parameter to option ") + char(optopt));
 	    case '?':
-		user_interaction_warning(string("ignoring unknown option ") + char(optopt)); 
+		user_interaction_warning(string("ignoring unknown option ") + char(optopt));
 		break;
 	    default:
 		throw SRC_BUG;
 	    }
 	}
 
-	    // reading arguments remain on the command line 
+	    // reading arguments remain on the command line
 	if(optind + 2 > argc)
 	{
 	    user_interaction_warning("missing source or destination argument on command line, see -h option for help");
@@ -261,14 +263,14 @@ static bool command_line(int argc, char *argv[],
 	    user_interaction_warning("too many argument on command line, see -h option for help");
 	    return false;
 	}
-	if(argv[optind] != "")
+	if(strncmp(argv[optind], "", 1) != 0)
 	    tools_split_path_basename(argv[optind], src_dir, src);
 	else
 	{
 	    user_interaction_warning("invalid argument as source archive");
 	    return false;
 	}
-	if(argv[optind+1] != "")
+	if(strncmp(argv[optind+1], "", 1) != 0)
 	    tools_split_path_basename(argv[optind+1], dst_dir, dst);
 	else
 	{

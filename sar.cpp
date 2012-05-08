@@ -242,7 +242,7 @@ int sar::inherited_read(char *a, size_t sz)
     return lu;
 }
 
-int sar::inherited_write(char *a, size_t sz)
+int sar::inherited_write(const char *a, size_t sz)
 {
     infinint to_write = sz;
     infinint max_at_once;

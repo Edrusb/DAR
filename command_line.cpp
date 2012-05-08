@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -23,8 +23,11 @@
 /*********************************************************************/
 
 #include <unistd.h>
+#include <string.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <getopt.h>
+#include <iostream>
 #include <string>
 #include "deci.hpp"
 #include "command_line.hpp"
@@ -46,7 +49,7 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 	      infinint &file_size, infinint &first_file_size, mask *&selection, mask *&subtree,
 	      string &filename, string *&ref_filename,
 	      bool &allow_over, bool &warn_over, bool &info_details,
-	      compression &algo, bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
+	      compression &algo, bool &detruire, bool &pause, bool &beep, bool &make_empty_dir,
 	      bool & only_more_recent, bool & ea_root, bool & ea_user,
 	      string & input_pipe, string &output_pipe,
 	      bool & ignore_owner)
@@ -90,7 +93,7 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 	try
 	{
 	    opterr = 0;
-	    
+
 	    while((lu = getopt_long(argc, argv, "c:A:x:d:t:l:vzynwpkR:s:S:X:I:P:bhLWDruUVC:i:o:O", get_long_opt(), NULL)) != EOF)
 	    {
 		switch(lu)
@@ -105,7 +108,7 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 			throw Erange("get_args", string(" missing argument to -")+char(lu));
 		    if(filename != "" || sauv_root != NULL)
 			throw Erange("get_args", " only one option of -c -d -t -l -C or -x is allowed");
-		    if(optarg != "")
+		    if(strncmp(optarg, "", 1) != 0)
 			tools_split_path_basename(optarg, sauv_root, filename);
 		    else
 			throw Erange("get_args", string(" invalid argument for option -") + char(lu));
@@ -138,9 +141,9 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 			throw Erange("get_args", "only one -A option is allowed");
 		    if(optarg == NULL)
 			throw Erange("get_args", "missing argument to -A");
-		    if(optarg == "")
+		    if(strncmp(optarg, "", 1) != 0)
 			throw Erange("get_args", "invalid argument for option -A");
-		    if(optarg == "-")
+		    if(strncmp(optarg, "-", 1) == 0)
 			throw Erange("get_args", "- not allowed with -A option");
 		    ref_filename = new string();
 		    if(ref_filename == NULL)
@@ -293,7 +296,7 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 			ea_user = false;
 #else
 		    user_interaction_warning("WARNING! Extended Attributs Support has not been activated at compilation time, thus -u option does nothing");
-#endif 
+#endif
 		    break;
 		case 'U':
 #ifdef EA_SUPPORT
@@ -333,10 +336,10 @@ bool get_args(int argc, char *argv[], operation &op, path * &fs_root, path * &sa
 			ignore_owner = true;
 		    break;
 		case '?':
-		    user_interaction_warning(string("ignoring unknown option ") + char(optopt)); 
+		    user_interaction_warning(string("ignoring unknown option ") + char(optopt));
 		    break;
 		default:
-		    user_interaction_warning(string("ignoring unknown option ") + char(lu)); 
+		    user_interaction_warning(string("ignoring unknown option ") + char(lu));
 		}
 	    }
 
@@ -503,7 +506,7 @@ static void usage(const char *command_name)
 	ui_printf("\t\t\t reading the archive from a pipe. For -C and -c options the archive to read is the one\n");
 	ui_printf("\t\t\t given with -A option: the archive of reference\n");
 	ui_printf("\n");
-	ui_printf("see man page for more details, not all common option are available for each option\n\n"); 
+	ui_printf("see man page for more details, not all common option are available for each option\n\n");
     }
     catch(...)
     {
