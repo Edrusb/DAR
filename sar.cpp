@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -29,6 +29,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
+#include <string.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <stdlib.h>
@@ -45,7 +46,7 @@ static bool sar_get_higher_number_in_dir(path dir ,string base_name, string ext,
 sar::sar(const string & base_name, const string & extension, S_I options, const path & dir, const string & execute) : generic_file(gf_read_only), archive_dir(dir)
 {
     set_options(options);
-    
+
     base = base_name;
     ext = extension;
     initial = true;
@@ -84,7 +85,7 @@ bool sar::skip(const infinint &pos)
     infinint byte_per_file = size - header::size();
     infinint dest_file, offset;
 
-    
+
     if(get_position() == pos)
 	return true; // no need to skip
 
@@ -98,7 +99,7 @@ bool sar::skip(const infinint &pos)
     }
     else
     {
-	dest_file = ((pos - byte_in_first_file) / byte_per_file) + 2; 
+	dest_file = ((pos - byte_in_first_file) / byte_per_file) + 2;
 	    // "+2" because file number starts to 1 and first file is to be count
 	offset = ((pos - byte_in_first_file) % byte_per_file) + header::size();
     }
@@ -147,14 +148,14 @@ bool sar::skip_forward(U_I x)
     infinint number = of_current;
     infinint offset = file_offset + x;
 
-    while((number == 1 ? offset >= first_size : offset >= size) 
+    while((number == 1 ? offset >= first_size : offset >= size)
 	  && (!of_last_file_known || number <= of_last_file_num))
     {
 	offset -= number == 1 ? first_size : size;
 	offset += header::size();
 	number++;
     }
-    
+
     if(number == 1 ? offset < first_size : offset < size)
     {
 	open_file(number);
@@ -202,20 +203,20 @@ bool sar::skip_backward(U_I x)
 	return false;
     }
 }
-          
+
 bool sar::skip_relative(S_I x)
 {
     if(x > 0)
 	return skip_forward(x);
-    
+
     if(x < 0)
 	return skip_backward(-x);
 
     return true; // when x == 0
-}		
+}
 
 infinint sar::get_position()
-{	    
+{
     if(of_current > 1)
 	return first_size - first_file_offset + (of_current-2)*(size-header::size()) + file_offset - header::size();
     else
@@ -226,7 +227,7 @@ S_I sar::inherited_read(char *a, size_t sz)
 {
     size_t lu = 0;
     bool loop = true;
-    
+
     while(lu < sz && loop)
     {
 	S_I tmp = of_fd->read(a+lu, sz-lu);
@@ -247,7 +248,7 @@ S_I sar::inherited_read(char *a, size_t sz)
     return lu;
 }
 
-S_I sar::inherited_write(char *a, size_t sz)
+S_I sar::inherited_write(const char *a, size_t sz)
 {
     infinint to_write = sz;
     infinint max_at_once;
@@ -281,7 +282,7 @@ S_I sar::inherited_write(char *a, size_t sz)
 	file_offset += tmp;
 	a += tmp;
     }
-	
+
     return sz;
 }
 
@@ -307,16 +308,16 @@ void sar::open_readonly(char *fic, const infinint &num)
 	    if(errno == ENOENT)
 	    {
 		user_interaction_pause(string(fic) + " is required for furthur operation, please provide the file.");
-		continue; 
+		continue;
 	    }
 	    else
 		throw Erange("sar::open_readonly", string("error openning ") + fic + " : " + strerror(errno));
 	else
 	    of_fd = new fichier(fd);
-	
+
 	    // trying to read the header
 	    //
-	try 
+	try
 	{
 	    h.read(*of_fd);
 	}
@@ -324,18 +325,18 @@ void sar::open_readonly(char *fic, const infinint &num)
 	{
 	    close_file();
 	    user_interaction_pause(string(fic) + string(" has a bad or corrupted header, please provide the correct file."));
-	    continue; 
+	    continue;
 	}
-		
+
 	    // checking agains the magic number
 	    //
 	if(h.magic != SAUV_MAGIC_NUMBER)
 	{
 	    close_file();
 	    user_interaction_pause(string(fic) + " is not a valid file (wrong magic number), please provide the good file.");
-	    continue; 
+	    continue;
 	}
-		
+
 	    // checking the ownership to the set of file
 	    //
 	if(num == 1 && first_file_offset == 0)
@@ -425,7 +426,7 @@ void sar::open_writeonly(char *fic, const infinint &num)
 		}
 	    }
 	    catch(Egeneric & e)
-	    {		 
+	    {
 		close(fd_tmp);
 		throw;
 	    }
@@ -439,12 +440,12 @@ void sar::open_writeonly(char *fic, const infinint &num)
 		user_interaction_pause(string(fic) + " is about to be overwritten");
 	    open_flag |= O_TRUNC;
 	}
-    }	 
-   
+    }
+
     fd = open(fic, open_flag, open_mode);
     of_flag = FLAG_NON_TERMINAL;
     if(fd < 0)
-	throw Erange("sar::open_writeonly open()", strerror(errno));    
+	throw Erange("sar::open_writeonly open()", strerror(errno));
     else
 	of_fd = new fichier(fd);
     h = make_write_header(num, FLAG_TERMINAL);
@@ -467,10 +468,10 @@ void sar::open_file_init()
 
 void sar::open_file(infinint num)
 {
-    if(of_fd == NULL || of_current != num) 
+    if(of_fd == NULL || of_current != num)
     {
 	char *fic = tools_str2charptr((archive_dir + path(sar_make_filename(base, num, ext))).display());
-	
+
 	try
 	{
 	    switch(get_mode())
@@ -504,7 +505,7 @@ void sar::open_file(infinint num)
 		}
 		else
 		    initial = false;
-		
+
 		open_writeonly(fic, num);
 		break;
 	    default :
@@ -542,13 +543,13 @@ void sar::set_offset(infinint offset)
 
 void sar::open_last_file()
 {
-    infinint num; 
+    infinint num;
 
     if(of_last_file_known)
 	open_file(of_last_file_num);
     else // last slice number is not known
     {
-	bool ask_user = false; 
+	bool ask_user = false;
 
 	while(of_flag != FLAG_TERMINAL)
 	{
@@ -556,6 +557,7 @@ void sar::open_last_file()
 	    {
 		open_file(num);
 		if(of_flag != FLAG_TERMINAL)
+		{
 		    if(!ask_user)
 		    {
 			hook_execute(0); // %n replaced by 0 means last file is about to be requested
@@ -566,6 +568,7 @@ void sar::open_last_file()
 			close_file();
 			user_interaction_pause(string("The last file of the set is not present in ") + archive_dir.display() + " , please provide it.");
 		    }
+		}
 	    }
 	    else // not slice available in the directory
 		if(!ask_user)
@@ -716,7 +719,7 @@ void sar::hook_execute(const infinint &num)
 		    }
 		}
 	    }
-	    while(loop);    
+	    while(loop);
 	}
 	catch(...)
 	{
@@ -728,7 +731,7 @@ void sar::hook_execute(const infinint &num)
     }
     MEM_OUT;
 }
-	
+
 
 string sar_make_filename(string base_name, infinint num, string ext)
 {
@@ -743,10 +746,10 @@ static bool sar_extract_num(string filename, string base_name, string ext, infin
     {
 	if(filename.size() <= base_name.size() + ext.size() + 2) // 2 for two dots beside number
 	    return false;
-	
+
 	if(filename.find(base_name) != 0) // checking that base_name is present at the beginning
 	    return false;
-	
+
 	if(filename.rfind(ext) != filename.size() - ext.size()) // checking that extension is at the end
 	    return false;
 
@@ -772,8 +775,8 @@ static bool sar_get_higher_number_in_dir(path dir, string base_name, string ext,
     {
 	if(ptr == NULL)
 	    throw Erange("sar_get_higher_number_in_dir", strerror(errno));
-	
-	ret = 0; 
+
+	ret = 0;
 	somme = false;
 	while((entry = readdir(ptr)) != NULL)
 	    if(sar_extract_num(entry->d_name, base_name, ext, cur))
@@ -839,7 +842,7 @@ bool trivial_sar::skip_relative(S_I x)
 infinint trivial_sar::get_position()
 {
     if(reference->get_position() >= offset)
-	return reference->get_position() - offset; 
+	return reference->get_position() - offset;
     else
 	throw Erange("trivial_sar::get_position", "position out of range, call skip from trivial_sar object not from its reference");
 }

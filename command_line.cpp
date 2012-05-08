@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdio.h>
 #include <fcntl.h>
 #include <getopt.h>
 #include <string>
@@ -52,15 +53,15 @@ static void show_version(const char *command_name);
 static void usage(const char *command_name);
 static const struct option *get_long_opt();
 static bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], operation &op, path * &fs_root, path * &sauv_root, path * &ref_root,
-			       infinint &file_size, infinint &first_file_size, ou_mask & inclus, ou_mask & exclus, 
+			       infinint &file_size, infinint &first_file_size, ou_mask & inclus, ou_mask & exclus,
 			       deque<string> & path_inclus, deque<string> & l_path_exclus,
 			       string & filename, string *& ref_filename,
 			       bool &allow_over, bool &warn_over, bool &info_details,
 			       compression &algo, U_I & compression_level,
-			       bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
+			       bool &detruire, bool &pause, bool &beep, bool &make_empty_dir,
 			       bool & only_more_recent, bool & ea_root, bool & ea_user,
 			       string & input_pipe, string &output_pipe,
-			       bool & ignore_owner, 
+			       bool & ignore_owner,
 			       string & execute, string & execute_ref,
 			       string & pass, string & pass_ref,
 			       ou_mask & compr_inclus, ou_mask & compr_exclus,
@@ -83,10 +84,10 @@ bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path * &sa
 	      string &filename, string *&ref_filename,
 	      bool &allow_over, bool &warn_over, bool &info_details,
 	      compression &algo, U_I & compression_level,
-	      bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
+	      bool &detruire, bool &pause, bool &beep, bool &make_empty_dir,
 	      bool & only_more_recent, bool & ea_root, bool & ea_user,
 	      string & input_pipe, string &output_pipe,
-	      bool & ignore_owner, 
+	      bool & ignore_owner,
 	      string & execute, string & execute_ref,
 	      string & pass, string & pass_ref,
 	      mask *& compress_mask)
@@ -133,18 +134,18 @@ bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path * &sa
     et_mask *tmp_mask;
     bool tar_format = true;
     vector<string> inclusions;
-    
+
     try
     {
 	try
 	{
 	    opterr = 0;
-	    
-	    
-	    if(!get_args_recursive(inclusions, argc, argv, op, fs_root, sauv_root, ref_root, 
+
+
+	    if(!get_args_recursive(inclusions, argc, argv, op, fs_root, sauv_root, ref_root,
 				   file_size, first_file_size, inclus, exclus,
 				   l_path_inclus, l_path_exclus,
-				   filename, ref_filename, 
+				   filename, ref_filename,
 				   allow_over, warn_over, info_details,
 				   algo, compression_level, detruire, pause, beep, make_empty_dir,
 				   only_more_recent, ea_root, ea_user,
@@ -156,8 +157,8 @@ bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path * &sa
 				   compr_inclus, compr_exclus,
 				   tar_format))
 		return false;
-		
-	    
+
+
 		// some sanity checks
 
 	    if(filename == "" || sauv_root == NULL)
@@ -201,14 +202,14 @@ bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path * &sa
 		delete name;
 	    }
 	    if(op == listing && tar_format)
-		only_more_recent = true; 
+		only_more_recent = true;
 	    if(execute != "" && file_size == 0 && (op == create || op == isolate))
 		user_interaction_warning("-E is not possible (and useless) with -c or -C and without slicing (-s option), -E will be ignored");
 	    if(execute_ref != "" && ref_filename == NULL)
 		user_interaction_warning("-F is only useful with -A option, for the archive of reference");
 	    if(pass_ref != "" && ref_filename == NULL)
 		user_interaction_warning("-J is only useful with -A option, for the archive of reference");
-	    
+
 
 		// generating masks
 		// for filenames
@@ -233,7 +234,7 @@ bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path * &sa
 		{
 		    path_inclus.add_mask(simple_path_mask((*fs_root + path(l_path_inclus.front())).display()));
 		    l_path_inclus.pop_front();
-		}				  
+		}
 	    else
 		path_inclus.add_mask(bool_mask(true));
 
@@ -256,7 +257,7 @@ bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path * &sa
 	    if(path_exclus.size() > 0)
 		tmp_mask->add_mask(not_mask(path_exclus));
 
-		// generating mask for 
+		// generating mask for
 		// compression selected files
 		//
 	    if(algo == none)
@@ -303,24 +304,24 @@ bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path * &sa
 }
 
 bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], operation &op, path * &fs_root, path * &sauv_root, path * &ref_root,
-			infinint &file_size, infinint &first_file_size, ou_mask & inclus, ou_mask & exclus, 
+			infinint &file_size, infinint &first_file_size, ou_mask & inclus, ou_mask & exclus,
 			deque<string> & l_path_inclus, deque<string> & l_path_exclus,
 			string & filename, string *& ref_filename,
 			bool &allow_over, bool &warn_over, bool &info_details,
 			compression &algo, U_I & compression_level,
-			bool &detruire, bool &pause, bool &beep, bool &make_empty_dir, 
+			bool &detruire, bool &pause, bool &beep, bool &make_empty_dir,
 			bool & only_more_recent, bool & ea_root, bool & ea_user,
 			string & input_pipe, string &output_pipe,
-			bool & ignore_owner, 
+			bool & ignore_owner,
 			string & execute, string & execute_ref,
 			string & pass, string & pass_ref,
 			ou_mask & compr_inclus, ou_mask & compr_exclus,
 			bool &tar_format)
-{ 
+{
     S_I lu;
     S_I rec_c;
     char **rec_v = NULL;
-   
+
     while((lu = getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL)) != EOF)
     {
 	switch(lu)
@@ -335,7 +336,7 @@ bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], ope
 		throw Erange("get_args", string(" missing argument to -")+char(lu));
 	    if(filename != "" || sauv_root != NULL)
 		throw Erange("get_args", " only one option of -c -d -t -l -C or -x is allowed");
-	    if(optarg != "")
+	    if(strncmp(optarg, "", 1) != 0)
 		tools_split_path_basename(optarg, sauv_root, filename);
 	    else
 		throw Erange("get_args", string(" invalid argument for option -") + char(lu));
@@ -368,9 +369,9 @@ bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], ope
 		throw Erange("get_args", "only one -A option is allowed");
 	    if(optarg == NULL)
 		throw Erange("get_args", "missing argument to -A");
-	    if(optarg == "")
+	    if(strncmp(optarg, "", 1) == 0)
 		throw Erange("get_args", "invalid argument for option -A");
-	    if(optarg == "-")
+	    if(strncmp(optarg, "-", 2) == 0)
 		throw Erange("get_args", "- not allowed with -A option");
 	    ref_filename = new string();
 	    if(ref_filename == NULL)
@@ -396,12 +397,12 @@ bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], ope
 	    if(optarg != NULL)
 	    {
 		S_I tmp = atoi(optarg);
-          
+
 		if(tmp < 0 || tmp > 9)
 		    throw Erange("get_args", "gzip compression level must be inbetween 0 and 9");
 		else
 		    compression_level = tmp;
-	    } 
+	    }
 	    break;
 	case 'y':
 	    if(algo == none)
@@ -411,12 +412,12 @@ bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], ope
 	    if(optarg != NULL)
 	    {
 		S_I tmp = atoi(optarg);
-		
+
 		if(tmp < 0 || tmp > 9)
 		    throw Erange("get_args", "bzip2 compression level must be inbetween 0 and 9");
 		else
 		    compression_level = tmp;
-	    } 
+	    }
 	    break;
 	case 'n':
 	    allow_over = false;
@@ -541,7 +542,7 @@ bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], ope
 		ea_user = false;
 #else
 	    user_interaction_warning("WARNING! Extended Attributs Support has not been activated at compilation time, thus -u option does nothing");
-#endif 
+#endif
 	    break;
 	case 'U':
 #ifdef EA_SUPPORT
@@ -646,12 +647,12 @@ bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], ope
 		try
 		{
 		    inclusions.push_back(optarg);
-		    ret = get_args_recursive(inclusions, rec_c, rec_v, op, fs_root, sauv_root, ref_root, 
+		    ret = get_args_recursive(inclusions, rec_c, rec_v, op, fs_root, sauv_root, ref_root,
 					     file_size, first_file_size, inclus, exclus,
 					     l_path_inclus, l_path_exclus,
-					     filename, ref_filename, 
+					     filename, ref_filename,
 					     allow_over, warn_over, info_details,
-					     algo, compression_level, detruire, pause, 
+					     algo, compression_level, detruire, pause,
 					     beep, make_empty_dir,
 					     only_more_recent, ea_root, ea_user,
 					     input_pipe, output_pipe,
@@ -680,7 +681,7 @@ bool get_args_recursive(vector<string> & inclusions, S_I argc, char *argv[], ope
 	    user_interaction_warning(string("ignoring unknown option ") + char(optopt));
 	    break;
 	default:
-	    user_interaction_warning(string("ignoring unknown option ") + char(lu)); 
+	    user_interaction_warning(string("ignoring unknown option ") + char(lu));
 	}
     }
     for(S_I i = optind; i < argc; i++)
@@ -1146,7 +1147,7 @@ static void make_args_from_file(const char *filename, S_I & argc, char **&argv)
     S_I fd = open(filename, O_RDONLY);
     if(fd < 0)
 	throw Erange("make_args_from_file", string("cannot open file ") + filename + " : " + strerror(errno));
-    
+
     try
     {
 	char a;
@@ -1215,13 +1216,13 @@ static void make_args_from_file(const char *filename, S_I & argc, char **&argv)
 			if(quotes.size() == 0)
 			{
 			    mots.push_back(make_word(fd, start, end));
-			    if(a != ' ') 
+			    if(a != ' ')
 				end++;  // skip the trailing quote
 			    if(lseek(fd, end+1, SEEK_SET) < 0)
 				throw Erange("make_args_from_file", string("Error seeking into config file ") + filename + " : " + strerror(errno));
 			    start = end+1;
 			}
-			else 
+			else
 			    end++;
 		    }
 		    else
@@ -1256,7 +1257,7 @@ static void make_args_from_file(const char *filename, S_I & argc, char **&argv)
 	throw;
     }
     close(fd);
-	// all (char *) addresses in "mots" are now known by argv, 
+	// all (char *) addresses in "mots" are now known by argv,
 	// thus they must be preserved.
 }
 
@@ -1280,7 +1281,7 @@ static char * make_word(S_I fd, off_t start, off_t end)
     {
 	if(lseek(fd, start, SEEK_SET) < 0)
 	    throw Erange("make_word", string("lseek(): ") + strerror(errno));
-	
+
 	do
 	{
 	    tmp = read(fd, ret+lu, longueur-lu);
@@ -1328,7 +1329,7 @@ static void check_basename(string & base)
     	// is basename is suspect ?
     if(!suspect.is_covered(base))
 	return; // not a suspect basename
-    
+
 	// is there a slice available ?
     if(is_a_slice_available(base))
 	return; // yes, thus basename is not a mistake
@@ -1361,15 +1362,15 @@ static bool is_a_slice_available(const string & base)
     {
 	char *char_chem = NULL;
 	string rest;
-	
+
 	tools_split_path_basename(name, chem, rest);
 	char_chem = tools_str2charptr(chem->display());
-	
+
 	try
 	{
 	    etage contents = char_chem;
 	    regular_mask slice = rest + "\\.[1-9][0-9]*\\."+ EXTENSION;
-	    
+
 	    while(!ret && contents.read(rest))
 		ret = slice.is_covered(rest);
 	}
@@ -1409,6 +1410,6 @@ static string retreive_basename(const string & base)
     new_base = string(new_base.begin(), new_base.begin()+index);
     index = new_base.find_last_not_of("0123456789");
     new_base = string(new_base.begin(), new_base.begin()+index);
-    
+
     return new_base;
 }

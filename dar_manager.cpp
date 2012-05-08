@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -25,6 +25,7 @@
 #include <getopt.h>
 #include <vector>
 #include <string>
+#include <stdio.h>
 #include "dar_suite.hpp"
 #include "database_header.hpp"
 #include "macro_tools.hpp"
@@ -39,11 +40,11 @@
 enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, move };
 
 static S_I little_main(S_I argc, char *argv[]);
-static bool command_line(S_I argc, char *argv[], 
-			 operation & op, 
-			 string & base, 
-			 string & arg, 
-			 archive_num & num, 
+static bool command_line(S_I argc, char *argv[],
+			 operation & op,
+			 string & base,
+			 string & arg,
+			 archive_num & num,
 			 vector<string> & rest,
 			 archive_num & num2);
 static void show_usage(const char *command);
@@ -132,11 +133,11 @@ S_I little_main(S_I argc, char *argv[])
     return EXIT_OK;
 }
 
-static bool command_line(S_I argc, char *argv[], 
-			 operation & op, 
-			 string & base, 
-			 string & arg, 
-			 archive_num & num, 
+static bool command_line(S_I argc, char *argv[],
+			 operation & op,
+			 string & base,
+			 string & arg,
+			 archive_num & num,
 			 vector<string> & rest,
 			 archive_num & num2)
 {
@@ -265,7 +266,7 @@ static bool command_line(S_I argc, char *argv[],
 	if(lu == 'o' || lu == 'r')
 	    break; // stop reading arguments
     }
-    
+
     for(S_I i = optind; i < argc; i++)
 	rest.push_back(argv[i]);
 
@@ -346,11 +347,11 @@ static void op_add(const string & base, const string &arg, string fake)
     try
     {
 	catalogue *catal = macro_tools_get_catalogue_from(arg);
-	
+
 	try
 	{
 	    string chemin, b;
-	 
+
 	    if(fake == "")
 		fake = arg;
 	    tools_split_path_basename(fake, chemin, b);
@@ -363,7 +364,7 @@ static void op_add(const string & base, const string &arg, string fake)
 	    throw;
 	}
 	delete catal;
-	
+
 	write_base(base, dat, true);
     }
     catch(...)
@@ -649,7 +650,7 @@ static database *read_base(const string & base)
     delete f;
     return ret;
 }
-    
+
 static void write_base(const string & filename, const database *base, bool overwrite)
 {
     generic_file *dat = database_header_create(filename, overwrite);
@@ -663,7 +664,7 @@ static void write_base(const string & filename, const database *base, bool overw
 	delete dat;
 	throw;
     }
-    
+
     delete dat;
 }
 

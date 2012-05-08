@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -24,6 +24,7 @@
 
 #include <netinet/in.h>
 #include <iomanip>
+#include <iostream>
 #include "data_tree.hpp"
 #include "tools.hpp"
 #include "user_interaction.hpp"
@@ -113,7 +114,7 @@ bool data_tree::get_data(archive_num & archive) const
 	}
 	it++;
     }
-    
+
     return archive != 0;
 }
 
@@ -134,7 +135,7 @@ bool data_tree::get_EA(archive_num & archive) const
 	}
 	it++;
     }
-    
+
     return archive != 0;
 }
 
@@ -156,7 +157,7 @@ bool data_tree::read_EA(archive_num num, infinint & val) const
 {
     map<archive_num, infinint>::iterator it = const_cast<data_tree *>(this)->last_change.find(num);
     map<archive_num, infinint>::iterator fin = const_cast<data_tree *>(this)->last_change.end();
-    
+
     if(it != fin)
     {
 	val = it->second;
@@ -201,7 +202,7 @@ void data_tree::listing() const
 
     user_interaction_stream() << "Archive number |  Data      |  EA " << endl;
     user_interaction_stream() << "---------------+------------+------------" << endl;
-    
+
     it = const_cast<data_tree *>(this)->last_mod.begin();
     fin_it = const_cast<data_tree *>(this)->last_mod.end();
     ut = const_cast<data_tree *>(this)->last_change.begin();
@@ -222,7 +223,7 @@ void data_tree::listing() const
 		    {
 			display_line(it->first, &(it->second), NULL);
 			it++;
-		    } 
+		    }
 		    else // ut only
 		    {
 			display_line(ut->first, NULL, &(ut->second));
@@ -238,7 +239,7 @@ void data_tree::listing() const
 	    display_line(ut->first, &(ut->second), NULL);
 	    ut++;
 	}
-    }	    
+    }
 }
 
 void data_tree::apply_permutation(archive_num src, archive_num dst)
@@ -447,7 +448,7 @@ const data_tree *data_dir::read_child(const string & name) const
 {
     list<data_tree *>::iterator it = const_cast<data_dir *>(this)->rejetons.begin();
     list<data_tree *>::iterator fin = const_cast<data_dir *>(this)->rejetons.end();
-    
+
     while(it != fin && *it != NULL && (*it)->get_name() != name)
 	it++;
 
@@ -463,7 +464,7 @@ const data_tree *data_dir::read_child(const string & name) const
 bool data_dir::remove_all_from(const archive_num & archive)
 {
     list<data_tree *>::iterator it = rejetons.begin();
-    
+
     while(it != rejetons.end())
     {
 	if((*it) == NULL)
@@ -494,7 +495,7 @@ void data_dir::show(archive_num num, string marge) const
 	data_dir *dir = dynamic_cast<data_dir *>(*it);
 	string etat = string( (*it)->get_data(ou) && (ou == num || num == 0) ? "[Data]" : "[    ]")
 	    + ( (*it)->get_EA(ou) && (ou == num || num == 0)  ? "[EA]" : "[  ]");
-	
+
 	user_interaction_stream() << etat << "  " << marge << (*it)->get_name() << endl;
 	if(dir != NULL)
 	    dir->show(num, marge+dir->get_name()+"/");
@@ -550,15 +551,17 @@ void data_dir::add_child(data_tree *fils)
 void data_dir::remove_child(const string & name)
 {
     list<data_tree *>::iterator it = rejetons.begin();
-    
+
     while(it != rejetons.end() && *it != NULL && (*it)->get_name() != name)
 	it++;
 
     if(it != rejetons.end())
+    {
 	if(*it == NULL)
 	    throw SRC_BUG;
 	else
 	    rejetons.erase(it);
+    }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -603,7 +606,7 @@ bool data_tree_find(path chemin, const data_dir & racine, const data_tree *& ptr
 	    }
 	}
     }
-    
+
     return ptr != NULL;
 }
 
@@ -616,13 +619,13 @@ void data_tree_update_with(const directory *dir, archive_num archive, data_dir *
     {
 	const directory *entry_dir = dynamic_cast<const directory *>(entry);
 	const inode *entry_ino = dynamic_cast<const inode *>(entry);
-	
+
 	if(entry_ino == NULL)
 	    continue; // continue with next loop
 	else
 	    racine->add(entry_ino, archive);
 
-	if(entry_dir != NULL) // going into recursion 
+	if(entry_dir != NULL) // going into recursion
 	{
 	    data_tree *new_root = const_cast<data_tree *>(racine->read_child(entry->get_name()));
 	    data_dir *new_root_dir = dynamic_cast<data_dir *>(new_root);
@@ -708,8 +711,8 @@ static void write_to_file(generic_file &f, archive_num a)
 
 static void display_line(archive_num num, const infinint *data, const infinint *ea)
 {
-    
-    user_interaction_stream() << setw(10) << num << "\t" 
-			      << (data == NULL ? "   " : tools_display_date(*data)) << "\t" 
+
+    user_interaction_stream() << setw(10) << num << "\t"
+			      << (data == NULL ? "   " : tools_display_date(*data)) << "\t"
 			      << (ea == NULL ? "   " : tools_display_date(*ea)) << endl;
 }

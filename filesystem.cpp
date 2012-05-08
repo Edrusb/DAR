@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -88,7 +88,7 @@ struct corres_ino_ea
 
 static map <infinint, corres_ino_ea> corres_write;
 /////////////////
- 
+
 
 void filesystem_set_root(const path &root, bool allow_overwrite, bool warn_overwrite, bool info_details, bool root_ea, bool user_ea)
 {
@@ -152,10 +152,10 @@ void filesystem_freemem()
     corres_write.clear();
     read_filename_pile.clear();
 }
- 
+
 void filesystem_reset_read()
 {
-    char *tmp;	
+    char *tmp;
 
     corres_read.clear();
     file_etiquette::reset_etiquette_counter();
@@ -177,7 +177,7 @@ void filesystem_reset_read()
 	    if(ref_dir != NULL)
 	    {
 		read_filename_struct rfst;
-		
+
 		rfst.last_acc = read_pile.back().last_acc = ref_dir->get_last_access();
 		rfst.last_mod = read_pile.back().last_mod = ref_dir->get_last_modif();
 		read_filename_pile.push_back(rfst);
@@ -209,7 +209,7 @@ bool filesystem_read(entree * & ref)
 
     if(read_current_dir == NULL)
 	throw Erange("filesystem_read", "filesystem module not initialized, call filesystem_set_root first then filesystem_reset_read");
-    
+
     do
     {
 	once_again = false;
@@ -220,11 +220,11 @@ bool filesystem_read(entree * & ref)
 	{
 	    etage & inner = read_pile.back();
 	    string name;
-	    
+
 	    if(!inner.read(name))
 	    {
 		string tmp;
-		
+
 		set_back_dir_dates(read_current_dir->display(), inner.last_acc, inner.last_mod);
 		read_pile.pop_back();
 		if(read_pile.size() > 0)
@@ -242,14 +242,14 @@ bool filesystem_read(entree * & ref)
 		{
 		    ref = make_read_entree(*read_current_dir, name, true);
 		    directory *ref_dir = dynamic_cast<directory *>(ref);
-			    
+
 		    if(ref_dir != NULL)
 		    {
 			char *ptr_name;
 
 			*read_current_dir += name;
 			ptr_name = tools_str2charptr(read_current_dir->display());
-			
+
 			try
 			{
 			    read_pile.push_back(etage(ptr_name));
@@ -259,7 +259,7 @@ bool filesystem_read(entree * & ref)
 			catch(Erange & e)
 			{
 			    string tmp;
-			    
+
 			    user_interaction_warning(string("error openning ") + ptr_name + " : " + e.get_message());
 			    try
 			    {
@@ -285,8 +285,8 @@ bool filesystem_read(entree * & ref)
 
 			delete ptr_name;
 		    }
-		    
-		    
+
+
 		    if(ref == NULL)
 			once_again = true;
 			// the file has been removed between the time
@@ -320,7 +320,7 @@ void filesystem_skip_read_to_parent_dir()
 	set_back_dir_dates(read_current_dir->display(), read_pile.back().last_acc, read_pile.back().last_mod);
 	read_pile.pop_back();
     }
-    
+
     if(! read_current_dir->pop(tmp))
 	throw SRC_BUG;
 }
@@ -359,7 +359,7 @@ extern void filesystem_skip_read_filename_in_parent_dir()
     else
 	throw SRC_BUG;
 }
-	
+
 void filesystem_reset_write()
 {
     corres_write.clear();
@@ -368,14 +368,14 @@ void filesystem_reset_write()
 	delete write_current_dir;
     write_current_dir = new path(*fs_root);
     if(write_current_dir == NULL)
-	throw Ememory("filesystem_reset_write"); 
+	throw Ememory("filesystem_reset_write");
 }
- 
+
 static nomme *make_read_entree(path & lieu, const string & name, bool see_hard_link)
 {
     char *ptr_name = tools_str2charptr((lieu + path(name)).display());
     nomme *ref = NULL;
-    
+
     try
     {
 	struct stat buf;
@@ -392,16 +392,16 @@ static nomme *make_read_entree(path & lieu, const string & name, bool see_hard_l
 	    default:
 		throw Erange("filesystem make_read_entree", string("lstat(") + ptr_name + ") : " + strerror(errno));
 	    }
-		
+
 		// the function returns NULL (meaning file does not exists)
 	}
 	else
-	{ 
+	{
 	    if(S_ISLNK(buf.st_mode))
 	    {
 		const S_I buf_size = 4096;
 		char buffer[buf_size];
-		
+
 		S_I sz = readlink(ptr_name, buffer, buf_size);
 		if(sz < 0)
 		    throw Erange("filesystem_read", strerror(errno));
@@ -409,7 +409,7 @@ static nomme *make_read_entree(path & lieu, const string & name, bool see_hard_l
 		    throw Erange("filesystem_read", string("link target name too long, increase buffer size in source code file ") + __FILE__);
 		else
 		    buffer[sz] = '\0';
-		
+
 		ref = new lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 			       buf.st_atime,
 			       buf.st_mtime,
@@ -428,9 +428,9 @@ static nomme *make_read_entree(path & lieu, const string & name, bool see_hard_l
 		else // file with hard link(s)
 		{
 		    map <ino_t, couple>::iterator it = corres_read.find(buf.st_ino);
-		    
+
 		    if(it == corres_read.end()) // inode not seen yet, first link on it
-		    { 
+		    {
 			file_etiquette *ptr = new file_etiquette(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 								 buf.st_atime,
 								 buf.st_mtime,
@@ -495,7 +495,7 @@ static nomme *make_read_entree(path & lieu, const string & name, bool see_hard_l
 
 	    if(ref == NULL)
 		throw Ememory("make_read_entree");
-	    
+
 	    inode *ino = dynamic_cast<inode *>(ref);
 	    if(ino != NULL)
 	    {
@@ -540,7 +540,8 @@ bool filesystem_write(const entree *x)
 {
     const eod *x_eod = dynamic_cast<const eod *>(x);
     const nomme *x_nom = dynamic_cast<const nomme *>(x);
-    bool ret = true; 
+
+    bool ret = true;
 
     try
     {
@@ -554,24 +555,24 @@ bool filesystem_write(const entree *x)
 		throw SRC_BUG;
 	    write_stack_dir.pop_back();
 	}
-	else 
+	else
 	    if(x_nom == NULL)
 		throw SRC_BUG; // neither "nomme" nor "eod"
 	    else // nomme
-	    { 
+	    {
 		path spot = *write_current_dir + x_nom->get_name();
 		const detruit *x_det = dynamic_cast<const detruit *>(x);
 		const inode *x_ino = dynamic_cast<const inode *>(x);
 		const etiquette *x_eti = dynamic_cast<const etiquette *>(x);
 		const directory *x_dir = dynamic_cast<const directory *>(x);
-		
+
 		nomme *exists = make_read_entree(*write_current_dir, x_nom->get_name(), false);
-		
+
 		try
 		{
 		    if(x_ino == NULL && x_det == NULL && x_eti == NULL)
 			throw SRC_BUG; // should be either inode or detruit or hard link
-		    
+
 		    if(x_det != NULL) // this is an object of class "detruit"
 		    {
 			if(exists != NULL) // the file to destroy exists
@@ -580,7 +581,7 @@ bool filesystem_write(const entree *x)
 				throw Erange("filesystem_write", spot.display() + " will not be remove from filesystem, overwriting not allowed");
 			    if(filesystem_warn_overwrite)
 				user_interaction_pause(spot.display() + " is about to be removed from filesystem, continue ? ");
-			    
+
 			    if(tolower(exists->signature()) == tolower(x_det->get_signature()))
 				supprime(spot);
 			    else
@@ -591,17 +592,17 @@ bool filesystem_write(const entree *x)
 			    }
 			}
 		    }
-		    else // hard_link or inode 
+		    else // hard_link or inode
 		    {
 			if(exists == NULL) // nothing of this name in filesystem
 			    make_file(x_nom, *write_current_dir, false);
 			else // an entry of this name exists in filesystem
 			{
 			    const inode *exists_ino = dynamic_cast<inode *>(exists);
-			    
+
 			    if((x_eti == NULL && x_ino == NULL) || exists_ino == NULL)
 				throw SRC_BUG; // should be both of class inode (or hard_link for x)
-			    
+
 			    if(filesystem_allow_overwrite)
 			    {
 				if(filesystem_warn_overwrite && x_dir == NULL)
@@ -626,7 +627,7 @@ bool filesystem_write(const entree *x)
 				    try // if possible and available restoring original EA
 				    {
 					if(got_it)
-					    (void)ea_filesystem_write_ea(spot.display(), ea, true, true); 
+					    (void)ea_filesystem_write_ea(spot.display(), ea, true, true);
 					    // we don't care about the return value, here
 				    }
 				    catch(Egeneric & e)
@@ -646,7 +647,7 @@ bool filesystem_write(const entree *x)
 				ret = false;
 			    }
 			}
-			
+
 			if(x_dir != NULL)
 			{
 			    *write_current_dir += x_dir->get_name();
@@ -684,7 +685,7 @@ void filesystem_pseudo_write(const directory *dir)
 
     path spot = *write_current_dir + dir->get_name();
     nomme *exists = make_read_entree(*write_current_dir, dir->get_name(), false);
-    
+
     try
     {
 	if(exists == NULL)
@@ -692,7 +693,7 @@ void filesystem_pseudo_write(const directory *dir)
 	else
 	{
 	    const directory *e_dir = dynamic_cast<const directory *>(exists);
-	    
+
 	    if(e_dir == NULL) // an inode of that name exists, but it is not a directory
 	    {
 		if(filesystem_allow_overwrite)
@@ -703,8 +704,8 @@ void filesystem_pseudo_write(const directory *dir)
 		    make_file(dir, *write_current_dir, false);
 		}
 		else
-		    throw Erange("filesystem_pseudo_write", 
-				 spot.display() + 
+		    throw Erange("filesystem_pseudo_write",
+				 spot.display() +
 				 " could not be restored, because a file of that name exists and overwrite is not allowed");
 	    }
 	    else // just setting permission to allow creation of any sub-dir or sub_file
@@ -729,10 +730,10 @@ void filesystem_pseudo_write(const directory *dir)
 	if(exists != NULL)
 	    delete exists;
 	throw;
-    }    
+    }
     if(exists != NULL)
 	delete exists;
-		
+
     *write_current_dir += dir->get_name();
     write_stack_dir.push_back(directory(*dir));
 }
@@ -762,13 +763,13 @@ bool filesystem_set_ea(const nomme *e, const ea_attributs & l)
 	    // buidling the path to file
 	if(e_dir == NULL) // not a directory (directory get a chdir in them so write_current_dir is up to date)
 	    spot += e->get_name();
-	
+
 	    // checking that we have not already restored the EA of this
 	    // inode throw a hard link
 	if(e_eti != NULL)
 	{
 	    map<infinint, corres_ino_ea>::iterator it;
-	    
+
 	    it = corres_write.find(e_eti->get_etiquette());
 	    if(it == corres_write.end())
 	    {
@@ -785,11 +786,11 @@ bool filesystem_set_ea(const nomme *e, const ea_attributs & l)
 		else
 		    it->second.ea_restored = true;
 	}
-	
+
 	string chemin = spot.display();
 	bool exists;
 
-	    // restoring the root EA 
+	    // restoring the root EA
 	    //
 	exists = ea_filesystem_is_present(chemin, ea_root);
 	if(!exists || filesystem_allow_overwrite)
@@ -814,7 +815,7 @@ bool filesystem_set_ea(const nomme *e, const ea_attributs & l)
 	    if(filesystem_ea_root)
 		user_interaction_warning(string("system EA for ")+chemin+" will not be restored, (overwriting not allowed)");
 
-	    // restoring the user EA 
+	    // restoring the user EA
 	    //
 	exists = ea_filesystem_is_present(chemin, ea_user);
 	if(!exists || filesystem_allow_overwrite)
@@ -866,7 +867,7 @@ bool filesystem_known_etiquette(const infinint & eti)
 void filesystem_forget_etiquette(file_etiquette *obj)
 {
     map<ino_t, couple>::iterator it = corres_read.begin();
-    
+
     while(it != corres_read.end() && it->second.obj != obj)
 	it++;
 
@@ -888,10 +889,10 @@ static void supprime(const path & ref)
 	{
 	    etage fils = s;
 	    string tmp;
-	    
+
 	    while(fils.read(tmp))
 		supprime(ref+tmp);
-	    
+
 	    if(rmdir(s) < 0)
 		throw Erange("supprime (dir)", strerror(errno));
 	}
@@ -935,7 +936,7 @@ static void make_file(const nomme * ref, const path & ou, bool dir_perm)
     try
     {
 	S_I ret;
-	
+
 	do
 	{
 	    if(ref_eti != NULL) // we potentially have to make a hard link
@@ -965,7 +966,7 @@ static void make_file(const nomme * ref, const path & ou, bool dir_perm)
 				// can't make hard link, trying to duplicate the inode
 				user_interaction_warning(string("error creating hard link ") + name + " : " + strerror(errno) + "\n Trying to duplicate the inode");
 				create_file = true;
-				clear_corres_write(ref_eti->get_etiquette()); 
+				clear_corres_write(ref_eti->get_etiquette());
 				    // need to remove this entry to be able
 				    // to restore EA for other copies
 				break;
@@ -977,7 +978,7 @@ static void make_file(const nomme * ref, const path & ou, bool dir_perm)
 					// need to remove this entry to be able
 					// to restore EA for other copies
 				    user_interaction_warning(string("error creating hard link : ") + name + " , the inode to link with [" + old + "] has disapeared, re-creating it");
-				    
+
 				}
 				else
 				{
@@ -1016,12 +1017,12 @@ static void make_file(const nomme * ref, const path & ou, bool dir_perm)
 	    else if(ref_dir != NULL)
 	    {
 		ret = mkdir(name, 0777);
-	    } 
+	    }
 	    else if(ref_fil != NULL)
 	    {
 		generic_file *ou;
 		infinint seek;
-		
+
 		ret = open(name, O_WRONLY|O_CREAT, 0777);
 		if(ret >= 0)
 		{
@@ -1064,7 +1065,7 @@ static void make_file(const nomme * ref, const path & ou, bool dir_perm)
 		    S_I sd = ret;
 		    struct sockaddr_un addr;
 		    addr.sun_family = AF_UNIX;
-		    
+
 		    try
 		    {
 			strncpy(addr.sun_path, name, UNIX_PATH_MAX - 1);
@@ -1084,12 +1085,14 @@ static void make_file(const nomme * ref, const path & ou, bool dir_perm)
 	    }
 	    else
 		throw SRC_BUG; // unknown inode type
-		
+
 	    if(ret < 0)
+	    {
 		if(errno != ENOSPC)
 		    throw Erange("make_file", strerror(errno));
 		else
 		    user_interaction_pause(string("can't create inode : ") + strerror(errno) + " Ready to continue ? ");
+	    }
 	}
 	while(ret < 0 && errno == ENOSPC);
 
@@ -1115,17 +1118,17 @@ static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm)
 	permission = 0777;
     else
 	permission = ref.get_perm();
-    
+
     try
     {
 	if(!filesystem_ignore_ownership)
 	    if(ref.get_saved_status() == s_saved)
 		if(lchown(name, ref.get_uid(), ref.get_gid()) < 0)
 		    user_interaction_warning(string(name) + string(" could not restore original ownership of file : ") + strerror(errno));
-	
+
 	try
 	{
-	    if(ref_lie == NULL) // not restoring permission for symbolic links 
+	    if(ref_lie == NULL) // not restoring permission for symbolic links
 		if(chmod(name, permission) < 0)
 		    throw Erange("make_owner_perm (permission)", strerror(errno));
 	}
@@ -1135,8 +1138,8 @@ static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm)
 		throw;
 		// else (the inode is a symlink), we simply ignore this error
 	}
-	
-	if(ref_lie == NULL) // not restoring atime & ctime for symbolic links	
+
+	if(ref_lie == NULL) // not restoring atime & ctime for symbolic links
 	    make_date(chem, ref.get_last_access(), ref.get_last_modif());
 
     }
@@ -1153,13 +1156,13 @@ static void make_date(const string & chemin, infinint access, infinint modif)
     struct utimbuf temps;
     time_t tmp = 0;
     char *filename;
-    
+
     access.unstack(tmp);
     temps.actime = tmp;
     tmp = 0;
     modif.unstack(tmp);
     temps.modtime = tmp;
-    
+
     filename = tools_str2charptr(chemin);
     try
     {

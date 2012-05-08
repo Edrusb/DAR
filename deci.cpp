@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -37,41 +37,41 @@ static inline void set_left(unsigned char & a, chiffre val) { val <<= 4; a &= 0x
 static inline void set_right(unsigned char & a, chiffre val) { val &= 0x0F; a &= 0xF0; a |= val; };
 
 static inline chiffre digit_htoc(unsigned char c) throw(Edeci)
-{ 
+{
     E_BEGIN;
-    if(c < '0' || c > '9') 
-	throw Edeci("deci.cpp : digit_htoc", "invalid decimal digit"); 
-    return chiffre(c - '0'); 
+    if(c < '0' || c > '9')
+	throw Edeci("deci.cpp : digit_htoc", "invalid decimal digit");
+    return chiffre(c - '0');
     E_END("deci.cpp : digit_htoc", "");
 }
 
 static inline unsigned char digit_ctoh(chiffre c) throw(Ebug)
-{ 
+{
     E_BEGIN;
-    if(c > 9) throw SRC_BUG; 
-    return '0' + c; 
+    if(c > 9) throw SRC_BUG;
+    return '0' + c;
     E_END("deci.cpp : digit_ctoh", "");
 }
 
 template <class T> void decicoupe(storage * &decimales, T x) throw(Ememory, Erange, Ebug)
 {
     E_BEGIN;
-    try 
+    try
     {
 	chiffre r;
 	const T d_t = 10;
 	T r_t;
 	storage::iterator it;
 	bool recule = false;
-	unsigned char tmp;
-	
+	unsigned char tmp = 0;
+
 	decimales = new storage(PAS);
 	if(decimales == NULL)
 	    throw Ememory("template deci::decicoupe");
-	
+
 	decimales->clear(0xFF);
 	it = decimales->rbegin();
-	
+
 	while(x > 0 || recule)
 	{
 	    if(x > 0)
@@ -141,7 +141,7 @@ deci::deci(string s) throw(Edeci, Ememory, Erange, Ebug)
 	}
 	else
 	    set_right(tmp, digit_htoc(*it));
-	
+
 	recule = ! recule;
 	if(it != s.rend())
 	    it++; // it is a reverse iterator thus ++ for going backward
@@ -152,11 +152,11 @@ deci::deci(string s) throw(Edeci, Ememory, Erange, Ebug)
 }
 
 deci::deci(const infinint & x) throw(Ememory, Erange, Ebug)
-{ 
-    E_BEGIN; 
-    decicoupe(decimales, x); 
+{
+    E_BEGIN;
+    decicoupe(decimales, x);
     reduce();
-    E_END("deci::deci", "infinint"); 
+    E_END("deci::deci", "infinint");
 }
 
 void deci::copy_from(const deci & ref) throw(Ememory, Erange, Ebug)
@@ -164,7 +164,7 @@ void deci::copy_from(const deci & ref) throw(Ememory, Erange, Ebug)
     E_BEGIN;
     if(decimales != NULL)
 	throw SRC_BUG;
-    
+
     decimales = new storage(*ref.decimales);
     E_END("deci::copy_from", "");
 }
@@ -199,7 +199,7 @@ void deci::reduce() throw(Ememory, Erange, Ebug)
 	    tmp = get_right(*it);
 	else
 	    tmp = get_left(*it);
-	   
+
 	if(tmp == 0 && leading_zero)
 	{
 	    if(avance)
@@ -211,6 +211,7 @@ void deci::reduce() throw(Ememory, Erange, Ebug)
 	}
 
 	if(tmp == 0xF)
+	{
 	    if(leading_zero)
 	    {
 		if(avance)
@@ -218,6 +219,7 @@ void deci::reduce() throw(Ememory, Erange, Ebug)
 	    }
 	    else
 		throw SRC_BUG;
+	}
 
 	if(tmp != 0 && tmp != 0xF)
 	    leading_zero = false;
@@ -265,7 +267,7 @@ string deci::human() const throw(Ememory, Erange, Ebug)
 
 	if(c != 0xF)
 	    s = s + string(1, digit_ctoh(c));
-	    
+
 	avance = ! avance;
     }
 
@@ -311,4 +313,4 @@ ostream & operator << (ostream & ref, const infinint & arg)
 
     return ref;
 }
-    
+

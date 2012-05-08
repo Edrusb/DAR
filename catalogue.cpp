@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -84,7 +84,7 @@ void entree_stats::add(const entree *ref)
 	const inode *ino = dynamic_cast<const inode *>(ref);
 	const hard_link *h = dynamic_cast<const hard_link *>(ref);
 	const detruit *x = dynamic_cast<const detruit *>(ref);
-				    
+
 	if(ino != NULL && h == NULL) // won't count twice the same inode if it is referenced with hard_link
 	{
 	    if(ino->get_saved_status() == s_saved)
@@ -94,8 +94,8 @@ void entree_stats::add(const entree *ref)
 
 	if(x != NULL)
 	    num_x++;
-	else 
-	{ 
+	else
+	{
 	    const directory *d = dynamic_cast<const directory*>(ref);
 	    if(d != NULL)
 		num_d++;
@@ -142,10 +142,10 @@ void entree_stats::add(const entree *ref)
 		    }
 		}
 	    }
-	}	
+	}
     }
 }
-			
+
 void entree_stats::listing(ostream & flux) const
 {
     flux << endl << "CATALOGUE CONTENTS :" << endl << endl;
@@ -179,7 +179,7 @@ entree *entree::read(generic_file & f)
     infinint tmp;
     hard_link *ptr_l = NULL;
     file_etiquette *ptr_e = NULL;
-    
+
     S_I lu = f.read(&type, 1);
 
     if(lu == 0)
@@ -250,8 +250,8 @@ entree *entree::read(generic_file & f)
     return ret;
 }
 
-void entree::dump(generic_file & f) const 
-{ 
+void entree::dump(generic_file & f) const
+{
     char s = signature();
     f.write(&s, 1);
 }
@@ -286,9 +286,9 @@ generic_file *inode::storage = NULL;
 
 bool inode::ignore_owner = false;
 
-inode::inode(U_16 xuid, U_16 xgid, U_16 xperm, 
-	     const infinint & last_access, 
-	     const infinint & last_modif, 
+inode::inode(U_16 xuid, U_16 xgid, U_16 xperm,
+	     const infinint & last_access,
+	     const infinint & last_modif,
 	     const string & xname) : nomme(xname)
 {
     uid = xuid;
@@ -331,9 +331,9 @@ inode::inode(generic_file & f, saved_status saved) : nomme(f)
 	    throw Erange("inode::inode", "badly structured inode: unknown inode flag");
 	}
     }
-    else 
+    else
 	ea_saved = ea_none;
-	
+
     if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
 	throw Erange("inode::inode", "missing data to build an inode");
     uid = ntohs(tmp);
@@ -383,7 +383,7 @@ inode::inode(const inode & ref) : nomme(ref)
     switch(ea_saved)
     {
     case ea_full:
-	ea_offset = ref.ea_offset;	
+	ea_offset = ref.ea_offset;
 	copy_crc(ea_crc, ref.ea_crc);
 	if(ref.ea != NULL) // might be NULL if build from a file
 	{
@@ -409,7 +409,7 @@ inode::inode(const inode & ref) : nomme(ref)
 	throw SRC_BUG;
     }
 }
- 
+
 bool inode::same_as(const inode & ref) const
 {
     return nomme::same_as(ref) && compatible_signature(ref.signature(), signature());
@@ -417,15 +417,15 @@ bool inode::same_as(const inode & ref) const
 
 bool inode::is_more_recent_than(const inode & ref) const
 {
-    return ref.last_mod < last_mod 
+    return ref.last_mod < last_mod
 	|| (!ignore_owner && uid != ref.uid)
 	|| (!ignore_owner && gid != ref.gid)
 	|| perm != ref.perm;
 }
-    
+
 bool inode::has_changed_since(const inode & ref) const
 {
-    return ref.last_mod != last_mod 
+    return ref.last_mod != last_mod
 	|| (!ignore_owner && uid != ref.uid)
 	|| (!ignore_owner && gid != ref.gid)
 	|| perm != ref.perm;
@@ -456,7 +456,7 @@ void inode::compare(const inode &other, bool root_ea, bool user_ea) const
 	    }
 	    else
 		throw Erange("inode::compare", "no Extended Attributs to compare with");
-		// else we ignore the EA present in the argument, 
+		// else we ignore the EA present in the argument,
 		// this is not a symetrical comparison
 		// we check that all data in current object are the same in the argument
 		// but additional data can reside in the argument
@@ -541,7 +541,7 @@ void inode::ea_set_saved_status(ea_status status)
 	if(ea != NULL)
 	    throw SRC_BUG;
 	ea_offset = 0;
-	last_cha = 0;	
+	last_cha = 0;
 	break;
     case ea_partial:
 	if(ea != NULL)
@@ -557,20 +557,20 @@ void inode::ea_set_saved_status(ea_status status)
 }
 
 void inode::ea_attach(ea_attributs *ref)
-{ 
-    if(ref != NULL && ea == NULL) 
-	ea = ref; 
-    else 
-	throw SRC_BUG; 
+{
+    if(ref != NULL && ea == NULL)
+	ea = ref;
+    else
+	throw SRC_BUG;
     if(ea_saved != ea_full)
 	throw SRC_BUG;
 }
 
-const ea_attributs *inode::get_ea() const 
-{ 
+const ea_attributs *inode::get_ea() const
+{
     if(ea_saved == ea_full)
 	if(ea != NULL)
-	    return ea; 
+	    return ea;
 	else
 	    if(ea_offset != 0 && storage != NULL)
 	    {
@@ -595,42 +595,42 @@ const ea_attributs *inode::get_ea() const
 	    }
 	    else
 		throw SRC_BUG;
-    else 
-	throw SRC_BUG; 
+    else
+	throw SRC_BUG;
 }
 
 void inode::ea_detach() const
-{ 
-    if(ea != NULL) 
-    { 
-	delete ea; 
-	const_cast<ea_attributs *&>(ea) = NULL; 
-    } 
+{
+    if(ea != NULL)
+    {
+	delete ea;
+	const_cast<ea_attributs *&>(ea) = NULL;
+    }
 }
 
 infinint inode::get_last_change() const
-{ 
-    if(ea_saved != ea_none) 
-	return last_cha; 
-    else 
-	throw SRC_BUG; 
+{
+    if(ea_saved != ea_none)
+	return last_cha;
+    else
+	throw SRC_BUG;
 }
 
-void inode::set_last_change(const infinint & x_time) 
-{ 
-    if(ea_saved != ea_none) 
-	last_cha = x_time; 
-    else 
-	throw SRC_BUG; 
+void inode::set_last_change(const infinint & x_time)
+{
+    if(ea_saved != ea_none)
+	last_cha = x_time;
+    else
+	throw SRC_BUG;
 }
 
 compression file::algo = none;
 generic_file *file::loc = NULL;
 
-file::file(U_16 xuid, U_16 xgid, U_16 xperm, 
-	   const infinint & last_access, 
-	   const infinint & last_modif, 
-	   const string & src, 
+file::file(U_16 xuid, U_16 xgid, U_16 xperm,
+	   const infinint & last_access,
+	   const infinint & last_modif,
+	   const string & src,
 	   const path & che,
 	   const infinint & taille) : inode(xuid, xgid, xperm, last_access, last_modif, src), chemin(che + src)
 {
@@ -651,9 +651,9 @@ file::file(generic_file & f, saved_status saved) : inode(f, saved), chemin("vide
 	if(version_greater(reading_ver, "01"))
 	    storage_size.read_from_file(f);
 	else
-	    storage_size = 2*size; 
-	    // compressed file should be less than twice 
-	    // larger than original file 
+	    storage_size = 2*size;
+	    // compressed file should be less than twice
+	    // larger than original file
 	    // (in case the compression is very bad
 	    // and takes more place than no compression !)
     }
@@ -665,7 +665,7 @@ file::file(generic_file & f, saved_status saved) : inode(f, saved), chemin("vide
     if(version_greater(reading_ver, "01"))
 	if(f.read(check, CRC_SIZE) != CRC_SIZE)
 	    throw Erange("file::file", "can't read CRC data");
-}    
+}
 
 void file::dump(generic_file & f) const
 {
@@ -704,10 +704,10 @@ generic_file *file::get_data() const
 
     if(get_saved_status() != s_saved)
 	throw Erange("file::get_data", "cannot provide data from a \"not saved\" file object");
-    
+
     if(status == empty)
 	throw Erange("file::get_data", "data has been cleaned, object is now empty");
-    
+
     if(status == from_path)
 	ret = new fichier(chemin, gf_read_only);
     else
@@ -715,7 +715,7 @@ generic_file *file::get_data() const
 	    throw SRC_BUG; // set_archive_localisation never called or with a bad argument
 	else
 	    if(loc->get_mode() == gf_write_only)
-		throw SRC_BUG; // cannot get data from a write-only file !!! 
+		throw SRC_BUG; // cannot get data from a write-only file !!!
 	    else
 	    {
 		tronc *tmp = new tronc(loc, offset, storage_size == 0 ? size : storage_size, gf_read_only);
@@ -766,7 +766,7 @@ void file::set_offset(const infinint & r)
 }
 
 bool file::get_crc(crc & c) const
-{ 
+{
     if(version_greater(reading_ver, "01"))
     {
 	copy_crc(c, check);
@@ -830,7 +830,7 @@ void file_etiquette::dump(generic_file &f) const
     etiquette.dump(f);
 }
 
-hard_link::hard_link(const string & name, file_etiquette *ref) : nomme(name) 
+hard_link::hard_link(const string & name, file_etiquette *ref) : nomme(name)
 {
     if(ref == NULL)
 	throw SRC_BUG;
@@ -847,18 +847,18 @@ void hard_link::dump(generic_file &f) const
     nomme::dump(f);
     get_etiquette().dump(f);
 }
- 
+
 void hard_link::set_reference(file_etiquette *ref)
-{   
-    if(ref == NULL) 
+{
+    if(ref == NULL)
 	throw SRC_BUG;
-    x_ref = ref; 
+    x_ref = ref;
 }
 
-lien::lien(U_16 uid, U_16 gid, U_16 perm, 
-	   const infinint & last_access, 
-	   const infinint & last_modif, 
-	   const string & name, 
+lien::lien(U_16 uid, U_16 gid, U_16 perm,
+	   const infinint & last_access,
+	   const infinint & last_modif,
+	   const string & name,
 	   const string & target) : inode(uid, gid, perm, last_access, last_modif, name)
 {
     points_to = target;
@@ -878,10 +878,10 @@ string lien::get_target() const
     return points_to;
 }
 
-void lien::set_target(string x) 
+void lien::set_target(string x)
 {
     set_saved_status(s_saved);
-    points_to = x; 
+    points_to = x;
 }
 
 void lien::sub_compare(const inode & other) const
@@ -902,9 +902,9 @@ void lien::dump(generic_file & f) const
 	tools_write_string(f, points_to);
 }
 
-directory::directory(U_16 xuid, U_16 xgid, U_16 xperm, 
-		     const infinint & last_access, 
-		     const infinint & last_modif, 
+directory::directory(U_16 xuid, U_16 xgid, U_16 xperm,
+		     const infinint & last_access,
+		     const infinint & last_modif,
 		     const string & xname) : inode(xuid, xgid, xperm, last_access, last_modif, xname)
 {
     parent = NULL;
@@ -930,7 +930,7 @@ directory::directory(generic_file & f, saved_status saved) : inode(f, saved)
     parent = NULL;
     fils.clear();
     it = fils.begin();
-    
+
     try
     {
 	while(fin == NULL)
@@ -941,7 +941,7 @@ directory::directory(generic_file & f, saved_status saved) : inode(f, saved)
 		d = dynamic_cast<directory *>(p);
 		fin = dynamic_cast<eod *>(p);
 		t = dynamic_cast<nomme *>(p);
-		
+
 		if(t != NULL) // p is a "nomme"
 		    fils.push_back(t);
 		if(d != NULL) // p is a directory
@@ -971,21 +971,21 @@ void directory::dump(generic_file & f) const
     vector<nomme *>::iterator x = const_cast<directory *>(this)->fils.begin();
     inode::dump(f);
     eod fin;
-    
+
     while(x != fils.end())
 	if(dynamic_cast<ignored *>(*x) != NULL)
 	    x++; // "ignored" need not to be saved, they are only useful when updating_destroyed
 	else
 	    (*x++)->dump(f);
 
-    fin.dump(f); // end of "this" directory   
+    fin.dump(f); // end of "this" directory
 }
-	
+
 void directory::add_children(nomme *r)
 {
     directory *d = dynamic_cast<directory *>(r);
     nomme *ancien;
-    
+
     if(search_children(r->get_name(), ancien))
     {
 	directory *a_dir = const_cast<directory *>(dynamic_cast<const directory *>(ancien));
@@ -1014,10 +1014,10 @@ void directory::add_children(nomme *r)
 	d->parent = this;
 }
 
-void directory::reset_read_children() const 
+void directory::reset_read_children() const
 {
     directory *moi = const_cast<directory *>(this);
-    moi->it = moi->fils.begin(); 
+    moi->it = moi->fils.begin();
 }
 
 bool directory::read_children(const nomme *&r) const
@@ -1059,22 +1059,22 @@ void directory::listing(ostream & flux,const mask &m, string marge) const
 	if(m.is_covered((*it)->get_name()) || d != NULL)
 	{
 	    if(det != NULL)
-		flux << marge << "[ REMOVED ]    " << (*it)->get_name() << endl; 
+		flux << marge << "[ REMOVED ]    " << (*it)->get_name() << endl;
 	    else
 	    {
 		if(hard != NULL)
 		    ino = hard->get_inode();
-		
+
 		if(ino == NULL)
 		    throw SRC_BUG;
 		else
 		    flux <<  marge << local_perm(*ino)
 			 << "\t" << local_uid(*ino)
 			 << "\t" << local_gid(*ino)
-			 << "\t" << local_size(*ino) 
+			 << "\t" << local_size(*ino)
 			 << "\t" << local_date(*ino)
 			 << "\t" << local_flag(*ino)
-			 << "   " << (*it)->get_name() << endl; 
+			 << "   " << (*it)->get_name() << endl;
 	    }
 
 	    if(d != NULL)
@@ -1105,12 +1105,12 @@ void directory::tar_listing(ostream & flux, const mask &m, const string & beginn
 	if(m.is_covered((*it)->get_name()))
 	{
 	    if(det != NULL)
-		flux << "[     REMOVED       ] "<< beginning << sep << (*it)->get_name() << endl; 
+		flux << "[     REMOVED       ] "<< beginning << sep << (*it)->get_name() << endl;
 	    else
 	    {
 		if(hard != NULL)
 		    ino = hard->get_inode();
-		
+
 		if(ino == NULL)
 		    throw SRC_BUG;
 		else
@@ -1120,7 +1120,7 @@ void directory::tar_listing(ostream & flux, const mask &m, const string & beginn
 			 << local_gid(*ino) << "\t"
 			 << local_size(*ino) << "\t"
 			 << local_date(*ino) << "\t"
-			 << beginning << sep << ino->get_name() << "   " << endl; 
+			 << beginning << sep << ino->get_name() << "   " << endl;
 	    }
 	}
 
@@ -1147,11 +1147,11 @@ bool directory::search_children(const string &name, nomme *&ref)
 	return false;
 }
 
-device::device(U_16 uid, U_16 gid, U_16 perm, 
-	       const infinint & last_access, 
-	       const infinint & last_modif, 
-	       const string & name, 
-	       U_16 major, 
+device::device(U_16 uid, U_16 gid, U_16 perm,
+	       const infinint & last_access,
+	       const infinint & last_modif,
+	       const string & name,
+	       U_16 major,
 	       U_16 minor) : inode(uid, gid, perm, last_access, last_modif, name)
 {
     xmajor = major;
@@ -1180,7 +1180,7 @@ void device::dump(generic_file & f) const
 
     inode::dump(f);
     if(get_saved_status() == s_saved)
-    {	
+    {
 	tmp = htons(xmajor);
 	f.write((char *)&tmp, (size_t)sizeof(tmp));
 	tmp = htons(xminor);
@@ -1192,7 +1192,7 @@ void device::sub_compare(const inode & other) const
 {
     const device *d_other = dynamic_cast<const device *>(&other);
     if(d_other == NULL)
-	throw SRC_BUG; // bug in inode::compare 
+	throw SRC_BUG; // bug in inode::compare
     if(get_saved_status() == s_saved && d_other->get_saved_status() == s_saved)
     {
 	if(get_major() != d_other->get_major())
@@ -1206,7 +1206,7 @@ void ignored_dir::dump(generic_file & f) const
 {
     directory tmp = directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_name());
     tmp.set_saved_status(get_saved_status());
-    tmp.dump(f); // dump an empty directory 
+    tmp.dump(f); // dump an empty directory
 }
 
 catalogue::catalogue() : out_compare("/")
@@ -1247,11 +1247,11 @@ catalogue::catalogue(generic_file & f) : out_compare("/")
 }
 
 catalogue & catalogue::operator = (const catalogue &ref)
-{ 
-    detruire(); 
-    out_compare = ref.out_compare; 
-    partial_copy_from(ref); 
-    return *this; 
+{
+    detruire();
+    out_compare = ref.out_compare;
+    partial_copy_from(ref);
+    return *this;
 }
 
 void catalogue::reset_read()
@@ -1271,7 +1271,7 @@ void catalogue::skip_read_to_parent_dir()
 bool catalogue::read(const entree * & ref)
 {
     const nomme *tmp;
-    
+
     if(current_read->read_children(tmp))
     {
 	const directory *dir = dynamic_cast<const directory *>(tmp);
@@ -1329,7 +1329,7 @@ void catalogue::reset_sub_read(const path &sub)
 {
     if(! sub.is_relative())
 	throw SRC_BUG;
-    
+
     if(sub_tree != NULL)
 	delete sub_tree;
     sub_tree = new path(sub);
@@ -1373,14 +1373,14 @@ bool catalogue::sub_read(const entree * &ref)
 	    {
 		ref = xtmp;
 		directory *dir = dynamic_cast<directory *>(xtmp);
-		
+
 		if(dir != NULL)
 		{
 		    current_read = dir;
 		    return true;
 		}
 		else
-		    if(sub_tree->read_subdir(tmp)) 
+		    if(sub_tree->read_subdir(tmp))
 		    {
 			user_interaction_warning(sub_tree->display() + " is not present in the archive");
 			delete sub_tree;
@@ -1416,7 +1416,7 @@ bool catalogue::sub_read(const entree * &ref)
 	{
 	    const directory *dir = dynamic_cast<const directory *>(ref);
 	    const eod *fin = dynamic_cast<const eod *>(ref);
-	    
+
 	    if(dir != NULL)
 		sub_count++;
 	    if(fin != NULL)
@@ -1426,7 +1426,7 @@ bool catalogue::sub_read(const entree * &ref)
 	}
 	else
 	    throw SRC_BUG;
-    }	    
+    }
 }
 
 void catalogue::reset_add()
@@ -1482,7 +1482,7 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
     const directory *dir = dynamic_cast<const directory *>(target);
     const eod *fin = dynamic_cast<const eod *>(target);
     const nomme *nom = dynamic_cast<const nomme *>(target);
-	
+
     if(out_compare.degre() > 1) // actually scanning a inexisting directory
     {
 	if(dir != NULL)
@@ -1493,12 +1493,14 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 		string tmp_s;
 
 		if(!out_compare.pop(tmp_s))
+		{
 		    if(out_compare.is_relative())
 			throw SRC_BUG; // should not be a relative path !!!
 		    else // both cases are bugs, but need to know which case is generating a bug
 			throw SRC_BUG; // out_compare.degre() > 0 but cannot pop !
+		}
 	    }
-	
+
 	return false;
     }
     else // scanning an existing directory
@@ -1514,7 +1516,7 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 	    extracted = target;
 	    return true;
 	}
-	    
+
 	if(nom == NULL)
 	    throw SRC_BUG; // ref, is neither a eod nor a nomme ! what's that ???
 
@@ -1526,13 +1528,13 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 	    const inode *dst_ino = dynamic_cast<const inode *>(found);
 	    const etiquette *src_eti = dynamic_cast<const etiquette *>(nom);
 	    const etiquette *dst_eti = dynamic_cast<const etiquette *>(found);
-	    
+
 		// extracting inode from hard links
 	    if(src_eti != NULL)
 		src_ino = src_eti->get_inode();
 	    if(dst_eti != NULL)
 		dst_ino = dst_eti->get_inode();
-	 
+
 		// updating internal structure to follow directory tree :
 	    if(dir != NULL)
 	    {
@@ -1544,7 +1546,7 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 	    }
 
 		// now comparing the objects :
-	    if(src_ino != NULL) 
+	    if(src_ino != NULL)
 		if(dst_ino != NULL)
 		{
 		    if(!src_ino->same_as(*dst_ino))
@@ -1563,7 +1565,7 @@ bool catalogue::compare(const entree * target, const entree * & extracted)
 			return false;
 		else
 		    throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a nomme which is neither detruit nor inode !
-	    
+
 	    if(dst_eti != NULL)
 		extracted = dst_eti->get_inode();
 	    else
@@ -1589,7 +1591,7 @@ infinint catalogue::update_destroyed_with(catalogue & ref)
     const detruit *pro_det;
     const nomme *pro_nom;
     infinint count = 0;
-    
+
     ref.reset_read();
     while(ref.read(projo))
     {
@@ -1597,7 +1599,7 @@ infinint catalogue::update_destroyed_with(catalogue & ref)
 	pro_dir = dynamic_cast<const directory *>(projo);
 	pro_det = dynamic_cast<const detruit *>(projo);
 	pro_nom = dynamic_cast<const nomme *>(projo);
-	
+
 	if(pro_eod != NULL)
 	{
 	    directory *tmp = current->get_parent();
@@ -1606,7 +1608,7 @@ infinint catalogue::update_destroyed_with(catalogue & ref)
 	    current = tmp;
 	    continue;
 	}
-	
+
 	if(pro_det != NULL)
 	    continue;
 
@@ -1639,14 +1641,14 @@ void catalogue::listing(ostream & flux, const mask &m, string marge) const
 {
     flux << "access mode    | user | group | size  |          date                 | [data ][ EA  ][compr] |   filename" << endl;
     flux << "---------------+------+-------+-------+-------------------------------+-----------------------+-----------" << endl;
-    contenu->listing(flux, m, marge); 
+    contenu->listing(flux, m, marge);
 }
 
-void catalogue::tar_listing(ostream & flux, const mask &m, const string & beginning) const 
-{ 
+void catalogue::tar_listing(ostream & flux, const mask &m, const string & beginning) const
+{
     flux << "[data ][ EA  ][compr] | permission | user  | group | size  |          date                 |    filename" << endl;
     flux << "----------------------+------------+-------+-------+-------+-------------------------------+------------" << endl;
-    contenu->tar_listing(flux, m, beginning); 
+    contenu->tar_listing(flux, m, beginning);
 }
 
 static void dummy_call(char *x)
@@ -1698,7 +1700,7 @@ static string local_perm(const inode &ref)
 
     U_32 perm = ref.get_perm();
     if(!extract_base_and_status(ref.signature(), (unsigned char &)type, st))
-	throw SRC_BUG;    
+	throw SRC_BUG;
 
     if(type == 'f')
 	type = '-';
@@ -1759,7 +1761,7 @@ static string local_perm(const inode &ref)
 	    ret += 'T';
 	else
 	    ret += '-';
-    
+
     return ret;
 }
 
@@ -1793,7 +1795,7 @@ static string local_date(const inode & ref)
 {
     return tools_display_date(ref.get_last_modif());
 }
-    
+
 static string local_flag(const inode & ref)
 {
     string ret;
@@ -1839,7 +1841,7 @@ static string local_flag(const inode & ref)
 		ret += "[Worse]";
     else
 	ret += "[-----]";
-    
+
     return ret;
 }
 
@@ -1850,7 +1852,7 @@ static bool extract_base_and_status(unsigned char signature, unsigned char & bas
 
     signature &= ~SAVED_FAKE_BIT;
     if(!isalpha(signature))
-	return false; 
+	return false;
     base = tolower(signature);
 
     if(fake)

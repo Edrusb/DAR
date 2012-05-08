@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -70,7 +70,7 @@ void compressor::init(compression algo, generic_file *compressed_side, U_I compr
 
 	if(compression_level > 9)
 	    throw SRC_BUG;
-	
+
 	switch(deflateInit(compr->strm, compression_level))
 	{
 	case Z_OK:
@@ -183,11 +183,11 @@ void compressor::change_algo(compression new_algo, U_I new_compression_level)
 	return;
 
 	// flush data
-    flush_write(); 
+    flush_write();
     flush_read();
     clean_read();
     clean_write();
-    
+
 	// clean existing data structures
     if(compr != NULL)
     {
@@ -207,7 +207,7 @@ void compressor::change_algo(compression new_algo, U_I new_compression_level)
 
 compressor::xfer::xfer(U_I sz)
 {
-    try 
+    try
     {
 	buffer = new char[sz];
 	if(buffer == NULL)
@@ -241,7 +241,7 @@ S_I compressor::none_read(char *a, size_t size)
     return compressed->read(a, size);
 }
 
-S_I compressor::none_write(char *a, size_t size)
+S_I compressor::none_write(const char *a, size_t size)
 {
     return compressed->write(a, size);
 }
@@ -256,14 +256,14 @@ S_I compressor::gzip_read(char *a, size_t size)
 
     decompr->strm->next_out = (Bytef *)a;
     decompr->strm->avail_out = size;
-  
+
     do
     {
 	    // feeding the input buffer if necessary
 	if(decompr->strm->avail_in == 0)
 	{
 	    decompr->strm->next_in = (Bytef *)decompr->buffer;
-	    decompr->strm->avail_in = compressed->read(decompr->buffer, 
+	    decompr->strm->avail_in = compressed->read(decompr->buffer,
 						       decompr->size);
 	}
 
@@ -281,7 +281,7 @@ S_I compressor::gzip_read(char *a, size_t size)
 	case Z_BUF_ERROR:
 		// no process is possible:
 	    if(decompr->strm->avail_in == 0) // because we reached EOF
-		ret = Z_STREAM_END; // zlib did not returned Z_STREAM_END (why ?) 
+		ret = Z_STREAM_END; // zlib did not returned Z_STREAM_END (why ?)
 	    else // nothing explains why no process is possible:
 		if(decompr->strm->avail_out == 0)
 		    throw SRC_BUG; // bug from DAR: no output possible
@@ -297,7 +297,7 @@ S_I compressor::gzip_read(char *a, size_t size)
     return (char *)decompr->strm->next_out - a;
 }
 
-S_I compressor::gzip_write(char *a, size_t size)
+S_I compressor::gzip_write(const char *a, size_t size)
 {
     compr->strm->next_in = (Bytef *)a;
     compr->strm->avail_in = size;
@@ -339,14 +339,14 @@ void compressor::flush_write()
     {
 	    // no more input
 	compr->strm->avail_in = 0;
-	do 
+	do
 	{
 		// setting the buffer for reception of data
 	    compr->strm->next_out = (Bytef *)compr->buffer;
 	    compr->strm->avail_out = compr->size;
 
 	    ret = deflate(compr->strm, Z_FINISH);
-		
+
 	    switch(ret)
 	    {
 	    case Z_OK :
@@ -362,7 +362,7 @@ void compressor::flush_write()
 		throw SRC_BUG;
 	    }
 	}
-	while(ret != Z_STREAM_END);   
+	while(ret != Z_STREAM_END);
 
 	if(deflateReset(compr->strm) != Z_OK)
 	    throw SRC_BUG;
@@ -400,7 +400,7 @@ void compressor::clean_write()
 	    compr->strm->next_out = (Bytef *)compr->buffer;
 	    compr->strm->avail_out = compr->size;
 	    compr->strm->avail_in = 0;
-	    
+
 	    ret = deflate(compr->strm, Z_FINISH);
 	}
 	while(ret == Z_OK);
