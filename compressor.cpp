@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -76,7 +76,7 @@ void compressor::init(compression algo, generic_file *compressed_side, U_I compr
 
 	if(compression_level > 9)
 	    throw SRC_BUG;
-	
+
 	switch(compr->wrap.compressInit(compression_level))
 	{
 	case WR_OK:
@@ -193,7 +193,7 @@ void compressor::change_algo(compression new_algo, U_I new_compression_level)
 
 compressor::xfer::xfer(U_I sz, wrapperlib_mode mode) : wrap(mode)
 {
-    try 
+    try
     {
 	buffer = new char[sz];
 	if(buffer == NULL)
@@ -216,7 +216,7 @@ S_I compressor::none_read(char *a, size_t size)
     return compressed->read(a, size);
 }
 
-S_I compressor::none_write(char *a, size_t size)
+S_I compressor::none_write(const char *a, size_t size)
 {
     return compressed->write(a, size);
 }
@@ -231,14 +231,14 @@ S_I compressor::gzip_read(char *a, size_t size)
 
     decompr->wrap.set_next_out(a);
     decompr->wrap.set_avail_out(size);
-  
+
     do
     {
 	    // feeding the input buffer if necessary
 	if(decompr->wrap.get_avail_in() == 0)
 	{
 	    decompr->wrap.set_next_in(decompr->buffer);
-	    decompr->wrap.set_avail_in(compressed->read(decompr->buffer, 
+	    decompr->wrap.set_avail_in(compressed->read(decompr->buffer,
 							decompr->size));
 	}
 
@@ -256,7 +256,7 @@ S_I compressor::gzip_read(char *a, size_t size)
 	case WR_BUF_ERROR:
 		// no process is possible:
 	    if(decompr->wrap.get_avail_in() == 0) // because we reached EOF
-		ret = WR_STREAM_END; // lib did not returned WR_STREAM_END (why ?) 
+		ret = WR_STREAM_END; // lib did not returned WR_STREAM_END (why ?)
 	    else // nothing explains why no process is possible:
 		if(decompr->wrap.get_avail_out() == 0)
 		    throw SRC_BUG; // bug from DAR: no output possible
@@ -272,7 +272,7 @@ S_I compressor::gzip_read(char *a, size_t size)
     return decompr->wrap.get_next_out() - a;
 }
 
-S_I compressor::gzip_write(char *a, size_t size)
+S_I compressor::gzip_write(const char *a, size_t size)
 {
     compr->wrap.set_next_in(a);
     compr->wrap.set_avail_in(size);
@@ -314,14 +314,14 @@ void compressor::flush_write()
     {
 	    // no more input
 	compr->wrap.set_avail_in(0);
-	do 
+	do
 	{
 		// setting the buffer for reception of data
 	    compr->wrap.set_next_out(compr->buffer);
 	    compr->wrap.set_avail_out(compr->size);
 
 	    ret = compr->wrap.compress(WR_FINISH);
-		
+
 	    switch(ret)
 	    {
 	    case WR_OK:
@@ -337,7 +337,7 @@ void compressor::flush_write()
 		throw SRC_BUG;
 	    }
 	}
-	while(ret != WR_STREAM_END);   
+	while(ret != WR_STREAM_END);
 
 	if(compr->wrap.compressReset() != WR_OK)
 	    throw SRC_BUG;
@@ -375,7 +375,7 @@ void compressor::clean_write()
 	    compr->wrap.set_next_out(compr->buffer);
 	    compr->wrap.set_avail_out(compr->size);
 	    compr->wrap.set_avail_in(0);
-	    
+
 	    ret = compr->wrap.compress(WR_FINISH);
 	}
 	while(ret == WR_OK);

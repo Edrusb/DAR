@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -146,7 +146,7 @@ S_I wrapperlib::z_decompress(S_I flag)
     return zlib2wrap_code(inflate(z_ptr, wrap2zlib_code(flag)));
 }
 
-void wrapperlib::z_set_next_in(char *x)
+void wrapperlib::z_set_next_in(const char *x)
 {
     CHECK_Z;
     z_ptr->next_in = (Bytef *)x;
@@ -193,7 +193,7 @@ U_I wrapperlib::z_get_avail_out() const
     CHECK_Z;
     return z_ptr->avail_out;
 }
-    
+
 U_64 wrapperlib::z_get_total_out() const
 {
     CHECK_Z;
@@ -204,10 +204,10 @@ U_64 wrapperlib::z_get_total_out() const
 ////////////// BZlib routines /////////////
 
 
-void wrapperlib::bz_set_next_in(char *x)
+void wrapperlib::bz_set_next_in(const char *x)
 {
     CHECK_BZ;
-    bz_ptr->next_in = x;
+    bz_ptr->next_in = (char *)x;
 }
 
 void wrapperlib::bz_set_avail_in(U_I x)
@@ -317,16 +317,16 @@ S_I wrapperlib::compressReset()
 	return ret;
 }
 
-S_I wrapperlib::decompressReset() 
-{ 
-    S_I ret = decompressEnd(); 
+S_I wrapperlib::decompressReset()
+{
+    S_I ret = decompressEnd();
 
     if(ret == WR_OK)
 	return decompressInit();
     else
 	return ret;
 }
-    
+
 static S_I zlib2wrap_code(S_I code)
 {
     switch(code)

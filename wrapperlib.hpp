@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -47,12 +47,12 @@ public:
     wrapperlib(const wrapperlib & ref);
     wrapperlib & operator = (const wrapperlib & ref);
     ~wrapperlib();
-        
-    void set_next_in(char *x) { return (this->*x_set_next_in)(x); };
+
+    void set_next_in(const char *x) { return (this->*x_set_next_in)(x); };
     void set_avail_in(U_I x) { return (this->*x_set_avail_in)(x); };
     U_I get_avail_in() const { return (this->*x_get_avail_in)(); };
     U_64 get_total_in() const { return (this->*x_get_total_in)(); };
-    
+
     void set_next_out(char *x) { return (this->*x_set_next_out)(x); };
     char *get_next_out() const { return (this->*x_get_next_out)(); };
     void set_avail_out(U_I x) { return (this->*x_set_avail_out)(x); };
@@ -65,7 +65,7 @@ public:
     S_I decompressEnd() { return (this->*x_decompressEnd)(); };
     S_I compress(S_I flag) { return (this->*x_compress)(flag); };
     S_I decompress(S_I flag) { return (this->*x_decompress)(flag);};
-    S_I compressReset(); 
+    S_I compressReset();
     S_I decompressReset();
 
 private:
@@ -73,11 +73,11 @@ private:
     bz_stream *bz_ptr;
     S_I level;
 
-    void (wrapperlib::*x_set_next_in)(char *x);
+    void (wrapperlib::*x_set_next_in)(const char *x);
     void (wrapperlib::*x_set_avail_in)(U_I x);
     U_I (wrapperlib::*x_get_avail_in)() const;
     U_64 (wrapperlib::*x_get_total_in)() const;
-    
+
     void (wrapperlib::*x_set_next_out)(char *x);
     char *(wrapperlib::*x_get_next_out)() const;
     void (wrapperlib::*x_set_avail_out)(U_I x);
@@ -100,7 +100,7 @@ private:
     S_I z_decompressEnd();
     S_I z_compress(S_I flag);
     S_I z_decompress(S_I flag);
-    void z_set_next_in(char *x);
+    void z_set_next_in(const char *x);
     void z_set_avail_in(U_I x);
     U_I z_get_avail_in() const;
     U_64 z_get_total_in() const;
@@ -111,14 +111,14 @@ private:
     U_64 z_get_total_out() const;
 
 	// set of routines for bzlib
-    
+
     S_I bz_compressInit(U_I compression_level);
     S_I bz_decompressInit();
     S_I bz_compressEnd();
     S_I bz_decompressEnd();
     S_I bz_compress(S_I flag);
     S_I bz_decompress(S_I flag);
-    void bz_set_next_in(char *x);
+    void bz_set_next_in(const char *x);
     void bz_set_avail_in(U_I x);
     U_I bz_get_avail_in() const;
     U_64 bz_get_total_in() const;

@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -26,6 +26,7 @@
 #include <string.h>
 #include <iostream>
 #include <getopt.h>
+#include <stdio.h>
 #include "user_interaction.hpp"
 #include "zapette.hpp"
 #include "sar.hpp"
@@ -38,7 +39,7 @@
 
 #define DAR_SLAVE_VERSION "1.1.0"
 
-static bool command_line(S_I argc, char *argv[], path * &chemin, string & filename, 
+static bool command_line(S_I argc, char *argv[], path * &chemin, string & filename,
 			 string &input_pipe, string &output_pipe, string & execute);
 static void show_usage(const char *command);
 static void show_version(const char *command);
@@ -73,7 +74,7 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
 	    slave_zapette zap = slave_zapette(input, output, source);
 	    input = output = NULL; // now managed by zap;
 	    source = NULL;  // now managed by zap;
-	    
+
 	    try
 	    {
 		zap.action();
@@ -102,14 +103,14 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
 	    delete output;
 	if(source != NULL)
 	    delete source;
-	
+
 	return EXIT_OK;
     }
     else
 	return EXIT_SYNTAX;
 }
 
-static bool command_line(S_I argc,char *argv[], path * &chemin, string & filename, 
+static bool command_line(S_I argc,char *argv[], path * &chemin, string & filename,
 			 string &input_pipe, string &output_pipe, string & execute)
 {
     S_I lu;
@@ -158,25 +159,25 @@ static bool command_line(S_I argc,char *argv[], path * &chemin, string & filenam
 	case ':':
 	    throw Erange("get_args", string("missing parameter to option ") + char(optopt));
 	case '?':
-	    user_interaction_warning(string("ignoring unknown option ") + char(optopt)); 
+	    user_interaction_warning(string("ignoring unknown option ") + char(optopt));
 	    break;
 	default:
-	    user_interaction_warning(string("ignoring unknown option ") + char(lu)); 
+	    user_interaction_warning(string("ignoring unknown option ") + char(lu));
 	}
     }
-	
+
     if(optind + 1 > argc)
     {
 	user_interaction_warning("missing archive basename, see -h option for help");
 	return false;
     }
-    
+
     if(optind + 1 < argc)
     {
 	user_interaction_warning("too many argument on command line, see -h option for help");
 	return false;
     }
-    
+
     tools_split_path_basename(argv[optind], chemin, filename);
     return true;
 }
@@ -209,7 +210,7 @@ static void show_usage(const char *command)
     }
     delete cmd;
 }
-    
+
 static void show_version(const char *command)
 {
     ostream & out = user_interaction_stream(); // for readability

@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -22,6 +22,7 @@
 //
 /*********************************************************************/
 
+#include <stdlib.h>
 #include "macro_tools.hpp"
 #include "terminateur.hpp"
 #include "user_interaction.hpp"
@@ -37,7 +38,7 @@ catalogue *macro_tools_get_catalogue_from(generic_file & f, compressor & zip, bo
 {
     terminateur term;
     catalogue *ret;
-	
+
     if(info_details)
 	user_interaction_warning("Extracting contents of the archive...");
 
@@ -63,26 +64,26 @@ catalogue *macro_tools_get_catalogue_from(generic_file & f, compressor & zip, bo
     return ret;
 }
 
-void macro_tools_open_archive(const path &sauv_path, 
-			      const string &basename, 
-			      const string &extension, 
-			      S_I options, 
-			      const string & pass, 
-			      generic_file *&ret1, 
-			      scrambler *&scram, 
-			      compressor *&ret2, 
-			      header_version &ver, 
-			      const string &input_pipe, 
-			      const string &output_pipe, 
+void macro_tools_open_archive(const path &sauv_path,
+			      const string &basename,
+			      const string &extension,
+			      S_I options,
+			      const string & pass,
+			      generic_file *&ret1,
+			      scrambler *&scram,
+			      compressor *&ret2,
+			      header_version &ver,
+			      const string &input_pipe,
+			      const string &output_pipe,
 			      const string & execute)
 {
     generic_file *zip_base = NULL;
-    
+
     if(basename == "-")
     {
 	tuyau *in = NULL;
 	tuyau *out = NULL;
-	
+
 	try
 	{
 	    tools_open_pipes(input_pipe, output_pipe, in, out);
@@ -157,9 +158,9 @@ catalogue *macro_tools_get_catalogue_from(const string &basename)
     try
     {
 	path where = chemin;
-	macro_tools_open_archive(where, base, EXTENSION, SAR_OPT_DONT_ERASE, "", 
+	macro_tools_open_archive(where, base, EXTENSION, SAR_OPT_DONT_ERASE, "",
 				 ret1, scram, ret2, ver, input_pipe, output_pipe, execute);
-	
+
 	ret = macro_tools_get_catalogue_from(*ret1, *ret2, false, size);
     }
     catch(...)
@@ -180,7 +181,7 @@ catalogue *macro_tools_get_catalogue_from(const string &basename)
 	delete ret2;
     if(scram != NULL)
 	delete scram;
-    
+
     return ret;
 }
 

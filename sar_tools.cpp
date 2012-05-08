@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include "cygwin_adapt.hpp"
+#include <string.h>
 #include "erreurs.hpp"
 #include "user_interaction.hpp"
 #include "sar.hpp"
@@ -45,7 +46,7 @@ generic_file *sar_tools_open_archive_fichier(const string &filename, bool allow_
     char *name = tools_str2charptr(filename);
     generic_file *ret = NULL;
     generic_file *tmp = NULL;
-    
+
     try
     {
 	S_I fd;
@@ -66,7 +67,6 @@ generic_file *sar_tools_open_archive_fichier(const string &filename, bool allow_
 		    user_interaction_pause(filename + " is about to be overwritten, continue ?");
 	    }
 	}
-	    
 	fd = open(name, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
 	if(fd < 0)
 	    throw Erange("open_archive_fichier", strerror(errno));
@@ -74,7 +74,7 @@ generic_file *sar_tools_open_archive_fichier(const string &filename, bool allow_
 	if(tmp == NULL)
 	    throw Ememory("open_archive_fichier");
 	ret = new trivial_sar(tmp);
-	if(ret == NULL) 
+	if(ret == NULL)
 	    throw Ememory("open_archive_fichier");
     }
     catch(...)
@@ -96,7 +96,7 @@ generic_file *sar_tools_open_archive_tuyau(S_I fd, gf_mode mode)
 {
     generic_file *tmp = NULL;
     generic_file *ret = NULL;
-    
+
     try
     {
 	tmp = new tuyau(fd, mode);
@@ -105,7 +105,7 @@ generic_file *sar_tools_open_archive_tuyau(S_I fd, gf_mode mode)
 	ret = new trivial_sar(tmp);
 	if(ret == NULL)
 	    throw Ememory("sar_tools_open_archive_tuyau");
-    }    
+    }
     catch(...)
     {
 	if(ret != NULL)

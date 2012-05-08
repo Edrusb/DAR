@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -36,7 +36,7 @@ hide_file::hide_file(generic_file &f) : generic_file(gf_read_only)
     if(ref == NULL)
 	throw SRC_BUG; // NULL argument given
     is_init = false;
-    pos_index = 0; 
+    pos_index = 0;
     pos_relicat = 0;
 }
 
@@ -46,12 +46,12 @@ bool hide_file::skip(const infinint & pos)
     U_I it = 0;
     while(it < morceau.size() && morceau[it].offset + morceau[it].longueur - 1 < pos)
 	it++;
-	
+
     if(it >= morceau.size())
 	return false;
     if(morceau[it].offset > pos)
 	throw SRC_BUG; // morceau has a hole in it.
-	
+
     pos_index = it;
     pos_relicat = pos - morceau[it].offset;
     return true;
@@ -136,7 +136,7 @@ S_I hide_file::inherited_read(char *a, size_t size)
 	(morceau[pos_index].longueur - pos_relicat).unstack(maxlire);
 	reste = size - lu;
 	maxlire = maxlire > reste ? reste : maxlire;
-		
+
 	ref->skip(morceau[pos_index].debut+pos_relicat);
 	lu += ref->read(a+lu, maxlire);
 	pos_relicat += lu;
@@ -146,7 +146,7 @@ S_I hide_file::inherited_read(char *a, size_t size)
 	    pos_relicat = 0;
 	}
     }
-	
+
     return lu;
 }
 
@@ -156,7 +156,7 @@ static void dummy_call(char *x)
     dummy_call(id);
 }
 
-S_I hide_file::inherited_write(char *a, size_t size)
+S_I hide_file::inherited_write(const char *a, size_t size)
 {
     CHECK_INIT;
     throw SRC_BUG; // hide_file alsways is read-only !

@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -31,7 +31,7 @@
 
 class hide_file : public generic_file
 {
-public:	
+public:
     hide_file(generic_file &f);
 
     bool skip(const infinint & pos);
@@ -45,12 +45,12 @@ protected:
 	infinint debut, longueur; // debut is the offset in ref file
 	infinint offset; // offset in the resulting no commented file
     };
-	
+
     vector <partie> morceau;
     generic_file *ref;
 
     S_I inherited_read(char *a, size_t size);
-    S_I inherited_write(char *a, size_t size);
+    S_I inherited_write(const char *a, size_t size);
 
     virtual void fill_morceau() = 0;
 	// the inherited classes have with this method

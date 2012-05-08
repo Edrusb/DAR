@@ -6,12 +6,12 @@
 ## modify it under the terms of the GNU General Public License
 ## as published by the Free Software Foundation; either version 2
 ## of the License, or (at your option) any later version.
-## 
+##
 ## This program is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
-## 
+##
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -38,7 +38,7 @@ MAN_DIR = man
 ### note that you have to call "make install-doc" to install doc there
 DOC_DIR = share/doc/dar-$(DAR_VERSION)
 
-### if you want Extended Attributes (EA) Support uncomment the following 
+### if you want Extended Attributes (EA) Support uncomment the following
 # EA_SUPPORT = "yes"
 
 ### if you need large file support uncomment the following (files > 2 GB)
@@ -69,19 +69,19 @@ CC = gcc
 # OPTIMIZATION = -g # debugging options
 # OPTIMIZATION = -ggdb3
 OPTIMIZATION = -O # -pg # -pg is for profiling using gprof (=debugging)
-# OPTIMIZATION = -O2 # -pg 
-#### note about the different optimizations. 
+# OPTIMIZATION = -O2 # -pg
+#### note about the different optimizations.
 #### if you need a small dar binary use -O. or even don't use any optimization
-#### -O2 makes a bigger but little faster executable. 
-#### -pg is for profiling (with gprof) use it if you want to modify dar code 
+#### -O2 makes a bigger but little faster executable.
+#### -pg is for profiling (with gprof) use it if you want to modify dar code
 #### to have a more optimized and faster binary. :-) do not use -pg for
 #### normal use !
 
-### it is strongly recommended to have a dar binary available beside your 
-### backup in case something goes wrong you will then be able to restore. If 
-### you pick the "dar" binary you would also need to pick the library that it 
+### it is strongly recommended to have a dar binary available beside your
+### backup in case something goes wrong you will then be able to restore. If
+### you pick the "dar" binary you would also need to pick the library that it
 ### relies on which may be complex (zlib, stdlib, etc.) thus, a static version
-### can be built by uncommenting the following line. Static version has all 
+### can be built by uncommenting the following line. Static version has all
 ### library integrated in the binary and is called "dar_static"
 ### This version can be picked up in place of dar to be stored with your backup
 ### to be able to restore them later.
@@ -96,11 +96,11 @@ BUILD_STATIC = "yes"
 INSTALL = install -o root -g root
 
 # this is to re-generate from XML files the usage text displayed with -h option
-LIBXML_ROOT = /opt/gnome
+LIBXML_ROOT = /usr
 # use 'make usage' to regenerate
 
 ifndef OPTIMIZATION
-OPTIMIZATION = 
+OPTIMIZATION =
 endif
 
 ifndef FILEOFFSET
@@ -112,13 +112,13 @@ endif
 ifdef USE_SYS_SIGLIST
 USE_SYS_SIGLIST = -DUSE_SYS_SIGLIST
 else
-USE_SYS_SIGLIST = 
+USE_SYS_SIGLIST =
 endif
 
 ifdef OS_BITS
 FORCE_OS_BITS = -DOS_BITS=$(OS_BITS)
 else
-FORCE_OS_BITS = 
+FORCE_OS_BITS =
 endif
 
 ifndef BUILD_STATIC
@@ -137,14 +137,14 @@ else
 USE_NODUMP =
 endif
 
-CPPFLAGS_COMMON = $(OPTIMIZATION) $(FILEOFFSET) $(USE_SYS_SIGLIST) $(FORCE_OS_BITS) $(USE_NODUMP) -Wall # -pedantic # -DTEST_MEMORY 
+CPPFLAGS_COMMON = $(OPTIMIZATION) $(FILEOFFSET) $(USE_SYS_SIGLIST) $(FORCE_OS_BITS) $(USE_NODUMP) -Wall # -pedantic # -DTEST_MEMORY
 # the -DTEST_MEMORY option is for memory leakage detection.
 # It makes the execution very slow, so don't add it for normal use
 
 
 LDFLAGS = $(OPTIMIZATION) $(FILEOFFSET) -Wall
 # note : static link has been chosen to be able to restore an achive
-# in a very simple environment, without having to look for 
+# in a very simple environment, without having to look for
 # a particular dynamic library and version. This makes of course the
 # binary a bit bigger but not much than that.
 LIBS_COMMON =  -lstdc++ -lz -lbz2
@@ -195,7 +195,7 @@ install-doc: BUGS CHANGES INSTALL LICENSE NOTES README TODO TUTORIAL
 	$(INSTALL) -d $(INSTALL_ROOT_DIR)/$(DOC_DIR)
 	$(INSTALL) -m 0444 BUGS CHANGES INSTALL LICENSE NOTES README TODO TUTORIAL $(INSTALL_ROOT_DIR)/$(DOC_DIR)
 
-uninstall : 
+uninstall :
 	cd $(INSTALL_ROOT_DIR)/$(BIN_DIR); rm -f $(CIBLE)
 	cd $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1; rm -f dar.1 dar_xform.1 dar_slave.1 dar_manager.1
 	if [ -d $(INSTALL_ROOT_DIR)/$(DOC_DIR) ] ; then cd $(INSTALL_ROOT_DIR)/$(DOC_DIR); rm -f BUGS CHANGES INSTALL LICENSE NOTES README TODO TUTORIAL; fi
@@ -288,10 +288,10 @@ dar-help : dar-help.c
 
 #
 
-dar_xform : $(OBJ_XFORM) 
+dar_xform : $(OBJ_XFORM)
 	$(CXX) $(LDFLAGS) $(OBJ_XFORM) $(LIBS_XFORM) -o $@
 
-dar_slave : $(OBJ_SLAVE) 
+dar_slave : $(OBJ_SLAVE)
 	$(CXX) $(LDFLAGS) $(OBJ_SLAVE) $(LIBS_SLAVE) -o $@
 
 dar_manager : $(OBJ_MANAGER)

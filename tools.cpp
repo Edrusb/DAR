@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -33,6 +33,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <signal.h>
+#include <stdlib.h>
 #include "tools.hpp"
 #include "erreurs.hpp"
 #include "deci.hpp"
@@ -47,13 +48,12 @@ char *tools_str2charptr(string x)
 {
     U_I size = x.size();
     char *ret = new char[size+1];
- 
+
     if(ret == NULL)
 	throw Ememory("tools_str2charptr");
-    for(register unsigned int i = 0; i < size; i++)
-	ret[i] = x[i];
+    memcpy(ret, x.c_str(), size);
     ret[size] = '\0';
-    
+
     return ret;
 }
 
@@ -67,7 +67,7 @@ void tools_read_string(generic_file & f, string & s)
 {
     char a[2] = { 0, 0 };
     S_I lu;
-    
+
     s = "";
     do
     {
@@ -109,7 +109,7 @@ void tools_read_string_size(generic_file & f, string & s, infinint taille)
     S_I lu = 0;
     const U_I buf_size = 10240;
     char buffer[buf_size];
-    
+
     s = "";
     do
     {
@@ -129,7 +129,7 @@ infinint tools_get_filesize(const path &p)
 {
     struct stat buf;
     char *name = tools_str2charptr(p.display());
-    
+
     if(name == NULL)
 	throw Ememory("tools_get_filesize");
 
@@ -210,7 +210,7 @@ char *tools_extract_basename(const char *command_name)
     path commande = command_name;
     string tmp = commande.basename();
     char *name = tools_str2charptr(tmp);
-    
+
     return name;
 }
 
@@ -275,7 +275,7 @@ void tools_open_pipes(const string &input, const string & output, tuyau *&in, tu
 	    in = new tuyau(0, gf_read_only); // stdin by default
 	if(in == NULL)
 	    throw Ememory("tools_open_pipes");
-	
+
 	if(output != "")
 	    out = new tuyau(output, gf_write_only);
 	else
@@ -336,16 +336,16 @@ string tools_int2str(S_I x)
 {
     infinint tmp = x >= 0 ? x : -x;
     deci d = tmp;
-    
+
     return (x >= 0 ? string("") : string("-")) + d.human();
-}    
+}
 
 U_32 tools_str2int(const string & x)
 {
     deci d = x;
     infinint t = d.computer();
     U_32 ret = 0;
-    
+
     t.unstack(ret);
     if(t != 0)
 	throw Erange("tools_str2int", "cannot convert the string to integer, overflow");
@@ -365,11 +365,11 @@ string tools_display_date(infinint date)
 {
     time_t pas = 0;
     string ret;
- 
+
     date.unstack(pas);
     ret = ctime(&pas);
 
-    return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n' 
+    return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n'
 }
 
 void tools_system(const vector<string> & argvector)
@@ -379,7 +379,7 @@ void tools_system(const vector<string> & argvector)
     else
     {
 	char **argv = new char *[argvector.size()+1];
-	
+
 	if(argv == NULL)
 	    throw Ememory("tools_system");
 	try
@@ -387,21 +387,21 @@ void tools_system(const vector<string> & argvector)
 		// make an (S_I, char *[]) couple
 	    for(register U_I i = 0; i <= argvector.size(); i++)
 		argv[i] = NULL;
-	    
+
 	    try
 	    {
 		S_I status;
 		bool loop;
-		
+
 		for(register U_I i = 0; i < argvector.size(); i++)
 		    argv[i] = tools_str2charptr(argvector[i]);
-		
+
 		do
 		{
 		    deadson(0);
 		    loop = false;
 		    S_I pid = fork();
-		    
+
 		    switch(pid)
 		    {
 		    case -1:
@@ -411,16 +411,17 @@ void tools_system(const vector<string> & argvector)
 			    // function that never returns
 		    default:
 			if(wait(&status) <= 0)
-			    throw Erange("tools_system", 
+			    throw Erange("tools_system",
 					 string("Unexpected error while waiting for dar to terminate: ") + strerror(errno));
 			else // checking the way dar has exit
 			    if(!WIFEXITED(status)) // not a normal ending
+			    {
 				if(WIFSIGNALED(status)) // exited because of a signal
 				{
 				    try
 				    {
 					user_interaction_pause(string("DAR terminated upon signal reception: ")
-#ifdef USE_SYS_SIGLIST 
+#ifdef USE_SYS_SIGLIST
 							       + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
 #else
 							       + tools_int2str(WTERMSIG(status))
@@ -437,6 +438,7 @@ void tools_system(const vector<string> & argvector)
 				    user_interaction_pause(string("DAR has terminated with exit code ")
 							   + tools_int2str(WEXITSTATUS(status))
 							   + " Continue anyway ?");
+			    }
 		    }
 		}
 		while(loop);
@@ -495,7 +497,7 @@ string tools_concat_vector(const string & separator, const vector<string> & x)
 
     while(it != fin)
 	ret += *it++ + separator;
-    
+
     return ret;
 }
 
@@ -524,20 +526,20 @@ static void runson(char *argv[])
     exit(EXIT_SYNTAX);
 }
 
-const char *tools_get_from_env(const char **env, char *clef)
+const char *tools_get_from_env(const char **env, const char *clef)
 {
     unsigned int index = 0;
     const char *ret = NULL;
-	
+
     if(env == NULL || clef == NULL)
 	return NULL;
 
     while(ret == NULL && env[index] != NULL)
     {
 	unsigned int letter = 0;
-	while(clef[letter] != '\0' 
+	while(clef[letter] != '\0'
 	      && env[index][letter] != '\0'
-	      && env[index][letter] != '=' 
+	      && env[index][letter] != '='
 	      && clef[letter] == env[index][letter])
 	    letter++;
 	if(clef[letter] == '\0' && env[index][letter] == '=')
@@ -548,12 +550,12 @@ const char *tools_get_from_env(const char **env, char *clef)
 
     return ret;
 }
-	
-	
+
+
 bool tools_is_member(const string & val, const vector<string> & liste)
 {
     U_I index = 0;
-	
+
     while(index < liste.size() && liste[index] != val)
 	index++;
 

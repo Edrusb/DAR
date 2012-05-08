@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -23,6 +23,8 @@
 /*********************************************************************/
 
 #include <iostream>
+#include <string.h>
+#include <stdio.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <errno.h>
@@ -56,7 +58,7 @@ void user_interaction_init(ostream *out, ostream *interact)
 	// checking and recording parameters to static variable
     if(out != NULL)
 	output = out;
-    else 
+    else
 	throw SRC_BUG;
     if(interact != NULL)
 	inter = interact;
@@ -65,11 +67,11 @@ void user_interaction_init(ostream *out, ostream *interact)
 
 	// looking for an input terminal
 	//
-	// we do not use anymore standart input but open a new descriptor 
+	// we do not use anymore standart input but open a new descriptor
 	// from the controlling terminal. This allow in some case to use
 	// standart input for piping data while keeping user interaction
 	// possible.
-    
+
     if(input < 0)
 	close(input);
 
@@ -79,7 +81,6 @@ void user_interaction_init(ostream *out, ostream *interact)
     else // no filesystem path to tty
     {
 	struct termio term;
-	
 	input = open(tty, O_RDONLY|O_TEXT);
 	if(input < 0)
 	    user_interaction_warning("No terminal found for user interaction. All questions will abort the program.");
@@ -93,9 +94,9 @@ void user_interaction_init(ostream *out, ostream *interact)
 		term.c_lflag &= ~ECHO;
 		term.c_lflag &= ~ECHOE;
 		interaction = term;
-		
+
 		    // checking now that we can change to character mode
-		set_term_mod(interaction); 
+		set_term_mod(interaction);
 		set_term_mod(initial);
 		    // but we don't need it right now, so swapping back to line mode
 		has_terminal = true;
@@ -110,7 +111,7 @@ void user_interaction_change_non_interactive_output(ostream *out)
 {
     if(out != NULL)
 	output = out;
-    else 
+    else
 	throw SRC_BUG;
 }
 
@@ -132,7 +133,7 @@ void user_interaction_pause(string message)
     char buffer[bufsize];
     char & a = buffer[0];
 
-    if(!has_terminal) 
+    if(!has_terminal)
     {
 	user_interaction_warning("No terminal found and user interaction needed, aborting.");
 	throw Euser_abort(message);
@@ -149,7 +150,7 @@ void user_interaction_pause(string message)
 	while(read(input, buffer, bufsize) >= 0)
 	    ;
 	tools_blocking_read(input, true);
-	
+
 	    // now asking the user
 	do
 	{
@@ -158,7 +159,7 @@ void user_interaction_pause(string message)
 		throw Erange("user_interaction_pause", string("Error while reading user answer from terminal: ") + strerror(errno));
 	}
 	while(a != 27 && a != '\n');
-	
+
 	if(a == 27) // escape key
 	    throw Euser_abort(message);
 	else
@@ -180,7 +181,7 @@ void user_interaction_warning(string message)
 
 ostream &user_interaction_stream()
 {
-    return *output; 
+    return *output;
 }
 
 void user_interaction_set_beep(bool mode)
@@ -194,13 +195,13 @@ static void dummy_call(char *x)
     dummy_call(id);
 }
 
-void ui_printf(char *format, ...)
+void ui_printf(const char *format, ...)
 {
     va_list ap;
     bool end;
     U_32 taille = strlen(format)+1;
     char *copie;
-    
+
     if(output == NULL)
 	throw Erange("ui_printf", "user_interaction  module is not initialized");
 
@@ -225,7 +226,7 @@ void ui_printf(char *format, ...)
 		*ptr = '\0';
 		end = false;
 	    }
-	    else 
+	    else
 		end = true;
 	    *output << start;
 	    if(!end)
