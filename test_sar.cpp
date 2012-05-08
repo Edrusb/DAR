@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_sar.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
+// $Id: test_sar.cpp,v 1.12 2003/03/02 10:58:47 edrusb Rel $
 //
 /*********************************************************************/
 #include <iostream>
@@ -30,33 +30,43 @@
 #include "integers.hpp"
 
 static void f1();
+static void f2();
+static void f3();
 
 S_I main()
 {
+    MEM_BEGIN;
     MEM_IN;
+    user_interaction_init(&cout, &cerr);
+    MEM_OUT;
     f1();
+    MEM_OUT;
+    f2();
+    MEM_OUT;
+    f3();
     MEM_OUT;
     MEM_END;
 }
 
 static void f1()
 {
-    user_interaction_init(&cout, &cerr);
     try
     {
-	sar sar1 = sar("destination", ".txt", 100, 110, SAR_OPT_DEFAULT/*&~SAR_OPT_DONT_ERASE&~SAR_OPT_WARN_OVERWRITE*/, path("./test"));
+	sar sar1 = sar("destination", "txt", 100, 110, SAR_OPT_DEFAULT/*&~SAR_OPT_DONT_ERASE&~SAR_OPT_WARN_OVERWRITE*/, path("./test"));
 	fichier src = fichier("./test/source.txt", gf_read_only);
-	
 	src.copy_to(sar1);
     }
     catch(Egeneric &e)
     {
 	e.dump();
     }
+}
 
+static void f2()
+{
     try
     {
-	sar sar2 = sar("destination", ".txt", SAR_OPT_DEFAULT, path("./test"));
+	sar sar2 = sar("destination", "txt", SAR_OPT_DEFAULT, path("./test"));
 	fichier dst = fichier("./test/destination.txt", gf_write_only);
 
 	sar2.copy_to(dst);
@@ -65,10 +75,13 @@ static void f1()
     {
 	e.dump();
     }
+}
 
+static void f3()
+{
     try 
     {
-	sar sar3 = sar("destination", ".txt", SAR_OPT_DEFAULT, path("./test"));
+	sar sar3 = sar("destination", "txt", SAR_OPT_DEFAULT, path("./test"));
 	fichier src = fichier("./test/source.txt", gf_read_only);
 	
 	display(sar3.get_position());
@@ -129,5 +142,3 @@ static void f1()
     }
     user_interaction_close();
 }
-
-    

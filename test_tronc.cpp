@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tronc.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
+// $Id: test_tronc.cpp,v 1.11.2.1 2003/04/15 21:51:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include "cygwin_adapt.hpp"
 #include "tronc.hpp"
 #include "deci.hpp"
 #include "testtools.hpp"
@@ -68,7 +69,7 @@ S_I main()
 	cout << f.get_position() << endl;
 
 	delete t;
-	S_I fd = open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC);
+	S_I fd = open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY);
 	fichier g = fd;
 	f.skip(0);
 	f.copy_to(g);

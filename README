@@ -71,7 +71,7 @@ the user asking a slice only if it is missing.
 
 COMPRESSION:
 last, dar can use compression. By default no compression is used. Actually 
-only gzip algorithm is implemented, but some room has been done for bzip2 and
+only gzip and bzip2 algorithm are implemented, but some room has been made 
 any other compression algorithm. Note that, compression is made before slices,
 which means that using compression with slices, will not make slices smaller, 
 but will probably make less slices in the backup.
@@ -114,7 +114,7 @@ dar is now able to produce an archive to its standard output or named pipe. it
 is also able to read an archive through a pair of pipes, to take a remote 
 archive as reference, or even to restore data from an archive ona remote host. 
 This way it is now possible to store an archive remotely and in total security 
-(if using encrypted means, like ssh sessions)
+(if using encrypted means, like ssh sessions. You will also find the netcat program very helpful)
 
 
 ISOLATION
@@ -147,7 +147,19 @@ dar can now read parameter from file. This is a way to extends the
 command-line length limited length input. A configuration file can ask dar to 
 read (to include) other configuration files. A simple but efficient mechanism 
 forbids a file to include itself directly or not, and there is no limitation 
-in the degree of recursion for the inclusion of configuration files.
+in the degree of recursion for the inclusion of configuration files. 
+
+Two special configuration files $HOME/.darrc and /etc/darrc are read if they 
+exist. The share the same syntax as any configuration file which is the syntax
+used on the command-line, completed by newlines and comments.
+
+Any configuration file can also receive conditional statements, which describe
+which options are to be used in different conditions. Conditions are: 
+restoration, listing, testing, difference, saving, isolation, any operation,
+none yet defined (which may be useful in case or recursive inclusion of files)
+
+SELECTIVE COMPRESSION
+dar can now be given a special filter that determines which files will be compressed or not. This way you can speed up the backup operation by not trying to compress *.mp3, *.mpg, *.zip, *.gz and other already compressed files. Moreover another mechanism allow you to say that file under a given size (whatever their name is), will not be compressed.
 
 DAR MANAGER
 The advantage of differential backup is that it takes much less space to store
@@ -164,6 +176,14 @@ data is), the more it will take time to execute. Still remains the advantage
 of the automatic processing of the restoration that allows you to do 
 something else during that time.
 
+FLAT RESTORATION
+It is now possible to restore any file without restoring the directories and subdirectories it was in at the time of the backup. If this option is activated, all files will be restored in the (-R) root directory whatever their real position is.
+
+NODUMP FLAG
+Linux ext2/3 filesystem, provides for each inodes a set of flag, amoung which 
+is the "nodump" flag, which in substance says "don't save this file". This
+is used by the so-called dump backup program. Dar can now take care to not save
+those files that have this flag set.
 
 LIMITATIONS :
 ==============

@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_catalogue.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
+// $Id: test_catalogue.cpp,v 1.12 2003/03/02 10:58:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,6 +29,7 @@
 #include "user_interaction.hpp"
 #include "test_memory.hpp"
 #include "integers.hpp"
+#include "macro_tools.hpp"
 
 #define FIC1 "test/dump.bin"
 #define FIC2 "test/dump2.bin"
@@ -39,16 +40,18 @@ void f3();
 
 S_I main()
 {
+    MEM_BEGIN;
     MEM_IN;
     user_interaction_init(&cout, &cerr);
+    catalogue_set_reading_version("03");
     try
     {
 	MEM_IN;
-	f1();
+//	f1();
 	MEM_OUT;
-	f2();
+//	f2();
 	MEM_OUT;
-	f3();
+//	f3();
 	MEM_OUT;
     }
     catch(Egeneric & e)
@@ -71,7 +74,7 @@ void f1()
 	fichier *dump = new fichier(FIC1, gf_read_write);
 	fichier *dump2 = new fichier(FIC2, gf_write_only);
 	
-	eod v_eod;
+	eod *v_eod = new eod();
 	file *v_file = new file(1024, 102, 0644, 1, 2, "fichier", "." , 1024);
 	lien *v_lien = new lien(1025, 103, 0645, 4, 5, "lien", "fichier");
 	directory *v_dir = new directory(1026, 104, 0646, 7, 8, "repertoire");
@@ -82,7 +85,7 @@ void f1()
 	detruit *v_detruit = new detruit("ancien fichier", 'f');
 	directory *v_sub_dir = new directory(200,20, 0777, 100, 101, "sous-repertoire");
 	
-	entree *liste[] = { &v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, NULL };
+	entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, NULL };
 	
 	for(S_I i = 0; liste[i] != NULL; i++)
 	{
@@ -106,6 +109,7 @@ void f1()
 	}
 	delete dump;
 	delete dump2;
+	delete v_eod;
 
 	v_dir->add_children(v_file);
 	v_dir->add_children(v_lien);
@@ -222,8 +226,8 @@ void f2()
 				    cout << "plus recent" << endl;
 				else
 				    cout << "pas plus recent" << endl;
-			else
-			    cout << "pas meme ou pas inode" << endl;
+			    else
+				cout << "pas meme ou pas inode" << endl;
 		    }
 		    else
 			cout << "objet inconnu" << endl;
@@ -265,4 +269,4 @@ void f3()
     cat.listing(cout);
     dif.listing(cout);
 }
-    
+ 

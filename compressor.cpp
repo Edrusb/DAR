@@ -1,30 +1,29 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.10 2002/12/10 20:54:23 edrusb Rel $
+// $Id: compressor.cpp,v 1.14 2003/03/11 19:42:52 edrusb Rel $
 //
 /*********************************************************************/
 
 #pragma implementation
 
-#include <zlib.h>
 #include <signal.h>
 #include <pthread.h>
 #include "compressor.hpp"
@@ -45,6 +44,10 @@ compressor::compressor(compression algo, generic_file *compressed_side, U_I comp
 
 void compressor::init(compression algo, generic_file *compressed_side, U_I compression_level)
 {
+	// theses are eventually overwritten below
+    wrapperlib_mode wr_mode = zlib_mode;
+    current_algo = algo;
+
     compr = decompr = NULL;
     switch(algo)
     {
@@ -55,13 +58,16 @@ void compressor::init(compression algo, generic_file *compressed_side, U_I compr
     case zip :
 	throw Efeature("zip compression not implemented");
 	break;
+    case bzip2 :
+	wr_mode = bzlib_mode;
+	    // NO BREAK !
     case gzip :
 	read_ptr = &compressor::gzip_read;
 	write_ptr = &compressor::gzip_write;
-	compr = new xfer(BUFFER_SIZE);
+	compr = new xfer(BUFFER_SIZE, wr_mode);
 	if(compr == NULL)
 	    throw Ememory("compressor::compressor");
-	decompr = new xfer(BUFFER_SIZE);
+	decompr = new xfer(BUFFER_SIZE, wr_mode);
 	if(decompr == NULL)
 	{
 	    delete compr;
@@ -70,52 +76,48 @@ void compressor::init(compression algo, generic_file *compressed_side, U_I compr
 
 	if(compression_level > 9)
 	    throw SRC_BUG;
-
-	switch(deflateInit(compr->strm, compression_level))
+	
+	switch(compr->wrap.compressInit(compression_level))
 	{
-	case Z_OK:
+	case WR_OK:
 	    break;
-	case Z_MEM_ERROR:
+	case WR_MEM_ERROR:
 	    delete compr;
 	    delete decompr;
 	    throw Ememory("compressor::compressor");
-	case Z_VERSION_ERROR:
+	case WR_VERSION_ERROR:
 	    delete compr;
 	    delete decompr;
 	    throw Erange("compressor::compressor", "incompatible Zlib version");
-	case Z_STREAM_ERROR:
+	case WR_STREAM_ERROR:
 	default:
 	    delete compr;
 	    delete decompr;
 	    throw SRC_BUG;
 	}
 
-	switch(inflateInit(decompr->strm))
+	switch(decompr->wrap.decompressInit())
 	{
-	case Z_OK:
-	    decompr->strm->avail_in = 0;
+	case WR_OK:
+	    decompr->wrap.set_avail_in(0);
 	    break;
-	case Z_MEM_ERROR:
-	    deflateEnd(compr->strm);
+	case WR_MEM_ERROR:
+	    compr->wrap.compressEnd();
 	    delete compr;
 	    delete decompr;
 	    throw Ememory("compressor::compressor");
-	case Z_VERSION_ERROR:
-	    deflateEnd(compr->strm);
+	case WR_VERSION_ERROR:
+	    compr->wrap.compressEnd();
 	    delete compr;
 	    delete decompr;
 	    throw Erange("compressor::compressor", "incompatible Zlib version");
-	case Z_STREAM_ERROR:
+	case WR_STREAM_ERROR:
 	default:
-	    deflateEnd(compr->strm);
+	    compr->wrap.compressEnd();
 	    delete compr;
 	    delete decompr;
 	    throw SRC_BUG;
 	}
-
-	break;
-    case bzip2 :
-	throw Efeature("bzip2 compression not implemented");
 	break;
     default :
 	throw SRC_BUG;
@@ -126,23 +128,31 @@ void compressor::init(compression algo, generic_file *compressed_side, U_I compr
 
 compressor::~compressor()
 {
+    terminate();
+    if(compressed_owner)
+	delete compressed;
+}
+
+void compressor::terminate()
+{
     if(compr != NULL)
     {
 	S_I ret;
 
-	    // flushing the pending data
+		// flushing the pending data
 	flush_write();
+	clean_write();
 
-	ret = deflateEnd(compr->strm);
+	ret = compr->wrap.compressEnd();
 	delete compr;
 
 	switch(ret)
 	{
-	case Z_OK:
+	case WR_OK:
 	    break;
-	case Z_DATA_ERROR: // some data remains in the compression pipe (data loss)
+	case WR_DATA_ERROR: // some data remains in the compression pipe (data loss)
 	    throw SRC_BUG;
-	case Z_STREAM_ERROR:
+	case WR_STREAM_ERROR:
 	    throw Erange("compressor::~compressor", "compressed data is corrupted");
 	default :
 	    throw SRC_BUG;
@@ -153,28 +163,19 @@ compressor::~compressor()
     {
 	    // flushing data
 	flush_read();
+	clean_read();
 
-	S_I ret = inflateEnd(decompr->strm);
+	S_I ret = decompr->wrap.decompressEnd();
 	delete decompr;
+
 	switch(ret)
 	{
-	case Z_OK:
+	case WR_OK:
 	    break;
 	default:
 	    throw SRC_BUG;
 	}
     }
-    if(compressed_owner)
-	delete compressed;
-}
-
-compression compressor::get_algo() const
-{
-    if(read_ptr == &compressor::none_read)
-	return none;
-    if(read_ptr == &compressor::gzip_read)
-	return gzip;
-    throw SRC_BUG;
 }
 
 void compressor::change_algo(compression new_algo, U_I new_compression_level)
@@ -182,47 +183,22 @@ void compressor::change_algo(compression new_algo, U_I new_compression_level)
     if(new_algo == get_algo())
 	return;
 
-	// flush data
-    flush_write();
-    flush_read();
-    clean_read();
-    clean_write();
-
-	// clean existing data structures
-    if(compr != NULL)
-    {
-	delete compr;
-	compr = NULL;
-    }
-    if(decompr != NULL)
-    {
-	delete decompr;
-	decompr = NULL;
-    }
+	// flush data and release zlib memory structures
+    terminate();
 
 	// change to new algorithm
     init(new_algo, compressed, new_compression_level);
 }
 
 
-compressor::xfer::xfer(U_I sz)
+compressor::xfer::xfer(U_I sz, wrapperlib_mode mode) : wrap(mode)
 {
-    try
+    try 
     {
 	buffer = new char[sz];
 	if(buffer == NULL)
 	    throw Ememory("");
 	size = sz;
-
-	strm = new z_stream;
-	if(strm == NULL)
-	{
-	    delete buffer;
-	    throw Ememory("");
-	}
-	strm->zalloc = NULL;
-	strm->zfree = NULL;
-	strm->opaque = NULL;
     }
     catch(Ememory &e)
     {
@@ -233,7 +209,6 @@ compressor::xfer::xfer(U_I sz)
 compressor::xfer::~xfer()
 {
     delete buffer;
-    delete strm;
 }
 
 S_I compressor::none_read(char *a, size_t size)
@@ -241,7 +216,7 @@ S_I compressor::none_read(char *a, size_t size)
     return compressed->read(a, size);
 }
 
-S_I compressor::none_write(const char *a, size_t size)
+S_I compressor::none_write(char *a, size_t size)
 {
     return compressed->write(a, size);
 }
@@ -249,83 +224,83 @@ S_I compressor::none_write(const char *a, size_t size)
 S_I compressor::gzip_read(char *a, size_t size)
 {
     S_I ret;
-    S_I flag = Z_NO_FLUSH;
+    S_I flag = WR_NO_FLUSH;
 
     if(size == 0)
 	return 0;
 
-    decompr->strm->next_out = (Bytef *)a;
-    decompr->strm->avail_out = size;
-
+    decompr->wrap.set_next_out(a);
+    decompr->wrap.set_avail_out(size);
+  
     do
     {
 	    // feeding the input buffer if necessary
-	if(decompr->strm->avail_in == 0)
+	if(decompr->wrap.get_avail_in() == 0)
 	{
-	    decompr->strm->next_in = (Bytef *)decompr->buffer;
-	    decompr->strm->avail_in = compressed->read(decompr->buffer,
-						       decompr->size);
+	    decompr->wrap.set_next_in(decompr->buffer);
+	    decompr->wrap.set_avail_in(compressed->read(decompr->buffer, 
+							decompr->size));
 	}
 
-	ret = inflate(decompr->strm, flag);
+	ret = decompr->wrap.decompress(flag);
 
 	switch(ret)
 	{
-	case Z_OK:
-	case Z_STREAM_END:
+	case WR_OK:
+	case WR_STREAM_END:
 	    break;
-	case Z_DATA_ERROR:
-	    throw Erange("compressor::gzip_read", "gzip data CRC error");
-	case Z_MEM_ERROR:
+	case WR_DATA_ERROR:
+	    throw Erange("compressor::gzip_read", "compressed data CRC error");
+	case WR_MEM_ERROR:
 	    throw Ememory("compressor::gzip_read");
-	case Z_BUF_ERROR:
+	case WR_BUF_ERROR:
 		// no process is possible:
-	    if(decompr->strm->avail_in == 0) // because we reached EOF
-		ret = Z_STREAM_END; // zlib did not returned Z_STREAM_END (why ?)
+	    if(decompr->wrap.get_avail_in() == 0) // because we reached EOF
+		ret = WR_STREAM_END; // lib did not returned WR_STREAM_END (why ?) 
 	    else // nothing explains why no process is possible:
-		if(decompr->strm->avail_out == 0)
+		if(decompr->wrap.get_avail_out() == 0)
 		    throw SRC_BUG; // bug from DAR: no output possible
 		else
-		    throw SRC_BUG; // unexpected comportment from zlib
+		    throw SRC_BUG; // unexpected comportment from lib
 	    break;
 	default:
 	    throw SRC_BUG;
 	}
     }
-    while(decompr->strm->avail_out > 0 && ret != Z_STREAM_END);
+    while(decompr->wrap.get_avail_out() > 0 && ret != WR_STREAM_END);
 
-    return (char *)decompr->strm->next_out - a;
+    return decompr->wrap.get_next_out() - a;
 }
 
-S_I compressor::gzip_write(const char *a, size_t size)
+S_I compressor::gzip_write(char *a, size_t size)
 {
-    compr->strm->next_in = (Bytef *)a;
-    compr->strm->avail_in = size;
+    compr->wrap.set_next_in(a);
+    compr->wrap.set_avail_in(size);
 
     if(a == NULL)
 	throw SRC_BUG;
 
-    while(compr->strm->avail_in > 0)
+    while(compr->wrap.get_avail_in() > 0)
     {
 	    // making room for output
-	compr->strm->next_out = (Bytef *)compr->buffer;
-	compr->strm->avail_out = compr->size;
+	compr->wrap.set_next_out(compr->buffer);
+	compr->wrap.set_avail_out(compr->size);
 
-	switch(deflate(compr->strm, Z_NO_FLUSH))
+	switch(compr->wrap.compress(WR_NO_FLUSH))
 	{
-	case Z_OK:
-	case Z_STREAM_END:
+	case WR_OK:
+	case WR_STREAM_END:
 	    break;
-	case Z_STREAM_ERROR:
+	case WR_STREAM_ERROR:
 	    throw SRC_BUG;
-	case Z_BUF_ERROR:
+	case WR_BUF_ERROR:
 	    throw SRC_BUG;
 	default :
 	    throw SRC_BUG;
 	}
 
-	if(compr->strm->next_out != (Bytef *)compr->buffer)
-	    compressed->write(compr->buffer, (char *)compr->strm->next_out - compr->buffer);
+	if(compr->wrap.get_next_out() != compr->buffer)
+	    compressed->write(compr->buffer, (char *)compr->wrap.get_next_out() - compr->buffer);
     }
 
     return size;
@@ -335,36 +310,36 @@ void compressor::flush_write()
 {
     S_I ret;
 
-    if(compr != NULL && compr->strm->total_in != 0)  // zlib
+    if(compr != NULL && compr->wrap.get_total_in() != 0)  // (z/bz)lib
     {
 	    // no more input
-	compr->strm->avail_in = 0;
-	do
+	compr->wrap.set_avail_in(0);
+	do 
 	{
 		// setting the buffer for reception of data
-	    compr->strm->next_out = (Bytef *)compr->buffer;
-	    compr->strm->avail_out = compr->size;
+	    compr->wrap.set_next_out(compr->buffer);
+	    compr->wrap.set_avail_out(compr->size);
 
-	    ret = deflate(compr->strm, Z_FINISH);
-
+	    ret = compr->wrap.compress(WR_FINISH);
+		
 	    switch(ret)
 	    {
-	    case Z_OK :
-	    case Z_STREAM_END:
-		if((char *)compr->strm->next_out != compr->buffer)
-		    compressed->write(compr->buffer, (char *)compr->strm->next_out - compr->buffer);
+	    case WR_OK:
+	    case WR_STREAM_END:
+		if(compr->wrap.get_next_out() != compr->buffer)
+		    compressed->write(compr->buffer, (char *)compr->wrap.get_next_out() - compr->buffer);
 		break;
-	    case Z_BUF_ERROR :
+	    case WR_BUF_ERROR :
 		throw SRC_BUG;
-	    case Z_STREAM_ERROR :
+	    case WR_STREAM_ERROR :
 		throw SRC_BUG;
 	    default :
 		throw SRC_BUG;
 	    }
 	}
-	while(ret != Z_STREAM_END);
+	while(ret != WR_STREAM_END);   
 
-	if(deflateReset(compr->strm) != Z_OK)
+	if(compr->wrap.compressReset() != WR_OK)
 	    throw SRC_BUG;
     }
 }
@@ -372,7 +347,7 @@ void compressor::flush_write()
 void compressor::flush_read()
 {
     if(decompr != NULL) // zlib
-	if(inflateReset(decompr->strm) != Z_OK)
+	if(decompr->wrap.decompressReset() != WR_OK)
 	    throw SRC_BUG;
 	// keep in the buffer the bytes already read, theses are discarded in case of a call to skip
 }
@@ -380,12 +355,12 @@ void compressor::flush_read()
 void compressor::clean_read()
 {
     if(decompr != NULL)
-	decompr->strm->avail_in = 0;
+	decompr->wrap.set_avail_in(0);
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: compressor.cpp,v 1.10 2002/12/10 20:54:23 edrusb Rel $";
+    static char id[]="$Id: compressor.cpp,v 1.14 2003/03/11 19:42:52 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -397,13 +372,13 @@ void compressor::clean_write()
 
 	do
 	{
-	    compr->strm->next_out = (Bytef *)compr->buffer;
-	    compr->strm->avail_out = compr->size;
-	    compr->strm->avail_in = 0;
-
-	    ret = deflate(compr->strm, Z_FINISH);
+	    compr->wrap.set_next_out(compr->buffer);
+	    compr->wrap.set_avail_out(compr->size);
+	    compr->wrap.set_avail_in(0);
+	    
+	    ret = compr->wrap.compress(WR_FINISH);
 	}
-	while(ret == Z_OK);
+	while(ret == WR_OK);
     }
 }
 

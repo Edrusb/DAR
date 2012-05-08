@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,68 +18,201 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.8 2002/10/28 20:39:32 edrusb Rel $
+// $Id: filesystem.hpp,v 1.11 2003/03/21 21:52:28 edrusb Rel $
 //
 /*********************************************************************/
 
 #ifndef FILESYSTEM_HPP
 #define FILESYSTEM_HPP
 
+#include <map>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <vector>
 #include "catalogue.hpp"
-
-//// set of function for initialization
-extern void filesystem_set_root(const path &root, bool allow_overwrite, bool warn_overwrite, bool info_details, bool root_ea, bool user_ea);
-extern void filesystem_ignore_owner(bool mode);
-extern void filesystem_freemem();
+#include "infinint.hpp"
+#include "etage.hpp"
 
 
-//// set of functions for filesystem reading (backup)
-extern void filesystem_reset_read();
-    // reset reading. for both filesystem_read() and filesystem_read_filename() methods
-extern bool filesystem_read(entree * &ref);
-extern void filesystem_skip_read_to_parent_dir();
-    // to use with filesystem_read() to continue reading in parent directory and
-    // ignore all entry not yet read of current directory
+class filesystem_hard_link_read
+{		
 
-//// set of functions for filesystem reading (comparision with existing archive)
-extern bool filesystem_read_filename(const string & name, nomme * &ref);
-    // looks a file of name given in argument, in current reading directory 
-    // WARNING : cannot mix fileystem_read() and filesystem_read_filename()
-    // filesystem_reset_read() must be called before changing of 
-    // reading method
-extern void filesystem_skip_read_filename_in_parent_dir();
-    // must be called when using filesystem_read_filename() to explore parent dir
+	// this class is not to be used directly
+	// it only provides some routine for the inherited classes
+
+public:
+    void forget_etiquette(file_etiquette *obj);
+	// tell the filesystem module that the reference of that etiquette does not
+	// exist anymore (not covered by filter for example)
+    
+protected:
+    void corres_reset() { corres_read.clear(); };
+
+    nomme *make_read_entree(path & lieu, const string & name, bool see_hard_link, bool ea_root_mode, bool ea_user_mode);
+    
+private:
+    struct couple
+    {
+	nlink_t count;
+	file_etiquette *obj;
+    };		
+    map <ino_t, couple> corres_read;
+};
 
 
-//// set of functions for writing (restoration)
-extern void filesystem_reset_write();
-extern bool filesystem_write(const entree *x);	
-    // the argument may be an object from class destroy
-    // return true upon success, 
-    // false if overwriting not allowed or refused 
-    // throw exception on other errors
-extern nomme *filesystem_get_before_write(const nomme *x);
-    // in this case the target has to be removed from the filesystem
-extern void filesystem_pseudo_write(const directory *dir);
-    // do not restore the directory, just stores that we are now 
-    // inspecting its contents
+class filesystem_backup : public filesystem_hard_link_read
+{
+public:
+    filesystem_backup(const path &root, bool x_info_details, bool root_ea, bool user_ea, bool check_no_dump_flag);
+    filesystem_backup(const filesystem_backup & ref) { copy_from(ref); };
+    filesystem_backup & operator = (const filesystem_backup & ref) { detruire(); copy_from(ref); return *this; };
+    ~filesystem_backup() { detruire(); };
 
-//// set of functions to manage EA (trapped and redirected to ea.hpp module) 
-extern bool filesystem_ea_has_been_restored(const hard_link *h);
-    // true if the inode pointed to by the arg has already got its EA restored
-extern bool filesystem_set_ea(const nomme *e, const ea_attributs & l);
-    // check the inode for which to restore EA, is not a hard link to
-    // an already restored inode, else call the proper ea_filesystem call
+    void reset_read();
+    bool read(entree * & ref);
+    void skip_read_to_parent_dir();
+	//  continue reading in parent directory and
+	// ignore all entry not yet read of current directory
+private:
 
-//// set of functions to manage hard links
-extern void filesystem_write_hard_linked_target_if_not_set(const etiquette *ref, const string & chemin);
-    // if a hard linked inode has not been restored (no change, or less recent than the one on filesystem)
-    // it is necessary to inform filesystem, where to hard link on, any future hard_link 
-    // that could be necessary to restore.
-extern bool filesystem_known_etiquette(const infinint & eti);
-    // return true if an inode in filesystem has been seen for that hard linked inode
-extern void filesystem_forget_etiquette(file_etiquette *obj);
-    // tell the filesystem module that the reference of that etiquette does not
-    // exist anymore (not covered by filter for example)
+    struct filename_struct
+    {
+	infinint last_acc;
+	infinint last_mod;
+    };
+
+    path *fs_root;
+    bool info_details;
+    bool ea_root;
+    bool ea_user;
+    bool no_dump_check;
+    path *current_dir;	// to translate from an hard linked inode to an  already allocated object 
+    vector<filename_struct> filename_pile; // to be able to restore last access of directory we open for reading
+    vector<etage> pile; 	// to store the contents of a directory
+
+    void detruire();
+    void copy_from(const filesystem_backup & ref);
+};
+
+class filesystem_diff : public filesystem_hard_link_read
+{
+public:
+    filesystem_diff(const path &root, bool x_info_details, bool root_ea, bool user_ea);
+    filesystem_diff(const filesystem_diff & ref) { copy_from(ref); };
+    filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
+    ~filesystem_diff() { detruire(); };
+	
+    void reset_read();
+    bool read_filename(const string & name, nomme * &ref);
+	// looks for a file of name given in argument, in current reading directory
+	// if this is a directory subsequent read are done in it
+    void skip_read_filename_in_parent_dir();
+	// subsequent calls to read_filename will take place in parent directory.
+
+private:
+    struct filename_struct
+    {
+	infinint last_acc;
+	infinint last_mod;
+    };
+
+    path *fs_root;
+    bool info_details;
+    bool ea_root;
+    bool ea_user;
+    path *current_dir;
+    vector<filename_struct> filename_pile;
+
+    void detruire();
+    void copy_from(const filesystem_diff & ref);
+};
+
+class filesystem_hard_link_write
+{
+
+	// this class is not to be used directly
+	// it only provides routines to its inherited classes
+	// this not public part is present.
+
+public:
+    bool ea_has_been_restored(const hard_link *h);
+	// true if the inode pointed to by the arg has already got its EA restored
+    bool set_ea(const nomme *e, const ea_attributs & l, path spot, 
+		bool allow_overwrite, bool warn_overwrite, bool info_details);
+	// check the inode for which to restore EA, is not a hard link to
+	// an already restored inode, else call the proper ea_filesystem call
+    void write_hard_linked_target_if_not_set(const etiquette *ref, const string & chemin);
+	// if a hard linked inode has not been restored (no change, or less recent than the one on filesystem)
+	// it is necessary to inform filesystem, where to hard link on, any future hard_link 
+	// that could be necessary to restore.
+    bool known_etiquette(const infinint & eti);
+	// return true if an inode in filesystem has been seen for that hard linked inode
+
+protected:
+    void corres_reset() { corres_write.clear(); };
+    void make_file(const nomme * ref, const path & ou, bool dir_perm, bool ignore_owner);
+	// generate inode or make a hard link on an already restored inode.
+    void clear_corres(const infinint & ligne);
+
+
+private:
+    struct corres_ino_ea
+    {
+	string chemin;
+	bool ea_restored;
+    };
+
+    map <infinint, corres_ino_ea> corres_write;
+};		
+
+
+class filesystem_restore : public filesystem_hard_link_write, public filesystem_hard_link_read
+{
+public:
+    filesystem_restore(const path &root, bool x_allow_overwrite, bool x_warn_overwrite, bool x_info_details,
+		       bool root_ea, bool user_ea, bool ignore_owner);
+    filesystem_restore(const filesystem_restore  & ref) { copy_from(ref); };
+    filesystem_restore & operator =(const filesystem_restore  & ref) { detruire(); copy_from(ref); return *this; };
+    ~filesystem_restore() { detruire(); };
+	
+    void reset_write();
+    bool write(const entree *x);
+	// the argument may be an object from class destroy
+	// return true upon success, 
+	// false if overwriting not allowed or refused 
+	// throw exception on other errors
+    nomme *get_before_write(const nomme *x);
+	// in this case the target has to be removed from the filesystem
+    void pseudo_write(const directory *dir);	
+	// do not restore the directory, just stores that we are now 
+	// inspecting its contents
+    bool set_ea(const nomme *e, const ea_attributs & l, 
+		bool allow_overwrite, 
+		bool warn_overwrite, 
+		bool info_details)
+	{  return filesystem_hard_link_write::set_ea(e, l, *current_dir, 
+						     allow_overwrite, 
+						     warn_overwrite, 
+						     info_details); 
+	};
+
+
+	
+private:
+    path *fs_root;
+    bool info_details;
+    bool ea_root;
+    bool ea_user;
+    bool allow_overwrite;
+    bool warn_overwrite;
+    bool ignore_ownership;
+    vector<directory> stack_dir;
+    path *current_dir;
+
+    void detruire();
+    void copy_from(const filesystem_restore & ref);
+
+};
+
 
 #endif

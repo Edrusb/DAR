@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_infinint.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
+// $Id: test_infinint.cpp,v 1.12.2.1 2003/04/15 21:51:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,6 +29,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <iostream>
+#include "cygwin_adapt.hpp"
 #include "test_memory.hpp"
 #include "integers.hpp"
 
@@ -36,6 +37,7 @@ static void routine1();
 
 S_I main()
 {
+    MEM_BEGIN;
     MEM_IN;
     routine1();
     MEM_OUT;
@@ -54,12 +56,12 @@ static void routine1()
 
     cout << d1.human() << " " << d2.human() << " " << d3.human() << endl;
 
-    S_I fd = open("toto", O_RDWR | O_CREAT | O_TRUNC, 0644);
+    S_I fd = open("toto", O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0644);
     if(fd >= 0)
     {
 	f1.dump(fd);
 	close(fd);
-	fd = open("toto", O_RDONLY);
+	fd = open("toto", O_RDONLY|O_BINARY);
 	if(fd >= 0)
 	{
 	    f3.read_from_file(fd);
@@ -127,4 +129,3 @@ static void routine1()
     d1 = deci(f1);
     cout << "factoriel(" <<d1.human() << ") = " << d2.human() << endl;
 }
-

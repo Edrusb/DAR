@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_storage.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
+// $Id: test_storage.cpp,v 1.12 2003/03/02 10:58:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -54,6 +54,7 @@ void affiche(const storage & ref)
 
 S_I main(S_I argc, char *argv[])
 {
+    MEM_BEGIN;
     MEM_IN;
     f1();
     MEM_OUT;

@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_memory.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: test_memory.cpp,v 1.11 2003/03/02 10:58:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -85,7 +85,7 @@ U_32 get_total_alloc_size()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: test_memory.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: test_memory.cpp,v 1.11 2003/03/02 10:58:47 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -97,7 +97,7 @@ void record_offset()
 
 void all_delete_done()
 {
-    if(liste.size() > initial_offset)
+    if(liste.size() != initial_offset || initial_size != total_size)
 	user_interaction_stream() << liste.size() - initial_offset << " memory allocation(s) not released ! " << " total size = " << total_size - initial_size << endl;
     else
 	if(liste.size() < initial_offset)

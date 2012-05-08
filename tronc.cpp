@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $
+// $Id: tronc.cpp,v 1.10 2003/02/11 22:02:11 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,19 +26,18 @@
 
 #include "tronc.hpp"
 #include <errno.h>
-#include <string.h>
 
-tronc::tronc(generic_file *f, const infinint & offset, const infinint &size) : generic_file(f->get_mode())
-{
-    ref = f;
+tronc::tronc(generic_file *f, const infinint & offset, const infinint &size) : generic_file(f->get_mode()) 
+{ 
+    ref = f; 
     sz = size;
     start = offset;
     current = size; // forces skipping the first time
 }
 
-tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(mode)
-{
-    ref = f;
+tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(mode) 
+{ 
+    ref = f; 
     sz = size;
     start = offset;
     current = size; // forces skipping the firt time
@@ -71,7 +70,6 @@ bool tronc::skip_to_eof()
 bool tronc::skip_relative(S_I x)
 {
     if(x < 0)
-    {
 	if(current < -x)
 	{
 	    ref->skip(start);
@@ -80,7 +78,7 @@ bool tronc::skip_relative(S_I x)
 	}
 	else
 	{
-	    bool r = ref->skip_relative(x);
+	    bool r = ref->skip_relative(x); 
 	    if(r)
 		current -= -x;
 	    else
@@ -90,10 +88,8 @@ bool tronc::skip_relative(S_I x)
 	    }
 	    return r;
 	}
-    }
-
+    
     if(x > 0)
-    {
 	if(current + x >= sz)
 	{
 	    current = sz;
@@ -109,10 +105,9 @@ bool tronc::skip_relative(S_I x)
 	    {
 		ref->skip(start+sz);
 		current = sz;
-	    }
+	    }   
 	    return r;
 	}
-    }
 
     return true;
 }
@@ -120,7 +115,7 @@ bool tronc::skip_relative(S_I x)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: tronc.cpp,v 1.9 2002/10/31 21:02:37 edrusb Rel $";
+    static char id[]="$Id: tronc.cpp,v 1.10 2003/02/11 22:02:11 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -155,7 +150,7 @@ S_I tronc::inherited_read(char *a, size_t size)
     return lu;
 }
 
-S_I tronc::inherited_write(const char *a, size_t size)
+S_I tronc::inherited_write(char *a, size_t size)
 {
     infinint avail = sz - current;
     U_32 macro_pas = 0, micro_pas;
@@ -180,7 +175,6 @@ S_I tronc::inherited_write(const char *a, size_t size)
     }
     while(ret > 0);
     current += wrote;
-
+    
     return wrote;
 }
-

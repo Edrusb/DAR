@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: generic_file.cpp,v 1.10.2.1 2003/04/15 21:51:52 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,6 +30,7 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#include "cygwin_adapt.hpp"
 #include "generic_file.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
@@ -57,20 +58,20 @@ void copy_crc(crc & dst, const crc & src)
 
 #define BUFFER_SIZE 102400
 
-S_I generic_file::read(char *a, size_t size)
+S_I generic_file::read(char *a, size_t size) 
 {
-    if(rw == gf_write_only)
+    if(rw == gf_write_only) 
 	throw Erange("generic_file::read", "reading a write only generic_file");
-    else
-	return (this->*active_read)(a, size);
+    else 
+	return (this->*active_read)(a, size); 
 }
 
-S_I generic_file::write(const char *a, size_t size)
-{
-    if(rw == gf_read_only)
+S_I generic_file::write(char *a, size_t size)
+{ 
+    if(rw == gf_read_only) 
 	throw Erange("generic_file::write", "writing to a read only generic_file");
-    else
-	return (this->*active_write)(a, size);
+    else 
+	return (this->*active_write)(a, size); 
 }
 
 S_I generic_file::read_back(char &a)
@@ -90,12 +91,12 @@ void generic_file::copy_to(generic_file & ref)
     char buffer[BUFFER_SIZE];
     S_I lu, ret = 0;
 
-    do
+    do 
     {
 	lu = this->read(buffer, BUFFER_SIZE);
 	if(lu > 0)
 	    ret = ref.write(buffer, lu);
-    }
+    } 
     while(lu > 0 && ret > 0);
 }
 
@@ -133,14 +134,14 @@ infinint generic_file::copy_to(generic_file & ref, infinint size)
 
     size.unstack(tmp);
 
-    do
+    do 
     {
 	delta = copy_to(ref, tmp);
 	wrote += delta;
 	tmp -= delta;
 	if(tmp == 0)
 	    size.unstack(tmp);
-    }
+    } 
     while(tmp > 0);
 
     return wrote;
@@ -173,15 +174,15 @@ bool generic_file::diff(generic_file & f)
 	    diff = true;
     }
     while(!diff && lu1 > 0);
-
+    
     return diff;
 }
 
-void generic_file::reset_crc()
+void generic_file::reset_crc() 
 {
     if(active_read == &generic_file::read_crc)
 	throw SRC_BUG; // crc still active, previous CRC value never read
-    clear(value);
+    clear(value); 
     enable_crc(true);
     crc_offset = 0;
 }
@@ -200,7 +201,7 @@ void generic_file::enable_crc(bool mode)
     }
 }
 
-void generic_file::compute_crc(const char *a, S_I size)
+void generic_file::compute_crc(char *a, S_I size)
 {
     for(register S_I i = 0; i < size; i++)
 	value[(i+crc_offset)%CRC_SIZE] ^= a[i];
@@ -214,7 +215,7 @@ S_I generic_file::read_crc(char *a, size_t size)
     return ret;
 }
 
-S_I generic_file::write_crc(const char *a, size_t size)
+S_I generic_file::write_crc(char *a, size_t size)
 {
     S_I ret = inherited_write(a, size);
     compute_crc(a, ret);
@@ -269,7 +270,7 @@ bool fichier::skip(const infinint &q)
     infinint pos = q;
     if(lseek(filedesc, 0, SEEK_SET) < 0)
 	return false;
-
+    
     do {
 	delta = 0;
 	pos.unstack(delta);
@@ -289,12 +290,10 @@ bool fichier::skip_to_eof()
 bool fichier::skip_relative(S_I x)
 {
     if(x > 0)
-    {
 	if(lseek(filedesc, x, SEEK_CUR) < 0)
 	    return false;
 	else
 	    return true;
-    }
 
     if(x < 0)
     {
@@ -319,7 +318,7 @@ bool fichier::skip_relative(S_I x)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: generic_file.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: generic_file.cpp,v 1.10.2.1 2003/04/15 21:51:52 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -329,7 +328,7 @@ infinint fichier::get_position()
 
     if(ret == -1)
 	throw Erange("fichier::get_position", string("error getting file position : ") + strerror(errno));
-
+    
     return ret;
 }
 
@@ -358,13 +357,13 @@ S_I fichier::inherited_read(char *a, size_t size)
 	}
 	else
 	    lu += ret;
-    }
+    } 
     while(lu < size && ret != 0);
 
     return lu;
 }
 
-S_I fichier::inherited_write(const char *a, size_t size)
+S_I fichier::inherited_write(char *a, size_t size)
 {
     S_I ret;
     size_t total = 0;
@@ -415,14 +414,12 @@ void fichier::open(const char *name, gf_mode m)
 
     do
     {
-	filedesc = ::open(name, mode, perm);
+	filedesc = ::open(name, mode, perm|O_BINARY);
 	if(filedesc < 0)
-	{
 	    if(filedesc == ENOSPC)
 		user_interaction_pause("no space left for inode, you have the oportunity to make some room now. When done : can we continue ?");
 	    else
 		throw Erange("fichier::open", string("can't open file : ") + strerror(errno));
-	}
     }
     while(filedesc == ENOSPC);
 }

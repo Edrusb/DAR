@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.hpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: sar.hpp,v 1.11 2003/03/02 10:58:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -57,11 +57,9 @@ public:
     bool get_total_file_number(infinint &num) const { num = of_last_file_num; return of_last_file_known; };
     bool get_last_file_size(infinint &num) const { num = of_last_file_size; return of_last_file_known; };
 
-	// hook to attach a command to execute after each slice
-
 protected :
     S_I inherited_read(char *a, size_t sz);
-    S_I inherited_write(const char *a, size_t sz);
+    S_I inherited_write(char *a, size_t sz);
 
 private :
     path archive_dir;
@@ -100,6 +98,8 @@ private :
     void set_offset(infinint offset);
     void open_last_file();
     header make_write_header(const infinint &num, char flag);
+
+	// hook to attach a command to execute after each slice
     string hook_substitute(const string & path, const string & basename, const string & num);
     void hook_execute(const infinint &num);
 };
@@ -118,8 +118,8 @@ public:
 
 protected:
     S_I inherited_read(char *a, size_t size) { return reference->read(a, size); };
-    S_I inherited_write(const char *a, size_t size) { return reference->write(a, size); };
-
+    S_I inherited_write(char *a, size_t size) { return reference->write(a, size); };
+    
 private:
     generic_file *reference;
     infinint offset;

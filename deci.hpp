@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: deci.hpp,v 1.8 2002/10/28 20:39:29 edrusb Rel $
+// $Id: deci.hpp,v 1.9 2003/02/11 22:01:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -61,4 +61,3 @@ private :
 ostream & operator << (ostream & ref, const infinint & arg);
 
 #endif
-

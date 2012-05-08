@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tuyau.cpp,v 1.7 2002/12/08 20:03:07 edrusb Rel $
+// $Id: test_tuyau.cpp,v 1.8 2003/02/11 22:02:08 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -35,17 +35,17 @@
 static const unsigned int buffer_size = 10000;
 static bool xmit = true;
 
-static int little_main(int argc, char *argv[]);
+static int little_main(int argc, char *argv[], const char **env);
 static void action_xmit(tuyau *in, tuyau *out, U_32 duration);
 static void action_loop(tuyau *in, tuyau *out);
 static void stop_xmit(int l);
 
 int main(int argc, char *argv[])
 {
-    return dar_suite_global(argc, argv, &little_main);
+    return dar_suite_global(argc, argv, NULL, &little_main);
 }
 
-static int little_main(int argc, char *argv[])
+static int little_main(int argc, char *argv[], const char **env)
 {
     tuyau *in = NULL, *out = NULL;
     U_32 duration;
@@ -135,5 +135,3 @@ static void action_loop(tuyau *in, tuyau *out)
 	out->write(buffer, buffer_size);
     }
 }
-
-	

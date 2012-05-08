@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: mask.cpp,v 1.10 2003/02/11 22:01:55 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -40,7 +40,7 @@ bool simple_mask::is_covered(const string &expression) const
 {
     char *tmp = tools_str2charptr(expression);
     bool ret;
-
+    
     if(tmp == NULL)
 	throw Ememory("simple_mask::is_covered");
 
@@ -134,11 +134,11 @@ void et_mask::add_mask(const mask& toadd)
 	throw Ememory("et_mask::et_mask");
 }
 
-bool et_mask::is_covered(const string & expression) const
+bool et_mask::is_covered(const string & expression) const 
 {
     vector<mask *>::iterator it = const_cast<et_mask &>(*this).lst.begin();
     vector<mask *>::iterator fin = const_cast<et_mask &>(*this).lst.end();
-
+ 
     if(lst.size() == 0)
 	throw Erange("et_mask::is_covered", "no mask in the list of mask to AND");
 
@@ -170,7 +170,7 @@ void et_mask::copy_from(const et_mask &m)
 void et_mask::detruit()
 {
     vector<mask *>::iterator it = lst.begin();
-
+    
     while(it != lst.end())
     {
 	delete *it;
@@ -181,15 +181,15 @@ void et_mask::detruit()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: mask.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: mask.cpp,v 1.10 2003/02/11 22:01:55 edrusb Rel $";
     dummy_call(id);
 }
 
-bool ou_mask::is_covered(const string & expression) const
+bool ou_mask::is_covered(const string & expression) const 
 {
     vector<mask *>::iterator it = const_cast<ou_mask &>(*this).lst.begin();
     vector<mask *>::iterator fin = const_cast<ou_mask &>(*this).lst.end();
-
+    
     if(lst.size() == 0)
 	throw Erange("et_mask::is_covered", "no mask in the list of mask to OR");
 
@@ -204,4 +204,3 @@ bool simple_path_mask::is_covered(const string &ch) const
     path p = ch;
     return p.is_subdir_of(chemin) || chemin.is_subdir_of(p);
 }
-

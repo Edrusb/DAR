@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.10 2002/12/14 19:29:53 edrusb Rel $
+// $Id: catalogue.hpp,v 1.13 2003/03/21 21:52:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -63,8 +63,8 @@ struct entree_stats
     infinint saved; // total number of saved inode (unix inode, not inode class) hard links do not count here
     infinint total; // total number of inode in archive (unix inode, not inode class) hard links do not count here
     void clear() { num_x = num_d = num_f = num_c = num_b = num_p 
-		  = num_s = num_l = num_hard_linked_inodes 
-		  = num_hard_link_entries = saved = total = 0; };
+		       = num_s = num_l = num_hard_linked_inodes 
+		       = num_hard_link_entries = saved = total = 0; };
     void add(const entree *ref);
     void listing(ostream & flux) const;
 };
@@ -203,7 +203,7 @@ private :
     static generic_file *storage; // where are stored EA
 	// this is a static variable (shared amoung all objects)
 	// because it is not efficient to have many copies of the same value
-	// if in the future, all inode have to their EA stored in the same
+	// if in the future, all inode have their EA stored in their own 
 	// generic_file, this will be changed.
     static bool ignore_owner;
 };
@@ -349,8 +349,8 @@ public :
     void add_children(nomme *r); // when r is a directory, 'parent' is set to 'this'
     void reset_read_children() const;
     bool read_children(const nomme * &r) const; // read the direct children of the directory, returns false if no more is available
-    void listing(ostream & flux, const mask &m, string marge = "") const;
-    void tar_listing(ostream & flux, const mask &m, const string & beginning = "") const;
+    void listing(ostream & flux, const mask &m = bool_mask(true), string marge = "") const;
+    void tar_listing(ostream & flux, const mask &m = bool_mask(true), const string & beginning = "") const;
     directory * get_parent() const { return parent; };
     bool search_children(const string &name, nomme *&ref);
 
@@ -555,8 +555,8 @@ public :
 	// ref must have the same root, else the operation generates a exception
     
     void dump(generic_file & ref) const;
-    void listing(ostream & flux, const mask &m, string marge = "") const;
-    void tar_listing(ostream & flux, const mask & m, const string & beginning = "") const;
+    void listing(ostream & flux, const mask &m = bool_mask(true), string marge = "") const;
+    void tar_listing(ostream & flux, const mask & m = bool_mask(true), const string & beginning = "") const;
     entree_stats get_stats() const { return stats; };
 
     const directory *get_contenu() const { return contenu; }; // used by data_tree
@@ -578,4 +578,3 @@ private :
 };
 
 #endif
-

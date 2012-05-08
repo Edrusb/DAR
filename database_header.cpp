@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database_header.cpp,v 1.3 2002/10/31 21:02:35 edrusb Rel $
+// $Id: database_header.cpp,v 1.4.2.1 2003/04/15 21:51:52 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,7 +27,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
-#include <string.h>
+#include "cygwin_adapt.hpp"
 #include "database_header.hpp"
 #include "compressor.hpp"
 #include "tools.hpp"
@@ -42,17 +42,17 @@ generic_file *database_header_create(const string & filename, bool overwrite)
 {
     char *ptr = tools_str2charptr(filename);
     generic_file *ret = NULL;
-
+    
     try
     {
 	struct stat buf;
 	S_I fd;
 	database_header h;
 	compressor *comp;
-
+	
 	if(stat(ptr, &buf) >= 0 && !overwrite)
 	    throw Erange("database_header_create", "Cannot create database, file exists");
-	fd = open(ptr, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+	fd = open(ptr, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
 	if(fd < 0)
 	    throw Erange("database_header_create", string("Cannot create database: ") + strerror(errno));
 	ret = new fichier(fd);
@@ -61,7 +61,7 @@ generic_file *database_header_create(const string & filename, bool overwrite)
 	    close(fd);
 	    throw Ememory("database_header_create");
 	}
-
+	
 	h.version = database_version;
 	h.options = HEADER_OPTION_NONE;
 	h.write(*ret);
@@ -70,7 +70,7 @@ generic_file *database_header_create(const string & filename, bool overwrite)
 	if(comp == NULL)
 	    throw Ememory("database_header_create");
 	else
-	    ret = comp;
+	    ret = comp; 
     }
     catch(...)
     {
@@ -102,7 +102,7 @@ generic_file *database_header_open(const string & filename)
 	    user_interaction_pause("The format version of the database is too high for that software version, try reading anyway ? ");
 	if(h.options != HEADER_OPTION_NONE)
 	    throw Erange("database_header_open", "Unknown header option in database, aborting\n");
-
+	
 	comp = new compressor(gzip, ret);
 	if(comp == NULL)
 	    throw Ememory("database_header_open");
@@ -116,13 +116,13 @@ generic_file *database_header_open(const string & filename)
 	    delete ret;
 	throw;
     }
-
+    
     delete ptr;
     return ret;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: database_header.cpp,v 1.3 2002/10/31 21:02:35 edrusb Rel $";
+    static char id[]="$Id: database_header.cpp,v 1.4.2.1 2003/04/15 21:51:52 edrusb Rel $";
     dummy_call(id);
 }

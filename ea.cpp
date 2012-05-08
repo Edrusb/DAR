@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $
+// $Id: ea.cpp,v 1.6 2003/02/11 22:01:37 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -47,8 +47,8 @@ ea_entry::ea_entry(generic_file & f)
 
     f.read((char *)(&fl), 1);
     domain = (fl & EA_ROOT) != 0 ? ea_root : ea_user;
-    mode = (fl &
-EA_DEL) != 0 ? ea_del : ea_insert;
+    mode = (fl & 
+	    EA_DEL) != 0 ? ea_del : ea_insert;
     tools_read_string(f, key);
     tmp.read_from_file(f);
     tools_read_string_size(f, value, tmp);
@@ -58,7 +58,7 @@ void ea_entry::dump(generic_file & f) const
 {
     unsigned char fl = 0;
     infinint tmp = value.size();
-    if(domain == ea_root)
+    if(domain == ea_root) 
 	fl |= EA_ROOT;
     if(mode == ea_del)
 	fl |= EA_DEL;
@@ -68,7 +68,7 @@ void ea_entry::dump(generic_file & f) const
     tools_write_string_all(f, value);
 }
 
-///////////// EA_ATTRIBUTS IMPLEMENTATION //////////
+///////////// EA_ATTRIBUTS IMPLEMENTATION //////////    
 
 ea_attributs::ea_attributs(generic_file & f)
 {
@@ -88,13 +88,13 @@ ea_attributs::ea_attributs(generic_file & f)
 	tmp.unstack(tmp2);
     }
     while(tmp2 > 0);
-
+    
     alire = attr.begin();
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: ea.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: ea.cpp,v 1.6 2003/02/11 22:01:37 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -102,9 +102,9 @@ void ea_attributs::dump(generic_file & f) const
 {
     vector<ea_entry>::iterator it = const_cast<ea_attributs &>(*this).attr.begin();
     vector<ea_entry>::iterator fin = const_cast<ea_attributs &>(*this).attr.end();
-
-
-size().dump(f);
+    
+    
+    size().dump(f);
     while(it != fin)
     {
 	it->dump(f);
@@ -115,7 +115,7 @@ size().dump(f);
 void ea_attributs::reset_read() const
 {
     ea_attributs *moi = const_cast<ea_attributs *>(this);
-    moi->alire = moi->attr.begin();
+    moi->alire = moi->attr.begin(); 
 }
 
 bool ea_attributs::read(ea_entry & x) const
@@ -140,9 +140,7 @@ bool ea_attributs::diff(const ea_attributs & other, bool check_ea_root, bool che
     reset_read();
     while(!diff && read(ea))
 	if(ea.mode == ea_insert)
-	{
 	    if((ea.domain == ea_user && check_ea_user) || (ea.domain == ea_root && check_ea_root))
-	    {
 		if(other.find(ea.domain, ea.key, mode, value))
 		{
 		    if(value != ea.value) // found but different
@@ -150,8 +148,6 @@ bool ea_attributs::diff(const ea_attributs & other, bool check_ea_root, bool che
 		}
 		else // not found
 		    diff = true;
-	    }
-	}
     return diff;
 }
 

@@ -179,8 +179,13 @@
 
   <arg flag="-B" repl="filename">
     <desc>
-       you can put any command line option or arguments in the given file, that will be parsed as if they were in place of
-       the -B option.
+       read options from given file
+    </desc>
+  </arg>
+
+  <arg flag="-N">
+    <desc>
+        do not read ~/.darrc nor /etc/darrc configuration file
     </desc>
   </arg>
 
@@ -210,7 +215,7 @@
 
   <arg flag="-y" opt="level">
     <desc>
-      compress data in archive using bzip2 algorithm (NOT IMPLEMENTED)
+      compress data in archive using bzip2 algorithm.
       <p/> by default the archive is not compressed
     </desc>
   </arg>
@@ -254,6 +259,21 @@
     </desc>
   </arg>
 
+  <arg flag="-m" repl="number">
+    <desc>
+       file size under which data is not compressed. By default -m 100 is 
+       assumed. If you want all file to be compressed whatever their size is 
+       use -m 0
+    </desc>
+  </arg>
+
+  <arg flag="--nodump">
+    <desc>
+    do not consider for backup file with nodump 'd' flag set (see lsattr/chattr).
+    </desc>
+  </arg>
+
+
   <hdr vspace="1">
   Restoring options (to use with -x) :
   </hdr>
@@ -271,6 +291,13 @@
     <desc>
       restores files only if they are absent or more recent than those on
       the filesystem
+    </desc>
+  </arg>
+
+  <arg flag="-f">
+    <desc>
+      do not restore directory structure. All files get restored in the 
+      directory specified by -R
     </desc>
   </arg>
 
@@ -313,30 +340,7 @@
   </hdr>
 
 <!--
-$Log: dar.xml,v $
-Revision 1.4  2002/12/10 20:54:24  edrusb
-patch integration : adding optional compression level on command line
-
-Revision 1.3  2002/10/28 20:39:27  edrusb
-updated CVS with last development version
-
-Revision 1.7  2002/09/28 14:56:29  denis
-mise a jour pour release.
-
-Revision 1.6  2002/09/12 13:53:46  denis
--B option
-
-Revision 1.5  2002/09/06 17:02:20  denis
-correction fuite memoire, cosmetique
-
-Revision 1.4  2002/09/05 21:02:11  denis
-options -Y -Z
-
-Revision 1.3  2002/08/23 10:21:52  denis
-mise a jour doc pour scrambling
-
-Revision 1.2  2002/08/22 20:27:59  denis
-mise en place de dar-help
+$Id: dar.xml,v 1.9 2003/03/13 20:48:13 edrusb Stab $
 
 Revision 1.3  2002/08/20 13:44:08  cs1cwm
 Added DTD and removed the #ifdef and #endif.

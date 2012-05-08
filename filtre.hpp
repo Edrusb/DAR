@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.hpp,v 1.8 2002/10/28 20:39:33 edrusb Rel $
+// $Id: filtre.hpp,v 1.13 2003/03/21 21:52:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -60,7 +60,9 @@ extern void filtre_restore(const mask &filtre,
 			   bool info_details, statistics & st,
 			   bool only_if_more_recent,
 			   bool restore_ea_root,
-			   bool restore_ea_user);
+			   bool restore_ea_user,
+			   bool flat,
+			   bool ignore_owner);
 
 extern void filtre_sauvegarde(const mask &filtre,
 			      const mask &subtree,
@@ -73,7 +75,9 @@ extern void filtre_sauvegarde(const mask &filtre,
 			      bool make_empty_dir,
 			      bool save_ea_root,
 			      bool save_ea_user,
-			      const mask &compr_mask);
+			      const mask &compr_mask,
+			      const infinint & min_compr_size,
+			      bool nodump);
 
 extern void filtre_difference(const mask &filtre,
 			      const mask &subtree,

@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_scrambler.cpp,v 1.4 2002/10/31 21:02:37 edrusb Rel $
+// $Id: test_scrambler.cpp,v 1.5 2003/02/11 22:02:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,14 +29,14 @@
 #include "test_memory.hpp"
 #include "integers.hpp"
 
-S_I little_main(S_I argc, char *argv[]);
+S_I little_main(S_I argc, char *argv[], const char **env);
 
 S_I main(S_I argc, char *argv[])
 {
-    return dar_suite_global(argc, argv, &little_main);
+    return dar_suite_global(argc, argv, NULL, &little_main);
 }
 
-S_I little_main(S_I argc, char *argv[])
+S_I little_main(S_I argc, char *argv[], const char **env)
 {
     MEM_IN;
     if(argc != 4)
@@ -68,6 +68,3 @@ S_I little_main(S_I argc, char *argv[])
     MEM_OUT;
     return EXIT_OK;
 }    
-    
-
-

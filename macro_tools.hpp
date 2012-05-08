@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: macro_tools.hpp,v 1.2 2002/10/31 21:02:36 edrusb Rel $
+// $Id: macro_tools.hpp,v 1.3 2003/02/11 22:01:55 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -56,4 +56,3 @@ extern catalogue *macro_tools_get_catalogue_from(generic_file & f,  // raw data 
 extern catalogue *macro_tools_get_catalogue_from(const string &basename);
 
 #endif
-

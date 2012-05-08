@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,13 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_compressor.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: test_compressor.cpp,v 1.13.2.1 2003/04/15 21:51:53 edrusb Rel $
 //
 /*********************************************************************/
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include "cygwin_adapt.hpp"
 #include "compressor.hpp"
 #include "test_memory.hpp"
 #include "integers.hpp"
@@ -33,6 +34,7 @@ static void f1();
 
 S_I main()
 {
+    MEM_BEGIN;
     MEM_IN;
     f1();
     MEM_OUT;
@@ -41,31 +43,47 @@ S_I main()
 
 static void f1()
 {
-    infinint pos;
+    infinint pos2, pos3;
 
     try
     {
 	fichier src1 = fichier("toto", gf_read_only);
 	fichier src2 = fichier("toto", gf_read_only);
-	fichier dst1 = open("tutu.none", O_WRONLY|O_CREAT|O_TRUNC, 0644);
-	fichier dst2 = open("tutu.gz", O_WRONLY|O_CREAT|O_TRUNC, 0644);
+	fichier src3 = fichier("toto", gf_read_only);
+	fichier dst1 = open("tutu.none", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+	fichier dst2 = open("tutu.gz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+	fichier dst3 = open("tutu.bz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
 	
 	compressor c1 = compressor(none, dst1);
 	compressor c2 = compressor(gzip, dst2);
+	compressor c3 = compressor(bzip2, dst3);
 	
 	src1.copy_to(c1);
 	src2.copy_to(c2);
+	src3.copy_to(c3);
 
 	    // ajout d'un deuxieme block de donnees indentiques
 	c2.flush_write();
-	pos = c2.get_position();
+	pos2 = c2.get_position();
 	src2.skip(0);
 	src2.copy_to(c2);
 
+	    // ajout d'un deuxieme block de donnees indentiques
+	c3.flush_write();
+	pos3 = c3.get_position();
+	src3.skip(0);
+	src3.copy_to(c3);
+
 	    // alteration du premier block de donnees compresses
 	c2.flush_write(); // to be sure all data is written to file
-//	dst2.skip(pos / 2);
-//	dst2.write("A", 1);
+	dst2.skip(pos2 / 2);
+	dst2.write("A", 1);
+
+	    // alteration du premier block de donnees compresses
+	c3.flush_write(); // to be sure all data is written to file
+	dst3.skip(pos3 / 2);
+	dst3.write("A", 1);
+
     }
     catch(Egeneric & e)
     {
@@ -76,23 +94,40 @@ static void f1()
     {
 	fichier src1 = fichier("tutu.none", gf_read_only);
 	fichier src2 = fichier("tutu.gz", gf_read_only);
-	fichier dst1 = open("tutu.none.bak", O_WRONLY|O_CREAT|O_TRUNC, 0644);
-	fichier dst2 = open("tutu.gz.bak", O_WRONLY|O_CREAT|O_TRUNC, 0644);
+	fichier src3 = fichier("tutu.bz", gf_read_only);
+	fichier dst1 = open("tutu.none.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+	fichier dst2 = open("tutu.gz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+	fichier dst3 = open("tutu.bz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
 	
 	compressor c1 = compressor(none, src1);
 	compressor c2 = compressor(gzip, src2);
+	compressor c3 = compressor(bzip2, src3);
 	
 	c1.copy_to(dst1);
-	try {
+	try
+	{
 	    c2.copy_to(dst2);
 	}
 	catch(Erange &e)
 	{
 	    e.dump();
-	    c2.skip(pos);
+	    c2.skip(pos2);
 	}
+
+	try
+	{
+	    c3.copy_to(dst3);
+	}
+	catch(Erange &e)
+	{
+	    e.dump();
+	    c3.skip(pos3);
+	}
+
 	c2.flush_read();
 	c2.copy_to(dst2);
+	c3.flush_read();
+	c3.copy_to(dst3);
     }
     catch(Egeneric & e)
     {
@@ -102,5 +137,6 @@ static void f1()
     unlink("tutu.gz");
     unlink("tutu.none.bak");
     unlink("tutu.gz.bak");
+    unlink("tutu.bz");
+    unlink("tutu.bz.bak");
 }
-

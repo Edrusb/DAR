@@ -18,12 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar-help.c,v 1.3 2002/10/28 20:39:26 edrusb Rel $
+// $Id: dar-help.c,v 1.3 2002/10/28 20:39:26 edrusb Stab $
 //
 /*********************************************************************/
 
 static char rcsid[] =
-  "$Id: dar-help.c,v 1.3 2002/10/28 20:39:26 edrusb Rel $";
+  "$Id: dar-help.c,v 1.3 2002/10/28 20:39:26 edrusb Stab $";
 /*
  * Using libxml2 to format the DAR help text.
  *

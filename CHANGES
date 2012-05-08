@@ -103,3 +103,32 @@ generated on 64 bits OS (have ot use OS_BITS=32 in Makefile on 64 bits OS).
 - dar is now built with dynamic linking, and a special verision named 
   dar_static which is statically linked is also available
 - fixed problem on Windows NT & 2000 (fixed by first change above)
+
+from version 1.2.1 to 1.3.0
+- added parenthesis for a warning to be able to show, when openning a 
+  scrambled archive
+- fixed bug #10
+- added feature : --flat option
+- improved slice name detection when given in place of archive basename
+- added feature : comments in the configuration file given to -B (see
+  man page for more).
+- added feature : --mincompr option
+- fixed a display error when listing a hard link (the name of the first
+  hard link seen on an inode was displayed in place of the name of each hard
+  link). This did not concerne the tree (-T option) listing.
+- added standart config files ~/.darrrc and /etc/darrc config files
+- conditional statements in included files (using make-like targets)
+- added feature : --noconf option
+- fixed a bug : a warning message issued when the user asks for dar to backup
+  the archive in the directory to save, was not displayed in some cases.
+- fixed bug #11
+- added total files counter in each archive while listing dar_manager database
+- fixed bug #12
+- improved slicename vs basename substitution warning and replacement.
+- changed internal name generation to avoid using std::sstream class
+- bzip2 compression implemented (need libbz2 library at compilation time)
+- added the --nodump feature
+- fixed bug #13
+- configuration file can have DOS or UNIX text formating
+- now closing files before asking for the last slice, this allow unmounting 
+  filesystem in that case.

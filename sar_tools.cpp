@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $
+// $Id: sar_tools.cpp,v 1.6.2.1 2003/04/15 21:51:53 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -27,7 +27,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
-#include <string.h>
+#include "cygwin_adapt.hpp"
 #include "erreurs.hpp"
 #include "user_interaction.hpp"
 #include "sar.hpp"
@@ -36,7 +36,7 @@
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: sar_tools.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: sar_tools.cpp,v 1.6.2.1 2003/04/15 21:51:53 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -45,7 +45,7 @@ generic_file *sar_tools_open_archive_fichier(const string &filename, bool allow_
     char *name = tools_str2charptr(filename);
     generic_file *ret = NULL;
     generic_file *tmp = NULL;
-
+    
     try
     {
 	S_I fd;
@@ -66,15 +66,15 @@ generic_file *sar_tools_open_archive_fichier(const string &filename, bool allow_
 		    user_interaction_pause(filename + " is about to be overwritten, continue ?");
 	    }
 	}
-
-	fd = open(name, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	    
+	fd = open(name, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
 	if(fd < 0)
 	    throw Erange("open_archive_fichier", strerror(errno));
 	tmp = new fichier(fd);
 	if(tmp == NULL)
 	    throw Ememory("open_archive_fichier");
 	ret = new trivial_sar(tmp);
-	if(ret == NULL)
+	if(ret == NULL) 
 	    throw Ememory("open_archive_fichier");
     }
     catch(...)
@@ -96,7 +96,7 @@ generic_file *sar_tools_open_archive_tuyau(S_I fd, gf_mode mode)
 {
     generic_file *tmp = NULL;
     generic_file *ret = NULL;
-
+    
     try
     {
 	tmp = new tuyau(fd, mode);
@@ -105,7 +105,7 @@ generic_file *sar_tools_open_archive_tuyau(S_I fd, gf_mode mode)
 	ret = new trivial_sar(tmp);
 	if(ret == NULL)
 	    throw Ememory("sar_tools_open_archive_tuyau");
-    }
+    }    
     catch(...)
     {
 	if(ret != NULL)
@@ -118,4 +118,3 @@ generic_file *sar_tools_open_archive_tuyau(S_I fd, gf_mode mode)
 
     return ret;
 }
-

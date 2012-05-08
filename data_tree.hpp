@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.hpp,v 1.2 2002/10/31 21:02:35 edrusb Rel $
+// $Id: data_tree.hpp,v 1.4 2003/02/19 22:29:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -57,7 +57,8 @@ public:
     void listing() const; // list where is saved this file
     virtual void apply_permutation(archive_num src, archive_num dst);
     virtual void skip_out(archive_num num); // decrement archive numbers above num
-    virtual void compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea) const;
+    virtual void compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea, 
+					   vector<infinint> & total_data, vector<infinint> & total_ea) const;
     
     virtual char obj_signature() const { return signature(); };
     static char signature() { return 't'; };
@@ -88,7 +89,8 @@ public:
 	// (or by any archive if num == 0)
     void apply_permutation(archive_num src, archive_num dst);
     void skip_out(archive_num num);
-    void compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea) const;
+    void compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea, 
+				   vector<infinint> & total_data, vector<infinint> & total_ea) const;
 
     char obj_signature() const { return signature(); };
     static char signature() { return 'd'; };

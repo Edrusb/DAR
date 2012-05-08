@@ -1,4 +1,4 @@
-.TH DAR 1 "SEPT 28, 2002"
+.TH DAR 1 "JAN 11, 2003"
 .UC 8
 .SH NAME
 dar \- disk archive
@@ -95,10 +95,10 @@ do not allow overwriting of any file of slice.
 Do not warn before overwriting file or slice. By default (no -n and no -w) overwriting is allowed but a warning is issued before proceeding.
 .TP 20
 -X, --exclude <mask>
-The mask is a string with wild cards (like * and ?) which is applied to filenames which are not directories. If a given file matches the mask, it is excluded from the operation. By default (no -X on the command line), no file is excluded from the operation. -X may be present several times on the command line.
+The mask is a string with wild cards (like * and ?) which is applied to filenames which are not directories. If a given file matches the mask, it is excluded from the operation. By default (no -X on the command line), no file is excluded from the operation. -X may be present several times on the command line, in that case a file will not be considered for the given operation if it matches at least one -Z mask.
 .TP 20
 -I, --include <mask>
-The mask is applied to filenames which are not directories. If a given file matches the mask and does not match any mask given with -X, the file is selected for the operation. By default (no -I and no -X on the command line), all files are included for the operation. -I may be present several times on the command line.
+The mask is applied to filenames which are not directories. If a given file matches the mask and does not match any mask given with -X, the file is selected for the operation. By default (no -I and no -X on the command line), all files are included for the operation. -I may be present several times on the command line, in that case all file that match one of the -I mask will be considered for the given operation, if they do not also match one of the -X mask. 
 .TP 20
 -R, --fs-root <path>
 The path points to the directory tree containing all the files that will be enrolled in the operation (backup or restoration). By default the current directory is used. All other paths used in -P option or in the [list of paths] on the command line are and must be relative to this path (or to current directory if -R is not present).
@@ -115,7 +115,7 @@ Do not consider the Extended Attributes (EA) of the user namespace. By default, 
 -U, --no-system-EA
 Do not consider the EA of the root (or system) namespace. By default, they are saved and restored, if the support for EA has been activated at compilation time. If not, this option is forced internally (you need not specify it).
 .P
-Note concerning Extended Attributes (EA): support for EA must be activated at compilation time, if your system supports it. Thus you can get two binaries of dar (of the same version), one supporting EA and another which does not (dar -h to see whether EA support is activated). The archives they produce are the same and can be read by each other. The only difference is that the binary without EA support is not able to save or restore EAs, but is still able to test them and list their presence.
+Note concerning Extended Attributes (EA): support for EA must be activated at compilation time, if your system supports it. Thus you can get two binaries of dar (of the same version), one supporting EA and another which does not (dar -V to see whether EA support is activated). The archives they produce are the same and can be read by each other. The only difference is that the binary without EA support is not able to save or restore EAs, but is still able to test them and list their presence.
 .TP 20
 -i, --input <path>
 is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c or -C is used). When reading from pipe, standard input is used, but with this option, the file <path> (usually a named pipe) is used instead.  This option is to receive output from dar_slave program.
@@ -157,7 +157,15 @@ scramble or unscramble the archive using <string> as pass phrase. A scrambled ar
 same as -K but the given key is used to unscramble the archive of reference (given with -A option).
 .TP 20
 -B, --batch <filename>
-You can put in the file any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occures in case of loop (a file includes itself) and DAR aborts immediately. Actually no comment is allowed in configuration files. 
+You can put in the file any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occures in case of loop (a file includes itself) and DAR aborts immediately. Comments are now allowed, and must start by a hash `#' character on each line. Note that for a line to be considered as comment the hash caracter must be the first character of the line (space or tab can still preceed the hash). See
+.B Conditional Syntax
+bellow for a more rich syntax in configuration files.
+.TP 20
+-N, --noconf
+Do not try to read neither ~/.darrc nor /etc/darrc configuration files. See
+.B files
+section bellow.
+
 .PP
 .RE
 SAVING AND ISOLATION OPTIONS (to use with -c or -C)
@@ -168,10 +176,10 @@ SAVING AND ISOLATION OPTIONS (to use with -c or -C)
 compresses within slices using gzip algorithm (if not specified, no compression is performed). The compression level (an integer from 0 to 9) is optional. -z is equivalent to -z9 which is max compression/slow processing. At the oposit, 0 is equivalent to no compression, which is also the case when no -z and no -y is given on the command line.
 .TP 20
 -y, --bzip2[level]
-compresses using bzip2 algorithm (NOT IMPLEMENTED)
+compresses using bzip2 algorithm. See -z above for usage details.
 .TP 20
 -s, --slice <number>
-Size of the slices in bytes. If the number is followed by k (or K), M, G, T or P the size is in kilobytes, megabytes, gigabytes, terabytes or petabytes respectively. Example: "20M" means 20 megabytes it is the same as giving 20971520 as argument. If -s is not present the backup will be written to a single slice whatever the size of the backup may be (there is probably some filesystem limitation, thus you might expect problems for file size over 2 gigabytes, depending on your filesystem).
+Size of the slices in bytes. If the number is appended by k (or K), M, G, T, P E, Z or Y the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes or yottabytes respectively. Example: "20M" means 20 megabytes it is the same as giving 20971520 as argument. If -s is not present the backup will be written to a single slice whatever the size of the backup may be (there is probably some filesystem limitation, thus you might expect problems for file size over 2 gigabytes, depending on your filesystem, but this is not a limitation of dar).
 .TP 20
 -S, --first-slice <number>
 -S gives the size of the first slice which may be chosen independently of the size of following slices. This option needs -s and by default, the size of the first slice is the same as the one of the following slices.
@@ -190,10 +198,20 @@ When excluding directories either explicitly using -P option, or implicitly givi
 does not store anything about theses. But with -D option, dar stores them as empty directories. This can be useful, if excluding a mount point (like /proc or /dev/pts). At restoration time, dar will then recreate theses directories (if necessary). This option has no meaning with -C and is ignored in that case.
 .TP 20
 -Z, --exclude-compression <mask>
-Filenames covered by this mask are not compressed. It is only useful with -z or -y. By default, all file are compressed (if compression is used).
+Filenames covered by this mask are not compressed. It is only useful with -z or -y. By default, all file are compressed (if compression is used). This option can be used several times, in that case a file that matches one of the -Z mask will not be compressed.
 .TP 20
 -Y, --include-compression <mask>
-Filenames covered by this mask (and not covered by -Z) are the only to be compressed. It is only available with -z no -y. By default all files are compressed.
+Filenames covered by this mask (and not covered by -Z) are the only to be compressed. It is only available with -z no -y. By default all files are compressed. This option can be used several times, in that case all files that match one of the -Y will be compressed, if they do not also match on of the -Z masks.
+.TP 20
+-m, --mincompr <number>
+files which size is below this value will not be compressed. If -m is not specified it is equivalent to giving 
+.B -m 100 
+as argument. If you want to compress all file whatever their size is you thus need to type 
+.B -m 0
+on the command line. The same number extensions as those used with -s or -S are available here, if you want to specify the size in kilobyte, megabyte, gigabyte etc.
+.TP 20 
+--nodump
+do not save files which have the 'd' flag set (see chattr(1) lsattr(1) ext2 commands). This option is available only if the dar binary has been compiled with the USE_NODUMP_FEATURE macro uncommented in the Makefile.
 .PP
 .PP
 .RE
@@ -205,6 +223,9 @@ Do not delete files that have been deleted since the backup of reference (file o
 .TP 20
 -r, --recent
 restore only files that are absent or more recent than those present in filesystem. -r is useless if -n is present.
+.TP 20
+-f, --flat
+do not restore directory structure. All file will be restored in the directory given to -R, if two files of the same name have to be restored, the usual scheme for warning (-w option) and overwriting (-n option) is used. No rename scheme is planned atually. When this option is set, dar does not remove files that have been stored as deleted since last backup. (-f implicitly implies -k).
 .RE
 .PP
 .RE
@@ -224,14 +245,14 @@ can be used to have a listing that displays the tree structure.
 -I and -X
 can be used to filter file to list base on their name. With -T the tree structure is not filtered unlike without -T. Note that -P and [list of path] is not available while listing.
 .P
-Else only -v and -b from general options are useful.
+Else only -v and -b from general options are useful. Note that -v displays an archive summary first, where a lot of information about the archive can be obtained.
 .TP 10
 displayed 
 fields
 .RS
 .TP 10
 [data]
-possible values are [     ] or [Saved] or [InRef] . [     ] means that the data has been saved because there is no change since backup of reference. [Saved] means that the data has been saved, and thus this archive is able to restore the file. [InRef] is used when isolating a catalogue from an archive, and means the file was saved in the reference archive.
+possible values are [     ] or [Saved] or [InRef] . [     ] means that the data has not been saved because there is no change since backup of reference. [Saved] means that the data has been saved, and thus this archive is able to restore the file. [InRef] is used when isolating a catalogue from an archive, and means the file was saved in the reference archive.
 .TP 10
 [EA]
 possible values are " " (empty string) or [Saved] or [     ]. It Shows if Extended Attributes are present and saved ([Saved]), are present but not saved ([     ]) which means there is no change since backup of reference, or if there is no EA saved for this file (empty string).
@@ -249,7 +270,7 @@ group
 group owner of the file
 .TP 10
 size
-size in byte of the file (if compression is enabled, the real size in the archive is compression rate smaller).
+size in byte of the file (if compression is enabled, the real size in the archive is "compression rate" time smaller).
 .TP 10
 date
 the last modification date of the file. The last access time is also saved and restored, but not displayed.
@@ -282,6 +303,88 @@ is returned when an error concerning the treated data has been detected. While s
 .TP 10
 6
 an error occured while executing user command (given with -E or -F option). Mainly because the creation of a new process is not possible (process table is full) or the user command returned an error code (exit status different of zero).
+
+.SH FILES
+.B $HOME/.darrc
+and
+.B /etc/darrc
+if present are read for configuration option. They share the same syntax as file given to -B option. If $HOME/.darrc is not present and only in that case, /etc/darrc is consulted. You can still launch /etc/darrc from .darrc using a statment like 
+.B -B /etc/darrc.
+None of theses file need to be present, but if they are they are parsed AFTER any option on the command line and AFTER included files from the command line (files given to the -B option). NOTE: if $HOME is not defined $HOME/.darrc default to /.darrc (at the root of the filesystem).
+
+Else you can see 
+.B conditional syntax
+bellow, and -N option above that leads dar to ignore the /etc/darrc and $HOME/.darrc files.
+
+.SH CONDITIONAL SYNTAX
+configuration files (-B option, $HOME/.darrc and /etc/darrc) usually contain a simple list of command-line arguments, split or not over several lines, and eventually mixed with comments (see -B option for more). But, you can also use make-like targets to ask for a particular set of commands to be used in certain conditions. 
+
+A condition takes the form of reserved word immediately followed by a colon ':'. This word + colon must stand alone on its line, eventually with spaces or tabs beside it. The available conditions are:
+.TP 20
+extract:
+all option listed after this condition get used if previously on command line or file the -x option has been used
+.TP 20
+create:
+all option listed after this condition get used if previously on command line or file (-B option) the -c option has been used
+.TP 20
+list:
+if -l option has been used
+.TP 20
+test:
+if -t option has been used
+.TP 20
+diff:
+if -d option has been used
+.TP 20
+isolate:
+if -C option has been used
+.TP 20
+all:
+in any case
+.TP 20
+default:
+if no -c, -d, -x, -t, -C or -l has been used at this point of the parsing.
+.P
+The condition stops when the next condition starts, or at End of File. The commands inserted before any condition are equivalent to those inserted after the "all:" condition. Remark : -c -d -x -t -C and -l are mutual exclusive, only one of them can be used while calling dar.
+.P 
+Here is an example of conditional syntax
+.RS
+.P
+create:
+  # upon creation exclude the
+.br
+  # following files from compression
+.br
+-Z "*.mp3" -Z "*.mpg"
+.P
+all:
+.br
+-b
+.br
+-p
+.P
+default:
+.br
+# this will get read if not
+.br
+# command has been set yet
+.br
+-V 
+.br
+# thus by default dar shows its version
+.P
+all:
+.br
+-v
+.br
+# for any command we also ask to be verbose
+.br
+# this is added to the previous all: condition
+.RE 
+.P
+Last point, you may have several time the same condition (several
+.B all:
+) for example. They will be concatenated together.
 
 .SH SEE ALSO
 dar_xform(1), dar_slave(1), dar_manager(1)

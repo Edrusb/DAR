@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_generic_file.cpp,v 1.6 2002/12/08 20:03:07 edrusb Rel $
+// $Id: test_generic_file.cpp,v 1.7.2.1 2003/04/15 21:51:53 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include "cygwin_adapt.hpp"
 #include "generic_file.hpp"
 #include "null_file.hpp"
 #include "integers.hpp"
@@ -39,7 +40,7 @@ S_I main(S_I argc, char *argv[])
     }
     
     fichier f1 = fichier(argv[1], gf_read_only);
-    S_I fd = open(argv[2], O_WRONLY|O_CREAT|O_TRUNC);
+    S_I fd = open(argv[2], O_WRONLY|O_CREAT|O_TRUNC|O_BINARY);
     if(fd < 0)
     {
 	cout << "cannot open "<< argv[2] << endl;
@@ -66,6 +67,4 @@ S_I main(S_I argc, char *argv[])
 	cout << "CRC OK" << endl;
     else
 	cout << "CRC PROBLEM" << endl;
-}	
-    
-    
+}

@@ -156,3 +156,116 @@ KNOWN BUGS:
 
     solution
 	replaced the macro by a proper definition.
+	
+	
+    affects version: 1.2.0
+    fixed in version: 1.2.1
+
+#10 description
+	when using dar on windows95 if giving c:/ or other driver to -R 
+        option, dar stops with the following error : 
+
+        file filesystem.cpp line 186 : it seems to be a bug here
+
+    problem 
+	dar checks first that c:/ is a directory. Cygwin says yes this
+	dar continues :	from c:/ dar completes the path with a dot thus 
+	dar tries to open the path c:/. which is cygwin does not report 
+	as an existing directory.    	
+
+    solution
+	dar does not try to open c:/. but tries to open c:/ . Moreover
+	additional code as been added to detect the incoherence if in
+	some other conditions such problem occurs. Dar will report the
+	exact problem (path does not exist / or path is not a directory)
+
+
+    affects version: 1.2.1, 1.2.0
+    fixed in version: 1.2.2
+
+#11 description
+	when giving to dar_manager an absolute path to -r option 
+        dar_manager stops with INTERNAL ERROR message.
+
+    problem
+	a check is missing to display error message in such condition
+
+    solution
+	added a error message, if an absolute path is given to -r
+
+    affects dar_manager version   : 1.0.0
+    fixed in dar_manager version  : 1.0.1
+
+#12 description
+	memory leakage when using -Z or -Y option. This bug has been
+	found and explained by David Rose, who proposed a good patch,
+	which I have just a little adapted.
+
+    problem
+	the dar code that call the zlib when changing the compression
+	algorithm did properly released memory allocated by dar but 
+	forget to execute a call of the zlib library that releases memory
+	allocate by the library itself.
+
+    solution
+	solution, add call to release memory used by zlib library when 
+	changing of compression algorithm
+
+    affects dar version   : 1.2.0, 1.2.1
+    fixed in dar version  : 1.3.0
+
+#13 description
+	archive created by dar under Windows NP SP6, XP, 2000, cannot be 
+	read, tested. All action on generated archive finishes by CRC error 
+	message, incoherent catalogue structure, or badly formated infinint.
+
+    problem
+	under windows, Dar uses Cygwin. As Unix and Window do not define
+	end of line the same way (\n for Unix and \r\n for Windows), 
+	Cygwin translates end of line on the fly when reading a file
+        (Windows to Unix), and when writing (Unix to Windows). At 
+	writting time espetially, each \n anywhere in the archive 
+	is written \r\n, thus two bytes get written in place of one.
+ 	In another hand, to get the global position in the whole archive
+	dar countes bytes it writes to file. Thus a shift occurs between
+	the position it thinks it writes the catalogue and the position
+	it actually does. Thus reading the archive, the given position 
+	is wrong, and archive cannot be openned.
+
+    solution
+	deactivate the translation when generating the archive. Cygwin adds
+	 A two special flags to pass to open(2) which are O_TEXT and 
+	O_BINARY, that change the way Cygwin handles file read(2) and 
+	write(2).
+
+    affects all dar suite program version 1.0.x, 1.1.x, 1.2.x
+    fixed in dar version 1.3.0
+
+#14 desciption
+	Dar aborts with the following message 
+
+         ---- exception nature = [alive] exception type = [BUG] ----------
+         [source]
+         file compressor.cpp line 320 : it seems to be a bug here
+         [most outside call]
+         -----------------------------------
+
+	while backing up using compression and scrambling (could not (yet) be
+	reproduced twice).
+
+    problem
+	this message is issued because zlib library reported an inconsistency
+	in call order or in call arguments given to zlib calls. Actually I 
+	cannot figure out what is wrong, nor how this bug may happens.
+
+    solution
+	none actually at the time of 1.3.0 release. 
+
+	But, if you are face to face with this bug, thanks to try reproducing 
+	it, re-issuing the same command in the same condition, and if 
+	reproduceable then as much as possible reduce the necessary 
+	environment condition that make this bug happen. Then please, contact 
+	me (either via Sourceforge or via email).
+
+    affects version 1.2.1 (at least)
+    not yet fixed (check sourceforge for fresh news).

@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
+// $Id: filtre.cpp,v 1.16 2003/03/21 21:52:28 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -32,13 +32,13 @@
 #include "test_memory.hpp"
 #include "null_file.hpp"
 
-static void save_inode(const string &info_quoi, inode * & ino, compressor *stock, bool info_details, const mask &compr_mask, compression compr_used);
-static bool save_ea(const string & info_quoi, inode * & ino, compressor *stock, const inode * ref, bool info_details);
+static void save_inode(const string &info_quoi, inode * & ino, compressor *stock, bool info_details, const mask &compr_mask, compression compr_used, const infinint & min_size_compression);
+static bool save_ea(const string & info_quoi, inode * & ino, compressor *stock, const inode * ref, bool info_details, compression compr_used);
 
-void filtre_restore(const mask &filtre,
+void filtre_restore(const mask &filtre, 
 		    const mask & subtree,
-		    catalogue & cat,
-		    bool detruire,
+		    catalogue & cat, 
+		    bool detruire, 
 		    const path & fs_racine,
 		    bool fs_allow_overwrite,
 		    bool fs_warn_overwrite,
@@ -46,16 +46,18 @@ void filtre_restore(const mask &filtre,
 		    statistics & st,
 		    bool only_if_more_recent,
 		    bool restore_ea_root,
-		    bool restore_ea_user)
+		    bool restore_ea_user,
+		    bool flat, 
+		    bool ignore_owner)
 {
     defile juillet = fs_racine;
     const eod tmp_eod;
     const entree *e;
+    filesystem_restore fs = filesystem_restore(fs_racine, fs_allow_overwrite, fs_warn_overwrite, info_details, restore_ea_root, restore_ea_user,ignore_owner);
+    filesystem_diff fs_flat = filesystem_diff(fs_racine, info_details, restore_ea_root, restore_ea_user);
+    
     st.clear();
-
-    filesystem_set_root(fs_racine, fs_allow_overwrite, fs_warn_overwrite, info_details, restore_ea_root, restore_ea_user);
     cat.reset_read();
-    filesystem_reset_write();
 
     while(cat.read(e))
     {
@@ -92,73 +94,99 @@ void filtre_restore(const mask &filtre,
 				throw SRC_BUG; // !?! how is this possible ?
 			    st.hard_links++;
 			}
-
+			
 			if(e_det != NULL)
 			{
-			    if(detruire)
+			    if(detruire && !flat)
 			    {
 				if(info_details)
 				    user_interaction_warning(string("removing file ") + juillet.get_string());
-				if(filesystem_write(e))
+				if(fs.write(e))
 				    st.deleted++;
 			    }
 			}
 			else
 			    if(e_ino != NULL)
 			    {
-				nomme *exists_nom = filesystem_get_before_write(e_ino);
-				inode *exists = dynamic_cast<inode *>(exists_nom);
+				nomme *exists_nom = NULL;
+				inode *exists = NULL;
+								
+				    // checking if file to restore already exists, retreiving info if available
+				if(!flat)
+				    exists_nom = fs.get_before_write(e_ino);
+				else
+				{
+				    string tmp = e_ino->get_name();
 
+				    if(e_dir != NULL || !fs_flat.read_filename(tmp, exists_nom))
+					exists_nom = NULL;
+				}
+
+				exists = dynamic_cast<inode *>(exists_nom);
 				if(exists_nom != NULL && exists == NULL)
-				    throw SRC_BUG;
-
+				    throw SRC_BUG; // filesystem should always provide inode or nothing
+				
 				try
 				{
 					// checking the file contents & inode
-				    if(e_ino->get_saved_status() == s_saved || (e_hard != NULL && filesystem_known_etiquette(e_hard->get_etiquette())))
+				    if(e_ino->get_saved_status() == s_saved || (e_hard != NULL && fs.known_etiquette(e_hard->get_etiquette())))
 				    {
 					if(!only_if_more_recent || exists == NULL || !e_ino->same_as(*exists) || e_ino->is_more_recent_than(*exists))
 					{
-					    if(info_details)
-						user_interaction_warning(string("restoring file ") + juillet.get_string());
-					    if(filesystem_write(e)) // e and not e_ino, it may be a hard link now
-						st.treated++;
+					    if(!flat || e_dir == NULL)
+					    {
+						if(info_details)
+						    user_interaction_warning(string("restoring file ") + juillet.get_string());
+						if(fs.write(e)) // e and not e_ino, it may be a hard link now
+						    st.treated++;
+					    }
+					    else
+						st.ignored++;
 					}
 					else // file is less recent than the one in the filesystem
 					{
 						// if it is a directory, just recording we go in it now
-					    if(e_dir != NULL)
-						filesystem_pseudo_write(e_dir);
+					    if(e_dir != NULL && !flat)
+						fs.pseudo_write(e_dir);
 					    if(e_eti != NULL) // future hard link will get linked against this file
-						filesystem_write_hard_linked_target_if_not_set(e_eti, juillet.get_string());
-					    st.tooold++;
+						fs.write_hard_linked_target_if_not_set(e_eti, flat ? (fs_racine+e_ino->get_name()).display() : juillet.get_string());
+					    if(e_dir == NULL || !flat)
+						st.tooold++;
+					    else 
+						st.ignored++;
 					}
 				    }
 				    else // no data saved for this entry (no change since reference backup)
 				    {
 					    // if it is a directory, just recording we go in it now
-					if(e_dir != NULL)
-					    filesystem_pseudo_write(e_dir);
+					if(e_dir != NULL && !flat)
+					    fs.pseudo_write(e_dir);
 					if(e_eti != NULL) // future hard link will get linked against this file
-					    filesystem_write_hard_linked_target_if_not_set(e_eti, juillet.get_string());
-					st.skipped++;
+					    fs.write_hard_linked_target_if_not_set(e_eti, flat ? (fs_racine+e_ino->get_name()).display() : juillet.get_string());
+					if(e_dir == NULL || !flat)
+					    st.skipped++;
+					else
+					    st.ignored++;
 				    }
-
+				    
 				    if(restore_ea_user || restore_ea_root)
 				    {
 					    // checking the EA list
 					    //
-					    // need to have EA data to restore and an
-					    // existing inode of the same type in
-					    // filesystem, to be able to set EA to
+					    // need to have EA data to restore and an 
+					    // existing inode of the same type in 
+					    // filesystem, to be able to set EA to 
 					    // an existing inode
-					if(((e_ino->ea_get_saved_status() == inode::ea_full &&
-					     (exists != NULL && exists->same_as(*e_ino)))
-					    || e_ino->get_saved_status() == s_saved))
+					if(e_ino->ea_get_saved_status() == inode::ea_full // we have EA available in archive
+					   && 
+					   (exists != NULL && exists->same_as(*e_ino)  // the file now exists in filesystem
+					    || e_ino->get_saved_status() == s_saved)   // either initially or just restored
+					   && 
+					   (!flat || e_dir == NULL))                   // we are not in flat mode restoring a directory
 					{
 					    try
 					    {
-						if(filesystem_set_ea(e_nom, *(e_ino->get_ea())))
+						if(fs.set_ea(e_nom, *(e_ino->get_ea()), fs_allow_overwrite, fs_warn_overwrite, info_details ))
 						    st.ea_treated++;
 					    }
 					    catch(Erange & e)
@@ -176,7 +204,7 @@ void filtre_restore(const mask &filtre,
 				    throw;
 				}
 				if(exists_nom != NULL)
-				    delete exists_nom;
+				    delete exists_nom; 
 			    }
 			    else
 				throw SRC_BUG; // a nomme is neither a detruit nor an inode !
@@ -190,7 +218,7 @@ void filtre_restore(const mask &filtre,
 		    if(dolly != NULL)
 			delete dolly;
 		}
-		else // inode not covered
+		else // inode not covered 
 		{
 		    st.ignored++;
 		    if(e_dir != NULL)
@@ -207,11 +235,12 @@ void filtre_restore(const mask &filtre,
 	    catch(Euser_abort & e)
 	    {
 		user_interaction_warning(juillet.get_string() + " not restored (user choice)");
-		const directory *e_dir = dynamic_cast<const directory *>(e_nom);
-		if(e_dir != NULL)
+
+		if(e_dir != NULL && !flat)
 		{
-		    cat.skip_read_to_parent_dir();
 		    user_interaction_warning("No file in this directory will be restored.");
+		    cat.skip_read_to_parent_dir();
+		    juillet.enfile(&tmp_eod);
 		}
 		st.errored++;
 	    }
@@ -222,25 +251,25 @@ void filtre_restore(const mask &filtre,
 	    catch(Egeneric & e)
 	    {
 		user_interaction_warning(string("Error while restoring ") + juillet.get_string() + " : " + e.get_message());
-		st.errored++;
 
-		if(e_dir != NULL)
+		if(e_dir != NULL && !flat)
 		{
 		    user_interaction_warning(string("Warning! No file in that directory will be restored: ") + juillet.get_string());
 		    cat.skip_read_to_parent_dir();
 		    juillet.enfile(&tmp_eod);
 		}
+		st.errored++;
 	    }
 	}
 	else
-	    (void)filesystem_write(e); // eod; don't care returned value
+	    if(!flat)
+		(void)fs.write(e); // eod; don't care returned value
     }
-    filesystem_freemem();
 }
 
 void filtre_sauvegarde(const mask &filtre,
 		       const mask &subtree,
-		       compressor *stockage,
+		       compressor *stockage, 
 		       catalogue & cat,
 		       catalogue &ref,
 		       const path & fs_racine,
@@ -249,26 +278,26 @@ void filtre_sauvegarde(const mask &filtre,
 		       bool make_empty_dir,
 		       bool save_ea_root,
 		       bool save_ea_user,
-		       const mask &compr_mask)
+		       const mask &compr_mask,
+		       const infinint & min_compr_size,
+		       bool nodump)
 {
     entree *e;
     const entree *f;
     defile juillet = fs_racine;
     const eod tmp_eod;
     compression stock_algo = stockage->get_algo();
-    st.clear();
+    filesystem_backup fs = filesystem_backup(fs_racine, info_details, save_ea_root, save_ea_user, nodump);
 
-    filesystem_set_root(fs_racine, false, false, info_details, save_ea_root,
-			save_ea_user);
+    st.clear();
     cat.reset_add();
     ref.reset_compare();
-    filesystem_reset_read();
 
-    while(filesystem_read(e))
+    while(fs.read(e))
     {
 	nomme *nom = dynamic_cast<nomme *>(e);
 	directory *dir = dynamic_cast<directory *>(e);
-
+	
 	juillet.enfile(e);
 	if(nom != NULL)
 	{
@@ -282,28 +311,27 @@ void filtre_sauvegarde(const mask &filtre,
 		    {
 			cat.add(e);
 			st.hard_links++;
-			st.treated++;
 		    }
 		    else // "e" is an inode
 		    {
 			inode *e_ino = dynamic_cast<inode *>(e);
 			bool known = ref.compare(e, f);
-
+			
 			try
 			{
 			    if(known)
 			    {
 				const inode *f_ino = dynamic_cast<const inode *>(f);
-
+				
 				if(e_ino == NULL || f_ino == NULL)
 				    throw SRC_BUG; // filesystem has provided a "nomme" which is not a "inode" thus which is a "detruit"
-
+				
 				if(e_ino->has_changed_since(*f_ino))
 				{
 				    if(e_ino->get_saved_status() != s_saved)
 					throw SRC_BUG; // filsystem should always provide "saved" "entree"
-
-				    save_inode(juillet.get_string(), e_ino, stockage, info_details, compr_mask, stock_algo);
+				    
+				    save_inode(juillet.get_string(), e_ino, stockage, info_details, compr_mask, stock_algo, min_compr_size);
 				    st.treated++;
 				}
 				else // inode has not changed since last backup
@@ -312,20 +340,20 @@ void filtre_sauvegarde(const mask &filtre,
 				    st.skipped++;
 				}
 
-				if(save_ea(juillet.get_string(), e_ino, stockage, f_ino, info_details))
+				if(save_ea(juillet.get_string(), e_ino, stockage, f_ino, info_details, stock_algo))
 				    st.ea_treated++;
 			    }
 			    else // inode not present in the catalogue of reference
 				if(e_ino != NULL)
 				{
-				    save_inode(juillet.get_string(), e_ino, stockage, info_details, compr_mask, stock_algo);
+				    save_inode(juillet.get_string(), e_ino, stockage, info_details, compr_mask, stock_algo, min_compr_size);
 				    st.treated++;
-				    if(save_ea(juillet.get_string(), e_ino, stockage, NULL, info_details))
+				    if(save_ea(juillet.get_string(), e_ino, stockage, NULL, info_details, stock_algo))
 					st.ea_treated++;
 				}
 				else
 				    throw SRC_BUG;  // filesystem has provided a "nomme" which is not a "inode" thus which is a "detruit"
-
+			    
 			    file *tmp = dynamic_cast<file *>(e);
 			    if(tmp != NULL)
 				tmp->clean_data();
@@ -349,11 +377,11 @@ void filtre_sauvegarde(const mask &filtre,
 		    if(dir != NULL && make_empty_dir)
 			ig = ignode = new ignored_dir(*dir);
 		    else
-			ig = new ignored(nom->get_name());
-			// necessary to not record deleted files at comparison
+			ig = new ignored(nom->get_name()); 
+			// necessary to not record deleted files at comparison 
 			// time in case files are just not covered by filters
 		    st.ignored++;
-
+		    
 		    if(ig == NULL)
 			throw Ememory("filtre_sauvegarde");
 		    else
@@ -374,13 +402,13 @@ void filtre_sauvegarde(const mask &filtre,
 				    if(f_ino != NULL)
 					tosave = dir->has_changed_since(*f_ino);
 				    else
-					throw SRC_BUG;
+					throw SRC_BUG; 
 				    // catalogue::compare() with a directory should return false or give a directory as
 				    // second argument or here f is not an inode (f_ino == NULL) !
 				    // and known == true
 				else
 				    tosave = true;
-
+				
 				ignode->set_saved_status(tosave ? s_saved : s_not_saved);
 			    }
 			    catch(...)
@@ -390,11 +418,11 @@ void filtre_sauvegarde(const mask &filtre,
 			    }
 			    ref.compare(&tmp_eod, f);
 			}
-			filesystem_skip_read_to_parent_dir();
+			fs.skip_read_to_parent_dir();
 			juillet.enfile(&tmp_eod);
 		    }
 		    if(eti != NULL) // must update filesystem to forget this etiquette
-			filesystem_forget_etiquette(eti);
+			fs.forget_etiquette(eti);
 		    delete e;
 		}
 	    }
@@ -423,11 +451,11 @@ void filtre_sauvegarde(const mask &filtre,
 
 		if(dir != NULL)
 		{
-		    filesystem_skip_read_to_parent_dir();
+		    fs.skip_read_to_parent_dir();
 		    juillet.enfile(&tmp_eod);
 		    user_interaction_warning("NO FILE IN THAT DIRECTORY CAN BE SAVED.");
 		}
-	    }
+	    }    
 	}
 	else // eod
 	{
@@ -436,7 +464,6 @@ void filtre_sauvegarde(const mask &filtre,
 	}
     }
     stockage->change_algo(stock_algo);
-    filesystem_freemem();
 }
 
 void filtre_difference(const mask &filtre,
@@ -450,10 +477,9 @@ void filtre_difference(const mask &filtre,
     const entree *e;
     defile juillet = fs_racine;
     const eod tmp_eod;
+    filesystem_diff fs = filesystem_diff(fs_racine ,info_details, check_ea_root, check_ea_user);
 
     st.clear();
-    filesystem_set_root(fs_racine, false, false, info_details, check_ea_root, check_ea_user);
-    filesystem_reset_read();
     cat.reset_read();
     while(cat.read(e))
     {
@@ -469,9 +495,9 @@ void filtre_difference(const mask &filtre,
 		{
 		    nomme *exists_nom = NULL;
 		    const inode *e_ino = dynamic_cast<const inode *>(e);
-
+		    
 		    if(e_ino != NULL)
-			if(filesystem_read_filename(e_ino->get_name(), exists_nom))
+			if(fs.read_filename(e_ino->get_name(), exists_nom))
 			{
 			    try
 			    {
@@ -491,7 +517,7 @@ void filtre_difference(const mask &filtre,
 				    {
 					user_interaction_warning(string("DIFF ")+juillet.get_string()+": "+ e.get_message());
 					if(e_dir == NULL && exists_dir != NULL)
-					    filesystem_skip_read_filename_in_parent_dir();
+					    fs.skip_read_filename_in_parent_dir();
 					if(e_dir != NULL && exists_dir == NULL)
 					{
 					    cat.skip_read_to_parent_dir();
@@ -501,8 +527,8 @@ void filtre_difference(const mask &filtre,
 					st.errored++;
 				    }
 				}
-				else // existing file is not an inode
-				    throw SRC_BUG; // filesystem, should always return inode with filesystem_read_filename()
+				else // existing file is not an inode 
+				    throw SRC_BUG; // filesystem, should always return inode with read_filename()
 			    }
 			    catch(...)
 			    {
@@ -537,9 +563,9 @@ void filtre_difference(const mask &filtre,
 	    }
 	    else // eod ?
 		if(dynamic_cast<const eod *>(e) != NULL) // yes eod
-		    filesystem_skip_read_filename_in_parent_dir();
-		else // no ?!?
-		    throw SRC_BUG; // not nomme neither eod ! what's that ?
+		    fs.skip_read_filename_in_parent_dir();
+		else // no ?!? 
+		    throw SRC_BUG; // not nomme neither eod ! what's that ?	
 	}
 	catch(Euser_abort &e)
 	{
@@ -559,10 +585,8 @@ void filtre_difference(const mask &filtre,
 	    st.deleted++;
 	}
     }
-    filesystem_skip_read_filename_in_parent_dir();
+    fs.skip_read_filename_in_parent_dir(); 
 	// this call here only to restore dates of the root (-R option) directory
-
-    filesystem_freemem();
 }
 
 void filtre_test(const mask &filtre,
@@ -590,7 +614,7 @@ void filtre_test(const mask &filtre,
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const directory *e_dir = dynamic_cast<const directory *>(e);
 	    const nomme *e_nom = dynamic_cast<const nomme *>(e);
-
+	    
 	    if(e_nom != NULL)
 	    {
 		if(subtree.is_covered(juillet.get_string()) && (e_dir != NULL || filtre.is_covered(e_nom->get_name())))
@@ -685,18 +709,18 @@ void filtre_isolate(catalogue & cat,
 	    file_etiquette *f_eti = dynamic_cast<file_etiquette *>(f);
 		// note about file_etiquette: the cloned object has the same etiquette
 		// and thus each etiquette correspond to two instances
-
+	    
 	    try
 	    {
 		if(f_ino == NULL)
 		    throw SRC_BUG; // inode should clone an inode
-
+		    
 		    // all data must be dropped
 		if(f_ino->get_saved_status() == s_saved)
-		    f_ino->set_saved_status(s_fake);
+		    f_ino->set_saved_status(s_fake); 
 		    // s_fake keep trace that this inode was saved
-		    // in reference catalogue, else it is s_not_saved
-
+		    // in reference catalogue, else it is s_not_saved 
+		
 		    // all EA must be dropped also
 		if(f_ino->ea_get_saved_status() == inode::ea_full)
 		    f_ino->ea_set_saved_status(inode::ea_partial);
@@ -710,14 +734,14 @@ void filtre_isolate(catalogue & cat,
 			throw SRC_BUG;
 			// two file_etiquette clones have the same etiquette
 			// this could be caused by a write error
-			// a bit error in an infinint is still possible and
+			// a bit error in an infinint is still possible and 
 			// may make the value of the infinint (= etiquette here)
 			// be changed without incoherence.
 			// But, this error should have been detected at
 			// catalogue reading as some hard_link cannot be associate
 			// with a file_etiquette, thus this is a bug here.
 		}
-
+		
 		cat.add(f);
 	    }
 	    catch(...)
@@ -727,22 +751,22 @@ void filtre_isolate(catalogue & cat,
 		throw;
 	    }
 	}
-	else // other entree than inode
+	else // other entree than inode 
 	    if(e != NULL)
 	    {
 		entree *f = e->clone();
 		hard_link *f_hard = dynamic_cast<hard_link *>(f);
 
 		try
-		{
+		{		    
 		    if(f_hard != NULL)
 		    {
 			map<infinint,file_etiquette *>::iterator it = corres.find(f_hard->get_etiquette());
-
+			
 			if(it != corres.end())
 			    f_hard->set_reference(it->second);
 			else
-			    throw SRC_BUG;
+			    throw SRC_BUG; 
 			    // no file_etiquette of that etiquette has ever been cloned,
 			    // the order being respected, an file_etiquette is come always first
 			    // before any hard_link on it, as there is no filter to skip the
@@ -758,7 +782,7 @@ void filtre_isolate(catalogue & cat,
 		    throw;
 		}
 	    }
-	    else
+	    else 
 		throw SRC_BUG; // read provided NULL while returning true
     }
 }
@@ -767,11 +791,11 @@ void filtre_isolate(catalogue & cat,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: filtre.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $";
+    static char id[]="$Id: filtre.cpp,v 1.16 2003/03/21 21:52:28 edrusb Rel $";
     dummy_call(id);
 }
 
-static void save_inode(const string & info_quoi, inode * & ino, compressor *stock, bool info_details, const mask &compr_mask, compression compr_used)
+static void save_inode(const string & info_quoi, inode * & ino, compressor *stock, bool info_details, const mask &compr_mask, compression compr_used, const infinint & min_size_compression)
 {
     if(ino == NULL || stock == NULL)
 	throw SRC_BUG;
@@ -779,7 +803,7 @@ static void save_inode(const string & info_quoi, inode * & ino, compressor *stoc
 	return;
     if(info_details)
 	user_interaction_warning(string("Adding file to archive: ") + info_quoi);
-
+    
     file *fic = dynamic_cast<file *>(ino);
 
     if(fic != NULL)
@@ -793,7 +817,8 @@ static void save_inode(const string & info_quoi, inode * & ino, compressor *stoc
 	{
 	    try
 	    {
-		bool compr_debraye = !compr_mask.is_covered(fic->get_name());
+		bool compr_debraye = !compr_mask.is_covered(fic->get_name()) 
+		    || fic->get_size() < min_size_compression;
 
 		if(compr_debraye && stock->get_algo() != none)
 		    stock->change_algo(none);
@@ -808,7 +833,7 @@ static void save_inode(const string & info_quoi, inode * & ino, compressor *stoc
 		if(!compr_debraye)
 		    fic->set_storage_size(stock->get_position() - start);
 		else
-		    fic->set_storage_size(0);
+		    fic->set_storage_size(0); 
 		    // means no compression, thus the real storage size is the filesize
 	    }
 	    catch(...)
@@ -823,14 +848,14 @@ static void save_inode(const string & info_quoi, inode * & ino, compressor *stoc
     }
 }
 
-static bool save_ea(const string & info_quoi, inode * & ino, compressor *stock, const inode * ref, bool info_details)
+static bool save_ea(const string & info_quoi, inode * & ino, compressor *stock, const inode * ref, bool info_details, compression compr_used)
 {
     bool ret = false;
     try
     {
 	switch(ino->ea_get_saved_status())
 	{
-	case inode::ea_full: // if there is something to save
+	case inode::ea_full: // if there is something to save 
 	    if(ref == NULL || ref->ea_get_saved_status() == inode::ea_none || ref->get_last_change() < ino->get_last_change())
 	    {
 		if(ino->get_ea() != NULL)
@@ -840,6 +865,7 @@ static bool save_ea(const string & info_quoi, inode * & ino, compressor *stock, 
 		    if(info_details)
 			user_interaction_warning(string("Saving Extended Attributes for ") + info_quoi);
 		    ino->ea_set_offset(stock->get_position());
+		    stock->change_algo(compr_used); // always compress EA (no size or filename consideration)
 		    stock->reset_crc(); // start computing CRC for any read/write on stock
 		    try
 		    {
@@ -860,7 +886,7 @@ static bool save_ea(const string & info_quoi, inode * & ino, compressor *stock, 
 		    throw SRC_BUG;
 	    }
 	    else // EA have not changed, dropping the EA infos
-		ino->ea_set_saved_status(inode::ea_partial);
+		ino->ea_set_saved_status(inode::ea_partial); 
 	    break;
 	case inode::ea_partial:
 	    throw SRC_BUG; //filesystem, must not provide inode in such a status
@@ -868,7 +894,7 @@ static bool save_ea(const string & info_quoi, inode * & ino, compressor *stock, 
 	    if(ref != NULL && ref->ea_get_saved_status() != inode::ea_none) // if there was some before
 	    {
 		    // we must record the EA have been dropped since ref backup
-		ea_attributs ea;
+		ea_attributs ea; 
 		ino->ea_set_saved_status(inode::ea_full);
 		ino->ea_set_offset(stock->get_position());
 		ea.clear(); // be sure it is empty
@@ -895,6 +921,6 @@ static bool save_ea(const string & info_quoi, inode * & ino, compressor *stock, 
     catch(Egeneric & e)
     {
 	user_interaction_warning(string("Error saving Extended Attributs for ") + info_quoi + ": " + e.get_message());
-    }
+    }	
     return ret;
 }

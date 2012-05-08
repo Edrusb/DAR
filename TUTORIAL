@@ -93,7 +93,7 @@ put an empty ZIP floppy in the device, and mount it according to your
 	mount /mnt/zip
 copy the dar binary to the zip drive (to be able to restore in case of big 
 problem, like a crash disk) and eventually man pages
-	cp `which dar` /mnt/zip
+	cp `which dar_static` /mnt/zip
 then, type the following
 	cd /
 	dar -c /mnt/zip/linux_full -s 100M -S 95M -p -b -z -R / -X "*~" -X ".*~" -P dev/pts -P proc -P mnt/zip -D

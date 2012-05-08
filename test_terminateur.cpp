@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_terminateur.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
+// $Id: test_terminateur.cpp,v 1.12.2.1 2003/04/15 21:51:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <iostream>
+#include "cygwin_adapt.hpp"
 #include "terminateur.hpp"
 #include "generic_file.hpp"
 #include "deci.hpp"
@@ -36,6 +37,7 @@ static void f1();
 
 S_I main()
 {
+    MEM_BEGIN;
     MEM_IN;
     f1();
     MEM_OUT;
@@ -44,7 +46,7 @@ S_I main()
 
 static void f1()
 {
-    fichier toto = open("toto", O_RDWR|O_CREAT|O_TRUNC, 0644);
+    fichier toto = open("toto", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644);
     terminateur term;
     
     infinint grand = 1;
@@ -61,5 +63,3 @@ static void f1()
     conv = term.get_catalogue_start();
     cout << conv.human() << endl;
 }
-
-    

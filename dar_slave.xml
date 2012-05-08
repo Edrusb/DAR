@@ -48,12 +48,7 @@
     See man page for more details.
   </hdr>
 <!--
-$Log: dar_slave.xml,v $
-Revision 1.3  2002/10/28 20:39:28  edrusb
-updated CVS with last development version
-
-Revision 1.2  2002/08/22 20:27:59  denis
-mise en place de dar-help
+$Id: dar_slave.xml,v 1.4 2003/02/07 07:10:25 edrusb Stab $
 
 Revision 1.3  2002/08/20 13:44:08  cs1cwm
 Added DTD and removed the #ifdef and #endif.

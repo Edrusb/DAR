@@ -1,14 +1,14 @@
 summary: DAR - Disk ARchive
 Name: dar
-Version: 1.2.1
-Release: 3
+Version: 1.3.0
+Release: 4
 Copyright: GPL
 Icon: dar.gif
 Group: Applications/Archiving
-Source: http://dar.linux.free.fr/dar-1.2.1.tar.gz
+Source: http://dar.linux.free.fr/dar-1.3.0.tar.gz
 URL: http://dar.linux.free.fr/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-BuildRequires: zlib-devel >= 1.1.3, gcc-c++
+BuildRequires: zlib-devel >= 1.1.3, gcc-c++, libbz2-devel >= 1.0.4
 
 %description
 DAR is a command line tool to backup a directory tree and files. DAR is
@@ -51,9 +51,13 @@ make INSTALL_ROOT_DIR=%{buildroot}/usr MAN_DIR=share/man INSTALL=install install
 /usr/share/man/man1/dar_slave.1
 /usr/share/man/man1/dar_xform.1
 /usr/share/man/man1/dar_manager.1
-%doc README TUTORIAL CHANGES LICENSE BUGS INSTALL TODO NOTES RESUME THANKS
+%doc README TUTORIAL CHANGES LICENSE BUGS INSTALL TODO NOTES THANKS
 
 %changelog
+
+* Wed May 14 2003 Denis Corbin <dar.linux@free.fr>
+- added dependency libbz2
+- see CHANGES file for more
 
 * Thu Jan  9 2003 Denis Corbin <dar.linux@free.fr>
 - removed the OS_BITS flag, which is no more necessary 
@@ -68,3 +72,5 @@ make INSTALL_ROOT_DIR=%{buildroot}/usr MAN_DIR=share/man INSTALL=install install
 * Thu Jun 27 2002 Denis Corbin
 
   - see file named "CHANGES"
+
+

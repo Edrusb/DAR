@@ -1,29 +1,19 @@
 TODO (order is not significant)
 ===========
-- bzip2 compression
 - API for Graphical User Interface(s)
 - libdar library (thread safe)
 - multi-language support (selection at compilation time)
 - bootable Linux image with what's necessary to restore a system from a dar
   archive
-- provide minimum file size parameter below which no compression is performed
 - change the packaging to have a "configure" script (thanks to Tim Doerzbacher)
 - rethink the behaviour of dar when virtual memory is exhausted 
   (do not fail stop asking the user whether to retry or stop, thus the routine
    must not need extra memory to work) 
-- add a feature that skips directory structure while restoring a 
-  "--flat" option as suggested by Rgbtxus.
-- rethink dar_manager command line to allow multiple actions and batch
 - make light limited version of dar_suite, based over 64 bits integers
 - have wilde card for -f and -r options of dar_manager
-- use standart integer types in integer.hpp (<stdint.h>)
 - standart batch options examples (non compressible file extensions, etc).
 - avoid cursor key to be considered as escape key.
 - add a FEC or similar layer for data recovery.
-- check how to integrate ext3 dump flag and don't save files that don't have it (maybe in option at compile time + option on command line to skip it)
-- BUG : cursor key act like escape key
-- rc file batch file by default (~/.darrc /etc/darrc) change dar behaviour 
-  to take the last option not display warning messages when to options are not
-  compatible (?)
-- comments in batch file (# sign)
-- infinint.cpp  read_from_file(S_I <-> int)
+? infinint.cpp  read_from_file(S_I <-> int)
+? remove the information of command line used for backup, put a developped list (from included files) before running.
+- consider a FEC algo to use bellow class sar (to protect slice header from medium error).

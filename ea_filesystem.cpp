@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.6 2003/01/03 22:34:16 edrusb Rel $
+// $Id: ea_filesystem.cpp,v 1.7 2003/02/11 22:01:38 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -247,7 +247,7 @@ static void read_ea(const string & name, ea_attributs & val, bool read_ea_root, 
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: ea_filesystem.cpp,v 1.6 2003/01/03 22:34:16 edrusb Rel $";
+    static char id[]="$Id: ea_filesystem.cpp,v 1.7 2003/02/11 22:01:38 edrusb Rel $";
 
     dummy_call(id);
 }

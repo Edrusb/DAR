@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: scrambler.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $
+// $Id: scrambler.cpp,v 1.6 2003/02/11 22:01:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -43,7 +43,7 @@ S_I scrambler::inherited_read(char *a, size_t size)
 	throw SRC_BUG;
 
     U_32 index = ref->get_position() % len;
-    S_I ret = ref->read(a, size);
+    S_I ret = ref->read(a, size);    
 
     for(register S_I i = 0; i < ret; i++)
     {
@@ -53,7 +53,7 @@ S_I scrambler::inherited_read(char *a, size_t size)
     return ret;
 }
 
-S_I scrambler::inherited_write(const char *a, size_t size)
+S_I scrambler::inherited_write(char *a, size_t size)
 {
     unsigned char *ptr = (unsigned char *)a;
     if(ref == NULL)
@@ -76,7 +76,7 @@ S_I scrambler::inherited_write(const char *a, size_t size)
 	    throw Ememory("scramble::inherited_write");
 	}
     }
-
+    
     for(register size_t i = 0; i < size; i++)
     {
 	buffer[i] = (ptr[i] + (unsigned char)(key[index])) % 256;
@@ -89,7 +89,6 @@ S_I scrambler::inherited_write(const char *a, size_t size)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: scrambler.cpp,v 1.5 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: scrambler.cpp,v 1.6 2003/02/11 22:01:58 edrusb Rel $";
     dummy_call(id);
 }
-

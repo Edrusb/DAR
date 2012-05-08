@@ -83,6 +83,7 @@ Set the path to dar. If no argument is given, dar is expected to be located in t
 -r, --restore [ist of files to restore]
 .B dar_manager
 will restore all (an only) the given files, asking for the proper archive only. Last version of each file over several archive is based on the modification time of the inode, thus if you have a more recent backup that contains an old version of a given file, a older archive could be used to restore the file, if its last modification time (mtime) is more recent. 
+Note that files listed after -r option, must never have an absolute path. They will be restored under the directory specified with -R option of dar (thus using -o option), or by default, in subdirectories of the current directory.
 .TP 20
 -u, --used [<number>]
 list the files that the given archive owns as last version available. Thus when no file is listed, the given archive is no more useful in database, and can be removed safely (-D option). If <number> is omitted, all available file are listed.

@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: terminateur.cpp,v 1.10 2003/02/11 22:02:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -38,7 +38,7 @@ void terminateur::dump(generic_file & f)
     size = f.get_position() - size;
 
     euclide(size, BLOCK_SIZE, nbbit, reste);
-
+ 
     if(reste != 0)
     {
 	    // adding some non informational bytes to get a multiple of BLOCK_SIZE
@@ -50,7 +50,7 @@ void terminateur::dump(generic_file & f)
 	    // one more for remaing bytes and non informational bytes.
 	nbbit++;
     }
-
+	
     last_byte = nbbit % 8;
     nbbit /= 8; // now, nbbit is the number of byte of terminator string (more or less 1)
 
@@ -76,7 +76,7 @@ void terminateur::dump(generic_file & f)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: terminateur.cpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $";
+    static char id[]="$Id: terminateur.cpp,v 1.10 2003/02/11 22:02:00 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -90,7 +90,7 @@ void terminateur::read_catalogue(generic_file & f)
     {
 	    // reading & counting the terminator string
 	char b;
-	do
+	do 
 	{
 	    if(f.read_back(b) != 1)
 		throw Erange("",""); // exception used locally
@@ -104,7 +104,7 @@ void terminateur::read_catalogue(generic_file & f)
 	    // considering the first non 0xFF byte of the terminator string (backward reading)
 	while(a != 0)
 	{
-	    if((a & 0x80) == 0)
+	    if(a & 0x80 == 0)
 		throw Erange("","");
 	    offset++;
 	    a <<= 1;
@@ -115,7 +115,7 @@ void terminateur::read_catalogue(generic_file & f)
 	if(offset < 0)
 	    throw SRC_BUG; // signed int overflow
 
-	    // skipping the start of "location"
+	    // skipping the start of "location" 
 	if(! f.skip_relative(-offset))
 	    throw Erange("","");
     }
@@ -127,4 +127,3 @@ void terminateur::read_catalogue(generic_file & f)
 	// reading and returning the position
     pos.read_from_file(f);
 }
-

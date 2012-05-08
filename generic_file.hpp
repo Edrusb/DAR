@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.9 2002/10/31 21:02:36 edrusb Rel $
+// $Id: generic_file.hpp,v 1.10 2003/02/11 22:01:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -57,16 +57,16 @@ class generic_file
 public :
     generic_file(gf_mode m) { rw = m; clear(value); crc_offset = 0; enable_crc(false); };
     virtual ~generic_file() {};
-
+    
     gf_mode get_mode() const { return rw; };
     S_I read(char *a, size_t size);
-    S_I write(const char *a, size_t size);
+    S_I write(char *a, size_t size);
     S_I read_back(char &a);
     virtual bool skip(const infinint & pos) = 0;
     virtual bool skip_to_eof() = 0;
     virtual bool skip_relative(S_I x) = 0;
     virtual infinint get_position() = 0;
-
+    
     void copy_to(generic_file &ref);
     void copy_to(generic_file &ref, crc & value);
 	// generates CRC on copied data
@@ -84,7 +84,7 @@ protected :
 	// must provide as much byte as requested up to end of file
 	// stay blocked if not enough available
 	// returning zero or less than requested means end of file
-    virtual S_I inherited_write(const char *a, size_t size) = 0;
+    virtual S_I inherited_write(char *a, size_t size) = 0;
 	// must write all data or block or throw exceptions
 	// thus always returns the second argument
 
@@ -93,12 +93,12 @@ private :
     crc value;
     S_I crc_offset;
     S_I (generic_file::* active_read)(char *a, size_t size);
-    S_I (generic_file::* active_write)(const char *a, size_t size);
+    S_I (generic_file::* active_write)(char *a, size_t size);
 
     void enable_crc(bool mode);
-    void compute_crc(const char *a, S_I size);
+    void compute_crc(char *a, S_I size);
     S_I read_crc(char *a, size_t size);
-    S_I write_crc(const char *a, size_t size);
+    S_I write_crc(char *a, size_t size);
 };
 
 class fichier : public generic_file
@@ -119,7 +119,7 @@ public :
 
 protected :
     S_I inherited_read(char *a, size_t size);
-    S_I inherited_write(const char *a, size_t size);
+    S_I inherited_write(char *a, size_t size);
 
 private :
     S_I filedesc;

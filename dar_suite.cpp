@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.11 2003/01/08 21:27:37 edrusb Rel $
+// $Id: dar_suite.cpp,v 1.13.2.5 2003/05/19 20:48:05 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -28,14 +28,14 @@
 #include "erreurs.hpp"
 #include "test_memory.hpp"
 
-const char *application_version = "1.2.1";
+const char *application_version = "1.3.0";
 
 const char *dar_suite_version()
 {
     return application_version;
 }
 
-int dar_suite_global(int argc, char *argv[], int (*call)(int, char *[]))
+int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(int, char *[], const char **env))
 {
     MEM_BEGIN;
     MEM_IN;
@@ -44,7 +44,7 @@ int dar_suite_global(int argc, char *argv[], int (*call)(int, char *[]))
     try
     {
 	user_interaction_init(&cerr, &cerr);
-	ret = (*call)(argc, argv);
+	ret = (*call)(argc, argv, env);
     }
     catch(Efeature &e)
     {
@@ -98,6 +98,6 @@ int dar_suite_global(int argc, char *argv[], int (*call)(int, char *[]))
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.11 2003/01/08 21:27:37 edrusb Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.13.2.5 2003/05/19 20:48:05 edrusb Rel $";
     dummy_call(id);
 }

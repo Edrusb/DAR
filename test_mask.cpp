@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_mask.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
+// $Id: test_mask.cpp,v 1.11 2003/02/11 22:02:05 edrusb Rel $
 //
 /*********************************************************************/
 

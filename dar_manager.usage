@@ -15,7 +15,7 @@
 	ui_printf("   -u <number>\t   list the most recent files contained in the given archive\n");
 	ui_printf("   -f <file>\t   list the archives where is saved the data and/or EA of that\n");
 	ui_printf("\t\t   file\n");
-	ui_printf("   -s <number>\t   shows the number of most recent file by archive\n");
+	ui_printf("   -s\t\t   shows the number of most recent file by archive\n");
 	ui_printf("   -m <number>\t   change an archive position within a given database. First\n");
 	ui_printf("\t\t   <number> is the archive to move, second <number> is where to\n");
 	ui_printf("\t\t   move it.\n");

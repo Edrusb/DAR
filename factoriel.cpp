@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: factoriel.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
+// $Id: factoriel.cpp,v 1.11.2.1 2003/04/15 21:51:52 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,6 +29,7 @@
 #include <string>
 #include <iostream>
 #include <errno.h>
+#include "cygwin_adapt.hpp"
 #include "infinint.hpp"
 #include "deci.hpp"
 #include "erreurs.hpp"
@@ -59,7 +60,7 @@ S_I main(S_I argc, char *argv[]) throw()
 	cout << f.human() << endl;
 	if(argc == 3)
 	{
-	    S_I fd = open(argv[2], O_RDWR|O_CREAT|O_TRUNC, 0644);
+	    S_I fd = open(argv[2], O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644);
 	    if(fd < 0)
 		cout << "cannot open file for test ! " << strerror(errno) << endl;
 	    else
@@ -92,6 +93,6 @@ S_I main(S_I argc, char *argv[]) throw()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: factoriel.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $";
+    static char id[]="$Id: factoriel.cpp,v 1.11.2.1 2003/04/15 21:51:52 edrusb Rel $";
     dummy_call(id);
 }

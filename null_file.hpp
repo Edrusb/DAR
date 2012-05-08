@@ -1,24 +1,24 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: null_file.hpp,v 1.4 2002/10/28 20:39:34 edrusb Rel $
+// $Id: null_file.hpp,v 1.5 2003/02/11 22:01:57 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -40,7 +40,7 @@ public :
 
 protected :
     int inherited_read(char *a, size_t size) { return 0; };
-    int inherited_write(const char *a, size_t size) { return size; };
+    int inherited_write(char *a, size_t size) { return size; };
 };
 
 #endif

@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.hpp,v 1.10 2002/12/10 20:54:23 edrusb Rel $
+// $Id: command_line.hpp,v 1.14 2003/03/13 20:48:11 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -34,9 +34,13 @@
 
 using namespace std;
 
-enum operation { extract, create, diff, test, listing, isolate };
+enum operation { noop, extract, create, diff, test, listing, isolate };
+    // noop stands for no-operation. get_args() never returns such value,
+    // it is just necessary within the command_line module
 
-extern bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, path *&sauv_root, path *&ref_root, 
+extern bool get_args(const char *home,
+		     S_I argc, char *argv[], operation &op, path * &fs_root, 
+		     path *&sauv_root, path *&ref_root, 
 		     infinint &file_size, infinint &first_file_size, 
 		     mask *&selection, mask *&subtree,
 		     string &filename, string *&ref_filename,
@@ -50,6 +54,9 @@ extern bool get_args(S_I argc, char *argv[], operation &op, path * &fs_root, pat
 		     bool &ignore_owner,
 		     string & execute, string & execute_ref,
 		     string & pass, string & pass_ref,
-		     mask *&compress_mask);
+		     mask *&compress_mask,
+		     bool & flat,
+		     infinint & min_compr_size,
+		     bool & nodump);
     
 #endif

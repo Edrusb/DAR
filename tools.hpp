@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.10 2002/10/31 21:02:37 edrusb Rel $
+// $Id: tools.hpp,v 1.11 2003/02/11 22:02:11 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -59,13 +59,17 @@ extern string tools_display_date(infinint date);
 extern void tools_system(const vector<string> & argvector);
 extern void tools_write_vector(generic_file & f, const vector<string> & x);
 extern void tools_read_vector(generic_file & f, vector<string> & x);
-extern string tools_concat_vector(const string & separator, const vector<string> & x);
+extern string tools_concat_vector(const string & separator, 
+				  const vector<string> & x);
 vector<string> operator + (vector<string> a, vector<string> b);
+extern bool tools_is_member(const string & val, const vector<string> & liste);
+
 
 template <class T> vector<T> operator +=(vector<T> & a, const vector<T> & b)
 {
     a = a + b;
     return a;
 }
+extern const char *tools_get_from_env(const char **env, char *clef);
 
 #endif

@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,14 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar.hpp,v 1.8 2002/10/28 20:39:27 edrusb Rel $
+// $Id: dar.hpp,v 1.9 2003/02/11 22:01:25 edrusb Rel $
 //
 /*********************************************************************/
 
 #ifndef DAR_HPP
 #define DAR_HPP
 
-extern int main(int argc, char *argv[]);
+// nothing
 
 #endif
 

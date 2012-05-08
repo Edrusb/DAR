@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
+// $Id: test_filesystem.cpp,v 1.15.2.1 2003/04/15 21:51:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -31,6 +31,7 @@
 #include <sys/un.h>
 #include <string.h>
 #include <iostream>
+#include "cygwin_adapt.hpp"
 #include "filesystem.hpp"
 #include "user_interaction.hpp"
 #include "test_memory.hpp"
@@ -45,8 +46,10 @@ static catalogue *cat;
 
 S_I main()
 {
+    MEM_BEGIN;
     MEM_IN;
     user_interaction_init(&cout, &cerr);
+    catalogue_set_reading_version("03");
     cat = new catalogue();
     MEM_OUT;
     build();
@@ -62,7 +65,6 @@ S_I main()
     }
     delete cat;
     MEM_OUT;
-    filesystem_freemem();
     user_interaction_close();
     MEM_OUT;
     MEM_END;
@@ -86,7 +88,7 @@ static void build()
 	close(fd);
     }
     mknod("arbo/sub/tube", 0777 | S_IFIFO, 0);
-    fd = open("arbo/sub/fichier", O_WRONLY|O_CREAT, 0777);
+    fd = open("arbo/sub/fichier", O_WRONLY|O_CREAT|O_BINARY, 0777);
     if(fd >= 0)
     {
 	write(fd, phrase, strlen(phrase));
@@ -111,10 +113,9 @@ static void del()
 static void test()
 {
     entree *p;
-    
-    filesystem_set_root(path("arbo"), false, true, true, false, false);
-    filesystem_reset_read();
-    while(filesystem_read(p))
+    filesystem_backup fs = filesystem_backup(path("arbo"), true, true, true, false);
+
+    while(fs.read(p))
     {
 	file *f = dynamic_cast<file *>(p);
 	cat->add(p);
@@ -124,8 +125,11 @@ static void test()
 
 	    try
 	    {
+                crc val;
+
 		fichier sortie = dup(1);
-		entree->copy_to(sortie);
+		entree->copy_to(sortie, val);
+		f->set_crc(val);
 	    }
 	    catch(...)
 	    {
@@ -143,16 +147,14 @@ static void re_test()
     const entree *e;
     detruit det1 = detruit("lien", 'l' | 0x80);
     detruit det2 = detruit("dev1", 'd');
+    filesystem_restore fs = filesystem_restore("algi", true, true, true, true, true, false);
 
     cat->reset_read();
-    filesystem_set_root("algi", true, true, true, false, false);
-    filesystem_reset_write();
-    
     
     while(cat->read(e))
-	filesystem_write(e);
+	fs.write(e);
     
-    filesystem_reset_write();
-    filesystem_write(&det1);
-    filesystem_write(&det2);
+    fs.reset_write();
+    fs.write(&det1);
+    fs.write(&det2);
 }

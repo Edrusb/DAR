@@ -1,31 +1,30 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.2 2002/10/31 21:02:35 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.4.2.2 2003/04/17 19:24:01 edrusb Rel $
 //
 /*********************************************************************/
 
 #include <getopt.h>
 #include <vector>
 #include <string>
-#include <stdio.h>
 #include "dar_suite.hpp"
 #include "database_header.hpp"
 #include "macro_tools.hpp"
@@ -35,16 +34,16 @@
 #include "user_interaction.hpp"
 #include "integers.hpp"
 
-#define DAR_MANAGER_VERSION "1.0.0"
+#define DAR_MANAGER_VERSION "1.1.0"
 
 enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, move };
 
-static S_I little_main(S_I argc, char *argv[]);
-static bool command_line(S_I argc, char *argv[],
-			 operation & op,
-			 string & base,
-			 string & arg,
-			 archive_num & num,
+static S_I little_main(S_I argc, char *argv[], const char **env);
+static bool command_line(S_I argc, char *argv[], 
+			 operation & op, 
+			 string & base, 
+			 string & arg, 
+			 archive_num & num, 
 			 vector<string> & rest,
 			 archive_num & num2);
 static void show_usage(const char *command);
@@ -67,12 +66,12 @@ static void op_move(const string & base, archive_num src, archive_num dst);
 static database *read_base(const string & base);
 static void write_base(const string & filename, const database *base, bool overwrite);
 
-S_I main(S_I argc, char *argv[])
+S_I main(S_I argc, char *argv[], const char **env)
 {
-    return dar_suite_global(argc, argv, &little_main);
+    return dar_suite_global(argc, argv, env, &little_main);
 }
 
-S_I little_main(S_I argc, char *argv[])
+S_I little_main(S_I argc, char *argv[], const char **env)
 {
     operation op;
     string base;
@@ -133,11 +132,11 @@ S_I little_main(S_I argc, char *argv[])
     return EXIT_OK;
 }
 
-static bool command_line(S_I argc, char *argv[],
-			 operation & op,
-			 string & base,
-			 string & arg,
-			 archive_num & num,
+static bool command_line(S_I argc, char *argv[], 
+			 operation & op, 
+			 string & base, 
+			 string & arg, 
+			 archive_num & num, 
 			 vector<string> & rest,
 			 archive_num & num2)
 {
@@ -266,7 +265,7 @@ static bool command_line(S_I argc, char *argv[],
 	if(lu == 'o' || lu == 'r')
 	    break; // stop reading arguments
     }
-
+    
     for(S_I i = optind; i < argc; i++)
 	rest.push_back(argv[i]);
 
@@ -302,6 +301,10 @@ static bool command_line(S_I argc, char *argv[],
 	rest.clear();
 	break;
     case restore:
+	for(unsigned int i = 0; i < rest.size(); i++)
+	    if(!path(rest[i]).is_relative())
+		throw Erange("command_line", "arguments to -r must be relative path (never begin by '/')");
+	break;
     case options:
 	break;
     case move:
@@ -329,7 +332,7 @@ static bool command_line(S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.2 2002/10/31 21:02:35 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.4.2.2 2003/04/17 19:24:01 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -347,11 +350,11 @@ static void op_add(const string & base, const string &arg, string fake)
     try
     {
 	catalogue *catal = macro_tools_get_catalogue_from(arg);
-
+	
 	try
 	{
 	    string chemin, b;
-
+	 
 	    if(fake == "")
 		fake = arg;
 	    tools_split_path_basename(fake, chemin, b);
@@ -360,11 +363,11 @@ static void op_add(const string & base, const string &arg, string fake)
 	catch(...)
 	{
 	    if(catal != NULL)
-		 delete catal;
+		delete catal;
 	    throw;
 	}
 	delete catal;
-
+	
 	write_base(base, dat, true);
     }
     catch(...)
@@ -650,7 +653,7 @@ static database *read_base(const string & base)
     delete f;
     return ret;
 }
-
+    
 static void write_base(const string & filename, const database *base, bool overwrite)
 {
     generic_file *dat = database_header_create(filename, overwrite);
@@ -664,7 +667,6 @@ static void write_base(const string & filename, const database *base, bool overw
 	delete dat;
 	throw;
     }
-
+    
     delete dat;
 }
-

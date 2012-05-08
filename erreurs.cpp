@@ -1,31 +1,32 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002 Denis Corbin
+// Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $
+// $Id: erreurs.cpp,v 1.12 2003/03/02 10:58:47 edrusb Rel $
 //
 /*********************************************************************/
 
 #pragma implementation
 
 #include <iostream>
-#include <sstream>
+#include "infinint.hpp"
+#include "deci.hpp"
 #include "erreurs.hpp"
 
 static bool initialized = false;
@@ -54,7 +55,7 @@ Egeneric::Egeneric(const Egeneric & ref)
     all_instances.push_back(this);
 }
 
- void Egeneric::add_to_last_destroyed(Egeneric *obj)
+void Egeneric::add_to_last_destroyed(Egeneric *obj)
 {
     if(obj->zombie)
 	throw SRC_BUG;
@@ -93,7 +94,7 @@ U_I Egeneric::alive()
 {
     U_I ret = 0;
     list<Egeneric *>::iterator it = all_instances.begin();
-
+    
     while(it != all_instances.end())
 	if(! (*it++)->zombie)
 	    ret++;
@@ -103,7 +104,7 @@ U_I Egeneric::alive()
 
 void Egeneric::clear_last_destroyed()
 {
-    list<Egeneric *>::iterator it = destroyed.begin();
+    list<Egeneric *>::iterator it = destroyed.begin(); 
 
     while(it != destroyed.end())
 	delete (*it++);
@@ -113,7 +114,7 @@ void Egeneric::clear_last_destroyed()
 
 void Egeneric::display_last_destroyed()
 {
-    list<Egeneric *>::iterator it = destroyed.begin();
+    list<Egeneric *>::iterator it = destroyed.begin(); 
 
     while(it != destroyed.end())
 	(*it++)->dump();
@@ -122,7 +123,7 @@ void Egeneric::display_last_destroyed()
 void Egeneric::display_alive()
 {
     list<Egeneric *>::iterator it = all_instances.begin();
-
+    
     while(it != all_instances.end())
     {
 	if(! (*it)->zombie)
@@ -132,7 +133,7 @@ void Egeneric::display_alive()
 }
 
 Ebug::Ebug(const string & file, S_I line) : Egeneric(string("file ") + file + " line " + int_to_string(line), "it seems to be a bug here") {};
-void Ebug::stack(const string & passage, const string & file, const string & line)
+void Ebug::stack(const string & passage, const string & file, const string & line) 
 {
     Egeneric::stack(passage, string("in file ") + file + " line " + string(line));
 }
@@ -146,7 +147,7 @@ static void init()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: erreurs.cpp,v 1.10 2002/12/08 20:03:07 edrusb Rel $";
+    static char id[]="$Id: erreurs.cpp,v 1.12 2003/03/02 10:58:47 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -205,9 +206,12 @@ static void notcatched()
 
 static string int_to_string(S_I i)
 {
-    ostringstream r;
+    infinint tmp;
 
-    r << i;
+    if(i < 0)
+	tmp = (U_I)-i;
+    else
+	tmp = (U_I)i;
 
-    return r.str();
+    return (i < 0 ? string("-") : string("")) + deci(tmp).human();
 }
