@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -22,8 +22,8 @@
 //
 /*********************************************************************/
 //
+#include <iostream>
 #include <string>
-#include <iostream.h>
 #include "erreurs.hpp"
 #include "generic_file.hpp"
 #include "infinint.hpp"
@@ -53,23 +53,23 @@ using namespace std;
 
 const version supported_version = "02";
 
-static void op_create(const operation op, const path &fs_root, const path &sauv_path, 
+static void op_create(const operation op, const path &fs_root, const path &sauv_path,
 		      const path *ref_path,
-		      const mask &selection, const mask &subtree, 
+		      const mask &selection, const mask &subtree,
 		      const string &filename, string *ref_filename,
 
-		      bool allow_over, bool warn_over, bool info_details, 
-		      bool pause, bool empty_dir, compression algo, 
-		      const infinint &file_size, 
+		      bool allow_over, bool warn_over, bool info_details,
+		      bool pause, bool empty_dir, compression algo,
+		      const infinint &file_size,
 		      const infinint &first_file_size,
 		      int argc, char *argv[],
 		      bool root_ea, bool user_ea,
 		      const string &input_pipe, const string &output_pipe);
 static void op_extract(const path &fs_root, const path &sauv_path,
-		       const mask &selection, const mask &subtree, 
-		       const string &filename, bool allow_over, bool warn_over, 
+		       const mask &selection, const mask &subtree,
+		       const string &filename, bool allow_over, bool warn_over,
 		       bool info_details, bool detruire,
-		       bool only_more_recent, bool restore_ea_root, 
+		       bool only_more_recent, bool restore_ea_root,
 		       bool restore_ea_user,
 		       const string &input_pipe, const string &output_pipe);
 static void op_diff(const path & fs_root, const path &sauv_path,
@@ -77,18 +77,18 @@ static void op_diff(const path & fs_root, const path &sauv_path,
 		    const string &filename, bool info_details,
 		    bool check_ea_root, bool check_ea_user,
 		    const string &input_pipe, const string &output_pipe);
-static void op_listing(const path &sauv_path, const string &filename, 
+static void op_listing(const path &sauv_path, const string &filename,
 		       bool info_details,
 		       const string &input_pipe, const string &output_pipe);
-static void op_test(const path &sauv_path, const mask &selection, 
-		    const mask &subtree, const string &filename, 
+static void op_test(const path &sauv_path, const mask &selection,
+		    const mask &subtree, const string &filename,
 		    bool info_details,
 		    const string &input_pipe, const string &output_pipe);
 static catalogue *get_catalogue_from(generic_file & decoupe, compressor &zip, bool info_details, infinint &cat_size);
-static void open_archive(const path &sauv_path, const string &basename, 
-			 const string &extension, int options, 
-			 generic_file *&ret1, compressor *&ret2, 
-			 header_version &ver, const string &input_pipe, 
+static void open_archive(const path &sauv_path, const string &basename,
+			 const string &extension, int options,
+			 generic_file *&ret1, compressor *&ret2,
+			 header_version &ver, const string &input_pipe,
 			 const string &output_pipe);
 static string make_string_from(int argc, char *argv[]);
 static void display_sauv_stat(const statistics & st);
@@ -117,14 +117,14 @@ static int little_main(int argc, char *argv[])
     compression algo;
     string input_pipe, output_pipe;
     bool ignore_owner;
-    
+
     if(! get_args(argc, argv, op, fs_root, sauv_root, ref_root,
-		  file_size, first_file_size, selection, 
-		  subtree, filename, ref_filename, 
-		  allow_over, warn_over, info_details, algo, detruire, 
-		  pause, beep, empty_dir, only_more_recent, 
+		  file_size, first_file_size, selection,
+		  subtree, filename, ref_filename,
+		  allow_over, warn_over, info_details, algo, detruire,
+		  pause, beep, empty_dir, only_more_recent,
 		  ea_root, ea_user,
-		  input_pipe, output_pipe, 
+		  input_pipe, output_pipe,
 		  ignore_owner))
 	return EXIT_SYNTAX;
     else
@@ -137,15 +137,15 @@ static int little_main(int argc, char *argv[])
 	    user_interaction_change_non_interactive_output(&cout);
 	    // standart output can be used to send non interactive
 	    // messages
-	
+
 	try
 	{
 	    switch(op)
 	    {
 	    case create:
 	    case isolate:
-		op_create(op, *fs_root, *sauv_root, ref_root, *selection, *subtree, filename, ref_filename, 
-			  allow_over, warn_over, info_details, pause, empty_dir, algo, file_size, 
+		op_create(op, *fs_root, *sauv_root, ref_root, *selection, *subtree, filename, ref_filename,
+			  allow_over, warn_over, info_details, pause, empty_dir, algo, file_size,
 			  first_file_size, argc, argv, ea_root, ea_user, input_pipe, output_pipe);
 		break;
 	    case extract:
@@ -199,12 +199,12 @@ static int little_main(int argc, char *argv[])
 }
 
 static void op_create(const operation op, const path &fs_root, const path &sauv_path, const path *ref_path,
-		      const mask &selection, const mask &subtree, 
+		      const mask &selection, const mask &subtree,
 		      const string &filename, string *ref_filename,
 		      bool allow_over, bool warn_over, bool info_details, bool pause,
 		      bool empty_dir,
-		      compression algo, const infinint &file_size, 
-		      const infinint &first_file_size, 
+		      compression algo, const infinint &file_size,
+		      const infinint &first_file_size,
 		      int argc, char *argv[], bool root_ea, bool user_ea,
 		      const string &input_pipe, const string &output_pipe)
 {
@@ -272,7 +272,7 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 		sar_opt &= ~SAR_OPT_PAUSE;
 	    if(pause && ref_path != NULL && *ref_path == sauv_path)
 		user_interaction_pause("Ready to start writing the archive? ");
-	    
+
 	    if(file_size == 0) // one SLICE
 		if(filename == "-") // output to stdout
 		    decoupe = sar_tools_open_archive_tuyau(1, gf_write_only); //archive goes to stdout
@@ -292,7 +292,7 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 	    if(user_ea)
 		ver.flag |= VERSION_FLAG_SAVED_EA_USER;
 	    ver.write(*decoupe);
-	    
+
 	    zip = new compressor(algo, *decoupe);
 	    if(zip == NULL)
 		throw Ememory("op_create");
@@ -328,7 +328,7 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 		user_interaction_warning("Writing archive contents...");
 	    current.dump(*zip);
 	    zip->flush_write();
-	    delete zip; 
+	    delete zip;
 	    zip = NULL;
 	    coord.dump(*decoupe);
 	    delete decoupe;
@@ -364,10 +364,10 @@ static void op_create(const operation op, const path &fs_root, const path &sauv_
 }
 
 static void op_extract(const path &fs_root, const path &sauv_path,
-		       const mask &selection, const mask &subtree, 
-		       const string &filename, bool allow_over, bool warn_over, 
-		       bool info_details,  bool detruire, 
-		       bool only_more_recent, bool restore_ea_root, 
+		       const mask &selection, const mask &subtree,
+		       const string &filename, bool allow_over, bool warn_over,
+		       bool info_details,  bool detruire,
+		       bool only_more_recent, bool restore_ea_root,
 		       bool restore_ea_user,
 		       const string &input_pipe, const string &output_pipe)
 {
@@ -391,7 +391,7 @@ static void op_extract(const path &fs_root, const path &sauv_path,
 	    {
 		statistics st;
 		MEM_IN;
-		filtre_restore(selection, subtree, *cat, detruire, 
+		filtre_restore(selection, subtree, *cat, detruire,
 			       fs_root, allow_over, warn_over, info_details,
 			       st, only_more_recent, restore_ea_root,
 			       restore_ea_user);
@@ -424,8 +424,8 @@ static void op_extract(const path &fs_root, const path &sauv_path,
     }
 }
 
-static void op_listing(const path &sauv_path, const string &filename, 
-		       bool info_details,		       
+static void op_listing(const path &sauv_path, const string &filename,
+		       bool info_details,
 		       const string &input_pipe, const string &output_pipe)
 {
     try
@@ -434,12 +434,12 @@ static void op_listing(const path &sauv_path, const string &filename,
 	compressor *zip;
 	header_version ver;
 
-	MEM_IN;	
+	MEM_IN;
 	open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver, input_pipe, output_pipe);
 	try
 	{
 	    infinint cat_size;
- 
+
 	    catalogue *cat = get_catalogue_from(*decoupe, *zip, info_details, cat_size);
 	    try
 	    {
@@ -449,17 +449,17 @@ static void op_listing(const path &sauv_path, const string &filename,
 		    infinint sub_file_size;
 		    infinint first_file_size;
 		    infinint last_file_size, file_number;
-		    
+
 		    user_interaction_stream() << "Archive version format               : " << ver.edition << endl;
 		    user_interaction_stream() << "Compression algorithm used           : " << compression2string(char2compression(ver.algo_zip)) << endl;
 		    user_interaction_stream() << "Catalogue size in archive            : " << deci(cat_size).human() << " bytes" << endl;
 		    user_interaction_stream() << "Command line options used for backup : " << ver.cmd_line << endl;
-		    
+
 		    if(real_decoupe != NULL)
 		    {
 			infinint sub_file_size = real_decoupe->get_sub_file_size();
 			infinint first_file_size = real_decoupe->get_first_sub_file_size();
-			if(real_decoupe->get_total_file_number(file_number) 
+			if(real_decoupe->get_total_file_number(file_number)
 			   && real_decoupe->get_last_file_size(last_file_size))
 			{
 			    user_interaction_stream() << "Archive is composed of " << file_number << " file" << endl;
@@ -484,7 +484,7 @@ static void op_listing(const path &sauv_path, const string &filename,
 			user_interaction_stream() << "Archive size is: " << decoupe->get_position() << " bytes" << endl;
 			user_interaction_stream() << "Previous archive size does not include headers present in each slice" << endl;
 		    }
-		    
+
 		    entree_stats stats = cat->get_stats();
 		    stats.listing(user_interaction_stream());
 		    user_interaction_pause("Continue listing archive contents?");
@@ -529,12 +529,12 @@ static void op_diff(const path & fs_root, const path &sauv_path,
 	compressor *zip = NULL;
 	header_version ver;
 	catalogue *cat = NULL;
-	
+
 	try
 	{
 	    infinint cat_size;
 	    statistics st;
-	    
+
 	    open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver, input_pipe, output_pipe);
 	    cat = get_catalogue_from(*decoupe, *zip, info_details, cat_size);
 	    filtre_difference(selection, subtree, *cat, fs_root, info_details, st, check_ea_root, check_ea_user);
@@ -569,8 +569,8 @@ static void op_diff(const path & fs_root, const path &sauv_path,
 }
 
 
-static void op_test(const path &sauv_path, const mask &selection, 
-		    const mask &subtree, const string &filename, 
+static void op_test(const path &sauv_path, const mask &selection,
+		    const mask &subtree, const string &filename,
 		    bool info_details,
 		    const string &input_pipe, const string &output_pipe)
 {
@@ -581,12 +581,12 @@ static void op_test(const path &sauv_path, const mask &selection,
 	compressor *zip = NULL;
 	header_version ver;
 	catalogue *cat = NULL;
-	
+
 	try
 	{
 	    infinint cat_size;
 	    statistics st;
-	    
+
 	    open_archive(sauv_path, filename, EXTENSION, SAR_OPT_DEFAULT, decoupe, zip, ver, input_pipe, output_pipe);
 	    cat = get_catalogue_from(*decoupe, *zip, info_details, cat_size);
 	    filtre_test(selection, subtree, *cat, info_details, st);
@@ -632,7 +632,7 @@ static void open_archive(const path &sauv_path, const string &basename, const st
     {
 	tuyau *in = NULL;
 	tuyau *out = NULL;
-	
+
 	try
 	{
 	    tools_open_pipes(input_pipe, output_pipe, in, out);
@@ -676,7 +676,7 @@ static catalogue *get_catalogue_from(generic_file & f, compressor & zip, bool in
 {
     terminateur term;
     catalogue *ret;
-	
+
     if(info_details)
 	user_interaction_warning("Extracting contents of the archive...");
 

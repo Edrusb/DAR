@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -22,7 +22,9 @@
 //
 /*********************************************************************/
 
-#include <iostream.h>
+#include <iostream>
+#include <string.h>
+#include <stdio.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <errno.h>
@@ -56,13 +58,13 @@ void user_interaction_init(int input_filedesc, ostream *out, ostream *interact)
 
     if(out != NULL)
 	output = out;
-    else 
+    else
 	throw SRC_BUG;
     if(interact != NULL)
 	inter = interact;
     else
 	throw SRC_BUG;
-    
+
 	// preparing input for swaping between char mode and line mode (terminal settings)
     if(ioctl(input_filedesc, TCGETA, &term) >= 0)
     {
@@ -89,7 +91,7 @@ void user_interaction_change_non_interactive_output(ostream *out)
 {
     if(out != NULL)
 	output = out;
-    else 
+    else
 	throw SRC_BUG;
 }
 
@@ -111,7 +113,7 @@ void user_interaction_pause(string message)
     char buffer[bufsize];
     char & a = buffer[0];
 
-    if(!has_terminal) 
+    if(!has_terminal)
     {
 	user_interaction_warning("No terminal found and user interaction needed, aborting.");
 	throw Euser_abort(message);
@@ -128,7 +130,7 @@ void user_interaction_pause(string message)
 	while(read(input, buffer, bufsize) >= 0)
 	    ;
 	tools_blocking_read(input, true);
-	
+
 	    // now asking the user
 	do
 	{
@@ -137,7 +139,7 @@ void user_interaction_pause(string message)
 		throw Erange("user_interaction_pause", string("Error while reading user answer from terminal: ") + strerror(errno));
 	}
 	while(a != 27 && a != '\n');
-	
+
 	if(a == 27) // escape key
 	    throw Euser_abort(message);
 	else
@@ -159,7 +161,7 @@ void user_interaction_warning(string message)
 
 ostream &user_interaction_stream()
 {
-    return *output; 
+    return *output;
 }
 
 void user_interaction_set_beep(bool mode)
@@ -179,7 +181,7 @@ void ui_printf(char *format, ...)
     bool end;
     unsigned long taille = strlen(format)+1;
     char *copie;
-    
+
     if(output == NULL)
 	throw Erange("ui_printf", "user_interaction  module is not initialized");
 
@@ -204,7 +206,7 @@ void ui_printf(char *format, ...)
 		*ptr = '\0';
 		end = false;
 	    }
-	    else 
+	    else
 		end = true;
 	    *output << start;
 	    if(!end)

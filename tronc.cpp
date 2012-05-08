@@ -6,12 +6,12 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -26,18 +26,19 @@
 
 #include "tronc.hpp"
 #include <errno.h>
+#include <string.h>
 
-tronc::tronc(generic_file *f, const infinint & offset, const infinint &size) : generic_file(f->get_mode()) 
-{ 
-    ref = f; 
+tronc::tronc(generic_file *f, const infinint & offset, const infinint &size) : generic_file(f->get_mode())
+{
+    ref = f;
     sz = size;
     start = offset;
     current = size; // forces skipping the first time
 }
 
-tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(mode) 
-{ 
-    ref = f; 
+tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(mode)
+{
+    ref = f;
     sz = size;
     start = offset;
     current = size; // forces skipping the firt time
@@ -70,6 +71,7 @@ bool tronc::skip_to_eof()
 bool tronc::skip_relative(signed int x)
 {
     if(x < 0)
+    {
 	if(current < -x)
 	{
 	    ref->skip(start);
@@ -78,7 +80,7 @@ bool tronc::skip_relative(signed int x)
 	}
 	else
 	{
-	    bool r = ref->skip_relative(x); 
+	    bool r = ref->skip_relative(x);
 	    if(r)
 		current -= -x;
 	    else
@@ -88,8 +90,10 @@ bool tronc::skip_relative(signed int x)
 	    }
 	    return r;
 	}
-    
+    }
+
     if(x > 0)
+    {
 	if(current + x >= sz)
 	{
 	    current = sz;
@@ -105,9 +109,10 @@ bool tronc::skip_relative(signed int x)
 	    {
 		ref->skip(start+sz);
 		current = sz;
-	    }   
+	    }
 	    return r;
 	}
+    }
 
     return true;
 }
@@ -175,7 +180,7 @@ int tronc::inherited_write(char *a, size_t size)
     }
     while(ret > 0);
     current += wrote;
-    
+
     return wrote;
 }
 
