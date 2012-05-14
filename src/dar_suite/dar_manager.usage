@@ -19,6 +19,7 @@
 	ui_printf("   -m <number>\t   change an archive position within a given database. First\n");
 	ui_printf("\t\t   <number> is the archive to move, second <number> is where to\n");
 	ui_printf("\t\t   move it.\n");
+	ui_printf("   -v\t\t   display more information about what it is doing\n");
 	ui_printf("   -h\t\t   displays this help information\n");
 	ui_printf("   -V\t\t   displays software version\n");
 	ui_printf("\n");

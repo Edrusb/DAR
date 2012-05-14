@@ -9,7 +9,7 @@ dar_xform \- disk archive "re-slicer"
 .P
 .B dar_xform -V
 .SH DESCRIPTION
-.B dar_xform  
+.B dar_xform
 changes the size of slices of an existing archive.
 .PP
 Source is the basename of the existing archive, destination is the basename of the archive to be created. If source basename is "-", the archive is read from standard input. If the destination basename is "-", the archive is written to standard output and -s option is not available.
@@ -21,10 +21,10 @@ Source is the basename of the existing archive, destination is the basename of t
 -h
 displays help usage.
 .TP 20
--V 
+-V
 displays version information.
 .TP 20
--b 
+-b
 make the terminal ring when user interaction is required (like for example the creation of a new slice when using the -p option)
 .TP 20
 -s <number>
@@ -33,7 +33,7 @@ Size of the slices in bytes. If the number is followed by k (or K), M, G, T or P
 -S <number>
 -S gives the size of the first slice which may be chosen independently of the size of following slices. This option needs -s and by default, the size of the first slice is the same as the one of the following slices.
 .TP 20
--p 
+-p
 pauses before writing to a new slice (this requires -s). By default there is no pause, all slices are output in the same directory, up to the end of the backup or until the filesystem is full. In this later case, the user is informed of the lack of disk space and dar stops for user interaction. As soon as some disk space is available, the user can continue the backup.
 .TP 20
 -n
@@ -57,7 +57,7 @@ Dar is not concerned by scrambling. It does not need to be aware of it to be abl
 uses the same exit status as dar does, see dar(1) man page.
 
 .SH SEE ALSO
-dar(1), dar_slave(1), dar_manager(1)
+dar(1), dar_slave(1), dar_manager(1), dar_cp(1)
 
 .SH KNOWN BUGS
 None actually.

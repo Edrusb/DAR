@@ -6,28 +6,31 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: no_comment.cpp,v 1.2.2.1 2003/05/19 20:48:06 edrusb Rel $
+// $Id: no_comment.cpp,v 1.7 2003/10/26 18:14:44 edrusb Rel $
 //
 /*********************************************************************/
 
+#include "../my_config.h"
 #include "no_comment.hpp"
 #include "infinint.hpp"
 
+using namespace libdar;
+
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: no_comment.cpp,v 1.2.2.1 2003/05/19 20:48:06 edrusb Rel $";
+    static char id[]="$Id: no_comment.cpp,v 1.7 2003/10/26 18:14:44 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -42,65 +45,68 @@ void no_comment::fill_morceau()
 
     morceau.clear();
     if(ref == NULL)
-	throw SRC_BUG;
+        throw SRC_BUG;
     ref->skip(0);
     tmp.longueur = 0;
 
     while(!stop)
     {
-	stop = ref->read(&a, 1) != 1;
-	switch(status)
-	{
-	case st_unknown:
-	    switch(a)
-	    {
-	    case ' ':
-	    case '\t':
-		tmp.longueur++;
-		break;
-	    case '#':
-		status = st_comment;
-		break;
-	    default:
-		status = st_command;
-		tmp.debut = ref->get_position() - 1;
-		tmp.offset = last_offset;
-		tmp.longueur++;
-	    }
-	    break;
-	case st_comment:
-	    if(a == '\n')
-	    {
-		status = st_unknown;
-		last_block_is_comment = true;
+        stop = ref->read(&a, 1) != 1;
+        switch(status)
+        {
+        case st_unknown:
+            switch(a)
+            {
+            case ' ':
+            case '\t':
+                tmp.longueur++;
+                break;
+	    case '\n':
 		tmp.longueur = 0;
-	    }
-	    break;
-	case st_command:
-	    if(!stop)
-		tmp.longueur++;
-	    if(a == '\n' || stop)
-	    {
-		status = st_unknown;
+		break;
+            case '#':
+                status = st_comment;
+                break;
+            default:
+                status = st_command;
+                tmp.debut = ref->get_position() - 1;
+                tmp.offset = last_offset;
+                tmp.longueur++;
+            }
+            break;
+        case st_comment:
+            if(a == '\n')
+            {
+                status = st_unknown;
+                last_block_is_comment = true;
+                tmp.longueur = 0;
+            }
+            break;
+        case st_command:
+            if(!stop)
+                tmp.longueur++;
+            if(a == '\n' || stop)
+            {
+                status = st_unknown;
 
-		if(last_block_is_comment)
-		{
-		    morceau.push_back(tmp);
-		    last_offset = tmp.offset+tmp.longueur;
-		}
-		else
-		{
-		    if(morceau.size() < 1)
-			throw SRC_BUG;
-		    morceau.back().longueur += tmp.longueur;
-		    last_offset = morceau.back().offset+morceau.back().longueur;
-		}
-		last_block_is_comment = false;
-		tmp.longueur = 0;
-	    }
-	    break;
-	default:
-	    throw SRC_BUG;
-	}
+                if(last_block_is_comment)
+                {
+                    morceau.push_back(tmp);
+                    last_offset = tmp.offset+tmp.longueur;
+                }
+                else
+                {
+                    if(morceau.size() < 1)
+                        throw SRC_BUG;
+                    morceau.back().longueur += tmp.longueur;
+                    last_offset = morceau.back().offset+morceau.back().longueur;
+                }
+                last_block_is_comment = false;
+                tmp.longueur = 0;
+            }
+            break;
+        default:
+            throw SRC_BUG;
+        }
     }
 }

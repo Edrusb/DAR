@@ -18,112 +18,118 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.10 2003/02/11 22:02:00 edrusb Rel $
+// $Id: terminateur.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #pragma implementation
 
+#include "../my_config.h"
 #include "terminateur.hpp"
 
 #define BLOCK_SIZE 4
 
-void terminateur::dump(generic_file & f)
+namespace libdar
 {
-    infinint size = f.get_position(), nbbit, reste;
-    S_I last_byte;
-    unsigned char a;
 
-    pos.dump(f);
-    size = f.get_position() - size;
-
-    euclide(size, BLOCK_SIZE, nbbit, reste);
-
-    if(reste != 0)
+    void terminateur::dump(generic_file & f)
     {
-	    // adding some non informational bytes to get a multiple of BLOCK_SIZE
-	S_I bourrage = reste % BLOCK_SIZE;
-	a = 0;
-	for(S_I i = bourrage; i < BLOCK_SIZE; i++)
-	    f.write((char *)&a, 1);
+        infinint size = f.get_position(), nbbit, reste;
+        S_I last_byte;
+        unsigned char a;
 
-	    // one more for remaing bytes and non informational bytes.
-	nbbit++;
+        pos.dump(f);
+        size = f.get_position() - size;
+
+        euclide(size, BLOCK_SIZE, nbbit, reste);
+ 
+        if(reste != 0)
+        {
+                // adding some non informational bytes to get a multiple of BLOCK_SIZE
+            S_I bourrage = reste % BLOCK_SIZE;
+            a = 0;
+            for(S_I i = bourrage; i < BLOCK_SIZE; i++)
+                f.write((char *)&a, 1);
+
+                // one more for remaing bytes and non informational bytes.
+            nbbit++;
+        }
+        
+        last_byte = nbbit % 8;
+        nbbit /= 8; // now, nbbit is the number of byte of terminator string (more or less 1)
+
+        if(last_byte != 0)
+        {                // making the last byte (starting eof) of the terminator string
+            a = 0;
+            for(S_I i = 0; i < last_byte; i++)
+            {
+                a >>= 1;
+                a |= 0x80;
+            }
+            f.write((char *)&a, 1);
+        }
+
+            // writing down all the other bytes of the terminator string
+        a = 0xff;
+        while(nbbit > 0)
+        {
+            f.write((char *)&a, 1);
+            nbbit--;
+        }
     }
 
-    last_byte = nbbit % 8;
-    nbbit /= 8; // now, nbbit is the number of byte of terminator string (more or less 1)
-
-    if(last_byte != 0)
-    {                // making the last byte (starting eof) of the terminator string
-	a = 0;
-	for(S_I i = 0; i < last_byte; i++)
-	{
-	    a >>= 1;
-	    a |= 0x80;
-	}
-	f.write((char *)&a, 1);
-    }
-
-	// writing down all the other bytes of the terminator string
-    a = 0xff;
-    while(nbbit > 0)
+    static void dummy_call(char *x)
     {
-	f.write((char *)&a, 1);
-	nbbit--;
+        static char id[]="$Id: terminateur.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $";
+        dummy_call(id);
     }
-}
 
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: terminateur.cpp,v 1.10 2003/02/11 22:02:00 edrusb Rel $";
-    dummy_call(id);
-}
-
-void terminateur::read_catalogue(generic_file & f)
-{
-    S_I offset = 0;
-    unsigned char a;
-
-    f.skip_to_eof();
-    try
+    void terminateur::read_catalogue(generic_file & f)
     {
-	    // reading & counting the terminator string
-	char b;
-	do
-	{
-	    if(f.read_back(b) != 1)
-		throw Erange("",""); // exception used locally
-	    a = (unsigned char)b;
-	    if(a == 0xFF)
-		offset++;
-	}
-	while(a == 0xFF);
-	offset *= 8; // offset is now a number of bits
+        S_I offset = 0;
+        unsigned char a;
 
-	    // considering the first non 0xFF byte of the terminator string (backward reading)
-	while(a != 0)
-	{
-	    if((a & 0x80) == 0)
-		throw Erange("","");
-	    offset++;
-	    a <<= 1;
-	}
+        f.skip_to_eof();
+        try
+        {
+                // reading & counting the terminator string
+            char b;
+            do
+            {
+                if(f.read_back(b) != 1)
+                    throw Erange("",""); // exception used locally
+                a = (unsigned char)b;
+                if(a == 0xFF)
+                    offset++;
+            }
+            while(a == 0xFF);
+            offset *= 8; // offset is now a number of bits
 
-	offset *= BLOCK_SIZE; // offset is now the byte offset of the position start
-	    // now we know where is located the position structure pointing to the start of the catalogue
-	if(offset < 0)
-	    throw SRC_BUG; // signed int overflow
+                // considering the first non 0xFF byte of the terminator string (backward reading)
+            while(a != 0)
+            {
+                if(a & 0x80 == 0)
+                    throw Erange("","");
+                offset++;
+                a <<= 1;
+            }
 
-	    // skipping the start of "location"
-	if(! f.skip_relative(-offset))
-	    throw Erange("","");
+            offset *= BLOCK_SIZE; // offset is now the byte offset of the position start
+                // now we know where is located the position structure pointing to the start of the catalogue
+            if(offset < 0)
+                throw SRC_BUG; // signed int overflow
+
+                // skipping the start of "location"
+            if(! f.skip_relative(-offset))
+                throw Erange("","");
+        }
+        catch(Erange &e)
+        {
+            throw Erange("terminateur::get_catalogue", "badly formated terminator, can't extract catalogue location");
+        }
+
+            // reading and returning the position
+        pos = infinint(NULL, &f);
     }
-    catch(Erange &e)
-    {
-	throw Erange("terminateur::get_catalogue", "badly formated terminator, can't extract catalogue location");
-    }
 
-	// reading and returning the position
-    pos.read_from_file(f);
-}
+} // end of namespace

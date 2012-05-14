@@ -18,168 +18,187 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.cpp,v 1.10 2003/02/11 22:02:11 edrusb Rel $
+// $Id: tronc.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #pragma implementation
 
-#include "tronc.hpp"
+#include "../my_config.h"
+
+#if STDC_HEADERS
+# include <string.h>
+#else
+# if !HAVE_STRCHR
+#  define strchr index
+#  define strrchr rindex
+# endif
+char *strchr (), *strrchr ();
+# if !HAVE_MEMCPY
+#  define memcpy(d, s, n) bcopy ((s), (d), (n))
+#  define memmove(d, s, n) bcopy ((s), (d), (n))
+# endif
+#endif
+
+#if HAVE_ERRNO_H
 #include <errno.h>
-#include <string.h>
+#endif
 
-tronc::tronc(generic_file *f, const infinint & offset, const infinint &size) : generic_file(f->get_mode())
+#include "tronc.hpp"
+
+namespace libdar
 {
-    ref = f;
-    sz = size;
-    start = offset;
-    current = size; // forces skipping the first time
-}
 
-tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(mode)
-{
-    ref = f;
-    sz = size;
-    start = offset;
-    current = size; // forces skipping the firt time
-}
-
-bool tronc::skip(const infinint & pos)
-{
-    if(current == pos)
-	return true;
-
-    if(pos > sz)
+    tronc::tronc(generic_file *f, const infinint & offset, const infinint &size) : generic_file(f->get_mode())
     {
-	current = sz;
-	ref->skip(start + sz);
-	return false;
-    }
-    else
-    {
-	current = pos;
-	return ref->skip(start + pos);
-    }
-}
-
-bool tronc::skip_to_eof()
-{
-    current = sz;
-    return ref->skip(start + sz);
-}
-
-bool tronc::skip_relative(S_I x)
-{
-    if(x < 0)
-    {
-	if(current < -x)
-	{
-	    ref->skip(start);
-	    current = 0;
-	    return false;
-	}
-	else
-	{
-	    bool r = ref->skip_relative(x);
-	    if(r)
-		current -= -x;
-	    else
-	    {
-		ref->skip(start);
-		current = 0;
-	    }
-	    return r;
-	}
+        ref = f; 
+        sz = size;
+        start = offset;
+        current = size; // forces skipping the first time
     }
 
-    if(x > 0)
+    tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(mode)
     {
-	if(current + x >= sz)
-	{
-	    current = sz;
-	    ref->skip(start+sz);
-	    return false;
-	}
-	else
-	{
-	    bool r = ref->skip_relative(x);
-	    if(r)
-		current += x;
-	    else
-	    {
-		ref->skip(start+sz);
-		current = sz;
-	    }
-	    return r;
-	}
+        ref = f; 
+        sz = size;
+        start = offset;
+        current = size; // forces skipping the firt time
     }
 
-    return true;
-}
-
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: tronc.cpp,v 1.10 2003/02/11 22:02:11 edrusb Rel $";
-    dummy_call(id);
-}
-
-S_I tronc::inherited_read(char *a, size_t size)
-{
-    infinint avail = sz - current;
-    U_32 macro_pas = 0, micro_pas;
-    U_32 lu = 0;
-    S_I ret;
-
-    do
+    bool tronc::skip(const infinint & pos)
     {
-	avail.unstack(macro_pas);
-	micro_pas = size - lu > macro_pas ? macro_pas : size - lu;
-	if(micro_pas > 0)
-	{
-	    ret = ref->read(a+lu, micro_pas);
-	    if(ret > 0)
-	    {
-		lu += ret;
-		macro_pas -= ret;
-	    }
-	    if(ret < 0)
-		throw Erange("tronc::inherited_read", strerror(errno));
-	}
-	else
-	    ret = 0;
+        if(current == pos)
+            return true;
+
+        if(pos > sz)
+        {
+            current = sz;
+            ref->skip(start + sz);
+            return false;
+        }
+        else
+        {
+            current = pos;
+            return ref->skip(start + pos);
+        }
     }
-    while(ret > 0);
-    current += lu;
 
-    return lu;
-}
-
-S_I tronc::inherited_write(const char *a, size_t size)
-{
-    infinint avail = sz - current;
-    U_32 macro_pas = 0, micro_pas;
-    U_32 wrote = 0;
-    S_I ret;
-
-    ref->skip(start + current);
-    do
+    bool tronc::skip_to_eof()
     {
-	avail.unstack(macro_pas);
-	if(macro_pas == 0 && wrote < size)
-	    throw Erange("tronc::inherited_write", "tried to write out of size limited file");
-	micro_pas = size - wrote > macro_pas ? macro_pas : size - wrote;
-	ret = ref->write(a+wrote, micro_pas);
-	if( ret > 0)
-	{
-	    wrote += ret;
-	    macro_pas -= ret;
-	}
-	if(ret < 0)
-	    throw Erange("tronc::inherited_write", strerror(errno));
+        current = sz;
+        return ref->skip(start + sz);
     }
-    while(ret > 0);
-    current += wrote;
 
-    return wrote;
-}
+    bool tronc::skip_relative(S_I x)
+    {
+        if(x < 0)
+            if(current < -x)
+            {
+                ref->skip(start);
+                current = 0;
+                return false;
+            }
+            else
+            {
+                bool r = ref->skip_relative(x); 
+                if(r)
+                    current -= -x;
+                else
+                {
+                    ref->skip(start);
+                    current = 0;
+                }
+                return r;
+            }
+    
+        if(x > 0)
+            if(current + x >= sz)
+            {
+                current = sz;
+                ref->skip(start+sz);
+                return false;
+            }
+            else
+            {
+                bool r = ref->skip_relative(x);
+                if(r)
+                    current += x;
+                else
+                {
+                    ref->skip(start+sz);
+                    current = sz;
+                }
+                return r;
+            }
+
+        return true;
+    }
+
+
+    static void dummy_call(char *x)
+    {
+        static char id[]="$Id: tronc.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $";
+        dummy_call(id);
+    }
+
+    S_I tronc::inherited_read(char *a, size_t size)
+    {
+        infinint avail = sz - current;
+        U_32 macro_pas = 0, micro_pas;
+        U_32 lu = 0;
+        S_I ret;
+
+        do
+        {
+            avail.unstack(macro_pas);
+            micro_pas = size - lu > macro_pas ? macro_pas : size - lu;
+            if(micro_pas > 0)
+            {
+                ret = ref->read(a+lu, micro_pas);
+                if(ret > 0)
+                {
+                    lu += ret;
+                    macro_pas -= ret;
+                }
+                if(ret < 0)
+                    throw Erange("tronc::inherited_read", strerror(errno));
+            }
+            else
+                ret = 0;
+        }
+        while(ret > 0);
+        current += lu;
+
+        return lu;
+    }
+
+    S_I tronc::inherited_write(char *a, size_t size)
+    {
+        infinint avail = sz - current;
+        U_32 macro_pas = 0, micro_pas;
+        U_32 wrote = 0;
+        S_I ret;
+
+        ref->skip(start + current);
+        do
+        {
+            avail.unstack(macro_pas);
+            if(macro_pas == 0 && wrote < size)
+                throw Erange("tronc::inherited_write", "tried to write out of size limited file");
+            micro_pas = size - wrote > macro_pas ? macro_pas : size - wrote;
+            ret = ref->write(a+wrote, micro_pas);
+            if( ret > 0)
+            {
+                wrote += ret;
+                macro_pas -= ret;
+            }
+            if(ret < 0)
+                throw Erange("tronc::inherited_write", strerror(errno));
+        }
+        while(ret > 0);
+        current += wrote;
+    
+        return wrote;
+    }
+
+} // end of namespace

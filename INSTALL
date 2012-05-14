@@ -1,139 +1,98 @@
 
 
-                          I N S T A L L A T I O N 
+                          I N S T A L L A T I O N
 
                           I N S T R U C T I O N S
 
 
-	SUMMARY
+        SUMMARY
+        =======
+
+                 I   _ installation from RPM binary package
+                 II  _ installation from sources
+                 III _ installation from binary package for windows
 
 
-This document tells you how to compile and install from sources for Linux,
-and Windows (using Cygwin). For RPM packages, install as any other package 
-(see rpm man page and documentation). A note is given at the end for the 
-somehow experimental binary package for Windows.
+        I _ INSTALLATION FROM RPM
+        ==========================
+
+For RPM packages, install as any other package (see rpm man page and
+relative documentation).
 
 
+        II _ INSTALLATION FROM SOURCES
+        ==============================
 
-	REQUIREMENTS
+        REQUIREMENTS
 
-You need a c++ compiler (source tested with gcc)
-zlib must be installed (at least version 1.1.3, but 1.1.4 is recommended),
-as well as libbzip2 (tester with version 1.0.2, more recent should also work).
+You need to have installed:
+- c++ compiler (supported compiler range from gcc-2.95.3 to gcc-3.3.1)
+- zlib must be installed (at least version 1.1.3, but 1.1.4 is recommended),
+  see http://www.gzip.org/zlib/ for source code,
+- as well as libbzip2 (tested with version 1.0.2, more recent should also work)
+  see http://sources.redhat.com/bzip2/ for source code.
 
 
+1. configure the package using the configuration script:
 
-	INSTALLATION FOR LINUX
+        ./configure [options...]
 
-1. First edit the Makefile to suite your needs 
-      * change INSTALL_ROOT_DIR 
-	if you don't want to install dar binary in /usr/local/bin
-	man pages in /usr/local/man
-	and documentations in /usr/local/doc/dar-<version>
-      * uncomment EA_SUPPORT if your platform supports extended attributes
-      * uncomment FILEOFFSET if you need support for large files
-      * uncomment USE_NODUMP_FEATURE if you have ext2 or 3 filesystem and want
-        to activate the --nodump option
-      * comment out USE_SYS_SIGLIST if you are going to compile under Cygwin
-      * for Cygwin, you will probably need to uncomment one of the OS_BITS
-        because the <stdint.h> header may be missing in the distro. Try first
-	without change, then try uncomment OS_BITS that match you system 
-	(most system are still actually 32 bits).
-      * if you need a special compiler set CXX and CC accordingly
-    NOTE that there will be one day a "configure" script, which will simplify
-    this setup step 1. (This is in the pipe for version 2.0.0 see CVS)
 
-2. you will need to compile it:
+check the doc/configure_options document to have the list of options and
+which are supported on which system.
 
-	make
 
-3. As root install it with
-	
-	make install
+2. then you need to compile:
 
-(This will install the dar suite binaries as well as their manual page).
+        make
 
-4. and if you want documentation installed
-	
-	make install-doc
 
-(This will install TUTORIAL, README, NOTES, etc.)
+3. As root install it with:
+        
+        make install-strip
 
-Optionally:
------------
-
-To uninstall: (also uninstalls doc if it was installed)
-
-	make uninstall
-
-To clean the package source tree after compilation:
-	
-	make clean
-
-If you want to debug dar's "infinint" integers or just get all factorial digits
-of a given number use the factoriel program:
-
-first compile it:
-
-	make factoriel
-
-Then to use factoriel:
-
-	./factoriel 100
-
-	The argument is a decimal number as huge as you want, all 
-	depends on the time you want to spend to compute the decimal 
-	representation of the factorial ("n!" in math).
-
-If you have planed to debug, you can build the several test programs 
-aimed to quite each module. They are to be used with a debugger for 
-step by step execution, not as fail/pass tests. Moreover some of them might now
-be obsolete:
-
-	make test
+This will install the dar suite binaries, libdar library and include files
+as well as their manual page, sample programs, if built, are never installed.
+'make install' also works be makes bigger binaries as they keep their symbol
+table, which is not useful for normal operations.
 
 
 
-
-	INSTALLATION FOR WINDOWS FROM SOURCES
-
-
-the compilation requires Cygwin ( http://cygwin.com/ ) 
-"Cygwin is a UNIX environment, developed by Red Hat, for Windows"
-you need from Cygwin the "gcc", "make" and "zlib" packages at least. If you
-need to edit the Makefile, install a text editor (such as vi or vim).
-Then, all steps described above for Linux apply here. And read the note at 
-the end of this file !
+        III _ INSTALLATION FOR WINDOWS FROM BINARY PACKAGE
+        ==================================================
 
 
-
-	INSTALLATION FOR WINDOWS FROM BINARY PACKAGE
-
-the binary package is a *.tgz file (thus you need winzip to unpack it). 
+the binary package is a *.zip file (thus you need winzip to unpack it).
 It contains a subdirectory (named dar) you will have to extract where you
-want in your directory tree.  
+want in your directory tree.
 Optionally you can add the path to dar in the PATH variable in autoexec.bat.
 Considering dar has been extracted under C:\dar you can add the following line
 in autoexec.bat:
 
-	set PATH=%PATH%;C:\Dar
+        set PATH=%PATH%;C:\Dar
 
-then you have to reboot. 
+then you have to reboot.
 (Just kidding ! This was to respect the Windows usage and way of life ;-) )
 
-Else if you don't setup the PATH variable, you need to specify the full 
+Else if you don't setup the PATH variable, you need to specify the full
 path to dar executables to use them from the Windows command-line prompt.
-Read the note below !
 
-	IMPORTANT NOTE FOR USE UNDER CYGWIN !
+
+        IMPORTANT NOTE !
 
 Note that path given to dar suite's program must respect the UNIX way (use
-slashes "/" not back slashes "\") thus you have to have to use c:/temp in 
+slashes "/" not back slashes "\") thus you have to have to use c:/temp in
 place of c:\temp for example.
 
+example:
 
+        c:\dar_win-1.2.1\dar -c f:/tmp/toto -s 2G -z1 -R "c:/My Documents"
 
-
-
-
+          ^             ^         ^   ^                     ^
+          |             |         |   |                     |
+          ---------------         ---------------------------
+        here use anti-slash         but here we use slash
+        as usually under           in arguments given to dar
+        windows to point
+        the command
 

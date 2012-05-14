@@ -1,19 +1,26 @@
 TODO (order is not significant)
 ===========
-- API for Graphical User Interface(s)
-- libdar library (thread safe)
+- libdar library thread safe
+- libdar API version 2 (see doc/ DOC_API)
 - multi-language support (selection at compilation time)
-- bootable Linux image with what's necessary to restore a system from a dar
-  archive
-- change the packaging to have a "configure" script (thanks to Tim Doerzbacher)
-- rethink the behaviour of dar when virtual memory is exhausted 
+- rethink the behavior of dar when virtual memory is exhausted
   (do not fail stop asking the user whether to retry or stop, thus the routine
-   must not need extra memory to work) 
-- make light limited version of dar_suite, based over 64 bits integers
-- have wilde card for -f and -r options of dar_manager
-- standart batch options examples (non compressible file extensions, etc).
-- avoid cursor key to be considered as escape key.
-- add a FEC or similar layer for data recovery.
-? infinint.cpp  read_from_file(S_I <-> int)
-? remove the information of command line used for backup, put a developped list (from included files) before running.
-- consider a FEC algo to use bellow class sar (to protect slice header from medium error).
+   must not need extra memory to work)
+- have wild card for -f and -r options of dar_manager
+- check the apache "Order" directive for command-line more grained inclusion/exclusion mechanism
+- add a global compression ratio displayed with -v -l option (computed once for all during creation).
+- add a 'testing' option for dar_manager's databases
+- redesign libdar API with open/close paradigm (see Notes)
+- have the possibility to define a given compression algo + level by file type
+- have several -B option which are called in order
+- add EA support for xfs filesystem
+- add KiB and KB
+- code review for constructor use in initialization
+- add link to mini-howto in documentation
+- add long-options under Solaris and on other system that do not provide it.
+- add new option to remove *all* user interaction (see support request) -Q option.
+- add an option to remove *all* un-necessary messages (not warning ones) -q option.
+- allow root directory to be a symbolic link to a directory
+- add an option to list only saved files of an archive
+- have -E be executed even without slicing when creating an archive
+- documentation of tools.hpp beside API documentation

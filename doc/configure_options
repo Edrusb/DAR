@@ -1,0 +1,103 @@
+
+        C O N F I G U R E   S C R I P T
+            U S E R   O P T I O N S
+
+
+Here are presented the various command-line option for the configure script.
+For an exhaustive list use:
+
+        ./configure --help
+
+General Options:
+
+        --prefix=<path>    which allows you to define where dar program will
+                           be installed (/usr/local by default)
+        --disable-static   do not build static library (activated by default)
+        --disable-shared   do not build dynamic library (activated by default)
+
+Dar specific options:
+They take the form of --enable-xxx or --disable-xxx where xxx is the name of
+the feature. Some features need an argument, which must be provided this way:
+
+        --enable-os-bits=32
+
+some features are activated by default, thus the --enable-xxx form is useless,
+the --disable-xxx has to be used instead to overcome the default settings.
+
+to simplify the document each option will be referred by a letter, those
+preceded by a 'x' are activated by default:
+
+x A ...... largefile
+  B ...... ea-support
+x C ...... nodump-flag
+  D ...... examples
+  E ...... os-bits
+x F ...... dar-static
+  G ...... mode
+x H ...... special-alloc
+  I ...... debug
+  J ...... pedantic
+  K ...... build-usage
+  L ...... test-memory
+x M ...... upx
+
+I, J, K and L are debugging options and should not be used for normal use.
+
+A : if set and if the system allows it, dar will be able to handle file of
+    size larger than 4GB
+B : if set, makes dar ready to save and restore Extended Attributes
+    (see doc/NOTES paragraphs I and V)
+C : if set, makes dar able to take care of the nodump-flag
+    (activates the dar's --nodump option)
+D : if set, example program based on infinint are also built
+E : if set, dar uses the given argument (32 or 64) to determine which integer
+    type to use. This much match your CPU register size. By default dar uses
+    the system stdint.h file to determine the correct integer type to use
+F : if set, builds dar_static binary (statically linked version of dar)
+G : if set, replace infinint by 32 or 64 bits integers. This makes a faster
+    executable and less fond of memory, but with several restrictions (about
+    for example ability to handle large files, or high dates, etc.),
+H : if set, use special memory allocation, adapted when a lot of little piece
+    of memory are allocated (improves dar's executable speed)
+I : if set, use debug compilation option, and if possible statically link
+    binaries
+J : if set, transmits the -pedantic option to the compiler
+K : if set, rebuild usage files (requires libxml2)
+L : if set, wrap memory allocation routine to track memory leakage (makes a
+    very slow executable)
+M : if set, look for UPX command, and if found compresses library and executables, if no upx is found, does the same as if the option is not given.
+
+
+For version 2.0.0
+-------------------------
+legend: ! = option available for that system
+        . = option Not available for that system
+(free inspiration from the Cisco ping command output)
+
+ System \ option   |  A B C D E F G H I J K L M
+ enable by default: |  x   x     x   x         x
+------------------------------------------------
+Linux              |  ! ! ! ! ! ! ! ! ! ! ! ! ! long options supported
+Solaris 8          |  ! . . ! ! . ! ! ! ! ! ! ! long options NOT supported 
+FreeBSD            |  ! . . ! ! . ! ! ! ! ! ! ! long options NOT supported
+Cygwin             |  ! . . ! ! . ! ! ! ! ! ! ! long options supported
+
+
+Consequences:
+
+For Linux
+----------
+No restrictions, no necessary options
+
+        ./configure [...]
+
+
+For Solaris FreeBSD and Cygwin,
+---------------
+configure will detect that two options cannot be activated (C and F) and
+thus will just show a warning. On theses system,
+
+        ./configure [...]
+is equivalent to
+        ./configure --disable-nodump-flag --disable-dar-static [...]
+both work the same.

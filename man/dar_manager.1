@@ -1,48 +1,48 @@
-.TH DAR_MANAGER 1 "SEPT 13, 2002"
+.TH DAR_MANAGER 1 "JUL 19, 2003"
 .UC 8
 .SH NAME
 dar_manager \- disk archive manager
 .SH SYNOPSIS
-.B dar_manager -C [<path>/]<database>
+.B dar_manager [-v] -C [<path>/]<database>
 .P
-.B dar_manager -B [<path>/]<database> -A [<path>/]<basename> [[<path>/]<archive_basename>]
+.B dar_manager [-v] -B [<path>/]<database> -A [<path>/]<basename> [[<path>/]<archive_basename>]
 .P
-.B dar_manager -B [<path>/]<database> -l
+.B dar_manager [-v] -B [<path>/]<database> -l
 .P
-.B dar_manager -B [<path>/]<database> -D <number>
+.B dar_manager [-v] -B [<path>/]<database> -D <number>
 .P
-.B dar_manager -B [<path>/]<database> -b <number> <new_archive_basename>
+.B dar_manager [-v] -B [<path>/]<database> -b <number> <new_archive_basename>
 .P
-.B dar_manager -B [<path>/]<database> -p <number> <path>
+.B dar_manager [-v] -B [<path>/]<database> -p <number> <path>
 .P
-.B dar_manager -B [<path>/]<database> -o [list of options to pass to dar]
+.B dar_manager [-v] -B [<path>/]<database> -o [list of options to pass to dar]
 .P
-.B dar_manager -B [<path>/]<database> -d [<path to dar command>]
+.B dar_manager [-v] -B [<path>/]<database> -d [<path to dar command>]
 .P
-.B dar_manager -B [<path>/]<database> -r [list of files to restore]
+.B dar_manager [-v] -B [<path>/]<database> -r [list of files to restore]
 .P
-.B dar_manager -B [<path>/]<database> -u <number>
+.B dar_manager [-v] -B [<path>/]<database> -u <number>
 .P
-.B dar_manager -B [<path>/]<database> -f file
-.P 
-.B dar_manager -B [<path>/]<database> -s 
+.B dar_manager [-v] -B [<path>/]<database> -f file
 .P
-.B dar_manager -B [<path>/]<database> -m <number> <number>
+.B dar_manager [-v] -B [<path>/]<database> -s
+.P
+.B dar_manager [-v] -B [<path>/]<database> -m <number> <number>
 .P
 .B dar_manager -h
 .P
 .B dar_manager -V
 .P
 .SH DESCRIPTION
-.B dar_manager 
+.B dar_manager
 is part of the Disk Archive suite. Its purpose is to simplify the restoration of a few files over many backup, full or differential. This is achieved by gathering the catalogue of each archive (this has to be done once). At any time you just have to give the relative path to the files you want to restore, dar_manager will call dar with proper options and restore the last version of each file.
 .PP
 you can restore any file by hand without
 .B dar_manager
 , but if you make a lot of differential backup, you may spend many time to find the archive that contains the last version of your file, as dar will not save it if it has not changed since previous backup.
-.B 
+.B
 dar_manager
-simplify the process by looking in its internal database, built from archive "catalogues". 
+simplify the process by looking in its internal database, built from archive "catalogues".
 .RE
 .SH OPTIONS
 .RS
@@ -53,15 +53,15 @@ creates an empty database that will collect informations about several archives.
 -B, --base [<path>/]<database>
 specify the database to read or modify. The <database> file must exist, and have a database structure (see -C option).
 .TP 20
--A, --add [<path>/]<basename> [<archive_basename>] 
-add an archive to the database. An isolated catalogue can also be used only if it has been produced by dar version 1.2.0 or above. Why ? Because, an isolated catalogue produced by older version will always tell that no files are saved in the archive of reference, in that case the solution is to provide the archive itself as argument. An optional second argument is the basename of the archive if it is different from the first argument (need for extraction of files). For example you could have an isolated catalogue in first argument and the basename of the original archive (where is stored the data) as second argument. By default, 
+-A, --add [<path>/]<basename> [[<path>/]<archive_basename>]
+add an archive to the database. An isolated catalogue can also be used only if it has been produced by dar version 1.2.0 or above. Why ? Because, an isolated catalogue produced by older version will always tell that no files are saved in the archive of reference, in that case the solution is to provide the archive itself as argument. An optional second argument is the basename of the archive if it is different from the first argument (need for extraction of files). For example you could have an isolated catalogue in first argument and the basename of the original archive (where is stored the data) as second argument. By default,
 .B dar_manager
 will look for an archive of reference in the command line used to create each archive, but in some cases, it may be necessary to specify the archive name (for example if you've changed its name).
 .TP 20
 -l, --list
 displays the informations about the archives compiled in the database. In particular, a number is given to each archive, which is required to some other option to design a particular archive within the database. Nothing avoids you to feed the database with several archive of the same basename ! You will just have to guess which one is asked under this name. :-)
 .TP 20
--D, --delete <number> 
+-D, --delete <number>
 removes an archive from the database. The number of the archive is given by the -l option. Note that all archive number greater than the one to be delete will be decremented by one. This keeps the order of the archive, in regards to time they have been added (-A option) to the database.
 .TP 20
 -b, --base <number> <new_archive_basename>
@@ -71,18 +71,18 @@ this option allows you to rename the archive basename (used when restoring files
 this option allows you to change the location of a given archive (used when restoring files from it)
 .TP 20
 -o, --options [list of option to pass to dar]
-Specify the option to use when calling dar. Each call erases the previous setting. Possible 
+Specify the option to use when calling dar. Each call erases the previous setting. Possible
 .B dar
-options are all the available ones except "-x"  and simple arguments (the [list of path]) which will be added by 
+options are all the available ones except "-x"  and simple arguments (the [list of path]) which will be added by
 .B dar_manager
 itself.
 .TP 20
 -d, --dar [<path>]
 Set the path to dar. If no argument is given, dar is expected to be located in the PATH
 .TP 20
--r, --restore [ist of files to restore]
+-r, --restore [list of files to restore]
 .B dar_manager
-will restore all (an only) the given files, asking for the proper archive only. Last version of each file over several archive is based on the modification time of the inode, thus if you have a more recent backup that contains an old version of a given file, a older archive could be used to restore the file, if its last modification time (mtime) is more recent. 
+will restore all (an only) the given files, asking for the proper archive only. Last version of each file over several archive is based on the modification time of the inode, thus if you have a more recent backup that contains an old version of a given file, a older archive could be used to restore the file, if its last modification time (mtime) is more recent.
 Note that files listed after -r option, must never have an absolute path. They will be restored under the directory specified with -R option of dar (thus using -o option), or by default, in subdirectories of the current directory.
 .TP 20
 -u, --used [<number>]
@@ -95,11 +95,14 @@ displays in which archive the given file is saved, and what are the modification
 show the number of most recent files by archive. This helps to determine which archive can be safely removed from the database.
 .TP 20
 -m, --move <number> <number>
-changes the ordrer of archives in the database. The first number is the number of the archive to move, while the second is the place where it must be shifted.
+changes the order of archives in the database. The first number is the number of the archive to move, while the second is the place where it must be shifted.
 
-Archvie order is important only in the case a file to be restored has EA that has been saved in an archive and data saved in another archive. This takes place when making a differential backup for file that have no change in data but changes in EA. In that case, the database must be feeded (-A option) with archive in the order they have been created. If 
+Archie order is important only in the case a file to be restored has EA that has been saved in an archive and data saved in another archive. This takes place when making a differential backup for file that have no change in data but changes in EA. In that case, the database must be fed (-A option) with archive in the order they have been created. If
 .B dar_manager
-detects such a desorder, it issues a warning is giving the name of the file that could not be restored properly (only EA have not been restored with the last version). Note that, if you don't use EA the ordrer of archives in the database has no importance. 
+detects such a disorder, it issues a warning is giving the name of the file that could not be restored properly (only EA have not been restored with the last version). Note that, if you don't use EA the order of archives in the database has no importance.
+.TP 20
+-v, --verbose
+displays additional information about what it is doing.
 .TP 20
 -h, --help
 display help usage
@@ -115,23 +118,29 @@ exits with the following code:
 Operation successful.
 .TP 10
 1
-Syntax error on command-line.
+see dar manual page for signification
 .TP 10
 2
-Error due to a hardware problem or a lack of memory.
+see dar manual page for signification
 .TP 10
 3
-Detection of a condition that should never happen, and which is considered as a bug of the application.
+see dar manual page for signification
+.TP 10
+7
+see dar manual page for signification
+.TP 10
+8
+see dar manual page for signification
 .TP 10
 11 and above
-.B dar
+.B dar called from dar_manager
 has exited with non zero status. Substract 10 to this exit code to get dar's exit code.
 
 .SH SEE ALSO
-dar(1), dar_xform(1), dar_slave(1)
+dar(1), dar_xform(1), dar_slave(1), dar_cp(1)
 
 .SH LIMITATIONS
-at most 65534 archives can be compiled in a given database, which should be enought for most users.
+at most 65534 archives can be compiled in a given database, which should be enough for most users.
 
 .SH KNOWN BUGS
 none actually

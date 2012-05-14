@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.hpp,v 1.6 2003/02/11 22:02:15 edrusb Rel $
+// $Id: zapette.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -28,44 +28,50 @@
 
 #pragma interface
 
+#include "../my_config.h"
 #include "generic_file.hpp"
 #include "integers.hpp"
 
-class zapette: public generic_file
+namespace libdar
 {
-public:
 
-    zapette(generic_file *input, generic_file *output);
-    ~zapette();
+    class zapette: public generic_file
+    {
+    public:
 
-	// inherited methods
-    bool skip(const infinint &pos);
-    bool skip_to_eof() { position = file_size; return true; };
-    bool skip_relative(S_I x);
-    infinint get_position() { return position; };
+        zapette(generic_file *input, generic_file *output);
+        ~zapette();
 
-protected:
-    S_I inherited_read(char *a, size_t size);
-    S_I inherited_write(const char *a, size_t size);
+            // inherited methods
+        bool skip(const infinint &pos);
+        bool skip_to_eof() { position = file_size; return true; };
+        bool skip_relative(S_I x);
+        infinint get_position() { return position; };
 
-private:
-    generic_file *in, *out;
-    infinint position, file_size;
-    char serial_counter;
+    protected:
+        S_I inherited_read(char *a, size_t size);
+        S_I inherited_write(char *a, size_t size);
 
-    void make_transfert(U_16 size, const infinint &offset, char *data, S_I & lu, infinint & arg);
-};
+    private:
+        generic_file *in, *out;
+        infinint position, file_size;
+        char serial_counter;
 
-class slave_zapette
-{
-public:
-    slave_zapette(generic_file *input, generic_file *output, generic_file *data);
-    ~slave_zapette();
+        void make_transfert(U_16 size, const infinint &offset, char *data, S_I & lu, infinint & arg);
+    };
 
-    void action();
+    class slave_zapette
+    {
+    public:
+        slave_zapette(generic_file *input, generic_file *output, generic_file *data);
+        ~slave_zapette();
 
-private:
-    generic_file *in, *out, *src;
-};
+        void action();
+    
+    private:
+        generic_file *in, *out, *src;
+    };
+
+} // end of namespace
 
 #endif

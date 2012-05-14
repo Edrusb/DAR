@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.hpp,v 1.11 2003/03/02 10:58:47 edrusb Rel $
+// $Id: sar.hpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -33,98 +33,111 @@
 #include "path.hpp"
 #include "integers.hpp"
 
-#define SAR_OPT_DEFAULT (SAR_OPT_WARN_OVERWRITE)
-#define SAR_OPT_WARN_OVERWRITE 0x01
-#define SAR_OPT_DONT_ERASE 0x02
-#define SAR_OPT_PAUSE 0x04
+#define SAR_CONTEXT_INIT "init"
+#define SAR_CONTEXT_OP   "operation"
 
-class sar : public generic_file
+namespace libdar
 {
-public:
-    sar(const string & base_name, const string & extension, S_I options, const path & dir, const string & execute = "");
-    sar(const string & base_name, const string & extension, const infinint & file_size, const infinint & first_file_size, S_I options, const path & dir, const string & execute = "");
-    ~sar();
+    const int SAR_OPT_WARN_OVERWRITE = 0x01;
+    const int SAR_OPT_DONT_ERASE     = 0x02;
+    const int SAR_OPT_PAUSE          = 0x04;
+    const int SAR_OPT_DEFAULT = SAR_OPT_WARN_OVERWRITE;
 
-	// inherited from generic_file
-    bool skip(const infinint &pos);
-    bool skip_to_eof();
-    bool skip_relative(S_I x);
-    infinint get_position();
+    class sar : public generic_file
+    {
+    public:
+        sar(const std::string & base_name, const std::string & extension, S_I options, const path & dir, const std::string & execute = "");
+        sar(const std::string & base_name, const std::string & extension, const infinint & file_size, const infinint & first_file_size, S_I options, const path & dir, const std::string & execute = "");
+        ~sar();
 
-	// informational routines
-    infinint get_sub_file_size() const { return size; };
-    infinint get_first_sub_file_size() const { return first_size; };
-    bool get_total_file_number(infinint &num) const { num = of_last_file_num; return of_last_file_known; };
-    bool get_last_file_size(infinint &num) const { num = of_last_file_size; return of_last_file_known; };
+            // inherited from generic_file
+        bool skip(const infinint &pos);
+        bool skip_to_eof();
+        bool skip_relative(S_I x);
+        infinint get_position();
 
-protected :
-    S_I inherited_read(char *a, size_t sz);
-    S_I inherited_write(const char *a, size_t sz);
+            // informational routines
+        infinint get_sub_file_size() const { return size; };
+        infinint get_first_sub_file_size() const { return first_size; };
+        bool get_total_file_number(infinint &num) const { num = of_last_file_num; return of_last_file_known; };
+        bool get_last_file_size(infinint &num) const { num = of_last_file_size; return of_last_file_known; };
+        
+        void set_info_status(std::string s) { status = s; };
+        std::string get_info_status() const { return status; };
 
-private :
-    path archive_dir;
-    string base, ext;
-    string hook;
-    infinint size;
-    infinint first_size;
-    infinint first_file_offset;
-    infinint file_offset;
+    protected :
+        S_I inherited_read(char *a, size_t sz);
+        S_I inherited_write(char *a, size_t sz);
 
-	// theses following variables are modified by open_file
-	// else the are used only for reading
-    infinint of_current;
-    infinint of_max_seen;
-    bool of_last_file_known;
-    infinint of_last_file_num;
-    infinint of_last_file_size;
-    label of_internal_name;
-    fichier *of_fd;
-    char of_flag;
-    bool initial;
+    private :
+        path archive_dir;
+        std::string base, ext;
+        std::string hook;
+        infinint size;
+        infinint first_size;
+        infinint first_file_offset;
+        infinint file_offset;
+        std::string status;
 
-	// theses are the option flags
-    bool opt_warn_overwrite;
-    bool opt_dont_erase;
-    bool opt_pause;
+        bool natural_destruction;
 
-    bool skip_forward(U_I x);
-    bool skip_backward(U_I x);
-    void close_file();
-    void open_readonly(char *fic, const infinint &num);
-    void open_writeonly(char *fic, const infinint &num);
-    void open_file_init();
-    void open_file(infinint num);
-    void set_options(S_I opt);
-    void set_offset(infinint offset);
-    void open_last_file();
-    header make_write_header(const infinint &num, char flag);
+            // theses following variables are modified by open_file
+            // else the are used only for reading
+        infinint of_current;
+        infinint of_max_seen;
+        bool of_last_file_known;
+        infinint of_last_file_num;
+        infinint of_last_file_size;
+        label of_internal_name;
+        fichier *of_fd;
+        char of_flag;
+        bool initial;
 
-	// hook to attach a command to execute after each slice
-    string hook_substitute(const string & path, const string & basename, const string & num);
-    void hook_execute(const infinint &num);
-};
+            // theses are the option flags
+        bool opt_warn_overwrite;
+        bool opt_dont_erase;
+        bool opt_pause;
+
+        bool skip_forward(U_I x);
+        bool skip_backward(U_I x);
+        void close_file();
+        void open_readonly(char *fic, const infinint &num);
+        void open_writeonly(char *fic, const infinint &num);
+        void open_file_init();
+        void open_file(infinint num);
+        void set_options(S_I opt);
+        void set_offset(infinint offset);
+        void open_last_file();
+        header make_write_header(const infinint &num, char flag);
+
+            // hook to attach a command to execute after each slice
+        std::string hook_substitute(const std::string & path, const std::string & basename, const std::string & num, const std::string & ext, const std::string & context);
+        void hook_execute(const infinint &num);
+    };
 
 
-class trivial_sar : public generic_file
-{
-public:
-    trivial_sar(generic_file *ref); // trivial_sar own the argument
-    ~trivial_sar() { if(reference != NULL) delete reference; };
+    class trivial_sar : public generic_file
+    {
+    public:
+        trivial_sar(generic_file *ref); // trivial_sar own the argument
+        ~trivial_sar() { if(reference != NULL) delete reference; };
 
-    bool skip(const infinint & pos) { return reference->skip(pos + offset); };
-    bool skip_to_eof() { return reference->skip_to_eof(); };
-    bool skip_relative(S_I x);
-    infinint get_position();
+        bool skip(const infinint & pos) { return reference->skip(pos + offset); };
+        bool skip_to_eof() { return reference->skip_to_eof(); };
+        bool skip_relative(S_I x);
+        infinint get_position();
 
-protected:
-    S_I inherited_read(char *a, size_t size) { return reference->read(a, size); };
-    S_I inherited_write(const char *a, size_t size) { return reference->write(a, size); };
+    protected:
+        S_I inherited_read(char *a, size_t size) { return reference->read(a, size); };
+        S_I inherited_write(char *a, size_t size) { return reference->write(a, size); };
+    
+    private:
+        generic_file *reference;
+        infinint offset;
+    };
 
-private:
-    generic_file *reference;
-    infinint offset;
-};
+    extern std::string sar_make_filename(std::string base_name, infinint num, std::string ext);
 
-extern string sar_make_filename(string base_name, infinint num, string ext);
+} // end of namespace
 
 #endif

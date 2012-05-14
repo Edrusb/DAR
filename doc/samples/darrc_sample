@@ -1,0 +1,54 @@
+######
+# this is an example of what could be a batch file
+# (given to -B option), a /etc/darrc and a $HOME/.darrc file
+# reminds that it is a simple example...
+#
+
+
+all:
+# make terminal bell when user action is requested
+-b
+
+create:
+# a list of file to not try to compress
+-X "*_all_*.*.dar"
+-X "*_diff_*.*.dar"
+-X "*_inc_*.*.dar"
+-Z "*.mpg"
+-Z "*.MPG"
+-Z "*.jpg"
+-Z "*.JPG"
+-Z "*.gz"
+-Z "*.tgz"
+-Z "*.bz2"
+-Z "*.tbz"
+-Z "*.mp3"
+-Z "*.mpeg"
+-Z "*.zip"
+-Z "*.dar"
+
+# create empty dir for excluded directories
+-D
+
+-R /
+
+# we don't save theses directories
+-P tmp
+-P var/tmp
+-P mnt
+-P proc
+-P dev/pts
+
+# here we say we don't want to save dar files
+-X "*.*.dar"
+
+# we pause before starting a new slices
+-p
+
+# and we use gzip compression
+-z
+
+default:
+# if no action is given then show the version
+# in place of the usage help
+-V

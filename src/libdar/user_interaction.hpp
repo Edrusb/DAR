@@ -18,28 +18,46 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.hpp,v 1.9 2003/02/11 22:02:12 edrusb Rel $
+// $Id: user_interaction.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #ifndef USER_INTERACTION_HPP
 #define USER_INTERACTION_HPP
 
+#include "../my_config.h"
 #include <string>
 
-using namespace std;
+namespace libdar
+{
 
-extern void user_interaction_init(ostream *out, ostream *interact);
-    // arg are the input file descriptor, output ostream object (on which are sent non interactive messages)
-    // and intereact ostream object on which are sent message that require a user interaction
-extern void user_interaction_change_non_interactive_output(ostream *out);
-extern void user_interaction_pause(string message);
-extern void user_interaction_warning(string message);
-extern ostream &user_interaction_stream();
-extern void user_interaction_set_beep(bool mode);
-extern void ui_printf(const char *format, ...);
-    // sometimes easier to use printf-like call than iostream (cout << etc.)
-    //////
-extern void user_interaction_close();
+        ///////////
+        // 2 call back function must be set before using this module
+        // the first callback is called by libdar to send a warning to the user
+        // the warning message is given in argument
+        // the seond callback is called by libdar to ask a question to the user
+        // the question is given in argument and the callback must return the
+        // user answer (true for yes/OK, false for no/NOK).
+        //
+        // theses two callback function must be given to libdar using the two
+        // following function which argument is the adresse of the callback function
+        //
+    extern void set_warning_callback(void (*callback)(const std::string &x));
+    extern void set_answer_callback(bool (*callback)(const std::string &x));
+
+
+	// the three following functions are used inside libdar and relies on the callback function
+	// set above
+    extern void user_interaction_pause(const std::string & message);
+    extern void user_interaction_warning(const std::string & message);
+
+	///////////////
+	// supported masks for the format
+	// %s %c %d %%  (normal behavior)
+	// %i (matches infinint *)
+	// %S (matches std::string *)
+    extern void ui_printf(char *format, ...);
+
+} // end of namespace
 
 #endif

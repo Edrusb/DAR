@@ -1,0 +1,2 @@
+SUBDIRS = man src doc misc
+dist_noinst_DATA = BUGS INSTALL README THANKS TODO AUTHORS COPYING ChangeLog NEWS

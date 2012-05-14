@@ -6,27 +6,31 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: testtools.cpp,v 1.11 2003/02/11 22:02:08 edrusb Rel $
+// $Id: testtools.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #include <iostream>
+
 #include "deci.hpp"
 #include "testtools.hpp"
 #include "user_interaction.hpp"
 #include "integers.hpp"
+
+using namespace libdar;
+using namespace std;
 
 void display(const infinint & x)
 {
@@ -40,9 +44,9 @@ void display_read(generic_file & f)
     char buffer[size];
     S_I lu = f.read(buffer, size);
     if(lu < size)
-	buffer[lu] = '\0';
+        buffer[lu] = '\0';
     else
-	buffer[size-1] = '\0';
+        buffer[size-1] = '\0';
     ui_printf("lu = %d : [%s]\n", lu, buffer);
 }
 
@@ -52,10 +56,10 @@ void display_back_read(generic_file & f)
     char buffer[size];
     S_I lu = 0;
     while(lu < size && f.read_back(buffer[lu]) == 1 )
-	lu++;
+        lu++;
     if(lu < size)
-	buffer[lu] = '\0';
+        buffer[lu] = '\0';
     else
-	buffer[size-1] = '\0';
+        buffer[size-1] = '\0';
     ui_printf("lu = %d : [%s]\n", lu, buffer);
 }

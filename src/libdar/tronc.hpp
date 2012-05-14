@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.hpp,v 1.10 2003/02/11 22:02:11 edrusb Rel $
+// $Id: tronc.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,27 +27,33 @@
 
 #pragma interface
 
+#include "../my_config.h"
 #include "generic_file.hpp"
 
-class tronc : public generic_file
+namespace libdar
 {
-public :
-    tronc(generic_file *f, const infinint &offset, const infinint &size);
-    tronc(generic_file *f, const infinint &offset, const infinint &size, gf_mode mode);
 
-    bool skip(const infinint & pos);
-    bool skip_to_eof();
-    bool skip_relative(S_I x);
-    infinint get_position() { return current; };
+    class tronc : public generic_file
+    {
+    public :
+        tronc(generic_file *f, const infinint &offset, const infinint &size);
+        tronc(generic_file *f, const infinint &offset, const infinint &size, gf_mode mode);
+    
+        bool skip(const infinint & pos);
+        bool skip_to_eof();
+        bool skip_relative(S_I x);
+        infinint get_position() { return current; };
 
-protected :
-    S_I inherited_read(char *a, size_t size);
-    S_I inherited_write(const char *a, size_t size);
+    protected :
+        S_I inherited_read(char *a, size_t size);
+        S_I inherited_write(char *a, size_t size);
 
-private :
-    infinint start, sz;
-    generic_file *ref;
-    infinint current;
-};
+    private :
+        infinint start, sz;
+        generic_file *ref;
+        infinint current;
+    };
+
+} // end of namespace
 
 #endif

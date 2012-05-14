@@ -1,0 +1,16 @@
+# configuration file for dar to have Parchive integrated
+# with DAR
+# to be passed to dar as argument of -B option
+# either directly on command line or throw $HOME/.darrc or /etc/darrc
+# files
+
+create:
+        -E "SOMEPATH/dar_par_create.duc %p %b %n %e %c 2"
+# 2 stands for 2% of redundancy
+# adjust it to your needs
+
+test:
+        -R "SOMEPATH/dar_par_test.duc %p %b %n %e %c"
+
+# note, that you may need to set the path to dar_par_test.duc
+# and dar_par_create.duc

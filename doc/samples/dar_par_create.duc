@@ -1,0 +1,36 @@
+#!/bin/sh
+
+###
+#
+# this script is to be launched on dar command line when creating an archive with -s option (slicing)
+# you need to run this script from dar, adding the following argument on command-line
+#
+#     -E "dar_par_create.duc %p %b %n %e %c 20"
+#
+# note that 20 means 20% of redundancy, tune it to your needs
+#
+###
+#
+# if you prefer you can also add the line above in your the $HOME/.darrc file
+# under the create: conditional statement (see dar man page)
+#
+###
+#
+# usage par_script slice.basename slice.number extension level
+# generates a Parchive redundancy file from the slice file
+#
+###
+
+if [ "$1" = "" -a "$2" = "" -a "$3" = "" -a "$4" == "" -a "$6" == "" ]; then
+  echo "usage: $0 <path> <basename> <slice number> <extension> <context(not used)> <redundancy ratio (%)>"
+  echo "$0 builds Parchive redundancy file for the given slice"
+  exit 0
+fi
+
+# change according to you need
+PAR=par2
+
+echo "creating PAR file for file $1/$2.$3.dar ..."
+
+exec $PAR c -r$6 -n1 "$1/$2.$3.$4"
+# script returned code it those of par

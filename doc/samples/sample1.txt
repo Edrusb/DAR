@@ -1,0 +1,90 @@
+#Preface
+#--------
+#
+#Here follows a sample batch file submited by Henrik Ingo (Thanks Henrik ;-) ).
+#It is complete for backup but does not use conditional syntax. Over comments 
+#(lines staring with #) all commands can also take place on the command-line. 
+#Thus, this is a nice way to discover DAR's features.
+#
+#                                                            Denis Corbin
+###########################################################################
+
+ 
+#Execution file for dar (Disc Archiver)
+#Sipmly use 'dar -B thisfile' to backup
+#This backs up my home machine
+ 
+#Where to place the backup (somewhere with lots of space)
+--create /mnt/win_d/darbackups/my_backup
+ 
+ 
+#General settings
+ 
+#size of an archive (one slice). 650M fits nicely on CD-R (and RW?)
+-s 650M
+#compress using bzip
+-y
+#verbose
+-v
+ 
+#Files not to compress
+-Z "*.mp3" -Z "*.avi" -Z "*.mpg" -Z "*.mpeg"
+-Z "*.divx" -Z "*.rm" -Z "*.wmv" -Z "*.wma"
+-Z "*.asf" -Z "*.ra"
+ 
+-Z "*.gif" -Z "*.jpg" -Z "*.jpeg" -Z "*.png"
+ 
+-Z "*.zip" -Z "*.tgz" -Z "*.gzip" -Z "*.bzip"
+-Z "*.bzip2" -Z "*.rar" -Z "*.Z"
+ 
+#Define directories to be backed up
+#First give a root
+--fs-root /
+ 
+#Then list directories to back up (relative to fs-root)
+#If none are given, everything under root is backed up
+#If something is specified, only those are backed up
+#just/give/path/like/this
+#Exclude directories/files with the --prune option
+#--prune not/this
+ 
+etc
+var/lib
+--prune var/lib/rpm
+--prune var/lib/urpmi
+ 
+var/local
+var/www
+var/ftp
+usr/local
+ 
+root
+--prune root/RPMS
+--prune root/tmp
+--prune root/kino
+--prune root/Desktop/Trash
+--prune root/Desktop/Roskakori
+--prune root/.Trash
+ 
+home/hingo
+--prune home/hingo/tmp
+--prune home/hingo/RPMS
+--prune home/hingo/kino
+--prune home/hingo/Desktop/Trash
+--prune home/hingo/.Trash
+--prune home/hingo/nobackup
+ 
+#Be sure to add quotes around tricky paths, or why not all paths...
+"mnt/win_d/My Documents/"
+mnt/win_d/text/
+ 
+ 
+#End of file
+#Use something like this to restore everything:
+# dar -x /mnt/win_d/darbackups/SIMSON_backup -R /
+#something like this to restore something (etc-subtree):
+# dar -x /mnt/win_d/darbackups/SIMSON_backup -R / etc
+#And something like this to retrieve a single file to temp
+# dar -x /mnt/win_d/darbackups/SIMSON_backup -R /tmp/ etc/httpd/conf/httpd2.conf --flat
+#Really looking forward to having ark support for dar!
+

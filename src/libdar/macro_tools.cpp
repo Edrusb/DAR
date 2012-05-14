@@ -18,181 +18,190 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: macro_tools.cpp,v 1.5 2003/02/11 22:01:54 edrusb Rel $
+// $Id: macro_tools.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
-#include <stdlib.h>
+#include "../my_config.h"
 #include "macro_tools.hpp"
 #include "terminateur.hpp"
 #include "user_interaction.hpp"
 #include "zapette.hpp"
 #include "sar.hpp"
-#include "dar_suite.hpp"
 
-const version macro_tools_supported_version = "03";
+using namespace std;
 
-static void version_check(const header_version & ver);
-
-catalogue *macro_tools_get_catalogue_from(generic_file & f, compressor & zip, bool info_details, infinint &cat_size)
+namespace libdar
 {
-    terminateur term;
-    catalogue *ret;
 
-    if(info_details)
-	user_interaction_warning("Extracting contents of the archive...");
+    const dar_version macro_tools_supported_version = "03";
 
-    term.read_catalogue(f);
-    if(zip.skip(term.get_catalogue_start()))
+    static void version_check(const header_version & ver);
+
+    catalogue *macro_tools_get_catalogue_from(generic_file & f, compressor & zip, bool info_details, infinint &cat_size)
     {
-	try
-	{
-	    ret = new catalogue(zip);
-	}
-	catch(Egeneric & e)
-	{
-	    throw Erange("get_catalogue_from", string("cannot open catalogue: ") + e.get_message());
-	}
-	cat_size = zip.get_position() - term.get_catalogue_start();
-    }
-    else
-	throw Erange("get_catalogue_from", "missing catalogue in file.");
+        terminateur term;
+        catalogue *ret;
+        
+        if(info_details)
+            user_interaction_warning("Extracting contents of the archive...");
 
-    if(ret == NULL)
-	throw Ememory("get_catalogue_from");
+        term.read_catalogue(f);
+        if(zip.skip(term.get_catalogue_start()))
+        {
+            try
+            {
+                ret = new catalogue(zip);
+                sar *ptr = dynamic_cast<sar *>(&f);
+                if(ptr != NULL)
+                    ptr->set_info_status(SAR_CONTEXT_OP);
+            }
+            catch(Egeneric & e)
+            {
+                throw Erange("get_catalogue_from", string("cannot open catalogue: ") + e.get_message());
+            }
+            cat_size = zip.get_position() - term.get_catalogue_start();
+        }
+        else
+            throw Erange("get_catalogue_from", "missing catalogue in file.");
 
-    return ret;
-}
+        if(ret == NULL)
+            throw Ememory("get_catalogue_from");
 
-void macro_tools_open_archive(const path &sauv_path,
-			      const string &basename,
-			      const string &extension,
-			      S_I options,
-			      const string & pass,
-			      generic_file *&ret1,
-			      scrambler *&scram,
-			      compressor *&ret2,
-			      header_version &ver,
-			      const string &input_pipe,
-			      const string &output_pipe,
-			      const string & execute)
-{
-    generic_file *zip_base = NULL;
-
-    if(basename == "-")
-    {
-	tuyau *in = NULL;
-	tuyau *out = NULL;
-
-	try
-	{
-	    tools_open_pipes(input_pipe, output_pipe, in, out);
-	    ret1 = new zapette(in, out);
-	    if(ret1 == NULL)
-	    {
-		delete in;
-		delete out;
-	    }
-	    else
-		in = out = NULL; // now managed by the zapette
-	}
-	catch(...)
-	{
-	    if(in != NULL)
-		delete in;
-	    if(out != NULL)
-		delete out;
-	    throw;
-	}
-    }
-    else
-	ret1 = new sar(basename, extension, options, sauv_path, execute);
-
-    if(ret1 == NULL)
-	throw Ememory("open_archive");
-
-    if(pass != "")
-    {
-	scram = new scrambler(pass, *ret1);
-	if(scram == NULL)
-	    throw Ememory("open_archive");
-	zip_base = scram;
-    }
-    else
-    {
-	scram = NULL;
-	zip_base = ret1;
+        return ret;
     }
 
-    ver.read(*ret1);
-    version_check(ver);
-    catalogue_set_reading_version(ver.edition);
-    file::set_compression_algo_used(char2compression(ver.algo_zip));
-    file::set_archive_localisation(zip_base);
-    ret2 = new compressor(char2compression(ver.algo_zip), *zip_base);
-    if((ver.flag & VERSION_FLAG_SCRAMBLED) != 0)
-	user_interaction_warning("Warning, this archive has been \"scrambled\" (-K option). A wrong key is not possible to detect, it will cause DAR to report the archive as corrupted\n");
-
-    if(ret2 == NULL)
+    void macro_tools_open_archive(const path &sauv_path,
+                                  const string &basename,
+                                  const string &extension,
+                                  S_I options,
+                                  const string & pass,
+                                  generic_file *&ret1,
+                                  scrambler *&scram,
+                                  compressor *&ret2,
+                                  header_version &ver,
+                                  const string &input_pipe,
+                                  const string &output_pipe,
+                                  const string & execute)
     {
-	delete ret1;
-	throw Ememory("open_archive");
+        generic_file *zip_base = NULL;
+    
+        if(basename == "-")
+        {
+            tuyau *in = NULL;
+            tuyau *out = NULL;
+        
+            try
+            {
+                tools_open_pipes(input_pipe, output_pipe, in, out);
+                ret1 = new zapette(in, out);
+                if(ret1 == NULL)
+                {
+                    delete in;
+                    delete out;
+                }
+                else
+                    in = out = NULL; // now managed by the zapette
+            }
+            catch(...)
+            {
+                if(in != NULL)
+                    delete in;
+                if(out != NULL)
+                    delete out;
+                throw;
+            }
+        }
+        else
+            ret1 = new sar(basename, extension, options, sauv_path, execute);
+
+        if(ret1 == NULL)
+            throw Ememory("open_archive");
+
+        if(pass != "")
+        {
+            scram = new scrambler(pass, *ret1);
+            if(scram == NULL)
+                throw Ememory("open_archive");
+            zip_base = scram;
+        }
+        else
+        {
+            scram = NULL;
+            zip_base = ret1;
+        }
+
+        ver.read(*ret1);
+        version_check(ver);
+        catalogue_set_reading_version(ver.edition);
+        file::set_compression_algo_used(char2compression(ver.algo_zip));
+        file::set_archive_localisation(zip_base);
+        ret2 = new compressor(char2compression(ver.algo_zip), *zip_base);
+        if((ver.flag & VERSION_FLAG_SCRAMBLED) != 0)
+            user_interaction_warning("Warning, this archive has been \"scrambled\" (-K option). A wrong key is not possible to detect, it will cause DAR to report the archive as corrupted\n");
+
+        if(ret2 == NULL)
+        {
+            delete ret1;
+            throw Ememory("open_archive");
+        }
     }
-}
 
-catalogue *macro_tools_get_catalogue_from(const string &basename)
-{
-    generic_file *ret1 = NULL;
-    scrambler *scram = NULL;
-    compressor *ret2 = NULL;
-    header_version ver;
-    string input_pipe, output_pipe, execute;
-    catalogue *ret = NULL;
-    infinint size;
-    string chemin, base;
-
-    input_pipe = output_pipe = execute = "";
-    tools_split_path_basename(basename, chemin, base);
-    if(chemin == "")
-	chemin = ".";
-    try
+    catalogue *macro_tools_get_catalogue_from(const string &basename, const string &extension)
     {
-	path where = chemin;
-	macro_tools_open_archive(where, base, EXTENSION, SAR_OPT_DONT_ERASE, "",
-				 ret1, scram, ret2, ver, input_pipe, output_pipe, execute);
+        generic_file *ret1 = NULL;
+        scrambler *scram = NULL;
+        compressor *ret2 = NULL;
+        header_version ver;
+        string input_pipe, output_pipe, execute;
+        catalogue *ret = NULL;
+        infinint size;
+        string chemin, base;
 
-	ret = macro_tools_get_catalogue_from(*ret1, *ret2, false, size);
+        input_pipe = output_pipe = execute = "";
+        tools_split_path_basename(basename, chemin, base);
+        if(chemin == "")
+            chemin = ".";
+        try
+        {
+            path where = chemin;
+            macro_tools_open_archive(where, base, extension, SAR_OPT_DONT_ERASE, "",
+                                     ret1, scram, ret2, ver, input_pipe, output_pipe, execute);
+        
+            ret = macro_tools_get_catalogue_from(*ret1, *ret2, false, size);
+        }
+        catch(...)
+        {
+            if(ret1 != NULL)
+                delete ret1;
+            if(ret2 != NULL)
+                delete ret2;
+            if(scram != NULL)
+                delete scram;
+            if(ret != NULL)
+                delete ret;
+            throw;
+        }
+        if(ret1 != NULL)
+            delete ret1;
+        if(ret2 != NULL)
+            delete ret2;
+        if(scram != NULL)
+            delete scram;
+    
+        return ret;
     }
-    catch(...)
+
+    static void dummy_call(char *x)
     {
-	if(ret1 != NULL)
-	    delete ret1;
-	if(ret2 != NULL)
-	    delete ret2;
-	if(scram != NULL)
-	    delete scram;
-	if(ret != NULL)
-	    delete ret;
-	throw;
+        static char id[]="$Id: macro_tools.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $";
+        dummy_call(id);
     }
-    if(ret1 != NULL)
-	delete ret1;
-    if(ret2 != NULL)
-	delete ret2;
-    if(scram != NULL)
-	delete scram;
 
-    return ret;
-}
+    static void version_check(const header_version & ver)
+    {
+        if(atoi(ver.edition) > atoi(macro_tools_supported_version))
+            user_interaction_pause("The format version of the archive is too high for that software version, try reading anyway?");
+    }
 
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: macro_tools.cpp,v 1.5 2003/02/11 22:01:54 edrusb Rel $";
-    dummy_call(id);
-}
-
-static void version_check(const header_version & ver)
-{
-    if(atoi(ver.edition) > atoi(macro_tools_supported_version))
-	user_interaction_pause("The format version of the archive is too high for that software version, try reading anyway?");
-}
+} // end of namespace

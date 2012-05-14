@@ -2,16 +2,16 @@ KNOWN BUGS:
 
 #1: description: files pointed to by a symbolic links get their times
         (mtime & atime) not properly restored
-	   
+           
     problem: when restoring time of a symbolic link the utime() system call
-	does not change the inode of the symbolic link itself but the one of 
-	the file pointed to by the symbolic link
+        does not change the inode of the symbolic link itself but the one of
+        the file pointed to by the symbolic link
 
     solution: as the utime() call behaves the same on many Unix platforms,
-	(HP-UX, solaris, Linux, etc.), the times for the symbolic links are
-	no more restored, thus files pointed to by symbolic links are not 
-	affected by the utime() strange behaviour. Dar, behaves not the 
-	same as touch, tar, etc.
+        (HP-UX, Solaris, Linux, etc.), the times for the symbolic links are
+        no more restored, thus files pointed to by symbolic links are not
+        affected by the utime() strange behavior. Dar, behaves not the
+        same as touch, tar, etc.
 
     affects version: 1.0.0
     fixed in version: 1.0.1
@@ -28,14 +28,14 @@ KNOWN BUGS:
     affects versions: 1.0.0, 1.0.1
     fixed in version: 1.0.2
 
-	
-#3: description: making differential backup with some directory implicitly or 
-        explicitly (-P) excluded, sometime lead to full backup. 
+        
+#3: description: making differential backup with some directory implicitly or
+        explicitly (-P) excluded, sometime lead to full backup.
 
     problem: when entering a directory that was ignored, the comparison in the
         catalogue of reference was not going back to the parent directory,
-	leading the comparison to be no more synchronised with the file being
-	read.
+        leading the comparison to be no more synchronized with the file being
+        read.
 
     solution: added a line to go back to parent directory when treating an
         ignored directory
@@ -45,14 +45,14 @@ KNOWN BUGS:
 
 
 #4: description: on Linux 64 bits, when an interaction from the user is
-	required, (escape or return key), the keys have to be pressed four
-	time before dar can read a character.
+        required, (escape or return key), the keys have to be pressed four
+        time before dar can read a character.
 
     problem:
-	unknown, same code works fine on other platforms, and if bad character
-	remains in the pipe, the message would be displayed several time,
-	which is not the case, here. It seems that the user has to press four
-	key for	the first one to be accessible to dar.
+        unknown, same code works fine on other platforms, and if bad character
+        remains in the pipe, the message would be displayed several time,
+        which is not the case, here. It seems that the user has to press four
+        key for the first one to be accessible to dar.
 
     solution: none actually
 
@@ -65,7 +65,7 @@ KNOWN BUGS:
            file compressor.cpp line 244 : it seems to be a bug here
    [most outside call]
    -----------------------------------
-	
+        
        or
  
    --- exception nature = [alive]  exception type = [BUG] ----------
@@ -75,28 +75,28 @@ KNOWN BUGS:
    -----------------------------------
 
     problem:
-	the zlib deflate() calls returned an unexpected value (Z_STREAM_END).
-	and inflate() in some rare cases was called without data to process,
-	when reaching end of file, which made inflate() to return Z_BUF_ERROR 
-	code.
+        the zlib deflate() calls returned an unexpected value (Z_STREAM_END).
+        and inflate() in some rare cases was called without data to process,
+        when reaching end of file, which made inflate() to return Z_BUF_ERROR
+        code.
 
     solution:
-	adding code for taking care of the returned code Z_STREAM_END by 
-	deflate(), and code for taking care of Z_BUF_ERROR returned at end
- 	of file.
+        adding code for taking care of the returned code Z_STREAM_END by
+        deflate(), and code for taking care of Z_BUF_ERROR returned at end
+        of file.
 
     affects version: 1.0.0, 1.0.1, 1.0.2
     fixed in version: 1.0.3
      
 
-#6: description: Dar does not properly display dates on Linux 64 bits 
+#6: description: Dar does not properly display dates on Linux 64 bits
         systems.
 
     problem:
-	non portable cast from 'time_t' to 'unsigned long int'
+        non portable cast from 'time_t' to 'unsigned long int'
 
     solution:
-	changed code not to have to use 'unsigned long int'
+        changed code not to have to use 'unsigned long int'
 
     affects version: 1.0.x, 1.1.x
     fixed in version: 1.2.0
@@ -106,143 +106,143 @@ KNOWN BUGS:
         even if the inode had not to be saved
 
     problem:
-	Dar reads all file in the directory to save, and then applies filters
-	to their filename. Error appears before the filter, leading to a 
-	global saving error.
+        Dar reads all file in the directory to save, and then applies filters
+        to their filename. Error appears before the filter, leading to a
+        global saving error.
 
     solution:
         read error are now caught sooner a message is displayed that the file
-        or directory will be ignored, and saving process continues. As 
-	this error occurs before testing filename against filters, an error 
-	message is still displayed (which may seems strange when the file was
-	about to be excluded by filter mechanism)  
-		Just reminds that dar reads a directory contents first, and 
-	then check filenames against filter. At the time of the message, Dar 
-	does not know the file would not to be saved. Thus, don't worry if 
-	you see this kind of message, they don't mean that dar was about to 
-	save the given file but rather exactly what the message says, that 
-	the file or directory could not be read. ;-)
+        or directory will be ignored, and saving process continues. As
+        this error occurs before testing filename against filters, an error
+        message is still displayed (which may seems strange when the file was
+        about to be excluded by filter mechanism)
+                Just reminds that dar reads a directory contents first, and
+        then check filenames against filter. At the time of the message, Dar
+        does not know the file would not to be saved. Thus, don't worry if
+        you see this kind of message, they don't mean that dar was about to
+        save the given file but rather exactly what the message says, that
+        the file or directory could not be read. ;-)
 
     affects version: 1.0.x, 1.1.x
     fixed in version: 1.2.0
 
 
 #8: description: when saving hard linked file using filter that does not save
-	the first hard link, dar stops with SEGFAULT.
+        the first hard link, dar stops with SEGFAULT.
 
     problem:
-	The first hard link is used as reference for the following occurences.
-	As it is not covered by the filter it is destroyed in filter module,
-	but filesystem module keeps using it as reference for following 
-	hard links on that inode.
+        The first hard link is used as reference for the following occurrences.
+        As it is not covered by the filter it is destroyed in filter module,
+        but filesystem module keeps using it as reference for following
+        hard links on that inode.
 
     solution:
-	added a call in filesystem module to "forget" a given reference. This
-	way, if a file_etiquette is not covered, filter module can inform 
-	filesystem module to delete the corresponding entry on the hard link
-	map. Subsequent hard link on that inode will generate first a new
-	file_etiquette, which will be used as reference (unless it is not 
-	covered by filter too).
+        added a call in filesystem module to "forget" a given reference. This
+        way, if a file_etiquette is not covered, filter module can inform
+        filesystem module to delete the corresponding entry on the hard link
+        map. Subsequent hard link on that inode will generate first a new
+        file_etiquette, which will be used as reference (unless it is not
+        covered by filter too).
 
     affects version: 1.1.x
     fixed in version: 1.2.0
 
 
 #9  description
-	failed to read an archive under windows NT and 2000
+        failed to read an archive under windows NT and 2000
 
     problem
-	error concerning the integer macro definition (module integer.hpp)
+        error concerning the integer macro definition (module integer.hpp)
 
     solution
-	replaced the macro by a proper definition.
-	
-	
+        replaced the macro by a proper definition.
+        
+        
     affects version: 1.2.0
     fixed in version: 1.2.1
 
 #10 description
-	when using dar on windows95 if giving c:/ or other driver to -R 
-        option, dar stops with the following error : 
+        when using dar on windows95 if giving c:/ or other driver to -R
+        option, dar stops with the following error :
 
         file filesystem.cpp line 186 : it seems to be a bug here
 
-    problem 
-	dar checks first that c:/ is a directory. Cygwin says yes this
-	dar continues :	from c:/ dar completes the path with a dot thus 
-	dar tries to open the path c:/. which is cygwin does not report 
-	as an existing directory.    	
+    problem
+        dar checks first that c:/ is a directory. Cygwin says yes this
+        dar continues : from c:/ dar completes the path with a dot thus
+        dar tries to open the path c:/. which is Cygwin does not report
+        as an existing directory.
 
     solution
-	dar does not try to open c:/. but tries to open c:/ . Moreover
-	additional code as been added to detect the incoherence if in
-	some other conditions such problem occurs. Dar will report the
-	exact problem (path does not exist / or path is not a directory)
+        dar does not try to open c:/. but tries to open c:/ . Moreover
+        additional code as been added to detect the incoherence if in
+        some other conditions such problem occurs. Dar will report the
+        exact problem (path does not exist / or path is not a directory)
 
 
     affects version: 1.2.1, 1.2.0
-    fixed in version: 1.2.2
+    fixed in version: 1.3.0
 
 #11 description
-	when giving to dar_manager an absolute path to -r option 
+        when giving to dar_manager an absolute path to -r option
         dar_manager stops with INTERNAL ERROR message.
 
     problem
-	a check is missing to display error message in such condition
+        a check is missing to display error message in such condition
 
     solution
-	added a error message, if an absolute path is given to -r
+        added a error message, if an absolute path is given to -r
 
     affects dar_manager version   : 1.0.0
     fixed in dar_manager version  : 1.0.1
 
 #12 description
-	memory leakage when using -Z or -Y option. This bug has been
-	found and explained by David Rose, who proposed a good patch,
-	which I have just a little adapted.
+        memory leakage when using -Z or -Y option. This bug has been
+        found and explained by David Rose, who proposed a good patch,
+        which I have just a little adapted.
 
     problem
-	the dar code that call the zlib when changing the compression
-	algorithm did properly released memory allocated by dar but 
-	forget to execute a call of the zlib library that releases memory
-	allocate by the library itself.
+        the dar code that call the zlib when changing the compression
+        algorithm did properly released memory allocated by dar but
+        forget to execute a call of the zlib library that releases memory
+        allocate by the library itself.
 
     solution
-	solution, add call to release memory used by zlib library when 
-	changing of compression algorithm
+        solution, add call to release memory used by zlib library when
+        changing of compression algorithm
 
     affects dar version   : 1.2.0, 1.2.1
     fixed in dar version  : 1.3.0
 
 #13 description
-	archive created by dar under Windows NP SP6, XP, 2000, cannot be 
-	read, tested. All action on generated archive finishes by CRC error 
-	message, incoherent catalogue structure, or badly formated infinint.
+        archive created by dar under Windows NP SP6, XP, 2000, cannot be
+        read, tested. All action on generated archive finishes by CRC error
+        message, incoherent catalogue structure, or badly formated infinint.
 
     problem
-	under windows, Dar uses Cygwin. As Unix and Window do not define
-	end of line the same way (\n for Unix and \r\n for Windows), 
-	Cygwin translates end of line on the fly when reading a file
-        (Windows to Unix), and when writing (Unix to Windows). At 
-	writting time espetially, each \n anywhere in the archive 
-	is written \r\n, thus two bytes get written in place of one.
- 	In another hand, to get the global position in the whole archive
-	dar countes bytes it writes to file. Thus a shift occurs between
-	the position it thinks it writes the catalogue and the position
-	it actually does. Thus reading the archive, the given position 
-	is wrong, and archive cannot be openned.
+        under windows, Dar uses Cygwin. As Unix and Window do not define
+        end of line the same way (\n for Unix and \r\n for Windows),
+        Cygwin translates end of line on the fly when reading a file
+        (Windows to Unix), and when writing (Unix to Windows). At
+        writing time especially, each \n anywhere in the archive
+        is written \r\n, thus two bytes get written in place of one.
+        In another hand, to get the global position in the whole archive
+        dar counts bytes it writes to file. Thus a shift occurs between
+        the position it thinks it writes the catalogue and the position
+        it actually does. Thus reading the archive, the given position
+        is wrong, and archive cannot be opened.
 
     solution
-	deactivate the translation when generating the archive. Cygwin adds
-	 A two special flags to pass to open(2) which are O_TEXT and 
-	O_BINARY, that change the way Cygwin handles file read(2) and 
-	write(2).
+        deactivate the translation when generating the archive. Cygwin adds
+         A two special flags to pass to open(2) which are O_TEXT and
+        O_BINARY, that change the way Cygwin handles file read(2) and
+        write(2).
 
     affects all dar suite program version 1.0.x, 1.1.x, 1.2.x
     fixed in dar version 1.3.0
 
-#14 desciption
-	Dar aborts with the following message 
+#14 description
+        Dar aborts with the following message
 
          ---- exception nature = [alive] exception type = [BUG] ----------
          [source]
@@ -250,22 +250,63 @@ KNOWN BUGS:
          [most outside call]
          -----------------------------------
 
-	while backing up using compression and scrambling (could not (yet) be
-	reproduced twice).
+        appeared while doing a backup using compression and scrambling (could 
+        not (yet) be reproduced twice).
 
     problem
-	this message is issued because zlib library reported an inconsistency
-	in call order or in call arguments given to zlib calls. Actually I 
-	cannot figure out what is wrong, nor how this bug may happens.
+        this message is issued because zlib library reported an inconsistency
+        in call order or in call arguments given to zlib calls. Actually I
+        cannot figure out what is wrong, nor how this bug may happens.
 
     solution
-	none actually at the time of 1.3.0 release. 
+        none actually at the time of 2.0.0 release.
 
-	But, if you are face to face with this bug, thanks to try reproducing 
-	it, re-issuing the same command in the same condition, and if 
-	reproduceable then as much as possible reduce the necessary 
-	environment condition that make this bug happen. Then please, contact 
-	me (either via Sourceforge or via email).
+        But, if you are face to face with this bug, thanks to try reproducing
+        it, re-issuing the same command in the same condition, and if
+        possible to reproduce then as much as possible reduce the necessary
+        environment condition that make this bug happen. Then please, contact
+        me (either via Sourceforge or via email).
 
     affects version 1.2.1 (at least)
-    not yet fixed (check sourceforge for fresh news).
+    not yet fixed (check Sourceforge for fresh news), nor reproduced.
+
+#15 description
+       Dar aborts with the following message when giving -y0 as argument
+
+       ---- exception nature = [alive]  exception type = [BUG] ----------
+       [source]
+              file compressor.cpp line 96 : it seems to be a bug here
+       [most outside call]
+       -----------------------------------
+
+    problem
+       correct compression level for zlib are from 0 to 9, 0 meaning no
+       compression, while for libbz2 correct compression levels are from
+       1 to 9, thus zero is not a valid value. libbz2 returns an error code
+       which triggers a libdar internal sanity check code, which throws this
+       BUG exception.
+
+
+    solution
+       forbid the use of -z0 or -y0. If you don't want compression, you will
+       need to not give neither -z nor -y.
+
+    affects version 1.3.0
+    fixed in version 2.0.0
+
+#16 description
+       Dar include does not ignore comments in included file as given by -B option
+
+    problem
+       when a line with only one carriage-return is put in a file, the following line
+       is considered as a normal line (not a comment), whatever it is, in particular
+       if it starts with a hash (#).
+
+    solution
+       make the algorithm consider normal line once another character than space, tab
+       hash or carriage-return is met. (added the carriage-return in the list).
+
+    affects version 1.2.0, 1.2.1, 1.3.0
+    fixed in version 2.0.0
+
+

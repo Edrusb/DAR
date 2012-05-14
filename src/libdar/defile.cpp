@@ -18,41 +18,47 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: defile.cpp,v 1.9 2003/02/11 22:01:36 edrusb Rel $
+// $Id: defile.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #pragma implementation
 
+#include "../my_config.h"
 #include "defile.hpp"
 
-void defile::enfile(const entree *e)
+using namespace std;
+
+namespace libdar
 {
-    const eod *fin = dynamic_cast<const eod *>(e);
-    const directory *dir = dynamic_cast<const directory *>(e);
-    const nomme *nom = dynamic_cast<const nomme *>(e);
-    string s;
 
-    if(! init)
-	chemin.pop(s);
-    else
-	init = false;
-
-    if(fin == NULL)
+    void defile::enfile(const entree *e)
     {
-	if(nom == NULL)
-	    throw SRC_BUG; // neither eod nor nomme
-	else
-	{
-	    chemin += nom->get_name();
-	    if(dir != NULL)
-		init = true;
-	}
-    }
-}
+        const eod *fin = dynamic_cast<const eod *>(e);
+        const directory *dir = dynamic_cast<const directory *>(e);
+        const nomme *nom = dynamic_cast<const nomme *>(e);
+        string s;
 
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: defile.cpp,v 1.9 2003/02/11 22:01:36 edrusb Rel $";
-    dummy_call(id);
-}
+        if(! init)
+            chemin.pop(s);
+        else
+            init = false;
+
+        if(fin == NULL)
+            if(nom == NULL)
+                throw SRC_BUG; // neither eod nor nomme
+            else
+            {
+                chemin += nom->get_name();
+                if(dir != NULL)
+                    init = true;
+            }
+    }
+            
+    static void dummy_call(char *x)
+    {
+        static char id[]="$Id: defile.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $";
+        dummy_call(id);
+    }
+    
+} // end of namespace

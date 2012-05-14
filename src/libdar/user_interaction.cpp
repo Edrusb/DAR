@@ -18,249 +18,178 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.cpp,v 1.11.2.1 2003/04/15 21:51:53 edrusb Rel $
+// $Id: user_interaction.cpp,v 1.9 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
-#include <iostream>
-#include <string.h>
-#include <stdio.h>
-#include <sys/ioctl.h>
-#include <termios.h>
-#include <errno.h>
+#include "../my_config.h"
+
+#if STDC_HEADERS
+# include <string.h>
+#else
+# if !HAVE_STRCHR
+#  define strchr index
+#  define strrchr rindex
+# endif
+char *strchr (), *strrchr ();
+# if !HAVE_MEMCPY
+#  define memcpy(d, s, n) bcopy ((s), (d), (n))
+#  define memmove(d, s, n) bcopy ((s), (d), (n))
+# endif
+#endif
+
+#if HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
+#if HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
+
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
+
+#if HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
+
+#if STDC_HEADERS
 #include <stdarg.h>
-#include <string.h>
-#include <stdio.h>
-#include "cygwin_adapt.hpp"
+#endif
+
+
+#include <iostream>
 #include "user_interaction.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "integers.hpp"
+#include "deci.hpp"
 
 using namespace std;
 
-static S_I input = -1;
-static ostream *output = NULL;
-static ostream *inter = NULL;
-static bool beep = false;
-static termio initial;
-static termio interaction;
-static bool has_terminal = false;
-
-static void set_term_mod(const struct termio & etat);
-
-void user_interaction_init(ostream *out, ostream *interact)
+namespace libdar
 {
-    has_terminal = false;
 
-	// checking and recording parameters to static variable
-    if(out != NULL)
-	output = out;
-    else
-	throw SRC_BUG;
-    if(interact != NULL)
-	inter = interact;
-    else
-	throw SRC_BUG;
+    static void (*warning_callback)(const string & x) = NULL;
+    static bool (*answer_callback)(const string & x) = NULL;
 
-	// looking for an input terminal
-	//
-	// we do not use anymore standart input but open a new descriptor
-	// from the controlling terminal. This allow in some case to use
-	// standart input for piping data while keeping user interaction
-	// possible.
-
-    if(input < 0)
-	close(input);
-
-    char *tty = ctermid(NULL);
-    if(tty == NULL)
-	user_interaction_warning("No terminal found for user interaction. All questions will abort the program.");
-    else // no filesystem path to tty
+    void set_warning_callback(void (*callback)(const string & x))
     {
-	struct termio term;
-	input = open(tty, O_RDONLY|O_TEXT);
-	if(input < 0)
-	    user_interaction_warning("No terminal found for user interaction. All questions will abort the program.");
-	else
-	{
-		// preparing input for swaping between char mode and line mode (terminal settings)
-	    if(ioctl(input, TCGETA, &term) >= 0)
-	    {
-		initial = term;
-		term.c_lflag &= ~ICANON;
-		term.c_lflag &= ~ECHO;
-		term.c_lflag &= ~ECHOE;
-		interaction = term;
-
-		    // checking now that we can change to character mode
-		set_term_mod(interaction);
-		set_term_mod(initial);
-		    // but we don't need it right now, so swapping back to line mode
-		has_terminal = true;
-	    }
-	    else // failed to retrieve parameters from tty
-		user_interaction_warning("No terminal found for user interaction. All questions will abort the program.");
-	}
-    }
-}
-
-void user_interaction_change_non_interactive_output(ostream *out)
-{
-    if(out != NULL)
-	output = out;
-    else
-	throw SRC_BUG;
-}
-
-static void set_term_mod(const struct termio & etat)
-{
-    if(ioctl(input, TCSETA, &etat) < 0)
-	throw Erange("user_interaction : set_term_mod", string("Error while changing user terminal properties: ") + strerror(errno));
-}
-
-void user_interaction_close()
-{
-    if(has_terminal)
-	ioctl(input, TCSETA, &initial);
-}
-
-void user_interaction_pause(string message)
-{
-    const S_I bufsize = 1024;
-    char buffer[bufsize];
-    char & a = buffer[0];
-
-    if(!has_terminal)
-    {
-	user_interaction_warning("No terminal found and user interaction needed, aborting.");
-	throw Euser_abort(message);
+        warning_callback = callback;
     }
 
-    if(input < 0)
-	throw SRC_BUG;
-
-    set_term_mod(interaction);
-    try
+    void set_answer_callback(bool (*callback)(const string &x))
     {
-	    // flushing any character remaining in the input stream
-	tools_blocking_read(input, false);
-	while(read(input, buffer, bufsize) >= 0)
-	    ;
-	tools_blocking_read(input, true);
-
-	    // now asking the user
-	do
-	{
-	    *inter << message << " [return = OK | esc = cancel]" << (beep ? "\007\007\007" : "") << endl;
-	    if(read(input, &a, 1) < 0)
-		throw Erange("user_interaction_pause", string("Error while reading user answer from terminal: ") + strerror(errno));
-	}
-	while(a != 27 && a != '\n');
-
-	if(a == 27) // escape key
-	    throw Euser_abort(message);
-	else
-	    *inter << "Continuing..." << endl;
+        answer_callback = callback;
     }
-    catch(...)
+
+    void user_interaction_pause(const string & message)
     {
-	set_term_mod(initial);
-	throw;
+        if(answer_callback == NULL)
+            cerr << "answer_callback not set, use set_answer_callback() first" << endl;
+        else
+            if(! (*answer_callback)(message))
+                throw Euser_abort(message);
     }
-}
 
-void user_interaction_warning(string message)
-{
-    if(output == NULL)
-	throw SRC_BUG; // user_interaction has not been properly initialized
-    *output << message << endl;
-}
-
-ostream &user_interaction_stream()
-{
-    return *output;
-}
-
-void user_interaction_set_beep(bool mode)
-{
-    beep = mode;
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: user_interaction.cpp,v 1.11.2.1 2003/04/15 21:51:53 edrusb Rel $";
-    dummy_call(id);
-}
-
-void ui_printf(const char *format, ...)
-{
-    va_list ap;
-    bool end;
-    U_32 taille = strlen(format)+1;
-    char *copie;
-
-    if(output == NULL)
-	throw Erange("ui_printf", "user_interaction  module is not initialized");
-
-    copie = new char[taille];
-    if(copie == NULL)
-	throw Ememory("ui_printf");
-
-    va_start(ap, format);
-    try
+    void user_interaction_warning(const string & message)
     {
-	char *ptr = copie, *start = copie;
-
-	strcpy(copie, format);
-	copie[taille-1] = '\0';
-
-	do
-	{
-	    while(*ptr != '%' && *ptr != '\0')
-		ptr++;
-	    if(*ptr == '%')
-	    {
-		*ptr = '\0';
-		end = false;
-	    }
-	    else
-		end = true;
-	    *output << start;
-	    if(!end)
-	    {
-		ptr++;
-		switch(*ptr)
-		{
-		case '%':
-		    *output << "%";
-		    break;
-		case 'd':
-		    *output << va_arg(ap, S_I);
-		    break;
-		case 's':
-		    *output << va_arg(ap, char *);
-		    break;
-		case 'c':
-		    *output << static_cast<char>(va_arg(ap, S_I));
-		    break;
-		default:
-		    throw Efeature(string("%") + (*ptr) + " is not implemented in ui_printf format argument");
-		}
-		ptr++;
-		start = ptr;
-	    }
-	}
-	while(!end);
+        if(warning_callback == NULL)
+            cerr << "warning_callback not set, use set_warning_callback first" << endl;
+        else
+            (*warning_callback)(message + '\n');
     }
-    catch(...)
+
+    static void dummy_call(char *x)
     {
-	va_end(ap);
-	delete copie;
-	throw;
+        static char id[]="$Id: user_interaction.cpp,v 1.9 2003/10/18 14:43:07 edrusb Rel $";
+        dummy_call(id);
     }
-    delete copie;
-    va_end(ap);
-}
+
+    void ui_printf(char *format, ...)
+    {
+        va_list ap;
+        bool end;
+        U_32 taille = strlen(format)+1;
+        char *copie;
+        string output = "";
+
+        U_I test;
+    
+        copie = new char[taille];
+        if(copie == NULL)
+            throw Ememory("ui_printf");
+
+        va_start(ap, format);
+        try
+        {
+            char *ptr = copie, *start = copie;
+
+            strcpy(copie, format);
+            copie[taille-1] = '\0';
+
+            do
+            {
+                while(*ptr != '%' && *ptr != '\0')
+                    ptr++;
+                if(*ptr == '%')
+                {
+                    *ptr = '\0';
+                    end = false;
+                }
+                else
+                    end = true;
+                output += start;
+                if(!end)
+                {
+                    ptr++;
+                    switch(*ptr)
+                    {
+                    case '%':
+                        output += "%";
+                        break;
+                    case 'd':
+                        output += tools_int2str(va_arg(ap, S_I));
+                        break;
+                    case 'u':
+                        test = va_arg(ap, U_I);
+                        output += deci(test).human();
+                        break;
+                    case 's':
+                        output += va_arg(ap, char *);
+                        break;
+                    case 'c':
+                        output += static_cast<char>(va_arg(ap, S_I));
+                        break;
+                    case 'i':
+                        output += deci(*(va_arg(ap, infinint *))).human();
+                        break;
+                    case 'S':
+                        output += *(va_arg(ap, string *));
+                        break;
+                    default:
+                        throw Efeature(string("%") + (*ptr) + " is not implemented in ui_printf format argument");
+                    }
+                    ptr++;
+                    start = ptr;
+                }
+            }
+            while(!end);
+        }
+        catch(...)
+        {
+            va_end(ap);
+            delete copie;
+            throw;
+        }
+        delete copie;
+        va_end(ap);
+
+        if(warning_callback == NULL)
+            cerr << "warning_callback not set, use set_warning_callback first" << endl;
+        else
+            (*warning_callback)(output);    
+    }
+
+} // end of namespace

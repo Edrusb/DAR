@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.hpp,v 1.5 2003/02/11 22:02:11 edrusb Rel $
+// $Id: tuyau.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,32 +27,38 @@
 
 #pragma interface
 
+#include "../my_config.h"
 #include "generic_file.hpp"
 
-class tuyau : public generic_file
+namespace libdar
 {
-public:
-    tuyau(int fd); // fd is the filedescriptor of a pipe extremity
-    tuyau(int fd, gf_mode mode); // forces the mode of possible
-    tuyau(const string &filename, gf_mode mode);
-    ~tuyau() { close(filedesc); };
 
-	// inherited from generic_file
-    bool skip(const infinint & pos);
-    bool skip_to_eof();
-    bool skip_relative(signed int x);
-    infinint get_position() { return position; };
+    class tuyau : public generic_file
+    {
+    public:
+        tuyau(int fd); // fd is the filedescriptor of a pipe extremity
+        tuyau(int fd, gf_mode mode); // forces the mode of possible
+        tuyau(const std::string &filename, gf_mode mode);
+        ~tuyau() { close(filedesc); };
+    
+            // inherited from generic_file
+        bool skip(const infinint & pos);
+        bool skip_to_eof();
+        bool skip_relative(signed int x);
+        infinint get_position() { return position; };
 
-protected:
-    virtual int inherited_read(char *a, size_t size);
-    virtual int inherited_write(const char *a, size_t size);
+    protected:
+        virtual int inherited_read(char *a, size_t size);
+        virtual int inherited_write(char *a, size_t size);
 
-private:
-    infinint position;
-    int filedesc;
-    string chemin; // named pipe open later
+    private:
+        infinint position;
+        int filedesc;
+        std::string chemin; // named pipe open later
 
-    void ouverture();
-};
+        void ouverture();
+    };
+
+} // end of namespace
 
 #endif

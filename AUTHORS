@@ -1,0 +1,77 @@
+
+
+
+                  D i s k   A R c h i v e
+
+                         ---------
+                           -----
+                             _
+
+
+        Conception & Development by Denis Corbin
+
+        http://dar.linux.free.fr/
+        dar.linux@free.fr
+
+I will not answer support requests sent by email: your questions and their
+answers may be interesting to others. For all and to all, thanks to use
+historical forum or sourceforge tracker. See http://dar.linux.free.fr/#help
+
+        else to pass through anti-spam filters, you
+        need to add "[EARTH IS BEAUTIFUL]" in the subject
+        of your emails.
+
+Chris Martin is the author of dar-help a little program that builds
+*.usage files from *.xml files. dar-help is used to simplify the maintenance
+of help string returned to user when the -h option is given.
+
+
+An extract of Denis Corbin's resume:
+        1970      my parents did a big mistake. ;-)
+        1989      BAC C (mention AB)
+        1990-1992 Classes Prepa
+        1992-1995 ENSEIRB - Ecole Nationale Superieur d'Electronique
+                            Informatique et Radiocommunications de Bordeaux
+                  Promo 1995.
+        1995      3 months Erasmus project in Bologna (Italy).
+        1996      Military Service 28e Regiment Transmission Armee de Terre
+                  Formation Equipex-RITA, operator on the RITTER network.
+        1997-2000 Software developer, Team leader, Project leader for
+                  Netcomsystems (today Spirent Communications). Designed
+                  softwares for the Smartbits network test equipment. Worked
+                  in cooperation with Californian team, have spent few weeks in
+                  Los Angeles.
+        2000-2002 Network Design, architecture and network support for DCN
+                  of Alcatel Submarine Networks, (worked mainly in France,
+                  and spend several weeks in USA, Chile and Brazil).
+       since 2003 Network Design and support for SFR (mobile operator) Internet
+                  ISP connectivity.
+
+        Good knowledge of
+              L1 protocols (bit encoding like Differential Manchester, etc.).
+              L2 protocols (Ethernet, Token Ring, frame format, detail behavior
+                       and structure of switch and hub equipments. ATM, FR,
+                       protocols, E1 and E3 WAN links).
+              L3 protocols (IP, OSI, OSPF, RIP, ISIS, ESIS, BGP, HSRP, VRRP).
+              L4 protocols (UDP, TCP, QoS).
+              DNS configuration and administrative interfaces.
+              RIPE administrative interface.
+                
+        Knowledge of
+             SDH networks, Submarine Equipment systems and TMN-OS.
+             GSM and GPRS network structure, SS7 and radio protocol.
+             
+        Practice of the following equipments:
+             Cisco switches and routers
+             Checkpoint Firewalls 4.1 and NG
+             Alteon L4-L7 load balancer
+             Netscreen Firewalls
+             SunOS/Solaris network and hardware administration (less practice
+                 for system admin.)
+             Linux OS (in particular as router/firewall system).
+              
+
+       spoken languages: French, English, Italian, Russian.
+       extra professional activities: astronomy, photography, occasional
+       chess player. Author and maintainer or Disk ARchive (but this, you know)
+

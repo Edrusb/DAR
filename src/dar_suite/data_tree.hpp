@@ -6,24 +6,26 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.hpp,v 1.4 2003/02/19 22:29:36 edrusb Rel $
+// $Id: data_tree.hpp,v 1.10 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #ifndef DATA_TREE_HPP
 #define DATA_TREE_HPP
+
+#include "../my_config.h"
 
 #include <map>
 #include <string>
@@ -31,6 +33,10 @@
 #include "generic_file.hpp"
 #include "infinint.hpp"
 #include "catalogue.hpp"
+#include "special_alloc.hpp"
+
+using namespace libdar;
+using namespace std;
 
 typedef U_16 archive_num;
 #define ARCHIVE_NUM_MAX  65534
@@ -52,17 +58,21 @@ public:
 
     void set_data(const archive_num & archive, const infinint & date) { last_mod[archive] = date; };
     void set_EA(const archive_num & archive, const infinint & date) { last_change[archive] = date; };
-    virtual bool remove_all_from(archive_num archive); // return true if the corresponding file 
-	// is no more located by any archive (this the object is no more usefull)
+    virtual bool remove_all_from(archive_num archive); // return true if the corresponding file
+        // is no more located by any archive (this the object is no more usefull)
     void listing() const; // list where is saved this file
     virtual void apply_permutation(archive_num src, archive_num dst);
     virtual void skip_out(archive_num num); // decrement archive numbers above num
-    virtual void compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea, 
-					   vector<infinint> & total_data, vector<infinint> & total_ea) const;
+    virtual void compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea,
+                                           vector<infinint> & total_data, vector<infinint> & total_ea) const;
     
     virtual char obj_signature() const { return signature(); };
     static char signature() { return 't'; };
-    
+
+#ifdef SPECIAL_ALLOC
+    void *operator new(size_t taille) { return special_alloc_new(taille); };
+    void operator delete(void *ptr) { special_alloc_delete(ptr); };
+#endif
 private:
     string filename;
     map<archive_num, infinint> last_mod; // key is archive number ; value is last_mod time
@@ -85,15 +95,20 @@ public:
 
     bool remove_all_from(const archive_num & archive); 
     void show(archive_num num, string marge = "") const; 
-	// list the most recent files owned by that archive 
-	// (or by any archive if num == 0)
+        // list the most recent files owned by that archive
+        // (or by any archive if num == 0)
     void apply_permutation(archive_num src, archive_num dst);
     void skip_out(archive_num num);
-    void compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea, 
-				   vector<infinint> & total_data, vector<infinint> & total_ea) const;
+    void compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea,
+                                   vector<infinint> & total_data, vector<infinint> & total_ea) const;
 
     char obj_signature() const { return signature(); };
     static char signature() { return 'd'; };
+    
+#ifdef SPECIAL_ALLOC
+    void *operator new(size_t taille) { return special_alloc_new(taille); };
+    void operator delete(void *ptr) { special_alloc_delete(ptr); };
+#endif
     
 private:
     list<data_tree *> rejetons;

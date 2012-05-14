@@ -1,0 +1,22 @@
+#!/bin/tcsh -f
+
+if(! -f configure) then
+  echo "run this script from the root directory of CVS working directory"
+  echo "which is where the 'configure' script resides"
+  exit 1
+endif
+
+if("$1" == "" || "$2" == "" || "$3" == "") then
+   echo "usage: $0 <version> <arch> <system>"
+   echo "example : $0 2.0.0 sun4 Solaris"
+   exit
+endif
+
+set filen="$1-$2-$3"
+
+./configure && make && mkdir dar-$filen && make DESTDIR=`pwd`/dar-$filen install-strip && tar -cf dar-$filen.tar dar-$filen && gzip -9 dar-$filen.tar
+make clean && make distclean
+./configure --enable-mode=32 && make && mkdir dar32-$filen && make DESTDIR=`pwd`/dar32-$filen install-strip && tar -cf dar32-$filen.tar dar32-$filen && gzip -9 dar32-$filen.tar
+make clean && make distclean
+./configure --enable-mode=64 && make && mkdir dar64-$filen && make DESTDIR=`pwd`/dar64-$filen install-strip && tar -cf dar64-$filen.tar dar64-$filen && gzip -9 dar64-$filen.tar
+make clean && make distclean

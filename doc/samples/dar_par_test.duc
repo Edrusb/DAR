@@ -1,0 +1,49 @@
+#!/bin/sh
+
+###
+#
+# this script is to be launched on dar command line when testing an archive with -s option (slicing)
+# you need to run this script from dar, adding the following argument on command-line
+#
+#     -E "dar_par_test.duc %p %b %n %e %c"
+#
+###
+#
+# if you prefer you can also add the line above in your the $HOME/.darrc file
+# under the test: conditional statement (see dar man page)
+#
+###
+#
+# usage par_script slice.basename slice.number extension
+# generates a Parchive redundancy file from the slice file
+#
+###
+
+if [ "$1" = "" -a "$2" = "" -a "$3" = "" -a "$4" == "" -a "$5" == "" ]; then
+  echo "usage: $0 <path> <basename> <slice number> <extension> <context>"
+  echo "$0 tests and if necessary repairs the given slice using Parchive redundancy  files"
+  exit 0
+fi
+
+if [ "$3" = "0" -o \( "$5" = "operation" -a "$3" = "1" \) ]; then
+  exit 0
+fi
+
+PAR=par2
+SLICE="$1/$2.$3.$4"
+
+if [ ! -r $SLICE ]; then
+   echo "`basename $0`: Cannot find or read the slice $SLICE, skiping, Dar will ask user for it"
+   exit 0;
+fi
+
+echo "$PAR verification slice $SLICE..."
+if ! $PAR v "$SLICE" ; then
+  echo "trying to repair the slice..."
+  if ! $PAR r "$SLICE" ; then
+     echo "PAR repairation failed. (read-only filesystem ?)"
+     exit 1
+  fi
+  echo "verifying after reparation..."
+  exec $PAR v "$SLICE"
+fi

@@ -18,236 +18,244 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.cpp,v 1.12 2003/03/02 10:58:47 edrusb Rel $
+// $Id: path.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #pragma implementation
 
-#include "path.hpp"
+#include "../my_config.h"
 #include <iostream>
+#include "path.hpp"
 
-static bool path_get_root(string & p, string & root);
+using namespace std;
 
-path::path(string s)
+namespace libdar
 {
-    string tmp;
-    dirs.clear();
-    relative = s[0] != '/';
-    if(s.size() < 1)
-	throw Erange("path::path", "empty string is not a valid path");
-    if(!relative)
-	s = string(s.begin()+1, s.end()); // remove the leading '/'
-    while(path_get_root(s, tmp))
-	dirs.push_back(tmp);
-    if(dirs.size() == 0 && relative)
-	throw Erange("path::path", "empty string is not a valid path");
-    reduce();
-    reading = dirs.begin();
-}
 
-path::path(const path & ref)
-{
-    dirs = ref.dirs;
-    relative = ref.relative;
-    reading = dirs.begin();
-}
+    static bool path_get_root(string & p, string & root);
 
-path & path::operator = (const path & ref)
-{
-    dirs = ref.dirs;
-    relative = ref.relative;
-    reading = dirs.begin();
-
-    return *this;
-}
-
-bool path::operator == (const path & ref) const
-{
-    if(ref.dirs.size() != dirs.size() || ref.relative != relative)
-	return false;
-    else
+    path::path(string s)
     {
-	list<string>::iterator here = (const_cast<path &>(*this)).dirs.begin();
-	list<string>::iterator there = (const_cast<path &>(ref)).dirs.begin();
-	list<string>::iterator here_fin = (const_cast<path &>(*this)).dirs.end();
-	list<string>::iterator there_fin = (const_cast<path &>(ref)).dirs.end();
-	while(here != here_fin && there != there_fin && *here == *there)
-	{
-	    here++;
-	    there++;
-	}
-
-	return here == here_fin && there == there_fin;
-    }
-}
-
-string path::basename() const
-{
-    if(dirs.size() > 0)
-	return dirs.back();
-    else
-	return "/";
-}
-
-bool path::read_subdir(string & r)
-{
-    if(reading != dirs.end())
-    {
-	r = *reading++;
-	return true;
-    }
-    else
-	return false;
-}
-
-bool path::pop(string &arg)
-{
-    if(relative)
-	if(dirs.size() > 1)
-	{
-	    arg = dirs.back();
-	    dirs.pop_back();
-	    return true;
-	}
-	else
-	    return false;
-    else
-	if(dirs.size() > 0)
-	{
-	    arg = dirs.back();
-	    dirs.pop_back();
-	    return true;
-	}
-	else
-	    return false;
-}
-
-bool path::pop_front(string & arg)
-{
-    if(is_relative())
-	if(dirs.size() > 1)
-	{
-	    arg = dirs.front();
-	    dirs.pop_front();
-	    return true;
-	}
-	else
-	    return false;
-    else
-	if(dirs.size() > 0)
-	{
-	    relative = false;
-	    arg = "/";
-	    return true;
-	}
-	else
-	    return false;
-}
-
-path & path::operator += (const path &arg)
-{
-    if(!arg.is_relative())
-	throw Erange("path::operator +", "can't add an absolute path");
-    list<string>::iterator it = (const_cast<path &>(arg)).dirs.begin();
-    list<string>::iterator it_fin = (const_cast<path &>(arg)).dirs.end();
-    while(it != it_fin)
-	dirs.push_back(*it++);
-
-    return *this;
-}
-
-bool path::is_subdir_of(const path & p) const
-{
-    list<string>::iterator it_me = (const_cast<path &>(*this)).dirs.begin();
-    list<string>::iterator it_arg = (const_cast<path &>(p)).dirs.begin();
-    list<string>::iterator fin_me = (const_cast<path &>(*this)).dirs.end();
-    list<string>::iterator fin_arg = (const_cast<path &>(p)).dirs.end();
-
-    while(it_me != fin_me && it_arg != fin_arg && *it_me == *it_arg)
-    {
-	it_me++;
-	it_arg++;
+        string tmp;
+        dirs.clear();
+        relative = s[0] != '/';
+        if(s.size() < 1)
+            throw Erange("path::path", "empty string is not a valid path");
+        if(!relative)
+            s = string(s.begin()+1, s.end()); // remove the leading '/'
+        while(path_get_root(s, tmp))
+            dirs.push_back(tmp);
+        if(dirs.size() == 0 && relative)
+            throw Erange("path::path", "empty string is not a valid path");
+        reduce();
+        reading = dirs.begin();
     }
 
-    return it_arg == fin_arg;
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: path.cpp,v 1.12 2003/03/02 10:58:47 edrusb Rel $";
-    dummy_call(id);
-}
-
-string path::display() const
-{
-    string ret = relative ? "" : "/";
-    list<string>::iterator it = (const_cast<path *>(this))->dirs.begin();
-    list<string>::iterator it_fin = (const_cast<path *>(this))->dirs.end();
-
-    if(it != it_fin)
-	ret += *it++;
-    while(it != it_fin)
-	ret = ret + "/" + *it++;
-
-    return ret;
-}
-
-void path::reduce()
-{
-    dirs.remove(".");
-    if(dirs.size() == 0 && relative)
-	dirs.push_back(".");
-    else
+    path::path(const path & ref)
     {
-	list<string>::iterator it = dirs.begin();
-	list<string>::iterator prev = it;
-
-	while(it != dirs.end())
-	{
-	    if(*it == ".." && *prev != "..")
-	    {
-		list<string>::iterator tmp = prev;
-
-		it = dirs.erase(it);
-		if(prev != dirs.begin())
-		{
-		    prev--;
-		    dirs.erase(tmp);
-		}
-		else
-		{
-		    dirs.erase(prev);
-		    prev = dirs.begin();
-		}
-	    }
-	    else
-	    {
-		prev = it;
-		it++;
-	    }
-	}
-	if(dirs.size() == 0 && relative)
-	    dirs.push_back(".");
+        dirs = ref.dirs;
+        relative = ref.relative;
+        reading = dirs.begin();
     }
-}
 
-static bool path_get_root(string & p, string & root)
-{
-    string::iterator it = p.begin();
+    path & path::operator = (const path & ref)
+    {
+        dirs = ref.dirs;
+        relative = ref.relative;
+        reading = dirs.begin();
 
-    if(p.size() == 0)
-	return false;
-    while(it != p.end() && *it != '/' )
-	it++;
+        return *this;
+    }
 
-    root = string(p.begin(), it);
-    if(it != p.end())
-	p = string(it+1, p.end());
-    else
-	p = "";
-    if(root.size() == 0)
-	throw Erange("path_get_root", "empty string as subdirectory does not make a valid path");
+    bool path::operator == (const path & ref) const
+    {
+        if(ref.dirs.size() != dirs.size() || ref.relative != relative)
+            return false;
+        else
+        {
+            list<string>::iterator here = (const_cast<path &>(*this)).dirs.begin();
+            list<string>::iterator there = (const_cast<path &>(ref)).dirs.begin();
+            list<string>::iterator here_fin = (const_cast<path &>(*this)).dirs.end();
+            list<string>::iterator there_fin = (const_cast<path &>(ref)).dirs.end();
+            while(here != here_fin && there != there_fin && *here == *there)
+            {
+                here++;
+                there++;
+            }
 
-    return true;
-}
+            return here == here_fin && there == there_fin;
+        }
+    }
+
+    string path::basename() const
+    {
+        if(dirs.size() > 0)
+            return dirs.back();
+        else
+            return "/";
+    }
+
+    bool path::read_subdir(string & r)
+    {
+        if(reading != dirs.end())
+        {
+            r = *reading++;
+            return true;
+        }
+        else
+            return false;
+    }
+
+    bool path::pop(string &arg)
+    {
+        if(relative)
+            if(dirs.size() > 1)
+            {
+                arg = dirs.back();
+                dirs.pop_back();
+                return true;
+            }
+            else
+                return false;
+        else
+            if(dirs.size() > 0)
+            {
+                arg = dirs.back();
+                dirs.pop_back();
+                return true;
+            }
+            else
+                return false;
+    }
+
+    bool path::pop_front(string & arg)
+    {
+        if(is_relative())
+            if(dirs.size() > 1)
+            {
+                arg = dirs.front();
+                dirs.pop_front();
+                return true;
+            }
+            else
+                return false;
+        else
+            if(dirs.size() > 0)
+            {
+                relative = false;
+                arg = "/";
+                return true;
+            }
+            else
+                return false;
+    }
+
+    path & path::operator += (const path &arg)
+    {
+        if(!arg.is_relative())
+            throw Erange("path::operator +", "can't add an absolute path");
+        list<string>::iterator it = (const_cast<path &>(arg)).dirs.begin();
+        list<string>::iterator it_fin = (const_cast<path &>(arg)).dirs.end();
+        while(it != it_fin)
+            dirs.push_back(*it++);
+    
+        return *this;
+    }
+
+    bool path::is_subdir_of(const path & p) const
+    {
+        list<string>::iterator it_me = (const_cast<path &>(*this)).dirs.begin();
+        list<string>::iterator it_arg = (const_cast<path &>(p)).dirs.begin();
+        list<string>::iterator fin_me = (const_cast<path &>(*this)).dirs.end();
+        list<string>::iterator fin_arg = (const_cast<path &>(p)).dirs.end();
+
+        while(it_me != fin_me && it_arg != fin_arg && *it_me == *it_arg)
+        {
+            it_me++;
+            it_arg++;
+        }
+
+        return it_arg == fin_arg; 
+    }
+
+    static void dummy_call(char *x)
+    {
+        static char id[]="$Id: path.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $";
+        dummy_call(id);
+    }
+
+    string path::display() const
+    {
+        string ret = relative ? "" : "/";
+        list<string>::iterator it = (const_cast<path *>(this))->dirs.begin();
+        list<string>::iterator it_fin = (const_cast<path *>(this))->dirs.end();
+
+        if(it != it_fin)
+            ret += *it++;
+        while(it != it_fin)
+            ret = ret + "/" + *it++;
+
+        return ret;
+    }
+
+    void path::reduce()
+    {
+        dirs.remove(".");
+        if(dirs.size() == 0 && relative)
+            dirs.push_back(".");
+        else
+        {
+            list<string>::iterator it = dirs.begin();
+            list<string>::iterator prev = it;
+
+            while(it != dirs.end())
+            {
+                if(*it == ".." && *prev != "..")
+                {
+                    list<string>::iterator tmp = prev;
+
+                    it = dirs.erase(it);
+                    if(prev != dirs.begin())
+                    {
+                        prev--;
+                        dirs.erase(tmp);
+                    }
+                    else
+                    {
+                        dirs.erase(prev);
+                        prev = dirs.begin();
+                    }
+                }
+                else
+                {
+                    prev = it;
+                    it++;
+                }
+            }
+            if(dirs.size() == 0 && relative)
+                dirs.push_back(".");
+        }
+    }
+
+    static bool path_get_root(string & p, string & root)
+    {
+        string::iterator it = p.begin();
+
+        if(p.size() == 0)
+            return false;
+        while(it != p.end() && *it != '/' )
+            it++;
+
+        root = string(p.begin(), it);
+        if(it != p.end())
+            p = string(it+1, p.end());
+        else
+            p = "";
+        if(root.size() == 0)
+            throw Erange("path_get_root", "empty string as subdirectory does not make a valid path");
+
+        return true;
+    }
+
+} // end of namespace

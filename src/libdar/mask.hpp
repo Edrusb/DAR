@@ -6,19 +6,19 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.hpp,v 1.10 2003/02/11 22:01:55 edrusb Rel $
+// $Id: mask.hpp,v 1.9 2003/10/24 11:10:57 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,136 +27,158 @@
 
 #pragma interface
 
-#include <string.h>
+#include "../my_config.h"
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+#if HAVE_REGEX_H
+#include <regex.h>
+#endif
+
 #include <string>
 #include <vector>
-#include <regex.h>
 #include "path.hpp"
 
-using namespace std;
-
-class mask
+namespace libdar
 {
-public :
-    virtual ~mask() {};
 
-    virtual bool is_covered(const string &expression) const = 0;
-    virtual mask *clone() const = 0;
-};
+        // generic class, parent of all masks
+    class mask
+    {
+    public :
+        virtual ~mask() {};
 
-class bool_mask : public mask
-{
-public :
-    bool_mask(bool always) { val = always; };
-
-    bool is_covered(const string &exp) const { return val; };
-    mask *clone() const { return new bool_mask(val); };
-
-private :
-    bool val;
-};
-
-class simple_mask : public mask
-{
-public :
-    simple_mask(const string & wilde_card_expression);
-    simple_mask(const simple_mask & m) { copy_from(m); };
-    simple_mask & operator = (const simple_mask & m) { detruit(); copy_from(m); return *this; };
-    virtual ~simple_mask() { detruit(); };
-
-    bool is_covered(const string &expression) const;
-    mask *clone() const { return new simple_mask(*this); };
-
-private :
-    char *the_mask;
-
-    void copy_from(const simple_mask & m);
-    void detruit() { if(the_mask != NULL) delete the_mask; the_mask = NULL; };
-};
+        virtual bool is_covered(const std::string &expression) const = 0;
+        virtual mask *clone() const = 0;
+    };
 
 
-class regular_mask : public mask
-{
-public :
-    regular_mask(const string & wild_card_expression);
-    virtual ~regular_mask() { regfree(&preg); };
+        // boolean mask, either always true or false
+    class bool_mask : public mask
+    {
+    public :
+        bool_mask(bool always) { val = always; };
 
-    bool is_covered(const string & expression) const;
-    mask *clone() const { return new regular_mask(*this); };
+        bool is_covered(const std::string &exp) const { return val; };
+        mask *clone() const { return new bool_mask(val); };
 
-private :
-    regex_t preg;
-};
+    private :
+        bool val;
+    };
 
-class not_mask : public mask
-{
-public :
-    not_mask(const mask &m) { copy_from(m); };
-    not_mask(const not_mask & m) { copy_from(m); };
-    not_mask & operator = (const not_mask & m) { detruit(); copy_from(m); return *this; };
-    ~not_mask() { detruit(); };
 
-    bool is_covered(const string &expression) const { return !ref->is_covered(expression); };
-    mask *clone() const { return new not_mask(*this); };
+        // matches as done on shell command lines (see "man 7 glob")
+    class simple_mask : public mask
+    {
+    public :
+        simple_mask(const std::string & wilde_card_expression);
+        simple_mask(const simple_mask & m) { copy_from(m); };
+        simple_mask & operator = (const simple_mask & m) { detruit(); copy_from(m); return *this; };
+        virtual ~simple_mask() { detruit(); };
 
-private :
-    mask *ref;
+        bool is_covered(const std::string &expression) const;
+        mask *clone() const { return new simple_mask(*this); };
 
-    void copy_from(const not_mask &m);
-    void copy_from(const mask &m);
-    void detruit();
-};
+    private :
+        char *the_mask;
+
+        void copy_from(const simple_mask & m);
+        void detruit() { if(the_mask != NULL) delete the_mask; the_mask = NULL; };
+    };
+
     
-class et_mask : public mask
-{
-public :
-    et_mask() {};
-    et_mask(const et_mask &m) { copy_from(m); };
-    et_mask & operator = (const et_mask &m) { detruit(); copy_from(m); return *this; };
-    ~et_mask() { detruit(); };
+        // matches regular expressions (see "man 7 regex")
+    class regular_mask : public mask
+    {
+    public :
+        regular_mask(const std::string & wilde_card_expression);
+        virtual ~regular_mask() { regfree(&preg); };
 
-    void add_mask(const mask & toadd);
+        bool is_covered(const std::string & expression) const;
+        mask *clone() const { return new regular_mask(*this); };
 
-    bool is_covered(const string & expression) const;
-    mask *clone() const { return new et_mask(*this); };
-    U_I size() const { return lst.size(); };
-protected :
-    vector<mask *> lst;
+    private :
+        regex_t preg;
+    };
+
+        // negation of the given mask
+    class not_mask : public mask
+    {
+    public :
+        not_mask(const mask &m) { copy_from(m); };
+        not_mask(const not_mask & m) { copy_from(m); };
+        not_mask & operator = (const not_mask & m) { detruit(); copy_from(m); return *this; };
+        ~not_mask() { detruit(); };
+
+        bool is_covered(const std::string &expression) const { return !ref->is_covered(expression); };
+        mask *clone() const { return new not_mask(*this); };
+
+    private :
+        mask *ref;
+
+        void copy_from(const not_mask &m);
+        void copy_from(const mask &m);
+        void detruit();
+    };
+
+        // makes an *AND* operator between two masks
+    class et_mask : public mask
+    {
+    public :
+        et_mask() {};
+        et_mask(const et_mask &m) { copy_from(m); };
+        et_mask & operator = (const et_mask &m) { detruit(); copy_from(m); return *this; };
+        ~et_mask() { detruit(); };
+
+        void add_mask(const mask & toadd);
+
+        bool is_covered(const std::string & expression) const;
+        mask *clone() const { return new et_mask(*this); };
+        U_I size() const { return lst.size(); };
+    protected :
+        std::vector<mask *> lst;
     
-private :
-    void copy_from(const et_mask & m);
-    void detruit();
-};
+    private :
+        void copy_from(const et_mask & m);
+        void detruit();
+    };
 
-class ou_mask : public et_mask
-{
-public :
-    bool is_covered(const string & expression) const;
-    mask *clone() const { return new ou_mask(*this); };
-};
+        // makes the *OR* operator between two masks
+    class ou_mask : public et_mask
+    {
+    public :
+        bool is_covered(const std::string & expression) const;
+        mask *clone() const { return new ou_mask(*this); };
+    };
 
-class simple_path_mask : public mask
-{
-public :
-    simple_path_mask(const string &p) : chemin(p) {};
+        // string matches if it is subdir or mask or mask is a subdir of expression
+    class simple_path_mask : public mask
+    {
+    public :
+        simple_path_mask(const std::string &p) : chemin(p) {};
 
-    bool is_covered(const string &ch) const;
-    mask *clone() const { return new simple_path_mask(*this); };
+        bool is_covered(const std::string &ch) const;
+        mask *clone() const { return new simple_path_mask(*this); };
     
-private :
-    path chemin;
-};
+    private :
+        path chemin;
+    };
 
-class same_path_mask : public mask
-{
-public : 
-    same_path_mask(const string &p) { chemin = p; };
+        // matches if string is exactly the given mask (no wilde card expression)
+    class same_path_mask : public mask
+    {
+    public :
+        same_path_mask(const std::string &p) { chemin = p; };
     
-    bool is_covered(const string &ch) const { return ch == chemin; };
-    mask *clone() const { return new same_path_mask(*this); };
+        bool is_covered(const std::string &ch) const { return ch == chemin; };
+        mask *clone() const { return new same_path_mask(*this); };
 
-private :
-    string chemin;
-};
+    private :
+        std::string chemin;
+    };
+
+} // end of namespace
 
 #endif

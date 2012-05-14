@@ -1,5 +1,5 @@
-from version 1.0.0 to version 1.0.1 
-- correction of few mistakes that lead the compilation to fail with certain 
+from version 1.0.0 to version 1.0.1
+- correction of few mistakes that lead the compilation to fail with certain
       C++ compilers
 - bug #1 fixed.
 
@@ -13,7 +13,7 @@ from version 1.0.2 to version 1.0.3
 from version 1.0.0 to version 1.1.0
 - added feature: now ignored directory are not stored at all in the archive
       unless -D option is used, in which case ignored directory are recorded as
-      empty dir (as it was in 1.0.x)
+      empty directory (as it was in 1.0.x)
 - added support for hard links. Generated archive format version is now 02, but
       format 01 can still be read, and use as reference.
 - fixed bug #1
@@ -22,19 +22,19 @@ from version 1.0.0 to version 1.1.0
 - added feature: restore only more recent file than existing one (-r option)
 - added feature: support for Extended Attributes (activated at compilation)
 - added feature: verbose option (-v) with -l (add archive contents)
-- modified behaviour: -l option without -v is no more interactive
+- modified behavior: -l option without -v is no more interactive
 - added feature: archive integrity test (option -t). CRC have been added in
-      the archive (format 02), thus even without compression Dar is able to 
+      the archive (format 02), thus even without compression Dar is able to
       detect errors.
 - added feature: comparison with filesystem (difference) (option -d)
-- modified behaviour: non interactive messages goes to stdout, while those
+- modified behavior: non interactive messages goes to stdout, while those
       asking user, goes to stderr (all goes to stderr if stdout is used for
       producing the archive, or for sending orders do dar_slave.
 - added feature: DAR automatically goes in non interactive mode if no terminal
       is found on standard input (for example when run from crontab). In that
       case any question make DAR to abort.
 - added feature: catalogue extraction to small file: "isolation" (-C option)
-- added feature: archive produced on stdout when using -c or -C with "-" as 
+- added feature: archive produced on stdout when using -c or -C with "-" as
       filename
 - added feature: -V option summarizes version of the binary
 - added feature: additional command "dar_xform" to "re-slice" an archive
@@ -43,18 +43,18 @@ from version 1.0.0 to version 1.1.0
 - fixed bug #5
 - a lot of speed optimization in algorithm
 - changed exit codes to positive values in case of error
-- dar returns an new error code when an operation is partially successful 
+- dar returns an new error code when an operation is partially successful
   (some filed missed to be saved / restored / tested / compared).
-- replace the use of vform() method by a customized simple implementation 
+- replace the use of vform() method by a customized simple implementation
   in the ui_printf() routine, this should now allow compilation with gcc-3
 - changed long option that used an underscore character (`_') by a dash ('-')
-- added -O option to have a better behaviour when used with non root user
+- added -O option to have a better behavior when used with non root user
 - added 'make doc' option in the makefile
 
 from version 1.1.0 to version 1.2.0
 - -P option can now accept wild cards
-- changed dar output format when listing archive contents to have something 
-  more similar to the output of tar. -T is provided to get the previous tree 
+- changed dar output format when listing archive contents to have something
+  more similar to the output of tar. -T is provided to get the previous tree
   listing
 - fixed bug #6
 - user interaction is now possible even if standard input is used (for pipe)
@@ -64,22 +64,22 @@ from version 1.1.0 to version 1.2.0
   uid and gid while listing archive contents.
 - added the possibility to launch command between slices (-E and -F options)
   for dar, dar_xform and dar_slave.
-- when saving or comparing a directory tree, DAR goes transparently in 
+- when saving or comparing a directory tree, DAR goes transparently in
   subdirectory not modifying the last_access date of each directory.
 - usage text (displayed by -h option) is now generated from xml file
   thanks to Chris Martin's little software named dar-help
 - fixed bug concerning the uninstallation of man pages
-- changed the place where man pages and documentation go /usr/share/doc 
-  usr/share/man 
+- changed the place where man pages and documentation go /usr/share/doc
+  usr/share/man
   in place of /usr/doc and /usr/man for the RPM package (conform to Filesystem
   Hierarchy Standard)
-- changed the place where documentation goes for /usr/local/doc to 
+- changed the place where documentation goes for /usr/local/doc to
   /usr/local/share/doc by default. (Thanks to Jerome Zago)
   (conform to Filesystem Hierarchy Standard)
 - added scrambling features (-J and -K options)
 - added selective compression (-Y and -Z options)
 - added third state for saved data to keep trace in an extracted catalogue of
-  what is saved in the reference archive (this opens the door to the archive 
+  what is saved in the reference archive (this opens the door to the archive
   manager)
 - added the ability to read configuration file (-B option, -B like "batch").
 - if a slice name is given in place of a base name, dar proposes to change
@@ -87,25 +87,25 @@ from version 1.1.0 to version 1.2.0
 - fixed bug #8
 - added dar_manager command-line program
 - replaced integer types by macro that can be adapted to have correct behavior
-  on 64 bits plateform (in particular to read archive from other platforms).
+  on 64 bits platform (in particular to read archive from other platforms).
 
 from version 1.2.0 to version 1.2.1
-- minor change to have backward compatiblity with old archive (dar < 1.2.0) 
-generated on 64 bits OS (have ot use OS_BITS=32 in Makefile on 64 bits OS).
+- minor change to have backward compatibility with old archive (dar < 1.2.0)
+generated on 64 bits OS (have to use OS_BITS=32 in Makefile on 64 bits OS).
 - adapted Axel Kohlmeyer's patch for RPMS
 - adapted Dietrich Rothe's patch for compression level : -z has an optional
   argument which is compression level to use.
 - I and -X now available while listing archive contents (-l)
-- based on Brian May's patch, dar with EA_SUPPORT avoids complaining when 
+- based on Brian May's patch, dar with EA_SUPPORT avoids complaining when
   reading a filesystem that do not supports EA.
-- based on Brian May's other patch, dar now uses by default the <stdint.h> 
+- based on Brian May's other patch, dar now uses by default the <stdint.h>
   integers.
-- dar is now built with dynamic linking, and a special verision named 
+- dar is now built with dynamic linking, and a special version named
   dar_static which is statically linked is also available
 - fixed problem on Windows NT & 2000 (fixed by first change above)
 
 from version 1.2.1 to 1.3.0
-- added parenthesis for a warning to be able to show, when openning a 
+- added parenthesis for a warning to be able to show, when opening a
   scrambled archive
 - fixed bug #10
 - added feature : --flat option
@@ -115,20 +115,63 @@ from version 1.2.1 to 1.3.0
 - added feature : --mincompr option
 - fixed a display error when listing a hard link (the name of the first
   hard link seen on an inode was displayed in place of the name of each hard
-  link). This did not concerne the tree (-T option) listing.
-- added standart config files ~/.darrrc and /etc/darrc config files
+  link). This did not concern the tree (-T option) listing.
+- added standard config files ~/.darrrc and /etc/darrc config files
 - conditional statements in included files (using make-like targets)
 - added feature : --noconf option
-- fixed a bug : a warning message issued when the user asks for dar to backup
-  the archive in the directory to save, was not displayed in some cases.
+- fixed a bug : warning message issued when th user asks for dar to backup
+  the archive in itself, was not displayed in some cases.
 - fixed bug #11
 - added total files counter in each archive while listing dar_manager database
 - fixed bug #12
-- improved slicename vs basename substitution warning and replacement.
+- improved slicename versus basename substitution warning and replacement.
 - changed internal name generation to avoid using std::sstream class
 - bzip2 compression implemented (need libbz2 library at compilation time)
 - added the --nodump feature
 - fixed bug #13
 - configuration file can have DOS or UNIX text formating
-- now closing files before asking for the last slice, this allow unmounting 
+- now closing files before asking for the last slice, this allow un-mounting
   filesystem in that case.
+
+from version 1.3.0 to 2.0.0
+- using configure script (built with automake & autoconf)
+- creation of the libdar library
+- API for libdar (version 1)
+- updating TUTORIAL
+- added chapter in NOTES for ssh / netcat use with dar
+- added -H option
+- making documentation for API : DOC_API
+- speed optimization for dar_manager
+- enclosed libdar sources in libdar namespace
+- added libdar dynamic library support (using libtool)
+- fixed bug in ui_printf. Bug appeared with the shell_interaction split from
+  user_interaction (for libdar)
+- fixed bug in dar_manager when creating empty database
+- changed hourshift implementation (no static variable used anymore)
+- changed code not to have dynamic allocation to take place before main() was
+  called
+- added compilation time option to replace infinint by 32 bits or 64 bits
+  integers
+- added special memory allocation (--enable-special-alloc) to better handle
+  many small dynamic objects (in the meaning of OOP).
+- fix. Dar_manager does no more send all its output to stderr, just interactive
+  messages are sent there.
+- changed "dar_manager -u" do not display anymore files present in the archive
+  which have not saved data or EA in the asked archive.
+- removed displaying of command-line used for backup ("dar -v -l ...") as it
+  is no more becoming inaccurate due to include files and as it would consume
+  too much space if it has to be developed.
+- added sample scripts for using dar with Parchive
+- now displaying option read from configuration files when using -v option
+- added %e and %c for user script parameters
+- using UPX to compress binary if available at compilation time
+- removed comments put by mistake in 1.3.0 around warning when try to backup
+  the archive itself. This revealed a bug, which made the warning be
+  issued in some wrong cases.
+- removed this previous warning when creating archive on the stdout
+- fixed bug #15
+- fixed error in libdar sanity checks, where exceptions were not raised (due 
+  to the lack of the "throw" keyword)
+- fixed bug #16
+- changed order of argument passed to dar by dar_manager, for the -x <archive>
+  be before any other option (in particular -B options).

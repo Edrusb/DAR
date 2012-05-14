@@ -1,0 +1,17 @@
+What will you find in this directory ?
+
+many script that help me build the releases:
+- batch_cygwin
+- batch_linux
+- match_linux_ea
+- make_cygwin_dist
+- make_rpm
+
+the RPM spec files for releases
+- *.rpm.spec
+
+DAR's logo to be included in RPM packages:
+- dar.gif
+
+a helper program to translate documentation to DOS format
+- todos.c

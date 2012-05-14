@@ -18,16 +18,19 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: hide_file.hpp,v 1.1 2003/02/11 22:01:52 edrusb Rel $
+// $Id: hide_file.hpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #ifndef HIDE_FILE_HPP
 #define HIDE_FILE_HPP
 
-
-#include "generic_file.hpp"
+#include "../my_config.h"
 #include <vector>
+#include "generic_file.hpp"
+
+using namespace libdar;
+using namespace std;
 
 class hide_file : public generic_file
 {
@@ -42,20 +45,20 @@ public:
 protected:
     struct partie
     {
-	infinint debut, longueur; // debut is the offset in ref file
-	infinint offset; // offset in the resulting no commented file
+        infinint debut, longueur; // debut is the offset in ref file
+        infinint offset; // offset in the resulting no commented file
     };
-
+        
     vector <partie> morceau;
     generic_file *ref;
 
     S_I inherited_read(char *a, size_t size);
-    S_I inherited_write(const char *a, size_t size);
+    S_I inherited_write(char *a, size_t size);
 
     virtual void fill_morceau() = 0;
-	// the inherited classes have with this method
-	// to fill the "morceau" variable that defines
-	// the portions
+        // the inherited classes have with this method
+        // to fill the "morceau" variable that defines
+        // the portions
 
 private:
     U_I pos_index;

@@ -1,0 +1,22 @@
+#!/bin/tcsh -f
+
+if(! -f configure) then
+  echo "run this script from the root directory of CVS working directory"
+  echo "which is where the 'configure' script resides"
+  exit 1
+endif
+
+if("$1" == "" || "$2" == "") then
+  echo usage: $0 "<archive> <rpm spec file>"
+  exit 1
+endif
+
+cp "$1" misc/dar.gif /usr/src/rpm/SOURCES
+cp "$2" /usr/src/rpm/SPECS
+
+set old_dir = `pwd`
+cd /usr/src/rpm/SPECS
+rpm -ba --clean --rmsource --nodeps --rmsource `basename $2`
+
+mv /usr/src/rpm/RPMS/i386/dar* /usr/src/rpm/SRPMS/dar* $old_dir
+rm /usr/src/rpm/SPECS/`basename $2`

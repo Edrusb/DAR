@@ -1,43 +1,55 @@
+version 2.0.0
+--------------
+Thanks to Jules for its suggestion about altern memory allocation when a lot of
+small blocks are asked and are only released at the end of the program, this is
+the base of the "special allocation". Thanks to Adam Sherman for presenting me
+Parchive. Thanks to Johnathan Burchill (author of kdar) for his feedback about
+the libdar API, and help in fixing bugs in pre-release 1, and in release 1.3.0
+bug #15. Thanks to Sergei Suyev for feedback. Thanks to Grzegorz Adam 
+Hankiewicz for its mini-howto. Thanks to Peter Kupec for having found and 
+reported bug #16, and for his attention to documentation coherence, and his 
+intensive testing.
+
 version 1.3.0
 --------------
 Thanks to David Rose for having found, identified an proposed a patch for
-bug #12. Memory leakages in general are difficult to find, thus  
+bug #12. Memory leakages in general are difficult to find, thus
 congratulations ! Thanks to Oliver Brendel for the great help and patience
 to my many asked tests to solve the bug #13, bug I could not reproduce. Thanks
-to John Reynolds for feedback. 
+to John Reynolds for feedback.
 
-Thanks also to Rgbtxus for the --flat option need expression. Thanks to Sergio 
+Thanks also to Rgbtxus for the --flat option need expression. Thanks to Sergio
 Borghese for reporting bug #11. Nicola Larosa for his suggestions about UPX
-(which will be considered for dar 2.x.x serie), Dietrich Rothe for the 
+(which will be considered for dar 2.x.x series), Dietrich Rothe for the
 --nodump feature request, and many others for feedback and encouragements.
 
 version 1.2.1
 ---------------
-Thanks to Axel Kohlmeyer for his patch about RPMS, Dietrich Rothe for its 
-patch on compression level, Brian May for his patches to comply with Debian 
-distro, Ulrich Hagen D.A.M Revok, Jahn Wells, Juhana Sadeharju, for their 
+Thanks to Axel Kohlmeyer for his patch about RPMS, Dietrich Rothe for its
+patch on compression level, Brian May for his patches to comply with Debian
+distro, Ulrich Hagen D.A.M Revok, Jahn Wells, Juhana Sadeharju, for their
 feedback and John Little for compiling the FAQ and man pages on the web.
 
 version 1.2.0
 ---------------
-Thanks to Chris Martin, Jerome Zago, Tim Doerzbacher, Sebastien Robart, 
+Thanks to Chris Martin, Jerome Zago, Tim Doerzbacher, Sebastien Robart,
 Kurt Palmer, Bernd Storsberg, Egor Cheshkov, Richard Bratt for feedback
 and suggestions.
 
-I must add a special Thanks to Chris Martin who realized a simple and 
-efficient tool that generates the usage C++ code from files writen in XML 
+I must add a special Thanks to Chris Martin who realized a simple and
+efficient tool that generates the usage C++ code from files written in XML
 syntax, making automatic word wrapping and indentation. This power tool
-named "dar-help" is licensed as part of DAR, but has been totally designed 
+named "dar-help" is licensed as part of DAR, but has been totally designed
 and written by Chris.
 
 
 version 1.1.0
 ---------------
 
-Thanks to Moritz Franosch for intensive testing, for finding several bugs and 
-proposing patches, to John Little for testing dar and for providing a forum 
-area, to Ulrich Hagen, Francois Botha, Tobias Jahn for feedback, and to 
-Andreas Gruenbacher for its Extended Attributes software, and its useful 
-answers to my questions. Thanks to the many other people that just encouraged 
+Thanks to Moritz Franosch for intensive testing, for finding several bugs and
+proposing patches, to John Little for testing dar and for providing a forum
+area, to Ulrich Hagen, Francois Botha, Tobias Jahn for feedback, and to
+Andreas Gruenbacher for its Extended Attributes software, and its useful
+answers to my questions. Thanks to the many other people that just encouraged
 me by their remarks and compliments.
 

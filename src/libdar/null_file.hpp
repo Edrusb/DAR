@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: null_file.hpp,v 1.5 2003/02/11 22:01:57 edrusb Rel $
+// $Id: null_file.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,20 +27,26 @@
 
 //#pragma interface
 
+#include "../my_config.h"
 #include "generic_file.hpp"
 
-class null_file : public generic_file
+namespace libdar
 {
-public :
-    null_file(gf_mode m) : generic_file(m) {};
-    bool skip(const infinint &pos) { return pos == 0; };
-    bool skip_to_eof() { return true; };
-    bool skip_relative(signed int x) { return false; };
-    infinint get_position() { return 0; };
 
-protected :
-    int inherited_read(char *a, size_t size) { return 0; };
-    int inherited_write(const char *a, size_t size) { return size; };
-};
+    class null_file : public generic_file
+    {
+    public :
+        null_file(gf_mode m) : generic_file(m) {};
+        bool skip(const infinint &pos) { return pos == 0; };
+        bool skip_to_eof() { return true; };
+        bool skip_relative(signed int x) { return false; };
+        infinint get_position() { return 0; };
+
+    protected :
+        int inherited_read(char *a, size_t size) { return 0; };
+        int inherited_write(char *a, size_t size) { return size; };
+    };
+
+} // end of namespace
 
 #endif

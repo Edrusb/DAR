@@ -1,0 +1,22 @@
+#!/bin/tcsh -f
+
+if(! -f configure) then
+  echo "run this script from the root directory of CVS working directory"
+  echo "which is where the 'configure' script resides"
+  exit 1
+endif
+
+if ("$1" == "") then
+  echo "usage: $0 <archive>"
+  exit
+endif
+
+misc/make_rpm $1 misc/dar_ea.rpm.spec
+mkdir rpm_dar_ea
+mv *.rpm rpm_dar_ea
+misc/make_rpm $1 misc/dar32_ea.rpm.spec
+mkdir rpm_dar32_ea
+mv *.rpm rpm_dar32_ea
+misc/make_rpm $1 misc/dar64_ea.rpm.spec
+mkdir rpm_dar64_ea
+mv *.rpm rpm_dar64_ea

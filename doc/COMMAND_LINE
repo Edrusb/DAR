@@ -1,0 +1,62 @@
+Status meanings :
+---------------
+! : not used
+- : used without arg
++ : used with argument
+* : used with optional argument
+---------------
+letter status description :
+---------------
+a !
+b - terminal bell                       --bell
+c + create archive                      --create
+d + difference with filesystem          --diff
+e !
+f - do not restore directory structure  --flat
+g !
+h - help usage                          --help
+i - path of the input pipe              --input
+j !
+k - do not deleted files drop between two backups --no-delete
+l + list archive contents               --list
+m + minimum size below which no compression will occur. --mincompr a default value is used. use -m 0 if you want to compress in any case.
+n - do not allow overwriting            --no-overwrite
+o - path of the output pipe             --output
+p - pause before creating new slice     --pause
+q - for version 2.1.0 suppress all messages except important warnings
+r - do not overwrite more recent file   --recent
+s + size of slice                       --slice
+t + test archive structure              --test
+u - not consider user EA                --no-user-EA
+v - verbose output                      --verbose
+w - do not warn before overwriting      --no-warn
+x + extract archive                     --extract
+y * bzip2 compression                   --bzip2
+z * gzip compression                    --gzip
+A + make a differential backup          --ref
+B + filename taken as command-line extension --config
+C + extract catalogue in separated file --isolate
+D - store excluded dir as empty dir     --empty-dir
+E + shell command to launch with slices --execute
+F + shell command to launch with slices of archive of reference   --execute-ref
+G !
+H * if a file for differential backup or diff differs from exactly one hour it is assumed as identical (no change).
+I + include mask                        --include
+J + key for unscrambling the reference catalogue --key-ref
+K + key for un/scrambling               --key
+L - license information
+M !
+N - do not read any configuration file ~/.darrc or /etc/darrc
+O - ignore user Id and group Id         --ignore-owner
+P + prune a directory tree              --prune
+Q - suppress some user interactions (OK for all), delete files 
+R + set the root directory              --root
+S + size of the first slice             --first-slice
+T - tree listing format                 --tree-format
+U - not consider root(or system) EA     --no-system-EA
+V - version information                 --version
+W - warranty disclosure information (POSIX RESERVED, sorry)
+X + exclude mask                        --exclude
+Y + included only filename for compression --include-compression
+Z + excluded filename from compression  --exclude-compression
+  - don't save files with nodump flag set --nodump

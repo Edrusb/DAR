@@ -18,103 +18,142 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.6.2.1 2003/04/15 21:51:53 edrusb Rel $
+// $Id: sar_tools.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 //
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
+
+#include "../my_config.h"
+
+#if STDC_HEADERS
+# include <string.h>
+#else
+# if !HAVE_STRCHR
+#  define strchr index
+#  define strrchr rindex
+# endif
+char *strchr (), *strrchr ();
+# if !HAVE_MEMCPY
+#  define memcpy(d, s, n) bcopy ((s), (d), (n))
+#  define memmove(d, s, n) bcopy ((s), (d), (n))
+# endif
+#endif
+
+#if HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
+#if HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+
+#if HAVE_ERRNO_H
 #include <errno.h>
-#include "cygwin_adapt.hpp"
-#include <string.h>
+#endif
+
 #include "erreurs.hpp"
 #include "user_interaction.hpp"
 #include "sar.hpp"
 #include "tools.hpp"
 #include "tuyau.hpp"
+#include "cygwin_adapt.hpp"
 
-static void dummy_call(char *x)
+using namespace std;
+
+namespace libdar
 {
-    static char id[]="$Id: sar_tools.cpp,v 1.6.2.1 2003/04/15 21:51:53 edrusb Rel $";
-    dummy_call(id);
-}
 
-generic_file *sar_tools_open_archive_fichier(const string &filename, bool allow_over, bool warn_over)
-{
-    char *name = tools_str2charptr(filename);
-    generic_file *ret = NULL;
-    generic_file *tmp = NULL;
-
-    try
+    static void dummy_call(char *x)
     {
-	S_I fd;
-
-	if(!allow_over || warn_over)
-	{
-	    struct stat buf;
-	    if(lstat(name, &buf) < 0)
-	    {
-		if(errno != ENOENT)
-		    throw Erange("open_archive_fichier", strerror(errno));
-	    }
-	    else
-	    {
-		if(!allow_over)
-		    throw Erange("open_archive_fichier", filename + " already exists, and overwritten is forbidden, aborting");
-		if(warn_over)
-		    user_interaction_pause(filename + " is about to be overwritten, continue ?");
-	    }
-	}
-	fd = open(name, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
-	if(fd < 0)
-	    throw Erange("open_archive_fichier", strerror(errno));
-	tmp = new fichier(fd);
-	if(tmp == NULL)
-	    throw Ememory("open_archive_fichier");
-	ret = new trivial_sar(tmp);
-	if(ret == NULL)
-	    throw Ememory("open_archive_fichier");
-    }
-    catch(...)
-    {
-	delete name;
-	if(ret != NULL)
-	    delete ret;
-	else // tmp is not managed by ret, which does not exist
-	    if(tmp != NULL)
-		delete tmp;
-	throw;
-    }
-    delete name;
-
-    return ret;
-}
-
-generic_file *sar_tools_open_archive_tuyau(S_I fd, gf_mode mode)
-{
-    generic_file *tmp = NULL;
-    generic_file *ret = NULL;
-
-    try
-    {
-	tmp = new tuyau(fd, mode);
-	if(tmp == NULL)
-	    throw Ememory("sar_tools_open_archive_tuyau");
-	ret = new trivial_sar(tmp);
-	if(ret == NULL)
-	    throw Ememory("sar_tools_open_archive_tuyau");
-    }
-    catch(...)
-    {
-	if(ret != NULL)
-	    delete ret;
-	else // tmp is not managed by ret, which does not exist
-	    if(tmp != NULL)
-		delete tmp;
-	throw;
+        static char id[]="$Id: sar_tools.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $";
+        dummy_call(id);
     }
 
-    return ret;
-}
+    generic_file *sar_tools_open_archive_fichier(const string &filename, bool allow_over, bool warn_over)
+    {
+        char *name = tools_str2charptr(filename);
+        generic_file *ret = NULL;
+        generic_file *tmp = NULL;
+    
+        try
+        {
+            S_I fd;
+
+            if(!allow_over || warn_over)
+            {
+                struct stat buf;
+                if(lstat(name, &buf) < 0)
+                {
+                    if(errno != ENOENT)
+                        throw Erange("open_archive_fichier", strerror(errno));
+                }
+                else
+                {
+                    if(!allow_over)
+                        throw Erange("open_archive_fichier", filename + " already exists, and overwritten is forbidden, aborting");
+                    if(warn_over)
+                        user_interaction_pause(filename + " is about to be overwritten, continue ?");
+                }
+            }
+            
+            fd = open(name, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
+            if(fd < 0)
+                throw Erange("open_archive_fichier", strerror(errno));
+            tmp = new fichier(fd);
+            if(tmp == NULL)
+                throw Ememory("open_archive_fichier");
+            ret = new trivial_sar(tmp);
+            if(ret == NULL)
+                throw Ememory("open_archive_fichier");
+        }
+        catch(...)
+        {
+            delete name;
+            if(ret != NULL)
+                delete ret;
+            else // tmp is not managed by ret, which does not exist
+                if(tmp != NULL)
+                    delete tmp;
+            throw;
+        }
+        delete name;
+
+        return ret;
+    }
+
+    generic_file *sar_tools_open_archive_tuyau(S_I fd, gf_mode mode)
+    {
+        generic_file *tmp = NULL;
+        generic_file *ret = NULL;
+    
+        try
+        {
+            tmp = new tuyau(fd, mode);
+            if(tmp == NULL)
+                throw Ememory("sar_tools_open_archive_tuyau");
+            ret = new trivial_sar(tmp);
+            if(ret == NULL)
+                throw Ememory("sar_tools_open_archive_tuyau");
+        }
+        catch(...)
+        {
+            if(ret != NULL)
+                delete ret;
+            else // tmp is not managed by ret, which does not exist
+                if(tmp != NULL)
+                    delete tmp;
+            throw;
+        }
+
+        return ret;
+    }
+
+} // end of namespace

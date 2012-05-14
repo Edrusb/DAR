@@ -18,38 +18,45 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: scrambler.hpp,v 1.5 2003/02/11 22:01:59 edrusb Rel $
+// $Id: scrambler.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
 #ifndef SCRAMBLER_HPP
 #define SCRAMBLER_HPP
 
+#include "../my_config.h"
+#include <string>
 #include "generic_file.hpp"
 #include "erreurs.hpp"
 #include "infinint.hpp"
 
-class scrambler : public generic_file
+namespace libdar
 {
-public:
-    scrambler(const string & pass, generic_file & hidden_side);
-    ~scrambler() { if(buffer != NULL) delete buffer; };
 
-    bool skip(const infinint & pos) { if(ref == NULL) throw SRC_BUG; return ref->skip(pos); };
-    bool skip_to_eof() { if(ref==NULL) throw SRC_BUG; return ref->skip_to_eof(); };
-    bool skip_relative(S_I x) { if(ref == NULL) throw SRC_BUG; return ref->skip_relative(x); };
-    infinint get_position() { if(ref == NULL) throw SRC_BUG; return ref->get_position(); };
+    class scrambler : public generic_file
+    {
+    public:
+        scrambler(const std::string & pass, generic_file & hidden_side);
+        ~scrambler() { if(buffer != NULL) delete buffer; };
+    
+        bool skip(const infinint & pos) { if(ref == NULL) throw SRC_BUG; return ref->skip(pos); };
+        bool skip_to_eof() { if(ref==NULL) throw SRC_BUG; return ref->skip_to_eof(); };
+        bool skip_relative(S_I x) { if(ref == NULL) throw SRC_BUG; return ref->skip_relative(x); };
+        infinint get_position() { if(ref == NULL) throw SRC_BUG; return ref->get_position(); };
 
-protected:
-    S_I inherited_read(char *a, size_t size);
-    S_I inherited_write(const char *a, size_t size);
+    protected:
+        S_I inherited_read(char *a, size_t size);
+        S_I inherited_write(char *a, size_t size);
 
-private:
-    string key;
-    U_32 len;
-    generic_file *ref;
-    unsigned char *buffer;
-    size_t buf_size;
-};
+    private:
+        std::string key;
+        U_32 len;
+        generic_file *ref;
+        unsigned char *buffer;
+        size_t buf_size;
+    };
+
+} // end of namespace
 
 #endif

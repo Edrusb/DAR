@@ -1,0 +1,16 @@
+#!/bin/tcsh -f
+
+if(! -f configure) then
+  echo "run this script from the root directory of CVS working directory"
+  echo "which is where the 'configure' script resides"
+  exit 1
+endif
+
+if("$1" == "") then
+   echo "usage: $0 <version>"
+   exit
+endif
+
+misc/make_cygwin_dist $1 ""
+misc/make_cygwin_dist $1 "32" --enable-mode=32
+misc/make_cygwin_dist $1 "64" --enable-mode=64

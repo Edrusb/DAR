@@ -1,0 +1,28 @@
+
+In this directory you can find several script and configuration files,
+that have been sent by dar users. They should work or be seen as illustration,
+and give a base to your own configuration.
+
+You will also find DUC files (Dar User Commands) see doc/NOTES chapter XV for
+more.
+
+
+
+file              |    author         |    description
+------------------+-------------------+---------------------------------
+                  |                   |
+cdbackup.sh         stef at hardco.de   script that use dar to make full
+                                        or differential backup to CDR
+
+darrc_sample        "(me)"              a sample /etc/darrc or ~/.darrc file
+
+sample1.txt         Henrik Ingo         for those who like to learn with
+                                        examples (a rich one) ;-)
+
+dar_par_create.duc  Denis Corbin        script to create PAR redundancy data
+                                        for protection
+dar_par_test.duc    Denis Corbin        script to test and repair slice
+                                        with redundancy data
+dar_par.dcf         Denis Corbin        dar config files for dar_par_create and
+                                        dar_par_test.duc
+

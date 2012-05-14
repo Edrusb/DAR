@@ -18,46 +18,77 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: etage.cpp,v 1.4 2003/02/11 22:01:41 edrusb Rel $
+// $Id: etage.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
 //
 /*********************************************************************/
 
-#include <dirent.h>
+#include "../my_config.h"
+
+// this was necessary to compile under Mac OS-X (boggus dirent.h)
+#if HAVE_STDINT_H
+#include <stdint.h>
+#endif
+
+#if HAVE_DIRENT_H
+# include <dirent.h>
+# define NAMLEN(dirent) strlen((dirent)->d_name)
+#else
+# define dirent direct
+# define NAMLEN(dirent) (dirent)->d_namlen
+# if HAVE_SYS_NDIR_H
+#  include <sys/ndir.h>
+# endif
+# if HAVE_SYS_DIR_H
+#  include <sys/dir.h>
+# endif
+# if HAVE_NDIR_H
+#  include <ndir.h>
+# endif
+#endif
+
+#if HAVE_ERRNO_H
 #include <errno.h>
-#include <string.h>
+#endif
+
 #include "etage.hpp"
 
+using namespace std;
 
-etage::etage(char *dirname)
+namespace libdar
 {
-    struct dirent *ret;
-    DIR *tmp = opendir(dirname);
 
-    if(tmp == NULL)
-	throw Erange("filesystem etage::etage" , strerror(errno));
-
-    fichier.clear();
-    while((ret = readdir(tmp)) != NULL)
-	if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
-	    fichier.push_back(string(ret->d_name));
-    closedir(tmp);
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: etage.cpp,v 1.4 2003/02/11 22:01:41 edrusb Rel $";
-    dummy_call(id);
-}
-
-
-bool etage::read(string & ref)
-{
-    if(fichier.size() > 0)
+    etage::etage(char *dirname)
     {
-	ref = fichier.front();
-	fichier.pop_front();
-	return true;
+        struct dirent *ret;
+        DIR *tmp = opendir(dirname);
+    
+        if(tmp == NULL)
+            throw Erange("filesystem etage::etage" , strerror(errno));
+    
+        fichier.clear();
+        while((ret = readdir(tmp)) != NULL)
+            if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
+                fichier.push_back(string(ret->d_name));
+        closedir(tmp);
     }
-    else
-	return false;
-}
+
+    static void dummy_call(char *x)
+    {
+        static char id[]="$Id: etage.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $";
+        dummy_call(id);
+    }
+
+    
+    bool etage::read(string & ref)
+    {
+        if(fichier.size() > 0)
+        {
+            ref = fichier.front();
+            fichier.pop_front();
+            return true;
+        }
+        else
+            return false;
+    }
+
+} // end of namespace

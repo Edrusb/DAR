@@ -27,6 +27,9 @@
 	ui_printf("\t\t   first\n");
 	ui_printf("   -b\t\t   ring the terminal bell when user action is required\n");
 	ui_printf("   -O\t\t   do not consider user and group ownership\n");
+	ui_printf("   -H [N]\t   ignore shift of an exact number of M hours if M less than or\n");
+	ui_printf("\t\t   equal to N in last modification dates. N defaults to 1 if\n");
+	ui_printf("\t\t   not specified.\n");
 	ui_printf("   -E <string>\t   command line to execute between slices\n");
 	ui_printf("   -F <string>\t   command line to execute between the slices of the archive of\n");
 	ui_printf("\t\t   reference\n");
@@ -34,9 +37,9 @@
 	ui_printf("   -u\t\t   do not save/restore EA of the user namespace.\n");
 	ui_printf("   -U\t\t   do not save/restore EA of the root namespace (needs root\n");
 	ui_printf("\t\t   privileges).\n");
-	ui_printf("\t\t   -U and -u are only available if EA_SUPPORT has been set at\n");
-	ui_printf("\t\t   compilation time. Check with -V to know compilation option\n");
-	ui_printf("\t\t   used.\n");
+	ui_printf("\t\t   -U and -u are not available if --disable-ea-support has been\n");
+	ui_printf("\t\t   given to the configure script at compilation time. Check\n");
+	ui_printf("\t\t   with -V to know compilation option used.\n");
 	ui_printf("   -K <string>\t   use the <string> to scramble/unscramble (i.e.: hide/decode)\n");
 	ui_printf("\t\t   the contents of the archive.\n");
 	ui_printf("   -J <string>\t   same as -K but it does concern the archive of reference\n");
@@ -69,8 +72,8 @@
 	ui_printf("   -m <number>\t   file size under which data is not compressed. By default -m\n");
 	ui_printf("\t\t   100 is assumed. If you want all file to be compressed\n");
 	ui_printf("\t\t   whatever their size is use -m 0\n");
-	ui_printf("   --nodump\t   do not consider for backup file with nodump 'd' flag set\n");
-	ui_printf("\t\t   (see lsattr/chattr).\n");
+	ui_printf("   --nodump\t   do not consider for backup, files having the nodump 'd' flag\n");
+	ui_printf("\t\t   set (see lsattr/chattr).\n");
 	ui_printf("\n");
 	ui_printf("Restoring options (to use with -x) :\n");
 	ui_printf("   -k\t\t   do not remove files marked as destroyed since the reference\n");
