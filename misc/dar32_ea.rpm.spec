@@ -1,12 +1,12 @@
 # THIS IS A GENERATED FILE DO NOT EDIT !
 summary: DAR - Disk ARchive
 Name: dar
-Version: 2.0.0
+Version: 2.0.1
 Release: 8
 Copyright: GPL
 Icon: dar.gif
 Group: Applications/Archiving
-Source: http://dar.linux.free.fr/dar-2.0.0.tar.gz
+Source: http://dar.linux.free.fr/dar-2.0.1.tar.gz
 URL: http://dar.linux.free.fr/
 BuildRoot: %{_tmppath}/%{name}32_ea-%{version}-%{release}-root
 BuildRequires: zlib-devel >= 1.1.3, gcc-c++, bzip2-devel >= 1.0.2

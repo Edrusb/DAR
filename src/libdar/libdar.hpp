@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.hpp,v 1.12 2003/10/18 14:43:07 edrusb Rel $
+// $Id: libdar.hpp,v 1.12.2.1 2003/11/19 18:40:14 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -40,7 +40,7 @@
 namespace libdar
 {
     const U_I LIBDAR_COMPILE_TIME_MAJOR = 1;
-    const U_I LIBDAR_COMPILE_TIME_MINOR = 0;
+    const U_I LIBDAR_COMPILE_TIME_MINOR = 1;
 
     extern void get_version(U_I & major, U_I & minor);
     extern void get_compile_time_features(bool & ea, bool & largefile, bool & nodump, bool & special_alloc, U_I & bits);

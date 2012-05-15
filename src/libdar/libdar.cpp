@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.14 2003/10/25 14:35:54 edrusb Rel $
+// $Id: libdar.cpp,v 1.15 2003/11/07 09:52:58 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -556,7 +556,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.14 2003/10/25 14:35:54 edrusb Rel $";
+        static char id[]="$Id: libdar.cpp,v 1.15 2003/11/07 09:52:58 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -687,9 +687,21 @@ namespace libdar
 
             if(create_not_isolate && sauv_path.is_subdir_of(fs_root)
                && selection.is_covered(filename+".1."+extension)
-               && subtree.is_covered(sauv_path.display())
                && filename!= "-")
-                user_interaction_pause(string("WARNING! The archive is located in the directory to backup, this may create an endless loop when the archive will try to save itself. You can either add -X \"")+ filename + ".*." + extension +"\" on the command line, or change the location of the archive (see -h for help). Do you really want to continue?");
+	    {
+		path tmp = sauv_path;
+		bool cov = true;
+		string drop;
+
+		do
+		{
+		    cov = cov && subtree.is_covered(tmp.display());
+		}
+		while(cov && tmp.pop(drop));
+
+		if(cov)
+		    user_interaction_pause(string("WARNING! The archive is located in the directory to backup, this may create an endless loop when the archive will try to save itself. You can either add -X \"")+ filename + ".*." + extension +"\" on the command line, or change the location of the archive (see -h for help). Do you really want to continue?");
+	    }
 
                 // building the reference catalogue
             if(ref_filename != NULL) // from a existing archive

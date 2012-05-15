@@ -295,18 +295,35 @@ KNOWN BUGS:
     fixed in version 2.0.0
 
 #16 description
-       Dar include does not ignore comments in included file as given by -B option
+       Dar include does not ignore comments in included file as given by -B 
+       option
 
     problem
-       when a line with only one carriage-return is put in a file, the following line
-       is considered as a normal line (not a comment), whatever it is, in particular
-       if it starts with a hash (#).
+       when a line with only one carriage-return is put in a file, the 
+       following line is considered as a normal line (not a comment), whatever
+       it is, in particular if it starts with a hash (#).
 
     solution
-       make the algorithm consider normal line once another character than space, tab
-       hash or carriage-return is met. (added the carriage-return in the list).
+       make the algorithm consider normal line once another character than 
+       space, tab hash or carriage-return is met. (added the carriage-return 
+       in the list).
 
     affects version 1.2.0, 1.2.1, 1.3.0
     fixed in version 2.0.0
 
+
+#17 description
+      Dar warns that the archive is about to save itself while a -P option is
+      used to prevent this eventuality.
+
+    problem
+      testing against this situation did not check that a parent directory of
+      the path where is saved the archive is excluded by a -P option.
+
+    solution
+      updating the test for the warning only appear in real auto-saving 
+      conditions.
+
+    affects version 2.0.0
+    fixed in version 2.0.1, 2.1.0 and greater.
 
