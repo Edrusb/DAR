@@ -1,0 +1,18 @@
+#!/bin/sh -f
+
+target=po/POTFILES.in
+
+if [ ! -f COPYING ] ; then
+   echo "must be run from the root directory of the package"
+   exit 1
+fi
+
+cat> $target <<EOF
+# List of source files containing translatable strings.
+# Copyright (C) 1995 Free Software Foundation, Inc.
+
+EOF
+
+find . -type f \( -name "*.?pp" -o -name "*.usage" \) -print >> $target
+
+sed -r -e 's%^(MSGID_BUGS_ADDRESS =).*%\1 http://sourceforge.net/tracker/?group_id=65612&atid=511612%' po/Makevars.template > po/Makevars

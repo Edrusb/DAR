@@ -89,7 +89,7 @@ AC_ARG_ENABLE(  [ea-support],
 AC_ARG_ENABLE(  [nodump-flag],
                 AC_HELP_STRING(--disable-nodump-flag, [deactivate the ext2/3 nodump flag check feature, if you don't have such filesystem]),
                 [AC_MSG_NOTICE([nodump flag disabled])],
-                [AC_CHECK_HEADER(linux/ext2_fs.h,
+                [AC_CHECK_HEADER(ext2fs/ext2_fs.h,
                                 [
                                 AC_DEFINE(NODUMP_FEATURE, [], [if defined, activates the ext2/3 nodump flag feature])
                                 ],
