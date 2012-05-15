@@ -1,3 +1,8 @@
+version 2.0.2
+--------------
+Thanks to Ruslan Hristov for reporting bug #18 (Sourceforge bug 850279),
+and thanks to Joshua Neal for reporting bug #19 (Sourceforge bug 851320).
+
 version 2.0.1
 --------------
 Thanks to David Baldwin for reporting bug #17 (Sourceforge bug 837735).

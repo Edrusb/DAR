@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: hide_file.hpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: hide_file.hpp,v 1.6.2.1 2003/11/28 08:03:06 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -46,7 +46,7 @@ protected:
     struct partie
     {
         infinint debut, longueur; // debut is the offset in ref file
-        infinint offset; // offset in the resulting no commented file
+        infinint offset; // offset in the resulting file
     };
         
     vector <partie> morceau;

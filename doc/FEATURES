@@ -3,7 +3,7 @@
                         DAR's FEATURES
 
 
-FILTERS:                      ref     : man dar
+FILTERS:                      ref     : man dar / NOTES chapter XVI
                               keywords: -I -X -P [list of path]
 dar is able to backup from total file system to a single file. Additionally a
 mechanism of filters permits, based on the filename, to exclude or include

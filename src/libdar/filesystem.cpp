@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.11 2003/10/18 14:43:07 edrusb Rel $
+// $Id: filesystem.cpp,v 1.11.2.1 2003/11/30 11:31:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -1367,7 +1367,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.11 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.11.2.1 2003/11/30 11:31:51 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1500,23 +1500,31 @@ namespace libdar
     static bool is_nodump_flag_set(const path & chem, const string & filename)
     {
 #ifdef NODUMP_FEATURE
-        S_I fd, f;
+        S_I fd, f = 0;
         char *ptr = tools_str2charptr((chem + filename).display());
     
         try
         {
-            fd = open(ptr, O_RDONLY|O_BINARY);
+            fd = open(ptr, O_RDONLY|O_BINARY|O_NONBLOCK);
             if(fd < 0)
-                throw Erange("filesystem.c:is_nodump_flag_set", string("failed to open ") + filename +" : " + strerror(errno));
-            if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
-            {
-                string error = strerror(errno);
-            
-                close(fd);
-                throw Erange("filesystem.c:is_nodump_flag_set", string("cannot get ext2 attributes for ") + filename +" : " + error);
-            }
-        
-            close(fd);
+		user_interaction_warning(string("Failed to open ") + filename +" while checking for nodump flag : " + strerror(errno));
+	    else
+	    {
+		try
+		{
+		    if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
+		    {
+			user_interaction_warning(string("Cannot get ext2 attributes (and nodump flag value) for ") + filename + " : " + strerror(errno));
+			f = 0;
+		    }
+		}
+		catch(...)
+		{
+		    close(fd);
+		    throw;
+		}
+		close(fd);
+	    }
         }
         catch(...)
         {

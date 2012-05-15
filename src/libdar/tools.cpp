@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.18 2003/10/18 14:43:07 edrusb Rel $
+// $Id: tools.cpp,v 1.18.2.1 2003/11/29 08:49:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -296,7 +296,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.18 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.18.2.1 2003/11/29 08:49:58 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -723,6 +723,45 @@ namespace libdar
                 user_interaction_warning(string("OK, keeping ") + base + " as basename");
             }
         }
+    }
+
+    string tools_getcwd()
+    {
+        size_t length = 10240;
+        char *buffer = NULL, *ret;
+        string cwd;
+        try
+        {
+            do 
+            {
+                buffer = new char[length];
+                if(buffer == NULL)
+                    throw Ememory("tools_getcwd()");
+                ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
+                if(ret == NULL) // could not get the CWD
+                    if(errno == ERANGE) // buffer too small
+                    {
+                        delete buffer;
+                        buffer = NULL;
+                        length *= 2;
+                    }
+                    else // other error
+                        throw Erange("tools_getcwd", string("Cannot get full path of current working directory: ") + strerror(errno));
+            }
+            while(ret == NULL);
+            
+            buffer[length - 1] = '\0';
+            cwd = buffer;
+        }
+        catch(...)
+        {
+            if(buffer != NULL)
+                delete buffer;
+            throw;
+        }
+        if(buffer != NULL)
+            delete buffer;
+        return cwd;
     }
 
     static bool is_a_slice_available(const string & base, const string & extension)

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.12 2003/10/18 14:43:07 edrusb Rel $
+// $Id: tools.hpp,v 1.12.2.1 2003/11/29 08:49:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -78,6 +78,9 @@ namespace libdar
 
         // base is the filename a slice
     extern void tools_check_basename(const path & loc, std::string & base, const std::string & extension);
+
+	// get current working directory
+    extern std::string tools_getcwd();
 
         // integer (agregates) manipulations
         // argument must be a regular interger (a bit field).

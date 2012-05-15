@@ -2,7 +2,7 @@
 summary: DAR - Disk ARchive
 Name: dar
 Version: DAR_VERSION
-Release: 8
+Release: 9
 Copyright: GPL
 Icon: dar.gif
 Group: Applications/Archiving
@@ -40,45 +40,66 @@ make DESTDIR=%{buildroot} install-strip
 
 %files
 %defattr(-,root,root,-)
-/usr/bin/dar
-/usr/bin/dar_slave
-/usr/bin/dar_xform
-/usr/bin/dar_manager
-/usr/bin/dar_static
 /usr/share/man/man1/dar.1
+/usr/share/man/man1/dar_manager.1
 /usr/share/man/man1/dar_slave.1
 /usr/share/man/man1/dar_xform.1
-/usr/share/man/man1/dar_manager.1
-/usr/include/dar/deci.hpp
-/usr/include/dar/erreurs.hpp
-/usr/include/dar/infinint.hpp
-/usr/include/dar/integers.hpp
+/usr/share/man/man1/dar_cp.1
+/usr/lib/libdar32.so.LIBDAR_MAJOR.0.LIBDAR_MINOR
+/usr/lib/libdar32.so.LIBDAR_MAJOR
+/usr/lib/libdar32.so
+/usr/lib/libdar32.la
+/usr/lib/libdar32.a
+/usr/include/dar/config.h
 /usr/include/dar/libdar.hpp
-/usr/include/dar/limitint.hpp
-/usr/include/dar/real_infinint.hpp
-/usr/include/dar/mask.hpp
 /usr/include/dar/path.hpp
+/usr/include/dar/mask.hpp
+/usr/include/dar/integers.hpp
+/usr/include/dar/real_infinint.hpp
 /usr/include/dar/statistics.hpp
 /usr/include/dar/user_interaction.hpp
-/usr/lib/libdar32.a
-/usr/lib/libdar32.la
-/usr/lib/libdar32.so
-/usr/lib/libdar32.so.1
-/usr/lib/libdar32.so.1.0.0
+/usr/include/dar/erreurs.hpp
+/usr/include/dar/deci.hpp
+/usr/include/dar/limitint.hpp
+/usr/include/dar/infinint.hpp
+/usr/include/dar/compressor.hpp
+/usr/include/dar/special_alloc.hpp
+/usr/include/dar/generic_file.hpp
+/usr/include/dar/wrapperlib.hpp
+/usr/include/dar/storage.hpp
+/usr/include/dar/tuyau.hpp
+/usr/include/dar/tools.hpp
+/usr/bin/dar
+/usr/bin/dar_xform
+/usr/bin/dar_slave
+/usr/bin/dar_manager
 /usr/bin/dar_cp
+/usr/bin/dar_static
 /usr/share/dar/dar_par.dcf
 /usr/share/dar/dar_par_create.duc
 /usr/share/dar/dar_par_test.duc
-%doc AUTHORS BUGS COPYING ChangeLog INSTALL NEWS README THANKS TODO doc/DOC_API doc/FEATURES doc/GOOD_BACKUP_PRACTICE doc/LIMITATIONS doc/NOTES doc/TUTORIAL doc/configure_options doc/samples/README doc/samples/cdbackup.sh doc/samples/darrc_sample doc/samples/sample1.txt doc/dar-differential-backup-mini-howto.en.html doc/LINKS
+/usr/share/dar/FEATURES
+/usr/share/dar/LIMITATIONS
+/usr/share/dar/NOTES
+/usr/share/dar/TUTORIAL
+/usr/share/dar/DOC_API
+/usr/share/dar/GOOD_BACKUP_PRACTICE
+/usr/share/dar/README
+/usr/share/dar/dar-differential-backup-mini-howto.en.html
+/usr/share/dar/LINKS
 
 %changelog
+* Sat Nov 22 2003 Denis Corbin <dar.linux@free.fr>
+- removed the %doc in spec file, as documentation
+  is now installed by "make"
+
 * Tue Oct 21 2003 Denis Corbin <dar.linux@free.fr>
 - added mini-howto and LINKS documentation
 
 * Thu Oct  9 2003 Denis Corbin <dar.linux@free.fr>
 - added sample scripts and dar_cp
 
-* Mon Sep 15 2003 Denis Corbin <dar.linux@free.fr
+* Mon Sep 15 2003 Denis Corbin <dar.linux@free.fr>
 - adapted spec file to dar version 2 (configure script)
 
 * Wed May 14 2003 Denis Corbin <dar.linux@free.fr>

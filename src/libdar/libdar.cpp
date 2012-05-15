@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.15 2003/11/07 09:52:58 edrusb Rel $
+// $Id: libdar.cpp,v 1.15.2.1 2003/11/29 08:49:58 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -556,7 +556,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.15 2003/11/07 09:52:58 edrusb Rel $";
+        static char id[]="$Id: libdar.cpp,v 1.15.2.1 2003/11/29 08:49:58 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -689,7 +689,7 @@ namespace libdar
                && selection.is_covered(filename+".1."+extension)
                && filename!= "-")
 	    {
-		path tmp = sauv_path;
+		path tmp = sauv_path == path(".") ? path(tools_getcwd()) : sauv_path;
 		bool cov = true;
 		string drop;
 

@@ -1,4 +1,4 @@
-.TH DAR 1 "OCT 1st, 2003"
+.TH DAR 1 "NOV 29th, 2003"
 .UC 8
 .SH NAME
 dar \- disk archive
@@ -97,14 +97,14 @@ do not allow overwriting of any file or slice.
 -w, --no-warn
 Do not warn before overwriting file or slice. By default (no -n and no -w) overwriting is allowed but a warning is issued before proceeding.
 .TP 20
+-R, --fs-root <path>
+The path points to the directory tree containing all the files that will be enrolled in the operation (backup or restoration). By default the current directory is used. All other paths used in -P option or in the [list of paths] on the command line are and must be relative to this path (or to current directory if -R is not present).
+.TP 20
 -X, --exclude <mask>
 The mask is a string with wild cards (like * and ?) which is applied to filenames which are not directories. If a given file matches the mask, it is excluded from the operation. By default (no -X on the command line), no file is excluded from the operation. -X may be present several times on the command line, in that case a file will not be considered for the given operation if it matches at least one -Z mask.
 .TP 20
 -I, --include <mask>
 The mask is applied to filenames which are not directories. If a given file matches the mask and does not match any mask given with -X, the file is selected for the operation. By default (no -I and no -X on the command line), all files are included for the operation. -I may be present several times on the command line, in that case all file that match one of the -I mask will be considered for the given operation, if they do not also match one of the -X mask.
-.TP 20
--R, --fs-root <path>
-The path points to the directory tree containing all the files that will be enrolled in the operation (backup or restoration). By default the current directory is used. All other paths used in -P option or in the [list of paths] on the command line are and must be relative to this path (or to current directory if -R is not present).
 .TP 20
 -P, --prune <path>
 Do not consider file or directory sub-tree given by the path. -P may be present several time on the command line. By default no sub-tree or file is excluded from the operation, and all the directory tree as indicated by -R is considered. Note that <path> may contains wild-cards like * or ? see
@@ -113,6 +113,10 @@ man page for more informations.
 .TP 20
 [list of paths]
 files or directory to only take in account, as opposed to -P. By default all files under the -R directory are considered. Else, if one or more file are given, just those are selected (if they do not match any -P option). All paths given this way must be relative to the -R directory.
+.P
+File selection in brief:
+.P
+As seen above, -I -X -P and [list of paths] are used to select the files to operate on. -I and -X only use the basename of files and do not apply to directories, while -P and [list of paths] use the full name including the path and do apply to directories. A directory is elected for operation if no -P option excludes it, and when a [list of paths] is present, if this directory is one of its member or a subdirectory of one of its members. If a directory is not selected, no recursion is done in it (the directory is pruned). For other files, over this previous mechanisms, a second test must be satisfied: no -X option must exclude the filename, and if some -I option are given, at least one must include the given file. -I -X and -P can use wild-cards, see glob(7) man page.
 .TP 20
 -u, --no-user-EA
 Do not consider the Extended Attributes (EA) of the user namespace. By default, they are saved and restored, if the support for EA has been activated at compilation time. If not, this option is forced internally (you need not specify it).

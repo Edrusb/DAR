@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: no_comment.cpp,v 1.7 2003/10/26 18:14:44 edrusb Rel $
+// $Id: no_comment.cpp,v 1.7.2.1 2003/11/28 08:03:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,7 +30,7 @@ using namespace libdar;
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: no_comment.cpp,v 1.7 2003/10/26 18:14:44 edrusb Rel $";
+    static char id[]="$Id: no_comment.cpp,v 1.7.2.1 2003/11/28 08:03:07 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -61,7 +61,7 @@ void no_comment::fill_morceau()
             case '\t':
                 tmp.longueur++;
                 break;
-	    case '\n':
+	    case '\n':  // cannot treat empty lines as command, because too short to fit in loop/switch
 		tmp.longueur = 0;
 		break;
             case '#':
@@ -98,7 +98,7 @@ void no_comment::fill_morceau()
                 {
                     if(morceau.size() < 1)
                         throw SRC_BUG;
-                    morceau.back().longueur += tmp.longueur;
+                    morceau.back().longueur = ref->get_position() - morceau.back().debut;
                     last_offset = morceau.back().offset+morceau.back().longueur;
                 }
                 last_block_is_comment = false;

@@ -1,5 +1,8 @@
+LIBDAR_MAJOR = `grep LIBDAR_COMPILE_TIME_MAJOR ../src/libdar/libdar.hpp | cut -d '=' -f 2 | cut -d ';' -f 1 | cut -d ' ' -f 2`
+LIBDAR_MINOR = `grep LIBDAR_COMPILE_TIME_MINOR ../src/libdar/libdar.hpp | cut -d '=' -f 2 | cut -d ';' -f 1 | cut -d ' ' -f 2`
+
 %.spec : %.proto ../configure.ac
-	sed -e "s%DAR_VERSION%$(PACKAGE_VERSION)%g" -e "s%GENERATE_COMMENT%THIS IS A GENERATED FILE DO NOT EDIT !%g" $< > $@
+	sed -e "s%DAR_VERSION%$(PACKAGE_VERSION)%g" -e "s%GENERATE_COMMENT%THIS IS A GENERATED FILE DO NOT EDIT !%g" -e "s%LIBDAR_MAJOR%$(LIBDAR_MAJOR)%g" -e "s%LIBDAR_MINOR%$(LIBDAR_MINOR)%g" $< > $@
 
 dar.rpm.spec : dar.rpm.proto
 dar.rpm.spec : dar.rpm.proto

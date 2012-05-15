@@ -30,9 +30,11 @@ foreach fichier (`find $build_dir/man -type f -print` )
    misc/todos $build_dir/`basename $fichier`.txt
 end
 rm -rf $build_dir/man $build_dir/bin $build_dir/lib $build_dir/include
-foreach fichier (README TODO INSTALL doc/TUTORIAL ChangeLog BUGS doc/NOTES THANKS COPYING doc/LINKS)
-   cp $fichier $build_dir/`basename $fichier`.txt
+foreach fichier (README TODO INSTALL doc/TUTORIAL ChangeLog BUGS doc/NOTES THANKS COPYING doc/LINKS doc/FEATURES doc/GOOD_BACKUP_PRACTICE doc/LIMITATIONS $build_dir/share/dar/dar_par* )
+   cp $fichier "$build_dir/`basename $fichier`.txt"
+   misc/todos "$build_dir/`basename $fichier`.txt"
 end
+rm -rf $build_dir/share
 cp doc/dar-differential-backup-mini-howto.en.html  $build_dir
 zip -9 -r "$dir_name".zip $dir_name
 rm -rf $build_dir

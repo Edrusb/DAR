@@ -22,6 +22,7 @@ VIII - Makefile targets
 XIII - overflow in arithmetic integer operations
  XIV - using data protection with DAR & PAR
   XV - Dar User Command (DUC files)
+ XVI - Examples of file filtering
 
 I- EA & differential backup
 ============================
@@ -1185,3 +1186,115 @@ doc/samples directory for a few examples of DUC files.
 Note that starting version 2.1.0, several -B options will be possible,
 each given command will be called in the order of their appearance of the
 corresponding -B option.
+
+
+ XVI - Examples of file filtering
+==================================
+
+file filtering is what defines which files are saved, listed, restored, 
+compared, tested, and so on, in brief, I will say which file are elected for
+the operated in the following, meaning by "operation, either a backup, a 
+restoration, a archive contents listing, a archive comparison, etc.
+
+file filtering is done using the following options -X, -I, -P, -R and with
+the any non options argument given on the command-line (which is the man page
+is referred as [list of path]). A non option argument is one that does not start
+by a dash ('-' character). If however you need to give in the [list of path] 
+an argument that starts by a dash, you need to add the '--' argument after 
+which no search is done for command line options.
+
+OK, Let's start with some concretes examples:
+
+	dar -c toto 
+
+this will backup the current directory and all what is located into it to 
+build the toto archive, also located in the current directory. Usually you
+should get a warning telling you that you are about to backup the archive itself
+
+Now let's see something less obvious:
+
+	dar -c toto -R / home/ftp
+
+the -R option tell dar to consider all file under the / root directory, while
+the "home/ftp" argument is not an option argument, and thus is a member of
+[list of path]. This tells dar to restrict the operation only on the 
+home/ftp subdirectory of the given root directory thus here /home/ftp.
+
+But this is a little bit different than the following:
+
+	dar -c toto -R /home/ftp
+
+here dar will save any file under /home/ftp without any restriction. So what
+is the difference ? Yes, exactly the same files will be saved as just above,
+but the file /home/ftp/welcome.msg for example, will be stored as 
+<ROOT>/welcome.msg . Where <ROOT> will be replaced by the argument given to
+-R option (which defaults to "."), at restoration or comparison time. While in
+the previous example the same file would have been stored with the following
+path <ROOT>/home/ftp/welcome.msg .
+
+
+	dar -c toto -R / -P home/ftp/pub  home/ftp etc
+
+as previously, but the -P option make all files under the /home/ftp/pub not to
+be considered for the operation. Additionally the /etc directory and its 
+subdirectories are saved, here [list of path] contains two members.
+
+	dar -c toto -R / -P etc/password etc
+
+here we save all the /etc except the /etc/password file. Arguments given to -P
+can be plain files also. But when they are directory this exclusion applies to
+the directory itself and its contents. Note that using -X to exclude "password"
+does have the same effect:
+
+	dar -c toto -R / -X "password" etc
+
+will save all the /etc directory except any file with name equal to "password".
+thus of course /etc/password will no be saved, but if it exists, 
+/etc/rc.d/password will not be saved neither if it is not a directory. Yes,
+if a directory /etc/rc.d/password exist, it will not be affected by the -X
+option. As well as -I, -X option do not apply to directories. The reason is
+to be able to filter some kind of file without excluding a particular directory
+for example you want to save all mp3 files and only MP3 files,
+
+	dar -c toto -R / -I "*.mp3" -I "*.MP3" home/ftp 
+
+will save any mp3 o MP3 ending files under the /home/ftp directories and 
+subdirectories. If instead -I (or -X) applied to directories, we would only be
+able to recurse in subdirectories ending by ".mp3" or ".MP3". If you had a 
+directory named "/home/ftp/Music" for example, full of mp3, you would not have
+been able to save it.
+
+Note that the glob expressions (where comes the wild-card '*' '?' and so on),
+can do much more complicated things like "*.[mM][pP]3" you could replace the
+previous example by
+
+	dar -c toto -R / -I "*.[mM][pP]3" home/ftp
+
+this would cover all .mp3 .mP3 .Mp3 and .MP3 files.
+
+Last an very complete example:
+
+	dar -c toto -R / -P "*/.mozilla/*/[Cc]ache" -X ".*~" -X ".*~" -I "*.[Mm][pP][123]" home/ftp -- -fake
+
+so what ?
+
+OK, here we save all under /home/ftp and /-fake but we do not save the contents
+of "*/.mozilla/*/[Cc]ache" like for example 
+"/home/ftp/.mozilla/ftp/abcd.slt/Cache" directory and its contents. In theses 
+directories we save any file matching "*.[Mm][pP][123]" files except those
+ending by a tilde (~ character), Thus for example file which name is 
+"toto.mp3" or ".bloup.Mp2"
+
+Now the inside algorithm:
+
+	a file is elected for operation if
+ 1 - its name does not match any -X option or it is a directory
+*and*
+ 2 - if some -I is given, file is either a directory or match at least one 
+     of the -I option given.
+*and*
+ 3 - path and filename do not match any -P option
+*and* 
+ 4 - if some non option are given (building a [list of path]) the path to the
+     file is one of the member of [list of path] or a subdirectory of one of
+     the members [list of path] .
