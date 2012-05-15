@@ -170,14 +170,14 @@ from version 1.3.0 to 2.0.0
   issued in some wrong cases.
 - removed this previous warning when creating archive on the stdout
 - fixed bug #15
-- fixed error in libdar sanity checks, where exceptions were not raised (due 
+- fixed error in libdar sanity checks, where exceptions were not raised (due
   to the lack of the "throw" keyword)
 - fixed bug #16
 - changed order of argument passed to dar by dar_manager, for the -x <archive>
   be before any other option (in particular -B options).
 
 from 2.0.0 to 2.0.1
-- fixed bug #17 
+- fixed bug #17
 
 from 2.0.1 to 2.0.2
 - fixed bug #18
@@ -187,3 +187,8 @@ from 2.0.1 to 2.0.2
 
 from 2.0.2 to 2.0.3
 - fixed bug #20
+
+from 2.0.3 to 2.0.4
+- updated autoconf version used to generate configure script (2.57 -> 2.59) The
+  large file support is back with gcc-3 (was only working with gcc-2)
+

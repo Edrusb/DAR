@@ -1,3 +1,7 @@
+version 2.0.4
+--------------
+Thanks to Matthew Valites and "nedkonz" for feedback about large file support.
+
 version 2.0.3
 --------------
 Thanks to "Gandalf" on the historical forum for having reported bug #20
@@ -18,9 +22,9 @@ small blocks are asked and are only released at the end of the program, this is
 the base of the "special allocation". Thanks to Adam Sherman for presenting me
 Parchive. Thanks to Johnathan Burchill (author of kdar) for his feedback about
 the libdar API, and help in fixing bugs in pre-release 1, and in release 1.3.0
-bug #15. Thanks to Sergei Suyev for feedback. Thanks to Grzegorz Adam 
-Hankiewicz for its mini-howto. Thanks to Peter Kupec for having found and 
-reported bug #16, and for his attention to documentation coherence, and his 
+bug #15. Thanks to Sergei Suyev for feedback. Thanks to Grzegorz Adam
+Hankiewicz for its mini-howto. Thanks to Peter Kupec for having found and
+reported bug #16, and for his attention to documentation coherence, and his
 intensive testing.
 
 version 1.3.0
