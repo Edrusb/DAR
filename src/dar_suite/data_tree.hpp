@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.hpp,v 1.10 2003/10/18 14:43:07 edrusb Rel $
+// $Id: data_tree.hpp,v 1.10.2.1 2003/12/14 13:57:54 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -58,8 +58,8 @@ public:
 
     void set_data(const archive_num & archive, const infinint & date) { last_mod[archive] = date; };
     void set_EA(const archive_num & archive, const infinint & date) { last_change[archive] = date; };
-    virtual bool remove_all_from(archive_num archive); // return true if the corresponding file
-        // is no more located by any archive (this the object is no more usefull)
+    virtual bool remove_all_from(const archive_num & archive); // return true if the corresponding file
+        // is no more located by any archive (thus, the object is no more usefull)
     void listing() const; // list where is saved this file
     virtual void apply_permutation(archive_num src, archive_num dst);
     virtual void skip_out(archive_num num); // decrement archive numbers above num

@@ -184,3 +184,6 @@ from 2.0.1 to 2.0.2
 - fixed bug #17bis
 - documentation about filter mechanism added
 - fixed bug #19
+
+from 2.0.2 to 2.0.3
+- fixed bug #20

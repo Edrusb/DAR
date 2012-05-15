@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.53)
-AC_INIT([DAR], [2.0.2], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.0.3], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -96,7 +96,7 @@ AC_ARG_ENABLE(  [nodump-flag],
                                 [
                                  AC_MSG_NOTICE([cannot find linux/ext2_fs.h header file, nodump-flag feature will not be activated])
                                 ])
-                 
+
                 ])
 
 AC_ARG_ENABLE(  [examples],
@@ -112,7 +112,7 @@ AC_ARG_ENABLE(  [os-bits],
                                 [
                                   AC_RUN_IFELSE(
                                         [AC_LANG_PROGRAM([#include <inttypes.h>],
-                                                         [ uint16_t a  = 0; uint32_t b = 0; uint64_t c = 0; 
+                                                         [ uint16_t a  = 0; uint32_t b = 0; uint64_t c = 0;
                                                            int16_t d = 0; int32_t e = 0; int64_t f = 0;
                                                            return a+b+c+d+e+f;
                                                          ])

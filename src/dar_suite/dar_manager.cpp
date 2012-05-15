@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.17 2003/10/18 14:43:07 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.17.2.1 2003/12/15 20:33:40 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -43,7 +43,7 @@
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.2.0"
+#define DAR_MANAGER_VERSION "1.2.1"
 
 enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, move };
 
@@ -91,7 +91,7 @@ S_I little_main(S_I argc, char *argv[], const char **env)
     archive_num num, num2;
     vector<string> rest;
     bool info_details;
-    
+
     shell_interaction_change_non_interactive_output(&cout);
     if(!command_line(argc, argv, op, base, arg, num, rest, num2, info_details))
         return EXIT_SYNTAX;
@@ -291,7 +291,7 @@ static bool command_line(S_I argc, char *argv[],
 	    if(lu == 'o' || lu == 'r')
 		break; // stop reading arguments
 	}
-    
+
     for(S_I i = optind; i < argc; i++)
         rest.push_back(argv[i]);
 
@@ -358,7 +358,7 @@ static bool command_line(S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.17 2003/10/18 14:43:07 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.17.2.1 2003/12/15 20:33:40 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -387,11 +387,11 @@ static void op_add(const string & base, const string &arg, string fake, bool inf
         if(info_details)
             user_interaction_warning("Reading catalogue of the archive to add...");
         catalogue *catal = macro_tools_get_catalogue_from(arg, EXTENSION);
-        
+
         try
         {
             string chemin, b;
-         
+
             if(info_details)
                 user_interaction_warning("Updating database with catalogue...");
             if(fake == "")
@@ -406,7 +406,7 @@ static void op_add(const string & base, const string &arg, string fake, bool inf
             throw;
         }
         delete catal;
-        
+
         if(info_details)
             user_interaction_warning("Compressing and writing back database to file...");
         write_base(base, dat, true);
@@ -764,7 +764,7 @@ static database *read_base(const string & base, bool partial)
         delete f;
     return ret;
 }
-    
+
 static void write_base(const string & filename, const database *base, bool overwrite)
 {
     generic_file *dat = database_header_create(filename, overwrite);
@@ -778,6 +778,6 @@ static void write_base(const string & filename, const database *base, bool overw
         delete dat;
         throw;
     }
-    
+
     delete dat;
 }

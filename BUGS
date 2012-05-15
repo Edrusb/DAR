@@ -383,3 +383,20 @@ KNOWN BUGS:
     affects version 1.3.0, 2.0.0, 2.0.1
     fixed in version 2.0.2
 
+#20 description
+      dar_manager did not completely removed reference to an archive when it
+      was removed from a database
+
+    problem
+      data_dir is a C++ class that inherit from data_tree. This one has a 
+      virtual method remove_all_from(), that had was redefined in the data_dir
+      class with a very little difference, making it not be a redefinition
+      of the inherited class. (argument was "archive_num" in place of "const
+      & archive_num"). This redefined method was never called, and the removal
+      never recursed in subdirectories.
+
+    solution
+      make the two signature identical in the mother and inherited classes.
+
+    affects version 1.3.0, 2.0.0, 2.0.1, 2.0.2
+    fixed in version 2.0.3

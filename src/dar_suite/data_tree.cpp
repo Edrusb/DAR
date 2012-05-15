@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.cpp,v 1.11 2003/10/18 14:43:07 edrusb Rel $
+// $Id: data_tree.cpp,v 1.11.2.1 2003/12/14 13:57:54 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -177,7 +177,7 @@ bool data_tree::read_EA(archive_num num, infinint & val) const
         return false;
 }
 
-bool data_tree::remove_all_from(archive_num archive)
+bool data_tree::remove_all_from(const archive_num & archive)
 {
     map<archive_num, infinint>::iterator it = last_mod.begin();
     while(it != last_mod.end())
@@ -706,7 +706,7 @@ static data_tree *read_from_file(generic_file & f)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: data_tree.cpp,v 1.11 2003/10/18 14:43:07 edrusb Rel $";
+    static char id[]="$Id: data_tree.cpp,v 1.11.2.1 2003/12/14 13:57:54 edrusb Rel $";
     dummy_call(id);
 }
 

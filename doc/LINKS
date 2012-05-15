@@ -1,14 +1,10 @@
 Here is a list of other projects related to DAR:
 
 project name: KDAR
-status: this project is under development, this is a KDE GUI Front End for DAR
 Author: Johnathan Burchill
-Screen-shots: http://www.phys.ucalgary.ca/~burchill/KDAR/index.html
-Contact: through dar-discussion mailing-list.
+web site: http://kdar.sourceforge.net/
 
 Project name: <to be defined>
-status: under development, this is a FLTK GUI that generates a command-line
-        it can run dar or provide the corresponding command line to put in 
-        crontab, etc.
 Author: Lars H. Rohwedder
+web site: ?
 
