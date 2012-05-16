@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.hpp,v 1.7 2003/11/15 00:16:47 edrusb Rel $
+// $Id: sar.hpp,v 1.7.2.1 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef SAR_HPP
 #define SAR_HPP
-
-#pragma interface
 
 #include <string>
 #include "generic_file.hpp"
@@ -128,7 +126,7 @@ namespace libdar
     protected:
         S_I inherited_read(char *a, size_t size) { return reference->read(a, size); };
         S_I inherited_write(char *a, size_t size) { return reference->write(a, size); };
-    
+
     private:
         generic_file *reference;
         infinint offset;

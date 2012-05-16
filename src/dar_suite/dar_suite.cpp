@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.8.4.2 2004/01/14 13:21:57 edrusb Rel $
+// $Id: dar_suite.cpp,v 1.8.4.3 2004/07/18 13:09:07 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -72,6 +72,11 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(int, 
         user_interaction_warning("Lack of memory to achieve the operation, aborting operation");
         ret = EXIT_ERROR;
     }
+    catch(std::bad_alloc & e)
+    {
+        user_interaction_warning("Lack of memory to achieve the operation, aborting operation");
+        ret = EXIT_ERROR;
+    }
     catch(Erange & e)
     {
         user_interaction_warning("FATAL error, aborting operation");
@@ -115,6 +120,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(int, 
 	x.dump();
 	user_interaction_warning("CAUGHT A NON (LIB)DAR EXCEPTION");
         user_interaction_warning("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER");
+	ret = EXIT_BUG;
     }
 
     try
@@ -132,6 +138,6 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(int, 
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.8.4.2 2004/01/14 13:21:57 edrusb Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.8.4.3 2004/07/18 13:09:07 edrusb Exp $";
     dummy_call(id);
 }

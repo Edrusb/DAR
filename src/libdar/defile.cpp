@@ -18,11 +18,9 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: defile.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: defile.cpp,v 1.5.4.1 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
-
-#pragma implementation
 
 #include "../my_config.h"
 #include "defile.hpp"
@@ -54,11 +52,11 @@ namespace libdar
                     init = true;
             }
     }
-            
+
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: defile.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: defile.cpp,v 1.5.4.1 2004/07/25 20:38:03 edrusb Exp $";
         dummy_call(id);
     }
-    
+
 } // end of namespace

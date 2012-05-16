@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.25.2.5 2004/01/31 13:00:53 edrusb Rel $
+// $Id: libdar.cpp,v 1.25.2.6 2004/09/10 22:34:15 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -231,7 +231,7 @@ namespace libdar
                             info_details, pause, empty_dir, algo, compression_level, file_size, first_file_size, root_ea, user_ea,
                             execute, crypto, pass, compr_mask, min_compr_size,
                             nodump, hourshift, empty);
-    };
+    }
 
     statistics op_create_noexcept(const path &fs_root,
 				  const path &sauv_path,
@@ -668,7 +668,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.25.2.5 2004/01/31 13:00:53 edrusb Rel $";
+        static char id[]="$Id: libdar.cpp,v 1.25.2.6 2004/09/10 22:34:15 edrusb Exp $";
         dummy_call(id);
     }
 

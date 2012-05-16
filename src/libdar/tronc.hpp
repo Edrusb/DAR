@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
+// $Id: tronc.hpp,v 1.4.4.1 2004/07/25 20:38:04 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef TRONC_HPP
 #define TRONC_HPP
-
-#pragma interface
 
 #include "../my_config.h"
 #include "generic_file.hpp"
@@ -38,7 +36,7 @@ namespace libdar
     public :
         tronc(generic_file *f, const infinint &offset, const infinint &size);
         tronc(generic_file *f, const infinint &offset, const infinint &size, gf_mode mode);
-    
+
         bool skip(const infinint & pos);
         bool skip_to_eof();
         bool skip_relative(S_I x);

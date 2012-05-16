@@ -246,3 +246,15 @@ from 2.1.3 to 2.1.4
 - improved limitint detection overflow
 - fixed bug #28
 
+from 2.1.4 to 2.1.5
+- added protection code against bad_alloc exception
+- new configure option to bypass libdl test
+- removed expected exception list in deci, limitint, real_infinint and storage
+  modules to improve global robustness
+- remove the #pragma implementation/interface directives which tend today to
+  become obsolete, and seems to be the cause of compilation problem on
+  (recent) Linux kernel 2.6.7 for example.
+- added protection code to report bug conditions
+- code simplification for filesystem reading (while performing backup)
+- fixed bug #29
+- fixed code syntax to support gcc-3.4.x

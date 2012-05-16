@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_infinint.cpp,v 1.9.4.3 2004/04/20 09:27:02 edrusb Rel $
+// $Id: test_infinint.cpp,v 1.9.4.4 2004/07/25 20:38:04 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -50,6 +50,7 @@ extern "C"
 #include "infinint.hpp"
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"
+#include "generic_file.hpp"
 
 using namespace libdar;
 using namespace std;

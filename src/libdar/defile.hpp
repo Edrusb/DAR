@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: defile.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: defile.hpp,v 1.5.4.1 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef DEFILE_HPP
 #define DEFILE_HPP
-
-#pragma interface
 
 #include "../my_config.h"
 #include "catalogue.hpp"
@@ -38,7 +36,7 @@ namespace libdar
     {
     public :
         defile(const path &racine) : chemin(racine) { init = true; };
-    
+
         void enfile(const entree *e);
         path get_path() const { return chemin; };
         std::string get_string() const { return chemin.display(); };

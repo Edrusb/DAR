@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.hpp,v 1.7.4.1 2004/01/31 13:00:53 edrusb Rel $
+// $Id: storage.hpp,v 1.7.4.3 2004/07/25 20:38:04 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef STORAGE_HPP
 #define STORAGE_HPP
-
-#pragma interface
 
 #include "../my_config.h"
 #include "erreurs.hpp"
@@ -56,34 +54,34 @@ namespace libdar
         };
 
     public:
-        storage(U_32 size) throw(Ememory, Ebug)
+        storage(U_32 size)
             { E_BEGIN; make_alloc(size, first, last); E_END("storage::storage","U_32"); };
-        storage(const infinint & size) throw(Ememory, Erange, Ebug);
-        storage(const storage & ref) throw(Ememory, Ebug)
+        storage(const infinint & size);
+        storage(const storage & ref)
             { E_BEGIN; copy_from(ref); E_END("storage::storage", "storage &"); };
         storage(generic_file & f, const infinint &size);
-        ~storage() throw(Ebug)
+        ~storage()
             { E_BEGIN; detruit(first); E_END("storage::~storage", ""); };
 
-        storage & operator = (const storage & val) throw(Ememory, Ebug)
+        storage & operator = (const storage & val)
             { E_BEGIN; detruit(first); copy_from(val); return *this; E_END("storage::operator=",""); };
 
-        bool operator < (const storage & ref) const throw()
+        bool operator < (const storage & ref) const
             { E_BEGIN; return difference(ref) < 0; E_END("storage::operator <",""); }; // true if arg uses more space than this
-        bool operator == (const storage & ref) const throw()
+        bool operator == (const storage & ref) const
             { E_BEGIN; return difference(ref) == 0; E_END("storage::operator ==",""); }; //true if arg have same space than this
-        bool operator > (const storage & ref) const throw()
+        bool operator > (const storage & ref) const
             { E_BEGIN; return difference(ref) > 0; E_END("storage::operator >", ""); };
-        bool operator <= (const storage & ref) const throw()
+        bool operator <= (const storage & ref) const
             { E_BEGIN; return difference(ref) <= 0; E_END("storage::operator <=", ""); };
-        bool operator >= (const storage & ref) const throw()
+        bool operator >= (const storage & ref) const
             { E_BEGIN; return difference(ref) >= 0; E_END("storage::operator >=", ""); };
-        bool operator != (const storage & ref) const throw()
+        bool operator != (const storage & ref) const
             { E_BEGIN; return difference(ref) != 0; E_END("storage::operator !=", ""); };
-        unsigned char & operator [](infinint position) throw(Ememory, Erange, Ebug);
-        unsigned char operator [](const infinint & position) const throw(Ememory, Erange, Ebug);
-        infinint size() const throw(Ememory, Erange, Ebug);
-        void clear(unsigned char val = 0) throw();
+        unsigned char & operator [](infinint position);
+        unsigned char operator [](const infinint & position) const;
+        infinint size() const;
+        void clear(unsigned char val = 0);
         void dump(generic_file & f) const;
 
         class iterator
@@ -94,28 +92,28 @@ namespace libdar
                 // default destructor is OK
                 // default operator = is OK
 
-            iterator operator ++ (S_I x) throw()
+            iterator operator ++ (S_I x)
                 { E_BEGIN; iterator ret = *this; skip_plus_one(); return ret;  E_END("storage::iterator::operator++", "(S_I)"); };
-            iterator operator -- (S_I x) throw()
+            iterator operator -- (S_I x)
                 { E_BEGIN; iterator ret = *this; skip_less_one(); return ret; E_END("storage::iterator::operator--", "(S_I)");};
-            iterator & operator ++ () throw()
+            iterator & operator ++ ()
                 { E_BEGIN; skip_plus_one(); return *this; E_END("storage::iterator::operator++", "()"); };
-            iterator & operator -- () throw()
+            iterator & operator -- ()
                 { E_BEGIN; skip_less_one(); return *this; E_END("storage::iterator::operator--", "()"); };
-            iterator operator + (U_32 s) const throw()
+            iterator operator + (U_32 s) const
                 { E_BEGIN; iterator ret = *this; ret += s; return ret; E_END("storage::iterator::operator +", ""); };
-            iterator operator - (U_32 s) const throw()
+            iterator operator - (U_32 s) const
                 { E_BEGIN; iterator ret = *this; ret -= s; return ret; E_END("storage::iterator::operator -", ""); };
-            iterator & operator += (U_32 s) throw();
-            iterator & operator -= (U_32 s) throw();
-            unsigned char &operator *() const throw(Erange);
+            iterator & operator += (U_32 s);
+	    iterator & operator -= (U_32 s);
+            unsigned char &operator *() const;
 
-            void skip_to(const storage & st, infinint val) throw(); // absolute position in st
-            infinint get_position() const throw(Erange, Ememory, Ebug);
+            void skip_to(const storage & st, infinint val); // absolute position in st
+            infinint get_position() const;
 
-            bool operator == (const iterator & cmp) const throw()
+            bool operator == (const iterator & cmp) const
                 { E_BEGIN; return ref == cmp.ref && cell == cmp.cell && offset == cmp.offset; E_END("storage::iterator::operator ==", ""); };
-            bool operator != (const iterator & cmp) const throw()
+            bool operator != (const iterator & cmp) const
                 { E_BEGIN; return ! (*this == cmp); E_END("storage::iterator::operator !=", ""); };
 
         private:
@@ -126,8 +124,8 @@ namespace libdar
             struct cellule *cell;
             U_32 offset;
 
-            void relative_skip_to(S_32 val) throw();
-            bool points_on_data() const throw()
+            void relative_skip_to(S_32 val);
+            bool points_on_data() const
                 { E_BEGIN; return ref != NULL && cell != NULL && offset < cell->size; E_END("storage::iterator::point_on_data", "");};
 
             inline void skip_plus_one();
@@ -138,45 +136,45 @@ namespace libdar
 
             // public storage methode using iterator
 
-        iterator begin() const throw()
+        iterator begin() const
             { E_BEGIN; iterator ret; ret.cell = first; ret.offset = 0; ret.ref = this; return ret; E_END("storage::begin", ""); };
-        iterator end() const throw()
+        iterator end() const
             { E_BEGIN; iterator ret; ret.cell = NULL; ret.offset = iterator::OFF_END; ret.ref = this; return ret; E_END("storage::end", ""); };
 
             // WARNING for the two following methods :
             // there is no "reverse_iterator" type, unlike the standart lib,
             // thus when going from rbegin() to rend(), you must use the -- operator
             // unlike the stdlib, that uses the ++ operator. this is the only difference in use with stdlib.
-        iterator rbegin() const throw()
+        iterator rbegin() const
             { E_BEGIN; iterator ret; ret.cell = last; ret.offset = last != NULL ? last->size-1 : 0; ret.ref = this; return ret; E_END("storage::rbegin", ""); };
-        iterator rend() const throw()
+        iterator rend() const
             { E_BEGIN; iterator ret; ret.cell = NULL, ret.offset = iterator::OFF_BEGIN; ret.ref = this; return ret; E_END("storage::rend", ""); };
 
-        U_I write(iterator & it, unsigned char *a, U_I size) throw(Erange);
-        U_I read(iterator & it, unsigned char *a, U_I size) const throw(Erange);
-        bool write(iterator & it, unsigned char a) throw(Erange)
+        U_I write(iterator & it, unsigned char *a, U_I size);
+        U_I read(iterator & it, unsigned char *a, U_I size) const;
+        bool write(iterator & it, unsigned char a)
             { E_BEGIN; return write(it, &a, 1) == 1; E_END("storage::write", "unsigned char"); };
-        bool read(iterator & it, unsigned char &a) const throw(Erange)
+        bool read(iterator & it, unsigned char &a) const
             { E_BEGIN; return read(it, &a, 1) == 1; E_END("storage::read", "unsigned char"); };
 
             // after one of theses 3 calls, the iterator given in argument are undefined (they may point nowhere)
-        void insert_null_bytes_at_iterator(iterator it, U_I size) throw(Erange, Ememory, Ebug);
-        void insert_const_bytes_at_iterator(iterator it, unsigned char a, U_I size) throw(Erange, Ememory, Ebug);
-        void insert_bytes_at_iterator(iterator it, unsigned char *a, U_I size) throw(Erange, Ememory, Ebug);
+        void insert_null_bytes_at_iterator(iterator it, U_I size);
+        void insert_const_bytes_at_iterator(iterator it, unsigned char a, U_I size);
+        void insert_bytes_at_iterator(iterator it, unsigned char *a, U_I size);
         void insert_as_much_as_necessary_const_byte_to_be_as_wider_as(const storage & ref, const iterator & it, unsigned char value);
-        void remove_bytes_at_iterator(iterator it, U_I number) throw(Ememory, Ebug);
-        void remove_bytes_at_iterator(iterator it, infinint number) throw(Ememory, Erange, Ebug);
+        void remove_bytes_at_iterator(iterator it, U_I number);
+        void remove_bytes_at_iterator(iterator it, infinint number);
 
 
     private:
         struct cellule *first, *last;
 
-        void copy_from(const storage & ref) throw(Ememory, Erange, Ebug);
-        S_32 difference(const storage & ref) const throw();
-        void reduce() throw(Ebug); // heuristic that tries to free some memory;
-        void insert_bytes_at_iterator_cmn(iterator it, bool constant, unsigned char *a, U_I size) throw(Erange, Ememory, Ebug);
+        void copy_from(const storage & ref);
+        S_32 difference(const storage & ref) const;
+        void reduce(); // heuristic that tries to free some memory;
+        void insert_bytes_at_iterator_cmn(iterator it, bool constant, unsigned char *a, U_I size);
         void fusionne(struct cellule *a_first, struct cellule *a_last, struct cellule *b_first, struct cellule *b_last,
-                      struct cellule *&res_first, struct cellule * & res_last) throw(Ebug);
+                      struct cellule *&res_first, struct cellule * & res_last);
 
             ///////////////////////////////
             // STATIC statments :
@@ -184,9 +182,9 @@ namespace libdar
 
         static U_32 alloc_size; // stores the last biggest memory allocation successfully realized
 
-        static void detruit(struct cellule *c) throw(Ebug);
-        static void make_alloc(U_32 size, struct cellule * & begin, struct cellule * & end) throw(Ememory, Ebug);
-        static void make_alloc(infinint size, cellule * & begin, struct cellule * & end) throw(Ememory, Erange, Ebug);
+        static void detruit(struct cellule *c);
+        static void make_alloc(U_32 size, struct cellule * & begin, struct cellule * & end);
+        static void make_alloc(infinint size, cellule * & begin, struct cellule * & end);
 
         friend class storage::iterator;
     };

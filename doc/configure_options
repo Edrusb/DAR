@@ -41,6 +41,7 @@ x H ...... special-alloc
   L ...... test-memory
 x M ...... upx
 x N ...... gnugetopt
+x O ...... libdl-test
 
 I, J, K and L are debugging options and should not be set for normal use.
 
@@ -71,7 +72,9 @@ M : if set, look for UPX command, and if found compresses library and executable
     if no upx is found, does the same as if the option is not given.
 N : if set (default), looks for libgnugetopt and use the gnu getopt_long()
     call.
-
+O : if configure cannot find a static version of libdl, it disables the building
+    of dar_static. Disable this option at your own risk and don't complain if
+    dar_static compilation fails.
 
 For version 2.1.x (N option in 2.1.2 appeared to fix a bug)
 -----------------------------
@@ -79,14 +82,14 @@ legend: ! = option available for that system
         . = option Not available for that system
 (free inspiration from the Cisco ping command output)
 
- System \ option   |  A B C D E F G H I J K L M N
-enabled by default:|  x   x     x   x         x x
----------------------------------------------------
-Linux              |  ! ! ! ! ! ! ! ! ! ! ! ! ! ! long options supported
-Solaris 8          |  ! . . ! ! . ! ! ! ! ! ! ! ! long options supported with libgnugetopt
-FreeBSD            |  ! . . ! ! . ! ! ! ! ! ! ! ! long options supported with libgnugetopt
-Cygwin             |  ! . . ! ! . ! ! ! ! ! ! ! ! long options supported
-NetBSD             |  ! . . ! ! . ! ! ! ! ! ! ! ! long options supported with libgnugetopt
+ System \ option   |  A B C D E F G H I J K L M N O
+enabled by default:|  x   x     x   x         x x x
+----------------------------------------------------
+Linux              |  ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! long options supported
+Solaris 8          |  ! . . ! ! . ! ! ! ! ! ! ! ! ! long options supported with libgnugetopt
+FreeBSD            |  ! . . ! ! . ! ! ! ! ! ! ! ! ! long options supported with libgnugetopt
+Cygwin             |  ! . . ! ! . ! ! ! ! ! ! ! ! ! long options supported
+NetBSD             |  ! . . ! ! . ! ! ! ! ! ! ! ! ! long options supported with libgnugetopt
 
 Consequences:
 

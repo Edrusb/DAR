@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.hpp,v 1.5.4.1 2004/01/28 15:29:46 edrusb Rel $
+// $Id: compressor.hpp,v 1.5.4.2 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef COMPRESSOR_HPP
 #define COMPRESSOR_HPP
-
-#pragma interface
 
 #include "generic_file.hpp"
 #include "integers.hpp"

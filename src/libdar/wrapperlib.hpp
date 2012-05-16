@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: wrapperlib.hpp,v 1.4.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: wrapperlib.hpp,v 1.4.4.2 2004/08/01 06:11:50 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -32,6 +32,8 @@ extern "C"
 #include <zlib.h>
 #include <bzlib.h>
 } // end extern "C"
+
+#include "integers.hpp"
 
 namespace libdar
 {

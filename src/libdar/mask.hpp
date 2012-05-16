@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.hpp,v 1.9.4.1 2003/12/20 23:05:34 edrusb Rel $
+// $Id: mask.hpp,v 1.9.4.2 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef MASK_HPP
 #define MASK_HPP
-
-#pragma interface
 
 #include "../my_config.h"
 

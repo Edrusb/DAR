@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: special_alloc.hpp,v 1.4.4.2 2004/01/28 15:29:47 edrusb Rel $
+// $Id: special_alloc.hpp,v 1.4.4.3 2004/08/01 06:11:50 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -35,9 +35,9 @@ extern "C"
 #if HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
+#endif
 } // end extern "C"
 
-#endif
 
 #define USE_SPECIAL_ALLOC(BASE_TYPE) \
         void *operator new(size_t taille) { return special_alloc_new(taille); };                \

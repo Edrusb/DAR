@@ -537,3 +537,23 @@ KNOWN BUGS:
 
     affects version from 2.1.0 to 2.1.3
     fixed in version 2.1.4
+
+#29 description
+      dar does Segmentation fault during backup when hard links are involved
+
+    problem
+      when an plain file inode linked several time to the directory tree
+      (a hard linked file), is not readable due to a lack a permission,
+      the filesystem module generates a C++ object and stores its address
+      for further reference and hard link handling. When the file opening
+      comes an exception is throw, leading to this object destruction, but the
+      reference stays in the the filesystem module, leading the next link to
+      this inode being referenced by a destroyed object.
+
+    solution
+      remove the reference when exception is caught. This removal was properly
+      done when such an inode was not to be saved (and the corresponding C++
+      object was destroyed), the case of the exception had been forgotten.
+
+    affects version up to 2.1.4
+    fixed in version 2.1.5

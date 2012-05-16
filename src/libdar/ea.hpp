@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.hpp,v 1.8.4.2 2004/07/13 22:37:33 edrusb Rel $
+// $Id: ea.hpp,v 1.8.4.3 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef EA_HPP
 #define EA_HPP
-
-#pragma interface
 
 #include "../my_config.h"
 #include <vector>

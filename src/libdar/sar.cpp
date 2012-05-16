@@ -18,11 +18,9 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.15.2.3 2004/04/20 09:27:01 edrusb Rel $
+// $Id: sar.cpp,v 1.15.2.4 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
-
-#pragma implementation
 
 #include "../my_config.h"
 
@@ -247,7 +245,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.15.2.3 2004/04/20 09:27:01 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.15.2.4 2004/07/25 20:38:03 edrusb Exp $";
         dummy_call(id);
     }
 

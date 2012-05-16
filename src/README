@@ -10,10 +10,12 @@ dar_suite directory
   contains all the rest of the code of dar, which is command-line specific
 
 examples directory
-  contains few programs that illustrate the use of infinint
+  contains few programs that illustrate the use of infinint, they are built
+  when using --enable-examples with the configure script.
 
 testing directory
-  contains a pletor for very simple program that helped me validate each C++
+  contains a plethora of very simple program that helped me validate each C++
   module of dar. They are to be used in step by step debugging and in
-  conjunction with variable watch. This program are not intended to be used
-  except by developers.
+  conjunction with variable watch. Theses programs are intended to be used
+  only by developers, they are built when using --enable-examples with the
+  configure script.

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: sar_tools.hpp,v 1.5.4.1 2004/08/01 06:11:50 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -29,10 +29,11 @@
 #include <string>
 #include "../my_config.h"
 #include "integers.hpp"
+#include "generic_file.hpp"
 
 namespace libdar
 {
-    
+
     extern generic_file *sar_tools_open_archive_fichier(const std::string &filename, bool allow_over, bool warn_over);
     extern generic_file *sar_tools_open_archive_tuyau(S_I fd, gf_mode mode);
 

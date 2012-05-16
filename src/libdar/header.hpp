@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
+// $Id: header.hpp,v 1.4.4.1 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef HEADER_H
 #define HEADER_H
-
-#pragma interface
 
 #include "../my_config.h"
 #include "infinint.hpp"
@@ -34,7 +32,7 @@
 namespace libdar
 {
     const unsigned int LABEL_SIZE = 10;
-    
+
     const char FLAG_NON_TERMINAL = 'N';
     const char FLAG_TERMINAL = 'T';
     const char EXTENSION_NO = 'N';
@@ -71,5 +69,5 @@ namespace libdar
     };
 
 } // end of namespace
-        
+
 #endif

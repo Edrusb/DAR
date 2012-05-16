@@ -18,45 +18,58 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.hpp,v 1.6.2.1 2004/07/25 20:38:04 edrusb Exp $
+// $Id: int_tools.cpp,v 1.1.2.1 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
-#ifndef TUYAU_HPP
-#define TUYAU_HPP
-
 #include "../my_config.h"
-#include "generic_file.hpp"
+
+#include "int_tools.hpp"
 
 namespace libdar
 {
-
-    class tuyau : public generic_file
+    void int_tools_swap_bytes(unsigned char &a, unsigned char &b)
     {
-    public:
-        tuyau(int fd); // fd is the filedescriptor of a pipe extremity
-        tuyau(int fd, gf_mode mode); // forces the mode if possible
-        tuyau(const std::string &filename, gf_mode mode);
-        ~tuyau() { close(filedesc); };
+        unsigned char c = a;
+        a = b;
+        b = c;
+    }
 
-            // inherited from generic_file
-        bool skip(const infinint & pos);
-        bool skip_to_eof();
-        bool skip_relative(signed int x);
-        infinint get_position() { return position; };
+    void int_tools_swap_bytes(unsigned char *a, U_I size)
+    {
+        if(size <= 1)
+            return;
+        else
+        {
+            int_tools_swap_bytes(a[0], a[size-1]);
+            int_tools_swap_bytes(a+1, size-2); // terminal recursivity
+        }
+    }
 
-    protected:
-        virtual int inherited_read(char *a, size_t size);
-        virtual int inherited_write(char *a, size_t size);
+    void int_tools_expand_byte(unsigned char a, int_tools_bitfield &bit)
+    {
+        unsigned char mask = 0x80;
 
-    private:
-        infinint position;
-        int filedesc;
-        std::string chemin; // named pipe open later
+        for(register S_I i = 0; i < 8; i++)
+        {
+            bit[i] = (a & mask) >> 7 - i;
+            mask >>= 1;
+        }
+    }
 
-        void ouverture();
-    };
+    void int_tools_contract_byte(const int_tools_bitfield &b, unsigned char & a)
+    {
+        E_BEGIN;
+        a = 0;
+
+        for(register S_I i = 0; i < 8; i++)
+        {
+            a <<= 1;
+            if(b[i] > 1)
+                throw Erange("infinint.cpp : contract_byte", "a binary digit is either 0 or 1");
+            a += b[i];
+        }
+        E_END("infinint.cpp : contract_byte", "");
+    }
 
 } // end of namespace
-
-#endif

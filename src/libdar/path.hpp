@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: path.hpp,v 1.5.4.1 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef PATH_HPP
 #define PATH_HPP
-
-#pragma interface
 
 #include "../my_config.h"
 #include <list>
@@ -43,7 +41,7 @@ namespace libdar
         path(const path & ref);
         path & operator = (const path & ref);
         bool operator == (const path & ref) const;
-    
+
         std::string basename() const; // name of the innermost directory/file of the path
         void reset_read() { reading = dirs.begin(); }; // reset for read_subdir. next call to read_subdir is the most global
             // directory
@@ -54,13 +52,13 @@ namespace libdar
             // when just the basename is present returns false, if the path is absolute,
             // the first call change it to relative (except if equal to "/" then return false)
 
-        path operator + (const path & arg) const { path tmp = *this; tmp += arg; return tmp; }; 
+        path operator + (const path & arg) const { path tmp = *this; tmp += arg; return tmp; };
             // add arg as a subdir of the object, arg can be a string also, which is converted to a path on the fly
         path & operator += (const path & arg);
         bool is_subdir_of(const path & p) const;
         std::string display() const;
         unsigned int degre() const { return dirs.size() + (relative ? 0 : 1); };
-    
+
     private :
         std::list<std::string>::iterator reading;
         std::list<std::string> dirs;

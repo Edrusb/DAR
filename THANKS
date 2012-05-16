@@ -1,3 +1,8 @@
+version 2.1.5
+-------------
+Thanks to Peter Landgren and Johnathan Burchill for reporting bug #29.
+Thanks to Brian May and to Travis (Tilley ?) for feedback.
+
 version 2.1.4
 -------------
 Thanks to Marius Tomaschewski, for reporting investigating and fix proposal for

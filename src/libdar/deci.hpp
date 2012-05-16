@@ -18,19 +18,17 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: deci.hpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: deci.hpp,v 1.6.4.2 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef DECI_HPP
 #define DECI_HPP
 
-#pragma interface
-
 #include "../my_config.h"
+#include <iostream>
 #include "storage.hpp"
 #include "infinint.hpp"
-#include <iostream>
 
 namespace libdar
 {
@@ -38,26 +36,26 @@ namespace libdar
     class deci
     {
     public :
-        deci(std::string s) throw(Edeci, Ememory, Erange, Ebug);
-        deci(const infinint & x) throw(Ememory, Erange, Ebug);
-        deci(const deci & ref) throw(Ememory, Erange, Ebug)
+        deci(std::string s);
+        deci(const infinint & x);
+        deci(const deci & ref)
             { E_BEGIN; copy_from(ref); E_END("deci::deci", "deci"); };
-        ~deci() throw(Ebug)
+        ~deci()
             { E_BEGIN; detruit(); E_END("deci::~deci", ""); };
-    
 
-        deci & operator = (const deci & ref) throw(Ememory, Erange, Ebug)
+
+        deci & operator = (const deci & ref)
             { E_BEGIN; detruit(); copy_from(ref); return *this; E_END("deci::operator = ", ""); };
 
-        infinint computer() const throw(Ememory, Erange, Ebug);
-        std::string human() const throw(Ememory, Erange, Ebug);
+        infinint computer() const;
+        std::string human() const;
 
     private :
         storage *decimales;
 
-        void detruit() throw(Ebug);
-        void copy_from(const deci & ref) throw(Ememory, Erange, Ebug);
-        void reduce() throw(Ememory, Erange, Ebug);
+        void detruit();
+        void copy_from(const deci & ref);
+        void reduce();
     };
 
     extern std::ostream & operator << (std::ostream & ref, const infinint & arg);

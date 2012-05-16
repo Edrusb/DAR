@@ -18,11 +18,9 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: path.cpp,v 1.6.4.1 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
-
-#pragma implementation
 
 #include "../my_config.h"
 #include <iostream>
@@ -159,7 +157,7 @@ namespace libdar
         list<string>::iterator it_fin = (const_cast<path &>(arg)).dirs.end();
         while(it != it_fin)
             dirs.push_back(*it++);
-    
+
         return *this;
     }
 
@@ -176,12 +174,12 @@ namespace libdar
             it_arg++;
         }
 
-        return it_arg == fin_arg; 
+        return it_arg == fin_arg;
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: path.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: path.cpp,v 1.6.4.1 2004/07/25 20:38:03 edrusb Exp $";
         dummy_call(id);
     }
 

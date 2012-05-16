@@ -18,11 +18,9 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: erreurs.cpp,v 1.6.4.2 2004/09/10 22:34:15 edrusb Exp $
 //
 /*********************************************************************/
-
-#pragma implementation
 
 #include "../my_config.h"
 
@@ -101,7 +99,7 @@ namespace libdar
     {
         U_I ret = 0;
         list<Egeneric *>::iterator it = all_instances.begin();
-    
+
         while(it != all_instances.end())
             if(! (*it++)->zombie)
                 ret++;
@@ -111,7 +109,7 @@ namespace libdar
 
     void Egeneric::clear_last_destroyed()
     {
-        list<Egeneric *>::iterator it = destroyed.begin(); 
+        list<Egeneric *>::iterator it = destroyed.begin();
 
         while(it != destroyed.end())
             delete (*it++);
@@ -121,7 +119,7 @@ namespace libdar
 
     void Egeneric::display_last_destroyed()
     {
-        list<Egeneric *>::iterator it = destroyed.begin(); 
+        list<Egeneric *>::iterator it = destroyed.begin();
 
         while(it != destroyed.end())
             (*it++)->dump();
@@ -130,7 +128,7 @@ namespace libdar
     void Egeneric::display_alive()
     {
         list<Egeneric *>::iterator it = all_instances.begin();
-    
+
         while(it != all_instances.end())
         {
             if(! (*it)->zombie)
@@ -139,7 +137,8 @@ namespace libdar
         }
     }
 
-    Ebug::Ebug(const string & file, S_I line) : Egeneric(string("file ") + file + " line " + int_to_string(line), "it seems to be a bug here") {};
+    Ebug::Ebug(const string & file, S_I line) : Egeneric(string("file ") + file + " line " + int_to_string(line), "it seems to be a bug here") {}
+
     void Ebug::stack(const string & passage, const string & file, const string & line)
     {
         Egeneric::stack(passage, string("in file ") + file + " line " + string(line));
@@ -154,7 +153,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: erreurs.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: erreurs.cpp,v 1.6.4.2 2004/09/10 22:34:15 edrusb Exp $";
         dummy_call(id);
     }
 

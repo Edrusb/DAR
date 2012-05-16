@@ -18,11 +18,9 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.18.2.2 2004/05/21 08:33:02 edrusb Rel $
+// $Id: catalogue.cpp,v 1.18.2.4 2004/09/10 20:15:27 edrusb Exp $
 //
 /*********************************************************************/
-
-#pragma implementation
 
 #include "../my_config.h"
 
@@ -1111,6 +1109,16 @@ namespace libdar
         x_ref = ref;
     }
 
+    infinint hard_link::get_etiquette() const
+    {
+	if(x_ref == NULL)
+	    throw SRC_BUG;
+	if(dynamic_cast<file_etiquette *>(x_ref) == NULL)
+	    throw SRC_BUG;
+
+	return x_ref->get_etiquette();
+    }
+
     lien::lien(U_16 uid, U_16 gid, U_16 perm,
                const infinint & last_access,
                const infinint & last_modif,
@@ -2028,7 +2036,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.18.2.2 2004/05/21 08:33:02 edrusb Rel $";
+        static char id[]="$Id: catalogue.cpp,v 1.18.2.4 2004/09/10 20:15:27 edrusb Exp $";
         dummy_call(id);
     }
 

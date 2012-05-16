@@ -18,11 +18,9 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.cpp,v 1.9.2.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: tuyau.cpp,v 1.9.2.2 2004/07/25 20:38:04 edrusb Exp $
 //
 /*********************************************************************/
-
-#pragma implementation
 
 #include "../my_config.h"
 
@@ -188,7 +186,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tuyau.cpp,v 1.9.2.1 2003/12/20 23:05:35 edrusb Rel $";
+        static char id[]="$Id: tuyau.cpp,v 1.9.2.2 2004/07/25 20:38:04 edrusb Exp $";
         dummy_call(id);
     }
 

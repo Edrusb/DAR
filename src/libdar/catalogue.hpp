@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.19.2.2 2004/01/28 15:29:46 edrusb Rel $
+// $Id: catalogue.hpp,v 1.19.2.4 2004/09/10 20:15:42 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef CATALOGUE_HPP
 #define CATALOGUE_HPP
-
-#pragma interface
 
 #include "../my_config.h"
 
@@ -343,7 +341,7 @@ namespace libdar
         void set_reference(file_etiquette *ref);
 
             // inherited from etiquette
-        infinint get_etiquette() const { return x_ref->get_etiquette(); };
+        infinint get_etiquette() const;
         const file *get_inode() const { return x_ref; };
 
 #ifdef LIBDAR_SPECIAL_ALLOC

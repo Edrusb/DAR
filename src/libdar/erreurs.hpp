@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.hpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: erreurs.hpp,v 1.7.4.1 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef ERREURS_HPP
 #define ERREURS_HPP
-
-#pragma interface
 
 #include "../my_config.h"
 #include <string>
@@ -94,7 +92,7 @@ namespace libdar
     public :
         Ebug(const std::string & file, S_I line);
         ~Ebug() { if(!zombie) add_to_last_destroyed(new Ebug(*this)); };
-    
+
         void stack(const std::string & passage, const std::string & file, const std::string & line);
     protected :
         std::string exceptionID() const { return "BUG"; };

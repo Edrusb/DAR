@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.8.2.2 2004/07/13 22:37:33 edrusb Rel $
+// $Id: filesystem.hpp,v 1.8.2.3 2004/09/10 20:15:43 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -88,19 +88,12 @@ namespace libdar
             // ignore all entry not yet read of current directory
     private:
 
-        struct filename_struct
-        {
-            infinint last_acc;
-            infinint last_mod;
-        };
-
         path *fs_root;
         bool info_details;
         bool save_root_ea;
         bool save_user_ea;
         bool no_dump_check;
         path *current_dir;      // to translate from an hard linked inode to an  already allocated object
-        std::vector<filename_struct> filename_pile; // to be able to restore last access of directory we open for reading
         std::vector<etage> pile;        // to store the contents of a directory
 
         void detruire();

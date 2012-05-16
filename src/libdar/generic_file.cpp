@@ -18,11 +18,9 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.11.2.2 2004/03/08 19:19:42 edrusb Rel $
+// $Id: generic_file.cpp,v 1.11.2.3 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
-
-#pragma implementation
 
 #include "../my_config.h"
 
@@ -68,6 +66,7 @@ char *strchr (), *strrchr ();
 #include "tools.hpp"
 #include "user_interaction.hpp"
 #include "cygwin_adapt.hpp"
+#include "int_tools.hpp"
 
 using namespace std;
 
@@ -115,7 +114,7 @@ namespace libdar
     S_I generic_file::write(const string & arg)
     {
         S_I ret = 0;
-        if(arg.size() > tools_maxof_agregate(size_t(0)))
+        if(arg.size() > int_tools_maxof_agregate(size_t(0)))
             throw SRC_BUG;
         size_t size = arg.size();
 
@@ -378,7 +377,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.11.2.2 2004/03/08 19:19:42 edrusb Rel $";
+        static char id[]="$Id: generic_file.cpp,v 1.11.2.3 2004/07/25 20:38:03 edrusb Exp $";
         dummy_call(id);
     }
 

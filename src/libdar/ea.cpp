@@ -18,12 +18,10 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.cpp,v 1.7.4.1 2004/07/13 22:37:33 edrusb Rel $
+// $Id: ea.cpp,v 1.7.4.2 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 //
-
-#pragma implementation
 
 #include "../my_config.h"
 #include "ea.hpp"
@@ -98,7 +96,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea.cpp,v 1.7.4.1 2004/07/13 22:37:33 edrusb Rel $";
+        static char id[]="$Id: ea.cpp,v 1.7.4.2 2004/07/25 20:38:03 edrusb Exp $";
         dummy_call(id);
     }
 

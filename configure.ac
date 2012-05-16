@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.1.4], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.1.5], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -196,11 +196,16 @@ AC_ARG_ENABLE(  [os-bits],
                 ]
              )
 
+AC_ARG_ENABLE( [libdl-test],
+	       AC_HELP_STRING(--disable-libdl-test, [avoids checking against a static version of libdl, but don't complain if static linking fails...]),
+               [skip_libdl_test="yes"],
+               [skip_libdl_test="no"])
+
 AC_ARG_ENABLE( [dar-static],
                 AC_HELP_STRING(--disable-dar-static, [avoids building dar_static, a dar statically linked version]),
                 [build_static="no"],
                 [
-                if test $libdl_static_pb = "yes" ; then
+                if test $libdl_static_pb = "yes" -a $skip_libdl_test = "no" ; then
                    AC_MSG_NOTICE([static linking not completely supported on this system, CANNOT and WILL NOT build dar_static !])
                    build_static="no"
                 else

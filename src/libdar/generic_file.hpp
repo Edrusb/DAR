@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.8.2.2 2004/01/28 15:29:46 edrusb Rel $
+// $Id: generic_file.hpp,v 1.8.2.3 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef GENERIC_FILE_HPP
 #define GENERIC_FILE_HPP
-
-#pragma interface
 
 extern "C"
 {

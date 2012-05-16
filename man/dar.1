@@ -105,7 +105,7 @@ This implies the -w option, and means that over avoiding warning for file overwr
 The path points to the directory tree containing all the files that will be enrolled in the operation (backup or restoration). By default the current directory is used. All other paths used in -P option or in the [list of paths] on the command line are and must be relative to this path (or to current directory if -R is not present).
 .TP 20
 -X, --exclude <mask>
-The mask is a string with wild cards (like * and ?) which is applied to filenames which are not directories. If a given file matches the mask, it is excluded from the operation. By default (no -X on the command line), no file is excluded from the operation. -X may be present several times on the command line, in that case a file will not be considered for the given operation if it matches at least one -Z mask.
+The mask is a string with wild cards (like * and ?) which is applied to filenames which are not directories. If a given file matches the mask, it is excluded from the operation. By default (no -X on the command line), no file is excluded from the operation. -X may be present several times on the command line, in that case a file will not be considered for the given operation if it matches at least one -X mask.
 .TP 20
 -I, --include <mask>
 The mask is applied to filenames which are not directories. If a given file matches the mask and does not match any mask given with -X, the file is selected for the operation. By default (no -I and no -X on the command line), all files are included for the operation. -I may be present several times on the command line, in that case all file that match one of the -I mask will be considered for the given operation, if they do not also match one of the -X mask.

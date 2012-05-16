@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.17.2.5 2004/07/13 22:37:33 edrusb Rel $
+// $Id: filesystem.cpp,v 1.17.2.7 2004/09/12 21:43:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -202,6 +202,13 @@ namespace libdar
                         }
                         else  // inode already seen previously
                         {
+				// some sanity checks
+			    if(it->second.obj == NULL)
+				throw SRC_BUG;
+			    if(dynamic_cast<file_etiquette *>(it->second.obj) == NULL)
+				throw SRC_BUG;
+				////
+
                             ref = new hard_link(name, it->second.obj);
 
                             if(ref != NULL)
@@ -329,7 +336,10 @@ namespace libdar
             fs_root = NULL;
         }
         if(current_dir != NULL)
+	{
             delete current_dir;
+	    current_dir = NULL;
+	}
     }
 
     void filesystem_backup::copy_from(const filesystem_backup & ref)
@@ -347,7 +357,6 @@ namespace libdar
         save_root_ea = ref.save_root_ea;
         save_user_ea = ref.save_user_ea;
         no_dump_check = ref.no_dump_check;
-        filename_pile = ref.filename_pile;
         pile = ref.pile;
     }
 
@@ -360,7 +369,6 @@ namespace libdar
         if(current_dir != NULL)
             delete current_dir;
         current_dir = new path(*fs_root);
-        filename_pile.clear();
         if(current_dir == NULL)
             throw Ememory("filesystem_backup::reset_read");
         pile.clear();
@@ -372,15 +380,8 @@ namespace libdar
             directory *ref_dir = dynamic_cast<directory *>(ref);
             try
             {
-                pile.push_back(etage(tmp));
                 if(ref_dir != NULL)
-                {
-                    filename_struct rfst;
-
-                    rfst.last_acc = pile.back().last_acc = ref_dir->get_last_access();
-                    rfst.last_mod = pile.back().last_mod = ref_dir->get_last_modif();
-                    filename_pile.push_back(rfst);
-                }
+		    pile.push_back(etage(tmp, ref_dir->get_last_access(), ref_dir->get_last_modif()));
                 else
                     if(ref == NULL)
                         throw Erange("filesystem_backup::reset_read", string("Non existant file: ") + tmp);
@@ -448,57 +449,65 @@ namespace libdar
                         if(!no_dump_check || !is_nodump_flag_set(*current_dir, name))
                         {
                             ref = make_read_entree(*current_dir, name, true, save_root_ea, save_user_ea);
-                            directory *ref_dir = dynamic_cast<directory *>(ref);
 
-                            if(ref_dir != NULL)
-                            {
-                                char *ptr_name;
+			    try
+			    {
+				directory *ref_dir = dynamic_cast<directory *>(ref);
 
-                                *current_dir += name;
-                                ptr_name = tools_str2charptr(current_dir->display());
+				if(ref_dir != NULL)
+				{
+				    char *ptr_name;
 
-                                try
-                                {
-                                    pile.push_back(etage(ptr_name));
-                                    pile.back().last_acc = ref_dir->get_last_access();
-                                    pile.back().last_mod = ref_dir->get_last_modif();
-                                }
-                                catch(Erange & e)
-                                {
-                                    string tmp;
+				    *current_dir += name;
+				    ptr_name = tools_str2charptr(current_dir->display());
 
-                                    user_interaction_warning(string("error openning ") + ptr_name + " : " + e.get_message());
-                                    try
-                                    {
-                                        pile.push_back(etage());
-                                        pile.back().last_acc = 0;
-                                        pile.back().last_mod = 0;
-                                    }
-                                    catch(Erange & e)
-                                    {
-                                        delete ref;
-                                        once_again = true;
-                                        ref = NULL;
-                                        if(! current_dir->pop(tmp))
-                                            throw SRC_BUG;
-                                    }
-                                }
-                                catch(Egeneric & e)
-                                {
-                                    delete ptr_name;
-                                    delete ref;
-                                    throw;
-                                }
+				    try
+				    {
+					try
+					{
+					    pile.push_back(etage(ptr_name, ref_dir->get_last_access(), ref_dir->get_last_modif()));
+					}
+					catch(Egeneric & e)
+					{
+					    string tmp;
 
-                                delete ptr_name;
-                            }
+					    user_interaction_warning(string("Cannot read directory contents: ") + ptr_name + " : " + e.get_message());
+					    try
+					    {
+						pile.push_back(etage());
+					    }
+					    catch(Egeneric & e)
+					    {
+						delete ref;
+						ref = NULL; // we ignore this directory and skip to the next one
+						if(! current_dir->pop(tmp))
+						    throw SRC_BUG;
+					    }
+					}
+				    }
+				    catch(...)
+				    {
+					delete ptr_name;
+					throw;
+				    }
+				    delete ptr_name;
+				}
 
-
-                            if(ref == NULL)
-                                once_again = true;
-                                // the file has been removed between the time
-                                // the directory has been openned, and the time
-                                // we try to read it, so we ignore it.
+				if(ref == NULL)
+				    once_again = true;
+				    // the file has been removed between the time
+				    // the directory has been openned, and the time
+				    // we try to read it, so we ignore it.
+			    }
+			    catch(...)
+			    {
+				if(ref != NULL)
+				{
+				    delete ref;
+				    ref = NULL;
+				}
+				throw;
+			    }
                         }
                         else // EXT2 nodump flag is set, and we must not consider such file for backup
                         {
@@ -1316,12 +1325,14 @@ namespace libdar
 
             if(S_ISDIR(buf.st_mode))
             {
-                etage fils = s;
+                etage fils = etage(s,0,0); // we don't care the access and modification time because directory will be destroyed
                 string tmp;
 
+		    // first we destroy directory's children
                 while(fils.read(tmp))
                     supprime(ref+tmp);
 
+		    // then the directory itself
                 if(rmdir(s) < 0)
                     throw Erange("supprime (dir)", string("Cannot remove directory ") + s + " : " + strerror(errno));
             }
@@ -1340,7 +1351,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.17.2.5 2004/07/13 22:37:33 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.17.2.7 2004/09/12 21:43:44 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -1458,8 +1469,8 @@ namespace libdar
     {
         try
         {
-            if(last_acc != 0 || last_mod != 0)
-                make_date(chem, last_acc, last_mod);
+	    if(last_acc != 0 || last_mod != 0)
+		make_date(chem, last_acc, last_mod);
                 // else the directory could not be openned properly
                 // and time could not be retrieved, so we don't try
                 // to restore them

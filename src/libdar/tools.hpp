@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.13 2003/11/27 20:54:13 edrusb Rel $
+// $Id: tools.hpp,v 1.13.2.1 2004/07/25 20:38:04 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -37,17 +37,17 @@ namespace libdar
 {
 
     extern char *tools_str2charptr(std::string x);
-    extern void tools_write_string(generic_file & f, const std::string & s); 
+    extern void tools_write_string(generic_file & f, const std::string & s);
         // add a '\0' at the end
-    extern void tools_read_string(generic_file & f, std::string & s); 
+    extern void tools_read_string(generic_file & f, std::string & s);
         // read up to '\0' char
-    extern void tools_write_string_all(generic_file & f, const std::string & s); 
+    extern void tools_write_string_all(generic_file & f, const std::string & s);
         // '\0' has no special meaning no '\0' at the end
-    extern void tools_read_string_size(generic_file & f, std::string & s, infinint taille); 
+    extern void tools_read_string_size(generic_file & f, std::string & s, infinint taille);
         // '\0' has no special meaning
     extern infinint tools_get_filesize(const path &p);
     extern infinint tools_get_extended_size(std::string s);
-    extern char *tools_extract_basename(const char *command_name); 
+    extern char *tools_extract_basename(const char *command_name);
     extern void tools_split_path_basename(const char *all, path * &chemin, std::string & base);
     extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base);
     extern void tools_open_pipes(const std::string &input, const std::string & output, tuyau *&in, tuyau *&out);
@@ -84,21 +84,6 @@ namespace libdar
 	// get file pointed to by a symbolic link, or the argument if it is not a symbolic link
 	// exception can occur if lack of memory or invalid argument given (NULL or empty string), system call error...
     extern std::string tools_readlink(const char *root);
-
-        // integer (agregates) manipulations
-        // argument must be a regular interger (a bit field).
-    template <class T> extern T tools_rotate_right_one_bit(T v)
-    {
-        bool retenue = (v & 1) != 0;
-
-        v >>= 1;
-        if(retenue)
-            v |= T(1) << (sizeof(v)*8 - 1);
-
-        return v;
-    }
-
-    template <class T> extern T tools_maxof_agregate(T unused) { return ~T(0) > 0 ? ~T(0) : ~tools_rotate_right_one_bit(T(1)); }
 
 } // end of namespace
 

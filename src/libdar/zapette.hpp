@@ -18,15 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.hpp,v 1.5 2003/11/15 00:16:47 edrusb Rel $
+// $Id: zapette.hpp,v 1.5.2.1 2004/07/25 20:38:04 edrusb Exp $
 //
 /*********************************************************************/
 //
 
 #ifndef ZAPETTE_HPP
 #define ZAPETTE_HPP
-
-#pragma interface
 
 #include "../my_config.h"
 #include "generic_file.hpp"
@@ -72,7 +70,7 @@ namespace libdar
         ~slave_zapette();
 
         void action();
-    
+
     private:
         generic_file *in, *out;
 	contextual *src;

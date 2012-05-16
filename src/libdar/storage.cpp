@@ -18,11 +18,9 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: storage.cpp,v 1.7.4.3 2004/09/10 22:34:16 edrusb Exp $
 //
 /*********************************************************************/
-
-#pragma implementation
 
 #include "../my_config.h"
 #include "storage.hpp"
@@ -36,11 +34,11 @@ namespace libdar
     U_32 storage::alloc_size = 120000;
         // must be less than the third of the maxmimum value of a U_32
 
-    storage::storage(const infinint & size) throw(Ememory, Erange, Ebug)
+    storage::storage(const infinint & size)
     {
-        E_BEGIN; 
-        make_alloc(size, first, last); 
-        E_END("storage::storage","infinint"); 
+        E_BEGIN;
+        make_alloc(size, first, last);
+        E_END("storage::storage","infinint");
     }
 
     storage::storage(generic_file & f, const infinint & size)
@@ -55,7 +53,7 @@ namespace libdar
             while(ptr != NULL)
             {
                 lu = 0;
-            
+
                 do
                 {
                     tmp = f.read(((char *)(ptr->data))+lu, ptr->size - lu);
@@ -76,16 +74,16 @@ namespace libdar
         E_END("storage::storage", "generic_file, U_32");
     }
 
-    unsigned char storage::operator [](const infinint &position) const throw(Ememory, Erange, Ebug)
+    unsigned char storage::operator [](const infinint &position) const
     {
-        E_BEGIN; 
+        E_BEGIN;
         return const_cast<storage &>(*this)[position];
-        E_END("storage::operator []","const"); 
+        E_END("storage::operator []","const");
     }
 
-    unsigned char & storage::operator [](infinint position) throw(Ememory, Erange, Ebug)
+    unsigned char & storage::operator [](infinint position)
     {
-        E_BEGIN; 
+        E_BEGIN;
         U_32 offset = 0;
         struct cellule *ptr = first;
 
@@ -98,16 +96,16 @@ namespace libdar
                 ptr = ptr->next;
             }
             else
-                position.unstack(offset); 
+                position.unstack(offset);
         } while(offset > ptr->size);
 
         return ptr->data[offset];
-        E_END("storage::operator []",""); 
+        E_END("storage::operator []","");
     }
-      
-    infinint storage::size() const throw(Ememory, Erange, Ebug)
+
+    infinint storage::size() const
     {
-        E_BEGIN; 
+        E_BEGIN;
         infinint ret = 0;
         struct cellule *ptr = first;
 
@@ -117,13 +115,13 @@ namespace libdar
             ptr = ptr->next;
         }
 
-        return ret;    
-        E_END("storage::size",""); 
+        return ret;
+        E_END("storage::size","");
     }
 
-    void storage::clear(unsigned char val) throw()
+    void storage::clear(unsigned char val)
     {
-        E_BEGIN; 
+        E_BEGIN;
         register struct cellule *cur = first;
         register U_32 i;
 
@@ -134,7 +132,7 @@ namespace libdar
                 cur->data[i++] = val;
             cur = cur->next;
         }
-        E_END("storage::clear",""); 
+        E_END("storage::clear","");
     }
 
     void storage::dump(generic_file & f) const
@@ -150,9 +148,9 @@ namespace libdar
         E_END("storage::dump", "");
     }
 
-    U_I storage::write(iterator & it, unsigned char *a, U_I size) throw(Erange)
+    U_I storage::write(iterator & it, unsigned char *a, U_I size)
     {
-        E_BEGIN; 
+        E_BEGIN;
         register U_I i;
 
         if(it.ref != this)
@@ -162,14 +160,14 @@ namespace libdar
             *(it++) = a[i];
 
         return i;
-        E_END("storage::write",""); 
+        E_END("storage::write","");
     }
 
-    U_I storage::read(iterator & it, unsigned char *a, U_I size) const throw(Erange)
+    U_I storage::read(iterator & it, unsigned char *a, U_I size) const
     {
-        E_BEGIN; 
+        E_BEGIN;
         register U_I i;
-    
+
         if(it.ref != this)
             throw Erange("storage::read", "the iterator is not indexing the object it has been asked to read from");
 
@@ -177,30 +175,30 @@ namespace libdar
             a[i] = *(it++);
 
         return i;
-        E_END("storage::read",""); 
+        E_END("storage::read","");
     }
 
-    void storage::insert_null_bytes_at_iterator(iterator it, U_I size) throw(Erange, Ememory, Ebug)
+    void storage::insert_null_bytes_at_iterator(iterator it, U_I size)
     {
-        E_BEGIN; 
+        E_BEGIN;
         unsigned char a = 0;
 
         insert_bytes_at_iterator_cmn(it, true, &a, size);
-        E_END("storage::insert_null_bytes_at_iterator",""); 
+        E_END("storage::insert_null_bytes_at_iterator","");
     }
 
-    void storage::insert_const_bytes_at_iterator(iterator it, unsigned char a, U_I size) throw(Erange, Ememory, Ebug)
+    void storage::insert_const_bytes_at_iterator(iterator it, unsigned char a, U_I size)
     {
-        E_BEGIN; 
+        E_BEGIN;
         insert_bytes_at_iterator_cmn(it, true, &a, size);
-        E_END("storage::insert_const_bytes_at_iterator",""); 
+        E_END("storage::insert_const_bytes_at_iterator","");
     }
 
-    void storage::insert_bytes_at_iterator(iterator it, unsigned char *a, U_I size) throw(Erange, Ememory, Ebug)
+    void storage::insert_bytes_at_iterator(iterator it, unsigned char *a, U_I size)
     {
-        E_BEGIN; 
+        E_BEGIN;
         insert_bytes_at_iterator_cmn(it, false, a, size);
-        E_END("storage::insert_bytes_at_iterator",""); 
+        E_END("storage::insert_bytes_at_iterator","");
     }
 
     void storage::insert_as_much_as_necessary_const_byte_to_be_as_wider_as(const storage & ref, const iterator &it, unsigned char value)
@@ -222,7 +220,7 @@ namespace libdar
                 c_ref = c_ref->next;
             }
         }
-    
+
         while(to_add > 0)
         {
             insert_const_bytes_at_iterator(it, value, to_add);
@@ -236,19 +234,19 @@ namespace libdar
         }
     }
 
-    void storage::remove_bytes_at_iterator(iterator it, U_I number) throw(Ememory, Ebug)
+    void storage::remove_bytes_at_iterator(iterator it, U_I number)
     {
-        E_BEGIN; 
+        E_BEGIN;
         while(number > 0 && it.cell != NULL)
         {
             U_I can_rem = it.cell->size - it.offset;
-        
+
             if(can_rem < number)
             {
                 if(it.offset > 0)
                 {
                     unsigned char *p = new unsigned char[it.offset];
-                
+
                     if(p != NULL)
                     {
                         for(register U_I i = 0; i < it.offset; i++)
@@ -267,7 +265,7 @@ namespace libdar
                 else
                 {
                     struct cellule *t = it.cell->next;
-                
+
                     if(t != NULL)
                         it.cell->next->prev = it.cell->prev;
                     else
@@ -277,7 +275,7 @@ namespace libdar
                         it.cell->prev->next = t;
                     else
                         first = t;
-                
+
                     number -= it.cell->size;
                     it.cell->next = NULL;
                     it.cell->prev = NULL;
@@ -306,12 +304,12 @@ namespace libdar
             }
         }
         reduce();
-        E_END("storage::remove_bytes_at_iterator","U_I"); 
+        E_END("storage::remove_bytes_at_iterator","U_I");
     }
 
-    void storage::remove_bytes_at_iterator(iterator it, infinint number) throw(Ememory, Erange, Ebug)
+    void storage::remove_bytes_at_iterator(iterator it, infinint number)
     {
-        E_BEGIN; 
+        E_BEGIN;
         U_32 sz = 0;
         number.unstack(sz);
 
@@ -321,13 +319,13 @@ namespace libdar
             sz = 0;
             number.unstack(sz);
         }
-        E_END("storage::remove_bytes_at_iterator","infinint"); 
+        E_END("storage::remove_bytes_at_iterator","infinint");
     }
 
     void storage::fusionne(struct cellule *a_first, struct cellule *a_last, struct cellule *b_first, struct cellule *b_last,
-                           struct cellule *&res_first, struct cellule * & res_last) throw(Ebug)
+                           struct cellule *&res_first, struct cellule * & res_last)
     {
-        E_BEGIN; 
+        E_BEGIN;
         if(a_first == NULL ^ a_last == NULL)
             throw SRC_BUG;
 
@@ -352,16 +350,16 @@ namespace libdar
                 res_first = a_first;
                 res_last = a_last;
             }
-        E_END("storage::fusionne",""); 
+        E_END("storage::fusionne","");
     }
 
-    void storage::copy_from(const storage & ref) throw(Ememory, Erange, Ebug)
+    void storage::copy_from(const storage & ref)
     {
-        E_BEGIN; 
+        E_BEGIN;
         U_32 pas = 0, delta;
         struct cellule *ptr = ref.first;
         first = last = NULL;
-    
+
         try
         {
             while(ptr != NULL || pas > 0)
@@ -390,24 +388,24 @@ namespace libdar
             first = last = NULL;
             throw;
         }
-    
+
         iterator i_ref = ref.begin();
         iterator i_new = begin();
-    
+
         while(i_ref != ref.end())
             *(i_new++) = *(i_ref++);
-        E_END("storage::copy_from",""); 
+        E_END("storage::copy_from","");
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: storage.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: storage.cpp,v 1.7.4.3 2004/09/10 22:34:16 edrusb Exp $";
         dummy_call(id);
     }
 
-    S_32 storage::difference(const storage & ref) const throw()
+    S_32 storage::difference(const storage & ref) const
     {
-        E_BEGIN; 
+        E_BEGIN;
         struct cellule *b = last, *a = ref.last;
         S_32 superior = 0;
 
@@ -425,12 +423,12 @@ namespace libdar
             }
         }
         return superior;
-        E_END("storage::difference",""); 
+        E_END("storage::difference","");
     }
 
-    void storage::reduce() throw(Ebug)
+    void storage::reduce()
     {
-        E_BEGIN; 
+        E_BEGIN;
         struct cellule *glisseur = first;
 
         while(glisseur != NULL)
@@ -438,18 +436,18 @@ namespace libdar
             if(glisseur->next != NULL)
             {
                 U_I somme = glisseur->next->size + glisseur->size;
-            
+
                 if(somme < alloc_size)
                 {
                     unsigned char *p = new unsigned char[somme];
-                
+
                     if(p != NULL)
                     {
                         struct cellule *tmp = glisseur->next;
-                    
+
                         for(register U_I i = 0; i < glisseur->size; i++)
                             p[i] = glisseur->data[i];
-                    
+
                         for(register U_I i = glisseur->size; i < somme; i++)
                             p[i] = tmp->data[i - glisseur->size];
 
@@ -457,13 +455,13 @@ namespace libdar
 
                         glisseur->data = p;
                         glisseur->size = somme;
-                    
+
                         glisseur->next = tmp->next;
                         if(glisseur->next != NULL)
                             glisseur->next->prev = glisseur;
                         else
                             last = glisseur;
-                    
+
                         tmp->next = tmp->prev = NULL;
                         detruit(tmp);
                     }
@@ -476,12 +474,12 @@ namespace libdar
             else // no next cellule
                 glisseur = glisseur->next;
         }
-        E_END("storage::reduce",""); 
+        E_END("storage::reduce","");
     }
 
-    void storage::insert_bytes_at_iterator_cmn(iterator it, bool constant, unsigned char *a, U_I size) throw(Erange, Ememory, Ebug)
+    void storage::insert_bytes_at_iterator_cmn(iterator it, bool constant, unsigned char *a, U_I size)
     {
-        E_BEGIN; 
+        E_BEGIN;
         if(it.ref != this)
             throw Erange("storage::insert_bytes_at_iterator_cmn", "the iterator is not indexing the object it has been asked to insert byte into");
 
@@ -561,18 +559,18 @@ namespace libdar
             default:
                 throw SRC_BUG;
             }
-        
+
             temp.last = temp.first = NULL;
         }
         reduce();
-        E_END("storage::insert_bytes_at_iterator_cmn",""); 
+        E_END("storage::insert_bytes_at_iterator_cmn","");
     }
 
-    void storage::detruit(struct cellule *c) throw(Ebug)
+    void storage::detruit(struct cellule *c)
     {
-        E_BEGIN; 
+        E_BEGIN;
         struct cellule *t;
-        
+
         while(c != NULL)
         {
             if(c->size == 0 && c->data != NULL)
@@ -585,15 +583,15 @@ namespace libdar
             delete c;
             c = t;
         }
-        E_END("storage::detruit",""); 
+        E_END("storage::detruit","");
     }
 
-    void storage::make_alloc(U_32 size, struct cellule * & begin, struct cellule * & end) throw (Ememory, Ebug)
+    void storage::make_alloc(U_32 size, struct cellule * & begin, struct cellule * & end)
     {
-        E_BEGIN; 
+        E_BEGIN;
         struct cellule *newone;
         struct cellule *previous = NULL;
-        
+
         do
         {
             U_32 dsize = alloc_size < size ? alloc_size : size;
@@ -606,11 +604,11 @@ namespace libdar
                 if(previous != NULL)
                     previous->next = newone;
                 else
-                    begin = newone; 
+                    begin = newone;
             }
             else
             {
-                detruit(begin); 
+                detruit(begin);
                 throw Ememory("storage::make_alloc");
             }
             newone->data = new unsigned char[dsize];
@@ -632,14 +630,14 @@ namespace libdar
                 }
         }
         while (size > 0);
-    
+
         end = newone;
-        E_END("storage::make_alloc","U_32"); 
+        E_END("storage::make_alloc","U_32");
     }
 
-    void storage::make_alloc(infinint size, struct cellule * & begin, struct cellule * &end) throw(Ememory, Erange, Ebug)
+    void storage::make_alloc(infinint size, struct cellule * & begin, struct cellule * &end)
     {
-        E_BEGIN; 
+        E_BEGIN;
         struct cellule *debut;
         struct cellule *fin;
         U_32 sz = 0;
@@ -678,7 +676,7 @@ namespace libdar
             size.unstack(sz);
         }
         while(sz > 0);
-        E_END("storage::make_alloc","infinint"); 
+        E_END("storage::make_alloc","infinint");
     }
 
 ///////////////////////////////////////////////////////////
@@ -686,50 +684,50 @@ namespace libdar
 ///////////////////////////////////////////////////////////
 
 
-    storage::iterator & storage::iterator::operator += (U_32 s) throw ()
+    storage::iterator & storage::iterator::operator += (U_32 s)
     {
         E_BEGIN;
         S_32 t = s >> 1;
         S_32 r = s & 0x1;
-    
-        relative_skip_to(t); 
-        relative_skip_to(t+r); 
-        return *this; 
-        E_END("storage::iterator::operator +=", ""); 
+
+        relative_skip_to(t);
+        relative_skip_to(t+r);
+        return *this;
+        E_END("storage::iterator::operator +=", "");
     }
 
-    storage::iterator & storage::iterator::operator -= (U_32 s) throw()
+    storage::iterator & storage::iterator::operator -= (U_32 s)
     {
-        E_BEGIN; 
+        E_BEGIN;
         static const U_32 max = (U_32)(~0) >> 1;  // maximum U_32 that can also be S_32
         if(s > max)
         {
             S_32 t = s >> 1; // equivalent to s/2;
             S_32 r = s & 0x01; // equivalent to s%2;
-            relative_skip_to(-t); 
-            relative_skip_to(-t); 
-            relative_skip_to(-r); 
+            relative_skip_to(-t);
+            relative_skip_to(-t);
+            relative_skip_to(-r);
         }
         else
             relative_skip_to(-(S_32)(s));
 
-        return *this; 
-        E_END("storage::iterator::operator -=",""); 
-    };
+        return *this;
+        E_END("storage::iterator::operator -=","");
+    }
 
-    unsigned char & storage::iterator::operator *() const throw(Erange)
+    unsigned char & storage::iterator::operator *() const
     {
-        E_BEGIN; 
+        E_BEGIN;
         if(points_on_data())
             return cell->data[offset];
         else
             throw Erange("storage::iterator::operator *()", "iterator does not point on data");
-        E_END("storage::iterator::operator *","unary operator"); 
+        E_END("storage::iterator::operator *","unary operator");
     }
 
-    void storage::iterator::skip_to(const storage & st, infinint val) throw()
+    void storage::iterator::skip_to(const storage & st, infinint val)
     {
-        E_BEGIN; 
+        E_BEGIN;
         U_16 pas = 0; // relative_skip_to has S_32 as argument, cannot call it with U_32
 
         *this = st.begin();
@@ -741,12 +739,12 @@ namespace libdar
             val.unstack(pas);
         }
         while(pas > 0);
-        E_END("storage::iterator::skip_to","infinint"); 
+        E_END("storage::iterator::skip_to","infinint");
     }
-        
-    void storage::iterator::relative_skip_to(S_32 val) throw()
+
+    void storage::iterator::relative_skip_to(S_32 val)
     {
-        E_BEGIN; 
+        E_BEGIN;
         if(val >= 0)
         {
             while(val > 0 && cell != NULL)
@@ -781,12 +779,12 @@ namespace libdar
                 else
                     offset = val;
             }
-        E_END("storage::iterator::relative_skip_to","S_32"); 
+        E_END("storage::iterator::relative_skip_to","S_32");
     }
 
-    infinint storage::iterator::get_position() const throw(Erange, Ememory, Ebug)
+    infinint storage::iterator::get_position() const
     {
-        E_BEGIN; 
+        E_BEGIN;
         if(ref == NULL || ref->first == NULL)
             throw Erange("storage::iterator::get_position", "reference storage of the iterator is empty or non existant");
 
@@ -808,7 +806,7 @@ namespace libdar
             throw Erange("storage::iterator::get_position", "the iterator position is not inside the storage of reference");
 
         return ret;
-        E_END("storage::iterator::get_position",""); 
+        E_END("storage::iterator::get_position","");
     }
 
 } // end of namespace

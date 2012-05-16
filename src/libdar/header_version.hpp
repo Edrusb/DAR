@@ -18,14 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header_version.hpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: header_version.hpp,v 1.6.4.1 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef HEADER_VERSION_HPP
 #define HEADER_VERSION_HPP
-
-#pragma interface
 
 #include "../my_config.h"
 #include "generic_file.hpp"
@@ -49,12 +47,12 @@ namespace libdar
         char algo_zip;
         std::string cmd_line;
         unsigned char flag; // added at edition 02
-    
+
         void read(generic_file &f)
             {
-                f.read(edition, sizeof(edition)); 
-                f.read(&algo_zip, sizeof(algo_zip)); 
-                tools_read_string(f, cmd_line); 
+                f.read(edition, sizeof(edition));
+                f.read(&algo_zip, sizeof(algo_zip));
+                tools_read_string(f, cmd_line);
                 if(version_greater(edition, "01"))
                     f.read((char *)&flag, (size_t)1);
                 else
@@ -62,8 +60,8 @@ namespace libdar
             };
         void write(generic_file &f)
             {
-                f.write(edition, sizeof(edition)); 
-                f.write(&algo_zip, sizeof(algo_zip)); 
+                f.write(edition, sizeof(edition));
+                f.write(&algo_zip, sizeof(algo_zip));
                 tools_write_string(f, cmd_line);
                 f.write((char *)&flag, (size_t)1);
             };

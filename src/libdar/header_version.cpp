@@ -18,12 +18,10 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header_version.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: header_version.cpp,v 1.5.4.1 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 //
-
-#pragma implementation
 
 #include "../my_config.h"
 
@@ -42,7 +40,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: header_version.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: header_version.cpp,v 1.5.4.1 2004/07/25 20:38:03 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -52,7 +50,7 @@ namespace libdar
 
         while(i < VERSION_SIZE && left[i] == right[i])
             i++;
-    
+
         return i < VERSION_SIZE && left[i] > right[i];
     }
 

@@ -18,11 +18,9 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.5.4.1 2004/05/03 19:32:54 edrusb Rel $
+// $Id: terminateur.cpp,v 1.5.4.2 2004/07/25 20:38:04 edrusb Exp $
 //
 /*********************************************************************/
-
-#pragma implementation
 
 #include "../my_config.h"
 #include "terminateur.hpp"
@@ -85,7 +83,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: terminateur.cpp,v 1.5.4.1 2004/05/03 19:32:54 edrusb Rel $";
+        static char id[]="$Id: terminateur.cpp,v 1.5.4.2 2004/07/25 20:38:04 edrusb Exp $";
         dummy_call(id);
     }
 

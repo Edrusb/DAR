@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: etage.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: etage.hpp,v 1.5.4.3 2004/09/13 09:20:59 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -32,17 +32,17 @@
 
 namespace libdar
 {
-    
+
     struct etage
     {
-        etage() { fichier.clear(); };
-        etage(char *dirname);
+	etage() { fichier.clear(); last_mod = 0; last_acc = 0; }; // required to fake an empty dir when one is impossible to open
+        etage(char *dirname, const infinint & x_last_acc, const infinint & x_last_mod);
         bool read(std::string & ref);
-        
+
         std::list<std::string> fichier;
         infinint last_mod, last_acc;
     };
-    
+
 } // end of namespace
 
 #endif

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.21.2.2 2004/01/15 14:06:28 edrusb Rel $
+// $Id: tools.cpp,v 1.21.2.3 2004/09/10 20:15:43 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -299,7 +299,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.21.2.2 2004/01/15 14:06:28 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.21.2.3 2004/09/10 20:15:43 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -847,7 +847,7 @@ namespace libdar
 
             try
             {
-                etage contents = char_chem;
+                etage contents = etage(char_chem, 0, 0); // we don't care the dates here so we set them to zero
                 regular_mask slice = rest + "\\.[1-9][0-9]*\\."+ extension;
 
                 while(!ret && contents.read(rest))

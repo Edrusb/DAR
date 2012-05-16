@@ -18,33 +18,52 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: null_file.hpp,v 1.4.4.1 2004/07/25 20:38:03 edrusb Exp $
+// $Id: int_tools.hpp,v 1.1.2.1 2004/07/25 20:38:03 edrusb Exp $
 //
 /*********************************************************************/
 
-#ifndef NULL_FILE_HPP
-#define NULL_FILE_HPP
+#ifndef INT_TOOLS_HPP
+#define INT_TOOLS_HPP
 
 #include "../my_config.h"
-#include "generic_file.hpp"
+
+#include "integers.hpp"
+#include "erreurs.hpp"
 
 namespace libdar
 {
+    typedef unsigned char int_tools_bitfield[8];
 
-    class null_file : public generic_file
+    extern void int_tools_swap_bytes(unsigned char &a, unsigned char &b);
+    extern void int_tools_swap_bytes(unsigned char *a, U_I size);
+    extern void int_tools_expand_byte(unsigned char a, int_tools_bitfield &bit);
+    extern void int_tools_contract_byte(const int_tools_bitfield &b, unsigned char & a);
+
+        // integer (agregates) manipulations
+        // argument must be a regular interger (a bit field).
+    template <class T> extern T int_tools_rotate_right_one_bit(T v)
     {
-    public :
-        null_file(gf_mode m) : generic_file(m) {};
-        bool skip(const infinint &pos) { return pos == 0; };
-        bool skip_to_eof() { return true; };
-        bool skip_relative(signed int x) { return false; };
-        infinint get_position() { return 0; };
+        bool retenue = (v & 1) != 0;
 
-    protected :
-        int inherited_read(char *a, size_t size) { return 0; };
-        int inherited_write(char *a, size_t size) { return size; };
-    };
+        v >>= 1;
+        if(retenue)
+            v |= T(1) << (sizeof(v)*8 - 1);
 
-} // end of namespace
+        return v;
+    }
+
+    template <class T> extern T int_tools_maxof_agregate(T unused) { return ~T(0) > 0 ? ~T(0) : ~int_tools_rotate_right_one_bit(T(1)); }
+
+    template <class B> static B int_tools_higher_power_of_2(B val)
+    {
+        B i = 0;
+
+        while((val >> i) > 1)
+            i++;
+
+        return i;
+    }
+
+}
 
 #endif

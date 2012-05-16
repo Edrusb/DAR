@@ -18,21 +18,19 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: terminateur.hpp,v 1.5.4.1 2004/07/25 20:38:04 edrusb Exp $
 //
 /*********************************************************************/
 
 #ifndef TERMINATEUR_HPP
 #define TERMINATEUR_HPP
 
-#pragma interface
-
 #include "../my_config.h"
 #include "generic_file.hpp"
 
 namespace libdar
 {
-    
+
     class terminateur
     {
     public :
@@ -40,11 +38,11 @@ namespace libdar
         void dump(generic_file &f);
         void read_catalogue(generic_file &f);
         infinint get_catalogue_start() { return pos; };
-        
+
     private :
         infinint pos;
     };
 
 } // end of namespace
-    
+
 #endif
