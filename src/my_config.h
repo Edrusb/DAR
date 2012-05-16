@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: my_config.h,v 1.3.4.2 2004/01/03 18:56:01 edrusb Rel $
+// $Id: my_config.h,v 1.7 2004/08/03 21:27:59 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -29,5 +29,7 @@
 #if HAVE_CONFIG_H
 #include "../config.h"
 #endif
+
+#include "gettext.h"
 
 #endif

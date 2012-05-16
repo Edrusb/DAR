@@ -18,9 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.hpp,v 1.4.4.6 2004/09/10 22:34:15 edrusb Exp $
+// $Id: real_infinint.hpp,v 1.13 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file real_infinint.hpp
+    /// \brief the original infinint class implementation
+    ///
+    /// the infinint class implementation defined in this module can
+    /// handle arbitrary large positive integer numbers
 
 #ifndef REAL_INFININT_HPP
 #define REAL_INFININT_HPP
@@ -37,6 +43,7 @@ extern "C"
 #include <typeinfo>
 #include "storage.hpp"
 #include "integers.hpp"
+#include "user_interaction.hpp"
 #include "int_tools.hpp"
 
 namespace libdar
@@ -44,6 +51,10 @@ namespace libdar
 
     class generic_file;
 
+	/// the arbitrary large positive integer class
+
+	/// can only handle positive integer numbers
+	/// \ingroup Private
     class infinint
     {
     public :
@@ -67,15 +78,15 @@ namespace libdar
 #endif
 
         infinint(const infinint & ref)
-            { E_BEGIN copy_from(ref); E_END("infinint::infinint", "const infinint &") };
-        infinint(int *fd, generic_file *x); // read an infinint from a file
+            { E_BEGIN; copy_from(ref); E_END("infinint::infinint", "const infinint &"); }
+        infinint(user_interaction & dialog, S_I *fd, generic_file *x); // read an infinint from a file
         ~infinint()
             { E_BEGIN detruit(); E_END("infinint::~infinint","") };
 
         infinint & operator = (const infinint & ref)
             { E_BEGIN detruit(); copy_from(ref); return *this; E_END("infinint::operator =","") };
 
-        void dump(int fd) const; // write byte sequence to file
+        void dump(user_interaction & dialog, int fd) const; // write byte sequence to file
         void dump(generic_file &x) const; // write byte sequence to file
         void read(generic_file &f) { detruit(); build_from_file(f); };
 
@@ -107,6 +118,12 @@ namespace libdar
             // when the object is null the value of the argument stays the same as before
         template <class T>void unstack(T &v)
             { E_BEGIN infinint_unstack_to(v); E_END("infinint::unstack", typeid(v).name()) }
+
+	infinint get_storage_size() const { return field->size(); };
+	    // it returns number of byte of information necessary to store the integer
+
+	unsigned char operator [] (const infinint & position) const;
+	    // return in big endian order the information byte storing the integer
 
         friend bool operator < (const infinint &, const infinint &);
         friend bool operator == (const infinint &, const infinint &);
@@ -286,7 +303,7 @@ namespace libdar
     {
         E_BEGIN
             // T is supposed to be an unsigned "integer"
-            // (ie.: sizeof returns the width of the storage bit field  and no sign bit is present)
+            // (ie.: sizeof() returns the width of the storage bit field  and no sign bit is present)
             // Note : static here avoids the recalculation of max_T at each call
         static const T max_T = int_tools_maxof_agregate(T(0));
         infinint step = max_T - a;

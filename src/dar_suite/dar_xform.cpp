@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.13.2.4 2004/03/10 21:18:20 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.30 2004/12/07 18:04:48 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -46,10 +46,10 @@ extern "C"
 
 using namespace libdar;
 
-#define EXTENSION "dar"
-#define DAR_XFORM_VERSION "1.2.1"
+#define DAR_XFORM_VERSION "1.3.0"
 
-static bool command_line(S_I argc, char *argv[],
+static bool command_line(user_interaction & dialog,
+			 S_I argc, char *argv[],
                          path * & src_dir, string & src,
                          path * & dst_dir, string & dst,
                          infinint & first_file_size,
@@ -60,16 +60,16 @@ static bool command_line(S_I argc, char *argv[],
                          bool & beep,
                          string & execute_src,
                          string & execute_dst);
-static void show_usage(const char *command_name);
-static void show_version(const char *command_name);
-static S_I sub_main(S_I argc, char *argv[], const char **env);
+static void show_usage(user_interaction & dialog, const char *command_name);
+static void show_version(user_interaction & dialog, const char *command_name);
+static S_I sub_main(user_interaction & dialog, S_I argc, char *argv[], const char **env);
 
 int main(S_I argc, char *argv[], const char **env)
 {
     return dar_suite_global(argc, argv, env, &sub_main);
 }
 
-static S_I sub_main(S_I argc, char *argv[], const char **env)
+static S_I sub_main(user_interaction & dialog, S_I argc, char *argv[], const char **env)
 {
     path *src_dir = NULL;
     path *dst_dir = NULL;
@@ -78,7 +78,7 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
     bool warn, allow, pause, beep;
     string execute_src, execute_dst;
 
-    if(command_line(argc, argv, src_dir, src, dst_dir, dst, first, size,
+    if(command_line(dialog, argc, argv, src_dir, src, dst_dir, dst, first, size,
                     warn, allow, pause, beep, execute_src, execute_dst))
     {
         try
@@ -88,7 +88,10 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
 	    sar *tmp_sar = NULL;
 
             if(dst != "-")
+	    {
                 shell_interaction_change_non_interactive_output(&cout);
+		tools_avoid_slice_overwriting(dialog,  dst_dir->display(), dst+".*."+EXTENSION, false, allow, warn);
+	    }
             try
             {
                 S_I dst_opt =
@@ -98,13 +101,13 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
                 shell_interaction_set_beep(beep);
                 if(src == "-")
                 {
-                    generic_file *tmp = new tuyau(0, gf_read_only);
+                    generic_file *tmp = new tuyau(dialog, 0, gf_read_only);
 
                     if(tmp == NULL)
                         throw Ememory("main");
                     try
                     {
-                        src_sar = new trivial_sar(tmp);
+                        src_sar = new trivial_sar(dialog, tmp);
                         if(src_sar == NULL)
                             delete tmp;
                         tmp = NULL;
@@ -118,7 +121,7 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
                 }
                 else 	// source not from a pipe
 		{
-                    tmp_sar = new sar(src, EXTENSION, SAR_OPT_DEFAULT, *src_dir, execute_src);
+                    tmp_sar = new sar(dialog, src, EXTENSION, SAR_OPT_DEFAULT, *src_dir, execute_src);
 		    if(tmp_sar == NULL)
 			throw Ememory("main");
 		    else
@@ -128,11 +131,11 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
 
                 if(size == 0)
                     if(dst == "-")
-                        dst_sar = sar_tools_open_archive_tuyau(1, gf_write_only);
+                        dst_sar = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only);
                     else
-                        dst_sar = sar_tools_open_archive_fichier((*dst_dir + sar_make_filename(dst, 1, EXTENSION)).display(), allow, warn);
+                        dst_sar = sar_tools_open_archive_fichier(dialog, (*dst_dir + sar_make_filename(dst, 1, EXTENSION)).display(), allow, warn);
                 else
-                    dst_sar = new sar(dst, EXTENSION, size, first, dst_opt, *dst_dir, execute_dst);
+                    dst_sar = new sar(dialog, dst, EXTENSION, size, first, dst_opt, *dst_dir, execute_dst);
                 if(dst_sar == NULL)
                     throw Ememory("main");
 
@@ -154,8 +157,8 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
                 }
                 catch(Egeneric & e)
                 {
-                    string msg = string("Error transforming the archive :")+e.get_message();
-                    user_interaction_warning(msg);
+                    string msg = string(gettext("Error transforming the archive :"))+e.get_message();
+                    dialog.warning(msg);
                     throw Edata(msg);
                 }
             }
@@ -185,7 +188,7 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
         return EXIT_SYNTAX;
 }
 
-static bool command_line(S_I argc, char *argv[],
+static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
                          path * & src_dir, string & src,
                          path * & dst_dir, string & dst,
                          infinint & first_file_size,
@@ -208,59 +211,60 @@ static bool command_line(S_I argc, char *argv[],
     file_size = 0;
     src = dst = "";
     execute_src = execute_dst = "";
+    U_I suffix_base = TOOLS_BIN_SUFFIX;
 
     try
     {
-        while((lu = getopt(argc, argv, "s:S:pwnhbVE:F:")) != EOF)
+        while((lu = getopt(argc, argv, "s:S:pwnhbVE:F:a::Qj")) != EOF)
         {
             switch(lu)
             {
             case 's':
                 if(file_size != 0)
-                    throw Erange("command_line", "only one -s option is allowed");
+                    throw Erange("command_line", gettext("Only one -s option is allowed"));
                 if(optarg == NULL)
-                    throw Erange("command_line", "missing argument to -s");
+                    throw Erange("command_line", gettext("Missing argument to -s"));
                 else
                 {
                     try
                     {
-                        file_size = tools_get_extended_size(optarg);
+                        file_size = tools_get_extended_size(optarg, suffix_base);
                         if(first_file_size == 0)
                             first_file_size = file_size;
                     }
                     catch(Edeci &e)
                     {
-                        user_interaction_warning("invalid size for option -s");
+                        dialog.warning(gettext("Invalid size for option -s"));
                         return false;
                     }
                 }
                 break;
             case 'S':
                 if(optarg == NULL)
-                    throw Erange("command_line", "missing argument to -S");
+                    throw Erange("command_line", gettext("Missing argument to -S"));
                 if(first_file_size == 0)
-                    first_file_size = tools_get_extended_size(optarg);
+                    first_file_size = tools_get_extended_size(optarg, suffix_base);
                 else
                     if(file_size == 0)
-                        throw Erange("command_line", "only one -S option is allowed");
+                        throw Erange("command_line", gettext("Only one -S option is allowed"));
                     else
                         if(file_size == first_file_size)
                         {
                             try
                             {
-                                first_file_size = tools_get_extended_size(optarg);
+                                first_file_size = tools_get_extended_size(optarg, suffix_base);
                                 if(first_file_size == file_size)
-                                    user_interaction_warning("specifying -S with the same value as the one given in -s is useless");
+                                    dialog.warning(gettext("Giving -S option the same value as the one given to -s is useless"));
                             }
                             catch(Egeneric &e)
                             {
-                                user_interaction_warning("invalid size for option -S");
+                                dialog.warning(gettext("Invalid size for option -S"));
                                 return false;
                             }
 
                         }
                         else
-                            throw Erange("command_line", "only one -S option is allowed");
+                            throw Erange("command_line", gettext("Only one -S option is allowed"));
                 break;
             case 'p':
                 pause = true;
@@ -275,14 +279,14 @@ static bool command_line(S_I argc, char *argv[],
                 beep = true;
                 break;
             case 'h':
-                show_usage(argv[0]);
+                show_usage(dialog, argv[0]);
                 return false;
             case 'V':
-                show_version(argv[0]);
+                show_version(dialog, argv[0]);
                 return false;
             case 'E':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -E");
+                    throw Erange("get_args", gettext("Missing argument to -E"));
                 if(execute_dst == "")
                     execute_dst = optarg;
                 else
@@ -290,16 +294,30 @@ static bool command_line(S_I argc, char *argv[],
                 break;
             case 'F':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -F");
+                    throw Erange("get_args", gettext("Missing argument to -F"));
                 if(execute_src == "")
                     execute_src = optarg;
                 else
 		    execute_src += string(" ; ") + optarg;
                 break;
+	    case 'a':
+		if(optarg == NULL)
+		    throw Erange("command_line", gettext("-a option requires an argument"));
+		if(strcasecmp("SI-unit", optarg) == 0 || strcasecmp("SI", optarg) == 0 || strcasecmp("SI-units", optarg) == 0)
+		    suffix_base = TOOLS_SI_SUFFIX;
+		else
+		    if(strcasecmp("binary-unit", optarg) == 0 || strcasecmp("binary", optarg) == 0 || strcasecmp("binary-units", optarg) == 0)
+			suffix_base = TOOLS_BIN_SUFFIX;
+		    else
+			throw Erange("command_line", string(gettext("Unknown parameter given to -a option: ")) + optarg);
+		break;
+	    case 'Q':
+	    case 'j':
+		break;  // ignore this option already parsed during initialization (dar_suite.cpp)
             case ':':
-                throw Erange("command_line", string("missing parameter to option ") + char(optopt));
+                throw Erange("command_line", tools_printf(gettext("Missing parameter to option -%c"), char(optopt)));
             case '?':
-                user_interaction_warning(string("ignoring unknown option ") + char(optopt));
+                dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
                 break;
             default:
                 throw SRC_BUG;
@@ -309,32 +327,32 @@ static bool command_line(S_I argc, char *argv[],
             // reading arguments remain on the command line
         if(optind + 2 > argc)
         {
-            user_interaction_warning("missing source or destination argument on command line, see -h option for help");
+            dialog.warning(gettext("Missing source or destination argument on command line, see -h option for help"));
             return false;
         }
         if(optind + 2 < argc)
         {
-            user_interaction_warning("too many argument on command line, see -h option for help");
+            dialog.warning(gettext("Too many argument on command line, see -h option for help"));
             return false;
         }
         if(argv[optind] != "")
             tools_split_path_basename(argv[optind], src_dir, src);
         else
         {
-            user_interaction_warning("invalid argument as source archive");
+            dialog.warning(gettext("Invalid argument as source archive"));
             return false;
         }
         if(argv[optind+1] != "")
             tools_split_path_basename(argv[optind+1], dst_dir, dst);
         else
         {
-            user_interaction_warning("invalid argument as destination archive");
+            dialog.warning(gettext("Invalid argument as destination archive"));
             return false;
         }
 
             // sanity checks
         if(dst == "-" && file_size != 0)
-            throw Erange("dar_xform::command_line", "archive on stdout is not compatible with slicing (-s option)");
+            throw Erange("dar_xform::command_line", gettext("Archive on stdout is not compatible with slicing (-s option)"));
     }
     catch(...)
     {
@@ -349,20 +367,20 @@ static bool command_line(S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.13.2.4 2004/03/10 21:18:20 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.30 2004/12/07 18:04:48 edrusb Rel $";
     dummy_call(id);
 }
 
-static void show_usage(const char *command_name)
+static void show_usage(user_interaction & dialog, const char *command_name)
 {
     char *name = tools_extract_basename(command_name);
     shell_interaction_change_non_interactive_output(&cout);
 
     try
     {
-        ui_printf("usage :\t %s [options] [<path>/]<basename> [<path>/]<basename>\n", name);
-        ui_printf("       \t %s -h\n",name);
-        ui_printf("       \t %s -V\n",name);
+        dialog.printf("usage :\t %s [options] [<path>/]<basename> [<path>/]<basename>\n", name);
+        dialog.printf("       \t %s -h\n",name);
+        dialog.printf("       \t %s -V\n",name);
 #include "dar_xform.usage"
     }
     catch(...)
@@ -373,27 +391,34 @@ static void show_usage(const char *command_name)
     delete name;
 }
 
-static void show_version(const char *command_name)
+static void show_version(user_interaction & dialog, const char *command_name)
 {
     char *name = tools_extract_basename(command_name);
-    U_I maj, min, bits;
-    bool ea, largefile, nodump, special_alloc;
+    U_I maj, med, min, bits;
+    bool ea, largefile, nodump, special_alloc, thread, libz, libbz2, libcrypto;
 
     get_version(maj, min);
-    get_compile_time_features(ea, largefile, nodump, special_alloc, bits);
+    if(maj > 2)
+	get_version(maj, med, min);
+    else
+	med = 0;
+    get_compile_time_features(ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
+    shell_interaction_change_non_interactive_output(&cout);
 
     try
     {
-        ui_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n\n", name, DAR_XFORM_VERSION);
-        ui_printf(" Using libdar %u.%u built with compilation time options:\n", maj, min);
-        tools_display_features(ea, largefile, nodump, special_alloc, bits);
-        ui_printf("\n");
-        ui_printf(" %s with %s version %s\n", __DATE__, CC_NAT, __VERSION__);
-        ui_printf(" %s is part of the Disk ARchive suite (Release %s)\n", name, PACKAGE_VERSION);
-        ui_printf(" %s comes with ABSOLUTELY NO WARRANTY; for details\n", name);
-        ui_printf(" type `%s -W'.  This is free software, and you are welcome\n", "dar");
-        ui_printf(" to redistribute it under certain conditions; type `%s -L | more'\n", "dar");
-        ui_printf(" for details.\n\n");
+        dialog.printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n\n", name, DAR_XFORM_VERSION);
+	if(maj > 2)
+	    dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
+	else
+	    dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
+        tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
+        dialog.printf("\n");
+        dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__);
+        dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name, PACKAGE_VERSION);
+        dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name, "dar")
+		       + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
+		       + tools_printf(gettext(" type `%s -L | more'\n for details.\n\n"), "dar"));
     }
     catch(...)
     {

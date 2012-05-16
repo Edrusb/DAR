@@ -18,9 +18,16 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.hpp,v 1.5.4.2 2004/09/22 03:14:24 edrusb Rel $
+// $Id: terminateur.hpp,v 1.9 2004/11/07 18:21:39 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file terminateur.hpp
+    /// \brief the terminateur class which defines the position of the catalogue
+    ///
+    /// the terminateur is a byte sequence present as the last bytes of an archive
+    /// which indicates how much byte backward libdar must skip back to find the
+    /// beginning of the catalogue.
 
 #ifndef TERMINATEUR_HPP
 #define TERMINATEUR_HPP
@@ -32,12 +39,17 @@
 namespace libdar
 {
 
+	/// terminateur class indicates the location of the beginning of the catalogue
+
+	/// it is the last bytes sequence of an archive.
+	/// \ingroup Private
+
     class terminateur
     {
     public :
         void set_catalogue_start(infinint xpos) { pos = xpos; };
         void dump(generic_file &f);
-        void read_catalogue(generic_file &f);
+        void read_catalogue(generic_file &f, bool with_elastic);
         infinint get_catalogue_start() { return pos; };
 
     private :

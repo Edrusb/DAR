@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: hide_file.hpp,v 1.7.2.1 2004/09/22 03:14:21 edrusb Rel $
+// $Id: hide_file.hpp,v 1.10 2004/10/01 22:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -36,7 +36,7 @@ using namespace std;
 class hide_file : public generic_file
 {
 public:
-    hide_file(generic_file &f);
+    hide_file(user_interaction & dialog, generic_file &f);
 
     bool skip(const infinint & pos);
     bool skip_to_eof();

@@ -17,32 +17,53 @@
         ==========================
 
 For RPM packages, install as any other package (see rpm man page and
-relative documentation).
+relative documentation). In a more general way, the binary packages
+provided on dar's web site are just for convenience. For a specific
+package type of a given distro, ask the corresponding disto maintainer
+team.
 
 
-        II _ INSTALLATION FROM SOURCES
+        II _ INSTALLATION FROM SOURCES (Any Unix including Cygwin)
         ==============================
 
-        REQUIREMENTS
+        MANDATORY
 
 You need to have installed:
-- c++ compiler (supported compiler range from gcc-2.95.3 to gcc-3.4.2)
-- zlib must be installed (at least version 1.1.3, but 1.1.4 is recommended),
+- a C++ compiler (only gcc-3 is supported but other may work too)
+- make
+
+        NOT MANDATORY
+- optionaly zlib can be installed to have gzip compression support
+  (at least version 1.1.3, but 1.1.4 is recommended),
   see http://www.gzip.org/zlib/ for source code,
-- as well as libbzip2 (tested with version 1.0.2, more recent should also work)
+- as well as libbzip2 to have bzip2 compression support.
+  (tested with version 1.0.2, more recent should also work)
   see http://sources.redhat.com/bzip2/ for source code.
 - GNU getopt is strongly recommended for system that do not have it by default
   (like FreeBSD), else you won't have long options nor optional arguments,
-  If you are using Linux or Cygwin/Linux you do have GNU getopt.
+  If you are using Linux or Cygwin/Linux you do not need to have GNU getopt.
+- last if you want strong encryption, openssl's crypto library is necessary.
+  openssl homepage: http://www.openssl.org/
+- if doxygen is available on your system, "make" will build the API reference
+  manual, which will be located in doc/html/index.html
+  doxygen homepage: http://www.stack.nl/~dimitri/doxygen/index.html
+- if upx is available on your system, "make install-strip" will compress the
+  dar binaries using upx. (http://upx.sourceforge.net/)
+
+
 
 
 1. configure the package using the configuration script:
 
-        ./configure [options...]
+        ./configure
 
+OR for a faster executable (see LIMITATIONS for drawbacks):
 
-check the doc/configure_options document to have the list of options and
-which are supported on which system.
+	./configure --enable-mode=64
+
+check the ./doc/configure_options file document for a list of other available
+options (or type ./configure --help)
+
 
 
 2. then you need to compile:
@@ -66,6 +87,8 @@ or if you use a cshell:
 
 the problem may come from compiler or system header files.
 
+
+
 3. As root install it with:
 
         make install-strip
@@ -76,7 +99,36 @@ as well as their manual page, sample programs, if built, are never installed.
 table, which is not useful for normal operations.
 
 Moreover if you had the upx command available in the PATH when "configure" was
-run,  at this step of installation, the binary files will be compressed using upx.
+run, at this step of installation, the binary files will be compressed using
+upx.
+
+
+
+4. Annex for Package Maintainers and those using Linux From Scratch:
+
+The DESTDIR variable is available, here is an example of use:
+
+   ./configure --prefix=/usr --enable-mode=64
+   make
+   make DESTDIR=/tmp/A install-strip
+
+this will *build* the package to be used under /usr (in particular library will
+have to be located in /usr/lib to work properly) but using DESTDIR the package
+will not be *installed* in /usr, but in /tmp/A/usr. So you can
+simply make a package of all the files under /tmp/A and install it on your
+system. Here is an example for Slackware:
+
+  cd /tmp/A
+  makepkg dar64-2.2.0.tgz
+
+At this step dar has not been installed on the system just a package has been
+made. To install you just have to do:
+
+  installpkg dar64-2.2.0.tgz
+
+which will put all under /usr as expected. Things should work the same for other
+distro.
+
 
 
 

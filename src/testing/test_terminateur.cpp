@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_terminateur.cpp,v 1.7.4.2 2004/04/20 09:27:02 edrusb Rel $
+// $Id: test_terminateur.cpp,v 1.11 2004/10/30 22:26:52 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -47,24 +47,34 @@ extern "C"
 #include "test_memory.hpp"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
+#include "shell_interaction.hpp"
+#include "user_interaction.hpp"
 
 using namespace libdar;
 using namespace std;
 
 static void f1();
 
+static user_interaction *ui = NULL;
+
 int main()
 {
     MEM_BEGIN;
     MEM_IN;
+    ui = shell_interaction_init(&cout, &cerr, false);
+    if(ui == NULL)
+	cout << "ERREUR !" << endl;
     f1();
+    shell_interaction_close();
+    if(ui != NULL)
+	delete ui;
     MEM_OUT;
     MEM_END;
 }
 
 static void f1()
 {
-    fichier toto = ::open("toto", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644);
+    fichier toto = fichier(*ui, ::open("toto", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644));
     terminateur term;
 
     infinint grand = 1;
@@ -77,7 +87,7 @@ static void f1()
     term.set_catalogue_start(grand);
     term.dump(toto);
     toto.skip(0);
-    term.read_catalogue(toto);
+    term.read_catalogue(toto, false);
     conv = term.get_catalogue_start();
     cout << conv.human() << endl;
 }

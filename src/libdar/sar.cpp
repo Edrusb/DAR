@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.15.2.4 2004/07/25 20:38:03 edrusb Exp $
+// $Id: sar.cpp,v 1.31 2005/01/03 13:25:56 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -114,7 +114,12 @@ namespace libdar
     static bool sar_extract_num(string filename, string base_name, string ext, infinint & ret);
     static bool sar_get_higher_number_in_dir(path dir ,string base_name, string ext, infinint & ret);
 
-    sar::sar(const string & base_name, const string & extension, S_I options, const path & dir, const string & execute) : contextual(gf_read_only), archive_dir(dir)
+    sar::sar(user_interaction & dialog,
+	     const string & base_name,
+	     const string & extension,
+	     S_I options,
+	     const path & dir,
+	     const string & execute) : contextual(dialog, gf_read_only), archive_dir(dir)
     {
         set_options(options);
 
@@ -129,10 +134,20 @@ namespace libdar
         open_file(1);
     }
 
-    sar::sar(const string & base_name, const string & extension, const infinint & file_size, const infinint & first_file_size, S_I options, const path & dir, const string & execute) : contextual(gf_write_only), archive_dir(dir)
+    sar::sar(user_interaction & dialog,
+	     const string & base_name,
+	     const string & extension,
+	     const infinint & file_size,
+	     const infinint & first_file_size,
+	     S_I options,
+	     const path & dir,
+	     const string & execute) : contextual(dialog, gf_write_only), archive_dir(dir)
     {
         if(file_size < header::size() + 1)
-            throw Erange("sar::sar", "file size too small");
+            throw Erange("sar::sar", gettext("File size too small"));
+
+	if(first_file_size < header::size() + 1)
+	    throw Erange("sar::sar", gettext("First file size too small"));
 
         initial = true;
         set_options(options);
@@ -245,7 +260,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.15.2.4 2004/07/25 20:38:03 edrusb Exp $";
+        static char id[]="$Id: sar.cpp,v 1.31 2005/01/03 13:25:56 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -306,19 +321,31 @@ namespace libdar
 
         while(lu < sz && loop)
         {
-            S_I tmp = of_fd->read(a+lu, sz-lu);
-            if(tmp < 0)
-                throw Erange("sar::inherited_read", string("Error reading data: ") + strerror(errno));
-            if(tmp == 0)
-                if(of_flag == FLAG_TERMINAL)
-                    loop = false;
-                else
-                    open_file(of_current + 1);
-            else
-            {
-                lu += tmp;
-                file_offset += tmp;
-            }
+
+	    S_I tmp;
+	    try
+	    {
+		tmp = of_fd->read(a+lu, sz-lu);
+	    }
+	    catch(Euser_abort & e)
+	    {
+		natural_destruction = false;
+		    // avoid the execution of "between slice" user commands
+		throw;
+	    }
+
+	    if(tmp < 0)
+		throw Erange("sar::inherited_read", string(gettext("Error reading data: ")) + strerror(errno));
+	    if(tmp == 0)
+		if(of_flag == FLAG_TERMINAL)
+		    loop = false;
+		else
+		    open_file(of_current + 1);
+	    else
+	    {
+		lu += tmp;
+		file_offset += tmp;
+	    }
         }
 
         return lu;
@@ -340,7 +367,16 @@ namespace libdar
             {
                 micro_wrote = 0;
                 tmp_wrote.unstack(micro_wrote);
-                tmp = of_fd->write(a, micro_wrote);
+		try
+		{
+		    tmp = of_fd->write(a, micro_wrote);
+		}
+		catch(Euser_abort & e)
+		{
+		    natural_destruction = false;
+			// avoid the execution of "between slice" user commands
+		    throw;
+		}
             }
             else
             {
@@ -349,7 +385,7 @@ namespace libdar
             }
             if(tmp == 0)
             {
-                user_interaction_pause("Can't write any byte to file, filesystem is full? Please check!");
+                get_gf_ui().pause(gettext("Cannot write any byte to file, filesystem is full? Please check!"));
                 continue;
             }
             to_write -= tmp;
@@ -383,13 +419,13 @@ namespace libdar
             if(fd < 0)
                 if(errno == ENOENT)
                 {
-                    user_interaction_pause(string(fic) + " is required for further operation, please provide the file.");
+                    get_gf_ui().pause(tools_printf(gettext("%s is required for further operation, please provide the file."), fic));
                     continue;
                 }
                 else
-                    throw Erange("sar::open_readonly", string("error openning ") + fic + " : " + strerror(errno));
+                    throw Erange("sar::open_readonly", tools_printf(gettext("Error openning %s : "), fic) +  strerror(errno));
             else
-                of_fd = new fichier(fd);
+                of_fd = new fichier(get_gf_ui(), fd);
 
                 // trying to read the header
                 //
@@ -400,7 +436,7 @@ namespace libdar
             catch(Egeneric & e)
             {
                 close_file();
-                user_interaction_pause(string(fic) + string(" has a bad or corrupted header, please provide the correct file."));
+		get_gf_ui().pause(tools_printf(gettext("%s has a bad or corrupted header, please provide the correct file."), fic));
                 continue;
             }
 
@@ -409,7 +445,7 @@ namespace libdar
             if(h.magic != SAUV_MAGIC_NUMBER)
             {
                 close_file();
-                user_interaction_pause(string(fic) + " is not a valid file (wrong magic number), please provide the good file.");
+                get_gf_ui().pause(tools_printf(gettext("%s is not a valid file (wrong magic number), please provide the good file."), fic));
                 continue;
             }
 
@@ -430,7 +466,7 @@ namespace libdar
                 catch(Erange & e)
                 {
                     close_file();
-                    user_interaction_pause(string("Error openning ") + fic + ": " + e.get_message() + " Retry ?");
+                    get_gf_ui().pause(tools_printf(gettext("Error openning %s : "), fic) + e.get_message() + gettext(" . Retry ?"));
                     continue;
                 }
             }
@@ -438,7 +474,7 @@ namespace libdar
                 if(! header_label_is_equal(of_internal_name, h.internal_name))
                 {
                     close_file();
-                    user_interaction_pause(string(fic) + " is a file from another set of backup file, please provide the correct file.");
+                    get_gf_ui().pause(string(fic) + gettext(" is a slice from another backup, please provide the correct slice."));
                     continue;
                 }
 
@@ -455,7 +491,7 @@ namespace libdar
                 break;
             default :
                 close_file();
-                user_interaction_pause(string(fic) + " has an unknown flag (neither terminal nor non_terminal file).");
+		get_gf_ui().pause(string(fic) + gettext(" has an unknown flag (neither terminal nor non_terminal file)."));
                 continue;
             }
             of_flag = h.flag;
@@ -473,7 +509,7 @@ namespace libdar
             // check if that the file exists
         if(stat(fic, &buf) < 0)
             if(errno != ENOENT) // other error than 'file does not exist' occured
-                throw Erange("sar::open_writeonly", string("Error checking for presence of file ") + fic + " : " + strerror(errno));
+                throw Erange("sar::open_writeonly", string(gettext("Error checking for presence of file ")) + fic + " : " + strerror(errno));
             else
                 open_flag |= O_CREAT;
         else // file exists
@@ -486,7 +522,7 @@ namespace libdar
                 {
                     try
                     {
-                        h.read(fd_tmp);
+                        h.read(get_gf_ui(), fd_tmp);
                     }
                     catch(Erange & e)
                     {
@@ -498,12 +534,12 @@ namespace libdar
                     {
                         open_flag |= O_TRUNC;
                         if(opt_dont_erase)
-                            throw Erange("sar::open_writeonly", "file exists, and DONT_ERASE option is set.");
+                            throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
                         if(opt_warn_overwrite)
                         {
                             try
                             {
-                                user_interaction_pause(string(fic) + " is about to be overwritten.");
+                                get_gf_ui().pause(string(fic) + gettext(" is about to be overwritten."));
                             }
                             catch(...)
                             {
@@ -523,12 +559,12 @@ namespace libdar
             else // file exists but could not be openned
             {
                 if(opt_dont_erase)
-                    throw Erange("sar::open_writeonly", "file exists, and DONT_ERASE option is set");
+                    throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
                 if(opt_warn_overwrite)
                 {
                     try
                     {
-                        user_interaction_pause(string(fic) + " is about to be overwritten");
+			get_gf_ui().pause(string(fic) + gettext(" is about to be overwritten."));
                     }
                     catch(...)
                     {
@@ -543,9 +579,9 @@ namespace libdar
         fd = ::open(fic, open_flag|O_BINARY, open_mode);
         of_flag = FLAG_NON_TERMINAL;
         if(fd < 0)
-            throw Erange("sar::open_writeonly open()", string("Error openning file ") + fic + " : " + strerror(errno));
+            throw Erange("sar::open_writeonly open()", string(gettext("Error openning file ")) + fic + " : " + strerror(errno));
         else
-            of_fd = new fichier(fd);
+            of_fd = new fichier(get_gf_ui(), fd);
 
         h = make_write_header(num, FLAG_TERMINAL);
         h.write(*of_fd);
@@ -600,7 +636,7 @@ namespace libdar
                             deci conv = of_current;
                             try
                             {
-                                user_interaction_pause(string("Finished writing to file ") + conv.human() + ", ready to continue ? ");
+				get_gf_ui().pause(string(gettext("Finished writing to file ")) + conv.human() + gettext(", ready to continue ? "));
                             }
                             catch(...)
                             {
@@ -642,7 +678,7 @@ namespace libdar
     void sar::set_offset(infinint offset)
     {
         if(of_fd == NULL)
-            throw Erange("sar::set_offset", "file not open");
+            throw Erange("sar::set_offset", gettext("file not open"));
         else
             of_fd->skip(offset);
     }
@@ -672,7 +708,7 @@ namespace libdar
                         else
                         {
                             close_file();
-                            user_interaction_pause(string("The last file of the set is not present in ") + archive_dir.display() + " , please provide it.");
+			    get_gf_ui().pause(string(gettext("The last file of the set is not present in ")) + archive_dir.display() + gettext(" , please provide it."));
                         }
                 }
                 else // not slice available in the directory
@@ -684,7 +720,7 @@ namespace libdar
                     else
                     {
                         close_file();
-                        user_interaction_pause(string("No backup file is present in ") + archive_dir.display() + " , please provide the last file of the set.");
+                        get_gf_ui().pause(string(gettext("No backup file is present in ")) + archive_dir.display() + gettext(" , please provide the last file of the set."));
                     }
             }
         }
@@ -750,12 +786,12 @@ namespace libdar
                     default:
                         try
                         {
-                            user_interaction_pause(string("unknown substitution string in user command-line: %")+ *it + " . Ignore it and continue ?");
+			    get_gf_ui().pause(string(gettext("Unknown substitution string: %"))+ *it + gettext(" . Ignore it and continue ?"));
                         }
                         catch(Euser_abort & e)
                         {
                             natural_destruction = false;
-                            throw Escript("sar::hook_substitute", string("unknown substitution string: %")+ *it);
+                            throw Escript("sar::hook_substitute", string(gettext("Unknown substitution string: %"))+ *it);
                         }
                     }
                     it++;
@@ -764,12 +800,12 @@ namespace libdar
                 {
                     try
                     {
-                        user_interaction_pause("last char of user command-line to execute is '%', (use '%%' instead to avoid this message). Ignore it and continue ?");
+                        get_gf_ui().pause(gettext("last char of user command-line to execute is '%', (use '%%' instead to avoid this message). Ignore it and continue ?"));
                     }
                     catch(Euser_abort)
                     {
                         natural_destruction = false;
-                        throw Escript("sar::hook_substitute","unknown substitution string at end of string: %");
+                        throw Escript("sar::hook_substitute",gettext("unknown substitution string at end of string: %"));
                     }
                 }
             }
@@ -804,31 +840,31 @@ namespace libdar
                             loop = false;
                             break; // All is fine, script did not report error
                         case 127:
-                            throw Erange("sar::hook_execute", "execve() failed. (process table is full ?)");
+                            throw Erange("sar::hook_execute", gettext("execve() failed. (process table is full ?)"));
                         case -1:
-                            throw Erange("sar::hook_execute", string("system() call failed: ") + strerror(errno));
+                            throw Erange("sar::hook_execute", string(gettext("system() call failed: ")) + strerror(errno));
                         default:
-                            throw Erange("sar::hook_execute", string("execution of [") + cmd_line + "] returned error code: " + tools_int2str(code));
+                            throw Erange("sar::hook_execute", tools_printf(gettext("execution of [ %S ] returned error code: %d"), &cmd_line, code));
                         }
                     }
                     catch(Erange & e)
                     {
                         try
                         {
-                            user_interaction_pause(string("Erreur during user command-line execution: ") + e.get_message() + " . Retry command-line ?");
+			    get_gf_ui().pause(string(gettext("Error during user command line execution: ")) + e.get_message() + gettext(" . Retry command-line ?"));
                             loop = true;
                         }
                         catch(Euser_abort & f)
                         {
                             try
                             {
-                                user_interaction_pause("Ignore previous error on user command-line and continue ?");
+				get_gf_ui().pause(gettext("Ignore previous error on user command line and continue ?"));
                                 loop = false;
                             }
                             catch(Euser_abort & g)
                             {
                                 natural_destruction = false;
-                                throw Escript("sar::hook_execute", string("Fatal error on user command-line: ") + e.get_message());
+                                throw Escript("sar::hook_execute", string(gettext("Fatal error on user command line: ")) + e.get_message());
                             }
                         }
                     }
@@ -888,7 +924,7 @@ namespace libdar
         try
         {
             if(ptr == NULL)
-                throw Erange("sar_get_higher_number_in_dir", string("Error reading openning directory ") + folder + " : " + strerror(errno));
+                throw Erange("sar_get_higher_number_in_dir", string(gettext("Error openning directory ")) + folder + " : " + strerror(errno));
 
             ret = 0;
             somme = false;
@@ -914,14 +950,14 @@ namespace libdar
         return somme;
     }
 
-    trivial_sar::trivial_sar(generic_file *ref) : generic_file(gf_read_write)
+    trivial_sar::trivial_sar(user_interaction & dialog, generic_file *ref) : generic_file(dialog, gf_read_write)
     {
         header tete;
 
         if(ref == NULL)
             throw SRC_BUG;
         if(ref->get_mode() == gf_read_write)
-            throw Efeature("read_write mode not supported for trivial_sar");
+            throw Efeature(gettext("Read-write mode not supported for \"trivial_sar\""));
         reference = ref;
         set_mode(ref->get_mode());
         if(get_mode() == gf_write_only)
@@ -938,7 +974,7 @@ namespace libdar
             {
                 tete.read(*reference);
                 if(tete.flag == FLAG_NON_TERMINAL)
-                    throw Erange("trivial_sar::trivial_sar", "this archive has slices and is not suited to be read from a pipe");
+                    throw Erange("trivial_sar::trivial_sar", gettext("This archive has slices and is not able to be read from a pipe"));
                 offset = reference->get_position();
             }
             else
@@ -958,7 +994,7 @@ namespace libdar
         if(reference->get_position() >= offset)
             return reference->get_position() - offset;
         else
-            throw Erange("trivial_sar::get_position", "position out of range, call skip from trivial_sar object not from its reference");
+            throw Erange("trivial_sar::get_position", gettext("Position out of range, must call \"skip\" method from trivial_sar object not from its \"reference\""));
     }
 
 } // end of namespace

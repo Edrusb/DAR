@@ -18,9 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.hpp,v 1.4.4.1 2004/07/25 20:38:03 edrusb Exp $
+// $Id: header.hpp,v 1.8 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file header.hpp
+    /// \brief slice header structure is defined here
+    /// \ingroup Private
+
 
 #ifndef HEADER_H
 #define HEADER_H
@@ -28,6 +33,7 @@
 #include "../my_config.h"
 #include "infinint.hpp"
 #include "generic_file.hpp"
+#include "user_interaction.hpp"
 
 namespace libdar
 {
@@ -61,8 +67,8 @@ namespace libdar
 
         void read(generic_file & f);
         void write(generic_file & f);
-        void read(S_I fd);
-        void write(S_I fd);
+        void read(user_interaction & dialog, S_I fd);
+        void write(user_interaction & dialog, S_I fd);
 
         static U_I size() { return sizeof(magic_number) + sizeof(label) + 2*sizeof(char); };
         void copy_from(const header & ref);

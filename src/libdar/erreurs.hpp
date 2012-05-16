@@ -18,9 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.hpp,v 1.7.4.1 2004/07/25 20:38:03 edrusb Exp $
+// $Id: erreurs.hpp,v 1.14 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file erreurs.hpp
+    /// \brief contains all the excetion class thrown by libdar
+
 
 #ifndef ERREURS_HPP
 #define ERREURS_HPP
@@ -36,29 +40,45 @@ namespace libdar
 #define E_BEGIN try {
 #define E_END(passage, message)  } catch(Egeneric & e) { e.stack(passage, message); throw; }
 
+	/// \addtogroup API
+	/// @{
+
+	/// this is the parent class of all exception classes.
+
+	/// this is a pure virtual class that provide some simple
+	/// mechanisme to carry the information about the cause of the exception,
+	/// as well as some a complex mechanim which not used often in libdar
+	/// that keep trace, for each exception throwing process, of the different
+	/// calls by which the current exception has been exiting.
     class Egeneric
     {
     public :
+	    /// the constructor
         Egeneric(const std::string &source, const std::string &message);
-        Egeneric(const Egeneric & ref);
-        virtual ~Egeneric() { all_instances.remove(this); };
+	    /// copy constructor
+        Egeneric(const Egeneric & ref) { pile = ref.pile; };
+	    /// the destructor
+        virtual ~Egeneric() {};
 
+	    /// rarely used mechanism to keep trace of calls the exception has been exiting from
         virtual void stack(const std::string & passage, const std::string & message = "") { pile.push_back(niveau(passage, message)); };
+
+	    /// get the message explaing the nature of the exception
+
+	    /// This is probably the only method you will use for all the
+	    /// the exception, as you will not have to create such objects
+	    /// and will only need to get the error message thanks to this
+	    /// method
         std::string get_message() const { return pile.front().objet; };
+
+	    /// get the call function which has thrown this exception
+	std::string get_source() const { return pile.front().lieu; };
+
+	    /// dump all information of the exception to the standard error
         void dump() const;
 
-        static U_I total() { return all_instances.size(); };
-        static U_I zombies() { return destroyed.size(); };
-        static U_I alive();
-        static void clear_last_destroyed();
-        static void display_last_destroyed(); // displays and clear the last destroyed exceptions fifo
-        static void display_alive();
-
     protected :
-        bool zombie;
-
         virtual std::string exceptionID() const = 0;
-        void add_to_last_destroyed(Egeneric *obj);
 
     private :
         struct niveau
@@ -66,151 +86,184 @@ namespace libdar
             niveau(const std::string &ou, const std::string &quoi) { lieu = ou; objet = quoi; };
             std::string lieu, objet;
         };
-        std::list<niveau> pile;
 
-        static const U_I fifo_size = 10; // number of last destroyed exceptions recorded
-        static std::list<Egeneric *> destroyed; // copies of destroyed last execeptions
-        static std::list<Egeneric *> all_instances;
+        std::list<niveau> pile;
     };
 
+
+	/// exception used when memory has been exhausted
+
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
     class Ememory : public Egeneric
     {
     public:
-        Ememory(const std::string &source) : Egeneric(source, "Lack of Memory") {};
-        ~Ememory() { if(!zombie) add_to_last_destroyed(new Ememory(*this)); };
+        Ememory(const std::string &source) : Egeneric(source, gettext("Lack of Memory")) {};
 
     protected :
         std::string exceptionID() const { return "MEMORY"; };
-        Ememory *dup() const { return new Ememory(*this); };
     };
 
 #define SRC_BUG Ebug(__FILE__, __LINE__)
 #define XMT_BUG(exception, call) exception.stack(call, __FILE__, __LINE__)
 
+	/// exception used to signal a bug. A bug is triggered when reaching some code that should never be reached
     class Ebug : public Egeneric
     {
     public :
         Ebug(const std::string & file, S_I line);
-        ~Ebug() { if(!zombie) add_to_last_destroyed(new Ebug(*this)); };
 
         void stack(const std::string & passage, const std::string & file, const std::string & line);
+
     protected :
         std::string exceptionID() const { return "BUG"; };
-        Ebug *dup() const { return new Ebug(*this); };
     };
 
+	/// exception used when arithmetic error is detected when operating on infinint
+
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
     class Einfinint : public Egeneric
     {
     public :
         Einfinint(const std::string & source, const std::string & message) : Egeneric(source, message) {};
-        ~Einfinint() { if(!zombie) add_to_last_destroyed(new Einfinint(*this)); };
 
     protected :
         std::string exceptionID() const { return "INFININT"; };
-        Einfinint *dup() const { return new Einfinint(*this); };
     };
 
+	/// exception used when a limitint overflow is detected, the maximum value of the limitint has been exceeded
+
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
     class Elimitint : public Egeneric
     {
     public :
-        Elimitint() : Egeneric("", "cannot handle a too large integer. Use full version of dar_suite programs (compilation option set for using infinint) to solve this problem") {};
-        ~Elimitint() { if(!zombie) add_to_last_destroyed(new Elimitint(*this)); };
+        Elimitint() : Egeneric("", gettext("cannot handle a too large integer. Use full version of dar_suite programs (compilation option set for using infinint) to solve this problem")) {};
 
     protected :
         std::string exceptionID() const { return "LIMITINT"; };
-        Elimitint *dup() const { return new Elimitint(*this); };
     };
 
+	/// exception used to signal range error
+
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
     class Erange : public Egeneric
     {
     public :
         Erange(const std::string & source, const std::string & message) : Egeneric(source, message) {};
-        ~Erange() { if(!zombie) add_to_last_destroyed(new Erange(*this)); };
 
     protected :
         std::string exceptionID() const { return "RANGE"; };
-        Erange *dup() const { return new Erange(*this); };
     };
 
+	/// exception used to signal convertion problem between infinint and string (decimal representation)
+
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
+	/// see also the class deci
     class Edeci : public Egeneric
     {
     public :
         Edeci(const std::string & source, const std::string & message) : Egeneric(source, message) {};
-        ~Edeci() { if(!zombie) add_to_last_destroyed(new Edeci(*this)); };
 
     protected :
         std::string exceptionID() const { return "DECI"; };
-        Edeci *dup() const { return new Edeci(*this); };
     };
 
+	/// exception used when a requested feature is not (yet) implemented
+
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
     class Efeature : public Egeneric
     {
     public :
         Efeature(const std::string & message) : Egeneric("", message) {};
-        ~Efeature() { if(!zombie) add_to_last_destroyed(new Efeature(*this)); };
 
     protected :
         std::string exceptionID() const { return "UNIMPLEMENTED FEATURE"; };
-        Efeature *dup() const { return new Efeature(*this); };
     };
 
+	/// exception used when hardware problem is found
+
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
     class Ehardware : public Egeneric
     {
     public :
         Ehardware(const std::string & source, const std::string & message) : Egeneric(source, message) {};
-        ~Ehardware() { if(!zombie) add_to_last_destroyed(new Ehardware(*this)); };
 
     protected :
         std::string exceptionID() const { return "HARDWARE ERROR"; };
-        Ehardware *dup() const { return new Ehardware(*this); };
     };
 
+	/// exception used to signal that the user has aborted the operation
+
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
     class Euser_abort : public Egeneric
     {
     public :
         Euser_abort(const std::string & msg) : Egeneric("",msg) {};
-        ~Euser_abort() { if(!zombie) add_to_last_destroyed(new Euser_abort(*this)); };
 
     protected :
         std::string exceptionID() const { return "USER ABORTED OPERATION"; };
-        Euser_abort *dup() const { return new Euser_abort(*this); };
     };
 
+	/// exception used when an error concerning the treated data has been met
 
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
     class Edata : public Egeneric
     {
     public :
         Edata(const std::string & msg) : Egeneric("", msg) {};
-        ~Edata() { if(!zombie) add_to_last_destroyed(new Edata(*this)); };
 
     protected :
         std::string exceptionID() const { return "ERROR IN TREATED DATA"; };
-        Edata *dup() const { return new Edata(*this); };
     };
 
+	/// exception used when error the inter-slice user command returned an error code
 
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
     class Escript : public Egeneric
     {
     public :
         Escript(const std::string & source, const std::string & msg) : Egeneric(source ,msg) {};
-        ~Escript() { if(!zombie) add_to_last_destroyed(new Escript(*this)); };
 
     protected :
         std::string exceptionID() const { return "USER ABORTED OPERATION"; };
-        Escript *dup() const { return new Escript(*this); };
     };
 
+	/// exception used to signal an error in the argument given to libdar call of the API
 
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
     class Elibcall : public Egeneric
     {
     public :
         Elibcall(const std::string & source, const std::string & msg) : Egeneric(source ,msg) {};
-        ~Elibcall() { if(!zombie) add_to_last_destroyed(new Elibcall(*this)); };
 
     protected :
         std::string exceptionID() const { return "USER ABORTED OPERATION"; };
-        Elibcall *dup() const { return new Elibcall(*this); };
     };
+
+	/// exception used when a requested fearture has not beed activated at compilation time
+
+	/// the inherited get_message() method is probably
+	/// the only one you will need to use
+    class Ecompilation : public Egeneric
+    {
+    public :
+        Ecompilation(const std::string & msg) : Egeneric("" ,msg) {};
+
+    protected :
+        std::string exceptionID() const { return "FEATURE DISABLED AT COMPILATION TIME"; };
+    };
+
+	/// @}
 
 } // end of namespace
 

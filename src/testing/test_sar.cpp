@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_sar.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_sar.cpp,v 1.7 2004/05/21 08:28:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -35,6 +35,8 @@
 
 using namespace libdar;
 
+static user_interaction *ui = NULL;
+
 static void f1();
 static void f2();
 static void f3();
@@ -42,8 +44,10 @@ static void f3();
 int main()
 {
     MEM_BEGIN;
+    ui = shell_interaction_init(&cout, &cerr, false);
+    if(ui == NULL)
+	cout << "ERREUR !" << endl;
     MEM_IN;
-    shell_interaction_init(&cout, &cerr);
     MEM_OUT;
     f1();
     MEM_OUT;
@@ -51,6 +55,9 @@ int main()
     MEM_OUT;
     f3();
     MEM_OUT;
+    shell_interaction_close();
+    if(ui != NULL)
+	delete ui;
     MEM_END;
 }
 
@@ -58,8 +65,8 @@ static void f1()
 {
     try
     {
-        sar sar1 = sar("destination", "txt", 100, 110, SAR_OPT_DEFAULT/*&~SAR_OPT_DONT_ERASE&~SAR_OPT_WARN_OVERWRITE*/, path("./test"));
-        fichier src = fichier("./test/source.txt", gf_read_only);
+        sar sar1 = sar(*ui, "destination", "txt", 100, 110, SAR_OPT_DEFAULT/*&~SAR_OPT_DONT_ERASE&~SAR_OPT_WARN_OVERWRITE*/, path("./test"));
+        fichier src = fichier(*ui, "./test/source.txt", gf_read_only);
         src.copy_to(sar1);
     }
     catch(Egeneric &e)
@@ -72,8 +79,8 @@ static void f2()
 {
     try
     {
-        sar sar2 = sar("destination", "txt", SAR_OPT_DEFAULT, path("./test"));
-        fichier dst = fichier("./test/destination.txt", gf_write_only);
+        sar sar2 = sar(*ui, "destination", "txt", SAR_OPT_DEFAULT, path("./test"));
+        fichier dst = fichier(*ui, "./test/destination.txt", gf_write_only);
 
         sar2.copy_to(dst);
     }
@@ -87,9 +94,9 @@ static void f3()
 {
     try
     {
-        sar sar3 = sar("destination", "txt", SAR_OPT_DEFAULT, path("./test"));
-        fichier src = fichier("./test/source.txt", gf_read_only);
-        
+        sar sar3 = sar(*ui, "destination", "txt", SAR_OPT_DEFAULT, path("./test"));
+        fichier src = fichier(*ui, "./test/source.txt", gf_read_only);
+
         display(sar3.get_position());
         display(src.get_position());
 
@@ -97,8 +104,8 @@ static void f3()
         src.skip(210);
         display(sar3.get_position());
         display(src.get_position());
-        display_read(sar3);
-        display_read(src);
+        display_read(*ui, sar3);
+        display_read(*ui, src);
         display(sar3.get_position());
         display(src.get_position());
 
@@ -106,10 +113,10 @@ static void f3()
         src.skip_to_eof();
         display(sar3.get_position());
         display(src.get_position());
-        display_read(sar3);
-        display_read(src);
-        display_back_read(sar3);
-        display_back_read(src);
+        display_read(*ui, sar3);
+        display_read(*ui, src);
+        display_back_read(*ui, sar3);
+        display_back_read(*ui, src);
 
         display(sar3.get_position());
         display(src.get_position());
@@ -117,34 +124,33 @@ static void f3()
         src.skip_relative(-20);
         display(sar3.get_position());
         display(src.get_position());
-        display_read(sar3);
-        display_read(src);
-        display_back_read(sar3);
-        display_back_read(src);
+        display_read(*ui, sar3);
+        display_read(*ui, src);
+        display_back_read(*ui, sar3);
+        display_back_read(*ui, src);
         display(sar3.get_position());
         display(src.get_position());
 
         sar3.skip(3);
         src.skip(3);
-        display_back_read(sar3);
-        display_back_read(src);
+        display_back_read(*ui, sar3);
+        display_back_read(*ui, src);
         display(sar3.get_position());
         display(src.get_position());
-        display_read(sar3);
-        display_read(src);
+        display_read(*ui, sar3);
+        display_read(*ui, src);
         display(sar3.get_position());
         display(src.get_position());
 
         sar3.skip(0);
         src.skip(0);
-        display_back_read(sar3);
-        display_back_read(src);
-        display_read(sar3);
-        display_read(src);
+        display_back_read(*ui, sar3);
+        display_back_read(*ui, src);
+        display_read(*ui, sar3);
+        display_read(*ui, src);
     }
     catch(Egeneric & e)
     {
         e.dump();
     }
-    shell_interaction_close();
 }

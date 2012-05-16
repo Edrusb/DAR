@@ -18,31 +18,59 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: null_file.hpp,v 1.4.4.1 2004/07/25 20:38:03 edrusb Exp $
+// $Id: null_file.hpp,v 1.11 2004/12/07 18:04:51 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file null_file.hpp
+    /// \brief /dev/null type file implementation under the generic_file interface
+    ///
+    /// this class is used when doing dry-run execution
 
 #ifndef NULL_FILE_HPP
 #define NULL_FILE_HPP
 
 #include "../my_config.h"
 #include "generic_file.hpp"
+#include "thread_cancellation.hpp"
 
 namespace libdar
 {
 
-    class null_file : public generic_file
+	/// the null_file class implements the /dev/null behavior
+
+	/// this is a generic_file implementation that emulate the
+	/// comportment of the /dev/null special file.
+	/// all that is writen to is lost, and nothing can be read from
+	/// it (empty file). This is a completed implementation all
+	/// call are consistent.
+	/// \ingroup Private
+
+    class null_file : public generic_file, public thread_cancellation
     {
     public :
-        null_file(gf_mode m) : generic_file(m) {};
+        null_file(user_interaction & dialog, gf_mode m) : generic_file(dialog, m) {};
         bool skip(const infinint &pos) { return pos == 0; };
         bool skip_to_eof() { return true; };
         bool skip_relative(signed int x) { return false; };
         infinint get_position() { return 0; };
 
     protected :
-        int inherited_read(char *a, size_t size) { return 0; };
-        int inherited_write(char *a, size_t size) { return size; };
+        int inherited_read(char *a, size_t size)
+	{
+#ifdef MUTEX_WORKS
+	    check_self_cancellation();
+#endif
+	    return 0;
+	};
+
+        int inherited_write(char *a, size_t size)
+	{
+#ifdef MUTEX_WORKS
+	    check_self_cancellation();
+#endif
+	    return size;
+	};
     };
 
 } // end of namespace

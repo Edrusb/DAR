@@ -18,73 +18,48 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.6.4.2 2004/09/10 22:34:15 edrusb Exp $
+// $Id: erreurs.cpp,v 1.14 2004/09/13 13:07:51 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
 #include <iostream>
+#include "erreurs.hpp"
 #include "infinint.hpp"
 #include "deci.hpp"
-#include "erreurs.hpp"
+#include "tools.hpp"
 
 using namespace std;
 
 namespace libdar
 {
-
     static bool initialized = false;
+	// does not avoid thread safe library.
+	// if two thread act at the same time on this
+	// value, this would have the same result
+	// as if only one had acted on it.
+	// subsequent action are read-only (once initialized is true).
 
     static void init();
     static void inattendue();
     static void notcatched();
-    static string int_to_string(S_I i);
-
-    list<Egeneric *> Egeneric::destroyed;
-    list<Egeneric *> Egeneric::all_instances;
 
     Egeneric::Egeneric(const string &source, const string &message)
     {
         if(!initialized)
             init();
         pile.push_front(niveau(source, message));
-        zombie = false;
-        all_instances.push_back(this);
-    }
-
-    Egeneric::Egeneric(const Egeneric & ref)
-    {
-        pile = ref.pile;
-        zombie = ref.zombie;
-        all_instances.push_back(this);
-    }
-
-    void Egeneric::add_to_last_destroyed(Egeneric *obj)
-    {
-        if(obj->zombie)
-            throw SRC_BUG;
-        else
-        {
-            destroyed.push_back(obj);
-            obj->zombie = true;
-            if(destroyed.size() > fifo_size)
-            {
-                delete destroyed.front();
-                destroyed.pop_front();
-            }
-        }
     }
 
     void Egeneric::dump() const
     {
-        string s;
         list<niveau> & tmp = const_cast< list<niveau> & >(pile);
         list<niveau>::iterator it;
 
         it = tmp.begin();
 
-        cerr << "---- exception nature = [" << (zombie ? "zombie" : "alive") << "]  exception type = ["  << exceptionID() << "] ----------" << endl;
+        cerr << "---- exception type = ["  << exceptionID() << "] ----------" << endl;
         cerr << "[source]" << endl;
         while(it != tmp.end())
         {
@@ -95,53 +70,11 @@ namespace libdar
         cerr << "-----------------------------------" << endl << endl;
     }
 
-    U_I Egeneric::alive()
-    {
-        U_I ret = 0;
-        list<Egeneric *>::iterator it = all_instances.begin();
-
-        while(it != all_instances.end())
-            if(! (*it++)->zombie)
-                ret++;
-
-        return ret;
-    }
-
-    void Egeneric::clear_last_destroyed()
-    {
-        list<Egeneric *>::iterator it = destroyed.begin();
-
-        while(it != destroyed.end())
-            delete (*it++);
-
-        destroyed.clear();
-    }
-
-    void Egeneric::display_last_destroyed()
-    {
-        list<Egeneric *>::iterator it = destroyed.begin();
-
-        while(it != destroyed.end())
-            (*it++)->dump();
-    }
-
-    void Egeneric::display_alive()
-    {
-        list<Egeneric *>::iterator it = all_instances.begin();
-
-        while(it != all_instances.end())
-        {
-            if(! (*it)->zombie)
-                (*it)->dump();
-            it++;
-        }
-    }
-
-    Ebug::Ebug(const string & file, S_I line) : Egeneric(string("file ") + file + " line " + int_to_string(line), "it seems to be a bug here") {}
+    Ebug::Ebug(const string & file, S_I line) : Egeneric(tools_printf(gettext("File %S line %d"), &file, line), gettext("it seems to be a bug here")) {}
 
     void Ebug::stack(const string & passage, const string & file, const string & line)
     {
-        Egeneric::stack(passage, string("in file ") + file + " line " + string(line));
+        Egeneric::stack(passage, tools_printf(gettext("in file %S line %S"), &file, &line));
     }
 
     static void init()
@@ -153,75 +86,34 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: erreurs.cpp,v 1.6.4.2 2004/09/10 22:34:15 edrusb Exp $";
+        static char id[]="$Id: erreurs.cpp,v 1.14 2004/09/13 13:07:51 edrusb Rel $";
         dummy_call(id);
-    }
-
-    static void status()
-    {
-        cerr << endl <<" Exceptions : " << endl;
-        cerr << "\t alive  = " << Egeneric::alive() << endl;
-        cerr << "\t zombie = " << Egeneric::zombies() << endl;
-        cerr << "\t --------------------" << endl;
-        cerr << "\t total  = " << Egeneric::total() << endl <<endl;
     }
 
     static void inattendue()
     {
         cerr << "###############################################" << endl;
-        cerr << "#   UNEXPECTED EXCEPTION,                     #" << endl;
-        cerr << "#                         E X I T I N G !     #" << endl;
+        cerr << gettext("#   UNEXPECTED EXCEPTION,                     #") << endl;
+        cerr << gettext("#                         E X I T I N G !     #") << endl;
         cerr << "#                                             #" << endl;
         cerr << "###############################################" << endl;
-        status();
-        cerr << "###############################################" << endl;
-        cerr << "#                                             #" << endl;
-        cerr << "#     LIST OF STILL ALIVE EXCEPTIONS :        #" << endl;
-        cerr << "#                                             #" << endl;
-        cerr << "###############################################" << endl;
-        Egeneric::display_alive();
-        cerr << "###############################################" << endl;
-        cerr << "#                                             #" << endl;
-        cerr << "#     LIST OF LAST DESTROYED EXCEPTIONS :     #" << endl;
-        cerr << "#                                             #" << endl;
-        cerr << "###############################################" << endl;
-        Egeneric::display_last_destroyed();
-        exit(3);
+        cerr << tools_printf(gettext(" THANKS TO REPORT THE PREVIOUS OUTPUT TO MAINTAINER\n GIVING A DESCRIPTION OF THE CIRCUMPSTANCES.")) << endl;
+	cerr << tools_printf(gettext(" IF POSSIBLE TRY TO PRODUCE THIS ERROR, A\n SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n IN SOLVING THIS PROBLEM.                THANKS")) << endl;
+        exit(3); // this was exit code for bugs at the time this code was part of dar
+	    // now it is part of libdar, while exit code stay defined in typical command line code (dar_suite software)
     }
 
     static void notcatched()
     {
         cerr << "###############################################" << endl;
-        cerr << "#   NOT CAUGHT EXCEPTION,                     #" << endl;
-        cerr << "#                         E X I T I N G !     #" << endl;
+        cerr << gettext("#   NOT CAUGHT EXCEPTION,                     #") << endl;
+        cerr << gettext("#                         E X I T I N G !     #") << endl;
         cerr << "#                                             #" << endl;
         cerr << "###############################################" << endl;
-        status();
-        cerr << "###############################################" << endl;
-        cerr << "#                                             #" << endl;
-        cerr << "#     LIST OF STILL ALIVE EXCEPTIONS :        #" << endl;
-        cerr << "#                                             #" << endl;
-        cerr << "###############################################" << endl;
-        Egeneric::display_alive();
-        cerr << "###############################################" << endl;
-        cerr << "#                                             #" << endl;
-        cerr << "#     LIST OF LAST DESTROYED EXCEPTIONS :     #" << endl;
-        cerr << "#                                             #" << endl;
-        cerr << "###############################################" << endl;
-        Egeneric::display_last_destroyed();
-        exit(3);
-    }
-
-    static string int_to_string(S_I i)
-    {
-        infinint tmp;
-
-        if(i < 0)
-            tmp = (U_I)-i;
-        else
-            tmp = (U_I)i;
-
-        return (i < 0 ? string("-") : string("")) + deci(tmp).human();
+        cerr << tools_printf(gettext(" THANKS TO REPORT THE PREVIOUS OUTPUT TO MAINTAINER\n GIVING A DESCRIPTION OF THE CIRCUMPSTANCES.")) << endl;
+	cerr << tools_printf(gettext(" IF POSSIBLE TRY TO PRODUCE THIS ERROR, A\n SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n IN SOLVING THIS PROBLEM.                THANKS")) <<endl;
+	exit(3); // this was exit code for bugs at the time this code was part of dar
+	    // now it is part of libdar, while exit code stay defined in typical command line code (dar_suite software)
     }
 
 } // end of namespace

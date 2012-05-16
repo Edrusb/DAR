@@ -1,0 +1,65 @@
+Let describe this automatic tool by its author, Manuel Iglesias:
+(extracted from email exchanges):
+------------------------------------------------------------------------------
+
+ To make it easier to use I have written a shell script with the following
+features:
+    -It assumes all backup files are in an accessible directory. From there
+     the user can copy them to removable media.
+    -Easy to configure different backups: Make a copy of the script and edit
+     'BACKUP SETUP.' in the new file. Configuration file 'darrc' is not
+     necessary.
+    -Mounts, makes a backup and then un-mounts filesystems: A mounted file
+     system could be an external H.D. where the backup files could be written.
+    -Decides/recommends which backup mode is the most suitable: Create
+     FullBackup, Rewrite FullBacup, Create DiffNN, Rewrite DiffNN, .......
+    -Fully automatic: Use '-auto' option to use with cron. I have studied my
+     system (I am new to Linux :-(.) and cron only sends mail if files in
+     /etc/cron.{hourly,daily,weekly,monthly} exit with code != 0. I have
+     written some shell scripts to handle cron jobs.
+    -Different backups can use the same 'Destination' directory: Backups are
+     created with base names made up of the shell script name: Shell script
+     'LoveLettersBackup' creates:
+      -LoveLettersBackupFull.1.dar
+      -.......
+      -LoveLettersBackupFull.N.dar
+      -LoveLettersBackupDiff01.1.dar
+      -.......
+      -LoveLettersBackupDiff01.N.dar
+      -.......
+      -LoveLettersBackupDiffNN.N.dar
+      -LoveLettersBackupDataBase
+    -Creates and keeps updated a Data Base file for later use by dar_manager.
+
+  The backup mode algorithm is the following:
+    -If there are not FullBackup files then create FullBackup.
+    -If there are not DiffBackup01 files then create DiffBackup01.
+    -If the sum of all DiffBackup files is less than %OfFullBackup
+     (% set in 'BACKUP SETUP.') then rewrite DiffBackup01.
+    -If the sum of all DiffBackup files is greater than %OfFullBackup
+     (% set in 'BACKUP SETUP.') then rewrite FullBackup.
+    -If DiffBackupXX is less than sum(DiffBackup(XX+1)..DiffBackupNN) then
+     rewrite DiffBackupXX.
+
+------------------------------------------------------------------------------
+
+ In my last E-mail I forgot to mention another condition which the backup
+mode algorithm takes in account: NrOfDiffBackups.
+  In the copies of the script I sent you: -If NrOfDiffBackups is greater than
+MaxNrOfDiffBackups (set in 'BACKUP SETUP.') then rewrite FullBackup.
+
+  In the meanwhile I have decided it is better to rewrite DiffBackup01 in that
+situation and I have modified the script accordingly. The backup mode
+algorithm is now the following:
+    -If there are not FullBackup files then create FullBackup.
+    -If there are not DiffBackup01 files then create DiffBackup01.
+    -If the sum of all DiffBackup files is less than %OfFullBackup
+     (% set in 'BACKUP SETUP.') then rewrite DiffBackup01.
+    -If NrOfDiffBackups is greater than MaxNrOfDiffBackups (set in
+     'BACKUP SETUP.') then rewrite DiffBackup01.
+    -If the sum of all DiffBackup files is greater than %OfFullBackup
+     (% set in 'BACKUP SETUP.') then rewrite FullBackup.
+    -If DiffBackupXX is less than sum(DiffBackup(XX+1)..DiffBackupNN)
+     then rewrite DiffBackupXX.
+
+------------------------------------------------------------------------------

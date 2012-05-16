@@ -18,16 +18,16 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.9.2.1 2004/09/12 21:43:44 edrusb Exp $
+// $Id: filtre.cpp,v 1.21 2004/11/14 00:07:26 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
 #include <map>
+#include "filtre.hpp"
 #include "user_interaction.hpp"
 #include "erreurs.hpp"
-#include "filtre.hpp"
 #include "filesystem.hpp"
 #include "ea.hpp"
 #include "defile.hpp"
@@ -39,10 +39,18 @@ using namespace std;
 namespace libdar
 {
 
-    static void save_inode(const string &info_quoi, inode * & ino, compressor *stock, bool info_details, const mask &compr_mask, compression compr_used, const infinint & min_size_compression);
-    static bool save_ea(const string & info_quoi, inode * & ino, compressor *stock, const inode * ref, bool info_details, compression compr_used);
+    static void save_inode(user_interaction & dialog,
+			   const string &info_quoi, inode * & ino,
+			   compressor *stock, bool info_details,
+			   const mask &compr_mask, compression compr_used,
+			   const infinint & min_size_compression, bool alter_atime);
+    static bool save_ea(user_interaction & dialog,
+			const string & info_quoi, inode * & ino, compressor *stock,
+			const inode * ref, bool info_details, compression compr_used);
+    static void restore_atime(const string & chemin, const inode * & ptr);
 
-    void filtre_restore(const mask &filtre,
+    void filtre_restore(user_interaction & dialog,
+			const mask &filtre,
                         const mask & subtree,
                         catalogue & cat,
                         bool detruire,
@@ -63,8 +71,12 @@ namespace libdar
         defile juillet = fs_racine;
         const eod tmp_eod;
         const entree *e;
-        filesystem_restore fs = filesystem_restore(fs_racine, fs_allow_overwrite, fs_warn_overwrite, info_details, restore_ea_root, restore_ea_user,ignore_owner, warn_remove_no_match, empty);
-        filesystem_diff fs_flat = filesystem_diff(fs_racine, false, restore_ea_root, restore_ea_user); //  info detail is set to false, to avoid duplication of informational messages already given by 'fs'
+
+        filesystem_restore fs = filesystem_restore(dialog, fs_racine, fs_allow_overwrite, fs_warn_overwrite, info_details, restore_ea_root, restore_ea_user, ignore_owner, warn_remove_no_match, empty);
+        filesystem_diff fs_flat = filesystem_diff(dialog, fs_racine, false, restore_ea_root, restore_ea_user, false);
+	    // info detail is set to false, to avoid duplication of informational messages already given by 'fs'
+	    // alter_atime is set to true, to preserve atime to its original value, ctime could not be
+	    // restored so its value has no need to be preserved here.
 
         st.clear();
         cat.reset_read();
@@ -110,7 +122,7 @@ namespace libdar
                                 if(detruire && !flat)
                                 {
                                     if(info_details)
-                                        user_interaction_warning(string("removing file ") + juillet.get_string());
+                                        dialog.warning(string(gettext("Removing file: ")) + juillet.get_string());
                                     if(fs.write(e))
                                         st.deleted++;
                                 }
@@ -141,12 +153,12 @@ namespace libdar
                                             // checking the file contents & inode
                                         if(e_ino->get_saved_status() == s_saved || (e_hard != NULL && fs.known_etiquette(e_hard->get_etiquette())))
                                         {
-                                            if(!only_if_more_recent || exists == NULL || !e_ino->same_as(*exists) || e_ino->is_more_recent_than(*exists, hourshift))
+                                            if(!only_if_more_recent || exists == NULL || !e_ino->same_as(*exists) || e_ino->is_more_recent_than(*exists, hourshift, ignore_owner))
                                             {
                                                 if(!flat || e_dir == NULL)
                                                 {
                                                     if(info_details)
-                                                        user_interaction_warning(string("restoring file ") + juillet.get_string());
+                                                        dialog.warning(string(gettext("Restoring file: ")) + juillet.get_string());
                                                     if(fs.write(e)) // e and not e_ino, it may be a hard link now
                                                         st.treated++;
                                                 }
@@ -196,12 +208,12 @@ namespace libdar
                                             {
                                                 try
                                                 {
-                                                    if(fs.set_ea(e_nom, *(e_ino->get_ea()), fs_allow_overwrite, fs_warn_overwrite, info_details ))
+                                                    if(fs.set_ea(e_nom, *(e_ino->get_ea(dialog)), fs_allow_overwrite, fs_warn_overwrite, info_details ))
                                                         st.ea_treated++;
                                                 }
                                                 catch(Erange & e)
                                                 {
-                                                    user_interaction_warning(string("Error while restoring EA for ") + juillet.get_string() + ": " + e.get_message());
+                                                    dialog.warning(string(gettext("Error while restoring EA for ")) + juillet.get_string() + " : " + e.get_message());
                                                 }
                                                 e_ino->ea_detach(); // in any case we clear memory
                                             }
@@ -244,11 +256,11 @@ namespace libdar
                 }
                 catch(Euser_abort & e)
                 {
-                    user_interaction_warning(juillet.get_string() + " not restored (user choice)");
+		    dialog.warning(juillet.get_string() + gettext(" not restored (user choice)"));
 
                     if(e_dir != NULL && !flat)
                     {
-                        user_interaction_warning("No file in this directory will be restored.");
+                        dialog.warning(gettext("No file in this directory will be restored."));
                         cat.skip_read_to_parent_dir();
                         juillet.enfile(&tmp_eod);
                     }
@@ -260,11 +272,11 @@ namespace libdar
                 }
                 catch(Egeneric & e)
                 {
-                    user_interaction_warning(string("Error while restoring ") + juillet.get_string() + " : " + e.get_message());
+                    dialog.warning(string(gettext("Error while restoring ")) + juillet.get_string() + " : " + e.get_message());
 
                     if(e_dir != NULL && !flat)
                     {
-                        user_interaction_warning(string("Warning! No file in that directory will be restored: ") + juillet.get_string());
+                        dialog.warning(string(gettext("Warning! No file in that directory will be restored: ")) + juillet.get_string());
                         cat.skip_read_to_parent_dir();
                         juillet.enfile(&tmp_eod);
                     }
@@ -277,7 +289,8 @@ namespace libdar
         }
     }
 
-    void filtre_sauvegarde(const mask &filtre,
+    void filtre_sauvegarde(user_interaction & dialog,
+			   const mask &filtre,
                            const mask &subtree,
                            compressor *stockage,
                            catalogue & cat,
@@ -291,14 +304,18 @@ namespace libdar
                            const mask &compr_mask,
                            const infinint & min_compr_size,
                            bool nodump,
-                           const infinint & hourshift)
+                           const infinint & hourshift,
+			   bool alter_atime,
+			   bool same_fs,
+			   bool ignore_owner)
     {
         entree *e;
         const entree *f;
         defile juillet = fs_racine;
         const eod tmp_eod;
         compression stock_algo = stockage->get_algo();
-        filesystem_backup fs = filesystem_backup(fs_racine, info_details, save_ea_root, save_ea_user, nodump);
+	infinint root_fs_device;
+        filesystem_backup fs = filesystem_backup(dialog, fs_racine, info_details, save_ea_root, save_ea_user, nodump, alter_atime, root_fs_device);
 
         st.clear();
         cat.reset_add();
@@ -308,13 +325,16 @@ namespace libdar
         {
             nomme *nom = dynamic_cast<nomme *>(e);
             directory *dir = dynamic_cast<directory *>(e);
+	    inode *e_ino = dynamic_cast<inode *>(e);
 
             juillet.enfile(e);
             if(nom != NULL)
             {
                 try
                 {
-                    if(subtree.is_covered(juillet.get_string()) && (dir != NULL || filtre.is_covered(nom->get_name())))
+                    if(subtree.is_covered(juillet.get_string())
+		       && (dir != NULL || filtre.is_covered(nom->get_name()))
+		       && (! same_fs || e_ino == NULL || e_ino->get_device() == root_fs_device))
                     {
                         hard_link *e_hard = dynamic_cast<hard_link *>(e);
 
@@ -325,7 +345,6 @@ namespace libdar
                         }
                         else // "e" is an inode
                         {
-                            inode *e_ino = dynamic_cast<inode *>(e);
                             bool known = ref.compare(e, f);
 
                             try
@@ -337,12 +356,12 @@ namespace libdar
                                     if(e_ino == NULL || f_ino == NULL)
                                         throw SRC_BUG; // filesystem has provided a "nomme" which is not a "inode" thus which is a "detruit"
 
-                                    if(e_ino->has_changed_since(*f_ino, hourshift))
+                                    if(e_ino->has_changed_since(*f_ino, hourshift, ignore_owner))
                                     {
                                         if(e_ino->get_saved_status() != s_saved)
                                             throw SRC_BUG; // filsystem should always provide "saved" "entree"
 
-                                        save_inode(juillet.get_string(), e_ino, stockage, info_details, compr_mask, stock_algo, min_compr_size);
+                                        save_inode(dialog, juillet.get_string(), e_ino, stockage, info_details, compr_mask, stock_algo, min_compr_size, alter_atime);
                                         st.treated++;
                                     }
                                     else // inode has not changed since last backup
@@ -351,15 +370,15 @@ namespace libdar
                                         st.skipped++;
                                     }
 
-                                    if(save_ea(juillet.get_string(), e_ino, stockage, f_ino, info_details, stock_algo))
+                                    if(save_ea(dialog, juillet.get_string(), e_ino, stockage, f_ino, info_details, stock_algo))
                                         st.ea_treated++;
                                 }
                                 else // inode not present in the catalogue of reference
                                     if(e_ino != NULL)
                                     {
-                                        save_inode(juillet.get_string(), e_ino, stockage, info_details, compr_mask, stock_algo, min_compr_size);
+                                        save_inode(dialog, juillet.get_string(), e_ino, stockage, info_details, compr_mask, stock_algo, min_compr_size, alter_atime);
                                         st.treated++;
-                                        if(save_ea(juillet.get_string(), e_ino, stockage, NULL, info_details, stock_algo))
+                                        if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, info_details, stock_algo))
                                             st.ea_treated++;
                                     }
                                     else
@@ -411,7 +430,7 @@ namespace libdar
 
                                     if(known)
                                         if(f_ino != NULL)
-                                            tosave = dir->has_changed_since(*f_ino, hourshift);
+                                            tosave = dir->has_changed_since(*f_ino, hourshift, ignore_owner);
                                         else
                                             throw SRC_BUG;
                                         // catalogue::compare() with a directory should return false or give a directory as
@@ -452,7 +471,7 @@ namespace libdar
                 catch(Egeneric & ex)
                 {
                     nomme *tmp = new ignored(nom->get_name());
-                    user_interaction_warning(string("Error while saving ") + juillet.get_string() + ": " + ex.get_message());
+                    dialog.warning(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
                     st.errored++;
 		    file_etiquette *eti = dynamic_cast<file_etiquette *>(e);
 
@@ -471,7 +490,7 @@ namespace libdar
                     {
                         fs.skip_read_to_parent_dir();
                         juillet.enfile(&tmp_eod);
-                        user_interaction_warning("NO FILE IN THAT DIRECTORY CAN BE SAVED.");
+                        dialog.warning(gettext("NO FILE IN THAT DIRECTORY CAN BE SAVED."));
                     }
                 }
             }
@@ -484,18 +503,21 @@ namespace libdar
         stockage->change_algo(stock_algo);
     }
 
-    void filtre_difference(const mask &filtre,
+    void filtre_difference(user_interaction & dialog,
+			   const mask &filtre,
                            const mask &subtree,
                            catalogue & cat,
                            const path & fs_racine,
                            bool info_details, statistics & st,
                            bool check_ea_root,
-                           bool check_ea_user)
+                           bool check_ea_user,
+			   bool alter_atime,
+			   bool ignore_owner)
     {
         const entree *e;
         defile juillet = fs_racine;
         const eod tmp_eod;
-        filesystem_diff fs = filesystem_diff(fs_racine ,info_details, check_ea_root, check_ea_user);
+        filesystem_diff fs = filesystem_diff(dialog, fs_racine ,info_details, check_ea_root, check_ea_user, alter_atime);
 
         st.clear();
         cat.reset_read();
@@ -526,14 +548,16 @@ namespace libdar
                                     {
                                         try
                                         {
-                                            e_ino->compare(*exists, check_ea_root, check_ea_user);
+                                            e_ino->compare(dialog, *exists, check_ea_root, check_ea_user, ignore_owner);
                                             if(info_details)
-                                                user_interaction_warning(string("OK   ")+juillet.get_string());
+                                                dialog.warning(string("OK   ")+juillet.get_string());
                                             st.treated++;
+					    if(!alter_atime)
+						restore_atime(juillet.get_string(), e_ino);
                                         }
                                         catch(Erange & e)
                                         {
-                                            user_interaction_warning(string("DIFF ")+juillet.get_string()+": "+ e.get_message());
+                                            dialog.warning(string(gettext("DIFF "))+juillet.get_string()+": "+ e.get_message());
                                             if(e_dir == NULL && exists_dir != NULL)
                                                 fs.skip_read_filename_in_parent_dir();
                                             if(e_dir != NULL && exists_dir == NULL)
@@ -543,6 +567,8 @@ namespace libdar
                                             }
 
                                             st.errored++;
+					    if(!alter_atime)
+						restore_atime(juillet.get_string(), e_ino);
                                         }
                                     }
                                     else // existing file is not an inode
@@ -557,7 +583,7 @@ namespace libdar
                             }
                             else // can't compare, nothing of that name in filesystem
                             {
-                                user_interaction_warning(string("DIFF ")+ juillet.get_string() + ": file not present in filesystem");
+                                dialog.warning(string(gettext("DIFF "))+ juillet.get_string() + gettext(": file not present in filesystem"));
                                 if(e_dir != NULL)
                                 {
                                     cat.skip_read_to_parent_dir();
@@ -599,15 +625,16 @@ namespace libdar
             }
             catch(Egeneric & e)
             {
-                user_interaction_warning(string("ERR  ")+juillet.get_string()+" : "+e.get_message());
-                st.deleted++;
+                dialog.warning(string(gettext("ERR  ")) + juillet.get_string() + " : " + e.get_message());
+                st.errored++;
             }
         }
         fs.skip_read_filename_in_parent_dir();
             // this call here only to restore dates of the root (-R option) directory
     }
 
-    void filtre_test(const mask &filtre,
+    void filtre_test(user_interaction & dialog,
+		     const mask &filtre,
                      const mask &subtree,
                      catalogue & cat,
                      bool info_details,
@@ -615,7 +642,7 @@ namespace libdar
     {
         const entree *e;
         defile juillet = path("<ROOT>");
-        null_file black_hole = gf_write_only;
+        null_file black_hole = null_file(dialog, gf_write_only);
         ea_attributs ea;
         infinint offset;
         crc check, original;
@@ -640,16 +667,16 @@ namespace libdar
                             // checking data file if any
                         if(e_file != NULL && e_file->get_saved_status() == s_saved)
                         {
-                            generic_file *dat = e_file->get_data();
+                            generic_file *dat = e_file->get_data(dialog);
                             if(dat == NULL)
-                                throw Erange("filtre_test", "Can't read saved data.");
+                                throw Erange("filtre_test", gettext("Can't read saved data."));
                             try
                             {
                                 dat->skip(0);
                                 dat->copy_to(black_hole, check);
                                 if(e_file->get_crc(original)) // CRC is not present in format "01"
                                     if(!same_crc(check, original))
-                                        throw Erange("fitre_test", "CRC error: data corruption.");
+                                        throw Erange("fitre_test", gettext("CRC error: data corruption."));
                             }
                             catch(...)
                             {
@@ -661,7 +688,7 @@ namespace libdar
                             // checking inode EA if any
                         if(e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_full)
                         {
-                            ea_attributs tmp = *(e_ino->get_ea());
+                            ea_attributs tmp = *(e_ino->get_ea(dialog));
                             tmp.check();
                             e_ino->ea_detach();
                         }
@@ -669,7 +696,7 @@ namespace libdar
 
                             // still no exception raised, this all is fine
                         if(info_details)
-                            user_interaction_warning(string("OK  ") + juillet.get_string());
+                            dialog.warning(string("OK  ") + juillet.get_string());
                     }
                     else // excluded by filter
                     {
@@ -696,13 +723,14 @@ namespace libdar
             }
             catch(Egeneric & e)
             {
-                user_interaction_warning(string("ERR ") + juillet.get_string() + " : " + e.get_message());
+                dialog.warning(string(gettext("ERR ")) + juillet.get_string() + " : " + e.get_message());
                 st.errored++;
             }
         }
     }
 
-    void filtre_isolate(catalogue & cat,
+    void filtre_isolate(user_interaction & dialog,
+			catalogue & cat,
                         catalogue & ref,
                         bool info_details)
     {
@@ -714,7 +742,7 @@ namespace libdar
         cat.reset_add();
 
         if(info_details)
-            user_interaction_warning("Removing references to saved data from catalogue...");
+            dialog.warning(gettext("Removing references to saved data from catalogue..."));
 
         while(ref.read(e))
         {
@@ -809,25 +837,29 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.9.2.1 2004/09/12 21:43:44 edrusb Exp $";
+        static char id[]="$Id: filtre.cpp,v 1.21 2004/11/14 00:07:26 edrusb Rel $";
         dummy_call(id);
     }
 
-    static void save_inode(const string & info_quoi, inode * & ino, compressor *stock, bool info_details, const mask &compr_mask, compression compr_used, const infinint & min_size_compression)
+    static void save_inode(user_interaction & dialog,
+			   const string & info_quoi, inode * & ino,
+			   compressor *stock, bool info_details,
+			   const mask &compr_mask, compression compr_used,
+			   const infinint & min_size_compression, bool alter_atime)
     {
         if(ino == NULL || stock == NULL)
             throw SRC_BUG;
         if(ino->get_saved_status() != s_saved)
             return;
         if(info_details)
-            user_interaction_warning(string("Adding file to archive: ") + info_quoi);
+            dialog.warning(string(gettext("Adding file to archive: ")) + info_quoi);
 
         file *fic = dynamic_cast<file *>(ino);
 
         if(fic != NULL)
         {
             infinint start = stock->get_position();
-            generic_file *source = fic->get_data();
+            generic_file *source = fic->get_data(dialog);
             crc val;
 
             fic->set_offset(start);
@@ -853,20 +885,29 @@ namespace libdar
                     else
                         fic->set_storage_size(0);
                         // means no compression, thus the real storage size is the filesize
+
                 }
                 catch(...)
                 {
                     delete source;
+			// restore atime of source
+		    if(!alter_atime)
+			tools_noexcept_make_date(info_quoi, ino->get_last_access(), ino->get_last_modif());
                     throw;
                 }
                 delete source;
+		    // restore atime of source
+		if(!alter_atime)
+		    tools_noexcept_make_date(info_quoi, ino->get_last_access(), ino->get_last_modif());
             }
             else
                 throw SRC_BUG; // saved_status == s_saved, but no data available, and no exception raised;
         }
     }
 
-    static bool save_ea(const string & info_quoi, inode * & ino, compressor *stock, const inode * ref, bool info_details, compression compr_used)
+    static bool save_ea(user_interaction & dialog,
+			const string & info_quoi, inode * & ino, compressor *stock,
+			const inode * ref, bool info_details, compression compr_used)
     {
         bool ret = false;
         try
@@ -876,18 +917,18 @@ namespace libdar
             case inode::ea_full: // if there is something to save
                 if(ref == NULL || ref->ea_get_saved_status() == inode::ea_none || ref->get_last_change() < ino->get_last_change())
                 {
-                    if(ino->get_ea() != NULL)
+                    if(ino->get_ea(dialog) != NULL)
                     {
                         crc val;
 
                         if(info_details)
-                            user_interaction_warning(string("Saving Extended Attributes for ") + info_quoi);
+                            dialog.warning(string(gettext("Saving Extended Attributes for ")) + info_quoi);
                         ino->ea_set_offset(stock->get_position());
                         stock->change_algo(compr_used); // always compress EA (no size or filename consideration)
                         stock->reset_crc(); // start computing CRC for any read/write on stock
                         try
                         {
-                            ino->get_ea()->dump(*stock);
+                            ino->get_ea(dialog)->dump(*stock);
                         }
                         catch(...)
                         {
@@ -917,7 +958,7 @@ namespace libdar
                     ino->ea_set_offset(stock->get_position());
                     ea.clear(); // be sure it is empty
                     if(info_details)
-                        user_interaction_warning(string("Saving Extended Attributes for ") + info_quoi);
+                        dialog.warning(string(gettext("Saving Extended Attributes for ")) + info_quoi);
                     ea.dump(*stock);
                     stock->flush_write();
                         // no need to detach, as the brand new ea has not been attached
@@ -938,9 +979,17 @@ namespace libdar
         }
         catch(Egeneric & e)
         {
-            user_interaction_warning(string("Error saving Extended Attributs for ") + info_quoi + ": " + e.get_message());
+            dialog.warning(string(gettext("Error saving Extended Attributs for ")) + info_quoi + ": " + e.get_message());
         }
         return ret;
+    }
+
+
+    static void restore_atime(const string & chemin, const inode * & ptr)
+    {
+	const file * ptr_f = dynamic_cast<const file *>(ptr);
+	if(ptr_f != NULL)
+	    tools_noexcept_make_date(chemin, ptr_f->get_last_access(), ptr_f->get_last_modif());
     }
 
 } // end of namespace

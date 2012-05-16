@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.cpp,v 1.7.4.2 2004/07/25 20:38:03 edrusb Exp $
+// $Id: mask.cpp,v 1.16 2004/12/01 22:10:46 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -31,20 +31,33 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include "mask.hpp"
 #include "tools.hpp"
 #include "erreurs.hpp"
-#include "mask.hpp"
+
 
 using namespace std;
 
 namespace libdar
 {
 
-    simple_mask::simple_mask(const string & wilde_card_expression)
+    simple_mask::simple_mask(const string & wilde_card_expression,
+			     bool case_sensit)
     {
         the_mask = tools_str2charptr(wilde_card_expression);
         if(the_mask == NULL)
             throw Ememory("simple_mask::simple_mask");
+	case_s = case_sensit;
+	try
+	{
+	    if(!case_s)
+		tools_to_upper(the_mask);
+	}
+	catch(...)
+	{
+	    delete the_mask;
+	    throw;
+	}
     }
 
     bool simple_mask::is_covered(const string &expression) const
@@ -55,8 +68,18 @@ namespace libdar
         if(tmp == NULL)
             throw Ememory("simple_mask::is_covered");
 
-        ret = fnmatch(the_mask, tmp, FNM_PERIOD) == 0;
-        delete tmp;
+	try
+	{
+	    if(!case_s)
+		tools_to_upper(tmp);
+	    ret = fnmatch(the_mask, tmp, FNM_PERIOD) == 0;
+	}
+	catch(...)
+	{
+	    delete tmp;
+	    throw;
+	}
+	delete tmp;
 
         return ret;
     }
@@ -67,9 +90,11 @@ namespace libdar
         if(the_mask == NULL)
             throw Ememory("simple_mask::copy_from");
         strcpy(the_mask, m.the_mask);
+	case_s = m.case_s;
     }
 
-    regular_mask::regular_mask(const string & wilde_card_expression)
+    regular_mask::regular_mask(const string & wilde_card_expression,
+			       bool case_sensit)
     {
         char *tmp = tools_str2charptr(wilde_card_expression);
 
@@ -77,7 +102,7 @@ namespace libdar
         {
             S_I ret;
 
-            if((ret = regcomp(&preg, tmp, REG_NOSUB)) != 0)
+            if((ret = regcomp(&preg, tmp, REG_NOSUB|(case_sensit ? 0 : REG_ICASE))) != 0)
             {
                 const S_I msg_size = 1024;
                 char msg[msg_size];
@@ -151,7 +176,7 @@ namespace libdar
         vector<mask *>::iterator fin = const_cast<et_mask &>(*this).lst.end();
 
         if(lst.size() == 0)
-            throw Erange("et_mask::is_covered", "no mask in the list of mask to AND");
+            throw Erange("et_mask::is_covered", gettext("No mask in the list of mask to operate on"));
 
         while(it != fin && (*it)->is_covered(expression))
             it++;
@@ -192,7 +217,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: mask.cpp,v 1.7.4.2 2004/07/25 20:38:03 edrusb Exp $";
+        static char id[]="$Id: mask.cpp,v 1.16 2004/12/01 22:10:46 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -202,7 +227,7 @@ namespace libdar
         vector<mask *>::iterator fin = const_cast<ou_mask &>(*this).lst.end();
 
         if(lst.size() == 0)
-            throw Erange("et_mask::is_covered", "no mask in the list of mask to OR");
+            throw Erange("et_mask::is_covered", gettext("No mask in the list of mask to operate on"));
 
         while(it != fin && ! (*it)->is_covered(expression))
             it++;
@@ -213,7 +238,16 @@ namespace libdar
     bool simple_path_mask::is_covered(const string &ch) const
     {
         path p = ch;
-        return p.is_subdir_of(chemin) || chemin.is_subdir_of(p);
+        return p.is_subdir_of(chemin, case_s) || chemin.is_subdir_of(p, case_s);
+    }
+
+
+    bool same_path_mask::is_covered(const std::string &ch) const
+    {
+	if(case_s)
+	    return ch == chemin;
+	else
+	    return tools_is_case_insensitive_equal(ch, chemin);
     }
 
 } // end of namespace

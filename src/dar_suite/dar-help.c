@@ -21,14 +21,14 @@
 //        which will forward, or give Chris's email upon his agreement
 //
 /*********************************************************************/
-// $Id: dar-help.c,v 1.7 2003/11/15 23:17:02 edrusb Rel $
+// $Id: dar-help.c,v 1.9 2004/07/20 21:16:17 edrusb Rel $
 //
 /*********************************************************************/
 
 void no_compiler_warning(char *x)
 {
     char rcsid[] =
-"$Id: dar-help.c,v 1.7 2003/11/15 23:17:02 edrusb Rel $";
+"$Id: dar-help.c,v 1.9 2004/07/20 21:16:17 edrusb Rel $";
     no_compiler_warning(rcsid);
 }
 /*
@@ -333,7 +333,7 @@ lineout(char *line)
 {
     char *p = line;
 
-    fputs("\tui_printf(\"", stdout);
+    fputs("\tdialog.printf(gettext(\"", stdout);
     while (*p) {
 	if (isprint(*p))
 	    putc(*p, stdout);
@@ -349,7 +349,7 @@ lineout(char *line)
     }
     if (*(p - 1) != '\n')
 	fputs("\\n", stdout);
-    fputs("\");\n", stdout);
+    fputs("\"));\n", stdout);
 }
 
 /*

@@ -18,12 +18,16 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.hpp,v 1.5.4.3 2004/09/22 03:14:22 edrusb Rel $
+// $Id: compressor.hpp,v 1.12 2004/11/07 18:21:37 edrusb Rel $
 //
 /*********************************************************************/
+    /// \file compressor.hpp
+    /// \brief compression engine implementation
 
 #ifndef COMPRESSOR_HPP
 #define COMPRESSOR_HPP
+
+#include "../my_config.h"
 
 #include "infinint.hpp"
 #include "generic_file.hpp"
@@ -33,19 +37,30 @@
 namespace libdar
 {
 
-    enum compression { none = 'n', zip = 'p', gzip = 'z', bzip2 = 'y' };
+	/// the different compression algorithm available
+
+	/// values to be used as argument of libdar API calls
+	/// \ingroup API
+    enum compression
+    {
+	none = 'n', ///< no compression
+	zip = 'p',  ///< zip compression (not implemented)
+	gzip = 'z', ///< gzip compression
+	bzip2 = 'y' ///< bzip2 compression
+    };
 
     extern compression char2compression(char a);
     extern char compression2char(compression c);
     extern std::string compression2string(compression c);
 
+	/// compression class for gzip and bzip2 algorithms
     class compressor : public generic_file
     {
     public :
-        compressor(compression algo, generic_file & compressed_side, U_I compression_level = 9);
+        compressor(user_interaction & dialog, compression algo, generic_file & compressed_side, U_I compression_level = 9);
             // compressed_side is not owned by the object and will remains
             // after the objet destruction
-        compressor(compression algo, generic_file *compressed_side, U_I compression_level = 9);
+        compressor(user_interaction & dialog, compression algo, generic_file *compressed_side, U_I compression_level = 9);
             // compressed_side is owned by the object and will be
             // deleted a destructor time
         ~compressor();

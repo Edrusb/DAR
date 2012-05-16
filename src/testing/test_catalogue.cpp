@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_catalogue.cpp,v 1.6.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_catalogue.cpp,v 1.13 2004/05/21 08:28:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -40,11 +40,14 @@ extern "C"
 #include "integers.hpp"
 #include "macro_tools.hpp"
 #include "shell_interaction.hpp"
+#include "deci.hpp"
 
 using namespace libdar;
 
 #define FIC1 "test/dump.bin"
 #define FIC2 "test/dump2.bin"
+
+static user_interaction *ui = NULL;
 
 void f1();
 void f2();
@@ -54,16 +57,18 @@ int main()
 {
     MEM_BEGIN;
     MEM_IN;
-    shell_interaction_init(&cout, &cerr);
-    catalogue_set_reading_version("03");
+    ui = shell_interaction_init(&cout, &cerr, false);
+    if(ui == NULL)
+	cout << "ERREUR !" << endl;
+
     try
     {
         MEM_IN;
-//      f1();
+	f1();
         MEM_OUT;
-//      f2();
+	f2();
         MEM_OUT;
-//      f3();
+	f3();
         MEM_OUT;
     }
     catch(Egeneric & e)
@@ -72,6 +77,8 @@ int main()
     }
 
     shell_interaction_close();
+    if(ui != NULL)
+	delete ui;
     MEM_OUT;
     MEM_END;
     return 0;
@@ -83,19 +90,20 @@ void f1()
     unlink(FIC2);
     try
     {
-        fichier *dump = new fichier(FIC1, gf_read_write);
-        fichier *dump2 = new fichier(FIC2, gf_write_only);
+        fichier *dump = new fichier(*ui, FIC1, gf_read_write);
+        fichier *dump2 = new fichier(*ui, FIC2, gf_write_only);
+	std::map <infinint, file_etiquette *> corres;
 
         eod *v_eod = new eod();
-        file *v_file = new file(1024, 102, 0644, 1, 2, "fichier", "." , 1024);
-        lien *v_lien = new lien(1025, 103, 0645, 4, 5, "lien", "fichier");
-        directory *v_dir = new directory(1026, 104, 0646, 7, 8, "repertoire");
-        chardev *v_char = new chardev(1027, 105, 0647, 10, 11, "char device", 104, 202);
-        blockdev *v_block = new blockdev(1028, 106, 0651, 13, 14, "block device", 105, 203);
-        tube *v_tube = new tube(1029, 107, 0652, 16, 17, "tuyau");
-        prise *v_prise = new prise(1030, 108, 0650, 19, 20, "prise");
+        file *v_file = new file(1024, 102, 0644, 1, 2, "fichier", "." , 1024, 0);
+        lien *v_lien = new lien(1025, 103, 0645, 4, 5, "lien", "fichier", 0);
+        directory *v_dir = new directory(1026, 104, 0646, 7, 8, "repertoire", 0);
+        chardev *v_char = new chardev(1027, 105, 0647, 10, 11, "char device", 104, 202, 0);
+        blockdev *v_block = new blockdev(1028, 106, 0651, 13, 14, "block device", 105, 203, 0);
+        tube *v_tube = new tube(1029, 107, 0652, 16, 17, "tuyau", 0);
+        prise *v_prise = new prise(1030, 108, 0650, 19, 20, "prise", 0);
         detruit *v_detruit = new detruit("ancien fichier", 'f');
-        directory *v_sub_dir = new directory(200,20, 0777, 100, 101, "sous-repertoire");
+        directory *v_sub_dir = new directory(200,20, 0777, 100, 101, "sous-repertoire", 0);
 
         entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, NULL };
 
@@ -105,7 +113,7 @@ void f1()
 
             if(ino != NULL)
                 ino->set_saved_status(s_saved);
-            liste[i]->dump(*dump);
+            liste[i]->dump(*ui, *dump);
         }
 
         dump->skip(0);
@@ -114,17 +122,17 @@ void f1()
         entree *ref = (entree *)1; // != NULL
         for(S_I i = 0; ref != NULL; i++)
         {
-            ref = entree::read(*dump, stats);
+            ref = entree::read(*ui, *dump, "03", stats, corres, none, dump);
             if(ref != NULL)
             {
-                ref->dump(*dump2);
+                ref->dump(*ui, *dump2);
                 delete ref;
             }
         }
         delete dump;
         delete dump2;
         delete v_eod;
-        stats.listing();
+        stats.listing(*ui);
 
         v_dir->add_children(v_file);
         v_dir->add_children(v_lien);
@@ -135,18 +143,18 @@ void f1()
         v_dir->add_children(v_detruit);
         v_dir->add_children(v_prise);
 
-        v_dir->listing();
+        v_dir->listing(*ui);
 
         unlink(FIC1);
         unlink(FIC2);
 
         stats.clear();
-        dump = new fichier(FIC1, gf_read_write);
-        v_dir->dump(*dump);
+        dump = new fichier(*ui, FIC1, gf_read_write);
+        v_dir->dump(*ui, *dump);
         dump->skip(0);
-        ref = entree::read(*dump, stats);
+        ref = entree::read(*ui, *dump, "03", stats, corres, none, dump);
         v_sub_dir = dynamic_cast<directory *>(ref);
-        v_sub_dir->listing();
+        v_sub_dir->listing(*ui);
 
         delete ref;
         delete dump;
@@ -164,7 +172,7 @@ void f2()
 
     try
     {
-        catalogue cat;
+        catalogue cat = *ui;
         const entree *ref;
 
         cat.listing();
@@ -178,14 +186,14 @@ void f2()
         {
             e.dump();
         }
-        cat.add(new file(1024, 102, 0644, 1, 2, "fichier", ".", 1024));
-        cat.add(new lien(1025, 103, 0645, 4, 5, "lien", "fichier"));
-        cat.add(new directory(1026, 104, 0646, 7, 8, "repertoire"));
-        cat.add(new chardev(1027, 105, 0647, 10, 11,  "char device", 104, 202));
-        cat.add(new blockdev(1028, 106, 0651, 13, 14, "block device", 105, 203));
+        cat.add(new file(1024, 102, 0644, 1, 2, "fichier", ".", 1024, 0));
+        cat.add(new lien(1025, 103, 0645, 4, 5, "lien", "fichier", 0));
+        cat.add(new directory(1026, 104, 0646, 7, 8, "repertoire", 0));
+        cat.add(new chardev(1027, 105, 0647, 10, 11,  "char device", 104, 202, 0));
+        cat.add(new blockdev(1028, 106, 0651, 13, 14, "block device", 105, 203, 0));
         cat.add(new eod());
-        cat.add(new tube(1029, 107, 0652, 16, 17, "tuyau"));
-        cat.add(new prise(1030, 108, 0650, 19, 20, "prise"));
+        cat.add(new tube(1029, 107, 0652, 16, 17, "tuyau", 0));
+        cat.add(new prise(1030, 108, 0650, 19, 20, "prise", 0));
         cat.add(new detruit("ancien fichier", 'f'));
 
         cat.listing();
@@ -207,11 +215,11 @@ void f2()
         }
 
         unlink(FIC1);
-        fichier f = fichier(FIC1, gf_read_write);
+        fichier f = fichier(*ui, FIC1, gf_read_write);
 
         cat.dump(f);
         f.skip(0);
-        catalogue lst = f;
+        catalogue lst = catalogue(*ui, f, "03", none, &f);
         lst.listing();
         bool ok;
 
@@ -238,8 +246,11 @@ void f2()
                             w = dynamic_cast<const inode *>(was);
                         if(ok && w != NULL)
                             if(i->same_as(*w))
-                                if(i->is_more_recent_than(*w, 0))
+                                if(i->is_more_recent_than(*w, 0, true))
+				{
                                     cout << "plus recent" << endl;
+				    cout << "new is " << deci(w->get_last_modif()).human() << " ref " << deci(i->get_last_modif()).human() << endl;
+				}
                                 else
                                     cout << "pas plus recent" << endl;
                             else
@@ -257,27 +268,27 @@ void f2()
 
 void f3()
 {
-    catalogue cat;
-    catalogue dif;
+    catalogue cat = *ui;
+    catalogue dif = *ui;
 
     cat.reset_add();
     dif.reset_add();
 
-    cat.add(new file(1024, 102, 0644, 1, 2, "fichier", ".", 1024));
-    cat.add(new lien(1025, 103, 0645, 4, 5, "lien", "fichier"));
-    cat.add(new directory(1026, 104, 0646, 7, 8, "repertoire"));
-    cat.add(new chardev(1027, 105, 0647, 10, 11, "char device", 104, 202));
-    cat.add(new blockdev(1028, 106, 0651, 13, 14, "block device", 105, 203));
+    cat.add(new file(1024, 102, 0644, 1, 2, "fichier", ".", 1024, 0));
+    cat.add(new lien(1025, 103, 0645, 4, 5, "lien", "fichier", 0));
+    cat.add(new directory(1026, 104, 0646, 7, 8, "repertoire", 0));
+    cat.add(new chardev(1027, 105, 0647, 10, 11, "char device", 104, 202, 0));
+    cat.add(new blockdev(1028, 106, 0651, 13, 14, "block device", 105, 203, 0));
     cat.add(new eod());
-    cat.add(new tube(1029, 107, 0652, 16, 17, "tuyau"));
-    cat.add(new prise(1030, 108, 0650, 19, 20, "prise"));
+    cat.add(new tube(1029, 107, 0652, 16, 17, "tuyau", 0));
+    cat.add(new prise(1030, 108, 0650, 19, 20, "prise", 0));
     cat.add(new detruit("ancien fichier", 'f'));
 
 
-    dif.add(new file(1024, 102, 0644, 1, 2, "fichier", ".",  1024));
-    dif.add(new lien(1025, 103, 0645, 4, 5, "lien", "fichier"));
-    dif.add(new tube(1029, 107, 0652, 16, 17, "tuyau"));
-    dif.add(new prise(1030, 108, 0650, 19, 20, "prise"));
+    dif.add(new file(1024, 102, 0644, 1, 2, "fichier", ".",  1024, 0));
+    dif.add(new lien(1025, 103, 0645, 4, 5, "lien", "fichier", 0));
+    dif.add(new tube(1029, 107, 0652, 16, 17, "tuyau", 0));
+    dif.add(new prise(1030, 108, 0650, 19, 20, "prise", 0));
     dif.add(new detruit("ancien fichier", 'f'));
 
     dif.update_destroyed_with(cat);

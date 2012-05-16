@@ -18,9 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: scrambler.hpp,v 1.5.4.1 2004/09/22 03:14:24 edrusb Rel $
+// $Id: scrambler.hpp,v 1.9 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file scrambler.hpp
+    /// \brief contains the definition of the scrambler class, a very weak encryption scheme
 
 #ifndef SCRAMBLER_HPP
 #define SCRAMBLER_HPP
@@ -35,10 +38,13 @@
 namespace libdar
 {
 
+	/// \brief scrambler is a very weak encryption scheme
+	/// \ingroup Private
+
     class scrambler : public generic_file
     {
     public:
-        scrambler(const std::string & pass, generic_file & hidden_side);
+        scrambler(user_interaction & dialog, const std::string & pass, generic_file & hidden_side);
         ~scrambler() { if(buffer != NULL) delete buffer; };
 
         bool skip(const infinint & pos) { if(ref == NULL) throw SRC_BUG; return ref->skip(pos); };

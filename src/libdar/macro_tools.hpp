@@ -18,9 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: macro_tools.hpp,v 1.8 2003/11/19 00:42:49 edrusb Rel $
+// $Id: macro_tools.hpp,v 1.14 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file macro_tools.hpp
+    /// \brief macroscopic tools for libdar internals
+    /// \ingroup Private
 
 #ifndef MACRO_TOOLS_HPP
 #define MACRO_TOOLS_HPP
@@ -40,14 +44,16 @@ namespace libdar
 
     extern const dar_version macro_tools_supported_version;
 
-    extern void macro_tools_open_archive(const path &sauv_path,  // path to slices
+    extern void macro_tools_open_archive(user_interaction & dialog,
+					 const path &sauv_path,  // path to slices
                                          const std::string &basename,  // slice basename
                                          const std::string &extension,  // slice extensions
                                          S_I options,  // options to SAR (see sar.hpp)
 					 crypto_algo crypto, // encryption algorithm
                                          const std::string &pass, // pass key for crypto/scrambling
+					 U_32 crypto_size,    // crypto block size
                                          generic_file *&ret1, // level 1 file (raw data) sar or zapette
-                                         scrambler *&scram, // NULL if pass is given an empty string else a scrambler (over raw data)
+                                         generic_file *&scram, // NULL if pass is given an empty string else a scrambler/other crypto class (over raw data)
                                          compressor *&ret2, // compressor over scrambler or raw data (if no scrambler)
                                          header_version &ver, // header read from raw data
                                          const std::string &input_pipe, // named pipe for input when basename is "-" (dar_slave)
@@ -55,12 +61,21 @@ namespace libdar
                                          const std::string & execute); // command to execute between slices
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed
 
-    extern catalogue *macro_tools_get_catalogue_from(generic_file & f,  // raw data access object
+    extern catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
+						     generic_file & f,  // raw data access object
+						     const header_version & ver, // version format as defined in the header of the archive to read
                                                      compressor & zip,  // compressor object over raw data
                                                      bool info_details, // verbose display (throught user_interaction)
-                                                     infinint &cat_size); // return size of archive in file (not in memory !)
+                                                     infinint &cat_size, // return size of archive in file (not in memory !)
+						     generic_file *zip_base);
 
-    extern catalogue *macro_tools_get_catalogue_from(const std::string &basename, const std::string & extension, crypto_algo crypto, const std::string & pass);
+    extern catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
+						     const std::string &basename,
+						     const std::string & extension,
+						     crypto_algo crypto,
+						     const std::string & pass,
+						     U_32 crypto_size);
+
 
 } // end of namespace
 

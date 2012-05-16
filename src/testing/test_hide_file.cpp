@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_hide_file.cpp,v 1.6.4.2 2004/04/20 09:27:02 edrusb Rel $
+// $Id: test_hide_file.cpp,v 1.9 2004/05/21 08:28:51 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -35,24 +35,33 @@ extern "C"
 #include "no_comment.hpp"
 #include "config_file.hpp"
 #include "cygwin_adapt.hpp"
+#include "shell_interaction.hpp"
+#include "user_interaction.hpp"
 
 using namespace libdar;
 
 void f1();
 void f2();
 
+static user_interaction *ui = NULL;
+
 int main()
 {
+    ui = shell_interaction_init(&cout, &cerr, false);
+    if(ui == NULL)
+	cout << "ERREUR !" << endl;
     f1();
     f2();
+    if(ui != NULL)
+	delete ui;
 }
 
 void f1()
 {
-    fichier src = fichier("toto", gf_read_only);
-    no_comment strip = src;
+    fichier src = fichier(*ui, "toto", gf_read_only);
+    no_comment strip = no_comment(*ui, src);
     int fd = ::open("titi", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
-    fichier dst = fd;
+    fichier dst = fichier(*ui, fd);
 
     strip.copy_to(dst);
 }
@@ -65,11 +74,11 @@ void f2()
     cibles.push_back("all");
     cibles.push_back("default");
 
-    fichier src = fichier("toto", gf_read_only);
-    config_file strip = config_file(cibles, src);
+    fichier src = fichier(*ui, "toto", gf_read_only);
+    config_file strip = config_file(*ui, cibles, src);
 
     int fd = ::open("tutu", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
-    fichier dst = fd;
+    fichier dst = fichier(*ui, fd);
 
     strip.copy_to(dst);
 }

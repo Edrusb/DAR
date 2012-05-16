@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: no_comment.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: no_comment.hpp,v 1.7 2004/06/20 14:26:25 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -33,7 +33,7 @@ using namespace libdar;
 class no_comment : public hide_file
 {
 public:
-    no_comment(generic_file &f) : hide_file(f) {};
+    no_comment(user_interaction & dialog, generic_file &f) : hide_file(dialog, f) {};
 
 protected:
     void fill_morceau();

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.21.2.3 2004/09/10 20:15:43 edrusb Exp $
+// $Id: tools.cpp,v 1.41 2004/12/01 22:10:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,20 +27,6 @@
 
 extern "C"
 {
-#if STDC_HEADERS
-# include <string.h>
-#else
-# if !HAVE_STRCHR
-#  define strchr index
-#  define strrchr rindex
-# endif
-char *strchr (), *strrchr ();
-# if !HAVE_MEMCPY
-#  define memcpy(d, s, n) bcopy ((s), (d), (n))
-#  define memmove(d, s, n) bcopy ((s), (d), (n))
-# endif
-#endif
-
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -104,6 +90,18 @@ char *strchr (), *strrchr ();
 #if HAVE_GRP_H
 #include <grp.h>
 #endif
+
+#if HAVE_SYS_TYPE_H
+#include <sys/types.h>
+#endif
+
+#if HAVE_UTIME_H
+#include <utime.h>
+#endif
+
+#if HAVE_CTYPE_H
+#include <ctype.h>
+#endif
 } // end extern "C"
 
 #include <iostream>
@@ -114,13 +112,14 @@ char *strchr (), *strrchr ();
 #include "integers.hpp"
 #include "mask.hpp"
 #include "etage.hpp"
+#include "elastic.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    static void runson(char *argv[]);
+    static void runson(user_interaction & dialog, char *argv[]);
     static void deadson(S_I sig);
     static bool is_a_slice_available(const string & base, const string & extension);
     static string retreive_basename(const string & base, const string & extension);
@@ -160,7 +159,7 @@ namespace libdar
         while(lu == 1 && a[0] != '\0');
 
         if(lu != 1 || a[0] != '\0')
-            throw Erange("tools_read_string", "not a zero terminated string in file");
+            throw Erange("tools_read_string", gettext("Not a zero terminated string in file"));
     }
 
     void tools_write_string_all(generic_file & f, const string & s)
@@ -218,7 +217,7 @@ namespace libdar
         try
         {
             if(lstat(name, &buf) < 0)
-                throw Erange("tools_get_filesize", strerror(errno));
+                throw Erange("tools_get_filesize", tools_printf(gettext("Cannot get file size: %s"), strerror(errno)));
         }
         catch(...)
         {
@@ -229,7 +228,7 @@ namespace libdar
         return (U_32)buf.st_size;
     }
 
-    infinint tools_get_extended_size(string s)
+    infinint tools_get_extended_size(string s, U_I base)
     {
         U_I len = s.size();
         infinint factor = 1;
@@ -240,28 +239,28 @@ namespace libdar
         {
         case 'K':
         case 'k': // kilobyte
-            factor = 1024;
+            factor = base;
             break;
         case 'M': // megabyte
-            factor = infinint(1024).power((U_I)2);
+            factor = infinint(base).power((U_I)2);
             break;
         case 'G': // gigabyte
-            factor = infinint(1024).power((U_I)3);
+            factor = infinint(base).power((U_I)3);
             break;
         case 'T': // terabyte
-            factor = infinint(1024).power((U_I)4);
+            factor = infinint(base).power((U_I)4);
             break;
         case 'P': // petabyte
-            factor = infinint(1024).power((U_I)5);
+            factor = infinint(base).power((U_I)5);
             break;
         case 'E': // exabyte
-            factor = infinint(1024).power((U_I)6);
+            factor = infinint(base).power((U_I)6);
             break;
         case 'Z': // zettabyte
-            factor = infinint(1024).power((U_I)7);
+            factor = infinint(base).power((U_I)7);
             break;
         case 'Y':  // yottabyte
-            factor = infinint(1024).power((U_I)8);
+            factor = infinint(base).power((U_I)8);
             break;
         case '0':
         case '1':
@@ -275,7 +274,7 @@ namespace libdar
         case '9':
             break;
         default :
-            throw Erange("command_line get_extended_size", string("unknown sufix in string : ")+s);
+            throw Erange("command_line get_extended_size", tools_printf(gettext("Unknown suffix [%c] in string %S"), s[len-1], &s));
         }
 
         if(factor != 1)
@@ -299,7 +298,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.21.2.3 2004/09/10 20:15:43 edrusb Exp $";
+        static char id[]="$Id: tools.cpp,v 1.41 2004/12/01 22:10:47 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -354,22 +353,22 @@ namespace libdar
         delete ptr;
     }
 
-    void tools_open_pipes(const string &input, const string & output, tuyau *&in, tuyau *&out)
+    void tools_open_pipes(user_interaction & dialog, const string &input, const string & output, tuyau *&in, tuyau *&out)
     {
         in = out = NULL;
         try
         {
             if(input != "")
-                in = new tuyau(input, gf_read_only);
+                in = new tuyau(dialog, input, gf_read_only);
             else
-                in = new tuyau(0, gf_read_only); // stdin by default
+                in = new tuyau(dialog, 0, gf_read_only); // stdin by default
             if(in == NULL)
                 throw Ememory("tools_open_pipes");
 
             if(output != "")
-                out = new tuyau(output, gf_write_only);
+                out = new tuyau(dialog, output, gf_write_only);
             else
-                out = new tuyau(1, gf_write_only); // stdout by default
+                out = new tuyau(dialog, 1, gf_write_only); // stdout by default
             if(out == NULL)
                 throw Ememory("tools_open_pipes");
 
@@ -438,7 +437,7 @@ namespace libdar
 
         t.unstack(ret);
         if(t != 0)
-            throw Erange("tools_str2int", "cannot convert the string to integer, overflow");
+            throw Erange("tools_str2int", gettext("Cannot convert the string to integer, overflow"));
 
         return ret;
     }
@@ -462,7 +461,7 @@ namespace libdar
         return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n'
     }
 
-    void tools_system(const vector<string> & argvector)
+    void tools_system(user_interaction & dialog, const vector<string> & argvector)
     {
         if(argvector.size() == 0)
             return; // nothing to do
@@ -495,38 +494,38 @@ namespace libdar
                         switch(pid)
                         {
                         case -1:
-                            throw Erange("tools_system", string("Error while calling fork() to launch dar: ") + strerror(errno));
+                            throw Erange("tools_system", string(gettext("Error while calling fork() to launch dar: ")) + strerror(errno));
                         case 0: // fork has succeeded, we are the child process
-                            runson(argv);
+                            runson(dialog, argv);
                                 // function that never returns
                         default:
                             if(wait(&status) <= 0)
                                 throw Erange("tools_system",
-                                             string("Unexpected error while waiting for dar to terminate: ") + strerror(errno));
+                                             string(gettext("Unexpected error while waiting for dar to terminate: ")) + strerror(errno));
                             else // checking the way dar has exit
                                 if(!WIFEXITED(status)) // not a normal ending
                                     if(WIFSIGNALED(status)) // exited because of a signal
                                     {
                                         try
                                         {
-                                            user_interaction_pause(string("DAR terminated upon signal reception: ")
+                                            dialog.pause(string(gettext("DAR terminated upon signal reception: "))
 #if HAVE_DECL_SYS_SIGLIST
-                                                                   + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
+							 + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
 #else
-                                                                   + tools_int2str(WTERMSIG(status))
+							 + tools_int2str(WTERMSIG(status))
 #endif
-                                                                   + " . Retry to launch dar as previously ?");
+							 + gettext(" . Retry to launch dar as previously ?"));
                                             loop = true;
                                         }
                                         catch(Euser_abort & e)
                                         {
-                                            user_interaction_pause("Continue anyway ?");
+                                            dialog.pause(gettext(" Continue anyway ?"));
                                         }
                                     }
                                     else // normal terminaison but exit code not zero
-                                        user_interaction_pause(string("DAR sub-process has terminated with exit code ")
-                                                               + tools_int2str(WEXITSTATUS(status))
-                                                               + " Continue anyway ?");
+                                        dialog.pause(string(gettext("DAR sub-process has terminated with exit code "))
+						     + tools_int2str(WEXITSTATUS(status))
+						     + gettext(" Continue anyway ?"));
                         }
                     }
                     while(loop);
@@ -564,7 +563,7 @@ namespace libdar
 
     void tools_read_vector(generic_file & f, vector<string> & x)
     {
-        infinint tmp = infinint(NULL, &f);
+        infinint tmp = infinint(f.get_gf_ui(), NULL, &f);
         string elem;
 
         x.clear();
@@ -599,19 +598,6 @@ namespace libdar
     }
 
 
-    static void deadson(S_I sig)
-    {
-        signal(SIGCHLD, &deadson);
-    }
-
-    static void runson(char *argv[])
-    {
-        if(execvp(argv[0], argv) < 0)
-            user_interaction_warning(string("Error while calling execvp:") + strerror(errno));
-        else
-            user_interaction_warning("execvp failed but did not returned error code");
-        exit(0);
-    }
 
     const char *tools_get_from_env(const char **env, char *clef)
     {
@@ -649,16 +635,24 @@ namespace libdar
         return index <liste.size();
     }
 
-    void tools_display_features(bool ea, bool largefile, bool nodump, bool special_alloc, U_I bits)
+    void tools_display_features(user_interaction & dialog, bool ea, bool largefile, bool nodump,
+				bool special_alloc, U_I bits, bool thread_safe,
+				bool libz, bool libbz2, bool libcrypto)
     {
-        ui_printf("   Extended Attributes support: %s\n", (ea ? "YES" : "NO"));
-        ui_printf("   Large files support (> 2GB): %s\n", (largefile ? "YES" : "NO"));
-        ui_printf("   ext2fs NODUMP flag support : %s\n", (nodump ? "YES" : "NO"));
-        ui_printf("   Special allocation scheme  : %s\n", (special_alloc ? "YES" : "NO"));
+#define YES_NO(x) (x ? gettext("YES") : gettext("NO"))
+
+	dialog.printf(gettext("   Libz compression (gzip)    : %s\n"), YES_NO(libz));
+	dialog.printf(gettext("   Libbz2 compression (bzip2) : %s\n"), YES_NO(libbz2));
+	dialog.printf(gettext("   Strong encryption          : %s\n"), YES_NO(libcrypto));
+        dialog.printf(gettext("   Extended Attributes support: %s\n"), YES_NO(ea));
+        dialog.printf(gettext("   Large files support (> 2GB): %s\n"), YES_NO(largefile));
+        dialog.printf(gettext("   ext2fs NODUMP flag support : %s\n"), YES_NO(nodump));
+        dialog.printf(gettext("   Special allocation scheme  : %s\n"), YES_NO(special_alloc));
         if(bits == 0)
-            ui_printf("   Integer size used          : unlimited\n");
+            dialog.printf(gettext("   Integer size used          : unlimited\n"));
         else
-            ui_printf("   Integer size used          : %d bits\n", bits);
+            dialog.printf(gettext("   Integer size used          : %d bits\n"), bits);
+	dialog.printf(gettext("   Thread safe support        : %s\n"), YES_NO(thread_safe));
     }
 
     bool is_equal_with_hourshift(const infinint & hourshift, const infinint & date1, const infinint & date2)
@@ -696,9 +690,9 @@ namespace libdar
         return ret;
     }
 
-    void tools_check_basename(const path & loc, string & base, const string & extension)
+    void tools_check_basename(user_interaction & dialog, const path & loc, string & base, const string & extension)
     {
-        regular_mask suspect = string(".\\.[1-9][0-9]*\\.")+extension;
+        regular_mask suspect = regular_mask(string(".\\.[1-9][0-9]*\\.")+extension, true);
         string old_path = (loc+base).display();
 
             // is basename is suspect ?
@@ -718,12 +712,12 @@ namespace libdar
         {
             try
             {
-                user_interaction_pause(string("Warning, ") + base + " seems more to be a slice name than a base name. Do you want to replace it by " + new_base + " ?");
+                dialog.pause(tools_printf(gettext("Warning, %S seems more to be a slice name than a base name. Do you want to replace it by %S ?"), &base, &new_base));
                 base = new_base;
             }
             catch(Euser_abort & e)
             {
-                user_interaction_warning(string("OK, keeping ") + base + " as basename");
+                dialog.warning(tools_printf(gettext("OK, keeping %S as basename"), &base));
             }
         }
     }
@@ -749,7 +743,7 @@ namespace libdar
 			length *= 2;
 		    }
 		    else // other error
-			throw Erange("tools_getcwd", string("Cannot get full path of current working directory: ") + strerror(errno));
+			throw Erange("tools_getcwd", string(gettext("Cannot get full path of current working directory: ")) + strerror(errno));
 	    }
 	    while(ret == NULL);
 
@@ -775,9 +769,9 @@ namespace libdar
 	string ret = "";
 
 	if(root == NULL)
-	    throw Erange("tools_readlink", "NULL argument given to tools_readlink");
+	    throw Erange("tools_readlink", gettext("NULL argument given to tools_readlink"));
 	if(strcmp(root, "") == 0)
-	    throw Erange("tools_readlink", "Empty string given as argument to tools_readlink");
+	    throw Erange("tools_readlink", gettext("Empty string given as argument to tools_readlink"));
 
 	try
 	{
@@ -801,7 +795,7 @@ namespace libdar
 			length *= 2;
 			break;
 		    default: // other error
-			throw Erange("get_readlink", string("Cannot read file information for ")+ root + " : " + strerror(errno));
+			throw Erange("get_readlink", tools_printf(gettext("Cannot read file information for %s : %s"), root, strerror(errno)));
 		    }
 		}
 		else // got the correct real path of symlink
@@ -831,6 +825,105 @@ namespace libdar
 	return ret;
     }
 
+
+    bool tools_look_for(const char *argument, S_I argc, char *argv[])
+    {
+	S_I count = 0;
+
+	while(count < argc && strcmp(argv[count], argument) != 0)
+	    count++;
+
+	return count < argc;
+    }
+
+    void tools_make_date(const string & chemin, infinint access, infinint modif)
+    {
+        struct utimbuf temps;
+        time_t tmp = 0;
+        char *filename;
+
+        access.unstack(tmp);
+        temps.actime = tmp;
+        tmp = 0;
+        modif.unstack(tmp);
+        temps.modtime = tmp;
+
+        filename = tools_str2charptr(chemin);
+        try
+        {
+            if(utime(filename , &temps) < 0)
+                Erange("tools_make_date", string(gettext("Cannot set last access and last modification time: ")) + strerror(errno));
+        }
+        catch(...)
+        {
+            delete filename;
+            throw;
+        }
+        delete filename;
+    }
+
+    void tools_noexcept_make_date(const string & chem, const infinint & last_acc, const infinint & last_mod)
+    {
+        try
+        {
+            if(last_acc != 0 || last_mod != 0)
+                tools_make_date(chem, last_acc, last_mod);
+                // else the directory could not be openned properly
+                // and time could not be retrieved, so we don't try
+                // to restore them
+        }
+        catch(Erange & e)
+        {
+                // cannot restore dates, ignoring
+        }
+    }
+
+    bool tools_is_case_insensitive_equal(const string & a, const string & b)
+    {
+	U_I curs = 0;
+	if(a.size() != b.size())
+	    return false;
+
+	while(curs < a.size() && tolower(a[curs]) == tolower(b[curs]))
+	    curs++;
+
+	return curs >= a.size();
+    }
+
+    void tools_to_upper(char *nts)
+    {
+	char *ptr = nts;
+
+	if(ptr == NULL)
+	    throw Erange("tools_to_upper", gettext("NULL given as argument"));
+
+	while(*ptr != '\0')
+	{
+	    *ptr = (char)toupper((int)*ptr);
+	    ptr++;
+	}
+    }
+
+    void tools_remove_last_char_if_equal_to(char c, string & s)
+    {
+	if(s[s.size()-1] == c)
+	    s = string(s.begin(), s.begin()+(s.size() - 1));
+    }
+
+    static void deadson(S_I sig)
+    {
+        signal(SIGCHLD, &deadson);
+    }
+
+    static void runson(user_interaction & dialog, char *argv[])
+    {
+        if(execvp(argv[0], argv) < 0)
+            dialog.warning(string(gettext("Error while calling execvp:")) + strerror(errno));
+        else
+            dialog.warning(gettext("execvp failed but did not returned error code"));
+        exit(0);
+    }
+
     static bool is_a_slice_available(const string & base, const string & extension)
     {
         char *name = tools_str2charptr(base);
@@ -847,8 +940,8 @@ namespace libdar
 
             try
             {
-                etage contents = etage(char_chem, 0, 0); // we don't care the dates here so we set them to zero
-                regular_mask slice = rest + "\\.[1-9][0-9]*\\."+ extension;
+                etage contents = etage(char_chem, 0, 0);  // we don't care the dates here so we set them to zero
+                regular_mask slice = regular_mask(rest + "\\.[1-9][0-9]*\\."+ extension, true);
 
                 while(!ret && contents.read(rest))
                     ret = slice.is_covered(rest);
@@ -892,6 +985,222 @@ namespace libdar
         new_base = string(new_base.begin(), new_base.begin()+index);
 
         return new_base;
+    }
+
+    void tools_read_range(const string & s, U_I & min, U_I & max)
+    {
+	string::iterator it = const_cast<string &>(s).begin();
+
+	while(it < s.end() && *it != '-')
+	    it++;
+
+	if(it < s.end())
+	{
+	    min = tools_str2int(string(const_cast<string &>(s).begin(), it));
+	    max = tools_str2int(string(++it, const_cast<string &>(s).end()));
+	}
+	else
+	    min = max = tools_str2int(s);
+    }
+
+
+    string tools_printf(char *format, ...)
+    {
+        va_list ap;
+	va_start(ap, format);
+	string output = "";
+	try
+	{
+	    output = tools_vprintf(format, ap);
+	}
+	catch(...)
+	{
+	    va_end(ap);
+	    throw;
+	}
+	va_end(ap);
+	return output;
+    }
+
+    string tools_vprintf(char *format, va_list ap)
+    {
+        bool end;
+        U_32 taille = strlen(format)+1;
+        char *copie;
+        string output = "";
+
+        U_I test;
+
+        copie = new char[taille];
+        if(copie == NULL)
+            throw Ememory("tools_printf");
+        try
+        {
+            char *ptr = copie, *start = copie;
+
+            strcpy(copie, format);
+            copie[taille-1] = '\0';
+
+            do
+            {
+                while(*ptr != '%' && *ptr != '\0')
+                    ptr++;
+                if(*ptr == '%')
+                {
+                    *ptr = '\0';
+                    end = false;
+                }
+                else
+                    end = true;
+                output += start;
+                if(!end)
+                {
+                    ptr++;
+                    switch(*ptr)
+                    {
+                    case '%':
+                        output += "%";
+                        break;
+                    case 'd':
+                        output += tools_int2str(va_arg(ap, S_I));
+                        break;
+                    case 'u':
+                        test = va_arg(ap, U_I);
+                        output += deci(test).human();
+                        break;
+                    case 's':
+                        output += va_arg(ap, char *);
+                        break;
+                    case 'c':
+                        output += static_cast<char>(va_arg(ap, S_I));
+                        break;
+                    case 'i':
+                        output += deci(*(va_arg(ap, infinint *))).human();
+                        break;
+                    case 'S':
+                        output += *(va_arg(ap, string *));
+                        break;
+                    default:
+                        throw Efeature(tools_printf(gettext("%%%c is not implemented in tools_printf format argument"), *ptr));
+                    }
+                    ptr++;
+                    start = ptr;
+                }
+            }
+            while(!end);
+        }
+        catch(...)
+        {
+            delete copie;
+            throw;
+        }
+        delete copie;
+
+	return output;
+    }
+
+    void tools_unlink_file_mask(user_interaction & dialog, const char *c_chemin, const char *file_mask, bool info_details)
+    {
+	simple_mask my_mask = simple_mask(string(file_mask), true);
+	etage dir = etage(c_chemin, 0, 0);
+	path chemin = path(string(c_chemin));
+	string entry;
+
+	while(dir.read(entry))
+	    if(my_mask.is_covered(entry))
+	    {
+		char *c_entry = tools_str2charptr((chemin + entry).display());
+		try
+		{
+		    if(info_details)
+			dialog.warning(tools_printf(gettext("Removing file %s"), c_entry));
+		    if(unlink(c_entry) != 0)
+			dialog.warning(tools_printf(gettext("ERROR removing file %s : %s"), c_entry, strerror(errno)));
+		}
+		catch(...)
+		{
+		    if(c_entry != NULL)
+			delete c_entry;
+		    throw;
+		}
+		delete c_entry;
+	    }
+    }
+
+    bool tools_do_some_files_match_mask(const char *c_chemin, const char *file_mask)
+    {
+	simple_mask my_mask = simple_mask(string(file_mask), true);
+	etage dir = etage(c_chemin, 0, 0);
+	string entry;
+	bool ret = false;
+
+	while(!ret && dir.read(entry))
+	    if(my_mask.is_covered(entry))
+		ret = true;
+
+	return ret;
+    }
+
+    void tools_avoid_slice_overwriting(user_interaction & dialog, const string & chemin, const string & x_file_mask, bool info_details, bool allow_overwriting, bool warn_overwriting)
+    {
+	char *c_chemin = tools_str2charptr(chemin);
+	try
+	{
+	    char *file_mask = tools_str2charptr(x_file_mask);
+	    try
+	    {
+		if(tools_do_some_files_match_mask(c_chemin, file_mask))
+		    if(!allow_overwriting)
+			throw Erange("tools_avoid_slice_overwriting", tools_printf(gettext("Overwriting not allowed while a slice of a previous archive with the same basename has been found in the %s directory, Operation aborted"), c_chemin));
+		    else
+		    {
+			try
+			{
+			    if(warn_overwriting)
+				dialog.pause(tools_printf(gettext("At least one slice of an old archive with the same basename remains in the directory %s , If you do not remove theses all first, you will have difficulty identifying the last slice of the archive you are about to create, because it may be hidden in between slices of this older archive. Do we remove the old archive's slices first ?"), c_chemin));
+			    tools_unlink_file_mask(dialog, c_chemin, file_mask, info_details);
+			}
+			catch(Euser_abort & e)
+			{
+				// nothing to do, just continue
+			}
+		    }
+	    }
+	    catch(...)
+	    {
+		if(file_mask != NULL)
+		    delete file_mask;
+		throw;
+	    }
+	    delete file_mask;
+	}
+	catch(...)
+	{
+	    if(c_chemin != NULL)
+		delete c_chemin;
+	    throw;
+	}
+	delete c_chemin;
+    }
+
+    void tools_add_elastic_buffer(generic_file & f, U_32 max_size)
+    {
+	elastic tic = (time(NULL) % (max_size - 1)) + 1; // range from 1 to max_size
+	char *buffer = new char[max_size];
+
+	if(buffer == NULL)
+	    throw Ememory("tools_add_elastic_buffer");
+	try
+	{
+	    tic.dump(buffer, max_size);
+	    f.write(buffer, tic.get_size());
+	}
+	catch(...)
+	{
+	    delete buffer;
+	    throw;
+	}
+	delete buffer;
     }
 
 

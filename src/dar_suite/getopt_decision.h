@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: getopt_decision.h,v 1.1.2.2 2004/03/11 16:57:51 edrusb Rel $
+// $Id: getopt_decision.h,v 1.3 2004/11/12 21:58:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,7 +27,7 @@
 
 #include "../my_config.h"
 
-#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
+#if HAVE_GETOPT_LONG
  #if HAVE_GETOPT_IN_UNISTD_H
   #if HAVE_GETOPT_LONG_IN_UNISTD_H
     // we do not need to include <getopt.h>

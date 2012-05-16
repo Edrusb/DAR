@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.hpp,v 1.6.4.1 2004/01/14 13:21:57 edrusb Rel $
+// $Id: dar_suite.hpp,v 1.11 2004/11/12 21:58:17 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -26,6 +26,7 @@
 #define DAR_SUITE_HPP
 
 #include "../my_config.h"
+#include "user_interaction.hpp"
 
 #define EXIT_OK 0           // all that was asked is done
 #define EXIT_SYNTAX 1       // syntax error on command line
@@ -45,6 +46,7 @@
     // fixed using full infinint version of the program
 #define EXIT_UNKNOWN_ERROR 9
     // error not possible to report by other mean no access to stdout/stderr)
+#define EXIT_COMPILATION 10
 
 #define EXTENSION "dar"
 
@@ -60,6 +62,10 @@
 #define CC_NAT "unknown"
 #endif
 
-extern int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(int, char *[], const char **env));
+using namespace libdar;
+
+extern int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_interaction & dialog, int, char *[], const char **env));
+
+extern std::string dar_suite_command_line_features();
 
 #endif

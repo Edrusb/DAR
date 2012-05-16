@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.hpp,v 1.7.2.2 2004/09/22 03:14:23 edrusb Rel $
+// $Id: sar.hpp,v 1.15 2004/12/29 13:30:41 edrusb Rel $
 //
 /*********************************************************************/
 
 #ifndef SAR_HPP
 #define SAR_HPP
+
+#include "../my_config.h"
 
 #include <string>
 #include "infinint.hpp"
@@ -39,11 +41,23 @@ namespace libdar
     const int SAR_OPT_PAUSE          = 0x04;
     const int SAR_OPT_DEFAULT = SAR_OPT_WARN_OVERWRITE;
 
+	// contextual is defined in generic_file module
     class sar : public contextual
     {
     public:
-        sar(const std::string & base_name, const std::string & extension, S_I options, const path & dir, const std::string & execute = "");
-        sar(const std::string & base_name, const std::string & extension, const infinint & file_size, const infinint & first_file_size, S_I options, const path & dir, const std::string & execute = "");
+        sar(user_interaction & dialog,
+	    const std::string & base_name,
+	    const std::string & extension, S_I options,
+	    const path & dir,
+	    const std::string & execute = "");
+        sar(user_interaction & dialog,
+	    const std::string & base_name,
+	    const std::string & extension,
+	    const infinint & file_size,
+	    const infinint & first_file_size,
+	    S_I options,
+	    const path & dir,
+	    const std::string & execute = "");
         ~sar();
 
             // inherited from generic_file
@@ -61,6 +75,12 @@ namespace libdar
 	    // inherited methods from contextual
         void set_info_status(const std::string & s) { status = s; };
         std::string get_info_status() const { return status; };
+
+	    // disable execution of user command when destroying the current object
+	void disable_natural_destruction() { natural_destruction = false; };
+
+	    // enable back execution of user command when destroying the current object
+	void enable_natural_destruction() { natural_destruction = true; };
 
     protected :
         S_I inherited_read(char *a, size_t sz);
@@ -116,7 +136,7 @@ namespace libdar
     class trivial_sar : public generic_file
     {
     public:
-        trivial_sar(generic_file *ref); // trivial_sar own the argument
+        trivial_sar(user_interaction & dialog, generic_file *ref); // trivial_sar own the argument
         ~trivial_sar() { if(reference != NULL) delete reference; };
 
         bool skip(const infinint & pos) { return reference->skip(pos + offset); };

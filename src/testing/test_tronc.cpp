@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tronc.cpp,v 1.6.4.2 2004/04/20 09:27:02 edrusb Rel $
+// $Id: test_tronc.cpp,v 1.11 2004/10/01 20:55:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -37,6 +37,10 @@ extern "C"
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+   
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
 } // end extern "C"
 
 #include <iostream>
@@ -54,44 +58,46 @@ using namespace libdar;
 int main()
 {
     path p = "test/source.txt";
-    fichier h = fichier(p, gf_read_only);
+    user_interaction *ui = shell_interaction_init(&cout, &cerr, false);
+    fichier h = fichier(*ui, p, gf_read_only);
 
-    shell_interaction_init(&cout, &cerr);
-    display_read(h);
+    display_read(*ui, h);
 
     try
     {
-        fichier f = fichier("test/source.txt", gf_read_only);
+        fichier f = fichier(*ui, "test/source.txt", gf_read_only);
         tronc *t;
 
-        t = new tronc(&f, 0, 10);
+        t = new tronc(*ui, &f, 0, 10);
         t->skip(0);
         cout << t->get_position() << endl;
         cout << f.get_position() << endl;
 
-        display_read(*t);
+        display_read(*ui, *t);
         cout << t->get_position() << endl;
         cout << f.get_position() << endl;
 
-        display_read(*t);
-        cout << t->get_position() << endl;
-        cout << f.get_position() << endl;
-
-        delete t;
-        t = new tronc(&f, 50, 5);
-        cout << t->get_position() << endl;
-        cout << f.get_position() << endl;
-
-        display_read(*t);
+        display_read(*ui, *t);
         cout << t->get_position() << endl;
         cout << f.get_position() << endl;
 
         delete t;
-        S_I fd = ::open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY);
-        fichier g = fd;
+        t = new tronc(*ui, &f, 50, 5);
+        cout << t->get_position() << endl;
+        cout << f.get_position() << endl;
+
+        display_read(*ui, *t);
+        cout << t->get_position() << endl;
+        cout << f.get_position() << endl;
+
+        delete t;
+        S_I fd = ::open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0666);
+	if(fd < 0)
+	    ui->warning(strerror(errno));
+        fichier g = fichier(*ui, fd);
         f.skip(0);
         f.copy_to(g);
-        t = new tronc(&g, 10, 10);
+        t = new tronc(*ui, &g, 10, 10);
 
         try
         {
@@ -104,18 +110,18 @@ int main()
         }
 
         t->skip_to_eof();
-        display_back_read(*t);
-        display_back_read(*t);
+        display_back_read(*ui, *t);
+        display_back_read(*ui, *t);
         g.skip(0);
-        display_read(g);
-        display_read(g);
+        display_read(*ui, g);
+        display_read(*ui, g);
 
         t->skip_relative(-5);
-        display_read(*t);
+        display_read(*ui, *t);
         t->skip(3);
-        display_read(*t);
+        display_read(*ui, *t);
         t->skip_relative(2);
-        display_read(*t);
+        display_read(*ui, *t);
 
         delete t;
     }
@@ -123,4 +129,6 @@ int main()
     {
         f.dump();
     }
+    if(ui != NULL)
+	delete ui;
 }

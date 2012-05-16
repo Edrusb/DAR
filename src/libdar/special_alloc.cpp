@@ -18,17 +18,38 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: special_alloc.cpp,v 1.4.4.1 2004/01/28 15:29:47 edrusb Rel $
+// $Id: special_alloc.cpp,v 1.12 2004/08/03 21:28:01 edrusb Rel $
 //
 /*********************************************************************/
 
-#include "erreurs.hpp"
+#include "../my_config.h"
 #include "special_alloc.hpp"
+#include "erreurs.hpp"
 #include "user_interaction.hpp"
 
 #include <list>
+#include <iostream>
+#include <errno.h>
 
 #ifdef LIBDAR_SPECIAL_ALLOC
+
+#ifdef MUTEX_WORKS
+extern "C"
+{
+#if HAVE_PTHREAD_H
+#include <pthread.h>
+#endif
+}
+static bool alloc_mutex_initialized = false;
+static pthread_mutex_t alloc_mutex;
+#define CRITICAL_START if(!alloc_mutex_initialized)\
+             throw Elibcall("alloc_mutex_initialized", gettext("Thread-safe not initialized for libdar, read manual or contact maintainer of the application that uses libdar"));\
+             pthread_mutex_lock(&alloc_mutex)
+#define CRITICAL_END pthread_mutex_unlock(&alloc_mutex)
+#else // MUTEX does not work or is not available
+#define CRITICAL_START //
+#define CRITICAL_END   //
+#endif // MUTEX_WORKS
 
 using namespace std;
 
@@ -46,69 +67,110 @@ namespace libdar
         unsigned long ref;
     };
 
-    list<struct segment> alloc;
+    static list<struct segment> alloc;
 
     void *special_alloc_new(size_t taille)
     {
         void *ret = NULL;
-        
-        if(alloc.size() == 0 || alloc.back().reste < taille)
-        {
-            struct segment seg;
-            
-            seg.alloc = ::new char[CHUNK_SIZE];
-            if(seg.alloc == NULL)
-                throw Ememory("special_alloc_new");
-            seg.ptr = seg.alloc;
-            seg.reste = CHUNK_SIZE;
-            seg.ref = 0;
-            
-            alloc.push_back(seg);
 
-            if(alloc.size() == 0)
-                throw SRC_BUG;
+	CRITICAL_START;
 
-            if(alloc.back().reste < taille)
-            {
-                ui_printf("requested chunk = %d\n", taille);
-                throw SRC_BUG;
-            }
-        }
+	try
+	{
 
-        ret = alloc.back().ptr;
-        alloc.back().ptr += taille;
-        alloc.back().reste -= taille;
-        alloc.back().ref++;
+	    if(alloc.size() == 0 || alloc.back().reste < taille)
+	    {
+		struct segment seg;
+
+		seg.alloc = ::new char[CHUNK_SIZE];
+		if(seg.alloc == NULL)
+		    throw Ememory("special_alloc_new");
+		seg.ptr = seg.alloc;
+		seg.reste = CHUNK_SIZE;
+		seg.ref = 0;
+
+		alloc.push_back(seg);
+
+		if(alloc.size() == 0)
+		    throw SRC_BUG;
+
+		if(alloc.back().reste < taille)
+		{
+		    cerr << "Requested chunk = "<< taille << endl;
+		    throw SRC_BUG;
+		}
+	    }
+
+	    ret = alloc.back().ptr;
+	    alloc.back().ptr += taille;
+	    alloc.back().reste -= taille;
+	    alloc.back().ref++;
+	}
+	catch(...)
+	{
+	    CRITICAL_END;
+	    throw;
+	}
+	CRITICAL_END;
 
         return ret;
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: special_alloc.cpp,v 1.4.4.1 2004/01/28 15:29:47 edrusb Rel $";
+        static char id[]="$Id: special_alloc.cpp,v 1.12 2004/08/03 21:28:01 edrusb Rel $";
         dummy_call(id);
     }
-   
+
     void special_alloc_delete(void *ptr)
     {
-        list<struct segment>::iterator rit = alloc.begin();
+        list<struct segment>::iterator rit;
 
-        while(rit != alloc.end() && (ptr < rit->alloc || ptr >= rit->alloc+CHUNK_SIZE))
-            rit++;
+	CRITICAL_START;
 
-        if(rit != alloc.end())
-        {
-            (rit->ref)--;
-            if(rit->ref == 0)
-            {
-                ::delete rit->alloc;
-                alloc.erase(rit);
-            }
-        }
-        else
-            throw SRC_BUG; // unknown memory, not allocated here !?
+	try
+	{
+	    rit = alloc.begin();
+	    while(rit != alloc.end() && (ptr < rit->alloc || ptr >= rit->alloc+CHUNK_SIZE))
+		rit++;
+
+	    if(rit != alloc.end())
+	    {
+		(rit->ref)--;
+		if(rit->ref == 0)
+		{
+		    ::delete rit->alloc;
+		    alloc.erase(rit);
+		}
+	    }
+	    else
+		throw SRC_BUG; // unknown memory, not allocated here !?
+	}
+	catch(...)
+	{
+	    CRITICAL_END;
+	    throw;
+	}
+
+	CRITICAL_END;
     }
 
+    void special_alloc_init_for_thread_safe()
+    {
+#ifdef MUTEX_WORKS
+	if(alloc_mutex_initialized)
+	    throw SRC_BUG; // should not be initialized twice
+	alloc_mutex_initialized = true; // we must not be in multi-thread
+	    // environment at that time.
+
+	if(pthread_mutex_init(&alloc_mutex, NULL) < 0)
+	{
+	    alloc_mutex_initialized = false;
+	    throw Erange("special_alloca_init_for_thread_safe", string(gettext("Cannot initialize mutex: ")) + strerror(errno));
+	}
+#endif
+    }
 } // end of namespace
 
 #endif
+

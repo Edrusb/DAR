@@ -1,23 +1,173 @@
-<!-- X-URL: http://gradha.sdf-eu.org/textos/dar-differential-backup-mini-howto.en.html -->
-<!-- Date: Tue, 23 Dec 2003 14:59:21 GMT -->
-<!-- Last-Modified: Sat, 06 Dec 2003 15:00:23 GMT -->
-<BASE HREF="http://gradha.sdf-eu.org/textos/dar-differential-backup-mini-howto.en.html">
-
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.3.0: http://docutils.sourceforge.net/" />
-<title>DAR differential backup mini-howto</title>
+<meta name="generator" content="Docutils 0.3.4: http://docutils.sourceforge.net/" />
+<title>DAR differential backup mini-howto -EN-</title>
 <meta name="author" content="Grzegorz Adam Hankiewicz" />
-<meta name="date" content="2003-12-06" />
+<meta name="date" content="2004-12-16 09:25:52 +0000 (Thu, 16 Dec 2004)" />
 <meta name="copyright" content="This document has been placed in the public domain." />
-<link rel="stylesheet" href="default.css" type="text/css" />
+<style type="text/css">
+
+/*
+:Author: David Goodger
+:Contact: goodger@users.sourceforge.net
+:date: Date: 2002/07/19 02:42:22
+:version: Revision: 1.7
+:copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+*/
+
+a.footnote-reference {
+  font-size: smaller ;
+  vertical-align: super }
+
+a.target {
+  color: blue }
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.attention, div.caution, div.danger, div.error, div.hint,
+div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.hint p.admonition-title, div.important p.admonition-title,
+div.note p.admonition-title, div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.figure {
+  margin-left: 2em }
+
+div.footer, div.header {
+  font-size: smaller }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr {
+  width: 75% }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+dd p:first-child {
+  margin-top: 0px }
+
+li p:first-child {
+  margin-top: 0px }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.literal-block, pre.doctest-block {
+  margin-left: 2em ;
+  margin-right: 2em ;
+  background-color: #eeeeee }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.field-argument {
+  font-style: italic }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option-argument {
+  font-style: italic }
+
+span.problematic {
+  color: red }
+
+table {
+  margin-top: 1em }
+
+table.citation {
+  border-left: solid thin gray ;
+  padding-left: 0.5ex }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.footnote {
+  border-left: solid thin black ;
+  padding-left: 0.5ex }
+
+td.docinfo-name {
+  font-weight: bold ;
+  text-align: right }
+
+td.field-name {
+  font-weight: bold }
+
+</style>
 </head>
 <body>
-<div class="document" id="dar-differential-backup-mini-howto">
-<h1 class="title">DAR differential backup mini-howto</h1>
+<h1 class="title">DAR differential backup mini-howto -EN-</h1>
 <table class="docinfo" frame="void" rules="none">
 <col class="docinfo-name" />
 <col class="docinfo-content" />
@@ -27,17 +177,21 @@
 <tr><th class="docinfo-name">Contact:</th>
 <td><a class="first last reference" href="mailto:gradha&#64;titanium.sabren.com">gradha&#64;titanium.sabren.com</a></td></tr>
 <tr><th class="docinfo-name">Date:</th>
-<td>2003-12-06</td></tr>
+<td>2004-12-16 09:25:52 +0000 (Thu, 16 Dec 2004)</td></tr>
 <tr><th class="docinfo-name">Version:</th>
-<td>1.13</td></tr>
-<tr class="field"><th class="docinfo-name">Web site:</th><td class="field-body"><a class="reference" href="http://gradha.sdf-eu.org/">http://gradha.sdf-eu.org/</a></td>
+<td>H2 ($Rev: 402 $ under <a class="reference" href="http://subversion.tigris.org/">Subversion</a> control)</td></tr>
+<tr class="field"><th class="docinfo-name">Web site:</th><td class="field-body"><a class="reference" href="http://gradha.sdf-eu.org/textos/backup.en.html">http://gradha.sdf-eu.org/textos/backup.en.html</a></td>
 </tr>
 <tr><th class="docinfo-name">Copyright:</th>
 <td>This document has been placed in the public domain.</td></tr>
+<tr class="field"><th class="docinfo-name">Translations:</th><td class="field-body">From the web site you can get this document in
+English, Italian and Spanish.</td>
+</tr>
 </tbody>
 </table>
+<div class="document" id="dar-differential-backup-mini-howto-en">
 <div class="contents topic" id="contents">
-<p class="topic-title"><a name="contents">Contents</a></p>
+<p class="topic-title first"><a name="contents">Contents</a></p>
 <ul class="simple">
 <li><a class="reference" href="#introduction" id="id2" name="id2">Introduction</a></li>
 <li><a class="reference" href="#simple-dar-usage" id="id3" name="id3">Simple DAR usage</a></li>
@@ -46,13 +200,15 @@
 <li><a class="reference" href="#making-differential-backups-with-dar" id="id6" name="id6">Making differential backups with DAR</a></li>
 <li><a class="reference" href="#setting-up-some-scripts-to-automate-the-process" id="id7" name="id7">Setting up some scripts to automate the process</a></li>
 <li><a class="reference" href="#recovering-your-backup-to-a-clean-machine" id="id8" name="id8">Recovering your backup to a clean machine</a></li>
-<li><a class="reference" href="#the-end" id="id9" name="id9">The end</a></li>
+<li><a class="reference" href="#adding-checks-to-the-backup-scripts" id="id9" name="id9">Adding checks to the backup scripts</a></li>
+<li><a class="reference" href="#ideas-for-the-future" id="id10" name="id10">Ideas for the future</a></li>
+<li><a class="reference" href="#the-end" id="id11" name="id11">The end</a></li>
 </ul>
 </div>
 <div class="section" id="introduction">
 <h1><a class="toc-backref" href="#id2" name="introduction">Introduction</a></h1>
 <blockquote>
-<p>We all should make backup of our important data. This omnipresent
+<p>We all should make backups of our important data. This omnipresent
 advice is usually ignored by most people. I ignored it too,
 until I lost a good deal of important data. Not happy enough,
 I managed to continue loosing data in a few posterior incidents,
@@ -70,22 +226,23 @@ differential backups are made. In my situation, very few files
 change from day to day, sometimes the source code of the project
 I'm hacking on, and always my mailboxes.</p>
 <p>The result is that I can restore the contents of my computer to a
-specific day with ease, if I ever need to. <a class="reference" href="http://dar.linux.free.fr/">DAR</a> is a commandline
+specific day with ease, if I ever need to. <a class="reference" href="http://dar.linux.free.fr/">DAR</a> is a command line
 program, and it can get slightly complex with a few options.
 This little mini-howto will explain my custom solution, which
-is very crude, but works fine for me (yes, I've actually tested
-restoring the data from the backup). The document is split in
-a few chapters:</p>
-<ul class="simple">
-<li><a class="reference" href="#simple-dar-usage">Simple DAR usage</a>.</li>
-<li><a class="reference" href="#the-backup-strategy">The backup strategy</a>.</li>
-<li><a class="reference" href="#making-a-full-backup-with-dar">Making a full backup with DAR</a>.</li>
-<li><a class="reference" href="#making-differential-backups-with-dar">Making differential backups with DAR</a>.</li>
-<li><a class="reference" href="#setting-up-some-scripts-to-automate-the-process">Setting up some scripts to automate the process</a>.</li>
-<li><a class="reference" href="#recovering-your-backup-to-a-clean-machine">Recovering your backup to a clean machine</a>.</li>
-</ul>
-<p>Note that all this document applies <strong>only</strong> to version 1.3.0
-of <a class="reference" href="http://dar.linux.free.fr/">DAR</a>. If it works with other versions, you are lucky.</p>
+is very crude, but works fine for me. Yes, I've actually tested
+restoring the data from the backup. In fact, during the end of
+the year 2003 I moved to another country and I took just one
+CD ROM with me plus a bootable <a class="reference" href="http://www.knoppix.org/">Knoppix</a>, and I recovered the exact
+state of my Debian installation in a few hours. No customizing,
+no long installations, no missing files.</p>
+<p>This document was written using version 1.3.0 of <a class="reference" href="http://dar.linux.free.fr/">DAR</a>. When
+I updated to DAR 2.0.3, everything kept working, I didn't
+even have to update my backup archives.  So it looks like the
+interface and backup format are pretty stable, or at least
+backwards compatible. However, don't take everything said here
+for granted.  Verify that the version of <a class="reference" href="http://dar.linux.free.fr/">DAR</a> you have installed
+works as expected and you can restore from the generated backup
+before you have to rely on it.</p>
 <p>This version of the text uses reStructuredText (that's
 what the weird markup in the text version is for). See
 <a class="reference" href="http://docutils.sourceforge.net/">http://docutils.sourceforge.net/</a> for more information.</p>
@@ -94,10 +251,10 @@ what the weird markup in the text version is for). See
 <div class="section" id="simple-dar-usage">
 <h1><a class="toc-backref" href="#id3" name="simple-dar-usage">Simple DAR usage</a></h1>
 <blockquote>
-<p><a class="reference" href="http://dar.linux.free.fr/">DAR</a> is very similar to tar in the number of options it has:
+<p><a class="reference" href="http://dar.linux.free.fr/">DAR</a> is very similar to <a class="reference" href="http://freshmeat.net/projects/tar/">tar</a> in the number of options it has:
 there's plenty for every need, but way too much for beginners to
 handle. As usual, you can always get help from the program typing
-<tt class="literal"><span class="pre">dar</span> <span class="pre">-h</span></tt> or <tt class="literal"><span class="pre">man</span> <span class="pre">dar</span></tt> after you have installed it. Like tar,
+<tt class="literal"><span class="pre">dar</span> <span class="pre">-h</span></tt> or <tt class="literal"><span class="pre">man</span> <span class="pre">dar</span></tt> after you have installed it. Like <a class="reference" href="http://freshmeat.net/projects/tar/">tar</a>,
 there's a set of mandatory switches which define the type of
 operation you are doing (create, extract, list, etc), and a set
 of switches which affect the selected option. Just for the sake
@@ -129,8 +286,8 @@ name. The purpose of the extension is clear, it helps to know
 visually that the file is a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> backup. The number is called
 a <em>slice</em>, and this is related to <a class="reference" href="http://dar.linux.free.fr/">DAR</a>'s built-in feature of
 splitting a backup over several media. If for example you wanted
-to make a backup to CDROM, but your directories are bigger
-than the capacity of one CDROM, you can tell <a class="reference" href="http://dar.linux.free.fr/">DAR</a> to split the
+to make a backup to CD ROM, but your directories are bigger
+than the capacity of one CD ROM, you can tell <a class="reference" href="http://dar.linux.free.fr/">DAR</a> to split the
 archive across as many files as needed, which you can later burn
 to several units.</p>
 <p>Would you like to recover that backup? Pretty easy, type the
@@ -169,13 +326,13 @@ least two parts is going to help <a class="reference" href="http://dar.linux.fre
 split into a 3.8 GB partition where my complete system lives, and
 another partition of 11 GB where all my music and other temporary
 files are stored, like a local Debian package repository I make
-for myself. The second hard disk has a 9.4 GB partition and its
-only purpose is to serve as backup of the first partition. I
+for myself. The second hard disk has a 9.4 GB partition and
+its only purpose is to serve as backup of the primary disk. I
 have no interest in backing up my music, because I have all the
-original CDs lying around.</p>
+original CDs lying around and have scripts to re-ogg them.</p>
 <p>From the 3.8 GB I want to backup, usually between 1.3 and 1.5 GB
 are always empty.  I will split logically the used 2.3 GB into
-<em>system</em> and <em>home directories</em> (at the moment of writting this
+<em>system</em> and <em>home directories</em> (at the moment of writing this
 my home is 588 MB). The reason for this split is that as a normal
 user, I can only change my home directory and other files from
 the partitions I won't be backing up. Meanwhile the <em>system</em>
@@ -192,9 +349,9 @@ data. You can make a <em>system backup</em> of a single machine, and
 <em>home backups</em> of each computer. Another common configuration is
 having a centralized server which exports home directories with
 NFS. Here you only have to backup the server. If you have users
-with high priviledges, leave them the task of doing the <em>system
+with high privileges, leave them the task of doing the <em>system
 backup</em> of their own machines, the exported home is something
-they can ignore.</p>
+they can ignore because it will be done at the server machine.</p>
 <p>Once you've decided what to backup, you want to decide how
 to configure <a class="reference" href="http://dar.linux.free.fr/">DAR</a> for the backups. You can use switches or
 configuration files. Switches are OK when you don't have many
@@ -221,8 +378,8 @@ backup, running as <strong>root</strong>.  Don't worry about the high number
 of switches, I'll go on describing the purpose of each of them:</p>
 <pre class="literal-block">
 dar -m 256 -y -s 600M -D -R / -c `date -I`_data -Z &quot;*.gz&quot; \
-   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -P home/gregorio -P tmp -P mnt \
-   -P dev/pts -P proc -P floppy -P burner -P cdrom
+   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gregorio -P tmp \
+   -P mnt -P dev/pts -P proc -P floppy -P burner -P cdrom
 </pre>
 <ul>
 <li><dl class="first">
@@ -284,9 +441,9 @@ doing a <em>system backup</em> here, so it will be the root directory.</p>
 <dt><tt class="literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_data</span></tt></dt>
 <dd><p class="first">This is the mandatory switch I talked of before, and it means
 to create a backup archive. For those who don't understand
-what follows, <tt class="literal"><span class="pre">`date</span> <span class="pre">-I`</span></tt> is the shell's backtick
+what follows, <tt class="literal"><span class="pre">`date</span> <span class="pre">-I`</span></tt> is the shell's back tick
 expansion. In short, <tt class="literal"><span class="pre">date</span> <span class="pre">-I</span></tt> will provide a date as
-YYYY-MM-DD format. With backticks and used as a parameter,
+YYYY-MM-DD format. With back ticks and used as a parameter,
 the output of the command will be used as a string of the
 parent command. This way you can create backup archives with
 the creation date embedded in the name. If you still don't
@@ -299,8 +456,8 @@ echo &quot;Today's date is `date -I`&quot;
 </dl>
 </li>
 <li><dl class="first">
-<dt><tt class="literal"><span class="pre">-Z</span> <span class="pre">mask</span></tt></dt>
-<dd><p class="first last">Using normal file name globbing you can specify patterns
+<dt><tt class="literal"><span class="pre">-Z</span> <span class="pre">file_pattern</span></tt></dt>
+<dd><p class="first last">Using normal file name globing you can specify patterns
 of files you want to store in your archive without
 compression. This only has sense if you use the <tt class="literal"><span class="pre">-y</span></tt>
 switch. Compressing compressed files only yields bigger files
@@ -328,8 +485,8 @@ switches you might want to use. And here's the command line I'll
 be running as a plain user inside my home directory:</p>
 <pre class="literal-block">
 dar -m 256 -y -s 600M -D -R /home/gregorio -c `date -I`_data \
-   -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -P instalacion_manual \
-   -P Mail/mail_pa_leer
+   -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; \
+   -P instalacion_manual -P Mail/mail_pa_leer
 </pre>
 <p>Nothing new under the sun. As you see, most of the command line
 is identical to the other one, I only change the name of the
@@ -347,14 +504,14 @@ the latest differential backup as reference. Here's the command
 line for a <em>system</em> differential backup:</p>
 <pre class="literal-block">
 dar -m 256 -y -s 600M -D -R / -c `date -I`_diff -Z &quot;*.gz&quot; \
-   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -P home/gregorio -P tmp -P mnt \
-   -P dev/pts -P proc -P floppy -P burner -P cdrom \
+   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gregorio -P tmp \
+   -P mnt -P dev/pts -P proc -P floppy -P burner -P cdrom \
    -A previous_backup
 </pre>
 <ul>
 <li><dl class="first">
 <dt><tt class="literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_diff</span></tt></dt>
-<dd><p class="first last">I only change the name of the file, cosmetical purpose.</p>
+<dd><p class="first last">I only change the name of the file, cosmetic purpose.</p>
 </dd>
 </dl>
 </li>
@@ -374,8 +531,8 @@ question at the command line.</p>
 completeness:</p>
 <pre class="literal-block">
 dar -m 256 -y -s 600M -D -R /home/gregorio -c `date -I`_diff \
-   -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -P instalacion_manual \
-   -P Mail/mail_pa_leer -A previous_backup
+   -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; \
+   -P instalacion_manual -P Mail/mail_pa_leer -A previous_backup
 </pre>
 <p><a class="reference" href="http://dar.linux.free.fr/">DAR</a> has another nice feature we don't use here:
 <em>catalogues</em>. When you create a backup archive with <a class="reference" href="http://dar.linux.free.fr/">DAR</a>,
@@ -410,8 +567,9 @@ DIR=/oldg/backup
 FILE=${DIR}/`/bin/date -I`_data
 # Commands
 /usr/local/bin/dar -m 256 -y -s 600M -D -R / -c $FILE -Z &quot;*.gz&quot; \
-   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -P home/gregorio -P tmp -P mnt \
-   -P dev/pts -P proc -P floppy -P burner -P cdrom &gt; /dev/null
+   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gregorio -P tmp \
+   -P mnt -P dev/pts -P proc -P floppy -P burner \
+   -P cdrom &gt; /dev/null
 /usr/local/bin/dar -t $FILE &gt; /dev/null
 /usr/bin/find $DIR -type f -exec chown .gregorio \{\} \;
 /usr/bin/find $DIR -type f -exec chmod 440 \{\} \;
@@ -427,7 +585,7 @@ would like to compile <a class="reference" href="http://dar.linux.free.fr/">DAR<
 you make them so nobody can touch them. And run <a class="reference" href="http://www.tripwire.org/">Tripwire</a> over
 them too.</li>
 <li><a class="reference" href="http://dar.linux.free.fr/">DAR</a> generates statistics after each run. We don't want them
-in our cron because it will generate unnecesary mail. Only
+in our cron because it will generate unnecessary mail. Only
 <tt class="literal"><span class="pre">stdout</span></tt> is redirected to <tt class="literal"><span class="pre">/dev/null</span></tt>. Errors will be
 reported and a mail generated if something goes wrong.</li>
 <li>The last two <tt class="literal"><span class="pre">find</span></tt> commands are optional. I use them to
@@ -447,7 +605,7 @@ DIR=/oldg/backup
 FILE=${DIR}/`/bin/date -I`_diff
 PREV=`/bin/ls $DIR/*.dar|/usr/bin/tail -n 1|/usr/bin/awk -F '.' '{print $1;}'`
 /usr/local/bin/dar -m 256 -y -s 600M -D -R / -c $FILE -Z &quot;*.gz&quot; \
-   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -P home/gregorio -P tmp -P mnt \
+   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gregorio -P tmp -P mnt \
    -P dev/pts -P proc -P floppy -P burner -P cdrom -A $PREV &gt; /dev/null
 /usr/local/bin/dar -t $FILE &gt; /dev/null
 /usr/bin/find $DIR -type f -exec chown .gregorio \{\} \;
@@ -470,7 +628,7 @@ extension. This means that if we don't get rid of the tail,
 the user, defeating the purpose of automation. We separate the
 complete filename with <tt class="literal"><span class="pre">awk</span></tt>. The <tt class="literal"><span class="pre">awk</span></tt> command separates
 the string at the dots, and prints the first column. The result
-is the basename we want to pass <a class="reference" href="http://dar.linux.free.fr/">DAR</a>.</li>
+is the base name we want to pass <a class="reference" href="http://dar.linux.free.fr/">DAR</a>.</li>
 </ul>
 <p>We only have to put these two scripts under cron control. This
 is what we have to type after <tt class="literal"><span class="pre">crontab</span> <span class="pre">-e</span></tt>:</p>
@@ -492,8 +650,8 @@ DIR=/oldg/backup_gregorio
 FILE=${DIR}/`/bin/date -I`_data
 # Commands
 /usr/local/bin/dar -m 256 -y -s 600M -D -R /home/gregorio -c $FILE \
-   -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -P .spec -P instalacion_manual \
-   -P Mail/mail_pa_leer &gt; /dev/null
+   -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; \
+   -P instalacion_manual -P Mail/mail_pa_leer &gt; /dev/null
 /usr/local/bin/dar -t $FILE &gt; /dev/null
 /usr/bin/find $DIR -type f -exec chmod 400 \{\} \;
 
@@ -504,8 +662,8 @@ DIR=/oldg/backup_gregorio
 FILE=${DIR}/`/bin/date -I`_diff
 PREV=`/bin/ls $DIR/*.dar|/usr/bin/tail -n 1|/usr/bin/awk -F '.' '{print $1;}'`
 /usr/local/bin/dar -m 256 -y -s 600M -D -R /home/gregorio -c $FILE \
-   -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -P .spec -P instalacion_manual \
-   -P Mail/mail_pa_leer -A $PREV &gt; /dev/null
+   -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.zip&quot; \
+   -P instalacion_manual -P Mail/mail_pa_leer -A $PREV &gt; /dev/null
 /usr/local/bin/dar -t $FILE &gt; /dev/null
 /usr/bin/find $DIR -type f -exec chmod 400 \{\} \;
 </pre>
@@ -559,8 +717,98 @@ files. You can put the result in a temporary directory, so the
 nice thing is you don't have to wipe your hard disk to test it.</p>
 </blockquote>
 </div>
+<div class="section" id="adding-checks-to-the-backup-scripts">
+<h1><a class="toc-backref" href="#id9" name="adding-checks-to-the-backup-scripts">Adding checks to the backup scripts</a></h1>
+<blockquote>
+<p>Denis Corbin suggests that the scripts creating the backups could
+verify the exit status of the <a class="reference" href="http://dar.linux.free.fr/">DAR</a> command. For the purpose of
+these very simple scripts this is not critical because <a class="reference" href="http://dar.linux.free.fr/">DAR</a>
+itself will bail out with an error message, and cron will
+report any output through mail (something which doesn't happen
+if everything goes right).</p>
+<p>However, testing the exit status can be useful if you are testing
+the scripts interactively and want to know which commands are
+executed:</p>
+<pre class="literal-block">
+#!/bin/sh
+
+DIR=/oldg/backup
+FILE=${DIR}/`/bin/date -I`_data
+# Commands
+if /usr/local/bin/dar -m 256 -y -s 600M -D -R / -c $FILE -Z &quot;*.gz&quot; \
+      -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gregorio -P tmp \
+      -P mnt -P dev/pts -P proc -P floppy -P burner \
+      -P cdrom &gt; /dev/null ; then
+   if /usr/local/bin/dar -t $FILE &gt; /dev/null ; then
+      echo &quot;Archive created and successfully tested.&quot;
+   else
+      echo &quot;Archive created but test FAILED.&quot;
+   fi
+else
+   echo &quot;Archive creating FAILED.&quot;
+fi
+/usr/bin/find $DIR -type f -exec chown .gregorio \{\} \;
+/usr/bin/find $DIR -type f -exec chmod 440 \{\} \;
+</pre>
+<p>You can test this version easily running the script and killing
+the <a class="reference" href="http://dar.linux.free.fr/">DAR</a> process from another terminal or console with <tt class="literal"><span class="pre">killall</span>
+<span class="pre">dar</span></tt>. That will force the termination of the <a class="reference" href="http://dar.linux.free.fr/">DAR</a> process and
+you will see that one of the failure branches is reached in the
+backup script.</p>
+<p>Another possible use of testing the status code could be to
+remove incomplete archives from the hard disk if something
+went wrong, trigger additional external commands when something
+fails, or avoid testing the created archive when you know that
+the first command already failed. The latter can be done easily
+concatenating both the creation and testing commands with <tt class="literal"><span class="pre">&amp;&amp;</span></tt>
+in a single line. That will tell the shell to run both commands
+as a sequence and avoid running the second if the first failed.</p>
+<p>However, if a power failure happens in the middle of a backup,
+this version of the script would still leave dangling invalid
+archives. To prevent this you could enhance the script to do
+a <em>positive verification</em>. This means creating the backup in
+a temporary directory along with a <tt class="literal"><span class="pre">*.valid</span></tt> file if the
+successful branch of the script is reached.</p>
+<p>With this strategy, another cron script monitoring the directory
+where the temporary backups are placed would move to the final
+backup directory those archives which have a <tt class="literal"><span class="pre">*.valid</span></tt> file,
+deleting all other whose last modification timestamp is older
+than one hour.</p>
+</blockquote>
+</div>
+<div class="section" id="ideas-for-the-future">
+<h1><a class="toc-backref" href="#id10" name="ideas-for-the-future">Ideas for the future</a></h1>
+<blockquote>
+<p>I'm not going to implement these soon, because I'm very lazy,
+but if you are one of those hyperactive hackers, here are some
+things which would be nice:</p>
+<ul class="simple">
+<li>Unify both the main and differential scripts into a single one,
+so if the script is run and there is no main backup for the
+current month, the main backup will be created. Useful if
+your machine happens to be down during the time the monthly
+backup is done.</li>
+<li>Upgrade the scripts to generate daily a CDROM image with
+<a class="reference" href="http://www.fokus.fhg.de/research/cc/glone/employees/joerg.schilling/private/cdrecord.html">cdrecord</a> and burn it automatically to a rewritable disc
+placed in your machine. So if your whole hard disk is trashed,
+you still have the last backup on removable media. Of course,
+this is limited and cannot be automated if your backup spans
+more than one CDROM. Do the same for ZIP/JAZZ/whatever you have.</li>
+<li>Integration of generated backups with a mini <a class="reference" href="http://www.knoppix.org/">Knoppix</a> bootable
+distribution. Or any other floppy distribution which can be
+booted from CDROM. So you have a recovery CDROM with tools to
+format your hard disk, and near it you have a fresh backup to
+restore a working machine.</li>
+<li>Synchronisation of backup directories through Internet with
+remote hosts. Even if the whole machine is burnt physically
+along with your house, you have up to date backups somewhere
+else. Could be done easily with programs like <a class="reference" href="http://rsync.samba.org/">rsync</a> through
+<a class="reference" href="http://www.openssh.com/">ssh</a> running in a cron job.</li>
+</ul>
+</blockquote>
+</div>
 <div class="section" id="the-end">
-<h1><a class="toc-backref" href="#id9" name="the-end">The end</a></h1>
+<h1><a class="toc-backref" href="#id11" name="the-end">The end</a></h1>
 <blockquote>
 And that's the whole <em>magic</em>. If you have problems, something
 is unclear or wrong (which is worse), drop me an email. If you
@@ -569,7 +817,7 @@ translation of the file <tt class="literal"><span class="pre">source.en.txt</spa
 it along this version and users can find easily their localized
 version. Talking about locations, you should be able to get
 the source of this document from my personal home page (link
-<a class="reference" href="#dar-differential-backup-mini-howto">at the beginning of the document</a>).</blockquote>
+<a class="reference" href="#dar-differential-backup-mini-howto-en">at the beginning of the document</a>).</blockquote>
 <blockquote>
 Enjoy!</blockquote>
 </div>

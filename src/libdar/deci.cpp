@@ -18,11 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: deci.cpp,v 1.5.4.3 2004/09/10 22:34:15 edrusb Exp $
+// $Id: deci.cpp,v 1.10 2004/09/13 13:07:51 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
+
 #include <iostream>
 #include "deci.hpp"
 #include "erreurs.hpp"
@@ -45,7 +46,7 @@ namespace libdar
     {
         E_BEGIN;
         if(c < '0' || c > '9')
-            throw Edeci("deci.cpp : digit_htoc", "invalid decimal digit");
+            throw Edeci("deci.cpp : digit_htoc", gettext("invalid decimal digit"));
         return chiffre(c - '0');
         E_END("deci.cpp : digit_htoc", "");
     }
@@ -124,7 +125,7 @@ namespace libdar
             size++;
 
         if(size == 0) // empty string
-            throw Erange("deci::deci(string s)", "an empty string is an invalid argument");
+            throw Erange("deci::deci(string s)", gettext("an empty string is an invalid argument"));
 
         decimales = new storage(size);
         if(decimales == NULL)
@@ -246,7 +247,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: deci.cpp,v 1.5.4.3 2004/09/10 22:34:15 edrusb Exp $";
+        static char id[]="$Id: deci.cpp,v 1.10 2004/09/13 13:07:51 edrusb Rel $";
         dummy_call(id);
     }
 

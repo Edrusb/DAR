@@ -18,9 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: int_tools.hpp,v 1.1.2.1 2004/07/25 20:38:03 edrusb Exp $
+// $Id: int_tools.hpp,v 1.3 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file int_tools.hpp
+    /// \brief elementary operation for infinint integers
+    /// \ingroup Private
 
 #ifndef INT_TOOLS_HPP
 #define INT_TOOLS_HPP

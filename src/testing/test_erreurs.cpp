@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_erreurs.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_erreurs.cpp,v 1.8 2004/05/21 08:28:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -32,12 +32,7 @@ using namespace libdar;
 using namespace std;
 
 void f1(S_I i);
-void f2(S_I i, S_I j) throw(Erange);
-
-void status()
-{
-    cout << "nombre total d'exceptions : " << Egeneric::total() << "   dont  " << Egeneric::alive() << " vivante(s) " << " et " << Egeneric::zombies() << " zombie(s) " << endl;
-}
+void f2(S_I i, S_I j);
 
 void f1(S_I i)
 {
@@ -55,7 +50,7 @@ void f1(S_I i)
     }
 }
 
-void f2(S_I i, S_I j) throw(Erange)
+void f2(S_I i, S_I j)
 {
     try
     {
@@ -72,7 +67,7 @@ void f2(S_I i, S_I j) throw(Erange)
     catch(Egeneric & e)
     {
         e.stack("f2", "unexpected");
-        throw;
+        throw; // Can throw an Unexpected exception (see englobing function declaration)
     }
 }
 
@@ -83,13 +78,9 @@ void f3()
         Ememory *x;
         Ebug y = SRC_BUG;
         string s;
-        
-        status();
+
         x = new Ememory("f3");
-        status();
-        Egeneric::display_last_destroyed();
         delete x;
-        status();
     }
     catch(Egeneric & e)
     {
@@ -102,25 +93,20 @@ void f4()
 {
     Erange *y;
     Erange x = Erange("essai", "coucou");
+    Edeci dec = Edeci("f4", "essai");
 
-    status();
-    Egeneric::display_last_destroyed();
     x.stack("ajout", "par ici");
     x.stack("crotte", "par ila");
-    
+    dec.dump();
+
     y = new Erange(x);
     y->dump();
     y->dump();
-    status();
-    Egeneric::display_last_destroyed();
     delete y;
-    status();
-    Egeneric::display_last_destroyed();
 }
 
 int main()
 {
-    status();
     f4();
     f4();
     f4();
@@ -133,10 +119,8 @@ int main()
     catch(Egeneric & e)
     {
         e.dump();
-        status();
     }
-    status();
-    
+
     try
     {
         f2(0, 10);
@@ -146,10 +130,4 @@ int main()
         e.dump();
     }
 
-    status();
-    Egeneric::display_alive();
-    Egeneric::display_last_destroyed();
-    status();
-    Egeneric::clear_last_destroyed();
-    status();
 }

@@ -6,29 +6,37 @@ PRESENTATION
 ================
 dar is a shell command, that makes backup of a directory tree and files.
 It has been tested under Linux, Windows (95, 2000, NT, XP), Solaris 8,
-FreeBSD and NetBSD. External GUI are possible thanks to the libdar library
-and its API.
+FreeBSD and NetBSD, it has been reported as working under Mac OS X 10.3.
+
+	*** See below an important note for Mac OS ! ***
+
+External GUI are possible thanks to the libdar library and its API.
 
 Actually dar is a set of six commands:
         dar
         dar_xform
         dar_slave
         dar_manager
-        dar_static (statically linked version of dar, it does not exist for
-                    Cygwin nor Solaris)
+        dar_static (statically linked version of dar, not all system
+	            support static linking)
         dar_cp
 
 And since version 2.0.0 theses commands are based on a library called
-libdar. This library is part of dar and licensed under the Gnu General
+libdar. This library is part of dar and licensed under the GNU General
 Public License (GPL in the following) like all the source code of the Dar
 suite programs. This imply that you can link libdar to your programs at
-the condition that your programs are also covered by the GPL, which says
+the condition that your programs are also covered by the GPL too, which says
 in particular that you must provide source code of your program. See
 COPYING file for details.
 
-To use the libdar library an API has been defined. See doc/DOC_API for details
-on this API. Have a look at doc/LINKS to get a non exhaustive list of external
-applications that relies on libdar.
+To use the libdar library an API has been defined. See doc/api_tutorial.html
+for details on this API. Have a look at doc/LINKS to get a non exhaustive
+list of external applications that relies on libdar.
+
+
+INSTALLATION
+==============
+see INSTALL file
 
 
 PACKAGE CONTENT
@@ -37,6 +45,10 @@ for functional description see the ./doc/FEATURES file
 for actual limitations see the ./doc/LIMITATIONS file
 for installation instructions see ./INSTALL file
 for a brief tutorial see ./doc/TUTORIAL file
+for some Frequently Asked Questions see ./doc/FAQ
+for a brief tutorial about libdar and its API ./doc/api_tutorial.html
+for a reference about API see ./doc/html/index.hmtl (you need doxygen,
+    the doc/html pages are built when typing 'make').
 for those who like to start with examples see ./doc/samples/REAME file
 for complete usage help see man page (type 'man dar' after installation)
 for detailed information on miscellaneous topics see the ./doc/NOTES file
@@ -45,4 +57,77 @@ for planned features see ./TODO
 for list of changes see ./Changelog
 for license information see ./COPYING
 for author information see ./AUTHOR
+
+
+VERSION PATTERN USED
+=====================
+Disk Archive package include both dar and libdar.
+
+The package is released under a three integer version (like 2.2.0 for example)
+
+- The first integer is called the major, and changes upon very general review of
+  the implementation. (versions 1 had all source files in a single directory, did
+  not used the autoconf configuration script, etc.).
+- The second integer (called medium), changes when new features are added.
+- The third integer (called minor), changes when bugs are fixed. Thus if you want
+  a very stable release check the one with the highest minor version.
+
+Over this version of the released package, there is also a version for each
+binary executable (dar, dar_xform, dar_slave, etc.) and for the libdar API.
+Theses versions follow the same rule of major.medium.minor and grow independently
+to each others. To know the version a binary is part of use the -V option.
+
+
+RELEASING PROCESS
+==================
+
+Here is the current release process:
+
+- development phase. The source taken from CVS should always compile (except in
+   some cases as seen recently when some specific compilation option have not
+   been tested after the addition of a new feature). Each added feature is tested
+   right after addition (usually before CVS archiving), so the CVS development
+   code should stay functional most of the time.
+   During this phase can take place API discussion, feature requests, etc.
+
+- API frozen phase. In this phase the API does not change, still new features are
+  added while they do not need API change. In this phase, client software can
+  upgrade to the new API, test and send their feedback. We will try to keep
+  at least one month for this phase.
+
+- Pre-release phase. The pre-release software is provided as a software to be
+  tested against the many possible environment. Anyone is welcome to test it
+  use it, toggle it as much as possible. The idea is to be sure that no forgotten
+  compilation situation or option combinaton have been forgotten. Several
+  pre-released versions may be available in each phase depending on the problem
+  seen by pre-releasers. The pre-release phase is at least one month long.
+
+- Release phase. The software is released under an appropriate version (minor
+  number starting to zero). Support requests is available, bug fix is the top
+  priority. New version that fix the reported bugs are released with the minor
+  number incremented by one. Fixes are also reported in the development branch
+  (a concurrent development phase takes place when starting a major release).
+
+- Obsolete phase. When comes the time for a new major release, the version
+  is no more updated against bug fix, unless backward release is necessary
+  (if a very big problem is detected in the next major release). Support
+  for obsolete versions is not available.
+
+
+MAC OS X
+============
+While dar does work properly under MAC OS X it has actually no consideration
+about file forks. MAC OS X seems to uses Macintosh structure of files where,
+to a given filename corresponds two parts: the data fork and the resource fork.
+The data fork matches the file contents of Unix filesystems, while the resource
+fork has no correspondence in Unix usual systems. For this reason actually dar
+does not save or restore resource forks, while they are crucial for some type
+files like program files for examples (the Power PC code is saved under the
+resource fork while the m86K code is saved under the file fork, for what I have
+read), some pictures have a preview picture in the resource fork, fonts are
+stored as resource fork, and so on.
+
+So, it is preferable to not rely on dar to make a backup of the whole MacOS X
+system, but you can still use it for data that you know are not using resource
+fork or don't bother loosing them.
 

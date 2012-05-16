@@ -39,7 +39,7 @@ space).
 Special integer mode
 ---------------------
 To overcome the previously explained memory issue, dar can be build in an
-other mode. In this other mode "infinint" is replaced by 32 bits or 64 bits
+other mode. In this other mode, "infinint" is replaced by 32 bits or 64 bits
 integers, as defined by the use of --enable-mode=32 or --enable-mode=64
 options given to configure script. The executables built this way (dar,
 dar_xform, dar_slave and dar_manager) run faster and use much less memory than
@@ -50,8 +50,13 @@ slice size, file size, dates, number of files to backup, total archive size
 which is 4,294,967,296 for 32 bits and 18,446,744,073,709,551,616 for 64 bits
 integers.
 
+In clear the 32 bits version cannot handle dates after year 2106
+and file sizes over 4 GB. While the 64 bits version cannot handle dates after
+around 500 billion years (which is longer than the estimated age of the
+Universe: 15 billion years) and file larger than around 18 EB (18 exa bytes).
+
 What the comportment when such a limit is reached ?
-For compatibility with the rest of the code limited length integers (32 or 64
+For compatibility with the rest of the code, limited length integers (32 or 64
 for now) cannot be used as-is, they are enclosed in a C++ class, which will
 report overflow in arithmetic operations. Archives generated with all the
 different version of dar will stay compatible between them, but the 32 bits or
@@ -65,13 +70,35 @@ Long/short options
 on several systems, command-line long options are not available. This is due
 to the fact that dar relies on GNU getopt. Systems like FreeBSD do not have
 by default GNU getopt, instead the getopt function proposed from the standard
-library do not support long options, nor optional arguments. On such system
+library does not support long options, nor optional arguments. On such system
 you will have to use short options only, and to overcome the lack of optional
 argument you need to explicitly set the argument. For example in place of "-z"
-use "-z 9" and so on. The vast majority of dar's features are available with
-FreeBSD's getopt, using short options and explicit arguments.
+use "-z 9" and so on. All options for dar's features are available with
+FreeBSD's getopt, just using short options and explicit arguments.
 
 Else you can install GNU getopt as a separated library called libgnugetopt. If
 the include file <getopt.h> is also available, the configure script will detect
-it and use this library. This way you can have long options.
+it and use this library. This way you can have long options on FreeBSD for
+example.
+
+the three dates of files
+------------------------
+Unix files have three dates :
+- last modification date (mtime)
+- last access date       (atime)
+- last inode change      (ctime)
+
+There is no standard way under Unix to change the ctime. So DAR does not save
+ctime date not it tries can restore it. Reading a file (when doing a backup or
+a comparison) updates the atime of the read files. Some applications like
+leafnode (an NNTP cache) base their expiry time on the atime. So since the
+the beginning and still by default, dar sets back the atime of file it reads.
+But changing the atime updates the ctime, which cannot be set back to its
+original value. As the ctime was not taken in account this was not a problem
+to me until I got feedback that some security tool base their inspection on
+the ctime (A file that had the ctime changed is most probably changed, in
+particular if the atime has not changed, this may indicate a dissimulation).
+
+So there is now a special mode in which dar does not try to set back the atime
+of files which preserves the ctime.
 

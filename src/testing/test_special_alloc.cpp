@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_special_alloc.cpp,v 1.2.4.1 2004/01/28 15:29:47 edrusb Rel $
+// $Id: test_special_alloc.cpp,v 1.5 2004/05/21 08:28:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,7 +27,6 @@
 #include "special_alloc.hpp"
 #include "user_interaction.hpp"
 #include "test_memory.hpp"
-#include "shell_interaction.hpp"
 
 #include <iostream>
 
@@ -39,8 +38,6 @@ int main()
     const int max = 3;
     void *ptr[max];
 #endif
-
-    shell_interaction_init(&cout, &cerr);
 
     MEM_BEGIN;
     MEM_IN;
@@ -68,6 +65,4 @@ int main()
 
     MEM_OUT;
     MEM_END;
-
-    shell_interaction_close();
 }

@@ -18,10 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea_filesystem.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: ea_filesystem.hpp,v 1.6 2004/11/07 18:21:37 edrusb Rel $
 //
 /*********************************************************************/
 //
+
+    /// \file ea_filesystem.hpp
+    /// \brief contains a set of routine to read or write EA to filesystem
+    /// \ingroup Private
+
 #ifndef EA_FILESYSTEM_HPP
 #define EA_FILESYSTEM_HPP
 
@@ -31,13 +36,13 @@
 
 namespace libdar
 {
-    
+
     extern void ea_filesystem_read_ea(const std::string & chemin, ea_attributs & val, bool root, bool user);
     extern bool ea_filesystem_write_ea(const std::string & chemin, const ea_attributs & val, bool root, bool user);
         // false if no EA could be set (true if at least one could be set)
     extern void ea_filesystem_clear_ea(const std::string & name, ea_domain dom);
     extern bool ea_filesystem_is_present(const std::string & name, ea_domain dom);
-    
+
 } // end of namespace
 
 #endif

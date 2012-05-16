@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database.cpp,v 1.13.4.1 2003/12/20 23:05:34 edrusb Rel $
+// $Id: database.cpp,v 1.23 2005/01/20 21:07:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -37,6 +37,7 @@ extern "C"
 
 #include <iomanip>
 #include <iostream>
+#include <deque>
 #include "database.hpp"
 #include "user_interaction.hpp"
 #include "deci.hpp"
@@ -72,7 +73,7 @@ void database::build(generic_file & f, bool partial)
     if(&f == NULL)
         throw SRC_BUG;
     coordinate.clear();
-    infinint tmp = infinint(NULL, &f); // number of archive to read
+    infinint tmp = infinint(f.get_gf_ui(), NULL, &f); // number of archive to read
     while(tmp > 0)
     {
         tools_read_string(f, dat.chemin);
@@ -81,7 +82,7 @@ void database::build(generic_file & f, bool partial)
         tmp--;
     }
     if(coordinate.size() < 1)
-        throw Erange("database::database", "badly formated database");
+        throw Erange("database::database", gettext("Badly formated database"));
     tools_read_vector(f, options_to_dar);
     tools_read_string(f, dar_path);
     if(!partial)
@@ -135,9 +136,9 @@ void database::add_archive(const catalogue & cat, const string & chemin, const s
     if(files == NULL)
         throw SRC_BUG;
     if(basename == "")
-        throw Erange("database::add_archive", "empty string is an invalid archive basename");
+        throw Erange("database::add_archive", gettext("Empty string is an invalid archive basename"));
     if(number >= ARCHIVE_NUM_MAX)
-        throw Erange("database::add_archive", "cannot add another archive, database is full");
+        throw Erange("database::add_archive", gettext("Cannot add another archive, database is full"));
 
     dat.chemin = chemin;
     dat.basename = basename;
@@ -145,17 +146,20 @@ void database::add_archive(const catalogue & cat, const string & chemin, const s
     data_tree_update_with(cat.get_contenu(), number, files);
 }
 
-void database::remove_archive(archive_num num)
+void database::remove_archive(archive_num min, archive_num max)
 {
-    vector<struct archive_data>::iterator it = coordinate.begin() + num;
-
-    if(num == 0 || num >= coordinate.size())
-        throw Erange("database::remove_archive", "non-existant archive in database");
-    coordinate.erase(it);
-    if(files == NULL)
-        throw SRC_BUG;
-    files->remove_all_from(num);
-    files->skip_out(num);
+    if(min > max)
+	throw Erange("database::remove_archive", gettext("Incorrect archive range in database"));
+    if(min == 0 || max >= coordinate.size())
+        throw Erange("database::remove_archive", gettext("Incorrect archive range in database"));
+    for(U_I i = max ; i >= min ; i--)
+    {
+	coordinate.erase(coordinate.begin() + i);
+	if(files == NULL)
+	    throw SRC_BUG;
+	files->remove_all_from(i);
+	files->skip_out(i);
+    }
 }
 
 void database::change_name(archive_num num, const string & basename)
@@ -163,7 +167,7 @@ void database::change_name(archive_num num, const string & basename)
     if(num < coordinate.size() && num != 0)
         coordinate[num].basename = basename;
     else
-        throw Erange("database::change_name", "non-existant archive in database");
+        throw Erange("database::change_name", gettext("Non existent archive in database"));
 }
 
 void database::set_path(archive_num num, const string & chemin)
@@ -171,7 +175,7 @@ void database::set_path(archive_num num, const string & chemin)
     if(num < coordinate.size() && coordinate[num].basename != "")
         coordinate[num].chemin = chemin;
     else
-        throw Erange("database::change_name", "non-existant archive in database");
+        throw Erange("database::change_name", gettext("Non existent archive in database"));
 }
 
 void database::set_permutation(archive_num src, archive_num dst)
@@ -181,9 +185,9 @@ void database::set_permutation(archive_num src, archive_num dst)
     if(files == NULL)
         throw SRC_BUG;
     if(src > coordinate.size() || src <= 0)
-        throw Erange("database::set_permutation", string("Invalid archive number: ") + tools_int2str(src));
+        throw Erange("database::set_permutation", string(gettext("Invalid archive number: ")) + tools_int2str(src));
     if(dst > coordinate.size() || dst <= 0)
-        throw Erange("database::set_permutation", string("Invalid archive number: ") + tools_int2str(dst));
+        throw Erange("database::set_permutation", string(gettext("Invalid archive number: ")) + tools_int2str(dst));
 
     moved = coordinate[src];
     coordinate.erase(coordinate.begin()+src);
@@ -193,27 +197,27 @@ void database::set_permutation(archive_num src, archive_num dst)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: database.cpp,v 1.13.4.1 2003/12/20 23:05:34 edrusb Rel $";
+    static char id[]="$Id: database.cpp,v 1.23 2005/01/20 21:07:53 edrusb Rel $";
     dummy_call(id);
 }
 
-void database::show_contents() const
+void database::show_contents(user_interaction & dialog) const
 {
     string opt = tools_concat_vector(" ", options_to_dar);
 
-    ui_printf("\ndar path    : %S\n", &dar_path);
-    ui_printf("dar options : %S\n\n", &opt);
+    dialog.printf(gettext("\ndar path    : %S\n"), &dar_path);
+    dialog.printf(gettext("dar options : %S\n\n"), &opt);
 
-    ui_printf("archive #   |    path      |    basename\n");
-    ui_printf("------------+--------------+---------------\n");
+    dialog.printf(gettext("archive #   |    path      |    basename\n"));
+    dialog.printf("------------+--------------+---------------\n");
     for(archive_num i = 1; i < coordinate.size(); i++)
     {
-        opt = (coordinate[i].chemin == "") ? "<empty>" : coordinate[i].chemin;
-        ui_printf(" \t%u\t%S\t%S\n", i, &opt, &coordinate[i].basename);
+        opt = (coordinate[i].chemin == "") ? gettext("<empty>") : coordinate[i].chemin;
+        dialog.printf(" \t%u\t%S\t%S\n", i, &opt, &coordinate[i].basename);
     }
 }
 
-void database::show_files(archive_num num) const
+void database::show_files(user_interaction & dialog, archive_num num) const
 {
     if(files == NULL)
         throw SRC_BUG;
@@ -222,14 +226,14 @@ void database::show_files(archive_num num) const
         if(files == NULL)
             throw SRC_BUG;
 
-        files->show(num);
+        files->show(dialog, num);
     }
     else
-        throw Erange("database::show_files", "non existant archive in database");
+        throw Erange("database::show_files", gettext("Non existent archive in database"));
 }
 
 
-void database::show_version(path chemin) const
+void database::show_version(user_interaction & dialog, path chemin) const
 {
     const data_tree *ptr = NULL;
     const data_dir *ptr_dir = files;
@@ -239,27 +243,27 @@ void database::show_version(path chemin) const
         throw SRC_BUG;
 
     if(!chemin.is_relative())
-        throw Erange("database::show_version", "invalid path, path must be relative");
+        throw Erange("database::show_version", gettext("Invalid path, path must be relative"));
 
     while(chemin.pop_front(tmp) && ptr_dir != NULL)
     {
         ptr = ptr_dir->read_child(tmp);
         if(ptr == NULL)
-            throw Erange("database::show_version", "non existant file in database");
+            throw Erange("database::show_version", gettext("Non existent file in database"));
         ptr_dir = dynamic_cast<const data_dir *>(ptr);
     }
 
     if(ptr_dir == NULL)
-        throw Erange("database::show_version", "non existant file in database");
+        throw Erange("database::show_version", gettext("Non existent file in database"));
 
     ptr = ptr_dir->read_child(chemin.display());
     if(ptr == NULL)
-        throw Erange("database::show_version", "non existant file in database");
+        throw Erange("database::show_version", gettext("Non existent file in database"));
     else
-        ptr->listing();
+        ptr->listing(dialog);
 }
 
-void database::show_most_recent_stats() const
+void database::show_most_recent_stats(user_interaction & dialog) const
 {
     vector<infinint> stats_data(coordinate.size(), 0);
     vector<infinint> stats_ea(coordinate.size(), 0);
@@ -269,28 +273,29 @@ void database::show_most_recent_stats() const
         throw SRC_BUG;
     files->compute_most_recent_stats(stats_data, stats_ea, total_data, total_ea);
 
-    ui_printf("  archive #   |  most recent/total data |  most recent/total EA\n");
-    ui_printf("--------------+-------------------------+-----------------------\n");
+    dialog.printf(gettext("  archive #   |  most recent/total data |  most recent/total EA\n"));
+    dialog.printf("--------------+-------------------------+-----------------------\n");
     for(archive_num i = 1; i < coordinate.size(); i++)
-        ui_printf("\t%u %i/%i \t\t\t %i/%i\n", i, &stats_data[i], &total_data[i], &stats_ea[i], &total_ea[i]);
+        dialog.printf("\t%u %i/%i \t\t\t %i/%i\n", i, &stats_data[i], &total_data[i], &stats_ea[i], &total_ea[i]);
 }
 
 
-void database::restore(const vector<string> & filename, bool early_release)
+void database::restore(user_interaction & dialog, const vector<string> & filename, bool early_release)
 {
     map<archive_num, vector<string> > command_line;
-    vector<string>::iterator it = const_cast<vector<string> *>(&filename)->begin();
-    vector<string>::iterator fin = const_cast<vector<string> *>(&filename)->end();
+    deque<string> anneau;
     const data_tree *ptr;
 
+    anneau.assign(filename.begin(), filename.end());
     if(files == NULL)
         throw SRC_BUG;
 
         // determination of the archive to restore and files to restore for each selected archive
-    while(it != fin)
+    while(anneau.size() > 0)
     {
-        if(data_tree_find(*it, *files, ptr))
+        if(data_tree_find(anneau.front(), *files, ptr))
         {
+	    const data_dir *ptr_dir = dynamic_cast<const data_dir *>(ptr);
             archive_num num_data = 0;
             archive_num num_ea = 0;
 
@@ -300,31 +305,51 @@ void database::restore(const vector<string> & filename, bool early_release)
             if(num_data == num_ea)
             {
                 if(num_data != 0)
-                    command_line[num_data].push_back(*it);
+		{
+		    command_line[num_data].push_back("-g");
+                    command_line[num_data].push_back(anneau.front());
+		}
             }
             else
             {
                 if(num_data != 0)
-                    command_line[num_data].push_back(*it);
+		{
+		    command_line[num_data].push_back("-g");
+                    command_line[num_data].push_back(anneau.front());
+		}
                 if(num_ea != 0)
-                    command_line[num_ea].push_back(*it);
+		{
+		    command_line[num_data].push_back("-g");
+                    command_line[num_ea].push_back(anneau.front());
+		}
                 if(num_data != 0 && num_ea != 0)
                     if(num_data > num_ea) // will restore "EA only" then "data + old EA"
-                        user_interaction_warning(string("concerning file ") + *it
-                                                 + " : archive #" + tools_int2str(num_data)
-                                                 + " contains the most recent data and some old EA while archive #"
-                                                 + tools_int2str(num_ea)
-                                                 + " contains a delta with the most recent EA only. Dar manager "
-                                                 + "will always restore archive in the order they have been added "
-                                                 + "in database, thus, for this file, last EA version, will not be "
-                                                 + "overwritten by the older version, saved with the data. "
-                                                 + " Either rebuid the database adding archive following chronological order "
-                                                 + " or restore EA manually from archive#" + tools_int2str(num_ea) + ".");
+		    {
+			string fic = anneau.front();
+			dialog.printf(gettext("Concerning file %S  : archive #%d contains the most recent data and some old EA while archive #%d contains the most recent EA only."), &fic, num_data, num_ea);
+			dialog.printf(gettext("Dar manager will always restore files from the archives in the order they have been added in database, thus, for this file, last EA version, will be overwritten by the older version associated with saved data."));
+			dialog.printf(gettext("To avoid such type of problem, reorder the archive in the database to have the most recent ones having the higher index number"));
+		    }
             }
+
+	    if(ptr_dir != NULL)
+	    {  // adding current directory children in the list of files
+		vector<string> fils;
+		vector<string>::iterator fit;
+		path base = anneau.front();
+		ptr_dir->read_all_children(fils);
+
+		fit = fils.begin();
+		while(fit != fils.end())
+		    anneau.push_back((base + *(fit++)).display());
+	    }
         }
         else
-            user_interaction_warning(string("cannot restore file ") + *it + " : non existant file in database");
-        it++;
+	{
+	    string fic = anneau.front();
+            dialog.printf(gettext("Cannot restore file %S : non existent file in database"), &fic);
+	}
+        anneau.pop_front();
     }
 
         //freeing memory if early_release is set
@@ -363,21 +388,21 @@ void database::restore(const vector<string> & filename, bool early_release)
 		argvector += options_to_dar;
                 argvector += ut->second;
 
-                cout << "CALLING DAR: " << tools_concat_vector(" ", argvector) << endl;
-                tools_system(argvector);
+                cout << gettext("CALLING DAR: ") << tools_concat_vector(" ", argvector) << endl;
+                tools_system(dialog, argvector);
             }
             catch(Erange & e)
             {
-                user_interaction_warning(string("Error while restoring the following files : ")
-                                         + tools_concat_vector( " ", ut->second)
-                                         + "   : "
-                                         + e.get_message());
+                dialog.warning(string(gettext("Error while restoring the following files : "))
+			       + tools_concat_vector( " ", ut->second)
+			       + "   : "
+			       + e.get_message());
             }
             ut++;
         }
     }
     else
-        user_interaction_warning("Cannot restore any file, nothing to do");
+        dialog.warning(gettext("Cannot restore any file, nothing done"));
 }
 
 static storage *file2storage(generic_file &f)

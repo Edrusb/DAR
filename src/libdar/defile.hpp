@@ -18,9 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: defile.hpp,v 1.5.4.1 2004/07/25 20:38:03 edrusb Exp $
+// $Id: defile.hpp,v 1.7 2004/11/07 18:21:37 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file defile.hpp
+    /// \brief here is defined the defile class
+    /// \ingroup Private
 
 #ifndef DEFILE_HPP
 #define DEFILE_HPP
@@ -31,7 +35,14 @@
 
 namespace libdar
 {
+	/// the defile class keep trace of the real path of files while the flow in the filter routines
 
+	/// the filter routines manipulates flow of inode, where their relative order
+	/// represent the directory structure. To be able to know what is the real path
+	/// of the current inode, all previously passed inode must be known.
+	/// this class is used to display the progression of the filtering routing,
+	/// and the file on which the filtering routine operates
+	/// \ingroup Private
     class defile
     {
     public :

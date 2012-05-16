@@ -1,0 +1,121 @@
+#!/usr/bin/perl -w
+
+use strict;
+use diagnostics;
+
+# Device that is the DVD drive
+my $DVD=("/dev/hdc");
+
+# Size of each slice - DVD max is 4482M
+# MC - for testing
+# my $SLICE_SIZE=("10M");
+# my $SLICE_SIZE=("4400M"); # doesn't work
+# BUG - Linux isofs limited to single files of 2^32=4096MB
+# my $SLICE_SIZE=("4000M");
+# value used by Daromizer is bigger than mine, use it
+# my $SLICE_SIZE=("4189500K");
+# need more space for parity data
+my $SLICE_SIZE=("4000M");
+
+# directory that all paths must be relative to
+# NOTE - all backup paths are relative to this
+my $ROOT_DIR=("/mnt/backup");
+
+# where all created files will be stored
+my $STORAGEDIR=("/mnt/backup/backups/");
+
+# list of dirs to be backed up
+# NOTE 1 - these are paths relative for $ROOT_DIR, above
+# NOTE 2 - this is used for naming; everything after the last / is used
+# for the base name. DO NOT have two things be the same (like /usr/bin and 
+# /usr/local bin). Otherwise, one will be overwritten
+# MC for testing
+# my @BACKUPDIRS=("test");
+my @BACKUPDIRS=("local","home","pub");
+
+# this the path to the slice as expressed in things that dar will
+# substitute the right values for (it's just used in 2 places)
+my $SLICE_PATH=("%p/%b.%n.%e");
+my $SLICE_NAME=("%b.%n");
+
+my $PARITY_PATH=("%p/%b.%n.par2");
+# par2 creates a bunch of "vol" files, we need those too
+my $PARITY_FILES=("%p/%b.%n.*.par2");
+
+# list of stuff to be compressed. This must be in the form of
+# -Z \"*.mask\"
+# with -Z repeated for each one
+my $NO_COMPRESS_LIST=("-Z \"*.gz\" -Z \"*.GZ\" -Z \"*.bz2\" -Z \"*.BZ2\" -Z \"*.zip\" -Z \"*.ZIP\" -Z \"*.ogg\" -Z \"*.OGG\" -Z \"*.mp3\" -Z \"*.MP3\" -Z \"*.mpg\" -Z \"*.MPG\" -Z \"*.mpeg\" -Z \"*.MPEG\" -Z \"*.wmv\" -Z \"*.WMV\" -Z \"*.avi\" -Z \"*.AVI\" -Z \"*.jpg\" -Z \"*.JPG\" -Z \"*.jpeg\" -Z \"*.JPEG\" -Z \"*.png\" -Z \"*.PNG\" -Z \"*.gif\" -Z \"*.GIF\"");
+
+my $PRE_PARITY_MESSAGE=("echo ; echo Caclulating parity information; echo");
+
+my $PARITY_COMMAND=("par2create -r10 $PARITY_PATH $SLICE_PATH");
+
+my $PRE_BLANK_MESSAGE=("echo ; echo Done archive, erasing DVD; echo");
+
+my $BLANK_COMMAND=("dvd+rw-format -force /dev/hdc");
+
+my $PRE_REC_MESSAGE=("echo ; echo Done erasing, burning to DVD; echo");
+
+# Command to record the DVD, with options
+# -dvd-compat = make the most compatible DVD by closing the session
+# -Z = create a new session
+# -r = generate sane rock ridge extensions
+# -J = generate Joliet extensions
+# -V = volume ID
+# %b = dar will substitute the base name
+# %n = dar will substitute the number of the slice
+# %p = dar will substitute slice path
+# FOR TESTING = -dry-run
+my $RECORD_COMMAND=("growisofs -dvd-compat -Z $DVD  -r -J -V $SLICE_NAME $SLICE_PATH $PARITY_PATH $PARITY_FILES");
+
+my $EJECT_COMMAND=("eject $DVD");
+
+my $POST_REC_MESSAGE=("echo ; echo Done burning $SLICE_NAME ; echo");
+
+# deletes files once done with them
+# note - use AFTER record command
+# MC - for testing
+# my $DELETE_COMMAND=("echo deleting $SLICE_PATH $PARITY_PATH $PARITY_FILES");
+my $DELETE_COMMAND=("rm -f $SLICE_PATH $PARITY_PATH $PARITY_FILES");
+
+# dar with basic options
+# -y = compress with bzip2 using default compression of 6
+# -s = slice it up
+# -R = root dir that all things to be backed up live in
+# -D = store empty directories too
+# -p = pause and wait for user to change DVD before continuing
+# -c (used below) = create an archive called whatever
+# FOR TESTING = -e
+my $DAR=("dar -y -s $SLICE_SIZE -R $ROOT_DIR -D $NO_COMPRESS_LIST -p -E \"$PRE_PARITY_MESSAGE ; $PARITY_COMMAND ; $PRE_BLANK_MESSAGE ; $BLANK_COMMAND ; $PRE_REC_MESSAGE ; $RECORD_COMMAND ; $EJECT_COMMAND ; $DELETE_COMMAND ; $POST_REC_MESSAGE\""); 
+
+&main;
+
+sub main{
+    my $backup_base;
+    my $backupdir;
+    my ($day, $month, $year) = (localtime)[3,4,5];
+    $year+=1900; # compensate for 1900 based year
+    $month+=1; # compensate for base 0 months
+    my $targetbase;
+    my $pause; # garbage input...
+
+    foreach $backupdir (@BACKUPDIRS){
+	# this gets rid of paths and such from $backupdir, just in case
+	$backup_base=$backupdir;
+	$backup_base =~ s/^\///;   # remove leading /
+	$backup_base =~ s/\w+\///g;   # remove everything matching "someword/"
+	$targetbase=$STORAGEDIR.$backup_base."_".$month."_".$day."_".$year;
+
+ 	print("Working on $backup_base\n");
+
+# MC for debugging
+#	print("Command is: $DAR $backupdir -c $targetbase");
+
+	system("$DAR $backup_base -c $targetbase");
+
+	print "Work on $backup_base complete. Change the DVD and\n";
+	print "press any key to continue...";
+	$pause = <STDIN>;  #Like a PAUSE statement in DOS .bat files
+    }
+}

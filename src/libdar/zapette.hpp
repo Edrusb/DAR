@@ -18,10 +18,19 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.hpp,v 1.5.2.2 2004/09/22 03:14:24 edrusb Rel $
+// $Id: zapette.hpp,v 1.10 2004/11/07 18:21:39 edrusb Rel $
 //
 /*********************************************************************/
 //
+
+    /// \file zapette.hpp
+    /// \brief remote control between dar and dar_slave.
+    ///
+    /// Two classes are defined in this module
+    /// - zapette is the dar side master class
+    /// - slave_zapette dar_slave side
+    /// .
+    /// theses two classes communicate throw a pair pipes
 
 #ifndef ZAPETTE_HPP
 #define ZAPETTE_HPP
@@ -34,11 +43,22 @@
 namespace libdar
 {
 
+	/// zapette emulate a file that is remotely controlled by slave_zapette
+
+	/// class zapette sends order to slave_zapette throw a
+	/// a first pipe and receive informations or data in return
+	/// from a second pipe from slave_zapette
+	/// \ingroup Private
     class zapette : public contextual
     {
     public:
 
-        zapette(generic_file *input, generic_file *output);
+	    /// zapette constructor
+
+	    /// \param[in] dialog is used to return status information to the user
+	    /// \param[in] input is the pipe (see class tuyau) from which is received the information or data
+	    /// \param[in] output is used to send orders to slave_zapette
+        zapette(user_interaction & dialog, generic_file *input, generic_file *output);
         ~zapette();
 
             // inherited methods from generic_file
@@ -64,12 +84,28 @@ namespace libdar
 	void make_transfert(U_16 size, const infinint &offset, char *data, const std::string & info, S_I & lu, infinint & arg);
     };
 
+	/// this class answers to order given by a zapette object
+
+	/// through a pair of pipes slave_zapette return information about
+	/// a given local archive (single or multi slices).
+	/// \ingroup Private
     class slave_zapette
     {
     public:
+
+	    /// slave_zapette constructor
+
+	    /// \param[in] input is used to receive orders from an zapette object
+	    /// \param[in] output is used to return informations or data in answer to received orders
+	    /// \param[in] data is where the informations or data is taken from
         slave_zapette(generic_file *input, generic_file *output, contextual *data);
         ~slave_zapette();
 
+
+	    /// main execution method for slave_zapette class
+
+	    /// this method implement a loop waiting for orders and answering to them
+	    /// the loop stops when a special order is received from the peer zapette object
         void action();
 
     private:

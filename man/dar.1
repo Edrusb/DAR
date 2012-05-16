@@ -102,7 +102,7 @@ Do not warn before overwriting file or slice. By default (no -n and no -w) overw
 This implies the -w option, and means that over avoiding warning for file overwriting, DAR also avoid signaling a file about to be removed when its type is not the expected one. File are removed when they have been recorded as deleted since the archive of reference. At restoration of the differential archive, if a file of the given name exists, it is remove, but if the type does not match the file that was present at the time of the archive of reference (directory, plain file, fifo, socket, char or block device, etc.), a warning is normally issued to prevent the accidental removal of data that was not saved in the backup of reference. (See also -k option)
 .TP 20
 -R, --fs-root <path>
-The path points to the directory tree containing all the files that will be enrolled in the operation (backup or restoration). By default the current directory is used. All other paths used in -P option or in the [list of paths] on the command line are and must be relative to this path (or to current directory if -R is not present).
+The path points to the directory tree containing all the files that will be enrolled in the operation (backup or restoration). By default the current directory is used. All other paths used in -P or -g options on the command line are and must be relative to this path (or to current directory if -R is not present).
 .TP 20
 -X, --exclude <mask>
 The mask is a string with wild cards (like * and ?) which is applied to filenames which are not directories. If a given file matches the mask, it is excluded from the operation. By default (no -X on the command line), no file is excluded from the operation. -X may be present several times on the command line, in that case a file will not be considered for the given operation if it matches at least one -X mask.
@@ -111,16 +111,38 @@ The mask is a string with wild cards (like * and ?) which is applied to filename
 The mask is applied to filenames which are not directories. If a given file matches the mask and does not match any mask given with -X, the file is selected for the operation. By default (no -I and no -X on the command line), all files are included for the operation. -I may be present several times on the command line, in that case all file that match one of the -I mask will be considered for the given operation, if they do not also match one of the -X mask.
 .TP 20
 -P, --prune <path>
-Do not consider file or directory sub-tree given by the path. -P may be present several time on the command line. By default no sub-tree or file is excluded from the operation, and all the directory tree as indicated by -R is considered. Note that <path> may contains wild-cards like * or ? see
+Do not consider file or directory sub-tree given by the path. -P may be present several time on the command line. The difference with -X is that the mask is not applied only to the filename, but also include the path. Moreover it applies also to directories (-X does not). By default (no -P on the command-line), no sub-tree or file is excluded from the operation, and all the directory tree (as indicated by -Roption) is considered. Note that <path> may contains wild-cards like * or ? see
 .B glob(7)
 man page for more informations.
 .TP 20
-[list of paths]
-files or directory to only take in account, as opposed to -P. By default all files under the -R directory are considered. Else, if one or more file are given, just those are selected (if they do not match any -P option). All paths given this way must be relative to the -R directory.
+-g, --go-into <path>
+Files or directory to only take in account, as opposed to -P. -g may be present several time on command-line. Same thing here, the difference with -I is that the mask is applied to the path+filename and also concerns directories. By default all files under the -R directory are considered. Else, if one or more -g option is given, just those are selected (if they do not match any -P option). All paths given this way must be relative to the -R directory. This is equivalent as giving <path> out of any option. All theses out of option arguments are also referred as [list of paths]. Warning, -g option cannot receive wild-cards (nor [list of paths]), they will not be interpreted.
 .P
-File selection in brief:
+.B File selection in brief:
 .P
-As seen above, -I -X -P and [list of paths] are used to select the files to operate on. -I and -X only use the basename of files and do not apply to directories, while -P and [list of paths] use the full name including the path and do apply to directories. A directory is elected for operation if no -P option excludes it, and if a [list of paths] is present, this directory is one of its member or a subdirectory of one of its members. If a directory is not selected, no recursion is done in it (the directory is pruned). For other files, over this previous mechanisms, a second test must be satisfied: no -X option must exclude the filename, and if some -I option are given, at least one must include the given file (using or not wild-cards).
+As seen above, -I -X -P and -g options are used to select the files to operate on. -I and -X only use the filename of files and do not apply to directories, while -P and -g use the filename *and* the path, they *do* apply to directories.
+.P
+since version 2.2.0 two modes of interpretation of theses options exist. The normal original method and the ordered method:
+.RS
+.TP 5
+the normal method is the default:
+A directory is elected for operation if no -P option excludes it. If at least one -g option is given one command line, one -g option must cover it, else it is not elected for operation. If a directory is not selected, no recursion is done in it (the directory is pruned). For non directories files, the same is true (P and -g do apply) and a second test must also be satisfied: no -X option must exclude the filename, and if at least one -I option is given, one must match the given filename (using or not wild-cards).
+.TP 5
+the ordered method (when -am option is given on command-line):
+The ordered method takes care of the order of presence between -X and -I on one hand and of -P and -g in the other hand. In the ordered method the last argument take precedence on all the previous ones, let's take an example:
+.RS
+.TP 5
+-X "*.mp?" -I "*.mp3" -I "toto*"
+Here dar will include all files except file of name "*.mp?" (those ending with "mpX" where X is any character), but it will however include those ending with "mp3". It will also include files which name begin by "toto" whatever they end with. This way, "toto.mp2" will be saved (it begins by "toto") as well as "titi.txt" as well as "joe.mp3" (it ends by "mp3"). But will not be saved "joe.mp2" (because it does not begin by "toto", nor ends by "mp3", and match "*.mp?" mask). As we see the last option (-I or -X) overcomes the previous one. -P and -g act the same but as seen above they do not act on filename only, but on the whole path+filename. Note that (-g , -P) and (-X , -I) are independent concerning their relative order. You can mix -X -I -g -P in any order, what will be important is the relative positions of -X options compared to -I options, and the relative positions of -g options relatively to -P options.
+.RE
+.P
+In logical terms, if <prev_mask> is the mask generated by all previous mask on the command line, -I <mask> generates the new following mask: <prev_mask> or <mask> . While -X <mask> generates the new following mask: <prev_mask> and not <mask>. This is recursive each time you add a -I or -X option. Things work the same with -P and -g options.
+.P
+-g option has been said to be equivalent to [list of paths]. This is true in the normal method, but false using the ordered method. Argument given in [list of paths] are usually moved after any other options, so they loose their relative position regarding -P options. In the ordered method this is annoying, thus -g option has been created to overcome this getopt() system call behavior.
+.RE
+.B This ends the file selection explication
+let's continue with other options.
+.P
 .TP 20
 -u, --no-user-EA
 Do not consider the Extended Attributes (EA) of the user namespace. By default, they are saved and restored, if the support for EA has been activated at compilation time. If not, this option is forced internally (you need not specify it).
@@ -128,7 +150,9 @@ Do not consider the Extended Attributes (EA) of the user namespace. By default, 
 -U, --no-system-EA
 Do not consider the EA of the root (or system) namespace. By default, they are saved and restored, if the support for EA has been activated at compilation time. If not, this option is forced internally (you need not specify it).
 .P
-Note concerning Extended Attributes (EA): support for EA must be activated at compilation time (--enable-ea-support given to the configure script), if your system supports it. Thus you can get two binaries of dar (of the same version), one supporting EA and another which does not (dar -V to see whether EA support is activated). The archives they produce are the same and can be read by each other. The only difference is that the binary without EA support is not able to save or restore EAs, but is still able to test them and list their presence.
+.B Note concerning Extended Attributes (EA)
+.P
+support for EA must be activated at compilation time (--enable-ea-support given to the configure script), if your system supports it. Thus you can get two binaries of dar (of the same version), one supporting EA and another which does not (dar -V to see whether EA support is activated). The archives they produce are the same and can be read by each other. The only difference is that the binary without EA support is not able to save or restore EAs, but is still able to test them and list their presence.
 .TP 20
 -i, --input <path>
 is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c or -C is used). When reading from pipe, standard input is used, but with this option, the file <path> (usually a named pipe) is used instead.  This option is to receive output from dar_slave program (see doc/NOTES for examples of use).
@@ -172,12 +196,17 @@ Several -E option can be given, given commands will then be called in the order 
 -F, --execute-ref <string>
 same as -E but is applied between slices of the reference archive (-A option).
 .TP 20
--K, --key <string>
-scramble or unscramble the archive using <string> as pass phrase. A scrambled archive can only be read if the same pass phrase is given. OK, that's a very weak scheme, I don't even speak about encryption. So why this feature ? Because I needed it. Without any tool, it is really difficult for a human to crack the scramble (if the key is long enough and is not the repetition of a shorter sequence. For not very important data you it might be useful to avoid UN-experimented people to have a look at you data.
-
+-K, --key [[<algo>]:]<string>
+encrypt/decrypt the archive using the <algo> cypher with the <string> as pass phrase. An encrypted archive can only be read if the same pass phrase is given. Available cyphers are "blowfish" (alias "bf") for strong encryption and "scrambling" (alias "scram") for a very weak encryption. By default if no <algo> or no ':' is given, the flowfish cypher is assumed. If your password contains a column ':' you need to specify the cypher to use (or at least use the initial ':' which is equivalent to 'bf:'). If the <string> is empty the pass phrase will be asked at execution time. Thus, the smallest argument that -K can receive is ':' which means blowfish cypher with the pass phrase asked at execution time.
 .TP 20
--J, --key-ref <string>
-same as -K but the given key is used to unscramble the archive of reference (given with -A option).
+-J, --key-ref [[<algo>]:]<string>
+same as -K but the given key is used to decrypt the archive of reference (given with -A option).
+.TP 20
+-#, --crypto-block <size>
+to be able to randomly access data in an archive, it is not encrypted globally but block by block. You can define the encryption block size thanks to this argument which default to 10240 bytes. Note that syntax used for -s option is also available here. Note also that crypto-block is stored as a 32 bits integer thus value larger than 4GB will cause an error.
+.TP 20
+-*, --crypto-block-ref <size>
+same as --crypto-block but for the archive of reference (same default value).
 .TP 20
 -B, --batch <filename>
 You can put in the file any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occurs in case of loop (a file includes itself) and DAR aborts immediately. Comments are now allowed, and must start by a hash `#' character on each line. Note that for a line to be considered as comment the hash character must be the first character of the line (space or tab can still precede the hash). See
@@ -191,6 +220,35 @@ section bellow.
 .TP 20
 -e, --empty
 Do not perform any action (backup or restoration), displays all messages as if it was for real ("dry run" action).
+.TP 20
+-aSI, --alter=SI[-unit[s]]
+when using k M G T E Z Y prefixes to define a size, use the SI meaning: multiple of 10^3 (a Mega is 1,000,000).
+.TP 20
+-abinary, --alter=binary[-unit[s]]
+when using k M G T E Z Y prefixes to define a size, use the historical computer science meaning: multiple of 2^10  (a Mega is 1,048,576).
+.P
+--alter=SI and --alter=binary can be used several times, they affect all prefix which follow even those found in file included by -B option up to the next --alter=... occurrence. Note that if in a file included by -B option an --alter=binary or --alter=SI is met, it affects all the following prefix even those outside the included files (for example in the following "-B some.dcf -s 1K" 1K may be equal to 1000 or 1024 depending on the presence of an --alter=SI or --alter=binary in the file some.dcf. By default (before any --alter=SI/binary argument has been reached), binary interpretation of suffix is done (for compatibility with older versions).
+.TP 20
+-Q
+Do not display initial warning on stderr when not launched from a terminal (for example when launched from an at job or crontab). Remains that any question to the user will be assumed a 'no' answer, which most of the time will abort the program. Important, this option cannot be used in configuration files (see -B option), it must be present on the command line.
+.TP 20
+-aa, --alter=atime
+when reading a filesystem, while doing a backup (-c option) or comparing (-d option) by default dar tries to be as much transparent as possible, and set back the last access time (atime) of read files and directories, as if they have not been read. But, preserving atime of read files, make their ctime to be changed (last inode change). There is no possibility to preserve both atime and ctime. If you want to overcome the default original behavior of dar and want to keep ctime unchanged, the --alter=atime is for you. Some security software rely on the ctime to be preserved, some other software rely on the atime to be preserved like leafnode NNTP caching software.
+.TP 20
+-ac, --alter=ctime
+set back the date alteration to ctime (see --alter=atime above), this is the default behavior. The use of this switch is to override the -aa option in dar configuration files or command-line (see -B option). From -aa and -ac the one which is last parsed from command-line or included files takes the win.
+.TP 20
+-am, --alter=mask
+set the ordered mode for mask. This affects the way -I and -X options are interpreted, as well as -g and -P options, and -Z and -Y options. It can take any place on the command-line and can be placed only once.
+.TP 20
+-an, --alter=no-case
+set the filters in case insensitive mode. This concerns only masks specified after this option (see also -acase option below). This changes the behavior of -I, -X, -g, -P, -Z and -Y options.
+.TP 20
+-acase, --alter=case
+set back to case sensitive mode for filters. All following masks are case insensitive, up to end of parsing or up to the next -an option. This changes the behavior of -I, -X, -g, -P, -Z and -Y options.
+.TP 20
+-j, --jog
+when virtual memory is exhausted, as user to make room before trying to continue. By default, when memory is exhausted dar aborts.
 .PP
 .RE
 SAVING AND ISOLATION OPTIONS (to use with -c or -C)
@@ -204,7 +262,7 @@ compresses within slices using gzip algorithm (if not specified, no compression 
 compresses using bzip2 algorithm. See -z above for usage details.
 .TP 20
 -s, --slice <number>
-Size of the slices in bytes. If the number is appended by k (or K), M, G, T, P E, Z or Y the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes or yottabytes respectively. Example: "20M" means 20 megabytes it is the same as giving 20971520 as argument. If -s is not present the backup will be written to a single slice whatever the size of the backup may be (there is probably some filesystem limitation, thus you might expect problems for file size over 2 gigabytes, depending on your filesystem, but this is not a limitation of dar).
+Size of the slices in bytes. If the number is appended by k (or K), M, G, T, P E, Z or Y the size is in kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, zettabytes or yottabytes respectively. Example: "20M" means 20 megabytes, by default, it is the same as giving 20971520 as argument (see also -aSI and -abinary options). If -s is not present the backup will be written to a single slice whatever the size of the backup may be (there is probably some filesystem limitation, thus you might expect problems for file size over 2 gigabytes, depending on your filesystem, but this is not a limitation of dar).
 .TP 20
 -S, --first-slice <number>
 -S gives the size of the first slice which may be chosen independently of the size of following slices. This option needs -s and by default, the size of the first slice is the same as the one of the following slices.
@@ -213,12 +271,12 @@ Size of the slices in bytes. If the number is appended by k (or K), M, G, T, P E
 pauses before writing to a new slice (this requires -s). By default there is no pause, all slices are written in the same directory, up to the end of the backup or until the filesystem is full. In this later case, the user is informed of the lack of disk space and dar stops for user action. As soon as some disk space is available, the user can continue the backup.
 .TP 20
 -A, --ref [<path>]/<basename>
-specifies the archive to use as reference (mandatory with -C). By default no archive is used and all files are saved (in regards to -I -X -P and the "list of paths"). All slices of the reference backup are expected to be on the same directory given by <path> or the current directory by default. Usually only the first and the last slice are required to extract the catalogue of reference and the use of symbolic links is also possible here to gather slices that do not reside in the same directory. You can also point <path> to a floppy or any other mounted directory, because
+specifies the archive to use as reference (mandatory with -C). By default no archive is used and all files are saved (in regards to -I -X -P and -g options). All slices of the reference backup are expected to be on the same directory given by <path> or the current directory by default. Usually only the first and the last slice are required to extract the catalogue of reference and the use of symbolic links is also possible here to gather slices that do not reside in the same directory. You can also point <path> to a floppy or any other mounted directory, because
 .B dar
 will pause and ask the user for required slices if they are not present.
 .TP 20
 -D, --empty-dir
-When excluding directories either explicitly using -P option, or implicitly giving a [list of paths],
+When excluding directories either explicitly using -P option, or implicitly by giving a -g option
 .B dar
 does not store anything about theses. But with -D option, dar stores them as empty directories. This can be useful, if excluding a mount point (like /proc or /dev/pts). At restoration time, dar will then recreate theses directories (if necessary). This option has no meaning with -C and is ignored in that case.
 .TP 20
@@ -226,7 +284,7 @@ does not store anything about theses. But with -D option, dar stores them as emp
 Filenames covered by this mask are not compressed. It is only useful with -z or -y. By default, all file are compressed (if compression is used). This option can be used several times, in that case a file that matches one of the -Z mask will not be compressed.
 .TP 20
 -Y, --include-compression <mask>
-Filenames covered by this mask (and not covered by -Z) are the only to be compressed. It is only available with -z no -y. By default all files are compressed. This option can be used several times, in that case all files that match one of the -Y will be compressed, if they do not also match on of the -Z masks.
+Filenames covered by this mask (and not covered by -Z) are the only to be compressed. It is only available with -z no -y. By default all files are compressed. This option can be used several times, in that case all files that match one of the -Y will be compressed, if they do not also match on of the -Z masks. The ordered method here applies too when activated (with -am option), it works exactly the same as -I and -X options, but apply to file compression, not file selection.
 .TP 20
 -m, --mincompr <number>
 files which size is below this value will not be compressed. If -m is not specified it is equivalent to giving
@@ -237,6 +295,12 @@ on the command line. The same number extensions as those used with -s or -S are 
 .TP 20
 --nodump
 do not save files which have the 'd' flag set (see chattr(1) lsattr(1) ext2 commands). This option may not be available if the system dar has been compiled on did not provide support for ext2 flags.
+.TP 20
+-G, --on-fly-isolate [<path>]/<basename>
+When creating a backup, perform a catalogue isolation of the resulting archive. This step is done after the backup has completed. The on-fly isolation is compressed with bzip2 (using compression level 9), and is a single sliced archive without encryption. Due to command-line exiguity, it is not possible to change compression algo, slice size or encryption scheme for the on-fly isolation. If you need a more complicated thing, either look for a GUI over libdar, or do a normal isolation (By the way it is possible to isolate an already isolated catalogue, this is equivalent to a copy, but you can add encryption, change compression, change slicing, etc.), you can also use dar_xform if you only want to change slices size (this is faster as no decompression/re-compression is done).
+.TP 20
+-M, --no-mount-points
+stay in the same filesystem as the root directory (see -R option), subdirectory that are mounting points for other filesystems will not be saved or saved empty if -D option is used.
 .PP
 .PP
 .RE
@@ -271,7 +335,7 @@ can be used to have a listing that displays the tree structure.
 list only saved files
 .TP 20
 -I and -X
-can be used to filter file to list base on their name. With -T the tree structure is not filtered unlike without -T. Note that -P and [list of path] is not available while listing.
+can be used to filter file to list base on their name. With -T the tree structure is not filtered unlike without -T. Note that -P and -g options are not available while listing.
 .P
 Else only -v and -b from general options are useful. Note that -v displays an archive summary first, where a lot of information about the archive can be obtained.
 .TP 10
@@ -324,9 +388,9 @@ must be replaced by -w d or -w default
 must be replaced by -H 1
 .P
 .B important !
-When using GNU getopt() optional arguments are available by sticking the argument to the option, "-z" for example is available as well as "-z9" , but "-z 9" will be read as "-z" option and "9" as member of [list of path]. When using a non GNU getopt, "-z" becomes an option that requires an argument, and thus "-z 9" is read as "-z" option with "9" as argument, while "-z9" will be rejected as a unknown option. In consequences, you
+When using GNU getopt(), optional arguments are available by sticking the argument to the option: "-z" for example is available as well as "-z9". But "-z 9" is wrong, it will be read as "-z" option and "9" as member of [list of path]. In the other side, when using a non GNU getopt this time, "-z" becomes an option that always requires an argument, and thus "-z 9" is read as "-z" option with "9" as argument, while "-z9" will be rejected as a unknown option, and "-z" alone will generate an error as no argument is provided. In consequences, you
 .B need
-a space between the option (like "-z") and its argument (like "9"), when optional argument are not available.
+a space between the option (like "-z") and its argument (like "9"), when dar does not rely on a GNU getopt() call.
 
 
 .SH EXIT CODES
@@ -359,6 +423,12 @@ an error has occurred when calling a libdar routine. This means the caller (dar 
 .TP 10
 8
 the version used of dar is based in finite length integers (it has been compiled with the option --enable-mode=...). This code is returned when an integer overflow occurred. use the full version (based in infinint) to avoid this error.
+.TP 10
+9
+this code indicates an unknown error. I have probably forgotten to update the exception caching code to take care of new exceptions... this is a minor bug you are welcome to report.
+.TP 10
+10
+you have tryed to use a feature that has been disabled at compilation time.
 
 .SH FILES
 .B $HOME/.darrc

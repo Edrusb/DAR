@@ -28,7 +28,7 @@ displays version information.
 make the terminal ring when user interaction is required (like for example the creation of a new slice when using the -p option)
 .TP 20
 -s <number>
-Size of the slices in bytes. If the number is followed by k (or K), M, G, T or P the size is in kilobytes, megabytes, gigabytes, terabytes or petabytes respectively. Example: "20M" means 20 megabytes it is the same as giving 20971520 as argument. If -s is not present the backup will be written to a single slice whatever the size of the backup may be (there is probably some filesystem limitation, thus you might expect problems with file size over 2 gigabytes, depending on your filesystem).
+Size of the slices in bytes. If the number is followed by k (or K), M, G, T or P the size is in kilobytes, megabytes, gigabytes, terabytes or petabytes respectively. Example: by default "20M" means 20 megabytes it is the same as giving 20971520 as argument (see also -aSI and -abinary options). If -s is not present the backup will be written to a single slice whatever the size of the backup may be (there is probably some filesystem limitation, thus you might expect problems with file size over 2 gigabytes, depending on your filesystem).
 .TP 20
 -S <number>
 -S gives the size of the first slice which may be chosen independently of the size of following slices. This option needs -s and by default, the size of the first slice is the same as the one of the following slices.
@@ -47,6 +47,20 @@ the string is a command-line to be launched between the slices of the destinatio
 .TP
 -F <string>
 the string is a command-line to be launched between the slices of the source archive. See dar(1) man page (same option) for more informations.
+.TP 20
+-aSI[-unit[s]]
+when using k M G T E Z Y prefixes to define a size, use the SI meaning: multiple of 10^3 (a Mega is 1,000,000).
+.TP 20
+-abinary[-unit[s]]
+when using k M G T E Z Y prefixes to define a size, use the historical computer science meaning: multiple of 2^10  (a Mega is 1,048,576).
+.P
+-aSI and -abinary can be used several times, they affect all prefix which follow even those found in file included by -B option up to the next -a... occurrence. Note that if in a file included by -B option an -abinary or -aSI is met, it affects all the following prefix even those outside the included files (for example in the following "-B some.dcf -s 1K" 1K may be equal to 1000 or 1024 depending on the presence of an -aSI or -abinary in the file some.dcf. By default (before any -aSI/binary argument has been reached), binary interpretation of suffix is done (for compatibility with older versions).
+.TP 20
+-Q
+Do not display any message on stderr when not launched from a terminal (for example when launched from an at job or crontab). Remains that any question to the user will be assumed a 'no' answer, which most of the time will abort the program.
+.TP 20
+-j
+when virtual memory is exhausted, as user to make room before trying to continue. By default, when memory is exhausted dar aborts.
 
 .SH NOTES
 Dar is not concerned by scrambling. It does not need to be aware of it to be able to change the slice scheme. Thus, it is not able to scramble a clear archive or unscramble an already scrambled archive.

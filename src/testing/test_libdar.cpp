@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_libdar.cpp,v 1.4.2.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_libdar.cpp,v 1.22 2004/11/12 21:58:18 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,49 +29,64 @@ extern "C"
 #if HAVE_STDIO_H
 #include <stdio.h>
 #endif
+#if MUTEX_WORKS
+#if HAVE_PTHREAD_H
+#include <pthread.h>
+#endif
+#endif
 } // end extern "C"
 
 #include "libdar.hpp"
 #include "tools.hpp"
+#include "null_file.hpp"
+#include "shell_interaction.hpp"
 
 using namespace std;
 using namespace libdar;
 
 void f1();
-void warning(const string &x);
-bool question(const string & x);
+void warning(const string &x, void *context);
+bool question(const string &x, void *context);
+string getstring(const string &x, bool echo, void *context);
 void f2();
 void f3();
+void f4();
+void f5();
+
+static user_interaction_callback ui = user_interaction_callback(warning, question, getstring, (void *)1000);
 
 int main()
 {
     f1();
     f2();
     f3();
+    f4();
+    f5();
 }
 
 #define BOOL2STR(val) ( val ? "yes" : "no" )
 
 void f1()
 {
-    U_I maj, min;
-    bool ea, large, nodump, special;
+    U_I maj, med, min;
+    bool ea, large, nodump, special, thread, libz, libbz2, libcrypto;
     U_I bits;
 
-    get_version(maj, min);
-    printf("version %u.%u\n", maj, min);
-    get_compile_time_features(ea, large, nodump, special, bits);
-    printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\n",
+    get_version(maj, med, min);
+    printf("version %u.%u.%u\n", maj, med, min);
+    get_compile_time_features(ea, large, nodump, special, bits, thread, libz, libbz2, libcrypto);
+    printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\nlibz =%s\nlibbz2 = %s\nlibcrypto = %s\n",
 	   BOOL2STR(ea),
 	   BOOL2STR(large),
 	   BOOL2STR(nodump),
 	   BOOL2STR(special),
-	   bits);
-    set_warning_callback(&warning);
-    set_answer_callback(&question);
+	   bits,
+	   BOOL2STR(libz),
+	   BOOL2STR(libbz2),
+	   BOOL2STR(libcrypto));
 }
 
-void warning(const string &x)
+void warning(const string &x, void *context)
 {
     U_16 code;
     string msg;
@@ -86,7 +101,7 @@ void warning(const string &x)
     {
 	try
 	{
-	    printf("%s\n", ptr);
+	    printf("[%d]%s\n", (U_I)context, ptr);
 	}
 	catch(...)
 	{
@@ -97,7 +112,7 @@ void warning(const string &x)
     }
 }
 
-bool question(const string & x)
+bool question(const string & x, void *context)
 {
     U_16 code;
     string msg;
@@ -115,7 +130,7 @@ bool question(const string & x)
 	{
 	    char r;
 
-	    printf("%s\n", ptr);
+	    printf("[%d]%s\n", (U_I)context, ptr);
 	    scanf("%c", &r);
 	    rep = r == 'y';
 	}
@@ -130,68 +145,92 @@ bool question(const string & x)
     return rep;
 }
 
+string getstring(const string &x, bool echo, void *context)
+{
+    throw SRC_BUG;
+}
+
 void listing(const std::string & flag,
 	     const std::string & perm,
 	     const std::string & uid,
 	     const std::string & gid,
 	     const std::string & size,
 	     const std::string & date,
-	     const std::string & filename)
+	     const std::string & filename,
+	     bool is_dir,
+	     bool has_children,
+	     void *context)
 {
-    ui_printf("[%S][%S][%S][%S][%S][%S][%S]\n", &flag, &perm, &uid, &gid, &size, &date, &filename);
+    ui.printf("[[%d]][%S][%S][%S][%S][%S][%S][%S][%s][%s]\n", (U_I)context, &flag, &perm, &uid, &gid, &size, &date, &filename, is_dir ? "dir" : "not_dir", has_children ? "has children" : "no children");
 }
 
 void f2()
 {
     U_16 code;
     string msg;
-    op_create_noexcept("/",
-		       ".",
-		       NULL,
-		       bool_mask(true),
-		       simple_path_mask("/etc"),
-		       "toto",
-		       "dar",
-		       true,
-		       true,
-		       true,
-		       false, // no pause
-		       true,
-		       none,
-		       1,
-		       0,
-		       0,
-		       false,
-		       false,
-		       "",
-		       crypto_none,
-		       "",
-		       bool_mask(false),
-		       0,
-		       false,
-		       false,
-		       0,
-		       false,
-		       code,
-		       msg);
+    statistics st;
+    archive *toto = create_archive_noexcept(ui,
+					    "/",
+					    ".",
+					    NULL,
+					    bool_mask(true),
+					    simple_path_mask("/etc", true),
+					    "toto",
+					    "dar",
+					    true,
+					    true,
+					    true,
+					    false, // no pause
+					    true,
+					    none,
+					    1,
+					    0,
+					    0,
+					    false,
+					    false,
+					    "",
+					    crypto_none,
+					    "",
+					    0,
+					    bool_mask(false),
+					    0,
+					    false,
+					    false,
+					    0,
+					    false,
+					    false,
+					    false,
+					    st,
+					    code,
+					    msg);
     if(code != LIBDAR_NOEXCEPT && code != LIBDAR_EUSER_ABORT)
     {
-	ui_printf("exception creating archive: %S\n", &msg);
+	ui.printf("exception creating archive: %S\n", &msg);
+	return;
+    }
+    if(toto != NULL)
+    {
+	op_listing_noexcept(ui, toto, true, false, bool_mask(true), false, code, msg);
+	if(code != LIBDAR_NOEXCEPT && code != LIBDAR_EUSER_ABORT)
+	{
+	    ui.printf("exception creating archive: %S\n", &msg);
+	    return;
+	}
+	close_archive_noexcept(toto, code, msg);
+    }
+
+    archive *arch = open_archive_noexcept(ui, ".", "toto", "dar", crypto_none, "", 0, "", "", "", true, code, msg);
+    if(code != LIBDAR_NOEXCEPT)
+    {
+	ui.printf("exception openning archive: %S\n", &msg);
 	return;
     }
 
-    archive *arch = open_archive_noexcept(".", "toto", "dar", crypto_none, "", "", "", "", true, code, msg);
+    ui.set_listing_callback(&listing);
+    bool ret = get_children_of_noexcept(ui, arch, "etc/rc.d", code, msg);
     if(code != LIBDAR_NOEXCEPT)
     {
-	ui_printf("exception openning archive: %S\n", &msg);
-	return;
-    }
-
-    set_op_tar_listing_callback(&listing);
-    bool ret = get_children_of_noexcept(arch, "etc/rc.d", code, msg);
-    if(code != LIBDAR_NOEXCEPT)
-    {
-	ui_printf("exception looking for children: %S\n", &msg);
+	ui.printf("exception looking for children: %S\n", &msg);
 	return;
     }
     if(ret)
@@ -199,10 +238,10 @@ void f2()
     else
 	printf("no found children\n");
 
-    ret = get_children_of_noexcept(arch, "", code, msg);
+    ret = get_children_of_noexcept(ui, arch, "", code, msg);
     if(code != LIBDAR_NOEXCEPT)
     {
-	ui_printf("exception looking for children of root\n", &msg);
+	ui.printf("exception looking for children of root\n", &msg);
 	return;
     }
     if(ret)
@@ -214,7 +253,7 @@ void f2()
     close_archive_noexcept(arch, code, msg);
     if(code != LIBDAR_NOEXCEPT)
     {
-	ui_printf("exception closing: %S\n", &msg);
+	ui.printf("exception closing: %S\n", &msg);
 	return;
     }
 }
@@ -224,18 +263,18 @@ void f3()
 	// need to create an archive named "titi" with file recorded as removed since reference backup
     U_16 code;
     string msg;
-    archive *arch = open_archive_noexcept(".", "titi", "dar", crypto_none, "", "", "", "", true, code, msg);
+    archive *arch = open_archive_noexcept(ui, ".", "titi", "dar", crypto_none, "", 0, "", "", "", true, code, msg);
     if(code != LIBDAR_NOEXCEPT)
     {
-	ui_printf("exception openning archive: %S\n", &msg);
+	ui.printf("exception openning archive: %S\n", &msg);
 	return;
     }
 
-    set_op_tar_listing_callback(&listing);
-    bool ret = get_children_of_noexcept(arch, "etc/rc.d", code, msg);
+    ui.set_listing_callback(&listing);
+    bool ret = get_children_of_noexcept(ui, arch, "etc/rc.d", code, msg);
     if(code != LIBDAR_NOEXCEPT)
     {
-	ui_printf("exception looking for children: %S\n", &msg);
+	ui.printf("exception looking for children: %S\n", &msg);
 	return;
     }
     if(ret)
@@ -246,7 +285,58 @@ void f3()
     close_archive_noexcept(arch, code, msg);
     if(code != LIBDAR_NOEXCEPT)
     {
-	ui_printf("exception closing: %S\n", &msg);
+	ui.printf("exception closing: %S\n", &msg);
 	return;
+    }
+}
+
+void f4()
+{
+#if MUTEX_WORKS
+    try
+    {
+	pthread_t tid = pthread_self();
+	pthread_t tod;
+	bool ret = cancel_current(tod);
+	cancel_clear();
+	cancel_thread(tid);
+	ret = cancel_current(tod);
+	cancel_clear();
+	ret = cancel_current(tod);
+	null_file fake = null_file(ui, gf_read_write);
+	fake.write("coucouc les amsi", 10);
+	cancel_thread(tid);
+	fake.write("coucouc les amsi", 10);
+	ui.printf("this statement should never be reached\n");
+    }
+    catch(Egeneric & e)
+    {
+	cout << "Exception caught: " << e.get_message() << endl;
+    }
+    catch(...)
+    {
+	ui.printf("unknown expcetion caught\n");
+    }
+#endif
+}
+
+void f5()
+{
+    user_interaction *dialog = shell_interaction_init(&cout, &cerr, false);
+
+    try
+    {
+	string ret;
+
+	ret = dialog->get_string("Mot de passe svp :", false);
+	cout << "---[" << ret << "]---" << endl;
+	ret = dialog->get_string("Mot de passe svp :", true);
+	cout << "---[" << ret << "]---" << endl;
+
+    }
+    catch(...)
+    {
+	delete dialog;
+	shell_interaction_close();
     }
 }

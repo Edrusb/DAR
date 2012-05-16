@@ -4,7 +4,8 @@ Document for DAR's end users :
 - configure_options (if you plane to compile dar)
 - FEATURES (general features of Dar, same as home page information)
 - TUTORIAL (complete tutorial to use most important feature of dar)
-- dar-differential-backup-mini-howto.en.htm (Grzegorz Adam Hankiewicz's Howto)
+- FAQ (Frequently Asked Questions)
+- mini-howto (Grzegorz Adam Hankiewicz's Howto)
 - GOOD_BACKUP_PRACTICE (how to avoid loosing data, take the good backup use)
 - LIMITATIONS (limitations of dar suite programs)
 - NOTES (detailed explanations on several points)
@@ -20,13 +21,13 @@ Document for DAR's end users :
     - how to use Parchive (alias PAR) with DAR
     - the Dar User Command (DUC files) convention
     - Examples of file filtering
+    - Strong encryption
+    - libdar and thread-safe requirement
     and probably some other topics added recently
-
-sample/README (for people who prefer to start with examples)
+- sample/README (for people who prefer to start with examples)
 
 Document for developers
-- DOC_API_1 : is the main document for API to libdar (for GUI developers)
-- DOC_API_2 : is specific document for API version 2 (for GUI developers)
-- COMMAND_LINE : is a very brief list of all options to dar
-
+- api_tutorial.html : tutorial for the API.
+- COMMAND_LINE : is a very brief list of all options used by dar
+- doc/html/index.html : reference manual for the API (need Doxygen to be built).
 

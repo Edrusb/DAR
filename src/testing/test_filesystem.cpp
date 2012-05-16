@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.8.2.2 2004/04/20 09:27:02 edrusb Rel $
+// $Id: test_filesystem.cpp,v 1.16 2005/01/28 23:27:57 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -53,6 +53,17 @@ extern "C"
 #if HAVE_SYS_UN_H
 #include <sys/un.h>
 #endif
+
+#if MAJOR_IN_MKDEV
+#include <sys/mkdev.h>
+#if !defined(makedev) && defined(mkdev)
+#define makedev(a,b) mkdev((a),(b))
+#endif
+#else
+#if MAJOR_IN_SYSMACROS
+#include <sys/sysmacros.h>
+#endif
+#endif
 } // end extern "C"
 
 #include <string.h>
@@ -64,6 +75,8 @@ extern "C"
 #include "integers.hpp"
 #include "shell_interaction.hpp"
 #include "cygwin_adapt.hpp"
+
+static user_interaction *ui = NULL;
 
 static void build();
 static void test();
@@ -78,9 +91,10 @@ int main()
 {
     MEM_BEGIN;
     MEM_IN;
-    shell_interaction_init(&cout, &cerr);
-    catalogue_set_reading_version("03");
-    cat = new catalogue();
+    ui = shell_interaction_init(&cout, &cerr, false);
+    if(ui == NULL)
+	cout << "ERREUR !" << endl;
+    cat = new catalogue(*ui);
     MEM_OUT;
     build();
     MEM_OUT;
@@ -96,6 +110,8 @@ int main()
     delete cat;
     MEM_OUT;
     shell_interaction_close();
+    if(ui != NULL)
+	delete ui;
     MEM_OUT;
     MEM_END;
 }
@@ -143,7 +159,9 @@ static void del()
 static void test()
 {
     entree *p;
-    filesystem_backup fs = filesystem_backup(path("arbo"), true, true, true, false);
+    infinint root_fs_device;
+
+    filesystem_backup fs = filesystem_backup(*ui, path("arbo"), true, true, true, false, false, root_fs_device);
 
     while(fs.read(p))
     {
@@ -151,13 +169,13 @@ static void test()
         cat->add(p);
         if(f != NULL)
         {
-            generic_file *entree = f->get_data();
+            generic_file *entree = f->get_data(*ui);
 
             try
             {
                 crc val;
 
-                fichier sortie = dup(1);
+                fichier sortie = fichier(*ui, dup(1));
                 entree->copy_to(sortie, val);
                 f->set_crc(val);
             }
@@ -174,17 +192,24 @@ static void test()
 
 static void re_test()
 {
-    const entree *e;
-    detruit det1 = detruit("lien", 'l' | 0x80);
-    detruit det2 = detruit("dev1", 'd');
-    filesystem_restore fs = filesystem_restore("algi", true, true, true, true, true, false, true, false);
+    try
+    {
+	const entree *e;
+	detruit det1 = detruit("lien", 'l' | 0x80);
+	detruit det2 = detruit("dev1", 'd');
+	filesystem_restore fs = filesystem_restore(*ui, "algi", true, true, true, true, true, false, true, false);
 
-    cat->reset_read();
+	cat->reset_read();
 
-    while(cat->read(e))
-        fs.write(e);
+	while(cat->read(e))
+	    fs.write(e);
 
-    fs.reset_write();
-    fs.write(&det1);
-    fs.write(&det2);
+	fs.reset_write();
+	fs.write(&det1);
+	fs.write(&det2);
+    }
+    catch(Egeneric & e)
+    {
+	e.dump();
+    }
 }

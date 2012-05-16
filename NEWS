@@ -1,13 +1,18 @@
+NOTE: As this file cannot be changed once a package is released,
+here follows a set of sources of information, from where you will
+be able to fetch fresh news about dar.
+
+
 For NEWS, you can check:
 
+the dar-news mailing list archives:
+
+        http://news.gmane.org/gmane.comp.sysutils.backup.dar.announce
         http://lists.sourceforge.net/lists/listinfo/dar-news
 
-This is a mailing-list, with NNTP and Web gateways. Other pointers of
-informations are:
+Here is the home page of the dar-news mailing list:
+        http://lists.sourceforge.net/lists/listinfo/dar-news
 
-        http://dar.linux.free.fr/
-        http://sourceforge.net/projects/dar/
-        http://www.99techs.net/cgi-bin/forums/yabb.pl#DARcat
 
 Four mailing-lists with their corresponding newsgroup on gmane exist about DAR:
 

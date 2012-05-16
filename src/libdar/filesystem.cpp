@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.17.2.8 2005/01/13 21:46:44 edrusb Rel $
+// $Id: filesystem.cpp,v 1.35 2005/01/29 15:08:02 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -46,10 +46,6 @@ char *strchr (), *strrchr ();
 
 #if HAVE_TIME_H
 #include <time.h>
-#endif
-
-#if HAVE_UTIME_H
-#include <utime.h>
 #endif
 
 #if HAVE_FCNTL_H
@@ -93,6 +89,9 @@ char *strchr (), *strrchr ();
 
 #if MAJOR_IN_MKDEV
 #include <sys/mkdev.h>
+#if !defined(makedev) && defined(mkdev)
+#define makedev(a,b) mkdev((a),(b))
+#endif
 #else
 #if MAJOR_IN_SYSMACROS
 #include <sys/sysmacros.h>
@@ -103,9 +102,9 @@ char *strchr (), *strrchr ();
 
 #include <map>
 
+#include "filesystem.hpp"
 #include "tools.hpp"
 #include "erreurs.hpp"
-#include "filesystem.hpp"
 #include "user_interaction.hpp"
 #include "catalogue.hpp"
 #include "ea_filesystem.hpp"
@@ -121,12 +120,13 @@ namespace libdar
 {
 
     static void supprime(const path & ref);
-    static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm, bool ignore_ownership);
-    static void make_date(const string & chemin, infinint access, infinint modif);
+    static void make_owner_perm(user_interaction & dialog,
+				const inode & ref, const path & ou, bool dir_perm, bool ignore_ownership);
     static void attach_ea(const string &chemin, inode *ino, bool ea_root_mode, bool ea_user_mode);
-    static void set_back_dir_dates(const string & chem, const infinint & last_acc, const infinint & last_mod);
-    static bool is_nodump_flag_set(const path & chem, const string & filename);
-    static path *get_root_with_symlink(const path & root, bool info_details);
+    static bool is_nodump_flag_set(user_interaction & dialog,
+				   const path & chem, const string & filename);
+    static path *get_root_with_symlink(user_interaction & dialog,
+				       const path & root, bool info_details);
 
 ///////////////////////////////////////////////////////////////////
 ///////////////// filesystem_hard_link_read methods ///////////////
@@ -148,12 +148,12 @@ namespace libdar
                 switch(errno)
                 {
                 case EACCES:
-                    user_interaction_warning(string("error reading inode of ") + ptr_name + " : " + strerror(errno));
+                    get_fs_ui().warning(tools_printf(gettext("Error reading inode of file %s : %s"), ptr_name, strerror(errno)));
                     break;
                 case ENOENT:
                     break;
                 default:
-                    throw Erange("filesystem_hard_link_read::make_read_entree", string("Cannot read inode for ") + ptr_name + " : " + strerror(errno));
+                    throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Cannot read inode for ")) + ptr_name + " : " + strerror(errno));
                 }
 
                     // the function returns NULL (meaning file does not exists)
@@ -168,7 +168,8 @@ namespace libdar
 				   buf.st_atime,
 				   buf.st_mtime,
 				   name,
-				   pointed);
+				   pointed,
+				   buf.st_dev);
                 }
                 else if(S_ISREG(buf.st_mode))
                 {
@@ -178,7 +179,8 @@ namespace libdar
                                        buf.st_mtime,
                                        name,
                                        lieu,
-                                       buf.st_size);
+                                       buf.st_size,
+				       buf.st_dev);
                     else // file with hard link(s)
                     {
                         map <ino_t, couple>::iterator it = corres_read.find(buf.st_ino);
@@ -190,7 +192,9 @@ namespace libdar
                                                                      buf.st_mtime,
                                                                      name,
                                                                      lieu,
-                                                                     buf.st_size);
+                                                                     buf.st_size,
+								     buf.st_dev,
+								     etiquette_counter++);
                             ref = ptr;
                             if(ref != NULL)
                             {
@@ -225,7 +229,8 @@ namespace libdar
                     ref = new directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
                                         buf.st_atime,
                                         buf.st_mtime,
-                                        name);
+                                        name,
+					buf.st_dev);
                 }
                 else if(S_ISCHR(buf.st_mode))
                     ref = new chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
@@ -233,26 +238,30 @@ namespace libdar
                                       buf.st_mtime,
                                       name,
                                       major(buf.st_rdev),
-                                      minor(buf.st_rdev)); // makedev(major, minor)
+                                      minor(buf.st_rdev), // makedev(major, minor)
+				      buf.st_dev);
                 else if(S_ISBLK(buf.st_mode))
                     ref = new blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
                                        buf.st_atime,
                                        buf.st_mtime,
                                        name,
                                        major(buf.st_rdev),
-                                       minor(buf.st_rdev)); // makedev(major, minor)
+                                       minor(buf.st_rdev), // makedev(major, minor)
+				       buf.st_dev);
                 else if(S_ISFIFO(buf.st_mode))
                     ref = new tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
                                    buf.st_atime,
                                    buf.st_mtime,
-                                   name);
+                                   name,
+				   buf.st_dev);
                 else if(S_ISSOCK(buf.st_mode))
                     ref = new prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
                                     buf.st_atime,
                                     buf.st_mtime,
-                                    name);
+                                    name,
+				    buf.st_dev);
                 else
-                    throw Erange("filesystem_hard_link_read::make_read_entree", string("Unknown file type ! file is ") + string(ptr_name));
+                    throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Unknown file type ! file name is : ")) + string(ptr_name));
 
                 if(ref == NULL)
                     throw Ememory("filesystem_hard_link_read::make_read_entree");
@@ -280,7 +289,7 @@ namespace libdar
                     }
                     catch(Egeneric & ex)
                     {
-                        user_interaction_warning(string("Error reading EA for ")+ptr_name+ " : " + ex.get_message());
+                        get_fs_ui().warning(string(gettext("Error reading EA for "))+ptr_name+ " : " + ex.get_message());
                             // no throw !
                             // we must be able to continue without EA
                     }
@@ -309,23 +318,44 @@ namespace libdar
             corres_read.erase(it);
     }
 
+    void filesystem_hard_link_read::copy_from(const filesystem_hard_link_read & ref)
+    {
+	corres_read = ref.corres_read;
+	etiquette_counter = ref.etiquette_counter;
+	if(ref.fs_ui == NULL)
+	    throw SRC_BUG;
+	fs_ui = ref.fs_ui->clone();
+    }
+
+    void filesystem_hard_link_read::detruire()
+    {
+	if(fs_ui != NULL)
+	    delete fs_ui;
+    }
+
+
 
 ///////////////////////////////////////////////////////////////////
 ///////////////// filesystem_backup methods ///////////////////////
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_backup::filesystem_backup(const path &root, bool x_info_details, bool x_save_root_ea, bool x_save_user_ea, bool check_no_dump_flag)
+    filesystem_backup::filesystem_backup(user_interaction & dialog,
+					 const path &root, bool x_info_details,
+					 bool x_save_root_ea, bool x_save_user_ea, bool check_no_dump_flag,
+					 bool x_alter_atime, infinint & root_fs_device)
+	: filesystem_hard_link_read(dialog)
     {
-	fs_root = get_root_with_symlink(root, x_info_details);
+	fs_root = get_root_with_symlink(get_fs_ui(), root, x_info_details);
 	if(fs_root == NULL)
 	    throw Ememory("filesystem_backup::filesystem_backup");
 	info_details = x_info_details;
 	save_root_ea = x_save_root_ea;
 	save_user_ea = x_save_user_ea;
 	no_dump_check = check_no_dump_flag;
+	alter_atime = x_alter_atime;
 	current_dir = NULL;
-        reset_read();
+        reset_read(root_fs_device);
     }
 
     void filesystem_backup::detruire()
@@ -344,6 +374,9 @@ namespace libdar
 
     void filesystem_backup::copy_from(const filesystem_backup & ref)
     {
+	const filesystem_hard_link_read *proto_ref = &ref;
+	filesystem_hard_link_read *proto_me = this;
+	*proto_me = *proto_ref;  // invoke the copy from parent class
         if(ref.fs_root != NULL)
             fs_root = new path(*ref.fs_root);
         else
@@ -357,15 +390,15 @@ namespace libdar
         save_root_ea = ref.save_root_ea;
         save_user_ea = ref.save_user_ea;
         no_dump_check = ref.no_dump_check;
+	alter_atime = ref.alter_atime;
         pile = ref.pile;
     }
 
-    void filesystem_backup::reset_read()
+    void filesystem_backup::reset_read(infinint & root_fs_device)
     {
         char *tmp;
 
         corres_reset();
-        file_etiquette::reset_etiquette_counter();
         if(current_dir != NULL)
             delete current_dir;
         current_dir = new path(*fs_root);
@@ -381,12 +414,15 @@ namespace libdar
             try
             {
                 if(ref_dir != NULL)
+		{
 		    pile.push_back(etage(tmp, ref_dir->get_last_access(), ref_dir->get_last_modif()));
+		    root_fs_device = ref_dir->get_device();
+		}
                 else
                     if(ref == NULL)
-                        throw Erange("filesystem_backup::reset_read", string("Non existant file: ") + tmp);
+                        throw Erange("filesystem_backup::reset_read", string(gettext("Non existant file: ")) + tmp);
                     else
-                        throw Erange("filesystem_backup::reset_read", string("File must be a directory: ")+ tmp);
+                        throw Erange("filesystem_backup::reset_read", string(gettext("File must be a directory: "))+ tmp);
             }
             catch(...)
             {
@@ -429,7 +465,8 @@ namespace libdar
                 {
                     string tmp;
 
-                    set_back_dir_dates(current_dir->display(), inner.last_acc, inner.last_mod);
+		    if(!alter_atime)
+			tools_noexcept_make_date(current_dir->display(), inner.last_acc, inner.last_mod);
                     pile.pop_back();
                     if(pile.size() > 0)
                     {
@@ -446,7 +483,7 @@ namespace libdar
                     {
                             // checking the EXT2 nodump flag (if set ignoring the file)
 
-                        if(!no_dump_check || !is_nodump_flag_set(*current_dir, name))
+                        if(!no_dump_check || !is_nodump_flag_set(get_fs_ui(), *current_dir, name))
                         {
                             ref = make_read_entree(*current_dir, name, true, save_root_ea, save_user_ea);
 
@@ -471,7 +508,8 @@ namespace libdar
 					{
 					    string tmp;
 
-					    user_interaction_warning(string("Cannot read directory contents: ") + ptr_name + " : " + e.get_message());
+					    get_fs_ui().warning(tools_printf(gettext("Cannot read directory contents: %s : "), ptr_name) + e.get_message());
+
 					    try
 					    {
 						pile.push_back(etage());
@@ -512,13 +550,13 @@ namespace libdar
                         else // EXT2 nodump flag is set, and we must not consider such file for backup
                         {
                             if(info_details)
-                                user_interaction_warning(string("ignoring file with NODUMP flag set: ") + (*current_dir + name).display());
+                                get_fs_ui().warning(string(gettext("Ignoring file with NODUMP flag set: ")) + (*current_dir + name).display());
                             once_again = true;
                         }
                     }
                     catch(Erange & e)
                     {
-                        user_interaction_warning("error reading directory contents : " + e.get_message() + " . Ignoring file or directory");
+                        get_fs_ui().warning(string(gettext("Error reading directory contents : ")) + e.get_message() + gettext(" . Ignoring file or directory"));
                         once_again = true;
                     }
                 }
@@ -540,7 +578,8 @@ namespace libdar
             throw SRC_BUG;
         else
         {
-            set_back_dir_dates(current_dir->display(), pile.back().last_acc, pile.back().last_mod);
+	    if(!alter_atime)
+		tools_noexcept_make_date(current_dir->display(), pile.back().last_acc, pile.back().last_mod);
             pile.pop_back();
         }
 
@@ -554,14 +593,15 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_diff::filesystem_diff(const path &root, bool x_info_details, bool x_check_root_ea, bool x_check_user_ea)
+    filesystem_diff::filesystem_diff(user_interaction & dialog, const path &root, bool x_info_details, bool x_check_root_ea, bool x_check_user_ea, bool x_alter_atime) : filesystem_hard_link_read(dialog)
     {
-	fs_root = get_root_with_symlink(root, x_info_details);
+	fs_root = get_root_with_symlink(get_fs_ui(), root, x_info_details);
 	if(fs_root == NULL)
 	    throw Ememory("filesystem_diff::filesystem_diff");
 	info_details = x_info_details;
 	check_root_ea = x_check_root_ea;
 	check_user_ea = x_check_user_ea;
+	alter_atime = x_alter_atime;
 	current_dir = NULL;
 
         reset_read();
@@ -573,7 +613,6 @@ namespace libdar
         char *tmp;
 
         corres_reset();
-        file_etiquette::reset_etiquette_counter();
         if(current_dir != NULL)
             delete current_dir;
         current_dir = new path(*fs_root);
@@ -597,9 +636,9 @@ namespace libdar
                 }
                 else
                     if(ref == NULL)
-                        throw Erange("filesystem_diff::reset_read", string("Non existant file: ") + tmp);
+                        throw Erange("filesystem_diff::reset_read", string(gettext("Non existant file: ")) + tmp);
                     else
-                        throw Erange("filesystem_diff::reset_read", string("File must be a directory: ") + tmp);
+                        throw Erange("filesystem_diff::reset_read", string(gettext("File must be a directory: ")) + tmp);
             }
             catch(...)
             {
@@ -647,7 +686,8 @@ namespace libdar
         if(filename_pile.size() > 0)
         {
             string tmp;
-            set_back_dir_dates(current_dir->display(), filename_pile.back().last_acc, filename_pile.back().last_mod);
+	    if(!alter_atime)
+		tools_noexcept_make_date(current_dir->display(), filename_pile.back().last_acc, filename_pile.back().last_mod);
             filename_pile.pop_back();
             current_dir->pop(tmp);
         }
@@ -665,6 +705,9 @@ namespace libdar
 
     void filesystem_diff::copy_from(const filesystem_diff & ref)
     {
+	const filesystem_hard_link_read *proto_ref = &ref;
+	filesystem_hard_link_read *proto_me = this;
+	*proto_me = *proto_ref;
         if(ref.fs_root != NULL)
             fs_root = new path(*ref.fs_root);
         else
@@ -676,6 +719,7 @@ namespace libdar
         info_details = ref.info_details;
         check_root_ea = ref.check_root_ea;
         check_user_ea = ref.check_user_ea;
+	alter_atime = ref.alter_atime;
         filename_pile = ref.filename_pile;
     }
 
@@ -747,12 +791,12 @@ namespace libdar
                 if(set_root_ea)
                 {
                     if(exists && warn_overwrite)
-                        user_interaction_pause(string("system EA for ")+chemin+ " are about to be overwriten, continue ? ");
+                        get_fs_ui().pause(tools_printf(gettext("System EA for %S are about to be overwriten, continue ?"), &chemin));
                     ea_filesystem_clear_ea(chemin, ea_domain_root);
                     if(ea_filesystem_write_ea(chemin, l, true, false))
                     {
                         if(info_details)
-                            user_interaction_warning(string("restoring system EA for ")+chemin);
+                            get_fs_ui().warning(string(gettext("Restoring system EA for "))+chemin);
                         ret = true;
                     }
                     else
@@ -762,7 +806,7 @@ namespace libdar
             }
             else
                 if(set_root_ea)
-                    user_interaction_warning(string("system EA for ")+chemin+" will not be restored, (overwriting not allowed)");
+                    get_fs_ui().warning(tools_printf(gettext("System EA for %S will not be restored, (overwriting not allowed)"), &chemin));
 
                 // restoring the user EA
                 //
@@ -772,12 +816,12 @@ namespace libdar
                 if(set_user_ea)
                 {
                     if(exists && warn_overwrite)
-                        user_interaction_pause(string("user EA for ")+chemin+ " are about to be overwriten, continue ? ");
+                        get_fs_ui().pause(tools_printf(gettext("User EA for %S are about to be overwriten, continue ?"), &chemin));
                     ea_filesystem_clear_ea(chemin, ea_domain_user);
                     if(ea_filesystem_write_ea(chemin, l, false, true))
                     {
                         if(info_details)
-                            user_interaction_warning(string("restoring user EA for ")+chemin);
+                            get_fs_ui().warning(string(gettext("Restoring user EA for "))+chemin);
                         ret = true;
                     }
                     else
@@ -787,7 +831,7 @@ namespace libdar
             }
             else
                 if(set_user_ea)
-                    user_interaction_warning(string("user EA for ")+chemin+" will not be restored, (overwriting not allowed)");
+                    get_fs_ui().warning(tools_printf(gettext("User EA for %S will not be restored, (overwriting not allowed)"), &chemin));
         }
         catch(Euser_abort & e)
         {
@@ -861,7 +905,8 @@ namespace libdar
                                 case EXDEV:
                                 case EPERM:
                                 // can't make hard link, trying to duplicate the inode
-                                    user_interaction_warning(string("error creating hard link ") + name + " : " + strerror(errno) + "\n Trying to duplicate the inode");
+                                    get_fs_ui().warning(tools_printf(gettext("Error creating hard link %s : %s\n Trying to duplicate the inode"),
+								     name, strerror(errno)));
                                     create_file = true;
                                     clear_corres(ref_eti->get_etiquette());
                                         // need to remove this entry to be able
@@ -874,13 +919,14 @@ namespace libdar
                                         clear_corres(ref_eti->get_etiquette());
                                             // need to remove this entry to be able
                                             // to restore EA for other copies
-                                        user_interaction_warning(string("error creating hard link : ") + name + " , the inode to link with [" + old + "] has disapeared, re-creating it");
+                                        get_fs_ui().warning(tools_printf(gettext("Error creating hard link : %s , the inode to link with [ %s ] has disapeared, re-creating it"),
+									 name, old));
 
                                     }
                                     else
                                     {
                                         create_file = false; // nothing to do;
-                                        user_interaction_warning(string("error creating hard link : ") + name + " , the inode to link with [" + old + "] is not present, cannot restore this hard link");
+                                        get_fs_ui().warning(tools_printf(gettext("Error creating hard link : %s , the inode to link with [ %s ] is not present, cannot restore this hard link"), name, old));
                                     }
                                     break;
                                 default :
@@ -923,10 +969,11 @@ namespace libdar
                     ret = ::open(name, O_WRONLY|O_CREAT|O_BINARY, 0777);
                     if(ret >= 0)
                     {
-                        fichier dest = ret;
+                        fichier dest = fichier(get_fs_ui(), ret);
 			    // the implicit destruction of dest (exiting the block)
 			    // will close the 'ret' file descriptor (see ~fichier())
-                        ou = ref_fil->get_data();
+                        ou = ref_fil->get_data(get_fs_ui());
+
                         try
                         {
                             crc crc_dyn, crc_ori;
@@ -934,7 +981,7 @@ namespace libdar
                             ou->copy_to(dest, crc_dyn);
                             if(ref_fil->get_crc(crc_ori))  // CRC is not present in format "01"
                                 if(!same_crc(crc_dyn, crc_ori))
-                                    throw Erange("filesystem_hard_link_write::make_file", "bad CRC, data corruption occured");
+                                    throw Erange("filesystem_hard_link_write::make_file", gettext("Bad CRC, data corruption occured"));
                         }
                         catch(...)
                         {
@@ -970,7 +1017,7 @@ namespace libdar
                             strncpy(addr.sun_path, name, UNIX_PATH_MAX - 1);
                             addr.sun_path[UNIX_PATH_MAX - 1] = '\0';
                             if(bind(sd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-                                throw Erange("filesystem_hard_link_write::make_file (socket bind)", string("Error creating Unix socket file: ") + name + " : " + strerror(errno));
+                                throw Erange("filesystem_hard_link_write::make_file (socket bind)", string(gettext("Error creating Unix socket file: ")) + name + " : " + strerror(errno));
                         }
                         catch(...)
                         {
@@ -987,14 +1034,14 @@ namespace libdar
 
                 if(ret < 0)
                     if(errno != ENOSPC)
-                        throw Erange("filesystem_hard_link_write::make_file", string("Could not create inode: ") + name + " : " + strerror(errno));
+                        throw Erange("filesystem_hard_link_write::make_file", string(gettext("Could not create inode: ")) + name + " : " + strerror(errno));
                     else
-                        user_interaction_pause(string("Cannot create inode: ") + strerror(errno) + " Ready to continue ?");
+                        get_fs_ui().pause(string(gettext("Cannot create inode: ")) + strerror(errno) + gettext(" Ready to continue ?"));
             }
             while(ret < 0 && errno == ENOSPC);
 
             if(ref_ino != NULL && ret >= 0)
-                make_owner_perm(*ref_ino, ou, dir_perm, ignore_owner);
+                make_owner_perm(get_fs_ui(), *ref_ino, ou, dir_perm, ignore_owner);
         }
         catch(...)
         {
@@ -1011,18 +1058,34 @@ namespace libdar
             corres_write.erase(it);
     }
 
+    void filesystem_hard_link_write::copy_from(const filesystem_hard_link_write & ref)
+    {
+	corres_write = ref.corres_write;
+	if(ref.fs_ui == NULL)
+	    throw SRC_BUG;
+	fs_ui = ref.fs_ui->clone();
+    }
+
+    void filesystem_hard_link_write::detruire()
+    {
+	if(fs_ui != NULL)
+	    delete fs_ui;
+    }
+
+
 
 ///////////////////////////////////////////////////////////////////
 ////////////////// filesystem_restore methods  ////////////////////
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_restore::filesystem_restore(const path &root, bool x_allow_overwrite,
+    filesystem_restore::filesystem_restore(user_interaction & dialog,
+					   const path &root, bool x_allow_overwrite,
                                            bool x_warn_overwrite, bool x_info_details,
                                            bool x_set_root_ea, bool x_set_user_ea, bool ignore_owner,
-					   bool x_warn_remove_no_match, bool x_empty)
+					   bool x_warn_remove_no_match, bool x_empty) : filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog)
     {
-	fs_root = get_root_with_symlink(root, x_info_details);
+	fs_root = get_root_with_symlink(get_fs_ui(), root, x_info_details);
 	if(fs_root == NULL)
 	    throw Ememory("filesystem_write::filesystem_write");
 	allow_overwrite = x_allow_overwrite;
@@ -1066,7 +1129,7 @@ namespace libdar
                 if(stack_dir.size() > 0)
 		{
 		    if(!empty)
-			make_owner_perm(stack_dir.back(), *current_dir, true, ignore_ownership);
+			make_owner_perm(get_fs_ui(), stack_dir.back(), *current_dir, true, ignore_ownership);
 		}
                 else
                     throw SRC_BUG;
@@ -1081,6 +1144,7 @@ namespace libdar
                     const detruit *x_det = dynamic_cast<const detruit *>(x);
                     const inode *x_ino = dynamic_cast<const inode *>(x);
                     const etiquette *x_eti = dynamic_cast<const etiquette *>(x);
+		    string spot_display = spot.display();
 
                     nomme *exists = make_read_entree(*current_dir, x_nom->get_name(), false, set_root_ea, set_user_ea);
 
@@ -1094,9 +1158,9 @@ namespace libdar
                             if(exists != NULL) // the file to destroy exists
                             {
                                 if(!allow_overwrite)
-                                    throw Erange("filesystem_write::write", spot.display() + " will not be remove from filesystem, overwriting not allowed");
+                                    throw Erange("filesystem_write::write", tools_printf(gettext("%S will not be remove from filesystem, overwriting not allowed"), &spot_display));
                                 if(warn_overwrite)
-                                    user_interaction_pause(spot.display() + " is about to be removed from filesystem, continue ? ");
+                                    get_fs_ui().pause(tools_printf(gettext("%S is about to be removed from filesystem, continue ? "), &spot_display));
 
                                 if(tolower(exists->signature()) == tolower(x_det->get_signature()))
 				{
@@ -1106,7 +1170,7 @@ namespace libdar
                                 else
                                 {
 				    if(warn_remove_no_match) // warning even if just allow_overwite is set (not espetially warn_overwrite)
-					user_interaction_pause(spot.display() + " must be removed, but does not match expected type, remove it anyway ?");
+					get_fs_ui().pause(tools_printf(gettext("%S must be removed, but does not match expected type, remove it anyway ?"), &spot_display));
 				    if(!empty)
 					supprime(spot);
                                 }
@@ -1129,11 +1193,11 @@ namespace libdar
                                 if(allow_overwrite)
                                 {
                                     if(warn_overwrite && x_dir == NULL)
-                                        user_interaction_pause(spot.display() + " is about to be overwritten, OK ?");
+                                        get_fs_ui().pause(tools_printf(gettext("%S is about to be overwritten, OK ?"), &spot_display));
                                     if(x_dir != NULL && x_ino->same_as(*exists_ino))
 				    {
 					if(!empty)
-					    make_owner_perm(*x_ino, *current_dir, false, ignore_ownership);
+					    make_owner_perm(get_fs_ui(), *x_ino, *current_dir, false, ignore_ownership);
 				    }
                                     else
                                     {
@@ -1146,7 +1210,7 @@ namespace libdar
                                         catch(Egeneric & ex)
                                         {
                                             got_it = false;
-                                            user_interaction_warning(string("existing EA for ") + spot.display() + " could not be read and preserved : " + ex.get_message());
+                                            get_fs_ui().warning(tools_printf(gettext("Existing EA for %S could not be read and preserved : "), &spot_display) + ex.get_message());
                                         }
 					if(!empty)
 					{
@@ -1162,17 +1226,17 @@ namespace libdar
                                         catch(Egeneric & e)
                                         {
                                             if(ea.size() >0)
-                                                user_interaction_warning(string("existing EA for ")+ spot.display() + " could not be preserved : " + e.get_message());
+                                                get_fs_ui().warning(tools_printf(gettext("Existing EA for %S could not be preserved : "), &spot_display) + e.get_message());
                                         }
                                     }
                                 }
                                 else // overwriting not allowed
                                 {
                                     if(x_dir != NULL && !x_ino->same_as(*exists_ino))
-                                        throw Erange("filesystem_write::write", string("Directory ")+spot.display()+" cannot be restored: overwriting not allowed and a non-directory inode of that name exists");
+                                        throw Erange("filesystem_write::write", tools_printf(gettext("Directory %S cannot be restored: overwriting not allowed and a non-directory inode of that name already exists"), &spot_display));
                                     else
                                         if(info_details)
-                                            user_interaction_warning(spot.display() + " has not been overwritten (action not allowed)");
+                                            get_fs_ui().warning(tools_printf(gettext("%S has not been overwritten (action not allowed)"), &spot_display));
                                     ret = false;
                                 }
                             }
@@ -1231,13 +1295,14 @@ namespace libdar
             else
             {
                 const directory *e_dir = dynamic_cast<const directory *>(exists);
+		string spot_display = spot.display();
 
                 if(e_dir == NULL) // an inode of that name exists, but it is not a directory
                 {
                     if(allow_overwrite)
                     {
                         if(warn_overwrite)
-                            user_interaction_pause(spot.display() + " is about to be removed and replaced by a directory, OK ?");
+                            get_fs_ui().pause(tools_printf(gettext("%S is about to be removed and replaced by a directory, OK ?"), &spot_display));
 			if(!empty)
 			{
 			    supprime(spot);
@@ -1246,8 +1311,7 @@ namespace libdar
                     }
                     else
                         throw Erange("filesystem_restore::pseudo_write",
-                                     spot.display() +
-                                     " could not be restored, because a file of that name exists and overwrite is not allowed");
+				     tools_printf(gettext("%S could not be restored, because a file of that name exists and overwrite is not allowed"), &spot_display));
                 }
                 else // just setting permission to allow creation of any sub-dir or sub_file
                 {
@@ -1256,7 +1320,7 @@ namespace libdar
                     {
 			if(!empty)
 			    if(chmod(name, 0777) < 0)
-				user_interaction_warning(string("Cannot restore permissions of ") + spot.display() + " : " + strerror(errno));
+				get_fs_ui().warning(tools_printf(gettext("Cannot restore permissions of %S : "), &spot_display) + strerror(errno));
                     }
                     catch(...)
                     {
@@ -1290,6 +1354,13 @@ namespace libdar
 
     void filesystem_restore::copy_from(const filesystem_restore & ref)
     {
+	const filesystem_hard_link_write *proto_refw = &ref;
+	filesystem_hard_link_write *proto_mew = this;
+	const filesystem_hard_link_read *proto_refr = &ref;
+	filesystem_hard_link_read *proto_mer = this;
+	*proto_mew = *proto_refw; // invoke copy operator from both parent classes
+	*proto_mer = *proto_refr;
+
         if(ref.fs_root != NULL)
             fs_root = new path(*ref.fs_root);
         else
@@ -1323,7 +1394,7 @@ namespace libdar
         {
             struct stat buf;
             if(lstat(s, &buf) < 0)
-                throw Erange("filesystem supprime", string("Cannot get inode information about file to remove ") + s + " : " + strerror(errno));
+                throw Erange("filesystem supprime", string(gettext("Cannot get inode information about file to remove ")) + s + " : " + strerror(errno));
 
             if(S_ISDIR(buf.st_mode))
             {
@@ -1336,11 +1407,11 @@ namespace libdar
 
 		    // then the directory itself
                 if(rmdir(s) < 0)
-                    throw Erange("supprime (dir)", string("Cannot remove directory ") + s + " : " + strerror(errno));
+                    throw Erange("supprime (dir)", string(gettext("Cannot remove directory ")) + s + " : " + strerror(errno));
             }
             else
                 if(unlink(s) < 0)
-                    throw Erange("supprime (file)", string("Cannot remove file ") + s + " : " + strerror(errno));
+                    throw Erange("supprime (file)", string(gettext("Cannot remove file ")) + s + " : " + strerror(errno));
         }
         catch(...)
         {
@@ -1353,11 +1424,12 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.17.2.8 2005/01/13 21:46:44 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.35 2005/01/29 15:08:02 edrusb Rel $";
         dummy_call(id);
     }
 
-    static void make_owner_perm(const inode & ref, const path & ou, bool dir_perm, bool ignore_ownership)
+    static void make_owner_perm(user_interaction & dialog,
+				const inode & ref, const path & ou, bool dir_perm, bool ignore_ownership)
     {
         string chem = (ou + ref.get_name()).display();
         char *name = tools_str2charptr(chem);
@@ -1376,11 +1448,11 @@ namespace libdar
 		{
 #if HAVE_LCHOWN
                     if(lchown(name, ref.get_uid(), ref.get_gid()) < 0)
-                        user_interaction_warning(string(name) + string("Could not restore original file ownership: ") + strerror(errno));
+                        dialog.warning(string(name) + string(gettext("Could not restore original file ownership: ")) + strerror(errno));
 #else
                     if(dynamic_cast<const lien *>(&ref) == NULL) // not a symbolic link
 			if(chown(name, ref.get_uid(), ref.get_gid()) < 0)
-			    user_interaction_warning(string(name) + string("Could not restore original file ownership: ") + strerror(errno));
+			    dialog.warning(string(name) + string(gettext("Could not restore original file ownership: ")) + strerror(errno));
 			//
 			// we don't/can't restore ownership for symbolic links (no system call to do that)
 			//
@@ -1390,7 +1462,7 @@ namespace libdar
             {
                 if(ref_lie == NULL) // not restoring permission for symbolic links
                     if(chmod(name, permission) < 0)
-			user_interaction_warning(string("Cannot restore permissions of ") + name + " : " + strerror(errno));
+			dialog.warning(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, strerror(errno)));
             }
             catch(Egeneric &e)
             {
@@ -1400,7 +1472,7 @@ namespace libdar
             }
 
             if(ref_lie == NULL) // not restoring atime & ctime for symbolic links
-                make_date(chem, ref.get_last_access(), ref.get_last_modif());
+                tools_make_date(chem, ref.get_last_access(), ref.get_last_modif());
         }
         catch(...)
         {
@@ -1408,33 +1480,6 @@ namespace libdar
             throw;
         }
         delete name;
-    }
-
-
-    static void make_date(const string & chemin, infinint access, infinint modif)
-    {
-        struct utimbuf temps;
-        time_t tmp = 0;
-        char *filename;
-
-        access.unstack(tmp);
-        temps.actime = tmp;
-        tmp = 0;
-        modif.unstack(tmp);
-        temps.modtime = tmp;
-
-        filename = tools_str2charptr(chemin);
-        try
-        {
-            if(utime(filename , &temps) < 0)
-                Erange("make_date", string("Cannot set last access and last modification time: ") + strerror(errno));
-        }
-        catch(...)
-        {
-            delete filename;
-            throw;
-        }
-        delete filename;
     }
 
     static void attach_ea(const string &chemin, inode *ino, bool ea_root_mode, bool ea_user_mode)
@@ -1467,23 +1512,8 @@ namespace libdar
             delete eat;
     }
 
-    static void set_back_dir_dates(const string & chem, const infinint & last_acc, const infinint & last_mod)
-    {
-        try
-        {
-	    if(last_acc != 0 || last_mod != 0)
-		make_date(chem, last_acc, last_mod);
-                // else the directory could not be openned properly
-                // and time could not be retrieved, so we don't try
-                // to restore them
-        }
-        catch(Erange & e)
-        {
-                // cannot restore dates, ignoring
-        }
-    }
-
-    static bool is_nodump_flag_set(const path & chem, const string & filename)
+    static bool is_nodump_flag_set(user_interaction & dialog,
+				   const path & chem, const string & filename)
     {
 #ifdef LIBDAR_NODUMP_FEATURE
         S_I fd, f = 0;
@@ -1493,14 +1523,14 @@ namespace libdar
         {
             fd = ::open(ptr, O_RDONLY|O_BINARY|O_NONBLOCK);
             if(fd < 0)
-		user_interaction_warning(string("Failed to open ") + filename +" while checking for nodump flag: " + strerror(errno));
+		dialog.warning(tools_printf(gettext("Failed to open %S while checking for nodump flag: %s"), &filename, strerror(errno)));
 	    else
 	    {
 		try
 		{
 		    if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
 		    {
-			user_interaction_warning(string("Cannot get ext2 attributes (and nodump flag value) for ") + filename + " : " + strerror(errno));
+			dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, strerror(errno)));
 			f = 0;
 		    }
 		}
@@ -1525,7 +1555,8 @@ namespace libdar
 #endif
     }
 
-    static path *get_root_with_symlink(const path & root, bool info_details)
+    static path *get_root_with_symlink(user_interaction & dialog,
+				       const path & root, bool info_details)
     {
 	path *ret = NULL;
         char *ptr = tools_str2charptr(root.display());
@@ -1533,7 +1564,7 @@ namespace libdar
 	{
 	    struct stat buf;
             if(lstat(ptr, &buf) < 0) // stat not lstat, thus we eventually get the symlink pointed to inode
-                throw Erange("filesystem:get_root_with_symlink", string("Cannot get inode information for ") + root.display() + " : " + strerror(errno));
+                throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("Cannot get inode information for %s : %s"), ptr, strerror(errno)));
 
 	    if(S_ISDIR(buf.st_mode))
 	    {
@@ -1561,10 +1592,10 @@ namespace libdar
 			// a symlink to where ???
 		}
 		if(info_details && ! (*ret == root) )
-		    user_interaction_warning(string("Replacing in the -R option ") + root.display() + " by the directory pointed to by this symbolic link: " + ret->display());
+		    dialog.warning(tools_printf(gettext("Replacing %s in the -R option by the directory pointed to by this symbolic link: "), ptr) + ret->display());
 	    }
 	    else // not a directory given as argument
-		throw Erange("filesystem:get_root_with_symlink", string("Given path ") + root.display() + " must be a directory (or symbolic link to an existing directory");
+		throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("The given path %s must be a directory (or symbolic link to an existing directory"), ptr));
 	}
 	catch(...)
 	{

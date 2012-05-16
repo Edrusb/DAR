@@ -18,9 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.hpp,v 1.7 2003/11/18 00:51:47 edrusb Rel $
+// $Id: filtre.hpp,v 1.13 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file filtre.hpp
+    /// \brief here is all the core routines for the operations
+    /// \ingroup Private
 
 #ifndef FILTRE_HPP
 #define FILTRE_HPP
@@ -36,7 +40,8 @@
 namespace libdar
 {
 
-    extern void filtre_restore(const mask &filtre,
+    extern void filtre_restore(user_interaction & dialog,
+			       const mask &filtre,
                                const mask & subtree,
                                catalogue & cat,
                                bool detruire,
@@ -54,7 +59,8 @@ namespace libdar
                                const infinint & hourshift,
 			       bool empty);
 
-    extern void filtre_sauvegarde(const mask &filtre,
+    extern void filtre_sauvegarde(user_interaction & dialog,
+				  const mask &filtre,
                                   const mask &subtree,
                                   compressor *stockage,
                                   catalogue & cat,
@@ -68,23 +74,31 @@ namespace libdar
                                   const mask &compr_mask,
                                   const infinint & min_compr_size,
                                   bool nodump,
-                                  const infinint & hourshift);
+                                  const infinint & hourshift,
+				  bool alter_time,
+				  bool same_fs,
+				  bool ignore_owner);
 
-    extern void filtre_difference(const mask &filtre,
+    extern void filtre_difference(user_interaction & dialog,
+				  const mask &filtre,
                                   const mask &subtree,
                                   catalogue & cat,
                                   const path & fs_racine,
                                   bool info_details, statistics & st,
                                   bool check_ea_root,
-                                  bool check_ea_user);
+                                  bool check_ea_user,
+				  bool alter_time,
+				  bool ignore_owner);
 
-    extern void filtre_test(const mask &filtre,
+    extern void filtre_test(user_interaction & dialog,
+			    const mask &filtre,
                             const mask &subtree,
                             catalogue & cat,
                             bool info_details,
                             statistics & st);
 
-    extern void filtre_isolate(catalogue & cat,
+    extern void filtre_isolate(user_interaction & dialog,
+			       catalogue & cat,
                                catalogue & ref,
                                bool info_details);
 

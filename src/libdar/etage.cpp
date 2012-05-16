@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: etage.cpp,v 1.9.2.2 2004/09/10 20:15:42 edrusb Exp $
+// $Id: etage.cpp,v 1.14 2004/09/13 13:07:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -60,13 +60,13 @@ using namespace std;
 namespace libdar
 {
 
-    etage::etage(char *dirname, const infinint & x_last_acc, const infinint & x_last_mod)
+    etage::etage(const char *dirname, const infinint & x_last_acc, const infinint & x_last_mod)
     {
         struct dirent *ret;
         DIR *tmp = opendir(dirname);
 
         if(tmp == NULL)
-            throw Erange("filesystem etage::etage" , string("Error openning directory: ") + dirname + " : " + strerror(errno));
+            throw Erange("filesystem etage::etage" , string(gettext("Error openning directory: ")) + dirname + " : " + strerror(errno));
 
         fichier.clear();
         while((ret = readdir(tmp)) != NULL)
@@ -80,7 +80,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: etage.cpp,v 1.9.2.2 2004/09/10 20:15:42 edrusb Exp $";
+        static char id[]="$Id: etage.cpp,v 1.14 2004/09/13 13:07:51 edrusb Rel $";
         dummy_call(id);
     }
 

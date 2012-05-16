@@ -18,9 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.hpp,v 1.7.4.3 2004/07/25 20:38:04 edrusb Exp $
+// $Id: storage.hpp,v 1.11 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file storage.hpp
+    /// \brief contains a class that permits arbitrary large data storage
 
 #ifndef STORAGE_HPP
 #define STORAGE_HPP
@@ -42,6 +45,11 @@ namespace libdar
 namespace libdar
 {
     class generic_file;
+
+	/// arbitrary large storage structure
+
+	/// used to store infinint
+	/// \ingroup Private
 
     class storage
     {
@@ -179,8 +187,6 @@ namespace libdar
             ///////////////////////////////
             // STATIC statments :
             //
-
-        static U_32 alloc_size; // stores the last biggest memory allocation successfully realized
 
         static void detruit(struct cellule *c);
         static void make_alloc(U_32 size, struct cellule * & begin, struct cellule * & end);

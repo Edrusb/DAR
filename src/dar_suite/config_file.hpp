@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: config_file.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: config_file.hpp,v 1.7 2004/06/20 14:26:25 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -34,7 +34,7 @@ using namespace libdar;
 class config_file : public hide_file
 {
 public:
-    config_file(const vector<string> & target, generic_file &f) : hide_file(f) { cibles = target; };
+    config_file(user_interaction & dialog, const vector<string> & target, generic_file &f) : hide_file(dialog, f) { cibles = target; };
 
 protected:
     void fill_morceau();

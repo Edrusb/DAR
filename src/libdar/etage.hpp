@@ -18,9 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: etage.hpp,v 1.5.4.3 2004/09/13 09:20:59 edrusb Exp $
+// $Id: etage.hpp,v 1.8 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file etage.hpp
+    /// \brief definition of the etage structure is done here
+    /// \ingroup Private
+
 
 #ifndef ETAGE_HPP
 #define ETAGE_HPP
@@ -33,10 +38,18 @@
 namespace libdar
 {
 
+	/// the etage structure keep trace of directory contents
+
+	/// it relies on the opendir() system call family than
+	/// cannot be used recursively. Thus each etage structure
+	/// contains the contents of a directory, and can then be stored beside
+	/// other etage structures corresponding to subdirectories
+	/// \ingroup Private
     struct etage
     {
 	etage() { fichier.clear(); last_mod = 0; last_acc = 0; }; // required to fake an empty dir when one is impossible to open
-        etage(char *dirname, const infinint & x_last_acc, const infinint & x_last_mod);
+        etage(const char *dirname, const infinint & x_last_acc, const infinint & x_last_mod);
+
         bool read(std::string & ref);
 
         std::list<std::string> fichier;

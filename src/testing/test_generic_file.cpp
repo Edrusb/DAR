@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_generic_file.cpp,v 1.7.4.3 2004/09/22 03:14:24 edrusb Rel $
+// $Id: test_generic_file.cpp,v 1.10 2004/10/01 22:05:36 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -47,26 +47,33 @@ extern "C"
 #include "null_file.hpp"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
+#include "shell_interaction.hpp"
 
 using namespace libdar;
 using namespace std;
 
+static user_interaction *ui = NULL;
+
 int main(S_I argc, char *argv[])
 {
+    ui = shell_interaction_init(&cout, &cerr, false);
+    if(ui == NULL)
+	cout << "ERREUR !" << endl;
+
     if(argc < 3)
     {
         cout << "usage " << argv[0] << " <filename> <filename>" << endl;
         return -1;
     }
 
-    fichier f1 = fichier(argv[1], gf_read_only);
+    fichier f1 = fichier(*ui, argv[1], gf_read_only);
     S_I fd = ::open(argv[2], O_WRONLY|O_CREAT|O_TRUNC|O_BINARY);
     if(fd < 0)
     {
         cout << "cannot open "<< argv[2] << endl;
         return -1;
     }
-    fichier f2 = fd;
+    fichier f2 = fichier(*ui, fd);
 
     f1.reset_crc();
     f2.reset_crc();
@@ -80,11 +87,15 @@ int main(S_I argc, char *argv[])
     else
         cout << "CRC PROBLEM" << endl;
     f1.skip(0);
-    null_file f3 = gf_write_only;
+    null_file f3 = null_file(*ui, gf_write_only);
     crc crc3;
     f1.copy_to(f3, crc3);
     if(same_crc(crc1, crc3))
         cout << "CRC OK" << endl;
     else
         cout << "CRC PROBLEM" << endl;
+
+    shell_interaction_close();
+    if(ui != NULL)
+	delete ui;
 }

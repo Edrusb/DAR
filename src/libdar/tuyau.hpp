@@ -18,9 +18,17 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.hpp,v 1.6.2.2 2004/09/22 03:14:24 edrusb Rel $
+// $Id: tuyau.hpp,v 1.13 2004/12/07 18:04:52 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file tuyau.hpp
+    /// \brief defines the implementation of pipe under the generic_file interface.
+    ///
+    /// mainly used between zapette and slave_zapette, this is a full implementation
+    /// if the generic_file interface that takes care of dead lock when two pipes needs
+    /// to be openned between the same two entities, each having one for reading and the
+    /// other for writing.
 
 #ifndef TUYAU_HPP
 #define TUYAU_HPP
@@ -28,16 +36,21 @@
 #include "../my_config.h"
 #include "infinint.hpp"
 #include "generic_file.hpp"
+#include "thread_cancellation.hpp"
 
 namespace libdar
 {
 
-    class tuyau : public generic_file
+	/// pipe implementation under the generic_file interface.
+
+	/// \ingroup Private
+
+    class tuyau : public generic_file, public thread_cancellation
     {
     public:
-        tuyau(int fd); // fd is the filedescriptor of a pipe extremity
-        tuyau(int fd, gf_mode mode); // forces the mode if possible
-        tuyau(const std::string &filename, gf_mode mode);
+        tuyau(user_interaction & dialog, int fd); // fd is the filedescriptor of a pipe extremity
+        tuyau(user_interaction & dialog, int fd, gf_mode mode); // forces the mode if possible
+        tuyau(user_interaction & dialog, const std::string &filename, gf_mode mode);
         ~tuyau() { close(filedesc); };
 
             // inherited from generic_file

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.cpp,v 1.10.2.2 2004/07/25 20:38:04 edrusb Exp $
+// $Id: zapette.cpp,v 1.19 2005/01/28 23:27:57 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -35,6 +35,10 @@ extern "C"
 
 #if HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif
+
+#if HAVE_ARPA_INET_H
+#include <arpa/inet.h>
 #endif
 } // end extern "C"
 
@@ -96,8 +100,8 @@ namespace libdar
         U_16 pas;
 
         if(f->read(&serial_num, 1) == 0)
-            throw Erange("request::read", "uncompleted request received, aborting\n");
-        offset = infinint(NULL, f);
+            throw Erange("request::read", gettext("Partial request received, aborting\n"));
+        offset = infinint(f->get_gf_ui(), NULL, f);
         pas = 0;
         while(pas < sizeof(tmp))
             pas += f->read((char *)&tmp+pas, sizeof(tmp)-pas);
@@ -161,11 +165,11 @@ namespace libdar
             arg = 0;
             break;
         case ANSWER_TYPE_INFININT:
-            arg = infinint(NULL, f);
+            arg = infinint(f->get_gf_ui(), NULL, f);
             size = 0;
             break;
         default:
-            throw Erange("answer::read", "corrupted data read on pipe");
+            throw Erange("answer::read", gettext("Corrupted data read on pipe"));
         }
     }
 
@@ -179,11 +183,11 @@ namespace libdar
             throw SRC_BUG;
 
         if(input->get_mode() == gf_write_only)
-            throw Erange("slave_zapette::slave_zapette", "input cannot be read");
+            throw Erange("slave_zapette::slave_zapette", gettext("Input cannot be read"));
         if(output->get_mode() == gf_read_only)
-            throw Erange("slave_zapette::slave_zapette", "cannot write to output");
+            throw Erange("slave_zapette::slave_zapette", gettext("Cannot write to output"));
         if(data->get_mode() != gf_read_only)
-            throw Erange("slave_zapette::slave_zapette", "data should be read-only");
+            throw Erange("slave_zapette::slave_zapette", gettext("Data should be read-only"));
         in = input;
         out = output;
         src = data;
@@ -251,7 +255,7 @@ namespace libdar
                     {
                         ans.type = ANSWER_TYPE_INFININT;
                         if(!src->skip_to_eof())
-                            throw Erange("slave_zapette::action", "cannot skip at end of file");
+                            throw Erange("slave_zapette::action", gettext("Cannot skip at end of file"));
                         ans.arg = src->get_position();
                         ans.write(out, NULL);
                     }
@@ -263,7 +267,7 @@ namespace libdar
 			ans.write(out, NULL);
 		    }
                     else
-                        throw Erange("zapette::action", "received unkown special order");
+                        throw Erange("zapette::action", gettext("Received unkown special order"));
                 }
             }
             while(req.size != REQUEST_SIZE_SPECIAL_ORDER || req.offset != REQUEST_OFFSET_END_TRANSMIT);
@@ -278,16 +282,16 @@ namespace libdar
             delete buffer;
     }
 
-    zapette::zapette(generic_file *input, generic_file *output) : contextual(gf_read_only)
+    zapette::zapette(user_interaction & dialog, generic_file *input, generic_file *output) : contextual(dialog, gf_read_only)
     {
         if(input == NULL)
             throw SRC_BUG;
         if(output == NULL)
             throw SRC_BUG;
         if(input->get_mode() == gf_write_only)
-            throw Erange("zapette::zapette", "cannot read on input");
+            throw Erange("zapette::zapette", gettext("Cannot read on input"));
         if(output->get_mode() == gf_read_only)
-            throw Erange("zapette::zapette", "cannot write on output");
+            throw Erange("zapette::zapette", gettext("Cannot write on output"));
 
         in = input;
         out = output;
@@ -313,7 +317,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: zapette.cpp,v 1.10.2.2 2004/07/25 20:38:04 edrusb Exp $";
+        static char id[]="$Id: zapette.cpp,v 1.19 2005/01/28 23:27:57 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -368,7 +372,7 @@ namespace libdar
 
     S_I zapette::inherited_read(char *a, size_t size)
     {
-        static U_16 max_short = ~0;
+        static const U_16 max_short = ~0;
         U_I lu = 0;
 
         if(size > 0)
@@ -415,7 +419,7 @@ namespace libdar
         {
             ans.read(in, data, size);
             if(ans.serial_num != req.serial_num)
-                user_interaction_pause("communication problem with peer, retry ?");
+                get_gf_ui().pause(gettext("Communication problem with peer, retry ?"));
 	}
         while(ans.serial_num != req.serial_num);
 
@@ -431,7 +435,7 @@ namespace libdar
             arg = ans.arg;
             break;
         default:  // might be a transmission error do to weak transport layer
-            throw Erange("zapette::make_transfert", "incoherent answer from peer");
+            throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
         }
 
             // sanity checks
@@ -440,20 +444,20 @@ namespace libdar
             if(req.offset == REQUEST_OFFSET_END_TRANSMIT)
             {
                 if(ans.size != 0 && ans.type != ANSWER_TYPE_DATA)
-                    user_interaction_warning("bad answer from peer, to connexion close");
+                    get_gf_ui().warning(gettext("Bad answer from peer, while closing connection"));
             }
             else if(req.offset == REQUEST_OFFSET_GET_FILESIZE)
             {
                 if(ans.size != 0 && ans.type != ANSWER_TYPE_INFININT)
-                    throw Erange("zapette::make_transfert", "incoherent answer from peer");
+                    throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
             }
 	    else if(req.offset == REQUEST_OFFSET_CHANGE_CONTEXT_STATUS)
 	    {
 		if(ans.arg != 1)
-		    throw Erange("zapette::set_info_status", "unexpected answer from slave, communcation problem or bug may hang the operation");
+		    throw Erange("zapette::set_info_status", gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
 	    }
             else
-                throw Erange("zapette::make_transfert", "corrupted data read from pipe");
+                throw Erange("zapette::make_transfert", gettext("Corrupted data read from pipe"));
         }
     }
 

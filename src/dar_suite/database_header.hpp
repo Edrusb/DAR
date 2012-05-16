@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database_header.hpp,v 1.5.4.1 2004/09/22 03:14:21 edrusb Rel $
+// $Id: database_header.hpp,v 1.8 2004/10/01 22:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -28,6 +28,8 @@
 #include "../my_config.h"
 #include "infinint.hpp"
 #include "generic_file.hpp"
+
+#include "user_interaction.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -41,7 +43,7 @@ struct database_header
     void write(generic_file & f) { f.write((char *)&version, 1); f.write((char *)&options, 1); };
 };
 
-extern generic_file *database_header_create(const string & filename, bool overwrite);
-extern generic_file *database_header_open(const string & filename);
+extern generic_file *database_header_create(user_interaction & dialog, const string & filename, bool overwrite);
+extern generic_file *database_header_open(user_interaction & dialog, const string & filename);
 
 #endif

@@ -18,9 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.hpp,v 1.8.4.4 2004/09/22 03:14:22 edrusb Rel $
+// $Id: ea.hpp,v 1.15 2004/11/07 18:21:37 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file ea.hpp
+    /// \brief contains a set of routines to manage EA values associated to a file
+    /// \ingroup Private
+
 
 #ifndef EA_HPP
 #define EA_HPP
@@ -56,7 +61,7 @@ namespace libdar
         std::string key, value;
 
         ea_entry() { mode = ea_insert; domain = ea_domain_user; key = value = ""; };
-        ea_entry(generic_file & f);
+        ea_entry(user_interaction & dialog, generic_file & f);
 
         void dump(generic_file & f) const;
     };
@@ -65,7 +70,7 @@ namespace libdar
     {
     public:
         ea_attributs() { alire = attr.begin(); };
-        ea_attributs(generic_file & f);
+        ea_attributs(user_interaction & dialog, generic_file & f);
         ea_attributs(const ea_attributs & ref);
 
         void dump(generic_file & f) const;

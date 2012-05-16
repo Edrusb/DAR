@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.8.4.2 2004/07/13 22:37:33 edrusb Rel $
+// $Id: ea_filesystem.cpp,v 1.15 2004/08/03 21:28:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -47,13 +47,15 @@ char *strchr (), *strrchr ();
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+#if HAVE_ATTR_XATTR_H
 #include <attr/xattr.h>
+#endif
 #endif
 } // end extern "C"
 
+#include "ea_filesystem.hpp"
 #include "ea.hpp"
 #include "tools.hpp"
-#include "ea_filesystem.hpp"
 #include "user_interaction.hpp"
 
 using namespace std;
@@ -166,7 +168,8 @@ namespace libdar
                         {
                         case ea_insert:
                             if(lsetxattr(p_chemin, k, v, v_size, 0) < 0)
-                                throw Erange("ea_filesystem write_ea", string("aborting operations for the EA of ")+chemin+ " : error while adding EA "+ k + " : " + strerror(errno));
+                                throw Erange("ea_filesystem write_ea", tools_printf(gettext("Aborting operations for the EA of %S : error while adding EA %s : %s"),
+										    &chemin,  k, strerror(errno)));
                             else
                                 num++;
                             break;
@@ -174,7 +177,8 @@ namespace libdar
                             if(lremovexattr(p_chemin, k) < 0)
                             {
                                 if(errno != ENOATTR)
-                                    throw Erange("ea_filesystem write_ea", string("aborting operations for the EAs of ")+chemin+ " : error while removing " + k + " : " + strerror(errno));
+                                    throw Erange("ea_filesystem write_ea", tools_printf(gettext("Aborting operations for the EAs of %S : error while removing %s : %s"),
+											&chemin,  k, strerror(errno)));
                             }
                             else
                                 num++;
@@ -234,7 +238,8 @@ namespace libdar
                     S_32 taille = lgetxattr(n_ptr, a_name, NULL, 0);
                     char *value = NULL;
                     if(taille < 0)
-                        throw Erange("ea_filesystem read_ea", string("error reading attribut ") + a_name + " of file " + n_ptr + "  : " + strerror(errno));
+                        throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribut %s of file %s : %s"),
+									   a_name, n_ptr, strerror(errno)));
                     value = new char[taille+MARGIN];
                     if(value == NULL)
                         throw Ememory("filesystem : read_ea_from");
@@ -242,7 +247,8 @@ namespace libdar
                     {
                         taille = lgetxattr(n_ptr, a_name, value, taille+MARGIN);
                         if(taille < 0)
-                            throw Erange("ea_filesystem read_ea", string("error reading attribut ") + a_name + " of file " + n_ptr + "  : " + strerror(errno));
+                            throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribut %s of file %s : %s"),
+									       a_name, n_ptr, strerror(errno)));
                         split_ea_name(*it, ea_ent.domain, ea_ent.key);
                         ea_ent.mode = ea_insert;
                         ea_ent.value = string(&(value[0]), &(value[taille]));
@@ -276,8 +282,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea_filesystem.cpp,v 1.8.4.2 2004/07/13 22:37:33 edrusb Rel $";
-
+        static char id[]="$Id: ea_filesystem.cpp,v 1.15 2004/08/03 21:28:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -292,7 +297,8 @@ namespace libdar
         {
             if(errno == ENOSYS || errno == ENOTSUP)
                 return ret;
-            throw Erange("ea_filesystem_get_ea_list_for", string("error retreiving EA list for ")+filename+ " : " + strerror(errno));
+            throw Erange("ea_filesystem_get_ea_list_for", tools_printf(gettext("Error retreiving EA list for %s : %s"),
+								       filename, strerror(errno)));
         }
 
         liste = new char[taille+MARGIN];
@@ -303,7 +309,8 @@ namespace libdar
             S_32 cursor = 0;
             taille = llistxattr(filename, liste, taille+MARGIN);
             if(taille < 0)
-                throw Erange("ea_filesystem_get_ea_list_for", string("error retreiving EA list for ")+filename+ " : " + strerror(errno));
+                throw Erange("ea_filesystem_get_ea_list_for", tools_printf(gettext("Error retreiving EA list for %s : %s"),
+									   filename, strerror(errno)));
             while(cursor < taille)
             {
                 ret.push_back(string(liste+cursor));
@@ -331,7 +338,7 @@ namespace libdar
         else if(x == ea_convert[ea_domain_user])
             return ea_domain_user;
         else
-            throw Erange("ea_filesystem : string2ea_domain", string("unknow EA namespace : ") + x);
+            throw Erange("ea_filesystem : string2ea_domain", string(gettext("unknow EA namespace : ")) + x);
     }
 
     static void split_ea_name(const string & src, ea_domain & d, string & key)
@@ -339,7 +346,7 @@ namespace libdar
         U_I cesure = src.find_first_of(".");
 
         if(cesure >= src.size() || cesure < 0)
-            throw Erange("ea_filesystem split_ea_name", string("unknown EA attribute name format : ") + src);
+            throw Erange("ea_filesystem split_ea_name", string(gettext("unknown EA attribute name format : ")) + src);
         d = string2ea_domain(string(src.begin(), src.begin()+cesure));
         key = string(src.begin()+cesure+1, src.end());
     }

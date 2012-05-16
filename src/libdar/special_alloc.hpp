@@ -18,12 +18,25 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: special_alloc.hpp,v 1.4.4.3 2004/08/01 06:11:50 edrusb Exp $
+// $Id: special_alloc.hpp,v 1.9 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
 
+    /// \file special_alloc.hpp
+    /// \brief re-definition of new and delete class operator
+    ///
+    /// this is a set of macro that makes the new and delete operator for
+    /// a class be re-defined in a way that allocation is done in big chunks
+    /// at the system level, and is split in small requested pieces for a
+    /// given object allocation. This bring some performance improvment,
+    /// because a lot a small objects that live and die toghether have to
+    /// be allocated.
+    /// \ingroup Private
+
 #ifndef SPECIAL_ALLOC_HPP
 #define SPECIAL_ALLOC_HPP
+
+#include "../my_config.h"
 
 #ifdef LIBDAR_SPECIAL_ALLOC
 
@@ -38,7 +51,6 @@ extern "C"
 #endif
 } // end extern "C"
 
-
 #define USE_SPECIAL_ALLOC(BASE_TYPE) \
         void *operator new(size_t taille) { return special_alloc_new(taille); };                \
         void *operator new(size_t taille, BASE_TYPE * & place) { return (void *) place; };      \
@@ -47,6 +59,12 @@ extern "C"
 
 namespace libdar
 {
+	// this following call is to be used in a
+	// multi-thread environment and is called from
+	// libdar global initialization function
+	// this makes the libdar thread-safe if POSIX mutex
+	// are available
+    extern void special_alloc_init_for_thread_safe();
 
     extern void *special_alloc_new(size_t taille);
     extern void special_alloc_delete(void *ptr);
@@ -56,3 +74,4 @@ namespace libdar
 #endif
 
 #endif
+

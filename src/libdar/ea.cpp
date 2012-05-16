@@ -18,12 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.cpp,v 1.7.4.2 2004/07/25 20:38:03 edrusb Exp $
+// $Id: ea.cpp,v 1.12 2004/08/03 21:28:00 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
+
 #include "ea.hpp"
 #include "tools.hpp"
 #include "integers.hpp"
@@ -44,7 +45,7 @@ namespace libdar
         alire = attr.begin();
     }
 
-    ea_entry::ea_entry(generic_file & f)
+    ea_entry::ea_entry(user_interaction & dialog, generic_file & f)
     {
         unsigned char fl;
 
@@ -53,7 +54,7 @@ namespace libdar
         mode = (fl &
                 EA_DEL) != 0 ? ea_del : ea_insert;
         tools_read_string(f, key);
-        infinint tmp = infinint(NULL, &f);
+        infinint tmp = infinint(dialog, NULL, &f);
         tools_read_string_size(f, value, tmp);
     }
 
@@ -73,10 +74,10 @@ namespace libdar
 
 ///////////// EA_ATTRIBUTS IMPLEMENTATION //////////
 
-    ea_attributs::ea_attributs(generic_file & f)
+    ea_attributs::ea_attributs(user_interaction & dialog, generic_file & f)
     {
         U_32 tmp2 = 0;
-        infinint tmp = infinint(NULL, &f);
+        infinint tmp = infinint(dialog, NULL, &f);
 
         tmp.unstack(tmp2);
 
@@ -84,7 +85,7 @@ namespace libdar
         {
             while(tmp2 > 0)
             {
-                attr.push_back(ea_entry(f));
+                attr.push_back(ea_entry(dialog, f));
                 tmp2--;
             }
             tmp.unstack(tmp2);
@@ -96,7 +97,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea.cpp,v 1.7.4.2 2004/07/25 20:38:03 edrusb Exp $";
+        static char id[]="$Id: ea.cpp,v 1.12 2004/08/03 21:28:00 edrusb Rel $";
         dummy_call(id);
     }
 

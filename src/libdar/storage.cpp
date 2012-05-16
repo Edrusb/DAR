@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.cpp,v 1.7.4.3 2004/09/10 22:34:16 edrusb Exp $
+// $Id: storage.cpp,v 1.14 2004/12/07 18:04:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,9 +30,6 @@
 
 namespace libdar
 {
-
-    U_32 storage::alloc_size = 120000;
-        // must be less than the third of the maxmimum value of a U_32
 
     storage::storage(const infinint & size)
     {
@@ -62,7 +59,7 @@ namespace libdar
                 while(lu < ptr->size && tmp != 0);
 
                 if(lu < ptr->size)
-                    throw Erange("storage::storage", "not enought data to initialize storage field");
+                    throw Erange("storage::storage", gettext("Not enought data to initialize storage field"));
                 ptr = ptr->next;
             }
         }
@@ -89,7 +86,7 @@ namespace libdar
 
         do {
             if(ptr == NULL)
-                throw Erange("storage::operator[]", "asking for an element out of array");
+                throw Erange("storage::operator[]", gettext("Asking for an element out of array"));
             if(offset > ptr->size)
             {
                 offset -= ptr->size;
@@ -154,7 +151,7 @@ namespace libdar
         register U_I i;
 
         if(it.ref != this)
-            throw Erange("storage::write", "the iterator is not indexing the object it has been asked to write to");
+            throw Erange("storage::write", gettext("The iterator is not indexing the object it has been asked to write to"));
 
         for(i = 0; i < size && it != end(); i++)
             *(it++) = a[i];
@@ -169,7 +166,7 @@ namespace libdar
         register U_I i;
 
         if(it.ref != this)
-            throw Erange("storage::read", "the iterator is not indexing the object it has been asked to read from");
+            throw Erange("storage::read", gettext("The iterator is not indexing the object it has been asked to read from"));
 
         for(i = 0; i < size && it != end(); i++)
             a[i] = *(it++);
@@ -399,7 +396,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: storage.cpp,v 1.7.4.3 2004/09/10 22:34:16 edrusb Exp $";
+        static char id[]="$Id: storage.cpp,v 1.14 2004/12/07 18:04:51 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -430,6 +427,7 @@ namespace libdar
     {
         E_BEGIN;
         struct cellule *glisseur = first;
+	U_32 failed_alloc = ~0;
 
         while(glisseur != NULL)
         {
@@ -437,7 +435,7 @@ namespace libdar
             {
                 U_I somme = glisseur->next->size + glisseur->size;
 
-                if(somme < alloc_size)
+                if(somme < failed_alloc)
                 {
                     unsigned char *p = new unsigned char[somme];
 
@@ -466,7 +464,10 @@ namespace libdar
                         detruit(tmp);
                     }
                     else // alloc failed
+		    {
+			failed_alloc = somme;
                         glisseur = glisseur->next;
+		    }
                 }
                 else // no fusion possible
                     glisseur = glisseur->next;
@@ -481,7 +482,7 @@ namespace libdar
     {
         E_BEGIN;
         if(it.ref != this)
-            throw Erange("storage::insert_bytes_at_iterator_cmn", "the iterator is not indexing the object it has been asked to insert byte into");
+            throw Erange("storage::insert_bytes_at_iterator_cmn", gettext("The iterator is not indexing the object it has been asked to insert byte into"));
 
         if(it.cell != NULL)
         {
@@ -575,8 +576,6 @@ namespace libdar
         {
             if(c->size == 0 && c->data != NULL)
                 throw SRC_BUG;
-            if(alloc_size < c->size)
-                alloc_size = c->size;
             if(c->data != NULL)
                 delete c->data;
             t = c->next;
@@ -591,11 +590,12 @@ namespace libdar
         E_BEGIN;
         struct cellule *newone;
         struct cellule *previous = NULL;
+	U_32 dsize;
 
+	begin = NULL;
+	dsize = size;
         do
         {
-            U_32 dsize = alloc_size < size ? alloc_size : size;
-
             newone = new struct cellule;
             if(newone != NULL)
             {
@@ -611,23 +611,27 @@ namespace libdar
                 detruit(begin);
                 throw Ememory("storage::make_alloc");
             }
-            newone->data = new unsigned char[dsize];
 
-            if(newone->data != NULL)
-            {
-                size -= dsize;
-                newone->size = dsize;
-                previous = newone;
-            }
-            else
-                if(alloc_size > 2)
-                    alloc_size /= 2;
-                else
-                {
-                    newone->size = 0;
-                    detruit(begin);
-                    throw Ememory("storage::make_alloc");
-                }
+	    do
+	    {
+		newone->data = new unsigned char[dsize];
+		if(newone->data != NULL)
+		{
+		    size -= dsize;
+		    newone->size = dsize;
+		    previous = newone;
+		}
+		else
+		    if(dsize > 2)
+			dsize /= 2;
+		    else
+		    {
+			newone->size = 0;
+			detruit(begin);
+			throw Ememory("storage::make_alloc");
+		    }
+	    }
+	    while(dsize > 1 && newone->data == NULL);
         }
         while (size > 0);
 
@@ -721,8 +725,8 @@ namespace libdar
         if(points_on_data())
             return cell->data[offset];
         else
-            throw Erange("storage::iterator::operator *()", "iterator does not point on data");
-        E_END("storage::iterator::operator *","unary operator");
+            throw Erange("storage::iterator::operator *()", gettext("Iterator does not point to data"));
+        E_END("storage::iterator::operator *", gettext("unary operator"));
     }
 
     void storage::iterator::skip_to(const storage & st, infinint val)
@@ -786,13 +790,13 @@ namespace libdar
     {
         E_BEGIN;
         if(ref == NULL || ref->first == NULL)
-            throw Erange("storage::iterator::get_position", "reference storage of the iterator is empty or non existant");
+            throw Erange("storage::iterator::get_position", gettext("Reference storage of the iterator is empty or non existant"));
 
         struct cellule *p = ref->first;
         infinint ret = 0;
 
         if(cell == NULL)
-            throw Erange("storage::iterator::get_position", "iterator does not point on data");
+            throw Erange("storage::iterator::get_position", gettext("Iterator does not point to data"));
 
         while(p != NULL && p != cell)
         {
@@ -803,7 +807,7 @@ namespace libdar
         if(p != NULL)
             ret += offset;
         else
-            throw Erange("storage::iterator::get_position", "the iterator position is not inside the storage of reference");
+            throw Erange("storage::iterator::get_position", gettext("The iterator position is not inside the storage of reference"));
 
         return ret;
         E_END("storage::iterator::get_position","");

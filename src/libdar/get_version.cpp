@@ -18,9 +18,11 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: get_version.cpp,v 1.7 2003/12/10 21:26:21 edrusb Rel $
+// $Id: get_version.cpp,v 1.8 2004/08/03 21:28:01 edrusb Rel $
 //
 /*********************************************************************/
+
+#include "../my_config.h"
 
 #include <iostream>
 #include "libdar.hpp"

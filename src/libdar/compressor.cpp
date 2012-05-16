@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.8.4.2 2004/07/25 20:38:03 edrusb Exp $
+// $Id: compressor.cpp,v 1.14 2004/07/31 17:45:24 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -40,13 +40,13 @@ using namespace std;
 namespace libdar
 {
 
-    compressor::compressor(compression algo, generic_file & compressed_side, U_I compression_level) : generic_file(compressed_side.get_mode())
+    compressor::compressor(user_interaction & dialog, compression algo, generic_file & compressed_side, U_I compression_level) : generic_file(dialog, compressed_side.get_mode())
     {
         init(algo, &compressed_side, compression_level);
         compressed_owner = false;
     }
 
-    compressor::compressor(compression algo, generic_file *compressed_side, U_I compression_level) : generic_file(compressed_side->get_mode())
+    compressor::compressor(user_interaction & dialog, compression algo, generic_file *compressed_side, U_I compression_level) : generic_file(dialog, compressed_side->get_mode())
     {
         init(algo, compressed_side, compression_level);
         compressed_owner = true;
@@ -71,7 +71,7 @@ namespace libdar
             write_ptr = &compressor::none_write;
             break;
         case zip :
-            throw Efeature("zip compression not implemented");
+            throw Efeature(gettext("zip compression not implemented"));
             break;
         case bzip2 :
             wr_mode = bzlib_mode;
@@ -100,7 +100,7 @@ namespace libdar
             case WR_VERSION_ERROR:
                 delete compr;
                 delete decompr;
-                throw Erange("compressor::compressor", "incompatible Zlib version");
+                throw Erange("compressor::compressor", gettext("incompatible Zlib version"));
             case WR_STREAM_ERROR:
             default:
                 delete compr;
@@ -122,7 +122,7 @@ namespace libdar
                 compr->wrap.compressEnd();
                 delete compr;
                 delete decompr;
-                throw Erange("compressor::compressor", "incompatible Zlib version");
+                throw Erange("compressor::compressor", gettext("incompatible Zlib version"));
             case WR_STREAM_ERROR:
             default:
                 compr->wrap.compressEnd();
@@ -165,7 +165,7 @@ namespace libdar
             case WR_DATA_ERROR: // some data remains in the compression pipe (data loss)
                 throw SRC_BUG;
             case WR_STREAM_ERROR:
-                throw Erange("compressor::~compressor", "compressed data is corrupted");
+                throw Erange("compressor::~compressor", gettext("compressed data is corrupted"));
             default :
                 throw SRC_BUG;
             }
@@ -255,7 +255,7 @@ namespace libdar
             case WR_STREAM_END:
                 break;
             case WR_DATA_ERROR:
-                throw Erange("compressor::gzip_read", "compressed data CRC error");
+                throw Erange("compressor::gzip_read", gettext("compressed data CRC error"));
             case WR_MEM_ERROR:
                 throw Ememory("compressor::gzip_read");
             case WR_BUF_ERROR:
@@ -365,7 +365,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: compressor.cpp,v 1.8.4.2 2004/07/25 20:38:03 edrusb Exp $";
+        static char id[]="$Id: compressor.cpp,v 1.14 2004/07/31 17:45:24 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -400,7 +400,7 @@ namespace libdar
         case 'y':
             return bzip2;
         default :
-            throw Erange("char2compression", "unknown compression");
+            throw Erange("char2compression", gettext("unknown compression"));
         }
     }
 
@@ -417,7 +417,7 @@ namespace libdar
         case bzip2:
             return 'y';
         default :
-            throw Erange("char2compression", "unknown compression");
+            throw Erange("char2compression", gettext("unknown compression"));
         }
     }
 
@@ -434,7 +434,7 @@ namespace libdar
         case bzip2 :
             return "bzip2";
         default :
-            throw Erange("compresion2char", "unknown compression");
+            throw Erange("compresion2char", gettext("unknown compression"));
         }
     }
 

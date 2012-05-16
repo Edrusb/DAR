@@ -1,20 +1,26 @@
 TODO (order is not significant)
 ===========
-- libdar library thread safe
-- multi-language support (selection at compilation time)
-- rethink the behavior of dar when virtual memory is exhausted
-  (do not fail stop asking the user whether to retry or stop, thus the routine
-   must not need extra memory to work)
 - have wild card for -f and -r options of dar_manager
-- check the apache "Order" directive for command-line more grained inclusion/exclusion mechanism
 - add a 'testing' option for dar_manager's databases
 - have the possibility to define a given compression algo + level by file type
-- add EA support for xfs filesystem
-- add KiB and KB
-- add long-options under Solaris and on other system that do not provide it.
-- add examples of use for -I -X -P and [list of path]
 - have dar_manager able to read encrypted archives, and encrypt databases
-- generic_file based read or write caching. to use around catalogue
-  (catalogue::catalogue(generic_file) constructor and catalogue::dump(generic_file) or better in the "none" algorithm for compressor
-- long options on all systems.
-
+- have -X -I -P read a list from a given file
+- having null terminated string in -B files
+- escape character for quotes in -B files
+- rewrite all documentation in HTML
+- LZO compression (poor documentation... need time to read how is done the implementation in lzop)
+- extend EA to xfs and trusted. Replace "root" EA name by "system" EA name (source code, comments, doc)
+- warning when an explicit file from [list of path] has not been found
+- dar_manager can restore all files at the state it was at a given time (Uwe Freese's original idea, on support forum)
+- add create_diff and create_full syntaxical target in dcf files
+- have a minimum block size for compression, under which files are compressed
+  toghether, size is user defined.
+- having a new action: the "snapshot" to catalogue (only contains informations about the current status of files)
+- deprecate [list of path] warn and redirect with -g option (open the make-like target syntax)
+- some more encryption cypher
+- Matthew's "dry martini" option ;-)
+- parchive inside libdar
+- have the possibility to abort (^C) dar_manager at any time without the risk of loosing the database
+- API feature : have a method to return information about the listed archvie (additional method, when not using op_listing)
+- API feature : have cypher used stored in the archive and automatically detect the cypher used when reading an archive
+- dar_manager uses temporary files to limit the period of "all in memory" information when writing back database to file.

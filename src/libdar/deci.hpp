@@ -18,9 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: deci.hpp,v 1.6.4.2 2004/07/25 20:38:03 edrusb Exp $
+// $Id: deci.hpp,v 1.9 2004/11/12 21:58:17 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file deci.hpp
+    /// \brief manages the decimal representation of infinint
+    /// \ingroup Tools
 
 #ifndef DECI_HPP
 #define DECI_HPP
@@ -33,21 +37,40 @@
 namespace libdar
 {
 
+	/// decimal class, convert infinint from and to decimal represention
+
+	/// the class contains the decimal representation of an integer
+	/// and can produce a readable string to display the corresponding
+	/// integer it can also produce a computer value corresponding to
+	/// the decimal value. In the other side, objects of this class can
+	/// be built from a integer as well as from a string representing
+	/// the decimals of an integer.
+	/// \ingroup Tools
     class deci
     {
     public :
+	    /// constructor to build a "deci" object from a string representing decimals
         deci(std::string s);
+
+	    /// constructor to build a "deci" from an infinint
         deci(const infinint & x);
+
+	    /// copy constructor
         deci(const deci & ref)
             { E_BEGIN; copy_from(ref); E_END("deci::deci", "deci"); };
+
+	    /// destructor
         ~deci()
             { E_BEGIN; detruit(); E_END("deci::~deci", ""); };
 
 
+	    /// copy operator
         deci & operator = (const deci & ref)
             { E_BEGIN; detruit(); copy_from(ref); return *this; E_END("deci::operator = ", ""); };
 
+	    /// this produce a infinint from the decimal stored in the current object
         infinint computer() const;
+	    /// this produce a string fromr the decimal stored in the current object
         std::string human() const;
 
     private :
@@ -58,7 +81,14 @@ namespace libdar
         void reduce();
     };
 
+	/// specific << operator to use infinint in std::ostream
+
+	/// including "deci.hpp" let this operator available so you can
+	/// display infinint with the << std::ostream operator as you can
+	/// do for standard types.
+	/// \ingroup Tools
     extern std::ostream & operator << (std::ostream & ref, const infinint & arg);
+
 } // end of namespace
 
 #endif

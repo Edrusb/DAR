@@ -29,12 +29,12 @@ of help string returned to user when the -h option is given.
 An extract of Denis Corbin's resume:
         1970      my parents did a big mistake. ;-)
         1989      BAC C (mention AB)
-        1990-1992 Classes Prepa
+        1990-1992 Classes Prepas
         1992-1995 ENSEIRB - Ecole Nationale Superieur d'Electronique
                             Informatique et Radiocommunications de Bordeaux
-                  Promo 1995.
+                            Promo 1995.
         1995      3 months Erasmus project in Bologna (Italy).
-        1996      Military Service 28e Regiment Transmission Armee de Terre
+        1996      Military Service: 28e Regiment Transmission Armee de Terre
                   Formation Equipex-RITA, operator on the RITTER network.
         1997-2000 Software developer, Team leader, Project leader for
                   Netcomsystems (today Spirent Communications). Designed
@@ -44,40 +44,44 @@ An extract of Denis Corbin's resume:
         2000-2002 Network Design, architecture and network support for DCN
                   of Alcatel Submarine Networks, (worked mainly in France,
                   and spend several weeks in USA, Chile and Brazil).
-        2002-2003 DNS maintainer and Firewall admin for Bouygues Telecom
-                  operator's GPRS network.
-       since 2003 Network Design and support for SFR's wap and SMS platform,
+        2002-2003 DNS maintainer and Firewall admin for the GPRS network of
+                  Bouygues Telecom (small french mobile operator).
+        2003-2004 Network Design and support for SFR's wap and SMS platform,
                   Internet ISP connectivity.
+	2003      Cisco Certified: CCNA
+       since 2004 Validation responsible of the hosting infrastructure
+                  that provides data to UMTS mobile phones for SFR.
+	2004      Cisco Certified: CCNP
 
         Good knowledge of
               L1 protocols (bit encoding like Differential Manchester, etc.).
-              L2 protocols (Ethernet, Token Ring, frame format, detail behavior
+              L2 protocols (Ethernet, Token Ring: frame format, detail behavior
                        and structure of switch and hub equipments. ATM, FR,
-                       protocols, E1 and E3 WAN links).
+                       protocols, E1, T1, T3 and E3 WAN links).
               L3 protocols (IP, OSI, OSPF, RIP, ISIS, ESIS, BGP, HSRP, VRRP...)
               L4 protocols (UDP, TCP).
               QoS (CBQ, TBF, RED, etc.)
               DNS configuration and administrative interfaces to network
-              databases,
-              Firewalls admin (Checkpoint, Netscreen, Linux iptables),
-              RIPE administrative interface,
-              Alteon Load Balancers.
+              databases (like the RIPE).
+              Firewall admin (Checkpoint, Netscreen, Linux iptables),
+              Alteon Load Balancers,
+	      BlueCoat proxy equipments.
 
         Knowledge of
              SDH networks, Submarine Equipment systems and TMN-OS,
-             GSM and GPRS network structure, SS7 and radio protocol.
+             GSM and GPRS network structure, SS7 and radio protocols.
+             HPOVO, HPOVPI.
 
-        Practice of the following equipments:
-             Cisco switches and routers (3550 SMI/EMI, 7200, 3600, 1700, 2500)
-             Checkpoint Firewalls 4.1 and NG
-             Alteon L4-L7 load balancer
+	Good practice of the following equipments:
+             Cisco switches and routers (3550 SMI/EMI, 7200, 3600, 1700, 2500, 4500)
+             Checkpoint Firewalls 4.1, NG and AI
+             Alteon L4-L7 load balancers
              Netscreen Firewalls
              SunOS/Solaris network and hardware administration (less practice
                  for system admin.)
-             Linux OS (in particular as router/firewall system).
-
+             Linux OS (software developement, system admin, and its very rich network
+                 features).
 
        spoken languages: French, English, Italian, Russian.
        extra professional activities: astronomy, photography, occasional
        chess player. Author and maintainer or Disk ARchive (but this, you know)
-

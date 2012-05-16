@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.7.4.6 2004/07/25 20:38:03 edrusb Exp $
+// $Id: real_infinint.cpp,v 1.18 2004/10/22 22:39:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -41,25 +41,25 @@ namespace libdar
 
     infinint::endian infinint::used_endian = not_initialized;
 
-    infinint::infinint(S_I *fd, generic_file *x)
+    infinint::infinint(user_interaction & dialog, S_I *fd, generic_file *x)
     {
         if(fd != NULL && x != NULL)
-            throw Erange("infinint::infinint(file, file)", "both arguments are not NULL, please choose for me one or the other");
+            throw Erange("infinint::infinint(file, file)", gettext("Both arguments are not NULL, please choose one or the other, not both"));
         if(fd != NULL)
         {
-            fichier f = dup(*fd);
+            fichier f = fichier(dialog, dup(*fd));
             build_from_file(f);
         }
         else
             if(x != NULL)
                 build_from_file(*x);
             else
-                throw Erange("infinint::infinint(file, file)", "cannot read from file, both arguments are NULL");
+                throw Erange("infinint::infinint(file, file)", gettext("Cannot read from file, both arguments are NULL"));
     }
 
-    void infinint::dump(S_I fd) const
+    void infinint::dump(user_interaction & dialog, S_I fd) const
     {
-        fichier f = dup(fd);
+        fichier f = fichier(dialog, dup(fd));
         dump(f);
     }
 
@@ -78,7 +78,7 @@ namespace libdar
             lu = x.read((char *)&a, 1);
 
             if(lu <= 0)
-                throw Erange("infinint::build_from_file(generic_file)", "reached end of file before all data could be read");
+                throw Erange("infinint::build_from_file(generic_file)", gettext("Reached end of file before all data could be read"));
 
             if(a == 0)
                 skip++;
@@ -91,7 +91,7 @@ namespace libdar
                 for(S_I i = 0; i < 8; i++)
                     pos = pos + bf[i];
                 if(pos != 1)
-                    throw Erange("infinint::build_from_file(generic_file)", "badly formed infinint or not supported format"); // more than 1 bit is set to 1
+                    throw Erange("infinint::build_from_file(generic_file)", gettext("Badly formed infinint or not supported format")); // more than 1 bit is set to 1
 
                 pos = 0;
                 while(bf[pos] == 0)
@@ -169,7 +169,7 @@ namespace libdar
         {
             while(tmp-- > 0)
                 if(x.write((char *)(&u), 1) < 1)
-                    throw Erange("infinint::dump(generic_file)", "can't write data to file");
+                    throw Erange("infinint::dump(generic_file)", gettext("Cannot write data to file"));
             tmp = 0;
             width.unstack(tmp);
         }
@@ -178,7 +178,7 @@ namespace libdar
             // now we write the last byte of the preambule, which as only one bit set
 
         if(x.write((char *)&last_width, 1) < 1)
-            throw Erange("infinint::dump(generic_file)", "can't write data to file");
+            throw Erange("infinint::dump(generic_file)", gettext("Cannot write data to file"));
 
             // we need now to write some justification byte to have an informational field multiple of TG
 
@@ -189,7 +189,7 @@ namespace libdar
             tmp = TG - tmp;
             while(tmp-- > 0)
                 if(x.write((char *)(&u), 1) < 1)
-                    throw Erange("infinint::dump(generic_file)", "can't write data to file");
+                    throw Erange("infinint::dump(generic_file)", gettext("Cannot write data to file"));
         }
 
             // now we continue dumping the informational bytes :
@@ -246,7 +246,7 @@ namespace libdar
             throw SRC_BUG;
 
         if(*this < arg)
-            throw Erange("infinint::operator", "subtracting a infinint greater than the first, infinint can't be negative");
+            throw Erange("infinint::operator", gettext("Subtracting a infinint greater than the first, infinint cannot be negative"));
 
             // now processing the operation
 
@@ -482,6 +482,11 @@ namespace libdar
         E_END("infinint::operator <<=", "infinint");
     }
 
+    unsigned char infinint::operator [] (const infinint & position) const
+    {
+	return (*field)[field->size() - (position + 1)];
+    }
+
     S_I infinint::difference(const infinint & b) const
     {
         E_BEGIN;
@@ -606,7 +611,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: real_infinint.cpp,v 1.7.4.6 2004/07/25 20:38:03 edrusb Exp $";
+        static char id[]="$Id: real_infinint.cpp,v 1.18 2004/10/22 22:39:17 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -622,7 +627,6 @@ namespace libdar
             used_endian = little_endian;
         E_END("infinint::setup_endian", "");
     }
-
 
 ///////////////////////////////////////////////////////////////////////
 ///////////////// friends and not friends of infinint /////////////////
@@ -738,7 +742,7 @@ namespace libdar
     {
         E_BEGIN;
         if(b == 0)
-            throw Einfinint("infinint.cpp : euclide", "division by zero"); // division by zero
+            throw Einfinint("infinint.cpp : euclide", gettext("Division by zero")); // division by zero
 
         if(a < b)
         {

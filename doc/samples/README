@@ -26,3 +26,13 @@ dar_par_test.duc    Denis Corbin        script to test and repair slice
 dar_par.dcf         Denis Corbin        dar config files for dar_par_create and
                                         dar_par_test.duc
 
+pause_every_n_slice.duc  Denis Corbin   pause every N slice instead of every
+                                        slice when creating an archive
+
+automatic_backup    Manuel Iglesias     automatic full/differential backup
+                                        script, with automatic mounting unmount
+                                        see automatic_backup.txt for more info
+automatic_backup.txt Manuel Iglesias    documentation for automatic_backup
+	                                script
+
+dar_backup          Matthew Caron       perl script wrapping: dar+parchive+growisofs

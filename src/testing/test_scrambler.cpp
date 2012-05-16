@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_scrambler.cpp,v 1.5.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_scrambler.cpp,v 1.8 2004/06/20 14:26:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -39,14 +39,14 @@ extern "C"
 
 using namespace libdar;
 
-S_I little_main(S_I argc, char *argv[], const char **env);
+S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env);
 
 int main(S_I argc, char *argv[])
 {
     return dar_suite_global(argc, argv, NULL, &little_main);
 }
 
-S_I little_main(S_I argc, char *argv[], const char **env)
+S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env)
 {
     MEM_IN;
     if(argc != 4)
@@ -55,9 +55,9 @@ S_I little_main(S_I argc, char *argv[], const char **env)
         return EXIT_SYNTAX;
     }
 
-    fichier *src = new fichier(argv[1], gf_read_only);
-    fichier *dst = new fichier(argv[2], gf_write_only);
-    scrambler *scr = new scrambler("bonjour", *dst);
+    fichier *src = new fichier(dialog, argv[1], gf_read_only);
+    fichier *dst = new fichier(dialog, argv[2], gf_write_only);
+    scrambler *scr = new scrambler(dialog, "bonjour", *dst);
 
     src->copy_to(*scr);
 
@@ -65,9 +65,9 @@ S_I little_main(S_I argc, char *argv[], const char **env)
     delete dst; dst = NULL;
     delete src; src = NULL;
 
-    src = new fichier(argv[2], gf_read_only);
-    scr = new scrambler("bonjour", *src);
-    dst = new fichier(argv[3], gf_write_only);
+    src = new fichier(dialog, argv[2], gf_read_only);
+    scr = new scrambler(dialog, "bonjour", *src);
+    dst = new fichier(dialog, argv[3], gf_write_only);
 
     scr->copy_to(*dst);
 

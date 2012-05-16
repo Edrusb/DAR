@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar.cpp,v 1.14 2003/11/19 00:43:46 edrusb Rel $
+// $Id: dar.cpp,v 1.28 2004/12/01 22:10:44 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -45,18 +45,18 @@
 using namespace std;
 using namespace libdar;
 
-static void display_sauv_stat(const statistics & st);
-static void display_rest_stat(const statistics & st);
-static void display_diff_stat(const statistics &st);
-static void display_test_stat(const statistics & st);
-static S_I little_main(S_I argc, char *argv[], const char **env);
+static void display_sauv_stat(user_interaction & dialog, const statistics & st);
+static void display_rest_stat(user_interaction & dialog, const statistics & st);
+static void display_diff_stat(user_interaction & dialog, const statistics &st);
+static void display_test_stat(user_interaction & dialog, const statistics & st);
+static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env);
 
 int main(S_I argc, char *argv[], const char **env)
 {
     return dar_suite_global(argc, argv, env, &little_main);
 }
 
-static S_I little_main(S_I argc, char *argv[], const char **env)
+static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env)
 {
     operation op;
     path *fs_root;
@@ -82,10 +82,17 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
     bool warn_remove_no_match;
     string alteration;
     bool empty;
+    path *on_fly_root;
+    string *on_fly_filename;
+    bool alter_atime;
+    bool same_fs;
+    U_32 crypto_size;
+    U_32 crypto_size_ref;
 
     if(home == NULL)
         home = "/";
-    if(! get_args(home, argc, argv, op, fs_root, sauv_root, ref_root,
+    if(! get_args(dialog,
+		  home, argc, argv, op, fs_root, sauv_root, ref_root,
                   file_size, first_file_size, selection,
                   subtree, filename, ref_filename,
                   allow_over, warn_over, info_details, algo,
@@ -99,19 +106,27 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
                   compr_mask,
                   flat, min_compr_size, nodump,
                   hourshift, warn_remove_no_match,
-		  alteration, empty))
+		  alteration, empty,
+		  on_fly_root,
+		  on_fly_filename,
+		  alter_atime,
+		  same_fs,
+		  crypto_size,
+		  crypto_size_ref))
         return EXIT_SYNTAX;
     else
     {
         MEM_IN;
 	archive *arch = NULL;
+	archive *cur = NULL;
+	bool on_fly_action = on_fly_filename != NULL && on_fly_root != NULL;
         shell_interaction_set_beep(beep);
 
         if(filename != "-"  || (output_pipe != "" && op != create && op != isolate))
             shell_interaction_change_non_interactive_output(&cout);
             // standart output can be used to send non interactive
             // messages
-        
+
         try
         {
             statistics st;
@@ -124,58 +139,83 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
 		if(ref_filename != NULL && ref_root != NULL)
 		{
 		    crypto_split_algo_pass(pass_ref, crypto, tmp_pass);
-		    arch = new archive(*ref_root, *ref_filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute_ref, info_details);
+		    arch = new archive(dialog, *ref_root, *ref_filename, EXTENSION, crypto, tmp_pass, crypto_size_ref,
+				       input_pipe, output_pipe, execute_ref, info_details);
 		}
 		crypto_split_algo_pass(pass, crypto, tmp_pass);
-                st = op_create(*fs_root, *sauv_root, arch, *selection, *subtree, filename, EXTENSION,
-                               allow_over, warn_over, info_details, pause, empty_dir,
-                               algo, compression_level, file_size,
-                               first_file_size, ea_root, ea_user, 
-                               execute, crypto, tmp_pass, *compr_mask,
-                               min_compr_size, nodump, ignore_owner, hourshift, empty);
-                display_sauv_stat(st);
-                if(st.errored > 0) // st is not used for isolation
-                    throw Edata("some file could not be saved");
-                break;
+                cur = new archive(dialog, *fs_root, *sauv_root, arch, *selection, *subtree, filename, EXTENSION,
+				  allow_over, warn_over, info_details, pause, empty_dir,
+				  algo, compression_level, file_size,
+				  first_file_size, ea_root, ea_user,
+				  execute, crypto, tmp_pass, crypto_size,
+				  *compr_mask,
+				  min_compr_size, nodump, ignore_owner, hourshift, empty,
+				  alter_atime, same_fs, st);
+                display_sauv_stat(dialog, st);
+		if(arch != NULL) // making some room in memory
+		{
+		    delete arch;
+		    arch = NULL;
+		}
+		if(st.errored > 0) // cur is not used for isolation
+                    throw Edata(gettext("Some file could not be saved"));
+		if(on_fly_action)
+		{
+		    if(info_details)
+			dialog.warning(gettext("Now performing on-fly isolation..."));
+		    if(cur == NULL)
+			throw SRC_BUG;
+		    arch = new archive(dialog, *on_fly_root, cur, *on_fly_filename, EXTENSION,
+				       allow_over, warn_over, info_details,
+				       false, bzip2, 9, 0, 0,
+				       "", crypto_none, "", 0, empty);
+		}
+		break;
             case isolate:
 		crypto_split_algo_pass(pass_ref, crypto, tmp_pass);
-		arch = new archive(*ref_root, *ref_filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute_ref, info_details);
+		arch = new archive(dialog, *ref_root, *ref_filename, EXTENSION, crypto, tmp_pass, crypto_size_ref,
+				   input_pipe, output_pipe, execute_ref, info_details);
 		crypto_split_algo_pass(pass, crypto, tmp_pass);
-                op_isolate(*sauv_root, arch, filename, EXTENSION, allow_over, warn_over, info_details,
-                           pause, algo, compression_level, file_size, first_file_size, 
-                           execute, crypto, tmp_pass);
+                cur = new archive(dialog, *sauv_root, arch, filename, EXTENSION, allow_over, warn_over, info_details,
+				  pause, algo, compression_level, file_size, first_file_size,
+				  execute, crypto, tmp_pass, crypto_size, empty);
                 break;
             case extract:
 		crypto_split_algo_pass(pass, crypto, tmp_pass);
-		arch = new archive(*sauv_root, filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute, info_details);
-                st = op_extract(arch, *fs_root, *selection, *subtree, allow_over, warn_over,
-                                info_details, detruire, only_more_recent, ea_root, ea_user,
-                                flat, ignore_owner, warn_remove_no_match, hourshift, empty);
-                display_rest_stat(st);
+		arch = new archive(dialog, *sauv_root, filename, EXTENSION, crypto, tmp_pass, crypto_size,
+				   input_pipe, output_pipe, execute, info_details);
+                st = arch->op_extract(dialog, *fs_root, *selection, *subtree, allow_over, warn_over,
+				      info_details, detruire, only_more_recent, ea_root, ea_user,
+				      flat, ignore_owner, warn_remove_no_match, hourshift, empty);
+                display_rest_stat(dialog, st);
                 if(st.errored > 0)
-                    throw Edata("all file asked could not be restored");        
+                    throw Edata(gettext("All files asked could not be restored"));
                 break;
             case diff:
 		crypto_split_algo_pass(pass, crypto, tmp_pass);
-		arch = new archive(*sauv_root, filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute, info_details);
-                st = op_diff(arch, *fs_root, *selection, *subtree, info_details, ea_root, ea_user, ignore_owner);
-                display_diff_stat(st);
+		arch = new archive(dialog, *sauv_root, filename, EXTENSION, crypto, tmp_pass, crypto_size,
+				   input_pipe, output_pipe, execute, info_details);
+                st = arch->op_diff(dialog, *fs_root, *selection, *subtree, info_details, ea_root, ea_user,
+				   ignore_owner, alter_atime);
+                display_diff_stat(dialog, st);
                 if(st.errored > 0 || st.deleted > 0)
-                    throw Edata("some file comparisons failed");
+                    throw Edata(gettext("Some file comparisons failed"));
                 break;
             case test:
 		crypto_split_algo_pass(pass, crypto, tmp_pass);
-		arch = new archive(*sauv_root, filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute, info_details);
-                st = op_test(arch, *selection, *subtree, info_details);
-                display_test_stat(st);
+		arch = new archive(dialog, *sauv_root, filename, EXTENSION, crypto, tmp_pass, crypto_size,
+				   input_pipe, output_pipe, execute, info_details);
+                st = arch->op_test(dialog, *selection, *subtree, info_details);
+                display_test_stat(dialog, st);
                 if(st.errored > 0)
-                    throw Edata("some files are corrupted in the archive and it will not be possible to restore them");
+                    throw Edata(gettext("Some files are corrupted in the archive and it will not be possible to restore them"));
                 break;
             case listing:
 		crypto_split_algo_pass(pass, crypto, tmp_pass);
                     // only_more_recent is used to carry --tar-format flag  while listing is asked
-		arch = new archive(*sauv_root, filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute, info_details);
-                op_listing(arch, info_details, only_more_recent, *selection, alteration != "");
+		arch = new archive(dialog, *sauv_root, filename, EXTENSION, crypto, tmp_pass, crypto_size,
+				   input_pipe, output_pipe, execute, info_details);
+                arch->op_listing(dialog, info_details, only_more_recent, *selection, alteration != "");
                 break;
             default:
                 throw SRC_BUG;
@@ -200,10 +240,10 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
                 delete compr_mask;
 	    if(arch != NULL)
 		delete arch;
+	    if(cur != NULL)
+		delete cur;
             throw;
         }
-
-        MEM_OUT;
 
         if(fs_root != NULL)
             delete fs_root;
@@ -221,6 +261,10 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
             delete compr_mask;
 	if(arch != NULL)
 	    delete arch;
+	if(cur != NULL)
+	    delete cur;
+
+        MEM_OUT;
 
         return EXIT_OK;
     }
@@ -228,71 +272,76 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar.cpp,v 1.14 2003/11/19 00:43:46 edrusb Rel $";
+    static char id[]="$Id: dar.cpp,v 1.28 2004/12/01 22:10:44 edrusb Rel $";
     dummy_call(id);
 }
 
 
-static void display_sauv_stat(const statistics & st)
+static void display_sauv_stat(user_interaction & dialog, const statistics & st)
 {
     infinint total = st.total();
 
-    ui_printf("\n\n --------------------------------------------\n");
-    ui_printf(" %i inode(s) saved\n", &st.treated);
-    ui_printf(" with %i hard link(s) recorded\n", &st.hard_links);
-    ui_printf(" %i inode(s) not saved (no file change)\n", &st.skipped);
-    ui_printf(" %i inode(s) failed to save (filesystem error)\n", &st.errored);
-    ui_printf(" %i files(s) ignored (excluded by filters)\n", &st.ignored);
-    ui_printf(" %i files(s) recorded as deleted from reference backup\n", &st.deleted);
-    ui_printf(" --------------------------------------------\n");
-    ui_printf(" --------------------------------------------\n");
-    ui_printf(" Total number of file considered: %i\n", &total);
+    dialog.printf("\n\n --------------------------------------------\n");
+    dialog.printf(gettext(" %i inode(s) saved\n"), &st.treated);
+    dialog.printf(gettext(" with %i hard link(s) recorded\n"), &st.hard_links);
+    dialog.printf(gettext(" %i inode(s) not saved (no file change)\n"), &st.skipped);
+    dialog.printf(gettext(" %i inode(s) failed to save (filesystem error)\n"), &st.errored);
+    dialog.printf(gettext(" %i files(s) ignored (excluded by filters)\n"), &st.ignored);
+    dialog.printf(gettext(" %i files(s) recorded as deleted from reference backup\n"), &st.deleted);
+    dialog.printf(" --------------------------------------------\n");
+    dialog.printf(gettext(" Total number of file considered: %i\n"), &total);
 #ifdef EA_SUPPORT
-    ui_printf(" --------------------------------------------\n");
-    ui_printf(" EA saved for %i file(s)\n", &st.ea_treated);
-    ui_printf(" --------------------------------------------\n");
+    dialog.printf(" --------------------------------------------\n");
+    dialog.printf(gettext(" EA saved for %i file(s)\n"), &st.ea_treated);
 #endif
+    dialog.printf(" --------------------------------------------\n");
+
 }
 
-static void display_rest_stat(const statistics & st)
+static void display_rest_stat(user_interaction & dialog, const statistics & st)
 {
     infinint total = st.total();
-    
-    ui_printf("\n\n --------------------------------------------\n");
-    ui_printf(" %i file(s) restored\n", &st.treated);
-    ui_printf(" %i file(s) not restored (not saved in archive)\n", &st.skipped);
-    ui_printf(" %i file(s) ignored (excluded by filters)\n", &st.ignored);
-    ui_printf(" %i file(s) less recent than the one on filesystem\n", &st.tooold);
-    ui_printf(" %i file(s) failed to restore (filesystem error)\n", &st.errored);
-    ui_printf(" %i file(s) deleted\n", &st.deleted);
-    ui_printf(" --------------------------------------------\n");
-    ui_printf(" Total number of file considered: %i\n", &total);
+
+    dialog.printf("\n\n --------------------------------------------\n");
+    dialog.printf(gettext(" %i file(s) restored\n"), &st.treated);
+    dialog.printf(gettext(" %i file(s) not restored (not saved in archive)\n"), &st.skipped);
+    dialog.printf(gettext(" %i file(s) ignored (excluded by filters)\n"), &st.ignored);
+    dialog.printf(gettext(" %i file(s) less recent than the one on filesystem\n"), &st.tooold);
+    dialog.printf(gettext(" %i file(s) failed to restore (filesystem error)\n"), &st.errored);
+    dialog.printf(gettext(" %i file(s) deleted\n"), &st.deleted);
+    dialog.printf(" --------------------------------------------\n");
+    dialog.printf(gettext(" Total number of file considered: %i\n"), &total);
 #ifdef EA_SUPPORT
-    ui_printf(" --------------------------------------------\n");
-    ui_printf(" EA restored for %i file(s)\n", &st.ea_treated);
-    ui_printf(" --------------------------------------------\n");
+    dialog.printf(" --------------------------------------------\n");
+    dialog.printf(gettext(" EA restored for %i file(s)\n"), &st.ea_treated);
 #endif
+    dialog.printf(" --------------------------------------------\n");
 }
 
-static void display_diff_stat(const statistics &st)
+static void display_diff_stat(user_interaction & dialog, const statistics &st)
 {
     infinint total = st.total();
 
-    ui_printf("\n %i file(s) do not match those on filesystem\n", &st.errored);
-    ui_printf(" %i file(s) failed to be read\n", &st.deleted);
-    ui_printf(" %i file(s) ignored (excluded by filters)\n", &st.ignored);
-    ui_printf(" --------------------------------------------\n");
-    ui_printf(" Total number of file considered: %i\n", &total);
+    dialog.printf("\n\n --------------------------------------------\n");
+    dialog.printf(gettext(" %i file(s) treated\n"), &st.treated);
+    dialog.printf(gettext(" %i file(s) do not match those on filesystem\n"), &st.errored);
+    dialog.printf(gettext(" %i file(s) ignored (excluded by filters)\n"), &st.ignored);
+    dialog.printf(" --------------------------------------------\n");
+    dialog.printf(gettext(" Total number of file considered: %i\n"), &total);
+    dialog.printf(" --------------------------------------------\n");
 }
 
-static void display_test_stat(const statistics & st)
+static void display_test_stat(user_interaction & dialog, const statistics & st)
 {
     infinint total = st.total();
 
-    ui_printf("\n %i file(s) with error\n", &st.errored);
-    ui_printf(" %i file(s) ignored (excluded by filters)\n", &st.ignored);
-    ui_printf(" --------------------------------------------\n");
-    ui_printf(" Total number of file considered: %i\n", &total);
+    dialog.printf("\n\n --------------------------------------------\n");
+    dialog.printf(gettext(" %i file(s) treated\n"), &st.treated);
+    dialog.printf(gettext(" %i file(s) with error\n"), &st.errored);
+    dialog.printf(gettext(" %i file(s) ignored (excluded by filters)\n"), &st.skipped);
+    dialog.printf(" --------------------------------------------\n");
+    dialog.printf(gettext(" Total number of file considered: %i\n"), &total);
+    dialog.printf(" --------------------------------------------\n");
 }
 
 const char *dar_version()

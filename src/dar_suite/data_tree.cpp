@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.cpp,v 1.11.4.2 2003/12/20 23:05:34 edrusb Rel $
+// $Id: data_tree.cpp,v 1.20 2005/01/28 23:27:55 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -35,6 +35,10 @@ extern "C"
 #if HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
+
+#if HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
 } // end extern "C"
 
 #include <iomanip>
@@ -48,7 +52,7 @@ using namespace libdar;
 static data_tree *read_from_file(generic_file & f);
 static void read_from_file(generic_file &f, archive_num &a);
 static void write_to_file(generic_file &f, archive_num a);
-static void display_line(archive_num num, const infinint *data, const infinint *ea);
+static void display_line(user_interaction & dialog, archive_num num, const infinint *data, const infinint *ea);
 
 data_tree::data_tree(const string & name)
 {
@@ -61,19 +65,19 @@ data_tree::data_tree(generic_file & f)
 
         // signature has already been read
     tools_read_string(f, filename);
-    infinint tmp = infinint(NULL, &f); // number of entry in last_mod map
+    infinint tmp = infinint(f.get_gf_ui(), NULL, &f); // number of entry in last_mod map
     while(tmp > 0)
     {
         read_from_file(f, k);
-        last_mod[k] = infinint(NULL, &f);
+        last_mod[k] = infinint(f.get_gf_ui(), NULL, &f);
         tmp--;
     }
 
-    tmp = infinint(NULL, &f); // number of entry in last_change map
+    tmp = infinint(f.get_gf_ui(), NULL, &f); // number of entry in last_change map
     while(tmp > 0)
     {
         read_from_file(f, k);
-        last_change[k] = infinint(NULL, &f);
+        last_change[k] = infinint(f.get_gf_ui(), NULL, &f);
         tmp--;
     }
 }
@@ -209,12 +213,12 @@ bool data_tree::remove_all_from(const archive_num & archive)
     return last_mod.size() == 0 && last_change.size() == 0;
 }
 
-void data_tree::listing() const
+void data_tree::listing(user_interaction & dialog) const
 {
     map<archive_num, infinint>::iterator it, fin_it, ut, fin_ut;
 
-    ui_printf("Archive number |  Data      |  EA\n");
-    ui_printf("---------------+------------+------------\n");
+    dialog.printf(gettext("Archive number |  Data      |  EA\n"));
+    dialog.printf("---------------+------------+------------\n");
 
     it = const_cast<data_tree *>(this)->last_mod.begin();
     fin_it = const_cast<data_tree *>(this)->last_mod.end();
@@ -227,29 +231,29 @@ void data_tree::listing() const
             if(ut != fin_ut)
                 if(it->first == ut->first)
                 {
-                    display_line(it->first, &(it->second), &(ut->second));
+                    display_line(dialog, it->first, &(it->second), &(ut->second));
                     it++;
                     ut++;
                 }
                 else // not converning the same archive
                     if(it->first < ut->first) // it only
                     {
-                        display_line(it->first, &(it->second), NULL);
+                        display_line(dialog, it->first, &(it->second), NULL);
                         it++;
                     }
                     else // ut only
                     {
-                        display_line(ut->first, NULL, &(ut->second));
+                        display_line(dialog, ut->first, NULL, &(ut->second));
                         ut++;
                     }
             else // ut at end of list thus it != fin_it (see while condition)
             {
-                display_line(it->first, &(it->second), NULL);
+                display_line(dialog, it->first, &(it->second), NULL);
                 it++;
             }
         else // it at end of list, this ut != fin_ut (see while condition)
         {
-            display_line(ut->first, &(ut->second), NULL);
+            display_line(dialog, ut->first, &(ut->second), NULL);
             ut++;
         }
     }
@@ -349,7 +353,7 @@ data_dir::data_dir(const string &name) : data_tree(name)
 
 data_dir::data_dir(generic_file &f) : data_tree(f)
 {
-    infinint tmp = infinint(NULL, &f); // number of children
+    infinint tmp = infinint(f.get_gf_ui(), NULL, &f); // number of children
     data_tree *entry = NULL;
     rejetons.clear();
 
@@ -359,7 +363,7 @@ data_dir::data_dir(generic_file &f) : data_tree(f)
         {
             entry = read_from_file(f);
             if(entry == NULL)
-                throw Erange("data_dir::data_dir", "unexpected end of file");
+                throw Erange("data_dir::data_dir", gettext("Unexpected end of file"));
             rejetons.push_back(entry);
             entry = NULL;
             tmp--;
@@ -477,6 +481,16 @@ const data_tree *data_dir::read_child(const string & name) const
             return *it;
 }
 
+void data_dir::read_all_children(vector<string> & fils) const
+{
+    list<data_tree *>::iterator it = const_cast< list<data_tree *> &>(rejetons).begin();
+    list<data_tree *>::iterator fin = const_cast< list<data_tree *> &>(rejetons).end();
+
+    fils.clear();
+    while(it != fin)
+	fils.push_back((*it++)->get_name());
+}
+
 bool data_dir::remove_all_from(const archive_num & archive)
 {
     list<data_tree *>::iterator it = rejetons.begin();
@@ -498,7 +512,7 @@ bool data_dir::remove_all_from(const archive_num & archive)
     return data_tree::remove_all_from(archive) && rejetons.size() == 0;
 }
 
-void data_dir::show(archive_num num, string marge) const
+void data_dir::show(user_interaction & dialog, archive_num num, string marge) const
 {
     list<data_tree *>::iterator it = const_cast<data_dir *>(this)->rejetons.begin();
     list<data_tree *>::iterator fin = const_cast<data_dir *>(this)->rejetons.end();
@@ -516,12 +530,12 @@ void data_dir::show(archive_num num, string marge) const
         name = (*it)->get_name();
         if(data || ea)
         {
-            etat = string(data ? "[Data]" : "[    ]") + (ea ? "[EA]" : "[  ]");
+            etat = string(data ? gettext("[Data]") : "[    ]") + (ea ? "[EA]" : "[  ]");
 
-            ui_printf("%S  %S%S\n", &etat, &marge, &name);
+            dialog.printf("%S  %S%S\n", &etat, &marge, &name);
         }
         if(dir != NULL)
-            dir->show(num, marge+name+"/");
+            dir->show(dialog, num, marge+name+"/");
         it++;
     }
 }
@@ -699,7 +713,7 @@ static data_tree *read_from_file(generic_file & f)
     else if (sign == data_dir::signature())
         ret = new data_dir(f);
     else
-        throw Erange("read_from_file", "unknown record type");
+        throw Erange("read_from_file", gettext("Unknown record type"));
 
     if(ret == NULL)
         throw Ememory("read_from_file");
@@ -709,7 +723,7 @@ static data_tree *read_from_file(generic_file & f)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: data_tree.cpp,v 1.11.4.2 2003/12/20 23:05:34 edrusb Rel $";
+    static char id[]="$Id: data_tree.cpp,v 1.20 2005/01/28 23:27:55 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -731,10 +745,10 @@ static void write_to_file(generic_file &f, archive_num a)
     f.write(buffer, sizeof(archive_num));
 }
 
-static void display_line(archive_num num, const infinint *data, const infinint *ea)
+static void display_line(user_interaction & dialog, archive_num num, const infinint *data, const infinint *ea)
 {
     string data_date = data == NULL ? "   " : tools_display_date(*data);
     string ea_date = ea == NULL ? "   " : tools_display_date(*ea);
 
-    ui_printf(" \t%u\t%S\t%S\n", num, &data_date, &ea_date);
+    dialog.printf(" \t%u\t%S\t%S\n", num, &data_date, &ea_date);
 }

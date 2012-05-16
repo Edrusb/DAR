@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: testtools.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
+// $Id: testtools.hpp,v 1.6 2004/06/20 14:26:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -32,7 +32,7 @@
 using namespace libdar;
 
 extern void display(const infinint & x);
-extern void display_read(generic_file & f);
-extern void display_back_read(generic_file & f);
+extern void display_read(user_interaction & dialog, generic_file & f);
+extern void display_back_read(user_interaction & dialog, generic_file & f);
 
 #endif

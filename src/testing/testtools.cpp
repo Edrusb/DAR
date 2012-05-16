@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: testtools.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: testtools.cpp,v 1.7 2004/06/20 14:26:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -38,7 +38,7 @@ void display(const infinint & x)
     cout << vu.human() << endl;
 }
 
-void display_read(generic_file & f)
+void display_read(user_interaction & dialog, generic_file & f)
 {
     const S_I size = 10;
     char buffer[size];
@@ -47,10 +47,10 @@ void display_read(generic_file & f)
         buffer[lu] = '\0';
     else
         buffer[size-1] = '\0';
-    ui_printf("lu = %d : [%s]\n", lu, buffer);
+    dialog.printf("lu = %d : [%s]\n", lu, buffer);
 }
 
-void display_back_read(generic_file & f)
+void display_back_read(user_interaction & dialog, generic_file & f)
 {
     const S_I size = 10;
     char buffer[size];
@@ -61,5 +61,5 @@ void display_back_read(generic_file & f)
         buffer[lu] = '\0';
     else
         buffer[size-1] = '\0';
-    ui_printf("lu = %d : [%s]\n", lu, buffer);
+    dialog.printf("lu = %d : [%s]\n", lu, buffer);
 }

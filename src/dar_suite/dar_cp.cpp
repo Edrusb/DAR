@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_cp.cpp,v 1.4.4.3 2004/04/25 17:10:25 edrusb Rel $
+// $Id: dar_cp.cpp,v 1.12 2004/12/01 22:10:44 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -50,12 +50,15 @@ extern "C"
 #endif
 }
 
+#include <iostream>
+
 #include "dar_suite.hpp"
 #include "tools.hpp"
 
 #define DAR_CP_VERSION "1.0.1"
 
 using namespace libdar;
+using namespace std;
 
 void show_usage(char *argv0);
 void show_version(char *argv0);
@@ -91,7 +94,7 @@ int main(int argc, char *argv[])
 
 void show_usage(char *argv0)
 {
-    printf("usage : %s <source> <destination>\n", argv0);
+    printf(gettext("usage : %s <source> <destination>\n"), argv0);
 }
 
 void show_version(char *argv0)
@@ -105,12 +108,11 @@ void show_version(char *argv0)
 	{
 	    printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n", cmd, DAR_CP_VERSION);
 	    printf("\n");
-	    printf(" %s with %s version %s\n", __DATE__, CC_NAT,  __VERSION__);
-	    printf(" %s is part of the Disk ARchive suite (Release %s)\n", cmd, PACKAGE_VERSION);
-	    printf(" %s comes with ABSOLUTELY NO WARRANTY; for details\n", cmd);
-	    printf(" type `dar -W'.  This is free software, and you are welcome\n");
-	    printf(" to redistribute it under certain conditions; type `dar -L | more'\n");
-	    printf(" for details.\n\n");
+	    printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__);
+	    printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd, PACKAGE_VERSION);
+	    printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `dar -W'."), cmd);
+	    printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"));
+	    printf(gettext(" type `dar -L | more'\n for details.\n\n"));
 	}
 	catch(...)
 	{
@@ -121,7 +123,7 @@ void show_version(char *argv0)
     }
     catch(...)
     {
-	printf("unexpected exception from libdar");
+	printf(gettext("Unexpected exception from libdar"));
 	exit(3);
     }
 /* END of C++ syntax used*/
@@ -139,7 +141,7 @@ int open_files(char *src, char *dst, int *fds, int *fdd)
         char *tmp2 = NULL;
         if(tmp == NULL)
         {
-            perror("memory allocation failed");
+            perror(gettext("Memory allocation failed"));
             return 0;
         }
         try
@@ -148,7 +150,8 @@ int open_files(char *src, char *dst, int *fds, int *fdd)
         }
         catch(...)
         {
-            fprintf(stderr,"memory allocation failed\n");
+            fprintf(stderr,gettext("Memory allocation failed"));
+	    fprintf(stderr,"\n");
             return 0;
         }
         strcpy(tmp, dst);
@@ -163,7 +166,7 @@ int open_files(char *src, char *dst, int *fds, int *fdd)
 
     if(*fds < 0)
     {
-        perror("cannot open source file");
+        perror(gettext("Cannot open source file"));
         if(tmp != NULL)
             free(tmp);
         return 0; // error
@@ -174,7 +177,7 @@ int open_files(char *src, char *dst, int *fds, int *fdd)
         free(tmp);
     if(*fdd < 0)
     {
-        perror("cannot open destination file");
+        perror(gettext("Cannot open destination file"));
         close(*fds);
         *fds = -1;
         return 0;
@@ -203,7 +206,7 @@ void copy_max(int src, int dst)
     off_t taille = lseek(src, 0, SEEK_END);
     lseek(src, 0, SEEK_SET);
 
-    printf("Starting the copy of %u byte(s)\n", taille);
+    cout << tools_printf(gettext("Starting the copy of %d byte(s)"), taille) << endl;
     do
     {
         lu = normal_copy(BUF_SIZE, buffer, src, dst);
@@ -212,24 +215,26 @@ void copy_max(int src, int dst)
 	    off_t local_missed;
 	    off_t current = lseek(src, 0, SEEK_CUR);
 
-            printf("Error reading source file (we are at %.2f %% of data copied), trying to read further: %s\n", (float)(current)/(float)(taille)*100, strerror(errno));
+            printf(gettext("Error reading source file (we are at %.2f %% of data copied), trying to read further: %s\n"), (float)(current)/(float)(taille)*100, strerror(errno));
             xfer_before_error(BUF_SIZE/2, buffer, src, dst);
             if(skip_to_next_readable(BUF_SIZE/2, buffer, src, dst, local_missed))
 	    {
-		printf("Skipping done (missing %u byte(s)), found correct data to read, continuing the copy\n", local_missed);
+		cout << tools_printf(gettext("Skipping done (missing %d byte(s)), found correct data to read, continuing the copy..."), local_missed) << endl;
 		missed += local_missed;
                 lu = 1;
 	    }
             else
 	    {
-		printf("Reached End of File, no correct data could be found after the last error\n");
+		printf(gettext("Reached End of File, no correct data could be found after the last error\n"));
+		missed += (taille - current);
                 lu = 0;
 	    }
         }
     }
     while(lu > 0);
 
-    printf("Copy finished. Missing %u byte(s) of data (%.2f %% of the total amount of data)\n", missed, (float)(missed)/((float)(taille))*100);
+    cout << tools_printf(gettext("Copy finished. Missing %d byte(s) of data"), missed);
+    cout << tools_printf(gettext(" %f %% of the total amount of data)\n"), (float)(missed)/((float)(taille))*100);
 }
 
 void xfer_before_error(int block, char *buffer, int src, int dst)
@@ -238,7 +243,7 @@ void xfer_before_error(int block, char *buffer, int src, int dst)
     {
 	if(lseek(src, -1, SEEK_CUR) < 0)
 	{
-	    perror("cannot seek back one char");
+	    perror(gettext("Cannot seek back one char"));
 	    exit(3);
 	}
     }
@@ -252,7 +257,7 @@ void xfer_before_error(int block, char *buffer, int src, int dst)
         {
             if(write(dst, buffer, lu) < 0)
             {
-                perror("cannot write to destination, aborting");
+                perror(gettext("Cannot write to destination, aborting"));
                 exit(3);
             }
         }
@@ -295,7 +300,7 @@ int skip_to_next_readable(int block, char *buffer, int src, int dst, off_t & mis
 	off_t mid = (max + min) / 2;
 	if(lseek(src, mid, SEEK_SET) < 0)
 	{
-	    perror("cannot seek in file");
+	    perror(gettext("Cannot seek in file"));
 	    return 0;
 	}
 	lu = read(src, buffer, 1);
@@ -328,7 +333,7 @@ int skip_to_next_readable(int block, char *buffer, int src, int dst, off_t & mis
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_cp.cpp,v 1.4.4.3 2004/04/25 17:10:25 edrusb Rel $";
+    static char id[]="$Id: dar_cp.cpp,v 1.12 2004/12/01 22:10:44 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -343,12 +348,12 @@ int normal_copy(int block, char *buffer, int src, int dst)
             int tmp = write(dst, buffer+ecrit, lu-ecrit);
             if(tmp < 0)
             {
-                perror("cannot write to destination, aborting");
+                perror(gettext("Cannot write to destination, aborting"));
                 exit(3);
             }
             else
                 if(tmp == 0)
-                    printf("non fatal error during writing to destination file, retrying\n");
+                    printf(gettext("Non fatal error while writing to destination file, retrying\n"));
                 else
                     ecrit += tmp;
         }

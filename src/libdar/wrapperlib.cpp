@@ -18,14 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: wrapperlib.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
+// $Id: wrapperlib.cpp,v 1.13 2004/10/02 21:32:25 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
-#include "erreurs.hpp"
 #include "wrapperlib.hpp"
+#include "erreurs.hpp"
 
 #define CHECK_Z if(z_ptr == NULL) throw SRC_BUG
 #define CHECK_BZ if(bz_ptr == NULL) throw SRC_BUG
@@ -33,20 +33,27 @@
 namespace libdar
 {
 
+#if LIBZ_AVAILABLE
     static S_I zlib2wrap_code(S_I code);
-    static S_I bzlib2wrap_code(S_I code);
     static S_I wrap2zlib_code(S_I code);
+#endif
+#if LIBBZ2_AVAILABLE
+    static S_I bzlib2wrap_code(S_I code);
     static S_I wrap2bzlib_code(S_I code);
+#endif
 
     wrapperlib::wrapperlib(wrapperlib_mode mode)
     {
         switch(mode)
         {
         case zlib_mode:
+#if LIBZ_AVAILABLE
             z_ptr = new z_stream;
             if(z_ptr == NULL)
                 throw Ememory("wrapperlib::wrapperlib");
+#if LIBBZ2_AVAILABLE
             bz_ptr = NULL;
+#endif
             z_ptr->zalloc = NULL;
             z_ptr->zfree = NULL;
             z_ptr->opaque = NULL;
@@ -66,11 +73,17 @@ namespace libdar
             x_get_avail_out = & wrapperlib::z_get_avail_out;
             x_get_total_out = & wrapperlib::z_get_total_out;
             break;
+#else
+	    throw Ecompilation("zlib compression support");
+#endif
         case bzlib_mode:
+#if LIBBZ2_AVAILABLE
             bz_ptr = new bz_stream;
             if(bz_ptr == NULL)
                 throw Ememory("wrapperlib::wrapperlib");
+#if LIBZ_AVAILABLE
             z_ptr = NULL;
+#endif
             bz_ptr->bzalloc = NULL;
             bz_ptr->bzfree = NULL;
             bz_ptr->opaque = NULL;
@@ -90,6 +103,9 @@ namespace libdar
             x_get_avail_out = & wrapperlib::bz_get_avail_out;
             x_get_total_out = & wrapperlib::bz_get_total_out;
             break;
+#else
+	    throw Ecompilation("libbz2 compression support");
+#endif
         default:
             throw SRC_BUG;
         }
@@ -98,30 +114,35 @@ namespace libdar
 
     wrapperlib::wrapperlib(const wrapperlib & ref)
     {
-        throw Efeature("cannot copy a wrapperlib object (NOT IMPLEMENTED)");
+        throw Efeature(gettext("Cannot copy a wrapperlib object (NOT IMPLEMENTED)"));
     }
 
     wrapperlib & wrapperlib::operator = (const wrapperlib & ref)
     {
-        throw Efeature("cannot copy a wrapperlib object (NOT IMPLEMENTED)");
+        throw Efeature(gettext("Cannot copy a wrapperlib object (NOT IMPLEMENTED)"));
     }
 
     wrapperlib::~wrapperlib()
     {
+#if LIBZ_AVAILABLE
         if(z_ptr != NULL)
             delete z_ptr;
+#endif
+#if LIBBZ2_AVAILABLE
         if(bz_ptr != NULL)
             delete bz_ptr;
+#endif
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: wrapperlib.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: wrapperlib.cpp,v 1.13 2004/10/02 21:32:25 edrusb Rel $";
         dummy_call(id);
     }
 
 ////////////// Zlib routines /////////////
 
+#if LIBZ_AVAILABLE
     S_I wrapperlib::z_compressInit(U_I compression_level)
     {
         CHECK_Z;
@@ -205,17 +226,17 @@ namespace libdar
         CHECK_Z;
         return z_ptr->avail_out;
     }
-    
+
     U_64 wrapperlib::z_get_total_out() const
     {
         CHECK_Z;
         return z_ptr->total_out;
     }
-
+#endif
 
 ////////////// BZlib routines /////////////
 
-
+#if LIBBZ2_AVAILABLE
     void wrapperlib::bz_set_next_in(char *x)
     {
         CHECK_BZ;
@@ -315,13 +336,14 @@ namespace libdar
             ret = BZ_STREAM_END;
         return bzlib2wrap_code(ret);
     }
+#endif
 
     S_I wrapperlib::compressReset()
     {
         S_I ret;
 
         if(level < 0)
-            throw Erange("wrapperlib::compressReset", "compressReset called but compressInit never called before");
+            throw Erange("wrapperlib::compressReset", gettext("compressReset called but compressInit never called before"));
         ret = compressEnd();
         if(ret == WR_OK)
             return compressInit(level);
@@ -331,14 +353,15 @@ namespace libdar
 
     S_I wrapperlib::decompressReset()
     {
-        S_I ret = decompressEnd(); 
+        S_I ret = decompressEnd();
 
         if(ret == WR_OK)
             return decompressInit();
         else
             return ret;
     }
-    
+
+#if LIBZ_AVAILABLE
     static S_I zlib2wrap_code(S_I code)
     {
         switch(code)
@@ -364,6 +387,23 @@ namespace libdar
         }
     }
 
+    static S_I wrap2zlib_code(S_I code)
+    {
+        switch(code)
+        {
+        case WR_NO_FLUSH:
+            return Z_NO_FLUSH;
+        case WR_FINISH:
+            return Z_FINISH;
+        default:
+            throw SRC_BUG;
+        }
+    }
+
+
+#endif
+
+#if LIBBZ2_AVAILABLE
     static S_I bzlib2wrap_code(S_I code)
     {
         switch(code)
@@ -390,19 +430,6 @@ namespace libdar
         }
     }
 
-    static S_I wrap2zlib_code(S_I code)
-    {
-        switch(code)
-        {
-        case WR_NO_FLUSH:
-            return Z_NO_FLUSH;
-        case WR_FINISH:
-            return Z_FINISH;
-        default:
-            throw SRC_BUG;
-        }
-    }
-
     static S_I wrap2bzlib_code(S_I code)
     {
         switch(code)
@@ -415,5 +442,6 @@ namespace libdar
             throw SRC_BUG;
         }
     }
+#endif
 
 } // end of namespace

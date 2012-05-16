@@ -18,10 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: statistics.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
+// $Id: statistics.hpp,v 1.6 2004/11/12 21:58:18 edrusb Rel $
 //
 /*********************************************************************/
 //
+
+    /// \file statistics.hpp
+    /// \brief handle the statistic structure that gives a summary of treated files after each operation
 
 #ifndef STATISTICS_HPP
 #define STATISTICS_HPP
@@ -31,25 +34,35 @@
 namespace libdar
 {
 
+	/// structure returned by libdar call to give a summary of the operation done in term of file treated
+
+	/// the different fields are used for backup, restoration and other operation
+	/// their meaning changes a bit depending on the operation. Some operation may
+	/// not use all fields. To have a detailed view of what fields get used and what
+	// are their meaning see the archive class constructor and methods documentation
+	/// \ingroup API
     struct statistics
     {
-        infinint treated; // saved | restored
-        infinint hard_links; // hard linked stored
-        infinint skipped; // not changed since last backup | file not restored because not saved in backup
-        infinint ignored; // ignored due to filter
-        infinint tooold; // ignored because less recent than the filesystem entry
-        infinint errored; // could not be saved | could not be restored (filesystem access wrights)
-        infinint deleted; // deleted file seen | number of files deleted
-        infinint ea_treated; // number of EA saved | number of EA restored
+        infinint treated;       ///< number of file treated (saved, restored, etc.) [all operations]
+        infinint hard_links;    ///< number of hard linked
+        infinint skipped;       ///< files not changed since last backup / file not restored because not saved in backup
+        infinint ignored;       ///< ignored files due to filter
+        infinint tooold;        ///< ignored files because less recent than the filesystem entry [restoration]
+        infinint errored;       ///< files that could not be saved / files that could not be restored (filesystem access right)
+        infinint deleted;       ///< deleted file seen / number of files deleted during the operation [restoration]
+        infinint ea_treated;    ///< number of EA saved / number of EA restored
 
+	    /// reset counters to zero
         void clear() { treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = 0; };
+
+	    /// total number of file treated
         infinint total() const
             {
-                return treated+skipped+ignored+tooold+errored+deleted; 
+                return treated+skipped+ignored+tooold+errored+deleted;
                     // hard_link are also counted in other counters
             };
     };
 
 } // end of namespace
-    
+
 #endif

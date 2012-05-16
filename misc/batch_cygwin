@@ -11,6 +11,6 @@ if("$1" == "") then
    exit
 endif
 
-misc/make_cygwin_dist $1 ""
+# misc/make_cygwin_dist $1 ""
 # misc/make_cygwin_dist $1 "32" --enable-mode=32
 misc/make_cygwin_dist $1 "64" --enable-mode=64

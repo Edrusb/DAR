@@ -1,0 +1,2336 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+<body>
+<h1 style="text-align: center;"> LIBDAR <br>
+</h1>
+<h1 style="text-align: center;">APPLICATION INTERFACE <br>
+</h1>
+<h1 style="text-align: center;">TUTORIAL</h1>
+<div style="text-align: center;">&nbsp; for API version 3.0.x<br>
+</div>
+<hr style="width: 100%; height: 2px;"><br>
+<h2>Presentation</h2>
+<div style="text-align: justify;">Libdar is a library that has been
+built from source code
+initially located in <span
+ style="font-style: italic; font-weight: bold;">dar </span>command
+line application. The
+features that libdar provides are the ability to handle
+Disk ARchive (<span style="font-style: italic;">dar</span>)'s archives,
+thanks to the following operations: <br>
+</div>
+<ul>
+  <li>archive creation, </li>
+  <li>file extraction, </li>
+  <li>archive listing, </li>
+  <li>archive testing, </li>
+  <li>archive comparison,</li>
+  <li>catalogue isolation. </li>
+</ul>
+<div style="text-align: justify;">Note that <span
+ style="font-style: italic;">Disk ARchive</span> has been released
+under the <span style="font-style: italic;">Gnu General Public License
+</span>(GPL), and so is the code of libdar. So, to link your code with
+libdar (statically or dynamically), <span style="font-weight: bold;">your
+application must also be covered by the GPL.</span><br>
+</div>
+<br>
+<div style="text-align: justify;">This tutorial will show you how to
+use libdar from
+the API. As the <span style="font-style: italic;">dar</span> command
+line now also uses this API, looking at his code may also be
+interesting as illustration, in particular the file <span
+ style="font-style: italic;">dar_suite/dar.cpp</span>.<br>
+</div>
+<br>
+<div style="text-align: justify;">The sample codes provided here are
+very simple code that could let you
+see overall process of using libdar, they may or may not compile, I
+have even not tried to, so just use them as illustration, no more. Note
+that there is a documentation
+reference for this API which is built with dar under the directory doc/html if you have Doxygen available and can be consulted on the <a href="http://dar.linux.free.fr/html/index.html">web</a>.<br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<h2>Let's Start</h2>
+<h3>conventions</h3>
+<h4>Language</h4>
+Dar and libdar are written in C++, and so is the libdar API. Libdar is thus easily usable with C or C++ code. For other languages, it depends on so many things (calling convention, etc.) that I would just say you are welcome to provide the necessary adaptation layer for any particular language. :-)
+<h4>Libdar namespace</h4>
+<div style="text-align: justify;">All libdar symbols are defined under
+the <span style="font-style: italic; font-weight: bold;">libdar </span><span
+ style="font-weight: bold;">namespace</span>. You
+can either add the <span style="font-style: italic;">using namespace
+libdar;</span> line at the beginning of your source files:<br>
+</div>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>using
+namespace libdar;<br>
+      </code><br>
+      <code>get_version(....);<br>
+      </code></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<div style="text-align: justify;">&nbsp;or, as we
+will do in the following examples, you can explicitely use the
+namespace in front of libdar objects :<br>
+</div>
+<br>
+<code></code>
+<table
+ style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
+libdar::get_version(....);<br>
+      </code></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h4>Exceptions or not Exceptions</h4>
+<div style="text-align: justify;">For each point we will see two ways
+of using libdar.
+One, is using exception, the other is without exceptions.
+They will be displayed this way :<br>
+</div>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+example
+code <span style="font-weight: bold;">using exceptions</span><br>
+      <br>
+      </code> </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+example
+code <span style="font-weight: bold;">not using</span> exceptions</code><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+All exceptions used by <span style="font-style: italic;">libdar</span>
+inherit from the pure virtual <span style="font-style: italic;"><span
+ style="font-weight: bold;">class Egeneric</span>.</span> The only
+method you
+will need to know about for any exception is the <span
+ style="font-style: italic; font-weight: bold;">get_message()</span>
+call,
+which returns a string explaining the reason of the
+message in a human language. The type of the error is defined by the
+class of the
+exception. Here follows all the exception classes and their meaning:<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: 0px;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 200px;"><code>class
+libdar::Egeneric<br>
+      </code></td>
+      <td style="vertical-align: top;">this is the parent class of all
+exception classes (a pure virtual class)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Ememory<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used when memory has
+been exhausted<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Ebug<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used to signal a bug.
+A bug is triggered when reaching some code that should never be reached<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Einfinint<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used when arithmetic
+error is detected when operating on infinint<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Elimitint<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used when a limitint
+overflow is detected, the maximum value of the limitint has been
+exceeded<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Erange<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used to signal range
+error<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Edeci<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used to signal
+convertion problem between infinint and string (decimal representation)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Efeature<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used when a requested
+feature is not (yet) implemented<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Ehardware<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used when hardware
+problem is found <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Euser_abort<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used to signal that
+the user has aborted the operation <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Edata<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used when an error
+concerning the treated data has been met<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Escript<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used when the
+inter-slice user command returned an error code<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Elibcall<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used to signal an
+error in the arguments given to a libdar call of the API<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><code>class libdar::Ecompilation<br>
+      </code></td>
+      <td style="vertical-align: top;">exception used when a requested
+fearture has not beed activated at compilation time<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<br>
+<h2>&nbsp;1 - First we *must* check the libdar version </h2>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>&nbsp;&nbsp;
+      <br>
+&nbsp;&nbsp;&nbsp; // we include this to be able to display some <br>
+&nbsp;&nbsp;&nbsp; // messages<br>
+#include &lt;io.h&gt;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // we include this header to access lidbar API<br>
+#include &lt;dar/libdar.h&gt;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // all sample code shown will be inside this<br>
+&nbsp;&nbsp;&nbsp; // function for simplicity of the examples<br>
+void my_sample_function()<br>
+{<br>
+&nbsp;&nbsp; try<br>
+&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; libdar::U_I maj, med, min;<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // first we <span
+ style="font-weight: bold;">MUST </span>call
+get_version()<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; libdar::<span style="font-weight: bold;">get_version</span>(maj,
+med, min); <br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if(maj !=
+libdar::LIBDAR_COMPILE_TIME_MAJOR ||<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; med &lt;
+libdar::LIBDAR_COMPILE_TIME_MEDIUM)<br>
+&nbsp; &nbsp; &nbsp; &nbsp; throw libdar::Erange("initialization", <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "we are linking against a
+wrong libdar"); <br>
+&nbsp;&nbsp; }</code><br>
+      <code>&nbsp;&nbsp; catch(libdar::Egeneric &amp; e)<br>
+&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; e.get_message()
+&lt;&lt;
+std::endl;<br>
+&nbsp;&nbsp; }<br>
+}<br>
+      <br>
+&nbsp;&nbsp; <br>
+      </code> </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>&nbsp;&nbsp;
+      <br>
+&nbsp;&nbsp;&nbsp; // we include this to be able to display some <br>
+&nbsp;&nbsp;&nbsp; // messages<br>
+#include &lt;io.h&gt;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // we include this header to access lidbar API<br>
+#include &lt;dar/libdar.h&gt;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // all sample code shown will be inside this<br>
+&nbsp;&nbsp;&nbsp; // function for simplicity of the examples<br>
+void my_sample_function()<br>
+{<br>
+      <br>
+&nbsp;&nbsp; </code><code> libdar::U_I maj, med, min;<br>
+&nbsp;&nbsp; libdar::U_16 excode;<br>
+&nbsp;&nbsp; std::string msg;<br>
+      </code><code><br>
+&nbsp;&nbsp;&nbsp; // first we <span style="font-weight: bold;">MUST </span>call
+get_version()<br>
+      <br>
+&nbsp;&nbsp; libdar::<span style="font-weight: bold;">get_version_noexcept</span>(maj,
+med, min, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+excode, msg);<br>
+      <br>
+&nbsp;&nbsp; if(excode != LIBDAR_NOEXCEPT)<br>
+&nbsp;&nbsp; { <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; msg &lt;&lt; endl;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return;<br>
+&nbsp;&nbsp; }<br>
+&nbsp; <br>
+&nbsp;&nbsp; if(maj != LIBDAR_COMPILE_TIME_MAJOR ||<br>
+&nbsp; &nbsp; &nbsp; </code><code>med &lt;
+libdar::LIBDAR_COMPILE_TIME_MEDIUM</code><code>)<br>
+&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; </code><code>"we are
+linking against wrong libdar"</code><code> &lt;&lt; std::endl;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return;<br>
+&nbsp;&nbsp;&nbsp; }<br>
+      </code> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<io .h=""><dar>The get_version* family function must be called for
+several reasons :<br>
+</dar></io>
+<ul>
+  <li>
+    <div style="text-align: justify;">you must check that the library
+you dynamically link with is compatible with the features you will use.
+The major number must be the same as no compatibility is assured
+between two libdar versions of different major number. And, the medium
+number must be greater or equal to the one used at compilation time to
+be sure
+that all the feature you have been using are available in the libdar
+library you dynamically link with. Changes between minor versions
+correspond to bug
+fixes which does not implies any API change, so there is no constraint
+about minor number.<br>
+    </div>
+  </li>
+  <li style="text-align: justify;">the get_version* calls, over
+returning version information, makes important initialization tasks for
+libdar. If it is not called first, the libdar library is not
+initialized and its behavior is unpredictable. Note that you may call
+get_version* several time if you wish, and in any flavor.<br>
+  </li>
+</ul>
+<h2>2 - Let's see the compilation time features</h2>
+once we have called a function of the <span style="font-style: italic;">get_version*</span>
+family it is possible to access the features activated at compilation
+time:<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <br>
+void my_sample_function()<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // let's continue in the
+same function<br>
+      <br>
+&nbsp;&nbsp;&nbsp; bool ea;<br>
+&nbsp;&nbsp;&nbsp; bool largefile;<br>
+&nbsp;&nbsp;&nbsp; bool nodump;<br>
+&nbsp;&nbsp;&nbsp; bool special_alloc;<br>
+&nbsp;&nbsp;&nbsp; libdar::U_I bits;<br>
+&nbsp;&nbsp;&nbsp; bool thread_safe;<br>
+&nbsp;&nbsp;&nbsp; bool libz;<br>
+&nbsp;&nbsp;&nbsp; bool libbz2;<br>
+&nbsp;&nbsp;&nbsp; bool libcrypto;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; libdar::<span style="font-weight: bold;">get_compile_time_features</span>(ea,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+largefile,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+nodump,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+special_alloc,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+bits,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+thread_safe,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libz,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libbz2,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libcrypto);<br>
+      </code><br>
+}<br>
+      <br>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code>
+      <code><br>
+      <br>
+&nbsp;// here there is no difference because no exceptions<br>
+&nbsp;// are thrown by the get_compile_time_feature() <br>
+&nbsp;// function<br>
+      </code> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<div style="text-align: justify;">You can do what you want with the
+resulting values, like displaying the libdar available feature, or even
+filter if you don't want to continue when a particular feature is
+missing. But, that's maybe not necessary to worry here, because libdar
+will tell you if the operation you ask requires a feature that has not
+been activated at compilation time thanks to the <span
+ style="font-style: italic;">Ecompile</span> exception or the <span
+ style="font-style: italic;">LIBDAR_ECOMPILATION</span> error code.<br>
+</div>
+<br>
+<br>
+<h2>3 -User interaction</h2>
+<div style="text-align: justify;">
+<h3>The generic <span style="font-style: italic;">user_interaction</span>
+class</h3>
+To be able to report messages to the user and to be able to ask
+questions
+to the user, a special class called<span style="font-style: italic;">
+<span style="font-weight: bold;">user_interaction </span></span>has
+been introduced as first argument of the
+API calls we will see below. Rawly, <span style="font-style: italic;">user_interaction</span>
+is a pure virtual class from which you can define your own inherited
+class to have your very own implementation of the interaction with the
+user (GUI's graphical interaction, for example). You will just have to
+override four methods which prototypes follow :<br>
+</div>
+<br style="font-style: italic; font-weight: bold;">
+<span style="font-style: italic; font-weight: bold;">void&nbsp;</span><span
+ style="font-style: italic; font-weight: bold;" class="el">pause</span><span
+ style="font-style: italic; font-weight: bold;"> (const std::string
+&amp;message);</span><br>
+<div style="margin-left: 40px; text-align: justify;">this method is
+called by libdar to request an boolean answer from the user. The
+question is given in argument and the <span style="font-style: italic;">pause()
+</span>method must either <span style="font-weight: bold;">return</span>
+if the user agreed the question (said
+"yes" or "true"), or <span style="font-weight: bold;">throw </span>a<span
+ style="font-weight: bold;"> </span><span
+ style="font-style: italic; font-weight: bold;">Euser_abort</span>
+exception if the user refused the proposition<span
+ style="font-weight: bold;"><span style="font-weight: bold;">. </span></span>Don't
+worry about thowing exception in your code, it will be trapped by
+libdar if you don't want to manage exceptions, and use libdar in the
+"no exception" manner.<span style="font-weight: bold;"><span
+ style="font-weight: bold;"><br>
+<br>
+</span></span></div>
+<span style="font-style: italic; font-weight: bold;">void&nbsp;</span><span
+ style="font-style: italic; font-weight: bold;" class="el">warning</span><span
+ style="font-style: italic; font-weight: bold;"> (const std::string
+&amp;message);</span><br>
+<div style="margin-left: 40px; text-align: justify;">libdar call this
+method to display an informational message to the user. It may not
+always be a warning as the name suggests, sometimes it is just
+normal information.<br>
+</div>
+<br>
+<span style="font-style: italic; font-weight: bold;">std::string&nbsp;</span><span
+ style="font-style: italic; font-weight: bold;" class="el">get_string</span><span
+ style="font-style: italic; font-weight: bold;"> (const std::string
+&amp;message, bool echo);</span><br>
+<div style="margin-left: 40px; text-align: justify;">This call is used
+to get a arbitrary answer from the user. As this is actually mainly
+used to get a password from the user (when no password has been suplied
+for an encrypted archive), the <span style="font-style: italic;">echo </span>argument
+tells that the user answer shall or shall not be displayed on screen.
+If <span style="font-style: italic;">echo</span> is set to "false" the
+implementation of <span style="font-style: italic;">get_string() </span>must
+hide the
+character typed by the user in answer to the displayed question.<br>
+</div>
+<br style="font-style: italic; font-weight: bold;">
+<span style="font-style: italic; font-weight: bold;">&nbsp;</span><span
+ style="font-style: italic; font-weight: bold;" class="el">user_interaction</span><span
+ style="font-style: italic; font-weight: bold;"> *&nbsp;</span><span
+ style="font-style: italic; font-weight: bold;" class="el">clone</span><span
+ style="font-style: italic; font-weight: bold;">
+() const;</span><br>
+<div style="margin-left: 40px; text-align: justify;">This is a
+technical call that must return a copy of the "this" object, like would
+do the copy constructor. Why not simply use the copy constructor?
+because libdar may need to keep an internal copy of the object. But the
+object which class is an inherited class of <span
+ style="font-style: italic;">user_interaction </span>is not know by
+his real class but through a <span style="font-style: italic;">user_interaction
+pointer </span>type. So invoking the copy constructor of the <span
+ style="font-style: italic;">user_interaction</span>
+class will make the new object copied only for the <span
+ style="font-style: italic;">user_interaction </span>part, this may
+cause a crash when using the object copy. A simple implementation of
+this method should be something like this (even if you don't want to
+use exceptions):<br>
+<br>
+<div style="margin-left: 40px;"><code></code><code></code>
+<table
+ style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
+      </code><code>user_interaction
+*my_own_class::clone() const<br>
+{<br>
+&nbsp;&nbsp;&nbsp; my_own_class *ret = new my_own_class(*this);<br>
+&nbsp;&nbsp;&nbsp; if(ret == NULL)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; throw
+Ememory("user_interaction_callback::clone");<br>
+&nbsp;&nbsp;&nbsp; else<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return ret;<br>
+}<br>
+      </code><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+</div>
+</div>
+<h3>The callback interaction class</h3>
+<div style="text-align: justify;"><span style="font-style: italic;">A </span>inherited
+class from<span style="font-style: italic;"> user_interaction</span>
+called <span style="font-weight: bold; font-style: italic;">user_interaction_callback</span>
+proposes an implementation of the user interaction based on callback
+functions. This just replaces the three interactions methods (pause,
+warning and get_string) by three normal functions of your choice, which
+must be given to the <span style="font-style: italic;">user_interaction_callback</span>'s
+constructor and you don't have to consider the <span
+ style="font-style: italic;">clone()</span> method. But you still need
+to implement theses callback functions. For a real
+example, I propose you to have a look at what is done for<span
+ style="font-style: italic;"> dar</span>'s command line. <span
+ style="font-style: italic;">dar</span>'s user interaction is done
+thanks to an object of the <span style="font-style: italic;">user_interaction_callback</span>
+class and three static functions of the module<span
+ style="font-style: italic;"> dar_suite/shell_interaction.cpp</span> <br>
+<br>
+Just a note however about the <span style="font-style: italic;">contextual</span>
+value present in the arguments of theses callback functions :<br>
+&nbsp;<br>
+<code></code><code></code>
+<table
+ style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
+      </code><code><br>
+&nbsp; // our own callback functions. <br>
+&nbsp; // for the illustration of what theses 'context' arguments<br>
+&nbsp; // can be used for we will imagine the situation where<br>
+&nbsp; // multiple windows or multiple threads may each one use <br>
+&nbsp; // libdar. But all share the same callback functions<br>
+&nbsp;<br>
+typedef class t_window_type t_win;<br>
+      <br>
+&nbsp; // this is an arbitrary type that here we will say<br>
+&nbsp; // points to a graphical window object wrapped in a C++<br>
+&nbsp; // class. <br>
+&nbsp; // Note that the show() wait_for_click() and so one<br>
+&nbsp; // methods attributed to the t_win class are absolutely<br>
+&nbsp; // imaginary. Any link to an existing class is a pure <br>
+&nbsp; // coincidence...<br>
+      <br>
+void warning_callback(const std::string &amp;x, void *context)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; (t_win *)(context)-&gt;show(x);<br>
+}<br>
+&nbsp;<br>
+bool answer_callback(const std::string &amp;x, void *context)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; click_type ret;<br>
+      <br>
+&nbsp; &nbsp; </code><code>(t_win *)(context)-&gt;show(x);<br>
+&nbsp;&nbsp;&nbsp; ret = (t_win *)(context)-&gt;wait_for_click();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; return ret == click_OK;<br>
+      </code><code>}<br>
+      <br>
+std::string string_callback(const std::string &amp;x, bool echo, void
+*context)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; (t_win *)(context)-&gt;show(x);<br>
+&nbsp;&nbsp;&nbsp; if(!echo)<br>
+&nbsp;&nbsp; &nbsp;&nbsp; (t_win *)(context)-&gt;set_hide_typed_char();<br>
+&nbsp;&nbsp;&nbsp; (t_win *)(context)-&gt;wait_for_click();<br>
+&nbsp;&nbsp;&nbsp; return (t_win *)(context)-&gt;read_text();<br>
+}<br>
+      <br>
+---------8&lt;-------8&lt;-------8&lt;-------<br>
+      <br>
+&nbsp; // So now each window can have it user_interaction object based
+on the same<br>
+      <br>
+libdar::user_interaction_callback dialog = <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::user_interaction_callback(&amp;warning_callback,
+&amp;answer_callback, &amp;string_callback,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(void *)get_current_windows_id());<br>
+      <br>
+&nbsp; // just the "context" argument changes, and will be passed asis
+from the constructor to the callback<br>
+&nbsp; // functions<br>
+      </code><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+</div>
+<br>
+<h2>4 - Masks</h2>
+<div style="text-align: justify;">Mask are used to define which file
+are to be considered and which are
+not to be considered. Libdar implements masks as several classes that
+all inherit from a pure virtual class that defines the way masks are
+used. This root class is the <span
+ style="font-weight: bold; font-style: italic;">class
+mask</span> and provides the <span style="font-style: italic;">is_covered()</span>
+method for libdar to know which files to consider. Here follows the
+different basic masks classes you
+can use to build very complex masks:<br>
+</div>
+<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: 0px;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 200px;">class libdar::mask<br>
+      </td>
+      <td style="vertical-align: top;">the generic class, parent of all
+masks (a pure virtual class)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::bool_mask<br>
+      </td>
+      <td style="vertical-align: top;">boolean mask, either always true
+or false, it matches either all files or no files at all<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::simple_mask<br>
+      </td>
+      <td style="vertical-align: top;">matches as done by the shell on
+the command
+lines (see "man 7 glob")<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::regular_mask<br>
+      </td>
+      <td style="vertical-align: top;">matches regular expressions (see
+"man 7 regex")<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::not_mask<br>
+      </td>
+      <td style="vertical-align: top;">negation of another mask<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::et_mask<br>
+      </td>
+      <td style="vertical-align: top;">makes an *AND* operator between
+two or more masks<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::ou_mask<br>
+      </td>
+      <td style="vertical-align: top;">makes the *OR* operator
+between&nbsp; two or more masks <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class lbdar::simple_path_mask<br>
+      </td>
+      <td style="vertical-align: top;">string matches if it is subdir
+of mask or mask is a subdir of expression<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">class libdar::same_path_mask<br>
+      </td>
+      <td style="vertical-align: top;">matches if the string is exactly
+the
+given mask (no wilde card expression)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; width: 210px;">class
+libdar::exclude_dir_mask<br>
+      </td>
+      <td style="vertical-align: top;">matches if string is the given
+string or a sub directory of it<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+Let's play with some masks :<br>
+<br>
+<br>
+<code></code><code></code>
+<table
+ style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
+      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // all files will be
+elected by this mask</code><br>
+      <code>&nbsp; libdar::bool_mask m1 = true;&nbsp;&nbsp;&nbsp; <br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // all file that match the glob
+expession "A*~" will match. <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the second argument of the
+constructor tell if the match is case sensitive so here <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // any file beginning by 'A' or by 'a'
+and ending by '~' will be elected by this mask<br>
+&nbsp; libdar::simple_mask m2 = libdar::simple_mask(std::string("A*~"),
+false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // m3 is the negation if m2. This mask
+will thus match<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // any file that does not begin by 'A'
+or 'a' and also finish by '~'<br>
+&nbsp; libdar::not_mask m3 = m2;<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // this mask matches any file that is a
+subdirectory of "/home/joe"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // and any file that has /home/joe as
+subdirectory, that is:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // "/", "/home", "/jome/joe" and any
+subdirectory are matched.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the second argument here too is the
+case sensitivity (so here<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //&nbsp; "/HoMe" will not be elected by
+this mask.<br>
+&nbsp; libdar::simple_path_mask m4 = simple_path_mask("/home/joe",
+true);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // now let's do some more complex things:<br>
+      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // m5 will now match
+only files that are elected by both m2 AND m4</code><br>
+      <code>&nbsp; libdar::et_mask m5;<br>
+&nbsp; m5.add_mask(m2);<br>
+&nbsp; m5.add_mask(m4);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // we can make more silly things like
+this, where m5 will select files<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // that match m2 AND m4 AND m3. But <span
+ style="font-style: italic;">m3 =
+not m2</span> so now m5 will never<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // match any file...<br>
+&nbsp; m5.add_mask(m3);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // but we could do the same with a
+"ou_mask" that realizes the OR operation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // and we would get an silly equivalent
+of m1 (a mask that matches any files)<br>
+&nbsp; libdar::ou_mask m6;<br>
+&nbsp; m6.add_mask(m2);<br>
+&nbsp; m6.add_mask(m4);<br>
+&nbsp; m6.add_mask(m3);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // last point, the NOT, AND and OR
+operation can be used recurively :<br>
+      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // even this, is
+possible where two ask are used as reference for each other !</code><br>
+      <code>&nbsp; libdar::not_mask m7 = m6;<br>
+&nbsp; m6.add_mask(m7);<br>
+      <br>
+      </code></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+Now that you see a bit more all the power of masks, you must know that
+in
+quite all libdar operations two masks are required: <br>
+<ul>
+  <li style="text-align: justify;">The first mask is used against
+filenames, but is not applied to directories, nor it is applied to the
+path part of the filenames. This first mask may be any
+combinaison of the masks seen previously, it will only be applied to
+socket, named pipes, symbolic links, char or block devices, plain
+files, but not to directories as we said. This way you can filter by
+type of file
+you want or don't want to save, restore, list, compaire, compress and
+so on.</li>
+  <li style="text-align: justify;">The second mask is applied to any
+file including directories and including the path part of the filename.
+So with it you can prune directories, or in
+the other way restrict the operation to a particula subdirectory, as
+well as to a particular plain file for example.<br>
+  </li>
+</ul>
+<code></code>
+<div style="margin-left: 40px; text-align: justify;"></div>
+<h2>5 - Let's create a simple archive</h2>
+Now that we have seen masks and exceptions classes let's start the real
+thing:<br>
+&nbsp;
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>&nbsp;
+// creating an archive is simple, it is just<br>
+&nbsp; // calling the "create" constructor of the archive<br>
+&nbsp; // class. It may be used for full or differential<br>
+&nbsp; // archive. But we will see differential later.<br>
+      <br>
+&nbsp; // my_arch should have been an object instead of a<br>
+&nbsp; // pointer to an archive object. <br>
+      <br>
+libdar::user_interaction_callback dialog =
+libdar::user_interaction_callback(ptr1, ptr2, ptr3);<br>
+&nbsp; // where ptr1, ptr2 and ptr3 are three callback<br>
+&nbsp; // functions.<br>
+libdar::statistics ret;<br>
+&nbsp; // we will see this structure a bit further<br>
+      <br>
+libdar::archive *my_arch = <br>
+&nbsp; &nbsp;&nbsp; new <span style="font-weight: bold;">libdar::archive</span>(dialog,
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;"/home",&nbsp; // saving all under this "root"<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
+&nbsp;&nbsp;&nbsp; &nbsp;NULL,&nbsp;&nbsp;&nbsp;&nbsp; // we do a full
+backup for now <br>
+&nbsp;&nbsp;&nbsp;&nbsp; libdar::not_mask(simple_mask("*~", true)), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+we don't save the files ending with<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // '~' this does not concern
+directories<br>
+&nbsp;&nbsp;&nbsp;&nbsp; libdar::bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+all directories and files not rejected <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+by the previous mask are saved<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"my_archive",&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+the basename of the slices <br>
+&nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
+occurence<br>
+&nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // nor we want to pause between slices<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // rejected directory will be
+saved as<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // empty (no directory is
+rejected so<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // here there is no
+importance for that<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // parameter)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;libdar::gzip // the archive will be compressed<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // using gzip <br>
+&nbsp;&nbsp;&nbsp; &nbsp;9,&nbsp;&nbsp;&nbsp;&nbsp; // at maximum
+compression level <br>
+&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp;&nbsp; // no slicing is
+done,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;0, &nbsp;&nbsp;&nbsp; // so the first slice
+size must also be <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+set to zero <br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // root EA will be saved if present<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // user EA too<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // no script will be
+executed between<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // slices (as there is no
+slicing) <br>
+&nbsp;&nbsp;&nbsp; &nbsp;libdar::crypto_blowfish, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+the blowfish strong encryption <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+will be used<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // as the password is
+not given here&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+(empty string is not a valid password) <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+it will be asked interactively to the<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user through the dialog<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user_interaction object<br>
+&nbsp;&nbsp;&nbsp; &nbsp;20480, // the block of encryption will be<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // 20 kbytes<br>
+&nbsp;&nbsp;&nbsp;&nbsp; libdar::not_mask(libdar::simple_mask("*gz")), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+all files will be compressed except<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // those ending by "gz"<br>
+&nbsp;&nbsp;&nbsp; &nbsp;800,&nbsp;&nbsp; // file which size is below
+800 bytes<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // will not be compressed<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved whatever is<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // as we make a full backup this <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+"ignore_owner" parameter is useless <br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp; // hourshift is
+useless here as we make <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // a
+full backup<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // we will make a real archive not a<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // dry-run operation<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // dar will set back the access
+time of<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
+change the<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of theses files
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // we may change of filesystem if<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
+&nbsp;&nbsp;&nbsp;&nbsp; ret);&nbsp; // this value is returned by libdar</code><br>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>&nbsp;
+// creating an archive is simple, it is just<br>
+&nbsp; // calling the "create" constructor of the archive<br>
+&nbsp; // class. It may be used for full or differential<br>
+&nbsp; // archive. But we will see differential later.<br>
+      <br>
+&nbsp; // my_arch should have been an object instead of a<br>
+&nbsp; // pointer to an archive object. <br>
+      </code><code><br>
+libdar::user_interaction_callback dialog =
+libdar::user_interaction_callback(ptr1, ptr2, ptr3);<br>
+&nbsp; // where ptr1, ptr2 and ptr3 are three callback<br>
+&nbsp; // functions.<br>
+libdar::statistics ret;<br>
+&nbsp; </code><code>// we will see this structure a bit further<br>
+      <br>
+      </code><code>U_16 exception, <br>
+std::string except_msg;</code><br>
+      <br>
+      <code><span class="el">libdar::archive *my_arch
+=&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">libdar::create_archive_noexcept</span>(dialog,</span></code><span
+ class="el"><code>&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; "/home",&nbsp; // saving all under this "root"<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
+&nbsp;&nbsp;&nbsp; &nbsp;NULL,&nbsp;&nbsp;&nbsp;&nbsp; // we do a full
+backup for now <br>
+&nbsp;&nbsp;&nbsp;&nbsp; libdar::not_mask(simple_mask("*~", true)), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+we don't save the files ending with<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // '~' this does not concern
+directories<br>
+&nbsp;&nbsp;&nbsp;&nbsp; libdar::bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+all directories and files not rejected <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+by the previous mask are saved<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"my_archive",&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+the basename of the slices <br>
+&nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
+occurence<br>
+&nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // nor we want to pause between slices<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // rejected directory will be
+saved as<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // empty (no directory is
+rejected so<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // here there is no
+importance for that<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // parameter)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;libdar::gzip // the archive will be compressed<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // using gzip <br>
+&nbsp;&nbsp;&nbsp; &nbsp;9,&nbsp;&nbsp;&nbsp;&nbsp; // at maximum
+compression level <br>
+&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp;&nbsp; // no slicing is
+done,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;0, &nbsp;&nbsp;&nbsp; // so the first slice
+size must also be <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+set to zero <br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // root EA will be saved if present<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // user EA too<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // no script will be
+executed between<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // slices (as there is no
+slicing) <br>
+&nbsp;&nbsp;&nbsp; &nbsp;libdar::crypto_blowfish, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+the blowfish strong encryption <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+will be used<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // as the password is
+not given here&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+(empty string is not a valid password) <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+it will be asked interactively to the<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user through the dialog<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user_interaction object<br>
+&nbsp;&nbsp;&nbsp; &nbsp;20480, // the block of encryption will be<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // 20 kbytes<br>
+&nbsp;&nbsp;&nbsp;&nbsp; libdar::not_mask(libdar::simple_mask("*gz")), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+all files will be compressed except<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // those ending by "gz"<br>
+&nbsp;&nbsp;&nbsp; &nbsp;800,&nbsp;&nbsp; // file which size is below
+800 bytes<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // will not be compressed<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved whatever is<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // as we make a full backup this <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+"ignore_owner" parameter is useless <br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp; // hourshift is
+useless here as we make <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // a
+full backup<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // we will make a real archive not a<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // dry-run operation<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // dar will set back the access
+time of<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
+change the<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of theses files
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // we may change of filesystem if<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
+&nbsp;&nbsp;&nbsp;&nbsp; ret,&nbsp;&nbsp; // this value is returned by
+libdar<br>
+&nbsp;&nbsp;&nbsp;&nbsp; exception, // thisgives the status of the call<br>
+&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of error the cause.<br>
+      <br>
+if(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+std::endl;<br>
+      <br>
+      </code></span> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<div style="text-align: justify;">When creating an archive, the created
+archive object can be used only as reference for a isolation or for
+differential backup. You cannot use it for restoration, listing,
+comparison, because the underlying file descriptors are openned in
+write only mode. An implementation which uses file descriptors in
+read-write access is not possible and is not a good idea anyway. Why ?
+Because, for example, if you want to test your just created archive,
+using the just created object would make the testing rely on
+information stored in virtual memory (the archive contents, the data
+location of a file, etc.), not in the file archive. If some corruption
+occured in the file you would not notice it.<br>
+</div>
+<br>
+So to totally complete the archive creation we must destroy the archive
+object we have just created, which have also as consequence to close
+any file descriptor used by the object :<br>
+<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+&nbsp;&nbsp;&nbsp;&nbsp; delete my_arch;<br>
+      <br>
+      </code> </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+libdar::close_archive_noexcept(my_arch, exception,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; except_msg);<br>
+      <br>
+      </code><span class="el"><code>if(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+std::endl;<br>
+      <br>
+      </code></span> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h2>6 - Testing the archive we have created</h2>
+So, as explained previously, we must create a new archive object but
+this time with the "read" constructor:<br>
+<br>
+<code><br>
+</code>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+my_arch = new </code><code>libdar::archive(dialog,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "/tmp",&nbsp; // where is the
+archive <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "my_archive", // slice name<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "dar",&nbsp;&nbsp; // dar's
+archive extensions<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; libdar::crypto_blowfish, <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 20480, // theses last three are
+for encryptions<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // not used
+as we didn't gave "-" as<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // slice
+name<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // no
+command executed for now<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; false); // no verbose output<br>
+      </code> </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+my_arch = </code><code>libdar::open_archive_noexcept(</code><code>dialog,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "/tmp",&nbsp; // where is the
+archive <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "my_archive", // slice name<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "dar",&nbsp;&nbsp; // dar's
+archive extensions<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; libdar::crypto_blowfish, <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 20480, // theses last three are
+for encryptions<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // not used
+as we didn't gave "-" as<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // slice
+name<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // no
+command executed for now<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; false, // no verbose output<br>
+      </code><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+exception,// this gives the status of the call<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of
+error the <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// cause of the error<br>
+      <br>
+i</code></span><span class="el"><span class="el"><code>f(exception !=
+LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+std::endl;</code></span><br>
+      </span><span class="el"><code><br>
+      </code></span> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+Now that we have openned the archive we can perform all operation on
+it, let's thus start by testing the archive coherence:<br>
+<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+ret = my_arch-&gt;<span class="el">op_test</span>(<span class="el"></span>dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// all files are tested<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+libdar::bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+//no directory is prune<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false); &nbsp;&nbsp; // no verbose output &nbsp;&nbsp;&nbsp; <br>
+      </code><br>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
+      <br>
+      <span class="el">ret = libdar::op_test_noexcept(</span></code><span
+ class="el"><code><span class="el"></span>dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+my_arch,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the archive
+to test<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; libdar::bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// all files are tested<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; libdar::bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+//no directory is prune<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false, &nbsp;&nbsp; // no verbose
+output</code></span><br>
+      <span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+exception,// this gives the status of the call<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of
+error the <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// cause of the error<br>
+      <br>
+      </code></span><span class="el"><span class="el"><code>i</code></span><span
+ class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+std::endl;<br>
+      <br>
+      </code></span></span></span> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<div style="text-align: justify;">We have tested the archive, but have
+not yet seen the libdar::statistics variable. It has been used to
+create an archive as well as here to test it.&nbsp; This structure
+reports the number of files treated, as well as the number files with
+error and the type of error. You can have a look at the API reference
+guide for more information about the use of different field. Here is an
+example, which relies on the <span style="font-style: italic;"><span
+ style="font-weight: bold;">class deci</span> </span>to display the
+value of an infinint variable:<br>
+</div>
+<br>
+<code></code><code></code>
+<table
+ style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 204);">&nbsp;&nbsp;
+      <code>&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; // we need the <span
+ style="font-style: italic;">class deci</span> to display the value of
+an infinint:<br>
+      </code><code></code><code>#include "deci.hpp"<br>
+      <br>
+&nbsp;std::cout &lt;&lt; std::string("Number of file treated :")
+&lt;&lt; libdar::deci(ret.treated).human() &lt;&lt; std::endl;<br>
+      <br>
+&nbsp; &nbsp; // or much more simple (but totally equivalent):<br>
+&nbsp;std::cout &lt;&lt; std::string("Number of file treated :")
+libdar::&lt;&lt; ret.treated &lt;&lt; std::endl;<br>
+      </code><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<div style="text-align: justify;">Note that the use of the class deci
+may throw exceptions (in case of lack of memory, for example), and
+there is actually no wrapper available to trap the exceptions that may
+be thrown by the class<span style="font-style: italic;"> deci</span>.
+So you have to protect the code using a<span style="font-style: italic;">
+<span style="font-weight: bold;">try {} catch {}</span></span>&nbsp;
+statment.<br>
+</div>
+<br>
+<h2>7 - listing archive contents</h2>
+The simple way:<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+my_arch-&gt;<span class="el">op_listing</span>(<span class="el"></span>dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false, // not a verbose output<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false, // not using the tar-like format<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// all filenames are listed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false);// do not filter unsaved files&nbsp; <br>
+      </code><br>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
+      <br>
+li<span class="el">bdar::op_test_listing(</span></code><span class="el"><code><span
+ class="el"></span>dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>false,
+// not a verbose output<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false, // not using the tar-like format<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// all filenames are listed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false,// do not filter unsaved
+files</code></span><br>
+      <span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+exception,// this gives the status of the call<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of
+error the <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// cause of the error<br>
+      <br>
+      </code></span><span class="el"><span class="el"><code>i</code></span><span
+ class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+endl;<br>
+      <br>
+      </code></span></span></span> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<div style="text-align: justify;">The listing will be done calling the<span
+ style="font-style: italic;"> warning()</span> method of the <span
+ style="font-style: italic;">dialog</span> object once for each file to
+list. This may not be very interesting because you will have just a
+string for each file, and it would require some parsing if you would
+like to split the listing in column, or display only filenames first
+and have other information available to the user in another way. The
+solution to this problem is to change the <span
+ style="font-style: italic;">user_interaction</span> object.<br>
+<br>
+The <span style="font-style: italic;">user_interaction</span> class
+has a<span style="font-style: italic;"> </span><span
+ style="font-weight: bold; font-style: italic;">listing()</span> method
+which provides as much arguments as different information to display:<br>
+<ul>
+  <li>filename, </li>
+  <li>permission, </li>
+  <li>user, </li>
+  <li>group, </li>
+  <li>file size,</li>
+  <li>last modification date,</li>
+  <li>if the file is a directory</li>
+  <li>if the file has children or is an empty dir</li>
+  <li>file type</li>
+  <li>flag about saved data / saved EA / compression used</li>
+</ul>
+<br>
+In the <span style="font-style: italic;">user_interaction</span> class
+(a pure virtual class), the <span style="font-style: italic;">listing()</span>
+method is not a pure virtual method, so you are not obliged to
+overwrite it, but it has just an empty implemtation so it does nothing.
+You understand now that, by default, this method is not used. To
+activate it, you must call&nbsp;<span style="font-style: italic;">
+set_use_listing(true) </span>protected method and of course you will
+have to ovewrite the <span style="font-style: italic;">listing()</span>
+method to have a less silly behavior:<br>
+<br>
+</div>
+<br>
+<code></code><code></code>
+<table
+ style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;&nbsp;&nbsp;
+// here follows the definition of our own implementation of<br>
+&nbsp;&nbsp;&nbsp; // of a user_interaction class <br>
+      <br>
+class my_user_interaction : public user_interaction<br>
+{<br>
+public :<br>
+&nbsp; &nbsp;&nbsp; // the inherited pure virtual methods we must define<br>
+&nbsp; &nbsp;&nbsp; // as seen at the beginning of this tutorial:<br>
+&nbsp; &nbsp;&nbsp; &nbsp; void pause(const std::string &amp; message);<br>
+      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void
+warning(const std::string &amp; message);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; std::string get_string(const
+std::string &amp; message, bool echo);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user_interaction *clone() const;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // we can overwrite this method to have splitted
+fields for listing:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void listing(const
+std::string &amp; flag,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const std::string
+&amp; perm,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const
+std::string &amp; uid,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const
+std::string &amp; gid,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp;
+size,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const
+std::string &amp; date,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; const std::string &amp;
+filename,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; bool
+is_dir,<br>
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; bool
+has_children);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp; // but it will not get used by libdar unless
+we call the protected method set_use_listing()<br>
+&nbsp;&nbsp;&nbsp;&nbsp; // for example this can be done in the class
+constructor :<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp; my_user_interaction() { <span
+ style="font-weight: bold;">set_use_listing(true);</span> };<br>
+};<br>
+      <br>
+      </code> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<div style="text-align: justify;">Now assuming we have implemented the <span
+ style="font-style: italic;">listing()</span> method in&nbsp; <span
+ style="font-style: italic;">my_user_interaction</span> class, calling <span
+ style="font-style: italic;">op_listing()</span> exactly as we did in
+the simple way, but just replacing the <span
+ style="font-style: italic;">dialog</span> object by one of the <span
+ style="font-style: italic;">my_user_interaction</span> class, would
+make this <span style="font-style: italic;">listing()</span> method
+called for each file to be listed, in place of the <span
+ style="font-style: italic;">warning()</span> method.<br>
+</div>
+<br>
+<div style="text-align: justify;">As seen at the beginning of this
+tutorial too, there is a children class of <span
+ style="font-style: italic;">user_interaction</span> based on callback
+functions which is called <span style="font-style: italic;">user_interaction_callback</span>.
+The <span style="font-style: italic;">listing()</span> method must
+also be activated here. This is done automatically when you give a
+callback function to the object, thanks to the <span
+ style="font-weight: bold; font-style: italic;">set_listing_callback()</span>
+method :<br>
+</div>
+<br>
+<code></code><code></code>
+<table
+ style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
+      </code><code><br>
+&nbsp; // our mandatory callback functions:<br>
+      <br>
+void warning_callback(const std::string &amp;x, void *context)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; ....<br>
+}<br>
+&nbsp;<br>
+bool answer_callback(const std::string &amp;x, void *context)<br>
+{<br>
+&nbsp; &nbsp; ....<br>
+}<br>
+      <br>
+std::string string_callback(const std::string &amp;x, bool echo, void
+*context)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; ....<br>
+}<br>
+      <br>
+&nbsp; // let's build a user_interaction_callback object:<br>
+      <br>
+libdar::user_interaction_callback dialog = <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::user_interaction_callback(&amp;warning_callback,
+&amp;answer_callback, &amp;string_callback, NULL);<br>
+      <br>
+&nbsp;&nbsp; // at this point our dialog object is perfectly
+operational for listing<br>
+&nbsp;&nbsp; // but libdar will call the warning_callback function to
+list the archive<br>
+&nbsp;&nbsp; // contents<br>
+      <br>
+&nbsp;&nbsp; // a new callback function for listing :<br>
+      <br>
+void listing_callback(const std::string &amp; flag,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; perm,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; uid,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; gid,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; size,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; date,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; const std::string &amp; filename,<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp; bool is_dir,<br>
+&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; bool has_children,<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; void *context)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; ....<br>
+}<br>
+      <br>
+      <span style="font-weight: bold;">dialog.set_listing_callback(&amp;listing_callback);</span><br>
+      <br>
+&nbsp;&nbsp; // now libdar will call the listing_callback function when
+we <br>
+&nbsp;&nbsp; // will use this <span style="font-style: italic;">dialog
+      </span>object for listing the archive contents.<br>
+      </code><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<h2>8 - comparing with filesystem</h2>
+comparison is realized by calling the<span
+ style="font-weight: bold; font-style: italic;"> op_diff</span> method
+of the <span style="font-style: italic;">class archive</span>.<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+&nbsp;&nbsp;&nbsp;&nbsp; ret = my_arch-&gt;op_diff(dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/home", // what directory to take<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// as root we shall<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// compare the archive<br>
+&nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// contents to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::bool_mask(true),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::bool_mask(true),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false,&nbsp;&nbsp; // no verbose output<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // comparing root EA <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // comparing user EA<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false,&nbsp;&nbsp; // do not ignore ownership<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// differences<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false);&nbsp; // do not set back atime<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// of read files<br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      </code> </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <br>
+&nbsp; ret = </code><code>libdar::op_diff_noexcept(dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+my_arch, // the archive to use<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/home", // what directory to take<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// as root we shall<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// compare the archive<br>
+&nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// contents to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::bool_mask(true),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::bool_mask(true),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false,&nbsp;&nbsp; // no verbose output<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // comparing root EA <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // comparing user EA<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false,&nbsp;&nbsp; // do not ignore ownership<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// differences<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false, &nbsp; // do not set back atime<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// of read&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; files</code><span
+ class="el"><code>exception, // this gives the<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; // status of the call<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+except_msg); // and in case of<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; // error the cause of the<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+error<br>
+      <br>
+      </code></span><span class="el"><span class="el"><code>i</code></span><span
+ class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+std::endl;<br>
+      <br>
+      </code></span></span></span><span class="el"><code></code></span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+simple, no ?<br style="font-style: italic;">
+<h2>9 - restoring files</h2>
+restoration of files is done by calling the&nbsp;<span
+ style="font-style: italic;"> </span><span
+ style="font-weight: bold; font-style: italic;">op_extract</span>
+method of archive class.<br>
+<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+ret = my_arch-&gt;<span class="el">op_extract</span>(<span class="el"></span>dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/tmp",&nbsp;&nbsp; // where to restore files to<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp;&nbsp; // restore any filename<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+libdar::simple_path_mask("denis/.tcshrc",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// but only restore<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// this file or directory<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false,// overwriting not allowed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true, // warn before overwriting<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; //
+useless here, not overwritting<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; true, //
+verbose output<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; true, //
+remove files marked as deleted<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// useless here too, as verwriting<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; //
+has been disabled<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false,// restore even if a file is more<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// recent, (useless here too)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true, // restore root EA &nbsp; <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; true, //
+restore user EA <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; false,//
+restore directory structure &nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false,// restore ownership<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; false,//
+don't warn if a file to be <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; //
+removed has a type that does<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; //
+the type of the orginal file &nbsp; <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+0,&nbsp;&nbsp; // no daylight saving consideration<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; false);
+// not a dry-run execution<br>
+      </code><br>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
+      <br>
+      <span class="el">ret = libdar::op_extract_noexcept(</span></code><span
+ class="el"><code><span class="el"></span>dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+my_arch,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the archive
+to test<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>"/tmp",&nbsp;&nbsp;
+// where to restore files to<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; libdar::bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// restore any filename<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::simple_path_mask("denis/.tcshrc",<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; true),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// but only restore<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// this file or directory<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false,// overwriting not allowed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; true, // warn before overwriting<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; // useless here, not
+overwritting<br>
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; true, // verbose output<br>
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; true, // remove files marked as deleted<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// useless here too, as verwriting<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; // has been disabled<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false,// restore even if a file is
+more<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// recent, (useless here too)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; true, // restore root EA &nbsp; <br>
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; true, // restore user EA <br>
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; false,// restore directory structure
+&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false,// restore ownership<br>
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; false,// don't warn if a file to be <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; // removed has a type
+that does<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; // the type of the
+orginal file &nbsp; <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp;&nbsp; // no daylight
+saving consideration<br>
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; false,// not a dry-run execution</code><br>
+      </span><span class="el"><code></code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+exception,// this gives the status of the call<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of
+error the <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// cause of the error<br>
+      <br>
+      </code></span><span class="el"><span class="el"><code>i</code></span><span
+ class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+std::endl;<br>
+      <br>
+      </code></span></span></span> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h2>10 - isolating the catalogue</h2>
+<div style="text-align: justify;">OK, I know, <span
+ style="font-style: italic;">catalogue </span>is
+not an english word (one would rather write <span
+ style="font-style: italic;">catalog</span>), but that's the name of
+the C++ class used in
+libdar, so we will keep using it here. Note that you don't have to
+directly access to this class.<br>
+</div>
+<br>
+<div style="text-align: justify;">Isolating the catalogue creates a new
+archive that only contains the list of files and their attributes
+(ownership, dates, size, etc.), but no data and no EA are stored in it.
+It is very similar to the same archive one get if he would made a
+differential backup of a filesystem that has not changed since the
+archive of reference. The usage is very similar to the archive
+creation, but it uses a different constructor that has less arguments :<br>
+</div>
+<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+libdar::archive *my_cat = new libdar::archive(dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/tmp",&nbsp; // where is saved the <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; // extracted catalogue<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+my_arch, // the archive of reference<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// is the one we have been<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// playing with previously<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"my_catalogue", // slice name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"dar",&nbsp;&nbsp; // file extension<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // allow slice overwriting<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // but warn before<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // verbose output<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // pause between slices<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::bzip2, // compression<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+9,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // max compression level<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+3000, // cut in slices of 3000 Bytes<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+3000, // first slice size is the same<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"echo slice %p/%b.%n.%e created",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// the script to run after<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// slice creation<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::crypto_none, // no encryption<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"",&nbsp;&nbsp;&nbsp; // unused password<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0,&nbsp;&nbsp;&nbsp;&nbsp; // unused crypto size<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false); // not a dry-run execution<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; <br>
+      </code><br>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
+      <span class="el">libdar::archive *my_cat = <br>
+&nbsp;&nbsp;&nbsp; libdar::op_isolate_noexcept(dialog,<br>
+      </span></code><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; "/tmp", &nbsp; // where is saved the <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; // extracted catalogue<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+my_arch, // the archive of reference<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// is the one we have been<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// playing with previously<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"my_catalogue", // slice name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"dar",&nbsp;&nbsp; // file extension<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // allow slice overwriting<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // but warn before<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // verbose output<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+true,&nbsp;&nbsp;&nbsp; // pause between slices<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::bzip2, // compression<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+9,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // max compression level<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+3000, // cut in slices of 3000 Bytes<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+3000, // first slice size is the same<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"echo slice %p/%b.%n.%e created",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// the script to run after<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// slice creation<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+libdar::crypto_none, // no encryption<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"",&nbsp;&nbsp;&nbsp; // unused password<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0,&nbsp;&nbsp;&nbsp;&nbsp; // unused crypto size<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+false, // not a dry-run execution</code><br>
+      </span><span class="el"><code></code></span><span class="el"><code>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+exception,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // this gives
+the status <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // of the call<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+except_msg); <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // and in
+case of error the <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // cause of the error<br>
+      <br>
+      </code></span><span class="el"><span class="el"><code>i</code></span><span
+ class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+std::endl;<br>
+      <br>
+      </code></span></span></span> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<div style="text-align: justify;">Now we have two archive objects. <span
+ style="font-style: italic;">my_arch</span> is a read-only object
+created by the "read" constructor. You can do any operations with it,
+like file restoration, file comparison, archive testing, as we have
+done in the previous paragraphs. The second archive object is <span
+ style="font-style: italic;">my_cat</span> which is a write only
+object. It can only be used as reference for another backup (a
+differential backup) or as a reference for a subsequent catalogue
+isolation (which would just clone the already isolated catalogue
+object, here).<br>
+<br>
+Note, that an isolated catalogue can be tested, compared with
+filesystem, and even you can try to restore files from it. But as there
+is no data associated with files contents, dar will not restore any
+file from it, of course. So for now we will just destroy the extracted
+catalogue object, for all its file descriptors to be closed:<br>
+<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+delete my_cat; &nbsp;&nbsp; <br>
+      </code><br>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code><br>
+close_archive_noexcept (my_cat, exception,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; except_msg);<br>
+      <br>
+      </code><span class="el"><code>
+if(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+std::endl;</code></span><code> <br>
+      <span class="el"></span></code><span class="el"><span class="el"><span
+ class="el"><code><br>
+      </code></span></span></span> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+and we keep the <span style="font-style: italic;">my_arch</span>
+object for our last operation :<br>
+</div>
+<h2>11 - creating a differential backup</h2>
+<div style="text-align: justify;">This operation is the same as the
+first one we did (archive creation). You have maybe noted that an
+argument was set to <span style="font-style: italic;">NULL</span>,&nbsp;
+here we will give it the value of <span style="font-style: italic;">my_arch
+</span>which means that <span style="font-style: italic;">my_arch</span>
+will become the archive of reference for the archive we will create. If
+we had not destroyed <span style="font-style: italic;">my_cat </span>above,
+we could have been using it in place of <span
+ style="font-style: italic;">my_arch</span> for exactly the same result.<br>
+</div>
+<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>&nbsp;
+      <br>
+libdar::archive *my_other_arch = <br>
+&nbsp; &nbsp;&nbsp; new libdar::archive(dialog, <br>
+&nbsp;&nbsp;&nbsp; &nbsp;"/home",&nbsp; // saving all under this "root"<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
+&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">my_arch,&nbsp;
+// differential backup </span><br>
+&nbsp;&nbsp;&nbsp; &nbsp;not_mask(simple_mask("*~", true)), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+we don't save the files ending with<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // '~' this does not concern
+directories<br>
+&nbsp;&nbsp;&nbsp; &nbsp;bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+all directories and files not rejected <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+by the previous mask are saved<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"my_archive",&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+the basename of the slices <br>
+&nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
+occurence<br>
+&nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // nor we want to pause between slices<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // rejected directory will be
+saved as<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // empty (no directory is
+rejected so<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // here there is no
+importance for that<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // parameter)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;libdar::gzip // the archive will be compressed<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // using gzip <br>
+&nbsp;&nbsp;&nbsp; &nbsp;9,&nbsp;&nbsp;&nbsp;&nbsp; // at maximum
+compression level <br>
+&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp;&nbsp; // no slicing is
+done,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;0, &nbsp;&nbsp;&nbsp; // so the first slice
+size must also be <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+set to zero <br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // root EA will be saved if present<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // user EA too<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // no script will be
+executed between<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // slices (as there is no
+slicing) <br>
+&nbsp;&nbsp;&nbsp; &nbsp;libdar::crypto_blowfish, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+the blowfish strong encryption <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+will be used<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // as the password is
+not given here&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+(empty string is not a valid password) <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+it will be asked interactively to the<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user through the dialog<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user_interaction object<br>
+&nbsp;&nbsp;&nbsp; &nbsp;20480, // the block of encryption will be<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // 20 kbytes<br>
+&nbsp;&nbsp;&nbsp; &nbsp;not_mask(simple_mask("*gz")), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+all files will be compressed except<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // those ending by "gz"<br>
+&nbsp;&nbsp;&nbsp; &nbsp;800,&nbsp;&nbsp; // file which size is below
+800 bytes<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // will not be compressed<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved whatever is<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // as we make a full backup this <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+"ignore_owner" parameter is useless <br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp; // hourshift is
+useless here as we make <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // a
+full backup<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // we will make a real archive not a<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // dry-run operation<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // dar will set back the access
+time of<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
+change the<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of theses files
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // we may change of filesystem if<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
+&nbsp;&nbsp;&nbsp;&nbsp; ret);&nbsp; // this value is returned by libdar</code><br>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>
+      </code><br>
+      <code><span class="el">libdar::archive *my_other_arch
+=&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; libdar::create_archive_noexcept(dialog,</span></code><span
+ class="el"><code>&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; "/home",&nbsp; // saving all under this "root"<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
+      </code></span><span class="el"><code><span
+ style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; my_arch,&nbsp; //
+differential backup </span></code></span><span class="el"><code><br>
+&nbsp;&nbsp;&nbsp; &nbsp;not_mask(simple_mask("*~", true)), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+we don't save the files ending with<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // '~' this does not concern
+directories<br>
+&nbsp;&nbsp;&nbsp; &nbsp;bool_mask(true), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+all directories and files not rejected <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+by the previous mask are saved<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"my_archive",&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+the basename of the slices <br>
+&nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
+occurence<br>
+&nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // nor we want to pause between slices<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // rejected directory will be
+saved as<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // empty (no directory is
+rejected so<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // here there is no
+importance for that<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // parameter)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;libdar::gzip // the archive will be compressed<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // using gzip <br>
+&nbsp;&nbsp;&nbsp; &nbsp;9,&nbsp;&nbsp;&nbsp;&nbsp; // at maximum
+compression level <br>
+&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp;&nbsp; // no slicing is
+done,<br>
+&nbsp;&nbsp;&nbsp; &nbsp;0, &nbsp;&nbsp;&nbsp; // so the first slice
+size must also be <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+set to zero <br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // root EA will be saved if present<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // user EA too<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // no script will be
+executed between<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // slices (as there is no
+slicing) <br>
+&nbsp;&nbsp;&nbsp; &nbsp;libdar::crypto_blowfish, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+the blowfish strong encryption <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+will be used<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // as the password is
+not given here&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+(empty string is not a valid password) <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+it will be asked interactively to the<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user through the dialog<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user_interaction object<br>
+&nbsp;&nbsp;&nbsp; &nbsp;20480, // the block of encryption will be<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // 20 kbytes<br>
+&nbsp;&nbsp;&nbsp; &nbsp;not_mask(simple_mask("*gz")), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+all files will be compressed except<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // those ending by "gz"<br>
+&nbsp;&nbsp;&nbsp; &nbsp;800,&nbsp;&nbsp; // file which size is below
+800 bytes<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // will not be compressed<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved whatever is<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // as we make a full backup this <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+"ignore_owner" parameter is useless <br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp; // hourshift is
+useless here as we make <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // a
+full backup<br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // we will make a real archive not a<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // dry-run operation<br>
+&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // dar will set back the access
+time of<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
+change the<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of theses files
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;false, // we may change of filesystem if<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
+&nbsp;&nbsp;&nbsp;&nbsp; ret,&nbsp;&nbsp; // this value is returned by
+libdar<br>
+&nbsp;&nbsp;&nbsp;&nbsp; exception, // thisgives the status of the call<br>
+&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of error the cause.<br>
+      <br>
+if(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+std::endl;<br>
+      <br>
+      </code></span> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+As previously my_other_arch is a write only object that we won't need
+anymore. So we destroy it:<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+&nbsp;&nbsp;&nbsp;&nbsp; delete my_other_arch;<br>
+      <br>
+      </code> </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+libdar::close_archive_noexcept(my_other_arch,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; exception,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; except_msg);<br>
+      <br>
+      </code><span class="el"><code>
+if(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+std::endl;<br>
+      <br>
+      </code></span> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<br>
+So, we are at the end of the tutorial, but still remains an object we
+need to destroy to cleanly release the memory used :<br>
+<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+&nbsp;&nbsp;&nbsp;&nbsp; delete my_arch;<br>
+      <br>
+      </code> </td>
+      <td
+ style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+libdar::close_archive_noexcept(my_arch, exception,<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; except_msg);<br>
+      <br>
+      </code><span class="el"><code>
+if(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt;
+std::endl;<br>
+      <br>
+      </code></span> </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+For more detailed information about the API you have the API reference
+guide, built from source code by Doxygen.<br>
+<br>
+<h2><br>
+</h2>
+<br>
+<io .h=""><dar></dar></io>
+</body>
+</html>

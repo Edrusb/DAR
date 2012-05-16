@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.cpp,v 1.9.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: user_interaction.cpp,v 1.24 2004/12/07 18:04:52 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -72,126 +72,159 @@ using namespace std;
 
 namespace libdar
 {
-
-    static void (*warning_callback)(const string & x) = NULL;
-    static bool (*answer_callback)(const string & x) = NULL;
-
-    void set_warning_callback(void (*callback)(const string & x))
+    user_interaction_callback::user_interaction_callback(void (*x_warning_callback)(const string &x, void *context),
+							 bool (*x_answer_callback)(const string &x, void *context),
+							 string (*x_string_callback)(const string &x, bool echo, void *context),
+							 void *context_value)
     {
-        warning_callback = callback;
+	if(x_warning_callback == NULL || x_answer_callback == NULL)
+	    throw Elibcall("user_interaction_callback::user_interaction_callback", gettext("NULL given as argument of user_interaction_callback"));
+	warning_callback = x_warning_callback;
+	answer_callback  = x_answer_callback;
+	string_callback  = x_string_callback;
+	tar_listing_callback = NULL;
+	context_val = context_value;
     }
 
-    void set_answer_callback(bool (*callback)(const string &x))
-    {
-        answer_callback = callback;
-    }
-
-    void user_interaction_pause(const string & message)
+    void user_interaction_callback::pause(const string & message)
     {
         if(answer_callback == NULL)
-            cerr << "answer_callback not set, use set_answer_callback() first" << endl;
+	    throw SRC_BUG;
         else
-            if(! (*answer_callback)(message))
-                throw Euser_abort(message);
+	{
+	    try
+	    {
+		if(! (*answer_callback)(message, context_val))
+		    throw Euser_abort(message);
+	    }
+	    catch(Euser_abort & e)
+	    {
+		throw;
+	    }
+	    catch(...)
+	    {
+		throw Elibcall("user_interaction_callback::pause", gettext("No exception allowed from libdar callbacks"));
+	    }
+	}
     }
 
-    void user_interaction_warning(const string & message)
+    void user_interaction_callback::warning(const string & message)
     {
         if(warning_callback == NULL)
-            cerr << "warning_callback not set, use set_warning_callback first" << endl;
+	    throw SRC_BUG;
         else
-            (*warning_callback)(message + '\n');
+	{
+	    try
+	    {
+		(*warning_callback)(message + '\n', context_val);
+	    }
+	    catch(...)
+	    {
+		throw Elibcall("user_interaction_callback::warning", gettext("No exception allowed from libdar callbacks"));
+	    }
+	}
     }
+
+    string user_interaction_callback::get_string(const string & message, bool echo)
+    {
+	if(string_callback == NULL)
+	    throw SRC_BUG;
+	else
+	{
+	    try
+	    {
+		return (*string_callback)(message, echo, context_val);
+	    }
+	    catch(...)
+	    {
+		throw Elibcall("user_interaction_callback::get_string", gettext("No exception allowed from libdar callbacks"));
+	    }
+	}
+    }
+
+    void user_interaction::listing(const std::string & flag,
+				   const std::string & perm,
+				   const std::string & uid,
+				   const std::string & gid,
+				   const std::string & size,
+				   const std::string & date,
+				   const std::string & filename,
+				   bool is_dir,
+				   bool has_children)
+    {
+	    // stupid code to stop having compiler complaining against unused arguments
+
+	throw Elibcall("user_interaction::listing",
+		       tools_printf(gettext("Not overwritten listing() method called with: (%S, %S, %S, %S, %S, %S, %S, %s, %s)"),
+				    &flag,
+				    &perm,
+				    &uid,
+				    &gid,
+				    &size,
+				    &date,
+				    &filename,
+				    is_dir ? "true" : "false",
+				    has_children ? "true" : "false"));
+    }
+
+
+	void user_interaction_callback::listing(const string & flag,
+					    const string & perm,
+					    const string & uid,
+					    const string & gid,
+					    const string & size,
+					    const string & date,
+					    const string & filename,
+					    bool is_dir,
+					    bool has_children)
+    {
+	if(tar_listing_callback != NULL)
+	{
+	    try
+	    {
+		(*tar_listing_callback)(flag, perm, uid, gid, size, date, filename, is_dir, has_children, context_val);
+	    }
+	    catch(...)
+	    {
+		throw Elibcall("user_interaction_callback::listing", gettext("No exception allowed from libdar callbacks"));
+	    }
+	}
+    }
+
+    user_interaction * user_interaction_callback::clone() const
+    {
+	user_interaction *ret = new user_interaction_callback(*this); // copy constructor
+	if(ret == NULL)
+	    throw Ememory("user_interaction_callback::clone");
+	else
+	    return ret;
+    }
+
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: user_interaction.cpp,v 1.9.4.1 2003/12/20 23:05:35 edrusb Rel $";
+        static char id[]="$Id: user_interaction.cpp,v 1.24 2004/12/07 18:04:52 edrusb Rel $";
         dummy_call(id);
     }
 
-    void ui_printf(char *format, ...)
+    void user_interaction::printf(char *format, ...)
     {
-        va_list ap;
-        bool end;
-        U_32 taille = strlen(format)+1;
-        char *copie;
-        string output = "";
-
-        U_I test;
-
-        copie = new char[taille];
-        if(copie == NULL)
-            throw Ememory("ui_printf");
-
-        va_start(ap, format);
-        try
-        {
-            char *ptr = copie, *start = copie;
-
-            strcpy(copie, format);
-            copie[taille-1] = '\0';
-
-            do
-            {
-                while(*ptr != '%' && *ptr != '\0')
-                    ptr++;
-                if(*ptr == '%')
-                {
-                    *ptr = '\0';
-                    end = false;
-                }
-                else
-                    end = true;
-                output += start;
-                if(!end)
-                {
-                    ptr++;
-                    switch(*ptr)
-                    {
-                    case '%':
-                        output += "%";
-                        break;
-                    case 'd':
-                        output += tools_int2str(va_arg(ap, S_I));
-                        break;
-                    case 'u':
-                        test = va_arg(ap, U_I);
-                        output += deci(test).human();
-                        break;
-                    case 's':
-                        output += va_arg(ap, char *);
-                        break;
-                    case 'c':
-                        output += static_cast<char>(va_arg(ap, S_I));
-                        break;
-                    case 'i':
-                        output += deci(*(va_arg(ap, infinint *))).human();
-                        break;
-                    case 'S':
-                        output += *(va_arg(ap, string *));
-                        break;
-                    default:
-                        throw Efeature(string("%") + (*ptr) + " is not implemented in ui_printf format argument");
-                    }
-                    ptr++;
-                    start = ptr;
-                }
-            }
-            while(!end);
-        }
-        catch(...)
-        {
-            va_end(ap);
-            delete copie;
-            throw;
-        }
-        delete copie;
-        va_end(ap);
-
-        if(warning_callback == NULL)
-            cerr << "warning_callback not set, use set_warning_callback first" << endl;
-        else
-            (*warning_callback)(output);
+	va_list ap;
+	va_start(ap, format);
+	string output = "";
+	try
+	{
+	    output = tools_vprintf(format, ap);
+	}
+	catch(...)
+	{
+	    va_end(ap);
+	    throw;
+	}
+	va_end(ap);
+	tools_remove_last_char_if_equal_to('\n', output);
+	warning(output);
     }
 
 } // end of namespace
+

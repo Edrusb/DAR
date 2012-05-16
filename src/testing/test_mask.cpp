@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_mask.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_mask.cpp,v 1.7 2004/06/18 21:57:54 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -38,13 +38,60 @@ static void display_res(mask *m, string s)
 
 int main()
 {
-    simple_mask m1 = string("*.toto");
-    simple_mask m2 = string("a?.toto");
-    simple_mask m3 = string("a?.toto");
-    simple_mask m4 = string("*.toto");
-
+    simple_mask m1 = simple_mask(string("*.toto"), true);
+    simple_mask m2 = simple_mask(string("a?.toto"), true);
+    simple_mask m3 = simple_mask(string("a?.toto"), true);
+    simple_mask m4 = simple_mask(string("*.toto"), true);
+    simple_mask m5 = simple_mask(string("*.toto"), false);
     display_res(&m1, "tutu.toto");
     display_res(&m2, "a1.toto");
     display_res(&m3, "b1.toto");
     display_res(&m4, "toto");
+    display_res(&m4, "a.TOTO");
+    display_res(&m5, "a.TOTO");
+
+    bool_mask m6 = true;
+    bool_mask m7 = false;
+    display_res(&m6, "totot");
+    display_res(&m7, "totot");
+
+    regular_mask m8 = regular_mask("^toto", true);
+    regular_mask m9 = regular_mask("titi$", false);
+    display_res(&m8, "totola");
+    display_res(&m8, "tOTOla");
+    display_res(&m8, "ttotola");
+    display_res(&m9, "latiti");
+    display_res(&m9, "laTiTI");
+
+    same_path_mask m10 = same_path_mask("Zorro", true);
+    same_path_mask m11 = same_path_mask("Zorro", false);
+    display_res(&m10, "Zorro");
+    display_res(&m10, "zorro");
+    display_res(&m10, "toto");
+    display_res(&m11, "Zorro");
+    display_res(&m11, "zorro");
+    display_res(&m11, "toto");
+
+    exclude_dir_mask m12 = exclude_dir_mask("/tmp/crotte", true);
+    exclude_dir_mask m13 = exclude_dir_mask("/tmp/croTte", false);
+    display_res(&m12, "/tmp/crotte");
+    display_res(&m12, "/tmp/crotte/de/bique");
+    display_res(&m12, "/tmp");
+    display_res(&m12, "/toto/crotte");
+    display_res(&m13, "/tmp/crotte");
+    display_res(&m13, "/tmp/CrOtte");
+    display_res(&m13, "/tMp/cRoTTE/seche");
+
+    simple_path_mask m14 = simple_path_mask("/tmp/crotte", true);
+    simple_path_mask m15 = simple_path_mask("/tmp/croTte", false);
+    display_res(&m14, "/tmp/crotte");
+    display_res(&m14, "/tmp/crotte/de/bique");
+    display_res(&m14, "/tmp");
+    display_res(&m14, "/toto/crotte");
+    display_res(&m15, "/tmp/crotte");
+    display_res(&m15, "/tmp/CrOtte");
+    display_res(&m15, "/tMp/cRoTTE/seche");
+    display_res(&m15, "/tMp");
+
 }
+

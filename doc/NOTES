@@ -1,28 +1,32 @@
 
 
 
-                DETAIL NOTES ON VARIOUS TOPICS
+                DETAILED NOTES ON VARIOUS TOPICS
 
 
 
  CONTENTS
 ----------------
-   I - EA & differential backup
-  II - dar and remote backup server
- III - bytes, bits, kilo, mega, etc.
-  IV - archive structure in brief
-   V - EA Support & Compilation Problems
-  VI - run DAR in background
- VII - run command or scripts from DAR
-VIII - Makefile targets
-  IX - Scrambling
-   X - dar_manager
-  XI - file extension used
- XII - dar and ssh (see also chapter II)
-XIII - overflow in arithmetic integer operations
- XIV - using data protection with DAR & PAR
-  XV - Dar User Command (DUC files)
- XVI - Examples of file filtering
+    I - EA & differential backup
+   II - dar and remote backup server
+  III - bytes, bits, kilo, mega, etc.
+   IV - archive structure in brief
+    V - EA Support & Compilation Problems
+   VI - run DAR in background
+  VII - run command or scripts from DAR
+ VIII - Makefile targets
+   IX - Scrambling
+    X - dar_manager
+   XI - file extension used
+  XII - dar and ssh (see also chapter II)
+ XIII - overflow in arithmetic integer operations
+  XIV - using data protection with DAR & PAR
+   XV - Dar User Command (DUC files)
+  XVI - Examples of file filtering
+ XVII - Strong encryption
+XVIII - libdar and thread-safe requirement
+
+
 
 I- EA & differential backup
 ============================
@@ -293,10 +297,23 @@ called it a "byte". A byte has 256 different states, (2 power 8). The ASCII
 a letter or more generally a character to some value of a byte, (A is assigned
 to 65, space to 32, etc). And as most text is composed of a set of character,
 they started to count size in byte. Time after time, following technology
-evolution, memory size approached 1000 bytes, but for some obscure reason it
-was decided that a "kilobyte" would be 1024 bytes not 1000 bytes. Some time
-after, and by extension, a megabyte has been defined to be 1024 kilobytes,
-a terabyte to be 1024 megabytes, etc.
+evolution, memory size approached 1000 bytes.
+
+But as memory is accessed through
+a bus which is a fixed number of cables (or integrated circuits), on which only
+two possible voltages are authorized to mean 0 or 1, the total number possible
+value to give to a bus is always a power of 2. With a two cable bus, you can
+have 4 values (00, 01, 10 and 11, where a digit is the state of a cable). Giving
+an value to each cable defines an address to read or write in the memory, which
+is done through another bus. Of course address given to the address bus give
+the position to a *byte* to read. this means the data bus is a 8 cable bus.
+Today, address and data bus are much larger than that of course. But, the
+problem remains, that the memory size is always a power of 2. Unfortunately
+1000 is not a power of 2 and approaching 1000 bytes, was decided that a
+"kilobyte" would be 1024 bytes which is 2 power 10. Some time after, and by
+extension, a megabyte has been defined to be 1024 kilobytes, a terabyte to be
+1024 megabytes, etc. at the exception of the 1.44 MB floppy where here the
+capacity is 1440 kilobytes thus here "mega" means 1000 kilo...
 
 In parallel, in the telecommunications domain, going from analogical to
 digital signal made the bit to be used also. In place of the analogical signal,
@@ -321,6 +338,16 @@ how much make powers of 1024. For example, if you want to fill a CD-R you will
 have to use the "-s 650M" option which is equivalent to "-s 6815744400", choose
 the one you prefer, the result is the same :-). Now, if you want 2 Megabytes
 slices in the sense of the metric system, simply use "-s 2000000".
+
+Starting version 2.2.0, you can alter the meaning of all the suffixes used by
+dar, the --alter=SI-units (which can be shorten to -aSI or -asi) change the
+meaning of the *following* prefixes on the command-line, to the metric system
+(or System International) up to the end of the line or to a --alter=binary-units
+arguments (-which can be shortened to -abinary), after which we are back to the
+computer science meaning of kilo, mega, etc. up to the end of the line or up to
+a next --alter=SI-units. Thus in place of -s 2000000 one could use:
+
+   -aSI -s 2M
 
 Yes, and to make things more confuse, marketing arrived and made sellers count
 gigabits a third way: I remember the last hard disk I bought, was described
@@ -934,6 +961,11 @@ if you want to have encryption over the network. The principle are the same.
                 ssh honey dar_slave backup > todar < toslave &
                 dar -d - -R / -i todar -o toslave
 
+Important. Depending on the shell you use, it may be necessary to invert
+the order in which "> todar" and "< toslave" are given on command line.
+The problem is that the shell hangs trying to open the pipes. Thanks to
+"/PeO" for his feedback.
+
         or on honey:
                 mkfifo todar toslave
                 ssh flower dar -d - -R / > toslave < todar &
@@ -1306,4 +1338,116 @@ Now the inside algorithm:
  4 - if some non option are given (building a [list of path]) the path to the
      file is one of the member of [list of path] or a subdirectory of one of
      the members [list of path] .
+
+
+XVII - Strong encryption
+==========================
+
+several cyphers are available. Remind that "scrambling" is not a strong encryption
+cypher, all other are.
+
+to be able to use a strong encrypted archive you need to know the three parameters
+used at creation time:
+
+- the cypher used (blowfish, ...)
+- the key or password used
+- the encryption block size used
+
+no information about these parameters is stored in the generated archive. If you
+make an error on just one of them, you will not be able to use your archive. If
+you forgot one of them, nobody can help you, you can just consider the data in this
+archive as lost. This is the drawback of strong encryption.
+
+
+How is it implemented ?
+------------------------
+
+To not completely break the possibility to directly access file, the archive is not
+encrypted as a whole (as would do an external program). The encryption is done
+block of data by block of data. Each block can be decrypted, and if you want to read
+some data somewhere you need to decrypt the whole block(s) it is in.
+
+In consequence, the larger the block size is, the stronger the encryption is. But the
+larger the block size is too, the longer it will take to recover an given file, in
+particular when the file size to restore is much smaller than the encryption block
+size used.
+
+An encryption block size can range from 10 bytes to 4 GB.
+
+If encryption is used as well as compression, compression is done first, then encryption
+is done on compressed data.
+
+An "elastic buffer" is introduced at the beginning and at the end of the archive, to
+protect against plain text attack.  The elastic buffer size randomly varies and is defined
+at execution time. It is composed of random (srand()) values. Two marks characters '>' and
+'<' delimit the size field, which indicate the byte size of the elastic buffer. The size
+field is randomly placed in the buffer. Last, the buffer is encrypted with the rest of the
+data. Typical elastic buffer size range from 1 byte to 10 kB, for both initial and terminal
+elastic buffers.
+
+Elastic buffers are also used inside compression blocks. The underlying cypher may not be
+able to encrypt at the requested block size boundary. If necessary a small elastic buffer
+is appended to the data before encryption, to be able, at restoration time, to know the
+amount of data and the amount of noise around it.
+
+Let's take an example with blowfish. Blowfish encrypts by multipe of 8 bytes
+(blowfish chain block cypher). An elastic buffer is always added to the data of a
+encryption block, its minimal size is 1 byte.
+
+Thus, if you request a encryption block of 3 bytes, theses 3 bytes will be padded by an
+elastic buffer of 5 bytes for theses 8 bytes to be encrypted. This will make a very poor
+compression ratio as only 3 bytes on 8 bytes are significant.
+
+If you request a encryption block of 8 bytes, as there is no room for the minimal elastic
+buffer of 1 byte, a second 8 byte block is used to put the elastic buffer, so the real
+encruption block will be 16 bytes.
+
+Idealy, a encryption block of 7 bytes, will use 8 bytes with 1 byte for the elastic buffer.
+
+This problem tends to disapear when the encryption block size grows, so this should not
+be a problem in normal conditions. Encryption block of 3 bytes is not a good idea to have
+a strong encryption scheme, for information, the default encryption block size is 10kB.
+
+
+
+
+
+XVIII - libdar and thread-safe requirement
+===========================================
+
+This is for those who plane to use libdar in their own programs.
+
+If you plan to have only one thread using libdar there is no problem, of
+course, you will however have to call one of the get_version() first, as
+usual. Thing change if you intend to have several concurrent threads using
+libdar library.
+
+libdar is thread-safe under certain conditions:
+
+Several 'configure' options have an impact on thread-safe support:
+
+--enable-test-memory is a debug option that avoid libdar to be thread-safe,
+  so don't use it.
+--enable-special-alloc (set by default), makes a thread-safe library only if
+  POSIX mutex are available (pthread_mutex_t type).
+--disable-thread-safe avoid looking for mutex, so unless --disable-special-alloc
+  is also used, the generated library will not be thread safe.
+
+You can check the thread safe capability of a library thanks to the
+get_compile_time_feature(...) call from the API. Or use 'dar -V' command, to
+quickly have the corresponding values and check using 'ldd' to see which
+library has been dynamically linked to dar, if applicable.
+
+IMPORTANT:
+As more as before it is mandatory to call get_version() call before any
+other call, when the call returns, libdar is ready for thread safe. Note that
+even if the prototype does not change get_version() *may* now throw an
+exception, so use get_version_noexcept() if you don't want to manage exceptions.
+
+For more information about libdar and its API, check the doc/api_tutorial.html
+document and the API reference manual under doc/html/index.html. This later
+file is built by Doxygen from source files during compilation (make), thus
+you need Doxygen to build the API reference manual. Else a copy of this manual
+is available on dar's homepage.
+
 

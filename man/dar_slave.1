@@ -40,6 +40,12 @@ sends the data to the named file <filename> instead of standard output. In most 
 .TP 20
 -E <string>
 string is a command to be launched between slices. See dar(1) man page (same option) for more informations.
+.TP 20
+-Q
+Do not display any message on stderr when not launched from a terminal (for example when launched from an at job or crontab). Remains that any question to the user will be assumed a 'no' answer, which most of the time will abort the program.
+.TP 20
+-j
+when virtual memory is exhausted, as user to make room before trying to continue. By default, when memory is exhausted dar aborts.
 
 .SH EXIT CODES
 .B dar_slaves

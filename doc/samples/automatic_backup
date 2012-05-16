@@ -1,0 +1,994 @@
+#Written by Manuel Iglesias. glesialo@tiscali.es
+#Notes:
+SystemDirectory=/sbin
+# This file should be copied (by CopySystemFiles) to its corresponding Directory (see above).
+# Exit codes at the end of this file.
+
+CommandName=`basename $0`
+
+
+
+#########################################################
+# BACKUP SETUP. BEGIN. Read Dar Doc before modification.
+#########################################################
+# Permissions.
+##################
+# Allow use only in run level 1.
+CheckRunLevel=false
+#
+# Allow use only by root (Super user).
+CheckUser=true
+#
+#########################################################
+# Paths and files.
+##################
+# Directories.
+#########
+# Backup files Directory: Absolute path (Should start with '/'!!). Don't end it with '/' unless it is '/'.
+DestinationDir=/store/.Store/Backup
+#
+# Origin of Backup/Restore Directory: Absolute path (Should start with '/'!!).
+# Don't end it with '/' unless it is '/'.
+OriginDir=/
+#
+# Directories to backup. Relative to Origin of Backup Dir! Empty means: all dirs
+# (Except those in Directories to ignore. See below.). Separate with spaces.
+SubDirsToBackup="root home"
+#
+# Directories to ignore. Relative to Origin of Backup Dir! Separate with spaces.
+SubDirsToIgnore="home/manolo2 home/manolo/documents/Secret */.Trash* .Trash*\
+ */.mozilla/*/[Cc]ache */.opera/[Cc]ache* */.pan/*/[Cc]ache */.thumbnails"
+#
+# DestinationDir will be automatically included in SubDirsToIgnore if DestinationDir is a subdirectory
+# of OriginDir. If you want to include the base (IE.: Temp if DestinationDir: OriginDir/Temp/Backup) of
+# DestinationDir instead, set constant IgnoreBaseOfDestinationDir to true. Value (true | false).
+IgnoreBaseOfDestinationDir=true
+#
+# File systems that should be mounted for a correct backup. If any of them has to be mounted,
+# it will be umounted before this shellscript exits. Please mind mounting order!!
+# Absolute path (Should start with '/'!!). Separate with spaces.
+DirsToMount="/home /home/common /store"
+#
+##################
+# Files.
+#########
+# Files to backup. Empty: all files (Except those in Files to ignore. See below.).
+# No Path. Separate with spaces.
+FilesToBackup=""
+#
+# Files that should not be included in backup. No Path. Separate with spaces.
+FilesToIgnore="*~ .*~ cryptfile0.crypt cryptfile1.crypt"
+#
+# Files that should not to be compressed. No Path. Separate with spaces.
+FilesNotToCompress="*.dar *.crypt *.arj *.bz2 *.bz *.Z *.tgz *.taz *.cpio *.deb\
+ *.gtar *.gz *.lzh *.lhz *.rar *.rpm *.shar *.sv4cpi *.sv4crc *.tar *.ustar *.zoo\
+ *.zip *.jar *.jpg *.gif *.mpg *.mpeg *.avi *.ram *.rm"
+#
+#########################################################
+# Parameters used to choose Differential Backup level.
+##################
+BlockSize=1024
+#
+# When Diffbackup > (MaxDiffPercentOfFullBackup% of FullBackup): New FullBackup recommended.
+MaxDiffPercentOfFullBackup=30
+#
+# When Diffbackup < (MinDiffPercentOfFullBackup% of FullBackup): Rewrite first DiffBackup recommended.
+MinDiffPercentOfFullBackup=3
+#
+# Max 99. If (Nr of DiffBackups) > MaxNrOfDiffBackups: Rewrite first DiffBackup recommended.
+MaxNrOfDiffBackups=20
+#
+#########################################################
+# Dar settings and options.
+##################
+#Used dar suite program names.
+DarManagerName=dar_manager
+DarName=dar
+#
+# Directory where dar usually resides. Absolute path (Should start with '/'!!). Don't end it with '/'.
+DarDir=/usr/local/bin
+#
+# Create empty sub-directories in backup instead of those not saved. Value (true | false).
+BackupIgnoredDirsEmpty=true
+#
+# CompressWithBZip2=false -> no compression. Value (true | false).
+CompressWithBZip2=true
+#
+# Compress Files > 100Mb. Only valid if CompressWithBZip2=true. Value (true | false).
+CompressBigFiles=true
+#
+# Value (true | false).
+VerboseMode=false
+#
+# Value (true | false).
+MakeSlices=true
+#
+# StopAfterSlices: Only valid if MakeSlices=true. Value (true | false).
+StopAfterSlices=false
+#
+# SizeOfDarStatic: dar_static + DocFiles + Restore shell + etc (To calculate first slize size).
+SizeOfDarStatic=4
+#
+SliceSize=650
+#
+#########################################################
+# BACKUP SETUP. END.  Read Dar Doc before modification.
+#########################################################
+
+
+
+#########################################################
+# SUBROUTINES. BEGIN.
+#########################################################
+
+echoE()
+{
+# echo to standard error. Remove leading/trailing blanks and double spaces.
+echo $* 1>&2
+	return 0
+}
+
+Usage()
+{
+echoE "$CommandName creates (Using '$DarName'), in directory"
+echoE "'$DestinationDir',"
+echoE "a backup of all files and directories in"
+echoE "'$OriginDir'."
+echoE "It analyzes current backup files and recommends the most suitable new"
+echoE "backup level to the user. It also creates/updates a database with backup"
+echoE "information for future Backup management (Using '$DarManagerName')."
+echoE
+echoE "The backup will be split in files of $SliceSize Mb to fit in removable media."
+echoE
+echoE "Usage: $CommandName. (User can choose backup level)."
+echoE "or"
+echoE "Usage: $CommandName -auto. ($CommandName selects backup level automatically)."
+echoE
+	return 0
+}
+
+UmountDirs ()
+{
+if [ "$DirsToUMount" != "" ]
+  then
+    echo "############"
+    echo "$CommandName: Unmounting file systems:"
+    for i in $DirsToUMount
+      do
+        mount | grep -w $i &> /dev/null
+        if [ $? -eq 0 ]
+          then
+            if (umount $i &> /dev/null)
+              then
+                echo "$CommandName: $i unmounted."
+              else
+                echoE "$CommandName: $i could not be unmounted."
+            fi
+          else
+            echo "$CommandName: $i was already unmounted."
+        fi
+      done
+fi
+echo "############"
+	return 0
+}
+
+TwoDigits ()
+{
+#Add leftmost 0
+if [ $1 -lt 10 ]
+  then
+    echo 0$1
+  else
+    echo $1
+fi
+	return 0
+}
+
+Stream()
+{
+# Output String(s) without letting the Shell interpret metacharacters.
+# Remove leading/trailing blanks and double spaces.
+# Enclose arguments in "" when calling. I.E.: Stream "$Var1 $Var2"
+TempStr=$@
+Length=${#TempStr}
+  if [ $Length -eq 0 ]
+    then
+      return
+    else
+      CharNum=0
+      while [ $CharNum -lt $Length ]
+        do
+          echo -n "${TempStr:$CharNum:1}"
+          let CharNum++
+        done
+      echo
+  fi
+return
+}
+
+#########################################################
+# SUBROUTINES. END.
+#########################################################
+
+
+
+NoUserChoice=false
+if [ $# -ne 0 ]
+  then
+    if [ "$1" == "-auto" ]
+      then
+        NoUserChoice=true
+      else
+        Usage
+        exit 1
+    fi
+fi
+
+if $CheckRunLevel
+  then
+    RunLevel=`runlevel | sed 's/.* //'`
+    if [ $RunLevel != S ]
+      then
+        echoE "$CommandName: RunLevel: $RunLevel. Please change to RunLevel 1 (init 1) and try again."
+        exit 1
+    fi
+fi
+
+if $CheckUser
+  then
+    CurrentUser=`whoami`
+    if [ "$CurrentUser" != "root" ]
+      then
+        echoE "$CommandName: User: '$CurrentUser'. Please login as 'root' and try again."
+        exit 1
+    fi
+fi
+echo "############"
+
+DirsToUMount=""
+if [ "$DirsToMount" != "" ]
+  then
+    echo "$CommandName: Mounting file systems:"
+    for i in $DirsToMount
+      do
+        mount | grep -w $i &> /dev/null
+        if [ $? -ne 0 ]
+          then
+            if (mount $i &> /dev/null)
+              then
+                echo "$CommandName: $i mounted."
+                DirsToUMount=" $i"$DirsToUMount
+              else
+                echoE "$CommandName: $i could not be mounted. Aborting."
+                UmountDirs
+                exit 2
+            fi
+          else
+            echo "$CommandName: $i was already mounted."
+        fi
+      done
+    echo "############"
+fi
+
+if [ "$OriginDir" != "/" ]
+  then
+#   if first character is not '/'.
+    if [ "${OriginDir:0:1}" != "/" ]
+      then
+        echoE "$CommandName: 'Origin' directory:"
+        echoE "$CommandName: $OriginDir."
+        echoE "$CommandName: Must be an absolute path (Should start with '/'!)."
+        echoE "$CommandName: Please edit '$CommandName' and try again."
+        UmountDirs
+        exit 3
+      else
+#       if last character is '/'.
+        if [ "${OriginDir:${#OriginDir}-1:1}" == "/" ]
+          then
+            echoE "$CommandName: 'Origin' directory:"
+            echoE "$CommandName: $OriginDir."
+            echoE "$CommandName: Should not end with '/'!."
+            echoE "$CommandName: Please edit '$CommandName' and try again."
+            UmountDirs
+            exit 3
+          else
+            if test ! -d $OriginDir
+              then
+                echoE "$CommandName: 'Origin' directory:"
+                echoE "$CommandName: $OriginDir."
+                echoE "$CommandName: Does not exist. Please edit '$CommandName' and try again."
+                UmountDirs
+                exit 3
+            fi
+        fi
+    fi
+fi
+
+if [ "$DestinationDir" != "/" ]
+  then
+#   if first character is not '/'.
+    if [ "${DestinationDir:0:1}" != "/" ]
+      then
+        echoE "$CommandName: 'DestinationDir' directory:"
+        echoE "$CommandName: $DestinationDir."
+        echoE "$CommandName: Must be an absolute path (Should start with '/'!)."
+        echoE "$CommandName: Please edit '$CommandName' and try again."
+        UmountDirs
+        exit 3
+      else
+#       if last character is '/'.
+        if [ "${DestinationDir:${#DestinationDir}-1:1}" == "/" ]
+          then
+            echoE "$CommandName: 'DestinationDir' directory:"
+            echoE "$CommandName: $DestinationDir."
+            echoE "$CommandName: Should not end with '/'!."
+            echoE "$CommandName: Please edit '$CommandName' and try again."
+            UmountDirs
+            exit 3
+          else
+            if test ! -d $DestinationDir
+              then
+                echoE "$CommandName: 'DestinationDir' directory:"
+                echoE "$CommandName: $DestinationDir."
+                echoE "$CommandName: Does not exist. Please edit '$CommandName' and try again."
+                UmountDirs
+                exit 3
+            fi
+        fi
+    fi
+fi
+
+if [ $OriginDir == $DestinationDir ]
+  then
+    echoE "$CommandName: 'DestinationDir' and 'OriginDir' can not be the same directory!"
+    echoE "$CommandName: Please edit '$CommandName' and try again."
+    UmountDirs
+    exit 3
+fi
+
+# Find dar & dar_manager
+if type >/dev/null 2>&1 $DarName
+  then
+    DarFound=true
+  else 
+    DarFound=false
+fi
+if type >/dev/null 2>&1 $DarManagerName
+  then
+    DarManagerFound=true
+  else 
+    DarManagerFound=false
+fi
+if ! ($DarFound && $DarManagerFound)
+  then
+    if [ "$DarDir" != "/" ]
+      then
+#       if first character is not '/'.
+        if [ "${DarDir:0:1}" != "/" ]
+          then
+            echoE "$CommandName: 'DarDir' directory:"
+            echoE "$CommandName: $DarDir."
+            echoE "$CommandName: Must be an absolute path (Should start with '/'!)."
+            echoE "$CommandName: Please edit '$CommandName' and try again."
+            UmountDirs
+            exit 3
+          else
+#           if last character is '/'.
+            if [ "${DarDir:${#DarDir}-1:1}" == "/" ]
+              then
+                echoE "$CommandName: 'DarDir' directory:"
+                echoE "$CommandName: $DarDir."
+                echoE "$CommandName: Should not end with '/'!."
+                echoE "$CommandName: Please edit '$CommandName' and try again."
+                UmountDirs
+                exit 3
+              else
+                if test ! -d $DarDir
+                  then
+                    echoE "$CommandName: 'DarDir' directory:"
+                    echoE "$CommandName: $DarDir."
+                    echoE "$CommandName: Does not exist. Please edit '$CommandName' and try again."
+                    UmountDirs
+                    exit 3
+                fi
+            fi
+        fi
+    fi
+#   Include directory, where dar usually resides, in PATH."
+#   DarDir not in PATH?
+    echo $PATH | grep $DarDir &> /dev/null
+    if [ $? -ne 0 ]
+      then
+        PATH=$DarDir":"$PATH
+    fi
+fi
+if ! type >/dev/null 2>&1 $DarName
+  then
+    echoE "$CommandName: $DarName neither in PATH nor in $DarDir. Aborting."
+    UmountDirs
+    exit 3
+fi
+if ! type >/dev/null 2>&1 $DarManagerName
+  then
+    echoE "$CommandName: $DarManagerName neither in PATH nor in $DarDir. Aborting."
+    UmountDirs
+    exit 3
+fi
+
+#########################################################
+# VARIABLES INITIALIZATION. BEGIN.
+#########################################################
+# Backup Paths.
+###############
+#Backup base names & DataBase name.
+FullBackupBaseName=$CommandName"Full"
+DiffBackupBaseName=$CommandName"Diff"
+DataBaseName=$CommandName"DataBase"
+#
+FullBackupPath=$DestinationDir/$FullBackupBaseName
+DiffBackupPath=$DestinationDir/$DiffBackupBaseName
+DataBasePath=$DestinationDir/$DataBaseName
+#
+#########################################################
+# Set dar options.
+###############
+# Backup base name (Will be set later): -c PathBackUpBaseName
+BackupNameOption="-c "
+#
+# Reference backup (Will be set later) for differential backups: -A PathBackUpBaseName
+ReferenceBackupOption="-A "
+#
+# Origin of Backup: -R /.
+DarOptions="-R "$OriginDir
+#
+# Compress data inside the backup using bzip2: -y[CompressLevel].
+# CompressLevel: 0 minimum; 9 maximun. Compress Files > 100Mb: -m 0. 
+if $CompressWithBZip2
+  then
+    DarOptions=$DarOptions" -y9"
+    if $CompressBigFiles
+      then
+        DarOptions=$DarOptions" -m 0"
+    fi
+fi
+#
+# Verbose mode: -v
+if $VerboseMode
+  then
+    DarOptions=$DarOptions" -v"
+fi
+#
+# Create empty sub-directories in backup instead of those not saved: -D
+if $BackupIgnoredDirsEmpty
+  then
+    DarOptions=$DarOptions" -D"
+fi
+#
+# Do not read ~/.darrc nor /etc/darrc configuration file: -N
+DarOptions=$DarOptions" -N"
+#
+#########################################################
+#Set Slice options.
+###############
+if [ $SliceSize -gt $SizeOfDarStatic ]
+  then
+    let FirstSliceSize=$SliceSize-$SizeOfDarStatic
+  else
+    FirstSliceSize=$SliceSize
+fi
+#
+# All sizes in Mb; Stop after each slize.
+if $MakeSlices
+  then
+    FirstSliceSizeOption="-S "$FirstSliceSize"M"
+    SliceSizeOption="-s "$SliceSize"M"
+#   Pause between slices to change removable media. Ring bell: -p -b
+    if $StopAfterSlices
+      then
+        DarOptions=$DarOptions" -p -b"
+    fi
+  else
+    FirstSliceSizeOption=""
+    SliceSizeOption=""
+fi
+#
+#########################################################
+#Set Include/Exclude Files Options.
+###############
+# Files you don't want to backup: -X "*~" -X ".*~" 		
+if [ "$FilesToIgnore" != "" ]
+  then
+    InclExclFilesOption='-X "'`Stream "$FilesToIgnore" |  sed 's/ /" -X "/g'`'"'
+  else
+    InclExclFilesOption=""
+fi
+#
+# Files you want to backup without compression: -Z "*.zip"
+if $CompressWithBZip2
+  then
+    if [ "$FilesNotToCompress" != "" ]
+      then
+        InclExclFilesOption=$InclExclFilesOption' -Z "'`Stream "$FilesNotToCompress" |  sed 's/ /" -Z "/g'`'"'
+    fi
+fi
+#
+#  Files to include in backup: -I "*.html".
+if [ "$FilesToBackup" != "" ]
+  then
+    InclExclFilesOption=' -I "'`Stream "$FilesToBackup" |  sed 's/ /" -I "/g'`'" '$InclExclFilesOption
+fi
+#
+#########################################################
+#Set Include/Exclude directories Options.
+###############
+# $OriginDir in $DestinationDir? 
+echo $DestinationDir | grep $OriginDir &> /dev/null
+if [ $? -eq 0 ]
+  then
+#   TempDir= $DestinationDir-$OriginDir
+    TempDir=`echo $DestinationDir | sed s%$OriginDir%%`
+    if $IgnoreBaseOfDestinationDir
+      then
+#       Include BaseDir of DestinationDir (Without first '/') in SubDirsToIgnore.
+#       if first character, in TempDir, is not '/'.
+        if [ "${DestinationDir:0:1}" != "/" ]
+          then
+#           Add '/' in front.
+            TempDir="/"$TempDir
+        fi
+        TempPath=$TempDir
+        while [ $TempPath != `dirname $TempPath` ]
+          do
+            BasePath=$TempPath
+            TempPath=`dirname $TempPath`
+          done
+        BasePath=`basename $BasePath`
+        if [ "$SubDirsToIgnore" != "" ]
+          then
+            SubDirsToIgnore=$SubDirsToIgnore" $BasePath"
+          else
+            SubDirsToIgnore=$BasePath
+        fi
+      else
+#       Include DestinationDir (Without first '/') in SubDirsToIgnore.
+#       if first character, in TempDir, is '/'.
+        if [ "${TempDir:0:1}" == "/" ]
+          then
+#           Remove first '/'.
+            TempDir=${TempDir:1:${#TempDir}-1}
+        fi
+        if [ "$SubDirsToIgnore" != "" ]
+          then
+            SubDirsToIgnore=$SubDirsToIgnore" $TempDir"
+          else
+            SubDirsToIgnore=$TempDir
+        fi
+    fi
+fi
+#
+# Sub-trees you must not save: -P dev/pts -P proc. Path must be relative to -R option
+# Enclose each directory in "" just in case there are metacharacters in the name.
+if [ "$SubDirsToIgnore" != "" ]
+  then
+    IncludeExclDirsOption='-P "'`Stream "$SubDirsToIgnore" |  sed 's/ /" -P "/g'`'"'
+  else
+    IncludeExclDirsOption=""
+fi
+#
+#  Sub-trees you must save: Add without any option in front.
+# Enclose each directory in "" just in case there are metacharacters in the name.
+if [ "$SubDirsToBackup" != "" ]
+  then
+    IncludeExclDirsOption='"'`Stream "$SubDirsToBackup" |  sed 's/ /" "/g'`'" '$IncludeExclDirsOption
+fi
+#
+#########################################################
+# Set dar_manager options.
+###############
+# Create DataBase: -C PathBaseName
+CreateDataBaseOption="-C "$DataBasePath
+#
+# DataBase used as reference: -B PathBaseName
+DataBaseNameOption="-B "$DataBasePath
+#
+# Add Archive to DataBase (Will be set later): -A PathArchiveName
+AddToDataBaseOption="-A "
+#
+#########################################################
+# VARIABLES INITIALIZATION. END.
+#########################################################
+
+
+
+FullDiffBackupSize=`ls -1 -s --block-size=$BlockSize $FullBackupPath.* 2> /dev/null | awk '{s = s + $1}
+                                                                                               END {print s}'`
+if [ "$FullDiffBackupSize" == "" ]
+  then
+    FullDiffBackupSize=0
+fi
+TotalDiffBackupSize=`ls -1 -s --block-size=$BlockSize $DiffBackupPath??.* 2> /dev/null | awk '{s = s + $1}
+                                                                                                  END {print s}'`
+if [ "$TotalDiffBackupSize" == "" ]
+  then
+    TotalDiffBackupSize=0
+fi
+
+echo "$CommandName: ### `date --rfc-822` ###"
+echo "$CommandName: Current backup information (Size in $BlockSize bytes blocks.):"
+if [ $FullDiffBackupSize -eq 0 ]
+  then
+    echo "$CommandName: No $FullBackupBaseName files found!"
+    echo "############"
+    echo "$CommandName: Preparing to Create $FullBackupBaseName."
+    DiffBackupNr=0
+    LastDiffBackup=$DiffBackupNr
+  else
+    echo "$CommandName: ..$FullBackupBaseName: $FullDiffBackupSize."
+    if [ $TotalDiffBackupSize -eq 0 ]
+      then
+        DiffBackupNr=1
+        LastDiffBackup=0
+        BaseName=$DiffBackupBaseName`TwoDigits $DiffBackupNr`
+        echo "############"
+        echo "$CommandName: Preparing to Create $BaseName."
+      else
+        echo "$CommandName: ..$DiffBackupBaseName: $TotalDiffBackupSize:"
+        DiffBackupNr=0
+        LastDiffBackup=$DiffBackupNr
+        BestChoiceDiffLevel=""
+        RemainingDiffSize=$TotalDiffBackupSize
+        CurrentSize=1
+        while [ $CurrentSize -ne 0 ]
+          do
+            let DiffBackupNr++
+            BaseName=$DiffBackupPath`TwoDigits $DiffBackupNr`
+            CurrentSize=`ls -1 -s --block-size=$BlockSize $BaseName.* 2> /dev/null | awk '{s = s + $1}
+                                                                                         END {print s}'`
+            if [ "$CurrentSize" == "" ]
+             then
+               CurrentSize=0
+            fi
+            if [ $CurrentSize -ne 0 ]
+              then
+                LastDiffBackup=$DiffBackupNr
+                let RemainingDiffSize=$RemainingDiffSize-$CurrentSize
+                if [ "$BestChoiceDiffLevel" == "" ] && [ $CurrentSize -lt $RemainingDiffSize ]
+                  then
+                    BestChoiceDiffLevel=$DiffBackupNr
+                fi
+                BaseName=$DiffBackupBaseName`TwoDigits $DiffBackupNr`
+                echo "$CommandName: ....$BaseName: $CurrentSize."
+            fi
+          done
+        echo "############"
+        let NextDiffBackup=$LastDiffBackup+1
+        if [ "$BestChoiceDiffLevel" == "" ]
+          then
+            BestChoiceDiffLevel=$NextDiffBackup
+        fi
+         Choice[4]="Exit $CommandName."
+        let MinDiffBackupSize=$FullDiffBackupSize*$MinDiffPercentOfFullBackup/100
+        if [ $TotalDiffBackupSize -lt $MinDiffBackupSize ]
+          then
+            BestChoiceDiffLevel=1
+            Choice[1]=" ($DiffBackupBaseName<$MinDiffPercentOfFullBackup%$FullBackupBaseName)."
+        fi
+        if [ $LastDiffBackup -gt $MaxNrOfDiffBackups ]
+          then
+            BestChoiceDiffLevel=1
+            Choice[1]=${Choice[1]}" (NrOfDiffBackups>$MaxNrOfDiffBackups)."
+        fi
+        BaseName=$DiffBackupBaseName`TwoDigits $BestChoiceDiffLevel`
+        Choice[1]=" $BaseName."${Choice[1]}
+        BaseName=$DiffBackupBaseName`TwoDigits $NextDiffBackup`
+        Choice[2]="Create $BaseName. Faster."
+        Choice[3]="Rewrite $FullBackupBaseName ($DiffBackupBaseName>$MaxDiffPercentOfFullBackup%$FullBackupBaseName). Recommended!"
+        let MaxDiffBackupSize=$FullDiffBackupSize*$MaxDiffPercentOfFullBackup/100
+        if [ $NextDiffBackup -eq $BestChoiceDiffLevel ]
+          then
+            if [ $TotalDiffBackupSize -gt $MaxDiffBackupSize ]
+              then
+                Choices="1 3"
+                CreateRewriteMode="Create"
+                Choice[1]=${Choice[1]}" Faster."
+              else
+                Choices=""
+            fi
+          else
+            CreateRewriteMode="Rewrite"
+            if [ $TotalDiffBackupSize -gt $MaxDiffBackupSize ]
+              then
+                Choices="1 2 3"
+              else
+                Choices="1 2"
+                Choice[1]=${Choice[1]}" Recommended!"
+            fi
+        fi
+        Choice[1]=$CreateRewriteMode${Choice[1]}
+        if [ "$Choices" == "" ]
+          then
+            DiffBackupNr=$BestChoiceDiffLevel
+            BaseName=$DiffBackupBaseName`TwoDigits $DiffBackupNr`
+            echo "$CommandName: Preparing to Create $BaseName."
+          else
+            Choices=$Choices" 4"
+            echo "$CommandName: Options:"
+            ChoiceNr=1
+            for i in $Choices
+              do
+                echo "$CommandName: $ChoiceNr.${Choice[$i]}"
+                let ChoiceNr++
+              done
+            echo "############"
+            if $NoUserChoice
+              then
+                echo $Choices | grep "3" &> /dev/null
+                if [ $? -eq 0 ]
+                  then
+                    Choice=3
+                  else
+                    Choice=1
+                fi
+              else
+                let ChoiceNr--
+                ValidNumber=false
+                until $ValidNumber
+                  do
+                    read -p "$CommandName: Please choose a number: " UserChoice
+                    case $UserChoice in
+                      [a-zA-Z-_.,]* | *[a-zA-Z-_.,] | *[a-zA-Z-_.,]*)
+                        echoE "$CommandName: No alpha characters allowed. Please try again.";;
+                      "") ;;
+                      *)
+                        ValidNumber=true;;
+                    esac
+                    if $ValidNumber
+                     then
+                       if [ $UserChoice -lt 1 ] || [ $UserChoice -gt $ChoiceNr ]
+                         then
+                           echoE "$CommandName: Allowed number range: 1..$ChoiceNr. Please try again."
+                           ValidNumber=false
+                       fi
+                    fi
+                  done
+                ChoiceNr=0
+                for i in $Choices
+                  do
+                    let ChoiceNr++
+                    if [ $ChoiceNr -eq $UserChoice ]
+                     then
+                       Choice=$i
+                    fi
+                  done
+                echo "############"
+            fi
+            case $Choice in
+              1)
+                DiffBackupNr=$BestChoiceDiffLevel
+                BaseName=$DiffBackupBaseName`TwoDigits $DiffBackupNr`
+                echo "$CommandName: Preparing to $CreateRewriteMode $BaseName.";;
+              2)
+                DiffBackupNr=$NextDiffBackup
+                BaseName=$DiffBackupBaseName`TwoDigits $DiffBackupNr`
+                echo "$CommandName: Preparing to Create $BaseName.";;
+              3)
+                echo "$CommandName: Preparing to Rewrite $FullBackupBaseName."
+                DiffBackupNr=0;;
+              4)
+                echoE "$CommandName: Program exits at user request."
+                UmountDirs
+                exit 4;;
+              *)
+                echoE "$CommandName:Warning: Incorrect choice: $Choice. Aborting."
+                UmountDirs
+                exit 5;;
+            esac
+        fi
+    fi
+fi
+
+if [ $DiffBackupNr -eq 0 ]
+  then
+    FullBackup=true
+  else
+    FullBackup=false
+fi
+
+if $FullBackup
+  then
+    BackupNameOption=$BackupNameOption$FullBackupPath
+    if [ $FullDiffBackupSize -ne 0 ]
+      then
+        echo "############"
+        echo "$CommandName: Removing previous $FullBackupBaseName files."
+        for i in $FullBackupPath.*
+          do
+            if test -f $i
+              then
+                if (rm $i)
+                  then
+                    echo "$CommandName: $i removed."
+                  else
+                    echoE "$CommandName:Warning: Failure to remove $i."
+                fi
+            fi
+          done
+    fi
+    if [ $TotalDiffBackupSize -ne 0 ]
+      then
+        echo "############"
+        echo "$CommandName: Removing previous $DiffBackupBaseName files."
+        for i in $DiffBackupPath??.*
+          do
+            if test -f $i
+              then
+                if (rm $i)
+                  then
+                    echo "$CommandName: $i removed."
+                  else
+                    echoE "$CommandName:Warning: Failure to remove $i."
+                fi
+            fi
+          done
+    fi
+    if test -f $DataBasePath
+      then
+        echo "############"
+        echo "$CommandName: Removing previous $DataBaseName file."
+        if (rm $DataBasePath)
+          then
+            echo "$CommandName: $DataBasePath removed."
+          else
+            echoE "$CommandName:Warning: Failure to remove $DataBasePath."
+        fi
+    fi
+    echo "############"
+    echo "$CommandName: creating $FullBackupBaseName. Please wait."
+    echo "###"
+    sh <<End
+    $DarName $FirstSliceSizeOption $SliceSizeOption $BackupNameOption $DarOptions $IncludeExclDirsOption $InclExclFilesOption
+End
+    ExitCode=$?
+    if [ $ExitCode -eq 0 ]
+      then
+        echo "###"
+        echo "$CommandName: $FullBackupBaseName created successfully."
+        echo "############"        
+        echo "$CommandName: Creating $DataBaseName."
+        AddToDataBaseOption=$AddToDataBaseOption$FullBackupPath
+        if ($DarManagerName $CreateDataBaseOption)
+          then
+            echo "$CommandName: Adding $FullBackupBaseName to $DataBaseName. Please wait."
+            if ($DarManagerName $DataBaseNameOption $AddToDataBaseOption)
+              then
+                echo "$CommandName: $FullBackupBaseName added to $DataBaseName successfully."
+              else
+                echoE "$CommandName: Warning: Adding $FullBackupBaseName to $DataBaseName failed."
+            fi
+          else
+            echoE "$CommandName: Warning: Creation of $DataBaseName failed."
+        fi
+      else
+        echoE "$CommandName: Sorry. '$DarName' failed with exit code $ExitCode. $FullBackupBaseName backup aborted."
+        UmountDirs
+    fi
+  else
+    BackupName=$DiffBackupBaseName`TwoDigits $DiffBackupNr`
+    BackupPath=$DiffBackupPath`TwoDigits $DiffBackupNr`
+    BackupNameOption=$BackupNameOption$BackupPath
+    if [ $DiffBackupNr -gt 1 ]
+      then
+        PrevDiffBackup=$DiffBackupNr
+        let PrevDiffBackup--
+        ReferenceBackupOption=$ReferenceBackupOption$DiffBackupPath`TwoDigits $PrevDiffBackup`
+      else
+        ReferenceBackupOption=$ReferenceBackupOption$FullBackupPath
+    fi
+#   In fact $DiffBackupNr+1 because FullBackup=1. Set to $DiffBackupNr for use in 'Erase .. from DataBase' loop below.
+    DataBaseLastValidArchive=$DiffBackupNr
+    if [ $LastDiffBackup -ne 0 ]
+      then
+        if [ $DiffBackupNr -le $LastDiffBackup ]
+          then
+            echo "############"
+            echo "$CommandName: Removing previous $DiffBackupBaseName files."
+        fi
+        let DiffBackupNr--
+        while [ $DiffBackupNr -lt $LastDiffBackup ]
+          do
+            let DiffBackupNr++
+            BaseName=$DiffBackupPath`TwoDigits $DiffBackupNr`
+            for i in $BaseName.*
+              do
+                if test -f $i
+                  then
+                    if (rm $i)
+                      then
+                        echo "$CommandName: $i removed."
+                      else
+                        echoE "$CommandName:Warning: Failure to remove $i."
+                    fi
+                fi
+              done
+          done
+    fi
+    if test -f $DataBasePath
+      then
+#       $DarManagerName -l outputs to standard error.
+        LastArchiveInDB=`$DarManagerName $DataBaseNameOption -l 2>&1 | awk 'END {print $1}'`
+        case $LastArchiveInDB in
+          [a-zA-Z-_.,]* | *[a-zA-Z-_.,] | *[a-zA-Z-_.,]*)
+#           If DataBase empty last line produced by 'dar_manager -l' is full of '--'
+            echoE "$CommandName: Warning: $DataBaseName is empty. Aborting."
+            UmountDirs
+            exit 6;;
+          *)
+            if [ $LastArchiveInDB -gt $DataBaseLastValidArchive ]
+              then
+                echo "############"
+                echo "$CommandName: Erasing previous Differential backups from $DataBaseName."
+                while [ $LastArchiveInDB -gt $DataBaseLastValidArchive ]
+                  do
+                    let ArchiveBaseName=$LastArchiveInDB-1
+                    BaseName=`TwoDigits $ArchiveBaseName`
+                    ArchiveBaseName=$DiffBackupBaseName$BaseName
+                    if ($DarManagerName $DataBaseNameOption -D $LastArchiveInDB)
+                      then
+                        echo "$CommandName: Archive $LastArchiveInDB ($ArchiveBaseName) erased from $DataBaseName."
+                      else
+                        echoE "$CommandName: Warning: Erasing of Archive $LastArchiveInDB ($ArchiveBaseName)\
+                                                                                  from $DataBaseName failed."
+                    fi
+                    let LastArchiveInDB--
+                  done
+            fi;;
+        esac
+      else
+        echoE "$CommandName: Warning! $DataBaseName does not exist. Aborting."
+        UmountDirs
+        exit 7
+    fi
+    echo "############"
+    echo "$CommandName: creating $BackupName. Please wait."
+    echo "###"
+    sh <<End
+    $DarName $SliceSizeOption $BackupNameOption $ReferenceBackupOption $DarOptions $IncludeExclDirsOption $InclExclFilesOption
+End
+    ExitCode=$?
+    if [ $ExitCode -eq 0 ]
+      then
+        echo "###"
+        echo "$CommandName: $BackupName created successfully."
+        echo "############"
+        echo "$CommandName: Updating $DataBaseName. Please wait."
+        AddToDataBaseOption=$AddToDataBaseOption$BackupPath
+        if ($DarManagerName $DataBaseNameOption $AddToDataBaseOption)
+          then
+            echo "$CommandName: $BackupName added to $DataBaseName successfully."
+          else
+            echoE "$CommandName: Warning: Adding $BackupName to $DataBaseName failed."
+        fi
+      else
+        echoE "$CommandName: Sorry. '$DarName' failed with exit code $ExitCode. $BackupName backup aborted."
+    fi
+fi
+
+UmountDirs
+
+exit 0
+
+Exit codes:
+0 Sucessful run.
+1 Wrong arguments;
+  || Not root;
+  || Wrong runlevel.
+2 File system could not be mounted.
+3 Incorrect Origin directory or it does not exist;
+  || Incorrect Destination directory or it does not exist;
+  || $DarName or $DarManagerName not in $PATH or $DarDir.
+4 User request exit.
+5 Wrong user choice.
+6 Database empty.
+7 Database does not exist.
+

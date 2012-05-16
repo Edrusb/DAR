@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.13.2.3 2004/03/10 21:18:20 edrusb Rel $
+// $Id: dar_slave.cpp,v 1.28 2004/12/07 18:04:48 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -59,23 +59,26 @@ char *strchr (), *strrchr ();
 #include "libdar.hpp"
 #include "shell_interaction.hpp"
 
+#define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
+
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.2.1"
+#define DAR_SLAVE_VERSION "1.3.0"
 
-static bool command_line(S_I argc, char *argv[], path * &chemin, string & filename,
+static bool command_line(user_interaction & dialog,
+			 S_I argc, char *argv[], path * &chemin, string & filename,
                          string &input_pipe, string &output_pipe, string & execute);
-static void show_usage(const char *command);
-static void show_version(const char *command);
-static S_I little_main(S_I argc, char *argv[], const char **env);
+static void show_usage(user_interaction & dialog, const char *command);
+static void show_version(user_interaction & dialog, const char *command);
+static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env);
 
 int main(S_I argc, char *argv[], const char **env)
 {
     return dar_suite_global(argc, argv, env, &little_main);
 }
 
-static S_I little_main(S_I argc, char *argv[], const char **env)
+static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env)
 {
     path *chemin = NULL;
     string filename;
@@ -83,18 +86,18 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
     string output_pipe;
     string execute;
 
-    if(command_line(argc, argv, chemin, filename, input_pipe, output_pipe, execute))
+    if(command_line(dialog, argc, argv, chemin, filename, input_pipe, output_pipe, execute))
     {
         tuyau *input = NULL;
         tuyau *output = NULL;
         sar *source = NULL;
         try
         {
-            source = new sar(filename, EXTENSION, SAR_OPT_DONT_ERASE, *chemin, execute);
+            source = new sar(dialog, filename, EXTENSION, SAR_OPT_DONT_ERASE, *chemin, execute);
             if(source == NULL)
                 throw Ememory("little_main");
 
-            tools_open_pipes(input_pipe, output_pipe, input, output);
+            tools_open_pipes(dialog, input_pipe, output_pipe, input, output);
 
             slave_zapette zap = slave_zapette(input, output, source);
             input = output = NULL; // now managed by zap;
@@ -106,7 +109,7 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
             }
             catch(Erange &e)
             {
-                user_interaction_warning(e.get_message());
+                dialog.warning(e.get_message());
                 throw Edata(e.get_message());
             }
         }
@@ -135,7 +138,8 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
         return EXIT_SYNTAX;
 }
 
-static bool command_line(S_I argc,char *argv[], path * &chemin, string & filename,
+static bool command_line(user_interaction & dialog,
+			 S_I argc,char *argv[], path * &chemin, string & filename,
                          string &input_pipe, string &output_pipe, string & execute)
 {
     S_I lu;
@@ -143,63 +147,66 @@ static bool command_line(S_I argc,char *argv[], path * &chemin, string & filenam
 
     if(argc < 1)
     {
-        user_interaction_warning("cannot read arguments on command line, aborting");
+        dialog.warning(gettext("Cannot read arguments on command line, aborting"));
         return false;
     }
 
-    while((lu = getopt(argc, argv, "i:o:hVE:")) != EOF)
+    while((lu = getopt(argc, argv, "i:o:hVE:Qj")) != EOF)
     {
         switch(lu)
         {
         case 'i':
             if(optarg == NULL)
-                throw Erange("get_args", "missing argument to -i");
+                throw Erange("get_args", gettext("Missing argument to -i option"));
             if(input_pipe == "")
                 input_pipe = optarg;
             else
-                user_interaction_warning("only one -i option is allowed, considering the first one");
+                dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
             break;
         case 'o':
             if(optarg == NULL)
-                throw Erange("get_args", "missing argument to -o");
+                throw Erange("get_args", gettext("Missing argument to -o option"));
             if(output_pipe == "")
                 output_pipe = optarg;
             else
-                user_interaction_warning("only one -o option is allowed, considering the first one");
+                dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
             break;
         case 'h':
-            show_usage(argv[0]);
+            show_usage(dialog, argv[0]);
             return false;
         case 'V':
-            show_version(argv[0]);
+            show_version(dialog, argv[0]);
             return false;
         case 'E':
             if(optarg == NULL)
-                throw Erange("get_args", "missing argument to -E");
+                throw Erange("get_args", gettext("Missing argument to -E option"));
             if(execute == "")
                 execute = optarg;
             else
 		execute += string(" ; ") + optarg;
             break;
+	case 'Q':
+	case 'j':
+	    break;  // ignore this option already parsed during initialization (dar_suite.cpp)
         case ':':
-            throw Erange("get_args", string("missing parameter to option ") + char(optopt));
+            throw Erange("get_args", tools_printf(gettext("Missing parameter to option -%c"), char(optopt)));
         case '?':
-            user_interaction_warning(string("ignoring unknown option ") + char(optopt));
+            dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
             break;
         default:
-            user_interaction_warning(string("ignoring unknown option ") + char(lu));
+            dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
         }
     }
 
     if(optind + 1 > argc)
     {
-        user_interaction_warning("missing archive basename, see -h option for help");
+        dialog.warning(gettext("Missing archive basename, see -h option for help"));
         return false;
     }
 
     if(optind + 1 < argc)
     {
-        user_interaction_warning("too many argument on command line, see -h option for help");
+        dialog.warning(gettext("Too many argument on command line, see -h option for help"));
         return false;
     }
 
@@ -209,22 +216,22 @@ static bool command_line(S_I argc,char *argv[], path * &chemin, string & filenam
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_slave.cpp,v 1.13.2.3 2004/03/10 21:18:20 edrusb Rel $";
+    static char id[]="$Id: dar_slave.cpp,v 1.28 2004/12/07 18:04:48 edrusb Rel $";
     dummy_call(id);
 }
 
-static void show_usage(const char *command)
+static void show_usage(user_interaction & dialog, const char *command)
 {
     char *cmd = tools_extract_basename(command);
     shell_interaction_change_non_interactive_output(&cout);
 
     try
     {
-        ui_printf("\nusage : \n");
-        ui_printf("  command1 | %s [options] [<path>/]basename | command2\n", cmd);
-        ui_printf("  %s [options] [-i input_pipe] [-o output_pipe] [<path>/]basename\n", cmd);
-        ui_printf("  %s -h\n", cmd);
-        ui_printf("  %s -V\n\n", cmd);
+        dialog.printf("\nusage : \n");
+        dialog.printf("  command1 | %s [options] [<path>/]basename | command2\n", cmd);
+        dialog.printf("  %s [options] [-i input_pipe] [-o output_pipe] [<path>/]basename\n", cmd);
+        dialog.printf("  %s -h\n", cmd);
+        dialog.printf("  %s -V\n\n", cmd);
 #include "dar_slave.usage"
     }
     catch(...)
@@ -235,27 +242,34 @@ static void show_usage(const char *command)
     delete cmd;
 }
 
-static void show_version(const char *command)
+static void show_version(user_interaction & dialog, const char *command)
 {
     char *cmd = tools_extract_basename(command);
-    U_I maj, min, bits;
-    bool ea, largefile, nodump, fastbadalloc;
+    U_I maj, med, min, bits;
+    bool ea, largefile, nodump, fastbadalloc, thread, libz, libbz2, libcrypto;
 
     get_version(maj, min);
-    get_compile_time_features(ea, largefile, nodump, fastbadalloc, bits);
-
+    if(maj > 2)
+	get_version(maj, med, min);
+    else
+	med = 0;
+    get_compile_time_features(ea, largefile, nodump, fastbadalloc, bits, thread, libz, libbz2, libcrypto);
+    shell_interaction_change_non_interactive_output(&cout);
     try
     {
-        ui_printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n", cmd, DAR_SLAVE_VERSION);
-        ui_printf(" Using libdar %u.%u built with compilation time options:\n", maj, min);
-        tools_display_features(ea, largefile, nodump, fastbadalloc, bits);
-        ui_printf("\n");
-        ui_printf(" %s with %s version %s\n", __DATE__, CC_NAT,  __VERSION__);
-        ui_printf(" %s is part of the Disk ARchive suite (Release %s)\n", cmd, PACKAGE_VERSION);
-        ui_printf(" %s comes with ABSOLUTELY NO WARRANTY; for details\n", cmd);
-        ui_printf(" type `dar -W'.  This is free software, and you are welcome\n");
-        ui_printf(" to redistribute it under certain conditions; type `dar -L | more'\n");
-        ui_printf(" for details.\n\n");
+        dialog.printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n", cmd, DAR_SLAVE_VERSION);
+	if(maj > 2)
+	    dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
+	else
+	    dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
+        tools_display_features(dialog, ea, largefile, nodump, fastbadalloc, bits, thread, libz, libbz2, libcrypto);
+        dialog.printf("\n");
+        dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__);
+        dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd, PACKAGE_VERSION);
+        dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY;"), cmd)
+		       + tools_printf(gettext(" for details\n type `dar -W'."))
+		       + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
+		       + tools_printf(gettext(" type `dar -L | more'\n for details.\n\n")));
     }
     catch(...)
     {

@@ -15,7 +15,7 @@ noinst_PROGRAMS = factoriel prime
 dist_noinst_DATA = README
 LDADD = -L../libdar -l$(MYLIB)
 
-factoriel_SOURCES = factoriel.cpp
+factoriel_SOURCES = factoriel.cpp ../dar_suite/shell_interaction.cpp
 factoriel_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 prime_SOURCES = prime.cpp

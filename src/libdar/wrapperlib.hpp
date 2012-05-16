@@ -18,9 +18,16 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: wrapperlib.hpp,v 1.4.4.2 2004/08/01 06:11:50 edrusb Exp $
+// $Id: wrapperlib.hpp,v 1.8 2004/11/07 18:21:39 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file wrapperlib.hpp
+    /// \brief libz and libbz2 wrapper to have identical interface to theses libraries.
+    ///
+    /// libz and libbz2 library differ in several in the way they return values
+    /// in certain circumpstances. This module defines the wrapperlib class
+    /// that make their use homogeneous.
 
 #ifndef WRAPPERLIB_HPP
 #define WRAPPERLIB_HPP
@@ -29,8 +36,13 @@
 
 extern "C"
 {
+#if HAVE_ZLIB_H && LIBZ_AVAILABLE
 #include <zlib.h>
+#endif
+
+#if HAVE_BZLIB_H && LIBBZ2_AVAILABLE
 #include <bzlib.h>
+#endif
 } // end extern "C"
 
 #include "integers.hpp"
@@ -49,6 +61,12 @@ namespace libdar
     const int WR_FINISH        = 8;
 
     enum wrapperlib_mode { zlib_mode, bzlib_mode };
+
+	/// this class encapsulates calls to libz or libbz2
+
+	/// this is mainly an adaptation of libbz2 specificities to
+	/// have libb2 acting exactly as libz does.
+	/// \ingroup Private
 
     class wrapperlib
     {
@@ -79,8 +97,12 @@ namespace libdar
         S_I decompressReset();
 
     private:
+#if LIBZ_AVAILABLE
         z_stream *z_ptr;
+#endif
+#if LIBBZ2_AVAILABLE
         bz_stream *bz_ptr;
+#endif
         S_I level;
 
         void (wrapperlib::*x_set_next_in)(char *x);
@@ -103,7 +125,7 @@ namespace libdar
 
 
             // set of routines for zlib
-
+#if LIBZ_AVAILABLE
         S_I z_compressInit(U_I compression_level);
         S_I z_decompressInit();
         S_I z_compressEnd();
@@ -119,9 +141,10 @@ namespace libdar
         void z_set_avail_out(U_I x);
         U_I z_get_avail_out() const;
         U_64 z_get_total_out() const;
+#endif
 
             // set of routines for bzlib
-
+#if LIBBZ2_AVAILABLE
         S_I bz_compressInit(U_I compression_level);
         S_I bz_decompressInit();
         S_I bz_compressEnd();
@@ -137,6 +160,7 @@ namespace libdar
         void bz_set_avail_out(U_I x);
         U_I bz_get_avail_out() const;
         U_64 bz_get_total_out() const;
+#endif
     };
 
 } // end of namespace

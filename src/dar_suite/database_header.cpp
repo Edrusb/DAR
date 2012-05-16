@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database_header.cpp,v 1.6.4.3 2004/04/20 09:27:00 edrusb Rel $
+// $Id: database_header.cpp,v 1.14 2004/07/31 13:56:42 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -60,7 +60,7 @@ static unsigned char database_version = 1;
 
 #define HEADER_OPTION_NONE 0x00
 
-generic_file *database_header_create(const string & filename, bool overwrite)
+generic_file *database_header_create(user_interaction & dialog, const string & filename, bool overwrite)
 {
     char *ptr = tools_str2charptr(filename);
     generic_file *ret = NULL;
@@ -73,11 +73,11 @@ generic_file *database_header_create(const string & filename, bool overwrite)
         compressor *comp;
 
         if(stat(ptr, &buf) >= 0 && !overwrite)
-            throw Erange("database_header_create", "Cannot create database, file exists");
+            throw Erange("database_header_create", gettext("Cannot create database, file exists"));
         fd = ::open(ptr, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
         if(fd < 0)
-            throw Erange("database_header_create", string("Cannot create database ") + filename + " : " + strerror(errno));
-        ret = new fichier(fd);
+            throw Erange("database_header_create", tools_printf(gettext("Cannot create database %S : %s"), &filename, strerror(errno)));
+        ret = new fichier(dialog, fd);
         if(ret == NULL)
         {
             close(fd);
@@ -88,7 +88,7 @@ generic_file *database_header_create(const string & filename, bool overwrite)
         h.options = HEADER_OPTION_NONE;
         h.write(*ret);
 
-        comp = new compressor(gzip, ret); // upon success, ret is owned by compr
+        comp = new compressor(dialog, gzip, ret); // upon success, ret is owned by compr
         if(comp == NULL)
             throw Ememory("database_header_create");
         else
@@ -106,7 +106,7 @@ generic_file *database_header_create(const string & filename, bool overwrite)
     return ret;
 }
 
-generic_file *database_header_open(const string & filename)
+generic_file *database_header_open(user_interaction & dialog, const string & filename)
 {
     char *ptr = tools_str2charptr(filename);
     generic_file *ret = NULL;
@@ -118,21 +118,21 @@ generic_file *database_header_open(const string & filename)
 
 	try
 	{
-	    ret = new fichier(ptr, gf_read_only);
+	    ret = new fichier(dialog, ptr, gf_read_only);
 	}
 	catch(Erange & e)
 	{
-	    throw Erange("database_header_open", string("Error reading database ") + filename + " : " + e.get_message());
+	    throw Erange("database_header_open", tools_printf(gettext("Error reading database %S : "), &filename) + e.get_message());
 	}
         if(ret == NULL)
             throw Ememory("database_header_open");
         h.read(*ret);
         if(h.version != database_version)
-            user_interaction_pause("The format version of the database is too high for that software version, try reading anyway ? ");
+            dialog.pause(gettext("The format version of this database is too high for that software version, try reading anyway ? "));
         if(h.options != HEADER_OPTION_NONE)
-            throw Erange("database_header_open", "Unknown header option in database, aborting\n");
+            throw Erange("database_header_open", gettext("Unknown header option in database, aborting\n"));
 
-        comp = new compressor(gzip, ret);
+        comp = new compressor(dialog, gzip, ret);
         if(comp == NULL)
             throw Ememory("database_header_open");
         else
@@ -152,6 +152,6 @@ generic_file *database_header_open(const string & filename)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: database_header.cpp,v 1.6.4.3 2004/04/20 09:27:00 edrusb Rel $";
+    static char id[]="$Id: database_header.cpp,v 1.14 2004/07/31 13:56:42 edrusb Rel $";
     dummy_call(id);
 }

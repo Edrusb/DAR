@@ -28,19 +28,36 @@ else
 endif
 
 #
+# Conditionnal part : Profiling
+#
+
+if PROFILING
+    LD_PROF = -pg
+    CPP_PROF = -pg
+clean-local:
+	rm -f gmon.out
+else
+    LD_PROF =
+    CPP_PROF =
+clean-local:
+
+endif
+
+
+#
 # conditionnal part: --enable-mode=...
 #
 
 if BUILD_MODE32
     MYLIB=dar32
-    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar
+    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar $(CPP_PROF)
 else
 if BUILD_MODE64
     MYLIB=dar64
-    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar  $(CPP_PROF)
 else
     MYLIB=dar
-    AM_CPPFLAGS=-I../libdar
+    AM_CPPFLAGS=-I../libdar $(CPP_PROF)
 endif
 endif
 
@@ -65,6 +82,8 @@ install-exec-hook:
 	echo "no exectuable packing, UPX not found or disabled"
 endif
 
+
+
 #
 # unconditionnal part
 #
@@ -72,7 +91,9 @@ endif
 bin_PROGRAMS = dar dar_xform dar_slave dar_manager dar_cp $(ALSO_BUILD)
 LDADD = -L../libdar -l$(MYLIB)
 if DEBUG_STATIC
-AM_LDFLAGS = -all-static
+AM_LDFLAGS = -all-static @LTLIBINTL@ $(LD_PROF)
+else
+AM_LDFLAGS = @LTLIBINTL@ $(LD_PROF)
 endif
 
 dar_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp shell_interaction.cpp shell_interaction.hpp dar.usage getopt_decision.h my_getopt_long.h

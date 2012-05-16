@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_path.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_path.cpp,v 1.7 2004/05/11 20:28:56 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -46,7 +46,7 @@ int main()
         path p5 = "/zozo/zizi/zuzu/zaza";
 
         cout << p2.display() << endl;
-        
+
         path *p[5] = { &p1, &p2, &p3, &p4, &p5 };
 
         for(S_I i = 0; i < 5; i++)
@@ -81,7 +81,7 @@ int main()
     {
         e.dump();
     }
-    
+
     try
     {
         path tmp = "";
@@ -90,7 +90,7 @@ int main()
     {
         e.dump();
     }
-    
+
     try
     {
         path t1 = "/toto/tutu";
@@ -102,7 +102,6 @@ int main()
         e.dump();
     }
     f2();
-    Egeneric::clear_last_destroyed();
     MEM_OUT;
     MEM_END;
 }

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.9.2.3 2004/04/20 09:27:02 edrusb Rel $
+// $Id: sar_tools.cpp,v 1.18 2004/08/03 21:28:01 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -62,6 +62,7 @@ char *strchr (), *strrchr ();
 #endif
 } // end extern "C"
 
+#include "sar_tools.hpp"
 #include "erreurs.hpp"
 #include "user_interaction.hpp"
 #include "sar.hpp"
@@ -76,11 +77,12 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar_tools.cpp,v 1.9.2.3 2004/04/20 09:27:02 edrusb Rel $";
+        static char id[]="$Id: sar_tools.cpp,v 1.18 2004/08/03 21:28:01 edrusb Rel $";
         dummy_call(id);
     }
 
-    generic_file *sar_tools_open_archive_fichier(const string &filename, bool allow_over, bool warn_over)
+    generic_file *sar_tools_open_archive_fichier(user_interaction & dialog,
+						 const string &filename, bool allow_over, bool warn_over)
     {
         char *name = tools_str2charptr(filename);
         generic_file *ret = NULL;
@@ -96,24 +98,24 @@ namespace libdar
                 if(lstat(name, &buf) < 0)
                 {
                     if(errno != ENOENT)
-                        throw Erange("open_archive_fichier", string("Error retreiving inode information for ") + name + " : " + strerror(errno));
+                        throw Erange("open_archive_fichier", tools_printf(gettext("Error retreiving inode information for %s : %s"), name, strerror(errno)));
                 }
                 else
                 {
                     if(!allow_over)
-                        throw Erange("open_archive_fichier", filename + " already exists, and overwritten is forbidden, aborting");
+                        throw Erange("open_archive_fichier", tools_printf(gettext("%S already exists, and overwritten is forbidden, aborting"), &filename));
                     if(warn_over)
-                        user_interaction_pause(filename + " is about to be overwritten, continue ?");
+                        dialog.pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
                 }
             }
 
             fd = ::open(name, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
             if(fd < 0)
-                throw Erange("open_archive_fichier", string("Error openning file ") + name + " : " + strerror(errno));
-            tmp = new fichier(fd);
+                throw Erange("open_archive_fichier", tools_printf(gettext("Error openning file %s : %s"), name, strerror(errno)));
+            tmp = new fichier(dialog, fd);
             if(tmp == NULL)
                 throw Ememory("open_archive_fichier");
-            ret = new trivial_sar(tmp);
+            ret = new trivial_sar(dialog, tmp);
             if(ret == NULL)
                 throw Ememory("open_archive_fichier");
         }
@@ -131,17 +133,17 @@ namespace libdar
         return ret;
     }
 
-    generic_file *sar_tools_open_archive_tuyau(S_I fd, gf_mode mode)
+    generic_file *sar_tools_open_archive_tuyau(user_interaction & dialog, S_I fd, gf_mode mode)
     {
         generic_file *tmp = NULL;
         generic_file *ret = NULL;
 
         try
         {
-            tmp = new tuyau(fd, mode);
+            tmp = new tuyau(dialog, fd, mode);
             if(tmp == NULL)
                 throw Ememory("sar_tools_open_archive_tuyau");
-            ret = new trivial_sar(tmp);
+            ret = new trivial_sar(dialog, tmp);
             if(ret == NULL)
                 throw Ememory("sar_tools_open_archive_tuyau");
         }

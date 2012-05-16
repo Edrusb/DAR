@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: shell_interaction.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
+// $Id: shell_interaction.hpp,v 1.7 2004/10/01 20:54:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -28,11 +28,16 @@
 #include "../my_config.h"
 #include <iostream>
 
-using namespace std;
+#include "user_interaction.hpp"
 
-void shell_interaction_init(ostream *out, ostream *interact);
-    // arg are the input file descriptor, output ostream object (on which are sent non interactive messages)
-    // and intereact ostream object on which are sent message that require a user interaction
+using namespace std;
+using namespace libdar;
+
+user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool silent);
+    // arg are output ostream object (on which are sent non interactive messages)
+    // and intereact ostream object (on which are sent message that require a user interaction)
+
+    // the argument returned must be freed with a call to "delete"
 
 void shell_interaction_change_non_interactive_output(ostream *out);
 void shell_interaction_close();

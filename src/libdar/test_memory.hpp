@@ -18,9 +18,16 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_memory.hpp,v 1.5.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_memory.hpp,v 1.7 2004/11/07 18:21:39 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file test_memory.hpp
+    /// \brief wrapper around new and delete operator to detect memory leakage
+    ///
+    /// activating this feature is only for debugging purpose, it makes
+    /// the resulting executable very very very very slow.
+
 
 #ifndef TEST_MEMORY_HPP
 #define TEST_MEMORY_HPP

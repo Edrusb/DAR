@@ -18,9 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header_version.hpp,v 1.6.4.2 2004/09/22 03:14:22 edrusb Rel $
+// $Id: header_version.hpp,v 1.11 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file header_version.hpp
+    /// \brief archive global header structure is defined here
+    /// \ingroup Private
 
 #ifndef HEADER_VERSION_HPP
 #define HEADER_VERSION_HPP
@@ -32,10 +36,9 @@
 
 namespace libdar
 {
-
     const int VERSION_FLAG_SAVED_EA_ROOT = 0x80;
     const int VERSION_FLAG_SAVED_EA_USER = 0x40;
-    const int VERSION_FLAG_SCRAMBLED     = 0x20;
+    const int VERSION_FLAG_SCRAMBLED     = 0x20;      // scrambled or strong encryption used
     const int VERSION_SIZE = 3;
     typedef char dar_version[VERSION_SIZE];
     extern void version_copy(dar_version & left, const dar_version & right);

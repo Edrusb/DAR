@@ -18,13 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.cpp,v 1.6.4.1 2004/07/25 20:38:03 edrusb Exp $
+// $Id: path.cpp,v 1.11 2004/07/31 17:45:24 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 #include <iostream>
 #include "path.hpp"
+#include "tools.hpp"
 
 using namespace std;
 
@@ -39,13 +40,13 @@ namespace libdar
         dirs.clear();
         relative = s[0] != '/';
         if(s.size() < 1)
-            throw Erange("path::path", "empty string is not a valid path");
+            throw Erange("path::path", gettext("Empty string is not a valid path"));
         if(!relative)
             s = string(s.begin()+1, s.end()); // remove the leading '/'
         while(path_get_root(s, tmp))
             dirs.push_back(tmp);
         if(dirs.size() == 0 && relative)
-            throw Erange("path::path", "empty string is not a valid path");
+            throw Erange("path::path", gettext("Empty string is not a valid path"));
         reduce();
         reading = dirs.begin();
     }
@@ -152,7 +153,7 @@ namespace libdar
     path & path::operator += (const path &arg)
     {
         if(!arg.is_relative())
-            throw Erange("path::operator +", "can't add an absolute path");
+            throw Erange("path::operator +", gettext("Cannot add an absolute path"));
         list<string>::iterator it = (const_cast<path &>(arg)).dirs.begin();
         list<string>::iterator it_fin = (const_cast<path &>(arg)).dirs.end();
         while(it != it_fin)
@@ -161,14 +162,15 @@ namespace libdar
         return *this;
     }
 
-    bool path::is_subdir_of(const path & p) const
+    bool path::is_subdir_of(const path & p, bool case_sensit) const
     {
         list<string>::iterator it_me = (const_cast<path &>(*this)).dirs.begin();
         list<string>::iterator it_arg = (const_cast<path &>(p)).dirs.begin();
         list<string>::iterator fin_me = (const_cast<path &>(*this)).dirs.end();
         list<string>::iterator fin_arg = (const_cast<path &>(p)).dirs.end();
 
-        while(it_me != fin_me && it_arg != fin_arg && *it_me == *it_arg)
+        while(it_me != fin_me && it_arg != fin_arg
+	      && (*it_me == *it_arg  || (!case_sensit && tools_is_case_insensitive_equal(*it_me, *it_arg))))
         {
             it_me++;
             it_arg++;
@@ -179,7 +181,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: path.cpp,v 1.6.4.1 2004/07/25 20:38:03 edrusb Exp $";
+        static char id[]="$Id: path.cpp,v 1.11 2004/07/31 17:45:24 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -251,7 +253,7 @@ namespace libdar
         else
             p = "";
         if(root.size() == 0)
-            throw Erange("path_get_root", "empty string as subdirectory does not make a valid path");
+            throw Erange("path_get_root", gettext("Empty string as subdirectory does not make a valid path"));
 
         return true;
     }

@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# This script is to be launched on dar command line when creating an archive
+# with -s option (slicing), in place of -p option (pause every slice done)
+#
+#   -E "pause_every_n_slice.duc %p %b %n %e %c N"
+#
+# will make dar pause when slice N will be done, when slice 2*N, 3*N etc.
+# will be done.
+#
+
+if [ "$1" = "" -a "$2" = "" -a "$3" = "" -a "$4" == "" -a "$6" == "" ]; then
+  echo "usage: $0 <path> <basename> <slice number> <extension> <context(not used)> <pause every this number of slices>"
+  exit 1
+fi
+
+
+let toto=$3%$6
+if [ $toto -eq 0 ] ; then
+  echo "Pausing after slice $3"
+  echo "Press return to continue"
+  read junk
+fi

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.cpp,v 1.7.4.2 2004/07/25 20:38:03 edrusb Exp $
+// $Id: header.cpp,v 1.15 2005/01/28 23:27:57 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -34,6 +34,10 @@ extern "C"
 
 #if HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif
+
+#if HAVE_ARPA_INET_H
+#include <arpa/inet.h>
 #endif
 
 #if TIME_WITH_SYS_TIME
@@ -67,10 +71,10 @@ namespace libdar
         case EXTENSION_NO:
             break;
         case EXTENSION_SIZE:
-            size_ext = infinint(NULL, &f);
+            size_ext = infinint(f.get_gf_ui(), NULL, &f);
             break;
         default :
-            throw Erange("header::read", "badly formated SAR header");
+            throw Erange("header::read", gettext("Badly formated SAR header"));
         }
     }
 
@@ -95,21 +99,21 @@ namespace libdar
         }
     }
 
-    void header::read(S_I fd)
+    void header::read(user_interaction & dialog, S_I fd)
     {
-        fichier fic = dup(fd);
+        fichier fic = fichier(dialog, dup(fd));
         read(fic);
     }
 
-    void header::write(S_I fd)
+    void header::write(user_interaction & dialog, S_I fd)
     {
-        fichier fic = dup(fd);
+        fichier fic = fichier(dialog, dup(fd));
         write(fic);
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: header.cpp,v 1.7.4.2 2004/07/25 20:38:03 edrusb Exp $";
+        static char id[]="$Id: header.cpp,v 1.15 2005/01/28 23:27:57 edrusb Rel $";
         dummy_call(id);
     }
 

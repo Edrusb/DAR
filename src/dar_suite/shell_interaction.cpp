@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: shell_interaction.cpp,v 1.9.4.3 2004/04/20 09:27:00 edrusb Rel $
+// $Id: shell_interaction.cpp,v 1.19 2004/11/04 17:47:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -66,7 +66,6 @@ char *strchr (), *strrchr ();
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "integers.hpp"
-#include "user_interaction.hpp"
 #include "cygwin_adapt.hpp"
 
 using namespace std;
@@ -78,15 +77,20 @@ static ostream *inter = NULL;
 static bool beep = false;
 static termios initial;
 static termios interaction;
+static termios initial_noecho;
 static bool has_terminal = false;
 
 static void set_term_mod(const struct termios & etat);
-static bool interaction_pause(const string &message);
-static void interaction_warning(const string & message);
+static bool interaction_pause(const string &message, void *context);
+static void interaction_warning(const string & message, void *context);
+static string interaction_string(const string & message, bool echo, void *context);
 
-void shell_interaction_init(ostream *out, ostream *interact)
+user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool silent)
 {
     has_terminal = false;
+    user_interaction *ret = new user_interaction_callback(interaction_warning, interaction_pause, interaction_string, NULL);
+    if(ret == NULL)
+	throw Ememory("shell_interaction_init");
 
         // checking and recording parameters to static variable
     if(out != NULL)
@@ -109,43 +113,53 @@ void shell_interaction_init(ostream *out, ostream *interact)
         close(input);
 
         // terminal settings
-
-    char *tty = ctermid(NULL);
-    if(tty == NULL)
-        interaction_warning("No terminal found for user interaction. All questions will abort the program.\n");
-    else // no filesystem path to tty
+    try
     {
-        struct termios term;
+	char *tty = ctermid(NULL);
+	if(tty == NULL)
+	    throw Erange("",""); // used locally
+	else // no filesystem path to tty
+	{
+	    struct termios term;
 
-        input = ::open(tty, O_RDONLY|O_TEXT);
-        if(input < 0)
-            interaction_warning("No terminal found for user interaction. All questions will abort the program.\n");
-        else
-        {
-                // preparing input for swaping between char mode and line mode (terminal settings)
-            if(tcgetattr(input, &term) >= 0)
-            {
-                initial = term;
-                term.c_lflag &= ~ICANON;
-                term.c_lflag &= ~ECHO;
-                term.c_lflag &= ~ECHOE;
-                interaction = term;
+	    input = ::open(tty, O_RDONLY|O_TEXT);
+	    if(input < 0)
+		throw Erange("",""); // used locally
+	    else
+	    {
+		    // preparing input for swaping between char mode and line mode (terminal settings)
+		if(tcgetattr(input, &term) >= 0)
+		{
+		    initial = term;
+		    initial_noecho = term;
+		    initial_noecho.c_lflag &= ~ECHO;
+		    term.c_lflag &= ~ICANON;
+		    term.c_lflag &= ~ECHO;
+		    term.c_lflag &= ~ECHOE;
+		    interaction = term;
 
-                    // checking now that we can change to character mode
-                set_term_mod(interaction);
-                set_term_mod(initial);
-                    // but we don't need it right now, so swapping back to line mode
-                has_terminal = true;
-            }
-            else // failed to retrieve parameters from tty
-                interaction_warning("No terminal found for user interaction. All questions will abort the program.\n");
-        }
+			// checking now that we can change to character mode
+		    set_term_mod(interaction);
+		    set_term_mod(initial);
+			// but we don't need it right now, so swapping back to line mode
+		    has_terminal = true;
+		}
+		else // failed to retrieve parameters from tty
+		    throw Erange("",""); // used locally
+	    }
+	}
     }
-
-        // setting darlib callback :
-
-    set_warning_callback(&interaction_warning);
-    set_answer_callback(&interaction_pause);
+    catch(Erange & e)
+    {
+	if(e.get_message() == "")
+	{
+	    if(!silent)
+		ret->warning(gettext("No terminal found for user interaction. All questions will be assumed a negative answer (less destructive choice), which most of the time will abort the program."));
+	}
+	else
+	    throw;
+    }
+    return ret;
 }
 
 void shell_interaction_change_non_interactive_output(ostream *out)
@@ -170,10 +184,10 @@ void shell_interaction_close()
 static void set_term_mod(const struct termios & etat)
 {
     if(tcsetattr(input, TCSANOW, &etat) < 0)
-        throw Erange("user_interaction : set_term_mod", string("Error while changing user terminal properties: ") + strerror(errno));
+        throw Erange("shell_interaction : set_term_mod", string(gettext("Error while changing user terminal properties: ")) + strerror(errno));
 }
 
-static bool interaction_pause(const string &message)
+static bool interaction_pause(const string &message, void *context)
 {
     const S_I bufsize = 1024;
     char buffer[bufsize];
@@ -198,16 +212,16 @@ static bool interaction_pause(const string &message)
             // now asking the user
         do
         {
-            *inter << message << " [return = OK | esc = cancel]" << (beep ? "\007\007\007" : "") << endl;
+            *inter << message << gettext(" [return = OK | esc = cancel]") << (beep ? "\007\007\007" : "") << endl;
             if(read(input, &a, 1) < 0)
-                throw Erange("dar_suite_user_interaction_pause", string("Error while reading user answer from terminal: ") + strerror(errno));
+                throw Erange("shell_interaction:interaction_pause", string(gettext("Error while reading user answer from terminal: ")) + strerror(errno));
         }
         while(a != 27 && a != '\n');
 
         if(a != 27)
-            *inter << "Continuing..." << endl;
+            *inter << gettext("Continuing...") << endl;
         else
-            *inter << "Escaping..." << endl;
+            *inter << gettext("Escaping...") << endl;
 
         ret = a != 27; // 27 is escape key
     }
@@ -220,15 +234,48 @@ static bool interaction_pause(const string &message)
     return ret;
 }
 
-static void interaction_warning(const string & message)
+static void interaction_warning(const string & message, void *context)
 {
     if(output == NULL)
-        throw SRC_BUG; // user_interaction has not been properly initialized
+        throw SRC_BUG; // shell_interaction has not been properly initialized
     *output << message;
+}
+
+static string interaction_string(const string & message, bool echo, void *context)
+{
+    string ret;
+    const U_I taille = 100;
+    U_I lu, i;
+    char buffer[taille+1];
+    bool fin = false;
+
+    if(!echo)
+	set_term_mod(initial_noecho);
+
+    if(output == NULL || input < 0)
+	throw SRC_BUG;  // shell_interaction has not been properly initialized
+    *inter << message;
+    do
+    {
+	lu = ::read(input, buffer, taille);
+	i = 0;
+	while(i < lu && buffer[i] != '\n')
+	    i++;
+	if(i < lu)
+	    fin = true;
+	buffer[i] = '\0';
+	ret += string(buffer);
+    }
+    while(!fin);
+    if(!echo)
+	*inter << endl;
+    set_term_mod(initial);
+
+    return ret;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: shell_interaction.cpp,v 1.9.4.3 2004/04/20 09:27:00 edrusb Rel $";
+    static char id[]="$Id: shell_interaction.cpp,v 1.19 2004/11/04 17:47:00 edrusb Rel $";
     dummy_call(id);
 }

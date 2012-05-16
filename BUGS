@@ -497,7 +497,8 @@ KNOWN BUGS:
       of the second target), as there is no contents in this target no
       reposition (seek) in the file is done, and the search for the next target
       start at that point (second character of the second target), which makes
-      the second target not recognized because of the missing initial character.
+      the second target not recognized because of the missing initial
+      character.
 
     solution
       avoid reading this extra character so the next character to read is the

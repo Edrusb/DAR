@@ -192,7 +192,7 @@ from 2.0.3 to 2.0.4
 - updated autoconf version used to generate configure script (2.57 -> 2.59) The
   large file support is back with gcc-3 (was only working with gcc-2)
 
-from 2.0.0 to 2.1.0
+from 2.0.x to 2.1.0
 - fixed bug #17
 - API version 2 documentation
 - API version 2 implementation
@@ -225,13 +225,12 @@ from 2.1.0 to 2.1.1
   stderr)
 - fixed typo in error message
 
-
 from 2.1.1 to 2.1.2
 - fixed bug #24
 - added "-w d" option which is equivalent to -w but necessary when dar
   is not compiled with GNU getopt
 - updated documentation about GNU getopt() vs non GNU getopt()
-- update configure script to have libgnugetopt autodetection
+- update configure script to have libgnugetopt auto-detection
 
 from 2.1.2 to 2.1.3
 - fixed namespace visibility inconsistency for several call to open()
@@ -263,3 +262,38 @@ from 2.1.5 to 2.1.6
 - fixed compilation problem with gcc-3.x for dar64
 - updated libtool to generate the configure script
 - fixed old info in dar's man page
+
+from 2.1.x to 2.2.0
+- caching read/write for catalogue to drop the number of Context Switches.
+- added -aSI and -abinary options
+- added -Q option
+- added -G option
+- fixed a display bug about archive size, present when listing with -v option
+- added -aa / -ac options
+- added -M option
+- thread safe support for libdar
+- added -g option
+- added -am option
+- added -acase / -an options
+- user_interaction can now be based on customized C++ class
+- user_interaction_callback now have a context argument
+- added feature: dar_manager now restores directory tree recursively
+- added feature: dar_manager can receive a range of archive number with -D option
+- added summary at the end of configure script
+- added -j option (--jog) change behavior when virtual memory is exhausted
+- added Native Language Support
+- added feature that proposes removal of slices of an older archive of same basename
+- libz is now optional
+- libbz2 is now optional
+- added openssh's libcrypto dependency
+- added blowfish strong encryption
+- changed archive format number (version "04"), difference occures only when encryption is used
+- moved libdar operations (archive creation, listing, testing ...) as method of
+  the C++ archive class
+- added thread cancelation routine
+- added feature : password can be read out of command-line (interactively at execution time).
+- added programming documentation (thanks to Doxygen)
+- optimize CRC computation for speed
+- added warning telling [list of path] is deprecated (better use -g option)
+- added Todd Vierling's patch for dar to compile under Interix
+

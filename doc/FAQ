@@ -1,0 +1,18 @@
+QUESTIONS
+-----------
+
+Q1 - I restore/save all files but dar reported some files have been ignored, what are those ignored files ?
+Q2 - Dar hangs when using it with pipes, why ?
+Q3 - Why, when I restore 1 file, dar report 3 files have been restored ?
+Q4 - I cannot find the binary package for my distro, where to look for ?
+
+ANSWERS
+--------
+
+A1 - When restoring/saving, all files are considered by default. But if you specify some files to restore or save, all other files are "ignored", this is the case when using -P -X -I or -g.
+
+A2 - Dar can produce archive on its standard output, if you give '-' as basename. But it cannot read an archive from its standard input. To feed an archive to dar through pipes, you need dar_slave and two pipes. The first pipe transmits orders from dar to dar_slave that tell dar_slave the requested portion of the archive, the second pipe goes the other way and carries from dar_slave the data requested by dar. This way, only needed data get transmitted over pipes, which cannot be possible with a single pipe.
+
+A3 - if you restore for example the file usr/bin/emacs dar will first restore usr (if the directory already exists, it will get its date and ownership restored, all existing files will be preserved), the /usr/bin is restored, then usr/bin/emacs is restored. Thus 3 inodes have been restored or modified while only one file has been asked for restoration.
+
+A4 - For any binary package, ask your distro maintainer to include dar (if not already done), and check on the web site of your preferite distro for a dar package.

@@ -18,9 +18,19 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.8.2.3 2004/09/10 20:15:43 edrusb Exp $
+// $Id: filesystem.hpp,v 1.17 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file filesystem.hpp
+    /// \brief defines several class that realize the interface with the filesystem
+    ///
+    /// - filesystem_hard_link_read
+    /// - filesystem_backup
+    /// - filesystem_diff
+    /// - filesystem_hard_link_write
+    /// - filesystem_restore
+    /// \ingroup Private
 
 #ifndef FILESYSTEM_HPP
 #define FILESYSTEM_HPP
@@ -46,22 +56,32 @@ extern "C"
 
 namespace libdar
 {
+	/// \addtogroup Private
+	/// @{
 
+	/// keep trace of hard links when reading the filesystem
     class filesystem_hard_link_read
     {
-
             // this class is not to be used directly
             // it only provides some routine for the inherited classes
 
     public:
+	filesystem_hard_link_read(user_interaction & dialog) { fs_ui = dialog.clone(); };
+	filesystem_hard_link_read(const filesystem_hard_link_read & ref) { copy_from(ref); };
+	filesystem_hard_link_read & operator = (const filesystem_hard_link_read & ref) { detruire(); copy_from(ref); return *this; };
+	~filesystem_hard_link_read() { detruire(); };
+
+
         void forget_etiquette(file_etiquette *obj);
             // tell the filesystem module that the reference of that etiquette does not
             // exist anymore (not covered by filter for example)
 
     protected:
-        void corres_reset() { corres_read.clear(); };
+        void corres_reset() { corres_read.clear(); etiquette_counter = 0; };
 
         nomme *make_read_entree(path & lieu, const std::string & name, bool see_hard_link, bool ea_root_mode, bool ea_user_mode);
+
+	user_interaction & get_fs_ui() const { return *fs_ui; };
 
     private:
         struct couple
@@ -70,18 +90,28 @@ namespace libdar
             file_etiquette *obj;
         };
         std::map <ino_t, couple> corres_read;
+	infinint etiquette_counter;
+
+	user_interaction *fs_ui;
+
+	void copy_from(const filesystem_hard_link_read & ref);
+	void detruire();
     };
 
 
+	/// make a flow sequence of inode to feed the backup filtering routing
     class filesystem_backup : public filesystem_hard_link_read
     {
     public:
-        filesystem_backup(const path &root, bool x_info_details, bool x_save_root_ea, bool x_save_user_ea, bool check_no_dump_flag);
-        filesystem_backup(const filesystem_backup & ref) { copy_from(ref); };
+        filesystem_backup(user_interaction & dialog,
+			  const path &root, bool x_info_details,
+			  bool x_save_root_ea, bool x_save_user_ea, bool check_no_dump_flag,
+			  bool alter_atime, infinint & root_fs_device);
+        filesystem_backup(const filesystem_backup & ref) : filesystem_hard_link_read(ref.get_fs_ui()) { copy_from(ref); };
         filesystem_backup & operator = (const filesystem_backup & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_backup() { detruire(); };
 
-        void reset_read();
+        void reset_read(infinint & root_fs_device);
         bool read(entree * & ref);
         void skip_read_to_parent_dir();
             //  continue reading in parent directory and
@@ -93,6 +123,7 @@ namespace libdar
         bool save_root_ea;
         bool save_user_ea;
         bool no_dump_check;
+	bool alter_atime;
         path *current_dir;      // to translate from an hard linked inode to an  already allocated object
         std::vector<etage> pile;        // to store the contents of a directory
 
@@ -100,11 +131,14 @@ namespace libdar
         void copy_from(const filesystem_backup & ref);
     };
 
+	/// make a flow of inode to feed the difference filter routine
     class filesystem_diff : public filesystem_hard_link_read
     {
     public:
-        filesystem_diff(const path &root, bool x_info_details, bool x_check_root_ea, bool x_check_user_ea);
-        filesystem_diff(const filesystem_diff & ref) { copy_from(ref); };
+        filesystem_diff(user_interaction & dialog,
+			const path &root, bool x_info_details,
+			bool x_check_root_ea, bool x_check_user_ea, bool alter_atime);
+        filesystem_diff(const filesystem_diff & ref) : filesystem_hard_link_read(ref.get_fs_ui()) { copy_from(ref); };
         filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_diff() { detruire(); };
 
@@ -126,6 +160,7 @@ namespace libdar
         bool info_details;
         bool check_root_ea;
         bool check_user_ea;
+	bool alter_atime;
         path *current_dir;
         std::vector<filename_struct> filename_pile;
 
@@ -133,12 +168,18 @@ namespace libdar
         void copy_from(const filesystem_diff & ref);
     };
 
+	/// keep trace of already written inodes to restore hard links
     class filesystem_hard_link_write
     {
             // this class is not to be used directly
             // it only provides routines to its inherited classes
 
     public:
+	filesystem_hard_link_write(user_interaction & dialog) { fs_ui = dialog.clone(); };
+	filesystem_hard_link_write(const filesystem_hard_link_write & ref) { copy_from(ref); };
+	filesystem_hard_link_write & operator = (const filesystem_hard_link_write & ref) { detruire(); copy_from(ref); return *this; };
+	~filesystem_hard_link_write() { detruire(); };
+
         bool ea_has_been_restored(const hard_link *h);
             // true if the inode pointed to by the arg has already got its EA restored
         bool set_ea(const nomme *e, const ea_attributs & l, path spot,
@@ -158,6 +199,8 @@ namespace libdar
             // generate inode or make a hard link on an already restored inode.
         void clear_corres(const infinint & ligne);
 
+	user_interaction & get_fs_ui() const { return *fs_ui; };
+
     private:
         struct corres_ino_ea
         {
@@ -166,16 +209,21 @@ namespace libdar
         };
 
         std::map <infinint, corres_ino_ea> corres_write;
+	user_interaction *fs_ui;
+
+	void copy_from(const filesystem_hard_link_write & ref);
+	void detruire();
     };
 
-
+	/// receive the flow of inode from the restoration filtering routing and promotes theses to real filesystem objects
     class filesystem_restore : public filesystem_hard_link_write, public filesystem_hard_link_read
     {
     public:
-        filesystem_restore(const path &root, bool x_allow_overwrite, bool x_warn_overwrite, bool x_info_details,
+        filesystem_restore(user_interaction & dialog,
+			   const path &root, bool x_allow_overwrite, bool x_warn_overwrite, bool x_info_details,
                            bool x_set_root_ea, bool x_set_user_ea, bool ignore_owner, bool x_warn_remove_no_match, bool empty);
-        filesystem_restore(const filesystem_restore  & ref) { copy_from(ref); };
-        filesystem_restore & operator =(const filesystem_restore  & ref) { detruire(); copy_from(ref); return *this; };
+        filesystem_restore(const filesystem_restore  & ref) : filesystem_hard_link_write(ref.filesystem_hard_link_write::get_fs_ui()), filesystem_hard_link_read(ref.filesystem_hard_link_read::get_fs_ui()) { copy_from(ref); };
+        filesystem_restore & operator = (const filesystem_restore  & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_restore() { detruire(); };
 
         void reset_write();
@@ -201,6 +249,9 @@ namespace libdar
 									info_details);
             };
 
+    protected:
+	user_interaction & get_fs_ui() const { return filesystem_hard_link_read::get_fs_ui(); };
+
     private:
         path *fs_root;
         bool info_details;
@@ -216,8 +267,9 @@ namespace libdar
 
         void detruire();
         void copy_from(const filesystem_restore & ref);
-
     };
+
+	/// @}
 
 } // end of namespace
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_compressor.cpp,v 1.6.4.2 2004/04/20 09:27:02 edrusb Rel $
+// $Id: test_compressor.cpp,v 1.9 2004/05/21 08:28:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -43,16 +43,24 @@ extern "C"
 #include "integers.hpp"
 #include "test_memory.hpp"
 #include "cygwin_adapt.hpp"
+#include "shell_interaction.hpp"
 
 using namespace libdar;
 
+static user_interaction *ui = NULL;
 static void f1();
 
 int main()
 {
     MEM_BEGIN;
     MEM_IN;
+    ui = shell_interaction_init(&cout, &cerr, false);
+    if(ui == NULL)
+	cout << "ERREUR !" << endl;
     f1();
+    shell_interaction_close();
+    if(ui != NULL)
+	delete ui;
     MEM_OUT;
     MEM_END;
 }
@@ -63,16 +71,16 @@ static void f1()
 
     try
     {
-        fichier src1 = fichier("toto", gf_read_only);
-        fichier src2 = fichier("toto", gf_read_only);
-        fichier src3 = fichier("toto", gf_read_only);
-        fichier dst1 = ::open("tutu.none", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
-        fichier dst2 = ::open("tutu.gz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
-        fichier dst3 = ::open("tutu.bz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+        fichier src1 = fichier(*ui, "toto", gf_read_only);
+        fichier src2 = fichier(*ui, "toto", gf_read_only);
+        fichier src3 = fichier(*ui, "toto", gf_read_only);
+        fichier dst1 = fichier(*ui, ::open("tutu.none", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
+        fichier dst2 = fichier(*ui, ::open("tutu.gz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
+        fichier dst3 = fichier(*ui, ::open("tutu.bz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
 
-        compressor c1 = compressor(none, dst1);
-        compressor c2 = compressor(gzip, dst2);
-        compressor c3 = compressor(bzip2, dst3);
+        compressor c1 = compressor(*ui, none, dst1);
+        compressor c2 = compressor(*ui, gzip, dst2);
+        compressor c3 = compressor(*ui, bzip2, dst3);
 
         src1.copy_to(c1);
         src2.copy_to(c2);
@@ -108,16 +116,16 @@ static void f1()
 
     try
     {
-        fichier src1 = fichier("tutu.none", gf_read_only);
-        fichier src2 = fichier("tutu.gz", gf_read_only);
-        fichier src3 = fichier("tutu.bz", gf_read_only);
-        fichier dst1 = ::open("tutu.none.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
-        fichier dst2 = ::open("tutu.gz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
-        fichier dst3 = ::open("tutu.bz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+        fichier src1 = fichier(*ui, "tutu.none", gf_read_only);
+        fichier src2 = fichier(*ui, "tutu.gz", gf_read_only);
+        fichier src3 = fichier(*ui, "tutu.bz", gf_read_only);
+        fichier dst1 = fichier(*ui, ::open("tutu.none.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
+        fichier dst2 = fichier(*ui, ::open("tutu.gz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
+        fichier dst3 = fichier(*ui, ::open("tutu.bz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
 
-        compressor c1 = compressor(none, src1);
-        compressor c2 = compressor(gzip, src2);
-        compressor c3 = compressor(bzip2, src3);
+        compressor c1 = compressor(*ui, none, src1);
+        compressor c2 = compressor(*ui, gzip, src2);
+        compressor c3 = compressor(*ui, bzip2, src3);
 
         c1.copy_to(dst1);
         try

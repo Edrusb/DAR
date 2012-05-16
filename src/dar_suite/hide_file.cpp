@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: hide_file.cpp,v 1.6 2003/10/26 18:14:44 edrusb Rel $
+// $Id: hide_file.cpp,v 1.11 2004/07/31 13:56:42 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,16 +30,16 @@ using namespace libdar;
 
 #define CHECK_INIT if(!is_init) init()
 
-hide_file::hide_file(generic_file &f) : generic_file(gf_read_only)
+hide_file::hide_file(user_interaction & dialog, generic_file &f) : generic_file(dialog, gf_read_only)
 {
     if(f.get_mode() == gf_write_only)
-        throw Erange("hide_file::hide_file", "hide_file cannot be initialized with write only file");
+        throw Erange("hide_file::hide_file", gettext("hide_file cannot be initialized with write-only file"));
 
     ref = &f;
     if(ref == NULL)
         throw SRC_BUG; // NULL argument given
     is_init = false;
-    pos_index = 0; 
+    pos_index = 0;
     pos_relicat = 0;
 }
 
@@ -49,12 +49,12 @@ bool hide_file::skip(const infinint & pos)
     U_I it = 0;
     while(it < morceau.size() && morceau[it].offset + morceau[it].longueur - 1 < pos)
         it++;
-        
+
     if(it >= morceau.size())
         return false;
     if(morceau[it].offset > pos)
         throw SRC_BUG; // morceau has a hole in it.
-        
+
     pos_index = it;
     pos_relicat = pos - morceau[it].offset;
     return true;
@@ -142,7 +142,7 @@ S_I hide_file::inherited_read(char *a, size_t size)
         (morceau[pos_index].longueur - pos_relicat).unstack(maxlire);
         reste = size - lu;
         maxlire = maxlire > reste ? reste : maxlire;
-                
+
         ref->skip(morceau[pos_index].debut+pos_relicat);
         lu += ref->read(a+lu, maxlire);
         pos_relicat += lu;
@@ -152,7 +152,7 @@ S_I hide_file::inherited_read(char *a, size_t size)
             pos_relicat = 0;
         }
     }
-        
+
     return lu;
 }
 
@@ -164,7 +164,7 @@ S_I hide_file::inherited_write(char *a, size_t size)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: hide_file.cpp,v 1.6 2003/10/26 18:14:44 edrusb Rel $";
+    static char id[]="$Id: hide_file.cpp,v 1.11 2004/07/31 13:56:42 edrusb Rel $";
     dummy_call(id);
 }
 

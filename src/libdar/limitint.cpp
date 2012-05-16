@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.cpp,v 1.8.4.8 2004/09/22 03:14:23 edrusb Rel $
+// $Id: limitint.cpp,v 1.21 2005/01/29 15:08:04 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,7 +30,6 @@
 
 namespace libdar
 {
-
 	// nothing more here, since pragma interface/implementation has been removed
 
 } // end of namespace

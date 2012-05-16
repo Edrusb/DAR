@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.cpp,v 1.9.2.2 2004/07/25 20:38:04 edrusb Exp $
+// $Id: tuyau.cpp,v 1.19 2004/12/07 18:04:52 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -69,30 +69,30 @@ using namespace std;
 namespace libdar
 {
 
-    tuyau::tuyau(S_I fd) : generic_file(generic_file_get_mode(fd))
+    tuyau::tuyau(user_interaction & dialog, S_I fd) : generic_file(dialog, generic_file_get_mode(fd))
     {
         if(filedesc < 0)
-            throw Erange("tuyau::tuyau", "bad file descriptor given");
+            throw Erange("tuyau::tuyau", gettext("Bad file descriptor given"));
         filedesc = fd;
         position = 0;
         chemin = "";
     }
 
-    tuyau::tuyau(S_I fd, gf_mode mode) : generic_file(mode)
+    tuyau::tuyau(user_interaction & dialog, S_I fd, gf_mode mode) : generic_file(dialog, mode)
     {
         gf_mode tmp;
 
         if(filedesc < 0)
-            throw Erange("tuyau::tuyau", "bad file descriptor given");
+            throw Erange("tuyau::tuyau", gettext("Bad file descriptor given"));
         tmp = generic_file_get_mode(fd);
         if(tmp != gf_read_write && tmp != mode)
-            throw Erange("tuyau::tuyau", generic_file_get_name(tmp)+" cannot be restricted to "+generic_file_get_name(mode));
+            throw Erange("tuyau::tuyau", tools_printf(gettext("%s cannot be restricted to %s"), generic_file_get_name(tmp), generic_file_get_name(mode)));
         filedesc = fd;
         position = 0;
         chemin = "";
     }
 
-    tuyau::tuyau(const string & filename, gf_mode mode) : generic_file(mode)
+    tuyau::tuyau(user_interaction & dialog, const string & filename, gf_mode mode) : generic_file(dialog, mode)
     {
         chemin = filename;
         position = 0;
@@ -102,19 +102,19 @@ namespace libdar
     bool tuyau::skip(const infinint & pos)
     {
         if(pos != position)
-            throw Erange("tuyau::skip", "skipping is not possible on a tuyau (= pipe)");
+            throw Erange("tuyau::skip", gettext("Skipping is not possible on a pipe"));
         return true;
     }
 
     bool tuyau::skip_to_eof()
     {
-        throw Erange("tuyau::skip", "skipping is not possible on a tuyau (= pipe)");
+        throw Erange("tuyau::skip", gettext("Skipping is not possible on a pipe"));
     }
 
     bool tuyau::skip_relative(S_I x)
     {
         if(x != 0)
-            throw Erange("tuyau::skip", "skipping is not possible on a tuyau (= pipe)");
+            throw Erange("tuyau::skip", gettext("Skipping is not possible on a pipe"));
         return true;
     }
 
@@ -123,6 +123,9 @@ namespace libdar
         S_I ret;
         U_I lu = 0;
 
+#ifdef MUTEX_WORKS
+	check_self_cancellation();
+#endif
         if(filedesc < 0)
             ouverture();
 
@@ -138,7 +141,7 @@ namespace libdar
                 case EIO:
                     throw Ehardware("tuyau::inherited_read", "");
                 default:
-                    throw Erange("tuyau::inherited_read", string("error while reading from pipe: ")+strerror(errno));
+                    throw Erange("tuyau::inherited_read", string(gettext("Error while reading from pipe: "))+strerror(errno));
                 }
             }
             else
@@ -155,6 +158,9 @@ namespace libdar
     {
         size_t total = 0;
 
+#ifdef MUTEX_WORKS
+	check_self_cancellation();
+#endif
         if(filedesc < 0)
             ouverture();
 
@@ -168,12 +174,12 @@ namespace libdar
                 case EINTR:
                     break;
                 case EIO:
-                    throw Ehardware("tuyau::inherited_write", string("Error writing data to pipe: ") + strerror(errno));
+                    throw Ehardware("tuyau::inherited_write", string(gettext("Error while writing data to pipe: ")) + strerror(errno));
                 case ENOSPC:
-                    user_interaction_pause("no space left on device, you have the oportunity to make room now. When ready : can we continue ?");
+                    get_gf_ui().pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
                     break;
                 default :
-                    throw Erange("tuyau::inherited_write", string("error while writing to pipe: ") + strerror(errno));
+                    throw Erange("tuyau::inherited_write", string(gettext("Error while writing data to pipe: ")) + strerror(errno));
                 }
             }
             else
@@ -186,7 +192,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tuyau.cpp,v 1.9.2.2 2004/07/25 20:38:04 edrusb Exp $";
+        static char id[]="$Id: tuyau.cpp,v 1.19 2004/12/07 18:04:52 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -215,7 +221,7 @@ namespace libdar
                 }
                 filedesc = ::open(ch, flag|O_BINARY);
                 if(filedesc < 0)
-                    throw Erange("tuyau::ouverture", string("Error openning pipe: ")+strerror(errno));
+                    throw Erange("tuyau::ouverture", string(gettext("Error openning pipe: "))+strerror(errno));
             }
             catch(...)
             {

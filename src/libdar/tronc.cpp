@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.cpp,v 1.7.2.2 2004/07/25 20:38:04 edrusb Exp $
+// $Id: tronc.cpp,v 1.14 2004/07/31 17:45:25 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -50,7 +50,7 @@ char *strchr (), *strrchr ();
 namespace libdar
 {
 
-    tronc::tronc(generic_file *f, const infinint & offset, const infinint &size) : generic_file(f->get_mode())
+    tronc::tronc(user_interaction & dialog, generic_file *f, const infinint & offset, const infinint &size) : generic_file(dialog, f->get_mode())
     {
         ref = f;
         sz = size;
@@ -58,7 +58,7 @@ namespace libdar
         current = size; // forces skipping the first time
     }
 
-    tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(mode)
+    tronc::tronc(user_interaction & dialog, generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(dialog, mode)
     {
         ref = f;
         sz = size;
@@ -138,7 +138,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tronc.cpp,v 1.7.2.2 2004/07/25 20:38:04 edrusb Exp $";
+        static char id[]="$Id: tronc.cpp,v 1.14 2004/07/31 17:45:25 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -183,7 +183,7 @@ namespace libdar
         {
             avail.unstack(macro_pas);
             if(macro_pas == 0 && wrote < size)
-                throw Erange("tronc::inherited_write", "tried to write out of size limited file");
+                throw Erange("tronc::inherited_write", gettext("Tried to write out of size limited file"));
             micro_pas = size - wrote > macro_pas ? macro_pas : size - wrote;
             ret = ref->write(a+wrote, micro_pas);
             if( ret > 0)

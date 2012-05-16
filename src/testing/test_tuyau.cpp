@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tuyau.cpp,v 1.5.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_tuyau.cpp,v 1.8 2004/06/20 14:26:27 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -67,8 +67,8 @@ using namespace libdar;
 static const unsigned int buffer_size = 10000;
 static bool xmit = true;
 
-static int little_main(int argc, char *argv[], const char **env);
-static void action_xmit(tuyau *in, tuyau *out, U_32 duration);
+static int little_main(user_interaction & dialog, int argc, char *argv[], const char **env);
+static void action_xmit(user_interaction & dialog, tuyau *in, tuyau *out, U_32 duration);
 static void action_loop(tuyau *in, tuyau *out);
 static void stop_xmit(int l);
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     return dar_suite_global(argc, argv, NULL, &little_main);
 }
 
-static int little_main(int argc, char *argv[], const char **env)
+static int little_main(user_interaction & dialog, int argc, char *argv[], const char **env)
 {
     tuyau *in = NULL, *out = NULL;
     U_32 duration;
@@ -85,24 +85,23 @@ static int little_main(int argc, char *argv[], const char **env)
     shell_interaction_change_non_interactive_output(&cout);
     if(argc != 4)
     {
-        ui_printf("usage : %s <input> <output> <seconds>\n", argv[0]);
-        ui_printf("usage : %s <input> <output> loop\n", argv[0]);
-        shell_interaction_close();
+        dialog.printf("usage : %s <input> <output> <seconds>\n", argv[0]);
+        dialog.printf("usage : %s <input> <output> loop\n", argv[0]);
         return 0;
     }
 
-    tools_open_pipes(argv[1], argv[2], in, out);
+    tools_open_pipes(dialog, argv[1], argv[2], in, out);
     if(strcmp(argv[3],"loop") == 0)
         action_loop(in, out);
     else
     {
         duration = atol(argv[3]);
-        action_xmit(in, out, duration);
+        action_xmit(dialog, in, out, duration);
     }
     return 0;
 }
 
-static void action_xmit(tuyau *in, tuyau *out, U_32 duration)
+static void action_xmit(user_interaction & dialog, tuyau *in, tuyau *out, U_32 duration)
 {
     char out_buffer[buffer_size];
     char in_buffer[buffer_size];
@@ -135,17 +134,17 @@ static void action_xmit(tuyau *in, tuyau *out, U_32 duration)
                 lu++;
         if(lu > 0)
         {
-            ui_printf("ERROR: on %d bytes transfered %d byte(s) had error\n", buffer_size, lu);
+            dialog.printf("ERROR: on %d bytes transfered %d byte(s) had error\n", buffer_size, lu);
             xmit_error = true;
         }
     }
 
     if(xmit_error)
-        ui_printf("TEST FAILED: some transmission error occured\n");
+        dialog.printf("TEST FAILED: some transmission error occured\n");
     else
-        ui_printf("TEST PASSED SUCCESSFULLY\n");
+        dialog.printf("TEST PASSED SUCCESSFULLY\n");
 
-    ui_printf("you can stop the loop instance with Control-C\n");
+    dialog.printf("you can stop the loop instance with Control-C\n");
 }
 
 static void stop_xmit(int l)

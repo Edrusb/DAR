@@ -4,113 +4,139 @@
 
 
 Here are presented the various command-line option for the configure script.
-For an exhaustive list use:
+For an exhaustive list of options use:
 
         ./configure --help
 
 General Options:
+-----------------
 
         --prefix=<path>    which allows you to define where dar program will
                            be installed (/usr/local by default)
         --disable-static   do not build static library (activated by default)
         --disable-shared   do not build dynamic library (activated by default)
 
-Dar specific options:
-They take the form of --enable-xxx or --disable-xxx where xxx is the name of
-the feature. Some features need an argument, which must be provided this way:
+Dar specific options (see details in next paragraph):
+----------------------
 
-        --enable-os-bits=32
+optimization options:
+  --enable-mode
 
-some features are activated by default, thus the --enable-xxx form is useless,
-the --disable-xxx has to be used instead to overcome the default settings.
+deactivation options:
+  --disable-largefile
+  --disable-ea-support
+  --disable-nodump-flag
+  --disable-dar-static
+  --disable-special-alloc
+  --disable-upx
+  --disable-gnugetopt
+  --disable-libdl-test
+  --disable-thread-safe
+  --disable-libz-linking
+  --disable-libbz2-linking
+  --disable-libcrypto-linking
+  --disable-build-html
 
-to simplify the document each option will be referred by a letter, those
-preceded by a 'x' are activated by default:
+troobleshooting options:
+  --enable-os-bits
 
-x A ...... largefile
-  B ...... ea-support
-x C ...... nodump-flag
-  D ...... examples
-  E ...... os-bits
-x F ...... dar-static
-  G ...... mode
-x H ...... special-alloc
-  I ...... debug
-  J ...... pedantic
-  K ...... build-usage
-  L ...... test-memory
-x M ...... upx
-x N ...... gnugetopt
-x O ...... libdl-test
+debugging options:
+  --enable-examples
+  --enable-debug
+  --enable-pedantic
+  --enable-build-usage
+  --enable-test-memory
+  --enable-profiling
 
-I, J, K and L are debugging options and should not be set for normal use.
+Description
+--------------
 
-A : if set and if the system allows it, dar will be able to handle file of
-    size larger than 4GB
-B : if set, makes dar ready to save and restore Extended Attributes
-    (see doc/NOTES paragraphs I and V)
-C : if set, makes dar able to take care of the nodump-flag
-    (activates the dar's --nodump option)
-D : if set, example program based on infinint are also built
-E : if set, dar uses the given argument (32 or 64) to determine which integer
-    type to use. This much match your CPU register size. By default dar uses
-    the system stdint.h file to determine the correct integer type to use
-F : if set, builds dar_static binary (statically linked version of dar)
-G : if set, replace infinint by 32 or 64 bits integers. This makes a faster
+  --enable-mode=32 or --enable-mode=64
+    if set, replace infinint by 32 or 64 bits integers. This makes a faster
     executable and less fond of memory, but with several restrictions (about
     for example ability to handle large files, or high dates. See
-    doc/LIMITATIONS for more),
-H : if set, use special memory allocation, adapted when a lot of little piece
-    of memory are allocated (improves dar's executable speed)
-I : if set, use debug compilation option, and if possible statically link
+    doc/LIMITATIONS for more)
+
+
+  --disable-largefile
+    whatever your system is, dar will be able to handle file of
+    size larger than 4GB
+
+  --disable-ea-support
+    whatever your system is, dar will not be able to save or restore
+    Extended Attributes (see doc/NOTES paragraphs I and V)
+
+  --disable-nodump-flag
+    whatever your system is, dar will not be able to take care of the
+    nodump-flag (thanks to the --nodump option)
+
+  --disable-dar-static
+    dar_static binary (statically linked version of dar) will not be built
+
+  --disable-special-alloc
+    dar uses a special allocation scheme by default (gather the many small
+    allocations in big fewer ones), this improves dar's execution speed
+
+  --disable-upx
+    if upx is found in the PATH, binary are upx compressed at installation
+    step. This can be disabled by this option.
+
+  --disable-gnugetopt
+    on non GNU systems (Solaris, etc.) configure looks for libgnugetopt
+    to have the long options support thanks to the gnu getopt_long() call,
+    this can be disabled.
+
+  --disable-libdl-test
+    some system lack statically linked library (like libdl), which forbids
+    building dar_static. If configure fails building a statically linked binary
+    that relies on libdl, it disabled dar_static. You can disable this security
+    check, but don't complain if you get error messages at compilation time.
+
+  --disable-thread-safe
+    libdar may need POSIX mutex to be thread safe. If you don't wan't libdar
+    relaying on POSIX mutex even if they are available, use this option.
+    The resulting library may not be thread safe. It will always be thread
+    safe if you use --disable-special-alloc, and it will never be thread safe
+    if --enable-test-memory is used.
+
+  --disable-libz-linking
+    disable linking to libz, thus -z option (gzip compression) will not
+    be available
+
+  --disable-libbz2-linking
+    disable linking to libbz2, thus -z option (libbz2 compression)
+    will not be available
+
+  --disable-libcrypto-linking
+    disable linking with openssl's libcrypto library. Strong encryption
+    will not be available
+
+  --enable-os-bits=32 or --enable-os-bits=64
+    if set, dar uses the given argument (32 or 64) to determine which integer
+    type to use. This much match your CPU register size. By default dar uses
+    the system <stdint.h> file to determine the correct integer type to use
+
+
+  --enable-examples
+    if set, example program based on infinint are also built
+
+  --enable-debug
+    if set, use debug compilation option, and if possible statically link
     binaries
-J : if set, transmits the -pedantic option to the compiler
-K : if set, rebuild usage files (requires libxml2)
-L : if set, wrap memory allocation routine to track memory leakage (makes a
+
+  --enable-pedantic
+    if set, transmits the -pedantic option to the compiler
+
+  --enable-build-usage
+    if set, rebuild usage files (requires libxml2)
+
+  --enable-test-memory
+    if set, wrap memory allocation routine to track memory leakage (makes a
     very slow executable)
-M : if set, look for UPX command, and if found compresses library and executables,
-    if no upx is found, does the same as if the option is not given.
-N : if set (default), looks for libgnugetopt and use the gnu getopt_long()
-    call.
-O : if configure cannot find a static version of libdl, it disables the building
-    of dar_static. Disable this option at your own risk and don't complain if
-    dar_static compilation fails.
 
-For version 2.1.x (N option in 2.1.2 appeared to fix a bug)
------------------------------
-legend: ! = option available for that system
-        . = option Not available for that system
-(free inspiration from the Cisco ping command output)
+  --disable-build-html
+    don't built the HTML programming documentation (under/doc/html). This is usually
+    done if doxygen is available.
 
- System \ option   |  A B C D E F G H I J K L M N O
-enabled by default:|  x   x     x   x         x x x
-----------------------------------------------------
-Linux              |  ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! long options supported
-Solaris 8          |  ! . . ! ! . ! ! ! ! ! ! ! ! ! long options supported with libgnugetopt
-FreeBSD            |  ! . . ! ! . ! ! ! ! ! ! ! ! ! long options supported with libgnugetopt
-Cygwin             |  ! . . ! ! . ! ! ! ! ! ! ! ! ! long options supported
-NetBSD             |  ! . . ! ! . ! ! ! ! ! ! ! ! ! long options supported with libgnugetopt
-
-Consequences:
-
-For Linux
-----------
-All option available
-
-        ./configure [...]
-
-
-For Solaris, FreeBSD, NetBSD and Cygwin,
----------------
-configure will detect that two options cannot be activated (C and F) and
-thus will just show a warning. On theses system,
-
-        ./configure [...]
-is equivalent to
-        ./configure --disable-nodump-flag --disable-dar-static [...]
-both work the same.
-
-if libgnugetopt library is present and the include file <getopt.h> is also available
-configure will use this library to link against long options will be available in
-resulting dar executable.
-
+  --enable-profiling
+    enable executable profiling

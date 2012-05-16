@@ -1,9 +1,8 @@
-	ui_printf("\n");
-	ui_printf("Common options:\n");
-	ui_printf("   -i <named pipe> use the given pipe instead of standard input to read orders\n");
-	ui_printf("\t\t   from dar\n");
-	ui_printf("   -o <named pipe> use the given pipe instead of standard output to write data\n");
-	ui_printf("\t\t   to dar\n");
-	ui_printf("   -E <string>\t   command line to execute between slices of the archive\n");
-	ui_printf("\n");
-	ui_printf("See man page for more details.\n");
+	dialog.printf(gettext("\n"));
+	dialog.printf(gettext("Common options:\n"));
+	dialog.printf(gettext("   -i <named pipe> pipe to use instead of std input to read orders from dar\n"));
+	dialog.printf(gettext("   -o <named pipe> pipe to use instead of std output to write data to dar\n"));
+	dialog.printf(gettext("   -E <string>\t   command line to execute between slices of the archive\n"));
+	dialog.printf(gettext("   -j\t\t   ask user what to do when memory is exhausted\n"));
+	dialog.printf(gettext("\n"));
+	dialog.printf(gettext("See man page for more details.\n"));

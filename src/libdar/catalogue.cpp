@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.18.2.4 2004/09/10 20:15:27 edrusb Exp $
+// $Id: catalogue.cpp,v 1.35 2005/01/28 23:27:55 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -34,6 +34,10 @@ extern "C"
 
 #if HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif
+
+#if HAVE_ARPA_INET_H
+#include <arpa/inet.h>
 #endif
 
 #ifdef STDC_HEADERS
@@ -54,19 +58,20 @@ extern "C"
 
 #include <algorithm>
 #include <map>
-#include "tools.hpp"
 #include "catalogue.hpp"
+#include "tools.hpp"
 #include "tronc.hpp"
 #include "user_interaction.hpp"
 #include "deci.hpp"
 #include "header.hpp"
+#include "cache.hpp"
 
 #define INODE_FLAG_EA_MASK  0x03
 #define INODE_FLAG_EA_FULL  0x01
 #define INODE_FLAG_EA_PART  0x02
 #define INODE_FLAG_EA_NONE  0x03
 
-#define REMOVE_TAG "[     REMOVED       ]"
+#define REMOVE_TAG gettext("[     REMOVED       ]")
 
 #define SAVED_FAKE_BIT 0x80
 
@@ -74,8 +79,6 @@ using namespace std;
 
 namespace libdar
 {
-    static dar_version reading_ver = "00"; // version not set here
-
     static string local_perm(const inode & ref);
     static string local_uid(const inode & ref);
     static string local_gid(const inode & ref);
@@ -83,11 +86,6 @@ namespace libdar
     static string local_date(const inode & ref);
     static string local_flag(const inode & ref);
     static bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & saved);
-
-    void catalogue_set_reading_version(const dar_version &ver)
-    {
-        version_copy(reading_ver, ver);
-    }
 
     unsigned char mk_signature(unsigned char base, saved_status state)
     {
@@ -176,29 +174,27 @@ namespace libdar
         }
     }
 
-    void entree_stats::listing() const
+    void entree_stats::listing(user_interaction & dialog) const
     {
-        ui_printf("\nCATALOGUE CONTENTS :\n\n");
-        ui_printf("total number of inode : %i\n", &total);
-        ui_printf("saved inode           : %i\n", &saved);
-        ui_printf("distribution of inodes\n");
-        ui_printf(" - directories        : %i\n", &num_d);
-        ui_printf(" - plain files        : %i\n", &num_f);
-        ui_printf(" - symbolic links     : %i\n", &num_l);
-        ui_printf(" - named pipes        : %i\n", &num_p);
-        ui_printf(" - unix sockets       : %i\n", &num_s);
-        ui_printf(" - character devices  : %i\n", &num_c);
-        ui_printf(" - block devices      : %i\n", &num_b);
-        ui_printf("hard links informations\n");
-        ui_printf("   number of file inode with hard links : %i\n", &num_hard_linked_inodes);
-        ui_printf("   total number of hard links           : %i\n", &num_hard_link_entries);
-        ui_printf("destroyed entries informations\n");
-        ui_printf("   %i file(s) have been record as destroyed since backup of reference\n\n", &num_x);
+        dialog.printf(gettext("\nCATALOGUE CONTENTS :\n\n"));
+        dialog.printf(gettext("total number of inode : %i\n"), &total);
+        dialog.printf(gettext("saved inode           : %i\n"), &saved);
+        dialog.printf(gettext("distribution of inodes\n"));
+        dialog.printf(gettext(" - directories        : %i\n"), &num_d);
+        dialog.printf(gettext(" - plain files        : %i\n"), &num_f);
+        dialog.printf(gettext(" - symbolic links     : %i\n"), &num_l);
+        dialog.printf(gettext(" - named pipes        : %i\n"), &num_p);
+        dialog.printf(gettext(" - unix sockets       : %i\n"), &num_s);
+        dialog.printf(gettext(" - character devices  : %i\n"), &num_c);
+        dialog.printf(gettext(" - block devices      : %i\n"), &num_b);
+        dialog.printf(gettext("hard links informations\n"));
+        dialog.printf(gettext("   number of file inode with hard links : %i\n"), &num_hard_linked_inodes);
+        dialog.printf(gettext("   total number of hard links           : %i\n"), &num_hard_link_entries);
+        dialog.printf(gettext("destroyed entries informations\n"));
+        dialog.printf(gettext("   %i file(s) have been record as destroyed since backup of reference\n\n"), &num_x);
     }
 
-    map <infinint, file_etiquette *> entree::corres;
-
-    entree *entree::read(generic_file & f, entree_stats & stats)
+    entree *entree::read(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, entree_stats & stats, std::map <infinint, file_etiquette *> & corres, compression default_algo, generic_file *data_loc)
     {
         char type;
         saved_status saved;
@@ -214,39 +210,39 @@ namespace libdar
             return ret;
 
         if(!extract_base_and_status((unsigned char)type, (unsigned char &)type, saved))
-            throw Erange("entree::read", "corrupted file");
+            throw Erange("entree::read", gettext("corrupted file"));
 
         switch(type)
         {
         case 'f':
-            ret = new file(f, saved);
+            ret = new file(dialog, f, reading_ver, saved, default_algo, data_loc);
             break;
         case 'l':
-            ret = new lien(f, saved);
+            ret = new lien(dialog, f, reading_ver, saved);
             break;
         case 'c':
-            ret = new chardev(f, saved);
+            ret = new chardev(dialog, f, reading_ver, saved);
             break;
         case 'b':
-            ret = new blockdev(f, saved);
+            ret = new blockdev(dialog, f, reading_ver, saved);
             break;
         case 'p':
-            ret = new tube(f, saved);
+            ret = new tube(dialog, f, reading_ver, saved);
             break;
         case 's':
-            ret = new prise(f, saved);
+            ret = new prise(dialog, f, reading_ver, saved);
             break;
         case 'd':
-            ret = new directory(f, saved, stats);
+            ret = new directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc);
             break;
         case 'z':
             if(saved != s_saved)
-                throw Erange("entree::read", "corrupted file");
+                throw Erange("entree::read", gettext("corrupted file"));
             ret = new eod(f);
             break;
         case 'x':
             if(saved != s_saved)
-                throw Erange("entree::read", "corrupted file");
+                throw Erange("entree::read", gettext("corrupted file"));
             ret = new detruit(f);
             break;
         case 'h':
@@ -259,11 +255,11 @@ namespace libdar
             else
             {
                 delete ptr_l;
-                throw Erange("entree::read", "corrupted file");
+                throw Erange("entree::read", gettext("corrupted file"));
             }
             break;
         case 'e':
-            ret = ptr_e = new file_etiquette(f, saved);
+            ret = ptr_e = new file_etiquette(dialog, f, reading_ver, saved, default_algo, data_loc);
             if(ret == NULL)
                 throw Ememory("entree::read");
             if(corres.find(ptr_e->get_etiquette()) != corres.end())
@@ -271,14 +267,14 @@ namespace libdar
             corres[ptr_e->get_etiquette()] = ptr_e;
             break;
         default :
-            throw Erange("entree::read", "unknown type of data in catalogue");
+            throw Erange("entree::read", gettext("unknown type of data in catalogue"));
         }
 
         stats.add(ret);
         return ret;
     }
 
-    void entree::dump(generic_file & f) const
+    void entree::dump(user_interaction & dialog, generic_file & f) const
     {
         char s = signature();
         f.write(&s, 1);
@@ -304,20 +300,16 @@ namespace libdar
         tools_read_string(f, xname);
     }
 
-    void nomme::dump(generic_file & f) const
+    void nomme::dump(user_interaction & dialog, generic_file & f) const
     {
-        entree::dump(f);
+        entree::dump(dialog, f);
         tools_write_string(f, xname);
     }
-
-    generic_file *inode::storage = NULL;
-
-    bool inode::ignore_owner = false;
 
     inode::inode(U_16 xuid, U_16 xgid, U_16 xperm,
                  const infinint & last_access,
                  const infinint & last_modif,
-                 const string & xname) : nomme(xname)
+                 const string & xname, const infinint & fs_device) : nomme(xname)
     {
         uid = xuid;
         gid = xgid;
@@ -331,6 +323,8 @@ namespace libdar
         last_mod = NULL;
         ea_offset = NULL;
         last_cha = NULL;
+	fs_dev = NULL;
+	storage = NULL;
 
         try
         {
@@ -340,6 +334,7 @@ namespace libdar
             last_cha = new infinint(0);
             if(last_acc == NULL || last_mod == NULL || ea_offset == NULL || last_cha == NULL)
                 throw Ememory("inde::inode");
+	    fs_dev = new infinint(fs_device);
         }
         catch(...)
         {
@@ -351,11 +346,13 @@ namespace libdar
                 delete ea_offset;
             if(last_cha != NULL)
                 delete last_cha;
+	    if(fs_dev != NULL)
+		delete fs_dev;
             throw;
         }
     }
 
-    inode::inode(generic_file & f, saved_status saved) : nomme(f)
+    inode::inode(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved) : nomme(f)
     {
         U_16 tmp;
         unsigned char flag;
@@ -378,41 +375,43 @@ namespace libdar
                 ea_saved = ea_none;
                 break;
             default:
-                throw Erange("inode::inode", "badly structured inode: unknown inode flag");
+                throw Erange("inode::inode", gettext("badly structured inode: unknown inode flag"));
             }
         }
         else
             ea_saved = ea_none;
 
         if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-            throw Erange("inode::inode", "missing data to build an inode");
+            throw Erange("inode::inode", gettext("missing data to build an inode"));
         uid = ntohs(tmp);
         if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-            throw Erange("inode::inode", "missing data to build an inode");
+            throw Erange("inode::inode", gettext("missing data to build an inode"));
         gid = ntohs(tmp);
         if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-            throw Erange("inode::inode", "missing data to build an inode");
+            throw Erange("inode::inode", gettext("missing data to build an inode"));
         perm = ntohs(tmp);
 
         last_acc = NULL;
         last_mod = NULL;
         last_cha = NULL;
         ea_offset = NULL;
+	fs_dev = NULL;
         try
         {
-            last_acc = new infinint(NULL, &f);
-            last_mod = new infinint(NULL, &f);
+	    fs_dev = new infinint(0); // the filesystemID is not saved in archive
+            last_acc = new infinint(dialog, NULL, &f);
+            last_mod = new infinint(dialog, NULL, &f);
             if(last_acc == NULL || last_mod == NULL)
                 throw Ememory("inode::inode(file)");
 
             switch(ea_saved)
             {
             case ea_full:
-                ea_offset = new infinint(NULL, &f);
+                ea_offset = new infinint(dialog, NULL, &f);
                 if(ea_offset == NULL)
                     throw Ememory("inode::inode(file)");
                 f.read((char *)ea_crc, CRC_SIZE);
-                last_cha = new infinint(NULL, &f);
+                last_cha = new infinint(dialog, NULL, &f);
                 if(last_cha == NULL)
                     throw Ememory("inode::inode(file)");
                 break;
@@ -421,7 +420,7 @@ namespace libdar
                 if(ea_offset == NULL)
                     throw Ememory("inode::inode(file)");
                 clear(ea_crc);
-                last_cha = new infinint(NULL, &f);
+                last_cha = new infinint(dialog, NULL, &f);
                 if(last_cha == NULL)
                     throw Ememory("inode::inode(file)");
                 break;
@@ -452,6 +451,9 @@ namespace libdar
                 delete last_cha;
             if(ea_offset != NULL)
                 delete ea_offset;
+	    if(fs_dev != NULL)
+		delete fs_dev;
+	    throw;
         }
     }
 
@@ -462,16 +464,19 @@ namespace libdar
         perm = ref.perm;
         xsaved = ref.xsaved;
         ea_saved = ref.ea_saved;
+	storage = ref.storage;
 
         last_acc = NULL;
         last_mod = NULL;
         last_cha = NULL;
         ea_offset = NULL;
         ea = NULL;
+	fs_dev = NULL;
         try
         {
             last_acc = new infinint(*ref.last_acc);
             last_mod = new infinint(*ref.last_mod);
+	    fs_dev = new infinint(*ref.fs_dev);
             if(last_acc == NULL || last_mod == NULL)
                 throw Ememory("inode::inode(inode)");
 
@@ -526,6 +531,8 @@ namespace libdar
                 delete ea_offset;
             if(last_cha != NULL)
                 delete last_cha;
+	    if(fs_dev != NULL)
+		delete fs_dev;
             throw;
         }
     }
@@ -542,6 +549,8 @@ namespace libdar
             delete ea_offset;
         if(last_cha != NULL)
             delete last_cha;
+	if(fs_dev != NULL)
+	    delete fs_dev;
     }
 
     bool inode::same_as(const inode & ref) const
@@ -549,7 +558,7 @@ namespace libdar
         return nomme::same_as(ref) && compatible_signature(ref.signature(), signature());
     }
 
-    bool inode::is_more_recent_than(const inode & ref, const infinint & hourshift) const
+    bool inode::is_more_recent_than(const inode & ref, const infinint & hourshift, bool ignore_owner) const
     {
         bool more_recent = (!ignore_owner && uid != ref.uid)
             || (!ignore_owner && gid != ref.gid)
@@ -564,7 +573,7 @@ namespace libdar
         return more_recent;
     }
 
-    bool inode::has_changed_since(const inode & ref, const infinint & hourshift) const
+    bool inode::has_changed_since(const inode & ref, const infinint & hourshift, bool ignore_owner) const
     {
         return (hourshift > 0 ? ! is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod) : *ref.last_mod != *last_mod)
             || (!ignore_owner && uid != ref.uid)
@@ -572,17 +581,17 @@ namespace libdar
             || perm != ref.perm;
     }
 
-    void inode::compare(const inode &other, bool root_ea, bool user_ea) const
+    void inode::compare(user_interaction & dialog, const inode &other, bool root_ea, bool user_ea, bool ignore_owner) const
     {
         if(!same_as(other))
-            throw Erange("inode::compare","different file type");
+            throw Erange("inode::compare",gettext("different file type"));
         if(!ignore_owner && get_uid() != other.get_uid())
-            throw Erange("inode.compare", "different owner");
+            throw Erange("inode.compare", gettext("different owner"));
         if(!ignore_owner && get_gid() != other.get_gid())
-            throw Erange("inode.compare", "different owner group");
+            throw Erange("inode.compare", gettext("different owner group"));
         if(get_perm() != other.get_perm())
-            throw Erange("inode.compare", "different permission");
-        sub_compare(other);
+            throw Erange("inode.compare", gettext("different permission"));
+        sub_compare(dialog, other);
         if(root_ea || user_ea)
         {
             switch(ea_get_saved_status())
@@ -590,13 +599,13 @@ namespace libdar
             case ea_full:
                 if(other.ea_get_saved_status() == ea_full)
                 {
-                    const ea_attributs *me = get_ea(); // this pointer must not be freed
-                    const ea_attributs *you = other.get_ea(); // this pointer must not be freed too
+                    const ea_attributs *me = get_ea(dialog); // this pointer must not be freed
+                    const ea_attributs *you = other.get_ea(dialog); // this pointer must not be freed too
                     if(me->diff(*you, root_ea, user_ea))
-                        throw Erange("inode::compare", "different Extended Attributes");
+                        throw Erange("inode::compare", gettext("different Extended Attributes"));
                 }
                 else
-                    throw Erange("inode::compare", "no Extended Attributs to compare with");
+                    throw Erange("inode::compare", gettext("no Extended Attributs to compare with"));
                     // else we ignore the EA present in the argument,
                     // this is not a symetrical comparison
                     // we check that all data in current object are the same in the argument
@@ -606,10 +615,10 @@ namespace libdar
                 if(other.ea_get_saved_status() != ea_none)
                 {
                     if(get_last_change() < other.get_last_change())
-                        throw Erange("inode::compare", "inode last change date (ctime) greater, EA might be different");
+                        throw Erange("inode::compare", gettext("inode last change date (ctime) greater, EA might be different"));
                 }
                 else
-                    throw Erange("inode::compare", "No extended Attributs to compare with");
+                    throw Erange("inode::compare", gettext("No extended Attributs to compare with"));
                 break;
             case ea_none:
                 break;
@@ -619,7 +628,7 @@ namespace libdar
         }
     }
 
-    void inode::dump(generic_file & r) const
+    void inode::dump(user_interaction & dialog, generic_file & r) const
     {
         U_16 tmp;
         unsigned char flag = 0;
@@ -638,7 +647,7 @@ namespace libdar
         default:
             throw SRC_BUG; // unknown value for ea_saved
         }
-        nomme::dump(r);
+        nomme::dump(dialog, r);
 
         r.write((char *)(&flag), 1);
         tmp = htons(uid);
@@ -711,7 +720,7 @@ namespace libdar
             throw SRC_BUG;
     }
 
-    const ea_attributs *inode::get_ea() const
+    const ea_attributs *inode::get_ea(user_interaction & dialog) const
     {
         if(ea_saved == ea_full)
             if(ea != NULL)
@@ -724,7 +733,7 @@ namespace libdar
                     storage->reset_crc();
                     try
                     {
-                        const_cast<ea_attributs *&>(ea) = new ea_attributs(*storage);
+                        const_cast<ea_attributs *&>(ea) = new ea_attributs(dialog, *storage);
                         if(ea == NULL)
                             throw Ememory("inode::get_ea");
                     }
@@ -735,7 +744,7 @@ namespace libdar
                     }
                     storage->get_crc(val);
                     if(!same_crc(val, ea_crc))
-                        throw Erange("inode::get_ea", "CRC error detected while reading EA");
+                        throw Erange("inode::get_ea", gettext("CRC error detected while reading EA"));
                     return ea;
                 }
                 else
@@ -769,21 +778,20 @@ namespace libdar
             throw SRC_BUG;
     }
 
-    compression file::algo = none;
-    generic_file *file::loc = NULL;
-
     file::file(U_16 xuid, U_16 xgid, U_16 xperm,
                const infinint & last_access,
                const infinint & last_modif,
                const string & src,
                const path & che,
-               const infinint & taille) : inode(xuid, xgid, xperm, last_access, last_modif, src), chemin(che + src)
+               const infinint & taille, const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, src, fs_device), chemin(che + src)
     {
         status = from_path;
         set_saved_status(s_saved);
         offset = NULL;
         size = NULL;
         storage_size = NULL;
+	loc = NULL; // field not used for backup
+	algo = none; // field not used for backup
         try
         {
             offset = new infinint(0);
@@ -804,26 +812,29 @@ namespace libdar
         }
     }
 
-    file::file(generic_file & f, saved_status saved) : inode(f, saved), chemin("vide")
+    file::file(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved,
+	       compression default_algo, generic_file *data_loc) : inode(dialog, f, reading_ver, saved), chemin("vide")
     {
         status = from_cat;
         size = NULL;
         offset = NULL;
         storage_size = NULL;
+	algo = default_algo; // only used for archive format "03" and older
+	loc = data_loc;
         try
         {
-            size = new infinint(NULL, &f);
+            size = new infinint(dialog, NULL, &f);
             if(size == NULL)
                 throw Ememory("file::file(generic_file)");
 
             if(saved == s_saved)
             {
-                offset = new infinint(NULL, &f);
+                offset = new infinint(dialog, NULL, &f);
                 if(offset == NULL)
                     throw Ememory("file::file(generic_file)");
                 if(version_greater(reading_ver, "01"))
                 {
-                    storage_size = new infinint(NULL, &f);
+                    storage_size = new infinint(dialog, NULL, &f);
                     if(storage_size == NULL)
                         throw Ememory("file::file(generic_file)");
                 }
@@ -846,9 +857,15 @@ namespace libdar
                 if(offset == NULL || storage_size == NULL)
                     throw Ememory("file::file(generic_file)");
             }
+
             if(version_greater(reading_ver, "01"))
+	    {
                 if(f.read(check, CRC_SIZE) != CRC_SIZE)
-                    throw Erange("file::file", "can't read CRC data");
+                    throw Erange("file::file", gettext("can't read CRC data"));
+		available_crc = true;
+	    }
+	    else
+		available_crc = false;
         }
         catch(...)
         {
@@ -860,7 +877,11 @@ namespace libdar
     file::file(const file & ref) : inode(ref), chemin(ref.chemin)
     {
         status = ref.status;
-        copy_crc(check, ref.check);
+	available_crc = ref.available_crc;
+	loc = ref.loc;
+	algo = ref.algo;
+	if(available_crc)
+	    copy_crc(check, ref.check);
         try
         {
             offset = new infinint(*ref.offset);
@@ -886,9 +907,9 @@ namespace libdar
             delete storage_size;
     }
 
-    void file::dump(generic_file & f) const
+    void file::dump(user_interaction & dialog, generic_file & f) const
     {
-        inode::dump(f);
+        inode::dump(dialog, f);
         size->dump(f);
         if(get_saved_status() == s_saved)
         {
@@ -896,39 +917,39 @@ namespace libdar
             storage_size->dump(f);
         }
         if(f.write((char *)check, CRC_SIZE) != CRC_SIZE)
-            throw Erange("file::dump", "cannot dump CRC data to file");
+            throw Erange("file::dump", gettext("cannot dump CRC data to file"));
     }
 
-    bool file::is_more_recent_than(const inode & ref, const infinint & hourshift) const
+    bool file::is_more_recent_than(const inode & ref, const infinint & hourshift, bool ignore_owner) const
     {
         const file *tmp = dynamic_cast<const file *>(&ref);
         if(tmp != NULL)
-            return inode::is_more_recent_than(*tmp, hourshift) || *size != *(tmp->size);
+            return inode::is_more_recent_than(*tmp, hourshift, ignore_owner) || *size != *(tmp->size);
         else
             throw SRC_BUG;
     }
 
-    bool file::has_changed_since(const inode & ref, const infinint & hourshift) const
+    bool file::has_changed_since(const inode & ref, const infinint & hourshift, bool ignore_owner) const
     {
         const file *tmp = dynamic_cast<const file *>(&ref);
         if(tmp != NULL)
-            return inode::has_changed_since(*tmp, hourshift) || *size != *(tmp->size);
+            return inode::has_changed_since(*tmp, hourshift, ignore_owner) || *size != *(tmp->size);
         else
             throw SRC_BUG;
     }
 
-    generic_file *file::get_data() const
+    generic_file *file::get_data(user_interaction & dialog) const
     {
         generic_file *ret;
 
         if(get_saved_status() != s_saved)
-            throw Erange("file::get_data", "cannot provide data from a \"not saved\" file object");
+            throw Erange("file::get_data", gettext("cannot provide data from a \"not saved\" file object"));
 
         if(status == empty)
-            throw Erange("file::get_data", "data has been cleaned, object is now empty");
+            throw Erange("file::get_data", gettext("data has been cleaned, object is now empty"));
 
         if(status == from_path)
-            ret = new fichier(chemin, gf_read_only);
+            ret = new fichier(dialog, chemin, gf_read_only);
         else
             if(loc == NULL)
                 throw SRC_BUG; // set_archive_localisation never called or with a bad argument
@@ -937,12 +958,12 @@ namespace libdar
                     throw SRC_BUG; // cannot get data from a write-only file !!!
                 else
                 {
-                    tronc *tmp = new tronc(loc, *offset, *storage_size == 0 ? *size : *storage_size, gf_read_only);
+                    tronc *tmp = new tronc(dialog, loc, *offset, *storage_size == 0 ? *size : *storage_size, gf_read_only);
                     if(tmp == NULL)
                         throw Ememory("file::get_data");
                     if(*size > 0 && *storage_size != 0)
                     {
-                        ret = new compressor(get_compression_algo_used(), tmp);
+                        ret = new compressor(dialog, get_compression_algo_used(), tmp);
                         if(ret == NULL)
                             delete tmp;
                     }
@@ -986,7 +1007,7 @@ namespace libdar
 
     bool file::get_crc(crc & c) const
     {
-        if(version_greater(reading_ver, "01"))
+        if(available_crc)
         {
             copy_crc(c, check);
             return true;
@@ -995,28 +1016,28 @@ namespace libdar
             return false;
     }
 
-    void file::sub_compare(const inode & other) const
+    void file::sub_compare(user_interaction & dialog, const inode & other) const
     {
         const file *f_other = dynamic_cast<const file *>(&other);
         if(f_other == NULL)
             throw SRC_BUG; // inode::compare should have called us with a correct argument
 
         if(get_size() != f_other->get_size())
-            throw Erange("file::sub_compare", "not same size");
+            throw Erange("file::sub_compare", gettext("not same size"));
         if(get_saved_status() == s_saved && f_other->get_saved_status() == s_saved)
         {
-            generic_file *me = get_data();
+            generic_file *me = get_data(dialog);
             if(me == NULL)
                 throw SRC_BUG;
             try
             {
-                generic_file *you = f_other->get_data();
+                generic_file *you = f_other->get_data(dialog);
                 if(you == NULL)
                     throw SRC_BUG;
                 try
                 {
                     if(me->diff(*you))
-                        throw Erange("file::sub_compare", "different file data");
+                        throw Erange("file::sub_compare", gettext("different file data"));
                 }
                 catch(...)
                 {
@@ -1034,53 +1055,40 @@ namespace libdar
         }
     }
 
-    infinint *file_etiquette::compteur = NULL;
-
     file_etiquette::file_etiquette(U_16 xuid, U_16 xgid, U_16 xperm,
                                    const infinint & last_access,
                                    const infinint & last_modif,
                                    const string & src,
                                    const path & che,
-                                   const infinint & taille) : file(xuid, xgid, xperm, last_access, last_modif, src, che, taille)
+                                   const infinint & taille,
+				   const infinint & fs_device,
+				   const infinint & etiquette_number) : file(xuid, xgid, xperm, last_access, last_modif, src, che, taille, fs_device)
     {
-        compteur_check();
-        etiquette = new infinint((*compteur)++);
+        etiquette = new infinint(etiquette_number);
         if(etiquette == NULL)
             throw Ememory("file_etiquette::file_etiquette");
     }
 
     file_etiquette::file_etiquette(const file_etiquette & ref) : file(ref)
     {
-        compteur_check();
         etiquette = new infinint(*ref.etiquette);
         if(etiquette == NULL)
             throw Ememory("file_etiquette::file_etiquette");
     }
 
-    file_etiquette::file_etiquette(generic_file &f, saved_status saved) : file(f, saved)
+    file_etiquette::file_etiquette(user_interaction & dialog,
+				   generic_file &f, const dar_version & reading_ver, saved_status saved,
+				   compression default_algo, generic_file *data_loc)
+	: file(dialog, f, reading_ver, saved, default_algo, data_loc)
     {
-        compteur_check();
-        etiquette = new infinint(NULL, &f);
+        etiquette = new infinint(dialog, NULL, &f);
         if(etiquette == NULL)
             throw Ememory("file_etiquette::file_etiquette(generic_file)");
-        if(*etiquette >= *compteur)
-            *compteur = *etiquette + 1;
     }
 
-    void file_etiquette::compteur_check()
+    void file_etiquette::dump(user_interaction & dialog, generic_file &f) const
     {
-        if(compteur == NULL)
-        {
-            compteur = new infinint;
-            if(compteur == NULL)
-                throw Ememory("file_etiquette::file_etiquette");
-            *compteur = 0;
-        }
-    }
-
-    void file_etiquette::dump(generic_file &f) const
-    {
-        file::dump(f);
+        file::dump(dialog, f);
         etiquette->dump(f);
     }
 
@@ -1096,9 +1104,9 @@ namespace libdar
         etiquette.read(f);
     }
 
-    void hard_link::dump(generic_file &f) const
+    void hard_link::dump(user_interaction & dialog, generic_file &f) const
     {
-        nomme::dump(f);
+        nomme::dump(dialog, f);
         get_etiquette().dump(f);
     }
 
@@ -1123,13 +1131,15 @@ namespace libdar
                const infinint & last_access,
                const infinint & last_modif,
                const string & name,
-               const string & target) : inode(uid, gid, perm, last_access, last_modif, name)
+               const string & target,
+	       const infinint & fs_device) : inode(uid, gid, perm, last_access, last_modif, name, fs_device)
     {
         points_to = target;
         set_saved_status(s_saved);
     }
 
-    lien::lien(generic_file & f, saved_status saved) : inode(f, saved)
+    lien::lien(user_interaction & dialog,
+	       generic_file & f, const dar_version & reading_ver, saved_status saved) : inode(dialog, f, reading_ver, saved)
     {
         if(saved == s_saved)
             tools_read_string(f, points_to);
@@ -1148,7 +1158,7 @@ namespace libdar
         points_to = x;
     }
 
-    void lien::sub_compare(const inode & other) const
+    void lien::sub_compare(user_interaction & dialog, const inode & other) const
     {
         const lien *l_other = dynamic_cast<const lien *>(&other);
         if(l_other == NULL)
@@ -1156,22 +1166,21 @@ namespace libdar
 
         if(get_saved_status() == s_saved && l_other->get_saved_status() == s_saved)
             if(get_target() != l_other->get_target())
-                throw Erange("lien:sub_compare", "symbolic link does not point to the same target");
+                throw Erange("lien:sub_compare", gettext("symbolic link does not point to the same target"));
     }
 
-    void lien::dump(generic_file & f) const
+    void lien::dump(user_interaction & dialog, generic_file & f) const
     {
-        inode::dump(f);
+        inode::dump(dialog, f);
         if(get_saved_status() == s_saved)
             tools_write_string(f, points_to);
     }
 
-    void (*(directory::tar_listing_callback))(const string & flag, const string & perm, const string & uid, const string & gid, const string & size, const string & date, const string & filename) = NULL;
-
     directory::directory(U_16 xuid, U_16 xgid, U_16 xperm,
                          const infinint & last_access,
                          const infinint & last_modif,
-                         const string & xname) : inode(xuid, xgid, xperm, last_access, last_modif, xname)
+                         const string & xname,
+			 const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, xname, fs_device)
     {
         parent = NULL;
         fils.clear();
@@ -1186,7 +1195,12 @@ namespace libdar
         it = fils.begin();
     }
 
-    directory::directory(generic_file & f, saved_status saved, entree_stats & stats) : inode(f, saved)
+    directory::directory(user_interaction & dialog,
+			 generic_file & f, const dar_version & reading_ver, saved_status saved,
+			 entree_stats & stats,
+			 std::map <infinint, file_etiquette *> & corres,
+			 compression default_algo,
+			 generic_file *data_loc) : inode(dialog, f, reading_ver, saved)
     {
         entree *p;
         nomme *t;
@@ -1201,7 +1215,7 @@ namespace libdar
         {
             while(fin == NULL)
             {
-                p = entree::read(f, stats);
+                p = entree::read(dialog, f, reading_ver, stats, corres, default_algo, data_loc);
                 if(p != NULL)
                 {
                     d = dynamic_cast<directory *>(p);
@@ -1216,7 +1230,7 @@ namespace libdar
                         throw SRC_BUG; // neither an eod nor a nomme ! what's that ???
                 }
                 else
-                    throw Erange("directory::directory", "missing data to build a directory");
+                    throw Erange("directory::directory", gettext("missing data to build a directory"));
             }
             delete fin; // no nead to keep it
         }
@@ -1232,19 +1246,19 @@ namespace libdar
         clear();
     }
 
-    void directory::dump(generic_file & f) const
+    void directory::dump(user_interaction & dialog, generic_file & f) const
     {
         vector<nomme *>::iterator x = const_cast<directory *>(this)->fils.begin();
-        inode::dump(f);
+        inode::dump(dialog, f);
         eod fin;
 
         while(x != fils.end())
             if(dynamic_cast<ignored *>(*x) != NULL)
                 x++; // "ignored" need not to be saved, they are only useful when updating_destroyed
             else
-                (*x++)->dump(f);
+                (*x++)->dump(dialog, f);
 
-        fin.dump(f); // end of "this" directory
+        fin.dump(dialog, f); // end of "this" directory
     }
 
     void directory::add_children(nomme *r)
@@ -1310,7 +1324,8 @@ namespace libdar
         it = fils.begin();
     }
 
-    void directory::listing(const mask &m, bool filter_unsaved, string marge) const
+    void directory::listing(user_interaction & dialog,
+			    const mask &m, bool filter_unsaved, string marge) const
     {
         vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
 
@@ -1328,7 +1343,7 @@ namespace libdar
                 if(det != NULL)
                 {
                     string tmp = (*it)->get_name();
-                    ui_printf("%S[ REMOVED ]    %S\n", &marge, &tmp);
+                    dialog.printf(gettext("%S[ REMOVED ]    %S\n"), &marge, &tmp);
                 }
                 else
                 {
@@ -1349,14 +1364,14 @@ namespace libdar
 			    string f = local_flag(*ino);
 			    string g = (*it)->get_name();
 
-			    ui_printf("%S%S\t%S\t%S\t%S\t%S\t%S\t%S\n", &marge, &a, &b, &c, &d, &e, &f, &g);
+			    dialog.printf("%S%S\t%S\t%S\t%S\t%S\t%S\t%S\n", &marge, &a, &b, &c, &d, &e, &f, &g);
 			}
                 }
 
                 if(d != NULL)
                 {
-                    d->listing(m, filter_unsaved, marge + "|  ");
-                    ui_printf("%S+---\n", &marge);
+                    d->listing(dialog, m, filter_unsaved, marge + "|  ");
+                    dialog.printf("%S+---\n", &marge);
                 }
             }
 
@@ -1364,14 +1379,15 @@ namespace libdar
         }
     }
 
-    void directory::tar_listing(const mask &m, bool filter_unsaved, const string & beginning) const
+    void directory::tar_listing(user_interaction & dialog,
+				const mask &m, bool filter_unsaved, const string & beginning) const
     {
         vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
         string sep = beginning == "" ? "" : "/";
 
         while(it != fils.end())
         {
-            const directory *d = dynamic_cast<directory *>(*it);
+            const directory *dir = dynamic_cast<directory *>(*it);
             const detruit *det = dynamic_cast<detruit *>(*it);
             const inode *ino = dynamic_cast<inode *>(*it);
             const hard_link *hard = dynamic_cast<hard_link *>(*it);
@@ -1383,10 +1399,10 @@ namespace libdar
                 if(det != NULL)
                 {
                     string tmp = (*it)->get_name();
-		    if(tar_listing_callback == NULL)
-			ui_printf("%s %S%S%S\n", REMOVE_TAG, &beginning, &sep, &tmp);
+		    if(dialog.get_use_listing())
+ 			dialog.listing(REMOVE_TAG, "xxxxxxxxxx", "", "", "", "", beginning+sep+tmp, false, false);
 		    else
-			(*tar_listing_callback)(REMOVE_TAG, "xxxxxxxxxx", "", "", "", "", beginning+sep+tmp);
+			dialog.printf("%s %S%S%S\n", REMOVE_TAG, &beginning, &sep, &tmp);
                 }
                 else
                 {
@@ -1407,17 +1423,17 @@ namespace libdar
 			    string f = local_flag(*ino);
 			    string g = (*it)->get_name();
 
-			    if(tar_listing_callback == NULL)
-				ui_printf("%S   %S   %S\t%S\t%S\t%S\t%S%S%S\n", &f, &a, &b, &c, &d, &e, &beginning, &sep, &g);
+			    if(dialog.get_use_listing())
+				dialog.listing(f, a, b, c, d, e, beginning+sep+g, dir != NULL, dir != NULL && dir->has_children());
 			    else
-				(*tar_listing_callback)(f, a, b, c, d, e, beginning+sep+g);
+				dialog.printf("%S   %S   %S\t%S\t%S\t%S\t%S%S%S\n", &f, &a, &b, &c, &d, &e, &beginning, &sep, &g);
 			}
 			// else do nothing
 		}
 	    }
 
-	    if(d != NULL)
-		d->tar_listing(m, filter_unsaved, beginning + sep + (*it)->get_name());
+	    if(dir != NULL)
+		dir->tar_listing(dialog, m, filter_unsaved, beginning + sep + (*it)->get_name());
 
 	    it++;
 	}
@@ -1439,7 +1455,7 @@ namespace libdar
             return false;
     }
 
-    bool directory::callback_for_children_of(const string & sdir) const
+    bool directory::callback_for_children_of(user_interaction & dialog, const string & sdir) const
     {
 	const directory *current = this;
 	const nomme *next_nom = NULL;
@@ -1450,12 +1466,15 @@ namespace libdar
 	bool loop = true;
 	nomme *tmp_nom;
 
+	if(!dialog.get_use_listing())
+	    throw Erange("directory::callback_for_children_of", gettext("listing() method must be given"));
+
 	if(sdir != "")
 	{
 	    path dir = sdir;
 
 	    if(!dir.is_relative())
-		throw Erange("directory::recursive_callback_for_children_of", "argument must be a relative path");
+		throw Erange("directory::callback_for_children_of", gettext("argument must be a relative path"));
 
 		///////////////////////////
 		// looking for the inner most directory (basename of given path)
@@ -1485,13 +1504,11 @@ namespace libdar
 	}
 
 	    ///////////////////////////
-	    // invoking callback for each element of the "current" directory
+	    // calling listing() for each element of the "current" directory
 	    //
 
 	if(current == NULL)
 	    throw SRC_BUG;
-	if(tar_listing_callback == NULL)
-	    throw Erange("directory::recursive_callback_for_children_of", "tar callback not set");
 
 	loop = false; // loop now serves as returned value
 
@@ -1500,6 +1517,7 @@ namespace libdar
 	{
 	    next_ino = dynamic_cast<const inode *>(next_nom);
 	    next_detruit = dynamic_cast<const detruit *>(next_nom);
+	    next_dir = dynamic_cast<const directory *>(next_nom);
 	    if(next_ino != NULL)
 	    {
 		 string a = local_perm(*next_ino);
@@ -1509,14 +1527,14 @@ namespace libdar
 		 string e = local_date(*next_ino);
 		 string f = local_flag(*next_ino);
 		 string g = next_ino->get_name();
-		 (*tar_listing_callback)(f,a,b,c,d,e,g);
+		 dialog.listing(f,a,b,c,d,e,g, next_dir != NULL, next_dir != NULL && next_dir->has_children());
 		 loop = true;
 	    }
 	    else
 		if(next_detruit != NULL)
 		{
 		    string a = next_detruit->get_name();
-		    (*tar_listing_callback)(REMOVE_TAG, "xxxxxxxxxx", "", "", "", "", a);
+		    dialog.listing(REMOVE_TAG, "xxxxxxxxxx", "", "", "", "", a, false, false);
 		    loop = true;
 		}
 		else
@@ -1531,33 +1549,35 @@ namespace libdar
                    const infinint & last_modif,
                    const string & name,
                    U_16 major,
-                   U_16 minor) : inode(uid, gid, perm, last_access, last_modif, name)
+                   U_16 minor,
+		   const infinint & fs_dev) : inode(uid, gid, perm, last_access, last_modif, name, fs_dev)
     {
         xmajor = major;
         xminor = minor;
         set_saved_status(s_saved);
     }
 
-    device::device(generic_file & f, saved_status saved) : inode(f, saved)
+    device::device(user_interaction & dialog,
+		   generic_file & f,  const dar_version & reading_ver, saved_status saved) : inode(dialog, f, reading_ver, saved)
     {
         U_16 tmp;
 
         if(saved == s_saved)
         {
             if(f.read((char *)&tmp, (size_t)sizeof(tmp)) != sizeof(tmp))
-                throw Erange("special::special", "missing data to build a special device");
+                throw Erange("special::special", gettext("missing data to build a special device"));
             xmajor = ntohs(tmp);
             if(f.read((char *)&tmp, (size_t)sizeof(tmp)) != sizeof(tmp))
-                throw Erange("special::special", "missing data to build a special device");
+                throw Erange("special::special", gettext("missing data to build a special device"));
             xminor = ntohs(tmp);
         }
     }
 
-    void device::dump(generic_file & f) const
+    void device::dump(user_interaction & dialog, generic_file & f) const
     {
         U_16 tmp;
 
-        inode::dump(f);
+        inode::dump(dialog, f);
         if(get_saved_status() == s_saved)
         {
             tmp = htons(xmajor);
@@ -1567,7 +1587,7 @@ namespace libdar
         }
     }
 
-    void device::sub_compare(const inode & other) const
+    void device::sub_compare(user_interaction & dialog, const inode & other) const
     {
         const device *d_other = dynamic_cast<const device *>(&other);
         if(d_other == NULL)
@@ -1575,54 +1595,86 @@ namespace libdar
         if(get_saved_status() == s_saved && d_other->get_saved_status() == s_saved)
         {
             if(get_major() != d_other->get_major())
-                throw Erange("device::sub_compare", "devices have not the same major number");
+                throw Erange("device::sub_compare", gettext("devices have not the same major number"));
             if(get_minor() != d_other->get_minor())
-                throw Erange("device::sub_compare", "devices have not the same minor number");
+                throw Erange("device::sub_compare", gettext("devices have not the same minor number"));
         }
     }
 
-    void ignored_dir::dump(generic_file & f) const
+    void ignored_dir::dump(user_interaction & dialog, generic_file & f) const
     {
-        directory tmp = directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_name());
+        directory tmp = directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_name(), 0);
         tmp.set_saved_status(get_saved_status());
-        tmp.dump(f); // dump an empty directory
+        tmp.dump(dialog, f); // dump an empty directory
     }
 
-    catalogue::catalogue() : out_compare("/")
+    catalogue::catalogue(user_interaction & dialog) : out_compare("/")
     {
-        contenu = new directory(0,0,0,0,0,"root");
-        if(contenu == NULL)
-            throw Ememory("catalogue::catalogue(path)");
-        current_compare = contenu;
-        current_add = contenu;
-        current_read = contenu;
-        sub_tree = NULL;
+	contenu = NULL;
+	cat_ui = NULL;
+
+	try
+	{
+	    contenu = new directory(0,0,0,0,0,"root",0);
+	    if(contenu == NULL)
+		throw Ememory("catalogue::catalogue(path)");
+	    current_compare = contenu;
+	    current_add = contenu;
+	    current_read = contenu;
+	    cat_ui = dialog.clone();
+	    sub_tree = NULL;
+	}
+	catch(...)
+	{
+	    if(contenu != NULL)
+		delete contenu;
+	    if(cat_ui != NULL)
+		delete cat_ui;
+	    throw;
+	}
+
         stats.clear();
     }
 
-    catalogue::catalogue(generic_file & f) : out_compare("/")
+    catalogue::catalogue(user_interaction & dialog,
+			 generic_file & f, const dar_version & reading_ver,
+			 compression default_algo, generic_file * data_loc) : out_compare("/")
     {
         string tmp;
         unsigned char a;
         saved_status st;
         unsigned char base;
+	cache over_f = cache(dialog, f, 102400, 1, 100, 20, 1, 100, 20);
+	std::map <infinint, file_etiquette *> corres;
+	contenu = NULL;
+	cat_ui = NULL;
 
-        f.read((char *)&a, 1); // need to read the signature before constructing "contenu"
-        if(! extract_base_and_status(a, base, st))
-            throw Erange("catalogue::catalogue(generic_file &)", "incoherent catalogue structure");
-        if(base != 'd')
-            throw Erange("catalogue::catalogue(generic_file &)", "incoherent catalogue structure");
+	try
+	{
+	    over_f.read((char *)&a, 1); // need to read the signature before constructing "contenu"
+	    if(! extract_base_and_status(a, base, st))
+		throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+	    if(base != 'd')
+		throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 
-        stats.clear();
-        contenu = new directory(f, st, stats);
-        if(contenu == NULL)
-            throw Ememory("catalogue::catalogue(path)");
-        current_compare = contenu;
-        current_add = contenu;
-        current_read = contenu;
-        sub_tree = NULL;
-
-        entree::freemem(); // free memory from hard_link map
+	    stats.clear();
+	    contenu = new directory(dialog, over_f, reading_ver, st, stats, corres, default_algo, data_loc);
+	    if(contenu == NULL)
+		throw Ememory("catalogue::catalogue(path)");
+	    current_compare = contenu;
+	    current_add = contenu;
+	    current_read = contenu;
+	    sub_tree = NULL;
+	    cat_ui = dialog.clone();
+	}
+	catch(...)
+	{
+	    if(contenu == NULL)
+		delete contenu;
+	    if(cat_ui == NULL)
+		delete cat_ui;
+	    throw;
+	}
     }
 
     catalogue & catalogue::operator = (const catalogue &ref)
@@ -1643,7 +1695,7 @@ namespace libdar
     {
         directory *tmp = current_read->get_parent();
         if(tmp == NULL)
-            throw Erange("catalogue::skip_read_to_parent_dir", "root does not have a parent directory");
+            throw Erange("catalogue::skip_read_to_parent_dir", gettext("root does not have a parent directory"));
         current_read = tmp;
     }
 
@@ -1681,11 +1733,11 @@ namespace libdar
         nomme *tmp;
 
         if(current_read == NULL)
-            throw Erange("catalogue::read_if_present", "no current directory defined");
+            throw Erange("catalogue::read_if_present", gettext("no current directory defined"));
         if(name == NULL) // we have to go to parent directory
         {
             if(current_read->get_parent() == NULL)
-                throw Erange("catalogue::read_if_present", "root directory has no parent directory");
+                throw Erange("catalogue::read_if_present", gettext("root directory has no parent directory"));
             else
                 current_read = current_read->get_parent();
             ref = NULL;
@@ -1761,7 +1813,7 @@ namespace libdar
                     else
                         if(sub_tree->read_subdir(tmp))
                         {
-                            user_interaction_warning(sub_tree->display() + " is not present in the archive");
+                            cat_ui->warning(sub_tree->display() + gettext(" is not present in the archive"));
                             delete sub_tree;
                             sub_tree = NULL;
                             sub_count = -2;
@@ -1775,7 +1827,7 @@ namespace libdar
                 }
                 else
                 {
-                    user_interaction_warning(sub_tree->display() + " is not present in the archive");
+                    cat_ui->warning(sub_tree->display() + gettext(" is not present in the archive"));
                     delete sub_tree;
                     sub_tree = NULL;
                     sub_count = -2;
@@ -1837,7 +1889,7 @@ namespace libdar
             directory *parent = current_add->get_parent();
             delete ref; // all data given throw add becomes owned by the catalogue object
             if(parent == NULL)
-                throw Erange("catalogue::add_file", "root has no parent directory, cannot change to it");
+                throw Erange("catalogue::add_file", gettext("root has no parent directory, cannot change to it"));
             else
                 current_add = parent;
         }
@@ -1888,7 +1940,7 @@ namespace libdar
             {
                 directory *tmp = current_compare->get_parent();
                 if(tmp == NULL)
-                    throw Erange("catalogue::compare", "root has no parent directory");
+                    throw Erange("catalogue::compare", gettext("root has no parent directory"));
                 current_compare = tmp;
                 extracted = target;
                 return true;
@@ -2016,51 +2068,68 @@ namespace libdar
 
     void catalogue::listing(const mask &m, bool filter_unsaved, string marge) const
     {
-        ui_printf("access mode    | user | group | size  |          date                 | [data ][ EA  ][compr] |   filename\n");
-        ui_printf("---------------+------+-------+-------+-------------------------------+-----------------------+-----------\n");
-        contenu->listing(m, filter_unsaved, marge);
+        cat_ui->printf(gettext("access mode    | user | group | size  |          date                 | [data ][ EA  ][compr] |   filename\n"));
+        cat_ui->printf("---------------+------+-------+-------+-------------------------------+-----------------------+-----------\n");
+        contenu->listing(*cat_ui, m, filter_unsaved, marge);
     }
 
     void catalogue::tar_listing(const mask &m, bool filter_unsaved, const string & beginning) const
     {
-        void (*tmp)(const std::string & flags, const std::string & perm, const std::string & uid, const std::string & gid,
-		    const std::string & size, const std::string & date, const std::string & filename);
-        directory::get_tar_listing_callback(tmp);
-        if(tmp == NULL)
+        if(!cat_ui->get_use_listing())
         {
-            ui_printf("[data ][ EA  ][compr] | permission | user  | group | size  |          date                 |    filename\n");
-            ui_printf("----------------------+------------+-------+-------+-------+-------------------------------+------------\n");
+            cat_ui->printf(gettext("[data ][ EA  ][compr] | permission | user  | group | size  |          date                 |    filename\n"));
+            cat_ui->printf("----------------------+------------+-------+-------+-------+-------------------------------+------------\n");
         }
-        contenu->tar_listing(m, filter_unsaved, beginning);
+	contenu->tar_listing(*cat_ui, m, filter_unsaved, beginning);
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.18.2.4 2004/09/10 20:15:27 edrusb Exp $";
+        static char id[]="$Id: catalogue.cpp,v 1.35 2005/01/28 23:27:55 edrusb Rel $";
         dummy_call(id);
     }
 
     void catalogue::dump(generic_file & ref) const
     {
-        contenu->dump(ref);
+	cache over_ref = cache(*cat_ui, ref, 102400, 1, 100, 20, 1, 100, 20);
+
+        contenu->dump(*cat_ui, over_ref);
     }
 
     void catalogue::partial_copy_from(const catalogue & ref)
     {
-        if(ref.contenu == NULL)
-            throw SRC_BUG;
-        contenu = new directory(*ref.contenu);
-        if(contenu == NULL)
-            throw Ememory("catalogue::catalogue(const catalogue &)");
-        current_compare = contenu;
-        current_add = contenu;
-        current_read = contenu;
-        if(ref.sub_tree != NULL)
-            sub_tree = new path(*ref.sub_tree);
-        else
-            sub_tree = NULL;
-        sub_count = ref.sub_count;
-        stats = ref.stats;
+	contenu = NULL;
+	cat_ui = NULL;
+	sub_tree = NULL;
+
+	try
+	{
+	    if(ref.contenu == NULL)
+		throw SRC_BUG;
+	    contenu = new directory(*ref.contenu);
+	    if(contenu == NULL)
+		throw Ememory("catalogue::catalogue(const catalogue &)");
+	    current_compare = contenu;
+	    current_add = contenu;
+	    current_read = contenu;
+	    if(ref.sub_tree != NULL)
+		sub_tree = new path(*ref.sub_tree);
+	    else
+		sub_tree = NULL;
+	    sub_count = ref.sub_count;
+	    stats = ref.stats;
+	    cat_ui = ref.cat_ui->clone();
+	}
+	catch(...)
+	{
+	    if(contenu != NULL)
+		delete contenu;
+	    if(cat_ui != NULL)
+		delete cat_ui;
+	    if(sub_tree != NULL)
+		delete sub_tree;
+	    throw;
+	}
     }
 
     void catalogue::detruire()
@@ -2069,6 +2138,8 @@ namespace libdar
             delete contenu;
         if(sub_tree != NULL)
             delete sub_tree;
+	if(cat_ui != NULL)
+	    delete cat_ui;
     }
 
 
@@ -2186,10 +2257,10 @@ namespace libdar
         switch(ref.get_saved_status())
         {
         case s_saved:
-            ret = "[Saved]";
+            ret = gettext("[Saved]");
             break;
         case s_fake:
-            ret = "[InRef]";
+            ret = gettext("[InRef]");
             break;
         case s_not_saved:
             ret = "[     ]";
@@ -2201,7 +2272,7 @@ namespace libdar
         switch(ref.ea_get_saved_status())
         {
         case inode::ea_full:
-            ret += "[Saved]";
+            ret += gettext("[Saved]");
             break;
         case inode::ea_partial:
             ret += "[     ]";
@@ -2221,7 +2292,7 @@ namespace libdar
                 if(fic->get_size() >= fic->get_storage_size())
                     ret += "[" + tools_addspacebefore(deci(((fic->get_size() - fic->get_storage_size())*100)/fic->get_size()).human(), 4) +"%]";
                 else
-                    ret += "[Worse]";
+                    ret += gettext("[Worse]");
         else
             ret += "[-----]";
 

@@ -18,9 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.hpp,v 1.4.4.2 2004/09/22 03:14:24 edrusb Rel $
+// $Id: tronc.hpp,v 1.9 2004/11/07 18:21:39 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file tronc.hpp
+    /// \brief defines a limited segment over another generic_file.
+    ///
+    /// This is used to read a part of a file as if it was a real file generating
+    /// end of file behavior when reaching the given length.
 
 #ifndef TRONC_HPP
 #define TRONC_HPP
@@ -32,19 +38,33 @@
 namespace libdar
 {
 
+	/// make a segment of a generic_file appear like a real generic_file
+
     class tronc : public generic_file
     {
     public :
-        tronc(generic_file *f, const infinint &offset, const infinint &size);
-        tronc(generic_file *f, const infinint &offset, const infinint &size, gf_mode mode);
+	    /// constructor
 
+	    //! \param dialog for user interaction
+	    //! \param f is the file to take out the segment
+	    //! \param offset is the position of the beginning of the segment
+	    //! \param size is the size of the segment
+        tronc(user_interaction & dialog, generic_file *f, const infinint &offset, const infinint &size);
+        tronc(user_interaction & dialog, generic_file *f, const infinint &offset, const infinint &size, gf_mode mode);
+
+	    /// inherited from generic_file
         bool skip(const infinint & pos);
+	    /// inherited from generic_file
         bool skip_to_eof();
+	    /// inherited from generic_file
         bool skip_relative(S_I x);
+	    /// inherited from generic_file
         infinint get_position() { return current; };
 
     protected :
+	    /// inherited from generic_file
         S_I inherited_read(char *a, size_t size);
+	    /// inherited from generic_file
         S_I inherited_write(char *a, size_t size);
 
     private :

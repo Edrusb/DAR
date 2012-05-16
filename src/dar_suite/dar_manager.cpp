@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.18.2.5 2004/03/11 20:21:46 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.36 2004/12/07 18:04:48 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -41,15 +41,21 @@ extern "C"
 #include "integers.hpp"
 #include "libdar.hpp"
 #include "shell_interaction.hpp"
+#include "tools.hpp"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.2.2"
+#define DAR_MANAGER_VERSION "1.3.0"
+
+
+#define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
+#define MISSING_ARG "Missing argument to -%c"
 
 enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, move };
 
-static S_I little_main(S_I argc, char *argv[], const char **env);
-static bool command_line(S_I argc, char *argv[],
+static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env);
+static bool command_line(user_interaction & dialog,
+			 S_I argc, char *argv[],
                          operation & op,
                          string & base,
                          string & arg,
@@ -57,34 +63,34 @@ static bool command_line(S_I argc, char *argv[],
                          vector<string> & rest,
                          archive_num & num2,
                          bool & verbose);
-static void show_usage(const char *command);
-static void show_version(const char *command);
-#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
+static void show_usage(user_interaction & dialog, const char *command);
+static void show_version(user_interaction & dialog, const char *command);
+#if HAVE_GETOPT_LONG
 static const struct option *get_long_opt();
 #endif
-static void op_create(const string & base, bool info_details);
-static void op_add(const string & base, const string &arg, string fake, bool info_details);
-static void op_listing(const string & base, bool info_details);
-static void op_del(const string & base, archive_num num, bool info_details);
-static void op_chbase(const string & base, archive_num num, const string & arg, bool info_details);
-static void op_where(const string & base, archive_num num, const string & arg, bool info_details);
-static void op_options(const string & base, const vector<string> & rest, bool info_details);
-static void op_dar(const string & base, const string & arg, bool info_details);
-static void op_restore(const string & base, const vector<string> & rest, bool info_details);
-static void op_used(const string & base, archive_num num, bool info_details);
-static void op_files(const string & base, const string & arg, bool info_details);
-static void op_stats(const string & base, bool info_details);
-static void op_move(const string & base, archive_num src, archive_num dst, bool info_details);
+static void op_create(user_interaction & dialog, const string & base, bool info_details);
+static void op_add(user_interaction & dialog, const string & base, const string &arg, string fake, bool info_details);
+static void op_listing(user_interaction & dialog, const string & base, bool info_details);
+static void op_del(user_interaction & dialog, const string & base, archive_num min, archive_num max, bool info_details);
+static void op_chbase(user_interaction & dialog, const string & base, archive_num num, const string & arg, bool info_details);
+static void op_where(user_interaction & dialog, const string & base, archive_num num, const string & arg, bool info_details);
+static void op_options(user_interaction & dialog, const string & base, const vector<string> & rest, bool info_details);
+static void op_dar(user_interaction & dialog, const string & base, const string & arg, bool info_details);
+static void op_restore(user_interaction & dialog, const string & base, const vector<string> & rest, bool info_details);
+static void op_used(user_interaction & dialog, const string & base, archive_num num, bool info_details);
+static void op_files(user_interaction & dialog, const string & base, const string & arg, bool info_details);
+static void op_stats(user_interaction & dialog, const string & base, bool info_details);
+static void op_move(user_interaction & dialog, const string & base, archive_num src, archive_num dst, bool info_details);
 
-static database *read_base(const string & base, bool partial);
-static void write_base(const string & filename, const database *base, bool overwrite);
+static database *read_base(user_interaction & dialog, const string & base, bool partial);
+static void write_base(user_interaction & dialog, const string & filename, const database *base, bool overwrite);
 
 int main(S_I argc, char *argv[], const char **env)
 {
     return dar_suite_global(argc, argv, env, &little_main);
 }
 
-S_I little_main(S_I argc, char *argv[], const char **env)
+S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env)
 {
     operation op;
     string base;
@@ -94,7 +100,7 @@ S_I little_main(S_I argc, char *argv[], const char **env)
     bool info_details;
 
     shell_interaction_change_non_interactive_output(&cout);
-    if(!command_line(argc, argv, op, base, arg, num, rest, num2, info_details))
+    if(!command_line(dialog, argc, argv, op, base, arg, num, rest, num2, info_details))
         return EXIT_SYNTAX;
     MEM_IN;
     switch(op)
@@ -102,43 +108,43 @@ S_I little_main(S_I argc, char *argv[], const char **env)
     case none_op:
         throw SRC_BUG;
     case create:
-        op_create(base, info_details);
+        op_create(dialog, base, info_details);
         break;
     case add:
-        op_add(base, arg, rest.size() > 0 ? rest[0] : "", info_details);
+        op_add(dialog, base, arg, rest.size() > 0 ? rest[0] : "", info_details);
         break;
     case listing:
-        op_listing(base, info_details);
+        op_listing(dialog, base, info_details);
         break;
     case del:
-        op_del(base, num, info_details);
+        op_del(dialog, base, num, num2, info_details);
         break;
     case chbase:
-        op_chbase(base, num, arg, info_details);
+        op_chbase(dialog, base, num, arg, info_details);
         break;
     case where:
-        op_where(base, num, arg, info_details);
+        op_where(dialog, base, num, arg, info_details);
         break;
     case options:
-        op_options(base, rest, info_details);
+        op_options(dialog, base, rest, info_details);
         break;
     case dar:
-        op_dar(base, arg, info_details);
+        op_dar(dialog, base, arg, info_details);
         break;
     case restore:
-        op_restore(base, rest, info_details);
+        op_restore(dialog, base, rest, info_details);
         break;
     case used:
-        op_used(base, num, info_details);
+        op_used(dialog, base, num, info_details);
         break;
     case files:
-        op_files(base, arg, info_details);
+        op_files(dialog, base, arg, info_details);
         break;
     case stats:
-        op_stats(base, info_details);
+        op_stats(dialog, base, info_details);
         break;
     case move:
-        op_move(base, num, num2, info_details);
+        op_move(dialog, base, num, num2, info_details);
         break;
     default:
         throw SRC_BUG;
@@ -147,7 +153,8 @@ S_I little_main(S_I argc, char *argv[], const char **env)
     return EXIT_OK;
 }
 
-static bool command_line(S_I argc, char *argv[],
+static bool command_line(user_interaction & dialog,
+			 S_I argc, char *argv[],
                          operation & op,
                          string & base,
                          string & arg,
@@ -157,6 +164,7 @@ static bool command_line(S_I argc, char *argv[],
                          bool & verbose)
 {
     S_I lu;
+    U_I min, max;
 
     base = arg = "";
     num = num2 = 0;
@@ -165,129 +173,134 @@ static bool command_line(S_I argc, char *argv[],
     verbose = false;
     string chem, filename;
 
-#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
-    while((lu = getopt_long(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:v", get_long_opt(), NULL)) != EOF)
+#if HAVE_GETOPT_LONG
+    while((lu = getopt_long(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQj", get_long_opt(), NULL)) != EOF)
 #else
-	while((lu = getopt(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:v")) != EOF)
+	while((lu = getopt(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQj")) != EOF)
 #endif
 	{
 	    switch(lu)
 	    {
 	    case 'C':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = create;
 		if(optarg == NULL)
-		    throw Erange("command_line", "missing argument to -C");
+		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		base = optarg;
 		break;
 	    case 'B':
 		if(base != "")
-		    throw Erange("command_line", "only one -B option on command line is allowed");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		if(optarg == NULL)
-		    throw Erange("command_line", "missing argument to -B");
+		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		base = optarg;
 		break;
 	    case 'A':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = add;
 		if(optarg == NULL)
-		    throw Erange("command_line", "missing argument to -A");
+		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		tools_split_path_basename(optarg, chem, filename);
-		tools_check_basename(chem, filename, EXTENSION);
+		tools_check_basename(dialog, chem, filename, EXTENSION);
 		arg = (path(chem)+filename).display();
 		break;
 	    case 'l':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = listing;
 		break;
 	    case 'D':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = del;
 		if(optarg == NULL)
-		    throw Erange("command_line", "missing argument to -D");
-		num = atoi(optarg);
+		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+		tools_read_range(string(optarg), min, max);
+		num = min;
+		num2 = max;
 		break;
 	    case 'b':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = chbase;
 		if(optarg == NULL)
-		    throw Erange("command_line", "missing argument to -b");
+		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		num = atoi(optarg);
 		break;
 	    case 'p':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = where;
 		if(optarg == NULL)
-		    throw Erange("command_line", "missing argument to -p");
+		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		num = atoi(optarg);
 		break;
 	    case 'o':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = options;
 		break;
 	    case 'd':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = dar;
 		if(optarg == NULL)
-		    throw Erange("command_line", "missing argument to -d");
+		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		arg = optarg;
 		break;
 	    case 'r':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = restore;
 		break;
 	    case 'u':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = used;
 		if(optarg == NULL)
-		    throw Erange("command_line", "missing argument to -u");
+		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		num = atoi(optarg);
 		break;
 	    case 'f':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = files;
 		if(optarg == NULL)
-		    throw Erange("command_line", "missing argument to -p");
+		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		arg = optarg;
 		break;
 	    case 's':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = stats;
 		break;
 	    case 'm':
 		if(op != none_op)
-		    throw Erange("command_line", "only one action is allowed at a time");
+		    throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		op = move;
 		if(optarg == NULL)
-		    throw Erange("command_line", "missing argument to -m");
+		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		num = atoi(optarg);
 		break;
 	    case 'h':
-		show_usage(argv[0]);
+		show_usage(dialog, argv[0]);
 		return false;
 	    case 'V':
-		show_version(argv[0]);
+		show_version(dialog, argv[0]);
 		return false;
 	    case 'v':
 		verbose = true;
 		break;
+	    case 'Q':
+	    case 'j':
+		break;  // ignore this option already parsed during initialization (dar_suite.cpp)
 	    case '?':
-		user_interaction_warning(string("ignoring unknown option ") + char(optopt));
+		dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
 		break;
 	    default:
-		user_interaction_warning(string("ignoring unknown option ") + char(lu));
+		dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
 	    }
 	    if(lu == 'o' || lu == 'r')
 		break; // stop reading arguments
@@ -301,7 +314,7 @@ static bool command_line(S_I argc, char *argv[],
     switch(op)
     {
     case none_op:
-        user_interaction_warning("no action specified, aborting");
+        dialog.warning(gettext("No action specified, aborting"));
         return false;
     case create:
     case listing:
@@ -311,17 +324,17 @@ static bool command_line(S_I argc, char *argv[],
     case files:
     case stats:
         if(rest.size() > 0)
-            user_interaction_warning("ignoring extra arguments on command line");
+            dialog.warning(gettext("Ignoring extra arguments on command line"));
         break;
     case add:
         if(rest.size() > 1)
-            user_interaction_warning("ignoring extra arguments on command line");
+            dialog.warning(gettext("Ignoring extra arguments on command line"));
         break;
     case chbase:
     case where:
         if(rest.size() != 1)
         {
-            user_interaction_warning("missing argument to command line, aborting");
+            dialog.warning(gettext("Missing argument to command line, aborting"));
             return false;
         }
         arg = rest[0];
@@ -330,14 +343,14 @@ static bool command_line(S_I argc, char *argv[],
     case restore:
         for(unsigned int i = 0; i < rest.size(); i++)
             if(!path(rest[i]).is_relative())
-                throw Erange("command_line", "arguments to -r must be relative path (never begin by '/')");
+                throw Erange("command_line", gettext("Arguments to -r must be relative path (never begin by '/')"));
         break;
     case options:
         break;
     case move:
         if(rest.size() != 1)
         {
-            user_interaction_warning("missing argument to command line, aborting");
+            dialog.warning(gettext("Missing argument to command line, aborting"));
             return false;
         }
         num2 = tools_str2int(rest[0]);
@@ -349,7 +362,7 @@ static bool command_line(S_I argc, char *argv[],
 
     if(base == "")
     {
-        user_interaction_warning("no database specified, aborting");
+        dialog.warning(gettext("No database specified, aborting"));
         return false;
     }
 
@@ -359,42 +372,42 @@ static bool command_line(S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.18.2.5 2004/03/11 20:21:46 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.36 2004/12/07 18:04:48 edrusb Rel $";
     dummy_call(id);
 }
 
-static void op_create(const string & base, bool info_details)
+static void op_create(user_interaction & dialog, const string & base, bool info_details)
 {
     database dat; // created empty;
 
     if(info_details)
     {
-        user_interaction_warning("Creating file...");
-        user_interaction_warning("Formating file as an empty database...");
+        dialog.warning(gettext("Creating file..."));
+        dialog.warning(gettext("Formating file as an empty database..."));
     }
-    write_base(base, &dat, false);
+    write_base(dialog, base, &dat, false);
     if(info_details)
-        user_interaction_warning("Database has been successfully created empty.");
+        dialog.warning(gettext("Database has been successfully created empty."));
 }
 
-static void op_add(const string & base, const string &arg, string fake, bool info_details)
+static void op_add(user_interaction & dialog, const string & base, const string &arg, string fake, bool info_details)
 {
     if(info_details)
-        user_interaction_warning("Uncompressing and loading database in memory...");
-    database *dat = read_base(base, false);
+        dialog.warning(gettext("Uncompressing and loading database in memory..."));
+    database *dat = read_base(dialog, base, false);
 
     try
     {
         if(info_details)
-            user_interaction_warning("Reading catalogue of the archive to add...");
-        catalogue *catal = macro_tools_get_catalogue_from(arg, EXTENSION, crypto_none, "");
+            dialog.warning(gettext("Reading catalogue of the archive to add..."));
+        catalogue *catal = macro_tools_get_catalogue_from(dialog, arg, EXTENSION, crypto_none, "", 0);
 
         try
         {
             string chemin, b;
 
             if(info_details)
-                user_interaction_warning("Updating database with catalogue...");
+                dialog.warning(gettext("Updating database with catalogue..."));
             if(fake == "")
                 fake = arg;
             tools_split_path_basename(fake, chemin, b);
@@ -409,8 +422,8 @@ static void op_add(const string & base, const string &arg, string fake, bool inf
         delete catal;
 
         if(info_details)
-            user_interaction_warning("Compressing and writing back database to file...");
-        write_base(base, dat, true);
+            dialog.warning(gettext("Compressing and writing back database to file..."));
+        write_base(dialog, base, dat, true);
     }
     catch(...)
     {
@@ -420,15 +433,15 @@ static void op_add(const string & base, const string &arg, string fake, bool inf
     delete dat;
 }
 
-static void op_listing(const string & base, bool info_details)
+static void op_listing(user_interaction & dialog, const string & base, bool info_details)
 {
     if(info_details)
-        user_interaction_warning("Uncompressing and loading database header in memory...");
-    database *dat = read_base(base, true);
+        dialog.warning(gettext("Uncompressing and loading database header in memory..."));
+    database *dat = read_base(dialog, base, true);
 
     try
     {
-        dat->show_contents();
+        dat->show_contents(dialog);
     }
     catch(...)
     {
@@ -438,20 +451,20 @@ static void op_listing(const string & base, bool info_details)
     delete dat;
 }
 
-static void op_del(const string & base, archive_num num, bool info_details)
+static void op_del(user_interaction & dialog, const string & base, archive_num min, archive_num max, bool info_details)
 {
     if(info_details)
-        user_interaction_warning("Uncompressing and loading database in memory...");
-    database *dat = read_base(base, false);
+        dialog.warning(gettext("Uncompressing and loading database in memory..."));
+    database *dat = read_base(dialog, base, false);
 
     try
     {
         if(info_details)
-            user_interaction_warning("Removing informations from the archive...");
-        dat->remove_archive(num);
+            dialog.warning(gettext("Removing informations from the archive..."));
+        dat->remove_archive(min, max);
         if(info_details)
-            user_interaction_warning("Compressing and writing back database to file...");
-        write_base(base, dat, true);
+            dialog.warning(gettext("Compressing and writing back database to file..."));
+        write_base(dialog, base, dat, true);
     }
     catch(...)
     {
@@ -461,20 +474,20 @@ static void op_del(const string & base, archive_num num, bool info_details)
     delete dat;
 }
 
-static void op_chbase(const string & base, archive_num num, const string & arg, bool info_details)
+static void op_chbase(user_interaction & dialog, const string & base, archive_num num, const string & arg, bool info_details)
 {
     if(info_details)
-        user_interaction_warning("Uncompressing and loading database header in memory...");
-    database *dat = read_base(base, true);
+        dialog.warning(gettext("Uncompressing and loading database header in memory..."));
+    database *dat = read_base(dialog, base, true);
 
     try
     {
         if(info_details)
-            user_interaction_warning("Changing database header information...");
+            dialog.warning(gettext("Changing database header information..."));
         dat->change_name(num, arg);
         if(info_details)
-            user_interaction_warning("Compressing and writing back database header to file...");
-        write_base(base, dat, true);
+            dialog.warning(gettext("Compressing and writing back database header to file..."));
+        write_base(dialog, base, dat, true);
     }
     catch(...)
     {
@@ -485,20 +498,20 @@ static void op_chbase(const string & base, archive_num num, const string & arg, 
 
 }
 
-static void op_where(const string & base, archive_num num, const string & arg, bool info_details)
+static void op_where(user_interaction & dialog, const string & base, archive_num num, const string & arg, bool info_details)
 {
     if(info_details)
-        user_interaction_warning("Uncompressing and loading database header in memory...");
-    database *dat = read_base(base, true);
+        dialog.warning(gettext("Uncompressing and loading database header in memory..."));
+    database *dat = read_base(dialog, base, true);
 
     try
     {
         if(info_details)
-            user_interaction_warning("Changing database header information...");
+            dialog.warning(gettext("Changing database header information..."));
         dat->set_path(num, arg);
         if(info_details)
-            user_interaction_warning("Compressing and writing back database header to file...");
-        write_base(base, dat, true);
+            dialog.warning(gettext("Compressing and writing back database header to file..."));
+        write_base(dialog, base, dat, true);
     }
     catch(...)
     {
@@ -509,20 +522,20 @@ static void op_where(const string & base, archive_num num, const string & arg, b
 
 }
 
-static void op_options(const string & base, const vector<string> & rest, bool info_details)
+static void op_options(user_interaction & dialog, const string & base, const vector<string> & rest, bool info_details)
 {
     if(info_details)
-        user_interaction_warning("Uncompressing and loading database header in memory...");
-    database *dat = read_base(base, true);
+        dialog.warning(gettext("Uncompressing and loading database header in memory..."));
+    database *dat = read_base(dialog, base, true);
 
     try
     {
         if(info_details)
-            user_interaction_warning("Changing database header information...");
+            dialog.warning(gettext("Changing database header information..."));
         dat->set_options(rest);
         if(info_details)
-            user_interaction_warning("Compressing and writing back database header to file...");
-        write_base(base, dat, true);
+            dialog.warning(gettext("Compressing and writing back database header to file..."));
+        write_base(dialog, base, dat, true);
     }
     catch(...)
     {
@@ -533,20 +546,20 @@ static void op_options(const string & base, const vector<string> & rest, bool in
 
 }
 
-static void op_dar(const string & base, const string & arg, bool info_details)
+static void op_dar(user_interaction & dialog, const string & base, const string & arg, bool info_details)
 {
     if(info_details)
-        user_interaction_warning("Uncompressing and loading database header in memory...");
-    database *dat = read_base(base, true);
+        dialog.warning(gettext("Uncompressing and loading database header in memory..."));
+    database *dat = read_base(dialog, base, true);
 
     try
     {
         if(info_details)
-            user_interaction_warning("Changing database header information...");
+            dialog.warning(gettext("Changing database header information..."));
         dat->set_dar_path(arg);
         if(info_details)
-            user_interaction_warning("Compressing and writing back database header to file...");
-        write_base(base, dat, true);
+            dialog.warning(gettext("Compressing and writing back database header to file..."));
+        write_base(dialog, base, dat, true);
     }
     catch(...)
     {
@@ -557,17 +570,17 @@ static void op_dar(const string & base, const string & arg, bool info_details)
 
 }
 
-static void op_restore(const string & base, const vector<string> & rest, bool info_details)
+static void op_restore(user_interaction & dialog, const string & base, const vector<string> & rest, bool info_details)
 {
     if(info_details)
-        user_interaction_warning("Uncompressing and loading database in memory...");
-    database *dat = read_base(base, false);
+        dialog.warning(gettext("Uncompressing and loading database in memory..."));
+    database *dat = read_base(dialog, base, false);
 
     try
     {
         if(info_details)
-            user_interaction_warning("Looking for archives of most recent versions, sorting files by archive to use for restoration...");
-        dat->restore(rest, true);
+            dialog.warning(gettext("Looking for archives of most recent versions, sorting files by archive to use for restoration..."));
+        dat->restore(dialog, rest, true);
     }
     catch(...)
     {
@@ -577,15 +590,15 @@ static void op_restore(const string & base, const vector<string> & rest, bool in
     delete dat;
 }
 
-static void op_used(const string & base, archive_num num, bool info_details)
+static void op_used(user_interaction & dialog, const string & base, archive_num num, bool info_details)
 {
     if(info_details)
-        user_interaction_warning("Uncompressing and loading database in memory...");
-    database *dat = read_base(base, false);
+        dialog.warning(gettext("Uncompressing and loading database in memory..."));
+    database *dat = read_base(dialog, base, false);
 
     try
     {
-        dat->show_files(num);
+        dat->show_files(dialog, num);
     }
     catch(...)
     {
@@ -596,15 +609,15 @@ static void op_used(const string & base, archive_num num, bool info_details)
 
 }
 
-static void op_files(const string & base, const string & arg, bool info_details)
+static void op_files(user_interaction & dialog, const string & base, const string & arg, bool info_details)
 {
     if(info_details)
-        user_interaction_warning("Uncompressing and loading database in memory...");
-    database *dat = read_base(base, false);
+        dialog.warning(gettext("Uncompressing and loading database in memory..."));
+    database *dat = read_base(dialog, base, false);
 
     try
     {
-        dat->show_version(arg);
+        dat->show_version(dialog, arg);
     }
     catch(...)
     {
@@ -615,40 +628,40 @@ static void op_files(const string & base, const string & arg, bool info_details)
 
 }
 
-static void op_stats(const string & base, bool info_details)
+static void op_stats(user_interaction & dialog, const string & base, bool info_details)
 {
     if(info_details)
-        user_interaction_warning("Uncompressing and loading database in memory...");
-    database *dat = read_base(base, false);
-
-    try
-    {
-        if(info_details)
-            user_interaction_warning("Computing statistics...");
-        dat->show_most_recent_stats();
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
-}
-
-static void op_move(const string & base, archive_num src, archive_num dst, bool info_details)
-{
-    if(info_details)
-        user_interaction_warning("Uncompressing and loading database in memory...");
-    database *dat = read_base(base, false);
+        dialog.warning(gettext("Uncompressing and loading database in memory..."));
+    database *dat = read_base(dialog, base, false);
 
     try
     {
         if(info_details)
-            user_interaction_warning("changing database information...");
+            dialog.warning(gettext("Computing statistics..."));
+        dat->show_most_recent_stats(dialog);
+    }
+    catch(...)
+    {
+        delete dat;
+        throw;
+    }
+    delete dat;
+}
+
+static void op_move(user_interaction & dialog, const string & base, archive_num src, archive_num dst, bool info_details)
+{
+    if(info_details)
+        dialog.warning(gettext("Uncompressing and loading database in memory..."));
+    database *dat = read_base(dialog, base, false);
+
+    try
+    {
+        if(info_details)
+            dialog.warning(gettext("Changing database information..."));
         dat->set_permutation(src, dst);
         if(info_details)
-            user_interaction_warning("Compressing and writing back database header to file...");
-        write_base(base, dat, true);
+            dialog.warning(gettext("Compressing and writing back database header to file..."));
+        write_base(dialog, base, dat, true);
     }
     catch(...)
     {
@@ -658,48 +671,57 @@ static void op_move(const string & base, archive_num src, archive_num dst, bool 
     delete dat;
 }
 
-static void show_usage(const char *command)
+static void show_usage(user_interaction & dialog, const char *command)
 {
-    ui_printf("usage :\n\n");
-    ui_printf("\tdar_manager [-v] -C [<path>/]<database>\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -A [<path>/]<basename> [[<path>/]<archive_basename>]\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -l\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -D <number>\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -b <number> <new_archive_basename>\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -p <number> <path>\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -o [list of options to pass to dar]\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -d [<path to dar command>]\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -r [list of files to restore]\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -u <number>\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -f file\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -s\n");
-    ui_printf("\tdar_manager [-v] -B [<path>/]<database> -m <number> <number>\n");
-    ui_printf("\tdar_manager -h\n");
-    ui_printf("\tdar_manager -V\n");
-    ui_printf("\n");
+    dialog.printf("usage :\n\n");
+    dialog.printf("\tdar_manager [options] -C [<path>/]<database>\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -A [<path>/]<basename> [[<path>/]<archive_basename>]\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -l\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -D <number>\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -b <number> <new_archive_basename>\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -p <number> <path>\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -o [list of options to pass to dar]\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -d [<path to dar command>]\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -r [list of files to restore]\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -u <number>\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -f file\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -s\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -m <number> <number>\n");
+    dialog.printf("\tdar_manager -h\n");
+    dialog.printf("\tdar_manager -V\n");
+    dialog.printf("\n");
 #include "dar_manager.usage"
 }
 
-static void show_version(const char *command_name)
+static void show_version(user_interaction & dialog, const char *command_name)
 {
     char *name = tools_extract_basename(command_name);
-    U_I maj, min, bits;
-    bool ea, largefile, nodump, special_alloc;
+    U_I maj, med, min, bits;
+    bool ea, largefile, nodump, special_alloc, thread, libz, libbz2, libcrypto;
 
     get_version(maj, min);
-    get_compile_time_features(ea, largefile, nodump, special_alloc, bits);
+    if(maj > 2)
+	get_version(maj, med, min);
+    else
+	med = 0;
+    get_compile_time_features(ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
+    shell_interaction_change_non_interactive_output(&cout);
     try
     {
-        ui_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n\n", name, DAR_MANAGER_VERSION);
-        ui_printf(" Using libdar %u.%u built with compilation time options:\n", maj, min);
-        tools_display_features(ea, largefile, nodump, special_alloc, bits);
-        ui_printf("\n");
-        ui_printf(" %s with %s version %s\n", __DATE__, CC_NAT, __VERSION__);
-        ui_printf(" %s is part of the Disk ARchive suite (Release %s)\n", name, PACKAGE_VERSION);
-        ui_printf(" %s comes with ABSOLUTELY NO WARRANTY; for details\n", name);
-        ui_printf(" type `%s -W'.  This is free software, and you are welcome\n", "dar");
-        ui_printf(" to redistribute it under certain conditions; type `%s -L | more'\n", "dar");
-        ui_printf(" for details.\n\n");
+        dialog.printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n", name, DAR_MANAGER_VERSION);
+	dialog.warning(string("   ") + dar_suite_command_line_features() + "\n");
+	if(maj > 2)
+	    dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
+	else
+	    dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
+        tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
+        dialog.printf("\n");
+        dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__);
+        dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name, PACKAGE_VERSION);
+        dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name, "dar")
+		       + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
+		       + tools_printf(gettext(" type `%s -L | more'\n for details.\n\n"), "dar"));
+        dialog.printf("");
     }
     catch(...)
     {
@@ -709,7 +731,7 @@ static void show_version(const char *command_name)
     delete name;
 }
 
-#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
+#if HAVE_GETOPT_LONG
 static const struct option *get_long_opt()
 {
     static const struct option ret[] = {
@@ -729,6 +751,7 @@ static const struct option *get_long_opt()
         {"help", no_argument, NULL, 'h'},
         {"version", no_argument, NULL, 'V'},
         {"verbose", no_argument, NULL, 'v'},
+	{"jog", no_argument, NULL, 'j'},
         { NULL, 0, NULL, 0 }
     };
 
@@ -736,9 +759,9 @@ static const struct option *get_long_opt()
 }
 #endif
 
-static database *read_base(const string & base, bool partial)
+static database *read_base(user_interaction & dialog, const string & base, bool partial)
 {
-    generic_file *f = database_header_open(base);
+    generic_file *f = database_header_open(dialog, base);
     database *ret = NULL;
 
     try
@@ -749,10 +772,10 @@ static database *read_base(const string & base, bool partial)
     }
     catch(Erange & e)
     {
-        string msg = string("Corrupted database. ")+e.get_message();
+        string msg = string(gettext("Corrupted database. "))+e.get_message();
         if(f != NULL)
             delete f;
-        user_interaction_warning(msg);
+        dialog.warning(msg);
         throw Edata(msg);
     }
     catch(...)
@@ -766,9 +789,9 @@ static database *read_base(const string & base, bool partial)
     return ret;
 }
 
-static void write_base(const string & filename, const database *base, bool overwrite)
+static void write_base(user_interaction & dialog, const string & filename, const database *base, bool overwrite)
 {
-    generic_file *dat = database_header_create(filename, overwrite);
+    generic_file *dat = database_header_create(dialog, filename, overwrite);
 
     try
     {

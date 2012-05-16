@@ -16,11 +16,11 @@ dist_noinst_DATA = dar.gif make_cygwin_dist make_rpm batch_cygwin batch_linux ba
 
 noinst_PROGRAMS=todos specs
 
-specs : dar.rpm.spec dar32.rpm.spec dar32_ea.rpm.spec dar64.rpm.spec dar64_ea.rpm.spec dar_ea.rpm.spec
+specs$(EXEEXT) : dar.rpm.spec dar32.rpm.spec dar32_ea.rpm.spec dar64.rpm.spec dar64_ea.rpm.spec dar_ea.rpm.spec
 	@echo "RPM spec files generated"
 clean_specs :
 	rm -f dar.rpm.spec dar32.rpm.spec dar32_ea.rpm.spec dar64.rpm.spec dar64_ea.rpm.spec dar_ea.rpm.spec
 
-todos_SOURCES=todos.c 
+todos_SOURCES=todos.c
 specs_SOURCES=dar.rpm.spec dar32.rpm.spec dar32_ea.rpm.spec dar64.rpm.spec dar64_ea.rpm.spec dar_ea.rpm.spec
 

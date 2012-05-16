@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.hpp,v 1.10.4.3 2004/09/22 03:14:21 edrusb Rel $
+// $Id: data_tree.hpp,v 1.16 2004/10/01 22:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -35,6 +35,7 @@
 #include "infinint.hpp"
 #include "catalogue.hpp"
 #include "special_alloc.hpp"
+#include "user_interaction.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -61,7 +62,7 @@ public:
     void set_EA(const archive_num & archive, const infinint & date) { last_change[archive] = date; };
     virtual bool remove_all_from(const archive_num & archive); // return true if the corresponding file
         // is no more located by any archive (thus, the object is no more usefull)
-    void listing() const; // list where is saved this file
+    void listing(user_interaction & dialog) const; // list where is saved this file
     virtual void apply_permutation(archive_num src, archive_num dst);
     virtual void skip_out(archive_num num); // decrement archive numbers above num
     virtual void compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea,
@@ -93,9 +94,10 @@ public:
 
     void add(const inode *entry, const archive_num & archive);
     const data_tree *read_child(const string & name) const;
+    void read_all_children(vector<string> & fils) const;
 
     bool remove_all_from(const archive_num & archive);
-    void show(archive_num num, string marge = "") const;
+    void show(user_interaction & dialog, archive_num num, string marge = "") const;
         // list the most recent files owned by that archive
         // (or by any archive if num == 0)
     void apply_permutation(archive_num src, archive_num dst);

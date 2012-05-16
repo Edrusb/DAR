@@ -24,7 +24,7 @@
 if [ "$1" = "" -a "$2" = "" -a "$3" = "" -a "$4" == "" -a "$6" == "" ]; then
   echo "usage: $0 <path> <basename> <slice number> <extension> <context(not used)> <redundancy ratio (%)>"
   echo "$0 builds Parchive redundancy file for the given slice"
-  exit 0
+  exit 1
 fi
 
 # change according to you need

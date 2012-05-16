@@ -18,10 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: integers.hpp,v 1.7.4.2 2004/01/28 15:29:46 edrusb Rel $
+// $Id: integers.hpp,v 1.11 2004/11/07 18:21:38 edrusb Rel $
 //
 /*********************************************************************/
-//
+
+
+    /// \file integers.hpp
+    /// \brief are defined here basic integer types that tend to be portable
+
 
 #ifndef INTEGERS_HPP
 #define INTEGERS_HPP
@@ -38,14 +42,18 @@ extern "C"
 
 namespace libdar
 {
+
+    typedef unsigned char U_8;
     typedef uint16_t U_16;
     typedef uint32_t U_32;
     typedef uint64_t U_64;
     typedef unsigned int U_I;
+    typedef signed char S_8;
     typedef int16_t S_16;
     typedef int32_t S_32;
     typedef int64_t S_64;
     typedef signed int S_I;
+
 }
 
 #else // HAVE_INTTYPES_H
@@ -57,11 +65,12 @@ namespace libdar
 
 namespace libdar
 {
-
+    typedef unsigned char U_8;
     typedef unsigned short U_16;
     typedef unsigned long U_32;
     typedef unsigned long long U_64;
     typedef unsigned int U_I;
+    typedef signed char S_8;
     typedef signed short S_16;
     typedef signed long S_32;
     typedef signed long long S_64;
@@ -74,10 +83,12 @@ namespace libdar
 
 namespace libdar
 {
+    typedef unsigned char U_8;
     typedef unsigned short U_16;
     typedef unsigned int U_32;
     typedef unsigned long long U_64;
     typedef unsigned int U_I;
+    typedef signed char S_8;
     typedef signed short S_16;
     typedef signed int S_32;
     typedef signed long long S_64;

@@ -18,12 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.5.4.2 2004/07/25 20:38:04 edrusb Exp $
+// $Id: terminateur.cpp,v 1.12 2004/10/30 22:26:51 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 #include "terminateur.hpp"
+#include "elastic.hpp"
 
 #define BLOCK_SIZE 4
 
@@ -83,16 +84,21 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: terminateur.cpp,v 1.5.4.2 2004/07/25 20:38:04 edrusb Exp $";
+        static char id[]="$Id: terminateur.cpp,v 1.12 2004/10/30 22:26:51 edrusb Rel $";
         dummy_call(id);
     }
 
-    void terminateur::read_catalogue(generic_file & f)
+    void terminateur::read_catalogue(generic_file & f, bool with_elastic)
     {
         S_I offset = 0;
         unsigned char a;
 
         f.skip_to_eof();
+	if(with_elastic)
+	    (void)elastic(f, elastic_backward);
+	    // temporary anomymous elastic skip backward in 'f'
+	    // up to the other elastic buffer end
+
         try
         {
                 // reading & counting the terminator string
@@ -128,11 +134,11 @@ namespace libdar
         }
         catch(Erange &e)
         {
-            throw Erange("terminateur::get_catalogue", "badly formated terminator, can't extract catalogue location");
+            throw Erange("terminateur::get_catalogue", gettext("Badly formated terminator, cannot extract catalogue location"));
         }
 
             // reading and returning the position
-        pos = infinint(NULL, &f);
+        pos = infinint(f.get_gf_ui(), NULL, &f);
     }
 
 } // end of namespace

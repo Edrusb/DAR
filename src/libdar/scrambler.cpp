@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: scrambler.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: scrambler.cpp,v 1.10 2004/07/31 14:00:24 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -31,10 +31,10 @@ using namespace std;
 namespace libdar
 {
 
-    scrambler::scrambler(const string & pass, generic_file & hidden_side) : generic_file(hidden_side.get_mode())
+    scrambler::scrambler(user_interaction & dialog, const string & pass, generic_file & hidden_side) : generic_file(dialog, hidden_side.get_mode())
     {
         if(pass == "")
-            throw Erange("scrambler::scrambler", "key cannot be an empty string");
+            throw Erange("scrambler::scrambler", gettext("Key cannot be an empty string"));
         key = pass;
         len = pass.size();
         ref = & hidden_side;
@@ -49,7 +49,7 @@ namespace libdar
             throw SRC_BUG;
 
         U_32 index = ref->get_position() % len;
-        S_I ret = ref->read(a, size);    
+        S_I ret = ref->read(a, size);
 
         for(register S_I i = 0; i < ret; i++)
         {
@@ -82,7 +82,7 @@ namespace libdar
                 throw Ememory("scramble::inherited_write");
             }
         }
-    
+
         for(register size_t i = 0; i < size; i++)
         {
             buffer[i] = (ptr[i] + (unsigned char)(key[index])) % 256;
@@ -95,7 +95,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: scrambler.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: scrambler.cpp,v 1.10 2004/07/31 14:00:24 edrusb Rel $";
         dummy_call(id);
     }
 

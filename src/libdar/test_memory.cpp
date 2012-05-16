@@ -18,12 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_memory.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_memory.cpp,v 1.7 2004/08/03 21:28:01 edrusb Rel $
 //
 /*********************************************************************/
 
+#include "../my_config.h"
+
 #include <list>
-#include "user_interaction.hpp"
+#include <iostream>
+
 #include "test_memory.hpp"
 #include "erreurs.hpp"
 
@@ -59,7 +62,7 @@ namespace libdar
             liste.push_back(al);
             total_size += size;
         }
-    
+
         return ret;
     }
 
@@ -76,19 +79,18 @@ namespace libdar
         }
         else
             throw SRC_BUG;
-    
+
         free(p);
     }
 
     U_32 get_total_alloc_size()
     {
-        Egeneric::clear_last_destroyed();
-        return total_size; 
+        return total_size;
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: test_memory.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: test_memory.cpp,v 1.7 2004/08/03 21:28:01 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -101,7 +103,7 @@ namespace libdar
     void all_delete_done()
     {
         if(liste.size() != initial_offset || initial_size != total_size)
-            ui_printf("%d memory allocation(s) not released ! Total size = %d\n", liste.size() - initial_offset, total_size - initial_size);
+            cerr << (liste.size() - initial_offset) << " memory allocation(s) not released ! Total size = " << total_size - initial_size << endl;
         else
             if(liste.size() < initial_offset)
                 throw SRC_BUG;
@@ -109,12 +111,10 @@ namespace libdar
 
     void memory_check(U_32 ref, const char *fichier, S_I ligne)
     {
-        Egeneric::clear_last_destroyed();
-    
         U_32 current = get_total_alloc_size();
         S_32 diff = current - ref;
         if(diff != 0)
-            ui_printf("file %s line %d : memory leakage detected : initial = %u    final = %u    DELTA = %d\n", fichier, ligne, ref, current, diff);
+            cerr << "file " << fichier << " line " << ligne << " : memory leakage detected : initial = " << ref << "    final = " << current << "    DELTA = " << diff << endl;
     }
 
 } // end of namespace

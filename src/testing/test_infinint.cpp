@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_infinint.cpp,v 1.9.4.4 2004/07/25 20:38:04 edrusb Exp $
+// $Id: test_infinint.cpp,v 1.14 2004/07/31 17:45:25 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -50,6 +50,8 @@ extern "C"
 #include "infinint.hpp"
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"
+#include "macro_tools.hpp"
+#include "shell_interaction.hpp"
 #include "generic_file.hpp"
 
 using namespace libdar;
@@ -58,12 +60,20 @@ using namespace std;
 static void routine1();
 static void routine2();
 
+static user_interaction *ui = NULL;
+
 int main()
 {
     MEM_BEGIN;
     MEM_IN;
+    ui = shell_interaction_init(&cout, &cerr, false);
+    if(ui == NULL)
+	cout << "ERREUR !" << endl;
     routine1();
     routine2();
+    shell_interaction_close();
+    if(ui != NULL)
+	delete ui;
     MEM_OUT;
     MEM_END;
 }
@@ -78,19 +88,19 @@ static void routine1()
     deci d2 = f2;
     deci d3 = f3;
 
-    cout << d1.human() << " " << d2.human() << " " << d3.human() << endl;
+    ui->warning(d1.human() + " " + d2.human() + " " + d3.human());
 
     S_I fd = ::open("toto", O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0644);
     if(fd >= 0)
     {
-        f1.dump(fd);
+        f1.dump(*ui, fd);
         close(fd);
         fd = ::open("toto", O_RDONLY|O_BINARY);
         if(fd >= 0)
         {
-            f3 = infinint(&fd, NULL);
+            f3 = infinint(*ui, &fd, NULL);
             d3 = deci(f3);
-            cout << d3.human() << endl;
+            ui->warning(d3.human());
         }
         close(fd);
         fd = -1;
@@ -98,42 +108,42 @@ static void routine1()
 
     f1 += 3;
     d1 = deci(f1);
-    cout << d1.human() << endl;
+    ui->warning(d1.human());
 
     f1 -= 2;
     d1 = deci(f1);
-    cout << d1.human() << endl;
+    ui->warning(d1.human());
 
     f1 *= 10;
     d1 = deci(f1);
-    cout << d1.human() << endl;
+    ui->warning(d1.human());
 
     f2 = f1;
     f1 /= 3;
     d1 = deci(f1);
-    cout << d1.human() << endl;
+    ui->warning(d1.human());
 
     f2 %= 3;
     d2 = deci(f2);
-    cout << d2.human() << endl;
+    ui->warning(d2.human());
 
     f2 >>= 12;
     d2 = deci(f2);
-    cout << d2.human() << endl;
+    ui->warning(d2.human());
 
     f1 = 4;
     f2 >>= f1;
     d2 = deci(f2);
-    cout << d2.human() << endl;
+    ui->warning(d2.human());
 
     f1 = 4+12;
     f2 = f3;
     f3 <<= f1;
     f2 <<= 4+12;
     d2 = deci(f2);
-    cout << d2.human() << endl;
+    ui->warning(d2.human());
     d3 = deci(f3);
-    cout << d3.human() << endl;
+    ui->warning(d3.human());
 
 
     f1 = 21;
@@ -145,27 +155,27 @@ static void routine1()
             d1 = deci(f1);
             d2 = deci(f2);
             d3 = deci(f3);
-            cout << d1.human() << " " << d2.human() << " " << d3.human() << endl;
+            ui->warning(d1.human() + " " + d2.human() + " " + d3.human());
             f2 *= f3;
             d2 = deci(f2);
-            cout << d2.human() << endl;
+            ui->warning(d2.human());
         }
     }
     catch(Elimitint & e)
     {
-        cout << e.get_message() << endl;
+        ui->warning(e.get_message());
     }
     d2 = deci(f2);
     d1 = deci(f1);
-    cout << "factoriel(" <<d1.human() << ") = " << d2.human() << endl;
+    ui->warning(string("factoriel(") + d1.human() + ") = " + d2.human());
 }
 
 static void routine2()
 {
-    cout << deci(infinint(2).power((U_I)0)).human() << endl;
-    cout << deci(infinint(2).power(infinint(0))).human() << endl;
-    cout << deci(infinint(2).power((U_I)1)).human() << endl;
-    cout << deci(infinint(2).power(infinint(1))).human() << endl;
-    cout << deci(infinint(2).power((U_I)2)).human() << endl;
-    cout << deci(infinint(2).power(infinint(2))).human() << endl;
+    ui->warning(deci(infinint(2).power((U_I)0)).human());
+    ui->warning(deci(infinint(2).power(infinint(0))).human());
+    ui->warning(deci(infinint(2).power((U_I)1)).human());
+    ui->warning(deci(infinint(2).power(infinint(1))).human());
+    ui->warning(deci(infinint(2).power((U_I)2)).human());
+    ui->warning(deci(infinint(2).power(infinint(2))).human());
 }

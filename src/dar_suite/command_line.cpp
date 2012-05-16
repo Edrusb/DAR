@@ -1,4 +1,4 @@
-/*********************************************************************/
+//*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.26.2.10 2004/04/20 13:31:53 edrusb Rel $
+// $Id: command_line.cpp,v 1.52 2004/12/07 18:04:48 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -46,7 +46,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -79,25 +79,38 @@ char *strchr (), *strrchr ();
 #include "libdar.hpp"
 #include "cygwin_adapt.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:vz::y::nw::pkR:s:S:X:I:P:bhLWDruUVC:i:o:OTE:F:K:J:Y:Z:B:fm:NH::a::e"
+#define OPT_STRING "c:A:x:d:t:l:vz::y::nw::pkR:s:S:X:I:P:bhLWDruUVC:i:o:OTE:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:"
+
+#define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
+#define MISSING_ARG "Missing argument to -%c"
+#define INVALID_ARG "Invalid argument for -%c option"
+#define INVALID_SIZE "Invalid size given with option -%c"
+
 
 using namespace std;
 using namespace libdar;
+struct pre_mask
+{
+    bool included;
+    string mask;
+    bool case_sensit;
+};
 
 static const U_I min_compr_size_default = 100;
     // the default value for --mincompr
 
     // return a newly allocated memory (to be deleted by the caller)
-static void show_license();
-static void show_warranty();
-static void show_version(const char *command_name);
-static void usage(const char *command_name);
-#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
+static void show_license(user_interaction & dialog);
+static void show_warranty(user_interaction & dialog);
+static void show_version(user_interaction & dialog, const char *command_name);
+static void usage(user_interaction & dialog, const char *command_name);
+#if HAVE_GETOPT_LONG
 static const struct option *get_long_opt();
 #endif
 static S_I reset_getopt(); // return the old position of parsing (next argument to parse)
 
-static bool get_args_recursive(vector<string> & inclusions,
+static bool get_args_recursive(user_interaction & dialog,
+			       vector<string> & inclusions,
                                S_I argc,
                                char *argv[],
                                operation &op,
@@ -106,10 +119,8 @@ static bool get_args_recursive(vector<string> & inclusions,
                                path * &ref_root,
                                infinint &file_size,
                                infinint &first_file_size,
-                               ou_mask & inclus,
-                               ou_mask & exclus,
-                               deque<string> & l_path_inclus,
-                               deque<string> & l_path_exclus,
+                               deque<pre_mask> & name_include_exclude,
+			       deque<pre_mask> & path_include_exclude,
                                string & filename,
                                string *& ref_filename,
                                bool &allow_over,
@@ -131,33 +142,41 @@ static bool get_args_recursive(vector<string> & inclusions,
                                string & execute_ref,
                                string & pass,
                                string & pass_ref,
-                               ou_mask & compr_inclus,
-                               ou_mask & compr_exclus,
+                               deque<pre_mask> & compr_include_exclude,
                                bool &tar_format,
                                bool & flat,
                                infinint & min_compr_size,
                                bool & readconfig,
                                bool & nodump,
                                infinint & hourshift,
-                               bool & warn_remove_no_match,
-                               string & alteration,
-                               bool & empty);
-static void make_args_from_file(operation op, const char *filename, S_I & argc,
+			       bool & warn_remove_no_match,
+			       string & alteration,
+			       bool & empty,
+			       U_I & suffix_base,
+			       path * & on_fly_root,
+			       string * & on_fly_filename,
+			       bool & alter_atime,
+			       bool & same_fs,
+			       U_32 crypto_size,
+			       U_32 crypto_size_ref,
+			       bool & ordered_filters,
+			       bool & case_sensit);
+static void make_args_from_file(user_interaction & dialog,
+				operation op, const char *filename, S_I & argc,
                                 char **&argv, bool info_details);
 static void destroy(S_I argc, char **argv);
 static char * make_word(generic_file & fic, off_t start, off_t end);
 static void skip_getopt(S_I argc, char *argv[], S_I next_to_read);
-static bool update_with_config_files(const char * home,
+static bool update_with_config_files(user_interaction & dialog,
+				     const char * home,
                                      operation &op,
                                      path * &fs_root,
                                      path * &sauv_root,
                                      path * &ref_root,
                                      infinint &file_size,
                                      infinint &first_file_size,
-                                     ou_mask & inclus,
-                                     ou_mask & exclus,
-                                     deque<string> & l_path_inclus,
-                                     deque<string> & l_path_exclus,
+				     deque<pre_mask> & name_include_exclude,
+				     deque<pre_mask> & path_include_exclude,
                                      string & filename,
                                      string *& ref_filename,
                                      bool &allow_over,
@@ -179,24 +198,42 @@ static bool update_with_config_files(const char * home,
                                      string & execute_ref,
                                      string & pass,
                                      string & pass_ref,
-                                     ou_mask & compr_inclus,
-                                     ou_mask & compr_exclus,
+				     deque<pre_mask> & compr_include_exclude,
                                      bool &tar_format,
                                      bool & flat,
                                      infinint & min_compr_size,
                                      bool & nodump,
                                      infinint & hourshift,
-                                     bool & warn_remove_no_match,
-                                     string & alteration,
-                                     bool & empty);
+				     bool & warn_remove_no_match,
+				     string & alteration,
+				     bool & empty,
+				     U_I & suffix_base,
+				     path * & on_fly_root,
+				     string * & on_fly_filename,
+				     bool & alter_atime,
+				     bool & same_fs,
+				     U_32 crypto_size,
+				     U_32 crypto_size_ref,
+				     bool & ordered_filters,
+				     bool & case_sensit);
+static mask *make_include_exclude_name(const string & x, bool no_case);
+static mask *make_exclude_path_ordered(const string & x, bool no_case);
+static mask *make_exclude_path_unordered(const string & x, bool no_case);
+static mask *make_include_path(const string & x, bool no_case);
+static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, bool no_case), mask *(*make_exclude_mask)(const string & x, bool no_case));
+static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, bool no_case), mask *(*make_exclude_mask)(const string & x, bool no_case));
+static void update_list_with_root(deque<pre_mask> & listing, const path &fs_root);
 
-    //#define DEBOGGAGE
+// #define DEBOGGAGE
 #ifdef DEBOGGAGE
 static void show_args(S_I argc, char *argv[]);
 #endif
 
-bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &fs_root, path * &sauv_root, path * &ref_root,
-              infinint &file_size, infinint &first_file_size, mask *&selection, mask *&subtree,
+bool get_args(user_interaction & dialog,
+	      const char *home, S_I argc, char *argv[],
+	      operation &op, path * &fs_root, path * &sauv_root, path * &ref_root,
+              infinint &file_size, infinint &first_file_size,
+	      mask *&selection, mask *&subtree,
               string &filename, string *&ref_filename,
               bool &allow_over, bool &warn_over, bool &info_details,
               compression &algo, U_I & compression_level,
@@ -211,9 +248,15 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
               infinint & min_compr_size,
               bool & nodump,
               infinint & hourshift,
-              bool & warn_remove_no_match,
-              string & alteration,
-              bool & empty)
+	      bool & warn_remove_no_match,
+	      string & alteration,
+	      bool & empty,
+	      path * & on_fly_root,
+	      string * & on_fly_filename,
+	      bool & alter_atime,
+	      bool & same_fs,
+	      U_32 & crypto_size,
+	      U_32 & crypto_size_ref)
 {
     op = noop;
     fs_root = NULL;
@@ -250,12 +293,9 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
     ea_user = false;
     ea_root = false;
 #endif
-    ou_mask inclus, exclus;
-    ou_mask path_inclus, path_exclus;
-    ou_mask compr_inclus, compr_exclus;
-    deque<string> l_path_exclus;
-    deque<string> l_path_inclus;
-    et_mask *tmp_mask;
+    deque<pre_mask> name_include_exclude;
+    deque<pre_mask> path_include_exclude;
+    deque<pre_mask> compr_include_exclude;
     bool tar_format = true;
     vector<string> inclusions;
     flat = false;
@@ -265,8 +305,18 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
     warn_remove_no_match = true;
     alteration = "";
     empty = false;
+    on_fly_root = NULL;
+    on_fly_filename = NULL;
+    alter_atime = false;
+    same_fs = false;
+    crypto_size = 10240;
+    crypto_size_ref = 10240;
 
     bool readconfig = true;
+    U_I suffix_base = TOOLS_BIN_SUFFIX;
+    bool ordered_filters = false;
+    bool case_sensit = true;
+    string cmd = path(argv[0]).basename();
 
     try
     {
@@ -275,11 +325,13 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
             opterr = 0;
 
 
-            if(!get_args_recursive(inclusions, argc, argv,
+            if(!get_args_recursive(dialog,
+				   inclusions, argc, argv,
                                    op, fs_root,
                                    sauv_root, ref_root,
-                                   file_size, first_file_size, inclus, exclus,
-                                   l_path_inclus, l_path_exclus,
+                                   file_size, first_file_size,
+				   name_include_exclude,
+				   path_include_exclude,
                                    filename, ref_filename,
                                    allow_over, warn_over, info_details,
                                    algo, compression_level, detruire, pause,
@@ -290,21 +342,30 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                                    execute,
                                    execute_ref,
                                    pass, pass_ref,
-                                   compr_inclus, compr_exclus,
+                                   compr_include_exclude,
                                    tar_format,
                                    flat, min_compr_size, readconfig, nodump,
                                    hourshift, warn_remove_no_match,
-                                   alteration, empty))
+				   alteration, empty, suffix_base,
+				   on_fly_root,
+				   on_fly_filename,
+				   alter_atime,
+				   same_fs,
+				   crypto_size,
+				   crypto_size_ref,
+				   ordered_filters,
+				   case_sensit))
                 return false;
 
                 // checking and updating options with configuration file if any
             if(readconfig)
-                if(! update_with_config_files(home,
+                if(! update_with_config_files(dialog,
+					      home,
                                               op, fs_root,
                                               sauv_root, ref_root,
-                                              file_size, first_file_size, inclus,
-                                              exclus,
-                                              l_path_inclus, l_path_exclus,
+                                              file_size, first_file_size,
+					      name_include_exclude,
+					      path_include_exclude,
                                               filename, ref_filename,
                                               allow_over, warn_over, info_details,
                                               algo, compression_level, detruire, pause,
@@ -315,48 +376,57 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                                               execute,
                                               execute_ref,
                                               pass, pass_ref,
-                                              compr_inclus, compr_exclus,
+                                              compr_include_exclude,
                                               tar_format,
                                               flat, min_compr_size, nodump,
                                               hourshift,
-                                              warn_remove_no_match,
-                                              alteration,
-                                              empty))
-                    return false;
+					      warn_remove_no_match,
+					      alteration,
+					      empty,
+					      suffix_base,
+					      on_fly_root,
+					      on_fly_filename,
+					      alter_atime,
+					      same_fs,
+					      crypto_size,
+					      crypto_size_ref,
+					      ordered_filters,
+					      case_sensit))
+		    return false;
 
                 // some sanity checks
 
             if(filename == "" || sauv_root == NULL || op == noop)
-                throw Erange("get_args", string("missing -c -x -d -t -l -C option, see `") + path(argv[0]).basename() + " -h' for help");
+		throw Erange("get_args", tools_printf(gettext("Missing -c -x -d -t -l -C option, see `%S -h' for help"), &cmd));
             if(filename == "-" && file_size != 0)
-                throw Erange("get_args", "slicing (-s option), is not compatible with archive on standart output (\"-\" as filename)");
+		throw Erange("get_args", gettext("Slicing (-s option), is not compatible with archive on standart output (\"-\" as filename)"));
             if(filename != "-" && (op != create || op != isolate))
                 if(sauv_root == NULL)
                     throw SRC_BUG;
             if(filename != "-")
-                tools_check_basename(*sauv_root, filename, EXTENSION);
+                tools_check_basename(dialog, *sauv_root, filename, EXTENSION);
             if(fs_root == NULL)
                 fs_root = new path(".");
             if(ref_filename != NULL && op != create && op != isolate)
-                user_interaction_warning("-A option is only useful with -c option");
+                dialog.warning(gettext("-A option is only useful with -c option"));
             if(op == isolate && ref_filename == NULL)
-                throw Erange("get_args", "with -C option, -A option is mandatory");
+                throw Erange("get_args", gettext("with -C option, -A option is mandatory"));
             if(op != extract && !warn_remove_no_match)
-                user_interaction_warning("-wa is only useful with -x option");
+                dialog.warning(gettext("-wa is only useful with -x option"));
             if(filename == "-" && ref_filename != NULL && *ref_filename == "-"
                && output_pipe == "")
-                throw Erange("get_args", "-o is mandatory when using \"-A -\" with \"-c -\" or \"-C -\"");
+                throw Erange("get_args", gettext("-o is mandatory when using \"-A -\" with \"-c -\" or \"-C -\""));
             if(ref_filename != NULL && *ref_filename != "-")
                 if(ref_root == NULL)
                     throw SRC_BUG;
                 else
-                    tools_check_basename(*ref_root, *ref_filename, EXTENSION);
+                    tools_check_basename(dialog, *ref_root, *ref_filename, EXTENSION);
             if(algo != none && op != create && op != isolate)
-                user_interaction_warning("-z or -y need only to be used with -c");
+                dialog.warning(gettext("-z or -y need only to be used with -c or -C"));
             if(first_file_size != 0 && file_size == 0)
-                throw Erange("get_args", "-S option requires the use of -s");
+                throw Erange("get_args", gettext("-S option requires the use of -s"));
             if(ignore_owner && (op == isolate || (op == create && ref_root == NULL) || op == test || op == listing))
-                user_interaction_warning("ignoring -O option, as it is useless in this situation");
+                dialog.warning(gettext("ignoring -O option, as it is useless in this situation"));
             if(getuid() != 0 && op == extract && !ignore_owner) // uid == 0 for root
             {
                 char *name = tools_extract_basename(argv[0]);
@@ -364,8 +434,8 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                 try
                 {
                     ignore_owner = true;
-                    string msg = string("file ownership will not be restored as ") + name + " is not run as root. to avoid this message use -O option";
-                    user_interaction_pause(msg);
+                    string msg = tools_printf(gettext("File ownership will not be restored as %s is not run as root. to avoid this message use -O option"), name);
+                    dialog.pause(msg);
                 }
                 catch(...)
                 {
@@ -377,133 +447,152 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
             if(op == listing && tar_format)
                 only_more_recent = true;
             if(execute != "" && file_size == 0 && (op == create || op == isolate))
-                user_interaction_warning("-E is not possible (and useless) with -c or -C and without slicing (-s option), -E will be ignored");
+                dialog.warning(gettext("-E is not possible (and useless) without slicing (-s option), -E will be ignored"));
             if(execute_ref != "" && ref_filename == NULL)
-                user_interaction_warning("-F is only useful with -A option, for the archive of reference");
+                dialog.warning(gettext("-F is only useful with -A option, for the archive of reference"));
             if(pass_ref != "" && ref_filename == NULL)
-                user_interaction_warning("-J is only useful with -A option, for the archive of reference");
+                dialog.warning(gettext("-J is only useful with -A option, for the archive of reference"));
             if(flat && op != extract)
-                user_interaction_warning("-f in only available with -x option, ignoring");
+                dialog.warning(gettext("-f in only available with -x option, ignoring"));
             if(min_compr_size != min_compr_size_default && op != create)
-                user_interaction_warning("-m is only useful with -c");
+                dialog.warning(gettext("-m is only useful with -c"));
             if(hourshift > 0)
                 if(op == create)
                 {
                     if(ref_filename == NULL)
-                        user_interaction_warning("-H is only useful with -A option when making a backup");
+                        dialog.warning(gettext("-H is only useful with -A option when making a backup"));
                 }
                 else
                     if(op == extract)
                     {
                         if(!only_more_recent)
-                            user_interaction_warning("-H is only useful with -r option when extracting");
+                            dialog.warning(gettext("-H is only useful with -r option when extracting"));
                     }
                     else
-                        user_interaction_warning("-H is only useful with -c or -x");
-            if(alteration != "")
-                if(op != listing)
-                    user_interaction_warning("-a is currently only available with -l, ignoring -a option");
-                else
-                    if(alteration != "s" && alteration != "saved")
-                        throw Erange("get_args", string("unkown argument given to -a: ")+ alteration);
-            if(empty && op != create && op != extract)
-                user_interaction_warning("-e is only useful with -x or -c");
+                        dialog.warning(gettext("-H is only useful with -c or -x"));
+	    if(alteration != "" && op != listing)
+		dialog.warning(gettext("-as is only available with -l, ignoring -as option"));
+	    if(empty && op != create && op != extract)
+		dialog.warning(gettext("-e is only useful with -x or -c"));
+	    if(op != create && (on_fly_root != NULL || on_fly_filename != NULL))
+		throw Erange("get_args", gettext("-G option is only available with -c"));
+	    if(on_fly_root != NULL ^ on_fly_filename != NULL)
+		throw SRC_BUG;
+	    if(alter_atime && op != create && op != diff)
+		dialog.warning(gettext("-aa is only useful with -c or -d"));
+	    if(same_fs && op != create)
+		dialog.warning(gettext("-M is only useful with -c"));
 
-                // generating masks
-                // for filenames
-                //
-            tmp_mask = new et_mask();
-            selection = tmp_mask; // tmp_mask is a pointer on et_mask which "selection" is not
-            if(tmp_mask == NULL)
-                throw Ememory("get_args");
-            if(inclus.size() > 0)
-                tmp_mask->add_mask(inclus);
-            else
-                tmp_mask->add_mask(bool_mask(true));
-            if(exclus.size() > 0)
-                tmp_mask->add_mask(not_mask(exclus));
 
+
+
+		//////////////////////
+		// generating masks
+		// for filenames
+		//
+	    if(ordered_filters)
+		selection = make_ordered_mask(name_include_exclude, &make_include_exclude_name, &make_include_exclude_name);
+	    else // unordered filters
+		selection = make_unordered_mask(name_include_exclude, &make_include_exclude_name, &make_include_exclude_name);
+
+
+		/////////////////////////
                 // generating masks for
                 // directory tree
                 //
-                // reading arguments remaining on the command line
-            if(l_path_inclus.size() > 0)
-                while(l_path_inclus.size() > 0)
-                {
-                    path_inclus.add_mask(simple_path_mask((*fs_root + path(l_path_inclus.front())).display()));
-                    l_path_inclus.pop_front();
-                }
-            else
-                path_inclus.add_mask(bool_mask(true));
 
-                // making exclude mask from file
+		// adding the root path to each argument
+	    update_list_with_root(path_include_exclude, *fs_root);
+	    if(ordered_filters)
+		subtree = make_ordered_mask(path_include_exclude, &make_include_path, &make_exclude_path_ordered);
+	    else // unordered filters
+		subtree = make_unordered_mask(path_include_exclude, &make_include_path, &make_exclude_path_unordered);
 
-            while(l_path_exclus.size() > 0)
-            {
-                path_exclus.add_mask(simple_mask((*fs_root + path(l_path_exclus.front())).display()));
-                l_path_exclus.pop_front();
-            }
 
-            tmp_mask = new et_mask();
-            subtree = tmp_mask;
-            if(tmp_mask == NULL)
-                throw Ememory("get_args");
-            if(path_inclus.size() > 0)
-                tmp_mask->add_mask(path_inclus);
-            else
-                tmp_mask->add_mask(bool_mask(true));
-            if(path_exclus.size() > 0)
-                tmp_mask->add_mask(not_mask(path_exclus));
-
-                // generating mask for
-                // compression selected files
+		////////////////////////////////
+		// generating mask for
+		// compression selected files
                 //
             if(algo == none)
             {
-                if(compr_inclus.size() > 0)
-                    user_interaction_warning("-Y is only useful with -z or -y option, ignoring -Y");
-                if(compr_exclus.size() > 0)
-                    user_interaction_warning("-Z is only useful with -z or -y option, ignoring -Z");
+                if(compr_include_exclude.size() > 0)
+                    dialog.warning(gettext("-Y and -Z are only useful with compression (-z or -y option for example), ignoring any -Y and -Z option"));
                 if(min_compr_size != min_compr_size_default)
-                    user_interaction_warning("-m is only useful with -z or -y option, ignoring -m");
+                    dialog.warning(gettext("-m is only useful with compression (-z or -y option for example), ignoring -m"));
             }
-            tmp_mask = new et_mask();
-            compress_mask = tmp_mask;  // tmp_mask is a pointer on et_mask which "compress_mask" is not
-            if(tmp_mask == NULL)
-                throw Ememory("get_args");
-            if(compr_inclus.size() > 0 && algo != none)
-                tmp_mask->add_mask(compr_inclus);
-            else
-                tmp_mask->add_mask(bool_mask(true));
-            if(compr_exclus.size() > 0 && algo != none)
-                tmp_mask->add_mask(not_mask(compr_exclus));
+
+	    if(algo != none)
+		if(ordered_filters)
+		    compress_mask = make_ordered_mask(compr_include_exclude, &make_include_exclude_name, & make_include_exclude_name);
+		else
+		    compress_mask = make_unordered_mask(compr_include_exclude, &make_include_exclude_name, & make_include_exclude_name);
+	    else
+	    {
+		compress_mask = new bool_mask(true);
+		if(compress_mask == NULL)
+		    throw Ememory("get_args");
+	    }
         }
         catch(...)
         {
             if(fs_root != NULL)
+	    {
                 delete fs_root;
+		fs_root = NULL;
+	    }
             if(sauv_root != NULL)
+	    {
                 delete sauv_root;
+		sauv_root = NULL;
+	    }
             if(selection != NULL)
+	    {
                 delete selection;
+		selection = NULL;
+	    }
             if(subtree != NULL)
+	    {
                 delete subtree;
+		subtree = NULL;
+	    }
+	    if(ref_root != NULL)
+	    {
+		delete ref_root;
+		ref_root = NULL;
+	    }
             if(ref_filename != NULL)
+	    {
                 delete ref_filename;
+		ref_filename = NULL;
+	    }
             if(compress_mask != NULL)
+	    {
                 delete compress_mask;
+		compress_mask = NULL;
+	    }
+	    if(on_fly_root != NULL)
+	    {
+		delete on_fly_root;
+		on_fly_root = NULL;
+	    }
+	    if(on_fly_filename != NULL)
+	    {
+		delete on_fly_filename;
+		on_fly_filename = NULL;
+	    }
             throw;
         }
     }
     catch(Erange & e)
     {
-        user_interaction_warning(string("parse error on command line : ") + e.get_message());
+        dialog.warning(string(gettext("parse error on command line (or included files) : ")) + e.get_message());
         return false;
     }
     return true;
 }
 
-static bool get_args_recursive(vector<string> & inclusions,
+static bool get_args_recursive(user_interaction & dialog,
+			       vector<string> & inclusions,
                                S_I argc,
                                char *argv[],
                                operation &op,
@@ -512,10 +601,8 @@ static bool get_args_recursive(vector<string> & inclusions,
                                path * &ref_root,
                                infinint &file_size,
                                infinint &first_file_size,
-                               ou_mask & inclus,
-                               ou_mask & exclus,
-                               deque<string> & l_path_inclus,
-                               deque<string> & l_path_exclus,
+                               deque<pre_mask> & name_include_exclude,
+			       deque<pre_mask> & path_include_exclude,
                                string & filename,
                                string *& ref_filename,
                                bool &allow_over,
@@ -537,23 +624,34 @@ static bool get_args_recursive(vector<string> & inclusions,
                                string & execute_ref,
                                string & pass,
                                string & pass_ref,
-                               ou_mask & compr_inclus,
-                               ou_mask & compr_exclus,
+			       deque<pre_mask> & compr_include_exclude,
                                bool &tar_format,
                                bool & flat,
                                infinint & min_compr_size,
                                bool & readconfig,
                                bool & nodump,
                                infinint & hourshift,
-                               bool & warn_remove_no_match,
-                               string & alteration,
-                               bool & empty)
+			       bool & warn_remove_no_match,
+			       string & alteration,
+			       bool & empty,
+			       U_I & suffix_base,
+			       path * & on_fly_root,
+			       string * & on_fly_filename,
+			       bool & alter_atime,
+			       bool & same_fs,
+			       U_32 crypto_size,
+			       U_32 crypto_size_ref,
+			       bool & ordered_filters,
+			       bool & case_sensit)
 {
     S_I lu;
     S_I rec_c;
     char **rec_v = NULL;
+    pre_mask tmp_pre_mask;
+    static bool warned = false;
+    U_I tmp;
 
-#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
+#if HAVE_GETOPT_LONG
     while((lu = getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL)) != EOF)
 #else
         while((lu = getopt(argc, argv, OPT_STRING)) != EOF)
@@ -568,13 +666,13 @@ static bool get_args_recursive(vector<string> & inclusions,
             case 'l':
             case 'C':
                 if(optarg == NULL)
-                    throw Erange("get_args", string(" missing argument to -")+char(lu));
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(filename != "" || sauv_root != NULL)
-                    throw Erange("get_args", " only one option of -c -d -t -l -C or -x is allowed");
+                    throw Erange("get_args", gettext(" Only one option of -c -d -t -l -C or -x is allowed"));
                 if(optarg != "")
                     tools_split_path_basename(optarg, sauv_root, filename);
                 else
-                    throw Erange("get_args", string(" invalid argument for option -") + char(lu));
+                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
                 switch(lu)
                 {
                 case 'c':
@@ -601,13 +699,13 @@ static bool get_args_recursive(vector<string> & inclusions,
                 break;
             case 'A':
                 if(ref_filename != NULL || ref_root != NULL)
-                    throw Erange("get_args", "only one -A option is allowed");
+                    throw Erange("get_args", gettext("Only one -A option is allowed"));
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -A");
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(optarg == "")
-                    throw Erange("get_args", "invalid argument for option -A");
+                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
                 if(optarg == "-")
-                    throw Erange("get_args", "- not allowed with -A option");
+                    throw Erange("get_args", gettext("\"-\" is not allowed as argument to -A option"));
                 ref_filename = new string();
                 if(ref_filename == NULL)
                     throw Ememory("get_args");
@@ -628,25 +726,25 @@ static bool get_args_recursive(vector<string> & inclusions,
                 if(algo == none)
                     algo = gzip;
                 else
-                    throw Erange("get_args", "choose either -z or -y not both");
+                    throw Erange("get_args", gettext("Choose either -z or -y not both"));
                 if(optarg != NULL)
                     if(! tools_my_atoi(optarg, compression_level) || compression_level > 9 || compression_level < 1)
-                        throw Erange("get_args", "gzip compression level must be between 1 and 9, included");
+                        throw Erange("get_args", gettext("Compression level must be between 1 and 9, included"));
                 break;
             case 'y':
                 if(algo == none)
                     algo = bzip2;
                 else
-                    throw Erange("get_args", "choose either -z or -y not both");
+                    throw Erange("get_args", gettext("Choose either -z or -y not both"));
                 if(optarg != NULL)
                     if(! tools_my_atoi(optarg, compression_level) || compression_level > 9 || compression_level < 1)
-                        throw Erange("get_args", "bzip2 compression level must be between 1 and 9, included");
+                        throw Erange("get_args", gettext("Compression level must be between 1 and 9, included"));
                 break;
             case 'n':
                 allow_over = false;
                 if(!warn_over)
                 {
-                    user_interaction_warning("-w option is useless with -n");
+                    dialog.warning(gettext("-w option is useless with -n"));
                     warn_over = false;
                 }
                 break;
@@ -658,7 +756,7 @@ static bool get_args_recursive(vector<string> & inclusions,
                         warn_remove_no_match = false;
                     else
 			if(strcmp(optarg, "d") != 0 && strcmp(optarg, "default") != 0)
-			    throw Erange("get_args", string("unknown option given to -w : ") + optarg);
+			    throw Erange("get_args", string(gettext("Unknown argument given to -w: ")) + optarg);
 			// else this is the default -w
                 }
                 break;
@@ -670,9 +768,9 @@ static bool get_args_recursive(vector<string> & inclusions,
                 break;
             case 'R':
                 if(fs_root != NULL)
-                    throw Erange("get_args", "only one -R option is allowed");
+                    throw Erange("get_args", gettext("Only one -R option is allowed"));
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -R");
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 else
                     fs_root = new path(optarg);
                 if(fs_root == NULL)
@@ -680,148 +778,165 @@ static bool get_args_recursive(vector<string> & inclusions,
                 break;
             case 's':
                 if(file_size != 0)
-                    throw Erange("get_args", "only one -s option is allowed");
+                    throw Erange("get_args", gettext("Only one -s option is allowed"));
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -s");
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 else
                 {
                     try
                     {
-                        file_size = tools_get_extended_size(optarg);
+                        file_size = tools_get_extended_size(optarg, suffix_base);
                         if(first_file_size == 0)
                             first_file_size = file_size;
                     }
                     catch(Edeci &e)
                     {
-                        user_interaction_warning("invalid size for option -s");
+                        dialog.warning(tools_printf(gettext(INVALID_SIZE), char(lu)));
                         return false;
                     }
                 }
                 break;
             case 'S':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -S");
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(first_file_size == 0)
-                    first_file_size = tools_get_extended_size(optarg);
+                    first_file_size = tools_get_extended_size(optarg, suffix_base);
                 else
                     if(file_size == 0)
-                        throw Erange("get_args", "only one -S option is allowed");
+                        throw Erange("get_args", gettext("Only one -S option is allowed"));
                     else
                         if(file_size == first_file_size)
                         {
                             try
                             {
-                                first_file_size = tools_get_extended_size(optarg);
+                                first_file_size = tools_get_extended_size(optarg, suffix_base);
                                 if(first_file_size == file_size)
-                                    user_interaction_warning("specifying -S with the same value as the one given in -s is useless");
+                                    dialog.warning(gettext("Giving to -S option the same value as the one given to -s option is useless"));
                             }
                             catch(Egeneric &e)
                             {
-                                user_interaction_warning("invalid size for option -S");
+                                dialog.warning(tools_printf(gettext(INVALID_SIZE), char(lu)));
                                 return false;
                             }
 
                         }
                         else
-                            throw Erange("get_args", "only one -S option is allowed");
+                            throw Erange("get_args", gettext("Only one -S option is allowed"));
                 break;
             case 'X':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missiong argument to -X");
-                exclus.add_mask(simple_mask(string(optarg)));
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		tmp_pre_mask.case_sensit = case_sensit;
+		tmp_pre_mask.included = false;
+		tmp_pre_mask.mask = string(optarg);
+                name_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'I':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -X");
-                inclus.add_mask(simple_mask(string(optarg)));
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		tmp_pre_mask.case_sensit = case_sensit;
+		tmp_pre_mask.included = true;
+		tmp_pre_mask.mask = string(optarg);
+                name_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'P':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -P");
-                l_path_exclus.push_back(optarg);
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		tmp_pre_mask.case_sensit = case_sensit;
+		tmp_pre_mask.included = false;
+		tmp_pre_mask.mask = string(optarg);
+                path_include_exclude.push_back(tmp_pre_mask);
+                break;
+	    case 'g':
+                if(optarg == NULL)
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		tmp_pre_mask.case_sensit = case_sensit;
+		tmp_pre_mask.included = true;
+		tmp_pre_mask.mask = string(optarg);
+                path_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'b':
                 beep = true;
                 break;
             case 'h':
-                usage(argv[0]);
+                usage(dialog, argv[0]);
                 return false;
             case 'L':
-                show_license();
+                show_license(dialog);
                 return false;
             case 'W':
-                show_warranty();
+                show_warranty(dialog);
                 return false;
             case 'D':
                 if(make_empty_dir)
-                    user_interaction_warning("syntax error: -D option has not to be present only once, ignoring additional -D");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     make_empty_dir = true;
                 break;
             case 'r':
                 if(!allow_over)
-                    user_interaction_warning("NOTE : -r is useless with -n");
+                    dialog.warning(gettext("-r is useless with -n"));
                 if(only_more_recent)
-                    user_interaction_warning("syntax error: -r is only necessary once, ignoring other occurences");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     only_more_recent = true;
                 break;
             case 'u':
 #ifdef EA_SUPPORT
                 if(!ea_user)
-                    user_interaction_warning("syntax error: -u is only necessary once, ignoring other occurences");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     ea_user = false;
 #else
-                user_interaction_warning("WARNING! Extended Attributs Support has not been activated at compilation time, thus -u option does nothing");
+                dialog.warning(gettext("WARNING! Extended Attributs Support has not been activated at compilation time, thus -u option does nothing"));
 #endif
                 break;
             case 'U':
 #ifdef EA_SUPPORT
                 if(!ea_root)
-                    user_interaction_warning("syntax error : -U is only necessary once, ignoring other occurences");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     ea_root = false;
 #else
-                user_interaction_warning("WARNING! Extended Attributs Support has not been activated at compilation time, thus -U option does nothing.");
+                dialog.warning(gettext("WARNING! Extended Attributs Support has not been activated at compilation time, thus -U option does nothing."));
 #endif
                 break;
             case 'V':
-                show_version(argv[0]);
+                show_version(dialog, argv[0]);
                 return false;
             case ':':
-                throw Erange("get_args", string("missing parameter to option ") + char(optopt));
+                throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
             case 'i':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -i");
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(input_pipe == "")
                     input_pipe = optarg;
                 else
-                    user_interaction_warning("only one -i option is allowed, considering the first one");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'o':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -o");
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(output_pipe == "")
                     output_pipe = optarg;
                 else
-                    user_interaction_warning("only one -o option is allowed, considering the first one");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'O':
                 if(ignore_owner)
-                    user_interaction_warning("only one -O option is necessary, ignoring other instances");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     ignore_owner = true;
                 break;
             case 'T': // long option --tar-format
                 if(!tar_format)
-                    user_interaction_warning("only one -T option is necessary, ignoring other instances");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     tar_format = false;
                 break;
             case 'E':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -E");
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(execute == "")
                     execute = optarg;
                 else
@@ -829,7 +944,7 @@ static bool get_args_recursive(vector<string> & inclusions,
                 break;
             case 'F':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -F");
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(execute_ref == "")
                     execute_ref = optarg;
                 else
@@ -837,39 +952,45 @@ static bool get_args_recursive(vector<string> & inclusions,
                 break;
             case 'J':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -J");
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(pass_ref == "")
                     pass_ref = optarg;
                 else
-                    user_interaction_warning("only one -J option is allowed, ignoring other instances");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'K':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -K");
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(pass == "")
                     pass = optarg;
                 else
-                    user_interaction_warning("only one -K option is allowed, ignoring other instances");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'Y':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missiong argument to -Y");
-                compr_inclus.add_mask(simple_mask(string(optarg)));
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		tmp_pre_mask.case_sensit = case_sensit;
+		tmp_pre_mask.included = true;
+		tmp_pre_mask.mask = string(optarg);
+		compr_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'Z':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -Z");
-                compr_exclus.add_mask(simple_mask(string(optarg)));
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		tmp_pre_mask.case_sensit = case_sensit;
+		tmp_pre_mask.included = false;
+		tmp_pre_mask.mask = string(optarg);
+		compr_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'B':
                 if(optarg == NULL)
-                    throw Erange("get_args", "missing argument to -B");
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(find(inclusions.begin(), inclusions.end(), string(optarg)) != inclusions.end())
-                    throw Erange("geta_args", string("file inclusion loop detected. The file ") + optarg  + " includes itslef directly or through other files (-B option)");
+                    throw Erange("geta_args", tools_printf(gettext("File inclusion loop detected. The file %s includes itself directly or through other files (-B option)"), optarg));
                 else
                 {
                     bool ret;
-                    make_args_from_file(op, optarg, rec_c, rec_v, info_details);
+                    make_args_from_file(dialog, op, optarg, rec_c, rec_v, info_details);
 #ifdef DEBOGGAGE
                     show_args(rec_c, rec_v);
 #endif
@@ -879,9 +1000,11 @@ static bool get_args_recursive(vector<string> & inclusions,
                     try
                     {
                         inclusions.push_back(optarg);
-                        ret = get_args_recursive(inclusions, rec_c, rec_v, op, fs_root, sauv_root, ref_root,
-                                                 file_size, first_file_size, inclus, exclus,
-                                                 l_path_inclus, l_path_exclus,
+                        ret = get_args_recursive(dialog,
+						 inclusions, rec_c, rec_v, op, fs_root, sauv_root, ref_root,
+                                                 file_size, first_file_size,
+						 name_include_exclude,
+                                                 path_include_exclude,
                                                  filename, ref_filename,
                                                  allow_over, warn_over, info_details,
                                                  algo, compression_level, detruire, pause,
@@ -892,15 +1015,24 @@ static bool get_args_recursive(vector<string> & inclusions,
                                                  execute,
                                                  execute_ref,
                                                  pass, pass_ref,
-                                                 compr_inclus, compr_exclus,
+                                                 compr_include_exclude,
                                                  tar_format,
                                                  flat,
                                                  min_compr_size,
                                                  readconfig, nodump,
                                                  hourshift,
-                                                 warn_remove_no_match,
-                                                 alteration,
-                                                 empty);
+						 warn_remove_no_match,
+						 alteration,
+						 empty,
+						 suffix_base,
+						 on_fly_root,
+						 on_fly_filename,
+						 alter_atime,
+						 same_fs,
+						 crypto_size,
+						 crypto_size_ref,
+						 ordered_filters,
+						 case_sensit);
                         inclusions.pop_back();
                     }
                     catch(...)
@@ -918,37 +1050,37 @@ static bool get_args_recursive(vector<string> & inclusions,
                 break;
             case 'f':
                 if(flat)
-                    user_interaction_warning("only one -f option is allowed, ignoring other instances");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     flat = true;
                 break;
             case 'm':
                 if(min_compr_size != min_compr_size_default)
-                    user_interaction_warning("only one -m option is allowed, ignoring other instances");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                 {
                     if(optarg == NULL)
-                        throw Erange("get_args", "missing argument to -m");
-                    min_compr_size = tools_get_extended_size(optarg);
+                        throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    min_compr_size = tools_get_extended_size(optarg, suffix_base);
                     if(min_compr_size == min_compr_size_default)
-                        user_interaction_warning(deci(min_compr_size_default).human() + " is the default falue for -m, no need to specify it on command line, ignoring");
+                        dialog.warning(tools_printf(gettext("%d is the default value for -m, no need to specify it on command line, ignoring"), min_compr_size_default));
                     break;
                 }
             case 'N':
                 if(!readconfig)
-                    user_interaction_warning("only one -N option is allowed, ignoring other instances");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     readconfig = false;
                 break;
             case ' ':
 #ifdef LIBDAR_NODUMP_FEATURE
                 if(nodump)
-                    user_interaction_warning("only one --nodump option is allowed, ignoring other instances");
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
                     nodump = true;
                 break;
 #else
-                throw Erange("command_line.cpp:get_args_recursive", "--nodump feature has not been activated at compilation time, it is thus not available");
+                throw Ecompilation(gettext("--nodump feature has not been activated at compilation time, it is thus not available"));
 #endif
             case 'H':
                 if(optarg == NULL)
@@ -961,48 +1093,140 @@ static bool get_args_recursive(vector<string> & inclusions,
                     }
                     catch(Edeci & e)
                     {
-                        throw Erange("command_line.cpp:get_args_recursive", "Argument given to -H is not a positive integer number");
+                        throw Erange("command_line.cpp:get_args_recursive", gettext("Argument given to -H is not a positive integer number"));
                     }
                 }
                 break;
-            case 'a':
+	    case 'a':
+		if(optarg == NULL)
+		    throw Erange("command_line.cpp:get_args_recursive", gettext("-a option requires an argument"));
+		if(strcasecmp("SI-unit", optarg) == 0 || strcasecmp("SI", optarg) == 0 || strcasecmp("SI-units", optarg) == 0)
+		    suffix_base = TOOLS_SI_SUFFIX;
+		else
+		    if(strcasecmp("binary-unit", optarg) == 0 || strcasecmp("binary", optarg) == 0 || strcasecmp("binary-units", optarg) == 0)
+			suffix_base = TOOLS_BIN_SUFFIX;
+		    else
+			if(strcasecmp("atime", optarg) == 0 || strcasecmp("a", optarg) == 0)
+			{
+			    if(alter_atime)
+				dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+			    alter_atime = true;
+			}
+			else
+			    if(strcasecmp("ctime", optarg) == 0 || strcasecmp("c", optarg) == 0)
+			    {
+				alter_atime = false;
+			    }
+			    else
+				if(strcasecmp("m", optarg) == 0 || strcasecmp("mask", optarg) == 0)
+				{
+				    if(ordered_filters)
+					dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+				    else
+					ordered_filters = true;
+				}
+				else
+				    if(strcasecmp("n", optarg) == 0 || strcasecmp("no-case", optarg) == 0 || strcasecmp("no_case", optarg) == 0)
+					case_sensit = false;
+				    else
+					if(strcasecmp("case", optarg) == 0)
+					    case_sensit = true;
+					else
+					    if(strcasecmp("s", optarg) == 0 || strcasecmp("saved", optarg) == 0)
+					    {
+						if(alteration != "")
+						    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+						else
+						    alteration = optarg;
+					    }
+					    else
+						throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
+		break;
+	    case 'e':
+		if(empty)
+		    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+		else
+		    empty = true;
+		break;
+	    case 'Q':
+	    case 'j':
+		break;  // ignore this option already parsed during initialization (dar_suite.cpp)
+            case 'G':
+                if(on_fly_filename != NULL || on_fly_root != NULL)
+                    throw Erange("get_args", tools_printf(gettext(ONLY_ONCE), char(lu)));
                 if(optarg == NULL)
-                    throw Erange("command_line.cpp:get_args_recursive", "-a option needs an argument");
-                if(alteration != "")
-                    user_interaction_warning("only one -a option is allowed, ignoring other instances");
-                else
-                    alteration = optarg;
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                if(strcmp("", optarg) == 0)
+                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                if(strcmp("-", optarg) == 0)
+                    throw Erange("get_args", gettext("\"-\" not allowed with -G option"));
+                on_fly_filename = new string();
+                if(on_fly_filename == NULL)
+                    throw Ememory("get_args");
+                try
+                {
+                    tools_split_path_basename(optarg, on_fly_root, *on_fly_filename);
+                }
+                catch(...)
+                {
+                    delete on_fly_filename;
+                    throw;
+                }
                 break;
-            case 'e':
-                if(empty)
-                    user_interaction_warning("only one -e option is allowed, ignoring other instances");
-                else
-                    empty = true;
-                break;
+	    case 'M':
+		if(same_fs)
+		    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+		else
+		    same_fs = true;
+		break;
+	    case '#':
+		if(! tools_my_atoi(optarg, tmp))
+		    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+		else
+		    crypto_size = (U_32)tmp;
+		break;
+	    case '*':
+		if(! tools_my_atoi(optarg, tmp))
+		    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+		else
+		    crypto_size_ref = (U_32)tmp;
+		break;
             case '?':
-                user_interaction_warning(string("ignoring unknown option ") + char(optopt));
+                dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"),char(optopt)));
                 break;
             default:
-                user_interaction_warning(string("ignoring unknown option ") + char(lu));
+                dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"),char(lu)));
             }
         }
 
+    tmp_pre_mask.case_sensit = case_sensit;
+    tmp_pre_mask.included = true;
+
+    if(optind < argc && !warned)
+    {
+	dialog.warning(gettext("The [list of path] is deprecated, thanks to use the -g option instead"));
+	warned = true;
+    }
+
     for(S_I i = optind; i < argc; i++)
-        l_path_inclus.push_back(argv[i]);
+    {
+	tmp_pre_mask.mask = string(argv[i]);
+	path_include_exclude.push_back(tmp_pre_mask);
+    }
 
     return true;
 }
 
-static void usage(const char *command_name)
+static void usage(user_interaction & dialog, const char *command_name)
 {
     char *name = tools_extract_basename(command_name);
     shell_interaction_change_non_interactive_output(&cout);
 
     try
     {
-        ui_printf("usage: %s [-c|-x|-d|-t|-l|-C] [<path>/]<basename> [options...] [list of paths]\n", name);
-        ui_printf("       %s -h\n", name);
-        ui_printf("       %s -V\n", name);
+        dialog.printf("usage: %s [-c|-x|-d|-t|-l|-C] [<path>/]<basename> [options...] [list of paths]\n", name);
+        dialog.printf("       %s -h\n", name);
+        dialog.printf("       %s -V\n", name);
 #include "dar.usage"
     }
     catch(...)
@@ -1016,382 +1240,389 @@ static void usage(const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.26.2.10 2004/04/20 13:31:53 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.52 2004/12/07 18:04:48 edrusb Rel $";
     dummy_call(id);
 }
 
-static void show_warranty()
+static void show_warranty(user_interaction & dialog)
 {
     shell_interaction_change_non_interactive_output(&cout);
-    ui_printf("                     NO WARRANTY\n");
-    ui_printf("\n");
-    ui_printf("  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY\n");
-    ui_printf("FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN\n");
-    ui_printf("OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES\n");
-    ui_printf("PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED\n");
-    ui_printf("OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF\n");
-    ui_printf("MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS\n");
-    ui_printf("TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE\n");
-    ui_printf("PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,\n");
-    ui_printf("REPAIR OR CORRECTION.\n");
-    ui_printf("\n");
-    ui_printf("  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING\n");
-    ui_printf("WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR\n");
-    ui_printf("REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,\n");
-    ui_printf("INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING\n");
-    ui_printf("OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED\n");
-    ui_printf("TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY\n");
-    ui_printf("YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER\n");
-    ui_printf("PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE\n");
-    ui_printf("POSSIBILITY OF SUCH DAMAGES.\n");
-    ui_printf("\n");
+    dialog.printf("                     NO WARRANTY\n");
+    dialog.printf("\n");
+    dialog.printf("  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY\n");
+    dialog.printf("FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN\n");
+    dialog.printf("OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES\n");
+    dialog.printf("PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED\n");
+    dialog.printf("OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF\n");
+    dialog.printf("MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS\n");
+    dialog.printf("TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE\n");
+    dialog.printf("PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,\n");
+    dialog.printf("REPAIR OR CORRECTION.\n");
+    dialog.printf("\n");
+    dialog.printf("  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING\n");
+    dialog.printf("WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR\n");
+    dialog.printf("REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,\n");
+    dialog.printf("INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING\n");
+    dialog.printf("OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED\n");
+    dialog.printf("TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY\n");
+    dialog.printf("YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER\n");
+    dialog.printf("PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE\n");
+    dialog.printf("POSSIBILITY OF SUCH DAMAGES.\n");
+    dialog.printf("\n");
 }
 
-static void show_license()
+static void show_license(user_interaction & dialog)
 {
     shell_interaction_change_non_interactive_output(&cout);
-    ui_printf("             GNU GENERAL PUBLIC LICENSE\n");
-    ui_printf("                Version 2, June 1991\n");
-    ui_printf("\n");
-    ui_printf(" Copyright (C) 1989, 1991 Free Software Foundation, Inc.\n");
-    ui_printf("                       59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n");
-    ui_printf(" Everyone is permitted to copy and distribute verbatim copies\n");
-    ui_printf(" of this license document, but changing it is not allowed.\n");
-    ui_printf("\n");
-    ui_printf("                     Preamble\n");
-    ui_printf("\n");
-    ui_printf("  The licenses for most software are designed to take away your\n");
-    ui_printf("freedom to share and change it.  By contrast, the GNU General Public\n");
-    ui_printf("License is intended to guarantee your freedom to share and change free\n");
-    ui_printf("software--to make sure the software is free for all its users.  This\n");
-    ui_printf("General Public License applies to most of the Free Software\n");
-    ui_printf("Foundation's software and to any other program whose authors commit to\n");
-    ui_printf("using it.  (Some other Free Software Foundation software is covered by\n");
-    ui_printf("the GNU Library General Public License instead.)  You can apply it to\n");
-    ui_printf("your programs, too.\n");
-    ui_printf("\n");
-    ui_printf("  When we speak of free software, we are referring to freedom, not\n");
-    ui_printf("price.  Our General Public Licenses are designed to make sure that you\n");
-    ui_printf("have the freedom to distribute copies of free software (and charge for\n");
-    ui_printf("this service if you wish), that you receive source code or can get it\n");
-    ui_printf("if you want it, that you can change the software or use pieces of it\n");
-    ui_printf("in new free programs; and that you know you can do these things.\n");
-    ui_printf("\n");
-    ui_printf("  To protect your rights, we need to make restrictions that forbid\n");
-    ui_printf("anyone to deny you these rights or to ask you to surrender the rights.\n");
-    ui_printf("These restrictions translate to certain responsibilities for you if you\n");
-    ui_printf("distribute copies of the software, or if you modify it.\n");
-    ui_printf("\n");
-    ui_printf("  For example, if you distribute copies of such a program, whether\n");
-    ui_printf("gratis or for a fee, you must give the recipients all the rights that\n");
-    ui_printf("you have.  You must make sure that they, too, receive or can get the\n");
-    ui_printf("source code.  And you must show them these terms so they know their\n");
-    ui_printf("rights.\n");
-    ui_printf("\n");
-    ui_printf("  We protect your rights with two steps: (1) copyright the software, and\n");
-    ui_printf("(2) offer you this license which gives you legal permission to copy,\n");
-    ui_printf("distribute and/or modify the software.\n");
-    ui_printf("\n");
-    ui_printf("  Also, for each author's protection and ours, we want to make certain\n");
-    ui_printf("that everyone understands that there is no warranty for this free\n");
-    ui_printf("software.  If the software is modified by someone else and passed on, we\n");
-    ui_printf("want its recipients to know that what they have is not the original, so\n");
-    ui_printf("that any problems introduced by others will not reflect on the original\n");
-    ui_printf("authors' reputations.\n");
-    ui_printf("\n");
-    ui_printf("  Finally, any free program is threatened constantly by software\n");
-    ui_printf("patents.  We wish to avoid the danger that redistributors of a free\n");
-    ui_printf("program will individually obtain patent licenses, in effect making the\n");
-    ui_printf("program proprietary.  To prevent this, we have made it clear that any\n");
-    ui_printf("patent must be licensed for everyone's free use or not licensed at all.\n");
-    ui_printf("\n");
-    ui_printf("  The precise terms and conditions for copying, distribution and\n");
-    ui_printf("modification follow.\n");
-    ui_printf("\n");
-    ui_printf("             GNU GENERAL PUBLIC LICENSE\n");
-    ui_printf("   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION\n");
-    ui_printf("\n");
-    ui_printf("  0. This License applies to any program or other work which contains\n");
-    ui_printf("a notice placed by the copyright holder saying it may be distributed\n");
-    ui_printf("under the terms of this General Public License.  The \"Program\", below,\n");
-    ui_printf("refers to any such program or work, and a \"work based on the Program\"\n");
-    ui_printf("means either the Program or any derivative work under copyright law:\n");
-    ui_printf("that is to say, a work containing the Program or a portion of it,\n");
-    ui_printf("either verbatim or with modifications and/or translated into another\n");
-    ui_printf("language.  (Hereinafter, translation is included without limitation in\n");
-    ui_printf("the term \"modification\".)  Each licensee is addressed as \"you\".\n");
-    ui_printf("\n");
-    ui_printf("Activities other than copying, distribution and modification are not\n");
-    ui_printf("covered by this License; they are outside its scope.  The act of\n");
-    ui_printf("running the Program is not restricted, and the output from the Program\n");
-    ui_printf("is covered only if its contents constitute a work based on the\n");
-    ui_printf("Program (independent of having been made by running the Program).\n");
-    ui_printf("Whether that is true depends on what the Program does.\n");
-    ui_printf("\n");
-    ui_printf("  1. You may copy and distribute verbatim copies of the Program's\n");
-    ui_printf("source code as you receive it, in any medium, provided that you\n");
-    ui_printf("conspicuously and appropriately publish on each copy an appropriate\n");
-    ui_printf("copyright notice and disclaimer of warranty; keep intact all the\n");
-    ui_printf("notices that refer to this License and to the absence of any warranty;\n");
-    ui_printf("and give any other recipients of the Program a copy of this License\n");
-    ui_printf("along with the Program.\n");
-    ui_printf("\n");
-    ui_printf("You may charge a fee for the physical act of transferring a copy, and\n");
-    ui_printf("you may at your option offer warranty protection in exchange for a fee.\n");
-    ui_printf("\n");
-    ui_printf("  2. You may modify your copy or copies of the Program or any portion\n");
-    ui_printf("of it, thus forming a work based on the Program, and copy and\n");
-    ui_printf("distribute such modifications or work under the terms of Section 1\n");
-    ui_printf("above, provided that you also meet all of these conditions:\n");
-    ui_printf("\n");
-    ui_printf("    a) You must cause the modified files to carry prominent notices\n");
-    ui_printf("    stating that you changed the files and the date of any change.\n");
-    ui_printf("\n");
-    ui_printf("    b) You must cause any work that you distribute or publish, that in\n");
-    ui_printf("    whole or in part contains or is derived from the Program or any\n");
-    ui_printf("    part thereof, to be licensed as a whole at no charge to all third\n");
-    ui_printf("    parties under the terms of this License.\n");
-    ui_printf("\n");
-    ui_printf("    c) If the modified program normally reads commands interactively\n");
-    ui_printf("    when run, you must cause it, when started running for such\n");
-    ui_printf("    interactive use in the most ordinary way, to print or display an\n");
-    ui_printf("    announcement including an appropriate copyright notice and a\n");
-    ui_printf("    notice that there is no warranty (or else, saying that you provide\n");
-    ui_printf("    a warranty) and that users may redistribute the program under\n");
-    ui_printf("    these conditions, and telling the user how to view a copy of this\n");
-    ui_printf("    License.  (Exception: if the Program itself is interactive but\n");
-    ui_printf("    does not normally print such an announcement, your work based on\n");
-    ui_printf("    the Program is not required to print an announcement.)\n");
-    ui_printf("\n");
-    ui_printf("These requirements apply to the modified work as a whole.  If\n");
-    ui_printf("identifiable sections of that work are not derived from the Program,\n");
-    ui_printf("and can be reasonably considered independent and separate works in\n");
-    ui_printf("themselves, then this License, and its terms, do not apply to those\n");
-    ui_printf("sections when you distribute them as separate works.  But when you\n");
-    ui_printf("distribute the same sections as part of a whole which is a work based\n");
-    ui_printf("on the Program, the distribution of the whole must be on the terms of\n");
-    ui_printf("this License, whose permissions for other licensees extend to the\n");
-    ui_printf("entire whole, and thus to each and every part regardless of who wrote it.\n");
-    ui_printf("\n");
-    ui_printf("Thus, it is not the intent of this section to claim rights or contest\n");
-    ui_printf("your rights to work written entirely by you; rather, the intent is to\n");
-    ui_printf("exercise the right to control the distribution of derivative or\n");
-    ui_printf("collective works based on the Program.\n");
-    ui_printf("\n");
-    ui_printf("In addition, mere aggregation of another work not based on the Program\n");
-    ui_printf("with the Program (or with a work based on the Program) on a volume of\n");
-    ui_printf("a storage or distribution medium does not bring the other work under\n");
-    ui_printf("the scope of this License.\n");
-    ui_printf("\n");
-    ui_printf("  3. You may copy and distribute the Program (or a work based on it,\n");
-    ui_printf("under Section 2) in object code or executable form under the terms of\n");
-    ui_printf("Sections 1 and 2 above provided that you also do one of the following:\n");
-    ui_printf("\n");
-    ui_printf("    a) Accompany it with the complete corresponding machine-readable\n");
-    ui_printf("    source code, which must be distributed under the terms of Sections\n");
-    ui_printf("    1 and 2 above on a medium customarily used for software interchange; or,\n");
-    ui_printf("\n");
-    ui_printf("    b) Accompany it with a written offer, valid for at least three\n");
-    ui_printf("    years, to give any third party, for a charge no more than your\n");
-    ui_printf("    cost of physically performing source distribution, a complete\n");
-    ui_printf("    machine-readable copy of the corresponding source code, to be\n");
-    ui_printf("    distributed under the terms of Sections 1 and 2 above on a medium\n");
-    ui_printf("    customarily used for software interchange; or,\n");
-    ui_printf("\n");
-    ui_printf("    c) Accompany it with the information you received as to the offer\n");
-    ui_printf("    to distribute corresponding source code.  (This alternative is\n");
-    ui_printf("    allowed only for noncommercial distribution and only if you\n");
-    ui_printf("    received the program in object code or executable form with such\n");
-    ui_printf("    an offer, in accord with Subsection b above.)\n");
-    ui_printf("\n");
-    ui_printf("The source code for a work means the preferred form of the work for\n");
-    ui_printf("making modifications to it.  For an executable work, complete source\n");
-    ui_printf("code means all the source code for all modules it contains, plus any\n");
-    ui_printf("associated interface definition files, plus the scripts used to\n");
-    ui_printf("control compilation and installation of the executable.  However, as a\n");
-    ui_printf("special exception, the source code distributed need not include\n");
-    ui_printf("anything that is normally distributed (in either source or binary\n");
-    ui_printf("form) with the major components (compiler, kernel, and so on) of the\n");
-    ui_printf("operating system on which the executable runs, unless that component\n");
-    ui_printf("itself accompanies the executable.\n");
-    ui_printf("\n");
-    ui_printf("If distribution of executable or object code is made by offering\n");
-    ui_printf("access to copy from a designated place, then offering equivalent\n");
-    ui_printf("access to copy the source code from the same place counts as\n");
-    ui_printf("distribution of the source code, even though third parties are not\n");
-    ui_printf("compelled to copy the source along with the object code.\n");
-    ui_printf("\n");
-    ui_printf("  4. You may not copy, modify, sublicense, or distribute the Program\n");
-    ui_printf("except as expressly provided under this License.  Any attempt\n");
-    ui_printf("otherwise to copy, modify, sublicense or distribute the Program is\n");
-    ui_printf("void, and will automatically terminate your rights under this License.\n");
-    ui_printf("However, parties who have received copies, or rights, from you under\n");
-    ui_printf("this License will not have their licenses terminated so long as such\n");
-    ui_printf("parties remain in full compliance.\n");
-    ui_printf("\n");
-    ui_printf("  5. You are not required to accept this License, since you have not\n");
-    ui_printf("signed it.  However, nothing else grants you permission to modify or\n");
-    ui_printf("distribute the Program or its derivative works.  These actions are\n");
-    ui_printf("prohibited by law if you do not accept this License.  Therefore, by\n");
-    ui_printf("modifying or distributing the Program (or any work based on the\n");
-    ui_printf("Program), you indicate your acceptance of this License to do so, and\n");
-    ui_printf("all its terms and conditions for copying, distributing or modifying\n");
-    ui_printf("the Program or works based on it.\n");
-    ui_printf("\n");
-    ui_printf("  6. Each time you redistribute the Program (or any work based on the\n");
-    ui_printf("Program), the recipient automatically receives a license from the\n");
-    ui_printf("original licensor to copy, distribute or modify the Program subject to\n");
-    ui_printf("these terms and conditions.  You may not impose any further\n");
-    ui_printf("restrictions on the recipients' exercise of the rights granted herein.\n");
-    ui_printf("You are not responsible for enforcing compliance by third parties to\n");
-    ui_printf("this License.\n");
-    ui_printf("\n");
-    ui_printf("  7. If, as a consequence of a court judgment or allegation of patent\n");
-    ui_printf("infringement or for any other reason (not limited to patent issues),\n");
-    ui_printf("conditions are imposed on you (whether by court order, agreement or\n");
-    ui_printf("otherwise) that contradict the conditions of this License, they do not\n");
-    ui_printf("excuse you from the conditions of this License.  If you cannot\n");
-    ui_printf("distribute so as to satisfy simultaneously your obligations under this\n");
-    ui_printf("License and any other pertinent obligations, then as a consequence you\n");
-    ui_printf("may not distribute the Program at all.  For example, if a patent\n");
-    ui_printf("license would not permit royalty-free redistribution of the Program by\n");
-    ui_printf("all those who receive copies directly or indirectly through you, then\n");
-    ui_printf("the only way you could satisfy both it and this License would be to\n");
-    ui_printf("refrain entirely from distribution of the Program.\n");
-    ui_printf("\n");
-    ui_printf("If any portion of this section is held invalid or unenforceable under\n");
-    ui_printf("any particular circumstance, the balance of the section is intended to\n");
-    ui_printf("apply and the section as a whole is intended to apply in other\n");
-    ui_printf("circumstances.\n");
-    ui_printf("\n");
-    ui_printf("It is not the purpose of this section to induce you to infringe any\n");
-    ui_printf("patents or other property right claims or to contest validity of any\n");
-    ui_printf("such claims; this section has the sole purpose of protecting the\n");
-    ui_printf("integrity of the free software distribution system, which is\n");
-    ui_printf("implemented by public license practices.  Many people have made\n");
-    ui_printf("generous contributions to the wide range of software distributed\n");
-    ui_printf("through that system in reliance on consistent application of that\n");
-    ui_printf("system; it is up to the author/donor to decide if he or she is willing\n");
-    ui_printf("to distribute software through any other system and a licensee cannot\n");
-    ui_printf("impose that choice.\n");
-    ui_printf("\n");
-    ui_printf("This section is intended to make thoroughly clear what is believed to\n");
-    ui_printf("be a consequence of the rest of this License.\n");
-    ui_printf("\n");
-    ui_printf("  8. If the distribution and/or use of the Program is restricted in\n");
-    ui_printf("certain countries either by patents or by copyrighted interfaces, the\n");
-    ui_printf("original copyright holder who places the Program under this License\n");
-    ui_printf("may add an explicit geographical distribution limitation excluding\n");
-    ui_printf("those countries, so that distribution is permitted only in or among\n");
-    ui_printf("countries not thus excluded.  In such case, this License incorporates\n");
-    ui_printf("the limitation as if written in the body of this License.\n");
-    ui_printf("\n");
-    ui_printf("  9. The Free Software Foundation may publish revised and/or new versions\n");
-    ui_printf("of the General Public License from time to time.  Such new versions will\n");
-    ui_printf("be similar in spirit to the present version, but may differ in detail to\n");
-    ui_printf("address new problems or concerns.\n");
-    ui_printf("\n");
-    ui_printf("Each version is given a distinguishing version number.  If the Program\n");
-    ui_printf("specifies a version number of this License which applies to it and \"any\n");
-    ui_printf("later version\", you have the option of following the terms and conditions\n");
-    ui_printf("either of that version or of any later version published by the Free\n");
-    ui_printf("Software Foundation.  If the Program does not specify a version number of\n");
-    ui_printf("this License, you may choose any version ever published by the Free Software\n");
-    ui_printf("Foundation.\n");
-    ui_printf("\n");
-    ui_printf("  10. If you wish to incorporate parts of the Program into other free\n");
-    ui_printf("programs whose distribution conditions are different, write to the author\n");
-    ui_printf("to ask for permission.  For software which is copyrighted by the Free\n");
-    ui_printf("Software Foundation, write to the Free Software Foundation; we sometimes\n");
-    ui_printf("make exceptions for this.  Our decision will be guided by the two goals\n");
-    ui_printf("of preserving the free status of all derivatives of our free software and\n");
-    ui_printf("of promoting the sharing and reuse of software generally.\n");
-    ui_printf("\n");
-    show_warranty();
-    ui_printf("              END OF TERMS AND CONDITIONS\n");
-    ui_printf("\n");
-    ui_printf("     How to Apply These Terms to Your New Programs\n");
-    ui_printf("\n");
-    ui_printf("  If you develop a new program, and you want it to be of the greatest\n");
-    ui_printf("possible use to the public, the best way to achieve this is to make it\n");
-    ui_printf("free software which everyone can redistribute and change under these terms.\n");
-    ui_printf("\n");
-    ui_printf("  To do so, attach the following notices to the program.  It is safest\n");
-    ui_printf("to attach them to the start of each source file to most effectively\n");
-    ui_printf("convey the exclusion of warranty; and each file should have at least\n");
-    ui_printf("the \"copyright\" line and a pointer to where the full notice is found.\n");
-    ui_printf("\n");
-    ui_printf("    <one line to give the program's name and a brief idea of what it does.>\n");
-    ui_printf("    Copyright (C) <year>  <name of author>\n");
-    ui_printf("\n");
-    ui_printf("    This program is free software; you can redistribute it and/or modify\n");
-    ui_printf("    it under the terms of the GNU General Public License as published by\n");
-    ui_printf("    the Free Software Foundation; either version 2 of the License, or\n");
-    ui_printf("    (at your option) any later version.\n");
-    ui_printf("\n");
-    ui_printf("    This program is distributed in the hope that it will be useful,\n");
-    ui_printf("    but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
-    ui_printf("    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n");
-    ui_printf("    GNU General Public License for more details.\n");
-    ui_printf("\n");
-    ui_printf("    You should have received a copy of the GNU General Public License\n");
-    ui_printf("    along with this program; if not, write to the Free Software\n");
-    ui_printf("    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n");
-    ui_printf("\n");
-    ui_printf("\n");
-    ui_printf("Also add information on how to contact you by electronic and paper mail.\n");
-    ui_printf("\n");
-    ui_printf("If the program is interactive, make it output a short notice like this\n");
-    ui_printf("when it starts in an interactive mode:\n");
-    ui_printf("\n");
-    ui_printf("    Gnomovision version 69, Copyright (C) year name of author\n");
-    ui_printf("    Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w'.\n");
-    ui_printf("    This is free software, and you are welcome to redistribute it\n");
-    ui_printf("    under certain conditions; type `show c' for details.\n");
-    ui_printf("\n");
-    ui_printf("The hypothetical commands `show w' and `show c' should show the appropriate\n");
-    ui_printf("parts of the General Public License.  Of course, the commands you use may\n");
-    ui_printf("be called something other than `show w' and `show c'; they could even be\n");
-    ui_printf("mouse-clicks or menu items--whatever suits your program.\n");
-    ui_printf("\n");
-    ui_printf("You should also get your employer (if you work as a programmer) or your\n");
-    ui_printf("school, if any, to sign a \"copyright disclaimer\" for the program, if\n");
-    ui_printf("necessary.  Here is a sample; alter the names:\n");
-    ui_printf("\n");
-    ui_printf("  Yoyodyne, Inc., hereby disclaims all copyright interest in the program\n");
-    ui_printf("  `Gnomovision' (which makes passes at compilers) written by James Hacker.\n");
-    ui_printf("\n");
-    ui_printf("  <signature of Ty Coon>, 1 April 1989\n");
-    ui_printf("  Ty Coon, President of Vice\n");
-    ui_printf("\n");
-    ui_printf("This General Public License does not permit incorporating your program into\n");
-    ui_printf("proprietary programs.  If your program is a subroutine library, you may\n");
-    ui_printf("consider it more useful to permit linking proprietary applications with the\n");
-    ui_printf("library.  If this is what you want to do, use the GNU Library General\n");
-    ui_printf("Public License instead of this License.\n");
-    ui_printf("\n");
+    dialog.printf("             GNU GENERAL PUBLIC LICENSE\n");
+    dialog.printf("                Version 2, June 1991\n");
+    dialog.printf("\n");
+    dialog.printf(" Copyright (C) 1989, 1991 Free Software Foundation, Inc.\n");
+    dialog.printf("                       59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n");
+    dialog.printf(" Everyone is permitted to copy and distribute verbatim copies\n");
+    dialog.printf(" of this license document, but changing it is not allowed.\n");
+    dialog.printf("\n");
+    dialog.printf("                     Preamble\n");
+    dialog.printf("\n");
+    dialog.printf("  The licenses for most software are designed to take away your\n");
+    dialog.printf("freedom to share and change it.  By contrast, the GNU General Public\n");
+    dialog.printf("License is intended to guarantee your freedom to share and change free\n");
+    dialog.printf("software--to make sure the software is free for all its users.  This\n");
+    dialog.printf("General Public License applies to most of the Free Software\n");
+    dialog.printf("Foundation's software and to any other program whose authors commit to\n");
+    dialog.printf("using it.  (Some other Free Software Foundation software is covered by\n");
+    dialog.printf("the GNU Library General Public License instead.)  You can apply it to\n");
+    dialog.printf("your programs, too.\n");
+    dialog.printf("\n");
+    dialog.printf("  When we speak of free software, we are referring to freedom, not\n");
+    dialog.printf("price.  Our General Public Licenses are designed to make sure that you\n");
+    dialog.printf("have the freedom to distribute copies of free software (and charge for\n");
+    dialog.printf("this service if you wish), that you receive source code or can get it\n");
+    dialog.printf("if you want it, that you can change the software or use pieces of it\n");
+    dialog.printf("in new free programs; and that you know you can do these things.\n");
+    dialog.printf("\n");
+    dialog.printf("  To protect your rights, we need to make restrictions that forbid\n");
+    dialog.printf("anyone to deny you these rights or to ask you to surrender the rights.\n");
+    dialog.printf("These restrictions translate to certain responsibilities for you if you\n");
+    dialog.printf("distribute copies of the software, or if you modify it.\n");
+    dialog.printf("\n");
+    dialog.printf("  For example, if you distribute copies of such a program, whether\n");
+    dialog.printf("gratis or for a fee, you must give the recipients all the rights that\n");
+    dialog.printf("you have.  You must make sure that they, too, receive or can get the\n");
+    dialog.printf("source code.  And you must show them these terms so they know their\n");
+    dialog.printf("rights.\n");
+    dialog.printf("\n");
+    dialog.printf("  We protect your rights with two steps: (1) copyright the software, and\n");
+    dialog.printf("(2) offer you this license which gives you legal permission to copy,\n");
+    dialog.printf("distribute and/or modify the software.\n");
+    dialog.printf("\n");
+    dialog.printf("  Also, for each author's protection and ours, we want to make certain\n");
+    dialog.printf("that everyone understands that there is no warranty for this free\n");
+    dialog.printf("software.  If the software is modified by someone else and passed on, we\n");
+    dialog.printf("want its recipients to know that what they have is not the original, so\n");
+    dialog.printf("that any problems introduced by others will not reflect on the original\n");
+    dialog.printf("authors' reputations.\n");
+    dialog.printf("\n");
+    dialog.printf("  Finally, any free program is threatened constantly by software\n");
+    dialog.printf("patents.  We wish to avoid the danger that redistributors of a free\n");
+    dialog.printf("program will individually obtain patent licenses, in effect making the\n");
+    dialog.printf("program proprietary.  To prevent this, we have made it clear that any\n");
+    dialog.printf("patent must be licensed for everyone's free use or not licensed at all.\n");
+    dialog.printf("\n");
+    dialog.printf("  The precise terms and conditions for copying, distribution and\n");
+    dialog.printf("modification follow.\n");
+    dialog.printf("\n");
+    dialog.printf("             GNU GENERAL PUBLIC LICENSE\n");
+    dialog.printf("   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION\n");
+    dialog.printf("\n");
+    dialog.printf("  0. This License applies to any program or other work which contains\n");
+    dialog.printf("a notice placed by the copyright holder saying it may be distributed\n");
+    dialog.printf("under the terms of this General Public License.  The \"Program\", below,\n");
+    dialog.printf("refers to any such program or work, and a \"work based on the Program\"\n");
+    dialog.printf("means either the Program or any derivative work under copyright law:\n");
+    dialog.printf("that is to say, a work containing the Program or a portion of it,\n");
+    dialog.printf("either verbatim or with modifications and/or translated into another\n");
+    dialog.printf("language.  (Hereinafter, translation is included without limitation in\n");
+    dialog.printf("the term \"modification\".)  Each licensee is addressed as \"you\".\n");
+    dialog.printf("\n");
+    dialog.printf("Activities other than copying, distribution and modification are not\n");
+    dialog.printf("covered by this License; they are outside its scope.  The act of\n");
+    dialog.printf("running the Program is not restricted, and the output from the Program\n");
+    dialog.printf("is covered only if its contents constitute a work based on the\n");
+    dialog.printf("Program (independent of having been made by running the Program).\n");
+    dialog.printf("Whether that is true depends on what the Program does.\n");
+    dialog.printf("\n");
+    dialog.printf("  1. You may copy and distribute verbatim copies of the Program's\n");
+    dialog.printf("source code as you receive it, in any medium, provided that you\n");
+    dialog.printf("conspicuously and appropriately publish on each copy an appropriate\n");
+    dialog.printf("copyright notice and disclaimer of warranty; keep intact all the\n");
+    dialog.printf("notices that refer to this License and to the absence of any warranty;\n");
+    dialog.printf("and give any other recipients of the Program a copy of this License\n");
+    dialog.printf("along with the Program.\n");
+    dialog.printf("\n");
+    dialog.printf("You may charge a fee for the physical act of transferring a copy, and\n");
+    dialog.printf("you may at your option offer warranty protection in exchange for a fee.\n");
+    dialog.printf("\n");
+    dialog.printf("  2. You may modify your copy or copies of the Program or any portion\n");
+    dialog.printf("of it, thus forming a work based on the Program, and copy and\n");
+    dialog.printf("distribute such modifications or work under the terms of Section 1\n");
+    dialog.printf("above, provided that you also meet all of these conditions:\n");
+    dialog.printf("\n");
+    dialog.printf("    a) You must cause the modified files to carry prominent notices\n");
+    dialog.printf("    stating that you changed the files and the date of any change.\n");
+    dialog.printf("\n");
+    dialog.printf("    b) You must cause any work that you distribute or publish, that in\n");
+    dialog.printf("    whole or in part contains or is derived from the Program or any\n");
+    dialog.printf("    part thereof, to be licensed as a whole at no charge to all third\n");
+    dialog.printf("    parties under the terms of this License.\n");
+    dialog.printf("\n");
+    dialog.printf("    c) If the modified program normally reads commands interactively\n");
+    dialog.printf("    when run, you must cause it, when started running for such\n");
+    dialog.printf("    interactive use in the most ordinary way, to print or display an\n");
+    dialog.printf("    announcement including an appropriate copyright notice and a\n");
+    dialog.printf("    notice that there is no warranty (or else, saying that you provide\n");
+    dialog.printf("    a warranty) and that users may redistribute the program under\n");
+    dialog.printf("    these conditions, and telling the user how to view a copy of this\n");
+    dialog.printf("    License.  (Exception: if the Program itself is interactive but\n");
+    dialog.printf("    does not normally print such an announcement, your work based on\n");
+    dialog.printf("    the Program is not required to print an announcement.)\n");
+    dialog.printf("\n");
+    dialog.printf("These requirements apply to the modified work as a whole.  If\n");
+    dialog.printf("identifiable sections of that work are not derived from the Program,\n");
+    dialog.printf("and can be reasonably considered independent and separate works in\n");
+    dialog.printf("themselves, then this License, and its terms, do not apply to those\n");
+    dialog.printf("sections when you distribute them as separate works.  But when you\n");
+    dialog.printf("distribute the same sections as part of a whole which is a work based\n");
+    dialog.printf("on the Program, the distribution of the whole must be on the terms of\n");
+    dialog.printf("this License, whose permissions for other licensees extend to the\n");
+    dialog.printf("entire whole, and thus to each and every part regardless of who wrote it.\n");
+    dialog.printf("\n");
+    dialog.printf("Thus, it is not the intent of this section to claim rights or contest\n");
+    dialog.printf("your rights to work written entirely by you; rather, the intent is to\n");
+    dialog.printf("exercise the right to control the distribution of derivative or\n");
+    dialog.printf("collective works based on the Program.\n");
+    dialog.printf("\n");
+    dialog.printf("In addition, mere aggregation of another work not based on the Program\n");
+    dialog.printf("with the Program (or with a work based on the Program) on a volume of\n");
+    dialog.printf("a storage or distribution medium does not bring the other work under\n");
+    dialog.printf("the scope of this License.\n");
+    dialog.printf("\n");
+    dialog.printf("  3. You may copy and distribute the Program (or a work based on it,\n");
+    dialog.printf("under Section 2) in object code or executable form under the terms of\n");
+    dialog.printf("Sections 1 and 2 above provided that you also do one of the following:\n");
+    dialog.printf("\n");
+    dialog.printf("    a) Accompany it with the complete corresponding machine-readable\n");
+    dialog.printf("    source code, which must be distributed under the terms of Sections\n");
+    dialog.printf("    1 and 2 above on a medium customarily used for software interchange; or,\n");
+    dialog.printf("\n");
+    dialog.printf("    b) Accompany it with a written offer, valid for at least three\n");
+    dialog.printf("    years, to give any third party, for a charge no more than your\n");
+    dialog.printf("    cost of physically performing source distribution, a complete\n");
+    dialog.printf("    machine-readable copy of the corresponding source code, to be\n");
+    dialog.printf("    distributed under the terms of Sections 1 and 2 above on a medium\n");
+    dialog.printf("    customarily used for software interchange; or,\n");
+    dialog.printf("\n");
+    dialog.printf("    c) Accompany it with the information you received as to the offer\n");
+    dialog.printf("    to distribute corresponding source code.  (This alternative is\n");
+    dialog.printf("    allowed only for noncommercial distribution and only if you\n");
+    dialog.printf("    received the program in object code or executable form with such\n");
+    dialog.printf("    an offer, in accord with Subsection b above.)\n");
+    dialog.printf("\n");
+    dialog.printf("The source code for a work means the preferred form of the work for\n");
+    dialog.printf("making modifications to it.  For an executable work, complete source\n");
+    dialog.printf("code means all the source code for all modules it contains, plus any\n");
+    dialog.printf("associated interface definition files, plus the scripts used to\n");
+    dialog.printf("control compilation and installation of the executable.  However, as a\n");
+    dialog.printf("special exception, the source code distributed need not include\n");
+    dialog.printf("anything that is normally distributed (in either source or binary\n");
+    dialog.printf("form) with the major components (compiler, kernel, and so on) of the\n");
+    dialog.printf("operating system on which the executable runs, unless that component\n");
+    dialog.printf("itself accompanies the executable.\n");
+    dialog.printf("\n");
+    dialog.printf("If distribution of executable or object code is made by offering\n");
+    dialog.printf("access to copy from a designated place, then offering equivalent\n");
+    dialog.printf("access to copy the source code from the same place counts as\n");
+    dialog.printf("distribution of the source code, even though third parties are not\n");
+    dialog.printf("compelled to copy the source along with the object code.\n");
+    dialog.printf("\n");
+    dialog.printf("  4. You may not copy, modify, sublicense, or distribute the Program\n");
+    dialog.printf("except as expressly provided under this License.  Any attempt\n");
+    dialog.printf("otherwise to copy, modify, sublicense or distribute the Program is\n");
+    dialog.printf("void, and will automatically terminate your rights under this License.\n");
+    dialog.printf("However, parties who have received copies, or rights, from you under\n");
+    dialog.printf("this License will not have their licenses terminated so long as such\n");
+    dialog.printf("parties remain in full compliance.\n");
+    dialog.printf("\n");
+    dialog.printf("  5. You are not required to accept this License, since you have not\n");
+    dialog.printf("signed it.  However, nothing else grants you permission to modify or\n");
+    dialog.printf("distribute the Program or its derivative works.  These actions are\n");
+    dialog.printf("prohibited by law if you do not accept this License.  Therefore, by\n");
+    dialog.printf("modifying or distributing the Program (or any work based on the\n");
+    dialog.printf("Program), you indicate your acceptance of this License to do so, and\n");
+    dialog.printf("all its terms and conditions for copying, distributing or modifying\n");
+    dialog.printf("the Program or works based on it.\n");
+    dialog.printf("\n");
+    dialog.printf("  6. Each time you redistribute the Program (or any work based on the\n");
+    dialog.printf("Program), the recipient automatically receives a license from the\n");
+    dialog.printf("original licensor to copy, distribute or modify the Program subject to\n");
+    dialog.printf("these terms and conditions.  You may not impose any further\n");
+    dialog.printf("restrictions on the recipients' exercise of the rights granted herein.\n");
+    dialog.printf("You are not responsible for enforcing compliance by third parties to\n");
+    dialog.printf("this License.\n");
+    dialog.printf("\n");
+    dialog.printf("  7. If, as a consequence of a court judgment or allegation of patent\n");
+    dialog.printf("infringement or for any other reason (not limited to patent issues),\n");
+    dialog.printf("conditions are imposed on you (whether by court order, agreement or\n");
+    dialog.printf("otherwise) that contradict the conditions of this License, they do not\n");
+    dialog.printf("excuse you from the conditions of this License.  If you cannot\n");
+    dialog.printf("distribute so as to satisfy simultaneously your obligations under this\n");
+    dialog.printf("License and any other pertinent obligations, then as a consequence you\n");
+    dialog.printf("may not distribute the Program at all.  For example, if a patent\n");
+    dialog.printf("license would not permit royalty-free redistribution of the Program by\n");
+    dialog.printf("all those who receive copies directly or indirectly through you, then\n");
+    dialog.printf("the only way you could satisfy both it and this License would be to\n");
+    dialog.printf("refrain entirely from distribution of the Program.\n");
+    dialog.printf("\n");
+    dialog.printf("If any portion of this section is held invalid or unenforceable under\n");
+    dialog.printf("any particular circumstance, the balance of the section is intended to\n");
+    dialog.printf("apply and the section as a whole is intended to apply in other\n");
+    dialog.printf("circumstances.\n");
+    dialog.printf("\n");
+    dialog.printf("It is not the purpose of this section to induce you to infringe any\n");
+    dialog.printf("patents or other property right claims or to contest validity of any\n");
+    dialog.printf("such claims; this section has the sole purpose of protecting the\n");
+    dialog.printf("integrity of the free software distribution system, which is\n");
+    dialog.printf("implemented by public license practices.  Many people have made\n");
+    dialog.printf("generous contributions to the wide range of software distributed\n");
+    dialog.printf("through that system in reliance on consistent application of that\n");
+    dialog.printf("system; it is up to the author/donor to decide if he or she is willing\n");
+    dialog.printf("to distribute software through any other system and a licensee cannot\n");
+    dialog.printf("impose that choice.\n");
+    dialog.printf("\n");
+    dialog.printf("This section is intended to make thoroughly clear what is believed to\n");
+    dialog.printf("be a consequence of the rest of this License.\n");
+    dialog.printf("\n");
+    dialog.printf("  8. If the distribution and/or use of the Program is restricted in\n");
+    dialog.printf("certain countries either by patents or by copyrighted interfaces, the\n");
+    dialog.printf("original copyright holder who places the Program under this License\n");
+    dialog.printf("may add an explicit geographical distribution limitation excluding\n");
+    dialog.printf("those countries, so that distribution is permitted only in or among\n");
+    dialog.printf("countries not thus excluded.  In such case, this License incorporates\n");
+    dialog.printf("the limitation as if written in the body of this License.\n");
+    dialog.printf("\n");
+    dialog.printf("  9. The Free Software Foundation may publish revised and/or new versions\n");
+    dialog.printf("of the General Public License from time to time.  Such new versions will\n");
+    dialog.printf("be similar in spirit to the present version, but may differ in detail to\n");
+    dialog.printf("address new problems or concerns.\n");
+    dialog.printf("\n");
+    dialog.printf("Each version is given a distinguishing version number.  If the Program\n");
+    dialog.printf("specifies a version number of this License which applies to it and \"any\n");
+    dialog.printf("later version\", you have the option of following the terms and conditions\n");
+    dialog.printf("either of that version or of any later version published by the Free\n");
+    dialog.printf("Software Foundation.  If the Program does not specify a version number of\n");
+    dialog.printf("this License, you may choose any version ever published by the Free Software\n");
+    dialog.printf("Foundation.\n");
+    dialog.printf("\n");
+    dialog.printf("  10. If you wish to incorporate parts of the Program into other free\n");
+    dialog.printf("programs whose distribution conditions are different, write to the author\n");
+    dialog.printf("to ask for permission.  For software which is copyrighted by the Free\n");
+    dialog.printf("Software Foundation, write to the Free Software Foundation; we sometimes\n");
+    dialog.printf("make exceptions for this.  Our decision will be guided by the two goals\n");
+    dialog.printf("of preserving the free status of all derivatives of our free software and\n");
+    dialog.printf("of promoting the sharing and reuse of software generally.\n");
+    dialog.printf("\n");
+    show_warranty(dialog);
+    dialog.printf("              END OF TERMS AND CONDITIONS\n");
+    dialog.printf("\n");
+    dialog.printf("     How to Apply These Terms to Your New Programs\n");
+    dialog.printf("\n");
+    dialog.printf("  If you develop a new program, and you want it to be of the greatest\n");
+    dialog.printf("possible use to the public, the best way to achieve this is to make it\n");
+    dialog.printf("free software which everyone can redistribute and change under these terms.\n");
+    dialog.printf("\n");
+    dialog.printf("  To do so, attach the following notices to the program.  It is safest\n");
+    dialog.printf("to attach them to the start of each source file to most effectively\n");
+    dialog.printf("convey the exclusion of warranty; and each file should have at least\n");
+    dialog.printf("the \"copyright\" line and a pointer to where the full notice is found.\n");
+    dialog.printf("\n");
+    dialog.printf("    <one line to give the program's name and a brief idea of what it does.>\n");
+    dialog.printf("    Copyright (C) <year>  <name of author>\n");
+    dialog.printf("\n");
+    dialog.printf("    This program is free software; you can redistribute it and/or modify\n");
+    dialog.printf("    it under the terms of the GNU General Public License as published by\n");
+    dialog.printf("    the Free Software Foundation; either version 2 of the License, or\n");
+    dialog.printf("    (at your option) any later version.\n");
+    dialog.printf("\n");
+    dialog.printf("    This program is distributed in the hope that it will be useful,\n");
+    dialog.printf("    but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
+    dialog.printf("    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n");
+    dialog.printf("    GNU General Public License for more details.\n");
+    dialog.printf("\n");
+    dialog.printf("    You should have received a copy of the GNU General Public License\n");
+    dialog.printf("    along with this program; if not, write to the Free Software\n");
+    dialog.printf("    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n");
+    dialog.printf("\n");
+    dialog.printf("\n");
+    dialog.printf("Also add information on how to contact you by electronic and paper mail.\n");
+    dialog.printf("\n");
+    dialog.printf("If the program is interactive, make it output a short notice like this\n");
+    dialog.printf("when it starts in an interactive mode:\n");
+    dialog.printf("\n");
+    dialog.printf("    Gnomovision version 69, Copyright (C) year name of author\n");
+    dialog.printf("    Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w'.\n");
+    dialog.printf("    This is free software, and you are welcome to redistribute it\n");
+    dialog.printf("    under certain conditions; type `show c' for details.\n");
+    dialog.printf("\n");
+    dialog.printf("The hypothetical commands `show w' and `show c' should show the appropriate\n");
+    dialog.printf("parts of the General Public License.  Of course, the commands you use may\n");
+    dialog.printf("be called something other than `show w' and `show c'; they could even be\n");
+    dialog.printf("mouse-clicks or menu items--whatever suits your program.\n");
+    dialog.printf("\n");
+    dialog.printf("You should also get your employer (if you work as a programmer) or your\n");
+    dialog.printf("school, if any, to sign a \"copyright disclaimer\" for the program, if\n");
+    dialog.printf("necessary.  Here is a sample; alter the names:\n");
+    dialog.printf("\n");
+    dialog.printf("  Yoyodyne, Inc., hereby disclaims all copyright interest in the program\n");
+    dialog.printf("  `Gnomovision' (which makes passes at compilers) written by James Hacker.\n");
+    dialog.printf("\n");
+    dialog.printf("  <signature of Ty Coon>, 1 April 1989\n");
+    dialog.printf("  Ty Coon, President of Vice\n");
+    dialog.printf("\n");
+    dialog.printf("This General Public License does not permit incorporating your program into\n");
+    dialog.printf("proprietary programs.  If your program is a subroutine library, you may\n");
+    dialog.printf("consider it more useful to permit linking proprietary applications with the\n");
+    dialog.printf("library.  If this is what you want to do, use the GNU Library General\n");
+    dialog.printf("Public License instead of this License.\n");
+    dialog.printf("\n");
 }
 
-static void show_version(const char *command_name)
+static void show_version(user_interaction & dialog, const char *command_name)
 {
     char *name = tools_extract_basename(command_name);
-    U_I maj, min, bits;
-    bool ea, largefile, nodump, special_alloc;
+    U_I maj, med, min, bits;
+    bool ea, largefile, nodump, special_alloc, thread, libz, libbz2, libcrypto;
 
     get_version(maj, min);
-    get_compile_time_features(ea, largefile, nodump, special_alloc, bits);
+    if(maj > 2)
+	get_version(maj, med, min);
+    else
+	med = 0;
+    get_compile_time_features(ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
+    shell_interaction_change_non_interactive_output(&cout);
     try
     {
-        ui_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n\n",  name, ::dar_version());
-        ui_printf(" Using libdar %u.%u built with compilation time options:\n", maj, min);
-        tools_display_features(ea, largefile, nodump, special_alloc, bits);
-        ui_printf("\n");
-        ui_printf(" %s with %s version %s\n", __DATE__, CC_NAT, __VERSION__);
-        ui_printf(" %s is part of the Disk ARchive suite (Release %s)\n", name, PACKAGE_VERSION);
-        ui_printf(" %s comes with ABSOLUTELY NO WARRANTY; for details\n", name);
-        ui_printf(" type `%s -W'.  This is free software, and you are welcome\n", name);
-        ui_printf(" to redistribute it under certain conditions; type `%s -L | more'\n", name);
-        ui_printf(" for details.\n\n");
+        dialog.warning(tools_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n",  name, ::dar_version())
+		       + "   " + dar_suite_command_line_features()
+		       + "\n"
+		       + (maj > 2 ? tools_printf(gettext(" Using libdar %u.%u.%u built with compilation time options:"), maj, med, min)
+			  : tools_printf(gettext(" Using libdar %u.%u built with compilation time options:"), maj, min)));
+	tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
+        dialog.printf("\n");
+        dialog.warning(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__)
+		+ tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name, PACKAGE_VERSION)
+		+ tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name, name)
+		+ tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
+		+ tools_printf(gettext(" type `%s -L | more'\n for details.\n\n"), name));
     }
     catch(...)
     {
@@ -1401,7 +1632,7 @@ static void show_version(const char *command_name)
     delete name;
 }
 
-#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
+#if HAVE_GETOPT_LONG
 static const struct option *get_long_opt()
 {
     static const struct option ret[] = {
@@ -1448,8 +1679,14 @@ static const struct option *get_long_opt()
         {"noconf", no_argument, NULL, 'N'},
         {"nodump", no_argument, NULL, ' '},
         {"hour", optional_argument, NULL, 'H'},
-        {"alter", optional_argument, NULL, 'a'},
-        {"empty", no_argument, NULL, 'e'},
+	{"alter", optional_argument, NULL, 'a'},
+	{"empty", no_argument, NULL, 'e'},
+	{"on-fly-isolate", required_argument, NULL, 'G'},
+	{"no-mount-points", no_argument, NULL, 'M'},
+	{"go-into", required_argument, NULL, 'g'},
+	{"jog", no_argument, NULL, 'j'},
+	{"crypto-block", required_argument, NULL, '#'},
+	{"crypto-block-ref", required_argument, NULL, '*'},
         { NULL, 0, NULL, 0 }
     };
 
@@ -1457,7 +1694,7 @@ static const struct option *get_long_opt()
 }
 #endif
 
-static void make_args_from_file(operation op, const char *filename, S_I & argc, char **&argv, bool info_details)
+static void make_args_from_file(user_interaction & dialog, operation op, const char *filename, S_I & argc, char **&argv, bool info_details)
 {
     vector <char> quotes;
     vector <char *> mots;
@@ -1466,14 +1703,14 @@ static void make_args_from_file(operation op, const char *filename, S_I & argc, 
 
     S_I fd = ::open(filename, O_RDONLY|O_BINARY);
     if(fd < 0)
-        throw Erange("make_args_from_file", string("cannot open file ") + filename + " : " + strerror(errno));
+        throw Erange("make_args_from_file", tools_printf(gettext("Cannot open file %s : %s"), filename, strerror(errno)));
 
-    fichier conf = fd; // the object conf will close fd
+    fichier conf = fichier(dialog, fd); // the object conf will close fd
 
         ////////
         // removing the comments from file
         //
-    no_comment sousconf = conf;
+    no_comment sousconf = no_comment(dialog, conf);
 
         ////////
         // defining the conditional syntax targets
@@ -1512,7 +1749,7 @@ static void make_args_from_file(operation op, const char *filename, S_I & argc, 
         //////
         //  hide the targets we don't want to see
         //
-    config_file surconf = config_file(cibles, sousconf);
+    config_file surconf = config_file(dialog, cibles, sousconf);
 
         //////
         //  now we have surconf -> sousconf -> conf -> fd
@@ -1618,7 +1855,7 @@ static void make_args_from_file(operation op, const char *filename, S_I & argc, 
                 }
         }
         if(quotes.size() > 0)
-            throw Erange("make_args_from_file", string("Parse error reading config file ") + filename + " : Unmatched " + quotes.back());
+            throw Erange("make_args_from_file", tools_printf(gettext("Parse error reading config file %s : Unmatched %c"), filename, quotes.back()));
 
         argc = mots.size();
         argv = new char *[argc];
@@ -1626,15 +1863,15 @@ static void make_args_from_file(operation op, const char *filename, S_I & argc, 
             throw Ememory("make_args_from_file");
 
         if(info_details)
-            ui_printf("arguments read from %s :", filename);
+            dialog.printf(gettext("Arguments read from %s :"), filename);
         for(S_I i = 0; i < argc; i++)
         {
             argv[i] = mots[i]; // copy of the address of each string
             if(info_details && i > 0)
-                ui_printf(" \"%s\"", argv[i]);
+                dialog.printf(" \"%s\"", argv[i]);
         }
         if(info_details)
-            ui_printf("\n");
+            dialog.printf("\n");
     }
     catch(...)
     {
@@ -1669,7 +1906,7 @@ static char * make_word(generic_file &fic, off_t start, off_t end)
     try
     {
         if(! fic.skip(start))
-            throw Erange("make_word", "End of file reached while skipping to the begin of a word");
+            throw Erange("make_word", gettext("End of file reached while skipping to the begin of a word"));
 
         do
         {
@@ -1680,7 +1917,7 @@ static char * make_word(generic_file &fic, off_t start, off_t end)
                 if(tmp < 0)
                     throw SRC_BUG;
                 else // tmp == 0
-                    throw Erange("make_word", "reached EOF while reading a word");
+                    throw Erange("make_word", gettext("Reached EOF while reading a word"));
         }
         while(lu < longueur);
         ret[longueur] = '\0';
@@ -1697,7 +1934,7 @@ static char * make_word(generic_file &fic, off_t start, off_t end)
 static void skip_getopt(S_I argc, char *argv[], S_I next_to_read)
 {
     (void)reset_getopt();
-#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
+#if HAVE_GETOPT_LONG
     while(getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL) != EOF && optind < next_to_read)
         ;
 #else
@@ -1711,25 +1948,21 @@ static void show_args(S_I argc, char *argv[])
 {
     register S_I i;
     for(i = 0; i < argc; i++)
-        ui_printf("[%s]\n", argv[i]);
+        dialog.printf("[%s]\n", argv[i]);
 }
 #endif
 
 
-
-
-
-static bool update_with_config_files(const char * home,
+static bool update_with_config_files(user_interaction & dialog,
+				     const char * home,
                                      operation &op,
                                      path * &fs_root,
                                      path * &sauv_root,
                                      path * &ref_root,
                                      infinint &file_size,
                                      infinint &first_file_size,
-                                     ou_mask & inclus,
-                                     ou_mask & exclus,
-                                     deque<string> & l_path_inclus,
-                                     deque<string> & l_path_exclus,
+				     deque<pre_mask> & name_include_exclude,
+				     deque<pre_mask> & path_include_exclude,
                                      string & filename,
                                      string *& ref_filename,
                                      bool &allow_over,
@@ -1751,16 +1984,24 @@ static bool update_with_config_files(const char * home,
                                      string & execute_ref,
                                      string & pass,
                                      string & pass_ref,
-                                     ou_mask & compr_inclus,
-                                     ou_mask & compr_exclus,
+				     deque<pre_mask> & compr_include_exclude,
                                      bool &tar_format,
                                      bool & flat,
                                      infinint & min_compr_size,
                                      bool & nodump,
                                      infinint & hourshift,
-                                     bool & warn_remove_no_match,
-                                     string & alteration,
-                                     bool & empty)
+				     bool & warn_remove_no_match,
+				     string & alteration,
+				     bool & empty,
+				     U_I & suffix_base,
+				     path * & on_fly_root,
+				     string * & on_fly_filename,
+				     bool & alter_atime,
+				     bool & same_fs,
+				     U_32 crypto_size,
+				     U_32 crypto_size_ref,
+				     bool & ordered_filters,
+				     bool & case_sensit)
 {
     const unsigned int len = strlen(home);
     const unsigned int delta = 20;
@@ -1785,21 +2026,19 @@ static bool update_with_config_files(const char * home,
 
         try
         {
-            user_interaction_warning(string("Reading config file: ")+buffer);
-            make_args_from_file(op, buffer, rec_c, rec_v, info_details);
+            make_args_from_file(dialog, op, buffer, rec_c, rec_v, info_details);
+	    try
+	    {
+		vector<string> inclusions;
+		(void)reset_getopt();
 
-            try
-            {
-                vector<string> inclusions;
-                (void)reset_getopt();
-
-                if(! get_args_recursive(inclusions,
+                if(! get_args_recursive(dialog,
+					inclusions,
                                         rec_c, rec_v, op, fs_root,
                                         sauv_root, ref_root,
                                         file_size, first_file_size,
-                                        inclus, exclus,
-                                        l_path_inclus,
-                                        l_path_exclus,
+                                        name_include_exclude,
+					path_include_exclude,
                                         filename, ref_filename,
                                         allow_over, warn_over,
                                         info_details,
@@ -1813,15 +2052,24 @@ static bool update_with_config_files(const char * home,
                                         execute,
                                         execute_ref,
                                         pass, pass_ref,
-                                        compr_inclus, compr_exclus,
+                                        compr_include_exclude,
                                         tar_format,
                                         flat,
                                         min_compr_size,
                                         btmp, nodump,
                                         hourshift,
-                                        warn_remove_no_match,
-                                        alteration,
-                                        empty))
+					warn_remove_no_match,
+					alteration,
+					empty,
+					suffix_base,
+					on_fly_root,
+					on_fly_filename,
+					alter_atime,
+					same_fs,
+					crypto_size,
+					crypto_size_ref,
+					ordered_filters,
+					case_sensit))
                     retour = syntax;
                 else
                     retour = ok;
@@ -1837,12 +2085,14 @@ static bool update_with_config_files(const char * home,
         }
         catch(Erange & e)
         {
+	    if(e.get_source() != "make_args_from_file")
+		throw;
+		// else:
                 // failed openning the file,
                 // nothing to do,
                 // we will try the other config file
                 // below
         }
-
 
         rec_c = 0;
         rec_v = NULL;
@@ -1854,20 +2104,21 @@ static bool update_with_config_files(const char * home,
 
             try
             {
-                make_args_from_file(op, buffer, rec_c, rec_v, info_details);
+                make_args_from_file(dialog, op, buffer, rec_c, rec_v, info_details);
+
                 try
                 {
                     vector<string> inclusions;
-                    user_interaction_warning(string("Reading config file: ")+buffer);
+                    dialog.warning(string(gettext("Reading config file: "))+buffer);
                     (void)reset_getopt(); // reset getopt call
 
-                    if(! get_args_recursive(inclusions,
+                    if(! get_args_recursive(dialog,
+					    inclusions,
                                             rec_c, rec_v, op, fs_root,
                                             sauv_root, ref_root,
                                             file_size, first_file_size,
-                                            inclus, exclus,
-                                            l_path_inclus,
-                                            l_path_exclus,
+                                            name_include_exclude,
+					    path_include_exclude,
                                             filename, ref_filename,
                                             allow_over, warn_over,
                                             info_details,
@@ -1881,16 +2132,25 @@ static bool update_with_config_files(const char * home,
                                             execute,
                                             execute_ref,
                                             pass, pass_ref,
-                                            compr_inclus, compr_exclus,
+                                            compr_include_exclude,
                                             tar_format,
                                             flat,
                                             min_compr_size,
                                             btmp,
                                             nodump,
                                             hourshift,
-                                            warn_remove_no_match,
-                                            alteration,
-                                            empty))
+					    warn_remove_no_match,
+					    alteration,
+					    empty,
+					    suffix_base,
+					    on_fly_root,
+					    on_fly_filename,
+					    alter_atime,
+					    same_fs,
+					    crypto_size,
+					    crypto_size_ref,
+					    ordered_filters,
+					    case_sensit))
                         retour = syntax;
                     else
                         retour = ok;
@@ -1932,4 +2192,212 @@ static S_I reset_getopt()
 #endif
 
     return ret;
+}
+
+
+static mask *make_include_exclude_name(const string & x, bool case_sensit)
+{
+    mask *ret = new simple_mask(x, case_sensit);
+    if(ret == NULL)
+	throw Ememory("make_include_exclude_name");
+    else
+	return ret;
+}
+
+static mask *make_exclude_path_ordered(const string & x, bool case_sensit)
+{
+    ou_mask *ret = new ou_mask();
+    if(ret == NULL)
+	throw Ememory("make_exclude_path");
+    else
+    {
+	ret->add_mask(simple_mask(x, case_sensit));
+	ret->add_mask(simple_mask(x + "/*", case_sensit));
+	return ret;
+    }
+}
+
+static mask *make_exclude_path_unordered(const string & x, bool case_sensit)
+{
+    mask *ret = new simple_mask(x, case_sensit);
+    if(ret == NULL)
+	throw Ememory("make_exclude_path");
+    else
+	return ret;
+}
+
+static mask *make_include_path(const string & x, bool case_sensit)
+{
+    mask *ret = new simple_path_mask(x, case_sensit);
+    if(ret == NULL)
+	throw Ememory("make_include_path");
+    else
+	return ret;
+}
+
+static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, bool no_case), mask *(*make_exclude_mask)(const string & x, bool no_case))
+{
+    mask *ret_mask = NULL;
+    ou_mask *tmp_ou_mask = NULL;
+    et_mask *tmp_et_mask = NULL;
+    mask *tmp_mask = NULL;
+
+    try
+    {
+	while(listing.size() > 0)
+	{
+	    if(listing.front().included)
+		if(ret_mask == NULL)
+		{
+		    ret_mask = (*make_include_mask)(listing.front().mask,
+						    listing.front().case_sensit);
+		    if(ret_mask == NULL)
+			throw Ememory("make_ordered_mask");
+		}
+		else // ret_mask != NULL
+		{
+		    if(tmp_ou_mask != NULL)
+		    {
+			tmp_mask = (*make_include_mask)(listing.front().mask,
+							listing.front().case_sensit);
+			tmp_ou_mask->add_mask(*tmp_mask);
+			delete tmp_mask;
+			tmp_mask = NULL;
+		    }
+		    else  // need to create ou_mask
+		    {
+			tmp_mask = (*make_include_mask)(listing.front().mask,
+							listing.front().case_sensit);
+			tmp_ou_mask = new ou_mask();
+			if(tmp_ou_mask == NULL)
+			    throw Ememory("make_ordered_mask");
+			tmp_ou_mask->add_mask(*ret_mask);
+			tmp_ou_mask->add_mask(*tmp_mask);
+			delete tmp_mask;
+			tmp_mask = NULL;
+			delete ret_mask;
+			ret_mask = tmp_ou_mask;
+			tmp_et_mask = NULL;
+		    }
+		}
+	    else // exclude mask
+		if(ret_mask == NULL)
+		{
+		    tmp_mask = (*make_exclude_mask)(listing.front().mask,
+						    listing.front().case_sensit);
+		    ret_mask = new not_mask(*tmp_mask);
+		    if(ret_mask == NULL)
+			throw Ememory("make_ordered_mask");
+		    delete tmp_mask;
+		    tmp_mask = NULL;
+		}
+		else // ret_mask != NULL
+		{
+		    if(tmp_et_mask != NULL)
+		    {
+			tmp_mask = (*make_exclude_mask)(listing.front().mask,
+							listing.front().case_sensit);
+			tmp_et_mask->add_mask(not_mask(*tmp_mask));
+			delete tmp_mask;
+			tmp_mask = NULL;
+		    }
+		    else // need to create et_mask
+		    {
+			tmp_mask = (*make_exclude_mask)(listing.front().mask,
+							listing.front().case_sensit);
+			tmp_et_mask = new et_mask();
+			if(tmp_et_mask == NULL)
+			    throw Ememory("make_ordered_mask");
+			tmp_et_mask->add_mask(*ret_mask);
+			tmp_et_mask->add_mask(not_mask(*tmp_mask));
+			delete tmp_mask;
+			tmp_mask = NULL;
+			delete ret_mask;
+			ret_mask = tmp_et_mask;
+			tmp_ou_mask = NULL;
+		    }
+		}
+	    listing.pop_front();
+	}
+
+	if(ret_mask == NULL)
+	{
+	    ret_mask = new bool_mask(true);
+	    if(ret_mask == NULL)
+		throw Ememory("get_args");
+	}
+    }
+    catch(...)
+    {
+	if(ret_mask != NULL)
+	    delete tmp_mask;
+	if(tmp_ou_mask != NULL && tmp_ou_mask != ret_mask)
+	    delete tmp_ou_mask;
+	if(tmp_et_mask != NULL && tmp_et_mask != ret_mask)
+	    delete tmp_et_mask;
+	if(tmp_mask != NULL)
+	    delete tmp_mask;
+	throw;
+    }
+
+    return ret_mask;
+}
+
+static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, bool no_case), mask *(*make_exclude_mask)(const string & x, bool no_case))
+{
+    et_mask *ret_mask = new et_mask();
+    ou_mask tmp_include, tmp_exclude;
+    mask *tmp_mask = NULL;
+
+    if(ret_mask == NULL)
+	throw Ememory("make_unordered_mask");
+
+    try
+    {
+	while(listing.size() > 0)
+	{
+	    if(listing.front().included)
+	    {
+		tmp_mask = (*make_include_mask)(listing.front().mask,
+ 						listing.front().case_sensit);
+		tmp_include.add_mask(*tmp_mask);
+		delete tmp_mask;
+		tmp_mask = NULL;
+	    }
+	    else // excluded mask
+	    {
+		tmp_mask = (*make_exclude_mask)(listing.front().mask,
+						listing.front().case_sensit);
+		tmp_exclude.add_mask(*tmp_mask);
+		delete tmp_mask;
+		tmp_mask = NULL;
+	    }
+	    listing.pop_front();
+	}
+
+	if(tmp_include.size() > 0)
+	    ret_mask->add_mask(tmp_include);
+	else
+	    ret_mask->add_mask(bool_mask(true));
+	if(tmp_exclude.size() > 0)
+	    ret_mask->add_mask(not_mask(tmp_exclude));
+    }
+    catch(...)
+    {
+	delete ret_mask;
+	throw;
+    }
+
+    return ret_mask;
+}
+
+static void update_list_with_root(deque<pre_mask> & listing, const path &fs_root)
+{
+    deque<pre_mask>::iterator it = listing.begin();
+
+    while(it != listing.end())
+    {
+	it->mask = (fs_root + path(it->mask)).display();
+	it++;
+    }
 }

@@ -92,7 +92,7 @@ used.
 USING PIPES / REMOTE OPERATIONS
                     ref     : NOTES chapter II, XII/man dar dar_slave dar_xform
                     keywords: -i -o -
- 
+
 dar is now able to produce an archive to its standard output or named pipe. it
 is also able to read an archive through a pair of pipes, to take a remote
 archive as reference, or even to restore data from an archive on a remote host.
@@ -132,6 +132,14 @@ the archive can be "scrambled" given a pass phrase. The same
 pass phrase must be given to retrieve or extract the archive contents. Of
 course this is not a very strong encryption, and its use is against simple
 user that do not have much mean to crack this scheme.
+
+STRONG ENCRYPTION                ref     : man dar/NOTES chapter XVII
+                                 keywords: -K -J -# -* blowfish
+To overcome the weakness of the scrambling algorithm dar can use blowfish
+algorithm to encrypt the whole archive. An "elastic buffers" are inserted
+and encrypted with the rest of the data, at the beginning and at the end
+of the archive to prevent a clear text attack or codebook attack.
+
 
 CONFIGURATION FILE               ref     : man dar
                                  keywords: -B
@@ -192,3 +200,11 @@ DATA PROTECTION                       ref     : man dar/NOTES chapter XIV, XV
                                       keywords:
 dar relies on the Parchive tool for data protection against media errors.
 http://parchive.sourceforge.net/
+
+
+ONE FILESYSTEM                        ref     : man dar
+                                      keywords: -M
+dar can backup files of a give filesystem only, even if some subdirectory
+in the scope are mounting points for other filesystems, dar will not recurse
+in theses directories.
+

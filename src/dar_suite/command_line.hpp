@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.hpp,v 1.8 2003/11/18 00:51:47 edrusb Rel $
+// $Id: command_line.hpp,v 1.14 2004/10/30 22:26:50 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -40,29 +40,37 @@ enum operation { noop, extract, create, diff, test, listing, isolate };
     // noop stands for no-operation. get_args() never returns such value,
     // it is just necessary within the command_line module
 
-extern bool get_args(const char *home,
-                     S_I argc, char *argv[], operation &op, path * &fs_root,
-                     path *&sauv_root, path *&ref_root,
-                     infinint &file_size, infinint &first_file_size,
-                     mask *&selection, mask *&subtree,
-                     string &filename, string *&ref_filename,
-                     bool &allow_over, bool &warn_over, bool &info_details,
-                     compression &algo, U_I & compression_level,
-                     bool &detruire,
-                     bool &pause, bool &beep,
+extern bool get_args(user_interaction & dialog,
+		     const char *home,
+                     S_I argc, char *argv[], operation & op, path * & fs_root,
+                     path * & sauv_root, path * & ref_root,
+                     infinint & file_size, infinint & first_file_size,
+                     mask * & selection, mask * & subtree,
+                     string & filename, string * & ref_filename,
+                     bool & allow_over, bool & warn_over, bool & info_details,
+                     compression & algo, U_I & compression_level,
+                     bool & detruire,
+                     bool & pause, bool & beep,
                      bool & make_empty_dir, bool & only_more_recent,
                      bool & ea_root, bool & ea_user,
-                     string & input_pipe, string &output_pipe,
-                     bool &ignore_owner,
+                     string & input_pipe, string & output_pipe,
+                     bool & ignore_owner,
                      string & execute, string & execute_ref,
                      string & pass, string & pass_ref,
-                     mask *&compress_mask,
+                     mask * & compress_mask,
                      bool & flat,
                      infinint & min_compr_size,
                      bool & nodump,
                      infinint & hourshift,
 		     bool & warn_remove_no_match,
 		     string & alteration,
-		     bool & empty);
+		     bool & empty,
+		     path * & on_fly_root,
+		     string * & on_fly_filename,
+		     bool & alter_atime,
+		     bool & same_fs,
+		     U_32 & crypto_size,
+		     U_32 & crypto_size_ref);
+
 
 #endif

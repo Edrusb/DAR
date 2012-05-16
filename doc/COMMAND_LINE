@@ -7,16 +7,16 @@ Status meanings :
 ---------------
 letter status description :
 ---------------
-a * alteration of operation             --alter   argument: s[aved]
+a * alteration of operation             --alter   argument: s[aved] | SI[-unit[s]] | binary[-unit[s]] | a[time] | c[time] | m[ask] | n[o-case] | case
 b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff
-e - simulate the operation              --empty		
+e - simulate the operation              --empty
 f - do not restore directory structure  --flat
-g !
+g + recurse in this directory           --go-into
 h - help usage                          --help
 i - path of the input pipe              --input
-j !
+j - ask user to make room in virtual memory when it is exhausted --jog
 k - do not deleted files drop between two backups --no-delete
 l + list archive contents               --list
 m + minimum size below which no compression will occur. --mincompr a default value is used. use -m 0 if you want to compress in any case.
@@ -39,17 +39,17 @@ C + extract catalogue in separated file --isolate
 D - store excluded dir as empty dir     --empty-dir
 E + shell command to launch with slices --execute
 F + shell command to launch with slices of archive of reference   --execute-ref
-G !
+G + catalogue isolation when creating an archive --on-fly-isolate
 H * if a file for differential backup or diff differs from exactly one hour it is assumed as identical (no change).
 I + include mask                        --include
 J + key for unscrambling the reference catalogue --key-ref
 K + key for un/scrambling               --key
 L - license information
-M !
+M - only consider what is under the current mounting point. --no-mount-points
 N - do not read any configuration file ~/.darrc or /etc/darrc
 O - ignore user Id and group Id         --ignore-owner
 P + prune a directory tree              --prune
-Q !
+Q + quite on stderr at startup		no long option equivalent
 R + set the root directory              --root
 S + size of the first slice             --first-slice
 T - tree listing format                 --tree-format,
@@ -60,7 +60,5 @@ X + exclude mask                        --exclude
 Y + included only filename for compression --include-compression
 Z + excluded filename from compression  --exclude-compression
   - don't save files with nodump flag set --nodump
-
-
-
-
+# + encryption block size                 --crypto-block
+* + encryption block size for the archive of reference --crypto-block-ref

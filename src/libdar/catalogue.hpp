@@ -18,9 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.19.2.5 2005/01/13 21:46:42 edrusb Rel $
+// $Id: catalogue.hpp,v 1.36 2005/01/29 15:08:02 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file catalogue.hpp
+    /// \brief here is defined the many classed which is build of the catalogue
+    /// \ingroup Private
 
 #ifndef CATALOGUE_HPP
 #define CATALOGUE_HPP
@@ -51,6 +55,9 @@ namespace libdar
     class file_etiquette;
     class entree;
 
+	/// \addtogroup Private
+	/// @{
+
     enum saved_status { s_saved, s_fake, s_not_saved };
 
     struct entree_stats
@@ -72,34 +79,34 @@ namespace libdar
                            = num_s = num_l = num_hard_linked_inodes
                            = num_hard_link_entries = saved = total = 0; };
         void add(const entree *ref);
-        void listing() const;
+        void listing(user_interaction & dialog) const;
     };
 
-    extern void catalogue_set_reading_version(const dar_version &ver);
     extern unsigned char mk_signature(unsigned char base, saved_status state);
 
-
+	/// the root class from all other inherite for any entry in the catalogue
     class entree
     {
     public :
-        static entree *read(generic_file & f, entree_stats & stats);
-        static void freemem() { corres.clear(); };
+        static entree *read(user_interaction & dialog,
+			    generic_file & f, const dar_version & reading_ver,
+			    entree_stats & stats,
+			    std::map <infinint, file_etiquette *> & corres,
+			    compression default_algo, generic_file *data_loc);
 
         virtual ~entree() {};
-        virtual void dump(generic_file & f) const;
+        virtual void dump(user_interaction & dialog, generic_file & f) const;
         virtual unsigned char signature() const = 0;
         virtual entree *clone() const = 0;
 
             // SPECIAL ALLOC not adapted here
             // because some inherited class object (eod) are
             // temporary
-
-    private :
-        static std::map <infinint, file_etiquette *> corres;
     };
 
     extern bool compatible_signature(unsigned char a, unsigned char b);
 
+	/// the End of Directory entry class
     class eod : public entree
     {
     public :
@@ -113,12 +120,13 @@ namespace libdar
             // well adapted to "SPECIAL ALLOC"
     };
 
+	/// the base class for all entry that have a name
     class nomme : public entree
     {
     public :
         nomme(const std::string & name) { xname = name; };
         nomme(generic_file & f);
-        void dump(generic_file & f) const;
+        void dump(user_interaction & dialog, generic_file & f) const;
 
         std::string get_name() const { return xname; };
         void change_name(const std::string &x) { xname = x; };
@@ -136,18 +144,19 @@ namespace libdar
         std::string xname;
     };
 
+	/// the root class for all inode
     class inode : public nomme
     {
     public:
         inode(U_16 xuid, U_16 xgid, U_16 xperm,
               const infinint & last_access,
               const infinint & last_modif,
-              const std::string & xname);
-        inode(generic_file & f, saved_status saved);
+              const std::string & xname, const infinint & device);
+        inode(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved);
         inode(const inode & ref);
         ~inode();
 
-        void dump(generic_file & f) const;
+        void dump(user_interaction & dialog, generic_file & f) const;
         U_16 get_uid() const { return uid; };
         U_16 get_gid() const { return gid; };
         U_16 get_perm() const { return perm; };
@@ -157,13 +166,15 @@ namespace libdar
         void set_last_modif(const infinint & x_time) { *last_mod = x_time; };
         saved_status get_saved_status() const { return xsaved; };
         void set_saved_status(saved_status x) { xsaved = x; };
+	infinint get_device() const { return *fs_dev; };
 
         bool same_as(const inode & ref) const;
-        virtual bool is_more_recent_than(const inode & ref, const infinint & hourshift) const;
-        virtual bool has_changed_since(const inode & ref, const infinint & hourshift) const;
+        virtual bool is_more_recent_than(const inode & ref, const infinint & hourshift,
+					 bool ignore_owner) const;
+        virtual bool has_changed_since(const inode & ref, const infinint & hourshift, bool ignore_owner) const;
             // signature() left as an abstract method
             // clone is abstract
-        void compare(const inode &other, bool root_ea, bool user_ea) const;
+        void compare(user_interaction & dialog, const inode &other, bool root_ea, bool user_ea, bool ignore_owner) const;
             // throw Erange exception if a difference has been detected
             // this is not a symetrical comparison, but all what is present
             // in the current object is compared against the argument
@@ -186,7 +197,7 @@ namespace libdar
 
             // II : to associate EA list to an inode object (mainly for backup operation) #EA_FULL only#
         void ea_attach(ea_attributs *ref);
-        const ea_attributs *get_ea() const;
+        const ea_attributs *get_ea(user_interaction & dialog) const;
         void ea_detach() const; //discards any future call to get_ea() !
 
             // III : to record where is dump the EA in the archive #EA_FULL only#
@@ -199,14 +210,12 @@ namespace libdar
 
             ////////////////////////
 
-        static void set_ignore_owner(bool mode) { ignore_owner = mode; };
-
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(inode);
 #endif
 
     protected:
-        virtual void sub_compare(const inode & other) const {};
+        virtual void sub_compare(user_interaction & dialog, const inode & other) const {};
 
     private :
         U_16 uid;
@@ -221,15 +230,11 @@ namespace libdar
             // the following is used if ea_saved == full or ea_saved == partial
         infinint *last_cha;
         crc ea_crc;
-
-        static generic_file *storage; // where are stored EA
-            // this is a static variable (shared amoung all objects)
-            // because it is not efficient to have many copies of the same value
-            // if in the future, all inode have their EA stored in their own
-            // generic_file, this will be changed.
-        static bool ignore_owner;
+	infinint *fs_dev;
+	generic_file *storage; // where are stored EA
     };
 
+	/// the plain file class
     class file : public inode
     {
     public :
@@ -238,18 +243,20 @@ namespace libdar
              const infinint & last_modif,
              const std::string & src,
              const path & che,
-             const infinint & taille);
+             const infinint & taille,
+	     const infinint & fs_device);
         file(const file & ref);
-        file(generic_file & f, saved_status saved);
+        file(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved,
+	     compression default_algo, generic_file *data_loc);
         ~file() { detruit(); };
 
-        void dump(generic_file & f) const;
-        bool is_more_recent_than(const inode & ref, const infinint & hourshift) const;
-        bool has_changed_since(const inode & ref, const infinint & hourshift) const;
+        void dump(user_interaction & dialog, generic_file & f) const;
+        bool is_more_recent_than(const inode & ref, const infinint & hourshift, bool ignore_owner) const;
+        bool has_changed_since(const inode & ref, const infinint & hourshift, bool ignore_owner) const;
         infinint get_size() const { return *size; };
         infinint get_storage_size() const { return *storage_size; };
         void set_storage_size(const infinint & s) { *storage_size = s; };
-        generic_file *get_data() const; // return a newly alocated object in read_only mode
+        generic_file *get_data(user_interaction & dialog) const; // return a newly alocated object in read_only mode
         void clean_data(); // partially free memory (but get_data() becomes disabled)
         void set_offset(const infinint & r);
         unsigned char signature() const { return mk_signature('f', get_saved_status()); };
@@ -258,16 +265,14 @@ namespace libdar
         bool get_crc(crc & c) const;
         entree *clone() const { return new file(*this); };
 
-        static void set_compression_algo_used(compression a) { algo = a; };
-        static compression get_compression_algo_used() { return algo; };
-        static void set_archive_localisation(generic_file *f) { loc = f; };
+        compression get_compression_algo_used() const { return algo; };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(file);
 #endif
 
     protected :
-        void sub_compare(const inode & other) const;
+        void sub_compare(user_interaction & dialog, const inode & other) const;
 
     private :
         enum { empty, from_path, from_cat } status;
@@ -275,14 +280,17 @@ namespace libdar
         infinint *offset;
         infinint *size;
         infinint *storage_size;
+
+	bool available_crc;
         crc check;
 
-        static generic_file *loc;
-        static compression algo;
+        generic_file *loc;
+        compression algo;
 
         void detruit();
     };
 
+	/// the hard link managment interface class (pure virtual class)
     class etiquette
     {
     public:
@@ -294,6 +302,7 @@ namespace libdar
 #endif
     };
 
+	/// the hard linked plain file
     class file_etiquette : public file, public etiquette
     {
     public :
@@ -302,20 +311,20 @@ namespace libdar
                        const infinint & last_modif,
                        const std::string & src,
                        const path & che,
-                       const infinint & taille);
+                       const infinint & taille,
+		       const infinint & fs_device,
+		       const infinint & etiquette_number);
         file_etiquette(const file_etiquette & ref);
-        file_etiquette(generic_file & f, saved_status saved);
+        file_etiquette(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved,
+		       compression default_algo, generic_file *data_loc);
         ~file_etiquette() { if(etiquette != NULL) delete etiquette; };
 
-        void dump(generic_file &f) const;
+        void dump(user_interaction & dialog, generic_file &f) const;
         unsigned char signature() const { return mk_signature('e', get_saved_status()); };
         entree *clone() const { return new file_etiquette(*this); };
 
-        static void reset_etiquette_counter() { compteur_check(); *compteur = 0; };
-
             // inherited from etiquette
         infinint get_etiquette() const { return *etiquette; };
-        void change_etiquette() { if(compteur == NULL) throw SRC_BUG; else *etiquette = (*compteur)++; };
         const file *get_inode() const { return this; };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
@@ -324,18 +333,16 @@ namespace libdar
 
     private :
         infinint *etiquette;
-
-        static infinint *compteur;
-        static void compteur_check();
     };
 
+	/// the secondary reference to a hard linked inode
     class hard_link : public nomme, public etiquette
     {
     public :
         hard_link(const std::string & name, file_etiquette *ref);
         hard_link(generic_file & f, infinint & etiquette); // with etiquette, a call to set_reference() follows
 
-        void dump(generic_file &f) const;
+        void dump(user_interaction & dialog, generic_file &f) const;
         unsigned char signature() const { return 'h'; };
         entree *clone() const { return new hard_link(*this); };
         void set_reference(file_etiquette *ref);
@@ -351,17 +358,19 @@ namespace libdar
         file_etiquette *x_ref;
     };
 
-
+	/// the symbolic link inode class
     class lien : public inode
     {
     public :
         lien(U_16 uid, U_16 gid, U_16 perm,
              const infinint & last_access,
              const infinint & last_modif,
-             const std::string & name, const std::string & target);
-        lien(generic_file & f, saved_status saved);
+             const std::string & name,
+	     const std::string & target,
+	     const infinint & fs_device);
+        lien(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved);
 
-        void dump(generic_file & f) const;
+        void dump(user_interaction & dialog, generic_file & f) const;
         std::string get_target() const;
         void set_target(std::string x);
 
@@ -374,48 +383,44 @@ namespace libdar
         USE_SPECIAL_ALLOC(lien);
 #endif
     protected :
-        void sub_compare(const inode & other) const;
+        void sub_compare(user_interaction & dialog, const inode & other) const;
 
     private :
         std::string points_to;
     };
 
+	/// the directory inode class
     class directory : public inode
     {
     public :
         directory(U_16 xuid, U_16 xgid, U_16 xperm,
                   const infinint & last_access,
                   const infinint & last_modif,
-                  const std::string & xname);
+                  const std::string & xname,
+		  const infinint & device);
         directory(const directory &ref); // only the inode part is build, no children is duplicated (empty dir)
-        directory(generic_file & f, saved_status saved, entree_stats & stats);
+        directory(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved, entree_stats & stats, std::map <infinint, file_etiquette *> & corres, compression default_algo, generic_file *data_loc);
         ~directory(); // detruit aussi tous les fils et se supprime de son 'parent'
 
-        void dump(generic_file & f) const;
+        void dump(user_interaction & dialog, generic_file & f) const;
         void add_children(nomme *r); // when r is a directory, 'parent' is set to 'this'
+	bool has_children() const { return fils.size() != 0; };
         void reset_read_children() const;
         bool read_children(const nomme * &r) const; // read the direct children of the directory, returns false if no more is available
-        void listing(const mask &m = bool_mask(true), bool filter_unsaved = false, std::string marge = "") const;
-        void tar_listing(const mask &m = bool_mask(true), bool filter_unsaved = false, const std::string & beginning = "") const;
+        void listing(user_interaction & dialog,
+		     const mask &m = bool_mask(true), bool filter_unsaved = false, std::string marge = "") const;
+        void tar_listing(user_interaction & dialog,
+			 const mask &m = bool_mask(true), bool filter_unsaved = false, const std::string & beginning = "") const;
         directory * get_parent() const { return parent; };
         bool search_children(const std::string &name, nomme *&ref);
-	bool callback_for_children_of(const std::string & sdir) const;
+	bool callback_for_children_of(user_interaction & dialog, const std::string & sdir) const;
 
             // using is_more_recent_than() from inode class
             // using method has_changed_since() from inode class
         unsigned char signature() const { return mk_signature('d', get_saved_status()); };
         entree *clone() const { return new directory(*this); };
 
-        static void set_tar_listing_callback(void (*callback)(const std::string & flag, const std::string & perm, const std::string & uid,
-                                                              const std::string & gid, const std::string & size, const std::string & date,
-                                                              const std::string & filename))
-            { tar_listing_callback = callback; };
-        static void get_tar_listing_callback(void (*&callback)(const std::string & flag, const std::string & perm, const std::string & uid,
-							       const std::string & gid, const std::string & size, const std::string & date,
-							       const std::string & filename))
-            { callback = tar_listing_callback; };
-
-#ifdef LIBDAR_SPECIAL_ALLOC
+ #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(directory);
 #endif
     private :
@@ -423,12 +428,10 @@ namespace libdar
         std::vector<nomme *> fils;
         std::vector<nomme *>::iterator it;
 
-        static void (*tar_listing_callback)(const std::string & flags, const std::string & perm, const std::string & uid, const std::string & gid,
-                                            const std::string & size, const std::string & date, const std::string & filename);
-
-        void clear();
+	void clear();
     };
 
+	/// the special device root class
     class device : public inode
     {
     public :
@@ -437,10 +440,11 @@ namespace libdar
                const infinint & last_modif,
                const std::string & name,
                U_16 major,
-               U_16 minor);
-        device(generic_file & f, saved_status saved);
+               U_16 minor,
+	       const infinint & fs_device);
+        device(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved);
 
-        void dump(generic_file & f) const;
+        void dump(user_interaction & dialog, generic_file & f) const;
         int get_major() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xmajor; };
         int get_minor() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xminor; };
         void set_major(int x) { xmajor = x; };
@@ -455,12 +459,13 @@ namespace libdar
 #endif
 
     protected :
-        void sub_compare(const inode & other) const;
+        void sub_compare(user_interaction & dialog, const inode & other) const;
 
     private :
         U_16 xmajor, xminor;
     };
 
+	/// the char device class
     class chardev : public device
     {
     public:
@@ -469,10 +474,11 @@ namespace libdar
                 const infinint & last_modif,
                 const std::string & name,
                 U_16 major,
-                U_16 minor) : device(uid, gid, perm, last_access,
+                U_16 minor,
+		const infinint & fs_device) : device(uid, gid, perm, last_access,
                                      last_modif, name,
-                                     major, minor) {};
-        chardev(generic_file & f, saved_status saved) : device(f, saved) {};
+                                     major, minor, fs_device) {};
+        chardev(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved) : device(dialog, f, reading_ver, saved) {};
 
             // using dump from device class
             // using method is_more_recent_than() from device class
@@ -485,6 +491,7 @@ namespace libdar
 #endif
     };
 
+	/// the block device class
     class blockdev : public device
     {
     public:
@@ -493,10 +500,11 @@ namespace libdar
                  const infinint & last_modif,
                  const std::string & name,
                  U_16 major,
-                 U_16 minor) : device(uid, gid, perm, last_access,
-                                      last_modif, name,
-                                      major, minor) {};
-        blockdev(generic_file & f, saved_status saved) : device(f, saved) {};
+                 U_16 minor,
+		 const infinint & fs_device) : device(uid, gid, perm, last_access,
+						      last_modif, name,
+						      major, minor, fs_device) {};
+        blockdev(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved) : device(dialog, f, reading_ver, saved) {};
 
             // using dump from device class
             // using method is_more_recent_than() from device class
@@ -509,14 +517,16 @@ namespace libdar
 #endif
     };
 
+	/// the named pipe class
     class tube : public inode
     {
     public :
         tube(U_16 xuid, U_16 xgid, U_16 xperm,
              const infinint & last_access,
              const infinint & last_modif,
-             const std::string & xname) : inode(xuid, xgid, xperm, last_access, last_modif, xname) { set_saved_status(s_saved); };
-        tube(generic_file & f, saved_status saved) : inode(f, saved) {};
+             const std::string & xname,
+	     const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, xname, fs_device) { set_saved_status(s_saved); };
+        tube(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved) : inode(dialog, f, reading_ver, saved) {};
 
             // using dump from inode class
             // using method is_more_recent_than() from inode class
@@ -529,14 +539,16 @@ namespace libdar
 #endif
     };
 
+	/// the Unix socket inode class
     class prise : public inode
     {
     public :
         prise(U_16 xuid, U_16 xgid, U_16 xperm,
               const infinint & last_access,
               const infinint & last_modif,
-              const std::string & xname) : inode(xuid, xgid, xperm, last_access, last_modif, xname) { set_saved_status(s_saved); };
-        prise(generic_file & f, saved_status saved) : inode(f, saved) {};
+              const std::string & xname,
+	      const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, xname, fs_device) { set_saved_status(s_saved); };
+        prise(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved) : inode(dialog, f, reading_ver, saved) {};
 
             // using dump from inode class
             // using method is_more_recent_than() from inode class
@@ -549,13 +561,14 @@ namespace libdar
 #endif
     };
 
+	/// the deleted file entry
     class detruit : public nomme
     {
     public :
         detruit(const std::string & name, unsigned char firm) : nomme(name) { signe = firm; };
-        detruit(generic_file & f) : nomme(f) { if(f.read((char *)&signe, 1) != 1) throw Erange("detruit::detruit", "missing data to buid"); };
+        detruit(generic_file & f) : nomme(f) { if(f.read((char *)&signe, 1) != 1) throw Erange("detruit::detruit", gettext("missing data to buid")); };
 
-        void dump(generic_file & f) const { nomme::dump(f); f.write((char *)&signe, 1); };
+        void dump(user_interaction & dialog, generic_file & f) const { nomme::dump(dialog, f); f.write((char *)&signe, 1); };
         unsigned char get_signature() const { return signe; };
         void set_signature(unsigned char x) { signe = x; };
         unsigned char signature() const { return 'x'; };
@@ -568,13 +581,14 @@ namespace libdar
         unsigned char signe;
     };
 
+	/// the present file to ignore (not to be recorded as deleted later)
     class ignored : public nomme
     {
     public :
         ignored(const std::string & name) : nomme(name) {};
         ignored(generic_file & f) : nomme(f) { throw SRC_BUG; };
 
-        void dump(generic_file & f) const { throw SRC_BUG; };
+        void dump(user_interaction & dialog, generic_file & f) const { throw SRC_BUG; };
         unsigned char signature() const { return 'i'; };
         entree *clone() const { return new ignored(*this); };
 #ifdef LIBDAR_SPECIAL_ALLOC
@@ -582,13 +596,14 @@ namespace libdar
 #endif
     };
 
+	/// the ignored directory class, to be promoted later as empty directory if needed
     class ignored_dir : public inode
     {
     public:
         ignored_dir(const directory &target) : inode(target) {};
-        ignored_dir(generic_file & f) : inode(f, s_not_saved) { throw SRC_BUG; };
+        ignored_dir(user_interaction & dialog, generic_file & f, const dar_version & reading_ver) : inode(dialog, f, reading_ver, s_not_saved) { throw SRC_BUG; };
 
-        void dump(generic_file & f) const; // behaves like an empty directory
+        void dump(user_interaction & dialog, generic_file & f) const; // behaves like an empty directory
         unsigned char signature() const { return 'j'; };
         entree *clone() const { return new ignored_dir(*this); };
 #ifdef LIBDAR_SPECIAL_ALLOC
@@ -596,11 +611,14 @@ namespace libdar
 #endif
     };
 
+	/// the catalogue class which gather all objects contained in a give archive
     class catalogue
     {
     public :
-        catalogue();
-        catalogue(generic_file & f);
+        catalogue(user_interaction & dialog);
+        catalogue(user_interaction & dialog,
+		  generic_file & f, const dar_version & reading_ver,
+		  compression default_algo, generic_file *data_loc);
         catalogue(const catalogue & ref) : out_compare(ref.out_compare) { partial_copy_from(ref); };
         catalogue & operator = (const catalogue &ref);
         ~catalogue() { detruire(); };
@@ -666,11 +684,15 @@ namespace libdar
         signed int sub_count;             // count the depth in of read routine in the sub_tree
         entree_stats stats;               // statistics catalogue contents
 
+	user_interaction *cat_ui;
+
         void partial_copy_from(const catalogue &ref);
         void detruire();
 
         static const eod r_eod;           // needed to return eod reference, without taking risk of saturating memory
     };
+
+	/// @}
 
 } // end of namespace
 
