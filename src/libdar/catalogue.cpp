@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.18.2.1 2003/12/20 23:05:34 edrusb Rel $
+// $Id: catalogue.cpp,v 1.18.2.2 2004/05/21 08:33:02 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -557,7 +557,7 @@ namespace libdar
             || (!ignore_owner && gid != ref.gid)
             || perm != ref.perm;
 
-        if(ref.last_mod < last_mod)
+        if(*ref.last_mod < *last_mod)
             if(hourshift > 0)
                 more_recent = more_recent || ! is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod);
             else
@@ -2028,7 +2028,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.18.2.1 2003/12/20 23:05:34 edrusb Rel $";
+        static char id[]="$Id: catalogue.cpp,v 1.18.2.2 2004/05/21 08:33:02 edrusb Rel $";
         dummy_call(id);
     }
 

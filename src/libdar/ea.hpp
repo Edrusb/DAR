@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.hpp,v 1.8.4.1 2004/01/28 15:29:46 edrusb Rel $
+// $Id: ea.hpp,v 1.8.4.2 2004/07/13 22:37:33 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -49,7 +49,7 @@ namespace libdar
         // solution : store the EA lists after the data and before the catalogue.
         // to be seen.
         //
-    enum ea_domain { ea_root, ea_user };
+    enum ea_domain { ea_domain_root, ea_domain_user };
 
     struct ea_entry
     {
@@ -57,7 +57,7 @@ namespace libdar
         enum ea_domain domain;
         std::string key, value;
 
-        ea_entry() { mode = ea_insert; domain = ea_user; key = value = ""; };
+        ea_entry() { mode = ea_insert; domain = ea_domain_user; key = value = ""; };
         ea_entry(generic_file & f);
 
         void dump(generic_file & f) const;
@@ -78,7 +78,7 @@ namespace libdar
         void clear() { attr.clear(); alire = attr.begin(); };
         bool find(ea_domain dom, const std::string &key, ea_mode & found_mode, std::string & found_value) const;
         bool diff(const ea_attributs & other, bool check_ea_root, bool check_ea_user) const;
-    
+
         void check() const {}; // actually empty, but additional checks could be added
 
 #ifdef LIBDAR_SPECIAL_ALLOC

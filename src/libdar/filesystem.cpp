@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.17.2.4 2004/04/20 09:27:01 edrusb Rel $
+// $Id: filesystem.cpp,v 1.17.2.5 2004/07/13 22:37:33 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -308,14 +308,14 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_backup::filesystem_backup(const path &root, bool x_info_details, bool root_ea, bool user_ea, bool check_no_dump_flag)
+    filesystem_backup::filesystem_backup(const path &root, bool x_info_details, bool x_save_root_ea, bool x_save_user_ea, bool check_no_dump_flag)
     {
 	fs_root = get_root_with_symlink(root, x_info_details);
 	if(fs_root == NULL)
 	    throw Ememory("filesystem_backup::filesystem_backup");
 	info_details = x_info_details;
-	ea_root = root_ea;
-	ea_user = user_ea;
+	save_root_ea = x_save_root_ea;
+	save_user_ea = x_save_user_ea;
 	no_dump_check = check_no_dump_flag;
 	current_dir = NULL;
         reset_read();
@@ -344,8 +344,8 @@ namespace libdar
         else
             current_dir = NULL;
         info_details = ref.info_details;
-        ea_root = ref.ea_root;
-        ea_user = ref.ea_user;
+        save_root_ea = ref.save_root_ea;
+        save_user_ea = ref.save_user_ea;
         no_dump_check = ref.no_dump_check;
         filename_pile = ref.filename_pile;
         pile = ref.pile;
@@ -368,7 +368,7 @@ namespace libdar
         tmp = tools_str2charptr(current_dir->display());
         try
         {
-            entree *ref = make_read_entree(*current_dir, "", true, ea_root, ea_user);
+            entree *ref = make_read_entree(*current_dir, "", true, save_root_ea, save_user_ea);
             directory *ref_dir = dynamic_cast<directory *>(ref);
             try
             {
@@ -447,7 +447,7 @@ namespace libdar
 
                         if(!no_dump_check || !is_nodump_flag_set(*current_dir, name))
                         {
-                            ref = make_read_entree(*current_dir, name, true, ea_root, ea_user);
+                            ref = make_read_entree(*current_dir, name, true, save_root_ea, save_user_ea);
                             directory *ref_dir = dynamic_cast<directory *>(ref);
 
                             if(ref_dir != NULL)
@@ -545,14 +545,14 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_diff::filesystem_diff(const path &root, bool x_info_details, bool root_ea, bool user_ea)
+    filesystem_diff::filesystem_diff(const path &root, bool x_info_details, bool x_check_root_ea, bool x_check_user_ea)
     {
 	fs_root = get_root_with_symlink(root, x_info_details);
 	if(fs_root == NULL)
 	    throw Ememory("filesystem_diff::filesystem_diff");
 	info_details = x_info_details;
-	ea_root = root_ea;
-	ea_user = user_ea;
+	check_root_ea = x_check_root_ea;
+	check_user_ea = x_check_user_ea;
 	current_dir = NULL;
 
         reset_read();
@@ -574,7 +574,7 @@ namespace libdar
         tmp = tools_str2charptr(current_dir->display());
         try
         {
-            entree *ref = make_read_entree(*current_dir, "", true, ea_root, ea_user);
+            entree *ref = make_read_entree(*current_dir, "", true, check_root_ea, check_user_ea);
             directory *ref_dir = dynamic_cast<directory *>(ref);
             try
             {
@@ -590,7 +590,7 @@ namespace libdar
                     if(ref == NULL)
                         throw Erange("filesystem_diff::reset_read", string("Non existant file: ") + tmp);
                     else
-                        throw Erange("filesystem_diff::reset_read", string("File must be a directory: ")+ tmp);
+                        throw Erange("filesystem_diff::reset_read", string("File must be a directory: ") + tmp);
             }
             catch(...)
             {
@@ -614,7 +614,7 @@ namespace libdar
         directory *ref_dir = NULL;
         if(current_dir == NULL)
             throw SRC_BUG;
-        ref = make_read_entree(*current_dir, name, false, ea_root, ea_user);
+        ref = make_read_entree(*current_dir, name, false, check_root_ea, check_user_ea);
         if(ref == NULL)
             return false; // no file of that name
         else
@@ -665,8 +665,8 @@ namespace libdar
         else
             current_dir = NULL;
         info_details = ref.info_details;
-        ea_root = ref.ea_root;
-        ea_user = ref.ea_user;
+        check_root_ea = ref.check_root_ea;
+        check_user_ea = ref.check_user_ea;
         filename_pile = ref.filename_pile;
     }
 
@@ -689,6 +689,7 @@ namespace libdar
 
     bool filesystem_hard_link_write::set_ea(const nomme *e, const ea_attributs & l, path spot,
                                             bool allow_overwrite, bool warn_overwrite,
+					    bool set_root_ea, bool set_user_ea,
                                             bool info_details)
     {
         const etiquette *e_eti = dynamic_cast<const etiquette *>(e);
@@ -731,14 +732,14 @@ namespace libdar
 
                 // restoring the root EA
                 //
-            exists = ea_filesystem_is_present(chemin, ea_root);
+            exists = ea_filesystem_is_present(chemin, ea_domain_root);
             if(!exists || allow_overwrite)
             {
-                if(ea_root)
+                if(set_root_ea)
                 {
                     if(exists && warn_overwrite)
                         user_interaction_pause(string("system EA for ")+chemin+ " are about to be overwriten, continue ? ");
-                    ea_filesystem_clear_ea(chemin, ea_root);
+                    ea_filesystem_clear_ea(chemin, ea_domain_root);
                     if(ea_filesystem_write_ea(chemin, l, true, false))
                     {
                         if(info_details)
@@ -751,19 +752,19 @@ namespace libdar
                 }
             }
             else
-                if(ea_root)
+                if(set_root_ea)
                     user_interaction_warning(string("system EA for ")+chemin+" will not be restored, (overwriting not allowed)");
 
                 // restoring the user EA
                 //
-            exists = ea_filesystem_is_present(chemin, ea_user);
+            exists = ea_filesystem_is_present(chemin, ea_domain_user);
             if(!exists || allow_overwrite)
             {
-                if(ea_user)
+                if(set_user_ea)
                 {
                     if(exists && warn_overwrite)
                         user_interaction_pause(string("user EA for ")+chemin+ " are about to be overwriten, continue ? ");
-                    ea_filesystem_clear_ea(chemin, ea_user);
+                    ea_filesystem_clear_ea(chemin, ea_domain_user);
                     if(ea_filesystem_write_ea(chemin, l, false, true))
                     {
                         if(info_details)
@@ -776,7 +777,7 @@ namespace libdar
                 }
             }
             else
-                if(ea_user)
+                if(set_user_ea)
                     user_interaction_warning(string("user EA for ")+chemin+" will not be restored, (overwriting not allowed)");
         }
         catch(Euser_abort & e)
@@ -1007,7 +1008,7 @@ namespace libdar
 
     filesystem_restore::filesystem_restore(const path &root, bool x_allow_overwrite,
                                            bool x_warn_overwrite, bool x_info_details,
-                                           bool root_ea, bool user_ea, bool ignore_owner,
+                                           bool x_set_root_ea, bool x_set_user_ea, bool ignore_owner,
 					   bool x_warn_remove_no_match, bool x_empty)
     {
 	fs_root = get_root_with_symlink(root, x_info_details);
@@ -1016,8 +1017,8 @@ namespace libdar
 	allow_overwrite = x_allow_overwrite;
 	warn_overwrite = x_warn_overwrite;
 	info_details = x_info_details;
-	ea_root = root_ea;
-	ea_user = user_ea;
+	set_root_ea = x_set_root_ea;
+	set_user_ea = x_set_user_ea;
 	ignore_ownership = ignore_owner;
 	warn_remove_no_match = x_warn_remove_no_match;
 	current_dir = NULL;
@@ -1070,7 +1071,7 @@ namespace libdar
                     const inode *x_ino = dynamic_cast<const inode *>(x);
                     const etiquette *x_eti = dynamic_cast<const etiquette *>(x);
 
-                    nomme *exists = make_read_entree(*current_dir, x_nom->get_name(), false, ea_root, ea_user);
+                    nomme *exists = make_read_entree(*current_dir, x_nom->get_name(), false, set_root_ea, set_user_ea);
 
                     try
                     {
@@ -1198,7 +1199,7 @@ namespace libdar
 
     nomme *filesystem_restore::get_before_write(const nomme *x)
     {
-        return make_read_entree(*current_dir, x->get_name(), false, ea_root, ea_user);
+        return make_read_entree(*current_dir, x->get_name(), false, set_root_ea, set_user_ea);
     }
 
     void filesystem_restore::pseudo_write(const directory *dir)
@@ -1207,7 +1208,7 @@ namespace libdar
             throw SRC_BUG;
 
         path spot = *current_dir + dir->get_name();
-        nomme *exists = make_read_entree(*current_dir, dir->get_name(), false, ea_root, ea_user);
+        nomme *exists = make_read_entree(*current_dir, dir->get_name(), false, set_root_ea, set_user_ea);
 
         try
         {
@@ -1287,8 +1288,8 @@ namespace libdar
         else
             current_dir = NULL;
         info_details = ref.info_details;
-        ea_root = ref.ea_root;
-        ea_user = ref.ea_user;
+        set_root_ea = ref.set_root_ea;
+        set_user_ea = ref.set_user_ea;
         allow_overwrite = ref.allow_overwrite;
         warn_overwrite = ref.warn_overwrite;
         ignore_ownership = ref.ignore_ownership;
@@ -1339,7 +1340,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.17.2.4 2004/04/20 09:27:01 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.17.2.5 2004/07/13 22:37:33 edrusb Rel $";
         dummy_call(id);
     }
 

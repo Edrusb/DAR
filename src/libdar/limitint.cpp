@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.cpp,v 1.8.4.4 2004/03/06 23:12:17 edrusb Rel $
+// $Id: limitint.cpp,v 1.8.4.5 2004/05/21 08:33:02 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -355,7 +355,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: limitint.cpp,v 1.8.4.4 2004/03/06 23:12:17 edrusb Rel $";
+        static char id[]="$Id: limitint.cpp,v 1.8.4.5 2004/05/21 08:33:02 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -447,12 +447,12 @@ namespace libdar
 
     template <class B> static B higher_power_of_2(B val)
     {
-        B i = 1;
+        B i = 0;
 
-        while(val >> i != 0)
+        while((val >> i) > 1)
             i++;
 
-        return i - 1;
+        return i;
     }
 
 ///////////////////////////////////////////////////////////////////////

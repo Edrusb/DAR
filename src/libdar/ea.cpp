@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: ea.cpp,v 1.7.4.1 2004/07/13 22:37:33 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -51,7 +51,7 @@ namespace libdar
         unsigned char fl;
 
         f.read((char *)(&fl), 1);
-        domain = (fl & EA_ROOT) != 0 ? ea_root : ea_user;
+        domain = (fl & EA_ROOT) != 0 ? ea_domain_root : ea_domain_user;
         mode = (fl &
                 EA_DEL) != 0 ? ea_del : ea_insert;
         tools_read_string(f, key);
@@ -63,7 +63,7 @@ namespace libdar
     {
         unsigned char fl = 0;
         infinint tmp = value.size();
-        if(domain == ea_root)
+        if(domain == ea_domain_root)
             fl |= EA_ROOT;
         if(mode == ea_del)
             fl |= EA_DEL;
@@ -92,13 +92,13 @@ namespace libdar
             tmp.unstack(tmp2);
         }
         while(tmp2 > 0);
-    
+
         alire = attr.begin();
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: ea.cpp,v 1.7.4.1 2004/07/13 22:37:33 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -106,8 +106,8 @@ namespace libdar
     {
         vector<ea_entry>::iterator it = const_cast<ea_attributs &>(*this).attr.begin();
         vector<ea_entry>::iterator fin = const_cast<ea_attributs &>(*this).attr.end();
-    
-    
+
+
         size().dump(f);
         while(it != fin)
         {
@@ -119,7 +119,7 @@ namespace libdar
     void ea_attributs::reset_read() const
     {
         ea_attributs *moi = const_cast<ea_attributs *>(this);
-        moi->alire = moi->attr.begin(); 
+        moi->alire = moi->attr.begin();
     }
 
     bool ea_attributs::read(ea_entry & x) const
@@ -144,7 +144,7 @@ namespace libdar
         reset_read();
         while(!diff && read(ea))
             if(ea.mode == ea_insert)
-                if((ea.domain == ea_user && check_ea_user) || (ea.domain == ea_root && check_ea_root))
+                if((ea.domain == ea_domain_user && check_ea_user) || (ea.domain == ea_domain_root && check_ea_root))
                     if(other.find(ea.domain, ea.key, mode, value))
                     {
                         if(value != ea.value) // found but different

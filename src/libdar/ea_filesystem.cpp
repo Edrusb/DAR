@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.8.4.1 2003/12/20 23:05:34 edrusb Rel $
+// $Id: ea_filesystem.cpp,v 1.8.4.2 2004/07/13 22:37:33 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -136,7 +136,7 @@ namespace libdar
         char *p_chemin = NULL;
         U_I num = 0;
 
-        if(!ea_root && !ea_user)
+        if(!rest_ea_root && !rest_ea_user)
             return false; // no EA can be restored
 
         p_chemin = tools_str2charptr(chemin);
@@ -149,9 +149,9 @@ namespace libdar
             {
                     // doing this for each attribute
 
-                if(ea_ent.domain == ea_root && !rest_ea_root)
+                if(ea_ent.domain == ea_domain_root && !rest_ea_root)
                     continue; // silently skipping this EA
-                if(ea_ent.domain == ea_user && !rest_ea_user)
+                if(ea_ent.domain == ea_domain_user && !rest_ea_user)
                     continue; // silently skipping this EA
 
                 char *k = tools_str2charptr(glue_ea_name(ea_ent.domain, ea_ent.key));
@@ -246,8 +246,8 @@ namespace libdar
                         split_ea_name(*it, ea_ent.domain, ea_ent.key);
                         ea_ent.mode = ea_insert;
                         ea_ent.value = string(&(value[0]), &(value[taille]));
-                        if((ea_ent.domain == ea_root && read_ea_root) ||
-                           (ea_ent.domain == ea_user && read_ea_user))
+                        if((ea_ent.domain == ea_domain_root && read_ea_root) ||
+                           (ea_ent.domain == ea_domain_user && read_ea_user))
                             val.add(ea_ent);
                     }
                     catch(...)
@@ -276,7 +276,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea_filesystem.cpp,v 1.8.4.1 2003/12/20 23:05:34 edrusb Rel $";
+        static char id[]="$Id: ea_filesystem.cpp,v 1.8.4.2 2004/07/13 22:37:33 edrusb Rel $";
 
         dummy_call(id);
     }
@@ -326,10 +326,10 @@ namespace libdar
 
     static ea_domain string2ea_domain(const string & x)
     {
-        if(x == ea_convert[ea_root])
-            return ea_root;
-        else if(x == ea_convert[ea_user])
-            return ea_user;
+        if(x == ea_convert[ea_domain_root])
+            return ea_domain_root;
+        else if(x == ea_convert[ea_domain_user])
+            return ea_domain_user;
         else
             throw Erange("ea_filesystem : string2ea_domain", string("unknow EA namespace : ") + x);
     }

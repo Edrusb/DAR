@@ -505,3 +505,35 @@ KNOWN BUGS:
 
     affects version 1.2.0 and older versions
     fixed in version 2.1.3
+
+
+#27 description
+      when restoring only more recent files (-r), with hourshift activated (-H)
+      the -H feature was randomly not activated.
+
+    problem
+      a test comparing the dates is made on address's objects rather on objects
+      themselves. This leads to the -H test being activated randomly depending
+      on address of two objects to compare.
+
+    solution
+      make the test on objects rather than on their addresses in memory.
+
+    affects version from 2.0.0 to 2.1.3
+    fixed in version 2.1.4
+
+#28 description
+      dar does not restore root Extended Attributes
+
+    problem
+      a collision occurred in the naming of the enumeration listing the
+      extended attributes available domains, and the variables carrying
+      user choice to consider or not user or root extended attributes for
+      the operation (backup, restoration, comparison, etc.)
+
+    solution
+      rename both the domain enumeration and the variables carrying
+      user choice about extended attribute comportment.
+
+    affects version from 2.1.0 to 2.1.3
+    fixed in version 2.1.4

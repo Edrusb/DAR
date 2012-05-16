@@ -240,3 +240,9 @@ from 2.1.2 to 2.1.3
 - made dar_cp more talkative about events that succeed while copying data
 - fixed bug #25
 - fixed bug #26
+
+from 2.1.3 to 2.1.4
+- fixed bug #27
+- improved limitint detection overflow
+- fixed bug #28
+

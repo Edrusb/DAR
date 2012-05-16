@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.8.2.1 2003/12/20 23:05:34 edrusb Rel $
+// $Id: filesystem.hpp,v 1.8.2.2 2004/07/13 22:37:33 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -76,7 +76,7 @@ namespace libdar
     class filesystem_backup : public filesystem_hard_link_read
     {
     public:
-        filesystem_backup(const path &root, bool x_info_details, bool root_ea, bool user_ea, bool check_no_dump_flag);
+        filesystem_backup(const path &root, bool x_info_details, bool x_save_root_ea, bool x_save_user_ea, bool check_no_dump_flag);
         filesystem_backup(const filesystem_backup & ref) { copy_from(ref); };
         filesystem_backup & operator = (const filesystem_backup & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_backup() { detruire(); };
@@ -96,8 +96,8 @@ namespace libdar
 
         path *fs_root;
         bool info_details;
-        bool ea_root;
-        bool ea_user;
+        bool save_root_ea;
+        bool save_user_ea;
         bool no_dump_check;
         path *current_dir;      // to translate from an hard linked inode to an  already allocated object
         std::vector<filename_struct> filename_pile; // to be able to restore last access of directory we open for reading
@@ -110,7 +110,7 @@ namespace libdar
     class filesystem_diff : public filesystem_hard_link_read
     {
     public:
-        filesystem_diff(const path &root, bool x_info_details, bool root_ea, bool user_ea);
+        filesystem_diff(const path &root, bool x_info_details, bool x_check_root_ea, bool x_check_user_ea);
         filesystem_diff(const filesystem_diff & ref) { copy_from(ref); };
         filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_diff() { detruire(); };
@@ -131,8 +131,8 @@ namespace libdar
 
         path *fs_root;
         bool info_details;
-        bool ea_root;
-        bool ea_user;
+        bool check_root_ea;
+        bool check_user_ea;
         path *current_dir;
         std::vector<filename_struct> filename_pile;
 
@@ -144,13 +144,12 @@ namespace libdar
     {
             // this class is not to be used directly
             // it only provides routines to its inherited classes
-            // this not public part is present.
 
     public:
         bool ea_has_been_restored(const hard_link *h);
             // true if the inode pointed to by the arg has already got its EA restored
         bool set_ea(const nomme *e, const ea_attributs & l, path spot,
-                    bool allow_overwrite, bool warn_overwrite, bool info_details);
+                    bool allow_overwrite, bool warn_overwrite, bool set_root_ea, bool set_user_ea, bool info_details);
             // check the inode for which to restore EA, is not a hard link to
             // an already restored inode, else call the proper ea_filesystem call
         void write_hard_linked_target_if_not_set(const etiquette *ref, const std::string & chemin);
@@ -181,7 +180,7 @@ namespace libdar
     {
     public:
         filesystem_restore(const path &root, bool x_allow_overwrite, bool x_warn_overwrite, bool x_info_details,
-                           bool root_ea, bool user_ea, bool ignore_owner, bool x_warn_remove_no_match, bool empty);
+                           bool x_set_root_ea, bool x_set_user_ea, bool ignore_owner, bool x_warn_remove_no_match, bool empty);
         filesystem_restore(const filesystem_restore  & ref) { copy_from(ref); };
         filesystem_restore & operator =(const filesystem_restore  & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_restore() { detruire(); };
@@ -204,14 +203,16 @@ namespace libdar
             {  return empty ? true : filesystem_hard_link_write::set_ea(e, l, *current_dir,
 									allow_overwrite,
 									warn_overwrite,
+									set_root_ea,
+									set_user_ea,
 									info_details);
             };
 
     private:
         path *fs_root;
         bool info_details;
-        bool ea_root;
-        bool ea_user;
+        bool set_root_ea;
+        bool set_user_ea;
         bool allow_overwrite;
         bool warn_overwrite;
         bool ignore_ownership;
