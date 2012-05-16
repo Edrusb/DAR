@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: elastic.cpp,v 1.6 2004/12/07 18:04:49 edrusb Rel $
+// $Id: elastic.cpp,v 1.6.2.1 2005/02/03 19:37:05 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -188,13 +188,13 @@ namespace libdar
 		    f.skip_relative(count - taille);
 	    else
 		if(count > taille)
-		    throw SRC_BUG;
+		    throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
 	}
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: elastic.cpp,v 1.6 2004/12/07 18:04:49 edrusb Rel $";
+        static char id[]="$Id: elastic.cpp,v 1.6.2.1 2005/02/03 19:37:05 edrusb Rel $";
         dummy_call(id);
     }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: macro_tools.cpp,v 1.19 2004/11/04 17:47:00 edrusb Rel $
+// $Id: macro_tools.cpp,v 1.19.2.1 2005/02/05 09:34:13 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -64,7 +64,7 @@ namespace libdar
         {
             try
             {
-                ret = new catalogue(dialog, zip, ver.edition, char2compression(ver.algo_zip), zip_base);
+                ret = new catalogue(dialog, zip, ver.edition, char2compression(ver.algo_zip), zip_base, &zip);
                 contextual *ptr = dynamic_cast<contextual *>(&f);
                 if(ptr != NULL)
                     ptr->set_info_status(CONTEXT_OP);
@@ -230,7 +230,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: macro_tools.cpp,v 1.19 2004/11/04 17:47:00 edrusb Rel $";
+        static char id[]="$Id: macro_tools.cpp,v 1.19.2.1 2005/02/05 09:34:13 edrusb Rel $";
         dummy_call(id);
     }
 

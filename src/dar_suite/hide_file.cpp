@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: hide_file.cpp,v 1.11 2004/07/31 13:56:42 edrusb Rel $
+// $Id: hide_file.cpp,v 1.11.2.1 2005/02/06 20:49:13 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -132,7 +132,7 @@ infinint hide_file::get_position()
 S_I hide_file::inherited_read(char *a, size_t size)
 {
     CHECK_INIT;
-    U_I lu = 0;
+    U_I lu = 0, tmp_lu = 0;
     size_t maxlire;
     size_t reste;
 
@@ -144,7 +144,10 @@ S_I hide_file::inherited_read(char *a, size_t size)
         maxlire = maxlire > reste ? reste : maxlire;
 
         ref->skip(morceau[pos_index].debut+pos_relicat);
-        lu += ref->read(a+lu, maxlire);
+        tmp_lu = ref->read(a+lu, maxlire);
+	if(tmp_lu == 0 && maxlire > 0)
+	    throw SRC_BUG;
+	lu += tmp_lu;
         pos_relicat += lu;
         if(pos_relicat >= morceau[pos_index].longueur)
         {
@@ -164,7 +167,7 @@ S_I hide_file::inherited_write(char *a, size_t size)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: hide_file.cpp,v 1.11 2004/07/31 13:56:42 edrusb Rel $";
+    static char id[]="$Id: hide_file.cpp,v 1.11.2.1 2005/02/06 20:49:13 edrusb Rel $";
     dummy_call(id);
 }
 

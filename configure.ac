@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.2.0], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.2.1], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -16,13 +16,11 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 
 # Checks for libraries.
-AC_CHECK_LIB(z, [deflate], [], [AC_MSG_WARN([library zlib not found])])
-AC_CHECK_LIB(bz2, [BZ2_bzCompress], [], [AC_MSG_WARN([library libbz2 not found])])
 AC_CHECK_LIB(socket, [socket], [], [])
 AC_CHECK_LIB(nsl, [endnetconfig], [], [])
-AC_CHECK_LIB(crypto, [BF_encrypt], [], [])
 
 AC_MSG_CHECKING([for static linking with libdl])
 MEM_LDFLAGS=$LDFLAGS
@@ -48,24 +46,7 @@ AC_CHECK_LIB(dl, [dlsym], [], [])
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADER(zlib.h, [local_libz="yes"
-			AC_DEFINE(HAVE_ZLIB_H, 1, [zlib.h header file is available])
-			],
-			[AC_MSG_WARN([Cannot find zlib.h header file])
-                                             local_libz="no"
-                                            ])
-AC_CHECK_HEADER(bzlib.h, [local_libbz2="yes"
-                          AC_DEFINE(HAVE_BZLIB_H, 1, [bzlib.h header file is available])
-                         ],
-			 [AC_MSG_WARN([Cannot find bzlib.h header file])
-                                                local_libbz2="no"
-                                               ])
-AC_CHECK_HEADER(openssl/crypto.h, [local_crypto="yes"
-                                   AC_DEFINE(HAVE_OPENSSL_CRYPTO_H, 1, [openssl/crypto.h header file is available])
-                                  ],
-                                  [AC_MSG_WARN([Cannt find openssl/crypto.h header file])
-                                   local_crypto="no"
-                                  ])
+
 
 AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h openssl/blowfish.h])
 
@@ -86,7 +67,6 @@ AC_CHECK_TYPE(off_t, [AC_CHECK_SIZEOF(off_t)], [AC_MSG_ERROR([Cannot find off_t 
 
 # Checks for library functions.
 AC_FUNC_FNMATCH
-AC_REPLACE_FNMATCH
 AC_FUNC_FORK
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_LSTAT
@@ -151,8 +131,15 @@ AC_ARG_ENABLE( [libz-linking],
               local_libz="no"
              ],
              [
+	       AC_CHECK_LIB(z, [deflate], [], [AC_MSG_WARN([library zlib not found])])
+               AC_CHECK_HEADER(zlib.h, [local_libz="yes"
+				       	AC_DEFINE(HAVE_ZLIB_H, 1, [zlib.h header file is available])
+				       ],
+ 			               [AC_MSG_WARN([Cannot find zlib.h header file])
+                                        local_libz="no"
+                                       ])
                if test "$local_libz" = "yes" ; then
-                AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
+               AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
                                                            #if HAVE_ZLIB_H
                                                            #include <zlib.h>
                                                            #endif
@@ -176,6 +163,13 @@ AC_ARG_ENABLE( [libbz2-linking],
              local_libbz2="no"
             ],
             [
+  	     AC_CHECK_LIB(bz2, [BZ2_bzCompress], [], [AC_MSG_WARN([library libbz2 not found])])
+	     AC_CHECK_HEADER(bzlib.h, [local_libbz2="yes"
+                                       AC_DEFINE(HAVE_BZLIB_H, 1, [bzlib.h header file is available])
+                                      ],
+		 	              [AC_MSG_WARN([Cannot find bzlib.h header file])
+                                       local_libbz2="no"
+                                      ])
               if test "$local_libbz2" = "yes" ; then
                  AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
                                                        #if HAVE_BZLIB_H
@@ -201,6 +195,13 @@ AC_ARG_ENABLE( [libcrypto-linking],
              local_crypto="no"
             ],
             [
+              AC_CHECK_LIB(crypto, [BF_encrypt], [], [])
+	      AC_CHECK_HEADER(openssl/crypto.h, [local_crypto="yes"
+                                                AC_DEFINE(HAVE_OPENSSL_CRYPTO_H, 1, [openssl/crypto.h header file is available])
+                                                ],
+                                                [AC_MSG_WARN([Cannt find openssl/crypto.h header file])
+                                                 local_crypto="no"
+                                                ])
               if test "$local_crypto" = "yes" ; then
                  AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
                                                        #if HAVE_OPENSSL_CRYPTO_H
@@ -469,7 +470,7 @@ AC_ARG_ENABLE(  [thread-safe],
 AC_ARG_ENABLE( [locale-dir],
                AC_HELP_STRING(--enable-locale-dir, [by default NLS files are installed in $prefix/share/locale. You override this with --enable-locale-dir=<path>]),
                [ AC_DEFINE_UNQUOTED(DAR_LOCALEDIR, ["$enableval"], [override the default location of *.mo files ($prefix/share/locale by default) ])],
-               [ AC_DEFINE(DAR_LOCALEDIR, [NULL], [override the default location of *.mo files ($prefix/share/locale by default) ])])
+               [ AC_DEFINE(DAR_LOCALEDIR, [""], [override the default location of *.mo files ($prefix/share/locale by default) ])])
 
 AC_ARG_ENABLE( [profiling],
 	       AC_HELP_STRING(--enable-profiling, [enable executable profiling]),

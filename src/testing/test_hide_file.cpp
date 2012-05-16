@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_hide_file.cpp,v 1.9 2004/05/21 08:28:51 edrusb Rel $
+// $Id: test_hide_file.cpp,v 1.9.2.1 2005/02/02 10:51:35 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -32,6 +32,7 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include "libdar.hpp"
 #include "no_comment.hpp"
 #include "config_file.hpp"
 #include "cygwin_adapt.hpp"
@@ -47,6 +48,9 @@ static user_interaction *ui = NULL;
 
 int main()
 {
+    U_I maj, med, min;
+
+    get_version(maj, med, min);
     ui = shell_interaction_init(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;

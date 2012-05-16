@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.35 2005/01/29 15:08:02 edrusb Rel $
+// $Id: filesystem.cpp,v 1.35.2.1 2005/02/11 16:09:30 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -127,6 +127,7 @@ namespace libdar
 				   const path & chem, const string & filename);
     static path *get_root_with_symlink(user_interaction & dialog,
 				       const path & root, bool info_details);
+    static mode_t get_file_permission(const string & path);
 
 ///////////////////////////////////////////////////////////////////
 ///////////////// filesystem_hard_link_read methods ///////////////
@@ -959,14 +960,17 @@ namespace libdar
                 }
                 else if(ref_dir != NULL)
                 {
-                    ret = mkdir(name, 0777);
-                }
+                    ret = mkdir(name, 0700); // as the directory has been created we are its owner and we will need only
+			// to create files under it so we need all rights for user, by security for now, no right are
+			// allowed for group and others, but this will be set properly at the end, when all files will
+			// be restored in that directory
+		}
                 else if(ref_fil != NULL)
                 {
                     generic_file *ou;
                     infinint seek;
 
-                    ret = ::open(name, O_WRONLY|O_CREAT|O_BINARY, 0777);
+                    ret = ::open(name, O_WRONLY|O_CREAT|O_BINARY, 0700); // munimum permissions
                     if(ret >= 0)
                     {
                         fichier dest = fichier(get_fs_ui(), ret);
@@ -998,11 +1002,11 @@ namespace libdar
                     delete cible;
                 }
                 else if(ref_blo != NULL)
-                    ret = mknod(name, S_IFBLK | 0777, makedev(ref_blo->get_major(), ref_blo->get_minor()));
+                    ret = mknod(name, S_IFBLK | 0700, makedev(ref_blo->get_major(), ref_blo->get_minor()));
                 else if(ref_cha != NULL)
-                    ret = mknod(name, S_IFCHR | 0777, makedev(ref_cha->get_major(), ref_cha->get_minor()));
+                    ret = mknod(name, S_IFCHR | 0700, makedev(ref_cha->get_major(), ref_cha->get_minor()));
                 else if(ref_tub != NULL)
-                    ret = mknod(name, S_IFIFO | 0777, 0);
+                    ret = mknod(name, S_IFIFO | 0700, 0);
                 else if(ref_pri != NULL)
                 {
                     ret = socket(PF_UNIX, SOCK_STREAM, 0);
@@ -1319,8 +1323,8 @@ namespace libdar
                     try
                     {
 			if(!empty)
-			    if(chmod(name, 0777) < 0)
-				get_fs_ui().warning(tools_printf(gettext("Cannot restore permissions of %S : "), &spot_display) + strerror(errno));
+			    if(chmod(name, 0700 | get_file_permission(name)) < 0)
+				get_fs_ui().warning(tools_printf(gettext("Cannot temporary change permissions of %S : "), &spot_display) + strerror(errno));
                     }
                     catch(...)
                     {
@@ -1424,7 +1428,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.35 2005/01/29 15:08:02 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.35.2.1 2005/02/11 16:09:30 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1436,13 +1440,32 @@ namespace libdar
         const lien *ref_lie = dynamic_cast<const lien *>(&ref);
         S_I permission;
 
-        if(dynamic_cast<const directory *>(&ref) != NULL && !dir_perm)
-            permission = 0777;
-        else
-            permission = ref.get_perm();
-
         try
         {
+		// if we are not root (geteuid()!=0) and if we are restoring in an already
+		// existing (!dir_perm) directory (dynamic_cast...), we must try, to have a chance to
+		// be able to create/modify sub-files or sub-directory, to set the user write access to
+		// that directory. This chmod is allowed only if we own the directory (so
+		// we only set the write bit for user). If this cannot be changed we are the
+		// owner of the directory, so we will try to restore as much as our permission
+		// allows it (maybe some group or other write bit is set for us).
+
+	    if(dynamic_cast<const directory *>(&ref) != NULL && !dir_perm && geteuid() != 0)
+	    {
+		mode_t tmp;
+		try
+		{
+		    tmp = get_file_permission(name); // the current permission value
+		}
+		catch(Egeneric & e)
+		{
+		    tmp = ref.get_perm(); // the value at the time of the backup
+		}
+		permission =  tmp | 0200; // add user write access to be able to add some subdirectories and files
+	    }
+	    else
+		permission = ref.get_perm();
+
             if(!ignore_ownership)
                 if(ref.get_saved_status() == s_saved)
 		{
@@ -1606,6 +1629,27 @@ namespace libdar
 	if(ret == NULL)
 	    throw SRC_BUG; // exit without exception, but ret not allocated !
 
+	return ret;
+    }
+
+    static mode_t get_file_permission(const string & path)
+    {
+	mode_t ret;
+	char *ptr = tools_str2charptr(path);
+
+	try
+	{
+	    struct stat buf;
+	    if(lstat(ptr, &buf) < 0)
+		throw Erange("filesystem.cpp:get_file_permission", tools_printf("Cannot read file permission for %s: %s", ptr, strerror(errno)));
+	    ret = buf.st_mode;
+	}
+	catch(...)
+	{
+	    delete ptr;
+	    throw;
+	}
+	delete ptr;
 	return ret;
     }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.35 2005/01/28 23:27:55 edrusb Rel $
+// $Id: catalogue.cpp,v 1.35.2.1 2005/02/05 09:34:12 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -194,7 +194,14 @@ namespace libdar
         dialog.printf(gettext("   %i file(s) have been record as destroyed since backup of reference\n\n"), &num_x);
     }
 
-    entree *entree::read(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, entree_stats & stats, std::map <infinint, file_etiquette *> & corres, compression default_algo, generic_file *data_loc)
+    entree *entree::read(user_interaction & dialog,
+			 generic_file & f,
+			 const dar_version & reading_ver,
+			 entree_stats & stats,
+			 std::map <infinint, file_etiquette *> & corres,
+			 compression default_algo,
+			 generic_file *data_loc,
+			 generic_file *ea_loc)
     {
         char type;
         saved_status saved;
@@ -215,25 +222,25 @@ namespace libdar
         switch(type)
         {
         case 'f':
-            ret = new file(dialog, f, reading_ver, saved, default_algo, data_loc);
+            ret = new file(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc);
             break;
         case 'l':
-            ret = new lien(dialog, f, reading_ver, saved);
+            ret = new lien(dialog, f, reading_ver, saved, ea_loc);
             break;
         case 'c':
-            ret = new chardev(dialog, f, reading_ver, saved);
+            ret = new chardev(dialog, f, reading_ver, saved, ea_loc);
             break;
         case 'b':
-            ret = new blockdev(dialog, f, reading_ver, saved);
+            ret = new blockdev(dialog, f, reading_ver, saved, ea_loc);
             break;
         case 'p':
-            ret = new tube(dialog, f, reading_ver, saved);
+            ret = new tube(dialog, f, reading_ver, saved, ea_loc);
             break;
         case 's':
-            ret = new prise(dialog, f, reading_ver, saved);
+            ret = new prise(dialog, f, reading_ver, saved, ea_loc);
             break;
         case 'd':
-            ret = new directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc);
+            ret = new directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc);
             break;
         case 'z':
             if(saved != s_saved)
@@ -259,7 +266,7 @@ namespace libdar
             }
             break;
         case 'e':
-            ret = ptr_e = new file_etiquette(dialog, f, reading_ver, saved, default_algo, data_loc);
+            ret = ptr_e = new file_etiquette(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc);
             if(ret == NULL)
                 throw Ememory("entree::read");
             if(corres.find(ptr_e->get_etiquette()) != corres.end())
@@ -309,7 +316,8 @@ namespace libdar
     inode::inode(U_16 xuid, U_16 xgid, U_16 xperm,
                  const infinint & last_access,
                  const infinint & last_modif,
-                 const string & xname, const infinint & fs_device) : nomme(xname)
+                 const string & xname,
+		 const infinint & fs_device) : nomme(xname)
     {
         uid = xuid;
         gid = xgid;
@@ -352,7 +360,11 @@ namespace libdar
         }
     }
 
-    inode::inode(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved) : nomme(f)
+    inode::inode(user_interaction & dialog,
+		 generic_file & f,
+		 const dar_version & reading_ver,
+		 saved_status saved,
+		 generic_file *ea_loc) : nomme(f)
     {
         U_16 tmp;
         unsigned char flag;
@@ -438,8 +450,10 @@ namespace libdar
             }
             ea = NULL; // in any case
 
-                // to be able later to read EA from file
-            storage = &f;
+                // to be able later to read EA from archive file
+	    if(ea_loc == NULL)
+		throw SRC_BUG;
+            storage = ea_loc;
         }
         catch(...)
         {
@@ -783,7 +797,8 @@ namespace libdar
                const infinint & last_modif,
                const string & src,
                const path & che,
-               const infinint & taille, const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, src, fs_device), chemin(che + src)
+               const infinint & taille,
+	       const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, src, fs_device), chemin(che + src)
     {
         status = from_path;
         set_saved_status(s_saved);
@@ -812,8 +827,13 @@ namespace libdar
         }
     }
 
-    file::file(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved,
-	       compression default_algo, generic_file *data_loc) : inode(dialog, f, reading_ver, saved), chemin("vide")
+    file::file(user_interaction & dialog,
+	       generic_file & f,
+	       const dar_version & reading_ver,
+	       saved_status saved,
+	       compression default_algo,
+	       generic_file *data_loc,
+	       generic_file *ea_loc) : inode(dialog, f, reading_ver, saved, ea_loc), chemin("vide")
     {
         status = from_cat;
         size = NULL;
@@ -1077,9 +1097,13 @@ namespace libdar
     }
 
     file_etiquette::file_etiquette(user_interaction & dialog,
-				   generic_file &f, const dar_version & reading_ver, saved_status saved,
-				   compression default_algo, generic_file *data_loc)
-	: file(dialog, f, reading_ver, saved, default_algo, data_loc)
+				   generic_file &f,
+				   const dar_version & reading_ver,
+				   saved_status saved,
+				   compression default_algo,
+				   generic_file *data_loc,
+				   generic_file *ea_loc)
+	: file(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc)
     {
         etiquette = new infinint(dialog, NULL, &f);
         if(etiquette == NULL)
@@ -1139,7 +1163,10 @@ namespace libdar
     }
 
     lien::lien(user_interaction & dialog,
-	       generic_file & f, const dar_version & reading_ver, saved_status saved) : inode(dialog, f, reading_ver, saved)
+	       generic_file & f,
+	       const dar_version & reading_ver,
+	       saved_status saved,
+	       generic_file *ea_loc) : inode(dialog, f, reading_ver, saved, ea_loc)
     {
         if(saved == s_saved)
             tools_read_string(f, points_to);
@@ -1200,7 +1227,8 @@ namespace libdar
 			 entree_stats & stats,
 			 std::map <infinint, file_etiquette *> & corres,
 			 compression default_algo,
-			 generic_file *data_loc) : inode(dialog, f, reading_ver, saved)
+			 generic_file *data_loc,
+			 generic_file *ea_loc) : inode(dialog, f, reading_ver, saved, ea_loc)
     {
         entree *p;
         nomme *t;
@@ -1215,7 +1243,7 @@ namespace libdar
         {
             while(fin == NULL)
             {
-                p = entree::read(dialog, f, reading_ver, stats, corres, default_algo, data_loc);
+                p = entree::read(dialog, f, reading_ver, stats, corres, default_algo, data_loc, ea_loc);
                 if(p != NULL)
                 {
                     d = dynamic_cast<directory *>(p);
@@ -1558,7 +1586,10 @@ namespace libdar
     }
 
     device::device(user_interaction & dialog,
-		   generic_file & f,  const dar_version & reading_ver, saved_status saved) : inode(dialog, f, reading_ver, saved)
+		   generic_file & f,
+		   const dar_version & reading_ver,
+		   saved_status saved,
+		   generic_file *ea_loc) : inode(dialog, f, reading_ver, saved, ea_loc)
     {
         U_16 tmp;
 
@@ -1638,7 +1669,9 @@ namespace libdar
 
     catalogue::catalogue(user_interaction & dialog,
 			 generic_file & f, const dar_version & reading_ver,
-			 compression default_algo, generic_file * data_loc) : out_compare("/")
+			 compression default_algo,
+			 generic_file *data_loc,
+			 generic_file *ea_loc) : out_compare("/")
     {
         string tmp;
         unsigned char a;
@@ -1658,7 +1691,7 @@ namespace libdar
 		throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 
 	    stats.clear();
-	    contenu = new directory(dialog, over_f, reading_ver, st, stats, corres, default_algo, data_loc);
+	    contenu = new directory(dialog, over_f, reading_ver, st, stats, corres, default_algo, data_loc, ea_loc);
 	    if(contenu == NULL)
 		throw Ememory("catalogue::catalogue(path)");
 	    current_compare = contenu;
@@ -2085,7 +2118,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.35 2005/01/28 23:27:55 edrusb Rel $";
+        static char id[]="$Id: catalogue.cpp,v 1.35.2.1 2005/02/05 09:34:12 edrusb Rel $";
         dummy_call(id);
     }
 

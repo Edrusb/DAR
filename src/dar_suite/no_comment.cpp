@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: no_comment.cpp,v 1.9 2004/03/07 01:44:43 edrusb Rel $
+// $Id: no_comment.cpp,v 1.9.2.1 2005/02/06 20:49:13 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,7 +30,7 @@ using namespace libdar;
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: no_comment.cpp,v 1.9 2004/03/07 01:44:43 edrusb Rel $";
+    static char id[]="$Id: no_comment.cpp,v 1.9.2.1 2005/02/06 20:49:13 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -71,7 +71,7 @@ void no_comment::fill_morceau()
                 status = st_command;
                 tmp.debut = ref->get_position() - 1;
                 tmp.offset = last_offset;
-                tmp.longueur++;
+		tmp.longueur = 1;
             }
             break;
         case st_comment:

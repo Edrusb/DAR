@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_cache.cpp,v 1.5 2004/10/01 20:55:00 edrusb Rel $
+// $Id: test_cache.cpp,v 1.5.2.1 2005/02/02 10:51:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,42 +26,42 @@
 
 extern "C"
 {
-#if HAVE_STRING_H   
+#if HAVE_STRING_H
 #include <string.h>
-#endif   
-   
-#if HAVE_UNISTD_H   
+#endif
+
+#if HAVE_UNISTD_H
 #include <unistd.h>
-#endif   
-   
+#endif
+
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
 
 #if HAVE_SYS_STAT_H
 #include <sys/stat.h>
-#endif   
+#endif
 
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-   
-#if HAVE_STDIO_H   
+
+#if HAVE_STDIO_H
 #include <stdio.h>
 #endif
-  
+
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
-   
+
 }
 
+#include "libdar.hpp"
 #include "cache.hpp"
 #include "shell_interaction.hpp"
 #include "erreurs.hpp"
 #include "generic_file.hpp"
 #include "shell_interaction.hpp"
-
 
 using namespace libdar;
 using namespace std;
@@ -73,6 +73,9 @@ static user_interaction *ui = NULL;
 
 int main()
 {
+    U_I maj, med, min;
+
+    get_version(maj, med, min);
     ui = shell_interaction_init(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;

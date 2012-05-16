@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_blowfish.cpp,v 1.2 2004/10/30 22:26:52 edrusb Rel $
+// $Id: test_blowfish.cpp,v 1.2.2.1 2005/02/02 10:51:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -42,6 +42,7 @@ extern "C"
 
 #include <iostream>
 
+#include "libdar.hpp"
 #include "erreurs.hpp"
 #include "crypto.hpp"
 #include "shell_interaction.hpp"
@@ -55,7 +56,11 @@ void f2(user_interaction *dialog);
 
 int main()
 {
-    user_interaction *dialog = shell_interaction_init(&cout, &cerr, false);
+    user_interaction *dialog = NULL;
+    U_I maj, med, min;
+
+    get_version(maj, med, min);
+    dialog = shell_interaction_init(&cout, &cerr, false);
     try
     {
 	f1(dialog);

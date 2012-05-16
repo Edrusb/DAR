@@ -558,3 +558,99 @@ KNOWN BUGS:
 
     affects version up to 2.1.4
     fixed in version 2.1.5
+
+#30 description
+      compilation failed with syntax error reported in libstdc++ header
+      files (reported on Solaris and openBSD).
+
+    problem
+      the configure scripts does detect the presence of mbstate_t type, and
+      redefines it. This conflicts the system header files and lead to a syntax
+      error.
+
+    workaround 1
+      will update the configure script to check if that fixes the problem. Else
+      there is a workaround. Once configure has finished, edit the config.h
+      file adding the line
+            #define HAVE_MBSTATE_T 1
+      and commenting out the line
+            #define mbstate_t int
+      Thanks to Steve Evans for this workaround.
+
+    solution
+      undefine the mbstate_t in dar's source code. This is implemented and
+      seems to work. No action is required for your part.
+
+    may affects version up to 2.2.0
+    fixed in version 2.2.1
+
+
+#31 description
+      dar segfault when restoring Extended Attributes
+
+    problem
+      to speed up the reading of the catalogue from an archive an intermediate
+      layer has been added thanks to an "cache" object. This object is temporary
+      instead of the object it does caching on. When the catalogue reading has
+      finished, the reference given to inode becomes invalid because it is
+      the caching object in place of the real underlying archive object.
+
+   solution
+      keep doing archive reading through the caching object but give the real
+      archive object to the inode contained in the catalogue for they have a
+      valid reference when it is time to restore EA.
+
+    affects version 2.2.0
+    fixed in version 2.2.1
+
+#32 description
+      dar is unable to read blowfish encrypted archives under certain conditions
+
+    problem
+      this bug appears when using infinint (no --enable-mode in command-line).
+      The implicit cast from a unsigned integer to an infinint in a operation
+      was not properly made by the compiler. Instead of converting the system
+      integer to an infinint which is possible thanks to the infinint constructor
+      class, the compiler down cast the the unsigned integer to unsigned char.
+
+    solution
+      use explicit cast conversion when doing operations which concern both
+      infinint and unsigned integers.
+
+    affects version 2.2.0
+    fixed in version 2.2.1
+
+#33 decription
+     dar hangs when the last line of a DCF file is starting with a few spaces or
+     tabs just following a comment.
+
+    problem
+      The layer that removes comments was counting the bytes from the beginning
+      while the first byte retained as significative was the first non space of
+      the line. leading to provide to upper layer a wrong information about the
+      number of byte in the file.
+
+    solution
+      start counting bytes from the first significative byte of the line instead
+      of the first byte of the line.
+
+    affects versions 2.1.x up to 2.2.0
+    fixed in version 2.2.1
+
+#34 description
+     when restoring files in a directory, this one has all permission set for
+     every body. This makes a security hole on multi-user system.
+
+    problem
+     when restoring in a directory as non privileged user it is necessary to
+     have write access to that directory, thus temporary change the permission.
+     The permission is thus changed, but the temporary change is too permissive,
+     thus opens a security hole, allowing local user delete/create/replace under
+     the directory restored.
+
+    solution
+     only add the user write access (if necessary) to the directory when dar
+     is run as non privileged user.
+
+    affects versions 1.x.x up to 2.2.0
+    fixed in version 2.2.1

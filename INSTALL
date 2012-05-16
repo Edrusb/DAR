@@ -51,13 +51,19 @@ You need to have installed:
   dar binaries using upx. (http://upx.sourceforge.net/)
 
 
+Important: due to a bug in the autoconf/libtool softwares used to
+build the configure script you must not have spaces in the name of the path
+used to build dar. You can install dar binary anywhere you want, the problem
+does not concern dar itslef, it concerns the ./configure script used to build
+dar: To work properly it must not be ran from a path which has a space in it.
+This problem is under investigation (bug 1117188 on sourceforge).
 
 
 1. configure the package using the configuration script:
 
         ./configure
 
-OR for a faster executable (see LIMITATIONS for drawbacks):
+OR for a faster executable (see doc/LIMITATIONS for drawbacks):
 
 	./configure --enable-mode=64
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.30 2004/11/14 00:07:27 edrusb Rel $
+// $Id: tools.hpp,v 1.30.2.1 2005/02/02 16:15:32 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -408,6 +408,17 @@ namespace libdar
 	/// \param[in,out] f file to append elastic buffer to
 	/// \param[in] max_size size of the elastic buffer to add
     extern void tools_add_elastic_buffer(generic_file & f, U_32 max_size);
+
+
+	/// tells whether two files are on the same mounted filesystem
+
+	/// \param[in] file1 first file
+	/// \param[in] file2 second file
+	/// \return true if the two file are located under the same mounting point
+	/// \note if one of the file is not present or if the filesystem information
+	///   is not possible to be read an exception is throw (Erange)
+    extern bool tools_are_on_same_filesystem(const std::string & file1, const std::string & file2);
+
 
 	/// @}
 

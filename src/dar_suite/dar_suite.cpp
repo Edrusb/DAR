@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.23 2004/12/07 18:04:48 edrusb Rel $
+// $Id: dar_suite.cpp,v 1.23.2.1 2005/02/20 16:05:45 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -55,10 +55,20 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
     int ret = EXIT_OK;
 
 	// gettext settings
-    if(setlocale(LC_CTYPE, "") == NULL)
-	cerr << "Cannot set locale category, native language support will not work" << endl;
-    if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == NULL)
-	cerr << "Cannot open the translated messages directory, native language support will not work" << endl;
+    try
+    {
+	if(DAR_LOCALEDIR != "")
+	    if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == NULL)
+		throw Erange("", "Cannot open the translated messages directory, native language support will not work");
+	if(setlocale(LC_MESSAGES, "") == NULL || setlocale(LC_CTYPE, "") == NULL)
+	    throw Erange("", "Cannot set locale category, native language support will not work");
+	if(textdomain(PACKAGE) == NULL)
+	    throw Erange("", "Cannot find dar's catalogue, native language support will not work");
+    }
+    catch(Erange & e)
+    {
+	cerr << e.get_message() << endl;
+    }
 
     try
     {
@@ -180,7 +190,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.23 2004/12/07 18:04:48 edrusb Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.23.2.1 2005/02/20 16:05:45 edrusb Rel $";
     dummy_call(id);
 }
 

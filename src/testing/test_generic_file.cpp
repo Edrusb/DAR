@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_generic_file.cpp,v 1.10 2004/10/01 22:05:36 edrusb Rel $
+// $Id: test_generic_file.cpp,v 1.10.2.1 2005/02/02 10:51:35 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -42,6 +42,7 @@ extern "C"
 
 #include <iostream>
 
+#include "libdar.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "null_file.hpp"
@@ -56,6 +57,9 @@ static user_interaction *ui = NULL;
 
 int main(S_I argc, char *argv[])
 {
+    U_I maj, med, min;
+
+    get_version(maj, med, min);
     ui = shell_interaction_init(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;

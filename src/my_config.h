@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: my_config.h,v 1.7 2004/08/03 21:27:59 edrusb Rel $
+// $Id: my_config.h,v 1.7.2.1 2005/02/20 16:05:45 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -28,6 +28,10 @@
 
 #if HAVE_CONFIG_H
 #include "../config.h"
+
+    // workaround for autoconf 2.59
+#undef mbstate_t
+
 #endif
 
 #include "gettext.h"

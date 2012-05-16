@@ -46,7 +46,7 @@ install-data-local:
 uninstall-local:
 	rm -rf $(DESTDIR)$(pkgincludedir)
 
-noinst_HEADERS = defile.hpp ea_filesystem.hpp etage.hpp filesystem.hpp filtre.hpp header.hpp macro_tools.hpp null_file.hpp sar.hpp sar_tools.hpp terminateur.hpp tronc.hpp zapette.hpp test_memory.hpp cygwin_adapt.hpp  elastic.hpp
+noinst_HEADERS = defile.hpp ea_filesystem.hpp etage.hpp filesystem.hpp filtre.hpp header.hpp macro_tools.hpp null_file.hpp sar.hpp sar_tools.hpp terminateur.hpp tronc.hpp zapette.hpp test_memory.hpp cygwin_adapt.hpp elastic.hpp nls_swap.hpp
 
 libdar_la_LDFLAGS = -version-info `./get_version$(EXEEXT)`
 libdar_la_SOURCES = catalogue.cpp catalogue.hpp compressor.cpp compressor.hpp deci.cpp deci.hpp defile.cpp defile.hpp ea.cpp ea.hpp ea_filesystem.cpp ea_filesystem.hpp erreurs.cpp erreurs.hpp etage.cpp etage.hpp filesystem.cpp filesystem.hpp filtre.cpp filtre.hpp generic_file.cpp generic_file.hpp header.cpp header_version.cpp real_infinint.cpp libdar.cpp macro_tools.cpp mask.cpp path.cpp sar.cpp sar_tools.cpp scrambler.cpp storage.cpp terminateur.cpp test_memory.cpp tools.cpp tronc.cpp tuyau.cpp user_interaction.cpp wrapperlib.cpp zapette.cpp special_alloc.cpp archive.cpp crypto.cpp cache.cpp cache.hpp int_tools.cpp tronconneuse.cpp elastic.cpp thread_cancellation.cpp

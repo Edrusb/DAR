@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.cpp,v 1.24 2004/12/07 18:04:52 edrusb Rel $
+// $Id: user_interaction.cpp,v 1.24.2.1 2005/02/20 16:05:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -67,6 +67,7 @@ char *strchr (), *strrchr ();
 #include "tools.hpp"
 #include "integers.hpp"
 #include "deci.hpp"
+#include "nls_swap.hpp"
 
 using namespace std;
 
@@ -77,13 +78,23 @@ namespace libdar
 							 string (*x_string_callback)(const string &x, bool echo, void *context),
 							 void *context_value)
     {
-	if(x_warning_callback == NULL || x_answer_callback == NULL)
-	    throw Elibcall("user_interaction_callback::user_interaction_callback", gettext("NULL given as argument of user_interaction_callback"));
-	warning_callback = x_warning_callback;
-	answer_callback  = x_answer_callback;
-	string_callback  = x_string_callback;
-	tar_listing_callback = NULL;
-	context_val = context_value;
+	NLS_SWAP_IN;
+	try
+	{
+	    if(x_warning_callback == NULL || x_answer_callback == NULL)
+		throw Elibcall("user_interaction_callback::user_interaction_callback", gettext("NULL given as argument of user_interaction_callback"));
+	    warning_callback = x_warning_callback;
+	    answer_callback  = x_answer_callback;
+	    string_callback  = x_string_callback;
+	    tar_listing_callback = NULL;
+	    context_val = context_value;
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
     }
 
     void user_interaction_callback::pause(const string & message)
@@ -203,7 +214,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: user_interaction.cpp,v 1.24 2004/12/07 18:04:52 edrusb Rel $";
+        static char id[]="$Id: user_interaction.cpp,v 1.24.2.1 2005/02/20 16:05:47 edrusb Rel $";
         dummy_call(id);
     }
 

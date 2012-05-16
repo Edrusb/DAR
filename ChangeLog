@@ -297,3 +297,22 @@ from 2.1.x to 2.2.0
 - added warning telling [list of path] is deprecated (better use -g option)
 - added Todd Vierling's patch for dar to compile under Interix
 
+from 2.2.0 to 2.2.1
+- fixed execution problem for testing programs
+- added control code to avoid the "endless loop" warning when -M is used
+  and root and archive are not located on the same filesystem
+- replaced an internal bug report by a more appropriate exception (elastic.cpp
+  line 191)
+- fixed bug #31
+- fixed bug #32
+- fixed bug #33
+- changed exception type when dar_manager's -D option does not receive an
+  integer
+  as argument
+- fixed bug #34
+- added Wesley Leggette's patch to API tutorial
+- fixed inconsistencies concerning Native Language Support in Dar
+- added gettext NLS domain switch when incoming and exiting from libdar
+- fixed bug #30
+- changed the way ctermid() system call is used
+- updated FAQ

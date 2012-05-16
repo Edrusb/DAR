@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_elastic.cpp,v 1.2 2004/10/30 22:26:52 edrusb Rel $
+// $Id: test_elastic.cpp,v 1.2.2.1 2005/02/02 10:51:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -45,6 +45,7 @@ extern "C"
 
 #include <iostream>
 
+#include "libdar.hpp"
 #include "elastic.hpp"
 #include "erreurs.hpp"
 #include "shell_interaction.hpp"
@@ -61,6 +62,9 @@ void f3();
  {
      try
      {
+	 U_I maj, med, min;
+
+	 get_version(maj, med, min);
 	 f1();
 	 f2();
 	 f3();

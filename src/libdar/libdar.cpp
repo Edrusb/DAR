@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.55 2005/01/29 15:08:03 edrusb Rel $
+// $Id: libdar.cpp,v 1.55.2.1 2005/02/20 16:05:46 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -44,6 +44,7 @@ extern "C"
 #include "generic_file.hpp"
 #include "user_interaction.hpp"
 #include "archive.hpp"
+#include "nls_swap.hpp"
 
 #include <list>
 
@@ -136,6 +137,7 @@ namespace libdar
 
     void get_version(U_I & major, U_I & minor)
     {
+	NLS_SWAP_IN;
         if(&major == NULL)
             throw Erange("get_version", gettext("Argument given to \"major\" is a NULL pointer"));
         if(&minor == NULL)
@@ -143,18 +145,22 @@ namespace libdar
         major = LIBDAR_COMPILE_TIME_MAJOR;
         minor = LIBDAR_COMPILE_TIME_MINOR;
 	libdar_init_thread_safe();
+	NLS_SWAP_OUT;
     }
 
     void get_version_noexcept(U_I & major, U_I & minor, U_16 & exception, string & except_msg)
     {
+	NLS_SWAP_IN;
 	WRAPPER_IN
 	    get_version(major, minor);
 	WRAPPER_OUT(exception, except_msg)
+        NLS_SWAP_OUT;
     }
 
 
     void get_version(U_I & major, U_I & medium, U_I & minor)
     {
+	NLS_SWAP_IN;
         if(&major == NULL)
             throw Erange("get_version", gettext("Argument given to \"major\" is a NULL pointer"));
 	if(&medium == NULL)
@@ -166,13 +172,16 @@ namespace libdar
 	medium = LIBDAR_COMPILE_TIME_MEDIUM;
         minor = LIBDAR_COMPILE_TIME_MINOR;
 	libdar_init_thread_safe();
+	NLS_SWAP_OUT;
     }
 
     void get_version_noexcept(U_I & major, U_I & medium, U_I & minor, U_16 & exception, std::string & except_msg)
     {
+	NLS_SWAP_IN;
 	WRAPPER_IN
 	    get_version(major, medium, minor);
 	WRAPPER_OUT(exception, except_msg)
+        NLS_SWAP_OUT;
     }
 
     archive* open_archive_noexcept(user_interaction & dialog,
@@ -185,13 +194,15 @@ namespace libdar
 				   std::string & except_msg)
     {
 	archive *ret = NULL;
+        NLS_SWAP_IN;
 	WRAPPER_IN
 	    ret = new archive(dialog, chem,  basename,  extension,
 			      crypto, pass, crypto_size,
 			      input_pipe, output_pipe,
 			      execute, info_details);
 	WRAPPER_OUT(exception, except_msg)
-	    return ret;
+        NLS_SWAP_OUT;
+	return ret;
     }
 
     archive *create_archive_noexcept(user_interaction & dialog,
@@ -230,6 +241,7 @@ namespace libdar
 				     std::string & except_msg)
     {
 	archive *arch_ret = NULL;
+	NLS_SWAP_IN;
 	WRAPPER_IN
 	    arch_ret = new archive(dialog,
 				   fs_root,
@@ -264,7 +276,8 @@ namespace libdar
 				   same_fs,
 				   ret);
 	WRAPPER_OUT(exception, except_msg)
-	    return arch_ret;
+        NLS_SWAP_OUT;
+	return arch_ret;
     }
 
     archive *isolate_archive_noexcept(user_interaction & dialog,
@@ -289,6 +302,7 @@ namespace libdar
 				      std::string & except_msg)
     {
 	archive *ret = NULL;
+	NLS_SWAP_IN;
 	WRAPPER_IN
 	    ret = new archive(dialog,
 			      sauv_path,
@@ -309,7 +323,8 @@ namespace libdar
 			      crypto_size,
 			      empty);
 	WRAPPER_OUT(exception, except_msg)
-	    return ret;
+	NLS_SWAP_OUT;
+	return ret;
     }
 
 
@@ -317,6 +332,7 @@ namespace libdar
 				U_16 & exception,
 				std::string & except_msg)
     {
+	NLS_SWAP_IN;
 	WRAPPER_IN
 	    if(ptr == NULL)
 		throw Erange("close_archive_noexcept", gettext("Invalid NULL pointer given to close_archive"));
@@ -326,21 +342,24 @@ namespace libdar
 		ptr = NULL;
 	    }
 	WRAPPER_OUT(exception, except_msg)
+        NLS_SWAP_OUT;
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.55 2005/01/29 15:08:03 edrusb Rel $";
+        static char id[]="$Id: libdar.cpp,v 1.55.2.1 2005/02/20 16:05:46 edrusb Rel $";
         dummy_call(id);
     }
 
     char *libdar_str2charptr_noexcept(const std::string & x, U_16 & exception, std::string & except_msg)
     {
         char *ret = NULL;
+        NLS_SWAP_IN;
         WRAPPER_IN
 	    ret = tools_str2charptr(x);
 	WRAPPER_OUT(exception, except_msg)
-	    return ret;
+	NLS_SWAP_OUT;
+	return ret;
     }
 
 
@@ -434,6 +453,7 @@ namespace libdar
 				   std::string & except_msg)
     {
 	statistics ret;
+	NLS_SWAP_IN;
 	WRAPPER_IN
 	    if(ptr == NULL)
 		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
@@ -454,7 +474,8 @@ namespace libdar
 			      hourshift,
 			      empty);
 	WRAPPER_OUT(exception, except_msg)
-	    return ret;
+	NLS_SWAP_OUT;
+	return ret;
     }
 
 
@@ -467,6 +488,7 @@ namespace libdar
 			     U_16 & exception,
 			     std::string & except_msg)
     {
+	NLS_SWAP_IN;
 	WRAPPER_IN
 	    if(ptr == NULL)
 		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
@@ -476,6 +498,7 @@ namespace libdar
 			selection,
 			filter_unsaved);
 	WRAPPER_OUT(exception, except_msg)
+        NLS_SWAP_OUT;
     }
 
     statistics op_diff_noexcept(user_interaction & dialog,
@@ -492,6 +515,7 @@ namespace libdar
 				std::string & except_msg)
     {
 	statistics ret;
+	NLS_SWAP_IN;
 	WRAPPER_IN
 	    if(ptr == NULL)
 		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
@@ -505,7 +529,8 @@ namespace libdar
 			   ignore_owner,
 			   alter_atime);
 	WRAPPER_OUT(exception, except_msg)
-	    return ret;
+        NLS_SWAP_OUT;
+	return ret;
     }
 
 
@@ -518,6 +543,7 @@ namespace libdar
 				std::string & except_msg)
     {
 	statistics ret;
+	NLS_SWAP_IN;
 	WRAPPER_IN
 	    if(ptr == NULL)
 		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
@@ -526,7 +552,8 @@ namespace libdar
 			   subtree,
 			   info_details);
 	WRAPPER_OUT(exception, except_msg)
-	    return ret;
+	NLS_SWAP_OUT;
+	return ret;
     }
 
 
@@ -537,13 +564,15 @@ namespace libdar
 				  std::string & except_msg)
     {
 	bool ret;
+	NLS_SWAP_IN;
 	WRAPPER_IN
 	    if(ptr == NULL)
 		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
 	ret = ptr->get_children_of(dialog,
 				   dir);
 	WRAPPER_OUT(exception, except_msg)
-	    return ret;
+	NLS_SWAP_OUT;
+	return ret;
     }
 
 } // end of namespace

@@ -1,3 +1,13 @@
+version 2.2.1
+--------------
+Thanks to Steve Evans for feedback and solution about bug #30. A big thank to
+P-O Yliniemi (alias Peo) for feedback and for providing me the necessary
+mean to investigate the problem of the "stack overflow" (compiler problem).
+Thanks to Karl W. Weigel for reporting bug #31 and for his useful feedback.
+A Big Thanks to Thomas Bettler for feedback about bug #32 which was difficult
+to reproduce and fix. Thanks to Matthias Keller for reporting bug #33 and to
+Joe Harvell for reporting bug #34.
+
 version 2.2.0
 --------------
 Thanks to "Gandalf" for his feedback and the "cache" implementation to

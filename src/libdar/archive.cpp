@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.cpp,v 1.21 2004/12/29 13:30:39 edrusb Rel $
+// $Id: archive.cpp,v 1.21.2.2 2005/02/20 16:05:45 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -44,6 +44,7 @@
 #include "elastic.hpp"
 #include "terminateur.hpp"
 #include "compressor.hpp"
+#include "nls_swap.hpp"
 
 
 #define GLOBAL_ELASTIC_BUFFER_SIZE 10240
@@ -65,6 +66,7 @@ namespace libdar
 	cat = NULL;
 	local_path = NULL;
 
+	NLS_SWAP_IN;
 	try
 	{
 	    macro_tools_open_archive(dialog, chem, basename, extension, SAR_OPT_DEFAULT, crypto, pass, crypto_size, level1, scram, level2, ver,
@@ -88,9 +90,10 @@ namespace libdar
 	catch(...)
 	{
 	    free();
+	    NLS_SWAP_OUT;
 	    throw;
 	}
-
+	NLS_SWAP_OUT;
     }
 
     archive::archive(user_interaction & dialog,
@@ -126,13 +129,23 @@ namespace libdar
 		     bool same_fs,
 		     statistics & ret)
     {
-        ret = op_create_in(dialog, true, fs_root, sauv_path, ref_arch, selection,
-			   subtree, filename, extension,
-			   allow_over, warn_over,
-			   info_details, pause, empty_dir, algo, compression_level, file_size, first_file_size, root_ea, user_ea,
-			   execute, crypto, pass, crypto_size, compr_mask, min_compr_size,
-			   nodump, hourshift, empty, alter_atime, same_fs, ignore_owner);
-	exploitable = false;
+	NLS_SWAP_IN;
+	try
+	{
+	    ret = op_create_in(dialog, true, fs_root, sauv_path, ref_arch, selection,
+			       subtree, filename, extension,
+			       allow_over, warn_over,
+			       info_details, pause, empty_dir, algo, compression_level, file_size, first_file_size, root_ea, user_ea,
+			       execute, crypto, pass, crypto_size, compr_mask, min_compr_size,
+			       nodump, hourshift, empty, alter_atime, same_fs, ignore_owner);
+	    exploitable = false;
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
     }
 
     archive::archive(user_interaction & dialog,
@@ -154,14 +167,24 @@ namespace libdar
 		     U_32 crypto_size,
 		     bool empty)
     {
-        (void)op_create_in(dialog, false, path("."), sauv_path,
-			   ref_arch, bool_mask(false), bool_mask(false),
-                           filename, extension, allow_over, warn_over, info_details,
-                           pause, false, algo, compression_level, file_size, first_file_size, false,
-                           false, execute, crypto, pass, crypto_size,
-                           bool_mask(false), 0, false, 0, empty, false, false, false);
-            // we ignore returned value;
-	exploitable = false;
+	NLS_SWAP_IN;
+	try
+	{
+	    (void)op_create_in(dialog, false, path("."), sauv_path,
+			       ref_arch, bool_mask(false), bool_mask(false),
+			       filename, extension, allow_over, warn_over, info_details,
+			       pause, false, algo, compression_level, file_size, first_file_size, false,
+			       false, execute, crypto, pass, crypto_size,
+			       bool_mask(false), 0, false, 0, empty, false, false, false);
+		// we ignore returned value;
+	    exploitable = false;
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
     }
 
 
@@ -193,7 +216,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: archive.cpp,v 1.21 2004/12/29 13:30:39 edrusb Rel $";
+        static char id[]="$Id: archive.cpp,v 1.21.2.2 2005/02/20 16:05:45 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -210,47 +233,57 @@ namespace libdar
 				   bool empty)
     {
         statistics st;
+	NLS_SWAP_IN;
+	try
+	{
 
             // sanity checks
 
-	if(!exploitable)
-	    throw Elibcall("op_test", gettext("This archive is not exploitable, check documentation for more"));
-        if(&fs_root == NULL)
-            throw Elibcall("op_extract", gettext("NULL argument given to \"fs_root\""));
-        if(&selection == NULL)
-            throw Elibcall("op_extract", gettext("NULL argument given to \"selection\""));
-        if(&subtree == NULL)
-            throw Elibcall("op_extract", gettext("NULL argument given to \"subtree\""));
-	if(&hourshift == NULL)
-	    throw Elibcall("op_extract", gettext("NULL argument given to \"hourshift\""));
+	    if(!exploitable)
+		throw Elibcall("op_test", gettext("This archive is not exploitable, check documentation for more"));
+	    if(&fs_root == NULL)
+		throw Elibcall("op_extract", gettext("NULL argument given to \"fs_root\""));
+	    if(&selection == NULL)
+		throw Elibcall("op_extract", gettext("NULL argument given to \"selection\""));
+	    if(&subtree == NULL)
+		throw Elibcall("op_extract", gettext("NULL argument given to \"subtree\""));
+	    if(&hourshift == NULL)
+		throw Elibcall("op_extract", gettext("NULL argument given to \"hourshift\""));
 
-            // end of sanity checks
+		// end of sanity checks
 
-	enable_natural_destruction();
-        try
-        {
-	    MEM_IN;
+	    enable_natural_destruction();
+	    try
+	    {
+		MEM_IN;
 
-	    filtre_restore(dialog, selection, subtree, get_cat(), detruire,
-			   fs_root, allow_over, warn_over, info_details,
-			   st, only_more_recent, restore_ea_root,
-			   restore_ea_user, flat, ignore_owner, warn_remove_no_match,
- 			   hourshift, empty);
-	    MEM_OUT;
-        }
-	catch(Euser_abort & e)
+		filtre_restore(dialog, selection, subtree, get_cat(), detruire,
+			       fs_root, allow_over, warn_over, info_details,
+			       st, only_more_recent, restore_ea_root,
+			       restore_ea_user, flat, ignore_owner, warn_remove_no_match,
+			       hourshift, empty);
+		MEM_OUT;
+	    }
+	    catch(Euser_abort & e)
+	    {
+		disable_natural_destruction();
+		throw;
+	    }
+	    catch(Erange &e)
+	    {
+		string msg = string(gettext("Error while restoring data: ")) + e.get_message();
+		dialog.warning(msg);
+		throw Edata(msg);
+	    }
+	}
+	catch(...)
 	{
-	    disable_natural_destruction();
+	    NLS_SWAP_OUT;
 	    throw;
 	}
-        catch(Erange &e)
-        {
-            string msg = string(gettext("Error while restoring data: ")) + e.get_message();
-            dialog.warning(msg);
-            throw Edata(msg);
-        }
+	NLS_SWAP_OUT;
 
-        return st;
+	return st;
     }
 
 
@@ -258,91 +291,101 @@ namespace libdar
 			     bool info_details, bool tar_format,
 			     const mask & selection, bool filter_unsaved)
     {
-            // sanity checks
-
-	if(!exploitable)
-	    throw Elibcall("op_test", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
-        if(&selection == NULL)
-            throw Elibcall("op_listing", gettext("NULL argument given to \"selection\""));
-
-	    // end of sanity checks
-
-	enable_natural_destruction();
-        try
-        {
-            MEM_IN;
-
-	    if(info_details)
-	    {
-		infinint sub_file_size;
-		infinint first_file_size;
-		infinint last_file_size, file_number;
-		string algo = compression2string(char2compression(get_header().algo_zip));
-		infinint cat_size = get_cat_size();
-
-		dialog.printf(gettext("Archive version format               : %s\n"), get_header().edition);
-		dialog.printf(gettext("Compression algorithm used           : %S\n"), &algo);
-		dialog.printf(gettext("Scrambling or strong encryption used : %s\n"), ((get_header().flag & VERSION_FLAG_SCRAMBLED) != 0 ? gettext("yes") : gettext("no")));
-		dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
-		    // the following field is no more used (lack of pertinence, when included files are used).
-		    // dialog.printf(gettext("Command line options used for backup : %S\n"), &(get_header().cmd_line));
-
-		try
-		{
-		    if(get_sar_param(sub_file_size, first_file_size, last_file_size, file_number))
-		    {
-			dialog.printf(gettext("Archive is composed of %i file(s)\n"), &file_number);
-			if(file_number == 1)
-			    dialog.printf(gettext("File size: %i bytes\n"), &last_file_size);
-			else
-			{
-			    if(first_file_size != sub_file_size)
-				dialog.printf(gettext("First file size       : %i bytes\n"), &first_file_size);
-			    dialog.printf(gettext("File size             : %i bytes\n"), &sub_file_size);
-			    dialog.printf(gettext("Last file size        : %i bytes\n"), &last_file_size);
-			}
-			if(file_number > 1)
-			{
-			    infinint total = first_file_size + (file_number-2)*sub_file_size + last_file_size;
-			    dialog.printf(gettext("Archive total size is : %i bytes\n"), &total);
-			}
-		    }
-		    else // not reading from a sar
-		    {
-			infinint arch_size = get_level2_size();
-			dialog.printf(gettext("Archive size is: %i bytes\n"), &arch_size);
-			dialog.printf(gettext("Previous archive size does not include headers present in each slice\n"));
-		    }
-		}
-		catch(Erange & e)
-		{
-		    string msg = e.get_message();
-		    dialog.printf("%S\n", &msg);
-		}
-
-		entree_stats stats = get_cat().get_stats();
-		stats.listing(dialog);
-		dialog.pause(gettext("Continue listing archive contents?"));
-	    }
-
-	    if(tar_format)
-		get_cat().tar_listing(selection, filter_unsaved);
-	    else
-		get_cat().listing(selection, filter_unsaved);
-
-	    MEM_OUT;
-        }
-	catch(Euser_abort & e)
+	NLS_SWAP_IN;
+	try
 	{
-	    disable_natural_destruction();
+		// sanity checks
+
+	    if(!exploitable)
+		throw Elibcall("op_test", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
+	    if(&selection == NULL)
+		throw Elibcall("op_listing", gettext("NULL argument given to \"selection\""));
+
+		// end of sanity checks
+
+	    enable_natural_destruction();
+	    try
+	    {
+		MEM_IN;
+
+		if(info_details)
+		{
+		    infinint sub_file_size;
+		    infinint first_file_size;
+		    infinint last_file_size, file_number;
+		    string algo = compression2string(char2compression(get_header().algo_zip));
+		    infinint cat_size = get_cat_size();
+
+		    dialog.printf(gettext("Archive version format               : %s\n"), get_header().edition);
+		    dialog.printf(gettext("Compression algorithm used           : %S\n"), &algo);
+		    dialog.printf(gettext("Scrambling or strong encryption used : %s\n"), ((get_header().flag & VERSION_FLAG_SCRAMBLED) != 0 ? gettext("yes") : gettext("no")));
+		    dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
+			// the following field is no more used (lack of pertinence, when included files are used).
+			// dialog.printf(gettext("Command line options used for backup : %S\n"), &(get_header().cmd_line));
+
+		    try
+		    {
+			if(get_sar_param(sub_file_size, first_file_size, last_file_size, file_number))
+			{
+			    dialog.printf(gettext("Archive is composed of %i file(s)\n"), &file_number);
+			    if(file_number == 1)
+				dialog.printf(gettext("File size: %i bytes\n"), &last_file_size);
+			    else
+			    {
+				if(first_file_size != sub_file_size)
+				    dialog.printf(gettext("First file size       : %i bytes\n"), &first_file_size);
+				dialog.printf(gettext("File size             : %i bytes\n"), &sub_file_size);
+				dialog.printf(gettext("Last file size        : %i bytes\n"), &last_file_size);
+			    }
+			    if(file_number > 1)
+			    {
+				infinint total = first_file_size + (file_number-2)*sub_file_size + last_file_size;
+				dialog.printf(gettext("Archive total size is : %i bytes\n"), &total);
+			    }
+			}
+			else // not reading from a sar
+			{
+			    infinint arch_size = get_level2_size();
+			    dialog.printf(gettext("Archive size is: %i bytes\n"), &arch_size);
+			    dialog.printf(gettext("Previous archive size does not include headers present in each slice\n"));
+			}
+		    }
+		    catch(Erange & e)
+		    {
+			string msg = e.get_message();
+			dialog.printf("%S\n", &msg);
+		    }
+
+		    entree_stats stats = get_cat().get_stats();
+		    stats.listing(dialog);
+		    dialog.pause(gettext("Continue listing archive contents?"));
+		}
+
+		if(tar_format)
+		    get_cat().tar_listing(selection, filter_unsaved);
+		else
+		    get_cat().listing(selection, filter_unsaved);
+
+		MEM_OUT;
+	    }
+	    catch(Euser_abort & e)
+	    {
+		disable_natural_destruction();
+		throw;
+	    }
+	    catch(Erange &e)
+	    {
+		string msg = string(gettext("Error while listing archive contents: ")) + e.get_message();
+		dialog.warning(msg);
+		throw Edata(msg);
+	    }
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
 	    throw;
 	}
-        catch(Erange &e)
-        {
-            string msg = string(gettext("Error while listing archive contents: ")) + e.get_message();
-            dialog.warning(msg);
-            throw Edata(msg);
-        }
+	NLS_SWAP_OUT;
     }
 
     statistics archive::op_diff(user_interaction & dialog,
@@ -354,36 +397,46 @@ namespace libdar
 				bool alter_atime)
     {
         statistics st;
-
-            // sanity checks
-
-	if(!exploitable)
-	    throw Elibcall("op_test", gettext("This archive is not exploitable, check documentation for more"));
-        if(&fs_root == NULL)
-            throw Elibcall("op_diff", gettext("NULL argument given to \"fs_root\""));
-        if(&selection == NULL)
-            throw Elibcall("op_diff", gettext("NULL argument given to \"selection\""));
-        if(&subtree == NULL)
-            throw Elibcall("op_diff", gettext("NULL argument given to \"subtree\""));
-
-            // end of sanity checks
-	enable_natural_destruction();
-        try
-        {
-	    filtre_difference(dialog, selection, subtree, get_cat(), fs_root, info_details, st, check_ea_root, check_ea_user, alter_atime, ignore_owner);
-        }
-	catch(Euser_abort & e)
+	NLS_SWAP_IN;
+	try
 	{
-	    disable_natural_destruction();
+
+		// sanity checks
+
+	    if(!exploitable)
+		throw Elibcall("op_test", gettext("This archive is not exploitable, check documentation for more"));
+	    if(&fs_root == NULL)
+		throw Elibcall("op_diff", gettext("NULL argument given to \"fs_root\""));
+	    if(&selection == NULL)
+		throw Elibcall("op_diff", gettext("NULL argument given to \"selection\""));
+	    if(&subtree == NULL)
+		throw Elibcall("op_diff", gettext("NULL argument given to \"subtree\""));
+
+		// end of sanity checks
+	    enable_natural_destruction();
+	    try
+	    {
+		filtre_difference(dialog, selection, subtree, get_cat(), fs_root, info_details, st, check_ea_root, check_ea_user, alter_atime, ignore_owner);
+	    }
+	    catch(Euser_abort & e)
+	    {
+		disable_natural_destruction();
+		throw;
+	    }
+	    catch(Erange & e)
+	    {
+		string msg = string(gettext("Error while comparing archive with filesystem: "))+e.get_message();
+		dialog.warning(msg);
+		throw Edata(msg);
+	    }
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
 	    throw;
 	}
-        catch(Erange & e)
-        {
-            string msg = string(gettext("Error while comparing archive with filesystem: "))+e.get_message();
-            dialog.warning(msg);
-            throw Edata(msg);
-        }
 
+	NLS_SWAP_OUT;
         return st;
     }
 
@@ -393,33 +446,43 @@ namespace libdar
 				bool info_details)
     {
         statistics st;
-
-            // sanity checks
-
-	if(!exploitable)
-	    throw Elibcall("op_test", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
-        if(&selection == NULL)
-            throw Elibcall("op_test", gettext("NULL argument given to \"selection\""));
-        if(&subtree == NULL)
-            throw Elibcall("op_test", gettext("NULL argument given to \"subtree\""));
-
-            // end of sanity checks
-	enable_natural_destruction();
-        try
-        {
-	    filtre_test(dialog, selection, subtree, get_cat(), info_details, st);
-        }
-	catch(Euser_abort & e)
+	NLS_SWAP_IN;
+	try
 	{
-	    disable_natural_destruction();
+
+		// sanity checks
+
+	    if(!exploitable)
+		throw Elibcall("op_test", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
+	    if(&selection == NULL)
+		throw Elibcall("op_test", gettext("NULL argument given to \"selection\""));
+	    if(&subtree == NULL)
+		throw Elibcall("op_test", gettext("NULL argument given to \"subtree\""));
+
+		// end of sanity checks
+	    enable_natural_destruction();
+	    try
+	    {
+		filtre_test(dialog, selection, subtree, get_cat(), info_details, st);
+	    }
+	    catch(Euser_abort & e)
+	    {
+		disable_natural_destruction();
+		throw;
+	    }
+	    catch(Erange & e)
+	    {
+		string msg = string(gettext("Error while testing archive: "))+e.get_message();
+		dialog.warning(msg);
+		throw Edata(msg);
+	    }
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
 	    throw;
 	}
-        catch(Erange & e)
-        {
-            string msg = string(gettext("Error while testing archive: "))+e.get_message();
-            dialog.warning(msg);
-            throw Edata(msg);
-        }
+	NLS_SWAP_OUT;
 
         return st;
     }
@@ -427,7 +490,17 @@ namespace libdar
     bool archive::get_children_of(user_interaction & dialog,
 				  const string & dir)
     {
-	return get_cat().get_contenu()->callback_for_children_of(dialog, dir);
+	NLS_SWAP_IN;
+	try
+	{
+	    return get_cat().get_contenu()->callback_for_children_of(dialog, dir);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
     }
 
 
@@ -519,6 +592,12 @@ namespace libdar
 		bool cov = true;
 		string drop;
 
+		    // checking for exclusion due to different filesystem
+
+		if(same_fs && !tools_are_on_same_filesystem(tmp.display(), fs_root.display()))
+		       cov = false;
+
+		    // checking for directory auto inclusion
 		do
 		{
 		    cov = cov && subtree.is_covered(tmp.display());

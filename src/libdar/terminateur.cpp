@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.12 2004/10/30 22:26:51 edrusb Rel $
+// $Id: terminateur.cpp,v 1.12.2.1 2005/02/06 18:30:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -84,7 +84,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: terminateur.cpp,v 1.12 2004/10/30 22:26:51 edrusb Rel $";
+        static char id[]="$Id: terminateur.cpp,v 1.12.2.1 2005/02/06 18:30:58 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -117,7 +117,7 @@ namespace libdar
                 // considering the first non 0xFF byte of the terminator string (backward reading)
             while(a != 0)
             {
-                if(a & 0x80 == 0)
+                if((a & 0x80) == 0)
                     throw Erange("","");
                 offset++;
                 a <<= 1;

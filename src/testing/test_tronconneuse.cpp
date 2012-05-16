@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tronconneuse.cpp,v 1.4 2004/10/30 22:26:52 edrusb Rel $
+// $Id: test_tronconneuse.cpp,v 1.4.2.1 2005/02/02 10:51:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -40,6 +40,7 @@ extern "C"
 #endif
 }
 
+#include "libdar.hpp"
 #include "tronconneuse.hpp"
 #include "shell_interaction.hpp"
 #include "deci.hpp"
@@ -87,7 +88,11 @@ void f3(user_interaction *dialog);
 
 int main()
 {
-    user_interaction *dialog = shell_interaction_init(&cout, &cerr, false);
+    U_I maj, med, min;
+    user_interaction *dialog = NULL;
+
+    get_version(maj, med, min);
+    dialog = shell_interaction_init(&cout, &cerr, false);
     try
     {
 	f1(dialog);

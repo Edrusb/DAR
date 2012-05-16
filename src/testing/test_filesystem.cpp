@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.16 2005/01/28 23:27:57 edrusb Rel $
+// $Id: test_filesystem.cpp,v 1.16.2.1 2005/02/02 10:51:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -69,6 +69,7 @@ extern "C"
 #include <string.h>
 #include <iostream>
 
+#include "libdar.hpp"
 #include "filesystem.hpp"
 #include "user_interaction.hpp"
 #include "test_memory.hpp"
@@ -91,6 +92,9 @@ int main()
 {
     MEM_BEGIN;
     MEM_IN;
+    U_I maj, med, min;
+
+    get_version(maj, med, min);
     ui = shell_interaction_init(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;

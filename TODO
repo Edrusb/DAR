@@ -24,3 +24,9 @@ TODO (order is not significant)
 - API feature : have a method to return information about the listed archvie (additional method, when not using op_listing)
 - API feature : have cypher used stored in the archive and automatically detect the cypher used when reading an archive
 - dar_manager uses temporary files to limit the period of "all in memory" information when writing back database to file.
+>> review documentation about -z 9 -z9 -z
+>> review NLS compilation problem (sourceforge)
+>> see how to restore file ownership when interruption is asked (restore parent directories, ownership, using thread cancellation or other mechanism).
+>> error when path contains spaces (#1117188)
+>> problem with FC3, about libattr which dynamic and static versions are not in the same directory << waiting reply from libtool team
+

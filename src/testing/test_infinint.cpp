@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_infinint.cpp,v 1.14 2004/07/31 17:45:25 edrusb Rel $
+// $Id: test_infinint.cpp,v 1.14.2.1 2005/02/02 10:51:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -45,6 +45,7 @@ extern "C"
 
 #include <iostream>
 
+#include "libdar.hpp"
 #include "test_memory.hpp"
 #include "integers.hpp"
 #include "infinint.hpp"
@@ -66,6 +67,9 @@ int main()
 {
     MEM_BEGIN;
     MEM_IN;
+    U_I maj, med, min;
+
+    get_version(maj, med, min);
     ui = shell_interaction_init(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;

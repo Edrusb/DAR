@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.36 2004/12/07 18:04:48 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.36.2.3 2005/02/20 20:21:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -45,11 +45,12 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.3.0"
+#define DAR_MANAGER_VERSION "1.3.1"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
+#define INVALID_ARG "Invalid argument given to -%c (requires integer)"
 
 enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, move };
 
@@ -217,7 +218,14 @@ static bool command_line(user_interaction & dialog,
 		op = del;
 		if(optarg == NULL)
 		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
-		tools_read_range(string(optarg), min, max);
+		try
+		{
+		    tools_read_range(string(optarg), min, max);
+		}
+		catch(Edeci & e)
+		{
+		    throw Erange("command_line", tools_printf(gettext(INVALID_ARG), char(lu)));
+		}
 		num = min;
 		num2 = max;
 		break;
@@ -372,7 +380,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.36 2004/12/07 18:04:48 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.36.2.3 2005/02/20 20:21:49 edrusb Rel $";
     dummy_call(id);
 }
 

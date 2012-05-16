@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tronc.cpp,v 1.11 2004/10/01 20:55:00 edrusb Rel $
+// $Id: test_tronc.cpp,v 1.11.2.1 2005/02/02 10:51:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -37,7 +37,7 @@ extern "C"
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-   
+
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
@@ -45,6 +45,7 @@ extern "C"
 
 #include <iostream>
 
+#include "libdar.hpp"
 #include "tronc.hpp"
 #include "deci.hpp"
 #include "testtools.hpp"
@@ -57,78 +58,88 @@ using namespace libdar;
 
 int main()
 {
-    path p = "test/source.txt";
-    user_interaction *ui = shell_interaction_init(&cout, &cerr, false);
-    fichier h = fichier(*ui, p, gf_read_only);
-
-    display_read(*ui, h);
+    U_I maj, med, min;
 
     try
     {
-        fichier f = fichier(*ui, "test/source.txt", gf_read_only);
-        tronc *t;
+	get_version(maj, med, min);
+	path p = "test/source.txt";
+	user_interaction *ui = shell_interaction_init(&cout, &cerr, false);
+	fichier h = fichier(*ui, p, gf_read_only);
 
-        t = new tronc(*ui, &f, 0, 10);
-        t->skip(0);
-        cout << t->get_position() << endl;
-        cout << f.get_position() << endl;
+	display_read(*ui, h);
 
-        display_read(*ui, *t);
-        cout << t->get_position() << endl;
-        cout << f.get_position() << endl;
+	try
+	{
+	    fichier f = fichier(*ui, "test/source.txt", gf_read_only);
+	    tronc *t;
 
-        display_read(*ui, *t);
-        cout << t->get_position() << endl;
-        cout << f.get_position() << endl;
+	    t = new tronc(*ui, &f, 0, 10);
+	    t->skip(0);
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
 
-        delete t;
-        t = new tronc(*ui, &f, 50, 5);
-        cout << t->get_position() << endl;
-        cout << f.get_position() << endl;
+	    display_read(*ui, *t);
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
 
-        display_read(*ui, *t);
-        cout << t->get_position() << endl;
-        cout << f.get_position() << endl;
+	    display_read(*ui, *t);
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
 
-        delete t;
-        S_I fd = ::open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0666);
-	if(fd < 0)
-	    ui->warning(strerror(errno));
-        fichier g = fichier(*ui, fd);
-        f.skip(0);
-        f.copy_to(g);
-        t = new tronc(*ui, &g, 10, 10);
+	    delete t;
+	    t = new tronc(*ui, &f, 50, 5);
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
 
-        try
-        {
-            f.skip(0);
-            f.copy_to(*t);
-        }
-        catch(Egeneric & e)
-        {
-            e.dump();
-        }
+	    display_read(*ui, *t);
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
 
-        t->skip_to_eof();
-        display_back_read(*ui, *t);
-        display_back_read(*ui, *t);
-        g.skip(0);
-        display_read(*ui, g);
-        display_read(*ui, g);
+	    delete t;
+	    S_I fd = ::open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0666);
+	    if(fd < 0)
+		ui->warning(strerror(errno));
+	    fichier g = fichier(*ui, fd);
+	    f.skip(0);
+	    f.copy_to(g);
+	    t = new tronc(*ui, &g, 10, 10);
 
-        t->skip_relative(-5);
-        display_read(*ui, *t);
-        t->skip(3);
-        display_read(*ui, *t);
-        t->skip_relative(2);
-        display_read(*ui, *t);
+	    try
+	    {
+		f.skip(0);
+		f.copy_to(*t);
+	    }
+	    catch(Egeneric & e)
+	    {
+		e.dump();
+	    }
 
-        delete t;
+	    t->skip_to_eof();
+	    display_back_read(*ui, *t);
+	    display_back_read(*ui, *t);
+	    g.skip(0);
+	    display_read(*ui, g);
+	    display_read(*ui, g);
+
+	    t->skip_relative(-5);
+	    display_read(*ui, *t);
+	    t->skip(3);
+	    display_read(*ui, *t);
+	    t->skip_relative(2);
+	    display_read(*ui, *t);
+
+	    delete t;
+	}
+	catch(Egeneric &f)
+	{
+	    f.dump();
+	}
+	if(ui != NULL)
+	    delete ui;
     }
-    catch(Egeneric &f)
+    catch(Egeneric & f)
     {
-        f.dump();
+	f.dump();
     }
-    if(ui != NULL)
-	delete ui;
 }

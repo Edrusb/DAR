@@ -1,10 +1,11 @@
 QUESTIONS
 -----------
 
-Q1 - I restore/save all files but dar reported some files have been ignored, what are those ignored files ?
-Q2 - Dar hangs when using it with pipes, why ?
-Q3 - Why, when I restore 1 file, dar report 3 files have been restored ?
-Q4 - I cannot find the binary package for my distro, where to look for ?
+Q1 - I restore/save all files but dar reported some files have been ignored, what are those ignored files?
+Q2 - Dar hangs when using it with pipes, why?
+Q3 - Why, when I restore 1 file, dar report 3 files have been restored?
+Q4 - I cannot find the binary package for my distro, where to look for?
+Q5 - Why, when does dar report "ignored" files while I make a backup without filters?
 
 ANSWERS
 --------
@@ -16,3 +17,27 @@ A2 - Dar can produce archive on its standard output, if you give '-' as basename
 A3 - if you restore for example the file usr/bin/emacs dar will first restore usr (if the directory already exists, it will get its date and ownership restored, all existing files will be preserved), the /usr/bin is restored, then usr/bin/emacs is restored. Thus 3 inodes have been restored or modified while only one file has been asked for restoration.
 
 A4 - For any binary package, ask your distro maintainer to include dar (if not already done), and check on the web site of your preferite distro for a dar package.
+
+Q5 - If you give to dar an argument which is not an option, up to version 2.2.x it is interpreted as "to save that file only". Let's take an example:
+
+   dar -c my-files -y -s 2045M data
+
+reports
+
+ --------------------------------------------
+ 31754 inode(s) saved
+ with 0 hard link(s) recorded
+ 0 inode(s) not saved (no file change)
+ 0 inode(s) failed to save (filesystem error)
+-> 147 files(s) ignored (excluded by filters)
+ 0 files(s) recorded as deleted from reference backup
+ --------------------------------------------
+
+the 147 files are due to the fact dar has excluded 147 files and directories which are not "data" in the current directory.
+
+Note also that the use arguments out of options like "data" is deprecated since version 2.2.0, you would rather use -g option:
+
+   dar -c my-files -y -s 2045M -g data
+
+In version 2.3.x such arguments which are not options will have another meaning.
+

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.41 2004/12/01 22:10:47 edrusb Rel $
+// $Id: tools.cpp,v 1.41.2.1 2005/02/02 16:15:32 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -298,7 +298,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.41 2004/12/01 22:10:47 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.41.2.1 2005/02/02 16:15:32 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1201,6 +1201,43 @@ namespace libdar
 	    throw;
 	}
 	delete buffer;
+    }
+
+    bool tools_are_on_same_filesystem(const string & file1, const string & file2)
+    {
+	dev_t id;
+	struct stat sstat;
+
+	char *filename = tools_str2charptr(file1);
+
+	try
+	{
+	    if(stat(filename, &sstat) < 0)
+		throw Erange("tools:tools_are_on_same_filesystem", string("Cannot get inode information for: ") +  file1 + " : " + strerror(errno));
+	    id = sstat.st_dev;
+	}
+	catch(...)
+	{
+	    delete filename;
+	    throw;
+	}
+	delete filename;
+
+	filename = tools_str2charptr(file2);
+	try
+	{
+	    if(stat(filename, &sstat) < 0)
+		throw Erange("tools:tools_are_on_same_filesystem", string("Cannot get inode information for: ") +  file2 + " : " + strerror(errno));
+	}
+	catch(...)
+	{
+	    delete filename;
+	    throw;
+	}
+	delete filename;
+
+
+	return id == sstat.st_dev;
     }
 
 

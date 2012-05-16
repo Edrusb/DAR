@@ -18,12 +18,13 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_special_alloc.cpp,v 1.5 2004/05/21 08:28:51 edrusb Rel $
+// $Id: test_special_alloc.cpp,v 1.5.2.1 2005/02/02 10:51:36 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+#include "libdar.hpp"
 #include "special_alloc.hpp"
 #include "user_interaction.hpp"
 #include "test_memory.hpp"
@@ -34,6 +35,9 @@ using namespace libdar;
 
 int main()
 {
+    U_I maj, med, min;
+
+    get_version(maj, med, min);
 #ifdef LIBDAR_SPECIAL_ALLOC
     const int max = 3;
     void *ptr[max];

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_catalogue.cpp,v 1.13 2004/05/21 08:28:51 edrusb Rel $
+// $Id: test_catalogue.cpp,v 1.13.2.2 2005/02/11 16:09:33 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -33,6 +33,7 @@ extern "C"
 
 #include <iostream>
 
+#include "libdar.hpp"
 #include "testtools.hpp"
 #include "catalogue.hpp"
 #include "user_interaction.hpp"
@@ -57,6 +58,9 @@ int main()
 {
     MEM_BEGIN;
     MEM_IN;
+    U_I maj, med, min;
+
+    get_version(maj, med, min);
     ui = shell_interaction_init(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
@@ -122,7 +126,7 @@ void f1()
         entree *ref = (entree *)1; // != NULL
         for(S_I i = 0; ref != NULL; i++)
         {
-            ref = entree::read(*ui, *dump, "03", stats, corres, none, dump);
+            ref = entree::read(*ui, *dump, "03", stats, corres, none, dump, dump);
             if(ref != NULL)
             {
                 ref->dump(*ui, *dump2);
@@ -152,7 +156,7 @@ void f1()
         dump = new fichier(*ui, FIC1, gf_read_write);
         v_dir->dump(*ui, *dump);
         dump->skip(0);
-        ref = entree::read(*ui, *dump, "03", stats, corres, none, dump);
+        ref = entree::read(*ui, *dump, "03", stats, corres, none, dump, dump);
         v_sub_dir = dynamic_cast<directory *>(ref);
         v_sub_dir->listing(*ui);
 
@@ -219,7 +223,7 @@ void f2()
 
         cat.dump(f);
         f.skip(0);
-        catalogue lst = catalogue(*ui, f, "03", none, &f);
+        catalogue lst = catalogue(*ui, f, "03", none, &f, &f);
         lst.listing();
         bool ok;
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronconneuse.cpp,v 1.5 2004/12/07 18:04:52 edrusb Rel $
+// $Id: tronconneuse.cpp,v 1.5.2.1 2005/02/06 18:30:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -98,9 +98,9 @@ namespace libdar
 	    if(encrypted->get_position() < initial_shift)
 		throw SRC_BUG; // eof is before the first encrypted byte
 	    euclide(encrypted->get_position() - initial_shift, encrypted_buf_size, block_num, residu);
-	    current_position = block_num * clear_block_size;
+	    current_position = block_num * infinint(clear_block_size);
 	    fill_buf();
-	    current_position = buf_offset + buf_byte_data; // we are now at the eof
+	    current_position = buf_offset + infinint(buf_byte_data); // we are now at the eof
 	}
 
 	return ret;
@@ -118,7 +118,7 @@ namespace libdar
 	{
 	    x = -x;
 	    if(current_position >= x)
-		ret = skip(current_position - x);
+		ret = skip(current_position - infinint(x));
 	    else
 	    {
 		skip(0);
@@ -143,7 +143,7 @@ namespace libdar
 	    {
 		while(pos_in_buf < buf_byte_data && lu < size)
 		    a[lu++] = buf[pos_in_buf++];
-		current_position = buf_offset + pos_in_buf;
+		current_position = buf_offset + infinint(pos_in_buf);
 	    }
 	}
 
@@ -168,7 +168,7 @@ namespace libdar
 		block_num++;
 	    }
 	}
-	current_position += size;
+	current_position += infinint(size);
 	return size;
     }
 
@@ -231,7 +231,7 @@ namespace libdar
 	infinint crypt_offset;
 	infinint tmp_ret;
 
-	if(current_position < buf_offset || buf_offset + buf_byte_data <= current_position)
+	if(current_position < buf_offset || (buf_offset + infinint(buf_byte_data)) <= current_position)
 	{
 	    position_clear2crypt(current_position, crypt_offset, buf_offset, tmp_ret, block_num);
 	    if(encrypted->skip(crypt_offset + initial_shift))
@@ -260,7 +260,7 @@ namespace libdar
 	    init_buf();
 	    encrypted->write(encrypted_buf, encrypt_data(block_num, buf, buf_byte_data, buf_size, encrypted_buf, encrypted_buf_size));
 	    buf_byte_data = 0;
-	    buf_offset += clear_block_size;
+	    buf_offset += infinint(clear_block_size);
 	}
     }
 
@@ -292,7 +292,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tronconneuse.cpp,v 1.5 2004/12/07 18:04:52 edrusb Rel $";
+        static char id[]="$Id: tronconneuse.cpp,v 1.5.2.1 2005/02/06 18:30:58 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -300,8 +300,8 @@ namespace libdar
     {
 	euclide(pos, clear_block_size, block_num, pos_in_buf);
 	init_buf(); // needs to be placed before the following line as encrypted_buf_size is defined by this call
-	file_buf_start = block_num * encrypted_buf_size;
-	clear_buf_start = block_num * clear_block_size;
+	file_buf_start = block_num * infinint(encrypted_buf_size);
+	clear_buf_start = block_num * infinint(clear_block_size);
     }
 
     void tronconneuse::position_crypt2clear(const infinint & pos, infinint & clear_pos)
@@ -309,7 +309,7 @@ namespace libdar
 	infinint block, residu;
 	init_buf(); // needs to be placed before the following line as encrypted_buf_size is defined by this call
 	euclide(pos, encrypted_buf_size, block, residu);
-	clear_pos = block * clear_block_size + residu;
+	clear_pos = block * infinint(clear_block_size) + residu;
     }
 
 } // end of namespace

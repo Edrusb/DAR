@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.36 2005/01/29 15:08:02 edrusb Rel $
+// $Id: catalogue.hpp,v 1.36.2.1 2005/02/05 09:34:13 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -92,7 +92,9 @@ namespace libdar
 			    generic_file & f, const dar_version & reading_ver,
 			    entree_stats & stats,
 			    std::map <infinint, file_etiquette *> & corres,
-			    compression default_algo, generic_file *data_loc);
+			    compression default_algo,
+			    generic_file *data_loc,
+			    generic_file *ea_loc);
 
         virtual ~entree() {};
         virtual void dump(user_interaction & dialog, generic_file & f) const;
@@ -152,7 +154,11 @@ namespace libdar
               const infinint & last_access,
               const infinint & last_modif,
               const std::string & xname, const infinint & device);
-        inode(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved);
+        inode(user_interaction & dialog,
+	      generic_file & f,
+	      const dar_version & reading_ver,
+	      saved_status saved,
+	      generic_file *ea_loc);
         inode(const inode & ref);
         ~inode();
 
@@ -246,8 +252,13 @@ namespace libdar
              const infinint & taille,
 	     const infinint & fs_device);
         file(const file & ref);
-        file(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved,
-	     compression default_algo, generic_file *data_loc);
+        file(user_interaction & dialog,
+	     generic_file & f,
+	     const dar_version & reading_ver,
+	     saved_status saved,
+	     compression default_algo,
+	     generic_file *data_loc,
+	     generic_file *ea_loc);
         ~file() { detruit(); };
 
         void dump(user_interaction & dialog, generic_file & f) const;
@@ -315,8 +326,13 @@ namespace libdar
 		       const infinint & fs_device,
 		       const infinint & etiquette_number);
         file_etiquette(const file_etiquette & ref);
-        file_etiquette(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved,
-		       compression default_algo, generic_file *data_loc);
+        file_etiquette(user_interaction & dialog,
+		       generic_file & f,
+		       const dar_version & reading_ver,
+		       saved_status saved,
+		       compression default_algo,
+		       generic_file *data_loc,
+		       generic_file *ea_loc);
         ~file_etiquette() { if(etiquette != NULL) delete etiquette; };
 
         void dump(user_interaction & dialog, generic_file &f) const;
@@ -368,7 +384,11 @@ namespace libdar
              const std::string & name,
 	     const std::string & target,
 	     const infinint & fs_device);
-        lien(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved);
+        lien(user_interaction & dialog,
+	     generic_file & f,
+	     const dar_version & reading_ver,
+	     saved_status saved,
+	     generic_file *ea_loc);
 
         void dump(user_interaction & dialog, generic_file & f) const;
         std::string get_target() const;
@@ -399,7 +419,15 @@ namespace libdar
                   const std::string & xname,
 		  const infinint & device);
         directory(const directory &ref); // only the inode part is build, no children is duplicated (empty dir)
-        directory(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved, entree_stats & stats, std::map <infinint, file_etiquette *> & corres, compression default_algo, generic_file *data_loc);
+        directory(user_interaction & dialog,
+		  generic_file & f,
+		  const dar_version & reading_ver,
+		  saved_status saved,
+		  entree_stats & stats,
+		  std::map <infinint, file_etiquette *> & corres,
+		  compression default_algo,
+		  generic_file *data_loc,
+		  generic_file *ea_loc);
         ~directory(); // detruit aussi tous les fils et se supprime de son 'parent'
 
         void dump(user_interaction & dialog, generic_file & f) const;
@@ -442,7 +470,11 @@ namespace libdar
                U_16 major,
                U_16 minor,
 	       const infinint & fs_device);
-        device(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved);
+        device(user_interaction & dialog,
+	       generic_file & f,
+	       const dar_version & reading_ver,
+	       saved_status saved,
+	       generic_file *ea_loc);
 
         void dump(user_interaction & dialog, generic_file & f) const;
         int get_major() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xmajor; };
@@ -478,7 +510,11 @@ namespace libdar
 		const infinint & fs_device) : device(uid, gid, perm, last_access,
                                      last_modif, name,
                                      major, minor, fs_device) {};
-        chardev(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved) : device(dialog, f, reading_ver, saved) {};
+        chardev(user_interaction & dialog,
+		generic_file & f,
+		const dar_version & reading_ver,
+		saved_status saved,
+		generic_file *ea_loc) : device(dialog, f, reading_ver, saved, ea_loc) {};
 
             // using dump from device class
             // using method is_more_recent_than() from device class
@@ -504,7 +540,11 @@ namespace libdar
 		 const infinint & fs_device) : device(uid, gid, perm, last_access,
 						      last_modif, name,
 						      major, minor, fs_device) {};
-        blockdev(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved) : device(dialog, f, reading_ver, saved) {};
+        blockdev(user_interaction & dialog,
+		 generic_file & f,
+		 const dar_version & reading_ver,
+		 saved_status saved,
+		 generic_file *ea_loc) : device(dialog, f, reading_ver, saved, ea_loc) {};
 
             // using dump from device class
             // using method is_more_recent_than() from device class
@@ -526,7 +566,11 @@ namespace libdar
              const infinint & last_modif,
              const std::string & xname,
 	     const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, xname, fs_device) { set_saved_status(s_saved); };
-        tube(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved) : inode(dialog, f, reading_ver, saved) {};
+        tube(user_interaction & dialog,
+	     generic_file & f,
+	     const dar_version & reading_ver,
+	     saved_status saved,
+ 	     generic_file *ea_loc) : inode(dialog, f, reading_ver, saved, ea_loc) {};
 
             // using dump from inode class
             // using method is_more_recent_than() from inode class
@@ -548,7 +592,11 @@ namespace libdar
               const infinint & last_modif,
               const std::string & xname,
 	      const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, xname, fs_device) { set_saved_status(s_saved); };
-        prise(user_interaction & dialog, generic_file & f, const dar_version & reading_ver, saved_status saved) : inode(dialog, f, reading_ver, saved) {};
+        prise(user_interaction & dialog,
+	      generic_file & f,
+	      const dar_version & reading_ver,
+	      saved_status saved,
+	      generic_file *ea_loc) : inode(dialog, f, reading_ver, saved, ea_loc) {};
 
             // using dump from inode class
             // using method is_more_recent_than() from inode class
@@ -601,7 +649,10 @@ namespace libdar
     {
     public:
         ignored_dir(const directory &target) : inode(target) {};
-        ignored_dir(user_interaction & dialog, generic_file & f, const dar_version & reading_ver) : inode(dialog, f, reading_ver, s_not_saved) { throw SRC_BUG; };
+        ignored_dir(user_interaction & dialog,
+		    generic_file & f,
+		    const dar_version & reading_ver,
+		    generic_file *ea_loc) : inode(dialog, f, reading_ver, s_not_saved, ea_loc) { throw SRC_BUG; };
 
         void dump(user_interaction & dialog, generic_file & f) const; // behaves like an empty directory
         unsigned char signature() const { return 'j'; };
@@ -617,8 +668,11 @@ namespace libdar
     public :
         catalogue(user_interaction & dialog);
         catalogue(user_interaction & dialog,
-		  generic_file & f, const dar_version & reading_ver,
-		  compression default_algo, generic_file *data_loc);
+		  generic_file & f,
+		  const dar_version & reading_ver,
+		  compression default_algo,
+		  generic_file *data_loc,
+		  generic_file *ea_loc);
         catalogue(const catalogue & ref) : out_compare(ref.out_compare) { partial_copy_from(ref); };
         catalogue & operator = (const catalogue &ref);
         ~catalogue() { detruire(); };
