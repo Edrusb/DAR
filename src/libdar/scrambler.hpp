@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: scrambler.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: scrambler.hpp,v 1.5.4.1 2004/09/22 03:14:24 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,6 +27,7 @@
 
 #include "../my_config.h"
 #include <string>
+#include "infinint.hpp"
 #include "generic_file.hpp"
 #include "erreurs.hpp"
 #include "infinint.hpp"
@@ -39,7 +40,7 @@ namespace libdar
     public:
         scrambler(const std::string & pass, generic_file & hidden_side);
         ~scrambler() { if(buffer != NULL) delete buffer; };
-    
+
         bool skip(const infinint & pos) { if(ref == NULL) throw SRC_BUG; return ref->skip(pos); };
         bool skip_to_eof() { if(ref==NULL) throw SRC_BUG; return ref->skip_to_eof(); };
         bool skip_relative(S_I x) { if(ref == NULL) throw SRC_BUG; return ref->skip_relative(x); };

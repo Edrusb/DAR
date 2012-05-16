@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: hide_file.hpp,v 1.7 2003/11/28 22:08:55 edrusb Rel $
+// $Id: hide_file.hpp,v 1.7.2.1 2004/09/22 03:14:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,6 +27,7 @@
 
 #include "../my_config.h"
 #include <vector>
+#include "infinint.hpp"
 #include "generic_file.hpp"
 
 using namespace libdar;
@@ -48,7 +49,7 @@ protected:
         infinint debut, longueur; // debut is the offset in ref file
         infinint offset; // offset in the resulting file
     };
-        
+
     vector <partie> morceau;
     generic_file *ref;
 

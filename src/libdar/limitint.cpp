@@ -18,15 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.cpp,v 1.8.4.7 2004/07/25 20:38:03 edrusb Exp $
+// $Id: limitint.cpp,v 1.8.4.8 2004/09/22 03:14:23 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
 #include "erreurs.hpp"
+#include "infinint.hpp"
 #include "generic_file.hpp"
-#include "limitint.hpp"
 
 namespace libdar
 {

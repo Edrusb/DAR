@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.hpp,v 1.7.2.1 2004/07/25 20:38:03 edrusb Exp $
+// $Id: sar.hpp,v 1.7.2.2 2004/09/22 03:14:23 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,7 @@
 #define SAR_HPP
 
 #include <string>
+#include "infinint.hpp"
 #include "generic_file.hpp"
 #include "header.hpp"
 #include "path.hpp"

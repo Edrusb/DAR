@@ -236,7 +236,7 @@ as argument. If you want to compress all file whatever their size is you thus ne
 on the command line. The same number extensions as those used with -s or -S are available here, if you want to specify the size in kilobyte, megabyte, gigabyte etc.
 .TP 20
 --nodump
-do not save files which have the 'd' flag set (see chattr(1) lsattr(1) ext2 commands). This option is available only if the dar binary has been compiled with the --enable-nodump-flag given to configure script (activated by default if available).
+do not save files which have the 'd' flag set (see chattr(1) lsattr(1) ext2 commands). This option may not be available if the system dar has been compiled on did not provide support for ext2 flags.
 .PP
 .PP
 .RE

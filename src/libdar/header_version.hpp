@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header_version.hpp,v 1.6.4.1 2004/07/25 20:38:03 edrusb Exp $
+// $Id: header_version.hpp,v 1.6.4.2 2004/09/22 03:14:22 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,7 @@
 #define HEADER_VERSION_HPP
 
 #include "../my_config.h"
+#include "infinint.hpp"
 #include "generic_file.hpp"
 #include "tools.hpp"
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.hpp,v 1.10.4.2 2004/01/28 15:29:46 edrusb Rel $
+// $Id: data_tree.hpp,v 1.10.4.3 2004/09/22 03:14:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,6 +30,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include "infinint.hpp"
 #include "generic_file.hpp"
 #include "infinint.hpp"
 #include "catalogue.hpp"

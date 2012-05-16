@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database_header.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: database_header.hpp,v 1.5.4.1 2004/09/22 03:14:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,7 @@
 #define DATABASE_HEADER_HPP
 
 #include "../my_config.h"
+#include "infinint.hpp"
 #include "generic_file.hpp"
 
 using namespace libdar;
@@ -35,7 +36,7 @@ struct database_header
 {
     unsigned char version;
     unsigned char options;
-    
+
     void read(generic_file & f) { f.read((char *)&version, 1); f.read((char *)&options, 1); };
     void write(generic_file & f) { f.write((char *)&version, 1); f.write((char *)&options, 1); };
 };

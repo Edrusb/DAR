@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.25.2.6 2004/09/10 22:34:15 edrusb Exp $
+// $Id: libdar.cpp,v 1.25.2.7 2004/09/22 03:14:22 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -39,6 +39,7 @@ extern "C"
 #include <string>
 #include <iostream>
 #include "erreurs.hpp"
+#include "infinint.hpp"
 #include "generic_file.hpp"
 #include "user_interaction.hpp"
 #include "terminateur.hpp"
@@ -668,7 +669,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.25.2.6 2004/09/10 22:34:15 edrusb Exp $";
+        static char id[]="$Id: libdar.cpp,v 1.25.2.7 2004/09/22 03:14:22 edrusb Rel $";
         dummy_call(id);
     }
 

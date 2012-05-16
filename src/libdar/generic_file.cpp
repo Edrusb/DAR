@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.11.2.3 2004/07/25 20:38:03 edrusb Exp $
+// $Id: generic_file.cpp,v 1.11.2.4 2004/09/22 03:14:22 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -61,6 +61,7 @@ char *strchr (), *strrchr ();
 #endif
 } // end extern "C"
 
+#include "infinint.hpp"
 #include "generic_file.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
@@ -377,7 +378,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.11.2.3 2004/07/25 20:38:03 edrusb Exp $";
+        static char id[]="$Id: generic_file.cpp,v 1.11.2.4 2004/09/22 03:14:22 edrusb Rel $";
         dummy_call(id);
     }
 

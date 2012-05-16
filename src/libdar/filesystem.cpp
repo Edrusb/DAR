@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.17.2.7 2004/09/12 21:43:44 edrusb Exp $
+// $Id: filesystem.cpp,v 1.17.2.8 2005/01/13 21:46:44 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -832,7 +832,7 @@ namespace libdar
 
         try
         {
-            S_I ret;
+            S_I ret; // will carry the system call returned value to create the requested file
 
             do
             {
@@ -924,6 +924,8 @@ namespace libdar
                     if(ret >= 0)
                     {
                         fichier dest = ret;
+			    // the implicit destruction of dest (exiting the block)
+			    // will close the 'ret' file descriptor (see ~fichier())
                         ou = ref_fil->get_data();
                         try
                         {
@@ -1351,7 +1353,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.17.2.7 2004/09/12 21:43:44 edrusb Exp $";
+        static char id[]="$Id: filesystem.cpp,v 1.17.2.8 2005/01/13 21:46:44 edrusb Rel $";
         dummy_call(id);
     }
 

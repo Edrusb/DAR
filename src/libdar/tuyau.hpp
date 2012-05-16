@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.hpp,v 1.6.2.1 2004/07/25 20:38:04 edrusb Exp $
+// $Id: tuyau.hpp,v 1.6.2.2 2004/09/22 03:14:24 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,7 @@
 #define TUYAU_HPP
 
 #include "../my_config.h"
+#include "infinint.hpp"
 #include "generic_file.hpp"
 
 namespace libdar

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.hpp,v 1.8.4.3 2004/07/25 20:38:03 edrusb Exp $
+// $Id: ea.hpp,v 1.8.4.4 2004/09/22 03:14:22 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -28,8 +28,8 @@
 #include "../my_config.h"
 #include <vector>
 #include <string>
-#include "generic_file.hpp"
 #include "infinint.hpp"
+#include "generic_file.hpp"
 #include "special_alloc.hpp"
 
 namespace libdar

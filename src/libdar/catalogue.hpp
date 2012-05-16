@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.19.2.4 2004/09/10 20:15:42 edrusb Exp $
+// $Id: catalogue.hpp,v 1.19.2.5 2005/01/13 21:46:42 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -92,7 +92,7 @@ namespace libdar
 
             // SPECIAL ALLOC not adapted here
             // because some inherited class object (eod) are
-            // temporaneous
+            // temporary
 
     private :
         static std::map <infinint, file_etiquette *> corres;

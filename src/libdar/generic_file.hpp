@@ -18,12 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.8.2.3 2004/07/25 20:38:03 edrusb Exp $
+// $Id: generic_file.hpp,v 1.8.2.4 2004/09/22 03:14:22 edrusb Rel $
 //
 /*********************************************************************/
 
 #ifndef GENERIC_FILE_HPP
 #define GENERIC_FILE_HPP
+
+/// IMPORTANT : THIS FILE MUST ALWAYS BE INCLUDE AFTER infinint.hpp
+///             (and infinint.hpp must be included too, always)
 
 extern "C"
 {

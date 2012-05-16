@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.hpp,v 1.7.4.6 2004/07/25 20:38:03 edrusb Exp $
+// $Id: limitint.hpp,v 1.7.4.7 2004/09/22 03:14:23 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -48,7 +48,6 @@ namespace libdar
 {
 
     class generic_file;
-    class fichier;
 
     template<class B> class limitint
     {
@@ -104,7 +103,7 @@ namespace libdar
             // note that the initial value of the argument is not ignored !
             // when the object is null the value of the argument stays the same as before
         template <class T>void unstack(T &v)
-            { E_BEGIN; limitint_unstack_to(v); E_END("limitint::unstack", typeid(v).name()); };
+            { E_BEGIN; limitint_unstack_to(v); E_END("limitint::unstack", typeid(v).name()); }
 
         bool operator < (const limitint &x) const { return field < x.field; };
         bool operator == (const limitint &x) const { return field == x.field; };
@@ -143,16 +142,16 @@ namespace libdar
 
     template <class B> limitint<B> operator + (const limitint<B> &, const limitint<B> &);
     template <class B> inline limitint<B> operator + (const limitint<B> & a, U_I b)
-    { return a + limitint<B>(b); };
+    { return a + limitint<B>(b); }
     template <class B> limitint<B> operator - (const limitint<B> &, const limitint<B> &);
     template <class B> inline limitint<B> operator - (const limitint<B> & a, U_I b)
-    { return a - limitint<B>(b); };
+    { return a - limitint<B>(b); }
     template <class B> limitint<B> operator * (const limitint<B> &, const limitint<B> &);
     template <class B> inline limitint<B> operator * (const limitint<B> & a, U_I b)
-    { return a * limitint<B>(b); };
+    { return a * limitint<B>(b); }
     template <class B> limitint<B> operator / (const limitint<B> &, const limitint<B> &);
     template <class B> limitint<B> operator / (const limitint<B> & a, U_I b)
-    { return a / limitint<B>(b); };
+    { return a / limitint<B>(b); }
     template <class B> limitint<B> operator % (const limitint<B> &, const limitint<B> &);
     template <class B> limitint<B> operator >> (const limitint<B> & a, U_32 bit);
     template <class B> limitint<B> operator >> (const limitint<B> & a, const limitint<B> & bit);
@@ -171,9 +170,20 @@ namespace libdar
         euclide(a, limitint<B>(b), q, r);
     }
 
+#ifndef INFININT_BASE_TYPE
+#error INFININT_BASE_TYPE not defined cannot instantiate template
+#else
+    typedef limitint<INFININT_BASE_TYPE> infinint;
+#endif
+} // end of namespace
 	///////////////////////////////////////////////////////////////////////
 	/////////  template implementation ////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
+
+#include "generic_file.hpp"
+
+namespace libdar
+{
 
     template <class B> typename limitint<B>::endian limitint<B>::used_endian = not_initialized;
 

@@ -258,3 +258,8 @@ from 2.1.4 to 2.1.5
 - code simplification for filesystem reading (while performing backup)
 - fixed bug #29
 - fixed code syntax to support gcc-3.4.x
+
+from 2.1.5 to 2.1.6
+- fixed compilation problem with gcc-3.x for dar64
+- updated libtool to generate the configure script
+- fixed old info in dar's man page

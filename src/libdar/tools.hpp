@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.13.2.1 2004/07/25 20:38:04 edrusb Exp $
+// $Id: tools.hpp,v 1.13.2.2 2004/09/22 03:14:24 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,6 +29,7 @@
 #include <string>
 #include <vector>
 #include "path.hpp"
+#include "infinint.hpp"
 #include "generic_file.hpp"
 #include "tuyau.hpp"
 #include "integers.hpp"

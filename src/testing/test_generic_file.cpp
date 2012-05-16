@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_generic_file.cpp,v 1.7.4.2 2004/04/20 09:27:02 edrusb Rel $
+// $Id: test_generic_file.cpp,v 1.7.4.3 2004/09/22 03:14:24 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -42,6 +42,7 @@ extern "C"
 
 #include <iostream>
 
+#include "infinint.hpp"
 #include "generic_file.hpp"
 #include "null_file.hpp"
 #include "integers.hpp"
