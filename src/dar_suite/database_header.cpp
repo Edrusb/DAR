@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database_header.cpp,v 1.6.4.2 2003/12/20 23:05:34 edrusb Rel $
+// $Id: database_header.cpp,v 1.6.4.3 2004/04/20 09:27:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -74,7 +74,7 @@ generic_file *database_header_create(const string & filename, bool overwrite)
 
         if(stat(ptr, &buf) >= 0 && !overwrite)
             throw Erange("database_header_create", "Cannot create database, file exists");
-        fd = open(ptr, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
+        fd = ::open(ptr, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
         if(fd < 0)
             throw Erange("database_header_create", string("Cannot create database ") + filename + " : " + strerror(errno));
         ret = new fichier(fd);
@@ -152,6 +152,6 @@ generic_file *database_header_open(const string & filename)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: database_header.cpp,v 1.6.4.2 2003/12/20 23:05:34 edrusb Rel $";
+    static char id[]="$Id: database_header.cpp,v 1.6.4.3 2004/04/20 09:27:00 edrusb Rel $";
     dummy_call(id);
 }

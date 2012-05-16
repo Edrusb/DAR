@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_hide_file.cpp,v 1.6.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_hide_file.cpp,v 1.6.4.2 2004/04/20 09:27:02 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -51,7 +51,7 @@ void f1()
 {
     fichier src = fichier("toto", gf_read_only);
     no_comment strip = src;
-    int fd = open("titi", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
+    int fd = ::open("titi", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
     fichier dst = fd;
 
     strip.copy_to(dst);
@@ -68,7 +68,7 @@ void f2()
     fichier src = fichier("toto", gf_read_only);
     config_file strip = config_file(cibles, src);
 
-    int fd = open("tutu", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
+    int fd = ::open("tutu", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
     fichier dst = fd;
 
     strip.copy_to(dst);

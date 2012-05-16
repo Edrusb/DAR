@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.26.2.8 2004/03/11 20:21:46 edrusb Rel $
+// $Id: command_line.cpp,v 1.26.2.10 2004/04/20 13:31:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -1016,7 +1016,7 @@ static void usage(const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.26.2.8 2004/03/11 20:21:46 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.26.2.10 2004/04/20 13:31:53 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -1464,7 +1464,7 @@ static void make_args_from_file(operation op, const char *filename, S_I & argc, 
     vector <string> cibles;
     argv = NULL;
 
-    S_I fd = open(filename, O_RDONLY|O_BINARY);
+    S_I fd = ::open(filename, O_RDONLY|O_BINARY);
     if(fd < 0)
         throw Erange("make_args_from_file", string("cannot open file ") + filename + " : " + strerror(errno));
 
@@ -1499,6 +1499,7 @@ static void make_args_from_file(operation op, const char *filename, S_I & argc, 
         break;
     case listing:
         cibles.push_back("listing");
+	cibles.push_back("list");
         break;
     case isolate:
         cibles.push_back("isolate");

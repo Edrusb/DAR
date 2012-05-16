@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: terminateur.cpp,v 1.5.4.1 2004/05/03 19:32:54 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -42,7 +42,7 @@ namespace libdar
         size = f.get_position() - size;
 
         euclide(size, BLOCK_SIZE, nbbit, reste);
- 
+
         if(reste != 0)
         {
                 // adding some non informational bytes to get a multiple of BLOCK_SIZE
@@ -54,7 +54,7 @@ namespace libdar
                 // one more for remaing bytes and non informational bytes.
             nbbit++;
         }
-        
+
         last_byte = nbbit % 8;
         nbbit /= 8; // now, nbbit is the number of byte of terminator string (more or less 1)
 
@@ -68,6 +68,11 @@ namespace libdar
             }
             f.write((char *)&a, 1);
         }
+	else // adding a terminal non 0xFF byte. (terminal when read down from end of file)
+	{
+	    a = 0;
+	    f.write((char *)&a, 1);
+	}
 
             // writing down all the other bytes of the terminator string
         a = 0xff;
@@ -80,7 +85,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: terminateur.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: terminateur.cpp,v 1.5.4.1 2004/05/03 19:32:54 edrusb Rel $";
         dummy_call(id);
     }
 

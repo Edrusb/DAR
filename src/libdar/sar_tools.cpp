@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.9.2.2 2003/12/20 23:05:34 edrusb Rel $
+// $Id: sar_tools.cpp,v 1.9.2.3 2004/04/20 09:27:02 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -76,7 +76,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar_tools.cpp,v 1.9.2.2 2003/12/20 23:05:34 edrusb Rel $";
+        static char id[]="$Id: sar_tools.cpp,v 1.9.2.3 2004/04/20 09:27:02 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -107,7 +107,7 @@ namespace libdar
                 }
             }
 
-            fd = open(name, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
+            fd = ::open(name, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
             if(fd < 0)
                 throw Erange("open_archive_fichier", string("Error openning file ") + name + " : " + strerror(errno));
             tmp = new fichier(fd);

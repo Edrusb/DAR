@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.15.2.2 2004/01/03 00:18:46 edrusb Rel $
+// $Id: sar.cpp,v 1.15.2.3 2004/04/20 09:27:01 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -247,7 +247,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.15.2.2 2004/01/03 00:18:46 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.15.2.3 2004/04/20 09:27:01 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -381,7 +381,7 @@ namespace libdar
             hook_execute(num);
                 // trying to open the file
                 //
-            S_I fd = open(fic, O_RDONLY|O_BINARY);
+            S_I fd = ::open(fic, O_RDONLY|O_BINARY);
             if(fd < 0)
                 if(errno == ENOENT)
                 {
@@ -480,7 +480,7 @@ namespace libdar
                 open_flag |= O_CREAT;
         else // file exists
         {
-            S_I fd_tmp = open(fic, O_RDONLY|O_BINARY);
+            S_I fd_tmp = ::open(fic, O_RDONLY|O_BINARY);
 
             if(fd_tmp >= 0)
             {
@@ -542,7 +542,7 @@ namespace libdar
             }
         }
 
-        fd = open(fic, open_flag|O_BINARY, open_mode);
+        fd = ::open(fic, open_flag|O_BINARY, open_mode);
         of_flag = FLAG_NON_TERMINAL;
         if(fd < 0)
             throw Erange("sar::open_writeonly open()", string("Error openning file ") + fic + " : " + strerror(errno));

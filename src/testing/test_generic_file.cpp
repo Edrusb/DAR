@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_generic_file.cpp,v 1.7.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_generic_file.cpp,v 1.7.4.2 2004/04/20 09:27:02 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -59,7 +59,7 @@ int main(S_I argc, char *argv[])
     }
 
     fichier f1 = fichier(argv[1], gf_read_only);
-    S_I fd = open(argv[2], O_WRONLY|O_CREAT|O_TRUNC|O_BINARY);
+    S_I fd = ::open(argv[2], O_WRONLY|O_CREAT|O_TRUNC|O_BINARY);
     if(fd < 0)
     {
         cout << "cannot open "<< argv[2] << endl;

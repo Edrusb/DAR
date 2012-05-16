@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_limitint.cpp,v 1.2.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_limitint.cpp,v 1.2.4.2 2004/04/20 09:27:02 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -78,7 +78,7 @@ int main()
 
 static void routine_real_infinint()
 {
-    int fd = open("toto", O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0644);
+    int fd = ::open("toto", O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0644);
 
     if(fd >= 0)
     {
@@ -102,7 +102,7 @@ static void routine_limitint()
         //
         //
 
-    int fd = open("toto", O_RDONLY | O_BINARY);
+    int fd = ::open("toto", O_RDONLY | O_BINARY);
     if(fd > 0)
     {
         infinint r1 = infinint(&fd, NULL);

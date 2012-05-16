@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.8.2.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_filesystem.cpp,v 1.8.2.2 2004/04/20 09:27:02 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -118,7 +118,7 @@ static void build()
         close(fd);
     }
     mknod("arbo/sub/tube", 0777 | S_IFIFO, 0);
-    fd = open("arbo/sub/fichier", O_WRONLY|O_CREAT|O_BINARY, 0777);
+    fd = ::open("arbo/sub/fichier", O_WRONLY|O_CREAT|O_BINARY, 0777);
     if(fd >= 0)
     {
         write(fd, phrase, strlen(phrase));

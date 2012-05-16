@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tronc.cpp,v 1.6.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_tronc.cpp,v 1.6.4.2 2004/04/20 09:27:02 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -87,7 +87,7 @@ int main()
         cout << f.get_position() << endl;
 
         delete t;
-        S_I fd = open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY);
+        S_I fd = ::open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY);
         fichier g = fd;
         f.skip(0);
         f.copy_to(g);

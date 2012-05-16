@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_infinint.cpp,v 1.9.4.2 2004/01/15 14:06:29 edrusb Rel $
+// $Id: test_infinint.cpp,v 1.9.4.3 2004/04/20 09:27:02 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -79,12 +79,12 @@ static void routine1()
 
     cout << d1.human() << " " << d2.human() << " " << d3.human() << endl;
 
-    S_I fd = open("toto", O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0644);
+    S_I fd = ::open("toto", O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0644);
     if(fd >= 0)
     {
         f1.dump(fd);
         close(fd);
-        fd = open("toto", O_RDONLY|O_BINARY);
+        fd = ::open("toto", O_RDONLY|O_BINARY);
         if(fd >= 0)
         {
             f3 = infinint(&fd, NULL);

@@ -462,3 +462,46 @@ KNOWN BUGS:
 
     affects version 2.1.1 and older
     fixed in version 2.1.2
+
+#25 description
+      under some hypothetical conditions (when the archive is larger than
+      10^16 Terabytes, 1 followed by 16 zeros), dar is not able to read
+      the archive.
+
+    problem
+      In this situation, the terminateur is not properly formed and cannot
+      fulfill its role: point to the start of the catalogue. A byte 0x00 is
+      missing near the end of the archive, that indicate the end of the
+      terminateur.
+
+    solution
+      properly write down terminateur string of archive. Note that archive
+      produced by earlier version are not possible to read dar version
+      that have the fix, but don't worry, if you have a such big archive
+      (more than 10^16 Terabytes), tell me I will create a little program
+      that fixes the archive ;-) . Note, "terminateur" the french word for
+      terminator, the word has been kept here because it is used in the
+      source code.
+
+    affects version 2.1.2 and older
+    fixed in version 2.1.3
+
+#26 description
+      in configuration file using conditional syntax (see man page), when
+      two targets follow each other on two directly following lines (the
+      first condition is thus empty), the second condition is skipped. This
+      condition also occurs if there is only comments between the two targets.
+
+    problem
+      when looking for the first target, an extra character is read (the first
+      of the second target), as there is no contents in this target no
+      reposition (seek) in the file is done, and the search for the next target
+      start at that point (second character of the second target), which makes
+      the second target not recognized because of the missing initial character.
+
+    solution
+      avoid reading this extra character so the next character to read is the
+      first character (not the second) of the following target.
+
+    affects version 1.2.0 and older versions
+    fixed in version 2.1.3

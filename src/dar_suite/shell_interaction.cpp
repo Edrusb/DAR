@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: shell_interaction.cpp,v 1.9.4.2 2003/12/26 14:09:50 edrusb Rel $
+// $Id: shell_interaction.cpp,v 1.9.4.3 2004/04/20 09:27:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -117,7 +117,7 @@ void shell_interaction_init(ostream *out, ostream *interact)
     {
         struct termios term;
 
-        input = open(tty, O_RDONLY|O_TEXT);
+        input = ::open(tty, O_RDONLY|O_TEXT);
         if(input < 0)
             interaction_warning("No terminal found for user interaction. All questions will abort the program.\n");
         else
@@ -229,6 +229,6 @@ static void interaction_warning(const string & message)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: shell_interaction.cpp,v 1.9.4.2 2003/12/26 14:09:50 edrusb Rel $";
+    static char id[]="$Id: shell_interaction.cpp,v 1.9.4.3 2004/04/20 09:27:00 edrusb Rel $";
     dummy_call(id);
 }

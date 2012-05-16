@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.17.2.3 2004/02/01 21:21:21 edrusb Rel $
+// $Id: filesystem.cpp,v 1.17.2.4 2004/04/20 09:27:01 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -910,7 +910,7 @@ namespace libdar
                     generic_file *ou;
                     infinint seek;
 
-                    ret = open(name, O_WRONLY|O_CREAT|O_BINARY, 0777);
+                    ret = ::open(name, O_WRONLY|O_CREAT|O_BINARY, 0777);
                     if(ret >= 0)
                     {
                         fichier dest = ret;
@@ -1339,7 +1339,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.17.2.3 2004/02/01 21:21:21 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.17.2.4 2004/04/20 09:27:01 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1477,7 +1477,7 @@ namespace libdar
 
         try
         {
-            fd = open(ptr, O_RDONLY|O_BINARY|O_NONBLOCK);
+            fd = ::open(ptr, O_RDONLY|O_BINARY|O_NONBLOCK);
             if(fd < 0)
 		user_interaction_warning(string("Failed to open ") + filename +" while checking for nodump flag: " + strerror(errno));
 	    else

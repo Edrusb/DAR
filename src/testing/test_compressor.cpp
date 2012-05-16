@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_compressor.cpp,v 1.6.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_compressor.cpp,v 1.6.4.2 2004/04/20 09:27:02 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -66,9 +66,9 @@ static void f1()
         fichier src1 = fichier("toto", gf_read_only);
         fichier src2 = fichier("toto", gf_read_only);
         fichier src3 = fichier("toto", gf_read_only);
-        fichier dst1 = open("tutu.none", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
-        fichier dst2 = open("tutu.gz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
-        fichier dst3 = open("tutu.bz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+        fichier dst1 = ::open("tutu.none", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+        fichier dst2 = ::open("tutu.gz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+        fichier dst3 = ::open("tutu.bz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
 
         compressor c1 = compressor(none, dst1);
         compressor c2 = compressor(gzip, dst2);
@@ -111,9 +111,9 @@ static void f1()
         fichier src1 = fichier("tutu.none", gf_read_only);
         fichier src2 = fichier("tutu.gz", gf_read_only);
         fichier src3 = fichier("tutu.bz", gf_read_only);
-        fichier dst1 = open("tutu.none.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
-        fichier dst2 = open("tutu.gz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
-        fichier dst3 = open("tutu.bz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+        fichier dst1 = ::open("tutu.none.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+        fichier dst2 = ::open("tutu.gz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
+        fichier dst3 = ::open("tutu.bz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
 
         compressor c1 = compressor(none, src1);
         compressor c2 = compressor(gzip, src2);

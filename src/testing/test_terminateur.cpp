@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_terminateur.cpp,v 1.7.4.1 2003/12/20 23:05:35 edrusb Rel $
+// $Id: test_terminateur.cpp,v 1.7.4.2 2004/04/20 09:27:02 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -64,7 +64,7 @@ int main()
 
 static void f1()
 {
-    fichier toto = open("toto", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644);
+    fichier toto = ::open("toto", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644);
     terminateur term;
 
     infinint grand = 1;

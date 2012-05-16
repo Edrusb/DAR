@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: factoriel.cpp,v 1.8.4.1 2003/12/20 23:05:34 edrusb Rel $
+// $Id: factoriel.cpp,v 1.8.4.2 2004/04/20 09:27:00 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -85,7 +85,7 @@ int main(S_I argc, char *argv[]) throw()
         cout << f.human() << endl;
         if(argc == 3)
         {
-            S_I fd = open(argv[2], O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644);
+            S_I fd = ::open(argv[2], O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644);
             if(fd < 0)
                 cout << "cannot open file for test ! " << strerror(errno) << endl;
             else
@@ -118,6 +118,6 @@ int main(S_I argc, char *argv[]) throw()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: factoriel.cpp,v 1.8.4.1 2003/12/20 23:05:34 edrusb Rel $";
+    static char id[]="$Id: factoriel.cpp,v 1.8.4.2 2004/04/20 09:27:00 edrusb Rel $";
     dummy_call(id);
 }

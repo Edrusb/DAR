@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_cp.cpp,v 1.4.4.1 2003/12/20 23:05:34 edrusb Rel $
+// $Id: dar_cp.cpp,v 1.4.4.3 2004/04/25 17:10:25 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -45,12 +45,15 @@ extern "C"
 #if HAVE_STRIN_H
 #include <string.h>
 #endif
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
 }
 
 #include "dar_suite.hpp"
 #include "tools.hpp"
 
-#define DAR_CP_VERSION "1.0.0"
+#define DAR_CP_VERSION "1.0.1"
 
 using namespace libdar;
 
@@ -156,7 +159,7 @@ int open_files(char *src, char *dst, int *fds, int *fdd)
             // loose its reference.
     }
 
-    *fds = open(src, O_RDONLY);
+    *fds = ::open(src, O_RDONLY);
 
     if(*fds < 0)
     {
@@ -166,7 +169,7 @@ int open_files(char *src, char *dst, int *fds, int *fdd)
         return 0; // error
     }
 
-    *fdd = open(dst, O_WRONLY|O_CREAT|O_EXCL, 0666);
+    *fdd = ::open(dst, O_WRONLY|O_CREAT|O_EXCL, 0666);
     if(tmp != NULL)
         free(tmp);
     if(*fdd < 0)
@@ -181,34 +184,67 @@ int open_files(char *src, char *dst, int *fds, int *fdd)
 }
 
 void xfer_before_error(int block, char *buffer, int src, int dst);
-int skip_to_next_readable(int block, char *buffer, int src, int dst);
+int skip_to_next_readable(int block, char *buffer, int src, int dst, off_t & missed);
     /* return 0 if not found any more readable data, else return 1 */
 int normal_copy(int block, char *buffer, int src, int dst);
     /* return the number of copied bytes (negative value upon error, zero at end of file) */
 
 void copy_max(int src, int dst)
 {
-#define BUF_SIZE 10240
+#define BUF_SIZE 1024
+	// choosing the correct value for BUF_SIZE
+	// too long make I/O error very long to recover
+	// too small make copying under normal condition a bit slow
+	// 1024 seems a balanced choice.
+	//
     char buffer[BUF_SIZE];
     int lu = 0;
+    off_t missed = 0;
+    off_t taille = lseek(src, 0, SEEK_END);
+    lseek(src, 0, SEEK_SET);
 
+    printf("Starting the copy of %u byte(s)\n", taille);
     do
     {
         lu = normal_copy(BUF_SIZE, buffer, src, dst);
         if(lu < 0)
         {
+	    off_t local_missed;
+	    off_t current = lseek(src, 0, SEEK_CUR);
+
+            printf("Error reading source file (we are at %.2f %% of data copied), trying to read further: %s\n", (float)(current)/(float)(taille)*100, strerror(errno));
             xfer_before_error(BUF_SIZE/2, buffer, src, dst);
-            if(skip_to_next_readable(BUF_SIZE/2, buffer, src, dst))
+            if(skip_to_next_readable(BUF_SIZE/2, buffer, src, dst, local_missed))
+	    {
+		printf("Skipping done (missing %u byte(s)), found correct data to read, continuing the copy\n", local_missed);
+		missed += local_missed;
                 lu = 1;
+	    }
             else
+	    {
+		printf("Reached End of File, no correct data could be found after the last error\n");
                 lu = 0;
+	    }
         }
     }
     while(lu > 0);
+
+    printf("Copy finished. Missing %u byte(s) of data (%.2f %% of the total amount of data)\n", missed, (float)(missed)/((float)(taille))*100);
 }
 
 void xfer_before_error(int block, char *buffer, int src, int dst)
 {
+    if(read(src, buffer, 1) == 1)
+    {
+	if(lseek(src, -1, SEEK_CUR) < 0)
+	{
+	    perror("cannot seek back one char");
+	    exit(3);
+	}
+    }
+    else
+	return; // the error is just next char to read
+
     while(block > 1)
     {
         int lu = read(src, buffer, block);
@@ -216,7 +252,7 @@ void xfer_before_error(int block, char *buffer, int src, int dst)
         {
             if(write(dst, buffer, lu) < 0)
             {
-                perror("canot write to destination, aborting");
+                perror("cannot write to destination, aborting");
                 exit(3);
             }
         }
@@ -225,47 +261,74 @@ void xfer_before_error(int block, char *buffer, int src, int dst)
     }
 }
 
-int skip_to_next_readable(int block, char *buffer, int src, int dst)
+int skip_to_next_readable(int block, char *buffer, int src, int dst, off_t & missed)
 {
-    int lu;
-    off_t shift = block;
+    int lu = 0;
+    off_t min = lseek(src, 0, SEEK_CUR), max;
+    missed = min;
 
-        // we assume that we can't read at current position
-        // so we start seeking ...
-    lseek(src, shift, SEEK_CUR);
+	//////////////////////////
+	// first step: looking for a next readable (maybe not the very next readable)
+	// we put its position in "max"
+	//////////////////////////
 
     do
     {
-        lu = read(src, buffer, 1);
-        if(lu < 0)
-        {
-            if(shift*2 > shift) // avoid integer overflow
-                shift *= 2;
-            lseek(src, shift, SEEK_CUR);
-        }
-        else
-        {
-            if(shift > 1)
-            {
-                shift /= 2;
-                lseek(src, -shift, SEEK_CUR);
-            }
-
-        }
+	lu = read(src, buffer, 1);
+	    // once we will read after the end of file, read() will return 0
+	if(lu < 0)
+	{
+	    if(block*2 > block) // avoid integer overflow
+		block *= 2;
+	    lseek(src, block, SEEK_CUR);
+	}
     }
-    while(shift > 1 && lu != 0);
-    if(lu > 0)
-        lseek(dst, lseek(src, 0, SEEK_CUR), SEEK_SET);
+    while(lu < 0);
+    max = lseek(src, 0, SEEK_CUR); // the current position
+
+	//////////////////////////
+	// second step: looking for the very next readable char between offsets min and max
+	//////////////////////////
+
+    while(max - min > 1)
+    {
+	off_t mid = (max + min) / 2;
+	if(lseek(src, mid, SEEK_SET) < 0)
+	{
+	    perror("cannot seek in file");
+	    return 0;
+	}
+	lu = read(src, buffer, 1);
+	switch(lu)
+	{
+	case 1: // valid character read
+	case 0: // still after EOF
+	    max = mid;
+	    break;
+	default: // no character could be read
+	    min = mid;
+	    break;
+	}
+    }
+
+    lseek(src, max, SEEK_SET);
+    lu = read(src, buffer, 1);
+    lseek(src, max, SEEK_SET);
+    lseek(dst, max, SEEK_SET);
         // we eventually make a hole in dst,
         // which will be full of zero
         // see lseek man page.
-
-    return lu;
+    missed = max - missed;
+    if(lu != 1)
+	return 0; // could not find valid char to read
+    else
+	return 1; // there is valid char to read
+    return 1;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_cp.cpp,v 1.4.4.1 2003/12/20 23:05:34 edrusb Rel $";
+    static char id[]="$Id: dar_cp.cpp,v 1.4.4.3 2004/04/25 17:10:25 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -290,8 +353,5 @@ int normal_copy(int block, char *buffer, int src, int dst)
                     ecrit += tmp;
         }
     }
-    else
-        if(lu < 0)
-            perror("error reading source file, trying to read further");
     return lu;
 }

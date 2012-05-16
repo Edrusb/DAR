@@ -1,17 +1,13 @@
-For NEWS, check one of the following sources (or all):
+For NEWS, you can check:
+
+        http://lists.sourceforge.net/lists/listinfo/dar-news
+
+This is a mailing-list, with NNTP and Web gateways. Other pointers of
+informations are:
 
         http://dar.linux.free.fr/
         http://sourceforge.net/projects/dar/
         http://www.99techs.net/cgi-bin/forums/yabb.pl#DARcat
-
-You can also subscribe to the dar-news mailing-list
-
-        http://lists.sourceforge.net/lists/listinfo/dar-news
-
-which can be seen also throw gmane NNTP gateway:
-
-        news://news.gmane.org/gmane.comp.sysutils.backup.dar.announce
-
 
 Four mailing-lists with their corresponding newsgroup on gmane exist about DAR:
 
@@ -19,12 +15,14 @@ http://lists.sourceforge.net/lists/listinfo/dar-news
    for important news about dar (read-only mailing-list)
 
 http://lists.sourceforge.net/lists/listinfo/dar-support
-   for support requests. There is also the alternative of the sourceforge 
+   for support requests. There is also the alternative of the sourceforge
    tracker, if you prefer.
+
+http://lists.sourceforge.net/lists/listinfo/dar-discussion
+   for general discussion EXCEPT all that concerns the technical support and
+   bug report
 
 http://lists.sourceforge.net/lists/listinfo/dar-libdar_api
    a developper area around libdar and its API
 
-http://lists.sourceforge.net/lists/listinfo/dar-discussion
-   for general discussion except what concerns the technical support and 
-   bug report
+
