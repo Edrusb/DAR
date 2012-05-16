@@ -1,5 +1,5 @@
 	ui_printf("\n");
-	ui_printf("options:\n");
+	ui_printf("Common options:\n");
 	ui_printf("   -i <named pipe> use the given pipe instead of standard input to read orders\n");
 	ui_printf("\t\t   from dar\n");
 	ui_printf("   -o <named pipe> use the given pipe instead of standard output to write data\n");

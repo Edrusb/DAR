@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.cpp,v 1.8.4.3 2004/01/31 13:00:53 edrusb Rel $
+// $Id: limitint.cpp,v 1.8.4.4 2004/03/06 23:12:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -237,7 +237,7 @@ namespace libdar
     {
         E_BEGIN;
         if(field < arg.field)
-            throw Erange("limitint::operator", "substracting a infinint greater than the first, infinint can't be negative");
+            throw Erange("limitint::operator", "subtracting a infinint greater than the first, infinint can't be negative");
 
             // now processing the operation
 
@@ -355,7 +355,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: limitint.cpp,v 1.8.4.3 2004/01/31 13:00:53 edrusb Rel $";
+        static char id[]="$Id: limitint.cpp,v 1.8.4.4 2004/03/06 23:12:17 edrusb Rel $";
         dummy_call(id);
     }
 

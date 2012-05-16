@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.13.2.1 2003/12/20 23:05:34 edrusb Rel $
+// $Id: dar_slave.cpp,v 1.13.2.2 2004/03/06 23:12:17 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -59,11 +59,12 @@ char *strchr (), *strrchr ();
 #include "dar_suite.hpp"
 #include "integers.hpp"
 #include "libdar.hpp"
+#include "shell_interaction.hpp"
 
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.2.0"
+#define DAR_SLAVE_VERSION "1.2.1"
 
 static bool command_line(S_I argc, char *argv[], path * &chemin, string & filename,
                          string &input_pipe, string &output_pipe, string & execute);
@@ -210,13 +211,15 @@ static bool command_line(S_I argc,char *argv[], path * &chemin, string & filenam
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_slave.cpp,v 1.13.2.1 2003/12/20 23:05:34 edrusb Rel $";
+    static char id[]="$Id: dar_slave.cpp,v 1.13.2.2 2004/03/06 23:12:17 edrusb Rel $";
     dummy_call(id);
 }
 
 static void show_usage(const char *command)
 {
     char *cmd = tools_extract_basename(command);
+    shell_interaction_change_non_interactive_output(&cout);
+
     try
     {
         ui_printf("\nusage : \n");

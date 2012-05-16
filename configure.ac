@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.1.0], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.1.1], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -77,6 +77,19 @@ AC_FUNC_UTIME_NULL
 AC_HEADER_TIME
 AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror utime])
 
+AC_MSG_CHECKING([for optreset presence])
+AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[#if HAVE_GETOPT_H
+				   #include <getopt.h>
+                                   #endif
+                                   #if HAVE_UNISTD_H
+                                   #include <unistd.h>
+                                   #endif]], [ int x = optreset; return 0; ]),
+                  [
+                   AC_DEFINE(HAVE_OPTRESET, 1, [the optreset external variable exists to reset getopt standard call])
+		   AC_MSG_RESULT(available)
+                  ],
+                  [AC_MSG_RESULT([not available])])
+
 # DAR's features
 AC_ARG_ENABLE(  [ea-support],
                 AC_HELP_STRING(--enable-ea-support,[extended attributes support]),
@@ -85,21 +98,30 @@ AC_ARG_ENABLE(  [ea-support],
                   AC_DEFINE(EA_SUPPORT, [], [if defined, activates support for Extended Attributes])
                 ])
 
-
+AC_MSG_CHECKING([ext2fs.h availability])
 AC_ARG_ENABLE(  [nodump-flag],
                 AC_HELP_STRING(--disable-nodump-flag, [deactivate the ext2/3 nodump flag check feature, if you don't have such filesystem]),
-                [AC_MSG_NOTICE([nodump flag disabled])],
-                [AC_CHECK_HEADER(ext2fs/ext2_fs.h,
+                [AC_MSG_RESULT([nodump flag disabled])],
+                [AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[#include <ext2fs/ext2_fs.h>
+					            #if HAVE_SYS_IOCTL_H
+                                      		    #include <sys/ioctl.h>
+         					    #endif]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]),
                                 [
                                 AC_DEFINE(LIBDAR_NODUMP_FEATURE, [ext2fs], [if defined, activates the ext2/3 nodump flag feature])
+                                AC_MSG_RESULT([found <ext2fs/ext2_fs.h>])
                                 ],
                                 [
-				 AC_CHECK_HEADER(linux/ext2_fs.h,
+				AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[#include <linux/ext2_fs.h>
+							            #if HAVE_SYS_IOCTL_H
+                                      				    #include <sys/ioctl.h>
+         							    #endif]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]),
                                                  [
  				                 AC_DEFINE(LIBDAR_NODUMP_FEATURE, [linux], [if defined, activates the ext2/3 nodump flag feature])
+  						 AC_MSG_RESULT([found <linux/ext2_fs.h>])
                                                  ],
 						 [
-                                                     AC_MSG_NOTICE([cannot find linux/ext2_fs.h header file, nodump-flag feature will not be activated])
+						     AC_MSG_RESULT([NOT FOUND])
+                                                     AC_MSG_WARN([cannot find ext2_fs.h header file, nodump-flag feature will not be activated])
 	                                         ])
                                 ])
 
@@ -114,7 +136,7 @@ AC_ARG_ENABLE(  [os-bits],
                 AC_HELP_STRING(--enable-os-bits=arg, [arg is 32 or 64. If for some reason, one wants to overcome detected system value]),
                 [AC_DEFINE_UNQUOTED(OS_BITS, $enableval, [manually set CPU's registers' size])],
                 [
-                        AC_CHECK_HEADERS(inttypes.h,
+                        AC_CHECK_HEADER(inttypes.h,
                                 [
                                   AC_RUN_IFELSE(
                                         [AC_LANG_PROGRAM([#include <inttypes.h>],

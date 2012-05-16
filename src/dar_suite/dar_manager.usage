@@ -1,5 +1,5 @@
 	ui_printf("\n");
-	ui_printf("options:\n");
+	ui_printf("Common options:\n");
 	ui_printf("   -C <database>   creates an empty database\n");
 	ui_printf("   -B <database>   specify the database to use (read or modify)\n");
 	ui_printf("   -A <archive>    add an archive to the database\n");

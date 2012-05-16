@@ -2,7 +2,7 @@ KNOWN BUGS:
 
 #1: description: files pointed to by a symbolic links get their times
         (mtime & atime) not properly restored
-           
+
     problem: when restoring time of a symbolic link the utime() system call
         does not change the inode of the symbolic link itself but the one of
         the file pointed to by the symbolic link
@@ -28,7 +28,7 @@ KNOWN BUGS:
     affects versions: 1.0.0, 1.0.1
     fixed in version: 1.0.2
 
-        
+
 #3: description: making differential backup with some directory implicitly or
         explicitly (-P) excluded, sometime lead to full backup.
 
@@ -65,9 +65,9 @@ KNOWN BUGS:
            file compressor.cpp line 244 : it seems to be a bug here
    [most outside call]
    -----------------------------------
-        
+
        or
- 
+
    --- exception nature = [alive]  exception type = [BUG] ----------
    [source]
            file compressor.cpp line 254 : it seems to be a bug here
@@ -87,7 +87,7 @@ KNOWN BUGS:
 
     affects version: 1.0.0, 1.0.1, 1.0.2
     fixed in version: 1.0.3
-     
+
 
 #6: description: Dar does not properly display dates on Linux 64 bits
         systems.
@@ -156,8 +156,8 @@ KNOWN BUGS:
 
     solution
         replaced the macro by a proper definition.
-        
-        
+
+
     affects version: 1.2.0
     fixed in version: 1.2.1
 
@@ -250,7 +250,7 @@ KNOWN BUGS:
          [most outside call]
          -----------------------------------
 
-        appeared while doing a backup using compression and scrambling (could 
+        appeared while doing a backup using compression and scrambling (could
         not (yet) be reproduced twice).
 
     problem
@@ -295,17 +295,17 @@ KNOWN BUGS:
     fixed in version 2.0.0
 
 #16 description
-       Dar include does not ignore comments in included file as given by -B 
+       Dar include does not ignore comments in included file as given by -B
        option
 
     problem
-       when a line with only one carriage-return is put in a file, the 
+       when a line with only one carriage-return is put in a file, the
        following line is considered as a normal line (not a comment), whatever
        it is, in particular if it starts with a hash (#).
 
     solution
-       make the algorithm consider normal line once another character than 
-       space, tab hash or carriage-return is met. (added the carriage-return 
+       make the algorithm consider normal line once another character than
+       space, tab hash or carriage-return is met. (added the carriage-return
        in the list).
 
     affects version 1.2.0, 1.2.1, 1.3.0
@@ -321,19 +321,19 @@ KNOWN BUGS:
       the path where is saved the archive is excluded by a -P option.
 
     solution
-      updating the test for the warning only appear in real auto-saving 
+      updating the test for the warning only appear in real auto-saving
       conditions.
 
     affects version 2.0.0
     fixed in version 2.0.1
 
 #17bis description
-      save as #17, but in the case where the archive is in the under the 
+      save as #17, but in the case where the archive is in the under the
       current directory, and some -P options exclude it.
 
     problem
        the current directory "." is not subsititued by its full path, and
-       the testing algorithm does tread "." as directly under the root "/" 
+       the testing algorithm does tread "." as directly under the root "/"
        directory, no -P could thus exclude it from the files to save.
 
     solution
@@ -349,20 +349,20 @@ KNOWN BUGS:
 
     problem
       the parsing code that strip the comments from files
-      is not counting empty lines ('\n') between two lines of commands 
-      (i.e.: uncommented lines). This strips the last uncommented line before the 
-      next line of comment, usually leading to the removal of an ending '\n' 
-      in the uncommented line, implying the fusion of the last command on this 
+      is not counting empty lines ('\n') between two lines of commands
+      (i.e.: uncommented lines). This strips the last uncommented line before the
+      next line of comment, usually leading to the removal of an ending '\n'
+      in the uncommented line, implying the fusion of the last command on this
       line and the next command on any uncommented after the last line of comment
       two commands that were initially separated by a '\n' and one or several lines
-      of comments. This wrongly interpreted command most of the time 
+      of comments. This wrongly interpreted command most of the time
       appear as a member of [list of path] and thus restricts the backup
       to only a subdirectory that most of the time does not exist. If -D option
       is used, all first level directory are excluded from backup and thus
       stored as empty directories.
 
    solution
-      bug fix in no_comment.cpp. A workaround is to remove comments or empty 
+      bug fix in no_comment.cpp. A workaround is to remove comments or empty
       lines from configuration files.
 
    affects versions 2.0.0, 2.0.1
@@ -373,11 +373,11 @@ KNOWN BUGS:
 
     problem
       to get the nodump flag value, dar needs to call the open() system call
-      in read-only mode. For named pipes this system call does return only when 
+      in read-only mode. For named pipes this system call does return only when
       another process opens the same pipe in write mode.
 
     solution
-      as proposed by Joshua Neal, the open will be set to non blocking mode 
+      as proposed by Joshua Neal, the open will be set to non blocking mode
       to return immediately.
 
     affects version 1.3.0, 2.0.0, 2.0.1
@@ -388,7 +388,7 @@ KNOWN BUGS:
       was removed from a database
 
     problem
-      data_dir is a C++ class that inherit from data_tree. This one has a 
+      data_dir is a C++ class that inherit from data_tree. This one has a
       virtual method remove_all_from(), that had was redefined in the data_dir
       class with a very little difference, making it not be a redefinition
       of the inherited class. (argument was "archive_num" in place of "const
@@ -400,3 +400,50 @@ KNOWN BUGS:
 
     affects version 1.3.0, 2.0.0, 2.0.1, 2.0.2
     fixed in version 2.0.3
+
+#21 description
+      under FreeBSD using -B option leads to parse error
+
+    problem
+      under FreeBSD, getopt() call is not reset just by setting optind to
+      zero like under Linux, but the variable optreset must be set to 1.
+
+    solution
+      configure script now check for the presence of optreset variable
+      which allows to properly reset the getopt call according to the
+      system nature.
+
+    affects version 2.1.0 and older
+    fixed in version 2.1.1
+
+#22 description
+      dar stops when fed with an empty file for -B option
+
+    problem
+      the comments stripping class lack a variable initialization
+
+    solution
+      initialize variable before use
+
+    affects version 2.1.0 and older
+    fixed in version 2.1.1
+
+
+#23 description
+      -z -y -H and -w do not work under FreeBSD
+
+    problem
+      the getopt() version does not support optional arguments
+
+    solution
+      implement dar's own getopt() or ask for GNU getopt as
+      a mandatory requirement.
+
+      in the meanwhile, replace
+          -z    by   -z 9
+          -y    by   -y 9
+          -H    by   -H 1
+          -w    by   -w a (which is not equivalent to -w see man page)
+
+    affects version 2.1.0 and older 2.x.x
+    not yet fixed (but fixed if you use GNU getopt)

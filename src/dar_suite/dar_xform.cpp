@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.13.2.1 2003/12/20 23:05:34 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.13.2.2 2004/03/06 23:12:17 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -46,7 +46,7 @@ extern "C"
 using namespace libdar;
 
 #define EXTENSION "dar"
-#define DAR_XFORM_VERSION "1.2.0"
+#define DAR_XFORM_VERSION "1.2.1"
 
 static bool command_line(S_I argc, char *argv[],
                          path * & src_dir, string & src,
@@ -348,13 +348,14 @@ static bool command_line(S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.13.2.1 2003/12/20 23:05:34 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.13.2.2 2004/03/06 23:12:17 edrusb Rel $";
     dummy_call(id);
 }
 
 static void show_usage(const char *command_name)
 {
     char *name = tools_extract_basename(command_name);
+    shell_interaction_change_non_interactive_output(&cout);
 
     try
     {

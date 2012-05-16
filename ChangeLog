@@ -215,3 +215,12 @@ from 2.0.0 to 2.1.0
 - fixed bug #20
 - configure script does not mess with CXXFLAGS or CFLAGS execpt when using
   debugging options.
+
+from 2.1.0 to 2.1.1
+- fixed configure script warning when an include file is "present but cannot
+  be compiled"
+- fixed bug #21
+- fixed bug #22
+- dar_xform and dar_slave now send their help usage on stdout (instead of
+  stderr)
+- fixed typo in error message

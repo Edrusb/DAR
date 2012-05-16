@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.7.4.3 2004/01/15 20:35:55 edrusb Rel $
+// $Id: real_infinint.cpp,v 1.7.4.4 2004/03/06 23:12:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -255,7 +255,7 @@ namespace libdar
             throw SRC_BUG;
 
         if(*this < arg)
-            throw Erange("infinint::operator", "substracting a infinint greater than the first, infinint can't be negative");
+            throw Erange("infinint::operator", "subtracting a infinint greater than the first, infinint can't be negative");
 
             // now processing the operation
 
@@ -698,7 +698,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: real_infinint.cpp,v 1.7.4.3 2004/01/15 20:35:55 edrusb Rel $";
+        static char id[]="$Id: real_infinint.cpp,v 1.7.4.4 2004/03/06 23:12:17 edrusb Rel $";
         dummy_call(id);
     }
 

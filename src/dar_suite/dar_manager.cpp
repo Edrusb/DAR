@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.18.2.2 2003/12/20 23:05:34 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.18.2.3 2004/03/06 23:12:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -46,7 +46,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.2.1"
+#define DAR_MANAGER_VERSION "1.2.2"
 
 enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, move };
 
@@ -361,7 +361,7 @@ static bool command_line(S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.18.2.2 2003/12/20 23:05:34 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.18.2.3 2004/03/06 23:12:17 edrusb Rel $";
     dummy_call(id);
 }
 

@@ -15,5 +15,6 @@ TODO (order is not significant)
 - add examples of use for -I -X -P and [list of path]
 - have dar_manager able to read encrypted archives, and encrypt databases
 - generic_file based read or write caching. to use around catalogue
-  (catalogue::catalogu(generic_file) contructor and catalogue::dump(generic_file) or better in the "none" algorithm for compressor
+  (catalogue::catalogue(generic_file) constructor and catalogue::dump(generic_file) or better in the "none" algorithm for compressor
 - long options on all systems.
+

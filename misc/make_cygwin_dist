@@ -20,7 +20,7 @@ if( -e $build_dir) then
 endif
 mkdir $build_dir
 make clean distclean || echo "ignoring error, tree already clean"
-./configure --prefix=$build_dir --disable-dar-static --disable-static --disable-nodump-flag $3 $4 $5 $6 $7 $8 $9 CXXFLAGS=-O
+./configure --prefix=$build_dir $3 $4 $5 $6 $7 $8 $9 CXXFLAGS=-O
 make
 make install-strip
 mv $build_dir/bin/* $build_dir/lib/*.so.*.*.* $build_dir

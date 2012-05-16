@@ -3,7 +3,7 @@
 	ui_printf("\t\t   read while the second non option argument is the name of the\n");
 	ui_printf("\t\t   new archive to create. Both are mandatory.\n");
 	ui_printf("\n");
-	ui_printf("options:\n");
+	ui_printf("Common options:\n");
 	ui_printf("   -h\t\t   displays this help information\n");
 	ui_printf("   -V\t\t   displays version information\n");
 	ui_printf("   -s <integer>    split the archive in several files of size <integer>\n");
