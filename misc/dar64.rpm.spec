@@ -1,12 +1,12 @@
 # THIS IS A GENERATED FILE DO NOT EDIT !
 summary: DAR - Disk ARchive
 Name: dar
-Version: 2.1.1
+Version: 2.1.2
 Release: 1
 Copyright: GPL
 Icon: dar.gif
 Group: Applications/Archiving
-Source: http://dar.linux.free.fr/dar-2.1.1.tar.gz
+Source: http://dar.linux.free.fr/dar-2.1.2.tar.gz
 URL: http://dar.linux.free.fr/
 BuildRoot: %{_tmppath}/%{name}64-%{version}-%{release}-root
 BuildRequires: zlib-devel >= 1.1.3, gcc-c++, bzip2-devel >= 1.0.2
@@ -45,7 +45,7 @@ make DESTDIR=%{buildroot} install-strip
 /usr/share/man/man1/dar_slave.1
 /usr/share/man/man1/dar_xform.1
 /usr/share/man/man1/dar_cp.1
-/usr/lib/libdar64.so.2.0.1
+/usr/lib/libdar64.so.2.0.2
 /usr/lib/libdar64.so.2
 /usr/lib/libdar64.so
 /usr/lib/libdar64.la

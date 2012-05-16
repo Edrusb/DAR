@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.13.2.2 2004/03/06 23:12:17 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.13.2.4 2004/03/10 21:18:20 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -30,6 +30,7 @@ extern "C"
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+#include "getopt_decision.h"
 } // end extern "C"
 
 #include <iostream>
@@ -348,7 +349,7 @@ static bool command_line(S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.13.2.2 2004/03/06 23:12:17 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.13.2.4 2004/03/10 21:18:20 edrusb Rel $";
     dummy_call(id);
 }
 

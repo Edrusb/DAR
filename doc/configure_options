@@ -40,6 +40,7 @@ x H ...... special-alloc
   K ...... build-usage
   L ...... test-memory
 x M ...... upx
+x N ...... gnugetopt
 
 I, J, K and L are debugging options and should not be set for normal use.
 
@@ -66,23 +67,26 @@ J : if set, transmits the -pedantic option to the compiler
 K : if set, rebuild usage files (requires libxml2)
 L : if set, wrap memory allocation routine to track memory leakage (makes a
     very slow executable)
-M : if set, look for UPX command, and if found compresses library and executables, if no upx is found, does the same as if the option is not given.
+M : if set, look for UPX command, and if found compresses library and executables,
+    if no upx is found, does the same as if the option is not given.
+N : if set (default), looks for libgnugetopt and use the gnu getopt_long()
+    call.
 
 
-For version 2.0.x and 2.1.x
+For version 2.1.x (N option in 2.1.2 appeared to fix a bug)
 -----------------------------
 legend: ! = option available for that system
         . = option Not available for that system
 (free inspiration from the Cisco ping command output)
 
- System \ option   |  A B C D E F G H I J K L M
-enabled by default:|  x   x     x   x         x
-------------------------------------------------
-Linux              |  ! ! ! ! ! ! ! ! ! ! ! ! ! long options supported
-Solaris 8          |  ! . . ! ! . ! ! ! ! ! ! ! long options NOT supported
-FreeBSD            |  ! . . ! ! . ! ! ! ! ! ! ! long options NOT supported
-Cygwin             |  ! . . ! ! . ! ! ! ! ! ! ! long options supported
-NetBSD             |  ! . . ! ! . ! ! ! ! ! ! ! long options NOT supported
+ System \ option   |  A B C D E F G H I J K L M N
+enabled by default:|  x   x     x   x         x x
+---------------------------------------------------
+Linux              |  ! ! ! ! ! ! ! ! ! ! ! ! ! ! long options supported
+Solaris 8          |  ! . . ! ! . ! ! ! ! ! ! ! ! long options supported with libgnugetopt
+FreeBSD            |  ! . . ! ! . ! ! ! ! ! ! ! ! long options supported with libgnugetopt
+Cygwin             |  ! . . ! ! . ! ! ! ! ! ! ! ! long options supported
+NetBSD             |  ! . . ! ! . ! ! ! ! ! ! ! ! long options supported with libgnugetopt
 
 Consequences:
 
@@ -102,3 +106,8 @@ thus will just show a warning. On theses system,
 is equivalent to
         ./configure --disable-nodump-flag --disable-dar-static [...]
 both work the same.
+
+if libgnugetopt library is present and the include file <getopt.h> is also available
+configure will use this library to link against long options will be available in
+resulting dar executable.
+

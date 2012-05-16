@@ -436,14 +436,29 @@ KNOWN BUGS:
       the getopt() version does not support optional arguments
 
     solution
-      implement dar's own getopt() or ask for GNU getopt as
-      a mandatory requirement.
+      document this problem, and make possible to reach any feature
 
       in the meanwhile, replace
           -z    by   -z 9
           -y    by   -y 9
           -H    by   -H 1
-          -w    by   -w a (which is not equivalent to -w see man page)
+          -w    by   -w d (added for the circumstances)
 
-    affects version 2.1.0 and older 2.x.x
-    not yet fixed (but fixed if you use GNU getopt)
+    affects all versions
+    documented starting version 2.1.2 (see dar's man page)
+
+#24 description
+      under windows 2000 SP4 failed to properly save a text file with DOS
+      carriage return. Testing the archive reports CRC error.
+
+    problem
+      The cygwin adaptation layer for dar to be able to run under windows,
+      needs non standard flag mode to not automatically translate between
+      windows and unix carriage return. This bug is related to bug #13
+      which fix was not properly applied in one single place.
+
+    solution
+      properly apply the fix of bug #13 in this single place too.
+
+    affects version 2.1.1 and older
+    fixed in version 2.1.2

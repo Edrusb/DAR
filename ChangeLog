@@ -224,3 +224,12 @@ from 2.1.0 to 2.1.1
 - dar_xform and dar_slave now send their help usage on stdout (instead of
   stderr)
 - fixed typo in error message
+
+
+from 2.1.1 to 2.1.2
+- fixed bug #24
+- added "-w d" option which is equivalent to -w but necessary when dar
+  is not compiled with GNU getopt
+- updated documentation about GNU getopt() vs non GNU getopt()
+- update configure script to have libgnugetopt autodetection
+

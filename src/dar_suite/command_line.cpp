@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.26.2.4 2004/03/06 23:12:17 edrusb Rel $
+// $Id: command_line.cpp,v 1.26.2.8 2004/03/11 20:21:46 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -38,9 +38,7 @@ extern "C"
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#if HAVE_GETOPT_H
-#include <getopt.h>
-#endif
+#include "getopt_decision.h"
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -94,7 +92,7 @@ static void show_license();
 static void show_warranty();
 static void show_version(const char *command_name);
 static void usage(const char *command_name);
-#if HAVE_GETOPT_H
+#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
 static const struct option *get_long_opt();
 #endif
 static S_I reset_getopt(); // return the old position of parsing (next argument to parse)
@@ -555,7 +553,7 @@ static bool get_args_recursive(vector<string> & inclusions,
     S_I rec_c;
     char **rec_v = NULL;
 
-#if HAVE_GETOPT_H
+#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
     while((lu = getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL)) != EOF)
 #else
         while((lu = getopt(argc, argv, OPT_STRING)) != EOF)
@@ -659,7 +657,9 @@ static bool get_args_recursive(vector<string> & inclusions,
                     if(strcmp(optarg, "a") == 0 || strcmp(optarg, "all") == 0)
                         warn_remove_no_match = false;
                     else
-                        throw Erange("get_args", string("unknown option given to -w : ") + optarg);
+			if(strcmp(optarg, "d") != 0 && strcmp(optarg, "default") != 0)
+			    throw Erange("get_args", string("unknown option given to -w : ") + optarg);
+			// else this is the default -w
                 }
                 break;
             case 'p':
@@ -1016,7 +1016,7 @@ static void usage(const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.26.2.4 2004/03/06 23:12:17 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.26.2.8 2004/03/11 20:21:46 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -1401,7 +1401,7 @@ static void show_version(const char *command_name)
     delete name;
 }
 
-#if HAVE_GETOPT_H
+#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
 static const struct option *get_long_opt()
 {
     static const struct option ret[] = {
@@ -1696,7 +1696,7 @@ static char * make_word(generic_file &fic, off_t start, off_t end)
 static void skip_getopt(S_I argc, char *argv[], S_I next_to_read)
 {
     (void)reset_getopt();
-#if HAVE_GETOPT_H
+#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
     while(getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL) != EOF && optind < next_to_read)
         ;
 #else

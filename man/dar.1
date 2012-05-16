@@ -51,7 +51,8 @@ If you want to extract, list, or use these backup as reference, you will only ha
 .PP
 COMMANDS :
 .PP
-Not all system actually support long options (Solaris, FreeBSD, ...). Thus for example --create will not be available on theses system, you will have to use -c instead. This will probably be fixed in the future.
+.B Important note:
+Not all system actually support long options (Solaris, FreeBSD, ...). For example --create will not be available on theses systems, and you will have to use -c instead. In the same way, not all system do support optional arguments (FreeBSD without GNU getopt for example), you then need to explicitly give the argument, for example in place of "-z" you will need to give "-z 9", see "EXPLICIT OPTIONAL ARGUMENTS" paragraph near the end of this document.
 
 .RS
 .TP 20
@@ -305,6 +306,28 @@ the last modification date of the file. The last access time is also saved and r
 filename
 The name of the file.
 .RE
+
+.SH EXPLICIT OPTIONAL ARGUMENTS
+
+When dar has not been compiled with GNU getopt, which is not present by default on some systems like FreeBSD, you may lack the optional arguments syntax. For example "-z" will create a parse error on command-line, or in -B configuration files. The solution is to explicitly give the argument. Here follows a list of explicit argument to use in place of optional ones:
+.TP 20
+-z
+must be replaced by -z 9
+.TP 20
+-y
+must be replaced by -y 9
+.TP 20
+-w
+must be replaced by -w d or -w default
+.TP 20
+-H
+must be replaced by -H 1
+.P
+.B important !
+When using GNU getopt() optional arguments are available by sticking the argument to the option, "-z" for example is available as well as "-z9" , but "-z 9" will be read as "-z" option and "9" as member of [list of path]. When using a non GNU getopt, "-z" becomes an option that requires an argument, and thus "-z 9" is read as "-z" option with "9" as argument, while "-z9" will be rejected as a unknown option. In consequences, you
+.B need
+a space between the option (like "-z") and its argument (like "9"), when optional argument are not available.
+
 
 .SH EXIT CODES
 .B dar

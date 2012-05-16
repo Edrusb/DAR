@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.18.2.3 2004/03/06 23:12:17 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.18.2.5 2004/03/11 20:21:46 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,9 +26,7 @@
 
 extern "C"
 {
-#if HAVE_GETOPT_H
-#include <getopt.h>
-#endif
+#include "getopt_decision.h"
 } // end extern "C"
 
 #include <vector>
@@ -61,7 +59,7 @@ static bool command_line(S_I argc, char *argv[],
                          bool & verbose);
 static void show_usage(const char *command);
 static void show_version(const char *command);
-#if HAVE_GETOPT_H
+#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
 static const struct option *get_long_opt();
 #endif
 static void op_create(const string & base, bool info_details);
@@ -167,7 +165,7 @@ static bool command_line(S_I argc, char *argv[],
     verbose = false;
     string chem, filename;
 
-#if HAVE_GETOPT_H
+#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
     while((lu = getopt_long(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:v", get_long_opt(), NULL)) != EOF)
 #else
 	while((lu = getopt(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:v")) != EOF)
@@ -361,7 +359,7 @@ static bool command_line(S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.18.2.3 2004/03/06 23:12:17 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.18.2.5 2004/03/11 20:21:46 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -711,7 +709,7 @@ static void show_version(const char *command_name)
     delete name;
 }
 
-#if HAVE_GETOPT_H
+#if HAVE_GETOPT_H && ! defined(NO_GNUGETOPT)
 static const struct option *get_long_opt()
 {
     static const struct option ret[] = {

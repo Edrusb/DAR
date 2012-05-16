@@ -14,12 +14,12 @@
         dar.linux@free.fr
 
 I will not answer support requests sent by email: your questions and their
-answers may be interesting to others. For all and to all, thanks to use
-historical forum or sourceforge tracker. See http://dar.linux.free.fr/#help
+answers may be interesting to others. For all and to all, if you need support
+thanks to read  http://dar.linux.free.fr/#help to know how to proceeed.
 
-        else to pass through anti-spam filters, you
+        else for non support requests, you
         need to add "[EARTH IS BEAUTIFUL]" in the subject
-        of your emails.
+        of your emails, to pass anti-spam filter.
 
 Chris Martin is the author of dar-help a little program that builds
 *.usage files from *.xml files. dar-help is used to simplify the maintenance
@@ -44,7 +44,7 @@ An extract of Denis Corbin's resume:
         2000-2002 Network Design, architecture and network support for DCN
                   of Alcatel Submarine Networks, (worked mainly in France,
                   and spend several weeks in USA, Chile and Brazil).
-        2002-2003 DNS maintainer and Firewall admin for Bouygues Telecom 
+        2002-2003 DNS maintainer and Firewall admin for Bouygues Telecom
                   operator's GPRS network.
        since 2003 Network Design and support for SFR's wap and SMS platform,
                   Internet ISP connectivity.
@@ -57,23 +57,25 @@ An extract of Denis Corbin's resume:
               L3 protocols (IP, OSI, OSPF, RIP, ISIS, ESIS, BGP, HSRP, VRRP...)
               L4 protocols (UDP, TCP).
               QoS (CBQ, TBF, RED, etc.)
-              DNS configuration and administrative interfaces.
-              Firewalls admin (Checkpoint, Netscreen, Linux iptables)
-              RIPE administrative interface.
-                
+              DNS configuration and administrative interfaces to network
+              databases,
+              Firewalls admin (Checkpoint, Netscreen, Linux iptables),
+              RIPE administrative interface,
+              Alteon Load Balancers.
+
         Knowledge of
-             SDH networks, Submarine Equipment systems and TMN-OS.
+             SDH networks, Submarine Equipment systems and TMN-OS,
              GSM and GPRS network structure, SS7 and radio protocol.
-             
+
         Practice of the following equipments:
-             Cisco switches and routers
+             Cisco switches and routers (3550 SMI/EMI, 7200, 3600, 1700, 2500)
              Checkpoint Firewalls 4.1 and NG
              Alteon L4-L7 load balancer
              Netscreen Firewalls
              SunOS/Solaris network and hardware administration (less practice
                  for system admin.)
              Linux OS (in particular as router/firewall system).
-              
+
 
        spoken languages: French, English, Italian, Russian.
        extra professional activities: astronomy, photography, occasional

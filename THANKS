@@ -1,3 +1,9 @@
+version 2.1.2
+-------------
+Many thanks to Omer Enbar for his patience, perseverance, and the patch he
+proposed that fixed the bug #24. Thanks again to Arcady Genkin for reporting
+bug #23
+
 version 2.1.1
 -------------
 Bill P. for feedback. Thanks to Arcady Genkin for reporting bug #21, #22, #23

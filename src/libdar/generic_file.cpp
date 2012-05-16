@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.11.2.1 2003/12/20 23:05:34 edrusb Rel $
+// $Id: generic_file.cpp,v 1.11.2.2 2004/03/08 19:19:42 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -378,7 +378,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.11.2.1 2003/12/20 23:05:34 edrusb Rel $";
+        static char id[]="$Id: generic_file.cpp,v 1.11.2.2 2004/03/08 19:19:42 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -474,7 +474,7 @@ namespace libdar
 
         do
         {
-            filedesc = ::open(name, mode, perm|O_BINARY);
+            filedesc = ::open(name, mode|O_BINARY, perm);
             if(filedesc < 0)
                 if(filedesc == ENOSPC)
                     user_interaction_pause("no space left for inode, you have the oportunity to make some room now. When done : can we continue ?");

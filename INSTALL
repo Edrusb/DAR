@@ -31,6 +31,9 @@ You need to have installed:
   see http://www.gzip.org/zlib/ for source code,
 - as well as libbzip2 (tested with version 1.0.2, more recent should also work)
   see http://sources.redhat.com/bzip2/ for source code.
+- GNU getopt is strongly recommended for system that do not have it by default
+  (like FreeBSD), else you won't have long options nor optional arguments,
+  If you are using Linux or Cygwin/Linux you do have GNU getopt.
 
 
 1. configure the package using the configuration script:
@@ -71,6 +74,9 @@ This will install the dar suite binaries, libdar library and include files
 as well as their manual page, sample programs, if built, are never installed.
 'make install' also works but makes bigger binaries as they keep their symbol
 table, which is not useful for normal operations.
+
+Moreover if you had the upx command available in the PATH when "configure" was
+run,  at this step of installation, the binary files will be compressed using upx.
 
 
 

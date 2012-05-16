@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.1.1], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.1.2], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -77,18 +77,49 @@ AC_FUNC_UTIME_NULL
 AC_HEADER_TIME
 AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror utime])
 
+AC_MSG_CHECKING([for getopt() in <unistd.h>])
+AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+                                    #if HAVE_UNISTD_H
+                                    #include <unistd.h>
+                                    #endif
+                                    }]],
+                                    [ getopt(0, NULL, NULL); ]),
+                  [
+                    AC_DEFINE(HAVE_GETOPT_IN_UNISTD_H, 1, [the getopt() call is declared in <unistd.h>])
+                    AC_MSG_RESULT(present)
+                  ],
+                   [AC_MSG_RESULT(absent)])
+
+AC_MSG_CHECKING([for getopt_long() in <unistd.h>])
+AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+                                    #if HAVE_UNISTD_H
+                                    #include <unistd.h>
+                                    #endif
+                                    }]],
+                                    [ getopt_long(0, NULL, NULL, NULL, NULL); ]),
+                  [
+                    AC_DEFINE(HAVE_GETOPT_LONG_IN_UNISTD_H, 1, [the getopt_long() call is declared in <unistd.h>]),
+                    AC_MSG_RESULT(present)
+                  ],
+                   [AC_MSG_RESULT(absent)])
+
+
 AC_MSG_CHECKING([for optreset presence])
-AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[#if HAVE_GETOPT_H
+AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+                                   #if HAVE_GETOPT_H
 				   #include <getopt.h>
-                                   #endif
+                                   #else
                                    #if HAVE_UNISTD_H
                                    #include <unistd.h>
-                                   #endif]], [ int x = optreset; return 0; ]),
+                                   #endif
+                                   #endif
+                                   }]], [ int x = optreset; return 0; ]),
                   [
                    AC_DEFINE(HAVE_OPTRESET, 1, [the optreset external variable exists to reset getopt standard call])
 		   AC_MSG_RESULT(available)
                   ],
                   [AC_MSG_RESULT([not available])])
+
 
 # DAR's features
 AC_ARG_ENABLE(  [ea-support],
@@ -102,19 +133,23 @@ AC_MSG_CHECKING([ext2fs.h availability])
 AC_ARG_ENABLE(  [nodump-flag],
                 AC_HELP_STRING(--disable-nodump-flag, [deactivate the ext2/3 nodump flag check feature, if you don't have such filesystem]),
                 [AC_MSG_RESULT([nodump flag disabled])],
-                [AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[#include <ext2fs/ext2_fs.h>
+                [AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+                                                    #include <ext2fs/ext2_fs.h>
 					            #if HAVE_SYS_IOCTL_H
                                       		    #include <sys/ioctl.h>
-         					    #endif]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]),
+         					    #endif
+                                                    }]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]),
                                 [
                                 AC_DEFINE(LIBDAR_NODUMP_FEATURE, [ext2fs], [if defined, activates the ext2/3 nodump flag feature])
                                 AC_MSG_RESULT([found <ext2fs/ext2_fs.h>])
                                 ],
                                 [
-				AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[#include <linux/ext2_fs.h>
+				AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+		                                                    #include <linux/ext2_fs.h>
 							            #if HAVE_SYS_IOCTL_H
                                       				    #include <sys/ioctl.h>
-         							    #endif]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]),
+         							    #endif
+                                                                    }]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]),
                                                  [
  				                 AC_DEFINE(LIBDAR_NODUMP_FEATURE, [linux], [if defined, activates the ext2/3 nodump flag feature])
   						 AC_MSG_RESULT([found <linux/ext2_fs.h>])
@@ -126,6 +161,12 @@ AC_ARG_ENABLE(  [nodump-flag],
                                 ])
 
                 ])
+
+AC_ARG_ENABLE(  [gnugetopt],
+	        AC_HELP_STRING(--disable-gnugetopt, [avoid linking with libgnugetopt if available]),
+		[AC_DEFINE(NO_GNUGETOPT, 1, [do not use getopt.h header])],
+    	        AC_CHECK_LIB(gnugetopt, [getopt_long], [], [])
+             )
 
 AC_ARG_ENABLE(  [examples],
                 AC_HELP_STRING(--enable-examples, [buld example and testing programs]),
@@ -139,7 +180,9 @@ AC_ARG_ENABLE(  [os-bits],
                         AC_CHECK_HEADER(inttypes.h,
                                 [
                                   AC_RUN_IFELSE(
-                                        [AC_LANG_PROGRAM([#include <inttypes.h>],
+                                        [AC_LANG_PROGRAM([extern "C" {
+						          #include <inttypes.h>
+                                                          }],
                                                          [ uint16_t a  = 0; uint32_t b = 0; uint64_t c = 0;
                                                            int16_t d = 0; int32_t e = 0; int64_t f = 0;
                                                            return a+b+c+d+e+f;

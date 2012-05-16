@@ -75,7 +75,7 @@ if DEBUG_STATIC
 AM_LDFLAGS = -all-static
 endif
 
-dar_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp shell_interaction.cpp shell_interaction.hpp dar.usage
+dar_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp shell_interaction.cpp shell_interaction.hpp dar.usage getopt_decision.h my_getopt_long.h
 dar_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 dar_xform_SOURCES = dar_suite.cpp dar_suite.hpp dar_xform.cpp shell_interaction.cpp shell_interaction.hpp dar_xform.usage
@@ -84,7 +84,7 @@ dar_xform_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 dar_slave_SOURCES =  dar_suite.cpp dar_suite.hpp dar_slave.cpp shell_interaction.cpp shell_interaction.hpp dar_slave.usage
 dar_slave_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
-dar_manager_SOURCES = dar_suite.cpp dar_suite.hpp dar_manager.cpp shell_interaction.cpp shell_interaction.hpp data_tree.cpp data_tree.hpp database.cpp database.hpp database_header.cpp database_header.hpp dar_manager.usage
+dar_manager_SOURCES = dar_suite.cpp dar_suite.hpp dar_manager.cpp shell_interaction.cpp shell_interaction.hpp data_tree.cpp data_tree.hpp database.cpp database.hpp database_header.cpp database_header.hpp dar_manager.usage getopt_decision.h my_getopt_long.h
 dar_manager_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 dar_cp_SOURCES = dar_cp.cpp
