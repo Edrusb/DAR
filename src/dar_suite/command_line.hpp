@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: command_line.hpp,v 1.8 2003/11/18 00:51:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -60,6 +60,9 @@ extern bool get_args(const char *home,
                      bool & flat,
                      infinint & min_compr_size,
                      bool & nodump,
-                     infinint & hourshift);
+                     infinint & hourshift,
+		     bool & warn_remove_no_match,
+		     string & alteration,
+		     bool & empty);
 
 #endif

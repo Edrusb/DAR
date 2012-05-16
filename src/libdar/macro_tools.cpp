@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: macro_tools.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: macro_tools.cpp,v 1.10 2003/11/19 16:57:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -52,9 +52,9 @@ namespace libdar
             try
             {
                 ret = new catalogue(zip);
-                sar *ptr = dynamic_cast<sar *>(&f);
+                contextual *ptr = dynamic_cast<contextual *>(&f);
                 if(ptr != NULL)
-                    ptr->set_info_status(SAR_CONTEXT_OP);
+                    ptr->set_info_status(CONTEXT_OP);
             }
             catch(Egeneric & e)
             {
@@ -75,6 +75,7 @@ namespace libdar
                                   const string &basename,
                                   const string &extension,
                                   S_I options,
+				  crypto_algo crypto,
                                   const string & pass,
                                   generic_file *&ret1,
                                   scrambler *&scram,
@@ -118,17 +119,20 @@ namespace libdar
         if(ret1 == NULL)
             throw Ememory("open_archive");
 
-        if(pass != "")
-        {
+	switch(crypto)
+	{
+	case crypto_scrambling:
             scram = new scrambler(pass, *ret1);
             if(scram == NULL)
                 throw Ememory("open_archive");
             zip_base = scram;
-        }
-        else
-        {
+	    break;
+        case crypto_none:
             scram = NULL;
             zip_base = ret1;
+	    break;
+	default:
+	    throw Erange("macro_tools_open_archive", "unknown encryption algorithm");
         }
 
         ver.read(*ret1);
@@ -147,7 +151,7 @@ namespace libdar
         }
     }
 
-    catalogue *macro_tools_get_catalogue_from(const string &basename, const string &extension)
+    catalogue *macro_tools_get_catalogue_from(const string &basename, const string &extension, crypto_algo crypto, const string & pass)
     {
         generic_file *ret1 = NULL;
         scrambler *scram = NULL;
@@ -165,7 +169,7 @@ namespace libdar
         try
         {
             path where = chemin;
-            macro_tools_open_archive(where, base, extension, SAR_OPT_DONT_ERASE, "",
+            macro_tools_open_archive(where, base, extension, SAR_OPT_DONT_ERASE, crypto, pass,
                                      ret1, scram, ret2, ver, input_pipe, output_pipe, execute);
         
             ret = macro_tools_get_catalogue_from(*ret1, *ret2, false, size);
@@ -194,7 +198,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: macro_tools.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: macro_tools.cpp,v 1.10 2003/11/19 16:57:07 edrusb Rel $";
         dummy_call(id);
     }
 

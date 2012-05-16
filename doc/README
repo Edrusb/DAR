@@ -19,11 +19,14 @@ Document for DAR's end users :
     - overflow algorithms used for fixed bit field integers
     - how to use Parchive (alias PAR) with DAR
     - the Dar User Command (DUC files) convention
+    - Examples of file filtering
     and probably some other topics added recently
 
 sample/README (for people who prefer to start with examples)
 
 Document for developers
-- DOC_API : is the main document for API to libdar (for GUI developers)
-- COMMAND_LINE : is a very brief list of options to dar
+- DOC_API_1 : is the main document for API to libdar (for GUI developers)
+- DOC_API_2 : is specific document for API version 2 (for GUI developers)
+- COMMAND_LINE : is a very brief list of all options to dar
+
 

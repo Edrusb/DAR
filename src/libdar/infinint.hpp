@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: infinint.hpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
+// $Id: infinint.hpp,v 1.8.4.1 2004/01/31 13:00:53 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -26,10 +26,10 @@
 #ifndef INFININT_HPP
 #define INFININT_HPP
 
-#ifndef MODE
+#ifndef LIBDAR_MODE
 #include "real_infinint.hpp"
 #else
-#if MODE == 32
+#if LIBDAR_MODE == 32
 #include "integers.hpp"
 #include "limitint.hpp"
 namespace libdar
@@ -37,7 +37,7 @@ namespace libdar
     typedef limitint<U_32> infinint;
 }
 # else
-#if MODE == 64
+#if LIBDAR_MODE == 64
 #include "integers.hpp"
 #include "limitint.hpp"
 namespace libdar
@@ -49,5 +49,5 @@ namespace libdar
 #endif
 #endif
 #endif
-     
+
 #endif

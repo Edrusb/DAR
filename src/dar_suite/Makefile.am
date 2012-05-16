@@ -24,7 +24,7 @@ endif
 if BUILD_DAR_STATIC
     ALSO_BUILD = dar_static
 else
-    ALSO_BUILD = 
+    ALSO_BUILD =
 endif
 
 #
@@ -33,11 +33,11 @@ endif
 
 if BUILD_MODE32
     MYLIB=dar32
-    AM_CPPFLAGS=-DMODE=32 -I../libdar
+    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar
 else
 if BUILD_MODE64
     MYLIB=dar64
-    AM_CPPFLAGS=-DMODE=64 -I../libdar
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar
 else
     MYLIB=dar
     AM_CPPFLAGS=-I../libdar
@@ -54,10 +54,10 @@ UPX = @UPX_PROG@
 if BUILD_DAR_STATIC
     ALSO_BUILD_INST = $(ALSO_BUILD)$(EXEEXT)
 else
-    ALSO_BUILD_INST = 
+    ALSO_BUILD_INST =
 endif
 
-install-exec-hook : 
+install-exec-hook :
 	cd $(DESTDIR)/$(bindir) ; $(UPX) -9 dar$(EXEEXT) dar_xform$(EXEEXT) dar_slave$(EXEEXT) dar_manager$(EXEEXT) dar_cp$(EXEEXT) $(ALSO_BUILD_INST)
 
 else

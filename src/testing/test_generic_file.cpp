@@ -18,13 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_generic_file.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_generic_file.cpp,v 1.7.4.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -36,6 +38,7 @@
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+} // end extern "C"
 
 #include <iostream>
 
@@ -54,7 +57,7 @@ int main(S_I argc, char *argv[])
         cout << "usage " << argv[0] << " <filename> <filename>" << endl;
         return -1;
     }
-    
+
     fichier f1 = fichier(argv[1], gf_read_only);
     S_I fd = open(argv[2], O_WRONLY|O_CREAT|O_TRUNC|O_BINARY);
     if(fd < 0)
@@ -69,7 +72,7 @@ int main(S_I argc, char *argv[])
     f1.copy_to(f2);
     crc crc1;
     crc crc2;
-    f1.get_crc(crc1);    
+    f1.get_crc(crc1);
     f2.get_crc(crc2);
     if(same_crc(crc1, crc2))
         cout << "CRC OK" << endl;

@@ -5,8 +5,9 @@
 PRESENTATION
 ================
 dar is a shell command, that makes backup of a directory tree and files.
-It has been tested under Linux, Windows (95, 2000, NT, XP) and Solaris 8.
-External GUI are possible thanks to the libdar library and its API.
+It has been tested under Linux, Windows (95, 2000, NT, XP), Solaris 8,
+FreeBSD and NetBSD. External GUI are possible thanks to the libdar library
+and its API.
 
 Actually dar is a set of six commands:
         dar
@@ -19,13 +20,15 @@ Actually dar is a set of six commands:
 
 And since version 2.0.0 theses commands are based on a library called
 libdar. This library is part of dar and licensed under the Gnu General
-Public License (GPL in the following) as all the source code of the Dar
+Public License (GPL in the following) like all the source code of the Dar
 suite programs. This imply that you can link libdar to your programs at
 the condition that your programs are also covered by the GPL, which says
 in particular that you must provide source code of your program. See
 COPYING file for details.
 
-To use the libdar library an API has been defined. See doc/DOC_API
+To use the libdar library an API has been defined. See doc/DOC_API for details
+on this API. Have a look at doc/LINKS to get a non exhaustive list of external
+applications that relies on libdar.
 
 
 PACKAGE CONTENT

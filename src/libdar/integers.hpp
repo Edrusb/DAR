@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: integers.hpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: integers.hpp,v 1.7.4.2 2004/01/28 15:29:46 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -31,11 +31,13 @@
 #ifndef OS_BITS
 
 #if HAVE_INTTYPES_H
+extern "C"
+{
 #include <inttypes.h>
+} // end extern "C"
 
 namespace libdar
 {
-
     typedef uint16_t U_16;
     typedef uint32_t U_32;
     typedef uint64_t U_64;
@@ -46,14 +48,16 @@ namespace libdar
     typedef signed int S_I;
 }
 
-#endif
+#else // HAVE_INTTYPES_H
+#error "Cannot determine interger types, use --enable-os-bits=... with the 'configure' script according to your system's CPU register size"
+#endif // HAVE_INTTYPES_H
 
 #else  //  OS_BITS not defined
 #if OS_BITS == 32
 
 namespace libdar
 {
-    
+
     typedef unsigned short U_16;
     typedef unsigned long U_32;
     typedef unsigned long long U_64;
@@ -82,7 +86,8 @@ namespace libdar
 }
 
 #else
-#error // unknown OS_BITS value ! use --enable-os-bits=... option to configure script
+#error "unknown value given to --enable-os-bits=... check the 'configure' script arguments"
+    // unknown OS_BITS value ! use --enable-os-bits=... option to configure script
     //
     // the previous line should not compile, this is the expected behaviour
 
@@ -90,4 +95,4 @@ namespace libdar
 #endif // OS_BITS == 32
 #endif // OS_BITS not defined
 
-#endif // ifndef
+#endif // header file multiple inclusion protection

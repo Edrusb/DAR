@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.cpp,v 1.8 2003/11/03 11:32:48 edrusb Rel $
+// $Id: limitint.cpp,v 1.8.4.3 2004/01/31 13:00:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,7 +29,7 @@
 #include "erreurs.hpp"
 #include "generic_file.hpp"
 #include "limitint.hpp"
- 
+
 namespace libdar
 {
     typedef unsigned char bitfield[8];
@@ -37,7 +37,7 @@ namespace libdar
     static void swap_bytes(unsigned char &a, unsigned char &b) throw();
     static void swap_bytes(unsigned char *a, U_I size) throw();
     static void expand_byte(unsigned char a, bitfield &bit) throw();
-    template <class B> static B higher_power_of_2(B val); 
+    template <class B> static B higher_power_of_2(B val);
     template <class T> static T rotate_right_one_bit(T v);
 
     template <class B> typename limitint<B>::endian limitint<B>::used_endian = not_initialized;
@@ -73,32 +73,32 @@ namespace libdar
         char *ptr = (char *)&field;
         S_I lu;
         bitfield bf;
-    
+
         while(!fin)
         {
             lu = x.read((char *)&a, 1);
 
             if(lu <= 0)
                 throw Erange("limitint::build_from_file(generic_file)", "reached end of file before all data could be read");
-        
+
             if(a == 0)
                 skip++;
             else // end of size field
             {
                     // computing the size to read
                 U_I pos = 0;
-            
+
                 expand_byte(a, bf);
                 for(S_I i = 0; i < 8; i++)
                     pos = pos + bf[i];
                 if(pos != 1)
                     throw Erange("limitint::build_from_file(generic_file)", "badly formed infinint or not supported format"); // more than 1 bit is set to 1
-            
+
                 pos = 0;
                 while(bf[pos] == 0)
                     pos++;
                 pos += 1; // bf starts at zero, but bit zero means 1 TG of length
-            
+
                 skip *= 8;
                 skip += pos;
                 skip *= TG;
@@ -108,7 +108,7 @@ namespace libdar
 
                 field = 0; // important to also clear "unread" bytes by the following call
                 lu = x.read(ptr, skip.field);
-                
+
                 if(used_endian == not_initialized)
                     setup_endian();
                 if(used_endian == big_endian)
@@ -121,7 +121,7 @@ namespace libdar
         E_END("limitint::read_from_file", "generic_file");
     }
 
- 
+
     template <class B> void limitint<B>::dump(generic_file & x) const throw(Einfinint, Ememory, Erange, Ebug)
     {
         E_BEGIN;
@@ -131,7 +131,7 @@ namespace libdar
         B justification;
         S_I direction = +1;
         unsigned char *ptr, *fin;
-        
+
 
         if(used_endian == not_initialized)
             setup_endian();
@@ -269,12 +269,21 @@ namespace libdar
         E_END("limitint::operator *=", "");
     }
 
+    template <class B> template<class T> limitint<B> limitint<B>::power(const T & exponent) const
+    {
+	limitint ret = 1;
+	for(T count = 0; count < exponent; count++)
+	    ret *= *this;
+
+	return ret;
+    }
+
     template <class B> limitint<B> & limitint<B>::operator /= (const limitint & arg) throw(Einfinint, Erange, Ememory, Ebug)
     {
         E_BEGIN;
         if(arg == 0)
             throw Einfinint("limitint.cpp : operator /=", "division by zero");
-        
+
         field /= arg.field;
         return *this;
         E_END("limitint::operator /=", "");
@@ -285,7 +294,7 @@ namespace libdar
         E_BEGIN;
         if(arg == 0)
             throw Einfinint("limitint.cpp : operator %=", "division by zero");
-        
+
         field %= arg.field;
         return *this;
         E_END("limitint::operator /=", "");
@@ -330,7 +339,7 @@ namespace libdar
     template <class B> U_32 limitint<B>::operator % (U_32 arg) const throw(Einfinint, Ememory, Erange, Ebug)
     {
         E_BEGIN;
-        return U_32(field % arg);   
+        return U_32(field % arg);
         E_END("limitint::modulo", "");
     }
 
@@ -346,7 +355,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: limitint.cpp,v 1.8 2003/11/03 11:32:48 edrusb Rel $";
+        static char id[]="$Id: limitint.cpp,v 1.8.4.3 2004/01/31 13:00:53 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -370,7 +379,7 @@ namespace libdar
         static const T max_T = ~T(0) > 0 ? ~T(0) : ~rotate_right_one_bit(T(1));
         T step = max_T - a;
 
-        if(field < step)
+        if(field < (B)(step) && (T)(field) < step)
         {
             a += field;
             field = 0;
@@ -439,7 +448,7 @@ namespace libdar
     template <class B> static B higher_power_of_2(B val)
     {
         B i = 1;
-                
+
         while(val >> i != 0)
             i++;
 
@@ -475,7 +484,7 @@ namespace libdar
         E_BEGIN;
         limitint<B> ret = a;
         ret *= b;
-    
+
         return ret;
         E_END("operator *", "limitint");
     }
@@ -504,8 +513,8 @@ namespace libdar
     {
         E_BEGIN;
         limitint<B> ret = a;
-        ret >>= bit; 
-        return ret; 
+        ret >>= bit;
+        return ret;
         E_END("operator >>", "limitint, U_32");
     }
 
@@ -513,16 +522,16 @@ namespace libdar
     {
         E_BEGIN;
         limitint<B> ret = a;
-        ret >>= bit; 
-        return ret; 
+        ret >>= bit;
+        return ret;
         E_END("operator >>", "limitint");
     }
 
     template <class B> limitint<B> operator << (const limitint<B> & a, U_32 bit) throw(Erange, Ememory, Ebug, Elimitint)
     {
         E_BEGIN;
-        limitint<B> ret = a; 
-        ret <<= bit; 
+        limitint<B> ret = a;
+        ret <<= bit;
         return ret;
         E_END("operator <<", "limitint, U_32");
     }
@@ -530,9 +539,9 @@ namespace libdar
     template <class B> limitint<B> operator << (const limitint<B> & a, const limitint<B> & bit) throw(Erange, Ememory, Ebug, Elimitint)
     {
         E_BEGIN;
-        limitint<B> ret = a; 
-        ret <<= bit; 
-        return ret; 
+        limitint<B> ret = a;
+        ret <<= bit;
+        return ret;
         E_END("operator <<", "limitint");
     }
 
@@ -549,7 +558,7 @@ namespace libdar
         size_t g = 0;
         time_t h = 0;
         off_t i = 0;
- 
+
             // this forces template instanciation
         t.unstack(a);
         t.unstack(b);
@@ -562,6 +571,8 @@ namespace libdar
         t = infinint(g);
         t = infinint(h);
         t = infinint(i);
+	t.power(d);
+	t.power(t);
         template_instance(x); // this call is never used,
             // this line is only to avoid compilation warning
             // of ... never used function :-)
@@ -622,11 +633,11 @@ namespace libdar
 
     static void maxi_mega_template()
     {
-#if MODE == 32
+#if LIBDAR_MODE == 32
         U_32 x;
         mega_template_instance(x);
 #endif
-#if MODE == 64
+#if LIBDAR_MODE == 64
         U_64 x;
         mega_template_instance(x);
 #endif

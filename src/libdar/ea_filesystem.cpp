@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
+// $Id: ea_filesystem.cpp,v 1.8.4.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -47,6 +49,7 @@ char *strchr (), *strrchr ();
 #endif
 #include <attr/xattr.h>
 #endif
+} // end extern "C"
 
 #include "ea.hpp"
 #include "tools.hpp"
@@ -94,9 +97,9 @@ namespace libdar
         ea_attributs eat;
         ea_attributs res;
         ea_entry one;
-        
+
         ea_filesystem_read_ea(name, eat, true, true);
-        eat.reset_read();    
+        eat.reset_read();
         while(eat.read(one))
         {
             if(one.domain == dom)
@@ -140,12 +143,12 @@ namespace libdar
         try
         {
             ea_entry ea_ent;
-        
+
             val.reset_read();
             while(val.read(ea_ent))
             {
                     // doing this for each attribute
-            
+
                 if(ea_ent.domain == ea_root && !rest_ea_root)
                     continue; // silently skipping this EA
                 if(ea_ent.domain == ea_user && !rest_ea_user)
@@ -218,7 +221,7 @@ namespace libdar
         {
             vector<string> ea_liste = ea_filesystem_get_ea_list_for(n_ptr);
             vector<string>::iterator it = ea_liste.begin();
-        
+
             while(it != ea_liste.end())
             {
                 char *a_name = tools_str2charptr(*it);
@@ -273,7 +276,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea_filesystem.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: ea_filesystem.cpp,v 1.8.4.1 2003/12/20 23:05:34 edrusb Rel $";
 
         dummy_call(id);
     }
@@ -291,7 +294,7 @@ namespace libdar
                 return ret;
             throw Erange("ea_filesystem_get_ea_list_for", string("error retreiving EA list for ")+filename+ " : " + strerror(errno));
         }
-    
+
         liste = new char[taille+MARGIN];
         if(liste == NULL)
             throw Ememory("filesystem : get_ea_list_for");

@@ -18,13 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
+// $Id: dar_suite.cpp,v 1.8.4.2 2004/01/14 13:21:57 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
 #include <iostream>
+#include "integers.hpp"
 #include "dar_suite.hpp"
 #include "user_interaction.hpp"
 #include "shell_interaction.hpp"
@@ -53,7 +54,6 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(int, 
         }
         else
             ret = (*call)(argc, argv, env);
-        shell_interaction_close();
     }
     catch(Efeature &e)
     {
@@ -109,6 +109,22 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(int, 
         user_interaction_warning("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER");
         ret = EXIT_BUG;
     }
+    catch(...)
+    {
+	Ebug x = SRC_BUG;
+	x.dump();
+	user_interaction_warning("CAUGHT A NON (LIB)DAR EXCEPTION");
+        user_interaction_warning("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER");
+    }
+
+    try
+    {
+        shell_interaction_close();
+    }
+    catch(...)
+    {
+	ret = EXIT_UNKNOWN_ERROR;
+    }
     MEM_OUT;
     MEM_END;
     return ret;
@@ -116,6 +132,6 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(int, 
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.8.4.2 2004/01/14 13:21:57 edrusb Rel $";
     dummy_call(id);
 }

@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_infinint.cpp,v 1.9 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_infinint.cpp,v 1.9.4.2 2004/01/15 14:06:29 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -39,6 +41,7 @@
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+} // end extern "C"
 
 #include <iostream>
 
@@ -52,12 +55,14 @@ using namespace libdar;
 using namespace std;
 
 static void routine1();
+static void routine2();
 
 int main()
 {
     MEM_BEGIN;
     MEM_IN;
     routine1();
+    routine2();
     MEM_OUT;
     MEM_END;
 }
@@ -67,7 +72,7 @@ static void routine1()
     infinint f1 = 123;
     infinint f2 = f1;
     infinint f3 = 0;
-    
+
     deci d1 = f1;
     deci d2 = f2;
     deci d3 = f3;
@@ -110,7 +115,7 @@ static void routine1()
     f2 %= 3;
     d2 = deci(f2);
     cout << d2.human() << endl;
-    
+
     f2 >>= 12;
     d2 = deci(f2);
     cout << d2.human() << endl;
@@ -128,7 +133,7 @@ static void routine1()
     cout << d2.human() << endl;
     d3 = deci(f3);
     cout << d3.human() << endl;
-    
+
 
     f1 = 21;
     f2 = 1;
@@ -152,4 +157,14 @@ static void routine1()
     d2 = deci(f2);
     d1 = deci(f1);
     cout << "factoriel(" <<d1.human() << ") = " << d2.human() << endl;
+}
+
+static void routine2()
+{
+    cout << deci(infinint(2).power((U_I)0)).human() << endl;
+    cout << deci(infinint(2).power(infinint(0))).human() << endl;
+    cout << deci(infinint(2).power((U_I)1)).human() << endl;
+    cout << deci(infinint(2).power(infinint(1))).human() << endl;
+    cout << deci(infinint(2).power((U_I)2)).human() << endl;
+    cout << deci(infinint(2).power(infinint(2))).human() << endl;
 }

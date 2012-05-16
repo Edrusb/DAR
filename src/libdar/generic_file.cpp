@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.9 2003/10/18 14:43:07 edrusb Rel $
+// $Id: generic_file.cpp,v 1.11.2.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -59,6 +61,7 @@ char *strchr (), *strrchr ();
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+} // end extern "C"
 
 #include "generic_file.hpp"
 #include "erreurs.hpp"
@@ -98,7 +101,7 @@ namespace libdar
         if(rw == gf_write_only)
             throw Erange("generic_file::read", "reading a write only generic_file");
         else
-            return (this->*active_read)(a, size); 
+            return (this->*active_read)(a, size);
     }
 
     S_I generic_file::write(char *a, size_t size)
@@ -106,7 +109,7 @@ namespace libdar
         if(rw == gf_read_only)
             throw Erange("generic_file::write", "writing to a read only generic_file");
         else
-            return (this->*active_write)(a, size); 
+            return (this->*active_write)(a, size);
     }
 
     S_I generic_file::write(const string & arg)
@@ -231,7 +234,7 @@ namespace libdar
                 diff = true;
         }
         while(!diff && lu1 > 0);
-    
+
         return diff;
     }
 
@@ -239,7 +242,7 @@ namespace libdar
     {
         if(active_read == &generic_file::read_crc)
             throw SRC_BUG; // crc still active, previous CRC value never read
-        clear(value); 
+        clear(value);
         enable_crc(true);
         crc_offset = 0;
     }
@@ -327,7 +330,7 @@ namespace libdar
         infinint pos = q;
         if(lseek(filedesc, 0, SEEK_SET) < 0)
             return false;
-    
+
         do {
             delta = 0;
             pos.unstack(delta);
@@ -375,7 +378,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.9 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: generic_file.cpp,v 1.11.2.1 2003/12/20 23:05:34 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -385,7 +388,7 @@ namespace libdar
 
         if(ret == -1)
             throw Erange("fichier::get_position", string("error getting file position : ") + strerror(errno));
-    
+
         return ret;
     }
 
@@ -407,9 +410,9 @@ namespace libdar
                     throw SRC_BUG; // non blocking read not compatible with
                         // generic_file
                 case EIO:
-                    throw Ehardware("fichier::inherited_read", "");
+                    throw Ehardware("fichier::inherited_read", string("Error while reading from file: ") + strerror(errno));
                 default :
-                    throw Erange("fichier::inherited_read", string("error while reading from file: ") + strerror(errno));
+                    throw Erange("fichier::inherited_read", string("Error while reading from file: ") + strerror(errno));
                 }
             }
             else
@@ -434,12 +437,12 @@ namespace libdar
                 case EINTR:
                     break;
                 case EIO:
-                    throw Ehardware("fichier::inherited_write", strerror(errno));
+                    throw Ehardware("fichier::inherited_write", string("Error while writing to file: ") + strerror(errno));
                 case ENOSPC:
                     user_interaction_pause("no space left on device, you have the oportunity to make room now. When ready : can we continue ?");
                     break;
                 default :
-                    throw Erange("fichier::inherited_write", string("error while writing to file: ") + strerror(errno));
+                    throw Erange("fichier::inherited_write", string("Error while writing to file: ") + strerror(errno));
                 }
             }
             else

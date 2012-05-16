@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: filesystem.hpp,v 1.8.2.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,6 +27,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -34,6 +36,7 @@
 #if HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
+} // end extern "C"
 
 #include <map>
 #include <vector>
@@ -54,18 +57,18 @@ namespace libdar
         void forget_etiquette(file_etiquette *obj);
             // tell the filesystem module that the reference of that etiquette does not
             // exist anymore (not covered by filter for example)
-    
+
     protected:
         void corres_reset() { corres_read.clear(); };
 
         nomme *make_read_entree(path & lieu, const std::string & name, bool see_hard_link, bool ea_root_mode, bool ea_user_mode);
-    
+
     private:
         struct couple
         {
             nlink_t count;
             file_etiquette *obj;
-        };              
+        };
         std::map <ino_t, couple> corres_read;
     };
 
@@ -111,7 +114,7 @@ namespace libdar
         filesystem_diff(const filesystem_diff & ref) { copy_from(ref); };
         filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_diff() { detruire(); };
-        
+
         void reset_read();
         bool read_filename(const std::string & name, nomme * &ref);
             // looks for a file of name given in argument, in current reading directory
@@ -139,7 +142,6 @@ namespace libdar
 
     class filesystem_hard_link_write
     {
-
             // this class is not to be used directly
             // it only provides routines to its inherited classes
             // this not public part is present.
@@ -164,7 +166,6 @@ namespace libdar
             // generate inode or make a hard link on an already restored inode.
         void clear_corres(const infinint & ligne);
 
-
     private:
         struct corres_ino_ea
         {
@@ -173,18 +174,18 @@ namespace libdar
         };
 
         std::map <infinint, corres_ino_ea> corres_write;
-    };          
+    };
 
 
     class filesystem_restore : public filesystem_hard_link_write, public filesystem_hard_link_read
     {
     public:
         filesystem_restore(const path &root, bool x_allow_overwrite, bool x_warn_overwrite, bool x_info_details,
-                           bool root_ea, bool user_ea, bool ignore_owner);
+                           bool root_ea, bool user_ea, bool ignore_owner, bool x_warn_remove_no_match, bool empty);
         filesystem_restore(const filesystem_restore  & ref) { copy_from(ref); };
         filesystem_restore & operator =(const filesystem_restore  & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_restore() { detruire(); };
-        
+
         void reset_write();
         bool write(const entree *x);
             // the argument may be an object from class destroy
@@ -193,21 +194,19 @@ namespace libdar
             // throw exception on other errors
         nomme *get_before_write(const nomme *x);
             // in this case the target has to be removed from the filesystem
-        void pseudo_write(const directory *dir);        
+        void pseudo_write(const directory *dir);
             // do not restore the directory, just stores that we are now
             // inspecting its contents
         bool set_ea(const nomme *e, const ea_attributs & l,
                     bool allow_overwrite,
                     bool warn_overwrite,
                     bool info_details)
-            {  return filesystem_hard_link_write::set_ea(e, l, *current_dir,
-                                                         allow_overwrite,
-                                                         warn_overwrite,
-                                                         info_details); 
+            {  return empty ? true : filesystem_hard_link_write::set_ea(e, l, *current_dir,
+									allow_overwrite,
+									warn_overwrite,
+									info_details);
             };
 
-
-        
     private:
         path *fs_root;
         bool info_details;
@@ -216,8 +215,10 @@ namespace libdar
         bool allow_overwrite;
         bool warn_overwrite;
         bool ignore_ownership;
+	bool warn_remove_no_match;
         std::vector<directory> stack_dir;
         path *current_dir;
+	bool empty;
 
         void detruire();
         void copy_from(const filesystem_restore & ref);

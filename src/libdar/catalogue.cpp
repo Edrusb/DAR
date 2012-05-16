@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.15 2003/10/18 14:43:07 edrusb Rel $
+// $Id: catalogue.cpp,v 1.18.2.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 // to allow compilation under Cygwin we need <sys/types.h>
 // else Cygwin's <netinet/in.h> lack __int16_t symbol !?!
 #if HAVE_SYS_TYPES_H
@@ -50,6 +52,7 @@
 #  include <time.h>
 # endif
 #endif
+} // end extern "C"
 
 #include <algorithm>
 #include <map>
@@ -64,6 +67,8 @@
 #define INODE_FLAG_EA_FULL  0x01
 #define INODE_FLAG_EA_PART  0x02
 #define INODE_FLAG_EA_NONE  0x03
+
+#define REMOVE_TAG "[     REMOVED       ]"
 
 #define SAVED_FAKE_BIT 0x80
 
@@ -111,7 +116,7 @@ namespace libdar
             const inode *ino = dynamic_cast<const inode *>(ref);
             const hard_link *h = dynamic_cast<const hard_link *>(ref);
             const detruit *x = dynamic_cast<const detruit *>(ref);
-                                    
+
             if(ino != NULL && h == NULL) // won't count twice the same inode if it is referenced with hard_link
             {
                 if(ino->get_saved_status() == s_saved)
@@ -172,7 +177,7 @@ namespace libdar
             }
         }
     }
-                        
+
     void entree_stats::listing() const
     {
         ui_printf("\nCATALOGUE CONTENTS :\n\n");
@@ -204,7 +209,7 @@ namespace libdar
         infinint tmp;
         hard_link *ptr_l = NULL;
         file_etiquette *ptr_e = NULL;
-    
+
         S_I lu = f.read(&type, 1);
 
         if(lu == 0)
@@ -380,7 +385,7 @@ namespace libdar
         }
         else
             ea_saved = ea_none;
-        
+
         if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
             throw Erange("inode::inode", "missing data to build an inode");
         uid = ntohs(tmp);
@@ -435,7 +440,7 @@ namespace libdar
                 throw SRC_BUG;
             }
             ea = NULL; // in any case
-            
+
                 // to be able later to read EA from file
             storage = &f;
         }
@@ -540,7 +545,7 @@ namespace libdar
         if(last_cha != NULL)
             delete last_cha;
     }
- 
+
     bool inode::same_as(const inode & ref) const
     {
         return nomme::same_as(ref) && compatible_signature(ref.signature(), signature());
@@ -551,7 +556,7 @@ namespace libdar
         bool more_recent = (!ignore_owner && uid != ref.uid)
             || (!ignore_owner && gid != ref.gid)
             || perm != ref.perm;
-    
+
         if(ref.last_mod < last_mod)
             if(hourshift > 0)
                 more_recent = more_recent || ! is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod);
@@ -683,7 +688,7 @@ namespace libdar
             if(ea != NULL)
                 throw SRC_BUG;
             *ea_offset = 0;
-            *last_cha = 0;      
+            *last_cha = 0;
             break;
         case ea_partial:
             if(ea != NULL)
@@ -701,9 +706,9 @@ namespace libdar
     void inode::ea_attach(ea_attributs *ref)
     {
         if(ref != NULL && ea == NULL)
-            ea = ref; 
+            ea = ref;
         else
-            throw SRC_BUG; 
+            throw SRC_BUG;
         if(ea_saved != ea_full)
             throw SRC_BUG;
     }
@@ -712,7 +717,7 @@ namespace libdar
     {
         if(ea_saved == ea_full)
             if(ea != NULL)
-                return ea; 
+                return ea;
             else
                 if(*ea_offset != 0 && storage != NULL)
                 {
@@ -738,32 +743,32 @@ namespace libdar
                 else
                     throw SRC_BUG;
         else
-            throw SRC_BUG; 
+            throw SRC_BUG;
     }
 
     void inode::ea_detach() const
     {
         if(ea != NULL)
         {
-            delete ea; 
-            const_cast<ea_attributs *&>(ea) = NULL; 
+            delete ea;
+            const_cast<ea_attributs *&>(ea) = NULL;
         }
     }
 
     infinint inode::get_last_change() const
     {
         if(ea_saved != ea_none)
-            return *last_cha; 
+            return *last_cha;
         else
-            throw SRC_BUG; 
+            throw SRC_BUG;
     }
 
     void inode::set_last_change(const infinint & x_time)
     {
         if(ea_saved != ea_none)
-            *last_cha = x_time; 
+            *last_cha = x_time;
         else
-            throw SRC_BUG; 
+            throw SRC_BUG;
     }
 
     compression file::algo = none;
@@ -812,7 +817,7 @@ namespace libdar
             size = new infinint(NULL, &f);
             if(size == NULL)
                 throw Ememory("file::file(generic_file)");
-            
+
             if(saved == s_saved)
             {
                 offset = new infinint(NULL, &f);
@@ -826,7 +831,7 @@ namespace libdar
                 }
                 else // version is "01"
                 {
-                    storage_size = new infinint(*size); 
+                    storage_size = new infinint(*size);
                     if(storage_size == NULL)
                         throw Ememory("file::file(generic_file)");
                     *storage_size *= 2;
@@ -853,7 +858,7 @@ namespace libdar
             throw;
         }
     }
-    
+
     file::file(const file & ref) : inode(ref), chemin(ref.chemin)
     {
         status = ref.status;
@@ -920,10 +925,10 @@ namespace libdar
 
         if(get_saved_status() != s_saved)
             throw Erange("file::get_data", "cannot provide data from a \"not saved\" file object");
-    
+
         if(status == empty)
             throw Erange("file::get_data", "data has been cleaned, object is now empty");
-    
+
         if(status == from_path)
             ret = new fichier(chemin, gf_read_only);
         else
@@ -1098,12 +1103,12 @@ namespace libdar
         nomme::dump(f);
         get_etiquette().dump(f);
     }
- 
+
     void hard_link::set_reference(file_etiquette *ref)
     {
         if(ref == NULL)
             throw SRC_BUG;
-        x_ref = ref; 
+        x_ref = ref;
     }
 
     lien::lien(U_16 uid, U_16 gid, U_16 perm,
@@ -1132,7 +1137,7 @@ namespace libdar
     void lien::set_target(string x)
     {
         set_saved_status(s_saved);
-        points_to = x; 
+        points_to = x;
     }
 
     void lien::sub_compare(const inode & other) const
@@ -1183,7 +1188,7 @@ namespace libdar
         parent = NULL;
         fils.clear();
         it = fils.begin();
-    
+
         try
         {
             while(fin == NULL)
@@ -1194,7 +1199,7 @@ namespace libdar
                     d = dynamic_cast<directory *>(p);
                     fin = dynamic_cast<eod *>(p);
                     t = dynamic_cast<nomme *>(p);
-                
+
                     if(t != NULL) // p is a "nomme"
                         fils.push_back(t);
                     if(d != NULL) // p is a directory
@@ -1224,7 +1229,7 @@ namespace libdar
         vector<nomme *>::iterator x = const_cast<directory *>(this)->fils.begin();
         inode::dump(f);
         eod fin;
-    
+
         while(x != fils.end())
             if(dynamic_cast<ignored *>(*x) != NULL)
                 x++; // "ignored" need not to be saved, they are only useful when updating_destroyed
@@ -1233,12 +1238,12 @@ namespace libdar
 
         fin.dump(f); // end of "this" directory
     }
-        
+
     void directory::add_children(nomme *r)
     {
         directory *d = dynamic_cast<directory *>(r);
         nomme *ancien;
-    
+
         if(search_children(r->get_name(), ancien))
         {
             directory *a_dir = const_cast<directory *>(dynamic_cast<const directory *>(ancien));
@@ -1270,7 +1275,7 @@ namespace libdar
     void directory::reset_read_children() const
     {
         directory *moi = const_cast<directory *>(this);
-        moi->it = moi->fils.begin(); 
+        moi->it = moi->fils.begin();
     }
 
     bool directory::read_children(const nomme *&r) const
@@ -1297,7 +1302,7 @@ namespace libdar
         it = fils.begin();
     }
 
-    void directory::listing(const mask &m, string marge) const
+    void directory::listing(const mask &m, bool filter_unsaved, string marge) const
     {
         vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
 
@@ -1321,35 +1326,37 @@ namespace libdar
                 {
                     if(hard != NULL)
                         ino = hard->get_inode();
-                
+
                     if(ino == NULL)
                         throw SRC_BUG;
                     else
-                    {
-                        string a = local_perm(*ino);
-                        string b = local_uid(*ino);
-                        string c = local_gid(*ino);
-                        string d = local_size(*ino);
-                        string e = local_date(*ino);
-                        string f = local_flag(*ino);
-                        string g = (*it)->get_name();
+			if(!filter_unsaved || ino->get_saved_status() != s_not_saved || d != NULL
+			   || ino->ea_get_saved_status() != ea_none)
+			{
+			    string a = local_perm(*ino);
+			    string b = local_uid(*ino);
+			    string c = local_gid(*ino);
+			    string d = local_size(*ino);
+			    string e = local_date(*ino);
+			    string f = local_flag(*ino);
+			    string g = (*it)->get_name();
 
-                        ui_printf("%S%S\t%S\t%S\t%S\t%S\t%S\t%S\n", &marge, &a, &b, &c, &d, &e, &f, &g);
-                    }
+			    ui_printf("%S%S\t%S\t%S\t%S\t%S\t%S\t%S\n", &marge, &a, &b, &c, &d, &e, &f, &g);
+			}
                 }
-            
+
                 if(d != NULL)
                 {
-                    d->listing(m, marge + "|  ");
+                    d->listing(m, filter_unsaved, marge + "|  ");
                     ui_printf("%S+---\n", &marge);
                 }
             }
-        
+
             it++;
         }
     }
 
-    void directory::tar_listing(const mask &m, const string & beginning) const
+    void directory::tar_listing(const mask &m, bool filter_unsaved, const string & beginning) const
     {
         vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
         string sep = beginning == "" ? "" : "/";
@@ -1368,38 +1375,44 @@ namespace libdar
                 if(det != NULL)
                 {
                     string tmp = (*it)->get_name();
-                    ui_printf("[     REMOVED       ] %S%S%S\n", &beginning, &sep, &tmp);
+		    if(tar_listing_callback == NULL)
+			ui_printf("%s %S%S%S\n", REMOVE_TAG, &beginning, &sep, &tmp);
+		    else
+			(*tar_listing_callback)(REMOVE_TAG, "xxxxxxxxxx", "", "", "", "", beginning+sep+tmp);
                 }
                 else
                 {
                     if(hard != NULL)
                         ino = hard->get_inode();
-                
+
                     if(ino == NULL)
                         throw SRC_BUG;
                     else
-                    {
-                        string a = local_perm(*ino);
-                        string b = local_uid(*ino);
-                        string c = local_gid(*ino);
-                        string d = local_size(*ino);
-                        string e = local_date(*ino);
-                        string f = local_flag(*ino);
-                        string g = (*it)->get_name();
+			if(!filter_unsaved || ino->get_saved_status() != s_not_saved
+			   || ino->ea_get_saved_status() != ea_none)
+			{
+			    string a = local_perm(*ino);
+			    string b = local_uid(*ino);
+			    string c = local_gid(*ino);
+			    string d = local_size(*ino);
+			    string e = local_date(*ino);
+			    string f = local_flag(*ino);
+			    string g = (*it)->get_name();
 
-                        if(tar_listing_callback == NULL)
-                            ui_printf("%S   %S   %S\t%S\t%S\t%S\t%S%S%S\n", &f, &a, &b, &c, &d, &e, &beginning, &sep, &g);
-                        else
-                            (*tar_listing_callback)(f, a, b, c, d, e, beginning+sep+g);
-                    }
-                }
-            }
+			    if(tar_listing_callback == NULL)
+				ui_printf("%S   %S   %S\t%S\t%S\t%S\t%S%S%S\n", &f, &a, &b, &c, &d, &e, &beginning, &sep, &g);
+			    else
+				(*tar_listing_callback)(f, a, b, c, d, e, beginning+sep+g);
+			}
+			// else do nothing
+		}
+	    }
 
-            if(d != NULL)
-                d->tar_listing(m, beginning + sep + (*it)->get_name());
+	    if(d != NULL)
+		d->tar_listing(m, filter_unsaved, beginning + sep + (*it)->get_name());
 
-            it++;
-        }
+	    it++;
+	}
     }
 
     bool directory::search_children(const string &name, nomme *&ref)
@@ -1416,6 +1429,93 @@ namespace libdar
         }
         else
             return false;
+    }
+
+    bool directory::callback_for_children_of(const string & sdir) const
+    {
+	const directory *current = this;
+	const nomme *next_nom = NULL;
+	const directory *next_dir = NULL;
+	const inode *next_ino = NULL;
+	const detruit *next_detruit = NULL;
+	string segment;
+	bool loop = true;
+	nomme *tmp_nom;
+
+	if(sdir != "")
+	{
+	    path dir = sdir;
+
+	    if(!dir.is_relative())
+		throw Erange("directory::recursive_callback_for_children_of", "argument must be a relative path");
+
+		///////////////////////////
+		// looking for the inner most directory (basename of given path)
+		//
+
+	    do
+	    {
+		if(!dir.pop_front(segment))
+		{
+		    segment = dir.display();
+		    loop = false;
+		}
+
+		if(const_cast<directory *>(current)->search_children(segment, tmp_nom))
+		{
+		    next_nom = const_cast<const nomme *>(tmp_nom);
+		    next_dir = dynamic_cast<const directory *>(next_nom);
+		    if(next_dir != NULL)
+			current = next_dir;
+		    else
+			return false;
+		}
+		else
+		    return false;
+	    }
+	    while(loop);
+	}
+
+	    ///////////////////////////
+	    // invoking callback for each element of the "current" directory
+	    //
+
+	if(current == NULL)
+	    throw SRC_BUG;
+	if(tar_listing_callback == NULL)
+	    throw Erange("directory::recursive_callback_for_children_of", "tar callback not set");
+
+	loop = false; // loop now serves as returned value
+
+	current->reset_read_children();
+	while(current->read_children(next_nom))
+	{
+	    next_ino = dynamic_cast<const inode *>(next_nom);
+	    next_detruit = dynamic_cast<const detruit *>(next_nom);
+	    if(next_ino != NULL)
+	    {
+		 string a = local_perm(*next_ino);
+		 string b = local_uid(*next_ino);
+		 string c = local_gid(*next_ino);
+		 string d = local_size(*next_ino);
+		 string e = local_date(*next_ino);
+		 string f = local_flag(*next_ino);
+		 string g = next_ino->get_name();
+		 (*tar_listing_callback)(f,a,b,c,d,e,g);
+		 loop = true;
+	    }
+	    else
+		if(next_detruit != NULL)
+		{
+		    string a = next_detruit->get_name();
+		    (*tar_listing_callback)(REMOVE_TAG, "xxxxxxxxxx", "", "", "", "", a);
+		    loop = true;
+		}
+		else
+		    throw SRC_BUG; // unknown class
+	}
+
+	return loop;
     }
 
     device::device(U_16 uid, U_16 gid, U_16 perm,
@@ -1498,7 +1598,7 @@ namespace libdar
         unsigned char a;
         saved_status st;
         unsigned char base;
-        
+
         f.read((char *)&a, 1); // need to read the signature before constructing "contenu"
         if(! extract_base_and_status(a, base, st))
             throw Erange("catalogue::catalogue(generic_file &)", "incoherent catalogue structure");
@@ -1519,10 +1619,10 @@ namespace libdar
 
     catalogue & catalogue::operator = (const catalogue &ref)
     {
-        detruire(); 
-        out_compare = ref.out_compare; 
-        partial_copy_from(ref); 
-        return *this; 
+        detruire();
+        out_compare = ref.out_compare;
+        partial_copy_from(ref);
+        return *this;
     }
 
     void catalogue::reset_read()
@@ -1542,7 +1642,7 @@ namespace libdar
     bool catalogue::read(const entree * & ref)
     {
         const nomme *tmp;
-    
+
         if(current_read->read_children(tmp))
         {
             const directory *dir = dynamic_cast<const directory *>(tmp);
@@ -1600,7 +1700,7 @@ namespace libdar
     {
         if(! sub.is_relative())
             throw SRC_BUG;
-    
+
         if(sub_tree != NULL)
             delete sub_tree;
         sub_tree = new path(sub);
@@ -1644,7 +1744,7 @@ namespace libdar
                 {
                     ref = xtmp;
                     directory *dir = dynamic_cast<directory *>(xtmp);
-                
+
                     if(dir != NULL)
                     {
                         current_read = dir;
@@ -1687,7 +1787,7 @@ namespace libdar
             {
                 const directory *dir = dynamic_cast<const directory *>(ref);
                 const eod *fin = dynamic_cast<const eod *>(ref);
-            
+
                 if(dir != NULL)
                     sub_count++;
                 if(fin != NULL)
@@ -1753,7 +1853,7 @@ namespace libdar
         const directory *dir = dynamic_cast<const directory *>(target);
         const eod *fin = dynamic_cast<const eod *>(target);
         const nomme *nom = dynamic_cast<const nomme *>(target);
-        
+
         if(out_compare.degre() > 1) // actually scanning a inexisting directory
         {
             if(dir != NULL)
@@ -1769,7 +1869,7 @@ namespace libdar
                         else // both cases are bugs, but need to know which case is generating a bug
                             throw SRC_BUG; // out_compare.degre() > 0 but cannot pop !
                 }
-        
+
             return false;
         }
         else // scanning an existing directory
@@ -1785,7 +1885,7 @@ namespace libdar
                 extracted = target;
                 return true;
             }
-            
+
             if(nom == NULL)
                 throw SRC_BUG; // ref, is neither a eod nor a nomme ! what's that ???
 
@@ -1797,13 +1897,13 @@ namespace libdar
                 const inode *dst_ino = dynamic_cast<const inode *>(found);
                 const etiquette *src_eti = dynamic_cast<const etiquette *>(nom);
                 const etiquette *dst_eti = dynamic_cast<const etiquette *>(found);
-            
+
                     // extracting inode from hard links
                 if(src_eti != NULL)
                     src_ino = src_eti->get_inode();
                 if(dst_eti != NULL)
                     dst_ino = dst_eti->get_inode();
-         
+
                     // updating internal structure to follow directory tree :
                 if(dir != NULL)
                 {
@@ -1834,7 +1934,7 @@ namespace libdar
                             return false;
                     else
                         throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a nomme which is neither detruit nor inode !
-            
+
                 if(dst_eti != NULL)
                     extracted = dst_eti->get_inode();
                 else
@@ -1860,7 +1960,7 @@ namespace libdar
         const detruit *pro_det;
         const nomme *pro_nom;
         infinint count = 0;
-    
+
         ref.reset_read();
         while(ref.read(projo))
         {
@@ -1868,7 +1968,7 @@ namespace libdar
             pro_dir = dynamic_cast<const directory *>(projo);
             pro_det = dynamic_cast<const detruit *>(projo);
             pro_nom = dynamic_cast<const nomme *>(projo);
-        
+
             if(pro_eod != NULL)
             {
                 directory *tmp = current->get_parent();
@@ -1877,7 +1977,7 @@ namespace libdar
                 current = tmp;
                 continue;
             }
-        
+
             if(pro_det != NULL)
                 continue;
 
@@ -1906,29 +2006,29 @@ namespace libdar
         return count;
     }
 
-    void catalogue::listing(const mask &m, string marge) const
+    void catalogue::listing(const mask &m, bool filter_unsaved, string marge) const
     {
         ui_printf("access mode    | user | group | size  |          date                 | [data ][ EA  ][compr] |   filename\n");
         ui_printf("---------------+------+-------+-------+-------------------------------+-----------------------+-----------\n");
-        contenu->listing(m, marge); 
+        contenu->listing(m, filter_unsaved, marge);
     }
 
-    void catalogue::tar_listing(const mask &m, const string & beginning) const
+    void catalogue::tar_listing(const mask &m, bool filter_unsaved, const string & beginning) const
     {
         void (*tmp)(const std::string & flags, const std::string & perm, const std::string & uid, const std::string & gid,
-		    const std::string & size, const std::string & date, const std::string & filename);  
+		    const std::string & size, const std::string & date, const std::string & filename);
         directory::get_tar_listing_callback(tmp);
         if(tmp == NULL)
         {
             ui_printf("[data ][ EA  ][compr] | permission | user  | group | size  |          date                 |    filename\n");
             ui_printf("----------------------+------------+-------+-------+-------+-------------------------------+------------\n");
         }
-        contenu->tar_listing(m, beginning); 
+        contenu->tar_listing(m, filter_unsaved, beginning);
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.15 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: catalogue.cpp,v 1.18.2.1 2003/12/20 23:05:34 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1975,7 +2075,7 @@ namespace libdar
 
         U_32 perm = ref.get_perm();
         if(!extract_base_and_status(ref.signature(), (unsigned char &)type, st))
-            throw SRC_BUG;    
+            throw SRC_BUG;
 
         if(type == 'f')
             type = '-';
@@ -2036,7 +2136,7 @@ namespace libdar
                 ret += 'T';
             else
                 ret += '-';
-    
+
         return ret;
     }
 
@@ -2070,7 +2170,7 @@ namespace libdar
     {
         return tools_display_date(ref.get_last_modif());
     }
-    
+
     static string local_flag(const inode & ref)
     {
         string ret;
@@ -2116,7 +2216,7 @@ namespace libdar
                     ret += "[Worse]";
         else
             ret += "[-----]";
-    
+
         return ret;
     }
 
@@ -2127,7 +2227,7 @@ namespace libdar
 
         signature &= ~SAVED_FAKE_BIT;
         if(!isalpha(signature))
-            return false; 
+            return false;
         base = tolower(signature);
 
         if(fake)

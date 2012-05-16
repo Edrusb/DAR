@@ -1,17 +1,17 @@
 if BUILD_MODE32
     MYLIB=dar32
-    AM_CPPFLAGS=-DMODE=32 -I../libdar -I../dar_suite
+    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -I../dar_suite
 else
 if BUILD_MODE64
     MYLIB=dar64
-    AM_CPPFLAGS=-DMODE=64 -I../libdar -I../dar_suite
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -I../dar_suite
 else
     MYLIB=dar
     AM_CPPFLAGS=-I../libdar -I../dar_suite
 endif
 endif
 
-noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint
+noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar
 LDADD = -L../libdar -l$(MYLIB)
 AM_LDFLAGS = -all-static
 noinst_HEADERS = testtools.hpp
@@ -67,6 +67,9 @@ test_storage_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 test_special_alloc_SOURCES = test_special_alloc.cpp ../dar_suite/shell_interaction.cpp
 test_special_alloc_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
-test_limitint_SOURCES = test_limitint.cpp ../dar_suite/shell_interaction.cpp 
+test_limitint_SOURCES = test_limitint.cpp ../dar_suite/shell_interaction.cpp
 test_limitint_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 test_limitint_CXXFLAGS = -Wno-long-long
+
+test_libdar_SOURCES = test_libdar.cpp
+test_libdar_DEPENDENCIES = ../libdar/lib$(MYLIB).la ../libdar/libdar.hpp ../libdar/tools.hpp

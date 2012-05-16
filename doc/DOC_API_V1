@@ -68,12 +68,12 @@ and add to CPPFLAGS the following:
         -I<somewhere>/libdar
 
 replacing <somewhere> by the path where has been installed the libdar headers
-(if other than /usr/include/dar or /usr/local/include/dar). Also important, your
-compiler must be a C/C++ compiler to understand the class syntax (GNU g++ is the one I
-use with which you can also compile pure C ANSI code).
+(if other than /usr/include/dar or /usr/local/include/dar). Also important, 
+your compiler must be a C/C++ compiler to understand the class syntax (GNU g++
+is the one I use with which you can also compile pure C ANSI code).
 
-If you plane to compile against the libdar32 or libdar64 version (instead of the
-infinint based default version), you need to add either -DMODE=32 or
+If you plane to compile against the libdar32 or libdar64 version (instead of
+the infinint based default version), you need to add either -DMODE=32 or
 -DMODE=64 to CPPFLAGS. The libdar32 is generated giving --enable-mode=32 to the
 configure script in dar's package, and the libdar64 with --enable-mode=64.
 
@@ -86,17 +86,17 @@ libdar among other library. This can be done as usual with something like:
 
         -ldar -lz -lbz2
 
-But if as previously seen in II you have not installed dar in standard directory
-(like /usr/lib or /usr/local/lib ...) you need to tell where is located the library
-giving the following argument:
+But if as previously seen in II you have not installed dar in standard 
+directory (like /usr/lib or /usr/local/lib ...) you need to tell where is 
+located the library giving the following argument:
 
         -L<somwhere> -ldar -lz -lbz2
 
 where <somewhereelse> is the path to libdar.a or libdar.so if available.
 
-Note that if you use the libdar32 or libdar64 variant library, you must first compile
-your program giving -DMODE=32 or -DMODE=64 respectively and replace -ldar by one of the
-following line:
+Note that if you use the libdar32 or libdar64 variant library, you must first 
+compile your program giving -DMODE=32 or -DMODE=64 respectively and replace 
+-ldar by one of the following line:
 
         -ldar32
 or
@@ -292,8 +292,8 @@ notation that you will see in the following of the documentation:
 
 note also that here we saw variable initialization (declaration + definition of
 the value) which is not the same as variable assignment (change of the value
-of an already existing value), but classes provided by libdar support both, thus
-you can use for example:
+of an already existing value), but classes provided by libdar support both, 
+thus you can use for example:
 
         titi my_object = 19; /* this is an initialization */
         my_object = "new value"; /* this is an assignment */
@@ -1025,11 +1025,14 @@ First you will need to include "erreurs.hpp" header file. It defines the
 exceptions hierarchy used by dar.
 
 all exceptions type are inherited from the Egeneric pure virtual class. You
-will rarely need to use it directly. It is like a template for other exceptions, in the way it defines for all the same way to interact with them. In particular, all the inherited exceptions types, use the
+will rarely need to use it directly. It is like a template for other exceptions
+in the way it defines for all the same way to interact with them. In 
+particular, all the inherited exceptions types, use the
 
         string get_message();
 
-method, which returns a string explaining the nature of the error. The inherited exceptions type are:
+method, which returns a string explaining the nature of the error. The 
+inherited exceptions type are:
         
         Ememory : when virtual memory has been exhausted
         Ebug : when dar detected a condition that should never happen,

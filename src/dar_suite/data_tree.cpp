@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.cpp,v 1.11.2.1 2003/12/14 13:57:54 edrusb Rel $
+// $Id: data_tree.cpp,v 1.11.4.2 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 // to allow compilation under Cygwin we need <sys/types.h>
 // else Cygwin's <netinet/in.h> lack __int16_t symbol !?!
 #if HAVE_SYS_TYPES_H
@@ -33,6 +35,7 @@
 #if HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
+} // end extern "C"
 
 #include <iomanip>
 #include "data_tree.hpp"
@@ -124,7 +127,7 @@ bool data_tree::get_data(archive_num & archive) const
         }
         it++;
     }
-    
+
     return archive != 0;
 }
 
@@ -145,7 +148,7 @@ bool data_tree::get_EA(archive_num & archive) const
         }
         it++;
     }
-    
+
     return archive != 0;
 }
 
@@ -167,7 +170,7 @@ bool data_tree::read_EA(archive_num num, infinint & val) const
 {
     map<archive_num, infinint>::iterator it = const_cast<data_tree *>(this)->last_change.find(num);
     map<archive_num, infinint>::iterator fin = const_cast<data_tree *>(this)->last_change.end();
-    
+
     if(it != fin)
     {
         val = it->second;
@@ -209,10 +212,10 @@ bool data_tree::remove_all_from(const archive_num & archive)
 void data_tree::listing() const
 {
     map<archive_num, infinint>::iterator it, fin_it, ut, fin_ut;
-    
+
     ui_printf("Archive number |  Data      |  EA\n");
     ui_printf("---------------+------------+------------\n");
-    
+
     it = const_cast<data_tree *>(this)->last_mod.begin();
     fin_it = const_cast<data_tree *>(this)->last_mod.end();
     ut = const_cast<data_tree *>(this)->last_change.begin();
@@ -461,7 +464,7 @@ const data_tree *data_dir::read_child(const string & name) const
 {
     list<data_tree *>::iterator it = const_cast<data_dir *>(this)->rejetons.begin();
     list<data_tree *>::iterator fin = const_cast<data_dir *>(this)->rejetons.end();
-    
+
     while(it != fin && *it != NULL && (*it)->get_name() != name)
         it++;
 
@@ -477,7 +480,7 @@ const data_tree *data_dir::read_child(const string & name) const
 bool data_dir::remove_all_from(const archive_num & archive)
 {
     list<data_tree *>::iterator it = rejetons.begin();
-    
+
     while(it != rejetons.end())
     {
         if((*it) == NULL)
@@ -514,7 +517,7 @@ void data_dir::show(archive_num num, string marge) const
         if(data || ea)
         {
             etat = string(data ? "[Data]" : "[    ]") + (ea ? "[EA]" : "[  ]");
-        
+
             ui_printf("%S  %S%S\n", &etat, &marge, &name);
         }
         if(dir != NULL)
@@ -572,7 +575,7 @@ void data_dir::add_child(data_tree *fils)
 void data_dir::remove_child(const string & name)
 {
     list<data_tree *>::iterator it = rejetons.begin();
-    
+
     while(it != rejetons.end() && *it != NULL && (*it)->get_name() != name)
         it++;
 
@@ -625,7 +628,7 @@ bool data_tree_find(path chemin, const data_dir & racine, const data_tree *& ptr
             }
         }
     }
-    
+
     return ptr != NULL;
 }
 
@@ -638,7 +641,7 @@ void data_tree_update_with(const directory *dir, archive_num archive, data_dir *
     {
         const directory *entry_dir = dynamic_cast<const directory *>(entry);
         const inode *entry_ino = dynamic_cast<const inode *>(entry);
-        
+
         if(entry_ino == NULL)
             continue; // continue with next loop
         else
@@ -706,7 +709,7 @@ static data_tree *read_from_file(generic_file & f)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: data_tree.cpp,v 1.11.2.1 2003/12/14 13:57:54 edrusb Rel $";
+    static char id[]="$Id: data_tree.cpp,v 1.11.4.2 2003/12/20 23:05:34 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -730,8 +733,8 @@ static void write_to_file(generic_file &f, archive_num a)
 
 static void display_line(archive_num num, const infinint *data, const infinint *ea)
 {
-    string data_date = data == NULL ? "   " : tools_display_date(*data); 
+    string data_date = data == NULL ? "   " : tools_display_date(*data);
     string ea_date = ea == NULL ? "   " : tools_display_date(*ea);
-    
+
     ui_printf(" \t%u\t%S\t%S\n", num, &data_date, &ea_date);
 }

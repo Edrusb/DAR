@@ -12,16 +12,8 @@ dar_suite directory
 examples directory
   contains few programs that illustrate the use of infinint
 
-libdl directory
-  contains nothing. It has been added when porting dar to Solaris, having
-  met some problem to build static version of dar. On this sytem the libdl
-  library is not provided as a static version, only the dynamic version exists.
-  For this reason static linking is not possible for dar. I was trying a work
-  around to build a fake libdl library, but this failed. CVS cannot remove
-  directories, thus libdl will stay here.
-
 testing directory
-  contains a pletor for very simple program that helped be validate each C++
+  contains a pletor for very simple program that helped me validate each C++
   module of dar. They are to be used in step by step debugging and in
   conjunction with variable watch. This program are not intended to be used
   except by developers.

@@ -1,26 +1,19 @@
 TODO (order is not significant)
 ===========
 - libdar library thread safe
-- libdar API version 2 (see doc/ DOC_API)
 - multi-language support (selection at compilation time)
 - rethink the behavior of dar when virtual memory is exhausted
   (do not fail stop asking the user whether to retry or stop, thus the routine
    must not need extra memory to work)
 - have wild card for -f and -r options of dar_manager
 - check the apache "Order" directive for command-line more grained inclusion/exclusion mechanism
-- add a global compression ratio displayed with -v -l option (computed once for all during creation).
 - add a 'testing' option for dar_manager's databases
-- redesign libdar API with open/close paradigm (see Notes)
 - have the possibility to define a given compression algo + level by file type
-- have several -B option which are called in order
 - add EA support for xfs filesystem
 - add KiB and KB
-- code review for constructor use in initialization
-- add link to mini-howto in documentation
 - add long-options under Solaris and on other system that do not provide it.
-- add new option to remove *all* user interaction (see support request) -Q option.
-- add an option to remove *all* un-necessary messages (not warning ones) -q option.
-- allow root directory to be a symbolic link to a directory
-- add an option to list only saved files of an archive
-- have -E be executed even without slicing when creating an archive
-- documentation of tools.hpp beside API documentation
+- add examples of use for -I -X -P and [list of path]
+- have dar_manager able to read encrypted archives, and encrypt databases
+- generic_file based read or write caching. to use around catalogue
+  (catalogue::catalogu(generic_file) contructor and catalogue::dump(generic_file) or better in the "none" algorithm for compressor
+- long options on all systems.

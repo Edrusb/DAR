@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: generic_file.hpp,v 1.8.2.2 2004/01/28 15:29:46 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,10 +27,13 @@
 
 #pragma interface
 
+extern "C"
+{
 #include "../my_config.h"
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+} // end extern "C"
 
 #include "infinint.hpp"
 #include "path.hpp"
@@ -47,13 +50,13 @@ namespace libdar
     enum gf_mode { gf_read_only, gf_write_only, gf_read_write };
 
 // note :
-// the read and write method are similar to the read and write system call
-// except that they never return negative values, but throw exception instead
-// returning zero means end of generic_file, and the call is blocking if
-// no data is available
-// write returns the number of bytes written, and never make partial writtingss
-// this it is blocked until all bytes are written or occures an exception
-// thus the returned value is always the value of the size argument.
+// the read and write method are similar to the read and write system calls
+// except that they never return negative values, but throw exception instead.
+// returning zero means end of generic_file. The call is blocking if
+// no data is available for reading.
+// write returns the number of bytes written, and never make partial writting
+// it is blocked until all bytes are written or an exception occured
+// thus the returned value is always the value of the argument "size".
 
     extern gf_mode generic_file_get_mode(S_I fd);
     extern const std::string generic_file_get_name(gf_mode mode);
@@ -63,7 +66,7 @@ namespace libdar
     public :
         generic_file(gf_mode m) { rw = m; clear(value); crc_offset = 0; enable_crc(false); };
         virtual ~generic_file() {};
-    
+
         gf_mode get_mode() const { return rw; };
         S_I read(char *a, size_t size);
         S_I write(char *a, size_t size);
@@ -73,7 +76,7 @@ namespace libdar
         virtual bool skip_to_eof() = 0;
         virtual bool skip_relative(S_I x) = 0;
         virtual infinint get_position() = 0;
-    
+
         void copy_to(generic_file &ref);
         void copy_to(generic_file &ref, crc & value);
             // generates CRC on copied data
@@ -132,6 +135,18 @@ namespace libdar
         S_I filedesc;
 
         void open(const char *name, gf_mode m);
+    };
+
+#define CONTEXT_INIT "init"
+#define CONTEXT_OP   "operation"
+
+    class contextual : public generic_file
+    {
+    public :
+	contextual(gf_mode m) : generic_file(m) {};
+
+	virtual void set_info_status(const std::string & s) = 0;
+        virtual std::string get_info_status() const = 0;
     };
 
 } // end of namespace

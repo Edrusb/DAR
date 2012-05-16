@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.hpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: sar.hpp,v 1.7 2003/11/15 00:16:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -33,9 +33,6 @@
 #include "path.hpp"
 #include "integers.hpp"
 
-#define SAR_CONTEXT_INIT "init"
-#define SAR_CONTEXT_OP   "operation"
-
 namespace libdar
 {
     const int SAR_OPT_WARN_OVERWRITE = 0x01;
@@ -43,7 +40,7 @@ namespace libdar
     const int SAR_OPT_PAUSE          = 0x04;
     const int SAR_OPT_DEFAULT = SAR_OPT_WARN_OVERWRITE;
 
-    class sar : public generic_file
+    class sar : public contextual
     {
     public:
         sar(const std::string & base_name, const std::string & extension, S_I options, const path & dir, const std::string & execute = "");
@@ -61,8 +58,9 @@ namespace libdar
         infinint get_first_sub_file_size() const { return first_size; };
         bool get_total_file_number(infinint &num) const { num = of_last_file_num; return of_last_file_known; };
         bool get_last_file_size(infinint &num) const { num = of_last_file_size; return of_last_file_known; };
-        
-        void set_info_status(std::string s) { status = s; };
+
+	    // inherited methods from contextual
+        void set_info_status(const std::string & s) { status = s; };
         std::string get_info_status() const { return status; };
 
     protected :

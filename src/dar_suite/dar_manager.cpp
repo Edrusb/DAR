@@ -18,15 +18,18 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.17.2.1 2003/12/15 20:33:40 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.18.2.2 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_GETOPT_H
 #include <getopt.h>
 #endif
+} // end extern "C"
 
 #include <vector>
 #include <string>
@@ -358,7 +361,7 @@ static bool command_line(S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.17.2.1 2003/12/15 20:33:40 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.18.2.2 2003/12/20 23:05:34 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -386,7 +389,7 @@ static void op_add(const string & base, const string &arg, string fake, bool inf
     {
         if(info_details)
             user_interaction_warning("Reading catalogue of the archive to add...");
-        catalogue *catal = macro_tools_get_catalogue_from(arg, EXTENSION);
+        catalogue *catal = macro_tools_get_catalogue_from(arg, EXTENSION, crypto_none, "");
 
         try
         {

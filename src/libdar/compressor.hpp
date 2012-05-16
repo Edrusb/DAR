@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: compressor.hpp,v 1.5.4.1 2004/01/28 15:29:46 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,7 +27,6 @@
 
 #pragma interface
 
-#include "../my_config.h"
 #include "generic_file.hpp"
 #include "integers.hpp"
 #include "wrapperlib.hpp"
@@ -51,7 +50,7 @@ namespace libdar
             // compressed_side is owned by the object and will be
             // deleted a destructor time
         ~compressor();
-    
+
         void flush_write(); // flush all data to compressed_side, and reset the compressor
             // for that additional write can be uncompresssed starting at this point.
         void flush_read(); // reset decompression engine to be able to read the next block of compressed data
@@ -61,7 +60,7 @@ namespace libdar
 
         compression get_algo() const { return current_algo; };
         void change_algo(compression new_algo, U_I new_compression_level = 9);
-    
+
             // inherited from generic file
         bool skip(const infinint & position) { flush_write(); flush_read(); clean_read(); return compressed->skip(position); };
         bool skip_to_eof()  { flush_write(); flush_read(); clean_read(); return compressed->skip_to_eof(); };
@@ -82,7 +81,7 @@ namespace libdar
             xfer(U_I sz, wrapperlib_mode mode);
             ~xfer();
         };
-    
+
         xfer *compr, *decompr;
         generic_file *compressed;
         bool compressed_owner;
@@ -95,7 +94,7 @@ namespace libdar
         S_I gzip_read(char *a, size_t size);
             // S_I zip_read(char *a, size_t size);
             // S_I bzip2_read(char *a, size_t size); // using gzip_read, same code thanks to wrapperlib
-    
+
         S_I (compressor::*write_ptr) (char *a, size_t size);
         S_I none_write(char *a, size_t size);
         S_I gzip_write(char *a, size_t size);

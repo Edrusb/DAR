@@ -1,3 +1,8 @@
+<!-- X-URL: http://gradha.sdf-eu.org/textos/dar-differential-backup-mini-howto.en.html -->
+<!-- Date: Tue, 23 Dec 2003 14:59:21 GMT -->
+<!-- Last-Modified: Sat, 06 Dec 2003 15:00:23 GMT -->
+<BASE HREF="http://gradha.sdf-eu.org/textos/dar-differential-backup-mini-howto.en.html">
+
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -6,7 +11,7 @@
 <meta name="generator" content="Docutils 0.3.0: http://docutils.sourceforge.net/" />
 <title>DAR differential backup mini-howto</title>
 <meta name="author" content="Grzegorz Adam Hankiewicz" />
-<meta name="date" content="2003-10-19" />
+<meta name="date" content="2003-12-06" />
 <meta name="copyright" content="This document has been placed in the public domain." />
 <link rel="stylesheet" href="default.css" type="text/css" />
 </head>
@@ -22,9 +27,9 @@
 <tr><th class="docinfo-name">Contact:</th>
 <td><a class="first last reference" href="mailto:gradha&#64;titanium.sabren.com">gradha&#64;titanium.sabren.com</a></td></tr>
 <tr><th class="docinfo-name">Date:</th>
-<td>2003-10-19</td></tr>
+<td>2003-12-06</td></tr>
 <tr><th class="docinfo-name">Version:</th>
-<td>1.10</td></tr>
+<td>1.13</td></tr>
 <tr class="field"><th class="docinfo-name">Web site:</th><td class="field-body"><a class="reference" href="http://gradha.sdf-eu.org/">http://gradha.sdf-eu.org/</a></td>
 </tr>
 <tr><th class="docinfo-name">Copyright:</th>
@@ -89,7 +94,7 @@ what the weird markup in the text version is for). See
 <div class="section" id="simple-dar-usage">
 <h1><a class="toc-backref" href="#id3" name="simple-dar-usage">Simple DAR usage</a></h1>
 <blockquote>
-<p>DAR is very similar to tar in the number of options it has:
+<p><a class="reference" href="http://dar.linux.free.fr/">DAR</a> is very similar to tar in the number of options it has:
 there's plenty for every need, but way too much for beginners to
 handle. As usual, you can always get help from the program typing
 <tt class="literal"><span class="pre">dar</span> <span class="pre">-h</span></tt> or <tt class="literal"><span class="pre">man</span> <span class="pre">dar</span></tt> after you have installed it. Like tar,
@@ -115,8 +120,9 @@ $ dar -c my_backup_file safecopy.py/ translate_chars.py/
  0 files(s) recorded as deleted from reference backup
  --------------------------------------------
  Total number of file considered: 19
-$ ls (mejorar esto, en anchura y con -F)
-mailbox_date_trimmer  mailbox_reader  my_backup_file.1.dar  safecopy.py  sdb.py  translate_chars.py
+$ ls
+mailbox_date_trimmer/  my_backup_file.1.dar  sdb.py/
+mailbox_reader/        safecopy.py/          translate_chars.py/
 </pre>
 <p>As you will notice, <a class="reference" href="http://dar.linux.free.fr/">DAR</a> will add a number and extension to your
 name. The purpose of the extension is clear, it helps to know
@@ -148,7 +154,7 @@ Continuing...
  --------------------------------------------
  Total number of file considered: 15
 $ ls
-safecopy.py  translate_chars.py
+safecopy.py/  translate_chars.py/
 </pre>
 </blockquote>
 </div>
@@ -203,7 +209,7 @@ scripts called periodically by cron (<a class="reference" href="#setting-up-some
 to automate the process</a>), so I don't mind having long command
 lines, and this very same document serves for the purpose of
 documenting the scripts. If you prefer configuration files,
-read DAR's documentation to find out how to use them and the
+read <a class="reference" href="http://dar.linux.free.fr/">DAR</a>'s documentation to find out how to use them and the
 format they use.</p>
 </blockquote>
 </div>
@@ -418,7 +424,7 @@ FILE=${DIR}/`/bin/date -I`_data
 doesn't have all of them included in the default
 environment. This is potentially a security risk. Ideally you
 would like to compile <a class="reference" href="http://dar.linux.free.fr/">DAR</a> as root and keep your binaries where
-you make them so nobody can touch them. And run tripwire over
+you make them so nobody can touch them. And run <a class="reference" href="http://www.tripwire.org/">Tripwire</a> over
 them too.</li>
 <li><a class="reference" href="http://dar.linux.free.fr/">DAR</a> generates statistics after each run. We don't want them
 in our cron because it will generate unnecesary mail. Only

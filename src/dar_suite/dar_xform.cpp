@@ -18,16 +18,19 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.11 2003/10/18 14:43:07 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.13.2.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+} // end extern "C"
 
 #include <iostream>
 #include "sar.hpp"
@@ -43,7 +46,7 @@
 using namespace libdar;
 
 #define EXTENSION "dar"
-#define DAR_XFORM_VERSION "1.1.0"
+#define DAR_XFORM_VERSION "1.2.0"
 
 static bool command_line(S_I argc, char *argv[],
                          path * & src_dir, string & src,
@@ -81,7 +84,8 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
         {
             generic_file *dst_sar = NULL;
             generic_file *src_sar = NULL;
-            
+	    sar *tmp_sar = NULL;
+
             if(dst != "-")
                 shell_interaction_change_non_interactive_output(&cout);
             try
@@ -94,7 +98,7 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
                 if(src == "-")
                 {
                     generic_file *tmp = new tuyau(0, gf_read_only);
-                    
+
                     if(tmp == NULL)
                         throw Ememory("main");
                     try
@@ -111,11 +115,16 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
                         throw;
                     }
                 }
-                else
-                    src_sar = new sar(src, EXTENSION, SAR_OPT_DEFAULT, *src_dir, execute_src);
-                if(src_sar == NULL)
-                    throw Ememory("main");
-                
+                else 	// source not from a pipe
+		{
+                    tmp_sar = new sar(src, EXTENSION, SAR_OPT_DEFAULT, *src_dir, execute_src);
+		    if(tmp_sar == NULL)
+			throw Ememory("main");
+		    else
+			tmp_sar->set_info_status(CONTEXT_OP);
+		    src_sar = tmp_sar;
+		}
+
                 if(size == 0)
                     if(dst == "-")
                         dst_sar = sar_tools_open_archive_tuyau(1, gf_write_only);
@@ -168,7 +177,7 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
         }
         delete src_dir;
         delete dst_dir;
-        
+
         return EXIT_OK;
     }
     else
@@ -247,7 +256,7 @@ static bool command_line(S_I argc, char *argv[],
                                 user_interaction_warning("invalid size for option -S");
                                 return false;
                             }
-                            
+
                         }
                         else
                             throw Erange("command_line", "only one -S option is allowed");
@@ -276,7 +285,7 @@ static bool command_line(S_I argc, char *argv[],
                 if(execute_dst == "")
                     execute_dst = optarg;
                 else
-                    user_interaction_warning("only one -E option is allowed, ignoring other instances");
+		    execute_dst += string(" ; ") + optarg;
                 break;
             case 'F':
                 if(optarg == NULL)
@@ -284,12 +293,12 @@ static bool command_line(S_I argc, char *argv[],
                 if(execute_src == "")
                     execute_src = optarg;
                 else
-                    user_interaction_warning("only one -F option is allowed, ignoring other instances");
+		    execute_src += string(" ; ") + optarg;
                 break;
             case ':':
                 throw Erange("command_line", string("missing parameter to option ") + char(optopt));
             case '?':
-                user_interaction_warning(string("ignoring unknown option ") + char(optopt)); 
+                user_interaction_warning(string("ignoring unknown option ") + char(optopt));
                 break;
             default:
                 throw SRC_BUG;
@@ -339,7 +348,7 @@ static bool command_line(S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.11 2003/10/18 14:43:07 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.13.2.1 2003/12/20 23:05:34 edrusb Rel $";
     dummy_call(id);
 }
 

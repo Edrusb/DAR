@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: tronc.cpp,v 1.7.2.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -43,6 +45,7 @@ char *strchr (), *strrchr ();
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+} // end extern "C"
 
 #include "tronc.hpp"
 
@@ -51,7 +54,7 @@ namespace libdar
 
     tronc::tronc(generic_file *f, const infinint & offset, const infinint &size) : generic_file(f->get_mode())
     {
-        ref = f; 
+        ref = f;
         sz = size;
         start = offset;
         current = size; // forces skipping the first time
@@ -59,7 +62,7 @@ namespace libdar
 
     tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(mode)
     {
-        ref = f; 
+        ref = f;
         sz = size;
         start = offset;
         current = size; // forces skipping the firt time
@@ -100,7 +103,7 @@ namespace libdar
             }
             else
             {
-                bool r = ref->skip_relative(x); 
+                bool r = ref->skip_relative(x);
                 if(r)
                     current -= -x;
                 else
@@ -110,7 +113,7 @@ namespace libdar
                 }
                 return r;
             }
-    
+
         if(x > 0)
             if(current + x >= sz)
             {
@@ -137,7 +140,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tronc.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: tronc.cpp,v 1.7.2.1 2003/12/20 23:05:35 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -160,8 +163,6 @@ namespace libdar
                     lu += ret;
                     macro_pas -= ret;
                 }
-                if(ret < 0)
-                    throw Erange("tronc::inherited_read", strerror(errno));
             }
             else
                 ret = 0;
@@ -192,12 +193,10 @@ namespace libdar
                 wrote += ret;
                 macro_pas -= ret;
             }
-            if(ret < 0)
-                throw Erange("tronc::inherited_write", strerror(errno));
         }
         while(ret > 0);
         current += wrote;
-    
+
         return wrote;
     }
 

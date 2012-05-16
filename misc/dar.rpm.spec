@@ -1,12 +1,12 @@
 # THIS IS A GENERATED FILE DO NOT EDIT !
 summary: DAR - Disk ARchive
 Name: dar
-Version: 2.0.4
-Release: 9
+Version: 2.1.0
+Release: 1
 Copyright: GPL
 Icon: dar.gif
 Group: Applications/Archiving
-Source: http://dar.linux.free.fr/dar-2.0.4.tar.gz
+Source: http://dar.linux.free.fr/dar-2.1.0.tar.gz
 URL: http://dar.linux.free.fr/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: zlib-devel >= 1.1.3, gcc-c++, bzip2-devel >= 1.0.2
@@ -28,7 +28,7 @@ make clean
 rm -rf %{buildroot}
 
 %build
-./configure --enable-os-bits=32 --prefix=/usr --mandir=/usr/share/man
+./configure CXXFLAGS=-O --prefix=/usr --mandir=/usr/share/man
 make
 
 %install
@@ -45,8 +45,8 @@ make DESTDIR=%{buildroot} install-strip
 /usr/share/man/man1/dar_slave.1
 /usr/share/man/man1/dar_xform.1
 /usr/share/man/man1/dar_cp.1
-/usr/lib/libdar.so.1.0.2
-/usr/lib/libdar.so.1
+/usr/lib/libdar.so.2.0.0
+/usr/lib/libdar.so.2
 /usr/lib/libdar.so
 /usr/lib/libdar.la
 /usr/lib/libdar.a
@@ -69,6 +69,12 @@ make DESTDIR=%{buildroot} install-strip
 /usr/include/dar/storage.hpp
 /usr/include/dar/tuyau.hpp
 /usr/include/dar/tools.hpp
+/usr/include/dar/catalogue.hpp
+/usr/include/dar/scrambler.hpp
+/usr/include/dar/archive.hpp
+/usr/include/dar/header_version.hpp
+/usr/include/dar/ea.hpp
+/usr/include/dar/crypto.hpp
 /usr/bin/dar
 /usr/bin/dar_xform
 /usr/bin/dar_slave
@@ -82,7 +88,8 @@ make DESTDIR=%{buildroot} install-strip
 /usr/share/dar/LIMITATIONS
 /usr/share/dar/NOTES
 /usr/share/dar/TUTORIAL
-/usr/share/dar/DOC_API
+/usr/share/dar/DOC_API_V1
+/usr/share/dar/DOC_API_V2
 /usr/share/dar/GOOD_BACKUP_PRACTICE
 /usr/share/dar/README
 /usr/share/dar/dar-differential-backup-mini-howto.en.html

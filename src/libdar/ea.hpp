@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.hpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
+// $Id: ea.hpp,v 1.8.4.1 2004/01/28 15:29:46 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -81,7 +81,7 @@ namespace libdar
     
         void check() const {}; // actually empty, but additional checks could be added
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(ea_attributs);
 #endif
 

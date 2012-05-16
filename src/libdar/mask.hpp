@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.hpp,v 1.9 2003/10/24 11:10:57 edrusb Rel $
+// $Id: mask.hpp,v 1.9.4.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,6 +29,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -36,6 +38,7 @@
 #if HAVE_REGEX_H
 #include <regex.h>
 #endif
+} // end extern "C"
 
 #include <string>
 #include <vector>
@@ -88,7 +91,7 @@ namespace libdar
         void detruit() { if(the_mask != NULL) delete the_mask; the_mask = NULL; };
     };
 
-    
+
         // matches regular expressions (see "man 7 regex")
     class regular_mask : public mask
     {
@@ -139,7 +142,7 @@ namespace libdar
         U_I size() const { return lst.size(); };
     protected :
         std::vector<mask *> lst;
-    
+
     private :
         void copy_from(const et_mask & m);
         void detruit();
@@ -161,7 +164,7 @@ namespace libdar
 
         bool is_covered(const std::string &ch) const;
         mask *clone() const { return new simple_path_mask(*this); };
-    
+
     private :
         path chemin;
     };
@@ -171,7 +174,7 @@ namespace libdar
     {
     public :
         same_path_mask(const std::string &p) { chemin = p; };
-    
+
         bool is_covered(const std::string &ch) const { return ch == chemin; };
         mask *clone() const { return new same_path_mask(*this); };
 

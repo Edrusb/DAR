@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_compressor.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_compressor.cpp,v 1.6.4.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -35,6 +37,7 @@
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+} // end extern "C"
 
 #include "compressor.hpp"
 #include "integers.hpp"
@@ -66,11 +69,11 @@ static void f1()
         fichier dst1 = open("tutu.none", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
         fichier dst2 = open("tutu.gz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
         fichier dst3 = open("tutu.bz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
-        
+
         compressor c1 = compressor(none, dst1);
         compressor c2 = compressor(gzip, dst2);
         compressor c3 = compressor(bzip2, dst3);
-        
+
         src1.copy_to(c1);
         src2.copy_to(c2);
         src3.copy_to(c3);
@@ -111,11 +114,11 @@ static void f1()
         fichier dst1 = open("tutu.none.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
         fichier dst2 = open("tutu.gz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
         fichier dst3 = open("tutu.bz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644);
-        
+
         compressor c1 = compressor(none, src1);
         compressor c2 = compressor(gzip, src2);
         compressor c3 = compressor(bzip2, src3);
-        
+
         c1.copy_to(dst1);
         try
         {

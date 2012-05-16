@@ -22,9 +22,12 @@
 	ui_printf("   -P <path>\t   subdirectory of the filesystem root (-R) to exclude from the\n");
 	ui_printf("\t\t   operation\n");
 	ui_printf("   -n\t\t   don't overwrite files\n");
-	ui_printf("   -w\t\t   don't warn before overwriting files\n");
+	ui_printf("   -w[a]\t   don't warn before overwriting files, -wa to avoid warning\n");
+	ui_printf("\t\t   when overwriting *and* removing files.\n");
 	ui_printf("\t\t   by default overwriting is allowed but a warning is issued\n");
-	ui_printf("\t\t   first\n");
+	ui_printf("\t\t   first. For file removal, a warning is issued when the type\n");
+	ui_printf("\t\t   of the file to be removed does not match the expected type\n");
+	ui_printf("\t\t   of file stored in the archive of reference.\n");
 	ui_printf("   -b\t\t   ring the terminal bell when user action is required\n");
 	ui_printf("   -O\t\t   do not consider user and group ownership\n");
 	ui_printf("   -H [N]\t   ignore shift of an exact number of M hours if M less than or\n");
@@ -46,6 +49,8 @@
 	ui_printf("\t\t   (given with -A option)\n");
 	ui_printf("   -B <filename>   read options from given file\n");
 	ui_printf("   -N\t\t   do not read ~/.darrc nor /etc/darrc configuration file\n");
+	ui_printf("   -e\t\t   dry run, do not really save/restore, but show all possible\n");
+	ui_printf("\t\t   warning messages as if it was for real\n");
 	ui_printf("\n");
 	ui_printf("   [path list]\t   subdirectories of the filesystem root (-R) to consider (all\n");
 	ui_printf("\t\t   by default) -- see also -P\n");
@@ -97,6 +102,7 @@
 	ui_printf("Listing options (to use with -l):\n");
 	ui_printf("   -T\t\t   tree output format. This was the default format used before\n");
 	ui_printf("\t\t   version 1.2.0\n");
+	ui_printf("   -as\t\t   only list saved files in the archive\n");
 	ui_printf("\n\n");
 	ui_printf("See man page for more details, not all common options are available for each\n");
 	ui_printf(" mode of operation.\n");

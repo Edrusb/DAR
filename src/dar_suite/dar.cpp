@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar.cpp,v 1.9 2003/10/18 14:43:07 edrusb Rel $
+// $Id: dar.cpp,v 1.14 2003/11/19 00:43:46 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -79,6 +79,9 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
     const char *home = tools_get_from_env(env, "HOME");
     bool nodump;
     infinint hourshift;
+    bool warn_remove_no_match;
+    string alteration;
+    bool empty;
 
     if(home == NULL)
         home = "/";
@@ -95,12 +98,13 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
                   pass, pass_ref,
                   compr_mask,
                   flat, min_compr_size, nodump,
-                  hourshift))
+                  hourshift, warn_remove_no_match,
+		  alteration, empty))
         return EXIT_SYNTAX;
     else
     {
         MEM_IN;
-
+	archive *arch = NULL;
         shell_interaction_set_beep(beep);
 
         if(filename != "-"  || (output_pipe != "" && op != create && op != isolate))
@@ -111,51 +115,67 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
         try
         {
             statistics st;
+	    string tmp_pass;
+	    crypto_algo crypto;
 
             switch(op)
             {
             case create:
-                st = op_create(*fs_root, *sauv_root, ref_root, *selection, *subtree, filename, EXTENSION,
-                               ref_filename, allow_over, warn_over, info_details, pause, empty_dir,
+		if(ref_filename != NULL && ref_root != NULL)
+		{
+		    crypto_split_algo_pass(pass_ref, crypto, tmp_pass);
+		    arch = new archive(*ref_root, *ref_filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute_ref, info_details);
+		}
+		crypto_split_algo_pass(pass, crypto, tmp_pass);
+                st = op_create(*fs_root, *sauv_root, arch, *selection, *subtree, filename, EXTENSION,
+                               allow_over, warn_over, info_details, pause, empty_dir,
                                algo, compression_level, file_size,
-                               first_file_size, ea_root, ea_user, input_pipe, output_pipe,
-                               execute, execute_ref, pass, pass_ref, *compr_mask,
-                               min_compr_size, nodump, ignore_owner, hourshift);
+                               first_file_size, ea_root, ea_user, 
+                               execute, crypto, tmp_pass, *compr_mask,
+                               min_compr_size, nodump, ignore_owner, hourshift, empty);
                 display_sauv_stat(st);
                 if(st.errored > 0) // st is not used for isolation
                     throw Edata("some file could not be saved");
                 break;
             case isolate:
-                op_isolate(*sauv_root, ref_root, filename, EXTENSION, ref_filename, allow_over, warn_over, info_details,
-                           pause, algo, compression_level, file_size, first_file_size, input_pipe, output_pipe,
-                           execute, execute_ref, pass, pass_ref);
+		crypto_split_algo_pass(pass_ref, crypto, tmp_pass);
+		arch = new archive(*ref_root, *ref_filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute_ref, info_details);
+		crypto_split_algo_pass(pass, crypto, tmp_pass);
+                op_isolate(*sauv_root, arch, filename, EXTENSION, allow_over, warn_over, info_details,
+                           pause, algo, compression_level, file_size, first_file_size, 
+                           execute, crypto, tmp_pass);
                 break;
             case extract:
-                st = op_extract(*fs_root, *sauv_root, *selection, *subtree, filename, EXTENSION, allow_over, warn_over,
-                                info_details, detruire, only_more_recent, ea_root, ea_user, input_pipe, output_pipe,
-                                execute, pass, flat, ignore_owner, hourshift);
+		crypto_split_algo_pass(pass, crypto, tmp_pass);
+		arch = new archive(*sauv_root, filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute, info_details);
+                st = op_extract(arch, *fs_root, *selection, *subtree, allow_over, warn_over,
+                                info_details, detruire, only_more_recent, ea_root, ea_user,
+                                flat, ignore_owner, warn_remove_no_match, hourshift, empty);
                 display_rest_stat(st);
                 if(st.errored > 0)
                     throw Edata("all file asked could not be restored");        
                 break;
             case diff:
-                st = op_diff(*fs_root, *sauv_root, *selection, *subtree, filename, EXTENSION, info_details, ea_root, ea_user,
-                             input_pipe, output_pipe, execute, pass, ignore_owner);
+		crypto_split_algo_pass(pass, crypto, tmp_pass);
+		arch = new archive(*sauv_root, filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute, info_details);
+                st = op_diff(arch, *fs_root, *selection, *subtree, info_details, ea_root, ea_user, ignore_owner);
                 display_diff_stat(st);
                 if(st.errored > 0 || st.deleted > 0)
                     throw Edata("some file comparisons failed");
                 break;
             case test:
-                st = op_test(*sauv_root, *selection, *subtree, filename, EXTENSION, info_details, input_pipe, output_pipe,
-                             execute, pass);
+		crypto_split_algo_pass(pass, crypto, tmp_pass);
+		arch = new archive(*sauv_root, filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute, info_details);
+                st = op_test(arch, *selection, *subtree, info_details);
                 display_test_stat(st);
                 if(st.errored > 0)
                     throw Edata("some files are corrupted in the archive and it will not be possible to restore them");
                 break;
             case listing:
+		crypto_split_algo_pass(pass, crypto, tmp_pass);
                     // only_more_recent is used to carry --tar-format flag  while listing is asked
-                op_listing(*sauv_root, filename, EXTENSION, info_details, only_more_recent, input_pipe, output_pipe,
-                           execute, pass, *selection);
+		arch = new archive(*sauv_root, filename, EXTENSION, crypto, tmp_pass, input_pipe, output_pipe, execute, info_details);
+                op_listing(arch, info_details, only_more_recent, *selection, alteration != "");
                 break;
             default:
                 throw SRC_BUG;
@@ -178,6 +198,8 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
                 delete ref_filename;
             if(compr_mask != NULL)
                 delete compr_mask;
+	    if(arch != NULL)
+		delete arch;
             throw;
         }
 
@@ -197,6 +219,8 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
             delete ref_filename;
         if(compr_mask != NULL)
             delete compr_mask;
+	if(arch != NULL)
+	    delete arch;
 
         return EXIT_OK;
     }
@@ -204,7 +228,7 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar.cpp,v 1.9 2003/10/18 14:43:07 edrusb Rel $";
+    static char id[]="$Id: dar.cpp,v 1.14 2003/11/19 00:43:46 edrusb Rel $";
     dummy_call(id);
 }
 

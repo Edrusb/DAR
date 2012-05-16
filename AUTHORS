@@ -44,17 +44,21 @@ An extract of Denis Corbin's resume:
         2000-2002 Network Design, architecture and network support for DCN
                   of Alcatel Submarine Networks, (worked mainly in France,
                   and spend several weeks in USA, Chile and Brazil).
-       since 2003 Network Design and support for SFR (mobile operator) Internet
-                  ISP connectivity.
+        2002-2003 DNS maintainer and Firewall admin for Bouygues Telecom 
+                  operator's GPRS network.
+       since 2003 Network Design and support for SFR's wap and SMS platform,
+                  Internet ISP connectivity.
 
         Good knowledge of
               L1 protocols (bit encoding like Differential Manchester, etc.).
               L2 protocols (Ethernet, Token Ring, frame format, detail behavior
                        and structure of switch and hub equipments. ATM, FR,
                        protocols, E1 and E3 WAN links).
-              L3 protocols (IP, OSI, OSPF, RIP, ISIS, ESIS, BGP, HSRP, VRRP).
-              L4 protocols (UDP, TCP, QoS).
+              L3 protocols (IP, OSI, OSPF, RIP, ISIS, ESIS, BGP, HSRP, VRRP...)
+              L4 protocols (UDP, TCP).
+              QoS (CBQ, TBF, RED, etc.)
               DNS configuration and administrative interfaces.
+              Firewalls admin (Checkpoint, Netscreen, Linux iptables)
               RIPE administrative interface.
                 
         Knowledge of

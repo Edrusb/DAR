@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.cpp,v 1.9 2003/10/18 14:43:07 edrusb Rel $
+// $Id: user_interaction.cpp,v 1.9.4.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -57,7 +59,7 @@ char *strchr (), *strrchr ();
 #if STDC_HEADERS
 #include <stdarg.h>
 #endif
-
+} // end extern "C"
 
 #include <iostream>
 #include "user_interaction.hpp"
@@ -103,7 +105,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: user_interaction.cpp,v 1.9 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: user_interaction.cpp,v 1.9.4.1 2003/12/20 23:05:35 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -116,7 +118,7 @@ namespace libdar
         string output = "";
 
         U_I test;
-    
+
         copie = new char[taille];
         if(copie == NULL)
             throw Ememory("ui_printf");
@@ -189,7 +191,7 @@ namespace libdar
         if(warning_callback == NULL)
             cerr << "warning_callback not set, use set_warning_callback first" << endl;
         else
-            (*warning_callback)(output);    
+            (*warning_callback)(output);
     }
 
 } // end of namespace

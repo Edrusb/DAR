@@ -1,4 +1,4 @@
- 
+
 
 
                 DETAIL NOTES ON VARIOUS TOPICS
@@ -104,7 +104,7 @@ operational system, which you want to backup regularly, without perturbing
 users. For security reasons you want to store the backup on another host
 (called remote host in the following), only used for backup. Of course you have
 not much space on local host to store the archive.
- 
+
 Between theses two hosts, you could use NFS and nothing special would be
 necessary to add, to use dar as usually. but if for security reasons you don't
 want to use NFS (insecure network, local user must not have access to backups),
@@ -113,7 +113,7 @@ then you need to use dar features brought by version 1.1.0:
 
 - dar can now output its archive to stdout instead of a given file. To activate
 it, use "-" as basename. Here is an example :
-        
+
         dar -c - -R / -z | some_program
 or
         dar -c - -R / -z > named_pipe_or_file
@@ -149,7 +149,7 @@ backup server you would type:
 
 if the catalogue is too big to fit on a floppy, you can slit it as usually
 using dar:
-        
+
         dar -A backup_name -C CAT_backup_name -z -s 1440k
 
 the generated archive (CAT_backup_name.1.dar, and so on), only contains the
@@ -241,7 +241,7 @@ on local host :
         dar -c - -A - -i /tmp/pipe_todar -o /tmp/pipe_toslave | some_prog
 
 on the remote host :
-        
+
         dar_slave -i /tmp/pipe_toslave -o /tmp/pipe_todar full_backup
  //dar_slave provides the full_backup for -A option
 
@@ -315,7 +315,7 @@ Anyway, back to dar, you have to possibility to give the size in byte or using
 a single letter as suffix (k or K, M, T, P, E, Z, Y) thus the possibility to
 provide a size in kilo, mega, tera, peta, exa, zetta or yotta byte, with the
 computer science definition of theses terms (power of 1024).
- 
+
 Theses suffixes are for simplicity and not to have to computer
 how much make powers of 1024. For example, if you want to fill a CD-R you will
 have to use the "-s 650M" option which is equivalent to "-s 6815744400", choose
@@ -549,7 +549,7 @@ theses between quotes for they appear as a single string to the shell that
 interprets the dar command-line. For example:
 
 you want to call
-        
+
         df .
 
 this is two worlds df (the command) and '.' its argument. Then you have to use
@@ -567,11 +567,14 @@ DAR provides several substitution strings:
         %p is replaced by the path to the slices
         %b is replaced by the basename of the slices
         %n is replaced by the number of the slice
+        %c is replaced by the context (OPERATION or INIT)
 
 The number of the slice (%n) is either the just written slice or the next
 slice to be read. For example if you make a backup (-c or -C), this is the
 number of the last slice completed. Else (using -t, -d, -A (with -c or -C), -l
  or -x), this is the number of the slice that will be required very soon.
+While %c (the context) is substitued by INIT or OPERATION. INIT when the slice
+is asked before the catalogue is read and OPERATION once it has been read.
 
 What the use of this feature ?
 
@@ -582,12 +585,12 @@ let's build a little script for that:
 
         %cat burner
         #!/bin/tcsh -f
-        
+
         if("$1" == "" || "$2" == "") then
            echo "usage: $0 <filename> <number>"
            exit 1
         endif
-        
+
         mkdir T
         mv $1 T
         mkisofs -o /tmp/image.iso -r -J -V "archive_$2" T
@@ -737,7 +740,7 @@ p = 112
 ---------------------------------------------------------------
 
         205     221     317     217     223     212     202
-     
+
 ---------------------------------------------------------------
 modulo
 256 :   205     221     61      217     223     212     202
@@ -870,7 +873,7 @@ example of use with netcat. Note that netcat command name is "nc"
 
         on honey:
                 nc -l -p 5000 | dar_slave backup | nc -l -p 5001
-        
+
         on flower:
                 nc -w 3 honey 5001 | dar -t - | nc -w 3 honey 5000
 
@@ -883,7 +886,7 @@ example of use with netcat. Note that netcat command name is "nc"
 
         on honey:
                 nc -l -p 5000 | dar_slave backup | nc -l -p 5001
-        
+
         on flower:
                 nc -w 3 honey 5001 | dar -d - -R / | nc -w 3 honey 5000
 
@@ -915,7 +918,7 @@ if you want to have encryption over the network. The principle are the same.
 
         or still on honey:
                 ssh flower dar -c - -R / -z | dar_xform -s 10M -S 5M -p - backup
-        
+
 2 - testing the archive
         on honey:
                 dar -t backup
@@ -946,7 +949,7 @@ if you want to have encryption over the network. The principle are the same.
                 or
                 ssh flower dar -c - -A - -i todar -o toslave | dar_xform -s 10M -S 5M -p - diff_linux
 
-                
+
 
 XIII - overflow in arithmetic integer operations
 ==================================================
@@ -1086,7 +1089,7 @@ to add the extra PAR files. Note that the amount of data generated by par
 depends on the redundancy rate specified on command-line (PAR -r option).
 
 You can also gather the PAR data of all the slices of your archive and put then
-an a separated disk. That's up to you.
+on a separated disk. That's up to you.
 
 The problem is when the corrupted slice is on a CD-R and thus cannot be
 repaired in place. You then need to copy it on your hard disk and run PAR to
@@ -1115,31 +1118,31 @@ shows that Parchive detected an error on slice 80 but could not repair it, as
 the filesystem (on CD-R) is read-only. Thus, you need to copy it on you hard
 disk for reparation:
 
-        dar_cp /mnt/cdrom/coucou.80.dar ~/tmp
+        dar_cp /mnt/cdrom/coucou.80.dar /tmp
 
 we need also to copy the redundancy files
-        
-        dar_cp /mnt/cdrom/coucou.80.dar.par2 ~/tmp
-        dar_cp /mnt/cdrom/coucou.80.dar.vol000+992.par2 ~/tmp
+
+        dar_cp /mnt/cdrom/coucou.80.dar.par2 /tmp
+        dar_cp /mnt/cdrom/coucou.80.dar.vol000+992.par2 /tmp
 
 then we repair it thanks to Parchive:
 
-        cd ~
+        cd /tmp
         par2repair coucou.80.dar
 
 if this succeeded, then you can burn it back on a new CD-R with all its
 parity files. But you can also, add, beside the coucou.80.dar slice, as many
 symbolic link as there is other slices located on CD:
 
-        cd ~
+        cd /tmp
         ln -s coucou.1.dar /mnt/cdrom
         ln -s coucou.2.dar /mnt/cdrom
         etc... up to (but except slice 80)
         ln -s coucou.183.dar /mnt/cdrom
-        
-then you can restore your archive giving ~ in place of /mnt/cdrom to dar:
 
-        dar -x ~/coucou -R ... etc.
+then you can restore your archive giving /tmp in place of /mnt/cdrom to dar:
+
+        dar -x /tmp/coucou -R ... etc.
 
 dar will find all slice on CD-R (thanks to the symbolic links we created),
 except for slice 80 which is the repaired one and which dar will find on hard
@@ -1156,7 +1159,7 @@ your commands or scripts, I propose you the following convention:
   - use the ".duc" extension to show anyone the script/command respect the
     following
   - must be called from dar with the following arguments:
-        
+
         example.duc %p %b %n %e %c [other optional arguments]
 
   - must provide brief help on what it does and what are the expected
@@ -1173,6 +1176,10 @@ from a slice, anybody could use both at a time giving the following argument
 to dar:
 
         -E "par.duc %p %b %n %e %c 1 ; burn.duc %p %b %n %e %c"
+
+or since version 2.1.0 with the following argument:
+
+        -E "par.duc %p %b %n %e %c 1" -E "burn.duc %p %b %n %e %c"
 
 of course a script has not to use all its arguments, in the case of burn.duc
 for example, the %c (context) is probably useless, and not used inside the
@@ -1191,25 +1198,26 @@ corresponding -B option.
  XVI - Examples of file filtering
 ==================================
 
-file filtering is what defines which files are saved, listed, restored, 
+file filtering is what defines which files are saved, listed, restored,
 compared, tested, and so on, in brief, I will say which file are elected for
-the operated in the following, meaning by "operation, either a backup, a 
+the operated in the following, meaning by "operation, either a backup, a
 restoration, a archive contents listing, a archive comparison, etc.
 
 file filtering is done using the following options -X, -I, -P, -R and with
 the any non options argument given on the command-line (which is the man page
-is referred as [list of path]). A non option argument is one that does not start
-by a dash ('-' character). If however you need to give in the [list of path] 
-an argument that starts by a dash, you need to add the '--' argument after 
-which no search is done for command line options.
+is referred as [list of path]). A non option argument is one that does not
+start by a dash ('-' character). If however you need to give in the [list of
+path] an argument that starts by a dash, you need to add the '--' argument
+after which no search is done for command line options.
 
 OK, Let's start with some concretes examples:
 
-	dar -c toto 
+	dar -c toto
 
-this will backup the current directory and all what is located into it to 
+this will backup the current directory and all what is located into it to
 build the toto archive, also located in the current directory. Usually you
-should get a warning telling you that you are about to backup the archive itself
+should get a warning telling you that you are about to backup the archive
+itself
 
 Now let's see something less obvious:
 
@@ -1217,7 +1225,7 @@ Now let's see something less obvious:
 
 the -R option tell dar to consider all file under the / root directory, while
 the "home/ftp" argument is not an option argument, and thus is a member of
-[list of path]. This tells dar to restrict the operation only on the 
+[list of path]. This tells dar to restrict the operation only on the
 home/ftp subdirectory of the given root directory thus here /home/ftp.
 
 But this is a little bit different than the following:
@@ -1226,7 +1234,7 @@ But this is a little bit different than the following:
 
 here dar will save any file under /home/ftp without any restriction. So what
 is the difference ? Yes, exactly the same files will be saved as just above,
-but the file /home/ftp/welcome.msg for example, will be stored as 
+but the file /home/ftp/welcome.msg for example, will be stored as
 <ROOT>/welcome.msg . Where <ROOT> will be replaced by the argument given to
 -R option (which defaults to "."), at restoration or comparison time. While in
 the previous example the same file would have been stored with the following
@@ -1236,7 +1244,7 @@ path <ROOT>/home/ftp/welcome.msg .
 	dar -c toto -R / -P home/ftp/pub  home/ftp etc
 
 as previously, but the -P option make all files under the /home/ftp/pub not to
-be considered for the operation. Additionally the /etc directory and its 
+be considered for the operation. Additionally the /etc directory and its
 subdirectories are saved, here [list of path] contains two members.
 
 	dar -c toto -R / -P etc/password etc
@@ -1249,18 +1257,18 @@ does have the same effect:
 	dar -c toto -R / -X "password" etc
 
 will save all the /etc directory except any file with name equal to "password".
-thus of course /etc/password will no be saved, but if it exists, 
+thus of course /etc/password will no be saved, but if it exists,
 /etc/rc.d/password will not be saved neither if it is not a directory. Yes,
 if a directory /etc/rc.d/password exist, it will not be affected by the -X
 option. As well as -I, -X option do not apply to directories. The reason is
 to be able to filter some kind of file without excluding a particular directory
 for example you want to save all mp3 files and only MP3 files,
 
-	dar -c toto -R / -I "*.mp3" -I "*.MP3" home/ftp 
+	dar -c toto -R / -I "*.mp3" -I "*.MP3" home/ftp
 
-will save any mp3 o MP3 ending files under the /home/ftp directories and 
+will save any mp3 o MP3 ending files under the /home/ftp directories and
 subdirectories. If instead -I (or -X) applied to directories, we would only be
-able to recurse in subdirectories ending by ".mp3" or ".MP3". If you had a 
+able to recurse in subdirectories ending by ".mp3" or ".MP3". If you had a
 directory named "/home/ftp/Music" for example, full of mp3, you would not have
 been able to save it.
 
@@ -1279,10 +1287,10 @@ Last an very complete example:
 so what ?
 
 OK, here we save all under /home/ftp and /-fake but we do not save the contents
-of "*/.mozilla/*/[Cc]ache" like for example 
-"/home/ftp/.mozilla/ftp/abcd.slt/Cache" directory and its contents. In theses 
+of "*/.mozilla/*/[Cc]ache" like for example
+"/home/ftp/.mozilla/ftp/abcd.slt/Cache" directory and its contents. In theses
 directories we save any file matching "*.[Mm][pP][123]" files except those
-ending by a tilde (~ character), Thus for example file which name is 
+ending by a tilde (~ character), Thus for example file which name is
 "toto.mp3" or ".bloup.Mp2"
 
 Now the inside algorithm:
@@ -1290,11 +1298,12 @@ Now the inside algorithm:
 	a file is elected for operation if
  1 - its name does not match any -X option or it is a directory
 *and*
- 2 - if some -I is given, file is either a directory or match at least one 
+ 2 - if some -I is given, file is either a directory or match at least one
      of the -I option given.
 *and*
  3 - path and filename do not match any -P option
-*and* 
+*and*
  4 - if some non option are given (building a [list of path]) the path to the
      file is one of the member of [list of path] or a subdirectory of one of
      the members [list of path] .
+

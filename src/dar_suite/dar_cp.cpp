@@ -18,17 +18,35 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_cp.cpp,v 1.4 2003/10/18 15:44:09 edrusb Rel $
+// $Id: dar_cp.cpp,v 1.4.4.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 //
-#include <stdio.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <string.h>
+
 #include "../my_config.h"
+
+extern "C"
+{
+#if HAVE_STDIO_H
+#include <stdio.h>
+#endif
+#if HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#if HAVE_STRIN_H
+#include <string.h>
+#endif
+}
+
 #include "dar_suite.hpp"
 #include "tools.hpp"
 
@@ -50,7 +68,7 @@ int main(int argc, char *argv[])
         show_version(argv[0]);
         exit(0);
     }
-    
+
     if(argc != 3 || argv[1] == "-h")
     {
         show_usage(argv[0]);
@@ -67,7 +85,7 @@ int main(int argc, char *argv[])
     else
         exit(2);
 }
- 
+
 void show_usage(char *argv0)
 {
     printf("usage : %s <source> <destination>\n", argv0);
@@ -147,7 +165,7 @@ int open_files(char *src, char *dst, int *fds, int *fdd)
             free(tmp);
         return 0; // error
     }
-    
+
     *fdd = open(dst, O_WRONLY|O_CREAT|O_EXCL, 0666);
     if(tmp != NULL)
         free(tmp);
@@ -173,7 +191,7 @@ void copy_max(int src, int dst)
 #define BUF_SIZE 10240
     char buffer[BUF_SIZE];
     int lu = 0;
-    
+
     do
     {
         lu = normal_copy(BUF_SIZE, buffer, src, dst);
@@ -232,7 +250,7 @@ int skip_to_next_readable(int block, char *buffer, int src, int dst)
                 shift /= 2;
                 lseek(src, -shift, SEEK_CUR);
             }
-            
+
         }
     }
     while(shift > 1 && lu != 0);
@@ -241,13 +259,13 @@ int skip_to_next_readable(int block, char *buffer, int src, int dst)
         // we eventually make a hole in dst,
         // which will be full of zero
         // see lseek man page.
-        
+
     return lu;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_cp.cpp,v 1.4 2003/10/18 15:44:09 edrusb Rel $";
+    static char id[]="$Id: dar_cp.cpp,v 1.4.4.1 2003/12/20 23:05:34 edrusb Rel $";
     dummy_call(id);
 }
 

@@ -20,3 +20,4 @@ rpm -ba --clean --rmsource --nodeps --rmsource `basename $2`
 
 mv /usr/src/rpm/RPMS/i386/dar* /usr/src/rpm/SRPMS/dar* $old_dir
 rm /usr/src/rpm/SPECS/`basename $2`
+

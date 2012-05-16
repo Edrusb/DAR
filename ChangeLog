@@ -192,3 +192,26 @@ from 2.0.3 to 2.0.4
 - updated autoconf version used to generate configure script (2.57 -> 2.59) The
   large file support is back with gcc-3 (was only working with gcc-2)
 
+from 2.0.0 to 2.1.0
+- fixed bug #17
+- API version 2 documentation
+- API version 2 implementation
+- -E and -F can now be present several time on command line and/or included
+  files (dar, dar_slave and dar_xform)
+- context (%c in -E and -F) is now transmitted in the pipes from dar to
+  dar_slave
+- added -wa option
+- added -as option
+- added -e option
+- updated the API to be able to add new encryption protocol later
+- root (-R argument) can now be a symbolic link pointing to a directory
+- fixed bug #17bis
+- added information returned by the system when error during read() to the
+  message returned to the user
+- fixed bug #18
+- documentation about filter mechanism added
+- fixed bug #19
+- don't fail for a file if permission could not be restored
+- fixed bug #20
+- configure script does not mess with CXXFLAGS or CFLAGS execpt when using
+  debugging options.

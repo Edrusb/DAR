@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: etage.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
+// $Id: etage.cpp,v 1.9.2.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 // this was necessary to compile under Mac OS-X (boggus dirent.h)
 #if HAVE_STDINT_H
 #include <stdint.h>
@@ -49,6 +51,7 @@
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+} // end extern "C"
 
 #include "etage.hpp"
 
@@ -61,10 +64,10 @@ namespace libdar
     {
         struct dirent *ret;
         DIR *tmp = opendir(dirname);
-    
+
         if(tmp == NULL)
-            throw Erange("filesystem etage::etage" , strerror(errno));
-    
+            throw Erange("filesystem etage::etage" , string("Error openning directory: ") + dirname + " : " + strerror(errno));
+
         fichier.clear();
         while((ret = readdir(tmp)) != NULL)
             if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
@@ -74,11 +77,11 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: etage.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: etage.cpp,v 1.9.2.1 2003/12/20 23:05:34 edrusb Rel $";
         dummy_call(id);
     }
 
-    
+
     bool etage::read(string & ref)
     {
         if(fichier.size() > 0)

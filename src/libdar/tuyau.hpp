@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: tuyau.hpp,v 1.6 2003/12/02 16:49:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -37,7 +37,7 @@ namespace libdar
     {
     public:
         tuyau(int fd); // fd is the filedescriptor of a pipe extremity
-        tuyau(int fd, gf_mode mode); // forces the mode of possible
+        tuyau(int fd, gf_mode mode); // forces the mode if possible
         tuyau(const std::string &filename, gf_mode mode);
         ~tuyau() { close(filedesc); };
     

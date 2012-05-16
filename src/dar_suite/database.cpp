@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database.cpp,v 1.13 2003/11/03 11:32:48 edrusb Rel $
+// $Id: database.cpp,v 1.13.4.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 #include <stdlib.h>
 #endif
@@ -31,6 +33,7 @@
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+} // end extern "C"
 
 #include <iomanip>
 #include <iostream>
@@ -59,7 +62,7 @@ database::database()
     if(files == NULL)
         throw Ememory("database::database");
     data_files = NULL;
-    
+
 }
 
 void database::build(generic_file & f, bool partial)
@@ -106,7 +109,7 @@ database::~database()
 void database::dump(generic_file & f) const
 {
     archive_num tmp = coordinate.size();
-    
+
     infinint(tmp).dump(f);
     for(archive_num i = 0; i < tmp; i++)
     {
@@ -128,14 +131,14 @@ void database::add_archive(const catalogue & cat, const string & chemin, const s
 {
     struct archive_data dat;
     archive_num number = coordinate.size();
-    
+
     if(files == NULL)
         throw SRC_BUG;
     if(basename == "")
         throw Erange("database::add_archive", "empty string is an invalid archive basename");
     if(number >= ARCHIVE_NUM_MAX)
         throw Erange("database::add_archive", "cannot add another archive, database is full");
- 
+
     dat.chemin = chemin;
     dat.basename = basename;
     coordinate.push_back(dat);
@@ -190,14 +193,14 @@ void database::set_permutation(archive_num src, archive_num dst)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: database.cpp,v 1.13 2003/11/03 11:32:48 edrusb Rel $";
+    static char id[]="$Id: database.cpp,v 1.13.4.1 2003/12/20 23:05:34 edrusb Rel $";
     dummy_call(id);
 }
 
 void database::show_contents() const
 {
     string opt = tools_concat_vector(" ", options_to_dar);
-    
+
     ui_printf("\ndar path    : %S\n", &dar_path);
     ui_printf("dar options : %S\n\n", &opt);
 
@@ -282,7 +285,7 @@ void database::restore(const vector<string> & filename, bool early_release)
 
     if(files == NULL)
         throw SRC_BUG;
-    
+
         // determination of the archive to restore and files to restore for each selected archive
     while(it != fin)
     {
@@ -290,10 +293,10 @@ void database::restore(const vector<string> & filename, bool early_release)
         {
             archive_num num_data = 0;
             archive_num num_ea = 0;
-            
+
             ptr->get_data(num_data);
             ptr->get_EA(num_ea);
-            
+
             if(num_data == num_ea)
             {
                 if(num_data != 0)
@@ -342,14 +345,14 @@ void database::restore(const vector<string> & filename, bool early_release)
         string dar_cmd = dar_path != "" ? dar_path : "dar";
         map<archive_num, vector<string> >::iterator ut = command_line.begin();
         vector<string> argvector_init = vector<string>(1, dar_cmd);
-        
+
         while(ut != command_line.end())
         {
             try
             {
                 string archive_name;
                 vector<string> argvector = argvector_init;
-                
+
                 if(coordinate[ut->first].chemin != "")
                     archive_name = coordinate[ut->first].chemin + "/";
                 else
@@ -359,7 +362,7 @@ void database::restore(const vector<string> & filename, bool early_release)
                 argvector.push_back(archive_name);
 		argvector += options_to_dar;
                 argvector += ut->second;
-                
+
                 cout << "CALLING DAR: " << tools_concat_vector(" ", argvector) << endl;
                 tools_system(argvector);
             }

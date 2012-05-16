@@ -18,13 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: factoriel.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
+// $Id: factoriel.cpp,v 1.8.4.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SYS_TYPE_H
 #include <sys/types.h>
 #endif
@@ -44,6 +46,7 @@
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+} // end extern "C"
 
 #include <string>
 #include <iostream>
@@ -67,13 +70,13 @@ int main(S_I argc, char *argv[]) throw()
     {
         if(argc != 2 && argc != 3)
             exit(1);
-        
+
         string s = argv[1];
         deci f = s;
         infinint max = f.computer();
         infinint i = 2;
         infinint p = 1;
-        
+
         while(i <= max)
             p *= i++;
 
@@ -115,6 +118,6 @@ int main(S_I argc, char *argv[]) throw()
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: factoriel.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $";
+    static char id[]="$Id: factoriel.cpp,v 1.8.4.1 2003/12/20 23:05:34 edrusb Rel $";
     dummy_call(id);
 }

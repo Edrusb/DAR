@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: filtre.cpp,v 1.9 2003/11/27 20:54:13 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -56,13 +56,15 @@ namespace libdar
                         bool restore_ea_user,
                         bool flat, 
                         bool ignore_owner,
-                        const infinint & hourshift)
+			bool warn_remove_no_match,
+                        const infinint & hourshift,
+			bool empty)
     {
         defile juillet = fs_racine;
         const eod tmp_eod;
         const entree *e;
-        filesystem_restore fs = filesystem_restore(fs_racine, fs_allow_overwrite, fs_warn_overwrite, info_details, restore_ea_root, restore_ea_user,ignore_owner);
-        filesystem_diff fs_flat = filesystem_diff(fs_racine, info_details, restore_ea_root, restore_ea_user);
+        filesystem_restore fs = filesystem_restore(fs_racine, fs_allow_overwrite, fs_warn_overwrite, info_details, restore_ea_root, restore_ea_user,ignore_owner, warn_remove_no_match, empty);
+        filesystem_diff fs_flat = filesystem_diff(fs_racine, false, restore_ea_root, restore_ea_user); //  info detail is set to false, to avoid duplication of informational messages already given by 'fs'
     
         st.clear();
         cat.reset_read();
@@ -800,7 +802,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: filtre.cpp,v 1.9 2003/11/27 20:54:13 edrusb Rel $";
         dummy_call(id);
     }
 

@@ -14,9 +14,9 @@ endif
 misc/make_rpm $1 misc/dar_ea.rpm.spec
 mkdir rpm_dar_ea
 mv *.rpm rpm_dar_ea
-misc/make_rpm $1 misc/dar32_ea.rpm.spec
-mkdir rpm_dar32_ea
-mv *.rpm rpm_dar32_ea
+# misc/make_rpm $1 misc/dar32_ea.rpm.spec
+# mkdir rpm_dar32_ea
+# mv *.rpm rpm_dar32_ea
 misc/make_rpm $1 misc/dar64_ea.rpm.spec
 mkdir rpm_dar64_ea
 mv *.rpm rpm_dar64_ea

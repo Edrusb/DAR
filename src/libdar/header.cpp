@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: header.cpp,v 1.7.4.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 // to allow compilation under Cygwin we need <sys/types.h>
 // else Cygwin's <netinet/in.h> lack __int16_t symbol !?!
 #if HAVE_SYS_TYPES_H
@@ -46,6 +48,7 @@
 #  include <time.h>
 # endif
 #endif
+} // end extern "C"
 
 #include "header.hpp"
 
@@ -108,7 +111,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: header.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: header.cpp,v 1.7.4.1 2003/12/20 23:05:34 edrusb Rel $";
         dummy_call(id);
     }
 

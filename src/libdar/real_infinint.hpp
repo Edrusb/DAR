@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
+// $Id: real_infinint.hpp,v 1.4.4.3 2004/01/15 20:35:55 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,9 +29,12 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
+} // end extern "C"
 
 #include <typeinfo>
 #include "storage.hpp"
@@ -81,6 +84,7 @@ namespace libdar
         infinint & operator -= (const infinint & ref) throw(Ememory, Erange, Ebug);
         infinint & operator *= (unsigned char arg) throw(Ememory, Erange, Ebug);
         infinint & operator *= (const infinint & ref) throw(Ememory, Erange, Ebug);
+	template <class T> infinint power(const T & exponent) const;
         inline infinint & operator /= (const infinint & ref) throw(Einfinint, Erange, Ememory, Ebug);
         inline infinint & operator %= (const infinint & ref) throw(Einfinint, Erange, Ememory, Ebug);
         infinint & operator >>= (U_32 bit) throw(Ememory, Erange, Ebug);
@@ -118,7 +122,7 @@ namespace libdar
 
         enum endian { big_endian, little_endian, not_initialized };
         typedef unsigned char group[TG];
-     
+
         storage *field;
 
         bool is_valid() const throw();
@@ -168,7 +172,7 @@ namespace libdar
     template <class T> inline void euclide(T a, T b, T & q, T &r)
     {
         E_BEGIN;
-        q = a/b; r = a%b; 
+        q = a/b; r = a%b;
         E_END("euclide", "");
     };
 
@@ -183,7 +187,7 @@ namespace libdar
     inline infinint & infinint::operator %= (const infinint & ref) throw(Einfinint, Erange, Ememory, Ebug)
     {
         E_BEGIN;
-        *this = *this % ref; 
+        *this = *this % ref;
         return *this;
         E_END("infinint::operator %=", "");
     }

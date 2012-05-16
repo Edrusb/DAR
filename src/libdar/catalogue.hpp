@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.16 2003/10/18 14:43:07 edrusb Rel $
+// $Id: catalogue.hpp,v 1.19.2.2 2004/01/28 15:29:46 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,9 +29,12 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+} // end extern "C"
 
 #include <vector>
 #include <map>
@@ -92,7 +95,7 @@ namespace libdar
             // SPECIAL ALLOC not adapted here
             // because some inherited class object (eod) are
             // temporaneous
-        
+
     private :
         static std::map <infinint, file_etiquette *> corres;
     };
@@ -127,10 +130,10 @@ namespace libdar
             // signature() is kept as an abstract method
             // clone() is abstract
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(nomme);
 #endif
-   
+
     private :
         std::string xname;
     };
@@ -153,10 +156,10 @@ namespace libdar
         infinint get_last_access() const { return *last_acc; };
         infinint get_last_modif() const { return *last_mod; };
         void set_last_access(const infinint & x_time) { *last_acc = x_time; };
-        void set_last_modif(const infinint & x_time) { *last_mod = x_time; };    
+        void set_last_modif(const infinint & x_time) { *last_mod = x_time; };
         saved_status get_saved_status() const { return xsaved; };
         void set_saved_status(saved_status x) { xsaved = x; };
-        
+
         bool same_as(const inode & ref) const;
         virtual bool is_more_recent_than(const inode & ref, const infinint & hourshift) const;
         virtual bool has_changed_since(const inode & ref, const infinint & hourshift) const;
@@ -180,7 +183,7 @@ namespace libdar
             // ea_full    : EA present in filesystem and attached to this inode
 
             // I : to know whether EA data is present or not for this object
-        void ea_set_saved_status(ea_status status); 
+        void ea_set_saved_status(ea_status status);
         ea_status ea_get_saved_status() const { return ea_saved; };
 
             // II : to associate EA list to an inode object (mainly for backup operation) #EA_FULL only#
@@ -200,10 +203,10 @@ namespace libdar
 
         static void set_ignore_owner(bool mode) { ignore_owner = mode; };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(inode);
 #endif
-    
+
     protected:
         virtual void sub_compare(const inode & other) const {};
 
@@ -241,7 +244,7 @@ namespace libdar
         file(const file & ref);
         file(generic_file & f, saved_status saved);
         ~file() { detruit(); };
-    
+
         void dump(generic_file & f) const;
         bool is_more_recent_than(const inode & ref, const infinint & hourshift) const;
         bool has_changed_since(const inode & ref, const infinint & hourshift) const;
@@ -261,7 +264,7 @@ namespace libdar
         static compression get_compression_algo_used() { return algo; };
         static void set_archive_localisation(generic_file *f) { loc = f; };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(file);
 #endif
 
@@ -288,7 +291,7 @@ namespace libdar
         virtual infinint get_etiquette() const = 0;
         virtual const file *get_inode() const = 0;
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(etiquette);
 #endif
     };
@@ -311,13 +314,13 @@ namespace libdar
         entree *clone() const { return new file_etiquette(*this); };
 
         static void reset_etiquette_counter() { compteur_check(); *compteur = 0; };
-    
+
             // inherited from etiquette
         infinint get_etiquette() const { return *etiquette; };
         void change_etiquette() { if(compteur == NULL) throw SRC_BUG; else *etiquette = (*compteur)++; };
         const file *get_inode() const { return this; };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(file_etiquette);
 #endif
 
@@ -343,7 +346,7 @@ namespace libdar
         infinint get_etiquette() const { return x_ref->get_etiquette(); };
         const file *get_inode() const { return x_ref; };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(hard_link);
 #endif
     private :
@@ -369,7 +372,7 @@ namespace libdar
         unsigned char signature() const { return mk_signature('l', get_saved_status()); };
         entree *clone() const { return new lien(*this); };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(lien);
 #endif
     protected :
@@ -394,10 +397,11 @@ namespace libdar
         void add_children(nomme *r); // when r is a directory, 'parent' is set to 'this'
         void reset_read_children() const;
         bool read_children(const nomme * &r) const; // read the direct children of the directory, returns false if no more is available
-        void listing(const mask &m = bool_mask(true), std::string marge = "") const;
-        void tar_listing(const mask &m = bool_mask(true), const std::string & beginning = "") const;
+        void listing(const mask &m = bool_mask(true), bool filter_unsaved = false, std::string marge = "") const;
+        void tar_listing(const mask &m = bool_mask(true), bool filter_unsaved = false, const std::string & beginning = "") const;
         directory * get_parent() const { return parent; };
         bool search_children(const std::string &name, nomme *&ref);
+	bool callback_for_children_of(const std::string & sdir) const;
 
             // using is_more_recent_than() from inode class
             // using method has_changed_since() from inode class
@@ -413,7 +417,7 @@ namespace libdar
 							       const std::string & filename))
             { callback = tar_listing_callback; };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(directory);
 #endif
     private :
@@ -437,7 +441,7 @@ namespace libdar
                U_16 major,
                U_16 minor);
         device(generic_file & f, saved_status saved);
-    
+
         void dump(generic_file & f) const;
         int get_major() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xmajor; };
         int get_minor() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xminor; };
@@ -448,7 +452,7 @@ namespace libdar
             // using method has_changed_since() from inode class
             // signature is left pure abstract
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(device);
 #endif
 
@@ -471,14 +475,14 @@ namespace libdar
                                      last_modif, name,
                                      major, minor) {};
         chardev(generic_file & f, saved_status saved) : device(f, saved) {};
-    
+
             // using dump from device class
             // using method is_more_recent_than() from device class
             // using method has_changed_since() from device class
         unsigned char signature() const { return mk_signature('c', get_saved_status()); };
         entree *clone() const { return new chardev(*this); };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(chardev);
 #endif
     };
@@ -495,14 +499,14 @@ namespace libdar
                                       last_modif, name,
                                       major, minor) {};
         blockdev(generic_file & f, saved_status saved) : device(f, saved) {};
-    
+
             // using dump from device class
             // using method is_more_recent_than() from device class
             // using method has_changed_since() from device class
         unsigned char signature() const { return mk_signature('b', get_saved_status()); };
         entree *clone() const { return new blockdev(*this); };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(blockdev);
 #endif
     };
@@ -515,14 +519,14 @@ namespace libdar
              const infinint & last_modif,
              const std::string & xname) : inode(xuid, xgid, xperm, last_access, last_modif, xname) { set_saved_status(s_saved); };
         tube(generic_file & f, saved_status saved) : inode(f, saved) {};
-    
+
             // using dump from inode class
             // using method is_more_recent_than() from inode class
             // using method has_changed_since() from inode class
         unsigned char signature() const { return mk_signature('p', get_saved_status()); };
         entree *clone() const { return new tube(*this); };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(tube);
 #endif
     };
@@ -542,7 +546,7 @@ namespace libdar
         unsigned char signature() const { return mk_signature('s', get_saved_status()); };
         entree *clone() const { return new prise(*this); };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(prise);
 #endif
     };
@@ -559,7 +563,7 @@ namespace libdar
         unsigned char signature() const { return 'x'; };
         entree *clone() const { return new detruit(*this); };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(detruit);
 #endif
     private :
@@ -575,7 +579,7 @@ namespace libdar
         void dump(generic_file & f) const { throw SRC_BUG; };
         unsigned char signature() const { return 'i'; };
         entree *clone() const { return new ignored(*this); };
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(ignored);
 #endif
     };
@@ -587,9 +591,9 @@ namespace libdar
         ignored_dir(generic_file & f) : inode(f, s_not_saved) { throw SRC_BUG; };
 
         void dump(generic_file & f) const; // behaves like an empty directory
-        unsigned char signature() const { return 'j'; }; 
+        unsigned char signature() const { return 'j'; };
         entree *clone() const { return new ignored_dir(*this); };
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(ignored_dir);
 #endif
     };
@@ -604,12 +608,12 @@ namespace libdar
         ~catalogue() { detruire(); };
 
         void reset_read();
-        void skip_read_to_parent_dir(); 
+        void skip_read_to_parent_dir();
             // skip all items of the current dir and of any subdir, the next call will return
             // next item of the parent dir (no eod to exit from the current dir !)
-        bool read(const entree * & ref); 
+        bool read(const entree * & ref);
             // sequential read (generates eod) and return false when all files have been read
-        bool read_if_present(std::string *name, const nomme * & ref); 
+        bool read_if_present(std::string *name, const nomme * & ref);
             // pseudo-sequential read (reading a directory still
             // implies that following read are located in this subdirectory up to the next EOD) but
             // it returns false if no entry of this name are present in the current directory
@@ -639,18 +643,18 @@ namespace libdar
             // always return false, while it temporary stores the missing directory structure
 
         bool direct_read(const path & ref, const nomme * &ret);
-            
+
         infinint update_destroyed_with(catalogue & ref);
             // ref must have the same root, else the operation generates a exception
-    
+
         void dump(generic_file & ref) const;
-        void listing(const mask &m = bool_mask(true), std::string marge = "") const;
-        void tar_listing(const mask & m = bool_mask(true), const std::string & beginning = "") const;
+        void listing(const mask &m = bool_mask(true), bool filter_unsaved = false, std::string marge = "") const;
+        void tar_listing(const mask & m = bool_mask(true), bool filter_unsaved = false, const std::string & beginning = "") const;
         entree_stats get_stats() const { return stats; };
 
         const directory *get_contenu() const { return contenu; }; // used by data_tree
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(catalogue);
 #endif
 

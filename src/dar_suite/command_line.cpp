@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.21 2003/11/03 21:28:45 edrusb Rel $
+// $Id: command_line.cpp,v 1.26.2.2 2004/01/28 15:29:45 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -56,6 +58,7 @@ char *strchr (), *strrchr ();
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+} // end extern "C"
 
 #include <string>
 #include <algorithm>
@@ -78,12 +81,12 @@ char *strchr (), *strrchr ();
 #include "libdar.hpp"
 #include "cygwin_adapt.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:vz::y::nwpkR:s:S:X:I:P:bhLWDruUVC:i:o:OTE:F:K:J:Y:Z:B:fm:NH::"
+#define OPT_STRING "c:A:x:d:t:l:vz::y::nw::pkR:s:S:X:I:P:bhLWDruUVC:i:o:OTE:F:K:J:Y:Z:B:fm:NH::a::e"
 
 using namespace std;
 using namespace libdar;
 
-static const unsigned int min_compr_size_default = 100; 
+static const unsigned int min_compr_size_default = 100;
     // the default value for --mincompr
 
     // return a newly allocated memory (to be deleted by the caller)
@@ -135,7 +138,10 @@ static bool get_args_recursive(vector<string> & inclusions,
                                infinint & min_compr_size,
                                bool & readconfig,
                                bool & nodump,
-                               infinint & hourshift);
+                               infinint & hourshift,
+			       bool & warn_remove_no_match,
+			       string & alteration,
+			       bool & empty);
 static void make_args_from_file(operation op, const char *filename, S_I & argc,
                                 char **&argv, bool info_details);
 static void destroy(S_I argc, char **argv);
@@ -179,7 +185,10 @@ static bool update_with_config_files(const char * home,
                                      bool & flat,
                                      infinint & min_compr_size,
                                      bool & nodump,
-                                     infinint & hourshift);
+                                     infinint & hourshift,
+				     bool & warn_remove_no_match,
+				     string & alteration,
+				     bool & empty);
 
     //#define DEBOGGAGE
 #ifdef DEBOGGAGE
@@ -201,7 +210,10 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
               bool & flat,
               infinint & min_compr_size,
               bool & nodump,
-              infinint & hourshift)
+              infinint & hourshift,
+	      bool & warn_remove_no_match,
+	      string & alteration,
+	      bool & empty)
 {
     op = noop;
     fs_root = NULL;
@@ -250,6 +262,9 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
     min_compr_size = min_compr_size_default;
     nodump = false;
     hourshift = 0;
+    warn_remove_no_match = true;
+    alteration = "";
+    empty = false;
 
     bool readconfig = true;
 
@@ -278,7 +293,8 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                                    compr_inclus, compr_exclus,
                                    tar_format,
                                    flat, min_compr_size, readconfig, nodump,
-                                   hourshift))
+                                   hourshift, warn_remove_no_match,
+				   alteration, empty))
                 return false;
 
                 // checking and updating options with configuration file if any
@@ -302,7 +318,10 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                                               compr_inclus, compr_exclus,
                                               tar_format,
                                               flat, min_compr_size, nodump,
-                                              hourshift))
+                                              hourshift,
+					      warn_remove_no_match,
+					      alteration,
+					      empty))
                     return false;
 
                 // some sanity checks
@@ -319,9 +338,11 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
             if(fs_root == NULL)
                 fs_root = new path(".");
             if(ref_filename != NULL && op != create && op != isolate)
-                user_interaction_warning("-A option is only useful with -c option\n");
+                user_interaction_warning("-A option is only useful with -c option");
             if(op == isolate && ref_filename == NULL)
                 throw Erange("get_args", "with -C option, -A option is mandatory");
+	    if(op != extract && !warn_remove_no_match)
+		user_interaction_warning("-wa is only useful with -x option");
             if(filename == "-" && ref_filename != NULL && *ref_filename == "-"
                && output_pipe == "")
                 throw Erange("get_args", "-o is mandatory when using \"-A -\" with \"-c -\" or \"-C -\"");
@@ -331,9 +352,9 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                 else
                     tools_check_basename(*ref_root, *ref_filename, EXTENSION);
             if(algo != none && op != create && op != isolate)
-                user_interaction_warning("-z or -y need only to be used with -c\n");
+                user_interaction_warning("-z or -y need only to be used with -c");
             if(first_file_size != 0 && file_size == 0)
-                throw Erange("get_args", "-S option requires the use of -s\n");
+                throw Erange("get_args", "-S option requires the use of -s");
             if(ignore_owner && (op == isolate || (op == create && ref_root == NULL) || op == test || op == listing))
                 user_interaction_warning("ignoring -O option, as it is useless in this situation");
             if(getuid() != 0 && op == extract && !ignore_owner) // uid == 0 for root
@@ -354,7 +375,7 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                 delete name;
             }
             if(op == listing && tar_format)
-                only_more_recent = true; 
+                only_more_recent = true;
             if(execute != "" && file_size == 0 && (op == create || op == isolate))
                 user_interaction_warning("-E is not possible (and useless) with -c or -C and without slicing (-s option), -E will be ignored");
             if(execute_ref != "" && ref_filename == NULL)
@@ -378,8 +399,15 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                             user_interaction_warning("-H is only useful with -r option when extracting");
                     }
                     else
-                        user_interaction_warning("-H is only usefule with -c or -x");
-                        
+                        user_interaction_warning("-H is only useful with -c or -x");
+	    if(alteration != "")
+		if(op != listing)
+		    user_interaction_warning("-a is currently only available with -l, ignoring -a option");
+		else
+		    if(alteration != "s" && alteration != "saved")
+			throw Erange("get_args", string("unkown argument given to -a: ")+ alteration);
+	    if(empty && op != create && op != extract)
+		user_interaction_warning("-e is only useful with -x or -c");
 
                 // generating masks
                 // for filenames
@@ -516,7 +544,10 @@ static bool get_args_recursive(vector<string> & inclusions,
                                infinint & min_compr_size,
                                bool & readconfig,
                                bool & nodump,
-                               infinint & hourshift)
+                               infinint & hourshift,
+			       bool & warn_remove_no_match,
+			       string & alteration,
+			       bool & empty)
 {
     S_I lu;
     S_I rec_c;
@@ -621,6 +652,13 @@ static bool get_args_recursive(vector<string> & inclusions,
                 break;
             case 'w':
                 warn_over = false;
+		if(optarg != NULL)
+		{
+		    if(strcmp(optarg, "a") == 0 || strcmp(optarg, "all") == 0)
+			warn_remove_no_match = false;
+		    else
+			throw Erange("get_args", string("unknown option given to -w : ") + optarg);
+		}
                 break;
             case 'p':
                 pause = true;
@@ -720,16 +758,16 @@ static bool get_args_recursive(vector<string> & inclusions,
                 break;
             case 'r':
                 if(!allow_over)
-                    user_interaction_warning("NOTE : -r is useless with -n\n");
+                    user_interaction_warning("NOTE : -r is useless with -n");
                 if(only_more_recent)
-                    user_interaction_warning("syntax error: -r is only necessary once, ignoring other occurences\n");
+                    user_interaction_warning("syntax error: -r is only necessary once, ignoring other occurences");
                 else
                     only_more_recent = true;
                 break;
             case 'u':
 #ifdef EA_SUPPORT
                 if(!ea_user)
-                    user_interaction_warning("syntax error: -u is only necessary once, ignoring other occurences\n");
+                    user_interaction_warning("syntax error: -u is only necessary once, ignoring other occurences");
                 else
                     ea_user = false;
 #else
@@ -739,7 +777,7 @@ static bool get_args_recursive(vector<string> & inclusions,
             case 'U':
 #ifdef EA_SUPPORT
                 if(!ea_root)
-                    user_interaction_warning("syntax error : -U is only necessary once, ignoring other occurences\n");
+                    user_interaction_warning("syntax error : -U is only necessary once, ignoring other occurences");
                 else
                     ea_root = false;
 #else
@@ -785,7 +823,7 @@ static bool get_args_recursive(vector<string> & inclusions,
                 if(execute == "")
                     execute = optarg;
                 else
-                    user_interaction_warning("only one -E option is allowed, ignoring other instances");
+		    execute += string(" ; ") + optarg;
                 break;
             case 'F':
                 if(optarg == NULL)
@@ -793,7 +831,7 @@ static bool get_args_recursive(vector<string> & inclusions,
                 if(execute_ref == "")
                     execute_ref = optarg;
                 else
-                    user_interaction_warning("only one -F option is allowed, ignoring other instances");
+		    execute_ref += string(" ; ") + optarg;
                 break;
             case 'J':
                 if(optarg == NULL)
@@ -857,7 +895,10 @@ static bool get_args_recursive(vector<string> & inclusions,
                                                  flat,
                                                  min_compr_size,
                                                  readconfig, nodump,
-                                                 hourshift);
+                                                 hourshift,
+						 warn_remove_no_match,
+						 alteration,
+						 empty);
                         inclusions.pop_back();
                     }
                     catch(...)
@@ -898,7 +939,7 @@ static bool get_args_recursive(vector<string> & inclusions,
                     readconfig = false;
                 break;
             case ' ':
-#ifdef NODUMP_FEATURE
+#ifdef LIBDAR_NODUMP_FEATURE
                 if(nodump)
                     user_interaction_warning("only one --nodump option is allowed, ignoring other instances");
                 else
@@ -922,14 +963,28 @@ static bool get_args_recursive(vector<string> & inclusions,
                     }
                 }
                 break;
+	    case 'a':
+		if(optarg == NULL)
+		    throw Erange("command_line.cpp:get_args_recursive", "-a option needs an argument");
+		if(alteration != "")
+		    user_interaction_warning("only one -a option is allowed, ignoring other instances");
+		else
+		    alteration = optarg;
+		break;
+	    case 'e':
+		if(empty)
+		    user_interaction_warning("only one -e option is allowed, ignoring other instances");
+		else
+		    empty = true;
+		break;
             case '?':
                 user_interaction_warning(string("ignoring unknown option ") + char(optopt));
                 break;
             default:
-                user_interaction_warning(string("ignoring unknown option ") + char(lu)); 
+                user_interaction_warning(string("ignoring unknown option ") + char(lu));
             }
         }
-    
+
     for(S_I i = optind; i < argc; i++)
         l_path_inclus.push_back(argv[i]);
 
@@ -959,7 +1014,7 @@ static void usage(const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.21 2003/11/03 21:28:45 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.26.2.2 2004/01/28 15:29:45 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -1325,7 +1380,7 @@ static void show_version(const char *command_name)
     get_compile_time_features(ea, largefile, nodump, special_alloc, bits);
     try
     {
-        ui_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n\n",  name, dar_version());
+        ui_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n\n",  name, ::dar_version());
         ui_printf(" Using libdar %u.%u built with compilation time options:\n", maj, min);
         tools_display_features(ea, largefile, nodump, special_alloc, bits);
         ui_printf("\n");
@@ -1363,7 +1418,7 @@ static const struct option *get_long_opt()
         {"test", required_argument, NULL, 't'},
         {"no-user-EA", no_argument, NULL, 'u'},
         {"verbose", no_argument, NULL, 'v'},
-        {"no-warn", no_argument, NULL, 'w'},
+        {"no-warn", optional_argument, NULL, 'w'},
         {"extract", required_argument, NULL, 'x'},
         {"bzip2", optional_argument, NULL, 'y'},
         {"gzip", optional_argument, NULL, 'z'},
@@ -1391,6 +1446,8 @@ static const struct option *get_long_opt()
         {"noconf", no_argument, NULL, 'N'},
         {"nodump", no_argument, NULL, ' '},
         {"hour", optional_argument, NULL, 'H'},
+	{"alter", optional_argument, NULL, 'a'},
+	{"empty", no_argument, NULL, 'e'},
         { NULL, 0, NULL, 0 }
     };
 
@@ -1566,7 +1623,7 @@ static void make_args_from_file(operation op, const char *filename, S_I & argc, 
             throw Ememory("make_args_from_file");
 
         if(info_details)
-            ui_printf("arguments read from %s :", filename); 
+            ui_printf("arguments read from %s :", filename);
         for(S_I i = 0; i < argc; i++)
         {
             argv[i] = mots[i]; // copy of the address of each string
@@ -1697,7 +1754,10 @@ static bool update_with_config_files(const char * home,
                                      bool & flat,
                                      infinint & min_compr_size,
                                      bool & nodump,
-                                     infinint & hourshift)
+                                     infinint & hourshift,
+				     bool & warn_remove_no_match,
+				     string & alteration,
+				     bool & empty)
 {
     const unsigned int len = strlen(home);
     const unsigned int delta = 20;
@@ -1714,22 +1774,22 @@ static bool update_with_config_files(const char * home,
         S_I rec_c = 0;
         char **rec_v = NULL;
         bool btmp = true;
-        
-        
+
+
             // trying to open $HOME/.darrc
         strncpy(buffer, home, len+1); // +1 because of final '\0'
         strncat(buffer, "/.darrc", delta);
-        
+
         try
         {
             user_interaction_warning(string("Reading config file: ")+buffer);
             make_args_from_file(op, buffer, rec_c, rec_v, info_details);
-            
+
             try
             {
                 vector<string> inclusions;
                 optind = 0; // reset getopt call
-                
+
                 if(! get_args_recursive(inclusions,
                                         rec_c, rec_v, op, fs_root,
                                         sauv_root, ref_root,
@@ -1755,7 +1815,10 @@ static bool update_with_config_files(const char * home,
                                         flat,
                                         min_compr_size,
                                         btmp, nodump,
-                                        hourshift))
+                                        hourshift,
+					warn_remove_no_match,
+					alteration,
+					empty))
                     retour = syntax;
                 else
                     retour = ok;
@@ -1777,15 +1840,15 @@ static bool update_with_config_files(const char * home,
                 // below
         }
 
-        
+
         rec_c = 0;
         rec_v = NULL;
-        
+
         if(retour == unknown)
         {
                 // trying to open /etc/darrc
             strncpy(buffer, "/etc/darrc", len+delta);
-            
+
             try
             {
                 make_args_from_file(op, buffer, rec_c, rec_v, info_details);
@@ -1794,7 +1857,7 @@ static bool update_with_config_files(const char * home,
                     vector<string> inclusions;
                     user_interaction_warning(string("Reading config file: ")+buffer);
                     optind = 0; // reset getopt call
-                    
+
                     if(! get_args_recursive(inclusions,
                                             rec_c, rec_v, op, fs_root,
                                             sauv_root, ref_root,
@@ -1821,7 +1884,10 @@ static bool update_with_config_files(const char * home,
                                             min_compr_size,
                                             btmp,
                                             nodump,
-                                            hourshift))
+                                            hourshift,
+					    warn_remove_no_match,
+					    alteration,
+					    empty))
                         retour = syntax;
                     else
                         retour = ok;
@@ -1847,6 +1913,6 @@ static bool update_with_config_files(const char * home,
         throw;
     }
     delete buffer;
-        
+
     return retour != syntax;
 }

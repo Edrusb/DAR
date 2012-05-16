@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.hpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: dar_suite.hpp,v 1.6.4.1 2004/01/14 13:21:57 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -43,6 +43,8 @@
     // do not match those expected (sanity checks warning).
 #define EXIT_LIMITINT 8    // limitinit overflow
     // fixed using full infinint version of the program
+#define EXIT_UNKNOWN_ERROR 9
+    // error not possible to report by other mean no access to stdout/stderr)
 
 #define EXTENSION "dar"
 

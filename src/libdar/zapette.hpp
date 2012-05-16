@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
+// $Id: zapette.hpp,v 1.5 2003/11/15 00:16:47 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -35,18 +35,22 @@
 namespace libdar
 {
 
-    class zapette: public generic_file
+    class zapette : public contextual
     {
     public:
 
         zapette(generic_file *input, generic_file *output);
         ~zapette();
 
-            // inherited methods
+            // inherited methods from generic_file
         bool skip(const infinint &pos);
         bool skip_to_eof() { position = file_size; return true; };
         bool skip_relative(S_I x);
         infinint get_position() { return position; };
+
+	    // inherited methods from contextual
+        void set_info_status(const std::string & s);
+        std::string get_info_status() const { return info; };
 
     protected:
         S_I inherited_read(char *a, size_t size);
@@ -56,20 +60,22 @@ namespace libdar
         generic_file *in, *out;
         infinint position, file_size;
         char serial_counter;
+	std::string info;
 
-        void make_transfert(U_16 size, const infinint &offset, char *data, S_I & lu, infinint & arg);
+	void make_transfert(U_16 size, const infinint &offset, char *data, const std::string & info, S_I & lu, infinint & arg);
     };
 
     class slave_zapette
     {
     public:
-        slave_zapette(generic_file *input, generic_file *output, generic_file *data);
+        slave_zapette(generic_file *input, generic_file *output, contextual *data);
         ~slave_zapette();
 
         void action();
     
     private:
-        generic_file *in, *out, *src;
+        generic_file *in, *out;
+	contextual *src;
     };
 
 } // end of namespace

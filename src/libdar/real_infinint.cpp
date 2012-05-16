@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: real_infinint.cpp,v 1.7.4.3 2004/01/15 20:35:55 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,9 +26,12 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+} // end extern "C"
 
 #include "real_infinint.hpp"
 #include "erreurs.hpp"
@@ -78,32 +81,32 @@ namespace libdar
         storage::iterator it;
         S_I lu;
         bitfield bf;
-    
+
         while(!fin)
         {
             lu = x.read((char *)&a, 1);
 
             if(lu <= 0)
                 throw Erange("infinint::build_from_file(generic_file)", "reached end of file before all data could be read");
-        
+
             if(a == 0)
                 skip++;
             else // end of size field
             {
                     // computing the size to read
                 U_I pos = 0;
-            
+
                 expand_byte(a, bf);
                 for(S_I i = 0; i < 8; i++)
                     pos = pos + bf[i];
                 if(pos != 1)
                     throw Erange("infinint::build_from_file(generic_file)", "badly formed infinint or not supported format"); // more than 1 bit is set to 1
-            
+
                 pos = 0;
                 while(bf[pos] == 0)
                     pos++;
                 pos += 1; // bf starts at zero, but bit zero means 1 TG of length
-            
+
                 skip *= 8;
                 skip += pos;
                 skip *= TG;
@@ -131,7 +134,7 @@ namespace libdar
         E_END("infinint::build_from_file", "generic_file");
     }
 
- 
+
     void infinint::dump(generic_file & x) const throw(Einfinint, Ememory, Erange, Ebug)
     {
         E_BEGIN;
@@ -140,7 +143,7 @@ namespace libdar
         unsigned char last_width;
         infinint justification;
         U_32 tmp;
-    
+
         if(! is_valid())
             throw SRC_BUG;
 
@@ -234,7 +237,7 @@ namespace libdar
 
         if(retenue != 0)
         {
-            field->insert_null_bytes_at_iterator(field->begin(), 1); 
+            field->insert_null_bytes_at_iterator(field->begin(), 1);
             (*field)[0] = retenue;
         }
 
@@ -272,7 +275,7 @@ namespace libdar
             if(somme < 0)
             {
                 somme = -somme;
-            
+
                 tmp = somme & 0xFF;
                 retenue = somme >> 8;
                 if(tmp != 0)
@@ -285,12 +288,12 @@ namespace libdar
             }
             else
                 retenue = 0;
-        
+
             *(it_res--) = somme;
         }
 
         reduce(); // it is necessary here !
-    
+
         return *this;
         E_END("infinint::operator -=", "");
     }
@@ -308,7 +311,7 @@ namespace libdar
         {
             produit = (*it) * arg + retenue;
             retenue = 0;
-        
+
             retenue = produit >> 8;
             produit = produit & 0xFF;
 
@@ -323,7 +326,7 @@ namespace libdar
 
         if(arg == 0)
             reduce(); // only necessary in that case
-    
+
         return *this;
         E_END("infinint::operator *=", "unsigned char");
     }
@@ -352,6 +355,15 @@ namespace libdar
         E_END("infinint::operator *=", "infinint");
     }
 
+    template <class T> infinint infinint::power(const T & exponent) const
+    {
+	infinint ret = 1;
+	for(T count = 0; count < exponent; count++)
+	    ret *= *this;
+
+	return ret;
+    }
+
     infinint & infinint::operator >>= (U_32 bit) throw(Ememory, Erange, Ebug)
     {
         E_BEGIN;
@@ -372,14 +384,14 @@ namespace libdar
         {
                 // shift right by "byte" bytes
             field->remove_bytes_at_iterator(it, byte);
-    
+
                 // shift right by "bit" bits
             if(bit != 0)
             {
                 for(register U_I i = 0; i < 8; i++)
                     bf[i] = i < shift_retenue ? 0 : 1;
                 contract_byte(bf, mask);
-            
+
                 it = field->begin();
                 while(it != field->end())
                 {
@@ -447,12 +459,12 @@ namespace libdar
                 // and now the bit translation
             shift_retenue = 8 - bit;
             it = field->rbegin();
-        
+
                 // the mask for selecting the retenue
             for(register U_I i = 0; i < 8; i++)
                 bf[i] = i < bit ? 1 : 0;
             contract_byte(bf, mask);
-        
+
             while(it != field->rend())
             {
                 r1 = (*it) & mask;
@@ -504,8 +516,8 @@ namespace libdar
 
         if(used_endian == big_endian)
             swap_bytes(debut, sizeof(T));
-    
-        return ret;   
+
+        return ret;
         E_END("infinint::modulo", "");
     }
 
@@ -528,16 +540,16 @@ namespace libdar
             {
                 ita = a.field->begin();
                 itb = b.field->begin();
-            
+
                 while(ita != a.field->end() && itb != b.field->end() && *ita == *itb)
                 {
                     ita++;
                     itb++;
                 }
-            
+
                 if(ita == a.field->end() && itb == b.field->end())
-                    return 0; 
-                    
+                    return 0;
+
                 if(itb == b.field->end())
                     return +1; // b can't be greater than a, at most it can be equal to it
 
@@ -561,7 +573,7 @@ namespace libdar
     {
         E_BEGIN;
         static const U_I max_a_time = ~ (U_I)(0); // this is the argument type of remove_bytes_at_iterator
-    
+
         U_I count = 0;
         storage::iterator it = field->begin();
 
@@ -686,7 +698,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: real_infinint.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: real_infinint.cpp,v 1.7.4.3 2004/01/15 20:35:55 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -700,7 +712,7 @@ namespace libdar
             // Note : static here avoids the recalculation of max_T at each call
         static const T max_T = tools_maxof_agregate(T(0));
         infinint step = max_T - a;
-    
+
         if(*this < step)
         {
             T transfert = 0;
@@ -710,7 +722,7 @@ namespace libdar
 
             while(ptr >= debut && it != field->rend())
                 *(ptr--) = *(it--);
-                
+
             if(used_endian == big_endian)
                 swap_bytes(debut, sizeof(transfert));
             a += transfert;
@@ -780,7 +792,7 @@ namespace libdar
     {
         E_BEGIN;
         a = 0;
-    
+
         for(register S_I i = 0; i < 8; i++)
         {
             a <<= 1;
@@ -820,7 +832,7 @@ namespace libdar
         E_BEGIN;
         infinint ret = a;
         ret *= b;
-    
+
         return ret;
         E_END("operator *", "infinint");
     }
@@ -830,7 +842,7 @@ namespace libdar
         E_BEGIN;
         infinint ret = a;
         ret *= b;
-    
+
         return ret;
         E_END("operator *", "infinint, unsigned char");
     }
@@ -840,7 +852,7 @@ namespace libdar
         E_BEGIN;
         infinint ret = b;
         ret *= a;
-    
+
         return ret;
         E_END("operator *", "unsigned char, infinint");
     }
@@ -869,8 +881,8 @@ namespace libdar
     {
         E_BEGIN;
         infinint ret = a;
-        ret >>= bit; 
-        return ret; 
+        ret >>= bit;
+        return ret;
         E_END("operator >>", "infinint, U_32");
     }
 
@@ -878,16 +890,16 @@ namespace libdar
     {
         E_BEGIN;
         infinint ret = a;
-        ret >>= bit; 
-        return ret; 
+        ret >>= bit;
+        return ret;
         E_END("operator >>", "infinint");
     }
 
     infinint operator << (const infinint & a, U_32 bit) throw(Erange, Ememory, Ebug)
     {
         E_BEGIN;
-        infinint ret = a; 
-        ret <<= bit; 
+        infinint ret = a;
+        ret <<= bit;
         return ret;
         E_END("operator <<", "infinint, U_32");
     }
@@ -895,9 +907,9 @@ namespace libdar
     infinint operator << (const infinint & a, const infinint & bit) throw(Erange, Ememory, Ebug)
     {
         E_BEGIN;
-        infinint ret = a; 
-        ret <<= bit; 
-        return ret; 
+        infinint ret = a;
+        ret <<= bit;
+        return ret;
         E_END("operator <<", "infinint");
     }
 
@@ -947,7 +959,7 @@ namespace libdar
         size_t g = 0;
         time_t h = 0;
         off_t i = 0;
- 
+
             // this forces template instanciation
         t.unstack(a);
         t.unstack(b);
@@ -961,6 +973,8 @@ namespace libdar
         t = infinint(g);
         t = infinint(h);
         t = infinint(i);
+	t.power(d);
+	t.power(t);
         template_instance(); // this call is never used,
             // this line is only to avoid compilation warning
             // of ... never used function :-)

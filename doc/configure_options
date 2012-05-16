@@ -41,7 +41,7 @@ x H ...... special-alloc
   L ...... test-memory
 x M ...... upx
 
-I, J, K and L are debugging options and should not be used for normal use.
+I, J, K and L are debugging options and should not be set for normal use.
 
 A : if set and if the system allows it, dar will be able to handle file of
     size larger than 4GB
@@ -56,7 +56,8 @@ E : if set, dar uses the given argument (32 or 64) to determine which integer
 F : if set, builds dar_static binary (statically linked version of dar)
 G : if set, replace infinint by 32 or 64 bits integers. This makes a faster
     executable and less fond of memory, but with several restrictions (about
-    for example ability to handle large files, or high dates, etc.),
+    for example ability to handle large files, or high dates. See
+    doc/LIMITATIONS for more),
 H : if set, use special memory allocation, adapted when a lot of little piece
     of memory are allocated (improves dar's executable speed)
 I : if set, use debug compilation option, and if possible statically link
@@ -68,31 +69,31 @@ L : if set, wrap memory allocation routine to track memory leakage (makes a
 M : if set, look for UPX command, and if found compresses library and executables, if no upx is found, does the same as if the option is not given.
 
 
-For version 2.0.0
--------------------------
+For version 2.0.x and 2.1.x
+-----------------------------
 legend: ! = option available for that system
         . = option Not available for that system
 (free inspiration from the Cisco ping command output)
 
  System \ option   |  A B C D E F G H I J K L M
- enable by default: |  x   x     x   x         x
+enabled by default:|  x   x     x   x         x
 ------------------------------------------------
 Linux              |  ! ! ! ! ! ! ! ! ! ! ! ! ! long options supported
-Solaris 8          |  ! . . ! ! . ! ! ! ! ! ! ! long options NOT supported 
+Solaris 8          |  ! . . ! ! . ! ! ! ! ! ! ! long options NOT supported
 FreeBSD            |  ! . . ! ! . ! ! ! ! ! ! ! long options NOT supported
 Cygwin             |  ! . . ! ! . ! ! ! ! ! ! ! long options supported
-
+NetBSD             |  ! . . ! ! . ! ! ! ! ! ! ! long options NOT supported
 
 Consequences:
 
 For Linux
 ----------
-No restrictions, no necessary options
+All option available
 
         ./configure [...]
 
 
-For Solaris FreeBSD and Cygwin,
+For Solaris, FreeBSD, NetBSD and Cygwin,
 ---------------
 configure will detect that two options cannot be activated (C and F) and
 thus will just show a warning. On theses system,

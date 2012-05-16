@@ -7,11 +7,11 @@ Status meanings :
 ---------------
 letter status description :
 ---------------
-a !
+a * alteration of operation             --alter   argument: s[aved]
 b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff
-e !
+e - simulate the operation              --empty		
 f - do not restore directory structure  --flat
 g !
 h - help usage                          --help
@@ -23,13 +23,13 @@ m + minimum size below which no compression will occur. --mincompr a default val
 n - do not allow overwriting            --no-overwrite
 o - path of the output pipe             --output
 p - pause before creating new slice     --pause
-q - for version 2.1.0 suppress all messages except important warnings
+q !
 r - do not overwrite more recent file   --recent
 s + size of slice                       --slice
 t + test archive structure              --test
 u - not consider user EA                --no-user-EA
 v - verbose output                      --verbose
-w - do not warn before overwriting      --no-warn
+w * do not warn before overwriting      --no-warn
 x + extract archive                     --extract
 y * bzip2 compression                   --bzip2
 z * gzip compression                    --gzip
@@ -49,10 +49,10 @@ M !
 N - do not read any configuration file ~/.darrc or /etc/darrc
 O - ignore user Id and group Id         --ignore-owner
 P + prune a directory tree              --prune
-Q - suppress some user interactions (OK for all), delete files 
+Q !
 R + set the root directory              --root
 S + size of the first slice             --first-slice
-T - tree listing format                 --tree-format
+T - tree listing format                 --tree-format,
 U - not consider root(or system) EA     --no-system-EA
 V - version information                 --version
 W - warranty disclosure information (POSIX RESERVED, sorry)
@@ -60,3 +60,7 @@ X + exclude mask                        --exclude
 Y + included only filename for compression --include-compression
 Z + excluded filename from compression  --exclude-compression
   - don't save files with nodump flag set --nodump
+
+
+
+

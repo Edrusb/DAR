@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: wrapperlib.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
+// $Id: wrapperlib.hpp,v 1.4.4.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,8 +26,12 @@
 #define WRAPPERLIB_HPP
 
 #include "../my_config.h"
+
+extern "C"
+{
 #include <zlib.h>
 #include <bzlib.h>
+} // end extern "C"
 
 namespace libdar
 {
@@ -51,12 +55,12 @@ namespace libdar
         wrapperlib(const wrapperlib & ref);
         wrapperlib & operator = (const wrapperlib & ref);
         ~wrapperlib();
-        
+
         void set_next_in(char *x) { return (this->*x_set_next_in)(x); };
         void set_avail_in(U_I x) { return (this->*x_set_avail_in)(x); };
         U_I get_avail_in() const { return (this->*x_get_avail_in)(); };
         U_64 get_total_in() const { return (this->*x_get_total_in)(); };
-    
+
         void set_next_out(char *x) { return (this->*x_set_next_out)(x); };
         char *get_next_out() const { return (this->*x_get_next_out)(); };
         void set_avail_out(U_I x) { return (this->*x_set_avail_out)(x); };
@@ -69,7 +73,7 @@ namespace libdar
         S_I decompressEnd() { return (this->*x_decompressEnd)(); };
         S_I compress(S_I flag) { return (this->*x_compress)(flag); };
         S_I decompress(S_I flag) { return (this->*x_decompress)(flag);};
-        S_I compressReset(); 
+        S_I compressReset();
         S_I decompressReset();
 
     private:
@@ -81,7 +85,7 @@ namespace libdar
         void (wrapperlib::*x_set_avail_in)(U_I x);
         U_I (wrapperlib::*x_get_avail_in)() const;
         U_64 (wrapperlib::*x_get_total_in)() const;
-    
+
         void (wrapperlib::*x_set_next_out)(char *x);
         char *(wrapperlib::*x_get_next_out)() const;
         void (wrapperlib::*x_set_avail_out)(U_I x);
@@ -115,7 +119,7 @@ namespace libdar
         U_64 z_get_total_out() const;
 
             // set of routines for bzlib
-    
+
         S_I bz_compressInit(U_I compression_level);
         S_I bz_decompressInit();
         S_I bz_compressEnd();

@@ -18,16 +18,19 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: config_file.cpp,v 1.6 2003/10/31 22:44:33 edrusb Rel $
+// $Id: config_file.cpp,v 1.6.4.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 #include <ctype.h>
 #endif
+} // end extern "C"
 
 #include "config_file.hpp"
 #include "tools.hpp"
@@ -36,10 +39,10 @@ using namespace libdar;
 
 void config_file::fill_morceau()
 {
-    string read_target; 
+    string read_target;
     partie tmp;
     infinint last_offset = 0;
-    infinint first, last;       
+    infinint first, last;
     enum { debut, fin } status = fin;
 
         // we read any text put before the first condition
@@ -50,7 +53,7 @@ void config_file::fill_morceau()
     if(ref == NULL)
         throw SRC_BUG;
     ref->skip(0);
-        
+
     while(find_next_target(*ref, first, read_target, last))
     {
         switch(status)
@@ -77,7 +80,7 @@ void config_file::fill_morceau()
             throw SRC_BUG;
         }
     }
-                        
+
     if(status == fin)
     {
         if(ref->get_position() < tmp.debut)
@@ -167,6 +170,6 @@ bool config_file::find_next_target(generic_file &f, infinint & debut, string & n
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: config_file.cpp,v 1.6 2003/10/31 22:44:33 edrusb Rel $";
+    static char id[]="$Id: config_file.cpp,v 1.6.4.1 2003/12/20 23:05:34 edrusb Rel $";
     dummy_call(id);
 }

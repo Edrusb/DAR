@@ -18,13 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
+// $Id: sar_tools.cpp,v 1.9.2.2 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -58,6 +60,7 @@ char *strchr (), *strrchr ();
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+} // end extern "C"
 
 #include "erreurs.hpp"
 #include "user_interaction.hpp"
@@ -73,7 +76,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar_tools.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: sar_tools.cpp,v 1.9.2.2 2003/12/20 23:05:34 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -82,7 +85,7 @@ namespace libdar
         char *name = tools_str2charptr(filename);
         generic_file *ret = NULL;
         generic_file *tmp = NULL;
-    
+
         try
         {
             S_I fd;
@@ -93,7 +96,7 @@ namespace libdar
                 if(lstat(name, &buf) < 0)
                 {
                     if(errno != ENOENT)
-                        throw Erange("open_archive_fichier", strerror(errno));
+                        throw Erange("open_archive_fichier", string("Error retreiving inode information for ") + name + " : " + strerror(errno));
                 }
                 else
                 {
@@ -103,10 +106,10 @@ namespace libdar
                         user_interaction_pause(filename + " is about to be overwritten, continue ?");
                 }
             }
-            
+
             fd = open(name, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
             if(fd < 0)
-                throw Erange("open_archive_fichier", strerror(errno));
+                throw Erange("open_archive_fichier", string("Error openning file ") + name + " : " + strerror(errno));
             tmp = new fichier(fd);
             if(tmp == NULL)
                 throw Ememory("open_archive_fichier");
@@ -119,9 +122,8 @@ namespace libdar
             delete name;
             if(ret != NULL)
                 delete ret;
-            else // tmp is not managed by ret, which does not exist
-                if(tmp != NULL)
-                    delete tmp;
+	    if(tmp != NULL)
+		delete tmp;
             throw;
         }
         delete name;
@@ -133,7 +135,7 @@ namespace libdar
     {
         generic_file *tmp = NULL;
         generic_file *ret = NULL;
-    
+
         try
         {
             tmp = new tuyau(fd, mode);

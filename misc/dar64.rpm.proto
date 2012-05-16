@@ -2,7 +2,7 @@
 summary: DAR - Disk ARchive
 Name: dar
 Version: DAR_VERSION
-Release: 9
+Release: 1
 Copyright: GPL
 Icon: dar.gif
 Group: Applications/Archiving
@@ -28,7 +28,7 @@ make clean
 rm -rf %{buildroot}
 
 %build
-./configure --enable-os-bits=32 --enable-mode=64 --prefix=/usr --mandir=/usr/share/man
+./configure CXXFLAGS=-O --enable-mode=64 --prefix=/usr --mandir=/usr/share/man
 make
 
 %install
@@ -69,6 +69,12 @@ make DESTDIR=%{buildroot} install-strip
 /usr/include/dar/storage.hpp
 /usr/include/dar/tuyau.hpp
 /usr/include/dar/tools.hpp
+/usr/include/dar/catalogue.hpp
+/usr/include/dar/scrambler.hpp
+/usr/include/dar/archive.hpp
+/usr/include/dar/header_version.hpp
+/usr/include/dar/ea.hpp
+/usr/include/dar/crypto.hpp
 /usr/bin/dar
 /usr/bin/dar_xform
 /usr/bin/dar_slave
@@ -82,7 +88,8 @@ make DESTDIR=%{buildroot} install-strip
 /usr/share/dar/LIMITATIONS
 /usr/share/dar/NOTES
 /usr/share/dar/TUTORIAL
-/usr/share/dar/DOC_API
+/usr/share/dar/DOC_API_V1
+/usr/share/dar/DOC_API_V2
 /usr/share/dar/GOOD_BACKUP_PRACTICE
 /usr/share/dar/README
 /usr/share/dar/dar-differential-backup-mini-howto.en.html

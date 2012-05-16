@@ -15,15 +15,15 @@ set dir_name="dar$2-$1-i386-windows"
 set build_dir=`pwd`/$dir_name
 echo "install directory is $build_dir"
 if( -e $build_dir) then
-   echo "cannot create $buid_dir file exists"
+   echo "cannot create $build_dir file exists"
    exit 1
 endif
 mkdir $build_dir
 make clean distclean || echo "ignoring error, tree already clean"
-./configure --prefix=$build_dir --disable-dar-static --disable-static --disable-nodump-flag $3 $4 $5 $6 $7 $8 $9
+./configure --prefix=$build_dir --disable-dar-static --disable-static --disable-nodump-flag $3 $4 $5 $6 $7 $8 $9 CXXFLAGS=-O
 make
 make install-strip
-mv $build_dir/bin/* $build_dir/lib/* $build_dir
+mv $build_dir/bin/* $build_dir/lib/*.so.*.*.* $build_dir
 cp /bin/cygwin1.dll /bin/cygz.dll /bin/cygbz2-1.dll $build_dir
 foreach fichier (`find $build_dir/man -type f -print` )
    man $fichier | col -b > $build_dir/`basename $fichier`.txt

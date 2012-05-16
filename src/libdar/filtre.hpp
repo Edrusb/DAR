@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.hpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: filtre.hpp,v 1.7 2003/11/18 00:51:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -50,7 +50,9 @@ namespace libdar
                                bool restore_ea_user,
                                bool flat,
                                bool ignore_owner,
-                               const infinint & hourshift);
+			       bool warn_remove_no_match,
+                               const infinint & hourshift,
+			       bool empty);
 
     extern void filtre_sauvegarde(const mask &filtre,
                                   const mask &subtree,

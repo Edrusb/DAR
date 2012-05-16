@@ -1,3 +1,11 @@
+version 2.1.0
+-------------
+Thanks to Shanon Denize for its suggestion about -wa option, to
+Lars Schmidt-Thieme for his suggestion about -as option. And,
+thanks to "nedkonz" on the historical forum, for feedback, and Nick Alcock
+for his "tiny" patch and feedback about GNU Coding Standards. Thanks to Tami
+King for feedback and help. Thanks to Patrick Drechsler for typo error feedback.
+
 version 2.0.4
 --------------
 Thanks to Matthew Valites and "nedkonz" for feedback about large file support.
@@ -62,11 +70,9 @@ and written by Chris.
 
 version 1.1.0
 ---------------
-
 Thanks to Moritz Franosch for intensive testing, for finding several bugs and
 proposing patches, to John Little for testing dar and for providing a forum
 area, to Ulrich Hagen, Francois Botha, Tobias Jahn for feedback, and to
 Andreas Gruenbacher for its Extended Attributes software, and its useful
 answers to my questions. Thanks to the many other people that just encouraged
 me by their remarks and compliments.
-

@@ -18,21 +18,25 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: special_alloc.hpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
+// $Id: special_alloc.hpp,v 1.4.4.2 2004/01/28 15:29:47 edrusb Rel $
 //
 /*********************************************************************/
 
 #ifndef SPECIAL_ALLOC_HPP
 #define SPECIAL_ALLOC_HPP
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
 
+extern "C"
+{
 #if HAVE_STDDEF_H
 #include <stddef.h>
 #else
 #if HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
+} // end extern "C"
+
 #endif
 
 #define USE_SPECIAL_ALLOC(BASE_TYPE) \

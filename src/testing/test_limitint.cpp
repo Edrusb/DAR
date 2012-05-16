@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_limitint.cpp,v 1.2 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_limitint.cpp,v 1.2.4.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -39,6 +41,7 @@
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+} // end extern "C"
 
 #include <iostream>
 
@@ -80,7 +83,7 @@ static void routine_real_infinint()
     if(fd >= 0)
     {
         infinint r1 = 1;
-        
+
         r1 <<= 32;
         r1--;
 
@@ -146,7 +149,7 @@ static void routine_limitint()
         // testing addition overflow
         //
         //
-    
+
     try
     {
         a++;
@@ -169,22 +172,22 @@ static void routine_limitint()
     {
         user_interaction_warning(e.get_message());
     }
-    
-    
+
+
         //////////////////////////////////////////
         // testing multiplication overflow
         //
         //
-    
+
     const unsigned int twopower16 = 65536;
-    
+
     a = twopower16 - 1;
     b = twopower16;
     c = twopower16 + 1;
 
     try
     {
-        d = a; 
+        d = a;
         d *= a; // OK
         d = a;
         d *= c; // OK
@@ -195,7 +198,7 @@ static void routine_limitint()
     {
         user_interaction_warning(e.get_message());
     }
-    
+
         // testing left shift overflow
 
     a = 1;

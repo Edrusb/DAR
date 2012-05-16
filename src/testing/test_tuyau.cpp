@@ -18,13 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tuyau.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_tuyau.cpp,v 1.5.4.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 #include <stdlib.h>
 #endif
@@ -50,6 +52,7 @@ char *strchr (), *strrchr ();
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
 # endif
 #endif
+} // end extern "C"
 
 #include <iostream>
 
@@ -87,7 +90,7 @@ static int little_main(int argc, char *argv[], const char **env)
         shell_interaction_close();
         return 0;
     }
-    
+
     tools_open_pipes(argv[1], argv[2], in, out);
     if(strcmp(argv[3],"loop") == 0)
         action_loop(in, out);
@@ -105,7 +108,7 @@ static void action_xmit(tuyau *in, tuyau *out, U_32 duration)
     char in_buffer[buffer_size];
     unsigned int lu;
     bool xmit_error = false;
-    
+
     signal(SIGALRM, &stop_xmit);
     alarm(duration);
     srand((unsigned int)getpid());
@@ -115,7 +118,7 @@ static void action_xmit(tuyau *in, tuyau *out, U_32 duration)
             // generate data to send;
         for(register unsigned int i = 0; i < buffer_size; i++)
             out_buffer[i] = rand() % 256;
-        
+
             // sending data
         out->write(out_buffer, buffer_size);
 
@@ -123,7 +126,7 @@ static void action_xmit(tuyau *in, tuyau *out, U_32 duration)
         lu = 0;
         while(lu < buffer_size)
             lu += in->read(in_buffer+lu, buffer_size-lu);
-        
+
             // compairing received data with sent one
 
         lu = 0;
@@ -136,12 +139,12 @@ static void action_xmit(tuyau *in, tuyau *out, U_32 duration)
             xmit_error = true;
         }
     }
-    
+
     if(xmit_error)
         ui_printf("TEST FAILED: some transmission error occured\n");
     else
         ui_printf("TEST PASSED SUCCESSFULLY\n");
-    
+
     ui_printf("you can stop the loop instance with Control-C\n");
 }
 
@@ -160,7 +163,7 @@ static void action_loop(tuyau *in, tuyau *out)
         lu = 0;
         while(lu < buffer_size)
             lu += in->read(buffer+lu, buffer_size-lu);
-        
+
         out->write(buffer, buffer_size);
     }
 }

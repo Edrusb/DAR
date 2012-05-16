@@ -18,15 +18,18 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_scrambler.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_scrambler.cpp,v 1.5.4.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_STDIO_H
 #include <stdio.h>
 #endif
+} // end extern "C"
 
 #include "scrambler.hpp"
 #include "dar_suite.hpp"
@@ -51,13 +54,13 @@ S_I little_main(S_I argc, char *argv[], const char **env)
         printf("usage: %s <source> <destination_scrambled> <destination_clear>\n", argv[0]);
         return EXIT_SYNTAX;
     }
-    
+
     fichier *src = new fichier(argv[1], gf_read_only);
     fichier *dst = new fichier(argv[2], gf_write_only);
     scrambler *scr = new scrambler("bonjour", *dst);
-    
+
     src->copy_to(*scr);
-    
+
     delete scr; scr = NULL;
     delete dst; dst = NULL;
     delete src; src = NULL;

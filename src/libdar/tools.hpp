@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.12.2.1 2003/11/29 08:49:58 edrusb Rel $
+// $Id: tools.hpp,v 1.13 2003/11/27 20:54:13 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -81,6 +81,9 @@ namespace libdar
 
 	// get current working directory
     extern std::string tools_getcwd();
+	// get file pointed to by a symbolic link, or the argument if it is not a symbolic link
+	// exception can occur if lack of memory or invalid argument given (NULL or empty string), system call error...
+    extern std::string tools_readlink(const char *root);
 
         // integer (agregates) manipulations
         // argument must be a regular interger (a bit field).

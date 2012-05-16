@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
+// $Id: compressor.cpp,v 1.8.4.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,9 +26,12 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SIGNAL_H
 #include <signal.h>
 #endif
+} // end extern "C"
 
 #include "compressor.hpp"
 
@@ -61,7 +64,7 @@ namespace libdar
             throw SRC_BUG;
         if(compression_level > 9)
             throw SRC_BUG;
-        
+
         compr = decompr = NULL;
         switch(algo)
         {
@@ -235,7 +238,7 @@ namespace libdar
 
         decompr->wrap.set_next_out(a);
         decompr->wrap.set_avail_out(size);
-  
+
         do
         {
                 // feeding the input buffer if necessary
@@ -325,7 +328,7 @@ namespace libdar
                 compr->wrap.set_avail_out(compr->size);
 
                 ret = compr->wrap.compress(WR_FINISH);
-                
+
                 switch(ret)
                 {
                 case WR_OK:
@@ -341,7 +344,7 @@ namespace libdar
                     throw SRC_BUG;
                 }
             }
-            while(ret != WR_STREAM_END);   
+            while(ret != WR_STREAM_END);
 
             if(compr->wrap.compressReset() != WR_OK)
                 throw SRC_BUG;
@@ -364,7 +367,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: compressor.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: compressor.cpp,v 1.8.4.1 2003/12/20 23:05:34 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -379,7 +382,7 @@ namespace libdar
                 compr->wrap.set_next_out(compr->buffer);
                 compr->wrap.set_avail_out(compr->size);
                 compr->wrap.set_avail_in(0);
-            
+
                 ret = compr->wrap.compress(WR_FINISH);
             }
             while(ret == WR_OK);

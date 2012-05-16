@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tronc.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_tronc.cpp,v 1.6.4.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -35,6 +37,7 @@
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+} // end extern "C"
 
 #include <iostream>
 
@@ -55,25 +58,25 @@ int main()
 
     shell_interaction_init(&cout, &cerr);
     display_read(h);
-    
+
     try
     {
         fichier f = fichier("test/source.txt", gf_read_only);
         tronc *t;
-        
+
         t = new tronc(&f, 0, 10);
         t->skip(0);
         cout << t->get_position() << endl;
         cout << f.get_position() << endl;
-        
+
         display_read(*t);
         cout << t->get_position() << endl;
         cout << f.get_position() << endl;
-        
+
         display_read(*t);
         cout << t->get_position() << endl;
         cout << f.get_position() << endl;
-        
+
         delete t;
         t = new tronc(&f, 50, 5);
         cout << t->get_position() << endl;
@@ -102,11 +105,11 @@ int main()
 
         t->skip_to_eof();
         display_back_read(*t);
-        display_back_read(*t);  
+        display_back_read(*t);
         g.skip(0);
         display_read(g);
         display_read(g);
-        
+
         t->skip_relative(-5);
         display_read(*t);
         t->skip(3);

@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.53)
-AC_INIT([DAR], [2.0.4], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_PREREQ(2.59)
+AC_INIT([DAR], [2.1.0], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -89,12 +89,18 @@ AC_ARG_ENABLE(  [ea-support],
 AC_ARG_ENABLE(  [nodump-flag],
                 AC_HELP_STRING(--disable-nodump-flag, [deactivate the ext2/3 nodump flag check feature, if you don't have such filesystem]),
                 [AC_MSG_NOTICE([nodump flag disabled])],
-                [AC_CHECK_HEADER(linux/ext2_fs.h,
+                [AC_CHECK_HEADER(ext2fs/ext2_fs.h,
                                 [
-                                AC_DEFINE(NODUMP_FEATURE, [], [if defined, activates the ext2/3 nodump flag feature])
+                                AC_DEFINE(LIBDAR_NODUMP_FEATURE, [ext2fs], [if defined, activates the ext2/3 nodump flag feature])
                                 ],
                                 [
-                                 AC_MSG_NOTICE([cannot find linux/ext2_fs.h header file, nodump-flag feature will not be activated])
+				 AC_CHECK_HEADER(linux/ext2_fs.h,
+                                                 [
+ 				                 AC_DEFINE(LIBDAR_NODUMP_FEATURE, [linux], [if defined, activates the ext2/3 nodump flag feature])
+                                                 ],
+						 [
+                                                     AC_MSG_NOTICE([cannot find linux/ext2_fs.h header file, nodump-flag feature will not be activated])
+	                                         ])
                                 ])
 
                 ])
@@ -145,13 +151,11 @@ AC_ARG_ENABLE( [mode],
 AC_ARG_ENABLE( [debug],
                 AC_HELP_STRING(--enable-debug, [build targets with debugging option and no optimization]),
                 [
-                        CXXFLAGS="-g -Wall"
+	                CXXFLAGS="-g -Wall"
                         CFLAGS="-g -Wall"
                         debug_static="yes"
                 ],
                 [
-                        CXXFLAGS=-O
-                        CFLAGS=-O
                         debug_static="no"
                 ])
 
@@ -159,7 +163,7 @@ AC_ARG_ENABLE( [debug],
 AC_ARG_ENABLE( [pedantic],
                AC_HELP_STRING(--enable-pedantic, [enable pedantic syntaxic check at compilation, use only for debugging purposes !]),
                [
-                        CXXFLAGS="$CXXFLAGS -pedantic"
+                        CXXFLAGS="$CXXFLAGS -pedantic -Wno-long-long"
                ],
                [])
 
@@ -182,7 +186,7 @@ AC_ARG_ENABLE(  [test-memory],
 AC_ARG_ENABLE(  [special-alloc],
                 AC_HELP_STRING(--disable-special-alloc, [makes dar using less memory, in particular in conjunction with --enable-mode=32 or 64]),
                 [],
-                [AC_DEFINE(SPECIAL_ALLOC, [], [if set activates specific new and delete operator which do better allocation for a lot of small items])
+                [AC_DEFINE(LIBDAR_SPECIAL_ALLOC, [], [if set activates specific new and delete operator which do better allocation for a lot of small items])
              ])
 
 AC_ARG_ENABLE( [upx],

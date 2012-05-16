@@ -1,4 +1,4 @@
-/*********************************************************************/
+//*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,32 +18,24 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: cygwin_adapt.hpp,v 1.3.4.1 2003/12/20 23:05:34 edrusb Rel $
+// $Id: crypto.hpp,v 1.1 2003/11/19 00:42:49 edrusb Rel $
 //
 /*********************************************************************/
+//
 
-#ifndef CYGWIN_ADAPT
-#define CYGWIN_ADAPT
+#ifndef CRYPTO_H
+#define CRYPTO_H
 
 #include "../my_config.h"
+#include <string>
 
-extern "C"
+namespace libdar
 {
-#if HAVE_FCNTL_H
-#include <fcntl.h>
-#endif
-    // if fcntl.h does not define O_TEXT nor O_BINARY (which is a Cygwin
-    // speciality), we define them as neutral ORed values : zero
-} // end extern "C"
 
-#ifndef O_TEXT
-// zero is neutral in ORed expression where it expected to be used
-#define O_TEXT 0
-#endif
+    enum crypto_algo { crypto_none, crypto_scrambling };
 
-#ifndef O_BINARY
-// zero is neutral in ORed expression where it expected to be used
-#define O_BINARY 0
-#endif
+    extern void crypto_split_algo_pass(const std::string & all, crypto_algo & algo, std::string & pass);
+
+} // end of namespace
 
 #endif

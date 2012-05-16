@@ -58,7 +58,7 @@ emacs "*~" and .*~".
 note that you have to quote the mask for it not to be interpreted by the shell
 the -X options do not apply to directories, nor to path, they just apply to
 filenames. (see also -I option in man page for more)
- 
+
 over theses files, there is several sub-trees you must not save: the proc
 file system for example, as well as the /dev/pts . Theses are virtual
 file systems, saving them would only make your backup bigger filled with
@@ -149,7 +149,7 @@ system.
 
         dar -t /mnt/zip/linux_full
 will check the whole archive
- 
+
 it is recommended to first unmount it and remount it, this to flush the cache.
 Else you may read data from cache (in memory) and do not detect an error on you
 floppy. dar -t cannot check a single slice, it checks all the archive. If you
@@ -268,6 +268,17 @@ We suppose your new disk is /dev/hda and /dev/sga is your ZIP drive.
         mount -t ext2 /dev/hda1 /disk
 would do the trick
 
+4bis. if you want to restore your system over several partitions
+like /usr /var /home and / you must create the partitions, format
+them. Then create the directories that will be used as mounting point
+an mount the partitions on theses directories
+
+       mkdir /disk/usr /disk/var /disk/home
+       mount -t ext2 /dev/hda2 /disk/usr
+       mount -t ext2 /dev/hda3 /disk/var
+       mount -t ext2 /dev/hda4 /disk/home
+for example if you have / /usr /var and /home partitions.
+
 5. we need to copy the dar binary from the ZIP to your disk
 insert the floppy ZIP where you have copied the dar binary
         cd /
@@ -354,7 +365,7 @@ backup.
 
 OK, now we would also have to restore from all differential backup the same
 way we did. Of course, this file may have changed since the full backup.
-        
+
         dar -R / -x /zip/linux_diff1  home/denis/my_precious_file
 
 and so on, up to the last differential archive.
@@ -482,7 +493,7 @@ archive #   |    path      |    basename
 
 In place of using -b and -p options, you can also tell the path and the name of
 the real archive to use at restoration time this way:
-        
+
         dar_manager -B my_base.dmd -A ~/Catalogues/CAT_linux_full /mnt/zip/linux_full
 
 this is done adding an optional argument. The first ~/Catalogue... is the

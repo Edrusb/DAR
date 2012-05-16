@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
+// $Id: zapette.cpp,v 1.10.2.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -26,6 +26,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 // to allow compilation under Cygwin we need <sys/types.h>
 // else Cygwin's <netinet/in.h> lack __int16_t symbol !?!
 #if HAVE_SYS_TYPES_H
@@ -35,10 +37,13 @@
 #if HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
+} // end extern "C"
 
+#include <string>
 #include "zapette.hpp"
 #include "infinint.hpp"
 #include "user_interaction.hpp"
+#include "tools.hpp"
 
 #define ANSWER_TYPE_DATA 'D'
 #define ANSWER_TYPE_INFININT 'I'
@@ -46,6 +51,9 @@
 #define REQUEST_SIZE_SPECIAL_ORDER 0
 #define REQUEST_OFFSET_END_TRANSMIT 0
 #define REQUEST_OFFSET_GET_FILESIZE 1
+#define REQUEST_OFFSET_CHANGE_CONTEXT_STATUS 2
+
+using namespace std;
 
 namespace libdar
 {
@@ -54,8 +62,9 @@ namespace libdar
     {
         char serial_num;
         U_16 size; // size or REQUEST_SIZE_SPECIAL_ORDER
-        infinint offset; // offset or REQUEST_OFFSET_END_TRANSMIT or REQUEST_OFFSET_GET_FILESIZE
- 
+        infinint offset; // offset or REQUEST_OFFSET_END_TRANSMIT or REQUEST_OFFSET_GET_FILESIZE, REQUEST_OFFSET_* ...
+	string info; // new contextual_status
+
         void write(generic_file *f); // master side
         void read(generic_file *f);  // slave side
     };
@@ -66,7 +75,7 @@ namespace libdar
         char type;
         U_16 size;
         infinint arg;
-    
+
         void write(generic_file *f, char *data); // slave side
         void read(generic_file *f, char *data, U_16 max);  // master side
     };
@@ -78,6 +87,8 @@ namespace libdar
         f->write(&serial_num, 1);
         offset.dump(*f);
         f->write((char *)&tmp, sizeof(tmp));
+	if(size == REQUEST_SIZE_SPECIAL_ORDER && offset == REQUEST_OFFSET_CHANGE_CONTEXT_STATUS)
+	    tools_write_string(*f, info);
     }
 
     void request::read(generic_file *f)
@@ -92,6 +103,10 @@ namespace libdar
         while(pas < sizeof(tmp))
             pas += f->read((char *)&tmp+pas, sizeof(tmp)-pas);
         size = ntohs(tmp);
+	if(size == REQUEST_SIZE_SPECIAL_ORDER && offset == REQUEST_OFFSET_CHANGE_CONTEXT_STATUS)
+	    tools_read_string(*f, info);
+	else
+	    info = "";
     }
 
     void answer::write(generic_file *f, char *data)
@@ -135,13 +150,13 @@ namespace libdar
             pas = 0;
             while(pas < size)
                 pas += f->read(data+pas, size-pas);
-        
+
             if(size > max) // need to drop the remaining data
             {
                 char black_hole;
-            
+
                 for(tmp = max; tmp < size; tmp++)
-                    f->read(&black_hole, 1); 
+                    f->read(&black_hole, 1);
                     // might not be very performant code
             }
             arg = 0;
@@ -155,7 +170,7 @@ namespace libdar
         }
     }
 
-    slave_zapette::slave_zapette(generic_file *input, generic_file *output, generic_file *data)
+    slave_zapette::slave_zapette(generic_file *input, generic_file *output, contextual *data)
     {
         if(input == NULL)
             throw SRC_BUG;
@@ -178,9 +193,9 @@ namespace libdar
     slave_zapette::~slave_zapette()
     {
         if(in != NULL)
-            delete in; 
+            delete in;
         if(out != NULL)
-            delete out; 
+            delete out;
         if(src != NULL)
             delete src;
     }
@@ -198,7 +213,7 @@ namespace libdar
             {
                 req.read(in);
                 ans.serial_num = req.serial_num;
-            
+
                 if(req.size != REQUEST_SIZE_SPECIAL_ORDER)
                 {
                     ans.type = ANSWER_TYPE_DATA;
@@ -241,6 +256,13 @@ namespace libdar
                         ans.arg = src->get_position();
                         ans.write(out, NULL);
                     }
+		    else if(req.offset == REQUEST_OFFSET_CHANGE_CONTEXT_STATUS) // contextual status change requested
+		    {
+			ans.type = ANSWER_TYPE_INFININT;
+			ans.arg = 1;
+			src->set_info_status(req.info);
+			ans.write(out, NULL);
+		    }
                     else
                         throw Erange("zapette::action", "received unkown special order");
                 }
@@ -257,7 +279,7 @@ namespace libdar
             delete buffer;
     }
 
-    zapette::zapette(generic_file *input, generic_file *output) : generic_file(gf_read_only)
+    zapette::zapette(generic_file *input, generic_file *output) : contextual(gf_read_only)
     {
         if(input == NULL)
             throw SRC_BUG;
@@ -272,18 +294,19 @@ namespace libdar
         out = output;
         position = 0;
         serial_counter = 0;
-    
+	info = CONTEXT_INIT;
+
             //////////////////////////////
             // retreiving the file size
             //
         S_I tmp = 0;
-        make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_GET_FILESIZE, NULL, tmp, file_size);
+        make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_GET_FILESIZE, NULL, "", tmp, file_size);
     }
-    
+
     zapette::~zapette()
     {
         S_I tmp = 0;
-        make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_END_TRANSMIT, NULL, tmp, file_size);
+        make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_END_TRANSMIT, NULL, "", tmp, file_size);
 
         delete in;
         delete out;
@@ -291,7 +314,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: zapette.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: zapette.cpp,v 1.10.2.1 2003/12/20 23:05:35 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -335,11 +358,20 @@ namespace libdar
             }
     }
 
+    void zapette::set_info_status(const std::string & s)
+    {
+	infinint val;
+	S_I tmp;
+
+	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_CHANGE_CONTEXT_STATUS, NULL, s, tmp, val);
+    }
+
+
     S_I zapette::inherited_read(char *a, size_t size)
     {
         static U_16 max_short = ~0;
         U_I lu = 0;
-    
+
         if(size > 0)
         {
             infinint not_used;
@@ -352,7 +384,7 @@ namespace libdar
                     pas = max_short;
                 else
                     pas = size - lu;
-                make_transfert(pas, position, a+lu, ret, not_used);
+                make_transfert(pas, position, a+lu, "", ret, not_used);
                 position += ret;
                 lu += ret;
             }
@@ -367,7 +399,7 @@ namespace libdar
         throw SRC_BUG; // zapette is read-only
     }
 
-    void zapette::make_transfert(U_16 size, const infinint &offset, char *data, S_I & lu, infinint & arg)
+    void zapette::make_transfert(U_16 size, const infinint &offset, char *data, const string & info, S_I & lu, infinint & arg)
     {
         request req;
         answer ans;
@@ -376,6 +408,7 @@ namespace libdar
         req.serial_num = serial_counter++; // may loopback to 0
         req.offset = offset;
         req.size = size;
+	req.info = info;
         req.write(out);
 
             // reading the answer
@@ -383,7 +416,8 @@ namespace libdar
         {
             ans.read(in, data, size);
             if(ans.serial_num != req.serial_num)
-                user_interaction_pause("communication problem with peer, retry ?");    }
+                user_interaction_pause("communication problem with peer, retry ?");
+	}
         while(ans.serial_num != req.serial_num);
 
             // argument affectation
@@ -400,7 +434,7 @@ namespace libdar
         default:  // might be a transmission error do to weak transport layer
             throw Erange("zapette::make_transfert", "incoherent answer from peer");
         }
-    
+
             // sanity checks
         if(req.size == REQUEST_SIZE_SPECIAL_ORDER)
         {
@@ -414,6 +448,11 @@ namespace libdar
                 if(ans.size != 0 && ans.type != ANSWER_TYPE_INFININT)
                     throw Erange("zapette::make_transfert", "incoherent answer from peer");
             }
+	    else if(req.offset == REQUEST_OFFSET_CHANGE_CONTEXT_STATUS)
+	    {
+		if(ans.arg != 1)
+		    throw Erange("zapette::set_info_status", "unexpected answer from slave, communcation problem or bug may hang the operation");
+	    }
             else
                 throw Erange("zapette::make_transfert", "corrupted data read from pipe");
         }

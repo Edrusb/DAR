@@ -62,4 +62,10 @@ case, dar suite program will abort with an error message asking you to use the
 
 Long/short options
 -------------------
-on several system command-line long options are not available. Dar actually relies on the system library. In the future, dar will come with its own getopt_long call to overcome this problem. Solaris is one of the affected system.
+on several system command-line long options are not available. Dar actually 
+relies on the system library. In the future, dar will come with its own 
+getopt_long call to overcome this problem. Solaris is one of the affected 
+system.
+
+
+

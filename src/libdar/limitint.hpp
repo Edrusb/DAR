@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.hpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: limitint.hpp,v 1.7.4.4 2004/01/28 15:29:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,6 +29,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -36,6 +38,7 @@
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+} // end extern "C"
 
 #include <typeinfo>
 #include "integers.hpp"
@@ -79,6 +82,7 @@ namespace libdar
         limitint & operator += (const limitint & ref) throw(Ememory, Erange, Ebug, Elimitint);
         limitint & operator -= (const limitint & ref) throw(Ememory, Erange, Ebug);
         limitint & operator *= (const limitint & ref) throw(Ememory, Erange, Ebug, Elimitint);
+	template <class T> limitint power(const T & exponent) const;
         limitint & operator /= (const limitint & ref) throw(Einfinint, Erange, Ememory, Ebug);
         limitint & operator %= (const limitint & ref) throw(Einfinint, Erange, Ememory, Ebug);
         limitint & operator >>= (U_32 bit) throw(Ememory, Erange, Ebug);
@@ -109,19 +113,19 @@ namespace libdar
         bool operator != (const limitint &x) const throw(Erange, Ebug) { return field != x.field; };
         bool operator >= (const limitint &x) const throw(Erange, Ebug) { return field >= x.field; };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(limitint);
 #endif
 
         B debug_get_max() const { return max_value; };
         B debug_get_bytesize() const { return bytesize; };
-        
+
     private :
         static const int TG = 4;
 
         enum endian { big_endian, little_endian, not_initialized };
         typedef unsigned char group[TG];
-     
+
         B field;
 
         void build_from_file(generic_file & x) throw(Erange, Ememory, Ebug, Elimitint);
@@ -158,13 +162,13 @@ namespace libdar
     template <class T> inline void euclide(T a, T b, T & q, T &r)
     {
         E_BEGIN;
-        q = a/b; r = a%b; 
+        q = a/b; r = a%b;
         E_END("euclide", "");
     }
-    
+
     template <class B> inline void euclide(limitint<B> a, U_I b, limitint<B> & q, limitint<B> &r)
     {
-        euclide(a, limitint<B>(b), q, r); 
+        euclide(a, limitint<B>(b), q, r);
     }
 
 } // end of namespace

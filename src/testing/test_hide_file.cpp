@@ -18,16 +18,19 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_hide_file.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_hide_file.cpp,v 1.6.4.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+} // end extern "C"
 
 #include "no_comment.hpp"
 #include "config_file.hpp"

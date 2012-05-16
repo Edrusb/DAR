@@ -18,13 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.18.2.1 2003/11/29 08:49:58 edrusb Rel $
+// $Id: tools.cpp,v 1.21.2.2 2004/01/15 14:06:28 edrusb Rel $
 //
 /*********************************************************************/
 
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -102,6 +104,7 @@ char *strchr (), *strrchr ();
 #if HAVE_GRP_H
 #include <grp.h>
 #endif
+} // end extern "C"
 
 #include <iostream>
 #include "tools.hpp"
@@ -121,18 +124,18 @@ namespace libdar
     static void deadson(S_I sig);
     static bool is_a_slice_available(const string & base, const string & extension);
     static string retreive_basename(const string & base, const string & extension);
-    
+
     char *tools_str2charptr(string x)
     {
         U_I size = x.size();
         char *ret = new char[size+1];
- 
+
         if(ret == NULL)
             throw Ememory("tools_str2charptr");
         for(register unsigned int i = 0; i < size; i++)
             ret[i] = x[i];
         ret[size] = '\0';
-    
+
         return ret;
     }
 
@@ -146,7 +149,7 @@ namespace libdar
     {
         char a[2] = { 0, 0 };
         S_I lu;
-    
+
         s = "";
         do
         {
@@ -188,7 +191,7 @@ namespace libdar
         S_I lu = 0;
         const U_I buf_size = 10240;
         char buffer[buf_size];
-    
+
         s = "";
         do
         {
@@ -208,7 +211,7 @@ namespace libdar
     {
         struct stat buf;
         char *name = tools_str2charptr(p.display());
-    
+
         if(name == NULL)
             throw Ememory("tools_get_filesize");
 
@@ -240,25 +243,25 @@ namespace libdar
             factor = 1024;
             break;
         case 'M': // megabyte
-            factor = infinint(1024)*infinint(1024);
+            factor = infinint(1024).power((U_I)2);
             break;
         case 'G': // gigabyte
-            factor = infinint(1024)*infinint(1024)*infinint(1024);
+            factor = infinint(1024).power((U_I)3);
             break;
         case 'T': // terabyte
-            factor = infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024);
+            factor = infinint(1024).power((U_I)4);
             break;
         case 'P': // petabyte
-            factor = infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024);
+            factor = infinint(1024).power((U_I)5);
             break;
         case 'E': // exabyte
-            factor = infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024);
+            factor = infinint(1024).power((U_I)6);
             break;
         case 'Z': // zettabyte
-            factor = infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024);
+            factor = infinint(1024).power((U_I)7);
             break;
         case 'Y':  // yottabyte
-            factor = infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024)*infinint(1024);
+            factor = infinint(1024).power((U_I)8);
             break;
         case '0':
         case '1':
@@ -289,14 +292,14 @@ namespace libdar
         path commande = command_name;
         string tmp = commande.basename();
         char *name = tools_str2charptr(tmp);
-    
+
         return name;
     }
 
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.18.2.1 2003/11/29 08:49:58 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.21.2.2 2004/01/15 14:06:28 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -362,7 +365,7 @@ namespace libdar
                 in = new tuyau(0, gf_read_only); // stdin by default
             if(in == NULL)
                 throw Ememory("tools_open_pipes");
-        
+
             if(output != "")
                 out = new tuyau(output, gf_write_only);
             else
@@ -423,7 +426,7 @@ namespace libdar
     {
         infinint tmp = x >= 0 ? x : -x;
         deci d = tmp;
-    
+
         return (x >= 0 ? string("") : string("-")) + d.human();
     }
 
@@ -432,7 +435,7 @@ namespace libdar
         deci d = x;
         infinint t = d.computer();
         U_32 ret = 0;
-    
+
         t.unstack(ret);
         if(t != 0)
             throw Erange("tools_str2int", "cannot convert the string to integer, overflow");
@@ -452,7 +455,7 @@ namespace libdar
     {
         time_t pas = 0;
         string ret;
- 
+
         date.unstack(pas);
         ret = ctime(&pas);
 
@@ -466,7 +469,7 @@ namespace libdar
         else
         {
             char **argv = new char *[argvector.size()+1];
-        
+
             if(argv == NULL)
                 throw Ememory("tools_system");
             try
@@ -474,21 +477,21 @@ namespace libdar
                     // make an (S_I, char *[]) couple
                 for(register U_I i = 0; i <= argvector.size(); i++)
                     argv[i] = NULL;
-            
+
                 try
                 {
                     S_I status;
                     bool loop;
-                
+
                     for(register U_I i = 0; i < argvector.size(); i++)
                         argv[i] = tools_str2charptr(argvector[i]);
-                
+
                     do
                     {
                         deadson(0);
                         loop = false;
                         S_I pid = fork();
-                    
+
                         switch(pid)
                         {
                         case -1:
@@ -521,7 +524,7 @@ namespace libdar
                                         }
                                     }
                                     else // normal terminaison but exit code not zero
-                                        user_interaction_pause(string("DAR has terminated with exit code ")
+                                        user_interaction_pause(string("DAR sub-process has terminated with exit code ")
                                                                + tools_int2str(WEXITSTATUS(status))
                                                                + " Continue anyway ?");
                         }
@@ -581,7 +584,7 @@ namespace libdar
 
         while(it != fin)
             ret += *it++ + separator;
-    
+
         return ret;
     }
 
@@ -614,7 +617,7 @@ namespace libdar
     {
         unsigned int index = 0;
         const char *ret = NULL;
-        
+
         if(env == NULL || clef == NULL)
             return NULL;
 
@@ -634,12 +637,12 @@ namespace libdar
 
         return ret;
     }
-        
-        
+
+
     bool tools_is_member(const string & val, const vector<string> & liste)
     {
         U_I index = 0;
-        
+
         while(index < liste.size() && liste[index] != val)
             index++;
 
@@ -689,7 +692,7 @@ namespace libdar
         {
             ret = false;
         }
-    
+
         return ret;
     }
 
@@ -697,18 +700,18 @@ namespace libdar
     {
         regular_mask suspect = string(".\\.[1-9][0-9]*\\.")+extension;
         string old_path = (loc+base).display();
-        
+
             // is basename is suspect ?
         if(!suspect.is_covered(base))
             return; // not a suspect basename
-        
+
             // is there a slice available ?
         if(is_a_slice_available(old_path, extension))
             return; // yes, thus basename is not a mistake
-        
+
             // removing the suspicious end (.<number>.extension)
             // and checking the avaibility of such a slice
-        
+
         string new_base = retreive_basename(base, extension);
         string new_path = (loc+new_base).display();
         if(is_a_slice_available(new_path, extension))
@@ -727,41 +730,105 @@ namespace libdar
 
     string tools_getcwd()
     {
-        size_t length = 10240;
-        char *buffer = NULL, *ret;
-        string cwd;
-        try
-        {
-            do 
-            {
-                buffer = new char[length];
-                if(buffer == NULL)
-                    throw Ememory("tools_getcwd()");
-                ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
-                if(ret == NULL) // could not get the CWD
-                    if(errno == ERANGE) // buffer too small
-                    {
-                        delete buffer;
-                        buffer = NULL;
-                        length *= 2;
-                    }
-                    else // other error
-                        throw Erange("tools_getcwd", string("Cannot get full path of current working directory: ") + strerror(errno));
-            }
-            while(ret == NULL);
-            
-            buffer[length - 1] = '\0';
-            cwd = buffer;
-        }
-        catch(...)
-        {
-            if(buffer != NULL)
-                delete buffer;
-            throw;
-        }
-        if(buffer != NULL)
-            delete buffer;
-        return cwd;
+	size_t length = 10240;
+	char *buffer = NULL, *ret;
+	string cwd;
+	try
+	{
+	    do
+	    {
+		buffer = new char[length];
+		if(buffer == NULL)
+		    throw Ememory("tools_getcwd()");
+		ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
+		if(ret == NULL) // could not get the CWD
+		    if(errno == ERANGE) // buffer too small
+		    {
+			delete buffer;
+			buffer = NULL;
+			length *= 2;
+		    }
+		    else // other error
+			throw Erange("tools_getcwd", string("Cannot get full path of current working directory: ") + strerror(errno));
+	    }
+	    while(ret == NULL);
+
+	    buffer[length - 1] = '\0';
+	    cwd = buffer;
+	}
+	catch(...)
+	{
+	    if(buffer != NULL)
+		delete buffer;
+	    throw;
+	}
+	if(buffer != NULL)
+	    delete buffer;
+	return cwd;
+    }
+
+    string tools_readlink(const char *root)
+    {
+	size_t length = 10240;
+	char *buffer = NULL;
+	S_I lu;
+	string ret = "";
+
+	if(root == NULL)
+	    throw Erange("tools_readlink", "NULL argument given to tools_readlink");
+	if(strcmp(root, "") == 0)
+	    throw Erange("tools_readlink", "Empty string given as argument to tools_readlink");
+
+	try
+	{
+	    do
+	    {
+		buffer = new char[length];
+		if(buffer == NULL)
+		    throw Ememory("tools_readlink");
+		lu = readlink(root, buffer, length-1); // length-1 to have room to add '\0' at the end
+
+		if(lu < 0) // error occured with readlink
+		{
+		    switch(errno)
+		    {
+		    case EINVAL: // not a symbolic link (thus we return the given argument)
+			ret = root;
+			break;
+		    case ENAMETOOLONG: // too small buffer
+			delete buffer;
+			buffer = NULL;
+			length *= 2;
+			break;
+		    default: // other error
+			throw Erange("get_readlink", string("Cannot read file information for ")+ root + " : " + strerror(errno));
+		    }
+		}
+		else // got the correct real path of symlink
+		    if((U_I)(lu) < length)
+		    {
+			buffer[lu] = '\0';
+			ret = buffer;
+		    }
+		    else // "lu" should not be greater than length: readlink system call error
+		    {
+			    // trying to workaround with a larger buffer
+			delete buffer;
+			buffer = NULL;
+			length *= 2;
+		    }
+	    }
+	    while(ret == "");
+	}
+	catch(...)
+	{
+	    if(buffer != NULL)
+		delete buffer;
+	    throw;
+	}
+	if(buffer != NULL)
+	    delete buffer;
+	return ret;
     }
 
     static bool is_a_slice_available(const string & base, const string & extension)
@@ -769,20 +836,20 @@ namespace libdar
         char *name = tools_str2charptr(base);
         path *chem = NULL;
         bool ret = false;
-        
+
         try
         {
             char *char_chem = NULL;
             string rest;
-            
+
             tools_split_path_basename(name, chem, rest);
             char_chem = tools_str2charptr(chem->display());
-            
+
             try
             {
                 etage contents = char_chem;
                 regular_mask slice = rest + "\\.[1-9][0-9]*\\."+ extension;
-                
+
                 while(!ret && contents.read(rest))
                     ret = slice.is_covered(rest);
             }
@@ -807,7 +874,7 @@ namespace libdar
         delete name;
         if(chem != NULL)
             delete chem;
-        
+
         return ret;
     }
 

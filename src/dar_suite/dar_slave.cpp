@@ -18,13 +18,15 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.11 2003/10/18 14:43:07 edrusb Rel $
+// $Id: dar_slave.cpp,v 1.13.2.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -42,6 +44,7 @@ char *strchr (), *strrchr ();
 #if HAVE_GETOPT_H
 #include <getopt.h>
 #endif
+} // end extern "C"
 
 #include <string>
 #include <iostream>
@@ -60,7 +63,7 @@ char *strchr (), *strrchr ();
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.1.0"
+#define DAR_SLAVE_VERSION "1.2.0"
 
 static bool command_line(S_I argc, char *argv[], path * &chemin, string & filename,
                          string &input_pipe, string &output_pipe, string & execute);
@@ -97,7 +100,7 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
             slave_zapette zap = slave_zapette(input, output, source);
             input = output = NULL; // now managed by zap;
             source = NULL;  // now managed by zap;
-            
+
             try
             {
                 zap.action();
@@ -126,7 +129,7 @@ static S_I little_main(S_I argc, char *argv[], const char **env)
             delete output;
         if(source != NULL)
             delete source;
-        
+
         return EXIT_OK;
     }
     else
@@ -177,37 +180,37 @@ static bool command_line(S_I argc,char *argv[], path * &chemin, string & filenam
             if(execute == "")
                 execute = optarg;
             else
-                user_interaction_warning("only one -E option is allowed, ignoring other instances");
+		execute += string(" ; ") + optarg;
             break;
         case ':':
             throw Erange("get_args", string("missing parameter to option ") + char(optopt));
         case '?':
-            user_interaction_warning(string("ignoring unknown option ") + char(optopt)); 
+            user_interaction_warning(string("ignoring unknown option ") + char(optopt));
             break;
         default:
-            user_interaction_warning(string("ignoring unknown option ") + char(lu)); 
+            user_interaction_warning(string("ignoring unknown option ") + char(lu));
         }
     }
-        
+
     if(optind + 1 > argc)
     {
         user_interaction_warning("missing archive basename, see -h option for help");
         return false;
     }
-    
+
     if(optind + 1 < argc)
     {
         user_interaction_warning("too many argument on command line, see -h option for help");
         return false;
     }
-    
+
     tools_split_path_basename(argv[optind], chemin, filename);
     return true;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_slave.cpp,v 1.11 2003/10/18 14:43:07 edrusb Rel $";
+    static char id[]="$Id: dar_slave.cpp,v 1.13.2.1 2003/12/20 23:05:34 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -230,7 +233,7 @@ static void show_usage(const char *command)
     }
     delete cmd;
 }
-    
+
 static void show_version(const char *command)
 {
     char *cmd = tools_extract_basename(command);

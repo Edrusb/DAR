@@ -46,14 +46,30 @@ which are supported on which system.
 
         make
 
+IMPORTANT. if you get compilation error at this step, try setting CXXFLAGS
+to -O (the letter O not zero) and return to step 1 (configure):
+
+	CXXFLAGS=-O
+	export CXXFLAGS
+	make clean distclean
+	./configure [options...]
+	make
+
+or if you use a cshell:
+	setenv CXXFLAGS -O
+	make clean distclean
+	./configure [options...]
+	make
+
+the problem may come from compiler or system header files.
 
 3. As root install it with:
-        
+
         make install-strip
 
 This will install the dar suite binaries, libdar library and include files
 as well as their manual page, sample programs, if built, are never installed.
-'make install' also works be makes bigger binaries as they keep their symbol
+'make install' also works but makes bigger binaries as they keep their symbol
 table, which is not useful for normal operations.
 
 

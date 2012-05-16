@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: shell_interaction.cpp,v 1.9 2003/10/18 14:43:07 edrusb Rel $
+// $Id: shell_interaction.cpp,v 1.9.4.2 2003/12/26 14:09:50 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_TERMIOS_H
 #include <termios.h>
 #endif
@@ -57,7 +59,9 @@ char *strchr (), *strrchr ();
 #if HAVE_STDIO_H
 #include <stdio.h>
 #endif
+} // end extern "C"
 
+#include "integers.hpp"
 #include "shell_interaction.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
@@ -100,23 +104,22 @@ void shell_interaction_init(ostream *out, ostream *interact)
         // from the controlling terminal. This allow in some case to keep use
         // standart input for piping data while still having user interaction
         // possible.
-    
-    if(input < 0)
+
+    if(input >= 0)
         close(input);
 
-    
         // terminal settings
 
     char *tty = ctermid(NULL);
     if(tty == NULL)
-        interaction_warning("No terminal found for user interaction. All questions will abort the program.");
+        interaction_warning("No terminal found for user interaction. All questions will abort the program.\n");
     else // no filesystem path to tty
     {
         struct termios term;
-        
+
         input = open(tty, O_RDONLY|O_TEXT);
         if(input < 0)
-            interaction_warning("No terminal found for user interaction. All questions will abort the program.");
+            interaction_warning("No terminal found for user interaction. All questions will abort the program.\n");
         else
         {
                 // preparing input for swaping between char mode and line mode (terminal settings)
@@ -127,15 +130,15 @@ void shell_interaction_init(ostream *out, ostream *interact)
                 term.c_lflag &= ~ECHO;
                 term.c_lflag &= ~ECHOE;
                 interaction = term;
-                
+
                     // checking now that we can change to character mode
-                set_term_mod(interaction); 
+                set_term_mod(interaction);
                 set_term_mod(initial);
                     // but we don't need it right now, so swapping back to line mode
                 has_terminal = true;
             }
             else // failed to retrieve parameters from tty
-                user_interaction_warning("No terminal found for user interaction. All questions will abort the program.");
+                interaction_warning("No terminal found for user interaction. All questions will abort the program.\n");
         }
     }
 
@@ -191,7 +194,7 @@ static bool interaction_pause(const string &message)
         while(read(input, buffer, bufsize) >= 0)
             ;
         tools_blocking_read(input, true);
-        
+
             // now asking the user
         do
         {
@@ -205,7 +208,7 @@ static bool interaction_pause(const string &message)
             *inter << "Continuing..." << endl;
         else
             *inter << "Escaping..." << endl;
-        
+
         ret = a != 27; // 27 is escape key
     }
     catch(...)
@@ -226,6 +229,6 @@ static void interaction_warning(const string & message)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: shell_interaction.cpp,v 1.9 2003/10/18 14:43:07 edrusb Rel $";
+    static char id[]="$Id: shell_interaction.cpp,v 1.9.4.2 2003/12/26 14:09:50 edrusb Rel $";
     dummy_call(id);
 }

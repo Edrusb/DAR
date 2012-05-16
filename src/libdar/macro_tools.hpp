@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: macro_tools.hpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: macro_tools.hpp,v 1.8 2003/11/19 00:42:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -33,6 +33,7 @@
 #include "header_version.hpp"
 #include "generic_file.hpp"
 #include "scrambler.hpp"
+#include "crypto.hpp"
 
 namespace libdar
 {
@@ -43,7 +44,8 @@ namespace libdar
                                          const std::string &basename,  // slice basename
                                          const std::string &extension,  // slice extensions
                                          S_I options,  // options to SAR (see sar.hpp)
-                                         const std::string &pass, // pass key to unscramble
+					 crypto_algo crypto, // encryption algorithm
+                                         const std::string &pass, // pass key for crypto/scrambling
                                          generic_file *&ret1, // level 1 file (raw data) sar or zapette
                                          scrambler *&scram, // NULL if pass is given an empty string else a scrambler (over raw data)
                                          compressor *&ret2, // compressor over scrambler or raw data (if no scrambler)
@@ -58,7 +60,7 @@ namespace libdar
                                                      bool info_details, // verbose display (throught user_interaction)
                                                      infinint &cat_size); // return size of archive in file (not in memory !)
 
-    extern catalogue *macro_tools_get_catalogue_from(const std::string &basename, const std::string & extension);
+    extern catalogue *macro_tools_get_catalogue_from(const std::string &basename, const std::string & extension, crypto_algo crypto, const std::string & pass);
 
 } // end of namespace
 

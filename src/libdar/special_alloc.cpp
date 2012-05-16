@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: special_alloc.cpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $
+// $Id: special_alloc.cpp,v 1.4.4.1 2004/01/28 15:29:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -28,7 +28,7 @@
 
 #include <list>
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
 
 using namespace std;
 
@@ -85,7 +85,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: special_alloc.cpp,v 1.4 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: special_alloc.cpp,v 1.4.4.1 2004/01/28 15:29:47 edrusb Rel $";
         dummy_call(id);
     }
    

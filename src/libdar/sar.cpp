@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.13 2003/10/18 14:43:07 edrusb Rel $
+// $Id: sar.cpp,v 1.15.2.2 2004/01/03 00:18:46 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 // this was necessary to compile under Mac OS-X (boggus dirent.h)
 #if HAVE_STDINT_H
 #include <stdint.h>
@@ -96,6 +98,7 @@ char *strchr (), *strrchr ();
 #if STDC_HEADERS
 #include <stdlib.h>
 #endif
+} // end extern "C"
 
 #include "sar.hpp"
 #include "deci.hpp"
@@ -113,22 +116,22 @@ namespace libdar
     static bool sar_extract_num(string filename, string base_name, string ext, infinint & ret);
     static bool sar_get_higher_number_in_dir(path dir ,string base_name, string ext, infinint & ret);
 
-    sar::sar(const string & base_name, const string & extension, S_I options, const path & dir, const string & execute) : generic_file(gf_read_only), archive_dir(dir)
+    sar::sar(const string & base_name, const string & extension, S_I options, const path & dir, const string & execute) : contextual(gf_read_only), archive_dir(dir)
     {
         set_options(options);
-    
+
         natural_destruction = true;
         base = base_name;
         ext = extension;
         initial = true;
         hook = execute;
-        status = SAR_CONTEXT_INIT;
+        status = CONTEXT_INIT;
 
         open_file_init();
         open_file(1);
     }
 
-    sar::sar(const string & base_name, const string & extension, const infinint & file_size, const infinint & first_file_size, S_I options, const path & dir, const string & execute) : generic_file(gf_write_only), archive_dir(dir)
+    sar::sar(const string & base_name, const string & extension, const infinint & file_size, const infinint & first_file_size, S_I options, const path & dir, const string & execute) : contextual(gf_write_only), archive_dir(dir)
     {
         if(file_size < header::size() + 1)
             throw Erange("sar::sar", "file size too small");
@@ -141,7 +144,7 @@ namespace libdar
         size = file_size;
         first_size = first_file_size;
         hook = execute;
-        status = SAR_CONTEXT_OP;
+        status = CONTEXT_OP;
 
         open_file_init();
         open_file(1);
@@ -160,7 +163,7 @@ namespace libdar
         infinint byte_per_file = size - header::size();
         infinint dest_file, offset;
 
-    
+
         if(get_position() == pos)
             return true; // no need to skip
 
@@ -174,7 +177,7 @@ namespace libdar
         }
         else
         {
-            dest_file = ((pos - byte_in_first_file) / byte_per_file) + 2; 
+            dest_file = ((pos - byte_in_first_file) / byte_per_file) + 2;
                 // "+2" because file number starts to 1 and first file is to be count
             offset = ((pos - byte_in_first_file) % byte_per_file) + header::size();
         }
@@ -230,7 +233,7 @@ namespace libdar
             offset += header::size();
             number++;
         }
-    
+
         if(number == 1 ? offset < first_size : offset < size)
         {
             open_file(number);
@@ -244,7 +247,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.13 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.15.2.2 2004/01/03 00:18:46 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -278,12 +281,12 @@ namespace libdar
             return false;
         }
     }
-          
+
     bool sar::skip_relative(S_I x)
     {
         if(x > 0)
             return skip_forward(x);
-    
+
         if(x < 0)
             return skip_backward(-x);
 
@@ -302,12 +305,12 @@ namespace libdar
     {
         size_t lu = 0;
         bool loop = true;
-    
+
         while(lu < sz && loop)
         {
             S_I tmp = of_fd->read(a+lu, sz-lu);
             if(tmp < 0)
-                throw Erange("sar::inherited_read", strerror(errno));
+                throw Erange("sar::inherited_read", string("Error reading data: ") + strerror(errno));
             if(tmp == 0)
                 if(of_flag == FLAG_TERMINAL)
                     loop = false;
@@ -346,8 +349,6 @@ namespace libdar
                 open_file(of_current + 1);
                 continue;
             }
-            if(tmp < 0) // not very usefull, as generic_file::write never returns negative values ... to change
-                throw Erange("sar::inherited_write", strerror(errno));
             if(tmp == 0)
             {
                 user_interaction_pause("Can't write any byte to file, filesystem is full? Please check!");
@@ -357,7 +358,7 @@ namespace libdar
             file_offset += tmp;
             a += tmp;
         }
-        
+
         return sz;
     }
 
@@ -384,14 +385,14 @@ namespace libdar
             if(fd < 0)
                 if(errno == ENOENT)
                 {
-                    user_interaction_pause(string(fic) + " is required for furthur operation, please provide the file.");
-                    continue; 
+                    user_interaction_pause(string(fic) + " is required for further operation, please provide the file.");
+                    continue;
                 }
                 else
                     throw Erange("sar::open_readonly", string("error openning ") + fic + " : " + strerror(errno));
             else
                 of_fd = new fichier(fd);
-        
+
                 // trying to read the header
                 //
             try
@@ -402,18 +403,18 @@ namespace libdar
             {
                 close_file();
                 user_interaction_pause(string(fic) + string(" has a bad or corrupted header, please provide the correct file."));
-                continue; 
+                continue;
             }
-                
+
                 // checking agains the magic number
                 //
             if(h.magic != SAUV_MAGIC_NUMBER)
             {
                 close_file();
                 user_interaction_pause(string(fic) + " is not a valid file (wrong magic number), please provide the good file.");
-                continue; 
+                continue;
             }
-                
+
                 // checking the ownership to the set of file
                 //
             if(num == 1 && first_file_offset == 0)
@@ -474,7 +475,7 @@ namespace libdar
             // check if that the file exists
         if(stat(fic, &buf) < 0)
             if(errno != ENOENT) // other error than 'file does not exist' occured
-                throw Erange("sar::open_writeonly stat()", strerror(errno));
+                throw Erange("sar::open_writeonly", string("Error checking for presence of file ") + fic + " : " + strerror(errno));
             else
                 open_flag |= O_CREAT;
         else // file exists
@@ -544,7 +545,7 @@ namespace libdar
         fd = open(fic, open_flag|O_BINARY, open_mode);
         of_flag = FLAG_NON_TERMINAL;
         if(fd < 0)
-            throw Erange("sar::open_writeonly open()", strerror(errno));    
+            throw Erange("sar::open_writeonly open()", string("Error openning file ") + fic + " : " + strerror(errno));
         else
             of_fd = new fichier(fd);
 
@@ -571,7 +572,7 @@ namespace libdar
         if(of_fd == NULL || of_current != num)
         {
             char *fic = tools_str2charptr((archive_dir + path(sar_make_filename(base, num, ext))).display());
-        
+
             try
             {
                 switch(get_mode())
@@ -612,7 +613,7 @@ namespace libdar
                     }
                     else
                         initial = false;
-                
+
                     open_writeonly(fic, num);
                     break;
                 default :
@@ -650,13 +651,13 @@ namespace libdar
 
     void sar::open_last_file()
     {
-        infinint num; 
+        infinint num;
 
         if(of_last_file_known)
             open_file(of_last_file_num);
         else // last slice number is not known
         {
-            bool ask_user = false; 
+            bool ask_user = false;
 
             while(of_flag != FLAG_TERMINAL)
             {
@@ -834,7 +835,7 @@ namespace libdar
                         }
                     }
                 }
-                while(loop);    
+                while(loop);
             }
             catch(...)
             {
@@ -846,7 +847,7 @@ namespace libdar
         }
         MEM_OUT;
     }
-        
+
 
     string sar_make_filename(string base_name, infinint num, string ext)
     {
@@ -861,10 +862,10 @@ namespace libdar
         {
             if(filename.size() <= base_name.size() + ext.size() + 2) // 2 for two dots beside number
                 return false;
-        
+
             if(filename.find(base_name) != 0) // checking that base_name is present at the beginning
                 return false;
-        
+
             if(filename.rfind(ext) != filename.size() - ext.size()) // checking that extension is at the end
                 return false;
 
@@ -889,9 +890,9 @@ namespace libdar
         try
         {
             if(ptr == NULL)
-                throw Erange("sar_get_higher_number_in_dir", strerror(errno));
-        
-            ret = 0; 
+                throw Erange("sar_get_higher_number_in_dir", string("Error reading openning directory ") + folder + " : " + strerror(errno));
+
+            ret = 0;
             somme = false;
             while((entry = readdir(ptr)) != NULL)
                 if(sar_extract_num(entry->d_name, base_name, ext, cur))
@@ -957,7 +958,7 @@ namespace libdar
     infinint trivial_sar::get_position()
     {
         if(reference->get_position() >= offset)
-            return reference->get_position() - offset; 
+            return reference->get_position() - offset;
         else
             throw Erange("trivial_sar::get_position", "position out of range, call skip from trivial_sar object not from its reference");
     }

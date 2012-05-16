@@ -5,16 +5,15 @@ what do they do ?
 
 	factoriel
 
-At the beginning a test program for infinint. It computes the factorial 
+At the beginning it was a test program for infinint. It computes the factorial
 of the given integer. If compiled without --enable-mode=... option given to
 configure, it will always (should at least), return the decimal representation
 of the asked decimal. The problem is more the time it will take to compute it.
+And using --enable-mode=... you will get the message dar reports when integer
+overflow has been detected.
 
 
 	prime
 
-testing if the given number is a prime factor. It relies on infinint. (also
+tests if the given number is a prime factor. It relies on infinint. (also
 a test program at the beginning).
-
-
-  

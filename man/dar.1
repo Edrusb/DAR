@@ -1,4 +1,4 @@
-.TH DAR 1 "NOV 29th, 2003"
+.TH DAR 1 "OCT 1st, 2003"
 .UC 8
 .SH NAME
 dar \- disk archive
@@ -95,7 +95,10 @@ makes the terminal ring when user action is required (like for example the creat
 do not allow overwriting of any file or slice.
 .TP 20
 -w, --no-warn
-Do not warn before overwriting file or slice. By default (no -n and no -w) overwriting is allowed but a warning is issued before proceeding.
+Do not warn before overwriting file or slice. By default (no -n and no -w) overwriting is allowed but a warning is issued before proceeding. This option may receive 'a' as argument:
+.TP 20
+-wa, --no-warn=all
+This implies the -w option, and means that over avoiding warning for file overwriting, DAR also avoid signaling a file about to be removed when its type is not the expected one. File are removed when they have been recorded as deleted since the archive of reference. At restoration of the differential archive, if a file of the given name exists, it is remove, but if the type does not match the file that was present at the time of the archive of reference (directory, plain file, fifo, socket, char or block device, etc.), a warning is normally issued to prevent the accidental removal of data that was not saved in the backup of reference. (See also -k option)
 .TP 20
 -R, --fs-root <path>
 The path points to the directory tree containing all the files that will be enrolled in the operation (backup or restoration). By default the current directory is used. All other paths used in -P option or in the [list of paths] on the command line are and must be relative to this path (or to current directory if -R is not present).
@@ -116,7 +119,7 @@ files or directory to only take in account, as opposed to -P. By default all fil
 .P
 File selection in brief:
 .P
-As seen above, -I -X -P and [list of paths] are used to select the files to operate on. -I and -X only use the basename of files and do not apply to directories, while -P and [list of paths] use the full name including the path and do apply to directories. A directory is elected for operation if no -P option excludes it, and when a [list of paths] is present, if this directory is one of its member or a subdirectory of one of its members. If a directory is not selected, no recursion is done in it (the directory is pruned). For other files, over this previous mechanisms, a second test must be satisfied: no -X option must exclude the filename, and if some -I option are given, at least one must include the given file. -I -X and -P can use wild-cards, see glob(7) man page.
+As seen above, -I -X -P and [list of paths] are used to select the files to operate on. -I and -X only use the basename of files and do not apply to directories, while -P and [list of paths] use the full name including the path and do apply to directories. A directory is elected for operation if no -P option excludes it, and if a [list of paths] is present, this directory is one of its member or a subdirectory of one of its members. If a directory is not selected, no recursion is done in it (the directory is pruned). For other files, over this previous mechanisms, a second test must be satisfied: no -X option must exclude the filename, and if some -I option are given, at least one must include the given file (using or not wild-cards).
 .TP 20
 -u, --no-user-EA
 Do not consider the Extended Attributes (EA) of the user namespace. By default, they are saved and restored, if the support for EA has been activated at compilation time. If not, this option is forced internally (you need not specify it).
@@ -163,6 +166,7 @@ will be replaced by the slice extension (always substituted by "dar")
 %c
 will be replaced by the context. Actually two possible value exist: "init" and "operation". When reading an archive for (testing, extraction, diff, listing, or while reading the archive of reference, see below the -F option), the "init" context takes place from the beginning up to the time the catalogue is retrieved. On a multiple slice archive this correspond to the first slice request and to the last slice requests. After, that point comes the "operation" context.  While creating an archive, the context is always "operation".
 .RE
+Several -E option can be given, given commands will then be called in the order they appear on the command line, and included files.
 .TP 20
 -F, --execute-ref <string>
 same as -E but is applied between slices of the reference archive (-A option).
@@ -183,7 +187,9 @@ bellow for a more rich syntax in configuration files.
 Do not try to read neither ~/.darrc nor /etc/darrc configuration files. See
 .B files
 section bellow.
-
+.TP 20
+-e, --empty
+Do not perform any action (backup or restoration), displays all messages as if it was for real ("dry run" action).
 .PP
 .RE
 SAVING AND ISOLATION OPTIONS (to use with -c or -C)
@@ -229,7 +235,7 @@ as argument. If you want to compress all file whatever their size is you thus ne
 on the command line. The same number extensions as those used with -s or -S are available here, if you want to specify the size in kilobyte, megabyte, gigabyte etc.
 .TP 20
 --nodump
-do not save files which have the 'd' flag set (see chattr(1) lsattr(1) ext2 commands). This option is available only if the dar binary has been compiled with the USE_NODUMP_FEATURE macro uncommented in the Makefile.
+do not save files which have the 'd' flag set (see chattr(1) lsattr(1) ext2 commands). This option is available only if the dar binary has been compiled with the --enable-nodump-flag given to configure script (activated by default if available).
 .PP
 .PP
 .RE
@@ -257,8 +263,11 @@ LISTING OPTIONS (to use with -l)
 .RS
 .PP
 .TP 20
- -T, --tar-format
+-T, --tar-format
 can be used to have a listing that displays the tree structure.
+.TP 20
+-as, --alter=saved
+list only saved files
 .TP 20
 -I and -X
 can be used to filter file to list base on their name. With -T the tree structure is not filtered unlike without -T. Note that -P and [list of path] is not available while listing.

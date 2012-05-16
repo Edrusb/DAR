@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $
+// $Id: tuyau.cpp,v 1.9.2.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -55,6 +57,7 @@ char *strchr (), *strrchr ();
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+} // end extern "C"
 
 #include "tuyau.hpp"
 #include "erreurs.hpp"
@@ -167,7 +170,7 @@ namespace libdar
                 case EINTR:
                     break;
                 case EIO:
-                    throw Ehardware("tuyau::inherited_write", strerror(errno));
+                    throw Ehardware("tuyau::inherited_write", string("Error writing data to pipe: ") + strerror(errno));
                 case ENOSPC:
                     user_interaction_pause("no space left on device, you have the oportunity to make room now. When ready : can we continue ?");
                     break;
@@ -185,7 +188,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tuyau.cpp,v 1.8 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: tuyau.cpp,v 1.9.2.1 2003/12/20 23:05:35 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -214,7 +217,7 @@ namespace libdar
                 }
                 filedesc = ::open(ch, flag|O_BINARY);
                 if(filedesc < 0)
-                    throw Erange("tuyau::ouverture", string("error openning pipe: ")+strerror(errno));
+                    throw Erange("tuyau::ouverture", string("Error openning pipe: ")+strerror(errno));
             }
             catch(...)
             {

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: mask.cpp,v 1.7.4.1 2003/12/20 23:05:34 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,9 +26,12 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_FNMATCH_H
 #include <fnmatch.h>
 #endif
+} // end extern "C"
 
 #include "tools.hpp"
 #include "erreurs.hpp"
@@ -50,7 +53,7 @@ namespace libdar
     {
         char *tmp = tools_str2charptr(expression);
         bool ret;
-    
+
         if(tmp == NULL)
             throw Ememory("simple_mask::is_covered");
 
@@ -148,7 +151,7 @@ namespace libdar
     {
         vector<mask *>::iterator it = const_cast<et_mask &>(*this).lst.begin();
         vector<mask *>::iterator fin = const_cast<et_mask &>(*this).lst.end();
- 
+
         if(lst.size() == 0)
             throw Erange("et_mask::is_covered", "no mask in the list of mask to AND");
 
@@ -180,7 +183,7 @@ namespace libdar
     void et_mask::detruit()
     {
         vector<mask *>::iterator it = lst.begin();
-    
+
         while(it != lst.end())
         {
             delete *it;
@@ -191,7 +194,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: mask.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $";
+        static char id[]="$Id: mask.cpp,v 1.7.4.1 2003/12/20 23:05:34 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -199,7 +202,7 @@ namespace libdar
     {
         vector<mask *>::iterator it = const_cast<ou_mask &>(*this).lst.begin();
         vector<mask *>::iterator fin = const_cast<ou_mask &>(*this).lst.end();
-    
+
         if(lst.size() == 0)
             throw Erange("et_mask::is_covered", "no mask in the list of mask to OR");
 

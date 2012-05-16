@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_special_alloc.cpp,v 1.2 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_special_alloc.cpp,v 1.2.4.1 2004/01/28 15:29:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -35,15 +35,17 @@ using namespace libdar;
 
 int main()
 {
+#ifdef LIBDAR_SPECIAL_ALLOC
     const int max = 3;
     void *ptr[max];
+#endif
 
     shell_interaction_init(&cout, &cerr);
 
     MEM_BEGIN;
     MEM_IN;
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
 
     for(int i = 0; i < max; i++)
         ptr[i] = special_alloc_new(1000);
@@ -51,7 +53,7 @@ int main()
         special_alloc_delete(ptr[i]);
 
     MEM_OUT;
-    
+
     for(int i = 0; i < max; i++)
         ptr[i] = special_alloc_new(1000);
     for(int i = 0; i < max - 1; i++)

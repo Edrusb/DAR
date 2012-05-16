@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.hpp,v 1.10.2.1 2003/12/14 13:57:54 edrusb Rel $
+// $Id: data_tree.hpp,v 1.10.4.2 2004/01/28 15:29:46 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -65,11 +65,11 @@ public:
     virtual void skip_out(archive_num num); // decrement archive numbers above num
     virtual void compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea,
                                            vector<infinint> & total_data, vector<infinint> & total_ea) const;
-    
+
     virtual char obj_signature() const { return signature(); };
     static char signature() { return 't'; };
 
-#ifdef SPECIAL_ALLOC
+#ifdef LIBDAR_SPECIAL_ALLOC
     void *operator new(size_t taille) { return special_alloc_new(taille); };
     void operator delete(void *ptr) { special_alloc_delete(ptr); };
 #endif
@@ -93,8 +93,8 @@ public:
     void add(const inode *entry, const archive_num & archive);
     const data_tree *read_child(const string & name) const;
 
-    bool remove_all_from(const archive_num & archive); 
-    void show(archive_num num, string marge = "") const; 
+    bool remove_all_from(const archive_num & archive);
+    void show(archive_num num, string marge = "") const;
         // list the most recent files owned by that archive
         // (or by any archive if num == 0)
     void apply_permutation(archive_num src, archive_num dst);
@@ -104,12 +104,12 @@ public:
 
     char obj_signature() const { return signature(); };
     static char signature() { return 'd'; };
-    
-#ifdef SPECIAL_ALLOC
+
+#ifdef LIBDAR_SPECIAL_ALLOC
     void *operator new(size_t taille) { return special_alloc_new(taille); };
     void operator delete(void *ptr) { special_alloc_delete(ptr); };
 #endif
-    
+
 private:
     list<data_tree *> rejetons;
 

@@ -18,12 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_filesystem.cpp,v 1.8.2.1 2003/12/20 23:05:35 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
@@ -51,6 +53,7 @@
 #if HAVE_SYS_UN_H
 #include <sys/un.h>
 #endif
+} // end extern "C"
 
 #include <string.h>
 #include <iostream>
@@ -174,13 +177,13 @@ static void re_test()
     const entree *e;
     detruit det1 = detruit("lien", 'l' | 0x80);
     detruit det2 = detruit("dev1", 'd');
-    filesystem_restore fs = filesystem_restore("algi", true, true, true, true, true, false);
+    filesystem_restore fs = filesystem_restore("algi", true, true, true, true, true, false, true, false);
 
     cat->reset_read();
-    
+
     while(cat->read(e))
         fs.write(e);
-    
+
     fs.reset_write();
     fs.write(&det1);
     fs.write(&det2);
