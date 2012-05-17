@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.35.2.1 2005/02/05 09:34:12 edrusb Rel $
+// $Id: catalogue.cpp,v 1.35.2.3 2005/12/05 15:58:04 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -54,6 +54,10 @@ extern "C"
 #  include <time.h>
 # endif
 #endif
+
+#if HAVE_LIMITS_H
+#include <limits.h>
+#endif
 } // end extern "C"
 
 #include <algorithm>
@@ -74,6 +78,14 @@ extern "C"
 #define REMOVE_TAG gettext("[     REMOVED       ]")
 
 #define SAVED_FAKE_BIT 0x80
+
+#define BUFFER_SIZE 102400
+#ifdef SSIZE_MAX
+#if SSIZE_MAX < BUFFER_SIZE
+#undef BUFFER_SIZE
+#define BUFFER_SIZE SSIZE_MAX
+#endif
+#endif
 
 using namespace std;
 
@@ -289,8 +301,8 @@ namespace libdar
 
     bool compatible_signature(unsigned char a, unsigned char b)
     {
-        a = tolower(a) & ~SAVED_FAKE_BIT;
-        b = tolower(b) & ~SAVED_FAKE_BIT;
+        a = tolower(a & ~SAVED_FAKE_BIT);
+        b = tolower(b & ~SAVED_FAKE_BIT);
 
         switch(a)
         {
@@ -1677,7 +1689,7 @@ namespace libdar
         unsigned char a;
         saved_status st;
         unsigned char base;
-	cache over_f = cache(dialog, f, 102400, 1, 100, 20, 1, 100, 20);
+	cache over_f = cache(dialog, f, BUFFER_SIZE, 1, 100, 20, 1, 100, 20);
 	std::map <infinint, file_etiquette *> corres;
 	contenu = NULL;
 	cat_ui = NULL;
@@ -2118,13 +2130,13 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.35.2.1 2005/02/05 09:34:12 edrusb Rel $";
+        static char id[]="$Id: catalogue.cpp,v 1.35.2.3 2005/12/05 15:58:04 edrusb Exp $";
         dummy_call(id);
     }
 
     void catalogue::dump(generic_file & ref) const
     {
-	cache over_ref = cache(*cat_ui, ref, 102400, 1, 100, 20, 1, 100, 20);
+	cache over_ref = cache(*cat_ui, ref, BUFFER_SIZE, 1, 100, 20, 1, 100, 20);
 
         contenu->dump(*cat_ui, over_ref);
     }

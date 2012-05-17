@@ -194,7 +194,7 @@ communicate. Thus you need additional program to make the input of the first
 going to the output to the second, and vice versa.
 Warning: you cannot use named pipe that way, because dar and dar_slave would
 get blocked upon opening of the first named pipe, waiting for the peer to
-open it also, even before they has started (dead lock at shell level).
+open it also, even before they have started (dead lock at shell level).
 For named pipes, there is -i and -o options that helps, they receive a
 filename as argument, which may be a named pipe. The -i argument is used
 instead of stdin and -o instead of stdout. Note that for dar -i and -o are only
@@ -1037,7 +1037,7 @@ The problem is that the shell hangs trying to open the pipes. Thanks to
         or on honey:
                 mkfifo todar toslave
                 ssh flower dar -d - -R / > toslave < todar &
-                dar_slave backup > todar < toslave
+                dar_slave -i toslave -o todar backup
 
 4 - making a differential backup
 

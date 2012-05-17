@@ -388,3 +388,14 @@ from 2.2.3 to 2.2.4
   Rivera
 - updated Swedish translation by Peter Landgren
 
+from 2.2.4 to 2.2.5
+- limited size of internal buffers allocated on the stack to not
+  be greater than SSIZE_MAX when this macro is defined. This comes
+  from feedback from "Steffe" at sourceforge after he ported dar
+  to HPnonStop.
+- integrated Andrey Yasniy's patch: fixed differential backup problem with
+  ru_RU.koi8-r locale.
+- integrated  Nick Alcock's patch: no warning shown when not on EXT2
+  filesystem and nodump feature has been activated.
+- avoid having arrow key be interpreted as escape key (while they remains
+  an escape key + one char, as received from the tty).

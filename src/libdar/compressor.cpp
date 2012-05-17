@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.14.2.1 2005/03/13 20:07:50 edrusb Rel $
+// $Id: compressor.cpp,v 1.14.2.2 2005/11/14 17:18:08 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -29,11 +29,21 @@ extern "C"
 #if HAVE_SIGNAL_H
 #include <signal.h>
 #endif
+#if HAVE_LIMITS_H
+#include <limits.h>
+#endif
 } // end extern "C"
 
 #include "compressor.hpp"
 
 #define BUFFER_SIZE 102400
+#ifdef SSIZE_MAX
+#if SSIZE_MAX < BUFFER_SIZE
+#undef BUFFER_SIZE
+#define BUFFER_SIZE SSIZE_MAX
+#endif
+#endif
+
 
 using namespace std;
 
@@ -365,7 +375,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: compressor.cpp,v 1.14.2.1 2005/03/13 20:07:50 edrusb Rel $";
+        static char id[]="$Id: compressor.cpp,v 1.14.2.2 2005/11/14 17:18:08 edrusb Exp $";
         dummy_call(id);
     }
 

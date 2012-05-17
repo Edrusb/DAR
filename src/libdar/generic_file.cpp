@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.23.2.1 2005/03/13 20:07:51 edrusb Rel $
+// $Id: generic_file.cpp,v 1.23.2.2 2005/11/14 17:18:08 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -59,6 +59,11 @@ char *strchr (), *strrchr ();
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+
+#if HAVE_LIMITS_H
+#include <limits.h>
+#endif
+
 } // end extern "C"
 
 #include "infinint.hpp"
@@ -68,6 +73,14 @@ char *strchr (), *strrchr ();
 #include "user_interaction.hpp"
 #include "cygwin_adapt.hpp"
 #include "int_tools.hpp"
+
+#define BUFFER_SIZE 102400
+#ifdef SSIZE_MAX
+#if SSIZE_MAX < BUFFER_SIZE
+#undef BUFFER_SIZE
+#define BUFFER_SIZE SSIZE_MAX
+#endif
+#endif
 
 using namespace std;
 
@@ -93,8 +106,6 @@ namespace libdar
         for(S_I i = 0; i < CRC_SIZE; i++)
             dst[i] = src[i];
     }
-
-#define BUFFER_SIZE 102400
 
     S_I generic_file::read(char *a, size_t size)
     {
@@ -417,7 +428,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.23.2.1 2005/03/13 20:07:51 edrusb Rel $";
+        static char id[]="$Id: generic_file.cpp,v 1.23.2.2 2005/11/14 17:18:08 edrusb Exp $";
         dummy_call(id);
     }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: shell_interaction.cpp,v 1.19.2.5 2005/05/06 10:56:41 edrusb Rel $
+// $Id: shell_interaction.cpp,v 1.19.2.6 2005/12/05 15:58:04 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -194,6 +194,7 @@ static bool interaction_pause(const string &message, void *context)
     const S_I bufsize = 1024;
     char buffer[bufsize];
     char & a = buffer[0];
+    char & b = buffer[1];
     bool ret;
 
     if(!has_terminal)
@@ -205,20 +206,38 @@ static bool interaction_pause(const string &message, void *context)
     set_term_mod(interaction);
     try
     {
-            // flushing any character remaining in the input stream
-        tools_blocking_read(input, false);
-        while(read(input, buffer, bufsize) >= 0)
-            ;
-        tools_blocking_read(input, true);
+	S_I tmp_ret, errno_bk, tmp_sup, errno_sup;
 
-            // now asking the user
         do
         {
+		// flushing any character remaining in the input stream
+
+	    tools_blocking_read(input, false);
+	    while(read(input, buffer, bufsize) >= 0)
+		;
+	    tools_blocking_read(input, true);
+
+		// now asking the user
+
             *inter << message << gettext(" [return = OK | esc = cancel]") << (beep ? "\007\007\007" : "") << endl;
-            if(read(input, &a, 1) < 0)
-                throw Erange("shell_interaction:interaction_pause", string(gettext("Error while reading user answer from terminal: ")) + strerror(errno));
+	    tmp_ret = read(input, &a, 1);
+	    errno_bk = errno;
+
+		// checking if another character is available in the pipe
+
+	    tools_blocking_read(input, false);
+	    errno_sup = EAGAIN+1; // = something different from EAGAIN, whatever it is...
+	    usleep(10000); // let a change for any other typed character to reach the input device
+	    tmp_sup = read(input, &b, 1);
+	    errno_sup = errno;
+	    tools_blocking_read(input, true);
+
+		// checking error conditions
+            if(tmp_ret < 0)
+		if(errno_bk != EINTR)
+		    throw Erange("shell_interaction:interaction_pause", string(gettext("Error while reading user answer from terminal: ")) + strerror(errno_bk));
         }
-        while(a != 27 && a != '\n');
+        while((a != 27 && a != '\n') || tmp_sup != -1 || errno_sup != EAGAIN);
 
         if(a != 27)
             *inter << gettext("Continuing...") << endl;
@@ -279,6 +298,6 @@ static string interaction_string(const string & message, bool echo, void *contex
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: shell_interaction.cpp,v 1.19.2.5 2005/05/06 10:56:41 edrusb Rel $";
+    static char id[]="$Id: shell_interaction.cpp,v 1.19.2.6 2005/12/05 15:58:04 edrusb Exp $";
     dummy_call(id);
 }

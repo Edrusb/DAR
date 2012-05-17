@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.31.2.1 2005/03/13 20:07:52 edrusb Rel $
+// $Id: sar.cpp,v 1.31.2.2 2005/12/05 17:43:27 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -260,7 +260,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.31.2.1 2005/03/13 20:07:52 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.31.2.2 2005/12/05 17:43:27 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -636,8 +636,21 @@ namespace libdar
                             deci conv = of_current;
                             try
                             {
-				get_gf_ui().pause(string(gettext("Finished writing to file ")) + conv.human() + gettext(", ready to continue ? "));
-                            }
+				bool done = false;
+				while(!done)
+				{
+				    try
+				    {
+					get_gf_ui().pause(string(gettext("Finished writing to file ")) + conv.human() + gettext(", ready to continue ? "));
+					done = true;
+				    }
+				    catch(Euser_abort & e)
+				    {
+					done = false;
+					get_gf_ui().warning(gettext("If you really want to stop dar, hit CTRL-C"));
+				    }
+				}
+			    }
                             catch(...)
                             {
                                 natural_destruction = false;

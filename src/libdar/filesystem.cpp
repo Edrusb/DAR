@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.35.2.5 2005/09/08 19:20:21 edrusb Rel $
+// $Id: filesystem.cpp,v 1.35.2.6 2005/12/05 15:58:04 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -1435,7 +1435,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.35.2.5 2005/09/08 19:20:21 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.35.2.6 2005/12/05 15:58:04 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -1560,7 +1560,8 @@ namespace libdar
 		{
 		    if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
 		    {
-			dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, strerror(errno)));
+			if(errno != ENOTTY)
+			    dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, strerror(errno)));
 			f = 0;
 		    }
 		}
