@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.4.4], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
+AC_INIT([DAR], [2.4.5], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -42,7 +42,7 @@ AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 
 
-AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h execinfo.h])
+AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h])
 
 
 AC_SYS_LARGEFILE
@@ -594,6 +594,16 @@ AC_ARG_ENABLE(  [thread-safe],
                                     [ AC_MSG_RESULT(no)])
                 ]
              )
+
+AC_ARG_ENABLE( [execinfo],
+	       AC_HELP_STRING(--disable-execinfo, [disable reporting stack information un self diagnostic bugs even]),
+	       [AC_MSG_WARN([ignoring execinfo even if available])],
+	       [
+	       AC_CHECK_LIB(execinfo, backtrace, [], []),
+	       AC_CHECK_HEADERS([execinfo.h])
+	       ]
+	     )
+
 
 
 AC_ARG_ENABLE( [profiling],

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: secu_string.cpp,v 1.4 2011/06/02 13:17:37 edrusb Rel $
+// $Id: secu_string.cpp,v 1.4.2.1 2012/03/29 19:37:43 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -38,6 +38,9 @@ extern "C"
 #endif
 #if HAVE_ERRNO_H
 #include <errno.h>
+#endif
+#if HAVE_UNISTD_H
+#include <unistd.h>
 #endif
 }
 
@@ -107,7 +110,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: secu_string.cpp,v 1.4 2011/06/02 13:17:37 edrusb Rel $";
+        static char id[]="$Id: secu_string.cpp,v 1.4.2.1 2012/03/29 19:37:43 edrusb Exp $";
         dummy_call(id);
     }
 

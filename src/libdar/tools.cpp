@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tools.cpp,v 1.102.2.2 2012/01/12 20:20:47 edrusb Exp $
+// $Id: tools.cpp,v 1.102.2.3 2012/04/09 14:28:33 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -139,7 +139,7 @@ namespace libdar
 #ifdef __DYNAMIC__
 	// Yes, this is a static variable,
 	// it contains the necessary mutex to keep libdar thread-safe
-    static const user_group_bases user_group;
+    static const user_group_bases *user_group = NULL;
 #endif
 
 	// the following variable is static this breaks the threadsafe support
@@ -151,6 +151,30 @@ namespace libdar
     static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension);
     static string retreive_basename(const string & base, const string & extension);
     static string tools_make_word(generic_file &fic, off_t start, off_t end);
+
+    void tools_init()
+    {
+#ifdef __DYNAMIC__
+	if(user_group == NULL)
+	{
+	    user_group = new user_group_bases();
+	    if(user_group == NULL)
+		throw Ememory("tools_init");
+	}
+#endif
+    }
+
+    void tools_end()
+    {
+#ifdef __DYNAMIC__
+	if(user_group != NULL)
+	{
+	    delete user_group;
+	    user_group = NULL;
+	}
+#endif
+    }
+
 
     char *tools_str2charptr(const string &x)
     {
@@ -292,7 +316,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.102.2.2 2012/01/12 20:20:47 edrusb Exp $";
+        static char id[]="$Id: tools.cpp,v 1.102.2.3 2012/04/09 14:28:33 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -412,7 +436,11 @@ namespace libdar
 #ifndef  __DYNAMIC__
 	string name = "";
 #else
-        string name = user_group.get_username(uid);
+	string name;
+	if(user_group != NULL)
+	    name = user_group->get_username(uid);
+	else
+	    throw SRC_BUG;
 #endif
 
         if(name.empty()) // uid not associated with a name
@@ -429,7 +457,11 @@ namespace libdar
 #ifndef __DYNAMIC__
 	string name = "";
 #else
-        string name = user_group.get_groupname(gid);
+	string name;
+	if(user_group != NULL)
+	    name = user_group->get_groupname(gid);
+	else
+	    throw SRC_BUG;
 #endif
 
         if(name.empty()) // uid not associated with a name

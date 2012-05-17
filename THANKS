@@ -1,3 +1,10 @@
+version 2.4.5
+--------------
+Thanks to Piotr Domanski and Paolo Sala for bug report. Thanks to Andreas
+Wolff for feedback and bug fix. A Big Thank to Neil Darlow who provided a
+great support in solving a bug in libdar that only expressed on ArchLinux
+and dynamic binary and infinint mode when used at the same time.
+
 version 2.4.4
 --------------
 Thanks again to Jurgen Nagler-Ihlein for bug report.

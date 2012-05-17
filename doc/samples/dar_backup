@@ -27,7 +27,7 @@ my $STORAGEDIR=("/mnt/backup/backups/");
 # list of dirs to be backed up
 # NOTE 1 - these are paths relative for $ROOT_DIR, above
 # NOTE 2 - this is used for naming; everything after the last / is used
-# for the base name. DO NOT have two things be the same (like /usr/bin and 
+# for the base name. DO NOT have two things be the same (like /usr/bin and
 # /usr/local bin). Otherwise, one will be overwritten
 # MC for testing
 # my @BACKUPDIRS=("test");
@@ -35,12 +35,12 @@ my @BACKUPDIRS=("local","home","pub");
 
 # this the path to the slice as expressed in things that dar will
 # substitute the right values for (it's just used in 2 places)
-my $SLICE_PATH=("%p/%b.%n.%e");
-my $SLICE_NAME=("%b.%n");
+my $SLICE_PATH=("%p/%b.%N.%e");
+my $SLICE_NAME=("%b.%N");
 
-my $PARITY_PATH=("%p/%b.%n.par2");
+my $PARITY_PATH=("%p/%b.%N.par2");
 # par2 creates a bunch of "vol" files, we need those too
-my $PARITY_FILES=("%p/%b.%n.*.par2");
+my $PARITY_FILES=("%p/%b.%N.*.par2");
 
 # list of stuff to be compressed. This must be in the form of
 # -Z \"*.mask\"
@@ -64,7 +64,7 @@ my $PRE_REC_MESSAGE=("echo ; echo Done erasing, burning to DVD; echo");
 # -J = generate Joliet extensions
 # -V = volume ID
 # %b = dar will substitute the base name
-# %n = dar will substitute the number of the slice
+# %N = dar will substitute the number of the slice
 # %p = dar will substitute slice path
 # FOR TESTING = -dry-run
 my $RECORD_COMMAND=("growisofs -dvd-compat -Z $DVD  -r -J -V $SLICE_NAME $SLICE_PATH $PARITY_PATH $PARITY_FILES");
@@ -87,7 +87,7 @@ my $DELETE_COMMAND=("rm -f $SLICE_PATH $PARITY_PATH $PARITY_FILES");
 # -p = pause and wait for user to change DVD before continuing
 # -c (used below) = create an archive called whatever
 # FOR TESTING = -e
-my $DAR=("dar -y -s $SLICE_SIZE -R $ROOT_DIR -D $NO_COMPRESS_LIST -p -E \"$PRE_PARITY_MESSAGE ; $PARITY_COMMAND ; $PRE_BLANK_MESSAGE ; $BLANK_COMMAND ; $PRE_REC_MESSAGE ; $RECORD_COMMAND ; $EJECT_COMMAND ; $DELETE_COMMAND ; $POST_REC_MESSAGE\""); 
+my $DAR=("dar -y -s $SLICE_SIZE -R $ROOT_DIR -D $NO_COMPRESS_LIST -p -E \"$PRE_PARITY_MESSAGE ; $PARITY_COMMAND ; $PRE_BLANK_MESSAGE ; $BLANK_COMMAND ; $PRE_REC_MESSAGE ; $RECORD_COMMAND ; $EJECT_COMMAND ; $DELETE_COMMAND ; $POST_REC_MESSAGE\"");
 
 &main;
 

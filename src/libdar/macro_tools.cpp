@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: macro_tools.cpp,v 1.86 2011/04/17 16:36:36 edrusb Rel $
+// $Id: macro_tools.cpp,v 1.86.2.1 2012/03/30 06:52:03 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -378,7 +378,7 @@ namespace libdar
 			tmp_ptr->set_callback_trailing_clear_data(&macro_tools_get_terminator_start);
 
 			if(sequential_read)
-			    elastic tmp = elastic(*tmp_ptr, elastic_forward, ver.edition);
+			    elastic(*tmp_ptr, elastic_forward, ver.edition); // this is line creates a temporary anonymous object and destroys it just afterward
 			    // this is necessary to skip the reading of the initial elastic buffer
 			    // nothing prevents the elastic buffer from carrying what could
 			    // be considered an escape mark.
@@ -721,7 +721,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: macro_tools.cpp,v 1.86 2011/04/17 16:36:36 edrusb Rel $";
+        static char id[]="$Id: macro_tools.cpp,v 1.86.2.1 2012/03/30 06:52:03 edrusb Exp $";
         dummy_call(id);
     }
 

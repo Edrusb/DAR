@@ -10,6 +10,7 @@
 
 
 
+
   <meta content="Denis Corbin" name="author">
   <meta content="Tutorial for using libdar library" name="description"></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
@@ -438,33 +439,62 @@ get_version(). For more details see libgcrypt documentation.</li></ul>
       </ul>
 
       <br>
-      <div style="text-align: justify;">As we saw, libdar used some
+      <h2>1 bis - We must prepare the end right now!<br>
+      </h2>
+<br>
+      <div style="text-align: justify;">As we saw, libdar used
+some
 datastructures (mutex, secured memory, etc.) that need to be released
-properly before ending the program. This need may become mandatory if
-using strong encryption, to be able clear any secured memory used.
-Secured here means that a memory that has been locked in memory for it
-cannot be swapped out to disk during the livetime of the program.
-however, for completness, this memory has to be cleared (data replaced
-by zeroed bytes), to be sure that once the program will have ended no
-one will have the possibility to retrieve from another program for
-example, any sensitive data that were previously stored in secured
-memory. This can be done using the following call:<br>
-      <br>
-      <div style="margin-left: 120px;"><code style="font-weight: bold;">libdar::close_and_clean()</code><br>
+properly before ending the program. It is mandatory to invoke the
+following function before exiting your program if you invoked
+get_version() previously. It is a good idea to implement this right now
+not to forget later:<br>
+      
       </div>
-      </div>
-      <br>
-      <br>
-
-      <h2>2 - Let's see the available features</h2>
-once we have called one of the <span style="font-style: italic;">get_version*</span>
-function it is possible to access the list of features activated at compilation
-time:<br>
-      <br>
+      
+      
       </td>
     </tr>
   </tbody>
 </table>
+<br>
+<table style="text-align: left; width: 90%; background-color: rgb(153, 255, 255);" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><code><span style="font-weight: bold;"><br>
+      </span></code>
+      <div style="margin-left: 40px;"><code style="font-weight: bold;">libdar::close_and_clean()</code><span style="font-weight: bold;"></span><br>
+      <span style="font-weight: bold;"></span></div>
+      <code style="font-weight: bold;"><br>
+      </code></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<table style="text-align: left; width: 90%;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      
+      <div style="text-align: justify;">In particular, closes_and_clean()
+makes the necessary for memory to be released in the proper order. <span style="text-decoration: underline;">Not
+calling close_and_clean() at the end of your program may result in uncaught exception message from libdar at the end of
+the execution</span>. This depends on the compiler, libc and option activated in libdar at compilation time.<br>
+      <br>
+<br>
+
+
+      </div>
+
+      <h2>2 - Let's see the available features</h2>
+
+once we have called one of the <span style="font-style: italic;">get_version*</span>
+function it is possible to access the list of features activated at compilation
+time:</td>
+    </tr>
+  </tbody>
+</table>
+<br>
 <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>

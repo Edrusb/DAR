@@ -55,7 +55,7 @@ Here follows an extract of Denis Corbin's resume:
         1997-2000 Software developer, Team leader, Project leader for
                   Netcomsystems (which was renamed Spirent Communications in
 		  1999) Denis' role was to design software for the Smartbits
-                  network tester. he worked in cooperation with Californian
+                  network tester. He worked in cooperation with Californian
                   team in Los Angeles.
         2000-2002 Network Design, architecture and network support for DCN
                   of Alcatel Submarine Networks, (Denis worked mainly in France,
@@ -63,16 +63,17 @@ Here follows an extract of Denis Corbin's resume:
         2002-2003 DNS maintainer and Firewall admin for the GPRS network of
                   Bouygues Telecom (small French mobile operator).
         2003-2004 Network Design and support for SFR's wap and SMS platform,
-                  Managed change of ISP connectivity (activating BGP dual homing)
-		  for SFR (main mobile operator in France) with no loss
-		  of service, becoming Local Internet Registrar (LIR).
+                  Managed change of ISP connectivity (activating BGP dual
+		  homing) for SFR (main mobile operator in France) with no loss
+		  of service. Denis helped SFR becoming Local Internet Registrar
+		  (LIR).
 	Nov. 2003 Denis became Cisco Certified CCNA
         2004-2005 Validation responsible of the hosting infrastructure
                   that provides data to UMTS mobile phones for SFR.
 	Dec. 2004 Denis became Cisco Certified CCNP
-        Since July 2005: Network and security engineer for Telindus France.
+        July 2005 Network and security engineer at Telindus France.
     	July 2008 Denis became Cisco Certified Internetwork Expert, CCIE #21568
-                  R&S, successfully passing the written and lab test
+                  R&S, successfully passing the written and lab exams
 	June 2009 Denis became Checkpoint Certified Security Expert (CCSE)
                   At Telindus Denis' current role, which depends on each project
 		  is to design and implement network architectures
@@ -84,6 +85,8 @@ Here follows an extract of Denis Corbin's resume:
 		  large project deployment over the country, coordinate the
 		  different engineers in charge of each site and be the single
 		  point of interaction toward the customer and the constructors
+         Nov 2011 Denis became Riverbed certified RCSA
+	 Apr 2012 Denis became certified Cisco Sales Expert
 
         Denis has proven good knowledge of network protocols, in particular:
               L1 protocols (bit encoding like Differential Manchester),
@@ -102,10 +105,14 @@ Here follows an extract of Denis Corbin's resume:
  	      	  software eventually with DNSSEC support),
               Firewall admin (Checkpoint, ASA, Catalyst's FWSM, Linux iptables),
 	      NTP protocol, syslog, SNMP, radius, tacacs+, SMTP, ...
+	      Cisco and Riverbed WAN optimization,
+	      FCoE, FC,
 
         Denis has also a general knowledge of:
               SDH networks, Submarine Equipment systems and TMN-OS,
               GSM and GPRS network structure, SS7 and radio protocols
+	      SAN, VSAN, zoning, LUN masking, Cisco VIC, virtual switchs,
+	      VMWare, Cisco UCS
 
 
 	These knowledges have been validated on the following equipments:

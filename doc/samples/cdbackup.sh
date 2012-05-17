@@ -47,7 +47,7 @@
 DAR_PARAMS="-s 699M -S 691M -R / -P dev/pts -P proc -P mnt -P cdrom -D"
 
 #temporary or target directory:
-TDIR="."                                               
+TDIR="."
 
 #I'm using a USB CDR drive, so i don't know which 'scsi'-bus it is on.
 #Cdrecord -scanbus is grepped for the following string:
@@ -77,13 +77,13 @@ if [ "$1" != "" ] && [ "$2" == "" ] ; then
 		echo "starting full backup"
 		$DAR_EXEC -c "$TDIR/$DATE" \
 		-X "$DATE.*.dar" -X "darswap" \
-		-N $DAR_PARAMS -E "$0 %p %b %n"
+		-N $DAR_PARAMS -E "$0 %p %b %N"
 	else
 		echo "starting incremental backup based on $1"
 		LDATE=`$BASENAME $1`
 		$DAR_EXEC -c "$TDIR/${DATE}_$LDATE" -A $1 \
 		-X "${DATE}_$LDATE.*.dar" -X "$LDATE.*.dar" -X "darswap" \
-		-N $DAR_PARAMS -E "$0 %p %b %n"
+		-N $DAR_PARAMS -E "$0 %p %b %N"
 	fi
 	echo "backup done"
 	echo "start: $START"

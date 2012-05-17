@@ -33,7 +33,7 @@ for dar:<br>
       <br>
       <h2 style="text-align: justify;">Fixed Limits</h2>
       <ul style="text-align: justify;">
-        
+
         <ul>
           <li>The size of SLICES may be limited by the file system or
 kernel (maximum file size is 2 GB with Linux kernel 2.2.x), other limits may exist depending on the filesystem used.<br>
@@ -54,9 +54,9 @@ limit should be high enough to not be a problem. <br>
 	</li>
         </ul>
 
-        
-        
-	
+
+
+
       </ul>
       <br>
       <h2 style="text-align: justify;">System variable limits</h2>
@@ -70,18 +70,19 @@ above even if the systems cannot yet manage such file sizes.
 Nevertheless, this has an overhead with memory and&nbsp; CPU usage,
 added to
 the C++ overhead for the datastructure. All together dar needs a
-average of 650 bytes of virtual memory by saved file. Thus, for example
+average of 650 bytes of virtual memory by saved file with dar-2.1.0 and around 850 with dar-2.4.x
+(that's the price to pay for new features). Thus, for example
 if you have 110,000 files to save, whatever is the total amount of data
-to save, dar will require around 67 MB of virtual memory.<br>
+to save, dar will require around 90 MB of virtual memory.<br>
       </div>
-      
+
       <div style="margin-left: 40px;"><br>
       </div>
 
       <div style="text-align: justify; margin-left: 40px;">Now, when doing catalogue
 extraction or differential backup, dar has in
 memory two catalogues, thus the amount of memory space needed is the
-double (134 MB in the example). Why ? Because for differential backup,
+double (180 MB in the example). Why ? Because for differential backup,
 dar starts with the catalogue of the archive of reference which is
 needed to know which files to save and which not to save, and in
 another hand, builds the catalogue of the new archive all along the
@@ -92,14 +93,13 @@ As you guess merging two archives into a third one requires even more
 memory (memory to store the first archive to merge, the second archive
 to merge and the resulting archive to produce).<br>
       </div>
-      
+
       <div style="margin-left: 40px;"><br>
       </div>
 
       <div style="text-align: justify; margin-left: 40px;">This memory issue, is not a
-limit by itself, but you need enough
-virtual memory to be able to save your data (if necessary you can still
-add swap space).<br>
+limit by itself, but you need enough virtual memory to be able to save your data (if necessary you can still
+add swap space, as partition or as a plain file).<br>
       </div>
       <br>
       <h3 style="text-align: justify;"><a name="Integers"></a>Integers</h3>
@@ -122,7 +122,7 @@ While the 64 bits version cannot handle dates after around 500 billion
 years (which is longer than the estimated age of the Universe: 15
 billion years) and file larger than around 18 EB (18 <a href="usage_notes.html#bytes_bits_kilo">exa bytes</a>). <br>
       </div>
-      
+
       <div style="margin-left: 40px;"><br>
       </div>
 
@@ -137,7 +137,7 @@ be able to read or produce all possible archives. In that case, dar
 suite program will abort with an error message asking you to use the
 "full" version of dar program.<br>
       </div>
-      
+
       <div style="margin-left: 40px;"><br>
       </div>
 
@@ -154,7 +154,7 @@ of "-z" use "-z 9" and so on (see <a href="man/index.html">dar's man page</a> se
 available with FreeBSD's getopt, just using short options and explicit
 arguments.<br>
       </div>
-      
+
       <div style="margin-left: 40px;"><br>
       </div>
 
@@ -192,7 +192,7 @@ store any date as far in the future as you want. Of course dar cannot
 stores dates before Jan the 1st of 1970, but it should not be a very
 big problem. ;-)<br>
       </div>
-      
+
       <div style="margin-left: 40px;"><br>
       </div>
 

@@ -5,7 +5,7 @@
 # this script is to be launched on dar command line when creating an archive with -s option (slicing)
 # you need to run this script from dar, adding the following argument on command-line
 #
-#     -E "dar_par_create.duc %p %b %n %e %c 20"
+#     -E "dar_par_create.duc %p %b %N %e %c 20"
 #
 # note that 20 means 20% of redundancy, tune it to your needs
 #

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.62 2011/05/20 10:23:07 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.62.2.1 2012/04/15 10:36:44 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -54,7 +54,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_XFORM_VERSION "1.5.0"
+#define DAR_XFORM_VERSION "1.5.1"
 
 static bool command_line(user_interaction & dialog,
 			 S_I argc, char * const argv[],
@@ -446,7 +446,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char * const argv[
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.62 2011/05/20 10:23:07 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.62.2.1 2012/04/15 10:36:44 edrusb Exp $";
     dummy_call(id);
 }
 

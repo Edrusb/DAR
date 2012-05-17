@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.91 2011/03/20 17:10:11 edrusb Rel $
+// $Id: libdar.cpp,v 1.91.2.1 2012/04/09 14:28:33 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -334,7 +334,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.91 2011/03/20 17:10:11 edrusb Rel $";
+        static char id[]="$Id: libdar.cpp,v 1.91.2.1 2012/04/09 14:28:33 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -425,6 +425,8 @@ namespace libdar
 		    throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s\n"), MIN_VERSION_GCRYPT));
 #endif
 
+	    tools_init();
+
 		 // so now libdar is ready for use!
 
 	     libdar_initialized = true;
@@ -437,6 +439,7 @@ namespace libdar
 	 if(libdar_initialized_gcrypt)
 	     gcry_control(GCRYCTL_TERM_SECMEM, 0); // by precaution if not already done by libgcrypt itself
 #endif
+	 tools_end();
     }
 
 

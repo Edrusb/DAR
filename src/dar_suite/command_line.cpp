@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.156.2.1 2012/01/04 09:55:55 edrusb Exp $
+// $Id: command_line.cpp,v 1.156.2.2 2012/04/13 07:59:07 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -1311,6 +1311,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.ignore_unknown_inode = true;
 		else if(strcasecmp("do-not-compare-symlink-mtime", optarg) == 0)
 		    p.no_compare_symlink_date = false;
+		else if(strcasecmp("test-self-reported-bug", optarg) == 0)
+		    throw SRC_BUG; // testing the way a internal error is reported
 		else
 		    throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;
@@ -1572,7 +1574,7 @@ static void usage(user_interaction & dialog, const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.156.2.1 2012/01/04 09:55:55 edrusb Exp $";
+    static char id[]="$Id: command_line.cpp,v 1.156.2.2 2012/04/13 07:59:07 edrusb Exp $";
     dummy_call(id);
 }
 

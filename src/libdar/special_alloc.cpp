@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: special_alloc.cpp,v 1.18.2.6 2012/03/10 20:57:21 edrusb Rel $
+// $Id: special_alloc.cpp,v 1.18.2.8 2012/04/12 19:43:45 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -104,7 +104,7 @@ namespace libdar
 	static map<record, zone *> ordered; //< class global map used to for zone lookup
     };
 
-    map<zone::record, zone *> zone::ordered;
+    map<zone::record, zone *> zone::ordered; //< this is the implementation of the static variable declared just above in class zone
 
 	//////////////////////////////////////////////
 	// forward definition of class cluster
@@ -687,8 +687,11 @@ namespace libdar
 		throw SRC_BUG;
 	    if(it->second->is_empty())
 	    {
-		delete it->second;
-		carte.erase(it);
+		map<U_I, sized *>::iterator tmp = it;
+
+		++it;
+		delete tmp->second;
+		carte.erase(tmp);
 	    }
 	    else
 		++it;
@@ -785,7 +788,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: special_alloc.cpp,v 1.18.2.6 2012/03/10 20:57:21 edrusb Rel $";
+        static char id[]="$Id: special_alloc.cpp,v 1.18.2.8 2012/04/12 19:43:45 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -831,10 +834,18 @@ namespace libdar
 	main_alloc.max_percent_full(output);
 #endif
 	main_alloc.garbage_collect();
-#ifdef LIBDAR_NO_OPTIMIZATION
+
+// testing whether all memory blocks are released
+// was disabled when compiler optimization was used
+// because it lead to 'false positive', but in fact
+// the 'false positive' was due to a bug (bug found by Andreas Wolff on Cygwin)
+// thus we re-enable the systematic control of proper memory release
+// by precaution we do not totally remove the possibility to disable it
+// when compiler optimization is activated.
+// #ifdef LIBDAR_NO_OPTIMIZATION
 	if(!main_alloc.is_empty())
 	    main_alloc.dump(output);
-#endif
+// #endif
 #endif
     }
 

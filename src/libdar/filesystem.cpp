@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.77.2.3 2012/02/19 17:25:08 edrusb Exp $
+// $Id: filesystem.cpp,v 1.77.2.4 2012/04/03 12:24:24 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -1283,8 +1283,6 @@ namespace libdar
 	    bool has_ea_saved = x_ino != NULL && (x_ino->ea_get_saved_status() == inode::ea_full || x_ino->ea_get_saved_status() == inode::ea_removed);
 	    path spot = *current_dir + x_nom->get_name();
 	    string spot_display = spot.display();
-	    over_action_data act_data = data_undefined;
-	    over_action_ea act_ea = EA_undefined;
 
 	    nomme *exists = NULL;
 
@@ -1313,6 +1311,8 @@ namespace libdar
 	    try
 	    {
 		inode *exists_ino = dynamic_cast<inode *>(exists);
+		directory *exists_dir = dynamic_cast<directory *>(exists);
+
 		if(exists_ino == NULL && exists != NULL)
 		    throw SRC_BUG; // an object from filesystem should always be an inode !?!
 
@@ -1324,7 +1324,7 @@ namespace libdar
 		    if(x_det != NULL)
 			throw Erange("filesystem_restore::write", string(gettext("Cannot remove non-existent file from filesystem: ")) + spot_display);
 
-		    if((has_data_saved || hard_link) && !only_overwrite)
+		    if((has_data_saved || hard_link || x_dir != NULL) && !only_overwrite)
 		    {
 			if(info_details)
 			    get_ui().warning(string(gettext("Restoring file's data: ")) + spot_display);
@@ -1369,6 +1369,8 @@ namespace libdar
 		}
 		else // exists != NULL
 		{
+		    over_action_data act_data = data_undefined;
+		    over_action_ea act_ea = EA_undefined;
 
 			// conflict: an entry of that name is already present in filesystem
 
@@ -1389,11 +1391,11 @@ namespace libdar
 			    if(!stack_dir.empty())
 				stack_dir.back().set_restore_date(true);
 			}
-		    else
+		    else // a normal inode (or hard linked one)
 		    {
 			if(has_data_saved)
 			    action_over_data(exists_ino, x_nom, spot_display, act_data, data_restored);
-			else
+			else // no data saved in the object to restore
 			{
 			    data_restored = done_no_change_no_data;
 			    if(x_mir != NULL)
@@ -1429,7 +1431,7 @@ namespace libdar
 		    }
 		}
 
-		if(x_dir != NULL && act_data != data_remove)
+		if(x_dir != NULL && (exists == NULL || exists_dir != NULL || data_restored == done_data_restored))
 		{
 		    *current_dir += x_dir->get_name();
 		    stack_dir.push_back(stack_dir_t(*x_dir, data_restored == done_data_restored));
@@ -1848,7 +1850,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.77.2.3 2012/02/19 17:25:08 edrusb Exp $";
+        static char id[]="$Id: filesystem.cpp,v 1.77.2.4 2012/04/03 12:24:24 edrusb Exp $";
         dummy_call(id);
     }
 

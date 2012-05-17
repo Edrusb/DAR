@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: libdar_4_4.hpp,v 1.21.2.3 2012/03/16 10:46:30 edrusb Rel $
+// $Id: libdar_4_4.hpp,v 1.21.2.4 2012/04/15 10:36:44 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -459,7 +459,7 @@ namespace libdar_4_4
 	// but we keep the major to 4 (to avoid alarming external programs expecting the libdar API version 4)
     const U_I LIBDAR_COMPILE_TIME_MEDIUM = 6;
 	///  libdar Minor version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MINOR = 3;
+    const U_I LIBDAR_COMPILE_TIME_MINOR = 4;
 
 	////////////////////////////////////////////////////////////////////////
 	// LIBDAR INITIALIZATION METHODS                                      //

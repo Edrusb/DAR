@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tools.hpp,v 1.85 2011/04/19 16:24:29 edrusb Rel $
+// $Id: tools.hpp,v 1.85.2.1 2012/04/09 14:28:33 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -71,6 +71,12 @@ namespace libdar
 
 	/// \addtogroup Tools
 	/// @{
+
+
+	/// libdar internal use only: it is launched from get_version() and initializes tools internal variables
+    extern void tools_init();
+	/// libdar internal use only: it is launched from close_and_clean() and releases tools internal variables
+    extern void tools_end();
 
 	/// convert a string to a char *
 

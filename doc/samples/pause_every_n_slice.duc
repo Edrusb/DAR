@@ -2,8 +2,8 @@
 
 ############################################################################
 # WARNING: this script is now obsolete, due to the -p option new feature
-# that provide the same feature. You can still use this script or tue it
-# for your own need if you like, this is why it is kept present here
+# that provide the same behavior. You can still use this script or tune it
+# for your own need if you like, this is why it is kept present here as sample
 ############################################################################
 # This script is to be launched on dar command line when creating an archive
 # with -s option (slicing), in place of -p option (pause every slice done)

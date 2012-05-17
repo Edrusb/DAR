@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_cp.cpp,v 1.27 2011/01/05 20:48:52 edrusb Rel $
+// $Id: dar_cp.cpp,v 1.27.2.1 2012/04/15 10:36:44 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -65,7 +65,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "thread_cancellation.hpp"
 
-#define DAR_CP_VERSION "1.2.3"
+#define DAR_CP_VERSION "1.2.4"
 
 using namespace libdar;
 using namespace std;
@@ -340,7 +340,7 @@ static int skip_to_next_readable(int block, char *buffer, int src, int dst, off_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_cp.cpp,v 1.27 2011/01/05 20:48:52 edrusb Rel $";
+    static char id[]="$Id: dar_cp.cpp,v 1.27.2.1 2012/04/15 10:36:44 edrusb Exp $";
     dummy_call(id);
 }
 

@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2012-03-16 12:05+0100\n"
-"PO-Revision-Date: 2011-07-21 16:13+0200\n"
+"POT-Creation-Date: 2012-04-15 12:50+0200\n"
+"PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
 "Language: sv\n"
@@ -40,7 +40,7 @@ msgstr ""
 "'thread'safe' inte initierat för libdar, läs manualen eller kontakta den som "
 "underhåller libdar-tillämpningen"
 
-#: src/libdar/thread_cancellation.cpp:179 src/libdar/special_alloc.cpp:822
+#: src/libdar/thread_cancellation.cpp:179 src/libdar/special_alloc.cpp:825
 #: src/libdar/user_group_bases.cpp:154
 msgid "Cannot initialize mutex: "
 msgstr "Kan ej initiera 'mutex': "
@@ -188,15 +188,15 @@ msgstr "Kan ej lägga till en etikett till en tom stack"
 msgid "Empty string as subdirectory does not make a valid path"
 msgstr "En tom sträng som undermapp utgör inte en giltig sökväg"
 
-#: src/libdar/secu_string.cpp:70 src/libdar/secu_string.cpp:99
+#: src/libdar/secu_string.cpp:73 src/libdar/secu_string.cpp:102
 msgid "Error while reading data for a secure memory:"
 msgstr "Fel vid läsning av data från säkert minne:"
 
-#: src/libdar/secu_string.cpp:94
+#: src/libdar/secu_string.cpp:97
 msgid "Cannot receive that much data in regard to the allocated memory"
 msgstr "kan ej ta emot så mycket data med hänsyn till allokerat minne"
 
-#: src/libdar/secu_string.cpp:117
+#: src/libdar/secu_string.cpp:120
 msgid "Cannot reduce the string to a size that is larger than its current size"
 msgstr ""
 "Kan ej reducera en sträng till en storlek, som är större än dess aktuella "
@@ -1309,186 +1309,186 @@ msgid "Too much line in file %S (integer overflow)"
 msgstr "För mycket rad i fil %S (heltalsspill)"
 
 #: src/libdar/tools.cpp:132 src/libdar/criterium.cpp:804
-#: src/dar_suite/dar_suite.cpp:266
+#: src/dar_suite/dar_suite.cpp:272
 msgid "YES"
 msgstr "JA"
 
 #: src/libdar/tools.cpp:132 src/libdar/criterium.cpp:805
-#: src/dar_suite/dar_suite.cpp:268
+#: src/dar_suite/dar_suite.cpp:274
 msgid "NO"
 msgstr "NEJ"
 
-#: src/libdar/tools.cpp:189
+#: src/libdar/tools.cpp:213
 msgid "Not a zero terminated string in file"
 msgstr "Inte en nollavslutad sträng i fil"
 
-#: src/libdar/tools.cpp:225
+#: src/libdar/tools.cpp:249
 #, c-format
 msgid "Cannot get file size: %s"
 msgstr "Kan inte hämta filstorlek: %s"
 
-#: src/libdar/tools.cpp:276
+#: src/libdar/tools.cpp:300
 #, c-format
 msgid "Unknown suffix [%c] in string %S"
 msgstr "Okänt suffix [%c] i sträng %S"
 
-#: src/libdar/tools.cpp:401
+#: src/libdar/tools.cpp:425
 #, fuzzy
 msgid "Cannot read \"fcntl\" file's flags : "
 msgstr "Kan ej läsa fcntl-fils flaggor : "
 
-#: src/libdar/tools.cpp:407
+#: src/libdar/tools.cpp:431
 #, fuzzy
 msgid "Cannot set \"fcntl\" file's flags : "
 msgstr "Kan sätta fcntl-fils flaggor : "
 
-#: src/libdar/tools.cpp:470 src/libdar/tools.cpp:475 src/libdar/tools.cpp:487
-#: src/libdar/tools.cpp:492
+#: src/libdar/tools.cpp:502 src/libdar/tools.cpp:507 src/libdar/tools.cpp:519
+#: src/libdar/tools.cpp:524
 #, fuzzy
 msgid "Invalid number: "
 msgstr "Ogiltigt arkivnummer: "
 
-#: src/libdar/tools.cpp:567
+#: src/libdar/tools.cpp:599
 msgid "date before 1970 is not allowed"
 msgstr "datum före 1970 är ej tillåtet"
 
-#: src/libdar/tools.cpp:572
+#: src/libdar/tools.cpp:604
 msgid "Incorrect month"
 msgstr "Felaktig månad"
 
-#: src/libdar/tools.cpp:577
+#: src/libdar/tools.cpp:609
 msgid "Incorrect day of month"
 msgstr "Felaktig dag i månad"
 
-#: src/libdar/tools.cpp:582
+#: src/libdar/tools.cpp:614
 #, fuzzy
 msgid "Incorrect hour"
 msgstr "Felaktig timme på dag"
 
-#: src/libdar/tools.cpp:587
+#: src/libdar/tools.cpp:619
 msgid "Incorrect minute"
 msgstr "Felaktig minut"
 
-#: src/libdar/tools.cpp:592
+#: src/libdar/tools.cpp:624
 msgid "Incorrect second"
 msgstr "Felaktig sekund"
 
-#: src/libdar/tools.cpp:596
+#: src/libdar/tools.cpp:628
 msgid "Bad formatted date expression"
 msgstr "Dåligt formaterad datumuttryck"
 
-#: src/libdar/tools.cpp:709
+#: src/libdar/tools.cpp:741
 msgid "Given date must be in the past"
 msgstr "Angivet datum måste vara i det förgågna"
 
-#: src/libdar/tools.cpp:744 src/libdar/tools.cpp:830
+#: src/libdar/tools.cpp:776 src/libdar/tools.cpp:862
 msgid "Error while calling fork() to launch dar: "
 msgstr "Fel vid anrop av fork() för att starta dar: "
 
-#: src/libdar/tools.cpp:758 src/libdar/tools.cpp:860
+#: src/libdar/tools.cpp:790 src/libdar/tools.cpp:892
 msgid "Unexpected error while waiting for dar to terminate: "
 msgstr "Oväntat fel vid väntan på att dar avslutas:  "
 
-#: src/libdar/tools.cpp:764 src/libdar/tools.cpp:866
+#: src/libdar/tools.cpp:796 src/libdar/tools.cpp:898
 msgid "DAR terminated upon signal reception: "
 msgstr "DAR avslutat vid signalmottagande: "
 
-#: src/libdar/tools.cpp:770 src/libdar/tools.cpp:872
+#: src/libdar/tools.cpp:802 src/libdar/tools.cpp:904
 msgid " . Retry to launch dar as previously ?"
 msgstr " . Försök att starta dar på samma sätt som förut ?"
 
-#: src/libdar/tools.cpp:775 src/libdar/tools.cpp:782 src/libdar/tools.cpp:877
-#: src/libdar/tools.cpp:884
+#: src/libdar/tools.cpp:807 src/libdar/tools.cpp:814 src/libdar/tools.cpp:909
+#: src/libdar/tools.cpp:916
 msgid " Continue anyway ?"
 msgstr " Fortsätta likväl ?"
 
-#: src/libdar/tools.cpp:780 src/libdar/tools.cpp:882
+#: src/libdar/tools.cpp:812 src/libdar/tools.cpp:914
 msgid "DAR sub-process has terminated with exit code "
 msgstr "DAR underprocess har avslutats med exitkod "
 
-#: src/libdar/tools.cpp:992
+#: src/libdar/tools.cpp:1024
 #, c-format
 msgid "   Libz compression (gzip)    : %s\n"
 msgstr "   Libz-komprimering (gzip)   : %s\n"
 
-#: src/libdar/tools.cpp:993
+#: src/libdar/tools.cpp:1025
 #, c-format
 msgid "   Libbz2 compression (bzip2) : %s\n"
 msgstr "   Libbz2-komprimering (bzip2): %s\n"
 
-#: src/libdar/tools.cpp:994
+#: src/libdar/tools.cpp:1026
 #, c-format
 msgid "   Liblzo2 compression (lzo)  : %s\n"
 msgstr "   Liblzo2-komprimering (lzo)   : %s\n"
 
-#: src/libdar/tools.cpp:995
+#: src/libdar/tools.cpp:1027
 #, c-format
 msgid "   Strong encryption          : %s\n"
 msgstr "   Stark kryptering           : %s\n"
 
-#: src/libdar/tools.cpp:996
+#: src/libdar/tools.cpp:1028
 #, c-format
 msgid "   Extended Attributes support: %s\n"
 msgstr "   Stöd för Extended Attribut : %s\n"
 
-#: src/libdar/tools.cpp:997
+#: src/libdar/tools.cpp:1029
 #, c-format
 msgid "   Large files support (> 2GB): %s\n"
 msgstr "   Stöd för stora filer(> 2GB): %s\n"
 
-#: src/libdar/tools.cpp:998
+#: src/libdar/tools.cpp:1030
 #, c-format
 msgid "   ext2fs NODUMP flag support : %s\n"
 msgstr "   stöd för ext2fs NODUMP-flagga : %s\n"
 
-#: src/libdar/tools.cpp:999
+#: src/libdar/tools.cpp:1031
 #, c-format
 msgid "   Special allocation scheme  : %s\n"
 msgstr "   Särskilt tilldelningsschema: %s\n"
 
-#: src/libdar/tools.cpp:1001
+#: src/libdar/tools.cpp:1033
 #, c-format
 msgid "   Integer size used          : unlimited\n"
 msgstr "   Utnyttjad heltalsstorlek  : obegränsad\n"
 
-#: src/libdar/tools.cpp:1003
+#: src/libdar/tools.cpp:1035
 #, c-format
 msgid "   Integer size used          : %d bits\n"
 msgstr "   Utnyttjad heltalsstorlek  : %d bitar\n"
 
-#: src/libdar/tools.cpp:1004
+#: src/libdar/tools.cpp:1036
 #, c-format
 msgid "   Thread safe support        : %s\n"
 msgstr "   Stöd för säker trådning    : %s\n"
 
-#: src/libdar/tools.cpp:1006
+#: src/libdar/tools.cpp:1038
 #, c-format
 msgid "   Furtive read mode support  : %s\n"
 msgstr "   Smygläsningsmode  stödd : %s\n"
 
-#: src/libdar/tools.cpp:1035
+#: src/libdar/tools.cpp:1067
 msgid "big"
 msgstr "stor"
 
-#: src/libdar/tools.cpp:1038
+#: src/libdar/tools.cpp:1070
 msgid "little"
 msgstr "liten"
 
-#: src/libdar/tools.cpp:1041
+#: src/libdar/tools.cpp:1073
 msgid "error!"
 msgstr "fel!"
 
-#: src/libdar/tools.cpp:1046
+#: src/libdar/tools.cpp:1078
 #, c-format
 msgid "   Detected system/CPU endian : %s"
 msgstr "   Upptäckte system/CPU endian : %s"
 
-#: src/libdar/tools.cpp:1047
+#: src/libdar/tools.cpp:1079
 #, fuzzy, c-format
 msgid "   Large dir. speed optimi.   : %s"
-msgstr "   Stöd för stora filer(> 2GB): %s\n"
+msgstr "   Stöd för stora filer(> 2GB): %s"
 
-#: src/libdar/tools.cpp:1091
+#: src/libdar/tools.cpp:1123
 #, c-format
 msgid ""
 "Warning, %S seems more to be a slice name than a base name. Do you want to "
@@ -1497,63 +1497,63 @@ msgstr ""
 "Varning, %S verkar mer vara namn på en del och inte ett basnamn. Vill du "
 "byta det mot %S ?"
 
-#: src/libdar/tools.cpp:1096
+#: src/libdar/tools.cpp:1128
 #, c-format
 msgid "OK, keeping %S as basename"
 msgstr "OK, behåller %S som basnamn"
 
-#: src/libdar/tools.cpp:1131
+#: src/libdar/tools.cpp:1163
 msgid "Cannot get full path of current working directory: "
 msgstr "Kan ej få komplett sökväg till gällande arbetsmapp: "
 
-#: src/libdar/tools.cpp:1158
+#: src/libdar/tools.cpp:1190
 #, fuzzy
 msgid "NULL argument given to tools_readlink()"
 msgstr "Tomt argument givet till 'tools_readlink'"
 
-#: src/libdar/tools.cpp:1160
+#: src/libdar/tools.cpp:1192
 #, fuzzy
 msgid "Empty string given as argument to tools_readlink()"
 msgstr "Tom sträng givet som argument till 'tools_readlink'"
 
-#: src/libdar/tools.cpp:1184
+#: src/libdar/tools.cpp:1216
 #, c-format
 msgid "Cannot read file information for %s : %s"
 msgstr "Kan ej läsa filinformation för %s : %s"
 
-#: src/libdar/tools.cpp:1237
+#: src/libdar/tools.cpp:1269
 msgid "Cannot set last access and last modification time: "
 msgstr "Kan ej sätta senaste tillgångtid och senaste modifieringstid: "
 
-#: src/libdar/tools.cpp:1273
+#: src/libdar/tools.cpp:1305
 msgid "NULL given as argument"
 msgstr "Tomt givet som argument"
 
-#: src/libdar/tools.cpp:1304
+#: src/libdar/tools.cpp:1336
 msgid "Aborting program: child process died unexpectedly"
 msgstr ""
 
-#: src/libdar/tools.cpp:1310
+#: src/libdar/tools.cpp:1342
 #, fuzzy, c-format
 msgid "Error trying to run %s: %s"
 msgstr "Fel vid räddning av EA-lista för %s : %s"
 
-#: src/libdar/tools.cpp:1312
+#: src/libdar/tools.cpp:1344
 #, fuzzy
 msgid "execvp() failed but did not returned error code"
 msgstr "execvp misslyckades, men gav ingen felkod"
 
-#: src/libdar/tools.cpp:1509
+#: src/libdar/tools.cpp:1541
 #, c-format
 msgid "Removing file %s"
 msgstr "Tar bort fil %s"
 
-#: src/libdar/tools.cpp:1511
+#: src/libdar/tools.cpp:1543
 #, fuzzy, c-format
 msgid "Error removing file %s: %s"
 msgstr "Fel vid filöppning %s : %s"
 
-#: src/libdar/tools.cpp:1536
+#: src/libdar/tools.cpp:1568
 #, c-format
 msgid ""
 "Overwriting not allowed while a slice of a previous archive with the same "
@@ -1562,7 +1562,7 @@ msgstr ""
 "Överskrivning ej tillåten då en del av ett tidigare arkiv med samma basnamn "
 "har hittats i %s-mappen. Åtgärden avbruten"
 
-#: src/libdar/tools.cpp:1542
+#: src/libdar/tools.cpp:1574
 #, fuzzy, c-format
 msgid ""
 "At least one slice of an old archive with the same name remains in the "
@@ -1575,43 +1575,43 @@ msgstr ""
 "kan bli gömd bland delarna i detta gamla arkiv. Skall vi ta bort det gamla "
 "arkivets delar först ?"
 
-#: src/libdar/tools.cpp:1580 src/libdar/tools.cpp:1584
+#: src/libdar/tools.cpp:1612 src/libdar/tools.cpp:1616
 #, fuzzy, c-format
 msgid "Cannot get inode information for %s: %s"
 msgstr "Kan ej få inodinformation för %s : %s"
 
-#: src/libdar/tools.cpp:1593
+#: src/libdar/tools.cpp:1625
 msgid "Current Working Directory cannot be a relative path"
 msgstr "Aktuell arbetsmapp kan ej  vara en relativ sökväg"
 
-#: src/libdar/tools.cpp:1606
+#: src/libdar/tools.cpp:1638
 msgid "Cannot block signals: "
 msgstr "Kan ej blockera signal: "
 
-#: src/libdar/tools.cpp:1612
+#: src/libdar/tools.cpp:1644
 msgid "Cannot unblock signals: "
 msgstr "Kan ej frisläppa signal: "
 
-#: src/libdar/tools.cpp:1630
+#: src/libdar/tools.cpp:1662
 #, fuzzy, c-format
 msgid "Cannot get last modification date: %s"
 msgstr "Kan ej sätta senaste tillgångtid och senaste modifieringstid: "
 
-#: src/libdar/tools.cpp:1640
+#: src/libdar/tools.cpp:1672
 #, c-format
 msgid "Cannot get mtime: %s"
 msgstr "Kan inte hämta mtime: %s"
 
-#: src/libdar/tools.cpp:1729
+#: src/libdar/tools.cpp:1761
 #, fuzzy, c-format
 msgid "Parse error: Unmatched `%c'"
 msgstr "Analysfel: "
 
-#: src/libdar/tools.cpp:1772
+#: src/libdar/tools.cpp:1804
 msgid "Unknown substitution string: %"
 msgstr "Okänd utbytessträng :%"
 
-#: src/libdar/tools.cpp:1779
+#: src/libdar/tools.cpp:1811
 #, fuzzy
 msgid ""
 "last char of user command-line to execute is '%', (use '%%' instead to avoid "
@@ -1620,77 +1620,77 @@ msgstr ""
 "sista tecknet i användarkommandoraden är '%', (använd '%%' i stället så "
 "undviks detta meddelande). Ignorera det och fortsätta ?"
 
-#: src/libdar/tools.cpp:1833
+#: src/libdar/tools.cpp:1865
 msgid "execve() failed. (process table is full ?)"
 msgstr "execve() misslyckades. (full processtabell ?)"
 
-#: src/libdar/tools.cpp:1835
+#: src/libdar/tools.cpp:1867
 msgid "system() call failed: "
 msgstr "system()-anrop misslyckades: "
 
-#: src/libdar/tools.cpp:1837
+#: src/libdar/tools.cpp:1869
 #, c-format
 msgid "execution of [ %S ] returned error code: %d"
 msgstr "utförande av [ %S ] resulterade i felkod: %d"
 
-#: src/libdar/tools.cpp:1844
+#: src/libdar/tools.cpp:1876
 msgid "Error during user command line execution: "
 msgstr "Fel vid utförande av användarkommandoradsexekvering: "
 
-#: src/libdar/tools.cpp:1844
+#: src/libdar/tools.cpp:1876
 msgid " . Retry command-line ?"
 msgstr " . Försöka med kommandoraden igen ?"
 
-#: src/libdar/tools.cpp:1849
+#: src/libdar/tools.cpp:1881
 msgid "Ignore previous error on user command line and continue ?"
 msgstr "Ignorera föregående fel från användarkommandorad och fortsätta ?"
 
-#: src/libdar/tools.cpp:1889
+#: src/libdar/tools.cpp:1921
 msgid "Fatal error on user command line: "
 msgstr "Ödesdigert fel i användarkommandorad: "
 
-#: src/libdar/tools.cpp:1910
+#: src/libdar/tools.cpp:1942
 msgid "End of file reached while skipping to the begin of a word"
 msgstr "Filslut uppnått vid överhoppande till början av ett ord"
 
-#: src/libdar/tools.cpp:1921
+#: src/libdar/tools.cpp:1953
 #, fuzzy
 msgid "Reached end of file while reading a word"
 msgstr "Nått filslut vid läsning av delsäkerhetskopiehuvud"
 
-#: src/libdar/tools.cpp:2054 src/libdar/tools.cpp:2060
+#: src/libdar/tools.cpp:2086 src/libdar/tools.cpp:2092
 #, fuzzy
 msgid "Badly formated octal number"
 msgstr "Dåligt formaterad databas"
 
-#: src/libdar/tools.cpp:2087
+#: src/libdar/tools.cpp:2119
 #, c-format
 msgid "Error while setting file permission: %s"
 msgstr "Fel vid tilldelning av en fils egenskaper:%s"
 
-#: src/libdar/tools.cpp:2144 src/libdar/tools.cpp:2160
+#: src/libdar/tools.cpp:2176 src/libdar/tools.cpp:2192
 #, c-format
 msgid "Unknown user: %S"
 msgstr "Okänd användare: %S"
 
-#: src/libdar/tools.cpp:2148
+#: src/libdar/tools.cpp:2180
 msgid ""
 "Cannot convert username to uid in statically linked binary, either directly "
 "provide the UID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:2164
+#: src/libdar/tools.cpp:2196
 msgid ""
 "Cannot convert group to gid in statically linked binary, either directly "
 "provide the GID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:2171
+#: src/libdar/tools.cpp:2203
 #, c-format
 msgid "Error while setting file user ownership: %s"
 msgstr "Fel vid inställning av ägare till fil: %s"
 
-#: src/libdar/tools.cpp:2331
+#: src/libdar/tools.cpp:2363
 #, fuzzy
 msgid "Error while fetching hostname: "
 msgstr "Fel vid listning av arkivinnehåll: "
@@ -1699,7 +1699,7 @@ msgstr "Fel vid listning av arkivinnehåll: "
 msgid "Consistency check failed for archive header"
 msgstr "Sundhetskontroll misslyckades för arkivhuvud"
 
-#: src/libdar/filtre.cpp:225
+#: src/libdar/filtre.cpp:224
 #, c-format
 msgid ""
 "File %S has changed during backup and is probably not saved in a valid state "
@@ -1709,7 +1709,7 @@ msgstr ""
 "i ett giltigt tillstånd (\"smutsig fil\"), vill du ta med den i "
 "återställningen i alla fall?"
 
-#: src/libdar/filtre.cpp:235
+#: src/libdar/filtre.cpp:234
 msgid ""
 "File had changed during backup and had been copied another time, restoring "
 "the next copy of file: "
@@ -1717,7 +1717,7 @@ msgstr ""
 "Fil har ändrats under säkerhetskopiering och har kopierats en annan gång, "
 "återställer nästa kopia av filen: "
 
-#: src/libdar/filtre.cpp:308
+#: src/libdar/filtre.cpp:304
 #, c-format
 msgid ""
 "The just restored file %S has been marked as dirty (sequential reading can "
@@ -1728,7 +1728,7 @@ msgstr ""
 "läsning kan bara detektera smutsigt status efter återställning), skall vi ta "
 "bort den precis återställd filen?"
 
-#: src/libdar/filtre.cpp:315
+#: src/libdar/filtre.cpp:311
 #, c-format
 msgid ""
 "The just restored file %S has been marked as dirty (sequential reading can "
@@ -1740,32 +1740,32 @@ msgstr ""
 "borttagande av den just återställda smutsiga filen som det är frågat om att "
 "ignorera denna filtyp"
 
-#: src/libdar/filtre.cpp:317
+#: src/libdar/filtre.cpp:313
 #, c-format
 msgid "Removing the dirty file %S"
 msgstr "Tar bort den smutsiga filen %S"
 
-#: src/libdar/filtre.cpp:387
+#: src/libdar/filtre.cpp:383
 msgid " not restored (user choice)"
 msgstr " ej återställd (användares val)"
 
-#: src/libdar/filtre.cpp:391
+#: src/libdar/filtre.cpp:387
 msgid "No file in this directory will be restored."
 msgstr "Ingen fil i denna mapp kommer att återställas."
 
-#: src/libdar/filtre.cpp:409
+#: src/libdar/filtre.cpp:405
 msgid "Error while restoring "
 msgstr "Fel vid återställning "
 
-#: src/libdar/filtre.cpp:414
+#: src/libdar/filtre.cpp:410
 msgid "Warning! No file in that directory will be restored: "
 msgstr "Varning! Ingen fil i den mappen kommer att återställas: "
 
-#: src/libdar/filtre.cpp:559
+#: src/libdar/filtre.cpp:555
 msgid "Recording hard link into the archive: "
 msgstr "Sparar hård länk till arkiv: "
 
-#: src/libdar/filtre.cpp:628
+#: src/libdar/filtre.cpp:624
 #, c-format
 msgid ""
 "SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of "
@@ -1774,59 +1774,59 @@ msgstr ""
 "SÄKERHETSVARNING %S: ctime har ändrats sedan arkivering av referenser "
 "gjorts, medan ingen inod eller data har ändrats"
 
-#: src/libdar/filtre.cpp:874
+#: src/libdar/filtre.cpp:870
 msgid "Error while saving "
 msgstr "Fel vid sparande "
 
-#: src/libdar/filtre.cpp:889
+#: src/libdar/filtre.cpp:885
 msgid "NO FILE IN THAT DIRECTORY CAN BE SAVED."
 msgstr "INGEN FIL I DEN MAPPEN KAN SPARAS."
 
-#: src/libdar/filtre.cpp:894
+#: src/libdar/filtre.cpp:890
 msgid "Cannot write down the archive: "
 msgstr "Kan ej skriva till arkivet:"
 
-#: src/libdar/filtre.cpp:972
+#: src/libdar/filtre.cpp:968
 msgid "SKIPPED (hard link in sequential read mode): "
 msgstr "ÖVERHOPPAD (hård länk i sekvensiell läsmode): "
 
-#: src/libdar/filtre.cpp:1002
+#: src/libdar/filtre.cpp:998
 msgid "OK   "
 msgstr "OK   "
 
-#: src/libdar/filtre.cpp:1013 src/libdar/filtre.cpp:1045
+#: src/libdar/filtre.cpp:1009 src/libdar/filtre.cpp:1041
 msgid "DIFF "
 msgstr "DIFF "
 
-#: src/libdar/filtre.cpp:1045
+#: src/libdar/filtre.cpp:1041
 msgid ": file not present in filesystem"
 msgstr ": fil finns inte filsystem"
 
-#: src/libdar/filtre.cpp:1097
+#: src/libdar/filtre.cpp:1093
 msgid "ERR  "
 msgstr "ERR  "
 
-#: src/libdar/filtre.cpp:1157
+#: src/libdar/filtre.cpp:1153
 msgid "Can't read saved data."
 msgstr "Kan ej läsas sparade data."
 
-#: src/libdar/filtre.cpp:1183
+#: src/libdar/filtre.cpp:1179
 msgid "CRC error: data corruption."
 msgstr "CRC-fel: data förstört."
 
-#: src/libdar/filtre.cpp:1219
+#: src/libdar/filtre.cpp:1215
 msgid "OK  "
 msgstr "OK  "
 
-#: src/libdar/filtre.cpp:1254
+#: src/libdar/filtre.cpp:1250
 msgid "ERR "
 msgstr "ERR "
 
-#: src/libdar/filtre.cpp:1275
+#: src/libdar/filtre.cpp:1271
 msgid "Preparing the archive contents for isolation..."
 msgstr "Förbereder arkivinnehållet för isolering..."
 
-#: src/libdar/filtre.cpp:1429
+#: src/libdar/filtre.cpp:1425
 msgid ""
 "Decremental mode is useless when merging is not applied to both an archive "
 "of reference and an auxiliary archive of reference. Ignore decremental mode "
@@ -1836,58 +1836,58 @@ msgstr ""
 "på både arkivreferens och en extra arkivreferens. Ignorera denna mod och "
 "fortsätta?"
 
-#: src/libdar/filtre.cpp:1531
+#: src/libdar/filtre.cpp:1527
 msgid "first"
 msgstr "första"
 
-#: src/libdar/filtre.cpp:1534
+#: src/libdar/filtre.cpp:1530
 msgid "second"
 msgstr "andra"
 
-#: src/libdar/filtre.cpp:1537
+#: src/libdar/filtre.cpp:1533
 msgid "next"
 msgstr "nästa"
 
-#: src/libdar/filtre.cpp:1540
+#: src/libdar/filtre.cpp:1536
 #, c-format
 msgid "Merging/filtering files from the %s archive"
 msgstr "Slår ihop/filtrerar filer från %s-arkiv"
 
-#: src/libdar/filtre.cpp:1622
+#: src/libdar/filtre.cpp:1618
 msgid "overwritten"
 msgstr "överskriven"
 
-#: src/libdar/filtre.cpp:1626 src/libdar/filtre.cpp:1670
+#: src/libdar/filtre.cpp:1622 src/libdar/filtre.cpp:1666
 msgid "dropped from the archive and marked as already saved"
 msgstr "släppt från arkivet och markerad som redan sparad"
 
-#: src/libdar/filtre.cpp:1629
+#: src/libdar/filtre.cpp:1625
 msgid "removed"
 msgstr "borttagen"
 
-#: src/libdar/filtre.cpp:1634
+#: src/libdar/filtre.cpp:1630
 #, c-format
 msgid "Data of file %S is about to be %S, proceed?"
 msgstr "Data hos filen %S skall till att bli %S, fortsätta?"
 
-#: src/libdar/filtre.cpp:1663
+#: src/libdar/filtre.cpp:1659
 msgid "replaced"
 msgstr "ersatt"
 
-#: src/libdar/filtre.cpp:1666
+#: src/libdar/filtre.cpp:1662
 msgid "removed from the archive"
 msgstr "borttagen från arkivet"
 
-#: src/libdar/filtre.cpp:1673
+#: src/libdar/filtre.cpp:1669
 msgid "merged with possible overwriting"
 msgstr "ihopslagning med möjlig överskrivning"
 
-#: src/libdar/filtre.cpp:1678
+#: src/libdar/filtre.cpp:1674
 #, c-format
 msgid "EA of file %S are about to be %S, proceed?"
 msgstr "EA för fil %S skall till att bli %S, fortsätta?"
 
-#: src/libdar/filtre.cpp:1737
+#: src/libdar/filtre.cpp:1733
 #, c-format
 msgid ""
 "EA of file %S from first archive have been updated with those of same named "
@@ -1896,7 +1896,7 @@ msgstr ""
 "EA för fil %S från första arkivet har uppdaterats med dessa av samma filnamn "
 "från det extra arkivet"
 
-#: src/libdar/filtre.cpp:1746
+#: src/libdar/filtre.cpp:1742
 #, c-format
 msgid ""
 "EA of file %S from first archive have been dropped and marked as already "
@@ -1904,23 +1904,23 @@ msgid ""
 msgstr ""
 "EA för fil %S från första arkivet har släppts och markerats som redan sparade"
 
-#: src/libdar/filtre.cpp:1755 src/libdar/filtre.cpp:1878
+#: src/libdar/filtre.cpp:1751 src/libdar/filtre.cpp:1874
 #, c-format
 msgid "EA of file %S from first archive have been removed"
 msgstr "EA för fil %S från första arkivet har tagits bort"
 
-#: src/libdar/filtre.cpp:1767
+#: src/libdar/filtre.cpp:1763
 #, c-format
 msgid "Data of file %S from first archive has been preserved from overwriting"
 msgstr "Data från fil %S från första arkivet har bevarats från överskrivning"
 
-#: src/libdar/filtre.cpp:1818
+#: src/libdar/filtre.cpp:1814
 #, c-format
 msgid ""
 "Data of file %S taken from the first archive of reference has been removed"
 msgstr "Data från fil %S taget från det första referensarkivet har tagits bort"
 
-#: src/libdar/filtre.cpp:1821
+#: src/libdar/filtre.cpp:1817
 #, c-format
 msgid ""
 "Data of file %S taken from the first archive of reference has been "
@@ -1928,17 +1928,17 @@ msgid ""
 msgstr ""
 "Data från fil %S taget från det första referensarkivet har skrivits över"
 
-#: src/libdar/filtre.cpp:1851
+#: src/libdar/filtre.cpp:1847
 #, c-format
 msgid "EA of file %S has been overwritten"
 msgstr "EA för fil %S har skrivits över"
 
-#: src/libdar/filtre.cpp:1855 src/libdar/filtre.cpp:1871
+#: src/libdar/filtre.cpp:1851 src/libdar/filtre.cpp:1867
 #, c-format
 msgid "EA of file %S has been overwritten and marked as already saved"
 msgstr "EA för fil %S har skrivits över och markerats som redan sparat"
 
-#: src/libdar/filtre.cpp:1861 src/libdar/filtre.cpp:1866
+#: src/libdar/filtre.cpp:1857 src/libdar/filtre.cpp:1862
 #, c-format
 msgid ""
 "EA of file %S from first archive have been updated with those of the same "
@@ -1947,23 +1947,23 @@ msgstr ""
 "EA för fil %S från första arkivet har uppdaterats med dessa med samma "
 "filnamn från det extra arkivet"
 
-#: src/libdar/filtre.cpp:2144
+#: src/libdar/filtre.cpp:2140
 msgid " not merged (user choice)"
 msgstr " ej ihopslagen (användares val)"
 
-#: src/libdar/filtre.cpp:2148
+#: src/libdar/filtre.cpp:2144
 msgid "No file in this directory will be considered for merging."
 msgstr "Ingen fil i denna mapp kommer att tas med vid ihopslagning."
 
-#: src/libdar/filtre.cpp:2168
+#: src/libdar/filtre.cpp:2164
 msgid "Error while considering file "
 msgstr "Fel vid bestämning av fil: "
 
-#: src/libdar/filtre.cpp:2172
+#: src/libdar/filtre.cpp:2168
 msgid "Warning! No file in this directory will be considered for merging: "
 msgstr "Varning! Ingen fil i den mappen kommer att slås ihop: "
 
-#: src/libdar/filtre.cpp:2208
+#: src/libdar/filtre.cpp:2204
 msgid ""
 "File selection has been aborted. Now building the resulting archive with the "
 "already selected files"
@@ -1971,19 +1971,19 @@ msgstr ""
 "Filval har avbrutits. Skapar nu det resulterande arkivet med de redan valda "
 "filerna"
 
-#: src/libdar/filtre.cpp:2359
+#: src/libdar/filtre.cpp:2355
 msgid "Adding Hard link to archive: "
 msgstr "Lägger till hård länk till arkiv: "
 
-#: src/libdar/filtre.cpp:2423
+#: src/libdar/filtre.cpp:2419
 msgid "Adding file to archive: "
 msgstr "Lägger till fil till arkiv: "
 
-#: src/libdar/filtre.cpp:2524
+#: src/libdar/filtre.cpp:2520
 msgid "Copied data does not match CRC"
 msgstr "Kopierade data matchar inte CRC"
 
-#: src/libdar/filtre.cpp:2608
+#: src/libdar/filtre.cpp:2604
 #, c-format
 msgid ""
 "File has disappeared while we were reading it, cannot check whether it has "
@@ -1992,7 +1992,7 @@ msgstr ""
 "Fil försvann medan den lästes, kan ej kontrollera huruvida den har ändrats "
 "under dess säkerhetskopiering: %S"
 
-#: src/libdar/filtre.cpp:2621
+#: src/libdar/filtre.cpp:2617
 #, c-format
 msgid ""
 "WARNING! File modified while reading it for backup. Performing retry %i of %i"
@@ -2000,7 +2000,7 @@ msgstr ""
 "VARNING! Fil ändrad under läsning för säkerhetskopiering. Genomför nytt "
 "försök %i av %i"
 
-#: src/libdar/filtre.cpp:2631
+#: src/libdar/filtre.cpp:2627
 msgid ""
 "WARNING! File modified while reading it for backup. No more retry for that "
 "file to not exceed the wasted byte limit. File is "
@@ -2008,7 +2008,7 @@ msgstr ""
 "VARNING! Fil ändrad vid läsning för säkerhetskopiering. Inga fler försök för "
 "den filen för att inte överskrida bortkastad byt-gräns. Fil är "
 
-#: src/libdar/filtre.cpp:2638
+#: src/libdar/filtre.cpp:2634
 msgid ""
 "WARNING! File modified while reading it for backup, but no more retry "
 "allowed: "
@@ -2016,11 +2016,11 @@ msgstr ""
 "VARNING! Fil ändrad under läsning för säkerhetskopiering, men inga fler "
 "försök tillåtna: "
 
-#: src/libdar/filtre.cpp:2691
+#: src/libdar/filtre.cpp:2687
 msgid "Saving Extended Attributes for "
 msgstr "Sparar Extended Attribut för "
 
-#: src/libdar/filtre.cpp:2747
+#: src/libdar/filtre.cpp:2743
 msgid "Error saving Extended Attributes for "
 msgstr "Fel vid sparande av Extended Attribut för "
 
@@ -2470,9 +2470,9 @@ msgstr ""
 msgid "libgcrypt not initialized and libdar not allowed to do so"
 msgstr "'libgcrypt' är ej initialiserad och 'libdar' ej tillåten att göra så"
 
-#: src/libdar/libdar.cpp:456 src/libdar/libdar.cpp:476
-#: src/libdar/libdar.cpp:495 src/libdar/libdar.cpp:517
-#: src/libdar/libdar.cpp:537
+#: src/libdar/libdar.cpp:459 src/libdar/libdar.cpp:479
+#: src/libdar/libdar.cpp:498 src/libdar/libdar.cpp:520
+#: src/libdar/libdar.cpp:540
 msgid "Invalid NULL argument given to 'ptr'"
 msgstr "Ogiltigt NULL-argument givet till 'ptr'"
 
@@ -2874,31 +2874,31 @@ msgstr " Klar att fortsätta ?"
 msgid "Cannot remove non-existent file from filesystem: "
 msgstr "Kan ej ta bort icke befintlig fil från filsystemet: "
 
-#: src/libdar/filesystem.cpp:1330 src/libdar/filesystem.cpp:1548
+#: src/libdar/filesystem.cpp:1330 src/libdar/filesystem.cpp:1550
 msgid "Restoring file's data: "
 msgstr "Återställer fils data: "
 
-#: src/libdar/filesystem.cpp:1346 src/libdar/filesystem.cpp:1700
+#: src/libdar/filesystem.cpp:1346 src/libdar/filesystem.cpp:1702
 msgid "Restoring file's EA: "
 msgstr "Återställer fils EA: "
 
-#: src/libdar/filesystem.cpp:1468
+#: src/libdar/filesystem.cpp:1470
 #, c-format
 msgid "%S is about to be removed from filesystem, continue?"
 msgstr "%S skall till att tas bort från filsystemet, fortsätta ? "
 
-#: src/libdar/filesystem.cpp:1473 src/libdar/filesystem.cpp:1482
+#: src/libdar/filesystem.cpp:1475 src/libdar/filesystem.cpp:1484
 #, c-format
 msgid "Removing file (reason is file recorded as removed in archive): %S"
 msgstr "Tar bort fil (orsaken är att fil är noterad som bortagen i arkiv): %S"
 
-#: src/libdar/filesystem.cpp:1480
+#: src/libdar/filesystem.cpp:1482
 #, c-format
 msgid ""
 "%S must be removed, but does not match expected type, remove it anyway ?"
 msgstr "%S måste tas bort, men matchar inte förvänta typ, ta bort ändå ?"
 
-#: src/libdar/filesystem.cpp:1488
+#: src/libdar/filesystem.cpp:1490
 #, c-format
 msgid ""
 "%S: Overwriting policy (Data) is undefined for that file, do not know "
@@ -2907,7 +2907,7 @@ msgstr ""
 "%S: Överskrivningspolicy (Data) är odefinierat för denna fil, vet ej "
 "huruvida bortagande är tillåtet eller ej!"
 
-#: src/libdar/filesystem.cpp:1524
+#: src/libdar/filesystem.cpp:1526
 #, c-format
 msgid ""
 "Directory %S cannot be restored: overwriting not allowed and a non-directory "
@@ -2918,34 +2918,34 @@ msgstr ""
 "inod med det namnet finns redan, alla filer i den mappen kommer att hoppas "
 "över vid återhämtning:"
 
-#: src/libdar/filesystem.cpp:1533
+#: src/libdar/filesystem.cpp:1535
 #, c-format
 msgid "%S is about to be overwritten, OK?"
 msgstr "%S skall till att överskrivas, OK?"
 
-#: src/libdar/filesystem.cpp:1574
+#: src/libdar/filesystem.cpp:1576
 #, c-format
 msgid "Existing EA for %S could not be read and preserved: "
 msgstr "Befintlig EA för %S kunde inte läsas och bevaras: "
 
-#: src/libdar/filesystem.cpp:1599
+#: src/libdar/filesystem.cpp:1601
 #, c-format
 msgid "Existing EA for %S could not be preserved : "
 msgstr "Befintlig EA för %S kunde inte bevaras : "
 
-#: src/libdar/filesystem.cpp:1615
+#: src/libdar/filesystem.cpp:1617
 #, c-format
 msgid ""
 "%S is about to be deleted (required by overwriting policy), do you agree?"
 msgstr ""
 "%S skall till at tas bort (krav från överskrivningspolicy), är du överens?"
 
-#: src/libdar/filesystem.cpp:1617
+#: src/libdar/filesystem.cpp:1619
 #, c-format
 msgid "Removing file (reason is overwriting policy): %S"
 msgstr "Tar bort fil (orsak är överskrivningspolicy): %S"
 
-#: src/libdar/filesystem.cpp:1623
+#: src/libdar/filesystem.cpp:1625
 #, c-format
 msgid ""
 "%S: Overwriting policy (Data) is undefined for that file, do not know "
@@ -2954,12 +2954,12 @@ msgstr ""
 "%S: Överskrivningspolicy är obestämd för denna fil, vet ej huruvida "
 "överskrivning tillåts eller ej!"
 
-#: src/libdar/filesystem.cpp:1679
+#: src/libdar/filesystem.cpp:1681
 #, c-format
 msgid "EA for %S are about to be overwritten, OK?"
 msgstr "Några EA för %S skall till att skrivas över, OK?"
 
-#: src/libdar/filesystem.cpp:1694
+#: src/libdar/filesystem.cpp:1696
 #, c-format
 msgid ""
 "EA for %S have not been overwritten because this file is a hard link "
@@ -2968,12 +2968,12 @@ msgstr ""
 "EA för %S har ej skrivits över eftersom denna fil är en hård länk pekande på "
 "en redan återskapad inode."
 
-#: src/libdar/filesystem.cpp:1714
+#: src/libdar/filesystem.cpp:1716
 #, c-format
 msgid "EA for %S are about to be removed, OK?"
 msgstr "EA för %S skall till att tas bort, OK?"
 
-#: src/libdar/filesystem.cpp:1725
+#: src/libdar/filesystem.cpp:1727
 #, c-format
 msgid ""
 "EA for %S have not been cleared as requested by the overwriting policy "
@@ -2982,16 +2982,16 @@ msgstr ""
 "EA for %S har ej nollställt enligt begäran från överskrivnngspolicyn "
 "eftersom denna fil är en hård länk pekande på en redan återställd inod"
 
-#: src/libdar/filesystem.cpp:1731
+#: src/libdar/filesystem.cpp:1733
 msgid "Clearing file's EA (requested by overwriting policy): "
 msgstr "Nollställning av fils EA (begärd av överskrivninsgpolicy): "
 
-#: src/libdar/filesystem.cpp:1744
+#: src/libdar/filesystem.cpp:1746
 #, c-format
 msgid "EA for %S are about to be merged, OK?"
 msgstr "EA för %S skall till att slås ihop, OK?"
 
-#: src/libdar/filesystem.cpp:1770
+#: src/libdar/filesystem.cpp:1772
 #, c-format
 msgid ""
 "%S: Overwriting policy (EA) is undefined for that file, do not know whether "
@@ -3000,19 +3000,19 @@ msgstr ""
 "%S: Överskrivningspolicyn (EA) är obestämd för denna fil, vet ej huruvida "
 "överskrivning är tillåten eller ej!"
 
-#: src/libdar/filesystem.cpp:1829
+#: src/libdar/filesystem.cpp:1831
 msgid "Cannot get inode information about file to remove "
 msgstr "Kan ej får inodsinformation om den fil som skall tas bort "
 
-#: src/libdar/filesystem.cpp:1842
+#: src/libdar/filesystem.cpp:1844
 msgid "Cannot remove directory "
 msgstr "Kan ej ta bort mapp "
 
-#: src/libdar/filesystem.cpp:1846
+#: src/libdar/filesystem.cpp:1848
 msgid "Cannot remove file "
 msgstr "Kan ej ta bort fil "
 
-#: src/libdar/filesystem.cpp:1900
+#: src/libdar/filesystem.cpp:1902
 msgid ""
 "uid value is too high for this system for libdar be able to restore it "
 "properly"
@@ -3020,7 +3020,7 @@ msgstr ""
 "uid-värde för högt för detta system för 'libdar' att kunna återställa den "
 "säkert"
 
-#: src/libdar/filesystem.cpp:1904
+#: src/libdar/filesystem.cpp:1906
 msgid ""
 "gid value is too high for this system for libdar be able to restore it "
 "properly"
@@ -3028,31 +3028,31 @@ msgstr ""
 "gid-värde för högt för detta system för 'libdar' att kunna återställa den "
 "säkert"
 
-#: src/libdar/filesystem.cpp:1908 src/libdar/filesystem.cpp:1912
+#: src/libdar/filesystem.cpp:1910 src/libdar/filesystem.cpp:1914
 msgid "Could not restore original file ownership: "
 msgstr "Kunde inte återställa ursprunglig ägare till fil: "
 
-#: src/libdar/filesystem.cpp:1924
+#: src/libdar/filesystem.cpp:1926
 #, c-format
 msgid "Cannot restore permissions of %s : %s"
 msgstr "Kan ej återställe behörigheter för %s : %s"
 
-#: src/libdar/filesystem.cpp:1990
+#: src/libdar/filesystem.cpp:1992
 #, c-format
 msgid "Failed to open %S while checking for nodump flag: %s"
 msgstr "Misslyckades att öppna %S medan kontroll av nodump-flagga gjordes: %s"
 
-#: src/libdar/filesystem.cpp:2001
+#: src/libdar/filesystem.cpp:2003
 #, c-format
 msgid "Cannot get ext2 attributes (and nodump flag value) for %S : %s"
 msgstr "Kan ej få ext2-attribut (och nodump-flaggvärde) för %S : %s"
 
-#: src/libdar/filesystem.cpp:2029
+#: src/libdar/filesystem.cpp:2031
 #, c-format
 msgid "Cannot get inode information for %s : %s"
 msgstr "Kan ej få inodinformation för %s : %s"
 
-#: src/libdar/filesystem.cpp:2057
+#: src/libdar/filesystem.cpp:2059
 #, c-format
 msgid ""
 "Replacing %s in the -R option by the directory pointed to by this symbolic "
@@ -3061,7 +3061,7 @@ msgstr ""
 "Återställer %s i -R alternativet genom den mapp, pekad på från denna "
 "symboliska länk: "
 
-#: src/libdar/filesystem.cpp:2060
+#: src/libdar/filesystem.cpp:2062
 #, c-format
 msgid ""
 "The given path %s must be a directory (or symbolic link to an existing "
@@ -3671,8 +3671,8 @@ msgstr "kan ej läsa CRC: inget escape-märke hittat för denna fil"
 
 #: src/libdar/catalogue.cpp:2261
 #, c-format
-msgid "not same size: %S <--> %S"
-msgstr "inte samma storlek: %S <--> %S"
+msgid "not same size: %i <--> %i"
+msgstr "inte samma storlek: %i <--> %i"
 
 #: src/libdar/catalogue.cpp:2297
 msgid "different file data"
@@ -3711,38 +3711,38 @@ msgstr "data saknas till att bygga en mapp"
 msgid "Cannot remove nonexistent entry %S from catalogue"
 msgstr "Kan ej flytta obefintligt data %S från katalog"
 
-#: src/libdar/catalogue.cpp:2809
+#: src/libdar/catalogue.cpp:2812
 msgid "listing() method must be given"
 msgstr "list()-metod måste anges"
 
-#: src/libdar/catalogue.cpp:2816
+#: src/libdar/catalogue.cpp:2819
 msgid "argument must be a relative path"
 msgstr "argumentet måste vara en relativ sökväg"
 
-#: src/libdar/catalogue.cpp:3083 src/libdar/catalogue.cpp:3086
+#: src/libdar/catalogue.cpp:3086 src/libdar/catalogue.cpp:3089
 msgid "missing data to build a special device"
 msgstr "data saknas till att skapa en specialenhet"
 
-#: src/libdar/catalogue.cpp:3113
+#: src/libdar/catalogue.cpp:3116
 #, c-format
 msgid "devices have not the same major number: %d <--> %d"
 msgstr "enheter har inte samma 'major'-tal: %d <--> %d"
 
-#: src/libdar/catalogue.cpp:3115
+#: src/libdar/catalogue.cpp:3118
 #, c-format
 msgid "devices have not the same minor number: %d <--> %d"
 msgstr "enheter har inte samma 'minor'-tal: %d <--> %d"
 
-#: src/libdar/catalogue.cpp:3122
+#: src/libdar/catalogue.cpp:3125
 msgid "missing data to build"
 msgstr "data saknas för att bygga"
 
-#: src/libdar/catalogue.cpp:3202 src/libdar/catalogue.cpp:3220
-#: src/libdar/catalogue.cpp:3222
+#: src/libdar/catalogue.cpp:3205 src/libdar/catalogue.cpp:3223
+#: src/libdar/catalogue.cpp:3225
 msgid "incoherent catalogue structure"
 msgstr "osammanhängande katalogstruktur"
 
-#: src/libdar/catalogue.cpp:3213
+#: src/libdar/catalogue.cpp:3216
 msgid ""
 "LAX MODE: catalogue label does not match archive label, as if it was an "
 "extracted catalogue, assuming data corruption occurred and fixing the "
@@ -3752,12 +3752,12 @@ msgstr ""
 "extraherad katalog, antar dataförstörelse skett och fixar till katalogen som "
 "en enkel intern katalog"
 
-#: src/libdar/catalogue.cpp:3265
+#: src/libdar/catalogue.cpp:3268
 msgid "CRC failed for table of contents (aka \"catalogue\")"
 msgstr ""
 "CRC misslyckades för innehållsförtäckning (också känts som \"katalog\")"
 
-#: src/libdar/catalogue.cpp:3267
+#: src/libdar/catalogue.cpp:3270
 msgid ""
 "LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This "
 "may even lead dar to see files in the archive that never existed, but this "
@@ -3768,31 +3768,31 @@ msgstr ""
 "att dar ser filer i arkivet, vilka aldrig funnits men detta kommer sannolikt "
 "leda till andar fel vid återställande av filer. Skall vi fortsätta ändå?"
 
-#: src/libdar/catalogue.cpp:3326
+#: src/libdar/catalogue.cpp:3329
 msgid "root does not have a parent directory"
 msgstr "rot har inte någon föräldramapp"
 
-#: src/libdar/catalogue.cpp:3366
+#: src/libdar/catalogue.cpp:3369
 msgid "no current directory defined"
 msgstr "ingen aktuell mapp definierad"
 
-#: src/libdar/catalogue.cpp:3370
+#: src/libdar/catalogue.cpp:3373
 msgid "root directory has no parent directory"
 msgstr "rotmappen har ingen föräldramapp"
 
-#: src/libdar/catalogue.cpp:3392
+#: src/libdar/catalogue.cpp:3395
 msgid "no current reading directory defined"
 msgstr "ingen aktuell läsmapp definierad"
 
-#: src/libdar/catalogue.cpp:3464 src/libdar/catalogue.cpp:3478
+#: src/libdar/catalogue.cpp:3467 src/libdar/catalogue.cpp:3481
 msgid " is not present in the archive"
 msgstr " är inte närvarande i arkivet"
 
-#: src/libdar/catalogue.cpp:3556
+#: src/libdar/catalogue.cpp:3559
 msgid "Cannot recurs in a non directory entry"
 msgstr "Kan ej gå rekursivt i en icke-mapp"
 
-#: src/libdar/catalogue.cpp:3559
+#: src/libdar/catalogue.cpp:3562
 msgid ""
 "The entry to recurs in does not exist, cannot add further entry to that "
 "absent subdirectory"
@@ -3800,11 +3800,11 @@ msgstr ""
 "Posten at gå rekursivt in i saknas, kqan ej lägga till ytterligare poster "
 "till den obefintliga undermappen."
 
-#: src/libdar/catalogue.cpp:3622
+#: src/libdar/catalogue.cpp:3625
 msgid "root has no parent directory"
 msgstr "rot har ingen föräldramapp"
 
-#: src/libdar/catalogue.cpp:3969
+#: src/libdar/catalogue.cpp:3972
 #, c-format
 msgid ""
 "access mode    | user | group | size  |          date                 | "
@@ -3813,16 +3813,16 @@ msgstr ""
 "access mod       | anvd | grupp | storl |         datum                 | "
 "[data ][ EA  ][kompr][S] |   filnamn\n"
 
-#: src/libdar/catalogue.cpp:4014
+#: src/libdar/catalogue.cpp:4017
 #, c-format
 msgid "%S [%c] [ REMOVED ENTRY ] (%S)  %S\n"
 msgstr "%S [%c] [ FLYTTAD ENTRY ] (%S)  %S\n"
 
-#: src/libdar/catalogue.cpp:4045 src/libdar/catalogue.cpp:4178
+#: src/libdar/catalogue.cpp:4048 src/libdar/catalogue.cpp:4181
 msgid "      Extended Attribute: ["
 msgstr "      Extended Attribut: ["
 
-#: src/libdar/catalogue.cpp:4084
+#: src/libdar/catalogue.cpp:4087
 #, c-format
 msgid ""
 "[data ][ EA  ][compr][S]| permission | user  | group | size  |          "
@@ -3831,19 +3831,19 @@ msgstr ""
 "[data ][ EA  ][kompr][S] | behörighet  | anvd |  grupp | storl |           "
 "datum               |    filnamn\n"
 
-#: src/libdar/catalogue.cpp:4809
+#: src/libdar/catalogue.cpp:4812
 msgid "[DIRTY]"
 msgstr "[SMUTS]"
 
-#: src/libdar/catalogue.cpp:4811 src/libdar/catalogue.cpp:4827
+#: src/libdar/catalogue.cpp:4814 src/libdar/catalogue.cpp:4830
 msgid "[Saved]"
 msgstr "[Sparad]"
 
-#: src/libdar/catalogue.cpp:4814 src/libdar/catalogue.cpp:4830
+#: src/libdar/catalogue.cpp:4817 src/libdar/catalogue.cpp:4833
 msgid "[InRef]"
 msgstr "[InRef]"
 
-#: src/libdar/catalogue.cpp:4853
+#: src/libdar/catalogue.cpp:4856
 msgid "[Worse]"
 msgstr "[Värre]"
 
@@ -4955,14 +4955,14 @@ msgstr " %i inod(er) noterade som borttagna\n"
 msgid "usage : %s <source> <destination>\n"
 msgstr "användning ; %s <källa> <mål>\n"
 
-#: src/dar_suite/dar_cp.cpp:140 src/dar_suite/command_line.cpp:1946
+#: src/dar_suite/dar_cp.cpp:140 src/dar_suite/command_line.cpp:1948
 #: src/dar_suite/dar_xform.cpp:481 src/dar_suite/dar_slave.cpp:269
 #: src/dar_suite/dar_manager.cpp:874
 #, c-format
 msgid " compiled the %s with %s version %s\n"
 msgstr " kompilerad den %s med %s version %s\n"
 
-#: src/dar_suite/dar_cp.cpp:141 src/dar_suite/command_line.cpp:1947
+#: src/dar_suite/dar_cp.cpp:141 src/dar_suite/command_line.cpp:1949
 #: src/dar_suite/dar_xform.cpp:482 src/dar_suite/dar_slave.cpp:270
 #: src/dar_suite/dar_manager.cpp:875
 #, c-format
@@ -5356,7 +5356,7 @@ msgstr ""
 msgid "Choose either -z or -y not both"
 msgstr "Välj antingen -z eller -y ej bägge"
 
-#: src/dar_suite/command_line.cpp:828 src/dar_suite/command_line.cpp:2618
+#: src/dar_suite/command_line.cpp:828 src/dar_suite/command_line.cpp:2620
 msgid "Compression level must be between 1 and 9, included"
 msgstr "Komprimeringsnivån måste ligga mellan 1 och 9 inklusive"
 
@@ -5411,8 +5411,8 @@ msgstr ""
 "Slinga i filinkludering har upptäckts. Filen %s inkluderar sig själv direkt "
 "eller genom andra filer (-B alternativ)"
 
-#: src/dar_suite/command_line.cpp:1161 src/dar_suite/command_line.cpp:2237
-#: src/dar_suite/command_line.cpp:2296
+#: src/dar_suite/command_line.cpp:1161 src/dar_suite/command_line.cpp:2239
+#: src/dar_suite/command_line.cpp:2298
 #, c-format
 msgid "In included file %S: "
 msgstr "I ingående filer %S: "
@@ -5460,26 +5460,26 @@ msgstr ""
 "-af alternativ behöver inte specificeras mer än en gång, ignorer extra af "
 "alternativ"
 
-#: src/dar_suite/command_line.cpp:1315
+#: src/dar_suite/command_line.cpp:1317
 #, c-format
 msgid "Unknown argument given to -a : %s"
 msgstr "Okänt argument givet till -a : %s"
 
-#: src/dar_suite/command_line.cpp:1329
+#: src/dar_suite/command_line.cpp:1331
 msgid "-G option is obsolete, use -@ option instead, see man page for details"
 msgstr ""
 "-G alternativet är utgånget, använd -@ alternativet i stället, se man page "
 "för detaljer"
 
-#: src/dar_suite/command_line.cpp:1356
+#: src/dar_suite/command_line.cpp:1358
 msgid "Only one -@ option is allowed"
 msgstr "Endast ett -@ alternativ är tillåtet"
 
-#: src/dar_suite/command_line.cpp:1412
+#: src/dar_suite/command_line.cpp:1414
 msgid "Syntax error in overwriting policy: "
 msgstr "Syntaxfel i överskrivningspolicy: "
 
-#: src/dar_suite/command_line.cpp:1443
+#: src/dar_suite/command_line.cpp:1445
 #, c-format
 msgid ""
 "%d is the default value for --sparse-file-min-size, no need to specify it on "
@@ -5488,33 +5488,33 @@ msgstr ""
 "%d är standardvärdet för --sparse-file-min-size, inget behov att specificera "
 "det på kommandoraden, ignorerar"
 
-#: src/dar_suite/command_line.cpp:1459
+#: src/dar_suite/command_line.cpp:1461
 #, c-format
 msgid "Unknown argument given to -2 : %s"
 msgstr "Okänt argument givet till -2 : %s"
 
-#: src/dar_suite/command_line.cpp:1496 src/dar_suite/dar_xform.cpp:375
+#: src/dar_suite/command_line.cpp:1498 src/dar_suite/dar_xform.cpp:375
 msgid "Missing argument to --hash"
 msgstr "Saknar argument till --hash"
 
-#: src/dar_suite/command_line.cpp:1503 src/dar_suite/dar_xform.cpp:382
+#: src/dar_suite/command_line.cpp:1505 src/dar_suite/dar_xform.cpp:382
 msgid "Unknown parameter given to --hash option: "
 msgstr "Okänd parameter givet till --hash alternativ: "
 
-#: src/dar_suite/command_line.cpp:1507 src/dar_suite/dar_xform.cpp:386
+#: src/dar_suite/command_line.cpp:1509 src/dar_suite/dar_xform.cpp:386
 #: src/dar_suite/dar_slave.cpp:200
 msgid "Missing argument to --min-digits"
 msgstr "Saknar argument till --min-digits"
 
-#: src/dar_suite/command_line.cpp:1516
+#: src/dar_suite/command_line.cpp:1518
 msgid "Error while parsing --min-digits option: "
 msgstr "Fel vid analys av --min-digits alternativ: "
 
-#: src/dar_suite/command_line.cpp:1522
+#: src/dar_suite/command_line.cpp:1524
 msgid "Missing argument to --backup-hook-execute"
 msgstr "Saknar argument till --backup-hook-execute"
 
-#: src/dar_suite/command_line.cpp:1551 src/dar_suite/command_line.cpp:1554
+#: src/dar_suite/command_line.cpp:1553 src/dar_suite/command_line.cpp:1556
 #: src/dar_suite/dar_xform.cpp:396 src/dar_suite/dar_slave.cpp:210
 #: src/dar_suite/dar_slave.cpp:213 src/dar_suite/dar_manager.cpp:476
 #: src/dar_suite/dar_manager.cpp:479
@@ -5522,7 +5522,7 @@ msgstr "Saknar argument till --backup-hook-execute"
 msgid "Ignoring unknown option -%c"
 msgstr "Ignorerar okänt alternativ -%c"
 
-#: src/dar_suite/command_line.cpp:1567
+#: src/dar_suite/command_line.cpp:1569
 #, c-format
 msgid ""
 "usage: %s [ -c | -x | -d | -t | -l | -C | -+ ] [<path>/]<basename> "
@@ -5531,19 +5531,19 @@ msgstr ""
 "Användning: %s [ -c | -x | -d | -t | -l | -C | -+ ] [<sökväg>/]<basnamn> "
 "[alternativ...]\n"
 
-#: src/dar_suite/command_line.cpp:1942
+#: src/dar_suite/command_line.cpp:1944
 #, c-format
 msgid " Using libdar %u.%u.%u built with compilation time options:"
 msgstr ""
 " Använder libdar med %u.%u.%u byggt med kompileringstillfällets alternativ:"
 
-#: src/dar_suite/command_line.cpp:1943
+#: src/dar_suite/command_line.cpp:1945
 #, c-format
 msgid " Using libdar %u.%u built with compilation time options:"
 msgstr ""
 " Använder libdar med %u.%u byggt med kompileringstillfällets alternativ:"
 
-#: src/dar_suite/command_line.cpp:1948 src/dar_suite/dar_xform.cpp:483
+#: src/dar_suite/command_line.cpp:1950 src/dar_suite/dar_xform.cpp:483
 #: src/dar_suite/dar_manager.cpp:876
 #, c-format
 msgid ""
@@ -5553,7 +5553,7 @@ msgstr ""
 " %s kommer med ABSOLUT INGEN GARANTI, för detaljer\n"
 " skriv '%s -W'."
 
-#: src/dar_suite/command_line.cpp:1949 src/dar_suite/dar_xform.cpp:484
+#: src/dar_suite/command_line.cpp:1951 src/dar_suite/dar_xform.cpp:484
 #: src/dar_suite/dar_slave.cpp:273 src/dar_suite/dar_manager.cpp:877
 msgid ""
 " This is free software, and you are welcome\n"
@@ -5562,7 +5562,7 @@ msgstr ""
 " Detta är fri programvara, och du är välkommen\n"
 " att återdistribuera den under vissa villkor;"
 
-#: src/dar_suite/command_line.cpp:1950 src/dar_suite/dar_xform.cpp:485
+#: src/dar_suite/command_line.cpp:1952 src/dar_suite/dar_xform.cpp:485
 #: src/dar_suite/dar_manager.cpp:878
 #, c-format
 msgid ""
@@ -5574,17 +5574,17 @@ msgstr ""
 " för detaljer.\n"
 "\n"
 
-#: src/dar_suite/command_line.cpp:2054 src/dar_suite/dar_manager.cpp:1226
+#: src/dar_suite/command_line.cpp:2056 src/dar_suite/dar_manager.cpp:1226
 #, c-format
 msgid "Cannot open file %S : %s"
 msgstr "Kan ej öppna fil %S : %s"
 
-#: src/dar_suite/command_line.cpp:2148
+#: src/dar_suite/command_line.cpp:2150
 #, c-format
 msgid "Arguments read from %S :"
 msgstr "Argument läses från %S :"
 
-#: src/dar_suite/command_line.cpp:2599
+#: src/dar_suite/command_line.cpp:2601
 #, c-format
 msgid ""
 "%s does not name a compression \"[algorithm][:][level]\" , like for examples "
@@ -5595,7 +5595,7 @@ msgstr ""
 "\", \"lzo\", \"bzip2\", \"lzo:3\", \"gzip:2\", \"8\" eller \"1\". Titta på "
 "man page om -z alternativ"
 
-#: src/dar_suite/command_line.cpp:2651
+#: src/dar_suite/command_line.cpp:2653
 #, c-format
 msgid ""
 "User target named \"%s\" is not allowed (reserved word for conditional "
@@ -5641,7 +5641,7 @@ msgstr "Avbryter..."
 msgid "provided password is too long for the allocated memory"
 msgstr "lämnat lösenord är för långt för det tilldelade minnet"
 
-#: src/dar_suite/dar_suite.cpp:129
+#: src/dar_suite/dar_suite.cpp:133
 #, c-format
 msgid ""
 "We have linked with an incompatible version of libdar. Expecting version %d."
@@ -5650,57 +5650,57 @@ msgstr ""
 "Vi har länkats med en inkompatibel version av libdar. Förväntad version %d."
 "%d.x men blev länkad med version %d.%d.%d"
 
-#: src/dar_suite/dar_suite.cpp:137
+#: src/dar_suite/dar_suite.cpp:145
 msgid "NOT YET IMPLEMENTED FEATURE has been used: "
 msgstr "EN INTE IMPLEMENTERAD FUNKTION har använts: "
 
-#: src/dar_suite/dar_suite.cpp:138
+#: src/dar_suite/dar_suite.cpp:146
 msgid "Please check documentation or upgrade your software if available"
 msgstr ""
 "Kontrollera dokumentationen eller uppgradera din programvara om tillgänglig"
 
-#: src/dar_suite/dar_suite.cpp:143
+#: src/dar_suite/dar_suite.cpp:151
 msgid "SEEMS TO BE A HARDWARE PROBLEM: "
 msgstr "VERKAR VARA ETT HÅRDVARUPROBLEM: "
 
-#: src/dar_suite/dar_suite.cpp:144
+#: src/dar_suite/dar_suite.cpp:152
 msgid "Please check your hardware"
 msgstr "Kontrollera din hårdvara"
 
-#: src/dar_suite/dar_suite.cpp:149
+#: src/dar_suite/dar_suite.cpp:157
 msgid "Lack of SECURED memory to achieve the operation, aborting operation"
 msgstr "Brist på SÄKERT minne för att utföra åtgärden, avbryter densamma"
 
-#: src/dar_suite/dar_suite.cpp:154 src/dar_suite/dar_suite.cpp:159
+#: src/dar_suite/dar_suite.cpp:162 src/dar_suite/dar_suite.cpp:167
 msgid "Lack of memory to achieve the operation, aborting operation"
 msgstr "Minnesbrist för att utföra åtgärden, avbryter densamma"
 
-#: src/dar_suite/dar_suite.cpp:164
+#: src/dar_suite/dar_suite.cpp:172
 msgid "FATAL error, aborting operation"
 msgstr "FATALT fel, avbryter åtgärd"
 
-#: src/dar_suite/dar_suite.cpp:170
+#: src/dar_suite/dar_suite.cpp:178
 msgid "Aborting program. User refused to continue while asking: "
 msgstr "Avbryter program. Användare vägrade fortsätta vid förfrågan: "
 
-#: src/dar_suite/dar_suite.cpp:175
+#: src/dar_suite/dar_suite.cpp:183
 msgid "Program has been aborted for the following reason: "
 msgstr "Progarmmet har avslutats av följande orsak: "
 
-#: src/dar_suite/dar_suite.cpp:185
+#: src/dar_suite/dar_suite.cpp:193
 msgid "Aborting program. An error occurred concerning user command execution: "
 msgstr ""
 "Avbryter program. Ett fel inträffade angående utförande av användarkommando: "
 
-#: src/dar_suite/dar_suite.cpp:190
+#: src/dar_suite/dar_suite.cpp:198
 msgid "Aborting program. An error occurred while calling libdar: "
 msgstr "Avbryter program. Ett fel inträffade vid anrop av libdar: "
 
-#: src/dar_suite/dar_suite.cpp:195 src/dar_suite/dar_suite.cpp:200
+#: src/dar_suite/dar_suite.cpp:203 src/dar_suite/dar_suite.cpp:208
 msgid "Aborting program. "
 msgstr "Avbryter program. "
 
-#: src/dar_suite/dar_suite.cpp:205
+#: src/dar_suite/dar_suite.cpp:213
 msgid ""
 "Aborting program. The requested operation needs a feature that has been "
 "disabled at compilation time: "
@@ -5708,15 +5708,15 @@ msgstr ""
 "Avbryter program. Den begärda åtgärden behöver funktioner, som har "
 "avaktiverats vid kompileringstillfället: "
 
-#: src/dar_suite/dar_suite.cpp:211 src/dar_suite/dar_suite.cpp:219
+#: src/dar_suite/dar_suite.cpp:219 src/dar_suite/dar_suite.cpp:227
 msgid "INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER"
 msgstr "INTERNT FEL, RAPPORTERA FÖREGÅENDE UTDATA TILL PROGRAMUNDERHÅLLAREN"
 
-#: src/dar_suite/dar_suite.cpp:218
+#: src/dar_suite/dar_suite.cpp:226
 msgid "CAUGHT A NON (LIB)DAR EXCEPTION"
 msgstr "FÅNGADE ETT ICKE- (LIB)DAR-AVBROTT"
 
-#: src/dar_suite/dar_suite.cpp:228
+#: src/dar_suite/dar_suite.cpp:234
 msgid ""
 "SANITY CHECK: AT LEAST ONE THREAD_CANCELLATION OBJECT HAS NOT BEEN DESTROYED "
 "AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END"
@@ -5724,7 +5724,7 @@ msgstr ""
 "SUNDHETSKONTROLL: ÅTMINSTONE ETT TRÅDAT AVBROTTSOBJEKT HAR INTE FÖRSTÖRTS "
 "OCH FINNS KVAR I MINNE MEDAN PROGRAMMET NÅDDE SITT SLUT"
 
-#: src/dar_suite/dar_suite.cpp:260
+#: src/dar_suite/dar_suite.cpp:266
 msgid ""
 "No more (virtual) memory available, you have the opportunity to stop un-"
 "necessary applications to free up some memory. Can we continue now ?"
@@ -5733,30 +5733,30 @@ msgstr ""
 "stoppa onödvändiga tillämpningar så att minne kan frigöras. Kan vi fortsätta "
 "nu?"
 
-#: src/dar_suite/dar_suite.cpp:271
+#: src/dar_suite/dar_suite.cpp:277
 #, c-format
 msgid "Long options support       : %s\n"
 msgstr "Stöd för långa alternativ  : %s\n"
 
-#: src/dar_suite/dar_suite.cpp:287
+#: src/dar_suite/dar_suite.cpp:293
 #, c-format
 msgid "Received signal: %s"
 msgstr "Mottagen signal: %s"
 
-#: src/dar_suite/dar_suite.cpp:289
+#: src/dar_suite/dar_suite.cpp:295
 #, c-format
 msgid "Received signal: %d"
 msgstr "Mottagen signal: %d"
 
-#: src/dar_suite/dar_suite.cpp:295
+#: src/dar_suite/dar_suite.cpp:301
 msgid "Archive fast termination engaged"
 msgstr "Snabb avslutning på arkiv inkopplat"
 
-#: src/dar_suite/dar_suite.cpp:299
+#: src/dar_suite/dar_suite.cpp:305
 msgid "Archive delayed termination engaged"
 msgstr "Fördröjd avslutning på arkiv inkopplat"
 
-#: src/dar_suite/dar_suite.cpp:303
+#: src/dar_suite/dar_suite.cpp:309
 #, fuzzy
 msgid ""
 "Disabling signal handler, the next time this signal is received the program "
@@ -5765,7 +5765,7 @@ msgstr ""
 "Kopplar bort signalhanterare, nästa gång denna signal mottages kommer "
 "programmet att avslutas omedelbart"
 
-#: src/dar_suite/dar_suite.cpp:307
+#: src/dar_suite/dar_suite.cpp:313
 msgid ""
 "Cannot cleanly abort the operation, thread-safe support is missing, will "
 "thus abruptly stop the program, generated archive may be unusable"

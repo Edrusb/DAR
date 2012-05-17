@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.51 2011/05/20 10:23:07 edrusb Rel $
+// $Id: dar_slave.cpp,v 1.51.2.1 2012/04/15 10:36:44 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -65,7 +65,7 @@ char *strchr (), *strrchr ();
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.4.0"
+#define DAR_SLAVE_VERSION "1.4.1"
 
 static bool command_line(user_interaction & dialog,
 			 S_I argc, char * const argv[], path * &chemin, string & filename,
@@ -233,7 +233,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_slave.cpp,v 1.51 2011/05/20 10:23:07 edrusb Rel $";
+    static char id[]="$Id: dar_slave.cpp,v 1.51.2.1 2012/04/15 10:36:44 edrusb Exp $";
     dummy_call(id);
 }
 

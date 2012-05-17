@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.113.2.4 2012/02/19 17:25:08 edrusb Exp $
+// $Id: filtre.cpp,v 1.113.2.5 2012/03/30 06:52:03 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -202,7 +202,6 @@ namespace libdar
 
 			if(path_covered && name_covered && dirty_covered && empty_dir_covered && flat_covered && only_deleted_covered)
 			{
-			    bool created = false; // will carry the information whether the restoration had created a new file
 			    filesystem_restore::action_done_for_data data_restored = filesystem_restore::done_no_change_no_data; // will be true if file's data have been restored (depending on overwriting policy)
 			    bool ea_restored = false; // will be true if file's EA have been restored (depending on overwriting policy)
 			    bool hard_link = false; // will be true if data_restored is true and only lead to a hard link creation or file replacement by a hard link to an already existing inode
@@ -276,10 +275,7 @@ namespace libdar
 				}
 
 				if(first_time)
-				{
 				    first_time = false;
-				    created = created_retry;
-				}
 				    // Now checking whether there is not a second copy
 				    // of the file to use instead, due to file change
 				    // while being read for backup. The last copy is the one
@@ -2382,7 +2378,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.113.2.4 2012/02/19 17:25:08 edrusb Exp $";
+        static char id[]="$Id: filtre.cpp,v 1.113.2.5 2012/03/30 06:52:03 edrusb Exp $";
         dummy_call(id);
     }
 

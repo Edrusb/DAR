@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.139.2.3 2012/02/12 20:43:34 edrusb Exp $
+// $Id: catalogue.cpp,v 1.139.2.5 2012/04/12 20:08:29 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -2258,7 +2258,7 @@ namespace libdar
 	{
 	    infinint s1 = get_size();
 	    infinint s2 = f_other->get_size();
-            throw Erange("file::sub_compare", tools_printf(gettext("not same size: %S <--> %S"), &s1, &s2));
+            throw Erange("file::sub_compare", tools_printf(gettext("not same size: %i <--> %i"), &s1, &s2));
 	}
 
         if(get_saved_status() == s_saved && f_other->get_saved_status() == s_saved)
@@ -2734,11 +2734,14 @@ namespace libdar
 	fils.erase(ut);
 #endif
 
-	    // removing reference from ordered_fils
+	    // recoding the address of the object to remove
+	nomme *obj = *ot;
+
+	    // removing its reference from ordered_fils
 	ordered_fils.erase(ot);
 
 	    // destroying the object itself
-	delete *ot;
+	delete obj;
         reset_read_children();
     }
 
@@ -4490,7 +4493,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.139.2.3 2012/02/12 20:43:34 edrusb Exp $";
+        static char id[]="$Id: catalogue.cpp,v 1.139.2.5 2012/04/12 20:08:29 edrusb Exp $";
         dummy_call(id);
     }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.43.2.4 2012/02/19 22:15:05 edrusb Exp $
+// $Id: dar_suite.cpp,v 1.43.2.5 2012/04/09 12:51:15 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -33,6 +33,10 @@ extern "C"
 
 #if HAVE_SIGNAL_H
 #include <signal.h>
+#endif
+
+#if HAVE_STDLIB_H
+#include <stdlib.h>
 #endif
 
 #if MUTEX_WORKS
@@ -131,6 +135,10 @@ int dar_suite_global(int argc, char * const argv[], const char **env, int (*call
 	}
 	else
 	    ret = (*call)(*ui, argc, argv, env);
+
+	// closing libdar
+
+	close_and_clean();
     }
     catch(Efeature &e)
     {
@@ -220,8 +228,6 @@ int dar_suite_global(int argc, char * const argv[], const char **env, int (*call
 	ret = EXIT_BUG;
     }
 
-	// closing libdar
-    close_and_clean();
 
     if(thread_cancellation::count() != 0)
     {
@@ -248,7 +254,7 @@ int dar_suite_global(int argc, char * const argv[], const char **env, int (*call
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.43.2.4 2012/02/19 22:15:05 edrusb Exp $";
+    static char id[]="$Id: dar_suite.cpp,v 1.43.2.5 2012/04/09 12:51:15 edrusb Exp $";
     dummy_call(id);
 }
 

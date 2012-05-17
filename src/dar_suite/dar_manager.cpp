@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.76.2.8 2012/03/16 10:46:30 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.76.2.9 2012/04/15 10:36:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -71,7 +71,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.7.1"
+#define DAR_MANAGER_VERSION "1.7.2"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
@@ -577,7 +577,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.76.2.8 2012/03/16 10:46:30 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.76.2.9 2012/04/15 10:36:44 edrusb Exp $";
     dummy_call(id);
 }
 
