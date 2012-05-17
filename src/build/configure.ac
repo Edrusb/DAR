@@ -492,7 +492,7 @@ AC_SUBST(DOXYGEN_PROG, [doxygen])
 # defaults
 AC_PREFIX_DEFAULT(/usr/local)
 
-AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile po/Makefile.in m4/Makefile po/Makefile intl/Makefile doc/mini-howto/Makefile ])
+AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile m4/Makefile po/Makefile intl/Makefile doc/mini-howto/Makefile ])
 AC_OUTPUT
 [echo ""
 echo "--"

@@ -1,0 +1,121 @@
+
+
+	HOWTO USE SOURCE CODE FOUND IN GIT
+
+In GIT you will only find source code, and no generated files. The configure
+script for example is generated from configure.ac file with autoconf tool,
+so you will not find it here an need specific tools to build this kind of files
+that are usually included in released packages.
+
+WARNING 1:
+You must be aware of the GIT tree structure, if not, you will probably have
+obtained the latest development version. Development version of dar is nothing
+more nothing less than development! It may work or may not and may be in a
+transition state. Do NOT USE DEVELOPMENT VERSION TO BACKUP YOUR SYSTEM!!!
+
+WARNING 2:
+No support will be provided for development source. DO NOT REPORT BUG about any
+problem met with development version of dar, but rather participate to the
+pre-release phases. DO NOT ASK FOR SUPPORT about a development version,
+but rather preserve the developpers from doing anything else than development,
+this will make development going faster and avoid them loosing precious time.
+
+ACKNOLEDGMENT:
+If you have read dar's documentation about the way GIT is used, and have
+retrieved the latest version of a particular branch (not the `master' branch),
+you are welcome to use this version for your own backup, ask for support in the
+dar-support mailing-list (precising the way you got the source code). If you
+find a problem with the latest release, and can still reproduce it with the
+version of that branch, you are welcome to open a bug report. If the problem
+is new to that GIT version, please ask for support on dar-support mailing-list.
+
+
+COMPILATION IN BRIEF:
+
+For a small program, you usually get a single source file to compile. But, when
+the program gets bigger, there is usually several files to compile and link
+together to obtain an executable binary. As this operation is not that evident
+and needs some understanding of the program implementation, usually the
+developpers provide a Makefile that let the building much more easy (just type
+'make' and the things goes on).
+
+Here dar is not a small program, it uses several Makefiles, and overall it must
+be able to work under Linux, Solaris, FreeBSD, MacOS X, Cygwin, and many other
+operating systems. Thus a single type of Makefile will not work because system
+include files, system library to link with do vary from system to system. For
+that reason, automake, autoconf, libtool and gettext are used to generate the
+correct Makefiles for the current system. These Makefiles, and the configure
+script are usually provided in each released package, but here as they are
+generated from other configuration file (Makefile.am and configure.ac), you
+will have to generate these files yourself.
+
+For that reason, you need the following tools:
+- gnu M4  ( http://www.gnu.org/software/m4/ )
+- autoconf ( http://www.gnu.org/software/autoconf/ )
+- automake ( http://www.gnu.org/software/automake/ )
+- libtool ( http://www.gnu.org/software/libtool/ )
+- gettext ( ohttp://www.gnu.org/software/gettext/gettext.html )
+
+If they are not present on your system, you must first install them.
+You can then use the following demo script (it may work or not on
+you system, that's more to be considered as a reminder of the different
+steps to follow to build the configure script and Makefiles):
+
+	misc/init
+
+Then you are ready to build dar as detailed in the documentation, in brief,
+the following commands should correspond to most needs:
+
+	./configure
+	make
+	make install-strip
+
+For your information the following diagram may help you. Be aware that this
+is a bit simplified.
+
+PACKAGING
+==========
+
+configure.ac -+-[autoconf]--> configure
+              |
+              \-[autoheader]--> config.h.in
+
+
+Makefile.am ---[automake]---> Makefile.in
+
+Makefile.in -+-[configure]-+--> Makefile
+             |             |
+config.h.in -+             +--> config.h
+
+Source code -+-[make dist]-+--> dar-<version>.tar.gz (standalone source package)
+
+CONFIGURATION
+==============
+
+Makefile.in -+-[configure]-+--> Makefile
+             |             |
+config.h.in -+             +--> config.h
+
+
+COMPILATION/LINKING
+====================
+
+Makefile   ---+--[make]--+
+                         |
+                         V
+config.h   ---+--------[gcc/ld]----> executables + libdar library
+              |
+C++ source ---+
+
+INSTALLATION
+=============
+
+Makefile   ---+--[make]--+
+                         |
+                         V
+executable  ---+-[install/strip/cp/...]-+-> moved in destination directories
++libdar        |                        |
+               |                        |
+documentation -+                        +-> doc. in destination directories
+(man, html,
+translations, ...)
