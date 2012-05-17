@@ -49,4 +49,6 @@ JH-readme.txt      Jakub Holy           description on how to use following
 JH-dar-make_user_backup.sh		Jakub's script
 JH_darrc				Jakub's darrc file
 JH_dar_archiver.options			Jakub's optional file
+cluster_digital_backups.sh		Roi Rodriguez Mendez & Mauro Silvosa Rivera (Cluster Digital S.L.)
+cluster_digital_readme.txt		extra documentation (the script has also a useful description in it)
 

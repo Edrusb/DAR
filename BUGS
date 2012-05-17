@@ -654,3 +654,18 @@ KNOWN BUGS:
 
     affects versions 1.x.x up to 2.2.0
     fixed in version 2.2.1
+
+#35 description
+     when producing archive to stdout sometimes the message
+     "Error while saving data: Bad file descriptor given" is displayed and dar
+     aborts its execution
+
+    problem
+     health check done on a uninitialized object field in place of a
+     constructor's argument that will be used to set this field.
+
+    solution
+     test the method's argument in place of the object field
+
+    affects version 2.2.x up to 2.2.3
+    fixed in version 2.2.4

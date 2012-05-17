@@ -381,3 +381,10 @@ from 2.2.2 to 2.2.3
 - now counting as errors the file with too long filename
 - now counting the file excluded due to nodump flag as ignored due filter
   selection
+
+from 2.2.3 to 2.2.4
+- fixed #35
+- added in doc/samples the backup Script of Rodriguez Mendez & Mauro Silvosa
+  Rivera
+- updated Swedish translation by Peter Landgren
+

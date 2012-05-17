@@ -3,10 +3,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.3.4: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.3.9: http://docutils.sourceforge.net/" />
 <title>DAR differential backup mini-howto -IT-</title>
 <meta name="author" content="Grzegorz Adam Hankiewicz" />
-<meta name="date" content="2004-12-16 09:25:52 +0000 (Thu, 16 Dec 2004)" />
+<meta name="date" content="2005-09-27 22:40:51 +0200" />
 <meta name="copyright" content="This document has been placed in the public domain." />
 <style type="text/css">
 
@@ -167,6 +167,7 @@ td.field-name {
 </style>
 </head>
 <body>
+<div class="document" id="dar-differential-backup-mini-howto-it">
 <h1 class="title">DAR differential backup mini-howto -IT-</h1>
 <table class="docinfo" frame="void" rules="none">
 <col class="docinfo-name" />
@@ -181,9 +182,9 @@ td.field-name {
 <tr><th class="docinfo-name">Contact:</th>
 <td><a class="first last reference" href="mailto:david0&#64;virgilio.it">david0&#64;virgilio.it</a></td></tr>
 <tr><th class="docinfo-name">Date:</th>
-<td>2004-12-16 09:25:52 +0000 (Thu, 16 Dec 2004)</td></tr>
+<td>2005-09-27 22:40:51 +0200</td></tr>
 <tr><th class="docinfo-name">Version:</th>
-<td>H2 ($Rev: 402 $ under <a class="reference" href="http://subversion.tigris.org/">Subversion</a> control)</td></tr>
+<td>H3 (406)</td></tr>
 <tr class="field"><th class="docinfo-name">Web site:</th><td class="field-body"><a class="reference" href="http://gradha.sdf-eu.org/textos/backup.en.html">http://gradha.sdf-eu.org/textos/backup.en.html</a></td>
 </tr>
 <tr><th class="docinfo-name">Copyright:</th>
@@ -193,7 +194,6 @@ English, Italian and Spanish.</td>
 </tr>
 </tbody>
 </table>
-<div class="document" id="dar-differential-backup-mini-howto-it">
 <div class="contents topic" id="contents">
 <p class="topic-title first"><a name="contents">Contents</a></p>
 <ul class="simple">
@@ -264,7 +264,7 @@ spiegato il misterioso markup nella versione txt). Vedi
 una per ogni necessità, ma questo comporta una maggiore difficoltà
 iniziale per il nuovo utente. Come sempre, in qualsiasi momento potete
 avere degli aiuti sui comandi disponibili scrivendo
-<tt class="literal"><span class="pre">dar</span> <span class="pre">-h</span></tt> o <tt class="literal"><span class="pre">man</span> <span class="pre">dar</span></tt> dopo che l'avete installato. Come nel
+<tt class="docutils literal"><span class="pre">dar</span> <span class="pre">-h</span></tt> o <tt class="docutils literal"><span class="pre">man</span> <span class="pre">dar</span></tt> dopo che l'avete installato. Come nel
 programma <a class="reference" href="http://freshmeat.net/projects/tar/">tar</a>, esistono una serie di opzioni obbligatorie che
 definiscono il tipo di operazione che intendete fare (creare,
 estrarre, listare etc) e un'ulteriore serie di opzioni che
@@ -355,7 +355,7 @@ della partizione in cui è memorizzato il sistema rimane abbastanza
 stabile e immutata
 perchè raramente (dis)installo software. Infatti anche della mia
 <em>home</em> directory le sole cose che cambiano sono abitualmente la mia
-cartella <tt class="literal"><span class="pre">Mail</span></tt> e <tt class="literal"><span class="pre">progetti</span></tt>, dove metto documenti come
+cartella <tt class="docutils literal"><span class="pre">Mail</span></tt> e <tt class="docutils literal"><span class="pre">progetti</span></tt>, dove metto documenti come
 questo e altri software che scrivo/modifico.</p>
 <p>La distinzione di base fra <em>home directories</em> e <em>system</em>
 può essere anche utile nella normale organizzazione. Se lavori per una
@@ -401,21 +401,21 @@ dar -m 256 -y -s 600M -D -R / -c `date -I`_data -Z &quot;*.gz&quot; \
    -P mnt -P dev/pts -P proc -P floppy -P burner -P cdrom
 </pre>
 <ul>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-m</span> <span class="pre">256</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-m</span> <span class="pre">256</span></tt></dt>
 <dd><p class="first last"><a class="reference" href="http://dar.linux.free.fr/">DAR</a> può comprimere i vostri backup. La compressione è
 applicata a ogni file e può essere negativa per file di
 ridotte dimensioni. Di default file con 100 bytes o meno
-non vengono compressi. Con l'opzione <tt class="literal"><span class="pre">-m</span></tt> porti questo
+non vengono compressi. Con l'opzione <tt class="docutils literal"><span class="pre">-m</span></tt> porti questo
 limite a 256 che sembra funzionare meglio per tutti quei piccoli
-file di configurazione che stanno sotto <tt class="literal"><span class="pre">/etc/</span></tt> e
-<tt class="literal"><span class="pre">/home</span></tt>. Come potete notare questa è un'opzione
+file di configurazione che stanno sotto <tt class="docutils literal"><span class="pre">/etc/</span></tt> e
+<tt class="docutils literal"><span class="pre">/home</span></tt>. Come potete notare questa è un'opzione
 assolutamente facoltativa, quasi per &quot;capriccio&quot;.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-y</span> <span class="pre">[level]</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-y</span> <span class="pre">[level]</span></tt></dt>
 <dd><p class="first last">Questa opzione attiva la compressione <a class="reference" href="http://sources.redhat.com/bzip2/">Bzip2</a> che di default
 non è attiva. Potete anche specificare un livello di
 compressione tramite un numero che può andare da 0 (nessuna
@@ -427,8 +427,8 @@ va più che bene.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-s</span> <span class="pre">600M</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-s</span> <span class="pre">600M</span></tt></dt>
 <dd><p class="first last">Ecco quà l'opzione di <a class="reference" href="http://dar.linux.free.fr/">DAR</a> che vi permette di definire la
 dimensione dei file di backup o meglio delle slice. La grandezza
 specificata di
@@ -444,9 +444,9 @@ dar per saperne di più.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-D</span></tt></dt>
-<dd><p class="first last">Memorizza il nome e il percorso delle directory escluse dall'opzione <tt class="literal"><span class="pre">-P</span></tt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-D</span></tt></dt>
+<dd><p class="first last">Memorizza il nome e il percorso delle directory escluse dall'opzione <tt class="docutils literal"><span class="pre">-P</span></tt>
 o che non ci sono fra quelle specificate alla linea di
 comando. Questa è una utile opzione
 quando state recuperando un backup dal nulla, così non dovete
@@ -454,8 +454,8 @@ creare manualmente tutte le directory escluse.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-R</span> <span class="pre">/</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-R</span> <span class="pre">/</span></tt></dt>
 <dd><p class="first last">Specifica la directory di root (directory radice) in cui
 salvare o dalla quale 'leggere' i file interessati dal
 backup. Di default questa è la directory in cui si
@@ -464,12 +464,12 @@ questa sarà la directory di root.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_data</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_data</span></tt></dt>
 <dd><p class="first">Questa è l'opzione obbligatoria di cui vi ho parlato prima
 e definisce la creazione del backup. Per chi non capisce ciò
-che segue, <tt class="literal"><span class="pre">`date</span> <span class="pre">-I`</span></tt> è un trucchetto della shell.
-Brevemente, <tt class="literal"><span class="pre">date</span> <span class="pre">-I</span></tt> restituisce una data con formato
+che segue, <tt class="docutils literal"><span class="pre">`date</span> <span class="pre">-I`</span></tt> è un trucchetto della shell.
+Brevemente, <tt class="docutils literal"><span class="pre">date</span> <span class="pre">-I</span></tt> restituisce una data con formato
 YYYY-MM-DD. L'output del comando fra gli apici singoli sarà
 usato come input dell'opzione -c. In questo modo potete creare
 backup con la data di creazione direttamente nel nome del file.
@@ -481,27 +481,27 @@ echo &quot;La data di oggi è `date -I`&quot;
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-Z</span> <span class="pre">file_pattern</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-Z</span> <span class="pre">file_pattern</span></tt></dt>
 <dd><p class="first last">Usando come argomento normali estensioni di file, potete decidere quali
 file volete memorizzare nel vostro backup, ma senza
 compressione. Questo ha senso solo se usate anche l'opzione
-<tt class="literal"><span class="pre">-y</span></tt>. Comprimendo file compressi otterrete solo file più
+<tt class="docutils literal"><span class="pre">-y</span></tt>. Comprimendo file compressi otterrete solo file più
 grandi, spreco di risorse e occupazione della CPU.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-P</span> <span class="pre">relative_path</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-P</span> <span class="pre">relative_path</span></tt></dt>
 <dd><p class="first last">Con questa opzione dite a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> quali cartelle non volete
 memorizzare nel vostro backup. Quì potreste mettere ad
 esempio la directory /home (Sono l'unico utilizzatore di
 questa macchina, ce ne sono pochi altri, ma solo per
 testare alcune funzioni), directory di sistema che non sono
-realmente dei file, come <tt class="literal"><span class="pre">proc</span></tt>, altri file che potreste
-aver montati sotto <tt class="literal"><span class="pre">mnt</span></tt> (ovvio, il drive in cui metterete
+realmente dei file, come <tt class="docutils literal"><span class="pre">proc</span></tt>, altri file che potreste
+aver montati sotto <tt class="docutils literal"><span class="pre">mnt</span></tt> (ovvio, il drive in cui metterete
 i file di backup) etc, etc. Notate che i percorsi che inserite
-devono essere relativi a quello specificato con l'opzione <tt class="literal"><span class="pre">-R</span></tt>.</p>
+devono essere relativi a quello specificato con l'opzione <tt class="docutils literal"><span class="pre">-R</span></tt>.</p>
 </dd>
 </dl>
 </li>
@@ -517,8 +517,8 @@ dar -m 256 -y -s 600M -D -R /home/gregorio -c `date -I`_data \
 </pre>
 <p>Nulla di nuovo sotto il sole. Come potete vedere, molti dei comandi
 sono identici a quelli 'di cui sopra', ho solo cambiato il nome 
-delle directories che voglio escludere con <tt class="literal"><span class="pre">-P</span></tt> e la directory
-radice con l'opzione <tt class="literal"><span class="pre">-R</span></tt>.</p>
+delle directories che voglio escludere con <tt class="docutils literal"><span class="pre">-P</span></tt> e la directory
+radice con l'opzione <tt class="docutils literal"><span class="pre">-R</span></tt>.</p>
 </blockquote>
 </div>
 <div class="section" id="eseguire-backup-differenziali-con-dar">
@@ -537,14 +537,14 @@ dar -m 256 -y -s 600M -D -R / -c `date -I`_diff -Z &quot;*.gz&quot; \
    -A previous_backup
 </pre>
 <ul>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_diff</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_diff</span></tt></dt>
 <dd><p class="first last">Ho solo cambiato il nome del file, per un motivo estetico.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-A</span> <span class="pre">previous_backup</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-A</span> <span class="pre">previous_backup</span></tt></dt>
 <dd><p class="first last">Questa nuova opzione viene usata per dire a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> dove trova
 il file di backup precedente così può creare un backup
 differenziale invece di uno base. L'unica cosa alla quale dovete
@@ -575,7 +575,7 @@ file sono cambiati e quali no. Facendo questo lavoro su di una
 rete ciò può occupare molta banda. Invece, dopo aver creato il
 backup, potete estrarre il <em>catalogo</em> e inviarlo alla macchina
 che fa i backup. Successivamente, potete usare questo file con
-l'opzione <tt class="literal"><span class="pre">-A</span></tt>, <a class="reference" href="http://dar.linux.free.fr/">DAR</a> lavorerà come se il file del backup base
+l'opzione <tt class="docutils literal"><span class="pre">-A</span></tt>, <a class="reference" href="http://dar.linux.free.fr/">DAR</a> lavorerà come se il file del backup base
 fosse quello.</p>
 <p>Questo può essere anche utile se usate le slices perchè il
 <em>catalogo</em> è creato per la prima e l'ultima slice. E' più
@@ -589,7 +589,7 @@ portare con voi tutti i dischi del vostro precedente backup.</p>
 <p>Come ho detto prima, è venuto il momento di mettere la nostra
 procedura di backup sotto cron. Mettendo il seguente script
 eseguibile per il backup del <em>sistema</em> sotto
-<tt class="literal"><span class="pre">/root/dar_backup.sh</span></tt>:</p>
+<tt class="docutils literal"><span class="pre">/root/dar_backup.sh</span></tt>:</p>
 <pre class="literal-block">
 #!/bin/sh
 
@@ -616,9 +616,9 @@ li avete creati, così nessuno può toccarli, e eseguirvi anche
 <a class="reference" href="http://www.tripwire.org/">Tripwire</a>.</li>
 <li><a class="reference" href="http://dar.linux.free.fr/">DAR</a> genera statistiche dopo ogni esecuzione. A noi non servono
 se eseguite in cron perchè produrrebbero solo mail inutili.
-Solo lo <tt class="literal"><span class="pre">stdout</span></tt> è rediretto a <tt class="literal"><span class="pre">/dev/null</span></tt>. Gli errori saranno
+Solo lo <tt class="docutils literal"><span class="pre">stdout</span></tt> è rediretto a <tt class="docutils literal"><span class="pre">/dev/null</span></tt>. Gli errori saranno
 invece riportati e una mail inviata se qualcosa andasse storto.</li>
-<li>Gli ultimi due comandi <tt class="literal"><span class="pre">find</span></tt> sono opzionali. Li uso per
+<li>Gli ultimi due comandi <tt class="docutils literal"><span class="pre">find</span></tt> sono opzionali. Li uso per
 cambiare i permessi dei file per un normale utente che creerà
 successivamente i backup. Ancora un ulteriore rischio in fatto
 di sicurezza. Root dovrebbe eseguire il backup dei file da
@@ -628,7 +628,7 @@ passare attraverso il mio firewall, la mia password di account
 e guardare a tutti i miei backup sono fregato.</li>
 </ul>
 <p>Ora ponete il seguente script, quasi identico al precedente, per
-i backup differenziali sotto <tt class="literal"><span class="pre">/root/dar_diff.sh</span></tt>:</p>
+i backup differenziali sotto <tt class="docutils literal"><span class="pre">/root/dar_diff.sh</span></tt>:</p>
 <pre class="literal-block">
 #!/bin/sh
 
@@ -642,34 +642,34 @@ PREV=`/bin/ls $DIR/*.dar|/usr/bin/tail -n 1|/usr/bin/awk -F '.' '{print $1;}'`
 /usr/bin/find $DIR -type f -exec chown .gregorio \{\} \;
 /usr/bin/find $DIR -type f -exec chmod 440 \{\} \;
 </pre>
-<p>Gli unici due cambiamenti sono le aggiunte dell'opzione <tt class="literal"><span class="pre">-A</span></tt> e
+<p>Gli unici due cambiamenti sono le aggiunte dell'opzione <tt class="docutils literal"><span class="pre">-A</span></tt> e
 la generazione della variabile PREV con una linea di comando un po'
 complicata. Vediamo cosa fa questa linea di comando:</p>
 <ul class="simple">
-<li>Primo, il comando <tt class="literal"><span class="pre">ls</span></tt> crea una lista dei file con estensione
-<tt class="literal"><span class="pre">.dar</span></tt> presenti nella directory di backup. Questo output è
+<li>Primo, il comando <tt class="docutils literal"><span class="pre">ls</span></tt> crea una lista dei file con estensione
+<tt class="docutils literal"><span class="pre">.dar</span></tt> presenti nella directory di backup. Questo output è
 rediretto al comando successivo.</li>
-<li>Di default <tt class="literal"><span class="pre">ls</span></tt> elenca i file in ordine alfabetico. <tt class="literal"><span class="pre">tail</span></tt>
-è usato per ottenere l'ultimo file con l'opzione <tt class="literal"><span class="pre">-n</span> <span class="pre">1</span></tt> che
+<li>Di default <tt class="docutils literal"><span class="pre">ls</span></tt> elenca i file in ordine alfabetico. <tt class="docutils literal"><span class="pre">tail</span></tt>
+è usato per ottenere l'ultimo file con l'opzione <tt class="docutils literal"><span class="pre">-n</span> <span class="pre">1</span></tt> che
 ordina di mostrare solo l'ultima riga. Di nuovo l'ultimo filename
 è rediretto al comando successivo.</li>
 <li><a class="reference" href="http://dar.linux.free.fr/">DAR</a> necessita di lavorare con filenames senza il numero di slice
 e senza estensione. Questo significa che se non correggiamo noi
 il nome del file, <a class="reference" href="http://dar.linux.free.fr/">DAR</a> ferma il processo e chiede all'utente se
 effettuare l'operazione in modo automatico o meno. Noi separiamo
-il nome del file con <tt class="literal"><span class="pre">awk</span></tt>. Il comando <tt class="literal"><span class="pre">awk</span></tt> separa le stringhe
+il nome del file con <tt class="docutils literal"><span class="pre">awk</span></tt>. Il comando <tt class="docutils literal"><span class="pre">awk</span></tt> separa le stringhe
 di testo dai punti e stampa a schermo la prima colonna. Il risultato
 è il nome base che possiamo passare a <a class="reference" href="http://dar.linux.free.fr/">DAR</a>.</li>
 </ul>
 <p>Ora dobbiamo solo mettere questi due script sotto il controllo
-di cron. Questo è ciò che dobbiamo scrivere dopo il comando <tt class="literal"><span class="pre">crontab</span> <span class="pre">-e</span></tt>:</p>
+di cron. Questo è ciò che dobbiamo scrivere dopo il comando <tt class="docutils literal"><span class="pre">crontab</span> <span class="pre">-e</span></tt>:</p>
 <pre class="literal-block">
 15 0 2-31 * * ./dar_diff.sh
 15 0 1    * * ./dar_backup.sh
 </pre>
-<p>Controllate in <tt class="literal"><span class="pre">man</span> <span class="pre">-S</span> <span class="pre">5</span> <span class="pre">crontab</span></tt> la sintassi del comando. In
+<p>Controllate in <tt class="docutils literal"><span class="pre">man</span> <span class="pre">-S</span> <span class="pre">5</span> <span class="pre">crontab</span></tt> la sintassi del comando. In
 breve queste due linee dicono a cron di far partire i processi
-15 minuti dopo la mezzanotte. <tt class="literal"><span class="pre">dar_backup.sh</span></tt> verrà eseguito solo il
+15 minuti dopo la mezzanotte. <tt class="docutils literal"><span class="pre">dar_backup.sh</span></tt> verrà eseguito solo il
 primo giorno del mese. L'altro script verrà eseguito tutti gli
 altri giorni.</p>
 <p>Ecco quì gli scripts di backup per i vostri utenti. Essi sono
@@ -738,7 +738,7 @@ quando eseguito come root.&quot;
 fi
 </pre>
 <p>Lo script si spiega da solo. L'unica cosa alla quale dovete fare
-attenzione è l'opzione <tt class="literal"><span class="pre">-w</span></tt>, che dice a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> di sovrascrivere i
+attenzione è l'opzione <tt class="docutils literal"><span class="pre">-w</span></tt>, che dice a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> di sovrascrivere i
 file trovati. Questo è obbligatorio per i backup differenziali.
 Ah, mettete lo script nella stessa directory dove mettete i file
 di backup. Ecco un'utilizzo di esempio:</p>
@@ -786,14 +786,14 @@ fi
 </pre>
 <p>Potete testare questa versione facilmente facendo partire lo
 script e killando i processi di <a class="reference" href="http://dar.linux.free.fr/">DAR</a> manualmente da un'altro
-terminale o un'altra console con <tt class="literal"><span class="pre">killall</span> <span class="pre">dar</span></tt>, che forzerà
+terminale o un'altra console con <tt class="docutils literal"><span class="pre">killall</span> <span class="pre">dar</span></tt>, che forzerà
 la fine dei processi <a class="reference" href="http://dar.linux.free.fr/">DAR</a> e vedrete che uno dei rami di fallimento
 sarà raggiunto nello script di backup.</p>
 <p>Un'ulteriore possibile utilizzo per testare il codice può essere
 di rimuovere gli archivi incompleti dall'hard disk se qualcosa
 va male o evitare di testare l'archivio creato quando sapete
 che il primo comando è già fallito. Successivamente può facilmente
-concatenare i comandi di creazione e di test con <tt class="literal"><span class="pre">&amp;&amp;</span></tt> in una
+concatenare i comandi di creazione e di test con <tt class="docutils literal"><span class="pre">&amp;&amp;</span></tt> in una
 singola linea di testo. Ciò dice alla shell di eseguire entrambi
 i comandi in sequenza e impedisce l'esecuzione del secondo se il
 primo è fallito.</p>
@@ -801,10 +801,10 @@ primo è fallito.</p>
 backup questa versione dello script lascierà archivi errati
 vaganti. Per prevenire ciò potete fare in modo che lo script esegua
 una <em>positive verification</em>. Ciò crea il backup in una
-directory temporanea insieme con un file <tt class="literal"><span class="pre">*.valid</span></tt>.</p>
+directory temporanea insieme con un file <tt class="docutils literal"><span class="pre">*.valid</span></tt>.</p>
 <p>Così un'altro script monitora la directory dove
 i file temporanei sono messi e sposta in una directory definitiva
-i file con <tt class="literal"><span class="pre">*.valid</span></tt> eliminando quelli la cui ultima
+i file con <tt class="docutils literal"><span class="pre">*.valid</span></tt> eliminando quelli la cui ultima
 modifica è precedente a un'ora.</p>
 </blockquote>
 </div>
@@ -838,6 +838,21 @@ backup in qualche altro posto. Potrebbe essere fatto facilmente
 con programmi come <a class="reference" href="http://rsync.samba.org/">rsync</a> attraverso <a class="reference" href="http://www.openssh.com/">ssh</a> eseguiti tramite cron.</li>
 </ul>
 </blockquote>
+<p>In effetti persone accorte hanno già iniziato a creare qualche script
+per sestessi e non hanno problemi a condividerli. Per evitare di
+&quot;disordinare&quot; questo mini-howto ho intenzione di archiviarli <em>come
+sono</em> nel mio spazio web:</p>
+<pre class="literal-block">
+http://gradha.sdf-eu.org/dar_scripts/
+</pre>
+<p>Sentitevi liberi di inviare i vostri lavori e i vostri aggiornamenti
+e li aggiungerò alla directory. Se avete intenzione di inviare un
+singolo file di script o un <tt class="docutils literal"><span class="pre">.tar.gz</span></tt> con una intera suite di
+backup, per favore inserite un semplice file <tt class="docutils literal"><span class="pre">.txt</span></tt> che metterò
+assieme agli altri files, così la gente potrà leggere cosa sono
+e cosa fanno i files, prima di scaricarli. Usate l'inglese nella
+vostra descrizione e non dimenticate di mettere nome e e-mail così
+la gente potrà inviarvi bugfixes o miglioramenti.</p>
 </div>
 <div class="section" id="the-end">
 <h1><a class="toc-backref" href="#id12" name="the-end">The end</a></h1>
@@ -845,7 +860,7 @@ con programmi come <a class="reference" href="http://rsync.samba.org/">rsync</a>
 And that's the whole <em>magic</em>. Se avete qualche problema, qualcosa
 non è chiaro o sbagliato (il che è peggio) inviatemi un'e-mail. Se
 trovi questo documento utile e lo vuoi tradurre inviami una
-traduzione del file <tt class="literal"><span class="pre">source.en.txt</span></tt> così posso ditribuirla assieme
+traduzione del file <tt class="docutils literal"><span class="pre">source.en.txt</span></tt> così posso ditribuirla assieme
 a questa versione e gli utenti troveranno più facilmente la versione
 relativa alla loro lingua. Dovreste raggiungere facilmente il codice
 di questo dodumento alla mia home page (link <a class="reference" href="#dar-differential-backup-mini-howto-it">at the beginning of

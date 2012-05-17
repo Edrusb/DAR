@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.cpp,v 1.19.2.1 2005/03/13 20:07:54 edrusb Rel $
+// $Id: tuyau.cpp,v 1.19.2.2 2005/10/11 14:58:55 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -82,7 +82,7 @@ namespace libdar
     {
         gf_mode tmp;
 
-        if(filedesc < 0)
+        if(fd < 0)
             throw Erange("tuyau::tuyau", gettext("Bad file descriptor given"));
         tmp = generic_file_get_mode(fd);
         if(tmp != gf_read_write && tmp != mode)
@@ -192,7 +192,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tuyau.cpp,v 1.19.2.1 2005/03/13 20:07:54 edrusb Rel $";
+        static char id[]="$Id: tuyau.cpp,v 1.19.2.2 2005/10/11 14:58:55 edrusb Rel $";
         dummy_call(id);
     }
 

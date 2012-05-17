@@ -1,4 +1,4 @@
-dist_noinst_DATA = cdbackup.sh darrc_sample sample1.txt dar_par.dcf README pause_every_n_slice.duc automatic_backup automatic_backup.txt dar_backup dar_rqck.bash JH-dar-make_user_backup.sh JH-readme.txt  JH_dar_archiver.options JH_darrc
+dist_noinst_DATA = cdbackup.sh darrc_sample sample1.txt dar_par.dcf README pause_every_n_slice.duc automatic_backup automatic_backup.txt dar_backup dar_rqck.bash JH-dar-make_user_backup.sh JH-readme.txt  JH_dar_archiver.options JH_darrc cluster_digital_backups.sh cluster_digital_readme.txt
 dist_pkgdata_SCRIPTS = dar_par_create.duc dar_par_test.duc
 install-data-local:
 	mkdir -p $(DESTDIR)$(pkgdatadir)
