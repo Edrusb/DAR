@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: infinint.hpp,v 1.10 2004/10/01 22:05:35 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #ifndef INFININT_HPP
 #define INFININT_HPP

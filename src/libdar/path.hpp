@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.hpp,v 1.9.2.1 2007/06/21 20:47:12 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file path.hpp
     /// \brief here is the definition of the path class

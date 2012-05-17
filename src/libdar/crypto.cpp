@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: crypto.cpp,v 1.12.2.7 2008/05/09 20:58:27 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -92,12 +88,6 @@ namespace libdar
 		pass = all;
 	    }
 	}
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: crypto.cpp,v 1.12.2.7 2008/05/09 20:58:27 edrusb Rel $";
-        dummy_call(id);
     }
 
 ///////////////////////////// BLOWFISH IMPLEMENTATION ////////////////////////////////

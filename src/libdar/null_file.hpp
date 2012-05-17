@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: null_file.hpp,v 1.11.4.1 2007/07/22 16:35:00 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file null_file.hpp
     /// \brief /dev/null type file implementation under the generic_file interface

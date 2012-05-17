@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.47.2.13 2010/09/12 16:32:51 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -2597,12 +2594,6 @@ namespace libdar
 	    contenu->recursive_has_changed_update();
 	contenu->xml_listing(*cat_ui, m, filter_unsaved, beginning);
 	cat_ui->warning("</Catalog>");
-    }
-
-    static void dummy_call(char *x)
-    {
-	static char id[]="$Id: catalogue.cpp,v 1.47.2.13 2010/09/12 16:32:51 edrusb Rel $";
-	dummy_call(id);
     }
 
     void catalogue::dump(generic_file & ref) const

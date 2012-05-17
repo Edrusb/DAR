@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database_header.hpp,v 1.2 2005/06/27 19:43:38 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file database_header.hpp
     /// \brief defines the database structure in file

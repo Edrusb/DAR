@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header_version.hpp,v 1.12 2005/05/08 12:12:01 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file header_version.hpp
     /// \brief archive global header structure is defined here

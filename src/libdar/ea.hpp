@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.hpp,v 1.16 2005/05/08 12:12:00 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file ea.hpp
     /// \brief contains a set of routines to manage EA values associated to a file

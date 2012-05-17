@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.20.2.1 2007/07/22 16:35:00 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -74,12 +70,6 @@ using namespace std;
 
 namespace libdar
 {
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: sar_tools.cpp,v 1.20.2.1 2007/07/22 16:35:00 edrusb Rel $";
-        dummy_call(id);
-    }
 
     generic_file *sar_tools_open_archive_fichier(user_interaction & dialog,
 						 const string &filename, bool allow_over, bool warn_over)

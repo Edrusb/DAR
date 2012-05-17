@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.cpp,v 1.21.2.1 2007/07/22 16:35:00 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -313,12 +309,6 @@ namespace libdar
 
         delete in;
         delete out;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: zapette.cpp,v 1.21.2.1 2007/07/22 16:35:00 edrusb Rel $";
-        dummy_call(id);
     }
 
     bool zapette::skip(const infinint & pos)

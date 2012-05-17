@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.cpp,v 1.13.2.2 2009/04/07 08:45:29 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -95,12 +91,6 @@ namespace libdar
     {
         attr = ref.attr;
         alire = attr.begin();
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: ea.cpp,v 1.13.2.2 2009/04/07 08:45:29 edrusb Rel $";
-        dummy_call(id);
     }
 
     void ea_attributs::dump(generic_file & f) const

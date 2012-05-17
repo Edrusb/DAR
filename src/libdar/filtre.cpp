@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.40.2.12 2010/09/12 16:32:51 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -1295,12 +1292,6 @@ namespace libdar
         stockage->change_algo(stock_algo);
     }
 
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: filtre.cpp,v 1.40.2.12 2010/09/12 16:32:51 edrusb Rel $";
-        dummy_call(id);
-    }
 
     static bool save_inode(user_interaction & dialog,
 			   const string & info_quoi, inode * & ino,

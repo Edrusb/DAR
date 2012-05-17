@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: deci.hpp,v 1.9 2004/11/12 21:58:17 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file deci.hpp
     /// \brief manages the decimal representation of infinint

@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_storage.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 #include <iostream>
@@ -76,33 +73,33 @@ void f1()
         storage st1(10), st2(12);
         storage *test;
         infinint u;
-        
+
         test = new storage(st1);
         delete test;
-        
+
         u = 10;
         affiche(u);
-        
+
         test = new storage(u);
         u = test->size();
         affiche(u);
-        
+
         if(*test < st1)
             cout << "vrai" << endl;
         else
             cout << "faux" << endl;
-        
+
         if(*test == st2)
             cout << "vrai" << endl;
         else
             cout << "faux" << endl;
-        
-        
+
+
         if(*test == st1)
             cout << "vrai" << endl;
         else
             cout << "faux" << endl;
-        
+
         if(st2 < *test)
             cout << "vrai" << endl;
         else
@@ -116,16 +113,16 @@ void f1()
         affiche(st1);
 
         storage::iterator it = st1.begin();
-        
+
         while(it != st1.end())
             cout << *(it++);
         cout << endl;
-        
+
         it = st1.rbegin();
         while(it != st1.rend())
             cout << *(it--);
         cout << endl;
-        
+
         const storage cst = st1;
         cout << cst[3] << endl;
 
@@ -143,7 +140,7 @@ void f1()
 
         it = ++(st2.begin());
         st2.read(it, (unsigned char *)buffer, st2.size() % 100);
-        
+
         delete test;
 
         it = st2.begin() + 3;
@@ -187,14 +184,14 @@ void f2()
     i = 0;
     while(it != x.end())
         *(it++) = (unsigned char)('A' + (i++ % 70));
-    
+
     affiche(x);
     size = x.size();
     u = size / 2;
     it.skip_to(x, u);
-    
+
     x.remove_bytes_at_iterator(it, 2000);
-    
+
     u = x.size();
     affiche(u);
     affiche(x);

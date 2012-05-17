@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.37.2.6 2010/08/06 14:00:14 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -270,12 +267,6 @@ namespace libdar
         }
         else
             return false;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: sar.cpp,v 1.37.2.6 2010/08/06 14:00:14 edrusb Rel $";
-        dummy_call(id);
     }
 
     bool sar::skip_backward(U_I x)

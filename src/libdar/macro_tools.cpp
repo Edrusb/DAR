@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: macro_tools.cpp,v 1.25.2.5 2009/04/14 20:20:45 edrusb Rel $
-//
-/*********************************************************************/
-
 
 #include "../my_config.h"
 
@@ -249,12 +245,6 @@ namespace libdar
             delete scram;
 
         return ret;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: macro_tools.cpp,v 1.25.2.5 2009/04/14 20:20:45 edrusb Rel $";
-        dummy_call(id);
     }
 
     static void version_check(user_interaction & dialog, const header_version & ver)

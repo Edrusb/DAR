@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: shell_interaction.hpp,v 1.8 2005/06/21 20:19:09 edrusb Rel $
-//
-/*********************************************************************/
 
 #ifndef SHELL_INTERACTION_HPP
 #define SHELL_INTERACTION_HPP

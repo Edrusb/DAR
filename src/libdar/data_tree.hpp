@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.hpp,v 1.2 2005/07/07 11:04:45 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file data_tree.hpp
     /// \brief two classes used to store tree information in dar_manager databases

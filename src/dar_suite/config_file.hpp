@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: config_file.hpp,v 1.7 2004/06/20 14:26:25 edrusb Rel $
-//
-/*********************************************************************/
 
 #ifndef CONFIG_FILE_HPP
 #define CONFIG_FILE_HPP

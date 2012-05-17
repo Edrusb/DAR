@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.hpp,v 1.11.4.4 2011/01/22 15:34:17 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file storage.hpp
     /// \brief contains a class that permits arbitrary large data storage

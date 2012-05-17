@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: elastic.cpp,v 1.7.2.2 2008/05/09 20:58:27 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -207,12 +204,6 @@ namespace libdar
 		if(count > taille)
 		    throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
 	}
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: elastic.cpp,v 1.7.2.2 2008/05/09 20:58:27 edrusb Rel $";
-        dummy_call(id);
     }
 
     U_32 elastic::dump(unsigned char *buffer, U_32 size) const

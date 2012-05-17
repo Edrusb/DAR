@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: cache.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -216,12 +213,6 @@ namespace libdar
 	    // else this is not time for cache resizing
 
 	    // reseting counters for statistics
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: cache.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $";
-        dummy_call(id);
     }
 
     void cache::fulfill_read()

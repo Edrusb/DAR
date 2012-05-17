@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.26.2.6 2010/02/23 18:27:41 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -454,12 +451,6 @@ namespace libdar
         }
 
         return true;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: generic_file.cpp,v 1.26.2.6 2010/02/23 18:27:41 edrusb Rel $";
-        dummy_call(id);
     }
 
     infinint fichier::get_position()

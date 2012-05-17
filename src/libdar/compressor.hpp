@@ -18,9 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.hpp,v 1.12.4.3 2009/05/14 17:33:39 edrusb Rel $
-//
-/*********************************************************************/
+
     /// \file compressor.hpp
     /// \brief compression engine implementation
 

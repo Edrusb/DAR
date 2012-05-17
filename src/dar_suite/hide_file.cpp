@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: hide_file.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 #include "hide_file.hpp"
@@ -163,12 +160,6 @@ S_I hide_file::inherited_write(const char *a, size_t size)
 {
     CHECK_INIT;
     throw SRC_BUG; // hide_file alsways is read-only !
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: hide_file.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $";
-    dummy_call(id);
 }
 
 void hide_file::init()

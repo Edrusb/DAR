@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: wrapperlib.hpp,v 1.9.2.2 2009/04/07 08:45:29 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file wrapperlib.hpp
     /// \brief libz and libbz2 wrapper to have identical interface to these libraries.

@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: etage.cpp,v 1.16.2.1 2007/07/22 16:34:59 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -106,13 +103,6 @@ namespace libdar
 	last_mod = x_last_mod;
 	last_acc = x_last_acc;
     }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: etage.cpp,v 1.16.2.1 2007/07/22 16:34:59 edrusb Rel $";
-        dummy_call(id);
-    }
-
 
     bool etage::read(string & ref)
     {

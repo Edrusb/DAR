@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask_list.cpp,v 1.2.2.6 2010/04/06 20:56:23 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -195,11 +192,6 @@ namespace libdar
 	close(src);
     }
 
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: mask_list.cpp,v 1.2.2.6 2010/04/06 20:56:23 edrusb Rel $";
-        dummy_call(id);
-    }
 
     bool mask_list::is_covered(const string & expression) const
     {

@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.hpp,v 1.53.2.16 2012/02/25 17:22:31 edrusb Exp $
-//
-/*********************************************************************/
-//
 
     /// \file libdar.hpp
     /// \brief the main file of the libdar API definitions

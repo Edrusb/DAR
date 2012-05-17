@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.36.2.10 2011/03/12 15:39:36 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -392,12 +388,6 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
         throw;
     }
     return true;
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: dar_xform.cpp,v 1.36.2.10 2011/03/12 15:39:36 edrusb Rel $";
-    dummy_call(id);
 }
 
 static void show_usage(user_interaction & dialog, const char *command_name)

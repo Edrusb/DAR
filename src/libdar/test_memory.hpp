@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_memory.hpp,v 1.7 2004/11/07 18:21:39 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file test_memory.hpp
     /// \brief wrapper around new and delete operator to detect memory leakage

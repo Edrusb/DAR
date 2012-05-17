@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.hpp,v 1.17.2.1 2007/07/22 16:35:00 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file mask.hpp
     /// \brief here lies a collection of mask classes

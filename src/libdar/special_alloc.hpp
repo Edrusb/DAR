@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: special_alloc.hpp,v 1.9 2004/11/07 18:21:38 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file special_alloc.hpp
     /// \brief re-definition of new and delete class operator

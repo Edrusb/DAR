@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.cpp,v 1.16.2.4 2011/01/22 22:37:12 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -440,12 +437,6 @@ namespace libdar
 	    ++i_ref;
 	}
         E_END("storage::copy_from","");
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: storage.cpp,v 1.16.2.4 2011/01/22 22:37:12 edrusb Rel $";
-        dummy_call(id);
     }
 
     S_32 storage::difference(const storage & ref) const

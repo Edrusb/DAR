@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: my_getopt_long.h,v 1.2 2004/03/15 14:31:52 edrusb Rel $
-//
-/*********************************************************************/
 
 #ifndef MY_GETOPT_LONG_H
 #define MY_GETOPT_LONG_H

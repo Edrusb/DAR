@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: thread_cancellation.cpp,v 1.4.2.4 2008/02/09 17:41:30 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -231,11 +228,6 @@ namespace libdar
     }
 #endif
 
-    static void dummy_call(char *x)
-    {
-	static char id[]="$Id: thread_cancellation.cpp,v 1.4.2.4 2008/02/09 17:41:30 edrusb Rel $";
-	dummy_call(id);
-    }
 
 #if MUTEX_WORKS
     bool thread_cancellation::cancel_status(pthread_t tid)

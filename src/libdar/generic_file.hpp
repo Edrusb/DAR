@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.25.2.3 2009/04/07 08:45:29 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file generic_file.hpp
     /// \brief class generic_file is defined here as well as class fichier

@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: config_file.cpp,v 1.8 2004/05/08 20:40:42 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -166,10 +162,4 @@ bool config_file::find_next_target(generic_file &f, infinint & debut, string & n
     }
 
     return found;
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: config_file.cpp,v 1.8 2004/05/08 20:40:42 edrusb Rel $";
-    dummy_call(id);
 }

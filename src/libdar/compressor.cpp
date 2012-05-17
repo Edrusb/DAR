@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.16.2.5 2010/07/28 13:23:28 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -381,12 +378,6 @@ namespace libdar
     {
         if(decompr != NULL)
             decompr->wrap.set_avail_in(0);
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: compressor.cpp,v 1.16.2.5 2010/07/28 13:23:28 edrusb Rel $";
-        dummy_call(id);
     }
 
     void compressor::clean_write()

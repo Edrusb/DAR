@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.24 2010/09/12 16:32:51 edrusb Rel $
-//
-/*********************************************************************/
-
 
 #include "../my_config.h"
 
@@ -272,12 +268,6 @@ namespace libdar
     void tools_extract_basename(const char *command_name, string &basename)
     {
         basename = path(command_name).basename();
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: tools.cpp,v 1.54.2.24 2010/09/12 16:32:51 edrusb Rel $";
-        dummy_call(id);
     }
 
     void tools_split_path_basename(const char *all, path * &chemin, string & base)

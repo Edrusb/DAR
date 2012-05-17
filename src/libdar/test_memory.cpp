@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_memory.cpp,v 1.7.4.1 2012/01/26 20:09:08 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -54,12 +51,6 @@ namespace libdar
     U_32 get_total_alloc_size()
     {
         return total_size;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: test_memory.cpp,v 1.7.4.1 2012/01/26 20:09:08 edrusb Exp $";
-        dummy_call(id);
     }
 
     void record_offset()

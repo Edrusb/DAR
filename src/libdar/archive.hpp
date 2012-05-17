@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.hpp,v 1.32.2.3 2010/09/12 16:32:51 edrusb Rel $
-//
-/*********************************************************************/
-//
 
     /// \file archive.hpp
     /// \brief the archive class is defined in this module

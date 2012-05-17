@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.15.2.2 2008/02/09 17:41:29 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -112,12 +109,6 @@ namespace libdar
         set_unexpected(inattendue);
         set_terminate(notcatched);
         initialized = true;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: erreurs.cpp,v 1.15.2.2 2008/02/09 17:41:29 edrusb Rel $";
-        dummy_call(id);
     }
 
     static void inattendue()

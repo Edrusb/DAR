@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: shell_interaction.cpp,v 1.27.2.1 2007/07/22 16:34:59 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -315,10 +312,4 @@ static string interaction_string(const string & message, bool echo, void *contex
     set_term_mod(initial);
 
     return ret;
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: shell_interaction.cpp,v 1.27.2.1 2007/07/22 16:34:59 edrusb Rel $";
-    dummy_call(id);
 }

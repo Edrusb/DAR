@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: string_file.hpp,v 1.1.2.1 2007/07/22 16:35:00 edrusb Rel $
-//
-/*********************************************************************/
-//
 
     /// \file string_file.hpp
     /// \brief emulate a generic_file from a string of characters

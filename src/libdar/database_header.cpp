@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database_header.cpp,v 1.1.2.2 2008/02/09 17:41:29 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -154,8 +151,3 @@ namespace libdar
 
 } // end of namespace
 
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: database_header.cpp,v 1.1.2.2 2008/02/09 17:41:29 edrusb Rel $";
-    dummy_call(id);
-}

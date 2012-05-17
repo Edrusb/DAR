@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.hpp,v 1.24.2.1 2009/04/06 20:23:19 edrusb Rel $
-//
-/*********************************************************************/
 
 #ifndef COMMAND_LINE_HPP
 #define COMMAND_LINE_HPP

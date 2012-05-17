@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.cpp,v 1.22.2.1 2007/07/22 16:35:00 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -188,12 +185,6 @@ namespace libdar
 
         position += total;
         return total;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: tuyau.cpp,v 1.22.2.1 2007/07/22 16:35:00 edrusb Rel $";
-        dummy_call(id);
     }
 
     void tuyau::ouverture()

@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.cpp,v 1.13.2.4 2008/02/02 14:10:50 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 #include <iostream>
@@ -194,11 +191,6 @@ namespace libdar
         return it_arg == fin_arg;
     }
 
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: path.cpp,v 1.13.2.4 2008/02/02 14:10:50 edrusb Rel $";
-        dummy_call(id);
-    }
 
     string path::display() const
     {

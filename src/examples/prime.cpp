@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: prime.cpp,v 1.8.2.2 2008/02/09 17:41:28 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -76,10 +72,4 @@ int little_main(user_interaction & ui, S_I argc, char *argv[], const char **env)
         cout << argv[1] << " is PRIME" << endl;
 
     return EXIT_OK;
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: prime.cpp,v 1.8.2.2 2008/02/09 17:41:28 edrusb Rel $";
-    dummy_call(id);
 }

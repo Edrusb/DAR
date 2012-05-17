@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.19.2.5 2011/01/04 16:27:13 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -681,13 +678,6 @@ namespace libdar
 
         field->insert_as_much_as_necessary_const_byte_to_be_as_wider_as(*ref.field, field->begin(), 0x00);
         E_END("infinint::make_at_least_as_wider_as", "");
-    }
-
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: real_infinint.cpp,v 1.19.2.5 2011/01/04 16:27:13 edrusb Rel $";
-        dummy_call(id);
     }
 
     void infinint::setup_endian()

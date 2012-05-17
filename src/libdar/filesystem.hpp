@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.22.2.3 2009/04/07 08:45:29 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file filesystem.hpp
     /// \brief defines several class that realize the interface with the filesystem

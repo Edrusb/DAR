@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.cpp,v 1.16.2.2 2009/01/24 16:01:16 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -115,12 +112,6 @@ namespace libdar
     {
         fichier fic = fichier(dialog, dup(fd));
         write(fic);
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: header.cpp,v 1.16.2.2 2009/01/24 16:01:16 edrusb Rel $";
-        dummy_call(id);
     }
 
     bool header_label_is_equal(const label &a, const label &b)

@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: statistics.hpp,v 1.11 2005/12/01 17:47:30 edrusb Rel $
-//
-/*********************************************************************/
-//
 
     /// \file statistics.hpp
     /// \brief handle the statistic structure that gives a summary of treated files after each operation

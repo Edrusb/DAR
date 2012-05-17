@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: statistics.cpp,v 1.5.2.3 2008/02/09 17:41:29 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -107,12 +103,6 @@ namespace libdar
 	if(locking)
 	    pthread_mutex_destroy(&lock_mutex);
 #endif
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: statistics.cpp,v 1.5.2.3 2008/02/09 17:41:29 edrusb Rel $";
-        dummy_call(id);
     }
 
     void statistics::copy_from(const statistics & ref)

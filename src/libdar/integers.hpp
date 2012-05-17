@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: integers.hpp,v 1.11 2004/11/07 18:21:38 edrusb Rel $
-//
-/*********************************************************************/
-
 
     /// \file integers.hpp
     /// \brief are defined here basic integer types that tend to be portable

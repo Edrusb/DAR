@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.70.2.8 2011/01/01 18:06:10 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -442,12 +438,6 @@ namespace libdar
 	    }
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: libdar.cpp,v 1.70.2.8 2011/01/01 18:06:10 edrusb Rel $";
-        dummy_call(id);
     }
 
     char *libdar_str2charptr_noexcept(const std::string & x, U_16 & exception, std::string & except_msg)

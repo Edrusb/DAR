@@ -18,11 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: nls_swap.hpp,v 1.3.2.2 2007/08/19 11:42:42 edrusb Rel $
-//
-/*********************************************************************/
-//
-
 
     /// \file nls_swap.hpp
     /// \brief provides a set of macro to change the NLS from user application domaine to libdar domain and viceversa

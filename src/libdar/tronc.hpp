@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.hpp,v 1.9.4.1 2007/07/22 16:35:00 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file tronc.hpp
     /// \brief defines a limited segment over another generic_file.

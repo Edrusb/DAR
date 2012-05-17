@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_deci.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 #include <iostream>
@@ -49,7 +46,7 @@ static void f1()
     deci d2 = t;
     deci d3 = infinint(125);
     U_I c;
-    
+
     cout << d1.human() << endl;
     cout << d2.human() << endl;
     cout << d3.human() << endl;

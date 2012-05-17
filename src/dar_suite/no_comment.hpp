@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: no_comment.hpp,v 1.7 2004/06/20 14:26:25 edrusb Rel $
-//
-/*********************************************************************/
 
 #ifndef NO_COMMENT_HPP
 #define NO_COMMENT_HPP

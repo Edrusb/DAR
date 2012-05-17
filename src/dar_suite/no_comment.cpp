@@ -18,21 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: no_comment.cpp,v 1.10.2.1 2007/07/22 16:34:59 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 #include "no_comment.hpp"
 #include "infinint.hpp"
 
 using namespace libdar;
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: no_comment.cpp,v 1.10.2.1 2007/07/22 16:34:59 edrusb Rel $";
-    dummy_call(id);
-}
 
 void no_comment::fill_morceau()
 {

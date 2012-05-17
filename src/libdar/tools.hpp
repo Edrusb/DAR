@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.39.2.16 2011/01/21 19:18:24 edrusb Rel $
-//
-/*********************************************************************/
-
 
     /// \file tools.hpp
     /// \brief a set of general purpose routines

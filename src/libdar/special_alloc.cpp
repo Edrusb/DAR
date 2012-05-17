@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: special_alloc.cpp,v 1.14.2.2 2008/02/09 17:41:29 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 #include "special_alloc.hpp"
@@ -126,12 +123,6 @@ namespace libdar
 	CRITICAL_END;
 
         return ret;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: special_alloc.cpp,v 1.14.2.2 2008/02/09 17:41:29 edrusb Rel $";
-        dummy_call(id);
     }
 
     void special_alloc_delete(void *ptr)

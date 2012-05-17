@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: deci.cpp,v 1.10.4.2 2008/02/09 17:41:29 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -245,12 +242,6 @@ namespace libdar
         if(justif_size > 0)
             decimales->remove_bytes_at_iterator(decimales->begin(), justif_size);
         E_END("deci::reduce", "");
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: deci.cpp,v 1.10.4.2 2008/02/09 17:41:29 edrusb Rel $";
-        dummy_call(id);
     }
 
     string deci::human() const

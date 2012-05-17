@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: scrambler.hpp,v 1.10.2.1 2007/07/22 16:35:00 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file scrambler.hpp
     /// \brief contains the definition of the scrambler class, a very weak encryption scheme

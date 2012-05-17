@@ -18,9 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database.cpp,v 1.6.2.3 2007/10/08 20:05:54 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -230,12 +227,6 @@ namespace libdar
 	coordinate.erase(coordinate.begin()+src);
 	coordinate.insert(coordinate.begin()+dst, moved);
 	files->apply_permutation(src, dst);
-    }
-
-    static void dummy_call(char *x)
-    {
-	static char id[]="$Id: database.cpp,v 1.6.2.3 2007/10/08 20:05:54 edrusb Rel $";
-	dummy_call(id);
     }
 
     void database::show_contents(user_interaction & dialog) const

@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronconneuse.hpp,v 1.7.4.1 2007/07/22 16:35:00 edrusb Rel $
-//
-/*********************************************************************/
-//
 
     /// \file tronconneuse.hpp
     /// \brief defines a block structured file.
