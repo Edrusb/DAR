@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_sar.cpp,v 1.8 2005/09/19 21:17:37 edrusb Rel $
+// $Id: test_sar.cpp,v 1.17 2011/04/17 16:36:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,44 +29,45 @@
 #include "deci.hpp"
 #include "testtools.hpp"
 #include "user_interaction.hpp"
-#include "test_memory.hpp"
 #include "integers.hpp"
 #include "shell_interaction.hpp"
+#include "libdar.hpp"
+#include "fichier.hpp"
 
 using namespace libdar;
 
 static user_interaction *ui = NULL;
 
+static label data_name;
+
 static void f1();
 static void f2();
 static void f3();
+static void f4();
 
 int main()
 {
-    MEM_BEGIN;
+    U_I major, medium, minor;
+    get_version(major, medium, minor);
     ui = shell_interaction_init(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
-    MEM_IN;
-    MEM_OUT;
+    data_name.clear();
     f1();
-    MEM_OUT;
     f2();
-    MEM_OUT;
     f3();
-    MEM_OUT;
+    f4();
     shell_interaction_close();
     if(ui != NULL)
 	delete ui;
-    MEM_END;
 }
 
 static void f1()
 {
     try
     {
-        sar sar1 = sar(*ui, "destination", "txt", 100, 110, true, false, 0,  path("./test"));
-        fichier src = fichier(*ui, "./test/source.txt", gf_read_only);
+        sar sar1 = sar(*ui, "destination", "txt", 100, 110, true, false, 0, path("./test"), data_name, "", "", "", hash_none, 0);
+        fichier src = fichier(*ui, "./test/source.txt", gf_read_only, tools_octal2int("0777"), false);
         src.copy_to(sar1);
     }
     catch(Egeneric &e)
@@ -79,8 +80,8 @@ static void f2()
 {
     try
     {
-        sar sar2 = sar(*ui, "destination", "txt", path("./test"));
-        fichier dst = fichier(*ui, "./test/destination.txt", gf_write_only);
+        sar sar2 = sar(*ui, "destination", "txt", path("./test"), 0, false);
+        fichier dst = fichier(*ui, "./test/destination.txt", gf_write_only, tools_octal2int("0777"), false);
 
         sar2.copy_to(dst);
     }
@@ -94,8 +95,8 @@ static void f3()
 {
     try
     {
-        sar sar3 = sar(*ui, "destination", "txt", path("./test"));
-        fichier src = fichier(*ui, "./test/source.txt", gf_read_only);
+        sar sar3 = sar(*ui, "destination", "txt", path("./test"), 0, false);
+        fichier src = fichier(*ui, "./test/source.txt", gf_read_only, tools_octal2int("0777"), false);
 
         display(sar3.get_position());
         display(src.get_position());
@@ -153,4 +154,24 @@ static void f3()
     {
         e.dump();
     }
+}
+
+void f4()
+{
+    try
+    {
+        sar sar2 = sar(*ui, "destination", "txt", path("./test"), 0, true, "echo SLICE %n");
+
+	display(sar2.get_position());
+	display_back_read(*ui, sar2);
+	sar2.skip_relative(-1);
+	display(sar2.get_position());
+	sar2.skip(0);
+	display_read(*ui, sar2);
+    }
+    catch(Egeneric & e)
+    {
+	e.dump();
+    }
+
 }

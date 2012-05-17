@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_cp.cpp,v 1.16.2.7 2008/02/09 20:11:27 edrusb Rel $
+// $Id: dar_cp.cpp,v 1.27 2011/01/05 20:48:52 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -65,7 +65,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "thread_cancellation.hpp"
 
-#define DAR_CP_VERSION "1.2.2"
+#define DAR_CP_VERSION "1.2.3"
 
 using namespace libdar;
 using namespace std;
@@ -74,20 +74,20 @@ static void show_usage(user_interaction & dialog, char *argv0);
 static void show_version(user_interaction & dialog, char *argv0);
 static int open_files(user_interaction & dialog, char *src, char *dst, int *fds, int *fdd);
 static int copy_max(user_interaction & dialog, int src, int dst);
-static int little_main(user_interaction & dialog, int argc, char *argv[], const char **env);
+static int little_main(user_interaction & dialog, int argc, char * const argv[], const char **env);
 static void xfer_before_error(int block, char *buffer, int src, int dst);
 static int skip_to_next_readable(int block, char *buffer, int src, int dst, off_t & missed);
     /* return 0 if not found any more readable data, else return 1 */
 static int normal_copy(int block, char *buffer, int src, int dst);
     /* return the number of copied bytes (negative value upon error, zero at end of file) */
-static int little_main(user_interaction & dialog, int argc, char *argv[], const char **env);
+static int little_main(user_interaction & dialog, int argc, char * const argv[], const char **env);
 
-int main(int argc, char *argv[], const char **env)
+int main(int argc, char * const argv[], const char **env)
 {
     return dar_suite_global(argc, argv, env, &little_main);
 }
 
-static int little_main(user_interaction & dialog, int argc, char *argv[], const char **env)
+static int little_main(user_interaction & dialog, int argc, char * const argv[], const char **env)
 {
     int fds, fdd;
     int ret = EXIT_OK;
@@ -139,9 +139,9 @@ static void show_version(user_interaction & dialog, char *argv0)
 	dialog.warning(tools_printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n\n", cmd.c_str(), DAR_CP_VERSION));
 	dialog.warning(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__));
 	dialog.warning(tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd.c_str(), PACKAGE_VERSION));
-	dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `dar -W'."), cmd.c_str()));
-	dialog.warning(tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;")));
-	dialog.warning(tools_printf(gettext(" type `dar -L | more'\n for details.\n\n")));
+	dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details type `dar -W'."), cmd.c_str()));
+	dialog.warning(tools_printf(gettext(" This is free software, and you are welcome to redistribute it under")));
+	dialog.warning(tools_printf(gettext(" certain conditions; type `dar -L | more' for details.\n\n")));
     }
     catch(...)
     {
@@ -204,8 +204,8 @@ static int copy_max(user_interaction & dialog, int src, int dst)
 
 #define BUF_SIZE 1024
 	// choosing the correct value for BUF_SIZE
-	// too long make I/O error very long to recover
-	// too small make copying under normal condition a bit slow
+	// too long makes I/O error very long to recover
+	// too small makes copying under normal condition a bit slow
 	// 1024 seems a balanced choice.
 	//
     char buffer[BUF_SIZE];
@@ -340,7 +340,7 @@ static int skip_to_next_readable(int block, char *buffer, int src, int dst, off_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_cp.cpp,v 1.16.2.7 2008/02/09 20:11:27 edrusb Rel $";
+    static char id[]="$Id: dar_cp.cpp,v 1.27 2011/01/05 20:48:52 edrusb Rel $";
     dummy_call(id);
 }
 

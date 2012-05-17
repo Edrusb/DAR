@@ -13,7 +13,7 @@ else
 endif
 endif
 
-noinst_PROGRAMS = factoriel prime
+noinst_PROGRAMS = factoriel prime formula
 dist_noinst_DATA = README
 LDADD = -L../libdar -l$(MYLIB)
 
@@ -22,3 +22,9 @@ factoriel_DEPENDENCIES = ../libdar/lib$(MYLIB).la ../dar_suite/shell_interaction
 
 prime_SOURCES = prime.cpp ../dar_suite/shell_interaction.cpp ../dar_suite/dar_suite.cpp
 prime_DEPENDENCIES = ../libdar/lib$(MYLIB).la ../dar_suite/shell_interaction.cpp ../dar_suite/dar_suite.cpp
+
+formula_SOURCES = formula.cpp ../dar_suite/shell_interaction.cpp ../dar_suite/dar_suite.cpp ../dar_suite/crit_action_cmd_line.cpp ../dar_suite/line_tools.cpp
+formula_DEPENDENCIES = ../libdar/lib$(MYLIB).la ../dar_suite/line_tools.cpp ../dar_suite/shell_interaction.cpp ../dar_suite/crit_action_cmd_line.cpp ../dar_suite/dar_suite.cpp
+
+
+

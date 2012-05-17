@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: header_version.cpp,v 1.7.2.2 2008/02/09 17:41:29 edrusb Rel $
+// $Id: header_version.cpp,v 1.12 2010/02/20 17:19:03 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -39,25 +39,10 @@ namespace libdar
 {
 
 
-    void version_copy(dar_version & dst, const dar_version & src)
-    {
-    	memcpy(dst, src, VERSION_SIZE);
-    }
-
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: header_version.cpp,v 1.7.2.2 2008/02/09 17:41:29 edrusb Rel $";
+        static char id[]="$Id: header_version.cpp,v 1.12 2010/02/20 17:19:03 edrusb Rel $";
         dummy_call(id);
-    }
-
-    bool version_greater(const dar_version & left, const dar_version & right)
-    {
-        S_I i = 0;
-
-        while(i < VERSION_SIZE && left[i] == right[i])
-            ++i;
-
-        return i < VERSION_SIZE && left[i] > right[i];
     }
 
 } // end of namespace

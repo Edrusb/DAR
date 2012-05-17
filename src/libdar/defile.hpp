@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: defile.hpp,v 1.7.4.1 2008/05/16 11:00:17 edrusb Rel $
+// $Id: defile.hpp,v 1.11 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -35,6 +35,10 @@
 
 namespace libdar
 {
+
+	/// \ingroup Private
+	/// @}
+
 	/// the defile class keep trace of the real path of files while the flow in the filter routines
 
 	/// the filter routines manipulates flow of inode, where their relative order
@@ -53,10 +57,12 @@ namespace libdar
         const std::string & get_string() const { return cache; };
 
     private :
-        path chemin;
-        bool init;
-	std::string cache;
+        path chemin; //< current path
+        bool init;   //< true if reached the "root" (all pushed arguments have been poped)
+	std::string cache; //< cache of "chemin" converted into string
     };
+
+	/// @}
 
 } // end of namespace
 

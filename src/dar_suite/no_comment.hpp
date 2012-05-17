@@ -16,11 +16,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: no_comment.hpp,v 1.7 2004/06/20 14:26:25 edrusb Rel $
+// $Id: no_comment.hpp,v 1.10 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file no_comment.hpp
+    /// \brief contains class that transparently strips out the comments from configuration file
+    /// \ingroup CMDLINE
+
+
 
 #ifndef NO_COMMENT_HPP
 #define NO_COMMENT_HPP
@@ -30,13 +36,18 @@
 
 using namespace libdar;
 
+    /// \addtogroup CMDLINE
+    /// @{
+
 class no_comment : public hide_file
 {
 public:
-    no_comment(user_interaction & dialog, generic_file &f) : hide_file(dialog, f) {};
+    no_comment(generic_file &f) : hide_file(f) {};
 
 protected:
     void fill_morceau();
 };
+
+    // @}
 
 #endif

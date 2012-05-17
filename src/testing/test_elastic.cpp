@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_elastic.cpp,v 1.4.2.2 2008/05/16 11:00:17 edrusb Rel $
+// $Id: test_elastic.cpp,v 1.8 2010/02/24 11:26:03 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -52,6 +52,7 @@ extern "C"
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"
 #include "macro_tools.hpp"
+#include "fichier.hpp"
 
 using namespace libdar;
 using namespace std;

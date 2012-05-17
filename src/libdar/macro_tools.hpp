@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: macro_tools.hpp,v 1.15 2005/09/19 21:17:37 edrusb Rel $
+// $Id: macro_tools.hpp,v 1.38 2011/04/09 19:55:08 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,7 +30,16 @@
 #define MACRO_TOOLS_HPP
 
 #include "../my_config.h"
+
+extern "C"
+{
+#if HAVE_LIMITS_H
+#include <limits.h>
+#endif
+
+}
 #include <string>
+
 #include "catalogue.hpp"
 #include "compressor.hpp"
 #include "infinint.hpp"
@@ -38,44 +47,80 @@
 #include "generic_file.hpp"
 #include "scrambler.hpp"
 #include "crypto.hpp"
+#include "escape.hpp"
+#include "pile.hpp"
+
+    /// \addtogroup Private
+    /// @{
+
+
+#define BUFFER_SIZE 102400
+#ifdef SSIZE_MAX
+#if SSIZE_MAX < BUFFER_SIZE
+#undef BUFFER_SIZE
+#define BUFFER_SIZE SSIZE_MAX
+#endif
+#endif
 
 namespace libdar
 {
 
-    extern const dar_version macro_tools_supported_version;
+    extern const archive_version macro_tools_supported_version;
+    extern const std::string LIBDAR_STACK_LABEL_UNCOMPRESSED;
+    extern const std::string LIBDAR_STACK_LABEL_CLEAR;
+    extern const std::string LIBDAR_STACK_LABEL_UNCYPHERED;
+    extern const std::string LIBDAR_STACK_LABEL_LEVEL1;
 
     extern void macro_tools_open_archive(user_interaction & dialog,
 					 const path &sauv_path,  // path to slices
                                          const std::string &basename,  // slice basename
+					 const infinint & min_digits,  // minimum digits for the slice number
                                          const std::string &extension,  // slice extensions
 					 crypto_algo crypto, // encryption algorithm
-                                         const std::string &pass, // pass key for crypto/scrambling
+                                         const secu_string &pass, // pass key for crypto/scrambling
 					 U_32 crypto_size,    // crypto block size
-                                         generic_file *&ret1, // level 1 file (raw data) sar or zapette
-                                         generic_file *&scram, // NULL if pass is given an empty string else a scrambler/other crypto class (over raw data)
-                                         compressor *&ret2, // compressor over scrambler or raw data (if no scrambler)
+					 pile & stack, // the stack of generic_file resulting of the archive openning
                                          header_version &ver, // header read from raw data
                                          const std::string &input_pipe, // named pipe for input when basename is "-" (dar_slave)
                                          const std::string &output_pipe, // named pipe for output when basename is "-" (dar_slave)
-                                         const std::string & execute); // command to execute between slices
-        // all allocated objects (ret1, ret2, scram), must be deleted when no more needed
+                                         const std::string & execute, // command to execute between slices
+					 infinint & second_terminateur_offset, // where to start looking for the second terminateur (set to zero if there is only one terminateur).
+					 bool lax,  // whether we skip&warn the usual verifications
+					 bool sequential_read, // whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
+					 bool info_details); // be or not verbose about the archive openning
+        // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
+
+    extern catalogue *macro_tools_get_derivated_catalogue_from(user_interaction & dialog,
+							       pile & data_stack,  // where to get the files and EA from
+							       pile & cata_stack,  // where to get the catalogue from
+							       const header_version & ver, // version format as defined in the header of the archive to read
+							       bool info_details, // verbose display (throught user_interaction)
+							       infinint &cat_size, // return size of archive in file (not in memory !)
+							       const infinint & second_terminateur_offset, // location of the second terminateur (zero if none exist)
+							        bool lax_mode);         // whether to do relaxed checkings
 
     extern catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
-						     generic_file & f,  // raw data access object
+						     pile & stack,  // raw data access object
 						     const header_version & ver, // version format as defined in the header of the archive to read
-                                                     compressor & zip,  // compressor object over raw data
                                                      bool info_details, // verbose display (throught user_interaction)
                                                      infinint &cat_size, // return size of archive in file (not in memory !)
-						     generic_file *zip_base);
+						     const infinint & second_terminateur_offset,
+						     bool lax_mode);
 
-    extern catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
-						     const std::string &basename,
-						     const std::string & extension,
-						     crypto_algo crypto,
-						     const std::string & pass,
-						     U_32 crypto_size);
+    extern catalogue *macro_tools_lax_search_catalogue(user_interaction & dialog,
+						       pile & stack,
+						       const archive_version & edition,
+						       compression compr_algo,
+						       bool info_details,
+						       bool even_partial_catalogues,
+						       const label & layer1_data_name);
 
+	// the beginning of the catalogue.
+
+    extern infinint macro_tools_get_terminator_start(generic_file & f, const archive_version & reading_ver);
 
 } // end of namespace
+
+	/// @}
 
 #endif

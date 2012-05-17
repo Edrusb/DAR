@@ -3,6 +3,12 @@
 
 
 
+
+
+
+
+
+
   <meta content="Denis Corbin" name="author">
   <meta content="Tutorial for using libdar library" name="description"></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
@@ -17,7 +23,7 @@
       <h1 style="text-align: center;">APPLICATION INTERFACE <br>
       </h1>
       <h1 style="text-align: center;">TUTORIAL</h1>
-      <div style="text-align: center;"> for API version 4.0.x<br>
+      <div style="text-align: center;"> for API version 5.x.x<br>
       </div>
       <h1 style="text-align: center;"> </h1>
       </td>
@@ -35,7 +41,7 @@
       <p style="text-align: justify;">The Libdar library has been built
 from source code originally
 located directly in the <em><strong>dar</strong></em> command line
-application. Libdar provides a complete abstraction for handling Disk
+application. Libdar provides a complete abstraction layer for handling Disk
 ARchive (<em>dar</em>)'s archives. The general operations provided are:</p>
       <div style="text-align: justify;"></div>
       <div></div>
@@ -63,12 +69,12 @@ This tutorial will show you how to
 use the libdar API. As <span style="font-style: italic;">dar</span>
 now also uses this API, looking at it's code may also provide a good
 illustration. The file <span style="font-style: italic;">src/dar_suite/dar.cpp</span>
-is the primary consumer.<br>
+is the primary consumer of the libdar API. <br>
       <div style="text-align: justify;"> <br>
-The sample code provided here is
+The sample codes provided here is
 solely illustrative and is not guaranteed to compile. More detailed API
 documentation is contained in the source code and can be compiled to
-the doc/html directory using Doxygen.<br>
+the doc/html directory using Doxygen, which is also provided <a href="http://dar.linux.free.fr/doc/html/index.html">online</a>.<br>
       </div>
       </td>
     </tr>
@@ -85,7 +91,7 @@ the doc/html directory using Doxygen.<br>
       <h4>Language</h4>
       <div style="text-align: justify;">Dar and libdar are written in
 C++, and so is the libdar API. While
-written in C++, libdar is easily usable with both C and C++ code.
+written in C++, libdar is easily usable by both C and C++ code.
 Access from other languages can be provided by specific bindings. I
 would only say that you are welcome to provide the necessary bindings
 yourself. :-) </div>
@@ -137,8 +143,7 @@ libdar::get_version(....);<br>
       <td style="vertical-align: top;">
       <h4>Exceptions or no Exceptions</h4>
       <div style="text-align: justify;">The library can be used with or
-without exceptions. For each example we will see a sample code for both
-methods. To the left is with exceptions, to the right without:<br>
+without <span style="font-style: italic;">exceptions.</span> For each example we will see a sample code for both ways. To the left is with exceptions, to the right without:<br>
       </div>
       </td>
     </tr>
@@ -289,7 +294,7 @@ activated at compilation time<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <h2>&nbsp;1 - First we *must* check the libdar version</h2>
+      <h2>&nbsp;1 - First we *must* initialize libdar by checking the libdar version</h2>
       </td>
     </tr>
   </tbody>
@@ -400,20 +405,60 @@ number must be greater or equal to the one used at compilation time to
 be sure that all the features you want are available in the libdar
 library you dynamically linked with. Changes between minor versions
 correspond to bug fixes and is not to imply any API change, thus no
-constraints are present there.<br>
+constraints are present there (except the presence of more bugs in lower numbers).<br>
           </div>
         </li>
-        <li style="text-align: justify;">the get_version() call, as
+        <li style="text-align: justify;">the
+get_version() call, as
 well as
 returning version information, does important initialization tasks for
 libdar. If not called first, the libdar library will not initialized
 properly and its behavior will be unpredictable. Note that you may call
-get_version() several time if you wish.</li>
+get_version() several time if you wish, the secon time only the version
+information are returned, the libdar library is not reset or the like.<br>
+</li>
+	<li style="text-align: justify;">Last, if strong encryption support is activated at compilation time, libdar will by default
+performs libgcrypt initialization when get_version() is called if libgcrypt is
+not already initialized. You can avoid having dar initializing libgcrypt by calling get_version()
+with an additional argument set to "false" :</li></ul>
+      <div style="text-align: left; margin-left: 120px;"><span style="font-family: Courier;">ger_version(maj, med, min, </span><span style="font-weight: bold; font-family: Courier;">false</span><span style="font-family: Courier;">)</span><br>
+      </div>
+
+      <ul style="text-align: justify;">
+        <li>Note
+that in multi-thread environment with strong encryption activated in
+libdar at compilation time, libgcrypt requires to be initialized from
+the application, thus you *must* avoid having libdar initializing
+libgcrypt by using the get_version() described just above and proceed
+from the application to the initialization of libgcrypt before calling
+get_version(). For more details see libgcrypt documentation.</li></ul>
+      <ul>
+
+      
       </ul>
+
       <br>
+      <div style="text-align: justify;">As we saw, libdar used some
+datastructures (mutex, secured memory, etc.) that need to be released
+properly before ending the program. This need may become mandatory if
+using strong encryption, to be able clear any secured memory used.
+Secured here means that a memory that has been locked in memory for it
+cannot be swapped out to disk during the livetime of the program.
+however, for completness, this memory has to be cleared (data replaced
+by zeroed bytes), to be sure that once the program will have ended no
+one will have the possibility to retrieve from another program for
+example, any sensitive data that were previously stored in secured
+memory. This can be done using the following call:<br>
+      <br>
+      <div style="margin-left: 120px;"><code style="font-weight: bold;">libdar::close_and_clean()</code><br>
+      </div>
+      </div>
+      <br>
+      <br>
+
       <h2>2 - Let's see the available features</h2>
-once we have called a function of the <span style="font-style: italic;">get_version*</span>
-function it is possible to access the features activated at compilation
+once we have called one of the <span style="font-style: italic;">get_version*</span>
+function it is possible to access the list of features activated at compilation
 time:<br>
       <br>
       </td>
@@ -431,33 +476,24 @@ void my_sample_function()<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // let's continue in the
 same function<br>
       <br>
-&nbsp;&nbsp;&nbsp; bool ea;<br>
-&nbsp;&nbsp;&nbsp; bool largefile;<br>
-&nbsp;&nbsp;&nbsp; bool nodump;<br>
-&nbsp;&nbsp;&nbsp; bool special_alloc;<br>
-&nbsp;&nbsp;&nbsp; libdar::U_I bits;<br>
-&nbsp;&nbsp;&nbsp; bool thread_safe;<br>
-&nbsp;&nbsp;&nbsp; bool libz;<br>
-&nbsp;&nbsp;&nbsp; bool libbz2;<br>
-&nbsp;&nbsp;&nbsp; bool libcrypto;<br>
+</code>
+      <div style="margin-left: 40px;"><code>bool ea = libdar::compile_time::ea();<br>
+bool largefile = libdar::compile_time::largefile();<br>
+bool nodump = libdar::compile_time::nodump();<br>
+bool special_alloc = libdar::compile_time::special_alloc();<br>
+U_I bits = libdar::compile_time::bits();<br>
+// bits is equal to zero for infinint,<br>
+// else it is equal to 32 or 64 depending on<br>
+// the compilation mode used.<br>
       <br>
-&nbsp;&nbsp;&nbsp; libdar::<span style="font-weight: bold;">get_compile_time_features</span>(ea,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-largefile,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-nodump,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-special_alloc,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-bits,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-thread_safe,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libz,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libbz2,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libcrypto);<br>
+bool thread = libdar::compile_time::thread_safe();<br>
+bool libz = libdar::compile_time::libz();<br>
+bool libbz2 = libdar::compile_time::libbz2();<br>
+bool liblzo = libdar::compile_time::liblzo();<br>
+bool libcrypto = libdar::compile_time::libgcrypt();<br>
+bool furtive_read = libdar::compile_time::furtive_read</code>();<br>
+      </div>
+      <code>
       </code><br>
 }<br>
       <br>
@@ -562,12 +598,14 @@ hide the characters typed by the user.<br>
       <br style="font-style: italic; font-weight: bold;">
       <span style="font-style: italic; font-weight: bold;">&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">user_interaction</span><span style="font-style: italic; font-weight: bold;"> *&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">clone</span><span style="font-style: italic; font-weight: bold;">
 () const;</span><br>
+      <div style="margin-left: 40px;">
 A deep copy
 operation must be implemented here. This is because libdar stores the
 reference to the <span style="font-style: italic;">user_interaction</span>
 class as a pointer but may want to keep a complete internal copy at
 some point. A simple implementation of this method should be something
-like this (even if you don't want to use exceptions): </td>
+like this (even if you don't want to use exceptions): </div>
+</td>
     </tr>
   </tbody>
 </table>
@@ -676,8 +714,7 @@ different window objects<br>
 libdar::user_interaction_callback dialog = <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 libdar::user_interaction_callback(&amp;warning_callback,
-&amp;answer_callback, &amp;string_callback,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&amp;answer_callback, &amp;string_callback,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 (void *)get_current_windows_id());<br>
       <br>
 &nbsp; // just the "context" argument changes, and will be passed as is
@@ -881,7 +918,7 @@ possible to have masks reference each other!</code><br>
     <tr>
       <td style="vertical-align: top;">Now that you've seen the power
 of these masks, you should know that in
-libdar there are two masks that are required: <br>
+libdar there are three masks that are required: <br>
       <ul style="text-align: justify;">
         <li>The first mask is used against
 the
@@ -890,7 +927,7 @@ names themselves (not the file path). This mask may be any combination
 of the masks seen previously; it will only be applied to socket, named
 pipes, symbolic links, char or block devices, plain files, but again
 not to directories. This way you can filter by file type for save,
-restore, list, compare, and compress, and other library operations.</li>
+restore, list, compare, compress, and other library operations.</li>
         <li>The second mask is applied to
 any
 file including directories, including the path part of the filename. So
@@ -915,7 +952,7 @@ argument is expended to an absolute path, so if in the previous
 example, your current directory was <span style="font-style: italic;">/var</span>
 your masks will be used against strings like "<span style="font-style: italic;">/var/tmp/A/some/file</span>". Of course
 there is no difference between these two libdar revisions when the <span style="font-style: italic;">fs_root</span> argument is an absolute
-path.<br>
+path <span style="font-style: italic;">[this change was necessary to support masks based on a list of files]</span><br>
       <br>
 An exception is the test operation, which has no <span style="font-style: italic;">fs_root</span> argument (because the
 operation is not relative to an existing filesystem), however the <span style="font-style: italic;">subtree</span> argument exist to receive a
@@ -923,11 +960,32 @@ mask for comparing the path of file to include or exclude from the test
 operation. In this case the situation is as if the <span style="font-style: italic;">fs_root</span> was set to the value "<span style="font-style: italic;">&lt;ROOT&gt;</span>". For example, masks
 will be compared to <span style="font-style: italic;">&lt;ROOT&gt;/some/file</span>
 when performing an archive test operation.<br>
+</div>
+      <div style="margin-left: 80px; text-align: justify;">
       </div>
-      <br>
-      <code></code>
+
+
+      <ul>
+        <li>The third mask --- which is not always needed --- concerns
+Extended Attributes (EA). It is applied to the full EA name in the form
+&lt;domain&gt;.&lt;name&gt; where &lt;domain&gt; is any string value
+like but not limited to the usual "user" or "system" domains.<br>
+        </li>
+      </ul>
+
+
+      <h2><br>
+</h2>
       <h2>5 - Let's create a simple archive</h2>
+
 Now that we have seen masks and exceptions let's start the real thing:<br>
+      <br>
+All the operations on archives are handled by the archive class which
+is defined in libdar/archive.hpp. Each operation requires some
+mandatory parameters and some optional parameters. Optional parameters
+are gathered in a archive_option auxilliary class, which default
+constructor set them to default values. We will see a bit further how
+to set these options, but for now let's keep the things simple:<br>
       </td>
     </tr>
   </tbody>
@@ -960,113 +1018,9 @@ libdar::archive *my_arch = <br>
       <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/home",&nbsp; // saving all under this "root"<br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
-&nbsp;&nbsp;&nbsp; &nbsp;NULL,&nbsp;&nbsp;&nbsp;&nbsp; // we do a full
-backup for now <br>
-&nbsp;&nbsp;&nbsp;&nbsp; libdar::not_mask(simple_mask("*~", true)), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-we don't save the files ending with<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // '~' this does not concern
-directories<br>
-&nbsp;&nbsp;&nbsp;&nbsp; libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-all directories and files not rejected <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-by the previous mask are saved<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"my_archive",&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-the basename of the slices <br>
-&nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
-occurrence<br>
-&nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
-&nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp; // nor do we want
-to pause between
-slices<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // rejected directories will be
-saved as<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // empty (no directory is
-rejected so<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // here there is no
-importance for that<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // parameter)<br>
-&nbsp;&nbsp;&nbsp; &nbsp;libdar::gzip // the archive will be compressed<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // using gzip <br>
-&nbsp;&nbsp;&nbsp; &nbsp;9,&nbsp;&nbsp;&nbsp;&nbsp; // at maximum
-compression level <br>
-&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp;&nbsp; // no slicing is
-done,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;0, &nbsp;&nbsp;&nbsp; // so the first slice
-size must also be <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-set to zero <br>
-&nbsp;&nbsp;&nbsp;&nbsp; libdar::bool_mask(true),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-save all EA<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // no script will be
-executed between<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // slices (as there is no
-slicing) <br>
-&nbsp;&nbsp;&nbsp; &nbsp;libdar::crypto_blowfish, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-the blowfish strong encryption <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-will be used<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // as the password is
-not given here&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-(empty string is not a valid password) <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-it will be queried interactively<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // through the dialog<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user_interaction object<br>
-&nbsp;&nbsp;&nbsp; &nbsp;20480, // the block of encryption will be<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // 20 kbytes<br>
-&nbsp;&nbsp;&nbsp;&nbsp; libdar::not_mask(libdar::simple_mask("*gz")), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-all files will be compressed except<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // those ending with "gz"<br>
-&nbsp;&nbsp;&nbsp; &nbsp;800,&nbsp;&nbsp; // files whose sized is below
-800 bytes<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // will not be compressed<br>
-&nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved regardless of<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
-&nbsp;&nbsp;&nbsp;&nbsp; libdar::inode::cf_all,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // useless here as we don't make a
-differential<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // backup.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-this field is used to define which fields have<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-to be considered to determine if a file has<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-changed since the arhive of reference<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp; // hourshift is
-useless here as we're making<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // a
-full backup<br>
-&nbsp;&nbsp;&nbsp;&nbsp; false, // we will make a real archive not a<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // dry-run operation<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // dar will set back the access
-time of<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
-change the<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of these files
-      <br>
-&nbsp;&nbsp;&nbsp; &nbsp;false, // we may cross to other filesystems if<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
-&nbsp;&nbsp;&nbsp;&nbsp; false, // we are not doing a snapshot of the
-filesystem<br>
-&nbsp;&nbsp;&nbsp;&nbsp; true,&nbsp; // we don't save directories
-marked as caching<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-directory by some applications.<br>
-&nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want to see the skipped
-files<br>
-&nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp; // we save all
-files not only those more recent<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-than a given date<br>
+&nbsp;&nbsp;&nbsp;&nbsp; "my_archive", // the basename of the slices<br>
+&nbsp;&nbsp;&nbsp;&nbsp; "dar",&nbsp; // the extension used for slices<br>
+&nbsp;&nbsp;&nbsp;&nbsp; archive_options_create(), // default options<br>
 &nbsp;&nbsp;&nbsp;&nbsp; &amp;ret); // this value is
 returned by libdar<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
@@ -1074,6 +1028,7 @@ if you don't want to have statistics of the<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
 operation you can set this parameter to NULL<br>
       </code> </p>
+
       </td>
       <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>&nbsp;&nbsp;
 // creating an archive is simple; it is just<br>
@@ -1102,119 +1057,11 @@ std::string except_msg;</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">libdar::create_archive_noexcept</span>(dialog,</span></code><span class="el"><code>&nbsp; <br>
 &nbsp;&nbsp;&nbsp;&nbsp; "/home",&nbsp; // saving all under this "root"<br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
-&nbsp;&nbsp;&nbsp; &nbsp;NULL,&nbsp;&nbsp;&nbsp;&nbsp; // we do a full
-backup for now <br>
-&nbsp;&nbsp;&nbsp;&nbsp; libdar::not_mask(simple_mask("*~", true)), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-we don't save the files ending with<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // '~' this does not concern
-directories<br>
-&nbsp;&nbsp;&nbsp;&nbsp; libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-all directories and files not rejected <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-by the previous mask are saved<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"my_archive",&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; "my_archive",&nbsp; <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
 the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
-occurrence<br>
-&nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
-&nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp; // nor do we want
-to pause between
-slices<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // rejected directories will be
-saved as<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // empty (no directory is
-rejected so<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // here there is no
-importance for that<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // parameter)<br>
-&nbsp;&nbsp;&nbsp; &nbsp;libdar::gzip // the archive will be compressed<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // using gzip <br>
-&nbsp;&nbsp;&nbsp; &nbsp;9,&nbsp;&nbsp;&nbsp;&nbsp; // at maximum
-compression level <br>
-&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp;&nbsp; // no slicing is
-done,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;0, &nbsp;&nbsp;&nbsp; // so the first slice
-size must also be <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-set to zero <br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-save all EA</code><br>
-      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;
-&nbsp;"",&nbsp;&nbsp;&nbsp; // no script will be
-executed between<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // slices (as there is no
-slicing) <br>
-&nbsp;&nbsp;&nbsp; &nbsp;libdar::crypto_blowfish, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-the blowfish strong encryption <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-will be used<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // as the password is
-not given here&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-(empty string is not a valid password) <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-it will be queried interactively <br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // through the dialog<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user_interaction object<br>
-&nbsp;&nbsp;&nbsp; &nbsp;20480, // the block of encryption will be<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // 20 kbytes<br>
-&nbsp;&nbsp;&nbsp;&nbsp; libdar::not_mask(libdar::simple_mask("*gz")), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-all files will be compressed except<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // those ending with "gz"<br>
-&nbsp;&nbsp;&nbsp; &nbsp;800,&nbsp;&nbsp; // files whose size is below
-800 bytes<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // will not be compressed<br>
-&nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved regardless of<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::inode::cf_all,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // useless here as we don't make a differential<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // backup.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-this field is used to define which fields have<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-to be considered to determine if a file has<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-changed since the arhive of reference</code></span><span class="el"><code><br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp; // hourshift is
-useless here as we're making<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // a
-full backup<br>
-&nbsp;&nbsp;&nbsp; &nbsp;false, // we will make a real archive not a<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // dry-run operation<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // dar will set back the access
-time of<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
-change the<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of these files
-      <br>
-&nbsp;&nbsp;&nbsp; &nbsp;false, // we may cross to other filesystems if<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-false, // we are not doing a snapshot of the filesystem<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-true,&nbsp; // we don't save directories marked as caching<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-directory by some applications.</code><br>
-      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; false, // w</code></span><span class="el"><code>e
-are not considering the cache directory<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-tagging standard.<br>
-&nbsp;&nbsp;&nbsp;&nbsp; false, // we dontt want to see skipped files<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-0,&nbsp;&nbsp;&nbsp;&nbsp; // we save all files not only those more
-recent<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-than a given date</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp; archive_options_create(), // default options</code></span><span class="el"><code></code><br>
       </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
 &amp;ret,&nbsp; // this value is returned by
 libdar<br>
@@ -1287,13 +1134,140 @@ std::endl;<br>
   </tbody>
 </table>
 <br>
+<table style="text-align: left; width: 90%;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Optional Arguments:</h3>
+      <br>
+      <div style="text-align: justify;">Back on the optional arguments.
+The archive constructor used above to
+create an archive uses an argument of type "archive_option_create". In
+the above example, we called the constructor of this class directly
+withing the argument list of the constructor. Thsi has for effect to
+built
+a anonymous temporary object of this class. Such a "just borned" object
+has
+all the necessary options set to the default values inside it (like
+default masks for example) to
+correspond to the default options. If you want to use non default
+options like compression, slicing, encryption , file filtering and so
+on, you must
+change the options to your need thanks to the appropriate method
+provided by the archive_options_create class. Assuming we want to make
+a
+compressed an sliced archive we would use the following code:<br>
+
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+<tbody><tr><td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;">
+
+      <p><code>&nbsp; <br>
+&nbsp;// we define an options object to be able to use <br>
+&nbsp;&nbsp; // non default options:<br>
+libdar::archive_options_create options;<br>
+      </code></p>
+      <p><code>&nbsp; // so now we can modify only the option we wish to<br>
+options.set_slicing(1024); // 1024 bytes, well that's small<br>
+options.set_compression(bzip2); // default is no compression<br>
+options.set_compression_level(6); // default is 9<br>
+      </code></p>
+
+<p><code>
+libdar::statistics ret;<br>
+&nbsp; // we will see this structure a bit further<br>
+      <br>
+libdar::archive *my_arch = <br>
+&nbsp; &nbsp;&nbsp; new <span style="font-weight: bold;">libdar::archive</span>(dialog,
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;"/home",&nbsp; // saving all under this "root"<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
+&nbsp;&nbsp;&nbsp;&nbsp; "my_archive", // the basename of the slices<br>
+&nbsp;&nbsp;&nbsp;&nbsp; "dar",&nbsp; // the extension used for slices<br>
+&nbsp;&nbsp;&nbsp;&nbsp; options, // the object we modified above<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &amp;ret); // this value is
+returned by libdar<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+if you don't want to have statistics of the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+operation you can set this parameter to NULL<br>
+      </code> </p>
+
+      </td><td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code></code>
+      <p><code>&nbsp;&nbsp; // we define an options object to be able to use <br>
+&nbsp;&nbsp; // non default options:<br>
+libdar::archive_options_create options;<br>
+</code></p>
+
+
+      <p><code>&nbsp; // so now we can modify only the option we wish to<br>
+options.set_slicing(1024); </code><code>// 1024 bytes, well that's small</code><br>
+      <code>
+options.set_compression(bzip2);&nbsp; // default is no compression<br>
+options.set_compression_level(6); // default is 9<br>
+      </code></p>
+      <code>libdar::statistics ret;<br>
+&nbsp; </code><code>// we will see this structure a bit further<br>
+      <br>
+      </code><code>U_16 exception, <br>
+std::string except_msg;</code><br>
+      <br>
+      <code><span class="el">libdar::archive *my_arch
+=&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">libdar::create_archive_noexcept</span>(dialog,</span></code><span class="el"><code>&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; "/home",&nbsp; // saving all under this "root"<br>
+&nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
+&nbsp;&nbsp;&nbsp;&nbsp; "my_archive", //
+the basename of the slices <br>
+&nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
+&nbsp;&nbsp;&nbsp;&nbsp; options, // the object we modified above</code></span><span class="el"><code></code><br>
+      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
+&amp;ret,&nbsp; // this value is returned by
+libdar<br>
+      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// if you don't want to have statistics of the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+operation you can set this parameter to NULL</code><br>
+      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; exception,
+// this gives the status of the call<br>
+&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of error the cause.<br>
+      <br>
+if(exception != LIBDAR_NOEXCEPT)<br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;&lt; std::endl;<br>
+      <br>
+      </code></span> </td></tr></tbody>
+</table>
+<br>
+<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <h2><br>
-      </h2>
+
+      <span style="font-weight: bold;"></span>
+      <p style="text-align: justify;">In
+the same way, each other
+operation (diff, testing, extraction, merging, ...) has a specific
+class that gathers the options parameters. These classes are defined
+in the file libdar/archive_options.hpp you are welcome to refer to for
+a complete up to date list of available options. The advantage of this
+class is to not break ascendant compatibility of the API when new
+features get added, while it also improve readability of your code.
+This way, the major current number '5' of the API should stay for a
+longer time than previous numbers, as for thoses each new feature
+implementation broke the ascendant compatibility by adding an new
+argument to an API call.<br>
+      </p>
+      <span style="font-weight: bold;"></span>
       <h2>6 - Testing the archive we have created</h2>
+
       <br>
 So, as explained previously, we must create a new archive object but
 this time with the "read" constructor: </td>
@@ -1313,18 +1287,7 @@ archive <br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "my_archive", // slice name<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "dar",&nbsp;&nbsp; // dar's
 archive extensions<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; libdar::crypto_blowfish, <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 20480, // these three previous
-are
-for encryptions<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // not used
-as we didn't gave "-" as<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // slice
-name<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // no
-command executed for now<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; false); // no verbose output<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; archive_options_read()); // default options<br>
       </code> </td>
       <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
 my_arch = </code><code>libdar::open_archive_noexcept(</code><code>dialog,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1334,18 +1297,7 @@ archive <br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "my_archive", // slice name<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "dar",&nbsp;&nbsp; // dar's
 archive extensions<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; libdar::crypto_blowfish, <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 20480, // these three previous
-are
-for encryptions<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // not used
-as we didn't gave "-" as<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // slice
-name<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // no
-command executed for now<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; false, // no verbose output<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; archive_options_read(), // default options<br>
       </code><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 exception,// this gives the status of the call<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of
@@ -1379,39 +1331,36 @@ Let's thus start by testing the archive coherence: </td>
   <tbody>
     <tr>
       <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+&nbsp;&nbsp; // for the exercice, we will change the default options:<br>
+archive_options_test options;<br>
+      <br>
+options.clear(); // this set back all options to default<br>
+&nbsp;// here this is not required as the object has just bee<br>
+&nbsp;// created, however it is used here for illustration that<br>
+&nbsp;// you can recycle an archive_option_* object.<br>
+options.set_info_details(true); // to have a verbose output<br>
+<br>
 ret = my_arch-&gt;<span class="el">op_test</span>(<span class="el"></span>dialog,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// all files are tested<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-//no directory is prune<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false,&nbsp; // no verbose output<br>
-      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false,&nbsp; /</code><code>/ we don't want to see the skipped files<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; options; // the non default options set above</code><code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 NULL);&nbsp; // we don't want a progressive report</code><code></code><br>
       <br>
       </td>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
-      <br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+&nbsp;&nbsp; // for the exercice, we will change the default options:<br>
+archive_options_test options;<br>
+<br>
+options.clear(); // this set back all options to default<br>
+&nbsp;// here this is not required as the object has just bee<br>
+&nbsp;// created, however it is used here for illustration that<br>
+&nbsp;// you can recycle an archive_option_* object.<br>
+options.set_info_details(true); // to have a verbose output</code><br>
+      <code><br>
       <span class="el">ret = libdar::op_test_noexcept(</span></code><span class="el"><code><span class="el"></span>dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 my_arch,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the archive
 to test<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// all files are tested<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-//no directory is prune<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false, &nbsp;&nbsp; // no verbose
-output<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false, // we don't want to see the skipped files<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>options, // the non default options set above<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NULL,&nbsp; // we don't want a
 progressive report<br>
       </code> </span> <span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1478,9 +1427,9 @@ libdar::&lt;&lt; ret.treated &lt;&lt; std::endl;<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <div style="text-align: justify;">Note that the use of the class
+      <div style="text-align: justify;">Note that the use of the <span style="font-style: italic;">class
 deci
-may throw exceptions (in case of lack of memory, for example), and
+      </span>may throw exceptions (in case of lack of memory, for example), and
 there is actually no wrapper available to trap the exceptions that may
 be thrown by the class<span style="font-style: italic;"> deci</span>.
 So you have to protect the code using a<span style="font-style: italic;">
@@ -1490,9 +1439,9 @@ statement.<br>
 You may have noticed that we used NULL as argument for
 "progressive_report". This argument must either receive NULL as
 argument or the address of a real allocated statistics object. This
-object will be updated by the libdar call and if thread support is
-enabled will let a concurrent thread reading its value to display the
-current number of file treated for example. Note that there is a little
+object will be updated by the libdar call and if multi-threaded support is
+enabled it will let a concurrent thread able to reading its value to display the
+current number of file treated, for example. Note that there is a little
 overhead passing a variable to progressive_report, due to the mutex
 that need be used to avoid one reading data while it is updated by
 another thread. Follows a example of use of this <span style="font-style: italic;">progressive report</span> feature:<br>
@@ -1525,7 +1474,7 @@ some_call_to_be_defined_to_call_op_test_in_another_tread(...,
       <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // doing a endless loop
 (assuming the current thread will be signaled or interrupted once the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // previously libdar call
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // previously libdar call running in another thread
 will end)<br>
       <br>
 &nbsp;&nbsp;&nbsp;&nbsp; while(true)<br>
@@ -1560,29 +1509,13 @@ The simple way:<br>
     <tr>
       <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 my_arch-&gt;<span class="el">op_listing</span>(<span class="el"></span>dialog,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false, // not a verbose output<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-normal, // using the tar-like format<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// all filenames are listed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false);// do not filter unsaved files&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; archive_option_listing()); // default options<br>
       </code><br>
       </td>
       <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
       <br>
 li<span class="el">bdar::op_test_listing(</span></code><span class="el"><code><span class="el"></span>dialog,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>false,
-// not a verbose output<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; normal, // using the tar-like format<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// all filenames are listed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false,// do not filter unsaved
-files</code></span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; archive_options_listing(), // default options</code></span><span class="el"><code></code></span><br>
       <span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 exception,// this gives the status of the call<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of
@@ -1642,9 +1575,11 @@ type is
 not explicitly given as a parameter in the listing method. File type is
 available as the first byte of the permissions string. This is standard
 POSIX stuff except for an extension: </em>"h"<em> for files hard
-linked several times. See </em><strong>man 2 stat</strong> <em> for
-more information. Note however that in the last arguments of this call,
-you may easily know whether a file is a directory or not and whether it
+linked several times (it has been removed after release 2.3.0 / API 4.0.0). See </em><strong>man 2 stat</strong> <em>
+for
+more information about POSIX permissions. Note however that the last
+arguments of this call, let you easily know whether a file is a
+directory or not and whether it
 is empty or not.</em></div>
       <div style="text-align: justify;">In the <span style="font-style: italic;">user_interaction</span> class
 (a virtual class), the <span style="font-style: italic;">listing()</span>
@@ -1830,46 +1765,56 @@ for listing the archive contents.<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      <div style="text-align: justify;">Last point about listing, you
-have noticed the second argument is <span style="font-style: italic;">normal</span>,
-which produces (if the <span style="font-style: italic;">listing()</span>
+      <div style="text-align: justify;">
+      </div>
+      <div style="text-align: justify;">Last point about listing, if
+you examin the definition of the archive_option_listing class in file
+libdar/archive_options.hpp, you will notice the the&nbsp;
+set_list_mode() method. It may receive either <span style="font-weight: bold; font-style: italic;">normal,</span> <span style="font-style: italic; font-weight: bold;">tree</span> or <span style="font-style: italic; font-weight: bold;">xml</span> <span style="font-style: italic;">(normal</span> being the default).<br>
+      </div>
+      <ul style="text-align: justify;">
+        <li><span style="font-style: italic;">normal</span>, produces (if the <span style="font-style: italic;">listing()</span>
 method of the given
 user_interaction object is not overwritten) a listing like tar would
-do. In place of <span style="font-weight: bold; font-style: italic;">normal</span>
-you can use <span style="font-style: italic; font-weight: bold;">tree</span>
-or <span style="font-weight: bold; font-style: italic;">xml</span>.
-Note that for these two new formats the <span style="font-style: italic;">listing()</span> is never used, so even if
+do. <br>
+        </li>
+        <li><span style="font-style: italic;"></span><span style="font-style: italic;">tree </span>produces a tree like directory listing (this was the original listing format in dar version 1.0.0)<span style="font-style: italic; font-weight: bold;"><br>
+          </span></li>
+        <li><span style="font-style: italic;">xml</span>, produces a XML output as described in doc/dar-catalog-1.0.dtd</li>
+      </ul>
+      <div style="text-align: justify;">Note that for these two last formats (tree and xml) the <span style="font-style: italic;">listing()</span> is never used, so even if
 you provide a object which listing() method is overwritten, the <span style="font-style: italic;">archive::op_listing()</span> method will
 still use the <span style="font-style: italic;">warning()</span>
 method of this <span style="font-style: italic;">user_interaction</span>
-object to report the archive contents.<br>
-      </div>
+object to report the archive contents.
+
       <br>
-      <h2>7 bis - Dynamic archive contents listing</h2>
+
+      </div>
+<h2>7 bis - Dynamic archive contents listing</h2>
       <div style="text-align: justify;">Well, in the previous chapter,
 we saw
 how to list the archive contents. You can imagine that when you have a
-huge archive this call may take a long time to complete and produce a
+huge archive this op_listing() call may take a long time to complete and produces a
 long output. If your application uses some graphical components and you
 want to have a more interesting way for listing the archive contents,
 you would maybe like to have just the first level of the directory tree
-and let the user open the subdirectories before listing their contents,
+and let the user open the subdirectories and list their contents when needed,
 having a sort of iterative archive listing. This would avoid having to
 wait for the long listing to complete as well as it would avoid having
 to allocate memory for all this graphical components representing each
 directories and files, entries that will most of the time would not be
-read by the user. This is of course possible (Else I would not write
-about it ;-) ).<br>
+read by the user.<br>
       </div>
       <br>
 First step, we need to use the listing() method of the
 user_interaction() as seen above. <br>
 Second step, we have to call the get_children_of() method of a given
-archive class.<br>
+archive class, instead of the op_listing() method.<br>
       <div style="text-align: justify;">In the following example, we
 will use
 the <span style="font-style: italic;">user_interaction_callback</span>
-class, but you can use your own inherited class from <span style="font-style: italic;">user_interaction</span>, and its <span style="font-style: italic;">listing()</span> class. <br>
+class, but you can use your own inherited class from <span style="font-style: italic;">user_interaction</span>, and its <span style="font-style: italic;">listing()</span> class.<br>
       </div>
       </td>
     </tr>
@@ -1940,7 +1885,8 @@ libdar::user_interaction_callback(&amp;warning_callback,
       <br>
 &nbsp;
 // Let's open an archive:<br>
-archive some_archive = archive(....); // we are reading a new archive,
+archive some_archive = archive(dialog, "/some/dir", "basename", "dar", archive_option_read()); <br>
+&nbsp; // we are reading a new archive,
 but we could have created one instead...<br>
       <br>
       </code><code>&nbsp; // now, instead of calling op_listing()
@@ -1950,11 +1896,11 @@ rather call:<br>
 "");</span><br>
 &nbsp; // the second argument is the directory of which we want to know
 the subdirectories and subfiles. Here "" means the <br>
-&nbsp; // root of the archive<br>
+&nbsp; // root of the archive (we cannot use absolute path here).<br>
 &nbsp; // get_chidren_of() method will call listing()'s dialog method
 (here our listing_callback() function through the<br>
 &nbsp; // user_interaction_callback implementation) for each entry of
-the "root" directory.<br>
+the root directory.<br>
       <br>
 &nbsp; // let suppose that thanks to listing_callback() during the
 previous call to get_chidren_of() we know that the entry <br>
@@ -2004,29 +1950,7 @@ of the <span style="font-style: italic;">class archive</span>. </td>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // contents to<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::bool_mask(true),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::bool_mask(true),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false,&nbsp;&nbsp; // no verbose output<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </code><code>libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// comparing all available EA<br>
-      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::inode::cf_all,&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// consider any fields for electing<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// differences<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false, &nbsp; // do not set back atime<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// of read files<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </code><code>false, &nbsp; // we don't want to see the skipped<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-&nbsp; &nbsp; &nbsp; // files<br>
+archive_options_diff(), // default options</code><code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 NULL);&nbsp;&nbsp; // we don't use progessive report<br>
       </code> <code> <br>
@@ -2048,29 +1972,7 @@ my_arch, // the archive to use<br>
 &nbsp; &nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // contents to<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::bool_mask(true),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::bool_mask(true),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false,&nbsp;&nbsp; // no verbose output<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code>&nbsp;&nbsp;&nbsp;&nbsp;
-      </code><code>libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// comparing all available EA</code><br>
-      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::inode::cf_all,&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// comparing any fields for electing<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// differences<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false, &nbsp; // do not set back atime<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// of read<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; false,
-&nbsp; // </code><code>we don't want to see the skipped<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-&nbsp; &nbsp; &nbsp; // files<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code>archive_options_diff(), // default options<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 NULL,&nbsp;&nbsp;&nbsp; // we don't use progressive report<br>
       </code> <code>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
@@ -2103,10 +2005,10 @@ std::endl;<br>
     <tr>
       <td style="vertical-align: top;">Simple, no?<br>
       <br>
-Just a note about the <span style="font-style: italic;">what_to_check </span>argument.
+Just a note about the <span style="font-style: italic;">set_what_to_check() </span>method<span style="font-style: italic;"> </span>argument of the archive_options_diff class.
 It may take several values:<br>
       <ul>
-        <li>cf_inode_type : a file is considered as changed if its
+        <li>cf_inode_type (default value): a file is considered as changed if its
 inode type
 has changed (directory/plain file/symbolic link/ ...)</li>
         <li>cf_mtime : permission change is ignored, as well as
@@ -2115,7 +2017,8 @@ change</li>
         <li>cf_ignore_owner : ownership change is ignored</li>
         <li>cf_all : all fields denoting a content's file change
 triggers a
-file changed status</li>
+file changed status (ownership, permission, dates, inode type).<br>
+</li>
       </ul>
       <br style="font-style: italic;">
       <h2>9 - restoring files</h2>
@@ -2132,71 +2035,7 @@ method of <em>class archive</em>. </td>
 ret = my_arch-&gt;<span class="el">op_extract</span>(<span class="el"></span>dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "/tmp",&nbsp;&nbsp; // where to restore files to<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp; &nbsp;&nbsp; // restore any filename<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
-libdar::simple_path_mask("denis/.tcshrc",<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-true),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// but only restore<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// this file or directory<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false,// overwriting not allowed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-true, // warn before overwriting<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; //
-useless here, not overwritting<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; true, //
-verbose output<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; true, //
-remove files marked as deleted<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// useless here too, as verwriting<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; //
-has been disabled<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false,// restore even if a file is more<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// recent, (useless here too)<br>
-      </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </code><code>libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// restoring any available EA</code><br>
-      <code>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp; false,//
-restore directory structure &nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::inode::cf_all,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// consider any valuable field to define<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// if a file is more recent on filesystem.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// defines also that we will restore<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; //
-permission, mtime and ownership<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; false,//
-don't warn if a file to be <br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; //
-removed has a type that does<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; //
-the type of the orginal file &nbsp; <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
-0,&nbsp;&nbsp;&nbsp; // no daylight saving consideration<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; false,//
-not a dry-run execution<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false,// don't erase EA present in filesystem <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// before restoration of elected<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// files<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </code><code>false,// we don't want to see the skipped files<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; archive_options_extract(), // default options</code><code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 NULL);// no progressive report used<br>
       </code> </td>
@@ -2208,63 +2047,7 @@ my_arch,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the archive
 to test<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>"/tmp",&nbsp;&nbsp;
 // where to restore files to<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// restore any filename<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::simple_path_mask("denis/.tcshrc",<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; true),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// but only restore<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// this file or directory<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false,// overwriting not allowed<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; true, // warn before overwriting<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; // useless here, not
-overwritting<br>
-&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; true, // verbose output<br>
-&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; true, // remove files marked as deleted<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// useless here too, as verwriting<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; // has been disabled<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; false,// restore even if a file is
-more<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// recent, (useless here too)<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </code><code>libdar::bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// restoring any available EA</code><br>
-      </span><span class="el"><code>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
-false,// restore directory structure
-&nbsp;&nbsp; <br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::inode::cf_all,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // consider any valuable field to define<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // if a file is more recent on filesystem<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // defines also that we will restore<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; // permission, mtime
-and ownership</code><br>
-      </span><span class="el"><code>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
-false,// don't warn if a file to be <br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; // removed has a type
-that does<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; // the type of the
-orginal file &nbsp; <br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp;&nbsp; // no daylight
-saving consideration<br>
-&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; false,// not a dry-run execution<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false,// don't erase EA present in filesystem <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// before restoration of elected<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// files<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false,// we don't want to see the skipped files<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>
-NULL, // no progressive report used</code><br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; </code></span><code> archive_options_extract(), // default options</code><span class="el"><code></code><br>
       </span><span class="el"><code></code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 exception,// this gives the status of the call<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of
@@ -2283,22 +2066,87 @@ std::endl;<br>
   </tbody>
 </table>
 <br>
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="text-align: justify; vertical-align: top;">Here as we used default options, we restore all the files stored in the
+archive in the directory /tmp (we also restore there the directory
+structure stored in the archive), but we could also make a flat
+restoration (ignore directory structure), as well as restore only some
+of the files. By default too, dar asks user confirmation before
+overwriting a file. You can change these options and many others using
+the methods the class archive_options_extract. We will here restore all
+that is under usr/lib and only files which filename ends with ".a", we
+want libdar to skip file that would lead to overwriting an existing
+file and also have libdar display files that have been skipped from the
+restoration.</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+
+
+
+
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+<tbody><tr><td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>archive_options_extract options;<br>
+      <br>
+options.set_selection(simple_mask("*.a", true));<br>
+options.set_subtree(simple_path_mask("usr/lib", true));<br>
+options.set_allow_over(false);<br>
+options.set_display_skipped(true);<br>
+<br>
+ret = my_arch-&gt;<span class="el">op_extract</span>(<span class="el"></span>dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/tmp",&nbsp;&nbsp; // where to restore files to<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; options, // non default options set just above</code><code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+NULL);// no progressive report used<br>
+      </code> </td>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>archive_options_extract options;<br>
+<br>
+options.set_selection(simple_mask("*.a", true));<br>
+options.set_subtree(simple_path_mask("usr/lib", true));<br>
+options.set_allow_over(false);<br>
+options.set_display_skipped(true);<br>
+      <br>
+      </code><code>
+      <span class="el">ret = libdar::op_extract_noexcept(</span></code><span class="el"><code><span class="el"></span>dialog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+my_arch,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the archive
+to test<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>"/tmp",&nbsp;&nbsp;
+// where to restore files to<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; </code></span><code>options, // non default options set just above<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NULL,</code><code>&nbsp;&nbsp;&nbsp; // no progressive report used</code><span class="el"><br>
+      </span><span class="el"><code></code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+exception,// this gives the status of the call<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of
+error the <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// cause of the error<br>
+      </code></span></td></tr></tbody>
+</table>
+<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top;">Here the <span style="font-style: italic;">what_to_check</span>
-argument serves two roles: <br>
+      <td style="vertical-align: top;">last point about optional parameter concerns the <span style="font-style: italic;">set</span>_<span style="font-style: italic;">what_to_check</span> method. It serves two roles here: <br>
       <ol style="text-align: justify;">
-        <li>Which field are to be ignored when looking if a file is
+        <li>Which field are to be ignored when looking whether a file is
 more
-recent that one of the filesystem (if this feature is enabled)<br>
+recent than the one in the filesystem (if this feature is enabled)<br>
         </li>
-        <li>Which field to avoid restoring (in when not having root
+        <li>Which field to avoid restoring (for example, when not having root
 privileges, avoid restoring ownership may be interesting instead of
 having a plethora of failure to restore ownership messages).<br>
         </li>
       </ol>
-      <h2>10 - isolating the catalogue</h2>
+      <h2><br>
+</h2>
+      <h2>10 - Isolating the Catalogue</h2>
+
       <div style="text-align: justify;">OK, I know, <span style="font-style: italic;">catalogue </span>is not an English word
 (one would rather write <span style="font-style: italic;">catalog</span>),
 but that's the name of the C++ class used in libdar, so we will keep
@@ -2314,7 +2162,7 @@ It is very similar to the same archive one gets if one makes a
 differential backup of a filesystem that has not changed since the
 creation of a reference archive. The usage is very similar to the
 archive creation, but it uses a different constructor that has less
-arguments :<br>
+arguments:<br>
       </div>
       </td>
     </tr>
@@ -2324,7 +2172,11 @@ arguments :<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>archive_options_isolate options;<br>
+      <br>
+&nbsp; // we just want to have a compressed isolated catalogue<br>
+options.set_compression(gzip);<br>
+<br>
 libdar::archive *my_cat = new libdar::archive(dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "/tmp",&nbsp; // where the extracted <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2340,57 +2192,22 @@ my_arch, // the archive of reference<br>
 "my_catalogue", // slice name<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "dar",&nbsp;&nbsp; // file extension<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-true,&nbsp;&nbsp;&nbsp; // allow slice overwriting<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-true,&nbsp;&nbsp;&nbsp; // but warn before<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-true,&nbsp;&nbsp;&nbsp; // verbose output<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2,
-&nbsp; &nbsp; &nbsp; // pause each 2 slices<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::bzip2, // compression<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-9,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // max compression level<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-3000, // cut in slices of 3000 Bytes<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-3000, // first slice size is the same<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-"echo slice %p/%b.%n.%e created",<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// the script to run after<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// slice creation<br>
+options) // non default options set above<br>
 &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::crypto_none, // no encryption<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-"",&nbsp;&nbsp;&nbsp; // unused password<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-0,&nbsp;&nbsp;&nbsp;&nbsp; // unused crypto size<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false); // not a dry-run execution<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; <br>
       </code><br>
       </td>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>archive_options_isolate options;<br>
+<br>
+&nbsp; // we just want to have a compressed isolated catalogue<br>
+options.set_compression(gzip);<br>
+      </code><code>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
       <span class="el">libdar::archive *my_cat = <br>
 &nbsp;&nbsp;&nbsp; libdar::op_isolate_noexcept(dialog,<br>
       </span></code><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp; "/tmp", &nbsp; // where is saved the <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; "/tmp", &nbsp; // where is saved the <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp; // extracted catalogue<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 my_arch, // the archive of reference<br>
@@ -2404,46 +2221,7 @@ my_arch, // the archive of reference<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "dar",&nbsp;&nbsp; // file extension<br>
 &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-true,&nbsp;&nbsp;&nbsp; // allow slice overwriting<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-true,&nbsp;&nbsp;&nbsp; // but warn before<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-true,&nbsp;&nbsp;&nbsp; // verbose output<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-2,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // pause each 2 slices<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::bzip2, // compression<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-9,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // max compression level<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-3000, // cut in slices of 3000 Bytes<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-3000, // first slice size is the same<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-"echo slice %p/%b.%n.%e created",<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// the script to run after<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// slice creation<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-libdar::crypto_none, // no encryption<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-"",&nbsp;&nbsp;&nbsp; // unused password<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-0,&nbsp;&nbsp;&nbsp;&nbsp; // unused crypto size<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-false, // not a dry-run execution</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; options, // non default options set above</code><br>
       </span><span class="el"><code></code></span><span class="el"><code>&nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 exception,<br>
@@ -2475,6 +2253,8 @@ std::endl;<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
+
+
       <div style="text-align: justify;">Now we have two archive
 objects. <span style="font-style: italic;">my_arch</span> is a
 read-only object
@@ -2484,14 +2264,13 @@ done in the previous sections. The second archive object is <span style="font-st
 object. It can only be used as a reference for another backup (a
 differential backup) or as a reference for a subsequent catalogue
 isolation (which would just clone the already isolated catalogue object
-here).<br>
-      </div>
+here). <br>
       <br>
-      <div style="text-align: justify;">Note that, if desired, an
-isolated catalogue can be tested, compared
-with the filesystem, and you can even try to restore files from it. But
-as there is no data associated with the files contents, dar will not
-restore any files from it, of course. So for now we will just destroy
+Note that once closed (object destruction) you can re-open the isolated
+catalogue and use it as a read-only object (you can then test its
+integrity as seen previously).<br>
+      <br>
+So for now we will just destroy
 the extracted catalogue object, so that all its file descriptors are
 closed: </div>
       </td>
@@ -2531,11 +2310,7 @@ object for our last operation:<br>
       <h2>11 - creating a differential backup</h2>
       <div style="text-align: justify;">This operation is the same as
 the
-first one we did (archive creation). Perhaps you have noted that an
-argument was set to <span style="font-style: italic;">NULL</span>.
-Here we will pass it <span style="font-style: italic;">my_arch </span>which
-means that <span style="font-style: italic;">my_arch</span> will
-become the reference archive for the archive we will create. If we had
+first one we did (archive creation). We will just provide the archive of reference as an optional parameter. If we had
 not destroyed <span style="font-style: italic;">my_cat </span>above,
 we could have used it in place of <span style="font-style: italic;">my_arch</span>
 for exactly the same result.<br>
@@ -2549,113 +2324,62 @@ for exactly the same result.<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>&nbsp;
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>archive_options_create options;<br>
+      <br>
+&nbsp;&nbsp; // we provide here the reference to an <br>
+&nbsp;&nbsp; // existing archive object, this implies that<br>
+&nbsp;&nbsp; // the archive will be a differential backup<br>
+options.set_reference(my_arch);<br>
+      <br>
+&nbsp;&nbsp; // as we are now used to options, we will set a more<br>
+&nbsp;&nbsp; // complex set of other options:<br>
+options.set_selection(not_mask(simple_mask("*~")));<br>
+options.set_empty_dir(true);<br>
+options.set_compression(bzip2);<br>
+options.set_compr_mask(not_mask(simple_mask("*.bz2")));<br>
+options.set_cache_directory_tagging(true);<br>
+options.set_slice_permission("0600");<br>
+options.set_slice_user_ownership("root");<br>
+options.set_slice_group_ownership("bin");<br>
+options.set_crypto_algo(crypto_blowfish);<br>
+&nbsp; // if not specified with set_crypto_pass() the password<br>
+&nbsp; // will be asked interactively to the user<br>
+options.set_slicing(100000000, 20480);<br>
+&nbsp;
       <br>
 libdar::archive *my_other_arch = <br>
 &nbsp; &nbsp;&nbsp; new libdar::archive(dialog, <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/home",&nbsp; // saving all under this "root"<br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
-&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">my_arch,&nbsp;
-// differential backup </span><br>
-&nbsp;&nbsp;&nbsp; &nbsp;not_mask(simple_mask("*~", true)), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-we don't save the files ending with<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // '~' this does not concern
-directories<br>
-&nbsp;&nbsp;&nbsp; &nbsp;bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-all directories and files not rejected <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-by the previous mask are saved<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"my_archive",&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+&nbsp;&nbsp;&nbsp; &nbsp;"my_archive", //
 the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
-occurrence<br>
-&nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
-&nbsp;&nbsp;&nbsp;&nbsp; 0, &nbsp; &nbsp; // nor we want to pause
-between slices<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // rejected directory will be
-saved as<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // empty (no directory is
-rejected so<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // here there is no
-importance for that<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // parameter)<br>
-&nbsp;&nbsp;&nbsp; &nbsp;libdar::gzip // the archive will be compressed<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // using gzip <br>
-&nbsp;&nbsp;&nbsp; &nbsp;9,&nbsp;&nbsp;&nbsp;&nbsp; // at maximum
-compression level <br>
-&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp;&nbsp; // no slicing is
-done,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;0, &nbsp;&nbsp;&nbsp; // so the first slice
-size must also be <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-set to zero <br>
-&nbsp;&nbsp;&nbsp;&nbsp; libdar::bool_mask(true),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-save all EA<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // no script will be
-executed between<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // slices (as there is no
-slicing) <br>
-&nbsp;&nbsp;&nbsp; &nbsp;libdar::crypto_blowfish, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-the blowfish strong encryption <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-will be used<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // as the password is
-not given here&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-(empty string is not a valid password) <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-it will be asked interactively to the<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user through the dialog<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user_interaction object<br>
-&nbsp;&nbsp;&nbsp; &nbsp;20480, // the block of encryption will be<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // 20 kbytes<br>
-&nbsp;&nbsp;&nbsp; &nbsp;not_mask(simple_mask("*gz")), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-all files will be compressed except<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // those ending by "gz"<br>
-&nbsp;&nbsp;&nbsp; &nbsp;800,&nbsp;&nbsp; // file which size is below
-800 bytes<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // will not be compressed<br>
-&nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved whatever is<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
-&nbsp;&nbsp;&nbsp;&nbsp; libdar::inode::cf_all,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // check all fields when looking for
-changes since<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-archive of reference<br>
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp; // hourshift is
-useless here as we make <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // a
-full backup<br>
-&nbsp;&nbsp;&nbsp; &nbsp;false, // we will make a real archive not a<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // dry-run operation<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // dar will set back the access
-time of<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
-change the<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of these files
-      <br>
-&nbsp;&nbsp;&nbsp; &nbsp;false, // we may change of filesystem if<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
-      </code><code>&nbsp;&nbsp;&nbsp;&nbsp; false, // we are not doing
-a snapshot of the filesystem<br>
-      </code><code>&nbsp;&nbsp;&nbsp;&nbsp; false, // we are not
-considering the cache directory<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-tagging standard.<br>
-      </code><code>&nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want to
-see the skipped files</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp; options, // the optional parameter as defined above</code><code></code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp; NULL); // no progressive report</code><br>
       </td>
-      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>
-      </code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>archive_options_create options;<br>
+<br>
+&nbsp;&nbsp; // we provide here the reference to an <br>
+&nbsp;&nbsp; // existing archive object, this implies that<br>
+&nbsp;&nbsp; // the archive will be a differential backup<br>
+options.set_reference(my_arch);<br>
+<br>
+&nbsp;&nbsp; // as we are now used to options, we will set a more<br>
+&nbsp;&nbsp; // complex set of other options:<br>
+options.set_selection(not_mask(simple_mask("*~")));<br>
+options.set_empty_dir(true);<br>
+options.set_compression(bzip2);<br>
+options.set_compr_mask(not_mask(simple_mask("*.bz2")));<br>
+options.set_cache_directory_tagging(true);<br>
+options.set_slice_permission("0600");<br>
+options.set_slice_user_ownership("root");<br>
+options.set_slice_group_ownership("bin");<br>
+options.set_crypto_algo(crypto_blowfish);<br>
+&nbsp; // if not specified with set_crypto_pass() the password<br>
+&nbsp; // will be asked interactively to the user<br>
+options.set_slicing(100000000, 20480);</code><code><br>
+      <br>
+      </code><code></code>
       <code><span class="el">libdar::archive *my_other_arch
 =&nbsp;&nbsp;&nbsp;&nbsp; <br>
 &nbsp;&nbsp;&nbsp;&nbsp; libdar::create_archive_noexcept(dialog,</span></code><span class="el"><code>&nbsp; <br>
@@ -2663,107 +2387,10 @@ see the skipped files</code><br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
       </code></span><span class="el"><code><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; my_arch,&nbsp; //
 differential backup </span></code></span><span class="el"><code><br>
-&nbsp;&nbsp;&nbsp; &nbsp;not_mask(simple_mask("*~", true)), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-we don't save the files ending with<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // '~' this does not concern
-directories<br>
-&nbsp;&nbsp;&nbsp; &nbsp;bool_mask(true), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-all directories and files not rejected <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-by the previous mask are saved<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"my_archive",&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
+&nbsp;&nbsp;&nbsp; &nbsp;"my_archive", //
 the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
-occurrence<br>
-&nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
-&nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp;&nbsp;&nbsp;&nbsp; // nor we want to
-pause between slices<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // rejected directory will be
-saved as<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // empty (no directory is
-rejected so<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // here there is no
-importance for that<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // parameter)<br>
-&nbsp;&nbsp;&nbsp; &nbsp;libdar::gzip // the archive will be compressed<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // using gzip <br>
-&nbsp;&nbsp;&nbsp; &nbsp;9,&nbsp;&nbsp;&nbsp;&nbsp; // at maximum
-compression level <br>
-&nbsp;&nbsp;&nbsp; &nbsp;0,&nbsp;&nbsp;&nbsp;&nbsp; // no slicing is
-done,<br>
-&nbsp;&nbsp;&nbsp; &nbsp;0, &nbsp;&nbsp;&nbsp; // so the first slice
-size must also be <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-set to zero <br>
-&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>libdar::bool_mask(true),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-save all EA</code><br>
-      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;
-&nbsp;"",&nbsp;&nbsp;&nbsp; // no script will be
-executed between<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // slices (as there is no
-slicing) <br>
-&nbsp;&nbsp;&nbsp; &nbsp;libdar::crypto_blowfish, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-the blowfish strong encryption <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-will be used<br>
-&nbsp;&nbsp;&nbsp; &nbsp;"",&nbsp;&nbsp;&nbsp; // as the password is
-not given here&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-(empty string is not a valid password) <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-it will be asked interactively to the<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user through the dialog<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // user_interaction object<br>
-&nbsp;&nbsp;&nbsp; &nbsp;20480, // the block of encryption will be<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // 20 kbytes<br>
-&nbsp;&nbsp;&nbsp; &nbsp;not_mask(simple_mask("*gz")), <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-all files will be compressed except<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // those ending by "gz"<br>
-&nbsp;&nbsp;&nbsp; &nbsp;800,&nbsp;&nbsp; // file which size is below
-800 bytes<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // will not be compressed<br>
-&nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved whatever is<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
-&nbsp;&nbsp;&nbsp; libdar::inode::</code></span><span class="el"><code>cf_all, <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-check all fields when looking for changes since<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-archive of reference</code><br>
-      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;0,&nbsp;&nbsp;&nbsp; // hourshift is
-useless here as we make <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // a
-full backup<br>
-&nbsp;&nbsp;&nbsp; &nbsp;false, // we will make a real archive not a<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // dry-run operation<br>
-&nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // dar will set back the access
-time of<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
-change the<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of these files
-      <br>
-&nbsp;&nbsp;&nbsp; &nbsp;false, // we may change of filesystem if<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-false, // we are not doing a snapshot of the filesystem<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-false, // we are not considering the cache directory<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
-tagging standard.<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-false, // we don't want to see the skipped files</code><br>
-      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-NULL,&nbsp; // </code></span><span class="el"><code> no progressive
-report</code><br>
-      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; exception,
+&nbsp;&nbsp;&nbsp;&nbsp; </code></span><code>options, // the optional parameter as defined above</code><span class="el"><code><br></code></span><span class="el"></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; exception,
 // thisgives the status of the call<br>
 &nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of error the cause.<br>
       <br>
@@ -2819,7 +2446,7 @@ std::endl;<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; text-align: justify;">So, we are
+      <td style="vertical-align: top; text-align: justify;">We are
 at the end of this first part of the tutorial, where we have
 seen the general way to manipulate dar archives like dar command-line
 does. But we still have an object we need
@@ -2857,7 +2484,7 @@ std::endl;<br>
     <tr>
       <td style="vertical-align: top;">For more detailed information
 about the API you can build the API
-documentation from the source code using Doxygen. <br>
+documentation from the source code using Doxygen or get it online from <a href="http://dar.linux.free.fr/doc/man/index.html">dar home page</a> or <a href="http://dar.sourceforge.net/doc/man/index.html">mirror site</a>.<br>
       <br>
       <br>
       <h2>12 - Compilation &amp; Linking<br>
@@ -2900,7 +2527,7 @@ main()<br>
       <br>
 Of course, you need to link your program with libdar. This is done by
 adding <span style="font-style: italic; font-weight: bold;">-ldar</span>
-:<code></code><code></code> <code>&nbsp; </code> </td>
+plus other library libdar can be built to use like libz, libbzip2, liblzo or libgcrypt :<code></code><code></code> <code>&nbsp; </code> </td>
     </tr>
   </tbody>
 </table>
@@ -2909,7 +2536,7 @@ adding <span style="font-style: italic; font-weight: bold;">-ldar</span>
   <tbody>
     <tr>
       <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code><code></code><span style="font-weight: bold;"></span><br>
-&gt; gcc <span style="font-weight: bold;">-ldar</span> my_prog.o -o
+&gt; gcc <span style="font-weight: bold;">-ldar</span> -lz -lbzip2 -llzo -lgcrypt my_prog.o -o
 my_prog<br>
       <br>
       </td>
@@ -3103,7 +2730,7 @@ very simple. What now succeeds when
 you ask for a cancellation this way? Well, an exception of type <span style="font-weight: bold; font-style: italic;">Ethread_cancel</span>
 is thrown. All along his path, memory is released and mutex are freed.
 Last, the exception appears to the libdar caller. So, you can catch it
-to define a specific comportment. If you don't want to use exceptions a
+to define a specific comportment. And if you don't want to use exceptions a
 special returned code is used.<br>
       </div>
       </td>
@@ -3254,7 +2881,20 @@ variable in the catch() statement above would have received<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
+      <div style="text-align: justify;">
+      </div>
+      <p style="text-align: justify;"><span style="font-weight: bold; text-decoration: underline;">A last and important point about multi-threaded environment: </span>An
+object like any other variable cannot be modified or read (with the use
+of its methods) without precaution from several threads at the same
+time. Care must be taken to avoid this situation, and the use of Posix
+mutex is recommanded in your program if you plan to let an archive
+object be accessed by more than one thread. See the <a href="http://dar.sourceforge.net/doc/FAQ.html#threadsafe">FAQ</a> for more about this point.<br>
+      </p>
+      <br>
+      <br>
+      <br>
       <h2 style="text-align: justify;">14 - Dar_manager API</h2>
+
       <br>
       <div style="text-align: justify;">For more about <span style="font-style: italic;">dar_manager</span>, please read the&nbsp;<span style="font-style: italic;"></span>man page where are described in
 detail the available features. Note that for <span style="font-style: italic;">dar_manager</span> there is not
@@ -3262,14 +2902,14 @@ a "<span style="font-style: italic;">without exception</span>" flavor,
 your
 program
 must be able to handle exceptions, which by the way are the same as the
-ones describes above.<br>
+ones described above.<br>
       </div>
       <br>
       <div style="text-align: justify;">To get dar_manager features you
 need to use the <span style="font-weight: bold; font-style: italic;">class
 database</span>
-which is defined in the <span style="font-style: italic;">database.hpp</span>
-header file so you first need to include that file. Let's see the
+which is defined in the <span style="font-style: italic;">libdar/database.hpp</span>
+header file so you first need to include that file. Most of the methods of the <span style="font-style: italic;">database</span> class do use options. For the same reason as previously seen for <span style="font-style: italic;">archive</span> manipulation, these options are passed thanks to a container class. These container classes for options used by the <span style="font-style: italic;">database</span> class are defined in the<span style="font-style: italic;"> libdar/database_options.hpp</span> file. Let's see the
 different method of the class <span style="font-style: italic;">database</span>
 :<br>
       </div>
@@ -3294,14 +2934,26 @@ void my_sample_function(user_interaction &amp; dialog)<br>
 database (no archive in it) called "base"<br>
       <br>
 &nbsp; &nbsp; database other&nbsp; = database(dialog,
-"/tmp/existing_base.dmd", false);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// we have created a database called "other" which contains <br>
+"/tmp/existing_base.dmd", database_open_options());<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// we have created a database object called "other" which contains <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // (in RAM) all information that were contained in the <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // database file "/tmp/existing_base.dmd"<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // I will explain below the last argument<br>
+      <br>
+&nbsp;&nbsp;&nbsp; database_open_option opt;<br>
+&nbsp;&nbsp;&nbsp; opt.set_partial(true);<br>
+&nbsp;&nbsp;&nbsp; database other2 = database(dialog, "/tmp/existing_base.dmd", opt);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// we have created a database object called "other2" which differs<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// from "other" in the option we used. While "other" is a fully loaded <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// database, "other2" is a partial database. This notion is explained <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// below<br>
 }</code> <br>
       <br>
       </td>
@@ -3320,13 +2972,16 @@ from nothing, or load a database to memory from a file using the second
 constructor. As you can see over the filename to give in this later
 constructor, we need a <span style="font-style: italic;">user_interaction</span>
 object to be able to inform the
-user of any problem that could be met, and a boolean argument called
-"partial":<br>
+user of any problem that could be met, and an object of class
+database_open_options. This last object contains options to use for
+this call (options are set to their default unless modified
+explicitely). Currently, the only available option is the "partial"
+option which is a boolean argument:<br>
       <br>
 In all the available methods for class database, some require to load
 the whole database in the memory while some other only require
 the database header. Loading just the database header is much faster
-than loading the whole database of course, and as you guess it requires
+than loading the whole database, of course, and as you guess it requires
 much less memory. While you can perform any operation with a full
 loaded database, only a subset of available method will be available
 with a partially loaded database.&nbsp; If you try a method that
@@ -3335,7 +2990,9 @@ object you use has been loaded with "true" as last argument (called
 "partial") of the constructor, and of course an empty database (built
 with the first
 constructor) is a completely loaded database, so you don't have
-restriction in using a new database object. But now let's see the
+restriction in using a new database object. <br>
+      <br>
+But now let's see the
 available method for that class:<br>
       </div>
       <br>
@@ -3407,9 +3064,15 @@ homepage</a>. </div>
       <td style="vertical-align: top;">
       <h2>Thanks</h2>
       <br>
-I would like to thank Wesley Leggette and Johnathan Burchill for having
+      <div style="text-align: justify;">I would like to thank Wesley
+Leggette and Johnathan Burchill for having
 given their feedback and
-having done grammar corrections to this document.<br>
+having done grammar corrections to this document. Out of this document,
+I would also like to thanks them a second time for their work around
+dar and libdar (Johnathan is the author of kdar, the KDE front-end for
+dar).<br>
+      </div>
+
       <br>
 Regards,<br>
 Denis Corbin.<br>
@@ -3419,5 +3082,6 @@ Denis Corbin.<br>
 </table>
 <br>
 </center>
+
 
 </body></html>

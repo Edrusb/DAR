@@ -2,6 +2,9 @@
 <html><head>
 
 
+
+
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Limitations</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -29,23 +32,35 @@ for dar:<br>
       <br>
       <h2 style="text-align: justify;">Fixed Limits</h2>
       <ul style="text-align: justify;">
-        <li>The size of SLICES may be limited by the file system or
-kernel (maximum file size is 2 GB with Linux kernel 2.2.x),</li>
-        <li>the number of SLICES is only limited by the size of the
+        
+        <ul>
+          <li>The size of SLICES may be limited by the file system or
+kernel (maximum file size is 2 GB with Linux kernel 2.2.x), other limits may exist depending on the filesystem used.<br>
+</li>
+          <li>the number of SLICES is only limited by the size of the
 filenames, thus using a basename of 10 chars, considering your file
 system can support 256 char per filename at most, you could already get
 up to&nbsp; 10^241 SLICES, 1 followed by 241 zero. But as soon as your
 file
 system will support bigger files or longer filename, dar will follow
 without change.</li>
-        <li>dar_manager can gather up to 65534 different backups. This
-limit should be high enough to not be a problem.<br>
+          <li>dar_manager can gather up to 65534 different backups, not more. This
+limit should be high enough to not be a problem. <br>
         </li>
+          <li>when using a listing file to define which file to operate on,
+            each line of the listing file must not be longer than 20480 bytes
+	    else a new line is considered after the 20480th byte.
+	</li>
+        </ul>
+
+        
+        
+	
       </ul>
       <br>
       <h2 style="text-align: justify;">System variable limits</h2>
       <h3 style="text-align: justify;">Memory</h3>
-      <div style="text-align: justify;">Dar uses virtual memory (=
+      <div style="text-align: justify; margin-left: 40px;">Dar uses virtual memory (=
 RAM+swap) to be able to add the list of file
 saved at the end of each archive. Dar uses its own integer type (called
 "infinint") that do not have limit (unlike 32 bits or 64 bits
@@ -58,8 +73,11 @@ average of 650 bytes of virtual memory by saved file. Thus, for example
 if you have 110,000 files to save, whatever is the total amount of data
 to save, dar will require around 67 MB of virtual memory.<br>
       </div>
-      <br>
-      <div style="text-align: justify;">Now, when doing catalogue
+      
+      <div style="margin-left: 40px;"><br>
+      </div>
+
+      <div style="text-align: justify; margin-left: 40px;">Now, when doing catalogue
 extraction or differential backup, dar has in
 memory two catalogues, thus the amount of memory space needed is the
 double (134 MB in the example). Why ? Because for differential backup,
@@ -68,18 +86,25 @@ needed to know which files to save and which not to save, and in
 another hand, builds the catalogue of the new archive all along the
 process. Now, for catalogue extraction, the process is equivalent to
 making a differential backup just after a full backup.<br>
-      </div>
       <br>
-      <div style="text-align: justify;">This memory issue, is not a
+As you guess merging two archives into a third one requires even more
+memory (memory to store the first archive to merge, the second archive
+to merge and the resulting archive to produce).<br>
+      </div>
+      
+      <div style="margin-left: 40px;"><br>
+      </div>
+
+      <div style="text-align: justify; margin-left: 40px;">This memory issue, is not a
 limit by itself, but you need enough
 virtual memory to be able to save your data (if necessary you can still
 add swap space).<br>
       </div>
       <br>
       <h3 style="text-align: justify;"><a name="Integers"></a>Integers</h3>
-      <div style="text-align: justify;">To overcome the previously
+      <div style="text-align: justify; margin-left: 40px;">To overcome the previously
 explained
-memory issue, dar can be build in an other mode. In this other mode,
+memory issue, dar can be built in an other mode. In this other mode,
 "infinint" is replaced by 32 bits or 64 bits integers, as defined by
 the use of --enable-mode=32 or --enable-mode=64 options given to
 configure script. The executables built this way (dar, dar_xform,
@@ -96,21 +121,27 @@ While the 64 bits version cannot handle dates after around 500 billion
 years (which is longer than the estimated age of the Universe: 15
 billion years) and file larger than around 18 EB (18 exa bytes). <br>
       </div>
-      <br>
-      <div style="text-align: justify;">What the comportment when such
+      
+      <div style="margin-left: 40px;"><br>
+      </div>
+
+      <div style="text-align: justify; margin-left: 40px;">What the comportment when such
 a
 limit is reached ? For compatibility with the rest of the code, limited
 length integers (32 or 64 for now) cannot be used as-is, they are
 enclosed in a C++ class, which will report overflow in arithmetic
 operations. Archives generated with all the different version of dar
 will stay compatible between them, but the 32 bits or 64 bits will not
-be able to read or produce all possible archive. In that case, dar
+be able to read or produce all possible archives. In that case, dar
 suite program will abort with an error message asking you to use the
 "full" version of dar program.<br>
       </div>
-      <br>
+      
+      <div style="margin-left: 40px;"><br>
+      </div>
+
       <h3 style="text-align: justify;">Command line</h3>
-      <div style="text-align: justify;">On several systems,
+      <div style="text-align: justify; margin-left: 40px;">On several systems,
 command-line long
 options are not available. This is due to the fact that dar relies on
 GNU getopt. Systems like FreeBSD do not have by default GNU getopt,
@@ -122,8 +153,11 @@ of "-z" use "-z 9" and so on (see <a href="man/index.html">dar's man page</a> se
 available with FreeBSD's getopt, just using short options and explicit
 arguments.<br>
       </div>
-      <br>
-      <div style="text-align: justify;">Else you can install GNU getopt
+      
+      <div style="margin-left: 40px;"><br>
+      </div>
+
+      <div style="text-align: justify; margin-left: 40px;">Else you can install GNU getopt
 as a
 separated library called libgnugetopt. If the include file
 &lt;getopt.h&gt; is also available, the configure script will detect it
@@ -138,15 +172,18 @@ of them) in the file pointed to by this -B option. -B can be used
 several times on command line and is recursive (you can use -B from a
 file read by -B option).<br>
       </div>
-      
+
       <h3 style="text-align: justify;">Dates</h3>
+      <div style="margin-left: 40px;">
 Unix files have three dates :<br>
-      <ul style="text-align: justify;">
+      </div>
+
+      <ul style="text-align: justify; margin-left: 40px;">
         <li>last modification date (mtime)</li>
         <li>last access date (atime)</li>
         <li>last inode change (ctime)</li>
       </ul>
-      <div style="text-align: justify;">In dar, dates are stored as
+      <div style="text-align: justify; margin-left: 40px;">In dar, dates are stored as
 integers (the number of seconds elapsed
 since Jan 1st, 1970) as Unix systems do. As seen above, the limitation is not due to dar
 but on the integer used, so if you use infinint, you should be able to
@@ -154,22 +191,13 @@ store any date as far in the future as you want. Of course dar cannot
 stores dates before Jan the 1st of 1970, but it should not be a very
 big problem. ;-)<br>
       </div>
-      <br>
-      <div style="text-align: justify;">There is no standard way under
+      
+      <div style="margin-left: 40px;"><br>
+      </div>
+
+      <div style="text-align: justify; margin-left: 40px;">There is no standard way under
 Unix
-to change the ctime. So DAR does not save ctime date (except when
-saving EA) nor it can restore it. Reading a file (when doing a
-backup or a comparison) updates the atime of the read files. Some
-applications like leafnode (an NNTP cache) base their expiry time on
-the atime. So since the beginning (up to 2.3.x releases), dar sets back
-the atime of file it reads. But changing the atime updates the ctime,
-which cannot be set back to its original value. As the ctime was not
-taken in account this was not a problem to me until I got feedback that
-some security tool base their inspection on the ctime (A file that had
-the ctime changed is most probably changed, in particular if the atime
-has not changed, this may indicate a dissimulation). So there is now a
-special mode in which dar does not try to set back the atime of files
-which preserves the ctime (see -aa and -ac option in <a href="man/index.html">dar's man page</a>). Starting release 2.4.0, by default dar will not set back the atime and thus preserves the ctime.<br>
+to change the ctime. So Dar is not able to restore the ctime date of files.<br>
       </div>
       </td>
     </tr>
@@ -179,5 +207,6 @@ which preserves the ctime (see -aa and -ac option in <a href="man/index.html">da
 <br>
 <br>
 </center>
+
 
 </body></html>

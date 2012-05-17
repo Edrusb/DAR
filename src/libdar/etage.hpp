@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: etage.hpp,v 1.9 2005/02/23 17:38:55 edrusb Rel $
+// $Id: etage.hpp,v 1.11 2009/12/18 10:10:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -40,7 +40,7 @@ namespace libdar
 
 	/// the etage structure keep trace of directory contents
 
-	/// it relies on the opendir() system call family than
+	/// it relies on the [fd]opendir() system call family than
 	/// cannot be used recursively. Thus each etage structure
 	/// contains the contents of a directory, and can then be stored beside
 	/// other etage structures corresponding to subdirectories
@@ -48,7 +48,12 @@ namespace libdar
     struct etage
     {
 	etage() { fichier.clear(); last_mod = 0; last_acc = 0; }; // required to fake an empty dir when one is impossible to open
-        etage(user_interaction & ui, const char *dirname, const infinint & x_last_acc, const infinint & x_last_mod, bool cache_directory_tagging);
+        etage(user_interaction & ui,
+	      const char *dirname,
+	      const infinint & x_last_acc,
+	      const infinint & x_last_mod,
+	      bool cache_directory_tagging,
+	      bool furtive_read_mode);
 
         bool read(std::string & ref);
 

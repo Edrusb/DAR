@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: factoriel.cpp,v 1.12.2.2 2008/02/09 17:41:28 edrusb Rel $
+// $Id: factoriel.cpp,v 1.18 2011/01/05 18:04:17 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -50,6 +50,10 @@ extern "C"
 #if HAVE_STRING_H
 #include <string.h>
 #endif
+
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
 } // end extern "C"
 
 #include <string>
@@ -58,28 +62,25 @@ extern "C"
 #include "infinint.hpp"
 #include "deci.hpp"
 #include "erreurs.hpp"
-#include "test_memory.hpp"
 #include "generic_file.hpp"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
+#include "fichier.hpp"
 #include "../dar_suite/shell_interaction.hpp"
 #include "../dar_suite/dar_suite.hpp"
 
 using namespace libdar;
 using namespace std;
 
-static int little_main(user_interaction & ui, int argc, char *argv[], const char **env);
+static int little_main(user_interaction & ui, int argc, char * const argv[], const char **env);
 
-int main(S_I argc, char *argv[], const char **env)
+int main(S_I argc, char * const argv[], const char **env)
 {
     return dar_suite_global(argc, argv, env, &little_main);
 }
 
-static int little_main(user_interaction & ui, int argc, char *argv[], const char **env)
+static int little_main(user_interaction & ui, int argc, char * const argv[], const char **env)
 {
-    MEM_BEGIN;
-    MEM_IN;
-
     if(argc != 2 && argc != 3)
 	exit(1);
 
@@ -110,26 +111,22 @@ static int little_main(user_interaction & ui, int argc, char *argv[], const char
 
 	    p.dump(fic);
 	    fic.skip(0);
-	    cp = infinint(ui, NULL, &fic);
+	    cp = infinint(fic);
 	    ui.warning(string("read from file: ") + deci(cp).human());
 	}
     }
 
     infinint *tmp;
     {
-	MEM_IN;
 	tmp = new infinint(19237);
 	delete tmp;
-	MEM_OUT;
     }
-    MEM_OUT; // matches the MEM_IN at the beginning of main
-    MEM_END;
 
     return EXIT_OK;
 }
 
 static void dummy_call(char *x)
 {
-static char id[]="$Id: factoriel.cpp,v 1.12.2.2 2008/02/09 17:41:28 edrusb Rel $";
-dummy_call(id);
+    static char id[]="$Id: factoriel.cpp,v 1.18 2011/01/05 18:04:17 edrusb Rel $";
+    dummy_call(id);
 }

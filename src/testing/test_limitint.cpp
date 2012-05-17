@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_limitint.cpp,v 1.7 2004/06/20 14:26:27 edrusb Rel $
+// $Id: test_limitint.cpp,v 1.10 2011/01/05 18:04:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -45,7 +45,6 @@ extern "C"
 
 #include <iostream>
 
-#include "test_memory.hpp"
 #include "integers.hpp"
 #include "infinint.hpp"
 #include "deci.hpp"
@@ -54,6 +53,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "erreurs.hpp"
 #include "generic_file.hpp"
+#include "fichier.hpp"
 
 
 static void routine_limitint(user_interaction & dialog);
@@ -110,7 +110,7 @@ static void routine_limitint(user_interaction & dialog)
     int fd = ::open("toto", O_RDONLY | O_BINARY);
     if(fd > 0)
     {
-        infinint r1 = infinint(dialog, &fd, NULL);
+        infinint r1 = infinint(dialog, fd);
         infinint r2;
 
         try

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: cache.hpp,v 1.10.2.2 2009/04/07 08:45:29 edrusb Rel $
+// $Id: cache.hpp,v 1.26 2011/04/17 13:12:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -35,7 +35,11 @@
 
 namespace libdar
 {
-	/// the cache class implements a very basic read/write caching mechanisme
+
+	/// \ingroup Private
+	/// @}
+
+	/// the cache class implements a very basic read/write caching mechanism
 
 	/// it is intended to reduce context switches when no compression is used
 	/// and when reading or writing catalogue through a pipe. The catalogue
@@ -46,43 +50,34 @@ namespace libdar
 	/// as the compression engine gather these many small read or write into
 	/// much bigger ones. This in only when there is no compression that
 	/// that this class is useful (and used).
-	/// \ingroup Private
     class cache : public generic_file
     {
     public:
-	cache(user_interaction & dialog,
-	      generic_file & hidden,
-	      U_I initial_size = 10240,
-              U_I unused_read_ratio = 10, U_I observation_read_number = 100, U_I max_size_hit_read_ratio = 50,
-	      U_I unused_write_ratio = 10, U_I observation_write_number = 100, U_I max_size_hit_write_ratio = 50);
-	    // *** hidden: is the file to cache, it is never deleted by the cache object,
-	    // *** intial_size: is the initial size of the cache for reading (read this amount of data at a time)
-	    // unused_read_ratio: is the ratio of cached data effectively asked for reading below which the cache size is divided by two
-            //   in other words, if during observation_read_number fullfilment of the cache, less than unused_read_ratio percent of data has been
-            //   effectively asked for reading, then the cache size is divided by two
-            // *** max_size_hit_read_ratio: is the ratio above which the cache size is doubled. In other words, if during observation_read_number
-	    //   times of cache fullfilment, more than max_size_hit_read_ratio percent time all the cached data has been asked for reading
-	    //   the cache size is doubled.
-	    // to have fixed size read caching, you can set unused_read_ratio to zero and max_size_hit_read_ratio to 101 or above.
-	    // *** unused_write_ratio: cache is flushed before being fullfilled if a seek operation has been asked. If after observation_write_number
-            //   of cache flushing, less than unused_write_ratio percent of the time the cache was full, its size is divided by 2
-            // *** max_size_hit_write_ratio: if after observation_write_number of cache flushing, max_size_hit_write_ratio percent of the time
-	    // the cache was fulled, its size get doubled.
-            // to have a fixed size write caching , you can set unused_write_ratio to zero and max_size_hit_write_ratio to 101 or above
-	~cache() { flush_write(); };
+	cache(generic_file & hidden, 	          //< is the file to cache, it is never deleted by the cache object,
+	      bool shift_mode,                    //< if true, when all cached data has been read, half of the data is flushed from the cache, the other half is shifted and new data take place to fill the cache. This is necessary for sequential reading, but has some CPU overhead.
+	      U_I initial_size = 10240,           //< is the initial size of the cache for reading (read this amount of data at a time)
+              U_I unused_read_ratio = 10,         //< is the ratio of cached data effectively asked for reading below which the cache size is divided by two in other words, if during observation_read_number fullfilment of the cache, less than unused_read_ratio percent of data has been effectively asked for reading, then the cache size is divided by two
+	      U_I observation_read_number = 100,  //< period of cache size consideration
+	      U_I max_size_hit_read_ratio = 50,   //< is the ratio above which the cache size is doubled. In other words, if during observation_read_number times of cache fullfilment, more than max_size_hit_read_ratio percent time all the cached data has been asked for reading the cache size is doubled. To have fixed size read caching, you can set unused_read_ratio to zero and max_size_hit_read_ratio to 101 or above.
+	      U_I unused_write_ratio = 10,        //< same as unused_read_ratio but for writing operations
+	      U_I observation_write_number = 100, //< same as observation_read_number but for writing operations
+	      U_I max_size_hit_write_ratio = 50); //< same as max_size_hit_read_ratio but for writing operations
+
+	~cache();
 
 
 	    // inherited from generic_file
-	bool skip(const infinint & pos) { flush_write(); clear_read(); return ref->skip(pos); };
-	bool skip_to_eof() { flush_write(); clear_read(); return ref->skip_to_eof(); };
-	bool skip_relative(S_I x) { flush_write(); clear_read(); return ref->skip_relative(x); };
-	infinint get_position() { return ref->get_position(); };
+	bool skip(const infinint & pos);
+	bool skip_to_eof();
+	bool skip_relative(S_I x);
+	infinint get_position() { return current_position; };
 
     protected:
 	    // inherited from generic_file
-	S_I inherited_read(char *a, size_t size);
-	S_I inherited_write(const char *a, size_t size);
-
+	U_I inherited_read(char *a, U_I size);
+	void inherited_write(const char *a, U_I size);
+	void inherited_sync_write() { flush_write(); };
+	void inherited_terminate() { flush_write(); };
     private:
 	struct buf
 	{
@@ -92,13 +87,20 @@ namespace libdar
 	    U_I last; // first to not read in the cache
 
 	    buf() { buffer = NULL; size = next = last = 0; };
+	    buf(const buf &ref) { throw SRC_BUG; };
 	    ~buf() { if(buffer != NULL) delete [] buffer; };
+	    void resize(U_I newsize);
+	    void shift_by_half();
+	    void clear() { next = last = 0; };
 	};
 
-	generic_file *ref;
+	generic_file *ref;                //< underlying file, (not owned by "this', not to be delete by "this")
 
-	struct buf buffer_cache;
-	bool read_mode; // true if in read mode, false if in write mode
+	struct buf buffer_cache;          //< where is stored cached data
+	infinint current_position;        //< current offset in file to read from or write to
+	bool read_mode;                   //< true if in read mode, false if in write mode
+	bool shifted_mode;                //< whether to half flush and shift or totally flush data
+	bool failed_increase;             //< whether we failed increasing the cache size
 
 	U_I read_obs;
 	U_I read_unused_rate;
@@ -117,8 +119,10 @@ namespace libdar
 
 	void flush_write();
 	void fulfill_read();
-	void clear_read() { if(read_mode) { buffer_cache.next = buffer_cache.last = 0; } };
+	void clear_read() { if(read_mode) buffer_cache.clear(); };
     };
+
+	/// @}
 
 } // end of namespace
 

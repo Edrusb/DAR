@@ -16,32 +16,51 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: libdar.hpp,v 1.53.2.16 2012/02/25 17:22:31 edrusb Exp $
+// $Id: libdar.hpp,v 1.70 2011/01/16 11:35:51 edrusb Rel $
 //
 /*********************************************************************/
 //
 
-    /// \file libdar.hpp
-    /// \brief the main file of the libdar API definitions
+    // NOTE : The following comments are used by doxygen to generate the documentation of reference
 
-    /// \addtogroup Private
-    /// \brief Symbols that are not to be used by external software.
+    /// \mainpage
+    /// You will find here the reference documentation for the dar and libdar source code, split in several "modules".
+    /// - API module: contains all information for using libdar within your program
+    /// - OLD_API_4_4 module: contains the backward compatible API to version 4.4.x
+    /// - Tools module: contains some routines you may like to have a look at (but using them with caution)
+    /// - Private module: contains all libdar internal documentation, it is not necessary to read it to be able to use libdar
+    /// - CMDLINE module: contains the documentation for command-line tools, you might want to have a look for illustration of library usage.
+    /// .
+    /// CMDLINE module is out of any namespace as it is not inteded to be used by external application, OLD_API_4_4 module is in the libdar_4_4 namespace. All other modules, are in the libdar namespace.
     ///
-    /// never use threses symboles (function, macro, variables, types, etc.)
-    /// they are not intended to be used by external programs
-    /// and may change or disapear without any warning or backward
-    /// compatibility
+    /// Please not that an API tutorial is also available for a higher view of this library.
 
-    /// \addtogroup API
+
+    /// \defgroup API API
     /// \brief APlication Interface
     ///
     /// This gather all symbols that may be accessed from an external
     /// program. Other symbols are not as much documented, and
     /// may change or be removed without any warning or backward
-    /// compatibility. So only use the function, macro, types
-    /// defined as member of the API in you external programs.
+    /// compatibility support. So only use the function, macro, types,
+    /// classes... defined as member of the API module in you external programs.
+
+
+    /// \defgroup Private Private
+    /// \brief Symbols that are not to be used by external software.
+    ///
+    /// never use threses symboles (function, macro, variables, types, etc.)
+    /// they are not intended to be used by external programs
+    /// and may change or disapear without any warning or backward
+    /// compatibility. Some are however documented for libdar development ease.
+
+
+    /// \file libdar.hpp
+    /// \brief the main file of the libdar API definitions
+    /// \ingroup API
+
 
 
 #ifndef LIBDAR_HPP
@@ -71,6 +90,7 @@ extern "C"
 #include "archive.hpp"
 #include "crypto.hpp"
 #include "thread_cancellation.hpp"
+#include "compile_time_features.hpp"
 
     /// \addtogroup API
     /// @{
@@ -120,11 +140,11 @@ namespace libdar
 
 
 	///  libdar Major version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MAJOR = 4;
+    const U_I LIBDAR_COMPILE_TIME_MAJOR = 5;
 	///  libdar Medium version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MEDIUM = 5;
+    const U_I LIBDAR_COMPILE_TIME_MEDIUM = 0;
 	///  libdar Minor version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MINOR = 1;
+    const U_I LIBDAR_COMPILE_TIME_MINOR = 0;
 
 	////////////////////////////////////////////////////////////////////////
 	// LIBDAR INITIALIZATION METHODS                                      //
@@ -141,19 +161,17 @@ namespace libdar
 	// THIS LIBDAR RELEASE.                                               //
 	////////////////////////////////////////////////////////////////////////
 
-    extern void get_version(U_I & major, U_I & minor);
-    extern void get_version_noexcept(U_I & major, U_I & minor, U_16 & exception, std::string & except_msg);
-
 	/// return the libdar version, and make libdar initialization (may throw Exceptions)
 
 	/// It is mandatory to call this function (or another one of the get_version* family)
 	/// \param[out] major the major number of the version
 	/// \param[out] medium the medium number of the version
 	/// \param[out] minor the minor number of the version
+	/// \param[in] init_libgcrypt whether to initialize libgcrypt if not already done (not used if libcrypt is not linked with libdar)
 	/// \note the calling application must match that the major function
 	/// is the same as the libdar used at compilation time. See API tutorial for a
 	/// sample code.
-    extern void get_version(U_I & major, U_I & medium, U_I & minor);
+    extern void get_version(U_I & major, U_I & medium, U_I & minor, bool init_libgcrypt = true);
 
 	/// return the libdar version, and make libdar initialization (does not throw exceptions)
 
@@ -163,31 +181,28 @@ namespace libdar
 	/// \param[out] minor the minor number of the version
 	/// \param[out] exception is to be compared with the LIBDAR_* macro to know whether the call succeeded
 	/// \param[out] except_msg in case exception is not equal to LIBDAR_NOEXCEPT this argument contains
+	/// \param[in] init_libgcrypt whether to initialize libgcrypt if not already done (not used if libcrypt is not linked with libdar)
 	/// a human readable explaination of the error met.
 	/// \note the calling application must match that the major function
 	/// is the same as the libdar used at compilation time. See API tutorial for a
 	/// sample code.
-    extern void get_version_noexcept(U_I & major, U_I & medium, U_I & minor, U_16 & exception, std::string & except_msg);
+    extern void get_version_noexcept(U_I & major, U_I & medium, U_I & minor, U_16 & exception, std::string & except_msg, bool init_libgcrypt = true);
 
 
-	/// return the options activated that have been activated at compilation time
+	///////////////////////////////////////////////
+	// CLOSING/CLEANING LIBDAR                   //
+	///////////////////////////////////////////////
 
-	/// \param[out] ea whether Extended Attribute support is available
-	/// \param[out] largefile whether large file support is available
-	/// \param[out] nodump whether the nodump feature is available
-	/// \param[out] special_alloc whether special allocation is activated
-	/// \param[out] bits the internal integer type used
-	/// \param[out] thread_safe whether thread safe support is available
-	/// \param[out] libz whether gzip compression is available
-	/// \param[out] libbz2 whether bz2 compression is available
-	/// \param[out] libcrypto whether strong encryption is available
-	/// \param[out] new_blowfish whether new blowfish implementation is available
-	/// \note This function does never throw exceptions, so there is no
-	/// get_compile_time_features_noexcept() function available.
-    extern void get_compile_time_features(bool & ea, bool & largefile, bool & nodump, bool & special_alloc, U_I & bits,
-					  bool & thread_safe,
-					  bool & libz, bool & libbz2, bool & libcrypto,
-					  bool & new_blowfish);
+	// while libdar has only a single boolean as global variable
+	// that defines whether the library is initialized or not
+	// it must proceed to mutex, and dependent libraries initializations
+	// (liblzo, libgcrypt, etc.), which is done during the get_version() call
+	// Some library also need to clear some data so the following call
+	// is provided in that aim and must be called when libdar will no more
+	// be used by the application.
+
+    extern void close_and_clean();
+
 
 	//////////
 	// WRAPPER FUNCTIONS AROUND archive class methods to trap exceptions and convert them in error code and message
@@ -206,9 +221,7 @@ namespace libdar
     extern archive* open_archive_noexcept(user_interaction & dialog,
 					  const path & chem, const std::string & basename,
 					  const std::string & extension,
-					  crypto_algo crypto, const std::string &pass, U_32 crypto_size,
-					  const std::string & input_pipe, const std::string & output_pipe,
-					  const std::string & execute, bool info_details,
+					  const archive_options_read & options,
 					  U_16 & exception,
 					  std::string & except_msg);
 
@@ -221,40 +234,13 @@ namespace libdar
     extern archive *create_archive_noexcept(user_interaction & dialog,
 					    const path & fs_root,
 					    const path & sauv_path,
-					    archive *ref_arch,
-					    const mask & selection,
-					    const mask & subtree,
 					    const std::string & filename,
 					    const std::string & extension,
-					    bool allow_over,
-					    bool warn_over,
-					    bool info_details,
-					    const infinint & pause,
-					    bool empty_dir,
-					    compression algo,
-					    U_I compression_level,
-					    const infinint &file_size,
-					    const infinint &first_file_size,
-					    const mask & ea_mask,
-					    const std::string & execute,
-					    crypto_algo crypto,
-					    const std::string & pass,
-					    U_32 crypto_size,
-					    const mask & compr_mask,
-					    const infinint & min_compr_size,
-					    bool nodump,
-					    inode::comparison_fields what_to_check,
-					    const infinint & hourshift,
-					    bool empty,
-					    bool alter_atime,
-					    bool same_fs,
-					    bool snapshot,
-					    bool cache_directory_tagging,
-					    bool display_skipped,
-					    const infinint & fixed_date,
+					    const archive_options_create & options,
 					    statistics * progressive_report,
 					    U_16 & exception,
 					    std::string & except_msg);
+
 
 
 	/// this is a wrapper around the archive constructor known as the "isolate" constructor
@@ -267,19 +253,7 @@ namespace libdar
 					     archive *ref_arch,
 					     const std::string & filename,
 					     const std::string & extension,
-					     bool allow_over,
-					     bool warn_over,
-					     bool info_details,
-					     const infinint & pause,
-					     compression algo,
-					     U_I compression_level,
-					     const infinint &file_size,
-					     const infinint &first_file_size,
-					     const std::string & execute,
-					     crypto_algo crypto,
-					     const std::string & pass,
-					     U_32 crypto_size,
-					     bool empty,
+					     const archive_options_isolate & options,
 					     U_16 & exception,
 					     std::string & except_msg);
 
@@ -291,30 +265,9 @@ namespace libdar
     extern archive *merge_archive_noexcept(user_interaction & dialog,
 					   const path & sauv_path,
 					   archive *ref_arch1,
-					   archive *ref_arch2,
-					   const mask & selection,
-					   const mask & subtree,
 					   const std::string & filename,
 					   const std::string & extension,
-					   bool allow_over,
-					   bool warn_over,
-					   bool info_details,
-					   const infinint & pause,
-					   bool empty_dir,
-					   compression algo,
-					   U_I compression_level,
-					   const infinint & file_size,
-					   const infinint & first_file_size,
-					   const mask & ea_mask,
-					   const std::string & execute,
-					   crypto_algo crypto,
-					   const std::string & pass,
-					   U_32 crypto_size,
-					   const mask & compr_mask,
-					   const infinint & min_compr_size,
-					   bool empty,
-					   bool display_skipped,
-					   bool keep_compressed,
+					   const archive_options_merge & options,
 					   statistics * progressive_report,
 					   U_16 & exception,
 					   std::string & except_msg);
@@ -338,21 +291,7 @@ namespace libdar
     extern statistics op_extract_noexcept(user_interaction & dialog,
 					  archive *ptr,
 					  const path &fs_root,
-					  const mask &selection,
-					  const mask &subtree,
-					  bool allow_over,
-					  bool warn_over,
-					  bool info_details,
-					  bool detruire,
-					  bool only_more_recent,
-					  const mask & ea_mask,
-					  bool flat,
-					  inode::comparison_fields what_to_check,
-					  bool warn_remove_no_match,
-					  const infinint & hourshift,
-					  bool empty,
-					  bool ea_erase,
-					  bool display_skipped,
+					  const archive_options_extract & options,
 					  statistics * progressive_report,
 					  U_16 & exception,
 					  std::string & except_msg);
@@ -365,10 +304,7 @@ namespace libdar
 	/// the get_version_noexcept function
     extern void op_listing_noexcept(user_interaction & dialog,
 				    archive *ptr,
-				    bool info_details,
-				    archive::listformat list_mode,
-				    const mask &selection,
-				    bool filter_unsaved,
+				    const archive_options_listing & options,
 				    U_16 & exception,
 				    std::string & except_msg);
 
@@ -381,13 +317,7 @@ namespace libdar
     extern statistics op_diff_noexcept(user_interaction & dialog,
 				       archive *ptr,
 				       const path & fs_root,
-				       const mask &selection,
-				       const mask &subtree,
-				       bool info_details,
-				       const mask & ea_mask,
-				       inode::comparison_fields what_to_check,
-				       bool alter_atime,
-				       bool display_skipped,
+				       const archive_options_diff & options,
 				       statistics * progressive_report,
 				       U_16 & exception,
 				       std::string & except_msg);
@@ -400,10 +330,7 @@ namespace libdar
 	/// the get_version_noexcept function
     extern statistics op_test_noexcept(user_interaction & dialog,
 				       archive *ptr,
-				       const mask &selection,
-				       const mask &subtree,
-				       bool info_details,
-				       bool display_skipped,
+				       const archive_options_test & options,
 				       statistics * progressive_report,
 				       U_16 & exception,
 				       std::string & except_msg);
@@ -467,6 +394,7 @@ namespace libdar
 	/// or if there is no more pending cancellation (thread has already been canceled).
     inline extern bool cancel_clear(pthread_t tid) { return thread_cancellation::clear_pending_request(tid); }
 #endif
+
 
 	/// @}
 

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.48.2.7 2008/02/09 20:11:27 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.76 2011/05/20 10:23:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,6 +30,22 @@ extern "C"
 #include <string.h>
 #endif
 
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#if HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
+
 #include "getopt_decision.h"
 } // end extern "C"
 
@@ -39,7 +55,6 @@ extern "C"
 #include "macro_tools.hpp"
 #include "data_tree.hpp"
 #include "database.hpp"
-#include "test_memory.hpp"
 #include "user_interaction.hpp"
 #include "integers.hpp"
 #include "libdar.hpp"
@@ -48,139 +63,193 @@ extern "C"
 #include "thread_cancellation.hpp"
 #include "archive.hpp"
 #include "string_file.hpp"
+#include "cygwin_adapt.hpp"
+#include "no_comment.hpp"
+#include "line_tools.hpp"
+#include "fichier.hpp"
+#include "deci.hpp"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.4.3"
+#define DAR_MANAGER_VERSION "1.5.0"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
 #define INVALID_ARG "Invalid argument given to -%c (requires integer)"
 
-enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, move, interactive };
+enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, move, interactive, check, batch };
 
-static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env);
+static S_I little_main(user_interaction & dialog, S_I argc, char *const argv[], const char **env);
 static bool command_line(user_interaction & dialog,
-			 S_I argc, char *argv[],
+			 S_I argc, char * const argv[],
                          operation & op,
                          string & base,
                          string & arg,
-                         archive_num & num,
+                         S_I & num,
                          vector<string> & rest,
                          archive_num & num2,
 			 infinint & date,
-                         bool & verbose);
+                         bool & verbose,
+			 bool & ignore_dat_options,
+			 bool recursive); // true if called from op_batch
 static void show_usage(user_interaction & dialog, const char *command);
 static void show_version(user_interaction & dialog, const char *command);
+
 #if HAVE_GETOPT_LONG
 static const struct option *get_long_opt();
 #endif
 static void op_create(user_interaction & dialog, const string & base, bool info_details);
-static void op_add(user_interaction & dialog, const string & base, const string &arg, string fake, bool info_details);
-static void op_listing(user_interaction & dialog, const string & base, bool info_details);
-static void op_del(user_interaction & dialog, const string & base, archive_num min, archive_num max, bool info_details);
-static void op_chbase(user_interaction & dialog, const string & base, archive_num num, const string & arg, bool info_details);
-static void op_where(user_interaction & dialog, const string & base, archive_num num, const string & arg, bool info_details);
-static void op_options(user_interaction & dialog, const string & base, const vector<string> & rest, bool info_details);
-static void op_dar(user_interaction & dialog, const string & base, const string & arg, bool info_details);
-static void op_restore(user_interaction & dialog, const string & base, const vector<string> & rest, const infinint & date, const string & options_for_dar, bool info_details);
-static void op_used(user_interaction & dialog, const string & base, archive_num num, bool info_details);
-static void op_files(user_interaction & dialog, const string & base, const string & arg, bool info_details);
-static void op_stats(user_interaction & dialog, const string & base, bool info_details);
-static void op_move(user_interaction & dialog, const string & base, archive_num src, archive_num dst, bool info_details);
-static void op_interactive(user_interaction & dialog, string base);
+static void op_add(user_interaction & dialog, database *dat, const string &arg, string fake, const infinint & min_digits, bool info_details);
+static void op_listing(user_interaction & dialog, const database *dat, bool info_details);
+static void op_del(user_interaction & dialog, database *dat, S_I min, archive_num max, bool info_details);
+static void op_chbase(user_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details);
+static void op_where(user_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details);
+static void op_options(user_interaction & dialog, database *dat, const vector<string> & rest, bool info_details);
+static void op_dar(user_interaction & dialog, database *dat, const string & arg, bool info_details);
+static void op_restore(user_interaction & dialog,
+		       database *dat,
+		       const vector<string> & rest,
+		       const infinint & date,
+		       const string & options_for_dar,
+		       bool info_details,
+		       bool early_release,
+		       bool ignore_dar_options_in_base);
+static void op_used(user_interaction & dialog, const database *dat, S_I num, bool info_details);
+static void op_files(user_interaction & dialog, const database *dat, const string & arg, bool info_details);
+static void op_stats(user_interaction & dialog, const database *dat, bool info_details);
+static void op_move(user_interaction & dialog, database *dat, S_I src, archive_num dst, bool info_details);
+static void op_interactive(user_interaction & dialog, database *dat, string base);
+static void op_check(user_interaction & dialog, const database *dat, bool info_details);
+static void op_batch(user_interaction & dialog, database *dat, const string & filename, bool info_details);
 
 static database *read_base(user_interaction & dialog, const string & base, bool partial);
 static void write_base(user_interaction & dialog, const string & filename, const database *base, bool overwrite);
 static vector<string> read_vector(user_interaction & dialog);
+static void finalize(user_interaction & dialog, operation op, database *dat, const string & base, bool info_details);
+static void action(user_interaction & dialog,
+		   operation op,
+		   database *dat,
+		   const string & arg,
+		   S_I num,
+		   const vector<string> & rest,
+		   archive_num num2,
+		   const infinint & date,
+		   const string & base,
+		   bool info_details,
+		   bool early_release,
+		   bool ignore_database_options);
+static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positive);
 
-int main(S_I argc, char *argv[], const char **env)
+
+int main(S_I argc, char *const argv[], const char **env)
 {
     return dar_suite_global(argc, argv, env, &little_main);
 }
 
-S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env)
+S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
     operation op;
     string base;
     string arg;
-    archive_num num, num2;
+    S_I num;
+    archive_num num2;
     vector<string> rest;
     bool info_details;
     infinint date;
+    database *dat = NULL;
+    bool partial_read;
+    bool ignore_dat_options;
 
     shell_interaction_change_non_interactive_output(&cout);
 
-    if(!command_line(dialog, argc, argv, op, base, arg, num, rest, num2, date, info_details))
+    if(!command_line(dialog, argc, argv, op, base, arg, num, rest, num2, date, info_details, ignore_dat_options, false))
 	return EXIT_SYNTAX;
-    MEM_IN;
+
+    if(op == none_op)
+        throw SRC_BUG;
+
     switch(op)
     {
-    case none_op:
-        throw SRC_BUG;
     case create:
-        op_create(dialog, base, info_details);
-        break;
+	break;
     case add:
-        op_add(dialog, base, arg, rest.empty() ? "" : rest[0], info_details);
-        break;
-    case listing:
-        op_listing(dialog, base, info_details);
-        break;
     case del:
-        op_del(dialog, base, num, num2, info_details);
-        break;
-    case chbase:
-        op_chbase(dialog, base, num, arg, info_details);
-        break;
-    case where:
-        op_where(dialog, base, num, arg, info_details);
-        break;
-    case options:
-        op_options(dialog, base, rest, info_details);
-        break;
-    case dar:
-        op_dar(dialog, base, arg, info_details);
-        break;
     case restore:
-        op_restore(dialog, base, rest, date, arg, info_details);
-        break;
     case used:
-        op_used(dialog, base, num, info_details);
-        break;
     case files:
-        op_files(dialog, base, arg, info_details);
-        break;
     case stats:
-        op_stats(dialog, base, info_details);
-        break;
     case move:
-        op_move(dialog, base, num, num2, info_details);
-        break;
     case interactive:
-	op_interactive(dialog, base);
+    case check:
+    case batch:
+	partial_read = false;
+	break;
+    case listing:
+    case chbase:
+    case where:
+    case options:
+    case dar:
+	partial_read = true;
 	break;
     default:
-        throw SRC_BUG;
+	throw SRC_BUG;
     }
-    MEM_OUT;
+
+    if(op == create)
+	op_create(dialog, base, info_details);
+    else
+    {
+	if(info_details)
+	{
+	    if(partial_read)
+		dialog.warning(gettext("Decompressing and loading database header to memory..."));
+	    else
+		dialog.warning(gettext("Decompressing and loading database to memory..."));
+	}
+	dat = read_base(dialog, base, partial_read);
+	try
+	{
+	    try
+	    {
+		action(dialog, op, dat, arg, num, rest, num2, date, base, info_details, true, ignore_dat_options);
+		finalize(dialog, op, dat, base, info_details);
+	    }
+	    catch(Edata & e)
+	    {
+		dialog.warning(string(gettext("Error met while processing operation: ")) + e.get_message());
+		finalize(dialog, op, dat, base, info_details);
+		throw;
+	    }
+	}
+	catch(...)
+	{
+	    if(dat != NULL)
+		delete dat;
+	    throw;
+	}
+	if(dat != NULL)
+	    delete dat;
+    }
+
     return EXIT_OK;
 }
 
 static bool command_line(user_interaction & dialog,
-			 S_I argc, char *argv[],
+			 S_I argc, char *const argv[],
                          operation & op,
                          string & base,
 			 string & arg,
-                         archive_num & num,
+                         S_I & num,
                          vector<string> & rest,
                          archive_num & num2,
 			 infinint & date,
-                         bool & verbose)
+                         bool & verbose,
+			 bool & ignore_dat_options,
+			 bool recursive)
 {
-    S_I lu;
-    U_I min, max;
+    S_I lu, min;
+    U_I max;
 
     base = arg = "";
     num = num2 = 0;
@@ -189,14 +258,17 @@ static bool command_line(user_interaction & dialog,
     verbose = false;
     string chem, filename;
     date = 0;
+    ignore_dat_options = false;
     string extra = "";
 
     try
     {
+
+	(void)line_tools_reset_getopt();
 #if HAVE_GETOPT_LONG
-	while((lu = getopt_long(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:", get_long_opt(), NULL)) != EOF)
+	while((lu = getopt_long(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:", get_long_opt(), NULL)) != EOF)
 #else
-	    while((lu = getopt(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:")) != EOF)
+	    while((lu = getopt(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:")) != EOF)
 #endif
 	    {
 		switch(lu)
@@ -210,6 +282,8 @@ static bool command_line(user_interaction & dialog,
 		    base = optarg;
 		    break;
 		case 'B':
+		    if(recursive)
+			throw Erange("command_line", tools_printf(gettext("-B option cannot be given inside a batch file")));
 		    if(base != "")
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    if(optarg == NULL)
@@ -254,7 +328,7 @@ static bool command_line(user_interaction & dialog,
 		    op = chbase;
 		    if(optarg == NULL)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
-		    num = atoi(optarg);
+		    num = tools_str2signed_int(optarg);
 		    break;
 		case 'p':
 		    if(op != none_op)
@@ -262,7 +336,7 @@ static bool command_line(user_interaction & dialog,
 		    op = where;
 		    if(optarg == NULL)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
-		    num = atoi(optarg);
+		    num = tools_str2signed_int(optarg);
 		    break;
 		case 'o':
 		    if(op != none_op)
@@ -288,7 +362,7 @@ static bool command_line(user_interaction & dialog,
 		    op = used;
 		    if(optarg == NULL)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
-		    num = atoi(optarg);
+		    num = tools_str2signed_int(optarg);
 		    break;
 		case 'f':
 		    if(op != none_op)
@@ -309,7 +383,7 @@ static bool command_line(user_interaction & dialog,
 		    op = move;
 		    if(optarg == NULL)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
-		    num = atoi(optarg);
+		    num = tools_str2int(optarg);
 		    break;
 		case 'h':
 		    show_usage(dialog, argv[0]);
@@ -333,12 +407,46 @@ static bool command_line(user_interaction & dialog,
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = interactive;
 		    break;
+		case 'c':
+		    if(op != none_op)
+			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+		    op = check;
+		    break;
 		case 'e':
 		    if(extra != "")
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    if(optarg == NULL)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    extra = optarg;
+		    break;
+		case '@':
+		    if(recursive)
+			throw Erange("command_line", tools_printf(gettext("Running batch file from a batch file is not allowed")));
+		    if(op != none_op)
+			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+		    op = batch;
+		    if(optarg == NULL)
+			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+		    arg = optarg;
+		    break;
+		case 'N':
+		    ignore_dat_options = true;
+		    break;
+		case ';':
+		    if(op != add)
+			dialog.warning(gettext("-; option is only valid after -A option, ignoring it"));
+		    else
+		    {
+			try
+			{
+			    deci tmp = string(optarg);
+			    date = tmp.computer();
+			}
+			catch(Edeci & e)
+			{
+			    throw Erange("command_line", tools_printf(gettext("invalid number give to -; option: %s"), optarg));
+			}
+		    }
 		    break;
 		case '?':
 		    dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
@@ -386,6 +494,7 @@ static bool command_line(user_interaction & dialog,
 	case files:
 	case stats:
 	case interactive:
+	case check:
 	    if(!rest.empty())
 		dialog.warning(gettext("Ignoring extra arguments on command line"));
 	    break;
@@ -420,11 +529,13 @@ static bool command_line(user_interaction & dialog,
 	    num2 = tools_str2int(rest[0]);
 	    rest.clear();
 	    break;
+	case batch:
+	    break;
 	default:
 	    throw SRC_BUG;
 	}
 
-	if(base == "")
+	if(base == "" && !recursive)
 	{
 	    dialog.warning(gettext("No database specified, aborting"));
 	    return false;
@@ -442,7 +553,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.48.2.7 2008/02/09 20:11:27 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.76 2011/05/20 10:23:07 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -460,332 +571,238 @@ static void op_create(user_interaction & dialog, const string & base, bool info_
         dialog.warning(gettext("Database has been successfully created empty."));
 }
 
-static void op_add(user_interaction & dialog, const string & base, const string &arg, string fake, bool info_details)
+static void op_add(user_interaction & dialog, database *dat, const string &arg, string fake, const infinint & min_digits, bool info_details)
 {
     thread_cancellation thr;
     string arch_path, arch_base;
+    bool date_order_problem = false;
+    archive_options_read read_options;
 
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    thr.check_self_cancellation();
     if(info_details)
-        dialog.warning(gettext("Uncompressing and loading database to memory..."));
-    database *dat = read_base(dialog, base, false);
-
+	dialog.warning(gettext("Reading catalogue of the archive to add..."));
+    tools_split_path_basename(arg, arch_path, arch_base);
+    read_options.set_info_details(info_details);
+    read_options.set_slice_min_digits(min_digits);
+    archive *arch = new archive(dialog, path(arch_path), arch_base, EXTENSION, read_options);
+    if(arch == NULL)
+	throw Ememory("dar_manager.cpp:op_add");
 
     try
     {
+	string chemin, b;
+
 	thr.check_self_cancellation();
 	if(info_details)
-            dialog.warning(gettext("Reading catalogue of the archive to add..."));
-	tools_split_path_basename(arg, arch_path, arch_base);
-        archive *arch = new archive(dialog, path(arch_path), arch_base, EXTENSION, crypto_none, "", 0, "", "", "", info_details);
-	if(arch == NULL)
-	    throw Ememory("dar_manager.cpp:op_add");
-
-        try
-        {
-            string chemin, b;
-
-	    thr.check_self_cancellation();
-            if(info_details)
-                dialog.warning(gettext("Updating database with catalogue..."));
-            if(fake == "")
-                fake = arg;
-            tools_split_path_basename(fake, chemin, b);
-            dat->add_archive(*arch, chemin, b);
-	    thr.check_self_cancellation();
-        }
-        catch(...)
-        {
-            if(arch != NULL)
-                delete arch;
-            throw;
-        }
-        delete arch;
-
-        if(info_details)
-            dialog.warning(gettext("Compressing and writing back database to file..."));
-        write_base(dialog, base, dat, true);
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
-}
-
-static void op_listing(user_interaction & dialog, const string & base, bool info_details)
-{
-    if(info_details)
-        dialog.warning(gettext("Uncompressing and loading database header to memory..."));
-    database *dat = read_base(dialog, base, true);
-
-    try
-    {
-        dat->show_contents(dialog);
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
-}
-
-static void op_del(user_interaction & dialog, const string & base, archive_num min, archive_num max, bool info_details)
-{
-    thread_cancellation thr;
-
-    if(info_details)        dialog.warning(gettext("Uncompressing and loading database to memory..."));
-    database *dat = read_base(dialog, base, false);
-
-    try
-    {
-	thr.check_self_cancellation();
-        if(info_details)
-            dialog.warning(gettext("Removing informations from the archive..."));
-        dat->remove_archive(min, max);
+	    dialog.warning(gettext("Updating database with catalogue..."));
+	if(fake == "")
+	    fake = arg;
+	tools_split_path_basename(fake, chemin, b);
+	dat->add_archive(*arch, chemin, b, database_add_options());
 	thr.check_self_cancellation();
 	if(info_details)
-            dialog.warning(gettext("Compressing and writing back database to file..."));
-        write_base(dialog, base, dat, true);
+	    dialog.warning(gettext("Checking date ordering of files between archive..."));
+	date_order_problem = dat->check_order(dialog);
+	thr.check_self_cancellation();
+
     }
     catch(...)
     {
-        delete dat;
-        throw;
+	if(arch != NULL)
+	    delete arch;
+	throw;
     }
-    delete dat;
+    delete arch;
+
+    if(!date_order_problem)
+	throw Edata(gettext("Some files do not follow chronological order when archive index increases withing the database, this can lead dar_manager to restored a wrong version of these files"));
 }
 
-static void op_chbase(user_interaction & dialog, const string & base, archive_num num, const string & arg, bool info_details)
+static void op_listing(user_interaction & dialog, const database *dat, bool info_details)
+{
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    dat->show_contents(dialog);
+}
+
+static void op_del(user_interaction & dialog, database *dat, S_I min, archive_num max, bool info_details)
 {
     thread_cancellation thr;
+    database_remove_options opt;
+    bool sign_plus;
+    archive_num rmin;
 
+    signed_int_to_archive_num(min, rmin, sign_plus);
+    opt.set_revert_archive_numbering(!sign_plus);
+    if(!sign_plus)
+	max = rmin;
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    thr.check_self_cancellation();
     if(info_details)
-        dialog.warning(gettext("Uncompressing and loading database header to memory..."));
-    database *dat = read_base(dialog, base, true);
-
-    try
-    {
-	thr.check_self_cancellation();
-        if(info_details)
-            dialog.warning(gettext("Changing database header information..."));
-        dat->change_name(num, arg);
-	thr.check_self_cancellation();
-        if(info_details)
-            dialog.warning(gettext("Compressing and writing back database header to file..."));
-        write_base(dialog, base, dat, true);
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
-
+	dialog.warning(gettext("Removing information from the archive..."));
+    dat->remove_archive(rmin, max, opt);
+    thr.check_self_cancellation();
 }
 
-static void op_where(user_interaction & dialog, const string & base, archive_num num, const string & arg, bool info_details)
+static void op_chbase(user_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details)
 {
     thread_cancellation thr;
+    database_change_basename_options opt;
+    bool sign_plus;
+    archive_num rnum;
 
+    signed_int_to_archive_num(num, rnum, sign_plus);
+    opt.set_revert_archive_numbering(!sign_plus);
+
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    thr.check_self_cancellation();
     if(info_details)
-        dialog.warning(gettext("Uncompressing and loading database header to memory..."));
-    database *dat = read_base(dialog, base, true);
-
-    try
-    {
-	thr.check_self_cancellation();
-        if(info_details)
-            dialog.warning(gettext("Changing database header information..."));
-        dat->set_path(num, arg);
-	thr.check_self_cancellation();
-	if(info_details)
-            dialog.warning(gettext("Compressing and writing back database header to file..."));
-        write_base(dialog, base, dat, true);
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
-
+	dialog.warning(gettext("Changing database header information..."));
+    dat->change_name(rnum, arg, opt);
+    thr.check_self_cancellation();
 }
 
-static void op_options(user_interaction & dialog, const string & base, const vector<string> & rest, bool info_details)
+static void op_where(user_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details)
 {
     thread_cancellation thr;
+    database_change_path_options opt;
+    bool sign_plus;
+    archive_num rnum;
 
+    signed_int_to_archive_num(num, rnum, sign_plus);
+    opt.set_revert_archive_numbering(!sign_plus);
+
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    thr.check_self_cancellation();
     if(info_details)
-        dialog.warning(gettext("Uncompressing and loading database header to memory..."));
-    database *dat = read_base(dialog, base, true);
-
-    try
-    {
-	thr.check_self_cancellation();
-        if(info_details)
-            dialog.warning(gettext("Changing database header information..."));
-        dat->set_options(rest);
-	thr.check_self_cancellation();
-	if(info_details)
-            dialog.warning(gettext("Compressing and writing back database header to file..."));
-        write_base(dialog, base, dat, true);
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
-
+	dialog.warning(gettext("Changing database header information..."));
+    dat->set_path(rnum, arg, opt);
+    thr.check_self_cancellation();
 }
 
-static void op_dar(user_interaction & dialog, const string & base, const string & arg, bool info_details)
+static void op_options(user_interaction & dialog, database *dat, const vector<string> & rest, bool info_details)
 {
     thread_cancellation thr;
 
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    thr.check_self_cancellation();
     if(info_details)
-        dialog.warning(gettext("Uncompressing and loading database header to memory..."));
-    database *dat = read_base(dialog, base, true);
-
-    try
-    {
-	thr.check_self_cancellation();
-        if(info_details)
-            dialog.warning(gettext("Changing database header information..."));
-        dat->set_dar_path(arg);
-	thr.check_self_cancellation();
-	if(info_details)
-            dialog.warning(gettext("Compressing and writing back database header to file..."));
-        write_base(dialog, base, dat, true);
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
-
+	dialog.warning(gettext("Changing database header information..."));
+    dat->set_options(rest);
+    thr.check_self_cancellation();
 }
 
-static void op_restore(user_interaction & dialog, const string & base, const vector<string> & rest, const infinint & date, const string & options_for_dar, bool info_details)
+static void op_dar(user_interaction & dialog, database *dat, const string & arg, bool info_details)
 {
     thread_cancellation thr;
-    string_file strfile = string_file(dialog, options_for_dar);
+
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    thr.check_self_cancellation();
+    if(info_details)
+	dialog.warning(gettext("Changing database header information..."));
+    dat->set_dar_path(arg);
+    thr.check_self_cancellation();
+}
+
+static void op_restore(user_interaction & dialog, database *dat, const vector<string> & rest, const infinint & date, const string & options_for_dar, bool info_details, bool early_release, bool ignore_dar_options_in_base)
+{
+    thread_cancellation thr;
+    string_file strfile = string_file(options_for_dar);
     vector <string> options = tools_split_in_words(strfile);
 
-    if(info_details)
-        dialog.warning(gettext("Uncompressing and loading database to memory..."));
-    database *dat = read_base(dialog, base, false);
+    database_restore_options dat_opt;
 
-    try
-    {
-	thr.check_self_cancellation();
-        if(info_details)
-            dialog.warning(gettext("Looking in archives for requested files, classifying files archive by archive..."));
-        dat->restore(dialog, rest, true, options, date);
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    thr.check_self_cancellation();
+    if(info_details)
+	dialog.warning(gettext("Looking in archives for requested files, classifying files archive by archive..."));
+    dat_opt.set_early_release(early_release);
+    dat_opt.set_info_details(info_details);
+    dat_opt.set_date(date);
+    dat_opt.set_extra_options_for_dar(options);
+    dat_opt.set_ignore_dar_options_in_database(ignore_dar_options_in_base);
+    dat->restore(dialog, rest, dat_opt);
 }
 
-static void op_used(user_interaction & dialog, const string & base, archive_num num, bool info_details)
+static void op_used(user_interaction & dialog, const database *dat, S_I num, bool info_details)
+{
+    thread_cancellation thr;
+    database_used_options opt;
+    bool sign_plus;
+    archive_num rnum;
+
+    signed_int_to_archive_num(num, rnum, sign_plus);
+    opt.set_revert_archive_numbering(!sign_plus);
+
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    thr.check_self_cancellation();
+    dat->show_files(dialog, rnum, opt);
+}
+
+static void op_files(user_interaction & dialog, const database *dat, const string & arg, bool info_details)
 {
     thread_cancellation thr;
 
-    if(info_details)
-        dialog.warning(gettext("Uncompressing and loading database to memory..."));
-    database *dat = read_base(dialog, base, false);
+    if(dat == NULL)
+	throw SRC_BUG;
 
-    try
-    {
-	thr.check_self_cancellation();
-        dat->show_files(dialog, num);
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
-
+    thr.check_self_cancellation();
+    dat->show_version(dialog, arg);
 }
 
-static void op_files(user_interaction & dialog, const string & base, const string & arg, bool info_details)
+static void op_stats(user_interaction & dialog, const database *dat, bool info_details)
 {
     thread_cancellation thr;
 
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    thr.check_self_cancellation();
     if(info_details)
-        dialog.warning(gettext("Uncompressing and loading database to memory..."));
-    database *dat = read_base(dialog, base, false);
-
-    try
-    {
-	thr.check_self_cancellation();
-        dat->show_version(dialog, arg);
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
-
+	dialog.warning(gettext("Computing statistics..."));
+    dat->show_most_recent_stats(dialog);
 }
 
-static void op_stats(user_interaction & dialog, const string & base, bool info_details)
+static void op_move(user_interaction & dialog, database *dat, S_I src, archive_num dst, bool info_details)
 {
     thread_cancellation thr;
+    bool date_order_problem = false;
 
+    if(src <= 0)
+	throw Erange("op_move", gettext("Negative number or zero not allowed when moving an archive inside a database"));
+
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    thr.check_self_cancellation();
     if(info_details)
-        dialog.warning(gettext("Uncompressing and loading database to memory..."));
-    database *dat = read_base(dialog, base, false);
-
-    try
-    {
-	thr.check_self_cancellation();
-        if(info_details)
-            dialog.warning(gettext("Computing statistics..."));
-        dat->show_most_recent_stats(dialog);
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
-}
-
-static void op_move(user_interaction & dialog, const string & base, archive_num src, archive_num dst, bool info_details)
-{
-    thread_cancellation thr;
-
+	dialog.warning(gettext("Changing database information..."));
+    dat->set_permutation(src, dst);
+    thr.check_self_cancellation();
     if(info_details)
-        dialog.warning(gettext("Uncompressing and loading database to memory..."));
-    database *dat = read_base(dialog, base, false);
-
-    try
-    {
-	thr.check_self_cancellation();
-        if(info_details)
-            dialog.warning(gettext("Changing database information..."));
-        dat->set_permutation(src, dst);
-	thr.check_self_cancellation();
-	if(info_details)
-            dialog.warning(gettext("Compressing and writing back database header to file..."));
-        write_base(dialog, base, dat, true);
-    }
-    catch(...)
-    {
-        delete dat;
-        throw;
-    }
-    delete dat;
+	dialog.warning(gettext("Checking date ordering of files between archive..."));
+    date_order_problem = dat->check_order(dialog);
+    thr.check_self_cancellation();
+    if(date_order_problem)
+	throw Edata(gettext("Some files do not follow chronological order when archive index increases withing the database, this can lead dar_manager to restored a wrong version of these files"));
 }
 
 static void show_usage(user_interaction & dialog, const char *command)
@@ -799,11 +816,14 @@ static void show_usage(user_interaction & dialog, const char *command)
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -p <number> <path>\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -o [list of options to pass to dar]\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -d [<path to dar command>]\n");
-    dialog.printf("\tdar_manager [options] -B [<path>/]<database> [-w <date>] -r [list of files to restore]\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> [-w <date>] [-e <options to dar>] -r [list of files to restore]\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -u <number>\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -f file\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -s\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -m <number> <number>\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -i\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -c\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -@ <filename>\n");
     dialog.printf("\tdar_manager -h\n");
     dialog.printf("\tdar_manager -V\n");
     dialog.printf("\n");
@@ -814,15 +834,9 @@ static void show_version(user_interaction & dialog, const char *command_name)
 {
     string name;
     tools_extract_basename(command_name, name);
-    U_I maj, med, min, bits;
-    bool ea, largefile, nodump, special_alloc, thread, libz, libbz2, libcrypto, new_blowfish;
+    U_I maj, med, min;
 
-    get_version(maj, min);
-    if(maj > 2)
-	get_version(maj, med, min);
-    else
-	med = 0;
-    get_compile_time_features(ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
+    get_version(maj, med, min);
     shell_interaction_change_non_interactive_output(&cout);
     dialog.printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n", name.c_str(), DAR_MANAGER_VERSION);
     dialog.warning(string("   ") + dar_suite_command_line_features() + "\n");
@@ -830,7 +844,7 @@ static void show_version(user_interaction & dialog, const char *command_name)
 	dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
     else
 	dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
-    tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
+    tools_display_features(dialog);
     dialog.printf("\n");
     dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__);
     dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name.c_str(), PACKAGE_VERSION);
@@ -864,6 +878,10 @@ static const struct option *get_long_opt()
 	{"when", required_argument, NULL, 'w'},
 	{"interactive", no_argument, NULL, 'i'},
 	{"extra", required_argument, NULL, 'e'},
+	{"check", no_argument, NULL, 'c'},
+ 	{"batch", required_argument, NULL, '@'},
+	{"ignore-options-in-base", no_argument, NULL, 'N'},
+	{"min-digits", required_argument, NULL, ';'},
         { NULL, 0, NULL, 0 }
     };
 
@@ -877,7 +895,9 @@ static database *read_base(user_interaction & dialog, const string & base, bool 
 
     try
     {
-        ret = new database(dialog, base, partial);
+	database_open_options dat_opt;
+	dat_opt.set_partial(partial);
+        ret = new database(dialog, base, dat_opt);
         if(ret == NULL)
             throw Ememory("read_base");
     }
@@ -894,218 +914,337 @@ static database *read_base(user_interaction & dialog, const string & base, bool 
 static void write_base(user_interaction & dialog, const string & filename, const database *base, bool overwrite)
 {
     thread_cancellation thr;
+    database_dump_options dat_opt;
 
+    dat_opt.set_overwrite(overwrite);
     thr.block_delayed_cancellation(true);
-    base->dump(dialog, filename, overwrite);
+    base->dump(dialog, filename, dat_opt);
     thr.block_delayed_cancellation(false);
 }
 
-static void op_interactive(user_interaction & dialog, string base)
+static void op_interactive(user_interaction & dialog, database *dat, string base)
 {
     char choice;
     bool saved = true;
-    database *dat = NULL;
     thread_cancellation thr;
     archive_num num, num2;
+    S_I tmp_si;
+    bool tmp_sign;
     string input, input2;
     archive *arch = NULL;
     vector <string> vectinput;
     U_I more = 25;
+    database_change_basename_options opt_change_name;
+    database_change_path_options opt_change_path;
+    database_remove_options opt_remove;
+    database_used_options opt_used;
 
-    dialog.warning(gettext("Uncompressing and loading database to memory..."));
-    dat = read_base(dialog, base, false);
+    if(dat == NULL)
+	throw SRC_BUG;
+
     thr.check_self_cancellation();
-
-    try
+    do
     {
-	do
+	try
 	{
-	    try
+	    archive_options_read read_options;
+
+		// diplay choice message
+
+	    dialog.warning_with_more(0);
+	    dialog.printf(gettext("\n\n\t Dar Manager Database used [%s] : %S\n"), saved ? gettext("Saved") : gettext("Not Saved"), &base);
+	    if(more > 0)
+		dialog.printf(gettext("\t Pause each %d line of output\n\n"), more);
+	    else
+		dialog.printf(gettext("\t No pause in output\n\n"));
+	    dialog.printf(gettext(" l : list database contents  \t A : Add an archive\n"));
+	    dialog.printf(gettext(" u : list archive contents   \t D : Remove an archive\n"));
+	    dialog.printf(gettext(" f : give file localization  \t m : modify archive order\n"));
+	    dialog.printf(gettext(" p : modify path of archives \t b : modify basename of archives\n"));
+	    dialog.printf(gettext(" d : path to dar             \t o : options to dar\n"));
+	    dialog.printf(gettext(" w : write changes to file   \t s : database statistics\n"));
+	    dialog.printf(gettext(" a : Save as                 \t n : pause each 'n' line (zero for no pause)\n"));
+	    dialog.printf(gettext(" c : check date order\n\n"));
+	    dialog.printf(gettext(" q : quit\n\n"));
+	    dialog.printf(gettext(" Choice: "));
+
+		// user's choice selection
+
+	    shell_interaction_read_char(choice);
+	    thr.check_self_cancellation();
+	    dialog.printf("\n\n");
+
+		// performing requested action
+
+	    dialog.warning_with_more(more);
+	    switch(choice)
 	    {
-
-		    // diplay choice message
-
-		dialog.warning_with_more(0);
-		dialog.printf(gettext("\n\n\t Dar Manager Database used [%s] : %S\n"), saved ? gettext("Saved") : gettext("Not Saved"), &base);
-		if(more > 0)
-		    dialog.printf(gettext("\t Pause each %d line of output\n\n"), more);
-		else
-		    dialog.printf(gettext("\t No pause in output\n\n"));
-		dialog.printf(gettext(" l : list database contents  \t A : Add an archive\n"));
-		dialog.printf(gettext(" u : list archive contents   \t D : Remove an archive\n"));
-		dialog.printf(gettext(" f : give file localization  \t m : modify archive order\n"));
-		dialog.printf(gettext(" p : modify path of archives \t b : modify basename of archives\n"));
-		dialog.printf(gettext(" d : path to dar             \t o : options to dar\n"));
-		dialog.printf(gettext(" w : write changes to file   \t s : database statistics\n"));
-		dialog.printf(gettext(" a : Save as                 \t n : pause each 'n' line (zero for no pause)\n\n"));
-		dialog.printf(gettext(" q : quit\n\n"));
-		dialog.printf(gettext(" Choice: "));
-
-		    // user's choice selection
-
-		shell_interaction_read_char(choice);
-		thr.check_self_cancellation();
-		dialog.printf("\n\n");
-
-		    // performing requested action
-
-		dialog.warning_with_more(more);
-		switch(choice)
+	    case 'l':
+		dat->show_contents(dialog);
+		break;
+	    case 'u':
+		input = dialog.get_string(gettext("Archive number: "), true);
+		tmp_si = tools_str2signed_int(input);
+		signed_int_to_archive_num(tmp_si, num, tmp_sign);
+		opt_used.set_revert_archive_numbering(!tmp_sign);
+		dat->show_files(dialog, num, opt_used);
+		break;
+	    case 'f':
+		input = dialog.get_string(gettext("File to look for: "), true);
+		dat->show_version(dialog, input);
+		break;
+	    case 'b':
+		input = dialog.get_string(gettext("Archive number to modify: "), true);
+		tmp_si = tools_str2signed_int(input);
+		signed_int_to_archive_num(tmp_si, num, tmp_sign);
+		opt_change_name.set_revert_archive_numbering(!tmp_sign);
+		input = dialog.get_string(tools_printf(gettext("New basename for archive number %d: "), tmp_si), true);
+		dat->change_name(num, input, opt_change_name);
+		saved = false;
+		break;
+	    case 'd':
+		input = dialog.get_string(gettext("Path to dar (empty string to use the default from PATH variable): "), true);
+		dat->set_dar_path(input);
+		saved = false;
+		break;
+	    case 'w':
+		dialog.warning(gettext("Compressing and writing back database to file..."));
+		write_base(dialog, base, dat, true);
+		saved = true;
+		break;
+	    case 'a':
+		input = dialog.get_string(gettext("New database name: "), true);
+		dialog.warning(gettext("Compressing and writing back database to file..."));
+		write_base(dialog, input, dat, false);
+		base = input;
+		saved = true;
+		break;
+	    case 'A':
+		input = dialog.get_string(gettext("Archive basename (or extracted catalogue basename) to add: "), true);
+		dialog.warning(gettext("Reading catalogue of the archive to add..."));
+		tools_split_path_basename(input, input, input2);
+		read_options.clear();
+		read_options.set_info_details(true);
+		arch = new archive(dialog, path(input), input2, EXTENSION, read_options);
+		if(arch == NULL)
+		    throw Ememory("dar_manager.cpp:op_interactive");
+		try
 		{
-		case 'l':
-		    dat->show_contents(dialog);
-		    break;
-		case 'u':
-		    input = dialog.get_string(gettext("Archive number: "), true);
-		    num = tools_str2int(input);
-		    dat->show_files(dialog, num);
-		    break;
-		case 'f':
-		    input = dialog.get_string(gettext("File to look for: "), true);
-		    dat->show_version(dialog, input);
-		    break;
-		case 'b':
-		    input = dialog.get_string(gettext("Archive number to modify: "), true);
-		    num = tools_str2int(input);
-		    input = dialog.get_string(tools_printf(gettext("New basename for archive number %d: "), num), true);
-		    dat->change_name(num, input);
-		    saved = false;
-		    break;
-		case 'd':
-		    input = dialog.get_string(gettext("Path to dar (empty string to use the default from PATH variable): "), true);
-		    dat->set_dar_path(input);
-		    saved = false;
-		    break;
-		case 'w':
-		    dialog.warning(gettext("Compressing and writing back database to file..."));
-		    write_base(dialog, base, dat, true);
-		    saved = true;
-		    break;
-		case 'a':
-		    input = dialog.get_string(gettext("New database name: "), true);
-		    dialog.warning(gettext("Compressing and writing back database to file..."));
-		    write_base(dialog, input, dat, false);
-		    base = input;
-		    saved = true;
-		    break;
-		case 'A':
-		    input = dialog.get_string(gettext("Archive basename (or extracted catalogue basename) to add: "), true);
-		    dialog.warning(gettext("Reading catalogue of the archive to add..."));
-		    tools_split_path_basename(input, input, input2);
-		    arch = new archive(dialog, path(input), input2, EXTENSION, crypto_none, "", 0, "", "", "", true);
-		    if(arch == NULL)
-			throw Ememory("dar_manager.cpp:op_interactive");
-		    try
-		    {
-			dialog.warning(gettext("Updating database with catalogue..."));
-			dat->add_archive(*arch, input, input2);
-		    }
-		    catch(...)
-		    {
-			delete arch;
-			arch = NULL;
-			throw;
-		    }
+		    dialog.warning(gettext("Updating database with catalogue..."));
+		    dat->add_archive(*arch, input, input2, database_add_options());
+		    thr.check_self_cancellation();
+		    dialog.warning(gettext("Checking date ordering of files between archive..."));
+		    (void)dat->check_order(dialog);
+		}
+		catch(...)
+		{
 		    delete arch;
 		    arch = NULL;
-		    saved = false;
-		    break;
-		case 'D':
-		    input = dialog.get_string(gettext("Archive number to remove: "), true);
-		    num = tools_str2int(input);
-		    dialog.warning(gettext("Removing informations from the archive..."));
-		    dat->remove_archive(num, num);
-		    saved = false;
-		    break;
-		case 'm':
-		    input = dialog.get_string(gettext("Archive number to move: "), true);
-		    num = tools_str2int(input);
-		    input = dialog.get_string(gettext("In which position to insert this archive: "), true);
-		    num2 = tools_str2int(input);
-		    dat->set_permutation(num, num2);
-		    saved = false;
-		    break;
-		case 'p':
-		    input = dialog.get_string(gettext("Archive number who's path to modify: "), true);
-		    num = tools_str2int(input);
-		    input = dialog.get_string(tools_printf(gettext("New path to give to archive number %d: "), num), true);
-		    dat->set_path(num, input);
-		    saved = false;
-		    break;
-		case 'o':
-		    vectinput = read_vector(dialog);
-		    dat->set_options(vectinput);
-		    saved = false;
-		    break;
-		case 's':
-		    dialog.warning(gettext("Computing statistics..."));
-		    dat->show_most_recent_stats(dialog);
-		    break;
-		case 'n':
-		    input = dialog.get_string(gettext("How much line to display at once: "), true);
-		    more = tools_str2int(input);
-		    break;
-		case 'q':
-		    if(!saved)
-		    {
-			try
-			{
-			    dialog.pause(gettext("Database not saved, Do you really want to quit ?"));
-			    dialog.printf(gettext("Continuing the action under process which is to exit... so we exit!"));
-			}
-			catch(Euser_abort & e)
-			{
-			    choice = ' ';
-			}
-		    }
-		    break;
-		default:
-		    dialog.printf(gettext("Unknown choice\n"));
+		    throw;
 		}
-	    }
-	    catch(Ethread_cancel & e)
-	    {
-		bool quit = false;
-
+		delete arch;
+		arch = NULL;
+		saved = false;
+		break;
+	    case 'D':
+		input = dialog.get_string(gettext("Archive number to remove: "), true);
+		tmp_si = tools_str2signed_int(input);
+		signed_int_to_archive_num(tmp_si, num, tmp_sign);
+		opt_remove.set_revert_archive_numbering(!tmp_sign);
+		dialog.pause(tools_printf(gettext("Are you sure to remove archive number %d ?"), tmp_si));
+		dialog.warning(gettext("Removing information from the archive..."));
+		dat->remove_archive(num, num, opt_remove);
+		saved = false;
+		break;
+	    case 'm':
+		input = dialog.get_string(gettext("Archive number to move: "), true);
+		num = tools_str2int(input);
+		input = dialog.get_string(gettext("In which position to insert this archive: "), true);
+		num2 = tools_str2int(input);
+		dat->set_permutation(num, num2);
+		thr.check_self_cancellation();
+		dialog.warning(gettext("Checking date ordering of files between archive..."));
+		dat->check_order(dialog);
+		saved = false;
+		break;
+	    case 'p':
+		input = dialog.get_string(gettext("Archive number who's path to modify: "), true);
+		tmp_si = tools_str2signed_int(input);
+		signed_int_to_archive_num(tmp_si, num, tmp_sign);
+		opt_change_path.set_revert_archive_numbering(!tmp_sign);
+		input = dialog.get_string(tools_printf(gettext("New path to give to archive number %d: "), tmp_si), true);
+		dat->set_path(num, input, opt_change_path);
+		saved = false;
+		break;
+	    case 'o':
+		vectinput = read_vector(dialog);
+		dat->set_options(vectinput);
+		saved = false;
+		break;
+	    case 's':
+		dialog.warning(gettext("Computing statistics..."));
+		dat->show_most_recent_stats(dialog);
+		break;
+	    case 'n':
+		input = dialog.get_string(gettext("How much line to display at once: "), true);
+		more = tools_str2int(input);
+		break;
+	    case 'c':
+		dialog.warning(gettext("Checking file's dates ordering..."));
+		(void)dat->check_order(dialog);
+		break;
+	    case 'q':
 		if(!saved)
 		{
 		    try
 		    {
 			dialog.pause(gettext("Database not saved, Do you really want to quit ?"));
 			dialog.printf(gettext("Continuing the action under process which is to exit... so we exit!"));
-			quit = true;
 		    }
 		    catch(Euser_abort & e)
 		    {
-			quit = false;
+			choice = ' ';
 		    }
 		}
-		else
-		    quit = true;
-		if(quit)
-		    throw;
-		else
-		{
-		    dialog.printf(gettext("re-enabling all signal handlers and continuing\n"));
-		    dar_suite_reset_signal_handler();
-		}
-	    }
-	    catch(Egeneric & e)
-	    {
-		string tmp = e.get_message();
-		dialog.warning(tools_printf(gettext("Error performing the requested action: %S"), &tmp));
+		break;
+	    default:
+		dialog.printf(gettext("Unknown choice\n"));
 	    }
 	}
-	while(choice != 'q');
+	catch(Ethread_cancel & e)
+	{
+	    bool quit = false;
+
+	    if(!saved)
+	    {
+		try
+		{
+		    dialog.pause(gettext("Database not saved, Do you really want to quit ?"));
+		    dialog.printf(gettext("Continuing the action under process which is to exit... so we exit!"));
+		    quit = true;
+		}
+		catch(Euser_abort & e)
+		{
+		    quit = false;
+		}
+	    }
+	    else
+		quit = true;
+	    if(quit)
+		throw;
+	    else
+	    {
+		dialog.printf(gettext("re-enabling all signal handlers and continuing\n"));
+		dar_suite_reset_signal_handler();
+	    }
+	}
+	catch(Egeneric & e)
+	{
+	    string tmp = e.get_message();
+	    dialog.warning(tools_printf(gettext("Error performing the requested action: %S"), &tmp));
+	}
     }
-    catch(...)
-    {
-	delete dat;
-	throw;
-    }
-    delete dat;
+    while(choice != 'q');
     if(arch != NULL)
 	throw SRC_BUG;
+}
+
+static void op_check(user_interaction & dialog, const database *dat, bool info_details)
+{
+    thread_cancellation thr;
+
+    if(dat == NULL)
+	throw SRC_BUG;
+
+    if(info_details)
+	dialog.warning(gettext("Checking date ordering of files between archive..."));
+    if(!dat->check_order(dialog))
+	throw Edata(gettext("Some files do not follow chronological order when archive index increases withing the database, this can lead dar_manager to restored a wrong version of these files"));
+    else
+	dialog.warning(gettext("No problem found"));
+    thr.check_self_cancellation();
+}
+
+static void op_batch(user_interaction & dialog, database *dat, const string & filename, bool info_details)
+{
+    const string pseudo_cmd = "dar_manager"; // to take the place of the command on the simulated command-line
+    string line;
+    char tmp;
+    bool sub_info_details;
+    vector<string> mots;
+    argc_argv cmdline;
+    operation sub_op;
+    string faked_base;
+    archive_num num2;
+    S_I num;
+    vector<string> rest;
+    infinint date;
+    string arg;
+    bool ignore_dat_options;
+
+    if(dat == NULL)
+	throw SRC_BUG;
+
+	// openning the batch file
+
+    if(info_details)
+	dialog.warning(gettext("Opening and reading the batch file..."));
+    int fd = -1;
+    fd = open(filename.c_str(), O_RDONLY|O_BINARY);
+
+    if(fd < 0)
+	throw Erange("op_batch", tools_printf(gettext("Cannot open file %S : %s"), &filename, strerror(errno)));
+
+    fichier batch_file = fichier(dialog, fd); // the object batch_file will close fd upon destructor call.
+
+    no_comment proper = no_comment(batch_file); // removing the comments from file
+
+	// reading it line by line and executing corresponding action
+
+    try
+    {
+	do
+	{
+	    line = "";
+	    tmp = 'x'; // something different from '\n' for the end of current loop be properly detected
+
+		// extracting the next line
+	    while(proper.read(&tmp,  1) == 1 && tmp != '\n')
+		line += tmp;
+
+	    string_file line_file = string_file(line);
+	    mots = tools_split_in_words(line_file);
+
+	    if(mots.size() == 0)
+		continue;
+
+	    if(info_details)
+		dialog.printf(gettext("\n\tExecuting batch file line: %S\n "), &line);
+
+	    cmdline.resize(mots.size() + 1); // +1 of pseudo_command
+	    cmdline.set_arg(pseudo_cmd, 0);
+
+	    for(register U_I i = 0; i < mots.size(); ++i)
+		cmdline.set_arg(mots[i], i+1);
+
+	    if(!command_line(dialog, cmdline.argc(), cmdline.argv(), sub_op, faked_base, arg, num, rest, num2, date, sub_info_details, ignore_dat_options, true))
+		throw Erange("op_batch", tools_printf(gettext("Syntax error in batch file: %S"), &line));
+
+	    if(sub_op == create)
+		throw Erange("op_batch", gettext("Syntax error in batch file: -C option not allowed"));
+
+	    if(sub_op == interactive)
+		throw Erange("op_batch", gettext("Syntax error in batch file: -i option not allowed"));
+
+	    action(dialog, sub_op, dat, arg, num, rest, num2, date, faked_base, sub_info_details, false, ignore_dat_options);
+	}
+	while(tmp == '\n');
+    }
+    catch(Edata & e)
+    {
+	e.prepend_message(gettext("Aborting batch operation: "));
+	throw;
+    }
 }
 
 static vector<string> read_vector(user_interaction & dialog)
@@ -1127,3 +1266,122 @@ static vector<string> read_vector(user_interaction & dialog)
 
     return ret;
 }
+
+static void finalize(user_interaction & dialog, operation op, database *dat, const string & base, bool info_details)
+{
+    switch(op)
+    {
+    case create:
+    case listing:
+    case restore:
+    case used:
+    case files:
+    case stats:
+    case interactive:
+    case check:
+	break;
+    case add:
+    case del:
+    case chbase:
+    case where:
+    case options:
+    case dar:
+    case move:
+    case batch:
+	if(info_details)
+	    dialog.warning(gettext("Compressing and writing back database to file..."));
+	write_base(dialog, base, dat, true);
+	break;
+    default:
+	throw SRC_BUG;
+    }
+}
+
+static void action(user_interaction & dialog,
+		   operation op,
+		   database *dat,
+		   const string & arg,
+		   S_I num,
+		   const vector<string> & rest,
+		   archive_num num2,
+		   const infinint & date,
+		   const string & base,
+		   bool info_details,
+		   bool early_release,
+		   bool ignore_database_options)
+{
+    switch(op)
+    {
+    case none_op:
+	throw SRC_BUG;
+    case create:
+	throw SRC_BUG;
+    case add:
+	op_add(dialog, dat, arg, rest.empty() ? "" : rest[0], date, info_details);
+	break;
+    case listing:
+	op_listing(dialog, dat, info_details);
+	break;
+    case del:
+	op_del(dialog, dat, num, num2, info_details);
+	break;
+    case chbase:
+	op_chbase(dialog, dat, num, arg, info_details);
+	break;
+    case where:
+	op_where(dialog, dat, num, arg, info_details);
+	break;
+    case options:
+	op_options(dialog, dat, rest, info_details);
+	break;
+    case dar:
+	op_dar(dialog, dat, arg, info_details);
+	break;
+    case restore:
+	op_restore(dialog, dat, rest, date, arg, info_details, early_release, ignore_database_options);
+	break;
+    case used:
+	op_used(dialog, dat, num, info_details);
+	break;
+    case files:
+	op_files(dialog, dat, arg, info_details);
+	break;
+    case stats:
+	op_stats(dialog, dat, info_details);
+	break;
+    case move:
+	op_move(dialog, dat, num, num2, info_details);
+	break;
+    case interactive:
+	op_interactive(dialog, dat, base);
+	break;
+    case check:
+	op_check(dialog, dat, info_details);
+	break;
+    case batch:
+	op_batch(dialog, dat, arg, info_details);
+	break;
+    default:
+	throw SRC_BUG;
+    }
+}
+
+
+static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positive)
+{
+    if(input < 0)
+    {
+	positive = false;
+	input = -input;
+    }
+    else
+	positive = true;
+
+    if(input < 0)
+	throw SRC_BUG;
+    if(input >= ARCHIVE_NUM_MAX)
+	throw Erange("signed_int_to_archive_name", tools_printf(gettext("Absolute value too high for an archive number: %d"), input));
+    else
+	num = input;
+}
+

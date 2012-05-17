@@ -16,62 +16,105 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: path.cpp,v 1.13.2.4 2008/02/02 14:10:50 edrusb Rel $
+// $Id: path.cpp,v 1.29 2011/03/01 20:45:36 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
+
+extern "C"
+{
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+}
+
 #include <iostream>
 #include "path.hpp"
 #include "tools.hpp"
+#include "nls_swap.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
+	/// extract the first path member of a given path
+
+	/// \param[in,out] p is the given path (in), it receive the new path without the first path member
+	/// \param[out] root this argument receive the first path member extracted from argument 'p'
+	/// \return false if given path is empty, true else. May throw exception in case of invalid path given
     static bool path_get_root(string & p, string & root);
 
-    path::path(const string & chem)
+    path::path(const string & chem, bool x_undisclosed)
     {
-        string tmp;
-	string s = chem;
-
+	NLS_SWAP_IN;
 	try
 	{
-	    dirs.clear();
-	    if(s.empty())
-		throw Erange("path::path", gettext("Empty string is not a valid path"));
-	    relative = s[0] != '/';
-	    if(!relative)
-		s = string(s.begin()+1, s.end()); // remove the leading '/'
-	    while(path_get_root(s, tmp))
-		dirs.push_back(tmp);
-	    if(dirs.empty() && relative)
-		throw Erange("path::path", gettext("Empty string is not a valid path"));
-	    reduce();
-	    reading = dirs.begin();
+	    string tmp;
+	    string s;
+
+	    undisclosed = x_undisclosed;
+	    try
+	    {
+		dirs.clear();
+		if(chem.empty())
+		    throw Erange("path::path", gettext("Empty string is not a valid path"));
+		if(chem == "/")
+		    undisclosed = false;
+		relative = (chem[0] != '/');
+		if(!relative)
+		    s = string(chem.begin()+1, chem.end()); // remove the leading '/'
+		else
+		    s = chem;
+		if(undisclosed) // if last char is '/' need to remove it
+		{
+		    string::iterator last = tools_find_last_char_of(s, '/');
+
+		    if(last + 1 == s.end()) // this is the last char of s
+			s = string(s.begin(), last);
+		}
+
+		if(undisclosed)
+		    dirs.push_back(s);
+		else
+		    while(path_get_root(s, tmp))
+			dirs.push_back(tmp);
+		if(dirs.empty() && relative)
+		    throw Erange("path::path", gettext("Empty string is not a valid path"));
+		if(!undisclosed)
+		    reduce();
+		reading = dirs.begin();
+	    }
+	    catch(Erange & e)
+	    {
+		string e_tmp = e.get_message();
+		throw Erange("path::path", tools_printf(gettext("%S is an not a valid path: %S"), &chem, &e_tmp));
+	    }
 	}
-	catch(Erange & e)
+	catch(...)
 	{
-	    string e_tmp = e.get_message();
-	    throw Erange("path::path", tools_printf(gettext("%S is an not a valid path: %S"), &chem, &e_tmp));
+	    NLS_SWAP_OUT;
+	    throw;
 	}
+	NLS_SWAP_OUT;
     }
 
     path::path(const path & ref)
     {
         dirs = ref.dirs;
         relative = ref.relative;
+	undisclosed = ref.undisclosed;
         reading = dirs.begin();
     }
 
-    path & path::operator = (const path & ref)
+    const path & path::operator = (const path & ref)
     {
         dirs = ref.dirs;
         relative = ref.relative;
+	undisclosed = ref.undisclosed;
         reading = dirs.begin();
 
         return *this;
@@ -79,22 +122,10 @@ namespace libdar
 
     bool path::operator == (const path & ref) const
     {
-        if(ref.dirs.size() != dirs.size() || ref.relative != relative)
-            return false;
-        else
-        {
-            list<string>::iterator here = (const_cast<path &>(*this)).dirs.begin();
-            list<string>::iterator there = (const_cast<path &>(ref)).dirs.begin();
-            list<string>::iterator here_fin = (const_cast<path &>(*this)).dirs.end();
-            list<string>::iterator there_fin = (const_cast<path &>(ref)).dirs.end();
-            while(here != here_fin && there != there_fin && *here == *there)
-            {
-                ++here;
-                ++there;
-            }
+	string me = display();
+	string you = ref.display();
 
-            return here == here_fin && there == there_fin;
-        }
+	return me == you;
     }
 
     string path::basename() const
@@ -141,7 +172,7 @@ namespace libdar
 
     bool path::pop_front(string & arg)
     {
-        if(is_relative())
+        if(relative)
             if(dirs.size() > 1)
             {
                 arg = dirs.front();
@@ -163,10 +194,11 @@ namespace libdar
 
     path & path::operator += (const path &arg)
     {
-        if(!arg.is_relative())
-            throw Erange("path::operator +", gettext("Cannot add an absolute path"));
-        list<string>::iterator it = (const_cast<path &>(arg)).dirs.begin();
-        list<string>::iterator it_fin = (const_cast<path &>(arg)).dirs.end();
+        if(!arg.relative)
+            throw Erange("path::operator +", dar_gettext("Cannot add an absolute path"));
+
+        list<string>::const_iterator it = arg.dirs.begin();
+        list<string>::const_iterator it_fin = arg.dirs.end();
         while(it != it_fin)
         {
             if(*it != string("."))
@@ -174,29 +206,37 @@ namespace libdar
             ++it;
         }
 
+	if(arg.undisclosed)
+	    undisclosed = true;
+
+	reduce();
         return *this;
     }
 
     bool path::is_subdir_of(const path & p, bool case_sensit) const
     {
-        list<string>::iterator it_me = (const_cast<path &>(*this)).dirs.begin();
-        list<string>::iterator it_arg = (const_cast<path &>(p)).dirs.begin();
-        list<string>::iterator fin_me = (const_cast<path &>(*this)).dirs.end();
-        list<string>::iterator fin_arg = (const_cast<path &>(p)).dirs.end();
+	string me = display();
+	string you = p.display();
 
-        while(it_me != fin_me && it_arg != fin_arg
-              && ((case_sensit && *it_me == *it_arg)  || (!case_sensit && tools_is_case_insensitive_equal(*it_me, *it_arg))))
-        {
-            ++it_me;
-            ++it_arg;
-        }
+	if(!case_sensit)
+	{
+		// converting all string in upper case
+	    tools_to_upper(me);
+	    tools_to_upper(you);
+	}
 
-        return it_arg == fin_arg;
+	if(me.size() >= you.size())
+	    if(strncmp(me.c_str(), you.c_str(), you.size()) == 0)
+		return true;
+	    else // path differs in the common length part, cannot be a subdir of "you"
+		return false;
+	else // I am shorter in length, cannot be a subdir of "you"
+	    return false;
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: path.cpp,v 1.13.2.4 2008/02/02 14:10:50 edrusb Rel $";
+	static char id[]="$Id: path.cpp,v 1.29 2011/03/01 20:45:36 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -213,11 +253,29 @@ namespace libdar
         return ret;
     }
 
+    void path::explode_undisclosed() const
+    {
+	path *me = const_cast<path *>(this);
+	if(!undisclosed)
+	    return;
+
+	try
+	{
+	    string res = display();
+	    path tmp = path(res, false);
+	    *me = tmp;
+	}
+	catch(...)
+	{
+	    me->reading = me->dirs.begin();
+	}
+    }
+
     void path::reduce()
     {
         dirs.remove(".");
         if(relative && dirs.empty())
-            dirs.push_back(".");
+	   dirs.push_back(".");
         else
         {
             list<string>::iterator it = dirs.begin();
@@ -267,7 +325,7 @@ namespace libdar
         else
             p = "";
         if(root.empty())
-            throw Erange("path_get_root", gettext("Empty string as subdirectory does not make a valid path"));
+            throw Erange("path_get_root", dar_gettext("Empty string as subdirectory does not make a valid path"));
 
         return true;
     }

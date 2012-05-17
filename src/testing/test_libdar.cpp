@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_libdar.cpp,v 1.33.2.3 2012/02/25 19:46:06 edrusb Exp $
+// $Id: test_libdar.cpp,v 1.45 2011/01/16 11:35:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -48,12 +48,13 @@ void f1();
 void warning(const string &x, void *context);
 bool question(const string &x, void *context);
 string getstring(const string &x, bool echo, void *context);
+secu_string getsecustring(const string &x, bool echo, void *context);
 void f2();
 void f3();
 void f4();
 void f5();
 
-static user_interaction_callback ui = user_interaction_callback(warning, question, getstring, (void *)1000);
+static user_interaction_callback ui = user_interaction_callback(warning, question, getstring, getsecustring,(void *)1000);
 
 int main()
 {
@@ -69,13 +70,25 @@ int main()
 void f1()
 {
     U_I maj, med, min;
-    bool ea, large, nodump, special, thread, libz, libbz2, libcrypto, new_blowfish;
+    bool ea, large, nodump, special, thread, libz, libbz2, liblzo2, libcrypto, furtive;
     U_I bits;
+    libdar::compile_time::endian endy;
 
     get_version(maj, med, min);
     printf("version %u.%u.%u\n", maj, med, min);
-    get_compile_time_features(ea, large, nodump, special, bits, thread, libz, libbz2, libcrypto, new_blowfish);
-    printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\nlibz =%s\nlibbz2 = %s\nlibcrypto = %s\nnew_blowfish = %s\n",
+    ea = libdar::compile_time::ea();
+    large = libdar::compile_time::largefile();
+    nodump = libdar::compile_time::nodump();
+    special = libdar::compile_time::special_alloc();
+    bits = libdar::compile_time::bits();
+    thread = libdar::compile_time::thread_safe();
+    libz = libdar::compile_time::libz();
+    libbz2 = libdar::compile_time::libbz2();
+    liblzo2 = libdar::compile_time::liblzo();
+    libcrypto = libdar::compile_time::libgcrypt();
+    furtive = libdar::compile_time::furtive_read();
+    endy = libdar::compile_time::system_endian();
+    printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\nlibz =%s\nlibbz2 = %s\nliblzo = %s\nlibcrypto = %s\nfurtive = %s\nendian = %c\n",
 	   BOOL2STR(ea),
 	   BOOL2STR(large),
 	   BOOL2STR(nodump),
@@ -83,13 +96,15 @@ void f1()
 	   bits,
 	   BOOL2STR(libz),
 	   BOOL2STR(libbz2),
+	   BOOL2STR(liblzo2),
 	   BOOL2STR(libcrypto),
-	   BOOL2STR(new_blowfish));
+	   BOOL2STR(furtive),
+	   endy);
 }
 
 void warning(const string &x, void *context)
 {
-    printf("[%p]%s\n", context, x.c_str());
+    printf("[%d]%s\n", (U_I)context, x.c_str());
 }
 
 bool question(const string & x, void *context)
@@ -97,7 +112,7 @@ bool question(const string & x, void *context)
     bool rep = false;
 	    char r;
 
-	    printf("[%p]%s\n", context, x.c_str());
+	    printf("[%d]%s\n", (U_I)context, x.c_str());
 	    scanf("%c", &r);
 	    rep = r == 'y';
 
@@ -105,6 +120,11 @@ bool question(const string & x, void *context)
 }
 
 string getstring(const string &x, bool echo, void *context)
+{
+    throw SRC_BUG;
+}
+
+secu_string getsecustring(const string &x, bool echo, void *context)
 {
     throw SRC_BUG;
 }
@@ -120,7 +140,7 @@ void listing(const std::string & flag,
 	     bool has_children,
 	     void *context)
 {
-    ui.printf("[[%p]][%S][%S][%S][%S][%S][%S][%S][%s][%s]\n", context, &flag, &perm, &uid, &gid, &size, &date, &filename, is_dir ? "dir" : "not_dir", has_children ? "has children" : "no children");
+    ui.printf("[[%d]][%S][%S][%S][%S][%S][%S][%S][%s][%s]\n", (U_I)context, &flag, &perm, &uid, &gid, &size, &date, &filename, is_dir ? "dir" : "not_dir", has_children ? "has children" : "no children");
 }
 
 void f2()
@@ -128,40 +148,16 @@ void f2()
     U_16 code;
     string msg;
     statistics st;
+    archive_options_read read_options;
+    archive_options_create create_options;
+
+    create_options.set_subtree(simple_path_mask("/etc", true));
     archive *toto = create_archive_noexcept(ui,
 					    "/",
 					    ".",
-					    NULL,
-					    bool_mask(true),
-					    simple_path_mask("/etc", true),
 					    "toto",
 					    "dar",
-					    true,
-					    true,
-					    true,
-					    0, // no pause
-					    true,
-					    none,
-					    1,
-					    0,
-					    0,
-					    bool_mask(true),
-					    "",
-					    crypto_none,
-					    "",
-					    0,
-					    bool_mask(false),
-					    0,
-					    false,
-					    inode::cf_all,
-					    0,
-					    false,
-					    false,
-					    false,
-					    false,
-					    false,
-					    false,
-					    0,
+					    create_options,
 					    &st,
 					    code,
 					    msg);
@@ -172,16 +168,24 @@ void f2()
     }
     if(toto != NULL)
     {
-	op_listing_noexcept(ui, toto, true, archive::normal, bool_mask(true), false, code, msg);
+	archive_options_listing options;
+
+	options.clear();
+	options.set_info_details(true);
+	options.set_list_mode(archive_options_listing::normal);
+	options.set_selection(bool_mask(true));
+	options.set_filter_unsaved(false);
+	op_listing_noexcept(ui, toto, options, code, msg);
 	if(code != LIBDAR_NOEXCEPT && code != LIBDAR_EUSER_ABORT)
 	{
 	    ui.printf("exception creating archive: %S\n", &msg);
-	    return;
 	}
 	close_archive_noexcept(toto, code, msg);
     }
 
-    archive *arch = open_archive_noexcept(ui, ".", "toto", "dar", crypto_none, "", 0, "", "", "", true, code, msg);
+    read_options.clear();
+    read_options.set_info_details(true);
+    archive *arch = open_archive_noexcept(ui, ".", "toto", "dar", read_options, code, msg);
     if(code != LIBDAR_NOEXCEPT)
     {
 	ui.printf("exception openning archive: %S\n", &msg);
@@ -222,10 +226,14 @@ void f2()
 
 void f3()
 {
+    archive_options_read read_options;
+
 	// need to create an archive named "titi" with file recorded as removed since reference backup
     U_16 code;
     string msg;
-    archive *arch = open_archive_noexcept(ui, ".", "titi", "dar", crypto_none, "", 0, "", "", "", true, code, msg);
+    read_options.clear();
+    read_options.set_info_details(true);
+    archive *arch = open_archive_noexcept(ui, ".", "titi", "dar", read_options, code, msg);
     if(code != LIBDAR_NOEXCEPT)
     {
 	ui.printf("exception openning archive: %S\n", &msg);
@@ -258,14 +266,14 @@ void f4()
     try
     {
 	pthread_t tid = pthread_self();
-	pthread_t tod = tid;
+	pthread_t tod = 0;
 	bool ret = cancel_status(tod);
 	cancel_clear(tid);
 	cancel_thread(tid);
  	ret = cancel_status(tod);
 	cancel_clear(tod);
 	ret = cancel_status(tod);
-	null_file fake = null_file(ui, gf_read_write);
+	null_file fake = null_file(gf_read_write);
 	fake.write("coucouc les amsi", 10);
 	cancel_thread(tid);
 	fake.write("coucouc les amsi", 10);

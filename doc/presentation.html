@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation - General Presentation</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+<center>
+<div style="text-align: center;">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+<tbody><tr><td style="vertical-align: top; width: 161px;"><a href="index.html"><img style="border: 0px solid ; width: 160px; height: 120px;" alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
+      </td>
+      <td style="vertical-align: top;">
+      <h1 style="text-align: center;"><br>
+      </h1>
+      <h1 style="text-align: center;">PRESENTATION<br>
+</h1>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+<hr style="width: 100%; height: 2px;">
+
+
+<h3 style="text-align: left;"><span style="text-decoration: underline;">1- General Presentation</span><br>
+</h3>
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <div style="text-align: justify;">Dar is a command-line software aimed to backup and archiving large live filesystems. It is a <span style="font-weight: bold;">filesystem independent</span> and <span style="font-weight: bold;">cross platform</span> tool.
+But, Dar is not a boot loader, nor it is an operating system.
+It does not create nor format partitions, but it can restore a full
+filesystem into a larger or a shorter partition, from one partition to
+several ones, (or the opposite from several to one partition), from a filesystem type to another
+filesystem
+type (ext2/3/4 to reiserFS for example), it can save and restore
+hard-linked inodes (hard linked plain files, sockets, char/block
+devices or even hard linked symlinks (!)), Solaris's Door files, it takes care of Posix Extended Attributes (Linux,
+MacOS, ...). It can also detect and restore sparse files, even when the
+underlying filesystem does not support them: it can restore a normal
+file with large portions of zeroed bytes as a sparse file on another
+filesystem that supports it, leading
+to a gain in space requirement for the restoration but also for the archive size.<br>
+
+      <br>
+
+From a filesystem, dar creates an archive, which may be split in a set of files (called slices) which size is user defined.
+Dar archives are suitable to be stored on floppy, CD, DVD, usb key,
+hard <span style="font-weight: bold;">disks</span>, and since release 2.4.0 to <span style="font-weight: bold;">tapes</span>
+too. But no, dar itself cannot burn a DVD. Instead the user can give dar a
+command to execute each time a slice is completed. Dar can perform <span style="font-weight: bold;">full backup</span><sup>1</sup>, <span style="font-weight: bold;">incremental backup</span><sup>2</sup>, <span style="font-weight: bold;">differential backup</span><sup>3</sup> and <span style="font-weight: bold;">decremental backup</span><sup>4</sup>.
+It also records files that have been removed since the last backup
+was
+made, leading the restoration of a system to get the exact same state
+it was at the time
+of the differential/incremental/decremental backup (removing files that
+ought to be removed, adding files that ought to be added and modifing files
+as expected).<br>
+
+      <br>
+
+Dar is able to be run on a<span style="font-weight: bold;"> live filesystem</span>.
+It can detect when a file has changed while it was reading it, in that
+case it is possible to ask dar to proceed to several retries to save such a
+file. File that could not be saved properly (because they
+changed during the backup and there is no more retry left) are flagged as "dirty" and are signaled at
+restoration time. <br>
+
+      <br>
+
+Dar provides <span style="font-weight: bold;">several hooks</span>
+for the user to perform certain actions when some event are met. One
+first hook let the user launch a command when a slice is completed&nbsp;
+(for burning the slice to DVD for example). A second hook is available
+for a given set of files or directories under backup, that let the user do some action
+before and after saving that file or directory (like <span style="font-weight: bold;">suspending
+a database</span>, and resuming it afterward).<br>
+      </div>
+
+      <br>
+      <div style="text-align: justify;">
+Dar code has been split into two parts since its release 2.0.0, a command-line part and a library part called <span style="font-weight: bold;">libdar</span>. Dar is not a Graphical User Interface it is only a command-line tool, but thanks to the libdar library, many <a href="#external_tools">external tool</a> rely on libdar and can manipulate dar archives at a more abstracted level with other interfaces than the shell command-line.<br>
+
+      <br>
+
+libdar may be linked against libz, libz2 and liblzo to provide gzip,
+bzip2 and lzo compression. It can also be linked against libgcrypt to
+provide strong encryption (blowfish, twofish, aes256, serpent256,
+camellia256).<br>
+      <br>
+Dar can be used through ssh for remote backups. It may also make used of so called "isolated <span style="font-style: italic;">catalogue</span>"
+which is a small file containing the table of contents (or catalog) of
+a given archive. These can be used as base for a differential,
+incremental or decremental backup, and can also be used as backup of
+the table of content of the original archive if that one get corrupted.<br>
+
+      <br>
+While dar/libdar provide a lot of features we will not mention here,
+you can use dar without having any knowledge of all of them. In its
+most simple form, dar can be used only with few options, here follows
+some example of use, that should not need additional explanations:<br>
+      <br>
+archive creation (backing up all /usr directory) :<br>
+      <code>&nbsp;&nbsp; dar -c my_backup -R / -g usr<br>
+&nbsp;&nbsp; <br>
+</code>archive restoration (restoring /usr in a alternate directory):<code><br>
+&nbsp;&nbsp;</code><code> dar -c my_backup -R /some/where/else<br>
+      <br>
+</code>archive testing:<code><br>
+&nbsp;&nbsp; </code><code>dar -t my_backup<br>
+      <br>
+</code>archive comparison with an existing filesystem:<code><br>
+      </code><code>&nbsp;&nbsp; dar -d my_backup -R /</code><br>
+      <br>While
+a big effort has been made on documentation, it must not lead you to
+think that you have to read it all to be able to use dar: most needs
+are covered by the <a href="Tutorial.html">tutorial</a> or <a href="mini-howto/index.html">mini-howto</a> and for direct explanation of common questions by the <a href="FAQ.html">FAQ</a>, then, if you like or if you need, you can also look at the
+detailed <a href="man/index.html">man pages</a> for a particular feature. You may also find some help
+on the <a href="http://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a> where a bit more than a hundred of
+subscribed users can help you. <br>
+      <br>
+Dar's documentation is big because it also includes all that may
+be useful to know how to use libdar, which is intended for developpers of
+external application relying on this library. For those even more
+curious there is also the documentation about dar's internals, libdar's
+structure, archive format, which can ease the understanding of the
+magic that makes all this working, and give a better understanding of
+dar/libdar code, which is written in C++. But, no, you do not need to
+read all this to just use dar! ;-)<br>
+      <br>Follow an <a href="Features.html">abstracted list of features</a> is available if you want to know more about dar/libdar.<br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div style="text-align: center;"><br>
+<div style="text-align: left;">
+<h3><span style="font-weight: bold; text-decoration: underline;"><a name="external_tools"></a>2 - Known Projects that rely
+on dar or libdar</span></h3>
+<h3><span style="font-weight: bold; text-decoration: underline;"></span></h3>
+<span style="font-weight: bold; text-decoration: underline;">
+<br>
+</span></div>
+</div>
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+
+  
+    
+      <span style="text-decoration: underline; font-weight: bold;"></span>
+      
+      <ul>
+<li style="text-align: justify;"><a href="http://kdar.sourceforge.net/">kdar</a> is a KDE
+Graphical User Interface to dar made by Johnathan Burchill </li><li style="text-align: justify;"> <a href="http://sarab.sourceforge.net/">SaraB</a>:
+Schedule
+And
+Rotate Automatic Backups - by Tristan Rhodes. SaraB works with DAR to
+schedule and rotate backups. Supports the Towers of Hanoi,
+Grandfather-Father-Son, or any custom backup rotation strategy.</li><li style="text-align: justify;"><a href="http://lazybackup.sourceforge.net/">Lazy Backup</a> by Daniel
+Johnson. Lazy Backup is intended to be so easy even lazy people will do
+their backups</li><li style="text-align: justify;">A Dar plugin has been made by
+Guus Jansman for <a href="http://mail.gnome.org/archives/mc-devel/2006-April/msg00001.html">Midnight
+commander</a> (mc)</li><li style="text-align: justify;"><a href="https://wiki.ubuntu.com/HomeUserBackup">HUbackup</a> : Home User
+backup (Thanks to Tristan Rhodes for informing about this project)</li><li style="text-align: justify;"><a href="http://sourceforge.net/projects/baras">Baras</a> by Aaron D.
+Marasco it a rewriting in Perl of SaraB.</li><li style="text-align: justify;"><a href="http://darbinding.sourceforge.net/">Python Bindings</a> by
+Wesley Leggette</li><li style="text-align: justify;"><a href="http://www.xsteve.at/prg/emacs/dar.html">Disk archive interface for Emacs</a> by <a href="http://www.xsteve.at/">Stefan Reich&ouml;r</a></li><li style="text-align: justify;"><a href="http://dargui.sourceforge.net/">DarGUI</a> by Malcolm Poole is a front-end to dar providing simple and graphical access to the main features of dar.</li><li style="text-align: justify;"><a href="http://www.artica.fr/">Artica</a> for Postfix by David Touzeau is a full Postfix Management console. It relies on dar for its integrated backups.<br>
+        </li>
+      </ul>
+
+      If some project you like are missing, you are welcome to contact me (see the AUTHOR
+document in the source package).</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<div style="text-align: left;">
+<h3><a name="limitations"></a><span style="font-weight: bold; text-decoration: underline;">3 - Limitations</span></h3>
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">Dar has some limitations, they are details <a href="Limitations.html">here</a>.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<h3><a name="dar_news"></a><span style="font-weight: bold; text-decoration: underline;">4 - </span><span style="text-decoration: underline;">Staying informed of dar/libdar's events</span></h3>
+</div>
+
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <div style="text-align: justify;">To stay informed about new releases and security issues please
+subscribe to the <a href="https://lists.sourceforge.net/lists/listinfo/dar-news">Dar-news</a> mailing-list. This is a read-only mailing-list with very low number of mail (usually less than ten a year).<br>
+      <br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr style="width: 100%; height: 2px;"><br>
+</div>
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <div style="text-align: justify;"><font size="-1"><sup>1</sup> <span style="text-decoration: underline;">Full backup:</span>
+A full backup is a backup of a full filesystem or of a subset of files
+where, for each file, the archive contains all the inode information
+(ownership, permission, dates, etc.) file's data and eventually file's
+Extended Attributes.<br>
+      <sup>2</sup> <span style="text-decoration: underline;">Differential backup:</span>
+A differential backup is based on a full backup. It contains only the
+data and Extended Attributes of files that changed since the full
+backup was made. It also contains the list of files that have been
+removed since the full backup was made. For files that did not change,
+it contains only the inode information. The advantage is that the
+backup process is much faster, the space required is also much lower.&nbsp;
+The drawback is that you need to restore the full backup first, then
+the differential backup to get the last saved state of your system.<br>
+      </font>
+      <div style="text-align: justify;"><font size="-1"><sup>3</sup> <span style="text-decoration: underline;">Incremental backup:</span>
+An incremental backup is essentially the same thing as a differential
+backup. Some make a difference, I do not. The only point I see is that
+the incremental backup is not based on a full backup but on a
+differential backup or on another incremental one.<br>
+      </font></div>
+      </div>
+      <div style="text-align: justify;"><font size="-1"><sup>4</sup> <span style="text-decoration: underline;">Decremental backup:</span>
+A decremental backup is a backup method in which the most recent backup
+is a full backup, while the oldest backup are a difference compared to
+that full backup. The advantage of such type of backup is the you can
+restore easily your system in the last state it had using only the last
+backup. And, if you want to restore it in the state it had some time before, then you can
+restore the last backup (full backup), then the previous archive
+(a decremental backup) and so on. As you most usually want to restore the
+system in its last available state, this makes restoration much more
+easy compared to doing incremental backups. However, this suffer from a
+important drawback, which is that you need to transform the last backup
+into a decremental backup when comes the time to make another backup.
+Then you have to remove the former full backup and replace it by its
+decremental version.</font><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+</center>
+
+
+
+
+
+
+
+
+
+
+</body></html>

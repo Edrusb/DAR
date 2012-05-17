@@ -16,14 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: special_alloc.hpp,v 1.9 2004/11/07 18:21:38 edrusb Rel $
+// $Id: special_alloc.hpp,v 1.11 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file special_alloc.hpp
     /// \brief re-definition of new and delete class operator
+    /// \ingroup Private
     ///
     /// this is a set of macro that makes the new and delete operator for
     /// a class be re-defined in a way that allocation is done in big chunks
@@ -31,7 +32,6 @@
     /// given object allocation. This bring some performance improvment,
     /// because a lot a small objects that live and die toghether have to
     /// be allocated.
-    /// \ingroup Private
 
 #ifndef SPECIAL_ALLOC_HPP
 #define SPECIAL_ALLOC_HPP
@@ -50,6 +50,9 @@ extern "C"
 #endif
 #endif
 } // end extern "C"
+
+    /// \addtogroup Private
+    /// @{
 
 #define USE_SPECIAL_ALLOC(BASE_TYPE) \
         void *operator new(size_t taille) { return special_alloc_new(taille); };                \
@@ -72,6 +75,8 @@ namespace libdar
 } // end of namespace
 
 #endif
+
+    /// @}
 
 #endif
 

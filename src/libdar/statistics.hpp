@@ -16,15 +16,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: statistics.hpp,v 1.11 2005/12/01 17:47:30 edrusb Rel $
+// $Id: statistics.hpp,v 1.20 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 //
 
     /// \file statistics.hpp
-    /// \brief handle the statistic structure that gives a summary of treated files after each operation
+    /// \brief handle the statistic structure that gives a summary of treated files after each operatio
+    /// \ingroup API
 
 #ifndef STATISTICS_HPP
 #define STATISTICS_HPP
@@ -32,6 +33,7 @@
 #include "../my_config.h"
 
 #include "infinint.hpp"
+#include "user_interaction.hpp"
 
 extern "C"
 {
@@ -41,6 +43,9 @@ extern "C"
 #endif
 #endif
 }
+
+    /// \addtogroup Private
+    /// @{
 
 #if MUTEX_WORKS
 #define LOCK_IN pthread_mutex_lock(&lock_mutex)
@@ -76,7 +81,7 @@ namespace libdar
 	    /// to always use the default value for this constructor or to explicitely give "true" as argument.
 	statistics(bool lock = true) { init(lock); clear(); };
 	statistics(const statistics & ref) { copy_from(ref); };
-	statistics & operator = (const statistics & ref) { detruit(); copy_from(ref); return *this; };
+	const statistics & operator = (const statistics & ref) { detruit(); copy_from(ref); return *this; };
 
 	    /// destructor
 	~statistics() { detruit(); };
@@ -99,6 +104,11 @@ namespace libdar
 	void add_to_ignored(const infinint & val) { (this->*add_to)(&ignored, val); };  ///< increment the ignored counter by a given value
 	void add_to_errored(const infinint & val) { (this->*add_to)(&errored, val); };  ///< increment the errored counter by a given value
 	void add_to_deleted(const infinint & val) { (this->*add_to)(&deleted, val); };  ///< increment the deleted counter by a given value
+	void add_to_byte_amount(const infinint & val) { (this->*add_to)(&byte_amount, val); }; ///< increment the byte amount counter by a given value
+
+	void sub_from_treated(const infinint & val) { (this->*sub_from)(&treated, val); };
+	void sub_from_ea_treated(const infinint & val) { (this->*sub_from)(&ea_treated, val); };
+	void sub_from_hard_links(const infinint & val) { (this->*sub_from)(&hard_links, val); };
 
 	infinint get_treated() const { return (this->*returned)(&treated); };     ///< returns the current value of the treated counter
 	infinint get_hard_links() const { return (this->*returned)(&hard_links); }; ///< returns the current value of the hard_links counter
@@ -108,6 +118,21 @@ namespace libdar
 	infinint get_errored() const { return (this->*returned)(&errored); };     ///< returns the current value of the errored counter
 	infinint get_deleted() const { return (this->*returned)(&deleted); };     ///< returns the current value of the deleted counter
 	infinint get_ea_treated() const { return (this->*returned)(&ea_treated); };  ///< returns the current value of the ea_treated counter
+	infinint get_byte_amount() const { return (this->*returned)(&byte_amount); };  ///< returns the current value of the byte_amount counter
+
+	void decr_treated() { (this->*decrement)(&treated); };        ///< decrement by one the treated counter
+	void decr_hard_links() { (this->*decrement)(&hard_links); };  ///< decrement by one the hard_links counter
+	void decr_skipped() { (this->*decrement)(&skipped); };        ///< decrement by one the skipped counter
+	void decr_ignored() { (this->*decrement)(&ignored); };        ///< decrement by one the ignored counter
+	void decr_tooold() { (this->*decrement)(&tooold); };          ///< decrement by one the toold counter
+	void decr_errored() { (this->*decrement)(&errored); };        ///< decrement by one the errored counter
+	void decr_deleted() { (this->*decrement)(&deleted); };        ///< decrement by one the deleted counter
+	void decr_ea_treated() { (this->*decrement)(&ea_treated); };  ///< decrement by one the ea_treated counter
+
+	void set_byte_amount(const infinint & val) { (this->*set_to)(&byte_amount, val); }; ///< set to the given value the byte_amount counter
+
+	    // debuging method
+	void dump(user_interaction & dialog) const;
 
     private:
 #if MUTEX_WORKS
@@ -115,19 +140,23 @@ namespace libdar
 #endif
 	bool locking;           ///< whether we use locking or not
 
-        infinint treated;       ///< number of file treated (saved, restored, etc.) [all operations]
-        infinint hard_links;    ///< number of hard linked files
+        infinint treated;       ///< number of inode treated (saved, restored, etc.) [all operations]
+        infinint hard_links;    ///< number of hard linked inodes treated (including those ignored by filters)
         infinint skipped;       ///< files not changed since last backup / file not restored because not saved in backup
         infinint ignored;       ///< ignored files due to filters
         infinint tooold;        ///< ignored files because less recent than the filesystem entry [restoration] / modfied during backup
         infinint errored;       ///< files that could not be saved / files that could not be restored (filesystem access right)
         infinint deleted;       ///< deleted file seen / number of files deleted during the operation [restoration]
         infinint ea_treated;    ///< number of EA saved / number of EA restored
+	infinint byte_amount;   ///< auxilliary counter, holds the wasted bytes due to repeat on change feature for example.
 
 
 	void (statistics::*increment)(infinint * var);                    ///< generic method for incrementing a variable
 	void (statistics::*add_to)(infinint * var, const infinint & val); ///< generic method for add a value to a variable
  	infinint (statistics::*returned)(const infinint * var) const;     ///< generic method for obtaining the value of a variable
+	void (statistics::*decrement)(infinint * var);                    ///< generic method for decrementing a variable
+	void (statistics::*set_to)(infinint * var, const infinint & val); ///< generic method for setting a variable to a given value
+	void (statistics::*sub_from)(infinint *var, const infinint & val);///< generic method for substracting to a variable
 
 	void increment_locked(infinint * var)
 	{
@@ -169,6 +198,43 @@ namespace libdar
 	    return *var;
 	};
 
+	void decrement_locked(infinint * var)
+	{
+	    LOCK_IN;
+	    (*var)--;
+	    LOCK_OUT;
+	}
+
+	void decrement_unlocked(infinint * var)
+	{
+	    (*var)--;
+	}
+
+	void set_to_locked(infinint *var, const infinint & val)
+	{
+	    LOCK_IN;
+	    (*var) = val;
+	    LOCK_OUT;
+	}
+
+	void set_to_unlocked(infinint *var, const infinint & val)
+	{
+	    *var = val;
+	}
+
+	void sub_from_unlocked(infinint *var, const infinint & val)
+	{
+	    *var -= val;
+	}
+
+	void sub_from_locked(infinint *var, const infinint & val)
+	{
+	    LOCK_IN;
+	    *var -= val;
+	    LOCK_OUT;
+	}
+
+
 	void init(bool lock); // set locking & mutex
 	void detruit();       // release and free the mutex
 	void copy_from(const statistics & ref); // reset mutex and copy data from the object of reference
@@ -176,5 +242,7 @@ namespace libdar
     };
 
 } // end of namespace
+
+    /// @}
 
 #endif

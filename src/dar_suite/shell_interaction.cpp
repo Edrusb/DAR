@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: shell_interaction.cpp,v 1.27.2.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: shell_interaction.cpp,v 1.35 2011/02/11 20:23:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -59,6 +59,11 @@ char *strchr (), *strrchr ();
 #if HAVE_STDIO_H
 #include <stdio.h>
 #endif
+
+#if HAVE_LIMITS_H
+#include <limits.h>
+#endif
+
 } // end extern "C"
 
 #include "integers.hpp"
@@ -84,11 +89,16 @@ static void set_term_mod(const struct termios & etat);
 static bool interaction_pause(const string &message, void *context);
 static void interaction_warning(const string & message, void *context);
 static string interaction_string(const string & message, bool echo, void *context);
+static secu_string interaction_secu_string(const string & message, bool echo, void *context);
 
 user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool silent)
 {
     has_terminal = false;
-    user_interaction *ret = new user_interaction_callback(interaction_warning, interaction_pause, interaction_string, NULL);
+    user_interaction *ret = new user_interaction_callback(interaction_warning,
+							  interaction_pause,
+							  interaction_string,
+							  interaction_secu_string,
+							  NULL);
     if(ret == NULL)
 	throw Ememory("shell_interaction_init");
 
@@ -197,6 +207,12 @@ void shell_interaction_close()
 {
     if(has_terminal)
 	set_term_mod(initial);
+
+    if(input >= 0)
+    {
+	close(input);
+	input = -1;
+    }
 }
 
 static void set_term_mod(const struct termios & etat)
@@ -207,7 +223,12 @@ static void set_term_mod(const struct termios & etat)
 
 static bool interaction_pause(const string &message, void *context)
 {
-    const S_I bufsize = 1024;
+    const U_I expected_buf_size = 1024;
+#ifdef SSIZE_MAX
+    const U_I bufsize = expected_buf_size > SSIZE_MAX ? SSIZE_MAX : expected_buf_size;
+#else
+    const U_I bufsize = expected_buf_size;
+#endif
     char buffer[bufsize];
     char & a = buffer[0];
     char & b = buffer[1];
@@ -237,7 +258,7 @@ static bool interaction_pause(const string &message, void *context)
 
 		// now asking the user
 
-            *inter << message << gettext(" [return = OK | Esc = cancel]") << (beep ? "\007\007\007" : "") << endl;
+            *inter << message << gettext(" [return = YES | Esc = NO]") << (beep ? "\007\007\007" : "") << endl;
 	    tools_block_all_signals(old_mask);
 	    tmp_ret = read(input, &a, 1);
 	    errno_bk = errno;
@@ -287,7 +308,12 @@ static void interaction_warning(const string & message, void *context)
 static string interaction_string(const string & message, bool echo, void *context)
 {
     string ret;
-    const U_I taille = 100;
+    const U_I expected_taille = 100;
+#ifdef SSIZE_MAX
+    const U_I taille = expected_taille > SSIZE_MAX ? SSIZE_MAX : expected_taille;
+#else
+    const U_I taille = expected_taille;
+#endif
     U_I lu, i;
     char buffer[taille+1];
     bool fin = false;
@@ -317,8 +343,60 @@ static string interaction_string(const string & message, bool echo, void *contex
     return ret;
 }
 
+static secu_string interaction_secu_string(const string & message, bool echo, void *context)
+{
+    const U_I expected_taille = 1000;
+#ifdef SSIZE_MAX
+    const U_I taille = expected_taille > SSIZE_MAX ? SSIZE_MAX : expected_taille;
+#else
+    const U_I taille = expected_taille;
+#endif
+    secu_string ret = taille;
+    bool fin = false;
+    U_I last = 0, i = 0;
+
+    if(!echo)
+	set_term_mod(initial_noecho);
+
+    try
+    {
+	if(output == NULL || input < 0)
+	    throw SRC_BUG;  // shell_interaction has not been properly initialized
+	*inter << message;
+	do
+	{
+	    ret.append(input, taille - ret.size());
+	    i = last;
+	    while(i < ret.size() && ret.c_str()[i] != '\n')
+		++i;
+	    if(i < ret.size()) // '\n' found so we stop here but remove this last char
+	    {
+		fin = true;
+		ret.reduce_string_size_to(i);
+	    }
+	    else
+		last = i;
+
+	    if(ret.size() == taille && !fin)
+		throw Erange("interaction_secu_string", gettext("provided password is too long for the allocated memory"));
+	}
+	while(!fin);
+
+	if(!echo)
+	    *inter << endl;
+    }
+    catch(...)
+    {
+	set_term_mod(initial);
+	throw;
+    }
+    set_term_mod(initial);
+
+    return ret;
+}
+
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: shell_interaction.cpp,v 1.27.2.1 2007/07/22 16:34:59 edrusb Rel $";
+    static char id[]="$Id: shell_interaction.cpp,v 1.35 2011/02/11 20:23:41 edrusb Rel $";
     dummy_call(id);
 }

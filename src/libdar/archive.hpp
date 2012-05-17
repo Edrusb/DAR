@@ -16,15 +16,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive.hpp,v 1.32.2.3 2010/09/12 16:32:51 edrusb Rel $
+// $Id: archive.hpp,v 1.69 2011/04/02 20:14:26 edrusb Rel $
 //
 /*********************************************************************/
 //
 
     /// \file archive.hpp
     /// \brief the archive class is defined in this module
+    /// \ingroup API
 
 
 #ifndef ARCHIVE_HPP
@@ -32,11 +33,13 @@
 
 #include "../my_config.h"
 
-#include "crypto.hpp"
 #include "path.hpp"
-#include "catalogue.hpp"
 #include "scrambler.hpp"
 #include "statistics.hpp"
+#include "archive_options.hpp"
+#include "escape.hpp"
+#include "escape_catalogue.hpp"
+#include "pile.hpp"
 
 namespace libdar
 {
@@ -51,14 +54,6 @@ namespace libdar
     {
     public:
 
-	    /// defines the way archive listing is done:
-	enum listformat
-	{
-	    normal,   //< the tar-like listing (should be the default to use)
-	    tree,     //< the original dar's tree listing (for those that like forest)
-	    xml       //< the xml catalogue output
-	};
-
 	    /// this constructor opens an already existing archive (for reading) [this is the "read" constructor]
 
 	    /// \param[in,out] dialog for user interaction
@@ -66,36 +61,12 @@ namespace libdar
 	    /// \param[in] basename the slices basename of the archive to read
 	    /// ("-" means standard input, and activates the output_pipe and input_pipe arguments)
 	    /// \param[in] extension the slice extension (should always be "dar")
-	    /// \param[in] crypto the crypto cypher to use to read the archive
-	    /// \param[in] pass the password or passphrase to decrypt (unused if encryption is not set)
-	    /// if an empty string is given and encryption is set, the password will be asked through the user_interaction object
-	    /// \param[in] crypto_size the encryption block size to use to decrypt (unused if encrytion is not set)
-	    /// \param[in] input_pipe the name of the input pipe to read data from (when basename is set to "-")
-	    /// if input_pipe is set to "" the information from dar_slave are expected in standard input else the given string
-	    /// must be the path to the a named pipe which will relay the information from dar_slave
-	    /// \param[in] output_pipe the name of the output pipe to send orders to (when basenale is set to "-")
-	    /// if output_pipe is set to "" the orders sent to dar_slave will exit by the standard output else the given string
-	    /// must be the path to a named pipe which will relay the orders to dar_slave
-	    /// \param[in] execute the command to execute before reading each slice (empty string for no script)
-	    /// several macros are available:
-	    /// - %%n : the slice number to be read
-	    /// - %%b : the archive basename
-	    /// - %%p : the slices path
-	    /// - %%e : the archive extension (usually "dar")
-	    /// - %%% : substitued by %%
-	    /// .
-	    /// \param[in] info_details whether the user needs detailed output of the operation
+	    /// \param[in] options A set of option to use to read the archive
 	archive(user_interaction & dialog,
 		const path & chem,
 		const std::string & basename,
 		const std::string & extension,
-		crypto_algo crypto,
-		const std::string &pass,
-		U_32 crypto_size,
-		const std::string & input_pipe,
-		const std::string & output_pipe,
-		const std::string & execute,
-		bool info_details);
+		const archive_options_read & options);
 
 
 	    /// this constuctor create an archive (full or differential) [this is the "create" constructor]
@@ -103,83 +74,27 @@ namespace libdar
 	    /// \param[in,out] dialog for user interaction
 	    /// \param[in] fs_root the filesystem to take as root for the backup
 	    /// \param[in] sauv_path the path where to create slices
-	    /// \param[in] ref_arch the archive to take as reference (NULL for a full backup)
-	    /// \param[in] selection to only save file (except directory) that match the given mask
-	    /// \param[in] subtree define the directory and files to consider (this mask will be applied to the absolute path of files being proceeded)
 	    /// \param[in] filename base name of the slices. If "-" is given the archive will be produced in standard output
 	    /// \param[in] extension slices extension ("dar")
-	    /// \param[in] allow_over whether overwritting is allowed
-	    /// \param[in] warn_over whether a warning shall be issued before overwriting
-	    /// \param[in] info_details whether the user needs detailed output of the operation
-	    /// \param[in] pause Pause beteween slices. Set to zero does not pause at all, set to 1 makes libdar pauses each slice, set to 2 makes libdar pause each 2 slices and so on.
-	    /// \param[in] empty_dir whether we need to store ignored directories as empty
-	    /// \param[in] algo the compression algorithm used
-	    /// \param[in] compression_level the compression level (from 1 to 9)
-	    /// \param[in] file_size the slice size in byte (0 for a single slice whatever its size is)
-	    /// \param[in] first_file_size the first file size (value 0 is forbidden unless file_size is also set to zero).
-	    /// \param[in] ea_mask defines which Extended Attributes to save
-	    /// \param[in] execute command to execute after each slice creation
-	    /// (see the "read" constructor for the available macros)
-	    /// \param[in] crypto cypher to use
-	    /// \param[in] pass the password / passphrase to encrypt the data with. Giving an empty string makes the password asked
-	    /// interactively through the dialog argument if encryption has been set.
-	    /// \param[in] crypto_size the size of the encryption by block to use
-	    /// \param[in] compr_mask files to compress
-	    /// \param[in] min_compr_size file size under which to never compress
-	    /// \param[in] nodump whether to ignore files with the nodump flag set
-	    /// \param[in] what_to_check fields to consider when comparing inodes with reference archive (see inode::comparison_fields enumeration in catalogue.hpp)
-	    /// \param[in] hourshift ignore differences of at most this integer number of hours while looking for changes in dates
-	    /// \param[in] empty whether to make a dry-run operation
-	    /// \param[in] alter_atime whether to alter atime or ctime in the filesystem when reading files to save
-	    /// \param[in] same_fs whether to limit the backup to files located on the same filesystem as the directory taken as root of the backup
-	    /// \param[in] snapshot whether to make an emtpy archive only referencing the current state of files in the filesystem
-	    /// \param[in] cache_directory_tagging whether to consider the Cache Directory Tagging Standard
-	    /// \param[in] display_skipped whether to display files that have been excluded by filters
-	    /// \param[in] fixed_date whether to ignore any archive of reference and only save file which modification is more recent that the given "fixed_date". To not use this feature set fixed_date to zero.
-	    /// \param[out] progressive_report statistics about the operation, considering the treated files (NULL can be given if you don't want to use this feature)
+	    /// \param[in] options optional parameters to use for the operation
+ 	    /// \param[out] progressive_report statistics about the operation, considering the treated files (NULL can be given if you don't want to use this feature)
 	    /// \note the statistics fields used are:
 	    /// - .treated: the total number of files seen
 	    /// - .hard_link: the number of hard linked inodes
-	    /// - .tooold: the number of files that changed at the time they were saved
+	    /// - .tooold: the number of files that changed at the time they were saved and that could not be resaved (due to repeat limit or byte limit)
 	    /// - .skipped: number of files not changed (differential backup)
 	    /// - .errored: number of files concerned by filesystem error
 	    /// - .ignored: number of files excluded by filters
 	    /// - .deleted: number of files recorded as deleted
+	    /// - .ea_treated: number of entry having some EA
+	    /// - .byte_amount : number of wasted bytes due to repeat on change feature
 	    /// .
 	archive(user_interaction & dialog,
 		const path & fs_root,
 		const path & sauv_path,
-		archive *ref_arch,
-		const mask & selection,
-		const mask & subtree,
 		const std::string & filename,
 		const std::string & extension,
-		bool allow_over,
-		bool warn_over,
-		bool info_details,
-		const infinint & pause,
-		bool empty_dir,
-		compression algo,
-		U_I compression_level,
-		const infinint &file_size,
-		const infinint &first_file_size,
-		const mask & ea_mask,
-		const std::string & execute,
-		crypto_algo crypto,
-		const std::string & pass,
-		U_32 crypto_size,
-		const mask & compr_mask,
-		const infinint & min_compr_size,
-		bool nodump,
-		inode::comparison_fields what_to_check,
-		const infinint & hourshift,
-		bool empty,
-		bool alter_atime,
-		bool same_fs,
-		bool snapshot,
-		bool cache_directory_tagging,
-		bool display_skipped,
-		const infinint & fixed_date,
+		const archive_options_create & options,
 		statistics * progressive_report);
 
 
@@ -190,108 +105,49 @@ namespace libdar
 	    /// \param[in] ref_arch the archive to take as reference (NULL for a full backup)
 	    /// \param[in] filename base name of the slices ("-" for standard output)
 	    /// \param[in] extension slices extension ("dar")
-	    /// \param[in] allow_over whether overwritting is allowed
-	    /// \param[in] warn_over whether a warning shall be issued before overwriting
-	    /// \param[in] info_details whether the user needs detailed output of the operation
-	    /// \param[in] pause Pause beteween slices. Set to zero does not pause at all, set to 1 makes libdar pauses each slice, set to 2 makes libdar pause each 2 slices and so on.
-	    /// \param[in] algo the compression algorithm used
-	    /// \param[in] compression_level the compression level (from 1 to 9)
-	    /// \param[in] file_size the slice size in byte (0 for a single slice whatever its size is)
-	    /// \param[in] first_file_size the first file size (zero is allowed only if file_size is set to zero)
-	    /// \param[in] execute command to execute after each slice creation
-	    /// \param[in] crypto cypher to use
-	    /// \param[in] pass the password / passphrase to encrypt the data with (empty string for interactive question)
-	    /// \param[in] crypto_size the size of the encryption by block to use
-	    /// \param[in] empty whether to make a dry-run operation
+	    /// \param[in] options optional parameters to use for the operation
 	archive(user_interaction & dialog,
 		const path &sauv_path,
 		archive *ref_arch,
 		const std::string & filename,
 		const std::string & extension,
-		bool allow_over,
-		bool warn_over,
-		bool info_details,
-		const infinint & pause,
-		compression algo,
-		U_I compression_level,
-		const infinint &file_size,
-		const infinint &first_file_size,
-		const std::string & execute,
-		crypto_algo crypto,
-		const std::string & pass,
-		U_32 crypto_size,
-		bool empty);
+		const archive_options_isolate & options);
 
 
 	    /// this constructor builds an archive from two given archive [this is the "merge" constructor]
 
 	    /// \param[in,out] dialog for user interaction
 	    /// \param[in] sauv_path the path where to create slices
-	    /// \param[in] ref_arch1 the first input archive (NULL if no archive to give, thus building a subset of ref_arch2)
-	    /// \param[in] ref_arch2 the first input archive (NULL if no archive to give, thus building a subset of ref_arch1)
-	    /// \param[in] selection to only consider files (except directory) that match the given mask
-	    /// \param[in] subtree define the directory and files to consider (this mask will be applied to the absolute path of files being proceeded, *
-            /// assuming a "<ROOT>" is the root of all paths)
+	    /// \param[in] ref_arch1 the first mandatory input archive (the second is optional and provided within the 'option' argument
 	    /// \param[in] filename base name of the slices. If "-" is given the archive will be produced in standard output
 	    /// \param[in] extension slices extension ("dar")
-	    /// \param[in] allow_over whether to allow slice overwriting
-	    /// \param[in] warn_over whether to warn before overwriting a slice
-	    /// \param[in] info_details whether the user needs detailed output of the operation
-	    /// \param[in] pause Pause beteween slices. Set to zero does not pause at all, set to 1 makes libdar pauses each slice, set to 2 makes libdar pause each 2 slices and so on.
-	    /// \param[in] empty_dir whether we need to store ignored directories as empty
-	    /// \param[in] algo is the compression algorithm used
-	    /// \param[in] compression_level is the compression level (from 1 to 9)
-	    /// \param[in] file_size the slice size in byte (0 for a single slice whatever its size is)
-	    /// \param[in] first_file_size the first file size (value 0 is forbidden unless file_size is also set to zero).
-	    /// \param[in] ea_mask defines which Extended Attributes to save
-	    /// \param[in] execute command to execute after each slice creation
-	    /// (see the "read" constructor for the available macros)
-	    /// \param[in] crypto cypher to use
-	    /// \param[in] pass the password / passphrase to encrypt the data with. Giving an empty string makes the password asked
-	    /// interactively through the dialog argument if encryption has been set.
-	    /// \param[in] crypto_size the size of the encryption by block to use
-	    /// \param[in] compr_mask files to compress
-	    /// \param[in] min_compr_size file size under which to never compress
-	    /// \param[in] empty whether to make a dry-run operation
-	    /// \param[in] display_skipped whether to display files that have been excluded by filters
-	    /// \param[in] keep_compressed make dar ignore the 'algo' argument and do not uncompress / compress files that are selected for merging
+	    /// \param[in] options optional parameters to be used for the operation
 	    /// \param[out] progressive_report statistics about the operation, considering the treated files (NULL can be given if you don't want to use this feature)
 	    /// \note the statistics fields used are:
 	    /// - .treated: the total number of files seen
 	    /// - .hard_link: the number of hard linked inodes
 	    /// - .ignored: number of files excluded by filters
 	    /// - .deleted: number of files recorded as deleted
+	    /// - .ea_treated: number of entry with EA
 	    /// .
 
 	archive(user_interaction & dialog,
 		const path & sauv_path,
 		archive *ref_arch1,
-		archive *ref_arch2,
-		const mask & selection,
-		const mask & subtree,
 		const std::string & filename,
 		const std::string & extension,
-                bool allow_over,
-		bool warn_over,
-		bool info_details,
-		const infinint & pause,
-		bool empty_dir,
-		compression algo,
-		U_I compression_level,
-		const infinint & file_size,
-		const infinint & first_file_size,
-		const mask & ea_mask,
-		const std::string & execute,
-		crypto_algo crypto,
-		const std::string & pass,
-		U_32 crypto_size,
-		const mask & compr_mask,
-		const infinint & min_compr_size,
-		bool empty,
-		bool display_skipped,
-		bool keep_compressed,
+		const archive_options_merge & options,
 		statistics * progressive_report);
 
+	    /// copy constructor (not implemented, throw an exception if called explicitely or implicitely)
+
+	    /// \note this lack of implementation is intentionnal, Archive should rather be manipulated
+	    /// using pointers, or passed as constant reference (const &) in arguments or returned values.
+	    /// Moreover, having two objets one copy of the other may lead to unexpected behaviors while
+	    /// merging or creating, isolating or merging archives.
+
+	archive(const archive & ref) : stack(ref.stack) { throw Efeature(gettext("Archive copy constructor is not implemented")); };
+	archive & operator = (const archive & ref) { throw Efeature(gettext("Archive assignment operator is not implemented")); };
 
 	    /// the destructor
 	~archive() { free(); };
@@ -301,80 +157,44 @@ namespace libdar
 
 	    /// \param[in,out] dialog for user interaction
 	    /// \param[in] fs_root the filesystem to take as root for the restoration
-	    /// \param[in] selection to only restore file (except directory) that match the given mask
-	    /// \param[in] subtree define the directory and files to consider (this mask will be applied to the absolute path of files being proceeded)
-	    /// \param[in] allow_over whether overwritting is allowed
-	    /// \param[in] warn_over whether a warning shall be issued before overwriting
-	    /// \param[in] info_details whether the user needs detailed output of the operation
-	    /// \param[in] detruire whether the files recorded as removed from the archive of reference shall be removed from filesystem
-	    /// \param[in] only_more_recent whether to restore only file more recent than those on filesystem
-	    /// \param[in] ea_mask mask which defines which EA to restore
-	    /// \param[in] flat whether to ignore directory structure and restore all files in the same directory
-	    /// \param[in] what_to_check fields to consider when comparing inodes with those on filesystem to determine if it is more recent (see inode::comparison_fields enumeration), also defines which if mtime has to be restored (cf_mtime) if permission have to be too (cf_ignore_owner) if ownership has to be restored too (cf_all)
-	    /// \param[in] warn_remove_no_match whether a warning must be issue if a file to remove does not match the expected type of file
-	    /// \param[in] hourshift ignore differences of at most this integer number of hours while looking for file to restore
-	    /// \param[in] empty whether to make a dry-run operation
-	    /// \param[in] ea_erase if set, all EA are first erased before being restored
-	    /// \param[in] display_skipped whether to display files that have been excluded by filters
+	    /// \param[in] options optional parameter to be used for the operation
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
 	    /// during the call (see the returned value to know the useful fields and their meining),
 	    /// NULL can be given in argument if you only need the result at the end of the operation through the returned value of this call
 	    /// this should speed up the operation by a little amount.
 	    /// \return the statistics about the operation, considering the treated files
 	    /// \note the statistics fields used are:
-	    /// - .treated: the total number of files seen
+	    /// - .treated: the total number of files restored
 	    /// - .skipped: number of files not saved in the archive
-	    /// - .tooold: number of file older than the one on filesystem
+	    /// - .tooold: number of file not restored due to overwriting policy decision
 	    /// - .errored: number of files concerned by filesystem error
 	    /// - .ignored: number of files excluded by filters
 	    /// - .deleted: number of files deleted
+	    /// - .hard_links: number of hard link restored
+	    /// - .ea_treated: number of entry having some EA
 	    /// .
 	statistics op_extract(user_interaction & dialog,
 			      const path &fs_root,
-			      const mask &selection,
-			      const mask &subtree,
-			      bool allow_over,
-			      bool warn_over,
-			      bool info_details,
-			      bool detruire,
-			      bool only_more_recent,
-			      const mask & ea_mask,
-			      bool flat,
-			      inode::comparison_fields what_to_check,
-			      bool warn_remove_no_match,
-			      const infinint & hourshift,
-			      bool empty,
-			      bool ea_erase,
-			      bool display_skipped,
+			      const archive_options_extract & options,
 			      statistics *progressive_report);
+
+	    /// display a summary of the archive
+
+	void summary(user_interaction & dialog);
 
 
 	    /// listing of the archive contents
 
 	    /// \param[in,out] dialog for user interaction
-	    /// \param[in] info_details whether the user needs detailed output of the operation
-	    /// \param[in] list_mode whether to list ala tar or in a tree like view
-	    /// \param[in] selection to only view some files (directories will always be seen)
-	    /// \param[in] filter_unsaved whether to ignore unsaved files
+	    /// \param[in] options list of optional parameters to use for the operation
 	void op_listing(user_interaction & dialog,
-			bool info_details,
-			archive::listformat list_mode,
-			const mask &selection,
-			bool filter_unsaved);
-
+			const archive_options_listing & options);
 
 	    /// archive comparison with filesystem
 
 	    /// \param[in,out] dialog for user interaction
 	    /// \param[in] fs_root the filesystem to take as root for the comparison
-	    /// \param[in] selection to only consider file (except directory) that match the given mask
-	    /// \param[in] subtree define the directory and files to consider (this mask will be applied to the absolute path of files being proceeded)
-	    /// \param[in] info_details whether the user needs detailed output of the operation
-	    /// \param[in] ea_mask is a mask that defines the Extended Attributes to compare
-	    /// \param[in] what_to_check fields to consider wien comparing inodes with those on filesystem (see inode::comparison_fields enumeration)
-	    /// \param[in] alter_atime whether to alter atime or ctime in the filesystem when reading files to compare
-	    /// \param[in] display_skipped whether to display files that have been excluded by filters
-	    /// \param[in] hourshift dates with up to this exact interger number of hour of difference are considered equal dates
+	    /// \param[in] options optional parameters to be used with the operation
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
 	    /// during the call (see the returned value to know the useful fields and their meining),
 	    /// NULL can be given in argument if you only need the result at the end of the operation through the returned value of this call
@@ -387,24 +207,14 @@ namespace libdar
 	    /// .
 	statistics op_diff(user_interaction & dialog,
 			   const path & fs_root,
-			   const mask &selection,
-			   const mask &subtree,
-			   bool info_details,
-			   const mask & ea_mask,
-			   inode::comparison_fields what_to_check,
-			   bool alter_atime,
-			   bool display_skipped,
-			   statistics * progressive_report,
-			   const infinint & hourshift = 0);
+			   const archive_options_diff & options,
+			   statistics * progressive_report);
 
 
 	    /// test the archive integrity
 
 	    /// \param[in,out] dialog for user interaction
-	    /// \param[in] selection to only test file (except directory) that match the given mask
-	    /// \param[in] subtree define the directory and files to consider (this mask will be applied to the string "<ROOT>/<relative filename>" of the files being proceeded, where "<ROOT>" is the litteral string "<ROOT>" without the quotes)
-	    /// \param[in] info_details whether the user needs detailed output of the operation
-	    /// \param[in] display_skipped whether to display files that have been excluded by filters
+	    /// \param[in] options optional parameter to use for the operation
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
 	    /// during the call (see the returned value to know the useful fields and their meining),
 	    /// NULL can be given in argument if you only need the result at the end of the operation through the returned value of this call
@@ -423,10 +233,7 @@ namespace libdar
 	    /// - .errored: number of files with error
 	    /// .
 	statistics op_test(user_interaction & dialog,
-			   const mask &selection,
-			   const mask &subtree,
-			   bool info_details,
-			   bool display_skipped,
+			   const archive_options_test & options,
 			   statistics * progressive_report);
 
 
@@ -450,19 +257,38 @@ namespace libdar
 	    /// \return the catalogue reference contained in this archive
 	    /// \note this method is not to be used directly from external application, it is
 	    /// not part of the API but must remain a public method for been usable by the database class
-	const catalogue & get_catalogue() const { if(cat == NULL) throw SRC_BUG; return *cat; };
+	    /// \note this method is not usable (throws an exception) if the archive has been
+	    /// open in sequential read mode and the catalogue has not yet been read; use the
+	    /// same method but with user_interaction argument instead, in that situation
+	const catalogue & get_catalogue() const;
+
+	    /// gives access to internal catalogue (not to be used from the API) even in sequential read mode
+	const catalogue & get_catalogue(user_interaction & dialog) const;
+
+	    /// closes all filedescriptors and associated data, just keep the catalogue
+
+	    /// \note once this method has been called, the archive object can only be used
+	    /// as reference for a differential archive.
+	    /// \note this method is not usable (throws an exception) if the archive has been
+	    /// open in sequential read mode and the catalogue has not yet been read; use the
+	    /// same method but with user_interaction argument instead in that situation
+	void drop_all_filedescriptors();
+
+	    /// closes all filedescriptors and associated even when in sequential read mode
+
+	void drop_all_filedescriptors(user_interaction & dialog);
 
     private:
 	enum operation { oper_create, oper_isolate, oper_merge };
 
-	generic_file *level1;
-	generic_file *scram;
-	compressor *level2;
+	pile stack;
 	header_version ver;
 	catalogue *cat;
 	infinint local_cat_size;
 	path *local_path;
-	bool exploitable; // is false if only the catalogue is available (for reference backup or isolation).
+	bool exploitable; //< is false if only the catalogue is available (for reference backup or isolation).
+	bool lax_read_mode; //< whether the archive has been openned in lax mode (unused for creation/merging/isolation)
+	bool sequential_read; //< whether the archive is read in sequential mode
 
 	void free();
 	catalogue & get_cat() { if(cat == NULL) throw SRC_BUG; else return *cat; };
@@ -495,7 +321,7 @@ namespace libdar
 				const mask & ea_mask,
 				const std::string & execute,
 				crypto_algo crypto,
-				const std::string & pass,
+				const secu_string & pass,
 				U_32 crypto_size,
 				const mask & compr_mask,
 				const infinint & min_compr_size,
@@ -503,56 +329,93 @@ namespace libdar
 				const infinint & hourshift,
 				bool empty,
 				bool alter_atime,
+				bool furtive_read_mode,
 				bool same_fs,
 				inode::comparison_fields what_to_check,
 				bool snapshot,
 				bool cache_directory_tagging,
 				bool display_skipped,
 				const infinint & fixed_date,
+				const std::string & slice_permission,
+				const std::string & slice_user_ownership,
+				const std::string & slice_group_ownership,
+				const infinint & repeat_count,
+				const infinint & repeat_byte,
+				bool add_marks_for_sequential_reading,
+				bool security_check,
+				const infinint & sparse_file_min_size,
+				const std::string & user_comment,
+				hash_algo hash,
+				const infinint & slice_min_digits,
+				const std::string & backup_hook_file_execute,
+				const mask & backup_hook_file_mask,
+				bool ignore_unknown,
 				statistics * progressive_report);
 
-	void op_create_in_sub(user_interaction & dialog,        ///< interaction with user
-			      operation op,                     ///< the filter operation to bind to
-			      const path & fs_root,             ///< root of the filesystem to act on
-			      const path & sauv_path_t,         ///< where to create the archive
-			      catalogue  * ref_arch1,           ///< catalogue of the archive of reference (a catalogue must be provided in any case, a empty one shall fit for no reference)
-			      catalogue  * ref_arch2,           ///< secondary catalogue used for merging, can be NULL if not used
-			      const path * ref_path,            ///< path of the archive of archive of reference (NULL if there is no archive of reference used, thus ref_arch (previous arg) is probably an empty archive)
-			      const mask & selection,           ///< filter on filenames
-			      const mask & subtree,             ///< filter on directory tree and filenames
-			      const std::string & filename,     ///< basename of the archive to create
-			      const std::string & extension,    ///< extension of the archives
-			      bool allow_over,                  ///< whether to allow overwriting (of slices)
-			      bool warn_over,                   ///< whether to warn before overwriting
-			      bool info_details,                ///< whether to display detailed informations
-			      const infinint & pause,           ///< whether to pause between slices
-			      bool empty_dir,                   ///< whether to store excluded dir as empty directories
-			      compression algo,                 ///< compression algorithm
-			      U_I compression_level,            ///< compression level (range 1 to 9)
-			      const infinint & file_size,       ///< slice size
-			      const infinint & first_file_size, ///< first slice size
-			      const mask & ea_mask,             ///< Extended Attribute to consider
-			      const std::string & execute,      ///< Command line to execute between slices
-			      crypto_algo crypto,               ///< crypt algorithm
-			      const std::string & pass,         ///< password ("" for onfly request of password)
-			      U_32 crypto_size,                 ///< size of crypto blocks
-			      const mask & compr_mask,          ///< files to compress
-			      const infinint & min_compr_size,  ///< file size under which to not compress files
-			      bool nodump,                      ///< whether to consider the "nodump" filesystem flag
-			      const infinint & hourshift,       ///< hourshift (see man page -H option)
-			      bool empty,                       ///< whether to make an "dry-run" execution
-			      bool alter_atime,                 ///< whether to alter atime date (by opposition to ctime) when reading files
-			      bool same_fs,                     ///< confin the files consideration to a single filesystem
-			      inode::comparison_fields what_to_check,  ///< fields to consider wien comparing inodes (see inode::comparison_fields enumeration)
-			      bool snapshot,                    ///< make as if all file had not changed
-			      bool cache_directory_tagging,     ///< avoid saving directory which follow the cache directory tagging
-			      bool display_skipped,             ///< display skipped files for the operation
-			      bool keep_compressed,             ///< keep file compressed when merging
-			      const infinint & fixed_date,      ///< whether to ignore any archive of reference and only save file which modification is more recent that the given "fixed_date" date
-			      statistics * st_ptr);             ///< statistics must not be NULL !
+	void op_create_in_sub(user_interaction & dialog,        //< interaction with user
+			      operation op,                     //< the filter operation to bind to
+			      const path & fs_root,             //< root of the filesystem to act on
+			      const path & sauv_path_t,         //< where to create the archive
+			      catalogue  * ref_arch1,           //< catalogue of the archive of reference (a catalogue must be provided in any case, a empty one shall fit for no reference)
+			      catalogue  * ref_arch2,           //< secondary catalogue used for merging, can be NULL if not used
+			      const path * ref_path,            //< path of the archive of archive of reference (NULL if there is no archive of reference used, thus ref_arch (previous arg) is probably an empty archive)
+			      const mask & selection,           //< filter on filenames
+			      const mask & subtree,             //< filter on directory tree and filenames
+			      const std::string & filename,     //< basename of the archive to create
+			      const std::string & extension,    //< extension of the archives
+			      bool allow_over,                  //< whether to allow overwriting (of slices)
+			      const crit_action & overwrite,    //< whether and how to allow overwriting (for files inside the archive)
+			      bool warn_over,                   //< whether to warn before overwriting
+			      bool info_details,                //< whether to display detailed informations
+			      const infinint & pause,           //< whether to pause between slices
+			      bool empty_dir,                   //< whether to store excluded dir as empty directories
+			      compression algo,                 //< compression algorithm
+			      U_I compression_level,            //< compression level (range 1 to 9)
+			      const infinint & file_size,       //< slice size
+			      const infinint & first_file_size, //< first slice size
+			      const mask & ea_mask,             //< Extended Attribute to consider
+			      const std::string & execute,      //< Command line to execute between slices
+			      crypto_algo crypto,               //< crypt algorithm
+			      const secu_string & pass,         //< password ("" for onfly request of password)
+			      U_32 crypto_size,                 //< size of crypto blocks
+			      const mask & compr_mask,          //< files to compress
+			      const infinint & min_compr_size,  //< file size under which to not compress files
+			      bool nodump,                      //< whether to consider the "nodump" filesystem flag
+			      const infinint & hourshift,       //< hourshift (see man page -H option)
+			      bool empty,                       //< whether to make an "dry-run" execution
+			      bool alter_atime,                 //< whether to alter atime date (by opposition to ctime) when reading files
+			      bool furtive_read_mode,           //< whether to neither alter atime nor ctome (if true alter_atime is ignored)
+			      bool same_fs,                     //< confin the files consideration to a single filesystem
+			      inode::comparison_fields what_to_check,  //< fields to consider wien comparing inodes (see inode::comparison_fields enumeration)
+			      bool snapshot,                    //< make as if all file had not changed
+			      bool cache_directory_tagging,     //< avoid saving directory which follow the cache directory tagging
+			      bool display_skipped,             //< display skipped files for the operation
+			      bool keep_compressed,             //< keep file compressed when merging
+			      const infinint & fixed_date,      //< whether to ignore any archive of reference and only save file which modification is more recent that the given "fixed_date" date
+			      const std::string & slice_permission,      //< permissions of slices that will be created
+			      const std::string & slice_user_ownership,  //< user ownership of slices that will be created
+			      const std::string & slice_group_ownership, //< group ownership of slices that will be created
+			      const infinint & repeat_count,             //< max number of retry to save a file that have changed while it was read for backup
+			      const infinint & repeat_byte,              //< max amount of wasted data used to save a file that have changed while it was read for backup
+			      bool decremental,                          //< in the merging context only, whether to build a decremental backup from the two archives of reference
+			      bool add_marks_for_sequential_reading,     //< whether to add marks for sequential reading
+			      bool security_check,                       //< whether to check for ctime change with no reason (rootkit ?)
+			      const infinint & sparse_file_min_size,     //< starting which size to consider looking for holes in sparse files (0 for no detection)
+			      const std::string & user_comment,          //< user comment to put in the archive
+			      hash_algo hash,                            //< whether to produce hash file, and which algo to use
+			      const infinint & slice_min_digits,         //< minimum digit for slice number
+			      const std::string & backup_hook_file_execute, //< command to execute before and after files to backup
+			      const mask & backup_hook_file_mask,         //< files elected to have a command executed before and after their backup
+			      bool ignore_unknown,                        //< whether to warn when an unknown inode type is met
+			      statistics * st_ptr);             //< statistics must not be NULL !
 
 	void disable_natural_destruction();
 	void enable_natural_destruction();
+	const label & get_layer1_data_name() const;
+	const label & get_catalogue_data_name() const;
+	bool only_contains_an_isolated_catalogue() const; //< true if the current archive only contains an isolated catalogue
+	void check_against_isolation(user_interaction & dialog, bool lax) const; //< throw Erange exception if the archive only contains an isolated catalogue
+	void check_header_version() const;
     };
 
 } // end of namespace

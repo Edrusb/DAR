@@ -16,11 +16,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: my_getopt_long.h,v 1.2 2004/03/15 14:31:52 edrusb Rel $
+// $Id: my_getopt_long.h,v 1.4 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file my_getopt_long.h
+    /// \brief may lead to the definition of getopt_long to solve declaration conflicts in <unistd.h> and <getopt.h>
+    /// \ingroup CMDLINE
+
 
 #ifndef MY_GETOPT_LONG_H
 #define MY_GETOPT_LONG_H

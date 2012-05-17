@@ -16,31 +16,36 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: storage.hpp,v 1.11.4.4 2011/01/22 15:34:17 edrusb Rel $
+// $Id: storage.hpp,v 1.20 2011/01/22 22:39:10 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file storage.hpp
     /// \brief contains a class that permits arbitrary large data storage
-
-#ifndef STORAGE_HPP
-#define STORAGE_HPP
+    /// \ingroup Private
 
 #include "../my_config.h"
 #include "erreurs.hpp"
 #include "integers.hpp"
+
+#ifdef LIBDAR_MODE
+#include "infinint.hpp"
+#endif
+
+    // it is necessary to not protect the previous inclusion inside
+    // the STORAGE_HPP protection to avoid cyclic dependancies.
+
+#ifndef STORAGE_HPP
+#define STORAGE_HPP
 
 #ifndef LIBDAR_MODE
 namespace libdar
 {
     class infinint;
 }
-#else
-#include "infinint.hpp"
 #endif
-
 
 namespace libdar
 {
@@ -72,7 +77,7 @@ namespace libdar
         ~storage()
             { E_BEGIN; detruit(first); E_END("storage::~storage", ""); };
 
-        storage & operator = (const storage & val)
+        const storage & operator = (const storage & val)
             { E_BEGIN; detruit(first); copy_from(val); return *this; E_END("storage::operator=",""); };
 
         bool operator < (const storage & ref) const
@@ -146,7 +151,7 @@ namespace libdar
             // public storage methode using iterator
 
         iterator begin() const
-            { E_BEGIN; iterator ret; ret.cell = first; ret.offset = 0; ret.ref = this; return ret; E_END("storage::begin", ""); };
+            { E_BEGIN; iterator ret; ret.cell = first; if(ret.cell != NULL) ret.offset = 0; else ret.offset = iterator::OFF_END; ret.ref = this; return ret; E_END("storage::begin", ""); };
         iterator end() const
             { E_BEGIN; iterator ret; ret.cell = NULL; ret.offset = iterator::OFF_END; ret.ref = this; return ret; E_END("storage::end", ""); };
 

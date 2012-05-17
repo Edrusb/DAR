@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: special_alloc.cpp,v 1.14.2.2 2008/02/09 17:41:29 edrusb Rel $
+// $Id: special_alloc.cpp,v 1.18 2011/02/11 20:23:42 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -130,7 +130,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: special_alloc.cpp,v 1.14.2.2 2008/02/09 17:41:29 edrusb Rel $";
+        static char id[]="$Id: special_alloc.cpp,v 1.18 2011/02/11 20:23:42 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -152,6 +152,7 @@ namespace libdar
 		if(rit->ref == 0)
 		{
 		    ::delete [] rit->alloc;
+		    rit->alloc = NULL;
 		    alloc.erase(rit);
 		}
 	    }

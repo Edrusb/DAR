@@ -16,15 +16,24 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: cache.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: cache.cpp,v 1.28 2011/04/17 13:12:29 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 
+extern "C"
+{
+#if HAVE_STRING_H
 #include <string.h>
+#endif
+#if HAVE_LIMITS_H
+#include <limits.h>
+#endif
+}
+
 #include "cache.hpp"
 
 using namespace std;
@@ -43,10 +52,15 @@ namespace libdar
 //
 
 
-    cache::cache(user_interaction & dialog,
-		 generic_file & hidden,
-		 U_I initial_size, U_I unused_read_ratio, U_I observation_read_number, U_I max_size_hit_read_ratio,
-		 U_I unused_write_ratio, U_I observation_write_number, U_I max_size_hit_write_ratio) : generic_file(dialog, hidden.get_mode())
+    cache::cache(generic_file & hidden,
+		 bool shift_mode,
+		 U_I initial_size,
+		 U_I unused_read_ratio,
+		 U_I observation_read_number,
+		 U_I max_size_hit_read_ratio,
+		 U_I unused_write_ratio,
+		 U_I observation_write_number,
+		 U_I max_size_hit_write_ratio) : generic_file(hidden.get_mode())
     {
 	    // sanity checks
 	if(&hidden == NULL)
@@ -70,6 +84,7 @@ namespace libdar
 	buffer_cache.size = initial_size;
 	buffer_cache.next = 0;
 	buffer_cache.last = 0;
+	current_position = ref->get_position();
 	read_mode = false;
 
 	read_obs = observation_read_number;
@@ -86,9 +101,154 @@ namespace libdar
 
 	stat_write_overused = 0;
 	stat_write_counter = 0;
+
+	shifted_mode = shift_mode;
+	failed_increase = false;
     }
 
-    S_I cache::inherited_read(char *a, size_t size)
+    cache::~cache()
+    {
+	try
+	{
+	    flush_write();
+	}
+	catch(...)
+	{
+		// ignore all exceptions
+	}
+    }
+
+    bool cache::skip(const infinint & pos)
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(!read_mode)
+	{
+	    flush_write();
+	    if(pos != current_position)
+		if(ref->skip(pos))
+		{
+		    current_position = pos;
+		    return true;
+		}
+		else
+		{
+		    current_position = ref->get_position();
+		    return false;
+		}
+	    else
+		return true;
+	}
+	else // read mode
+	    if(current_position <= pos + buffer_cache.next && pos <= current_position + buffer_cache.last - buffer_cache.next) // requested position already in the cache
+	    {
+		if(pos < current_position)
+		{
+
+			// skipping backward in cache
+
+		    infinint delta = current_position - pos;
+		    U_I delta_ui = 0;
+
+		    current_position -= delta;
+		    delta.unstack(delta_ui);
+		    if(delta != 0)
+			throw SRC_BUG;
+
+		    if(delta_ui > buffer_cache.next)
+			throw SRC_BUG;
+		    buffer_cache.next -= delta_ui;
+		}
+		else
+		{
+
+			// skipping forward in cache
+
+
+		    infinint delta = pos - current_position;
+		    U_I delta_ui = 0;
+
+		    current_position += delta;
+		    delta.unstack(delta_ui);
+		    if(delta != 0)
+			throw SRC_BUG;
+
+		    if(delta_ui + buffer_cache.next > buffer_cache.last)
+			throw SRC_BUG;
+
+		    buffer_cache.next += delta_ui;
+		}
+		return true;
+	    }
+	    else // position out of the cache
+	    {
+		bool ret;
+
+		clear_read();
+		ret = ref->skip(pos);
+		current_position = pos;
+		return ret;
+	    }
+    }
+
+    bool cache::skip_to_eof()
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(!read_mode)
+	{
+	    bool ret;
+
+	    flush_write();
+	    ret = ref->skip_to_eof();
+	    current_position = ref->get_position();
+	    return ret;
+	}
+	else
+	{
+	    bool ret = ref->skip_to_eof();
+	    if(ret)
+		return skip(ref->get_position());
+	    else
+		return ret;
+	}
+    }
+
+    bool cache::skip_relative(S_I x)
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(!read_mode)
+	{
+	    bool ret;
+
+	    flush_write();
+	    ret = ref->skip_relative(x);
+	    current_position = ref->get_position();
+	    return ret;
+	}
+	else // read mode
+	{
+	    if(x >= 0)
+		return skip(current_position + x);
+	    else
+	    {
+		if(current_position >= -x) // -x is positive (because x is negative)
+		    return skip(current_position - infinint(-x));
+		else
+		{
+		    current_position = 0;
+		    (void)skip(0);
+		    return false;
+		}
+	    }
+	}
+    }
+
+    U_I cache::inherited_read(char *a, U_I size)
     {
 	U_I ret = 0;
 	bool eof = false;
@@ -98,7 +258,6 @@ namespace libdar
 	    flush_write();
 	    read_mode = true;
 	}
-
 
 	do
 	{
@@ -121,12 +280,13 @@ namespace libdar
 	    }
 	}
 	while(ret < size && !eof);
+	current_position += ret;
 
 	return ret;
     }
 
 
-    S_I cache::inherited_write(const char *a, size_t size)
+    void cache::inherited_write(const char *a, U_I size)
     {
 	U_I wrote = 0;
 	U_I avail, min;
@@ -137,24 +297,31 @@ namespace libdar
 	    read_mode = false;
 	}
 
-	while(wrote < size)
+	try
 	{
-	    avail = buffer_cache.size - buffer_cache.next;
-	    if(avail == 0)
+	    while(wrote < size)
 	    {
-		flush_write();
 		avail = buffer_cache.size - buffer_cache.next;
 		if(avail == 0)
-		    throw SRC_BUG;
+		{
+		    flush_write();
+		    avail = buffer_cache.size - buffer_cache.next;
+		    if(avail == 0)
+			throw SRC_BUG;
+		}
+		min = avail > (size-wrote) ? (size-wrote) : avail;
+
+		(void)memcpy(buffer_cache.buffer + buffer_cache.next, a + wrote, min);
+		wrote += min;
+		buffer_cache.next += min;
 	    }
-	    min = avail > (size-wrote) ? (size-wrote) : avail;
-
-	    (void)memcpy(buffer_cache.buffer + buffer_cache.next, a + wrote, min);
-	    wrote += min;
-	    buffer_cache.next += min;
+	    current_position += wrote;
 	}
-
-	return wrote;
+	catch(...)
+	{
+	    current_position = ref->get_position();
+	    throw;
+	}
     }
 
 
@@ -220,7 +387,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: cache.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $";
+        static char id[]="$Id: cache.cpp,v 1.28 2011/04/17 13:12:29 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -237,39 +404,54 @@ namespace libdar
 	if(buffer_cache.next == buffer_cache.last && buffer_cache.next != 0)
 	    stat_read_overused++;
 
-	    // all data in cache is lost, cache becomes empty at this point
-	    // eventually checking cache behavior
+	    // flushing / shifting the cache contents
+
+	if(shifted_mode)
+	    buffer_cache.shift_by_half();
+	else
+	    buffer_cache.clear();
+
+	    ///////
+	    // some data may remain in the cache, we need to preserve them !!!
+	    // this occurres when a shift by half of the buffer has been done just before
+	    ///////
 
 	if(stat_read_counter >= read_obs)
 	{
 	    if(stat_read_overused * 100 > read_overused_rate * stat_read_counter) // need to increase cache size
 	    {
-		U_I tmp = buffer_cache.size * 2;
-		if(buffer_cache.size < tmp)
+		if(!failed_increase)
 		{
-		    delete [] buffer_cache.buffer;
-		    buffer_cache.buffer = NULL;
-		    buffer_cache.size = tmp;
-		    buffer_cache.buffer = new char[buffer_cache.size];
-		    if(buffer_cache.buffer == NULL)
-			throw Ememory("cache::fulfill_read");
+		    U_I tmp = buffer_cache.size * 2;
+#ifdef SSIZE_MAX
+		    if(tmp <= SSIZE_MAX && buffer_cache.size < tmp)
+#else
+		    if(buffer_cache.size < tmp)
+#endif
+		    {
+			try
+			{
+			    buffer_cache.resize(tmp);
+			}
+			catch(Ememory & e)
+			{
+			    failed_increase = true;
+			}
+			catch(bad_alloc & e)
+			{
+			    failed_increase = true;
+			}
+		    }
 		}
-		    // else nothing is done as we cannot get a larger buffer
 	    }
 	    else
 		if(stat_read_unused * 100 < read_unused_rate * stat_read_counter) // need to decrease cache size
 		{
-		    U_I tmp = buffer_cache.size / 2;
-		    if(tmp < buffer_cache.size && tmp > 0)
-		    {
-			delete [] buffer_cache.buffer;
-			buffer_cache.buffer = NULL;
-			buffer_cache.size = tmp;
-			buffer_cache.buffer = new char[buffer_cache.size];
-			if(buffer_cache.buffer == NULL)
-			    throw Ememory("cache::fulfill_read");
-		    }
-			// else nothing is done, as we cannot get asmaller buffer
+		    U_I tmp = 2 * buffer_cache.size / 3;
+		    if(tmp < buffer_cache.size && tmp > 0 && tmp > buffer_cache.last) // so we have enough room in the new buffer for in place data
+			buffer_cache.resize(tmp);
+			// else nothing is done, as we cannot get a smaller buffer
+		    failed_increase = false;
 		}
 		// else the cache size does not need to be changed
 	    stat_read_counter = 0;
@@ -280,8 +462,65 @@ namespace libdar
 
 	    // now fulfilling the cache
 
-	buffer_cache.next = 0;
-	buffer_cache.last = ref->read(buffer_cache.buffer, buffer_cache.size);
+
+	if(buffer_cache.next != buffer_cache.last)
+	    throw SRC_BUG;
+	    // should not call fullfill_read unless all data has been read
+	else
+	{
+	    U_I lu = ref->read(buffer_cache.buffer + buffer_cache.last, buffer_cache.size - buffer_cache.last);
+	    buffer_cache.last += lu;
+	}
     }
 
+///////////////////////////// cache::buf methods /////////////////////////////////
+
+    void cache::buf::resize(U_I newsize)
+    {
+	char *tmp = NULL;
+
+	if(newsize < last)
+	    throw SRC_BUG;
+
+	tmp = new char[newsize];
+	if(tmp == NULL)
+	    throw Ememory("cache::buf::resize");
+
+	try
+	{
+	    (void)memcpy(tmp, buffer, last);
+	    if(buffer == NULL)
+		throw SRC_BUG;
+	    delete[] buffer;
+	    buffer = tmp;
+	    size = newsize;
+	}
+	catch(...)
+	{
+	    if(tmp != NULL)
+	    {
+		delete tmp;
+		tmp = NULL;
+	    }
+	    throw;
+	}
+    }
+
+    void cache::buf::shift_by_half()
+    {
+	U_I half = last / 2;
+	U_I reste = last % 2;
+
+	if(last > 1)
+	{
+	    (void)memmove(buffer, buffer + half, half+reste);
+	    next -= half;
+	    last -= half;
+	}
+    }
+
+
 } // end of namespace
+
+
+

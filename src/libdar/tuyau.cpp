@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tuyau.cpp,v 1.22.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: tuyau.cpp,v 1.41 2011/04/19 14:57:24 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -55,70 +55,194 @@ char *strchr (), *strrchr ();
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+#if HAVE_LIMITS_H
+#include <limits.h>
+#endif
 } // end extern "C"
 
 #include "tuyau.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
-#include "user_interaction.hpp"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
+
+#define BUFFER_SIZE 102400
+#ifdef SSIZE_MAX
+#if SSIZE_MAX < BUFFER_SIZE
+#undef BUFFER_SIZE
+#define BUFFER_SIZE SSIZE_MAX
+#endif
+#endif
+
 
 using namespace std;
 
 namespace libdar
 {
 
-    tuyau::tuyau(user_interaction & dialog, S_I fd) : generic_file(dialog, generic_file_get_mode(fd))
+    tuyau::tuyau(user_interaction & dialog, S_I fd) : generic_file(generic_file_get_mode(fd)), mem_ui(dialog)
     {
-        if(filedesc < 0)
-            throw Erange("tuyau::tuyau", gettext("Bad file descriptor given"));
+	gf_mode tmp;
+
+        if(fd < 0)
+            throw Erange("tuyau::tuyau", "Bad file descriptor given");
+	tmp = generic_file_get_mode(fd);
+	if(tmp == gf_read_write)
+	    throw Erange("tuyau::tuyau", tools_printf("A pipe cannot be in read and write mode at the same time, I need precision on the mode to use for the given filedscriptor"));
+	pipe_mode = pipe_fd;
         filedesc = fd;
         position = 0;
-        chemin = "";
+	other_end_fd = -1;
+	has_one_to_read = false;
     }
 
-    tuyau::tuyau(user_interaction & dialog, S_I fd, gf_mode mode) : generic_file(dialog, mode)
+    tuyau::tuyau(user_interaction & dialog, S_I fd, gf_mode mode) : generic_file(mode), mem_ui(dialog)
     {
         gf_mode tmp;
 
         if(fd < 0)
-            throw Erange("tuyau::tuyau", gettext("Bad file descriptor given"));
+            throw Erange("tuyau::tuyau", "Bad file descriptor given");
+	if(mode == gf_read_write)
+	    throw Erange("tuyau::tuyau", tools_printf("A pipe cannot be in read and write mode at the same time"));
         tmp = generic_file_get_mode(fd);
         if(tmp != gf_read_write && tmp != mode)
-            throw Erange("tuyau::tuyau", tools_printf(gettext("%s cannot be restricted to %s"), generic_file_get_name(tmp), generic_file_get_name(mode)));
+            throw Erange("tuyau::tuyau", tools_printf("%s cannot be restricted to %s", generic_file_get_name(tmp), generic_file_get_name(mode)));
+	pipe_mode = pipe_fd;
         filedesc = fd;
         position = 0;
-        chemin = "";
+	other_end_fd = -1;
+	has_one_to_read = false;
     }
 
-    tuyau::tuyau(user_interaction & dialog, const string & filename, gf_mode mode) : generic_file(dialog, mode)
+    tuyau::tuyau(user_interaction & dialog, const string & filename, gf_mode mode) : generic_file(mode), mem_ui(dialog)
     {
+	pipe_mode = pipe_path;
         chemin = filename;
         position = 0;
-        filedesc = -1; // not yet openned
+	other_end_fd = -1;
+	has_one_to_read = false;
+    }
+
+    tuyau::tuyau(user_interaction & dialog) : generic_file(gf_write_only), mem_ui(dialog)
+    {
+	int tube[2];
+
+	if(pipe(tube) < 0)
+	    throw Erange("tuyau::tuyau", string(gettext("Error while creating anonymous pipe: ")) + strerror(errno));
+	pipe_mode = pipe_both;
+	position = 0;
+	filedesc = tube[1];
+	other_end_fd = tube[0];
+	has_one_to_read = false;
+    }
+
+    tuyau::~tuyau()
+    {
+	try
+	{
+	    terminate();
+	}
+	catch(...)
+	{
+		// ignore all exceptions
+	}
+    }
+
+    int tuyau::get_read_fd() const
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(pipe_mode == pipe_both)
+	    return other_end_fd;
+	else
+	    throw Erange("tuyau::get_read_fd", gettext("Pipe's other end is not known, cannot provide a filedescriptor on it"));
+    }
+
+    void tuyau::close_read_fd()
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(pipe_mode == pipe_both)
+	{
+	    close(other_end_fd);
+	    pipe_mode = pipe_fd;
+	}
+	else
+	    throw Erange("tuyau::get_read_fd", gettext("Pipe's other end is not known, cannot close any filedescriptor pointing on it"));
+    }
+
+    void tuyau::do_not_close_read_fd()
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(pipe_mode == pipe_both)
+	    pipe_mode = pipe_fd;
+	else
+	    throw Erange("tuyau::get_read_fd", "Pipe's other end is not known, there is no reason to ask not to close a filedescriptor on it");
     }
 
     bool tuyau::skip(const infinint & pos)
     {
-        if(pos != position)
-            throw Erange("tuyau::skip", gettext("Skipping is not possible on a pipe"));
-        return true;
+	if(is_terminated())
+	    throw SRC_BUG;
+
+        if(pos < position)
+            throw Erange("tuyau::skip", "Skipping backward is not possible on a pipe");
+	else
+	    if(pos == position)
+		return true;
+	    else
+		return read_and_drop(pos - position);
     }
 
     bool tuyau::skip_to_eof()
     {
-        throw Erange("tuyau::skip", gettext("Skipping is not possible on a pipe"));
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	return read_to_eof();
     }
 
     bool tuyau::skip_relative(S_I x)
     {
-        if(x != 0)
-            throw Erange("tuyau::skip", gettext("Skipping is not possible on a pipe"));
-        return true;
+	if(is_terminated())
+	    throw SRC_BUG;
+
+        if(x < 0)
+            throw Erange("tuyau::skip", "Skipping backward is not possible on a pipe");
+	else
+	    return read_and_drop(x);
     }
 
-    S_I tuyau::inherited_read(char *a, size_t size)
+    bool tuyau::has_next_to_read()
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(has_one_to_read)
+	    return true;
+	else
+	{
+	    S_I ret = ::read(filedesc, &next_to_read, 1);
+	    if(ret <= 0)
+		return false;
+	    else
+	    {
+		has_one_to_read = true;
+		return true;
+	    }
+	}
+    }
+
+    U_I tuyau::inherited_read(char *a, U_I size)
     {
         S_I ret;
         U_I lu = 0;
@@ -126,12 +250,38 @@ namespace libdar
 #ifdef MUTEX_WORKS
 	check_self_cancellation();
 #endif
-        if(filedesc < 0)
-            ouverture();
+	ouverture();
+
+	switch(pipe_mode)
+	{
+	case pipe_fd:
+	case pipe_both:
+	    break;
+	case pipe_path:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
+
+	if(size == 0)
+	    return 0;
+
+	if(has_one_to_read)
+	{
+	    a[lu] = next_to_read;
+	    ++lu;
+	    has_one_to_read = false;
+	}
 
         do
         {
-            ret = ::read(filedesc, a+lu, size-lu);
+#ifdef SSIZE_MAX
+	    U_I to_read = size - lu > SSIZE_MAX ? SSIZE_MAX : size - lu;
+#else
+	    U_I to_read = size - lu;
+#endif
+
+            ret = ::read(filedesc, a+lu, to_read);
             if(ret < 0)
             {
                 switch(errno)
@@ -148,25 +298,46 @@ namespace libdar
                 if(ret > 0)
                     lu += ret;
         }
-        while(lu < size && ret != 0);
+        while(lu < size && ret > 0);
         position += lu;
 
         return lu;
     }
 
-    S_I tuyau::inherited_write(const char *a, size_t size)
+    void tuyau::inherited_write(const char *a, U_I size)
     {
-        size_t total = 0;
+        U_I total = 0;
+	ssize_t ret;
+#ifdef SSIZE_MAX
+	static const U_I step = SSIZE_MAX/2;
+#else
+	const U_I step = size; // which is no limit...
+#endif
+
 
 #ifdef MUTEX_WORKS
 	check_self_cancellation();
 #endif
-        if(filedesc < 0)
-            ouverture();
+
+	ouverture();
+
+	switch(pipe_mode)
+	{
+	case pipe_fd:
+	case pipe_both:
+	    break;
+	case pipe_path:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
 
         while(total < size)
         {
-            S_I ret = ::write(filedesc, a+total, size-total);
+	    if(size - total > step)
+		ret = ::write(filedesc, a+total, step);
+	    else
+		ret = ::write(filedesc, a+total, size - total);
             if(ret < 0)
             {
                 switch(errno)
@@ -176,7 +347,7 @@ namespace libdar
                 case EIO:
                     throw Ehardware("tuyau::inherited_write", string(gettext("Error while writing data to pipe: ")) + strerror(errno));
                 case ENOSPC:
-                    get_gf_ui().pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
+                    get_ui().pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
                     break;
                 default :
                     throw Erange("tuyau::inherited_write", string(gettext("Error while writing data to pipe: ")) + strerror(errno));
@@ -187,18 +358,36 @@ namespace libdar
         }
 
         position += total;
-        return total;
+    }
+
+    void tuyau::inherited_terminate()
+    {
+	switch(pipe_mode)
+	{
+	case pipe_both:
+	    close(other_end_fd);
+		// no break here !
+	case pipe_fd:
+	    other_end_fd = -1;
+	    close(filedesc);
+	    filedesc = -1;
+	    break;
+	case pipe_path:
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tuyau.cpp,v 1.22.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: tuyau.cpp,v 1.41 2011/04/19 14:57:24 edrusb Rel $";
         dummy_call(id);
     }
 
     void tuyau::ouverture()
     {
-        if(chemin != "")
+        if(pipe_mode == pipe_path)
         {
 	    S_I flag;
 
@@ -219,9 +408,76 @@ namespace libdar
 	    filedesc = ::open(chemin.c_str(), flag|O_BINARY);
 	    if(filedesc < 0)
 		throw Erange("tuyau::ouverture", string(gettext("Error opening pipe: "))+strerror(errno));
+	    pipe_mode = pipe_fd;
         }
-        else
-            throw SRC_BUG; // no path nor file descriptor
+    }
+
+    bool tuyau::read_and_drop(infinint byte)
+    {
+	char buffer[BUFFER_SIZE];
+	U_I u_step;
+	U_I step, max_i_step = 0;
+	S_I lu;
+	bool eof = false;
+
+
+	max_i_step = int_tools_maxof_agregate(max_i_step);
+	if(max_i_step <= 0)
+	    throw SRC_BUG; // error in max positive value calculation, just above
+
+	if(max_i_step > BUFFER_SIZE)
+	    max_i_step = BUFFER_SIZE; // max read a time
+
+	if(get_mode() != gf_read_only)
+	    throw Erange("tuyau::read_and_drop", "Cannot skip in pipe in writing mode");
+
+	u_step = 0;
+	byte.unstack(u_step);
+
+	do
+	{
+	    while(u_step > 0 && !eof)
+	    {
+		if(u_step > max_i_step)
+		    step = max_i_step;
+		else
+		    step = u_step;
+
+		lu = read(buffer, step);
+		if(lu < 0)
+		    throw SRC_BUG;
+		if((U_I)lu < step)
+		    eof = true;
+		u_step -= lu;
+		position += lu;
+	    }
+	    if(!eof)
+	    {
+		u_step = 0;
+		byte.unstack(u_step);
+	    }
+	}
+	while(u_step > 0 && !eof);
+
+	if(byte > 0)
+	    throw SRC_BUG;
+
+	return !eof;
+    }
+
+    bool tuyau::read_to_eof()
+    {
+	char buffer[BUFFER_SIZE];
+	S_I lu = 0;
+
+	if(get_mode() != gf_read_only)
+	    throw Erange("tuyau::read_and_drop", "Cannot skip in pipe in writing mode");
+
+	while((lu = read(buffer, BUFFER_SIZE)) > 0)
+	    position += lu;
+
+	return true;
     }
 
 } // end of namespace
+

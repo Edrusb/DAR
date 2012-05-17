@@ -16,14 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: terminateur.hpp,v 1.9.4.1 2008/05/09 20:58:27 edrusb Rel $
+// $Id: terminateur.hpp,v 1.15 2011/04/11 17:12:01 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file terminateur.hpp
     /// \brief the terminateur class which defines the position of the catalogue
+    /// \ingroup Private
     ///
     /// the terminateur is a byte sequence present as the last bytes of an archive
     /// which indicates how much byte backward libdar must skip back to find the
@@ -50,11 +51,13 @@ namespace libdar
     public :
         void set_catalogue_start(infinint xpos) { pos = xpos; };
         void dump(generic_file &f);
-        void read_catalogue(generic_file &f, bool with_elastic, const dar_version & reading_ver);
-        infinint get_catalogue_start() { return pos; };
+        void read_catalogue(generic_file &f, bool with_elastic, const archive_version & reading_ver, const infinint & where_from = 0);
+        infinint get_catalogue_start() const { return pos; };
+	infinint get_terminateur_start() const { return t_start; };
 
     private :
         infinint pos;
+	infinint t_start;
     };
 
 } // end of namespace

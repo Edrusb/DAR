@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation - Downloading dar/libdar</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+<center>
+<div style="text-align: center;">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+<tbody><tr><td style="vertical-align: top; width: 161px;"><a href="index.html"><img style="border: 0px solid ; width: 160px; height: 120px;" alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
+      </td><td style="vertical-align: top;">
+      <h1 style="text-align: center;"><br>
+      </h1>
+      <h1 style="text-align: center;">DOWNLOADING DAR/LIBDAR<br>
+</h1>
+      </td></tr></tbody>
+</table>
+</div>
+<span style="font-weight: bold;"><br>
+</span>
+<hr style="width: 100%; height: 2px;">
+</center>
+<br>
+<br>
+
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <div style="text-align: justify;">
+      
+      <h3><a name="packages_signature"></a><span style="text-decoration: underline;">1 - Packages Signature</span></h3>
+      <h3><span style="text-decoration: underline;"></span></h3>
+      <span style="text-decoration: underline;"><br>
+      </span>
+      <div style="margin-left: 40px;">Source packages and binary
+packages for windows are signed with <a href="authentification.html">author's
+GPG key</a>. You can find the signatures for released packages on the <a href="http://dar.linux.free.fr/sign">home page</a> and on its <a href="http://dar.sourceforge.net/sign">mirror site</a>. Binary
+packages for your distro have to be fetched from your distro's site
+which will probably provide you electronic signatures.<br>
+      </div>
+
+
+
+      
+      </div>
+<div style="text-align: justify;">
+      <br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+<br>
+
+
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3><a name="source_download"></a><span style="text-decoration: underline;">2 - Source Packages</span></h3>
+      <br>
+      <div style="margin-left: 40px;">Source packages can be found <a href="http://sourceforge.net/project/showfiles.php?group_id=65612">here</a>.</div>
+</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2"><tbody><tr><td style="vertical-align: top;"><div style="text-align: justify;">
+  
+    
+      
+      
+      <h3><a name="linux_binaries"></a><span style="font-weight: bold; text-decoration: underline;">3 - Binary packages for Linux</span></h3>
+      <h3><span style="font-weight: bold; text-decoration: underline;"></span></h3>
+      <span style="font-weight: bold; text-decoration: underline;"><br>
+      </span>
+      <div style="margin-left: 40px;">All
+Linux distribution do provide a binary package for dar/libdar. In fact,
+the dar source package is most of the time split into tree or more
+packages, one for libdar library, a second for the dar command-line
+tools and a third for the dar documentation.<br>
+      </div>
+
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+
+<br>
+
+
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <div style="text-align: justify;">
+      <h3><span style="font-weight: bold;"></span><a name="windows_binaries"></a><span style="font-weight: bold; text-decoration: underline;">4 - Binary package for Windows</span></h3>
+      <h3><span style="font-weight: bold; text-decoration: underline;"></span></h3>
+      <span style="font-weight: bold; text-decoration: underline;"><br>
+      </span>
+      <div style="margin-left: 40px;"><span style="font-weight: bold;">Binary
+packages for windows</span> are provided <a href="http://sourceforge.net/project/showfiles.php?group_id=65612">here</a>. <br>
+      <br>
+
+There is several point to be aware when <a name="dar_under_windows"></a>using
+dar under windows:<br>
+      <br>
+      </div>
+
+      </div>
+      
+      
+      <div style="text-align: justify; margin-left: 40px;">the binary package is a *.zip
+file (thus you need winzip to unpack it). It contains a subdirectory
+(named dar) you will have to extract where you want in your directory
+tree. Optionally you can add the path to dar in the PATH variable in
+autoexec.bat. Considering dar has been extracted under C:\dar you can
+add the following line in autoexec.bat:<br>
+      </div>
+      
+      <div style="margin-left: 40px;"><br>
+      </div>
+
+      <div style="margin-left: 80px;"><code>set PATH=%PATH%;C:\Dar</code><br>
+      </div>
+      
+      <div style="margin-left: 40px;"><br>
+      </div>
+
+      <div style="text-align: justify; margin-left: 40px;">then you have to reboot. (Just
+kidding ! This was to respect the Windows usage and way of life ;-) )
+Else if you don't setup the PATH variable, you need to specify the full
+path to dar executables to use them from the Windows command-line
+prompt.<br>
+      </div>
+      
+      <div style="margin-left: 40px;"><br>
+      <span style="font-weight: bold; text-decoration: underline;">IMPORTANT
+NOTES !</span><br>
+      <br>
+      </div>
+
+      
+      
+      <div style="margin-left: 80px;">
+      <div style="text-align: justify;">Note that path given to dar
+suite's program must respect the UNIX way (use slashes "/" not back
+slashes "\") thus you have to have to use /temp in place of \temp.
+Moreover, drive letters cannot be used the usual way,&nbsp; like
+c:\windows\system32. Instead you will have to give the following path
+/cygdrive/c/windows/system32. As you see the /cygdrive directory is a
+virtual directory that has all the drives as children directories :<br>
+      <br>
+      </div>
+      </div>
+      <div style="text-align: justify;">
+      <div style="margin-left: 120px;"><code><span style="font-weight: bold;">X:\some\file</span></code>&nbsp; has to
+be written&nbsp; <code><span style="font-weight: bold;">/cygdrive/X/some/file</span></code><br>
+      </div>
+      </div>
+      <div style="margin-left: 40px;">
+      <div style="text-align: justify;"> <br>
+      <br>
+      <div style="margin-left: 40px;">
+for example:<br>
+      <code></code><br>
+      <code></code></div>
+
+      </div>
+      
+      </div>
+      <div style="margin-left: 120px;"><code>c:\dar_win-1.2.1\dar -c
+/cygdrive/f/tmp/toto -s 2G -z1 -R "/cygdrive/c/My Documents"</code><br>
+      <code></code><br>
+      <code>&nbsp;
+^&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+^&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ^&nbsp;&nbsp;
+^&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+^</code><br>
+      <code>&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;---------------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+---------------------------</code><br>
+      <code>here use
+anti-slash&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; but here we use
+slash</code><br>
+      <code>as usually
+under&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; in
+arguments given to dar</code><br>
+      <code>windows to point</code><br>
+      <code>the command</code><br>
+      </div>
+      
+      <div style="margin-left: 40px;"><br>
+</div></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+<br>
+
+<table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3><span style="font-weight: bold; text-decoration: underline;"><a name="MacOS"></a>5 - Binary Packages for Mac OS</span></h3>
+      <div style="margin-left: 40px;">
+      <div style="margin-left: 40px;"><span style="font-weight: bold; text-decoration: underline;"></span></div>
+Binary packages for Mac OS can be fetched from <a href="http://mac.softpedia.com/get/Developer-Tools/Disk-ARchive.shtml">softpedia</a>.<br>
+      <br>
+      </div>
+      <h3><a name="FreeBSD_portage"></a><span style="font-weight: bold; text-decoration: underline;">6 - Portage for FreeBSD</span></h3>
+      <div style="margin-left: 40px;">
+      Source package portage for freeBSD is <a href="http://www.freebsd.org/cgi/cvsweb.cgi/ports/sysutils/dar/">available here</a>.<br>
+<br>
+      </div>
+
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+</body></html>

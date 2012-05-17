@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.29.2.6 2008/02/09 17:41:28 edrusb Rel $
+// $Id: dar_suite.cpp,v 1.43 2011/05/20 10:29:09 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -52,12 +52,14 @@ extern "C"
 #include "dar_suite.hpp"
 #include "shell_interaction.hpp"
 #include "erreurs.hpp"
-#include "test_memory.hpp"
 #include "libdar.hpp"
 #include "thread_cancellation.hpp"
 
 #define GENERAL_REPORT(msg) 	if(ui != NULL)\
+                                {\
+                                    shell_interaction_change_non_interactive_output(&cerr);\
 	                            ui->warning(msg);\
+				}\
 	                        else\
                                     cerr << msg << endl;
 
@@ -84,10 +86,8 @@ void dar_suite_reset_signal_handler()
 #endif
 }
 
-int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_interaction & dialog, int, char *[], const char **env))
+int dar_suite_global(int argc, char * const argv[], const char **env, int (*call)(user_interaction & dialog, int, char * const [], const char **env))
 {
-    MEM_BEGIN;
-    MEM_IN;
     int ret = EXIT_OK;
 
     dar_suite_reset_signal_handler();
@@ -120,11 +120,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 	if(jog)
 	    std::set_new_handler(&jogger);
 
-	get_version(maj, min); // mandatory first call to libdar
-	if(maj > 2)
-	    get_version(maj, med, min);
-	else
-	    med = 0;
+	get_version(maj, med, min);
 	if(maj != LIBDAR_COMPILE_TIME_MAJOR || med < LIBDAR_COMPILE_TIME_MEDIUM)
 	{
 	    GENERAL_REPORT(tools_printf(gettext("We have linked with an incompatible version of libdar. Expecting version %d.%d.x but having linked with version %d.%d.%d"), LIBDAR_COMPILE_TIME_MAJOR, LIBDAR_COMPILE_TIME_MEDIUM, maj, med, min));
@@ -143,6 +139,11 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
     {
 	GENERAL_REPORT(string(gettext("SEEMS TO BE A HARDWARE PROBLEM: "))+e.get_message());
 	GENERAL_REPORT(string(gettext("Please check your hardware")));
+	ret = EXIT_ERROR;
+    }
+    catch(Esecu_memory & e)
+    {
+	GENERAL_REPORT(string(gettext("Lack of SECURED memory to achieve the operation, aborting operation")));
 	ret = EXIT_ERROR;
     }
     catch(Ememory & e)
@@ -173,7 +174,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
     }
     catch(Edata & e)
     {
-	    // no output just the exit code is set
+	GENERAL_REPORT(e.get_message());
 	ret = EXIT_DATA_ERROR;
     }
     catch(Escript & e)
@@ -216,9 +217,12 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 	ret = EXIT_BUG;
     }
 
+	// closing libdar
+    close_and_clean();
+
     if(thread_cancellation::count() != 0)
     {
-	GENERAL_REPORT(string(gettext("SANITY CHECK: AT LEAST ONE OBJECT HAS NOT BEEN DESTROYED AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END")));
+	GENERAL_REPORT(string(gettext("SANITY CHECK: AT LEAST ONE THREAD_CANCELLATION OBJECT HAS NOT BEEN DESTROYED AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END")));
     }
 
 	// restoring terminal settings
@@ -233,14 +237,12 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 	ret = EXIT_UNKNOWN_ERROR;
     }
 
-    MEM_OUT;
-    MEM_END;
     return ret;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.29.2.6 2008/02/09 17:41:28 edrusb Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.43 2011/05/20 10:29:09 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -292,7 +294,7 @@ static void signals_abort(int l, bool now)
     }
 #if HAVE_SIGNAL_H
     signal(l, SIG_DFL);
-    GENERAL_REPORT(string(gettext("Disabling signal handler, the next time this signal is received the program will end immediately")));
+    GENERAL_REPORT(string(gettext("Disabling signal handler, the next time this signal will be received the program will end immediately")));
 #endif
     cancel_thread(pthread_self(), now);
 #else

@@ -16,15 +16,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sar_tools.hpp,v 1.10 2004/11/07 18:21:38 edrusb Rel $
+// $Id: sar_tools.hpp,v 1.16 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 //
 
     /// \file sar_tools.hpp
     /// \brief a set of tools aims to help Segmentation And Reassemblement (sar) class
+    /// \ingroup Private
 
 #ifndef SAR_TOOLS_HPP
 #define SAR_TOOLS_HPP
@@ -35,20 +36,19 @@
 #include "integers.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
+#include "header.hpp"
+#include "sar.hpp"
 
 namespace libdar
 {
 
-	/// \brief create a container for a single sliced archive
-	/// \ingroup Private
-    extern generic_file *sar_tools_open_archive_fichier(user_interaction & dialog,
-							const std::string &filename,
-							bool allow_over, bool warn_over);
-
 	/// \brief create an container to write a archive to a pipe
 	/// \ingroup Private
-    extern generic_file *sar_tools_open_archive_tuyau(user_interaction & dialog,
-						      S_I fd, gf_mode mode);
+    extern trivial_sar *sar_tools_open_archive_tuyau(user_interaction & dialog,
+						     S_I fd,
+						     gf_mode mode,
+						     const label & data_name,
+						     const std::string & execute);
 
 } // end of namespace
 

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: prime.cpp,v 1.8.2.2 2008/02/09 17:41:28 edrusb Rel $
+// $Id: prime.cpp,v 1.13 2009/12/18 10:10:21 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -43,14 +43,14 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-int little_main(user_interaction & ui, S_I argc, char *argv[], const char **env);
+int little_main(user_interaction & ui, S_I argc, char * const argv[], const char **env);
 
-int main(S_I argc, char *argv[], const char **env)
+int main(S_I argc, char * const argv[], const char **env)
 {
     return dar_suite_global(argc, argv, env, &little_main);
 }
 
-int little_main(user_interaction & ui, S_I argc, char *argv[], const char **env)
+int little_main(user_interaction & ui, S_I argc, char * const argv[], const char **env)
 {
     if(argc != 2)
     {
@@ -61,7 +61,7 @@ int little_main(user_interaction & ui, S_I argc, char *argv[], const char **env)
     deci x = string(argv[1]);
     cout << "converting string to infinint... " << endl;
     infinint num = x.computer();
-    cout << "checking if the number is a prime factor... " << endl;
+    cout << "checking whether the number is a prime factor... " << endl;
     infinint max = (num / 2) + 1;
     infinint i = 2;
     while(i < max)
@@ -80,6 +80,6 @@ int little_main(user_interaction & ui, S_I argc, char *argv[], const char **env)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: prime.cpp,v 1.8.2.2 2008/02/09 17:41:28 edrusb Rel $";
+    static char id[]="$Id: prime.cpp,v 1.13 2009/12/18 10:10:21 edrusb Rel $";
     dummy_call(id);
 }

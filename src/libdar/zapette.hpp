@@ -16,15 +16,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: zapette.hpp,v 1.10.4.2 2009/04/07 08:45:29 edrusb Rel $
+// $Id: zapette.hpp,v 1.25 2011/04/17 13:12:30 edrusb Rel $
 //
 /*********************************************************************/
 //
 
     /// \file zapette.hpp
     /// \brief remote control between dar and dar_slave.
+    /// \ingroup Private
     ///
     /// Two classes are defined in this module
     /// - zapette is the dar side master class
@@ -43,13 +44,17 @@
 namespace libdar
 {
 
+
+	/// \addtogroup Private
+	/// @{
+
 	/// zapette emulate a file that is remotely controlled by slave_zapette
 
 	/// class zapette sends order to slave_zapette throw a
 	/// a first pipe and receive informations or data in return
 	/// from a second pipe from slave_zapette
 	/// \ingroup Private
-    class zapette : public contextual
+    class zapette : public generic_file, public contextual, protected mem_ui
     {
     public:
 
@@ -63,25 +68,45 @@ namespace libdar
 
             // inherited methods from generic_file
         bool skip(const infinint &pos);
-        bool skip_to_eof() { position = file_size; return true; };
+        bool skip_to_eof() { if(is_terminated()) throw SRC_BUG; position = file_size; return true; };
         bool skip_relative(S_I x);
-        infinint get_position() { return position; };
+        infinint get_position() { if(is_terminated()) throw SRC_BUG; return position; };
 
-	    // inherited methods from contextual
+	    // overwritten inherited methods from contextual
         void set_info_status(const std::string & s);
-        std::string get_info_status() const { return info; };
+	bool is_an_old_start_end_archive() const;
+	const label & get_data_name() const;
 
     protected:
-        S_I inherited_read(char *a, size_t size);
-        S_I inherited_write(const char *a, size_t size);
+        U_I inherited_read(char *a, U_I size);
+        void inherited_write(const char *a, U_I size);
+	void inherited_sync_write() {};
+	void inherited_terminate();
 
     private:
         generic_file *in, *out;
         infinint position, file_size;
         char serial_counter;
-	std::string info;
 
-	void make_transfert(U_16 size, const infinint &offset, char *data, const std::string & info, S_I & lu, infinint & arg);
+	    /// wrapped formatted method to communicate with the slave_zapette located behind the pair of pipes (= tuyau)
+
+	    /// \param[in] size is the size of the amount of data we want the zapette to send us
+	    /// \param[in] offset is the byte offset of the portion of the data we want
+	    /// \param[in,out] data is the location where to return the requested data
+	    /// \param[in] info the new contextual string to set to the slave_zapette.
+	    /// \param[out] lu the amount of byte wrote to '*data'
+	    /// \param[out] arg infinint value return for special order (see note below).
+	    /// \note with default parameters, this method permits the caller to get a portion of data from the
+	    /// remote slave_zapette. In addition, it let the caller change the 'contextual' status of the remote object.
+	    /// if size is set to REQUEST_SPECIAL_ORDER, the offset is used to transmit a special order to the
+	    /// remote slave_zapette. Defined order are for example REQUEST_OFFSET_END_TRANSMIT , REQUEST_OFFSET_GET_FILESIZE,
+	    /// and so on (see at the beginning of zapette.cpp file for more). Each of these order may expect a returned value
+	    /// which may be an integer (provided by the "arg" argument of this call)  a boolean value (provided by the "arg"
+	    /// argument where 0 means false and 1 means true) or a char * (first byte to put the answer to is given by 'data' and
+	    /// allocated space for the reply must be given through 'lu' which at return given the effective length of the returned
+	    /// string
+
+	void make_transfert(U_16 size, const infinint &offset, char *data, const std::string & info, S_I & lu, infinint & arg) const;
     };
 
 	/// this class answers to order given by a zapette object
@@ -97,8 +122,8 @@ namespace libdar
 
 	    /// \param[in] input is used to receive orders from an zapette object
 	    /// \param[in] output is used to return informations or data in answer to received orders
-	    /// \param[in] data is where the informations or data is taken from
-        slave_zapette(generic_file *input, generic_file *output, contextual *data);
+	    /// \param[in] data is where the informations or data is taken from. Object must inherit from contextual
+        slave_zapette(generic_file *input, generic_file *output, generic_file *data);
         ~slave_zapette();
 
 
@@ -109,9 +134,13 @@ namespace libdar
         void action();
 
     private:
-        generic_file *in, *out;
-	contextual *src;
+        generic_file *in;     //< where to read orders from
+	generic_file *out;    //< where to send requested info or data to
+	generic_file *src;    //< where to read data from
+	contextual *src_ctxt; //< same as src but seen as contextual
     };
+
+	/// @}
 
 } // end of namespace
 

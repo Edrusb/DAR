@@ -7,5 +7,5 @@ Name: libdar
 Description: Disk ARchive library
 Requires:
 Version: #LIBDAR_VERSION#
-Libs: -L${libdir} -ldar#LIBDAR_SUFFIX#
+Libs: -L${libdir} -ldar#LIBDAR_SUFFIX# @LIBS@
 Cflags: -I${includedir} #LIBDAR_MODE#

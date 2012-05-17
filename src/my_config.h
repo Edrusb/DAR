@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: my_config.h,v 1.9 2005/09/11 19:01:16 edrusb Rel $
+// $Id: my_config.h,v 1.10 2009/12/18 11:48:47 edrusb Rel $
 //
 /*********************************************************************/
 //

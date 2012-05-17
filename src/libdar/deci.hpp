@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: deci.hpp,v 1.9 2004/11/12 21:58:17 edrusb Rel $
+// $Id: deci.hpp,v 1.12 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -37,6 +37,10 @@
 namespace libdar
 {
 
+	/// \ingroup Tools
+	/// @}
+
+
 	/// decimal class, convert infinint from and to decimal represention
 
 	/// the class contains the decimal representation of an integer
@@ -45,7 +49,6 @@ namespace libdar
 	/// the decimal value. In the other side, objects of this class can
 	/// be built from a integer as well as from a string representing
 	/// the decimals of an integer.
-	/// \ingroup Tools
     class deci
     {
     public :
@@ -65,7 +68,7 @@ namespace libdar
 
 
 	    /// copy operator
-        deci & operator = (const deci & ref)
+        const deci & operator = (const deci & ref)
             { E_BEGIN; detruit(); copy_from(ref); return *this; E_END("deci::operator = ", ""); };
 
 	    /// this produce a infinint from the decimal stored in the current object
@@ -88,6 +91,9 @@ namespace libdar
 	/// do for standard types.
 	/// \ingroup Tools
     extern std::ostream & operator << (std::ostream & ref, const infinint & arg);
+
+
+	/// @}
 
 } // end of namespace
 

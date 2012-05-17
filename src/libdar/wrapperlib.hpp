@@ -16,14 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: wrapperlib.hpp,v 1.9.2.2 2009/04/07 08:45:29 edrusb Rel $
+// $Id: wrapperlib.hpp,v 1.14 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file wrapperlib.hpp
     /// \brief libz and libbz2 wrapper to have identical interface to these libraries.
+    /// \ingroup Private
     ///
     /// libz and libbz2 library differ in several in the way they return values
     /// in certain circumpstances. This module defines the wrapperlib class
@@ -50,6 +51,9 @@ extern "C"
 namespace libdar
 {
 
+	/// \addtogroup Private
+	/// @{
+
     const int WR_OK            = 0;
     const int WR_MEM_ERROR     = 1;
     const int WR_VERSION_ERROR = 2;
@@ -73,7 +77,7 @@ namespace libdar
     public:
         wrapperlib(wrapperlib_mode mode);
         wrapperlib(const wrapperlib & ref);
-        wrapperlib & operator = (const wrapperlib & ref);
+        const wrapperlib & operator = (const wrapperlib & ref);
         ~wrapperlib();
 
         void set_next_in(const char *x) { return (this->*x_set_next_in)(x); };
@@ -162,6 +166,8 @@ namespace libdar
         U_64 bz_get_total_out() const;
 #endif
     };
+
+	/// @}
 
 } // end of namespace
 

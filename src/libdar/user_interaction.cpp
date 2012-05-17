@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: user_interaction.cpp,v 1.29.2.1 2008/02/09 11:14:39 edrusb Rel $
+// $Id: user_interaction.cpp,v 1.35 2011/05/20 10:23:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -107,7 +107,7 @@ namespace libdar
 	    if(count >= at_once)
 	    {
 		count = 0;
-		(void)this->pause(gettext("Continue? "));
+		(void)this->pause(dar_gettext("Continue? "));
 	    }
 	}
 	inherited_warning(message);
@@ -126,7 +126,7 @@ namespace libdar
 	    // stupid code to stop having compiler complaining against unused arguments
 
 	throw Elibcall("user_interaction::listing",
-		       tools_printf(gettext("Not overwritten listing() method called with: (%S, %S, %S, %S, %S, %S, %S, %s, %s)"),
+		       tools_printf("Not overwritten listing() method called with: (%S, %S, %S, %S, %S, %S, %S, %s, %s)",
 				    &flag,
 				    &perm,
 				    &uid,
@@ -139,17 +139,17 @@ namespace libdar
     }
 
     void user_interaction::dar_manager_show_files(const string & filename,
-						bool available_data,
-						bool available_ea)
+						  bool data_change,
+						  bool ea_change)
     {
-	throw Elibcall("user_interaction::dar_manager_show_files", gettext("Not overwritten dar_manager_show_files() method has been called!"));
+	throw Elibcall("user_interaction::dar_manager_show_files", "Not overwritten dar_manager_show_files() method has been called!");
     }
 
     void user_interaction::dar_manager_contents(U_I number,
 					       const string & chemin,
 					       const string & archive_name)
     {
-	throw Elibcall("user_interaction::dar_manager_contents", gettext("Not overwritten dar_manager_contents() method has been called!"));
+	throw Elibcall("user_interaction::dar_manager_contents", "Not overwritten dar_manager_contents() method has been called!");
     }
 
     void user_interaction::dar_manager_statistics(U_I number,
@@ -158,14 +158,16 @@ namespace libdar
 						  const infinint & ea_count,
 						  const infinint & total_ea)
     {
-	throw Elibcall("user_interaction::dar_manager_statistics", gettext("Not overwritten dar_manager_statistics() method has been called!"));
+	throw Elibcall("user_interaction::dar_manager_statistics", "Not overwritten dar_manager_statistics() method has been called!");
     }
 
     void user_interaction::dar_manager_show_version(U_I number,
 						    const string & data_date,
-						    const string & ea_date)
+						    const string & data_presence,
+						    const string & ea_date,
+						    const string & ea_presence)
     {
-	throw Elibcall("user_interaction::dar_manager_show_version", gettext("Not overwritten dar_manager_show_version() method has been called!"));
+	throw Elibcall("user_interaction::dar_manager_show_version", "Not overwritten dar_manager_show_version() method has been called!");
     }
 
 
@@ -199,16 +201,18 @@ namespace libdar
     user_interaction_callback::user_interaction_callback(void (*x_warning_callback)(const string &x, void *context),
 							 bool (*x_answer_callback)(const string &x, void *context),
 							 string (*x_string_callback)(const string &x, bool echo, void *context),
+							 secu_string (*x_secu_string_callback)(const string &x, bool echo, void *context),
 							 void *context_value)
     {
 	NLS_SWAP_IN;
 	try
 	{
 	    if(x_warning_callback == NULL || x_answer_callback == NULL)
-		throw Elibcall("user_interaction_callback::user_interaction_callback", gettext("NULL given as argument of user_interaction_callback"));
+		throw Elibcall("user_interaction_callback::user_interaction_callback", dar_gettext("NULL given as argument of user_interaction_callback()"));
 	    warning_callback = x_warning_callback;
 	    answer_callback  = x_answer_callback;
 	    string_callback  = x_string_callback;
+	    secu_string_callback  = x_secu_string_callback;
 	    tar_listing_callback = NULL;
 	    dar_manager_show_files_callback = NULL;
 	    dar_manager_contents_callback = NULL;
@@ -241,12 +245,12 @@ namespace libdar
 	    }
 	    catch(Egeneric & e)
 	    {
-		throw Elibcall("user_interaction_callback::pause", string(gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
+		throw Elibcall("user_interaction_callback::pause", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
 	    }
 	    catch(...)
 
 	    {
-		throw Elibcall("user_interaction_callback::pause", gettext("No exception allowed from libdar callbacks"));
+		throw Elibcall("user_interaction_callback::pause", dar_gettext("No exception allowed from libdar callbacks"));
 	    }
 	}
     }
@@ -263,7 +267,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("user_interaction_callback::warning", gettext("No exception allowed from libdar callbacks"));
+		throw Elibcall("user_interaction_callback::warning", dar_gettext("No exception allowed from libdar callbacks"));
 	    }
 	}
     }
@@ -280,7 +284,24 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("user_interaction_callback::get_string", gettext("No exception allowed from libdar callbacks"));
+		throw Elibcall("user_interaction_callback::get_string", dar_gettext("No exception allowed from libdar callbacks"));
+	    }
+	}
+    }
+
+    secu_string user_interaction_callback::get_secu_string(const string & message, bool echo)
+    {
+	if(string_callback == NULL)
+	    throw SRC_BUG;
+	else
+	{
+	    try
+	    {
+		return (*secu_string_callback)(message, echo, context_val);
+	    }
+	    catch(...)
+	    {
+		throw Elibcall("user_interaction_callback::get_secu_string", dar_gettext("No exception allowed from libdar callbacks"));
 	    }
 	}
     }
@@ -303,14 +324,14 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("user_interaction_callback::listing", gettext("No exception allowed from libdar callbacks"));
+		throw Elibcall("user_interaction_callback::listing", dar_gettext("No exception allowed from libdar callbacks"));
 	    }
 	}
     }
 
     void user_interaction_callback::dar_manager_show_files(const string & filename,
-							 bool available_data,
-							 bool available_ea)
+							   bool available_data,
+							   bool available_ea)
     {
 	if(dar_manager_show_files_callback != NULL)
 	{
@@ -320,7 +341,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("user_interaction_callback::dar_manager_show_files", gettext("No exception allowed from libdar callbacks"));
+		throw Elibcall("user_interaction_callback::dar_manager_show_files", dar_gettext("No exception allowed from libdar callbacks"));
 	    }
 	}
     }
@@ -337,7 +358,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("user_interaction_callback::dar_manager_contents", gettext("No exception allowed from libdar callbacks"));
+		throw Elibcall("user_interaction_callback::dar_manager_contents", dar_gettext("No exception allowed from libdar callbacks"));
 	    }
 	}
     }
@@ -356,24 +377,26 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("user_interaction_callback::dar_manager_statistics", gettext("No exception allowed from libdar callbacks"));
+		throw Elibcall("user_interaction_callback::dar_manager_statistics", dar_gettext("No exception allowed from libdar callbacks"));
 	    }
 	}
     }
 
     void user_interaction_callback::dar_manager_show_version(U_I number,
 							     const string & data_date,
-							     const string & ea_date)
+							     const string & data_presence,
+							     const string & ea_date,
+							     const string & ea_presence)
     {
 	if(dar_manager_show_version_callback != NULL)
 	{
 	    try
 	    {
-		(*dar_manager_show_version_callback)(number, data_date, ea_date, context_val);
+		(*dar_manager_show_version_callback)(number, data_date, data_presence, ea_date, ea_presence, context_val);
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("user_interaction_callback::dar_manager_show_version", gettext("No exception allowed from libdar callbacks"));
+		throw Elibcall("user_interaction_callback::dar_manager_show_version", dar_gettext("No exception allowed from libdar callbacks"));
 	    }
 	}
     }
@@ -391,7 +414,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: user_interaction.cpp,v 1.29.2.1 2008/02/09 11:14:39 edrusb Rel $";
+        static char id[]="$Id: user_interaction.cpp,v 1.35 2011/05/20 10:23:07 edrusb Rel $";
         dummy_call(id);
     }
 

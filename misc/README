@@ -3,15 +3,13 @@ What will you find in this directory ?
 --------------------
 | IMPORTANT !
 |   as there is so many distro today (yep, the Slackware hegemony is over...)
-|   I do not produce anymore any binary packages. Ask your preferred distro
+|   I do not produce anymore binary packages. Ask your preferred distro
 |   maintainer team to upgrade their packages or wait for they do so.
-|   Please, don't ask me support about these binary packages, I only know
-|   Slackware Linux distro which perfectly suites my needs.
 |   The following scripts are provided for convenience and are now obsoleted
 |   there are thus no more maintained not much used.
 --------------------
 
-many script that help(ed) me build the releases:
+many script that help(ed) build the releases:
 - batch_cygwin
 - batch_linux
 - match_linux_ea

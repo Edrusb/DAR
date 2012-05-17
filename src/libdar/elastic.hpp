@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: elastic.hpp,v 1.5.4.1 2008/05/09 20:58:27 edrusb Rel $
+// $Id: elastic.hpp,v 1.9 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -41,6 +41,10 @@
 namespace libdar
 {
 
+	/// \ingroup Private
+	/// @}
+
+
     enum elastic_direction { elastic_forward, elastic_backward };
 
 	/// the elastic buffer class
@@ -53,8 +57,8 @@ namespace libdar
     {
     public:
 	elastic(U_32 size);
-	elastic(const unsigned char *buffer, U_32 size, elastic_direction dir, const dar_version & reading_ver);
-	elastic(generic_file &f, elastic_direction dir, const dar_version & reading_ver);
+	elastic(const unsigned char *buffer, U_32 size, elastic_direction dir, const archive_version & reading_ver);
+	elastic(generic_file &f, elastic_direction dir, const archive_version & reading_ver);
 
 	U_32 dump(unsigned char *buffer, U_32 size) const;
 	U_32 get_size() const { return taille; };
@@ -65,13 +69,15 @@ namespace libdar
 	U_32 taille; // max size of elastic buffer is 4GB which is large enough
 
 	void randomize(unsigned char *a) const;
-	U_I base_from_version(const dar_version & reading_ver) const;
-	unsigned char get_low_mark(const dar_version & reading_ver) const;
-	unsigned char get_high_mark(const dar_version & reading_ver) const;
+	U_I base_from_version(const archive_version & reading_ver) const;
+	unsigned char get_low_mark(const archive_version & reading_ver) const;
+	unsigned char get_high_mark(const archive_version & reading_ver) const;
 	unsigned char get_low_mark() const { return 255; };
 	unsigned char get_high_mark() const { return 254; };
 
     };
+
+	/// @}
 
 } // end of namespace
 

@@ -16,14 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: mask_list.hpp,v 1.1.2.3 2009/07/25 20:13:35 edrusb Rel $
+// $Id: mask_list.hpp,v 1.8 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file mask_list.hpp
     /// \brief here lies a mask that selects files present in a given list
+    /// \ingroup API
     ///
     /// The mask_list classes defined here is to be used for filtering files
     /// in the libdar API calls.
@@ -42,7 +43,7 @@ namespace libdar
         /// @{
 
         /// the mask_list class, matches string that are present in a given file
-
+	///
         /// the given file must contain one entry per line (thus no carriage return
         /// is allowed in a given entry). Note that the file listed in the
         /// file may have a relative path or an absolute path.
@@ -72,7 +73,7 @@ namespace libdar
 
     private:
 
-	    // we need to change to lexicographical order relation ship for the '/' character be the most lower of all. This way
+	    // we need to change to lexicographical order relationship for the '/' character be the most lower of all. This way
 	    // the first entry listed from a set a file sharing the same first characters will be the one corresponding
 	    // to the directory with this common prefix.
 
@@ -109,9 +110,9 @@ namespace libdar
         bool case_s;
         bool including;   // mask is used for including files (not for excluding files)
 
-	std::list<std::basic_string<my_char> > convert_list_string_char(const std::list<std::string> & src) const;
-	std::basic_string<my_char> convert_string_char(const std::string & src) const;
-	std::string convert_string_my_char(const std::basic_string<my_char> & src) const;
+	static std::list<std::basic_string<my_char> > convert_list_string_char(const std::list<std::string> & src);
+	static std::basic_string<my_char> convert_string_char(const std::string & src);
+	static std::string convert_string_my_char(const std::basic_string<my_char> & src);
     };
 
         /// @}

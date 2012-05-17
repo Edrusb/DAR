@@ -16,16 +16,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: null_file.hpp,v 1.11.4.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: null_file.hpp,v 1.21 2011/04/17 13:12:29 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file null_file.hpp
     /// \brief /dev/null type file implementation under the generic_file interface
+    /// \ingroup Private
     ///
-    /// this class is used when doing dry-run execution
+    /// this class is used in particular when doing dry-run execution
 
 #ifndef NULL_FILE_HPP
 #define NULL_FILE_HPP
@@ -36,6 +37,9 @@
 
 namespace libdar
 {
+
+	/// \addtogroup Private
+	/// @{
 
 	/// the null_file class implements the /dev/null behavior
 
@@ -49,14 +53,14 @@ namespace libdar
     class null_file : public generic_file, public thread_cancellation
     {
     public :
-        null_file(user_interaction & dialog, gf_mode m) : generic_file(dialog, m) {};
-        bool skip(const infinint &pos) { return pos == 0; };
+        null_file(gf_mode m) : generic_file(m) {};
+        bool skip(const infinint &pos) { return true; };
         bool skip_to_eof() { return true; };
         bool skip_relative(signed int x) { return false; };
         infinint get_position() { return 0; };
 
     protected :
-        int inherited_read(char *a, size_t size)
+        U_I inherited_read(char *a, U_I size)
 	{
 #ifdef MUTEX_WORKS
 	    check_self_cancellation();
@@ -64,14 +68,19 @@ namespace libdar
 	    return 0;
 	};
 
-        int inherited_write(const char *a, size_t size)
+        void inherited_write(const char *a, U_I size)
 	{
 #ifdef MUTEX_WORKS
 	    check_self_cancellation();
 #endif
-	    return size;
 	};
+
+	void inherited_sync_write() {};
+
+	void inherited_terminate() {};
     };
+
+	/// @}
 
 } // end of namespace
 

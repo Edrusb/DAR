@@ -5,13 +5,15 @@
                           I N S T R U C T I O N S
 
 
-For the impatients:
+For the impatients using a released or pre-release package:
 
 	./configure [--enable-mode=64]
 	make
 	make install-strip
 
-Please read the complete documentation pointing your html browser to:
+for the others and for more detailed information, please read the complete
+documentation pointing your html browser to:
 
-	doc/index.html#requirements
+	doc/from_sources.html
+
 

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar.cpp,v 1.43.2.4 2010/09/12 16:32:51 edrusb Rel $
+// $Id: dar.cpp,v 1.97 2011/03/31 15:52:00 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -29,7 +29,6 @@
 #include "user_interaction.hpp"
 #include "command_line.hpp"
 #include "tools.hpp"
-#include "test_memory.hpp"
 #include "dar.hpp"
 #include "sar_tools.hpp"
 #include "dar_suite.hpp"
@@ -37,9 +36,11 @@
 #include "deci.hpp"
 #include "libdar.hpp"
 #include "shell_interaction.hpp"
+#include "criterium.hpp"
+#include "line_tools.hpp"
 
 #ifndef DAR_VERSION
-#define DAR_VERSION "unknown"
+#define DAR_VERSION "unknown (BUG at compilation time?)"
 #endif
 
 using namespace std;
@@ -50,219 +51,209 @@ static void display_rest_stat(user_interaction & dialog, const statistics & st);
 static void display_diff_stat(user_interaction & dialog, const statistics &st);
 static void display_test_stat(user_interaction & dialog, const statistics & st);
 static void display_merge_stat(user_interaction & dialog, const statistics & st);
-static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env);
+static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env);
 
-int main(S_I argc, char *argv[], const char **env)
+int main(S_I argc, char * const argv[], const char **env)
 {
     return dar_suite_global(argc, argv, env, &little_main);
 }
 
-static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env)
+static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
     S_I ret = EXIT_OK;
-    operation op;
-    path *fs_root;
-    path *sauv_root;
-    path *ref_root;
-    infinint file_size;
-    infinint first_file_size;
-    mask *selection, *subtree, *compr_mask, *ea_mask;
-    string filename, *ref_filename;
-    bool allow_over, warn_over, info_details, detruire, beep, empty_dir, only_more_recent, ea_erase;
-    infinint pause;
-    compression algo;
-    U_I compression_level;
-    string input_pipe, output_pipe;
-    inode::comparison_fields what_to_check;
-    string execute, execute_ref;
-    string pass;
-    string pass_ref;
-    bool flat;
-    infinint min_compr_size;
+    line_param param;
     const char *home = tools_get_from_env(env, "HOME");
-    bool nodump;
-    infinint hourshift;
-    bool warn_remove_no_match;
-    string alteration;
-    bool empty;
-    path *on_fly_root;
-    string *on_fly_filename;
-    bool alter_atime;
-    bool same_fs;
-    bool snapshot;
-    bool cache_directory_tagging;
-    U_32 crypto_size;
-    U_32 crypto_size_ref;
-    bool display_skipped;
-    archive::listformat list_mode;
-    path *aux_root;
-    string *aux_filename;
-    string aux_pass;
-    string aux_execute;
-    U_32 aux_crypto_size;
-    bool keep_compressed;
-    infinint fixed_date;
-    bool quiet;
+    vector<string> dar_dcf_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DCF_PATH"));
+    vector<string> dar_duc_path = line_tools_explode_PATH(tools_get_from_env(env, "DAR_DUC_PATH"));
 
     if(home == NULL)
         home = "/";
     if(! get_args(dialog,
 		  home,
+		  dar_dcf_path,
+		  dar_duc_path,
 		  argc,
 		  argv,
-		  op,
-		  fs_root,
-		  sauv_root,
-		  ref_root,
-                  file_size,
-		  first_file_size,
-		  selection,
-                  subtree,
-		  filename,
-		  ref_filename,
-                  allow_over,
-		  warn_over,
-		  info_details,
-		  algo,
-                  compression_level,
-		  detruire,
-                  pause,
-		  beep,
-		  empty_dir,
-		  only_more_recent,
-                  ea_mask,
-                  input_pipe, output_pipe,
-                  what_to_check,
-                  execute,
-		  execute_ref,
-                  pass,
-		  pass_ref,
-                  compr_mask,
-                  flat,
-		  min_compr_size,
-		  nodump,
-                  hourshift,
-		  warn_remove_no_match,
-		  alteration,
-		  empty,
-		  on_fly_root,
-		  on_fly_filename,
-		  alter_atime,
-		  same_fs,
-		  snapshot,
-		  cache_directory_tagging,
-		  crypto_size,
-		  crypto_size_ref,
-		  ea_erase,
-		  display_skipped,
-		  list_mode,
-		  aux_root,
-		  aux_filename,
-		  aux_pass,
-		  aux_execute,
-		  aux_crypto_size,
-		  keep_compressed,
-		  fixed_date,
-		  quiet))
+		  param))
         return EXIT_SYNTAX;
-    else
+    else // get_args is OK, we've got a valid command line
     {
-        MEM_IN;
 	archive *arch = NULL;
 	archive *aux = NULL;
 	archive *cur = NULL;
-	bool on_fly_action = on_fly_filename != NULL && on_fly_root != NULL;
-        shell_interaction_set_beep(beep);
+        shell_interaction_set_beep(param.beep);
 
-        if(filename != "-"  || (output_pipe != "" && op != create && op != isolate && op != merging))
+        if(param.filename != "-"
+	   || (param.output_pipe != "" && param.op != create && param.op != isolate && param.op != merging))
             shell_interaction_change_non_interactive_output(&cout);
             // standart output can be used to send non interactive
             // messages
 
-        try
-        {
-            statistics st = false;
-	    string tmp_pass;
+	try
+	{
+	    statistics st = false;
+	    secu_string tmp_pass;
 	    crypto_algo crypto, aux_crypto;
+	    archive_options_read read_options;
+	    archive_options_create create_options;
+	    archive_options_isolate isolate_options;
+	    archive_options_merge merge_options;
+	    archive_options_extract extract_options;
+	    archive_options_listing listing_options;
+	    archive_options_diff diff_options;
+	    archive_options_test test_options;
 
-            switch(op)
+            switch(param.op)
             {
             case create:
 	    case merging:
-		if(ref_filename != NULL && ref_root != NULL)
+		if(param.ref_filename != NULL && param.ref_root != NULL)
 		{
-		    crypto_split_algo_pass(pass_ref, crypto, tmp_pass);
-		    if(op == merging && aux_root != NULL && info_details)
+		    crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass);
+		    if(param.op == merging && param.aux_root != NULL && param.info_details)
 			dialog.warning(gettext("Considering the (first) archive of reference:"));
-		    arch = new archive(dialog, *ref_root, *ref_filename, EXTENSION, crypto, tmp_pass, crypto_size_ref,
-				       input_pipe, output_pipe, execute_ref, info_details);
+		    read_options.clear();
+		    read_options.set_crypto_algo(crypto);
+		    read_options.set_crypto_pass(tmp_pass);
+		    read_options.set_crypto_size(param.crypto_size_ref);
+		    read_options.set_input_pipe(param.input_pipe);
+		    read_options.set_output_pipe(param.output_pipe);
+		    read_options.set_execute(param.execute_ref);
+		    read_options.set_info_details(param.info_details);
+		    read_options.set_slice_min_digits(param.ref_num_digits);
+		    if(param.sequential_read)
+		    {
+			if(param.op == merging)
+			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
+			else
+			    read_options.set_sequential_read(true);
+		    }
+		    arch = new archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
+				       read_options);
 		}
 
-		if(aux_root != NULL && aux_filename != NULL)
+		if(param.aux_root != NULL && param.aux_filename != NULL)
 		{
-		    if(op != merging)
+		    if(param.op != merging && param.op != create)
 			throw SRC_BUG;
-		    if(info_details)
-			dialog.warning(gettext("Considering the (second alias auxiliary) archive of reference:"));
-		    crypto_split_algo_pass(aux_pass, aux_crypto, tmp_pass);
-		    aux = new archive(dialog, *aux_root, *aux_filename, EXTENSION, aux_crypto, tmp_pass, aux_crypto_size,
-				      "", "", aux_execute, info_details);
+		    if(param.op == merging)
+		    {
+			if(param.info_details)
+			    dialog.warning(gettext("Considering the (second alias auxiliary) archive of reference:"));
+			crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass);
+			read_options.clear();
+			read_options.set_crypto_algo(aux_crypto);
+			read_options.set_crypto_pass(tmp_pass);
+			read_options.set_crypto_size(param.aux_crypto_size);
+			read_options.set_execute(param.aux_execute);
+			read_options.set_info_details(param.info_details);
+			read_options.set_slice_min_digits(param.aux_num_digits);
+			if(param.sequential_read)
+			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
+			aux = new archive(dialog, *param.aux_root, *param.aux_filename, EXTENSION,
+					  read_options);
+		    }
 		}
 
-		crypto_split_algo_pass(pass, crypto, tmp_pass);
+		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
 
-		switch(op)
+		switch(param.op)
 		{
 		case create:
-		    cur = new archive(dialog, *fs_root, *sauv_root, arch, *selection, *subtree, filename, EXTENSION,
-				      allow_over, warn_over, info_details, pause, empty_dir,
-				      algo, compression_level,
-				      file_size, first_file_size,
-				      *ea_mask,
-				      execute, crypto, tmp_pass, crypto_size,
-				      *compr_mask,
-				      min_compr_size, nodump,
-				      what_to_check,
-				      hourshift, empty,
-				      alter_atime, same_fs,
-				      snapshot,
-				      cache_directory_tagging,
-				      display_skipped,
-				      fixed_date,
+		    create_options.clear();
+		    if(arch != NULL)
+		    {
+			arch->drop_all_filedescriptors(dialog);
+			create_options.set_reference(arch);
+		    }
+		    create_options.set_selection(*param.selection);
+		    create_options.set_subtree(*param.subtree);
+		    create_options.set_allow_over(param.allow_over);
+		    create_options.set_warn_over(param.warn_over);
+		    create_options.set_info_details(param.info_details);
+		    create_options.set_pause(param.pause);
+		    create_options.set_empty_dir(param.empty_dir);
+		    create_options.set_compression(param.algo);
+		    create_options.set_compression_level(param.compression_level);
+		    create_options.set_slicing(param.file_size, param.first_file_size);
+		    create_options.set_ea_mask(*param.ea_mask);
+		    create_options.set_execute(param.execute);
+		    create_options.set_crypto_algo(crypto);
+		    create_options.set_crypto_pass(tmp_pass);
+		    create_options.set_crypto_size(param.crypto_size);
+		    create_options.set_compr_mask(*param.compress_mask);
+		    create_options.set_min_compr_size(param.min_compr_size);
+		    create_options.set_nodump(param.nodump);
+		    create_options.set_what_to_check(param.what_to_check);
+		    create_options.set_hourshift(param.hourshift);
+		    create_options.set_empty(param.empty);
+		    create_options.set_alter_atime(param.alter_atime);
+		    create_options.set_furtive_read_mode(param.furtive_read_mode);
+		    create_options.set_same_fs(param.same_fs);
+		    create_options.set_snapshot(param.snapshot);
+		    create_options.set_cache_directory_tagging(param.cache_directory_tagging);
+		    create_options.set_display_skipped(param.display_skipped);
+		    create_options.set_fixed_date(param.fixed_date);
+		    create_options.set_slice_permission(param.slice_perm);
+		    create_options.set_slice_user_ownership(param.slice_user);
+		    create_options.set_slice_group_ownership(param.slice_group);
+		    create_options.set_retry_on_change(param.repeat_count, param.repeat_byte);
+		    create_options.set_sequential_marks(param.use_sequential_marks);
+		    create_options.set_sparse_file_min_size(param.sparse_file_min_size);
+		    create_options.set_security_check(param.security_check);
+		    create_options.set_user_comment(param.user_comment);
+		    create_options.set_hash_algo(param.hash);
+		    create_options.set_slice_min_digits(param.num_digits);
+		    if(param.backup_hook_mask != NULL)
+			create_options.set_backup_hook(param.backup_hook_execute, *param.backup_hook_mask);
+		    create_options.set_ignore_unknown_inode_type(param.ignore_unknown_inode);
+		    cur = new archive(dialog, *param.fs_root, *param.sauv_root, param.filename, EXTENSION,
+				      create_options,
 				      &st);
-		    if(!quiet)
+		    if(!param.quiet)
 			display_sauv_stat(dialog, st);
 		    break;
 		case merging:
-		    cur = new archive(dialog,    // user_interaction &
-				      *sauv_root,  //const path &
-				      arch,       // archive *
-				      aux,        // archive *
-				      *selection, // const mask &
-				      *subtree,   // const mask &
-				      filename,   // const string &
-				      EXTENSION,  // const string &
-				      allow_over, // bool
-				      warn_over,  // bool
-				      info_details, // bool
-				      pause,         // const infinint &
-				      empty_dir,   // bool
-				      algo,         // compression
-				      compression_level,  // U_I
-				      file_size,     // const infinint &
-				      first_file_size, // const infinint &
-				      *ea_mask,      // const mask &
-				      execute,       // const string &
-				      crypto,        // crypto_algo
-				      tmp_pass,      // const string &
-				      crypto_size,   // U_32
-				      *compr_mask,    // const mask &
-				      min_compr_size,  // const infinint &
-				      empty,           // bool
-				      display_skipped,  // bool
-				      keep_compressed,
-				      &st);            // statistics*
-		    if(!quiet)
+		    merge_options.clear();
+		    merge_options.set_auxilliary_ref(aux);
+		    merge_options.set_selection(*param.selection);
+		    merge_options.set_subtree(*param.subtree);
+		    merge_options.set_allow_over(param.allow_over);
+		    merge_options.set_overwriting_rules(*param.overwrite);
+		    merge_options.set_warn_over(param.warn_over);
+		    merge_options.set_info_details(param.info_details);
+		    merge_options.set_pause(param.pause);
+		    merge_options.set_empty_dir(param.empty_dir);
+		    merge_options.set_compression(param.algo);
+		    merge_options.set_compression_level(param.compression_level);
+		    merge_options.set_slicing(param.file_size, param.first_file_size);
+		    merge_options.set_ea_mask(*param.ea_mask);
+		    merge_options.set_execute(param.execute);
+		    merge_options.set_crypto_algo(crypto);
+		    merge_options.set_crypto_pass(tmp_pass);
+		    merge_options.set_crypto_size(param.crypto_size);
+		    merge_options.set_compr_mask(*param.compress_mask);
+		    merge_options.set_min_compr_size(param.min_compr_size);
+		    merge_options.set_empty(param.empty);
+		    merge_options.set_display_skipped(param.display_skipped);
+		    merge_options.set_keep_compressed(param.keep_compressed);
+		    merge_options.set_slice_permission(param.slice_perm);
+		    merge_options.set_slice_user_ownership(param.slice_user);
+		    merge_options.set_slice_group_ownership(param.slice_group);
+		    merge_options.set_decremental_mode(param.decremental);
+		    merge_options.set_sequential_marks(param.use_sequential_marks);
+		    merge_options.set_sparse_file_min_size(param.sparse_file_min_size);
+		    merge_options.set_user_comment(param.user_comment);
+		    merge_options.set_hash_algo(param.hash);
+		    merge_options.set_slice_min_digits(param.num_digits);
+		    cur = new archive(dialog,            // user_interaction &
+				      *param.sauv_root,  //const path &
+				      arch,              // archive *
+				      param.filename,    // const string &
+				      EXTENSION,         // const string &
+				      merge_options,
+				      &st);              // statistics*
+		    if(!param.quiet)
 			display_merge_stat(dialog, st);
 		    break;
 		default:
@@ -284,130 +275,352 @@ static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const 
 
 		    // checking for onfly isolation
 
-		if(st.get_errored() > 0) // cur is not used for isolation
-		    throw Edata(gettext("Some file could not be saved"));
+		if(st.get_errored() > 0)
+		    ret = EXIT_DATA_ERROR;
 		if(st.get_tooold() != 0)
 		    ret = EXIT_SAVED_MODIFIED;
 
-		if(on_fly_action)
+		if(param.op == create)
+		if(param.aux_root != NULL && param.aux_filename != NULL)
 		{
-		    if(info_details)
-			dialog.warning(gettext("Now performing on-fly isolation..."));
-		    if(cur == NULL)
+		    if(param.op != merging && param.op != create)
 			throw SRC_BUG;
-		    arch = new archive(dialog, *on_fly_root, cur, *on_fly_filename, EXTENSION,
-				       allow_over, warn_over, info_details,
-				       false, bzip2, 9, 0, 0,
-				       "", crypto_none, "", 0, empty);
+		    if(param.op == create)
+		    {
+			if(param.info_details)
+			    dialog.warning(gettext("Now performing on-fly isolation..."));
+			if(cur == NULL)
+			    throw SRC_BUG;
+			crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass);
+			isolate_options.clear();
+			isolate_options.set_allow_over(param.allow_over);
+			isolate_options.set_warn_over(param.warn_over);
+			isolate_options.set_info_details(param.info_details);
+			isolate_options.set_pause(param.pause);
+			if(compile_time::libbz2())
+			    isolate_options.set_compression(bzip2);
+			else
+			    if(compile_time::libz())
+				isolate_options.set_compression(gzip);
+			    else
+				if(compile_time::liblzo())
+				    isolate_options.set_compression(lzo);
+				else // no compression
+				    isolate_options.set_compression(none);
+			isolate_options.set_execute(param.aux_execute);
+			isolate_options.set_crypto_algo(aux_crypto);
+			isolate_options.set_crypto_pass(tmp_pass);
+			isolate_options.set_crypto_size(param.aux_crypto_size);
+			isolate_options.set_empty(param.empty);
+			isolate_options.set_slice_permission(param.slice_perm);
+			isolate_options.set_slice_user_ownership(param.slice_user);
+			isolate_options.set_slice_group_ownership(param.slice_group);
+			isolate_options.set_hash_algo(param.hash);
+			isolate_options.set_slice_min_digits(param.aux_num_digits);
+			isolate_options.set_user_comment(param.user_comment);
+			isolate_options.set_sequential_marks(param.use_sequential_marks);
+			arch = new archive(dialog, *param.aux_root, cur, *param.aux_filename, EXTENSION,
+					   isolate_options);
+		    }
 		}
 		break;
             case isolate:
-		crypto_split_algo_pass(pass_ref, crypto, tmp_pass);
-		arch = new archive(dialog, *ref_root, *ref_filename, EXTENSION, crypto, tmp_pass, crypto_size_ref,
-				   input_pipe, output_pipe, execute_ref, info_details);
-		crypto_split_algo_pass(pass, crypto, tmp_pass);
-                cur = new archive(dialog, *sauv_root, arch, filename, EXTENSION, allow_over, warn_over, info_details,
-				  pause, algo, compression_level, file_size, first_file_size,
-				  execute, crypto, tmp_pass, crypto_size, empty);
+		crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass);
+		read_options.clear();
+		read_options.set_crypto_algo(crypto);
+		read_options.set_crypto_pass(tmp_pass);
+		read_options.set_crypto_size(param.crypto_size_ref);
+		read_options.set_input_pipe(param.input_pipe);
+		read_options.set_output_pipe(param.output_pipe);
+		read_options.set_execute(param.execute_ref);
+		read_options.set_info_details(param.info_details);
+		read_options.set_sequential_read(param.sequential_read);
+		read_options.set_slice_min_digits(param.ref_num_digits);
+		arch = new archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
+				   read_options);
+		if(arch == NULL)
+		    throw Ememory("little_main");
+		else
+		    arch->drop_all_filedescriptors(dialog);
+
+		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		isolate_options.clear();
+		isolate_options.set_allow_over(param.allow_over);
+		isolate_options.set_warn_over(param.warn_over);
+		isolate_options.set_info_details(param.info_details);
+		isolate_options.set_pause(param.pause);
+		isolate_options.set_compression(param.algo);
+		isolate_options.set_compression_level(param.compression_level);
+		isolate_options.set_slicing(param.file_size, param.first_file_size);
+		isolate_options.set_execute(param.execute);
+		isolate_options.set_crypto_algo(crypto);
+		isolate_options.set_crypto_pass(tmp_pass);
+		isolate_options.set_crypto_size(param.crypto_size);
+		isolate_options.set_empty(param.empty);
+		isolate_options.set_slice_permission(param.slice_perm);
+		isolate_options.set_slice_user_ownership(param.slice_user);
+		isolate_options.set_slice_group_ownership(param.slice_group);
+		isolate_options.set_user_comment(param.user_comment);
+		isolate_options.set_hash_algo(param.hash);
+		isolate_options.set_slice_min_digits(param.num_digits);
+		isolate_options.set_sequential_marks(param.use_sequential_marks);
+                cur = new archive(dialog, *param.sauv_root, arch, param.filename, EXTENSION,
+				  isolate_options);
                 break;
             case extract:
-		crypto_split_algo_pass(pass, crypto, tmp_pass);
-		arch = new archive(dialog, *sauv_root, filename, EXTENSION, crypto, tmp_pass, crypto_size,
-				   input_pipe, output_pipe, execute, info_details);
-                st = arch->op_extract(dialog, *fs_root, *selection, *subtree, allow_over, warn_over,
-				      info_details, detruire, only_more_recent, *ea_mask,
-				      flat,
-				      what_to_check,
-				      warn_remove_no_match, hourshift, empty, ea_erase,
-				      display_skipped, NULL);
-		if(!quiet)
+		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		read_options.clear();
+		read_options.set_crypto_algo(crypto);
+		read_options.set_crypto_pass(tmp_pass);
+		read_options.set_crypto_size(param.crypto_size);
+		read_options.set_input_pipe(param.input_pipe);
+		read_options.set_output_pipe(param.output_pipe);
+		read_options.set_execute(param.execute);
+		read_options.set_info_details(param.info_details);
+		read_options.set_lax(param.lax);
+		read_options.set_sequential_read(param.sequential_read);
+		read_options.set_slice_min_digits(param.num_digits);
+
+		if(param.ref_filename != NULL && param.ref_root != NULL)
+		{
+		    secu_string ref_tmp_pass;
+		    crypto_algo ref_crypto;
+
+		    crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
+		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
+		    read_options.set_ref_crypto_algo(ref_crypto);
+		    read_options.set_ref_crypto_pass(ref_tmp_pass);
+		    read_options.set_ref_crypto_size(param.crypto_size_ref);
+		    read_options.set_ref_execute(param.execute_ref);
+		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
+		}
+
+		arch = new archive(dialog,
+				   *param.sauv_root,
+				   param.filename,
+				   EXTENSION,
+				   read_options);
+
+		extract_options.clear();
+		extract_options.set_selection(*param.selection);
+		extract_options.set_subtree(*param.subtree);
+		extract_options.set_warn_over(param.warn_over);
+		extract_options.set_info_details(param.info_details);
+		extract_options.set_ea_mask(*param.ea_mask);
+		extract_options.set_flat(param.flat);
+		extract_options.set_what_to_check(param.what_to_check);
+		extract_options.set_warn_remove_no_match(param.warn_remove_no_match);
+		extract_options.set_empty(param.empty);
+		extract_options.set_display_skipped(param.display_skipped);
+		extract_options.set_empty_dir(!param.empty_dir);
+		    // the inversion above (!) is due to the fact this option is
+		    // set with the same -D option that is used at backup time to
+		    // save as empty directories those which have been excluded
+		    // by filters, option, which default is 'false', but here
+		    // in a restoration context, unless -D is provided (which set the
+		    // option to "true"), we want that all directories, empty or not, be restored
+		extract_options.set_overwriting_rules(*param.overwrite);
+		switch(param.dirty)
+		{
+		case dirtyb_ignore:
+		    extract_options.set_dirty_behavior(true, false);
+		    break;
+		case dirtyb_warn:
+		    extract_options.set_dirty_behavior(false, true);
+		    break;
+		case dirtyb_ok:
+		    extract_options.set_dirty_behavior(false, false);
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
+		extract_options.set_only_deleted(param.only_deleted);
+		extract_options.set_ignore_deleted(param.not_deleted);
+
+                st = arch->op_extract(dialog,
+				      *param.fs_root,
+				      extract_options,
+				      NULL);
+		if(!param.quiet)
 		    display_rest_stat(dialog, st);
                 if(st.get_errored() > 0)
                     throw Edata(gettext("All files asked could not be restored"));
                 break;
             case diff:
-		crypto_split_algo_pass(pass, crypto, tmp_pass);
-		arch = new archive(dialog, *sauv_root, filename, EXTENSION, crypto, tmp_pass, crypto_size,
-				   input_pipe, output_pipe, execute, info_details);
-                st = arch->op_diff(dialog, *fs_root, *selection, *subtree, info_details, *ea_mask,
-				   what_to_check,
-				   alter_atime, display_skipped, NULL, hourshift);
-		if(!quiet)
+		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		read_options.clear();
+		read_options.set_crypto_algo(crypto);
+		read_options.set_crypto_pass(tmp_pass);
+		read_options.set_crypto_size(param.crypto_size);
+		read_options.set_input_pipe(param.input_pipe);
+		read_options.set_output_pipe(param.output_pipe);
+		read_options.set_execute(param.execute);
+		read_options.set_info_details(param.info_details);
+		read_options.set_lax(param.lax);
+		read_options.set_sequential_read(param.sequential_read);
+		read_options.set_slice_min_digits(param.num_digits);
+
+		if(param.ref_filename != NULL && param.ref_root != NULL)
+		{
+		    secu_string ref_tmp_pass;
+		    crypto_algo ref_crypto;
+
+		    crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
+		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
+		    read_options.set_ref_crypto_algo(ref_crypto);
+		    read_options.set_ref_crypto_pass(ref_tmp_pass);
+		    read_options.set_ref_crypto_size(param.crypto_size_ref);
+		    read_options.set_ref_execute(param.execute_ref);
+		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
+		}
+		arch = new archive(dialog,
+				   *param.sauv_root,
+				   param.filename,
+				   EXTENSION,
+				   read_options);
+
+		diff_options.clear();
+		diff_options.set_selection(*param.selection);
+		diff_options.set_subtree(*param.subtree);
+		diff_options.set_info_details(param.info_details);
+		diff_options.set_ea_mask(*param.ea_mask);
+		diff_options.set_what_to_check(param.what_to_check);
+		diff_options.set_alter_atime(param.alter_atime);
+		diff_options.set_furtive_read_mode(param.furtive_read_mode);
+		diff_options.set_display_skipped(param.display_skipped);
+		diff_options.set_hourshift(param.hourshift);
+		diff_options.set_compare_symlink_date(param.no_compare_symlink_date);
+                st = arch->op_diff(dialog, *param.fs_root,
+				   diff_options,
+				   NULL);
+		if(!param.quiet)
 		    display_diff_stat(dialog, st);
                 if(st.get_errored() > 0 || st.get_deleted() > 0)
                     throw Edata(gettext("Some file comparisons failed"));
                 break;
-            case test:
-		crypto_split_algo_pass(pass, crypto, tmp_pass);
-		arch = new archive(dialog, *sauv_root, filename, EXTENSION, crypto, tmp_pass, crypto_size,
-				   input_pipe, output_pipe, execute, info_details);
-                st = arch->op_test(dialog, *selection, *subtree, info_details, display_skipped, NULL);
-		if(!quiet)
+	    case test:
+		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		read_options.clear();
+		read_options.set_crypto_algo(crypto);
+		read_options.set_crypto_pass(tmp_pass);
+		read_options.set_crypto_size(param.crypto_size);
+		read_options.set_input_pipe(param.input_pipe);
+		read_options.set_output_pipe(param.output_pipe);
+		read_options.set_execute(param.execute);
+		read_options.set_info_details(param.info_details);
+		read_options.set_lax(param.lax);
+		read_options.set_sequential_read(param.sequential_read);
+		read_options.set_slice_min_digits(param.num_digits);
+
+		if(param.ref_filename != NULL && param.ref_root != NULL)
+		{
+		    secu_string ref_tmp_pass;
+		    crypto_algo ref_crypto;
+
+		    crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
+		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
+		    read_options.set_ref_crypto_algo(ref_crypto);
+		    read_options.set_ref_crypto_pass(ref_tmp_pass);
+		    read_options.set_ref_crypto_size(param.crypto_size_ref);
+		    read_options.set_ref_execute(param.execute_ref);
+		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
+		}
+		arch = new archive(dialog,
+				   *param.sauv_root,
+				   param.filename,
+				   EXTENSION,
+				   read_options);
+
+		test_options.clear();
+		test_options.set_selection(*param.selection);
+		test_options.set_subtree(*param.subtree);
+		test_options.set_info_details(param.info_details);
+		test_options.set_empty(param.empty);
+		test_options.set_display_skipped(param.display_skipped);
+                st = arch->op_test(dialog, test_options, NULL);
+		if(!param.quiet)
 		    display_test_stat(dialog, st);
                 if(st.get_errored() > 0)
                     throw Edata(gettext("Some files are corrupted in the archive and it will not be possible to restore them"));
                 break;
+
             case listing:
-		crypto_split_algo_pass(pass, crypto, tmp_pass);
-		arch = new archive(dialog, *sauv_root, filename, EXTENSION, crypto, tmp_pass, crypto_size,
-				   input_pipe, output_pipe, execute, info_details);
-                arch->op_listing(dialog, info_details, list_mode, *selection, alteration != "");
+		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		read_options.clear();
+		read_options.set_crypto_algo(crypto);
+		read_options.set_crypto_pass(tmp_pass);
+		read_options.set_crypto_size(param.crypto_size);
+		read_options.set_input_pipe(param.input_pipe);
+		read_options.set_output_pipe(param.output_pipe);
+		read_options.set_execute(param.execute);
+		read_options.set_info_details(param.info_details);
+		read_options.set_lax(param.lax);
+		read_options.set_sequential_read(param.sequential_read);
+		read_options.set_slice_min_digits(param.num_digits);
+
+		arch = new archive(dialog,
+				   *param.sauv_root,
+				   param.filename,
+				   EXTENSION,
+				   read_options);
+
+		if(param.quiet)
+		    arch->summary(dialog);
+		else
+		{
+		    if(param.info_details)
+		    {
+			arch->summary(dialog);
+			dialog.pause(gettext("Continue listing archive contents?"));
+		    }
+		    listing_options.clear();
+		    listing_options.set_info_details(param.info_details);
+		    listing_options.set_list_mode(param.list_mode);
+		    listing_options.set_selection(*param.selection);
+		    listing_options.set_subtree(*param.subtree);
+		    listing_options.set_filter_unsaved(param.filter_unsaved);
+		    listing_options.set_display_ea(param.list_ea);
+		    arch->op_listing(dialog, listing_options);
+		}
                 break;
             default:
                 throw SRC_BUG;
             }
-            MEM_OUT;
-        }
-        catch(...)
-        {
-            if(fs_root != NULL)
-                delete fs_root;
-            if(sauv_root != NULL)
-                delete sauv_root;
-            if(selection != NULL)
-                delete selection;
-            if(subtree != NULL)
-                delete subtree;
-            if(ref_root != NULL)
-                delete ref_root;
-            if(ref_filename != NULL)
-                delete ref_filename;
-            if(compr_mask != NULL)
-                delete compr_mask;
+	}
+	catch(...)
+	{
 	    if(arch != NULL)
+	    {
 		delete arch;
+		arch = NULL;
+	    }
 	    if(cur != NULL)
+	    {
 		delete cur;
-	    if(ea_mask != NULL)
-		delete ea_mask;
+		cur = NULL;
+	    }
 	    if(aux != NULL)
+	    {
 		delete aux;
-            throw;
-        }
-
-        if(fs_root != NULL)
-            delete fs_root;
-        if(sauv_root != NULL)
-            delete sauv_root;
-        if(selection != NULL)
-            delete selection;
-        if(subtree != NULL)
-            delete subtree;
-        if(ref_root != NULL)
-            delete ref_root;
-        if(ref_filename != NULL)
-            delete ref_filename;
-        if(compr_mask != NULL)
-            delete compr_mask;
+		aux = NULL;
+	    }
+	    throw;
+	}
 	if(arch != NULL)
+	{
 	    delete arch;
+	    arch = NULL;
+	}
 	if(cur != NULL)
+	{
 	    delete cur;
-	if(ea_mask != NULL)
-	    delete ea_mask;
+	    cur = NULL;
+	}
 	if(aux != NULL)
+	{
 	    delete aux;
-        MEM_OUT;
+	    aux = NULL;
+	}
 
         return ret;
     }
@@ -415,7 +628,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const 
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar.cpp,v 1.43.2.4 2010/09/12 16:32:51 edrusb Rel $";
+    static char id[]="$Id: dar.cpp,v 1.97 2011/03/31 15:52:00 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -431,17 +644,19 @@ static void display_sauv_stat(user_interaction & dialog, const statistics & st)
     infinint errored = st.get_errored();
     infinint deleted = st.get_deleted();
     infinint ea_treated = st.get_ea_treated();
+    infinint byte_count = st.get_byte_amount();
 
     dialog.printf("\n\n --------------------------------------------\n");
     dialog.printf(gettext(" %i inode(s) saved\n"), &treated);
-    dialog.printf(gettext(" with %i hard link(s) recorded\n"), &hard_links);
-    dialog.printf(gettext(" %i inode(s) changed at the moment of the backup\n"), &tooold);
+    dialog.printf(gettext("   including %i hard link(s) treated\n"), &hard_links);
+    dialog.printf(gettext(" %i inode(s) changed at the moment of the backup and could not be saved properly\n"), &tooold);
+    dialog.printf(gettext(" %i byte(s) have been wasted in the archive to resave changing files"), & byte_count);
     dialog.printf(gettext(" %i inode(s) not saved (no inode/file change)\n"), &skipped);
-    dialog.printf(gettext(" %i inode(s) failed to save (filesystem error)\n"), &errored);
+    dialog.printf(gettext(" %i inode(s) failed to be saved (filesystem error)\n"), &errored);
     dialog.printf(gettext(" %i inode(s) ignored (excluded by filters)\n"), &ignored);
     dialog.printf(gettext(" %i inode(s) recorded as deleted from reference backup\n"), &deleted);
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" Total number of inodes considered: %i\n"), &total);
+    dialog.printf(gettext(" Total number of inode(s) considered: %i\n"), &total);
 #ifdef EA_SUPPORT
     dialog.printf(" --------------------------------------------\n");
     dialog.printf(gettext(" EA saved for %i inode(s)\n"), &ea_treated);
@@ -453,6 +668,7 @@ static void display_rest_stat(user_interaction & dialog, const statistics & st)
 {
     infinint total = st.total();
     infinint treated = st.get_treated();
+    infinint hard_links = st.get_hard_links();
     infinint tooold = st.get_tooold();
     infinint skipped = st.get_skipped();
     infinint ignored = st.get_ignored();
@@ -462,13 +678,14 @@ static void display_rest_stat(user_interaction & dialog, const statistics & st)
 
     dialog.printf("\n\n --------------------------------------------\n");
     dialog.printf(gettext(" %i inode(s) restored\n"), &treated);
+    dialog.printf(gettext("    including %i hard link(s)\n"), &hard_links);
     dialog.printf(gettext(" %i inode(s) not restored (not saved in archive)\n"), &skipped);
+    dialog.printf(gettext(" %i inode(s) not restored (overwriting policy decision)\n"), &tooold);
     dialog.printf(gettext(" %i inode(s) ignored (excluded by filters)\n"), &ignored);
-    dialog.printf(gettext(" %i inode(s) less recent than the one on filesystem\n"), &tooold);
     dialog.printf(gettext(" %i inode(s) failed to restore (filesystem error)\n"), &errored);
     dialog.printf(gettext(" %i inode(s) deleted\n"), &deleted);
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" Total number of inodes considered: %i\n"), &total);
+    dialog.printf(gettext(" Total number of inode(s) considered: %i\n"), &total);
 #ifdef EA_SUPPORT
     dialog.printf(" --------------------------------------------\n");
     dialog.printf(gettext(" EA restored for %i inode(s)\n"), &ea_treated);
@@ -484,11 +701,11 @@ static void display_diff_stat(user_interaction & dialog, const statistics &st)
     infinint errored = st.get_errored();
 
     dialog.printf("\n\n --------------------------------------------\n");
-    dialog.printf(gettext(" %i inode(s) treated\n"), &treated);
-    dialog.printf(gettext(" %i inode(s) do not match those on filesystem\n"), &errored);
-    dialog.printf(gettext(" %i inode(s) ignored (excluded by filters)\n"), &ignored);
+    dialog.printf(gettext(" %i item(s) treated\n"), &treated);
+    dialog.printf(gettext(" %i item(s) do not match those on filesystem\n"), &errored);
+    dialog.printf(gettext(" %i item(s) ignored (excluded by filters)\n"), &ignored);
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" Total number of inodes considered: %i\n"), &total);
+    dialog.printf(gettext(" Total number of items considered: %i\n"), &total);
     dialog.printf(" --------------------------------------------\n");
 }
 
@@ -501,11 +718,11 @@ static void display_test_stat(user_interaction & dialog, const statistics & st)
     infinint skipped = st.get_skipped();
 
     dialog.printf("\n\n --------------------------------------------\n");
-    dialog.printf(gettext(" %i inode(s) treated\n"), &treated);
-    dialog.printf(gettext(" %i inode(s) with error\n"), &errored);
-    dialog.printf(gettext(" %i inode(s) ignored (excluded by filters)\n"), &skipped);
+    dialog.printf(gettext(" %i item(s) treated\n"), &treated);
+    dialog.printf(gettext(" %i item(s) with error\n"), &errored);
+    dialog.printf(gettext(" %i item(s) ignored (excluded by filters)\n"), &skipped);
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" Total number of inodes considered: %i\n"), &total);
+    dialog.printf(gettext(" Total number of items considered: %i\n"), &total);
     dialog.printf(" --------------------------------------------\n");
 }
 
@@ -517,14 +734,19 @@ static void display_merge_stat(user_interaction & dialog, const statistics & st)
     infinint hard_links = st.get_hard_links();
     infinint deleted = st.get_deleted();
     infinint ignored = st.get_ignored();
+    infinint ea_treated = st.get_ea_treated();
 
     dialog.printf("\n\n --------------------------------------------\n");
     dialog.printf(gettext(" %i inode(s) added to archive\n"), &treated);
     dialog.printf(gettext(" with %i hard link(s) recorded\n"), &hard_links);
     dialog.printf(gettext(" %i inode(s) ignored (excluded by filters)\n"), &ignored);
     dialog.printf(gettext(" %i inode(s) recorded as deleted\n"), &deleted);
+#ifdef EA_SUPPORT
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" Total number of inodes considered: %i\n"), &total);
+    dialog.printf(gettext(" EA saved for %i inode(s)\n"), &ea_treated);
+#endif
+    dialog.printf(" --------------------------------------------\n");
+    dialog.printf(gettext(" Total number of inode(s) considered: %i\n"), &total);
     dialog.printf(" --------------------------------------------\n");
 }
 

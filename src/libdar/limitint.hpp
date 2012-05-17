@@ -16,19 +16,21 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: limitint.hpp,v 1.18.2.5 2011/01/04 16:27:13 edrusb Rel $
+// $Id: limitint.hpp,v 1.38 2011/03/20 21:02:50 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file limitint.hpp
     /// \brief the reviewed implementation of infinint based on system limited integers
+    /// \ingroup Private
     ///
     /// the limitint template class implementation defined in this module can
     /// handle positive integers and detect overflow. It shares with infinint the same
     /// interface, so it can be use in place of it, but throw Elimitint exceptions if
     /// overflow is detected.
+
 
 #ifndef LIMITINT_HPP
 #define LIMITINT_HPP
@@ -44,6 +46,14 @@ extern "C"
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
 } // end extern "C"
 
 #include <typeinfo>
@@ -52,14 +62,22 @@ extern "C"
 #include "special_alloc.hpp"
 #include "int_tools.hpp"
 
+
+#define ZEROED_SIZE 50
+
 namespace libdar
 {
+
+    /// \addtogroup Private
+    /// @{
+
 
     class generic_file;
     class user_interaction;
 
 	/// limitint template class
-
+	/// \ingroup Private
+	///
 	/// the limitint template class implementation can
 	/// handle positive integers and detect overflow. It shares with infinint the same
 	/// interface, so it can be use in place of it, but throw Elimitint exceptions if
@@ -68,7 +86,6 @@ namespace libdar
 	/// In particular it is assumed that the sizeof() operator gives the amount of
 	/// byte of information that this type can handle, and it is also assumed that
 	/// the bytes of information are contiguous.
-	/// \ingroup Private
 
     template<class B> class limitint
     {
@@ -92,8 +109,9 @@ namespace libdar
 #endif
 #endif
 
-        limitint(user_interaction & dialog, S_I *fd, generic_file *x); // read an limitint from a file
-
+	    // read an limitint from a file
+        limitint(user_interaction & dialog, S_I fd);
+	limitint(generic_file & x);
 
         void dump(user_interaction & dialog, S_I fd) const; // write byte sequence to file
         void dump(generic_file &x) const; // write byte sequence to file
@@ -127,13 +145,13 @@ namespace libdar
             // note that the initial value of the argument is not ignored !
             // when the object is null the value of the argument stays the same as before
         template <class T>void unstack(T &v)
-            { E_BEGIN; limitint_unstack_to(v); E_END("limitint::unstack", typeid(v).name()); }
+	{ E_BEGIN; limitint_unstack_to(v); E_END("limitint::unstack", typeid(v).name()); }
 
 	limitint get_storage_size() const;
 	    // it returns number of byte of information necessary to store the integer
 
 	unsigned char operator [] (const limitint & position) const;
-	    // return in big endian order the information byte storing the integer
+	    // return in big endian order the information bytes storing the integer
 
 
         bool operator < (const limitint &x) const { return field < x.field; };
@@ -154,7 +172,7 @@ namespace libdar
 
     private :
         static const int TG = 4;
-	static const U_32 sizeof_field = sizeof(B);
+	static const U_32 sizeof_field = sizeof(B); // number of bytes
 
         enum endian { big_endian, little_endian, not_initialized };
         typedef unsigned char group[TG];
@@ -163,6 +181,7 @@ namespace libdar
 
         void build_from_file(generic_file & x);
         template <class T> void limitint_from(T a);
+	template <class T> T max_val_of(T x);
         template <class T> void limitint_unstack_to(T &a);
 
             /////////////////////////
@@ -171,8 +190,12 @@ namespace libdar
         static endian used_endian;
         static const U_I bytesize = sizeof(B);
         static const B max_value = ~B(0) > 0 ? ~B(0) : ~(B(1) << (bytesize*8 - 1));
+	static U_8 zeroed_field[ZEROED_SIZE];
+
         static void setup_endian();
     };
+
+    template <class B> U_8 limitint<B>::zeroed_field[ZEROED_SIZE];
 
     template <class B> limitint<B> operator + (const limitint<B> &, const limitint<B> &);
     template <class B> inline limitint<B> operator + (const limitint<B> & a, U_I b)
@@ -221,6 +244,7 @@ namespace libdar
 	///////////////////////////////////////////////////////////////////////
 
 #include "generic_file.hpp"
+#include "fichier.hpp"
 #include "user_interaction.hpp"
 
 namespace libdar
@@ -228,20 +252,17 @@ namespace libdar
 
     template <class B> typename limitint<B>::endian limitint<B>::used_endian = not_initialized;
 
-    template <class B> limitint<B>::limitint(user_interaction & dialog, S_I *fd, generic_file *x)
+
+
+    template <class B> limitint<B>::limitint(user_interaction & dialog, S_I fd)
     {
-        if(fd != NULL && x != NULL)
-            throw Erange("limitint::limitint(file, file)", "Both arguments are not NULL, please choose one or the other, not both"); // message not translated, expected
-        if(fd != NULL)
-        {
-            fichier f = fichier(dialog, dup(*fd));
-            build_from_file(f);
-        }
-        else
-            if(x != NULL)
-                build_from_file(*x);
-            else
-                throw Erange("limitint::limitint(file, file)", "Cannot read from file, both arguments are NULL"); // message not translated, expected
+	fichier f = fichier(dialog, dup(fd));
+	build_from_file(f);
+    }
+
+    template <class B> limitint<B>::limitint(generic_file & x)
+    {
+	build_from_file(x);
     }
 
     template <class B> void limitint<B>::dump(user_interaction & dialog, S_I fd) const
@@ -278,7 +299,7 @@ namespace libdar
                 for(S_I i = 0; i < 8; ++i)
                     pos += bf[i];
                 if(pos != 1)
-                    throw Erange("limitint::build_from_file(generic_file)", gettext("Badly formed infinint or not supported format")); // more than 1 bit is set to 1
+                    throw Erange("limitint::build_from_file(generic_file)", gettext("Badly formed \"infinint\" or not supported format")); // more than 1 bit is set to 1
 
                 pos = 0;
                 while(bf[pos] == 0)
@@ -292,12 +313,12 @@ namespace libdar
                 if(skip.field > bytesize)
                     throw Elimitint();
 
-                field = 0; // important to also clear "unread" bytes by the following call
+                field = 0; // important to also clear "unread" bytes by this call
                 lu = x.read(ptr, skip.field);
 
                 if(used_endian == not_initialized)
                     setup_endian();
-                if(used_endian == big_endian)
+                if(used_endian == little_endian)
                     int_tools_swap_bytes((unsigned char *)ptr, skip.field);
                 else
                     field >>= (bytesize - skip.field)*8;
@@ -322,7 +343,7 @@ namespace libdar
         if(used_endian == not_initialized)
             setup_endian();
 
-        if(used_endian == big_endian)
+        if(used_endian == little_endian)
         {
             direction = -1;
             ptr = (unsigned char *)(&field) + (bytesize - 1);
@@ -366,41 +387,41 @@ namespace libdar
 
             // now we write the preamble except the last byte. All these are zeros.
 
-        unsigned char u = 0x00;
-
-        while(width-- > 0)
-            if(x.write((char *)(&u), 1) < 1)
-                throw Erange("limitint::dump(generic_file)", gettext("Cannot write data to file"));
-
+        while(width != 0)
+	    if(width > ZEROED_SIZE)
+	    {
+		x.write((char *)zeroed_field, ZEROED_SIZE);
+		width -= ZEROED_SIZE;
+	    }
+	    else
+	    {
+		x.write((char *)zeroed_field, width);
+		width = 0;
+	    }
 
             // now we write the last byte of the preambule, which as only one bit set
 
-        if(x.write((char *)&last_width, 1) < 1)
-            throw Erange("limitint::dump(generic_file)", gettext("Cannot write data to file"));
+        x.write((char *)&last_width, 1);
 
             // we need now to write some justification byte to have an informational field multiple of TG
 
         if(justification != 0)
         {
             justification = TG - justification;
-            while(justification-- > 0)
-                if(x.write((char *)(&u), 1) < 1)
-                    throw Erange("limitint::dump(generic_file)", gettext("Cannot write data to file"));
+	    if(justification > ZEROED_SIZE)
+		throw SRC_BUG;
+	    else
+                x.write((char *)zeroed_field, justification);
         }
 
             // now we continue dumping the informational bytes:
         if(ptr == fin) // field is equal to zero
-        {
-            if(x.write((char *)(&u), 1) < 1)
-		throw Erange("limitint::dump(generic_file)", gettext("Cannot write data to file"));
-        }
+            x.write((char *)zeroed_field, 1);
         else // we have some bytes to write down
             while(ptr != fin)
             {
-                if(x.write((char *)ptr, 1) < 1)
-                    throw Erange("limitint::dump(generic_file)", gettext("Cannot write data to file"));
-                else
-                    ptr += direction;
+                x.write((char *)ptr, 1);
+		ptr += direction;
             }
 
         E_END("limitint::dump", "generic_file");
@@ -423,7 +444,7 @@ namespace libdar
     {
         E_BEGIN;
         if(field < arg.field)
-            throw Erange("limitint::operator", gettext("Subtracting a infinint greater than the first, infinint cannot be negative"));
+            throw Erange("limitint::operator", gettext("Subtracting an \"infinint\" greater than the first, \"infinint\" cannot be negative"));
 
             // now processing the operation
 
@@ -489,7 +510,7 @@ namespace libdar
     template <class B> limitint<B> & limitint<B>::operator >>= (U_32 bit)
     {
         E_BEGIN;
-	if(bit >= sizeof_field)
+	if(bit >= sizeof_field*8)
 	    field = 0;
 	else
 	    field >>= bit;
@@ -566,13 +587,28 @@ namespace libdar
         E_END("limitint::limitint_from", "");
     }
 
+    template <class B> template <class T> T limitint<B>::max_val_of(T x)
+    {
+	x = 0;
+	x = ~x;
+
+	if(x < 1) // T is a signed integer type, we are not comparing to zero to avoid compiler warning when the template is used against unsigned integers
+	{
+	    x = 1;
+	    x = int_tools_rotate_right_one_bit(x);
+	    x = ~x;
+	}
+
+	return x;
+    }
+
     template <class B> template <class T> void limitint<B>::limitint_unstack_to(T &a)
     {
         E_BEGIN;
             // T is supposed to be an unsigned "integer"
             // (ie.: sizeof returns the width of the storage bit field  and no sign bit is present)
             // Note : static here avoids the recalculation of max_T at each call
-        static const T max_T = ~T(0) > 0 ? ~T(0) : ~int_tools_rotate_right_one_bit(T(1));
+        static const T max_T = max_val_of(a);
         T step = max_T - a;
 
         if(field < (B)(step) && (T)(field) < step)
@@ -620,13 +656,12 @@ namespace libdar
     template <class B> void limitint<B>::setup_endian()
     {
         E_BEGIN;
-        U_16 u = 1;
-        unsigned char *ptr = (unsigned char *)(&u);
-
-        if(ptr[0] == 1)
+	if(integers_system_is_big_endian())
             used_endian = big_endian;
         else
             used_endian = little_endian;
+
+	bzero(zeroed_field, ZEROED_SIZE);
         E_END("limitint::setup_endian", "");
     }
 
@@ -794,6 +829,7 @@ namespace libdar
         E_END("operator ^", "limitint");
     }
 
+	/// @}
 
 } // end of namespace
 

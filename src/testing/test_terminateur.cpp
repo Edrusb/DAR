@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_terminateur.cpp,v 1.12.2.1 2008/05/16 11:00:17 edrusb Rel $
+// $Id: test_terminateur.cpp,v 1.16 2011/01/05 18:04:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -45,12 +45,12 @@ extern "C"
 #include "terminateur.hpp"
 #include "generic_file.hpp"
 #include "deci.hpp"
-#include "test_memory.hpp"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
 #include "shell_interaction.hpp"
 #include "user_interaction.hpp"
 #include "macro_tools.hpp"
+#include "fichier.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -63,8 +63,6 @@ int main()
 {
     U_I maj, med, min;
 
-    MEM_BEGIN;
-    MEM_IN;
     get_version(maj, med, min);
     ui = shell_interaction_init(&cout, &cerr, false);
     if(ui == NULL)
@@ -73,8 +71,6 @@ int main()
     shell_interaction_close();
     if(ui != NULL)
 	delete ui;
-    MEM_OUT;
-    MEM_END;
 }
 
 static void f1()

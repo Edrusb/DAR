@@ -1,45 +1,45 @@
-Status meanings :
+Status flags:
 ---------------
 ! : not used
 - : used without arg
 + : used with argument
 * : used with optional argument
 ---------------
-letter status description :
+letters usage:
 ---------------
-a * alteration of operation             --alter   argument: s[aved] | SI[-unit[s]] | binary[-unit[s]] | a[time] | c[time] | m[ask] | n[o-case] | case | r[egex] | g[lob] | e[rase_ea] | k[eep-compressed] | f[ixed_date]
+a * alteration of operation             --alter   argument: s[aved] | SI[-unit[s]] | binary[-unit[s]] | a[time] | c[time] | m[ask] | n[o-case] | case | r[egex] | g[lob] | e[rase_ea] | k[eep-compressed] | f[ixed_date] | d[ecremental] | l[axist] | t[ape-marks] | h[oles-recheck] | secu | list-ea | i[gnore-unknown-inode-type] | do-not-compare-symlink-mtime
 b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff
-e - simulate the operation              --empty
+e - simulate the operation              --empty (aka dry-run)
 f - do not restore directory structure  --flat
 g + recurse in this directory           --go-into
 h - help usage                          --help
-i - path of the input pipe              --input
+i + path of the input pipe              --input
 j - ask user to make room in virtual memory when it is exhausted --jog
-k - do not deleted files drop between two backups --no-delete
+k + do not deleted files drop between two backups --no-delete / --deleted { ignore | only }
 l + list archive contents               --list
 m + minimum size below which no compression will occur. --mincompr a default value is used. use -m 0 if you want to compress in any case.
 n - do not allow overwriting            --no-overwrite
-o - path of the output pipe             --output
-p - pause before creating new slice     --pause
+o + path of the output pipe             --output
+p + pause before creating new slice     --pause
 q - suppress final statistics report    --quiet
 r - do not overwrite more recent file   --recent [=date] (to implement)
 s + size of slice                       --slice
 t + test archive structure              --test
 u + exclude EA from operation (mask)    --exclude-ea
-v - verbose output                      --verbose   --verbose=skipped -vb
+v + verbose output                      --verbose   --verbose=skipped -vb
 w * do not warn before overwriting      --no-warn
 x + extract archive                     --extract
-y * bzip2 compression                   --bzip2
-z * gzip compression                    --gzip
+y * [DEPRECATED] bzip2 compression      --bzip2
+z * gzip compression                    --gzip --compress
 A + make a differential backup          --ref
 B + filename taken as command-line extension --config
 C + extract catalogue in separated file --isolate
 D - store excluded dir as empty dir     --empty-dir
 E + shell command to launch with slices --execute
 F + shell command to launch with slices of archive of reference   --execute-ref
-G + catalogue isolation when creating an archive --on-fly-isolate
+G # [OBSOLETE] : catalogue isolation when creating an archive --on-fly-isolate
 H * if a file for differential backup or diff differs from exactly one hour it is assumed as identical (no change).
 I + include mask                        --include
 J + key for unscrambling the reference catalogue --key-ref
@@ -47,13 +47,13 @@ K + key for un/scrambling               --key
 L - license information
 M - only consider what is under the current mounting point. --no-mount-points
 N - do not read any configuration file ~/.darrc or /etc/darrc
-O - ignore user Id and group Id         --ignore-owner
+O + ignore user Id and group Id         --ignore-owner
 P + prune a directory tree              --prune
 Q + quite on stderr at startup		no long option equivalent
 R + set the root directory              --root
 S + size of the first slice             --first-slice
-T - tree listing format                 --tree-format, --list-format=<normal|tree|xml>
-U - include EA for the operation (mask) --include-ea
+T + tree listing format                 --tree-format, --list-format=<normal|tree|xml>
+U + include EA for the operation (mask) --include-ea
 V - version information                 --version
 W - warranty disclosure information (POSIX RESERVED, sorry)
 X + exclude mask                        --exclude
@@ -65,8 +65,33 @@ Z + excluded filename from compression  --exclude-compression
 , - cache directory tagging standard    --cache-directory-tagging
 [ + include files listed in given file   --include-from-file
 ] + exclude files listed in given file   --exclude-from-file
+- x (forbidden by getopt)
+? x (forbidden by getopt)
+: x (forbidden by getopt)
 + + merging operation                    --merge
 @ + second reference archive for merging --aux-ref
 $ + key for auxilliary refence archive   --aux-key
 ~ + command to execute between slices    --aux-execute
 % + encryption block size for the auxilliary archive of reference --aux-crypto-block
+/ + policy to solve overwriting conflict --overwriting-policy
+^ + ownership and permission of generated slices --slice-mode
+_ + retry on change                      --retry-on-change <count[:max byte]>
+{ !
+} !
+0 * sequential read of the archive       --sequential-read
+1 + sparse-file detection tunning        --sparse-file-min-size <int>
+2 + dirty file behavior                  --dirty-behavior {ignore|no-warn}
+3 + create a hash algorithm (+algo)      --hash <algo>
+4 !
+5 !
+6 !
+7 !
+8 !
+9 !
+" + anonymous pipe descriptor to read conf from. --pipe-fd
+. + user comment                         --user-comment
+; + min_digits                           --min-digits archive[,ref[,aux]];
+< + backup hook mask                     --backup-hook-include
+> + backup hook mask                     --backup-hook-exclude
+= + backup hook execute                  --backup-hook-execute
+\ !

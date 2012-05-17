@@ -16,11 +16,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: config_file.hpp,v 1.7 2004/06/20 14:26:25 edrusb Rel $
+// $Id: config_file.hpp,v 1.10 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file config_file.hpp
+    /// \brief specific routines to manages included files's targets
+    /// \ingroup CMDLINE
+
 
 #ifndef CONFIG_FILE_HPP
 #define CONFIG_FILE_HPP
@@ -31,10 +36,13 @@
 
 using namespace libdar;
 
+    /// \addtogroup CMDLINE
+    /// @{
+
 class config_file : public hide_file
 {
 public:
-    config_file(user_interaction & dialog, const vector<string> & target, generic_file &f) : hide_file(dialog, f) { cibles = target; };
+    config_file(const vector<string> & target, generic_file &f) : hide_file(f) { cibles = target; };
 
 protected:
     void fill_morceau();
@@ -45,5 +53,6 @@ private:
     bool find_next_target(generic_file &f, infinint & debut, string & nature, infinint & fin);
 };
 
+    /// @}
 
 #endif

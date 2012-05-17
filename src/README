@@ -1,4 +1,4 @@
-What will you find here ?
+What will you find here?
 
 Source code for dar suite program.
 
@@ -14,8 +14,15 @@ examples directory
   when using --enable-examples with the configure script.
 
 testing directory
-  contains a plethora of very simple program that helped me validate each C++
+  contains a plethora of very simple program that helped validate each C++
   module of dar. They are to be used in step by step debugging and in
   conjunction with variable watch. Theses programs are intended to be used
   only by developers, they are built when using --enable-examples with the
   configure script.
+
+check
+  contains the global validation routine that are run when calling
+  "make check". Note that running 'make check' may take several days to
+  complete depending on the power of your computer, this is also due to
+  the fact that these routine are very basic but robust, they are not
+  especially optimized for speed.

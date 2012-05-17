@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_mask_list.cpp,v 1.1 2005/03/28 21:19:24 edrusb Rel $
+// $Id: test_mask_list.cpp,v 1.2 2009/12/18 10:10:21 edrusb Rel $
 //
 /*********************************************************************/
 

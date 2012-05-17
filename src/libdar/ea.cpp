@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: ea.cpp,v 1.13.2.2 2009/04/07 08:45:29 edrusb Rel $
+// $Id: ea.cpp,v 1.22 2010/08/04 10:07:54 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -39,54 +39,33 @@ using namespace std;
 namespace libdar
 {
 
-    ea_entry::ea_entry(user_interaction & dialog, generic_file & f, const dar_version & edit)
-    {
-	infinint tmp;
-	unsigned char fl;
-	string pre_key = "";
+///////////// STATIC FUNCTION DECLARATION ///////////
 
-	if(version_greater("05", edit)) // "05" > edit => old format
-	{
-	    f.read((char *)(&fl), 1);
-	    if((fl & EA_ROOT) != 0)
-		pre_key = "system.";
-	    else
-		pre_key = "user.";
-	}
-        tools_read_string(f, key);
-	key = pre_key + key;
-        tmp = infinint(dialog, NULL, &f);
-        tools_read_string_size(f, value, tmp);
-    }
-
-    void ea_entry::dump(generic_file & f) const
-    {
-        infinint tmp = value.size();
-
-        tools_write_string(f, key);
-        tmp.dump(f);
-        tools_write_string_all(f, value);
-    }
+    static void read_pair_string(generic_file & f, const archive_version & edit, string & key, string & val);
+    static void write_pair_key(generic_file & f, const string & key, const string & val);
 
 ///////////// EA_ATTRIBUTS IMPLEMENTATION //////////
 
-    ea_attributs::ea_attributs(user_interaction & dialog, generic_file & f, const dar_version & edit)
+    ea_attributs::ea_attributs(generic_file & f, const archive_version & edit)
     {
-        U_32 tmp2 = 0;
-        infinint tmp = infinint(dialog, NULL, &f); // number of EA
+        infinint tmp = infinint(f); // number of EA
+	string key, val;
+	U_32 tmp2 = 0;
 
-        tmp.unstack(tmp2);
 
-        do
-        {
-            while(tmp2 > 0)
-            {
-                attr.push_back(ea_entry(dialog, f, edit));
-                tmp2--;
-            }
-            tmp.unstack(tmp2);
-        }
-        while(tmp2 > 0);
+	tmp.unstack(tmp2);
+
+	do
+	{
+	    while(tmp2 > 0)
+	    {
+		read_pair_string(f, edit, key, val);
+		attr[key] = val;
+		tmp2--;
+	    }
+	    tmp.unstack(tmp2);
+	}
+	while(tmp2 > 0);
 
         alire = attr.begin();
     }
@@ -99,18 +78,18 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea.cpp,v 1.13.2.2 2009/04/07 08:45:29 edrusb Rel $";
+        static char id[]="$Id: ea.cpp,v 1.22 2010/08/04 10:07:54 edrusb Rel $";
         dummy_call(id);
     }
 
     void ea_attributs::dump(generic_file & f) const
     {
-        vector<ea_entry>::const_iterator it = attr.begin();
+        map<string, string>::const_iterator it = attr.begin();
 
         size().dump(f);
         while(it != attr.end())
         {
-            it->dump(f);
+	    write_pair_key(f, it->first, it->second);
             it++;
         }
     }
@@ -121,12 +100,14 @@ namespace libdar
         moi->alire = moi->attr.begin();
     }
 
-    bool ea_attributs::read(ea_entry & x) const
+    bool ea_attributs::read(string & key, string & value) const
     {
         ea_attributs *moi = const_cast<ea_attributs *>(this);
         if(alire != attr.end())
         {
-            x = *(moi->alire)++;
+            key = alire->first;
+	    value = alire->second;
+	    ++(moi->alire);
             return true;
         }
         else
@@ -135,15 +116,16 @@ namespace libdar
 
     bool ea_attributs::diff(const ea_attributs & other, const mask & filter) const
     {
-        ea_entry ea;
+	string key;
+	string val;
         string value;
         bool diff = false;
 
         reset_read();
-        while(!diff && read(ea))
-	    if(filter.is_covered(ea.key))
+        while(!diff && read(key, val))
+	    if(filter.is_covered(key))
 	    {
-		if(!other.find(ea.key, value) || value != ea.value) // not found or different
+		if(!other.find(key, value) || value != val) // not found or different
 		    diff = true;
 	    }
 
@@ -152,17 +134,74 @@ namespace libdar
 
     bool ea_attributs::find(const string & key, string & found_value) const
     {
-        vector<ea_entry>::const_iterator it = attr.begin();
+        map<string, string>::const_iterator it = attr.find(key);
 
-        while(it != attr.end() && it->key != key)
-            it++;
         if(it != attr.end())
         {
-	    found_value = it->value;
+	    found_value = it->second;
+	    if(it->first != key)
+		throw SRC_BUG;
             return true;
         }
         else
             return false;
+    }
+
+    infinint ea_attributs::space_used() const
+    {
+	map<string, string>::const_iterator it = attr.begin();
+	infinint ret = 0;
+
+	while(it != attr.end())
+	{
+	    ret += it->first.size() + it->second.size();
+	    ++it;
+	}
+
+	return ret;
+    }
+
+    ea_attributs ea_attributs::operator + (const ea_attributs & arg) const
+    {
+	ea_attributs ret = *this; // copy constructor
+	string key, value;
+
+	arg.reset_read();
+	while(arg.read(key, value))
+	    ret.add(key, value);
+
+	return ret;
+    }
+
+///////////// STATIC FUNCTION IMPLEMENTATION ///////
+
+    static void read_pair_string(generic_file & f, const archive_version & edit, string & key, string & val)
+    {
+	infinint tmp;
+	unsigned char fl;
+	string pre_key = "";
+
+	if(edit < 5) // old format
+	{
+	    f.read((char *)(&fl), 1);
+	    if((fl & EA_ROOT) != 0)
+		pre_key = "system.";
+	    else
+		pre_key = "user.";
+	}
+        tools_read_string(f, key);
+	key = pre_key + key;
+        tmp = infinint(f);
+        tools_read_string_size(f, val, tmp);
+    }
+
+    static void write_pair_key(generic_file & f, const string & key, const string & val)
+    {
+        infinint tmp = val.size();
+
+        tools_write_string(f, key);
+        tmp.dump(f);
+        tools_write_string_all(f, val);
     }
 
 } // end of namespace

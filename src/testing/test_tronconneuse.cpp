@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_tronconneuse.cpp,v 1.6.2.1 2007/07/22 16:35:01 edrusb Rel $
+// $Id: test_tronconneuse.cpp,v 1.11 2010/02/24 11:26:03 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -45,12 +45,14 @@ extern "C"
 #include "shell_interaction.hpp"
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"
+#include "macro_tools.hpp"
+#include "fichier.hpp"
 
 class test : public tronconneuse
 {
 public:
-    test(user_interaction & dialog, U_32 block_size, generic_file & encrypted_size): tronconneuse(dialog, block_size, encrypted_size) {
-    };
+    test(user_interaction & dialog, U_32 block_size, generic_file & encrypted_size, bool no_is = false): tronconneuse(block_size, encrypted_size, no_is, macro_tools_supported_version)
+    {};
 
 protected:
     U_32 encrypted_block_size_for(U_32 clear_block_size) { return clear_block_size + 1; };

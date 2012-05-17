@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: int_tools.cpp,v 1.3.4.2 2008/02/09 17:41:29 edrusb Rel $
+// $Id: int_tools.cpp,v 1.6 2009/12/18 10:10:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -59,7 +59,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: int_tools.cpp,v 1.3.4.2 2008/02/09 17:41:29 edrusb Rel $";
+        static char id[]="$Id: int_tools.cpp,v 1.6 2009/12/18 10:10:21 edrusb Rel $";
         dummy_call(id);
     }
 

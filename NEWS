@@ -1,9 +1,11 @@
-NOTE: As this file cannot be changed once a package is released,
-here follows a set of sources of information, from where you will
-be able to fetch fresh news about dar.
 
 
-For NEWS, you can check:
+For ChangeLog brought by each new version, please read the Changelog file
+in this directory. If accessing source code from CVS, this file is
+located at src/build/ChangeLog
+
+
+For events concerning dar, you can check:
 
 the dar-news mailing list archives:
 
@@ -13,3 +15,8 @@ the dar-news mailing list archives:
 Here is the home page of the dar-news mailing list if you wish to
 subscribe to it:
         http://lists.sourceforge.net/lists/listinfo/dar-news
+
+For general development status, you can check the top of the homepage:
+
+    	http://dar.linux.free.fr/
+

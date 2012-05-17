@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: int_tools.hpp,v 1.3 2004/11/07 18:21:38 edrusb Rel $
+// $Id: int_tools.hpp,v 1.6 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -36,6 +36,10 @@
 
 namespace libdar
 {
+
+	/// \addtogroup Private
+	/// @{
+
     typedef unsigned char int_tools_bitfield[8];
 
     extern void int_tools_swap_bytes(unsigned char &a, unsigned char &b);
@@ -56,7 +60,7 @@ namespace libdar
         return v;
     }
 
-    template <class T> extern T int_tools_maxof_agregate(T unused) { return ~T(0) > 0 ? ~T(0) : ~int_tools_rotate_right_one_bit(T(1)); }
+    template <class T> extern T int_tools_maxof_agregate(T unused) { unused = 0; unused = ~unused; unused = unused > 0 ? unused : ~int_tools_rotate_right_one_bit(T(1)); return unused; }
 
     template <class B> static B int_tools_higher_power_of_2(B val)
     {
@@ -67,6 +71,8 @@ namespace libdar
 
         return i;
     }
+
+	/// @}
 
 }
 

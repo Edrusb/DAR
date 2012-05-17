@@ -16,21 +16,21 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.22.2.3 2009/04/07 08:45:29 edrusb Rel $
+// $Id: filesystem.hpp,v 1.38 2011/02/27 14:53:47 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file filesystem.hpp
-    /// \brief defines several class that realize the interface with the filesystem
+    /// \brief defines several classes that realize the interface with the filesystem
+    /// \ingroup Private
     ///
     /// - filesystem_hard_link_read
     /// - filesystem_backup
     /// - filesystem_diff
     /// - filesystem_hard_link_write
     /// - filesystem_restore
-    /// \ingroup Private
 
 #ifndef FILESYSTEM_HPP
 #define FILESYSTEM_HPP
@@ -53,6 +53,7 @@ extern "C"
 #include "catalogue.hpp"
 #include "infinint.hpp"
 #include "etage.hpp"
+#include "criterium.hpp"
 
 namespace libdar
 {
@@ -60,34 +61,51 @@ namespace libdar
 	/// @{
 
 	/// keep trace of hard links when reading the filesystem
-    class filesystem_hard_link_read
+
+    class filesystem_hard_link_read : virtual protected mem_ui
     {
             // this class is not to be used directly
             // it only provides some routine for the inherited classes
 
     public:
-	filesystem_hard_link_read(user_interaction & dialog) { fs_ui = dialog.clone(); };
-	filesystem_hard_link_read(const filesystem_hard_link_read & ref) { copy_from(ref); };
-	filesystem_hard_link_read & operator = (const filesystem_hard_link_read & ref) { detruire(); copy_from(ref); return *this; };
-	~filesystem_hard_link_read() { detruire(); };
+	filesystem_hard_link_read(user_interaction & dialog,
+				  bool x_furtive_read_mode) : mem_ui(dialog) { furtive_read_mode = x_furtive_read_mode; };
 
+	    // the copy of the current object would make copy of addresses in
+	    // corres_read that could be released twice ... thus, copy constructor and
+	    // assignement are forbidden for this class:
 
-        void forget_etiquette(file_etiquette *obj);
-            // tell the filesystem module that the reference of that etiquette does not
-            // exist anymore (not covered by filter for example)
+	filesystem_hard_link_read(const filesystem_hard_link_read & ref) : mem_ui(ref.get_ui()) { throw SRC_BUG; };
+	const filesystem_hard_link_read & operator = (const filesystem_hard_link_read & ref) { throw SRC_BUG; };
+
+	    // get the last assigned number for a hard linked inode
+	const infinint & get_last_etoile_ref() const { return etiquette_counter; };
+
+	virtual ~filesystem_hard_link_read() {};
 
     protected:
+	    // reset the whole list of hard linked inodes (hard linked inode stay alive but are no more referenced by the current object)
         void corres_reset() { corres_read.clear(); etiquette_counter = 0; };
 
-        nomme *make_read_entree(path & lieu, const std::string & name, bool see_hard_link, const mask & ea_mask);
-
-	user_interaction & get_fs_ui() const { return *fs_ui; };
+	    // create and return a libdar object corresponding to one pointed to by its path
+	    // during this operation, hard linked inode are recorded in a list to be easily pointed
+	    // to by a new reference to it.
+        nomme *make_read_entree(path & lieu,               //< path of the file to read
+				const std::string & name,  //< name of the file to read
+				bool see_hard_link,        //< whether we want to detect hard_link and eventually return a mirage object (not necessary when diffing an archive with filesystem)
+				const mask & ea_mask);    //< which EA to consider when creating the object
 
     private:
+
+	    // private datastructure
+
         struct couple
         {
-            nlink_t count;
-            file_etiquette *obj;
+            nlink_t count;       //< counts the number of hard link on that inode that have not yet been found in filesystem, once this count reaches zero, the "couple" structure can be dropped and the "holder" too (no more expected hard links to be found)
+            etoile *obj;         //< the address of the corresponding etoile object for that inode
+	    mirage holder;       //< it increments by one the obj internal counters, thus, while this object is alive, the obj will not be destroyed
+
+	    couple(etoile *ptr, nlink_t ino_count) : holder("FAKE", ptr) { count = ino_count; obj = ptr; };
         };
 
 	struct node
@@ -100,17 +118,18 @@ namespace libdar
 	    dev_t device;
 	};
 
+	    // private variable
+
         std::map <node, couple> corres_read;
 	infinint etiquette_counter;
+	bool furtive_read_mode;
 
-	user_interaction *fs_ui;
-
-	void copy_from(const filesystem_hard_link_read & ref);
-	void detruire();
     };
 
 
+
 	/// make a flow sequence of inode to feed the backup filtering routing
+
     class filesystem_backup : public filesystem_hard_link_read
     {
     public:
@@ -120,10 +139,12 @@ namespace libdar
 			  const mask & x_ea_mask,
 			  bool check_no_dump_flag,
 			  bool alter_atime,
+			  bool furtive_read_mode,
 			  bool x_cache_directory_tagging,
-			  infinint & root_fs_device);
-        filesystem_backup(const filesystem_backup & ref) : filesystem_hard_link_read(ref.get_fs_ui()) { copy_from(ref); };
-        filesystem_backup & operator = (const filesystem_backup & ref) { detruire(); copy_from(ref); return *this; };
+			  infinint & root_fs_device,
+			  bool x_ignore_unknown);
+        filesystem_backup(const filesystem_backup & ref) : mem_ui(ref.get_ui()), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode) { copy_from(ref); };
+        const filesystem_backup & operator = (const filesystem_backup & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_backup() { detruire(); };
 
         void reset_read(infinint & root_fs_device);
@@ -133,34 +154,42 @@ namespace libdar
             // ignore all entry not yet read of current directory
     private:
 
-        path *fs_root;
-        bool info_details;
-	mask *ea_mask;
-        bool no_dump_check;
-	bool alter_atime;
-	bool cache_directory_tagging;
-        path *current_dir;      // to translate from an hard linked inode to an  already allocated object
-        std::vector<etage> pile;        // to store the contents of a directory
+        path *fs_root;           //< filesystem's root to consider
+        bool info_details;       //< detailed information returned to the user
+	mask *ea_mask;           //< mask defining the EA to consider
+        bool no_dump_check;      //< whether to check against the nodump flag presence
+	bool alter_atime;        //< whether to set back atime or not
+	bool furtive_read_mode;  //< whether to use furtive read mode (if true, alter_atime is ignored)
+	bool cache_directory_tagging; //< whether to consider cache directory taggin standard
+        path *current_dir;       //< needed to translate from an hard linked inode to an  already allocated object
+        std::vector<etage> pile; //< to store the contents of a directory
+	bool ignore_unknown;     //< whether to ignore unknown inode types
 
         void detruire();
         void copy_from(const filesystem_backup & ref);
     };
 
+
 	/// make a flow of inode to feed the difference filter routine
+
     class filesystem_diff : public filesystem_hard_link_read
     {
     public:
         filesystem_diff(user_interaction & dialog,
-			const path &root, bool x_info_details,
-			const mask & x_ea_mask, bool alter_atime);
-        filesystem_diff(const filesystem_diff & ref) : filesystem_hard_link_read(ref.get_fs_ui()) { copy_from(ref); };
-        filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
+			const path &root,
+			bool x_info_details,
+			const mask & x_ea_mask,
+			bool alter_atime,
+			bool furtive_read_mode);
+        filesystem_diff(const filesystem_diff & ref) : mem_ui(ref.get_ui()), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode) { copy_from(ref); };
+        const filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_diff() { detruire(); };
 
         void reset_read();
         bool read_filename(const std::string & name, nomme * &ref);
             // looks for a file of name given in argument, in current reading directory
-            // if this is a directory subsequent read are done in it
+            // if this is a directory, subsequent read take place in it
+
         void skip_read_filename_in_parent_dir();
             // subsequent calls to read_filename will take place in parent directory.
 
@@ -175,6 +204,7 @@ namespace libdar
         bool info_details;
 	mask *ea_mask;
 	bool alter_atime;
+	bool furtive_read_mode;
         path *current_dir;
         std::vector<filename_struct> filename_pile;
 
@@ -183,42 +213,60 @@ namespace libdar
     };
 
 	/// keep trace of already written inodes to restore hard links
-    class filesystem_hard_link_write
+
+    class filesystem_hard_link_write : virtual protected mem_ui
     {
             // this class is not to be used directly
             // it only provides routines to its inherited classes
 
     public:
-	filesystem_hard_link_write(user_interaction & dialog, bool x_ea_erase) { fs_ui = dialog.clone(); ea_erase = x_ea_erase; };
-	filesystem_hard_link_write(const filesystem_hard_link_write & ref) { copy_from(ref); };
-	filesystem_hard_link_write & operator = (const filesystem_hard_link_write & ref) { detruire(); copy_from(ref); return *this; };
-	~filesystem_hard_link_write() { detruire(); };
+	filesystem_hard_link_write(user_interaction & dialog) : mem_ui(dialog) { corres_write.clear(); };
+	filesystem_hard_link_write(const filesystem_hard_link_write & ref) : mem_ui(ref) { throw SRC_BUG; };
+	const filesystem_hard_link_write & operator = (const filesystem_hard_link_write & ref) { throw SRC_BUG; };
 
-        bool ea_has_been_restored(const hard_link *h);
-            // true if the inode pointed to by the arg has already got its EA restored
-        bool set_ea(const nomme *e, const ea_attributs & list_ea, path spot,
-                    bool allow_overwrite, bool warn_overwrite, const mask & ea_mask, bool info_details);
-            // check whether the inode for which to restore EA is not a hard link to
-            // an already restored inode. if not, it calls the proper ea_filesystem call to restore EA
-        void write_hard_linked_target_if_not_set(const etiquette *ref, const std::string & chemin);
+        void write_hard_linked_target_if_not_set(const mirage *ref, const std::string & chemin);
             // if a hard linked inode has not been restored (no change, or less recent than the one on filesystem)
             // it is necessary to inform filesystem, where to hard link on, any future hard_link
             // that could be necessary to restore.
+
         bool known_etiquette(const infinint & eti);
             // return true if an inode in filesystem has been seen for that hard linked inode
 
-	    // return the ea_ease status (whether EA are first erased before being restored, else they are overwritten)
-	bool get_ea_erase() const { return ea_erase; };
-	    // set the ea_erase status
-	void set_ea_erase(bool status) { ea_erase = status; };
+	    /// forget everything about a hard link if the path used to build subsequent hard links is the one given in argument
+	    /// \param[in] ligne is the etiquette number for that hard link
+	    /// \param[in] path if the internaly recorded path to build subsequent hard link to that inode is equal to path, forget everything about this hard linked inode
+        void clear_corres_if_pointing_to(const infinint & ligne, const std::string & path);
 
     protected:
         void corres_reset() { corres_write.clear(); };
-        void make_file(const nomme * ref, const path & ou, bool dir_perm, inode::comparison_fields what_to_check);
-            // generate inode or make a hard link on an already restored inode.
-        void clear_corres(const infinint & ligne);
+        void make_file(const nomme * ref,                       //< object to restore in filesystem
+		       const path & ou,                         //< where to restore it
+		       bool dir_perm,                           //< false for already existing directories, this makes dar set the minimum available permission to be able to restore files in that directory at a later time
+		       inode::comparison_fields what_to_check); //< defines whether to restore permission, ownership, dates, etc.
+            // generate inode or make a hard link on an already restored or existing inode.
 
-	user_interaction & get_fs_ui() const { return *fs_ui; };
+
+	    /// add the given EA matching the given mask to the file pointed to by "e" and spot
+
+	    /// \param[in] e may be an inode or a hard link to an inode,
+	    /// \param[in] list_ea the list of EA to restore
+	    /// \param[in] spot the path where to restore these EA (full path required, including the filename of 'e')
+	    /// \param[in] ea_mask the EA entry to restore from the list_ea (other entries are ignored)
+	    /// \return true if EA could be restored, false if "e" is a hard link to an inode that has its EA already restored previously
+        bool raw_set_ea(const nomme *e,
+			const ea_attributs & list_ea,
+			const std::string & spot,
+			const mask & ea_mask);
+            // check whether the inode for which to restore EA is not a hard link to
+            // an already restored inode. if not, it calls the proper ea_filesystem call to restore EA
+
+	    /// remove EA set from filesystem's file, allows subsequent raw_set_ea
+
+	    /// \param[in] e this object may be a hard link to or an inode
+	    /// \param[in] path the path in the filesystem where reside the object whose EA to clear
+	    /// \return true if EA could be cleared, false if "e" is a hard link to an inode that has its  EA already restored previously
+	bool raw_clear_ea_set(const nomme *e, const std::string & path);
+
 
     private:
         struct corres_ino_ea
@@ -228,65 +276,99 @@ namespace libdar
         };
 
         std::map <infinint, corres_ino_ea> corres_write;
-	user_interaction *fs_ui;
-	bool ea_erase;
-
-	void copy_from(const filesystem_hard_link_write & ref);
-	void detruire();
     };
 
+
 	/// receive the flow of inode from the restoration filtering routing and promotes these to real filesystem objects
+
     class filesystem_restore : public filesystem_hard_link_write, public filesystem_hard_link_read
     {
     public:
+	    /// constructor
         filesystem_restore(user_interaction & dialog,
-			   const path &root, bool x_allow_overwrite, bool x_warn_overwrite, bool x_info_details,
-                           const mask & x_ea_mask, inode::comparison_fields what_to_check, bool x_warn_remove_no_match, bool empty, bool ea_erase);
-        filesystem_restore(const filesystem_restore  & ref) : filesystem_hard_link_write(ref.filesystem_hard_link_write::get_fs_ui(), ref.get_ea_erase()), filesystem_hard_link_read(ref.filesystem_hard_link_read::get_fs_ui()) { copy_from(ref); };
-        filesystem_restore & operator = (const filesystem_restore  & ref) { detruire(); copy_from(ref); return *this; };
+			   const path & root,
+			   bool x_warn_overwrite,
+			   bool x_info_details,
+                           const mask & x_ea_mask,
+			   inode::comparison_fields what_to_check,
+			   bool x_warn_remove_no_match,
+			   bool empty,
+			   const crit_action *x_overwrite,
+			   bool x_only_overwrite);
+	    /// copy constructor is forbidden (throws an exception)
+        filesystem_restore(const filesystem_restore & ref) : mem_ui(ref), filesystem_hard_link_write(ref), filesystem_hard_link_read(get_ui(), true) { throw SRC_BUG; };
+	    /// assignment operator is forbidden (throws an exception)
+        const filesystem_restore & operator = (const filesystem_restore  & ref) { throw SRC_BUG; };
+	    /// destructor
         ~filesystem_restore() { restore_stack_dir_ownership(); detruire(); };
 
+	    /// reset the writing process for the current object
         void reset_write();
-        bool write(const entree *x, bool & created);
-            // the 'x' argument may be an object from class destroy
-	    // the 'created' argument is set back to true if no overwriting was necessary to restore the file
-            // return true upon success,
-            // false if overwriting not allowed or refused
-            // throw exception on other errors
-        nomme *get_before_write(const nomme *x);
-            // in this case the target has to be removed from the filesystem
-        void pseudo_write(const directory *dir);
-            // do not restore the directory, just stores that we are now
-            // inspecting its contents
-        bool set_ea(const nomme *e, const ea_attributs & l,
-                    bool allow_overwrite,
-                    bool warn_overwrite,
-                    bool info_details)
-            {  return empty ? true : filesystem_hard_link_write::set_ea(e, l, *current_dir,
-									allow_overwrite,
-									warn_overwrite,
-									*ea_mask,
- 									info_details);
-            };
 
-    protected:
-	user_interaction & get_fs_ui() const { return filesystem_hard_link_read::get_fs_ui(); };
+	typedef enum
+	{
+	    done_data_restored,
+	    done_no_change_no_data,
+	    done_no_change_policy,
+	    done_data_removed
+	} action_done_for_data;
+
+	    /// restore a libdar object to a filesystem entry both data and EA
+
+	    /// \param[in] x is the libdar object to restore
+	    /// \param[out] data_restored true if data has been restored (inode or hard link created), false if either there is no data to restore or if this action is forbidden by the overwriting policy
+	    /// \param[out] ea_restored  true if EA has been restored, false if either no EA to restore or if forbidden by overwriting policy
+	    /// \param[out] data_created true if data has been restored leading to file creation, false in any other case
+	    /// \param[out] hard_link true when data_restored is true and only a hard link to an already existing inode has been created
+	    /// \note any failure to restore data or EA that is not due to its absence in "x" nor to an interdiction from the overwriting policy is signaled
+	    /// through an exception.
+	void write(const entree *x, action_done_for_data & data_restored, bool & ea_restored, bool & data_created, bool & hard_link);
+
+
+	    /// ask for no warning or user interaction for the next write operation
+	    /// \note this is used when a file has been saved several times due to its changes at the time of the backup
+	    /// and is restored in sequential read. Restoring each failed backup would lead to ask each time the
+	    /// actions to take about overwriting... anoying for the user
+	void ignore_overwrite_restrictions_for_next_write() { ignore_over_restricts = true; };
+
 
     private:
+	class stack_dir_t : public directory
+	{
+	public:
+	    stack_dir_t(const directory & ref, bool restore) : directory(ref) { restore_date = restore; };
+
+	    bool get_restore_date() const { return restore_date; };
+	    void set_restore_date(bool val) { restore_date = val; };
+
+	private:
+	    bool restore_date;
+	};
+
         path *fs_root;
         bool info_details;
 	mask *ea_mask;
-        bool allow_overwrite;
         bool warn_overwrite;
 	inode::comparison_fields what_to_check;
 	bool warn_remove_no_match;
-        std::vector<directory> stack_dir;
+        std::vector<stack_dir_t> stack_dir;
         path *current_dir;
 	bool empty;
+	bool ignore_over_restricts;
+	const crit_action *overwrite;
+	bool only_overwrite;
 
         void detruire();
-        void copy_from(const filesystem_restore & ref);
 	void restore_stack_dir_ownership();
+
+	    // subroutines of write()
+	void action_over_remove(const inode *in_place, const detruit *to_be_added, const std::string & spot, over_action_data action);
+	void action_over_data(const inode *in_place,
+			      const nomme *to_be_added,
+			      const std::string & spot,
+			      over_action_data action,
+			      action_done_for_data & data_done);
+	bool action_over_ea(const inode *in_place, const nomme *to_be_added, const std::string & spot, over_action_ea action);
     };
 
 	/// @}

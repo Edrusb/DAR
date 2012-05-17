@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_tronc.cpp,v 1.12.2.1 2008/02/09 17:41:30 edrusb Rel $
+// $Id: test_tronc.cpp,v 1.18 2010/08/27 20:44:24 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -57,28 +57,38 @@ extern "C"
 #include "integers.hpp"
 #include "shell_interaction.hpp"
 #include "cygwin_adapt.hpp"
+#include "fichier.hpp"
 
 using namespace libdar;
 
+void f1();
+void f2();
+
 int main()
+{
+    f1();
+    f2();
+}
+
+void f1()
 {
     U_I maj, med, min;
 
     try
     {
 	get_version(maj, med, min);
-	path p = "test/source.txt";
+	string p = "test/source.txt";
 	user_interaction *ui = shell_interaction_init(&cout, &cerr, false);
-	fichier h = fichier(*ui, p, gf_read_only);
+	fichier h = fichier(*ui, p, gf_read_only, tools_octal2int("0777"), false);
 
 	display_read(*ui, h);
 
 	try
 	{
-	    fichier f = fichier(*ui, "test/source.txt", gf_read_only);
+	    fichier f = fichier(*ui, "test/source.txt", gf_read_only, tools_octal2int("0777"), false);
 	    tronc *t;
 
-	    t = new tronc(*ui, &f, 0, 10);
+	    t = new tronc(&f, 0, infinint(10));
 	    t->skip(0);
 	    cout << t->get_position() << endl;
 	    cout << f.get_position() << endl;
@@ -92,7 +102,7 @@ int main()
 	    cout << f.get_position() << endl;
 
 	    delete t;
-	    t = new tronc(*ui, &f, 50, 5);
+	    t = new tronc(&f, 50, infinint(5));
 	    cout << t->get_position() << endl;
 	    cout << f.get_position() << endl;
 
@@ -107,7 +117,7 @@ int main()
 	    fichier g = fichier(*ui, fd);
 	    f.skip(0);
 	    f.copy_to(g);
-	    t = new tronc(*ui, &g, 10, 10);
+	    t = new tronc(&g, 10, infinint(10));
 
 	    try
 	    {
@@ -138,6 +148,88 @@ int main()
 	catch(Egeneric &f)
 	{
 	    f.dump();
+	}
+	if(ui != NULL)
+	    delete ui;
+    }
+    catch(Egeneric & f)
+    {
+	f.dump();
+    }
+}
+
+
+void f2()
+{
+    try
+    {
+	string p = "test/source.txt";
+	user_interaction *ui = shell_interaction_init(&cout, &cerr, false);
+
+	try
+	{
+	    fichier f = fichier(*ui, "test/source.txt", gf_read_only, tools_octal2int("0777"), false);
+	    tronc *t;
+
+	    t = new tronc(&f, 1);
+	    t->skip(0);
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
+
+	    display_read(*ui, *t);
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
+
+	    display_read(*ui, *t);
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
+
+	    t->skip_to_eof();
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
+
+	    display_read(*ui, *t);
+	    t->skip_relative(1);
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
+
+	    t->skip_relative(-3);
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
+	    display_read(*ui, *t);
+
+	    delete t;
+
+		/////// now testing writing mode
+
+	    S_I fd = ::open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0666);
+	    if(fd < 0)
+		ui->warning(strerror(errno));
+	    fichier g = fichier(*ui, fd);
+	    g.skip(0);
+	    display_read(*ui, g);
+
+	    t = new tronc(&g, 2);
+
+	    f.skip(0);
+	    f.copy_to(*t);
+	    cout << t->get_position() << endl;
+	    cout << f.get_position() << endl;
+	    cout << g.get_position() << endl;
+
+	    g.skip(0);
+	    display_read(*ui, g);
+
+	    g.skip(1);
+	    display_read(*ui, g);
+
+	    g.skip(2);
+	    display_read(*ui, g);
+
+	}
+	catch(Egeneric &e)
+	{
+	    e.dump();
 	}
 	if(ui != NULL)
 	    delete ui;

@@ -46,7 +46,7 @@
 
   <arg flag="-l">
     <desc>
-        give informations about the archive compiled in the database
+        gives information about the archive compiled in the database
     </desc>
   </arg>
 
@@ -115,6 +115,25 @@
         move an archive within a given database.
     </desc>
   </arg>
+
+  <arg flag="-i">
+    <desc>
+        user interactive mode
+    </desc>
+  </arg>
+
+  <arg flag="-c">
+    <desc>
+        check database for dates order
+    </desc>
+  </arg>
+
+  <arg flag="-L" repl="filename">
+    <desc>
+        execute on a given database a batch of action as defined by the provided file.
+    </desc>
+  </arg>
+
 
   <arg flag="-h">
     <desc>

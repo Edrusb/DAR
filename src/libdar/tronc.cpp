@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tronc.cpp,v 1.14.4.2 2008/02/09 17:41:30 edrusb Rel $
+// $Id: tronc.cpp,v 1.27 2011/04/17 13:12:30 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -50,48 +50,102 @@ char *strchr (), *strrchr ();
 namespace libdar
 {
 
-    tronc::tronc(user_interaction & dialog, generic_file *f, const infinint & offset, const infinint &size) : generic_file(dialog, f->get_mode())
+    tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, bool own_f) : generic_file(f->get_mode())
     {
         ref = f;
         sz = size;
         start = offset;
         current = size; // forces skipping the first time
+	own_ref = own_f;
+	limited = true;
     }
 
-    tronc::tronc(user_interaction & dialog, generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(dialog, mode)
+    tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode, bool own_f) : generic_file(mode)
     {
         ref = f;
         sz = size;
         start = offset;
         current = size; // forces skipping the firt time
+	own_ref = own_f;
+	limited = true;
+    }
+
+    tronc::tronc(generic_file *f, const infinint &offset, bool own_f) : generic_file(f->get_mode())
+    {
+        ref = f;
+        sz = 0;
+        start = offset;
+        current = 0;
+	own_ref = own_f;
+	limited = false;
+    }
+
+    tronc::tronc(generic_file *f, const infinint &offset, gf_mode mode, bool own_f) : generic_file(mode)
+    {
+        ref = f;
+        sz = 0;
+        start = offset;
+        current = 0;
+	own_ref = own_f;
+	limited = false;
     }
 
     bool tronc::skip(const infinint & pos)
     {
+	if(is_terminated())
+	    throw SRC_BUG;
+
         if(current == pos)
             return true;
 
-        if(pos > sz)
+        if(limited && pos > sz)
         {
-            current = sz;
-            ref->skip(start + sz);
+            if(ref->skip(start + sz))
+		current = sz;
+	    else
+		set_back_current_position();
             return false;
         }
         else
         {
-            current = pos;
-            return ref->skip(start + pos);
+	    bool ret = ref->skip(start + pos);
+	    if(ret)
+		current = pos;
+	    else
+		set_back_current_position();
+	    return ret;
         }
     }
 
     bool tronc::skip_to_eof()
     {
-        current = sz;
-        return ref->skip(start + sz);
+	bool ret;
+
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(limited)
+	{
+	    ret =  ref->skip(start + sz);
+	    if(ret)
+		current = sz;
+	    else
+		set_back_current_position();
+	}
+	else
+	{
+	    ret = ref->skip_to_eof();
+	    set_back_current_position();
+	}
+
+	return ret;
     }
 
     bool tronc::skip_relative(S_I x)
     {
+	if(is_terminated())
+	    throw SRC_BUG;
+
         if(x < 0)
 	{
             if(current < -x)
@@ -116,7 +170,7 @@ namespace libdar
 
         if(x > 0)
 	{
-            if(current + x >= sz)
+            if(limited && current + x >= sz)
             {
                 current = sz;
                 ref->skip(start+sz);
@@ -129,8 +183,17 @@ namespace libdar
                     current += x;
                 else
                 {
-                    ref->skip(start+sz);
-                    current = sz;
+		    if(limited)
+		    {
+			ref->skip(start+sz);
+			current = sz;
+		    }
+		    else
+		    {
+			ref->skip_to_eof();
+			set_back_current_position();
+		    }
+
                 }
                 return r;
             }
@@ -142,64 +205,104 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tronc.cpp,v 1.14.4.2 2008/02/09 17:41:30 edrusb Rel $";
+        static char id[]="$Id: tronc.cpp,v 1.27 2011/04/17 13:12:30 edrusb Rel $";
         dummy_call(id);
     }
 
-    S_I tronc::inherited_read(char *a, size_t size)
+    U_I tronc::inherited_read(char *a, U_I size)
     {
-        infinint avail = sz - current;
-        U_32 macro_pas = 0, micro_pas;
-        U_32 lu = 0;
-        S_I ret;
+        U_I lu = 0;
+	infinint abso_pos = start + current;
 
-        do
-        {
-            avail.unstack(macro_pas);
-            micro_pas = size - lu > macro_pas ? macro_pas : size - lu;
-            if(micro_pas > 0)
-            {
-                ret = ref->read(a+lu, micro_pas);
-                if(ret > 0)
-                {
-                    lu += ret;
-                    macro_pas -= ret;
-                }
-            }
-            else
-                ret = 0;
-        }
-        while(ret > 0);
-        current += lu;
+	if(ref->get_position() != abso_pos)
+	{
+	    if(!ref->skip(abso_pos))
+		throw Erange("tronc::inherited_read", gettext("Cannot skip to the current position in \"tronc\""));
+	}
+
+	if(limited)
+	{
+	    infinint avail = sz - current;
+	    U_32 macro_pas = 0, micro_pas;
+	    U_I ret;
+
+	    do
+	    {
+		avail.unstack(macro_pas);
+		micro_pas = size - lu > macro_pas ? macro_pas : size - lu;
+		if(micro_pas > 0)
+		{
+		    ret = ref->read(a+lu, micro_pas);
+		    if(ret > 0)
+		    {
+			lu += ret;
+			macro_pas -= ret;
+		    } // else ret = 0 and this ends the while loop
+		}
+		else
+		    ret = 0;
+	    }
+	    while(ret > 0);
+	}
+	else
+	    lu = ref->read(a, size);
+
+	current += lu;
 
         return lu;
     }
 
-    S_I tronc::inherited_write(const char *a, size_t size)
+    void tronc::inherited_write(const char *a, U_I size)
     {
-        infinint avail = sz - current;
-        U_32 macro_pas = 0, micro_pas;
-        U_32 wrote = 0;
-        S_I ret;
+        U_I wrote = 0;
 
-        ref->skip(start + current);
-        do
-        {
-            avail.unstack(macro_pas);
-            if(macro_pas == 0 && wrote < size)
-                throw Erange("tronc::inherited_write", gettext("Tried to write out of size limited file"));
-            micro_pas = size - wrote > macro_pas ? macro_pas : size - wrote;
-            ret = ref->write(a+wrote, micro_pas);
-            if( ret > 0)
-            {
-                wrote += ret;
-                macro_pas -= ret;
-            }
-        }
-        while(ret > 0);
-        current += wrote;
+        if(!ref->skip(start + current))
+	    throw Erange("tronc::inherited_read", gettext("Cannot skip to the current position in \"tronc\""));
+	if(limited)
+	{
+	    infinint avail = sz - current;
+	    U_32 macro_pas = 0, micro_pas;
 
-        return wrote;
+	    do
+	    {
+		avail.unstack(macro_pas);
+		if(macro_pas == 0 && wrote < size)
+		    throw Erange("tronc::inherited_write", gettext("Tried to write out of size limited file"));
+		micro_pas = size - wrote > macro_pas ? macro_pas : size - wrote;
+		ref->write(a+wrote, micro_pas);
+		wrote += micro_pas;
+		macro_pas -= micro_pas;
+	    }
+	    while(wrote < size);
+	}
+	else
+	{
+	    ref->write(a, size);
+	    wrote = size;
+	}
+
+	current += wrote;
+    }
+
+    void tronc::set_back_current_position()
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	infinint ref_pos = ref->get_position();
+
+	if(ref_pos < start)
+	    throw SRC_BUG;
+
+	if(limited)
+	{
+	    if(ref_pos > start + sz)
+		throw SRC_BUG;
+	    else
+		current = ref_pos - start;
+	}
+	else
+	    current = ref_pos - start;
     }
 
 } // end of namespace

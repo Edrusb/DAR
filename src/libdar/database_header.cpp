@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database_header.cpp,v 1.1.2.2 2008/02/09 17:41:29 edrusb Rel $
+// $Id: database_header.cpp,v 1.7 2010/08/27 20:44:24 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -58,13 +58,14 @@ extern "C"
 #include "user_interaction.hpp"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
+#include "fichier.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    static unsigned char database_version = 1;
+    static const unsigned char database_version = 2;
 
 #define HEADER_OPTION_NONE 0x00
 
@@ -102,7 +103,7 @@ namespace libdar
 	h.options = HEADER_OPTION_NONE;
 	h.write(*ret);
 
-	comp = new compressor(dialog, gzip, ret); // upon success, ret is owned by compr
+	comp = new compressor(gzip, ret); // upon success, ret is owned by compr
 	if(comp == NULL)
 	    throw Ememory("database_header_create");
 	else
@@ -111,7 +112,7 @@ namespace libdar
 	return ret;
     }
 
-    generic_file *database_header_open(user_interaction & dialog, const string & filename)
+    generic_file *database_header_open(user_interaction & dialog, const string & filename, unsigned char & db_version)
     {
 	generic_file *ret = NULL;
 
@@ -122,7 +123,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new fichier(dialog, filename.c_str(), gf_read_only);
+		ret = new fichier(dialog, filename.c_str(), gf_read_only, tools_octal2int("0777"), false);
 	    }
 	    catch(Erange & e)
 	    {
@@ -131,12 +132,13 @@ namespace libdar
 	    if(ret == NULL)
 		throw Ememory("database_header_open");
 	    h.read(*ret);
-	    if(h.version != database_version)
-		dialog.pause(gettext("The format version of this database is too high for that software version, try reading anyway ? "));
+	    if(h.version > database_version)
+		throw Erange("database_header_open", gettext("The format version of this database is too high for that software version, use a more recent software to read or modify this database"));
+	    db_version = h.version;
 	    if(h.options != HEADER_OPTION_NONE)
 		throw Erange("database_header_open", gettext("Unknown header option in database, aborting\n"));
 
-	    comp = new compressor(dialog, gzip, ret);
+	    comp = new compressor(gzip, ret);
 	    if(comp == NULL)
 		throw Ememory("database_header_open");
 	    else
@@ -152,10 +154,15 @@ namespace libdar
 	return ret;
     }
 
+    extern const unsigned char database_header_get_supported_version()
+    {
+	return database_version;
+    }
+
 } // end of namespace
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: database_header.cpp,v 1.1.2.2 2008/02/09 17:41:29 edrusb Rel $";
+    static char id[]="$Id: database_header.cpp,v 1.7 2010/08/27 20:44:24 edrusb Rel $";
     dummy_call(id);
 }

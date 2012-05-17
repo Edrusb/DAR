@@ -1,7 +1,7 @@
 
 
 
-                  D i s k   A R c h i v e
+               D i s k   A R c h i v e  -  D A R
 
                          ---------
                            -----
@@ -14,8 +14,8 @@
             Nick Alcock, Brian May, Martin Jost, Jurgen Menden, Todd Vierling
             Omer Enbar, David Rose, Alex Kohlmeyer, Dietrich Rothe,
 	    Moritz Franosch, John Little, Chris Martin, Michael Roitzsch,
-            Andrea Palazzi, Dwayne C. Litzenberger, Sonni Norlov, David Fries,
-	    Jan-Pascal van Best.
+            Andrea Palazzi, Dwayne C. Litzenberger, Erik Wasser, Sonni Norlov,
+            David Fries, Jan-Pascal van Best.
 
         Translations of program messages are from:
 	    Peter Landgren for Swedish
@@ -24,83 +24,107 @@
 
         http://dar.linux.free.fr/   (main site)
         http://dar.sourceforge.net/ (mirror site)
-        dar.linux@free.fr
 
 No answer to support requests will be done out of mailing-list or other public
-area: your questions and their answers may be interesting to others. For all
-and to all, if you need support thanks to read the URL to know how to proceed:
-
-     http://dar.linux.free.fr/#help
-
-                                                  Sharing must be both ways.
-
-        else for non support requests, you
-        need to add "[EARTH IS BEAUTIFUL]" in the subject
-        of your emails, to pass anti-spam filter.
+area: your questions and their answers may be of interest to others. For all
+and to all, if you need support thanks to read read the link below:
 
 
-An extract of Denis Corbin's resume:
-        1970      my parents did a big mistake. ;-)
+        http://dar.linux.free.fr/doc/index.html#ask_for_support
+
+                                              Sharing must be both directions.
+
+        Else for non support requests only, you are welcome to send an email
+        to Denis at dar.linux@free.fr paying attention to add the following
+        string (the quotes are not necessary) "[EARTH IS BEAUTIFUL]" in the
+        subject of your email, to be able to pass anti-spam filter.
+
+
+Here follows an extract of Denis Corbin's resume:
+        1970      Denis's firsts days...
         1989      BAC C (mention AB)
-        1990-1992 Classes Prepas
+        1990-1992 Classes Prepas (math. sup. math. spe. M)
         1992-1995 ENSEIRB - Ecole Nationale Superieur d'Electronique
                             Informatique et Radiocommunications de Bordeaux
-                            Promo 1995.
+                            Promo I-1995.
         1995      3 months Erasmus project in Bologna (Italy).
         1996      Military Service: 28e Regiment Transmission Armee de Terre
                   Formation Equipex-RITA, operator on the RITTER network.
-                  Preparation Militaire PMTE.
+                  Military training PMTE (Preparation Militaire Terre
+		  Encadrement).
         1997-2000 Software developer, Team leader, Project leader for
-                  Netcomsystems (today Spirent Communications). Designed
-                  software for the Smartbits network test equipment. Worked
-                  in cooperation with Californian team, has spent few weeks in
-                  Los Angeles.
+                  Netcomsystems (which was renamed Spirent Communications in
+		  1999) Denis' role was to design software for the Smartbits
+                  network tester. he worked in cooperation with Californian
+                  team in Los Angeles.
         2000-2002 Network Design, architecture and network support for DCN
-                  of Alcatel Submarine Networks, (worked mainly in France,
+                  of Alcatel Submarine Networks, (Denis worked mainly in France,
                   and spent several weeks in USA, Chile and Brazil).
         2002-2003 DNS maintainer and Firewall admin for the GPRS network of
-                  Bouygues Telecom (small french mobile operator).
+                  Bouygues Telecom (small French mobile operator).
         2003-2004 Network Design and support for SFR's wap and SMS platform,
-                  Internet ISP connectivity.
-	Nov. 2003 Cisco Certified: CCNA
+                  Managed change of ISP connectivity (activating BGP dual homing)
+		  for SFR (main mobile operator in France) with no loss
+		  of service, becoming Local Internet Registrar (LIR).
+	Nov. 2003 Denis became Cisco Certified CCNA
         2004-2005 Validation responsible of the hosting infrastructure
                   that provides data to UMTS mobile phones for SFR.
-	Dec. 2004 Cisco Certified: CCNP
-        July 2005 Network and security engineer for Telindus France.
-        july 2008 Cisco Certified Internetwork Expert (CCIE R&S)
+	Dec. 2004 Denis became Cisco Certified CCNP
+        Since July 2005: Network and security engineer for Telindus France.
+    	July 2008 Denis became Cisco Certified Internetwork Expert, CCIE #21568
+                  R&S, passing the written and lab test with success
+	June 2009 Denis became Checkpoint Certified Security Expert (CCSE)
+                  At Telindus Denis' current role, which depends on each project
+		  is to design and implement network architectures
+		  (Datacenters, network operator backbones, campus networks),
+		  troubleshoot and audit networks, teach network technologies or
+		  explain implemented architectures behaviors, define migration
+		  plans for datacenter networks, Internet connectivity (usually
+		  for multi-homed companies), be guarantor of the homogeneity of
+		  large project deployment over the country, coordinate the
+		  different engineers in charge of each site and be the single
+		  point of interaction toward the customer and the constructors
 
-        Good knowledge of
-              L1 protocols (bit encoding like Differential Manchester, etc.).
+        Denis has proven good knowledge of network protocols, in particular:
+              L1 protocols (bit encoding like Differential Manchester),
               L2 protocols (Ethernet, Token Ring: frame format, detail behavior
-                       and structure of switch and hub equipments. ATM, FR,
-                       protocols, E1, T1, T3 and E3 WAN links).
-              L3 protocols (IPv4, IPv6, OSI, OSPF, RIP, ISIS, ESIS, BGP, HSRP,
-              VRRP, DECNET, IPX, IGMP, PIM, ICMP, MLD, ...)
-              L4 protocols (UDP, TCP).
-              QoS (CBQ, TBF, RED, WRED, etc.)
-              DNS configuration and administrative interfaces to network
-              databases (like the RIPE).
-              Firewall admin (Checkpoint, Netscreen, Linux iptables),
-              Alteon Load Balancers,
-	      BlueCoat proxy equipments.
+                       and structure of switch and hub equipments. ATM,
+		       FrameRelay, E1, T1, T3 and E3 protocols and WAN links),
+              L3 protocols (IPv4, IPv6, OSI, OSPF, EIGRP, RIP, ISIS, ESIS, BGP,
+	      HSRP, VRRP, GLBP, DECNET, IPX, IGMP, PIM, ICMP, MLD, IPSec, GRE,
+	      NHRP, DMVPN, 802.1x, 802.11, ...),
+              Multicast routing (PIM-SM, PIM-DM, PIM-SSM, PIM-bidir, IGMP,
+	      Anycast RP, MSDP, ...) IPv6 Multicast, MLD,
+              QoS (CBQ, TBF, RED, WRED, RSVP, etc.)
+              MPLS, LDP, RSVP-TE, Tageted-LDP, MP-BGP, VPLS, EoMPLS, L3VPN, ...
+              L4 protocols (UDP, TCP),
+              DNS configuration and administrative interfaces to network ("bind"
+ 	      	  software eventually with DNSSEC support),
+              Firewall admin (Checkpoint, ASA, Catalyst's FWSM, Linux iptables),
+	      NTP protocol, syslog, SNMP, radius, tacacs+, SMTP, ...
 
-        Knowledge of
-             SDH networks, Submarine Equipment systems and TMN-OS,
-             GSM and GPRS network structure, SS7 and radio protocols.
-             HPOVO, HPOVPI.
+        Denis has also a general knowledge of:
+              SDH networks, Submarine Equipment systems and TMN-OS,
+              GSM and GPRS network structure, SS7 and radio protocols
 
-	Good practice of the following equipments:
-             Cisco switches and routers (3550 SMI/EMI, 3750, 7200, 3600, 1700,
-             2500, 4500, 6500, 2500, 2960)
-             Checkpoint Firewalls 4.1, NG and AI,
-             Alteon L4-L7 load balancers
-             Netscreen Firewalls (today Juniper's)
-             SunOS/Solaris network and hardware administration (less practice
-                 for system admin.)
-             Linux OS (software developement, system admin, and its very rich
-             network features).
-             Cisco ACS (Radius/Tacacs+ server)
 
-       spoken languages: French, English, Italian, Russian.
-       extra professional activities: astronomy, photography, occasional
-       chess player. Author and maintainer or Disk ARchive (but this, you know)
+	These knowledges have been validated on the following equipments:
+              Cisco switches and routers (Nexus 7000, 5000, 2000, Catalysts
+	      6500/Sup 720, 3550 SMI/EMI, Catalysts 3750v2, 3750-E, 3750-G,
+	      3750-X, 3560, 2960, Cisco routers 7200, 3600, 1700, 2500, ASR9000,
+              ASR1000, MWR 2941)
+              Checkpoint Firewalls 4.1, NG, AI, NGX-R65
+              Redback routers SE800, SE100
+	      Cisco NAM Card/Catalyst 6500-E
+              Alteon L4-L7 load balancers (AD3, AD4)
+              Netscreen Firewalls (today Juniper's)
+              SunOS/Solaris network and hardware administration
+              Linux OS (software development, system admin, and its very rich
+              network features)
+              Cisco ACS (Radius/Tacacs+ server)
+              Cisco WAFS (WAE) and Riverbed for WAN optimization
+
+       Denis is able to speak and write in French, English, Italian and Russian,
+       he has some extra-professional activities: astronomy, photography,
+       occasional chess player and is the author and maintainer of the GPL free
+       software named "Disk ARchive".

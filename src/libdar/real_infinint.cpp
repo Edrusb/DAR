@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.19.2.5 2011/01/04 16:27:13 edrusb Rel $
+// $Id: real_infinint.cpp,v 1.32 2011/03/20 17:10:11 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -29,33 +29,39 @@ extern "C"
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
 } // end extern "C"
 
 #include "real_infinint.hpp"
 #include "erreurs.hpp"
 #include "generic_file.hpp"
 #include "tools.hpp"
+#include "fichier.hpp"
 
 namespace libdar
 {
 
     infinint::endian infinint::used_endian = not_initialized;
+    U_8 infinint::zeroed_field[ZEROED_SIZE];
 
-    infinint::infinint(user_interaction & dialog, S_I *fd, generic_file *x)
+    infinint::infinint(user_interaction & dialog, S_I fd)
     {
-        if(fd != NULL && x != NULL)
-            throw Erange("infinint::infinint(file, file)", gettext("Both arguments are not NULL, please choose one or the other, not both"));
-        if(fd != NULL)
-        {
-            fichier f = fichier(dialog, dup(*fd));
-            build_from_file(f);
-        }
-        else
-            if(x != NULL)
-                build_from_file(*x);
-            else
-                throw Erange("infinint::infinint(file, file)", gettext("Cannot read from file, both arguments are NULL"));
+	fichier f = fichier(dialog, dup(fd));
+	build_from_file(f);
     }
+
+    infinint::infinint(generic_file & x)
+    {
+	build_from_file(x);
+    }
+
 
     void infinint::dump(user_interaction & dialog, S_I fd) const
     {
@@ -91,7 +97,7 @@ namespace libdar
                 for(S_I i = 0; i < 8; ++i)
                     pos += bf[i];
                 if(pos != 1)
-                    throw Erange("infinint::build_from_file(generic_file)", gettext("Badly formed infinint or not supported format")); // more than 1 bit is set to 1
+                    throw Erange("infinint::build_from_file(generic_file)", gettext("Badly formed \"infinint\" or not supported format")); // more than 1 bit is set to 1
 
                 pos = 0;
                 while(bf[pos] == 0)
@@ -138,6 +144,9 @@ namespace libdar
         if(! is_valid())
             throw SRC_BUG;
 
+	if(*(field->begin()) == 0)
+	    const_cast<infinint *>(this)->reduce();
+
         width = field->size();    // this is the informational field size in byte
             // TG is the width in TG, thus the number of bit that must have
             // the preamble
@@ -163,22 +172,29 @@ namespace libdar
             // now we write the preamble except the last byte. All these are zeros.
 
         tmp = 0;
-        unsigned char u = 0x00;
         width.unstack(tmp);
         do
         {
-            while(tmp-- > 0)
-                if(x.write((char *)(&u), 1) < 1)
-                    throw Erange("infinint::dump(generic_file)", gettext("Cannot write data to file"));
+            while(tmp != 0)
+	    {
+		if(tmp > ZEROED_SIZE)
+		{
+		    x.write((char *)zeroed_field, ZEROED_SIZE);
+		    tmp -= ZEROED_SIZE;
+		}
+		else
+		{
+		    x.write((char *)zeroed_field, tmp);
+		    tmp = 0;
+		}
+	    }
             tmp = 0;
             width.unstack(tmp);
         }
         while(tmp > 0);
 
-            // now we write the last byte of the preambule, which has only one bit set
-
-        if(x.write((char *)&last_width, 1) < 1)
-            throw Erange("infinint::dump(generic_file)", gettext("Cannot write data to file"));
+            // now we write the last byte of the preambule, which as only one bit set
+	x.write((char *)&last_width, 1);
 
             // we need now to write some justification byte to have an informational field multiple of TG
 
@@ -187,9 +203,10 @@ namespace libdar
             U_16 tmp = 0;
             justification.unstack(tmp);
             tmp = TG - tmp;
-            while(tmp-- > 0)
-                if(x.write((char *)(&u), 1) < 1)
-                    throw Erange("infinint::dump(generic_file)", gettext("Cannot write data to file"));
+	    if(tmp > ZEROED_SIZE)
+		throw SRC_BUG;
+	    else
+		x.write((char *)zeroed_field, tmp);
         }
 
             // now we continue dumping the informational bytes :
@@ -236,8 +253,9 @@ namespace libdar
             (*field)[0] = retenue;
         }
 
-            // reduce(); // not necessary here, as the resulting filed is
-            // not smaller than the one of the two infinint in presence
+            // reduce() is not necessary here, as the resulting filed is
+            // not smaller than the one of the two infinint in presence.
+	    // resulting infinint is thus in canonical form (no leading zeros)
 
         return *this;
         E_END("infinint::operator +=", "");
@@ -250,7 +268,7 @@ namespace libdar
             throw SRC_BUG;
 
         if(*this < arg)
-            throw Erange("infinint::operator", gettext("Subtracting a infinint greater than the first, infinint cannot be negative"));
+            throw Erange("infinint::operator", gettext("Subtracting an \"infinint\" greater than the first, \"infinint\" cannot be negative"));
 
             // now processing the operation
 
@@ -291,7 +309,10 @@ namespace libdar
 	    --it_res;
         }
 
-        reduce(); // it is necessary here !
+	    // the resulting infinint is most probably *NOT* in canonical form
+	    // to improve performance, since release 2.4.0, it is admitted that an infinint may not
+	    // be in canonical form. It will be "reduced()" to canonical form only when necessary
+	    // at the detriment of the space used during the gap.
 
         return *this;
         E_END("infinint::operator -=", "");
@@ -304,7 +325,7 @@ namespace libdar
             throw SRC_BUG;
 
         storage::iterator it = field->rbegin();
-        U_I produit, retenue = 0;
+        U_I produit, retenue = 0; // assuming U_I is larger than unsigned char
 
         while(it != field->rend())
         {
@@ -326,6 +347,9 @@ namespace libdar
 
         if(arg == 0)
             reduce(); // only necessary in that case
+	    // and it may worth it for big numbers so doing it
+	    // even if since release 2.4.0 it is allowed to keep an infinint
+	    // under non canonical form
 
         return *this;
         E_END("infinint::operator *=", "unsigned char");
@@ -348,8 +372,6 @@ namespace libdar
 	    ++it_t;
         }
 
-            //  ret.reduce();  // not necessary because all operations
-            // done on ret, provide reduced infinint
         *this = ret;
 
         return *this; // copy constructor
@@ -368,11 +390,22 @@ namespace libdar
 	storage::iterator it_res = field->rbegin();
 
 	while(it_res != field->rend() && it_a != arg.field->rend())
-	    *it_res-- &= *it_a--;
-	while(it_res != field->rend())	// set upper bits to zero when arg is smaller than *this
-	    *it_res-- = 0;
+	{
+	    *it_res &= *it_a;
+	    --it_res;
+	    --it_a;
+	}
 
-	reduce();
+	if(it_res != field->rend())
+	{
+	    while(it_res != field->rend())	// set upper bits to zero when arg is smaller than *this
+	    {
+		*it_res = 0;
+		--it_res;
+	    }
+
+	    reduce();
+	}
 
 	return *this;
 	E_END("infinint::operator &=", "infinint");
@@ -392,8 +425,6 @@ namespace libdar
 	while(it_res != field->rend() && it_a != arg.field->rend())
 	    *it_res-- |= *it_a--;
 
-	reduce();
-
 	return *this;
 	E_END("infinint::operator |=", "infinint");
     }
@@ -410,9 +441,11 @@ namespace libdar
 	storage::iterator it_res = field->rbegin();
 
 	while(it_res != field->rend() && it_a != arg.field->rend())
-	    *it_res-- ^= *it_a--;
-
-	reduce();
+	{
+	    *it_res ^= *it_a;
+	    --it_res;
+	    --it_a;
+	}
 
 	return *this;
 	E_END("infinint::operator ^=", "infinint");
@@ -457,7 +490,6 @@ namespace libdar
                     r2 = r1;
                     ++it;
                 }
-                reduce(); // necessary here
             }
         }
 
@@ -532,7 +564,6 @@ namespace libdar
                 r2 = r1;
                 ++it;
             }
-            reduce();
         }
 
         return *this;
@@ -572,7 +603,13 @@ namespace libdar
         if(! a.is_valid() || ! b.is_valid())
             throw SRC_BUG;
 
-        if(*a.field < *b.field) // field is shorter for this than for ref and object are always "reduced"
+	    // need to reduce object to their canonical form first and if not already in canonical form
+	if(*(a.field->begin()) == 0)
+	    const_cast<infinint *>(this)->reduce(); // reducing "this" which a is a reference to, thus reducing "a"
+	if(*(b.field->begin()) == 0)
+	    const_cast<infinint &>(b).reduce();
+
+        if(*a.field < *b.field) // field is shorter for this than for ref and object have been reduced "reduced", thus a < b
             return -1;
         else
             if(*a.field > *b.field)
@@ -633,8 +670,9 @@ namespace libdar
                 else
                     if(count > 1)
                         field->remove_bytes_at_iterator(field->begin(), count - 1);
-
-                    // it == field->end()  is still true
+		    // cannot remove count because we reached the end of field thus field only contains zeros, and
+		    // we must keep field at least one byte width.
+		    // else count == 1 and nothing has to be done
             }
             else
             {
@@ -686,20 +724,18 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: real_infinint.cpp,v 1.19.2.5 2011/01/04 16:27:13 edrusb Rel $";
+	static char id[]="$Id: real_infinint.cpp,v 1.32 2011/03/20 17:10:11 edrusb Rel $";
         dummy_call(id);
     }
 
     void infinint::setup_endian()
     {
         E_BEGIN;
-        U_16 u = 1;
-        unsigned char *ptr = (unsigned char *)(&u);
-
-        if(ptr[0] == 1)
+        if(integers_system_is_big_endian())
             used_endian = big_endian;
         else
             used_endian = little_endian;
+	bzero(zeroed_field, ZEROED_SIZE);
         E_END("infinint::setup_endian", "");
     }
 
@@ -872,7 +908,14 @@ namespace libdar
             return;
         }
 
+	    // need to reduce a and b first
+	if(*(a.field->begin()) == 0)
+	    a.reduce();
+
         r = b;
+	if(*(r.field->begin()) == 0)
+	    r.reduce();
+
         while(*a.field >= *r.field)
             r <<= 8; // one byte
 

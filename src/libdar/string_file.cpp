@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: string_file.cpp,v 1.2.2.2 2008/02/09 17:41:30 edrusb Rel $
+// $Id: string_file.cpp,v 1.8 2011/04/17 13:12:30 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -42,6 +42,9 @@ namespace libdar
     bool string_file::skip_relative(S_I x)
     {
 	bool ret = true;
+
+	if(is_terminated())
+	    throw SRC_BUG;
 
 	if(x > 0)
 	{
@@ -73,6 +76,9 @@ namespace libdar
     {
 	bool ret;
 
+	if(is_terminated())
+	    throw SRC_BUG;
+
 	if(pos < len)
 	{
 	    cur = pos;
@@ -89,18 +95,21 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: string_file.cpp,v 1.2.2.2 2008/02/09 17:41:30 edrusb Rel $";
+        static char id[]="$Id: string_file.cpp,v 1.8 2011/04/17 13:12:30 edrusb Rel $";
         dummy_call(id);
     }
 
-    S_I string_file::inherited_read(char *a, size_t size)
+    U_I string_file::inherited_read(char *a, U_I size)
     {
 	infinint avail_inf = len - cur;
-	size_t avail = 0;
+	U_I avail = 0;
 	U_I ret;
 	const char* ptr = data.c_str();
 	infinint tmp_sk = cur;
 	U_64 tmp_sk_64 = 0;
+
+	if(is_terminated())
+	    throw SRC_BUG;
 
             //
 	    // calculating the amount of available character to be returned

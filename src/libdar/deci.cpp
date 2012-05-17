@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: deci.cpp,v 1.10.4.2 2008/02/09 17:41:29 edrusb Rel $
+// $Id: deci.cpp,v 1.15 2011/02/11 20:23:42 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -28,6 +28,7 @@
 #include "deci.hpp"
 #include "erreurs.hpp"
 #include "integers.hpp"
+#include "nls_swap.hpp"
 
 using namespace std;
 
@@ -62,52 +63,63 @@ namespace libdar
     template <class T> void decicoupe(storage * &decimales, T x)
     {
         E_BEGIN;
-        try
-        {
-            chiffre r;
-            const T d_t = 10;
-            T r_t;
-            storage::iterator it;
-            bool recule = false;
-            unsigned char tmp;
+	NLS_SWAP_IN;
+	try
+	{
+	    try
+	    {
+		chiffre r;
+		const T d_t = 10;
+		T r_t;
+		storage::iterator it;
+		bool recule = false;
+		unsigned char tmp;
 
-            decimales = new storage(PAS);
-            if(decimales == NULL)
-                throw Ememory("template deci::decicoupe");
+		decimales = new storage(PAS);
+		if(decimales == NULL)
+		    throw Ememory("template deci::decicoupe");
 
-            decimales->clear(0xFF);
-            it = decimales->rbegin();
+		decimales->clear(0xFF);
+		it = decimales->rbegin();
 
-            while(x > 0 || recule)
-            {
-                if(x > 0)
-                {
-                    euclide(x,d_t,x,r_t);
-                    r = 0;
-                    r_t.unstack(r);
-                }
-                else
-                    r = 0xF; // not significative information
-                if(recule)
-                {
-                    set_left(tmp, chiffre(r));
-                    if(it == decimales->rend())
-                    {
-                        decimales->insert_const_bytes_at_iterator(decimales->begin(), 0xFF, PAS);
-                        it = decimales->begin() + PAS - 1;
-                    }
-                    *(it--) = tmp;
-                }
-                else
-                    set_right(tmp, chiffre(r));
-                recule = ! recule;
-            }
-        }
-        catch(Ememory & e)
-        {
-            delete decimales;
-            throw;
-        }
+		while(x > 0 || recule)
+		{
+		    if(x > 0)
+		    {
+			euclide(x,d_t,x,r_t);
+			r = 0;
+			r_t.unstack(r);
+		    }
+		    else
+			r = 0xF; // not significative information
+		    if(recule)
+		    {
+			set_left(tmp, chiffre(r));
+			if(it == decimales->rend())
+			{
+			    decimales->insert_const_bytes_at_iterator(decimales->begin(), 0xFF, PAS);
+			    it = decimales->begin() + PAS - 1;
+			}
+			*(it--) = tmp;
+		    }
+		    else
+			set_right(tmp, chiffre(r));
+		    recule = ! recule;
+		}
+	    }
+	    catch(Ememory & e)
+	    {
+		delete decimales;
+		decimales = NULL;
+		throw;
+	    }
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
 
         E_END("decicoupe", "");
     }
@@ -115,45 +127,55 @@ namespace libdar
     deci::deci(string s)
     {
         E_BEGIN;
-        string::reverse_iterator it = s.rbegin();
-        storage::iterator ut;
-        bool recule = false;
-        unsigned char tmp = 0xFF;
+	NLS_SWAP_IN;
+	try
+	{
+	    string::reverse_iterator it = s.rbegin();
+	    storage::iterator ut;
+	    bool recule = false;
+	    unsigned char tmp = 0xFF;
 
-        U_I size = s.size() / 2;
-        if(s.size() % 2 != 0)
-            size++;
+	    U_I size = s.size() / 2;
+	    if(s.size() % 2 != 0)
+		size++;
 
-        if(size == 0) // empty string
-            throw Erange("deci::deci(string s)", gettext("an empty string is an invalid argument"));
+	    if(size == 0) // empty string
+		throw Erange("deci::deci(string s)", gettext("an empty string is an invalid argument"));
 
-        decimales = new storage(size);
-        if(decimales == NULL)
-            throw Ememory("deci::deci(string s)");
-        decimales->clear(0xFF); // FF is not a valid couple of decimal digit
+	    decimales = new storage(size);
+	    if(decimales == NULL)
+		throw Ememory("deci::deci(string s)");
+	    decimales->clear(0xFF); // FF is not a valid couple of decimal digit
 
-        ut = decimales->rbegin();
-        while(it != s.rend() || recule)
-        {
-            if(recule)
-            {
-                if(it != s.rend())
-                    set_left(tmp, digit_htoc(*it));
-                else
-                    set_left(tmp, 0xF);
-                if(ut == decimales->rend())
-                    throw SRC_BUG;
-                *(ut--) = tmp;
-            }
-            else
-                set_right(tmp, digit_htoc(*it));
+	    ut = decimales->rbegin();
+	    while(it != s.rend() || recule)
+	    {
+		if(recule)
+		{
+		    if(it != s.rend())
+			set_left(tmp, digit_htoc(*it));
+		    else
+			set_left(tmp, 0xF);
+		    if(ut == decimales->rend())
+			throw SRC_BUG;
+		    *(ut--) = tmp;
+		}
+		else
+		    set_right(tmp, digit_htoc(*it));
 
-            recule = ! recule;
-            if(it != s.rend())
-                it++; // it is a reverse iterator thus ++ for going backward
-        }
+		recule = ! recule;
+		if(it != s.rend())
+		    it++; // it is a reverse iterator thus ++ for going backward
+	    }
 
-        reduce();
+	    reduce();
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
         E_END("deci::deci", "string");
     }
 
@@ -249,7 +271,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: deci.cpp,v 1.10.4.2 2008/02/09 17:41:29 edrusb Rel $";
+        static char id[]="$Id: deci.cpp,v 1.15 2011/02/11 20:23:42 edrusb Rel $";
         dummy_call(id);
     }
 

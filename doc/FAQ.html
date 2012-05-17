@@ -8,10 +8,6 @@
 
 
 
-
-
-
-
   <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -46,10 +42,7 @@ file, dar report 3 files have been restored?</span></a><br>
 compiling dar I get the following message : " g++: /lib/libattr.a: No
 such file or directory", what can I do?</a><br>
       <a href="#A4"><span style="font-weight: bold; font-style: italic;">I
-cannot find the binary package for my distro, where to look for?</span></a><br>
-      <span style="font-weight: bold; font-style: italic;"><a href="#A5">Why,
-does dar reports "ignored" files while I make a backup without
-filter?</a><br>
+cannot find the binary package for my distro, where to look for?</span></a><span style="font-weight: bold; font-style: italic;"><br>
       </span><span style="font-weight: bold; font-style: italic;"><a href="#A6">Can I
 use different filters between a full backup and a
 differential backup? Would not dar consider some file not included in
@@ -79,22 +72,31 @@ UID/GID
 instead of plain usernames and usergroups?</span></a><br>
       <a style="font-style: italic;" href="#Dar_Manager_encrypted"><span style="font-weight: bold;">Dar_Manager does not accept
 encrypted archives, how to workaround this?</span></a><br>
-      <a href="#staticOSX"><span style="font-weight: bold; font-style: italic;">How to overcome the
-lack of static linking on MacOS X?</span></a><br>
-      <a href="#A13"><span style="font-weight: bold; font-style: italic;"> </span></a><span style="font-weight: bold; font-style: italic;"><a href="#parallel">Why
-cannot dar use the full power of my multi-processor computer?</a><br>
-      <a href="#threadsafe">Is libdar thread-safe, which way you mean it is?</a></span><br>
-      <a style="font-weight: bold; font-style: italic;" href="#How_to_solve_configure:_error:_Cannot">How to solve "configure: error: Cannot find size_t type"?</a><br><a style="font-weight: bold; font-style: italic;" href="#search_for_questions">
+      <a href="#staticOSX"><span style="font-weight: bold; font-style: italic;">How to overcome the lack of static linking on MacOS X?</span></a><a href="#A13">
+<span style="font-weight: bold; font-style: italic;"></span></a><span style="font-style: italic;"><br style="font-weight: bold; font-style: italic;">
+      </span><a href="#single_slice"><span style="font-weight: bold; font-style: italic;">Why cannot I test, extract file, list the contents of a given slice from an archive?</span></a><br>
+      <a href="#merge_two_isolated"><span style="font-weight: bold; font-style: italic;">Why cannot I merge two isolated catalogues?</span></a><br>
+      <a href="#A13"><span style="font-weight: bold; font-style: italic;"> </span></a><span style="font-weight: bold; font-style: italic;"><a href="#parallel">Why cannot dar use the full power of my multi-processor computer?</a><br>
+      <a href="#threadsafe">Is libdar thread-safe, which way do you mean it is?</a><br>
+      <a style="font-weight: bold; font-style: italic;" href="#How_to_solve_configure:_error:_Cannot">How to solve "configure: error: Cannot find size_t type"?</a><br>
+</span><a href="#slow"><span style="font-weight: bold; font-style: italic;">Why dar became much slower since release 2.4.0 ?</span></a><br>
+      <span style="font-weight: bold; font-style: italic;"><a style="font-weight: bold; font-style: italic;" href="#search_for_questions">
 How to search for questions (and their answers) about <span style="font-weight: bold; font-style: italic;">known</span> problems similar to mines?</a><br>
       <a style="font-style: italic; font-weight: bold;" href="#open_failed_excluded">Why dar tells me that he failed to open a directory, while I have excluded this directory?</a><br>
       <span style="font-weight: bold; font-style: italic;"><br>
       <br>
       </span>
-      <h2><span style="text-decoration: underline;">Answers:</span><br>
-      </h2>
-      <span style="font-style: italic; font-weight: bold;"><a name="A1" id="A1"></a> I restore/save all files but dar reported some files have
-been ignored, what are those ignored files?</span> </div>
-      <div style="text-align: justify;"> When restoring/saving, all
+      <h2><span style="font-weight: bold;">
+      </span></h2><h2><span style="text-decoration: underline;">Answers:</span></h2>
+
+      <h1><span style="font-weight: bold; font-style: italic;">
+      </span></h1><h2> </h2>
+
+      <span style="font-weight: bold; font-style: italic;"> <span style="font-style: italic; font-weight: bold;"><a name="A1" id="A1"></a>
+I restore/save all files but dar reported some files have
+been ignored, what are those ignored files?</span> </span></span></div>
+      <div style="text-align: justify; margin-left: 40px;"> When
+restoring/saving, all
 files are
 considered by default. But if you specify some files to restore or
 save, all other files are "ignored", this is the case when using -P -X
@@ -102,30 +104,35 @@ save, all other files are "ignored", this is the case when using -P -X
       </div>
       <br>
       <span style="font-weight: bold; font-style: italic;"><a name="A2" id="A2"></a>Dar hangs when using it with pipes, why?</span><br>
-      <div style="text-align: justify;">Dar can produce archive on its
+      <div style="text-align: justify; margin-left: 40px;">Dar
+can
+produce archive on its
 standard output, if you give '-' as
-basename. But it cannot read an archive from its standard input. To
-feed an archive to dar through pipes, you need dar_slave and two pipes.
-The first pipe transmits orders from dar to dar_slave that tell
-dar_slave the requested portion of the archive, the second pipe goes
-the other way and carries from dar_slave the data requested by dar.
-This way, only needed data get transmitted over pipes, which cannot be
-possible with a single pipe.<br>
+basename. But it cannot read an archive from its standard input in
+direct access mode. To
+feed an archive to dar through pipes, you need dar_slave and two pipes
+or use the sequential mode (--sequential-mode option, which is very
+slow compared to the default direct access mode).
+To use dar with dar_slave over pipes in direct access mode (which is the&nbsp; more efficient way to proceed), see the <a href="usage_notes.html#dar_remote">detailed notes</a> or more precisely <a href="usage_notes.html#netcat_ssh">dar and ssh note</a>.<br>
       </div>
       <br style="font-weight: bold; font-style: italic;">
       <span style="font-weight: bold; font-style: italic;"><a name="A3" id="A3"></a>Why, when I restore 1 file, dar report 3 files have been
 restored?</span><br>
-      <div style="text-align: justify;">if you restore for example the
+      <div style="text-align: justify; margin-left: 40px;">if
+you
+restore for example the
 file usr/bin/emacs dar will first
 restore usr (if the directory already exists, it will get its date and
-ownership restored, all existing files will be preserved), then /usr/bin
-is restored, and last usr/bin/emacs is restored. Thus 3 inodes have been
+ownership restored, all existing files will be preserved), then
+/usr/bin will be restored, and last usr/bin/emacs will be restored.
+Thus 3 inodes have been
 restored or modified while only one file has been asked for restoration.<br>
       </div>
       <br>
       <span style="font-weight: bold; font-style: italic;"><a name="libattr"></a>While compiling dar I get the following message : "
 g++: /lib/libattr.a: No such file or directory", what can I do?</span><br>
-      <div style="text-align: justify;">The problem comes from an
+      <div style="text-align: justify;">
+      <div style="margin-left: 40px;">The problem comes from an
 incoherence in your distro (Redhat and Slackware seem(ed) concerned at
 least): Dar (Libtool) finds
 /usr/lib/gcc-lib/i386-redhat-linux/3.3.3/../../../libattr.la&nbsp; file
@@ -135,67 +142,38 @@ are expected to be found under /lib. While the dynamic libattr is
 there,&nbsp; the static version has been moved to /usr/lib. A
 workaround is to make a symbolic link:<br>
       <br>
-      <div style="margin-left: 40px;"><code>ln -s /usr/lib/libattr.a
+      </div>
+      <div style="margin-left: 80px;"><code>ln -s /usr/lib/libattr.a
 /lib/libattr.a</code><br>
       </div>
       </div>
       <br>
-      <br style="font-weight: bold; font-style: italic;">
+<br style="font-weight: bold; font-style: italic;">
       <span style="font-weight: bold; font-style: italic;"><a name="A4" id="A4"></a>I cannot find the binary package for my distro, where to
 look for?</span><br>
-      <div style="text-align: justify;">For any binary package, ask
+      <div style="text-align: justify; margin-left: 40px;">For any
+binary package, ask
 your distro maintainer to include dar (if
 not already done), and check on the web site of your preferred distro
 for a dar package<br>
       </div>
-      <br style="font-weight: bold; font-style: italic;">
-      <span style="font-weight: bold; font-style: italic;"><a name="A5" id="A5"></a>Why, does dar reports "ignored" files while I make a
-backup without filter?</span><br>
-      <div style="text-align: justify;">If you give to dar an argument
-which is not an option, up to version
-2.2.x it is interpreted as "to save that file only" (it is now replaced by -g option). Let's take an
-example:<br>
-      </div>
-      <br>
-      <div style="margin-left: 40px;"> <code>dar -c my-files -y -s
-2045M data<br>
-      <br>
-</code></div>or since version 2.3.0:<br>
-      <div style="margin-left: 40px;"><code><br>
-      </code><code>dar -c my-files -y -s
-2045M -g data</code><br>
-
-      </div>
-
-      <br>
-reports<br>
-      <br>
-      <div style="margin-left: 40px;"> <code>--------------------------------------------<br>
-31754 inode(s) saved<br>
-with 0 hard link(s) recorded<br>
-0 inode(s) not saved (no file change)<br>
-0 inode(s) failed to save (filesystem error)<br><span style="font-weight: bold; text-decoration: underline;">147 files(s) ignored (excluded by filters)</span><br>
-0 files(s) recorded as deleted from reference backup<br>
---------------------------------------------</code><br>
-      </div>
-      <br>
-      <div style="text-align: justify;">the 147 files are due to the
-fact dar has excluded 147 files and
-directories which are not "data" in the current directory (or if using -R option, in the directory pointed to by -R option). </div><br>
-      <br>
+      <span style="font-weight: bold; font-style: italic;"></span><br>
       <span style="font-style: italic; font-weight: bold;"><a name="A6" id="A6"></a>Can I use different filters between a full backup and a
 differential backup? Would not dar consider some file not included in
 the filter to be deleted?</span><br>
-      <div style="text-align: justify;">Yes, you can. No, there is no
+      <div style="text-align: justify; margin-left: 40px;">Yes, you
+can. No, there is no
 risk to have dar deleting the files that
 were not selected for the differential backup. Here is the way dar
 works:<br>
       </div>
-      <br>
-      <div style="text-align: justify;">During a backup process, when a
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">During a
+backup process, when a
 file is ignored due to filter
 exclusion, an "ignored" entry is added to the catalogue. At the
-end of the backup, dar compares both catalogues the one of reference
+end of the backup, dar compares both catalogues, the one of reference
 and the new one built during the backup process, and adds a "detruit"
 (destroyed in English) entry, when an entry of the reference is not
 present in the new catalogue. Thus, if an "ignored" is present no
@@ -208,7 +186,8 @@ removed and the catalogue is dumped in the archive.<br>
 action dar
 makes all the system slower and slower, then it stops with the message
 "killed"! How to overcome this problem?</span><br>
-      <div style="text-align: justify;">Dar needs virtual memory to
+      <div style="text-align: justify; margin-left: 40px;">Dar needs
+virtual memory to
 work. Virtual memory is the RAM + SWAP
 space. Dar memory requirement grows with the amount of file saved, not
 with the amount of data saved. If you have a few huge files you will
@@ -221,8 +200,10 @@ catalogue of the archive of reference, which most of the time will make
 dar using twice more memory when doing a differential backup than a
 full backup.<br>
       </div>
-      <br>
-      <div style="text-align: justify;">Anyway, the solution is:<br>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">Anyway, the
+solution is:<br>
       </div>
       <ol style="text-align: justify;">
         <li>Read the <a href="Limitations.html">limitatons file</a> to understand the problem and
@@ -231,7 +212,7 @@ aware of the limitations you will bring at step 3, bellow.</li>
         <li>If you can, add swap space to your system (under Linux, you
 can
 either add a swap partition or a swap file, which is less constraining
-but also a bit less impressive). Bob Barry provided a script that can
+but also a bit less efficient). Bob Barry provided a script that can
 give you a raw estimation of the required virtual memory
 (<a href="samples/index.html">doc/samples/dar_rqck.bash</a>).</li>
         <li>If this is not enough, or if you don't want/can add swap
@@ -243,7 +224,8 @@ on you system</li>
         <li>If all that fails, ask for support on the <a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support
 mailing-list</a>.</li>
       </ol>
-      <div style="text-align: justify;">There is still a workaround
+      <div style="text-align: justify; margin-left: 40px;">There is
+still a workaround
 which is to make several smaller archives
 of the files to backup. For example, make a backup for all in
 /usr/local another for all in /var and so on. These backup can be full
@@ -256,13 +238,16 @@ several differential archives concerning different set of files.<br>
       <br>
       <br style="font-weight: bold; font-style: italic;">
       <span style="font-weight: bold; font-style: italic;"><a name="A8" id="A8"></a>I have a backup I want to change the size of slices?</span><br>
-dar_xform is your friend!<br>
+      <div style="margin-left: 40px;">dar_xform is your friend!<br>
       <br>
-      <div style="margin-left: 40px;"> <code>dar_xform -s &lt;size&gt;
+      </div>
+      <div style="margin-left: 80px;"> <code>dar_xform -s &lt;size&gt;
 original_archive new_archive</code><br>
       </div>
-      <br>
-      <div style="text-align: justify;">dar_xform will create a new
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">dar_xform
+will create a new
 archive with the slices of the requested
 size, (you can also make use of -S option for the first slice). Note
 that you don't need to decrypt the archive, not dar will uncompress it,
@@ -272,33 +257,37 @@ this is thus a very fast processing. See <a href="man/index.html">dar_xform man 
       <br style="font-weight: bold; font-style: italic;">
       <span style="font-weight: bold; font-style: italic;"><a name="A9" id="A9"></a>I have a backup in one slice, how can I split it in
 several slices?</span><br>
-dar_xform is your friend!<br>
+      <div style="margin-left: 40px;">dar_xform is your friend!<br>
       <br>
-      <div style="margin-left: 40px;"> <code>dar_xform -s &lt;size&gt;
+      </div>
+      <div style="margin-left: 80px;"> <code>dar_xform -s &lt;size&gt;
 original_archive new_archive</code><br>
       </div>
-      <br>
+      <div style="margin-left: 40px;"><br>
 see above for more.<br>
+      </div>
       <br>
       <span style="font-weight: bold; font-style: italic;"><a name="A10" id="A10"></a>I have a backup in several slice, how can I stick all
 them in a single file?</span><br>
-dar_xform is your friend!<br>
+      <div style="margin-left: 40px;">dar_xform is your friend!<br>
       <br>
       <code>dar_xform original_archive new_archive</code><br>
       <br>
 dar_xform without -s option creates a single sliced archive. See
 dar_xform man page for more.<br>
+      </div>
       <br>
       <br>
       <span style="font-weight: bold; font-style: italic;"><a name="A11" id="A11"></a>I have a backup, how can I change its encryption scheme?</span><br>
-      <div style="text-align: justify;">The merging feature let you do
+      <div style="text-align: justify; margin-left: 40px;">The merging
+feature let you do
 that. The merging has two roles, putting
 in one archive the contents of two archives, and at the same time
 filtering file contents to not copy certain files in the resulting
 archive. The merging feature can take two but also only one archive as
-input, so we will use it in a special way:<br>
+input, so we will use it in that special way here:<br>
       </div>
-      <ul style="text-align: justify;">
+      <ul style="text-align: justify; margin-left: 40px;">
         <li>a single input (our original archive)</li>
         <li>no file filtering (so we keep all the files)</li>
         <li>Keep files compressed (no decompression/re compression) to
@@ -306,78 +295,98 @@ speed
 up the process<br>
         </li>
       </ul>
-      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+      <div style="text-align: justify; margin-left: 80px;"> <code>dar
 -+ new_archive -A
 original_archive -K "&lt;new_algo&gt;:new pass" -ak</code><br>
       </div>
-      <div style="text-align: justify;"><br>
-If the original archive was encrypted you need to add the -J option to
+      <div style="text-align: justify; margin-left: 40px;"><br>
+If the original archive was not in clear you need to add the -J option to
 provide the encryption key, and if you don't want to have password in
-clear on the command line (that can be seen with <span style="font-style: italic;">top</span> or <span style="font-style: italic;">ps</span> by other users), simply provide
+clear on the command line (command that can be seen with <span style="font-style: italic;">top</span> or <span style="font-style: italic;">ps</span> by other users), simply provide
 "&lt;algo&gt;:" then dar will ask you on the fly the password, if using
 blowfish you can then just provide <code>":"</code> for the keys:<br>
       <br>
       </div>
-      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+      <div style="text-align: justify; margin-left: 80px;"> <code>dar
 -+ new_archive -A
 original_archive -K ":" -J ":" -ak<br>
       <br>
       </code> </div>
-      <div style="text-align: justify;">Note that you can also change
-slicing (and even compression, <a href="#A12">see below</a>) of the archive at the same time
-thanks to -s option:<br>
+      <div style="text-align: justify; margin-left: 40px;">Note that
+you can also change
+slicing of the archive at the same time
+thanks to -s and -S options:<br>
       <br>
       </div>
-      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+      <div style="text-align: justify; margin-left: 80px;"> <code>dar
 -+ new_archive -A
 original_archive -K ":" -J ":" -ak -s 1G</code><br>
       </div>
       <br>
       <span style="font-weight: bold; font-style: italic;"><a name="A12" id="A12"></a>I have a backup, how can I change its compression
 algorithm?</span><br>
-      <div style="text-align: justify;">Same thing as above : we will
+      <div style="text-align: justify; margin-left: 40px;">Same thing
+as above : we will
 use the merging feature :<br>
       <br>
 to use bzip2 compression:<br>
       <br>
       </div>
-      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+      <div style="text-align: justify; margin-left: 80px;"> <code>dar
 -+ new_archive -A
-original_archive -y</code><br>
+original_archive -zbzip2</code><br>
       </div>
-      <div style="text-align: justify;"><br>
+      <div style="text-align: justify; margin-left: 40px;"><br>
 to use gzip compression<br>
       <br>
       </div>
-      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+      <div style="text-align: justify; margin-left: 80px;"> <code>dar
 -+ new_archive -A
-original_archive -z<br>
+original_archive -zgzip<br>
+      <br>
+</code></div>
+      <div style="text-align: justify; margin-left: 40px;">
+to use lzo compression<br>
+      </div>
+      <div style="text-align: justify; margin-left: 80px;">
+      <br>
+
+
+       <code>dar
+-+ new_archive -A
+original_archive -zlzo</code><br>
+      <code>
       <br>
       </code> </div>
-      <div style="text-align: justify;">to use no compression at all:<br>
+
+      <div style="text-align: justify; margin-left: 40px;">to use no
+compression at all:<br>
       <br>
       </div>
-      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+      <div style="text-align: justify; margin-left: 80px;"> <code>dar
 -+ new_archive -A
 original_archive</code><br>
       </div>
-      <div style="text-align: justify;"><br>
+      <div style="text-align: justify; margin-left: 40px;"><br>
 Note that you can also change encryption scheme and slicing at the same
 time you change compression:<br>
       <br>
       </div>
       <div style="margin-left: 40px;">
-      <div style="text-align: justify;"> <code>dar -+ new_archive -A
-original_archive -y -K ":" -J ":" -s 1G</code><br>
+      <div style="text-align: justify;">
+      <div style="margin-left: 40px;"><code>dar -+ new_archive -A
+original_archive -zbzip2 -K ":" -J ":" -s 1G</code><br>
+      </div>
       <code></code></div>
       </div>
       <br>
       <span style="font-weight: bold; font-style: italic;"><a name="A13"></a>Which
 options can I use with which options?</span><br>
-      <div style="text-align: justify;">DAR provides seven commands:<br>
+      <div style="text-align: justify; margin-left: 40px;">DAR provides
+seven commands:<br>
       <br>
       </div>
-      <dl style="text-align: justify;">
+      <dl style="text-align: justify; margin-left: 40px;">
         <dd>-c&nbsp;&nbsp; to create a new archive</dd>
         <dd> -x&nbsp;&nbsp; to extract files from a given archive</dd>
         <dd>-l&nbsp;&nbsp;&nbsp; to list the contents of a given archive</dd>
@@ -404,27 +413,31 @@ Follow for each command the available options (those marked OK):<br>
 <table style="width: 80%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="width: 13%; text-align: left; vertical-align: middle;"><br>
+      <td style="width: 10%; text-align: left; vertical-align: middle;">short option<br>
       </td>
-      <td style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-c<br>
+      <td style="vertical-align: top; width: 20%;">long&nbsp; option<br>
       </td>
-      <td style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-x<br>
+<td style="height: 12%; text-align: center; vertical-align: middle; width: 10%; font-weight: bold;">-c<br>
       </td>
-      <td style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-l<br>
+      <td style="height: 12%; text-align: center; vertical-align: middle; width: 10%; font-weight: bold;">-x<br>
       </td>
-      <td style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-d<br>
+      <td style="height: 12%; text-align: center; vertical-align: middle; width: 10%; font-weight: bold;">-l<br>
       </td>
-      <td style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-t<br>
+      <td style="height: 12%; text-align: center; vertical-align: middle; width: 10%; font-weight: bold;">-d<br>
       </td>
-      <td style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-C<br>
+      <td style="height: 12%; text-align: center; vertical-align: middle; width: 10%; font-weight: bold;">-t<br>
       </td>
-      <td style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-+<br>
+      <td style="height: 12%; text-align: center; vertical-align: middle; width: 10%; font-weight: bold;">-C<br>
+      </td>
+      <td style="height: 12%; text-align: center; vertical-align: middle; width: 10%; font-weight: bold;">-+<br>
       </td>
     </tr>
     <tr>
       <td style="width: 13%; text-align: left; vertical-align: middle;">-v<br>
       </td>
-      <td style="height: 12%; width: 12%; text-align: center; vertical-align: middle;">OK<br>
+      <td style="vertical-align: top;">--verbose<br>
+      </td>
+<td style="height: 12%; width: 12%; text-align: center; vertical-align: middle;">OK<br>
       </td>
       <td style="height: 12%; width: 12%; text-align: center; vertical-align: middle;">OK<br>
       </td>
@@ -442,7 +455,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-vs<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK<br>
+      <td style="vertical-align: top;">--verbose=s<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK<br>
       </td>
       <td style="text-align: center; vertical-align: middle;">OK<br>
       </td>
@@ -459,7 +474,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-b<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK<br>
+      <td style="vertical-align: top;">--beep<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK<br>
       </td>
       <td style="text-align: center; vertical-align: middle;">OK<br>
       </td>
@@ -477,7 +494,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-n<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK<br>
+      <td style="vertical-align: top;">--no-overwrite<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK<br>
       </td>
       <td style="text-align: center; vertical-align: middle;">OK<br>
       </td>
@@ -492,7 +511,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-w<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--no-warn<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -503,7 +524,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-wa<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="vertical-align: top;">--no-warn=all<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -512,9 +535,25 @@ Follow for each command the available options (those marked OK):<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
     </tr>
     <tr>
+      <td style="vertical-align: top;">-A<br>
+      </td>
+      <td style="vertical-align: top;">--ref<br>
+      </td>
+<td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+    </tr>
+    <tr>
       <td style="vertical-align: top;">-R<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--fs-root<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -525,7 +564,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-X<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--exclude<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -536,7 +577,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-I<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--include<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -547,9 +590,11 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-P<br>
       </td>
+      <td style="vertical-align: top;">--prune<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -558,9 +603,12 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-g<br>
       </td>
+      <td style="vertical-align: top;">--go-into<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -569,9 +617,12 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-]<br>
       </td>
+      <td style="vertical-align: top;">--exclude-from-file<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -580,9 +631,12 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-[<br>
       </td>
+      <td style="vertical-align: top;">--include-from-file<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -591,7 +645,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-u<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--exclude-ea<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -602,7 +658,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-U<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--include-ea<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -613,7 +671,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-i<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--input<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -624,7 +684,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-o<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--output<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -635,7 +697,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-O<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--comparison-field<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -646,7 +710,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-H<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--hour<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -657,7 +723,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-E<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--execute<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -668,7 +736,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-F<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--ref-execute<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -679,7 +749,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-K<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--key<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -690,7 +762,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-J<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--ref-key<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -701,7 +775,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-#<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--crypto-block<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -712,7 +788,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-*<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--ref-crypto-block<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -723,7 +801,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-B<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--batch<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -734,7 +814,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-N<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--noconf<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -745,7 +827,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-e<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--empty<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -756,7 +840,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-aSI<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--alter=SI<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -767,7 +853,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-abinary<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--alter=binary<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -778,7 +866,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-Q<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;"><br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -789,7 +879,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-aa<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--alter=atime<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -800,7 +892,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-ac<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--alter=ctime<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -811,7 +905,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-am<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--alter=mask<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -822,7 +918,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-an<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--alter=no-case<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -833,7 +931,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-acase<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--alter=case<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -844,7 +944,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-ar<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">OK<br>
+      <td style="vertical-align: top;">--alter=regex<br>
+      </td>
+<td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
@@ -862,7 +964,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-ag<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">OK<br>
+      <td style="vertical-align: top;">--alter=glob<br>
+      </td>
+<td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
@@ -880,7 +984,9 @@ Follow for each command the available options (those marked OK):<br>
 <tr>
       <td style="vertical-align: top;">-j<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--jog<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
@@ -891,7 +997,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-z<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--compression<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -902,18 +1010,22 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-y<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--bzip2<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">deprecated</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">deprecated</td>
+      <td style="text-align: center; vertical-align: middle;">deprecated</td>
     </tr>
     <tr>
       <td style="vertical-align: top;">-s<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--slice<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -924,7 +1036,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-S<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--first-slice<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -935,7 +1049,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-p<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--pause<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -946,7 +1062,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-@<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="vertical-align: top;">--aux<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -957,7 +1075,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-$<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="vertical-align: top;">--aux-key<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -968,7 +1088,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-~<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="vertical-align: top;">--aux-execute<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -979,7 +1101,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-%<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="vertical-align: top;">--aux-crypto-block<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -990,8 +1114,10 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-D<br>
       </td>
+      <td style="vertical-align: top;">--empty-dir<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1001,7 +1127,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-Z<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--exclude-compression<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1012,7 +1140,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-Y<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--include-compression<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1023,7 +1153,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-m<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--mincompr<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1034,7 +1166,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-ak<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">--<br>
+      <td style="vertical-align: top;">--alter=keep-compressed<br>
+      </td>
+<td style="vertical-align: top; text-align: center;">--<br>
       </td>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
@@ -1052,7 +1186,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-af<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">OK<br>
+      <td style="vertical-align: top;">--alter=fixed-date<br>
+      </td>
+<td style="vertical-align: top; text-align: center;">OK<br>
       </td>
       <td style="vertical-align: top; text-align: center;">--<br>
       </td>
@@ -1068,9 +1204,11 @@ Follow for each command the available options (those marked OK):<br>
       </td>
     </tr>
 <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
       <td style="vertical-align: top;">--nodump<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1078,21 +1216,13 @@ Follow for each command the available options (those marked OK):<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
     </tr>
-    <tr>
-      <td style="vertical-align: top;">-G<br>
-      </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
-    </tr>
+
     <tr>
       <td style="vertical-align: top;">-M<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--no-mount-points<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1103,7 +1233,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-,<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="vertical-align: top;">--cache-directory-tagging<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1114,7 +1246,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-k<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="vertical-align: top;">--deleted<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1125,7 +1259,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-r<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="vertical-align: top;">--recent<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1136,7 +1272,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-f<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="vertical-align: top;">--flat<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1147,7 +1285,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-ae<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="vertical-align: top;">--alter=erase_ea<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1158,7 +1298,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-T<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="vertical-align: top;">--list-format<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1169,7 +1311,9 @@ Follow for each command the available options (those marked OK):<br>
     <tr>
       <td style="vertical-align: top;">-as<br>
       </td>
-      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="vertical-align: top;">--alter=saved<br>
+      </td>
+<td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">OK</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
@@ -1177,7 +1321,153 @@ Follow for each command the available options (those marked OK):<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
     </tr><tr>
+      <td style="vertical-align: top;">-ad<br>
+      </td>
+      <td style="vertical-align: top;">--alter=decremental<br>
+      </td>
+<td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+    </tr><tr>
       <td style="vertical-align: top;">-q<br>
+      </td>
+      <td style="vertical-align: top;">--quiet<br>
+      </td>
+<td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-/<br>
+      </td>
+      <td style="vertical-align: top;">--overwriting-policy<br>
+      </td>
+<td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+    </tr><tr>
+      <td style="vertical-align: top;">-&lt;<br>
+      </td>
+      <td style="vertical-align: top;">--backup-hook-include<br>
+      </td>
+<td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-&gt;<br>
+      </td>
+      <td style="vertical-align: top;">--backup-hook-exclude<br>
+      </td>
+<td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-=<br>
+      </td>
+      <td style="vertical-align: top;">--backup-hook-execute<br>
+      </td>
+<td style="vertical-align: top; text-align: center;">OK</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+      <td style="vertical-align: top; text-align: center;">--</td>
+    </tr><tr>
+      <td style="vertical-align: top;">-ai<br>
+      </td>
+      <td style="vertical-align: top;">--alter=ignore-unknown-inode-type<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-at<br>
+      </td>
+      <td style="vertical-align: top;">--alter=tape-marks<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-0<br>
+      </td>
+      <td style="vertical-align: top;">--sequential-read<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-;<br>
+      </td>
+      <td style="vertical-align: top;">--min-digits<br>
       </td>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
@@ -1194,6 +1484,207 @@ Follow for each command the available options (those marked OK):<br>
       <td style="vertical-align: top; text-align: center;">OK<br>
       </td>
     </tr>
+    <tr>
+      <td style="vertical-align: top;">-1<br>
+      </td>
+      <td style="vertical-align: top;">--sparse-file-min-size<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-ah<br>
+      </td>
+      <td style="vertical-align: top;">--alter=hole-recheck<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-^<br>
+      </td>
+      <td style="vertical-align: top;">--slice-mode<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-_<br>
+      </td>
+      <td style="vertical-align: top;">--retry-on-change<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-asecu<br>
+      </td>
+      <td style="vertical-align: top;">--alter=secu<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-.<br>
+      </td>
+      <td style="vertical-align: top;">--user-comment<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-3<br>
+      </td>
+      <td style="vertical-align: top;">--hash<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-2<br>
+      </td>
+      <td style="vertical-align: top;">--dirty-behavior<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-al<br>
+      </td>
+      <td style="vertical-align: top;">--alter=lax<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-alist-ea<br>
+      </td>
+      <td style="vertical-align: top;">--alter=list-ea<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">--<br>
+      </td>
+    </tr>
+
 
   </tbody>
 </table>
@@ -1206,22 +1697,24 @@ Follow for each command the available options (those marked OK):<br>
       <td> <a name="A14"></a><span style="font-weight: bold; font-style: italic;">Why dar reports
 corruption of the archive I have
 transfered with FTP?</span>
-      <p style="text-align: justify;">Dar archive are binary files,
+      <p style="text-align: justify; margin-left: 40px;">Dar archive
+are binary files,
 they must be transfered in
 binary mode
 when using FTP. This is done in the following way for the ftp
 command-line client :</p>
-      <div style="text-align: justify;"> </div>
-      <p style="text-align: justify; margin-left: 40px;"><code>ftp
+      <div style="text-align: justify; margin-left: 40px;"> </div>
+      <p style="text-align: justify; margin-left: 80px;"><code>ftp
 &lt;somewhere&gt;<br>
 &lt;login&gt;<br>
-&lt;password&gt;<br>
-bin<br>
+&lt;password&gt;<br><span style="font-weight: bold; text-decoration: underline;">
+bin</span><br>
 put &lt;file&gt;<br>
 get &lt;file&gt;<br>
 bye</code></p>
-      <div style="text-align: justify;"> </div>
-      <p style="text-align: justify;">If you transfer an archive (or
+      <div style="text-align: justify; margin-left: 40px;"> </div>
+      <p style="text-align: justify; margin-left: 40px;">If you
+transfer an archive (or
 any other binary file) in ascii mode (the opposite of binary mode), the
 8th bit of each byte will be lost and the archive will become
 impossible to recover (due to the destruction of this information). Be
@@ -1237,11 +1730,13 @@ to be sure you can delete the original file.</p>
     <tr>
       <td style="text-align: justify;"> <span style="font-weight: bold; font-style: italic;">Why DAR does save <a name="UIDGID"></a>UID/GID
 instead of plain usernames and usergroups?</span>
-      <p>In each file property there is
+      <p style="margin-left: 40px;">In
+each file property is
 not present the name of the owner nor the name of the group owner, but
 instead are present two numbers, the user ID and the group ID (UID
 &amp; GID in short). In the /etc/password file these numbers are
-associated names and other properties, like the login shell, the home
+associated to names and other properties, like the login shell, the
+home
 directory, the password (see also /etc/shadow).
 Thus, when you do a directory list (with the 'ls' command for example
 or with any GUI program for another example), the listing application
@@ -1251,7 +1746,7 @@ number associated, then the listing program fetchs the inode attributes
 for each file and looks among other information for the UID and the
 GID. To be able
 to display the real user name and group name, the listing application
-calls a given standard C library call that will do the lookup in
+use a well-defined standard C library call that will do the lookup in
 /etc/password, eventually NIS system if configured and any other
 additional
 system, [this way applications have not to bother with the many system
@@ -1261,7 +1756,7 @@ application display for each
 file found in a directory the attributes and the user name and group
 name as returned by the system.<br>
       </p>
-      <p>As you can see, the user name and
+      <p style="margin-left: 40px;">As you can see, the user name and
 group name are not part of any file attribute, but UID and GID *are*
 instead. Dar is a backup tool mainly, it does preserve at much as
 possible the files property to be able to restore them as close as
@@ -1271,9 +1766,10 @@ with UID=3. The name corresponding the UID 3 may exist or not,&nbsp;
 may exist and be the same or may exist and be different, the file will
 be anyway restored in UID 3.<br>
       </p>
-      <span style="text-decoration: underline;">Scenario with dar's way
+      <div style="margin-left: 40px;"><span style="text-decoration: underline;">Scenario with dar's way
 of restoring</span><br>
-      <p style="margin-left: 40px;">Thus, when doing backup and
+      </div>
+      <p style="margin-left: 80px;">Thus, when doing backup and
 restoration of a crashed system you can be confident, the restoration
 will not interfere with the bootable system you have used to launch dar
 to restore your disk. Assuming you have UID 1 labeled <span style="font-style: italic;">'bin'</span> in your
@@ -1288,7 +1784,7 @@ you will see that the original files
 owned by <span style="font-style: italic;">'bin'</span> are now owned
 by user <span style="font-style: italic;">'admin'.</span> <br>
       </p>
-      <p style="margin-left: 40px;">This is really a mirage: in your
+      <p style="margin-left: 80px;">This is really a mirage: in your
 restoration you will also restore the <span style="font-style: italic;">/etc/password</span>
 file and other
 system configuration files (like NIS configuration files if they have
@@ -1298,9 +1794,9 @@ be backed associated to user <span style="font-style: italic;">'bin'</span>
 as expected and files originally owned by user <span style="font-style: italic;">bin</span> will now been listed as owned
 by <span style="font-style: italic;">bin</span> as expected.<br>
       </p>
-      <span style="text-decoration: underline;"></span><span style="text-decoration: underline;">Scenario with plain name way of
-restoring</span>
-      <p style="margin-left: 40px;">If dar had done else, restoring
+      <div style="margin-left: 40px;"><span style="text-decoration: underline;"></span><span style="text-decoration: underline;">Scenario with plain name way of
+restoring</span></div>
+      <p style="margin-left: 80px;">If dar had done else, restoring
 the files owned by <span style="font-style: italic;">'bin'</span> to
 the UID corresponding to <span style="font-style: italic;">'bin',</span>
 these
@@ -1311,7 +1807,8 @@ have been launched, this UID 2 would have become some other user and
 not <span style="font-style: italic;">'bin'</span> which is mapped to
 UID 1 in the restored <span style="font-style: italic;">/etc/password.</span><br>
       </p>
-      <p>Now, if you want to change some UID/GID when moving a set of
+      <p style="margin-left: 40px;">Now, if you want to change some
+UID/GID when moving a set of
 files from
 one live system to another system, there is no problem if you are <span style="font-weight: bold;">not</span>
 restoring dar under the <span style="font-style: italic;">'root'</span>
@@ -1321,13 +1818,13 @@ usually not allowed to modify UID/GID, thus restored files by dar will
 have group and user ownership of the dar process, which is the one that
 has launched dar.<br>
       </p>
-      <p>But if you really need to move a
+      <p style="margin-left: 40px;">But if you really need to move a
 directory tree containing a set of files with different ownership and
 you want to preserve these different ownership from one live system to
 another, while the corresponding UID/GID do not match between the two
 system, dar can still help you:<br>
       </p>
-      <ul>
+      <ul style="margin-left: 40px;">
         <li>Save your directory tree on the source live system</li>
         <li>From the root account in the destination live system do the
 following:</li>
@@ -1335,15 +1832,16 @@ following:</li>
         <li>change the UID of files according to the one used by the
 destination filesystem with the command:</li>
       </ul>
-      <div style="margin-left: 80px;">find /path/to/restored/archive
+      <div style="margin-left: 120px;">find /path/to/restored/archive
 -uid &lt;old UID&gt;&nbsp; -print -exec chown &lt;new name&gt; {} \;<br>
       <br>
       </div>
-      <div style="margin-left: 80px;">find /path/to/restored/archive
+      <div style="margin-left: 120px;">find /path/to/restored/archive
 -gid &lt;old GID&gt; -print -exec chgrp &lt;new name&gt; {} \;<br>
       <br>
       </div>
-The first command will let you remap an UID to another for all files
+      <div style="margin-left: 40px;">The first command will let you
+remap an UID to another for all files
 under the /path/to/restored/archive directory<br>
 The second command will let you remap a GID to another for all files
 under the /path/to/restored/archive directory<br>
@@ -1351,7 +1849,8 @@ under the /path/to/restored/archive directory<br>
       <span style="text-decoration: underline;">Example on how to
 globally modify ownership of a directory tree user by user</span><br>
       <br>
-      <div style="margin-left: 40px;">For example, you have on the <span style="font-weight: bold;">source</span> system three users: Pierre
+      </div>
+      <div style="margin-left: 80px;">For example, you have on the <span style="font-weight: bold;">source</span> system three users: Pierre
 (UID
 100), Paul (UID 101), Jacques (UID 102)<br>
 but on the <span style="font-weight: bold;">destination</span> system,
@@ -1364,7 +1863,8 @@ assume UID 680 is not used. Then after the archive restoration in the
 directory /tmp/A we will do the following:<br>
       <br>
       </div>
-      <div style="margin-left: 80px;">find /tmp/A -uid 100 -print -exec
+      <div style="margin-left: 120px;">find /tmp/A -uid 100 -print
+-exec
 chown 680 {} \;<br>
 find /tmp/A -uid 101 -print -exec chown pierre {} \;<br>
 find /tmp/A -uid 102 -print -exec chown paul {} \;<br>
@@ -1382,11 +1882,13 @@ temporarily moved to UID 680 are now set to their UID on the
 destination live system, UID 680 is no more used).<br>
       <br>
       </div>
+      <div style="margin-left: 40px;">
       <div style="margin-left: 40px;">You can then move the modified
 files to appropriated destination or
 make a new dar archive to be restored in appropriated place if you want
 to use some of dar's feature like for example only restore files that
 are more recent than those present on filesystem.<br>
+      </div>
       <br>
       <br>
       <br style="font-weight: bold; font-style: italic;">
@@ -1395,12 +1897,15 @@ are more recent than those present on filesystem.<br>
 does not accept
 encrypted archives, how to workaround this?</span><br>
       <br>
-Yes, that's true, dar_manager does not accept encrypted archives. The
+      <div style="margin-left: 40px;">Yes,
+that's true, dar_manager
+does not accept encrypted archives. The
 first reason is that while dar_manager database cannot be encrypted
-this is not very fair to add them encrypted archives. The second reason
+this is not very fair to add to them encrypted archives. The second
+reason
 is because the dar_manager database should hold the key for each
-encrypted archive making this archive the weakest point in your the
-data security: Breaking the database encryption would then provide
+encrypted archive making this archive the weakest point in your data
+security: Breaking the database encryption would then provide
 access to any encryption key, and with original archive access it would
 bring access to data of any of the archive added to the database.<br>
       <br>
@@ -1416,7 +1921,8 @@ add and test before you can expect finding it in a released version of
 dar.<br>
       <br>
 In the meanwhile, you can proceed as follows:<br>
-      <ul>
+      </div>
+      <ul style="margin-left: 40px;">
         <li>isolate your encrypted archive to unencrypted 'extracted
 catalogue': Do not use the -K option while isolating, you will however
 need to use the -J option to let dar able to read the encrypted
@@ -1433,7 +1939,8 @@ of your choice,</li>
         <li>change the name and path of the added catalogue to point to
 your real encrypted archives (-b and -p options of dar_manager).</li>
       </ul>
-Note that the database is not encrypted this will expose the archive
+      <div style="margin-left: 40px;">Note that the database is not
+encrypted this will expose the archive
 file listing (not the file's contents) of your encrypted archives to
 anyone able to read the database, thus it is recommended to set
 restrictive permission to this database file.<br>
@@ -1443,7 +1950,8 @@ will have to make dar_manager pass the key to dar for it be able to
 restore the needed files from the archive. This can be done in several
 ways: dar_manager's command-line, dar_manager database or dar.dcf file.
       <br>
-      <ol>
+      </div>
+      <ol style="margin-left: 40px;">
         <li>dar_manager's command-line: simply pass the -e "-K
 &lt;key&gt;" to dar_manager . Note that this will expose the key twice:
 on dar_manager's command-line and on dar's command-line.<br>
@@ -1457,27 +1965,36 @@ better choice. However, if -i option it is a safe way to feed the
 dar_manager database with the '-K &lt;key&gt;' option to be passed to
 dar, this option will be received by dar on command-line. Thus still
 the key will be visible by other users on your same system.</li>
-        <li>The last and best way is to use a DCF file with restrictive
+        <li>A better way is to use a DCF file with restrictive
 permission. This one will receive the '-K &lt;key&gt;' option for dar
 to be able to read the encrypted archives. And dar_manager will ask dar
 to read this file thanks to the '-B &lt;filename&gt;' option you will
 have give either on dar_manager's command-line (-e -B &lt;filename&gt;
-...) or from the stored option in the database (-o -B &lt;filename&gt;).<br>
+...) or from the stored option in the database (-o -B &lt;filename&gt;).</li>
+        <li>The best way is let dar_manager pass the -K option to dar,
+but without password : simply passing the -e "-K :" option to
+dar_manager. When dar will get the -K option with the ":" argument, it
+will dynamically ask for the password and store it in secured memory.<br>
         </li>
+
       </ol>
-note that you must prevent other users reading any file holding the
+      <div style="margin-left: 40px;">note that you must prevent other
+users reading any file holding the
 archive key, this covers the dar_manager database as well as the DCF
 files you could temporarily use. Second note, in this workaround
 approach we have assumed that all encrypted archive do share the same
 key.<br>
+      </div>
       <br>
       <br>
       <span style="font-weight: bold; font-style: italic;">How to <a name="staticOSX"></a>overcome the lack of static linking on MacOS X?</span><br>
       <br>
-The answer comes from Dave Vasilevsky in an email to the dar-support
+      <div style="margin-left: 40px;">The answer comes from Dave
+Vasilevsky in an email to the dar-support
 mailing-list. I let him explain how to do:<br style="font-style: italic;">
       <br style="font-style: italic;">
-      <div style="margin-left: 40px;"><span style="font-style: italic;">Pure-static
+      </div>
+      <div style="margin-left: 80px;"><span style="font-style: italic;">Pure-static
 executables aren't used on OS X.
 However, Mac OS X does have other ways to build portable binaries.
 HOWTO build portable binaries on OS X?</span><br style="font-style: italic;">
@@ -1490,10 +2007,11 @@ libraries that exist on the oldest version of OS X that you care about.
 of Apple's SDKs, for example: </span><br style="font-style: italic;">
       <br style="font-style: italic;">
       </div>
-      <div style="font-style: italic; margin-left: 80px;">export
+      <div style="font-style: italic; margin-left: 120px;">export
 CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.2.8.sdk" <br>
 export LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.2.8.sdk" <br>
       </div>
+      <div style="margin-left: 40px;">
       <div style="margin-left: 40px;"><br style="font-style: italic;">
       <br style="font-style: italic;">
       <span style="font-style: italic;">Second, you have to make sure
@@ -1515,14 +2033,53 @@ therefore you will not be able to save special Mac information like </span><br s
       <span style="font-style: italic;">resource forks. </span><br style="font-style: italic;">
       <span style="font-style: italic;">* To work on both ppc and x86
 Macs, you need to build a universal
-binary. For instructions, use Google </span><img style="font-style: italic;" src="chrome://editor/content/images/smile_n.gif" alt=":-)" class="moz-txt-smily" align="middle" height="19" width="19"><span style="font-style: italic;"> </span><br style="font-style: italic;">
+binary. For instructions, use Google </span>:-)<span style="font-style: italic;"> </span><br style="font-style: italic;">
       <span style="font-style: italic;">* To make a 10.2-compatible
 binary, you must build with GCC 3.3. </span><br style="font-style: italic;">
       <span style="font-style: italic;">* These instructions won't work
 for the 10.1 SDK, that one is harder to
-use. </span><br style="font-style: italic;">
-      </div>
+use. </span><br>
+      <span style="font-style: italic;"></span></div>
+      <span style="font-style: italic;"> <br>
+      <a name="single_slice"></a><br style="font-weight: bold; font-style: italic;">
+      </span></div>
+      <span style="font-weight: bold; font-style: italic;">Why cannot I
+test, extract file, list the contents of a given slice from an archive?</span><br>
       <br>
+      <div style="margin-left: 40px;"> </div>
+      <div style="margin-left: 40px;">Well
+this is due to dar's design. Since release 2.4.0 two feature can help
+you be close to that point, namely --sequential-reading which ask dar
+to read the archive sequentially and -al option which as dar to be
+relaxed on sanity and coherence checks. You can put a single slice into
+a given directory, and create as much empty files as necessary to
+simulate slices of that archive which has lower numbers than the real
+slice(s) that remains of a partially lost archive. Then using
+sequential-reading (--sequential-read option) and laxist mode (-al
+option) you will get to the
+requested information:<br>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: Courier New,Courier,monospace;">mkdir tempo</span><br style="font-family: Courier New,Courier,monospace;">
+      <span style="font-family: Courier New,Courier,monospace;">cd tempo</span><br style="font-family: Courier New,Courier,monospace;">
+      <span style="font-family: Courier New,Courier,monospace;">ln -s ../sowhere/backup.3.dar </span><br style="font-family: Courier New,Courier,monospace;">
+      <span style="font-family: Courier New,Courier,monospace;">touch backup.1.dar</span><br style="font-family: Courier New,Courier,monospace;">
+      <span style="font-family: Courier New,Courier,monospace;">touch backup.2.dar</span><br style="font-family: Courier New,Courier,monospace;">
+      <span style="font-family: Courier New,Courier,monospace;">dar -l backup --sequential-reading -al</span><br>
+      </div>
+<br>
+      </div>
+      <span style="font-weight: bold; font-style: italic;"><a name="merge_two_isolated"></a>Why cannot I merge two isolated
+catalogues?</span><br>
+      <div style="margin-left: 40px;"><br>
+Since version 2.4.0, isolated catalogues can also be used to rescue an
+corrupted internal catalogue of the archive it has been isolated from.
+For that feature be possible, a mecanism let dar know if an given
+isolated catalogue and a given archive correspond to the same contents.
+Merging two isolated catalogues would break this feature as the
+resulting archive would not match any real archive an could only be
+used as reference for a differential backup.<br>
+      <br>
+      </div>
       <span style="font-weight: bold; font-style: italic;"><a name="parallel"></a>Why cannot dar use the full power of my
 multi-processor computer?</span><br>
       <br>
@@ -1622,7 +2179,7 @@ Parallelization is strongly related to the algorithm used, some
 algorithms are well adapted to this operation some others are not.<br>
       </div>
       <br>
-      <span style="font-weight: bold; font-style: italic;"><a name="threadsafe"></a>Is libdar thread-safe, which way you mean it is?<br>
+      <span style="font-weight: bold; font-style: italic;"><a name="threadsafe"></a>Is libdar thread-safe, which way do you mean it is?<br>
       <br>
       </span>
       <div style="margin-left: 40px;">libdar is the part of dar's
@@ -1693,16 +2250,47 @@ gcc compiler has been compiled with C++ support activated, or if you
 are using gcc binary from a distro, double check you have installed the
 C++ support for gcc.<br>
       <br>
+</div><a name="slow"></a><span style="font-weight: bold; font-style: italic;">Why dar became much slower since release 2.4.0 ?</span><br>
+      <div style="margin-left: 40px;">
+      <br>
+This is the drawback of new features!<br>
+      <ul>
+
+        <li>Espetially to be able to read dar archive through pipes in
+sequential mode, dar inserts so-called "escape sequence" to know
+for example when a new file starts. This way dar can skip to the next
+mark upon archive corruption or if the given file has not to be
+restored. However, if such a sequence of byte is found into a file's
+data, it must be modified not to collide with real escape sequences. This implies to dar to inspect all data added to an archive for
+such sequence of byte, instead of just copying the data to the archive (eventually compressing and cyphering it).</li>
+
+        <li>The other feature that brings an important overhead is the
+sparse file detection mechanism. To be able to detect a hole in a file
+and store it into the archive, dar needs here too, to inspect each
+file's data.</li>
+      </ul>
+You can disable both of these features, using respectively the options <span style="font-weight: bold;">-at</span>
+option, which suppress "tape marks" (just another name for escape
+sequences), but does not allow the generated archive to be used in
+sequential read mode, and <span style="font-weight: bold;">-1 0</span>
+option, which completely disables the sparse file detection. The
+execution time becomes back the same as the one of dar 2.3.x releases.<br>
+<br>
       </div>
+
       <span style="font-weight: bold; font-style: italic;"><a name="search_for_questions"></a>How to search for questions (and their answers) about known problems similar to mines?</span><br>
-      <div style="margin-left: 40px;"><br>
-Before sending an email to the dar-support mailing-list, you are asked
-to first look in the already sent email if there your problem has not
-been yet exposed and solved. This will first for you the fastest way to
+      <div style="margin-left: 40px;"><br>Before
+sending an email to the dar-support mailing-list, you are welcome
+to first look in the already sent email if your problem has not yet
+been exposed and solved. This will first for you be the fastest way to
 get an answer to your problem, and for me a way to preserve time for
 development.<br>
       <br>
-But yes, there is now tones of emails to read to have a chance to find the answer to your problem. Hopefully, there is a <a href="http://news.gmane.org/gmane.comp.sysutils.backup.dar.support">search engine at gmane</a> (see the dark green area at the bottom of the page).<br>
+But yes, there is now tones of emails subjects to read to have a chance
+to have a chance to find the answer to your problem. The most simple
+way is to use the <a href="http://news.gmane.org/gmane.comp.sysutils.backup.dar.support">search engine at gmane</a><br>
+      <br>
+Dar-support&nbsp; mailing-list is archived at sourceforge *and* at <a href="http://news.gmane.org/gmane.comp.sysutils.backup.dar.support">gmane.org</a>&nbsp; Only this second archive owns a search engine (look there for the green box at the bottom of the page).<br>
       <br>
 This search engine is available for <a href="http://news.gmane.org/index.php?prefix=gmane.comp.sysutils.backup.dar">all the mailing list archived at gmane</a> used around dar.<br>
       <br>
@@ -1738,9 +2326,6 @@ directory in the backup.<br>
 <br>
 
       </div>
-
-
-
       </td>
     </tr>
   </tbody>
@@ -1750,5 +2335,6 @@ directory in the backup.<br>
 </div>
 </div>
 </center>
+
 
 </body></html>

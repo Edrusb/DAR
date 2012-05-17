@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_tuyau.cpp,v 1.8 2004/06/20 14:26:27 edrusb Rel $
+// $Id: test_tuyau.cpp,v 1.10 2009/12/18 10:10:22 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -67,17 +67,17 @@ using namespace libdar;
 static const unsigned int buffer_size = 10000;
 static bool xmit = true;
 
-static int little_main(user_interaction & dialog, int argc, char *argv[], const char **env);
+static int little_main(user_interaction & dialog, int argc, char * const argv[], const char **env);
 static void action_xmit(user_interaction & dialog, tuyau *in, tuyau *out, U_32 duration);
 static void action_loop(tuyau *in, tuyau *out);
 static void stop_xmit(int l);
 
-int main(int argc, char *argv[])
+int main(int argc, char * const argv[])
 {
     return dar_suite_global(argc, argv, NULL, &little_main);
 }
 
-static int little_main(user_interaction & dialog, int argc, char *argv[], const char **env)
+static int little_main(user_interaction & dialog, int argc, char * const argv[], const char **env)
 {
     tuyau *in = NULL, *out = NULL;
     U_32 duration;

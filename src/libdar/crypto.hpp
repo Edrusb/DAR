@@ -16,23 +16,24 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: crypto.hpp,v 1.8.2.3 2008/05/09 20:58:27 edrusb Rel $
+// $Id: crypto.hpp,v 1.21 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 //
 
     /// \file crypto.hpp
     /// \brief the crypto algoritm definition
+    /// \ingroup Private
 
 #ifndef CRYPTO_HPP
 #define CRYPTO_HPP
 
 extern "C"
 {
-#if HAVE_OPENSSL_BLOWFISH_H
-#include <openssl/blowfish.h>
+#if HAVE_GCRYPT_H
+#include <gcrypt.h>
 #endif
 }
 
@@ -41,6 +42,7 @@ extern "C"
 
 #include "tronconneuse.hpp"
 #include "header_version.hpp"
+#include "secu_string.hpp"
 
 namespace libdar
 {
@@ -54,21 +56,34 @@ namespace libdar
 	crypto_none,          ///< no encryption
 	crypto_scrambling,    ///< scrambling weak encryption
 	crypto_blowfish,      ///< blowfish strong encryption
-	crypto_blowfish_weak  ///< blowfish strong encryption old implementation with frequent IV collision (=weakness)
+	crypto_aes256,        ///< AES 256 strong encryption
+	crypto_twofish256,    ///< twofish 256 strong encryption
+	crypto_serpent256,    ///< serpent 256 strong encryption
+	crypto_camellia256    ///< camellia 256 strong encryption
     };
 
-    extern void crypto_split_algo_pass(const std::string & all, crypto_algo & algo, std::string & pass);
+	/// \ingroup Private
+	/// @}
 
-	/// blowfish implementation of encryption
+    extern void crypto_split_algo_pass(const secu_string & all, crypto_algo & algo, secu_string & pass);
+
+
+	/// implementation of encryption using symetrical cryptography used in libgcrypt (among which is blowfish)
+	//
+	//
 
 	/// inherited class from tronconneuse class
 	/// \ingroup Private
-    class blowfish : public tronconneuse
+    class crypto_sym : public tronconneuse
     {
     public:
-	blowfish(user_interaction & dialog, U_32 block_size, const std::string & password, generic_file & encrypted_side,
-		 const dar_version & reading_ver, bool weak_mode);
-	    // destructor does not seems to be required for BF_KEY
+	crypto_sym(U_32 block_size,
+		   const secu_string & password,
+		   generic_file & encrypted_side,
+		   bool no_initial_shift,
+		   const archive_version & reading_ver,
+		   crypto_algo algo); //< must be a symetrical algo (else an exception is thrown)
+	~crypto_sym() { detruit(); };
 
     protected:
 	U_32 encrypted_block_size_for(U_32 clear_block_size);
@@ -81,21 +96,26 @@ namespace libdar
 			  char *clear_buf, U_32 clear_size);
 
     private:
-#if HAVE_OPENSSL_BLOWFISH_H
-	BF_KEY clef;       //< used to encrypt/decrypt the data
-	BF_KEY essiv_clef; //< used to build the Initialization Vector
+#if CRYPTO_AVAILABLE
+	gcry_cipher_hd_t clef;       //< used to encrypt/decrypt the data
+	gcry_cipher_hd_t essiv_clef; //< used to build the Initialization Vector
 #endif
-	bool x_weak_mode;
-	dar_version reading_version;
+	size_t algo_block_size;         //< the block size of the algorithm
+	unsigned char *ivec;            //< algo_block_size allocated in secure memory to be used as Initial Vector
+	U_I algo_id;                    //< algo ID in libgcrypt
+	archive_version reading_version;
 
-	void make_ivec(const infinint & ref, unsigned char ivec[8]);
-	std::string pkcs5_pass2key(const std::string & password,         //< human provided password
+	secu_string pkcs5_pass2key(const secu_string & password,         //< human provided password
 				   const std::string & salt,             //< salt string
 				   U_I iteration_count,                  //< number of time to shake the melange
 				   U_I output_length);                   //< length of the string to return
-	void dar_set_key(const std::string & key);                       //< assign both keys from the given (hash) string
+	void dar_set_essiv(const secu_string & key);                     //< assign essiv from the given (hash) string
+	void make_ivec(const infinint & ref, unsigned char *ivec, U_I size);
 	void self_test(void);
+	void detruit();
     };
+
+	/// @}
 
 } // end of namespace
 

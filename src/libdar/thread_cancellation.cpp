@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: thread_cancellation.cpp,v 1.4.2.4 2008/02/09 17:41:30 edrusb Rel $
+// $Id: thread_cancellation.cpp,v 1.11 2011/01/07 19:53:16 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -40,7 +40,7 @@ extern "C"
 #include "tools.hpp"
 
 #define CRITICAL_START if(!initialized)                                     \
-             throw Elibcall("thread_cancellation", gettext("Thread-safe not initialized for libdar, read manual or contact maintainer of the application that uses libdar")); \
+             throw Elibcall("thread_cancellation", dar_gettext("Thread-safe not initialized for libdar, read manual or contact maintainer of the application that uses libdar")); \
              sigset_t Critical_section_mask_memory;                         \
              tools_block_all_signals(Critical_section_mask_memory);         \
              pthread_mutex_lock(&access)
@@ -176,7 +176,7 @@ namespace libdar
 	if(!initialized)
 	{
 	    if(pthread_mutex_init(&access, NULL) < 0)
-		throw Erange("thread_cancellation::init", string(gettext("Cannot initialize mutex: ")) + strerror(errno));
+		throw Erange("thread_cancellation::init", string(dar_gettext("Cannot initialize mutex: ")) + strerror(errno));
 	    initialized = true;
 	}
 #endif
@@ -233,7 +233,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: thread_cancellation.cpp,v 1.4.2.4 2008/02/09 17:41:30 edrusb Rel $";
+	static char id[]="$Id: thread_cancellation.cpp,v 1.11 2011/01/07 19:53:16 edrusb Rel $";
 	dummy_call(id);
     }
 
@@ -270,7 +270,6 @@ namespace libdar
 
 	return ret;
     }
-
 
     bool thread_cancellation::clear_pending_request(pthread_t tid)
     {

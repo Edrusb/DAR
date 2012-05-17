@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.26.2.6 2010/02/23 18:27:41 edrusb Rel $
+// $Id: generic_file.cpp,v 1.46 2011/04/17 13:12:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -70,7 +70,6 @@ char *strchr (), *strrchr ();
 #include "generic_file.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
-#include "user_interaction.hpp"
 #include "cygwin_adapt.hpp"
 #include "int_tools.hpp"
 
@@ -90,68 +89,62 @@ using namespace std;
 namespace libdar
 {
 
-    void clear(crc & value)
+    void generic_file::terminate() const
     {
-	memset(value, '\0', CRC_SIZE);
+	generic_file *ceci = const_cast<generic_file *>(this);
+	try
+	{
+	    if(!terminated)
+		ceci->inherited_terminate();
+	}
+	catch(...)
+	{
+	    ceci->terminated = true;
+	    throw;
+	}
+	ceci->terminated = true;
     }
 
-    bool same_crc(const crc &a, const crc &b)
+    U_I generic_file::read(char *a, U_I size)
     {
-	S_I i = 0;
-	while(i < CRC_SIZE && a[i] == b[i])
-            ++i;
-        return i == CRC_SIZE;
-    }
-
-    void copy_crc(crc & dst, const crc & src)
-    {
-	memcpy(dst, src, CRC_SIZE);
-    }
-
-    string crc2str(const crc & a)
-    {
-	ostringstream ret;
-
-	if(CRC_SIZE < 2)
+	if(terminated)
 	    throw SRC_BUG;
 
-	ret << hex << (((unsigned char)(a[0]) & 0xF0) >> 4);
-	ret << hex << ((unsigned char)(a[0]) & 0x0F);
-	ret << hex << (((unsigned char)(a[1]) & 0xF0) >> 4);
-	ret << hex << ((unsigned char)(a[1]) & 0x0F);
-
-	return ret.str();
-    }
-
-    S_I generic_file::read(char *a, size_t size)
-    {
         if(rw == gf_write_only)
             throw Erange("generic_file::read", gettext("Reading a write only generic_file"));
         else
             return (this->*active_read)(a, size);
     }
 
-    S_I generic_file::write(const char *a, size_t size)
+    void generic_file::write(const char *a, U_I size)
     {
+	if(terminated)
+	    throw SRC_BUG;
         if(rw == gf_read_only)
             throw Erange("generic_file::write", gettext("Writing to a read only generic_file"));
         else
-            return (this->*active_write)(a, size);
+            (this->*active_write)(a, size);
     }
 
-    S_I generic_file::write(const string & arg)
+    void generic_file::write(const string & arg)
     {
-        if(arg.size() > int_tools_maxof_agregate(size_t(0)))
+	if(terminated)
+	    throw SRC_BUG;
+
+        if(arg.size() > int_tools_maxof_agregate(U_I(0)))
             throw SRC_BUG;
 
-        return write(arg.c_str(), arg.size());
+        write(arg.c_str(), arg.size());
     }
 
     S_I generic_file::read_back(char &a)
     {
+	if(terminated)
+	    throw SRC_BUG;
+
         if(skip_relative(-1))
         {
-            S_I ret = read(&a,1);
+            U_I ret = read(&a,1);
             skip_relative(-1);
             return ret;
         }
@@ -162,7 +155,10 @@ namespace libdar
     void generic_file::copy_to(generic_file & ref)
     {
         char buffer[BUFFER_SIZE];
-        S_I lu, ret = 0;
+        U_I lu;
+
+	if(terminated)
+	    throw SRC_BUG;
 
         do
         {
@@ -179,7 +175,7 @@ namespace libdar
 	    {
 		try
 		{
-		    ret = ref.write(buffer, lu);
+		    ref.write(buffer, lu);
 		}
 		catch(Egeneric & e)
 		{
@@ -188,12 +184,15 @@ namespace libdar
 		}
 	    }
         }
-        while(lu > 0 && ret > 0);
+        while(lu > 0);
     }
 
     void generic_file::copy_to(generic_file & ref, crc & value)
     {
-        reset_crc();
+	if(terminated)
+	    throw SRC_BUG;
+
+        reset_crc(value.get_size());
         copy_to(ref);
         get_crc(value);
     }
@@ -201,10 +200,13 @@ namespace libdar
     U_32 generic_file::copy_to(generic_file & ref, U_32 size)
     {
         char buffer[BUFFER_SIZE];
-        S_I lu = 1, ret = 1, pas;
+        S_I lu = 1, pas;
         U_32 wrote = 0;
 
-        while(wrote < size && ret > 0 && lu > 0)
+	if(terminated)
+	    throw SRC_BUG;
+
+        while(wrote < size && lu > 0)
         {
             pas = size > BUFFER_SIZE ? BUFFER_SIZE : size;
 	    try
@@ -220,7 +222,7 @@ namespace libdar
             {
 		try
 		{
-		    ret = ref.write(buffer, lu);
+		    ref.write(buffer, lu);
 		}
 		catch(Egeneric & e)
 		{
@@ -239,6 +241,9 @@ namespace libdar
         U_32 tmp = 0, delta;
         infinint wrote = 0;
 
+	if(terminated)
+	    throw SRC_BUG;
+
         size.unstack(tmp);
 
         do
@@ -254,28 +259,34 @@ namespace libdar
         return wrote;
     }
 
-    bool generic_file::diff(generic_file & f)
+    bool generic_file::diff(generic_file & f, crc & value)
     {
         char buffer1[BUFFER_SIZE];
         char buffer2[BUFFER_SIZE];
-        S_I lu1 = 0, lu2 = 0;
+        U_I lu1 = 0, lu2 = 0;
         bool diff = false;
+
+	if(terminated)
+	    throw SRC_BUG;
 
         if(get_mode() == gf_write_only || f.get_mode() == gf_write_only)
             throw Erange("generic_file::diff", gettext("Cannot compare files in write only mode"));
         skip(0);
         f.skip(0);
+	value.clear();
         do
         {
             lu1 = read(buffer1, BUFFER_SIZE);
             lu2 = f.read(buffer2, BUFFER_SIZE);
             if(lu1 == lu2)
             {
-                register S_I i = 0;
+                register U_I i = 0;
                 while(i < lu1 && buffer1[i] == buffer2[i])
                     ++i;
                 if(i < lu1)
                     diff = true;
+		else
+		    value.compute(buffer1, lu1);
             }
             else
                 diff = true;
@@ -285,17 +296,33 @@ namespace libdar
         return diff;
     }
 
-    void generic_file::reset_crc()
+    void generic_file::sync_write()
     {
+	if(terminated)
+	    throw SRC_BUG;
+
+	if(rw == gf_write_only || rw == gf_read_write)
+	    inherited_sync_write();
+	else
+	    throw Erange("generic_file::read", gettext("Cannot sync write on a read-only generic_file"));
+    }
+
+    void generic_file::reset_crc(const infinint & width)
+    {
+	if(terminated)
+	    throw SRC_BUG;
+
         if(active_read == &generic_file::read_crc)
             throw SRC_BUG; // crc still active, previous CRC value never read
-        clear(value);
         enable_crc(true);
-        crc_offset = 0;
+	checksum.resize(width);
     }
 
     void generic_file::enable_crc(bool mode)
     {
+	if(terminated)
+	    throw SRC_BUG;
+
         if(mode) // routines with crc features
         {
             active_read = &generic_file::read_crc;
@@ -308,274 +335,49 @@ namespace libdar
         }
     }
 
-    void generic_file::compute_crc(const char *a, S_I size)
+    U_I generic_file::read_crc(char *a, U_I size)
     {
-	S_I initial = crc_offset == 0 ? 0 : CRC_SIZE - crc_offset;
-	S_I final = size < initial ? 0 : ((size - initial) / CRC_SIZE)*CRC_SIZE + initial;
-	S_I i;
-	S_I index = crc_offset;
+	if(terminated)
+	    throw SRC_BUG;
+	else
+	{
+	    S_I ret = inherited_read(a, size);
+	    checksum.compute(a, ret);
+	    return ret;
+	}
+    }
 
-	    // initial bytes
-	if(initial > size)
-	    initial = size;
-
-	for(i = 0; i < initial; ++i, ++index)
-	    value[index % CRC_SIZE] ^= a[i];
-
-
-	    // block bytes
-
-	register U_16 *bcrc = (U_16 *)(&value);
-	register U_16 *blck = (U_16 *)(a + initial);
-	register U_16 *stop = (U_16 *)(a + final);
-
-	if(sizeof(*blck) != CRC_SIZE)
+    void generic_file::write_crc(const char *a, U_I size)
+    {
+	if(terminated)
 	    throw SRC_BUG;
 
-	while(blck < stop)
-	{
-	    *bcrc ^= *blck;
-	    ++blck;
-	}
-
-
-	    // final bytes
-
-	index = 0;
-	for(i = final; i < size; ++i, ++index)
-	    value[index % CRC_SIZE] ^= a[i];
-
-	crc_offset = (crc_offset + size) % CRC_SIZE;
-    }
-
-    S_I generic_file::read_crc(char *a, size_t size)
-    {
-        S_I ret = inherited_read(a, size);
-        compute_crc(a, ret);
-        return ret;
-    }
-
-    S_I generic_file::write_crc(const char *a, size_t size)
-    {
-        S_I ret = inherited_write(a, size);
-        compute_crc(a, ret);
-        return ret;
+        inherited_write(a, size);
+	checksum.compute(a, size);
     }
 
     void generic_file::copy_from(const generic_file & ref)
     {
+	if(terminated)
+	    throw SRC_BUG;
+
 	rw = ref.rw;
-	copy_crc(value, ref.value);
-	crc_offset = ref.crc_offset;
-	gf_ui = ref.gf_ui->clone();
+	checksum = ref.checksum;
+	terminated = ref.terminated;
+	active_read = ref.active_read;
+	active_write = ref.active_write;
     }
 
-    fichier::fichier(user_interaction & dialog, S_I fd) : generic_file(dialog, generic_file_get_mode(fd))
-    {
-        filedesc = fd;
-    }
-
-    fichier::fichier(user_interaction & dialog, const char *name, gf_mode m) : generic_file(dialog, m)
-    {
-        fichier::open(name, m);
-    }
-
-    fichier::fichier(user_interaction & dialog, const path &chemin, gf_mode m) : generic_file(dialog, m)
-    {
-        open(chemin.display().c_str(), m);
-    }
-
-    infinint fichier::get_size() const
-    {
-        struct stat dat;
-        infinint filesize;
-
-        if(filedesc < 0)
-            throw SRC_BUG;
-
-        if(fstat(filedesc, &dat) < 0)
-            throw Erange("fichier::get_size()", string(gettext("Error getting size of file: ")) + strerror(errno));
-        else
-            filesize = dat.st_size;
-
-        return filesize;
-    }
-
-    bool fichier::skip(const infinint &q)
-    {
-        off_t delta;
-        infinint pos = q;
-        if(lseek(filedesc, 0, SEEK_SET) < 0)
-            return false;
-
-        do
-	{
-            delta = 0;
-            pos.unstack(delta);
-            if(delta > 0)
-                if(lseek(filedesc, delta, SEEK_CUR) < 0)
-                    return false;
-        } while(delta > 0);
-
-        return true;
-    }
-
-    bool fichier::skip_to_eof()
-    {
-        return lseek(filedesc, 0, SEEK_END) >= 0;
-    }
-
-    bool fichier::skip_relative(S_I x)
-    {
-        if(x > 0)
-	{
-            if(lseek(filedesc, x, SEEK_CUR) < 0)
-                return false;
-            else
-                return true;
-	}
-
-        if(x < 0)
-        {
-            bool ret = true;
-            off_t actu = lseek(filedesc, 0, SEEK_CUR);
-
-            if(actu < -x)
-            {
-                actu = 0;
-                ret = false;
-            }
-            else
-                actu += x; // x is negative
-            if(lseek(filedesc, actu, SEEK_SET) < 0)
-                ret = false;
-
-            return ret;
-        }
-
-        return true;
-    }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.26.2.6 2010/02/23 18:27:41 edrusb Rel $";
+        static char id[]="$Id: generic_file.cpp,v 1.46 2011/04/17 13:12:29 edrusb Rel $";
         dummy_call(id);
-    }
-
-    infinint fichier::get_position()
-    {
-        off_t ret = lseek(filedesc, 0, SEEK_CUR);
-
-        if(ret == -1)
-            throw Erange("fichier::get_position", string(gettext("Error getting file reading position: ")) + strerror(errno));
-
-        return ret;
-    }
-
-    S_I fichier::inherited_read(char *a, size_t size)
-    {
-        S_I ret;
-        U_I lu = 0;
-
-#ifdef MUTEX_WORKS
-	check_self_cancellation();
-#endif
-        do
-        {
-            ret = ::read(filedesc, a+lu, size-lu);
-            if(ret < 0)
-            {
-                switch(errno)
-                {
-                case EINTR:
-                    break;
-                case EAGAIN:
-                    throw SRC_BUG; // non blocking read not compatible with
-                        // generic_file
-                case EIO:
-                    throw Ehardware("fichier::inherited_read", string(gettext("Error while reading from file: ")) + strerror(errno));
-                default :
-                    throw Erange("fichier::inherited_read", string(gettext("Error while reading from file: ")) + strerror(errno));
-                }
-            }
-            else
-                lu += ret;
-        }
-        while(lu < size && ret != 0);
-
-        return lu;
-    }
-
-    S_I fichier::inherited_write(const char *a, size_t size)
-    {
-        S_I ret;
-        size_t total = 0;
-
-#ifdef MUTEX_WORKS
-	check_self_cancellation();
-#endif
-        while(total < size)
-        {
-            ret = ::write(filedesc, a+total, size-total);
-            if(ret < 0)
-            {
-                switch(errno)
-                {
-                case EINTR:
-                    break;
-                case EIO:
-                    throw Ehardware("fichier::inherited_write", string(gettext("Error while writing to file: ")) + strerror(errno));
-                case ENOSPC:
-                    get_gf_ui().pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
-                    break;
-                default :
-                    throw Erange("fichier::inherited_write", string(gettext("Error while writing to file: ")) + strerror(errno));
-                }
-            }
-            else
-                total += ret;
-        }
-
-        return total;
-    }
-
-    void fichier::open(const char *name, gf_mode m)
-    {
-        S_I mode;
-        S_I perm = 0777;
-
-        switch(m)
-        {
-        case gf_read_only :
-            mode = O_RDONLY;
-            break;
-        case gf_write_only :
-            mode = O_WRONLY|O_CREAT;
-            break;
-        case gf_read_write :
-            mode = O_RDWR|O_CREAT;
-            break;
-        default:
-            throw SRC_BUG;
-        }
-
-        do
-        {
-            filedesc = ::open(name, mode|O_BINARY, perm);
-            if(filedesc < 0)
-	    {
-                if(errno == ENOSPC)
-                    get_gf_ui().pause(gettext("No space left for inode, you have the opportunity to make some room now. When done : can we continue ?"));
-                else
-                    throw Erange("fichier::open", string(gettext("Cannot open file : ")) + strerror(errno));
-	    }
-        }
-        while(filedesc < 0 && errno == ENOSPC);
     }
 
     gf_mode generic_file_get_mode(S_I fd)
     {
-        S_I flags = fcntl(fd, F_GETFL) & O_ACCMODE;
+	S_I flags = fcntl(fd, F_GETFL) & O_ACCMODE;
         gf_mode ret;
 
         switch(flags)

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: statistics.cpp,v 1.5.2.3 2008/02/09 17:41:29 edrusb Rel $
+// $Id: statistics.cpp,v 1.14 2011/05/20 10:23:07 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -50,11 +50,11 @@ namespace libdar
 	if(locking)
 	{
 	    LOCK_IN;
-	    treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = 0;
+	    treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = byte_amount = 0;
 	    LOCK_OUT;
 	}
 	else
-	    treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = 0;
+	    treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = byte_amount = 0;
     }
 
     infinint statistics::total() const
@@ -81,7 +81,7 @@ namespace libdar
 #if MUTEX_WORKS
 	if(locking)
 	    if(pthread_mutex_init(&lock_mutex, NULL) < 0)
-		throw Erange("statistics::statistics", string(gettext("Error while initializing mutex for class statistics: ")) + strerror(errno));
+		throw Erange("statistics::statistics", string(dar_gettext("Error while initializing \"mutex\" for class \"statistics\": ")) + strerror(errno));
 #else
 	if(locking)
 	    throw Ecompilation("Thread support not activated, cannot use statistics object with lock activated");
@@ -91,12 +91,18 @@ namespace libdar
 	    increment = & statistics::increment_locked;
 	    add_to = & statistics::add_to_locked;
 	    returned = & statistics::returned_locked;
+	    decrement = & statistics::decrement_locked;
+	    set_to = & statistics::set_to_locked;
+	    sub_from = & statistics::sub_from_locked;
 	}
 	else
 	{
 	    increment = & statistics::increment_unlocked;
 	    add_to = & statistics::add_to_unlocked;
 	    returned = & statistics::returned_unlocked;
+	    decrement = & statistics::decrement_unlocked;
+	    set_to = & statistics::set_to_unlocked;
+	    sub_from = & statistics::sub_from_unlocked;
 	}
     }
 
@@ -111,7 +117,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: statistics.cpp,v 1.5.2.3 2008/02/09 17:41:29 edrusb Rel $";
+        static char id[]="$Id: statistics.cpp,v 1.14 2011/05/20 10:23:07 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -127,6 +133,23 @@ namespace libdar
 	errored = ref.errored;
 	deleted = ref.deleted;
 	ea_treated = ref.ea_treated;
+	byte_amount = ref.byte_amount;
+    }
+
+    void statistics::dump(user_interaction & dialog) const
+    {
+	dialog.printf("--------- Statistics DUMP ----------");
+	dialog.printf("locking = %c", locking ? 'y' : 'n');
+	dialog.printf("treated = %i", &treated);
+	dialog.printf("hard_links = %i", &hard_links);
+	dialog.printf("skipped = %i", &skipped);
+	dialog.printf("ignored = %i", &ignored);
+	dialog.printf("tooold = %i", &tooold);
+	dialog.printf("errored = %i", &errored);
+	dialog.printf("deleted = %i", &deleted);
+	dialog.printf("ea_treated = %i", &ea_treated);
+	dialog.printf("byte_amount = %i", &byte_amount);
+	dialog.printf("------------------------------------");
     }
 
 

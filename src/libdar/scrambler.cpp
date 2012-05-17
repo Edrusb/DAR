@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: scrambler.cpp,v 1.11.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: scrambler.cpp,v 1.18 2010/08/31 20:45:04 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -31,27 +31,29 @@ using namespace std;
 namespace libdar
 {
 
-    scrambler::scrambler(user_interaction & dialog, const string & pass, generic_file & hidden_side) : generic_file(dialog, hidden_side.get_mode())
+    scrambler::scrambler(const secu_string & pass, generic_file & hidden_side) : generic_file(hidden_side.get_mode())
     {
-        if(pass == "")
+        if(pass.size() == 0)
             throw Erange("scrambler::scrambler", gettext("Key cannot be an empty string"));
-        key = pass;
+        key = pass.c_str();
+	    // here aboce we've convert a secured data to unsecured data, but due to the weakness of the scrambling algo,
+	    // this does not open any security breach...
         len = pass.size();
         ref = & hidden_side;
         buffer = NULL;
         buf_size = 0;
     }
 
-    S_I scrambler::inherited_read(char *a, size_t size)
+    U_I scrambler::inherited_read(char *a, U_I size)
     {
-        unsigned char *ptr = (unsigned char *)a;
         if(ref == NULL)
             throw SRC_BUG;
 
+        unsigned char *ptr = (unsigned char *)a;
         U_32 index = ref->get_position() % len;
-        S_I ret = ref->read(a, size);
+        U_I ret = ref->read(a, size);
 
-        for(register S_I i = 0; i < ret; ++i)
+        for(register U_I i = 0; i < ret; ++i)
         {
             ptr[i] = ((S_I)(ptr[i]) - (unsigned char)(key[index])) % 256;
             index = (index + 1)%len;
@@ -59,7 +61,7 @@ namespace libdar
         return ret;
     }
 
-    S_I scrambler::inherited_write(const char *a, size_t size)
+    void scrambler::inherited_write(const char *a, U_I size)
     {
         const unsigned char *ptr = (const unsigned char *)a;
         if(ref == NULL)
@@ -83,19 +85,19 @@ namespace libdar
             }
         }
 
-        for(register size_t i = 0; i < size; ++i)
+        for(register U_I i = 0; i < size; ++i)
         {
             buffer[i] = (ptr[i] + (unsigned char)(key[index])) % 256;
             index = (index + 1)%len;
         }
 
-        return ref->write((char *)buffer, size);
+        ref->write((char *)buffer, size);
     }
 
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: scrambler.cpp,v 1.11.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: scrambler.cpp,v 1.18 2010/08/31 20:45:04 edrusb Rel $";
         dummy_call(id);
     }
 

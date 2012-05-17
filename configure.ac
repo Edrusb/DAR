@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.3.12], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.4.0], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -9,6 +9,7 @@ AC_DEFINE_UNQUOTED(DAR_VERSION, "AC_PACKAGE_VERSION", [dar and dar_suite version
 AM_INIT_AUTOMAKE
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION
+XGETTEXT_EXTRA_OPTIONS='--keyword=dar_gettext'
 AM_ICONV
 
 # Checks for programs.
@@ -18,12 +19,18 @@ AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+AC_MSG_CHECKING([for C++ compiler usability])
+AC_COMPILE_IFELSE(AC_LANG_PROGRAM([],
+                                  [ class test { public: int test; }; ]),
+                  [AC_MSG_RESULT(ok)],
+                  [AC_MSG_ERROR([No C++ compiler found])])
+
 # Checks for libraries.
 AC_CHECK_LIB(socket, [socket], [], [])
 AC_CHECK_LIB(nsl, [endnetconfig], [], [])
 
 AC_ARG_ENABLE( [libdl-linking],
-	       AC_HELP_STRING(--disable-libdl-linking, [ignore any libdl and avoid linking against it]),
+               AC_HELP_STRING(--disable-libdl-linking, [ignore any libdl and avoid linking against it]),
                [],
                [
                  AC_CHECK_LIB(dl, [dlsym], [], [])
@@ -35,7 +42,7 @@ AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 
 
-AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h openssl/blowfish.h limits.h openssl/evp.h openssl/hmac.h stddef.h])
+AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h])
 
 
 AC_SYS_LARGEFILE
@@ -64,7 +71,7 @@ AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_UTIME_NULL
 AC_HEADER_TIME
-AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror utime])
+AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror utime fdopendir])
 
 AC_MSG_CHECKING([for getopt() in <unistd.h>])
 AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
@@ -95,9 +102,9 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
 
 AC_MSG_CHECKING([for optreset presence])
 AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
-		  	           #if HAVE_STDIO_H
+		                   #if HAVE_STDIO_H
 				   #include <stdio.h>
- 				   #endif
+				   #endif
                                    #if HAVE_GETOPT_H
                                    #include <getopt.h>
                                    #else
@@ -112,6 +119,26 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
                   ],
                   [AC_MSG_RESULT([not available])])
 
+AC_MSG_CHECKING([for Door file support])
+AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+		 	            #if HAVE_SYS_STAT_H
+				    #include <sys/stat.h>
+				    #endif
+				    #if HAVE_UNISTD_H
+				    #include <unistd.h>
+				    #endif
+				  }]],
+				  [ struct stat buf;
+				    if(S_ISDOOR(buf.st_mode))
+				      return 0;
+				    else
+				      return 1;
+				  ]),
+		  [
+		    AC_DEFINE(HAVE_DOOR, 1, [whether the system has the necessary routine to handle Door files])
+		    AC_MSG_RESULT(available)
+		  ],
+		  [AC_MSG_RESULT([not available])])
 
 # DAR's features
 
@@ -178,55 +205,85 @@ AC_ARG_ENABLE( [libbz2-linking],
              fi
            ])
 
+AC_ARG_ENABLE( [liblzo2-linking],
+               AC_HELP_STRING(--disable-liblzo2-linking, [disable linking with liblzo2 and disables lzo compression support]),
+            [
+             AC_MSG_WARN([lzo compression support has been disabled by user])
+             local_liblzo2="no"
+            ],
+            [
+  	     AC_CHECK_LIB(lzo2, [lzo1x_1_compress], [], [AC_MSG_WARN([library liblzo2 not found])])
+	     AC_CHECK_HEADER(lzo/lzo1x.h, [local_liblzo2="yes"
+                                       AC_DEFINE(HAVE_LZO_LZO1X_H, 1, [lzo/lzo1x.h header file is available])
+                                      ],
+		 	              [AC_MSG_WARN([Cannot find lzo/lzo1x.h header file])
+                                       local_liblzo2="no"
+                                      ])
+              if test "$local_liblzo2" = "yes" ; then
+                 AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
+                                                       #if HAVE_LZO_LZO1X_H
+                                                       #include <lzo/lzo1x.h>
+                                                       #endif
+                                              }]],
+                                              [[
+						        int x = lzo1x_1_compress(0, 0, 0, 0, 0);
+                                              ]]),
+                                              [ AC_DEFINE(LIBLZO2_AVAILABLE, 1, [header and linking is available to have lzo functions])],
+                                              [ local_liblzo2="no" ])
+             else
+                AC_MSG_WARN([lzo compression support not available])
+             fi
+           ])
 
-AC_ARG_ENABLE( [libcrypto-linking],
-               AC_HELP_STRING(--disable-libcrypto-linking, [disable linking with libcrypto (openssl) and disables strong encryption support]),
+
+
+AC_ARG_ENABLE( [libgcrypt-linking],
+               AC_HELP_STRING(--disable-libgcrypt-linking, [disable linking with libgcrypt which disables strong encryption support]),
             [
              AC_MSG_WARN([strong encryption support has been disabled by user])
              local_crypto="no"
             ],
             [
-              AC_CHECK_LIB(crypto, [BF_encrypt], [], [])
-	      AC_CHECK_HEADER(openssl/crypto.h, [local_crypto="yes"
-                                                AC_DEFINE(HAVE_OPENSSL_CRYPTO_H, 1, [openssl/crypto.h header file is available])
-                                                ],
-                                                [AC_MSG_WARN([Cannt find openssl/crypto.h header file])
-                                                 local_crypto="no"
-                                                ])
+              AC_CHECK_LIB(gpg-error, [gpg_err_init], [], [])
+              AC_CHECK_LIB(gcrypt, [gcry_check_version], [], [])
+	      AC_CHECK_HEADER(gcrypt.h, [local_crypto="yes"
+                                         AC_DEFINE(HAVE_GCRYPT_H, 1, [gcrypt.h header file is available])
+                                        ],
+                                        [AC_MSG_WARN([Cannt find gcrypt.h header file])
+                                         local_crypto="no"
+                                        ])
               if test "$local_crypto" = "yes" ; then
-                 AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
-                                                       #if HAVE_OPENSSL_CRYPTO_H
-                                                       #include <openssl/crypto.h>
+                 AC_DEFINE(MIN_VERSION_GCRYPT, "1.4.0", [libgcrypt minimum version])
+		 AC_MSG_CHECKING([for libgcrypt usability])
+                 AC_RUN_IFELSE(AC_LANG_PROGRAM([[ extern "C"
+		 				  {
+                                                       #if HAVE_GCRYPT_H
+                                                       #include <gcrypt.h>
                                                        #endif
-						       #if HAVE_OPENSSL_BLOWFISH_H
-						       #include <openssl/blowfish.h>
-						       #endif
-                                              }]],
+                                                  }
+						  #include <iostream>
+						  using namespace std;
+					      ]],
                                               [[
-							BF_encrypt((unsigned int *)0, (const BF_KEY*)0);
+						 if(!gcry_check_version(MIN_VERSION_GCRYPT))
+						 {
+						   cout << "ligcrypt version too low, minimum version is " << MIN_VERSION_GCRYPT << endl;
+                                                   exit(1);
+						 }
+                                                 else
+  						   exit(0);
                                               ]]),
-                                              [ AC_DEFINE(CRYPTO_AVAILABLE, 1, [header and linking is available to have strong encryption functions])],
-                                              [ local_crypto="no" ])
-		AC_MSG_CHECKING([prerequisits for full blowfish implementation])
-                AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
-							#if HAVE_OPENSSL_EVP_H
-							#include <openssl/evp.h>
-							#endif
-							#if HAVE_OPENSSL_HMAC_H
-							#include <openssl/hmac.h>
-							#endif
-						}]],
-						[[
-                                                    const EVP_MD *digest = EVP_sha1();
-						    HMAC_CTX hmac;
-						    EVP_MD_size(digest);
-						    HMAC_CTX_init(&hmac);
-                                                ]]),
-						[ AC_DEFINE(CRYPTO_FULL_BF_AVAILABLE, 1, [whether header and linking for new and better blowfish implementation is available])
-						  local_crypto_full_bf="yes"
-                                                  AC_MSG_RESULT(available)  ],
-						[ local_crypto_full_bf="no"
-                                                  AC_MSG_RESULT(not met)    ])
+                                              [ AC_DEFINE(CRYPTO_AVAILABLE, 1, [header and linking is available to have strong encryption works])
+					        AC_MSG_RESULT([ok])
+					      ],
+					      [
+					         if test "$?" = "1" ; then
+						   AC_MSG_RESULT([failed: need libgcypt >= MIN_VERSION_GCRYPT, disabling strong encryption support])
+						 else
+ 						   AC_MSG_RESULT([failed: libgcrypt is unusable, cannot even call gcry_check_version(). Disabling strong encryption support])
+						 fi
+						 local_crypto="yes"
+					      ])
              else
                 AC_MSG_WARN([strong encryption support not available])
              fi
@@ -320,10 +377,9 @@ AC_ARG_ENABLE(  [gnugetopt],
                 AC_CHECK_LIB(gnugetopt, [getopt_long], [], [])
              )
 
-
 AC_MSG_CHECKING([for getopt() availability]);
 AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
-				   #if HAVE_STDIO_H
+		                   #if HAVE_STDIO_H
 				   #include <stdio.h>
 				   #endif
                                    #if HAVE_GETOPT_H
@@ -341,6 +397,9 @@ AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
 
 AC_MSG_CHECKING([for getopt_long() availability]);
 AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+		                   #if HAVE_STDIO_H
+				   #include <stdio.h>
+				   #endif
                                    #if HAVE_GETOPT_H
                                    #include <getopt.h>
                                    #else
@@ -389,6 +448,48 @@ AC_ARG_ENABLE( [mode],
                 AC_HELP_STRING(--enable-mode=arg, [where arg is 32 or 64. Makes dar internally use 32 bits or 64 bits integers in place of infinint (which is the case if this option is not given)]),
                 [build_mode=$enableval],
                 [])
+
+AC_ARG_ENABLE( [furtive-read],
+	       AC_HELP_STRING(--disable-furtive-read,
+      	                      [Ignore furtive read mode availability on systems that support it]),
+	       [ local_furtive_read_mode="no"
+	         AC_MSG_WARN([Furtive read mode disabled])
+               ],
+               [ AC_MSG_CHECKING([furtive read mode availability])
+                 AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
+					         #if HAVE_SYS_TYPE_H
+						 #include <sys/types.h>
+						 #endif
+						 #if HAVE_SYS_STAT_H
+						 #include <sys/stat.h>
+						 #endif
+						 #if HAVE_FCNTL_H
+						 #include <fcntl.h>
+						 #endif
+						 #if HAVE_DIRENT_H
+						 #include <dirent.h>
+						 #endif
+						 }
+						 ]],
+						 [[
+						 int x = O_NOATIME;
+						 int fd = open("/",O_RDONLY|O_NOATIME);
+						 #if HAVE_FDOPENDIR
+						 (void)fdopendir(fd);
+						 #else
+						 syntaxically incorrect statement here to force compilation to fail!
+						 #endif
+						 ]]),
+						 [ AC_DEFINE(FURTIVE_READ_MODE_AVAILABLE, 1, [furtive read mode is available])
+						 AC_MSG_RESULT(available)
+						 local_furtive_read_mode="yes"
+						 ],
+						 [AC_MSG_RESULT(no available)
+						 local_furtive_read_mode="no"
+						 ])
+	       ]
+ 	    )
+
 
 AC_ARG_ENABLE( [debug],
                 AC_HELP_STRING(--enable-debug, [build targets with debugging option and no optimization]),
@@ -445,12 +546,6 @@ AC_ARG_ENABLE( [build-html],
 	       ]
              )
 
-AC_ARG_ENABLE(  [test-memory],
-                AC_HELP_STRING(--enable-test-memory, [for debugging purpose only, activate a memory leakage detection mechanism, resulting executable is very slow]),
-                [AC_DEFINE(TEST_MEMORY, [], [debuggging feature to track memory leakage, makes binary very slow])
-                 local_test_memory="yes"
-             ])
-
 AC_ARG_ENABLE(  [special-alloc],
                 AC_HELP_STRING(--disable-special-alloc, [special memory allcation scheme makes dar using less memory and run a bit faster, in particular in conjunction with --enable-mode=32 or 64, you can disable it if you like]),
                 [],
@@ -469,7 +564,7 @@ AC_ARG_ENABLE( [upx],
              )
 
 AC_ARG_ENABLE(  [thread-safe],
-                AC_HELP_STRING(--disable-thread-safe, [libdar is thread safe if POSIX mutex are available, you can manually disable the use of POSIX mutex, the resulting libdar library will probably not be thread-safe]),
+                AC_HELP_STRING(--disable-thread-safe, [libdar is thread safe if POSIX mutex are available, you can manually disable the use of POSIX mutex, the resulting libdar library will not be thread-safe anymore unless special-alloc is disabled too]),
                 [ AC_MSG_NOTICE([thread-safe support disabled])
                 ],
                 [ AC_CHECK_LIB(pthread, [pthread_mutex_init], [], [])
@@ -490,6 +585,7 @@ AC_ARG_ENABLE(  [thread-safe],
                                     [ AC_MSG_RESULT(no)])
                 ]
              )
+
 
 AC_ARG_ENABLE( [profiling],
 	       AC_HELP_STRING(--enable-profiling, [enable executable profiling]),
@@ -532,12 +628,12 @@ AC_PREFIX_DEFAULT(/usr/local)
 # hack from litool mailing-list to know from source point of view whether we are compiling for dynamic or static way
 
 AC_CONFIG_COMMANDS([hack-libtool], [
-				    sed 's,^pic_flag=,pic_flag=-D__DYNAMIC__,' libtool > libtoolT \
+				    sed 's,^pic_flag=,pic_flag=" -D__DYNAMIC__ ",' libtool > libtoolT \
 				    && mv -f libtoolT libtool && chmod 755 libtool
 ])
 
 
-AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile po/Makefile.in po/Makefile doc/mini-howto/Makefile src/libdar/libdar.pc.tmpl doc/man/Makefile])
+AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile doc/mini-howto/Makefile src/libdar/libdar.pc.tmpl doc/man/Makefile src/check/Makefile po/Makefile.in])
 AC_OUTPUT
 [echo ""
 echo "--"
@@ -559,18 +655,18 @@ else
   echo "NO"
 fi
 
-echo -n "   Strong encryption support  : "
-if [ "$local_crypto" = "yes" ] ; then
+echo -n "   Liblzo2 compression (lzo)  : "
+if [ "$local_liblzo2" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
 fi
 
-echo -n "   New blowfish implementation: "
-if [ "$local_crypto" = "yes" -a "$local_crypto_full_bf" = "yes" ] ; then
-   echo "YES"
+echo -n "   Strong encryption support  : "
+if [ "$local_crypto" = "yes" ] ; then
+  echo "YES"
 else
-   echo "NO"
+  echo "NO"
 fi
 
 echo -n "   Extended Attributes support: "
@@ -602,7 +698,7 @@ else
 fi
 
 echo -n "   Integer size used          : "
-if [ -z "$build_mode" ] ; then
+if [ -z "$build_mode" -o \( ! "$build_mode" = "32" -a ! "$build_mode" = "64" \) ] ; then
   echo "infinint"
 else
   echo "$build_mode"
@@ -615,6 +711,12 @@ else
   echo "NO"
 fi
 
+echo -n "   Furtive read mode          : "
+if [ "$local_furtive_read_mode" = "yes" ]; then
+   echo "YES"
+else
+   echo "NO"
+fi
 
 echo ""
 echo "  DAR SUITE command line programs:"
@@ -668,8 +770,10 @@ if [ "$static_pb" = "yes" -a "$build_static" = "yes" ]; then
    echo ""
    echo "    should bring you to the essentials."
    echo ""
+   echo "You also might want to speed up the compilation process running ./configure"
+   echo "with the --disable-shared option"
+   echo ""
 fi
 
 echo ""
 ]
-

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.20.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: sar_tools.cpp,v 1.25 2010/08/27 20:44:24 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -77,46 +77,29 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar_tools.cpp,v 1.20.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: sar_tools.cpp,v 1.25 2010/08/27 20:44:24 edrusb Rel $";
         dummy_call(id);
     }
 
-    generic_file *sar_tools_open_archive_fichier(user_interaction & dialog,
-						 const string &filename, bool allow_over, bool warn_over)
+    trivial_sar *sar_tools_open_archive_tuyau(user_interaction & dialog,
+					      S_I fd,
+					      gf_mode mode,
+					      const label & data_name,
+					      const std::string & execute)
     {
-        generic_file *ret = NULL;
         generic_file *tmp = NULL;
+        trivial_sar *ret = NULL;
 
         try
         {
-            S_I fd;
-
-            if(!allow_over || warn_over)
-            {
-                struct stat buf;
-                if(lstat(filename.c_str(), &buf) < 0)
-                {
-                    if(errno != ENOENT)
-                        throw Erange("open_archive_fichier", tools_printf(gettext("Error retrieving inode information for %s : %s"), filename.c_str(), strerror(errno)));
-                }
-                else
-                {
-                    if(!allow_over)
-                        throw Erange("open_archive_fichier", tools_printf(gettext("%S already exists, and overwritten is forbidden, aborting"), &filename));
-                    if(warn_over)
-                        dialog.pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
-                }
-            }
-
-            fd = ::open(filename.c_str(), O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
-            if(fd < 0)
-                throw Erange("open_archive_fichier", tools_printf(gettext("Error opening file %s : %s"), filename.c_str(), strerror(errno)));
-            tmp = new fichier(dialog, fd);
+            tmp = new tuyau(dialog, fd, mode);
             if(tmp == NULL)
-                throw Ememory("open_archive_fichier");
-            ret = new trivial_sar(dialog, tmp);
+                throw Ememory("sar_tools_open_archive_tuyau");
+            ret = new trivial_sar(dialog, tmp, data_name, execute);
             if(ret == NULL)
-                throw Ememory("open_archive_fichier");
+                throw Ememory("sar_tools_open_archive_tuyau");
+	    else
+		tmp = NULL;
         }
         catch(...)
         {
@@ -124,33 +107,6 @@ namespace libdar
                 delete ret;
 	    if(tmp != NULL)
 		delete tmp;
-            throw;
-        }
-
-        return ret;
-    }
-
-    generic_file *sar_tools_open_archive_tuyau(user_interaction & dialog, S_I fd, gf_mode mode)
-    {
-        generic_file *tmp = NULL;
-        generic_file *ret = NULL;
-
-        try
-        {
-            tmp = new tuyau(dialog, fd, mode);
-            if(tmp == NULL)
-                throw Ememory("sar_tools_open_archive_tuyau");
-            ret = new trivial_sar(dialog, tmp);
-            if(ret == NULL)
-                throw Ememory("sar_tools_open_archive_tuyau");
-        }
-        catch(...)
-        {
-            if(ret != NULL)
-                delete ret;
-            else // tmp is not managed by ret, which does not exist
-                if(tmp != NULL)
-                    delete tmp;
             throw;
         }
 

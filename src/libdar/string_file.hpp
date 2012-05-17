@@ -16,16 +16,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: string_file.hpp,v 1.1.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: string_file.hpp,v 1.10 2011/04/17 13:12:30 edrusb Rel $
 //
 /*********************************************************************/
 //
 
     /// \file string_file.hpp
     /// \brief emulate a generic_file from a string of characters
-    ///
+    /// \ingroup Private
 
 #ifndef STRING_FILE_HPP
 #define STRING_FILE_HPP
@@ -47,7 +47,7 @@ namespace libdar
     public:
 
 	    /// constructor
-	string_file(user_interaction & dialog, const std::string & contents): generic_file(dialog, gf_read_only) { data = contents; cur = 0; len = data.size(); };
+	string_file(const std::string & contents): generic_file(gf_read_only) { data = contents; cur = 0; len = data.size(); };
 
 	    // inherited from generic_file
 	bool skip(const infinint & pos);
@@ -57,8 +57,10 @@ namespace libdar
 
     protected:
 	    // inherited from generic_file
-	S_I inherited_read(char *a, size_t size);
-	S_I inherited_write(const char *a, size_t size) { throw Efeature("Writing on a string_file is not allowed"); };
+	U_I inherited_read(char *a, U_I size);
+	void inherited_write(const char *a, U_I size) { throw Efeature("Writing on a string_file is not allowed"); };
+	void inherited_sync_write() {};
+	void inherited_terminate() {};
 
     private:
 	std::string data;

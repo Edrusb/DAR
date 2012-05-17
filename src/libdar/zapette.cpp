@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: zapette.cpp,v 1.21.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: zapette.cpp,v 1.35 2011/04/17 16:36:36 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -45,7 +45,6 @@ extern "C"
 #include <string>
 #include "zapette.hpp"
 #include "infinint.hpp"
-#include "user_interaction.hpp"
 #include "tools.hpp"
 
 #define ANSWER_TYPE_DATA 'D'
@@ -55,6 +54,8 @@ extern "C"
 #define REQUEST_OFFSET_END_TRANSMIT 0
 #define REQUEST_OFFSET_GET_FILESIZE 1
 #define REQUEST_OFFSET_CHANGE_CONTEXT_STATUS 2
+#define REQUEST_IS_OLD_START_END_ARCHIVE 3
+#define REQUEST_GET_DATA_NAME 4
 
 using namespace std;
 
@@ -101,7 +102,9 @@ namespace libdar
 
         if(f->read(&serial_num, 1) == 0)
             throw Erange("request::read", gettext("Partial request received, aborting\n"));
-        offset = infinint(f->get_gf_ui(), NULL, f);
+	if(f == NULL)
+	    throw SRC_BUG;
+        offset = infinint(*f);
         pas = 0;
         while(pas < sizeof(tmp))
             pas += f->read((char *)&tmp+pas, sizeof(tmp)-pas);
@@ -165,7 +168,9 @@ namespace libdar
             arg = 0;
             break;
         case ANSWER_TYPE_INFININT:
-            arg = infinint(f->get_gf_ui(), NULL, f);
+	    if(f == NULL)
+		throw SRC_BUG;
+            arg = infinint(*f);
             size = 0;
             break;
         default:
@@ -173,7 +178,7 @@ namespace libdar
         }
     }
 
-    slave_zapette::slave_zapette(generic_file *input, generic_file *output, contextual *data)
+    slave_zapette::slave_zapette(generic_file *input, generic_file *output, generic_file *data)
     {
         if(input == NULL)
             throw SRC_BUG;
@@ -191,6 +196,9 @@ namespace libdar
         in = input;
         out = output;
         src = data;
+	src_ctxt = dynamic_cast<contextual *>(data);
+	if(src_ctxt == NULL)
+	    throw Erange("slave_zapette::slave_zapette", "Object given to data must inherit from contextual class");
     }
 
     slave_zapette::~slave_zapette()
@@ -263,10 +271,23 @@ namespace libdar
 		    {
 			ans.type = ANSWER_TYPE_INFININT;
 			ans.arg = 1;
-			src->set_info_status(req.info);
+ 			src_ctxt->set_info_status(req.info);
 			ans.write(out, NULL);
 		    }
-                    else
+                    else if(req.offset == REQUEST_IS_OLD_START_END_ARCHIVE) // return whether the underlying archive has an old slice header or not
+		    {
+			ans.type = ANSWER_TYPE_INFININT;
+			ans.arg = src_ctxt->is_an_old_start_end_archive() ? 1 : 0;
+			ans.write(out, NULL);
+		    }
+		    else if(req.offset == REQUEST_GET_DATA_NAME) // return the data_name of the underlying sar
+		    {
+			ans.type = ANSWER_TYPE_DATA;
+			ans.arg = 0;
+			ans.size = src_ctxt->get_data_name().size();
+			ans.write(out, (char *)(src_ctxt->get_data_name().data()));
+		    }
+		    else
                         throw Erange("zapette::action", gettext("Received unknown special order"));
                 }
             }
@@ -282,7 +303,7 @@ namespace libdar
             delete [] buffer;
     }
 
-    zapette::zapette(user_interaction & dialog, generic_file *input, generic_file *output) : contextual(dialog, gf_read_only)
+    zapette::zapette(user_interaction & dialog, generic_file *input, generic_file *output) : generic_file(gf_read_only), mem_ui(dialog)
     {
         if(input == NULL)
             throw SRC_BUG;
@@ -297,7 +318,7 @@ namespace libdar
         out = output;
         position = 0;
         serial_counter = 0;
-	info = CONTEXT_INIT;
+	contextual::set_info_status(CONTEXT_INIT);
 
             //////////////////////////////
             // retreiving the file size
@@ -308,21 +329,35 @@ namespace libdar
 
     zapette::~zapette()
     {
-        S_I tmp = 0;
-        make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_END_TRANSMIT, NULL, "", tmp, file_size);
-
+	try
+	{
+	    terminate();
+	}
+	catch(...)
+	{
+		// ignore all exceptions
+	}
         delete in;
         delete out;
     }
 
+    void zapette::inherited_terminate()
+    {
+        S_I tmp = 0;
+        make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_END_TRANSMIT, NULL, "", tmp, file_size);
+    }
+
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: zapette.cpp,v 1.21.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: zapette.cpp,v 1.35 2011/04/17 16:36:36 edrusb Rel $";
         dummy_call(id);
     }
 
     bool zapette::skip(const infinint & pos)
     {
+	if(is_terminated())
+	    throw SRC_BUG;
+
         if(pos >= file_size)
         {
             position = file_size;
@@ -337,6 +372,9 @@ namespace libdar
 
     bool zapette::skip_relative(S_I x)
     {
+	if(is_terminated())
+	    throw SRC_BUG;
+
         if(x >= 0)
         {
             position += x;
@@ -364,13 +402,45 @@ namespace libdar
     void zapette::set_info_status(const std::string & s)
     {
 	infinint val;
-	S_I tmp;
+	S_I tmp = 0;
+
+	if(is_terminated())
+	    throw SRC_BUG;
 
 	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_CHANGE_CONTEXT_STATUS, NULL, s, tmp, val);
+	contextual::set_info_status(s);
     }
 
+    bool zapette::is_an_old_start_end_archive() const
+    {
+	infinint val;
+	S_I tmp = 0;
 
-    S_I zapette::inherited_read(char *a, size_t size)
+	if(is_terminated())
+	    throw SRC_BUG;
+
+  	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_IS_OLD_START_END_ARCHIVE, NULL, "", tmp, val);
+	return val == 1;
+    }
+
+    const label & zapette::get_data_name() const
+    {
+	static label data_name;
+	infinint arg;
+	S_I lu = data_name.size(); // used to specify the amount of space allocated for the answer
+
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_GET_DATA_NAME, data_name.data(), "", lu, arg);
+
+	if(lu != (S_I)data_name.size())
+	    throw Erange("zapette::get_data_name", gettext("Uncomplete answer received from peer"));
+
+	return data_name;
+    }
+
+    U_I zapette::inherited_read(char *a, U_I size)
     {
         static const U_16 max_short = ~0;
         U_I lu = 0;
@@ -397,29 +467,32 @@ namespace libdar
         return lu;
     }
 
-    S_I zapette::inherited_write(const char *a, size_t size)
+    void zapette::inherited_write(const char *a, U_I size)
     {
         throw SRC_BUG; // zapette is read-only
     }
 
-    void zapette::make_transfert(U_16 size, const infinint &offset, char *data, const string & info, S_I & lu, infinint & arg)
+    void zapette::make_transfert(U_16 size, const infinint &offset, char *data, const string & info, S_I & lu, infinint & arg) const
     {
         request req;
         answer ans;
 
             // building the request
-        req.serial_num = serial_counter++; // may loopback to 0
+        req.serial_num = const_cast<char &>(serial_counter)++; // may loopback to 0
         req.offset = offset;
         req.size = size;
 	req.info = info;
         req.write(out);
+
+	if(req.size == REQUEST_SIZE_SPECIAL_ORDER)
+	    size = lu;
 
             // reading the answer
         do
         {
             ans.read(in, data, size);
             if(ans.serial_num != req.serial_num)
-                get_gf_ui().pause(gettext("Communication problem with peer, retry ?"));
+                get_ui().pause(gettext("Communication problem with peer, retry ?"));
 	}
         while(ans.serial_num != req.serial_num);
 
@@ -444,7 +517,7 @@ namespace libdar
             if(req.offset == REQUEST_OFFSET_END_TRANSMIT)
             {
                 if(ans.size != 0 && ans.type != ANSWER_TYPE_DATA)
-                    get_gf_ui().warning(gettext("Bad answer from peer, while closing connection"));
+                    get_ui().warning(gettext("Bad answer from peer, while closing connection"));
             }
             else if(req.offset == REQUEST_OFFSET_GET_FILESIZE)
             {
@@ -454,9 +527,19 @@ namespace libdar
 	    else if(req.offset == REQUEST_OFFSET_CHANGE_CONTEXT_STATUS)
 	    {
 		if(ans.arg != 1)
-		    throw Erange("zapette::set_info_status", gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
+		    throw Erange("zapette::make_transfert", gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
 	    }
-            else
+            else if(req.offset == REQUEST_IS_OLD_START_END_ARCHIVE)
+	    {
+		if(ans.type != ANSWER_TYPE_INFININT || (ans.arg != 0 && ans.arg != 1) )
+		    throw Erange("zapetee::make_transfert", gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
+	    }
+	    else if(req.offset == REQUEST_GET_DATA_NAME)
+	    {
+		if(ans.type != ANSWER_TYPE_DATA && lu != (S_I)(label::common_size()))
+		    throw Erange("zapetee::make_transfert", gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
+	    }
+	    else
                 throw Erange("zapette::make_transfert", gettext("Corrupted data read from pipe"));
         }
     }

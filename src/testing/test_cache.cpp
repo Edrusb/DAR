@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_cache.cpp,v 1.7.2.1 2008/02/09 11:14:39 edrusb Rel $
+// $Id: test_cache.cpp,v 1.11 2010/08/27 20:44:24 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -63,6 +63,7 @@ extern "C"
 #include "generic_file.hpp"
 #include "shell_interaction.hpp"
 #include "cygwin_adapt.hpp"
+#include "fichier.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -97,9 +98,8 @@ int main()
 
 void f1()
 {
-    fichier f = fichier(*ui, "toto", gf_read_only);
-    cache c = cache(*ui,
-		    f,
+    fichier f = fichier(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
+    cache c = cache(f,
 		    10,
 		    10, 3, 20,
 		    10, 3, 20);
@@ -127,8 +127,7 @@ void f2()
 	return;
     }
     fichier g = fichier(*ui, fd);
-    cache c = cache(*ui,
-		    g,
+    cache c = cache(g,
 		    10,
 		    10, 3, 20,
 		    10, 3, 20);

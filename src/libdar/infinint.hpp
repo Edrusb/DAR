@@ -16,12 +16,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: infinint.hpp,v 1.10 2004/10/01 22:05:35 edrusb Rel $
+// $Id: infinint.hpp,v 1.12 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 //
+
+    /// \file infinint.hpp
+    /// \brief switch module to limitint (32 ou 64 bits integers) or infinint
+    /// \ingroup Private
+
 
 #ifndef INFININT_HPP
 #define INFININT_HPP

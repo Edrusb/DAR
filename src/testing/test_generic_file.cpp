@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_generic_file.cpp,v 1.11 2005/02/22 17:59:50 edrusb Rel $
+// $Id: test_generic_file.cpp,v 1.16 2010/08/27 20:44:24 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -49,6 +49,8 @@ extern "C"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
 #include "shell_interaction.hpp"
+#include "crc.hpp"
+#include "fichier.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -70,7 +72,7 @@ int main(S_I argc, char *argv[])
         return -1;
     }
 
-    fichier f1 = fichier(*ui, argv[1], gf_read_only);
+    fichier f1 = fichier(*ui, argv[1], gf_read_only, tools_octal2int("0777"), false);
     S_I fd = ::open(argv[2], O_WRONLY|O_CREAT|O_TRUNC|O_BINARY);
     if(fd < 0)
     {
@@ -79,22 +81,22 @@ int main(S_I argc, char *argv[])
     }
     fichier f2 = fichier(*ui, fd);
 
-    f1.reset_crc();
-    f2.reset_crc();
+    f1.reset_crc(crc::OLD_CRC_SIZE);
+    f2.reset_crc(crc::OLD_CRC_SIZE);
     f1.copy_to(f2);
     crc crc1;
     crc crc2;
     f1.get_crc(crc1);
     f2.get_crc(crc2);
-    if(same_crc(crc1, crc2))
+    if(crc1 == crc2)
         cout << "CRC OK" << endl;
     else
         cout << "CRC PROBLEM" << endl;
     f1.skip(0);
-    null_file f3 = null_file(*ui, gf_write_only);
+    null_file f3 = null_file(gf_write_only);
     crc crc3;
     f1.copy_to(f3, crc3);
-    if(same_crc(crc1, crc3))
+    if(crc1 == crc3)
         cout << "CRC OK" << endl;
     else
         cout << "CRC PROBLEM" << endl;

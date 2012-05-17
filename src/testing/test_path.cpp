@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_path.cpp,v 1.7.4.1 2008/02/09 11:14:39 edrusb Rel $
+// $Id: test_path.cpp,v 1.10 2011/01/05 18:04:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,7 +26,6 @@
 #include <iostream>
 
 #include "path.hpp"
-#include "test_memory.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -35,8 +34,6 @@ void f2();
 
 int main()
 {
-    MEM_BEGIN;
-    MEM_IN;
     try
     {
         path p1 = "/";
@@ -102,8 +99,6 @@ int main()
         e.dump();
     }
     f2();
-    MEM_OUT;
-    MEM_END;
 }
 
 void f2()

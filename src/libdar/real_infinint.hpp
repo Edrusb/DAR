@@ -16,14 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: real_infinint.hpp,v 1.14.2.3 2011/01/04 16:27:13 edrusb Rel $
+// $Id: real_infinint.hpp,v 1.26 2011/02/17 21:45:22 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file real_infinint.hpp
     /// \brief the original infinint class implementation
+    /// \ingroup Private
     ///
     /// the infinint class implementation defined in this module can
     /// handle arbitrary large positive integer numbers
@@ -45,6 +46,8 @@ extern "C"
 #include "integers.hpp"
 #include "int_tools.hpp"
 
+#define ZEROED_SIZE 50
+
 namespace libdar
 {
     class generic_file;
@@ -61,29 +64,33 @@ namespace libdar
 #if SIZEOF_OFF_T > SIZEOF_TIME_T
 #if SIZEOF_OFF_T > SIZEOF_SIZE_T
         infinint(off_t a = 0)
-            { E_BEGIN infinint_from(a); E_END("infinint::infinint", "off_t") };
+	{ E_BEGIN infinint_from(a); E_END("infinint::infinint", "off_t") };
 #else
         infinint(size_t a = 0)
-            { E_BEGIN infinint_from(a); E_END("infinint::infinint", "size_t") };
+	{ E_BEGIN infinint_from(a); E_END("infinint::infinint", "size_t") };
 #endif
 #else
 #if SIZEOF_TIME_T > SIZEOF_SIZE_T
         infinint(time_t a = 0)
-            { E_BEGIN infinint_from(a); E_END("infinint::infinint", "time_t") };
+	{ E_BEGIN infinint_from(a); E_END("infinint::infinint", "time_t") };
 #else
         infinint(size_t a = 0)
-            { E_BEGIN infinint_from(a); E_END("infinint::infinint", "size_t") };
+	{ E_BEGIN infinint_from(a); E_END("infinint::infinint", "size_t") };
 #endif
 #endif
 
         infinint(const infinint & ref)
-            { E_BEGIN; copy_from(ref); E_END("infinint::infinint", "const infinint &"); }
-        infinint(user_interaction & dialog, S_I *fd, generic_file *x); // read an infinint from a file
-        ~infinint()
-            { E_BEGIN detruit(); E_END("infinint::~infinint","") };
+	{ E_BEGIN; copy_from(ref); E_END("infinint::infinint", "const infinint &"); }
 
-        infinint & operator = (const infinint & ref)
-            { E_BEGIN detruit(); copy_from(ref); return *this; E_END("infinint::operator =","") };
+	    // read an infinint from a file
+	infinint(user_interaction & dialog, S_I fd);
+	infinint(generic_file & x);
+
+        ~infinint()
+	{ E_BEGIN detruit(); E_END("infinint::~infinint","") };
+
+        const infinint & operator = (const infinint & ref)
+	{ E_BEGIN detruit(); copy_from(ref); return *this; E_END("infinint::operator =","") };
 
         void dump(user_interaction & dialog, int fd) const; // write byte sequence to file
         void dump(generic_file &x) const; // write byte sequence to file
@@ -104,22 +111,22 @@ namespace libdar
         infinint & operator <<= (U_32 bit);
         infinint & operator <<= (infinint bit);
         infinint operator ++(int a)
-            { E_BEGIN infinint ret = *this; ++(*this); return ret; E_END("infinint::operator ++", "int") };
+	{ E_BEGIN infinint ret = *this; ++(*this); return ret; E_END("infinint::operator ++", "int") };
         infinint operator --(int a)
-            { E_BEGIN infinint ret = *this; --(*this); return ret; E_END("infinint::operator --", "int") };
+	{ E_BEGIN infinint ret = *this; --(*this); return ret; E_END("infinint::operator --", "int") };
         infinint & operator ++()
-            { E_BEGIN return *this += 1; E_END("infinint::operator ++", "()") };
+	{ E_BEGIN return *this += 1; E_END("infinint::operator ++", "()") };
         infinint & operator --()
-            { E_BEGIN return *this -= 1; E_END("infinint::operator --", "()") };
+	{ E_BEGIN return *this -= 1; E_END("infinint::operator --", "()") };
 
         U_32 operator % (U_32 arg) const
-            { E_BEGIN return modulo(arg); E_END("infinint::operator %","") };
+	{ E_BEGIN return modulo(arg); E_END("infinint::operator %","") };
 
             // increment the argument up to a legal value for its storage type and decrement the object in consequence
             // note that the initial value of the argument is not ignored !
-            // when the object is null the value of the argument stays the same as before
+            // when the object is null the value of the argument is unchanged
         template <class T>void unstack(T &v)
-            { E_BEGIN infinint_unstack_to(v); E_END("infinint::unstack", typeid(v).name()) }
+	{ E_BEGIN infinint_unstack_to(v); E_END("infinint::unstack", typeid(v).name()) }
 
 	infinint get_storage_size() const { return field->size(); };
 	    // it returns number of byte of information necessary to store the integer
@@ -152,6 +159,7 @@ namespace libdar
         void detruit();
         void make_at_least_as_wider_as(const infinint & ref);
         template <class T> void infinint_from(T a);
+	template <class T> T max_val_of(T x);
         template <class T> void infinint_unstack_to(T &a);
         template <class T> T modulo(T arg) const;
         signed int difference(const infinint & b) const; // gives the sign of (*this - arg) but only the sign !
@@ -160,16 +168,17 @@ namespace libdar
             // static statments
             //
         static endian used_endian;
+	static U_8 zeroed_field[ZEROED_SIZE];
         static void setup_endian();
     };
 
 
 #define OPERATOR(OP) inline bool operator OP (const infinint &a, const infinint &b) \
-{ \
-    E_BEGIN \
-    return a.difference(b) OP 0; \
-    E_END("operator OP", "infinint, infinint") \
-}
+    {									\
+	E_BEGIN								\
+	    return a.difference(b) OP 0;				\
+	E_END("operator OP", "infinint, infinint")			\
+	    }
 
     OPERATOR(<)
     OPERATOR(>)
@@ -196,25 +205,25 @@ namespace libdar
     template <class T> inline void euclide(T a, T b, T & q, T &r)
     {
         E_BEGIN
-        q = a/b; r = a%b;
+	    q = a/b; r = a%b;
         E_END("euclide", "")
-    }
+	    }
 
     inline infinint & infinint::operator /= (const infinint & ref)
     {
         E_BEGIN
-        *this = *this / ref;
+	    *this = *this / ref;
         return *this;
         E_END("infinint::operator /=", "")
-    }
+	    }
 
     inline infinint & infinint::operator %= (const infinint & ref)
     {
         E_BEGIN
-        *this = *this % ref;
+	    *this = *this % ref;
         return *this;
         E_END("infinint::operator %=", "")
-    }
+	    }
 
 
 	/////////////////////////////////////////////////////
@@ -233,7 +242,7 @@ namespace libdar
     template <class T> T infinint::modulo(T arg) const
     {
         E_BEGIN
-        infinint tmp = *this % infinint(arg);
+	    infinint tmp = *this % infinint(arg);
         T ret = 0;
         unsigned char *debut = (unsigned char *)(&ret);
         unsigned char *ptr = debut + sizeof(T) - 1;
@@ -246,10 +255,16 @@ namespace libdar
             --it;
         }
 
-        if(it != tmp.field->rend())
-            throw SRC_BUG; // could not put all the data in the returned value !
+	    // checking for overflow (should never occur, but for sanity, we check it anyway)
 
-        if(used_endian == big_endian)
+	while(it != tmp.field->rend()) // field may not be reduced (some zeros are leading)
+	{
+	    if(*it != 0)
+		throw SRC_BUG; // could not put all the data in the returned value !
+	    --it;
+	}
+
+        if(used_endian == little_endian)
             int_tools_swap_bytes(debut, sizeof(T));
 
         return ret;
@@ -267,7 +282,7 @@ namespace libdar
         if(used_endian == not_initialized)
             setup_endian();
 
-        if(used_endian == big_endian)
+        if(used_endian == little_endian)
         {
             direction = -1;
             ptr = (unsigned char *)(&a) + (size - 1);
@@ -312,13 +327,28 @@ namespace libdar
         E_END("infinint::infinint_from", "")
     }
 
+    template <class T> T infinint::max_val_of(T x)
+    {
+	x = 0;
+	x = ~x;
+
+	if(x <= 0) // T is a signed integer type. Note that it should be "x < 0" but to avoid compiler warning when T is unsigned it does not hurt having "x <= 0" here
+	{
+	    x = 1;
+	    x = int_tools_rotate_right_one_bit(x);
+	    x = ~x;
+	}
+
+	return x;
+    }
+
     template <class T> void infinint::infinint_unstack_to(T &a)
     {
-        E_BEGIN
-            // T is supposed to be an unsigned "integer"
-            // (ie.: sizeof() returns the width of the storage bit field  and no sign bit is present)
-            // Note : static here avoids the recalculation of max_T at each call
-        static const T max_T = int_tools_maxof_agregate(T(0));
+        E_BEGIN;
+	    // T is supposed to be an unsigned "integer"
+	    // (ie.: sizeof() returns the width of the storage bit field  and no sign bit is present)
+	    // Note : static here avoids the recalculation of max_T at each call
+	static const T max_T = max_val_of(a);
         infinint step = max_T - a;
 
         if(*this < step)
@@ -334,7 +364,8 @@ namespace libdar
                 --ptr;
                 --it;
 	    }
-            if(used_endian == big_endian)
+
+            if(used_endian == little_endian)
                 int_tools_swap_bytes(debut, sizeof(transfert));
             a += transfert;
             *this -= *this;

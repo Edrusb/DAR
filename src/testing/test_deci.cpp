@@ -16,16 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_deci.cpp,v 1.6 2003/10/18 14:43:07 edrusb Rel $
+// $Id: test_deci.cpp,v 1.8 2011/01/05 18:04:17 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
 #include <iostream>
 
-#include "test_memory.hpp"
 #include "deci.hpp"
 
 using namespace libdar;
@@ -35,11 +34,7 @@ static void f1();
 
 int main()
 {
-    MEM_BEGIN;
-    MEM_IN;
     f1();
-    MEM_OUT;
-    MEM_END;
 }
 
 static void f1()
@@ -49,7 +44,7 @@ static void f1()
     deci d2 = t;
     deci d3 = infinint(125);
     U_I c;
-    
+
     cout << d1.human() << endl;
     cout << d2.human() << endl;
     cout << d3.human() << endl;

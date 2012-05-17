@@ -9,6 +9,7 @@ if MAKE_USAGE
 
 noinst_PROGRAMS = dar-help
 dar_help_SOURCES = dar-help.c
+dar_help_LDFLAGS = -pthread
 
 command_line.cpp : dar.usage
 dar_xform.cpp : dar_xform.usage
@@ -51,17 +52,18 @@ endif
 #
 
 localedir = @localedir@
+system_path = @sysconfdir@
 
 if BUILD_MODE32
     MYLIB=dar32
-    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\"  $(CPP_PROF)
+    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
 else
 if BUILD_MODE64
     MYLIB=dar64
-    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" $(CPP_PROF)
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
 else
     MYLIB=dar
-    AM_CPPFLAGS=-I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" $(CPP_PROF)
+    AM_CPPFLAGS=-I../libdar -DDAR_LOCALEDIR=\"$(localedir)\"  -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
 endif
 endif
 
@@ -100,26 +102,25 @@ else
 AM_LDFLAGS = @LTLIBINTL@ $(LD_PROF)
 endif
 
-dar_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp shell_interaction.cpp shell_interaction.hpp dar.usage getopt_decision.h my_getopt_long.h
+dar_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp shell_interaction.cpp shell_interaction.hpp dar.usage getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp crit_action_cmd_line.cpp crit_action_cmd_line.hpp
 dar_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
-dar_xform_SOURCES = dar_suite.cpp dar_suite.hpp dar_xform.cpp shell_interaction.cpp shell_interaction.hpp dar_xform.usage
+dar_xform_SOURCES = dar_suite.cpp dar_suite.hpp dar_xform.cpp shell_interaction.cpp shell_interaction.hpp dar_xform.usage line_tools.hpp line_tools.cpp
 dar_xform_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
-dar_slave_SOURCES =  dar_suite.cpp dar_suite.hpp dar_slave.cpp shell_interaction.cpp shell_interaction.hpp dar_slave.usage
+dar_slave_SOURCES =  dar_suite.cpp dar_suite.hpp dar_slave.cpp shell_interaction.cpp shell_interaction.hpp dar_slave.usage line_tools.hpp line_tools.cpp
 dar_slave_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
-dar_manager_SOURCES = dar_suite.cpp dar_suite.hpp dar_manager.cpp shell_interaction.cpp shell_interaction.hpp dar_manager.usage getopt_decision.h my_getopt_long.h
+dar_manager_SOURCES = dar_suite.cpp dar_suite.hpp dar_manager.cpp shell_interaction.cpp shell_interaction.hpp dar_manager.usage getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp no_comment.cpp no_comment.hpp hide_file.cpp hide_file.hpp
 dar_manager_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
-dar_cp_SOURCES = dar_cp.cpp dar_suite.cpp shell_interaction.cpp
+dar_cp_SOURCES = dar_cp.cpp dar_suite.cpp shell_interaction.cpp line_tools.hpp line_tools.cpp
 dar_cp_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 #
 # dar_static ( --enable-dar-static )
 #
 
-dar_static_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp shell_interaction.cpp shell_interaction.hpp dar.usage
+dar_static_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp shell_interaction.cpp shell_interaction.hpp dar.usage line_tools.hpp line_tools.cpp crit_action_cmd_line.cpp
 dar_static_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 dar_static_LDFLAGS = -all-static @LTLIBINTL@
-

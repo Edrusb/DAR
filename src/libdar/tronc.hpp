@@ -16,14 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tronc.hpp,v 1.9.4.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: tronc.hpp,v 1.22 2011/04/17 13:12:30 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file tronc.hpp
     /// \brief defines a limited segment over another generic_file.
+    /// \ingroup Private
     ///
     /// This is used to read a part of a file as if it was a real file generating
     /// end of file behavior when reaching the given length.
@@ -37,20 +38,34 @@
 
 namespace libdar
 {
+	/// \addtogroup Private
+	/// @{
 
-	/// make a segment of a generic_file appear like a real generic_file
+	/// makes a segment of a generic_file appear like a real generic_file
 
     class tronc : public generic_file
     {
     public :
 	    /// constructor
 
-	    //! \param dialog for user interaction
-	    //! \param f is the file to take out the segment
+	    //! \param f is the file to take the segment from
 	    //! \param offset is the position of the beginning of the segment
 	    //! \param size is the size of the segment
-        tronc(user_interaction & dialog, generic_file *f, const infinint &offset, const infinint &size);
-        tronc(user_interaction & dialog, generic_file *f, const infinint &offset, const infinint &size, gf_mode mode);
+	    //! \param own_f is true if this object has to owns and may destroy the 'f' object at tronc's destruction time
+        tronc(generic_file *f, const infinint &offset, const infinint &size, bool own_f = false);
+        tronc(generic_file *f, const infinint &offset, const infinint &size, gf_mode mode, bool own_f = false);
+
+	    /// other constructor, the end of the segment is the end of the underlying generic_file
+	    /// only data before offset is inaccessible
+        tronc(generic_file *f, const infinint &offset, bool own_f = false);
+        tronc(generic_file *f, const infinint &offset, gf_mode mode, bool own_f = false);
+
+	    /// destructor
+	~tronc()
+	{
+	    if(own_ref)
+		delete ref;
+	};
 
 	    /// inherited from generic_file
         bool skip(const infinint & pos);
@@ -63,15 +78,24 @@ namespace libdar
 
     protected :
 	    /// inherited from generic_file
-        S_I inherited_read(char *a, size_t size);
+        U_I inherited_read(char *a, U_I size);
 	    /// inherited from generic_file
-        S_I inherited_write(const char *a, size_t size);
+        void inherited_write(const char *a, U_I size);
+	void inherited_sync_write() { ref->sync_write(); }
+	void inherited_terminate() {if(own_ref) ref->terminate(); };
 
     private :
-        infinint start, sz;
-        generic_file *ref;
-        infinint current;
+        infinint start;  //< offset in the global generic file to start at
+	infinint sz;     //< length of the portion to consider
+        generic_file *ref; //< global generic file of which to take a piece
+        infinint current;  //< inside position of the next read or write
+	bool own_ref;      //< whether we own ref (and must destroy it when no more needed)
+	bool limited;      //< whether the sz argument is to be considered
+
+	void set_back_current_position();
     };
+
+	/// @}
 
 } // end of namespace
 

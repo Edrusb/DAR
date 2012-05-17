@@ -16,15 +16,26 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tools.hpp,v 1.39.2.16 2011/01/21 19:18:24 edrusb Rel $
+// $Id: tools.hpp,v 1.85 2011/04/19 16:24:29 edrusb Rel $
 //
 /*********************************************************************/
 
 
+    /// \defgroup Tools Tools
+    /// \brief a set of tool routine
+    ///
+    /// these routines are available from libdar for historical
+    /// reason, but are not part of the API.
+    /// They are shared and used by dar, dar_slave, dar_xform,
+    /// and dar_manager command. You should avoid using them in
+    /// external program as they may be removed or changed without
+    /// backward compatibility support.
+
     /// \file tools.hpp
     /// \brief a set of general purpose routines
+    /// \ingroup Tools
 
 
 #ifndef TOOLS_HPP
@@ -44,11 +55,13 @@ extern "C"
 
 #include <string>
 #include <vector>
+#include <map>
 #include "path.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "tuyau.hpp"
 #include "integers.hpp"
+#include "tlv_list.hpp"
 
 #define TOOLS_SI_SUFFIX 1000
 #define TOOLS_BIN_SUFFIX 1024
@@ -57,13 +70,6 @@ namespace libdar
 {
 
 	/// \addtogroup Tools
-	/// \brief a set of tool routine
-	///
-	/// these routines are part of the libdar API for historical
-	/// reason. They are shared and used by dar, dar_slave, dar_xform,
-	/// and dar_manager command. You should avoid using thoses in
-	/// external program as they may be removed or changed without
-	/// backward compatibility support.
 	/// @{
 
 	/// convert a string to a char *
@@ -119,6 +125,25 @@ namespace libdar
 	/// \exception Ememory can be thrown if memory allocation failed
     extern void tools_extract_basename(const char *command_name, std::string & basename);
 
+
+	/// give a pointer to the last character of the given value in the given string
+
+	/// \param[in] s is the given string
+	/// \param[in] v is the given char value
+	/// \return a interator on s, pointing on the last char of s equal to v or a pointing to s.end() if no such char could be found is "s"
+	/// \note the arguments are not modified neither the data they are pointing to. However the const statement has not been used to
+	/// be able to return a iterator on the string (and not a const_interator). There is probably other ways to do that (using const_cast) for example
+    extern std::string::iterator tools_find_last_char_of(std::string &s, unsigned char v);
+
+	/// give a pointer to the last character of the given value in the given string
+
+	/// \param[in] s is the given string
+	/// \param[in] v is the given char value
+	/// \return a interator on s, pointing on the first char of s equal to v or a pointing to s.end() if no such char could be found is "s"
+	/// \note the arguments are not modified neither the data they are pointing to. However the const statement has not been used to
+	/// be able to return a iterator on the string (and not a const_interator). There is probably other ways to do that (using const_cast) for example
+    extern std::string::iterator tools_find_first_char_of(std::string &s, unsigned char v);
+
         /// split a given full path in path part and basename part
 
         /// \param[in] all is the path to split
@@ -156,13 +181,13 @@ namespace libdar
 
         /// \param[in] uid the User ID number
         /// \return the name of the corresponding user or the uid if none corresponds
-    extern std::string tools_name_of_uid(U_16 uid);
+    extern std::string tools_name_of_uid(const infinint & uid);
 
         /// convert gid to name in regards of the current system's configuration
 
         /// \param[in] gid the Group ID number
         /// \return the name of the corresponding group or the gid if none corresponds
-    extern std::string tools_name_of_gid(U_16 gid);
+    extern std::string tools_name_of_gid(const infinint & gid);
 
         /// convert unsigned word to string
 
@@ -180,14 +205,29 @@ namespace libdar
 
         /// \param[in] x the decimal representation of the integer
         /// \return the value corresponding to the decimal representation given
-    extern U_32 tools_str2int(const std::string & x);
+    extern U_I tools_str2int(const std::string & x);
+
+        /// convert a signed integer written in decimal notation to the corresponding value
+
+        /// \param[in] x the decimal representation of the integer
+        /// \return the value corresponding to the decimal representation given
+    extern S_I tools_str2signed_int(const std::string & x);
+
+        /// ascii to integer conversion
+
+        /// \param[in] a is the ascii string to convert
+        /// \param[out] val is the resulting value
+        /// \return true if the conversion could be done false if the given string does not
+        /// correspond to the decimal representation of an unsigned integer
+	/// \note this call is now a warapper around tools_str2int
+    extern bool tools_my_atoi(const char *a, U_I & val);
 
         /// prepend spaces before the given string
 
         /// \param[in] s the string to append spaces to
         /// \param[in] expected_size the minimum size of the resulting string
         /// \return a string at least as much long as expected_size with prepended leading spaces if necessary
-    extern std::string tools_addspacebefore(std::string s, unsigned int expected_size);
+    extern std::string tools_addspacebefore(std::string s, U_I expected_size);
 
         /// convert a date in second to its human readable representation
 
@@ -207,6 +247,15 @@ namespace libdar
         /// \param[in,out] dialog for user interaction
         /// \param[in] argvector the equivalent to the argv[] vector
     extern void tools_system(user_interaction & dialog, const std::vector<std::string> & argvector);
+
+	/// wrapper to the "system" system call using anonymous pipe to tranmit arguments to the child process
+
+	/// \param[in,out] dialog for user interaction
+	/// \param[in] dar_cmd the path to the executable to run
+	/// \param[in] argvpipe the list of arguments to pass through anonymous pipe
+	/// \note the command to execute must understand the --pipe-fd option that
+	/// gives the filedescriptor to read from the command-line options
+    extern void tools_system_with_pipe(user_interaction & dialog, const std::string & dar_cmd, const std::vector<std::string> & argvpipe);
 
         /// write a list of string to file
 
@@ -253,14 +302,32 @@ namespace libdar
         /// \param[in] thread_safe whether thread safe support is available
         /// \param[in] libz whether libz compression is available
         /// \param[in] libbz2 whether libbz2 compression is available
+	/// \param[in] liblzo2 whether lzo compression is available
         /// \param[in] libcrypto whether strong encryption is available
-	/// \param[in] new_blowfish whether new blowfish implementation is available
+	/// \param[in] furtive_read whether furtive read access is available
+	/// \note this routine is deprecated, as it needs a change in its interface
+	/// upon each new feature addition, use the other tools_display_features()
+	/// routing, with a single argument (see below).
     extern void tools_display_features(user_interaction & dialog,
-                                       bool ea, bool largefile, bool nodump, bool special_alloc, U_I bits, bool thread_safe,
+                                       bool ea,
+				       bool largefile,
+				       bool nodump,
+				       bool special_alloc,
+				       U_I bits,
+				       bool thread_safe,
                                        bool libz,
                                        bool libbz2,
+				       bool liblzo2,
                                        bool libcrypto,
-				       bool new_blowfish);
+				       bool furtive_read);
+
+        /// display the compilation time features of libdar
+
+        /// \param[in,out] dialog for user interaction
+	/// \note this call uses the compile_time:: routines, and will
+	/// not change its interface upon new feature addition
+    extern void tools_display_features(user_interaction & dialog);
+
 
         /// test if two dates are equal taking care of a integer hour of difference
 
@@ -269,15 +336,6 @@ namespace libdar
         /// \param[in] date2 second date to compare to
         /// \return whether dates are equal or not
     extern bool tools_is_equal_with_hourshift(const infinint & hourshift, const infinint & date1, const infinint & date2);
-
-        /// ascii to integer conversion
-
-        /// \param[in] a is the ascii string to convert
-        /// \param[out] val is the resulting value
-        /// \return true if the conversion could be done false if the given string does not
-        /// correspond to the decimal representation of an unsigned integer
-    extern bool tools_my_atoi(char *a, U_I & val);
-
 
         /// template function to add two vectors
 
@@ -323,7 +381,7 @@ namespace libdar
         /// \param[in] argc is the number of argument on the command line
         /// \param[in] argv is the list of argument on the command line
         /// \return true if the argument is present in the list
-    extern bool tools_look_for(const char *argument, S_I argc, char *argv[]);
+    extern bool tools_look_for(const char *argument, S_I argc, char *const argv[]);
 
 
         /// set dates of a given file, no exception thrown
@@ -369,7 +427,10 @@ namespace libdar
         /// \param[out] min the minimum value of the range
         /// \param[out] max the maximum value of the range
         /// \exception Erange is thrown is the string to parse is incorrect
-    extern void tools_read_range(const std::string & s, U_I & min, U_I & max);
+	/// \note: either a single number (positive or negative) is returned in min
+	/// (max is set to min if min is positive or to zero if min is negative)
+	/// or a range of positive numbers.
+    extern void tools_read_range(const std::string & s, S_I & min, U_I & max);
 
 
         /// make printf-like formating to a std::string
@@ -482,6 +543,11 @@ namespace libdar
 	/// \return the mtime of the given file
     extern infinint tools_get_mtime(const std::string & s);
 
+	/// returns the last change date of the given file
+
+	/// \param[in] s path of the file to get the last ctime
+	/// \return the ctime of the given file
+    extern infinint tools_get_ctime(const std::string & s);
 
 	/// read a file and split its contents in words
 
@@ -489,6 +555,75 @@ namespace libdar
 	/// \return the list of words found in this order in the file
 	/// \note The different quotes are taken into account
     extern std::vector<std::string> tools_split_in_words(generic_file & f);
+
+	/// look next char in string out of parenthesis
+
+	/// \param[in] data is the string to look into
+	/// \param[in] what is the char to look for
+	/// \param[in] start is the index in string to start from, assuming at given position we are out of parenthesis
+	/// \param[out] found the position of the next char equal to what
+	/// \return true if a char equal to 'what' has been found and set the 'found' argument to its position or returns false if
+	/// no such character has been found out of parenthesis
+	/// \note the 'found' argument is assigned only if the call returns true, its value is not to be used when false is returned from the call
+	/// \note second point, the start data should point to a character that is out of any parenthesis, behavior is undefined else.
+    extern bool tools_find_next_char_out_of_parenthesis(const std::string & data, const char what,  U_32 start, U_32 & found);
+
+
+	/// produce the string resulting from the substition of % macro defined in the map
+
+	/// \param[in] hook is the user's expression in which to proceed to substitution
+	/// \param[in] corres is a map telling which char following a % sign to replace by which string
+	/// \return the resulting string of the substitution
+    extern std::string tools_substitute(const std::string & hook,
+					const std::map<char, std::string> & corres);
+
+
+	/// produces the string resulting from the substitution of %... macro
+
+	/// \param[in] hook the string in which to substitute
+	/// \param[in] path is by what %p will be replaced
+	/// \param[in] basename is by what %b will be replaced
+	/// \param[in] num is by what %n will be replaced
+	/// \param[in] padded_num is by what %N will be replaced
+	/// \param[in] ext is by what %e will be replaced
+	/// \param[in] context is by what %c will be replaced
+	/// \return the substitued resulting string
+	/// \note it now relies on tools_substitue
+    extern std::string tools_hook_substitute(const std::string & hook,
+					     const std::string & path,
+					     const std::string & basename,
+					     const std::string & num,
+					     const std::string & padded_num,
+					     const std::string & ext,
+					     const std::string & context);
+
+
+	/// execute and retries at user will a given command line
+
+	/// \param[in] ui which way to ask the user whether to continue upon command line error
+	/// \param[in] cmd_line the command line to execute
+    extern void tools_hook_execute(user_interaction & ui,
+				   const std::string & cmd_line);
+
+
+	/// subsititue and execute command line
+
+	/// \param[in,out] ui this is the way to contact the user
+	/// \param[in] hook the string in which to substitute
+	/// \param[in] path is by what %p will be replaced
+	/// \param[in] basename is by what %b will be replaced
+	/// \param[in] num is by what %n will be replaced
+	/// \param[in] padded_num is by what %N will be replaced
+	/// \param[in] ext is by what %e will be replaced
+	/// \param[in] context is by what %c will be replaced
+    extern void tools_hook_substitute_and_execute(user_interaction & ui,
+						  const std::string & hook,
+						  const std::string & path,
+						  const std::string & basename,
+						  const std::string & num,
+						  const std::string & padded_num,
+						  const std::string & ext,
+						  const std::string & context);
 
 	/// builds a regex from root directory and user provided regex to be applied to the relative path
 
@@ -501,17 +636,62 @@ namespace libdar
 
 	/// convert string for xml output
 
-	/// \note any < > & quote and double-quote are replaced by adequate sequence for unicode
+	/// \note any < > & quote and double quote are replaced by adequate sequence for unicode
 	/// \note second point, nothing is done here to replace system native strings to unicode
     extern std::string tools_output2xml(const std::string & src);
 
-	/// Produces the in "dest" the XORed value of "src" for the 'n' first bytes
+	/// convert octal string to integer
 
-	/// \param[out] dest is the area where to write down the result
+	/// \param perm is a string representing a number in octal (string must have a leading zero)
+	/// \return the corresponding value as an integer
+    extern U_I tools_octal2int(const std::string & perm);
+
+
+	/// convert a number to a string corresponding to its octal representation
+
+	/// \param perm is the octal number
+	/// \return the corresponding octal string
+    extern std::string tools_int2octal(const U_I & perm);
+
+	/// change the permission of the file which descriptor is given
+
+	/// \param[in] fd file's descriptor
+	/// \param[in] perm file permission to set the file to
+    extern void tools_set_permission(S_I fd, U_I perm);
+
+	/// change ownership of the file which descriptor is given
+
+	/// \param[in] fd file's descriptor
+	/// \param[in] slice_user the user to set the file to. For empty string, no attempts to change the user ownership is done
+	/// \param[in] slice_group the group to set the file to. For empty string, no attempts to change the group ownership is done
+	/// \note this call may throw Erange exception upon system error
+    extern void tools_set_ownership(S_I fd, const std::string & slice_user, const std::string & slice_group);
+
+	/// Produces in "dest" the XORed value of "dest" and "src"
+
+	/// \param[in,out] dest is the area where to write down the result
 	/// \param[in] src points to vector or array of values to convert
 	/// \param[in] n is the number of byte to convert from src to dest
 	/// \note dest *must* be a valid pointer to an allocated memory area of at least n bytes
-    extern void tools_memxor(void *dest, const void *src, size_t n);
+    extern void tools_memxor(void *dest, const void *src, U_I n);
+
+	/// Produces a list of TLV from a constant type and a list of string
+
+	/// \param[in,out] dialog for user interaction
+	/// \param[in] type is the type each TLV will have
+	/// \param[in] data is the list of string to convert into a list of TLV
+	/// \return a tlv_list object. Each TLV in the list correspond to a string in the given list
+    extern tlv_list tools_string2tlv_list(user_interaction & dialog, const U_16 & type, const std::vector<std::string> & data);
+
+
+
+	/// Extract from anonymous pipe a tlv_list
+
+	/// \param[in,out] dialog for user interaction
+	/// \param[in] fd the filedescriptor for the anonymous pipe's read extremity
+	/// \param[out] result the resulting tlv_list
+    extern void tools_read_from_pipe(user_interaction & dialog, S_I fd, tlv_list & result);
+
 
 
 	/// Produces a pseudo random number x, where 0 <= x < max
@@ -526,9 +706,10 @@ namespace libdar
 
 	/// \param[in] number is the number to decompose
 	/// \param[in] base is the base to decompose the number into
-	/// \return a vector of 'digit' int the specified base, the first begin the less significative
-	/// \note this template does not take care of the possibily existing optimized euclide division
+	/// \return a vector of 'digit' int the specified base, the first beeing the less significative
+	/// \note this template does not take care of the possibily existing optimized euclide division to speed up the operation
 	/// like what exists for infinint. A specific overriden fonction for this type would be better.
+	/// \note, the name "big_endian" is erroneous, it gives a little endian vector
 
     template <class N, class B> std::vector<B> tools_number_base_decomposition_in_big_endian(N number, const B & base)
     {
@@ -546,6 +727,41 @@ namespace libdar
 	return ret;
     }
 
+	/// convert a unsigned char into its hexa decima representation
+
+	/// \param[in] x is the byte to convert
+	/// \return the string representing the value of x written in hexadecimal
+    std::string tools_unsigned_char_to_hexa(unsigned char x);
+
+	/// convert a string into its hexadecima representation
+
+	/// \param[in] input input string to convert
+	/// \return a string containing an hexadecimal number corresponding to the bytes of the input string
+
+    std::string tools_string_to_hexa(const std::string & input);
+
+	/// Defines the CRC size to use for a given filesize
+
+	/// \param[in] size is the size of the file to protect by CRC
+	/// \return crc_size is the size of the crc to use
+    extern infinint tools_file_size_to_crc_size(const infinint & size);
+
+	/// return a string containing the Effective UID
+
+    extern std::string tools_get_euid();
+
+
+	/// return a string containing the Effective UID
+
+    extern std::string tools_get_egid();
+
+	/// return a string containing the hostname of the current host
+
+    extern std::string tools_get_hostname();
+
+	/// return a string containing the current time (UTC)
+
+    extern std::string tools_get_date_utc();
 
 } /// end of namespace
 

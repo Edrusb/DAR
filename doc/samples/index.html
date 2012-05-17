@@ -1,14 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 
-
-
-
-
-
-  
-  
-  
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar - Scripts and Examples</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -38,7 +30,7 @@ users. They should all work, if some do not, see them as illustration
 or examples that let you have a base to your own configuration scripts.<br>
       </div>
       <br>
-      <div style="text-align: justify;">You will here both DUC files (<a href="../Notes.html#XV">Dar User Commands</a>) that can be launched
+      <div style="text-align: justify;">You will here both DUC files (<a href="../usage_notes.html#extensions_used">Dar User Commands</a>) that can be launched
 from dar thanks to its -E or -F options as well as scripts from where
 dar is launched:<br>
       </div>
@@ -77,7 +69,7 @@ file<br>
       </td>
       <td style="vertical-align: top;">"(me)"<br>
       </td>
-      <td style="vertical-align: top;"><a href="../Notes.html#XI">DCF</a><br>
+      <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DCF</a><br>
       </td>
       <td style="vertical-align: top;"><a href="darrc_sample">darrc_sample</a><br>
       </td>
@@ -88,7 +80,7 @@ learn with examples (a rich one) ;-)<br>
       </td>
       <td style="vertical-align: top;">Henrik Ingo<br>
       </td>
-      <td style="vertical-align: top;"><a href="../Notes.html#XI">DCF</a><br>
+      <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DCF</a><br>
       </td>
       <td style="vertical-align: top;"><a href="sample1.txt">sample1.txt</a><br>
       </td>
@@ -99,7 +91,7 @@ data for protection against media corruption<br>
       </td>
       <td style="vertical-align: top;">Denis Corbin<br>
       </td>
-      <td style="vertical-align: top;"><a href="../Notes.html#XI">DUC</a><br>
+      <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DUC</a><br>
       </td>
       <td style="vertical-align: top;"><a href="dar_par_create.duc">dar_par_create.duc</a><br>
       </td>
@@ -110,7 +102,7 @@ slice with redundancy data<br>
       </td>
       <td style="vertical-align: top;">Denis Corbin<br>
       </td>
-      <td style="vertical-align: top;"><a href="../Notes.html#XI">DUC</a></td>
+      <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DUC</a></td>
       <td style="vertical-align: top;"><a href="dar_par_test.duc">dar_par_test.duc</a><br>
       </td>
     </tr>
@@ -120,7 +112,7 @@ dar_par_create and dar_par_test.duc<br>
       </td>
       <td style="vertical-align: top;"><br>
       </td>
-      <td style="vertical-align: top;"><a href="../Notes.html#XI">DCF</a><br>
+      <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DCF</a><br>
       </td>
       <td style="vertical-align: top;"><a href="dar_par.dcf">dar_par.dcf</a><br>
       </td>
@@ -133,7 +125,7 @@ slice to pause]<br>
       </td>
       <td style="vertical-align: top;">Denis Corbin<br>
       </td>
-      <td style="vertical-align: top;"><a href="../Notes.html#XI">DCF</a><br>
+      <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DCF</a><br>
       </td>
       <td style="vertical-align: top;"><a href="pause_every_n_slice.duc">pause_every_n_slice.duc</a><br>
       </td>
@@ -182,8 +174,8 @@ document</a>.<br>
       <td style="vertical-align: top;">Jakub Holy<br>
       </td>
       <td style="vertical-align: top;">Script<br>
-      <a href="../Notes.html#XI">DCF</a><br>
-      <a href="../Notes.html#XI">DCF</a><br>
+      <a href="../usage_notes.html#extensions_used">DCF</a><br>
+      <a href="../usage_notes.html#extensions_used">DCF</a><br>
       </td>
       <td style="vertical-align: top;"><a href="JH-dar-make_user_backup.sh">JH-dar-make_user_backup.sh</a><br>
       <a href="JH_darrc">JH_darrc</a><br>
@@ -238,10 +230,10 @@ The design requires that each backup job fits on a single DVD, optionally writin
         <li> copying system documentation to DVD for reference during system recovery</li>
         <li>Writing dar_static to DVD for potential use during system recovery </li>
         <li>Writing /etc/lvm and contents to DVD for potential use during </li>
-        <li>system recovery 
-	</li><li>Options to restart failed DVD operations by skipping to DVD 
+        <li>system recovery
+	</li><li>Options to restart failed DVD operations by skipping to DVD
         </li><li>writing and to DVD verification
- 	</li><li>Extensive error trappiMyBackup.shng</li></ul>The script contains itself a very detailed user information.<br>
+ 	</li><li>Extensive error trapping</li></ul>The script contains itself a very detailed user information.<br>
 
 </td>
       <td style="vertical-align: top;">Charles<br>
@@ -250,7 +242,21 @@ The design requires that each backup job fits on a single DVD, optionally writin
       </td>
       <td style="vertical-align: top;"><a href="MyBackup.sh.tar.gz">MyBackup.sh.tar.gz</a><br>
       </td>
+    </tr><tr>
+      <td style="vertical-align: top;">A shell script to replace -p
+option when one need to pause before dar lacks space to add a new slice
+on the disk. This may be of some use when using support of different
+sizes to store a given archive. You then need to&nbsp; choose the size
+of slices (-s option) as the biggest common divisor of all slice sizes
+to let dar handle this situation quite nicely.<br>
+      </td>
+      <td style="vertical-align: top;">Denis Corbin<br>
+      </td>
+      <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DUC</a></td>
+      <td style="vertical-align: top;"><a href="available_space.duc">available_space.duc</a><br>
+      </td>
     </tr>
+
 
 
 
@@ -259,6 +265,7 @@ The design requires that each backup job fits on a single DVD, optionally writin
 <br>
 <br>
 </center>
+
 
 
 

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: hide_file.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: hide_file.cpp,v 1.18 2011/04/17 13:12:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,7 +30,7 @@ using namespace libdar;
 
 #define CHECK_INIT if(!is_init) init()
 
-hide_file::hide_file(user_interaction & dialog, generic_file &f) : generic_file(dialog, gf_read_only)
+hide_file::hide_file(generic_file &f) : generic_file(gf_read_only)
 {
     if(f.get_mode() == gf_write_only)
         throw Erange("hide_file::hide_file", gettext("hide_file cannot be initialized with write-only file"));
@@ -46,6 +46,9 @@ hide_file::hide_file(user_interaction & dialog, generic_file &f) : generic_file(
 bool hide_file::skip(const infinint & pos)
 {
     CHECK_INIT;
+    if(is_terminated())
+	throw SRC_BUG;
+
     U_I it = 0;
     while(it < morceau.size() && morceau[it].offset + morceau[it].longueur - 1 < pos)
         ++it;
@@ -63,6 +66,9 @@ bool hide_file::skip(const infinint & pos)
 bool hide_file::skip_to_eof()
 {
     CHECK_INIT;
+    if(is_terminated())
+	throw SRC_BUG;
+
     pos_index = morceau.size();
     return true;
 }
@@ -70,6 +76,9 @@ bool hide_file::skip_to_eof()
 bool hide_file::skip_relative(S_I x)
 {
     CHECK_INIT;
+    if(is_terminated())
+	throw SRC_BUG;
+
     if(x > 0)
     {
         infinint my_x = x;
@@ -120,6 +129,9 @@ bool hide_file::skip_relative(S_I x)
 infinint hide_file::get_position()
 {
     CHECK_INIT;
+    if(is_terminated())
+	throw SRC_BUG;
+
     if(pos_index >= morceau.size())
 	if(morceau.empty())
 	    return 0; // empty virtual file
@@ -129,9 +141,12 @@ infinint hide_file::get_position()
         return morceau[pos_index].offset + pos_relicat;
 }
 
-S_I hide_file::inherited_read(char *a, size_t size)
+U_I hide_file::inherited_read(char *a, U_I size)
 {
     CHECK_INIT;
+    if(is_terminated())
+	throw SRC_BUG;
+
     U_I lu = 0, tmp_lu = 0;
     size_t maxlire;
     size_t reste;
@@ -159,7 +174,7 @@ S_I hide_file::inherited_read(char *a, size_t size)
     return lu;
 }
 
-S_I hide_file::inherited_write(const char *a, size_t size)
+void hide_file::inherited_write(const char *a, size_t size)
 {
     CHECK_INIT;
     throw SRC_BUG; // hide_file alsways is read-only !
@@ -167,7 +182,7 @@ S_I hide_file::inherited_write(const char *a, size_t size)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: hide_file.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $";
+    static char id[]="$Id: hide_file.cpp,v 1.18 2011/04/17 13:12:29 edrusb Rel $";
     dummy_call(id);
 }
 

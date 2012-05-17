@@ -322,7 +322,7 @@
     </desc>
   </arg>
 
-  <arg flag="-y" opt="level">
+  <arg flag="-z" opt="bzip2[:level]">
     <desc>
       compress data in archive using bzip2 algorithm.
     </desc>
@@ -388,7 +388,7 @@
     </desc>
   </arg>
 
-  <arg flag="-G" opt="path/" repl="basename">
+  <arg flag="-@" opt="path/" repl="basename">
     <desc>
        Do on-fly catalogue isolation of the resulting archive
     </desc>
@@ -403,6 +403,18 @@
   <arg flag="-,">
     <desc>
        ignore directories that follow the Directory Tagging Standard
+    </desc>
+  </arg>
+
+  <arg flag="-/" repl="string">
+    <desc>
+        which way dar can overwrite files at archive merging or extraction time
+    </desc>
+  </arg>
+
+  <arg flag="-^" repl="string">
+    <desc>
+       permission[:user[:group]] of created slices
     </desc>
   </arg>
 
@@ -465,7 +477,7 @@
   </hdr>
 
 <!--
-$Id: dar.xml,v 1.24.2.1 2009/04/06 20:23:19 edrusb Rel $
+$Id: dar.xml,v 1.27 2011/01/22 19:07:42 edrusb Rel $
 
 Revision 1.3  2002/08/20 13:44:08  cs1cwm
 Added DTD and removed the #ifdef and #endif.

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.36.2.10 2011/03/12 15:39:36 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.62 2011/05/20 10:23:07 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -49,13 +49,15 @@ extern "C"
 #include "shell_interaction.hpp"
 #include "libdar.hpp"
 #include "thread_cancellation.hpp"
+#include "header.hpp"
+#include "line_tools.hpp"
 
 using namespace libdar;
 
-#define DAR_XFORM_VERSION "1.4.3"
+#define DAR_XFORM_VERSION "1.5.0"
 
 static bool command_line(user_interaction & dialog,
-			 S_I argc, char *argv[],
+			 S_I argc, char * const argv[],
                          path * & src_dir, string & src,
                          path * & dst_dir, string & dst,
                          infinint & first_file_size,
@@ -65,17 +67,24 @@ static bool command_line(user_interaction & dialog,
                          infinint & pause,
                          bool & beep,
                          string & execute_src,
-                         string & execute_dst);
+                         string & execute_dst,
+			 string & slice_perm,
+			 string & slice_user,
+			 string & slice_group,
+			 hash_algo & hash,
+			 infinint & src_min_digits,
+			 infinint & dst_min_digits);
+
 static void show_usage(user_interaction & dialog, const char *command_name);
 static void show_version(user_interaction & dialog, const char *command_name);
-static S_I sub_main(user_interaction & dialog, S_I argc, char *argv[], const char **env);
+static S_I sub_main(user_interaction & dialog, S_I argc, char *const argv[], const char **env);
 
-int main(S_I argc, char *argv[], const char **env)
+int main(S_I argc, char *const argv[], const char **env)
 {
     return dar_suite_global(argc, argv, env, &sub_main);
 }
 
-static S_I sub_main(user_interaction & dialog, S_I argc, char *argv[], const char **env)
+static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
     path *src_dir = NULL;
     path *dst_dir = NULL;
@@ -85,23 +94,31 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char *argv[], const cha
     infinint pause;
     string execute_src, execute_dst;
     thread_cancellation thr;
+    string slice_perm;
+    string slice_user;
+    string slice_group;
+    hash_algo hash;
+    infinint src_min_digits;
+    infinint dst_min_digits;
     S_I ret = EXIT_OK;
 
     try
     {
 	if(command_line(dialog, argc, argv, src_dir, src, dst_dir, dst, first, size,
-			warn, allow, pause, beep, execute_src, execute_dst))
+			warn, allow, pause, beep, execute_src, execute_dst, slice_perm, slice_user, slice_group, hash,
+			src_min_digits, dst_min_digits))
 	{
 	    generic_file *dst_sar = NULL;
 	    generic_file *src_sar = NULL;
-	    sar *tmp_sar = NULL;
+	    label data_name;
 
+	    data_name.clear();
 	    try
 	    {
 		if(dst != "-")
 		{
 		    shell_interaction_change_non_interactive_output(&cout);
-		    tools_avoid_slice_overwriting_regex(dialog,  dst_dir->display(), string("^")+dst+"\\.[0-9]+\\."+EXTENSION+"$", false, allow, warn, false);
+		    tools_avoid_slice_overwriting_regex(dialog,  dst_dir->display(), string("^")+dst+"\\.[0-9]+\\."+EXTENSION+"(\\.(md5|sha1))?$", false, allow, warn, false);
 		}
 
 		thr.check_self_cancellation();
@@ -109,41 +126,37 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char *argv[], const cha
 		shell_interaction_set_beep(beep);
 		if(src == "-")
 		{
-		    generic_file *tmp = new tuyau(dialog, 0, gf_read_only);
+		    trivial_sar *tmp_sar = new trivial_sar(dialog, src, false);
+		    if(tmp_sar == NULL)
+			throw Ememory("sub_main");
 
-		    if(tmp == NULL)
-			throw Ememory("main");
-		    try
-		    {
-			src_sar = new trivial_sar(dialog, tmp);
-			if(src_sar == NULL)
-			    delete tmp;
-			tmp = NULL;
-		    }
-		    catch(...)
-		    {
-			if(tmp != NULL)
-			    delete tmp;
-			throw;
-		    }
+		    src_sar = tmp_sar;
+		    if(src_sar != NULL)
+			data_name = tmp_sar->get_data_name();
+		    else
+			throw SRC_BUG;
 		}
 		else 	// source not from a pipe
 		{
-		    tmp_sar = new sar(dialog, src, EXTENSION, *src_dir, execute_src);
+		    sar *tmp_sar = new sar(dialog, src, EXTENSION, *src_dir, false, src_min_digits, false, execute_src);
 		    if(tmp_sar == NULL)
 			throw Ememory("main");
 		    else
 			tmp_sar->set_info_status(CONTEXT_OP);
 		    src_sar = tmp_sar;
+		    if(src_sar != NULL)
+			data_name = tmp_sar->get_data_name();
+		    else
+			throw SRC_BUG;
 		}
 
 		if(size == 0)
 		    if(dst == "-")
-			dst_sar = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only);
+			dst_sar = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name, execute_dst);
 		    else
-			dst_sar = sar_tools_open_archive_fichier(dialog, (*dst_dir + sar_make_filename(dst, 1, EXTENSION)).display(), allow, warn);
+			dst_sar = new trivial_sar(dialog, dst, EXTENSION, *dst_dir, data_name, execute_dst, allow, warn, slice_perm, slice_user, slice_group, hash, dst_min_digits);
 		else
-		    dst_sar = new sar(dialog, dst, EXTENSION, size, first, warn, allow, pause, *dst_dir, execute_dst);
+		    dst_sar = new sar(dialog, dst, EXTENSION, size, first, warn, allow, pause, *dst_dir, data_name, slice_perm, slice_user, slice_group, hash, dst_min_digits, execute_dst);
 		if(dst_sar == NULL)
 		    throw Ememory("main");
 
@@ -208,7 +221,7 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char *argv[], const cha
     return ret;
 }
 
-static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
+static bool command_line(user_interaction & dialog, S_I argc, char * const argv[],
                          path * & src_dir, string & src,
                          path * & dst_dir, string & dst,
                          infinint & first_file_size,
@@ -218,7 +231,13 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
                          infinint & pause,
                          bool & beep,
                          string & execute_src,
-                         string & execute_dst)
+                         string & execute_dst,
+			 string & slice_perm,
+			 string & slice_user,
+			 string & slice_group,
+			 hash_algo & hash,
+			 infinint & src_min_digits,
+			 infinint & dst_min_digits)
 {
     S_I lu;
     src_dir = NULL;
@@ -232,10 +251,16 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
     src = dst = "";
     execute_src = execute_dst = "";
     U_I suffix_base = TOOLS_BIN_SUFFIX;
+    slice_perm = "";
+    slice_user = "";
+    slice_group = "";
+    hash = hash_none;
+    src_min_digits = 0;
+    dst_min_digits = 0;
 
     try
     {
-        while((lu = getopt(argc, argv, "s:S:p::wnhbVE:F:a::Qj")) != EOF)
+        while((lu = getopt(argc, argv, "s:S:p::wnhbVE:F:a::Qj^:3:;:")) != EOF)
         {
             switch(lu)
             {
@@ -312,7 +337,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
                 return false;
             case 'E':
                 if(optarg == NULL)
-                    throw Erange("get_args", gettext("Missing argument to -E"));
+                    throw Erange("command_line", gettext("Missing argument to -E"));
                 if(execute_dst == "")
                     execute_dst = optarg;
                 else
@@ -320,7 +345,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
                 break;
             case 'F':
                 if(optarg == NULL)
-                    throw Erange("get_args", gettext("Missing argument to -F"));
+                    throw Erange("command_line", gettext("Missing argument to -F"));
                 if(execute_src == "")
                     execute_src = optarg;
                 else
@@ -340,6 +365,31 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
 	    case 'Q':
 	    case 'j':
 		break;  // ignore this option already parsed during initialization (dar_suite.cpp)
+	    case '^':
+		if(optarg == NULL)
+		    throw Erange("command_line", tools_printf(gettext("Missing argument to -^"), char(lu)));
+		line_tools_slice_ownership(string(optarg), slice_perm, slice_user, slice_group);
+		break;
+	    case '3':
+		if(optarg == NULL)
+		    throw Erange("command_line", tools_printf(gettext("Missing argument to --hash"), char(lu)));
+		if(strcasecmp(optarg, "md5") == 0)
+		    hash = hash_md5;
+		else
+		    if(strcasecmp(optarg, "sha1") == 0)
+			hash = hash_sha1;
+		    else
+			throw Erange("command_line", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
+		break;
+	    case ';':
+		if(optarg == NULL)
+		    throw Erange("command_line", tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
+		else
+		{
+		    infinint tmp2;
+		    line_tools_get_min_digits(optarg, src_min_digits, dst_min_digits, tmp2);
+		}
+		break;
             case ':':
                 throw Erange("command_line", tools_printf(gettext("Missing parameter to option -%c"), char(optopt)));
             case '?':
@@ -396,7 +446,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.36.2.10 2011/03/12 15:39:36 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.62 2011/05/20 10:23:07 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -416,15 +466,9 @@ static void show_version(user_interaction & dialog, const char *command_name)
 {
     string name;
     tools_extract_basename(command_name, name);
-    U_I maj, med, min, bits;
-    bool ea, largefile, nodump, special_alloc, thread, libz, libbz2, libcrypto, new_blowfish;
+    U_I maj, med, min;
 
-    get_version(maj, min);
-    if(maj > 2)
-	get_version(maj, med, min);
-    else
-	med = 0;
-    get_compile_time_features(ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
+    get_version(maj, med, min);
     shell_interaction_change_non_interactive_output(&cout);
 
     dialog.printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n\n", name.c_str(), DAR_XFORM_VERSION);
@@ -432,7 +476,7 @@ static void show_version(user_interaction & dialog, const char *command_name)
 	dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
     else
 	dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
-    tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
+    tools_display_features(dialog);
     dialog.printf("\n");
     dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__);
     dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name.c_str(), PACKAGE_VERSION);

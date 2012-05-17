@@ -16,11 +16,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: getopt_decision.h,v 1.3.4.1 2010/12/21 20:54:08 edrusb Rel $
+// $Id: getopt_decision.h,v 1.6 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file getopt_decision.h
+    /// \brief switch routine to define which file to include based on the result of the configure script
+    /// \ingroup CMDLINE
+
 
 #ifndef GETOPT_DECISION_H
 #define GETOPT_DECISION_H

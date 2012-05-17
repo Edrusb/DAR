@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: header.cpp,v 1.16.2.2 2009/01/24 16:01:16 edrusb Rel $
+// $Id: header.cpp,v 1.34 2011/04/17 20:59:43 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -50,122 +50,360 @@ extern "C"
 #  include <time.h>
 # endif
 #endif
-
-#if HAVE_STRING_H
-#include <string.h>
-#endif
 } // end extern "C"
 
 #include "header.hpp"
+#include "tlv_list.hpp"
+#include "tools.hpp"
+#include "fichier.hpp"
 
+using namespace std;
 namespace libdar
 {
 
-    void header::read(generic_file & f)
+    enum extension_type
     {
-        magic_number tmp;
+	extension_none = 'N',     //< no extension (obsolete since format "08")
+	extension_size = 'S',     //< extension is the size of slices (obsolete since format "08")
+	extension_tlv =  'T'      //< extension is a TLV (systematic since format "08")
+    };
 
-        f.read((char *)&tmp, sizeof(magic_number));
-        magic = ntohl(tmp);
-        f.read(internal_name, LABEL_SIZE);
-        f.read(&flag, 1);
-        f.read(&extension, 1);
-        switch(extension)
-        {
-        case EXTENSION_NO:
-            break;
-        case EXTENSION_SIZE:
-            size_ext = infinint(f.get_gf_ui(), NULL, &f);
-            break;
-	case EXTENSION_TLV:
-	    throw Efeature(gettext("Archive format too recent for this version of DAR"));
-        default :
-            throw Erange("header::read", gettext("Badly formatted SAR header"));
-        }
+
+    enum tlv_type
+    {
+	tlv_size = 1,             //< TLV gives the size of slices (infinint)
+	tlv_first_size = 2,       //< TLV gives the size of first slice (infinint)
+	tlv_data_name = 3,        //< TLV gives the name of the data set
+	tlv_reserved = 65535      //< TLV reserved if 16 bits type space is exhausted to signal a new (larger type storage, to be implemented of course)
+    };
+
+
+	/*************************************************************/
+	/******************* HEADER datastructure ********************/
+	/*************************************************************/
+
+    header::header()
+    {
+        magic = 0;
+	internal_name.clear();
+	data_name.clear();
+        flag = '\0';
+	first_size = NULL;
+	slice_size = NULL;
+	old_header = false;
     }
 
-    void header::write(generic_file & f)
+    void header::read(user_interaction & ui, generic_file & f, bool lax)
     {
         magic_number tmp;
+	tlv_list tempo;
+	char extension;
+	fichier *f_fic = dynamic_cast<fichier *>(&f);
+
+	clear_pointers();
+	old_header = false;
+        if(f.read((char *)&tmp, sizeof(magic_number)) != sizeof(magic_number))
+	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
+        magic = ntohl(tmp);
+	try
+	{
+	    internal_name.read(f);
+	}
+	catch(Erange & e)
+	{
+	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
+	}
+        if(f.read(&flag, 1) != 1)
+	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
+        if(f.read(&extension, 1) != 1)
+	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
+	data_name.clear();
+        switch(extension)
+        {
+        case extension_none:
+	    if(f_fic != NULL)
+	    {
+		slice_size = new infinint(f_fic->get_size());
+		if(slice_size == NULL)
+		{
+		    if(!lax)
+			throw Ememory("header::read");
+		    else
+		    {
+			ui.warning(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
+			slice_size = new infinint(0);
+			if(slice_size == NULL)
+			    throw Ememory("header::read");
+		    }
+		    // this extension was used in archives before release 2.4.0
+		    // when the first slice had the same size of the following ones
+		    // the slice size of all slices if thus the one of the first which
+		    // was learnt by getting the size of the file
+		    // this works also for single sliced archives.
+		}
+	    }
+	    else
+		throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe, only using dar_slave or normal plain file (slice) method"));
+	    old_header = true;
+            break;
+        case extension_size:
+	    slice_size = new infinint(f);
+	    if(slice_size == NULL)
+	    {
+		if(!lax)
+		    throw Ememory("header::read");
+		else
+		{
+		    ui.warning(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
+		    slice_size = new infinint(0);
+		    if(slice_size == NULL)
+			throw Ememory("header::read");
+		}
+	    }
+	    if(f_fic != NULL)
+	    {
+		first_size = new infinint(f_fic->get_size());
+		if(first_size == NULL)
+		{
+		    if(!lax)
+			throw Ememory("header::read");
+		    else
+		    {
+			ui.warning(gettext("LAX MODE: first slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
+			first_size = new infinint(0);
+			if(first_size == NULL)
+			    throw Ememory("header::read");
+		    }
+		    // note: the "extension_size" extension was used in archives before release 2.4.0
+		    // this option was only used in the first slice and contained the size of slices (not of the first slice)
+		    // when the first slice had a different size. This way, reading the size of the current file gives
+		    // the size of the first slice while the header extension gives the size of following slices.
+		}
+	    }
+	    else
+		if(!lax)
+		    throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe. It only can be read using dar_slave or normal plain file (slice)"));
+		else
+		    ui.warning(gettext("LAX MODE: first slice size is not possible to read, continuing anyway..."));
+	    old_header = true;
+            break;
+	case extension_tlv:
+	    tempo.read(f);        // read the list of TLV stored in the header
+	    fill_from(ui, tempo); // from the TLV list, set the different fields of the current header object
+	    if(slice_size == NULL && f_fic != NULL)
+	    {
+		slice_size = new infinint(f_fic->get_size());
+		if(slice_size == NULL)
+		    throw Ememory("header::read");
+	    }
+	    break;
+        default:
+	    if(!lax)
+		throw Erange("header::read", gettext("Badly formatted SAR header (unknown TLV type in slice header)"));
+	    else
+	    {
+		ui.warning(gettext("LAX MODE: Unknown data in slice header, ignoring and continuing"));
+		slice_size = new infinint(0);
+		if(slice_size == NULL)
+		    throw Ememory("header::read");
+	    }
+        }
+	if(data_name.is_cleared())
+	    data_name = internal_name;
+    }
+
+    void header::write(user_interaction & ui, generic_file & f)
+    {
+        magic_number tmp;
+	char tmp_ext[] = { extension_tlv, '\0' };
 
         tmp = htonl(magic);
         f.write((char *)&tmp, sizeof(magic));
-        f.write(internal_name, LABEL_SIZE);
+        internal_name.dump(f);
         f.write(&flag, 1);
-        f.write(&extension, 1);
-        switch(extension)
-        {
-        case EXTENSION_NO:
-            break;
-        case EXTENSION_SIZE:
-            size_ext.dump(f);
-            break;
-        default:
-            throw SRC_BUG;
-        }
+        f.write(tmp_ext, 1); // since release 2.4.0, tlv is always used to store optional information
+	build_tlv_list(ui).dump(f);
     }
 
-    void header::read(user_interaction & dialog, S_I fd)
+    void header::read(user_interaction & dialog, S_I fd, bool lax)
     {
         fichier fic = fichier(dialog, dup(fd));
-        read(fic);
+        read(dialog, fic, lax);
     }
 
     void header::write(user_interaction & dialog, S_I fd)
     {
         fichier fic = fichier(dialog, dup(fd));
-        write(fic);
+        write(dialog, fic);
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: header.cpp,v 1.16.2.2 2009/01/24 16:01:16 edrusb Rel $";
+        static char id[]="$Id: header.cpp,v 1.34 2011/04/17 20:59:43 edrusb Rel $";
         dummy_call(id);
     }
 
-    bool header_label_is_equal(const label &a, const label &b)
-    {
-        return memcmp(a, b, LABEL_SIZE) == 0;
-    }
 
-    void header_generate_internal_filename(label &ret)
+    bool header::get_first_slice_size(infinint & size)
     {
-        const time_t src1 = time(NULL);
-
-	if(sizeof(src1) >= LABEL_SIZE)
-	    memcpy(ret, &src1, LABEL_SIZE);
-	else
+	if(first_size != NULL)
 	{
-	    const U_I left = LABEL_SIZE - sizeof(src1);
-	    const pid_t src2 = getpid();
-
-	    if(sizeof(src2) >= left)
-		memcpy(ret, &src1, left);
-	    else
-		memcpy(ret, &src1, sizeof(src2));
+	    size = *first_size;
+	    return true;
 	}
+	else
+	    return false;
     }
 
-    header::header()
+    void header::set_first_slice_size(const infinint & size)
     {
-        magic = 0;
-        memset(internal_name, '\0', LABEL_SIZE);
-        extension = flag = '\0';
-        size_ext = 0;
+	if(first_size == NULL)
+	{
+	    first_size = new infinint();
+	    if(first_size == NULL)
+		throw Ememory("header::set_first_file_size");
+	}
+	*first_size = size;
     }
+
+    bool header::get_slice_size(infinint & size)
+    {
+	if(slice_size != NULL)
+	{
+	    size = *slice_size;
+	    return true;
+	}
+	else
+	    return false;
+    }
+
+    void header::set_slice_size(const infinint & size)
+    {
+	if(slice_size == NULL)
+	{
+	    slice_size = new infinint();
+	    if(slice_size == NULL)
+		throw Ememory("header::set_slice_size");
+	}
+
+	*slice_size = size;
+    }
+
 
     void header::copy_from(const header & ref)
     {
         magic = ref.magic;
-        label_copy(internal_name,ref.internal_name);
+        internal_name = ref.internal_name;
+ 	data_name = ref.data_name;
         flag = ref.flag;
-        extension = ref.extension;
-        size_ext = ref.size_ext;
+
+	if(ref.first_size != NULL)
+	{
+	    first_size = new infinint();
+	    if(first_size == NULL)
+		throw Ememory("header::copy_from");
+	    *first_size = *ref.first_size;
+	}
+	else
+	    first_size = NULL;
+
+	if(ref.slice_size != NULL)
+	{
+	    slice_size = new infinint();
+	    if(slice_size == NULL)
+		throw Ememory("header::copy_from");
+	    *slice_size = *ref.slice_size;
+	}
+	else
+	    slice_size = NULL;
+	old_header = ref.old_header;
     }
 
-    void label_copy(label & left, const label & right)
+    void header::clear_pointers()
     {
-    	memcpy(left, right, LABEL_SIZE);
+	if(first_size != NULL)
+	{
+	    delete first_size;
+	    first_size = NULL;
+	}
+
+	if(slice_size != NULL)
+	{
+	    delete slice_size;
+	    slice_size = NULL;
+	}
+    }
+
+    void header::fill_from(user_interaction & ui, const tlv_list & extension)
+    {
+	U_I taille = extension.size();
+	memory_file tmp = memory_file(gf_read_write);
+
+	clear_pointers();
+	for(U_I index = 0; index < taille; index++)
+	{
+	    extension[index].get_contents(tmp);
+	    switch(extension[index].get_type())
+	    {
+	    case tlv_first_size:
+		first_size = new infinint();
+		if(first_size == NULL)
+		    throw Ememory("header::fill_from");
+		first_size->read(tmp);
+		break;
+	    case tlv_size:
+		slice_size = new infinint();
+		if(slice_size == NULL)
+		    throw Ememory("header::fill_from");
+		slice_size->read(tmp);
+		break;
+	    case tlv_data_name:
+		try
+		{
+		    data_name.read(tmp);
+		}
+		catch(Erange & e)
+		{
+		    throw Erange("header::fill_from", gettext("incomplete data set name found in a slice header"));
+		}
+		break;
+	    default:
+		ui.pause(tools_printf(gettext("Unknown entry found in slice header (type = %d), option not supported. The archive you are reading may have been generated by a more recent version of libdar, ignore this entry and continue anyway?"), extension[index].get_type()));
+	    }
+	}
+    }
+
+    tlv_list header::build_tlv_list(user_interaction & ui) const
+    {
+	tlv_list ret;
+	tlv tmp;
+	memory_file pseudo_fic = memory_file(gf_read_write);
+
+	if(first_size != NULL)
+	{
+	    pseudo_fic.reset();
+	    first_size->dump(pseudo_fic);
+	    tmp.set_type(tlv_first_size);
+	    tmp.set_contents(pseudo_fic);
+	    ret.add(tmp);
+	}
+
+	if(slice_size != NULL)
+	{
+	    pseudo_fic.reset();
+	    slice_size->dump(pseudo_fic);
+	    tmp.set_type(tlv_size);
+	    tmp.set_contents(pseudo_fic);
+	    ret.add(tmp);
+	}
+
+	pseudo_fic.reset();
+	data_name.dump(pseudo_fic);
+	tmp.set_type(tlv_data_name);
+	tmp.set_contents(pseudo_fic);
+	ret.add(tmp);
+
+	return ret;
     }
 
 } // end of namespace

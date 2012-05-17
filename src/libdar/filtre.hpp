@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filtre.hpp,v 1.21.2.1 2010/09/12 16:32:51 edrusb Rel $
+// $Id: filtre.hpp,v 1.42 2011/03/31 15:52:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -32,38 +32,43 @@
 #include "../my_config.h"
 #include <vector>
 #include "mask.hpp"
-#include "compressor.hpp"
+#include "pile.hpp"
 #include "catalogue.hpp"
 #include "path.hpp"
 #include "statistics.hpp"
+#include "criterium.hpp"
+#include "archive_options.hpp"
 
 namespace libdar
 {
 
-    extern void filtre_restore(user_interaction & dialog,
-			       const mask &filtre,
-                               const mask & subtree,
-                               catalogue & cat,
-                               bool detruire,
-                               const path & fs_racine,
-                               bool fs_allow_overwrite,
-                               bool fs_warn_overwrite,
-                               bool info_details,
-                               statistics & st,
-                               bool only_if_more_recent,
-                               const mask & ea_mask,
-                               bool flat,
-			       inode::comparison_fields what_to_check,
-			       bool warn_remove_no_match,
-                               const infinint & hourshift,
-			       bool empty,
-			       bool ea_erase,
-			       bool display_skipped);
+	/// \ingroup Private
+	/// @}
+
+    extern void filtre_restore(user_interaction & dialog, //< for user interaction
+			       const mask &filtre,        //< which filename to restore
+                               const mask & subtree,      //< which directory and paths to restore
+                               catalogue & cat,           //< table of content to extract information from
+                               const path & fs_racine,    //< root path under which to restore directiry tree and files
+                               bool fs_warn_overwrite,    //< whether to warn before overwriting (to be replaced by overwriting policy)
+                               bool info_details,         //< whether to be verbose
+                               statistics & st,           //< statistics result about the operation
+                               const mask & ea_mask,      //< defines EA to restore/not restore
+                               bool flat,                 //< if true, directories are not restores, all files are placed directly at in fs_racine directory
+			       inode::comparison_fields what_to_check, //< which file properties to restore
+			       bool warn_remove_no_match, //< wether to warn for file to remove not matching the expected type
+			       bool empty,                //< dry-run execution
+			       bool display_skipped,      //< whether to display skipped files
+			       bool empty_dir,            //< whether to restore directories that do contain any file to restore
+			       const crit_action & x_overwrite, //< how and whether to overwrite files
+ 			       archive_options_extract::t_dirty dirty, //< whether to restore dirty files
+			       bool only_deleted,         //< whether to only consider deleted files
+			       bool not_deleted);         //< <wether to consider deleted files
 
     extern void filtre_sauvegarde(user_interaction & dialog,
 				  const mask &filtre,
                                   const mask &subtree,
-                                  compressor *stockage,
+                                  pile & stack,
                                   catalogue & cat,
                                   catalogue &ref,
                                   const path & fs_racine,
@@ -76,12 +81,20 @@ namespace libdar
                                   bool nodump,
                                   const infinint & hourshift,
 				  bool alter_time,
+				  bool furtive_read_mode,
 				  bool same_fs,
 				  inode::comparison_fields what_to_check,
 				  bool snapshot,
 				  bool cache_directory_tagging,
 				  bool display_skipped,
-				  const infinint & fixed_date);
+				  bool security_check,
+				  const infinint & repeat_count,
+				  const infinint & repeat_byte,
+				  const infinint & fixed_date,
+				  const infinint & sparse_file_min_size,
+				  const std::string & backup_hook_file_execute,
+				  const mask & backup_hook_file_mask,
+				  bool ignore_unknown);
 
     extern void filtre_difference(user_interaction & dialog,
 				  const mask &filtre,
@@ -92,15 +105,18 @@ namespace libdar
 				  statistics & st,
 				  const mask & ea_mask,
 				  bool alter_time,
+				  bool furtive_read_mode,
 				  inode::comparison_fields what_to_check,
 				  bool display_skipped,
-				  const infinint & hourshift);
+				  const infinint & hourshift,
+				  bool compare_symlink_date);
 
     extern void filtre_test(user_interaction & dialog,
 			    const mask &filtre,
                             const mask &subtree,
                             catalogue & cat,
                             bool info_details,
+			    bool empty,
                             statistics & st,
 			    bool display_skipped);
 
@@ -112,7 +128,7 @@ namespace libdar
     extern void filtre_merge(user_interaction & dialog,
 			     const mask & filtre,
 			     const mask & subtree,
-			     compressor *stockage,
+			     pile & stack,
 			     catalogue & cat,
 			     catalogue * ref1,
 			     catalogue * ref2,
@@ -123,7 +139,13 @@ namespace libdar
 			     const mask & compr_mask,
 			     const infinint & min_compr_size,
 			     bool display_skipped,
-			     bool keep_compressed);
+			     bool keep_compressed,
+			     const crit_action & overwrite,
+			     bool warn_overwrite,
+			     bool decremental_mode,
+			     const infinint & sparse_file_min_size);
+
+	/// @}
 
 } // end of namespace
 

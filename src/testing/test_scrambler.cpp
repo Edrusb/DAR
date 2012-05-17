@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_scrambler.cpp,v 1.8 2004/06/20 14:26:27 edrusb Rel $
+// $Id: test_scrambler.cpp,v 1.14 2011/01/05 18:04:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -31,33 +31,36 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include <string>
+
 #include "scrambler.hpp"
 #include "dar_suite.hpp"
 #include "generic_file.hpp"
-#include "test_memory.hpp"
 #include "integers.hpp"
+#include "fichier.hpp"
+#include "tools.hpp"
 
 using namespace libdar;
 
-S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env);
+S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env);
 
-int main(S_I argc, char *argv[])
+int main(S_I argc, char * const argv[])
 {
     return dar_suite_global(argc, argv, NULL, &little_main);
 }
 
-S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env)
+S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
-    MEM_IN;
     if(argc != 4)
     {
         printf("usage: %s <source> <destination_scrambled> <destination_clear>\n", argv[0]);
         return EXIT_SYNTAX;
     }
 
-    fichier *src = new fichier(dialog, argv[1], gf_read_only);
-    fichier *dst = new fichier(dialog, argv[2], gf_write_only);
-    scrambler *scr = new scrambler(dialog, "bonjour", *dst);
+    fichier *src = new fichier(dialog, argv[1], gf_read_only, tools_octal2int("0777"), false);
+    fichier *dst = new fichier(dialog, argv[2], gf_write_only, tools_octal2int("0777"), false);
+    std::string pass = "bonjour";
+    scrambler *scr = new scrambler(secu_string(pass.c_str(), pass.size()), *dst);
 
     src->copy_to(*scr);
 
@@ -65,9 +68,9 @@ S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **
     delete dst; dst = NULL;
     delete src; src = NULL;
 
-    src = new fichier(dialog, argv[2], gf_read_only);
-    scr = new scrambler(dialog, "bonjour", *src);
-    dst = new fichier(dialog, argv[3], gf_write_only);
+    src = new fichier(dialog, argv[2], gf_read_only, tools_octal2int("0777"), false);
+    scr = new scrambler(secu_string(pass.c_str(), pass.size()), *src);
+    dst = new fichier(dialog, argv[3], gf_write_only, tools_octal2int("0777"), false);
 
     scr->copy_to(*dst);
 
@@ -75,6 +78,5 @@ S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **
     delete src;
     delete dst;
 
-    MEM_OUT;
     return EXIT_OK;
 }

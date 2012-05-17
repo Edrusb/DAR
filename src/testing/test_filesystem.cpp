@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.21.2.1 2006/06/26 18:59:12 edrusb Exp $
+// $Id: test_filesystem.cpp,v 1.37 2011/03/06 20:01:50 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -72,10 +72,11 @@ extern "C"
 #include "libdar.hpp"
 #include "filesystem.hpp"
 #include "user_interaction.hpp"
-#include "test_memory.hpp"
 #include "integers.hpp"
 #include "shell_interaction.hpp"
 #include "cygwin_adapt.hpp"
+#include "label.hpp"
+#include "fichier.hpp"
 
 static user_interaction *ui = NULL;
 
@@ -90,34 +91,24 @@ static catalogue *cat;
 
 int main()
 {
-    MEM_BEGIN;
-    MEM_IN;
     U_I maj, med, min;
+    label data_name;
 
     get_version(maj, med, min);
     ui = shell_interaction_init(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
-    cat = new catalogue(*ui);
-    MEM_OUT;
+    cat = new catalogue(*ui, 120, data_name);
     build();
-    MEM_OUT;
     test();
-    MEM_OUT;
     {
-        MEM_IN;
         re_test();
-        MEM_OUT;
         del();
-        MEM_OUT;
     }
     delete cat;
-    MEM_OUT;
     shell_interaction_close();
     if(ui != NULL)
 	delete ui;
-    MEM_OUT;
-    MEM_END;
 }
 
 static void build()
@@ -165,8 +156,9 @@ static void test()
     entree *p;
     infinint root_fs_device;
     infinint errors, skipped_dump;
+    bool_mask all = true;
 
-    filesystem_backup fs = filesystem_backup(*ui, path("arbo"), true, bool_mask(true), false, false, false, root_fs_device);
+    filesystem_backup fs = filesystem_backup(*ui, path("arbo"), true, bool_mask(true), false, false, false,false, root_fs_device, false);
 
     while(fs.read(p, errors, skipped_dump))
     {
@@ -174,7 +166,7 @@ static void test()
         cat->add(p);
         if(f != NULL)
         {
-            generic_file *entree = f->get_data(*ui);
+            generic_file *entree = f->get_data(file::normal);
 
             try
             {
@@ -192,7 +184,7 @@ static void test()
             delete entree;
         }
     }
-    cat->listing();
+    cat->listing(false, all, all, false, false, "");
 }
 
 static void re_test()
@@ -200,19 +192,23 @@ static void re_test()
     try
     {
 	const entree *e;
-	detruit det1 = detruit("lien", 'l' | 0x80);
-	detruit det2 = detruit("dev1", 'd');
-	filesystem_restore fs = filesystem_restore(*ui, "algi", true, true, true, bool_mask(true), inode::cf_all, true, false, false);
-	bool hasbeencreated;
+	detruit det1 = detruit("lien", 'l' | 0x80, 129);
+	detruit det2 = detruit("dev1", 'd', 192);
+	path where = "algi";
+	bool_mask all = true;
+	crit_constant_action todo =  crit_constant_action(data_preserve, EA_preserve);
+	filesystem_restore fs = filesystem_restore(*ui, where, true, true, all, inode::cf_all, true, false, &todo, false);
+	bool hasbeencreated, ea_restored, hard_link;
+	libdar::filesystem_restore::action_done_for_data  data_restored;
 
 	cat->reset_read();
 
 	while(cat->read(e))
- 	    fs.write(e, hasbeencreated);
+ 	    fs.write(e, data_restored, ea_restored, hasbeencreated, hard_link);
 
 	fs.reset_write();
-	fs.write(&det1, hasbeencreated);
-	fs.write(&det2, hasbeencreated);
+	fs.write(&det1, data_restored, ea_restored, hasbeencreated, hard_link);
+	fs.write(&det2, data_restored, ea_restored, hasbeencreated, hard_link);
     }
     catch(Egeneric & e)
     {

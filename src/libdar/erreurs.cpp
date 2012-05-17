@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.15.2.2 2008/02/09 17:41:29 edrusb Rel $
+// $Id: erreurs.cpp,v 1.20 2011/01/07 19:53:16 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -36,6 +36,7 @@ extern "C"
 #include "infinint.hpp"
 #include "deci.hpp"
 #include "tools.hpp"
+#include "nls_swap.hpp"
 
 using namespace std;
 
@@ -51,6 +52,25 @@ namespace libdar
     static void init();
     static void inattendue();
     static void notcatched();
+
+    const char *dar_gettext(const char *arg)
+    {
+	const char *ret = NULL;
+
+	NLS_SWAP_IN;
+	try
+	{
+	    ret = gettext(arg);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+
+	return ret;
+    }
 
     const std::string Egeneric::empty_string = "";
 
@@ -116,7 +136,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: erreurs.cpp,v 1.15.2.2 2008/02/09 17:41:29 edrusb Rel $";
+        static char id[]="$Id: erreurs.cpp,v 1.20 2011/01/07 19:53:16 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -128,7 +148,7 @@ namespace libdar
         cerr << "#                                             #" << endl;
         cerr << "###############################################" << endl;
         cerr << tools_printf(gettext(" THANKS TO REPORT THE PREVIOUS OUTPUT TO MAINTAINER\n GIVING A DESCRIPTION OF THE CIRCUMSTANCES.")) << endl;
-	cerr << tools_printf(gettext(" IF POSSIBLE TRY TO PRODUCE THIS ERROR, A\n SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n IN SOLVING THIS PROBLEM.                THANKS")) << endl;
+	cerr << tools_printf(gettext(" IF POSSIBLE TRY TO REPRODUCE THIS ERROR, A\n SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n IN SOLVING THIS PROBLEM.                THANKS")) << endl;
         exit(3); // this was exit code for bugs at the time this code was part of dar
 	    // now it is part of libdar, while exit code stay defined in typical command line code (dar_suite software)
     }

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: mask.cpp,v 1.18.2.3 2007/07/27 16:02:49 edrusb Rel $
+// $Id: mask.cpp,v 1.24 2011/02/11 20:23:42 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -48,7 +48,7 @@ namespace libdar
 	    tools_to_upper(the_mask);
     }
 
-    simple_mask & simple_mask::operator = (const simple_mask & m)
+    const simple_mask & simple_mask::operator = (const simple_mask & m)
     {
 	const mask *src = & m;
 	mask *dst = this;
@@ -122,7 +122,7 @@ namespace libdar
 
     }
 
-    not_mask & not_mask::operator = (const not_mask & m)
+    const not_mask & not_mask::operator = (const not_mask & m)
     {
 	const mask *src = &m;
 	mask *dst = this;
@@ -155,7 +155,7 @@ namespace libdar
         }
     }
 
-    et_mask & et_mask::operator = (const et_mask &m)
+    const et_mask & et_mask::operator = (const et_mask &m)
     {
 	const mask *src = &m;
 	mask *dst = this;
@@ -172,19 +172,6 @@ namespace libdar
             lst.push_back(t);
         else
             throw Ememory("et_mask::et_mask");
-    }
-
-    bool et_mask::is_covered(const string & expression) const
-    {
-        vector<mask *>::const_iterator it = lst.begin();
-
-        if(lst.empty())
-            throw Erange("et_mask::is_covered", gettext("No mask in the list of mask to operate on"));
-
-        while(it != lst.end() && (*it)->is_covered(expression))
-            ++it;
-
-        return it == lst.end();
     }
 
     void et_mask::copy_from(const et_mask &m)
@@ -212,6 +199,7 @@ namespace libdar
         while(it != lst.end())
         {
             delete *it;
+	    *it = NULL;
             ++it;
         }
         lst.clear();
@@ -219,27 +207,14 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: mask.cpp,v 1.18.2.3 2007/07/27 16:02:49 edrusb Rel $";
+        static char id[]="$Id: mask.cpp,v 1.24 2011/02/11 20:23:42 edrusb Rel $";
         dummy_call(id);
     }
 
-    bool ou_mask::is_covered(const string & expression) const
+
+    bool simple_path_mask::is_covered(const path &ch) const
     {
-        vector<mask *>::const_iterator it = lst.begin();
-
-        if(lst.empty())
-            throw Erange("et_mask::is_covered", gettext("No mask in the list of mask to operate on"));
-
-        while(it != lst.end() && ! (*it)->is_covered(expression))
-            it++;
-
-        return it != lst.end();
-    }
-
-    bool simple_path_mask::is_covered(const string &ch) const
-    {
-        path p = ch;
-        return p.is_subdir_of(chemin, case_s) || chemin.is_subdir_of(p, case_s);
+        return ch.is_subdir_of(chemin, case_s) || chemin.is_subdir_of(ch, case_s);
     }
 
 

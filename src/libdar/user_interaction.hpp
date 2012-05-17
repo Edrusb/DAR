@@ -16,21 +16,23 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: user_interaction.hpp,v 1.18.2.3 2009/04/07 08:45:29 edrusb Rel $
+// $Id: user_interaction.hpp,v 1.27 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file user_interaction.hpp
     /// \brief defines the interaction between libdar and the user.
+    /// \ingroup API
     ///
-    /// Two classes are defined
+    /// Three classes are defined
     /// - user_interaction is the root class that you can use to make your own classes
     /// - user_interaction_callback is a specialized inherited class which is implements
     ///   user interaction thanks to callback functions
+    /// - user_interaction_blind provides fully usable objects that do not show anything
+    ///   and always assume a negative answer from the user
     /// .
-
 
 ///////////////////////////////////////////////////////////////////////
 // IMPORTANT : THIS FILE MUST ALWAYS BE INCLUDE AFTER infinint.hpp   //
@@ -49,9 +51,15 @@
 #include <string>
 #include "erreurs.hpp"
 #include "integers.hpp"
+#include "secu_string.hpp"
 
 namespace libdar
 {
+
+	/// \addtogroup API
+	/// @{
+
+
 
 	/// This is a pure virtual class that is used by libdar when interaction with the user is required.
 
@@ -77,6 +85,7 @@ namespace libdar
 	//! In that case the listing of archive contents is done thanks to this listing()
 	//! method instead of the warning() method.
 	//! - get_string() method
+	//! - get_secu_string() method
 	//! .
 	//! WARNING !
 	//! if your own class has specific fields, you will probably
@@ -133,6 +142,14 @@ namespace libdar
 	    //! \return the user's answer.
 	virtual std::string get_string(const std::string & message, bool echo) = 0;
 
+	    /// same a get_string() but uses secu_string instead
+
+	    //! \param[in] message is the question to display to the user.
+	    //! \param[in] echo is set to false is the answer must not be shown while the user answers.
+	    //! \return the user's answer.
+	virtual secu_string get_secu_string(const std::string & message, bool echo) = 0;
+
+
 	    /// optional method to use if you want file listing splitted in several fields.
 	    /// If want to use this feature, you have then to supply an implementation for this method,
 	    /// in your inherited class which will be called by libdar in place of the warning method
@@ -171,12 +188,12 @@ namespace libdar
 	    /// method in place of the warning() method.
 
 	    /// \param[in] filename name of the file
-	    /// \param[in] available_data whether the backup has data associated with the file
-	    /// \param[in] available_ea whether the backup has Extended Attributes associated with the file
+	    /// \param[in] data_change whether the backup owns the most recent data for the file
+	    /// \param[in] ea_change whether the backup owns the most recent  Extended Attributes for the file
 	    /// \note this method can be set for database::show_files() method to call it
 	virtual void dar_manager_show_files(const std::string & filename,
-					  bool available_data,
-					  bool available_ea);
+					    bool data_change,
+					    bool ea_change);
 
 
 	    /// optional method to use if you want dar_manager database archive listing split in several fields
@@ -222,11 +239,15 @@ namespace libdar
 
 	    /// \param[in] number archive number
 	    /// \param[in] data_date is the last modification date of the requested file in thie archive whose number is "number"
+	    /// \param[in] data_presence is the nature of this modification, true if the data was saved, false if it was deleted
 	    /// \param[in] ea_date is the date of the EA for the requested file in the archive whose number is "number"
+	    /// \param[in] ea_presence is the nature of this modification, true if the EAs were saved, false if they were deleted
 	    /// \note this method can be set for database::show_version() method to call it
 	virtual void dar_manager_show_version(U_I number,
 					      const std::string & data_date,
-					      const std::string & ea_date);
+					      const std::string & data_presence,
+					      const std::string & ea_date,
+					      const std::string & ea_presence);
 
 	    /// libdar uses this call to format output before send to warning() method.
 
@@ -325,6 +346,7 @@ namespace libdar
 	    //! \param[in] x_warning_callback is used by warning() method
 	    //! \param[in] x_answer_callback is used by the pause() method
 	    //! \param[in] x_string_callback is used by get_string() method
+	    //! \param[in] x_secu_string_callback is used by get_secu_string() method
 	    //! \param[in] context_value will be passed as last argument of callbacks when
 	    //! called from this object.
 	    //! \note The context argument of each callback is set with the context_value given
@@ -334,13 +356,15 @@ namespace libdar
 	user_interaction_callback(void (*x_warning_callback)(const std::string &x, void *context),
 				  bool (*x_answer_callback)(const std::string &x, void *context),
 				  std::string (*x_string_callback)(const std::string &x, bool echo, void *context),
+				  secu_string (*x_secu_string_callback)(const std::string &x, bool echo, void *context),
 				  void *context_value);
 
 	    /// overwritting method from parent class.
        	void pause(const std::string & message);
 	    /// overwritting method from parent class.
 	std::string get_string(const std::string & message, bool echo);
-
+	    /// overwritting method from parent class.
+	secu_string get_secu_string(const std::string & message, bool echo);
 	    /// overwritting method from parent class.
         void listing(const std::string & flag,
 		     const std::string & perm,
@@ -354,8 +378,8 @@ namespace libdar
 
 	    /// overwritting method from parent class
 	void dar_manager_show_files(const std::string & filename,
-				  bool available_data,
-				  bool available_ea);
+				    bool available_data,
+				    bool available_ea);
 
 	    /// overwritting method from parent class
 	void dar_manager_contents(U_I number,
@@ -372,7 +396,9 @@ namespace libdar
 	    /// overwritting method from parent class
 	void dar_manager_show_version(U_I number,
 				      const std::string & data_date,
-				      const std::string & ea_date);
+				      const std::string & data_presence,
+				      const std::string & ea_date,
+				      const std::string & ea_presence);
 
 	    /// You can set a listing callback thanks to this method.
 
@@ -427,7 +453,9 @@ namespace libdar
 
 	void set_dar_manager_show_version_callback(void (*callback)(U_I number,
 								    const std::string & data_date,
+								    const std::string & data_presence,
 								    const std::string & ea_date,
+								    const std::string & ea_presence,
 								    void *context))
 	{
 	    dar_manager_show_version_callback = callback;
@@ -446,6 +474,7 @@ namespace libdar
 	void (*warning_callback)(const std::string & x, void *context);  // pointer to function
 	bool (*answer_callback)(const std::string & x, void *context);   // pointer to function
 	std::string (*string_callback)(const std::string & x, bool echo, void *context); // pointer to function
+	secu_string (*secu_string_callback)(const std::string & x, bool echo, void *context); // pointer to function
 	void (*tar_listing_callback)(const std::string & flags,
 				     const std::string & perm,
 				     const std::string & uid,
@@ -472,11 +501,33 @@ namespace libdar
 						void *context);
 	void (*dar_manager_show_version_callback)(U_I number,
 						  const std::string & data_date,
+						  const std::string & data_presence,
 						  const std::string & ea_date,
+						  const std::string & ea_presence,
 						  void *context);
 
 	void *context_val;
     };
+
+
+	/// full implementation class for user_interaction, which shows nothing and assumes answer "no" to any question
+
+    class user_interaction_blind : public user_interaction
+    {
+    public:
+	bool pause2(const std::string & message) { return false; };
+
+	std::string get_string(const std::string & message, bool echo) { return "user_interaction_blind, is blindly answering no"; };
+	secu_string get_secu_string(const std::string & message, bool echo) { return secu_string(); };
+
+	user_interaction *clone() const { user_interaction *ret = new user_interaction_blind(); if(ret == NULL) throw Ememory("user_interaction_blind::clone"); return ret; };
+
+    protected:
+	void inherited_warning(const std::string & message) {}; // do not display any warning, this is "bind user_interaction" !
+
+    };
+
+	/// @}
 
 } // end of namespace
 

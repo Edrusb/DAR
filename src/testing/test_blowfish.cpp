@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_blowfish.cpp,v 1.4.2.3 2008/02/09 17:41:30 edrusb Rel $
+// $Id: test_blowfish.cpp,v 1.13 2010/08/31 21:04:38 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -52,6 +52,7 @@ extern "C"
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"
 #include "macro_tools.hpp"
+#include "fichier.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -88,7 +89,8 @@ void f1(user_interaction *dialog)
 {
     int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
     fichier fic = fichier(*dialog, fd);
-    blowfish bf = blowfish(*dialog, 10, string("bonjour"), fic, macro_tools_supported_version, false);
+    string pass = "bonjour";
+    crypto_sym bf = crypto_sym(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish);
     char buffer[100] = "bonjour les amis il fait chaud il fait beau ! ";
 
     bf.write(buffer, strlen(buffer));
@@ -99,8 +101,9 @@ void f1(user_interaction *dialog)
 
 void f2(user_interaction *dialog)
 {
-    fichier fic = fichier(*dialog, "toto", gf_read_only);
-    blowfish bf = blowfish(*dialog, 10, string("bonjour"), fic, macro_tools_supported_version, false);
+    fichier fic = fichier(*dialog, "toto", gf_read_only, tools_octal2int("0777"), false);
+    string pass = "bonjour";
+    crypto_sym bf = crypto_sym(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish);
     char buffer[100];
     S_I lu;
     bool ret;

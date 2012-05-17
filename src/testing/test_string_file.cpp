@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_string_file.cpp,v 1.1 2005/09/18 20:49:33 edrusb Rel $
+// $Id: test_string_file.cpp,v 1.4 2011/01/07 19:53:16 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -32,14 +32,14 @@
 int main()
 {
     user_interaction *dialog = shell_interaction_init(&cout, &cerr, false);
-    U_I min, maj;
+    U_I min, med, maj;
 
 	// initializing libdar
-    get_version(maj, min);
+    get_version(maj, med, min);
 
     try
     {
-	string_file strfile = string_file(*dialog, "Bonjour les amis, il fait beau, il fait chaud, les mouches pettent et les cailloux fleurissent");
+	string_file strfile = string_file("Bonjour les amis, il fait beau, il fait chaud, les mouches pettent et les cailloux fleurissent");
 	char buffer[100];
 	S_I lu;
 	infinint pos;

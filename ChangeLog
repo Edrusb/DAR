@@ -419,8 +419,8 @@ from 2.2.x to 2.3.0
 - added -[ and -] options (file selection from file listing)
   Important consequence for libdar user programs:
   the fs_root argument is now expanded to full absolute path inside libdar,
-  thus the mask you will give for path inclusion/exclusion (the "subtree" argument)
-  will be used against full absolute path of files under consideration
+  thus the mask you will give for path inclusion/exclusion (the "subtree"
+  argument)will be used against full absolute path of files under consideration
   for the operation. Assuming you have fs_root=tmp/A and the current
   directory is /tmp, your mask will be used against strings like
   /var/tmp/A/some/file. (instead of tmp/A/some/file as in the previous API
@@ -430,58 +430,85 @@ from 2.2.x to 2.3.0
   completely formatted archive will all the file saved so far. This archive can
   be take as reference for a further backup to continue the operation at a later
   time.
-- dar_manager aborts properly upon certain signal reception (do not let the database
-  partially updated).
-- dar_slave and dar_xform now recognize when a slicename is given in place of a basename
-- reviewed thread_cancellation (API change) for it be possible to cancel several thread at the same time
-- prevent some dead-lock situation that can occur when a signal is received inside a critical section
+- dar_manager aborts properly upon certain signal reception (do not let the
+  database partially updated).
+- dar_slave and dar_xform now recognize when a slicename is given in place of a
+  basename
+- reviewed thread_cancellation (API change) for it be possible to cancel several
+  thread at the same time
+- prevent some dead-lock situation that can occur when a signal is received
+  inside a critical section
 - dar_cp, dar_xform and dar_slave also abort nicely upon signal reception
-- dar_manager can now restore files based on a given date (not always the most recent version)
+- dar_manager can now restore files based on a given date (not always the most
+  recent version)
 - dar_manager now has an interactive mode (-i option)
-- change in API, the warning() method need not be overwritten, but the new protected method
-  inherited_warning() must be inherited in its place (same function, same prototype
-  as the original warning() method).
-- dar_manager features are now part of libdar. API has been completed with these new features
+- change in API, the warning() method need not be overwritten, but the new
+  protected method inherited_warning() must be inherited in its place (same
+  function, same prototype as the original warning() method).
+- dar_manager features are now part of libdar. API has been completed with these
+  new features
 - added the "last_slice" context (%c with -E option) when creating an archive
-- dar now check a file has not been modified while it was reading it, if so it reports a warning and returns a specific exit code
-- remove included gettext from the package (it is more a source of conflict with external gettext and if somebody needs internationalization better is to install libintl/gettext on its own).
+- dar now check a file has not been modified while it was reading it, if so it
+  reports a warning and returns a specific exit code
+- remove included gettext from the package (it is more a source of conflict with
+  external gettext and if somebody needs internationalization better is to
+  install libintl/gettext on its own).
 - added George Foot feedback about the good backup practice sort guide.
 - added -e option to dar_manager
 - added the progressive_report feature in the API
 - dar can now pause every N slice where N >= 1
-- integrated Dave Vasilevsky's patch to support Extended Attributes and file forks under MacOS X
-- added method in API for external program be able to list dar_manager databases, their file contents and the statistics
+- integrated Dave Vasilevsky's patch to support Extended Attributes and file
+  forks under MacOS X
+- added method in API for external program be able to list dar_manager
+  databases, their file contents and the statistics
 - added the merge/sub-archive feature
 - remove [list of path] from command line (-g option is now mandatory)
 - added regex expression in filters (-ar/-ag options)
 - added -ak option
-- added the --comparison-field option (extension of the --ignore-owner option aka -O option)
-- added the -af option (backup files more recent than a given date, others are keept as already saved)
-- dar now take care that an escape character can be sent when pressing the arrow keys and avoid considering them in this situation
-- dar will no refuse to abort if user presses escape when dar asks the user to be ready to write to a new slice
+- added the --comparison-field option (extension of the --ignore-owner option
+  aka -O option)
+- added the -af option (backup files more recent than a given date, others are
+  keept as already saved)
+- dar now take care that an escape character can be sent when pressing the arrow
+  keys and avoid considering them in this situation
+- dar will no refuse to abort if user presses escape when dar asks the user to
+  be ready to write to a new slice
 - adapted Wesley Legette's patch for an xml archive listing
 - added 'InRef' status for EA (same meaning as the one for file's data)
 
-
 from 2.3.0 to 2.3.1
-- set back Nick Alcock's patch which has been dropped from 2.2.x to 2.3.x (patch name is "Do not moan about every single file on a non-ext2 filesystem")
+- set back Nick Alcock's patch which has been dropped from 2.2.x to 2.3.x (patch
+  name is "Do not moan about every single file on a non-ext2 filesystem")
 - fixed compilation problem when thread-safe code is disabled
 - integrated Wiebe Cazemier's patch for dar's man page
-- fixed bug in listing: -as option also listed files that had EA even when these were not saved in the archive
+- fixed bug in listing: -as option also listed files that had EA even when these
+  were not saved in the archive
 - file permission of installed sample scripts lacked the executable bit
-- fixed a bug that appeared when a file is removed while at the time it is saved by dar
-- avoid having an unnecessary warning appearing when restoring a file in a directory that has default EA set
-- Cygwin has changed and does not support anymore the path in the form "c:/some/where", you have to use "/cygdrive/c/some/where" instead. Documentation has been updated in consequence.
+- fixed a bug that appeared when a file is removed while at the time it is saved
+  by dar
+- avoid having an unnecessary warning appearing when restoring a file in a
+  directory that has default EA set
+- Cygwin has changed and does not support anymore the path in the form
+  "c:/some/where", you have to use "/cygdrive/c/some/where" instead.
+  Documentation has been updated in consequence.
 
 from 2.3.1 to 2.3.2
-- fixed bug in Native Language Support when --enable-locale-dir was not set (Thomas Jacob's patch)
+- fixed bug in Native Language Support when --enable-locale-dir was not set
+  (Thomas Jacob's patch)
 - updated Swedish translation by Peter Landgren
 -  --verbose=skipped was not available (only the short -vs form was available)
-- reviewed regex with ordered mask for the feature to better fits user's need (Dave Vasilevsky's feedback)
-- fixed bug where compression algorithm was changed to maximum (fixed with Richard Fish's adequate patch)
+- reviewed regex with ordered mask for the feature to better fits user's need
+  (Dave Vasilevsky's feedback)
+- fixed bug where compression algorithm was changed to maximum (fixed with
+  Richard Fish's adequate patch)
 - fixed tutorial with command line evolution (dar's -g option in particular)
 - latest version of Grzegorz Adam Hankiewicz's mini-howto
 - fixed bug concerning restoration of only more recent files
+
+from 2.3.2 to 2.3.3
+- avoid using getpwuid() and getgrgid() for static linking.
+- fixed typo in dar's man page
+- update FAQ
 
 from 2.3.2 to 2.3.3
 - avoid using getpwuid() and getgrgid() for static linking.
@@ -513,11 +540,11 @@ from 2.3.2 to 2.3.3
   when some data have been reported [SF #1622913]
 
 from 2.3.3 to 2.3.4
-- fixed behavior when differential backup is interrupted (no more store file that
-  would have been read if no interruption had been done as "deleted" since the
-  archive of reference) [SF #1669091].
-- added official method to access catalogue's statistics through the API (for kdar
-  next version).
+- fixed behavior when differential backup is interrupted (no more store file
+  that would have been read if no interruption had been done as "deleted" since
+  the archive of reference) [SF #1669091].
+- added official method to access catalogue's statistics through the API (for
+  kdar next version).
 - Fixed syntax error in dar_par_create.duc and dar_par_test.duc files (Parchive
   integration with dar).
 - minor spelling fix in error message (compressor.cpp)
@@ -541,13 +568,17 @@ from 2.3.5 to 2.3.6
 - fixed bug in regex mask building when not using ordered masks
 - fixing bug that led dar_manager to report no error while some files failed
   to be restored due to command-line for dar being too large.
-- fixed bug met when user aborts operation while dar is finalizing archive creation [SF #1800507]
+- fixed bug met when user aborts operation while dar is finalizing archive
+  creation [SF #1800507]
 - fixed problem with execvp when dar_manager launches dar
 
 from 2.3.6 to 2.3.7
-- fixed bug in dar_manager about the localization of the archive in which to find the latest EA
-- fixed bug in configure script to properly report full blowfish encryption support
-- fixed a bug in the statistics calculus of dar_manager for most recent files per archive
+- fixed bug in dar_manager about the localization of the archive in which to
+  find the latest EA
+- fixed bug in configure script to properly report full blowfish encryption
+  support
+- fixed a bug in the statistics calculus of dar_manager for most recent files
+  per archive
 - removed inappropriate internal error check
 - added --disable-libdl-linking option
 - fixed mistake in API tutorial
@@ -592,7 +623,7 @@ version 2.3.9 to 2.3.10
 - added patch by Jan-Pascal van Best to have -[ and -] options working with
   archive merging
 - fixed bug in displaying dates [SF 2922417]
-- enhanced pseudo-random number generation used in dar
+- enhanced pseudo random number generation used in dar
 - added an error message when an include/exclude file listing does not
   contains an invalid path (instead of a self reported bug message).
 - modified message displayed when some slice of an old archive having the
@@ -619,6 +650,126 @@ version 2.3.10 to 2.3.11
 - probable fix (problem difficult to reproduce) for double memory release in
   the storage class [SF 3163389]
 
-from 2.3.11 to 2.3.12
-- avoiding concurrent use of -p and -Q options, error message shown in that
-  situation.
+from 2.3.x to 2.4.0
+- hard links support for pipes, soft links, char and block devices has been
+  added (so far, only hard links on plain files were supported)
+- added rich overwriting feature for merging archives (-/ option)
+- changed default behavior of dar: it no more tries to preserve the atime of
+  read files, which had as side effect to modify the ctime. See man page for
+  -aa and -ac options for details
+- simplified the use of the "sed" command in Makefiles.am files
+- integrated Wiebe Cazemier's patch for man page
+- -E option has been extended to work also when generating a single sliced
+  archive (no need to have -s option to be able to use -E option).
+- slice header has been extended to store additional information (slice
+  layout is now redundant in each each slice and may be used as backup from
+  a slice to another in case of corruption).
+- dar does no more need to read the first then the last slice of an archive to
+  get its contents, it now instead only needs the last slice.
+- an isolated catalogue can now be used as backup of the original archive's
+  internal catalogue (-A option in conjunction with -x option for example)
+- added directory look-up optimization (adaptation of Erik Wasser's patch)
+- added -e option support (aka dry-run) to archive testing
+- added the possibility to set permission and ownership of generated slices
+- re-designed the libdar API to have all optional parameters carried by class
+  object in a single argument, the aim to not break backward compatibility of
+  the API upon each new feature addition. The libdar_4_4 namespace can be used
+  for backward compatibility with older applications (see API documentation)
+- added retry on change feature (-_ option).
+- changed storage for UID and GID from U_16 to infinint to support arbitrarily
+  larger UID and GID
+- added lzo compression support
+- dar_manager now uses an anonymous pipe to send configuration to dar, this
+  solves the problem due to command-line limitation.
+- dar now stores a "removal date" when a file disappeared since the archive of
+  reference was done (so far only the information that a file was removed was
+  stored). This is needed for dar_manager (see next new feature)
+- dar_manager can now better restore the status of a set of files exactly as
+  it was at any given time from a set of full and differential backups. In
+  particular, it does no more restore files that were removed at the requested
+  date.
+- added check in dar_manager to detect conditions where a file has a
+  modification date that has been set to the past. Two objectives are at the
+  root of this feature: proper restoration of files and detection of possible
+  rootkit
+- added mode for restoration that avoid restoring directory tree which do not
+  contain any saved files (in particular when restoring a differential backup)
+  see man page for -D option for more details.
+- reviewed implementation of code managing Extended Attributes (much faster now)
+- added batch feature (-@ option) to dar_manager
+- added Furtive Read Mode support (O_NOATIME + fdopendir): when the system
+  supports it, while reading data, dar does not modify any date (ctime or atime)
+- added the possibility to have sequential reading of archives (ala tar) see
+  option --sequential-read
+- added the possibility to read from a pipe (single pipe, without dar_slave)
+  (use '-' as filename in conjunction with --sequential-read)
+- added -P -g -[ and -] options to archive listing (-l option)
+- added sparse file detection mechanism (can save and restore sparse files)
+- added dirty flag in archive for file that changed while being saved. By
+  default a warning is issued when the user is about to restore a dirty file,
+  this can be changed thanks to the --dirty-behavior option
+- -R option can receive an arbitrary string (still is excepted an empty string)
+  In particular dar will no more complain if the given path contains // or \\
+  however it must in a way or another point to something that exists!
+- added a short listing feature (listing only the summary), (using both -l and
+  -q options)
+- extended conditional statements in included files (DCF) with user defined
+  targets (see user target paragraph at the end of dar man page) User targets
+  let the user add a set of options using a single keyword on command-line.
+- a sample /etc/darrc is now proposed with some user targets for common
+  operation like compression without compressing already compressed files.
+- dar now releases filedescriptors of archive of reference(s) before proceeding
+  to the operation (differential backup, archive isolation, etc.)
+- user can add a comment in archive header some macro are provided for common
+  options (see --user-comment in man page). This comment can be seen when
+  listing an archive in verbose mode (-l -v) or when displaying the archive's
+  summary (-l -v -q).
+- added a "security warning" feature if ctime has changed in filesystem while
+  inode has not changed at all (-asecu disables this feature). This is to target
+  possible rootkit files. Note that this may toggle false positive, if for
+  example you change EA of a file.
+- added feature: DAR_DUC_PATH environment variable, which let dar look for a DUC
+  file (see -E and -F options) in the given path.
+- added feature: DAR_DCF_PATH environment variable, same as previously but for
+  DCF files (see -B option).
+- added two targets for conditional syntax: "reference:" and "auxiliary:"
+- weak blowfish implementation has been removed (no backward compatibility as
+  it suffered of a weak Initial Vector (IV) initialization), but the normal
+  blowfish encryption stays in place.
+- Due to openssh licensing, replaced openssh by libgcrypt dependancy (which
+  stays optional).
+- added new cyphers aes256, twofish256, serpent256 and camellia256
+- added the hash feature (--hash option), supporting md5 and sha1 algorithms.
+  The hash is calculated on the fly for each slice, before its data is even
+  written to disk. This let one to check for media corruption even before a
+  multi-sliced archive is finished. However this does not prevent an archive to
+  be corrupted due to a software bug (in dar, libdar or in a external library),
+  so it is always recommended to test the archive using dar's -t option.
+- -G option (on-fly isolation) has been replaced by -@ when creating an archive,
+  to reduce the number of letter used for options. This also let available the
+  usual switches associated to -@ option to define an encryption algorithm and
+  passphrase for the on-fly isolated catalogue.
+- slices number may be padded with zeros (--min-digits option) Note that if using
+  this option when creating an archive, this same option is required for any
+  operation on this archive
+- added -konly feature to only remove files recorded as suppressed at
+  differential backup restoration time.
+- dar and libdar now store keys in secure memory (with the exception that a DCF
+  is parsed in unlocked memory, having a key in a DCF file is not as secure as
+  having dar asking for password at execution time using the "-K :" syntax)
+- added hook for backup: a user command or script can be run before saving and
+  after backing up files that match a given mask all along the backup process
+  (see -<, -> and -= options).
+- added feature: -alist-ea let the user see the Extended Attributes of files
+  while listing an archive contents.
+- dar_manager can receive negative numbers to point to archive counting by the
+  end of the database.
+- dar and libdar stay released under GPL 2.1 (not under GPL 3, and not lesser
+  GPL, neither)
+- setting the "little/big endian" to usual meaning (it was inverted in the code)
+  this does not change the dar's behavior nor its compatibility with different
+  systems or older libdar versions.
+- added -ai option to avoid warning for unknown inode types
+- added support for Solaris's Door files
+- added feature: decremental backup
+

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.14.2.2 2008/05/09 20:58:27 edrusb Rel $
+// $Id: terminateur.cpp,v 1.22 2011/04/11 17:12:01 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -84,16 +84,19 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: terminateur.cpp,v 1.14.2.2 2008/05/09 20:58:27 edrusb Rel $";
+        static char id[]="$Id: terminateur.cpp,v 1.22 2011/04/11 17:12:01 edrusb Rel $";
         dummy_call(id);
     }
 
-    void terminateur::read_catalogue(generic_file & f, bool with_elastic, const dar_version & reading_ver)
+    void terminateur::read_catalogue(generic_file & f, bool with_elastic, const archive_version & reading_ver, const infinint & where_from)
     {
         S_I offset = 0;
         unsigned char a;
 
-        f.skip_to_eof();
+	if(where_from == 0)
+	    f.skip_to_eof();
+	else
+	    f.skip(where_from);
 	if(with_elastic)
 	    (void)elastic(f, elastic_backward, reading_ver);
 	    // temporary anomymous elastic skip backward in 'f'
@@ -131,14 +134,16 @@ namespace libdar
                 // skipping the start of "location"
             if(! f.skip_relative(-offset))
                 throw Erange("","");
+
+	    t_start = f.get_position();
         }
         catch(Erange &e)
         {
-            throw Erange("terminateur::get_catalogue", gettext("Badly formatted terminator, cannot extract catalogue location"));
+            throw Erange("terminateur::get_catalogue", gettext("Badly formatted terminator, cannot extract catalogue location: ") + e.get_message());
         }
 
             // reading and returning the position
-        pos = infinint(f.get_gf_ui(), NULL, &f);
+        pos = infinint(f);
     }
 
 } // end of namespace

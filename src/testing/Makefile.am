@@ -13,7 +13,7 @@ AM_CPPFLAGS=-I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"
 endif
 endif
 
-noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_string_file
+noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_string_file test_escape test_hash_fichier
 AM_LDFLAGS = -all-static @LTLIBINTL@
 
 LDADD = -L../libdar -l$(MYLIB)
@@ -94,3 +94,9 @@ test_mask_list_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 test_string_file_SOURCES = test_string_file.cpp ../dar_suite/shell_interaction.cpp testtools.cpp
 test_string_file_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+
+test_escape_SOURCES = test_escape.cpp ../dar_suite/shell_interaction.cpp
+test_escape_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+
+test_hash_fichier_SOURCES = test_hash_fichier.cpp ../dar_suite/shell_interaction.cpp
+test_hash_fichier_DEPENDENCIES = ../libdar/lib$(MYLIB).la

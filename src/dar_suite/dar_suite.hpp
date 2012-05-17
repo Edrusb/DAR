@@ -16,12 +16,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_suite.hpp,v 1.14 2005/08/23 21:23:15 edrusb Rel $
+// $Id: dar_suite.hpp,v 1.17 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 //
+
+    /// \file dar_suite.hpp
+    /// \brief contains routine to manage CLI's common initialization and ultimate exception catching
+    /// \ingroup CMDLINE
+
 #ifndef DAR_SUITE_HPP
 #define DAR_SUITE_HPP
 
@@ -65,9 +70,14 @@
 
 using namespace libdar;
 
+    /// \addtogroup CMDLINE
+    /// @{
+
 extern void dar_suite_reset_signal_handler();
-extern int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_interaction & dialog, int, char *[], const char **env));
+extern int dar_suite_global(int argc, char * const argv[], const char **env, int (*call)(user_interaction & dialog, int, char *const [], const char **env));
 
 extern std::string dar_suite_command_line_features();
+
+    /// @}
 
 #endif

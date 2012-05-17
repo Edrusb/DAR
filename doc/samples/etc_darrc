@@ -1,0 +1,101 @@
+#############################################################
+# This is the default system wide configuration file for dar
+#
+
+# It is used automatically by dar unless you define a .darrc in
+# your home directory or use -N option on command-line.
+# You can continue using this default file even if you use your
+# own .darrc file, by including the following in it:
+#
+#     -B /etc/darrc
+#
+
+# To not force anyone to use a given option, each option set
+# is defined under a specific user target. Each user target can
+# be used on command-line to activate the set of option it defines.
+# For example, using the word "par2" on command-line will activate
+# all options following the "par2:" keyword below.
+
+# we are using short options here because long options may not be
+# available everywhere.
+
+par2:
+  -B "SOMEPATH/dar_par.dcf"
+
+compress-exclusion:
+# here we define some files that have not to be compressed.
+# First setting case insentive mode on:
+-an
+# Then telling dar that the following masks are glob expression
+# which is the default, right, but if sooner on command-line the
+# user swapped to regex, the following mask would not work as expected
+# any more, so we force back to glob expression in any case:
+-ag
+
+# Now follows all the file specification to never try to compress:
+
+# compressed video format
+-Z "*.mpg"
+-Z "*.avi"
+-Z "*.flac"
+-Z "*.cr2"
+-Z "*.vob"
+
+# compressed picture format
+-Z "*.jpg"
+-Z "*.jpeg"
+-Z "*.mpeg"
+-Z "*.png"
+
+# compressed audio format
+-Z "*.mp3"
+-Z "*.ogg"
+
+# compressed package
+-Z "*.deb"
+-Z "*.tgz"
+-Z "*.tbz2"
+-Z "*.rpm"
+-Z "*.xpi"
+-Z "*.run"
+-Z "*.sis"
+
+# other compressed data
+-Z "*.gz"
+-Z "*.Z"
+-Z "*.bz2"
+-Z "*.zip"
+-Z "*.jar"
+-Z "*.rar"
+
+# dar archives (may be compressed)
+-Z "*.dar"
+
+# Now we swap back to case sensitive mode for masks which is the default
+# mode:
+-acase
+
+
+verbose:
+-v
+-vs
+
+no-emacs-backup:
+-ag
+-X "*~"
+-X ".*~"
+
+samba:
+-H 1
+# samba filesystem need this to properly report date
+# and not lead dar to resave all files when changing
+# from summer to winter time and viceversa.
+
+
+dry-run:
+-e
+# well, the name of the option is not intuitive, I admit,
+# but letter d was already used ...
+
+bell:
+-b

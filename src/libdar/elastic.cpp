@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: elastic.cpp,v 1.7.2.2 2008/05/09 20:58:27 edrusb Rel $
+// $Id: elastic.cpp,v 1.12 2011/04/14 18:28:09 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -80,7 +80,7 @@ namespace libdar
 	taille = size;
     }
 
-    elastic::elastic(const unsigned char *buffer, U_32 size, elastic_direction dir, const dar_version & reading_ver)
+    elastic::elastic(const unsigned char *buffer, U_32 size, elastic_direction dir, const archive_version & reading_ver)
     {
 	U_32 pos = (dir == elastic_forward ? 0 : size - 1);
 	const U_32 first_pos = pos;
@@ -88,7 +88,7 @@ namespace libdar
 	unsigned char first_mark = (dir == elastic_forward ? get_low_mark(reading_ver) : get_high_mark(reading_ver));
 	unsigned char last_mark  = (dir == elastic_forward ? get_high_mark(reading_ver) : get_low_mark(reading_ver));
 
-	while(pos < size && buffer[pos] != SINGLE_MARK && buffer[pos] != first_mark)
+	while(pos >= 0 && pos < size && buffer[pos] != SINGLE_MARK && buffer[pos] != first_mark)
 	    pos += step;
 
 	if(pos >= size)
@@ -138,7 +138,7 @@ namespace libdar
 	}
     }
 
-    elastic::elastic(generic_file &f, elastic_direction dir,  const dar_version & reading_ver)
+    elastic::elastic(generic_file &f, elastic_direction dir,  const archive_version & reading_ver)
     {
 	U_32 count = 0;
 	S_I (generic_file::*lecture)(char &a) = (dir == elastic_forward ? &generic_file::read_forward : &generic_file::read_back);
@@ -211,7 +211,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: elastic.cpp,v 1.7.2.2 2008/05/09 20:58:27 edrusb Rel $";
+        static char id[]="$Id: elastic.cpp,v 1.12 2011/04/14 18:28:09 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -286,25 +286,25 @@ namespace libdar
 	while(*a == SINGLE_MARK || *a == get_low_mark() || *a == get_high_mark());
     }
 
-    U_I elastic::base_from_version(const dar_version & reading_ver) const
+    U_I elastic::base_from_version(const archive_version & reading_ver) const
     {
-	if(version_greater(reading_ver, "06"))
+	if(reading_ver > 6)
 	    return 254;
 	else
 	    return 256;
     }
 
-    unsigned char elastic::get_low_mark(const dar_version & reading_ver) const
+    unsigned char elastic::get_low_mark(const archive_version & reading_ver) const
     {
-	if(version_greater(reading_ver, "06"))
+	if(reading_ver > 6)
 	    return get_low_mark();
 	else
 	    return '>';
     }
 
-    unsigned char elastic::get_high_mark(const dar_version & reading_ver) const
+    unsigned char elastic::get_high_mark(const archive_version & reading_ver) const
     {
-	if(version_greater(reading_ver, "06"))
+	if(reading_ver > 6)
 	    return get_high_mark();
 	else
 	    return '<';

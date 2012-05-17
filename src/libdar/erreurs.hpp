@@ -16,15 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: erreurs.hpp,v 1.15.2.1 2007/07/27 16:02:49 edrusb Rel $
+// $Id: erreurs.hpp,v 1.24 2011/05/20 10:23:07 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file erreurs.hpp
     /// \brief contains all the excetion class thrown by libdar
-
+    /// \ingroup API
 
 #ifndef ERREURS_HPP
 #define ERREURS_HPP
@@ -42,6 +42,9 @@ namespace libdar
 
 	/// \addtogroup API
 	/// @{
+
+	/// a routine to change NLS domaine forth and back for inline routines
+    extern const char *dar_gettext(const char *);
 
 	/// this is the parent class of all exception classes.
 
@@ -109,11 +112,24 @@ namespace libdar
     class Ememory : public Egeneric
     {
     public:
-        Ememory(const std::string &source) : Egeneric(source, gettext("Lack of Memory")) {};
+        Ememory(const std::string &source) : Egeneric(source, dar_gettext("Lack of Memory")) {};
 
-    protected :
+    protected:
+        Ememory(const std::string &source, const std::string & message) : Egeneric(source, message) {};
         std::string exceptionID() const { return "MEMORY"; };
     };
+
+	/// exception used when secure memory has been exhausted
+
+    class Esecu_memory : public Ememory
+    {
+    public:
+        Esecu_memory(const std::string &source) : Ememory(source, dar_gettext("Lack of Secured Memory")) {};
+
+    protected:
+        std::string exceptionID() const { return "SECU_MEMORY"; };
+    };
+
 
 #define SRC_BUG Ebug(__FILE__, __LINE__)
 #define XMT_BUG(exception, call) exception.stack(call, __FILE__, __LINE__)
@@ -150,7 +166,7 @@ namespace libdar
     class Elimitint : public Egeneric
     {
     public :
-        Elimitint() : Egeneric("", gettext("cannot handle a too large integer. Use full version of dar_suite programs (compilation option set for using infinint) to solve this problem")) {};
+        Elimitint() : Egeneric("", dar_gettext("Cannot handle such a too large integer. Use a full version of libdar (compiled to rely on the \"infinint\" integer type) to solve this problem")) {};
 
     protected :
         std::string exceptionID() const { return "LIMITINT"; };
@@ -222,6 +238,7 @@ namespace libdar
         std::string exceptionID() const { return "USER ABORTED OPERATION"; };
     };
 
+
 	/// exception used when an error concerning the treated data has been met
 
 	/// the inherited get_message() method is probably
@@ -280,9 +297,9 @@ namespace libdar
     class Ethread_cancel : public Egeneric
     {
     public:
-	Ethread_cancel(bool now, U_64 x_flag) : Egeneric("", now ? gettext("Thread cancellation requested, aborting as soon as possible") : gettext("Thread cancellation requested, aborting as properly as possible")) { immediate = now; flag = x_flag; };
+	Ethread_cancel(bool now, U_64 x_flag) : Egeneric("", now ? dar_gettext("Thread cancellation requested, aborting as soon as possible") : dar_gettext("Thread cancellation requested, aborting as properly as possible")) { immediate = now; flag = x_flag; };
 
-	bool immediate_cancel() const { return immediate; }
+	bool immediate_cancel() const { return immediate; };
 	U_64 get_flag() const { return flag; };
 
     protected:
@@ -292,6 +309,7 @@ namespace libdar
 	bool immediate;
 	U_64 flag;
     };
+
 
 	/// @}
 

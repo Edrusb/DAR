@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: defile.cpp,v 1.8.2.2 2008/05/16 11:00:17 edrusb Rel $
+// $Id: defile.cpp,v 1.12 2009/12/18 10:10:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -38,19 +38,19 @@ namespace libdar
         const nomme *nom = dynamic_cast<const nomme *>(e);
         string s;
 
-        if(! init)
+        if(! init) // we must remove previous entry brought by a previous call to this method
 	{
             if(! chemin.pop(s))
 		throw SRC_BUG; // no more directory to pop!
 	}
-        else
+        else // nothing to be removed
             init = false;
 
-        if(fin == NULL)
+        if(fin == NULL) // not eod
 	{
-            if(nom == NULL)
+            if(nom == NULL) // not a nomme
                 throw SRC_BUG; // neither eod nor nomme
-            else
+            else // a nomme
             {
                 chemin += nom->get_name();
                 if(dir != NULL)
@@ -62,7 +62,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: defile.cpp,v 1.8.2.2 2008/05/16 11:00:17 edrusb Rel $";
+        static char id[]="$Id: defile.cpp,v 1.12 2009/12/18 10:10:21 edrusb Rel $";
         dummy_call(id);
     }
 

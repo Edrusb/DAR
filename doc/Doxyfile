@@ -614,7 +614,10 @@ EXCLUDE                = doc \
                          man \
                          misc \
                          po \
-                         src/testing
+                         src/testing \
+			 config.h \
+			 gettext.h \
+			 my_config.h
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or
 # directories that are symbolic links (a Unix filesystem feature) are excluded
@@ -662,7 +665,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             =
+IMAGE_PATH             = doc/dar_s_doc.jpg
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

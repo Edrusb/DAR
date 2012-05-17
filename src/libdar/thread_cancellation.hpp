@@ -16,14 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: thread_cancellation.hpp,v 1.5.2.4 2006/12/12 18:25:35 edrusb Rel $
+// $Id: thread_cancellation.hpp,v 1.15 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file thread_cancellation.hpp
     /// \brief to be able to cancel libdar operation while running in a given thread.
+    /// \ingroup API
     ///
     /// the class thread_cancellation implemented in this module
     /// permits to define checkpoints where is looked whether the current
@@ -72,13 +73,13 @@ namespace libdar
 	    /// the destructor
 	virtual ~thread_cancellation();
 
-	    /// the checkpoint where is seen whether the current libdar call must abort
+	    /// Checkpoint test : whether the current libdar call must abort or not
 
 	    /// \exception Euser_abort is thrown if the thread the checkpoint is running
 	    /// from is marked as to be canceled.
 	void check_self_cancellation() const;
 
-	    /// by default delayed (non immediate) cancellation generate an specific exception
+	    /// by default delayed (non immediate) cancellation generate a specific exception,
 	    /// it is possible for delayed cancellation only, do block such exceptions for a certain time
 
 	    ///\param[in] mode can be set to true to block delayed cancellations
@@ -145,10 +146,10 @@ namespace libdar
 
 	    // class's static variables and types
 
-	static pthread_mutex_t access;         ///< mutex for the access to "info"
-	static bool initialized;               ///< true if the mutex has been initialized
+	static pthread_mutex_t access;                 ///< mutex for the access to "info"
+	static bool initialized;                       ///< true if the mutex has been initialized
 	static std::list<thread_cancellation *> info;  ///< list of all object
-	static std::list<fields> preborn;      ///< canceled thread that still not have a thread_cancellation object to deal with cancellation
+	static std::list<fields> preborn;              ///< canceled thread that still not have a thread_cancellation object to deal with cancellation
 
 #endif
     };

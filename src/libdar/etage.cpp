@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: etage.cpp,v 1.16.2.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: etage.cpp,v 1.24 2010/08/27 20:44:24 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -55,12 +55,31 @@ extern "C"
 #if HAVE_STRING_H
 #include <string.h>
 #endif
+
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#if HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 } // end extern "C"
 
 #include "etage.hpp"
 #include "tools.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
+#include "cygwin_adapt.hpp"
+#include "user_interaction.hpp"
+#include "fichier.hpp"
 
 #define CACHE_DIR_TAG_FILENAME "CACHEDIR.TAG"
 #define CACHE_DIR_TAG_FILENAME_CONTENTS "Signature: 8a477f597d28d172789f06886806bc55"
@@ -77,39 +96,82 @@ namespace libdar
 		 const char *dirname,
 		 const infinint & x_last_acc,
 		 const infinint & x_last_mod,
-		 bool cache_directory_tagging)
+		 bool cache_directory_tagging,
+		 bool furtive_read_mode)
     {
         struct dirent *ret;
-        DIR *tmp = opendir(dirname);
-	bool is_cache_dir = false;
+	DIR *tmp = NULL;
+#if FURTIVE_READ_MODE_AVAILABLE
+	int fddir = -1;
 
-        if(tmp == NULL)
-            throw Erange("filesystem etage::etage" , string(gettext("Error opening directory: ")) + dirname + " : " + strerror(errno));
-
-        fichier.clear();
-        while(!is_cache_dir && (ret = readdir(tmp)) != NULL)
-            if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
-	    {
-		if(cache_directory_tagging)
-		    is_cache_dir = cache_directory_tagging_check(ui, dirname, ret->d_name);
-                fichier.push_back(string(ret->d_name));
-	    }
-        closedir(tmp);
-
-	if(is_cache_dir)
+	if(furtive_read_mode)
 	{
-	    fichier.clear();
-	    ui.warning(tools_printf(gettext("Detected Cache Directory Tagging Standard for %s, the contents of that directory will not be saved"), dirname));
-		// drop all the contents of the directory because it follows the Cache Directory Tagging Standard
-	}
+	    fddir = ::open(dirname, O_RDONLY|O_BINARY|O_NOATIME);
 
-	last_mod = x_last_mod;
-	last_acc = x_last_acc;
+	    if(fddir < 0)
+	    {
+		if(errno != EPERM)
+		    throw Erange("etage::etage",
+				 string(gettext("Error opening directory in furtive read mode: ")) + dirname + " : " + strerror(errno));
+		else // using back normal access mode
+		    ui.warning(tools_printf(gettext("Could not open directory %s in furtive read mode (%s), using normal mode"), dirname, strerror(errno)));
+	    }
+	}
+#endif
+	try
+	{
+#if FURTIVE_READ_MODE_AVAILABLE
+	    if(furtive_read_mode && fddir >= 0)
+	    {
+		tmp = fdopendir(fddir);
+		if(tmp == NULL)
+		    close(fddir);
+		    // else, tmp != NULL:
+		    // fddir is now under control of the system
+		    // we must not close it.
+	    }
+	    else
+		tmp = opendir(dirname);
+#else
+	    tmp = opendir(dirname);
+#endif
+	    bool is_cache_dir = false;
+
+	    if(tmp == NULL)
+		throw Erange("etage::etage" , string(gettext("Error opening directory: ")) + dirname + " : " + strerror(errno));
+
+	    fichier.clear();
+	    while(!is_cache_dir && (ret = readdir(tmp)) != NULL)
+		if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
+		{
+		    if(cache_directory_tagging)
+			is_cache_dir = cache_directory_tagging_check(ui, dirname, ret->d_name);
+		    fichier.push_back(string(ret->d_name));
+		}
+	    closedir(tmp);
+	    tmp = NULL;
+
+	    if(is_cache_dir)
+	    {
+		fichier.clear();
+		ui.warning(tools_printf(gettext("Detected Cache Directory Tagging Standard for %s, the contents of that directory will not be saved"), dirname));
+		    // drop all the contents of the directory because it follows the Cache Directory Tagging Standard
+	    }
+
+	    last_mod = x_last_mod;
+	    last_acc = x_last_acc;
+	}
+	catch(...)
+	{
+	    if(tmp != NULL)
+		closedir(tmp);
+	    throw;
+	}
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: etage.cpp,v 1.16.2.1 2007/07/22 16:34:59 edrusb Rel $";
+        static char id[]="$Id: etage.cpp,v 1.24 2010/08/27 20:44:24 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -140,7 +202,7 @@ namespace libdar
 	else // we need to inspect the few first bytes of the file
 	{
 	    path chem = path(cpath)+string(filename);
-	    fichier fic = fichier(dialog, chem, gf_read_only);
+	    fichier fic = fichier(dialog, chem.display(), gf_read_only, tools_octal2int("0777"), false);
 	    U_I len = strlen(CACHE_DIR_TAG_FILENAME_CONTENTS);
 	    char *buffer = new char[len+1];
 	    S_I lu;

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.33.2.4 2008/02/09 20:11:27 edrusb Rel $
+// $Id: dar_slave.cpp,v 1.51 2011/05/20 10:23:07 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -58,42 +58,48 @@ char *strchr (), *strrchr ();
 #include "integers.hpp"
 #include "libdar.hpp"
 #include "shell_interaction.hpp"
+#include "line_tools.hpp"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.3.4"
+#define DAR_SLAVE_VERSION "1.4.0"
 
 static bool command_line(user_interaction & dialog,
-			 S_I argc, char *argv[], path * &chemin, string & filename,
-                         string &input_pipe, string &output_pipe, string & execute);
+			 S_I argc, char * const argv[], path * &chemin, string & filename,
+                         string &input_pipe, string &output_pipe, string & execute,
+			 infinint & min_digits);
 static void show_usage(user_interaction & dialog, const char *command);
 static void show_version(user_interaction & dialog, const char *command);
-static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env);
+static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env);
 
-int main(S_I argc, char *argv[], const char **env)
+int main(S_I argc, char * const argv[], const char **env)
 {
     return dar_suite_global(argc, argv, env, &little_main);
 }
 
-static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **env)
+static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
     path *chemin = NULL;
     string filename;
     string input_pipe;
     string output_pipe;
     string execute;
+    infinint min_digits;
 
-    if(command_line(dialog, argc, argv, chemin, filename, input_pipe, output_pipe, execute))
+    if(command_line(dialog, argc, argv, chemin, filename, input_pipe, output_pipe, execute, min_digits))
     {
         tuyau *input = NULL;
         tuyau *output = NULL;
         sar *source = NULL;
+
+	if(chemin == NULL)
+	    throw SRC_BUG;
         try
         {
-            source = new sar(dialog, filename, EXTENSION, *chemin, execute);
+            source = new sar(dialog, filename, EXTENSION, *chemin, true, min_digits, false, execute);
             if(source == NULL)
                 throw Ememory("little_main");
 
@@ -139,8 +145,9 @@ static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const 
 }
 
 static bool command_line(user_interaction & dialog,
-			 S_I argc,char *argv[], path * &chemin, string & filename,
-                         string &input_pipe, string &output_pipe, string & execute)
+			 S_I argc,char * const argv[], path * &chemin, string & filename,
+                         string &input_pipe, string &output_pipe, string & execute,
+    			 infinint & min_digits)
 {
     S_I lu;
     execute = "";
@@ -157,7 +164,7 @@ static bool command_line(user_interaction & dialog,
         {
         case 'i':
             if(optarg == NULL)
-                throw Erange("get_args", gettext("Missing argument to -i option"));
+                throw Erange("command_line", gettext("Missing argument to -i option"));
             if(input_pipe == "")
                 input_pipe = optarg;
             else
@@ -165,7 +172,7 @@ static bool command_line(user_interaction & dialog,
             break;
         case 'o':
             if(optarg == NULL)
-                throw Erange("get_args", gettext("Missing argument to -o option"));
+                throw Erange("command_line", gettext("Missing argument to -o option"));
             if(output_pipe == "")
                 output_pipe = optarg;
             else
@@ -179,7 +186,7 @@ static bool command_line(user_interaction & dialog,
             return false;
         case 'E':
             if(optarg == NULL)
-                throw Erange("get_args", gettext("Missing argument to -E option"));
+                throw Erange("command_line", gettext("Missing argument to -E option"));
             if(execute == "")
                 execute = optarg;
             else
@@ -188,8 +195,17 @@ static bool command_line(user_interaction & dialog,
 	case 'Q':
 	case 'j':
 	    break;  // ignore this option already parsed during initialization (dar_suite.cpp)
+	case ';':
+	    if(optarg == NULL)
+		throw Erange("command_line", tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
+	    else
+	    {
+		infinint tmp2, tmp3;
+		line_tools_get_min_digits(optarg, min_digits, tmp2, tmp3);
+	    }
+	    break;
         case ':':
-            throw Erange("get_args", tools_printf(gettext("Missing parameter to option -%c"), char(optopt)));
+            throw Erange("command_line", tools_printf(gettext("Missing parameter to option -%c"), char(optopt)));
         case '?':
             dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
             break;
@@ -217,7 +233,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_slave.cpp,v 1.33.2.4 2008/02/09 20:11:27 edrusb Rel $";
+    static char id[]="$Id: dar_slave.cpp,v 1.51 2011/05/20 10:23:07 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -239,22 +255,16 @@ static void show_version(user_interaction & dialog, const char *command)
 {
     string cmd;
     tools_extract_basename(command, cmd);
-    U_I maj, med, min, bits;
-    bool ea, largefile, nodump, fastbadalloc, thread, libz, libbz2, libcrypto, new_blowfish;
+    U_I maj, med, min;
 
-    get_version(maj, min);
-    if(maj > 2)
-	get_version(maj, med, min);
-    else
-	med = 0;
-    get_compile_time_features(ea, largefile, nodump, fastbadalloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
+    get_version(maj, med, min);
     shell_interaction_change_non_interactive_output(&cout);
     dialog.printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n", cmd.c_str(), DAR_SLAVE_VERSION);
     if(maj > 2)
 	dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
     else
 	dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
-    tools_display_features(dialog, ea, largefile, nodump, fastbadalloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
+    tools_display_features(dialog);
     dialog.printf("\n");
     dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__);
     dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd.c_str(), PACKAGE_VERSION);

@@ -1,6 +1,11 @@
-version 2.3.12
+version 2.4.0
 --------------
-Thanks to Angela Kahealani for feedback.
+Thanks to Wiebe Cazemier for feedback and patch for documentation. Thanks
+to Dave Vasilevsky for bug fix and feedback. Thanks to Erik Wasser for patch.
+Thanks to Sony Electronics Inc. Thanks to T. Leske for his proposal of using
+libgcrypt and patch against 2.3.x versions. Thanks to Vladimir Mosgalin for
+feedback and testing on Solaris and several other Unix systems. Thanks again
+to Peter Landgren for Swedish translation.
 
 version 2.3.11
 --------------

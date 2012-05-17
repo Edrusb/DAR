@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_hide_file.cpp,v 1.10 2005/02/22 17:59:50 edrusb Rel $
+// $Id: test_hide_file.cpp,v 1.13 2010/08/27 20:44:24 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -38,6 +38,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "shell_interaction.hpp"
 #include "user_interaction.hpp"
+#include "fichier.hpp"
 
 using namespace libdar;
 
@@ -62,8 +63,8 @@ int main()
 
 void f1()
 {
-    fichier src = fichier(*ui, "toto", gf_read_only);
-    no_comment strip = no_comment(*ui, src);
+    fichier src = fichier(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
+    no_comment strip = no_comment(src);
     int fd = ::open("titi", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
     fichier dst = fichier(*ui, fd);
 
@@ -78,8 +79,8 @@ void f2()
     cibles.push_back("all");
     cibles.push_back("default");
 
-    fichier src = fichier(*ui, "toto", gf_read_only);
-    config_file strip = config_file(*ui, cibles, src);
+    fichier src = fichier(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
+    config_file strip = config_file(cibles, src);
 
     int fd = ::open("tutu", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
     fichier dst = fichier(*ui, fd);

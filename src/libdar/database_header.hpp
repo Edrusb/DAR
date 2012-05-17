@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database_header.hpp,v 1.2 2005/06/27 19:43:38 edrusb Rel $
+// $Id: database_header.hpp,v 1.5 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -38,6 +38,9 @@
 namespace libdar
 {
 
+	/// \ingroup Private
+	/// @}
+
 	/// create the header for a dar_manager database
 
 	/// \param[in] dialog is used for user interaction
@@ -51,8 +54,13 @@ namespace libdar
 
 	/// \param[in] dialog for user interaction
 	/// \param[in] filename is the filename to read from
+	/// \param[out] db_version version of the database
 	/// \return the generic_file where the database header has been put
-    extern generic_file *database_header_open(user_interaction & dialog, const std::string & filename);
+    extern generic_file *database_header_open(user_interaction & dialog, const std::string & filename, unsigned char & db_version);
+
+    extern const unsigned char database_header_get_supported_version();
+
+	///@}
 
 } // end of namespace
 

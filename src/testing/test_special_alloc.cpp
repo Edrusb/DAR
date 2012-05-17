@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_special_alloc.cpp,v 1.6 2005/02/22 17:59:50 edrusb Rel $
+// $Id: test_special_alloc.cpp,v 1.8 2011/01/05 18:04:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,7 +27,6 @@
 #include "libdar.hpp"
 #include "special_alloc.hpp"
 #include "user_interaction.hpp"
-#include "test_memory.hpp"
 
 #include <iostream>
 
@@ -43,9 +42,6 @@ int main()
     void *ptr[max];
 #endif
 
-    MEM_BEGIN;
-    MEM_IN;
-
 #ifdef LIBDAR_SPECIAL_ALLOC
 
     for(int i = 0; i < max; i++)
@@ -53,7 +49,6 @@ int main()
     for(int i = 0; i < max; i++)
         special_alloc_delete(ptr[i]);
 
-    MEM_OUT;
 
     for(int i = 0; i < max; i++)
         ptr[i] = special_alloc_new(1000);
@@ -67,6 +62,4 @@ int main()
 
 #endif
 
-    MEM_OUT;
-    MEM_END;
 }

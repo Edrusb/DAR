@@ -1,4 +1,4 @@
-/*********************************************************************/
+//*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: mask.hpp,v 1.17.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: mask.hpp,v 1.25 2011/05/20 10:23:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,6 +27,7 @@
     ///
     /// The mask classes defined here are to be used to filter files
     /// in the libdar API calls.
+    /// \ingroup API
 
 #ifndef MASK_HPP
 #define MASK_HPP
@@ -67,8 +68,16 @@ namespace libdar
 
 	    /// \param[in] expression is the filename to check
 	    /// \return true if the given filename is covered by the mask
-	    /// \note only libdar internal need to call this method
+	    /// \note only libdar internally needs to call this method
         virtual bool is_covered(const std::string &expression) const = 0;
+
+	    /// check whether the given path is covered by the mask
+
+	    /// \param[in] chemin is the path to check
+	    /// \return true if the given path is covered by the mask
+	    /// \note only libdar internally needs to call this method
+	    /// \note this is an optional method to the previous one, it can be overwritten
+	virtual bool is_covered(const path & chemin) const { return is_covered(chemin.display()); };
 
 	    /// this is to be able to copy a mask without knowing its
 	    /// exact class and without loosing its specialized data
@@ -90,7 +99,9 @@ namespace libdar
         bool_mask(bool always) { val = always; };
 
 	    /// inherited from the mask class
-        bool is_covered(const std::string &) const { return val; };
+        bool is_covered(const std::string & expression) const { return val; };
+        bool is_covered(const path & chemin) const { return val; };
+
 	    /// inherited from the mask class
         mask *clone() const { return new bool_mask(val); };
 
@@ -113,10 +124,11 @@ namespace libdar
 	    /// copy constructor
         simple_mask(const simple_mask & m) : mask(m) { copy_from(m); };
 	    /// assignment operator
-        simple_mask & operator = (const simple_mask & m);
+        const simple_mask & operator = (const simple_mask & m);
 
 	    /// inherited from the mask class
         bool is_covered(const std::string &expression) const;
+
 	    /// inherited from the mask class
         mask *clone() const { return new simple_mask(*this); };
 
@@ -150,6 +162,7 @@ namespace libdar
 
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const;
+
 	    /// inherited from the mask class
         mask *clone() const { return new regular_mask(*this); };
 
@@ -179,12 +192,14 @@ namespace libdar
 	    /// copy constructor
         not_mask(const not_mask & m) : mask(m) { copy_from(m); };
 	    /// assignment operator
-        not_mask & operator = (const not_mask & m);
+        const not_mask & operator = (const not_mask & m);
 	    /// destructor
         ~not_mask() { detruit(); };
 
 	    /// inherited from the mask class
         bool is_covered(const std::string &expression) const { return !ref->is_covered(expression); };
+        bool is_covered(const path & chemin) const { return !ref->is_covered(chemin); };
+
 	    /// inherited from the mask class
         mask *clone() const { return new not_mask(*this); };
 
@@ -212,7 +227,7 @@ namespace libdar
 	    /// copy constructor
         et_mask(const et_mask &m) : mask(m) { copy_from(m); };
 	    /// assignment operator
-        et_mask & operator = (const et_mask &m);
+        const et_mask & operator = (const et_mask &m);
 	    /// destructor
         ~et_mask() { detruit(); };
 
@@ -225,7 +240,9 @@ namespace libdar
         void add_mask(const mask & toadd);
 
 	    /// inherited from the mask class
-        bool is_covered(const std::string & expression) const;
+        bool is_covered(const std::string & expression) const { return t_is_covered(expression); };
+        bool is_covered(const path & chemin) const { return t_is_covered(chemin); };
+
 	    /// inherited from the mask class
         mask *clone() const { return new et_mask(*this); };
 
@@ -248,6 +265,20 @@ namespace libdar
     private :
         void copy_from(const et_mask & m);
         void detruit();
+
+	template<class T> bool t_is_covered(const T & expression) const
+	{
+	    std::vector<mask *>::const_iterator it = lst.begin();
+
+	    if(lst.empty())
+		throw Erange("et_mask::is_covered", dar_gettext("No mask in the list of mask to operate on"));
+
+	    while(it != lst.end() && (*it)->is_covered(expression))
+		++it;
+
+	    return it == lst.end();
+	}
+
     };
 
 
@@ -259,11 +290,28 @@ namespace libdar
 	/// with the masks added thanks to the add_mask method
     class ou_mask : public et_mask
     {
-    public :
+    public:
 	    /// inherited from the mask class
-        bool is_covered(const std::string & expression) const;
+        bool is_covered(const std::string & expression) const { return t_is_covered(expression); };
+        bool is_covered(const path & chemin) const { return t_is_covered(chemin); }
+;
 	    /// inherited from the mask class
         mask *clone() const { return new ou_mask(*this); };
+
+    private:
+	template<class T> bool t_is_covered(const T & expression) const
+	{
+	    std::vector<mask *>::const_iterator it = lst.begin();
+
+	    if(lst.empty())
+		throw Erange("et_mask::is_covered", dar_gettext("No mask to operate on in the list of mask"));
+
+	    while(it != lst.end() && ! (*it)->is_covered(expression))
+		it++;
+
+	    return it != lst.end();
+	}
+
     };
 
 
@@ -277,10 +325,12 @@ namespace libdar
 	    /// \param[in] p the path the compare with
 	    /// \param[in] case_sensit whether the mask is case sensitive or not
 	    /// \note p must be a valid path
-        simple_path_mask(const std::string &p, bool case_sensit) : chemin(p) { case_s = case_sensit; };
+        simple_path_mask(const path &p, bool case_sensit) : chemin(p) { case_s = case_sensit; };
 
 	    /// inherited from the mask class
-        bool is_covered(const std::string &ch) const;
+        bool is_covered(const std::string & expression) const { throw SRC_BUG; };
+        bool is_covered(const path & chemin) const;
+
 	    /// inherited from the mask class
         mask *clone() const { return new simple_path_mask(*this); };
 
@@ -302,7 +352,8 @@ namespace libdar
         same_path_mask(const std::string &p, bool case_sensit) { chemin = p; case_s = case_sensit; };
 
 	    /// inherited from the mask class
-        bool is_covered(const std::string &ch) const;
+        bool is_covered(const std::string &chemin) const;
+
 	    /// inherited from the mask class
         mask *clone() const { return new same_path_mask(*this); };
 
@@ -312,7 +363,7 @@ namespace libdar
     };
 
 
-	/// matches if string is the given string or a sub directory of it
+	/// matches if string is the given constructor string or a sub directory of it
 
     class exclude_dir_mask : public mask
     {
@@ -324,7 +375,9 @@ namespace libdar
 	exclude_dir_mask(const std::string &p, bool case_sensit) { chemin = p; case_s = case_sensit;};
 
 	    /// inherited from the mask class
-	bool is_covered(const std::string &ch) const { return path(ch).is_subdir_of(chemin, case_s); }
+	bool is_covered(const std::string &expression) const { throw SRC_BUG; }
+	bool is_covered(const path &chemin) const { return chemin.is_subdir_of(chemin, case_s); };
+
 	    /// inherited from the mask class
 	mask *clone() const { return new exclude_dir_mask(*this); };
 

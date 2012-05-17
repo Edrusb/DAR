@@ -16,11 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: hide_file.hpp,v 1.10.4.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: hide_file.hpp,v 1.18 2011/04/17 13:12:29 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file hide_file.hpp
+    /// \brief contains class of base to split files in words
+    /// \ingroup CMDLINE
 
 #ifndef HIDE_FILE_HPP
 #define HIDE_FILE_HPP
@@ -33,10 +37,13 @@
 using namespace libdar;
 using namespace std;
 
+    /// \addtogroup CMDLINE
+    /// @{
+
 class hide_file : public generic_file
 {
 public:
-    hide_file(user_interaction & dialog, generic_file &f);
+    hide_file(generic_file &f);
 
     bool skip(const infinint & pos);
     bool skip_to_eof();
@@ -53,8 +60,10 @@ protected:
     vector <partie> morceau;
     generic_file *ref;
 
-    S_I inherited_read(char *a, size_t size);
-    S_I inherited_write(const char *a, size_t size);
+    U_I inherited_read(char *a, U_I size);
+    void inherited_write(const char *a, size_t size);
+    void inherited_sync_write() {};
+    void inherited_terminate() {};
 
     virtual void fill_morceau() = 0;
         // the inherited classes have with this method
@@ -68,6 +77,8 @@ private:
 
     void init();
 };
+
+    /// @}
 
 
 #endif

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_infinint.cpp,v 1.16 2005/09/11 19:01:16 edrusb Rel $
+// $Id: test_infinint.cpp,v 1.19 2011/01/05 18:04:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -46,7 +46,6 @@ extern "C"
 #include <iostream>
 
 #include "libdar.hpp"
-#include "test_memory.hpp"
 #include "integers.hpp"
 #include "infinint.hpp"
 #include "deci.hpp"
@@ -65,8 +64,6 @@ static user_interaction *ui = NULL;
 
 int main()
 {
-    MEM_BEGIN;
-    MEM_IN;
     U_I maj, med, min;
 
     get_version(maj, med, min);
@@ -78,8 +75,6 @@ int main()
     shell_interaction_close();
     if(ui != NULL)
 	delete ui;
-    MEM_OUT;
-    MEM_END;
 }
 
 static void routine1()
@@ -102,7 +97,7 @@ static void routine1()
         fd = ::open("toto", O_RDONLY|O_BINARY);
         if(fd >= 0)
         {
-            f3 = infinint(*ui, &fd, NULL);
+            f3 = infinint(*ui, fd);
             d3 = deci(f3);
             ui->warning(d3.human());
         }

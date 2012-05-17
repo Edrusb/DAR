@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.19.2.2 2009/02/06 20:25:09 edrusb Rel $
+// $Id: ea_filesystem.cpp,v 1.24 2010/05/24 19:44:05 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -59,7 +59,6 @@ char *strchr (), *strrchr ();
 #include "ea_filesystem.hpp"
 #include "ea.hpp"
 #include "tools.hpp"
-#include "user_interaction.hpp"
 
 #define MSG_NO_EA_SUPPORT "Extended Attribute support not activated at compilation time"
 
@@ -151,21 +150,21 @@ namespace libdar
     {
         U_I num = 0;
         const char *p_chemin = chemin.c_str();
-	ea_entry ea_ent;
+	string key, value;
 
 	val.reset_read();
-	while(val.read(ea_ent))
+	while(val.read(key, value))
 	{
 		// doing this for each attribute
 
-	    if(!filter.is_covered(ea_ent.key))
+	    if(!filter.is_covered(key))
 		continue; // silently skipping this EA
 
 		// now, action !
 
-	    if(my_lsetxattr(p_chemin, ea_ent.key.c_str(), ea_ent.value.c_str(), ea_ent.value.size(), 0) < 0)
+	    if(my_lsetxattr(p_chemin, key.c_str(), value.c_str(), value.size(), 0) < 0)
 		throw Erange("ea_filesystem write_ea", tools_printf(gettext("Aborting operations for the EA of %S : error while adding EA %s : %s"),
-								    &chemin,  ea_ent.key.c_str(), strerror(errno)));
+								    &chemin,  key.c_str(), strerror(errno)));
 	    else
 		num++;
 	}
@@ -177,20 +176,19 @@ namespace libdar
     {
         U_I num = 0;
         const char *p_chemin = chemin.c_str();
-
-	ea_entry ea_ent;
+	string key, value;
 
 	val.reset_read();
-	while(val.read(ea_ent))
+	while(val.read(key, value))
 	{
 		// doing this for each attribute
 
-	    if(!filter.is_covered(ea_ent.key))
+	    if(!filter.is_covered(key))
 		continue; // silently skipping this EA
 
 		// now, action !
 
-	    const char *k = ea_ent.key.c_str();
+	    const char *k = key.c_str();
 	    if(my_lremovexattr(p_chemin, k) < 0)
 	    {
 		if(errno != ENOATTR)
@@ -218,7 +216,7 @@ namespace libdar
 	    {
 		const char *a_name = it->c_str();
 		const U_I MARGIN = 2;
-		ea_entry ea_ent;
+		string ea_ent_key, ea_ent_value;
 		S_64 taille = my_lgetxattr(n_ptr, a_name, NULL, 0);
 		char *value = NULL;
 		if(taille < 0)
@@ -232,13 +230,13 @@ namespace libdar
 		    try
 		    {
 			taille = my_lgetxattr(n_ptr, a_name, value, taille+MARGIN);
-			    // if the previous call overflows the buffer this may leed to SEGFAULT and so on.
+			    // if the previous call overflows the buffer this may need to SEGFAULT and so on.
 			if(taille < 0)
 			    throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
 									       a_name, n_ptr, strerror(errno)));
-			ea_ent.key = *it;
-			ea_ent.value = string((char *)value, (char *)value+taille);
-			val.add(ea_ent);
+			ea_ent_key = *it;
+			ea_ent_value = string((char *)value, (char *)value+taille);
+			val.add(ea_ent_key, ea_ent_value);
 		    }
 		    catch(...)
 		    {
@@ -248,11 +246,11 @@ namespace libdar
 		    delete [] value;
 		}
 		else // trivial case where the value has a length of zero
-		{
-		    ea_ent.key = *it;
-		    ea_ent.value = string("");
-		    val.add(ea_ent);
-		}
+                {
+                    ea_ent_key = *it;
+                    ea_ent_value = string("");
+                    val.add(ea_ent_key, ea_ent_value);
+                }
 	    }
 	    it++;
 	}
@@ -260,7 +258,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea_filesystem.cpp,v 1.19.2.2 2009/02/06 20:25:09 edrusb Rel $";
+        static char id[]="$Id: ea_filesystem.cpp,v 1.24 2010/05/24 19:44:05 edrusb Rel $";
         dummy_call(id);
     }
 

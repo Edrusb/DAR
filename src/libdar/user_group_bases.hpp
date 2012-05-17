@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: user_group_bases.hpp,v 1.1.2.1 2007/07/24 16:29:32 edrusb Rel $
+// $Id: user_group_bases.hpp,v 1.4 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -48,6 +48,9 @@ extern "C"
 
 namespace libdar
 {
+
+	/// \addtogroup Private
+	/// @{
 
     class user_group_bases
     {
@@ -88,6 +91,9 @@ namespace libdar
 	static bool class_initialized;
 
     };
+
+
+	/// @}
 
 }  // end of namespace
 

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_catalogue.cpp,v 1.15.2.3 2008/02/09 17:41:30 edrusb Rel $
+// $Id: test_catalogue.cpp,v 1.34 2011/04/17 16:36:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -37,11 +37,12 @@ extern "C"
 #include "testtools.hpp"
 #include "catalogue.hpp"
 #include "user_interaction.hpp"
-#include "test_memory.hpp"
 #include "integers.hpp"
 #include "macro_tools.hpp"
 #include "shell_interaction.hpp"
 #include "deci.hpp"
+#include "label.hpp"
+#include "fichier.hpp"
 
 using namespace libdar;
 
@@ -53,11 +54,10 @@ static user_interaction *ui = NULL;
 void f1();
 void f2();
 void f3();
+void f4();
 
 int main()
 {
-    MEM_BEGIN;
-    MEM_IN;
     U_I maj, med, min;
 
     get_version(maj, med, min);
@@ -67,13 +67,10 @@ int main()
 
     try
     {
-        MEM_IN;
 	f1();
-        MEM_OUT;
 	f2();
-        MEM_OUT;
 	f3();
-        MEM_OUT;
+	f4();
     }
     catch(Egeneric & e)
     {
@@ -83,33 +80,37 @@ int main()
     shell_interaction_close();
     if(ui != NULL)
 	delete ui;
-    MEM_OUT;
-    MEM_END;
     return 0;
 }
 
 void f1()
 {
+
+	//
+	// test save/backup of each inode type
+	//
+
     unlink(FIC1);
     unlink(FIC2);
     try
     {
-        fichier *dump = new fichier(*ui, FIC1, gf_read_write);
-        fichier *dump2 = new fichier(*ui, FIC2, gf_write_only);
-	std::map <infinint, file_etiquette *> corres;
+        fichier *dump = new fichier(*ui, FIC1, gf_read_write, tools_octal2int("0644"), false);
+        fichier *dump2 = new fichier(*ui, FIC2, gf_write_only, tools_octal2int("0777"), false);
+	std::map <infinint, etoile *> corres;
 
         eod *v_eod = new eod();
-        file *v_file = new file(1024, 102, 0644, 1, 2, "fichier", "." , 1024, 0);
-        lien *v_lien = new lien(1025, 103, 0645, 4, 5, "lien", "fichier", 0);
-        directory *v_dir = new directory(1026, 104, 0646, 7, 8, "repertoire", 0);
-        chardev *v_char = new chardev(1027, 105, 0647, 10, 11, "char device", 104, 202, 0);
-        blockdev *v_block = new blockdev(1028, 106, 0651, 13, 14, "block device", 105, 203, 0);
-        tube *v_tube = new tube(1029, 107, 0652, 16, 17, "tuyau", 0);
-        prise *v_prise = new prise(1030, 108, 0650, 19, 20, "prise", 0);
-        detruit *v_detruit = new detruit("ancien fichier", 'f');
-        directory *v_sub_dir = new directory(200,20, 0777, 100, 101, "sous-repertoire", 0);
+        file *v_file = new file(1024, 102, 0644, 1, 2, 3, "fichier", "." , 1024, 0, false);
+        lien *v_lien = new lien(1025, 103, 0645, 4, 5, 6, "lien", "fichier", 0);
+        directory *v_dir = new directory(1026, 104, 0646, 7, 8, 9, "repertoire", 0);
+        chardev *v_char = new chardev(1027, 105, 0647, 10, 11, 12,  "char device", 104, 202, 0);
+        blockdev *v_block = new blockdev(1028, 106, 0651, 13, 14, 15,  "block device", 105, 203, 0);
+        tube *v_tube = new tube(1029, 107, 0652, 16, 17, 18, "tuyau", 0);
+        prise *v_prise = new prise(1030, 108, 0650, 19, 20, 21,  "prise", 0);
+        detruit *v_detruit = new detruit("ancien fichier", 'f', 192);
+        directory *v_sub_dir = new directory(200,20, 0777, 100, 101, 102, "sous-repertoire", 0);
+	mirage *v_mir = new mirage("Zorro mirage", new etoile(dynamic_cast<inode *>(v_prise->clone()), 10));
 
-        entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, NULL };
+        entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, v_mir, NULL };
 
         for(S_I i = 0; liste[i] != NULL; ++i)
         {
@@ -117,7 +118,7 @@ void f1()
 
             if(ino != NULL)
                 ino->set_saved_status(s_saved);
-            liste[i]->dump(*ui, *dump);
+            liste[i]->dump(*dump, false);
         }
 
         dump->skip(0);
@@ -126,10 +127,10 @@ void f1()
         entree *ref = (entree *)1; // != NULL
         for(S_I i = 0; ref != NULL; ++i)
         {
-            ref = entree::read(*ui, *dump, "03", stats, corres, none, dump, dump);
+            ref = entree::read(*ui, *dump, macro_tools_supported_version, stats, corres, none, dump, dump, false, false, NULL);
             if(ref != NULL)
             {
-                ref->dump(*ui, *dump2);
+                ref->dump(*dump2, false);
                 delete ref;
             }
         }
@@ -147,18 +148,15 @@ void f1()
         v_dir->add_children(v_detruit);
         v_dir->add_children(v_prise);
 
-        v_dir->listing(*ui);
-
         unlink(FIC1);
         unlink(FIC2);
 
         stats.clear();
-        dump = new fichier(*ui, FIC1, gf_read_write);
-        v_dir->dump(*ui, *dump);
+        dump = new fichier(*ui, FIC1, gf_read_write, tools_octal2int("0644"), false);
+        v_dir->dump(*dump, false);
         dump->skip(0);
-        ref = entree::read(*ui, *dump, "03", stats, corres, none, dump, dump);
+        ref = entree::read(*ui, *dump, macro_tools_supported_version, stats, corres, none, dump, dump, false, false, NULL);
         v_sub_dir = dynamic_cast<directory *>(ref);
-        v_sub_dir->listing(*ui);
 
         delete ref;
         delete dump;
@@ -172,14 +170,20 @@ void f1()
 
 void f2()
 {
-        /// test catalogue a proprement parler
+	//
+        // test catalogue a proprement parler
+	//
 
     try
     {
-        catalogue cat = *ui;
+	label data_name;
+        catalogue cat = catalogue(*ui, 12, data_name);
         const entree *ref;
+	bool_mask tmp = true;
+	label lax_label;
 
-        cat.listing();
+	lax_label.clear();
+        cat.listing(false, tmp, tmp, false, false, "");
 
         cat.reset_add();
         try
@@ -190,17 +194,17 @@ void f2()
         {
             e.dump();
         }
-        cat.add(new file(1024, 102, 0644, 1, 2, "fichier", ".", 1024, 0));
-        cat.add(new lien(1025, 103, 0645, 4, 5, "lien", "fichier", 0));
-        cat.add(new directory(1026, 104, 0646, 7, 8, "repertoire", 0));
-        cat.add(new chardev(1027, 105, 0647, 10, 11,  "char device", 104, 202, 0));
-        cat.add(new blockdev(1028, 106, 0651, 13, 14, "block device", 105, 203, 0));
+        cat.add(new file(1024, 102, 0644, 1, 2, 3, "fichier", ".", 1024, 0, false));
+        cat.add(new lien(1025, 103, 0645, 4, 5, 6,  "lien", "fichier", 0));
+        cat.add(new directory(1026, 104, 0646, 7, 8, 9, "repertoire", 0));
+        cat.add(new chardev(1027, 105, 0647, 10, 11, 12,  "char device", 104, 202, 0));
+        cat.add(new blockdev(1028, 106, 0651, 13, 14, 15, "block device", 105, 203, 0));
         cat.add(new eod());
-        cat.add(new tube(1029, 107, 0652, 16, 17, "tuyau", 0));
-        cat.add(new prise(1030, 108, 0650, 19, 20, "prise", 0));
-        cat.add(new detruit("ancien fichier", 'f'));
+        cat.add(new tube(1029, 107, 0652, 16, 17, 18, "tuyau", 0));
+        cat.add(new prise(1030, 108, 0650, 19, 20, 21,  "prise", 0));
+        cat.add(new detruit("ancien fichier", 102, 'f'));
 
-        cat.listing();
+        cat.listing(false, tmp, tmp, false, false, "");
 
         cat.reset_read();
         while(cat.read(ref))
@@ -219,12 +223,12 @@ void f2()
         }
 
         unlink(FIC1);
-        fichier f = fichier(*ui, FIC1, gf_read_write);
+        fichier f = fichier(*ui, FIC1, gf_read_write, tools_octal2int("0644"), false);
 
         cat.dump(f);
         f.skip(0);
-        catalogue lst = catalogue(*ui, f, "03", none, &f, &f);
-        lst.listing();
+        catalogue lst = catalogue(*ui, f, macro_tools_supported_version, none, &f, &f, false, lax_label);
+        lst.listing(false, tmp, tmp, false, false, "");
         bool ok;
 
         lst.reset_read();
@@ -274,31 +278,83 @@ void f2()
 
 void f3()
 {
-    catalogue cat = *ui;
-    catalogue dif = *ui;
+    label data_name;
+    catalogue cat = catalogue(*ui, 180, data_name);
+    catalogue dif = catalogue(*ui, 190, data_name);
+    bool_mask tmp = true;
 
     cat.reset_add();
     dif.reset_add();
 
-    cat.add(new file(1024, 102, 0644, 1, 2, "fichier", ".", 1024, 0));
-    cat.add(new lien(1025, 103, 0645, 4, 5, "lien", "fichier", 0));
-    cat.add(new directory(1026, 104, 0646, 7, 8, "repertoire", 0));
-    cat.add(new chardev(1027, 105, 0647, 10, 11, "char device", 104, 202, 0));
-    cat.add(new blockdev(1028, 106, 0651, 13, 14, "block device", 105, 203, 0));
+    cat.add(new file(1024, 102, 0644, 1, 2, 3, "fichier", ".", 1024, 0, false));
+    cat.add(new lien(1025, 103, 0645, 4, 5, 6, "lien", "fichier", 0));
+    cat.add(new directory(1026, 104, 0646, 7, 8, 9, "repertoire", 0));
+    cat.add(new chardev(1027, 105, 0647, 10, 11, 12, "char device", 104, 202, 0));
+    cat.add(new blockdev(1028, 106, 0651, 13, 14, 15, "block device", 105, 203, 0));
     cat.add(new eod());
-    cat.add(new tube(1029, 107, 0652, 16, 17, "tuyau", 0));
-    cat.add(new prise(1030, 108, 0650, 19, 20, "prise", 0));
-    cat.add(new detruit("ancien fichier", 'f'));
+    cat.add(new tube(1029, 107, 0652, 16, 17, 18, "tuyau", 0));
+    cat.add(new prise(1030, 108, 0650, 19, 20, 21, "prise", 0));
+    cat.add(new detruit("ancien fichier", 'f', 190));
 
 
-    dif.add(new file(1024, 102, 0644, 1, 2, "fichier", ".",  1024, 0));
-    dif.add(new lien(1025, 103, 0645, 4, 5, "lien", "fichier", 0));
-    dif.add(new tube(1029, 107, 0652, 16, 17, "tuyau", 0));
-    dif.add(new prise(1030, 108, 0650, 19, 20, "prise", 0));
-    dif.add(new detruit("ancien fichier", 'f'));
+    dif.add(new file(1024, 102, 0644, 1, 2, 3, "fichier", ".",  1024, 0, false));
+    dif.add(new lien(1025, 103, 0645, 4, 5, 6, "lien", "fichier", 0));
+    dif.add(new tube(1029, 107, 0652, 16, 17, 18,  "tuyau", 0));
+    dif.add(new prise(1030, 108, 0650, 19, 20, 21, "prise", 0));
+    dif.add(new detruit("ancien fichier", 'f', 12));
 
     dif.update_destroyed_with(cat);
 
-    cat.listing();
-    dif.listing();
+    cat.listing(false, tmp, tmp, false, false, "");
+    dif.listing(false, tmp, tmp, false, false, "");
+}
+
+
+void f4()
+{
+
+	//
+	// hard link testing
+	//
+
+
+    tube *v_tube = new tube(1029, 107, 0652, 16, 17, 18, "tuyau", 0);
+    etoile *deneb = new etoile(v_tube, 100);
+
+    cout << deneb->get_ref_count() << endl;
+    cout << deneb->get_etiquette() << endl;
+    cout << deneb->is_wrote() << endl;
+
+    mirage *abell = new mirage("Zorro et Bernardo", deneb);
+
+    cout << deneb->get_ref_count() << endl;
+    cout << deneb->get_etiquette() << endl;
+    cout << deneb->is_wrote() << endl;
+
+    cout << abell->is_inode_wrote() << endl;
+    cout << abell->get_etiquette() << endl;
+
+    entree *tmp = abell->clone();
+    mirage *trefle =  dynamic_cast<mirage *>(tmp);
+
+    cout << deneb->get_ref_count() << endl;
+    cout << deneb->get_etiquette() << endl;
+    cout << deneb->is_wrote() << endl;
+
+    cout << trefle->is_inode_wrote() << endl;
+    cout << trefle->get_etiquette() << endl;
+
+    abell->set_inode_wrote(true);
+    cout << trefle->is_inode_wrote() << endl;
+
+    delete trefle;
+    cout << deneb->get_ref_count() << endl;
+    cout << deneb->get_etiquette() << endl;
+    cout << deneb->is_wrote() << endl;
+
+    cout << abell->is_inode_wrote() << endl;
+    cout << abell->get_etiquette() << endl;
+
+    delete abell;
+	// verify with debugging and break in ~etoile that the deneb is properly released
 }

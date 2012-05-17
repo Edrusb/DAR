@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.70.2.8 2011/01/01 18:06:10 edrusb Rel $
+// $Id: libdar.cpp,v 1.91 2011/03/20 17:10:11 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -35,12 +35,22 @@ extern "C"
 #include <unistd.h>
 #endif
 
+#if LIBLZO2_AVAILABLE
+#if HAVE_LZO_LZO1X_H
+#include <lzo/lzo1x.h>
+#endif
+#endif
+
 #if HAVE_LIBINTL_H
 #include <libintl.h>
 #endif
 
 #if HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+
+#if HAVE_GCRYPT_H
+#include <gcrypt.h>
 #endif
 
 #if HAVE_TIME_H
@@ -154,10 +164,15 @@ using namespace std;
 
 namespace libdar
 {
-    static void libdar_init_thread_safe();
-    static void libdar_init_srand();
+    static void libdar_init(bool init_libgcrypt_if_not_done); // drives the "libdar_initialized" variable
 
-    void get_version(U_I & major, U_I & minor)
+    static bool libdar_initialized = false; //< static variable modified once during the first get_version call
+#ifdef CRYPTO_AVAILABLE
+    static bool libdar_initialized_gcrypt = false; //< to record whether libdar did initialized libgcrypt
+#endif
+
+
+    void get_version(U_I & major, U_I & minor, bool init_libgcrypt)
     {
 	NLS_SWAP_IN;
         if(&major == NULL)
@@ -166,22 +181,20 @@ namespace libdar
             throw Elibcall("get_version", gettext("Argument given to \"minor\" is a NULL pointer"));
         major = LIBDAR_COMPILE_TIME_MAJOR;
         minor = LIBDAR_COMPILE_TIME_MINOR;
-	libdar_init_thread_safe();
-	libdar_init_srand();
+	libdar_init(init_libgcrypt);
 	NLS_SWAP_OUT;
     }
 
-    void get_version_noexcept(U_I & major, U_I & minor, U_16 & exception, string & except_msg)
+    void get_version_noexcept(U_I & major, U_I & minor, U_16 & exception, string & except_msg, bool init_libgcrypt)
     {
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    get_version(major, minor);
+	    get_version(major, minor, init_libgcrypt);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
     }
 
-
-    void get_version(U_I & major, U_I & medium, U_I & minor)
+    void get_version(U_I & major, U_I & medium, U_I & minor, bool init_libgcrypt)
     {
 	NLS_SWAP_IN;
         if(&major == NULL)
@@ -194,26 +207,24 @@ namespace libdar
         major = LIBDAR_COMPILE_TIME_MAJOR;
 	medium = LIBDAR_COMPILE_TIME_MEDIUM;
         minor = LIBDAR_COMPILE_TIME_MINOR;
-	libdar_init_thread_safe();
-	libdar_init_srand();
+	libdar_init(init_libgcrypt);
 	NLS_SWAP_OUT;
     }
 
-    void get_version_noexcept(U_I & major, U_I & medium, U_I & minor, U_16 & exception, std::string & except_msg)
+    void get_version_noexcept(U_I & major, U_I & medium, U_I & minor, U_16 & exception, std::string & except_msg, bool init_libgcrypt)
     {
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    get_version(major, medium, minor);
+	    get_version(major, medium, minor, init_libgcrypt);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
     }
 
     archive* open_archive_noexcept(user_interaction & dialog,
-				   const path & chem, const std::string & basename,
+				   const path & chem,
+				   const std::string & basename,
 				   const std::string & extension,
-				   crypto_algo crypto, const std::string &pass, U_32 crypto_size,
-				   const std::string & input_pipe, const std::string & output_pipe,
-				   const std::string & execute, bool info_details,
+				   const archive_options_read & options,
 				   U_16 & exception,
 				   std::string & except_msg)
     {
@@ -221,9 +232,7 @@ namespace libdar
         NLS_SWAP_IN;
 	WRAPPER_IN
 	    ret = new archive(dialog, chem,  basename,  extension,
-			      crypto, pass, crypto_size,
-			      input_pipe, output_pipe,
-			      execute, info_details);
+			      options);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
 	return ret;
@@ -232,37 +241,9 @@ namespace libdar
     archive *create_archive_noexcept(user_interaction & dialog,
 				     const path & fs_root,
 				     const path & sauv_path,
-				     archive *ref_arch,
-				     const mask & selection,
-				     const mask & subtree,
 				     const std::string & filename,
 				     const std::string & extension,
-				     bool allow_over,
-				     bool warn_over,
-				     bool info_details,
-				     const infinint & pause,
-				     bool empty_dir,
-				     compression algo,
-				     U_I compression_level,
-				     const infinint &file_size,
-				     const infinint &first_file_size,
-				     const mask & ea_mask,
-				     const std::string & execute,
-				     crypto_algo crypto,
-				     const std::string & pass,
-				     U_32 crypto_size,
-				     const mask & compr_mask,
-				     const infinint & min_compr_size,
-				     bool nodump,
-				     inode::comparison_fields what_to_check,
-				     const infinint & hourshift,
-				     bool empty,
-				     bool alter_atime,
-				     bool same_fs,
-				     bool snapshot,
-				     bool cache_directory_tagging,
-				     bool display_skipped,
-				     const infinint & fixed_date,
+				     const archive_options_create & options,
 				     statistics * progressive_report,
 				     U_16 & exception,
 				     std::string & except_msg)
@@ -273,61 +254,22 @@ namespace libdar
 	    arch_ret = new archive(dialog,
 				   fs_root,
 				   sauv_path,
-				   ref_arch,
-				   selection,
-				   subtree,
 				   filename,
 				   extension,
-				   allow_over,
-				   warn_over,
-				   info_details,
-				   pause,
-				   empty_dir,
-				   algo,
-				   compression_level,
-				   file_size,
-				   first_file_size,
-				   ea_mask,
-				   execute,
-				   crypto,
-				   pass,
-				   crypto_size,
-				   compr_mask,
-				   min_compr_size,
-				   nodump,
-				   what_to_check,
-				   hourshift,
-				   empty,
-				   alter_atime,
-				   same_fs,
-				   snapshot,
-				   cache_directory_tagging,
-				   display_skipped,
-				   fixed_date,
+				   options,
 				   progressive_report);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
 	return arch_ret;
     }
 
+
     archive *isolate_archive_noexcept(user_interaction & dialog,
 				      const path &sauv_path,
 				      archive *ref_arch,
 				      const std::string & filename,
 				      const std::string & extension,
-				      bool allow_over,
-				      bool warn_over,
-				      bool info_details,
-				      const infinint & pause,
-				      compression algo,
-				      U_I compression_level,
-				      const infinint &file_size,
-				      const infinint &first_file_size,
-				      const std::string & execute,
-				      crypto_algo crypto,
-				      const std::string & pass,
-				      U_32 crypto_size,
-				      bool empty,
+				      const archive_options_isolate & options,
 				      U_16 & exception,
 				      std::string & except_msg)
     {
@@ -339,19 +281,7 @@ namespace libdar
 			      ref_arch,
 			      filename,
 			      extension,
-			      allow_over,
-			      warn_over,
-			      info_details,
-			      pause,
-			      algo,
-			      compression_level,
-			      file_size,
-			      first_file_size,
-			      execute,
-			      crypto,
-			      pass,
-			      crypto_size,
-			      empty);
+			      options);
 	WRAPPER_OUT(exception, except_msg)
 	NLS_SWAP_OUT;
 	return ret;
@@ -360,30 +290,9 @@ namespace libdar
     archive *merge_archive_noexcept(user_interaction & dialog,
 				    const path & sauv_path,
 				    archive *ref_arch1,
-				    archive *ref_arch2,
-				    const mask & selection,
-				    const mask & subtree,
 				    const std::string & filename,
 				    const std::string & extension,
-				    bool allow_over,
-				    bool warn_over,
-				    bool info_details,
-				    const infinint & pause,
-				    bool empty_dir,
-				    compression algo,
-				    U_I compression_level,
-				    const infinint & file_size,
-				    const infinint & first_file_size,
-				    const mask & ea_mask,
-				    const std::string & execute,
-				    crypto_algo crypto,
-				    const std::string & pass,
-				    U_32 crypto_size,
-				    const mask & compr_mask,
-				    const infinint & min_compr_size,
-				    bool empty,
-				    bool display_skipped,
-				    bool keep_compressed,
+				    const archive_options_merge & options,
 				    statistics * progressive_report,
 				    U_16 & exception,
 				    std::string & except_msg)
@@ -394,30 +303,9 @@ namespace libdar
 	    ret = new archive(dialog,
 			      sauv_path,
 			      ref_arch1,
-			      ref_arch2,
-			      selection,
-			      subtree,
 			      filename,
 			      extension,
-			      allow_over,
-			      warn_over,
-			      info_details,
-			      pause,
-			      empty_dir,
-			      algo,
-			      compression_level,
-			      file_size,
-			      first_file_size,
-			      ea_mask,
-			      execute,
-			      crypto,
-			      pass,
-			      crypto_size,
-			      compr_mask,
-			      min_compr_size,
-			      empty,
-			      display_skipped,
-			      keep_compressed,
+			      options,
 			      progressive_report);
 	WRAPPER_OUT(exception, except_msg)
 	NLS_SWAP_OUT;
@@ -446,7 +334,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.70.2.8 2011/01/01 18:06:10 edrusb Rel $";
+        static char id[]="$Id: libdar.cpp,v 1.91 2011/03/20 17:10:11 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -461,113 +349,102 @@ namespace libdar
 	return ret;
     }
 
-    void get_compile_time_features(bool & ea, bool & largefile, bool & nodump, bool & special_alloc, U_I & bits,
-				   bool & thread_safe,
-				   bool & libz, bool & libbz2, bool & libcrypto,
-				   bool & new_blowfish)
+    static void libdar_init(bool init_libgcrypt_if_not_done)
     {
-#ifdef EA_SUPPORT
-        ea = true;
-#else
-        ea = false;
-#endif
-#if defined( _FILE_OFFSET_BITS ) ||  defined( _LARGE_FILES )
-        largefile = true;
-#else
-        largefile = sizeof(off_t) > 4;
-#endif
-#ifdef LIBDAR_NODUMP_FEATURE
-        nodump = true;
-#else
-        nodump = false;
-#endif
-#ifdef LIBDAR_SPECIAL_ALLOC
-        special_alloc = true;
-#else
-        special_alloc = false;
-#endif
-#ifdef LIBDAR_MODE
-        bits = LIBDAR_MODE;
-#else
-        bits = 0; // infinint
-#endif
-#if ( defined( MUTEX_WORKS ) || ! defined( LIBDAR_SPECIAL_ALLOC ) ) && ! defined( TEST_MEMORY )
-	thread_safe = true;
-#else
-	thread_safe = false;
-#endif
-#if LIBZ_AVAILABLE
-	libz = true;
-#else
-	libz = false;
-#endif
-#if LIBBZ2_AVAILABLE
-	libbz2 = true;
-#else
-	libbz2 = false;
-#endif
+	if(!libdar_initialized)
+	{
+		// locale for gettext
 
-#if CRYPTO_AVAILABLE
-	libcrypto = true;
-#if CRYPTO_FULL_BF_AVAILABLE
-        new_blowfish = true;
-#else
-        new_blowfish = false;
-#endif
-#else
-	libcrypto = false;
-	new_blowfish = false;
-#endif
-    }
+	    if(string(DAR_LOCALEDIR) != string(""))
+		if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == NULL)
+		    throw Erange("", "Cannot open the translated messages directory, native language support will not work");
 
+		// pseudo random generator
+
+	    srand(time(NULL)+getpid()+getppid());
+
+
+		// initializing mutex
 
 #ifdef MUTEX_WORKS
-    static bool thread_safe_initialized = false;
+#ifdef LIBDAR_SPECIAL_ALLOC
+	    special_alloc_init_for_thread_safe();
+#endif
+	    thread_cancellation::init();
 #endif
 
-    static void libdar_init_thread_safe()
-    {
-#ifdef MUTEX_WORKS
-	if(thread_safe_initialized)
-	    return;
-#ifdef LIBDAR_SPECIAL_ALLOC
-	special_alloc_init_for_thread_safe();
-#endif
-	thread_safe_initialized = true;
-	thread_cancellation::init();
-#endif
-  	if(string(DAR_LOCALEDIR) != string(""))
-	    if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == NULL)
-		throw Erange("", "Cannot open the translated messages directory, native language support will not work");
+		// building the (later read only) database of user/UID and group/GID of the system
+
 #ifdef __DYNAMIC__
-	user_group_bases::class_init();
+	    user_group_bases::class_init();
+#endif
+
+		// initializing LIBLZO2
+
+#if HAVE_LIBLZO2
+	    if(lzo_init() != LZO_E_OK)
+		throw Erange("libdar_init_thread_safe", gettext("Initialization problem for liblzo2 library"));
+#endif
+
+		// initializing libgcrypt
+
+#ifdef CRYPTO_AVAILABLE
+	    if(!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P))
+	    {
+		if(init_libgcrypt_if_not_done)
+		{
+		    gcry_error_t err;
+
+			// no multi-thread support activated for gcrypt
+			// this must be done from the application as stated
+			// by the libgcrypt documentation
+
+		    if(!gcry_check_version(MIN_VERSION_GCRYPT))
+			throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s\n"), MIN_VERSION_GCRYPT));
+
+			// initializing default sized secured memory for libgcrypt
+		    (void)gcry_control(GCRYCTL_INIT_SECMEM, 65536);
+			// if secured memory could not be allocated, further request of secured memory will fail
+			// and a warning will show at that time (we cannot send a warning (just failure notice) at that time).
+
+		    err = gcry_control(GCRYCTL_ENABLE_M_GUARD);
+		    if(err != GPG_ERR_NO_ERROR)
+			throw Erange("libdar_init",tools_printf(gettext("Error while activating libgcrypt's memory guard: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+
+		    err = gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
+		    if(err != GPG_ERR_NO_ERROR)
+			throw Erange("libdar_init",tools_printf(gettext("Error while telling libgcrypt that initialization is finished: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+
+		    libdar_initialized_gcrypt = true;
+		}
+		else
+		    throw Erange("libdar_init_libgcrypt", gettext("libgcrypt not initialized and libdar not allowed to do so"));
+	    }
+	    else
+		if(!gcry_check_version(MIN_VERSION_GCRYPT))
+		    throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s\n"), MIN_VERSION_GCRYPT));
+#endif
+
+		 // so now libdar is ready for use!
+
+	     libdar_initialized = true;
+	 }
+     }
+
+     extern void close_and_clean()
+     {
+#ifdef CRYPTO_AVAILABLE
+	 if(libdar_initialized_gcrypt)
+	     gcry_control(GCRYCTL_TERM_SECMEM, 0); // by precaution if not already done by libgcrypt itself
 #endif
     }
 
-    static void libdar_init_srand()
-    {
-	srand(time(NULL)+getpid()+getppid());
-    }
 
 
     statistics op_extract_noexcept(user_interaction & dialog,
 				   archive *ptr,
 				   const path &fs_root,
-				   const mask &selection,
-				   const mask &subtree,
-				   bool allow_over,
-				   bool warn_over,
-				   bool info_details,
-				   bool detruire,
-				   bool only_more_recent,
-				   const mask & ea_mask,
-				   bool flat,
-				   inode::comparison_fields what_to_check,
-				   bool warn_remove_no_match,
-				   const infinint & hourshift,
-				   bool empty,
-				   bool ea_erase,
-				   bool display_skipped,
+				   const archive_options_extract & options,
 				   statistics * progressive_report,
 				   U_16 & exception,
 				   std::string & except_msg)
@@ -579,21 +456,7 @@ namespace libdar
 		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
 	ret = ptr->op_extract(dialog,
 			      fs_root,
-			      selection,
-			      subtree,
-			      allow_over,
-			      warn_over,
-			      info_details,
-			      detruire,
-			      only_more_recent,
-			      ea_mask,
-			      flat,
-			      what_to_check,
-			      warn_remove_no_match,
-			      hourshift,
-			      empty,
-			      ea_erase,
-			      display_skipped,
+			      options,
 			      progressive_report);
 	WRAPPER_OUT(exception, except_msg)
 	NLS_SWAP_OUT;
@@ -603,10 +466,7 @@ namespace libdar
 
     void op_listing_noexcept(user_interaction & dialog,
 			     archive *ptr,
-			     bool info_details,
-			     archive::listformat list_mode,
-			     const mask &selection,
-			     bool filter_unsaved,
+			     const archive_options_listing & options,
 			     U_16 & exception,
 			     std::string & except_msg)
     {
@@ -615,10 +475,7 @@ namespace libdar
 	    if(ptr == NULL)
 		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
 	ptr->op_listing(dialog,
-			info_details,
-			list_mode,
-			selection,
-			filter_unsaved);
+			options);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
     }
@@ -626,17 +483,10 @@ namespace libdar
     statistics op_diff_noexcept(user_interaction & dialog,
 				archive *ptr,
 				const path & fs_root,
-				const mask &selection,
-				const mask &subtree,
-				bool info_details,
-				const mask & ea_mask,
-				inode::comparison_fields what_to_check,
-				bool alter_atime,
-				bool display_skipped,
+				const archive_options_diff & options,
 				statistics * progressive_report,
 				U_16 & exception,
-				std::string & except_msg,
-				const infinint & hourshift = 0)
+				std::string & except_msg)
     {
 	statistics ret;
 	NLS_SWAP_IN;
@@ -645,15 +495,8 @@ namespace libdar
 		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
 	ret = ptr->op_diff(dialog,
 			   fs_root,
-			   selection,
-			   subtree,
-			   info_details,
-			   ea_mask,
-			   what_to_check,
-			   alter_atime,
-			   display_skipped,
-			   progressive_report,
-			   hourshift);
+			   options,
+			   progressive_report);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
 	return ret;
@@ -662,10 +505,7 @@ namespace libdar
 
     statistics op_test_noexcept(user_interaction & dialog,
 				archive *ptr,
-				const mask &selection,
-				const mask &subtree,
-				bool info_details,
-				bool display_skipped,
+				const archive_options_test & options,
 				statistics * progressive_report,
 				U_16 & exception,
 				std::string & except_msg)
@@ -676,10 +516,7 @@ namespace libdar
 	    if(ptr == NULL)
 		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
 	ret = ptr->op_test(dialog,
-			   selection,
-			   subtree,
-			   info_details,
-			   display_skipped,
+			   options,
 			   progressive_report);
 	WRAPPER_OUT(exception, except_msg)
 	NLS_SWAP_OUT;

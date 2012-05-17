@@ -16,17 +16,27 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar.hpp,v 1.5 2004/07/31 13:56:42 edrusb Rel $
+// $Id: dar.hpp,v 1.7 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
+
+    /// \file dar.hpp
+    /// \brief main module for dar command-line tool
+    /// \ingroup CMDLINE
+
 
 #ifndef DAR_HPP
 #define DAR_HPP
 
 #include "../my_config.h"
 
+    /// \addtogroup CMDLINE
+    /// @{
+
 extern const char *dar_version();
+
+    /// @}
 
 #endif

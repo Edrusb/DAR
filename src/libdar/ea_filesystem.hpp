@@ -16,19 +16,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: ea_filesystem.hpp,v 1.7 2005/05/08 12:12:00 edrusb Rel $
+// $Id: ea_filesystem.hpp,v 1.9 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 //
 
     /// \file ea_filesystem.hpp
     /// \brief filesystem dependent Extended Attributes operations
+    /// \ingroup Private
     ///
     /// This file contains a set of routines used to manipulate
     /// (read, write or test the presence of) Extended Attributes
-    /// \ingroup Private
+
 
 #ifndef EA_FILESYSTEM_HPP
 #define EA_FILESYSTEM_HPP
@@ -40,6 +41,9 @@
 
 namespace libdar
 {
+	/// \ingroup Private
+	/// @}
+
 	/// read EA associated to a given file
 
 	/// \param[in] chemin is the path to the file to read attributes of
@@ -79,6 +83,8 @@ namespace libdar
 	/// \param[in] filter
 	/// \return true if at least one EA covered by filter and present in the list exists as EA of the given file
     extern bool ea_filesystem_has_ea(const std::string & name, const ea_attributs & list, const mask & filter);
+
+	/// @}
 
 } // end of namespace
 

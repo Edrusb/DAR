@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_erreurs.cpp,v 1.8 2004/05/21 08:28:51 edrusb Rel $
+// $Id: test_erreurs.cpp,v 1.9 2009/12/18 10:10:21 edrusb Rel $
 //
 /*********************************************************************/
 

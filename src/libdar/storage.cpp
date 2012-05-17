@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: storage.cpp,v 1.16.2.4 2011/01/22 22:37:12 edrusb Rel $
+// $Id: storage.cpp,v 1.21 2011/01/22 22:39:10 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -159,20 +159,22 @@ namespace libdar
         if(it.ref != this)
             throw Erange("storage::write", gettext("The iterator is not indexing the object it has been asked to write to"));
 
-        U_I wrote = 0;
+	U_I wrote = 0;
 	while(wrote < size && it != end())
 	{
 	    U_32 to_write = size - wrote;
 	    U_32 space = it.cell->size - it.offset;
 
 	    if(to_write <= space)
-	    {	// enough room in current data block
+	    {
+		    // enough room in current data block
 		memcpy(it.cell->data + it.offset, a + wrote, to_write);
 		wrote += to_write;
 		it.offset += to_write;
 	    }
 	    else
-	    {	// more to copy than available in current data block
+	    {
+		    // more to copy than available in current data block
 		memcpy(it.cell->data + it.offset, a + wrote, space);
 		wrote += space;
 		it.cell = it.cell->next;
@@ -183,7 +185,7 @@ namespace libdar
 	    }
 	}
 
-        return wrote;
+	return wrote;
         E_END("storage::write","");
     }
 
@@ -201,13 +203,15 @@ namespace libdar
 	    U_32 space = it.cell->size - it.offset;
 
 	    if(to_read <= space)
-	    {	// enough room in current data block
+	    {
+		    // enough room in current data block
 		memcpy(a + read, it.cell->data + it.offset, to_read);
 		read += to_read;
 		it.offset += to_read;
 	    }
 	    else
-	    {	// more to copy than available in current data block
+	    {
+		    // more to copy than available in current data block
 		memcpy(a + read, it.cell->data + it.offset, space);
 		read += space;
 		it.cell = it.cell->next;
@@ -334,7 +338,7 @@ namespace libdar
                 {
 		    memcpy(p, it.cell->data, it.offset);
 		    memcpy(p + it.offset, it.cell->data + it.offset + number, it.cell->size - it.offset - number);
-		    delete [] it.cell->data;
+                    delete [] it.cell->data;
 
                     it.cell->data = p;
                     it.cell->size -= number;
@@ -435,7 +439,7 @@ namespace libdar
 
         while(i_ref != ref.end())
 	{
-            *i_new = *i_ref;
+	    *i_new = *i_ref;
 	    ++i_new;
 	    ++i_ref;
 	}
@@ -444,7 +448,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: storage.cpp,v 1.16.2.4 2011/01/22 22:37:12 edrusb Rel $";
+        static char id[]="$Id: storage.cpp,v 1.21 2011/01/22 22:39:10 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -490,9 +494,9 @@ namespace libdar
                     if(p != NULL)
                     {
                         struct cellule *tmp = glisseur->next;
+
 			memcpy(p, glisseur->data, glisseur->size);
 			memcpy(p + glisseur->size, tmp->data, somme - glisseur->size);
-
                         delete [] glisseur->data;
 
                         glisseur->data = p;
@@ -526,12 +530,12 @@ namespace libdar
     {
         E_BEGIN;
         if(it.ref != this)
-            throw Erange("storage::insert_bytes_at_iterator_cmn", gettext("The iterator is not indexing the object it has been defined for"));
+	    throw Erange("storage::insert_bytes_at_iterator_cmn", gettext("The iterator is not indexing the object it has been defined for"));
+
 
         if(it.cell != NULL)
         {
-            storage temp = size+it.cell->size; // we create a chain of cellules containing enough
-		// place to hold the current cellule's data plus the bytes to insert.
+            storage temp = size+it.cell->size;
             struct cellule *before, *after;
             iterator gliss = temp.begin();
 
@@ -551,7 +555,7 @@ namespace libdar
 		// first we release the cellule that has been copied to "temp" object
             before = it.cell->prev;
             after = it.cell->next;
-	    it.cell->prev = NULL;
+            it.cell->prev = NULL;
             it.cell->next = NULL;
             detruit(it.cell);
 	    it.cell = NULL;
@@ -568,10 +572,11 @@ namespace libdar
                 last = temp.last;
             temp.last->next = after;
 
-            temp.first = temp.last = NULL;
+	    temp.first = temp.last = NULL;
 		// this way when "temp" object will be destroyed
 		// it will not affect the chain of cells which is now
 		// part of "this" (current object).
+
         }
         else // it_cell == NULL
         {
@@ -613,8 +618,8 @@ namespace libdar
 
             temp.last = temp.first = NULL;
         }
-	reduce();
 
+        reduce();
         E_END("storage::insert_bytes_at_iterator_cmn","");
     }
 
@@ -644,56 +649,57 @@ namespace libdar
         E_BEGIN;
         struct cellule *newone;
         struct cellule *previous = NULL;
-
 	U_32 dsize = size;
-	begin = NULL;
-        do
-        {
-            newone = new struct cellule;
-            if(newone != NULL)
-            {
-                newone->prev = previous;
-                newone->next = NULL;
-                if(previous != NULL)
-                    previous->next = newone;
-                else
-                    begin = newone;
-            }
-            else
-            {
-                detruit(begin);
-		begin = NULL;
-                throw Ememory("storage::make_alloc");
-            }
 
+	begin = end = NULL;
+
+	if(size > 0)
+	{
 	    do
 	    {
-		if(dsize > 0)
-		    newone->data = new unsigned char[dsize];
-		else
-		    newone->data = NULL;
-		if(newone->data != NULL || dsize == 0)
+		newone = new struct cellule;
+		if(newone != NULL)
 		{
-		    size -= dsize;
-		    newone->size = dsize;
-		    previous = newone;
+		    newone->prev = previous;
+		    newone->next = NULL;
+		    if(previous != NULL)
+			previous->next = newone;
+		    else
+			begin = newone;
 		}
 		else
-		    if(dsize > 2)
-			dsize /= 2;
-		    else
-		    {
-			newone->size = 0;
-			detruit(begin);
-			begin = NULL;
-			throw Ememory("storage::make_alloc");
-		    }
-	    }
-	    while(dsize > 1 && newone->data == NULL);
-        }
-        while (size > 0);
+		{
+		    detruit(begin);
+		    begin = NULL;
+		    throw Ememory("storage::make_alloc");
+		}
 
-        end = newone;
+		do
+		{
+		    newone->data = new unsigned char[dsize];
+		    if(newone->data != NULL)
+		    {
+			size -= dsize;
+			newone->size = dsize;
+			previous = newone;
+		    }
+		    else
+			if(dsize > 2)
+			    dsize /= 2;
+			else
+			{
+			    newone->size = 0;
+			    detruit(begin);
+			    begin = NULL;
+			    throw Ememory("storage::make_alloc");
+			}
+		}
+		while(dsize > 1 && newone->data == NULL);
+	    }
+	    while (size > 0);
+
+	    end = newone;
+	}
         E_END("storage::make_alloc","U_32");
     }
 
@@ -703,45 +709,48 @@ namespace libdar
         struct cellule *debut;
         struct cellule *fin;
         U_32 sz = 0;
+	begin = end = NULL;
 
-        size.unstack(sz);
-        begin = end = NULL;
+	if(size > 0)
+	{
+	    size.unstack(sz);
 
-        do
-        {
-            try
-            {
-                make_alloc(sz, debut, fin);
-                if(end != NULL)
-                {
-                    end->next = debut;
-                    debut->prev = end;
-                    end = fin;
-                }
-                else
-                    if(begin != NULL)
-                        throw SRC_BUG;
-                    else
-                    {
-                        begin = debut;
-                        end = fin;
-                    }
-            }
-            catch(Ememory & e)
-            {
-                if(begin != NULL)
+	    do
+	    {
+		try
 		{
-                    detruit(begin);
-		    begin = NULL;
-		    end = NULL;
+		    make_alloc(sz, debut, fin);
+		    if(end != NULL)
+		    {
+			end->next = debut;
+			debut->prev = end;
+			end = fin;
+		    }
+		    else
+			if(begin != NULL)
+			    throw SRC_BUG;
+			else
+			{
+			    begin = debut;
+			    end = fin;
+			}
 		}
+		catch(Ememory & e)
+		{
+		    if(begin != NULL)
+		    {
+			detruit(begin);
+			begin = NULL;
+			end = NULL;
+		    }
 
-                throw;
-            }
-            sz = 0;
-            size.unstack(sz);
-        }
-        while(sz > 0);
+		    throw;
+		}
+		sz = 0;
+		size.unstack(sz);
+	    }
+	    while(sz > 0);
+	}
         E_END("storage::make_alloc","infinint");
     }
 

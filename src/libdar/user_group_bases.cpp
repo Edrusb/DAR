@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: user_group_bases.cpp,v 1.1.2.2 2008/02/09 18:52:28 edrusb Rel $
+// $Id: user_group_bases.cpp,v 1.7 2011/06/02 13:17:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -75,7 +75,9 @@ namespace libdar
 
     const std::string user_group_bases::empty_string = "";
     bool user_group_bases::class_initialized = false;
+#if MUTEX_WORKS
     pthread_mutex_t user_group_bases::lock_fill;
+#endif
 
     void user_group_bases::fill() const
     {
@@ -116,21 +118,28 @@ namespace libdar
 
     const string & user_group_bases::get_username(const infinint & uid) const
     {
-	map<infinint, string>::const_iterator it = user_database.find(uid);
+	map<infinint, string>::const_iterator it;
 
 	fill();
+	it = user_database.find(uid);
 	if(it != user_database.end())
 	    return it->second;
 	else
 	    return empty_string;
     }
 
+    static void dummy_call(char *x)
+    {
+        static char id[]="$Id: user_group_bases.cpp,v 1.7 2011/06/02 13:17:37 edrusb Rel $";
+        dummy_call(id);
+    }
 
     const string & user_group_bases::get_groupname(const infinint & gid) const
     {
-	map<infinint, string>::const_iterator it = group_database.find(gid);
+	map<infinint, string>::const_iterator it;
 
 	fill();
+	it = group_database.find(gid);
 	if(it != group_database.end())
 	    return it->second;
 	else

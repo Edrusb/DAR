@@ -16,19 +16,19 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact dar's author : dar.linux@free.fr
+// to contact dar's author : http://dar.linux.free.fr/email.html
 // to contact Chris Martin, author of dar-help, contact dar's author
-//        which will forward, or give Chris's email upon his agreement
+//        which will forward, or give you Chris's email upon his agreement
 //
 /*********************************************************************/
-// $Id: dar-help.c,v 1.9 2004/07/20 21:16:17 edrusb Rel $
+// $Id: dar-help.c,v 1.11 2009/12/18 11:48:47 edrusb Rel $
 //
 /*********************************************************************/
 
 void no_compiler_warning(char *x)
 {
     char rcsid[] =
-"$Id: dar-help.c,v 1.9 2004/07/20 21:16:17 edrusb Rel $";
+"$Id: dar-help.c,v 1.11 2009/12/18 11:48:47 edrusb Rel $";
     no_compiler_warning(rcsid);
 }
 /*
@@ -69,6 +69,10 @@ char *strchr (), *strrchr ();
 
 #if HAVE_ERRNO_H
 #include <errno.h>
+#endif
+
+#if HAVE_PTHREAD_H
+#include <pthread.h>
 #endif
 
 #if HAVE_LIBXML_TREE_H

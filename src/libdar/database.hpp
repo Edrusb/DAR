@@ -16,14 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database.hpp,v 1.5 2005/09/25 19:05:42 edrusb Rel $
+// $Id: database.hpp,v 1.14 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file database.hpp
     /// \brief this file holds the database class definition
+    /// \ingroup API
 
 
 #ifndef DATABASE_HPP
@@ -37,6 +38,7 @@
 #include "generic_file.hpp"
 #include "data_tree.hpp"
 #include "storage.hpp"
+#include "database_options.hpp"
 
 namespace libdar
 {
@@ -56,9 +58,8 @@ namespace libdar
 
 	    /// \param[in] dialog for user interaction
 	    /// \param[in] base database filename
-	    /// \param[in] partial set to true to only load an manipulate database header
-	    /// \note not all methods are available if the database is partially built from file (see bellow)
- 	database(user_interaction & dialog, const std::string & base, bool partial);
+	    /// \param[in] opt extendable list of options to use for this operation
+ 	database(user_interaction & dialog, const std::string & base, const database_open_options & opt);
 
 	    /// database destructor (no implicit file saving)
 	~database();
@@ -67,8 +68,8 @@ namespace libdar
 
 	    /// \param[in] dialog for user interaction
 	    /// \param[in] filename name of file to save database to
-	    /// \param[in] overwrite whether we can overwrite the file if it already exists
-	void dump(user_interaction & dialog, const std::string & filename, bool overwrite) const;
+	    /// \param[in] opt extendable list of options to use for this operation
+	void dump(user_interaction & dialog, const std::string & filename, const database_dump_options & opt) const;
 
 	    // SETTINGS
 
@@ -77,17 +78,19 @@ namespace libdar
 	    /// \param[in] arch is the archive to add to the database (may be a partial archive)
 	    /// \param[in] chemin is the path to this archive to record in the database
 	    /// \param[in] basename is the archive's basename to record in the database
+	    /// \param[in] opt extendable list of options to use for this operation
 	    /// \note this method is not available with partially extracted databases.
-	void add_archive(const archive & arch, const std::string & chemin, const std::string & basename);
+	void add_archive(const archive & arch, const std::string & chemin, const std::string & basename, const database_add_options & opt);
 
 	    /// remove an archive from a database
 
 	    /// \param[in] min first archive index to remove
 	    /// \param[in] max last archive index to remove
+	    /// \param[in] opt extendable list of options to use for this operation
 	    /// \note the archives which indexes are in the range [min-max] are
 	    /// removed. If you want to remove only one archive choose min equal to max.
 	    /// \note this method is not available with partially extracted databases.
-	void remove_archive(archive_num min, archive_num max);
+	void remove_archive(archive_num min, archive_num max, const database_remove_options & opt);
 
 	    /// change order of archive within the database
 
@@ -100,13 +103,15 @@ namespace libdar
 
 	    /// \param[in] num is the archive index to rename
 	    /// \param[in] basename is the new basename to give to that archive
-	void change_name(archive_num num, const std::string & basename);
+	    /// \param[in] opt optional parameters for this operation
+	void change_name(archive_num num, const std::string & basename, const database_change_basename_options &opt);
 
 	    /// change one's archive path recorded in the database
 
 	    /// \param[in] num is the archive index who's path to change
 	    /// \param[in] chemin is the new path to give to that archive
-	void set_path(archive_num num, const std::string & chemin);
+	    /// \param[in] opt optional parameters for this operation
+	void set_path(archive_num num, const std::string & chemin, const database_change_path_options & opt);
 
 	    /// change the default options given to dar when performing restoration
 
@@ -144,9 +149,10 @@ namespace libdar
 
 	    /// \param[in,out] dialog where to display listing to
 	    /// \param[in] num is the archive number to look at
+	    /// \param[in] opt optional parameters for this operation
 	    /// \note if "num" is set to zero all archive contents is listed
 	    /// \note this method is not available with partially extracted databases.
-	void show_files(user_interaction & dialog, archive_num num) const;
+	void show_files(user_interaction & dialog, archive_num num, const database_used_options & opt) const;
 
 	    /// list the archive where a give file is present
 
@@ -167,19 +173,25 @@ namespace libdar
 
 	    /// \param[in,out] dialog where to have user interaction
 	    /// \param[in] filename list of filename to restore
-	    /// \param[in] early_release if set to true release memory before calling dar, consequences is that many calls to the database are no more possible.
-	    /// \param[in] extra_options_for_dar list of options to pass to dar
-	    /// \param[in] date passed this date files are ignored. So you can restore files in the most recent state before a certain "date".
-	    /// \note if "date" is set to zero, the most recent state available is looked for.
-	    /// \note this method is not available with partially extracted databases.
-	    /// \note if early_release is true, free almost all memory allocated by the database before calling dar.
-	    /// drawback is that no more action is possible after this call (except destruction)
-	    /// if date is zero the most recent version is looked for, else the last version before (including) the given date is looked for
+	    /// \param[in] opt extendable list of options to use for this operation
 	void restore(user_interaction & dialog,
 		     const std::vector<std::string> & filename,
-		     bool early_release,
-		     const std::vector<std::string> & extra_options_for_dar,
-		     const infinint & date = 0);
+		     const database_restore_options & opt);
+
+	    /// check that all files's Data and EA are more recent when archive number grows within the database, only warn the user
+
+	    /// \param[in,out] dialog for user interaction
+	    /// \return true if check succeeded, false if warning have been issued
+
+	bool check_order(user_interaction & dialog) const
+	{
+	    bool initial_warn = true;
+
+	    if(files == NULL)
+		throw SRC_BUG;
+	    return files->check_order(dialog, ".", initial_warn) && initial_warn;
+	}
+
 
     private:
 
@@ -196,7 +208,8 @@ namespace libdar
 	data_dir *files;                             //< structure containing files and they status in the set of archive used for that database
 	storage *data_files;                         //< when reading archive in partial mode, this is where is located the "not readed" part of the archive
 
-	void build(generic_file & f, bool partial);  //< used by constructors
+	void build(user_interaction & dialog, generic_file & f, bool partial, unsigned char db_version);  //< used by constructors
+	archive_num get_real_archive_num(archive_num num, bool revert) const;
     };
 
 } // end of namespace

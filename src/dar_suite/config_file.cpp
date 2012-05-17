@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: config_file.cpp,v 1.8 2004/05/08 20:40:42 edrusb Rel $
+// $Id: config_file.cpp,v 1.11 2011/03/06 13:08:17 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -124,7 +124,7 @@ bool config_file::find_next_target(generic_file &f, infinint & debut, string & n
             }
             break;
         case search: // reading the current word
-            if(isalpha(a))
+            if(isalnum(a) || a == '_' || a == '-')
                 nature += a;
             else
                 if(a == ':')
@@ -170,6 +170,6 @@ bool config_file::find_next_target(generic_file &f, infinint & debut, string & n
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: config_file.cpp,v 1.8 2004/05/08 20:40:42 edrusb Rel $";
+    static char id[]="$Id: config_file.cpp,v 1.11 2011/03/06 13:08:17 edrusb Rel $";
     dummy_call(id);
 }

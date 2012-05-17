@@ -1,4 +1,4 @@
-.TH DAR_SLAVE 1 "JAN 8, 2006"
+.TH DAR_SLAVE 1 "Jan. 9th, 2011"
 .UC 8
 .SH NAME
 dar_slave - disk archive slave
@@ -39,14 +39,16 @@ reads the orders from the named file instead of standard input. In most cases th
 sends the data to the named file <filename> instead of standard output. In most cases the filename will be a named pipe.
 .TP 20
 -E <string>
-string is a command to be launched between slices. See dar(1) man page (same option) for more informations.
+string is a command to be launched between slices. See dar(1) man page (same option) for more information.
 .TP 20
 -Q
 Do not display any message on stderr when not launched from a terminal (for example when launched from an at job or crontab). Remains that any question to the user will be assumed a 'no' answer, which most of the time will abort the program.
 .TP 20
 -j
 when virtual memory is exhausted, as user to make room before trying to continue. By default, when memory is exhausted dar aborts.
-
+.TP 20
+-; <num>
+Defines the minimum number of digits to use for archive slice numbers. See the same option in dar man page for more details.
 .SH EXIT CODES
 .B dar_slaves
 exists with the same codes as dar does, see dar(1) man page.

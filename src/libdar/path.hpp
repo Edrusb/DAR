@@ -16,14 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: path.hpp,v 1.9.2.1 2007/06/21 20:47:12 edrusb Rel $
+// $Id: path.hpp,v 1.18 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file path.hpp
     /// \brief here is the definition of the path class
+    /// \ingroup API
     ///
     /// the path class handle path and provide several operation on them
 
@@ -35,14 +36,17 @@
 #include <string>
 #include "erreurs.hpp"
 
-#define FAKE_ROOT path(string("<ROOT>"))
+#define FAKE_ROOT path(string("<ROOT>"), true)
 
 namespace libdar
 {
 
 	/// the class path is here to manipulate paths in the Unix notation: using'/'
 
-	/// several operations are provided as well as convertion functions
+	/// several operations are provided as well as convertion functions, but
+	/// for the API user, it can be used as if it was a std::string object.
+	/// However if the argument is not a valid path, an exception may be thrown
+	/// by libdar
 	/// \ingroup API
 
     class path
@@ -51,20 +55,25 @@ namespace libdar
 	    /// constructor from a string
 
 	    //! This realizes the string to path convertion function
+	    //! \param[in] s the string to convert to path
+	    //! \param[in] x_undisclosed do not split the given string, consider it as a single directory name, even if some '/' are found in it
 	    //! \note empty string is not a valid string (exception thrown)
-        path(const std::string & s);
+	    //! \note having undisclosed set to true, does not allow one to pop() right away, first push must be made. While having undisclosed set to false
+	    //! let the user pop() right away if the given string is composed of several path members ("member1/member2/member3" for example of path
+	    //! allow one to pop() three time, while in the same example setting undisclosed to true, allow one to pop() just once).
+        path(const std::string & s, bool x_undisclosed = false);
 
 	    /// constructor from a char *
 
 	    //! this realizes the char * to path convertion function
 	    //! \note empty string is not a valid string (exception thrown)
-        path(const char *s) { *this = path(std::string(s)); };
+        path(const char *s, bool x_undisclosed = false) { *this = path(std::string(s), x_undisclosed); };
 
 	    /// copy constructor
         path(const path & ref);
 
 	    /// assignment operator
-        path & operator = (const path & ref);
+        const path & operator = (const path & ref);
 
 	    /// comparison operator
         bool operator == (const path & ref) const;
@@ -88,6 +97,12 @@ namespace libdar
 
 	    /// whether the path is relative or absolute (= start with a /)
         bool is_relative() const { return relative; };
+
+	    /// whether the path is absolute or relative
+	bool is_absolute() const { return !relative; };
+
+	    /// whether the path has an undisclosed part at the beginning
+	bool is_undisclosed() const { return undisclosed; };
 
 	    /// remove and gives in argument the basename of the path
 
@@ -137,10 +152,14 @@ namespace libdar
 	    /// \note a absolute path counts one more that its relative brother
         unsigned int degre() const { return dirs.size() + (relative ? 0 : 1); };
 
+	    /// \brief if the current object is an undisclosed path, tries to convert it back to normal path
+	void explode_undisclosed() const;
+
     private :
         std::list<std::string>::iterator reading;
         std::list<std::string> dirs;
         bool relative;
+	bool undisclosed;
 
         void reduce();
     };

@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: header_version.hpp,v 1.12 2005/05/08 12:12:01 edrusb Rel $
+// $Id: header_version.hpp,v 1.22 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -33,42 +33,94 @@
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "tools.hpp"
+#include "archive_version.hpp"
 
 namespace libdar
 {
-    const int VERSION_FLAG_SAVED_EA_ROOT = 0x80;      // no more used since version "05"
-    const int VERSION_FLAG_SAVED_EA_USER = 0x40;      // no more used since version "05"
-    const int VERSION_FLAG_SCRAMBLED     = 0x20;      // scrambled or strong encryption used
-    const int VERSION_SIZE = 3;
-    typedef char dar_version[VERSION_SIZE];
-    extern void version_copy(dar_version & dst, const dar_version & src);
-    extern bool version_greater(const dar_version & left, const dar_version & right);
-        // operation left > right
 
+	/// \addtogroup Private
+	/// @{
+
+    const U_I VERSION_FLAG_SAVED_EA_ROOT = 0x80;      //< no more used since version "05"
+    const U_I VERSION_FLAG_SAVED_EA_USER = 0x40;      //< no more used since version "05"
+    const U_I VERSION_FLAG_SCRAMBLED     = 0x20;      //< scrambled or strong encryption used
+    const U_I VERSION_FLAG_SEQUENCE_MARK = 0x10;      //< escape sequence marks present for sequential reading
+    const U_I VERSION_FLAG_INITIAL_OFFSET = 0x08;     //< whether the header contains the initial offset (size of clear data before encrypted) NOTE : This value is set internally by header_version, no need to set flag with it! But that's OK to set it or not, it will be updated according to initial_offset's value.
+    const U_I VERSION_FLAG_HAS_AN_EXTENDED_SIZE = 0x01; //< reserved for future use
+    const U_I VERSION_SIZE = 3;                       //< size of the version field
+    const U_I HEADER_CRC_SIZE = 2;                    //< size of the CRC (deprecated, now only used when reading old archives)
+
+
+	/// manages of the archive header and trailer
     struct header_version
     {
-        dar_version edition;
+        archive_version edition;
         char algo_zip;
-        std::string cmd_line;
+        std::string cmd_line; // used long ago to store cmd_line, then abandonned, then recycled as a user comment field
         unsigned char flag; // added at edition 02
+	infinint initial_offset; // not dropped to archive if set to zero (at dump() time, the flag is also updated with VERSION_FLAG_INITIAL_OFFSET accordingly to this value)
+
+	header_version()
+	{
+	    algo_zip = ' ';
+	    cmd_line = "";
+	    flag = 0;
+	    initial_offset = 0;
+	}
 
         void read(generic_file &f)
-            {
-                f.read(edition, sizeof(edition));
-                f.read(&algo_zip, sizeof(algo_zip));
-                tools_read_string(f, cmd_line);
-                if(version_greater(edition, "01"))
-                    f.read((char *)&flag, (size_t)1);
-                else
-                    flag = 0;
-            };
+	{
+	    crc ctrl;
+
+	    f.reset_crc(HEADER_CRC_SIZE);
+	    edition.read(f);
+	    f.read(&algo_zip, sizeof(algo_zip));
+	    tools_read_string(f, cmd_line);
+	    if(edition > 1)
+		f.read((char *)&flag, 1);
+	    else
+		flag = 0;
+	    if((flag & VERSION_FLAG_INITIAL_OFFSET) != 0)
+		initial_offset.read(f);
+	    else
+		initial_offset = 0;
+	    f.get_crc(ctrl);
+	    if((edition == empty_archive_version()))
+		throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
+	    if(edition > 7)
+	    {
+		crc coh = infinint(HEADER_CRC_SIZE);
+		coh.read(f);
+		if(coh != ctrl)
+		    throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
+	    }
+	    if(initial_offset == 0)
+		initial_offset = f.get_position();
+	};
+
         void write(generic_file &f)
-            {
-                f.write(edition, sizeof(edition));
-                f.write(&algo_zip, sizeof(algo_zip));
-                tools_write_string(f, cmd_line);
-                f.write((char *)&flag, (size_t)1);
-            };
+	{
+	    crc ctrl;
+
+		// preparing the data
+
+	    if(initial_offset != 0)
+		flag |= VERSION_FLAG_INITIAL_OFFSET; // adding it to the flag
+	    else
+		flag &= ~VERSION_FLAG_INITIAL_OFFSET; // removing it from the flag
+
+		// writing down the data
+
+	    f.reset_crc(HEADER_CRC_SIZE);
+	    edition.dump(f);
+	    f.write(&algo_zip, sizeof(algo_zip));
+	    tools_write_string(f, cmd_line);
+	    f.write((char *)&flag, 1);
+	    if(initial_offset != 0)
+		initial_offset.dump(f);
+	    f.get_crc(ctrl);
+	    ctrl.dump(f);
+	};
     };
 
 } // end of namespace

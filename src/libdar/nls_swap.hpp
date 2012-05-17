@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: nls_swap.hpp,v 1.3.2.2 2007/08/19 11:42:42 edrusb Rel $
+// $Id: nls_swap.hpp,v 1.8 2011/01/09 17:25:58 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -31,13 +31,19 @@
 #ifndef NLS_SWAP_HPP
 #define NLS_SWAP_HPP
 
+#include <string>
+
 #include "../my_config.h"
 #include "tools.hpp"
 
 #ifdef ENABLE_NLS
 
+    /// \addtogroup Private
+    /// @{
+
+
 #define NLS_SWAP_IN                             \
-         string nls_swap_tmp;                   \
+         std::string nls_swap_tmp;              \
          if(textdomain(NULL) != NULL)           \
          {                                      \
 	     nls_swap_tmp = textdomain(NULL);   \
@@ -57,6 +63,9 @@
 #define NLS_SWAP_OUT //
 
 #endif
+
+    /// @}
+
 
 
 #endif

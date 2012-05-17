@@ -16,14 +16,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.25.2.3 2009/04/07 08:45:29 edrusb Rel $
+// $Id: generic_file.hpp,v 1.50 2011/04/17 16:36:36 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file generic_file.hpp
     /// \brief class generic_file is defined here as well as class fichier
+    /// \ingroup Private
     ///
     /// the generic_file interface is widely used in libdar
     /// it defines the standard way of transmitting data between different
@@ -35,7 +36,6 @@
     /// - dry run operations
     /// - file access
     /// .
-    /// \ingroup Private
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -62,8 +62,11 @@ extern "C"
 
 #include "path.hpp"
 #include "integers.hpp"
-#include "user_interaction.hpp"
 #include "thread_cancellation.hpp"
+#include "label.hpp"
+#include "crc.hpp"
+#include "user_interaction.hpp"
+#include "mem_ui.hpp"
 
 #include <string>
 
@@ -72,13 +75,6 @@ namespace libdar
 
 	/// \addtogroup Private
 	/// @{
-
-    const int CRC_SIZE = 2;
-    typedef char crc[CRC_SIZE];
-    extern void clear(crc & value);
-    extern void copy_crc(crc & dst, const crc & src);
-    extern bool same_crc(const crc &a, const crc &b);
-    extern std::string crc2str(const crc &a);
 
 	/// generic_file openning modes
     enum gf_mode
@@ -109,107 +105,158 @@ namespace libdar
     {
     public :
 	    /// main constructor
-        generic_file(user_interaction & dialog, gf_mode m) { rw = m; clear(value); crc_offset = 0; enable_crc(false); gf_ui = dialog.clone(); };
+        generic_file(gf_mode m) { rw = m; terminated = false; enable_crc(false); };
+
 	    /// copy constructor
 	generic_file(const generic_file &ref) { copy_from(ref); };
+
+
+	    /// virtual destructor, this let inherited destructor to be called even from a generic_file pointer to an inherited class
+
+	    /// destructor-like call, except that it is allowed to throw exceptions
+	void terminate() const;
+
+	virtual ~generic_file() {};
+
 	    /// assignment operator
-	generic_file & operator = (const generic_file & ref) { detruire(); copy_from(ref); return *this; };
-	    /// destructor
-        virtual ~generic_file() { detruire(); };
+	const generic_file & operator = (const generic_file & ref) { copy_from(ref); return *this; };
 
 	    /// retreive the openning mode for this object
         gf_mode get_mode() const { return rw; };
 
 	    /// read data from the generic_file
-        S_I read(char *a, size_t size);
+
+	    /// \param[in, out] a is where to put the data to read
+	    /// \param[in] size is how much data to read
+	    /// \return the exact number of byte read.
+	    /// \note read as much as requested data, unless EOF is met (only EOF can lead to reading less than requested data)
+	    /// \note EOF is met if read() returns less than size
+        U_I read(char *a, U_I size);
+
 	    /// write data to the generic_file
-        S_I write(const char *a, size_t size);
+
+	    /// \note throws a exception if not all data could be written as expected
+        void write(const char *a, U_I size);
+
 	    /// write a string to the generic_file
-        S_I write(const std::string & arg);
+
+	    /// \note throws a exception if not all data could be written as expected
+        void write(const std::string & arg);
+
 	    /// skip back one char, read on char and skip back one char
         S_I read_back(char &a);
+
 	    /// read one char
-	S_I read_forward(char &a) { return read(&a, 1); };
+	S_I read_forward(char &a) { if(terminated) throw SRC_BUG; return read(&a, 1); };
+
 	    /// skip at the absolute position
+
+	    /// \param[in] pos the offset in byte where next read/write operation must start
+	    /// \return true if operation was successfull and false if the requested position is not valid (after end of file)
+	    /// \note if requested position is not valid the reading/writing cursor must be set to the closest valid position
         virtual bool skip(const infinint & pos) = 0;
+
 	    /// skip to the end of file
         virtual bool skip_to_eof() = 0;
+
 	    /// skip relatively to the current position
         virtual bool skip_relative(S_I x) = 0;
+
 	    /// get the current read/write position
         virtual infinint get_position() = 0;
 
 	    /// copy all data from current position to the object in argument
-        void copy_to(generic_file &ref);
+        virtual void copy_to(generic_file &ref);
+
 	    /// copy all data from the current position to the object in argument and computes a CRC value of the transmitted data
-        void copy_to(generic_file &ref, crc & value);
+        virtual void copy_to(generic_file &ref, crc & value);
+
 	    /// small copy (up to 4GB) with CRC calculation
         U_32 copy_to(generic_file &ref, U_32 size); // returns the number of byte effectively copied
+
 	    /// copy the given amount to the object in argument
         infinint copy_to(generic_file &ref, infinint size); // returns the number of byte effectively copied
+
 	    /// compares the contents with the object in argument
-        bool diff(generic_file & f); // return true if arg differs from "this"
+
+	    /// \param[in] f is the file to compare the current object with
+	    /// \param[in,out] value is the computed checksum, its value can be used for additional
+	    /// testing if this method returns false (no difference between files). The given checksum
+	    /// has to be set to the expected width by the caller.
+	    /// \return true if arg differ from "this"
+        bool diff(generic_file & f, crc & value);
 
             /// reset CRC on read or writen data
-        void reset_crc();
-	    /// get CRC of the transfered date since last reset
-        void get_crc(crc & val) { enable_crc(false); copy_crc(val, value); };
 
-	    /// get the cached user_interaction for inherited classes in particular (this stay a public method, not a protected one)
-	user_interaction & get_gf_ui() const { return *gf_ui; };
+	    /// \param[in] width is the width to use for the CRC
+        void reset_crc(const infinint & width);
+
+	    /// to known whether CRC calculation is activated or not
+	bool crc_status() const { return active_read == &generic_file::read_crc; };
+
+	    /// get CRC of the transfered date since last reset
+
+	    /// \note does also disable checksum calculation, which if needed again
+	    /// have to be re-enabled calling reset_crc() method
+        void get_crc(crc & val) { enable_crc(false); val = checksum; };
+
+	    /// write any pending data
+	void sync_write();
 
     protected :
         void set_mode(gf_mode x) { rw = x; };
-        virtual S_I inherited_read(char *a, size_t size) = 0;
-            // must provide as much byte as requested up to end of file
-            // stay blocked if not enough available
-            // returning zero or less than requested means end of file
-        virtual S_I inherited_write(const char *a, size_t size) = 0;
-            // must write all data or block or throw exceptions
-            // thus always returns the second argument
+
+	    /// implementation of read() operation
+
+	    /// \param[in,out] a where to put the data to read
+	    /// \param[in] size says how much data to read
+	    /// \return the exact amount of data read and put into 'a'
+	    /// \note read as much byte as requested, up to end of file
+	    /// stays blocked if not enough data is available and EOF not
+	    /// yet met. May return less data than requested only if EOF as been reached.
+	    /// in other worlds, EOF is reached when returned data is stricly less than the requested data
+	    /// Any problem shall be reported by throwing an exception.
+        virtual U_I inherited_read(char *a, U_I size) = 0;
+
+	    /// implementation of the write() operation
+
+	    /// \param[in] a what data to write
+	    /// \param[in] size amount of data to write
+	    /// \note must either write all data or report an error by throwing an exception
+        virtual void inherited_write(const char *a, U_I size) = 0;
+
+
+	    /// write down any pending data
+
+	    /// \note this method is called after read/write mode
+	    /// checking from sync_write() public method;
+	virtual void inherited_sync_write() = 0;
+
+
+	    /// destructor-like call, except that it is allowed to throw exceptions
+
+	    /// \note this method must never be called directly but using terminate() instead,
+	    /// generic_file class manages it to never be called more than once
+	virtual void inherited_terminate() = 0;
+
+
+	    /// is some specific call (skip() & Co.) need to be forbidden when the object
+	    /// has been terminated, one can use this call to check the terminated status
+	bool is_terminated() const { return terminated; };
 
     private :
         gf_mode rw;
-        crc value;
-        S_I crc_offset;
-	user_interaction *gf_ui;
-        S_I (generic_file::* active_read)(char *a, size_t size);
-        S_I (generic_file::* active_write)(const char *a, size_t size);
+        crc checksum;
+	bool terminated;
+        U_I (generic_file::* active_read)(char *a, U_I size);
+        void (generic_file::* active_write)(const char *a, U_I size);
 
         void enable_crc(bool mode);
-        void compute_crc(const char *a, S_I size);
-        S_I read_crc(char *a, size_t size);
-        S_I write_crc(const char *a, size_t size);
 
-	void detruire() { if(gf_ui != NULL) delete gf_ui; };
+        U_I read_crc(char *a, U_I size);
+        void write_crc(const char *a, U_I size);
+
 	void copy_from(const generic_file & ref);
-    };
-
-	/// this is a full implementation of a generic_file applied to a plain file
-    class fichier : public generic_file, public thread_cancellation
-    {
-    public :
-        fichier(user_interaction & dialog, S_I fd);
-        fichier(user_interaction & dialog, const char *name, gf_mode m);
-        fichier(user_interaction & dialog, const path & chemin, gf_mode m);
-        ~fichier() { close(filedesc); };
-
-        infinint get_size() const;
-
-            // herite de generic_file
-        bool skip(const infinint & pos);
-        bool skip_to_eof();
-        bool skip_relative(S_I x);
-        infinint get_position();
-
-    protected :
-        S_I inherited_read(char *a, size_t size);
-        S_I inherited_write(const char *a, size_t size);
-
-    private :
-        S_I filedesc;
-
-        void open(const char *name, gf_mode m);
     };
 
 #define CONTEXT_INIT "init"
@@ -218,21 +265,36 @@ namespace libdar
 
 	/// the contextual class adds the information of phases in the generic_file
 
-	/// two phases are defined
+	/// several phases are defined like for example
 	/// - INIT phase
 	/// - OPERATIONAL phase
+	/// - LAST SLICE phase
 	/// .
 	/// these are used to help the command launched between slices to
 	/// decide the action to do depending on the context when reading an archive
 	/// (first slice / last slice read, ...)
 	/// the context must also be transfered to dar_slave through the pair of tuyau objects
-    class contextual : public generic_file
+	///
+	/// this class also support some additional informations common to all 'level1' layer of
+	/// archive, such as:
+	/// - the data_name information
+	///
+
+    class label;
+
+    class contextual
     {
     public :
-	contextual(user_interaction & dialog, gf_mode m) : generic_file(dialog, m) {};
+	contextual() { status = ""; };
+	virtual ~contextual() {};
 
-	virtual void set_info_status(const std::string & s) = 0;
-        virtual std::string get_info_status() const = 0;
+	virtual void set_info_status(const std::string & s) { status = s; };
+        virtual std::string get_info_status() const { return status; };
+	virtual bool is_an_old_start_end_archive() const = 0;
+
+	virtual const label & get_data_name() const = 0;
+    private:
+	std::string status;
     };
 
 	/// @}

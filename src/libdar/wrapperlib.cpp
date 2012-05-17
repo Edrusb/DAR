@@ -16,9 +16,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-// to contact the author : dar.linux@free.fr
+// to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: wrapperlib.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: wrapperlib.cpp,v 1.18 2010/02/26 18:33:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -117,7 +117,7 @@ namespace libdar
         throw Efeature(gettext("Cannot copy a wrapperlib object (NOT IMPLEMENTED)"));
     }
 
-    wrapperlib & wrapperlib::operator = (const wrapperlib & ref)
+    const wrapperlib & wrapperlib::operator = (const wrapperlib & ref)
     {
         throw Efeature(gettext("Cannot copy a wrapperlib object (NOT IMPLEMENTED)"));
     }
@@ -136,7 +136,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: wrapperlib.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: wrapperlib.cpp,v 1.18 2010/02/26 18:33:27 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -381,7 +381,10 @@ namespace libdar
         case Z_STREAM_ERROR:
             return WR_STREAM_ERROR;
         case Z_NEED_DICT:
-            throw SRC_BUG; // unexpected error code
+	    return WR_DATA_ERROR;
+		// we do not use explicit dictionnary for compression,
+		// this is zlib assumes it requires a dictionnary, this is
+		// to be considered a data error.
         default:
             throw SRC_BUG; // unexpected error code
         }

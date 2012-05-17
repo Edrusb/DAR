@@ -56,7 +56,7 @@
 	dialog.printf(gettext("   -$ <string>\t   encryption key for auxiliary archive\n"));
 	dialog.printf(gettext("   -~ <string>\t   command between slices of the auxiliary archive\n"));
 	dialog.printf(gettext("   -z [level]\t   compress data in archive using gzip algorithm\n"));
-	dialog.printf(gettext("   -y [level]\t   compress data in archive using bzip2 algorithm.\n"));
+	dialog.printf(gettext("   -z [bzip2[:level]] compress data in archive using bzip2 algorithm.\n"));
 	dialog.printf(gettext("   -s <integer>    split the archive in several files of size <integer>\n"));
 	dialog.printf(gettext("   -S <integer>    first file size (if different from following ones)\n"));
 	dialog.printf(gettext("   -aSI \t   slice size suffixes k, M, T, G, etc. are power of 10\n"));
@@ -67,10 +67,13 @@
 	dialog.printf(gettext("   -Y <mask>\t   do only compress the matching filenames\n"));
 	dialog.printf(gettext("   -m <number>\t   do not compress file smaller than <number>\n"));
 	dialog.printf(gettext("   --nodump\t   do not backup, files having the nodump 'd' flag set\n"));
-	dialog.printf(gettext("   -G [path/]<basename> Do on-fly catalogue isolation of the resulting archive\n"));
+	dialog.printf(gettext("   -@ [path/]<basename> Do on-fly catalogue isolation of the resulting archive\n"));
 	dialog.printf(gettext("   -M\t\t   stay in the same filesystem while scanning directories\n"));
 	dialog.printf(gettext("   -,\t\t   ignore directories that follow the Directory Tagging\n"));
 	dialog.printf(gettext("\t\t   Standard\n"));
+	dialog.printf(gettext("   -/ <string>\t   which way dar can overwrite files at archive merging or\n"));
+	dialog.printf(gettext("\t\t   extraction time\n"));
+	dialog.printf(gettext("   -^ <string>\t   permission[:user[:group]] of created slices\n"));
 	dialog.printf(gettext("\n"));
 	dialog.printf(gettext("Restoring options (to use with -x) :\n"));
 	dialog.printf(gettext("   -k\t\t   do not remove files destroyed since the reference backup\n"));
