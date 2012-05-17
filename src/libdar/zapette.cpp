@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.cpp,v 1.19 2005/01/28 23:27:57 edrusb Rel $
+// $Id: zapette.cpp,v 1.19.2.1 2005/03/13 20:07:54 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -226,7 +226,7 @@ namespace libdar
                         if(req.size > buf_size)
                         {
                             if(buffer != NULL)
-                                delete buffer;
+                                delete [] buffer;
                             buffer = new char[req.size];
                             if(buffer == NULL)
                                 throw Ememory("slave_zapette::action");
@@ -275,11 +275,11 @@ namespace libdar
         catch(...)
         {
             if(buffer != NULL)
-                delete buffer;
+                delete [] buffer;
             throw;
         }
         if(buffer != NULL)
-            delete buffer;
+            delete [] buffer;
     }
 
     zapette::zapette(user_interaction & dialog, generic_file *input, generic_file *output) : contextual(dialog, gf_read_only)
@@ -317,7 +317,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: zapette.cpp,v 1.19 2005/01/28 23:27:57 edrusb Rel $";
+        static char id[]="$Id: zapette.cpp,v 1.19.2.1 2005/03/13 20:07:54 edrusb Rel $";
         dummy_call(id);
     }
 

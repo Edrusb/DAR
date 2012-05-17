@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.30.2.1 2005/02/02 16:15:32 edrusb Rel $
+// $Id: tools.hpp,v 1.30.2.2 2005/03/13 20:07:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -68,7 +68,7 @@ namespace libdar
 	/// \param[in] x is the string to convert
 	/// \return the address of newly allocated memory containing the equivalent string as the argument
 	/// \exception Ememory is thrown if the memory allocation failed, this call never return NULL
-	/// \note that the allocated memory must be released by the caller thanks to the "delete" operator
+	/// \note that the allocated memory must be released by the caller thanks to the "delete []" operator
     extern char *tools_str2charptr(std::string x);
 
 	/// write a string to a file with a '\\0' at then end
@@ -114,7 +114,7 @@ namespace libdar
 	/// \param[in] command_name is the full path of the file
 	/// \return the basename of the file
 	/// \exception Ememory can be thrown if memory allocation failed
-	/// \note the returned value has to be release thanks to the "delete" operator by the caller of this function
+	/// \note the returned value has to be release thanks to the "delete []" operator by the caller of this function
     extern char *tools_extract_basename(const char *command_name);
 
 	/// split a given full path in path part and basename part

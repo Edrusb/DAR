@@ -152,7 +152,7 @@ Do not consider the EA of the root (or system) namespace. By default, they are s
 .P
 .B Note concerning Extended Attributes (EA)
 .P
-support for EA must be activated at compilation time (--enable-ea-support given to the configure script), if your system supports it. Thus you can get two binaries of dar (of the same version), one supporting EA and another which does not (dar -V to see whether EA support is activated). The archives they produce are the same and can be read by each other. The only difference is that the binary without EA support is not able to save or restore EAs, but is still able to test them and list their presence.
+Support for EA must be activated at compilation time (the configure script tries to do so if your system has all the required support for that). Thus you can get two binaries of dar (of the same version), one supporting EA and another which does not (dar -V to see whether EA support is activated). The archives they produce are the same and can be read by each other. The only difference is that the binary without EA support is not able to save or restore EAs, but is still able to test them and list their presence.
 .TP 20
 -i, --input <path>
 is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c or -C is used). When reading from pipe, standard input is used, but with this option, the file <path> (usually a named pipe) is used instead.  This option is to receive output from dar_slave program (see doc/NOTES for examples of use).
@@ -164,7 +164,7 @@ is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -
 Do not consider user ID (uid) or group ID (gid), when comparing with archive of reference (-c -A) while doing a differential backup, when extracting (-x) or when comparing (-d). This is useful when dar is used by a non-privileged user. It will not consider a file has changed just because it has only the uid or gid changed, nor report a comparison mismatch if only
 uid or gid is different.
 .TP 20
--H, --hour[num]
+-H[num], --hour [num]
 if -H is used, two dates are considered equal if they differ from a integer number of hours, and that number is less than or equal to [num]. If not specified num defaults to 1. This is used when making a differential backup, to compare last_modification date of inodes, and at restoration time if the -r option (restore only more recent files) is used. This is to workaround some filesystems (like Samba filesystem) that seems to change the dates of files after having gone from or to daylight saving time (winter/summer time).
 .TP 20
 -E, --execute <string>
@@ -197,7 +197,7 @@ Several -E option can be given, given commands will then be called in the order 
 same as -E but is applied between slices of the reference archive (-A option).
 .TP 20
 -K, --key [[<algo>]:]<string>
-encrypt/decrypt the archive using the <algo> cypher with the <string> as pass phrase. An encrypted archive can only be read if the same pass phrase is given. Available cyphers are "blowfish" (alias "bf") for strong encryption and "scrambling" (alias "scram") for a very weak encryption. By default if no <algo> or no ':' is given, the flowfish cypher is assumed. If your password contains a column ':' you need to specify the cypher to use (or at least use the initial ':' which is equivalent to 'bf:'). If the <string> is empty the pass phrase will be asked at execution time. Thus, the smallest argument that -K can receive is ':' which means blowfish cypher with the pass phrase asked at execution time.
+encrypt/decrypt the archive using the <algo> cypher with the <string> as pass phrase. An encrypted archive can only be read if the same pass phrase is given. Available cyphers are "blowfish" (alias "bf") for strong encryption and "scrambling" (alias "scram") for a very weak encryption. By default if no <algo> or no ':' is given, the blowfish cypher is assumed. If your password contains a column ':' you need to specify the cypher to use (or at least use the initial ':' which is equivalent to 'bf:'). If the <string> is empty the pass phrase will be asked at execution time. Thus, the smallest argument that -K can receive is ':' which means blowfish cypher with the pass phrase asked at execution time.
 .TP 20
 -J, --key-ref [[<algo>]:]<string>
 same as -K but the given key is used to decrypt the archive of reference (given with -A option).
@@ -230,7 +230,7 @@ when using k M G T E Z Y prefixes to define a size, use the historical computer 
 --alter=SI and --alter=binary can be used several times, they affect all prefix which follow even those found in file included by -B option up to the next --alter=... occurrence. Note that if in a file included by -B option an --alter=binary or --alter=SI is met, it affects all the following prefix even those outside the included files (for example in the following "-B some.dcf -s 1K" 1K may be equal to 1000 or 1024 depending on the presence of an --alter=SI or --alter=binary in the file some.dcf. By default (before any --alter=SI/binary argument has been reached), binary interpretation of suffix is done (for compatibility with older versions).
 .TP 20
 -Q
-Do not display initial warning on stderr when not launched from a terminal (for example when launched from an at job or crontab). Remains that any question to the user will be assumed a 'no' answer, which most of the time will abort the program. Important, this option cannot be used in configuration files (see -B option), it must be present on the command line.
+Do not display initial warning on stderr when not launched from a terminal (for example when launched from an at job or crontab). Remains that any question to the user will be assumed a 'no' answer, which most of the time will abort the program. Important, this option cannot be used inside configuration files (see -B option), it must be present on the command line. Since version 2.2.2, giving this option on command-line also forces the non interactive mode even if dar is launched from terminal, this makes dar possible to run in background (it is recommended to then redirect the stdout and/or stderr to some files).
 .TP 20
 -aa, --alter=atime
 when reading a filesystem, while doing a backup (-c option) or comparing (-d option) by default dar tries to be as much transparent as possible, and set back the last access time (atime) of read files and directories, as if they have not been read. But, preserving atime of read files, make their ctime to be changed (last inode change). There is no possibility to preserve both atime and ctime. If you want to overcome the default original behavior of dar and want to keep ctime unchanged, the --alter=atime is for you. Some security software rely on the ctime to be preserved, some other software rely on the atime to be preserved like leafnode NNTP caching software.
@@ -255,10 +255,10 @@ SAVING AND ISOLATION OPTIONS (to use with -c or -C)
 .RS
 .PP
 .TP 20
--z, --gzip[level]
+-z[level], --gzip [level]
 compresses within slices using gzip algorithm (if not specified, no compression is performed). The compression level (an integer from 1 to 9) is optional. -z is equivalent to -z9 which is max compression/slow processing. At the opposite, 1 means less compression and faster processing.
 .TP 20
--y, --bzip2[level]
+-y[level], --bzip2 [level]
 compresses using bzip2 algorithm. See -z above for usage details.
 .TP 20
 -s, --slice <number>
@@ -388,9 +388,9 @@ must be replaced by -w d or -w default
 must be replaced by -H 1
 .P
 .B important !
-When using GNU getopt(), optional arguments are available by sticking the argument to the option: "-z" for example is available as well as "-z9". But "-z 9" is wrong, it will be read as "-z" option and "9" as member of [list of path]. In the other side, when using a non GNU getopt this time, "-z" becomes an option that always requires an argument, and thus "-z 9" is read as "-z" option with "9" as argument, while "-z9" will be rejected as a unknown option, and "-z" alone will generate an error as no argument is provided. In consequences, you
+When using GNU getopt(), optional arguments are available by sticking the argument to the short option: "-z" for example is available as well as "-z9". But "-z 9" is wrong, it will be read as "-z" option and "9" as member of [list of path]. In the other side, when using a non GNU getopt this time, "-z" becomes an option that always requires an argument, and thus "-z 9" is read as "-z" option with "9" as argument, while "-z9" will be rejected as a unknown option, and "-z" alone will generate an error as no argument is provided. In consequences, you
 .B need
-a space between the option (like "-z") and its argument (like "9"), when dar does not rely on a GNU getopt() call.
+a space between the option (like "-z") and its argument (like "9"), when dar does not rely on a GNU getopt() call, which also imply you to explicitly use arguments to options listed just above.
 
 
 .SH EXIT CODES
@@ -428,7 +428,7 @@ the version used of dar is based in finite length integers (it has been compiled
 this code indicates an unknown error. I have probably forgotten to update the exception caching code to take care of new exceptions... this is a minor bug you are welcome to report.
 .TP 10
 10
-you have tryed to use a feature that has been disabled at compilation time.
+you have tried to use a feature that has been disabled at compilation time.
 
 .SH FILES
 .B $HOME/.darrc

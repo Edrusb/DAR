@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronconneuse.cpp,v 1.5.2.1 2005/02/06 18:30:58 edrusb Rel $
+// $Id: tronconneuse.cpp,v 1.5.2.2 2005/03/13 20:07:54 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -176,12 +176,12 @@ namespace libdar
     {
 	if(buf != NULL)
 	{
-	    delete buf;
+	    delete [] buf;
 	    buf = NULL;
 	}
 	if(encrypted_buf != NULL)
 	{
-	    delete encrypted_buf;
+	    delete [] encrypted_buf;
 	    encrypted_buf = NULL;
 	}
 	buf_size = 0;
@@ -292,7 +292,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tronconneuse.cpp,v 1.5.2.1 2005/02/06 18:30:58 edrusb Rel $";
+        static char id[]="$Id: tronconneuse.cpp,v 1.5.2.2 2005/03/13 20:07:54 edrusb Rel $";
         dummy_call(id);
     }
 

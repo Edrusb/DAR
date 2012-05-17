@@ -6,6 +6,7 @@ Q2 - Dar hangs when using it with pipes, why?
 Q3 - Why, when I restore 1 file, dar report 3 files have been restored?
 Q4 - I cannot find the binary package for my distro, where to look for?
 Q5 - Why, when does dar report "ignored" files while I make a backup without filters?
+Q6 - Can I use different filters between a full backup and a differential backup? Would not dar consider some file not included in the filter to be deleted?
 
 ANSWERS
 --------
@@ -41,3 +42,14 @@ Note also that the use arguments out of options like "data" is deprecated since 
 
 In version 2.3.x such arguments which are not options will have another meaning.
 
+A6 - Yes, you can. No, there is no risk to have dar deleting the files that
+were not selected for the differential backup. Here is the way dar works:
+
+During a backup process, when a file is ignored due
+to filter exclusion, an "ignored" entry is added to the catalogue
+however. At the end of the backup, dar compares both catalogues the one
+of reference and the new one built during the backup process, and adds a
+"detruit" (destroyed in English) entry, when an entry of the reference
+is not present in the new catalogue. Thus, if an "ignored" is present no
+"detruit" will be added for that name. Then all "ignored" entries are
+removed and the catalogue is dumped in the archive.

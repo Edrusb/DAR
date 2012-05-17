@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: special_alloc.cpp,v 1.12 2004/08/03 21:28:01 edrusb Rel $
+// $Id: special_alloc.cpp,v 1.12.2.1 2005/03/13 20:07:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -118,7 +118,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: special_alloc.cpp,v 1.12 2004/08/03 21:28:01 edrusb Rel $";
+        static char id[]="$Id: special_alloc.cpp,v 1.12.2.1 2005/03/13 20:07:53 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -139,7 +139,7 @@ namespace libdar
 		(rit->ref)--;
 		if(rit->ref == 0)
 		{
-		    ::delete rit->alloc;
+		    ::delete [] rit->alloc;
 		    alloc.erase(rit);
 		}
 	    }

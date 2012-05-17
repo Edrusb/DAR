@@ -453,15 +453,20 @@ prototypes you must override:<br>
 &amp;message);</span><br>
 <div style="margin-left: 40px; text-align: justify;">this method is
 called by libdar when the library needs a yes or no ("continue" or
-"kill") answer to a question, which is provided by the string <em>message</em>.
+"kill")
+answer to a question, which is provided by the string <em>message</em>.
 The question posed by <em>pause()</em> must be answered by returning
-if "true" or throwing a <em><strong>Euser_abort</strong></em>
+"true" or throwing a <em><strong>Euser_abort</strong></em>
 exception if the user refused the proposition<span
  style="font-weight: bold;"><span style="font-weight: bold;">. </span></span>Don't
 worry about thowing an exception in your code; it will be trapped by
 libdar if you don't want to manage exceptions, and are using libdar in
-the "no exception" method.<span style="font-weight: bold;"><span
- style="font-weight: bold;"><br>
+the "no exception" method. (<strong>NOTE</strong>: Unfortunately there
+is currently no way to send
++ back a cancel signal without throwing an exception. For next API
+version a new method called <em>pause2()</em> will allow you to answer
+"true" or "false" and thus avoid using exceptions)<br>
+<span style="font-weight: bold;"><span style="font-weight: bold;"><br>
 <br>
 </span></span></div>
 <span style="font-style: italic; font-weight: bold;">void&nbsp;</span><span
@@ -829,8 +834,10 @@ Now that we have seen masks and exceptions let's start the real thing:<br>
 &nbsp; // differential archives. We'll see an example of<br>
 &nbsp; // of differential archives later.<br>
       <br>
-&nbsp; // my_arch should have been an object instead of a<br>
-&nbsp; // pointer to an archive object. <br>
+&nbsp; // note that while this example uses a pointer to store<br>
+&nbsp; // my_arch, it is perhaps better practice to use a plain<br>
+&nbsp; // stack object. In your code, use an object instead of<br>
+&nbsp; // a pointer to an object under normal circumstances.<br>
       <br>
 libdar::user_interaction_callback dialog =
 libdar::user_interaction_callback(ptr1, ptr2, ptr3);<br>
@@ -941,8 +948,10 @@ change the<br>
 &nbsp; // differential archives. We'll see an example of<br>
 &nbsp; // of differential archives later.<br>
       <br>
-&nbsp; // my_arch should have been an object instead of a<br>
-&nbsp; // pointer to an archive object. <br>
+&nbsp; // note that while this example uses a pointer to store<br>
+&nbsp; // my_arch, it is perhaps better practice to use a plain<br>
+&nbsp; // stack object. In your code, use an object instead of<br>
+&nbsp; // a pointer to an object under normal circumstances.<br>
       </code><code><br>
 libdar::user_interaction_callback dialog =
 libdar::user_interaction_callback(ptr1, ptr2, ptr3);<br>
@@ -1366,7 +1375,16 @@ can be displayed:<br>
   <li>file type</li>
   <li>flag about saved data / saved EA / compression used</li>
 </ul>
-<br>
+<p><br>
+<strong>Technical note:</strong> <em>You may notice that file type is
+not explicitly given as a parameter in the listing method. File type is
+available as the first byte of the permissions string. This is standard
+POSIX stuff except for an extension: </em>"h"<em> for files hard
+linked several times. See </em><strong>man 2 stat</strong> <em> for
+more information. Note however that in the last arguments of this call,
+you may easily know whether a file is a directory or not and whether it
+is empty or not.</em></p>
+<p>
 In the <span style="font-style: italic;">user_interaction</span> class
 (a virtual class), the <span style="font-style: italic;">listing()</span>
 method is not a pure virtual method, so you are not obliged to
@@ -1377,6 +1395,7 @@ set_use_listing(true) </span>protected method and of course you will
 have to ovewrite the <span style="font-style: italic;">listing()</span>
 method to have a less silly behavior:<br>
 <br>
+</p>
 </div>
 <br>
 <code></code><code></code>
@@ -2300,6 +2319,119 @@ std::endl;<br>
 <br>
 For more detailed information about the API you can build the API
 documentation from the source code using Doxygen.<br>
+<br>
+<br>
+<h2>12 - Compilation &amp; Linking<br>
+</h2>
+<h3>Compilation</h3>
+All the symbols found in the libdar API are defined via <span
+ style="font-style: italic; font-weight: bold;">&lt;dar/libdar.h&gt;</span>
+so you should only need to include this header.<br>
+<br>
+<br>
+<code></code><code></code>
+<table
+ style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 204);"><br>
+      <code></code>&gt; cat my_prog.cpp<span style="font-weight: bold;"><br>
+#include &lt;dar/libdar.h&gt;</span><br>
+      <br>
+main()<br>
+{<br>
+&nbsp;&nbsp; libdar::get_version(...);<br>
+&nbsp;&nbsp; ...<br>
+}<br>
+&gt; gcc -c my_prog.cpp<br>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<h3>Linking</h3>
+Of course, you need to link your program with libdar. This is done by
+adding <span style="font-style: italic; font-weight: bold;">-ldar</span>
+:<br>
+<br>
+<br>
+<code></code><code></code>
+<table
+ style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
+      </code><code></code><span style="font-weight: bold;"></span><br>
+&gt; gcc <span style="font-weight: bold;">-ldar</span> my_prog.o -o
+my_prog<br>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<h3>Libdar's different flavors</h3>
+Well, all the compilation and linking steps described above assume you
+have a "<span style="font-style: italic;">full</span>" libdar library.
+Beside the <span style="font-style: italic;">full</span> (alias <span
+ style="font-style: italic;">infinint</span>) libdar flavor, libdar
+also comes in 32 and 64 bits
+versions. In theses last ones, in place of internally relying on a
+special type (which
+is a C++ class called<span style="font-style: italic;"> infinint</span>)
+to
+handle arbitrary large integers, libdar32 relies on 32 bits integers
+and
+libdar64 relies on 64 bits integers (there are limitations which are
+described in doc/LIMITATIONS). But all theses libdar version (infinint,
+32bits, 64bits) have the same
+interface and must be used the same way, except for compilation and
+linking.<br>
+<br>
+Theses different libdar versions can coexist on the same system, they
+share the same include files. But the MODE macro must be set to 32
+or 64 when compiling for linking with libdar32 or libdar64
+respectively. The MODE macro defines the way the "<span
+ style="font-style: italic;">class infinint" </span>type is
+implemented in libdar, and thus changes the way the libdar headers
+files are interpreted by the compiler.<br>
+<br>
+<code></code><code></code>
+<table
+ style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>&gt;
+cat my_prog.cpp<span style="font-weight: bold;"><br>
+      </span>#include &lt;dar/libdar.h&gt;<br>
+      <br>
+main()<br>
+{<br>
+&nbsp;&nbsp; libdar::get_version(...);<br>
+&nbsp;&nbsp; ...<br>
+}<br>
+&gt; gcc -c <span style="font-weight: bold;">-DMODE=32</span>
+my_prog.cpp<br>
+      <br>
+      <code></code><code></code><span style="font-weight: bold;"></span><br>
+&gt; gcc <span style="font-weight: bold;">-ldar32</span> my_prog.o -o
+my_prog<br>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+and replace 32 by 64 to link with libdar64.<br>
 <br>
 <hr style="width: 100%; height: 2px;">
 <h2>Thanks</h2>

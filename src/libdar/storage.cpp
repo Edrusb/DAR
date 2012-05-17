@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.cpp,v 1.14 2004/12/07 18:04:51 edrusb Rel $
+// $Id: storage.cpp,v 1.14.2.1 2005/03/13 20:07:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -248,7 +248,7 @@ namespace libdar
                     {
                         for(register U_I i = 0; i < it.offset; i++)
                             p[i] = it.cell->data[i];
-                        delete it.cell->data;
+                        delete [] it.cell->data;
 
                         it.cell->data = p;
                         it.cell->size -= can_rem;
@@ -290,7 +290,7 @@ namespace libdar
                         p[i] = it.cell->data[i];
                     for(register U_I i = it.offset+number ; i < it.cell->size ; i++)
                         p[i-number] = it.cell->data[i];
-                    delete it.cell->data;
+                    delete [] it.cell->data;
 
                     it.cell->data = p;
                     it.cell->size -= number;
@@ -396,7 +396,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: storage.cpp,v 1.14 2004/12/07 18:04:51 edrusb Rel $";
+        static char id[]="$Id: storage.cpp,v 1.14.2.1 2005/03/13 20:07:53 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -449,7 +449,7 @@ namespace libdar
                         for(register U_I i = glisseur->size; i < somme; i++)
                             p[i] = tmp->data[i - glisseur->size];
 
-                        delete glisseur->data;
+                        delete [] glisseur->data;
 
                         glisseur->data = p;
                         glisseur->size = somme;
@@ -577,7 +577,7 @@ namespace libdar
             if(c->size == 0 && c->data != NULL)
                 throw SRC_BUG;
             if(c->data != NULL)
-                delete c->data;
+                delete [] c->data;
             t = c->next;
             delete c;
             c = t;

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.cpp,v 1.16 2004/12/01 22:10:46 edrusb Rel $
+// $Id: mask.cpp,v 1.16.2.2 2005/03/19 23:28:09 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -55,9 +55,19 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    delete the_mask;
+	    delete [] the_mask;
 	    throw;
 	}
+    }
+
+    simple_mask & simple_mask::operator = (const simple_mask & m)
+    {
+	const mask *src = & m;
+	mask *dst = this;
+	*dst = *src; // explicitely invoke the inherited "mask" class's operator =
+	detruit();
+	copy_from(m);
+	return *this;
     }
 
     bool simple_mask::is_covered(const string &expression) const
@@ -76,10 +86,10 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    delete tmp;
+	    delete [] tmp;
 	    throw;
 	}
-	delete tmp;
+	delete [] tmp;
 
         return ret;
     }
@@ -113,10 +123,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete tmp;
+            delete [] tmp;
             throw;
         }
-        delete tmp;
+        delete [] tmp;
     }
 
     bool regular_mask::is_covered(const string & expression) const
@@ -130,12 +140,22 @@ namespace libdar
         }
         catch(...)
         {
-            delete tmp;
+            delete [] tmp;
             throw;
         }
-        delete tmp;
+        delete [] tmp;
 
         return matches;
+    }
+
+    not_mask & not_mask::operator = (const not_mask & m)
+    {
+	const mask *src = &m;
+	mask *dst = this;
+	*dst = *src; // explicitely invoke the inherited "mask" class's operator =
+	detruit();
+	copy_from(m);
+	return *this;
     }
 
     void not_mask::copy_from(const not_mask &m)
@@ -159,6 +179,16 @@ namespace libdar
             delete ref;
             ref = NULL;
         }
+    }
+
+    et_mask & et_mask::operator = (const et_mask &m)
+    {
+	const mask *src = &m;
+	mask *dst = this;
+	*dst = *src; // explicitely invoke the inherited "mask" class's operator =
+	detruit();
+	copy_from(m);
+	return *this;
     }
 
     void et_mask::add_mask(const mask& toadd)
@@ -217,7 +247,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: mask.cpp,v 1.16 2004/12/01 22:10:46 edrusb Rel $";
+        static char id[]="$Id: mask.cpp,v 1.16.2.2 2005/03/19 23:28:09 edrusb Rel $";
         dummy_call(id);
     }
 

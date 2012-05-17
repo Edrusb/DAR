@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.23 2004/12/07 18:04:50 edrusb Rel $
+// $Id: generic_file.cpp,v 1.23.2.1 2005/03/13 20:07:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -126,10 +126,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete ptr;
+            delete [] ptr;
             throw;
         }
-        delete ptr;
+        delete [] ptr;
 
         return ret;
     }
@@ -340,10 +340,10 @@ namespace libdar
         }
         catch(Egeneric & e)
         {
-            delete name;
+            delete [] name;
             throw;
         }
-        delete name;
+        delete [] name;
     }
 
     infinint fichier::get_size() const
@@ -417,7 +417,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.23 2004/12/07 18:04:50 edrusb Rel $";
+        static char id[]="$Id: generic_file.cpp,v 1.23.2.1 2005/03/13 20:07:51 edrusb Rel $";
         dummy_call(id);
     }
 

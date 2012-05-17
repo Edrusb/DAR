@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_cp.cpp,v 1.12 2004/12/01 22:10:44 edrusb Rel $
+// $Id: dar_cp.cpp,v 1.12.2.2 2005/05/08 16:32:29 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -54,8 +54,9 @@ extern "C"
 
 #include "dar_suite.hpp"
 #include "tools.hpp"
+#include "cygwin_adapt.hpp"
 
-#define DAR_CP_VERSION "1.0.1"
+#define DAR_CP_VERSION "1.0.2"
 
 using namespace libdar;
 using namespace std;
@@ -116,10 +117,10 @@ void show_version(char *argv0)
 	}
 	catch(...)
 	{
-	    delete cmd;
+	    delete [] cmd;
 	    throw;
 	}
-	delete cmd;
+	delete [] cmd;
     }
     catch(...)
     {
@@ -157,12 +158,12 @@ int open_files(char *src, char *dst, int *fds, int *fdd)
         strcpy(tmp, dst);
         strcat(tmp, "/");
         strcat(tmp, tmp2);
-        delete tmp2;
+        delete [] tmp2;
         dst = tmp; // dst is not dynamically allocated, thus we can
             // loose its reference.
     }
 
-    *fds = ::open(src, O_RDONLY);
+    *fds = ::open(src, O_RDONLY|O_BINARY);
 
     if(*fds < 0)
     {
@@ -172,7 +173,7 @@ int open_files(char *src, char *dst, int *fds, int *fdd)
         return 0; // error
     }
 
-    *fdd = ::open(dst, O_WRONLY|O_CREAT|O_EXCL, 0666);
+    *fdd = ::open(dst, O_WRONLY|O_CREAT|O_EXCL|O_BINARY, 0666);
     if(tmp != NULL)
         free(tmp);
     if(*fdd < 0)
@@ -333,7 +334,7 @@ int skip_to_next_readable(int block, char *buffer, int src, int dst, off_t & mis
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_cp.cpp,v 1.12 2004/12/01 22:10:44 edrusb Rel $";
+    static char id[]="$Id: dar_cp.cpp,v 1.12.2.2 2005/05/08 16:32:29 edrusb Rel $";
     dummy_call(id);
 }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: cache.cpp,v 1.10 2004/12/07 18:04:49 edrusb Rel $
+// $Id: cache.cpp,v 1.10.2.1 2005/03/13 20:07:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -185,7 +185,7 @@ namespace libdar
 		U_I tmp = buffer_cache.size * 2;
 		if(buffer_cache.size < tmp)
 		{
-		    delete buffer_cache.buffer;
+		    delete [] buffer_cache.buffer;
 		    buffer_cache.buffer = NULL;
 		    buffer_cache.size = tmp;
 		    buffer_cache.buffer = new char[buffer_cache.size];
@@ -200,7 +200,7 @@ namespace libdar
 		    U_I tmp = buffer_cache.size / 2;
 		    if(tmp < buffer_cache.size && tmp > 0)
 		    {
-			delete buffer_cache.buffer;
+			delete [] buffer_cache.buffer;
 			buffer_cache.buffer = NULL;
 			buffer_cache.size = tmp;
 			buffer_cache.buffer = new char[buffer_cache.size];
@@ -220,7 +220,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: cache.cpp,v 1.10 2004/12/07 18:04:49 edrusb Rel $";
+        static char id[]="$Id: cache.cpp,v 1.10.2.1 2005/03/13 20:07:49 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -247,7 +247,7 @@ namespace libdar
 		U_I tmp = buffer_cache.size * 2;
 		if(buffer_cache.size < tmp)
 		{
-		    delete buffer_cache.buffer;
+		    delete [] buffer_cache.buffer;
 		    buffer_cache.buffer = NULL;
 		    buffer_cache.size = tmp;
 		    buffer_cache.buffer = new char[buffer_cache.size];
@@ -262,7 +262,7 @@ namespace libdar
 		    U_I tmp = buffer_cache.size / 2;
 		    if(tmp < buffer_cache.size && tmp > 0)
 		    {
-			delete buffer_cache.buffer;
+			delete [] buffer_cache.buffer;
 			buffer_cache.buffer = NULL;
 			buffer_cache.size = tmp;
 			buffer_cache.buffer = new char[buffer_cache.size];

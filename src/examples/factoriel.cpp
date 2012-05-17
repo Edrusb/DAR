@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: factoriel.cpp,v 1.11 2004/05/21 08:28:43 edrusb Rel $
+// $Id: factoriel.cpp,v 1.11.2.1 2005/03/19 19:48:46 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -59,79 +59,70 @@ extern "C"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
 #include "../dar_suite/shell_interaction.hpp"
+#include "../dar_suite/dar_suite.hpp"
 
 using namespace libdar;
 using namespace std;
 
-int main(S_I argc, char *argv[]) throw()
+static int little_main(user_interaction & ui, int argc, char *argv[], const char **env);
+
+int main(S_I argc, char *argv[], const char **env)
+{
+    return dar_suite_global(argc, argv, env, &little_main);
+}
+
+static int little_main(user_interaction & ui, int argc, char *argv[], const char **env)
 {
     MEM_BEGIN;
     MEM_IN;
-    try
+
+    if(argc != 2 && argc != 3)
+	exit(1);
+
+    string s = argv[1];
+    deci f = s;
+    infinint max = f.computer();
+    infinint i = 2;
+    infinint p = 1;
+
+    while(i <= max)
+	p *= i++;
+
+    ui.warning("calcul finished, now computing the decimal representation ... ");
+    f = deci(p);
+    ui.warning(f.human());
+    if(argc == 3)
     {
-	user_interaction *ui = shell_interaction_init(&cout, &cerr, false);
-
-	if(ui == NULL)
-	    throw SRC_BUG; // shell_interaction_init never returns NULL, but throws exception if necessary
-	try
+	S_I fd = ::open(argv[2], O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644);
+	if(fd < 0)
+	    ui.warning(string("cannot open file for test ! ") + strerror(errno));
+	else
 	{
-	    if(argc != 2 && argc != 3)
-		exit(1);
+	    fichier fic = fichier(ui, fd);
+	    infinint cp;
 
-	    string s = argv[1];
-	    deci f = s;
-	    infinint max = f.computer();
-	    infinint i = 2;
-	    infinint p = 1;
-
-	    while(i <= max)
-		p *= i++;
-
-	    ui->warning("calcul finished, now computing the decimal representation ... ");
-	    f = deci(p);
-	    ui->warning(f.human());
-	    if(argc == 3)
-	    {
-		S_I fd = ::open(argv[2], O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644);
-		if(fd < 0)
-		    ui->warning(string("cannot open file for test ! ") + strerror(errno));
-		else
-		{
-		    fichier fic = fichier(*ui, fd);
-		    infinint cp;
-
-		    p.dump(fic);
-		    fic.skip(0);
-		    cp = infinint(*ui, NULL, &fic);
-		    ui->warning(string("read from file: ") + deci(cp).human());
-		}
-	    }
+	    p.dump(fic);
+	    fic.skip(0);
+	    cp = infinint(ui, NULL, &fic);
+	    ui.warning(string("read from file: ") + deci(cp).human());
 	}
-	catch(...)
-	{
-	    if(ui != NULL)
-		delete ui;
-	    throw;
-	}
-    }
-    catch(Egeneric & e)
-    {
-        e.dump();
     }
 
     infinint *tmp;
     {
-        MEM_IN;
-        tmp = new infinint(19237);
-        delete tmp;
-        MEM_OUT;
+	MEM_IN;
+	tmp = new infinint(19237);
+	delete tmp;
+	MEM_OUT;
     }
     MEM_OUT; // matches the MEM_IN at the beginning of main
     MEM_END;
+
+    return EXIT_OK;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: factoriel.cpp,v 1.11 2004/05/21 08:28:43 edrusb Rel $";
-    dummy_call(id);
+static char id[]="$Id: factoriel.cpp,v 1.11.2.1 2005/03/19 19:48:46 edrusb Rel $";
+dummy_call(id);
 }

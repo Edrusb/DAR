@@ -1,7 +1,7 @@
 	dialog.printf(gettext("\n"));
 	dialog.printf(gettext("\t\t   the first non options argument is the archive to read\n"));
 	dialog.printf(gettext("\n"));
-	dialog.printf(gettext("\t\t   the second non option argulent is the archive to create\n"));
+	dialog.printf(gettext("\t\t   the second non option argument is the archive to create\n"));
 	dialog.printf(gettext("\n"));
 	dialog.printf(gettext("Common options:\n"));
 	dialog.printf(gettext("   -h\t\t   displays this help information\n"));

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: wrapperlib.cpp,v 1.13 2004/10/02 21:32:25 edrusb Rel $
+// $Id: wrapperlib.cpp,v 1.13.2.2 2005/03/19 19:49:01 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -136,7 +136,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: wrapperlib.cpp,v 1.13 2004/10/02 21:32:25 edrusb Rel $";
+        static char id[]="$Id: wrapperlib.cpp,v 1.13.2.2 2005/03/19 19:49:01 edrusb Rel $";
         dummy_call(id);
     }
 

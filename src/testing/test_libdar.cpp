@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_libdar.cpp,v 1.22 2004/11/12 21:58:18 edrusb Rel $
+// $Id: test_libdar.cpp,v 1.22.2.1 2005/03/13 20:07:54 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -105,10 +105,10 @@ void warning(const string &x, void *context)
 	}
 	catch(...)
 	{
-	    delete ptr;
+	    delete [] ptr;
 	    throw;
 	}
-	delete ptr;
+	delete [] ptr;
     }
 }
 

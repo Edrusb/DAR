@@ -316,3 +316,46 @@ from 2.2.0 to 2.2.1
 - fixed bug #30
 - changed the way ctermid() system call is used
 - updated FAQ
+
+from 2.2.1 to 2.2.2
+- fixed typo in dar man page (flowfish ;-) )
+- -Q option now forces the non terminal mode even when dar is run from a
+  terminal (tty) this makes dar possible to run in background without having
+  the shell stopping it upon text output.
+- removed unused control code for dar's command line syntax
+- spelling fix of the tutorial by Ralph Slooten
+- added the pertinent part of the memory leak patch from Wesley Leggette
+  (there is no bug here as the function where could occur the memory leak
+   is not used in dar).
+- updated FAQ
+- updated man page information about optional argument's syntax to options
+  like -z9 or --zip 9
+- avoid calls to textdomain() when --disable-nls is set
+- updates doc/NOTES
+- fixed potential memory leakage on some system (to a "new[]" was
+  corresponding a "delete" in place of a "delete[]")
+  In consequences, for API users, note that the following calls
+	  - tools_str2charptr
+  	  - tools_extract_basename
+	  - libdar_str2charptr_noexcept
+  all return a char * pointer which area must be released
+  by the caller using the delete[] operator
+- partially integrated Wesley's api_tutorial patch (added explanations)
+- Fixed installation problem of header files, problem reported by
+  Juergen Menden
+- updated the examples programs for they properly initialize libdar
+- the gettext.h file was not installed with libdar headers
+- fixed typo error reported by Peter Landgren
+- updated api_tutorial with compilation & linking informations
+- fixed pedantic warning about some classes inherited from "mask"
+  (the parent copy constructor is not called from inherited copy
+   constructor; note that the parent class is a pure virtual class)
+- added Swedish translation (by Peter Landgren)
+- fixed typo in French translation
+- added a const_cast statment to avoid compilation warning under some systems
+- fixed problem on solaris where the TIME&MIN non canonical parameters
+  for terminal are not set by default to 1 and 0 (but to 4 and 0),
+  leading keyboard interaction to be impossible when dar needs
+  user interaction.
+- added O_BINARY to open() mode in dar_cp, without this will cause some problem
+  under Cygwin.

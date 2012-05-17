@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.hpp,v 1.14 2004/11/07 18:21:38 edrusb Rel $
+// $Id: mask.hpp,v 1.14.2.3 2005/03/19 23:28:09 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -111,9 +111,9 @@ namespace libdar
 	    /// \param[in] case_sensit whether the mask is case sensitive or not
         simple_mask(const std::string & wilde_card_expression, bool case_sensit);
 	    /// copy constructor
-        simple_mask(const simple_mask & m) { copy_from(m); };
+        simple_mask(const simple_mask & m) : mask(m) { copy_from(m); };
 	    /// assignment operator
-        simple_mask & operator = (const simple_mask & m) { detruit(); copy_from(m); return *this; };
+        simple_mask & operator = (const simple_mask & m);
 	    /// destructor
         virtual ~simple_mask() { detruit(); };
 
@@ -127,7 +127,7 @@ namespace libdar
 	bool case_s;
 
         void copy_from(const simple_mask & m);
-        void detruit() { if(the_mask != NULL) delete the_mask; the_mask = NULL; };
+        void detruit() { if(the_mask != NULL) delete [] the_mask; the_mask = NULL; };
     };
 
 
@@ -170,9 +170,9 @@ namespace libdar
 	    /// as an internal copy of the mask given in argument has been done.
         not_mask(const mask &m) { copy_from(m); };
 	    /// copy constructor
-        not_mask(const not_mask & m) { copy_from(m); };
+        not_mask(const not_mask & m) : mask(m) { copy_from(m); };
 	    /// assignment operator
-        not_mask & operator = (const not_mask & m) { detruit(); copy_from(m); return *this; };
+        not_mask & operator = (const not_mask & m);
 	    /// destructor
         ~not_mask() { detruit(); };
 
@@ -203,9 +203,9 @@ namespace libdar
 	    /// thanks to the add_mask() method
         et_mask() {};
 	    /// copy constructor
-        et_mask(const et_mask &m) { copy_from(m); };
+        et_mask(const et_mask &m) : mask(m) { copy_from(m); };
 	    /// assignment operator
-        et_mask & operator = (const et_mask &m) { detruit(); copy_from(m); return *this; };
+        et_mask & operator = (const et_mask &m);
 	    /// destructor
         ~et_mask() { detruit(); };
 
@@ -233,7 +233,7 @@ namespace libdar
 	    /// remove all previously added masks
 	    /// \note that after this call the mask is no more usable as the *AND* operator cannot be done
 	    /// on any mask
-	void clear() { lst.clear(); };
+	void clear() { detruit(); };
 
     protected :
         std::vector<mask *> lst;

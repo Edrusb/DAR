@@ -37,8 +37,11 @@ dist_noinst_DATA = libdar.hpp path.hpp mask.hpp integers.hpp real_infinint.hpp s
 install-data-local:
 	mkdir -p $(DESTDIR)$(pkgincludedir)
 	cp ../../config.h $(DESTDIR)$(pkgincludedir)
-	for file in $(dist_noinst_DATA) ; do sed -e "s%#include \"../my_config.h\"%INC_CONFIG_FILE_H%g" "$$file" | sed -e "s%#include \"%#include \"$(pkgincludedir)/%g" | sed -e "s%INC_CONFIG_FILE_H%#include \"$(pkgincludedir)/config.h\"%g" > $(DESTDIR)$(pkgincludedir)/"$$file"  ; done
-	for file in $(DESTDIR)$(pkgincludedir)/* ; do sed -e "s%HAVE_%LIBDAR_HAS_%g" "$$file" | sed -e "s%PACKAGE%DAR_PACKAGE%g" | sed -e "s%SIZEOF_%LIBDAR_SIZEOF_%g" | sed -e "s%LSTAT_FOLLOWS_SLASHED_SYMLINK%LIBDAR_LSTAT_FOLLOWS_SLASHED_SYMLINK%g" | sed -e "s%VERSION%LIBDAR_VERSION%g" | sed -e "s%MUTEX_WORKS%LIBDAR_MUTEX_WORKS%g" | sed -e "s%OS_BITS%LIBDAR_OS_BITS%g" > "$$file.tmp" && mv "$$file.tmp" "$$file" ; done
+	sed -e "s%../config.h%config.h%g" ../my_config.h | sed -e "s%HAVE_CONFIG_H%1%g" > ./my_config.h
+	cp ../gettext.h .
+	for file in $(dist_noinst_DATA) gettext.h my_config.h ; do sed -e "s%#include \"../my_config.h\"%INC_MY_CONFIG_FILE_H%g" "$$file" | sed -e "s%#include \"%#include \"$(pkgincludedir)/%g" | sed -e "s%INC_MY_CONFIG_FILE_H%#include \"$(pkgincludedir)/my_config.h\"%g" > $(DESTDIR)$(pkgincludedir)/"$$file"  ; done
+	rm my_config.h gettext.h
+	for file in $(DESTDIR)$(pkgincludedir)/* ; do sed -e "s%HAVE_%LIBDAR_HAS_%g" "$$file" | sed -e "s%PACKAGE%DAR_PACKAGE%g" | sed -e "s%SIZEOF_%LIBDAR_SIZEOF_%g" | sed -e "s%LSTAT_FOLLOWS_SLASHED_SYMLINK%LIBDAR_LSTAT_FOLLOWS_SLASHED_SYMLINK%g" | sed -e "s%VERSION%LIBDAR_VERSION%g" | sed -e "s%MUTEX_WORKS%LIBDAR_MUTEX_WORKS%g" | sed -e "s%OS_BITS%LIBDAR_OS_BITS%g" | sed -e "s%_AVAILABLE%_AVAILABLE_FOR_LIBDAR%g" | sed -e "s%STDC_HEADERS%LIBDAR_STDC_HEADERS%g" | sed -e "s%ENABLE_NLS%DAR_ENABLE_NLS%g" | sed -e "s%HAVE_GETTEXT%DAR_HAS_GETTEXT%g" > "$$file.tmp" && mv "$$file.tmp" "$$file" ; done
 	grep DAR $(DESTDIR)$(pkgincludedir)/config.h | grep -v "#undef" >  $(DESTDIR)$(pkgincludedir)/config.h.tmp
 	mv  $(DESTDIR)$(pkgincludedir)/config.h.tmp  $(DESTDIR)$(pkgincludedir)/config.h
 	chmod 0644 $(DESTDIR)$(pkgincludedir)/*

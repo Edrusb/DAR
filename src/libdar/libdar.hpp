@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.hpp,v 1.38.2.1 2005/02/20 20:21:50 edrusb Rel $
+// $Id: libdar.hpp,v 1.38.2.3 2005/05/08 16:32:30 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -122,7 +122,7 @@ namespace libdar
 	///  libdar Medium version defined at compilation time
     const U_I LIBDAR_COMPILE_TIME_MEDIUM = 0;
 	///  libdar Minor version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MINOR = 1;
+    const U_I LIBDAR_COMPILE_TIME_MINOR = 2;
 
 	////////////////////////////////////////////////////////////////////////
 	// LIBDAR INITIALIZATION METHODS                                      //
@@ -386,7 +386,7 @@ namespace libdar
 	/// for an explaination of the two last arguments exception and except_msg check
 	/// the get_version_noexcept function
         /// \return the address of a newly allocated memory
-        /// which must be released calling the "delete"
+        /// which must be released calling the "delete []"
         /// operator when no more needed.
         /// \return NULL in case of error
     extern char *libdar_str2charptr_noexcept(const std::string & x, U_16 & exception, std::string & except_msg);

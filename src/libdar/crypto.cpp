@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: crypto.cpp,v 1.11 2004/12/07 18:04:49 edrusb Rel $
+// $Id: crypto.cpp,v 1.11.2.3 2005/03/19 19:49:00 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -86,7 +86,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: crypto.cpp,v 1.11 2004/12/07 18:04:49 edrusb Rel $";
+        static char id[]="$Id: crypto.cpp,v 1.11.2.3 2005/03/19 19:49:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -105,10 +105,10 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    delete c_key;
+	    delete [] c_key;
 	    throw;
 	}
-	delete c_key;
+	delete [] c_key;
 #else
 	throw Ecompilation(gettext("blowfish strong encryption support"));
 #endif

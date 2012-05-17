@@ -494,6 +494,69 @@ header, then the terminator and catalogue (located on the last slice) and then
 proceed to the operation. If it is extracting the whole archive, dar goes
 back to the first slice and asks for all slices one by one.
 
+LAYERS
+
+Things get a bit more complicated if we consider compression and encryption.
+The way the problem is addressed in dar's code is a bit like networks are
+designed in computer science, using the notion of _layer_. Here, there is a
+additional constraint, a given layer may or may not be present (encryption,
+compression, slicing for example). So all layer must have the same interface
+for serving the layer above them. This interface is defined by the pure virtual
+class "generic_file", which provides generic methods for reading, writing,
+skipping, getting the current offset when writing or reading to a file.
+This way the compressor class acts like a file which compresses data wrote to it
+and writes compressed data to another "generic_file". The blowfish and scramble
+classes act the same but in place of compressing/uncompressing they
+encrypt/decrypt the data to/from another generic_file object. The slicing we
+have seen above follows the same principle, this is a "sar" object that transfers
+data wrote to it to several fichier objects. Class fichier also inherit
+from generic_file class, and is a wrapper for the plain file system calls.
+
+Here are now the layers:
+
+              +----+--+----+-...........+---------+
+archive       |file|EA|file|            |catalogue|
+layout        |data|  |data|            |         |
+              +----+--+----+-...........+---------+
+                   |           |              |
+                   |           |              |
+                   V           V              V
+              +-----------------------------------+
+compression   |         (compressed)  data        |
+              +-----------------------------------+
+                    |                      |
+                    |                      |          / Terminateur
+                    |                      |          |
+                    |                      |          V
+elastic  +---+      |                      |       +----+---+
+buffers  |EEE|      |                      |       |TTTT|EEE|
+         +---+      |                      |       +----+---+
+           |        |                      |              |
+           V        V                      V              V
+         +--------------------------------------------------+
+cipher   |        (encrypted) data                          |
+         +--------------------------------------------------+
+header\               |                         |
+version|              |                         |
+       |              |                         |
+       |              |                         |
+       V              V                         V
+     +------------------------------------------------------+
+sar  |VVV|                  data                            |
+     +------------------------------------------------------+
+        |         |  |         |   |        |   |        |  |
+slice   |         |  |         |   |        |   |        |  |
+headers |         |  |         |   |        |   |        |  |
+ |  |   |         |  |         |   |        |   |        |  |
+ |  +---|------\  |  |         |   |        |   |        |  |
+ V      V      V  V  V         V   V        V   V        V  V
++---------+  +---------+  +---------+  +---------+  +-------+
+|HH| data |  |HH| data |  |HH| data |  |HH| data |  |HH|data|
++---------+  +---------+  +---------+  +---------+  +-------+
+  slice 1      slice 2      slice 3      slice 4      slice 5
+
+
+
 QUESTION:
 why not having put the slices information at the end, for dar not to ask
 the first then the last slice ?

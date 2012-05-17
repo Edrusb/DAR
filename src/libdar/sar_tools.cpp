@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.18 2004/08/03 21:28:01 edrusb Rel $
+// $Id: sar_tools.cpp,v 1.18.2.1 2005/03/13 20:07:52 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -77,7 +77,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar_tools.cpp,v 1.18 2004/08/03 21:28:01 edrusb Rel $";
+        static char id[]="$Id: sar_tools.cpp,v 1.18.2.1 2005/03/13 20:07:52 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -121,14 +121,14 @@ namespace libdar
         }
         catch(...)
         {
-            delete name;
+            delete [] name;
             if(ret != NULL)
                 delete ret;
 	    if(tmp != NULL)
 		delete tmp;
             throw;
         }
-        delete name;
+        delete [] name;
 
         return ret;
     }

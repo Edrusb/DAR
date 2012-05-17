@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: shell_interaction.cpp,v 1.19.2.1 2005/02/20 19:56:29 edrusb Rel $
+// $Id: shell_interaction.cpp,v 1.19.2.5 2005/05/06 10:56:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -126,25 +126,29 @@ user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool s
 	    throw Erange("",""); // used locally
 	else
 	{
-		// preparing input for swaping between char mode and line mode (terminal settings)
-	    if(tcgetattr(input, &term) >= 0)
-	    {
-		initial = term;
-		initial_noecho = term;
-		initial_noecho.c_lflag &= ~ECHO;
-		term.c_lflag &= ~ICANON;
-		term.c_lflag &= ~ECHO;
-		term.c_lflag &= ~ECHOE;
-		interaction = term;
+	    if(silent)
+		has_terminal = false; // force non interactive mode
+	    else
+		    // preparing input for swaping between char mode and line mode (terminal settings)
+		if(tcgetattr(input, &term) >= 0)
+		{
+		    initial = term;
+		    initial_noecho = term;
+		    initial_noecho.c_lflag &= ~ECHO;
+		    term.c_lflag &= ~ICANON;
+  		    term.c_lflag &= ~ECHO;
+		    term.c_cc[VTIME] = 0;
+		    term.c_cc[VMIN] = 1;
+		    interaction = term;
 
-		    // checking now that we can change to character mode
-		set_term_mod(interaction);
-		set_term_mod(initial);
-		    // but we don't need it right now, so swapping back to line mode
-		has_terminal = true;
-	    }
-	    else // failed to retrieve parameters from tty
-		throw Erange("",""); // used locally
+			// checking now that we can change to character mode
+		    set_term_mod(interaction);
+		    set_term_mod(initial);
+			// but we don't need it right now, so swapping back to line mode
+		    has_terminal = true;
+		}
+		else // failed to retrieve parameters from tty
+		    throw Erange("",""); // used locally
 	}
     }
     catch(Erange & e)
@@ -181,7 +185,7 @@ void shell_interaction_close()
 
 static void set_term_mod(const struct termios & etat)
 {
-    if(tcsetattr(input, TCSANOW, &etat) < 0)
+    if(tcsetattr(input, TCSANOW, const_cast<struct termios *>(&etat)) < 0)
         throw Erange("shell_interaction : set_term_mod", string(gettext("Error while changing user terminal properties: ")) + strerror(errno));
 }
 
@@ -228,6 +232,7 @@ static bool interaction_pause(const string &message, void *context)
         set_term_mod(initial);
         throw;
     }
+    set_term_mod(initial);
 
     return ret;
 }
@@ -274,6 +279,6 @@ static string interaction_string(const string & message, bool echo, void *contex
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: shell_interaction.cpp,v 1.19.2.1 2005/02/20 19:56:29 edrusb Rel $";
+    static char id[]="$Id: shell_interaction.cpp,v 1.19.2.5 2005/05/06 10:56:41 edrusb Rel $";
     dummy_call(id);
 }

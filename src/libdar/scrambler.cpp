@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: scrambler.cpp,v 1.10 2004/07/31 14:00:24 edrusb Rel $
+// $Id: scrambler.cpp,v 1.10.2.1 2005/03/13 20:07:52 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -70,7 +70,7 @@ namespace libdar
         {
             if(buffer != NULL)
             {
-                delete buffer;
+                delete [] buffer;
                 buffer = NULL;
             }
             buffer = new unsigned char[size];
@@ -95,7 +95,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: scrambler.cpp,v 1.10 2004/07/31 14:00:24 edrusb Rel $";
+        static char id[]="$Id: scrambler.cpp,v 1.10.2.1 2005/03/13 20:07:52 edrusb Rel $";
         dummy_call(id);
     }
 

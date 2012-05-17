@@ -24,10 +24,10 @@
 	dialog.printf(gettext("   -O\t\t   do not consider user and group ownership\n"));
 	dialog.printf(gettext("   -H [N]\t   ignore shift in dates of an exact number of hours\n"));
 	dialog.printf(gettext("   -E <string>\t   command to execute between slices\n"));
-	dialog.printf(gettext("   -F <string>\t   save as -E but for the archive of reference\n"));
+	dialog.printf(gettext("   -F <string>\t   same as -E but for the archive of reference\n"));
 	dialog.printf(gettext("   -u\t\t   do not save/restore EA of the user namespace.\n"));
 	dialog.printf(gettext("   -U\t\t   do not save/restore EA of the root namespace\n"));
-	dialog.printf(gettext("   -K <string>\t   use <string> as key to scramble/unscramble\n"));
+	dialog.printf(gettext("   -K <string>\t   use <string> as key to encrypt/decrypt\n"));
 	dialog.printf(gettext("   -J <string>\t   same as -K but it does concern the archive of reference\n"));
 	dialog.printf(gettext("   -# <integer>    encryption block size\n"));
 	dialog.printf(gettext("   -* <integer>    same as -# but for archive of reference\n"));

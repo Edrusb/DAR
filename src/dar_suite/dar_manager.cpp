@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.36.2.3 2005/02/20 20:21:49 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.36.2.4 2005/03/13 20:07:48 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -380,7 +380,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.36.2.3 2005/02/20 20:21:49 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.36.2.4 2005/03/13 20:07:48 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -733,10 +733,10 @@ static void show_version(user_interaction & dialog, const char *command_name)
     }
     catch(...)
     {
-        delete name;
+        delete [] name;
         throw;
     }
-    delete name;
+    delete [] name;
 }
 
 #if HAVE_GETOPT_LONG

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: cache.hpp,v 1.9 2004/11/07 18:21:37 edrusb Rel $
+// $Id: cache.hpp,v 1.9.2.1 2005/03/13 20:07:50 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -92,7 +92,7 @@ namespace libdar
 	    U_I last; // first to not read in the cache
 
 	    buf() { buffer = NULL; size = next = last = 0; };
-	    ~buf() { if(buffer != NULL) delete buffer; };
+	    ~buf() { if(buffer != NULL) delete [] buffer; };
 	};
 
 	generic_file *ref;

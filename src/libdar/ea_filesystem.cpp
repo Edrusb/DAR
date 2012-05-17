@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.15 2004/08/03 21:28:00 edrusb Rel $
+// $Id: ea_filesystem.cpp,v 1.15.2.1 2005/03/13 20:07:50 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -189,25 +189,25 @@ namespace libdar
                     }
                     catch(...)
                     {
-                        delete v;
+                        delete [] v;
                         throw;
                     }
-                    delete v;
+                    delete [] v;
                 }
                 catch(...)
                 {
-                    delete k;
+                    delete [] k;
                     throw;
                 }
-                delete k;
+                delete [] k;
             }
         }
         catch(Egeneric & e)
         {
-            delete p_chemin;
+            delete [] p_chemin;
             throw;
         }
-        delete p_chemin;
+        delete [] p_chemin;
 
         return num > 0;
     }
@@ -258,31 +258,31 @@ namespace libdar
                     }
                     catch(...)
                     {
-                        delete value;
+                        delete [] value;
                         throw;
                     }
-                    delete value;
+                    delete [] value;
                 }
                 catch(...)
                 {
-                    delete a_name;
+                    delete [] a_name;
                     throw;
                 }
-                delete a_name;
+                delete [] a_name;
                 it++;
             }
         }
         catch(...)
         {
-            delete n_ptr;
+            delete [] n_ptr;
             throw;
         }
-        delete n_ptr;
+        delete [] n_ptr;
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea_filesystem.cpp,v 1.15 2004/08/03 21:28:00 edrusb Rel $";
+        static char id[]="$Id: ea_filesystem.cpp,v 1.15.2.1 2005/03/13 20:07:50 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -319,10 +319,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete liste;
+            delete [] liste;
             throw;
         }
-        delete liste;
+        delete [] liste;
         return ret;
     }
 

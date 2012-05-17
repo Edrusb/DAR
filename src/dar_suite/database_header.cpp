@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database_header.cpp,v 1.14 2004/07/31 13:56:42 edrusb Rel $
+// $Id: database_header.cpp,v 1.14.2.1 2005/03/13 20:07:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -96,12 +96,12 @@ generic_file *database_header_create(user_interaction & dialog, const string & f
     }
     catch(...)
     {
-        delete ptr;
+        delete [] ptr;
         if(ret != NULL)
             delete ret;
         throw;
     }
-    delete ptr;
+    delete [] ptr;
 
     return ret;
 }
@@ -140,18 +140,18 @@ generic_file *database_header_open(user_interaction & dialog, const string & fil
     }
     catch(...)
     {
-        delete ptr;
+        delete [] ptr;
         if(ret != NULL)
             delete ret;
         throw;
     }
 
-    delete ptr;
+    delete [] ptr;
     return ret;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: database_header.cpp,v 1.14 2004/07/31 13:56:42 edrusb Rel $";
+    static char id[]="$Id: database_header.cpp,v 1.14.2.1 2005/03/13 20:07:49 edrusb Rel $";
     dummy_call(id);
 }

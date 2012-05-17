@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.28.2.1 2005/02/20 20:21:49 edrusb Rel $
+// $Id: dar_slave.cpp,v 1.28.2.2 2005/03/13 20:07:49 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -216,7 +216,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_slave.cpp,v 1.28.2.1 2005/02/20 20:21:49 edrusb Rel $";
+    static char id[]="$Id: dar_slave.cpp,v 1.28.2.2 2005/03/13 20:07:49 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -236,10 +236,10 @@ static void show_usage(user_interaction & dialog, const char *command)
     }
     catch(...)
     {
-        delete cmd;
+        delete [] cmd;
         throw;
     }
-    delete cmd;
+    delete [] cmd;
 }
 
 static void show_version(user_interaction & dialog, const char *command)
@@ -273,8 +273,8 @@ static void show_version(user_interaction & dialog, const char *command)
     }
     catch(...)
     {
-        delete cmd;
+        delete [] cmd;
         throw;
     }
-    delete cmd;
+    delete [] cmd;
 }

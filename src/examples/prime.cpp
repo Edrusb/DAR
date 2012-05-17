@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: prime.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $
+// $Id: prime.cpp,v 1.7.6.1 2005/03/19 19:48:58 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -29,18 +29,27 @@
 #include "infinint.hpp"
 #include "deci.hpp"
 #include "integers.hpp"
+#include "../dar_suite/shell_interaction.hpp"
+#include "../dar_suite/dar_suite.hpp"
 
 using namespace libdar;
 using namespace std;
 
-int main(S_I argc, char *argv[])
+int little_main(user_interaction & ui, S_I argc, char *argv[], const char **env);
+
+int main(S_I argc, char *argv[], const char **env)
+{
+    return dar_suite_global(argc, argv, env, &little_main);
+}
+
+int little_main(user_interaction & ui, S_I argc, char *argv[], const char **env)
 {
     if(argc != 2)
     {
         cout << "usage : " << argv[0] <<  " <number>" << endl;
         exit(1);
     }
-    
+
     deci x = string(argv[1]);
     cout << "converting string to infinint... " << endl;
     infinint num = x.computer();
@@ -57,10 +66,12 @@ int main(S_I argc, char *argv[])
         cout << argv[1] << " is NOT prime" << endl;
     else
         cout << argv[1] << " is PRIME" << endl;
+
+    return EXIT_OK;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: prime.cpp,v 1.7 2003/10/18 14:43:07 edrusb Rel $";
+    static char id[]="$Id: prime.cpp,v 1.7.6.1 2005/03/19 19:48:58 edrusb Rel $";
     dummy_call(id);
 }

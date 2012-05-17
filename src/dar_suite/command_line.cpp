@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.52 2004/12/07 18:04:48 edrusb Rel $
+// $Id: command_line.cpp,v 1.52.2.2 2005/03/13 20:07:46 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -439,10 +439,10 @@ bool get_args(user_interaction & dialog,
                 }
                 catch(...)
                 {
-                    delete name;
+                    delete [] name;
                     throw;
                 }
-                delete name;
+                delete [] name;
             }
             if(op == listing && tar_format)
                 only_more_recent = true;
@@ -702,10 +702,8 @@ static bool get_args_recursive(user_interaction & dialog,
                     throw Erange("get_args", gettext("Only one -A option is allowed"));
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-                if(optarg == "")
+                if(strcmp("", optarg) == 0)
                     throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
-                if(optarg == "-")
-                    throw Erange("get_args", gettext("\"-\" is not allowed as argument to -A option"));
                 ref_filename = new string();
                 if(ref_filename == NULL)
                     throw Ememory("get_args");
@@ -1231,16 +1229,16 @@ static void usage(user_interaction & dialog, const char *command_name)
     }
     catch(...)
     {
-        delete name;
+        delete [] name;
         throw;
     }
 
-    delete name;
+    delete [] name;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.52 2004/12/07 18:04:48 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.52.2.2 2005/03/13 20:07:46 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -1626,10 +1624,10 @@ static void show_version(user_interaction & dialog, const char *command_name)
     }
     catch(...)
     {
-        delete name;
+        delete [] name;
         throw;
     }
-    delete name;
+    delete [] name;
 }
 
 #if HAVE_GETOPT_LONG

@@ -1,3 +1,11 @@
+version 2.2.2
+--------------
+Thanks to Ryan Vietri for feedback. Thanks to Ralph Slooten for feedback,
+and tutorial spelling fix. Thanks to Juergen Menden for feedback and patch and
+to Peter Landgren for feedback and Swedish translation, thanks to Olive for
+feedback and patience ;-). Last, a Very Big Thank to Wesley Leggette again
+for his many feedbacks, patches and constructive remarks.
+
 version 2.2.1
 --------------
 Thanks to Steve Evans for feedback and solution about bug #30. A big thank to

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: thread_cancellation.hpp,v 1.1 2004/12/07 18:04:52 edrusb Rel $
+// $Id: thread_cancellation.hpp,v 1.1.2.1 2005/05/06 10:56:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -69,7 +69,7 @@ namespace libdar
 	    /// the constructor
 	thread_cancellation();
 
-	    /// the checkpoint where is seen wheter the current libdar call must abort
+	    /// the checkpoint where is seen whether the current libdar call must abort
 
 	    /// \exception Euser_abort is thrown if the thread the checkpoint is running
 	    /// from is marked as to be canceled.
@@ -80,7 +80,7 @@ namespace libdar
 	    /// must be called once before any call to thread_cancellation class's methods
 	static void init();
 
-	    /// marks the thread given in argumlent as to be canceled
+	    /// marks the thread given in argument as to be canceled
 
 	    //! \param[in] tid the thread ID of the thread where any libdar call must abort
 	    //! \return true if no already pending thread cancellation is under process

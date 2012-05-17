@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.31 2005/01/03 13:25:56 edrusb Rel $
+// $Id: sar.cpp,v 1.31.2.1 2005/03/13 20:07:52 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -260,7 +260,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.31 2005/01/03 13:25:56 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.31.2.1 2005/03/13 20:07:52 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -661,10 +661,10 @@ namespace libdar
             }
             catch(Egeneric & e)
             {
-                delete fic;
+                delete [] fic;
                 throw;
             }
-            delete fic;
+            delete [] fic;
         }
     }
 
@@ -873,11 +873,11 @@ namespace libdar
             }
             catch(...)
             {
-                delete ptr;
+                delete [] ptr;
                 MEM_OUT;
                 throw;
             }
-            delete ptr;
+            delete [] ptr;
         }
         MEM_OUT;
     }
@@ -938,13 +938,13 @@ namespace libdar
         }
         catch(Egeneric & e)
         {
-            delete folder;
+            delete [] folder;
             if(ptr != NULL)
                 closedir(ptr);
             throw;
         }
 
-        delete folder;
+        delete [] folder;
         if(ptr != NULL)
             closedir(ptr);
         return somme;

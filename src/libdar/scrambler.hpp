@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: scrambler.hpp,v 1.9 2004/11/07 18:21:38 edrusb Rel $
+// $Id: scrambler.hpp,v 1.9.2.1 2005/03/13 20:07:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -45,7 +45,7 @@ namespace libdar
     {
     public:
         scrambler(user_interaction & dialog, const std::string & pass, generic_file & hidden_side);
-        ~scrambler() { if(buffer != NULL) delete buffer; };
+        ~scrambler() { if(buffer != NULL) delete [] buffer; };
 
         bool skip(const infinint & pos) { if(ref == NULL) throw SRC_BUG; return ref->skip(pos); };
         bool skip_to_eof() { if(ref==NULL) throw SRC_BUG; return ref->skip_to_eof(); };

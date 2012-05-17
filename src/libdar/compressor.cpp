@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.14 2004/07/31 17:45:24 edrusb Rel $
+// $Id: compressor.cpp,v 1.14.2.1 2005/03/13 20:07:50 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -213,7 +213,7 @@ namespace libdar
 
     compressor::xfer::~xfer()
     {
-        delete buffer;
+        delete [] buffer;
     }
 
     S_I compressor::none_read(char *a, size_t size)
@@ -365,7 +365,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: compressor.cpp,v 1.14 2004/07/31 17:45:24 edrusb Rel $";
+        static char id[]="$Id: compressor.cpp,v 1.14.2.1 2005/03/13 20:07:50 edrusb Rel $";
         dummy_call(id);
     }
 

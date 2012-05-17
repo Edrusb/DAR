@@ -1,5 +1,5 @@
 /*********************************************************************/
-// dar - disk archive - a backup/restoration program
+// da - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.41.2.1 2005/02/02 16:15:32 edrusb Rel $
+// $Id: tools.cpp,v 1.41.2.3 2005/05/06 10:01:52 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -178,9 +178,9 @@ namespace libdar
         }
         catch(...)
         {
-            delete tmp;
+            delete [] tmp;
         }
-        delete tmp;
+        delete [] tmp;
     }
 
     void tools_read_string_size(generic_file & f, string & s, infinint taille)
@@ -221,10 +221,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete name;
+            delete [] name;
         }
 
-        delete name;
+        delete [] name;
         return (U_32)buf.st_size;
     }
 
@@ -298,7 +298,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.41.2.1 2005/02/02 16:15:32 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.41.2.3 2005/05/06 10:01:52 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -347,10 +347,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete ptr;
+            delete [] ptr;
             throw;
         }
-        delete ptr;
+        delete [] ptr;
     }
 
     void tools_open_pipes(user_interaction & dialog, const string &input, const string & output, tuyau *&in, tuyau *&out)
@@ -386,11 +386,14 @@ namespace libdar
     void tools_blocking_read(S_I fd, bool mode)
     {
         S_I flags = fcntl(fd, F_GETFL, 0);
+	if(flags < 0)
+	    throw Erange("tools_blocking_read", string(gettext("Cannot read fcntl file's flags : "))+strerror(errno));
         if(!mode)
-            flags |= O_NDELAY;
+            flags |= O_NONBLOCK;
         else
-            flags &= ~O_NDELAY;
-        fcntl(fd, F_SETFL, flags);
+            flags &= ~O_NONBLOCK;
+        if(fcntl(fd, F_SETFL, flags) < 0)
+	    throw Erange("tools_blocking_read", string(gettext("Cannot set fcntl file's flags : "))+strerror(errno));
     }
 
     string tools_name_of_uid(U_16 uid)
@@ -534,7 +537,7 @@ namespace libdar
                 {
                     for(register U_I i = 0; i < argvector.size(); i++)
                         if(argv[i] != NULL)
-                            delete argv[i];
+                            delete [] argv[i];
                     throw;
                 }
                 for(register U_I i = 0; i < argvector.size(); i++)
@@ -543,10 +546,10 @@ namespace libdar
             }
             catch(...)
             {
-                delete argv;
+                delete [] argv;
                 throw;
             }
-            delete argv;
+            delete [] argv;
         }
     }
 
@@ -753,11 +756,11 @@ namespace libdar
 	catch(...)
 	{
 	    if(buffer != NULL)
-		delete buffer;
+		delete [] buffer;
 	    throw;
 	}
 	if(buffer != NULL)
-	    delete buffer;
+	    delete [] buffer;
 	return cwd;
     }
 
@@ -790,7 +793,7 @@ namespace libdar
 			ret = root;
 			break;
 		    case ENAMETOOLONG: // too small buffer
-			delete buffer;
+			delete [] buffer;
 			buffer = NULL;
 			length *= 2;
 			break;
@@ -807,7 +810,7 @@ namespace libdar
 		    else // "lu" should not be greater than length: readlink system call error
 		    {
 			    // trying to workaround with a larger buffer
-			delete buffer;
+			delete [] buffer;
 			buffer = NULL;
 			length *= 2;
 		    }
@@ -817,11 +820,11 @@ namespace libdar
 	catch(...)
 	{
 	    if(buffer != NULL)
-		delete buffer;
+		delete [] buffer;
 	    throw;
 	}
 	if(buffer != NULL)
-	    delete buffer;
+	    delete [] buffer;
 	return ret;
     }
 
@@ -856,10 +859,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete filename;
+            delete [] filename;
             throw;
         }
-        delete filename;
+        delete [] filename;
     }
 
     void tools_noexcept_make_date(const string & chem, const infinint & last_acc, const infinint & last_mod)
@@ -952,19 +955,19 @@ namespace libdar
             }
             catch(...)
             {
-                delete char_chem;
+                delete [] char_chem;
                 throw;
             }
-            delete char_chem;
+            delete [] char_chem;
         }
         catch(...)
         {
-            delete name;
+            delete [] name;
             if(chem != NULL)
                 delete chem;
             throw;
         }
-        delete name;
+        delete [] name;
         if(chem != NULL)
             delete chem;
 
@@ -1091,10 +1094,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete copie;
+            delete [] copie;
             throw;
         }
-        delete copie;
+        delete [] copie;
 
 	return output;
     }
@@ -1120,10 +1123,10 @@ namespace libdar
 		catch(...)
 		{
 		    if(c_entry != NULL)
-			delete c_entry;
+			delete [] c_entry;
 		    throw;
 		}
-		delete c_entry;
+		delete [] c_entry;
 	    }
     }
 
@@ -1169,18 +1172,18 @@ namespace libdar
 	    catch(...)
 	    {
 		if(file_mask != NULL)
-		    delete file_mask;
+		    delete [] file_mask;
 		throw;
 	    }
-	    delete file_mask;
+	    delete [] file_mask;
 	}
 	catch(...)
 	{
 	    if(c_chemin != NULL)
-		delete c_chemin;
+		delete [] c_chemin;
 	    throw;
 	}
-	delete c_chemin;
+	delete [] c_chemin;
     }
 
     void tools_add_elastic_buffer(generic_file & f, U_32 max_size)
@@ -1197,10 +1200,10 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    delete buffer;
+	    delete [] buffer;
 	    throw;
 	}
-	delete buffer;
+	delete [] buffer;
     }
 
     bool tools_are_on_same_filesystem(const string & file1, const string & file2)
@@ -1218,10 +1221,10 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    delete filename;
+	    delete [] filename;
 	    throw;
 	}
-	delete filename;
+	delete [] filename;
 
 	filename = tools_str2charptr(file2);
 	try
@@ -1231,10 +1234,10 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    delete filename;
+	    delete [] filename;
 	    throw;
 	}
-	delete filename;
+	delete [] filename;
 
 
 	return id == sstat.st_dev;

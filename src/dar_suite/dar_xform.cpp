@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.30.2.1 2005/02/20 20:21:49 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.30.2.2 2005/03/13 20:07:49 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -367,7 +367,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.30.2.1 2005/02/20 20:21:49 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.30.2.2 2005/03/13 20:07:49 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -385,10 +385,10 @@ static void show_usage(user_interaction & dialog, const char *command_name)
     }
     catch(...)
     {
-        delete name;
+        delete [] name;
         throw;
     }
-    delete name;
+    delete [] name;
 }
 
 static void show_version(user_interaction & dialog, const char *command_name)
@@ -422,8 +422,8 @@ static void show_version(user_interaction & dialog, const char *command_name)
     }
     catch(...)
     {
-        delete name;
+        delete [] name;
         throw;
     }
-    delete name;
+    delete [] name;
 }

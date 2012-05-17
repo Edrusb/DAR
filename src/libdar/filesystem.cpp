@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.35.2.1 2005/02/11 16:09:30 edrusb Rel $
+// $Id: filesystem.cpp,v 1.35.2.3 2005/03/19 19:49:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -299,10 +299,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete ptr_name;
+            delete [] ptr_name;
             throw;
         }
-        delete ptr_name;
+        delete [] ptr_name;
 
         return ref;
 
@@ -436,10 +436,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete tmp;
+            delete [] tmp;
             throw;
         }
-        delete tmp;
+        delete [] tmp;
     }
 
 
@@ -526,10 +526,10 @@ namespace libdar
 				    }
 				    catch(...)
 				    {
-					delete ptr_name;
+					delete [] ptr_name;
 					throw;
 				    }
-				    delete ptr_name;
+				    delete [] ptr_name;
 				}
 
 				if(ref == NULL)
@@ -652,10 +652,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete tmp;
+            delete [] tmp;
             throw;
         }
-        delete tmp;
+        delete [] tmp;
     }
 
     bool filesystem_diff::read_filename(const string & name, nomme * &ref)
@@ -940,10 +940,10 @@ namespace libdar
                         }
                         catch(...)
                         {
-                            delete old;
+                            delete [] old;
                             throw;
                         }
-                        delete old;
+                        delete [] old;
                     }
 
                     if(create_file)
@@ -999,7 +999,7 @@ namespace libdar
                 {
                     char *cible = tools_str2charptr(ref_lie->get_target());
                     ret = symlink(cible ,name);
-                    delete cible;
+                    delete [] cible;
                 }
                 else if(ref_blo != NULL)
                     ret = mknod(name, S_IFBLK | 0700, makedev(ref_blo->get_major(), ref_blo->get_minor()));
@@ -1049,10 +1049,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete name;
+            delete [] name;
             throw;
         }
-        delete name;
+        delete [] name;
     }
 
     void filesystem_hard_link_write::clear_corres(const infinint & ligne)
@@ -1328,10 +1328,10 @@ namespace libdar
                     }
                     catch(...)
                     {
-                        delete name;
+                        delete [] name;
                         throw;
                     }
-                    delete name;
+                    delete [] name;
                 }
             }
         }
@@ -1419,16 +1419,16 @@ namespace libdar
         }
         catch(...)
         {
-            delete s;
+            delete [] s;
             throw;
         }
 
-        delete s;
+        delete [] s;
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.35.2.1 2005/02/11 16:09:30 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.35.2.3 2005/03/19 19:49:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1499,10 +1499,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete name;
+            delete [] name;
             throw;
         }
-        delete name;
+        delete [] name;
     }
 
     static void attach_ea(const string &chemin, inode *ino, bool ea_root_mode, bool ea_user_mode)
@@ -1567,10 +1567,10 @@ namespace libdar
         }
         catch(...)
         {
-            delete ptr;
+            delete [] ptr;
             throw;
         }
-        delete ptr;
+        delete [] ptr;
 
         return (f & EXT2_NODUMP_FL) != 0;
 #else
@@ -1618,14 +1618,14 @@ namespace libdar
 		    dialog.warning(tools_printf(gettext("Replacing %s in the -R option by the directory pointed to by this symbolic link: "), ptr) + ret->display());
 	    }
 	    else // not a directory given as argument
-		throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("The given path %s must be a directory (or symbolic link to an existing directory"), ptr));
+		throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("The given path %s must be a directory (or symbolic link to an existing directory)"), ptr));
 	}
 	catch(...)
 	{
-	    delete ptr;
+	    delete [] ptr;
 	    throw;
 	}
-	delete ptr;
+	delete [] ptr;
 	if(ret == NULL)
 	    throw SRC_BUG; // exit without exception, but ret not allocated !
 
@@ -1646,10 +1646,10 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    delete ptr;
+	    delete [] ptr;
 	    throw;
 	}
-	delete ptr;
+	delete [] ptr;
 	return ret;
     }
 

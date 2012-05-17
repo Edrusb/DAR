@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.cpp,v 1.19 2004/12/07 18:04:52 edrusb Rel $
+// $Id: tuyau.cpp,v 1.19.2.1 2005/03/13 20:07:54 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -192,7 +192,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tuyau.cpp,v 1.19 2004/12/07 18:04:52 edrusb Rel $";
+        static char id[]="$Id: tuyau.cpp,v 1.19.2.1 2005/03/13 20:07:54 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -225,10 +225,10 @@ namespace libdar
             }
             catch(...)
             {
-                delete ch;
+                delete [] ch;
                 throw;
             }
-            delete ch;
+            delete [] ch;
         }
         else
             throw SRC_BUG; // no path nor file descriptor

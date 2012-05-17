@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.23.2.1 2005/02/20 16:05:45 edrusb Rel $
+// $Id: dar_suite.cpp,v 1.23.2.2 2005/03/05 16:43:13 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -54,6 +54,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
     MEM_IN;
     int ret = EXIT_OK;
 
+#ifdef ENABLE_NLS
 	// gettext settings
     try
     {
@@ -69,6 +70,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
     {
 	cerr << e.get_message() << endl;
     }
+#endif
 
     try
     {
@@ -190,7 +192,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.23.2.1 2005/02/20 16:05:45 edrusb Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.23.2.2 2005/03/05 16:43:13 edrusb Rel $";
     dummy_call(id);
 }
 

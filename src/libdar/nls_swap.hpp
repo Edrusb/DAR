@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: nls_swap.hpp,v 1.1.2.1 2005/02/20 16:05:47 edrusb Rel $
+// $Id: nls_swap.hpp,v 1.1.2.3 2005/03/13 20:07:52 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -34,7 +34,7 @@
 #include "../my_config.h"
 #include "tools.hpp"
 
-
+#ifdef ENABLE_NLS
 #define NLS_SWAP_IN                             \
          string nls_swap_tmp;                   \
          if(textdomain(NULL) != NULL)           \
@@ -58,10 +58,10 @@
                   }                                              \
                   catch(...)                                     \
                   {                                              \
-                      delete tmp;                                \
+                      delete [] tmp;                             \
                       throw;                                     \
                   }                                              \
-                  delete tmp;                                    \
+                  delete [] tmp;                                 \
 	    }                                                    \
             catch(...)                                           \
             {                                                    \
@@ -69,6 +69,11 @@
         }                                                        \
         else                                                     \
             nls_swap_tmp = ""
+
+#else
+#define NLS_SWAP_IN //
+#define NLS_SWAP_OUT //
+#endif
 
 
 #endif
