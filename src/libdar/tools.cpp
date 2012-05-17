@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tools.cpp,v 1.102.2.3 2012/04/09 14:28:33 edrusb Exp $
+// $Id: tools.cpp,v 1.102.2.4 2012/05/05 11:49:50 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -316,7 +316,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.102.2.3 2012/04/09 14:28:33 edrusb Exp $";
+        static char id[]="$Id: tools.cpp,v 1.102.2.4 2012/05/05 11:49:50 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -2189,7 +2189,7 @@ namespace libdar
 #ifdef __DYNAMIC__
 			    struct group *pgroup = getgrnam(group);
 			    if(pgroup == NULL)
-				throw Erange("tools_set_ownership", tools_printf(gettext("Unknown user: %S"), &slice_user));
+				throw Erange("tools_set_ownership", tools_printf(gettext("Unknown group: %S"), &slice_group));
 			    else
 				gid = pgroup->gr_gid;
 #else

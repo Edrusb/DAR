@@ -1,0 +1,33 @@
+#!/bin/sh
+
+if [ -z "$1" -o -z "$2" -o -z "$3" -o -z "$4" -o -z "$5" -o -z "$6" -o -z "$7" ]; then
+  echo "This script is expected to be run from dar this way:"
+  echo "dar ... -E \"$0 %p %b %n %e %c <mount point> <slice size -KB)>\" ..."
+  echo "where %p %b ... %c are to be used verbatim, while <mount point> is to be"
+  echo "replaced by the path of the mounted filesystem to monitor"
+  echo "and <slice size> by the minimum space required to store a full slice"
+  exit 1
+fi
+
+
+SLICE_PATH="$1"
+SLICE_BASENAME="$2"
+SLICE_NUMBER="$3"
+SLICE_EXTENSION="$4"
+DAR_CONTEXT="$5"
+MOUNT_POINT="$6"
+SLICE_SIZE="$7"
+
+
+FREE=`df $MOUNT_POINT | grep '/' | sed -re 's/.*[ ]+([0-9]+)[ ]+[0-9]+%.*/\1/'`
+
+while [ $FREE -le $SLICE_SIZE ]; do
+FREE=`df $MOUNT_POINT | grep '/' | sed -re 's/.*[ ]+([0-9]+)[ ]+[0-9]+%.*/\1/'`
+echo Free space on $MOUNT_POINT is $FREE KB
+echo "Waiting for disk change... Press enter when ready to continue!"
+read i
+done
+
+echo "Continuing with slice $SLICE_NUMBER"
+
+
