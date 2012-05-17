@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: fichier.hpp,v 1.9 2011/04/17 13:12:29 edrusb Rel $
+// $Id: fichier.hpp,v 1.9.2.1 2012/02/19 17:25:08 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -86,6 +86,9 @@ namespace libdar
         bool skip_relative(S_I x);
         infinint get_position();
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(fichier);
+#endif
     protected :
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size);

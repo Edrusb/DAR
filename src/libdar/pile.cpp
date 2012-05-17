@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: pile.cpp,v 1.12 2011/06/02 13:17:37 edrusb Rel $
+// $Id: pile.cpp,v 1.12.2.1 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -92,7 +92,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: pile.cpp,v 1.12 2011/06/02 13:17:37 edrusb Rel $";
+        static char id[]="$Id: pile.cpp,v 1.12.2.1 2012/02/12 20:43:34 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -238,7 +238,7 @@ namespace libdar
 	    throw Erange("pile::copy_to", "Error: copy_to() from empty stack");
     }
 
-    void pile::copy_to(generic_file & ref, crc & value)
+    void pile::copy_to(generic_file & ref, const infinint & crc_size, crc * & value)
     {
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -247,7 +247,7 @@ namespace libdar
 	{
 	    if(stack.back().ptr == NULL)
 		throw SRC_BUG;
-	    stack.back().ptr->copy_to(ref, value);
+	    stack.back().ptr->copy_to(ref, crc_size, value);
 	}
 	else
 	    throw Erange("pile::copy_to(crc)", "Error: copy_to(crc) from empty stack");

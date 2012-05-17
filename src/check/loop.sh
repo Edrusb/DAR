@@ -20,7 +20,7 @@ if [ ! -x ./all_features ] ; then
   exit 2
 fi
 
-if [ $EUID != 0 ]; then
+if [ `id -u` -ne 0 ]; then
   echo "********************************************"
   echo ""
   echo "need to be run as root"

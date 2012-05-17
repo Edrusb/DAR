@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.76.2.4 2011/07/21 14:29:00 edrusb Exp $
+// $Id: dar_manager.cpp,v 1.76.2.7 2012/02/26 11:55:02 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -71,7 +71,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.6.0"
+#define DAR_MANAGER_VERSION "1.7.0"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
@@ -93,6 +93,7 @@ static bool command_line(user_interaction & dialog,
                          bool & verbose,
 			 bool & ignore_dat_options,
 			 bool & even_when_removed,
+			 bool & check_order,
 			 bool recursive); // true if called from op_batch
 static void show_usage(user_interaction & dialog, const char *command);
 static void show_version(user_interaction & dialog, const char *command);
@@ -125,7 +126,10 @@ static void op_interactive(user_interaction & dialog, database *dat, string base
 static void op_check(user_interaction & dialog, const database *dat, bool info_details);
 static void op_batch(user_interaction & dialog, database *dat, const string & filename, bool info_details);
 
-static database *read_base(user_interaction & dialog, const string & base, bool partial);
+static database *read_base(user_interaction & dialog,
+			   const string & base,
+			   bool partial,
+			   bool check_order);
 static void write_base(user_interaction & dialog, const string & filename, const database *base, bool overwrite);
 static vector<string> read_vector(user_interaction & dialog);
 static void finalize(user_interaction & dialog, operation op, database *dat, const string & base, bool info_details);
@@ -164,10 +168,11 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
     bool partial_read;
     bool ignore_dat_options;
     bool even_when_removed;
+    bool check_order;
 
     shell_interaction_change_non_interactive_output(&cout);
 
-    if(!command_line(dialog, argc, argv, op, base, arg, num, rest, num2, date, info_details, ignore_dat_options, even_when_removed, false))
+    if(!command_line(dialog, argc, argv, op, base, arg, num, rest, num2, date, info_details, ignore_dat_options, even_when_removed, check_order, false))
 	return EXIT_SYNTAX;
 
     if(op == none_op)
@@ -211,7 +216,7 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
 	    else
 		dialog.warning(gettext("Decompressing and loading database to memory..."));
 	}
-	dat = read_base(dialog, base, partial_read);
+	dat = read_base(dialog, base, partial_read, check_order);
 	try
 	{
 	    try
@@ -251,6 +256,7 @@ static bool command_line(user_interaction & dialog,
                          bool & verbose,
 			 bool & ignore_dat_options,
 			 bool & even_when_removed,
+			 bool & check_order,
 			 bool recursive)
 {
     S_I lu, min;
@@ -265,6 +271,7 @@ static bool command_line(user_interaction & dialog,
     date = 0;
     ignore_dat_options = false;
     even_when_removed = false;
+    check_order = true;
     string extra = "";
 
     try
@@ -272,9 +279,9 @@ static bool command_line(user_interaction & dialog,
 
 	(void)line_tools_reset_getopt();
 #if HAVE_GETOPT_LONG
-	while((lu = getopt_long(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:k", get_long_opt(), NULL)) != EOF)
+	while((lu = getopt_long(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:", get_long_opt(), NULL)) != EOF)
 #else
-	    while((lu = getopt(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:k")) != EOF)
+	    while((lu = getopt(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:")) != EOF)
 #endif
 	    {
 		switch(lu)
@@ -457,6 +464,14 @@ static bool command_line(user_interaction & dialog,
 			}
 		    }
 		    break;
+		case 'a':
+		    if(optarg == NULL)
+			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+		    if(strcasecmp("i", optarg) == 0 || strcasecmp("ignore-order", optarg) == 0)
+			check_order = false;
+		    else
+			throw Erange("command_line", tools_printf(gettext(INVALID_ARG), char(lu)));
+		    break;
 		case '?':
 		    dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
 		    break;
@@ -562,7 +577,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.76.2.4 2011/07/21 14:29:00 edrusb Exp $";
+    static char id[]="$Id: dar_manager.cpp,v 1.76.2.7 2012/02/26 11:55:02 edrusb Exp $";
     dummy_call(id);
 }
 
@@ -893,6 +908,7 @@ static const struct option *get_long_opt()
 	{"ignore-options-in-base", no_argument, NULL, 'N'},
 	{"min-digits", required_argument, NULL, ';'},
 	{"ignore-when-removed", no_argument, NULL, 'k'},
+	{"alter", required_argument, NULL, 'a'},
         { NULL, 0, NULL, 0 }
     };
 
@@ -900,13 +916,14 @@ static const struct option *get_long_opt()
 }
 #endif
 
-static database *read_base(user_interaction & dialog, const string & base, bool partial)
+static database *read_base(user_interaction & dialog, const string & base, bool partial, bool check_order)
 {
     database *ret = NULL;
 
     try
     {
 	database_open_options dat_opt;
+	dat_opt.set_warn_order(check_order);
 	dat_opt.set_partial(partial);
         ret = new database(dialog, base, dat_opt);
         if(ret == NULL)
@@ -1193,6 +1210,7 @@ static void op_batch(user_interaction & dialog, database *dat, const string & fi
     string arg;
     bool ignore_dat_options;
     bool even_when_removed;
+    bool check_order; // not used here
 
     if(dat == NULL)
 	throw SRC_BUG;
@@ -1239,7 +1257,7 @@ static void op_batch(user_interaction & dialog, database *dat, const string & fi
 	    for(register U_I i = 0; i < mots.size(); ++i)
 		cmdline.set_arg(mots[i], i+1);
 
-	    if(!command_line(dialog, cmdline.argc(), cmdline.argv(), sub_op, faked_base, arg, num, rest, num2, date, sub_info_details, ignore_dat_options, even_when_removed, true))
+	    if(!command_line(dialog, cmdline.argc(), cmdline.argv(), sub_op, faked_base, arg, num, rest, num2, date, sub_info_details, ignore_dat_options, even_when_removed, check_order, true))
 		throw Erange("op_batch", tools_printf(gettext("Syntax error in batch file: %S"), &line));
 
 	    if(sub_op == create)

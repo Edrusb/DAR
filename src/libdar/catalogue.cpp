@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.139.2.1 2011/07/20 14:38:07 edrusb Exp $
+// $Id: catalogue.cpp,v 1.139.2.3 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -60,6 +60,7 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include <typeinfo>
 #include <algorithm>
 #include <map>
 #include "catalogue.hpp"
@@ -368,44 +369,72 @@ namespace libdar
         {
             if(read_crc)
             {
-                crc tmp;
-                f.get_crc(tmp); // keep f in a coherent status
+		crc * tmp = f.get_crc(); // keep f in a coherent status
+		if(tmp != NULL)
+		    delete tmp;
             }
             throw;
         }
 
         if(read_crc)
         {
-            crc crc_calc, crc_read;
+            crc *crc_calc = f.get_crc();
 
-            f.get_crc(crc_calc);
-            crc_read.read(f);
-            if(crc_read != crc_calc)
-            {
-                nomme * ret_nom = dynamic_cast<nomme *>(ret);
-                string nom = ret_nom != NULL ? ret_nom->get_name() : "";
+	    if(crc_calc == NULL)
+		throw SRC_BUG;
 
-                try
-                {
-                    if(!lax)
-                        throw Erange("", "temporary exception");
-                    else
-                    {
-                        if(nom == "")
-                            nom = gettext("unknown entry");
-                        dialog.pause(tools_printf(gettext("Entry information CRC failure for %S. Ignore the failure?"), &nom));
-                    }
-                }
-                catch(Egeneric & e) // we catch here the temporary exception and the Euser_abort thrown by dialog.pause()
-                {
-                    if(nom != "")
-                        throw Erange("entree::read", tools_printf(gettext("Entry information CRC failure for %S"), &nom));
-                    else
-                        throw Erange("entree::read", gettext(gettext("Entry information CRC failure")));
-                }
-            }
-            ret->post_constructor(*ptr);
-        }
+	    try
+	    {
+		crc *crc_read = create_crc_from_file(f);
+		if(crc_read == NULL)
+		    throw SRC_BUG;
+
+		try
+		{
+		    if(*crc_read != *crc_calc)
+		    {
+			nomme * ret_nom = dynamic_cast<nomme *>(ret);
+			string nom = ret_nom != NULL ? ret_nom->get_name() : "";
+
+			try
+			{
+			    if(!lax)
+				throw Erange("", "temporary exception");
+			    else
+			    {
+				if(nom == "")
+				    nom = gettext("unknown entry");
+				dialog.pause(tools_printf(gettext("Entry information CRC failure for %S. Ignore the failure?"), &nom));
+			    }
+			}
+			catch(Egeneric & e) // we catch here the temporary exception and the Euser_abort thrown by dialog.pause()
+			{
+			    if(nom != "")
+				throw Erange("entree::read", tools_printf(gettext("Entry information CRC failure for %S"), &nom));
+			    else
+				throw Erange("entree::read", gettext(gettext("Entry information CRC failure")));
+			}
+		    }
+		    ret->post_constructor(*ptr);
+		}
+		catch(...)
+		{
+		    if(crc_read != NULL)
+			delete crc_read;
+		    throw;
+		}
+		if(crc_read != NULL)
+		    delete crc_read;
+	    }
+	    catch(...)
+	    {
+		if(crc_calc != NULL)
+		    delete crc_calc;
+		throw;
+	    }
+	    if(crc_calc != NULL)
+		delete crc_calc;
+	}
 
         stats.add(ret);
         return ret;
@@ -415,20 +444,35 @@ namespace libdar
     {
         if(small)
         {
-            crc tmp;
+	    crc *tmp = NULL;
 
-            f.reset_crc(ENTREE_CRC_SIZE);
-            try
-            {
-                inherited_dump(f, small);
-            }
-            catch(...)
-            {
-                f.get_crc(tmp); // keep f in a coherent status
-                throw;
-            }
-            f.get_crc(tmp);
-            tmp.dump(f);
+	    try
+	    {
+		f.reset_crc(ENTREE_CRC_SIZE);
+		try
+		{
+		    inherited_dump(f, small);
+		}
+		catch(...)
+		{
+		    tmp = f.get_crc(); // keep f in a coherent status
+		    throw;
+		}
+
+		tmp = f.get_crc();
+		if(tmp == NULL)
+		    throw SRC_BUG;
+
+		tmp->dump(f);
+	    }
+	    catch(...)
+	    {
+		if(tmp != NULL)
+		    delete tmp;
+		throw;
+	    }
+	    if(tmp != NULL)
+		delete tmp;
         }
         else
             inherited_dump(f, small);
@@ -547,6 +591,11 @@ namespace libdar
         xsaved = saved;
         edit = reading_ver;
         esc = ptr;
+        last_acc = NULL;
+        last_mod = NULL;
+        last_cha = NULL;
+        ea_offset = NULL;
+        fs_dev = NULL;
         ea_crc = NULL;
 
         if(reading_ver > 1)
@@ -596,11 +645,6 @@ namespace libdar
             throw Erange("inode::inode", gettext("missing data to build an inode"));
         perm = ntohs(tmp);
 
-        last_acc = NULL;
-        last_mod = NULL;
-        last_cha = NULL;
-        ea_offset = NULL;
-        fs_dev = NULL;
         try
         {
             fs_dev = new infinint(0); // the filesystemID is not saved in archive
@@ -630,20 +674,23 @@ namespace libdar
                     ea_offset = new infinint(f);
                     if(ea_offset == NULL)
                         throw Ememory("inode::inode(file)");
-                    ea_crc = new crc;
-                    if(ea_crc == NULL)
-                        throw Ememory("inode::inode(file)");
-                    else // ea_crc properly allocated
-                        if(reading_ver <= 7)
-                        {
-                            ea_crc->old_read(f);
 
-                            last_cha = new infinint(f);
-                            if(last_cha == NULL)
-                                throw Ememory("inode::inode(file)");
-                        }
-                        else // archive format >= 8
-                            ea_crc->read(f);
+		    if(reading_ver <= 7)
+		    {
+			ea_crc = create_crc_from_file(f, true);
+			if(ea_crc == NULL)
+			    throw SRC_BUG;
+
+			last_cha = new infinint(f);
+			if(last_cha == NULL)
+			    throw Ememory("inode::inode(file)");
+		    }
+		    else // archive format >= 8
+		    {
+			ea_crc = create_crc_from_file(f, false);
+			if(ea_crc == NULL)
+			    throw SRC_BUG;
+		    }
                     break;
                 case ea_partial:
                 case ea_fake:
@@ -719,6 +766,11 @@ namespace libdar
                 delete fs_dev;
                 fs_dev = NULL;
             }
+	    if(ea_crc != NULL)
+	    {
+		delete ea_crc;
+		ea_crc = NULL;
+	    }
             throw;
         }
     }
@@ -759,7 +811,7 @@ namespace libdar
                     throw Ememory("inode::inode(inode)");
                 if(ref.ea_crc != NULL)
                 {
-                    ea_crc = new crc(*ref.ea_crc);
+                    ea_crc = ref.ea_crc->clone();
                     if(ea_crc == NULL)
                         throw Ememory("inode::inode(inode)");
                 }
@@ -892,12 +944,18 @@ namespace libdar
                 delete ea_crc;
                 ea_crc = NULL;
             }
-            else
-                *ea_crc = *(ref.ea_crc);
+            else // both ea_crc and ref.ea_crc not NULL
+		if(ea_crc->get_size() == ref.ea_crc->get_size())
+		    *ea_crc = *(ref.ea_crc);
+		else
+		{
+		    delete ea_crc;
+		    ea_crc = ref.ea_crc->clone();
+		}
         else // ea_crc == NULL
             if(ref.ea_crc != NULL)
             {
-                ea_crc = new crc(*ref.ea_crc);
+                ea_crc = ref.ea_crc->clone();
                 if(ea_crc == NULL)
                     throw Ememory("inode::operator =");
             }
@@ -1176,57 +1234,76 @@ namespace libdar
             else
                 if(storage != NULL) // ea_offset may be equal to zero if the first inode saved had only EA modified since archive of reference
                 {
-                    crc val, my_crc;
+		    crc *val = NULL;
+		    const crc *my_crc = NULL;
 
-                    if(esc == NULL)
-                        storage->skip(*ea_offset);
-                    else
-                    {
-                        if(!esc->skip_to_next_mark(escape::seqt_ea, false))
-                            throw Erange("inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
-                        storage->skip(esc->get_position()); // required to eventually reset the compression engine
-                    }
-                    if(ea_get_size() == 0)
-                        storage->reset_crc(crc::OLD_CRC_SIZE);
-                    else
-                        storage->reset_crc(tools_file_size_to_crc_size(ea_get_size()));
+		    try
+		    {
+			if(esc == NULL)
+			    storage->skip(*ea_offset);
+			else
+			{
+			    if(!esc->skip_to_next_mark(escape::seqt_ea, false))
+				throw Erange("inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
+			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
+			}
 
-                    try
-                    {
-                        try
-                        {
-                            if(edit <= 1)
-                                throw SRC_BUG;   // EA do not exist in that archive format
-                            const_cast<ea_attributs *&>(ea) = new ea_attributs(*storage, edit);
-                            if(ea == NULL)
-                                throw Ememory("inode::get_ea");
-                        }
-                        catch(Euser_abort & e)
-                        {
-                            throw;
-                        }
-                        catch(Ebug & e)
-                        {
-                            throw;
-                        }
-                        catch(Ethread_cancel & e)
-                        {
-                            throw;
-                        }
-                        catch(Egeneric & e)
-                        {
-                            throw Erange("inode::get_ea", string("Error while reading EA from archive: ") + e.get_message());
-                        }
-                    }
-                    catch(...)
-                    {
-                        storage->get_crc(val); // keeps storage in coherent status
-                        throw;
-                    }
-                    storage->get_crc(val);
-                    ea_get_crc(my_crc); // ea_get_crc() will eventually fetch the CRC for EA from the archive (sequential reading)
-                    if(val != my_crc)
-                        throw Erange("inode::get_ea", gettext("CRC error detected while reading EA"));
+			if(ea_get_size() == 0)
+			    storage->reset_crc(crc::OLD_CRC_SIZE);
+			else
+			    storage->reset_crc(tools_file_size_to_crc_size(ea_get_size()));
+
+			try
+			{
+			    try
+			    {
+				if(edit <= 1)
+				    throw SRC_BUG;   // EA do not exist in that archive format
+				const_cast<ea_attributs *&>(ea) = new ea_attributs(*storage, edit);
+				if(ea == NULL)
+				    throw Ememory("inode::get_ea");
+			    }
+			    catch(Euser_abort & e)
+			    {
+				throw;
+			    }
+			    catch(Ebug & e)
+			    {
+				throw;
+			    }
+			    catch(Ethread_cancel & e)
+			    {
+				throw;
+			    }
+			    catch(Egeneric & e)
+			    {
+				throw Erange("inode::get_ea", string("Error while reading EA from archive: ") + e.get_message());
+			    }
+			}
+			catch(...)
+			{
+			    val = storage->get_crc(); // keeps storage in coherent status
+			    throw;
+			}
+			val = storage->get_crc();
+			if(val == NULL)
+			    throw SRC_BUG;
+
+			ea_get_crc(my_crc); // ea_get_crc() will eventually fetch the CRC for EA from the archive (sequential reading)
+			if(my_crc == NULL)
+			    throw SRC_BUG;
+
+			if(typeid(*val) != typeid(*my_crc) || *val != *my_crc)
+			    throw Erange("inode::get_ea", gettext("CRC error detected while reading EA"));
+		    }
+		    catch(...)
+		    {
+			if(val != NULL)
+			    delete val;
+			throw;
+		    }
+		    if(val != NULL)
+			delete val;
                     return ea;
                 }
                 else
@@ -1266,32 +1343,47 @@ namespace libdar
             throw SRC_BUG;
     }
 
-    void inode::ea_get_crc(crc & val) const
+    void inode::ea_set_crc(const crc & val)
+    {
+	if(ea_crc != NULL)
+	{
+	    delete ea_crc;
+	    ea_crc = NULL;
+	}
+	ea_crc = val.clone();
+	if(ea_crc == NULL)
+	    throw Ememory("inode::ea_set_crc");
+    }
+
+    void inode::ea_get_crc(const crc * & ptr) const
     {
         if(esc != NULL && ea_crc == NULL)
         {
             if(esc->skip_to_next_mark(escape::seqt_ea_crc, false))
             {
-                crc *tmp = new crc();
-                if(tmp == NULL)
-                    throw Ememory("inode::ea_get_crc");
+                crc *tmp = NULL;
+
                 try
                 {
                     if(edit >= 8)
-                        tmp->read(*esc);
+                        tmp = create_crc_from_file(*esc, false);
                     else // archive format <= 7
-                        tmp->old_read(*esc);
+                        tmp = create_crc_from_file(*esc, true);
+		    if(tmp == NULL)
+			throw SRC_BUG;
                     const_cast<inode *>(this)->ea_crc = tmp;
+		    tmp = NULL; // the object is now owned by "this"
                 }
                 catch(...)
                 {
-                    delete tmp;
+		    if(tmp != NULL)
+			delete tmp;
                     throw;
                 }
             }
             else
             {
-                crc *tmp = new crc(); // creating a default CRC
+                crc *tmp = new crc_n(1); // creating a default CRC
                 if(tmp == NULL)
                     throw Ememory("inode::ea_get_crc");
                 try
@@ -1301,6 +1393,7 @@ namespace libdar
                         // this is to avoid trying to fetch the CRC a new time if decision
                         // has been taken to continue the operation after the exception
                         // thrown below has been catched.
+		    tmp = NULL;  // the object is now owned by "this"
                 }
                 catch(...)
                 {
@@ -1314,7 +1407,7 @@ namespace libdar
         if(ea_crc == NULL)
             throw SRC_BUG;
         else
-            val = *ea_crc;
+            ptr = ea_crc;
     }
 
     bool inode::ea_get_crc_size(infinint & val) const
@@ -1758,11 +1851,9 @@ namespace libdar
 
                     if(reading_ver >= 8)
                     {
-                        check = new crc();
+			check = create_crc_from_file(f);
                         if(check == NULL)
                             throw Ememory("file::file");
-                        else
-                            check->read(f);
                     }
                         // before version 8, crc was dump in any case, not only when data was saved
                 }
@@ -1783,11 +1874,9 @@ namespace libdar
                             // for archive version >= 8, the crc is only present
                             // if the archive does contain file data
 
-                        check = new crc();
+                        check = create_crc_from_file(f, true);
                         if(check == NULL)
                             throw Ememory("file::file");
-                        else
-                            check->old_read(f);
                     }
                         // archive version >= 8, crc only present if  saved == s_saved (seen above)
                 }
@@ -1862,12 +1951,12 @@ namespace libdar
             {
 		if(ref.check == NULL)
 		{
-		    crc tmp;
+		    const crc *tmp = NULL;
 		    ref.get_crc(tmp);
 		    if(ref.check == NULL) // failed to read the crc from escape layer
 			throw SRC_BUG;
 		}
-		check = new crc(*ref.check);
+		check = ref.check->clone();
                 if(check == NULL)
                     throw Ememory("file::file(file)");
             }
@@ -2080,12 +2169,24 @@ namespace libdar
         return *offset;
     }
 
-    bool file::get_crc(crc & c) const
+    void file::set_crc(const crc &c)
+    {
+	if(check != NULL)
+	{
+	    delete check;
+	    check = NULL;
+	}
+	check = c.clone();
+	if(check == NULL)
+	    throw Ememory("file::set_crc");
+    }
+
+    bool file::get_crc(const crc * & c) const
     {
         if(get_escape_layer() == NULL)
             if(check != NULL)
             {
-                c = *check;
+                c = check;
                 return true;
             }
             else
@@ -2098,7 +2199,7 @@ namespace libdar
                 {
                     if(get_escape_layer()->skip_to_next_mark(escape::seqt_file_crc, false))
                     {
-                        crc *tmp = new crc();
+                        crc *tmp = NULL;
 
 			    // first, recording storage_size (needed when isolating a catalogue in sequential read mode)
 			if(*storage_size == 0)
@@ -2112,21 +2213,14 @@ namespace libdar
 			else
 			    throw SRC_BUG; // how is this possible ??? it should always be zero in sequential read mode !
 
-                        if(tmp == NULL)
-                            throw Ememory("file::get_crc");
-                        else
-                        {
-                            try
-                            {
-                                tmp->read(*(get_escape_layer()));
-                                const_cast<file *>(this)->check = tmp;
-                            }
-                            catch(...)
-                            {
-                                delete tmp;
-                                throw;
-                            }
-                        }
+			tmp = create_crc_from_file(*(get_escape_layer()));
+			if(tmp == NULL)
+			    throw SRC_BUG;
+			else
+			{
+			    const_cast<file *>(this)->check = tmp;
+			    tmp = NULL; // object now owned by "this"
+			}
                     }
                     else
                         throw Erange("file::file", gettext("can't read data CRC: No escape mark found for that file"));
@@ -2135,7 +2229,7 @@ namespace libdar
                 if(check == NULL)
                     throw SRC_BUG; // should not be NULL now!
                 else
-                    c = *check;
+                    c = check;
                 return true;
             }
             else
@@ -2179,29 +2273,49 @@ namespace libdar
                     throw SRC_BUG;
                 try
                 {
-                    crc value;
-                    crc original;
+                    crc *value = NULL;
+                    const crc *original = NULL;
+		    infinint crc_size;
 
 		    if(has_crc())
 		    {
 			if(get_crc(original))
-			    value.resize_based_on(original);
+			{
+			    if(original == NULL)
+				throw SRC_BUG;
+			    crc_size = original->get_size();
+			}
 			else
 			    throw SRC_BUG; // has a crc but cannot get it?!?
 		    }
-		    else // we must not yet fetch the crc yet, espetially when perfoming a sequential read
-			value.resize(tools_file_size_to_crc_size(f_other->get_size()));
+		    else // we must not fetch the crc yet, especially when perfoming a sequential read
+			crc_size = tools_file_size_to_crc_size(f_other->get_size());
 
-		    if(me->diff(*you, value))
-			throw Erange("file::sub_compare", gettext("different file data"));
-		    else
-			if(get_crc(original))
+		    try
+		    {
+			if(me->diff(*you, crc_size, value))
+			    throw Erange("file::sub_compare", gettext("different file data"));
+			else
 			{
-			    if(original.get_size() != value.get_size())
-				throw Erange("file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
-			    if(original != value)
-                                throw Erange("file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
+			    if(original != NULL)
+			    {
+				if(value == NULL)
+				    throw SRC_BUG;
+				if(original->get_size() != value->get_size())
+				    throw Erange("file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
+				if(*original != *value)
+				    throw Erange("file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
+			    }
 			}
+		    }
+		    catch(...)
+		    {
+			if(value != NULL)
+			    delete value;
+			throw;
+		    }
+		    if(value != NULL)
+			delete value;
                 }
                 catch(...)
                 {
@@ -2299,7 +2413,9 @@ namespace libdar
                          const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device)
     {
         parent = NULL;
+#ifdef LIBDAR_FAST_DIR
         fils.clear();
+#endif
         ordered_fils.clear();
         it = ordered_fils.begin();
         set_saved_status(s_saved);
@@ -2309,7 +2425,9 @@ namespace libdar
     directory::directory(const directory &ref) : inode(ref)
     {
         parent = NULL;
+#ifdef LIBDAR_FAST_DIR
         fils.clear();
+#endif
         ordered_fils.clear();
         it = ordered_fils.begin();
         recursive_has_changed = ref.recursive_has_changed;
@@ -2348,7 +2466,9 @@ namespace libdar
         bool lax_end = false;
 
         parent = NULL;
+#ifdef LIBDAR_FAST_DIR
         fils.clear();
+#endif
         ordered_fils.clear();
         recursive_has_changed = true; // need to call recursive_has_changed_update() first if this fields has to be used
 
@@ -2395,7 +2515,9 @@ namespace libdar
                             // carring the same etiquette if we destroy them right now.
                         if(t != NULL) // p is a "nomme"
                         {
+#ifdef LIBDAR_FAST_DIR
                             fils[t->get_name()] = t;
+#endif
                             ordered_fils.push_back(t);
                         }
                         if(d != NULL) // p is a directory
@@ -2470,59 +2592,57 @@ namespace libdar
 
     void directory::add_children(nomme *r)
     {
-        map<string, nomme *>::iterator ancien;
         directory *d = dynamic_cast<directory *>(r);
+	nomme *ancien_nomme;
 
         if(r == NULL)
             throw SRC_BUG;
 
-        ancien = fils.find(r->get_name());
-
-        if(ancien != fils.end())
+	if(search_children(r->get_name(), ancien_nomme))  // same entry already present
         {
-            directory *a_dir = const_cast<directory *>(dynamic_cast<const directory *>(ancien->second));
+            directory *a_dir = dynamic_cast<directory *>(ancien_nomme);
 
             if(a_dir != NULL && d != NULL) // both directories : merging them
             {
                 a_dir = d; // updates the inode part, does not touch the directory specific part as defined in the directory::operator =
-                map<string, nomme *>::iterator xit = d->fils.begin();
-                while(xit != d->fils.end())
+                list<nomme *>::iterator xit = d->ordered_fils.begin();
+                while(xit != d->ordered_fils.end())
                 {
-                    a_dir->add_children(xit->second);
+                    a_dir->add_children(*xit);
                     ++xit;
                 }
+
+		    // need to clear the lists of objects before destroying the directory objects itself
+		    // to avoid the destructor destroyed the director children that have been merged to the a_dir directory
+#ifdef LIBDAR_FAST_DIR
                 d->fils.clear();
+#endif
+		d->ordered_fils.clear();
                 delete r;
                 r = NULL;
                 d = NULL;
             }
-            else // not directories : replacing
+            else // not directories: removing and replacing old entry
             {
-                list<nomme *>::iterator ordered_ancien;
-
-                    // localizing old object
-                if(ancien->second == NULL)
-                    throw SRC_BUG;
-                ordered_ancien = find(ordered_fils.begin(), ordered_fils.end(), ancien->second);
-                if(ordered_ancien == ordered_fils.end())
+                if(ancien_nomme == NULL)
                     throw SRC_BUG;
 
-                    // releasing it from lists and memory
-                if(*ordered_ancien != ancien->second)
-                    throw SRC_BUG;
-                fils.erase(ancien);
-                ordered_fils.erase(ordered_ancien);
-                delete *ordered_ancien;
-                *ordered_ancien = NULL;
+		    // removing the old object
+		remove(ancien_nomme->get_name());
+		ancien_nomme = NULL;
 
                     // adding the new object
+#ifdef LIBDAR_FAST_DIR
                 fils[r->get_name()] = r;
+#endif
                 ordered_fils.push_back(r);
             }
         }
-        else // no conflict : adding
+        else // no conflict: adding
         {
+#ifdef LIBDAR_FAST_DIR
             fils[r->get_name()] = r;
+#endif
             ordered_fils.push_back(r);
         }
 
@@ -2557,6 +2677,7 @@ namespace libdar
 
     void directory::tail_to_read_children()
     {
+#ifdef LIBDAR_FAST_DIR
         map<string, nomme *>::iterator dest;
 	list<nomme *>::iterator ordered_dest = it;
 
@@ -2578,34 +2699,46 @@ namespace libdar
 		throw;
 	    }
         }
+#endif
         ordered_fils.erase(it, ordered_fils.end());
         it = ordered_fils.end();
     }
 
     void directory::remove(const string & name)
     {
-        map<string, nomme *>::iterator xit = fils.find(name);
 
-        if(xit != fils.end())
-        {
-            list<nomme *>::iterator ordered_xit;
+                    // localizing old object in ordered_fils
+	list<nomme *>::iterator ot = ordered_fils.begin();
 
-            if(xit->second == NULL)
-                throw SRC_BUG;
-            ordered_xit = find(ordered_fils.begin(), ordered_fils.end(), xit->second);
-            if(ordered_xit == ordered_fils.end())
-                throw SRC_BUG;
+	while(ot != ordered_fils.end() && *ot != NULL && (*ot)->get_name() != name)
+	    ++ot;
 
-            if(*ordered_xit != xit->second)
-                throw SRC_BUG;
-            fils.erase(xit);
-            ordered_fils.erase(ordered_xit);
-            delete *ordered_xit;
-            *ordered_xit = NULL;
-        }
-        else
+	if(ot == ordered_fils.end())
             throw Erange("directory::remove", tools_printf(gettext("Cannot remove nonexistent entry %S from catalogue"), &name));
 
+	if(*ot == NULL)
+	    throw SRC_BUG;
+
+
+#ifdef LIBDAR_FAST_DIR
+	    // localizing old object in fils
+	map<string, nomme *>::iterator ut = fils.find(name);
+	if(ut == fils.end())
+	    throw SRC_BUG;
+
+	    // sanity checks
+	if(*ot != ut->second)
+	    throw SRC_BUG;
+
+	    // removing reference from fils
+	fils.erase(ut);
+#endif
+
+	    // removing reference from ordered_fils
+	ordered_fils.erase(ot);
+
+	    // destroying the object itself
+	delete *ot;
         reset_read_children();
     }
 
@@ -2620,13 +2753,16 @@ namespace libdar
             *it = NULL;
             ++it;
         }
+#ifdef LIBDAR_FAST_DIR
         fils.clear();
+#endif
         ordered_fils.clear();
         it = ordered_fils.begin();
     }
 
     bool directory::search_children(const string &name, nomme * & ptr)
     {
+#ifdef LIBDAR_FAST_DIR
         map<string, nomme *>::iterator ut = fils.find(name);
 
         if(ut != fils.end())
@@ -2634,9 +2770,26 @@ namespace libdar
             if(ut->second == NULL)
                 throw SRC_BUG;
             ptr = ut->second;
+	    if(ptr == NULL)
+		throw SRC_BUG;
         }
         else
             ptr = NULL;
+#else
+	list<nomme *>::iterator ot = ordered_fils.begin();
+
+	while(ot != ordered_fils.end() && *ot != NULL && (*ot)->get_name() != name)
+	    ++ot;
+
+	if(ot != ordered_fils.end())
+	{
+	    ptr = *ot;
+	    if(ptr == NULL)
+		throw SRC_BUG;
+	}
+	else
+	    ptr = NULL;
+#endif
         return ptr != NULL;
     }
 
@@ -2764,16 +2917,19 @@ namespace libdar
 
     infinint directory::get_tree_size() const
     {
-        infinint ret = fils.size();
+        infinint ret = ordered_fils.size();
+	const directory *fils_dir = NULL;
 
-        list<nomme *>::const_iterator it = ordered_fils.begin();
-        while(it != ordered_fils.end())
+        list<nomme *>::const_iterator ot = ordered_fils.begin();
+        while(ot != ordered_fils.end())
         {
-            const directory *fils_dir = dynamic_cast<const directory *>(*it);
+	    if(*ot == NULL)
+		throw SRC_BUG;
+            fils_dir = dynamic_cast<const directory *>(*ot);
             if(fils_dir != NULL)
                 ret += fils_dir->get_tree_size();
 
-            ++it;
+            ++ot;
         }
 
         return ret;
@@ -2870,14 +3026,17 @@ namespace libdar
             mirage *m = dynamic_cast<mirage *>(*curs);
             nomme *n = dynamic_cast<nomme *>(*curs);
 
+		// sanity check
             if((m != NULL && n == NULL) || (d != NULL && n == NULL))
                 throw SRC_BUG;
 
+		// recursive call
             if(d != NULL)
                 d->remove_all_mirages_and_reduce_dirs();
 
             if(m != NULL || (d != NULL && d->is_empty()))
             {
+#ifdef LIBDAR_FAST_DIR
                 map<string, nomme *>::iterator monfils = fils.find(n->get_name());
 
                 if(monfils == fils.end())
@@ -2885,6 +3044,7 @@ namespace libdar
                 if(monfils->second != *curs)
                     throw SRC_BUG;
                 fils.erase(monfils);
+#endif
                 curs = ordered_fils.erase(curs);
                     // curs now points to the next item
                 delete n;
@@ -3021,8 +3181,9 @@ namespace libdar
         saved_status st;
         unsigned char base;
         map <infinint, etoile *> corres;
+        crc *calc_crc = NULL;
+	crc *read_crc = NULL;
         contenu = NULL;
-        crc calc_crc, read_crc;
 
         try
         {
@@ -3073,24 +3234,32 @@ namespace libdar
             }
             catch(...)
             {
-                ff.get_crc(calc_crc); // keeping "f" in coherent status
+                calc_crc = ff.get_crc(); // keeping "f" in coherent status
+		if(calc_crc != NULL)
+		{
+		    delete calc_crc;
+		    calc_crc = NULL;
+		}
                 throw;
             }
-            ff.get_crc(calc_crc); // keeping "f" incoherent status in any case
+            calc_crc = ff.get_crc(); // keeping "f" incoherent status in any case
+	    if(calc_crc == NULL)
+		throw SRC_BUG;
+
             if(reading_ver > 7)
             {
                 bool force_crc_failure = false;
 
                 try
                 {
-                    read_crc.read(ff);
+		    read_crc = create_crc_from_file(ff);
                 }
                 catch(Egeneric & e)
                 {
                     force_crc_failure = true;
                 }
 
-                if(force_crc_failure || read_crc != calc_crc)
+                if(force_crc_failure || read_crc == NULL || calc_crc == NULL || read_crc->get_size() != calc_crc->get_size() || *read_crc != *calc_crc)
                 {
                     if(!lax)
                         throw Erange("catalogue::catalogue(generic_file &)", gettext("CRC failed for table of contents (aka \"catalogue\")"));
@@ -3103,8 +3272,17 @@ namespace libdar
         {
             if(contenu != NULL)
                 delete contenu;
+	    if(calc_crc != NULL)
+		delete calc_crc;
+	    if(read_crc != NULL)
+		delete read_crc;
             throw;
         }
+	    // "contenu" must not be destroyed under normal terminaison!
+	if(calc_crc != NULL)
+	    delete calc_crc;
+	if(read_crc != NULL)
+	    delete read_crc;
     }
 
     const catalogue & catalogue::operator = (const catalogue &ref)
@@ -4208,7 +4386,7 @@ namespace libdar
                                 case 'f': // plain files
                                     if(data_st == s_saved)
                                     {
-                                        crc tmp;
+                                        const crc *tmp = NULL;
                                         const file * f_ino = dynamic_cast<const file *>(e_ino);
 
                                         if(f_ino == NULL)
@@ -4218,10 +4396,10 @@ namespace libdar
 
                                         if(reg == NULL)
                                             throw SRC_BUG; // f is signature for plain files
-                                        if(!reg->get_crc(tmp))
+                                        if(reg->get_crc(tmp) && tmp != NULL)
+                                            chksum = tmp->crc2str();
+					else
                                             chksum = "";
-                                        else
-                                            chksum = tmp.crc2str();
                                     }
                                     else
                                     {
@@ -4312,27 +4490,40 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.139.2.1 2011/07/20 14:38:07 edrusb Exp $";
+        static char id[]="$Id: catalogue.cpp,v 1.139.2.3 2012/02/12 20:43:34 edrusb Exp $";
         dummy_call(id);
     }
 
     void catalogue::dump(generic_file & f) const
     {
-	crc tmp;
+	crc *tmp = NULL;
 
-	f.reset_crc(CAT_CRC_SIZE);
 	try
 	{
-	    ref_data_name.dump(f);
-	    contenu->dump(f, false);
+	    f.reset_crc(CAT_CRC_SIZE);
+	    try
+	    {
+		ref_data_name.dump(f);
+		contenu->dump(f, false);
+	    }
+	    catch(...)
+	    {
+		tmp = f.get_crc();
+		throw;
+	    }
+	    tmp = f.get_crc();
+	    if(tmp == NULL)
+		throw SRC_BUG;
+	    tmp->dump(f);
 	}
 	catch(...)
 	{
-	    f.get_crc(tmp);
+	    if(tmp != NULL)
+		delete tmp;
 	    throw;
 	}
-	f.get_crc(tmp);
-	tmp.dump(f);
+	if(tmp != NULL)
+	    delete tmp;
     }
 
     void catalogue::reset_all()
@@ -4794,3 +4985,4 @@ namespace libdar
     }
 
 } // end of namespace
+

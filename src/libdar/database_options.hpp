@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database_options.hpp,v 1.6.2.1 2011/06/20 14:02:03 edrusb Exp $
+// $Id: database_options.hpp,v 1.6.2.2 2011/12/13 21:24:54 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -46,7 +46,9 @@ namespace libdar
     class database_open_options
     {
     public:
-	database_open_options() { x_partial = false; };
+	database_open_options() { clear(); };
+
+	void clear() { x_partial = false; x_warn_order = true; };
 
 	    // setings
 
@@ -56,13 +58,18 @@ namespace libdar
 	    /// \note if value is set to true, the database loading is quick but only some database methods are available (see the database class documentation)
 	void set_partial(bool value) { x_partial = value; };
 
+	    /// warning about file ordering in database
+
+	    /// \param[in] value whether to warn when file chronological ordering does not respect the order of archives
+	void set_warn_order(bool value) { x_warn_order = value; };
 
 	    // gettings
 	bool get_partial() const { return x_partial; };
+	bool get_warn_order() const { return x_warn_order; };
 
     private:
 	bool x_partial;
-
+	bool x_warn_order;
     };
 
 	/// options to write a database to file
@@ -70,7 +77,9 @@ namespace libdar
     class database_dump_options
     {
     public:
-	database_dump_options() { x_overwrite = false; };
+	database_dump_options() { clear(); };
+
+	void clear() { x_overwrite = false; };
 
 	    // settings
 
@@ -92,7 +101,9 @@ namespace libdar
     class database_add_options
     {
     public:
-	database_add_options() {};
+	database_add_options() { clear(); };
+
+	void clear() {};
     };
 
 	/// options to remove an archive from the base
@@ -100,7 +111,9 @@ namespace libdar
     class database_remove_options
     {
     public:
-	database_remove_options() { x_revert_archive_numbering = false; };
+	database_remove_options() { clear(); };
+
+	void clear() { x_revert_archive_numbering = false; };
 
 	    /// defines whether the archive number is counted from the beginning or from the end of the database
 	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };
@@ -117,7 +130,9 @@ namespace libdar
     class database_change_basename_options
     {
     public:
-	database_change_basename_options() { x_revert_archive_numbering = false; };
+	database_change_basename_options() { clear(); };
+
+	void clear() { x_revert_archive_numbering = false; };
 
 	    /// defines whether the archive number is counted from the beginning or from the end of the database
 	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };
@@ -135,7 +150,9 @@ namespace libdar
     class database_change_path_options
     {
     public:
-	database_change_path_options() { x_revert_archive_numbering = false; };
+	database_change_path_options() { clear(); };
+
+	void clear() { x_revert_archive_numbering = false; };
 
 	    /// defines whether the archive number is counted from the beginning or from the end of the database
 	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };
@@ -152,7 +169,9 @@ namespace libdar
     class database_restore_options
     {
     public:
-	database_restore_options() { x_early_release = x_info_details = x_ignore_dar_options_in_database = x_even_when_removed = false; x_date = 0; x_extra_options_for_dar.clear(); };
+	database_restore_options() { clear(); };
+
+	void clear() { x_early_release = x_info_details = x_ignore_dar_options_in_database = x_even_when_removed = false; x_date = 0; x_extra_options_for_dar.clear(); };
 
 	    // settings
 
@@ -215,7 +234,9 @@ namespace libdar
     class database_used_options
     {
     public:
-	database_used_options() { x_revert_archive_numbering = false; };
+	database_used_options() { clear(); };
+
+	void clear() { x_revert_archive_numbering = false; };
 
 	    /// defines whether the archive number is counted from the beginning or from the end of the database
 	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };

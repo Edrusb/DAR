@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.111 2011/05/27 12:29:18 edrusb Rel $
+// $Id: catalogue.hpp,v 1.111.2.6 2012/02/19 22:15:05 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -139,9 +139,9 @@ namespace libdar
         virtual unsigned char signature() const = 0;
         virtual entree *clone() const = 0;
 
-            // SPECIAL ALLOC not adapted here
-            // because some inherited class object (eod) are
-            // temporary
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(entree);
+#endif
 
     protected:
 	virtual void inherited_dump(generic_file & f, bool small) const;
@@ -165,8 +165,10 @@ namespace libdar
         unsigned char signature() const { return 'z'; };
         entree *clone() const { return new eod(); };
 
-            // eod are generally temporary object they are NOT
-            // well adapted to "SPECIAL ALLOC"
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(eod);
+#endif
     };
 
 	/// the base class for all entry that have a name
@@ -283,8 +285,8 @@ namespace libdar
 
             // III : to record where is dump the EA in the archive #EA_FULL only#
         void ea_set_offset(const infinint & pos) { *ea_offset = pos; };
-        void ea_set_crc(const crc & val) { crc::set_crc_pointer(ea_crc, &val); };
-	void ea_get_crc(crc & val) const;
+        void ea_set_crc(const crc & val);
+	void ea_get_crc(const crc * & ptr) const; //< the argument is set the an allocated crc object owned by this "inode" object, this reference stays valid while the "inode" object exists and MUST NOT be deleted by the caller in any case
 	bool ea_get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
 
             // IV : to know/record if EA have been modified # any EA status#
@@ -520,8 +522,8 @@ namespace libdar
 	const infinint & get_offset() const;
         unsigned char signature() const { return mk_signature('f', get_saved_status()); };
 
-        void set_crc(const crc &c) { crc::set_crc_pointer(check, &c); };
-        bool get_crc(crc & c) const;
+        void set_crc(const crc &c);
+        bool get_crc(const crc * & c) const; //< the argument is set the an allocated crc object the owned by the "file" object, its stay valid while this "file" object exists and MUST NOT be deleted by the caller in any case
 	bool has_crc() const { return check != NULL; };
 	bool get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
 	void drop_crc() { if(check != NULL) { delete check; check = NULL; } };
@@ -603,6 +605,10 @@ namespace libdar
         unsigned char signature() const { return mk_signature('o', get_saved_status()); };
 
         generic_file *get_data(get_data_mode mode) const; // inherited from class file
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(door);
+#endif
     };
 
 	/// the symbolic link inode class
@@ -670,7 +676,7 @@ namespace libdar
         ~directory(); // detruit aussi tous les fils et se supprime de son 'parent'
 
         void add_children(nomme *r); // when r is a directory, 'parent' is set to 'this'
-	bool has_children() const { return !fils.empty(); };
+	bool has_children() const { return !ordered_fils.empty(); };
         void reset_read_children() const;
 	void end_read() const;
         bool read_children(const nomme * &r) const; // read the direct children of the directory, returns false if no more is available
@@ -705,7 +711,7 @@ namespace libdar
 	void get_etiquettes_found_in_tree(std::map<infinint, infinint> & already_found) const;
 
 	    // whether this directory is empty or not
-	bool is_empty() const { return fils.empty(); };
+	bool is_empty() const { return ordered_fils.empty(); };
 
 	    // recursively remove all mirage entries
 	void remove_all_mirages_and_reduce_dirs();
@@ -723,7 +729,9 @@ namespace libdar
 	static const eod fin;
 
         directory *parent;
+#ifdef LIBDAR_FAST_DIR
         std::map<std::string, nomme *> fils; // used for fast lookup
+#endif
 	std::list<nomme *> ordered_fils;
         std::list<nomme *>::iterator it;
 	bool recursive_has_changed;
@@ -1106,9 +1114,6 @@ namespace libdar
 	    /// reset all pointers to the root (a bit better than reset_add() + reset_read() + reset_compare() + reset_sub_read())
 	void reset_all();
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(catalogue);
-#endif
 
     protected:
 	entree_stats & access_stats() { return stats; };

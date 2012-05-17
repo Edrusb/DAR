@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.156 2011/05/27 12:29:18 edrusb Rel $
+// $Id: command_line.cpp,v 1.156.2.1 2012/01/04 09:55:55 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -159,6 +159,7 @@ struct recursive_param
     bool ea_erase;
     bool only_more_recent;
     bool detruire;
+    bool no_inter;
 
     recursive_param(user_interaction & x_dialog,
 		    const char *x_home,
@@ -181,6 +182,7 @@ struct recursive_param
 	ea_erase = false;
 	only_more_recent = false;
 	detruire = true;
+	no_inter = false;
     };
 
     recursive_param(const recursive_param & ref): dar_dcf_path(ref.dar_dcf_path), dar_duc_path(ref.dar_duc_path)
@@ -492,6 +494,9 @@ bool get_args(user_interaction & dialog,
 
 	if(p.not_deleted && p.only_deleted)
 	    throw Erange("get_args", gettext("-konly and -kignore cannot be used at the same time"));
+
+	if(rec.no_inter && p.pause > 0)
+	    throw Erange("get_args", gettext("-p and -Q options are mutually exclusives"));
 
 	    //////////////////////
 	    // generating masks
@@ -1316,6 +1321,8 @@ static bool get_args_recursive(recursive_param & rec,
                     p.empty = true;
                 break;
             case 'Q':
+		rec.no_inter = true;
+		break;
             case 'j':
                 break;  // ignore this option already parsed during initialization (dar_suite.cpp)
             case 'G':
@@ -1565,7 +1572,7 @@ static void usage(user_interaction & dialog, const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.156 2011/05/27 12:29:18 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.156.2.1 2012/01/04 09:55:55 edrusb Exp $";
     dummy_call(id);
 }
 

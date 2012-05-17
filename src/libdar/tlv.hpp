@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tlv.hpp,v 1.2 2009/12/18 10:10:21 edrusb Rel $
+// $Id: tlv.hpp,v 1.2.2.2 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -49,7 +49,10 @@ namespace libdar
 
 	tlv() { type = 0; value = NULL; };
 	tlv(generic_file & f) { init(f); };
+	tlv(const tlv & ref) { copy_from(ref); };
+	~tlv() { detruit(); };
 
+	const tlv & operator = (const tlv & ref) { detruit(); copy_from(ref); return *this; };
 
 	    // methods (read / write tlv datastructure to file)
 
@@ -63,11 +66,16 @@ namespace libdar
 	void set_contents(const memory_file & contents);  //< the generic_file object is provided to dump data to the tlv object
         void get_contents(memory_file & contents) const;  //< the generic_file object is provided to read data from the tlv object
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(tlv);
+#endif
     private:
 	U_16 type;
 	storage *value;
 
 	void init(generic_file & f);
+	void copy_from(const tlv & ref);
+	void detruit() { if(value != NULL) { delete value; value = NULL; } };
     };
 
 	/// @}

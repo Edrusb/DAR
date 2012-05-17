@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.43 2011/05/20 10:29:09 edrusb Rel $
+// $Id: dar_suite.cpp,v 1.43.2.4 2012/02/19 22:15:05 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -54,6 +54,8 @@ extern "C"
 #include "erreurs.hpp"
 #include "libdar.hpp"
 #include "thread_cancellation.hpp"
+#include "memory_check.hpp"
+#include "special_alloc.hpp"
 
 #define GENERAL_REPORT(msg) 	if(ui != NULL)\
                                 {\
@@ -90,6 +92,7 @@ int dar_suite_global(int argc, char * const argv[], const char **env, int (*call
 {
     int ret = EXIT_OK;
 
+    memory_check_snapshot();
     dar_suite_reset_signal_handler();
 
 #ifdef ENABLE_NLS
@@ -236,13 +239,16 @@ int dar_suite_global(int argc, char * const argv[], const char **env, int (*call
     {
 	ret = EXIT_UNKNOWN_ERROR;
     }
-
+#ifdef LIBDAR_SPECIAL_ALLOC
+    special_alloc_garbage_collect(cerr);
+#endif
+    memory_check_snapshot();
     return ret;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.43 2011/05/20 10:29:09 edrusb Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.43.2.4 2012/02/19 22:15:05 edrusb Exp $";
     dummy_call(id);
 }
 
@@ -294,7 +300,7 @@ static void signals_abort(int l, bool now)
     }
 #if HAVE_SIGNAL_H
     signal(l, SIG_DFL);
-    GENERAL_REPORT(string(gettext("Disabling signal handler, the next time this signal will be received the program will end immediately")));
+    GENERAL_REPORT(string(gettext("Disabling signal handler, the next time this signal is received the program will abort immediately")));
 #endif
     cancel_thread(pthread_self(), now);
 #else

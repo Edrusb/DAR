@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.24 2010/05/24 19:44:05 edrusb Rel $
+// $Id: ea_filesystem.cpp,v 1.24.2.1 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -77,7 +77,7 @@ namespace libdar
 
     static bool write_ea(const string & chemin, const ea_attributs & val, const mask & filter);
     static bool remove_ea(const string & name, const ea_attributs & val, const mask & filter);
-    static void read_ea(const string & name, ea_attributs & val, const mask & filter);
+    static ea_attributs * read_ea(const string & name, const mask & filter);
     static vector<string> ea_filesystem_get_ea_list_for(const char *filename);
 #endif
 
@@ -90,22 +90,32 @@ namespace libdar
 #endif
     }
 
-    void ea_filesystem_read_ea(const string & name, ea_attributs & val, const mask & filter)
+    ea_attributs * ea_filesystem_read_ea(const string & name, const mask & filter)
     {
 #ifdef EA_SUPPORT
-        read_ea(name, val, filter);
+        return read_ea(name, filter);
 #else
-        val.clear();
+	return NULL;
 #endif
     }
 
     void ea_filesystem_clear_ea(const string &name, const mask & filter)
     {
 #ifdef EA_SUPPORT
-        ea_attributs eat;
-
-        ea_filesystem_read_ea(name, eat, filter);
-        remove_ea(name, eat, bool_mask(true));
+        ea_attributs * eat =  ea_filesystem_read_ea(name, filter);
+	try
+	{
+	    if(eat != NULL)
+		remove_ea(name, *eat, bool_mask(true));
+	}
+	catch(...)
+	{
+	    if(eat != NULL)
+		delete eat;
+	    throw;
+	}
+	if(eat != NULL)
+	    delete eat;
 #else
         throw Efeature(gettext(MSG_NO_EA_SUPPORT));
 #endif
@@ -202,63 +212,86 @@ namespace libdar
         return num > 0;
     }
 
-    static void read_ea(const string & name, ea_attributs & val, const mask & filter)
+    static ea_attributs * read_ea(const string & name, const mask & filter)
     {
         const char *n_ptr = name.c_str();
+	ea_attributs *ret = NULL;
 
-        val.clear();
 	vector<string> ea_liste = ea_filesystem_get_ea_list_for(n_ptr);
 	vector<string>::iterator it = ea_liste.begin();
 
-	while(it != ea_liste.end())
+	try
 	{
-	    if(filter.is_covered(*it))
+	    while(it != ea_liste.end())
 	    {
-		const char *a_name = it->c_str();
-		const U_I MARGIN = 2;
-		string ea_ent_key, ea_ent_value;
-		S_64 taille = my_lgetxattr(n_ptr, a_name, NULL, 0);
-		char *value = NULL;
-		if(taille < 0)
-		    throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
-								       a_name, n_ptr, strerror(errno)));
-		if(taille > 0)
+		if(filter.is_covered(*it))
 		{
-		    value = new char[taille+MARGIN];
-		    if(value == NULL)
-			throw Ememory("filesystem : read_ea_from");
-		    try
+		    const char *a_name = it->c_str();
+		    const U_I MARGIN = 2;
+		    string ea_ent_key, ea_ent_value;
+		    S_64 taille = my_lgetxattr(n_ptr, a_name, NULL, 0);
+		    char *value = NULL;
+		    if(taille < 0)
+			throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
+									   a_name, n_ptr, strerror(errno)));
+
+		    if(ret == NULL)
 		    {
-			taille = my_lgetxattr(n_ptr, a_name, value, taille+MARGIN);
-			    // if the previous call overflows the buffer this may need to SEGFAULT and so on.
-			if(taille < 0)
-			    throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
-									       a_name, n_ptr, strerror(errno)));
-			ea_ent_key = *it;
-			ea_ent_value = string((char *)value, (char *)value+taille);
-			val.add(ea_ent_key, ea_ent_value);
+			ret = new ea_attributs();
+			if(ret == NULL)
+			    throw Ememory("read_ea");
+			ret->clear();
 		    }
-		    catch(...)
+
+		    if(taille > 0)
 		    {
+			value = new char[taille+MARGIN];
+			if(value == NULL)
+			    throw Ememory("filesystem : read_ea_from");
+			try
+			{
+			    taille = my_lgetxattr(n_ptr, a_name, value, taille+MARGIN);
+				// if the previous call overflows the buffer this may need to SEGFAULT and so on.
+			    if(taille < 0)
+				throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
+										   a_name, n_ptr, strerror(errno)));
+			    ea_ent_key = *it;
+			    ea_ent_value = string((char *)value, (char *)value+taille);
+			    ret->add(ea_ent_key, ea_ent_value);
+			}
+			catch(...)
+			{
+			    delete [] value;
+			    throw;
+			}
 			delete [] value;
-			throw;
 		    }
-		    delete [] value;
+		    else // trivial case where the value has a length of zero
+		    {
+			ea_ent_key = *it;
+			ea_ent_value = string("");
+			ret->add(ea_ent_key, ea_ent_value);
+		    }
 		}
-		else // trivial case where the value has a length of zero
-                {
-                    ea_ent_key = *it;
-                    ea_ent_value = string("");
-                    val.add(ea_ent_key, ea_ent_value);
-                }
+		it++;
 	    }
-	    it++;
 	}
+	catch(...)
+	{
+	    if(ret != NULL)
+	    {
+		delete ret;
+		ret = NULL;
+	    }
+	    throw;
+	}
+
+	return ret;
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea_filesystem.cpp,v 1.24 2010/05/24 19:44:05 edrusb Rel $";
+        static char id[]="$Id: ea_filesystem.cpp,v 1.24.2.1 2012/02/12 20:43:34 edrusb Exp $";
         dummy_call(id);
     }
 

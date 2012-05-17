@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: defile.hpp,v 1.11 2011/01/09 17:25:58 edrusb Rel $
+// $Id: defile.hpp,v 1.11.2.1 2012/02/19 17:25:08 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -55,6 +55,10 @@ namespace libdar
         void enfile(const entree *e);
         const path & get_path() const { return chemin; };
         const std::string & get_string() const { return cache; };
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(defile);
+#endif
 
     private :
         path chemin; //< current path

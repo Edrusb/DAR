@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.20 2011/01/07 19:53:16 edrusb Rel $
+// $Id: erreurs.cpp,v 1.20.2.1 2012/02/25 14:43:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -28,6 +28,9 @@ extern "C"
 {
 #if HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+#if HAVE_EXECINFO_H
+#include <execinfo.h>
 #endif
 } // end extern "C"
 
@@ -120,7 +123,32 @@ namespace libdar
         cerr << "-----------------------------------" << endl << endl;
     }
 
-    Ebug::Ebug(const string & file, S_I line) : Egeneric(tools_printf(gettext("File %S line %d"), &file, line), gettext("it seems to be a bug here")) {}
+    Ebug::Ebug(const string & file, S_I line) : Egeneric(tools_printf(gettext("File %S line %d"), &file, line), gettext("it seems to be a bug here"))
+    {
+	    // adding the current stack if possible
+#if HAVE_EXECINFO_H
+	const int buf_size = 20;
+	void *buffer[buf_size];
+	int size = backtrace(buffer, buf_size);
+	char **symbols = backtrace_symbols(buffer, size);
+
+	try
+	{
+	    for(int i = 0; i < size; ++i)
+		Egeneric::stack("stack dump", string(symbols[i]));
+	}
+	catch(...)
+	{
+	    if(symbols != NULL)
+		delete symbols;
+	    throw;
+	}
+	if(symbols != NULL)
+	    delete symbols;
+#else
+	 Egeneric::stack("stack dump", "execinfo absent, cannot dump the stack information at the time the exception was thrown");
+#endif
+    }
 
     void Ebug::stack(const string & passage, const string & file, const string & line)
     {
@@ -136,7 +164,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: erreurs.cpp,v 1.20 2011/01/07 19:53:16 edrusb Rel $";
+        static char id[]="$Id: erreurs.cpp,v 1.20.2.1 2012/02/25 14:43:44 edrusb Exp $";
         dummy_call(id);
     }
 

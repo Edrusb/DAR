@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: scrambler.hpp,v 1.21 2011/04/17 13:12:30 edrusb Rel $
+// $Id: scrambler.hpp,v 1.21.2.1 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -57,6 +57,9 @@ namespace libdar
         bool skip_relative(S_I x) { if(ref == NULL) throw SRC_BUG; return ref->skip_relative(x); };
         infinint get_position() { if(ref == NULL) throw SRC_BUG; return ref->get_position(); };
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(scrambler);
+#endif
     protected:
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size);

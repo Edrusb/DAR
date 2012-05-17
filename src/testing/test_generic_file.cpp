@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_generic_file.cpp,v 1.16 2010/08/27 20:44:24 edrusb Rel $
+// $Id: test_generic_file.cpp,v 1.16.2.1 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -84,24 +84,46 @@ int main(S_I argc, char *argv[])
     f1.reset_crc(crc::OLD_CRC_SIZE);
     f2.reset_crc(crc::OLD_CRC_SIZE);
     f1.copy_to(f2);
-    crc crc1;
-    crc crc2;
-    f1.get_crc(crc1);
-    f2.get_crc(crc2);
-    if(crc1 == crc2)
-        cout << "CRC OK" << endl;
-    else
-        cout << "CRC PROBLEM" << endl;
-    f1.skip(0);
-    null_file f3 = null_file(gf_write_only);
-    crc crc3;
-    f1.copy_to(f3, crc3);
-    if(crc1 == crc3)
-        cout << "CRC OK" << endl;
-    else
-        cout << "CRC PROBLEM" << endl;
+    crc *crc1 = f1.get_crc();
+    crc *crc2 = f2.get_crc();
+    crc *crc3 = NULL;
 
-    shell_interaction_close();
-    if(ui != NULL)
-	delete ui;
+    try
+    {
+	if(crc1 == NULL || crc2 == NULL)
+	    throw SRC_BUG;
+	if(*crc1 == *crc2)
+	    cout << "CRC OK" << endl;
+	else
+	    cout << "CRC PROBLEM" << endl;
+	f1.skip(0);
+	null_file f3 = null_file(gf_write_only);
+	f1.copy_to(f3, crc::OLD_CRC_SIZE, crc3);
+	if(crc3 == NULL)
+	    throw SRC_BUG;
+	if(*crc1 == *crc3)
+	    cout << "CRC OK" << endl;
+	else
+	    cout << "CRC PROBLEM" << endl;
+
+	shell_interaction_close();
+	if(ui != NULL)
+	    delete ui;
+    }
+    catch(...)
+    {
+	if(crc1 != NULL)
+	    delete crc1;
+	if(crc2 != NULL)
+	    delete crc2;
+	if(crc3 != NULL)
+	    delete crc3;
+	throw;
+    }
+    if(crc1 != NULL)
+	delete crc1;
+    if(crc2 != NULL)
+	delete crc2;
+    if(crc3 != NULL)
+	delete crc3;
 }

@@ -1,3 +1,9 @@
+version 2.4.3
+--------------
+Thanks to Jurgen Nagler-Ihlein for bug report. Thanks to Stefan J. Betz,
+Philippe Naudin, Vladimir Mosgalin and Andrea Vai for help in troubleshooting
+dar's memory usage.
+
 version 2.4.2
 --------------
 Thanks to Philippe Naudin for feedback and tests. Thanks to Jurgen Nagler-Ihlein
@@ -17,6 +23,11 @@ Thanks to Sony Electronics Inc. Thanks to T. Leske for his proposal of using
 libgcrypt and patch against 2.3.x versions. Thanks to Vladimir Mosgalin for
 feedback and testing on Solaris and several other Unix systems. Thanks again
 to Peter Landgren for Swedish translation.
+
+version 2.3.12
+--------------
+Thanks to Angela Kahealani for feedback.
+
 
 version 2.3.11
 --------------

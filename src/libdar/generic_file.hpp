@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.50 2011/04/17 16:36:36 edrusb Rel $
+// $Id: generic_file.hpp,v 1.50.2.3 2012/02/19 22:15:05 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -105,7 +105,7 @@ namespace libdar
     {
     public :
 	    /// main constructor
-        generic_file(gf_mode m) { rw = m; terminated = false; enable_crc(false); };
+        generic_file(gf_mode m) { rw = m; terminated = false; enable_crc(false); checksum = NULL; };
 
 	    /// copy constructor
 	generic_file(const generic_file &ref) { copy_from(ref); };
@@ -116,10 +116,10 @@ namespace libdar
 	    /// destructor-like call, except that it is allowed to throw exceptions
 	void terminate() const;
 
-	virtual ~generic_file() {};
+	virtual ~generic_file() { destroy(); };
 
 	    /// assignment operator
-	const generic_file & operator = (const generic_file & ref) { copy_from(ref); return *this; };
+	const generic_file & operator = (const generic_file & ref) { destroy(); copy_from(ref); return *this; };
 
 	    /// retreive the openning mode for this object
         gf_mode get_mode() const { return rw; };
@@ -169,7 +169,12 @@ namespace libdar
         virtual void copy_to(generic_file &ref);
 
 	    /// copy all data from the current position to the object in argument and computes a CRC value of the transmitted data
-        virtual void copy_to(generic_file &ref, crc & value);
+
+	    /// \param[in] ref defines where to copy the data to
+	    /// \param[in] crc_size tell the width of the crc to compute on the copied data
+	    /// \param[out] value points to a newly allocated crc object containing the crc value
+	    /// \note value has to be deleted by the caller when no more needed
+        virtual void copy_to(generic_file &ref, const infinint & crc_size, crc * & value);
 
 	    /// small copy (up to 4GB) with CRC calculation
         U_32 copy_to(generic_file &ref, U_32 size); // returns the number of byte effectively copied
@@ -180,11 +185,13 @@ namespace libdar
 	    /// compares the contents with the object in argument
 
 	    /// \param[in] f is the file to compare the current object with
-	    /// \param[in,out] value is the computed checksum, its value can be used for additional
+	    /// \param[in] crc_size is the width of the CRC to use for calculation
+	    /// \param[out] value is the computed checksum, its value can be used for additional
 	    /// testing if this method returns false (no difference between files). The given checksum
 	    /// has to be set to the expected width by the caller.
 	    /// \return true if arg differ from "this"
-        bool diff(generic_file & f, crc & value);
+	    /// \note value has to be deleted by the caller when no more needed
+        bool diff(generic_file & f, const infinint & crc_size, crc * & value);
 
             /// reset CRC on read or writen data
 
@@ -196,9 +203,10 @@ namespace libdar
 
 	    /// get CRC of the transfered date since last reset
 
-	    /// \note does also disable checksum calculation, which if needed again
+	    /// \return a newly allocated crc object, that the caller has the responsibility to delete
+	    /// \note does also ends checksum calculation, which if needed again
 	    /// have to be re-enabled calling reset_crc() method
-        void get_crc(crc & val) { enable_crc(false); val = checksum; };
+        crc *get_crc();
 
 	    /// write any pending data
 	void sync_write();
@@ -246,7 +254,7 @@ namespace libdar
 
     private :
         gf_mode rw;
-        crc checksum;
+        crc *checksum;
 	bool terminated;
         U_I (generic_file::* active_read)(char *a, U_I size);
         void (generic_file::* active_write)(const char *a, U_I size);
@@ -255,7 +263,7 @@ namespace libdar
 
         U_I read_crc(char *a, U_I size);
         void write_crc(const char *a, U_I size);
-
+	void destroy();
 	void copy_from(const generic_file & ref);
     };
 
@@ -293,6 +301,7 @@ namespace libdar
 	virtual bool is_an_old_start_end_archive() const = 0;
 
 	virtual const label & get_data_name() const = 0;
+
     private:
 	std::string status;
     };

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: etage.hpp,v 1.11 2009/12/18 10:10:21 edrusb Rel $
+// $Id: etage.hpp,v 1.11.2.1 2012/02/19 17:25:08 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -59,6 +59,10 @@ namespace libdar
 
         std::list<std::string> fichier;
         infinint last_mod, last_acc;
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(etage);
+#endif
     };
 
 } // end of namespace

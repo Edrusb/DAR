@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: real_infinint.hpp,v 1.26 2011/02/17 21:45:22 edrusb Rel $
+// $Id: real_infinint.hpp,v 1.26.2.2 2012/02/25 14:43:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -64,33 +64,33 @@ namespace libdar
 #if SIZEOF_OFF_T > SIZEOF_TIME_T
 #if SIZEOF_OFF_T > SIZEOF_SIZE_T
         infinint(off_t a = 0)
-	{ E_BEGIN infinint_from(a); E_END("infinint::infinint", "off_t") };
+	{ infinint_from(a); };
 #else
         infinint(size_t a = 0)
-	{ E_BEGIN infinint_from(a); E_END("infinint::infinint", "size_t") };
+	{ infinint_from(a); };
 #endif
 #else
 #if SIZEOF_TIME_T > SIZEOF_SIZE_T
         infinint(time_t a = 0)
-	{ E_BEGIN infinint_from(a); E_END("infinint::infinint", "time_t") };
+	{ infinint_from(a); };
 #else
         infinint(size_t a = 0)
-	{ E_BEGIN infinint_from(a); E_END("infinint::infinint", "size_t") };
+	{ infinint_from(a); };
 #endif
 #endif
 
         infinint(const infinint & ref)
-	{ E_BEGIN; copy_from(ref); E_END("infinint::infinint", "const infinint &"); }
+	{ copy_from(ref); }
 
 	    // read an infinint from a file
 	infinint(user_interaction & dialog, S_I fd);
 	infinint(generic_file & x);
 
         ~infinint()
-	{ E_BEGIN detruit(); E_END("infinint::~infinint","") };
+	{ detruit(); };
 
         const infinint & operator = (const infinint & ref)
-	{ E_BEGIN detruit(); copy_from(ref); return *this; E_END("infinint::operator =","") };
+	{ detruit(); copy_from(ref); return *this; };
 
         void dump(user_interaction & dialog, int fd) const; // write byte sequence to file
         void dump(generic_file &x) const; // write byte sequence to file
@@ -111,22 +111,22 @@ namespace libdar
         infinint & operator <<= (U_32 bit);
         infinint & operator <<= (infinint bit);
         infinint operator ++(int a)
-	{ E_BEGIN infinint ret = *this; ++(*this); return ret; E_END("infinint::operator ++", "int") };
+	{ infinint ret = *this; ++(*this); return ret; };
         infinint operator --(int a)
-	{ E_BEGIN infinint ret = *this; --(*this); return ret; E_END("infinint::operator --", "int") };
+	{ infinint ret = *this; --(*this); return ret; };
         infinint & operator ++()
-	{ E_BEGIN return *this += 1; E_END("infinint::operator ++", "()") };
+	{ return *this += 1; };
         infinint & operator --()
-	{ E_BEGIN return *this -= 1; E_END("infinint::operator --", "()") };
+	{ return *this -= 1; };
 
         U_32 operator % (U_32 arg) const
-	{ E_BEGIN return modulo(arg); E_END("infinint::operator %","") };
+	{ return modulo(arg); };
 
             // increment the argument up to a legal value for its storage type and decrement the object in consequence
             // note that the initial value of the argument is not ignored !
             // when the object is null the value of the argument is unchanged
         template <class T>void unstack(T &v)
-	{ E_BEGIN infinint_unstack_to(v); E_END("infinint::unstack", typeid(v).name()) }
+	{ infinint_unstack_to(v); }
 
 	infinint get_storage_size() const { return field->size(); };
 	    // it returns number of byte of information necessary to store the integer
@@ -144,6 +144,9 @@ namespace libdar
 
 	static bool is_system_big_endian();
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(infinint);
+#endif
     private :
         static const int TG = 4;
 
@@ -175,10 +178,8 @@ namespace libdar
 
 #define OPERATOR(OP) inline bool operator OP (const infinint &a, const infinint &b) \
     {									\
-	E_BEGIN								\
 	    return a.difference(b) OP 0;				\
-	E_END("operator OP", "infinint, infinint")			\
-	    }
+    }
 
     OPERATOR(<)
     OPERATOR(>)
@@ -204,26 +205,20 @@ namespace libdar
     void euclide(infinint a, const infinint &b, infinint &q, infinint &r);
     template <class T> inline void euclide(T a, T b, T & q, T &r)
     {
-        E_BEGIN
-	    q = a/b; r = a%b;
-        E_END("euclide", "")
-	    }
+	q = a/b; r = a%b;
+    }
 
     inline infinint & infinint::operator /= (const infinint & ref)
     {
-        E_BEGIN
-	    *this = *this / ref;
+	*this = *this / ref;
         return *this;
-        E_END("infinint::operator /=", "")
-	    }
+    }
 
     inline infinint & infinint::operator %= (const infinint & ref)
     {
-        E_BEGIN
-	    *this = *this % ref;
+	*this = *this % ref;
         return *this;
-        E_END("infinint::operator %=", "")
-	    }
+    }
 
 
 	/////////////////////////////////////////////////////
@@ -241,8 +236,7 @@ namespace libdar
 
     template <class T> T infinint::modulo(T arg) const
     {
-        E_BEGIN
-	    infinint tmp = *this % infinint(arg);
+	infinint tmp = *this % infinint(arg);
         T ret = 0;
         unsigned char *debut = (unsigned char *)(&ret);
         unsigned char *ptr = debut + sizeof(T) - 1;
@@ -268,13 +262,11 @@ namespace libdar
             int_tools_swap_bytes(debut, sizeof(T));
 
         return ret;
-        E_END("infinint::modulo", "")
     }
 
 
     template <class T> void infinint::infinint_from(T a)
     {
-        E_BEGIN
         U_I size = sizeof(a);
         S_I direction = +1;
         unsigned char *ptr, *fin;
@@ -323,8 +315,6 @@ namespace libdar
         }
         else
             throw Ememory("template infinint::infinint_from");
-
-        E_END("infinint::infinint_from", "")
     }
 
     template <class T> T infinint::max_val_of(T x)
@@ -344,7 +334,6 @@ namespace libdar
 
     template <class T> void infinint::infinint_unstack_to(T &a)
     {
-        E_BEGIN;
 	    // T is supposed to be an unsigned "integer"
 	    // (ie.: sizeof() returns the width of the storage bit field  and no sign bit is present)
 	    // Note : static here avoids the recalculation of max_T at each call
@@ -375,7 +364,6 @@ namespace libdar
             *this -= step;
             a = max_T;
         }
-        E_END("infinint::infinint_unstack_to", "")
     }
 
 } // end of namespace

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: escape_catalogue.hpp,v 1.14.2.1 2011/07/24 10:46:49 edrusb Rel $
+// $Id: escape_catalogue.hpp,v 1.14.2.2 2012/02/19 22:15:05 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -82,10 +82,6 @@ namespace libdar
 	bool read_if_present(std::string *name, const nomme * & ref) const;
 	void tail_catalogue_to_current_read();
 	bool read_second_time_dir() const { return status == ec_detruits; };
-
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(escape_catalogue);
-#endif
 
     private:
 	enum state

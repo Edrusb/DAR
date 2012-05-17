@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: compile_time_features.hpp,v 1.1 2011/01/16 11:35:51 edrusb Rel $
+// $Id: compile_time_features.hpp,v 1.1.2.1 2012/01/12 20:20:47 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -87,7 +87,6 @@ namespace libdar
 	    /// returns whether libdar can support furtive read mode when run by privileged user
 	bool furtive_read();
 
-
 	    /// type used to return the endian nature of the current system
 	enum endian
 	{
@@ -98,6 +97,10 @@ namespace libdar
 
 	    /// returns the detected integer endian of the system
 	endian system_endian();
+
+
+	    /// returns whether libdar has been built with speed optimization for last directory
+	bool fast_dir();
     }
 
 } // end of namespace

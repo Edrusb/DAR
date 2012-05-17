@@ -22,7 +22,7 @@ mkdir "$SUB2"
 cd "$SUB2"
 ln -s "../$SUB1"/hard_linked_inode.txt symlink.txt
 ln symlink.txt hard_to_symlink.txt
-dd bs=4096 seek=10 count=1 if=/dev/zero of=sparse.txt >& /dev/null
+dd bs=4096 seek=10 count=1 if=/dev/zero of=sparse.txt 1> /dev/null 2> /dev/null
 echo "some chars in the middle of holes" >> sparse.txt
 dd bs=4096 conv=notrunc if=/dev/zero  count=10 >> sparse.txt 2> /dev/null
 cp sparse.txt sparse2.txt

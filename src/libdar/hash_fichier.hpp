@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: hash_fichier.hpp,v 1.7 2011/04/17 13:12:29 edrusb Rel $
+// $Id: hash_fichier.hpp,v 1.7.2.1 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -103,6 +103,10 @@ namespace libdar
         bool skip_to_eof() { throw SRC_BUG; };
         bool skip_relative(S_I x) { if(x != 0) throw SRC_BUG; else return true; };
 	    // no need to overwrite the get_position() method
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(hash_fichier);
+#endif
 
     protected:
 	U_I inherited_read(char *a, U_I size) { throw SRC_BUG; };

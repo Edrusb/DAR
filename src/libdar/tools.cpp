@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tools.cpp,v 1.102 2011/05/20 10:23:07 edrusb Rel $
+// $Id: tools.cpp,v 1.102.2.2 2012/01/12 20:20:47 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -128,6 +128,8 @@ extern "C"
 #include "user_group_bases.hpp"
 #endif
 #include "compile_time_features.hpp"
+
+#define YES_NO(x) (x ? gettext("YES") : gettext("NO"))
 
 using namespace std;
 
@@ -290,7 +292,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.102 2011/05/20 10:23:07 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.102.2.2 2012/01/12 20:20:47 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -984,8 +986,6 @@ namespace libdar
                                 bool libz, bool libbz2, bool liblzo2, bool libcrypto,
 				bool furtive_read)
     {
-#define YES_NO(x) (x ? gettext("YES") : gettext("NO"))
-
 	NLS_SWAP_IN;
 	try
 	{
@@ -1044,6 +1044,7 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 	dialog.printf(gettext("   Detected system/CPU endian : %s"), endy);
+	dialog.printf(gettext("   Large dir. speed optimi.   : %s"), YES_NO(compile_time::fast_dir()));
     }
 
     bool tools_is_equal_with_hourshift(const infinint & hourshift, const infinint & date1, const infinint & date2)
@@ -2173,17 +2174,17 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    delete group;
+		    delete [] group;
 		    throw;
 		}
-		delete group;
+		delete [] group;
 	    }
 	    catch(...)
 	    {
-		delete user;
+		delete [] user;
 		throw;
 	    }
-	    delete user;
+	    delete [] user;
 	}
 	catch(...)
 	{

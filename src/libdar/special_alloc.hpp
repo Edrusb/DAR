@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: special_alloc.hpp,v 1.11 2011/01/09 17:25:58 edrusb Rel $
+// $Id: special_alloc.hpp,v 1.11.2.2 2012/02/25 14:43:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -37,6 +37,7 @@
 #define SPECIAL_ALLOC_HPP
 
 #include "../my_config.h"
+#include <iostream>
 
 #ifdef LIBDAR_SPECIAL_ALLOC
 
@@ -65,12 +66,17 @@ namespace libdar
 	// this following call is to be used in a
 	// multi-thread environment and is called from
 	// libdar global initialization function
-	// this makes the libdar thread-safe if POSIX mutex
+	// this makes libdar thread-safe if POSIX mutex
 	// are available
     extern void special_alloc_init_for_thread_safe();
 
     extern void *special_alloc_new(size_t taille);
     extern void special_alloc_delete(void *ptr);
+
+	// this should be called for sanity and control purposes just before ending the program,
+	// it will report any block still not yet released
+    extern void special_alloc_garbage_collect(std::ostream & output);
+
 
 } // end of namespace
 

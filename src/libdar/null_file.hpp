@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: null_file.hpp,v 1.21 2011/04/17 13:12:29 edrusb Rel $
+// $Id: null_file.hpp,v 1.21.2.1 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -59,6 +59,9 @@ namespace libdar
         bool skip_relative(signed int x) { return false; };
         infinint get_position() { return 0; };
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(null_file);
+#endif
     protected :
         U_I inherited_read(char *a, U_I size)
 	{

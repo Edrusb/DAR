@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database.hpp,v 1.14 2011/01/09 17:25:58 edrusb Rel $
+// $Id: database.hpp,v 1.14.2.2 2011/12/28 18:07:06 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -189,7 +189,10 @@ namespace libdar
 
 	    if(files == NULL)
 		throw SRC_BUG;
-	    return files->check_order(dialog, ".", initial_warn) && initial_warn;
+	    if(check_order_asked)
+		return files->check_order(dialog, ".", initial_warn) && initial_warn;
+	    else
+		return true;
 	}
 
 
@@ -200,6 +203,7 @@ namespace libdar
 	{
 	    std::string chemin;      //< path to the archive
 	    std::string basename;    //< basename of the archive
+	    infinint root_last_mod;  //< last modification date of the root directory
 	};
 
 	std::vector<struct archive_data> coordinate; //< list of archive used to build the database
@@ -207,9 +211,12 @@ namespace libdar
 	std::string dar_path;                        //< path to dar
 	data_dir *files;                             //< structure containing files and they status in the set of archive used for that database
 	storage *data_files;                         //< when reading archive in partial mode, this is where is located the "not readed" part of the archive
+	bool check_order_asked;                      //< whether order check has been asked
 
 	void build(user_interaction & dialog, generic_file & f, bool partial, unsigned char db_version);  //< used by constructors
 	archive_num get_real_archive_num(archive_num num, bool revert) const;
+
+	const infinint & get_root_last_mod(const archive_num & num) const;
     };
 
 } // end of namespace

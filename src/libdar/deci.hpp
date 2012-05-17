@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: deci.hpp,v 1.12 2011/01/09 17:25:58 edrusb Rel $
+// $Id: deci.hpp,v 1.12.2.2 2012/02/25 14:43:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -60,21 +60,25 @@ namespace libdar
 
 	    /// copy constructor
         deci(const deci & ref)
-            { E_BEGIN; copy_from(ref); E_END("deci::deci", "deci"); };
+            { copy_from(ref); };
 
 	    /// destructor
         ~deci()
-            { E_BEGIN; detruit(); E_END("deci::~deci", ""); };
+            { detruit(); };
 
 
 	    /// copy operator
         const deci & operator = (const deci & ref)
-            { E_BEGIN; detruit(); copy_from(ref); return *this; E_END("deci::operator = ", ""); };
+            { detruit(); copy_from(ref); return *this; };
 
 	    /// this produce a infinint from the decimal stored in the current object
         infinint computer() const;
 	    /// this produce a string fromr the decimal stored in the current object
         std::string human() const;
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(deci);
+#endif
 
     private :
         storage *decimales;

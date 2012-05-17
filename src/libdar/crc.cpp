@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: crc.cpp,v 1.12 2011/06/02 13:17:37 edrusb Rel $
+// $Id: crc.cpp,v 1.12.2.1 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -133,7 +133,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: crc.cpp,v 1.12 2011/06/02 13:17:37 edrusb Rel $";
+        static char id[]="$Id: crc.cpp,v 1.12.2.1 2012/02/12 20:43:34 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -192,256 +192,293 @@ namespace libdar
     }
 
 	/////////////////////////////////////////////
-	// Class implementation follows
+	// Class CRC_I implementation follows
 	//
 
-    crc::crc(U_I width) : i_cyclic(1)
+
+    crc_i::crc_i(const infinint & width) : size(width), cyclic(width)
     {
 	if(width == 0)
 	    throw Erange("crc::crc", gettext("Invalid size for CRC width"));
-	infinint_mode = true; // to be able to use resive_non_infinint()
-	i_size = 0;
-	resize_non_infinint(width);
+	clear();
     }
 
-    crc::crc(const infinint & width) : i_cyclic(1)
+    crc_i::crc_i(const infinint & width, generic_file & f) : size(width), cyclic(f, width)
     {
-	if(width == 0)
-	    throw Erange("crc::crc", gettext("Invalid size for CRC width"));
-	infinint_mode = true;
-	i_size = 0;
-	resize(width);
+	pointer = cyclic.begin();
     }
 
-    bool crc::operator == (const crc & ref) const
+    bool crc_i::operator == (const crc & ref) const
     {
-	if(infinint_mode != ref.infinint_mode)
+	const crc_i *ref_i = dynamic_cast<const crc_i *>(&ref);
+	if(ref_i == NULL)
+	    throw SRC_BUG;
+
+	if(size != ref_i->size)
 	    return false;
-	if(infinint_mode)
-	{
-	    if(i_size != ref.i_size)
-		return false;
-	    else // same size
-		return T_compare(i_cyclic.begin(), i_cyclic.end(), ref.i_cyclic.begin(), ref.i_cyclic.end());
-	}
-	else // not infinint mode
-	{
-	    if(n_size != ref.n_size)
-		return false;
-	    else // same size
-		return T_compare(n_cyclic, n_cyclic + n_size, ref.n_cyclic, ref.n_cyclic + ref.n_size);
-	}
+	else // same size
+	    return T_compare(cyclic.begin(), cyclic.end(), ref_i->cyclic.begin(), ref_i->cyclic.end());
     }
 
-    void crc::compute(const infinint & offset, const char *buffer, U_I length)
+    void crc_i::compute(const infinint & offset, const char *buffer, U_I length)
     {
-	infinint tmp = offset % (infinint_mode ? i_size : n_size);
+	infinint tmp = offset % size;
 
 	    // first we skip the cyclic at the correct position
 
-	if(infinint_mode)
-	    i_pointer.skip_to(i_cyclic, tmp);
-	else
-	{
-	    U_I s_offset = 0;
-
-	    tmp.unstack(s_offset);
-	    if(tmp != 0)
-		throw SRC_BUG; // tmp does not fit in a U_I variable !
-	    n_pointer = n_cyclic + s_offset;
-	}
+	pointer.skip_to(cyclic, tmp);
 
 	    // now we can compute the CRC
 
 	compute(buffer, length);
     }
 
-    void crc::compute(const char *buffer, U_I length)
+    void crc_i::compute(const char *buffer, U_I length)
     {
-	if(infinint_mode)
-	    T_compute(buffer, length, i_cyclic.begin(), i_pointer, i_cyclic.end());
-	else
-	    n_compute(buffer, length, n_cyclic, n_pointer, n_cyclic + n_size, n_size);
+	T_compute(buffer, length, cyclic.begin(), pointer, cyclic.end());
     }
 
-    void crc::clear()
+    void crc_i::clear()
     {
-	if(infinint_mode)
-	{
-	    i_cyclic.clear();
-	    i_pointer = i_cyclic.begin();
-	}
-	else
-	{
-	    memset(n_cyclic, 0, n_size);
-	    n_pointer = n_cyclic;
-	}
+	cyclic.clear();
+	pointer = cyclic.begin();
     }
 
-    void crc::dump(generic_file & f) const
+    void crc_i::dump(generic_file & f) const
     {
-	if(infinint_mode)
-	{
-	    i_size.dump(f);
-	    i_cyclic.dump(f);
-	}
-	else
-	{
-	    infinint tmp = n_size;
-	    tmp.dump(f);
-	    f.write((const char *)n_cyclic, n_size);
-	}
+	size.dump(f);
+	cyclic.dump(f);
     }
 
-    void crc::read(generic_file & f)
+    string crc_i::crc2str() const
     {
+	return T_crc2str(cyclic.begin(), cyclic.end());
+    }
+
+    void crc_i::copy_from(const crc_i & ref)
+    {
+	if(size != ref.size)
+	{
+	    size = ref.size;
+	    cyclic = ref.cyclic;
+	}
+	else
+	    copy_data_from(ref);
+	pointer = cyclic.begin();
+    }
+
+    void crc_i::copy_data_from(const crc_i & ref)
+    {
+	if(ref.size == size)
+	{
+	    storage::iterator ref_it = ref.cyclic.begin();
+	    storage::iterator it = cyclic.begin();
+
+	    while(ref_it != ref.cyclic.end() && it != cyclic.end())
+	    {
+		*it = *ref_it;
+		++it;
+		++ref_it;
+	    }
+	    if(ref_it != ref.cyclic.end() || it != cyclic.end())
+		throw SRC_BUG;
+	}
+	else
+	    throw SRC_BUG;
+    }
+
+
+	/////////////////////////////////////////////
+	// Class CRC_N implementation follows
+	//
+
+
+    crc_n::crc_n(U_I width)
+    {
+	pointer = NULL;
+	cyclic = NULL;
 	try
 	{
-	    i_size.read(f);
-	    resize(i_size);
-
-	    if(infinint_mode)
-	    {
-		i_cyclic = storage(f, i_size);
-		i_pointer = i_cyclic.begin();
-	    }
-	    else
-	    {
-		f.read((char*)n_cyclic, n_size);
-		n_pointer = n_cyclic;
-	    }
+	    if(width == 0)
+		throw Erange("crc::crc", gettext("Invalid size for CRC width"));
+	    alloc(width);
+	    clear();
 	}
 	catch(...)
 	{
-	    resize(1);
+	    destroy();
 	    throw;
 	}
     }
 
-    void crc::old_read(generic_file & f)
+    crc_n::crc_n(U_I width, generic_file & f)
     {
-	char buffer[OLD_CRC_SIZE];
-
-	if(f.read(buffer, OLD_CRC_SIZE) < (S_I)OLD_CRC_SIZE)
-	    throw Erange("crc::read", gettext("Reached End of File while reading CRC data"));
-
-	resize(OLD_CRC_SIZE);
-	if(infinint_mode)
-	    T_old_read(i_pointer, i_cyclic.begin(), i_cyclic.end(), buffer, OLD_CRC_SIZE);
-	else
-	    T_old_read(n_pointer, n_cyclic, n_cyclic + n_size, buffer, OLD_CRC_SIZE);
+	pointer = NULL;
+	cyclic = NULL;
+	try
+	{
+	    alloc(width);
+	    f.read((char*)cyclic, size);
+	}
+	catch(...)
+	{
+	    destroy();
+	    throw;
+	}
     }
 
-    string crc::crc2str() const
+    const crc_n & crc_n::operator = (const crc_n & ref)
     {
-	if(infinint_mode)
-	    return T_crc2str(i_cyclic.begin(), i_cyclic.end());
+	if(size != ref.size)
+	{
+	    destroy();
+	    copy_from(ref);
+	}
 	else
-	    return T_crc2str(n_cyclic, n_cyclic + n_size);
+	    copy_data_from(ref);
+
+	return *this;
     }
 
-    void crc::resize(const infinint & width)
+    bool crc_n::operator == (const crc & ref) const
     {
-	if(width == 0)
-	    throw Erange("crc::crc", gettext("Invalid size for CRC width"));
-	if(width == (infinint_mode ? i_size : n_size))
-	    clear();
+	const crc_n *ref_n = dynamic_cast<const crc_n *>(&ref);
+	if(ref_n == NULL)
+	    throw SRC_BUG;
+
+	if(size != ref_n->size)
+	    return false;
+	else // same size
+	    return T_compare(cyclic, cyclic + size, ref_n->cyclic, ref_n->cyclic + ref_n->size);
+    }
+
+    void crc_n::compute(const infinint & offset, const char *buffer, U_I length)
+    {
+	infinint tmp = offset % size;
+	U_I s_offset = 0;
+
+	    // first we skip the cyclic at the correct position
+
+	tmp.unstack(s_offset);
+	if(tmp != 0)
+	    throw SRC_BUG; // tmp does not fit in a U_I variable !
+	pointer = cyclic + s_offset;
+
+	    // now we can compute the CRC
+
+	compute(buffer, length);
+    }
+
+    void crc_n::compute(const char *buffer, U_I length)
+    {
+	n_compute(buffer, length, cyclic, pointer, cyclic + size, size);
+    }
+
+    void crc_n::clear()
+    {
+	memset(cyclic, 0, size);
+	pointer = cyclic;
+    }
+
+    void crc_n::dump(generic_file & f) const
+    {
+	infinint tmp = size;
+	tmp.dump(f);
+	f.write((const char *)cyclic, size);
+    }
+
+
+    string crc_n::crc2str() const
+    {
+	return T_crc2str(cyclic, cyclic + size);
+    }
+
+    void crc_n::alloc(U_I width)
+    {
+	size = width;
+	cyclic = new unsigned char[size];
+	if(cyclic == NULL)
+	    throw Ememory("crc::copy_from");
+	pointer = cyclic;
+    }
+
+    void crc_n::copy_from(const crc_n & ref)
+    {
+	alloc(ref.size);
+	copy_data_from(ref);
+    }
+
+    void crc_n::copy_data_from(const crc_n & ref)
+    {
+	if(size != ref.size)
+	    throw SRC_BUG;
+	(void)memcpy(cyclic, ref.cyclic, size);
+	pointer = cyclic;
+    }
+
+    void crc_n::destroy()
+    {
+	if(cyclic != NULL)
+	{
+	    delete [] cyclic;
+	    cyclic = NULL;
+	}
+	size = 0;
+	pointer = NULL;
+    }
+
+	/////////////////////////////////////////////
+	// exported routines implementation
+	//
+
+    crc *create_crc_from_file(generic_file & f, bool old)
+    {
+	crc *ret = NULL;
+	if(old)
+	    ret = new crc_n(crc::OLD_CRC_SIZE, f);
 	else
 	{
-	    if(width > INFININT_MODE_START)
-		resize_infinint(width);
+	    infinint taille = f; // reading the crc size
+
+	    if(taille < INFININT_MODE_START)
+	    {
+		U_I s = 0;
+		taille.unstack(s);
+		if(taille > 0)
+		    throw SRC_BUG;
+		ret = new crc_n(s, f);
+	    }
 	    else
-	    {
-		infinint tmp = width;
-		U_I n_tmp = 0;
-		tmp.unstack(n_tmp);
-		if(tmp > 0)
-		    SRC_BUG; // INFININT_MODE_START not possible to be held in a U_I variable
-		resize_non_infinint(n_tmp);
-	    }
+		ret = new crc_i(taille, f);
 	}
+
+	if(ret == NULL)
+	    throw Ememory("create_crc_from_file");
+
+	return ret;
     }
 
-    void crc::resize_infinint(const infinint & width)
+    crc *create_crc_from_size(infinint width)
     {
-	destroy();
-	infinint_mode = true;
-	i_size = width;
-	i_cyclic = storage(width);
-	i_cyclic.clear();
-	i_pointer = i_cyclic.begin();
-    }
+	crc *ret = NULL;
 
-    void crc::resize_non_infinint(U_I width)
-    {
-	destroy();
-	infinint_mode = false;
-	n_size = width;
-	n_cyclic = new unsigned char[n_size];
-	if(n_cyclic == NULL)
-	    throw Ememory("crc::resize");
-	n_pointer = n_cyclic;
-	(void)memset(n_cyclic, 0, n_size);
-    }
-
-    void crc::set_crc_pointer(crc * & dst, const crc * src)
-    {
-	if(src == NULL)
+	if(width < INFININT_MODE_START)
 	{
-	    if(dst != NULL)
-	    {
-		delete dst;
-		dst = NULL;
-	    }
-	}
-	else // src != NULL
-	{
-	    if(dst == NULL)
-	    {
-		dst = new crc(*src);
-		if(dst == NULL)
-		    throw Ememory("crc::set_crc_pointer");
-	    }
-	    else
-		*dst = *src;
-	}
-    }
+	    U_I s = 0;
+	    width.unstack(s);
+	    if(width > 0)
+		throw SRC_BUG;
 
-    void crc::copy_from(const crc & ref)
-    {
-	infinint_mode = ref.infinint_mode;
-
-	if(infinint_mode)
-	{
-	    i_size = ref.i_size;
-	    i_cyclic = ref.i_cyclic;
-	    i_pointer = i_cyclic.begin();
+	    ret = new crc_n(s);
 	}
 	else
-	{
-	    n_size = ref.n_size;
-	    n_cyclic = new unsigned char[n_size];
-	    if(n_cyclic == NULL)
-		throw Ememory("crc::copy_from");
-	    n_pointer = n_cyclic;
-	    (void)memcpy(n_cyclic, ref.n_cyclic, n_size);
-	}
-    }
+	    ret = new crc_i(width);
 
-    void crc::destroy()
-    {
-	if(!infinint_mode)
-	{
-	    if(n_cyclic != NULL)
-	    {
-		delete [] n_cyclic;
-		n_cyclic = NULL;
-	    }
-	    n_size = 0;
-	    n_pointer = NULL;
-	}
-    }
+	if(ret == NULL)
+	    throw Ememory("create_crc_from_size");
 
+	return ret;
+    }
 
 } // end of namespace
 

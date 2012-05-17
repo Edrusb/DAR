@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tlv.cpp,v 1.4 2011/06/02 13:17:37 edrusb Rel $
+// $Id: tlv.cpp,v 1.4.2.2 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -63,6 +63,11 @@ namespace libdar
 
     void tlv::set_contents(const memory_file & contents)
     {
+	if(value != NULL)
+	{
+	    delete value;
+	    value = NULL;
+	}
 	value = new storage(contents.get_raw_data());
 	if(value == NULL)
 	    throw Ememory("tlv::set_contents");
@@ -78,7 +83,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tlv.cpp,v 1.4 2011/06/02 13:17:37 edrusb Rel $";
+        static char id[]="$Id: tlv.cpp,v 1.4.2.2 2012/02/19 17:25:09 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -94,6 +99,19 @@ namespace libdar
 	    value = new storage(f, length);
 	    if(value == NULL)
 		throw Ememory("tlv::init");
+	}
+	else
+	    value = NULL;
+    }
+
+    void tlv::copy_from(const tlv & ref)
+    {
+	type = ref.type;
+	if(ref.value != NULL)
+	{
+	    value = new storage(*(ref.value));
+	    if(value == NULL)
+		throw Ememory("tlv::copy_from");
 	}
 	else
 	    value = NULL;

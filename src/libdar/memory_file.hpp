@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: memory_file.hpp,v 1.12 2011/06/02 13:28:46 edrusb Rel $
+// $Id: memory_file.hpp,v 1.12.2.1 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -68,6 +68,10 @@ namespace libdar
 	    /// return the raw data
 	const storage & get_raw_data() const { if(is_terminated()) throw SRC_BUG; return data; };
 	void set_raw_data(const storage & val) { if(is_terminated()) throw SRC_BUG; data = val; position = 0; };
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(memory_file);
+#endif
 
     protected:
 	U_I inherited_read(char *a, U_I size);

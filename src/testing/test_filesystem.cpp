@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.37 2011/03/06 20:01:50 edrusb Rel $
+// $Id: test_filesystem.cpp,v 1.37.2.1 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -170,11 +170,23 @@ static void test()
 
             try
             {
-                crc val;
+                crc *val = NULL;
+		infinint crc_size = 1;
 
                 fichier sortie = fichier(*ui, dup(1));
-                entree->copy_to(sortie, val);
-                f->set_crc(val);
+                entree->copy_to(sortie, crc_size, val);
+		if(val == NULL)
+		    throw SRC_BUG;
+		try
+		{
+		    f->set_crc(*val);
+		}
+		catch(...)
+		{
+		    delete val;
+		    throw;
+		}
+		delete val;
             }
             catch(...)
             {

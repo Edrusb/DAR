@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: crc.hpp,v 1.8 2011/02/11 20:23:42 edrusb Rel $
+// $Id: crc.hpp,v 1.8.2.2 2012/02/19 17:25:08 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -49,45 +49,95 @@ namespace libdar
     public:
 	static const U_I OLD_CRC_SIZE = 2;
 
-	crc(U_I width = 1);
-	crc(const infinint & width);
-	crc(const crc & ref) : i_cyclic(1) { copy_from(ref); };
-	const crc & operator = (const crc & ref) { destroy(); copy_from(ref); return *this; };
-	~crc() { destroy(); };
+	virtual ~crc() {};
+
+	virtual bool operator == (const crc & ref) const = 0;
+	bool operator != (const crc & ref) const { return ! (*this == ref); };
+
+	virtual void compute(const infinint & offset, const char *buffer, U_I length) = 0;
+	virtual void compute(const char *buffer, U_I length) = 0; // for sequential read only
+	virtual void clear() = 0;
+	virtual void dump(generic_file & f) const = 0;
+	virtual std::string crc2str() const = 0;
+	virtual infinint get_size() const = 0;
+	virtual crc *clone() const = 0;
+    };
+
+    extern crc *create_crc_from_file(generic_file & f, bool old = false);
+    extern crc *create_crc_from_size(infinint width);
+
+    class crc_i : public crc
+    {
+    public:
+	crc_i(const infinint & width);
+	crc_i(const infinint & width, generic_file & f);
+	crc_i(const crc_i & ref) : size(ref.size), cyclic(ref.size) { copy_data_from(ref); pointer = cyclic.begin(); };
+	const crc_i & operator = (const crc_i & ref) { copy_from(ref); return *this; };
 
 	bool operator == (const crc & ref) const;
-	bool operator != (const crc & ref) const { return ! (*this == ref); };
 
 	void compute(const infinint & offset, const char *buffer, U_I length);
 	void compute(const char *buffer, U_I length); // for sequential read only
 	void clear();
 	void dump(generic_file & f) const;
-	void read(generic_file & f);
-	void old_read(generic_file & f);
 	std::string crc2str() const;
-	void resize(const infinint & width);
-	void resize(U_I width) { resize_non_infinint(width); };
-	void resize_based_on(const crc & ref) { resize(ref.get_size()); };
-	infinint get_size() const { return infinint_mode ? i_size : n_size; };
+	infinint get_size() const { return size; };
 
-	static void set_crc_pointer(crc * & dst, const crc *src);
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(crc_i);
+#endif
+
+
+    protected:
+	crc *clone() const { return new crc_i(*this); };
 
     private:
 
-	bool infinint_mode;                           //< true for infinint mode
-                                                      // ---
-	infinint i_size;                              //< size of the checksum (infinint mode)
-	storage::iterator i_pointer;                  //< points to the next byte to modify (infinint mode)
-	storage i_cyclic;                             //< the checksum storage (infinint mode)
-	                                              // ---
-	U_I n_size;                                   //< size of checksum (non infinint mode)
-	unsigned char *n_pointer;                     //< points to the next byte to modify (non infinint mode)
-	unsigned char *n_cyclic;                      //< the checksum storage (non infinint mode)
+	infinint size;                              //< size of the checksum
+	storage::iterator pointer;                  //< points to the next byte to modify
+	storage cyclic;                             //< the checksum storage
 
-	void copy_from(const crc & ref);
+	void copy_from(const crc_i & ref);
+	void copy_data_from(const crc_i & ref);
+    };
+
+
+    class crc_n : public crc
+    {
+    public:
+
+	crc_n(U_I width);
+	crc_n(U_I width, generic_file & f);
+	crc_n(const crc_n & ref) { copy_from(ref); };
+	const crc_n & operator = (const crc_n & ref);
+	~crc_n() { destroy(); };
+
+	bool operator == (const crc & ref) const;
+
+	void compute(const infinint & offset, const char *buffer, U_I length);
+	void compute(const char *buffer, U_I length); // for sequential read only
+	void clear();
+	void dump(generic_file & f) const;
+	std::string crc2str() const;
+	infinint get_size() const { return size; };
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(crc_n);
+#endif
+
+    protected:
+	crc *clone() const { return new crc_n(*this); };
+
+    private:
+
+	U_I size;                                   //< size of checksum (non infinint mode)
+	unsigned char *pointer;                     //< points to the next byte to modify (non infinint mode)
+	unsigned char *cyclic;                      //< the checksum storage (non infinint mode)
+
+	void alloc(U_I width);
+	void copy_from(const crc_n & ref);
+	void copy_data_from(const crc_n & ref);
 	void destroy();
-	void resize_infinint(const infinint & width);
-	void resize_non_infinint(U_I width);
     };
 
 

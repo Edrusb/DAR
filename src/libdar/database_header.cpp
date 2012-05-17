@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database_header.cpp,v 1.7 2010/08/27 20:44:24 edrusb Rel $
+// $Id: database_header.cpp,v 1.7.2.1 2011/12/28 18:07:06 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -65,7 +65,7 @@ using namespace std;
 namespace libdar
 {
 
-    static const unsigned char database_version = 2;
+    static const unsigned char database_version = 3;
 
 #define HEADER_OPTION_NONE 0x00
 
@@ -163,6 +163,6 @@ namespace libdar
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: database_header.cpp,v 1.7 2010/08/27 20:44:24 edrusb Rel $";
+    static char id[]="$Id: database_header.cpp,v 1.7.2.1 2011/12/28 18:07:06 edrusb Exp $";
     dummy_call(id);
 }

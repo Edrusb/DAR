@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: label.hpp,v 1.6 2011/04/17 16:36:36 edrusb Rel $
+// $Id: label.hpp,v 1.6.2.1 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -69,6 +69,9 @@ namespace libdar
 
 	static U_I common_size() { return LABEL_SIZE; };
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(label);
+#endif
     private:
 	static const U_I LABEL_SIZE = 10;
 

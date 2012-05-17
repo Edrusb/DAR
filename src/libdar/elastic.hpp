@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: elastic.hpp,v 1.9 2011/01/09 17:25:58 edrusb Rel $
+// $Id: elastic.hpp,v 1.9.2.1 2012/02/19 17:25:08 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -64,6 +64,10 @@ namespace libdar
 	U_32 get_size() const { return taille; };
 
 	static U_I max_length() { return (U_I)(254)*254*254*254 - 1; };
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(elastic);
+#endif
 
     private:
 	U_32 taille; // max size of elastic buffer is 4GB which is large enough

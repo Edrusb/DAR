@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.113.2.2 2011/06/20 14:02:03 edrusb Exp $
+// $Id: filtre.cpp,v 1.113.2.4 2012/02/19 17:25:08 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -477,8 +477,8 @@ namespace libdar
 			   const mask & backup_hook_file_mask,
 			   bool ignore_unknown)
     {
-        entree *e;
-        const entree *f;
+        entree *e = NULL;
+        const entree *f = NULL;
         defile juillet = fs_racine;
         const eod tmp_eod;
 	compressor *stockage;
@@ -510,119 +510,123 @@ namespace libdar
 
 	try
 	{
-	    while(fs.read(e, fs_errors, skipped_dump))
+	    try
 	    {
-		nomme *nom = dynamic_cast<nomme *>(e);
-		directory *dir = dynamic_cast<directory *>(e);
-		inode *e_ino = dynamic_cast<inode *>(e);
-		file *e_file = dynamic_cast<file *>(e);
-		mirage *e_mir = dynamic_cast<mirage *>(e);
-		bool known_hard_link = false;
-
-		st.add_to_ignored(skipped_dump);
-		st.add_to_errored(fs_errors);
-
-		juillet.enfile(e);
-		thr_cancel.check_self_cancellation();
-
-		if(e_mir != NULL)
+		while(fs.read(e, fs_errors, skipped_dump))
 		{
-		    known_hard_link = e_mir->is_inode_wrote();
-		    if(!known_hard_link)
-		    {
-			e_ino = dynamic_cast<inode *>(e_mir->get_inode());
-			e_file = dynamic_cast<file *>(e_mir->get_inode());
-		    }
-		}
+		    nomme *nom = dynamic_cast<nomme *>(e);
+		    directory *dir = dynamic_cast<directory *>(e);
+		    inode *e_ino = dynamic_cast<inode *>(e);
+		    file *e_file = dynamic_cast<file *>(e);
+		    mirage *e_mir = dynamic_cast<mirage *>(e);
+		    bool known_hard_link = false;
 
-		if(nom != NULL)
-		{
-		    try
+		    st.add_to_ignored(skipped_dump);
+		    st.add_to_errored(fs_errors);
+
+		    juillet.enfile(e);
+		    thr_cancel.check_self_cancellation();
+
+		    if(e_mir != NULL)
 		    {
-			if(subtree.is_covered(juillet.get_path())
-			   && (dir != NULL || filtre.is_covered(nom->get_name()))
-			   && (! same_fs || e_ino == NULL || e_ino->get_device() == root_fs_device))
+			known_hard_link = e_mir->is_inode_wrote();
+			if(!known_hard_link)
 			{
-			    if(known_hard_link)
+			    e_ino = dynamic_cast<inode *>(e_mir->get_inode());
+			    e_file = dynamic_cast<file *>(e_mir->get_inode());
+			}
+		    }
+
+		    if(nom != NULL)
+		    {
+			try
+			{
+			    if(subtree.is_covered(juillet.get_path())
+			       && (dir != NULL || filtre.is_covered(nom->get_name()))
+			       && (! same_fs || e_ino == NULL || e_ino->get_device() == root_fs_device))
 			    {
-				    // no need to update the semaphore here as no data is read and no directory is expected here
-				cat.pre_add(e, stockage); // if cat is a escape_catalogue, this adds an escape sequence and entry info in the archive
-				cat.add(e);
-				st.incr_hard_links();
-				if(e_mir != NULL)
+				if(known_hard_link)
 				{
-				    if(e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == inode::ea_full)
-					if(info_details)
-					    dialog.warning(string(gettext("Recording hard link into the archive: "))+juillet.get_string());
+					// no need to update the semaphore here as no data is read and no directory is expected here
+				    cat.pre_add(e, stockage); // if cat is a escape_catalogue, this adds an escape sequence and entry info in the archive
+				    cat.add(e);
+				    e = NULL;
+				    st.incr_hard_links();
+				    if(e_mir != NULL)
+				    {
+					if(e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == inode::ea_full)
+					    if(info_details)
+						dialog.warning(string(gettext("Recording hard link into the archive: "))+juillet.get_string());
+				    }
+				    else
+					throw SRC_BUG; // known_hard_link is true and e_mir == NULL !???
 				}
 				else
-				    throw SRC_BUG; // known_hard_link is true and e_mir == NULL !???
-			    }
-			    else
-			    {
-				const inode *f_ino = NULL;
-				const file *f_file = NULL;
-				const mirage *f_mir = NULL;
-
-				if(e_ino == NULL)
-				    throw SRC_BUG; // if not a known hard link, e_ino should still either point to a real inode
-				    // or to the hard linked new inode.
-
-				if(fixed_date == 0)
 				{
-				    bool conflict = ref.compare(e, f);
+				    const inode *f_ino = NULL;
+				    const file *f_file = NULL;
+				    const mirage *f_mir = NULL;
 
-				    if(!conflict)
-				    {
-					f = NULL;
-					f_ino = NULL;
-					f_mir = NULL;
-				    }
-				    else // inode was already present in filesystem at the time the archive of reference was made
-				    {
-					f_ino = dynamic_cast<const inode*>(f);
-					f_file = dynamic_cast<const file *>(f);
-					f_mir = dynamic_cast<const mirage *>(f);
+				    if(e_ino == NULL)
+					throw SRC_BUG; // if not a known hard link, e_ino should still either point to a real inode
+					// or to the hard linked new inode.
 
-					if(f_mir != NULL)
+				    if(fixed_date == 0)
+				    {
+					bool conflict = ref.compare(e, f);
+
+					if(!conflict)
 					{
-					    f_ino = f_mir->get_inode();
-					    f_file = dynamic_cast<const file *>(f_ino);
+					    f = NULL;
+					    f_ino = NULL;
+					    f_mir = NULL;
 					}
-
-					    // Now checking for filesystem dissimulation
-
-					if(security_check)
+					else // inode was already present in filesystem at the time the archive of reference was made
 					{
-					    if(f_ino != NULL && e_ino != NULL)
+					    f_ino = dynamic_cast<const inode*>(f);
+					    f_file = dynamic_cast<const file *>(f);
+					    f_mir = dynamic_cast<const mirage *>(f);
+
+					    if(f_mir != NULL)
 					    {
-						    // both are inodes
+						f_ino = f_mir->get_inode();
+						f_file = dynamic_cast<const file *>(f_ino);
+					    }
 
-						if(f_ino->signature() == e_ino->signature())
+						// Now checking for filesystem dissimulation
+
+					    if(security_check)
+					    {
+						if(f_ino != NULL && e_ino != NULL)
 						{
-							// same inode type
+							// both are inodes
 
-						    if(f_ino->get_uid() == e_ino->get_uid()
-						       && f_ino->get_gid() == e_ino->get_gid()
-						       && f_ino->get_perm() == e_ino->get_perm()
-						       && f_ino->get_last_modif() == e_ino->get_last_modif())
+						    if(f_ino->signature() == e_ino->signature())
 						    {
-							    // same inode information
+							    // same inode type
 
-							if(f_file == NULL || e_file == NULL
-							   || f_file->get_size() == e_file->get_size())
+							if(f_ino->get_uid() == e_ino->get_uid()
+							   && f_ino->get_gid() == e_ino->get_gid()
+							   && f_ino->get_perm() == e_ino->get_perm()
+							   && f_ino->get_last_modif() == e_ino->get_last_modif())
 							{
-								// file size is unchanged
+								// same inode information
 
-							    if(f_ino->has_last_change() && e_ino->has_last_change())
+							    if(f_file == NULL || e_file == NULL
+							       || f_file->get_size() == e_file->get_size())
 							    {
-								    // both inode ctime has been recorded
+								    // file size is unchanged
 
-								if(f_ino->get_last_change() != e_ino->get_last_change())
+								if(f_ino->has_last_change() && e_ino->has_last_change())
 								{
-								    string tmp = juillet.get_string();
+									// both inode ctime has been recorded
 
-								    dialog.printf(gettext("SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of reference was done, while no inode or data changed"), &tmp);
+								    if(f_ino->get_last_change() != e_ino->get_last_change())
+								    {
+									string tmp = juillet.get_string();
+
+									dialog.printf(gettext("SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of reference was done, while no inode or data changed"), &tmp);
+								    }
 								}
 							    }
 							}
@@ -631,283 +635,290 @@ namespace libdar
 					    }
 					}
 				    }
-				}
-				else
-				    f = NULL;
-
-				try
-				{
-				    f_ino = snapshot ? NULL : f_ino;
-				    f_file = snapshot ? NULL : f_file;
-
-					// EVALUATING THE ACTION TO PERFORM
-
-				    bool change_to_remove_ea =
-					e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_none
-					    // current inode to backup does not have any EA
-					&& f_ino != NULL && f_ino->ea_get_saved_status() != inode::ea_none
-					&& f_ino->ea_get_saved_status() != inode::ea_removed;
-					// and reference was an inode with EA
-
-				    bool avoid_saving_inode =
-					snapshot
-					    // don't backup if doing a snapshot
-					|| (fixed_date > 0 && e_ino != NULL && e_ino->get_last_modif() < fixed_date)
-					    // don't backup if older than given date (if reference date given)
-					|| (fixed_date == 0 && e_ino != NULL && f_ino != NULL && !e_ino->has_changed_since(*f_ino, hourshift, what_to_check)
-					    && (f_file == NULL || !f_file->is_dirty()))
-					    // don't backup if doing differential backup and entry is the same as the one in the archive of reference
-					    // and if the reference is a plain file, it was not saved as dirty
-					;
-
-				    bool avoid_saving_ea =
-					snapshot
-					    // don't backup if doing a snapshot
-					|| (fixed_date > 0 && e_ino != NULL &&  e_ino->ea_get_saved_status() != inode::ea_none && e_ino->get_last_change() < fixed_date)
-					    // don't backup if older than given date (if reference date given)
-					|| (fixed_date == 0 && e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_full && f_ino != NULL && f_ino->ea_get_saved_status() != inode::ea_none && e_ino->get_last_change() <= f_ino->get_last_change())
-					    // don't backup if doing differential backup and entry is the same as the one in the archive of reference
-					;
-
-				    bool sparse_file_detection =
-					e_file != NULL
-					&& e_file->get_size() > sparse_file_min_size
-					&& sparse_file_min_size != 0;
-
-					// MODIFIYING INODE IF NECESSARY
-
-				    if(e_ino->get_saved_status() != s_saved)
-					throw SRC_BUG; // filsystem should always provide "saved" "entree"
-
-				    if(avoid_saving_inode)
-				    {
-					e_ino->set_saved_status(s_not_saved);
-					st.incr_skipped();
-				    }
-
-				    if(avoid_saving_ea)
-				    {
-					if(e_ino->ea_get_saved_status() == inode::ea_full)
-					    e_ino->ea_set_saved_status(inode::ea_partial);
-				    }
-
-				    if(change_to_remove_ea)
-					e_ino->ea_set_saved_status(inode::ea_removed);
-
-				    if(e_file != NULL)
-					e_file->set_sparse_file_detection_write(sparse_file_detection);
-
-					// DECIDING WHETHER FILE DATA WILL BE COMPRESSED OR NOT
-
-				    if(e_file != NULL)
-				    {
-					if(compr_mask.is_covered(nom->get_name()) && e_file->get_size() >= min_compr_size)
-						// e_nom not e_file because "e"
-						// may be a hard link, in which case its name is not carried by e_ino nor e_file
-					    e_file->change_compression_algo_write(stock_algo);
-					else
-					    e_file->change_compression_algo_write(none);
-				    }
-
-					// PRE RECORDING THE INODE (for sequential reading)
-
-				    cat.pre_add(e, stockage);
-
-					// PERFORMING ACTION FOR INODE
-
-				    if(!save_inode(dialog,
-						   juillet.get_string(),
-						   e_ino,
-						   stockage,
-						   info_details,
-						   stock_algo,
-						   alter_atime,
-						   true,   // check_change
-						   true,   // compute_crc
-						   file::normal, // keep_mode
-						   cat,
-						   repeat_count,
-						   repeat_byte,
-						   sparse_file_min_size,
-						   &sem,
-						   wasted_bytes))
-				    {
-					st.set_byte_amount(wasted_bytes);
-					st.incr_tooold();
-				    }
-
-				    if(!avoid_saving_inode)
-					st.incr_treated();
-
-					// PERFORMING ACTION FOR EA
-
-				    if(e_ino->ea_get_saved_status() != inode::ea_removed)
-				    {
-					if(e_ino->ea_get_saved_status() == inode::ea_full)
-					    cat.pre_add_ea(e, stockage);
-					if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, info_details, stock_algo))
-					    st.incr_ea_treated();
-					cat.pre_add_ea_crc(e, stockage);
-				    }
-
-					// CLEANING UP MEMORY FOR PLAIN FILES
-
-				    if(e_file != NULL)
-					e_file->clean_data();
-
-					// UPDATING HARD LINKS
-
-				    if(e_mir != NULL)
-					e_mir->set_inode_wrote(true); // record that this inode has been saved (it is a "known_hard_link" now)
-
-					// ADDING ENTRY TO CATALOGUE
-
-				    cat.add(e);
-				}
-				catch(...)
-				{
-				    if(dir != NULL && fixed_date == 0)
-					ref.compare(&tmp_eod, f);
-				    throw;
-				}
-			    }
-			}
-			else // inode not covered
-			{
-			    nomme *ig = NULL;
-			    inode *ignode = NULL;
-			    sem.raise(juillet.get_string(), e, false);
-
-			    if(display_skipped)
-				dialog.warning(string(gettext(SKIPPED)) + juillet.get_string());
-
-			    if(dir != NULL && make_empty_dir)
-				ig = ignode = new ignored_dir(*dir);
-			    else
-				ig = new ignored(nom->get_name());
-				// necessary to not record deleted files at comparison
-				// time in case files are just not covered by filters
-			    st.incr_ignored();
-
-			    if(ig == NULL)
-				throw Ememory("filtre_sauvegarde");
-			    else
-				cat.add(ig);
-
-			    if(dir != NULL)
-			    {
-				if(make_empty_dir)
-				{
-				    bool known;
-
-				    if(fixed_date == 0)
-					known = ref.compare(dir, f);
 				    else
-					known = false;
+					f = NULL;
 
 				    try
 				    {
-					const inode *f_ino = known ? dynamic_cast<const inode *>(f) : NULL;
-					bool tosave = false;
+					f_ino = snapshot ? NULL : f_ino;
+					f_file = snapshot ? NULL : f_file;
 
-					if(known)
-					    if(f_ino != NULL)
-						tosave = dir->has_changed_since(*f_ino, hourshift, what_to_check);
+					    // EVALUATING THE ACTION TO PERFORM
+
+					bool change_to_remove_ea =
+					    e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_none
+						// current inode to backup does not have any EA
+					    && f_ino != NULL && f_ino->ea_get_saved_status() != inode::ea_none
+					    && f_ino->ea_get_saved_status() != inode::ea_removed;
+					    // and reference was an inode with EA
+
+					bool avoid_saving_inode =
+					    snapshot
+						// don't backup if doing a snapshot
+					    || (fixed_date > 0 && e_ino != NULL && e_ino->get_last_modif() < fixed_date)
+						// don't backup if older than given date (if reference date given)
+					    || (fixed_date == 0 && e_ino != NULL && f_ino != NULL && !e_ino->has_changed_since(*f_ino, hourshift, what_to_check)
+						&& (f_file == NULL || !f_file->is_dirty()))
+						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
+						// and if the reference is a plain file, it was not saved as dirty
+					    ;
+
+					bool avoid_saving_ea =
+					    snapshot
+						// don't backup if doing a snapshot
+					    || (fixed_date > 0 && e_ino != NULL &&  e_ino->ea_get_saved_status() != inode::ea_none && e_ino->get_last_change() < fixed_date)
+						// don't backup if older than given date (if reference date given)
+					    || (fixed_date == 0 && e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_full && f_ino != NULL && f_ino->ea_get_saved_status() != inode::ea_none && e_ino->get_last_change() <= f_ino->get_last_change())
+						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
+					    ;
+
+					bool sparse_file_detection =
+					    e_file != NULL
+					    && e_file->get_size() > sparse_file_min_size
+					    && sparse_file_min_size != 0;
+
+					    // MODIFIYING INODE IF NECESSARY
+
+					if(e_ino->get_saved_status() != s_saved)
+					    throw SRC_BUG; // filsystem should always provide "saved" "entree"
+
+					if(avoid_saving_inode)
+					{
+					    e_ino->set_saved_status(s_not_saved);
+					    st.incr_skipped();
+					}
+
+					if(avoid_saving_ea)
+					{
+					    if(e_ino->ea_get_saved_status() == inode::ea_full)
+						e_ino->ea_set_saved_status(inode::ea_partial);
+					}
+
+					if(change_to_remove_ea)
+					    e_ino->ea_set_saved_status(inode::ea_removed);
+
+					if(e_file != NULL)
+					    e_file->set_sparse_file_detection_write(sparse_file_detection);
+
+					    // DECIDING WHETHER FILE DATA WILL BE COMPRESSED OR NOT
+
+					if(e_file != NULL)
+					{
+					    if(compr_mask.is_covered(nom->get_name()) && e_file->get_size() >= min_compr_size)
+						    // e_nom not e_file because "e"
+						    // may be a hard link, in which case its name is not carried by e_ino nor e_file
+						e_file->change_compression_algo_write(stock_algo);
 					    else
-						throw SRC_BUG;
-					    // catalogue::compare() with a directory should return false or give a directory as
-					    // second argument or here f is not an inode (f_ino == NULL) !
-					    // and known == true
-					else
-					    tosave = true;
+						e_file->change_compression_algo_write(none);
+					}
 
-					ignode->set_saved_status(tosave && !snapshot ? s_saved : s_not_saved);
+					    // PRE RECORDING THE INODE (for sequential reading)
+
+					cat.pre_add(e, stockage);
+
+					    // PERFORMING ACTION FOR INODE
+
+					if(!save_inode(dialog,
+						       juillet.get_string(),
+						       e_ino,
+						       stockage,
+						       info_details,
+						       stock_algo,
+						       alter_atime,
+						       true,   // check_change
+						       true,   // compute_crc
+						       file::normal, // keep_mode
+						       cat,
+						       repeat_count,
+						       repeat_byte,
+						       sparse_file_min_size,
+						       &sem,
+						       wasted_bytes))
+					{
+					    st.set_byte_amount(wasted_bytes);
+					    st.incr_tooold();
+					}
+
+					if(!avoid_saving_inode)
+					    st.incr_treated();
+
+					    // PERFORMING ACTION FOR EA
+
+					if(e_ino->ea_get_saved_status() != inode::ea_removed)
+					{
+					    if(e_ino->ea_get_saved_status() == inode::ea_full)
+						cat.pre_add_ea(e, stockage);
+					    if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, info_details, stock_algo))
+						st.incr_ea_treated();
+					    cat.pre_add_ea_crc(e, stockage);
+					}
+
+					    // CLEANING UP MEMORY FOR PLAIN FILES
+
+					if(e_file != NULL)
+					    e_file->clean_data();
+
+					    // UPDATING HARD LINKS
+
+					if(e_mir != NULL)
+					    e_mir->set_inode_wrote(true); // record that this inode has been saved (it is a "known_hard_link" now)
+
+					    // ADDING ENTRY TO CATALOGUE
+
+					cat.add(e);
+					e = NULL;
 				    }
 				    catch(...)
 				    {
-					if(fixed_date == 0)
+					if(dir != NULL && fixed_date == 0)
 					    ref.compare(&tmp_eod, f);
 					throw;
 				    }
-				    if(fixed_date == 0)
-					ref.compare(&tmp_eod, f);
 				}
-				fs.skip_read_to_parent_dir();
-				juillet.enfile(&tmp_eod);
 			    }
-
-			    delete e; // we don't keep this object in the catalogue so we must destroy it
-			    e = NULL;
-			}
-		    }
-		    catch(Ebug & e)
-		    {
-			throw;
-		    }
-		    catch(Euser_abort & e)
-		    {
-			throw;
-		    }
-		    catch(Escript & e)
-		    {
-			throw;
-		    }
-		    catch(Ethread_cancel & e)
-		    {
-			throw;
-		    }
-		    catch(Elimitint & e)
-		    {
-			throw;
-		    }
-		    catch(Egeneric & ex)
-		    {
-			const string & how = ex.find_object("generic_file::copy_to");
-
-			if(how != "write") // error did not occured while adding data to the archive
-			{
-			    nomme *tmp = new ignored(nom->get_name());
-			    dialog.warning(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
-			    st.incr_errored();
-
-				// now we can destroy the object
-			    delete e;
-			    e = NULL;
-
-			    if(tmp == NULL)
-				throw Ememory("fitre_sauvegarde");
-			    cat.add(tmp);
-
-			    if(dir != NULL)
+			    else // inode not covered
 			    {
-				fs.skip_read_to_parent_dir();
-				juillet.enfile(&tmp_eod);
-				dialog.warning(gettext("NO FILE IN THAT DIRECTORY CAN BE SAVED."));
+				nomme *ig = NULL;
+				inode *ignode = NULL;
+				sem.raise(juillet.get_string(), e, false);
+
+				if(display_skipped)
+				    dialog.warning(string(gettext(SKIPPED)) + juillet.get_string());
+
+				if(dir != NULL && make_empty_dir)
+				    ig = ignode = new ignored_dir(*dir);
+				else
+				    ig = new ignored(nom->get_name());
+				    // necessary to not record deleted files at comparison
+				    // time in case files are just not covered by filters
+				st.incr_ignored();
+
+				if(ig == NULL)
+				    throw Ememory("filtre_sauvegarde");
+				else
+				    cat.add(ig);
+
+				if(dir != NULL)
+				{
+				    if(make_empty_dir)
+				    {
+					bool known;
+
+					if(fixed_date == 0)
+					    known = ref.compare(dir, f);
+					else
+					    known = false;
+
+					try
+					{
+					    const inode *f_ino = known ? dynamic_cast<const inode *>(f) : NULL;
+					    bool tosave = false;
+
+					    if(known)
+						if(f_ino != NULL)
+						    tosave = dir->has_changed_since(*f_ino, hourshift, what_to_check);
+						else
+						    throw SRC_BUG;
+						// catalogue::compare() with a directory should return false or give a directory as
+						// second argument or here f is not an inode (f_ino == NULL) !
+						// and known == true
+					    else
+						tosave = true;
+
+					    ignode->set_saved_status(tosave && !snapshot ? s_saved : s_not_saved);
+					}
+					catch(...)
+					{
+					    if(fixed_date == 0)
+						ref.compare(&tmp_eod, f);
+					    throw;
+					}
+					if(fixed_date == 0)
+					    ref.compare(&tmp_eod, f);
+				    }
+				    fs.skip_read_to_parent_dir();
+				    juillet.enfile(&tmp_eod);
+				}
+
+				delete e; // we don't keep this object in the catalogue so we must destroy it
+				e = NULL;
 			    }
 			}
-			else
+			catch(Ebug & e)
 			{
-			    ex.prepend_message(gettext("Cannot write down the archive: "));
-			    throw; // error occured while adding data to the archive, archive cannot be generated properly
+			    throw;
+			}
+			catch(Euser_abort & e)
+			{
+			    throw;
+			}
+			catch(Escript & e)
+			{
+			    throw;
+			}
+			catch(Ethread_cancel & e)
+			{
+			    throw;
+			}
+			catch(Elimitint & e)
+			{
+			    throw;
+			}
+			catch(Egeneric & ex)
+			{
+			    const string & how = ex.find_object("generic_file::copy_to");
+
+			    if(how != "write") // error did not occured while adding data to the archive
+			    {
+				nomme *tmp = new ignored(nom->get_name());
+				dialog.warning(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
+				st.incr_errored();
+
+				    // now we can destroy the object
+				delete e;
+				e = NULL;
+
+				if(tmp == NULL)
+				    throw Ememory("fitre_sauvegarde");
+				cat.add(tmp);
+
+				if(dir != NULL)
+				{
+				    fs.skip_read_to_parent_dir();
+				    juillet.enfile(&tmp_eod);
+				    dialog.warning(gettext("NO FILE IN THAT DIRECTORY CAN BE SAVED."));
+				}
+			    }
+			    else
+			    {
+				ex.prepend_message(gettext("Cannot write down the archive: "));
+				throw; // error occured while adding data to the archive, archive cannot be generated properly
+			    }
 			}
 		    }
-		}
-		else // eod
-		{
-		    sem.raise(juillet.get_string(), e, true);
-		    sem.lower();
-		    if(fixed_date == 0)
-			ref.compare(e, f); // makes the comparison in the reference catalogue go to parent directory
-		    cat.pre_add(e, stockage); // adding a mark and dropping EOD entry in the archive if cat is an escape_catalogue object (else, does nothing)
-		    cat.add(e);
+		    else // eod
+		    {
+			sem.raise(juillet.get_string(), e, true);
+			sem.lower();
+			if(fixed_date == 0)
+			    ref.compare(e, f); // makes the comparison in the reference catalogue go to parent directory
+			cat.pre_add(e, stockage); // adding a mark and dropping EOD entry in the archive if cat is an escape_catalogue object (else, does nothing)
+			cat.add(e);
+		    }
 		}
 	    }
+	    catch(Ethread_cancel & e)
+	    {
+		if(!e.immediate_cancel())
+		    stockage->change_algo(stock_algo);
+		throw Ethread_cancel_with_attr(e.immediate_cancel(), e.get_flag(), fs.get_last_etoile_ref());
+	    }
 	}
-	catch(Ethread_cancel & e)
+	catch(...)
 	{
-	    if(!e.immediate_cancel())
-		stockage->change_algo(stock_algo);
-	    throw Ethread_cancel_with_attr(e.immediate_cancel(), e.get_flag(), fs.get_last_etoile_ref());
+	    if(e != NULL)
+		delete e;
+	    throw;
 	}
 
         stockage->change_algo(stock_algo);
@@ -940,10 +951,11 @@ namespace libdar
 
         st.clear();
         cat.reset_read();
-        while(cat.read(e))
-        {
-            const directory *e_dir = dynamic_cast<const directory *>(e);
-            const nomme *e_nom = dynamic_cast<const nomme *>(e);
+
+	while(cat.read(e))
+	{
+	    const directory *e_dir = dynamic_cast<const directory *>(e);
+	    const nomme *e_nom = dynamic_cast<const nomme *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const mirage *e_mir = dynamic_cast<const mirage *>(e);
 
@@ -960,34 +972,34 @@ namespace libdar
 		    dialog.warning(gettext("SKIPPED (hard link in sequential read mode): ") + e_mir->get_name());
 	    }
 
-            juillet.enfile(e);
+	    juillet.enfile(e);
 	    thr_cancel.check_self_cancellation();
-            try
-            {
-                if(e_nom != NULL)
-                {
-                    if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || filtre.is_covered(e_nom->get_name())))
-                    {
-                        nomme *exists_nom = NULL;
+	    try
+	    {
+		if(e_nom != NULL)
+		{
+		    if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || filtre.is_covered(e_nom->get_name())))
+		    {
+			nomme *exists_nom = NULL;
 
-                        if(e_ino != NULL)
+			if(e_ino != NULL)
 			{
 			    if(e_nom == NULL)
 				throw SRC_BUG;
-                            if(fs.read_filename(e_nom->get_name(), exists_nom))
-                            {
-                                try
-                                {
-                                    inode *exists = dynamic_cast<inode *>(exists_nom);
-                                    directory *exists_dir = dynamic_cast<directory *>(exists_nom);
+			    if(fs.read_filename(e_nom->get_name(), exists_nom))
+			    {
+				try
+				{
+				    inode *exists = dynamic_cast<inode *>(exists_nom);
+				    directory *exists_dir = dynamic_cast<directory *>(exists_nom);
 
-                                    if(exists != NULL)
-                                    {
-                                        try
-                                        {
-                                            e_ino->compare(*exists, ea_mask, what_to_check, hourshift, compare_symlink_date);
-                                            if(info_details)
-                                                dialog.warning(string(gettext("OK   "))+juillet.get_string());
+				    if(exists != NULL)
+				    {
+					try
+					{
+					    e_ino->compare(*exists, ea_mask, what_to_check, hourshift, compare_symlink_date);
+					    if(info_details)
+						dialog.warning(string(gettext("OK   "))+juillet.get_string());
 					    if(e_dir == NULL || !cat.read_second_time_dir())
 						st.incr_treated();
 					    if(!alter_atime)
@@ -995,17 +1007,17 @@ namespace libdar
 						const inode * tmp_exists = const_cast<const inode *>(exists);
 						restore_atime(juillet.get_string(), tmp_exists);
 					    }
-                                        }
-                                        catch(Erange & e)
-                                        {
-                                            dialog.warning(string(gettext("DIFF "))+juillet.get_string()+": "+ e.get_message());
-                                            if(e_dir == NULL && exists_dir != NULL)
-                                                fs.skip_read_filename_in_parent_dir();
-                                            if(e_dir != NULL && exists_dir == NULL)
-                                            {
-                                                cat.skip_read_to_parent_dir();
-                                                juillet.enfile(&tmp_eod);
-                                            }
+					}
+					catch(Erange & e)
+					{
+					    dialog.warning(string(gettext("DIFF "))+juillet.get_string()+": "+ e.get_message());
+					    if(e_dir == NULL && exists_dir != NULL)
+						fs.skip_read_filename_in_parent_dir();
+					    if(e_dir != NULL && exists_dir == NULL)
+					    {
+						cat.skip_read_to_parent_dir();
+						juillet.enfile(&tmp_eod);
+					    }
 
 					    if(e_dir == NULL || !cat.read_second_time_dir())
 						st.incr_errored();
@@ -1014,79 +1026,79 @@ namespace libdar
 						const inode * tmp_exists = const_cast<const inode *>(exists);
 						restore_atime(juillet.get_string(), tmp_exists);
 					    }
-                                        }
-                                    }
-                                    else // existing file is not an inode
-                                        throw SRC_BUG; // filesystem, should always return inode with read_filename()
-                                }
-                                catch(...)
-                                {
-                                    delete exists_nom;
+					}
+				    }
+				    else // existing file is not an inode
+					throw SRC_BUG; // filesystem, should always return inode with read_filename()
+				}
+				catch(...)
+				{
+				    delete exists_nom;
 				    exists_nom = NULL;
-                                    throw;
-                                }
-                                delete exists_nom;
+				    throw;
+				}
+				delete exists_nom;
 				exists_nom = NULL;
-                            }
-                            else // can't compare, nothing of that name in filesystem
-                            {
-                                dialog.warning(string(gettext("DIFF "))+ juillet.get_string() + gettext(": file not present in filesystem"));
-                                if(e_dir != NULL)
-                                {
-                                    cat.skip_read_to_parent_dir();
-                                    juillet.enfile(&tmp_eod);
-                                }
+			    }
+			    else // can't compare, nothing of that name in filesystem
+			    {
+				dialog.warning(string(gettext("DIFF "))+ juillet.get_string() + gettext(": file not present in filesystem"));
+				if(e_dir != NULL)
+				{
+				    cat.skip_read_to_parent_dir();
+				    juillet.enfile(&tmp_eod);
+				}
 
 				if(e_dir == NULL || !cat.read_second_time_dir())
 				    st.incr_errored();
-                            }
+			    }
 			}
-                        else // not an inode (for example a detruit, hard_link etc...), nothing to do
-                            st.incr_treated();
-                    }
-                    else // not covered by filters
-                    {
+			else // not an inode (for example a detruit, hard_link etc...), nothing to do
+			    st.incr_treated();
+		    }
+		    else // not covered by filters
+		    {
 			if(display_skipped)
 			    dialog.warning(string(gettext(SKIPPED)) + juillet.get_string());
 
 			if(e_dir == NULL || !cat.read_second_time_dir())
 			    st.incr_ignored();
-                        if(e_dir != NULL)
-                        {
-                            cat.skip_read_to_parent_dir();
-                            juillet.enfile(&tmp_eod);
-                        }
-                    }
-                }
-                else // eod ?
-                    if(dynamic_cast<const eod *>(e) != NULL) // yes eod
-                        fs.skip_read_filename_in_parent_dir();
-                    else // no ?!?
-                        throw SRC_BUG; // not nomme neither eod ! what's that ?
-            }
-            catch(Euser_abort &e)
-            {
-                throw;
-            }
-            catch(Ebug &e)
-            {
-                throw;
-            }
-            catch(Escript & e)
-            {
-                throw;
-            }
+			if(e_dir != NULL)
+			{
+			    cat.skip_read_to_parent_dir();
+			    juillet.enfile(&tmp_eod);
+			}
+		    }
+		}
+		else // eod ?
+		    if(dynamic_cast<const eod *>(e) != NULL) // yes eod
+			fs.skip_read_filename_in_parent_dir();
+		    else // no ?!?
+			throw SRC_BUG; // not nomme neither eod ! what's that ?
+	    }
+	    catch(Euser_abort &e)
+	    {
+		throw;
+	    }
+	    catch(Ebug &e)
+	    {
+		throw;
+	    }
+	    catch(Escript & e)
+	    {
+		throw;
+	    }
 	    catch(Ethread_cancel & e)
 	    {
 		throw;
 	    }
-            catch(Egeneric & e)
-            {
-                dialog.warning(string(gettext("ERR  ")) + juillet.get_string() + " : " + e.get_message());
+	    catch(Egeneric & e)
+	    {
+		dialog.warning(string(gettext("ERR  ")) + juillet.get_string() + " : " + e.get_message());
 		if(e_dir == NULL || !cat.read_second_time_dir())
 		    st.incr_errored();
-            }
-        }
+	    }
+	}
         fs.skip_read_filename_in_parent_dir();
             // this call here only to restore dates of the root (-R option) directory
     }
@@ -1105,7 +1117,6 @@ namespace libdar
         null_file black_hole = null_file(gf_write_only);
         ea_attributs ea;
         infinint offset;
-        crc check, original;
         const eod tmp_eod;
 	thread_cancellation thr_cancel;
 
@@ -1147,22 +1158,37 @@ namespace libdar
 				try
 				{
 				    infinint crc_size;
+				    crc *check = NULL;
+				    const crc *original = NULL;
 
-				    if(e_file->get_crc_size(crc_size))
-					check.resize(crc_size); // no guess on the CRC size, we have it
-				    else  // falling back on the guessing method based on file size
-					check.resize(tools_file_size_to_crc_size(e_file->get_size()));
+				    if(!e_file->get_crc_size(crc_size))
+					crc_size = tools_file_size_to_crc_size(e_file->get_size());
 
 				    dat->skip(0);
-				    dat->copy_to(black_hole, check);
+				    dat->copy_to(black_hole, crc_size, check);
+				    if(check == NULL)
+					throw SRC_BUG;
 
-					// due to possible sequential reading mode, the CRC
-					// must not me fetched before the data has been copied
-				    if(e_file->get_crc(original))
+				    try
 				    {
-					if(check != original)
-					    throw Erange("fitre_test", gettext("CRC error: data corruption."));
+					    // due to possible sequential reading mode, the CRC
+					    // must not be fetched before the data has been copied
+					if(e_file->get_crc(original))
+					{
+					    if(original == NULL)
+						throw SRC_BUG;
+					    if(typeid(*check) != typeid(*original))
+						throw SRC_BUG;
+					    if(*check != *original)
+						throw Erange("fitre_test", gettext("CRC error: data corruption."));
+					}
 				    }
+				    catch(...)
+				    {
+					delete check;
+					throw;
+				    }
+				    delete check;
 				}
 				catch(...)
 				{
@@ -2242,7 +2268,7 @@ namespace libdar
 
 		    if(e_file != NULL)
 		    {
-			crc val;
+			const crc *val = NULL;
 
 			if(!e_file->get_crc(val)) // this can occur when reading an old archive format
 			    compute_file_crc = true;
@@ -2356,7 +2382,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.113.2.2 2011/06/20 14:02:03 edrusb Exp $";
+        static char id[]="$Id: filtre.cpp,v 1.113.2.4 2012/02/19 17:25:08 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -2413,8 +2439,6 @@ namespace libdar
 		    loop = false;
 		    infinint start = stock->get_position();
 		    generic_file *source = NULL;
-		    crc val = tools_file_size_to_crc_size(fic->get_size());
-		    crc original;
 
 		    try
 		    {
@@ -2452,6 +2476,10 @@ namespace libdar
 			{
 			    generic_file *dest = stock;
 			    sparse_file *dst_hole = NULL;
+			    infinint crc_size = tools_file_size_to_crc_size(fic->get_size());
+			    crc * val = NULL;
+			    const crc * original = NULL;
+			    bool crc_available = false;
 
 			    fic->set_offset(start);
 			    source->skip(0);
@@ -2474,24 +2502,29 @@ namespace libdar
 				}
 
 				if(!compute_crc)
-				{
-				    if(fic->get_crc(original))
-					val.resize_based_on(original);
-				    else
-					original.resize(val.get_size()+1); // to remember that the file has no CRC and no crc recalculation has been asked
-				}
+				    crc_available = fic->get_crc(original);
+				else
+				    crc_available = false;
 
-				source->copy_to(*dest, val);
+				source->copy_to(*dest, crc_size, val);
+				if(val == NULL)
+				    throw SRC_BUG;
 
 				if(compute_crc)
-				    fic->set_crc(val);
+				    fic->set_crc(*val);
 				else
 				{
-				    if(keep_mode == file::normal)
-					if(original.get_size() == val.get_size())
-					    if(original != val)
-						throw Erange("save_inode", gettext("Copied data does not match CRC"));
+				    if(keep_mode == file::normal && crc_available)
+				    {
+					if(original == NULL)
+					    throw SRC_BUG;
+					if(typeid(*original) != typeid(*val))
+					    throw SRC_BUG;
+					if(*original != *val)
+					    throw Erange("save_inode", gettext("Copied data does not match CRC"));
+				    }
 				}
+
 				if(dst_hole != NULL)
 				{
 				    dst_hole->sync_write();
@@ -2515,7 +2548,18 @@ namespace libdar
 				    dst_hole = NULL;
 				    dest = NULL;
 				}
+				if(val != NULL)
+				{
+				    delete val;
+				    val = NULL;
+				}
 				throw;
+			    }
+
+			    if(val != NULL)
+			    {
+				delete val;
+				val = NULL;
 			    }
 
 			    if(dst_hole != NULL)
@@ -2537,6 +2581,7 @@ namespace libdar
 			{
 			    delete source;
 			    source = NULL;
+
 				// restore atime of source
 			    if(!alter_atime)
 				tools_noexcept_make_date(info_quoi, ino->get_last_access(), ino->get_last_modif());
@@ -2544,6 +2589,7 @@ namespace libdar
 			}
 			delete source;
 			source = NULL;
+
 
 			    // adding the data CRC if escape marks are used
 			cat.pre_add_crc(ino, stock);
@@ -2637,27 +2683,38 @@ namespace libdar
             case inode::ea_full: // if there is something to save
 		if(ino->get_ea() != NULL)
 		{
-		    crc val;
+		    crc * val = NULL;
 
-		    if(info_details)
-			dialog.warning(string(gettext("Saving Extended Attributes for ")) + info_quoi);
-		    ino->ea_set_offset(stock->get_position());
-		    stock->change_algo(compr_used); // always compress EA (no size or filename consideration)
-		    stock->reset_crc(tools_file_size_to_crc_size(ino->ea_get_size())); // start computing CRC for any read/write on stock
 		    try
 		    {
-			ino->get_ea()->dump(*stock);
+			if(info_details)
+			    dialog.warning(string(gettext("Saving Extended Attributes for ")) + info_quoi);
+			ino->ea_set_offset(stock->get_position());
+			stock->change_algo(compr_used); // always compress EA (no size or filename consideration)
+			stock->reset_crc(tools_file_size_to_crc_size(ino->ea_get_size())); // start computing CRC for any read/write on stock
+			try
+			{
+			    ino->get_ea()->dump(*stock);
+			}
+			catch(...)
+			{
+			    val = stock->get_crc(); // this keeps "stock" in a coherent status
+			    throw;
+			}
+			val = stock->get_crc();
+			ino->ea_set_crc(*val);
+			ino->ea_detach();
+			stock->flush_write();
+			ret = true;
 		    }
 		    catch(...)
 		    {
-			stock->get_crc(val); // this keeps "stock" in a coherent status
+			if(val != NULL)
+			    delete val;
 			throw;
 		    }
-		    stock->get_crc(val);
-		    ino->ea_set_crc(val);
-		    ino->ea_detach();
-		    stock->flush_write();
-		    ret = true;
+		    if(val != NULL)
+			delete val;
 		}
 		else
 		    throw SRC_BUG;

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database.cpp,v 1.22.2.3 2011/06/25 11:15:36 edrusb Exp $
+// $Id: database.cpp,v 1.22.2.5 2011/12/28 18:07:06 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -68,7 +68,7 @@ namespace libdar
 	if(files == NULL)
 	    throw Ememory("database::database");
 	data_files = NULL;
-
+	check_order_asked = true;
     }
 
     database::database(user_interaction & dialog, const string & base, const database_open_options & opt)
@@ -80,6 +80,7 @@ namespace libdar
 	    throw Ememory("database::database");
 	try
 	{
+	    check_order_asked = opt.get_warn_order();
 	    build(dialog, *f, opt.get_partial(), db_version);
 	}
 	catch(...)
@@ -107,6 +108,10 @@ namespace libdar
 	    {
 		tools_read_string(f, dat.chemin);
 		tools_read_string(f, dat.basename);
+		if(db_version >= 3)
+		    dat.root_last_mod.read(f);
+		else
+		    dat.root_last_mod = 0;
 		coordinate.push_back(dat);
 		--tmp;
 	    }
@@ -163,6 +168,7 @@ namespace libdar
 	    {
 		tools_write_string(*f, coordinate[i].chemin);
 		tools_write_string(*f, coordinate[i].basename);
+		coordinate[i].root_last_mod.dump(*f);
 	    }
 	    tools_write_vector(*f, options_to_dar);
 	    tools_write_string(*f, dar_path);
@@ -201,10 +207,11 @@ namespace libdar
 
 	    dat.chemin = chemin;
 	    dat.basename = basename;
+	    dat.root_last_mod = arch.get_catalogue().get_root_dir_last_modif();
 	    coordinate.push_back(dat);
 	    data_tree_update_with(arch.get_catalogue().get_contenu(), number, files);
 	    if(number > 1)
-		files->finalize_except_self(number, arch.get_catalogue().get_root_dir_last_modif());
+		files->finalize_except_self(number, get_root_last_mod(number), 0);
 	}
 	catch(...)
 	{
@@ -298,6 +305,36 @@ namespace libdar
 	    coordinate.erase(coordinate.begin()+src);
 	    coordinate.insert(coordinate.begin()+dst, moved);
 	    files->apply_permutation(src, dst);
+
+		// update et_absent dates
+
+	    set<archive_num> re_finalize;
+	    set<archive_num>::iterator re_it;
+
+	    if(src < dst)
+	    {
+		re_finalize.insert(src);
+		re_finalize.insert(dst);
+		re_finalize.insert(dst+1);
+	    }
+	    else // src >= dst
+	    {
+		re_finalize.insert(src+1);
+		re_finalize.insert(dst);
+		re_finalize.insert(dst+1);
+
+		    // if src == dst the set still contains on entry (src or dst).
+		    // this is intended to let the user have the possibility
+		    // to ask dates recompilation, even if in theory this is useless
+	    }
+
+	    re_it = re_finalize.begin();
+	    while(re_it != re_finalize.end())
+	    {
+		files->finalize_except_self(*re_it, get_root_last_mod(*re_it), *re_it + 1);
+		++re_it;
+	    }
+
 	}
         catch(...)
         {
@@ -309,7 +346,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: database.cpp,v 1.22.2.3 2011/06/25 11:15:36 edrusb Exp $";
+	static char id[]="$Id: database.cpp,v 1.22.2.5 2011/12/28 18:07:06 edrusb Exp $";
 	dummy_call(id);
     }
 
@@ -668,6 +705,14 @@ namespace libdar
 	}
 	else
 	    return num;
+    }
+
+    const infinint & database::get_root_last_mod(const archive_num & num) const
+    {
+	if(num >= coordinate.size())
+	    throw SRC_BUG;
+
+	return coordinate[num].root_last_mod;
     }
 
 } // end of namespace

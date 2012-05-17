@@ -352,9 +352,9 @@ GO "F2-3"  $DAR -N -+ $merge_diff -A $diff "-@" $diff2 -B $OPT
 GO "F2-4" check_hash $hash $merge_diff.*.dar
 GO "F2-5"  $DAR -N -t $merge_diff -B $OPT
 mkdir $dst
-GO "F2-6"  $DAR -N -x $full -R $dst -B $OPT
-GO "F2-7"  $DAR -N -x $full2 -R $dst -n -B $OPT
-GO "F2-8"  $DAR -N -x $diff2 -R $dst -w -B $OPT
+GO "F2-6"  $DAR -N -x $full2 -R $dst -B $OPT
+GO "F2-7"  $DAR -N -x $diff2 -R $dst -w -B $OPT
+GO "F2-8"  $DAR -N -x $full -R $dst -w -B $OPT
 GO "F2-9"  $DAR -N -x $diff -R $dst -w -B $OPT
 GO "F2-A"  $DAR -N -d $merge_diff -R $dst --alter=do-not-compare-symlink-mtime -B $OPT
 rm -rf $dst

@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.4.2], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.4.3], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -42,7 +42,7 @@ AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 
 
-AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h])
+AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h execinfo.h])
 
 
 AC_SYS_LARGEFILE
@@ -563,6 +563,14 @@ AC_ARG_ENABLE( [upx],
                 ]
              )
 
+AC_ARG_ENABLE( [fast-dir],
+	       AC_HELP_STRING(--disable-fast-dir, [disable optimization for large directories, doing so has a little positive impact on memory requirement but a huge drawback on execution time]),
+	       [],
+	       [AC_DEFINE(LIBDAR_FAST_DIR, 1, [activation of speed optimization for large directories])
+	        local_fast_dir="yes"
+	       ]
+	     )
+
 AC_ARG_ENABLE(  [thread-safe],
                 AC_HELP_STRING(--disable-thread-safe, [libdar is thread safe if POSIX mutex are available, you can manually disable the use of POSIX mutex, the resulting libdar library will not be thread-safe anymore unless special-alloc is disabled too]),
                 [ AC_MSG_NOTICE([thread-safe support disabled])
@@ -590,6 +598,10 @@ AC_ARG_ENABLE(  [thread-safe],
 AC_ARG_ENABLE( [profiling],
 	       AC_HELP_STRING(--enable-profiling, [enable executable profiling]),
                [ profiling="yes" ])
+
+AC_ARG_ENABLE( [debug-memory],
+	       AC_HELP_STRING(--enable-debug-memory, [log memory allocations and releases to /tmp/dar_debug_mem_allocation.txt this debugging option lead to a slow executable]),
+	       [AC_DEFINE(LIBDAR_DEBUG_MEMORY, 1, [if defined, builds a very slow executable])])
 
 AC_ARG_ENABLE( [dar-static],
                AC_HELP_STRING(--disable-dar-static, [avoids building dar_static, a dar statically linked version]),
@@ -713,6 +725,13 @@ fi
 
 echo -n "   Furtive read mode          : "
 if [ "$local_furtive_read_mode" = "yes" ]; then
+   echo "YES"
+else
+   echo "NO"
+fi
+
+echo -n "   Large directory optim.     : "
+if [ "$local_fast_dir" = "yes" ] ; then
    echo "YES"
 else
    echo "NO"

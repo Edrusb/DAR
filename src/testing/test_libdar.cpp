@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_libdar.cpp,v 1.45 2011/01/16 11:35:51 edrusb Rel $
+// $Id: test_libdar.cpp,v 1.45.2.1 2012/02/25 19:57:01 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -104,7 +104,7 @@ void f1()
 
 void warning(const string &x, void *context)
 {
-    printf("[%d]%s\n", (U_I)context, x.c_str());
+    printf("[%p]%s\n", context, x.c_str());
 }
 
 bool question(const string & x, void *context)
@@ -112,7 +112,7 @@ bool question(const string & x, void *context)
     bool rep = false;
 	    char r;
 
-	    printf("[%d]%s\n", (U_I)context, x.c_str());
+	    printf("[%p]%s\n", context, x.c_str());
 	    scanf("%c", &r);
 	    rep = r == 'y';
 
@@ -140,7 +140,7 @@ void listing(const std::string & flag,
 	     bool has_children,
 	     void *context)
 {
-    ui.printf("[[%d]][%S][%S][%S][%S][%S][%S][%S][%s][%s]\n", (U_I)context, &flag, &perm, &uid, &gid, &size, &date, &filename, is_dir ? "dir" : "not_dir", has_children ? "has children" : "no children");
+    ui.printf("[[%p]][%S][%S][%S][%S][%S][%S][%S][%s][%s]\n", context, &flag, &perm, &uid, &gid, &size, &date, &filename, is_dir ? "dir" : "not_dir", has_children ? "has children" : "no children");
 }
 
 void f2()

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: header.hpp,v 1.19 2011/01/09 17:25:58 edrusb Rel $
+// $Id: header.hpp,v 1.19.2.1 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -76,14 +76,15 @@ namespace libdar
 
         header();
         header(const header & ref) { copy_from(ref); };
-        const struct header & operator = (const header & ref) { copy_from(ref); return *this; };
+        const struct header & operator = (const header & ref) { free_pointers(); copy_from(ref); return *this; };
+	~header() { free_pointers(); };
 
 	    // global methods
 
         void read(user_interaction & ui, generic_file & f, bool lax = false );
-        void write(user_interaction &, generic_file & f);
+        void write(user_interaction &, generic_file & f) const;
         void read(user_interaction & dialog, S_I fd, bool lax = false);
-        void write(user_interaction & dialog, S_I fd);
+        void write(user_interaction & dialog, S_I fd) const;
 
 	    /// minimal size of a header in an archive
 
@@ -104,11 +105,11 @@ namespace libdar
 	char & get_set_flag() { return flag; };
 	label & get_set_data_name() { return data_name; };
 
-	bool get_first_slice_size(infinint & size);
+	bool get_first_slice_size(infinint & size) const;
 	void set_first_slice_size(const infinint & size);
 	void unset_first_slice_size() { if(first_size != NULL) { delete first_size; first_size = NULL; } };
 
-	bool get_slice_size(infinint & size);
+	bool get_slice_size(infinint & size) const;
 	void set_slice_size(const infinint & size);
 	void unset_slice_size() { if(slice_size != NULL) { delete slice_size; slice_size = NULL; } };
 
@@ -125,7 +126,7 @@ namespace libdar
 
 
         void copy_from(const header & ref);
-	void clear_pointers();
+	void free_pointers();
 	void fill_from(user_interaction & ui, const tlv_list & list);
 	tlv_list build_tlv_list(user_interaction & ui) const;
     };

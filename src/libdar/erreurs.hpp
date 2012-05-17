@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: erreurs.hpp,v 1.24 2011/05/20 10:23:07 edrusb Rel $
+// $Id: erreurs.hpp,v 1.24.2.1 2012/02/25 14:43:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -36,9 +36,6 @@
 
 namespace libdar
 {
-
-#define E_BEGIN try {
-#define E_END(passage, message)  } catch(Egeneric & e) { e.stack(passage, message); throw; }
 
 	/// \addtogroup API
 	/// @{
@@ -58,12 +55,10 @@ namespace libdar
     public :
 	    /// the constructor
         Egeneric(const std::string &source, const std::string &message);
-	    /// copy constructor
-        Egeneric(const Egeneric & ref) { pile = ref.pile; };
 	    /// the destructor
         virtual ~Egeneric() {};
 
-	    /// rarely used mechanism to keep trace of calls the exception has been exiting from
+	    /// add more detailed couple of information to the exception
         virtual void stack(const std::string & passage, const std::string & message = "") { pile.push_back(niveau(passage, message)); };
 
 	    /// get the message explaing the nature of the exception
@@ -132,7 +127,7 @@ namespace libdar
 
 
 #define SRC_BUG Ebug(__FILE__, __LINE__)
-#define XMT_BUG(exception, call) exception.stack(call, __FILE__, __LINE__)
+// #define XMT_BUG(exception, call) exception.stack(call, __FILE__, __LINE__)
 
 	/// exception used to signal a bug. A bug is triggered when reaching some code that should never be reached
     class Ebug : public Egeneric

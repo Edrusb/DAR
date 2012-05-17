@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: compressor.hpp,v 1.26 2011/04/17 13:12:29 edrusb Rel $
+// $Id: compressor.hpp,v 1.26.2.2 2012/02/19 22:15:05 edrusb Exp $
 //
 /*********************************************************************/
     /// \file compressor.hpp

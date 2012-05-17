@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive_options.cpp,v 1.38 2011/06/02 13:17:37 edrusb Rel $
+// $Id: archive_options.cpp,v 1.38.2.1 2012/02/25 14:43:44 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -35,7 +35,7 @@ namespace libdar
 
     static const U_32 default_crypto_size = 10240;
     static const path default_ref_chem = "/";
-    static const infinint default_min_compr_size = 100;
+    static const U_I default_min_compr_size = 100;
     static const inode::comparison_fields default_comparison_fields = inode::cf_all;
     static const crit_constant_action default_crit_action = crit_constant_action(data_preserve, EA_preserve);
     static const string default_user_comment = "N/A";
@@ -1290,7 +1290,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: archive_options.cpp,v 1.38 2011/06/02 13:17:37 edrusb Rel $";
+        static char id[]="$Id: archive_options.cpp,v 1.38.2.1 2012/02/25 14:43:44 edrusb Exp $";
         dummy_call(id);
     }
 

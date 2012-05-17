@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.46 2011/04/17 13:12:29 edrusb Rel $
+// $Id: generic_file.cpp,v 1.46.2.1 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -187,14 +187,14 @@ namespace libdar
         while(lu > 0);
     }
 
-    void generic_file::copy_to(generic_file & ref, crc & value)
+    void generic_file::copy_to(generic_file & ref, const infinint & crc_size, crc * & value)
     {
 	if(terminated)
 	    throw SRC_BUG;
 
-        reset_crc(value.get_size());
+        reset_crc(crc_size);
         copy_to(ref);
-        get_crc(value);
+        value = get_crc();
     }
 
     U_32 generic_file::copy_to(generic_file & ref, U_32 size)
@@ -259,7 +259,7 @@ namespace libdar
         return wrote;
     }
 
-    bool generic_file::diff(generic_file & f, crc & value)
+    bool generic_file::diff(generic_file & f, const infinint & crc_size, crc * & value)
     {
         char buffer1[BUFFER_SIZE];
         char buffer2[BUFFER_SIZE];
@@ -273,27 +273,67 @@ namespace libdar
             throw Erange("generic_file::diff", gettext("Cannot compare files in write only mode"));
         skip(0);
         f.skip(0);
-	value.clear();
-        do
-        {
-            lu1 = read(buffer1, BUFFER_SIZE);
-            lu2 = f.read(buffer2, BUFFER_SIZE);
-            if(lu1 == lu2)
-            {
-                register U_I i = 0;
-                while(i < lu1 && buffer1[i] == buffer2[i])
-                    ++i;
-                if(i < lu1)
-                    diff = true;
+	value = create_crc_from_size(crc_size);
+	if(value == NULL)
+	    throw SRC_BUG;
+	try
+	{
+	    do
+	    {
+		lu1 = read(buffer1, BUFFER_SIZE);
+		lu2 = f.read(buffer2, BUFFER_SIZE);
+		if(lu1 == lu2)
+		{
+		    register U_I i = 0;
+		    while(i < lu1 && buffer1[i] == buffer2[i])
+			++i;
+		    if(i < lu1)
+			diff = true;
+		    else
+			value->compute(buffer1, lu1);
+		}
 		else
-		    value.compute(buffer1, lu1);
-            }
-            else
-                diff = true;
-        }
-        while(!diff && lu1 > 0);
+		    diff = true;
+	    }
+	    while(!diff && lu1 > 0);
+	}
+	catch(...)
+	{
+	    delete value;
+	    value = NULL;
+	    throw;
+	}
 
         return diff;
+    }
+
+    void generic_file::reset_crc(const infinint & width)
+    {
+	if(terminated)
+	    throw SRC_BUG;
+
+        if(active_read == &generic_file::read_crc)
+            throw SRC_BUG; // crc still active, previous CRC value never read
+	if(checksum != NULL)
+	    throw SRC_BUG; // checksum is only created when crc mode is activated
+	checksum = create_crc_from_size(width);
+        enable_crc(true);
+    }
+
+    crc *generic_file::get_crc()
+    {
+	crc *ret = NULL;
+
+	if(checksum == NULL)
+	    throw SRC_BUG;
+	else
+	{
+	    ret = checksum;
+	    checksum = NULL; // the CRC object is now under the responsibility of the caller
+	}
+	enable_crc(false);
+
+	return ret;
     }
 
     void generic_file::sync_write()
@@ -307,16 +347,6 @@ namespace libdar
 	    throw Erange("generic_file::read", gettext("Cannot sync write on a read-only generic_file"));
     }
 
-    void generic_file::reset_crc(const infinint & width)
-    {
-	if(terminated)
-	    throw SRC_BUG;
-
-        if(active_read == &generic_file::read_crc)
-            throw SRC_BUG; // crc still active, previous CRC value never read
-        enable_crc(true);
-	checksum.resize(width);
-    }
 
     void generic_file::enable_crc(bool mode)
     {
@@ -325,6 +355,8 @@ namespace libdar
 
         if(mode) // routines with crc features
         {
+	    if(checksum == NULL)
+		throw SRC_BUG;
             active_read = &generic_file::read_crc;
             active_write = &generic_file::write_crc;
         }
@@ -342,7 +374,9 @@ namespace libdar
 	else
 	{
 	    S_I ret = inherited_read(a, size);
-	    checksum.compute(a, ret);
+	    if(checksum == NULL)
+		throw SRC_BUG;
+	    checksum->compute(a, ret);
 	    return ret;
 	}
     }
@@ -353,7 +387,18 @@ namespace libdar
 	    throw SRC_BUG;
 
         inherited_write(a, size);
-	checksum.compute(a, size);
+	if(checksum == NULL)
+	    throw SRC_BUG;
+	checksum->compute(a, size);
+    }
+
+    void generic_file::destroy()
+    {
+	if(checksum != NULL)
+	{
+	    delete checksum;
+	    checksum = NULL;
+	}
     }
 
     void generic_file::copy_from(const generic_file & ref)
@@ -362,7 +407,10 @@ namespace libdar
 	    throw SRC_BUG;
 
 	rw = ref.rw;
-	checksum = ref.checksum;
+	if(ref.checksum != NULL)
+	    checksum = ref.checksum->clone();
+	else
+	    checksum = NULL;
 	terminated = ref.terminated;
 	active_read = ref.active_read;
 	active_write = ref.active_write;
@@ -371,7 +419,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.46 2011/04/17 13:12:29 edrusb Rel $";
+        static char id[]="$Id: generic_file.cpp,v 1.46.2.1 2012/02/12 20:43:34 edrusb Exp $";
         dummy_call(id);
     }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: semaphore.hpp,v 1.4 2011/01/09 17:25:58 edrusb Rel $
+// $Id: semaphore.hpp,v 1.4.2.1 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -108,6 +108,9 @@ namespace libdar
 	    /// to tell that the backup is completed for the last "raised" entry.
 	void lower();
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(semaphore);
+#endif
     private:
 	infinint count;       //< is the number of subdirectories currently saved in the last directory that matched the mask
 	std::string chem;     //< path of the file that has to be call in the "end" context when count will drop to zero

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: header_version.hpp,v 1.22 2011/01/09 17:25:58 edrusb Rel $
+// $Id: header_version.hpp,v 1.22.2.1 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -70,7 +70,7 @@ namespace libdar
 
         void read(generic_file &f)
 	{
-	    crc ctrl;
+	    crc *ctrl = NULL;
 
 	    f.reset_crc(HEADER_CRC_SIZE);
 	    edition.read(f);
@@ -84,23 +84,58 @@ namespace libdar
 		initial_offset.read(f);
 	    else
 		initial_offset = 0;
-	    f.get_crc(ctrl);
-	    if((edition == empty_archive_version()))
-		throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
-	    if(edition > 7)
+
+	    ctrl = f.get_crc();
+	    if(ctrl == NULL)
+		throw SRC_BUG;
+	    try
 	    {
-		crc coh = infinint(HEADER_CRC_SIZE);
-		coh.read(f);
-		if(coh != ctrl)
+		if((edition == empty_archive_version()))
 		    throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
+		if(edition > 7)
+		{
+		    crc *coh = create_crc_from_file(f);
+
+		    if(coh == NULL)
+			throw SRC_BUG;
+		    try
+		    {
+			if(typeid(*coh) != typeid(*ctrl))
+			{
+			    if(coh->get_size() != ctrl->get_size())
+				throw SRC_BUG;
+			    else
+				throw SRC_BUG; // both case lead to a bug, but we need to know which one is met
+			}
+			if(*coh != *ctrl)
+			    throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
+		    }
+		    catch(...)
+		    {
+			if(coh != NULL)
+			    delete coh;
+			throw;
+		    }
+		    if(coh != NULL)
+			delete coh;
+		}
+		if(initial_offset == 0)
+		    initial_offset = f.get_position();
 	    }
-	    if(initial_offset == 0)
-		initial_offset = f.get_position();
+	    catch(...)
+	    {
+		if(ctrl != NULL)
+		    delete ctrl;
+		throw;
+	    }
+
+	    if(ctrl != NULL)
+		delete ctrl;
 	};
 
         void write(generic_file &f)
 	{
-	    crc ctrl;
+	    crc *ctrl = NULL;
 
 		// preparing the data
 
@@ -118,8 +153,22 @@ namespace libdar
 	    f.write((char *)&flag, 1);
 	    if(initial_offset != 0)
 		initial_offset.dump(f);
-	    f.get_crc(ctrl);
-	    ctrl.dump(f);
+
+	    ctrl = f.get_crc();
+	    if(ctrl == NULL)
+		throw SRC_BUG;
+	    try
+	    {
+		ctrl->dump(f);
+	    }
+	    catch(...)
+	    {
+		if(ctrl != NULL)
+		    delete ctrl;
+		throw;
+	    }
+	    if(ctrl != NULL)
+		delete ctrl;
 	};
     };
 

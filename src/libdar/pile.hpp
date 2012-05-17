@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: pile.hpp,v 1.14 2011/04/17 13:12:29 edrusb Rel $
+// $Id: pile.hpp,v 1.14.2.1 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -140,7 +140,7 @@ namespace libdar
 	bool skip_relative(S_I x);
 	infinint get_position();
 	void copy_to(generic_file & ref);
-	void copy_to(generic_file & ref, crc & value);
+	void copy_to(generic_file & ref, const infinint & crc_size, crc * & value);
 
     protected:
 	U_I inherited_read(char *a, U_I size);

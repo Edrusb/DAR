@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: storage.hpp,v 1.20 2011/01/22 22:39:10 edrusb Rel $
+// $Id: storage.hpp,v 1.20.2.3 2012/02/25 14:43:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -29,6 +29,7 @@
 #include "../my_config.h"
 #include "erreurs.hpp"
 #include "integers.hpp"
+#include "special_alloc.hpp"
 
 #ifdef LIBDAR_MODE
 #include "infinint.hpp"
@@ -69,29 +70,29 @@ namespace libdar
 
     public:
         storage(U_32 size)
-            { E_BEGIN; make_alloc(size, first, last); E_END("storage::storage","U_32"); };
+            { make_alloc(size, first, last); };
         storage(const infinint & size);
         storage(const storage & ref)
-            { E_BEGIN; copy_from(ref); E_END("storage::storage", "storage &"); };
+            { copy_from(ref); };
         storage(generic_file & f, const infinint &size);
         ~storage()
-            { E_BEGIN; detruit(first); E_END("storage::~storage", ""); };
+            {  detruit(first); };
 
         const storage & operator = (const storage & val)
-            { E_BEGIN; detruit(first); copy_from(val); return *this; E_END("storage::operator=",""); };
+            {  detruit(first); copy_from(val); return *this; };
 
         bool operator < (const storage & ref) const
-            { E_BEGIN; return difference(ref) < 0; E_END("storage::operator <",""); }; // true if arg uses more space than this
+            { return difference(ref) < 0; }; // true if arg uses more space than this
         bool operator == (const storage & ref) const
-            { E_BEGIN; return difference(ref) == 0; E_END("storage::operator ==",""); }; //true if arg have same space than this
+            { return difference(ref) == 0; }; //true if arg have same space than this
         bool operator > (const storage & ref) const
-            { E_BEGIN; return difference(ref) > 0; E_END("storage::operator >", ""); };
+            { return difference(ref) > 0; };
         bool operator <= (const storage & ref) const
-            { E_BEGIN; return difference(ref) <= 0; E_END("storage::operator <=", ""); };
+            { return difference(ref) <= 0; };
         bool operator >= (const storage & ref) const
-            { E_BEGIN; return difference(ref) >= 0; E_END("storage::operator >=", ""); };
+            { return difference(ref) >= 0; };
         bool operator != (const storage & ref) const
-            { E_BEGIN; return difference(ref) != 0; E_END("storage::operator !=", ""); };
+            { return difference(ref) != 0; };
         unsigned char & operator [](infinint position);
         unsigned char operator [](const infinint & position) const;
         infinint size() const;
@@ -107,17 +108,17 @@ namespace libdar
                 // default operator = is OK
 
             iterator operator ++ (S_I x)
-                { E_BEGIN; iterator ret = *this; skip_plus_one(); return ret;  E_END("storage::iterator::operator++", "(S_I)"); };
+                { iterator ret = *this; skip_plus_one(); return ret; };
             iterator operator -- (S_I x)
-                { E_BEGIN; iterator ret = *this; skip_less_one(); return ret; E_END("storage::iterator::operator--", "(S_I)");};
+                { iterator ret = *this; skip_less_one(); return ret; };
             iterator & operator ++ ()
-                { E_BEGIN; skip_plus_one(); return *this; E_END("storage::iterator::operator++", "()"); };
+                { skip_plus_one(); return *this; };
             iterator & operator -- ()
-                { E_BEGIN; skip_less_one(); return *this; E_END("storage::iterator::operator--", "()"); };
+                { skip_less_one(); return *this; };
             iterator operator + (U_32 s) const
-                { E_BEGIN; iterator ret = *this; ret += s; return ret; E_END("storage::iterator::operator +", ""); };
+                { iterator ret = *this; ret += s; return ret; };
             iterator operator - (U_32 s) const
-                { E_BEGIN; iterator ret = *this; ret -= s; return ret; E_END("storage::iterator::operator -", ""); };
+                { iterator ret = *this; ret -= s; return ret; };
             iterator & operator += (U_32 s);
 	    iterator & operator -= (U_32 s);
             unsigned char &operator *() const;
@@ -126,9 +127,9 @@ namespace libdar
             infinint get_position() const;
 
             bool operator == (const iterator & cmp) const
-                { E_BEGIN; return ref == cmp.ref && cell == cmp.cell && offset == cmp.offset; E_END("storage::iterator::operator ==", ""); };
+                { return ref == cmp.ref && cell == cmp.cell && offset == cmp.offset; };
             bool operator != (const iterator & cmp) const
-                { E_BEGIN; return ! (*this == cmp); E_END("storage::iterator::operator !=", ""); };
+                { return ! (*this == cmp); };
 
         private:
             static const U_32 OFF_BEGIN = 1;
@@ -140,7 +141,7 @@ namespace libdar
 
             void relative_skip_to(S_32 val);
             bool points_on_data() const
-                { E_BEGIN; return ref != NULL && cell != NULL && offset < cell->size; E_END("storage::iterator::point_on_data", "");};
+                {  return ref != NULL && cell != NULL && offset < cell->size; };
 
             inline void skip_plus_one();
             inline void skip_less_one();
@@ -151,18 +152,18 @@ namespace libdar
             // public storage methode using iterator
 
         iterator begin() const
-            { E_BEGIN; iterator ret; ret.cell = first; if(ret.cell != NULL) ret.offset = 0; else ret.offset = iterator::OFF_END; ret.ref = this; return ret; E_END("storage::begin", ""); };
+            { iterator ret; ret.cell = first; if(ret.cell != NULL) ret.offset = 0; else ret.offset = iterator::OFF_END; ret.ref = this; return ret; };
         iterator end() const
-            { E_BEGIN; iterator ret; ret.cell = NULL; ret.offset = iterator::OFF_END; ret.ref = this; return ret; E_END("storage::end", ""); };
+            { iterator ret; ret.cell = NULL; ret.offset = iterator::OFF_END; ret.ref = this; return ret;  };
 
             // WARNING for the two following methods :
             // there is no "reverse_iterator" type, unlike the standart lib,
             // thus when going from rbegin() to rend(), you must use the -- operator
             // unlike the stdlib, that uses the ++ operator. this is the only difference in use with stdlib.
         iterator rbegin() const
-            { E_BEGIN; iterator ret; ret.cell = last; ret.offset = last != NULL ? last->size-1 : 0; ret.ref = this; return ret; E_END("storage::rbegin", ""); };
+            { iterator ret; ret.cell = last; ret.offset = last != NULL ? last->size-1 : 0; ret.ref = this; return ret; };
         iterator rend() const
-            { E_BEGIN; iterator ret; ret.cell = NULL, ret.offset = iterator::OFF_BEGIN; ret.ref = this; return ret; E_END("storage::rend", ""); };
+            { iterator ret; ret.cell = NULL, ret.offset = iterator::OFF_BEGIN; ret.ref = this; return ret; };
 
 	    /// write data to the storage at the location pointed to by it
 
@@ -172,9 +173,9 @@ namespace libdar
         U_I write(iterator & it, unsigned char *a, U_I size);
         U_I read(iterator & it, unsigned char *a, U_I size) const;
         bool write(iterator & it, unsigned char a)
-            { E_BEGIN; return write(it, &a, 1) == 1; E_END("storage::write", "unsigned char"); };
+            { return write(it, &a, 1) == 1; };
         bool read(iterator & it, unsigned char &a) const
-            { E_BEGIN; return read(it, &a, 1) == 1; E_END("storage::read", "unsigned char"); };
+            { return read(it, &a, 1) == 1; };
 
             // after one of these 3 calls, the iterator given in argument are undefined (they may point nowhere)
         void insert_null_bytes_at_iterator(iterator it, U_I size);
@@ -184,7 +185,9 @@ namespace libdar
         void remove_bytes_at_iterator(iterator it, U_I number);
         void remove_bytes_at_iterator(iterator it, infinint number);
 
-
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(storage);
+#endif
     private:
         struct cellule *first, *last;
 
@@ -208,7 +211,6 @@ namespace libdar
 
     inline void storage::iterator::skip_plus_one()
     {
-        E_BEGIN;
         if(cell != NULL)
             if(++offset >= cell->size)
             {
@@ -218,12 +220,10 @@ namespace libdar
                 else
                     offset = OFF_END;
             }
-        E_END("storage::iterator::slik_plus_one", "");
     }
 
     inline void storage::iterator::skip_less_one()
     {
-        E_BEGIN;
         if(cell != NULL)
 	{
             if(offset > 0)
@@ -237,7 +237,6 @@ namespace libdar
                     offset = OFF_BEGIN;
             }
 	}
-        E_END("storage::iterator::slik_plus_one", "");
     }
 
 } // end of namespace

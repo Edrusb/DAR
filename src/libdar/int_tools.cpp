@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: int_tools.cpp,v 1.6 2009/12/18 10:10:21 edrusb Rel $
+// $Id: int_tools.cpp,v 1.6.2.1 2012/02/25 14:43:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -59,13 +59,12 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: int_tools.cpp,v 1.6 2009/12/18 10:10:21 edrusb Rel $";
+        static char id[]="$Id: int_tools.cpp,v 1.6.2.1 2012/02/25 14:43:44 edrusb Exp $";
         dummy_call(id);
     }
 
     void int_tools_contract_byte(const int_tools_bitfield &b, unsigned char & a)
     {
-        E_BEGIN;
         a = 0;
 
         for(register S_I i = 0; i < 8; ++i)
@@ -75,7 +74,6 @@ namespace libdar
                 throw Erange("infinint.cpp : contract_byte", gettext("a binary digit is either 0 or 1"));
             a += b[i];
         }
-        E_END("infinint.cpp : contract_byte", "");
     }
 
 } // end of namespace

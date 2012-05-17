@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: secu_string.hpp,v 1.4 2011/01/09 17:25:58 edrusb Rel $
+// $Id: secu_string.hpp,v 1.4.2.2 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -40,7 +40,7 @@
 
 #include <string>
 #include "integers.hpp"
-
+#include "special_alloc.hpp"
 
 namespace libdar
 {
@@ -56,7 +56,7 @@ namespace libdar
 	/// if more constructor are needed (espetially toward API), tell me, but
 	/// this is a non-sens to build a secure string from another data structure which is
 	/// not yet secured, where from the read() method that fetches data directly from a
-	/// filedescriptor (::read() low-level system call) which might be a tty for example
+	/// filedescriptor (read() low-level system call) which might be a tty for example
 
     class secu_string
     {
@@ -143,6 +143,9 @@ namespace libdar
 	    /// up to the first new-line character.
 	U_I size() const { return *string_size; }; // returns the size of the string
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(secu_string);
+#endif
     private:
 	U_I *allocated_size;
 	char *mem;

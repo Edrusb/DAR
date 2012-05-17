@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sar.cpp,v 1.82.2.1 2011/07/23 16:36:31 edrusb Rel $
+// $Id: sar.cpp,v 1.82.2.2 2012/01/05 10:41:24 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -390,7 +390,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.82.2.1 2011/07/23 16:36:31 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.82.2.2 2012/01/05 10:41:24 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -881,109 +881,111 @@ namespace libdar
 
     void sar::open_writeonly(const char *fic, const infinint &num)
     {
-        struct stat buf;
-        header h;
-        S_I open_flag = O_WRONLY;
+	header h;
         S_I open_mode = perm;
-        S_I fd;
+        S_I fd = -1;
 	bool unlink_on_error = false;
 
-            // check if that the file exists
-        if(stat(fic, &buf) < 0)
-            if(errno != ENOENT) // other error than 'file does not exist' occured
-                throw Erange("sar::open_writeonly", string(gettext("Error checking for presence of file ")) + fic + " : " + strerror(errno));
-            else
-	    {
-                open_flag |= O_CREAT;
-		unlink_on_error = true;
-	    }
-        else // file exists
-        {
-            S_I fd_tmp = ::open(fic, O_RDONLY|O_BINARY);
-
-            if(fd_tmp >= 0)
-            {
-                try
-                {
-                    try
-                    {
-                        h.read(get_ui(), fd_tmp);
-                    }
-                    catch(Erange & e)
-                    {
-                        h.get_set_internal_name() = of_internal_name;
-                        h.get_set_internal_name().invert_first_byte();
-                            // this way we are sure that the file is not considered as part of the SAR
-                    }
-                    if(h.get_set_internal_name() != of_internal_name)
-                    {
-                        open_flag |= O_TRUNC;
-                        if(!opt_allow_overwrite)
-                            throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
-                        if(opt_warn_overwrite)
-                        {
-                            try
-                            {
-                                get_ui().pause(string(fic) + gettext(" is about to be overwritten."));
-				unlink_on_error = true;
-                            }
-                            catch(...)
-                            {
-                                natural_destruction = false;
-                                throw;
-                            }
-                        }
-                    }
-		    else // slice of the current set
-			unlink_on_error = false; // yes this is the initial (and current) value, I know.
-                }
-                catch(Egeneric & e)
-                {
-                    close(fd_tmp);
-                    throw;
-                }
-                close(fd_tmp);
-            }
-            else // file exists but could not be openned
-            {
-                if(!opt_allow_overwrite)
-                    throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
-                if(opt_warn_overwrite)
-                {
-                    try
-                    {
-			get_ui().pause(string(fic) + gettext(" is about to be overwritten."));
-			unlink_on_error = true;
-                    }
-                    catch(...)
-                    {
-                        natural_destruction = false;
-                        throw;
-                    }
-                }
-                open_flag |= O_TRUNC;
-            }
-        }
-
-	    // OK, now that the testing of the existence of the slice that we want to open is
-	    // done we can start the main stuf (writing data to the slice)
-
-        fd = ::open(fic, open_flag|O_BINARY, open_mode);
 	try
 	{
-	    of_flag = flag_type_located_at_end_of_slice;
-	    if(fd < 0)
-		throw Erange("sar::open_writeonly open()", string(gettext("Error opening file ")) + fic + " : " + strerror(errno));
-	    else
+		// open succeeds only if this file does NOT already exist
+	     fd = ::open(fic, O_WRONLY|O_BINARY|O_CREAT|O_EXCL, open_mode);
+
+	    if(fd < 0) // open failed
 	    {
-		if((open_flag & O_CREAT) != 0) // slice has just been created
+		bool do_overwrite = false;
+
+		if(errno == EEXIST) // file already exists
+		{
+		    S_I fd_tmp = ::open(fic, O_RDONLY|O_BINARY);
+
+		    try
+		    {
+			if(fd_tmp >= 0)
+			{
+			    try
+			    {
+				h.read(get_ui(), fd_tmp);
+			    }
+			    catch(Erange & e)
+			    {
+				h.get_set_internal_name() = of_internal_name;
+				h.get_set_internal_name().invert_first_byte();
+				    // this way we are sure that the file is not considered as part of the current SAR
+			    }
+			    if(h.get_set_internal_name() != of_internal_name)
+				do_overwrite = true; // this is not a slice of the current archive
+			    close(fd_tmp);
+			    fd_tmp = -1;
+			}
+			else // open read_only failed
+			    do_overwrite = true;     // reading failed, trying overwriting (if allowed)
+		    }
+		    catch(...)
+		    {
+			if(fd_tmp >= 0)
+			    close(fd_tmp);
+			throw;
+		    }
+		}
+		else // other error
+		    throw Erange("sar::open_writeonly open()", string(gettext("Error opening file ")) + fic + " : " + strerror(errno));
+
+		if(do_overwrite)
+		{
+		    if(!opt_allow_overwrite)
+			throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
+		    if(opt_warn_overwrite)
+		    {
+			try
+			{
+			    get_ui().pause(string(fic) + gettext(" is about to be overwritten."));
+			    unlink_on_error = true;
+			}
+			catch(...)
+			{
+			    natural_destruction = false;
+			    throw;
+			}
+		    }
+		    else
+			unlink_on_error = true;
+
+			// open with overwriting
+		    fd = ::open(fic, O_WRONLY|O_BINARY|O_TRUNC, open_mode);
+		}
+		else // open without overwriting
+		    fd = ::open(fic, O_WRONLY|O_BINARY, open_mode);
+
+		if(fd < 0)
+		    throw Erange("sar::open_writeonly open()", string(gettext("Error opening file ")) + fic + " : " + strerror(errno));
+		else
 		    tools_set_ownership(fd, slice_user, slice_group);
+	    }
+	    else
+		tools_set_ownership(fd, slice_user, slice_group);
+
+
+	    if(fd < 0)
+		throw SRC_BUG;
+
+		// OK, now that the testing of the existence of the slice that we want to open is
+		// done we can start the main stuf (writing data to the slice)
+
+	    try
+	    {
+		of_flag = flag_type_located_at_end_of_slice;
+
 		if(hash == hash_none)
+		{
 		    of_fd = new fichier(get_ui(), fd);
+		    fd = -1;
+		}
 		else
 		{
 		    hash_fichier *tmp;
 		    of_fd = tmp = new hash_fichier(get_ui(), fd);
+		    fd = -1;
 		    if(tmp != NULL)
 		    {
 			tmp->set_hash_file_name(fic, hash, hash_algo_to_string(hash));
@@ -993,28 +995,35 @@ namespace libdar
 		}
 		if(of_fd == NULL)
 		    throw Ememory("sar::open_writeonly");
-	    }
 
-	    h = make_write_header(num, of_flag);
-	    h.write(get_ui(), *of_fd);
-	    if(num == 1)
+		h = make_write_header(num, of_flag);
+		h.write(get_ui(), *of_fd);
+		if(num == 1)
+		{
+		    first_file_offset = of_fd->get_position();
+		    if(first_file_offset == 0)
+			throw SRC_BUG;
+		    other_file_offset = first_file_offset; // same header in all slice since release 2.4.0
+		    if(first_file_offset >= first_size)
+			throw Erange("sar::sar", gettext("First slice size is too small to even just be able to drop the slice header"));
+		    if(other_file_offset >= size)
+			throw Erange("sar::sar", gettext("Slice size is too small to even just be able to drop the slice header"));
+		}
+	    }
+	    catch(...)
 	    {
-		first_file_offset = of_fd->get_position();
-		if(first_file_offset == 0)
-		    throw SRC_BUG;
-		other_file_offset = first_file_offset; // same header in all slice since release 2.4.0
-		if(first_file_offset >= first_size)
-		    throw Erange("sar::sar", gettext("First slice size is too small to even just be able to drop the slice header"));
-		if(other_file_offset >= size)
-		    throw Erange("sar::sar", gettext("Slice size is too small to even just be able to drop the slice header"));
+		if(unlink_on_error)
+		    unlink(fic);
+		throw;
 	    }
 	}
 	catch(...)
 	{
-	    if(unlink_on_error)
-		unlink(fic);
+	    if(fd >= 0)
+		close(fd);
 	    throw;
 	}
+
     }
 
     void sar::open_file_init()
@@ -1341,28 +1350,26 @@ namespace libdar
 	ext = extension;
 	x_min_digits = min_digits;
 
-	    // creating the slice
+	    // creating the slice if it does not exist else failing
 
-	if(!allow_over || warn_over)
+	fd = ::open(name, O_WRONLY|O_BINARY|O_CREAT|O_EXCL, tools_octal2int(slice_permission));
+
+	if(fd < 0) // open failed
 	{
-	    struct stat buf;
-	    if(lstat(name, &buf) < 0)
-	    {
-		if(errno != ENOENT)
-		    throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("Error retrieving inode information for %s : %s"), name, strerror(errno)));
-	    }
-	    else
+	    if(errno == EEXIST)
 	    {
 		if(!allow_over)
 		    throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("%S already exists, and overwritten is forbidden, aborting"), &filename));
 		if(warn_over)
 		    dialog.pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
-	    }
-	}
 
-	fd = ::open(name, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, tools_octal2int(slice_permission));
-	if(fd < 0)
-	    throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("Error opening file %s : %s"), name, strerror(errno)));
+		fd = ::open(name, O_WRONLY|O_BINARY|O_TRUNC, tools_octal2int(slice_permission));
+		if(fd < 0)
+		    throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("Error opening file %s : %s"), name, strerror(errno)));
+	    }
+	    else
+		throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("Error opening file %s : %s"), name, strerror(errno)));
+	}
 
 	try
 	{

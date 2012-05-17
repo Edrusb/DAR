@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.32 2011/03/20 17:10:11 edrusb Rel $
+// $Id: real_infinint.cpp,v 1.32.2.1 2012/02/25 14:43:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -71,7 +71,6 @@ namespace libdar
 
     void infinint::build_from_file(generic_file & x)
     {
-        E_BEGIN;
         unsigned char a;
         bool fin = false;
         infinint skip = 0;
@@ -128,13 +127,11 @@ namespace libdar
             }
         }
         reduce(); // necessary to reduce due to TG storage
-        E_END("infinint::build_from_file", "generic_file");
     }
 
 
     void infinint::dump(generic_file & x) const
     {
-        E_BEGIN;
         infinint width;
         infinint pos;
         unsigned char last_width;
@@ -211,13 +208,10 @@ namespace libdar
 
             // now we continue dumping the informational bytes :
         field->dump(x);
-
-        E_END("infinint::dump", "generic_file");
     }
 
     infinint & infinint::operator += (const infinint & arg)
     {
-        E_BEGIN;
         if(! is_valid() || ! arg.is_valid())
             throw SRC_BUG;
 
@@ -258,12 +252,10 @@ namespace libdar
 	    // resulting infinint is thus in canonical form (no leading zeros)
 
         return *this;
-        E_END("infinint::operator +=", "");
     }
 
     infinint & infinint::operator -= (const infinint & arg)
     {
-        E_BEGIN;
         if(! is_valid() || ! arg.is_valid())
             throw SRC_BUG;
 
@@ -315,12 +307,10 @@ namespace libdar
 	    // at the detriment of the space used during the gap.
 
         return *this;
-        E_END("infinint::operator -=", "");
     }
 
     infinint & infinint::operator *= (unsigned char arg)
     {
-        E_BEGIN;
         if(!is_valid())
             throw SRC_BUG;
 
@@ -352,12 +342,10 @@ namespace libdar
 	    // under non canonical form
 
         return *this;
-        E_END("infinint::operator *=", "unsigned char");
     }
 
     infinint & infinint::operator *= (const infinint & arg)
     {
-        E_BEGIN;
         infinint ret = 0;
 
         if(!is_valid() || !arg.is_valid())
@@ -375,12 +363,10 @@ namespace libdar
         *this = ret;
 
         return *this; // copy constructor
-        E_END("infinint::operator *=", "infinint");
     }
 
     infinint & infinint::operator &= (const infinint & arg)
     {
-	E_BEGIN;
 	if(! is_valid() || ! arg.is_valid())
 	    throw SRC_BUG;
 
@@ -408,12 +394,10 @@ namespace libdar
 	}
 
 	return *this;
-	E_END("infinint::operator &=", "infinint");
     }
 
     infinint & infinint::operator |= (const infinint & arg)
     {
-	E_BEGIN;
 	if(! is_valid() || ! arg.is_valid())
 	    throw SRC_BUG;
 
@@ -426,12 +410,10 @@ namespace libdar
 	    *it_res-- |= *it_a--;
 
 	return *this;
-	E_END("infinint::operator |=", "infinint");
     }
 
     infinint & infinint::operator ^= (const infinint & arg)
     {
-	E_BEGIN;
 	if(! is_valid() || ! arg.is_valid())
 	    throw SRC_BUG;
 
@@ -448,13 +430,11 @@ namespace libdar
 	}
 
 	return *this;
-	E_END("infinint::operator ^=", "infinint");
     }
 
 
     infinint & infinint::operator >>= (U_32 bit)
     {
-        E_BEGIN;
         if(! is_valid())
             throw SRC_BUG;
 
@@ -494,12 +474,10 @@ namespace libdar
         }
 
         return *this;
-        E_END("infinint::operator >>=", "U_32");
     }
 
     infinint & infinint::operator >>= (infinint bit)
     {
-        E_BEGIN;
         if(! is_valid() || ! bit.is_valid())
             throw SRC_BUG;
 
@@ -515,12 +493,10 @@ namespace libdar
         while(delta_bit > 0);
 
         return *this;
-        E_END("infinint::operator >>=", "infinint");
     }
 
     infinint & infinint::operator <<= (U_32 bit)
     {
-        E_BEGIN;
         if(! is_valid())
             throw SRC_BUG;
 
@@ -567,12 +543,10 @@ namespace libdar
         }
 
         return *this;
-        E_END("infinint::operator <<=", "U_32");
     }
 
     infinint & infinint::operator <<= (infinint bit)
     {
-        E_BEGIN;
         U_32 delta_bit = 0;
         bit.unstack(delta_bit);
 
@@ -585,7 +559,6 @@ namespace libdar
         while(delta_bit > 0);
 
         return *this;
-        E_END("infinint::operator <<=", "infinint");
     }
 
     unsigned char infinint::operator [] (const infinint & position) const
@@ -595,7 +568,6 @@ namespace libdar
 
     S_I infinint::difference(const infinint & b) const
     {
-        E_BEGIN;
         storage::iterator ita;
         storage::iterator itb;
         const infinint & a = *this;
@@ -636,20 +608,16 @@ namespace libdar
 
                 return *ita - *itb;
             }
-        E_END("infinint::difference", "");
     }
 
 
     bool infinint::is_valid() const
     {
-        E_BEGIN;
         return field != NULL;
-        E_END("infinint::is_valid", "");
     }
 
     void infinint::reduce()
     {
-        E_BEGIN;
         static const U_I max_a_time = ~ (U_I)(0); // this is the argument type of remove_bytes_at_iterator
 
         U_I count = 0;
@@ -683,12 +651,10 @@ namespace libdar
             }
         }
         while(it != field->end() && (*it) == 0);
-        E_END("infinint::reduce", "");
     }
 
     void infinint::copy_from(const infinint & ref)
     {
-        E_BEGIN;
         if(ref.is_valid())
         {
             field = new storage(*(ref.field));
@@ -697,46 +663,39 @@ namespace libdar
         }
         else
             throw SRC_BUG;
-        E_END("infinint::copy_from", "");
     }
 
     void infinint::detruit()
     {
-        E_BEGIN;
         if(field != NULL)
         {
             delete field;
             field = NULL;
         }
-        E_END("infinint::detruit", "");
     }
 
     void infinint::make_at_least_as_wider_as(const infinint & ref)
     {
-        E_BEGIN;
         if(! is_valid() || ! ref.is_valid())
             throw SRC_BUG;
 
         field->insert_as_much_as_necessary_const_byte_to_be_as_wider_as(*ref.field, field->begin(), 0x00);
-        E_END("infinint::make_at_least_as_wider_as", "");
     }
 
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: real_infinint.cpp,v 1.32 2011/03/20 17:10:11 edrusb Rel $";
+	static char id[]="$Id: real_infinint.cpp,v 1.32.2.1 2012/02/25 14:43:44 edrusb Exp $";
         dummy_call(id);
     }
 
     void infinint::setup_endian()
     {
-        E_BEGIN;
         if(integers_system_is_big_endian())
             used_endian = big_endian;
         else
             used_endian = little_endian;
 	bzero(zeroed_field, ZEROED_SIZE);
-        E_END("infinint::setup_endian", "");
     }
 
     bool infinint::is_system_big_endian()
@@ -763,141 +722,112 @@ namespace libdar
 
     infinint operator + (const infinint & a, const infinint & b)
     {
-        E_BEGIN;
         infinint ret = a;
         ret += b;
 
         return ret;
-        E_END("operator +", "infinint");
     }
 
     infinint operator - (const infinint & a, const infinint & b)
     {
-        E_BEGIN;
         infinint ret = a;
         ret -= b;
 
         return ret;
-        E_END("operator -", "infinint");
     }
 
     infinint operator * (const infinint & a, const infinint & b)
     {
-        E_BEGIN;
         infinint ret = a;
         ret *= b;
 
         return ret;
-        E_END("operator *", "infinint");
     }
 
     infinint operator * (const infinint &a, const unsigned char b)
     {
-        E_BEGIN;
         infinint ret = a;
         ret *= b;
 
         return ret;
-        E_END("operator *", "infinint, unsigned char");
     }
 
     infinint operator * (const unsigned char a, const infinint &b)
     {
-        E_BEGIN;
         infinint ret = b;
         ret *= a;
 
         return ret;
-        E_END("operator *", "unsigned char, infinint");
     }
 
     infinint operator / (const infinint & a, const infinint & b)
     {
-        E_BEGIN;
         infinint q, r;
         euclide(a, b, q, r);
 
         return q;
-        E_END("operator / ", "infinint");
     }
 
     infinint operator % (const infinint & a, const infinint & b)
     {
-        E_BEGIN;
         infinint q, r;
         euclide(a, b, q, r);
 
         return r;
-        E_END("operator %", "infinint");
     }
 
 
     infinint operator & (const infinint & a, const infinint & bit)
     {
-	E_BEGIN;
 	infinint ret = a;
 	ret &= bit;
 	return ret;
-	E_END("operator &", "infinint");
     }
 
     infinint operator | (const infinint & a, const infinint & bit)
     {
-	E_BEGIN;
 	infinint ret = a;
 	ret |= bit;
 	return ret;
-	E_END("operator |", "infinint");
     }
 
     infinint operator ^ (const infinint & a, const infinint & bit)
     {
-	E_BEGIN;
 	infinint ret = a;
 	ret ^= bit;
 	return ret;
-	E_END("operator ^", "infinint");
     }
 
     infinint operator >> (const infinint & a, U_32 bit)
     {
-        E_BEGIN;
         infinint ret = a;
         ret >>= bit;
         return ret;
-        E_END("operator >>", "infinint, U_32");
     }
 
     infinint operator >> (const infinint & a, const infinint & bit)
     {
-        E_BEGIN;
         infinint ret = a;
         ret >>= bit;
         return ret;
-        E_END("operator >>", "infinint");
     }
 
     infinint operator << (const infinint & a, U_32 bit)
     {
-        E_BEGIN;
         infinint ret = a;
         ret <<= bit;
         return ret;
-        E_END("operator <<", "infinint, U_32");
     }
 
     infinint operator << (const infinint & a, const infinint & bit)
     {
-        E_BEGIN;
         infinint ret = a;
         ret <<= bit;
         return ret;
-        E_END("operator <<", "infinint");
     }
 
     void euclide(infinint a, const infinint &b, infinint &q, infinint &r)
     {
-        E_BEGIN;
         if(b == 0)
             throw Einfinint("infinint.cpp : euclide", gettext("Division by zero")); // division by zero
 
@@ -932,7 +862,6 @@ namespace libdar
         }
 
         r = a;
-        E_END("euclide", "infinint");
     }
 
 } // end of namespace

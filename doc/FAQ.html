@@ -11,13 +11,10 @@
 
 
 
-  
-  
-  <meta content="text/html; charset=us-ascii" http-equiv="content-type">
-  <title>DAR - Frequently Asked Questions</title>
 
   
-</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+  
+  <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -2508,13 +2505,13 @@ first we create the destination directory:<br>
       <div style="margin-left: 40px;">The "--retry-on-change" let dar
 retry the copy of a file up to three times if that file has changed at
 the time dar was reading it. You can increase this number at will. If a
-file fails to be copies correctly after more than the allowed retry, a
+file fails to be copied correctly after more than the allowed retry, a
 warning is issued about that file.<br>
       <br>
 "piping" ('|' shell syntax) the first dar's output to the second dar's
 input makes the operation not requiering any temporary storage, only
 virtual memory is used to perform this copy. Compression is thus not
-requested as it would only slow down the process.<br>
+requested as it would only slow down the whole process.<br>
       <br>
       <span style="text-decoration: underline;">last point,</span> you
 should compare the copied data to the original one, before removing it,
@@ -2523,7 +2520,14 @@ be done using:<br>
       <br>
 &nbsp;&nbsp;&nbsp; <code>diff -r &lt;srcdir&gt; &lt;dstdir&gt;</code><br>
       <br>
+But, no, diff will not check extended Attributes, File Forks or Posix
+ACL, hard linked inodes, etc. If you want a more controlable way of
+copying a large directory, simply use dar with a real archive file,
+compare the archive toward the original filesystem, restore the archive
+contents to its new place, and compare the restored filesystem toward
+the original archive. <br>
       <br>
+Any better idea? Feel free to contact dar's author for an update of this documentation!<span style="font-family: Courier;"></span><br>
       <br>
       </div>
 </td></tr></tbody></table><br>

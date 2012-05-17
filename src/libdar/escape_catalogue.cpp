@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: escape_catalogue.cpp,v 1.25.2.1 2011/07/24 10:46:49 edrusb Rel $
+// $Id: escape_catalogue.cpp,v 1.25.2.2 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -185,7 +185,7 @@ namespace libdar
 	{
 	    if(ref_file->get_saved_status() == s_saved)
 	    {
-		crc c;
+		const crc * c = NULL;
 
 		if(ref_file->get_crc(c))
 		{
@@ -197,7 +197,7 @@ namespace libdar
 			throw SRC_BUG;
 
 		    ceci->esc->add_mark_at_current_position(escape::seqt_file_crc);
-		    c.dump(*(ceci->esc));
+		    c->dump(*(ceci->esc));
 		}
 		    // else, the data may come from an old archive format
 	    }
@@ -232,7 +232,7 @@ namespace libdar
 	{
 	    if(ref_ino->ea_get_saved_status() == inode::ea_full)
 	    {
-		crc c;
+		const crc * c = NULL;
 
 		ref_ino->ea_get_crc(c);
 
@@ -243,7 +243,7 @@ namespace libdar
 		if(ceci->esc == NULL)
 		    throw SRC_BUG;
 		ceci->esc->add_mark_at_current_position(escape::seqt_ea_crc);
-		c.dump(*(ceci->esc));
+		c->dump(*(ceci->esc));
 	    }
 		// else, nothing to do.
 	}
@@ -589,7 +589,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: escape_catalogue.cpp,v 1.25.2.1 2011/07/24 10:46:49 edrusb Rel $";
+        static char id[]="$Id: escape_catalogue.cpp,v 1.25.2.2 2012/02/12 20:43:34 edrusb Exp $";
         dummy_call(id);
     }
 

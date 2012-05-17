@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: trontextual.hpp,v 1.4 2011/01/09 17:25:58 edrusb Rel $
+// $Id: trontextual.hpp,v 1.4.2.1 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -48,6 +48,9 @@ namespace libdar
 	bool is_an_old_start_end_archive() const { if(ref == NULL) throw SRC_BUG; return ref->is_an_old_start_end_archive(); };
 	const label & get_data_name() const { if(ref == NULL) throw SRC_BUG; return ref->get_data_name(); };
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(trontextual);
+#endif
     private:
 	contextual *ref;   //< this is just a pointer to data owned by the inherited class tronc part of this object
 

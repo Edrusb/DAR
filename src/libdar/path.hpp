@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: path.hpp,v 1.18 2011/01/09 17:25:58 edrusb Rel $
+// $Id: path.hpp,v 1.18.2.1 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -35,6 +35,7 @@
 #include <list>
 #include <string>
 #include "erreurs.hpp"
+#include "special_alloc.hpp"
 
 #define FAKE_ROOT path(string("<ROOT>"), true)
 
@@ -155,6 +156,9 @@ namespace libdar
 	    /// \brief if the current object is an undisclosed path, tries to convert it back to normal path
 	void explode_undisclosed() const;
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(path);
+#endif
     private :
         std::list<std::string>::iterator reading;
         std::list<std::string> dirs;

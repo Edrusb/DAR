@@ -650,6 +650,10 @@ version 2.3.10 to 2.3.11
 - probable fix (problem difficult to reproduce) for double memory release in
   the storage class [SF 3163389]
 
+from 2.3.11 to 2.3.12
+- avoiding concurrent use of -p and -Q options, error message shown in that
+  situation.
+
 from 2.3.x to 2.4.0
 - hard links support for pipes, soft links, char and block devices has been
   added (so far, only hard links on plain files were supported)
@@ -807,3 +811,35 @@ from 2.4.1 to 2.4.2
   for deleted files).
 - fixing compilation problem on certain systems (missing #include statement)
 - fixing documentation syntax and spelling
+
+from 2.4.2 to 2.4.3
+- fixed absurd compilation warning about possibly uninitialized variable
+- added -ai switch to dar_manager to disable warning about improper file order
+  in database.
+- fixed bug met while changing order of archives in a dar_manager database
+- avoiding concurrent use of -p and -Q options, error message shown in that
+  situation.
+- modified slice overwriting detection code to use a single atomic system call
+  to create a new slice
+- replaced delete by delete[] for conversion routine of user/group to uid/gid
+- added the possibility to disable speed optimization for large directories
+- added memory troubleshooting option --enable-debug-memory
+- simplified class CRC implementation
+- fixed failed memory release upon exception thrown in class deci
+- modified tlv, tlv_list classes and ea_filesystem routines to not require
+  any corresponding temporary objects in libdar (saves a few new/delete calls)
+- fixed silent bug in tlv class: due to the absence of copy constructor and
+  destructor, some memory was not released and referred after the corresponding
+  object's destruction
+- modified generic_file class to avoid temporary crc objects
+- fixed bug in header class that lead unreleased field (this class lacked a
+  destructor), memory impact was however little: 10 bytes per slice
+- fixing bug in class tlv: unreleased memory
+- added protection code in class deci to properly release memory against
+  exception thrown from called routines when user interrupts the operation.
+- replace previous internal stack report code by backtrace()/backtrace_symbols()
+- complete change of the implementation of the 'special-alloc' feature:
+  the old code eat too much memory not to be adapted to new features added
+  in release 2.4.0. This new implementation also bring some speed improvement
+
+

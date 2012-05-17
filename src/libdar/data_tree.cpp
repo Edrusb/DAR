@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: data_tree.cpp,v 1.15.2.3 2011/07/30 15:49:47 edrusb Rel $
+// $Id: data_tree.cpp,v 1.15.2.5 2011/12/28 18:07:06 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -82,6 +82,9 @@ namespace libdar
 	case et_removed:
 	    f.write("R", 1);
 	    break;
+	case et_absent:
+	    f.write("A", 1);
+	    break;
 	default:
 	    throw SRC_BUG;
 	}
@@ -104,6 +107,9 @@ namespace libdar
 	    break;
 	case 'R':
 	    present = et_removed;
+	    break;
+	case 'A':
+	    present = et_absent;
 	    break;
 	default:
 	    throw Erange("data_tree::status::read", gettext("Unexpected value found in database"));
@@ -134,6 +140,7 @@ namespace libdar
 		last_mod[k] = sta;
 		break;
 	    case 2:
+	    case 3:
 		sta.read(f);
 		last_mod[k] = sta;
 		break;
@@ -200,11 +207,11 @@ namespace libdar
 	map<archive_num, status>::const_iterator it = last_mod.begin();
 	infinint max_seen = 0, max_real = 0;
 	    //archive (first argument) carries the last archive number (in the order of the database) in which a valid entry has been
-	    //found, but which is not just a record "et_present" meining that the file existed but has not been saved (differential backup context).
+	    //found, but which is not just a record "et_present" meaning that the file existed but has not been saved (differential backup context) or "et_absent" (no entry in the corresponding archive).
 	archive_num archive_seen = 0; //< last archive number (in the order of the database) in which a valid entry has been found (any state)
 	archive_num archive_even_when_removed = 0; //< last archive number in which a valid entry with data available has been found
-	bool presence_seen; //< whether the last found valid entry indicates file was present or removed
-	bool presence_real; //< whether the last found valid entry not being in an "et_present" state was present or removed
+	bool presence_seen = false; //< whether the last found valid entry indicates file was present or removed
+	bool presence_real = false; //< whether the last found valid entry not being in an "et_present" state was present or removed
 	lookup ret;
 
 	archive = 0; // 0 is never assigned to an archive number
@@ -223,6 +230,7 @@ namespace libdar
 		    presence_seen = true;
 		    break;
 		case et_removed:
+		case et_absent:
 		    presence_seen = false;
 		    break;
 		default:
@@ -245,6 +253,7 @@ namespace libdar
 			archive_even_when_removed = archive;
 			break;
 		    case et_removed:
+		    case et_absent:
 			presence_real = false;
 			break;
 		    case et_present:
@@ -273,20 +282,24 @@ namespace libdar
 	    else
 		ret = not_found;
 	else
-	    if(presence_seen && !presence_real) // last acceptable entry is a file present but not saved,
-		    // but no full backup is present in a previous archive
-	    {
-		archive = archive_seen;
-		ret = not_restorable;
-	    }
-	    else
-		if(presence_seen != presence_real)
-		    throw SRC_BUG;
-		else  // archive > 0 && presence_seen == present_real
-		    if(presence_real)
-			ret = found_present;
-		    else
-			ret = found_removed;
+	    if(archive_seen != 0)
+		if(presence_seen && !presence_real) // last acceptable entry is a file present but not saved,
+			// but no full backup is present in a previous archive
+		{
+		    archive = archive_seen;
+		    ret = not_restorable;
+		}
+		else
+		    if(presence_seen != presence_real)
+			throw SRC_BUG;
+		    else  // archive > 0 && presence_seen == present_real
+			if(presence_real)
+			    ret = found_present;
+			else
+			    ret = found_removed;
+	    else // archive != 0 but archive_seen == 0
+		throw SRC_BUG;
+
 
 	return ret;
     }
@@ -295,7 +308,7 @@ namespace libdar
     {
 	map<archive_num, status>::const_iterator it = last_change.begin();
 	infinint max_seen = 0, max_real = 0;
-	bool presence_seen, presence_real;
+	bool presence_seen = false, presence_real = false;
 	archive_num archive_seen = 0;
 	archive_num archive_even_when_removed = 0;
 	lookup ret;
@@ -316,6 +329,7 @@ namespace libdar
 		    presence_seen = true;
 		    break;
 		case et_removed:
+		case et_absent:
 		    presence_seen = false;
 		    break;
 		default:
@@ -338,6 +352,7 @@ namespace libdar
 			archive_even_when_removed = archive;
 			break;
 		    case et_removed:
+		    case et_absent:
 			presence_real = false;
 			break;
 		    case et_present:
@@ -364,17 +379,19 @@ namespace libdar
 	    else
 		ret = not_found;
 	else
-	    if(presence_seen && !presence_real) // last acceptable entry is a file present but not saved, but no full backup is present in a previous archive
-		ret = not_restorable;
+	    if(archive_seen != 0)
+		if(presence_seen && !presence_real) // last acceptable entry is a file present but not saved, but no full backup is present in a previous archive
+		    ret = not_restorable;
+		else
+		    if(presence_seen != presence_real)
+			throw SRC_BUG;
+		    else  // archive > 0 && presence_seen == present_real
+			if(presence_real)
+			    ret = found_present;
+			else
+			    ret = found_removed;
 	    else
-		if(presence_seen != presence_real)
-		    throw SRC_BUG;
-		else  // archive > 0 && presence_seen == present_real
-		    if(presence_real)
-			ret = found_present;
-		    else
-			ret = found_removed;
-
+		throw SRC_BUG;
 
 	return ret;
     }
@@ -407,7 +424,7 @@ namespace libdar
 	    return false;
     }
 
-    void data_tree::finalize(const archive_num & archive, const infinint & deleted_date)
+    void data_tree::finalize(const archive_num & archive, const infinint & deleted_date, const archive_num & ignore_archives_greater_or_equal)
     {
 	map<archive_num, status>::iterator it = last_mod.begin();
 	bool presence_max = false;
@@ -417,12 +434,12 @@ namespace libdar
 
 	    // checking the last_mod map
 
-	while(it != last_mod.end())
+	while(it != last_mod.end() && !found_in_archive)
 	{
-	    if(it->first == archive)
+	    if(it->first == archive && it->second.present != et_absent)
 		found_in_archive = true;
 	    else
-		if(it->first > num_max)
+		if(it->first > num_max && (it->first < ignore_archives_greater_or_equal || ignore_archives_greater_or_equal == 0))
 		{
 		    num_max = it->first;
 		    switch(it->second.present)
@@ -433,6 +450,7 @@ namespace libdar
 			last_mtime = it->second.date; // used as deleted_data for EA
 			break;
 		    case et_removed:
+		    case et_absent:
 			presence_max = false;
 			last_mtime = it->second.date; // keeping this date as it is
 			    // not possible to know when the EA have been removed
@@ -446,18 +464,43 @@ namespace libdar
 	    ++it;
 	}
 
-	if(!found_in_archive) // not entry found for asked archive
+	if(!found_in_archive) // not entry found for asked archive (or recorded as et_absent)
 	{
-	    if(num_max == 0)
-		throw Erange("data_tree::finalize", gettext("Corrupted database, empty entry found"));
 	    if(presence_max)
 	    {
+		    // the most recent entry found stated that this file
+		    // existed at the time "last_mtime"
+		    // and this entry is absent from the archive under addition
+		    // thus we must record that it has been removed in the
+		    // archive we currently add.
+
 		if(deleted_date > last_mtime)
-		    set_data(archive, deleted_date, et_removed); // add an entry telling that this file does no more exist in the current archive
+		    set_data(archive, deleted_date, et_absent); // add an entry telling that this file does no more exist in the current archive
 		else
-		    set_data(archive, last_mtime + 1, et_removed);
+		    set_data(archive, last_mtime + 1, et_absent);
 	    }
-		// else, this is not necessary to add anything
+	    else // the entry has been seen previously but as removed in the latest state,
+		// if we already have an et_absent entry (which is possible during a reordering archive operation within a database), we can (and must) suppress it.
+	    {
+		map<archive_num, status>::iterator it = last_mod.find(archive);
+		if(it != last_mod.end()) // we have an entry associated to this archive
+		{
+		    switch(it->second.present)
+		    {
+		    case et_saved:
+		    case et_present:
+			throw SRC_BUG; // entry has not been found in the current archive
+		    case et_removed:
+			break;         // we must keep it, it was in the original archive
+		    case et_absent:
+			last_mod.erase(it); // this entry had been added from previous neighbor archive, we must remove it now, it was not part of the original archive
+			break;
+		    default:
+			throw SRC_BUG;
+		    }
+		}
+		    // else already absent from the base for this archive, cool.
+	    }
 	}
 	    // else, entry found for the current archive
 
@@ -473,12 +516,12 @@ namespace libdar
 	num_max = 0;
 	found_in_archive = false;
 
-	while(it != last_change.end())
+	while(it != last_change.end() && !found_in_archive)
 	{
-	    if(it->first == archive)
+	    if(it->first == archive && it->second.present != et_absent)
 		found_in_archive = true;
 	    else
-		if(it->first > num_max)
+		if(it->first > num_max && (it->first < ignore_archives_greater_or_equal || ignore_archives_greater_or_equal == 0))
 		{
 		    num_max = it->first;
 		    switch(it->second.present)
@@ -488,6 +531,7 @@ namespace libdar
 			presence_max = true;
 			break;
 		    case et_removed:
+		    case et_absent:
 			presence_max = false;
 			break;
 		    default:
@@ -501,7 +545,8 @@ namespace libdar
 	{
 	    if(num_max != 0) // num_max may be equal to zero if this entry never had any EA in any recorded archive
 		if(presence_max)
-		    set_EA(archive, (last_mtime < deleted_date ? deleted_date : last_mtime), et_removed); // add an entry telling that EA for this file do no more exist in the current archive
+		    set_EA(archive, (last_mtime < deleted_date ? deleted_date : last_mtime), et_absent); // add an entry telling that EA for this file do no more exist in the current archive
+		// else last entry found stated the EA was removed, nothing more to do
 	}
 	    // else, entry found for the current archive
     }
@@ -1000,13 +1045,13 @@ namespace libdar
 	return ret;
     }
 
-    void data_dir::finalize(const archive_num & archive, const infinint & deleted_date)
+    void data_dir::finalize(const archive_num & archive, const infinint & deleted_date, const archive_num & ignore_archives_greater_or_equal)
     {
 	infinint new_deleted_date;
 	archive_num tmp_archive;
 	etat tmp_presence;
 
-	data_tree::finalize(archive, deleted_date);
+	data_tree::finalize(archive, deleted_date, ignore_archives_greater_or_equal);
 
 	switch(get_data(tmp_archive, 0, false))
 	{
@@ -1024,10 +1069,10 @@ namespace libdar
 	if(!read_data(tmp_archive, new_deleted_date, tmp_presence))
 	    throw SRC_BUG;
 
-	finalize_except_self(archive, new_deleted_date);
+	finalize_except_self(archive, new_deleted_date, ignore_archives_greater_or_equal);
     }
 
-    void data_dir::finalize_except_self(const archive_num & archive, const infinint & deleted_date)
+    void data_dir::finalize_except_self(const archive_num & archive, const infinint & deleted_date, const archive_num & ignore_archives_greater_or_equal)
     {
 	list<data_tree *>::iterator it = rejetons.begin();
 
@@ -1035,7 +1080,7 @@ namespace libdar
 	{
 	    if(*it == NULL)
 		throw SRC_BUG;
-	    (*it)->finalize(archive, deleted_date);
+	    (*it)->finalize(archive, deleted_date, ignore_archives_greater_or_equal);
 	    ++it;
 	}
     }
@@ -1309,7 +1354,7 @@ static data_tree *read_from_file(generic_file & f, unsigned char db_version)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: data_tree.cpp,v 1.15.2.3 2011/07/30 15:49:47 edrusb Rel $";
+    static char id[]="$Id: data_tree.cpp,v 1.15.2.5 2011/12/28 18:07:06 edrusb Exp $";
     dummy_call(id);
 }
 
@@ -1361,6 +1406,9 @@ static void display_line(user_interaction & dialog,
     case data_tree::et_removed:
 	data_state = REMOVED;
 	break;
+    case data_tree::et_absent:
+	data_state = ABSENT;
+	break;
     default:
 	throw SRC_BUG;
     }
@@ -1376,6 +1424,8 @@ static void display_line(user_interaction & dialog,
     case data_tree::et_removed:
 	ea_state = REMOVED;
 	break;
+    case data_tree::et_absent:
+	throw SRC_BUG; // state not used for EA
     default:
 	throw SRC_BUG;
     }

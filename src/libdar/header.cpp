@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: header.cpp,v 1.34 2011/04/17 20:59:43 edrusb Rel $
+// $Id: header.cpp,v 1.34.2.1 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -100,7 +100,7 @@ namespace libdar
 	char extension;
 	fichier *f_fic = dynamic_cast<fichier *>(&f);
 
-	clear_pointers();
+	free_pointers();
 	old_header = false;
         if(f.read((char *)&tmp, sizeof(magic_number)) != sizeof(magic_number))
 	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
@@ -212,7 +212,7 @@ namespace libdar
 	    data_name = internal_name;
     }
 
-    void header::write(user_interaction & ui, generic_file & f)
+    void header::write(user_interaction & ui, generic_file & f) const
     {
         magic_number tmp;
 	char tmp_ext[] = { extension_tlv, '\0' };
@@ -231,7 +231,7 @@ namespace libdar
         read(dialog, fic, lax);
     }
 
-    void header::write(user_interaction & dialog, S_I fd)
+    void header::write(user_interaction & dialog, S_I fd) const
     {
         fichier fic = fichier(dialog, dup(fd));
         write(dialog, fic);
@@ -239,12 +239,12 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: header.cpp,v 1.34 2011/04/17 20:59:43 edrusb Rel $";
+        static char id[]="$Id: header.cpp,v 1.34.2.1 2012/02/12 20:43:34 edrusb Exp $";
         dummy_call(id);
     }
 
 
-    bool header::get_first_slice_size(infinint & size)
+    bool header::get_first_slice_size(infinint & size) const
     {
 	if(first_size != NULL)
 	{
@@ -266,7 +266,7 @@ namespace libdar
 	*first_size = size;
     }
 
-    bool header::get_slice_size(infinint & size)
+    bool header::get_slice_size(infinint & size) const
     {
 	if(slice_size != NULL)
 	{
@@ -296,30 +296,37 @@ namespace libdar
         internal_name = ref.internal_name;
  	data_name = ref.data_name;
         flag = ref.flag;
+	first_size = NULL;
+	slice_size = NULL;
 
-	if(ref.first_size != NULL)
+	try
 	{
-	    first_size = new infinint();
-	    if(first_size == NULL)
-		throw Ememory("header::copy_from");
-	    *first_size = *ref.first_size;
-	}
-	else
-	    first_size = NULL;
+	    if(ref.first_size != NULL)
+	    {
+		first_size = new infinint();
+		if(first_size == NULL)
+		    throw Ememory("header::copy_from");
+		*first_size = *ref.first_size;
+	    }
 
-	if(ref.slice_size != NULL)
-	{
-	    slice_size = new infinint();
-	    if(slice_size == NULL)
-		throw Ememory("header::copy_from");
-	    *slice_size = *ref.slice_size;
+	    if(ref.slice_size != NULL)
+	    {
+		slice_size = new infinint();
+		if(slice_size == NULL)
+		    throw Ememory("header::copy_from");
+		*slice_size = *ref.slice_size;
+	    }
+
+	    old_header = ref.old_header;
 	}
-	else
-	    slice_size = NULL;
-	old_header = ref.old_header;
+	catch(...)
+	{
+	    free_pointers();
+	    throw;
+	}
     }
 
-    void header::clear_pointers()
+    void header::free_pointers()
     {
 	if(first_size != NULL)
 	{
@@ -339,7 +346,7 @@ namespace libdar
 	U_I taille = extension.size();
 	memory_file tmp = memory_file(gf_read_write);
 
-	clear_pointers();
+	free_pointers();
 	for(U_I index = 0; index < taille; index++)
 	{
 	    extension[index].get_contents(tmp);

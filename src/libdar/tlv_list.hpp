@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tlv_list.hpp,v 1.4 2011/01/09 17:25:58 edrusb Rel $
+// $Id: tlv_list.hpp,v 1.4.2.1 2012/02/19 17:25:09 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -54,6 +54,9 @@ namespace libdar
 	void clear() { contents.clear(); };
 	void add(const tlv & next) { contents.push_back(next); };
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(tlv_list);
+#endif
     private:
 	std::vector<tlv> contents;
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: limitint.hpp,v 1.38 2011/03/20 21:02:50 edrusb Rel $
+// $Id: limitint.hpp,v 1.38.2.1 2012/02/25 14:43:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -94,18 +94,18 @@ namespace libdar
 #if SIZEOF_OFF_T > SIZEOF_TIME_T
 #if SIZEOF_OFF_T > SIZEOF_SIZE_T
         limitint(off_t a = 0)
-            { E_BEGIN; limitint_from(a); E_END("limitint::limitint", "off_t"); };
+            { limitint_from(a); };
 #else
         limitint(size_t a = 0)
-            { E_BEGIN; limitint_from(a); E_END("limitint::limitint", "size_t"); };
+            { limitint_from(a); };
 #endif
 #else
 #if SIZEOF_TIME_T > SIZEOF_SIZE_T
         limitint(time_t a = 0)
-            { E_BEGIN; limitint_from(a); E_END("limitint::limitint", "time_t"); };
+            { limitint_from(a); };
 #else
         limitint(size_t a = 0)
-            { E_BEGIN; limitint_from(a); E_END("limitint::limitint", "size_t"); };
+            { limitint_from(a); };
 #endif
 #endif
 
@@ -131,13 +131,13 @@ namespace libdar
         limitint & operator <<= (U_32 bit);
         limitint & operator <<= (limitint bit);
         limitint operator ++(int a)
-            { E_BEGIN; limitint ret = *this; ++(*this); return ret; E_END("limitint::operator ++", "int"); };
+            { limitint ret = *this; ++(*this); return ret; };
         limitint operator --(int a)
-            { E_BEGIN; limitint ret = *this; --(*this); return ret; E_END("limitint::operator --", "int"); };
+            { limitint ret = *this; --(*this); return ret; };
         limitint & operator ++()
-            { E_BEGIN; return *this += 1; E_END("limitint::operator ++", "()"); };
+            { return *this += 1; };
         limitint & operator --()
-            { E_BEGIN; return *this -= 1; E_END("limitint::operator --", "()"); };
+            { return *this -= 1; };
 
         U_32 operator % (U_32 arg) const;
 
@@ -145,7 +145,7 @@ namespace libdar
             // note that the initial value of the argument is not ignored !
             // when the object is null the value of the argument stays the same as before
         template <class T>void unstack(T &v)
-	{ E_BEGIN; limitint_unstack_to(v); E_END("limitint::unstack", typeid(v).name()); }
+	{ limitint_unstack_to(v); }
 
 	limitint get_storage_size() const;
 	    // it returns number of byte of information necessary to store the integer
@@ -223,9 +223,8 @@ namespace libdar
 
     template <class T> inline void euclide(T a, T b, T & q, T &r)
     {
-        E_BEGIN;
+
         q = a/b; r = a%b;
-        E_END("euclide", "");
     }
 
     template <class B> inline void euclide(limitint<B> a, U_I b, limitint<B> & q, limitint<B> &r)
@@ -273,7 +272,6 @@ namespace libdar
 
     template <class B> void limitint<B>::build_from_file(generic_file & x)
     {
-        E_BEGIN;
         unsigned char a;
         bool fin = false;
         limitint<B> skip = 0;
@@ -325,13 +323,11 @@ namespace libdar
                 fin = true;
             }
         }
-        E_END("limitint::read_from_file", "generic_file");
     }
 
 
     template <class B> void limitint<B>::dump(generic_file & x) const
     {
-        E_BEGIN;
         B width = bytesize;
         B pos;
         unsigned char last_width;
@@ -423,13 +419,10 @@ namespace libdar
                 x.write((char *)ptr, 1);
 		ptr += direction;
             }
-
-        E_END("limitint::dump", "generic_file");
     }
 
     template<class B> limitint<B> & limitint<B>::operator += (const limitint & arg)
     {
-        E_BEGIN;
         B res = field + arg.field;
         if(res < field || res < arg.field)
             throw Elimitint();
@@ -437,12 +430,10 @@ namespace libdar
             field = res;
 
         return *this;
-        E_END("limitint::operator +=", "");
     }
 
     template <class B> limitint<B> & limitint<B>::operator -= (const limitint & arg)
     {
-        E_BEGIN;
         if(field < arg.field)
             throw Erange("limitint::operator", gettext("Subtracting an \"infinint\" greater than the first, \"infinint\" cannot be negative"));
 
@@ -450,13 +441,11 @@ namespace libdar
 
         field -= arg.field;
         return *this;
-        E_END("limitint::operator -=", "");
     }
 
 
     template <class B> limitint<B> & limitint<B>::operator *= (const limitint & arg)
     {
-        E_BEGIN;
         static const B max_power = bytesize*8 - 1;
 
         B total = int_tools_higher_power_of_2(field) + int_tools_higher_power_of_2(arg.field) + 1; // for an explaination about "+2" see NOTES
@@ -473,7 +462,6 @@ namespace libdar
                 throw Elimitint();
         field = total;
         return *this;
-        E_END("limitint::operator *=", "");
     }
 
     template <class B> template<class T> limitint<B> limitint<B>::power(const T & exponent) const
@@ -487,104 +475,82 @@ namespace libdar
 
     template <class B> limitint<B> & limitint<B>::operator /= (const limitint & arg)
     {
-        E_BEGIN;
         if(arg == 0)
             throw Einfinint("limitint.cpp : operator /=", gettext("Division by zero"));
 
         field /= arg.field;
         return *this;
-        E_END("limitint::operator /=", "");
     }
 
     template <class B> limitint<B> & limitint<B>::operator %= (const limitint & arg)
     {
-        E_BEGIN;
         if(arg == 0)
             throw Einfinint("limitint.cpp : operator %=", gettext("Division by zero"));
 
         field %= arg.field;
         return *this;
-        E_END("limitint::operator /=", "");
     }
 
     template <class B> limitint<B> & limitint<B>::operator >>= (U_32 bit)
     {
-        E_BEGIN;
 	if(bit >= sizeof_field*8)
 	    field = 0;
 	else
 	    field >>= bit;
         return *this;
-        E_END("limitint::operator >>=", "U_32");
     }
 
     template <class B> limitint<B> & limitint<B>::operator >>= (limitint bit)
     {
-        E_BEGIN;
         field >>= bit.field;
         return *this;
-        E_END("limitint::operator >>=", "limitint");
     }
 
     template <class B> limitint<B> & limitint<B>::operator <<= (U_32 bit)
     {
-        E_BEGIN;
         if(bit + int_tools_higher_power_of_2(field) >= bytesize*8)
             throw Elimitint();
         field <<= bit;
         return *this;
-        E_END("limitint::operator <<=", "U_32");
     }
 
     template <class B> limitint<B> & limitint<B>::operator <<= (limitint bit)
     {
-        E_BEGIN;
         if(bit.field + int_tools_higher_power_of_2(field) >= bytesize*8)
             throw Elimitint();
         field <<= bit.field;
         return *this;
-        E_END("limitint::operator <<=", "limitint");
     }
 
     template <class B> limitint<B> & limitint<B>::operator &= (const limitint & arg)
     {
-        E_BEGIN;
         field &= arg.field;
         return *this;
-        E_END("limitint::operator &=", "");
     }
 
     template <class B> limitint<B> & limitint<B>::operator |= (const limitint & arg)
     {
-        E_BEGIN;
         field |= arg.field;
         return *this;
-        E_END("limitint::operator |=", "");
     }
 
     template <class B> limitint<B> & limitint<B>::operator ^= (const limitint & arg)
     {
-        E_BEGIN;
         field ^= arg.field;
         return *this;
-        E_END("limitint::operator ^=", "");
     }
 
     template <class B> U_32 limitint<B>::operator % (U_32 arg) const
     {
-        E_BEGIN;
         return U_32(field % arg);
-        E_END("limitint::modulo", "");
     }
 
     template <class B> template <class T> void limitint<B>::limitint_from(T a)
     {
-        E_BEGIN;
         if(sizeof(a) <= bytesize || a <= (T)(max_value))
 	    field = B(a);
         else
             throw Elimitint();
-        E_END("limitint::limitint_from", "");
     }
 
     template <class B> template <class T> T limitint<B>::max_val_of(T x)
@@ -604,7 +570,7 @@ namespace libdar
 
     template <class B> template <class T> void limitint<B>::limitint_unstack_to(T &a)
     {
-        E_BEGIN;
+
             // T is supposed to be an unsigned "integer"
             // (ie.: sizeof returns the width of the storage bit field  and no sign bit is present)
             // Note : static here avoids the recalculation of max_T at each call
@@ -621,8 +587,6 @@ namespace libdar
             field -= step;
             a = max_T;
         }
-
-        E_END("limitint::limitint_unstack_to", "");
     }
 
     template <class B> limitint<B> limitint<B>::get_storage_size() const
@@ -655,14 +619,12 @@ namespace libdar
 
     template <class B> void limitint<B>::setup_endian()
     {
-        E_BEGIN;
 	if(integers_system_is_big_endian())
             used_endian = big_endian;
         else
             used_endian = little_endian;
 
 	bzero(zeroed_field, ZEROED_SIZE);
-        E_END("limitint::setup_endian", "");
     }
 
 
@@ -691,142 +653,112 @@ namespace libdar
 
     template <class B> limitint<B> operator + (const limitint<B> & a, const limitint<B> & b)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret += b;
 
         return ret;
-        E_END("operator +", "limitint");
     }
 
     template <class B> limitint<B> operator - (const limitint<B> & a, const limitint<B> & b)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret -= b;
 
         return ret;
-        E_END("operator -", "limitint");
     }
 
     template <class B> limitint<B> operator * (const limitint<B> & a, const limitint<B> & b)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret *= b;
 
         return ret;
-        E_END("operator *", "limitint");
     }
 
     template <class B> limitint<B> operator / (const limitint<B> & a, const limitint<B> & b)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret /= b;
 
         return ret;
-        E_END("operator / ", "limitint");
     }
 
     template <class B> limitint<B> operator % (const limitint<B> & a, const limitint<B> & b)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret %= b;
 
         return ret;
-        E_END("operator %", "limitint");
     }
 
     template <class B> limitint<B> operator >> (const limitint<B> & a, U_32 bit)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret >>= bit;
         return ret;
-        E_END("operator >>", "limitint, U_32");
     }
 
     template <class B> limitint<B> operator >> (const limitint<B> & a, const limitint<B> & bit)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret >>= bit;
         return ret;
-        E_END("operator >>", "limitint");
     }
 
     template <class B> limitint<B> operator << (const limitint<B> & a, U_32 bit)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret <<= bit;
         return ret;
-        E_END("operator <<", "limitint, U_32");
     }
 
     template <class B> limitint<B> operator << (const limitint<B> & a, const limitint<B> & bit)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret <<= bit;
         return ret;
-        E_END("operator <<", "limitint");
     }
 
     template <class B> limitint<B> operator & (const limitint<B> & a, U_32 bit)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret &= bit;
         return ret;
-        E_END("operator &", "limitint");
     }
 
     template <class B> limitint<B> operator & (const limitint<B> & a, const limitint<B> & bit)
     {
-        E_BEGIN;
         limitint<B> ret = a;
 	ret &= bit;
         return ret;
-        E_END("operator &", "limitint");
     }
 
     template <class B> limitint<B> operator | (const limitint<B> & a, U_32 bit)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret |= bit;
         return ret;
-        E_END("operator |", "U_32");
     }
 
     template <class B> limitint<B> operator | (const limitint<B> & a, const limitint<B> & bit)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret |= bit;
         return ret;
-        E_END("operator |", "limitint");
     }
 
     template <class B> limitint<B> operator ^ (const limitint<B> & a, U_32 bit)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret ^= bit;
         return ret;
-        E_END("operator ^", "U_32");
     }
 
     template <class B> limitint<B> operator ^ (const limitint<B> & a, const limitint<B> & bit)
     {
-        E_BEGIN;
         limitint<B> ret = a;
         ret ^= bit;
         return ret;
-        E_END("operator ^", "limitint");
     }
 
 	/// @}

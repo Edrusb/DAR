@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: ea_filesystem.hpp,v 1.9 2011/01/09 17:25:58 edrusb Rel $
+// $Id: ea_filesystem.hpp,v 1.9.2.1 2012/02/12 20:43:34 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -47,10 +47,10 @@ namespace libdar
 	/// read EA associated to a given file
 
 	/// \param[in] chemin is the path to the file to read attributes of
-	/// \param[out] val is the resulting list of EA associated to this file
 	/// \param[in] filter is a mask that defines which attributes names have to be considered only
-	/// \return true whether some attribute could be found
-    extern void ea_filesystem_read_ea(const std::string & chemin, ea_attributs & val, const mask & filter);
+	/// \return NULL if no EA have been found under the specified mask, or returns a newly allocated object
+	/// that the caller has the responsibility to delete when no more needed
+    extern ea_attributs * ea_filesystem_read_ea(const std::string & chemin, const mask & filter);
 
 	/// overwrite some attribute to a given file's attribute list
 
@@ -79,10 +79,9 @@ namespace libdar
 	/// test the presence of EA for a given file
 
 	/// \param[in] name is the filename which EA presence must be check against
-	/// \param[in] list list of attributes
-	/// \param[in] filter
-	/// \return true if at least one EA covered by filter and present in the list exists as EA of the given file
-    extern bool ea_filesystem_has_ea(const std::string & name, const ea_attributs & list, const mask & filter);
+	/// \param[in] filter is a mask that defines which attributes names to only consider
+	/// \return true if at least one EA has been found
+    extern bool ea_filesystem_has_ea(const std::string & name, const mask & filter);
 
 	/// @}
 

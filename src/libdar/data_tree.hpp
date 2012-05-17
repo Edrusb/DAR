@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: data_tree.hpp,v 1.5.2.2 2011/06/20 14:02:03 edrusb Exp $
+// $Id: data_tree.hpp,v 1.5.2.5 2012/02/19 17:25:08 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -65,7 +65,8 @@ namespace libdar
 	{
 	    et_saved,    //< data/EA present in the archive
 	    et_present,  //< file/EA present in the archive but data not saved (differential backup)
-	    et_removed   //< file/EA stored as deleted since archive of reference of file/EA not present in the archive
+	    et_removed,  //< file/EA stored as deleted since archive of reference of file/EA not present in the archive
+	    et_absent    //< file not even mentionned in the archive, This entry is equivalent to et_removed, but is required to be able to properly re-order the archive when user asks to do so. The dates associated to this state are computed from neighbor archives in the database
 	};
 
 	data_tree(const std::string &name);
@@ -95,7 +96,17 @@ namespace libdar
 	virtual bool check_order(user_interaction & dialog, const path & current_path, bool & initial_warn) const { return check_map_order(dialog, last_mod, current_path, "data", initial_warn) && check_map_order(dialog, last_change, current_path, "EA", initial_warn); };
 
 	    /// add deleted entry if no object of the current archive exist and the entry of the previous archive is already present.
-	virtual void finalize(const archive_num & archive, const infinint & deleted_date);
+
+	    /// \param[in] archive is the number of the archive to finalize
+	    /// \param[in] deleted_date date of deletion to use for inode removal when no
+	    /// information can be grabbed from the archive (this date is take from the
+	    /// parent dir last modification date)
+	    /// \param[in] ignore_archive_greater_or_equal ignore archives which number
+	    /// is greater or equal "ingore_archive_greater_or_equal" as if they were not
+	    /// present in the database. If set to zero, no archive is ignored.
+	virtual void finalize(const archive_num & archive,
+			      const infinint & deleted_date,
+			      const archive_num & ignore_archive_greater_or_equal);
 
 	    /// return true if the corresponding file is no more located in any archive (thus, the object is no more usefull in the base)
 	virtual bool remove_all_from(const archive_num & archive_to_remove, const archive_num & last_archive);
@@ -115,8 +126,7 @@ namespace libdar
 	static char signature() { return 't'; };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
-	void *operator new(size_t taille) { return special_alloc_new(taille); };
-	void operator delete(void *ptr) { special_alloc_delete(ptr); };
+        USE_SPECIAL_ALLOC(data_tree);
 #endif
     private:
 	struct status
@@ -161,11 +171,13 @@ namespace libdar
 	void add(const detruit *entry, const archive_num & archive);
 	const data_tree *read_child(const std::string & name) const;
 	void read_all_children(std::vector<std::string> & fils) const;
-	virtual void finalize_except_self(const archive_num & archive, const infinint & deleted_date);
+	virtual void finalize_except_self(const archive_num & archive,
+					  const infinint & deleted_date,
+					  const archive_num & ignore_archives_greater_or_equal);
 
 	    // inherited methods
 	bool check_order(user_interaction & dialog, const path & current_path, bool & initial_warn) const;
-	void finalize(const archive_num & archive, const infinint & deleted_date);
+	void finalize(const archive_num & archive, const infinint & deleted_date, const archive_num & ignore_archives_greater_or_equal);
 	bool remove_all_from(const archive_num & archive_to_remove, const archive_num & last_archive);
 
 	    /// list the most recent files owned by that archive (or by any archive if num == 0)
@@ -179,10 +191,8 @@ namespace libdar
 	static char signature() { return 'd'; };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
-	void *operator new(size_t taille) { return special_alloc_new(taille); };
-	void operator delete(void *ptr) { special_alloc_delete(ptr); };
+        USE_SPECIAL_ALLOC(data_dir);
 #endif
-
     private:
 	std::list<data_tree *> rejetons;          //< subdir and subfiles of the current dir
 

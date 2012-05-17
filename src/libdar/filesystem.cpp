@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.77.2.1 2011/07/18 11:31:10 edrusb Exp $
+// $Id: filesystem.cpp,v 1.77.2.3 2012/02/19 17:25:08 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -146,197 +146,210 @@ namespace libdar
         nomme *ref = NULL;
 	struct stat buf;
 
-	if(lstat(ptr_name, &buf) < 0)
-	{
-	    switch(errno)
-	    {
-	    case EACCES:
-		get_ui().warning(tools_printf(gettext("Error reading inode of file %s : %s"), ptr_name, strerror(errno)));
-		break;
-	    case ENOENT:
-		break;
-	    default:
-		throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Cannot read inode for ")) + ptr_name + " : " + strerror(errno));
-	    }
-
-		// the current method returns NULL (= ref)  (meaning file does not exists)
-	}
-	else
+	try
 	{
 
-	    if(S_ISLNK(buf.st_mode))
+	    if(lstat(ptr_name, &buf) < 0)
 	    {
-		string pointed = tools_readlink(ptr_name);
+		switch(errno)
+		{
+		case EACCES:
+		    get_ui().warning(tools_printf(gettext("Error reading inode of file %s : %s"), ptr_name, strerror(errno)));
+		    break;
+		case ENOENT:
+		    break;
+		default:
+		    throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Cannot read inode for ")) + ptr_name + " : " + strerror(errno));
+		}
 
-		ref = new lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-			       buf.st_atime,
-			       buf.st_mtime,
-			       buf.st_ctime,
-			       name,
-			       pointed,
-			       buf.st_dev);
+		    // the current method returns NULL (= ref)  (meaning file does not exists)
 	    }
-	    else if(S_ISREG(buf.st_mode))
-		ref = new file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-			       buf.st_atime,
-			       buf.st_mtime,
-			       buf.st_ctime,
-			       name,
-			       lieu,
-			       buf.st_size,
-			       buf.st_dev,
-			       furtive_read_mode);
-	    else if(S_ISDIR(buf.st_mode))
-		ref = new directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+	    else
+	    {
+
+		if(S_ISLNK(buf.st_mode))
+		{
+		    string pointed = tools_readlink(ptr_name);
+
+		    ref = new lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+				   buf.st_atime,
+				   buf.st_mtime,
+				   buf.st_ctime,
+				   name,
+				   pointed,
+				   buf.st_dev);
+		}
+		else if(S_ISREG(buf.st_mode))
+		    ref = new file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+				   buf.st_atime,
+				   buf.st_mtime,
+				   buf.st_ctime,
+				   name,
+				   lieu,
+				   buf.st_size,
+				   buf.st_dev,
+				   furtive_read_mode);
+		else if(S_ISDIR(buf.st_mode))
+		    ref = new directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+					buf.st_atime,
+					buf.st_mtime,
+					buf.st_ctime,
+					name,
+					buf.st_dev);
+		else if(S_ISCHR(buf.st_mode))
+		    ref = new chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+				      buf.st_atime,
+				      buf.st_mtime,
+				      buf.st_ctime,
+				      name,
+				      major(buf.st_rdev),
+				      minor(buf.st_rdev), // makedev(major, minor)
+				      buf.st_dev);
+		else if(S_ISBLK(buf.st_mode))
+		    ref = new blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+				       buf.st_atime,
+				       buf.st_mtime,
+				       buf.st_ctime,
+				       name,
+				       major(buf.st_rdev),
+				       minor(buf.st_rdev), // makedev(major, minor)
+				       buf.st_dev);
+		else if(S_ISFIFO(buf.st_mode))
+		    ref = new tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+				   buf.st_atime,
+				   buf.st_mtime,
+				   buf.st_ctime,
+				   name,
+				   buf.st_dev);
+		else if(S_ISSOCK(buf.st_mode))
+		    ref = new prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 				    buf.st_atime,
 				    buf.st_mtime,
 				    buf.st_ctime,
 				    name,
 				    buf.st_dev);
-	    else if(S_ISCHR(buf.st_mode))
-		ref = new chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-				  buf.st_atime,
-				  buf.st_mtime,
-				  buf.st_ctime,
-				  name,
-				  major(buf.st_rdev),
-				  minor(buf.st_rdev), // makedev(major, minor)
-				  buf.st_dev);
-	    else if(S_ISBLK(buf.st_mode))
-		ref = new blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+#if HAVE_DOOR
+		else if(S_ISDOOR(buf.st_mode))
+		    ref = new door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 				   buf.st_atime,
 				   buf.st_mtime,
 				   buf.st_ctime,
 				   name,
-				   major(buf.st_rdev),
-				   minor(buf.st_rdev), // makedev(major, minor)
+				   lieu,
 				   buf.st_dev);
-	    else if(S_ISFIFO(buf.st_mode))
-		ref = new tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-			       buf.st_atime,
-			       buf.st_mtime,
-			       buf.st_ctime,
-			       name,
-			       buf.st_dev);
-	    else if(S_ISSOCK(buf.st_mode))
-		ref = new prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-				buf.st_atime,
-				buf.st_mtime,
-				buf.st_ctime,
-				name,
-				buf.st_dev);
-#if HAVE_DOOR
-	    else if(S_ISDOOR(buf.st_mode))
-		ref = new door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-			       buf.st_atime,
-			       buf.st_mtime,
-			       buf.st_ctime,
-			       name,
-			       lieu,
-			       buf.st_dev);
 #endif
-	    else
-		throw Edata(string(gettext("Unknown file type! file name is: ")) + string(ptr_name));
+		else
+		    throw Edata(string(gettext("Unknown file type! file name is: ")) + string(ptr_name));
 
-		//
-		// Extended Attributes Considerations
-		//
+		    //
+		    // Extended Attributes Considerations
+		    //
 
-	    inode *ino = dynamic_cast<inode *>(ref);
-	    if(ino != NULL)
-	    {
-		try
+		inode *ino = dynamic_cast<inode *>(ref);
+		if(ino != NULL)
 		{
-		    attach_ea(ptr_name, ino, ea_mask);
-		}
-		catch(Ebug & e)
-		{
-		    throw;
-		}
-		catch(Euser_abort & e)
-		{
-		    throw;
-		}
-		catch(Ethread_cancel & e)
-		{
-		    throw;
-		}
-		catch(Ememory & e)
-		{
-		    throw;
-		}
-		catch(Egeneric & ex)
-		{
-		    get_ui().warning(string(gettext("Error reading EA for "))+ptr_name+ " : " + ex.get_message());
-			// no throw !
-			// we must be able to continue without EA
-		}
-	    }
-
-		//
-		// hard link detection
-		//
-
-	    if(ref == NULL)
-		throw Ememory("filesystem_hard_link_read::make_read_entree");
-
-	    if(buf.st_nlink > 1 && see_hard_link && dynamic_cast<directory *>(ref) == NULL)
-	    {
-		map<node, couple>::iterator it = corres_read.find(node(buf.st_ino, buf.st_dev));
-
-		if(it == corres_read.end()) // inode not yet seen, creating the etoile object
-		{
-		    inode *ino_ref = dynamic_cast<inode *>(ref);
-		    etoile *tmp_et = NULL;
-
-		    if(ino_ref == NULL)
-			throw SRC_BUG;
-		    tmp_et = new etoile(ino_ref, etiquette_counter++);
-		    if(tmp_et == NULL)
-			throw Ememory("filesystem_hard_link_read::make_read_entree");
 		    try
 		    {
-			ref = NULL; // the object pointed to by ref is now managed by tmp_et
-			couple tmp = couple(tmp_et, buf.st_nlink - 1);
-			pair <node, couple> p_tmp(node(buf.st_ino, buf.st_dev), tmp);
-			corres_read.insert(p_tmp);
-			it = corres_read.find(node(buf.st_ino,buf.st_dev));
-			if(it == corres_read.end())
-			    throw SRC_BUG; // the addition of the entry to the map failed !!!
-			else
-			    it->second.obj->get_inode()->change_name("");
-			    // name of inode attached to an etoile is not used so we don't want to waste space in this field.
+			attach_ea(ptr_name, ino, ea_mask);
 		    }
-		    catch(...)
+		    catch(Ebug & e)
 		    {
-			if(tmp_et != NULL)
-			    delete tmp_et;
 			throw;
 		    }
-
-		    ref = new mirage(name, tmp_et);
-		}
-		else // inode already seen creating a new mirage on the given etoile
-		{
-			// some sanity checks
-		    if(it->second.obj == NULL)
-			throw SRC_BUG;
-
-		    if(ref != NULL)
-			delete ref;  // we don't need this just created inode as it is already attached to the etoile object
-		    ref = new mirage(name, it->second.obj);
-		    if(ref != NULL)
+		    catch(Euser_abort & e)
 		    {
-			it->second.count--;
-			if(it->second.count == 0)
-			    corres_read.erase(it);
-			    // this deletes the couple entry, implying the release of memory used by the holder object, but the etoile will only be destroyed once its internal counter drops to zero
+			throw;
+		    }
+		    catch(Ethread_cancel & e)
+		    {
+			throw;
+		    }
+		    catch(Ememory & e)
+		    {
+			throw;
+		    }
+		    catch(Egeneric & ex)
+		    {
+			get_ui().warning(string(gettext("Error reading EA for "))+ptr_name+ " : " + ex.get_message());
+			    // no throw !
+			    // we must be able to continue without EA
 		    }
 		}
-	    }
 
-	    if(ref == NULL)
-		throw Ememory("filesystem_hard_link_read::make_read_entree");
+		    //
+		    // hard link detection
+		    //
+
+		if(ref == NULL)
+		    throw Ememory("filesystem_hard_link_read::make_read_entree");
+
+		if(buf.st_nlink > 1 && see_hard_link && dynamic_cast<directory *>(ref) == NULL)
+		{
+		    map<node, couple>::iterator it = corres_read.find(node(buf.st_ino, buf.st_dev));
+
+		    if(it == corres_read.end()) // inode not yet seen, creating the etoile object
+		    {
+			inode *ino_ref = dynamic_cast<inode *>(ref);
+			etoile *tmp_et = NULL;
+
+			if(ino_ref == NULL)
+			    throw SRC_BUG;
+			tmp_et = new etoile(ino_ref, etiquette_counter++);
+			if(tmp_et == NULL)
+			    throw Ememory("filesystem_hard_link_read::make_read_entree");
+			try
+			{
+			    ref = NULL; // the object pointed to by ref is now managed by tmp_et
+			    couple tmp = couple(tmp_et, buf.st_nlink - 1);
+			    pair <node, couple> p_tmp(node(buf.st_ino, buf.st_dev), tmp);
+			    corres_read.insert(p_tmp);
+			    it = corres_read.find(node(buf.st_ino,buf.st_dev));
+			    if(it == corres_read.end())
+				throw SRC_BUG; // the addition of the entry to the map failed !!!
+			    else
+				it->second.obj->get_inode()->change_name("");
+				// name of inode attached to an etoile is not used so we don't want to waste space in this field.
+			}
+			catch(...)
+			{
+			    if(tmp_et != NULL)
+				delete tmp_et;
+			    throw;
+			}
+
+			ref = new mirage(name, tmp_et);
+		    }
+		    else // inode already seen creating a new mirage on the given etoile
+		    {
+			    // some sanity checks
+			if(it->second.obj == NULL)
+			    throw SRC_BUG;
+
+			if(ref != NULL)
+			    delete ref;  // we don't need this just created inode as it is already attached to the etoile object
+			ref = new mirage(name, it->second.obj);
+			if(ref != NULL)
+			{
+			    it->second.count--;
+			    if(it->second.count == 0)
+				corres_read.erase(it);
+				// this deletes the couple entry, implying the release of memory used by the holder object, but the etoile will only be destroyed once its internal counter drops to zero
+			}
+		    }
+		}
+
+		if(ref == NULL)
+		    throw Ememory("filesystem_hard_link_read::make_read_entree");
+	    }
+	}
+	catch(...)
+	{
+	    if(ref != NULL)
+	    {
+		delete ref;
+		ref = NULL;
+	    }
+	    throw;
 	}
 
         return ref;
@@ -1033,25 +1046,42 @@ namespace libdar
 
 			try
 			{
-			    crc crc_ori;
-			    crc crc_dyn;
+			    const crc *crc_ori = NULL;
+			    crc *crc_dyn = NULL;
 			    infinint crc_size;
 
-			    if(ref_fil->get_crc_size(crc_size))
-				crc_dyn.resize(crc_size);
-			    else
-				crc_dyn.resize(tools_file_size_to_crc_size(ref_fil->get_size()));
-
-			    ou->skip(0);
-			    ou->copy_to(dest, crc_dyn);
-
-			    if(ref_fil->get_crc(crc_ori))
+			    try
 			    {
-				if(crc_dyn != crc_ori)
-				    throw Erange("filesystem_hard_link_write::make_file", gettext("Bad CRC, data corruption occurred"));
-				    // else nothing to do, nor to signal
+
+				if(!ref_fil->get_crc_size(crc_size))
+				    crc_size = tools_file_size_to_crc_size(ref_fil->get_size());
+
+				ou->skip(0);
+				ou->copy_to(dest, crc_size, crc_dyn);
+
+				if(crc_dyn == NULL)
+				    throw SRC_BUG;
+
+				if(ref_fil->get_crc(crc_ori))
+				{
+				    if(crc_ori == NULL)
+					throw SRC_BUG;
+				    if(typeid(*crc_dyn) != typeid(*crc_ori))
+					throw SRC_BUG;
+				    if(*crc_dyn != *crc_ori)
+					throw Erange("filesystem_hard_link_write::make_file", gettext("Bad CRC, data corruption occurred"));
+					// else nothing to do, nor to signal
+				}
+				    // else this is a very old archive
 			    }
-				// else this is a very old archive
+			    catch(...)
+			    {
+				if(crc_dyn != NULL)
+				    delete crc_dyn;
+				throw;
+			    }
+			    if(crc_dyn != NULL)
+				delete crc_dyn;
 			}
 			catch(...)
 			{
@@ -1525,46 +1555,59 @@ namespace libdar
 	    }
 	    else // not both in_place and to_be_added are directories
 	    {
-		ea_attributs ea; // saving original EA of existing inode
+		ea_attributs *ea = NULL; // saving original EA of existing inode
 		bool got_it = true;
 
 		try
 		{
-		    ea_filesystem_read_ea(spot, ea, bool_mask(true));
+		    try
+		    {
+			ea = ea_filesystem_read_ea(spot, bool_mask(true));
+		    }
+		    catch(Ethread_cancel & e)
+		    {
+			throw;
+		    }
+		    catch(Egeneric & ex)
+		    {
+			got_it = false;
+			get_ui().warning(tools_printf(gettext("Existing EA for %S could not be read and preserved: "), &spot) + ex.get_message());
+		    }
+
+		    if(!empty)
+		    {
+			supprime(get_ui(), spot); // this destroyes EA, (removes inode, or hard link to inode)
+			make_file(to_be_added, *current_dir, false, what_to_check);
+			data_done = done_data_restored;
+		    }
+
+		    try // if possible and available restoring original EA
+		    {
+			if(got_it && !empty)
+			    if(ea != NULL) // if ea is NULL no EA is present in the original file, thus nothing has to be restored
+				(void)ea_filesystem_write_ea(spot, *ea, bool_mask(true));
+			    // we don't care about the return value, here, errors are returned through exceptions
+			    // the returned value is informative only and does not determine any subsequent actions
+		    }
+		    catch(Ethread_cancel & e)
+		    {
+			throw;
+		    }
+		    catch(Egeneric & e)
+		    {
+			if(ea != NULL && ea->size() > 0)
+			    get_ui().warning(tools_printf(gettext("Existing EA for %S could not be preserved : "), &spot) + e.get_message());
+
+		    }
 		}
-		catch(Ethread_cancel & e)
+		catch(...)
 		{
+		    if(ea != NULL)
+			delete ea;
 		    throw;
 		}
-		catch(Egeneric & ex)
-		{
-		    got_it = false;
-		    get_ui().warning(tools_printf(gettext("Existing EA for %S could not be read and preserved: "), &spot) + ex.get_message());
-		}
-
-		if(!empty)
-		{
-		    supprime(get_ui(), spot); // this destroyes EA, (removes inode, or hard link to inode)
-		    make_file(to_be_added, *current_dir, false, what_to_check);
-		    data_done = done_data_restored;
-		}
-
-		try // if possible and available restoring original EA
-		{
-		    if(got_it && !empty)
-			(void)ea_filesystem_write_ea(spot, ea, bool_mask(true));
-			// we don't care about the return value, here, errors are returned through exceptions
-			// the returned value is informative only and does not determine any subsequent actions
-		}
-		catch(Ethread_cancel & e)
-		{
-		    throw;
-		}
-		catch(Egeneric & e)
-		{
-		    if(ea.size() > 0)
-			get_ui().warning(tools_printf(gettext("Existing EA for %S could not be preserved : "), &spot) + e.get_message());
-		}
+		if(ea != NULL)
+		    delete ea;
 	    }
 	    break;
 	case data_remove:
@@ -1805,7 +1848,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.77.2.1 2011/07/18 11:31:10 edrusb Exp $";
+        static char id[]="$Id: filesystem.cpp,v 1.77.2.3 2012/02/19 17:25:08 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -1904,20 +1947,19 @@ namespace libdar
 
     static void attach_ea(const string &chemin, inode *ino, const mask & ea_mask)
     {
-        ea_attributs *eat = new ea_attributs();
-        if(eat == NULL)
-            throw Ememory("filesystem : attach_ea");
+        ea_attributs *eat = NULL;
         try
         {
             if(ino == NULL)
                 throw SRC_BUG;
-            ea_filesystem_read_ea(chemin, *eat, ea_mask);
-            if(eat->size() > 0)
+            eat = ea_filesystem_read_ea(chemin, ea_mask);
+            if(eat != NULL)
             {
+		if(eat->size() <= 0)
+		    throw SRC_BUG;
                 ino->ea_set_saved_status(inode::ea_full);
                 ino->ea_attach(eat);
-                eat = NULL;
-                    // allocated memory now managed by the inode object
+                eat = NULL; // allocated memory now managed by the inode object
             }
             else
                 ino->ea_set_saved_status(inode::ea_none);
@@ -1929,8 +1971,9 @@ namespace libdar
             throw;
         }
         if(eat != NULL)
-            delete eat;
+            throw SRC_BUG;
     }
+
 
     static bool is_nodump_flag_set(user_interaction & dialog,
 				   const path & chem, const string & filename, bool info)
