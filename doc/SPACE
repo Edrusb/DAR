@@ -1,0 +1,16 @@
+Objects size in memory (not the same as in archive file, it is smaller there)
+
+
+type           | itself       | sub-fields                  | total (bytes)
+---------------+------------- +-----------------------------+--------
+struct cellule | 16 bytes     | 0                           |  16 
+class storage  | 8 bytes      | n*16 (cellule) + size       |  24 + size (n = 1 up to 120000 bytes) then 8+n*16+size (n>1)
+class infinint | 4 bytes      | 24 (storage) + size         |  28 + size; where size = ln(value)/ln(256)+1;
+---------------+--------------+-----------------------------+--------
+CATALOGUE 
+---------------+--------------+-----------------------------+--------
+class entree   | N/A (pure virtual class)
+class eod      | 4 bytes      | 0			    | 4 bytes
+class nomme    | N/A (pure virtual class)
+class inode    | N/A (pure virtual class)
+class file     | 80 bytes     | 112 bytes (dynamic allocations part from 4 infinints 4*(8+16+4)) | 192 bytes

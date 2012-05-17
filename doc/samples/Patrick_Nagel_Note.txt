@@ -1,0 +1,9 @@
+Follows a copy from Patrick Nagel site at http://www.patrick-nagel.net/ftpbackup/
+
+-----------------------------------------------
+
+
+I wrote ftpbackup.sh to conveniently backup my root server. My root server provider offers a 40 GB FTP storage, where I can store backup archives. To put them on there by hand was a bit of a hassle, so I wrote this little script. It calls my backup scripts (namely backup-root.sh and backup-storage.sh) which both create a .dar file that contains the whole backup. This .dar file is then being sent to the provider's backup FTP server. After everything is done, a mail is sent to root which informs about successful completion or failure, and the used/free space on the FTP as well as on the local backup partition.
+
+Configuration is done in the script, everything is explained there. The two scripts backup-root.sh and backup-storage.sh are two examples how to create the backups. I'm using these scripts for quite some time, and also did two full recoveries without any problems. backup-root.sh includes backup-root.options and backup-storage.sh includes backup-storage.options through dar's "-B" option. All options in those .options files are documented, so it should be easy for anybody to understand what the script does, and how.
+
