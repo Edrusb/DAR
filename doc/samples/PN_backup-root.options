@@ -1,0 +1,31 @@
+### Options that are appended to the dar command:
+
+# No warning when not run from a terminal
+-Q
+# Don't try to read darrc files
+-N
+# Be verbose (so everything can be logged)
+-v
+# No warn on overwrite (should not happen anyway)
+-w
+# Compression level
+-z1
+# Keep empty directories as such, so they can be restored
+-D
+# Blowfish encryption
+-K bf:secretpassword
+# Directory to backup
+-R "/"
+# Excludes (must be specified as relative paths to the directory
+# that is to be backed up)
+-P "mnt/loop"
+-P "mnt/storage"
+-P "mnt/tmp"
+-P "mnt/backupftp"
+-P "dev/pts"
+-P "proc"
+-P "sys"
+-P "tmp"
+-P "var/tmp"
+-P "usr/tmp"
+-P "usr/portage/distfiles"
