@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sar.cpp,v 1.82 2011/04/19 14:57:24 edrusb Rel $
+// $Id: sar.cpp,v 1.82.2.1 2011/07/23 16:36:31 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -390,7 +390,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.82 2011/04/19 14:57:24 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.82.2.1 2011/07/23 16:36:31 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1336,6 +1336,7 @@ namespace libdar
 
 	    // initializing object fields from constructor arguments
 
+	end_of_slice = 0;
 	base = base_name;
 	ext = extension;
 	x_min_digits = min_digits;
@@ -1409,6 +1410,7 @@ namespace libdar
     {
 	reference = NULL;
 	offset = 0;
+	end_of_slice = 0;
 	hook = "";
 	base = "";
 	ext = "";
@@ -1446,6 +1448,7 @@ namespace libdar
     {
 	reference = NULL;
 	offset = 0;
+	end_of_slice = 0;
 	hook = "";
 	base = "";
 	ext = "";
@@ -1545,8 +1548,8 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-        if(reference->get_position() >= offset)
-            return reference->get_position() - offset;
+        if(reference->get_position() >= offset + end_of_slice)
+            return reference->get_position() - offset - end_of_slice;
         else
             throw Erange("trivial_sar::get_position", gettext("Position out of range"));
     }
@@ -1600,6 +1603,8 @@ namespace libdar
 		    --ret;
 		    if(a[ret] != flag_type_terminal)
 			throw Erange("trivial_sar::inherited_read", gettext("This archive is not single sliced, more data exists in the next slices but cannot be read from the current pipe, aborting"));
+		    else
+			end_of_slice = 1;
 		}
 		    // else assuming EOF has already been reached
 	    }

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: all_features.cpp,v 1.2 2011/03/31 19:21:02 edrusb Rel $
+// $Id: all_features.cpp,v 1.2.2.1 2011/07/30 07:45:14 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -26,9 +26,10 @@
 #include "../my_config.h"
 
 #include "libdar.hpp"
-
+#include <cstdlib>
 using namespace libdar;
 using namespace std;
+
 
 int main()
 {

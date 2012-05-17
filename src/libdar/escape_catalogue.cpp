@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: escape_catalogue.cpp,v 1.25 2011/06/02 13:17:37 edrusb Rel $
+// $Id: escape_catalogue.cpp,v 1.25.2.1 2011/07/24 10:46:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -47,6 +47,7 @@ namespace libdar
 	cat_det = NULL;
 	min_read_offset = 0;
 	depth = 0; // we start at the root... of course
+	wait_parent_depth = 0; // to disable this feature
 
 	    // dropping the data_name in the archive
 	esc->add_mark_at_current_position(escape::seqt_data_name);
@@ -74,6 +75,7 @@ namespace libdar
 	cat_det = NULL;
 	min_read_offset = 0;
 	depth = 0; // we start at the root
+	wait_parent_depth = 0; // to disable this feature
 
 	    // fetching the value of ref_data_name
 	if(esc->skip_to_next_mark(escape::seqt_data_name, false))
@@ -295,8 +297,21 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	ceci->reset_reading_process();
-	catalogue::skip_read_to_parent_dir();
+	switch(status)
+	{
+	case ec_init:
+	case ec_eod:
+	case ec_detruits:
+	    throw SRC_BUG;
+	case ec_marks:
+	    ceci->wait_parent_depth = depth;
+	    break;
+	case ec_completed:
+	    catalogue::skip_read_to_parent_dir();
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
     }
 
     bool escape_catalogue::read(const entree * & ref) const
@@ -404,6 +419,20 @@ namespace libdar
 			    entree *ref_nc = const_cast<entree *>(ref);
 
 			    ceci->add(ref_nc);
+			    if(wait_parent_depth > 0) // we must not return this object as it is member of a skipped dir
+			    {
+				if(depth < wait_parent_depth) // we are back out of the skipped directory
+				{
+				    if(is_eod)
+					ceci->wait_parent_depth = 0;
+				    else
+					throw SRC_BUG; // we should get out of the directory reading a EOD !
+				}
+
+				ref = NULL; // must not release object except, they are now part of catalogue
+				continue;   // ignore this entry and skip to the next one
+			    }
+
 			    if(is_eod)
 				ref = get_r_eod_address();
 			}
@@ -555,11 +584,12 @@ namespace libdar
 	    throw Ememory("escape_catalogue::copy_from");
 	min_read_offset = ref.min_read_offset;
 	depth = ref.depth;
+	wait_parent_depth = ref.wait_parent_depth;
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: escape_catalogue.cpp,v 1.25 2011/06/02 13:17:37 edrusb Rel $";
+        static char id[]="$Id: escape_catalogue.cpp,v 1.25.2.1 2011/07/24 10:46:49 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -604,6 +634,7 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 	depth = 0;
+	wait_parent_depth = 0;
     }
 
 } // end of namespace

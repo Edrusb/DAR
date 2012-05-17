@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sar.hpp,v 1.51 2011/04/17 13:12:30 edrusb Rel $
+// $Id: sar.hpp,v 1.51.2.1 2011/07/23 16:36:31 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -276,6 +276,7 @@ namespace libdar
     private:
         generic_file *reference;  //< points to the underlying data, not owned by "this"
         infinint offset;          //< offset to apply to get the first byte of data out of SAR headers
+	infinint end_of_slice;    //< when end of slice/archive is met, there is an offset by 1 compared to the offset of reference. end_of_slice is set to 1 in that situation, else it is always equal to zero
 	std::string hook;         //< command to execute after slice writing (not used in read-only mode)
 	std::string base;         //< basename of the archive (used for string susbstitution in hook)
 	std::string ext;          //< extension of the archive (used for string substitution in hook)

@@ -102,4 +102,4 @@ test_hash_fichier_SOURCES = test_hash_fichier.cpp ../dar_suite/shell_interaction
 test_hash_fichier_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 test_old_api_SOURCES = test_old_api.cpp
-test_old_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+test_old_api_DEPENDENCIES = ../libdar/lib$(MYLIB).la

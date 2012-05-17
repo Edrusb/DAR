@@ -1,4 +1,4 @@
-.TH DAR 1 "May 27th, 2011"
+.TH DAR 1 "Sept. 5th, 2011"
 .UC 8
 .SH NAME
 dar
@@ -202,7 +202,7 @@ inode-type
 Only the inode type is considered. Ownership, permission and dates are ignored. Inode specific attributes are still considered (like file size for plain files). Thus comparison will ignore differences for ownership, permission, and dates and at restoration dar will not try to set the ownership, permission and dates.
 .RE
 .P
-When no flag is provided to this option, -O option acts as if the "ignore-owner" flag was set, which is the behavior in older releases (< 2.3.0). Note also that for backward compatibility, --ignore-owner option still exists and is now just an alias to the --comparison-field=ignore-owner option. Of course if this option is not used, all fields are used for comparison or restoration.
+When no flag is provided to this option, -O option acts as if the "ignore-owner" flag was set, which is the behavior in older releases (< 2.3.0). Note also that for backward compatibility, --ignore-owner option still exists and since version 2.3.0 is just an alias to the --comparison-field=ignore-owner option. Of course if this option is not used, all fields are used for comparison or restoration.
 .TP 20
 -H[num], --hour[=num]
 if -H is used, two dates are considered equal if they differ from a integer number of hours, and that number is less than or equal to [num]. If not specified, num defaults to 1. This is used when making a differential backup, to compare last_modification date of inodes, at restoration or merging time if overwriting policy is based on file's data or EA being more recent and last, when comparing an archive with a filesystem (-d option). This is to workaround some filesystems (like Samba filesystem) that seems to change the dates of files after having gone from or to daylight saving time (winter/summer time). Note that -H option has influence on the overwriting policy (see -/ option) only if it is found before on command-line or in an included file (using -B option).
@@ -256,7 +256,7 @@ to be able to randomly access data in an archive, it is not encrypted globally b
 same as --crypto-block but for the archive of reference (same default value). --crypto-block-ref is a synonym.
 .TP 20
 -B, --batch <filename>
-You can put in the file any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occurs in case of loop (a file includes itself) and DAR aborts immediately. Comments are now allowed, and must start by a hash `#' character on each line. Note that for a line to be considered as comment the hash character must be the first character of the line (space or tab can still precede the hash). See
+You can put in the file any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occurs in case of loop (a file includes itself) and DAR aborts immediately. Comments are allowed, and must start by a hash `#' character on each line. Note that for a line to be considered as comment the hash character must be the first character of the line (space or tab can still precede the hash). See
 .B Conditional Syntax
 bellow for a more rich syntax in configuration files. See also the environment variable DAR_DCF_PATH in the ENVIRONMENT section at the end of this document.
 .TP 20
@@ -699,7 +699,7 @@ and most interesting, %c (c for context), will be replaced by "start" or by "end
 This way, one can stop a database just before it was about to be backed up, and restart it once the backup is completed. Note that the masks seen above that drive the execution of this command can be applied to a directory or a plain file for example. When a directory is selected for this feature, the command is logically ran before starting (with the context "start") to backup any file located in that directory or in a subdirectory of it, and once all file in that directory or subdirectories have been saved, the command is ran a second time (with the context "end"). During that time, if any file do match the backup-hook masks, no command will be executed for these. It is assumed that when a directory has been asked for a backup-hook to be executed this hook (or user command) is prepare for backup all data located in that directory. The environment variable DAR_DUC_PATH also applies to these user commands (see -E above, or the ENVIRONMENT paragraph below).
 .TP 20
 -ai, --alter=ignore-unknown-inode-type
-When dar meets an inode type it is not aware about (some times ago, it was the case for Door inode on Solaris for example, Door inodes are now handled by dar), it issues a warning about its inability to handle such inode. This warning occurs even if that entry is filtered out by mean of -X, -I, -P, -g, -[ or -] options, as soon as some other entry in that same directory has to be considered for backup, leading dar to read that directory contents and failing on that unknown inode type (filtering is done based on the result of directory listing). This option is to avoid dar issuing such warning in that situation.
+When dar meets an inode type it is not aware about (some times ago, it was the case for Door inode on Solaris for example, Door inodes are handled by dar since release 2.4.0), it issues a warning about its inability to handle such inode. This warning occurs even if that entry is filtered out by mean of -X, -I, -P, -g, -[ or -] options, as soon as some other entry in that same directory has to be considered for backup, leading dar to read that directory contents and failing on that unknown inode type (filtering is done based on the result of directory listing). This option is to avoid dar issuing such warning in that situation.
 .PP
 .PP
 .B RESTORATION OPTIONS (to use with -x)

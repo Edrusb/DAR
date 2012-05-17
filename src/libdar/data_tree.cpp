@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: data_tree.cpp,v 1.15.2.2 2011/06/25 11:15:36 edrusb Exp $
+// $Id: data_tree.cpp,v 1.15.2.3 2011/07/30 15:49:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -451,7 +451,12 @@ namespace libdar
 	    if(num_max == 0)
 		throw Erange("data_tree::finalize", gettext("Corrupted database, empty entry found"));
 	    if(presence_max)
-		set_data(archive, deleted_date, et_removed); // add an entry telling that this file does no more exist in the current archive
+	    {
+		if(deleted_date > last_mtime)
+		    set_data(archive, deleted_date, et_removed); // add an entry telling that this file does no more exist in the current archive
+		else
+		    set_data(archive, last_mtime + 1, et_removed);
+	    }
 		// else, this is not necessary to add anything
 	}
 	    // else, entry found for the current archive
@@ -1304,7 +1309,7 @@ static data_tree *read_from_file(generic_file & f, unsigned char db_version)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: data_tree.cpp,v 1.15.2.2 2011/06/25 11:15:36 edrusb Exp $";
+    static char id[]="$Id: data_tree.cpp,v 1.15.2.3 2011/07/30 15:49:47 edrusb Rel $";
     dummy_call(id);
 }
 

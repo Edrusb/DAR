@@ -9,6 +9,7 @@
 
 
 
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's FEATURES</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -48,15 +49,16 @@ particular method of class archive.<br>
       <br>
 The new API makes use of new "option" classes that all have a
 constructor without argument. Objects of theses classes carry all the
-current and futur arguments used to manage dar archive through libdar
+current and future arguments used to manage dar archive through libdar
 API. This way, if a new option has to be added in the future, no change
-will be necessary to program that use the libdar API though an API version 5.x.x.
+will be necessary to program that use the libdar API though an API
+version 5.x.x.
 The class option's constructor will set this new parameter to its
-default value, and a new method for that class will be added to change
-manage this new parameter's value, available for programs that are aware of it.<br>
+default value, and a new method for that class will be added to manage
+this new parameter's value, available for programs that are aware of it.<br>
       <br>
-Any program can then, at will, take into consideration new options or
-simply ignore them (and use defaut values for them), while new feature keep getting added dar release after dar release.<br>
+Any program can then, at will, take into consideration the new options or
+simply ignore them (and use default values for them), while new features keep getting added to libdar release after release.<br>
       </div>
       <br>
       <h3>The old API is kept available beside the new one</h3>
@@ -67,10 +69,10 @@ As you guess it provides the API 4.4.x to libdar, which is the one used
 from release 2.3.5. However some small changes have
 still to be made for your program to compile and work with new libdar
 using the old API. This is the object of this document to describe
-them. This backward compatible API will disapear at next major release
-(which will probably be version 2.5.0, while at that time the API
-should still be under version 5.x.x and thus stay compatible with
-current new API, if all work as expected).<br>
+them. This backward compatible API will probably disappear at next major release
+(which will probably be version 2.5.0. In the meanwhile, the API
+should still be available under versions 5.x.x and thus stay compatible with
+current new API).<br>
       <br>
       </div>
       <div style="text-align: justify;">
@@ -80,7 +82,7 @@ current new API, if all work as expected).<br>
         <li>The first point is to no more include "libdar.hpp" but
 "libdar_4_4.hpp" instead. This file contains the libdar_4_4 namespace
 symbols.</li>
-        <li>The second point of course is to no more use the libdar namespace but libdar_4_4 namespace.<br>
+        <li>The second point, of course is to no more use the <span style="font-weight: bold;">libdar</span> namespace but instead the <span style="font-weight: bold;">libdar_4_4</span> namespace.<br>
         </li>
       </ol>
 The following table shows two code examples. On the left is placed the
@@ -175,18 +177,17 @@ int example()<br>
       <td style="vertical-align: top;">Compilation and linking stay unchanged, thus running <span style="font-style: italic;">sed</span> on your code using the following script-like code should do the trick:<br>
       <br>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">foreach f ( *.c *.h *.cpp *.hpp )</span><br style="font-family: monospace;">
-      <span style="font-family: monospace;">{</span><br style="font-family: monospace;">
-      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; mv "$f" "$f.bak"</span><br style="font-family: monospace;">
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">for file in *.c *.h *.cpp *.hpp ; do</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; mv "$file" "$file.bak"</span><br style="font-family: monospace;">
       <span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; sed -r
 -e 's/libdar::/libdar_4_4::/g' -e 's/using namespace libdar/using
 namespace libdar_4_4/' -e 's|#include &lt;dar/libdar.hpp&gt;|#include
-&lt;dar/libdar_4_4.hpp&gt;|' "$f.bak" &gt; "$f"</span><br style="font-family: monospace;">
-      <span style="font-family: monospace;">}</span><br>
+&lt;dar/libdar_4_4.hpp&gt;|' "$file.bak" &gt; "$file"</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">done</span><br>
 </div>
-      <h3>Want to try the new API ?</h3>
+      <h3>Want to try the new API instead ?</h3>
       <div style="margin-left: 40px;">
-      <div style="text-align: justify;">The first step is to read the <a href="api_tutorial.html">API Tutorial</a>. Then if more detailed information is required, check the <a href="man/index.html">API documentation</a>. Finaly you can subscribe to <a href="https://lists.sourceforge.net/lists/listinfo/dar-libdar_api">libdar-api mailing-list</a> for any problem, questions or suggestions about the API.<br>
+      <div style="text-align: justify;">If you want to go one step further and instead of using the backward compatible API, directly use the new libdar API, the first step is to read the <a href="api_tutorial.html">API Tutorial</a>. Then, if more detailed information is required, check the <a href="man/index.html">API documentation</a>. Finaly you can subscribe to <a href="https://lists.sourceforge.net/lists/listinfo/dar-libdar_api">libdar-api mailing-list</a> for any problem, questions or suggestions about the API.<br>
       </div>
       <br>
       <br>

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive.cpp,v 1.135 2011/05/20 10:29:09 edrusb Rel $
+// $Id: archive.cpp,v 1.135.2.1 2011/08/06 14:28:38 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -449,7 +449,7 @@ namespace libdar
 	catalogue *ref_cat1 = NULL;
 	catalogue *ref_cat2 = NULL;
 	archive *ref_arch2 = options.get_auxilliary_ref();
-	compression algo_kept;
+	compression algo_kept = none;
 
 	NLS_SWAP_IN;
 	try
@@ -620,7 +620,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: archive.cpp,v 1.135 2011/05/20 10:29:09 edrusb Rel $";
+        static char id[]="$Id: archive.cpp,v 1.135.2.1 2011/08/06 14:28:38 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1478,7 +1478,7 @@ namespace libdar
 	    cat = NULL;    // [object member variable]
 	    bool aborting = false;
 	    infinint aborting_next_etoile = 0;
-	    U_64 flag;     // carries the sar option flag
+	    U_64 flag = 0;     // carries the sar option flag
 	    terminateur coord;
 	    label data_name;
 	    generic_file *tmp = NULL;

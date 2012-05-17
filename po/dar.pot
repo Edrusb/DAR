@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.4.1\n"
+"Project-Id-Version: dar 2.4.2\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2011-07-21 16:43+0200\n"
+"POT-Creation-Date: 2011-09-05 14:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3388,28 +3388,28 @@ msgstr ""
 msgid "Corrupted database, empty entry found"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:562
+#: src/libdar/data_tree.cpp:567
 #, c-format
 msgid ""
 "Archive number |  Data                   | status ||  EA                     "
 "| status \n"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:563
+#: src/libdar/data_tree.cpp:568
 #, c-format
 msgid ""
 "---------------+-------------------------+--------++-------------------------"
 "+----------\n"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:756
+#: src/libdar/data_tree.cpp:761
 #, c-format
 msgid ""
 "Dates of file's %S are not increasing when database's archive number grows. "
 "Concerned file is: %S"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:759
+#: src/libdar/data_tree.cpp:764
 msgid ""
 "Dates are not increasing for all files when database's archive number grows, "
 "working with this database may lead to improper file's restored version. "
@@ -3418,43 +3418,43 @@ msgid ""
 "the database"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:762
+#: src/libdar/data_tree.cpp:767
 msgid "Do you want to ignore the same type of error for other files?"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:799
+#: src/libdar/data_tree.cpp:804
 msgid "Unexpected end of file"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1084
+#: src/libdar/data_tree.cpp:1089
 msgid "[ Saved ]"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1086 src/libdar/data_tree.cpp:1091
+#: src/libdar/data_tree.cpp:1091 src/libdar/data_tree.cpp:1096
 msgid "[       ]"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1089
+#: src/libdar/data_tree.cpp:1094
 msgid "[  EA   ]"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1297
+#: src/libdar/data_tree.cpp:1302
 msgid "Unknown record type"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1337
+#: src/libdar/data_tree.cpp:1342
 msgid "removed "
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1338
+#: src/libdar/data_tree.cpp:1343
 msgid "present "
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1339
+#: src/libdar/data_tree.cpp:1344
 msgid "saved   "
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1340
+#: src/libdar/data_tree.cpp:1345
 msgid "absent  "
 msgstr ""
 
@@ -5388,39 +5388,39 @@ msgstr ""
 msgid "Error opening directory "
 msgstr ""
 
-#: src/libdar/sar.cpp:1351
+#: src/libdar/sar.cpp:1352
 #, c-format
 msgid "Error retrieving inode information for %s : %s"
 msgstr ""
 
-#: src/libdar/sar.cpp:1356
+#: src/libdar/sar.cpp:1357
 #, c-format
 msgid "%S already exists, and overwritten is forbidden, aborting"
 msgstr ""
 
-#: src/libdar/sar.cpp:1358
+#: src/libdar/sar.cpp:1359
 #, c-format
 msgid "%S is about to be overwritten, continue ?"
 msgstr ""
 
-#: src/libdar/sar.cpp:1364
+#: src/libdar/sar.cpp:1365
 #, c-format
 msgid "Error opening file %s : %s"
 msgstr ""
 
-#: src/libdar/sar.cpp:1551
+#: src/libdar/sar.cpp:1554
 msgid "Position out of range"
 msgstr ""
 
-#: src/libdar/sar.cpp:1578
+#: src/libdar/sar.cpp:1581
 msgid "This archive has slices and is not possible to read from a pipe"
 msgstr ""
 
-#: src/libdar/sar.cpp:1585
+#: src/libdar/sar.cpp:1588
 msgid "Read-write mode not supported for \"trivial_sar\""
 msgstr ""
 
-#: src/libdar/sar.cpp:1602
+#: src/libdar/sar.cpp:1605
 msgid ""
 "This archive is not single sliced, more data exists in the next slices but "
 "cannot be read from the current pipe, aborting"
@@ -5618,16 +5618,16 @@ msgstr ""
 msgid "not enough space provided to dump the elastic buffer"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:92
+#: src/libdar/escape_catalogue.cpp:94
 msgid ""
 "incoherent data after escape sequence, cannot read internal data set label"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:103
+#: src/libdar/escape_catalogue.cpp:105
 msgid "could not find the internal data set label escape sequence"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:375
+#: src/libdar/escape_catalogue.cpp:390
 msgid ""
 "Escape sequences used for reading lead the archive to place some files out "
 "of the specified root. To overcome this problem, try reading the archive in "
@@ -5636,7 +5636,7 @@ msgid ""
 "lax mode"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:378
+#: src/libdar/escape_catalogue.cpp:393
 msgid ""
 "LAX MODE: Archive directory structure is corrupted, it would lead to place "
 "some files out of the specified root directory. Restoring different "
@@ -5644,29 +5644,29 @@ msgid ""
 "different directories in the specified root directory"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:393
+#: src/libdar/escape_catalogue.cpp:408
 msgid ""
 "LAX MODE: found unknown catalogue entry, assuming data corruption occurred. "
 "Skipping to the next entry, this may lead to improper directory structure "
 "being restored, if the corrupted data was a directory"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:400
+#: src/libdar/escape_catalogue.cpp:415
 msgid "Corrupted entry following an escape mark in the archive"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:415
+#: src/libdar/escape_catalogue.cpp:444
 msgid ""
 "Uncompleted archive! Assuming it has been interrupted during the backup "
 "process. If an error has been reported just above, simply ignore it, this is "
 "about the file that was saved at the time of the interruption."
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:473
+#: src/libdar/escape_catalogue.cpp:502
 msgid "Cannot extract from the internal catalogue the list of files to remove"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:593
+#: src/libdar/escape_catalogue.cpp:623
 msgid ""
 "Resetting the sequential reading process of the archive contents while it is "
 "not finished, will make all data unread so far becoming inaccessible"

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: escape_catalogue.hpp,v 1.14 2011/01/09 17:25:58 edrusb Rel $
+// $Id: escape_catalogue.hpp,v 1.14.2.1 2011/07/24 10:46:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -92,7 +92,7 @@ namespace libdar
 	{
 	    ec_init,   //< state in which no one file has yet been searched in the archive
 	    ec_marks,  //< state in which we find the next file using escape sequence marks
-	    ec_eod,    //< state in which the archive is missing trailing EOD entries, due to user interruption, this returning EOD in enough number to get back to the root directory
+	    ec_eod,    //< state in which the archive is missing trailing EOD entries, due to user interruption, thus returning EOD in enough number to get back to the root directory
 	    ec_detruits,  //< state in which which detruits objects are returned from the catalogue
 	    ec_completed  //< state in which the escape_catalogue object is completed and has all information in memory as a normal catalogue
 	};
@@ -106,8 +106,9 @@ namespace libdar
 	std::map <infinint, etoile *> corres;
         state status;
 	catalogue *cat_det; //< holds the final catalogue's detruit objects when no more file can be read from the archive
-	infinint min_read_offset; //< next offset in archive should be greater than that to identify a mark
-	infinint depth;      //< directory depth of archive being read sequentially
+	infinint min_read_offset;   //< next offset in archive should be greater than that to identify a mark
+	infinint depth;             //< directory depth of archive being read sequentially
+	infinint wait_parent_depth; //< ignore any further entry while depth is less than wait_parent_depth. disabled is set to zero
 
 	void set_esc(escape *esc_ptr) { if(esc_ptr != NULL) esc = esc_ptr; else throw SRC_BUG; };
 	void copy_from(const escape_catalogue & ref);

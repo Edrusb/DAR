@@ -10,7 +10,14 @@
 
 
 
-  <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+
+  
+  
+  <meta content="text/html; charset=us-ascii" http-equiv="content-type">
+  <title>DAR - Frequently Asked Questions</title>
+
+  
+</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -85,11 +92,16 @@ encrypted archives, how to workaround this?</span></a><br>
       <span style="font-weight: bold; font-style: italic;"><a style="font-weight: bold; font-style: italic;" href="#search_for_questions">
 How to search for questions (and their answers) about <span style="font-weight: bold; font-style: italic;">known</span> problems similar to mines?</a><br>
       <a style="font-style: italic; font-weight: bold;" href="#open_failed_excluded">Why dar tells me that he failed to open a directory, while I have excluded this directory?</a><br>
-      </span><a style="font-weight: bold; font-style: italic;" href="#security">Dar reports a "SECURITY WARNING! SUSPICIOUS FILE" what does that mean!? </a><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">
-      <br>
+      </span><a style="font-weight: bold; font-style: italic;" href="#security">Dar reports a "SECURITY WARNING! SUSPICIOUS FILE" what does that mean!? </a><br>
+      <a href="#copy"><span style="font-weight: bold;"><span style="font-style: italic;">Can dar help copy a large directory tree?</span><span style="font-weight: bold; font-style: italic;">
+     </span></span></a><br>
+<span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">
+      
       </span>
       <h2><span style="font-weight: bold;">
-      </span></h2><h2><span style="text-decoration: underline;">Answers:</span></h2>
+      </span></h2><br>
+      <h2><span style="text-decoration: underline;">Answers:</span></h2>
+
 
       <h1><span style="font-weight: bold; font-style: italic;">
       </span></h1><h2> </h2>
@@ -2051,8 +2063,8 @@ test, extract file, list the contents of a given slice from an archive?</span><b
       <div style="margin-left: 40px;"> </div>
       <div style="margin-left: 40px;">Well
 this is due to dar's design. Since release 2.4.0 two feature can help
-you be close to that point, namely --sequential-reading which ask dar
-to read the archive sequentially and -al option which as dar to be
+you be close to that point, namely --sequential-reading which asks dar
+to read the archive sequentially and -al option which asks dar to be
 relaxed on sanity and coherence checks. You can put a single slice into
 a given directory, and create as much empty files as necessary to
 simulate slices of that archive which has lower numbers than the real
@@ -2066,10 +2078,23 @@ requested information:<br>
       <span style="font-family: Courier New,Courier,monospace;">ln -s ../sowhere/backup.3.dar </span><br style="font-family: Courier New,Courier,monospace;">
       <span style="font-family: Courier New,Courier,monospace;">touch backup.1.dar</span><br style="font-family: Courier New,Courier,monospace;">
       <span style="font-family: Courier New,Courier,monospace;">touch backup.2.dar</span><br style="font-family: Courier New,Courier,monospace;">
-      <span style="font-family: Courier New,Courier,monospace;">dar -l backup --sequential-reading -al</span><br>
+      <span style="font-family: Courier New,Courier,monospace;">dar -l backup --sequential-reading -al<br>
+      <br>
+</span></div></div>
+      <div style="margin-left: 40px;">Note however that using the
+laxist mode skips a lot a sanity checks. This method is to be used as
+last ressort method upon heavy archive corruption. It is still a good
+option to test your archive once on destination medium and if possible
+in addition to add redundancy data using Parchive to be able to repair
+an archive corrupted due to media problem.<br>
       </div>
+      <div style="margin-left: 40px;">
+      <div style="margin-left: 40px;">
+      </div>
+
 <br>
       </div>
+
       <span style="font-weight: bold; font-style: italic;"><a name="merge_two_isolated"></a>Why cannot I merge two isolated
 catalogues?</span><br>
       <div style="margin-left: 40px;"><br>
@@ -2423,20 +2448,87 @@ examples) to find some evidence of it.<br>
 and others...<br>
       </div>
       <br>
+      <br><span style="font-weight: bold;"><span style="font-style: italic;"><a name="copy"></a>
+      Can dar help copy a large directory tree?</span><span style="font-weight: bold; font-style: italic;">
+     </span><br>
+     </span><br>
+
+The answer is "yes" and even for more than one reason:<br>
+      <ol>
+        <li>Many backup/copy tools do not take care of hard linked
+inode (hard linked plain files, named pipes, char devices, block
+devices, symlinks)... dar does,</li>
+        <li>
+Many backup/copy tools do not take care of sparse files... dar does,</li>
+        <li>
+Many backup/copy tools do not take care of Extended Attributes... dar does,</li>
+        <li>
+Many backup/copy tools do not take care of Posix ACL (Linux)... dar does,</li>
+        <li>
+Many backup/copy tools do not take care of file forks (MacOS X)... dar does,</li>
+        <li>
+Many backup/copy tools do not take any precautions while working on a live system... dar does.</li>
+      </ol>
+
+      
+Using the following command will do the trick:<br>
+
       <br>
 
+      
+      <div style="margin-left: 40px;"><code>dar -c - -R &lt;srcdir&gt; -N --retry-on-change 3 | dar -x - --sequential-read -N -R &lt;dstdir&gt;</code><br>
+      <code></code></div>
+      <code>
+      <br>
+      &lt;srcdir&gt;</code> contents will be copied to <code>&lt;dstdir&gt;</code>
+both must exist before running this command, and <code>&lt;dstdir&gt;</code> should
+be an empty dir. <br>
 
+      <br>
+
+Here is an example: we will copy the content of /home/my to /home2/my:<br>
+
+      <br>
+
+first we create the destination directory:<br>
+
+      
+      <div style="margin-left: 40px;"><code>mkdir /home2/my<br>
+      <br>
+      </code></div>
+
+
+      then we run dar:<br>
+
+      
+      <div style="margin-left: 40px;"><code>dar -c - -R /home/my -N --retry-on-change 3 | dar -x - --sequential-read -N -R /home2/my</code><span style="font-weight: bold;"></span><br>
+      <span style="font-weight: bold;"><br>
+      </span></div>
+</div>
+      <div style="margin-left: 40px;">The "--retry-on-change" let dar
+retry the copy of a file up to three times if that file has changed at
+the time dar was reading it. You can increase this number at will. If a
+file fails to be copies correctly after more than the allowed retry, a
+warning is issued about that file.<br>
+      <br>
+"piping" ('|' shell syntax) the first dar's output to the second dar's
+input makes the operation not requiering any temporary storage, only
+virtual memory is used to perform this copy. Compression is thus not
+requested as it would only slow down the process.<br>
+      <br>
+      <span style="text-decoration: underline;">last point,</span> you
+should compare the copied data to the original one, before removing it,
+as no backup file has been dropped down to filesystem. This can simply
+be done using:<br>
+      <br>
+&nbsp;&nbsp;&nbsp; <code>diff -r &lt;srcdir&gt; &lt;dstdir&gt;</code><br>
+      <br>
+      <br>
+      <br>
       </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<br>
+</td></tr></tbody></table><br>
 </div>
 </div>
 </center>
-
-
 
 </body></html>
