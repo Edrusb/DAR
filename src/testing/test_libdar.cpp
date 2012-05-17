@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_libdar.cpp,v 1.33.2.2 2007/07/22 16:35:01 edrusb Rel $
+// $Id: test_libdar.cpp,v 1.33.2.3 2012/02/25 19:46:06 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -89,7 +89,7 @@ void f1()
 
 void warning(const string &x, void *context)
 {
-    printf("[%d]%s\n", (U_I)context, x.c_str());
+    printf("[%p]%s\n", context, x.c_str());
 }
 
 bool question(const string & x, void *context)
@@ -97,7 +97,7 @@ bool question(const string & x, void *context)
     bool rep = false;
 	    char r;
 
-	    printf("[%d]%s\n", (U_I)context, x.c_str());
+	    printf("[%p]%s\n", context, x.c_str());
 	    scanf("%c", &r);
 	    rep = r == 'y';
 
@@ -120,7 +120,7 @@ void listing(const std::string & flag,
 	     bool has_children,
 	     void *context)
 {
-    ui.printf("[[%d]][%S][%S][%S][%S][%S][%S][%S][%s][%s]\n", (U_I)context, &flag, &perm, &uid, &gid, &size, &date, &filename, is_dir ? "dir" : "not_dir", has_children ? "has children" : "no children");
+    ui.printf("[[%p]][%S][%S][%S][%S][%S][%S][%S][%s][%s]\n", context, &flag, &perm, &uid, &gid, &size, &date, &filename, is_dir ? "dir" : "not_dir", has_children ? "has children" : "no children");
 }
 
 void f2()
@@ -258,7 +258,7 @@ void f4()
     try
     {
 	pthread_t tid = pthread_self();
-	pthread_t tod;
+	pthread_t tod = tid;
 	bool ret = cancel_status(tod);
 	cancel_clear(tid);
 	cancel_thread(tid);

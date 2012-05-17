@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.76.2.13 2011/03/12 15:39:36 edrusb Rel $
+// $Id: command_line.cpp,v 1.76.2.14 2012/01/04 09:48:20 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -190,7 +190,8 @@ static bool get_args_recursive(user_interaction & dialog,
 			       bool & keep_compressed,
 			       bool & fixed_date_mode,
 			       infinint & fixed_date,
-			       bool & quiet);
+			       bool & quiet,
+			       bool & no_inter);
 
 static void make_args_from_file(user_interaction & dialog,
                                 operation op, const char *filename, S_I & argc,
@@ -258,7 +259,8 @@ static bool update_with_config_files(user_interaction & dialog,
 				     bool & keep_compressed,
 				     bool & fixed_date_mode,
 				     infinint & fixed_date,
-				     bool & quiet);
+				     bool & quiet,
+				     bool & no_inter);
 
 static mask *make_include_exclude_name(const string & x, mask_opt opt);
 static mask *make_exclude_path_ordered(const string & x, mask_opt opt);
@@ -386,7 +388,7 @@ bool get_args(user_interaction & dialog,
     string cmd = path(argv[0]).basename();
     bool glob_mode = true; // defaults to glob expressions
     bool fixed_date_mode = false;
-
+    bool no_inter = false;
 
     try
     {
@@ -440,7 +442,8 @@ bool get_args(user_interaction & dialog,
 				   keep_compressed,
 				   fixed_date_mode,
 				   fixed_date,
-				   quiet))
+				   quiet,
+				   no_inter))
                 return false;
 
                 // checking and updating options with configuration file if any
@@ -495,7 +498,8 @@ bool get_args(user_interaction & dialog,
 					      keep_compressed,
 					      fixed_date_mode,
 					      fixed_date,
-					      quiet))
+					      quiet,
+					      no_inter))
                     return false;
 
                 // some sanity checks
@@ -628,6 +632,8 @@ bool get_args(user_interaction & dialog,
 	    if(algo != none && op == merging && keep_compressed)
 		dialog.warning(gettext("Compression option (-z or -y) is useless and ignored when using -ak option"));
 
+	    if(no_inter && pause > 0)
+		throw Erange("get_args", gettext("-p and -Q options are mutually exclusives"));
 
                 //////////////////////
                 // generating masks
@@ -820,7 +826,8 @@ static bool get_args_recursive(user_interaction & dialog,
 			       bool & keep_compressed,
 			       bool & fixed_date_mode,
 			       infinint & fixed_date,
-			       bool & quiet)
+			       bool & quiet,
+			       bool & no_inter)
 {
     S_I lu;
     S_I rec_c;
@@ -1296,7 +1303,8 @@ static bool get_args_recursive(user_interaction & dialog,
 						 keep_compressed,
 						 fixed_date_mode,
 						 fixed_date,
-						 quiet);
+						 quiet,
+						 no_inter);
                         inclusions.pop_back();
                     }
                     catch(...)
@@ -1443,6 +1451,8 @@ static bool get_args_recursive(user_interaction & dialog,
                     empty = true;
                 break;
             case 'Q':
+		no_inter = true;
+		break;
             case 'j':
                 break;  // ignore this option already parsed during initialization (dar_suite.cpp)
             case 'G':
@@ -1568,7 +1578,7 @@ static void usage(user_interaction & dialog, const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.76.2.13 2011/03/12 15:39:36 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.76.2.14 2012/01/04 09:48:20 edrusb Exp $";
     dummy_call(id);
 }
 
@@ -2254,7 +2264,8 @@ static bool update_with_config_files(user_interaction & dialog,
 				     bool & keep_compressed,
 				     bool & fixed_date_mode,
 				     infinint & fixed_date,
-				     bool & quiet)
+				     bool & quiet,
+				     bool & no_inter)
 {
     const unsigned int len = strlen(home);
     const unsigned int delta = 20;
@@ -2337,7 +2348,8 @@ static bool update_with_config_files(user_interaction & dialog,
 					keep_compressed,
 					fixed_date_mode,
 					fixed_date,
-					quiet))
+					quiet,
+					no_inter))
                     retour = syntax;
                 else
                     retour = ok;
@@ -2433,7 +2445,8 @@ static bool update_with_config_files(user_interaction & dialog,
 					    keep_compressed,
 					    fixed_date_mode,
 					    fixed_date,
-					    quiet))
+					    quiet,
+					    no_inter))
                         retour = syntax;
                     else
                         retour = ok;

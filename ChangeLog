@@ -619,4 +619,6 @@ version 2.3.10 to 2.3.11
 - probable fix (problem difficult to reproduce) for double memory release in
   the storage class [SF 3163389]
 
-
+from 2.3.11 to 2.3.12
+- avoiding concurrent use of -p and -Q options, error message shown in that
+  situation.

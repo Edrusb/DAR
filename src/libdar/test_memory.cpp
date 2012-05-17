@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_memory.cpp,v 1.7 2004/08/03 21:28:01 edrusb Rel $
+// $Id: test_memory.cpp,v 1.7.4.1 2012/01/26 20:09:08 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -50,38 +50,6 @@ namespace libdar
     static U_32 initial_size = 0;
     static list <my_alloc> liste;
 
-    void * operator new(size_t size) throw (bad_alloc)
-    {
-        void *ret = malloc(size);
-
-        if(ret != NULL)
-        {
-            my_alloc al;
-            al.address = ret;
-            al.size = size;
-            liste.push_back(al);
-            total_size += size;
-        }
-
-        return ret;
-    }
-
-    void operator delete(void *p) throw ()
-    {
-        list<my_alloc>::iterator it = liste.begin();
-        while(it != liste.end() && it->address != p)
-            it++;
-
-        if(it != liste.end())
-        {
-            total_size -= it->size;
-            liste.remove(*it);
-        }
-        else
-            throw SRC_BUG;
-
-        free(p);
-    }
 
     U_32 get_total_alloc_size()
     {
@@ -90,7 +58,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: test_memory.cpp,v 1.7 2004/08/03 21:28:01 edrusb Rel $";
+        static char id[]="$Id: test_memory.cpp,v 1.7.4.1 2012/01/26 20:09:08 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -118,5 +86,41 @@ namespace libdar
     }
 
 } // end of namespace
+
+using namespace libdar;
+
+void * operator new(size_t size) throw (bad_alloc)
+{
+    void *ret = malloc(size);
+
+    if(ret != NULL)
+    {
+	my_alloc al;
+	al.address = ret;
+	al.size = size;
+	liste.push_back(al);
+	total_size += size;
+    }
+
+    return ret;
+}
+
+void operator delete(void *p) throw ()
+{
+    list<my_alloc>::iterator it = liste.begin();
+    while(it != liste.end() && it->address != p)
+	it++;
+
+    if(it != liste.end())
+    {
+	total_size -= it->size;
+	liste.remove(*it);
+    }
+    else
+	throw SRC_BUG;
+
+    free(p);
+}
+
 
 #endif
