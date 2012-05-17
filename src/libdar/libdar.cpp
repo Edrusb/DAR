@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.55.2.3 2005/03/19 19:49:01 edrusb Rel $
+// $Id: libdar.cpp,v 1.70 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -119,6 +119,11 @@ using namespace std;
                         code = LIBDAR_ECOMPILATION;\
                         msg = e.get_message();     \
                     }                              \
+                    catch(Ethread_cancel & e)      \
+                    {                              \
+                        code = LIBDAR_THREAD_CANCEL;\
+                        msg = e.get_message();     \
+                    }                              \
                     catch(Egeneric & e)            \
                     {/*unknown Egeneric exception*/\
 			code = LIBDAR_EBUG;        \
@@ -127,7 +132,7 @@ using namespace std;
                     catch(...)                     \
                     {/* unknown Egeneric exception*/\
 			code = LIBDAR_UNKNOWN;     \
-                        msg = gettext("Caugth a none libdar exception");  \
+                        msg = gettext("Caught a none libdar exception");  \
                     }                              //
 
 
@@ -139,9 +144,9 @@ namespace libdar
     {
 	NLS_SWAP_IN;
         if(&major == NULL)
-            throw Erange("get_version", gettext("Argument given to \"major\" is a NULL pointer"));
+            throw Elibcall("get_version", gettext("Argument given to \"major\" is a NULL pointer"));
         if(&minor == NULL)
-            throw Erange("get_version", gettext("Argument given to \"minor\" is a NULL pointer"));
+            throw Elibcall("get_version", gettext("Argument given to \"minor\" is a NULL pointer"));
         major = LIBDAR_COMPILE_TIME_MAJOR;
         minor = LIBDAR_COMPILE_TIME_MINOR;
 	libdar_init_thread_safe();
@@ -162,11 +167,11 @@ namespace libdar
     {
 	NLS_SWAP_IN;
         if(&major == NULL)
-            throw Erange("get_version", gettext("Argument given to \"major\" is a NULL pointer"));
+            throw Elibcall("get_version", gettext("Argument given to \"major\" is a NULL pointer"));
 	if(&medium == NULL)
-	    throw Erange("get_version", gettext("Argument given to \"medium\" is a NULL pointer"));
+	    throw Elibcall("get_version", gettext("Argument given to \"medium\" is a NULL pointer"));
         if(&minor == NULL)
-            throw Erange("get_version", gettext("argument given to \"minor\" is a NULL pointer"));
+            throw Elibcall("get_version", gettext("argument given to \"minor\" is a NULL pointer"));
 
         major = LIBDAR_COMPILE_TIME_MAJOR;
 	medium = LIBDAR_COMPILE_TIME_MEDIUM;
@@ -216,14 +221,13 @@ namespace libdar
 				     bool allow_over,
 				     bool warn_over,
 				     bool info_details,
-				     bool pause,
+				     const infinint & pause,
 				     bool empty_dir,
 				     compression algo,
 				     U_I compression_level,
 				     const infinint &file_size,
 				     const infinint &first_file_size,
-				     bool root_ea,
-				     bool user_ea,
+				     const mask & ea_mask,
 				     const std::string & execute,
 				     crypto_algo crypto,
 				     const std::string & pass,
@@ -231,12 +235,16 @@ namespace libdar
 				     const mask & compr_mask,
 				     const infinint & min_compr_size,
 				     bool nodump,
-				     bool ignore_owner,
+				     inode::comparison_fields what_to_check,
 				     const infinint & hourshift,
 				     bool empty,
 				     bool alter_atime,
 				     bool same_fs,
-				     statistics & ret,
+				     bool snapshot,
+				     bool cache_directory_tagging,
+				     bool display_skipped,
+				     const infinint & fixed_date,
+				     statistics * progressive_report,
 				     U_16 & exception,
 				     std::string & except_msg)
     {
@@ -260,8 +268,7 @@ namespace libdar
 				   compression_level,
 				   file_size,
 				   first_file_size,
-				   root_ea,
-				   user_ea,
+				   ea_mask,
 				   execute,
 				   crypto,
 				   pass,
@@ -269,12 +276,16 @@ namespace libdar
 				   compr_mask,
 				   min_compr_size,
 				   nodump,
-				   ignore_owner,
+				   what_to_check,
 				   hourshift,
 				   empty,
 				   alter_atime,
 				   same_fs,
-				   ret);
+				   snapshot,
+				   cache_directory_tagging,
+				   display_skipped,
+				   fixed_date,
+				   progressive_report);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
 	return arch_ret;
@@ -288,7 +299,7 @@ namespace libdar
 				      bool allow_over,
 				      bool warn_over,
 				      bool info_details,
-				      bool pause,
+				      const infinint & pause,
 				      compression algo,
 				      U_I compression_level,
 				      const infinint &file_size,
@@ -327,6 +338,75 @@ namespace libdar
 	return ret;
     }
 
+    archive *merge_archive_noexcept(user_interaction & dialog,
+				    const path & sauv_path,
+				    archive *ref_arch1,
+				    archive *ref_arch2,
+				    const mask & selection,
+				    const mask & subtree,
+				    const std::string & filename,
+				    const std::string & extension,
+				    bool allow_over,
+				    bool warn_over,
+				    bool info_details,
+				    const infinint & pause,
+				    bool empty_dir,
+				    compression algo,
+				    U_I compression_level,
+				    const infinint & file_size,
+				    const infinint & first_file_size,
+				    const mask & ea_mask,
+				    const std::string & execute,
+				    crypto_algo crypto,
+				    const std::string & pass,
+				    U_32 crypto_size,
+				    const mask & compr_mask,
+				    const infinint & min_compr_size,
+				    bool empty,
+				    bool display_skipped,
+				    bool keep_compressed,
+				    statistics * progressive_report,
+				    U_16 & exception,
+				    std::string & except_msg)
+    {
+	archive *ret = NULL;
+	NLS_SWAP_IN;
+	WRAPPER_IN
+	    ret = new archive(dialog,
+			      sauv_path,
+			      ref_arch1,
+			      ref_arch2,
+			      selection,
+			      subtree,
+			      filename,
+			      extension,
+			      allow_over,
+			      warn_over,
+			      info_details,
+			      pause,
+			      empty_dir,
+			      algo,
+			      compression_level,
+			      file_size,
+			      first_file_size,
+			      ea_mask,
+			      execute,
+			      crypto,
+			      pass,
+			      crypto_size,
+			      compr_mask,
+			      min_compr_size,
+			      empty,
+			      display_skipped,
+			      keep_compressed,
+			      progressive_report);
+	WRAPPER_OUT(exception, except_msg)
+	NLS_SWAP_OUT;
+	return ret;
+    }
+
+
+
 
     void close_archive_noexcept(archive *ptr,
 				U_16 & exception,
@@ -335,7 +415,7 @@ namespace libdar
 	NLS_SWAP_IN;
 	WRAPPER_IN
 	    if(ptr == NULL)
-		throw Erange("close_archive_noexcept", gettext("Invalid NULL pointer given to close_archive"));
+		throw Elibcall("close_archive_noexcept", gettext("Invalid NULL pointer given to close_archive"));
 	    else
 	    {
 		delete ptr;
@@ -347,7 +427,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.55.2.3 2005/03/19 19:49:01 edrusb Rel $";
+        static char id[]="$Id: libdar.cpp,v 1.70 2005/12/29 02:32:41 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -442,13 +522,15 @@ namespace libdar
 				   bool info_details,
 				   bool detruire,
 				   bool only_more_recent,
-				   bool restore_ea_root,
-				   bool restore_ea_user,
+				   const mask & ea_mask,
 				   bool flat,
-				   bool ignore_owner,
+				   inode::comparison_fields what_to_check,
 				   bool warn_remove_no_match,
 				   const infinint & hourshift,
 				   bool empty,
+				   bool ea_erase,
+				   bool display_skipped,
+				   statistics * progressive_report,
 				   U_16 & exception,
 				   std::string & except_msg)
     {
@@ -466,13 +548,15 @@ namespace libdar
 			      info_details,
 			      detruire,
 			      only_more_recent,
-			      restore_ea_root,
-			      restore_ea_user,
+			      ea_mask,
 			      flat,
-			      ignore_owner,
+			      what_to_check,
 			      warn_remove_no_match,
 			      hourshift,
-			      empty);
+			      empty,
+			      ea_erase,
+			      display_skipped,
+			      progressive_report);
 	WRAPPER_OUT(exception, except_msg)
 	NLS_SWAP_OUT;
 	return ret;
@@ -482,7 +566,7 @@ namespace libdar
     void op_listing_noexcept(user_interaction & dialog,
 			     archive *ptr,
 			     bool info_details,
-			     bool tar_format,
+			     archive::listformat list_mode,
 			     const mask &selection,
 			     bool filter_unsaved,
 			     U_16 & exception,
@@ -494,7 +578,7 @@ namespace libdar
 		throw Elibcall("op_extract_noexcept", gettext("Invalid NULL argument given to 'ptr'"));
 	ptr->op_listing(dialog,
 			info_details,
-			tar_format,
+			list_mode,
 			selection,
 			filter_unsaved);
 	WRAPPER_OUT(exception, except_msg)
@@ -507,10 +591,11 @@ namespace libdar
 				const mask &selection,
 				const mask &subtree,
 				bool info_details,
-				bool check_ea_root,
-				bool check_ea_user,
-				bool ignore_owner,
+				const mask & ea_mask,
+				inode::comparison_fields what_to_check,
 				bool alter_atime,
+				bool display_skipped,
+				statistics * progressive_report,
 				U_16 & exception,
 				std::string & except_msg)
     {
@@ -524,10 +609,11 @@ namespace libdar
 			   selection,
 			   subtree,
 			   info_details,
-			   check_ea_root,
-			   check_ea_user,
-			   ignore_owner,
-			   alter_atime);
+			   ea_mask,
+			   what_to_check,
+			   alter_atime,
+			   display_skipped,
+			   progressive_report);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
 	return ret;
@@ -539,6 +625,8 @@ namespace libdar
 				const mask &selection,
 				const mask &subtree,
 				bool info_details,
+				bool display_skipped,
+				statistics * progressive_report,
 				U_16 & exception,
 				std::string & except_msg)
     {
@@ -550,7 +638,9 @@ namespace libdar
 	ret = ptr->op_test(dialog,
 			   selection,
 			   subtree,
-			   info_details);
+			   info_details,
+			   display_skipped,
+			   progressive_report);
 	WRAPPER_OUT(exception, except_msg)
 	NLS_SWAP_OUT;
 	return ret;

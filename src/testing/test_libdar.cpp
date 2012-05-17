@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_libdar.cpp,v 1.22.2.1 2005/03/13 20:07:54 edrusb Rel $
+// $Id: test_libdar.cpp,v 1.33 2005/12/13 20:54:46 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -180,14 +180,13 @@ void f2()
 					    true,
 					    true,
 					    true,
-					    false, // no pause
+					    0, // no pause
 					    true,
 					    none,
 					    1,
 					    0,
 					    0,
-					    false,
-					    false,
+					    bool_mask(true),
 					    "",
 					    crypto_none,
 					    "",
@@ -195,12 +194,16 @@ void f2()
 					    bool_mask(false),
 					    0,
 					    false,
-					    false,
+					    inode::cf_all,
 					    0,
 					    false,
 					    false,
 					    false,
-					    st,
+					    false,
+					    false,
+					    false,
+					    0,
+					    &st,
 					    code,
 					    msg);
     if(code != LIBDAR_NOEXCEPT && code != LIBDAR_EUSER_ABORT)
@@ -210,7 +213,7 @@ void f2()
     }
     if(toto != NULL)
     {
-	op_listing_noexcept(ui, toto, true, false, bool_mask(true), false, code, msg);
+	op_listing_noexcept(ui, toto, true, archive::normal, bool_mask(true), false, code, msg);
 	if(code != LIBDAR_NOEXCEPT && code != LIBDAR_EUSER_ABORT)
 	{
 	    ui.printf("exception creating archive: %S\n", &msg);
@@ -297,12 +300,12 @@ void f4()
     {
 	pthread_t tid = pthread_self();
 	pthread_t tod;
-	bool ret = cancel_current(tod);
-	cancel_clear();
+	bool ret = cancel_status(tod);
+	cancel_clear(tid);
 	cancel_thread(tid);
-	ret = cancel_current(tod);
-	cancel_clear();
-	ret = cancel_current(tod);
+ 	ret = cancel_status(tod);
+	cancel_clear(tod);
+	ret = cancel_status(tod);
 	null_file fake = null_file(ui, gf_read_write);
 	fake.write("coucouc les amsi", 10);
 	cancel_thread(tid);

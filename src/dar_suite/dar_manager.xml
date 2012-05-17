@@ -11,7 +11,7 @@
 <!ATTLIST hdr
   vspace CDATA #IMPLIED>
 <!ELEMENT arg (desc)>
-<!ATTLIST arg 
+<!ATTLIST arg
   vspace CDATA #IMPLIED
   flag 	 CDATA #IMPLIED
   opt  	 CDATA #IMPLIED
@@ -24,7 +24,7 @@
 
   <indents flag="4" desc="20" cont="1" wrap="79"/>
 
-  <hdr vspace="1">options:</hdr>
+  <hdr vspace="1">Commands:</hdr>
 
   <arg flag="-C" repl="database">
     <desc>
@@ -50,9 +50,9 @@
     </desc>
   </arg>
 
-  <arg flag="-D" repl="number">
+  <arg flag="-D" repl="number[-number]">
     <desc>
-        delete an archive from the database (use -l to get archive numbers)
+        delete an archive from the database
     </desc>
   </arg>
 
@@ -76,13 +76,19 @@
 
   <arg flag="-d" repl="dar's path">
     <desc>
-       specify the path to dar (else dar must be located in a directory covered by the PATH variable)   
+       specify the path to dar
     </desc>
   </arg>
 
   <arg flag="-r" repl="files">
     <desc>
        restores the given files
+    </desc>
+  </arg>
+
+  <arg flag="-w" repl="date">
+    <desc>
+       only with -r, restores in state just before the given date
     </desc>
   </arg>
 
@@ -94,7 +100,7 @@
 
   <arg flag="-f" repl="file">
     <desc>
-        list the archives where is saved the data and/or EA of that file
+        list the archives where the given file is present
     </desc>
   </arg>
 
@@ -106,8 +112,7 @@
 
   <arg flag="-m" repl="number">
     <desc>
-        change an archive position within a given database. First <repl>number</repl> 
-        is the archive to move, second <repl>number</repl> is where to move it.
+        move an archive within a given database.
     </desc>
   </arg>
 
@@ -120,6 +125,20 @@
   <arg flag="-V">
     <desc>
         displays software version
+    </desc>
+  </arg>
+
+  <hdr vspace="1">Options:</hdr>
+
+  <arg flag="-v">
+    <desc>
+        display more information about what is going on
+    </desc>
+  </arg>
+
+  <arg flag="-j">
+    <desc>
+        ask user what to do when memory is exhausted
     </desc>
   </arg>
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.hpp,v 1.8 2004/11/07 18:21:38 edrusb Rel $
+// $Id: path.hpp,v 1.9 2005/11/01 21:54:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -34,6 +34,8 @@
 #include <list>
 #include <string>
 #include "erreurs.hpp"
+
+#define FAKE_ROOT path(string("<ROOT>"))
 
 namespace libdar
 {
@@ -142,6 +144,7 @@ namespace libdar
 
         void reduce();
     };
+
 
 } // end of namespace
 

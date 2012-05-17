@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.cpp,v 1.19.2.1 2005/03/13 20:07:54 edrusb Rel $
+// $Id: zapette.cpp,v 1.21 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -267,7 +267,7 @@ namespace libdar
 			ans.write(out, NULL);
 		    }
                     else
-                        throw Erange("zapette::action", gettext("Received unkown special order"));
+                        throw Erange("zapette::action", gettext("Received unknown special order"));
                 }
             }
             while(req.size != REQUEST_SIZE_SPECIAL_ORDER || req.offset != REQUEST_OFFSET_END_TRANSMIT);
@@ -317,7 +317,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: zapette.cpp,v 1.19.2.1 2005/03/13 20:07:54 edrusb Rel $";
+        static char id[]="$Id: zapette.cpp,v 1.21 2005/12/29 02:32:41 edrusb Rel $";
         dummy_call(id);
     }
 

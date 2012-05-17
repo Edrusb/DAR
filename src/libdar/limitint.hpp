@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.hpp,v 1.16 2004/11/07 18:21:38 edrusb Rel $
+// $Id: limitint.hpp,v 1.18 2005/12/05 11:56:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -50,13 +50,13 @@ extern "C"
 #include "integers.hpp"
 #include "erreurs.hpp"
 #include "special_alloc.hpp"
-#include "user_interaction.hpp"
 #include "int_tools.hpp"
 
 namespace libdar
 {
 
     class generic_file;
+    class user_interaction;
 
 	/// limitint template class
 
@@ -209,6 +209,7 @@ namespace libdar
 	///////////////////////////////////////////////////////////////////////
 
 #include "generic_file.hpp"
+#include "user_interaction.hpp"
 
 namespace libdar
 {
@@ -218,7 +219,7 @@ namespace libdar
     template <class B> limitint<B>::limitint(user_interaction & dialog, S_I *fd, generic_file *x)
     {
         if(fd != NULL && x != NULL)
-            throw Erange("limitint::limitint(file, file)", gettext("Both arguments are not NULL, please choose one or the other, not both"));
+            throw Erange("limitint::limitint(file, file)", "Both arguments are not NULL, please choose one or the other, not both"); // message not translated, expected
         if(fd != NULL)
         {
             fichier f = fichier(dialog, dup(*fd));
@@ -228,7 +229,7 @@ namespace libdar
             if(x != NULL)
                 build_from_file(*x);
             else
-                throw Erange("limitint::limitint(file, file)", gettext("Cannot read from file, both arguments are NULL"));
+                throw Erange("limitint::limitint(file, file)", "Cannot read from file, both arguments are NULL"); // message not translated, expected
     }
 
     template <class B> void limitint<B>::dump(user_interaction & dialog, S_I fd) const

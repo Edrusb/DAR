@@ -18,21 +18,43 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.23.2.2 2005/03/05 16:43:13 edrusb Rel $
+// $Id: dar_suite.cpp,v 1.29.2.2 2006/02/04 14:47:15 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
-#include <iostream>
+
+extern "C"
+{
+#if HAVE_LOCALE_H
 #include <locale.h>
+#endif
+
+#if HAVE_SIGNAL_H
+#include <signal.h>
+#endif
+
+#if MUTEX_WORKS
+#if HAVE_PTHREAD_H
+#include <pthread.h>
+#else
+#define pthread_t U_I
+#endif
+#endif
+
+}
+
+#include <iostream>
 #include <new>
+
 #include "integers.hpp"
 #include "dar_suite.hpp"
 #include "shell_interaction.hpp"
 #include "erreurs.hpp"
 #include "test_memory.hpp"
 #include "libdar.hpp"
+#include "thread_cancellation.hpp"
 
 #define GENERAL_REPORT(msg) 	if(ui != NULL)\
 	                            ui->warning(msg);\
@@ -46,13 +68,29 @@ using namespace libdar;
 static void jogger();
 
 static user_interaction *ui = NULL;
+static void signals_abort(int l, bool now);
+static void signal_abort_delayed(int l);
+static void signal_abort_now(int l);
 
+void dar_suite_reset_signal_handler()
+{
+#if HAVE_SIGNAL_H
+    signal(SIGTERM, &signal_abort_delayed);
+    signal(SIGINT, &signal_abort_delayed);
+    signal(SIGQUIT, &signal_abort_delayed);
+    signal(SIGHUP, &signal_abort_delayed);
+    signal(SIGUSR1, &signal_abort_delayed);
+    signal(SIGUSR2, &signal_abort_now);
+#endif
+}
 
 int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_interaction & dialog, int, char *[], const char **env))
 {
     MEM_BEGIN;
     MEM_IN;
     int ret = EXIT_OK;
+
+    dar_suite_reset_signal_handler();
 
 #ifdef ENABLE_NLS
 	// gettext settings
@@ -128,6 +166,11 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 	GENERAL_REPORT(string(gettext("Aborting program. User refused to continue while asking: ")) + e.get_message());
 	ret = EXIT_USER_ABORT;
     }
+    catch(Ethread_cancel & e)
+    {
+	GENERAL_REPORT(string(gettext("Program has been aborted for the following reason: ")) + e.get_message());
+	ret = EXIT_USER_ABORT;
+    }
     catch(Edata & e)
     {
 	    // no output just the exit code is set
@@ -135,12 +178,12 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
     }
     catch(Escript & e)
     {
-	GENERAL_REPORT(string(gettext("Aborting program. An error occured concerning user command execution: ")) + e.get_message());
+	GENERAL_REPORT(string(gettext("Aborting program. An error occurred concerning user command execution: ")) + e.get_message());
 	ret = EXIT_SCRIPT_ERROR;
     }
     catch(Elibcall & e)
     {
-	GENERAL_REPORT(string(gettext("Aborting program. An error occured while calling libdar: ")) + e.get_message());
+	GENERAL_REPORT(string(gettext("Aborting program. An error occurred while calling libdar: ")) + e.get_message());
 	ret = EXIT_LIBDAR;
     }
     catch(Einfinint & e)
@@ -173,6 +216,9 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 	ret = EXIT_BUG;
     }
 
+    if(thread_cancellation::count() != 0)
+	throw SRC_BUG;
+
 	// restoring terminal settings
     try
     {
@@ -192,7 +238,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.23.2.2 2005/03/05 16:43:13 edrusb Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.29.2.2 2006/02/04 14:47:15 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -201,7 +247,7 @@ static void jogger()
 {
     if(ui == NULL)
 	throw Ememory("jogger");
-    ui->pause(gettext("No more (virtual) memory available, you have the opportunity to stop unncessary applications to free up some memory. Can we continue now ?"));
+    ui->pause(gettext("No more (virtual) memory available, you have the opportunity to stop un-necessary applications to free up some memory. Can we continue now ?"));
 }
 
 string dar_suite_command_line_features()
@@ -213,4 +259,42 @@ string dar_suite_command_line_features()
 #endif
 
     return tools_printf(gettext("Long options support       : %s\n"), long_opt);
+}
+
+static void signal_abort_delayed(int l)
+{
+    signals_abort(l, false);
+}
+
+static void signal_abort_now(int l)
+{
+    signals_abort(l, true);
+}
+
+static void signals_abort(int l, bool now)
+{
+#if HAVE_DECL_SYS_SIGLIST
+    GENERAL_REPORT(tools_printf(gettext("Received signal: %s"), sys_siglist[l]));
+#else
+    GENERAL_REPORT(tools_printf(gettext("Received signal: %d"), l));
+#endif
+
+#if MUTEX_WORKS
+    if(now)
+    {
+	GENERAL_REPORT(string(gettext("Archive fast termination engaged")));
+    }
+    else
+    {
+	GENERAL_REPORT(string(gettext("Archive delayed termination engaged")));
+    }
+#if HAVE_SIGNAL_H
+    signal(l, SIG_DFL);
+    GENERAL_REPORT(string(gettext("Disabling signal handler, the next time this signal is received the program will end immediately")));
+#endif
+    cancel_thread(pthread_self(), now);
+#else
+    GENERAL_REPORT(string(gettext("Cannot cleanly abort the operation, thread-safe support is missing, will thus abruptly stop the program, generated archive may be unusable")));
+    exit(EXIT_USER_ABORT);
+#endif
 }

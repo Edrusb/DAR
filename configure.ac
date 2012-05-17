@@ -1,13 +1,13 @@
-# Process this file with autoconf to produce a configure script.
+ |# Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.2.7], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.3.0], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
 AC_DEFINE_UNQUOTED(DAR_VERSION, "AC_PACKAGE_VERSION", [dar and dar_suite version, definition in configure.ac])
 
 AM_INIT_AUTOMAKE
-AM_GNU_GETTEXT([use-libtool])
+AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION
 AM_ICONV
 
@@ -21,26 +21,7 @@ AC_PROG_RANLIB
 # Checks for libraries.
 AC_CHECK_LIB(socket, [socket], [], [])
 AC_CHECK_LIB(nsl, [endnetconfig], [], [])
-
-AC_MSG_CHECKING([for static linking with libdl])
-MEM_LDFLAGS=$LDFLAGS
-LDFLAGS="-static -ldl"
-AC_RUN_IFELSE(
-        [
-        AC_LANG_PROGRAM([extern void *dlopen(const char *p, int mode);],
-                        [if(0) dlopen("coucou", 0);])
-        ],
-        [libdl_static_pb="no"
-         AC_MSG_RESULT([available])
-        ],
-        [libdl_static_pb="yes"
-         AC_MSG_RESULT([failed])
-        ],
-        [])
-LDFLAGS=$MEM_LDFLAGS
-
 AC_CHECK_LIB(dl, [dlsym], [], [])
-
 
 # Checks for header files.
 AC_HEADER_DIRENT
@@ -64,6 +45,7 @@ AC_DECL_SYS_SIGLIST
 AC_CHECK_TYPE(size_t, [AC_CHECK_SIZEOF(size_t)], [AC_MSG_ERROR([Cannot find size_t type])], [])
 AC_CHECK_TYPE(time_t, [AC_CHECK_SIZEOF(time_t)], [AC_MSG_ERROR([Cannot find time_t type])], [])
 AC_CHECK_TYPE(off_t, [AC_CHECK_SIZEOF(off_t)], [AC_MSG_ERROR([Cannot find off_t type])], [])
+
 
 # Checks for library functions.
 AC_FUNC_FNMATCH
@@ -229,7 +211,7 @@ AC_ARG_ENABLE(  [ea-support],
                 ],
                 [ AC_CHECK_HEADERS([attr/xattr.h])
                   AC_CHECK_LIB(attr, [lgetxattr], [], [])
-                  AC_MSG_CHECKING([for Extended Attribute support])
+                  AC_MSG_CHECKING([for Unix Extended Attribute support])
                   AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
                                                      #if HAVE_SYS_TYPES_H
                                                      #include <sys/types.h>
@@ -244,7 +226,26 @@ AC_ARG_ENABLE(  [ea-support],
                                         local_ea_support="yes"
                                         AC_MSG_RESULT([yes])
                                  ],
-                                 [ AC_MSG_RESULT([no]) ]
+                                 [
+                  AC_MSG_RESULT([no])
+                  AC_CHECK_HEADERS([sys/xattr.h])
+                  AC_CHECK_LIB(c, [fgetxattr])
+                  AC_MSG_CHECKING([for Mac OS X Extended Attribute support])
+                  AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+                                                     #if HAVE_SYS_XATTR_H
+                                                     #include <sys/xattr.h>
+                                                     #endif
+                                                    }]],
+                                                    [ getxattr((char *)0, (char *)0, (void *)0, 0, 0, XATTR_NOFOLLOW); ]),
+                                    [
+                                        AC_DEFINE(EA_SUPPORT, [], [if defined, activates support for Extended Attributes])
+                                        AC_DEFINE(OSX_EA_SUPPORT, [], [if defined, activates support for Mac OS X Extended Attributes])
+                                        local_ea_support="yes"
+                                        AC_MSG_RESULT([yes])
+                                    ],
+                                    [ AC_MSG_RESULT([no]) ],
+                                    )
+                                 ]
                                  )
                 ]
              )
@@ -335,7 +336,7 @@ AC_ARG_ENABLE(  [os-bits],
                 [
                         AC_CHECK_HEADER(inttypes.h,
                                 [
-                                  AC_RUN_IFELSE(
+                                  AC_COMPILE_IFELSE(
                                         [AC_LANG_PROGRAM([extern "C" {
                                                           #include <inttypes.h>
                                                           }],
@@ -351,23 +352,6 @@ AC_ARG_ENABLE(  [os-bits],
                         )
                 ]
              )
-
-AC_ARG_ENABLE( [libdl-test],
-               AC_HELP_STRING(--disable-libdl-test, [avoids checking against a static version of libdl, but don't complain if static linking fails...]),
-               [skip_libdl_test="yes"],
-               [skip_libdl_test="no"])
-
-AC_ARG_ENABLE( [dar-static],
-                AC_HELP_STRING(--disable-dar-static, [avoids building dar_static, a dar statically linked version]),
-                [build_static="no"],
-                [
-                if test $libdl_static_pb = "yes" -a $skip_libdl_test = "no" ; then
-                   AC_MSG_NOTICE([static linking not completely supported on this system, CANNOT and WILL NOT build dar_static !])
-                   build_static="no"
-                else
-                   build_static="yes"
-                fi
-                ])
 
 AC_ARG_ENABLE( [mode],
                 AC_HELP_STRING(--enable-mode=arg, [where arg is 32 or 64. Makes dar internally use 32 bits or 64 bits integers in place of infinint (which is the case if this option is not given)]),
@@ -404,8 +388,10 @@ AC_ARG_ENABLE( [build-usage],
                [build_usage="no"])
 
 AC_ARG_ENABLE( [build-html],
-	       AC_HELP_STRING(--disable-build-html, [don't build programming documentation (in particular libdar API documentation)]),
-	       [ doxygen="no" ],
+	       AC_HELP_STRING(--disable-build-html, [don't build programming documentation (in particular libdar API documentation) and html man page]),
+	       [ doxygen="no"
+                 groff="no"
+               ],
 	       [ AC_CHECK_PROG(doxygen, doxygen, [yes], [no], [$PATH])
  	           AC_MSG_CHECKING([for doxygen version])
 		   if test "$doxygen" = "yes" ; then
@@ -418,6 +404,12 @@ AC_ARG_ENABLE( [build-html],
 			   doxygen="no"
                        fi
                    fi
+                 AC_CHECK_PROG(tmp, man, [yes], [no], [$PATH])
+                 if test "$tmp" = "yes" ; then
+                    AC_CHECK_PROG(groff, groff, [yes], [no], [$PATH])
+                 else
+                    groff = "no";
+                 fi
 	       ]
              )
 
@@ -476,15 +468,33 @@ AC_ARG_ENABLE( [profiling],
 	       AC_HELP_STRING(--enable-profiling, [enable executable profiling]),
                [ profiling="yes" ])
 
+AC_ARG_ENABLE( [dar-static],
+               AC_HELP_STRING(--disable-dar-static, [avoids building dar_static, a dar statically linked version]),
+               [build_static="no"],
+               [build_static="yes"])
+
+MEM_LDFLAGS=$LDFLAGS
+LDFLAGS="-static -ldl"
+AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
+                                                #include <stdio.h>
+                                             }
+                               ]],
+                               [
+                                  printf("Hello World!");
+                               ]),
+              [static_pb="no"],
+              [static_pb="yes"])
+LDFLAGS=$MEM_LDFLAGS
 
 AM_CONDITIONAL([MAKE_ALL_DIR], [test $examples = "yes"])
 AM_CONDITIONAL([MAKE_USAGE], [test $build_usage = "yes"])
-AM_CONDITIONAL([BUILD_DAR_STATIC], [test $build_static = "yes"])
-AM_CONDITIONAL([DEBUG_STATIC], [test $debug_static = "yes" -a "$libdl_static_pb" != "yes"])
+AM_CONDITIONAL([BUILD_DAR_STATIC], [test $build_static = "yes" -a $static_pb = "no"])
+AM_CONDITIONAL([DEBUG_STATIC], [test $debug_static = "yes" -a $static_pb = "no"])
 AM_CONDITIONAL([BUILD_MODE32], [test "$build_mode" = "32"])
 AM_CONDITIONAL([BUILD_MODE64], [test "$build_mode" = "64"])
 AM_CONDITIONAL([USE_UPX], [test "$upx" = "yes"])
 AM_CONDITIONAL([USE_DOXYGEN], [test "$doxygen" = "yes"])
+AM_CONDITIONAL([USE_GROFF], [test "$groff" = "yes"])
 AM_CONDITIONAL([PROFILING], [test "$profiling" = "yes"])
 AC_SUBST(UPX_PROG, [upx])
 AC_SUBST(DOXYGEN_PROG, [doxygen])
@@ -492,7 +502,7 @@ AC_SUBST(DOXYGEN_PROG, [doxygen])
 # defaults
 AC_PREFIX_DEFAULT(/usr/local)
 
-AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile po/Makefile.in m4/Makefile po/Makefile intl/Makefile doc/mini-howto/Makefile ])
+AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile po/Makefile.in m4/Makefile po/Makefile doc/mini-howto/Makefile src/libdar/libdar.pc.tmpl doc/man/Makefile])
 AC_OUTPUT
 [echo ""
 echo "--"
@@ -582,7 +592,11 @@ fi
 
 echo -n "   Building dar_static    : "
 if  [ "$build_static" = "yes" ]; then
-  echo "YES"
+  if [ "$static_pb" = "yes" ]; then
+     echo "NO  (system does not support static linking, see note below)"
+  else
+     echo "YES"
+  fi
 else
   echo "NO"
 fi
@@ -601,6 +615,18 @@ else
   echo "NO"
 fi
 
+if [ "$static_pb" = "yes" -a "$build_static" = "yes" ]; then
+   echo ""
+   echo "  Note:"
+   echo ""
+   echo "    If  you  want to know  which libraries  are not available  as  static"
+   echo "    libraries check the logs in the config.log generated file. the command"
+   echo ""
+   echo "         'grep -e -static -A 2 config.log'"
+   echo ""
+   echo "    should bring you to the essentials."
+   echo ""
+fi
 
 echo ""
 ]

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: etage.cpp,v 1.14 2004/09/13 13:07:51 edrusb Rel $
+// $Id: etage.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -51,28 +51,57 @@ extern "C"
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
 } // end extern "C"
 
 #include "etage.hpp"
+#include "tools.hpp"
+#include "infinint.hpp"
+#include "generic_file.hpp"
+
+#define CACHE_DIR_TAG_FILENAME "CACHEDIR.TAG"
+#define CACHE_DIR_TAG_FILENAME_CONTENTS "Signature: 8a477f597d28d172789f06886806bc55"
 
 using namespace std;
 
 namespace libdar
 {
+	// check if the given file is a tag tellig if the current directory is a cache directory
+    static bool cache_directory_tagging_check(user_interaction & dialog, const char *cpath, const char *filename);
 
-    etage::etage(const char *dirname, const infinint & x_last_acc, const infinint & x_last_mod)
+
+    etage::etage(user_interaction &ui,
+		 const char *dirname,
+		 const infinint & x_last_acc,
+		 const infinint & x_last_mod,
+		 bool cache_directory_tagging)
     {
         struct dirent *ret;
         DIR *tmp = opendir(dirname);
+	bool is_cache_dir = false;
 
         if(tmp == NULL)
-            throw Erange("filesystem etage::etage" , string(gettext("Error openning directory: ")) + dirname + " : " + strerror(errno));
+            throw Erange("filesystem etage::etage" , string(gettext("Error opening directory: ")) + dirname + " : " + strerror(errno));
 
         fichier.clear();
-        while((ret = readdir(tmp)) != NULL)
+        while(!is_cache_dir && (ret = readdir(tmp)) != NULL)
             if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
+	    {
+		if(cache_directory_tagging)
+		    is_cache_dir = cache_directory_tagging_check(ui, dirname, ret->d_name);
                 fichier.push_back(string(ret->d_name));
+	    }
         closedir(tmp);
+
+	if(is_cache_dir)
+	{
+	    fichier.clear();
+	    ui.warning(tools_printf(gettext("Detected Cache Directory Tagging Standard for %s, the contents of that directory will not be saved"), dirname));
+		// drop all the contents of the directory because it follows the Cache Directory Tagging Standard
+	}
 
 	last_mod = x_last_mod;
 	last_acc = x_last_acc;
@@ -80,7 +109,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: etage.cpp,v 1.14 2004/09/13 13:07:51 edrusb Rel $";
+        static char id[]="$Id: etage.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -95,6 +124,46 @@ namespace libdar
         }
         else
             return false;
+    }
+
+	///////////////////////////////////////////
+	////////////// static functions ///////////
+	///////////////////////////////////////////
+
+
+    static bool cache_directory_tagging_check(user_interaction & dialog, const char *cpath, const char *filename)
+    {
+	bool ret = false;
+
+	if(strcmp(CACHE_DIR_TAG_FILENAME, filename) != 0)
+	    ret = false;
+	else // we need to inspect the few first bytes of the file
+	{
+	    path chem = path(cpath)+string(filename);
+	    fichier fic = fichier(dialog, chem, gf_read_only);
+	    U_I len = strlen(CACHE_DIR_TAG_FILENAME_CONTENTS);
+	    char *buffer = new char[len+1];
+	    S_I lu;
+
+	    if(buffer == NULL)
+		throw Ememory("etage:cache_directory_tagging_check");
+	    try
+	    {
+		lu = fic.read(buffer, len);
+		if(lu < 0 || (U_I)(lu) < len)
+		    ret = false;
+		else
+		    ret = strncmp(buffer, CACHE_DIR_TAG_FILENAME_CONTENTS, len) == 0;
+	    }
+	    catch(...)
+	    {
+		delete buffer;
+		throw;
+	    }
+	    delete buffer;
+	}
+
+	return ret;
     }
 
 } // end of namespace

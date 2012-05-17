@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.30.2.3 2006/01/12 15:06:33 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.36.2.1 2006/01/19 14:42:47 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -43,10 +43,11 @@ extern "C"
 #include "integers.hpp"
 #include "shell_interaction.hpp"
 #include "libdar.hpp"
+#include "thread_cancellation.hpp"
 
 using namespace libdar;
 
-#define DAR_XFORM_VERSION "1.3.1"
+#define DAR_XFORM_VERSION "1.4.0"
 
 static bool command_line(user_interaction & dialog,
 			 S_I argc, char *argv[],
@@ -56,7 +57,7 @@ static bool command_line(user_interaction & dialog,
                          infinint & file_size,
                          bool & warn,
                          bool & allow,
-                         bool & pause,
+                         infinint & pause,
                          bool & beep,
                          string & execute_src,
                          string & execute_dst);
@@ -75,53 +76,55 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char *argv[], const cha
     path *dst_dir = NULL;
     string src, dst;
     infinint first, size;
-    bool warn, allow, pause, beep;
+    bool warn, allow, beep;
+    infinint pause;
     string execute_src, execute_dst;
+    thread_cancellation thr;
+    S_I ret = EXIT_OK;
 
-    if(command_line(dialog, argc, argv, src_dir, src, dst_dir, dst, first, size,
-                    warn, allow, pause, beep, execute_src, execute_dst))
+    try
     {
-        try
-        {
-            generic_file *dst_sar = NULL;
-            generic_file *src_sar = NULL;
+	if(command_line(dialog, argc, argv, src_dir, src, dst_dir, dst, first, size,
+			warn, allow, pause, beep, execute_src, execute_dst))
+	{
+	    generic_file *dst_sar = NULL;
+	    generic_file *src_sar = NULL;
 	    sar *tmp_sar = NULL;
 
-            if(dst != "-")
+	    try
 	    {
-                shell_interaction_change_non_interactive_output(&cout);
-		tools_avoid_slice_overwriting(dialog,  dst_dir->display(), dst+".*."+EXTENSION, false, allow, warn, false);
-	    }
-            try
-            {
-                S_I dst_opt =
-                    (allow ? 0 : SAR_OPT_DONT_ERASE)
-                    | (warn ? SAR_OPT_WARN_OVERWRITE : 0)
-                    | (pause ? SAR_OPT_PAUSE : 0);
-                shell_interaction_set_beep(beep);
-                if(src == "-")
-                {
-                    generic_file *tmp = new tuyau(dialog, 0, gf_read_only);
-
-                    if(tmp == NULL)
-                        throw Ememory("main");
-                    try
-                    {
-                        src_sar = new trivial_sar(dialog, tmp);
-                        if(src_sar == NULL)
-                            delete tmp;
-                        tmp = NULL;
-                    }
-                    catch(...)
-                    {
-                        if(tmp != NULL)
-                            delete tmp;
-                        throw;
-                    }
-                }
-                else 	// source not from a pipe
+		if(dst != "-")
 		{
-                    tmp_sar = new sar(dialog, src, EXTENSION, SAR_OPT_DEFAULT, *src_dir, execute_src);
+		    shell_interaction_change_non_interactive_output(&cout);
+		    tools_avoid_slice_overwriting(dialog,  dst_dir->display(), dst+".*."+EXTENSION, false, allow, warn, false);
+		}
+
+		thr.check_self_cancellation();
+
+		shell_interaction_set_beep(beep);
+		if(src == "-")
+		{
+		    generic_file *tmp = new tuyau(dialog, 0, gf_read_only);
+
+		    if(tmp == NULL)
+			throw Ememory("main");
+		    try
+		    {
+			src_sar = new trivial_sar(dialog, tmp);
+			if(src_sar == NULL)
+			    delete tmp;
+			tmp = NULL;
+		    }
+		    catch(...)
+		    {
+			if(tmp != NULL)
+			    delete tmp;
+			throw;
+		    }
+		}
+		else 	// source not from a pipe
+		{
+		    tmp_sar = new sar(dialog, src, EXTENSION, *src_dir, execute_src);
 		    if(tmp_sar == NULL)
 			throw Ememory("main");
 		    else
@@ -129,63 +132,75 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char *argv[], const cha
 		    src_sar = tmp_sar;
 		}
 
-                if(size == 0)
-                    if(dst == "-")
-                        dst_sar = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only);
-                    else
-                        dst_sar = sar_tools_open_archive_fichier(dialog, (*dst_dir + sar_make_filename(dst, 1, EXTENSION)).display(), allow, warn);
-                else
-                    dst_sar = new sar(dialog, dst, EXTENSION, size, first, dst_opt, *dst_dir, execute_dst);
-                if(dst_sar == NULL)
-                    throw Ememory("main");
+		if(size == 0)
+		    if(dst == "-")
+			dst_sar = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only);
+		    else
+			dst_sar = sar_tools_open_archive_fichier(dialog, (*dst_dir + sar_make_filename(dst, 1, EXTENSION)).display(), allow, warn);
+		else
+		    dst_sar = new sar(dialog, dst, EXTENSION, size, first, warn, allow, pause, *dst_dir, execute_dst);
+		if(dst_sar == NULL)
+		    throw Ememory("main");
 
-                try
-                {
-                    src_sar->copy_to(*dst_sar);
-                }
-                catch(Escript & e)
-                {
-                    throw;
-                }
-                catch(Euser_abort & e)
-                {
-                    throw;
-                }
-                catch(Ebug & e)
-                {
-                    throw;
-                }
-                catch(Egeneric & e)
-                {
-                    string msg = string(gettext("Error transforming the archive :"))+e.get_message();
-                    dialog.warning(msg);
-                    throw Edata(msg);
-                }
-            }
-            catch(...)
-            {
-                if(dst_sar != NULL)
-                    delete dst_sar;
-                if(src_sar != NULL)
-                    delete src_sar;
-                throw;
-            }
-            delete src_sar;
-            delete dst_sar;
-        }
-        catch(...)
-        {
-            delete src_dir;
-            delete dst_dir;
-            throw;
-        }
-        delete src_dir;
-        delete dst_dir;
+		thr.check_self_cancellation();
+		try
+		{
+		    src_sar->copy_to(*dst_sar);
+		}
+		catch(Escript & e)
+		{
+		    throw;
+		}
+		catch(Euser_abort & e)
+		{
+		    throw;
+		}
+		catch(Ebug & e)
+		{
+		    throw;
+		}
+		catch(Ethread_cancel & e)
+		{
+		    throw;
+		}
+		catch(Egeneric & e)
+		{
+		    string msg = string(gettext("Error transforming the archive :"))+e.get_message();
+		    dialog.warning(msg);
+		    throw Edata(msg);
+		}
+	    }
+	    catch(...)
+	    {
+		if(dst_sar != NULL)
+		    delete dst_sar;
+		if(src_sar != NULL)
+		    delete src_sar;
+		throw;
+	    }
+	    if(src_sar != NULL)
+		delete src_sar;
+	    if(dst_sar != NULL)
+		delete dst_sar;
 
-        return EXIT_OK;
+	    ret = EXIT_OK;
+	}
+	else
+	    ret = EXIT_SYNTAX;
     }
-    else
-        return EXIT_SYNTAX;
+    catch(...)
+    {
+	if(src_dir != NULL)
+	    delete src_dir;
+	if(dst_dir != NULL)
+	    delete dst_dir;
+	throw;
+    }
+    if(src_dir != NULL)
+	delete src_dir;
+    if(dst_dir != NULL)
+	delete dst_dir;
+    return ret;
 }
 
 static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
@@ -195,7 +210,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
                          infinint & file_size,
                          bool & warn,
                          bool & allow,
-                         bool & pause,
+                         infinint & pause,
                          bool & beep,
                          string & execute_src,
                          string & execute_dst)
@@ -205,7 +220,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
     dst_dir = NULL;
     warn = true;
     allow = true;
-    pause = false;
+    pause = 0;
     beep = false;
     first_file_size = 0;
     file_size = 0;
@@ -215,7 +230,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
 
     try
     {
-        while((lu = getopt(argc, argv, "s:S:pwnhbVE:F:a::Qj")) != EOF)
+        while((lu = getopt(argc, argv, "s:S:p::wnhbVE:F:a::Qj")) != EOF)
         {
             switch(lu)
             {
@@ -267,7 +282,13 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
                             throw Erange("command_line", gettext("Only one -S option is allowed"));
                 break;
             case 'p':
-                pause = true;
+		if(optarg != NULL)
+		{
+		    deci conv = string(optarg);
+		    pause = conv.computer();
+		}
+		else
+		    pause = 1;
                 break;
             case 'w':
                 warn = false;
@@ -336,7 +357,10 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
             return false;
         }
         if(argv[optind] != "")
+	{
             tools_split_path_basename(argv[optind], src_dir, src);
+	    tools_check_basename(dialog, *src_dir, src, EXTENSION);
+	}
         else
         {
             dialog.warning(gettext("Invalid argument as source archive"));
@@ -367,7 +391,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.30.2.3 2006/01/12 15:06:33 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.36.2.1 2006/01/19 14:42:47 edrusb Rel $";
     dummy_call(id);
 }
 

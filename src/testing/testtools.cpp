@@ -18,13 +18,14 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: testtools.cpp,v 1.7 2004/06/20 14:26:27 edrusb Rel $
+// $Id: testtools.cpp,v 1.8 2005/03/28 21:19:24 edrusb Rel $
 //
 /*********************************************************************/
 
 #include <iostream>
 
 #include "deci.hpp"
+#include "tools.hpp"
 #include "testtools.hpp"
 #include "user_interaction.hpp"
 #include "integers.hpp"
@@ -47,7 +48,7 @@ void display_read(user_interaction & dialog, generic_file & f)
         buffer[lu] = '\0';
     else
         buffer[size-1] = '\0';
-    dialog.printf("lu = %d : [%s]\n", lu, buffer);
+    dialog.warning(tools_printf("lu = %d : [%s]\n", lu, buffer));
 }
 
 void display_back_read(user_interaction & dialog, generic_file & f)
@@ -61,5 +62,5 @@ void display_back_read(user_interaction & dialog, generic_file & f)
         buffer[lu] = '\0';
     else
         buffer[size-1] = '\0';
-    dialog.printf("lu = %d : [%s]\n", lu, buffer);
+    dialog.warning(tools_printf("lu = %d : [%s]\n", lu, buffer));
 }

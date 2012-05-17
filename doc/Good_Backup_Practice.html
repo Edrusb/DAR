@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta name="generator"
+ content="HTML Tidy for Linux/x86 (vers 1 July 2005), see www.w3.org">
+  <meta content="text/html; charset=us-ascii" http-equiv="content-type">
+  <title>Good Backup Practice Short Guide</title>
+</head>
+<body
+ style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);"
+ link="#0000ff" vlink="#000055" alink="#ff0000">
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 161px;"><a
+ href="index.html"><img
+ style="border: 0px solid ; width: 160px; height: 120px;"
+ alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
+      </td>
+      <td style="vertical-align: top;">
+      <h1 style="text-align: center;"><br>
+      </h1>
+      <h1 style="text-align: center;">Good Backup Practice Short Guide</h1>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h1 style="text-align: center;"></h1>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h2 style="text-align: justify;">Presentation<br>
+      </h2>
+      <div style="text-align: justify;">This short guide is here to
+gather important (and somehow obvious)
+techniques about computer backups. It also explains the risks you take
+not following theses principles. I thought this was obvious and well
+known by anyone, up to recently when I started getting feedback of
+people complaining about their lost data because of bad media or other
+reasons. To the question "have you tested your archive?", I was
+surprised to get the negative answers.
+      <p>This guide is not especially linked to dar no more than to any
+other tool, thus, you can take advantage of reading this document if
+you are not sure of your backup procedure, whatever is the backup
+software you use.</p>
+      </div>
+      <h2 style="text-align: justify;">Notions</h2>
+      <div style="text-align: justify;"> In the following we will speak
+about backup and archive: </div>
+      <ul style="text-align: justify;">
+        <li>by backup, is meant a copy of some data that remains in
+place in an operational system</li>
+        <li>by
+archive, is meant a copy of data that is removed afterward from an
+operational system. It stays available but is no more used frequently.</li>
+      </ul>
+      <div style="text-align: justify;"> With the previous meaning of
+an archive you can also make a backup of an archive (for example a
+clone copy of your archive). </div>
+      <h2 style="text-align: justify;">Archives</h2>
+      <div style="text-align: justify;"> <span
+ style="font-weight: bold; text-decoration: underline;">1.</span> The
+first think to do just after making an archive is testing it on its
+definitive medium. </div>
+      <div style="text-align: justify;"> There are several reasons that
+make this testing important:<br>
+      </div>
+      <ul>
+        <li>any medium may have a surface error, which in some case
+cannot be detected at writing time.</li>
+        <li>the software you use may have bugs (also dar can, yes. ;-)
+... ).</li>
+        <li>you
+may have done a wrong operation or missed an error message (no space
+left to write the whole archive ad so on), especially when using poorly
+written scripts.</li>
+      </ul>
+      <div style="text-align: justify;"> Of
+course the archive testing must be done when the backup has been put on
+its definitive place (CD-R, floppy, tape, etc.), if you have to move it
+(copy to another media), then you need to test it again on the new
+medium. The testing operation, must read/test all the data, not just
+list the archive contents (-t option instead of -l option for dar). And
+of course the archive must have a minimum mechanism to detect errors
+(dar has one without compression, and two when using compression). </div>
+      <div style="text-align: justify;"> <br>
+      <span style="font-weight: bold; text-decoration: underline;">2.</span>
+As a replacement for testing, a better operation is to compare the
+files in the archive with those on the original files on the disk (-d
+option for dar). This makes the same as testing archive readability and
+coherence, while also checking that the data is really identical
+whatever the corruption detection<br>
+mechanisms used are. This
+operation is not suited for a set of data that changes (like a active
+system backup), but is probably what you need when creating an archive.
+      <p><span style="font-weight: bold; text-decoration: underline;">3.</span>
+Increasing the degree of security, the next thing to try is to restore
+the archive in a temporary place or better on another computer. This
+will let you check that from end to end, you have a good usable backup,
+on which you can rely. Once you have restored, you will need to compare
+the result, the diff command can help you here, moreover, this is a
+program that has no link with dar so it would be very improbable to
+have a common bug to both dar and diff that let you think both original
+and restored data are identical while they are not!</p>
+      <p><span style="text-decoration: underline; font-weight: bold;">4.</span>
+Unfortunately, many (all) media do alter with time, and an archive
+that was properly written on a correct media may become unreadable with
+time and/or bad environment conditions. Thus of course, take care not
+to store magnetic storages near magnetic sources (like HiFi speakers)
+or enclosed in metallic boxes, as well as avoid having sun directly
+lighting your CD-R(W) DVD-R(W), etc. Also mentioned for many media is
+humidity: respect the acceptable humidity range for each medium (don't
+store your data in your bathroom, kitchen, cave, ...). Same thing about
+the temperature. More generally have a look at the safe environmental
+conditions described in the documentation, even just once for each
+media type.</p>
+      <p>The problem with archive is that usually you
+need them for a long time, while the media has a limited lifetime. A
+solution is to make one (or several) copy (i.e.: backup of archive) of
+the data when the original support has arrived it half expected life.</p>
+      <p>Another
+solution, is to use <a href="http://parchive.sourceforge.net/">Parchive</a>,
+it works in the principle of RAID disk
+systems, creating beside each file a par file which can be used later
+to recover missing part or corrupted part of the original file. Of
+course, Parchive can work on dar's slices. But, it requires more
+storage, thus you will have to choose smaller slice size to have place
+to put Parchive data on your CD-R for example. The amount of data
+generated by Parchive depends on the redundancy level (Parchive's -r
+option). Check the NOTES file for more informations about using
+Parchive with dar. When using read-only medium, you will need to copy
+the corrupted file to a read-write medium for Parchive can repair it.
+Unfortunately the usual 'cp' command will stop when the first I/O error
+will be met, making you unavailable to get the sane data *after* the
+corruption. In most case you will not have enough sane data for
+Parchive to repair you file. For that reason "dar_cp" is a cp-like
+command that skip over the corruptions and can copy sane data after the
+corrupted part.</p>
+      <p><span style="font-weight: bold; text-decoration: underline;">5.</span>
+another problem arrives when an archive is often read. The fact to
+read, often degrades the media little by little, and makes the media's
+lifetime shorter. A possible solution is to have two copies, one for
+reading and one to keep as backup, copy which should be never read
+except for making a new copy. Chances are that the often read copy will
+"die" before the backup copy, you then could be able to make a new
+backup copy from the original backup copy, which in turn could become
+the new "often read" medium.</p>
+      <p><span style="font-weight: bold; text-decoration: underline;">6.</span>
+Of course, if you want to have an often read archive and also want to
+keep it forever, you could combine the two of the previous techniques,
+making two copies, one for storage and one for backup. Once you have
+spent a certain time (medium half lifetime for example), you could make
+a new copy, and keep them beside the original backup copy in case of.</p>
+      <p><span style="font-weight: bold; text-decoration: underline;">7.</span>
+Another problem, is safety of your data. In some case, the archive you
+have does not need to be kept a very long time nor it needs to be read
+often, but instead is very "precious". in that case a solution could be
+to make several copies that you could store in very different
+locations. This could prevent data lost in case of fire disaster, or
+other cataclysms.</p>
+      <p><span style="font-weight: bold; text-decoration: underline;">8.</span>
+Another aspect is the privacy of your data. An archive may not have to
+be accessible to anyone. This aspect is a bit out of the scope of this
+document, but several directions could be possible to answer this
+problem:</p>
+      </div>
+      <ul style="text-align: justify;">
+        <li>Physical restriction to the access of the archive (stored
+in a bank or locked place, for example)</li>
+        <li>Hid the archive (in your garden ;-) ) or hide the data
+among other data (Edgar Poe's hidden letter technique)</li>
+        <li>Encrypting your archive</li>
+        <li>And probably some other ways I forgot.</li>
+      </ul>
+      <div style="text-align: justify;">For encryption, dar now
+provides strong encryption inside the archive
+(blowfish algorithm), it does preserve the direct access feature that
+avoid you having to read the whole archive to restore just one file.
+But you can also use an external encryption mechanism, like GnuPG to
+encrypt slice by slice for example.
+      <h2>Backup</h2>
+Backups act a bit like an archive, except that
+they are a copy of a changing set of data, which is moreover expected
+to stay on the original location (the system).
+      <p>The fact that the data is changing introduces two problems:<br>
+      </p>
+      <ul>
+        <li>A backup is quite never up to date, and you will probably
+loose data if you have to rely on them</li>
+        <li>A backup becomes soon obsolete.</li>
+      </ul>
+The
+backup has a also the role of keeping a recent history of changes. For
+example, you may have deleted a precious data from your system. And it
+is quite possible that you notice this mistake long ago after deletion.
+In that case, a old backup stays useful, in spite of some more recent
+backups.
+      <p>In consequences, backup need to be done often for having a
+minimum delta in case of crash disk. But, and new backup do not mean
+that older can be removed. A usual way of doing that, is to have a set
+of media, over which you rotate the backups. The new backup is done
+over the oldest backup of the set. This way you keep a certain history
+of your system changes. It is your choice to decide how much archive
+you want to keep, and the frequency of your backups.</p>
+      <p>A
+point that can increase the history while saving media space required
+by each backup is the differential backup. A differential backup is a
+backup done only of what have changed since a previous backup (the
+"backup of reference"). The drawback is that it is not autonomous and
+cannot be used alone to restore a full system. Thus there is no problem
+to keep the differential backup on the same media as the one where is
+located the backup of reference.</p>
+      <p>Doing a lot of consecutive
+differential backup (taking the last backup as reference for the next
+differential backup), will save your media space, but will cost time at
+restoration in case of computer accident. You will have to restore the
+full backup (of reference), then you will have to restore all the many
+backup you have done up to the last. This implies that you must keep
+all the differential backup you have done since the backup of
+reference,if you wish to restore the exact state of the filesystem at
+the time of the last differential backup.</p>
+      <p>It is thus up to
+you to decide how much differential backup you do, and how much often
+you make a full backup. A common scheme, is to make a full backup once
+a week and make differential backup each day of the week. The backup
+done in a week are kept together. You could then have ten sets of
+full+differential backups, and a new full backup would erase the oldest
+full backup as well as its associated differential backups, this way
+you keep ten week history of backup with a backup every day, but this
+is just an example.</p>
+      <p>An interesting protection suggested by
+George Foot on the dar-support mailing-list: once you make a new full
+backup, the idea is to make an additional differential backup based on
+the previous full backup (the one just older than the one we have just
+built) full backup, which would "acts as a substitute for the actual
+full backup in case something does go wrong with it later on".</p>
+      <br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <p>Any other trick/idea/improvement/correction/evidences are
+welcome !</p>
+      <p>Denis.</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<br>
+<br>
+</body>
+</html>

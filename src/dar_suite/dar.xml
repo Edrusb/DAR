@@ -11,7 +11,7 @@
 <!ATTLIST hdr
   vspace CDATA #IMPLIED>
 <!ELEMENT arg (desc)>
-<!ATTLIST arg 
+<!ATTLIST arg
   vspace CDATA #IMPLIED
   flag 	 CDATA #IMPLIED
   opt  	 CDATA #IMPLIED
@@ -62,6 +62,12 @@
     </desc>
   </arg>
 
+  <arg flag="-+">
+    <desc>
+       merge two archives / create a sub archive
+    </desc>
+  </arg>
+
   <arg vspace="1" flag="-h">
     <desc>
       displays this help information
@@ -79,11 +85,11 @@
   <hdr vspace="1">Common options:</hdr>
 
   <arg flag="-v"> <desc> verbose output </desc> </arg>
+  <arg flag="-vs"> <desc> display skipped files </desc> </arg>
 
   <arg flag="-R" repl="path">
     <desc>
-      filesystem root directory for saving or restoring (current dir by
-      default) 
+      filesystem root directory (current dir by default)
     </desc>
   </arg>
 
@@ -96,18 +102,30 @@
   <arg flag="-I" repl="mask">
     <desc>
       files to include in the operation (all by default)
-      <p/>
-      -X and -I do not affect directories (see -P and the path list for
-      that)
-      <p/>
-      -X, -I and -P may appear more than once on the command line
     </desc>
   </arg>
 
   <arg flag="-P" repl="path">
     <desc>
-       subdirectory of the filesystem root (-R) to exclude from the
-       operation
+       subdirectory to exclude from the operation
+    </desc>
+  </arg>
+
+  <arg flag="-g" repl="path">
+    <desc>
+       subdirectory to include in the operation
+    </desc>
+  </arg>
+
+  <arg flag="-[" repl="filename">
+    <desc>
+       filename contains a list of files to include
+    </desc>
+  </arg>
+
+  <arg flag="-]" repl="path">
+    <desc>
+       filename contains a list of files to exclude
     </desc>
   </arg>
 
@@ -120,10 +138,15 @@
   <arg flag="-w">
     <desc>
        don't warn before overwriting files
-       <p/> 
-       by default overwriting is allowed but a warning is issued first
     </desc>
   </arg>
+
+  <arg flag="-wa">
+    <desc>
+       don't warn before overwriting and removing files
+    </desc>
+  </arg>
+
 
   <arg flag="-b">
     <desc>
@@ -131,51 +154,66 @@
     </desc>
   </arg>
 
-  <arg flag="-O">
+  <arg flag="-O[ignore-owner | mtime | inode-type]">
     <desc>
        do not consider user and group ownership
     </desc>
   </arg>
 
+  <arg flag="-H" opt="N">
+    <desc>
+       ignore shift in dates of an exact number of hours
+    </desc>
+  </arg>
+
   <arg flag="-E" repl="string">
     <desc>
-       command line to execute between slices
+       command to execute between slices
     </desc>
   </arg>
 
   <arg flag="-F" repl="string">
     <desc>
-       command line to execute between the slices of the archive of reference
+       same as -E but for the archive of reference
     </desc>
   </arg>
 
-  <arg vspace="1" flag="-u">
+  <arg flag="-u" repl="mask">
     <desc>
-      do not save/restore EA of the user namespace. 
+      mask to ignore certain EA
     </desc>
   </arg>
 
-  <arg flag="-U">
+  <arg flag="-U" repl="mask">
     <desc>
-      do not save/restore EA of the root namespace
-      (needs root privileges).
-      <p/>
-      -U and -u are only available if EA_SUPPORT has been set at compilation time.
-      Check with -V to know compilation option used.
+      mask to allow certain EA
     </desc>
   </arg>
 
   <arg flag="-K" repl="string">
     <desc>
-       use the <repl>string</repl> to scramble/unscramble (i.e.: hide/decode) the contents of the archive. 
-    </desc>   
+       use <repl>string</repl> as key to encrypt/decrypt
+    </desc>
   </arg>
 
   <arg flag="-J" repl="string">
     <desc>
-       same as -K but it does concern the archive of reference (given with -A option)
+       same as -K but it does concern the archive of reference
     </desc>
   </arg>
+
+ <arg flag="-#" repl="integer">
+    <desc>
+       encryption block size
+    </desc>
+  </arg>
+
+ <arg flag="-*" repl="integer">
+    <desc>
+       same as -# but for archive of reference
+    </desc>
+  </arg>
+
 
   <arg flag="-B" repl="filename">
     <desc>
@@ -189,34 +227,103 @@
     </desc>
   </arg>
 
-  <arg vspace="1" opt="path list">
+  <arg flag="-e">
     <desc>
-      subdirectories of the filesystem root (-R) to consider (all by
-      default) -- see also -P
+       dry run, fake execution, nothing is produced
+    </desc>
+  </arg>
+
+  <arg flag="-Q">
+    <desc>
+      suppress the initial warning when not launched from a tty
+    </desc>
+  </arg>
+
+  <arg flag="-aa">
+    <desc>
+       do not try to preserve atime of file open for reading.
+    </desc>
+  </arg>
+
+  <arg flag="-ac">
+    <desc>
+       do not try to preserve ctime (default behavior).
+    </desc>
+  </arg>
+
+  <arg flag="-am">
+    <desc>
+       set ordered mode for all filters
+    </desc>
+  </arg>
+
+  <arg flag="-an">
+    <desc>
+      the masks that follow are now case insensitive
+    </desc>
+  </arg>
+
+  <arg flag="-acase">
+    <desc>
+      the masks that follow are now case sensitive
+    </desc>
+  </arg>
+
+  <arg flag="-ar">
+    <desc>
+       set the following masks to be regex expressions
+    </desc>
+  </arg>
+
+  <arg flag="-ag">
+    <desc>
+      set the following masks to be glob expressions
+    </desc>
+  </arg>
+
+  <arg flag="-j">
+    <desc>
+        ask user what to do when memory is exhausted
     </desc>
   </arg>
 
   <hdr vspace="1">
-    Saving or Isolation options (to use with -c or -C) :
+    Saving / Isolation / merging options (to use with -c, -C or -+):
   </hdr>
 
   <arg flag="-A" opt="path/" repl="basename">
-    <desc> archive to take as reference (mandatory with -C)
+    <desc>
+        archive to take as reference
+    </desc>
+  </arg>
+
+  <arg flag="-@" opt="path/" repl="basename">
+    <desc>
+        auxiliary archive of reference for merging
+    </desc>
+  </arg>
+
+  <arg flag="-$" repl="string">
+    <desc>
+       encryption key for auxiliary archive
+    </desc>
+  </arg>
+
+  <arg flag="-~" repl="string">
+    <desc>
+        command between slices of the auxiliary archive
     </desc>
   </arg>
 
   <arg flag="-z" opt="level">
     <desc>
-      compress data in archive using gzip algorithm. The optionnal argument is the gzip 
-      compression to use: it ranges from 0 (no compression, fast processing) to 9 
-      (max compression, slow processing). Note: there is no space ! Example: -z6 
+      compress data in archive using gzip algorithm
     </desc>
   </arg>
 
   <arg flag="-y" opt="level">
     <desc>
       compress data in archive using bzip2 algorithm.
-      <p/> by default the archive is not compressed
     </desc>
   </arg>
 
@@ -228,51 +335,75 @@
 
   <arg flag="-S" repl="integer">
     <desc>
-      first file size (if different from following ones) -- requires -s
+      first file size (if different from following ones)
+    </desc>
+  </arg>
+
+  <arg flag="-aSI">
+    <desc>
+      slice size suffixes k, M, T, G, etc. are power of 10
+    </desc>
+  </arg>
+
+  <arg flag="-abinary">
+    <desc>
+      slice size suffixes k, M, T, G, etc. are power of 2
     </desc>
   </arg>
 
   <arg flag="-p">
     <desc>
-      pauses before writing to a new file -- requires -s
+      pauses before writing to a new file
     </desc>
   </arg>
 
   <arg flag="-D">
     <desc>
-      stores directories excluded by the -P option or absent 
-      from <repl>path list</repl> as empty directories
+      excluded directories are stored as empty directories
     </desc>
   </arg>
 
   <arg flag="-Z" repl="mask">
     <desc>
-      Filenames covered by this <repl>mask</repl> are not compressed. By default all 
-      files are compressed (if compression is used)
-    </desc>  
+      do not compress the matching filenames
+    </desc>
   </arg>
 
   <arg flag="-Y" repl="mask">
     <desc>
-       Filenames covered by this <repl>mask</repl> and not covered by -Z <repl>mask</repl>
-       are the only to be compressed. By default all files are compressed.
+       do only compress the matching filenames
     </desc>
   </arg>
 
   <arg flag="-m" repl="number">
     <desc>
-       file size under which data is not compressed. By default -m 100 is 
-       assumed. If you want all file to be compressed whatever their size is 
-       use -m 0
+       do not compress file smaller than <repl>number</repl>
     </desc>
   </arg>
 
   <arg flag="--nodump">
     <desc>
-    do not consider for backup file with nodump 'd' flag set (see lsattr/chattr).
+    do not backup, files having the nodump 'd' flag set
     </desc>
   </arg>
 
+  <arg flag="-G" opt="path/" repl="basename">
+    <desc>
+       Do on-fly catalogue isolation of the resulting archive
+    </desc>
+  </arg>
+
+  <arg flag="-M">
+    <desc>
+      stay in the same filesystem while scanning directories
+    </desc>
+  </arg>
+
+  <arg flag="-,">
+    <desc>
+       ignore directories that follow the Directory Tagging Standard
+    </desc>
+  </arg>
 
   <hdr vspace="1">
   Restoring options (to use with -x) :
@@ -280,46 +411,35 @@
 
   <arg flag="-k">
     <desc>
-      do not remove files marked as destroyed since the reference backup
-      (see also -A)
-      <p/>
-      -k has no effect when used with -n
+      do not remove files destroyed since the reference backup
     </desc>
   </arg>
 
   <arg flag="-r">
     <desc>
-      restores files only if they are absent or more recent than those on
-      the filesystem
+      do not restore file older than those on filesystem
     </desc>
   </arg>
 
   <arg flag="-f">
     <desc>
-      do not restore directory structure. All files get restored in the 
-      directory specified by -R
+      do not restore directory structure
     </desc>
   </arg>
 
   <hdr vspace="1">
-    Reading options (to use with -x, -d, -t, -l, -C, -c)
+    Reading options (to use with -x, -d, -t, -l, -A)
   </hdr>
 
   <arg flag="-i" repl="named pipe">
     <desc>
-      use the given pipe instead of standard input to read data from dar_slave 
+      pipe to use instead of std input to read data from dar_slave
     </desc>
   </arg>
 
   <arg flag="-o" repl="named pipe">
     <desc>
-      use the given pipe instead of standard output to send orders to dar_slave. 
-      <p/>
-      These two options are only 
-      available if the
-      basename of the archive to read is -, which means reading the
-      archive from a pipe. For -C and -c options the archive to read 
-      is the one given with -A option: the archive of reference
+      pipe to use instead of std output to orders dar_slave
     </desc>
   </arg>
 
@@ -329,18 +449,22 @@
 
   <arg flag="-T">
     <desc>
-        tree output format. This was the default format used before version 1.2.0
+        tree output format
     </desc>
   </arg>
 
+  <arg flag="-as">
+    <desc>
+        only list files saved in the archive
+    </desc>
+  </arg>
 
   <hdr vspace="2">
-    See man page for more details, not all common options are available
-    for each mode of operation.
+    Type \"man dar\" for more details and for all available options.
   </hdr>
 
 <!--
-$Id: dar.xml,v 1.9 2003/03/13 20:48:13 edrusb Stab $
+$Id: dar.xml,v 1.24 2005/12/29 02:32:41 edrusb Rel $
 
 Revision 1.3  2002/08/20 13:44:08  cs1cwm
 Added DTD and removed the #ifdef and #endif.

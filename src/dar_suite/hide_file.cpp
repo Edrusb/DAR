@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: hide_file.cpp,v 1.11.2.1 2005/02/06 20:49:13 edrusb Rel $
+// $Id: hide_file.cpp,v 1.12 2005/02/22 17:59:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -167,7 +167,7 @@ S_I hide_file::inherited_write(char *a, size_t size)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: hide_file.cpp,v 1.11.2.1 2005/02/06 20:49:13 edrusb Rel $";
+    static char id[]="$Id: hide_file.cpp,v 1.12 2005/02/22 17:59:21 edrusb Rel $";
     dummy_call(id);
 }
 

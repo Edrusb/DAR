@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.hpp,v 1.15 2004/12/29 13:30:41 edrusb Rel $
+// $Id: sar.hpp,v 1.16 2005/09/19 21:17:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -36,26 +36,23 @@
 
 namespace libdar
 {
-    const int SAR_OPT_WARN_OVERWRITE = 0x01;
-    const int SAR_OPT_DONT_ERASE     = 0x02;
-    const int SAR_OPT_PAUSE          = 0x04;
-    const int SAR_OPT_DEFAULT = SAR_OPT_WARN_OVERWRITE;
-
 	// contextual is defined in generic_file module
     class sar : public contextual
     {
     public:
         sar(user_interaction & dialog,
 	    const std::string & base_name,
-	    const std::string & extension, S_I options,
+	    const std::string & extension,
 	    const path & dir,
 	    const std::string & execute = "");
-        sar(user_interaction & dialog,
+        sar(user_interaction  & dialog,
 	    const std::string & base_name,
 	    const std::string & extension,
 	    const infinint & file_size,
 	    const infinint & first_file_size,
-	    S_I options,
+ 	    bool x_warn_overwirte,
+	    bool x_allow_overwrite,
+	    const infinint & pause,
 	    const path & dir,
 	    const std::string & execute = "");
         ~sar();
@@ -112,8 +109,10 @@ namespace libdar
 
             // theses are the option flags
         bool opt_warn_overwrite;
-        bool opt_dont_erase;
-        bool opt_pause;
+        bool opt_allow_overwrite;
+
+	    //
+        infinint pause;
 
         bool skip_forward(U_I x);
         bool skip_backward(U_I x);
@@ -122,7 +121,6 @@ namespace libdar
         void open_writeonly(char *fic, const infinint &num);
         void open_file_init();
         void open_file(infinint num);
-        void set_options(S_I opt);
         void set_offset(infinint offset);
         void open_last_file();
         header make_write_header(const infinint &num, char flag);

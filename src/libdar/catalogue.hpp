@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.36.2.1 2005/02/05 09:34:13 edrusb Rel $
+// $Id: catalogue.hpp,v 1.48.2.1 2006/01/24 17:04:57 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -41,14 +41,15 @@ extern "C"
 #include <vector>
 #include <map>
 #include "infinint.hpp"
-#include "path.hpp"
 #include "generic_file.hpp"
+#include "path.hpp"
 #include "header_version.hpp"
 #include "ea.hpp"
 #include "compressor.hpp"
 #include "integers.hpp"
 #include "mask.hpp"
 #include "special_alloc.hpp"
+#include "user_interaction.hpp"
 
 namespace libdar
 {
@@ -58,7 +59,12 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    enum saved_status { s_saved, s_fake, s_not_saved };
+    enum saved_status
+    {
+	s_saved,      //< inode is saved in the archive
+	s_fake,       //< inode is not saved in the archive but is in the archive of reference (isolation context)
+	s_not_saved   //< inode is not saved in the archive
+    };
 
     struct entree_stats
     {
@@ -83,6 +89,7 @@ namespace libdar
     };
 
     extern unsigned char mk_signature(unsigned char base, saved_status state);
+    extern void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state);
 
 	/// the root class from all other inherite for any entry in the catalogue
     class entree
@@ -150,6 +157,17 @@ namespace libdar
     class inode : public nomme
     {
     public:
+
+	    /// flag used to only consider certain fields when comparing/restoring inodes
+
+	enum comparison_fields
+	{
+	    cf_all,          //< consider any available field for comparing inodes
+	    cf_ignore_owner, //< consider any available field except ownership fields
+	    cf_mtime,        //< consider any available field except ownership and permission fields
+	    cf_inode_type    //< only consider the file type
+	};
+
         inode(U_16 xuid, U_16 xgid, U_16 xperm,
               const infinint & last_access,
               const infinint & last_modif,
@@ -176,11 +194,11 @@ namespace libdar
 
         bool same_as(const inode & ref) const;
         virtual bool is_more_recent_than(const inode & ref, const infinint & hourshift,
-					 bool ignore_owner) const;
-        virtual bool has_changed_since(const inode & ref, const infinint & hourshift, bool ignore_owner) const;
+					 comparison_fields what_to_check) const;
+        virtual bool has_changed_since(const inode & ref, const infinint & hourshift, comparison_fields what_to_check) const;
             // signature() left as an abstract method
-            // clone is abstract
-        void compare(user_interaction & dialog, const inode &other, bool root_ea, bool user_ea, bool ignore_owner) const;
+            // clone is abstract too
+        void compare(user_interaction & dialog, const inode &other, const mask & ea_mask, comparison_fields what_to_check) const;
             // throw Erange exception if a difference has been detected
             // this is not a symetrical comparison, but all what is present
             // in the current object is compared against the argument
@@ -192,9 +210,10 @@ namespace libdar
             // EXTENDED ATTRIBUTS Methods
             //
 
-        enum ea_status { ea_none, ea_partial, ea_full };
-            // ea_none    : no EA present to this inode in filesystem
+        enum ea_status { ea_none, ea_partial, ea_fake, ea_full };
+            // ea_none    : no EA present for this inode in filesystem
             // ea_partial : EA present in filesystem but not stored (ctime used to check changes)
+	    // ea_fake    : EA present in filesystem but not attached to this inode (isolation context)
             // ea_full    : EA present in filesystem and attached to this inode
 
             // I : to know whether EA data is present or not for this object
@@ -209,10 +228,14 @@ namespace libdar
             // III : to record where is dump the EA in the archive #EA_FULL only#
         void ea_set_offset(const infinint & pos) { *ea_offset = pos; };
         void ea_set_crc(const crc & val) { copy_crc(ea_crc, val); };
+	void ea_get_crc(crc & val) const { copy_crc(val, ea_crc); };
 
-            // IV : to know/record if EA have been modified #EA_FULL or EA_PARTIAL#
+            // IV : to know/record if EA have been modified #EA_FULL,  EA_PARTIAL or EA_FAKE#
         infinint get_last_change() const;
         void set_last_change(const infinint & x_time);
+
+	    // V : for archive migration (merging)
+        void change_ea_location(generic_file *loc) { storage = loc; };
 
             ////////////////////////
 
@@ -238,6 +261,7 @@ namespace libdar
         crc ea_crc;
 	infinint *fs_dev;
 	generic_file *storage; // where are stored EA
+	dar_version edit;   // need to know EA format used in archive file
     };
 
 	/// the plain file class
@@ -262,12 +286,12 @@ namespace libdar
         ~file() { detruit(); };
 
         void dump(user_interaction & dialog, generic_file & f) const;
-        bool is_more_recent_than(const inode & ref, const infinint & hourshift, bool ignore_owner) const;
-        bool has_changed_since(const inode & ref, const infinint & hourshift, bool ignore_owner) const;
+        bool is_more_recent_than(const inode & ref, const infinint & hourshift, inode::comparison_fields what_to_check) const;
+        bool has_changed_since(const inode & ref, const infinint & hourshift, inode::comparison_fields what_to_check) const;
         infinint get_size() const { return *size; };
         infinint get_storage_size() const { return *storage_size; };
         void set_storage_size(const infinint & s) { *storage_size = s; };
-        generic_file *get_data(user_interaction & dialog) const; // return a newly alocated object in read_only mode
+        generic_file *get_data(user_interaction & dialog, bool keep_compressed = false) const; // return a newly alocated object in read_only mode
         void clean_data(); // partially free memory (but get_data() becomes disabled)
         void set_offset(const infinint & r);
         unsigned char signature() const { return mk_signature('f', get_saved_status()); };
@@ -277,6 +301,11 @@ namespace libdar
         entree *clone() const { return new file(*this); };
 
         compression get_compression_algo_used() const { return algo; };
+
+	    // object migration methods (merging)
+	void change_compression_algo_used(compression x) { algo = x; };
+	void change_location(generic_file *x) { loc = x; };
+
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(file);
@@ -306,7 +335,7 @@ namespace libdar
     {
     public:
         virtual infinint get_etiquette() const = 0;
-        virtual const file *get_inode() const = 0;
+        virtual const file_etiquette *get_inode() const = 0;
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(etiquette);
@@ -333,22 +362,23 @@ namespace libdar
 		       compression default_algo,
 		       generic_file *data_loc,
 		       generic_file *ea_loc);
-        ~file_etiquette() { if(etiquette != NULL) delete etiquette; };
 
         void dump(user_interaction & dialog, generic_file &f) const;
         unsigned char signature() const { return mk_signature('e', get_saved_status()); };
         entree *clone() const { return new file_etiquette(*this); };
 
+	void change_etiquette(const infinint & new_val) { etiquette = new_val; };
+
             // inherited from etiquette
-        infinint get_etiquette() const { return *etiquette; };
-        const file *get_inode() const { return this; };
+        infinint get_etiquette() const { return etiquette; };
+        const file_etiquette *get_inode() const { return this; };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(file_etiquette);
 #endif
 
     private :
-        infinint *etiquette;
+        infinint etiquette;
     };
 
 	/// the secondary reference to a hard linked inode
@@ -365,7 +395,7 @@ namespace libdar
 
             // inherited from etiquette
         infinint get_etiquette() const;
-        const file *get_inode() const { return x_ref; };
+        const file_etiquette *get_inode() const { return x_ref; };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(hard_link);
@@ -439,6 +469,8 @@ namespace libdar
 		     const mask &m = bool_mask(true), bool filter_unsaved = false, std::string marge = "") const;
         void tar_listing(user_interaction & dialog,
 			 const mask &m = bool_mask(true), bool filter_unsaved = false, const std::string & beginning = "") const;
+	void xml_listing(user_interaction & dialog,
+			 const mask &m = bool_mask(true), bool filter_unsaved = false, const std::string & beginning = "") const;
         directory * get_parent() const { return parent; };
         bool search_children(const std::string &name, nomme *&ref);
 	bool callback_for_children_of(user_interaction & dialog, const std::string & sdir) const;
@@ -446,6 +478,12 @@ namespace libdar
             // using is_more_recent_than() from inode class
             // using method has_changed_since() from inode class
         unsigned char signature() const { return mk_signature('d', get_saved_status()); };
+
+	    // some data has changed since archive of reference in this directory or subdirectories
+	bool get_recursive_has_changed() const { return recursive_has_changed; };
+	    // update the recursive_has_changed field
+	void recursive_has_changed_update() const;
+
         entree *clone() const { return new directory(*this); };
 
  #ifdef LIBDAR_SPECIAL_ALLOC
@@ -455,6 +493,7 @@ namespace libdar
         directory *parent;
         std::vector<nomme *> fils;
         std::vector<nomme *>::iterator it;
+	bool recursive_has_changed;
 
 	void clear();
     };
@@ -614,7 +653,7 @@ namespace libdar
     {
     public :
         detruit(const std::string & name, unsigned char firm) : nomme(name) { signe = firm; };
-        detruit(generic_file & f) : nomme(f) { if(f.read((char *)&signe, 1) != 1) throw Erange("detruit::detruit", gettext("missing data to buid")); };
+        detruit(generic_file & f) : nomme(f) { if(f.read((char *)&signe, 1) != 1) throw Erange("detruit::detruit", gettext("missing data to build")); };
 
         void dump(user_interaction & dialog, generic_file & f) const { nomme::dump(dialog, f); f.write((char *)&signe, 1); };
         unsigned char get_signature() const { return signe; };
@@ -715,11 +754,12 @@ namespace libdar
         bool direct_read(const path & ref, const nomme * &ret);
 
         infinint update_destroyed_with(catalogue & ref);
-            // ref must have the same root, else the operation generates a exception
+            // ref must have the same root, else the operation generates an exception
 
         void dump(generic_file & ref) const;
         void listing(const mask &m = bool_mask(true), bool filter_unsaved = false, std::string marge = "") const;
         void tar_listing(const mask & m = bool_mask(true), bool filter_unsaved = false, const std::string & beginning = "") const;
+        void xml_listing(const mask & m = bool_mask(true), bool filter_unsaved = false, const std::string & beginning = "") const;
         entree_stats get_stats() const { return stats; };
 
         const directory *get_contenu() const { return contenu; }; // used by data_tree

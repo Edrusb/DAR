@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: macro_tools.hpp,v 1.14 2004/11/07 18:21:38 edrusb Rel $
+// $Id: macro_tools.hpp,v 1.15 2005/09/19 21:17:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -48,7 +48,6 @@ namespace libdar
 					 const path &sauv_path,  // path to slices
                                          const std::string &basename,  // slice basename
                                          const std::string &extension,  // slice extensions
-                                         S_I options,  // options to SAR (see sar.hpp)
 					 crypto_algo crypto, // encryption algorithm
                                          const std::string &pass, // pass key for crypto/scrambling
 					 U_32 crypto_size,    // crypto block size

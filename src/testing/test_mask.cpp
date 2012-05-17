@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_mask.cpp,v 1.7 2004/06/18 21:57:54 edrusb Rel $
+// $Id: test_mask.cpp,v 1.8 2005/11/09 18:31:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -62,6 +62,18 @@ int main()
     display_res(&m8, "ttotola");
     display_res(&m9, "latiti");
     display_res(&m9, "laTiTI");
+    m8 = regular_mask(".+\\.[1-9][0-9]*\\.dar", true);
+    display_res(&m8, "acapulco");
+    display_res(&m8, ".1928.dar");
+    display_res(&m8, "toto.182dar");
+    display_res(&m8, "toto..dar");
+    display_res(&m8, "tutu.1.dar");
+    display_res(&m8, "tutu.0.dar");
+    display_res(&m8, "t.1928.dar");
+    m8 = regular_mask("^etc/rc.d/.*\\.", true);
+    display_res(&m8, "etc/rc.d/toto.aiai");
+    display_res(&m8, "etc/rc.d/totoaiai");
+    display_res(&m8, "etc/rc.d/toto/titi.du");
 
     same_path_mask m10 = same_path_mask("Zorro", true);
     same_path_mask m11 = same_path_mask("Zorro", false);

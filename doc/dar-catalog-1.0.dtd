@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!ELEMENT Catalog (File|Symlink|Device|Pipe|Socket|Directory)*>
+<!ATTLIST Catalog format CDATA #FIXED "1.0">
+
+
+<!ELEMENT Attributes EMPTY>
+	<!-- saved (data saved),                                                     -->
+	<!-- referenced (if entry is present but not saved; for differential archive)-->
+	<!-- deleted (if entry is marked deleted)                                    -->
+<!ATTLIST Attributes data (saved|referenced|deleted) #REQUIRED>
+	<!-- saved (if extended attributes are saved),                               -->
+    <!-- referenced (if entry is present but not saved; for differential archive)    -->
+	<!-- absent (if no extended attributes are associated to this entry          -->
+<!ATTLIST Attributes metadata (saved|referenced|absent) #REQUIRED>
+<!ATTLIST Attributes user CDATA #REQUIRED>       <!-- string, user name              -->
+<!ATTLIST Attributes group CDATA #REQUIRED>      <!-- string, group name             -->
+<!ATTLIST Attributes permissions CDATA #REQUIRED>    <!-- string, posix permissions      -->
+<!ATTLIST Attributes atime CDATA #REQUIRED>      <!-- decimal, posix time            -->
+<!ATTLIST Attributes mtime CDATA #REQUIRED>      <!-- decimal, posix time            -->
+<!ATTLIST Attributes ctime CDATA #REQUIRED>      <!-- decimal, posix time            -->
+	<!-- ea information is not included -->
+
+
+<!ELEMENT Directory (Attributes,(File|Symlink|Device|Pipe|Socket|Directory)*)>
+<!ATTLIST Directory name CDATA #REQUIRED>        <!-- string, entry name             -->
+
+<!ELEMENT Symlink (Attributes)>
+<!ATTLIST Symlink name CDATA #REQUIRED>          <!-- string, entry name             -->
+<!ATTLIST Symlink target CDATA "" >              <!-- string, symbolic link target   -->
+
+<!ELEMENT Device (Attributes)>
+<!ATTLIST Device name CDATA #REQUIRED>           <!-- string, entry name             -->
+<!ATTLIST Device type (character|block) #REQUIRED>
+<!ATTLIST Device major CDATA "" >                <!-- decimal, major number          -->
+<!ATTLIST Device minor CDATA "" >                <!-- decimal, minor number          -->
+
+<!ELEMENT File (Attributes)>
+<!ATTLIST File name CDATA #REQUIRED>             <!-- string, entry name             -->
+<!ATTLIST File size CDATA #REQUIRED>             <!-- decimal, file size in bytes    -->
+<!ATTLIST File stored CDATA "" >                 <!-- decimal, stored size in bytes  -->
+<!ATTLIST File crc CDATA "" >                    <!-- hexidecimal, crc sum of file   -->
+
+
+<!ELEMENT Socket (Attributes)>
+<!ATTLIST Socket name CDATA #REQUIRED>           <!-- string, entry name             -->
+
+
+<!ELEMENT Pipe (Attributes)>
+<!ATTLIST Pipe name CDATA #REQUIRED>             <!-- string, entry name             -->

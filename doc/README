@@ -1,33 +1,7 @@
-What you will find in this directory ?
 
-Document for DAR's end users :
-- configure_options (if you plane to compile dar)
-- FEATURES (general features of Dar, same as home page information)
-- TUTORIAL (complete tutorial to use most important feature of dar)
-- FAQ (Frequently Asked Questions)
-- mini-howto (Grzegorz Adam Hankiewicz's Howto)
-- GOOD_BACKUP_PRACTICE (how to avoid loosing data, take the good backup use)
-- LIMITATIONS (limitations of dar suite programs)
-- NOTES (detailed explanations on several points)
-    - Extended Attributes hints
-    - Using DAR for remote backup
-    - a romanced history about kilo, mega, etc. in computer science.
-    - how to run a script from dar
-    - how scrambling works
-    - how to use dar_manager
-    - file extension used
-    - dar and ssh, dar and netcat
-    - overflow algorithms used for fixed bit field integers
-    - how to use Parchive (alias PAR) with DAR
-    - the Dar User Command (DUC files) convention
-    - Examples of file filtering
-    - Strong encryption
-    - libdar and thread-safe requirement
-    and probably some other topics added recently
-- sample/README (for people who prefer to start with examples)
+   Dar Documentation Main Directory
 
-Document for developers
-- api_tutorial.html : tutorial for the API.
-- COMMAND_LINE : is a very brief list of all options used by dar
-- doc/html/index.html : reference manual for the API (need Doxygen to be built).
+All the documentation has been moved to HTML. To access it, please point your
+web browser to the index.html file found in this directory.
+
 

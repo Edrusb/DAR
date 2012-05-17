@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.14.2.2 2005/11/14 17:18:08 edrusb Exp $
+// $Id: compressor.cpp,v 1.16 2005/12/06 23:14:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -375,7 +375,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: compressor.cpp,v 1.14.2.2 2005/11/14 17:18:08 edrusb Exp $";
+        static char id[]="$Id: compressor.cpp,v 1.16 2005/12/06 23:14:29 edrusb Rel $";
         dummy_call(id);
     }
 

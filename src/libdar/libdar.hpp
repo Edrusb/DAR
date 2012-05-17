@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.hpp,v 1.38.2.8 2006/02/24 14:39:59 edrusb Rel $
+// $Id: libdar.hpp,v 1.53 2005/12/13 20:54:45 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -108,6 +108,8 @@ extern "C"
 #define LIBDAR_UNKNOWN 13
     /// feature not activated at compilation time
 #define LIBDAR_ECOMPILATION 14
+    /// thread cancellation has been requested
+#define LIBDAR_THREAD_CANCEL 15
     /// @}
 
     /// libdar namespace encapsulate all libdar symbols
@@ -118,11 +120,11 @@ namespace libdar
 
 
 	///  libdar Major version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MAJOR = 3;
+    const U_I LIBDAR_COMPILE_TIME_MAJOR = 4;
 	///  libdar Medium version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MEDIUM = 1;
+    const U_I LIBDAR_COMPILE_TIME_MEDIUM = 0;
 	///  libdar Minor version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MINOR = 4;
+    const U_I LIBDAR_COMPILE_TIME_MINOR = 0;
 
 	////////////////////////////////////////////////////////////////////////
 	// LIBDAR INITIALIZATION METHODS                                      //
@@ -224,14 +226,13 @@ namespace libdar
 					    bool allow_over,
 					    bool warn_over,
 					    bool info_details,
-					    bool pause,
+					    const infinint & pause,
 					    bool empty_dir,
 					    compression algo,
 					    U_I compression_level,
 					    const infinint &file_size,
 					    const infinint &first_file_size,
-					    bool root_ea,
-					    bool user_ea,
+					    const mask & ea_mask,
 					    const std::string & execute,
 					    crypto_algo crypto,
 					    const std::string & pass,
@@ -239,12 +240,16 @@ namespace libdar
 					    const mask & compr_mask,
 					    const infinint & min_compr_size,
 					    bool nodump,
-					    bool ignore_owner,
+					    inode::comparison_fields what_to_check,
 					    const infinint & hourshift,
 					    bool empty,
 					    bool alter_atime,
 					    bool same_fs,
-					    statistics & ret,
+					    bool snapshot,
+					    bool cache_directory_tagging,
+					    bool display_skipped,
+					    const infinint & fixed_date,
+					    statistics * progressive_report,
 					    U_16 & exception,
 					    std::string & except_msg);
 
@@ -262,7 +267,7 @@ namespace libdar
 					     bool allow_over,
 					     bool warn_over,
 					     bool info_details,
-					     bool pause,
+					     const infinint & pause,
 					     compression algo,
 					     U_I compression_level,
 					     const infinint &file_size,
@@ -274,6 +279,42 @@ namespace libdar
 					     bool empty,
 					     U_16 & exception,
 					     std::string & except_msg);
+
+	/// this is a wrapper around the archive constructor known as the "merging" constructor
+
+	/// check the archive class for details
+	/// for an explaination of the two extra arguments exception and except_msg check
+	/// the get_version_noexcept function
+    extern archive *merge_archive_noexcept(user_interaction & dialog,
+					   const path & sauv_path,
+					   archive *ref_arch1,
+					   archive *ref_arch2,
+					   const mask & selection,
+					   const mask & subtree,
+					   const std::string & filename,
+					   const std::string & extension,
+					   bool allow_over,
+					   bool warn_over,
+					   bool info_details,
+					   const infinint & pause,
+					   bool empty_dir,
+					   compression algo,
+					   U_I compression_level,
+					   const infinint & file_size,
+					   const infinint & first_file_size,
+					   const mask & ea_mask,
+					   const std::string & execute,
+					   crypto_algo crypto,
+					   const std::string & pass,
+					   U_32 crypto_size,
+					   const mask & compr_mask,
+					   const infinint & min_compr_size,
+					   bool empty,
+					   bool display_skipped,
+					   bool keep_compressed,
+					   statistics * progressive_report,
+					   U_16 & exception,
+					   std::string & except_msg);
 
 
 	/// this is wrapper around the archive destructor
@@ -301,13 +342,15 @@ namespace libdar
 					  bool info_details,
 					  bool detruire,
 					  bool only_more_recent,
-					  bool restore_ea_root,
-					  bool restore_ea_user,
+					  const mask & ea_mask,
 					  bool flat,
-					  bool ignore_owner,
+					  inode::comparison_fields what_to_check,
 					  bool warn_remove_no_match,
 					  const infinint & hourshift,
 					  bool empty,
+					  bool ea_erase,
+					  bool display_skipped,
+					  statistics * progressive_report,
 					  U_16 & exception,
 					  std::string & except_msg);
 
@@ -320,7 +363,7 @@ namespace libdar
     extern void op_listing_noexcept(user_interaction & dialog,
 				    archive *ptr,
 				    bool info_details,
-				    bool tar_format,
+				    archive::listformat list_mode,
 				    const mask &selection,
 				    bool filter_unsaved,
 				    U_16 & exception,
@@ -338,10 +381,11 @@ namespace libdar
 				       const mask &selection,
 				       const mask &subtree,
 				       bool info_details,
-				       bool check_ea_root,
-				       bool check_ea_user,
-				       bool ignore_owner,
+				       const mask & ea_mask,
+				       inode::comparison_fields what_to_check,
 				       bool alter_atime,
+				       bool display_skipped,
+				       statistics * progressive_report,
 				       U_16 & exception,
 				       std::string & except_msg);
 
@@ -356,6 +400,8 @@ namespace libdar
 				       const mask &selection,
 				       const mask &subtree,
 				       bool info_details,
+				       bool display_skipped,
+				       statistics * progressive_report,
 				       U_16 & exception,
 				       std::string & except_msg);
 
@@ -401,26 +447,21 @@ namespace libdar
 	/// ask that any libdar code running in the thread given as argument be cleanly aborted
 	/// when the execution will reach the next libdar checkpoint
 	/// \param[in] tid is the Thread ID to cancel libdar in
-    inline extern void cancel_thread(pthread_t tid) { thread_cancellation::cancel(tid); }
+    inline extern void cancel_thread(pthread_t tid, bool immediate = true, U_64 flag = 0) { thread_cancellation::cancel(tid, immediate, flag); }
 
-	/// thread consultation of the current cancellation process
+	/// consultation of the cancellation status of a given thread
 
-	/// \param[out] tid is the tid of the thread in which libdar must abort its operation
-	/// \return false if currently no cancellation is under process
-    inline extern bool cancel_current(pthread_t & tid) { return thread_cancellation::current_cancel(tid); }
+	/// \param[in] tid is the tid of the thread to get status about
+	/// \return false if no cancellation has been requested for the given thread
+    inline extern bool cancel_status(pthread_t tid) { return thread_cancellation::cancel_status(tid); }
 
 	/// thread cancellation deactivation
 
-	/// abort the thread cancellation initiated by cancel_thread() function
-	/// if the libdar has not already aborted its operation.
-	/// \return false if the libdar operation in the given thread had already aborted
-	/// or if there is no more pending cancellation.
-    inline extern bool cancel_clear() { return thread_cancellation::clear_pending_request(); }
+	/// abort the thread cancellation for the given thread
+	/// \return false if no thread cancellation was under process for that thread
+	/// or if there is no more pending cancellation (thread has already been canceled).
+    inline extern bool cancel_clear(pthread_t tid) { return thread_cancellation::clear_pending_request(tid); }
 #endif
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	// ALL OTHER CALLS OF THE LIBDAR LIBRARY ARE NOT PART OF THE API AND WILL NOT BE DOCUMENTED FOR NOW //
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/// @}
 

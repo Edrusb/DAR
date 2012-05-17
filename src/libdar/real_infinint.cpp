@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.18.2.1 2005/06/22 12:09:56 edrusb Rel $
+// $Id: real_infinint.cpp,v 1.19 2005/09/11 19:01:16 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -614,7 +614,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: real_infinint.cpp,v 1.18.2.1 2005/06/22 12:09:56 edrusb Rel $";
+        static char id[]="$Id: real_infinint.cpp,v 1.19 2005/09/11 19:01:16 edrusb Rel $";
         dummy_call(id);
     }
 

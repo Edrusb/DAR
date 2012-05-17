@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.14 2004/09/13 13:07:51 edrusb Rel $
+// $Id: erreurs.cpp,v 1.15 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -86,7 +86,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: erreurs.cpp,v 1.14 2004/09/13 13:07:51 edrusb Rel $";
+        static char id[]="$Id: erreurs.cpp,v 1.15 2005/12/29 02:32:41 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -97,7 +97,7 @@ namespace libdar
         cerr << gettext("#                         E X I T I N G !     #") << endl;
         cerr << "#                                             #" << endl;
         cerr << "###############################################" << endl;
-        cerr << tools_printf(gettext(" THANKS TO REPORT THE PREVIOUS OUTPUT TO MAINTAINER\n GIVING A DESCRIPTION OF THE CIRCUMPSTANCES.")) << endl;
+        cerr << tools_printf(gettext(" THANKS TO REPORT THE PREVIOUS OUTPUT TO MAINTAINER\n GIVING A DESCRIPTION OF THE CIRCUMSTANCES.")) << endl;
 	cerr << tools_printf(gettext(" IF POSSIBLE TRY TO PRODUCE THIS ERROR, A\n SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n IN SOLVING THIS PROBLEM.                THANKS")) << endl;
         exit(3); // this was exit code for bugs at the time this code was part of dar
 	    // now it is part of libdar, while exit code stay defined in typical command line code (dar_suite software)
@@ -110,7 +110,7 @@ namespace libdar
         cerr << gettext("#                         E X I T I N G !     #") << endl;
         cerr << "#                                             #" << endl;
         cerr << "###############################################" << endl;
-        cerr << tools_printf(gettext(" THANKS TO REPORT THE PREVIOUS OUTPUT TO MAINTAINER\n GIVING A DESCRIPTION OF THE CIRCUMPSTANCES.")) << endl;
+        cerr << tools_printf(gettext(" THANKS TO REPORT THE PREVIOUS OUTPUT TO MAINTAINER\n GIVING A DESCRIPTION OF THE CIRCUMSTANCES.")) << endl;
 	cerr << tools_printf(gettext(" IF POSSIBLE TRY TO PRODUCE THIS ERROR, A\n SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n IN SOLVING THIS PROBLEM.                THANKS")) <<endl;
 	exit(3); // this was exit code for bugs at the time this code was part of dar
 	    // now it is part of libdar, while exit code stay defined in typical command line code (dar_suite software)

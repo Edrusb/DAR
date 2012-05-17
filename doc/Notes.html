@@ -1,0 +1,2657 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>DAR's Notes</title>
+</head>
+<body
+ style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);"
+ link="#0000ff" vlink="#000055" alink="#ff0000">
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 161px;"><a
+ href="index.html"><img
+ style="border: 0px solid ; width: 160px; height: 120px;"
+ alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
+      </td>
+      <td style="vertical-align: top;">
+      <h1 style="text-align: center;"><br>
+      </h1>
+      <h1 style="text-align: center;">Detailed Notes on Various Topics</h1>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<div style="text-align: center;">
+<hr style="width: 100%; height: 2px;"></div>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <div style="text-align: justify;">
+      <h2>Introduction</h2>
+      <div style="text-align: justify; margin-left: 40px;">Here take
+place a collection of notes. Theses have been created after
+implementation of a given feature, mainly for further reference but
+also for user information. The ideas behind theses notes are to remind
+some choices of implementation, the arguments that lead to this choices
+in on side, and in the other side let the user have a room to be
+informed on the choices done and be able to bring his remarks without
+having to deeply look in the code to learn dar's internals.<br>
+      </div>
+      </div>
+      <h2>Contents</h2>
+      <div style="margin-left: 40px;"><a href="#I">EA
+&amp; differential backup</a><span style="font-weight: bold;"></span><br>
+      <span style="font-weight: bold;"></span><a href="#II">Dar
+and remote backup server</a><br>
+      <a href="#III">Bytes,
+bits, kilo, mega etc.</a><span style="font-weight: bold;"></span><br>
+      <span style="font-weight: bold;"></span><a href="#IV">Archive
+structure in brief</a><br>
+      <a href="#V">EA
+Support &amp; Compilation Problems</a><br>
+      <a href="#VI">Running
+DAR in background</a><br>
+      <a href="#VII">Running
+command or scripts from DAR</a><br>
+      <a href="#VIII">Makefile
+targets</a><span style="font-weight: bold;"></span><br>
+      <span style="font-weight: bold;"></span><a href="#IX">Scrambling</a><br>
+      <a href="#X">dar_manager</a><br>
+      <a href="#XI">Files'
+extension used</a><span style="font-weight: bold;"></span><br>
+      <span style="font-weight: bold;"></span><a href="#XII">dar
+and ssh</a><span style="font-weight: bold;"></span><br>
+      <span style="font-weight: bold;"></span><a href="#XIII">Overflow
+in arithmetic integer operations</a><span style="font-weight: bold;"></span><br>
+      <span style="font-weight: bold;"></span><a href="#XIV">Using
+data protection with DAR &amp; PAR</a><br>
+      <a href="#XV">Dar
+User Command</a><br>
+      <a href="#XVI">Examples
+of file filtering</a><span style="font-weight: bold;"></span><br>
+      <span style="font-weight: bold;"></span><a href="#XVII">Strong
+encryption</a><br>
+      <a href="#XVIII">libdar
+and thread-safe requirement</a><span style="font-weight: bold;"></span><br>
+      <span style="font-weight: bold;"></span><a href="#XIX">Dar_manager
+and delete files</a><span style="font-weight: bold;"></span><br>
+      <span style="font-weight: bold;"></span><a href="#XX">Native
+Language Support / gettext / libintl</a></div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h3><a name="I"></a></h3>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>EA &amp; differential backup</h3>
+      <h4>Brief presentation of EA:</h4>
+      <div style="margin-left: 40px;">
+      <div style="text-align: justify;">EA stands for Extended
+Attributes. In
+Unix filesystem a regular file is composed of a set of byte (the data)
+and an inode. The inode add properties to the file, such as owner,
+group, permission, dates (last modification date of the data [mtime],
+last access date to data [atime], and last inode change date [ctime]),
+etc). Last, the name of the file is not contained in the inode, but in
+the directory(ies) it is linked to. When a file is linked more than
+once in the directory tree, we speak about "hard links". This way the
+same data and associated inode appears several time in the same or
+different directories. This is not the same as a symbolic links, which
+is a file that contains the path to another file (which may or may not
+exist). A symbolic link has its own inode. OK, now let's talk about EA:
+      <br>
+      </div>
+      <br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">Extended
+attributes is a recent feature of Unix file system. They extend
+attributes provided by the inode and associated to a data. They are not
+part of the inode, nor part of the data, nor part of a given directory.
+They are stored beside the inode and are a set of pair of key and
+value. The owner of the file can add or define any key and eventually
+associate data to it. It can also list and remove a particular key.
+What they are used for ? A way to associate information to a file. <br>
+      <br>
+One particular interesting use of EA, is ACL: Access Control List. ACL
+can be implemented using EA and add a more fine grain in assigning
+access permission to file. For more information one EA and ACL, see the
+site of Andreas Grunbacher: <br>
+      <br>
+      <div style="margin-left: 40px;"><a href="http://acl.bestbits.at/">http://acl.bestbits.at/</a><br>
+      </div>
+      </div>
+      <h4>EA &amp; Differential Backup</h4>
+      <div style="text-align: justify; margin-left: 40px;">to determine
+that
+an EA has changed dar looks at the ctime value. if ctime has changed,
+(due to EA change, but also to permission or owner change) dar saves
+the EA. ctime also changes, if atime or mtime changes. So if you access
+a file or modify it, dar will consider that the EA have changed also.
+This is not really fair, I admit.<br>
+      <br>
+Something better would be to compare EA one by one, and record those
+that have changed or have been deleted. But to be able to compare all
+EA and their value reference EA must reside in memory. As EA can grow
+up to 64 KB by file, this can lead to a quick saturation of the virtual
+memory, which is already enough solicited by the catalogue. <br>
+      <br>
+Theses two schemes implies a different pattern for saving EA in
+archive. In the first case (no EA in memory except at time of operation
+on it), to avoid skipping in the archive (and ask the user to change of
+disks too often), EA must be stored beside the data of the file (if
+present). Thus they must be distributed all along the archive (except
+at the end that only contains the catalogue).<br>
+      <br>
+In the second case (EA are loaded in memory for comparison), EA must
+reside beside or within the catalogue, in any case at the end of the
+archive, not to have to user to need all disks to just take an archive
+as reference.<br>
+      <br>
+As the catalogue, grows already fast with the number of file to save
+(from a few bytes for hard_link to 400 bytes around per directory
+inode), the memory saving option has been adopted.<br>
+      <br>
+Thus, EA changes are based on the ctime change. Unfortunately, no
+system call permits to restore ctime. Thus, restoring an differential
+backup after its reference has been restored, will present restored
+inode as more recent than those in the differential archive, thus the
+-r option would prevent any EA restoration. In consequence, -r has been
+disabled for EA, it does only concern data contents. If you don't want
+to restore any EA but just more recent data, you can use the following
+: -r -u "*"</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="II"></a>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Dar and remote backup server</h3>
+      <div style="text-align: justify; margin-left: 40px;">The
+situation is
+the following : you have a host (called local in the following), on
+which resides an operational system, which you want to backup
+regularly, without perturbing users. For security reasons you want to
+store the backup on another host (called remote host in the following),
+only used for backup. Of course you have not much space on local host
+to store the archive.<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">Between
+theses two
+hosts, you could use NFS and nothing special would be necessary to add,
+to use dar as usually. but if for security reasons you don't want to
+use NFS (insecure network, local user must not have access to backups),
+but prefer to communicate through an encrypted session, (using ssh for
+example) then you need to use dar features brought by version 1.1.0: <br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+dar can now output its archive to stdout instead of a given file. To
+activate it, use "-" as basename. Here is an example :<br>
+      <br>
+      </div>
+      <div style="margin-left: 80px;"><code>dar -c - -R / -z |
+some_program</code><br>
+      </div>
+      <div style="margin-left: 40px;">or<br>
+      </div>
+      <div style="margin-left: 80px;"><code>dar -c - -R / -z &gt;
+named_pipe_or_file</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">Note, that
+file
+splitting is not available as it has not much meaning when writing to a
+pipe. (a pipe has no name, there is no way to skip (or seek) in a pipe,
+while dar needs to set back a flag in a slice header when it is not the
+last slice of the set). At the other end of the pipe (on the remote
+host), the data can be redirected to a file, with proper filename
+(something that matches "*.1.dar").<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="margin-left: 80px;"><code>some_other_program &gt;
+backup_name.1.dar</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">It is also
+possible to redirect the output to dar_xform which can in turn on the
+remote host split the data flow in several files, pausing between them,
+exactly as dar is able to do: <br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="margin-left: 80px;"><code>some_other_program |
+dar_xform -s 100M - backup_name</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">this will
+create backup_name.1.dar and so on. The resulting archive is totally
+compatible with those directly generated by dar. OK,
+you are happy, you can backup the local filesystem to a remote server
+through a secure socket session, in a full featured dar archive
+without using NFS. But, now you want to make a differential backup
+taking this archive as reference. How to do that? The
+simplest way is to use the new feature called "isolation", which
+extracts the catalogue from the archive and stores it in a little file.
+On the remote backup server you would type: <br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="margin-left: 80px;"><code>dar -A backup_name -C
+CAT_backup_name -z</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+if the catalogue is too big to fit on a floppy, you can slit it as
+usually using dar:<br>
+      <br>
+      </div>
+      <div style="margin-left: 80px;"><code>dar -A backup_name -C
+CAT_backup_name -z -s 1440k</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">the
+generated
+archive (CAT_backup_name.1.dar, and so on), only contains the
+catalogue, but can still be used as reference for a new backup. You
+just need to transfer it back to the local host, either using floppies,
+or through a secured socket session, or even directly isolating the
+catalogue to a pipe&nbsp; that goes from the remote host to the local
+host: <br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+on remote host:<br>
+      </div>
+      <div style="margin-left: 80px;"><code>dar -A backup_name -C - -z
+| some_program</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+on local host:<br>
+      </div>
+      <div style="margin-left: 80px;"><code>some_other_program &gt;
+CAT_backup_name.1.dar</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+or use dar_xform as previously if you need splitting :<br>
+      </div>
+      <div style="margin-left: 80px;"><code>some_other_program |
+dar_xform -s 1440k CAT_backup_name</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+then you can make your differential backup as usual:<br>
+      </div>
+      <div style="margin-left: 80px;"><code>dar -A CAT_backup_name -c -
+-z -R / | some_program</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+or if this time you prefer to save the archive locally:<br>
+      </div>
+      <div style="margin-left: 80px;"><code>dar -A CAT_backup_name -c
+backup_diff -z -R /</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">For
+differential
+backups instead of isolating the catalogue, it is also possible to read
+an archive or its extracted catalogue through pipes. Yes, two pipes are
+required for dar to be able to read an archive. The first goes from dar
+to the external program "dar_slave" and carries orders (asking some
+portions of the archive), and the other pipe, goes from "dar_slave"
+back to "dar" and carries the asked data for reading.<br>
+      <br>
+By default, if you specify "-" as basename for -l, -t, -d, -x, or to -A
+(used with -C or -c), dar and dar_slave will use their standard input
+and output to communicate. Thus you need additional program to make the
+input of the first going to the output to the second, and vice versa.
+Warning: you cannot use named pipe that way, because dar and dar_slave
+would get blocked upon opening of the first named pipe, waiting for the
+peer to open it also, even before they have started (dead lock at shell
+level). For named pipes, there is -i and -o options that helps, they
+receive a filename as argument, which may be a named pipe. The -i
+argument is used instead of stdin and -o instead of stdout. Note that
+for dar -i and -o are only available if "-" is used as basename. Let's
+take an example:<br>
+      <br>
+You now want to restore an archive from your remote backup server. Thus
+on it you have to run dar_slave this way<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+on remote server:<br>
+      </div>
+      <div style="margin-left: 80px;"><code>some_prog | dar_slave
+backup_name | some_other_prog</code><br>
+      </div>
+      <div style="margin-left: 40px;">or<br>
+      </div>
+      <div style="margin-left: 80px;"><code>dar_slave -o
+/tmp/pipe_todar -i /tmp/pipe_toslave backup_name</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+and on the local host you have to run dar this way:<br>
+      <br>
+      </div>
+      <div style="margin-left: 80px;"><code>some_prog | dar -x - -v ...
+| some_other_prog</code><br>
+      </div>
+      <div style="margin-left: 40px;">or<br>
+      </div>
+      <div style="margin-left: 80px;"><code>dar -x - -i /tmp/pipe_todar
+-o /tmp/pipe_toslave -v ...</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">there is no
+order
+to run dar or dar_slave first, dar can use -i and/or -o, while
+dar_slave does not. What is important here is to connect in a way or in
+an other their input and output, it does not matter how. The only
+restriction is that communication support must be perfect: no data
+loss, no duplication, no order change, thus communication over TCP
+should be fine.<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">Of course,
+you can
+also isolate a catalogue through pipes, test an archive, make
+difference, use a reference catalogue this way etc, and even then,
+output the resulting archive to pipe ! If using -C or -c with "-" while
+using -A also with "-", it is then mandatory to use -o: The output
+catalogue will generated on standard output, thus to send order to
+dar_slave you must use another channel with -o: <br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<code>&nbsp;&nbsp; LOCAL
+HOST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+REMOTE HOST</code><br>
+      <code>&nbsp;&nbsp;
++-----------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++-----------------------------+</code><br>
+      <code>&nbsp;&nbsp; |&nbsp;&nbsp; filesystem&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; backup of reference&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;
++-----+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | backup of reference
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++-----------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; | DAR
+|--&lt;-]=========================[-&lt;--| DAR_SLAVE
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;
+|--&gt;-]=========================[-&gt;--|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;
++-----+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | orders to dar_slave
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++-----------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++-----------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++---&gt;---]=========================[-&gt;--| DAR_XFORM |--&gt; backup|</code><br>
+      <code>&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; saved data&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-----------+ to slices|</code><br>
+      <code>&nbsp;&nbsp;
++-----------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++-----------------------------+</code><br>
+      <br>
+on local host :<br>
+      </div>
+      <div style="margin-left: 80px;"><code>dar -c - -A - -i
+/tmp/pipe_todar -o /tmp/pipe_toslave | some_prog</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+on the remote host :<br>
+      <br>
+      </div>
+      <div style="margin-left: 80px;"><code>dar_slave -i
+/tmp/pipe_toslave -o /tmp/pipe_todar full_backup</code><br>
+      </div>
+      <div style="margin-left: 40px;">dar_slave provides the
+full_backup for -A option<br>
+      <br>
+      </div>
+      <div style="margin-left: 80px;"><code>some_other_prog | dar_xform
+- diff -s 140M -p ...</code><br>
+      </div>
+      <div style="margin-left: 40px;">while dar_xform make slice of the
+output archive provided by dar<br>
+      <br>
+Last, if you don't want to mess with pipe, you have still the
+possibility to create a VPN and mount a NFS partition over it. In some
+cases it may be sufficient for what you want to do. See VPN-HOWTO for
+simple implementation using sshd and pppd.</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h3><a name="III"></a></h3>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Bytes, bits, kilo, mega etc.</h3>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">you probably
+know
+a bit the metric system, where a dimension is expressed by a base unit
+(the meter for distance, the liter for volume, the joule for energy,
+the volt for electrical potential, the bar for pressure, the watt for
+power, the second for time, etc.), and declined using prefixes: <br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      <div style="margin-left: 40px;">deci&nbsp; (d) = 0.1<br>
+centi (c) = 0.01<br>
+milli (m) = 0.001<br>
+micro (u) = 0.000,001 (symbol is not "u" but the "mu" Greek letter)<br>
+nano&nbsp; (n) = 0.000,000,001<br>
+pico&nbsp; (p) = 0.000,000,000,001<br>
+femto (f) = 0.000,000,000,000,001<br>
+atto&nbsp; (a) = 0.000,000,000,000,000,001<br>
+zepto (z) = 0.000,000,000,000,000,000,001<br>
+yocto (y) = 0.000,000,000,000,000,000,000,001<br>
+deca (da) = 10<br>
+hecto (h) = 100<br>
+kilo&nbsp; (k) = 1,000&nbsp; (yes, a lower case letter)<br>
+mega&nbsp; (M) = 1,000,000<br>
+giga&nbsp; (G) = 1,000,000,000<br>
+tera&nbsp; (T) = 1,000,000,000,000<br>
+peta&nbsp; (P) = 1,000,000,000,000,000<br>
+exa&nbsp;&nbsp; (E) = 1,000,000,000,000,000,000<br>
+zetta (Z) = 1,000,000,000,000,000,000,000<br>
+yotta (Y) = 1,000,000,000,000,000,000,000,000<br>
+      </div>
+      <br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">This way two
+milliseconds are 0.002 second, and 5 kilometers are 5,000 meters. All
+was fine and nice up to the recent time when computer science appeared:
+In this discipline, the need to measure the size of information storage
+raised. The smallest size, is the bit (contraction of <span
+ style="font-style: italic;"><span style="font-weight: bold;">bi</span>nary
+digi<span style="font-weight: bold;">t</span></span>), binary because
+it has two possible states: "0" and "1". Grouping bits by 8 computer
+scientists called it a <span style="font-style: italic;">byte</span>.
+A byte has 256 different states, (2 power 8). The ASCII (American
+Standard Code for Information Interchange) code arrived and assigned a
+letter or more generally a character to some value of a byte, (A is
+assigned to 65, space to 32, etc). And as most text is composed of a
+set of character, they started to count size in byte. Time after time,
+following technology evolution, memory size approached 1000 bytes. <br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">But as
+memory is
+accessed through a bus which is a fixed number of cables (or integrated
+circuits), on which only two possible voltages are authorized to mean 0
+or 1, the total amount of byte that a bus can address is always a power
+of 2. With a two cable bus, you can have 4 values (00, 01, 10 and 11,
+where a digit is the state of a cable) so you can address 4 bytes.
+Giving a value to each cable defines an address to read or write in the
+memory. Unfortunately 1000 is not a power of 2 and approaching 1000
+bytes, was decided that a "kilobyte" would be 1024 bytes which is 2
+power 10. Some time after, and by extension, a megabyte has been
+defined to be 1024 kilobytes, a terabyte to be 1024 megabytes, etc. at
+the exception of the 1.44 MB floppy where here the capacity is 1440
+kilobytes thus here "mega" means 1000 kilo... <br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">In parallel,
+in
+the telecommunications domain, going from analogical to digital signal
+made the bit to be used also. In place of the analogical signal, took
+place a flow of bits, representing the samples of the original signal.
+For telecommunications the problem was more a problem of size of flow:
+how much bit could be transmitted by second. At some ancient time
+appeared the 1200 bit by second, then 64000, also designed as 64
+Kbit/s. Thus here, kilo stays in the usual meaning of 1000 time the
+base unit (at the exception that the K is uppercase while it should be
+lowercase). You can also find Ethernet 10 Mbit/s which is 10,000 bits
+by seconds, same thing with Token-Ring that had 4, 16 or 100 Mbit by
+seconds (4,000, 16,000 or 100,000 bits/s). But, even for
+telecommunications, kilo is not always 1000 times the base unit: the E1
+bandwidth at 2Mbit/s for example, is in fact 32*64Kbit/s thus 2048
+Kbit/s ... not 2000 Kbit/s <br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">Anyway, back
+to
+dar, you have to possibility to give the size in byte or using a single
+letter as suffix (k or K, M, T, P, E, Z, Y) thus the possibility to
+provide a size in kilo, mega, tera, peta, exa, zetta or yotta byte,
+with the computer science definition of theses terms (power of 1024) by
+default.<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+Theses suffixes are for simplicity and not to have to computer how much
+make powers of 1024. For example, if you want to fill a CD-R you will
+have to use the "-s 650M" option which is equivalent to "-s
+6815744400", choose the one you prefer, the result is the same :-).
+Now, if you want 2 Megabytes slices in the sense of the metric system,
+simply use "-s 2000000" or read below:<br>
+      <br>
+Starting version 2.2.0, you can alter the meaning of all the suffixes
+used by dar, the<br>
+      <code></code><br>
+      <code></code></div>
+      <div style="margin-left: 80px;"><code>--alter=SI-units</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+(which can be shorten to -aSI or -asi) change the meaning of the
+prefixes that follow on the command-line, to the metric system (or
+System International) up to the end of the line or to a <br>
+      <br>
+      </div>
+      <div style="margin-left: 80px;"><code>--alter=binary-units</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">arguments
+(-which
+can be shortened to -abinary), after which we are back to the computer
+science meaning of kilo, mega, etc. up to the end of the line or up to
+a next --alter=SI-units. Thus in place of -s 2000000 one could use:<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+&nbsp;&nbsp; -aSI -s 2M<br>
+      <br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">Yes, and to
+make
+things more confuse, marketing arrived and made sellers count gigabits
+a third way: I remember some time ago, I bought a hard disk which was
+described as "2.1 GB", (OK, that's several couple of years ago), but in
+fact it had only 2097152 bytes available. This is far from 2202009
+bytes (= 2.1 GiB for computer science meaning), and a bit more than
+2,000,000 bytes (metric system). OK, if it had theses 2202009 bytes
+(computer science meaning of 2.1 GB), this hard disk would have been
+sold under the label "2.5 GB"! ... just kidding :-)<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+Note that to distinguish kilo, mega, tera and so on the new
+abbreviation are defined:<br>
+      <div style="margin-left: 40px;">Ki = 1024 <br>
+Mi = 1024*1024<br>
+GiB = and so on...<br>
+TiB<br>
+PiB<br>
+EiB<br>
+ZiB<br>
+YiB<br>
+      </div>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="IV"></a><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Archive structure in brief</h3>
+      <br>
+      <h4>The Slice Level</h4>
+      <div style="margin-left: 40px;">A slice is composed of a header
+and data<br>
+      </div>
+      <br>
+      <div style="text-align: justify; margin-left: 80px;"><code>+--------+-------------------------------------------+</code><br>
+      <code>| header |&nbsp;
+Data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>+--------+-------------------------------------------+</code><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;"><br>
+the slice header is composed of<br>
+      </div>
+      <ul style="text-align: justify; margin-left: 40px;">
+        <li>a magic number that tells this is a dar slice</li>
+        <li>a internal_name which is unique to a given archive</li>
+        <li>a flag that tells if the slice is the last of the archive</li>
+        <li>a extension flag, that says if some extension field is
+present.
+Possible extension field is the size of the slices (-s option) when -S
+is used</li>
+      </ul>
+      <div style="text-align: justify; margin-left: 80px;"><code>+-------+----------+------+-----------+</code><br>
+      <code>| Magic | internal | flag | extension |</code><br>
+      <code>| Num.&nbsp; | name&nbsp;&nbsp;&nbsp;&nbsp; | byte |
+byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>+-------+----------+------+-----------+</code><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;"><br>
+Or for the first slice if -s and -S are used together<br>
+      </div>
+      <div style="text-align: justify; margin-left: 80px;"><code>+-------+----------+------+-----------+-------------------+</code><br>
+      <code>| Magic | internal | flag | extension | following
+slices&nbsp; |</code><br>
+      <code>| Num.&nbsp; | name&nbsp;&nbsp;&nbsp;&nbsp; | byte |
+byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+size&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>+-------+----------+------+-----------+-------------------+</code><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;"><br>
+the header is the first thing to be written, and if it is not the last
+slice, the flag field is overwritten. The header is also the first part
+to be read.<br>
+      <br>
+To know where a given position takes place in the archive, dar must
+first read the first archive, to know the size of the first slice, and
+if extension is present, the size of following slices is read. This is
+why at start-up dar always asks the first slice.<br>
+      </div>
+      <br>
+      <h4>Archive Level</h4>
+      <div style="margin-left: 40px;">The archive level describes the
+structure of the slice's data field, when they are stick together
+across slices.<br>
+      <br>
+      </div>
+      <div style="margin-left: 80px;"><code>+---------+-----------------------------------------+-----------+------+</code><br>
+      <code>| version |&nbsp;&nbsp;&nbsp;&nbsp;
+Data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| catalogue | term |</code><br>
+      <code>| header&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>+---------+-----------------------------------------+-----------+------+</code><br>
+      </div>
+      <div style="margin-left: 80px;"><code></code></div>
+      <div style="margin-left: 40px;"><br>
+the header version is composed of:<br>
+      </div>
+      <ul style="margin-left: 40px;">
+        <li>edition version of the archive</li>
+        <li>compression algorithm used</li>
+        <li>command line used for creating the archive</li>
+        <li>flag that tells if root or user EA have been saved</li>
+      </ul>
+      <div style="margin-left: 80px;"><code>+---------+------+---------------+------+</code><br>
+      <code>| edition | algo | command line&nbsp; | flag |</code><br>
+      <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>+---------+------+---------------+------+</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+The data is a suite of file contents, with EA if present<br>
+      <br>
+      </div>
+      <div style="margin-left: 80px;"><code>&nbsp; ....</code><code>--+---------------------+----+------------+-----------+----+---....</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; file
+data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | EA | file
+data&nbsp; | file data | EA |</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | (may be
+compressed) |&nbsp;&nbsp;&nbsp; | (no EA)&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;
+....--+---------------------+----+------------+-----------+----+---....</code><br>
+      <code></code></div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">the
+catalogue,
+contains all inode, directory structure and hard_links information. The
+directory structure is stored in a simple way: the inode of a directory
+comes, then the inode of the files it contains, then a special entry
+named "EOD" for End of Directory. Considering the following tree:<br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><br>
+      </div>
+      <div style="margin-left: 80px; text-align: justify;"><code>&nbsp;-
+toto</code><br>
+      <code>&nbsp;&nbsp;&nbsp; | titi</code><br>
+      <code>&nbsp;&nbsp;&nbsp; | tutu</code><br>
+      <code>&nbsp;&nbsp;&nbsp; | tata</code><br>
+      <code>&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp; | blup</code><br>
+      <code>&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp; +--</code><br>
+      <code>&nbsp;&nbsp;&nbsp; | boum</code><br>
+      <code>&nbsp;&nbsp;&nbsp; | coucou</code><br>
+      <code>&nbsp;&nbsp;&nbsp; +---</code><br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><br>
+it would generate the following sequence for catalogue storage:<br>
+      <br>
+      </div>
+      <div style="margin-left: 80px; text-align: justify;"><code>+-------+------+------+------+------+-----+------+--------+-----+</code><br>
+      <code>|&nbsp; toto | titi | tutu | tata | blup | EOD | boum |
+coucou | EOD |</code><br>
+      <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>+-------+------+------+------+------+-----+------+--------+-----+</code><br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><br>
+EOD takes on byte, and this way no need to store the full path of each
+file, just the filename is recorded.<br>
+      <br>
+the terminator stores the position of the beginning of the catalogue,
+it is the last thing to be written. Thus dar first reads the
+terminator, then the catalogue.<br>
+      </div>
+      <br>
+      <h4>All&nbsp; Together</h4>
+      <div style="text-align: justify; margin-left: 40px;">Here is an
+example of how data can be structured in a four slice archive:<br>
+      <br>
+      </div>
+      <div style="text-align: justify; margin-left: 80px;"><code>+-------------+--------+------------------------+</code><br>
+      <code>| slice + ext | version|&nbsp; file data +
+EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>| header&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | header
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>+-------------+--------+------------------------+</code><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;"><br>
+the first slice has been defined smaller using the -S option<br>
+      <br>
+      </div>
+      <div style="text-align: justify; margin-left: 80px;"><code>+--------+--------------------------------------------+</code><br>
+      <code>| slice&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file data
++
+EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>| header
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>+--------+--------------------------------------------+</code><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;"><code></code><br>
+      <code></code></div>
+      <div style="text-align: justify; margin-left: 80px;"><code>+--------+--------------------------------------------+</code><br>
+      <code>| slice&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file data
++
+EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>| header
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>+--------+--------------------------------------------+</code><br>
+      <code></code><br>
+      <code>+--------+---------------------+-----------+------+</code><br>
+      <code>| slice&nbsp; |&nbsp;&nbsp; file data +
+EA&nbsp;&nbsp;&nbsp; | catalogue | term |</code><br>
+      <code>| header
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>+--------+---------------------+-----------+------+<br>
+      <br>
+      </code></div>
+      <div style="text-align: justify; margin-left: 40px;">the last
+slice is smaller because there was not enough data to make it full.<br>
+      <br>
+The archive is written quite sequentially, except when creating a new
+slice, the flag in the slice header has to be changed to non terminal.<br>
+      <br>
+Else, Dar read first the slice header of the first slice, then the
+version header, then the terminator and catalogue (located on the last
+slice) and then proceed to the operation. If it is extracting the whole
+archive, dar goes back to the first slice and asks for all slices one
+by one.<br>
+      </div>
+      <br>
+      <h4>Other Levels</h4>
+      <div style="text-align: justify; margin-left: 40px;">Things get a
+bit
+more complicated if we consider compression and encryption. The way the
+problem is addressed in dar's code is a bit like networks are designed
+in computer science, using the notion of _layer_. Here, there is a
+additional constraint, a given layer may or may not be present
+(encryption, compression, slicing for example). So all layer must have
+the same interface for serving the layer above them. This interface is
+defined by the pure virtual class "generic_file", which provides
+generic methods for reading, writing, skipping, getting the current
+offset when writing or reading to a file. This way the compressor class
+acts like a file which compresses data wrote to it and writes
+compressed data to another "generic_file". The blowfish and scramble
+classes act the same but in place of compressing/uncompressing they
+encrypt/decrypt the data to/from another generic_file object. The
+slicing we have seen above follows the same principle, this is a "sar"
+object that transfers data wrote to it to several fichier objects.
+Class fichier also inherit from generic_file class, and is a wrapper
+for the plain file system calls.<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+Here are now the layers:<br>
+      <br>
+      </div>
+      <div style="margin-left: 80px;"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++----+--+----+-...........+---------+</code><br>
+      <code>archive&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|file|EA|file|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|catalogue|</code><br>
+      <code>layout&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|data|&nbsp;
+|data|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++----+--+----+-...........+---------+</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++-----------------------------------+</code><br>
+      <code>compression&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (compressed)&nbsp;
+data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++-----------------------------------+</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; / Terminateur</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</code><br>
+      <code>elastic&nbsp; +---+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +----+---+</code><br>
+      <code>buffers&nbsp; |EEE|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |TTTT|EEE|</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++---+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +----+---+</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++--------------------------------------------------+</code><br>
+      <code>cipher&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (encrypted)
+data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++--------------------------------------------------+</code><br>
+      <code>header\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>version|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;
++------------------------------------------------------+</code><br>
+      <code>sar&nbsp;
+|VVV|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;
++------------------------------------------------------+</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |</code><br>
+      <code>slice&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |</code><br>
+      <code>headers |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |</code><br>
+      <code>&nbsp;|&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |</code><br>
+      <code>&nbsp;|&nbsp; +---|------\&nbsp; |&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; |</code><br>
+      <code>&nbsp;V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V&nbsp; V&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V&nbsp; V</code><br>
+      <code>+---------+&nbsp; +---------+&nbsp; +---------+&nbsp;
++---------+&nbsp; +-------+</code><br>
+      <code>|HH| data |&nbsp; |HH| data |&nbsp; |HH| data |&nbsp; |HH|
+data |&nbsp; |HH|data|</code><br>
+      <code>+---------+&nbsp; +---------+&nbsp; +---------+&nbsp;
++---------+&nbsp; +-------+</code><br>
+      <code>&nbsp; slice 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice 3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+slice 4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice 5</code><br>
+      <code></code></div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <br>
+      <br>
+Question: why not having put the slices information at the end, for dar
+not to ask the first then the last slice?<br>
+      <br>
+      <div style="text-align: justify; margin-left: 40px;">Slicing and
+archiving are approached in two independent ways. For slicing, making
+header at the end of the file would require much more complicated and
+heavy code, because, slice have variable size, and header too. Then it
+would have cost more memory and process to manage the end of slice,
+when reading data you must not provide the header as data.<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">keeping
+slicing
+and archiving as two independent classes, is really necessary for dar
+to evaluate. Without this, it would not have been so easy to create
+dar_xform, which is only concerned by "sar" class (the C++ class that
+implements slicing). So putting the slicing information in the
+catalogue or terminator is really a bad idea for long term evolution
+and maintenance point of view. <br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">maybe the
+sar
+class will receive a new implementation one day in that way that header
+get stored at the end of slices, and overall slicing information would
+be stored at the end of the last slice. This way, dar would not ask the
+first slice before asking for the last one, in the meanwhile, you will
+have to first provide the first slice in any case.<br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="V"></a>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>EA Support &amp; Compilation Problems</h3>
+      <div style="text-align: justify;">If you just want to compile DAR
+with
+EA support available, you just need the attr-x.x.x.src.tar.gz package
+to have the libattr library and header files installed. If you want to
+use EA, then you need to have EA support in your kernel.<br>
+      <br>
+[<span style="font-style: italic;">What follows in this chapter is
+becoming obsolete, you may skip it as today EA support is available in
+standard in at least Linux kernels</span>]<br>
+      <br>
+I personally got some problem to compile dar with EA support, due to EA
+package installation problem:<br>
+      <br>
+when installing EA package, the /usr/include/attr directory is not
+created nor the xattr.h file put in it. To solve this problem, create
+it manually, and copy the xattr.h (and also attributes.h even if it is
+not required by dar) to it, giving it proper permission (world
+readable). These include files can be found in the "include" subdir of
+the xattr package: as root type the following replacing &lt;package&gt;
+by the path where your package has been compiled:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>cd
+/usr/include<br>
+mkdir attr<br>
+chmod 0755 attr<br>
+cp &lt;package&gt;/include/xattr.h &lt;package&gt;/include/attributes.h
+attr<br>
+cd attr<br>
+chmod 0644 *</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+The second problem is while linking, the static library version does
+not exist. You can built it using the following command (after package
+compilation):<br>
+      <br>
+as previously as root type:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>chdir
+&lt;package&gt;/libattr<br>
+ar r libattr.a syscalls.o libattr.o<br>
+mv libattr.a /usr/lib<br>
+chmod 0644 /usr/lib/libattr.a</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+dar should now be able to compile with support for EA activated.</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3><a name="VI"></a>Running DAR in background</h3>
+      <br>
+DAR can be run in background:<br>
+      <br>
+      <div style="margin-left: 40px;"><code>dar [command-line
+arguments] &lt; /dev/null &amp;</code></div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="VII"></a>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Running command or scripts from DAR</h3>
+      <div style="text-align: justify;">This concerns options -E and
+-F. They both receive a string as
+argument. Thus if the argument must be a command with its own
+arguments, you have to put theses between quotes for they appear as a
+single string to the shell that interprets the dar command-line. For
+example if you want to call<br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"><code>df .</code><br>
+      </div>
+      <br>
+[<span style="font-style: italic;">This is two worlds: "df" (the
+command) and "." its argument</span>] then you have to use the
+following on DAR command-line:<br>
+      <br>
+      <div style="margin-left: 40px;"><code>-E "df ."</code><br>
+      </div>
+or<br>
+      <div style="margin-left: 40px;"><code>-E 'df .'</code><br>
+      </div>
+      <br>
+      <br>
+DAR provides several substitution strings:<br>
+      <br>
+      <ul>
+        <li style="text-align: justify;"><code>%%</code> is replaced by
+a single <code>%</code> Thus if you need a <code>%</code> in you
+command line you MUST replace it by <code>%</code><code>%</code> in
+the argument string of -E or -F<br>
+        </li>
+        <li><code>%p </code>is replaced by the path to the slices</li>
+        <li><code>%b </code>is replaced by the basename of the slices</li>
+        <li><code>%n</code> is replaced by the number of the slice</li>
+        <li><code>%c</code> is replaced by the context replaced by
+"operation", "init" or "last_slice"depending on the context.<br>
+        </li>
+      </ul>
+      <div style="text-align: justify;">The number of the slice (<code>%n</code>)
+is either the just written slice or the next slice to be read. For
+example if you make a backup (-c or -C), this is the number of the last
+slice completed. Else (using -t, -d, -A (with -c or -C), -l or -x),
+this is the number of the slice that will be required very soon. While
+%c (the context) is substituted by "init", "operation" or "last_slice".
+      <br>
+      <br>
+      <ul>
+        <li>"init" when the slice is asked before the catalogue is read</li>
+        <li>"operation" once the catalogue is read and/or data
+treatment has begun.</li>
+        <li>"last_slice" when the last slice has been written (archive
+creation only)<br>
+        </li>
+      </ul>
+      </div>
+      <br>
+What the use of this feature? For example you want to burn the band-new
+slices on CD as soon as they are&nbsp; available.<br>
+      <br>
+let's build a little script for that:<br>
+      <br>
+      <div style="margin-left: 40px;"><code>%cat burner</code><br>
+      <code></code></div>
+      <div style="margin-left: 80px;"><code>#!/bin/tcsh -f</code><br>
+      <code></code><br>
+      <code>if("$1" == "" || "$2" == "") then</code><br>
+      <code>&nbsp; echo "usage: $0 &lt;filename&gt; &lt;number&gt;"</code><br>
+      <code>&nbsp; exit 1</code><br>
+      <code>endif</code><br>
+      <code></code><br>
+      <code>mkdir T</code><br>
+      <code>mv $1 T</code><br>
+      <code>mkisofs -o /tmp/image.iso -r -J -V "archive_$2" T</code><br>
+      <code>cdrecord dev=0,0 speed=8 -data /tmp/image.iso</code><br>
+      <code>rm /tmp/image.iso</code><br>
+      <code>if(! diff /mnt/cdrom/$1 T/$1) then</code><br>
+      <code>&nbsp; exit 2</code><br>
+      <code>else</code><br>
+      <code>&nbsp; rm -rf T</code><br>
+      <code>endif</code><br>
+      <code></code></div>
+      <div style="margin-left: 40px;"><code>%</code><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">This little script, receive the
+slice
+filename, and its number as argument, what it does is to burn a CD with
+it, and compare the resulting CD with the original slice. Upon failure,
+the script return 2 (or 1 if syntax is not correct on the
+command-line). Note that this script is only here for illustration,
+there are many more interesting user scripts made by several dar users.
+Theses are available in the examples part of the documentation.<br>
+      </div>
+      <br>
+One could then use it this way:<br>
+      <br>
+      <div style="margin-left: 40px;"><code>-E "./burner %p/%b.%n.dar
+%n"</code><br>
+      </div>
+      <br>
+which can make the following DAR command-line:<br>
+      <br>
+      <div style="margin-left: 40px;"><code>dar -c ~/tmp/example -z -R
+/ usr/local -s 650M -E "./burner %p/%b.%n.dar %n" -p</code><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">First note that as our script
+does
+not change CD from the device, we need to pause between slices (-p
+option). The pause take place after the execution of the command (-E
+option). Thus we could add in the script a command to send a mail or
+play a music to inform us that the slice is burned. The advantage, here
+is that we don't have to come twice by slices, once when the slice is
+ready, once when the slice is burnt.<br>
+      </div>
+      <br>
+Another example:<br>
+      <br>
+      <div style="text-align: justify;">you want to send a huge file by
+email. (OK that's better to use FTP,
+but sometimes, people think than the less you can do the more they
+control you, and thus they disable many services, either by fear of the
+unknown, either by stupidity). So you only have mail available to
+transfer your data:<br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"><code>dar -c toto -s 2M
+my_huge_file -E
+"uuencode %b.%n.dar %b.%n.dar | mail -s 'slice %n' your@email.address ;
+rm %b.%n.dar ; sleep 300"</code><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">Here we make an archive with
+slices of 2 Megabytes, because our mail
+system does not allow larger emails. We save only one file:
+"my_huge_file" (but we could even save the whole filesystem it would
+also work). The command we execute each time a slice is ready is:<br>
+      </div>
+      <br>
+      <ol>
+        <li>uuencode the file and send the output my email to our
+address.</li>
+        <li>remove the slice</li>
+        <li>wait 5 minutes, to no overload too much the mail system,
+This is also</li>
+        <li>useful, if you have a small mailbox, from which it takes
+time to retrieve mail.</li>
+      </ol>
+Note that we did not used the <code>%p</code> substitution string, as
+the slices are saved in the current directory.<br>
+      <br>
+      <div style="text-align: justify;">Last example, is while
+extracting, in
+the case the slices cannot all be present in the filesystem, you need a
+script or a command to fetch the soon to be requested slice. It could
+be using ftp, lynx, ssh, etc. I let you do the script as an exercise.
+:-)</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="VIII"></a>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Makefile targets (does only concern versions 1.x.x)</h3>
+      <br>
+Here follows user available <span style="font-weight: bold;">targets</span>
+and <span style="font-weight: bold;">macros</span> to be used with
+make.<br>
+      <br>
+A target is a word that can be put as argument of make like "all" or
+"clean".<br>
+A macro is a variable that can be changed in the Makefile or changed on
+the make command-line, this way<br>
+      <div style="margin-left: 40px;"><code>make
+INSTALL_ROOT_DIR="/some/where/else"</code><br>
+      </div>
+      <br>
+      <h4>Targets</h4>
+      <div style="margin-left: 40px;">default : builds dar dar_xform
+and dar_slave (used if not target is given)<br>
+all&nbsp;&nbsp;&nbsp;&nbsp; : builds dar dar_xform dar_slave and test
+programs<br>
+depend&nbsp; : rebuild file dependency. This modifies the Makefile<br>
+install : install dar software and manual pages as described by<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INSTALL_ROOT_DIR
+BIN_DIR and MAN_DIR macros<br>
+install-doc : install documentation (tutorial notes, etc.) as described
+by<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the
+INSTALL_ROOT_DIR and INSTALL_DOC_DIR macros<br>
+uninstall : remove dar software, man pages and documentation if present<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; as described by
+macro used for installation<br>
+test&nbsp;&nbsp;&nbsp; : only builds test programs<br>
+clean_all : remove all generated files (temporary and final files)<br>
+clean&nbsp;&nbsp; : remove all files except the C++ generated files
+with the "usage"<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; extension<br>
+usage&nbsp;&nbsp; : builds the dar-help program, and generates
+"*.usage" files that<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; contains
+generated the C++ code&nbsp; corresponding to the help text<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; displayed with
+option -h.<br>
+clean_usage : remove C++ generated files<br>
+      </div>
+      <br>
+      <h4>Macros</h4>
+      <div style="margin-left: 40px;">DAR_VERSION&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+: DO NOT CHANGE IT ! : get dar version from source<br>
+INSTALL_ROOT_DIR&nbsp; : can be changed&nbsp;&nbsp;&nbsp;&nbsp; : base
+directory for installation<br>
+BIN_DIR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :
+can be changed&nbsp;&nbsp;&nbsp;&nbsp; : subdir where to store binaries<br>
+MAN_DIR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :
+can be changed&nbsp;&nbsp;&nbsp;&nbsp; : subdir where to store man pages<br>
+DOC_DIR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :
+can be changed&nbsp;&nbsp;&nbsp;&nbsp; : subdir where to store doc files<br>
+EA_SUPPORT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : set or unset
+it&nbsp;&nbsp;&nbsp; : if set add support for EA<br>
+FILEOFFSET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : set or unset
+it&nbsp;&nbsp;&nbsp; : if set, support for large files<br>
+USE_SYS_SIGLIST&nbsp;&nbsp; : set or unset it&nbsp;&nbsp;&nbsp; : if
+set, uses the sys_siglist vector<br>
+OS_BITS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :
+set or unset it&nbsp;&nbsp;&nbsp; : if set, change int macros for alpha
+OS<br>
+CXX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+: can be changed&nbsp;&nbsp;&nbsp;&nbsp; : point to your C++ compiler<br>
+CC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+: can be changed&nbsp;&nbsp;&nbsp;&nbsp; : point to your C compiler</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="IX"></a>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Scrambling</h3>
+      <br>
+      <br>
+How does it works?<br>
+      <br>
+      <div style="text-align: justify;">take the pass phrase. It is a
+string,
+thus a sequence of bytes, thus a sequence of integer each one between 0
+and 255 (including 0 and 255). The data to "scramble" is also a
+sequence of byte, usually much longer than the pass phrase. The
+principle is to add byte by byte the pass phrase to the data, modulo
+256. The pass phrase is repeated all along the archive. Let's take an
+example: <br>
+      </div>
+      <br>
+the pass phrase is "he\220lo" (where \220 is the character which value
+is 220). the data is "example"<br>
+      <br>
+taken from ASCII standard:<br>
+      <div style="margin-left: 40px;">h = 104<br>
+l = 108<br>
+o = 111<br>
+e = 101<br>
+x = 120<br>
+a = 97<br>
+m = 109<br>
+p = 112<br>
+      </div>
+      <br>
+&nbsp;<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+e&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+m&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+p&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 101&nbsp;&nbsp;&nbsp;&nbsp;
+120&nbsp;&nbsp;&nbsp;&nbsp; 97&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+109&nbsp;&nbsp;&nbsp;&nbsp; 112&nbsp;&nbsp;&nbsp;&nbsp;
+108&nbsp;&nbsp;&nbsp;&nbsp; 101<br>
+      <br>
++&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+e&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \220&nbsp;&nbsp;&nbsp;
+l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+o&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 104&nbsp;&nbsp;&nbsp;&nbsp;
+101&nbsp;&nbsp;&nbsp;&nbsp; 220&nbsp;&nbsp;&nbsp;&nbsp;
+108&nbsp;&nbsp;&nbsp;&nbsp; 111&nbsp;&nbsp;&nbsp;&nbsp;
+104&nbsp;&nbsp;&nbsp;&nbsp; 101<br>
+      <br>
+---------------------------------------------------------------<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 205&nbsp;&nbsp;&nbsp;&nbsp;
+221&nbsp;&nbsp;&nbsp;&nbsp; 317&nbsp;&nbsp;&nbsp;&nbsp;
+217&nbsp;&nbsp;&nbsp;&nbsp; 223&nbsp;&nbsp;&nbsp;&nbsp;
+212&nbsp;&nbsp;&nbsp;&nbsp; 202<br>
+      <br>
+---------------------------------------------------------------<br>
+modulo<br>
+256 :&nbsp;&nbsp; 205&nbsp;&nbsp;&nbsp;&nbsp;
+221&nbsp;&nbsp;&nbsp;&nbsp; 61&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+217&nbsp;&nbsp;&nbsp;&nbsp; 223&nbsp;&nbsp;&nbsp;&nbsp;
+212&nbsp;&nbsp;&nbsp;&nbsp; 202<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \205&nbsp;&nbsp;&nbsp;
+\201&nbsp;&nbsp;&nbsp; =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\217&nbsp;&nbsp;&nbsp; \223&nbsp;&nbsp;&nbsp; \212&nbsp;&nbsp;&nbsp;
+\202</code><br>
+      <br>
+thus the data "example" will be written in the archive
+"\205\201=\217\223\212\202"<br>
+      <br>
+      <div style="text-align: justify;">This method allows to decode
+any
+portion without knowing the rest of the data. It does not consume much
+resources to compute, but it is terribly weak and easy to crack. Of
+course, the data is more difficult to retrieve without the key when the
+key is long. Today dar can also use strong encryption (blowfish
+algorithm for now) and thanks to a encryption block can still avoid
+reading the whole archive to restore any single file.</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="X"></a><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>dar_manager</h3>
+      <br>
+      <br>
+      <div style="text-align: justify;"><span
+ style="font-style: italic;">dar_manager</span>
+is the last member of the dar suite programs. Its role is to gather
+information about several backups to easily and automatically restore
+the last versions of a given set of file over many different backups
+(up to 65534).<br>
+      <br>
+A first thing to do is to build a "database" from archives or their
+extracted catalogues. You may have several databases, they will be
+independent of each others. Each database is stored in a single
+(compressed) file.<br>
+      <br>
+When you will need a particular file to be restored, using the
+collected information,<span style="font-style: italic;"> dar_manager</span>
+will call dar with proper options to restore the file(s) from the
+correct archive. This is particularly useful when making differential
+backups, because all files are not saved at each backup (those that did
+not changed) the last version of a given file may be located in an
+archive done many time ago. <br>
+      <br>
+As <span style="font-style: italic;">dar_manager</span> calls dar, it
+must know the path to each archive. By default, it uses the path given
+using -A option, as well as the basename given. But you might be
+feeding the database with an extracted catalogue (dar's -C option),
+while the real archive is stored on a CD with a different basename. You
+may either use the -b and -p option to change the basename and path at
+any time, or set different basename and path when you add archive by
+giving extra optional argument to -A option.<br>
+      <br>
+Next point, you may need some special options to always be passed to
+dar, this is the use of the -o option.<br>
+      <br>
+last point <span style="font-style: italic;">dar_manager</span> looks
+for dar in the PATH variable. But you can also specify which dar
+command you want to be used (-d option), if it is not in the PATH or
+for security reasons.<br>
+      <br>
+Normal operation is to update your database(s) after each new archive
+has been created. And when you need to restore a particular file or set
+of files, you will just have to call dar_manager with -r option:<br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"><code>dar_manager -r file1
+home/my_directory tmp/file2 ...</code><br>
+      </div>
+      <br>
+As well when some archive get destroyed due to archive rotation, you
+can safely remove them from the dar_manager database.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="XI"></a><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Files' extension used</h3>
+dar suite programs use several type of files:<br>
+      <br>
+      <ul>
+        <li>slices&nbsp; (dar, dar_xform, dar_slave, dar_manager)</li>
+        <li>configuration files (dar, dar_xform, dar_slave)</li>
+        <li>databases&nbsp; (dar_manager)</li>
+        <li><a href="#XV">user command</a>&nbsp; (dar, dar_xform,
+dar_slave)</li>
+        <li>filter list (dar's -[ and -] options)</li>
+      </ul>
+If for slice the extension and even the filename format cannot be
+customized, (basename.slicenumber.dar) there is not mandatory rule for
+the other type of files.<br>
+      <br>
+In the case you have no idea how to name theses, here is what I use:<br>
+configuration files receive "<span style="font-weight: bold;">.dcf</span>"
+as extension, (Dar Configuration file)<br>
+while database receive&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ".<span
+ style="font-weight: bold;">dmd</span>" as extension, (Dar Manager
+Database)<br>
+for user command I propose&nbsp; "<span style="font-weight: bold;">.duc</span>"
+as extension, (Dar User Command)<br>
+for filter list I suggest&nbsp;&nbsp; "<span style="font-weight: bold;">.dfl</span>"
+as extension. (Dar Filter List)<br>
+      <br>
+but, you are totally free to use the filename you want !&nbsp;&nbsp; ;-)<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="XII"></a><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>dar and ssh (see also<a href="#II">
+paragraph II</a>)</h3>
+As reported "DrMcCoy" in the historical forum "Dar Technical
+Questions", the netcat program can be very helpful if you plane to
+backup over the network.<br>
+      <br>
+The context in which will take place the following examples are a
+"local" host named "flower" has to be backup or restored form/to a
+remote host called "honey" (OK, the name of the machines are silly...)<br>
+      <br>
+      <h4>Example of use with netcat. Note that netcat command name is
+"nc"</h4>
+      <h5 style="margin-left: 40px;">Creating a full backup of "flower"
+saved on "honey"</h5>
+      <div style="margin-left: 80px;">on honey:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>nc -l -p 5000 &gt;
+backup.1.dar</code><br>
+      </div>
+      <div style="margin-left: 80px;"><br>
+then on flower:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>dar -c - -R / -z | nc -w 3
+honey 5000</code><br>
+      </div>
+      <div style="margin-left: 80px;"><br>
+but this will produce only one slice, instead you could use the
+following to have several slices on honey:<br>
+      <br>
+on honey:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>nc -l -p 5000 | dar_xform
+-s 10M -S 5M -p - backup</code><br>
+      </div>
+      <div style="margin-left: 80px;"><br>
+on flower:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>dar -c - -R / -z | nc -w 3
+honey 5000</code><br>
+      </div>
+      <div style="margin-left: 80px;"><br>
+by the way note that <span style="font-style: italic;">dar_xform</span>
+can also launch a user script between&nbsp; slices exactly the same way
+as dar does, thanks to the -E and -F options.<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <h5 style="margin-left: 40px;">Testing the archive</h5>
+      <div style="margin-left: 80px;">testing the archive can be done
+on honey but you could also do it remotely even if it is not very
+useful !<br>
+      <br>
+on honey:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>nc -l -p 5000 | dar_slave
+backup | nc -l -p 5001</code><br>
+      </div>
+      <div style="margin-left: 80px;"><br>
+on flower:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>nc -w 3 honey 5001 | dar
+-t - | nc -w 3 honey 5000</code><br>
+      </div>
+      <div style="margin-left: 80px;"><br>
+note also that <span style="font-style: italic;">dar_slave</span> can
+run a script between slices, if for example you need to load slices
+from a robot, this can be done automatically, or if you just want to
+mount/unmount a removable media eject or load it and ask the user to
+change it ...<br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <h5 style="margin-left: 40px;">Comparing with original filesystem</h5>
+      <div style="margin-left: 80px;">on honey:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>nc -l -p 5000 | dar_slave
+backup | nc -l -p 5001</code><br>
+      </div>
+      <div style="margin-left: 80px;"><br>
+on flower:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>nc -w 3 honey 5001 | dar
+-d - -R / | nc -w 3 honey 5000</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <h5 style="margin-left: 40px;">Making a differential backup</h5>
+      <div style="text-align: justify; margin-left: 80px;">Here the
+problem
+is that dar needs two pipes to send orders and read data coming from
+dar_slave, and a third pipe to write out the new archive. This cannot
+be realized only with stdin and stdout as previously. Thus we will need
+a named pipe (created by the mkfifo command).&nbsp; <br>
+      </div>
+      <div style="margin-left: 80px;"><br>
+on honey:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>nc -l -p 5000 | dar_slave
+backup | nc -l -p 5001<br>
+nc -l -p 5002 | dar_xform -s 10M -p - diff_backup<br>
+      </code></div>
+      <div style="margin-left: 80px;"><br>
+on flower:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>mkfifo toslave</code><br>
+      <code>nc -w 3 honey 5000 &lt; toslave &amp;</code><br>
+      <code>nc -w 3 honey 5001 | dar -A - -o toslave -c - -R / -z | nc
+-w 3 honey 5002</code><br>
+      </div>
+      <br>
+      <br>
+      <div style="text-align: justify; margin-left: 40px;">with netcat
+the
+data goes in clear over the network. You could use ssh instead if you
+want to have encryption over the network. The principle are the same.<br>
+      </div>
+      <br>
+      <h4>Example of use with ssh</h4>
+      <h5 style="margin-left: 40px;">Creating full backup of "flower"
+saved on "honey"</h5>
+      <div style="margin-left: 80px;">we assume you have a sshd daemon
+on flower.<br>
+on honey:<br>
+      </div>
+      <div style="margin-left: 120px;"><code><acronym>ssh flower dar -c
+- -R / -z &gt; backup.1.dar</acronym></code><br>
+      </div>
+      <div style="margin-left: 80px;"><br>
+or still on honey:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>ssh flower dar -c - -R /
+-z | dar_xform -s 10M -S 5M -p - backup</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <h5 style="margin-left: 40px;">Testing the archive</h5>
+      <div style="margin-left: 80px;">on honey:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>dar -t backup</code><br>
+      </div>
+      <div style="margin-left: 80px;"><br>
+or from flower: (assuming you have a sshd daemon on honey)<br>
+      <br>
+      </div>
+      <div style="margin-left: 120px;"><code>ssh honey dar -t backup</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <h5 style="margin-left: 40px;">Comparing with original filesystem</h5>
+      <div style="margin-left: 80px;">on flower:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>mkfifo todar toslave<br>
+ssh honey dar_slave backup &gt; todar &lt; toslave &amp;<br>
+dar -d - -R / -i todar -o toslave</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <div style="margin-left: 80px;">Important. Depending on the shell
+you
+use, it may be necessary to invert the order in which "&gt; todar" and
+"&lt; toslave" are given on command line. The problem is that the shell
+hangs trying to open the pipes. Thanks to "/PeO" for his feedback.<br>
+      <br>
+or on honey:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>mkfifo todar toslave<br>
+ssh flower dar -d - -R / &gt; toslave &lt; todar &amp;<br>
+dar_slave -i toslave -o todar backup</code><br>
+      </div>
+      <div style="margin-left: 40px;"><br>
+      </div>
+      <h5 style="margin-left: 40px;">Making a differential backup</h5>
+      <div style="margin-left: 80px;">on flower:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>mkfifo todar toslave<br>
+      </code></div>
+      <div style="margin-left: 120px;"><code>ssh honey dar_slave backup
+&gt; todar &lt; toslave &amp;<br>
+      <br>
+      </code></div>
+      <div style="margin-left: 80px;">and on honey:<br>
+      </div>
+      <div style="margin-left: 120px;"><code>ssh flower dar -c - -A -
+-i todar -o toslave &gt; diff_linux.1.dar</code><br>
+      </div>
+      <div style="margin-left: 80px;">or<br>
+      </div>
+      <div style="margin-left: 120px;"><code>ssh flower dar -c - -A -
+-i todar -o toslave | dar_xform -s 10M -S 5M -p - diff_linux<br>
+      </code></div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="XIII"></a><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Overflow in arithmetic integer operations</h3>
+      <br>
+      <div style="text-align: justify;">Some code explanation about the
+detection of integer arithmetic operation overflows. We speak about
+*unsigned* integers, and we have only portable standard ways to detect
+overflows when using 32 bits or 64 bits integer in place of infinint.<br>
+      <br>
+Developed in binary, a number is a finite suite of digits (0 or 1). To
+obtain the original number from the binary representation, we must
+multiply each digit by a power of two. example the binary
+representation "101101" designs the number N where:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;">N = 2^5 +
+2^3 + 2^2 + 2^0<br>
+      </div>
+      <div style="text-align: justify;"><br>
+in that context we will say that 5 is the maximum power of N (the power
+of the higher non null binary digit).<br>
+      <br>
+      </div>
+for the addition "+" operation, if an overflow occurs, the result is
+less than one or both operands, so overflow is not difficult to detect.
+To convince you, let's assume that the result is greater both operands
+while it has overflowed. Thus the real result (without overflow) less
+the first operands should gives the second argument, but here we get a
+value that is greater than the all 1 bits integer (because there was an
+overflow and the resulting overflowed value is greater than the first
+second and the first operand), so this is absurd, and in case of
+overflow the resulting value is less than one of the operands.<br>
+      <div style="text-align: justify;"><br>
+for substraction "-" operation, if the second operand is greater than
+the first there will be an overflow (result must be unsigned thus
+positive) else there will not be any overflow. Thus detection is even
+more simple.<br>
+      <br>
+for division "/" and modulo "%" operations, there is never an overflow
+(there is just illicit the division by zero).<br>
+      <br>
+for multiplication "*" operation, a heuristic has been chosen to
+quickly detect overflow, the drawback is that it may triggers false
+overflow when number get near the maximum possible integer value. Here
+is the heuristic used:<br>
+      <br>
+given A and B two integers, which max powers are m and n respectively,
+we have<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;">A &lt;
+2^(m+1)<br>
+      </div>
+      <div style="text-align: justify;">and<br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;">B &lt;
+2^(n+1)<br>
+      </div>
+      <div style="text-align: justify;"><br>
+thus we also have:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;">A.B &lt;
+2^(m+1).2^(n+1)<br>
+      </div>
+      <div style="text-align: justify;"><br>
+which is:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;">A.B &lt;
+2^(m+n+2)<br>
+      </div>
+      <div style="text-align: justify;"><br>
+      </div>
+by consequences we know that the maximum power of the product of A by B
+is at most m+n+1 and while m+n+1 is less than or equal to the maximum
+power of the integer field there will not be overflow else we consider
+there will be an overflow even if it may not be always the case (this
+is an heuristic algorithm). </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="XIV"></a>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Using data protection with DAR &amp; PAR</h3>
+      <div style="text-align: justify;">Parchive (PAR in the following)
+is a
+very nice program that makes possible to recover a file which has been
+corrupted. It creates redundancy data stored in a separated file (or
+set of files), which can be used to repair the original file. This
+additional data may also be damaged, PAR will be able to repair the
+original file as well as the redundancy files, up to a certain point,
+of course. This point is defined by the percentage of redundancy you
+defined for a given file. But,... check the official PAR site here: <br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a
+ href="http://parchive.sourceforge.net/">http://parchive.sourceforge.net</a><br>
+      <br>
+First to remind you the <a href="#XI">chapter
+XI above</a>, dar can use several types of files. <br>
+      </div>
+      <ul style="text-align: justify;">
+        <li>DUC files (Dar User Scripts), are any script or command.
+They are
+bind to dar through the -E option, and are launch after slice creation
+or before slice reading.</li>
+        <li>- DCF files (Dar Configuration Files), are text files, that
+extend the command line arguments. They must respect a well defined
+syntax (see man page 'conditional syntax' for details). Theses
+configuration files are bind to dar through the -B option.</li>
+      </ul>
+      <div style="text-align: justify;"><br>
+In the following we will present two DUC files, and one DCF file.&nbsp;
+All
+theses files are distributed and normally installed under
+$prefix/shared/dar directory where $prefix is /usr/local by default, or
+else the path given to --prefix=... configure option.<br>
+      <br>
+The discussion here is to show how to use PAR with DAR. Two DUC files
+are available for that. They are intended to be called between slice by
+dar thanks to dar's -E option. the first "dar_par_create.duc" generates
+redundancy files for each slice. Theses files will be required later if
+corruption occurred on a slice. This script is expected to be used when
+creating an archive (-c option or -C option). <br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"><code>dar -c some_archive -E
+"/usr/local/share/dar/samples/dar_par_create.duc %p %b %n %e %c 20" ...
+and
+other options to dar</code><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">The second "dar_par_test.duc",
+tests
+the coherence of the redundancy files together with the slice they
+protect. If a corruption is detected, the scripts asks Parchive to
+repair the slice (thus this will fail on CD-ROM, as the filesystem is
+Read-Only, but we will see further how to fix that). This script is
+also expected to be used as argument to -E option, but this time, when
+testing an archive (dar's -t option), or "diffing" (-d option) an
+archive with a filesystem. <br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"><code>dar -t some_archive -E
+"/usr/local/share/dar/samples/dar_par_test.duc %p %b %n %e %c" ... and
+other
+options to dar</code><br>
+      </div>
+      <br>
+In both previous examples, the %p %b %n %e %c are macro that dar
+replaces respectively by the path, basename, slice number, extension,
+context of the last slice created or the next slice to read depending
+on the operation asked (backup or restore for example). See dar's man
+page and chapter XV of this file below for more. Now, to avoid you
+having to type all theses -E options, a DCF file named "dar_par.dcf" is
+provided. You can thus replace the -E options and arguments by<br>
+      <br>
+&nbsp;&nbsp;&nbsp; <code>-B /usr/local/share/dar/samples/dar_par.dcf</code><br>
+      <br>
+you could thus type<br>
+      <br>
+      <div style="margin-left: 40px;"><code>dar -c some_archive -B
+/usr/local/share/dar/samples/dar_par.dcf ...<br>
+dar -t some_archive -B /usr/local/share/dar/samples/dar_par.dcf ...<br>
+dar -l some_archive -B /usr/local/share/dar/samples/dar_par.dcf ...<br>
+etc.</code><br>
+      </div>
+      <br>
+If you plane to always use Parchive with dar, you can even add "-B
+/usr/local/share/dar/samples/dar_par.dcf" in your $HOME/.darrc file !
+This way,
+dar would always use Parchive (unless -N option is given on
+command-line). here is an example:<br>
+      <br>
+      <div style="margin-left: 40px;"><code>#cat ~/.darrc<br>
+all:<br>
+-B /usr/local/share/dar/samples/dar_par.dcf</code><br>
+      </div>
+      <br>
+&nbsp;... and so on.<br>
+      <div style="text-align: justify;"><br>
+      <br>
+What to do of this extra data files generated by PAR ?<br>
+      <br>
+You can put them after each slice on a CD-R, which requires you to
+adjust the slice size a few megabytes below the size of the CD-R to
+have enough room left to add the extra PAR files. Note that the amount
+of data generated by par depends on the redundancy rate specified on
+command-line (PAR's -r option). You can also gather the PAR data of all
+the slices of your archive and put then on a separated disk. That's up
+to you. <br>
+      <br>
+The problem is when the corrupted slice is on a CD-R and thus cannot be
+repaired in place. You then need to copy it on your hard disk and run
+PAR to repair it. The problem is that with the standard 'cp' command to
+copy the corrupted slice to disk, you will not be able to access the
+data present after the corruption. Thus, you may miss too much data for
+it may be repaired by PAR. To solve this problem, the command 'dar_cp'
+(which is a replacement for 'cp' and which is installed with dar) can
+be used. It will skip over the I/O error and continue the copy with
+good readable data. This way you will only miss the corrupted data,
+which should be most of the time possible to recover thanks to PAR
+redundancy files. <br>
+      <br>
+Once repaired, you can burn it again, but you may rather put symbolic
+links in the directory where resided your repaired slice, each symbolic
+link pointing to the name of the *other* slices on CD-R which are not
+corrupted. Dar must be given a single directory where all slice will be
+fetched. <br>
+&nbsp;<br>
+Let's take an example. You have an archive which basename is 'coucou'
+and which is made of 183 slices of 650 MB each except the last one
+which is only 459 MB.<br>
+      </div>
+      <br>
+Calling<br>
+      <br>
+      <div style="margin-left: 40px;"><code>dar -B
+/usr/local/share/dar/samples/dar_par.dcf -t /mnt/cdrom/coucou</code><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">shows that Parchive detected an
+error on slice 80 but could not repair
+it, as the filesystem (on CD-R) is read-only. Thus, you need to copy it
+on you hard disk for reparation: <br>
+      </div>
+      <br>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar_cp
+/mnt/cdrom/coucou.80.dar /tmp</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+we need also to copy the redundancy files<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar_cp
+/mnt/cdrom/coucou.80.dar.par2 /tmp<br>
+dar_cp /mnt/cdrom/coucou.80.dar.vol000+992.par2 /tmp</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+then we repair it thanks to Parchive:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>cd /tmp<br>
+par2repair coucou.80.dar</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+if this succeeded, then you can burn it back on a new CD-R with all its
+parity files. But you can also, add, beside the coucou.80.dar slice, as
+many symbolic link as there is other slices located on CD: <br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>cd /tmp</code><br>
+      <code>ln -s coucou.1.dar /mnt/cdrom</code><br>
+      <code>ln -s coucou.2.dar /mnt/cdrom</code><br>
+      <code>etc... up to (but except slice 80)</code><br>
+      <code>ln -s coucou.183.dar /mnt/cdrom</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+then you can restore your archive giving /tmp in place of /mnt/cdrom to
+dar:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar -x
+/tmp/coucou -R ... etc.</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+dar will find all slice on CD-R (thanks to the symbolic links we
+created), except for slice 80 which is the repaired one and which dar
+will find on hard disk.<br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h3><a name="XV"></a></h3>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Dar User Command</h3>
+      <div style="text-align: justify;">Since version 1.2.0 dar's user
+can
+make dar calling their commands or scripts between slices, thanks to
+the -E and -F options. To be able to easily share your commands or
+scripts, I propose you the following convention:<br>
+      <br>
+- use the <a href="#XI">".duc" extension</a> to show anyone the
+script/command respect
+the following<br>
+- must be called from dar with the following arguments:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>example.duc
+%p %b %n %e %c [other optional arguments]</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+- must provide brief help on what it does and what are the expected
+arguments, when called without argument. This is the standard "usage:"
+convention.<br>
+      <br>
+Then, any user, could share their "dar user commands" (i.e.: DUC files)
+and don't bother much about how to use them. Moreover it would be easy
+to chain them:<br>
+      <br>
+if for example two persons created their own script, one "burn.duc"
+which burns a slice on CD-R(W) and "par.duc" which makes a Parchive
+redundancy file from a slice, anybody could use both at a time giving
+the following argument to dar:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>-E
+"par.duc %p %b %n %e %c 1 ; burn.duc %p %b %n %e %c"</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+or since version 2.1.0 with the following argument:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>-E
+"par.duc %p %b %n %e %c 1" -E "burn.duc %p %b %n %e %c"</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+of course a script has not to use all its arguments, in the case of
+burn.duc for example, the %c (context) is probably useless, and not
+used inside the script, while it is still possible to give it all the
+"normal" arguments of a DUC file, extra not used argument are simply
+ignored. <br>
+      <br>
+If you have interesting DUC scripts, you are welcome to contact me by
+email, for I add them on the web site and in the following releases.
+For now, check doc/samples directory for a few examples of DUC files.<br>
+      <br>
+Note that starting version 2.1.0, several -B options will be possible,
+each given command will be called in the order of their appearance of
+the corresponding -B option.</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="XVI"></a>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Examples of file filtering</h3>
+      <div style="text-align: justify;">File filtering is what defines
+which
+files are saved, listed, restored, compared, tested, and so on. In
+brief, in the following we will say which file are elected for the
+operated, meaning by "operation", either a backup, a restoration, an
+archive contents listing, an archive comparison, etc. <br>
+      <br>
+File filtering is done using the following options -X, -I, -P, -R,
+-[,&nbsp; -] or -g.<br>
+      <br>
+OK, Let's start with some concretes examples:<br>
+      <code></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar -c
+toto</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+this will backup the current directory and all what is located into it
+to build the toto archive, also located in the current directory.
+Usually you should get a warning telling you that you are about to
+backup the archive itself<br>
+      <br>
+Now let's see something less obvious:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar -c
+toto -R / -g home/ftp</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+the -R option tell dar to consider all file under the / root directory,
+while the <span style="font-style: italic;">-g "home/ftp"</span>
+argument tells dar to restrict the operation only on the <span
+ style="font-style: italic;">home/ftp</span> subdirectory of the given
+root directory thus here /home/ftp.<br>
+      <br>
+But this is a little bit different than the following:<br>
+      <code></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar -c
+toto -R /home/ftp</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+here dar will save any file under /home/ftp without any restriction. So
+what is the difference? Yes, exactly the same files will be saved as
+just above, but the file /home/ftp/welcome.msg for example, will be
+stored as &lt;ROOT&gt;/welcome.msg . Where &lt;ROOT&gt; will be
+replaced by the argument given to -R option (which defaults to "."), at
+restoration or comparison time. While in the previous example the same
+file would have been stored with the following path
+&lt;ROOT&gt;/home/ftp/welcome.msg .<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar -c
+toto -R / -P home/ftp/pub -g home/ftp -g etc</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+as previously, but the -P option make all files under the /home/ftp/pub
+not to be considered for the operation. Additionally the /etc directory
+and its subdirectories are saved. <br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar -c
+toto -R / -P etc/password -g etc</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+here we save all the /etc except the /etc/password file. Arguments
+given to -P can be plain files also. But when they are directory this
+exclusion applies to the directory itself and its contents. Note that
+using -X to exclude "password" does have the same effect: <br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar -c
+toto -R / -X "password" -g etc</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+will save all the /etc directory except any file with name equal to
+"password". thus of course /etc/password will no be saved, but if it
+exists, /etc/rc.d/password will not be saved neither if it is not a
+directory. Yes, if a directory /etc/rc.d/password exist, it will not be
+affected by the -X option. As well as -I option, -X option do not apply
+to
+directories. The reason is to be able to filter some kind of file
+without excluding a particular directory for example you want to save
+all mp3 files and only MP3 files,<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar -c
+toto -R / -I "*.mp3" -I "*.MP3" home/ftp</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+will save any mp3 or MP3 ending files under the /home/ftp directories
+and subdirectories. If instead -I (or -X) applied to directories, we
+would only be able to recurse in subdirectories ending by ".mp3" or
+".MP3". If you had a directory named "/home/ftp/Music" for example,
+full of mp3, you would not have been able to save it.<br>
+      <br>
+Note that the glob expressions (where comes the wild-card '*' '?' and
+so on), can do much more complicated things like "*.[mM][pP]3" you
+could replace the previous example by<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar -c
+toto -R / -I "*.[mM][pP]3" home/ftp</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+this would cover all .mp3 .mP3 .Mp3 and .MP3 files. One step further,
+the <span style="font-weight: bold; font-style: italic;">-acase</span>
+option makes following filtering arguments become case sensitive (which
+is the default), while the -<span
+ style="font-style: italic; font-weight: bold;">ano-case</span> (alias
+      <span style="font-style: italic;">-an</span> in short) set to
+case insensitive mode filters arguments that
+follows it. In shorter we have:<br>
+      <br>
+      <div style="margin-left: 40px;"><code>dar -c toto -R /&nbsp; -an
+-I "*.mp3' home/ftp</code><br>
+      </div>
+      <br>
+Last a very complete example:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"><code>dar -c
+toto -R / -P "*/.mozilla/*/[Cc]ache" -X ".*~" -X ".*~" -I
+"*.[Mm][pP][123]" -g home/ftp -g "fake"</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+so what ?<br>
+      <br>
+OK, here we save all under /h<span style="font-style: italic;">ome/ftp</span>
+and <span style="font-style: italic;">/fake</span> but we do not save
+the contents of "<span style="font-style: italic;">*/.mozilla/*/[Cc]ache</span>"
+like for example "<span style="font-style: italic;">/home/ftp/.mozilla/ftp/abcd.slt/Cache</span>"
+directory and its contents. In theses directories we save any file
+matching "<span style="font-style: italic;">*.[Mm][pP][123]</span>"
+files except those ending by a tilde (~ character), Thus for example
+file which name is "<span style="font-style: italic;">toto.mp3</span>"
+or "<span style="font-style: italic;">.bloup.Mp2</span>" <br>
+      <br>
+Now the inside algorithm:<br>
+      <br>
+&nbsp;a file is elected for operation if<br>
+&nbsp;1 - its name does not match any -X option or it is a directory<br>
+*and*<br>
+&nbsp;2 - if some -I is given, file is either a directory or match at
+least one of the -I option given.<br>
+*and*<br>
+&nbsp;3 - path and filename do not match any -P option <br>
+*and*<br>
+&nbsp;4 - if some non option are given (building a [list of path]) the
+path
+to the file is one of the member of [list of path] or a subdirectory of
+one of path given to a -g options.<br>
+      <br>
+This is the unordered method (<span style="font-style: italic;">-am</span>
+option), since version 2.2.x there is also an
+ordered method which gives even more power to filters, the dar man mage
+will give you all the details.<br>
+      <br>
+In parallel of file filtering, you will find Extended Attributes
+filtering thanks to the -u and -U options (they work the same as -X and
+-I option but apply to EA), you will also find the file compression
+filtering (-Z and -Y options) that defines which file to compress or to
+not compress, here too the way they work is the same as seen with -X
+and -I options, the <span style="font-style: italic;">-ano-case</span>
+/ <span style="font-style: italic;">-acase</span> options do also
+apply here, as well as the -am option. Last all theses filtering (file,
+EA, compression) can also use regular expression in place of glob
+expression (thanks to the <span style="font-style: italic;">-ag</span>
+/<span style="font-style: italic;"> -ar</span> options).<br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="XVII"></a><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Strong encryption</h3>
+      <br>
+      <div style="text-align: justify;">Several cyphers are available.
+Remind that "scrambling" is not a strong encryption cypher, all other
+are.<br>
+      <br>
+to be able to use a strong encrypted archive you need to know the three
+parameters used at creation time:<br>
+      </div>
+      <ul style="text-align: justify;">
+        <li>the cypher used (blowfish, ...)</li>
+        <li>the key or password used</li>
+        <li>the encryption block size used</li>
+      </ul>
+      <div style="text-align: justify;">no information about these
+parameters
+is stored in the generated archive. If you make an error on just one of
+them, you will not be able to use your archive. If you forgot one of
+them, nobody can help you, you can just consider the data in this
+archive as lost. This is the drawback of strong encryption. <br>
+      <br>
+      </div>
+      <h4 style="text-align: justify;">How is it implemented?</h4>
+      <div style="text-align: justify;">To not completely break the
+possibility to directly access file, the archive is&nbsp; not encrypted
+as a
+whole (as would do an external program). The encryption is done block
+of data by block of data. Each block can be decrypted, and if you want
+to read some data somewhere you need to decrypt the whole block(s) it
+is in.<br>
+      <br>
+In consequence, the larger the block size is, the stronger the
+encryption is. But the larger the block size is too, the longer it will
+take to recover an given file, in particular when the file size to
+restore is much smaller than the encryption block size used.<br>
+      <br>
+An encryption block size can range from 10 bytes to 4 GB.<br>
+      <br>
+If encryption is used as well as compression, compression is done
+first, then encryption is done on compressed data.<br>
+      <br>
+An "elastic buffer" is introduced at the beginning and at the end of
+the archive, to protect against plain text attack.&nbsp; The elastic
+buffer
+size randomly varies and is defined at execution time. It is composed
+of random (srand()) values. Two marks characters '&gt;' and '&lt;'
+delimit the size field, which indicate the byte size of the elastic
+buffer. The size field is randomly placed in the buffer. Last, the
+buffer is encrypted with the rest of the data. Typical elastic buffer
+size range from 1 byte to 10 kB, for both initial and terminal elastic
+buffers. <br>
+      <br>
+Elastic buffers are also used inside compression blocks. The underlying
+cypher may not be able to encrypt at the requested block size boundary.
+If necessary a small elastic buffer is appended to the data before
+encryption, to be able, at restoration time, to know the amount of data
+and the amount of noise around it.<br>
+      <br>
+Let's take an example with blowfish. Blowfish encrypts by multiple of 8
+bytes (blowfish chain block cypher). An elastic buffer is always added
+to the data of a encryption block, its minimal size is 1 byte. <br>
+      <br>
+Thus, if you request a encryption block of 3 bytes, theses 3 bytes will
+be padded by an elastic buffer of 5 bytes for theses 8 bytes to be
+encrypted. This will make a very poor compression ratio as only 3 bytes
+on 8 bytes are significant.<br>
+      <br>
+If you request a encryption block of 8 bytes, as there is no room for
+the minimal elastic buffer of 1 byte, a second 8 byte block is used to
+put the elastic buffer, so the real encryption block will be 16 bytes.<br>
+      <br>
+Ideally, a encryption block of 7 bytes, will use 8 bytes with 1 byte
+for
+the elastic buffer.<br>
+      <br>
+This problem tends to disappear when the encryption block size grows,
+so
+this should not be a problem in normal conditions. Encryption block of
+3 bytes is not a good idea to have a strong encryption scheme, for
+information, the default encryption block size is 10kB.<br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="XVIII"></a><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>libdar and thread-safe requirement</h3>
+      <br>
+      <div style="text-align: justify;">This is for those who plane to
+use libdar in their own programs.<br>
+      <br>
+If you plan to have only one thread using libdar there is no problem,
+of course, you will however have to call one of the get_version()
+first, as usual. Thing change if you intend to have several concurrent
+threads using libdar library.<br>
+      <br>
+libdar is thread-safe under certain conditions:<br>
+      <br>
+Several 'configure' options have an impact on thread-safe support:<br>
+      <br>
+--enable-test-memory is a debug option that avoid libdar to be
+thread-safe,&nbsp; so don't use it.<br>
+--enable-special-alloc (set by default), makes a thread-safe library
+only if POSIX mutex are available (pthread_mutex_t type).<br>
+--disable-thread-safe avoid looking for mutex, so unless
+--disable-special-alloc is also used, the generated library will not be
+thread safe.<br>
+      <br>
+You can check the thread safe capability of a library thanks to the
+get_compile_time_feature(...) call from the API. Or use 'dar -V'
+command, to&nbsp; quickly have the corresponding values and check using
+'ldd' to see which library has been dynamically linked to dar, if
+applicable.<br>
+      <br style="font-weight: bold; text-decoration: underline;">
+      <span style="font-weight: bold; text-decoration: underline;">IMPORTANT:</span><br>
+As more as before it is mandatory to call get_version() call before any
+other call, when the call returns, libdar is ready for thread safe.
+Note that even if the prototype does not change get_version() *may* now
+throw an exception, so use get_version_noexcept() if you don't want to
+manage exceptions.<br>
+      <br>
+For more information about libdar and its API, check the <a
+ href="api_tutorial.html">doc/api_tutorial.html</a> document
+and the API reference manual under <a href="man/index.html">doc/html/index.html</a><br>
+      <br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<hr style="width: 100%; height: 2px;"><a name="XIX"></a>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Dar_manager and delete files</h3>
+      <br>
+      <div style="text-align: justify;">This is for further reference
+and explanations.<br>
+      <br>
+In dar archive when a file has been deleted since the backup of
+reference (in case of differential archive), an entry of a special type
+(called "detruit") is put in the catalogue of the archive which only
+contains the name of the missing file. <br>
+      <br>
+In a dar_manager database, to each files that have been found in one of
+the archive used to build this database corresponds a list of
+association. This associations put in relation the mtime (date of
+modification of the file) to the archive number where the file has been
+found in that state. <br>
+      <br>
+There is thus no way to record "detruit" entries in a dar_manager
+database, as no date is associated with it. Yes, in a dar archive, we
+can only notice a file has been destroyed because it is not present in
+the filesystem but is present in the catalogue of the archive of
+reference. Thus we know the file has been destroyed between the date
+the archive of reference has been done and the date the current archive
+is actually done. Unfortunately, no date is recorded in dar archives
+telling it has been done at which time.<br>
+      <br>
+From dar_manager, inspecting a catalogue, there thus is no way to give
+a significant date to a "detuit" entry. In consequences, for a given
+file which has been removed, then recreated, then removed again along a
+series of differential backups, it is not possible to order the times
+when this file has been removed in the series of date when it has
+existed. <br>
+      <br>
+The ultimate consequence is that if the user asks dar_manager to
+restore a directory in the state just before a given date (-w option),
+it will not be possible to know if that file existed at that time. We
+can effectively see that it was not present in a given archive but as
+we don't know the date of that archive we cannot determine if it is
+before of after the date requested by the user, and dar_manager is not
+able to restore the non existence of a file for a given time, we must
+use dar directly with the archive that has been done at the date we
+wish. <br>
+      <br>
+Note that having a date stored in each dar archive would not solve the
+problem without some more informations. First, we should assume that
+the date is consistent from host to host and from time to time (What is
+the user change of time due to daylight saving or move around the
+Earth, or if two users in two different places share a filesystem ---
+with rsync, nfs, or other mean --- and do backups alternatively...).
+Let's assume the system time is significant and thus let's imagine
+what would the matter if in each archive this date of archive
+construction was stored. <br>
+      <br>
+Then when a detruit object is met in an archive it can be given the
+date the archive has been built and thus ordered in the series of dates
+when the corresponding file was found in other archives. So when the
+user asks for restoration at of a directory a given file's state is
+possible to know, and thus the restoration of the corresponding archive
+will do what we expect : either remove the file (if the selected backup
+contains an&nbsp; "detruit" object, or&nbsp; restore the file in the
+state it
+had).<br>
+      <br>
+Suppose now, a dar_manager database built with a series of full backup.
+There will thus no be any "detruit" objects, but a file may be present
+or may be missing in a given archive. The solution is thus that once an
+archive has been integrated in the database, the last step is to scan
+the whole database for files that have no date associated with this
+last archive, thus we can assume theses files were not present and add
+the date of the archive creation with the information that this file
+was removed at that time. Moreover, if the last archive add a file
+which was not know in archives already present in the database, we must
+consider this file was deletes in each of theses previous archives, but
+then we must record the dates of creation for all theses previous
+archive to be able to put this information properly in the database.
+But, in that case we would not be able to make dar remove a file, as no
+"detruit" object exist (all archive are full backups), and dar_manager
+should remove itself the entry from the filesystem. Beside the fact
+that it is not the role to dar_manager to directly interact with the
+filesystem, dar_manager should record an additional information to know
+if a file is deleted because it has been found a "detruit" object in an
+archive, or if it is deleted because it has not been found any entry in
+an given archive. This is necessary to known whether to rely on dar to
+remove the file or to make dar_manager do it itself, or maybe better is
+to never rely on dar to remove a file but always let dar_manager do it
+itself. <br>
+      <br>
+Assuming we accept to make dar_manager able to rm entries from
+filesystem without relying on dar, we must store the date of the
+archive creation in each archive, and store theses dates for each
+archive in dar_manager databases. Then instead of using the mtime of
+each file, we could do something much more simple in database: for each
+file, record if it was present or not in each archive used to built the
+database, and beside this, store only the archive creation date of each
+archive. This way, dar_manager would only have for each file to take
+the last state of the file (deleted or present) before the given date
+(or the last known state if no date is given) and either restore the
+file from the corresponding archive or remove it.<br>
+      <br>
+But if a user has removed a file by accident and only notice this
+mistake after several backups, it would become painful to restore this
+file, as the user should find manually at which date it was present to
+be able to feed dar_manager with the proper -w option, this worse than
+looking for the last archive that has the file we look for.<br>
+      <br>
+Here we are back to the restoration of a file and the restoration of a
+state. By state, I mean the state a directory tree had at a given time,
+like a photo. In its original version dar_manager was aimed to restore
+files, whatever they exist or not in the last archive added to a
+database. It only finds the last archive where the file is present.
+Making dar_manager restore a state, and thus considering files that
+have been removed at a given date, is no more no less than restoring
+from a given archive, directly with dar. So all this discussion about
+the fact that dar_manager is not able to handle files that have been
+removed, to arrive to the fact that adding this feature to dar_manager
+will make it become quite useless... sight. But, that was necessary. </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><a name="XX"></a><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Native Language Support / gettext / libintl</h3>
+      <br>
+      <div style="text-align: justify;">Native Language Support (NLS)
+is the fact a given program can display
+its messages in different languages. For dar, this is implemented using
+the gettext tools. This tool must be installed on the system for dar
+can be able to display messages in another language than English.&nbsp;
+      <br>
+      <br>
+Things are the following:<br>
+- On a system without gettext dar will not use gettext at all. All
+messages will be in English (OK maybe better saying Frenglish) ;-)<br>
+- On a system with gettext dar will use the system's gettext, unless
+you use --disable-nls option with the configure script.<br>
+      <br>
+If NLS is available you just have to set the LANG environment variable
+to your locale settings to change the language in which dar displays
+its messages (see ABOUT-NLS for more about the LANG variable).<br>
+      <br>
+just for information, gettext() is the name of the call that makes
+translations of string in the program. This call is implemented in the
+library called 'libintl' (intl for Internationalization). Last point,
+gettext by translating strings, makes the Native Language Support (NLS)
+possible, in other words, it let you have the messages of your
+preferred&nbsp; programs being displayed in you native language for
+those
+not having the English as mother tong. <br>
+      <br>
+This was necessary to say, because you may miss the links between
+"gettext" , "libintl" and "NLS".<br>
+      <br>
+READ the ABOUT-NLS file at the root of the source package to learn more
+about
+the way to display dar's messages in your own language. Note that not
+all languages are yet supported, this is up to you to send me a
+translation in your language and/or contact a translating team as
+explained in ABOUT-NLS.<br>
+      <br>
+To know which languages are supported by dar, read the po/LINGUAS file
+and check out for the presence of the corresponding *.po files in this
+directory. </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<br>
+</body>
+</html>

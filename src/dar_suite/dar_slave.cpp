@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.28.2.2 2005/03/13 20:07:49 edrusb Rel $
+// $Id: dar_slave.cpp,v 1.33 2006/01/08 16:33:42 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -64,7 +64,7 @@ char *strchr (), *strrchr ();
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.3.1"
+#define DAR_SLAVE_VERSION "1.3.2"
 
 static bool command_line(user_interaction & dialog,
 			 S_I argc, char *argv[], path * &chemin, string & filename,
@@ -93,7 +93,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const 
         sar *source = NULL;
         try
         {
-            source = new sar(dialog, filename, EXTENSION, SAR_OPT_DONT_ERASE, *chemin, execute);
+            source = new sar(dialog, filename, EXTENSION, *chemin, execute);
             if(source == NULL)
                 throw Ememory("little_main");
 
@@ -211,12 +211,13 @@ static bool command_line(user_interaction & dialog,
     }
 
     tools_split_path_basename(argv[optind], chemin, filename);
+    tools_check_basename(dialog, *chemin, filename, EXTENSION);
     return true;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_slave.cpp,v 1.28.2.2 2005/03/13 20:07:49 edrusb Rel $";
+    static char id[]="$Id: dar_slave.cpp,v 1.33 2006/01/08 16:33:42 edrusb Rel $";
     dummy_call(id);
 }
 

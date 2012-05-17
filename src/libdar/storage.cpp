@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.cpp,v 1.14.2.1 2005/03/13 20:07:53 edrusb Rel $
+// $Id: storage.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -59,7 +59,7 @@ namespace libdar
                 while(lu < ptr->size && tmp != 0);
 
                 if(lu < ptr->size)
-                    throw Erange("storage::storage", gettext("Not enought data to initialize storage field"));
+                    throw Erange("storage::storage", gettext("Not enough data to initialize storage field"));
                 ptr = ptr->next;
             }
         }
@@ -396,7 +396,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: storage.cpp,v 1.14.2.1 2005/03/13 20:07:53 edrusb Rel $";
+        static char id[]="$Id: storage.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -790,7 +790,7 @@ namespace libdar
     {
         E_BEGIN;
         if(ref == NULL || ref->first == NULL)
-            throw Erange("storage::iterator::get_position", gettext("Reference storage of the iterator is empty or non existant"));
+            throw Erange("storage::iterator::get_position", gettext("Reference storage of the iterator is empty or non existent"));
 
         struct cellule *p = ref->first;
         infinint ret = 0;

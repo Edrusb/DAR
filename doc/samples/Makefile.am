@@ -1,11 +1,13 @@
-dist_noinst_DATA = cdbackup.sh darrc_sample sample1.txt dar_par.dcf README pause_every_n_slice.duc automatic_backup automatic_backup.txt dar_backup dar_rqck.bash JH-dar-make_user_backup.sh JH-readme.txt  JH_dar_archiver.options JH_darrc cluster_digital_backups.sh cluster_digital_readme.txt
-dist_pkgdata_SCRIPTS = dar_par_create.duc dar_par_test.duc
-install-data-local:
-	mkdir -p $(DESTDIR)$(pkgdatadir)
-	sed -e "s%SOMEPATH%$(pkgdatadir)%g" dar_par.dcf > $(DESTDIR)$(pkgdatadir)/dar_par.dcf
-	chmod 0644 $(DESTDIR)$(pkgdatadir)/dar_par.dcf
+SAMPLES = cdbackup.sh darrc_sample sample1.txt  README pause_every_n_slice.duc automatic_backup automatic_backup.txt dar_backup dar_rqck.bash JH-dar-make_user_backup.sh JH-readme.txt  JH_dar_archiver.options JH_darrc cluster_digital_backups.sh cluster_digital_readme.txt index.html dar_par_create.duc dar_par_test.duc
+dist_noinst_DATA = $(SAMPLES) dar_par.dcf
 
+
+install-data-hook:
+	$(INSTALL) -d $(DESTDIR)$(pkgdatadir)/samples
+	sed -e "s%SOMEPATH%$(pkgdatadir)/samples%g" dar_par.dcf > $(DESTDIR)$(pkgdatadir)/samples/dar_par.dcf
+	chmod 0644 $(DESTDIR)$(pkgdatadir)/samples/dar_par.dcf
+	$(INSTALL) -m 0644 $(SAMPLES) $(DESTDIR)$(pkgdatadir)/samples
 
 uninstall-local:
-	rm $(DESTDIR)$(pkgdatadir)/dar_par.dcf
+	rm -rf $(DESTDIR)$(pkgdatadir)/samples
 

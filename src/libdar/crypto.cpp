@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: crypto.cpp,v 1.11.2.3 2005/03/19 19:49:00 edrusb Rel $
+// $Id: crypto.cpp,v 1.12.2.1 2006/02/04 14:47:15 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -86,7 +86,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: crypto.cpp,v 1.11.2.3 2005/03/19 19:49:00 edrusb Rel $";
+        static char id[]="$Id: crypto.cpp,v 1.12.2.1 2006/02/04 14:47:15 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -162,9 +162,9 @@ namespace libdar
 
     U_32 blowfish::decrypt_data(const infinint & block_num, const char *crypt_buf, const U_32 crypt_size, char *clear_buf, U_32 clear_size)
     {
+#if CRYPTO_AVAILABLE
 	unsigned char ivec[8];
 
-#if CRYPTO_AVAILABLE
 	make_ivec(block_num, ivec);
 	BF_cbc_encrypt((const unsigned char *)crypt_buf, (unsigned char *)clear_buf, crypt_size, &clef, ivec, BF_DECRYPT);
 

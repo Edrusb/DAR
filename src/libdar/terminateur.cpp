@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.12.2.1 2005/02/06 18:30:58 edrusb Rel $
+// $Id: terminateur.cpp,v 1.14 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -84,7 +84,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: terminateur.cpp,v 1.12.2.1 2005/02/06 18:30:58 edrusb Rel $";
+        static char id[]="$Id: terminateur.cpp,v 1.14 2005/12/29 02:32:41 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -134,7 +134,7 @@ namespace libdar
         }
         catch(Erange &e)
         {
-            throw Erange("terminateur::get_catalogue", gettext("Badly formated terminator, cannot extract catalogue location"));
+            throw Erange("terminateur::get_catalogue", gettext("Badly formatted terminator, cannot extract catalogue location"));
         }
 
             // reading and returning the position

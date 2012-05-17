@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.hpp,v 1.14 2004/10/30 22:26:50 edrusb Rel $
+// $Id: command_line.hpp,v 1.24 2005/12/13 20:54:45 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -32,11 +32,13 @@
 #include "compressor.hpp"
 #include "mask.hpp"
 #include "path.hpp"
+#include "catalogue.hpp"
+#include "archive.hpp"
 
 using namespace std;
 using namespace libdar;
 
-enum operation { noop, extract, create, diff, test, listing, isolate };
+enum operation { noop, extract, create, diff, test, listing, isolate, merging };
     // noop stands for no-operation. get_args() never returns such value,
     // it is just necessary within the command_line module
 
@@ -50,11 +52,12 @@ extern bool get_args(user_interaction & dialog,
                      bool & allow_over, bool & warn_over, bool & info_details,
                      compression & algo, U_I & compression_level,
                      bool & detruire,
-                     bool & pause, bool & beep,
+                     infinint & pause,
+		     bool & beep,
                      bool & make_empty_dir, bool & only_more_recent,
-                     bool & ea_root, bool & ea_user,
+                     mask * & ea_mask,
                      string & input_pipe, string & output_pipe,
-                     bool & ignore_owner,
+                     inode::comparison_fields & what_to_check,
                      string & execute, string & execute_ref,
                      string & pass, string & pass_ref,
                      mask * & compress_mask,
@@ -69,8 +72,20 @@ extern bool get_args(user_interaction & dialog,
 		     string * & on_fly_filename,
 		     bool & alter_atime,
 		     bool & same_fs,
+		     bool & snapshot,
+		     bool & cache_directory_tagging,
 		     U_32 & crypto_size,
-		     U_32 & crypto_size_ref);
+		     U_32 & crypto_size_ref,
+		     bool & ea_erase,
+		     bool & display_skipped,
+		     archive::listformat & list_mode,
+		     path * & aux_root,
+		     string * & aux_filename,
+		     string & aux_pass,
+		     string & aux_execute,
+		     U_32 & aux_crypto_size,
+		     bool & keep_compressed,
+		     infinint & fixed_date);
 
 
 #endif

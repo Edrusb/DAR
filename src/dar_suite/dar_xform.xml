@@ -11,7 +11,7 @@
 <!ATTLIST hdr
   vspace CDATA #IMPLIED>
 <!ELEMENT arg (desc)>
-<!ATTLIST arg 
+<!ATTLIST arg
   vspace CDATA #IMPLIED
   flag 	 CDATA #IMPLIED
   opt  	 CDATA #IMPLIED
@@ -26,12 +26,17 @@
 
   <arg vspace="1" flag=" ">
     <desc>
-        the first non options argument is the name of the archive to read while the
-	second non option argument is the name of the new archive to create. Both are mandatory.
+        the first non options argument is the archive to read
     </desc>
   </arg>
 
-  <hdr vspace="1">options:</hdr>
+  <arg vspace="1" flag=" ">
+     <desc>
+        the second non option argument is the archive to create
+     </desc>
+  </arg>
+
+  <hdr vspace="1">Common options:</hdr>
 
   <arg flag="-h">
     <desc>
@@ -53,13 +58,13 @@
 
   <arg flag="-S" repl="integer">
     <desc>
-      first file size (if different from following ones) -- requires -s
+      first file size
     </desc>
   </arg>
 
   <arg flag="-p">
     <desc>
-      pauses before writing to a new file -- requires -s
+      pauses before writing to a new file
     </desc>
   </arg>
 
@@ -72,8 +77,6 @@
   <arg flag="-w">
     <desc>
        don't warn before overwriting files
-       <p/> 
-       by default overwriting is allowed but a warning is issued first
     </desc>
   </arg>
 
@@ -85,13 +88,31 @@
 
   <arg flag="-E" repl="string">
     <desc>
-       command line to execute between slices of destination archive
+       command to execute between slices of destination archive
     </desc>
   </arg>
 
   <arg flag="-F" repl="string">
     <desc>
-       command line to execute between slice of source archive
+       command to execute between slice of source archive
+    </desc>
+  </arg>
+
+  <arg flag="-aSI">
+    <desc>
+      slice size suffixes k, M, T, G, etc. are power of 10
+    </desc>
+  </arg>
+
+  <arg flag="-abinary">
+    <desc>
+      slice size suffixes k, M, T, G, etc. are power of 2
+    </desc>
+  </arg>
+
+  <arg flag="-j">
+    <desc>
+        ask user what to do when memory is exhausted
     </desc>
   </arg>
 
@@ -99,7 +120,7 @@
     See man page for more details.
   </hdr>
 <!--
-$Id: dar_xform.xml,v 1.4 2003/02/07 07:10:25 edrusb Stab $
+$Id: dar_xform.xml,v 1.6 2004/12/01 22:10:44 edrusb Rel $
 
 Revision 1.3  2002/08/20 13:44:08  cs1cwm
 Added DTD and removed the #ifdef and #endif.

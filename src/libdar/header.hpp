@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.hpp,v 1.8 2004/11/07 18:21:38 edrusb Rel $
+// $Id: header.hpp,v 1.9 2006/01/08 16:33:42 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -27,8 +27,8 @@
     /// \ingroup Private
 
 
-#ifndef HEADER_H
-#define HEADER_H
+#ifndef HEADER_HPP
+#define HEADER_HPP
 
 #include "../my_config.h"
 #include "infinint.hpp"

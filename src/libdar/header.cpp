@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.cpp,v 1.15 2005/01/28 23:27:57 edrusb Rel $
+// $Id: header.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -74,7 +74,7 @@ namespace libdar
             size_ext = infinint(f.get_gf_ui(), NULL, &f);
             break;
         default :
-            throw Erange("header::read", gettext("Badly formated SAR header"));
+            throw Erange("header::read", gettext("Badly formatted SAR header"));
         }
     }
 
@@ -113,7 +113,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: header.cpp,v 1.15 2005/01/28 23:27:57 edrusb Rel $";
+        static char id[]="$Id: header.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $";
         dummy_call(id);
     }
 

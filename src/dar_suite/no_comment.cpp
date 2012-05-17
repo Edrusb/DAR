@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: no_comment.cpp,v 1.9.2.1 2005/02/06 20:49:13 edrusb Rel $
+// $Id: no_comment.cpp,v 1.10 2005/02/22 17:59:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -30,7 +30,7 @@ using namespace libdar;
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: no_comment.cpp,v 1.9.2.1 2005/02/06 20:49:13 edrusb Rel $";
+    static char id[]="$Id: no_comment.cpp,v 1.10 2005/02/22 17:59:21 edrusb Rel $";
     dummy_call(id);
 }
 

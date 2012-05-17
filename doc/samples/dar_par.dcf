@@ -10,7 +10,7 @@ create:
 # adjust it to your needs
 
 test:
-        -R "SOMEPATH/dar_par_test.duc %p %b %n %e %c"
+        -E "SOMEPATH/dar_par_test.duc %p %b %n %e %c"
 
 # note, that you may need to set the path to dar_par_test.duc
 # and dar_par_create.duc

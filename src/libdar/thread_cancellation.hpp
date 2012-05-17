@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: thread_cancellation.hpp,v 1.1.2.1 2005/05/06 10:56:41 edrusb Rel $
+// $Id: thread_cancellation.hpp,v 1.5.2.1 2006/02/04 14:47:15 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -49,6 +49,8 @@ extern "C"
 #define pthread_t U_I
 #endif
 }
+#include <list>
+#include "integers.hpp"
 
 namespace libdar
 {
@@ -69,11 +71,23 @@ namespace libdar
 	    /// the constructor
 	thread_cancellation();
 
+	    /// the destructor
+	virtual ~thread_cancellation();
+
 	    /// the checkpoint where is seen whether the current libdar call must abort
 
 	    /// \exception Euser_abort is thrown if the thread the checkpoint is running
 	    /// from is marked as to be canceled.
 	void check_self_cancellation() const;
+
+	    /// by default delayed (non immediate) cancellation generate an specific exception
+	    /// it is possible for delayed cancellation only, do block such exceptions for a certain time
+
+	    ///\param[in] mode can be set to true to block delayed cancellations
+	    ///\note when unblocking delayed cancellations, if a delayed cancellation has been
+	    ///requested during the ignore time, it will be thrown by this call
+	void block_delayed_cancellation(bool mode);
+
 
 	    /// mandatory initialization static method
 
@@ -83,30 +97,58 @@ namespace libdar
 	    /// marks the thread given in argument as to be canceled
 
 	    //! \param[in] tid the thread ID of the thread where any libdar call must abort
-	    //! \return true if no already pending thread cancellation is under process
-	static bool cancel(pthread_t tid);
+	    //! \param[in] x_immediate whether the cancellation must be as fast as possible or can take a
+	    //! \param[in] x_flag is a value to transmit to the Ethread_cancel exception used to cancel libdar's call stack
+	    //! little time to make a usable archive
+	static void cancel(pthread_t tid, bool x_immediate, U_64 x_flag);
 
-	    /// gives the thread ID of the current thread in cancellation process
+	    /// gives the cancellation status of the given thread ID
 
-	    //! \param[out] tid the tid of the current thread under cancellation
-	    //! \return true if a current thread is waited
-	    //! to be canceled, and then gives its tid in argument.
-	static bool current_cancel(pthread_t & tid);
+	    //! \param[in] tid the thread to check
+	    //! \return true if the given thread is under cancellation
+	static bool cancel_status(pthread_t tid);
 
 	    /// abort the pending thread cancellation
 
 	    /// \return true if the pending thread was still running and
 	    /// false if it has already aborted.
-	static bool clear_pending_request();
+	static bool clear_pending_request(pthread_t tid);
+
+	    /// method for debugging/control purposes
+	static U_I count()
+	{
+#if MUTEX_WORKS
+	    return info.size();
+#else
+	    return 0;
+#endif
+	};
 
 #if MUTEX_WORKS
     private:
-	pthread_t tid;                         ///< thread id of the current thread
 
-	static bool cancellation;               ///< true if a thread has to be canceled
-	static pthread_t to_cancel;            ///< thread to cancel
-	static pthread_mutex_t access;         ///< mutex for the access to "to_cancel"
+	    // class types
+
+	struct fields
+	{
+	    pthread_t tid;             ///< thread id of the current thread
+	    bool block_delayed;        ///< whether we buffer any delayed cancellation requests for "this" thread
+	    bool immediate;            ///< whether we take a few more second to make a real usable archive
+	    bool cancellation;         ///< true if a thread has to be canceled
+	    U_64 flag;                 ///< user defined informational field, given to the Ethread_cancel constructor
+	};
+
+	    // object information
+
+	fields status;
+
+	    // class's static variables and types
+
+	static pthread_mutex_t access;         ///< mutex for the access to "info"
 	static bool initialized;               ///< true if the mutex has been initialized
+	static std::list<thread_cancellation *> info;  ///< list of all object
+	static std::list<fields> preborn;      ///< canceled thread that still not have a thread_cancellation object to deal with cancellation
+
 #endif
     };
 

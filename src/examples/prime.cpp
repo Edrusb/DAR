@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: prime.cpp,v 1.7.6.1 2005/03/19 19:48:58 edrusb Rel $
+// $Id: prime.cpp,v 1.8 2005/04/09 21:43:34 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -72,6 +72,6 @@ int little_main(user_interaction & ui, S_I argc, char *argv[], const char **env)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: prime.cpp,v 1.7.6.1 2005/03/19 19:48:58 edrusb Rel $";
+    static char id[]="$Id: prime.cpp,v 1.8 2005/04/09 21:43:34 edrusb Rel $";
     dummy_call(id);
 }

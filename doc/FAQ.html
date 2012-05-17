@@ -1,0 +1,1187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=us-ascii" http-equiv="content-type">
+  <title>DAR - Frequently Asked Questions</title>
+</head>
+<body
+ style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);"
+ link="#0000ff" vlink="#000055" alink="#ff0000">
+<div style="text-align: center;">
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 161px;"><a
+ href="index.html"><img
+ style="border: 0px solid ; width: 160px; height: 120px;"
+ alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
+      </td>
+      <td style="vertical-align: top;">
+      <h1 style="text-align: center;"><br>
+      </h1>
+      <h1 style="text-align: center;">DAR's - Frequently Asked Questions</h1>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <div style="text-align: left;">
+      <h2 style="text-decoration: underline;">Questions:</h2>
+      <a href="#A1"><span style="font-style: italic; font-weight: bold;">I
+restore/save all files but dar reported some files have been ignored,
+what are those ignored files?</span></a><br>
+      <span style="font-weight: bold; font-style: italic;"><a href="#A2">Dar
+hangs when using it with pipes, why?</a><br>
+      </span> <a href="#A3"><span
+ style="font-weight: bold; font-style: italic;">Why, when I restore 1
+file, dar report 3 files have been restored?</span></a><br>
+      <a style="font-style: italic; font-weight: bold;" href="#libattr">While
+compiling dar I get the following message : " g++: /lib/libattr.a: No
+such file or directory", what can I do?</a><br>
+      <a href="#A4"><span style="font-weight: bold; font-style: italic;">I
+cannot find the binary package for my distro, where to look for?</span></a><br>
+      <span style="font-weight: bold; font-style: italic;"><a href="#A5">Why,
+does dar reports "ignored" files while I make a backup without
+filter?</a><br>
+      </span><span style="font-weight: bold; font-style: italic;"><a
+ href="#A6">Can I
+use different filters between a full backup and a
+differential backup? Would not dar consider some file not included in
+the filter to be deleted?</a><br>
+      </span> <a href="#A7"><span
+ style="font-weight: bold; font-style: italic;">Once in action dar
+makes all the system slower and slower, then it stops with the message
+"killed"! How to overcome this problem?</span></a><br>
+      <span style="font-weight: bold; font-style: italic;"><a href="#A8">I
+have a backup I want to change the size of slices?</a><br>
+      </span> <span style="font-weight: bold; font-style: italic;"><a
+ href="#A9">I have
+a backup in one slice, how can I split it in several
+slices?</a><br>
+      </span> <span style="font-weight: bold; font-style: italic;"><a
+ href="#A10">I
+have a backup in several slice, how can I stick all them
+in a single file?</a><br>
+      </span> <span style="font-weight: bold; font-style: italic;"><a
+ href="#A11">I
+have a backup, how can I change its encryption scheme?</a><br>
+      </span> <span style="font-weight: bold; font-style: italic;"><a
+ href="#A12">I
+have a backup, how can I change its compression
+algorithm?</a><br>
+      </span><a href="#A13"><span
+ style="font-weight: bold; font-style: italic;"><span
+ style="font-weight: bold; font-style: italic;">Which
+options can I use with which options?</span></span></a><br>
+      <a style="font-style: italic; font-weight: bold;" href="#A14">Why
+dar reports corruption for the archive I have transfered with FTP ?</a><br>
+      <a href="#A13"><span
+ style="font-weight: bold; font-style: italic;"> </span></a><br>
+      <h2><span style="text-decoration: underline;">Answers:</span><br>
+      </h2>
+      <span style="font-style: italic; font-weight: bold;"><a name="A1"
+ id="A1"></a> I restore/save all files but dar reported some files have
+been ignored, what are those ignored files?</span> </div>
+      <div style="text-align: justify;"> When restoring/saving, all
+files are
+considered by default. But if you specify some files to restore or
+save, all other files are "ignored", this is the case when using -P -X
+-I or -g.<br>
+      </div>
+      <br>
+      <span style="font-weight: bold; font-style: italic;"><a name="A2"
+ id="A2"></a>Dar hangs when using it with pipes, why?</span><br>
+      <div style="text-align: justify;">Dar can produce archive on its
+standard output, if you give '-' as
+basename. But it cannot read an archive from its standard input. To
+feed an archive to dar through pipes, you need dar_slave and two pipes.
+The first pipe transmits orders from dar to dar_slave that tell
+dar_slave the requested portion of the archive, the second pipe goes
+the other way and carries from dar_slave the data requested by dar.
+This way, only needed data get transmitted over pipes, which cannot be
+possible with a single pipe.<br>
+      </div>
+      <br style="font-weight: bold; font-style: italic;">
+      <span style="font-weight: bold; font-style: italic;"><a name="A3"
+ id="A3"></a>Why, when I restore 1 file, dar report 3 files have been
+restored?</span><br>
+      <div style="text-align: justify;">if you restore for example the
+file usr/bin/emacs dar will first
+restore usr (if the directory already exists, it will get its date and
+ownership restored, all existing files will be preserved), the /usr/bin
+is restored, then usr/bin/emacs is restored. Thus 3 inodes have been
+restored or modified while only one file has been asked for restoration.<br>
+      </div>
+      <br>
+      <span style="font-weight: bold; font-style: italic;"><a
+ name="libattr"></a>While compiling dar I get the following message : "
+g++: /lib/libattr.a: No such file or directory", what can I do?</span><br>
+      <div style="text-align: justify;">The problem comes from an
+incoherence in your distro (Redhat and Slackware seem(ed) concerned at
+least): Dar (Libtool) finds
+/usr/lib/gcc-lib/i386-redhat-linux/3.3.3/../../../libattr.la&nbsp; file
+to link with. This file defines where is located libattr static and
+dynamic libraries but in this file both static and dynamic libraries
+are expected to be found under /lib. While the dynamic libattr is
+there,&nbsp; the static version has been moved to /usr/lib. A
+workaround is to make a symbolic link:<br>
+      <br>
+      <div style="margin-left: 40px;"><code>ln -s /usr/lib/libattr.a
+/lib/libattr.a</code><br>
+      </div>
+      </div>
+      <br>
+      <br style="font-weight: bold; font-style: italic;">
+      <span style="font-weight: bold; font-style: italic;"><a name="A4"
+ id="A4"></a>I cannot find the binary package for my distro, where to
+look for?</span><br>
+      <div style="text-align: justify;">For any binary package, ask
+your distro maintainer to include dar (if
+not already done), and check on the web site of your preferred distro
+for a dar package<br>
+      </div>
+      <br style="font-weight: bold; font-style: italic;">
+      <span style="font-weight: bold; font-style: italic;"><a name="A5"
+ id="A5"></a>Why, does dar reports "ignored" files while I make a
+backup without filter?</span><br>
+      <div style="text-align: justify;">If you give to dar an argument
+which is not an option, up to version
+2.2.x it is interpreted as "to save that file only". Let's take an
+example:<br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"> <code>dar -c my-files -y -s
+2045M data</code><br>
+      </div>
+      <br>
+reports<br>
+      <br>
+      <div style="margin-left: 40px;"> <code>--------------------------------------------<br>
+31754 inode(s) saved<br>
+with 0 hard link(s) recorded<br>
+0 inode(s) not saved (no file change)<br>
+0 inode(s) failed to save (filesystem error)<br>
+-&gt; 147 files(s) ignored (excluded by filters)<br>
+0 files(s) recorded as deleted from reference backup<br>
+--------------------------------------------</code><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">the 147 files are due to the
+fact dar has excluded 147 files and
+directories which are not "data" in the current directory. Note also
+that the use arguments out of options like "data" is deprecated since
+version 2.2.0, you would rather use -g option:<br>
+      </div>
+      <br>
+      <div style="margin-left: 40px;"> <code>dar -c my-files -y -s
+2045M -g
+data</code><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">In version 2.3.x such arguments
+which are not options will have another
+meaning. Note that starting version 2.3.x the option -vs will report
+those entry
+that are skipped. </div>
+      <br>
+      <br>
+      <span style="font-style: italic; font-weight: bold;"><a name="A6"
+ id="A6"></a>Can I use different filters between a full backup and a
+differential backup? Would not dar consider some file not included in
+the filter to be deleted?</span><br>
+      <div style="text-align: justify;">Yes, you can. No, there is no
+risk to have dar deleting the files that
+were not selected for the differential backup. Here is the way dar
+works:<br>
+      </div>
+      <br>
+      <div style="text-align: justify;">During a backup process, when a
+file is ignored due to filter
+exclusion, an "ignored" entry is added to the catalogue however. At the
+end of the backup, dar compares both catalogues the one of reference
+and the new one built during the backup process, and adds a "detruit"
+(destroyed in English) entry, when an entry of the reference is not
+present in the new catalogue. Thus, if an "ignored" is present no
+"detruit" will be added for that name. Then all "ignored" entries are
+removed and the catalogue is dumped in the archive.<br>
+      </div>
+      <br>
+      <a name="A7" id="A7"></a><br>
+      <span style="font-weight: bold; font-style: italic;">Once in
+action dar
+makes all the system slower and slower, then it stops with the message
+"killed"! How to overcome this problem?</span><br>
+      <div style="text-align: justify;">Dar needs virtual memory to
+work. Virtual memory is the RAM + SWAP
+space. Dar memory requirement grows with the amount of file saved, not
+with the amount of data saved. If you have a few huge files you will
+have little chance to see any memory limitation problem. At the
+opposite, saving a plethora of files (either big or small), will make
+dar request a lot of virtual memory. Dar needs this memory to build the
+catalogue (the contents) of the archive it creates. Same thing, for
+differential backup, except it also needs to load in memory the
+catalogue of the archive of reference, which most of the time will make
+dar using twice more memory when doing a differential backup than a
+full backup.<br>
+      </div>
+      <br>
+      <div style="text-align: justify;">Anyway, the solution is:<br>
+      </div>
+      <ol style="text-align: justify;">
+        <li>Read the doc/LIMITATIONS file to understand the problem and
+be
+aware of the limitations you will bring at step 3, bellow.</li>
+        <li>If you can, add swap space to your system (under Linux, you
+can
+either add a swap partition or a swap file, which is less constraining
+but also a bit less impressive). Bob Barry provided a script that can
+give you a raw estimation of the required virtual memory
+(doc/samples/dar_rqck.bash).</li>
+        <li>If this is not enough, or if you don't want/can add swap
+space,
+recompile dar giving --enable-mode=64 argument to the configure script.</li>
+        <li>If this not enough, and you have some money, you can add
+some RAM
+on you system</li>
+        <li>If all that fails, ask for support on the dar-support
+mailing-list.</li>
+      </ol>
+      <div style="text-align: justify;">There is still a workaround
+which is to make several smaller archives
+of the files to backup. For example, make a backup for all in
+/usr/local another for all in /var and so on. Theses backup can be full
+or differential. The drawback is not big as you can store theses
+archive side by side and use them at will. Moreover, you can feed a
+unique dar_manager database with all theses different archives. This
+which will hide you the fact that there are several full archives and
+several differential archives concerning different set of files.<br>
+      </div>
+      <br>
+      <br style="font-weight: bold; font-style: italic;">
+      <span style="font-weight: bold; font-style: italic;"><a name="A8"
+ id="A8"></a>I have a backup I want to change the size of slices?</span><br>
+dar_xform is your friend!<br>
+      <br>
+      <div style="margin-left: 40px;"> <code>dar_xform -s &lt;size&gt;
+original_archive new_archive</code><br>
+      </div>
+      <br>
+      <div style="text-align: justify;">dar_xform will create a new
+archive with the slices of the requested
+size, (you can also make use of -S option for the first slice). Note
+that you don't need to decrypt the archive, not dar will uncompress it,
+this is thus a very fast processing. See <span
+ style="font-weight: bold;">dar_xform man page for more</span>.<br>
+      </div>
+      <br style="font-weight: bold; font-style: italic;">
+      <br style="font-weight: bold; font-style: italic;">
+      <span style="font-weight: bold; font-style: italic;"><a name="A9"
+ id="A9"></a>I have a backup in one slice, how can I split it in
+several slices?</span><br>
+dar_xform is your friend!<br>
+      <br>
+      <div style="margin-left: 40px;"> <code>dar_xform -s &lt;size&gt;
+original_archive new_archive</code><br>
+      </div>
+      <br>
+see above for more.<br>
+      <br>
+      <span style="font-weight: bold; font-style: italic;"><a name="A10"
+ id="A10"></a>I have a backup in several slice, how can I stick all
+them in a single file?</span><br>
+dar_xform is your friend!<br>
+      <br>
+      <code>dar_xform original_archive new_archive</code><br>
+      <br>
+dar_xform without -s option creates a single sliced archive. See
+dar_xform man page for more.<br>
+      <br>
+      <br>
+      <span style="font-weight: bold; font-style: italic;"><a name="A11"
+ id="A11"></a>I have a backup, how can I change its encryption scheme?</span><br>
+      <div style="text-align: justify;">The merging feature let you do
+that. The merging has two roles, putting
+in one archive the contents of two archives, and at the same time
+filtering file contents to not copy certain files in the resulting
+archive. The merging feature can take two but also only one archive as
+input, so we will use it in a special way:<br>
+      </div>
+      <ul style="text-align: justify;">
+        <li>a single input (our original archive)</li>
+        <li>no file filtering (so we keep all the files)</li>
+        <li>Keep files compressed (no decompression/re compression) to
+speed
+up the process<br>
+        </li>
+      </ul>
+      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+-+ new_archive -A
+original_archive -K "&lt;new_algo&gt;:new pass" -ak</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+If the original archive was in clear you need to add the -J option to
+provide the encryption key, and if you don't want to have password in
+clear on the command line (command that can be seen with <span
+ style="font-style: italic;">top</span> or <span
+ style="font-style: italic;">ps</span> by other users), simply provide
+"&lt;algo&gt;:" then dar will ask you on the fly the password, if using
+blowfish you can then just provide <code>":"</code> for the keys:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+-+ new_archive -A
+original_archive -K ":" -J ":" -ak<br>
+      <br>
+      </code> </div>
+      <div style="text-align: justify;">Note that you can also change
+slicing of the archive at the same time
+thanks to -s option:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+-+ new_archive -A
+original_archive -K ":" -J ":" -ak -s 1G</code><br>
+      </div>
+      <br>
+      <span style="font-weight: bold; font-style: italic;"><a name="A12"
+ id="A12"></a>I have a backup, how can I change its compression
+algorithm?</span><br>
+      <div style="text-align: justify;">Same thing as above : we will
+use the merging feature :<br>
+      <br>
+to use bzip2 compression:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+-+ new_archive -A
+original_archive -y</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+to use gzip compression<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+-+ new_archive -A
+original_archive -z<br>
+      <br>
+      </code> </div>
+      <div style="text-align: justify;">to use no compression at all:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px; text-align: justify;"> <code>dar
+-+ new_archive -A
+original_archive</code><br>
+      </div>
+      <div style="text-align: justify;"><br>
+Note that you can also change encryption scheme and slicing at the same
+time you change compression:<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px;">
+      <div style="text-align: justify;"> <code>dar -+ new_archive -A
+original_archive -y -K ":" -J ":" -s 1G</code><br>
+      <code></code></div>
+      </div>
+      <br>
+      <span style="font-weight: bold; font-style: italic;"><a name="A13"></a>Which
+options can I use with which options?</span><br>
+      <div style="text-align: justify;">DAR provides seven commands:<br>
+      <br>
+      </div>
+      <dl style="text-align: justify;">
+        <dd>-c&nbsp;&nbsp; to create a new archive</dd>
+        <dd> -x&nbsp;&nbsp; to extract files from a given archive</dd>
+        <dd>-l&nbsp;&nbsp;&nbsp; to list the contents of a given archive</dd>
+        <dd>-d&nbsp;&nbsp; to compare the contents of an archive with
+filesystem</dd>
+        <dd> -t&nbsp;&nbsp;&nbsp; to test the coherence of a given
+archive</dd>
+        <dd>-C&nbsp; to isolate an archive (extract its contents to a
+usually
+small file)</dd>
+        <dd>-+&nbsp;&nbsp; to merge two archives in one or create a sub
+archive from one or two other archives<br>
+          <br>
+Follow for each command the available options (those marked OK):<br>
+        </dd>
+      </dl>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<div style="text-align: justify;">
+<table
+ style="width: 80%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="1" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="width: 13%; text-align: left; vertical-align: middle;"><br>
+      </td>
+      <td
+ style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-c<br>
+      </td>
+      <td
+ style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-x<br>
+      </td>
+      <td
+ style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-l<br>
+      </td>
+      <td
+ style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-d<br>
+      </td>
+      <td
+ style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-t<br>
+      </td>
+      <td
+ style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-C<br>
+      </td>
+      <td
+ style="height: 12%; text-align: center; vertical-align: middle; width: 12%; font-weight: bold;">-+<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 13%; text-align: left; vertical-align: middle;">-v<br>
+      </td>
+      <td
+ style="height: 12%; width: 12%; text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td
+ style="height: 12%; width: 12%; text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td
+ style="height: 12%; width: 12%; text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td
+ style="height: 12%; width: 12%; text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td
+ style="height: 12%; width: 12%; text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td
+ style="height: 12%; width: 12%; text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td
+ style="height: 12%; width: 12%; text-align: center; vertical-align: middle;">OK<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-vs<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-b<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-n<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-w<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-wa<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-R<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-X<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-I<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-P<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-g<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-]<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-[<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-u<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-U<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-i<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-o<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-O<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-H<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-E<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-F<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-K<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-J<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-#<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-*<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-B<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-N<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-e<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-aSI<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-abinary<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-Q<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-aa<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-ac<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-am<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-an<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-acase<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-j<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-z<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-y<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-s<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-S<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-p<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-@<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-$<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-~<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-%<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-D<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-Z<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-Y<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-m<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">--nodump<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-G<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-M<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-,<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-k<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-r<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-f<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-ae<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-T<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">-as<br>
+      </td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">OK</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+      <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td> <a name="A14"></a><span
+ style="font-weight: bold; font-style: italic;">Why dar reports
+corruption of the archive I have
+transfered with FTP ?</span>
+      <p style="text-align: justify;">Dar archive are binary files,
+they must be transfered in
+binary mode
+when using FTP. This is done in the following way for the ftp
+command-line client :</p>
+      <div style="text-align: justify;"> </div>
+      <p style="text-align: justify; margin-left: 40px;"><code>ftp
+&lt;somewhere&gt;<br>
+&lt;login&gt;<br>
+&lt;password&gt;<br>
+bin<br>
+put &lt;file&gt;<br>
+get &lt;file&gt;<br>
+bye</code></p>
+      <div style="text-align: justify;"> </div>
+      <p style="text-align: justify;">If you transfer an archive (or
+any other binary file) in ascii mode (the opposite of binary mode), the
+8th bit of each byte will be lost and the archive will become
+impossible to recover (due to the destruction of this information). Be
+very careful to test your archive after transferring back to you host
+to be sure you can delete the original file.</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+</div>
+</div>
+</body>
+</html>

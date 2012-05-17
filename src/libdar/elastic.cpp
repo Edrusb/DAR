@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: elastic.cpp,v 1.6.2.1 2005/02/03 19:37:05 edrusb Rel $
+// $Id: elastic.cpp,v 1.7 2005/02/22 17:59:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -194,7 +194,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: elastic.cpp,v 1.6.2.1 2005/02/03 19:37:05 edrusb Rel $";
+        static char id[]="$Id: elastic.cpp,v 1.7 2005/02/22 17:59:35 edrusb Rel $";
         dummy_call(id);
     }
 

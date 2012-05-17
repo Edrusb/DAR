@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.23.2.2 2005/11/14 17:18:08 edrusb Exp $
+// $Id: generic_file.cpp,v 1.26 2005/12/13 20:54:45 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -74,6 +74,9 @@ char *strchr (), *strrchr ();
 #include "cygwin_adapt.hpp"
 #include "int_tools.hpp"
 
+#include <iostream>
+#include <sstream>
+
 #define BUFFER_SIZE 102400
 #ifdef SSIZE_MAX
 #if SSIZE_MAX < BUFFER_SIZE
@@ -105,6 +108,21 @@ namespace libdar
     {
         for(S_I i = 0; i < CRC_SIZE; i++)
             dst[i] = src[i];
+    }
+
+    string crc2str(const crc & a)
+    {
+	ostringstream ret;
+
+	if(CRC_SIZE < 2)
+	    throw SRC_BUG;
+
+	ret << hex << (((unsigned char)(a[0]) & 0xF0) >> 4);
+	ret << hex << ((unsigned char)(a[0]) & 0x0F);
+	ret << hex << (((unsigned char)(a[1]) & 0xF0) >> 4);
+	ret << hex << ((unsigned char)(a[1]) & 0x0F);
+
+	return ret.str();
     }
 
     S_I generic_file::read(char *a, size_t size)
@@ -428,7 +446,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.23.2.2 2005/11/14 17:18:08 edrusb Exp $";
+        static char id[]="$Id: generic_file.cpp,v 1.26 2005/12/13 20:54:45 edrusb Rel $";
         dummy_call(id);
     }
 

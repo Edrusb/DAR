@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_sar.cpp,v 1.7 2004/05/21 08:28:51 edrusb Rel $
+// $Id: test_sar.cpp,v 1.8 2005/09/19 21:17:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -65,7 +65,7 @@ static void f1()
 {
     try
     {
-        sar sar1 = sar(*ui, "destination", "txt", 100, 110, SAR_OPT_DEFAULT/*&~SAR_OPT_DONT_ERASE&~SAR_OPT_WARN_OVERWRITE*/, path("./test"));
+        sar sar1 = sar(*ui, "destination", "txt", 100, 110, true, false, 0,  path("./test"));
         fichier src = fichier(*ui, "./test/source.txt", gf_read_only);
         src.copy_to(sar1);
     }
@@ -79,7 +79,7 @@ static void f2()
 {
     try
     {
-        sar sar2 = sar(*ui, "destination", "txt", SAR_OPT_DEFAULT, path("./test"));
+        sar sar2 = sar(*ui, "destination", "txt", path("./test"));
         fichier dst = fichier(*ui, "./test/destination.txt", gf_write_only);
 
         sar2.copy_to(dst);
@@ -94,7 +94,7 @@ static void f3()
 {
     try
     {
-        sar sar3 = sar(*ui, "destination", "txt", SAR_OPT_DEFAULT, path("./test"));
+        sar sar3 = sar(*ui, "destination", "txt", path("./test"));
         fichier src = fichier(*ui, "./test/source.txt", gf_read_only);
 
         display(sar3.get_position());

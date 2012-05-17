@@ -25,8 +25,6 @@
 /* Get declarations of GNU message catalog functions.  */
 #if HAVE_GETTEXT
 #include <libintl.h>
-#else
-#include "../intl/libintl.h"
 #endif
 
 #else

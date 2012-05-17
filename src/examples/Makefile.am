@@ -1,6 +1,6 @@
 if BUILD_MODE32
-    MYLIB=dar32
-    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar
+  MYLIB=dar32
+  AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar
 else
 if BUILD_MODE64
     MYLIB=dar64

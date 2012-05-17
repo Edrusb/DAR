@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.15.2.1 2005/03/13 20:07:50 edrusb Rel $
+// $Id: ea_filesystem.cpp,v 1.19 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -50,6 +50,9 @@ char *strchr (), *strrchr ();
 #if HAVE_ATTR_XATTR_H
 #include <attr/xattr.h>
 #endif
+#if HAVE_SYS_XATTR_H
+#include <sys/xattr.h>
+#endif
 #endif
 } // end extern "C"
 
@@ -58,90 +61,120 @@ char *strchr (), *strrchr ();
 #include "tools.hpp"
 #include "user_interaction.hpp"
 
+#define MSG_NO_EA_SUPPORT "Extended Attribute support not activated at compilation time"
+
 using namespace std;
 
 namespace libdar
 {
 
 #ifdef EA_SUPPORT
-    static string ea_convert[] = { "system", "user" };
+    // Wrapper functions for l*attr
+    inline static ssize_t my_lgetxattr(const char *path, const char *name, void *value, size_t size);
+    inline static int     my_lsetxattr(const char *path, const char *name, void *value, size_t size, int flags);
+    inline static ssize_t my_llistxattr(const char *path, char *list, size_t size);
+    inline static int     my_lremovexattr(const char *path, const char *name);
 
-    static bool write_ea(const string & chemin, const ea_attributs & val, bool ea_root, bool ea_user);
-    static void read_ea(const string & name, ea_attributs & val, bool read_ea_root, bool read_ea_user);
+
+    static bool write_ea(const string & chemin, const ea_attributs & val, const mask & filter);
+    static bool remove_ea(const string & name, const ea_attributs & val, const mask & filter);
+    static void read_ea(const string & name, ea_attributs & val, const mask & filter);
     static vector<string> ea_filesystem_get_ea_list_for(const char *filename);
-    static string ea_domain2string(ea_domain d);
-    static ea_domain string2ea_domain(const string & x);
-    static void split_ea_name(const string & src, ea_domain & d, string & key);
-    static string glue_ea_name(const ea_domain & d, const string & key);
 #endif
 
-    bool ea_filesystem_write_ea(const string & chemin, const ea_attributs & val, bool root, bool user)
+    bool ea_filesystem_write_ea(const string & chemin, const ea_attributs & val, const mask & filter)
     {
 #ifdef EA_SUPPORT
-        return write_ea(chemin, val, root, user);
+        return write_ea(chemin, val, filter);
 #else
-        return false;
+        throw Efeature(gettext(MSG_NO_EA_SUPPORT));
 #endif
     }
 
-    void ea_filesystem_read_ea(const string & name, ea_attributs & val, bool root, bool user)
+    void ea_filesystem_read_ea(const string & name, ea_attributs & val, const mask & filter)
     {
 #ifdef EA_SUPPORT
-        read_ea(name, val, root, user);
+        read_ea(name, val, filter);
 #else
         val.clear();
 #endif
     }
 
-    void ea_filesystem_clear_ea(const string &name, ea_domain dom)
+    void ea_filesystem_clear_ea(const string &name, const mask & filter)
     {
 #ifdef EA_SUPPORT
         ea_attributs eat;
-        ea_attributs res;
-        ea_entry one;
 
-        ea_filesystem_read_ea(name, eat, true, true);
-        eat.reset_read();
-        while(eat.read(one))
-        {
-            if(one.domain == dom)
-            {
-                one.mode = ea_del;
-                res.add(one);
-            }
-        }
-        ea_filesystem_write_ea(name, res, true, true);
+        ea_filesystem_read_ea(name, eat, filter);
+        remove_ea(name, eat, bool_mask(true));
+#else
+        throw Efeature(gettext(MSG_NO_EA_SUPPORT));
 #endif
     }
 
-    bool ea_filesystem_is_present(const string & name, ea_domain dom)
+    bool ea_filesystem_has_ea(const string & name)
     {
-        ea_attributs tmp;
-        ea_entry ea_ent;
-        bool found = false;
+#ifdef EA_SUPPORT
+	char *p_name = tools_str2charptr(name);
+	bool ret = true;
 
-        ea_filesystem_read_ea(name, tmp, true, true);
-        tmp.reset_read();
-        while(!found && tmp.read(ea_ent))
-        {
-            if(ea_ent.domain == dom)
-                found = true;
-        }
+	try
+	{
+	    vector<string> val = ea_filesystem_get_ea_list_for(p_name);
+	    ret = val.size() > 0;
+	}
+	catch(...)
+	{
+	    delete [] p_name;
+	    throw;
+	}
+	delete [] p_name;
 
-        return found;
+        return ret;
+#else
+	return false;
+#endif
+    }
+
+    bool ea_filesystem_has_ea(const string & name, const ea_attributs & list, const mask & filter)
+    {
+#ifdef EA_SUPPORT
+	char *p_name = tools_str2charptr(name);
+	bool ret = false;
+
+	try
+	{
+	    vector<string> val = ea_filesystem_get_ea_list_for(p_name);
+	    vector<string>::iterator it = val.begin();
+	    string tmp;
+
+	    while(it != val.end() && ! ret)
+	    {
+		if(filter.is_covered(*it))
+		    ret = list.find(*it, tmp);
+		it++;
+	    }
+	}
+	catch(...)
+	{
+	    delete [] p_name;
+	    throw;
+	}
+	delete [] p_name;
+
+	return ret;
+#else
+	return false;
+#endif
     }
 
 #ifdef EA_SUPPORT
 
-    static bool write_ea(const string & chemin, const ea_attributs & val, bool rest_ea_root, bool rest_ea_user)
+    static bool write_ea(const string & chemin, const ea_attributs & val, const mask & filter)
     {
-        char *p_chemin = NULL;
         U_I num = 0;
+        char *p_chemin = tools_str2charptr(chemin);
 
-        if(!rest_ea_root && !rest_ea_user)
-            return false; // no EA can be restored
-
-        p_chemin = tools_str2charptr(chemin);
         try
         {
             ea_entry ea_ent;
@@ -151,41 +184,22 @@ namespace libdar
             {
                     // doing this for each attribute
 
-                if(ea_ent.domain == ea_domain_root && !rest_ea_root)
-                    continue; // silently skipping this EA
-                if(ea_ent.domain == ea_domain_user && !rest_ea_user)
+                if(!filter.is_covered(ea_ent.key))
                     continue; // silently skipping this EA
 
-                char *k = tools_str2charptr(glue_ea_name(ea_ent.domain, ea_ent.key));
+                char *k = tools_str2charptr(ea_ent.key);
                 try
                 {
                     char *v = tools_str2charptr(ea_ent.value);
-                    U_32 v_size = ea_ent.value.size();
+                    U_64 v_size = ea_ent.value.size();
                     try
                     {
-                                // now, action !
-                        switch(ea_ent.mode)
-                        {
-                        case ea_insert:
-                            if(lsetxattr(p_chemin, k, v, v_size, 0) < 0)
-                                throw Erange("ea_filesystem write_ea", tools_printf(gettext("Aborting operations for the EA of %S : error while adding EA %s : %s"),
-										    &chemin,  k, strerror(errno)));
-                            else
-                                num++;
-                            break;
-                        case ea_del:
-                            if(lremovexattr(p_chemin, k) < 0)
-                            {
-                                if(errno != ENOATTR)
-                                    throw Erange("ea_filesystem write_ea", tools_printf(gettext("Aborting operations for the EAs of %S : error while removing %s : %s"),
-											&chemin,  k, strerror(errno)));
-                            }
-                            else
-                                num++;
-                            break;
-                        default:
-                            throw SRC_BUG;
-                        }
+                            // now, action !
+			if(my_lsetxattr(p_chemin, k, v, v_size, 0) < 0)
+			    throw Erange("ea_filesystem write_ea", tools_printf(gettext("Aborting operations for the EA of %S : error while adding EA %s : %s"),
+										&chemin,  k, strerror(errno)));
+			else
+			    num++;
                     }
                     catch(...)
                     {
@@ -212,15 +226,61 @@ namespace libdar
         return num > 0;
     }
 
-    static void read_ea(const string & name, ea_attributs & val, bool read_ea_root, bool read_ea_user)
+    static bool remove_ea(const string & chemin, const ea_attributs & val, const mask & filter)
     {
-        val.clear();
-        if(! read_ea_root && ! read_ea_user)
-            return; // nothing to do
+        U_I num = 0;
+        char *p_chemin = tools_str2charptr(chemin);
 
+        try
+        {
+            ea_entry ea_ent;
+
+            val.reset_read();
+            while(val.read(ea_ent))
+            {
+                    // doing this for each attribute
+
+                if(!filter.is_covered(ea_ent.key))
+                    continue; // silently skipping this EA
+
+                char *k = tools_str2charptr(ea_ent.key);
+                try
+                {
+			// now, action !
+		    if(my_lremovexattr(p_chemin, k) < 0)
+		    {
+			if(errno != ENOATTR)
+			    throw Erange("ea_filesystem write_ea", tools_printf(gettext("Aborting operations for the EAs of %S : error while removing %s : %s"),
+										&chemin,  k, strerror(errno)));
+		    }
+		    else
+			num++;
+                }
+                catch(...)
+                {
+                    delete [] k;
+                    throw;
+                }
+                delete [] k;
+            }
+        }
+        catch(Egeneric & e)
+        {
+            delete [] p_chemin;
+            throw;
+        }
+        delete [] p_chemin;
+
+        return num > 0;
+    }
+
+    static void read_ea(const string & name, ea_attributs & val, const mask & filter)
+    {
         char *n_ptr = tools_str2charptr(name);
+
         if(n_ptr == NULL)
             throw Ememory("read_ea_from");
+        val.clear();
         try
         {
             vector<string> ea_liste = ea_filesystem_get_ea_list_for(n_ptr);
@@ -228,48 +288,49 @@ namespace libdar
 
             while(it != ea_liste.end())
             {
-                char *a_name = tools_str2charptr(*it);
-                if(a_name == NULL)
-                    throw Ememory("filesystem : read_ea_from");
-                try
-                {
-                    const U_I MARGIN = 10;
-                    ea_entry ea_ent;
-                    S_32 taille = lgetxattr(n_ptr, a_name, NULL, 0);
-                    char *value = NULL;
-                    if(taille < 0)
-                        throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribut %s of file %s : %s"),
-									   a_name, n_ptr, strerror(errno)));
-                    value = new char[taille+MARGIN];
-                    if(value == NULL)
-                        throw Ememory("filesystem : read_ea_from");
-                    try
-                    {
-                        taille = lgetxattr(n_ptr, a_name, value, taille+MARGIN);
-                        if(taille < 0)
-                            throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribut %s of file %s : %s"),
+		if(filter.is_covered(*it))
+		{
+		    char *a_name = tools_str2charptr(*it);
+		    if(a_name == NULL)
+			throw Ememory("filesystem : read_ea_from");
+		    try
+		    {
+			const U_I MARGIN = 2;
+			ea_entry ea_ent;
+			S_64 taille = my_lgetxattr(n_ptr, a_name, NULL, 0);
+			char *value = NULL;
+			if(taille < 0)
+			    throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
 									       a_name, n_ptr, strerror(errno)));
-                        split_ea_name(*it, ea_ent.domain, ea_ent.key);
-                        ea_ent.mode = ea_insert;
-                        ea_ent.value = string(&(value[0]), &(value[taille]));
-                        if((ea_ent.domain == ea_domain_root && read_ea_root) ||
-                           (ea_ent.domain == ea_domain_user && read_ea_user))
-                            val.add(ea_ent);
-                    }
-                    catch(...)
-                    {
-                        delete [] value;
-                        throw;
-                    }
-                    delete [] value;
-                }
-                catch(...)
-                {
-                    delete [] a_name;
-                    throw;
-                }
-                delete [] a_name;
-                it++;
+			value = new char[taille+MARGIN];
+			if(value == NULL)
+			    throw Ememory("filesystem : read_ea_from");
+			try
+			{
+			    taille = my_lgetxattr(n_ptr, a_name, value, taille+MARGIN);
+				// if the previous call overflows the buffer this may need to SEGFAULT and so on.
+			    if(taille < 0)
+				throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
+										   a_name, n_ptr, strerror(errno)));
+			    ea_ent.key = *it;
+			    ea_ent.value = string((char *)value, (char *)value+taille);
+			    val.add(ea_ent);
+			}
+			catch(...)
+			{
+			    delete [] value;
+			    throw;
+			}
+			delete [] value;
+		    }
+		    catch(...)
+		    {
+			delete [] a_name;
+			throw;
+		    }
+		    delete [] a_name;
+		}
+		it++;
             }
         }
         catch(...)
@@ -282,23 +343,23 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea_filesystem.cpp,v 1.15.2.1 2005/03/13 20:07:50 edrusb Rel $";
+        static char id[]="$Id: ea_filesystem.cpp,v 1.19 2005/12/29 02:32:41 edrusb Rel $";
         dummy_call(id);
     }
 
     static vector<string> ea_filesystem_get_ea_list_for(const char *filename)
     {
         vector<string> ret;
-        const U_I MARGIN = 20;
-        ssize_t taille = llistxattr(filename, NULL, 0);
+        const U_I MARGIN = 2;
+        ssize_t taille = my_llistxattr(filename, NULL, 0);
         char *liste = NULL;
 
         if(taille < 0)
         {
             if(errno == ENOSYS || errno == ENOTSUP)
                 return ret;
-            throw Erange("ea_filesystem_get_ea_list_for", tools_printf(gettext("Error retreiving EA list for %s : %s"),
-								       filename, strerror(errno)));
+            throw Erange("ea_filesystem_get_ea_list_for", tools_printf(gettext("Error retrieving EA list for %s : %s"),
+                                                                       filename, strerror(errno)));
         }
 
         liste = new char[taille+MARGIN];
@@ -306,11 +367,11 @@ namespace libdar
             throw Ememory("filesystem : get_ea_list_for");
         try
         {
-            S_32 cursor = 0;
-            taille = llistxattr(filename, liste, taille+MARGIN);
+            S_64 cursor = 0;
+            taille = my_llistxattr(filename, liste, taille+MARGIN);
             if(taille < 0)
-                throw Erange("ea_filesystem_get_ea_list_for", tools_printf(gettext("Error retreiving EA list for %s : %s"),
-									   filename, strerror(errno)));
+                throw Erange("ea_filesystem_get_ea_list_for", tools_printf(gettext("Error retrieving EA list for %s : %s"),
+                                                                           filename, strerror(errno)));
             while(cursor < taille)
             {
                 ret.push_back(string(liste+cursor));
@@ -326,35 +387,51 @@ namespace libdar
         return ret;
     }
 
-    static string ea_domain2string(ea_domain d)
+#ifdef OSX_EA_SUPPORT
+
+    inline static ssize_t my_lgetxattr(const char *path, const char *name, void *value, size_t size)
     {
-        return ea_convert[d];
+        return getxattr(path, name, value, size, 0, XATTR_NOFOLLOW);
     }
 
-    static ea_domain string2ea_domain(const string & x)
+    inline static int     my_lsetxattr(const char *path, const char *name, void *value, size_t size, int flags)
     {
-        if(x == ea_convert[ea_domain_root])
-            return ea_domain_root;
-        else if(x == ea_convert[ea_domain_user])
-            return ea_domain_user;
-        else
-            throw Erange("ea_filesystem : string2ea_domain", string(gettext("unknow EA namespace : ")) + x);
+        return setxattr(path, name, value, size, 0, XATTR_NOFOLLOW | flags);
     }
 
-    static void split_ea_name(const string & src, ea_domain & d, string & key)
+    inline static ssize_t my_llistxattr(const char *path, char *list, size_t size)
     {
-        U_I cesure = src.find_first_of(".");
-
-        if(cesure >= src.size() || cesure < 0)
-            throw Erange("ea_filesystem split_ea_name", string(gettext("unknown EA attribute name format : ")) + src);
-        d = string2ea_domain(string(src.begin(), src.begin()+cesure));
-        key = string(src.begin()+cesure+1, src.end());
+        return listxattr(path, list, size, XATTR_NOFOLLOW);
     }
 
-    static string glue_ea_name(const ea_domain & d, const string & key)
+    inline static int     my_lremovexattr(const char *path, const char *name)
     {
-        return ea_domain2string(d) + "." + key;
+        return removexattr(path, name, XATTR_NOFOLLOW);
     }
+
+#else
+
+    inline static ssize_t my_lgetxattr(const char *path, const char *name, void *value, size_t size)
+    {
+        return lgetxattr(path, name, value, size);
+    }
+
+    inline static int     my_lsetxattr(const char *path, const char *name, void *value, size_t size, int flags)
+    {
+        return lsetxattr(path, name, value, size, flags);
+    }
+
+    inline static ssize_t my_llistxattr(const char *path, char *list, size_t size)
+    {
+        return llistxattr(path, list, size);
+    }
+
+    inline static int     my_lremovexattr(const char *path, const char *name)
+    {
+        return lremovexattr(path, name);
+    }
+
+#endif
 
 #endif
 

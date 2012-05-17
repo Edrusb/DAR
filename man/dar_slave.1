@@ -1,13 +1,13 @@
-.TH DAR_SLAVE 1 "SEPT 28, 2002"
+.TH DAR_SLAVE 1 "JAN 8, 2006"
 .UC 8
 .SH NAME
-dar_slave \- disk archive slave
+dar_slave - disk archive slave
 .SH SYNOPSIS
-.B dar_slave [options] [<path>/]source
+dar_slave [options] [<path>/]source
 .P
-.B dar_slave -h
+dar_slave -h
 .P
-.B dar_slave -V
+dar_slave -V
 .SH DESCRIPTION
 .B dar_slave
 reads an archive and listens for
@@ -51,6 +51,9 @@ when virtual memory is exhausted, as user to make room before trying to continue
 .B dar_slaves
 exists with the same codes as dar does, see dar(1) man page.
 
+.SH SIGNALS
+Any signal sent to dar_slave will abort the program immediately, there is no way to have a proper termination before the end of the process
+
 .SH SEE ALSO
 dar(1), dar_xform(1), dar_manager(1), dar_cp(1)
 
@@ -60,6 +63,6 @@ None actually.
 .SH AUTHOR
 .nf
 http://dar.linux.free.fr/
-Denis Corbin (dar.linux@free.fr)
+Denis Corbin
 France
 Europe

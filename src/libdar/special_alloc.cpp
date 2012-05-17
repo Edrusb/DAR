@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: special_alloc.cpp,v 1.12.2.1 2005/03/13 20:07:53 edrusb Rel $
+// $Id: special_alloc.cpp,v 1.14 2005/06/01 18:54:23 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,7 @@
 #include "special_alloc.hpp"
 #include "erreurs.hpp"
 #include "user_interaction.hpp"
+#include "tools.hpp"
 
 #include <list>
 #include <iostream>
@@ -42,10 +43,17 @@ extern "C"
 }
 static bool alloc_mutex_initialized = false;
 static pthread_mutex_t alloc_mutex;
-#define CRITICAL_START if(!alloc_mutex_initialized)\
+
+#define CRITICAL_START if(!alloc_mutex_initialized)                         \
              throw Elibcall("alloc_mutex_initialized", gettext("Thread-safe not initialized for libdar, read manual or contact maintainer of the application that uses libdar"));\
+             sigset_t Critical_section_mem_mask_memory;                     \
+             tools_block_all_signals(Critical_section_mem_mask_memory);     \
              pthread_mutex_lock(&alloc_mutex)
-#define CRITICAL_END pthread_mutex_unlock(&alloc_mutex)
+
+#define CRITICAL_END pthread_mutex_unlock(&alloc_mutex);                    \
+             tools_set_back_blocked_signals(Critical_section_mem_mask_memory)
+
+
 #else // MUTEX does not work or is not available
 #define CRITICAL_START //
 #define CRITICAL_END   //
@@ -118,7 +126,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: special_alloc.cpp,v 1.12.2.1 2005/03/13 20:07:53 edrusb Rel $";
+        static char id[]="$Id: special_alloc.cpp,v 1.14 2005/06/01 18:54:23 edrusb Rel $";
         dummy_call(id);
     }
 

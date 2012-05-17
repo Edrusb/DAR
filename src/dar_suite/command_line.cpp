@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.52.2.2 2005/03/13 20:07:46 edrusb Rel $
+// $Id: command_line.cpp,v 1.76 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -78,22 +78,39 @@ extern "C"
 #include "dar.hpp"
 #include "libdar.hpp"
 #include "cygwin_adapt.hpp"
+#include "mask_list.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:vz::y::nw::pkR:s:S:X:I:P:bhLWDruUVC:i:o:OTE:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::kR:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
 #define INVALID_ARG "Invalid argument for -%c option"
 #define INVALID_SIZE "Invalid size given with option -%c"
 
+#define DEFAULT_CRYPTO_SIZE 10240
+
 
 using namespace std;
 using namespace libdar;
 struct pre_mask
 {
-    bool included;
-    string mask;
+    bool included;      // whether it is a include or exclude entry
+    string mask;        // the string (either a mask or a filename)
+    bool case_sensit;   // whether comparison is case sensitive
+    bool file_listing;  // whether the corresponding string is a filename containing a list of file to match to
+    bool glob_exp;      // whether this is a glob (not regex) expression
+};
+
+struct mask_opt
+{
     bool case_sensit;
+    bool file_listing;
+    const path & prefix;
+    bool glob_exp;
+
+    mask_opt(const path & ref) : prefix(ref) {};
+
+    void read_from(struct pre_mask m) { case_sensit = m.case_sensit; file_listing = m.file_listing; glob_exp = m.glob_exp; };
 };
 
 static const U_I min_compr_size_default = 100;
@@ -110,7 +127,7 @@ static const struct option *get_long_opt();
 static S_I reset_getopt(); // return the old position of parsing (next argument to parse)
 
 static bool get_args_recursive(user_interaction & dialog,
-			       vector<string> & inclusions,
+                               vector<string> & inclusions,
                                S_I argc,
                                char *argv[],
                                operation &op,
@@ -120,7 +137,7 @@ static bool get_args_recursive(user_interaction & dialog,
                                infinint &file_size,
                                infinint &first_file_size,
                                deque<pre_mask> & name_include_exclude,
-			       deque<pre_mask> & path_include_exclude,
+                               deque<pre_mask> & path_include_exclude,
                                string & filename,
                                string *& ref_filename,
                                bool &allow_over,
@@ -128,55 +145,67 @@ static bool get_args_recursive(user_interaction & dialog,
                                bool &info_details,
                                compression &algo,
                                U_I & compression_level,
-                               bool &detruire,
-                               bool &pause,
-                               bool &beep,
-                               bool &make_empty_dir,
+                               bool & detruire,
+                               infinint & pause,
+                               bool & beep,
+                               bool & make_empty_dir,
                                bool & only_more_recent,
-                               bool & ea_root,
-                               bool & ea_user,
+                               deque<pre_mask> & ea_include_exclude,
                                string & input_pipe,
                                string &output_pipe,
-                               bool & ignore_owner,
+                               inode::comparison_fields & what_to_check,
                                string & execute,
                                string & execute_ref,
                                string & pass,
                                string & pass_ref,
                                deque<pre_mask> & compr_include_exclude,
-                               bool &tar_format,
                                bool & flat,
                                infinint & min_compr_size,
                                bool & readconfig,
                                bool & nodump,
                                infinint & hourshift,
-			       bool & warn_remove_no_match,
-			       string & alteration,
-			       bool & empty,
-			       U_I & suffix_base,
-			       path * & on_fly_root,
-			       string * & on_fly_filename,
-			       bool & alter_atime,
-			       bool & same_fs,
-			       U_32 crypto_size,
-			       U_32 crypto_size_ref,
-			       bool & ordered_filters,
-			       bool & case_sensit);
+                               bool & warn_remove_no_match,
+                               string & alteration,
+                               bool & empty,
+                               U_I & suffix_base,
+                               path * & on_fly_root,
+                               string * & on_fly_filename,
+                               bool & alter_atime,
+                               bool & same_fs,
+                               bool & snapshot,
+                               bool & cache_directory_tagging,
+                               U_32 crypto_size,
+                               U_32 crypto_size_ref,
+                               bool & ordered_filters,
+                               bool & case_sensit,
+			       bool & ea_erase,
+			       bool & display_skipped,
+			       archive::listformat & list_mode,
+			       path * & aux_root,
+			       string * & aux_filename,
+			       string & aux_pass,
+			       string & aux_execute,
+			       U_32 & aux_crypto_size,
+			       bool & glob_mode,
+			       bool & keep_compressed,
+			       bool & fixed_date_mode,
+			       infinint & fixed_date);
+
 static void make_args_from_file(user_interaction & dialog,
-				operation op, const char *filename, S_I & argc,
+                                operation op, const char *filename, S_I & argc,
                                 char **&argv, bool info_details);
 static void destroy(S_I argc, char **argv);
-static char * make_word(generic_file & fic, off_t start, off_t end);
 static void skip_getopt(S_I argc, char *argv[], S_I next_to_read);
 static bool update_with_config_files(user_interaction & dialog,
-				     const char * home,
+                                     const char * home,
                                      operation &op,
                                      path * &fs_root,
                                      path * &sauv_root,
                                      path * &ref_root,
                                      infinint &file_size,
                                      infinint &first_file_size,
-				     deque<pre_mask> & name_include_exclude,
-				     deque<pre_mask> & path_include_exclude,
+                                     deque<pre_mask> & name_include_exclude,
+                                     deque<pre_mask> & path_include_exclude,
                                      string & filename,
                                      string *& ref_filename,
                                      bool &allow_over,
@@ -184,45 +213,57 @@ static bool update_with_config_files(user_interaction & dialog,
                                      bool &info_details,
                                      compression &algo,
                                      U_I & compression_level,
-                                     bool &detruire,
-                                     bool &pause,
-                                     bool &beep,
-                                     bool &make_empty_dir,
+                                     bool & detruire,
+                                     infinint & pause,
+                                     bool & beep,
+                                     bool & make_empty_dir,
                                      bool & only_more_recent,
-                                     bool & ea_root,
-                                     bool & ea_user,
+				     deque<pre_mask> & ea_include_exclude,
                                      string & input_pipe,
                                      string &output_pipe,
-                                     bool & ignore_owner,
+                                     inode::comparison_fields & what_to_check,
                                      string & execute,
                                      string & execute_ref,
                                      string & pass,
                                      string & pass_ref,
-				     deque<pre_mask> & compr_include_exclude,
-                                     bool &tar_format,
+                                     deque<pre_mask> & compr_include_exclude,
                                      bool & flat,
                                      infinint & min_compr_size,
                                      bool & nodump,
                                      infinint & hourshift,
-				     bool & warn_remove_no_match,
-				     string & alteration,
-				     bool & empty,
-				     U_I & suffix_base,
-				     path * & on_fly_root,
-				     string * & on_fly_filename,
-				     bool & alter_atime,
-				     bool & same_fs,
-				     U_32 crypto_size,
-				     U_32 crypto_size_ref,
-				     bool & ordered_filters,
-				     bool & case_sensit);
-static mask *make_include_exclude_name(const string & x, bool no_case);
-static mask *make_exclude_path_ordered(const string & x, bool no_case);
-static mask *make_exclude_path_unordered(const string & x, bool no_case);
-static mask *make_include_path(const string & x, bool no_case);
-static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, bool no_case), mask *(*make_exclude_mask)(const string & x, bool no_case));
-static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, bool no_case), mask *(*make_exclude_mask)(const string & x, bool no_case));
-static void update_list_with_root(deque<pre_mask> & listing, const path &fs_root);
+                                     bool & warn_remove_no_match,
+                                     string & alteration,
+                                     bool & empty,
+                                     U_I & suffix_base,
+                                     path * & on_fly_root,
+                                     string * & on_fly_filename,
+                                     bool & alter_atime,
+                                     bool & same_fs,
+                                     bool & snapshot,
+                                     bool & cache_directory_tagging,
+                                     U_32 crypto_size,
+                                     U_32 crypto_size_ref,
+                                     bool & ordered_filters,
+                                     bool & case_sensit,
+				     bool & ea_erase,
+				     bool & display_skipped,
+				     archive::listformat & list_mode,
+				     path * & aux_root,
+				     string * & aux_filename,
+				     string & aux_pass,
+				     string & aux_execute,
+				     U_32 & aux_crypto_size,
+				     bool & glob_mode,
+				     bool & keep_compressed,
+				     bool & fixed_date_mode,
+				     infinint & fixed_date);
+
+static mask *make_include_exclude_name(const string & x, mask_opt opt);
+static mask *make_exclude_path_ordered(const string & x, mask_opt opt);
+static mask *make_exclude_path_unordered(const string & x, mask_opt opt);
+static mask *make_include_path(const string & x, mask_opt opt);
+static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, mask_opt opt), mask *(*make_exclude_mask)(const string & x, mask_opt opt), const path & prefix);
+static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, mask_opt opt), mask *(*make_exclude_mask)(const string & x, mask_opt opt), const path & prefix);
 
 // #define DEBOGGAGE
 #ifdef DEBOGGAGE
@@ -230,17 +271,21 @@ static void show_args(S_I argc, char *argv[]);
 #endif
 
 bool get_args(user_interaction & dialog,
-	      const char *home, S_I argc, char *argv[],
-	      operation &op, path * &fs_root, path * &sauv_root, path * &ref_root,
+              const char *home, S_I argc, char *argv[],
+              operation &op, path * &fs_root, path * &sauv_root, path * &ref_root,
               infinint &file_size, infinint &first_file_size,
-	      mask *&selection, mask *&subtree,
+              mask *&selection, mask *&subtree,
               string &filename, string *&ref_filename,
               bool &allow_over, bool &warn_over, bool &info_details,
               compression &algo, U_I & compression_level,
-              bool &detruire, bool &pause, bool &beep, bool &make_empty_dir,
-              bool & only_more_recent, bool & ea_root, bool & ea_user,
+              bool & detruire,
+	      infinint & pause,
+	      bool & beep,
+	      bool & make_empty_dir,
+              bool & only_more_recent,
+	      mask * & ea_mask,
               string & input_pipe, string &output_pipe,
-              bool & ignore_owner,
+              inode::comparison_fields & what_to_check,
               string & execute, string & execute_ref,
               string & pass, string & pass_ref,
               mask *& compress_mask,
@@ -248,15 +293,27 @@ bool get_args(user_interaction & dialog,
               infinint & min_compr_size,
               bool & nodump,
               infinint & hourshift,
-	      bool & warn_remove_no_match,
-	      string & alteration,
-	      bool & empty,
-	      path * & on_fly_root,
-	      string * & on_fly_filename,
-	      bool & alter_atime,
-	      bool & same_fs,
-	      U_32 & crypto_size,
-	      U_32 & crypto_size_ref)
+              bool & warn_remove_no_match,
+              string & alteration,
+              bool & empty,
+              path * & on_fly_root,
+              string * & on_fly_filename,
+              bool & alter_atime,
+              bool & same_fs,
+              bool & snapshot,
+              bool & cache_directory_tagging,
+              U_32 & crypto_size,
+              U_32 & crypto_size_ref,
+	      bool & ea_erase,
+	      bool & display_skipped,
+	      archive::listformat & list_mode,
+	      path * & aux_root,
+	      string * & aux_filename,
+	      string & aux_pass,
+	      string & aux_execute,
+	      U_32 & aux_crypto_size,
+	      bool & keep_compressed,
+	      infinint & fixed_date)
 {
     op = noop;
     fs_root = NULL;
@@ -265,6 +322,7 @@ bool get_args(user_interaction & dialog,
     selection = NULL;
     subtree = NULL;
     ref_filename = NULL;
+    ea_mask = NULL;
     file_size = 0;
     first_file_size = 0;
     filename = "";
@@ -274,29 +332,22 @@ bool get_args(user_interaction & dialog,
     algo = none;
     compression_level = 9;
     detruire = true;
-    pause = false;
+    pause = 0;
     beep = false;
     make_empty_dir = false;
-    only_more_recent = false; // when listing, it is set to true, if tar-format is asked
+    only_more_recent = false;
     input_pipe = "";
     output_pipe = "";
-    ignore_owner = false;
+    what_to_check = inode::cf_all;
     execute = "";
     execute_ref = "";
     pass = "";
     pass_ref = "";
     compress_mask = NULL;
-#ifdef EA_SUPPORT
-    ea_user = true;
-    ea_root = true;
-#else
-    ea_user = false;
-    ea_root = false;
-#endif
     deque<pre_mask> name_include_exclude;
     deque<pre_mask> path_include_exclude;
     deque<pre_mask> compr_include_exclude;
-    bool tar_format = true;
+    deque<pre_mask> ea_include_exclude;
     vector<string> inclusions;
     flat = false;
     min_compr_size = min_compr_size_default;
@@ -309,14 +360,29 @@ bool get_args(user_interaction & dialog,
     on_fly_filename = NULL;
     alter_atime = false;
     same_fs = false;
-    crypto_size = 10240;
-    crypto_size_ref = 10240;
+    snapshot = false;
+    cache_directory_tagging = false;
+    crypto_size = DEFAULT_CRYPTO_SIZE;
+    crypto_size_ref = DEFAULT_CRYPTO_SIZE;
+    ea_erase = false;
+    display_skipped = false;
+    list_mode = archive::normal;
+    aux_root = NULL;
+    aux_filename = NULL;
+    aux_pass = "";
+    aux_execute = "";
+    aux_crypto_size = DEFAULT_CRYPTO_SIZE;
+    keep_compressed = false;
+    fixed_date = 0;
 
     bool readconfig = true;
     U_I suffix_base = TOOLS_BIN_SUFFIX;
     bool ordered_filters = false;
     bool case_sensit = true;
     string cmd = path(argv[0]).basename();
+    bool glob_mode = true; // defaults to glob expressions
+    bool fixed_date_mode = false;
+
 
     try
     {
@@ -326,114 +392,155 @@ bool get_args(user_interaction & dialog,
 
 
             if(!get_args_recursive(dialog,
-				   inclusions, argc, argv,
+                                   inclusions, argc, argv,
                                    op, fs_root,
                                    sauv_root, ref_root,
                                    file_size, first_file_size,
-				   name_include_exclude,
-				   path_include_exclude,
+                                   name_include_exclude,
+                                   path_include_exclude,
                                    filename, ref_filename,
                                    allow_over, warn_over, info_details,
-                                   algo, compression_level, detruire, pause,
+                                   algo, compression_level, detruire,
+				   pause,
                                    beep, make_empty_dir,
-                                   only_more_recent, ea_root, ea_user,
+                                   only_more_recent,
+				   ea_include_exclude,
                                    input_pipe, output_pipe,
-                                   ignore_owner,
+                                   what_to_check,
                                    execute,
                                    execute_ref,
                                    pass, pass_ref,
                                    compr_include_exclude,
-                                   tar_format,
                                    flat, min_compr_size, readconfig, nodump,
                                    hourshift, warn_remove_no_match,
-				   alteration, empty, suffix_base,
-				   on_fly_root,
-				   on_fly_filename,
-				   alter_atime,
-				   same_fs,
-				   crypto_size,
-				   crypto_size_ref,
-				   ordered_filters,
-				   case_sensit))
+                                   alteration, empty, suffix_base,
+                                   on_fly_root,
+                                   on_fly_filename,
+                                   alter_atime,
+                                   same_fs,
+                                   snapshot,
+                                   cache_directory_tagging,
+                                   crypto_size,
+                                   crypto_size_ref,
+                                   ordered_filters,
+                                   case_sensit,
+				   ea_erase,
+				   display_skipped,
+				   list_mode,
+				   aux_root,
+				   aux_filename,
+				   aux_pass,
+				   aux_execute,
+				   aux_crypto_size,
+				   glob_mode,
+				   keep_compressed,
+				   fixed_date_mode,
+				   fixed_date))
                 return false;
 
                 // checking and updating options with configuration file if any
             if(readconfig)
                 if(! update_with_config_files(dialog,
-					      home,
+                                              home,
                                               op, fs_root,
                                               sauv_root, ref_root,
                                               file_size, first_file_size,
-					      name_include_exclude,
-					      path_include_exclude,
+                                              name_include_exclude,
+                                              path_include_exclude,
                                               filename, ref_filename,
                                               allow_over, warn_over, info_details,
-                                              algo, compression_level, detruire, pause,
+                                              algo,
+					      compression_level,
+					      detruire,
+					      pause,
                                               beep, make_empty_dir,
-                                              only_more_recent, ea_root, ea_user,
+                                              only_more_recent,
+					      ea_include_exclude,
                                               input_pipe, output_pipe,
-                                              ignore_owner,
+                                              what_to_check,
                                               execute,
                                               execute_ref,
                                               pass, pass_ref,
                                               compr_include_exclude,
-                                              tar_format,
                                               flat, min_compr_size, nodump,
                                               hourshift,
-					      warn_remove_no_match,
-					      alteration,
-					      empty,
-					      suffix_base,
-					      on_fly_root,
-					      on_fly_filename,
-					      alter_atime,
-					      same_fs,
-					      crypto_size,
-					      crypto_size_ref,
-					      ordered_filters,
-					      case_sensit))
-		    return false;
+                                              warn_remove_no_match,
+                                              alteration,
+                                              empty,
+                                              suffix_base,
+                                              on_fly_root,
+                                              on_fly_filename,
+                                              alter_atime,
+                                              same_fs,
+                                              snapshot,
+                                              cache_directory_tagging,
+                                              crypto_size,
+                                              crypto_size_ref,
+                                              ordered_filters,
+                                              case_sensit,
+					      ea_erase,
+					      display_skipped,
+					      list_mode,
+					      aux_root,
+					      aux_filename,
+					      aux_pass,
+					      aux_execute,
+					      aux_crypto_size,
+					      glob_mode,
+					      keep_compressed,
+					      fixed_date_mode,
+					      fixed_date))
+                    return false;
 
                 // some sanity checks
 
             if(filename == "" || sauv_root == NULL || op == noop)
-		throw Erange("get_args", tools_printf(gettext("Missing -c -x -d -t -l -C option, see `%S -h' for help"), &cmd));
+                throw Erange("get_args", tools_printf(gettext("Missing -c -x -d -t -l -C -+ option, see `%S -h' for help"), &cmd));
             if(filename == "-" && file_size != 0)
-		throw Erange("get_args", gettext("Slicing (-s option), is not compatible with archive on standart output (\"-\" as filename)"));
-            if(filename != "-" && (op != create || op != isolate))
+                throw Erange("get_args", gettext("Slicing (-s option), is not compatible with archive on standard output (\"-\" as filename)"));
+            if(filename != "-" && (op != create && op != isolate && op != merging))
                 if(sauv_root == NULL)
                     throw SRC_BUG;
             if(filename != "-")
                 tools_check_basename(dialog, *sauv_root, filename, EXTENSION);
+	    if(op == merging && aux_filename != NULL)
+		if(aux_root == NULL)
+		    throw SRC_BUG;
+		else
+		    tools_check_basename(dialog, *aux_root, *aux_filename, EXTENSION);
             if(fs_root == NULL)
                 fs_root = new path(".");
-            if(ref_filename != NULL && op != create && op != isolate)
-                dialog.warning(gettext("-A option is only useful with -c option"));
+	    if(fixed_date_mode && op != create)
+		throw Erange("get_args", gettext("-af option is only available with -c"));
+            if(ref_filename != NULL && op != create && op != isolate && op != merging)
+                dialog.warning(gettext("-A option is only useful with -c, -C or -+ options"));
             if(op == isolate && ref_filename == NULL)
                 throw Erange("get_args", gettext("with -C option, -A option is mandatory"));
+	    if(op == merging && ref_filename == NULL)
+                throw Erange("get_args", gettext("with -+ option, -A option is mandatory"));
             if(op != extract && !warn_remove_no_match)
                 dialog.warning(gettext("-wa is only useful with -x option"));
             if(filename == "-" && ref_filename != NULL && *ref_filename == "-"
                && output_pipe == "")
-                throw Erange("get_args", gettext("-o is mandatory when using \"-A -\" with \"-c -\" or \"-C -\""));
+                throw Erange("get_args", gettext("-o is mandatory when using \"-A -\" with \"-c -\" \"-C -\" or \"-+ -\""));
             if(ref_filename != NULL && *ref_filename != "-")
                 if(ref_root == NULL)
                     throw SRC_BUG;
                 else
                     tools_check_basename(dialog, *ref_root, *ref_filename, EXTENSION);
-            if(algo != none && op != create && op != isolate)
-                dialog.warning(gettext("-z or -y need only to be used with -c or -C"));
+            if(algo != none && op != create && op != isolate && op != merging)
+                dialog.warning(gettext("-z or -y need only to be used with -c -C or -+ options"));
             if(first_file_size != 0 && file_size == 0)
                 throw Erange("get_args", gettext("-S option requires the use of -s"));
-            if(ignore_owner && (op == isolate || (op == create && ref_root == NULL) || op == test || op == listing))
+            if(what_to_check != inode::cf_all && (op == isolate || (op == create && ref_root == NULL) || op == test || op == listing || op == merging))
                 dialog.warning(gettext("ignoring -O option, as it is useless in this situation"));
-            if(getuid() != 0 && op == extract && !ignore_owner) // uid == 0 for root
+            if(getuid() != 0 && op == extract && what_to_check == inode::cf_all) // uid == 0 for root
             {
                 char *name = tools_extract_basename(argv[0]);
 
                 try
                 {
-                    ignore_owner = true;
+                    what_to_check = inode::cf_ignore_owner;
                     string msg = tools_printf(gettext("File ownership will not be restored as %s is not run as root. to avoid this message use -O option"), name);
                     dialog.pause(msg);
                 }
@@ -444,9 +551,7 @@ bool get_args(user_interaction & dialog,
                 }
                 delete [] name;
             }
-            if(op == listing && tar_format)
-                only_more_recent = true;
-            if(execute != "" && file_size == 0 && (op == create || op == isolate))
+            if(execute != "" && file_size == 0 && (op == create || op == isolate || op == merging))
                 dialog.warning(gettext("-E is not possible (and useless) without slicing (-s option), -E will be ignored"));
             if(execute_ref != "" && ref_filename == NULL)
                 dialog.warning(gettext("-F is only useful with -A option, for the archive of reference"));
@@ -454,7 +559,7 @@ bool get_args(user_interaction & dialog,
                 dialog.warning(gettext("-J is only useful with -A option, for the archive of reference"));
             if(flat && op != extract)
                 dialog.warning(gettext("-f in only available with -x option, ignoring"));
-            if(min_compr_size != min_compr_size_default && op != create)
+            if(min_compr_size != min_compr_size_default && op != create && op != merging)
                 dialog.warning(gettext("-m is only useful with -c"));
             if(hourshift > 0)
                 if(op == create)
@@ -470,48 +575,78 @@ bool get_args(user_interaction & dialog,
                     }
                     else
                         dialog.warning(gettext("-H is only useful with -c or -x"));
-	    if(alteration != "" && op != listing)
-		dialog.warning(gettext("-as is only available with -l, ignoring -as option"));
-	    if(empty && op != create && op != extract)
-		dialog.warning(gettext("-e is only useful with -x or -c"));
-	    if(op != create && (on_fly_root != NULL || on_fly_filename != NULL))
-		throw Erange("get_args", gettext("-G option is only available with -c"));
-	    if(on_fly_root != NULL ^ on_fly_filename != NULL)
-		throw SRC_BUG;
-	    if(alter_atime && op != create && op != diff)
-		dialog.warning(gettext("-aa is only useful with -c or -d"));
-	    if(same_fs && op != create)
-		dialog.warning(gettext("-M is only useful with -c"));
+            if(alteration != "" && op != listing)
+                dialog.warning(gettext("-as is only available with -l, ignoring -as option"));
+            if(empty && op != create && op != extract && op != merging)
+                dialog.warning(gettext("-e is only useful with -x, -c or -+ options"));
+            if(op != create && op != merging && (on_fly_root != NULL || on_fly_filename != NULL))
+                throw Erange("get_args", gettext("-G option is only available with -c or -+ options"));
+            if(on_fly_root != NULL ^ on_fly_filename != NULL)
+                throw SRC_BUG;
+            if(alter_atime && op != create && op != diff)
+                dialog.warning(gettext("-aa is only useful with -c or -d"));
+            if(same_fs && op != create)
+                dialog.warning(gettext("-M is only useful with -c"));
+            if(snapshot && op != create)
+                dialog.warning(gettext("The snapshot backup (-A +) is only available with -c option, ignoring"));
+            if(cache_directory_tagging && op != create)
+                dialog.warning(gettext("The Cache Directory Tagging Standard is only useful while performing a backup, ignoring it here"));
+	    if(op == listing && path_include_exclude.size() != 0)
+		dialog.warning(gettext("Warning, the following options -[ , -], -P and -g are not used with -l (listing) operation"));
+
+	    if((aux_root != NULL || aux_filename != NULL) && op != merging)
+		throw Erange("get_args", gettext("-@ is only available with -+ option"));
+	    if(aux_pass != "" && op != merging)
+		throw Erange("get_args", gettext("-$ is only available with -+ option"));
+	    if(aux_execute != "" && op != merging)
+		throw Erange("get_args", gettext("-~ is only available with -+ option"));
+	    if(aux_crypto_size != DEFAULT_CRYPTO_SIZE && op != merging)
+		throw Erange("get_args", tools_printf(gettext("-%% is only available with -+ option")));
+
+	    if(aux_pass != "" && aux_filename == NULL)
+		dialog.warning(gettext("-$ is only useful with -@ option, for the auxiliary archive of reference"));
+	    if(aux_crypto_size != DEFAULT_CRYPTO_SIZE && aux_filename == NULL)
+		dialog.printf(gettext("-%% is only useful with -@ option, for the auxiliary archive of reference"));
+	    if(aux_execute != "" && aux_filename == NULL)
+		dialog.warning(gettext("-~ is only useful with -@ option, for the auxiliary archive of reference"));
+	    if(keep_compressed && op != merging)
+	    {
+		dialog.warning(gettext("-ak is only available while merging (operation -+), ignoring -ak"));
+		keep_compressed = false;
+	    }
+
+	    if(algo != none && op == merging && keep_compressed)
+		dialog.warning(gettext("Compression option (-z or -y) is useless and ignored when using -ak option"));
 
 
+                //////////////////////
+                // generating masks
+                // for filenames
+                //
+            if(ordered_filters)
+                selection = make_ordered_mask(name_include_exclude, &make_include_exclude_name, &make_include_exclude_name,
+                                              tools_relative2absolute_path(*fs_root, tools_getcwd()));
+            else // unordered filters
+                selection = make_unordered_mask(name_include_exclude, &make_include_exclude_name, &make_include_exclude_name,
+                                                tools_relative2absolute_path(*fs_root, tools_getcwd()));
 
 
-		//////////////////////
-		// generating masks
-		// for filenames
-		//
-	    if(ordered_filters)
-		selection = make_ordered_mask(name_include_exclude, &make_include_exclude_name, &make_include_exclude_name);
-	    else // unordered filters
-		selection = make_unordered_mask(name_include_exclude, &make_include_exclude_name, &make_include_exclude_name);
-
-
-		/////////////////////////
+                /////////////////////////
                 // generating masks for
                 // directory tree
                 //
 
-		// adding the root path to each argument
-	    update_list_with_root(path_include_exclude, *fs_root);
-	    if(ordered_filters)
-		subtree = make_ordered_mask(path_include_exclude, &make_include_path, &make_exclude_path_ordered);
-	    else // unordered filters
-		subtree = make_unordered_mask(path_include_exclude, &make_include_path, &make_exclude_path_unordered);
+            if(ordered_filters)
+                subtree = make_ordered_mask(path_include_exclude, &make_include_path, &make_exclude_path_ordered,
+                                            op != test && op != merging ? tools_relative2absolute_path(*fs_root, tools_getcwd()) : "<ROOT>");
+            else // unordered filters
+                subtree = make_unordered_mask(path_include_exclude, &make_include_path, &make_exclude_path_unordered,
+                                              op != test && op != merging ? tools_relative2absolute_path(*fs_root, tools_getcwd()) : "<ROOT>");
 
 
-		////////////////////////////////
-		// generating mask for
-		// compression selected files
+                ////////////////////////////////
+                // generating mask for
+                // compression selected files
                 //
             if(algo == none)
             {
@@ -521,78 +656,98 @@ bool get_args(user_interaction & dialog,
                     dialog.warning(gettext("-m is only useful with compression (-z or -y option for example), ignoring -m"));
             }
 
-	    if(algo != none)
-		if(ordered_filters)
-		    compress_mask = make_ordered_mask(compr_include_exclude, &make_include_exclude_name, & make_include_exclude_name);
-		else
-		    compress_mask = make_unordered_mask(compr_include_exclude, &make_include_exclude_name, & make_include_exclude_name);
-	    else
-	    {
-		compress_mask = new bool_mask(true);
-		if(compress_mask == NULL)
-		    throw Ememory("get_args");
-	    }
+            if(algo != none)
+                if(ordered_filters)
+                    compress_mask = make_ordered_mask(compr_include_exclude, &make_include_exclude_name, & make_include_exclude_name,
+                                                      tools_relative2absolute_path(*fs_root, tools_getcwd()));
+                else
+                    compress_mask = make_unordered_mask(compr_include_exclude, &make_include_exclude_name, & make_include_exclude_name,
+                                                        tools_relative2absolute_path(*fs_root, tools_getcwd()));
+            else
+            {
+                compress_mask = new bool_mask(true);
+                if(compress_mask == NULL)
+                    throw Ememory("get_args");
+            }
+
+	        ////////////////////////////////
+		// generating mask for EA
+		//
+		//
+
+	    if(ordered_filters)
+		ea_mask = make_ordered_mask(ea_include_exclude, &make_include_exclude_name, &make_include_exclude_name,
+					    tools_relative2absolute_path(*fs_root, tools_getcwd()));
+	    else // unordered filters
+		ea_mask = make_unordered_mask(ea_include_exclude, &make_include_exclude_name, &make_include_exclude_name,
+					      tools_relative2absolute_path(*fs_root, tools_getcwd()));
+
         }
         catch(...)
         {
             if(fs_root != NULL)
-	    {
+            {
                 delete fs_root;
-		fs_root = NULL;
-	    }
+                fs_root = NULL;
+            }
             if(sauv_root != NULL)
-	    {
+            {
                 delete sauv_root;
-		sauv_root = NULL;
-	    }
+                sauv_root = NULL;
+            }
             if(selection != NULL)
-	    {
+            {
                 delete selection;
-		selection = NULL;
-	    }
+                selection = NULL;
+            }
             if(subtree != NULL)
-	    {
+            {
                 delete subtree;
-		subtree = NULL;
-	    }
-	    if(ref_root != NULL)
-	    {
-		delete ref_root;
-		ref_root = NULL;
-	    }
+                subtree = NULL;
+            }
+            if(ref_root != NULL)
+            {
+                delete ref_root;
+                ref_root = NULL;
+            }
             if(ref_filename != NULL)
-	    {
+            {
                 delete ref_filename;
-		ref_filename = NULL;
-	    }
+                ref_filename = NULL;
+            }
             if(compress_mask != NULL)
-	    {
+            {
                 delete compress_mask;
-		compress_mask = NULL;
-	    }
-	    if(on_fly_root != NULL)
+                compress_mask = NULL;
+            }
+            if(on_fly_root != NULL)
+            {
+                delete on_fly_root;
+                on_fly_root = NULL;
+            }
+            if(on_fly_filename != NULL)
+            {
+                delete on_fly_filename;
+                on_fly_filename = NULL;
+            }
+	    if(ea_mask != NULL)
 	    {
-		delete on_fly_root;
-		on_fly_root = NULL;
-	    }
-	    if(on_fly_filename != NULL)
-	    {
-		delete on_fly_filename;
-		on_fly_filename = NULL;
+		delete ea_mask;
+		ea_mask = NULL;
 	    }
             throw;
         }
     }
     catch(Erange & e)
     {
-        dialog.warning(string(gettext("parse error on command line (or included files) : ")) + e.get_message());
+        dialog.warning(string(gettext("Parse error on command line (or included files): ")) + e.get_message());
         return false;
     }
     return true;
 }
 
 static bool get_args_recursive(user_interaction & dialog,
-			       vector<string> & inclusions,
+                               vector<string> & inclusions,
                                S_I argc,
                                char *argv[],
                                operation &op,
@@ -602,7 +757,7 @@ static bool get_args_recursive(user_interaction & dialog,
                                infinint &file_size,
                                infinint &first_file_size,
                                deque<pre_mask> & name_include_exclude,
-			       deque<pre_mask> & path_include_exclude,
+                               deque<pre_mask> & path_include_exclude,
                                string & filename,
                                string *& ref_filename,
                                bool &allow_over,
@@ -610,45 +765,56 @@ static bool get_args_recursive(user_interaction & dialog,
                                bool &info_details,
                                compression &algo,
                                U_I & compression_level,
-                               bool &detruire,
-                               bool &pause,
-                               bool &beep,
-                               bool &make_empty_dir,
+                               bool & detruire,
+                               infinint & pause,
+                               bool & beep,
+                               bool & make_empty_dir,
                                bool & only_more_recent,
-                               bool & ea_root,
-                               bool & ea_user,
+			       deque<pre_mask> & ea_include_exclude,
                                string & input_pipe,
                                string &output_pipe,
-                               bool & ignore_owner,
+                               inode::comparison_fields & what_to_check,
                                string & execute,
                                string & execute_ref,
                                string & pass,
                                string & pass_ref,
-			       deque<pre_mask> & compr_include_exclude,
-                               bool &tar_format,
+                               deque<pre_mask> & compr_include_exclude,
                                bool & flat,
                                infinint & min_compr_size,
                                bool & readconfig,
                                bool & nodump,
                                infinint & hourshift,
-			       bool & warn_remove_no_match,
-			       string & alteration,
-			       bool & empty,
-			       U_I & suffix_base,
-			       path * & on_fly_root,
-			       string * & on_fly_filename,
-			       bool & alter_atime,
-			       bool & same_fs,
-			       U_32 crypto_size,
-			       U_32 crypto_size_ref,
-			       bool & ordered_filters,
-			       bool & case_sensit)
+                               bool & warn_remove_no_match,
+                               string & alteration,
+                               bool & empty,
+                               U_I & suffix_base,
+                               path * & on_fly_root,
+                               string * & on_fly_filename,
+                               bool & alter_atime,
+                               bool & same_fs,
+                               bool & snapshot,
+                               bool & cache_directory_tagging,
+                               U_32 crypto_size,
+                               U_32 crypto_size_ref,
+                               bool & ordered_filters,
+                               bool & case_sensit,
+			       bool & ea_erase,
+			       bool & display_skipped,
+			       archive::listformat & list_mode,
+			       path * & aux_root,
+			       string * & aux_filename,
+			       string & aux_pass,
+			       string & aux_execute,
+			       U_32 & aux_crypto_size,
+			       bool & glob_mode,
+			       bool & keep_compressed,
+			       bool & fixed_date_mode,
+			       infinint & fixed_date)
 {
     S_I lu;
     S_I rec_c;
     char **rec_v = NULL;
     pre_mask tmp_pre_mask;
-    static bool warned = false;
     U_I tmp;
 
 #if HAVE_GETOPT_LONG
@@ -665,10 +831,11 @@ static bool get_args_recursive(user_interaction & dialog,
             case 't':
             case 'l':
             case 'C':
+	    case '+':
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(filename != "" || sauv_root != NULL)
-                    throw Erange("get_args", gettext(" Only one option of -c -d -t -l -C or -x is allowed"));
+                    throw Erange("get_args", gettext(" Only one option of -c -d -t -l -C -x or -+ is allowed"));
                 if(optarg != "")
                     tools_split_path_basename(optarg, sauv_root, filename);
                 else
@@ -693,32 +860,69 @@ static bool get_args_recursive(user_interaction & dialog,
                 case 'C':
                     op = isolate;
                     break;
+		case '+':
+		    op = merging;
+		    break;
                 default:
                     throw SRC_BUG;
                 }
                 break;
             case 'A':
-                if(ref_filename != NULL || ref_root != NULL)
+                if(ref_filename != NULL || ref_root != NULL || snapshot || fixed_date != 0)
                     throw Erange("get_args", gettext("Only one -A option is allowed"));
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(strcmp("", optarg) == 0)
                     throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
-                ref_filename = new string();
-                if(ref_filename == NULL)
-                    throw Ememory("get_args");
-                try
-                {
-                    tools_split_path_basename(optarg, ref_root, *ref_filename);
-                }
-                catch(...)
-                {
-                    delete ref_filename;
-                    throw;
-                }
+		if(fixed_date_mode)
+		{
+		    try
+		    {
+			try
+			{
+				// trying to read a simple integer
+			    deci tmp = string(optarg);
+			    fixed_date = tmp.computer();
+			}
+			catch(Edeci)
+			{
+				// fallback to human readable string
+
+			    fixed_date = tools_convert_date(optarg);
+			}
+		    }
+		    catch(Egeneric & e)
+		    {
+			throw Erange("get_args", string(gettext("Error while parsing -A argument as a date: ")+ e.get_message()));
+		    }
+		}
+		else
+		    if(strcmp("+", optarg) == 0)
+			snapshot = true;
+		    else
+		    {
+			ref_filename = new string();
+			if(ref_filename == NULL)
+			    throw Ememory("get_args");
+			try
+			{
+			    tools_split_path_basename(optarg, ref_root, *ref_filename);
+			}
+			catch(...)
+			{
+			    delete ref_filename;
+			    throw;
+			}
+		    }
                 break;
             case 'v':
-                info_details = true;
+		if(optarg == NULL)
+		    info_details = true;
+		else
+		    if (strcasecmp("skipped", optarg) == 0 || strcasecmp("s", optarg) == 0)
+			display_skipped = true;
+		    else
+			throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;
             case 'z':
                 if(algo == none)
@@ -753,13 +957,19 @@ static bool get_args_recursive(user_interaction & dialog,
                     if(strcmp(optarg, "a") == 0 || strcmp(optarg, "all") == 0)
                         warn_remove_no_match = false;
                     else
-			if(strcmp(optarg, "d") != 0 && strcmp(optarg, "default") != 0)
-			    throw Erange("get_args", string(gettext("Unknown argument given to -w: ")) + optarg);
-			// else this is the default -w
+                        if(strcmp(optarg, "d") != 0 && strcmp(optarg, "default") != 0)
+                            throw Erange("get_args", string(gettext("Unknown argument given to -w: ")) + optarg);
+                        // else this is the default -w
                 }
                 break;
             case 'p':
-                pause = true;
+		if(optarg != NULL)
+		{
+		    deci conv = string(optarg);
+		    pause = conv.computer();
+		}
+		else
+		    pause = 1;
                 break;
             case 'k':
                 detruire = false;
@@ -824,33 +1034,43 @@ static bool get_args_recursive(user_interaction & dialog,
             case 'X':
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-		tmp_pre_mask.case_sensit = case_sensit;
-		tmp_pre_mask.included = false;
-		tmp_pre_mask.mask = string(optarg);
+                tmp_pre_mask.file_listing = false;
+                tmp_pre_mask.case_sensit = case_sensit;
+                tmp_pre_mask.included = false;
+                tmp_pre_mask.mask = string(optarg);
+		tmp_pre_mask.glob_exp = glob_mode;
                 name_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'I':
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-		tmp_pre_mask.case_sensit = case_sensit;
-		tmp_pre_mask.included = true;
-		tmp_pre_mask.mask = string(optarg);
+                tmp_pre_mask.file_listing = false;
+                tmp_pre_mask.case_sensit = case_sensit;
+                tmp_pre_mask.included = true;
+                tmp_pre_mask.mask = string(optarg);
+		tmp_pre_mask.glob_exp = glob_mode;
                 name_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'P':
+            case ']':
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-		tmp_pre_mask.case_sensit = case_sensit;
-		tmp_pre_mask.included = false;
-		tmp_pre_mask.mask = string(optarg);
+                tmp_pre_mask.file_listing = lu == ']';
+                tmp_pre_mask.case_sensit = case_sensit;
+                tmp_pre_mask.included = false;
+                tmp_pre_mask.mask = string(optarg);
+		tmp_pre_mask.glob_exp = glob_mode;
                 path_include_exclude.push_back(tmp_pre_mask);
                 break;
-	    case 'g':
+            case 'g':
+            case '[':
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-		tmp_pre_mask.case_sensit = case_sensit;
-		tmp_pre_mask.included = true;
-		tmp_pre_mask.mask = string(optarg);
+                tmp_pre_mask.file_listing = lu == '[';
+                tmp_pre_mask.case_sensit = case_sensit;
+                tmp_pre_mask.included = true;
+                tmp_pre_mask.mask = string(optarg);
+		tmp_pre_mask.glob_exp = glob_mode;
                 path_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'b':
@@ -880,24 +1100,15 @@ static bool get_args_recursive(user_interaction & dialog,
                     only_more_recent = true;
                 break;
             case 'u':
-#ifdef EA_SUPPORT
-                if(!ea_user)
-                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
-                else
-                    ea_user = false;
-#else
-                dialog.warning(gettext("WARNING! Extended Attributs Support has not been activated at compilation time, thus -u option does nothing"));
-#endif
-                break;
             case 'U':
-#ifdef EA_SUPPORT
-                if(!ea_root)
-                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
-                else
-                    ea_root = false;
-#else
-                dialog.warning(gettext("WARNING! Extended Attributs Support has not been activated at compilation time, thus -U option does nothing."));
-#endif
+		if(optarg == NULL)
+		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		tmp_pre_mask.file_listing = false;
+		tmp_pre_mask.case_sensit = case_sensit;
+		tmp_pre_mask.included = lu == 'U';
+		tmp_pre_mask.mask = string(optarg);
+		tmp_pre_mask.glob_exp = glob_mode;
+		ea_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'V':
                 show_version(dialog, argv[0]);
@@ -921,16 +1132,38 @@ static bool get_args_recursive(user_interaction & dialog,
                     dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'O':
-                if(ignore_owner)
+                if(what_to_check != inode::cf_all)
                     dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
-                    ignore_owner = true;
+		    if(optarg == NULL)
+			what_to_check = inode::cf_ignore_owner;
+		    else
+			if(strcasecmp(optarg, "ignore-owner") == 0)
+			    what_to_check = inode::cf_ignore_owner;
+			else
+			    if(strcasecmp(optarg, "mtime") == 0)
+				what_to_check = inode::cf_mtime;
+			    else
+				if(strcasecmp(optarg, "inode-type") == 0)
+				    what_to_check = inode::cf_inode_type;
+				else
+				    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+
                 break;
-            case 'T': // long option --tar-format
-                if(!tar_format)
-                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
-                else
-                    tar_format = false;
+            case 'T':
+                if(optarg == NULL)
+                    list_mode = archive::tree;
+		else
+		    if(strcasecmp("normal", optarg) == 0)
+                	list_mode = archive::normal;
+		    else
+			if (strcasecmp("tree", optarg) == 0)
+			    list_mode = archive::tree;
+			else
+			    if (strcasecmp("xml", optarg) == 0)
+				list_mode = archive::xml;
+			    else
+				throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;
             case 'E':
                 if(optarg == NULL)
@@ -967,18 +1200,22 @@ static bool get_args_recursive(user_interaction & dialog,
             case 'Y':
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-		tmp_pre_mask.case_sensit = case_sensit;
-		tmp_pre_mask.included = true;
-		tmp_pre_mask.mask = string(optarg);
-		compr_include_exclude.push_back(tmp_pre_mask);
+                tmp_pre_mask.file_listing = false;
+                tmp_pre_mask.case_sensit = case_sensit;
+                tmp_pre_mask.included = true;
+                tmp_pre_mask.mask = string(optarg);
+		tmp_pre_mask.glob_exp = glob_mode;
+                compr_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'Z':
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-		tmp_pre_mask.case_sensit = case_sensit;
-		tmp_pre_mask.included = false;
-		tmp_pre_mask.mask = string(optarg);
-		compr_include_exclude.push_back(tmp_pre_mask);
+                tmp_pre_mask.file_listing = false;
+                tmp_pre_mask.case_sensit = case_sensit;
+                tmp_pre_mask.included = false;
+                tmp_pre_mask.mask = string(optarg);
+		tmp_pre_mask.glob_exp = glob_mode;
+                compr_include_exclude.push_back(tmp_pre_mask);
                 break;
             case 'B':
                 if(optarg == NULL)
@@ -993,44 +1230,61 @@ static bool get_args_recursive(user_interaction & dialog,
                     show_args(rec_c, rec_v);
 #endif
                     S_I optind_mem = reset_getopt(); // save the external variable to use recursivity (see getopt)
-			// reset getopt module
+                        // reset getopt module
 
                     try
                     {
                         inclusions.push_back(optarg);
                         ret = get_args_recursive(dialog,
-						 inclusions, rec_c, rec_v, op, fs_root, sauv_root, ref_root,
+                                                 inclusions, rec_c, rec_v, op, fs_root, sauv_root, ref_root,
                                                  file_size, first_file_size,
-						 name_include_exclude,
+                                                 name_include_exclude,
                                                  path_include_exclude,
                                                  filename, ref_filename,
                                                  allow_over, warn_over, info_details,
-                                                 algo, compression_level, detruire, pause,
+                                                 algo,
+						 compression_level,
+						 detruire,
+						 pause,
                                                  beep, make_empty_dir,
-                                                 only_more_recent, ea_root, ea_user,
+                                                 only_more_recent,
+						 ea_include_exclude,
                                                  input_pipe, output_pipe,
-                                                 ignore_owner,
+                                                 what_to_check,
                                                  execute,
                                                  execute_ref,
                                                  pass, pass_ref,
                                                  compr_include_exclude,
-                                                 tar_format,
                                                  flat,
                                                  min_compr_size,
                                                  readconfig, nodump,
                                                  hourshift,
-						 warn_remove_no_match,
-						 alteration,
-						 empty,
-						 suffix_base,
-						 on_fly_root,
-						 on_fly_filename,
-						 alter_atime,
-						 same_fs,
-						 crypto_size,
-						 crypto_size_ref,
-						 ordered_filters,
-						 case_sensit);
+                                                 warn_remove_no_match,
+                                                 alteration,
+                                                 empty,
+                                                 suffix_base,
+                                                 on_fly_root,
+                                                 on_fly_filename,
+                                                 alter_atime,
+                                                 same_fs,
+                                                 snapshot,
+                                                 cache_directory_tagging,
+                                                 crypto_size,
+                                                 crypto_size_ref,
+                                                 ordered_filters,
+                                                 case_sensit,
+						 ea_erase,
+						 display_skipped,
+						 list_mode,
+						 aux_root,
+						 aux_filename,
+						 aux_pass,
+						 aux_execute,
+						 aux_crypto_size,
+						 glob_mode,
+						 keep_compressed,
+						 fixed_date_mode,
+						 fixed_date);
                         inclusions.pop_back();
                     }
                     catch(...)
@@ -1095,60 +1349,90 @@ static bool get_args_recursive(user_interaction & dialog,
                     }
                 }
                 break;
-	    case 'a':
-		if(optarg == NULL)
-		    throw Erange("command_line.cpp:get_args_recursive", gettext("-a option requires an argument"));
-		if(strcasecmp("SI-unit", optarg) == 0 || strcasecmp("SI", optarg) == 0 || strcasecmp("SI-units", optarg) == 0)
-		    suffix_base = TOOLS_SI_SUFFIX;
-		else
-		    if(strcasecmp("binary-unit", optarg) == 0 || strcasecmp("binary", optarg) == 0 || strcasecmp("binary-units", optarg) == 0)
-			suffix_base = TOOLS_BIN_SUFFIX;
-		    else
-			if(strcasecmp("atime", optarg) == 0 || strcasecmp("a", optarg) == 0)
-			{
-			    if(alter_atime)
-				dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
-			    alter_atime = true;
-			}
-			else
-			    if(strcasecmp("ctime", optarg) == 0 || strcasecmp("c", optarg) == 0)
-			    {
-				alter_atime = false;
-			    }
-			    else
-				if(strcasecmp("m", optarg) == 0 || strcasecmp("mask", optarg) == 0)
-				{
-				    if(ordered_filters)
-					dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
-				    else
-					ordered_filters = true;
-				}
-				else
-				    if(strcasecmp("n", optarg) == 0 || strcasecmp("no-case", optarg) == 0 || strcasecmp("no_case", optarg) == 0)
-					case_sensit = false;
-				    else
-					if(strcasecmp("case", optarg) == 0)
-					    case_sensit = true;
-					else
-					    if(strcasecmp("s", optarg) == 0 || strcasecmp("saved", optarg) == 0)
-					    {
-						if(alteration != "")
-						    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+            case 'a':
+                if(optarg == NULL)
+                    throw Erange("command_line.cpp:get_args_recursive", gettext("-a option requires an argument"));
+                if(strcasecmp("SI-unit", optarg) == 0 || strcasecmp("SI", optarg) == 0 || strcasecmp("SI-units", optarg) == 0)
+                    suffix_base = TOOLS_SI_SUFFIX;
+                else
+                    if(strcasecmp("binary-unit", optarg) == 0 || strcasecmp("binary", optarg) == 0 || strcasecmp("binary-units", optarg) == 0)
+                        suffix_base = TOOLS_BIN_SUFFIX;
+                    else
+                        if(strcasecmp("atime", optarg) == 0 || strcasecmp("a", optarg) == 0)
+                        {
+                            if(alter_atime)
+                                dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                            alter_atime = true;
+                        }
+                        else
+                            if(strcasecmp("ctime", optarg) == 0 || strcasecmp("c", optarg) == 0)
+                            {
+                                alter_atime = false;
+                            }
+                            else
+                                if(strcasecmp("m", optarg) == 0 || strcasecmp("mask", optarg) == 0)
+                                {
+                                    if(ordered_filters)
+                                        dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                                    else
+                                        ordered_filters = true;
+                                }
+                                else
+                                    if(strcasecmp("n", optarg) == 0 || strcasecmp("no-case", optarg) == 0 || strcasecmp("no_case", optarg) == 0)
+                                        case_sensit = false;
+                                    else
+                                        if(strcasecmp("case", optarg) == 0)
+                                            case_sensit = true;
+                                        else
+                                            if(strcasecmp("s", optarg) == 0 || strcasecmp("saved", optarg) == 0)
+                                            {
+                                                if(alteration != "")
+                                                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                                                else
+                                                    alteration = optarg;
+                                            }
+                                            else
+						if(strcasecmp("e", optarg) == 0 || strcasecmp("erase_ea", optarg) == 0)
+						{
+						    if(ea_erase)
+							dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+						    else
+							ea_erase = true;
+						}
 						else
-						    alteration = optarg;
-					    }
-					    else
-						throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
-		break;
-	    case 'e':
-		if(empty)
-		    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
-		else
-		    empty = true;
-		break;
-	    case 'Q':
-	    case 'j':
-		break;  // ignore this option already parsed during initialization (dar_suite.cpp)
+						    if(strcasecmp("g", optarg) == 0 || strcasecmp("glob", optarg) == 0)
+							glob_mode = true;
+						    else
+							if(strcasecmp("r", optarg) == 0 || strcasecmp("regex", optarg) == 0)
+							    glob_mode = false;
+							else
+							    if(strcasecmp("k", optarg) == 0 || strcasecmp("keep-compressed", optarg) == 0)
+							    {
+								if(keep_compressed)
+								    dialog.warning(gettext("-ak option need not be specified more than once, ignoring extra -ak options"));
+								keep_compressed = true;
+							    }
+							    else
+								if(strcasecmp("f", optarg) == 0 || strcasecmp("fixed-date", optarg) == 0)
+								{
+								    if(ref_filename != NULL || ref_root != NULL || snapshot)
+									throw Erange("get_args", gettext("-af must be present before -A option not after!"));
+								    if(fixed_date_mode)
+									dialog.warning(gettext("-af option need not be specified more than once, ignoring extra -af options"));
+								    fixed_date_mode = true;
+								}
+								else
+								    throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
+                break;
+            case 'e':
+                if(empty)
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                else
+                    empty = true;
+                break;
+            case 'Q':
+            case 'j':
+                break;  // ignore this option already parsed during initialization (dar_suite.cpp)
             case 'G':
                 if(on_fly_filename != NULL || on_fly_root != NULL)
                     throw Erange("get_args", tools_printf(gettext(ONLY_ONCE), char(lu)));
@@ -1171,24 +1455,75 @@ static bool get_args_recursive(user_interaction & dialog,
                     throw;
                 }
                 break;
-	    case 'M':
-		if(same_fs)
-		    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+            case 'M':
+                if(same_fs)
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                else
+                    same_fs = true;
+                break;
+            case '#':
+                if(! tools_my_atoi(optarg, tmp))
+                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                else
+                    crypto_size = (U_32)tmp;
+                break;
+            case '*':
+                if(! tools_my_atoi(optarg, tmp))
+                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                else
+                    crypto_size_ref = (U_32)tmp;
+                break;
+            case ',':
+                if(cache_directory_tagging)
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                else
+                    cache_directory_tagging = true;
+                break;
+	    case '@':
+		if(aux_filename != NULL || aux_root != NULL)
+		    throw Erange("get_args", gettext("Only one -@ option is allowed"));
+		if(optarg == NULL)
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		if(strcmp("", optarg) == 0)
+                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 		else
-		    same_fs = true;
+		{
+		    aux_filename = new string();
+		    if(aux_filename == NULL)
+			throw Ememory("get_args");
+		    try
+		    {
+			tools_split_path_basename(optarg, aux_root, *aux_filename);
+		    }
+		    catch(...)
+		    {
+			delete aux_filename;
+			throw;
+		    }
+		}
 		break;
-	    case '#':
-		if(! tools_my_atoi(optarg, tmp))
-		    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
-		else
-		    crypto_size = (U_32)tmp;
+	    case '~':
+		if(optarg == NULL)
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                if(aux_execute == "")
+                    aux_execute = optarg;
+                else
+                    aux_execute += string(" ; ") + optarg;
 		break;
-	    case '*':
-		if(! tools_my_atoi(optarg, tmp))
-		    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
-		else
-		    crypto_size_ref = (U_32)tmp;
-		break;
+	    case '$':
+                if(optarg == NULL)
+                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                if(aux_pass == "")
+                    aux_pass = optarg;
+                else
+                    dialog.warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
+                break;
+	    case '%':
+                if(! tools_my_atoi(optarg, tmp))
+                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                else
+                    aux_crypto_size = (U_32)tmp;
+                break;
             case '?':
                 dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"),char(optopt)));
                 break;
@@ -1197,20 +1532,8 @@ static bool get_args_recursive(user_interaction & dialog,
             }
         }
 
-    tmp_pre_mask.case_sensit = case_sensit;
-    tmp_pre_mask.included = true;
-
-    if(optind < argc && !warned)
-    {
-	dialog.warning(gettext("The [list of path] is deprecated, thanks to use the -g option instead"));
-	warned = true;
-    }
-
-    for(S_I i = optind; i < argc; i++)
-    {
-	tmp_pre_mask.mask = string(argv[i]);
-	path_include_exclude.push_back(tmp_pre_mask);
-    }
+    if(optind < argc)
+        throw Erange("get_args_recursive", tools_printf(gettext("Unknown argument : %s"), argv[optind]));
 
     return true;
 }
@@ -1222,7 +1545,7 @@ static void usage(user_interaction & dialog, const char *command_name)
 
     try
     {
-        dialog.printf("usage: %s [-c|-x|-d|-t|-l|-C] [<path>/]<basename> [options...] [list of paths]\n", name);
+        dialog.printf(gettext("usage: %s [ -c | -x | -d | -t | -l | -C | -+ ] [<path>/]<basename> [options...]\n"), name);
         dialog.printf("       %s -h\n", name);
         dialog.printf("       %s -V\n", name);
 #include "dar.usage"
@@ -1238,7 +1561,7 @@ static void usage(user_interaction & dialog, const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.52.2.2 2005/03/13 20:07:46 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.76 2005/12/29 02:32:41 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -1602,25 +1925,25 @@ static void show_version(user_interaction & dialog, const char *command_name)
 
     get_version(maj, min);
     if(maj > 2)
-	get_version(maj, med, min);
+        get_version(maj, med, min);
     else
-	med = 0;
+        med = 0;
     get_compile_time_features(ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
     shell_interaction_change_non_interactive_output(&cout);
     try
     {
         dialog.warning(tools_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n",  name, ::dar_version())
-		       + "   " + dar_suite_command_line_features()
-		       + "\n"
-		       + (maj > 2 ? tools_printf(gettext(" Using libdar %u.%u.%u built with compilation time options:"), maj, med, min)
-			  : tools_printf(gettext(" Using libdar %u.%u built with compilation time options:"), maj, min)));
-	tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
+                       + "   " + dar_suite_command_line_features()
+                       + "\n"
+                       + (maj > 2 ? tools_printf(gettext(" Using libdar %u.%u.%u built with compilation time options:"), maj, med, min)
+                          : tools_printf(gettext(" Using libdar %u.%u built with compilation time options:"), maj, min)));
+        tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
         dialog.printf("\n");
         dialog.warning(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__)
-		+ tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name, PACKAGE_VERSION)
-		+ tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name, name)
-		+ tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
-		+ tools_printf(gettext(" type `%s -L | more'\n for details.\n\n"), name));
+                       + tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name, PACKAGE_VERSION)
+                       + tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name, name)
+                       + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
+                       + tools_printf(gettext(" type `%s -L | more'\n for details.\n\n"), name));
     }
     catch(...)
     {
@@ -1643,11 +1966,11 @@ static const struct option *get_long_opt()
         {"list", required_argument, NULL, 'l'},
         {"no-overwrite", no_argument, NULL, 'n'},
         {"output", required_argument, NULL, 'o'},
-        {"pause", no_argument, NULL, 'p'},
+        {"pause", optional_argument, NULL, 'p'},
         {"recent", no_argument, NULL, 'r'},
         {"slice", required_argument, NULL, 's'},
         {"test", required_argument, NULL, 't'},
-        {"no-user-EA", no_argument, NULL, 'u'},
+        {"exclude-ea", required_argument, NULL, 'u'},
         {"verbose", no_argument, NULL, 'v'},
         {"no-warn", optional_argument, NULL, 'w'},
         {"extract", required_argument, NULL, 'x'},
@@ -1660,11 +1983,13 @@ static const struct option *get_long_opt()
         {"prune", required_argument, NULL, 'P'},
         {"fs-root", required_argument, NULL, 'R'},
         {"first-slice", required_argument, NULL, 'S'},
-        {"no-system-EA", no_argument, NULL, 'U'},
+        {"include-ea", required_argument, NULL, 'U'},
         {"version", no_argument, NULL, 'V'},
         {"exclude", required_argument, NULL, 'X'},
         {"ignore-owner", no_argument, NULL, 'O'},
+	{"comparison-field", optional_argument, NULL, 'O'},
         {"tree-format", no_argument, NULL, 'T'},
+        {"list-format", required_argument, NULL, 'T'},
         {"execute", required_argument, NULL, 'E'},
         {"execute-ref",required_argument, NULL, 'F'},
         {"key", required_argument, NULL, 'K'},
@@ -1677,14 +2002,22 @@ static const struct option *get_long_opt()
         {"noconf", no_argument, NULL, 'N'},
         {"nodump", no_argument, NULL, ' '},
         {"hour", optional_argument, NULL, 'H'},
-	{"alter", optional_argument, NULL, 'a'},
-	{"empty", no_argument, NULL, 'e'},
-	{"on-fly-isolate", required_argument, NULL, 'G'},
-	{"no-mount-points", no_argument, NULL, 'M'},
-	{"go-into", required_argument, NULL, 'g'},
-	{"jog", no_argument, NULL, 'j'},
-	{"crypto-block", required_argument, NULL, '#'},
-	{"crypto-block-ref", required_argument, NULL, '*'},
+        {"alter", optional_argument, NULL, 'a'},
+        {"empty", no_argument, NULL, 'e'},
+        {"on-fly-isolate", required_argument, NULL, 'G'},
+        {"no-mount-points", no_argument, NULL, 'M'},
+        {"go-into", required_argument, NULL, 'g'},
+        {"jog", no_argument, NULL, 'j'},
+        {"crypto-block", required_argument, NULL, '#'},
+        {"crypto-block-ref", required_argument, NULL, '*'},
+        {"cache-directory-tagging", no_argument, NULL, ','},
+        {"include-from-file", required_argument, NULL, '['},
+        {"exclude-from-file", required_argument, NULL, ']'},
+	{"merge", required_argument, NULL, '+'},
+	{"aux-ref", required_argument, NULL, '@'},
+	{"aux-key", required_argument, NULL, '$'},
+	{"aux-execute", required_argument, NULL, '~'},
+	{"aux-crypto-block", required_argument, NULL, '%'},
         { NULL, 0, NULL, 0 }
     };
 
@@ -1694,10 +2027,9 @@ static const struct option *get_long_opt()
 
 static void make_args_from_file(user_interaction & dialog, operation op, const char *filename, S_I & argc, char **&argv, bool info_details)
 {
-    vector <char> quotes;
-    vector <char *> mots;
     vector <string> cibles;
     argv = NULL;
+    argc = 0;
 
     S_I fd = ::open(filename, O_RDONLY|O_BINARY);
     if(fd < 0)
@@ -1734,8 +2066,11 @@ static void make_args_from_file(user_interaction & dialog, operation op, const c
         break;
     case listing:
         cibles.push_back("listing");
-	cibles.push_back("list");
+        cibles.push_back("list");
         break;
+    case merging:
+	cibles.push_back("merge");
+	break;
     case isolate:
         cibles.push_back("isolate");
         break;
@@ -1756,115 +2091,44 @@ static void make_args_from_file(user_interaction & dialog, operation op, const c
         //  surconf can be used as a normal file.
         //
 
+    const char *command = "dar";
+    char *pseudo_command = NULL;
+
     try
     {
-        char a;
-        off_t start = 0;
-        off_t end = 0;
-        bool loop = true;
-
-            // adding a fake "dar" word as first argument (= argv[0])
-            //
-        const char *command = "dar";
-        char *pseudo_command = new char[strlen(command)+1];
-
-        if(pseudo_command == NULL)
-            throw Ememory("make_args_from_file");
-        strncpy(pseudo_command, command, strlen(command));
-        pseudo_command[strlen(command)] = '\0';
-        mots.push_back(pseudo_command);
+	vector <string> mots;
 
 
             // now parsing the file and cutting words
             // taking care of quotes
             //
+	mots = tools_split_in_words(surconf);
 
-        while(loop)
-        {
-            if(surconf.read(&a, 1) != 1) // reached end of file
-            {
-                loop = false;
-                a = ' '; // to close the last word
-            }
 
-            if(quotes.size() == 0) // outside a word
-                switch(a)
-                {
-                case ' ':
-                case '\t':
-                case '\n':
-                case '\r':
-                    start++;
-                    break;
-                case '"':
-                case '\'':
-                case '`':
-                    quotes.push_back(a);
-                    end = start;
-                    start++;
-                    break;
-                default:
-                    quotes.push_back(' '); // the quote space means no quote
-                    end = start;
-                    break;
-                }
-            else // inside a word
-                switch(a)
-                {
-                case '\t':
-                    if(quotes.back() != ' ')
-                    {
-                        end++;
-                        break;
-                    }
-                        // no break !
-                case '\n':
-                case '\r':
-                    a = ' ';
-                        // no break !
-                case ' ':
-                case '"':
-                case '\'':
-                case '`':
-                    if(a == quotes.back()) // "a" is an ending quote
-                    {
-                        quotes.pop_back();
-                        if(quotes.size() == 0) // reached end of word
-                        {
-                            mots.push_back(make_word(surconf, start, end));
-                            if(a != ' ')
-                                end++;  // skip the trailing quote
-                            if(! surconf.skip(end+1))
-                                loop = false; // reached end of file
-                            start = end+1;
-                        }
-                        else
-                            end++;
-                    }
-                    else // "a" is a nested starting quote
-                    {
-                        if(a != ' ') // quote ' ' does not have ending quote
-                            quotes.push_back(a);
-                        end++;
-                    }
-                    break;
-                default:
-                    end++;
-                }
-        }
-        if(quotes.size() > 0)
-            throw Erange("make_args_from_file", tools_printf(gettext("Parse error reading config file %s : Unmatched %c"), filename, quotes.back()));
-
-        argc = mots.size();
+	    // now converting the mots of type vector<string> to argc/argv arguments
+	    //
+        argc = mots.size()+1;
         argv = new char *[argc];
         if(argv == NULL)
             throw Ememory("make_args_from_file");
+	for(S_I i = 0; i < argc; i++)
+	    argv[i] = NULL;
+
+            // adding a fake "dar" word as first argument (= argv[0])
+            //
+	char *pseudo_command = new char[strlen(command)+1];
+	if(pseudo_command == NULL)
+	    throw Ememory("make_args_from_file");
+        strncpy(pseudo_command, command, strlen(command));
+        pseudo_command[strlen(command)] = '\0';
+	argv[0] = pseudo_command;
+	pseudo_command = NULL;
 
         if(info_details)
             dialog.printf(gettext("Arguments read from %s :"), filename);
-        for(S_I i = 0; i < argc; i++)
+        for(U_I i = 0; i < mots.size(); i++)
         {
-            argv[i] = mots[i]; // copy of the address of each string
+            argv[i+1] = tools_str2charptr(mots[i]); // mots[i] goes to argv[i+1] !
             if(info_details && i > 0)
                 dialog.printf(" \"%s\"", argv[i]);
         }
@@ -1873,15 +2137,19 @@ static void make_args_from_file(user_interaction & dialog, operation op, const c
     }
     catch(...)
     {
-        while(mots.size() > 0)
+        if(argv != NULL)
         {
-            delete mots.back();
-            mots.pop_back();
+	    for(S_I i = 0; i < argc; i++)
+		if(argv[i] != NULL)
+		    delete[] argv[i];
+	    delete[] argv;
         }
+	argv = NULL;
+	argc = 0;
+	if(pseudo_command != NULL)
+	    delete[] pseudo_command;
         throw;
     }
-        // all (char *) addresses in "mots" are now known by argv,
-        // thus they must be preserved.
 }
 
 
@@ -1891,42 +2159,6 @@ static void destroy(S_I argc, char **argv)
     for(i = 0; i < argc; i++)
         delete argv[i];
     delete argv;
-}
-
-static char * make_word(generic_file &fic, off_t start, off_t end)
-{
-    off_t longueur = end - start + 1;
-    S_I lu = 0, tmp;
-    char *ret = new char[longueur+1];
-
-    if(ret == NULL)
-        throw Ememory("make_word");
-    try
-    {
-        if(! fic.skip(start))
-            throw Erange("make_word", gettext("End of file reached while skipping to the begin of a word"));
-
-        do
-        {
-            tmp = fic.read(ret+lu, longueur-lu);
-            if(tmp > 0)
-                lu += tmp;
-            else
-                if(tmp < 0)
-                    throw SRC_BUG;
-                else // tmp == 0
-                    throw Erange("make_word", gettext("Reached EOF while reading a word"));
-        }
-        while(lu < longueur);
-        ret[longueur] = '\0';
-    }
-    catch(...)
-    {
-        delete ret;
-        throw;
-    }
-
-    return ret;
 }
 
 static void skip_getopt(S_I argc, char *argv[], S_I next_to_read)
@@ -1952,15 +2184,15 @@ static void show_args(S_I argc, char *argv[])
 
 
 static bool update_with_config_files(user_interaction & dialog,
-				     const char * home,
+                                     const char * home,
                                      operation &op,
                                      path * &fs_root,
                                      path * &sauv_root,
                                      path * &ref_root,
                                      infinint &file_size,
                                      infinint &first_file_size,
-				     deque<pre_mask> & name_include_exclude,
-				     deque<pre_mask> & path_include_exclude,
+                                     deque<pre_mask> & name_include_exclude,
+                                     deque<pre_mask> & path_include_exclude,
                                      string & filename,
                                      string *& ref_filename,
                                      bool &allow_over,
@@ -1968,38 +2200,50 @@ static bool update_with_config_files(user_interaction & dialog,
                                      bool &info_details,
                                      compression &algo,
                                      U_I & compression_level,
-                                     bool &detruire,
-                                     bool &pause,
-                                     bool &beep,
-                                     bool &make_empty_dir,
+                                     bool & detruire,
+                                     infinint & pause,
+                                     bool & beep,
+                                     bool & make_empty_dir,
                                      bool & only_more_recent,
-                                     bool & ea_root,
-                                     bool & ea_user,
+				     deque<pre_mask> & ea_include_exclude,
                                      string & input_pipe,
                                      string &output_pipe,
-                                     bool & ignore_owner,
+                                     inode::comparison_fields & what_to_check,
                                      string & execute,
                                      string & execute_ref,
                                      string & pass,
                                      string & pass_ref,
-				     deque<pre_mask> & compr_include_exclude,
-                                     bool &tar_format,
+                                     deque<pre_mask> & compr_include_exclude,
                                      bool & flat,
                                      infinint & min_compr_size,
                                      bool & nodump,
                                      infinint & hourshift,
-				     bool & warn_remove_no_match,
-				     string & alteration,
-				     bool & empty,
-				     U_I & suffix_base,
-				     path * & on_fly_root,
-				     string * & on_fly_filename,
-				     bool & alter_atime,
-				     bool & same_fs,
-				     U_32 crypto_size,
-				     U_32 crypto_size_ref,
-				     bool & ordered_filters,
-				     bool & case_sensit)
+                                     bool & warn_remove_no_match,
+                                     string & alteration,
+                                     bool & empty,
+                                     U_I & suffix_base,
+                                     path * & on_fly_root,
+                                     string * & on_fly_filename,
+                                     bool & alter_atime,
+                                     bool & same_fs,
+                                     bool & snapshot,
+                                     bool & cache_directory_tagging,
+                                     U_32 crypto_size,
+                                     U_32 crypto_size_ref,
+                                     bool & ordered_filters,
+                                     bool & case_sensit,
+				     bool & ea_erase,
+				     bool & display_skipped,
+				     archive::listformat & list_mode,
+				     path * & aux_root,
+				     string * & aux_filename,
+				     string & aux_pass,
+				     string & aux_execute,
+				     U_32 & aux_crypto_size,
+				     bool & glob_mode,
+				     bool & keep_compressed,
+				     bool & fixed_date_mode,
+				     infinint & fixed_date)
 {
     const unsigned int len = strlen(home);
     const unsigned int delta = 20;
@@ -2025,49 +2269,63 @@ static bool update_with_config_files(user_interaction & dialog,
         try
         {
             make_args_from_file(dialog, op, buffer, rec_c, rec_v, info_details);
-	    try
-	    {
-		vector<string> inclusions;
-		(void)reset_getopt();
+            try
+            {
+                vector<string> inclusions;
+                (void)reset_getopt();
 
                 if(! get_args_recursive(dialog,
-					inclusions,
+                                        inclusions,
                                         rec_c, rec_v, op, fs_root,
                                         sauv_root, ref_root,
                                         file_size, first_file_size,
                                         name_include_exclude,
-					path_include_exclude,
+                                        path_include_exclude,
                                         filename, ref_filename,
                                         allow_over, warn_over,
                                         info_details,
                                         algo, compression_level,
-                                        detruire, pause,
+                                        detruire,
+					pause,
                                         beep, make_empty_dir,
-                                        only_more_recent, ea_root,
-                                        ea_user,
+                                        only_more_recent,
+					ea_include_exclude,
                                         input_pipe, output_pipe,
-                                        ignore_owner,
+                                        what_to_check,
                                         execute,
                                         execute_ref,
                                         pass, pass_ref,
                                         compr_include_exclude,
-                                        tar_format,
                                         flat,
                                         min_compr_size,
                                         btmp, nodump,
                                         hourshift,
-					warn_remove_no_match,
-					alteration,
-					empty,
-					suffix_base,
-					on_fly_root,
-					on_fly_filename,
-					alter_atime,
-					same_fs,
-					crypto_size,
-					crypto_size_ref,
-					ordered_filters,
-					case_sensit))
+                                        warn_remove_no_match,
+                                        alteration,
+                                        empty,
+                                        suffix_base,
+                                        on_fly_root,
+                                        on_fly_filename,
+                                        alter_atime,
+                                        same_fs,
+                                        snapshot,
+                                        cache_directory_tagging,
+                                        crypto_size,
+                                        crypto_size_ref,
+                                        ordered_filters,
+                                        case_sensit,
+					ea_erase,
+					display_skipped,
+					list_mode,
+					aux_root,
+					aux_filename,
+					aux_pass,
+					aux_execute,
+					aux_crypto_size,
+					glob_mode,
+					keep_compressed,
+					fixed_date_mode,
+					fixed_date))
                     retour = syntax;
                 else
                     retour = ok;
@@ -2083,9 +2341,9 @@ static bool update_with_config_files(user_interaction & dialog,
         }
         catch(Erange & e)
         {
-	    if(e.get_source() != "make_args_from_file")
-		throw;
-		// else:
+            if(e.get_source() != "make_args_from_file")
+                throw;
+                // else:
                 // failed openning the file,
                 // nothing to do,
                 // we will try the other config file
@@ -2111,44 +2369,58 @@ static bool update_with_config_files(user_interaction & dialog,
                     (void)reset_getopt(); // reset getopt call
 
                     if(! get_args_recursive(dialog,
-					    inclusions,
+                                            inclusions,
                                             rec_c, rec_v, op, fs_root,
                                             sauv_root, ref_root,
                                             file_size, first_file_size,
                                             name_include_exclude,
-					    path_include_exclude,
+                                            path_include_exclude,
                                             filename, ref_filename,
                                             allow_over, warn_over,
                                             info_details,
                                             algo, compression_level,
-                                            detruire, pause,
+                                            detruire,
+					    pause,
                                             beep, make_empty_dir,
-                                            only_more_recent, ea_root,
-                                            ea_user,
+                                            only_more_recent,
+					    ea_include_exclude,
                                             input_pipe, output_pipe,
-                                            ignore_owner,
+                                            what_to_check,
                                             execute,
                                             execute_ref,
                                             pass, pass_ref,
                                             compr_include_exclude,
-                                            tar_format,
                                             flat,
                                             min_compr_size,
                                             btmp,
                                             nodump,
                                             hourshift,
-					    warn_remove_no_match,
-					    alteration,
-					    empty,
-					    suffix_base,
-					    on_fly_root,
-					    on_fly_filename,
-					    alter_atime,
-					    same_fs,
-					    crypto_size,
-					    crypto_size_ref,
-					    ordered_filters,
-					    case_sensit))
+                                            warn_remove_no_match,
+                                            alteration,
+                                            empty,
+                                            suffix_base,
+                                            on_fly_root,
+                                            on_fly_filename,
+                                            alter_atime,
+                                            same_fs,
+                                            snapshot,
+                                            cache_directory_tagging,
+                                            crypto_size,
+                                            crypto_size_ref,
+                                            ordered_filters,
+                                            case_sensit,
+					    ea_erase,
+					    display_skipped,
+					    list_mode,
+					    aux_root,
+					    aux_filename,
+					    aux_pass,
+					    aux_execute,
+					    aux_crypto_size,
+					    glob_mode,
+					    keep_compressed,
+					    fixed_date_mode,
+					    fixed_date))
                         retour = syntax;
                     else
                         retour = ok;
@@ -2193,79 +2465,115 @@ static S_I reset_getopt()
 }
 
 
-static mask *make_include_exclude_name(const string & x, bool case_sensit)
+static mask *make_include_exclude_name(const string & x, mask_opt opt)
 {
-    mask *ret = new simple_mask(x, case_sensit);
-    if(ret == NULL)
-	throw Ememory("make_include_exclude_name");
+    mask *ret = NULL;
+
+    if(opt.glob_exp)
+	ret = new simple_mask(x, opt.case_sensit);
     else
-	return ret;
+	ret = new regular_mask(x, opt.case_sensit);
+
+    if(ret == NULL)
+        throw Ememory("make_include_exclude_name");
+    else
+        return ret;
 }
 
-static mask *make_exclude_path_ordered(const string & x, bool case_sensit)
+static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
 {
-    ou_mask *ret = new ou_mask();
-    if(ret == NULL)
-	throw Ememory("make_exclude_path");
-    else
+    mask *ret = NULL;
+    if(opt.file_listing)
+        ret = new mask_list(x, opt.case_sensit, opt.prefix, false);
+    else // not file listing mask
     {
-	ret->add_mask(simple_mask(x, case_sensit));
-	ret->add_mask(simple_mask(x + "/*", case_sensit));
-	return ret;
+	if(opt.glob_exp)
+	{
+	    ou_mask *val = new ou_mask();
+
+	    if(val == NULL)
+		throw Ememory("make_exclude_path");
+
+	    val->add_mask(simple_mask((opt.prefix + x).display(), opt.case_sensit));
+	    val->add_mask(simple_mask((opt.prefix + x).display() + "/*", opt.case_sensit));
+	    ret = val;
+	}
+	else // regex
+	{
+	    ret = new regular_mask((opt.prefix.display() + "/(" + x + ")/?.*"), opt.case_sensit);
+
+	    if(ret == NULL)
+		throw Ememory("make_exclude_path");
+	}
     }
+
+    return ret;
 }
 
-static mask *make_exclude_path_unordered(const string & x, bool case_sensit)
+
+static mask *make_exclude_path_unordered(const string & x, mask_opt opt)
 {
-    mask *ret = new simple_mask(x, case_sensit);
-    if(ret == NULL)
-	throw Ememory("make_exclude_path");
+    mask *ret = NULL;
+
+    if(opt.file_listing)
+        ret = new mask_list(x, opt.case_sensit, opt.prefix, false);
     else
-	return ret;
+	if(opt.glob_exp)
+	    ret = new simple_mask((opt.prefix + x).display(), opt.case_sensit);
+	else
+	    ret = new regular_mask(string("^") + (opt.prefix + x).display(), opt.case_sensit);
+    if(ret == NULL)
+        throw Ememory("make_exclude_path");
+
+    return ret;
 }
 
-static mask *make_include_path(const string & x, bool case_sensit)
+static mask *make_include_path(const string & x, mask_opt opt)
 {
-    mask *ret = new simple_path_mask(x, case_sensit);
-    if(ret == NULL)
-	throw Ememory("make_include_path");
+    mask *ret = NULL;
+
+    if(opt.file_listing)
+        ret = new mask_list(x, opt.case_sensit, opt.prefix, true);
     else
-	return ret;
+        ret = new simple_path_mask((opt.prefix +x).display(), opt.case_sensit);
+    if(ret == NULL)
+        throw Ememory("make_include_path");
+
+    return ret;
 }
 
-static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, bool no_case), mask *(*make_exclude_mask)(const string & x, bool no_case))
+static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, mask_opt opt), mask *(*make_exclude_mask)(const string & x, mask_opt opt), const path & prefix)
 {
     mask *ret_mask = NULL;
     ou_mask *tmp_ou_mask = NULL;
     et_mask *tmp_et_mask = NULL;
     mask *tmp_mask = NULL;
+    mask_opt opt = prefix;
 
     try
     {
-	while(listing.size() > 0)
-	{
-	    if(listing.front().included)
-		if(ret_mask == NULL)
-		{
-		    ret_mask = (*make_include_mask)(listing.front().mask,
-						    listing.front().case_sensit);
+        while(listing.size() > 0)
+        {
+            opt.read_from(listing.front());
+            if(listing.front().included)
+                if(ret_mask == NULL) // first mask
+                {
+		    ret_mask = (*make_include_mask)(listing.front().mask, opt);
 		    if(ret_mask == NULL)
 			throw Ememory("make_ordered_mask");
 		}
-		else // ret_mask != NULL
+		else // ret_mask != NULL (need to chain to existing masks)
 		{
 		    if(tmp_ou_mask != NULL)
 		    {
-			tmp_mask = (*make_include_mask)(listing.front().mask,
-							listing.front().case_sensit);
+  		        tmp_mask = (*make_include_mask)(listing.front().mask, opt);
 			tmp_ou_mask->add_mask(*tmp_mask);
 			delete tmp_mask;
 			tmp_mask = NULL;
 		    }
 		    else  // need to create ou_mask
 		    {
-			tmp_mask = (*make_include_mask)(listing.front().mask,
-							listing.front().case_sensit);
+  		        tmp_mask = (*make_include_mask)(listing.front().mask, opt);
 			tmp_ou_mask = new ou_mask();
 			if(tmp_ou_mask == NULL)
 			    throw Ememory("make_ordered_mask");
@@ -2281,8 +2589,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
 	    else // exclude mask
 		if(ret_mask == NULL)
 		{
-		    tmp_mask = (*make_exclude_mask)(listing.front().mask,
-						    listing.front().case_sensit);
+  		    tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
 		    ret_mask = new not_mask(*tmp_mask);
 		    if(ret_mask == NULL)
 			throw Ememory("make_ordered_mask");
@@ -2293,16 +2600,14 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
 		{
 		    if(tmp_et_mask != NULL)
 		    {
-			tmp_mask = (*make_exclude_mask)(listing.front().mask,
-							listing.front().case_sensit);
+ 		        tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
 			tmp_et_mask->add_mask(not_mask(*tmp_mask));
 			delete tmp_mask;
 			tmp_mask = NULL;
 		    }
 		    else // need to create et_mask
 		    {
-			tmp_mask = (*make_exclude_mask)(listing.front().mask,
-							listing.front().case_sensit);
+		        tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
 			tmp_et_mask = new et_mask();
 			if(tmp_et_mask == NULL)
 			    throw Ememory("make_ordered_mask");
@@ -2341,11 +2646,12 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
     return ret_mask;
 }
 
-static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, bool no_case), mask *(*make_exclude_mask)(const string & x, bool no_case))
+static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, mask_opt opt), mask *(*make_exclude_mask)(const string & x, mask_opt opt), const path & prefix)
 {
     et_mask *ret_mask = new et_mask();
     ou_mask tmp_include, tmp_exclude;
     mask *tmp_mask = NULL;
+    mask_opt opt = prefix;
 
     if(ret_mask == NULL)
 	throw Ememory("make_unordered_mask");
@@ -2354,18 +2660,17 @@ static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include
     {
 	while(listing.size() > 0)
 	{
+	    opt.read_from(listing.front());
 	    if(listing.front().included)
 	    {
-		tmp_mask = (*make_include_mask)(listing.front().mask,
- 						listing.front().case_sensit);
+  	        tmp_mask = (*make_include_mask)(listing.front().mask, opt);
 		tmp_include.add_mask(*tmp_mask);
 		delete tmp_mask;
 		tmp_mask = NULL;
 	    }
 	    else // excluded mask
 	    {
-		tmp_mask = (*make_exclude_mask)(listing.front().mask,
-						listing.front().case_sensit);
+ 	        tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
 		tmp_exclude.add_mask(*tmp_mask);
 		delete tmp_mask;
 		tmp_mask = NULL;
@@ -2387,15 +2692,4 @@ static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include
     }
 
     return ret_mask;
-}
-
-static void update_list_with_root(deque<pre_mask> & listing, const path &fs_root)
-{
-    deque<pre_mask>::iterator it = listing.begin();
-
-    while(it != listing.end())
-    {
-	it->mask = (fs_root + path(it->mask)).display();
-	it++;
-    }
 }

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.22 2004/12/07 18:04:50 edrusb Rel $
+// $Id: generic_file.hpp,v 1.25 2005/12/13 20:54:45 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -37,13 +37,19 @@
     /// .
     /// \ingroup Private
 
-#ifndef GENERIC_FILE_HPP
-#define GENERIC_FILE_HPP
 
 ///////////////////////////////////////////////////////////////////////
 // IMPORTANT : THIS FILE MUST ALWAYS BE INCLUDE AFTER infinint.hpp   //
 //             (and infinint.hpp must be included too, always)       //
 ///////////////////////////////////////////////////////////////////////
+#include "infinint.hpp"
+///////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef GENERIC_FILE_HPP
+#define GENERIC_FILE_HPP
+
 
 #include "../my_config.h"
 
@@ -54,11 +60,12 @@ extern "C"
 #endif
 } // end extern "C"
 
-#include "infinint.hpp"
 #include "path.hpp"
 #include "integers.hpp"
 #include "user_interaction.hpp"
 #include "thread_cancellation.hpp"
+
+#include <string>
 
 namespace libdar
 {
@@ -71,6 +78,7 @@ namespace libdar
     extern void clear(crc & value);
     extern void copy_crc(crc & dst, const crc & src);
     extern bool same_crc(const crc &a, const crc &b);
+    extern std::string crc2str(const crc &a);
 
 	/// generic_file openning modes
     enum gf_mode
@@ -206,6 +214,7 @@ namespace libdar
 
 #define CONTEXT_INIT "init"
 #define CONTEXT_OP   "operation"
+#define CONTEXT_LAST_SLICE  "last_slice"
 
 	/// the contextual class adds the information of phases in the generic_file
 

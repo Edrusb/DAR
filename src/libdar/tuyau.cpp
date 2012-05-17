@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.cpp,v 1.19.2.2 2005/10/11 14:58:55 edrusb Rel $
+// $Id: tuyau.cpp,v 1.22 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -192,7 +192,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tuyau.cpp,v 1.19.2.2 2005/10/11 14:58:55 edrusb Rel $";
+        static char id[]="$Id: tuyau.cpp,v 1.22 2005/12/29 02:32:41 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -221,7 +221,7 @@ namespace libdar
                 }
                 filedesc = ::open(ch, flag|O_BINARY);
                 if(filedesc < 0)
-                    throw Erange("tuyau::ouverture", string(gettext("Error openning pipe: "))+strerror(errno));
+                    throw Erange("tuyau::ouverture", string(gettext("Error opening pipe: "))+strerror(errno));
             }
             catch(...)
             {

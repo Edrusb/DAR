@@ -1,13 +1,13 @@
-.TH DAR_CP 1 "OCT 4, 2003"
+.TH DAR_CP 1 "JAN 8, 2006"
 .UC 8
 .SH NAME
-dar_cp \- disk archive copy
+dar_cp - disk archive copy
 .SH SYNOPSIS
-.B dar_cp <source file> <destination file>
+dar_cp <source file> <destination file>
 .P
-.B dar_cp -h
+dar_cp -h
 .P
-.B dar_cp -V
+dar_cp -V
 .SH DESCRIPTION
 .B dar_cp
 is similar to the standard 'cp' command, except it does not stop copying when an I/O error is met. Instead, it skips a bit further and continues to copy the rest of the file, as much as possible.
@@ -31,7 +31,8 @@ Displays help usage.
 Displays version information.
 
 .SH EXIT CODES
-.B dar_cp exists with the following codes:
+.B dar_cp
+exists with the following codes:
 .TP 10
 0
 upon normal execution (be some corrupted parted skipped or not)
@@ -45,6 +46,9 @@ could not open source or destination files
 3
 any other system error met during the copy
 
+.SH SIGNALS
+Any signal sent to dar_cp will abort the program immediately, there is no way to have a proper termination before the end of the process
+
 .SH SEE ALSO
 dar(1), dar_xform(1), dar_manager(1), dar_slave(1)
 
@@ -54,6 +58,6 @@ None actually.
 .SH AUTHOR
 .nf
 http://dar.linux.free.fr/
-Denis Corbin (dar.linux@free.fr)
+Denis Corbin
 France
 Europe

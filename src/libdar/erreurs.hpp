@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.hpp,v 1.14 2004/11/07 18:21:38 edrusb Rel $
+// $Id: erreurs.hpp,v 1.15 2005/05/30 15:52:38 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -261,6 +261,25 @@ namespace libdar
 
     protected :
         std::string exceptionID() const { return "FEATURE DISABLED AT COMPILATION TIME"; };
+    };
+
+
+	/// exception used when the thread libdar is running in is asked to stop
+
+    class Ethread_cancel : public Egeneric
+    {
+    public:
+	Ethread_cancel(bool now, U_64 x_flag) : Egeneric("", now ? gettext("Thread cancellation requested, aborting as soon as possible") : gettext("Thread cancellation requested, aborting as properly as possible")) { immediate = now; flag = x_flag; };
+
+	bool immediate_cancel() const { return immediate; }
+	U_64 get_flag() const { return flag; };
+
+    protected:
+	std::string exceptionID() const { return "THREAD CANCELLATION REQUESTED, ABORTING"; };
+
+    private:
+	bool immediate;
+	U_64 flag;
     };
 
 	/// @}

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.16.2.2 2005/09/08 19:20:21 edrusb Rel $
+// $Id: test_filesystem.cpp,v 1.21 2005/11/17 15:24:11 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -166,7 +166,7 @@ static void test()
     infinint root_fs_device;
     infinint errors, skipped_dump;
 
-    filesystem_backup fs = filesystem_backup(*ui, path("arbo"), true, true, true, false, false, root_fs_device);
+    filesystem_backup fs = filesystem_backup(*ui, path("arbo"), true, bool_mask(true), false, false, false, root_fs_device);
 
     while(fs.read(p, errors, skipped_dump))
     {
@@ -202,7 +202,7 @@ static void re_test()
 	const entree *e;
 	detruit det1 = detruit("lien", 'l' | 0x80);
 	detruit det2 = detruit("dev1", 'd');
-	filesystem_restore fs = filesystem_restore(*ui, "algi", true, true, true, true, true, false, true, false);
+	filesystem_restore fs = filesystem_restore(*ui, "algi", true, true, true, bool_mask(true), inode::cf_all, true, false, false);
 
 	cat->reset_read();
 

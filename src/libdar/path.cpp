@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.cpp,v 1.11 2004/07/31 17:45:24 edrusb Rel $
+// $Id: path.cpp,v 1.13 2005/11/09 18:31:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -37,10 +37,11 @@ namespace libdar
     path::path(string s)
     {
         string tmp;
+
         dirs.clear();
-        relative = s[0] != '/';
         if(s.size() < 1)
             throw Erange("path::path", gettext("Empty string is not a valid path"));
+        relative = s[0] != '/';
         if(!relative)
             s = string(s.begin()+1, s.end()); // remove the leading '/'
         while(path_get_root(s, tmp))
@@ -157,7 +158,11 @@ namespace libdar
         list<string>::iterator it = (const_cast<path &>(arg)).dirs.begin();
         list<string>::iterator it_fin = (const_cast<path &>(arg)).dirs.end();
         while(it != it_fin)
-            dirs.push_back(*it++);
+        {
+            if(*it != string("."))
+                dirs.push_back(*it);
+            it++;
+        }
 
         return *this;
     }
@@ -170,7 +175,7 @@ namespace libdar
         list<string>::iterator fin_arg = (const_cast<path &>(p)).dirs.end();
 
         while(it_me != fin_me && it_arg != fin_arg
-	      && (*it_me == *it_arg  || (!case_sensit && tools_is_case_insensitive_equal(*it_me, *it_arg))))
+              && (*it_me == *it_arg  || (!case_sensit && tools_is_case_insensitive_equal(*it_me, *it_arg))))
         {
             it_me++;
             it_arg++;
@@ -181,7 +186,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: path.cpp,v 1.11 2004/07/31 17:45:24 edrusb Rel $";
+        static char id[]="$Id: path.cpp,v 1.13 2005/11/09 18:31:53 edrusb Rel $";
         dummy_call(id);
     }
 

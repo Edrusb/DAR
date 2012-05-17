@@ -1,24 +1,18 @@
 if BUILD_MODE32
-    MYLIB=dar32
-    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -I../dar_suite
+MYLIB=dar32
+AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -I../dar_suite
 else
 if BUILD_MODE64
-    MYLIB=dar64
-    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -I../dar_suite
+MYLIB=dar64
+AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -I../dar_suite
 else
-    MYLIB=dar
-    AM_CPPFLAGS=-I../libdar -I../dar_suite
+MYLIB=dar
+AM_CPPFLAGS=-I../libdar -I../dar_suite
 endif
 endif
 
-if BUILD_DAR_STATIC
-  noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish
-  AM_LDFLAGS = -all-static @LTLIBINTL@
-else
-  noinst_PROGRAMS =
-### testing program are used for debugging purposes, they will be built only if static linking is available
-  AM_LDFLAGS = @LTLIBINTL@
-endif
+noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_string_file
+AM_LDFLAGS = -all-static @LTLIBINTL@
 
 LDADD = -L../libdar -l$(MYLIB)
 noinst_HEADERS = testtools.hpp
@@ -92,3 +86,9 @@ test_elastic_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 test_blowfish_SOURCES = test_blowfish.cpp ../dar_suite/shell_interaction.cpp
 test_blowfish_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+
+test_mask_list_SOURCES = test_mask_list.cpp ../dar_suite/shell_interaction.cpp
+test_mask_list_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+
+test_string_file_SOURCES = test_string_file.cpp ../dar_suite/shell_interaction.cpp testtools.cpp
+test_string_file_DEPENDENCIES = ../libdar/lib$(MYLIB).la

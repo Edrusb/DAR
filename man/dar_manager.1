@@ -1,41 +1,44 @@
-.TH DAR_MANAGER 1 "JUL 19, 2003"
+.TH DAR_MANAGER 1 "JAN 8, 2006"
 .UC 8
 .SH NAME
-dar_manager \- disk archive manager
+dar_manager - disk archive manager
 .SH SYNOPSIS
-.B dar_manager [-v] [-j] -C [<path>/]<database>
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -A [<path>/]<basename> [[<path>/]<archive_basename>]
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -l
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -D <number>[-<number>]
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -b <number> <new_archive_basename>
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -p <number> <path>
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -o [list of options to pass to dar]
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -d [<path to dar command>]
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -r [list of files to restore]
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -u <number>
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -f file
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -s
-.P
-.B dar_manager [-v] [-j] -B [<path>/]<database> -m <number> <number>
-.P
-.B dar_manager -h
-.P
-.B dar_manager -V
-.P
+
+dar_manager [-v] [-j] -C [<path>/]<database>
+
+dar_manager [-v] [-j] -B [<path>/]<database> -A [<path>/]<basename> [ [<path>/]<archive_basename>]
+
+dar_manager [-v] [-j] -B [<path>/]<database> -l
+
+dar_manager [-v] [-j] -B [<path>/]<database> -D <number>[-<number>]
+
+dar_manager [-v] [-j] -B [<path>/]<database> -b <number> <new_archive_basename>
+
+dar_manager [-v] [-j] -B [<path>/]<database> -p <number> <path>
+
+dar_manager [-v] [-j] -B [<path>/]<database> -o [list of options to pass to dar]
+
+dar_manager [-v] [-j] -B [<path>/]<database> -d [<path to dar command>]
+
+dar_manager [-v] [-j] -B [<path>/]<database> [-w <date>] [-e <extra options to dar>] -r [list of files to restore]
+
+dar_manager [-v] [-j] -B [<path>/]<database> -u <number>
+
+dar_manager [-v] [-j] -B [<path>/]<database> -f file
+
+dar_manager [-v] [-j] -B [<path>/]<database> -s
+
+dar_manager [-v] [-j] -B [<path>/]<database> -m <number> <number>
+
+dar_manager [-v] [-j] -B [<path>/]<database> -i
+
+dar_manager -h
+
+dar_manager -V
+
 .SH DESCRIPTION
 .B dar_manager
-is part of the Disk Archive suite. Its purpose is to simplify the restoration of a few files over many backup, full or differential. This is achieved by gathering the catalogue of each archive (this has to be done once). At any time you just have to give the relative path to the files you want to restore, dar_manager will call dar with proper options and restore the last version of each file.
+is part of the Disk Archive suite. Its purpose is to simplify the restoration of a set of few files present in many backup, full or differential. This is achieved by gathering the catalogue of each archive (this has to be done once). At any time you just have to give the relative path to the files you want to restore, dar_manager will call dar with the proper options and restore the last version of each file (or the last version before given date). Note that dar_manager is to be used when you have remove some files by accident some time ago and wish to recover them. It thus not adapted to restore the state a directory tree had at a given time, in particular when some files have to be removed. For that you must use dar directly with the corresponding archive to the date for which you wish to restore the state.
 .PP
 you can restore any file by hand without
 .B dar_manager
@@ -43,9 +46,7 @@ you can restore any file by hand without
 .B
 dar_manager
 simplify the process by looking in its internal database, built from archive "catalogues".
-.RE
 .SH OPTIONS
-.RS
 .TP 20
 -C, --create [<path>/]<database>
 creates an empty database that will collect informations about several archives. The <database> is a filename that is required for -B option. To destroy a <database> just remove the file.
@@ -53,7 +54,10 @@ creates an empty database that will collect informations about several archives.
 -B, --base [<path>/]<database>
 specify the database to read or modify. The <database> file must exist, and have a database structure (see -C option).
 .TP 20
--A, --add [<path>/]<basename> [[<path>/]<archive_basename>]
+-i, --interactive
+use a keyboard interactive text menu to do operations on the given database. So you may avoid reading the other options described in this manual page, if you wish, and just use the interactive option. You will however always have to create an empty database (-C option) and restore files manually (-r option).
+.TP 20
+-A, --add [<path>/]<basename> [ [<path>/]<archive_basename>]
 add an archive to the database. An isolated catalogue can also be used only if it has been produced by dar version 1.2.0 or above. Why ? Because, an isolated catalogue produced by older version will always tell that no files are saved in the archive of reference, in that case the solution is to provide the archive itself as argument. An optional second argument is the basename of the archive if it is different from the first argument (need for extraction of files). For example you could have an isolated catalogue in first argument and the basename of the original archive (where is stored the data) as second argument. By default,
 .B dar_manager
 will look for an archive of reference in the command line used to create each archive, but in some cases, it may be necessary to specify the archive name (for example if you've changed its name).
@@ -85,6 +89,16 @@ Set the path to dar. If no argument is given, dar is expected to be located in t
 will restore all (an only) the given files, asking for the proper archive only. Last version of each file over several archive is based on the modification time of the inode, thus if you have a more recent backup that contains an old version of a given file, a older archive could be used to restore the file, if its last modification time (mtime) is more recent.
 Note that files listed after -r option, must never have an absolute path. They will be restored under the directory specified with -R option of dar (thus using -o option), or by default, in subdirectories of the current directory.
 .TP 20
+-w, --when <date>
+alters the -r option behavior: still restores the files in the most recent version available but only before the given date (versions of more recent dates are ignored). The <date> must respect the following format [ [ [year/]month/]day-]hour:minute[:second]. For example "22:10" for 10 PM past 10 or the current day,  "7-22:10" for 10 PM past 10 the 7th of the current month, "3/07-22:10" for the 7th of march at 22:10 of the current year, "2002/03/31-14:00:00" the date of the first dar's release ;-). The given date must be in the past, of course, and is compared to the "last modification" date of the saved files and not to the date at which archives have been done. Thus if a file has been changed long ago but saved in a recent (full) archive, it will be elected for restoration even for dates older than the creation of the archive. In the other way, a file saved long time ago with a mtime that was set to a date in the future will not be elected for restoration when giving the date at which was done the archive.
+.TP 20
+-e, --extra <options>
+pass some more options to dar. While the -o options takes all that follows on the command line as argument to pass to dar and write theses in the database, the -e option does not alter the database and has only one argument. In other words, if you need to pass several options to dar through the use of the -e option, you need to use quotes (simple quotes ' or double quotes ") to enclose theses options. Example:
+.P
+.RS
+dar_manager -B database.dmd -e "-w -v -p -b -r -H 1" -r some/files
+.RE
+.TP 20
 -u, --used <number>
 list the files that the given archive owns as last version available. Thus when no file is listed, the given archive is no more useful in database, and can be removed safely (-D option). If <number> is zero, all available file are listed.
 .TP 20
@@ -115,7 +129,7 @@ display help usage
 .TP 20
 -V, --version
 display software version
-.RE
+
 .SH EXIT CODES
 .B dar_manager
 exits with the following code:
@@ -139,8 +153,11 @@ see dar manual page for signification
 see dar manual page for signification
 .TP 10
 11 and above
-.B dar called from dar_manager
-has exited with non zero status. Substract 10 to this exit code to get dar's exit code.
+.B dar
+ called from dar_manager has exited with non zero status. Substract 10 to this exit code to get dar's exit code.
+
+.SH SIGNALS
+dar_manager acts like dar (see dar man page for list of signals), upon certain signal reception dar aborts cleanly
 
 .SH SEE ALSO
 dar(1), dar_xform(1), dar_slave(1), dar_cp(1)
@@ -154,6 +171,6 @@ none actually
 .SH AUTHOR
 .nf
 http://dar.linux.free.fr/
-Denis Corbin (dar.linux@free.fr)
+Denis Corbin
 France
 Europe

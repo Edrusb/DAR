@@ -2,25 +2,41 @@ TODO (order is not significant)
 ===========
 - have wild card for -f and -r options of dar_manager
 - add a 'testing' option for dar_manager's databases
-- have the possibility to define a given compression algo + level by file type
+- have the possibility to define a given compression algo + level by file type and be able to merge archive using different compressions
 - have dar_manager able to read encrypted archives, and encrypt databases
-- have -X -I -P read a list from a given file
 - having null terminated string in -B files
 - escape character for quotes in -B files
 - rewrite all documentation in HTML
 - LZO compression (poor documentation... need time to read how is done the implementation in lzop)
-- extend EA to xfs and trusted. Replace "root" EA name by "system" EA name (source code, comments, doc)
 - warning when an explicit file from [list of path] has not been found
-- dar_manager can restore all files at the state it was at a given time (Uwe Freese's original idea, on support forum)
 - add create_diff and create_full syntaxical target in dcf files
+- have makefile-like user targets
+- have "reference" target (once a -A option is given). [Same as create_diff / create_full]
 - have a minimum block size for compression, under which files are compressed
-  toghether, size is user defined.
-- having a new action: the "snapshot" to catalogue (only contains informations about the current status of files)
-- deprecate [list of path] warn and redirect with -g option (open the make-like target syntax)
+toghether, size would be user defined.
 - some more encryption cypher
 - Matthew's "dry martini" option ;-)
 - parchive inside libdar
-- have the possibility to abort (^C) dar_manager at any time without the risk of loosing the database
-- API feature : have a method to return information about the listed archvie (additional method, when not using op_listing)
+- API feature : have a method to return information about the listed archive (additional method, when not using op_listing)
 - API feature : have cypher used stored in the archive and automatically detect the cypher used when reading an archive
-- dar_manager uses temporary files to limit the period of "all in memory" information when writing back database to file.
+- hard links support to pipes soft links and directory
+- regex in -X -I -P -g masks (switch --alter=r[egex] --alter=g[lob])
+- enable cross compilation (Wesley) http://sources.redhat.com/autobook/autobook/autobook_258.html and http://sources.redhat.com/autobook/autobook/autobook_269.html#SEC269
+- error when path contains spaces (#1117188)
+- prevoir revue de code module par module avec consideration des aspects :
+- robustesse (protection des exceptions et des cas possibles d'erreurs)
+- messages a traduire (gettext)
+- documentation (commentaires et doxygen)
+- simplification du code (converstions inutiles, mise en facteur commun...)
+- optimisation memoire et vitesse
+- decremental backup feature
+- only process file removal at restoration time
+- remember the cypher used (algorithm chosen for encryption stored inside the archive)
+this way user does only have to use the password/passphrase
+- binary diff when file size exceed a given size (no diff by default)
+- suppress the summary information at the end of the backup (with -q option)
+- "path" to look for slices (George Foot's original idea)
+- dar_cat program (makes one archive from two) : make an operator+ on archive and catalogue
+- vesionning of *.mo files to be able to have several versions of libdar installed
+- remove all generated files from CVS (./configure & so ON, make dev snapshot available from web).
+- optimize search in directory when there is at least several hundred files

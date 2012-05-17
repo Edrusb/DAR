@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.cpp,v 1.16.2.2 2005/03/19 23:28:09 edrusb Rel $
+// $Id: mask.cpp,v 1.18 2005/11/09 18:31:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -104,29 +104,31 @@ namespace libdar
     }
 
     regular_mask::regular_mask(const string & wilde_card_expression,
-			       bool case_sensit)
+			       bool x_case_sensit)
     {
-        char *tmp = tools_str2charptr(wilde_card_expression);
+	mask_exp = wilde_card_expression;
+	case_sensit = x_case_sensit;
+	set_preg(mask_exp, case_sensit);
+    }
 
-        try
-        {
-            S_I ret;
+    regular_mask::regular_mask(const regular_mask & ref) : mask(ref)
+    {
+	mask_exp = ref.mask_exp;
+	case_sensit = ref.case_sensit;
+	set_preg(mask_exp, case_sensit);
+    }
 
-            if((ret = regcomp(&preg, tmp, REG_NOSUB|(case_sensit ? 0 : REG_ICASE))) != 0)
-            {
-                const S_I msg_size = 1024;
-                char msg[msg_size];
-                regerror(ret, &preg, msg, msg_size);
-                throw Erange("regular_mask::regular_mask", msg);
-            }
+    regular_mask & regular_mask::operator= (const regular_mask & ref)
+    {
+	const mask *ref_ptr = &ref;
+	mask *me = this;
+	*me = *ref_ptr; // initializing the inherited mask part of the object
+	mask_exp = ref.mask_exp;
+	case_sensit = ref.case_sensit;
+	regfree(&preg);
+	set_preg(mask_exp, case_sensit);
 
-        }
-        catch(...)
-        {
-            delete [] tmp;
-            throw;
-        }
-        delete [] tmp;
+	return *this;
     }
 
     bool regular_mask::is_covered(const string & expression) const
@@ -146,6 +148,31 @@ namespace libdar
         delete [] tmp;
 
         return matches;
+    }
+
+
+    void regular_mask::set_preg(const string & wilde_card_expression, bool x_case_sensit)
+    {
+        char *tmp = tools_str2charptr(wilde_card_expression);
+
+        try
+        {
+            S_I ret;
+
+            if((ret = regcomp(&preg, tmp, REG_NOSUB|(x_case_sensit ? 0 : REG_ICASE)|REG_EXTENDED)) != 0)
+            {
+                const S_I msg_size = 1024;
+                char msg[msg_size];
+                regerror(ret, &preg, msg, msg_size);
+                throw Erange("regular_mask::regular_mask", msg);
+            }
+        }
+        catch(...)
+        {
+            delete [] tmp;
+            throw;
+        }
+        delete [] tmp;
     }
 
     not_mask & not_mask::operator = (const not_mask & m)
@@ -247,7 +274,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: mask.cpp,v 1.16.2.2 2005/03/19 23:28:09 edrusb Rel $";
+        static char id[]="$Id: mask.cpp,v 1.18 2005/11/09 18:31:53 edrusb Rel $";
         dummy_call(id);
     }
 

@@ -7,7 +7,7 @@ Status meanings :
 ---------------
 letter status description :
 ---------------
-a * alteration of operation             --alter   argument: s[aved] | SI[-unit[s]] | binary[-unit[s]] | a[time] | c[time] | m[ask] | n[o-case] | case
+a * alteration of operation             --alter   argument: s[aved] | SI[-unit[s]] | binary[-unit[s]] | a[time] | c[time] | m[ask] | n[o-case] | case | r[egex] | g[lob] | e[rase_ea] | k[eep-compressed] | f[ixed_date]
 b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff
@@ -24,11 +24,11 @@ n - do not allow overwriting            --no-overwrite
 o - path of the output pipe             --output
 p - pause before creating new slice     --pause
 q !
-r - do not overwrite more recent file   --recent
+r - do not overwrite more recent file   --recent [=date] (to implement)
 s + size of slice                       --slice
 t + test archive structure              --test
-u - not consider user EA                --no-user-EA
-v - verbose output                      --verbose
+u + exclude EA from operation (mask)    --exclude-ea
+v - verbose output                      --verbose   --verbose=skipped -vb
 w * do not warn before overwriting      --no-warn
 x + extract archive                     --extract
 y * bzip2 compression                   --bzip2
@@ -52,8 +52,8 @@ P + prune a directory tree              --prune
 Q + quite on stderr at startup		no long option equivalent
 R + set the root directory              --root
 S + size of the first slice             --first-slice
-T - tree listing format                 --tree-format,
-U - not consider root(or system) EA     --no-system-EA
+T - tree listing format                 --tree-format, --list-format=<normal|tree|xml>
+U - include EA for the operation (mask) --include-ea
 V - version information                 --version
 W - warranty disclosure information (POSIX RESERVED, sorry)
 X + exclude mask                        --exclude
@@ -62,3 +62,11 @@ Z + excluded filename from compression  --exclude-compression
   - don't save files with nodump flag set --nodump
 # + encryption block size                 --crypto-block
 * + encryption block size for the archive of reference --crypto-block-ref
+, - cache directory tagging standard    --cache-directory-tagging
+[ + include files listed in given file   --include-from-file
+] + exclude files listed in given file   --exclude-from-file
++ + merging operation                    --merge
+@ + second reference archive for merging --aux-ref
+$ + key for auxilliary refence archive   --aux-key
+~ + command to execute between slices    --aux-execute
+% + encryption block size for the auxilliary archive of reference --aux-crypto-block

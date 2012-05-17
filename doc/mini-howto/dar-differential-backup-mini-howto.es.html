@@ -3,10 +3,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.3.9: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.3.4: http://docutils.sourceforge.net/" />
 <title>DAR differential backup mini-howto -ES-</title>
 <meta name="author" content="Grzegorz Adam Hankiewicz" />
-<meta name="date" content="2005-09-27 22:40:51 +0200" />
+<meta name="date" content="2004-12-16 09:25:52 +0000 (Thu, 16 Dec 2004)" />
 <meta name="copyright" content="Este documento está bajo dominio público." />
 <style type="text/css">
 
@@ -167,7 +167,6 @@ td.field-name {
 </style>
 </head>
 <body>
-<div class="document" id="dar-differential-backup-mini-howto-es">
 <h1 class="title">DAR differential backup mini-howto -ES-</h1>
 <table class="docinfo" frame="void" rules="none">
 <col class="docinfo-name" />
@@ -180,9 +179,9 @@ td.field-name {
 <tr class="field"><th class="docinfo-name">Translator:</th><td class="field-body">Grzegorz Adam Hankiewicz</td>
 </tr>
 <tr><th class="docinfo-name">Date:</th>
-<td>2005-09-27 22:40:51 +0200</td></tr>
+<td>2004-12-16 09:25:52 +0000 (Thu, 16 Dec 2004)</td></tr>
 <tr><th class="docinfo-name">Version:</th>
-<td>H3 (406)</td></tr>
+<td>H2 ($Rev: 402 $ under <a class="reference" href="http://subversion.tigris.org/">Subversion</a> control)</td></tr>
 <tr class="field"><th class="docinfo-name">Web site:</th><td class="field-body"><a class="reference" href="http://gradha.sdf-eu.org/textos/backup.es.html">http://gradha.sdf-eu.org/textos/backup.es.html</a></td>
 </tr>
 <tr><th class="docinfo-name">Copyright:</th>
@@ -192,6 +191,7 @@ inglés, italiano y español.</td>
 </tr>
 </tbody>
 </table>
+<div class="document" id="dar-differential-backup-mini-howto-es">
 <div class="contents topic" id="contents">
 <p class="topic-title first"><a name="contents">Contents</a></p>
 <ul class="simple">
@@ -262,7 +262,7 @@ en <a class="reference" href="http://docutils.sourceforge.net/">http://docutils.
 <p><a class="reference" href="http://dar.linux.free.fr/">DAR</a> es muy similar a <a class="reference" href="http://freshmeat.net/projects/tar/">tar</a> en el número de opciones que tiene: hay
 suficiente para cada necesidad, pero demasiadas para un novato.
 Como es habitual, siempre puede obtener ayuda del programa
-tecleando <tt class="docutils literal"><span class="pre">dar</span> <span class="pre">-h</span></tt> o <tt class="docutils literal"><span class="pre">man</span> <span class="pre">dar</span></tt> tras su instalación. Al
+tecleando <tt class="literal"><span class="pre">dar</span> <span class="pre">-h</span></tt> o <tt class="literal"><span class="pre">man</span> <span class="pre">dar</span></tt> tras su instalación. Al
 igual que <a class="reference" href="http://freshmeat.net/projects/tar/">tar</a>, hay un conjunto de parámetros obligatorios que
 definen el tipo de operación que va a realizar (crear, extraer,
 listar, etc), y un conjunto de parámetros que afectan la opción
@@ -353,7 +353,7 @@ que no hago copias de seguridad.  Mientras, la parte <em>sistema</em>
 de la partición es bastante estable y no se modifica porque
 (des)instalo software muy de vez en cuando.  De hecho, de mi
 directorio <em>home</em> las únicas cosas que cambian normalmente
-son mis directorios <tt class="docutils literal"><span class="pre">Mail</span></tt> y <tt class="docutils literal"><span class="pre">projects</span></tt>, donde pongo este
+son mis directorios <tt class="literal"><span class="pre">Mail</span></tt> y <tt class="literal"><span class="pre">projects</span></tt>, donde pongo este
 documento y otro software que escribo/hackeo.</p>
 <p>La diferenciación básica entre <em>directorios home</em> y <em>de sistema</em>
 también puede ser útil en organizaciones. Si trabaja para una
@@ -399,22 +399,22 @@ dar -m 256 -y -s 600M -D -R / -c `date -I`_data -Z &quot;*.gz&quot; \
    -P mnt -P dev/pts -P proc -P floppy -P burner -P cdrom
 </pre>
 <ul>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">-m</span> <span class="pre">256</span></tt></dt>
+<li><dl class="first">
+<dt><tt class="literal"><span class="pre">-m</span> <span class="pre">256</span></tt></dt>
 <dd><p class="first last"><a class="reference" href="http://dar.linux.free.fr/">DAR</a> puede comprimir su copia de seguridad. La compresión
 se aplica a ficheros individuales, y puede ser perjudicial
 para pequeños ficheros. Por defecto los ficheros con 100
-bytes o menos no serán comprimidos. Con el parámetro <tt class="docutils literal"><span class="pre">-m</span></tt>
+bytes o menos no serán comprimidos. Con el parámetro <tt class="literal"><span class="pre">-m</span></tt>
 incremento este valor a 256, el cual parece funcionar mejor
 para esos pequeños ficheros de configuración que se almacenan
-en <tt class="docutils literal"><span class="pre">/etc/</span></tt> y <tt class="docutils literal"><span class="pre">/home</span></tt>. Como puede ver, esta opción es
+en <tt class="literal"><span class="pre">/etc/</span></tt> y <tt class="literal"><span class="pre">/home</span></tt>. Como puede ver, esta opción es
 completamente opcional, básicamente para fanáticos del ajuste
 como yo.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">-y</span> <span class="pre">[nivel]</span></tt></dt>
+<li><dl class="first">
+<dt><tt class="literal"><span class="pre">-y</span> <span class="pre">[nivel]</span></tt></dt>
 <dd><p class="first last">Esta opción activa la compresión <a class="reference" href="http://sources.redhat.com/bzip2/">Bzip2</a> del archivo, que por
 defecto está desactivada. Incluso puede especificar un nivel
 numérico de compresión, que va de 0 (no compresión) hasta
@@ -425,8 +425,8 @@ el 6 me va bien.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">-s</span> <span class="pre">600M</span></tt></dt>
+<li><dl class="first">
+<dt><tt class="literal"><span class="pre">-s</span> <span class="pre">600M</span></tt></dt>
 <dd><p class="first last">Aquí está la característica de <a class="reference" href="http://dar.linux.free.fr/">DAR</a> de trocear. El tamaño
 especificado de 600 Megabytes es el tamaño máximo de fichero
 que <a class="reference" href="http://dar.linux.free.fr/">DAR</a> creará. Si su copia de seguridad es mayor, obtendrá
@@ -438,22 +438,22 @@ mucho más pequeñas que este tamaño, y mantengo este parámetro
 sólo por si acaso se me ocurre crear un fichero grande en
 mi directorio home y olvido borrarlo. Si este parámetro
 le resulta útil, lea también en el manual de <a class="reference" href="http://dar.linux.free.fr/">DAR</a> sobre el
-parámetro <tt class="docutils literal"><span class="pre">-S</span></tt>.</p>
+parámetro <tt class="literal"><span class="pre">-S</span></tt>.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">-D</span></tt></dt>
+<li><dl class="first">
+<dt><tt class="literal"><span class="pre">-D</span></tt></dt>
 <dd><p class="first last">Almacena directorios como directorios vacíos aquellos excluidos
-por la opción <tt class="docutils literal"><span class="pre">-P</span></tt> o aquellos ausentes en la línea de
+por la opción <tt class="literal"><span class="pre">-P</span></tt> o aquellos ausentes en la línea de
 comando como parámetros. Esto es útil cuando recupera una
 copia de seguridad desde cero, para que no tenga que crear
 manualmente todos los directorios que fueron excluidos.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">-R</span> <span class="pre">/</span></tt></dt>
+<li><dl class="first">
+<dt><tt class="literal"><span class="pre">-R</span> <span class="pre">/</span></tt></dt>
 <dd><p class="first last">Especifica el directorio raíz para salvar o recuperar ficheros.
 Por defecto esto apunta al directorio de trabajo actual.
 Estamos realizando una <em>copia de seguridad de sistema</em>,
@@ -461,13 +461,13 @@ así que apuntará al directorio raíz.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_data</span></tt></dt>
+<li><dl class="first">
+<dt><tt class="literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_data</span></tt></dt>
 <dd><p class="first">Este es uno de los parámetros obligatorios de los que hablé
 antes, y significa crear una copia de seguridad. Para aquellos
-que no entienden lo que sigue, <tt class="docutils literal"><span class="pre">`date</span> <span class="pre">-I`</span></tt> es la expansión
+que no entienden lo que sigue, <tt class="literal"><span class="pre">`date</span> <span class="pre">-I`</span></tt> es la expansión
 de comillas de la shell de línea de comando. En pocas palabras,
-<tt class="docutils literal"><span class="pre">date</span> <span class="pre">-I</span></tt> proporcionará la fecha en formato AAAA-MM-DD. Con
+<tt class="literal"><span class="pre">date</span> <span class="pre">-I</span></tt> proporcionará la fecha en formato AAAA-MM-DD. Con
 comillas y usado como parámetro, la salida del comando será
 usada como cadena del comando padre. De este modo puede
 crear copias de seguridad con la fecha de creación empotrada
@@ -479,28 +479,28 @@ echo &quot;La fecha de hoy es `date -I`&quot;
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">-Z</span> <span class="pre">patrón_fichero</span></tt></dt>
+<li><dl class="first">
+<dt><tt class="literal"><span class="pre">-Z</span> <span class="pre">patrón_fichero</span></tt></dt>
 <dd><p class="first last">Usando las reglas normales de meta caracteres en ficheros puede
 especificar patrones de ficheros que quiere almacenar en la
 copia de seguridad sin compresión. Esto sólo tiene sentido
-si usa el parámetro <tt class="docutils literal"><span class="pre">-y</span></tt>. Comprimir ficheros comprimidos
+si usa el parámetro <tt class="literal"><span class="pre">-y</span></tt>. Comprimir ficheros comprimidos
 únicamente crea ficheros mayores y malgasta tiempo de la CPU.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">-P</span> <span class="pre">ruta_relativa</span></tt></dt>
+<li><dl class="first">
+<dt><tt class="literal"><span class="pre">-P</span> <span class="pre">ruta_relativa</span></tt></dt>
 <dd><p class="first last">Con este parámetro le dice a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> qué rutas no quiere
 almacenar en su copia de seguridad. Aquí posiblemente quiere
 poner el directorio home (soy el único usuario de la máquina,
 hay algunos más, pero con el propósito de pruebas/sistema),
 directorios de sistema que no son realmente ficheros físicos
-como <tt class="docutils literal"><span class="pre">proc</span></tt>, otras unidades que pueda tener montadas bajo
-<tt class="docutils literal"><span class="pre">mnt</span></tt> (destacando la unidad donde va a poner la copia de
+como <tt class="literal"><span class="pre">proc</span></tt>, otras unidades que pueda tener montadas bajo
+<tt class="literal"><span class="pre">mnt</span></tt> (destacando la unidad donde va a poner la copia de
 seguridad), etc, etc.  Tenga en cuenta que las rutas que
 especifique aquí deben ser relativas a la ruta especificada
-por el parámetro <tt class="docutils literal"><span class="pre">-R</span></tt>.</p>
+por el parámetro <tt class="literal"><span class="pre">-R</span></tt>.</p>
 </dd>
 </dl>
 </li>
@@ -515,8 +515,8 @@ dar -m 256 -y -s 600M -D -R /home/gregorio -c `date -I`_data \
 </pre>
 <p>Nada nuevo bajo el sol. Como puede ver, la mayoría de la línea
 de comando es idéntica a la anterior, únicamente cambio el nombre
-de los directorios que quiero excluir con <tt class="docutils literal"><span class="pre">-P</span></tt> y el directorio
-raíz con el parámetro <tt class="docutils literal"><span class="pre">-R</span></tt>.</p>
+de los directorios que quiero excluir con <tt class="literal"><span class="pre">-P</span></tt> y el directorio
+raíz con el parámetro <tt class="literal"><span class="pre">-R</span></tt>.</p>
 </blockquote>
 </div>
 <div class="section" id="haciendo-copias-de-seguridad-diferenciales-con-dar">
@@ -536,14 +536,14 @@ dar -m 256 -y -s 600M -D -R / -c `date -I`_diff -Z &quot;*.gz&quot; \
    -A copia_previa
 </pre>
 <ul>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_diff</span></tt></dt>
+<li><dl class="first">
+<dt><tt class="literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_diff</span></tt></dt>
 <dd><p class="first last">Sólo cambio el nombre del fichero, por razones cosméticas.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">-A</span> <span class="pre">copia_previa</span></tt></dt>
+<li><dl class="first">
+<dt><tt class="literal"><span class="pre">-A</span> <span class="pre">copia_previa</span></tt></dt>
 <dd><p class="first last">Este nuevo parámetro se usa para decirle a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> dónde puede
 encontrar la copia de seguridad anterior para que pueda
 crear una copia de seguridad diferencial en lugar de una
@@ -574,7 +574,7 @@ decidir qué ficheros han cambiado. Realizar esto puede consumir
 mucho ancho de banda en una red. En su lugar, tras crear la
 copia de seguridad, puede extraer el <em>catálogo</em> y enviarlo a la
 máquina que realiza las copias de seguridad.  La siguiente vez,
-puede usar este fichero con el parámetro <tt class="docutils literal"><span class="pre">-A</span></tt>, y funcionará
+puede usar este fichero con el parámetro <tt class="literal"><span class="pre">-A</span></tt>, y funcionará
 como si el fichero completo estuviese ahí.</p>
 <p>Esto también puede ser útil si usa trozos, porque el <em>catálogo</em>
 se crea a partir del primer y último trozo. Es mucho más cómodo
@@ -589,7 +589,7 @@ seguridad anterior.</p>
 <p>Tal y como se mencionó anteriormente, es hora de configurar
 las copias de seguridad bajo cron. Ponga el siguiente
 script ejecutable para copias de seguridad de <em>sistema</em> bajo
-<tt class="docutils literal"><span class="pre">/root/dar_backup.sh</span></tt>:</p>
+<tt class="literal"><span class="pre">/root/dar_backup.sh</span></tt>:</p>
 <pre class="literal-block">
 #!/bin/sh
 
@@ -615,10 +615,10 @@ como root y guardar los binarios donde los cree para que nadie
 pueda tocarlos.  Y también ejecutar <a class="reference" href="http://www.tripwire.org/">Tripwire</a> sobre ellos.</li>
 <li><a class="reference" href="http://dar.linux.free.fr/">DAR</a> genera estadísticas tras cada ejecución. No las queremos
 en nuestro cron porque generarían emails innecesarios. Sólo
-<tt class="docutils literal"><span class="pre">stdout</span></tt> (la salida estándar) es redireccionada a
-<tt class="docutils literal"><span class="pre">/dev/null</span></tt>.  Los errores serán mostrados y un email enviado
+<tt class="literal"><span class="pre">stdout</span></tt> (la salida estándar) es redireccionada a
+<tt class="literal"><span class="pre">/dev/null</span></tt>.  Los errores serán mostrados y un email enviado
 si algo va mal.</li>
-<li>Los últimos dos comandos <tt class="docutils literal"><span class="pre">find</span></tt> son opcionales. Los uso para
+<li>Los últimos dos comandos <tt class="literal"><span class="pre">find</span></tt> son opcionales. Los uso para
 cambiar el propietario a un usuario normal, quien creará
 posteriormente las copias de seguridad. De nuevo, otro
 riesgo de seguridad. El usuario root debería hacer copias
@@ -629,7 +629,7 @@ cortafuegos y las palabras claves de mis cuentas de usuarios
 para poder leer las copias de seguridad, ya la he fastidiado.</li>
 </ul>
 <p>Ahora ponga el siguiente script casi idéntico para copias de
-seguridad diferenciales en <tt class="docutils literal"><span class="pre">/root/dar_diff.sh</span></tt>:</p>
+seguridad diferenciales en <tt class="literal"><span class="pre">/root/dar_diff.sh</span></tt>:</p>
 <pre class="literal-block">
 #!/bin/sh
 
@@ -643,37 +643,37 @@ PREV=`/bin/ls $DIR/*.dar|/usr/bin/tail -n 1|/usr/bin/awk -F '.' '{print $1;}'`
 /usr/bin/find $DIR -type f -exec chown .gregorio \{\} \;
 /usr/bin/find $DIR -type f -exec chmod 440 \{\} \;
 </pre>
-<p>Los únicos dos cambios son la adición del parámetro <tt class="docutils literal"><span class="pre">-A</span></tt>
+<p>Los únicos dos cambios son la adición del parámetro <tt class="literal"><span class="pre">-A</span></tt>
 y la generación de la variable PREV con una complicada línea
 de comando.  Veamos qué es lo que hace esta línea de comando:</p>
 <ul class="simple">
-<li>Primero el comando <tt class="docutils literal"><span class="pre">ls</span></tt> crea un listado de los ficheros con
-la extensión <tt class="docutils literal"><span class="pre">.dar</span></tt> en el directorio de copias de
+<li>Primero el comando <tt class="literal"><span class="pre">ls</span></tt> crea un listado de los ficheros con
+la extensión <tt class="literal"><span class="pre">.dar</span></tt> en el directorio de copias de
 seguridad. La salida se pasa por una tubería al siguiente
 comando.</li>
-<li>Por defecto <tt class="docutils literal"><span class="pre">ls</span></tt> muestra los ficheros en orden alfabético.
-Usamos <tt class="docutils literal"><span class="pre">tail</span></tt> para obtener el último fichero con el parámetro
-<tt class="docutils literal"><span class="pre">-n</span> <span class="pre">1</span></tt>, el cual hace que sólo se muestre la última línea.
+<li>Por defecto <tt class="literal"><span class="pre">ls</span></tt> muestra los ficheros en orden alfabético.
+Usamos <tt class="literal"><span class="pre">tail</span></tt> para obtener el último fichero con el parámetro
+<tt class="literal"><span class="pre">-n</span> <span class="pre">1</span></tt>, el cual hace que sólo se muestre la última línea.
 De nuevo, el último nombre de fichero es enviado por tubería
 al siguiente comando.</li>
 <li><a class="reference" href="http://dar.linux.free.fr/">DAR</a> quiere operar siempre con nombres de fichero sin número de
 trozo o extensión. Esto significa que si no nos deshacemos de
 éstas, <a class="reference" href="http://dar.linux.free.fr/">DAR</a> detendrá la operación para realizar una pregunta
 interactiva al usuario, fastidiando toda la automatización.
-Separamos el nombre completo del fichero con <tt class="docutils literal"><span class="pre">awk</span></tt>. El comando
-<tt class="docutils literal"><span class="pre">awk</span></tt> separa la cadena por los puntos, y muestra la primera
+Separamos el nombre completo del fichero con <tt class="literal"><span class="pre">awk</span></tt>. El comando
+<tt class="literal"><span class="pre">awk</span></tt> separa la cadena por los puntos, y muestra la primera
 columna. El resultado es el nombre base que queremos pasar
 a <a class="reference" href="http://dar.linux.free.fr/">DAR</a>.</li>
 </ul>
 <p>Ahora sólo tenemos que poner estos dos scripts bajo cron. Esto
-es lo que tenemos que teclear tras <tt class="docutils literal"><span class="pre">crontab</span> <span class="pre">-e</span></tt>:</p>
+es lo que tenemos que teclear tras <tt class="literal"><span class="pre">crontab</span> <span class="pre">-e</span></tt>:</p>
 <pre class="literal-block">
 15 0 2-31 * * ./dar_diff.sh
 15 0 1    * * ./dar_backup.sh
 </pre>
-<p>Puede informarse sobre la sintaxis con <tt class="docutils literal"><span class="pre">man</span> <span class="pre">-S</span> <span class="pre">5</span> <span class="pre">crontab</span></tt>.
+<p>Puede informarse sobre la sintaxis con <tt class="literal"><span class="pre">man</span> <span class="pre">-S</span> <span class="pre">5</span> <span class="pre">crontab</span></tt>.
 En pocas palabras, estas dos líneas le dicen a cron que ejecute
-los scripts 15 minutos tras medianoche. <tt class="docutils literal"><span class="pre">dar_backup.sh</span></tt>
+los scripts 15 minutos tras medianoche. <tt class="literal"><span class="pre">dar_backup.sh</span></tt>
 se ejecutará sólo el primer día del mes. El otro script se
 ejecutará el resto de los días.</p>
 <p>Aquí están los scripts de copia de seguridad para sus usuarios.
@@ -744,7 +744,7 @@ you want to put the restored data, usually '/' when run as root.&quot;
 fi
 </pre>
 <p>Este script es auto explicativo. La única cosa por la que debe
-preocuparse es el parámetro <tt class="docutils literal"><span class="pre">-w</span></tt>, que le dice a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> que
+preocuparse es el parámetro <tt class="literal"><span class="pre">-w</span></tt>, que le dice a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> que
 sobreescriba los ficheros que encuentre. Esto es necesario para
 copias de seguridad diferenciales. Oh, y ponga el script en el
 mismo directorio que sus ficheros de copia de seguridad. Aquí
@@ -793,14 +793,14 @@ fi
 </pre>
 <p>Puede probar esta versión fácilmente ejecutando el script
 y matando el proceso <a class="reference" href="http://dar.linux.free.fr/">DAR</a> desde otra terminal o consola con
-<tt class="docutils literal"><span class="pre">killall</span> <span class="pre">dar</span></tt>.  Esto forzará la terminación del proceso <a class="reference" href="http://dar.linux.free.fr/">DAR</a>
+<tt class="literal"><span class="pre">killall</span> <span class="pre">dar</span></tt>.  Esto forzará la terminación del proceso <a class="reference" href="http://dar.linux.free.fr/">DAR</a>
 y verá que una de las ramas de error es alcanzada en el script.</p>
 <p>Otro posible uso de la verificación del código de retorno del
 comando sería borrar archivos incompletos del disco duro si algo
 falla, ejecutar comandos externos adicionales si algo falla,
 o evitar verificar el archivo creado cuando sabe que el primer
 comando falló. Esto último se puede hacer fácilmente concatenando
-los comandos de creación y verificación con <tt class="docutils literal"><span class="pre">&amp;&amp;</span></tt> en una sola
+los comandos de creación y verificación con <tt class="literal"><span class="pre">&amp;&amp;</span></tt> en una sola
 línea. Esto le dice a la shell que ejecute ambos comandos como
 una secuencia para evitar ejecutar el segundo si el primero falla.</p>
 <p>No obstante, si falla la corriente eléctrica durante una copia
@@ -808,12 +808,12 @@ de seguridad, esta versión del script todavía dejaría a medio
 escribir archivos inválidos. Para prevenir esto podría mejorar el
 script para realizar una <em>verificación positiva</em>. Esto significa
 crear el fichero de copia de seguridad en un directorio temporal
-junto con un fichero <tt class="docutils literal"><span class="pre">*.valid</span></tt> si se alcanza la rama adecuada
+junto con un fichero <tt class="literal"><span class="pre">*.valid</span></tt> si se alcanza la rama adecuada
 del script con éxito.</p>
 <p>Continuando esta estrategia, otro script cron monitorizando el
 directorio donde se crean los ficheros temporales de copias de
 seguridad movería al directorio final aquellos archivos con un
-fichero <tt class="docutils literal"><span class="pre">*.valid</span></tt> correspondiente, borrando todos los demás
+fichero <tt class="literal"><span class="pre">*.valid</span></tt> correspondiente, borrando todos los demás
 cuya última fecha de modificación fuese mayor que una hora.</p>
 </blockquote>
 </div>
@@ -851,19 +851,6 @@ copias de seguridad seguras en alguna otra parte. Podría hacerse
 de forma sencilla con programas como <a class="reference" href="http://rsync.samba.org/">rsync</a> funcionando por <a class="reference" href="http://www.openssh.com/">ssh</a>
 como tarea del cron.</li>
 </ul>
-<p>De hecho, ya hay personas listas que han comenzado a hacer
-scripts de este estilo para sí mismos y no están asustadas
-de compartirlos. Para evitar engordar este mini-howto, voy a
-guardarlos <em>tal y como son</em> en mi página web:</p>
-<pre class="literal-block">
-http://gradha.sdf-eu.org/dar_scripts/
-</pre>
-<p>Sientase libre de enviarme sus propias mejoras y las añadiré
-al directorio.  Ya sea un fichero único o un <tt class="docutils literal"><span class="pre">.tar.gz</span></tt> con una
-suite de copias de seguridad completa, por favor añada un fichero
-simple <tt class="docutils literal"><span class="pre">.txt</span></tt> que pondré al lado del fichero. Por favor use
-inglés en su descripción, ¡y no olvide poner su nombre y dirección
-de correo para que la gente pueda enviarle correcciones o mejoras!</p>
 </blockquote>
 </div>
 <div class="section" id="el-fin">
@@ -872,7 +859,7 @@ de correo para que la gente pueda enviarle correcciones o mejoras!</p>
 Y esa es toda la <em>magia</em>. Si tiene problemas, algo no está claro
 o es incorrecto (lo cual es peor), mándeme un email. Si encuentra
 este documento útil y quiere traducirlo, mándeme una traducción
-del fichero <tt class="docutils literal"><span class="pre">source.en.txt</span></tt> para que pueda distribuirla junto
+del fichero <tt class="literal"><span class="pre">source.en.txt</span></tt> para que pueda distribuirla junto
 con esta versión y otros usuarios puedan encontrar fácilmente su
 versión traducida. Hablando de localizar, debería ser capaz de
 obtener el código fuente de este documento de mi página personal

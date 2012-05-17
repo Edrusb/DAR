@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: shell_interaction.hpp,v 1.7 2004/10/01 20:54:59 edrusb Rel $
+// $Id: shell_interaction.hpp,v 1.8 2005/06/21 20:19:09 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -35,11 +35,12 @@ using namespace libdar;
 
 user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool silent);
     // arg are output ostream object (on which are sent non interactive messages)
-    // and intereact ostream object (on which are sent message that require a user interaction)
+    // and interact ostream object (on which are sent message that require a user interaction)
 
     // the argument returned must be freed with a call to "delete"
 
 void shell_interaction_change_non_interactive_output(ostream *out);
+void shell_interaction_read_char(char & a);
 void shell_interaction_close();
 void shell_interaction_set_beep(bool mode);
 

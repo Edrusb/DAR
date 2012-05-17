@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.cpp,v 1.12 2004/08/03 21:28:00 edrusb Rel $
+// $Id: ea.cpp,v 1.13 2005/05/08 12:12:00 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -29,7 +29,7 @@
 #include "tools.hpp"
 #include "integers.hpp"
 
-// theses MACRO are used only when dumping in file
+// theses MACRO are used only when dumping in file (obsolete since archive format "05")
 #define EA_ROOT 0x80
 #define EA_DEL 0x40
 #define EA_DEFAULT_USER_INSERT 0x00
@@ -39,34 +39,30 @@ using namespace std;
 namespace libdar
 {
 
-    ea_attributs::ea_attributs(const ea_attributs & ref)
+    ea_entry::ea_entry(user_interaction & dialog, generic_file & f, const dar_version & edit)
     {
-        attr = ref.attr;
-        alire = attr.begin();
-    }
+	infinint tmp;
+	unsigned char fl;
+	string pre_key = "";
 
-    ea_entry::ea_entry(user_interaction & dialog, generic_file & f)
-    {
-        unsigned char fl;
-
-        f.read((char *)(&fl), 1);
-        domain = (fl & EA_ROOT) != 0 ? ea_domain_root : ea_domain_user;
-        mode = (fl &
-                EA_DEL) != 0 ? ea_del : ea_insert;
+	if(version_greater("05", edit)) // "05" > edit => old format
+	{
+	    f.read((char *)(&fl), 1);
+	    if((fl & EA_ROOT) != 0)
+		pre_key = "system.";
+	    else
+		pre_key = "user.";
+	}
         tools_read_string(f, key);
-        infinint tmp = infinint(dialog, NULL, &f);
+	key = pre_key + key;
+        tmp = infinint(dialog, NULL, &f);
         tools_read_string_size(f, value, tmp);
     }
 
     void ea_entry::dump(generic_file & f) const
     {
-        unsigned char fl = 0;
         infinint tmp = value.size();
-        if(domain == ea_domain_root)
-            fl |= EA_ROOT;
-        if(mode == ea_del)
-            fl |= EA_DEL;
-        f.write((char *)(&fl), 1);
+
         tools_write_string(f, key);
         tmp.dump(f);
         tools_write_string_all(f, value);
@@ -74,10 +70,10 @@ namespace libdar
 
 ///////////// EA_ATTRIBUTS IMPLEMENTATION //////////
 
-    ea_attributs::ea_attributs(user_interaction & dialog, generic_file & f)
+    ea_attributs::ea_attributs(user_interaction & dialog, generic_file & f, const dar_version & edit)
     {
         U_32 tmp2 = 0;
-        infinint tmp = infinint(dialog, NULL, &f);
+        infinint tmp = infinint(dialog, NULL, &f); // number of EA
 
         tmp.unstack(tmp2);
 
@@ -85,7 +81,7 @@ namespace libdar
         {
             while(tmp2 > 0)
             {
-                attr.push_back(ea_entry(dialog, f));
+                attr.push_back(ea_entry(dialog, f, edit));
                 tmp2--;
             }
             tmp.unstack(tmp2);
@@ -95,9 +91,15 @@ namespace libdar
         alire = attr.begin();
     }
 
+    ea_attributs::ea_attributs(const ea_attributs & ref)
+    {
+        attr = ref.attr;
+        alire = attr.begin();
+    }
+
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea.cpp,v 1.12 2004/08/03 21:28:00 edrusb Rel $";
+        static char id[]="$Id: ea.cpp,v 1.13 2005/05/08 12:12:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -105,7 +107,6 @@ namespace libdar
     {
         vector<ea_entry>::iterator it = const_cast<ea_attributs &>(*this).attr.begin();
         vector<ea_entry>::iterator fin = const_cast<ea_attributs &>(*this).attr.end();
-
 
         size().dump(f);
         while(it != fin)
@@ -133,38 +134,33 @@ namespace libdar
             return false;
     }
 
-    bool ea_attributs::diff(const ea_attributs & other, bool check_ea_root, bool check_ea_user) const
+    bool ea_attributs::diff(const ea_attributs & other, const mask & filter) const
     {
         ea_entry ea;
         string value;
-        ea_mode mode;
         bool diff = false;
 
         reset_read();
         while(!diff && read(ea))
-            if(ea.mode == ea_insert)
-                if((ea.domain == ea_domain_user && check_ea_user) || (ea.domain == ea_domain_root && check_ea_root))
-                    if(other.find(ea.domain, ea.key, mode, value))
-                    {
-                        if(value != ea.value) // found but different
-                            diff = true;
-                    }
-                    else // not found
-                        diff = true;
+	    if(filter.is_covered(ea.key))
+	    {
+		if(!other.find(ea.key, value) || value != ea.value) // not found or different
+		    diff = true;
+	    }
+
         return diff;
     }
 
-    bool ea_attributs::find(ea_domain dom, const string &key, ea_mode & found_mode, string & found_value) const
+    bool ea_attributs::find(const string & key, string & found_value) const
     {
         vector<ea_entry>::iterator it = const_cast<vector<ea_entry> &>(attr).begin();
         vector<ea_entry>::iterator fin = const_cast<vector<ea_entry> &>(attr).end();
 
-        while(it != fin && (it->domain != dom || it->key != key))
+        while(it != fin && it->key != key)
             it++;
         if(it != fin)
         {
-            found_mode = it->mode;
-            found_value = it->value;
+	    found_value = it->value;
             return true;
         }
         else

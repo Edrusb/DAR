@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.hpp,v 1.13 2004/11/07 18:21:38 edrusb Rel $
+// $Id: real_infinint.hpp,v 1.14 2005/09/25 19:05:42 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -43,13 +43,12 @@ extern "C"
 #include <typeinfo>
 #include "storage.hpp"
 #include "integers.hpp"
-#include "user_interaction.hpp"
 #include "int_tools.hpp"
 
 namespace libdar
 {
-
     class generic_file;
+    class user_interaction;
 
 	/// the arbitrary large positive integer class
 
@@ -158,6 +157,7 @@ namespace libdar
         static endian used_endian;
         static void setup_endian();
     };
+
 
 #define OPERATOR(OP) inline bool operator OP (const infinint &a, const infinint &b) \
 { \

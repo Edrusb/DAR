@@ -8,22 +8,35 @@
                              _
 
 
-        Conception & Development by Denis Corbin
+        Original Design & Development: Denis Corbin
 
-        http://dar.linux.free.fr/
+        Several patches are from by Wesley Leggette, Dave Vasilevsky,
+            Nick Alcock, Brian May, Martin Jost, Jurgen Menden, Todd Vierling
+            Omer Enbar, David Rose, Alex Kohlmeyer, Dietrich Rothe,
+	    Moritz Franosch, John Little, Chris Martin, Michael Roitzsch.
+
+        Translations of program messages are from:
+	    Peter Landgren for Swedish
+            Markus Kamp for German
+            Denis Corbin for French
+
+        http://dar.linux.free.fr/   (main site)
+        http://dar.sourceforge.net/ (mirror site)
         dar.linux@free.fr
 
-I will not answer support requests sent by email: your questions and their
-answers may be interesting to others. For all and to all, if you need support
-thanks to read  http://dar.linux.free.fr/#help to know how to proceed.
+No answer to support requests will be done out of mailing-list or other public
+area: your questions and their answers may be interesting to others. For all
+and to all, if you need support thanks to read
+
+     http://dar.linux.free.fr/#help
+
+                                                  Sharing must be both ways.
+
+to know how to proceed.
 
         else for non support requests, you
         need to add "[EARTH IS BEAUTIFUL]" in the subject
         of your emails, to pass anti-spam filter.
-
-Chris Martin is the author of dar-help a little program that builds
-*.usage files from *.xml files. dar-help is used to simplify the maintenance
-of help string returned to user when the -h option is given.
 
 
 An extract of Denis Corbin's resume:
@@ -38,7 +51,7 @@ An extract of Denis Corbin's resume:
                   Formation Equipex-RITA, operator on the RITTER network.
         1997-2000 Software developer, Team leader, Project leader for
                   Netcomsystems (today Spirent Communications). Designed
-                  softwares for the Smartbits network test equipment. Worked
+                  software for the Smartbits network test equipment. Worked
                   in cooperation with Californian team, have spent few weeks in
                   Los Angeles.
         2000-2002 Network Design, architecture and network support for DCN
@@ -74,10 +87,10 @@ An extract of Denis Corbin's resume:
              HPOVO, HPOVPI.
 
 	Good practice of the following equipments:
-             Cisco switches and routers (3550 SMI/EMI, 7200, 3600, 1700, 2500, 4500)
+             Cisco switches and routers (3550 SMI/EMI, 7200, 3600, 1700, 2500, 4500, 6500)
              Checkpoint Firewalls 4.1, NG and AI
              Alteon L4-L7 load balancers
-             Netscreen Firewalls
+             Netscreen Firewalls (today Juniper's)
              SunOS/Solaris network and hardware administration (less practice
                  for system admin.)
              Linux OS (software developement, system admin, and its very rich
@@ -87,4 +100,3 @@ An extract of Denis Corbin's resume:
        spoken languages: French, English, Italian, Russian.
        extra professional activities: astronomy, photography, occasional
        chess player. Author and maintainer or Disk ARchive (but this, you know)
-

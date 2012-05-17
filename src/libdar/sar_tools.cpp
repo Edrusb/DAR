@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.18.2.1 2005/03/13 20:07:52 edrusb Rel $
+// $Id: sar_tools.cpp,v 1.20 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -77,7 +77,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar_tools.cpp,v 1.18.2.1 2005/03/13 20:07:52 edrusb Rel $";
+        static char id[]="$Id: sar_tools.cpp,v 1.20 2005/12/29 02:32:41 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -98,7 +98,7 @@ namespace libdar
                 if(lstat(name, &buf) < 0)
                 {
                     if(errno != ENOENT)
-                        throw Erange("open_archive_fichier", tools_printf(gettext("Error retreiving inode information for %s : %s"), name, strerror(errno)));
+                        throw Erange("open_archive_fichier", tools_printf(gettext("Error retrieving inode information for %s : %s"), name, strerror(errno)));
                 }
                 else
                 {
@@ -111,7 +111,7 @@ namespace libdar
 
             fd = ::open(name, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
             if(fd < 0)
-                throw Erange("open_archive_fichier", tools_printf(gettext("Error openning file %s : %s"), name, strerror(errno)));
+                throw Erange("open_archive_fichier", tools_printf(gettext("Error opening file %s : %s"), name, strerror(errno)));
             tmp = new fichier(dialog, fd);
             if(tmp == NULL)
                 throw Ememory("open_archive_fichier");

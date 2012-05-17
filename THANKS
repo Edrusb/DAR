@@ -1,3 +1,18 @@
+version 2.3.0
+--------------
+Thanks to Wesley Leggette again for his feedback and for his many
+proposed patchs for new features. Thanks to Dave Vasilevsky
+for his patch opening support for EA and file forks under MacOS X. Thanks
+to "ex-bart" for feedback and very interesting feature request. Thanks to
+Uwe Freese for feedback. Thanks to Aaron D. Marasco for feedback. And as
+always, thanks to Johnathan Burchill (author of kdar) for appreciated
+feedback remarks and proposals. Thanks to Michael Roitzsch for bug fix.
+
+A special Thanks goes to Michael Roitzsch (again him ;-)) Rodd Zurcher,
+Helmut Jarausch and markus Kamp (again him ;-)) for helping make this
+release stable thanks to their feedback and participation to the
+pre-release phase.
+
 version 2.2.7
 -------------
 Thanks to Markus Kamp for German Translation
@@ -8,7 +23,8 @@ Thanks to Gerald Britton and Halfgaar for reporting bug problem.
 
 version 2.2.5
 --------------
-Thanks to "Steffe" for feedback and suggestion, to Andrey Yasniy and to Nick Alcock for feedback and patches.
+Thanks to "Steffe" for feedback and suggestion, to Andrey Yasniy and to Nick
+Alcock for feedback and patches.
 
 version 2.2.4
 --------------
@@ -96,7 +112,7 @@ Thanks to Shanon Denize for its suggestion about -wa option, to
 Lars Schmidt-Thieme for his suggestion about -as option. And,
 thanks to "nedkonz" on the historical forum, for feedback, and Nick Alcock
 for his "tiny" patch and feedback about GNU Coding Standards. Thanks to Tami
-King for feedback and help. Thanks to Patrick Drechsler for typo error feedback.
+King for feedback and help. Thanks to Patrick Drechsler for typo error feedback
 
 version 2.0.4
 --------------
@@ -168,4 +184,3 @@ area, to Ulrich Hagen, Francois Botha, Tobias Jahn for feedback, and to
 Andreas Gruenbacher for its Extended Attributes software, and its useful
 answers to my questions. Thanks to the many other people that just encouraged
 me by their remarks and compliments.
-

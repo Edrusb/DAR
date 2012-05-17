@@ -17,6 +17,8 @@ dar_manager.cpp : dar_manager.usage
 
 endif
 
+dist_noinst_DATA = dar.xml dar_xform.xml dar_slave.xml dar_manager.xml
+
 #
 # conditionnal part: --enable-build-static
 #
@@ -105,7 +107,7 @@ dar_xform_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 dar_slave_SOURCES =  dar_suite.cpp dar_suite.hpp dar_slave.cpp shell_interaction.cpp shell_interaction.hpp dar_slave.usage
 dar_slave_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
-dar_manager_SOURCES = dar_suite.cpp dar_suite.hpp dar_manager.cpp shell_interaction.cpp shell_interaction.hpp data_tree.cpp data_tree.hpp database.cpp database.hpp database_header.cpp database_header.hpp dar_manager.usage getopt_decision.h my_getopt_long.h
+dar_manager_SOURCES = dar_suite.cpp dar_suite.hpp dar_manager.cpp shell_interaction.cpp shell_interaction.hpp dar_manager.usage getopt_decision.h my_getopt_long.h
 dar_manager_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 dar_cp_SOURCES = dar_cp.cpp dar_suite.cpp shell_interaction.cpp

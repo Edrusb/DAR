@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.hpp,v 1.11 2004/11/12 21:58:17 edrusb Rel $
+// $Id: dar_suite.hpp,v 1.14 2005/08/23 21:23:15 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -46,7 +46,8 @@
     // fixed using full infinint version of the program
 #define EXIT_UNKNOWN_ERROR 9
     // error not possible to report by other mean no access to stdout/stderr)
-#define EXIT_COMPILATION 10
+#define EXIT_COMPILATION 10 // feature not activated at compilation time
+#define EXIT_SAVED_MODIFIED 11 // some files have been modified at the time they were saved
 
 #define EXTENSION "dar"
 
@@ -64,6 +65,7 @@
 
 using namespace libdar;
 
+extern void dar_suite_reset_signal_handler();
 extern int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_interaction & dialog, int, char *[], const char **env));
 
 extern std::string dar_suite_command_line_features();

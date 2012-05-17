@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: defile.cpp,v 1.7 2004/08/03 21:28:00 edrusb Rel $
+// $Id: defile.cpp,v 1.8 2005/12/01 17:47:30 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -39,7 +39,10 @@ namespace libdar
         string s;
 
         if(! init)
-            chemin.pop(s);
+	{
+            if(! chemin.pop(s))
+		throw SRC_BUG; // no more directory to pop!
+	}
         else
             init = false;
 
@@ -56,7 +59,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: defile.cpp,v 1.7 2004/08/03 21:28:00 edrusb Rel $";
+        static char id[]="$Id: defile.cpp,v 1.8 2005/12/01 17:47:30 edrusb Rel $";
         dummy_call(id);
     }
 

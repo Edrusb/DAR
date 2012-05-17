@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header_version.hpp,v 1.11 2004/11/07 18:21:38 edrusb Rel $
+// $Id: header_version.hpp,v 1.12 2005/05/08 12:12:01 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -36,12 +36,12 @@
 
 namespace libdar
 {
-    const int VERSION_FLAG_SAVED_EA_ROOT = 0x80;
-    const int VERSION_FLAG_SAVED_EA_USER = 0x40;
+    const int VERSION_FLAG_SAVED_EA_ROOT = 0x80;      // no more used since version "05"
+    const int VERSION_FLAG_SAVED_EA_USER = 0x40;      // no more used since version "05"
     const int VERSION_FLAG_SCRAMBLED     = 0x20;      // scrambled or strong encryption used
     const int VERSION_SIZE = 3;
     typedef char dar_version[VERSION_SIZE];
-    extern void version_copy(dar_version & left, const dar_version & right);
+    extern void version_copy(dar_version & dst, const dar_version & src);
     extern bool version_greater(const dar_version & left, const dar_version & right);
         // operation left > right
 

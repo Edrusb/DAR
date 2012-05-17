@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.31.2.2 2005/12/05 17:43:27 edrusb Exp $
+// $Id: sar.cpp,v 1.37 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -117,12 +117,11 @@ namespace libdar
     sar::sar(user_interaction & dialog,
 	     const string & base_name,
 	     const string & extension,
-	     S_I options,
 	     const path & dir,
 	     const string & execute) : contextual(dialog, gf_read_only), archive_dir(dir)
     {
-        set_options(options);
-
+	opt_warn_overwrite = true;
+	opt_allow_overwrite = false;
         natural_destruction = true;
         base = base_name;
         ext = extension;
@@ -139,7 +138,9 @@ namespace libdar
 	     const string & extension,
 	     const infinint & file_size,
 	     const infinint & first_file_size,
-	     S_I options,
+	     bool x_warn_overwrite,
+	     bool x_allow_overwrite,
+	     const infinint & x_pause,
 	     const path & dir,
 	     const string & execute) : contextual(dialog, gf_write_only), archive_dir(dir)
     {
@@ -150,24 +151,29 @@ namespace libdar
 	    throw Erange("sar::sar", gettext("First file size too small"));
 
         initial = true;
-        set_options(options);
+	opt_warn_overwrite = x_warn_overwrite;
+	opt_allow_overwrite = x_allow_overwrite;
         natural_destruction = true;
         base = base_name;
         ext = extension;
         size = file_size;
         first_size = first_file_size;
         hook = execute;
+	pause = x_pause;
         status = CONTEXT_OP;
 
         open_file_init();
-        open_file(1);
+	open_file(1);
     }
 
     sar::~sar()
     {
         close_file();
         if(get_mode() == gf_write_only && natural_destruction)
+	{
+	    set_info_status(CONTEXT_LAST_SLICE);
             hook_execute(of_current);
+	}
     }
 
     bool sar::skip(const infinint &pos)
@@ -260,7 +266,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.31.2.2 2005/12/05 17:43:27 edrusb Exp $";
+        static char id[]="$Id: sar.cpp,v 1.37 2005/12/29 02:32:41 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -423,7 +429,7 @@ namespace libdar
                     continue;
                 }
                 else
-                    throw Erange("sar::open_readonly", tools_printf(gettext("Error openning %s : "), fic) +  strerror(errno));
+                    throw Erange("sar::open_readonly", tools_printf(gettext("Error opening %s : "), fic) +  strerror(errno));
             else
                 of_fd = new fichier(get_gf_ui(), fd);
 
@@ -433,6 +439,14 @@ namespace libdar
             {
                 h.read(*of_fd);
             }
+	    catch(Ethread_cancel & e)
+	    {
+		throw;
+	    }
+	    catch(Euser_abort & e)
+	    {
+		throw;
+	    }
             catch(Egeneric & e)
             {
                 close_file();
@@ -466,7 +480,7 @@ namespace libdar
                 catch(Erange & e)
                 {
                     close_file();
-                    get_gf_ui().pause(tools_printf(gettext("Error openning %s : "), fic) + e.get_message() + gettext(" . Retry ?"));
+                    get_gf_ui().pause(tools_printf(gettext("Error opening %s : "), fic) + e.get_message() + gettext(" . Retry ?"));
                     continue;
                 }
             }
@@ -505,13 +519,17 @@ namespace libdar
         S_I open_flag = O_WRONLY;
         S_I open_mode = 0666; // umask will unset some bits while calling open
         S_I fd;
+	bool unlink_on_error = false;
 
             // check if that the file exists
         if(stat(fic, &buf) < 0)
             if(errno != ENOENT) // other error than 'file does not exist' occured
                 throw Erange("sar::open_writeonly", string(gettext("Error checking for presence of file ")) + fic + " : " + strerror(errno));
             else
+	    {
                 open_flag |= O_CREAT;
+		unlink_on_error = true;
+	    }
         else // file exists
         {
             S_I fd_tmp = ::open(fic, O_RDONLY|O_BINARY);
@@ -528,18 +546,19 @@ namespace libdar
                     {
                         label_copy(h.internal_name, of_internal_name);
                         h.internal_name[0] = ~h.internal_name[0];
-                            // this way we are shure that the file is not considered as part of the SAR
+                            // this way we are sure that the file is not considered as part of the SAR
                     }
                     if(h.internal_name != of_internal_name)
                     {
                         open_flag |= O_TRUNC;
-                        if(opt_dont_erase)
+                        if(!opt_allow_overwrite)
                             throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
                         if(opt_warn_overwrite)
                         {
                             try
                             {
                                 get_gf_ui().pause(string(fic) + gettext(" is about to be overwritten."));
+				unlink_on_error = true;
                             }
                             catch(...)
                             {
@@ -548,6 +567,8 @@ namespace libdar
                             }
                         }
                     }
+		    else // slice of the current set
+			unlink_on_error = false; // yes this is the initial (and current) value, I know.
                 }
                 catch(Egeneric & e)
                 {
@@ -558,13 +579,14 @@ namespace libdar
             }
             else // file exists but could not be openned
             {
-                if(opt_dont_erase)
+                if(!opt_allow_overwrite)
                     throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
                 if(opt_warn_overwrite)
                 {
                     try
                     {
 			get_gf_ui().pause(string(fic) + gettext(" is about to be overwritten."));
+			unlink_on_error = true;
                     }
                     catch(...)
                     {
@@ -577,20 +599,29 @@ namespace libdar
         }
 
         fd = ::open(fic, open_flag|O_BINARY, open_mode);
-        of_flag = FLAG_NON_TERMINAL;
-        if(fd < 0)
-            throw Erange("sar::open_writeonly open()", string(gettext("Error openning file ")) + fic + " : " + strerror(errno));
-        else
-            of_fd = new fichier(get_gf_ui(), fd);
+	try
+	{
+	    of_flag = FLAG_NON_TERMINAL;
+	    if(fd < 0)
+		throw Erange("sar::open_writeonly open()", string(gettext("Error opening file ")) + fic + " : " + strerror(errno));
+	    else
+		of_fd = new fichier(get_gf_ui(), fd);
 
-        h = make_write_header(num, FLAG_TERMINAL);
-        h.write(*of_fd);
-        if(num == 1)
-        {
-            first_file_offset = of_fd->get_position();
-            if(first_file_offset == 0)
-                throw SRC_BUG;
-        }
+	    h = make_write_header(num, FLAG_TERMINAL);
+	    h.write(*of_fd);
+	    if(num == 1)
+	    {
+		first_file_offset = of_fd->get_position();
+		if(first_file_offset == 0)
+		    throw SRC_BUG;
+	    }
+	}
+	catch(...)
+	{
+	    if(unlink_on_error)
+		unlink(fic);
+	    throw;
+	}
     }
 
     void sar::open_file_init()
@@ -631,31 +662,24 @@ namespace libdar
 
                             // launch the shell command after the slice has been written
                         hook_execute(of_current);
-                        if(opt_pause)
+                        if(pause != 0 && ((num-1) % pause == 0))
                         {
                             deci conv = of_current;
-                            try
-                            {
-				bool done = false;
-				while(!done)
+			    bool ready = false;
+
+			    while(!ready)
+			    {
+				try
 				{
-				    try
-				    {
-					get_gf_ui().pause(string(gettext("Finished writing to file ")) + conv.human() + gettext(", ready to continue ? "));
-					done = true;
-				    }
-				    catch(Euser_abort & e)
-				    {
-					done = false;
-					get_gf_ui().warning(gettext("If you really want to stop dar, hit CTRL-C"));
-				    }
+				    get_gf_ui().pause(string(gettext("Finished writing to file ")) + conv.human() + gettext(", ready to continue ? "));
+				    ready = true;
+				}
+				catch(Euser_abort & e)
+				{
+				    get_gf_ui().warning(string(gettext("If you really want to abort the archive creation hit CTRL-C, then press enter.")));
+				    ready = false;
 				}
 			    }
-                            catch(...)
-                            {
-                                natural_destruction = false;
-                                throw;
-                            }
                         }
                     }
                     else
@@ -679,13 +703,6 @@ namespace libdar
             }
             delete [] fic;
         }
-    }
-
-    void sar::set_options(S_I opt)
-    {
-        opt_warn_overwrite = (opt & SAR_OPT_WARN_OVERWRITE) != 0;
-        opt_dont_erase = (opt & SAR_OPT_DONT_ERASE) != 0;
-        opt_pause = (opt & SAR_OPT_PAUSE) != 0;
     }
 
     void sar::set_offset(infinint offset)
@@ -920,6 +937,10 @@ namespace libdar
             ret = conv.computer();
             return true;
         }
+	catch(Ethread_cancel & e)
+	{
+	    throw;
+	}
         catch(Egeneric &e)
         {
             return false;
@@ -937,7 +958,7 @@ namespace libdar
         try
         {
             if(ptr == NULL)
-                throw Erange("sar_get_higher_number_in_dir", string(gettext("Error openning directory ")) + folder + " : " + strerror(errno));
+                throw Erange("sar_get_higher_number_in_dir", string(gettext("Error opening directory ")) + folder + " : " + strerror(errno));
 
             ret = 0;
             somme = false;

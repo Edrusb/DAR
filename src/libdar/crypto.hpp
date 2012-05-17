@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: crypto.hpp,v 1.7 2004/12/04 23:07:25 edrusb Rel $
+// $Id: crypto.hpp,v 1.8 2006/01/08 16:33:42 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -26,8 +26,8 @@
     /// \file crypto.hpp
     /// \brief the crypto algoritm definition
 
-#ifndef CRYPTO_H
-#define CRYPTO_H
+#ifndef CRYPTO_HPP
+#define CRYPTO_HPP
 
 extern "C"
 {

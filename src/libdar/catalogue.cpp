@@ -1,4 +1,4 @@
-/*********************************************************************/
+//*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.35.2.4 2006/01/01 23:10:45 edrusb Rel $
+// $Id: catalogue.cpp,v 1.47.2.2 2006/02/02 16:39:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -70,10 +70,11 @@ extern "C"
 #include "header.hpp"
 #include "cache.hpp"
 
-#define INODE_FLAG_EA_MASK  0x03
+#define INODE_FLAG_EA_MASK  0x07
 #define INODE_FLAG_EA_FULL  0x01
 #define INODE_FLAG_EA_PART  0x02
 #define INODE_FLAG_EA_NONE  0x03
+#define INODE_FLAG_EA_FAKE  0x04
 
 #define REMOVE_TAG gettext("[     REMOVED       ]")
 
@@ -95,8 +96,19 @@ namespace libdar
     static string local_uid(const inode & ref);
     static string local_gid(const inode & ref);
     static string local_size(const inode & ref);
+    static string local_storage_size(const inode & ref);
     static string local_date(const inode & ref);
     static string local_flag(const inode & ref);
+    static void xml_listing_attributes(user_interaction & dialog,      //< for user interaction
+				       const string & beginning,       //< character string to use as margin
+				       const string & data,            //< ("saved" | "referenced" | "deleted")
+				       const string & metadata,        //< ("saved" | "referenced" | "absent")
+				       const string & user = "",       //< user name (empty string if not available)
+				       const string & group = "",      //< group name (empty string if not available)
+				       const string & permissions = "",//< permission (empty string if not available)
+				       const string & atime = "",      //< last access time (empty string if not available)
+				       const string & mtime = "",      //< last modification time (empty string if not available)
+				       const string & ctime = "");     //< last inode change time (empty string if not available)
     static bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & saved);
 
     unsigned char mk_signature(unsigned char base, saved_status state)
@@ -116,6 +128,18 @@ namespace libdar
         }
     }
 
+    void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state)
+    {
+	if(sig & SAVED_FAKE_BIT == 0)
+	    if(islower(sig))
+		state = s_saved;
+	    else
+		state = s_not_saved;
+	else
+	    state = s_fake;
+
+	base = tolower(sig & ~SAVED_FAKE_BIT);
+    }
 
     void entree_stats::add(const entree *ref)
     {
@@ -345,6 +369,7 @@ namespace libdar
         last_cha = NULL;
 	fs_dev = NULL;
 	storage = NULL;
+	version_copy(edit, "00");
 
         try
         {
@@ -382,6 +407,7 @@ namespace libdar
         unsigned char flag;
 
         xsaved = saved;
+	version_copy(edit, reading_ver);
 
         if(version_greater(reading_ver, "01"))
         {
@@ -398,6 +424,9 @@ namespace libdar
             case INODE_FLAG_EA_NONE:
                 ea_saved = ea_none;
                 break;
+	    case INODE_FLAG_EA_FAKE:
+		ea_saved = ea_fake;
+		break;
             default:
                 throw Erange("inode::inode", gettext("badly structured inode: unknown inode flag"));
             }
@@ -440,6 +469,7 @@ namespace libdar
                     throw Ememory("inode::inode(file)");
                 break;
             case ea_partial:
+	    case ea_fake:
                 ea_offset = new infinint(0);
                 if(ea_offset == NULL)
                     throw Ememory("inode::inode(file)");
@@ -500,10 +530,11 @@ namespace libdar
 	fs_dev = NULL;
         try
         {
+	    version_copy(edit, ref.edit);
             last_acc = new infinint(*ref.last_acc);
             last_mod = new infinint(*ref.last_mod);
 	    fs_dev = new infinint(*ref.fs_dev);
-            if(last_acc == NULL || last_mod == NULL)
+            if(last_acc == NULL || last_mod == NULL || fs_dev == NULL)
                 throw Ememory("inode::inode(inode)");
 
             switch(ea_saved)
@@ -526,6 +557,7 @@ namespace libdar
                     throw Ememory("inode::inode(inode)");
                 break;
             case ea_partial:
+	    case ea_fake:
                 last_cha = new infinint(*ref.last_cha);
                 if(last_cha == NULL)
                     throw Ememory("inode::inode(inode)");
@@ -584,14 +616,14 @@ namespace libdar
         return nomme::same_as(ref) && compatible_signature(ref.signature(), signature());
     }
 
-    bool inode::is_more_recent_than(const inode & ref, const infinint & hourshift, bool ignore_owner) const
+    bool inode::is_more_recent_than(const inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
     {
-        bool more_recent = (!ignore_owner && uid != ref.uid)
-            || (!ignore_owner && gid != ref.gid)
-            || perm != ref.perm;
+        bool more_recent = (what_to_check == cf_all && uid != ref.uid)
+            || (what_to_check == cf_all && gid != ref.gid)
+            || ((what_to_check == cf_all || what_to_check == cf_ignore_owner) && perm != ref.perm);
 
-        if(*ref.last_mod < *last_mod)
-            if(hourshift > 0)
+        if(what_to_check != cf_inode_type && *ref.last_mod < *last_mod)
+	    if(hourshift > 0)
                 more_recent = more_recent || ! is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod);
             else
                 more_recent = true;
@@ -599,59 +631,70 @@ namespace libdar
         return more_recent;
     }
 
-    bool inode::has_changed_since(const inode & ref, const infinint & hourshift, bool ignore_owner) const
+    bool inode::has_changed_since(const inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
     {
-        return (hourshift > 0 ? ! is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod) : *ref.last_mod != *last_mod)
-            || (!ignore_owner && uid != ref.uid)
-            || (!ignore_owner && gid != ref.gid)
-            || perm != ref.perm;
+        return (what_to_check != cf_inode_type && (hourshift > 0 ? ! is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod) : *ref.last_mod != *last_mod))
+            || (what_to_check == cf_all && uid != ref.uid)
+            || (what_to_check == cf_all && gid != ref.gid)
+            || (what_to_check != cf_mtime && what_to_check != cf_inode_type && perm != ref.perm);
     }
 
-    void inode::compare(user_interaction & dialog, const inode &other, bool root_ea, bool user_ea, bool ignore_owner) const
+    void inode::compare(user_interaction & dialog, const inode &other, const mask & ea_mask, comparison_fields what_to_check) const
     {
         if(!same_as(other))
             throw Erange("inode::compare",gettext("different file type"));
-        if(!ignore_owner && get_uid() != other.get_uid())
+        if(what_to_check == cf_all && get_uid() != other.get_uid())
             throw Erange("inode.compare", gettext("different owner"));
-        if(!ignore_owner && get_gid() != other.get_gid())
+        if(what_to_check == cf_all && get_gid() != other.get_gid())
             throw Erange("inode.compare", gettext("different owner group"));
-        if(get_perm() != other.get_perm())
+        if((what_to_check == cf_all || what_to_check == cf_ignore_owner) && get_perm() != other.get_perm())
             throw Erange("inode.compare", gettext("different permission"));
         sub_compare(dialog, other);
-        if(root_ea || user_ea)
-        {
-            switch(ea_get_saved_status())
-            {
-            case ea_full:
-                if(other.ea_get_saved_status() == ea_full)
-                {
-                    const ea_attributs *me = get_ea(dialog); // this pointer must not be freed
-                    const ea_attributs *you = other.get_ea(dialog); // this pointer must not be freed too
-                    if(me->diff(*you, root_ea, user_ea))
-                        throw Erange("inode::compare", gettext("different Extended Attributes"));
-                }
-                else
-                    throw Erange("inode::compare", gettext("no Extended Attributs to compare with"));
-                    // else we ignore the EA present in the argument,
-                    // this is not a symetrical comparison
-                    // we check that all data in current object are the same in the argument
-                    // but additional data can reside in the argument
-                break;
-            case ea_partial:
-                if(other.ea_get_saved_status() != ea_none)
-                {
-                    if(get_last_change() < other.get_last_change())
-                        throw Erange("inode::compare", gettext("inode last change date (ctime) greater, EA might be different"));
-                }
-                else
-                    throw Erange("inode::compare", gettext("No extended Attributs to compare with"));
-                break;
-            case ea_none:
-                break;
-            default:
-                throw SRC_BUG;
-            }
-        }
+
+	switch(ea_get_saved_status())
+	{
+	case ea_full:
+	    if(other.ea_get_saved_status() == ea_full)
+	    {
+		const ea_attributs *me = get_ea(dialog); // this pointer must not be freed
+		const ea_attributs *you = other.get_ea(dialog); // this pointer must not be freed too
+		if(me->diff(*you, ea_mask))
+		    throw Erange("inode::compare", gettext("different Extended Attributes"));
+	    }
+	    else
+	    {
+#ifdef EA_SUPPORT
+		throw Erange("inode::compare", gettext("no Extended Attribute to compare with"));
+#else
+		throw Efeature(gettext("Cannot compare EA: EA support has not been activated at compilation time"));
+#endif
+	    }
+		// else we ignore the EA present in the argument,
+		// this is not a symetrical comparison
+		// we check that all data in current object are the same in the argument
+		// but additional data can reside in the argument
+	    break;
+	case ea_partial:
+	case ea_fake:
+	    if(other.ea_get_saved_status() != ea_none)
+	    {
+		if(get_last_change() < other.get_last_change())
+		    throw Erange("inode::compare", gettext("inode last change date (ctime) greater, EA might be different"));
+	    }
+	    else
+	    {
+#ifdef EA_SUPPORT
+		throw Erange("inode::compare", gettext("no Extended Attributes to compare with"));
+#else
+	        throw Efeature(gettext("Cannot compare EA: EA support has not been activated at compilation time"));
+#endif
+	    }
+	    break;
+	case ea_none:
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
     }
 
     void inode::dump(user_interaction & dialog, generic_file & r) const
@@ -667,6 +710,9 @@ namespace libdar
         case ea_partial:
             flag |= INODE_FLAG_EA_PART;
             break;
+	case ea_fake:
+	    flag |= INODE_FLAG_EA_FAKE;
+	    break;
         case ea_full:
             flag |= INODE_FLAG_EA_FULL;
             break;
@@ -695,6 +741,7 @@ namespace libdar
             r.write((char *)ea_crc, CRC_SIZE);
                 // no break
         case ea_partial:
+	case ea_fake:
             last_cha->dump(r);
             break;
         case ea_none:
@@ -724,6 +771,7 @@ namespace libdar
             *last_cha = 0;
             break;
         case ea_partial:
+	case ea_fake:
             if(ea != NULL)
             {
                 delete ea;
@@ -759,9 +807,30 @@ namespace libdar
                     storage->reset_crc();
                     try
                     {
-                        const_cast<ea_attributs *&>(ea) = new ea_attributs(dialog, *storage);
-                        if(ea == NULL)
-                            throw Ememory("inode::get_ea");
+			try
+			{
+			    if(edit[0] == '0' && edit[1] == '0')
+				throw SRC_BUG;
+			    const_cast<ea_attributs *&>(ea) = new ea_attributs(dialog, *storage, edit);
+			    if(ea == NULL)
+				throw Ememory("inode::get_ea");
+			}
+			catch(Euser_abort & e)
+			{
+			    throw;
+			}
+			catch(Ebug & e)
+			{
+			    throw;
+			}
+			catch(Ethread_cancel & e)
+			{
+			    throw;
+			}
+			catch(Egeneric & e)
+			{
+			    throw Erange("inode::get_ea", string("Error while reading EA from archive: ") + e.get_message());
+			}
                     }
                     catch(...)
                     {
@@ -952,25 +1021,25 @@ namespace libdar
             throw Erange("file::dump", gettext("cannot dump CRC data to file"));
     }
 
-    bool file::is_more_recent_than(const inode & ref, const infinint & hourshift, bool ignore_owner) const
+    bool file::is_more_recent_than(const inode & ref, const infinint & hourshift, inode::comparison_fields what_to_check) const
     {
         const file *tmp = dynamic_cast<const file *>(&ref);
         if(tmp != NULL)
-            return inode::is_more_recent_than(*tmp, hourshift, ignore_owner) || *size != *(tmp->size);
+            return inode::is_more_recent_than(*tmp, hourshift, what_to_check) || *size != *(tmp->size);
         else
             throw SRC_BUG;
     }
 
-    bool file::has_changed_since(const inode & ref, const infinint & hourshift, bool ignore_owner) const
+    bool file::has_changed_since(const inode & ref, const infinint & hourshift, inode::comparison_fields what_to_check) const
     {
         const file *tmp = dynamic_cast<const file *>(&ref);
         if(tmp != NULL)
-            return inode::has_changed_since(*tmp, hourshift, ignore_owner) || *size != *(tmp->size);
+            return inode::has_changed_since(*tmp, hourshift, what_to_check) || *size != *(tmp->size);
         else
             throw SRC_BUG;
     }
 
-    generic_file *file::get_data(user_interaction & dialog) const
+    generic_file *file::get_data(user_interaction & dialog, bool keep_compressed) const
     {
         generic_file *ret;
 
@@ -981,8 +1050,12 @@ namespace libdar
             throw Erange("file::get_data", gettext("data has been cleaned, object is now empty"));
 
         if(status == from_path)
+	{
+	    if(keep_compressed)
+		throw SRC_BUG; // keep compressed is not possible on an inode take from a filesystem
             ret = new fichier(dialog, chemin, gf_read_only);
-        else
+	}
+        else // inode from archive
             if(loc == NULL)
                 throw SRC_BUG; // set_archive_localisation never called or with a bad argument
             else
@@ -991,16 +1064,16 @@ namespace libdar
                 else
                 {
                     tronc *tmp = new tronc(dialog, loc, *offset, *storage_size == 0 ? *size : *storage_size, gf_read_only);
-                    if(tmp == NULL)
-                        throw Ememory("file::get_data");
-                    if(*size > 0 && *storage_size != 0)
-                    {
-                        ret = new compressor(dialog, get_compression_algo_used(), tmp);
-                        if(ret == NULL)
-                            delete tmp;
-                    }
-                    else
-                        ret = tmp;
+		    if(tmp == NULL)
+			throw Ememory("file::get_data");
+		    if(*size > 0 && *storage_size != 0 && ! keep_compressed)
+		    {
+			ret = new compressor(dialog, get_compression_algo_used(), tmp);
+			if(ret == NULL)
+			    delete tmp;
+		    }
+		    else
+			ret = tmp;
                 }
 
         if(ret == NULL)
@@ -1031,7 +1104,7 @@ namespace libdar
 
     void file::set_offset(const infinint & r)
     {
-        if(status != from_path)
+        if(status == empty)
             throw SRC_BUG;
         set_saved_status(s_saved);
         *offset = r;
@@ -1094,18 +1167,14 @@ namespace libdar
                                    const path & che,
                                    const infinint & taille,
 				   const infinint & fs_device,
-				   const infinint & etiquette_number) : file(xuid, xgid, xperm, last_access, last_modif, src, che, taille, fs_device)
+				   const infinint & etiquette_number) : file(xuid, xgid, xperm, last_access, last_modif, src, che, taille, fs_device), etiquette(etiquette_number)
     {
-        etiquette = new infinint(etiquette_number);
-        if(etiquette == NULL)
-            throw Ememory("file_etiquette::file_etiquette");
+	    // nothing to do more (all is done just above).
     }
 
-    file_etiquette::file_etiquette(const file_etiquette & ref) : file(ref)
+    file_etiquette::file_etiquette(const file_etiquette & ref) : file(ref), etiquette(ref.etiquette)
     {
-        etiquette = new infinint(*ref.etiquette);
-        if(etiquette == NULL)
-            throw Ememory("file_etiquette::file_etiquette");
+	    // nothing to do more (all is done just above).
     }
 
     file_etiquette::file_etiquette(user_interaction & dialog,
@@ -1117,15 +1186,13 @@ namespace libdar
 				   generic_file *ea_loc)
 	: file(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc)
     {
-        etiquette = new infinint(dialog, NULL, &f);
-        if(etiquette == NULL)
-            throw Ememory("file_etiquette::file_etiquette(generic_file)");
+        etiquette = infinint(dialog, NULL, &f);
     }
 
     void file_etiquette::dump(user_interaction & dialog, generic_file &f) const
     {
         file::dump(dialog, f);
-        etiquette->dump(f);
+        etiquette.dump(f);
     }
 
     hard_link::hard_link(const string & name, file_etiquette *ref) : nomme(name)
@@ -1225,6 +1292,7 @@ namespace libdar
         fils.clear();
         it = fils.begin();
         set_saved_status(s_saved);
+	recursive_has_changed = true;
     }
 
     directory::directory(const directory &ref) : inode(ref)
@@ -1232,6 +1300,7 @@ namespace libdar
         parent = NULL;
         fils.clear();
         it = fils.begin();
+	recursive_has_changed = ref.recursive_has_changed;
     }
 
     directory::directory(user_interaction & dialog,
@@ -1250,6 +1319,7 @@ namespace libdar
         parent = NULL;
         fils.clear();
         it = fils.begin();
+	recursive_has_changed = true; // need to call recursive_has_changed_update() first if this fields has to be used
 
         try
         {
@@ -1368,17 +1438,19 @@ namespace libdar
 			    const mask &m, bool filter_unsaved, string marge) const
     {
         vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
+	thread_cancellation thr;
 
+	thr.check_self_cancellation();
         while(it != fils.end())
         {
-            const directory *d = dynamic_cast<directory *>(*it);
+            const directory *dir = dynamic_cast<directory *>(*it);
             const detruit *det = dynamic_cast<detruit *>(*it);
             const inode *ino = dynamic_cast<inode *>(*it);
             const hard_link *hard = dynamic_cast<hard_link *>(*it);
 
             if(*it == NULL)
                 throw SRC_BUG; // NULL entry ! should not be
-            if(m.is_covered((*it)->get_name()) || d != NULL)
+            if(m.is_covered((*it)->get_name()) || dir != NULL)
             {
                 if(det != NULL)
                 {
@@ -1393,8 +1465,10 @@ namespace libdar
                     if(ino == NULL)
                         throw SRC_BUG;
                     else
-			if(!filter_unsaved || ino->get_saved_status() != s_not_saved || d != NULL
-			   || ino->ea_get_saved_status() != ea_none)
+			if(!filter_unsaved
+			   || ino->get_saved_status() != s_not_saved
+			   || ino->ea_get_saved_status() != ea_none
+			   || (dir != NULL && dir->get_recursive_has_changed()))
 			{
 			    string a = local_perm(*ino);
 			    string b = local_uid(*ino);
@@ -1405,13 +1479,13 @@ namespace libdar
 			    string g = (*it)->get_name();
 
 			    dialog.printf("%S%S\t%S\t%S\t%S\t%S\t%S\t%S\n", &marge, &a, &b, &c, &d, &e, &f, &g);
-			}
-                }
 
-                if(d != NULL)
-                {
-                    d->listing(dialog, m, filter_unsaved, marge + "|  ");
-                    dialog.printf("%S+---\n", &marge);
+			    if(dir != NULL)
+			    {
+				dir->listing(dialog, m, filter_unsaved, marge + "|  ");
+				dialog.printf("%S+---\n", &marge);
+			    }
+			}
                 }
             }
 
@@ -1424,7 +1498,9 @@ namespace libdar
     {
         vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
         string sep = beginning == "" ? "" : "/";
+	thread_cancellation thr;
 
+	thr.check_self_cancellation();
         while(it != fils.end())
         {
             const directory *dir = dynamic_cast<directory *>(*it);
@@ -1452,8 +1528,10 @@ namespace libdar
                     if(ino == NULL)
                         throw SRC_BUG;
                     else
-			if(!filter_unsaved || ino->get_saved_status() != s_not_saved
-			   || ino->ea_get_saved_status() != ea_none)
+			if(!filter_unsaved
+			   || ino->get_saved_status() != s_not_saved
+			   || ino->ea_get_saved_status() != ea_none
+			   || (dir != NULL && dir->get_recursive_has_changed()))
 			{
 			    string a = local_perm(*ino);
 			    string b = local_uid(*ino);
@@ -1467,32 +1545,266 @@ namespace libdar
 				dialog.listing(f, a, b, c, d, e, beginning+sep+g, dir != NULL, dir != NULL && dir->has_children());
 			    else
 				dialog.printf("%S   %S   %S\t%S\t%S\t%S\t%S%S%S\n", &f, &a, &b, &c, &d, &e, &beginning, &sep, &g);
+
+			    if(dir != NULL)
+				dir->tar_listing(dialog, m, filter_unsaved, beginning + sep + (*it)->get_name());
 			}
 			// else do nothing
 		}
 	    }
 
-	    if(dir != NULL)
-		dir->tar_listing(dialog, m, filter_unsaved, beginning + sep + (*it)->get_name());
-
 	    it++;
+	}
+    }
+
+    void directory::xml_listing(user_interaction & dialog,
+				const mask &m,
+				bool filter_unsaved,
+				const string & beginning) const
+    {
+    	vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
+	thread_cancellation thr;
+
+	thr.check_self_cancellation();
+	while(it != fils.end())
+	{
+	    const directory *dir = dynamic_cast<directory *>(*it);
+	    const detruit *det = dynamic_cast<detruit *>(*it);
+	    const inode *ino = dynamic_cast<inode *>(*it);
+	    const hard_link *hard = dynamic_cast<hard_link *>(*it);
+	    const lien *sym = dynamic_cast<lien *>(*it);
+	    const device *dev = dynamic_cast<device *>(*it);
+
+	    if(*it == NULL)
+		throw SRC_BUG; // NULL entry ! should not be
+
+	    if(m.is_covered((*it)->get_name()) || dir != NULL)
+	    {
+		string name = (*it)->get_name();
+
+		if(det != NULL)
+		{
+		    unsigned char sig;
+		    saved_status state;
+		    string data = "deleted";
+		    string metadata = "absent";
+
+		    unmk_signature(det->get_signature(), sig, state);
+		    switch(sig)
+		    {
+		    case 'd':
+			dialog.printf("%S<Directory name=\"%S\">\n", &beginning, &name);
+			xml_listing_attributes(dialog, beginning, data, metadata);
+			dialog.printf("%S</Directory>\n", &beginning);
+			break;
+		    case 'f':
+		    case 'h':
+		    case 'e':
+			dialog.printf("%S<File name=\"%S\">\n", &beginning, &name);
+			xml_listing_attributes(dialog, beginning, data, metadata);
+			dialog.printf("%S</File>\n", &beginning);
+			break;
+		    case 'l':
+			dialog.printf("%S<Symlink name=\"%S\">\n", &beginning, &name);
+			xml_listing_attributes(dialog, beginning, data, metadata);
+			dialog.printf("%S</Symlink>\n", &beginning);
+			break;
+		    case 'c':
+			dialog.printf("%S<Device name=\"%S\" type=\"character\">\n", &beginning, &name);
+			xml_listing_attributes(dialog, beginning, data, metadata);
+			dialog.printf("%S</Device>\n", &beginning);
+			break;
+		    case 'b':
+			dialog.printf("%S<Device name=\"%S\" type=\"block\">\n", &beginning, &name);
+			xml_listing_attributes(dialog, beginning, data, metadata);
+			dialog.printf("%S</Device>\n", &beginning);
+			break;
+		    case 'p':
+			dialog.printf("%S<Pipe name=\"%S\">\n", &beginning, &name);
+			xml_listing_attributes(dialog, beginning, data, metadata);
+			dialog.printf("%S</Pipe>\n", &beginning);
+			break;
+		    case 's':
+			dialog.printf("%S<Socket name=\"%S\">\n", &beginning, &name);
+			xml_listing_attributes(dialog, beginning, data, metadata);
+			dialog.printf("%S</Socket>\n", &beginning);
+			break;
+		    default:
+			throw SRC_BUG;
+		    }
+		}
+		else
+		{
+		    if(hard != NULL)
+			ino = hard->get_inode();
+		    if(ino == NULL)
+			throw SRC_BUG; // this is a nomme which is neither a detruit nor an inode
+
+		    if(!filter_unsaved
+		       || ino->get_saved_status() != s_not_saved
+		       || ino->ea_get_saved_status() != ea_none
+		       || (dir != NULL && dir->get_recursive_has_changed()))
+		    {
+			string perm = local_perm(*ino);
+			string uid = local_uid(*ino);
+			string gid = local_gid(*ino);
+			string size = local_size(*ino);
+			string stored = local_storage_size(*ino);
+			string mtime = deci(ino->get_last_modif()).human();
+			string atime = deci(ino->get_last_access()).human();
+			string ctime = "";
+			string data, metadata, maj, min, chksum, target;
+			const file *reg = dynamic_cast<const file *>(ino); // ino is no more *it (if *it was a hard_link)
+			saved_status data_st;
+			ea_status ea_st = ino->ea_get_saved_status();
+			unsigned char sig;
+			crc tmp;
+			unmk_signature(ino->signature(), sig, data_st);
+			data_st = ino->get_saved_status(); // the trusted source for inode status is get_saved_status, not the signature (may change in future, who knows)
+			if(stored == "0")
+			    stored = size;
+
+			    // defining "data" string
+
+			switch(data_st)
+			{
+			case s_saved:
+			    data = "saved";
+			    break;
+			case s_fake:
+			case s_not_saved:
+			    data = "referenced";
+			    break;
+			default:
+			    throw SRC_BUG;
+			}
+
+			    // defining "metadata" string
+
+			switch(ea_st)
+			{
+			case ea_full:
+			    metadata = "saved";
+			    ctime = deci(ino->get_last_change()).human();
+			    break;
+			case ea_partial:
+			case ea_fake:
+			    metadata = "referenced";
+			    ctime = deci(ino->get_last_change()).human();
+			    break;
+			case ea_none:
+			    metadata = "absent";
+			    ctime = "";
+			    break;
+			default:
+			    throw SRC_BUG;
+			}
+
+			    // building entry for each type of inode
+
+			switch(sig)
+			{
+			case 'd': // directories
+			    dialog.printf("%S<Directory name=\"%S\">\n", &beginning, &name);
+			    xml_listing_attributes(dialog, beginning, data, metadata, uid, gid, perm, atime, mtime, ctime);
+			    dir->xml_listing(dialog, m, filter_unsaved, beginning + "\t");
+			    dialog.printf("%S</Directory>\n", &beginning);
+			    break;
+			case 'f': // plain files
+			case 'h': // hard linked files
+			case 'e': // hard linked files
+			    if(data_st == s_saved)
+			    {
+				if(reg == NULL)
+				    throw SRC_BUG; // f, e is signature for plain files, h has been
+				if(!reg->get_crc(tmp))
+				    chksum = "";
+				else
+				    chksum = crc2str(tmp);
+			    }
+			    else
+			    {
+				stored = "";
+				chksum = "";
+			    }
+			    dialog.printf("%S<File name=\"%S\" size=\"%S\" stored=\"%S\" crc=\"%S\">\n",
+					  &beginning, &name, &size, &stored, &chksum);
+			    xml_listing_attributes(dialog, beginning, data, metadata, uid, gid, perm, atime, mtime, ctime);
+			    dialog.printf("%S</File>\n", &beginning);
+			    break;
+			case 'l': // soft link
+			    if(data_st == s_saved)
+				target = sym->get_target();
+			    else
+				target = "";
+			    dialog.printf("%S<Symlink name=\"%S\" target=\"%S\">\n",
+					  &beginning, &name, &target);
+			    xml_listing_attributes(dialog, beginning, data, metadata, uid, gid, perm, atime, mtime, ctime);
+			    dialog.printf("%S</Symlink>\n", &beginning);
+			    break;
+			case 'c':
+			case 'b':
+				// this is maybe less performant, to have both 'c' and 'b' here and
+				// make an additional test, but this has the advantage to not duplicate
+				// very similar code, which would obviously evoluate the same way.
+				// Experience shows that two identical codes even when driven by the same need
+				// are an important source of bugs, as one will forget to update both of them, the
+				// same way...
+
+			    if(sig == 'c')
+				target = "character";
+			    else
+				target = "block";
+				// we re-used target variable which is not used for the current inode
+
+			    if(data_st == s_saved)
+			    {
+				maj = tools_uword2str(dev->get_major());
+				min = tools_uword2str(dev->get_minor());
+			    }
+			    else
+				maj = min = "";
+
+			    dialog.printf("%S<Device name=\"%S\" type=\"%S\" major=\"%S\" minor=\"%S\">\n",
+					  &beginning, &name, &target, &maj, &min);
+			    xml_listing_attributes(dialog, beginning, data, metadata, uid, gid, perm, atime, mtime, ctime);
+			    dialog.printf("%S</Device>\n", &beginning);
+			    break;
+			case 'p':
+			    dialog.printf("%S<Pipe name=\"%S\">\n", &beginning, &name);
+			    xml_listing_attributes(dialog, beginning, data, metadata, uid, gid, perm, atime, mtime, ctime);
+			    dialog.printf("%S</Pipe>\n", &beginning);
+			    break;
+			case 's':
+			    dialog.printf("%S<Socket name=\"%S\">\n", &beginning, &name);
+			    xml_listing_attributes(dialog, beginning, data, metadata, uid, gid, perm, atime, mtime, ctime);
+			    dialog.printf("%S</Socket>\n", &beginning);
+			    break;
+			default:
+			    throw SRC_BUG;
+			}
+		    }
+		}  // end of filter check
+
+		it++;
+	    }  // end of loop
 	}
     }
 
     bool directory::search_children(const string &name, nomme *&ref)
     {
-        vector<nomme *>::iterator ut = fils.begin();
+	vector<nomme *>::iterator ut = fils.begin();
 
-        while(ut != fils.end() && (*ut)->get_name() != name)
-            ut++;
+	while(ut != fils.end() && (*ut)->get_name() != name)
+	    ut++;
 
-        if(ut != fils.end())
-        {
-            ref = *ut;
-            return true;
-        }
-        else
-            return false;
+	if(ut != fils.end())
+	{
+	    ref = *ut;
+	    return true;
+	}
+	else
+	    return false;
     }
 
     bool directory::callback_for_children_of(user_interaction & dialog, const string & sdir) const
@@ -1560,15 +1872,15 @@ namespace libdar
 	    next_dir = dynamic_cast<const directory *>(next_nom);
 	    if(next_ino != NULL)
 	    {
-		 string a = local_perm(*next_ino);
-		 string b = local_uid(*next_ino);
-		 string c = local_gid(*next_ino);
-		 string d = local_size(*next_ino);
-		 string e = local_date(*next_ino);
-		 string f = local_flag(*next_ino);
-		 string g = next_ino->get_name();
-		 dialog.listing(f,a,b,c,d,e,g, next_dir != NULL, next_dir != NULL && next_dir->has_children());
-		 loop = true;
+		string a = local_perm(*next_ino);
+		string b = local_uid(*next_ino);
+		string c = local_gid(*next_ino);
+		string d = local_size(*next_ino);
+		string e = local_date(*next_ino);
+		string f = local_flag(*next_ino);
+		string g = next_ino->get_name();
+		dialog.listing(f,a,b,c,d,e,g, next_dir != NULL, next_dir != NULL && next_dir->has_children());
+		loop = true;
 	    }
 	    else
 		if(next_detruit != NULL)
@@ -1584,17 +1896,39 @@ namespace libdar
 	return loop;
     }
 
+    void directory::recursive_has_changed_update() const
+    {
+	vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
+
+	const_cast<directory *>(this)->recursive_has_changed = false;
+	while(it != fils.end())
+	{
+	    const directory *d = dynamic_cast<directory *>(*it);
+	    const inode *ino = dynamic_cast<inode *>(*it);
+	    if(d != NULL)
+	    {
+		d->recursive_has_changed_update();
+		const_cast<directory *>(this)->recursive_has_changed |= d->get_recursive_has_changed();
+	    }
+	    if(ino != NULL && !recursive_has_changed)
+		const_cast<directory *>(this)->recursive_has_changed |=
+		    ino->get_saved_status() != s_not_saved
+		    || ino->ea_get_saved_status() != ea_none;
+	    it++;
+	}
+    }
+
     device::device(U_16 uid, U_16 gid, U_16 perm,
-                   const infinint & last_access,
-                   const infinint & last_modif,
-                   const string & name,
-                   U_16 major,
-                   U_16 minor,
+		   const infinint & last_access,
+		   const infinint & last_modif,
+		   const string & name,
+		   U_16 major,
+		   U_16 minor,
 		   const infinint & fs_dev) : inode(uid, gid, perm, last_access, last_modif, name, fs_dev)
     {
-        xmajor = major;
-        xminor = minor;
-        set_saved_status(s_saved);
+	xmajor = major;
+	xminor = minor;
+	set_saved_status(s_saved);
     }
 
     device::device(user_interaction & dialog,
@@ -1603,52 +1937,52 @@ namespace libdar
 		   saved_status saved,
 		   generic_file *ea_loc) : inode(dialog, f, reading_ver, saved, ea_loc)
     {
-        U_16 tmp;
+	U_16 tmp;
 
-        if(saved == s_saved)
-        {
-            if(f.read((char *)&tmp, (size_t)sizeof(tmp)) != sizeof(tmp))
-                throw Erange("special::special", gettext("missing data to build a special device"));
-            xmajor = ntohs(tmp);
-            if(f.read((char *)&tmp, (size_t)sizeof(tmp)) != sizeof(tmp))
-                throw Erange("special::special", gettext("missing data to build a special device"));
-            xminor = ntohs(tmp);
-        }
+	if(saved == s_saved)
+	{
+	    if(f.read((char *)&tmp, (size_t)sizeof(tmp)) != sizeof(tmp))
+		throw Erange("special::special", gettext("missing data to build a special device"));
+	    xmajor = ntohs(tmp);
+	    if(f.read((char *)&tmp, (size_t)sizeof(tmp)) != sizeof(tmp))
+		throw Erange("special::special", gettext("missing data to build a special device"));
+	    xminor = ntohs(tmp);
+	}
     }
 
     void device::dump(user_interaction & dialog, generic_file & f) const
     {
-        U_16 tmp;
+	U_16 tmp;
 
-        inode::dump(dialog, f);
-        if(get_saved_status() == s_saved)
-        {
-            tmp = htons(xmajor);
-            f.write((char *)&tmp, (size_t)sizeof(tmp));
-            tmp = htons(xminor);
-            f.write((char *)&tmp, (size_t)sizeof(tmp));
-        }
+	inode::dump(dialog, f);
+	if(get_saved_status() == s_saved)
+	{
+	    tmp = htons(xmajor);
+	    f.write((char *)&tmp, (size_t)sizeof(tmp));
+	    tmp = htons(xminor);
+	    f.write((char *)&tmp, (size_t)sizeof(tmp));
+	}
     }
 
     void device::sub_compare(user_interaction & dialog, const inode & other) const
     {
-        const device *d_other = dynamic_cast<const device *>(&other);
-        if(d_other == NULL)
-            throw SRC_BUG; // bug in inode::compare
-        if(get_saved_status() == s_saved && d_other->get_saved_status() == s_saved)
-        {
-            if(get_major() != d_other->get_major())
-                throw Erange("device::sub_compare", gettext("devices have not the same major number"));
-            if(get_minor() != d_other->get_minor())
-                throw Erange("device::sub_compare", gettext("devices have not the same minor number"));
-        }
+	const device *d_other = dynamic_cast<const device *>(&other);
+	if(d_other == NULL)
+	    throw SRC_BUG; // bug in inode::compare
+	if(get_saved_status() == s_saved && d_other->get_saved_status() == s_saved)
+	{
+	    if(get_major() != d_other->get_major())
+		throw Erange("device::sub_compare", gettext("devices have not the same major number"));
+	    if(get_minor() != d_other->get_minor())
+		throw Erange("device::sub_compare", gettext("devices have not the same minor number"));
+	}
     }
 
     void ignored_dir::dump(user_interaction & dialog, generic_file & f) const
     {
-        directory tmp = directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_name(), 0);
-        tmp.set_saved_status(get_saved_status());
-        tmp.dump(dialog, f); // dump an empty directory
+	directory tmp = directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_name(), 0);
+	tmp.set_saved_status(get_saved_status());
+	tmp.dump(dialog, f); // dump an empty directory
     }
 
     catalogue::catalogue(user_interaction & dialog) : out_compare("/")
@@ -1676,7 +2010,7 @@ namespace libdar
 	    throw;
 	}
 
-        stats.clear();
+	stats.clear();
     }
 
     catalogue::catalogue(user_interaction & dialog,
@@ -1685,10 +2019,10 @@ namespace libdar
 			 generic_file *data_loc,
 			 generic_file *ea_loc) : out_compare("/")
     {
-        string tmp;
-        unsigned char a;
-        saved_status st;
-        unsigned char base;
+	string tmp;
+	unsigned char a;
+	saved_status st;
+	unsigned char base;
 	cache over_f = cache(dialog, f, BUFFER_SIZE, 1, 100, 20, 1, 100, 20);
 	std::map <infinint, file_etiquette *> corres;
 	contenu = NULL;
@@ -1724,421 +2058,436 @@ namespace libdar
 
     catalogue & catalogue::operator = (const catalogue &ref)
     {
-        detruire();
-        out_compare = ref.out_compare;
-        partial_copy_from(ref);
-        return *this;
+	detruire();
+	out_compare = ref.out_compare;
+	partial_copy_from(ref);
+	return *this;
     }
 
     void catalogue::reset_read()
     {
-        current_read = contenu;
-        contenu->reset_read_children();
+	current_read = contenu;
+	contenu->reset_read_children();
     }
 
     void catalogue::skip_read_to_parent_dir()
     {
-        directory *tmp = current_read->get_parent();
-        if(tmp == NULL)
-            throw Erange("catalogue::skip_read_to_parent_dir", gettext("root does not have a parent directory"));
-        current_read = tmp;
+	directory *tmp = current_read->get_parent();
+	if(tmp == NULL)
+	    throw Erange("catalogue::skip_read_to_parent_dir", gettext("root does not have a parent directory"));
+	current_read = tmp;
     }
 
     bool catalogue::read(const entree * & ref)
     {
-        const nomme *tmp;
+	const nomme *tmp;
 
-        if(current_read->read_children(tmp))
-        {
-            const directory *dir = dynamic_cast<const directory *>(tmp);
-            if(dir != NULL)
-            {
-                current_read = const_cast<directory *>(dir);
-                dir->reset_read_children();
-            }
-            ref = tmp;
-            return true;
-        }
-        else
-        {
-            directory *papa = current_read->get_parent();
-            ref = & r_eod;
-            if(papa == NULL)
-                return false; // we reached end of root, no eod generation
-            else
-            {
-                current_read = papa;
-                return true;
-            }
-        }
+	if(current_read->read_children(tmp))
+	{
+	    const directory *dir = dynamic_cast<const directory *>(tmp);
+	    if(dir != NULL)
+	    {
+		current_read = const_cast<directory *>(dir);
+		dir->reset_read_children();
+	    }
+	    ref = tmp;
+	    return true;
+	}
+	else
+	{
+	    directory *papa = current_read->get_parent();
+	    ref = & r_eod;
+	    if(papa == NULL)
+		return false; // we reached end of root, no eod generation
+	    else
+	    {
+		current_read = papa;
+		return true;
+	    }
+	}
     }
 
     bool catalogue::read_if_present(string *name, const nomme * & ref)
     {
-        nomme *tmp;
+	nomme *tmp;
 
-        if(current_read == NULL)
-            throw Erange("catalogue::read_if_present", gettext("no current directory defined"));
-        if(name == NULL) // we have to go to parent directory
-        {
-            if(current_read->get_parent() == NULL)
-                throw Erange("catalogue::read_if_present", gettext("root directory has no parent directory"));
-            else
-                current_read = current_read->get_parent();
-            ref = NULL;
-            return true;
-        }
-        else // looking for a real filename
-            if(current_read->search_children(*name, tmp))
-            {
-                directory *d = dynamic_cast<directory *>(tmp);
-                if(d != NULL) // this is a directory need to chdir to it
-                    current_read = d;
-                ref = tmp;
-                return true;
-            }
-            else // filename not present in current dir
-                return false;
+	if(current_read == NULL)
+	    throw Erange("catalogue::read_if_present", gettext("no current directory defined"));
+	if(name == NULL) // we have to go to parent directory
+	{
+	    if(current_read->get_parent() == NULL)
+		throw Erange("catalogue::read_if_present", gettext("root directory has no parent directory"));
+	    else
+		current_read = current_read->get_parent();
+	    ref = NULL;
+	    return true;
+	}
+	else // looking for a real filename
+	    if(current_read->search_children(*name, tmp))
+	    {
+		directory *d = dynamic_cast<directory *>(tmp);
+		if(d != NULL) // this is a directory need to chdir to it
+		    current_read = d;
+		ref = tmp;
+		return true;
+	    }
+	    else // filename not present in current dir
+		return false;
     }
 
     void catalogue::reset_sub_read(const path &sub)
     {
-        if(! sub.is_relative())
-            throw SRC_BUG;
+	if(! sub.is_relative())
+	    throw SRC_BUG;
 
-        if(sub_tree != NULL)
-            delete sub_tree;
-        sub_tree = new path(sub);
-        if(sub_tree == NULL)
-            throw Ememory("catalogue::reset_sub_read");
-        sub_count = -1; // must provide the path to subtree;
-        reset_read();
+	if(sub_tree != NULL)
+	    delete sub_tree;
+	sub_tree = new path(sub);
+	if(sub_tree == NULL)
+	    throw Ememory("catalogue::reset_sub_read");
+	sub_count = -1; // must provide the path to subtree;
+	reset_read();
     }
 
     bool catalogue::sub_read(const entree * &ref)
     {
-        string tmp;
+	string tmp;
 
-        if(sub_tree == NULL)
-            throw SRC_BUG; // reset_sub_read
+	if(sub_tree == NULL)
+	    throw SRC_BUG; // reset_sub_read
 
-        switch(sub_count)
-        {
-        case 0 : // sending oed to go back to the root
-            if(sub_tree->pop(tmp))
-            {
-                ref = &r_eod;
-                return true;
-            }
-            else
-            {
-                ref = NULL;
-                delete sub_tree;
-                sub_tree = NULL;
-                sub_count = -2;
-                return false;
-            }
-        case -2: // reading is finished
-            return false;
-        case -1: // providing path to sub_tree
-            if(sub_tree->read_subdir(tmp))
-            {
-                nomme *xtmp;
+	switch(sub_count)
+	{
+	case 0 : // sending oed to go back to the root
+	    if(sub_tree->pop(tmp))
+	    {
+		ref = &r_eod;
+		return true;
+	    }
+	    else
+	    {
+		ref = NULL;
+		delete sub_tree;
+		sub_tree = NULL;
+		sub_count = -2;
+		return false;
+	    }
+	case -2: // reading is finished
+	    return false;
+	case -1: // providing path to sub_tree
+	    if(sub_tree->read_subdir(tmp))
+	    {
+		nomme *xtmp;
 
-                if(current_read->search_children(tmp, xtmp))
-                {
-                    ref = xtmp;
-                    directory *dir = dynamic_cast<directory *>(xtmp);
+		if(current_read->search_children(tmp, xtmp))
+		{
+		    ref = xtmp;
+		    directory *dir = dynamic_cast<directory *>(xtmp);
 
-                    if(dir != NULL)
-                    {
-                        current_read = dir;
-                        return true;
-                    }
-                    else
-                        if(sub_tree->read_subdir(tmp))
-                        {
-                            cat_ui->warning(sub_tree->display() + gettext(" is not present in the archive"));
-                            delete sub_tree;
-                            sub_tree = NULL;
-                            sub_count = -2;
-                            return false;
-                        }
-                        else // subdir is a single file (no tree))
-                        {
-                            sub_count = 0;
-                            return true;
-                        }
-                }
-                else
-                {
-                    cat_ui->warning(sub_tree->display() + gettext(" is not present in the archive"));
-                    delete sub_tree;
-                    sub_tree = NULL;
-                    sub_count = -2;
-                    return false;
-                }
-            }
-            else
-            {
-                sub_count = 1;
-                current_read->reset_read_children();
-                    // now reading the sub_tree
-                    // no break !
-            }
+		    if(dir != NULL)
+		    {
+			current_read = dir;
+			return true;
+		    }
+		    else
+			if(sub_tree->read_subdir(tmp))
+			{
+			    cat_ui->warning(sub_tree->display() + gettext(" is not present in the archive"));
+			    delete sub_tree;
+			    sub_tree = NULL;
+			    sub_count = -2;
+			    return false;
+			}
+			else // subdir is a single file (no tree))
+			{
+			    sub_count = 0;
+			    return true;
+			}
+		}
+		else
+		{
+		    cat_ui->warning(sub_tree->display() + gettext(" is not present in the archive"));
+		    delete sub_tree;
+		    sub_tree = NULL;
+		    sub_count = -2;
+		    return false;
+		}
+	    }
+	    else
+	    {
+		sub_count = 1;
+		current_read->reset_read_children();
+		    // now reading the sub_tree
+		    // no break !
+	    }
 
-        default:
-            if(read(ref) && sub_count > 0)
-            {
-                const directory *dir = dynamic_cast<const directory *>(ref);
-                const eod *fin = dynamic_cast<const eod *>(ref);
+	default:
+	    if(read(ref) && sub_count > 0)
+	    {
+		const directory *dir = dynamic_cast<const directory *>(ref);
+		const eod *fin = dynamic_cast<const eod *>(ref);
 
-                if(dir != NULL)
-                    sub_count++;
-                if(fin != NULL)
-                    sub_count--;
+		if(dir != NULL)
+		    sub_count++;
+		if(fin != NULL)
+		    sub_count--;
 
-                return true;
-            }
-            else
-                throw SRC_BUG;
-        }
+		return true;
+	    }
+	    else
+		throw SRC_BUG;
+	}
     }
 
     void catalogue::reset_add()
     {
-        current_add = contenu;
+	current_add = contenu;
     }
 
     void catalogue::add(entree *ref)
     {
-        if(current_add == NULL)
-            throw SRC_BUG;
+	if(current_add == NULL)
+	    throw SRC_BUG;
 
-        eod *f = dynamic_cast<eod *>(ref);
+	eod *f = dynamic_cast<eod *>(ref);
 
-        if(f == NULL) // ref is not eod
-        {
-            nomme *n = dynamic_cast<nomme *>(ref);
-            directory *t = dynamic_cast<directory *>(ref);
+	if(f == NULL) // ref is not eod
+	{
+	    nomme *n = dynamic_cast<nomme *>(ref);
+	    directory *t = dynamic_cast<directory *>(ref);
 
-            if(n == NULL)
-                throw SRC_BUG; // unknown type neither "eod" nor "nomme"
-            current_add->add_children(n);
-            if(t != NULL) // ref is a directory
-                current_add = t;
-            stats.add(ref);
-        }
-        else // ref is an eod
-        {
-            directory *parent = current_add->get_parent();
-            delete ref; // all data given throw add becomes owned by the catalogue object
-            if(parent == NULL)
-                throw Erange("catalogue::add_file", gettext("root has no parent directory, cannot change to it"));
-            else
-                current_add = parent;
-        }
+	    if(n == NULL)
+		throw SRC_BUG; // unknown type neither "eod" nor "nomme"
+	    current_add->add_children(n);
+	    if(t != NULL) // ref is a directory
+		current_add = t;
+	    stats.add(ref);
+	}
+	else // ref is an eod
+	{
+	    directory *parent = current_add->get_parent();
+	    delete ref; // all data given throw add becomes owned by the catalogue object
+	    if(parent == NULL)
+		throw Erange("catalogue::add_file", gettext("root has no parent directory, cannot change to it"));
+	    else
+		current_add = parent;
+	}
     }
 
     void catalogue::add_in_current_read(nomme *ref)
     {
-        if(current_read == NULL)
-            throw SRC_BUG; // current read directory does not exists
-        current_read->add_children(ref);
+	if(current_read == NULL)
+	    throw SRC_BUG; // current read directory does not exists
+	current_read->add_children(ref);
     }
 
     void catalogue::reset_compare()
     {
-        current_compare = contenu;
-        out_compare = "/";
+	current_compare = contenu;
+	out_compare = "/";
     }
 
     bool catalogue::compare(const entree * target, const entree * & extracted)
     {
-        const directory *dir = dynamic_cast<const directory *>(target);
-        const eod *fin = dynamic_cast<const eod *>(target);
-        const nomme *nom = dynamic_cast<const nomme *>(target);
+	const directory *dir = dynamic_cast<const directory *>(target);
+	const eod *fin = dynamic_cast<const eod *>(target);
+	const nomme *nom = dynamic_cast<const nomme *>(target);
 
-        if(out_compare.degre() > 1) // actually scanning a inexisting directory
-        {
-            if(dir != NULL)
-                out_compare += dir->get_name();
-            else
-                if(fin != NULL)
-                {
-                    string tmp_s;
+	if(out_compare.degre() > 1) // actually scanning a inexisting directory
+	{
+	    if(dir != NULL)
+		out_compare += dir->get_name();
+	    else
+		if(fin != NULL)
+		{
+		    string tmp_s;
 
-                    if(!out_compare.pop(tmp_s))
-                        if(out_compare.is_relative())
-                            throw SRC_BUG; // should not be a relative path !!!
-                        else // both cases are bugs, but need to know which case is generating a bug
-                            throw SRC_BUG; // out_compare.degre() > 0 but cannot pop !
-                }
+		    if(!out_compare.pop(tmp_s))
+			if(out_compare.is_relative())
+			    throw SRC_BUG; // should not be a relative path !!!
+			else // both cases are bugs, but need to know which case is generating a bug
+			    throw SRC_BUG; // out_compare.degre() > 0 but cannot pop !
+		}
 
-            return false;
-        }
-        else // scanning an existing directory
-        {
-            nomme *found;
+	    return false;
+	}
+	else // scanning an existing directory
+	{
+	    nomme *found;
 
-            if(fin != NULL)
-            {
-                directory *tmp = current_compare->get_parent();
-                if(tmp == NULL)
-                    throw Erange("catalogue::compare", gettext("root has no parent directory"));
-                current_compare = tmp;
-                extracted = target;
-                return true;
-            }
+	    if(fin != NULL)
+	    {
+		directory *tmp = current_compare->get_parent();
+		if(tmp == NULL)
+		    throw Erange("catalogue::compare", gettext("root has no parent directory"));
+		current_compare = tmp;
+		extracted = target;
+		return true;
+	    }
 
-            if(nom == NULL)
-                throw SRC_BUG; // ref, is neither a eod nor a nomme ! what's that ???
+	    if(nom == NULL)
+		throw SRC_BUG; // ref, is neither a eod nor a nomme ! what's that ???
 
-            if(current_compare->search_children(nom->get_name(), found))
-            {
-                const detruit *src_det = dynamic_cast<const detruit *>(nom);
-                const detruit *dst_det = dynamic_cast<const detruit *>(found);
-                const inode *src_ino = dynamic_cast<const inode *>(nom);
-                const inode *dst_ino = dynamic_cast<const inode *>(found);
-                const etiquette *src_eti = dynamic_cast<const etiquette *>(nom);
-                const etiquette *dst_eti = dynamic_cast<const etiquette *>(found);
+	    if(current_compare->search_children(nom->get_name(), found))
+	    {
+		const detruit *src_det = dynamic_cast<const detruit *>(nom);
+		const detruit *dst_det = dynamic_cast<const detruit *>(found);
+		const inode *src_ino = dynamic_cast<const inode *>(nom);
+		const inode *dst_ino = dynamic_cast<const inode *>(found);
+		const etiquette *src_eti = dynamic_cast<const etiquette *>(nom);
+		const etiquette *dst_eti = dynamic_cast<const etiquette *>(found);
 
-                    // extracting inode from hard links
-                if(src_eti != NULL)
-                    src_ino = src_eti->get_inode();
-                if(dst_eti != NULL)
-                    dst_ino = dst_eti->get_inode();
+		    // extracting inode from hard links
+		if(src_eti != NULL)
+		    src_ino = src_eti->get_inode();
+		if(dst_eti != NULL)
+		    dst_ino = dst_eti->get_inode();
 
-                    // updating internal structure to follow directory tree :
-                if(dir != NULL)
-                {
-                    directory *d_ext = dynamic_cast<directory *>(found);
-                    if(d_ext != NULL)
-                        current_compare = d_ext;
-                    else
-                        out_compare += dir->get_name();
-                }
+		    // updating internal structure to follow directory tree :
+		if(dir != NULL)
+		{
+		    directory *d_ext = dynamic_cast<directory *>(found);
+		    if(d_ext != NULL)
+			current_compare = d_ext;
+		    else
+			out_compare += dir->get_name();
+		}
 
-                    // now comparing the objects :
-                if(src_ino != NULL)
-                    if(dst_ino != NULL)
-                    {
-                        if(!src_ino->same_as(*dst_ino))
-                            return false;
-                    }
-                    else
-                        return false;
-                else
-                    if(src_det != NULL)
-                        if(dst_det != NULL)
-                        {
-                            if(!dst_det->same_as(*dst_det))
-                                return false;
-                        }
-                        else
-                            return false;
-                    else
-                        throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a nomme which is neither detruit nor inode !
+		    // now comparing the objects :
+		if(src_ino != NULL)
+		    if(dst_ino != NULL)
+		    {
+			if(!src_ino->same_as(*dst_ino))
+			    return false;
+		    }
+		    else
+			return false;
+		else
+		    if(src_det != NULL)
+			if(dst_det != NULL)
+			{
+			    if(!dst_det->same_as(*dst_det))
+				return false;
+			}
+			else
+			    return false;
+		    else
+			throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a nomme which is neither detruit nor inode !
 
-                if(dst_eti != NULL)
-                    extracted = dst_eti->get_inode();
-                else
-                    extracted = found;
-                return true;
-            }
-            else
-            {
-                if(dir != NULL)
-                    out_compare += dir->get_name();
-                return false;
-            }
-        }
+		if(dst_eti != NULL)
+		    extracted = dst_eti->get_inode();
+		else
+		    extracted = found;
+		return true;
+	    }
+	    else
+	    {
+		if(dir != NULL)
+		    out_compare += dir->get_name();
+		return false;
+	    }
+	}
     }
 
     infinint catalogue::update_destroyed_with(catalogue & ref)
     {
-        directory *current = contenu;
-        nomme *ici;
-        const entree *projo;
-        const eod *pro_eod;
-        const directory *pro_dir;
-        const detruit *pro_det;
-        const nomme *pro_nom;
-        infinint count = 0;
+	directory *current = contenu;
+	nomme *ici;
+	const entree *projo;
+	const eod *pro_eod;
+	const directory *pro_dir;
+	const detruit *pro_det;
+	const nomme *pro_nom;
+	infinint count = 0;
 
-        ref.reset_read();
-        while(ref.read(projo))
-        {
-            pro_eod = dynamic_cast<const eod *>(projo);
-            pro_dir = dynamic_cast<const directory *>(projo);
-            pro_det = dynamic_cast<const detruit *>(projo);
-            pro_nom = dynamic_cast<const nomme *>(projo);
+	ref.reset_read();
+	while(ref.read(projo))
+	{
+	    pro_eod = dynamic_cast<const eod *>(projo);
+	    pro_dir = dynamic_cast<const directory *>(projo);
+	    pro_det = dynamic_cast<const detruit *>(projo);
+	    pro_nom = dynamic_cast<const nomme *>(projo);
 
-            if(pro_eod != NULL)
-            {
-                directory *tmp = current->get_parent();
-                if(tmp == NULL)
-                    throw SRC_BUG; // reached root for "contenu", and not yet for "ref";
-                current = tmp;
-                continue;
-            }
+	    if(pro_eod != NULL)
+	    {
+		directory *tmp = current->get_parent();
+		if(tmp == NULL)
+		    throw SRC_BUG; // reached root for "contenu", and not yet for "ref";
+		current = tmp;
+		continue;
+	    }
 
-            if(pro_det != NULL)
-                continue;
+	    if(pro_det != NULL)
+		continue;
 
-            if(pro_nom == NULL)
-                throw SRC_BUG; // neither an eod nor a nomme ! what's that ?
+	    if(pro_nom == NULL)
+		throw SRC_BUG; // neither an eod nor a nomme ! what's that ?
 
-            if(!current->search_children(pro_nom->get_name(), ici))
-            {
-                current->add_children(new detruit(pro_nom->get_name(), pro_nom->signature()));
-                count++;
-                if(pro_dir != NULL)
-                    ref.skip_read_to_parent_dir();
-            }
-            else
-                if(pro_dir != NULL)
-                {
-                    directory *ici_dir = dynamic_cast<directory *>(ici);
+	    if(!current->search_children(pro_nom->get_name(), ici))
+	    {
+		current->add_children(new detruit(pro_nom->get_name(), pro_nom->signature()));
+		count++;
+		if(pro_dir != NULL)
+		    ref.skip_read_to_parent_dir();
+	    }
+	    else
+		if(pro_dir != NULL)
+		{
+		    directory *ici_dir = dynamic_cast<directory *>(ici);
 
-                    if(ici_dir != NULL)
-                        current = ici_dir;
-                    else
-                        ref.skip_read_to_parent_dir();
-                }
-        }
+		    if(ici_dir != NULL)
+			current = ici_dir;
+		    else
+			ref.skip_read_to_parent_dir();
+		}
+	}
 
-        return count;
+	return count;
     }
 
     void catalogue::listing(const mask &m, bool filter_unsaved, string marge) const
     {
-        cat_ui->printf(gettext("access mode    | user | group | size  |          date                 | [data ][ EA  ][compr] |   filename\n"));
-        cat_ui->printf("---------------+------+-------+-------+-------------------------------+-----------------------+-----------\n");
-        contenu->listing(*cat_ui, m, filter_unsaved, marge);
+	cat_ui->printf(gettext("access mode    | user | group | size  |          date                 | [data ][ EA  ][compr] |   filename\n"));
+	cat_ui->printf("---------------+------+-------+-------+-------------------------------+-----------------------+-----------\n");
+	if(filter_unsaved)
+	    contenu->recursive_has_changed_update();
+	contenu->listing(*cat_ui, m, filter_unsaved, marge);
     }
 
     void catalogue::tar_listing(const mask &m, bool filter_unsaved, const string & beginning) const
     {
-        if(!cat_ui->get_use_listing())
-        {
-            cat_ui->printf(gettext("[data ][ EA  ][compr] | permission | user  | group | size  |          date                 |    filename\n"));
-            cat_ui->printf("----------------------+------------+-------+-------+-------+-------------------------------+------------\n");
-        }
+	if(!cat_ui->get_use_listing())
+	{
+	    cat_ui->printf(gettext("[data ][ EA  ][compr] | permission | user  | group | size  |          date                 |    filename\n"));
+	    cat_ui->printf("----------------------+------------+-------+-------+-------+-------------------------------+------------\n");
+	}
+	if(filter_unsaved)
+	    contenu->recursive_has_changed_update();
 	contenu->tar_listing(*cat_ui, m, filter_unsaved, beginning);
+    }
+
+    void catalogue::xml_listing(const mask &m, bool filter_unsaved, const string & beginning) const
+    {
+	cat_ui->warning("<?xml version=\"1.0\" ?>");
+	cat_ui->warning("<!DOCTYPE Catalog SYSTEM \"dar-catalog-1.0.dtd\">\n");
+	cat_ui->warning("<Catalog format=\"1.0\">");
+	if(filter_unsaved)
+	    contenu->recursive_has_changed_update();
+	contenu->xml_listing(*cat_ui, m, filter_unsaved, beginning);
+	cat_ui->warning("</Catalog>");
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.35.2.4 2006/01/01 23:10:45 edrusb Rel $";
-        dummy_call(id);
+	static char id[]="$Id: catalogue.cpp,v 1.47.2.2 2006/02/02 16:39:49 edrusb Rel $";
+	dummy_call(id);
     }
 
     void catalogue::dump(generic_file & ref) const
     {
 	cache over_ref = cache(*cat_ui, ref, BUFFER_SIZE, 1, 100, 20, 1, 100, 20);
 
-        contenu->dump(*cat_ui, over_ref);
+	contenu->dump(*cat_ui, over_ref);
     }
 
     void catalogue::partial_copy_from(const catalogue & ref)
@@ -2179,10 +2528,10 @@ namespace libdar
 
     void catalogue::detruire()
     {
-        if(contenu != NULL)
-            delete contenu;
-        if(sub_tree != NULL)
-            delete sub_tree;
+	if(contenu != NULL)
+	    delete contenu;
+	if(sub_tree != NULL)
+	    delete sub_tree;
 	if(cat_ui != NULL)
 	    delete cat_ui;
     }
@@ -2193,178 +2542,212 @@ namespace libdar
 
     static string local_perm(const inode &ref)
     {
-        string ret = "";
-        saved_status st;
-        char type;
+	string ret = "";
+	saved_status st;
+	char type;
 
-        U_32 perm = ref.get_perm();
-        if(!extract_base_and_status(ref.signature(), (unsigned char &)type, st))
-            throw SRC_BUG;
+	U_32 perm = ref.get_perm();
+	if(!extract_base_and_status(ref.signature(), (unsigned char &)type, st))
+	    throw SRC_BUG;
 
-        if(type == 'f')
-            type = '-';
-        if(type == 'e')
-            type = 'h';
-        ret += type;
-        if((perm & 0400) != 0)
-            ret += 'r';
-        else
-            ret += '-';
-        if((perm & 0200) != 0)
-            ret += 'w';
-        else
-            ret += '-';
-        if((perm & 0100) != 0)
-            if((perm & 04000) != 0)
-                ret += 's';
-            else
-                ret += 'x';
-        else
-            if((perm & 04000) != 0)
-                ret += 'S';
-            else
-                ret += '-';
-        if((perm & 040) != 0)
-            ret += 'r';
-        else
-            ret += '-';
-        if((perm & 020) != 0)
-            ret += 'w';
-        else
-            ret += '-';
-        if((perm & 010) != 0)
-            if((perm & 02000) != 0)
-                ret += 's';
-            else
-                ret += 'x';
-        else
-            if((perm & 02000) != 0)
-                ret += 'S';
-            else
-                ret += '-';
-        if((perm & 04) != 0)
-            ret += 'r';
-        else
-            ret += '-';
-        if((perm & 02) != 0)
-            ret += 'w';
-        else
-            ret += '-';
-        if((perm & 01) != 0)
-            if((perm & 01000) != 0)
-                ret += 't';
-            else
-                ret += 'x';
-        else
-            if((perm & 01000) != 0)
-                ret += 'T';
-            else
-                ret += '-';
+	if(type == 'f')
+	    type = '-';
+	if(type == 'e')
+	    type = 'h';
+	ret += type;
+	if((perm & 0400) != 0)
+	    ret += 'r';
+	else
+	    ret += '-';
+	if((perm & 0200) != 0)
+	    ret += 'w';
+	else
+	    ret += '-';
+	if((perm & 0100) != 0)
+	    if((perm & 04000) != 0)
+		ret += 's';
+	    else
+		ret += 'x';
+	else
+	    if((perm & 04000) != 0)
+		ret += 'S';
+	    else
+		ret += '-';
+	if((perm & 040) != 0)
+	    ret += 'r';
+	else
+	    ret += '-';
+	if((perm & 020) != 0)
+	    ret += 'w';
+	else
+	    ret += '-';
+	if((perm & 010) != 0)
+	    if((perm & 02000) != 0)
+		ret += 's';
+	    else
+		ret += 'x';
+	else
+	    if((perm & 02000) != 0)
+		ret += 'S';
+	    else
+		ret += '-';
+	if((perm & 04) != 0)
+	    ret += 'r';
+	else
+	    ret += '-';
+	if((perm & 02) != 0)
+	    ret += 'w';
+	else
+	    ret += '-';
+	if((perm & 01) != 0)
+	    if((perm & 01000) != 0)
+		ret += 't';
+	    else
+		ret += 'x';
+	else
+	    if((perm & 01000) != 0)
+		ret += 'T';
+	    else
+		ret += '-';
 
-        return ret;
+	return ret;
     }
 
     static string local_uid(const inode & ref)
     {
-        return tools_name_of_uid(ref.get_uid());
+	return tools_name_of_uid(ref.get_uid());
     }
 
     static string local_gid(const inode & ref)
     {
-        return tools_name_of_gid(ref.get_gid());
+	return tools_name_of_gid(ref.get_gid());
     }
 
     static string local_size(const inode & ref)
     {
-        string ret;
+	string ret;
 
-        const file *fic = dynamic_cast<const file *>(&ref);
-        if(fic != NULL)
-        {
-            deci d = fic->get_size();
-            ret = d.human();
-        }
-        else
-            ret = "0";
+	const file *fic = dynamic_cast<const file *>(&ref);
+	if(fic != NULL)
+	{
+	    deci d = fic->get_size();
+	    ret = d.human();
+	}
+	else
+	    ret = "0";
 
-        return ret;
+	return ret;
+    }
+
+    static string local_storage_size(const inode & ref)
+    {
+	string ret;
+
+	const file *fic = dynamic_cast<const file*>(&ref);
+	if(fic != NULL)
+	{
+	    deci d = fic->get_storage_size();
+	    ret = d.human();
+	}
+	else
+	    ret = "0";
+
+	return ret;
     }
 
     static string local_date(const inode & ref)
     {
-        return tools_display_date(ref.get_last_modif());
+	return tools_display_date(ref.get_last_modif());
     }
 
     static string local_flag(const inode & ref)
     {
-        string ret;
+	string ret;
 
-        switch(ref.get_saved_status())
-        {
-        case s_saved:
-            ret = gettext("[Saved]");
-            break;
-        case s_fake:
-            ret = gettext("[InRef]");
-            break;
-        case s_not_saved:
-            ret = "[     ]";
-            break;
-        default:
-            throw SRC_BUG;
-        }
+	switch(ref.get_saved_status())
+	{
+	case s_saved:
+	    ret = gettext("[Saved]");
+	    break;
+	case s_fake:
+	    ret = gettext("[InRef]");
+	    break;
+	case s_not_saved:
+	    ret = "[     ]";
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
 
-        switch(ref.ea_get_saved_status())
-        {
-        case inode::ea_full:
-            ret += gettext("[Saved]");
-            break;
-        case inode::ea_partial:
-            ret += "[     ]";
-            break;
-        case inode::ea_none:
-            ret += "       ";
-            break;
-        default:
-            throw SRC_BUG;
-        }
+	switch(ref.ea_get_saved_status())
+	{
+	case inode::ea_full:
+	    ret += gettext("[Saved]");
+	    break;
+	case inode::ea_fake:
+	    ret += gettext("[InRef]");
+	    break;
+	case inode::ea_partial:
+	    ret += "[     ]";
+	    break;
+	case inode::ea_none:
+	    ret += "       ";
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
 
-        const file *fic = dynamic_cast<const file *>(&ref);
-        if(fic != NULL && fic->get_saved_status() == s_saved)
-            if(fic->get_storage_size() == 0)
-                ret += "[     ]";
-            else
-                if(fic->get_size() >= fic->get_storage_size())
-                    ret += "[" + tools_addspacebefore(deci(((fic->get_size() - fic->get_storage_size())*100)/fic->get_size()).human(), 4) +"%]";
-                else
-                    ret += gettext("[Worse]");
-        else
-            ret += "[-----]";
+	const file *fic = dynamic_cast<const file *>(&ref);
+	if(fic != NULL && fic->get_saved_status() == s_saved)
+	    if(fic->get_storage_size() == 0)
+		ret += "[     ]";
+	    else
+		if(fic->get_size() >= fic->get_storage_size())
+		    ret += "[" + tools_addspacebefore(deci(((fic->get_size() - fic->get_storage_size())*100)/fic->get_size()).human(), 4) +"%]";
+		else
+		    ret += gettext("[Worse]");
+	else
+	    ret += "[-----]";
 
-        return ret;
+	return ret;
+    }
+
+    static void xml_listing_attributes(user_interaction & dialog,
+				       const string & beginning,
+				       const string & data,
+				       const string & metadata,
+				       const string & user,
+				       const string & group,
+				       const string & permissions,
+				       const string & atime,
+				       const string & mtime,
+				       const string & ctime)
+    {
+	dialog.printf("%S<Attributes data=\"%S\" metadata=\"%S\" user=\"%S\" group=\"%S\" permissions=\"%S\" atime=\"%S\" mtime=\"%S\" ctime=\"%S\" />\n",
+		      &beginning, &data, &metadata, &user, &group, &permissions, &atime, &mtime, &ctime);
     }
 
 
     static bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & saved)
     {
-        bool fake = (signature & SAVED_FAKE_BIT) != 0;
+	bool fake = (signature & SAVED_FAKE_BIT) != 0;
 
-        signature &= ~SAVED_FAKE_BIT;
-        if(!isalpha(signature))
-            return false;
-        base = tolower(signature);
+	signature &= ~SAVED_FAKE_BIT;
+	if(!isalpha(signature))
+	    return false;
+	base = tolower(signature);
 
-        if(fake)
-            if(base == signature)
-                saved = s_fake;
-            else
-                return false;
-        else
-            if(signature == base)
-                saved = s_saved;
-            else
-                saved = s_not_saved;
-        return true;
+	if(fake)
+	    if(base == signature)
+		saved = s_fake;
+	    else
+		return false;
+	else
+	    if(signature == base)
+		saved = s_saved;
+	    else
+		saved = s_not_saved;
+	return true;
     }
 
 } // end of namespace

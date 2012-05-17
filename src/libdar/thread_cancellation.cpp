@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: thread_cancellation.cpp,v 1.1 2004/12/07 18:04:52 edrusb Rel $
+// $Id: thread_cancellation.cpp,v 1.4.2.1 2006/02/04 14:47:15 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -33,45 +33,136 @@ extern "C"
 
 #include "erreurs.hpp"
 #include "thread_cancellation.hpp"
+#include "tools.hpp"
 
-#define CRITICAL_START if(!initialized)  \
+#define CRITICAL_START if(!initialized)                                     \
              throw Elibcall("thread_cancellation", gettext("Thread-safe not initialized for libdar, read manual or contact maintainer of the application that uses libdar")); \
+             sigset_t Critical_section_mask_memory;                         \
+             tools_block_all_signals(Critical_section_mask_memory);         \
              pthread_mutex_lock(&access)
-#define CRITICAL_END pthread_mutex_unlock(&access)
+
+#define CRITICAL_END pthread_mutex_unlock(&access);                         \
+             tools_set_back_blocked_signals(Critical_section_mask_memory)
 
 using namespace std;
 
 namespace libdar
 {
+
+	// class static variables
 #if MUTEX_WORKS
-    bool thread_cancellation::cancellation = false;
-    pthread_t thread_cancellation::to_cancel;
     pthread_mutex_t thread_cancellation::access;
     bool thread_cancellation::initialized = false;
+    list<thread_cancellation *> thread_cancellation::info;
+    list<thread_cancellation::fields> thread_cancellation::preborn;
 #endif
 
     thread_cancellation::thread_cancellation()
     {
 #if MUTEX_WORKS
-	tid = pthread_self();
+	bool bug = false;
+
+	status.tid = pthread_self();
+	list<thread_cancellation *>::iterator ptr;
+
+	CRITICAL_START;
+	ptr = info.begin();
+	while(ptr != info.end() && *ptr != NULL && (*ptr)->status.tid != status.tid)
+	    ptr++;
+	if(ptr == info.end()) // first object in that thread
+	{
+	    list<fields>::iterator it = preborn.begin();
+	    while(it != preborn.end() && it->tid != status.tid)
+		it++;
+	    if(it == preborn.end()) // no pending cancellation for that thread
+	    {
+		status.block_delayed = false;
+		status.immediate = true;
+		status.cancellation = false;
+		status.flag = 0;
+	    }
+	    else // pending cancellation for that thread
+	    {
+		status = *it;
+		preborn.erase(it);
+	    }
+	}
+	else  // an object already exist for that thread
+	    if(*ptr == NULL) // bug
+		bug = true;
+	    else  // an object already exists for that thread
+		status = (*ptr)->status;
+
+	if(!bug)
+	    info.push_back(this);
+	CRITICAL_END;
+
+	if(bug)
+	    throw SRC_BUG;
+#endif
+    }
+
+    thread_cancellation::~thread_cancellation()
+    {
+#if MUTEX_WORKS
+	list<thread_cancellation *>::iterator ptr;
+	bool bug = false;
+
+	CRITICAL_START;
+	ptr = info.begin();
+	while(ptr != info.end() && *ptr != this)
+	    ptr++;
+	if(ptr == info.end())
+	    bug = true;
+	else
+	    if(*ptr == NULL)
+		bug = true;
+	    else
+	    {
+		if((*ptr)->status.cancellation) // cancellation for that thread
+		    preborn.push_back((*ptr)->status);
+		info.erase(ptr);
+	    }
+	CRITICAL_END;
+
+	if(bug)
+	    throw SRC_BUG;
 #endif
     }
 
     void thread_cancellation::check_self_cancellation() const
     {
 #if MUTEX_WORKS
-	bool abort = false;
-
-	CRITICAL_START;
-	if(cancellation && tid == to_cancel)
+	if(status.cancellation && (status.immediate || !status.block_delayed))
 	{
-	    abort = true;
-	    cancellation = false;
+	    (void)clear_pending_request(status.tid); // avoid other object of that thread to throw exception
+	    throw Ethread_cancel(status.immediate, status.flag); // we can throw the exception now
+	}
+#endif
+    }
+
+    void thread_cancellation::block_delayed_cancellation(bool mode)
+    {
+#if MUTEX_WORKS
+	list<thread_cancellation *>::iterator ptr;
+
+	    // we update all object of the current thread
+	CRITICAL_START;
+	ptr = info.begin();
+	while(ptr != info.end())
+	{
+	    if(*ptr == NULL)
+		throw SRC_BUG;
+	    if((*ptr)->status.tid == status.tid)
+		(*ptr)->status.block_delayed = mode;
+	    ptr++;
 	}
 	CRITICAL_END;
 
-	if(abort)
-	    throw Euser_abort(string(gettext("Thread canceled by application")));
+	if(status.block_delayed != mode)
+	    throw SRC_BUG;
+	if(!mode)
+	    check_self_cancellation();
 #endif
     }
 
@@ -90,23 +181,52 @@ namespace libdar
 #endif
     }
 
-    bool thread_cancellation::cancel(pthread_t tid)
+    void thread_cancellation::cancel(pthread_t tid, bool x_immediate, U_64 x_flag)
     {
 #if MUTEX_WORKS
-	bool ret;
+	bool found = false, bug = false;
+	list<thread_cancellation *>::iterator ptr;
 
 	CRITICAL_START;
-	if(!cancellation)
+	ptr = info.begin();
+	while(ptr != info.end() && !bug)
 	{
-	    to_cancel  = tid;
-	    cancellation = true;
-	    ret = true;
+	    if(*ptr == NULL)
+		bug = true;
+	    else
+		if((*ptr)->status.tid == tid)
+		{
+		    found = true;
+		    (*ptr)->status.immediate = x_immediate;
+		    (*ptr)->status.cancellation = true;
+		    (*ptr)->status.flag = x_flag;
+		}
+	    ptr++;
 	}
-	else
-	    ret = false;
+
+	if(!found && !bug)  // no thread_cancellation object exist for that thread
+	{
+	    list<fields>::iterator it = preborn.begin();
+	    fields tmp;
+
+	    tmp.tid = tid;
+	    tmp.block_delayed = false;
+	    tmp.immediate = x_immediate;
+	    tmp.cancellation = true;
+	    tmp.flag = x_flag;
+
+	    while(it != preborn.end() && it->tid != tid)
+		it++;
+
+	    if(it != preborn.end())
+		*it = tmp;
+	    else
+		preborn.push_back(tmp);
+	}
 	CRITICAL_END;
 
-	return ret;
+	if(bug)
+	    throw SRC_BUG;
 #else
 	throw Ecompilation(gettext("multi-thread support"));
 #endif
@@ -114,20 +234,40 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: thread_cancellation.cpp,v 1.1 2004/12/07 18:04:52 edrusb Rel $";
+	static char id[]="$Id: thread_cancellation.cpp,v 1.4.2.1 2006/02/04 14:47:15 edrusb Rel $";
 	dummy_call(id);
     }
 
-    bool thread_cancellation::current_cancel(pthread_t & tid)
+    bool thread_cancellation::cancel_status(pthread_t tid)
     {
 #if MUTEX_WORKS
-	bool ret;
+	bool ret, bug = false;
+	list<thread_cancellation *>::iterator ptr;
 
 	CRITICAL_START;
-	ret = cancellation;
-	if(ret)
-	    tid = to_cancel;
+	ptr = info.begin();
+	while(ptr != info.end() && (*ptr) != NULL && (*ptr)->status.tid != tid)
+	    ptr++;
+	if(ptr == info.end())
+	{
+	    list<fields>::iterator it = preborn.begin();
+	    while(it != preborn.end() && it->tid != tid)
+		it++;
+
+	    if(it == preborn.end())
+		ret = false;
+	    else
+		ret = it->cancellation;
+	}
+	else
+	    if(*ptr == NULL)
+		bug = true;
+	    else
+		ret = (*ptr)->status.cancellation;
 	CRITICAL_END;
+
+	if(bug)
+	    throw SRC_BUG;
 
 	return ret;
 #else
@@ -135,20 +275,49 @@ namespace libdar
 #endif
     }
 
-    bool thread_cancellation::clear_pending_request()
+    bool thread_cancellation::clear_pending_request(pthread_t tid)
     {
-	bool ret = false;
 #if MUTEX_WORKS
+	bool ret = false, bug = false;
+	list<thread_cancellation *>::iterator ptr;
+	list<fields>::iterator it;
+
 	CRITICAL_START;
-	ret = cancellation;
-	cancellation = false;
+	ptr = info.begin();
+	while(ptr != info.end())
+	{
+	    if(*ptr == NULL)
+		bug = true;
+	    if((*ptr)->status.tid == tid)
+	    {
+		ret = (*ptr)->status.cancellation;
+		(*ptr)->status.cancellation = false;
+	    }
+	    ptr++;
+	}
+
+	it = preborn.begin();
+	while(it != preborn.end())
+	{
+	    if(it->tid == tid)
+	    {
+		ret = it->cancellation;
+		preborn.erase(it);
+		it = preborn.begin();
+	    }
+	    else
+		it++;
+	}
+
 	CRITICAL_END;
+
+	if(bug)
+	    throw SRC_BUG;
+
+	return ret;
 #else
 	throw Ecompilation(gettext("multi-thread support"));
 #endif
-	return ret;
     }
 
 } // end of namespace
-
-

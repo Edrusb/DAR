@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.hpp,v 1.15 2004/11/07 18:21:37 edrusb Rel $
+// $Id: ea.hpp,v 1.16 2005/05/08 12:12:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -36,32 +36,18 @@
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "special_alloc.hpp"
+#include "mask.hpp"
+#include "header_version.hpp"
 
 namespace libdar
 {
 
-    enum ea_mode { ea_insert, ea_del }; // for use later
-        // actually the whole EA list is stored/restored, but
-        // it could be possible to check which EA have changed to save only thoses
-        // and also record EA that have been removed.
-        // the problem is the localisation of EA in the archive,
-        // comparison implies retrieving each EA list, which could implies
-        // reading the whole archive for EA lists.
-        // other thing to consider, is the catalogue extraction, it must also contain
-        // all EA lists. to be able to compare.
-        // solution : store the EA lists after the data and before the catalogue.
-        // to be seen.
-        //
-    enum ea_domain { ea_domain_root, ea_domain_user };
-
     struct ea_entry
     {
-        ea_mode mode;
-        enum ea_domain domain;
         std::string key, value;
 
-        ea_entry() { mode = ea_insert; domain = ea_domain_user; key = value = ""; };
-        ea_entry(user_interaction & dialog, generic_file & f);
+        ea_entry() { key = value = ""; };
+        ea_entry(user_interaction & dialog, generic_file & f, const dar_version & edit);
 
         void dump(generic_file & f) const;
     };
@@ -70,7 +56,7 @@ namespace libdar
     {
     public:
         ea_attributs() { alire = attr.begin(); };
-        ea_attributs(user_interaction & dialog, generic_file & f);
+        ea_attributs(user_interaction & dialog, generic_file & f, const dar_version & edit);
         ea_attributs(const ea_attributs & ref);
 
         void dump(generic_file & f) const;
@@ -79,10 +65,8 @@ namespace libdar
         bool read(ea_entry & x) const;
         infinint size() const { return attr.size(); };
         void clear() { attr.clear(); alire = attr.begin(); };
-        bool find(ea_domain dom, const std::string &key, ea_mode & found_mode, std::string & found_value) const;
-        bool diff(const ea_attributs & other, bool check_ea_root, bool check_ea_user) const;
-
-        void check() const {}; // actually empty, but additional checks could be added
+        bool find(const std::string &key, std::string & found_value) const;
+        bool diff(const ea_attributs & other, const mask & filter) const;
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(ea_attributs);

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.hpp,v 1.14.2.3 2005/03/19 23:28:09 edrusb Rel $
+// $Id: mask.hpp,v 1.17 2005/11/12 17:27:08 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -140,9 +140,14 @@ namespace libdar
 	    /// the constructor to be used by libdar external programs
 
 	    /// \param[in] wilde_card_expression is the regular expression that defines the mask
-	    /// \param[in] case_sensit whether the mask is case sensitive or not
+	    /// \param[in] x_case_sensit whether the mask is case sensitive or not
         regular_mask(const std::string & wilde_card_expression,
-		     bool case_sensit);
+		     bool x_case_sensit);
+	    /// the copy constructor
+	regular_mask(const regular_mask & ref);
+	    /// the assignment operator
+	regular_mask & operator= (const regular_mask & ref);
+
 	    /// destructor
         virtual ~regular_mask() { regfree(&preg); };
 
@@ -153,6 +158,11 @@ namespace libdar
 
     private :
         regex_t preg;
+	std::string mask_exp; //< used only by the copy constructor
+	bool case_sensit;     //< used only by the copy constructor
+
+	void set_preg(const std::string & wilde_card_expression,
+		      bool x_case_sensit);
     };
 
 

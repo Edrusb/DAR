@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: shell_interaction.cpp,v 1.19.2.6 2005/12/05 15:58:04 edrusb Exp $
+// $Id: shell_interaction.cpp,v 1.27 2005/12/29 02:32:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -177,10 +177,26 @@ void shell_interaction_set_beep(bool mode)
     beep = mode;
 }
 
+void shell_interaction_read_char(char & a)
+{
+    sigset_t old_mask;
+
+    if(input < 0)
+	throw SRC_BUG;
+
+    tools_block_all_signals(old_mask);
+    set_term_mod(interaction);
+    if(read(input, &a, 1) < 0)
+	throw Erange("shell_interaction_read_char", string(gettext("Error reading character: ")) + strerror(errno));
+    tools_blocking_read(input, true);
+    set_term_mod(initial);
+    tools_set_back_blocked_signals(old_mask);
+}
+
 void shell_interaction_close()
 {
     if(has_terminal)
-        tcsetattr(input, TCSADRAIN, &initial);
+	set_term_mod(initial);
 }
 
 static void set_term_mod(const struct termios & etat)
@@ -206,7 +222,9 @@ static bool interaction_pause(const string &message, void *context)
     set_term_mod(interaction);
     try
     {
+	sigset_t old_mask;
 	S_I tmp_ret, errno_bk, tmp_sup, errno_sup;
+
 
         do
         {
@@ -219,7 +237,8 @@ static bool interaction_pause(const string &message, void *context)
 
 		// now asking the user
 
-            *inter << message << gettext(" [return = OK | esc = cancel]") << (beep ? "\007\007\007" : "") << endl;
+            *inter << message << gettext(" [return = OK | Esc = cancel]") << (beep ? "\007\007\007" : "") << endl;
+	    tools_block_all_signals(old_mask);
 	    tmp_ret = read(input, &a, 1);
 	    errno_bk = errno;
 
@@ -233,6 +252,8 @@ static bool interaction_pause(const string &message, void *context)
 	    tools_blocking_read(input, true);
 
 		// checking error conditions
+
+	    tools_set_back_blocked_signals(old_mask);
             if(tmp_ret < 0)
 		if(errno_bk != EINTR)
 		    throw Erange("shell_interaction:interaction_pause", string(gettext("Error while reading user answer from terminal: ")) + strerror(errno_bk));
@@ -298,6 +319,6 @@ static string interaction_string(const string & message, bool echo, void *contex
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: shell_interaction.cpp,v 1.19.2.6 2005/12/05 15:58:04 edrusb Exp $";
+    static char id[]="$Id: shell_interaction.cpp,v 1.27 2005/12/29 02:32:41 edrusb Rel $";
     dummy_call(id);
 }

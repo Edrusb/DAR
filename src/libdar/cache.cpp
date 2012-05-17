@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: cache.cpp,v 1.10.2.1 2005/03/13 20:07:49 edrusb Rel $
+// $Id: cache.cpp,v 1.12 2005/12/05 11:56:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -50,7 +50,7 @@ namespace libdar
     {
 	    // sanity checks
 	if(&hidden == NULL)
-	    throw Erange("cache::cache", gettext("NULL given as \"hidden\" argument while initializing cache"));
+	    throw Erange("cache::cache", "NULL given as \"hidden\" argument while initializing cache"); // not translated message, this is expected
 	if(initial_size < 1)
 	    throw Erange("cache::cache", gettext("wrong value given as initial_size argument while initializing cache"));
 	if(observation_read_number < 2)
@@ -220,7 +220,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: cache.cpp,v 1.10.2.1 2005/03/13 20:07:49 edrusb Rel $";
+        static char id[]="$Id: cache.cpp,v 1.12 2005/12/05 11:56:21 edrusb Rel $";
         dummy_call(id);
     }
 

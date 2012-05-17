@@ -1,0 +1,1089 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Known Bugs</title>
+</head>
+<body
+ style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);"
+ link="#0000ff" vlink="#000055" alink="#ff0000">
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; width: 161px;"><a
+ href="index.html"><img
+ style="border: 0px solid ; width: 160px; height: 120px;"
+ alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
+      </td>
+      <td style="vertical-align: top;">
+      <h1 style="text-align: center;"><br>
+      </h1>
+      <h1 style="text-align: center;">Known Bugs</h1>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div style="text-align: center;">
+<span style="font-family: monospace;"><span style="font-weight: bold;"><br>
+<br>
+</span></span><code></code>
+<hr style="width: 100%; height: 2px;"><code><br>
+</code>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <div style="text-align: justify;"><code><span
+ style="font-weight: bold;"></span></code>Here follows the description
+and status of old bugs. For recent bugs please consult the <a
+ href="http://sourceforge.net/tracker/?group_id=65612&amp;atid=511612">bug
+tracker</a> on sourceforge.<br>
+      <code><span style="font-weight: bold;"></span></code><code><span
+ style="font-weight: bold;"></span></code><br>
+      <code><span style="font-weight: bold;"></span></code><br>
+      <code><span style="font-weight: bold;">#1:</span> </code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> files
+pointed to by a symbolic links get their times (mtime &amp; atime) not
+properly restored</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">problem:</span> when restoring
+time of a symbolic link the
+utime() system call does not change the inode of
+the symbolic link itself but the one of the file pointed to by the
+symbolic link</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">solution:</span> as the utime()
+call behaves the same on
+many Unix platforms, (HP-UX, Solaris, Linux,
+etc.), the times for the symbolic links are </code><code>no more
+restored, thus files
+pointed to by symbolic links are not </code><code>affected by the
+utime()
+strange behavior. Dar, behaves not the </code><code>same as touch,
+tar, etc.</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code>affects
+version: 1.0.0</code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code>fixed
+in version: 1.0.1</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code> </code><br>
+      <code><span style="font-weight: bold;">#2:</span> <span
+ style="text-decoration: underline;"></span></code><br>
+      <code><span style="text-decoration: underline;"></span></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> dar
+immediately exits with message "file mode is
+neither read nor write" while
+creating an archive on 64 bits platforms.</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">problem:</span> missing mask with
+O_ACCMODE for flags
+returned by fcntl() </code><code>system call</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+O_ACCMODE mask added</code><br>
+      <code> </code><br>
+      <code>affects versions: 1.0.0, 1.0.1</code><br>
+      <code>fixed in version: 1.0.2</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code> </code><br>
+      <code><span style="font-weight: bold;">#3: </span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> making
+differential backup with some directory
+implicitly or </code><code>explicitly (-P) excluded,
+sometime lead to full backup.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+when entering a directory that was ignored,
+the comparison in the </code><code>catalogue of reference was
+not going back to the parent directory, </code><code>leading the
+comparison to be
+no more synchronized with the file being </code><code>read.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+added a line to go back to parent
+directory when treating an </code><code>ignored directory </code><br>
+      <code> </code><br>
+      <code>affects versions: 1.0.0, 1.0.1</code><br>
+      <code>fixed in version: 1.0.2</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code> </code><br>
+      <code><span style="font-weight: bold;">#4:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> on Linux 64
+bits, when an interaction from the user is </code><code>required,
+(escape or return
+key), the keys have to be pressed four </code><code>time before dar
+can read a
+character.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span> </code><code>unknown,
+same code works
+fine on other platforms, and if bad character </code><code>remains in
+the pipe, the
+message would be displayed several time, </code><code>which is not the
+case, here.
+It seems that the user has to press four </code><code>key for the
+first one to be
+accessible to dar.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+none actually</code><br>
+      <code> </code><br>
+      <code>affects versions: 1.0.0, 1.0.1 , 1.0.2 and probably
+also 1.1.0</code><br>
+      <code>fixed in version: none</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#5:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> Dar stops one
+of the two following error:</code><br>
+      <code>--- exception nature = [alive]&nbsp; exception type =
+[BUG] ----------</code><br>
+      <code>[source]</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file
+compressor.cpp line 244 : it seems to be a bug here</code><br>
+      <code>[most outside call]</code><br>
+      <code>&nbsp;-----------------------------------</code><br>
+      <code> </code><br>
+      <code>or</code><br>
+      <code> </code><br>
+      <code>--- exception nature = [alive]&nbsp; exception type =
+[BUG] ----------</code><br>
+      <code>[source]</code><br>
+      <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file
+compressor.cpp line 254 : it seems to be a bug here</code><br>
+      <code>[most outside call]</code><br>
+      <code>-----------------------------------</code><br>
+      <code> </code><br>
+      <code style="text-decoration: underline;">problem:</code><code>
+the zlib deflate() calls
+returned an unexpected value (Z_STREAM_END) </code><code>and inflate()
+in some rare
+cases was called without data to process, </code><code>when reaching
+end of file,
+which made inflate() to return Z_BUF_ERROR </code><code>code.</code><br>
+      <code> </code><br>
+      <code style="text-decoration: underline;">solution:</code><code>
+adding code for taking care
+of the returned code Z_STREAM_END by </code><code>deflate(), and code
+for
+taking care of Z_BUF_ERROR returned at end </code><code>of file.</code><br>
+      <code> </code><br>
+      <code>affects version: 1.0.0, 1.0.1, 1.0.2</code><br>
+      <code>fixed in version: 1.0.3</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code> </code><br>
+      <code><span style="font-weight: bold;">#6:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> Dar does not
+properly display dates on Linux 64 bits </code><code>systems.</code><br>
+      <code> </code><br>
+      <code style="text-decoration: underline;">problem:</code><code>
+non portable cast from
+'time_t' to 'unsigned long int'</code><br>
+      <code> </code><br>
+      <code style="text-decoration: underline;">solution:</code><code>
+changed code not to have to
+use 'unsigned long int'</code><br>
+      <code> </code><br>
+      <code>affects version: 1.0.x, 1.1.x</code><br>
+      <code>fixed in version: 1.2.0</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code> </code><br>
+      <code><span style="font-weight: bold;">#7:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> while saving,
+Dar stops when a given inode could not
+be read, </code><code>even if the inode had not to
+be saved</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span> </code><code>Dar
+reads all file in the
+directory to save, and then applies filters </code><code>to their
+filename. Error
+appears before the filter, leading to a </code><code>global saving
+error.</code><br>
+      <code> </code><br>
+      <code style="text-decoration: underline;">solution:</code><code>
+read error are now caught
+sooner a message is displayed that the file </code><code>or directory
+will be
+ignored, and saving process continues. As </code><code>this error
+occurs before
+testing filename against filters, an error </code><code>message is
+still displayed
+(which may seems strange when the file was </code><code>about to be
+excluded by
+filter mechanism) <br>
+      </code><code></code><br>
+      <code>Just reminds that dar reads a directory contents first, and
+      </code><code>then check filenames against
+filter. At the time of the message, Dar </code><code>does not know the
+file would
+not to be saved. Thus, don't worry if </code><code>you see this kind
+of
+message, they don't mean that dar was about to </code><code>save the
+given file but
+rather exactly what the message says, that </code><code>the file or
+directory could
+not be read. ;-)</code><br>
+      <code> </code><br>
+      <code>affects version: 1.0.x, 1.1.x</code><br>
+      <code>fixed in version: 1.2.0</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code> </code><br>
+      <code><span style="font-weight: bold;">#8:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> when saving
+hard linked file using filter that does
+not save </code><code>the first hard link, dar
+stops with SEGFAULT.</code><br>
+      <code> </code><br>
+      <code style="text-decoration: underline;">problem:</code><code>
+The first hard link is used
+as reference for the following occurrences. </code><code>As it is not
+covered by the
+filter it is destroyed in filter module, </code><code>but filesystem
+module keeps
+using it as reference for following </code><code>hard links on that
+inode. </code><br>
+      <code> </code><br>
+      <code style="text-decoration: underline;">solution:</code><code>
+added a call in filesystem
+module to "forget" a given reference. This </code><code>way, if a
+file_etiquette is
+not covered, filter module can inform </code><code>filesystem module
+to delete
+the corresponding entry on the hard link </code><code>map. Subsequent
+hard link on
+that inode will generate first a new </code><code>file_etiquette,
+which will
+be used as reference (unless it is not </code><code>covered by filter
+too). </code><br>
+      <code> </code><br>
+      <code>affects version: 1.1.x</code><br>
+      <code>fixed in version: 1.2.0</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code> </code><br>
+      <code><span style="font-weight: bold;">#9:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> </code><code>failed
+to read an archive
+under windows NT and 2000</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span> </code><code>error
+concerning the integer
+macro definition (module integer.hpp)</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span> </code><code>replaced
+the macro by a
+proper definition.</code><code></code><br>
+      <code> </code><br>
+      <code>affects version: 1.2.0</code><br>
+      <code>fixed in version: 1.2.1</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#10:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> </code><code>when
+using dar on windows95
+if giving c:/ or other driver to -R </code><code>option, dar stops
+with the
+following error:</code><br>
+      <code> </code><br>
+      <code>file filesystem.cpp line 186
+: it seems to be a bug here</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span> </code><code>dar
+checks first that c:/ is
+a directory. Cygwin says yes this </code><code>dar continues : from
+c:/ dar
+completes the path with a dot thus </code><code>dar tries to open the
+path
+c:/. which is Cygwin does not report </code><code>as an existing
+directory. </code><code><br>
+      <br>
+      </code><code><span style="text-decoration: underline;">solution:</span>
+      </code><code>dar does not try to open
+c:/. but tries to open c:/ . Moreover </code><code>additional code as
+been
+added to detect the incoherence if in </code><code>some other
+conditions such
+problem occurs. Dar will report the </code><code>exact problem (path
+does not
+exist / or path is not a directory)</code><br>
+      <code></code><br>
+      <code>affects version: 1.2.1, 1.2.0</code><br>
+      <code>fixed in version: 1.3.0</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#11:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> when giving to
+dar_manager
+an absolute path to -r option dar_manager stops with
+INTERNAL ERROR message.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span> a
+check is missing to
+display error message in such condition</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+added a error message, if an
+absolute path is given to -r</code><br>
+      <code> </code><br>
+      <code>affects dar_manager version&nbsp;&nbsp; : 1.0.0</code><br>
+      <code>fixed in dar_manager version&nbsp; : 1.0.1</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#12:</span></code><br
+ style="text-decoration: underline;">
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> memory leakage
+when using -Z
+or -Y option. This bug has been found and explained by David
+Rose, who proposed a good patch, which I have just a little
+adapted.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+the dar code that call the
+zlib when changing the compression algorithm did properly
+released memory allocated by dar but forget to execute a call of
+the zlib library that releases memory allocate by the library
+itself. </code><br>
+      <code></code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+solution, add call to
+release memory used by zlib library when changing of compression
+algorithm</code><br>
+      <code> </code><br>
+      <code>affects dar version&nbsp;&nbsp; : 1.2.0, 1.2.1</code><br>
+      <code>fixed in dar version&nbsp; : 1.3.0</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#13:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> archive
+created by dar under
+Windows NP SP6, XP, 2000, cannot be read, tested. All action on
+generated archive finishes by CRC error message, incoherent
+catalogue structure, or badly formated infinint.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+under windows, Dar uses
+Cygwin. As Unix and Window do not define end of line the same way (\n
+for Unix and \r\n for Windows), Cygwin translates end of
+line on the fly when reading a file (Windows to Unix), and when
+writing (Unix to Windows). At writing time especially,
+each \n anywhere in the archive is written \r\n, thus two
+bytes get written in place of one. In another hand, to get the
+global position in the whole archive dar counts bytes it writes
+to file. Thus a shift occurs between the position it thinks it
+writes the catalogue and the position it actually does. Thus
+reading the archive, the given position is wrong, and archive cannot
+be opened.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+deactivate the translation
+when generating the archive. Cygwin adds a two special flags to
+pass to open(2) which are O_TEXT and O_BINARY, that change the
+way Cygwin handles file read(2) and write(2).</code><br>
+      <code> </code><br>
+      <code>affects all dar suite program version 1.0.x, 1.1.x,
+1.2.x</code><br>
+      <code>fixed in dar version 1.3.0</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#14:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> Dar aborts
+with the
+following message</code><br>
+      <code> </code><br>
+      <div style="margin-left: 40px;"><code>---- exception nature
+= [alive] exception type = [BUG] ----------</code><br>
+      <code>[source]</code><br>
+      <code>&nbsp; &nbsp; file compressor.cpp
+line 320 : it seems to be a bug here</code><br>
+      <code>[most outside call]</code><br>
+      <code>-----------------------------------</code><br>
+      </div>
+      <code> </code><br>
+      <code>It appears while doing a
+backup using compression and scrambling (could not (yet) be reproduced
+twice).</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+this message is issued
+because zlib library reported an inconsistency in call order or in call
+arguments given to zlib calls. Actually I cannot figure out what is
+wrong, nor how this bug may happens.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+none actually at the time of
+2.0.0 release.</code><br>
+      <code> </code><br>
+      <code>But, if you are face to face
+with this bug, thanks to try reproducing it, re-issuing the same
+command in the same condition,&nbsp; and if possible to reproduce then
+as much as possible reduce the necessary environment condition that
+make this bug happen. Then please, contact me (either via Sourceforge
+or via email).</code><br>
+      <code> </code><br>
+      <code>affects version 1.2.1 (at least)</code><br>
+      <code>not yet fixed (check Sourceforge for fresh news),
+nor reproduced.</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#15:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> Dar aborts
+with the following
+message when giving -y0 as argument</code><br>
+      <code> </code><br>
+      <div style="margin-left: 40px;"><code>---- exception nature =
+[alive]&nbsp; exception type = [BUG] ----------</code><br>
+      <code>[source]</code><br>
+      <code>&nbsp;&nbsp;&nbsp;
+file compressor.cpp line 96 : it seems to be a bug here</code><br>
+      <code>[most outside call]</code><br>
+      <code>-----------------------------------</code><br>
+      </div>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+correct compression level for zlib
+are from 0 to 9, 0 meaning no compression, while for libbz2
+correct compression levels are from 1 to 9, thus zero is not a valid
+value. libbz2 returns an error code which triggers a libdar internal
+sanity check code, which throws this BUG exception.</code><br>
+      <code> </code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+forbid the use of -z0 or -y0. If
+you don't want compression, you will need to not give neither -z nor
+-y. </code><br>
+      <code> </code><br>
+      <code>affects version 1.3.0</code><br>
+      <code>fixed in version 2.0.0</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#16:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> Dar include
+does not ignore
+comments in included file as given by -B option</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+when a line with only one
+carriage-return is put in a file, the following line is considered as a
+normal line (not a comment), whatever it is, in particular if it starts
+with a hash (#).</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+make the algorithm consider normal
+line once another character than space, tab hash or carriage-return
+is met. (added the carriage-return in the list).</code><br>
+      <code> </code><br>
+      <code>affects version 1.2.0, 1.2.1, 1.3.0</code><br>
+      <code>fixed in version 2.0.0</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code> </code><br>
+      <code><span style="font-weight: bold;">#17:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> Dar warns that
+the archive is about to
+save itself while a -P option is used to prevent this eventuality.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+testing against this situation did not
+check that a parent directory of the path where is saved the archive is
+excluded by a -P option. </code><br>
+      <code></code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+updating the test for the warning only
+appear in real auto-saving conditions.</code><br>
+      <code> </code><br>
+      <code>affects version 2.0.0</code><br>
+      <code>fixed in version 2.0.1</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#17bis:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> save as #17,
+but in the case where the
+archive is in the under the current directory, and some -P options
+exclude it.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+the current directory "." is not
+substitued by its full path, and the testing algorithm does tread
+"." as directly under the root "/" directory, no -P could thus
+exclude it from the files to save.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+for testing and preventing
+self-backup, "." is replaced by its full path counterpart. affects
+version 2.0.0, 2.0.1, fixed in version 2.0.2</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#18:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> Dar does not
+save files or just stores
+empty directories when using -B option or having a ~/.darrc or
+/etc/darrc file</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+the parsing code that strip the comments
+from files is not counting empty lines ('\n')
+between two lines of commands (i.e.: uncommented lines). This strips
+the last uncommented line before the next line of comment, usually
+leading to
+the&nbsp; removal of an ending '\n' in the uncommented line, implying
+the
+fusion of the last command on this line and the next command on any
+uncommented after the last line of comment two commands that were
+initially
+separated by a '\n' and one or several&nbsp; lines of comments. This
+wrongly interpreted
+command most of the time appear as a member of [list of path] and
+thus restricts&nbsp; the backup to only a subdirectory that most of the
+time does not exist. If -D option is used, all first level directory
+are excluded from backup and thus stored as empty directories.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+bug fix in no_comment.cpp. A workaround
+is to remove comments or empty lines from configuration files. </code><br>
+      <code></code><br>
+      <code>affects versions 2.0.0, 2.0.1</code><br>
+      <code>fixed in versions 2.0.2</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#19:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> Dar hangs when
+using --nodump with named
+pipe to save</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+to get the nodump flag value, dar needs
+to call the open() system call in read-only mode. For named pipes
+this&nbsp; system call does return only when another process opens the
+same pipe in
+write mode.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+as proposed by Joshua Neal, the open
+will be set to non blocking mode to return immediately.</code><br>
+      <code> </code><br>
+      <code>affects version 1.3.0, 2.0.0, 2.0.1</code><br>
+      <code>fixed in version 2.0.2</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#20:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> dar_manager
+did not completely removed
+reference to an archive when it was removed from a database</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+data_dir is a C++ class that inherit
+from data_tree. This one has a virtual method remove_all_from(), that
+had was redefined in the data_dir class with a very little difference,
+making it not be a redefinition of the inherited class. (argument was
+"archive_num" in place of "const &amp; archive_num"). This redefined
+method was never called, and the removal never recursed in
+subdirectories.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+make the two signature identical in the
+mother and inherited classes.</code><br>
+      <code> </code><br>
+      <code>affects version 1.3.0, 2.0.0, 2.0.1, 2.0.2</code><br>
+      <code>fixed in version 2.0.3</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#21:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> under FreeBSD
+using -B option leads to
+parse error</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+under FreeBSD, getopt() call is not
+reset just by setting optind to zero like under Linux, but the variable
+optreset must be set to 1.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+configure script now check for the
+presence of optreset variable which allows to properly reset the
+getopt call according to the system nature.</code><br>
+      <code> </code><br>
+      <code>affects version 2.1.0 and older</code><br>
+      <code>fixed in version 2.1.1</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#22:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> dar stops when
+fed with an empty file
+for -B option</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+the comments stripping class lack a
+variable initialization</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+initialize variable before use</code><br>
+      <code> </code><br>
+      <code>affects version 2.1.0 and older</code><br>
+      <code>fixed in version 2.1.1</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code> </code><br>
+      <code><span style="font-weight: bold;">#23:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> -z -y -H and
+-w do not work under FreeBSD</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+the getopt() version does not support
+optional arguments</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+document this problem, and make possible
+to reach any feature</code><br>
+      <code> </code><br>
+      <code>in the meanwhile, replace</code><br>
+      <div style="margin-left: 40px;"><code>-z&nbsp;&nbsp;&nbsp;
+by&nbsp;&nbsp; -z 9</code><br>
+      <code>-y&nbsp;&nbsp;&nbsp; by&nbsp;&nbsp; -y 9</code><br>
+      <code>-H&nbsp;&nbsp;&nbsp; by&nbsp;&nbsp; -H 1</code><br>
+      <code>-w&nbsp;&nbsp;&nbsp; by&nbsp;&nbsp; -w d (added for the
+circumstances)</code><br>
+      </div>
+      <code> </code><br>
+      <code>affects all versions</code><br>
+      <code>documented starting version 2.1.2 (see dar's man
+page)</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#24:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> under windows
+2000 SP4 failed to
+properly save a text file with DOS carriage return. Testing the archive
+reports CRC error.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+The cygwin adaptation layer for dar to
+be able to run under windows, needs non standard flag mode to not
+automatically translate between windows and unix carriage return. This
+bug is related to bug #13 which fix was not properly applied in
+one single place. </code><br>
+      <code></code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+properly apply the fix of bug #13 in
+this single place too.</code><br>
+      <code> </code><br>
+      <code>affects version 2.1.1 and older</code><br>
+      <code>fixed in version 2.1.2</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#25:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> under some
+hypothetical conditions (when
+the archive is larger than 10^16 Terabytes, 1 followed by 16
+zeros), dar is not able to read the archive.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+In this situation, the terminateur is
+not properly formed and cannot fulfill its role: point to the start of
+the catalogue. A byte 0x00 is missing near the end of the archive,
+that indicate the end of the terminateur.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+properly write down terminateur string
+of archive. Note that archive produced by earlier version are not
+possible to read dar version that have the fix, but don't worry, if
+you have a such big archive (more than 10^16 Terabytes), tell me I will
+create a little program that fixes the archive ;-) . Note,
+"terminateur" the french word for terminator, the word has been kept
+here
+because it is used in the source code.</code><br>
+      <code> </code><br>
+      <code>affects version 2.1.2 and older</code><br>
+      <code>fixed in version 2.1.3</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#26:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> in
+configuration file using conditional
+syntax (see man page), when two targets follow each other on two
+directly following lines (the first condition is thus empty), the
+second condition is skipped. This condition also occurs if there is
+only
+comments between the two targets.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+when looking for the first target, an
+extra character is read (the first of the second target), as there is
+no
+contents in this target no reposition (seek) in the file is done,
+and the search for the next target start at that point (second
+character of
+the second target), which makes the second target not recognized
+because
+of the missing initial character.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+avoid reading this extra character so
+the next character to read is the first character (not the second) of
+the
+following target.</code><br>
+      <code> </code><br>
+      <code>affects version 1.2.0 and older versions</code><br>
+      <code>fixed in version 2.1.3</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code> </code><br>
+      <code><span style="font-weight: bold;">#27:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> when restoring
+only more recent files
+(-r), with hourshift activated (-H) the -H feature was randomly not
+activated.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span> a
+test comparing the dates is made on
+address's objects rather on objects themselves. This leads to the -H
+test
+being activated randomly depending on address of two objects to compare.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+make the test on objects rather than on
+their addresses in memory.</code><br>
+      <code> </code><br>
+      <code>affects version from 2.0.0 to 2.1.3</code><br>
+      <code>fixed in version 2.1.4</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#28:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> dar does not
+restore root Extended
+Attributes</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span> a
+collision occurred in the naming of
+the enumeration listing the extended attributes available domains,
+and the variables carrying user choice to consider or not user or
+root extended attributes for the operation (backup, restoration,
+comparison, etc.)</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+rename both the domain enumeration and
+the variables carrying user choice about extended attribute
+comportment.</code><br>
+      <code> </code><br>
+      <code>affects version from 2.1.0 to 2.1.3</code><br>
+      <code>fixed in version 2.1.4</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#29:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> dar does
+Segmentation fault during
+backup when hard links are involved</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+when an plain file inode linked several
+time to the directory tree (a hard linked file), is not readable
+due to a lack a permission, the filesystem module generates a C++
+object and stores its address for further reference and hard link
+handling. When the file opening comes an exception is throw, leading to
+this object destruction, but the reference stays in the the filesystem
+module, leading the next link to this inode being referenced by a
+destroyed object.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+remove the reference when exception is
+caught. This removal was properly done when such an inode was not to be
+saved (and the corresponding C++ object was destroyed), the case of the
+exception had been forgotten.</code><br>
+      <code> </code><br>
+      <code>affects version up to 2.1.4</code><br>
+      <code>fixed in version 2.1.5</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#30:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> compilation
+failed with syntax error
+reported in libstdc++ header files (reported on Solaris and openBSD).</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+the configure scripts does detect the
+presence of mbstate_t type, and redefines it. This conflicts the system
+header files and lead to a syntax error.</code><br>
+      <code> </code><br>
+      <code>workaround 1:</code><br>
+      <code></code></div>
+      <div style="margin-left: 80px; text-align: justify;"><code>will
+update the configure script to
+check if that fixes the problem. Else there is a workaround. Once
+configure
+has finished, edit the config.h file adding the line</code><br>
+      </div>
+      <div style="margin-left: 120px; text-align: justify;"><code>#define
+HAVE_MBSTATE_T 1</code><br>
+      </div>
+      <div style="margin-left: 80px; text-align: justify;"><code>and
+commenting out the line</code><br>
+      <div style="margin-left: 40px;"><code>#define mbstate_t int</code><br>
+      </div>
+      <code>Thanks to Steve Evans for this
+workaround.</code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+undefine the mbstate_t in dar's source
+code. This is implemented and seems to work. No action is required for
+your part.</code><br>
+      <code> </code><br>
+      <code>may affects version up to 2.2.0 </code><br>
+      <code>fixed in version 2.2.1</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code> </code><br>
+      <code><span style="font-weight: bold;">#31:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> dar segfault
+when restoring Extended
+Attributes</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+to speed up the reading of the catalogue
+from an archive an intermediate layer has been added thanks to an
+"cache"&nbsp; object. This object is temporary instead of the object it
+does caching
+on. When the catalogue reading has finished, the reference given to
+inode
+becomes invalid because it is the caching object in place of the real
+underlying archive object.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+keep doing archive reading through the
+caching object but give the real archive object to the inode contained
+in
+the catalogue for they have a valid reference when it is time to
+restore EA.</code><br>
+      <code> </code><br>
+      <code>affects version 2.2.0</code><br>
+      <code>fixed in version 2.2.1</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#32:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> dar is unable
+to read blowfish encrypted
+archives under certain conditions</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+this bug appears when using infinint (no
+--enable-mode in command-line). The implicit cast from a unsigned
+integer to an infinint in a operation was not properly made by the
+compiler.
+Instead of converting the system integer to an infinint which is
+possible
+thanks to the infinint constructor class, the compiler down cast the
+the
+unsigned integer to unsigned char.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+use explicit cast conversion when doing
+operations which concern both infinint and unsigned integers.</code><br>
+      <code> </code><br>
+      <code>affects version 2.2.0</code><br>
+      <code>fixed in version 2.2.1</code><br>
+      <code></code></div>
+      <code> <br>
+      </code>
+      <div style="text-align: justify;"><code><span
+ style="font-weight: bold;">#33:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">decription:</span> dar hangs when
+the last line of a DCF file is
+starting with a few spaces or tabs just following a comment.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+The layer that removes comments was
+counting the bytes from the beginning while the first byte retained as
+significative was the first non space of the line. leading to provide
+to upper
+layer a wrong information about the number of byte in the file.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+start counting bytes from the first
+significative byte of the line instead of the first byte of the line.</code><br>
+      <code> </code><br>
+      <code>affects versions 2.1.x up to 2.2.0</code><br>
+      <code>fixed in version 2.2.1</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#34:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> when restoring
+files in a directory, this one
+has all permission set for every body. This makes a security hole on
+multi-user system.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+when restoring in a directory as non
+privileged user it is necessary to have write access to that directory,
+thus temporary change the permission. The permission is thus changed,
+but the
+temporary change is too permissive, thus opens a security hole,
+allowing local
+user delete/create/replace under the directory restored. </code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+only add the user write access (if necessary)
+to the directory when dar is run as non privileged user.</code><br>
+      <code> </code><br>
+      <code>affects versions 1.x.x up to 2.2.0</code><br>
+      <code>fixed in version 2.2.1</code><br>
+      <code></code></div>
+      <div style="text-align: justify;"><code> </code><br>
+      <code><span style="font-weight: bold;">#35:</span></code><br>
+      <code></code></div>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> when producing
+archive to stdout sometimes the
+message "Error while saving data: Bad file descriptor
+given" is displayed and dar aborts its execution</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+health check done on a uninitialized object
+field in place of a constructor's argument that will be used to
+set this field.</code><br>
+      <code> </code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+test the method's argument in place of the
+object field</code><br>
+      <code> </code><br>
+      <code>affects version 2.2.x up to 2.2.3</code><br>
+      <code>fixed in version 2.2.4</code> <br>
+      <br>
+      </div>
+      <code><span style="font-weight: bold;">#36: </span></code>
+      <div>
+      <div style="margin-left: 40px;"><code><span
+ style="text-decoration: underline;">description:</span>
+when using -I or -X with -l option directory names are also filtered
+while they should not be, as described in the man page</code><br>
+      <code> </code><br>
+      <code> <span style="text-decoration: underline;">solution:</span>
+avoid
+having -X/-I filtering directories</code><br>
+      <code> </code><br>
+      <code>affected versions 2.2.x up to 2.2.5</code><br>
+      <code>fixed in 2.2.6</code><br>
+      </div>
+      <code><br>
+      <span style="font-weight: bold;">#37:</span><br>
+      </code>
+      <div style="margin-left: 40px; text-align: justify;"><code><span
+ style="text-decoration: underline;">description:</span> when restoring
+a file which all EA has been dropped since the archive of reference,
+dar reports CRC error.</code><br>
+      <code></code><br>
+      <code><span style="text-decoration: underline;">problem:</span>
+to store that EA has been dropped, dar saves an empty EA list, but did
+not calculated the CRC value</code><br>
+      <code></code><br>
+      <code><span style="text-decoration: underline;">solution:</span>
+make the CRC value set when storing an empty list of EA. Note that this
+bug did not cause any problem except a CRC error message.</code><br>
+      <code></code><br>
+      <code>affects versions up to 2.2.6</code><br>
+      <code>fixed in 2.2.7</code><br>
+      </div>
+      <br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+</div>
+<br>
+<br>
+</body>
+</html>

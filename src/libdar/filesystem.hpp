@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.17.2.1 2005/09/08 19:20:21 edrusb Rel $
+// $Id: filesystem.hpp,v 1.22 2005/11/17 15:24:11 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -79,7 +79,7 @@ namespace libdar
     protected:
         void corres_reset() { corres_read.clear(); etiquette_counter = 0; };
 
-        nomme *make_read_entree(path & lieu, const std::string & name, bool see_hard_link, bool ea_root_mode, bool ea_user_mode);
+        nomme *make_read_entree(path & lieu, const std::string & name, bool see_hard_link, const mask & ea_mask);
 
 	user_interaction & get_fs_ui() const { return *fs_ui; };
 
@@ -104,9 +104,13 @@ namespace libdar
     {
     public:
         filesystem_backup(user_interaction & dialog,
-			  const path &root, bool x_info_details,
-			  bool x_save_root_ea, bool x_save_user_ea, bool check_no_dump_flag,
-			  bool alter_atime, infinint & root_fs_device);
+			  const path &root,
+			  bool x_info_details,
+			  const mask & x_ea_mask,
+			  bool check_no_dump_flag,
+			  bool alter_atime,
+			  bool x_cache_directory_tagging,
+			  infinint & root_fs_device);
         filesystem_backup(const filesystem_backup & ref) : filesystem_hard_link_read(ref.get_fs_ui()) { copy_from(ref); };
         filesystem_backup & operator = (const filesystem_backup & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_backup() { detruire(); };
@@ -120,10 +124,10 @@ namespace libdar
 
         path *fs_root;
         bool info_details;
-        bool save_root_ea;
-        bool save_user_ea;
+	mask *ea_mask;
         bool no_dump_check;
 	bool alter_atime;
+	bool cache_directory_tagging;
         path *current_dir;      // to translate from an hard linked inode to an  already allocated object
         std::vector<etage> pile;        // to store the contents of a directory
 
@@ -137,7 +141,7 @@ namespace libdar
     public:
         filesystem_diff(user_interaction & dialog,
 			const path &root, bool x_info_details,
-			bool x_check_root_ea, bool x_check_user_ea, bool alter_atime);
+			const mask & x_ea_mask, bool alter_atime);
         filesystem_diff(const filesystem_diff & ref) : filesystem_hard_link_read(ref.get_fs_ui()) { copy_from(ref); };
         filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_diff() { detruire(); };
@@ -158,8 +162,7 @@ namespace libdar
 
         path *fs_root;
         bool info_details;
-        bool check_root_ea;
-        bool check_user_ea;
+	mask *ea_mask;
 	bool alter_atime;
         path *current_dir;
         std::vector<filename_struct> filename_pile;
@@ -175,17 +178,17 @@ namespace libdar
             // it only provides routines to its inherited classes
 
     public:
-	filesystem_hard_link_write(user_interaction & dialog) { fs_ui = dialog.clone(); };
+	filesystem_hard_link_write(user_interaction & dialog, bool x_ea_erase) { fs_ui = dialog.clone(); ea_erase = x_ea_erase; };
 	filesystem_hard_link_write(const filesystem_hard_link_write & ref) { copy_from(ref); };
 	filesystem_hard_link_write & operator = (const filesystem_hard_link_write & ref) { detruire(); copy_from(ref); return *this; };
 	~filesystem_hard_link_write() { detruire(); };
 
         bool ea_has_been_restored(const hard_link *h);
             // true if the inode pointed to by the arg has already got its EA restored
-        bool set_ea(const nomme *e, const ea_attributs & l, path spot,
-                    bool allow_overwrite, bool warn_overwrite, bool set_root_ea, bool set_user_ea, bool info_details);
-            // check the inode for which to restore EA, is not a hard link to
-            // an already restored inode, else call the proper ea_filesystem call
+        bool set_ea(const nomme *e, const ea_attributs & list_ea, path spot,
+                    bool allow_overwrite, bool warn_overwrite, const mask & ea_mask, bool info_details);
+            // check whether the inode for which to restore EA is not a hard link to
+            // an already restored inode. if not, it calls the proper ea_filesystem call to restore EA
         void write_hard_linked_target_if_not_set(const etiquette *ref, const std::string & chemin);
             // if a hard linked inode has not been restored (no change, or less recent than the one on filesystem)
             // it is necessary to inform filesystem, where to hard link on, any future hard_link
@@ -193,9 +196,12 @@ namespace libdar
         bool known_etiquette(const infinint & eti);
             // return true if an inode in filesystem has been seen for that hard linked inode
 
+	    // return the ea_ease status (whether EA are first erased before being restored, else they are overwritten)
+	bool get_ea_erase() const { return ea_erase; };
+
     protected:
         void corres_reset() { corres_write.clear(); };
-        void make_file(const nomme * ref, const path & ou, bool dir_perm, bool ignore_owner);
+        void make_file(const nomme * ref, const path & ou, bool dir_perm, inode::comparison_fields what_to_check);
             // generate inode or make a hard link on an already restored inode.
         void clear_corres(const infinint & ligne);
 
@@ -210,6 +216,7 @@ namespace libdar
 
         std::map <infinint, corres_ino_ea> corres_write;
 	user_interaction *fs_ui;
+	bool ea_erase;
 
 	void copy_from(const filesystem_hard_link_write & ref);
 	void detruire();
@@ -221,10 +228,10 @@ namespace libdar
     public:
         filesystem_restore(user_interaction & dialog,
 			   const path &root, bool x_allow_overwrite, bool x_warn_overwrite, bool x_info_details,
-                           bool x_set_root_ea, bool x_set_user_ea, bool ignore_owner, bool x_warn_remove_no_match, bool empty);
-        filesystem_restore(const filesystem_restore  & ref) : filesystem_hard_link_write(ref.filesystem_hard_link_write::get_fs_ui()), filesystem_hard_link_read(ref.filesystem_hard_link_read::get_fs_ui()) { copy_from(ref); };
+                           const mask & x_ea_mask, inode::comparison_fields what_to_check, bool x_warn_remove_no_match, bool empty, bool ea_erase);
+        filesystem_restore(const filesystem_restore  & ref) : filesystem_hard_link_write(ref.filesystem_hard_link_write::get_fs_ui(), ref.get_ea_erase()), filesystem_hard_link_read(ref.filesystem_hard_link_read::get_fs_ui()) { copy_from(ref); };
         filesystem_restore & operator = (const filesystem_restore  & ref) { detruire(); copy_from(ref); return *this; };
-        ~filesystem_restore() { detruire(); };
+        ~filesystem_restore() { restore_stack_dir_ownership(); detruire(); };
 
         void reset_write();
         bool write(const entree *x);
@@ -244,8 +251,7 @@ namespace libdar
             {  return empty ? true : filesystem_hard_link_write::set_ea(e, l, *current_dir,
 									allow_overwrite,
 									warn_overwrite,
-									set_root_ea,
-									set_user_ea,
+									*ea_mask,
 									info_details);
             };
 
@@ -255,11 +261,10 @@ namespace libdar
     private:
         path *fs_root;
         bool info_details;
-        bool set_root_ea;
-        bool set_user_ea;
+	mask *ea_mask;
         bool allow_overwrite;
         bool warn_overwrite;
-        bool ignore_ownership;
+	inode::comparison_fields what_to_check;
 	bool warn_remove_no_match;
         std::vector<directory> stack_dir;
         path *current_dir;
@@ -267,6 +272,7 @@ namespace libdar
 
         void detruire();
         void copy_from(const filesystem_restore & ref);
+	void restore_stack_dir_ownership();
     };
 
 	/// @}
