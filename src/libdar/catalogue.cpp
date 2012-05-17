@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.47.2.2 2006/02/02 16:39:49 edrusb Rel $
+// $Id: catalogue.cpp,v 1.47.2.3 2006/05/27 15:08:34 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -1467,7 +1467,7 @@ namespace libdar
                     else
 			if(!filter_unsaved
 			   || ino->get_saved_status() != s_not_saved
-			   || ino->ea_get_saved_status() != ea_none
+			   || (ino->ea_get_saved_status() != ea_none && ino->ea_get_saved_status() != ea_partial)
 			   || (dir != NULL && dir->get_recursive_has_changed()))
 			{
 			    string a = local_perm(*ino);
@@ -1530,7 +1530,7 @@ namespace libdar
                     else
 			if(!filter_unsaved
 			   || ino->get_saved_status() != s_not_saved
-			   || ino->ea_get_saved_status() != ea_none
+			   || (ino->ea_get_saved_status() != ea_none && ino->ea_get_saved_status() != ea_partial)
 			   || (dir != NULL && dir->get_recursive_has_changed()))
 			{
 			    string a = local_perm(*ino);
@@ -1642,7 +1642,7 @@ namespace libdar
 
 		    if(!filter_unsaved
 		       || ino->get_saved_status() != s_not_saved
-		       || ino->ea_get_saved_status() != ea_none
+		       || (ino->ea_get_saved_status() != ea_none && ino->ea_get_saved_status() != ea_partial)
 		       || (dir != NULL && dir->get_recursive_has_changed()))
 		    {
 			string perm = local_perm(*ino);
@@ -2479,7 +2479,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: catalogue.cpp,v 1.47.2.2 2006/02/02 16:39:49 edrusb Rel $";
+	static char id[]="$Id: catalogue.cpp,v 1.47.2.3 2006/05/27 15:08:34 edrusb Exp $";
 	dummy_call(id);
     }
 

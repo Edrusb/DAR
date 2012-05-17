@@ -461,3 +461,14 @@ from 2.2.x to 2.3.0
 - dar will no refuse to abort if user presses escape when dar asks the user to be ready to write to a new slice
 - adapted Wesley Legette's patch for an xml archive listing
 - added 'InRef' status for EA (same meaning as the one for file's data)
+
+
+from 2.3.0 to 2.3.1
+- set back Nick Alcock's patch which has been dropped from 2.2.x to 2.3.x (patch name is "Do not moan about every single file on a non-ext2 filesystem")
+- fixed compilation problem when thread-safe code is disabled
+- integrated Wiebe Cazemier's patch for dar's man page
+- fixed bug in listing: -as option also listed files that had EA even when theses were not saved in the archive
+- file permission of installed sample scripts lacked the executable bit
+- fixed a bug that appeared when a file is removed while at the time it is saved by dar
+- avoid having an unnecessary warning appearing when restoring a file in a directory that has default EA set
+- Cygwin has changed and does not support anymore the path in the form "c:/some/where", you have to use "/cygdrive/c/some/where" instead. Documentation has been updated in consequence.

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.22 2005/11/17 15:24:11 edrusb Rel $
+// $Id: filesystem.hpp,v 1.22.2.1 2006/06/20 20:28:50 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -198,6 +198,8 @@ namespace libdar
 
 	    // return the ea_ease status (whether EA are first erased before being restored, else they are overwritten)
 	bool get_ea_erase() const { return ea_erase; };
+	    // set the ea_erase status
+	void set_ea_erase(bool status) { ea_erase = status; };
 
     protected:
         void corres_reset() { corres_write.clear(); };
@@ -234,8 +236,9 @@ namespace libdar
         ~filesystem_restore() { restore_stack_dir_ownership(); detruire(); };
 
         void reset_write();
-        bool write(const entree *x);
-            // the argument may be an object from class destroy
+        bool write(const entree *x, bool & created);
+            // the 'x' argument may be an object from class destroy
+	    // the 'created' argument is set back to true if no overwriting was necessary to restore the file
             // return true upon success,
             // false if overwriting not allowed or refused
             // throw exception on other errors
@@ -252,7 +255,7 @@ namespace libdar
 									allow_overwrite,
 									warn_overwrite,
 									*ea_mask,
-									info_details);
+ 									info_details);
             };
 
     protected:

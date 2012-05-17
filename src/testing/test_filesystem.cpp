@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.21 2005/11/17 15:24:11 edrusb Rel $
+// $Id: test_filesystem.cpp,v 1.21.2.1 2006/06/26 18:59:12 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -203,15 +203,16 @@ static void re_test()
 	detruit det1 = detruit("lien", 'l' | 0x80);
 	detruit det2 = detruit("dev1", 'd');
 	filesystem_restore fs = filesystem_restore(*ui, "algi", true, true, true, bool_mask(true), inode::cf_all, true, false, false);
+	bool hasbeencreated;
 
 	cat->reset_read();
 
 	while(cat->read(e))
-	    fs.write(e);
+ 	    fs.write(e, hasbeencreated);
 
 	fs.reset_write();
-	fs.write(&det1);
-	fs.write(&det2);
+	fs.write(&det1, hasbeencreated);
+	fs.write(&det2, hasbeencreated);
     }
     catch(Egeneric & e)
     {

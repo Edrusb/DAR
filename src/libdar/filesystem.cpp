@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.45 2005/12/29 02:32:41 edrusb Rel $
+// $Id: filesystem.cpp,v 1.45.2.2 2006/06/20 20:28:50 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -1198,13 +1198,14 @@ namespace libdar
             throw Ememory("filesystem_write::reset_write");
     }
 
-    bool filesystem_restore::write(const entree *x)
+    bool filesystem_restore::write(const entree *x, bool & created)
     {
         const eod *x_eod = dynamic_cast<const eod *>(x);
         const nomme *x_nom = dynamic_cast<const nomme *>(x);
 	const directory *x_dir = dynamic_cast<const directory *>(x);
 
         bool ret = true;
+	created = true;
 
         try
         {
@@ -1273,6 +1274,7 @@ namespace libdar
                             {
                                 const inode *exists_ino = dynamic_cast<inode *>(exists);
 
+				created = false;
                                 if((x_eti == NULL && x_ino == NULL) || exists_ino == NULL)
                                     throw SRC_BUG; // should be both of class inode (or hard_link for x)
 
@@ -1568,7 +1570,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.45 2005/12/29 02:32:41 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.45.2.2 2006/06/20 20:28:50 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -1698,7 +1700,8 @@ namespace libdar
 		{
 		    if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
 		    {
-			dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, strerror(errno)));
+			if(errno != ENOTTY)
+			    dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, strerror(errno)));
 			f = 0;
 		    }
 		}

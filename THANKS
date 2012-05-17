@@ -1,3 +1,10 @@
+version 2.3.1
+--------------
+Thanks to Adam Fuksa for bug feedback. Thanks to Nick Alcock and
+to Wiebe Cazemier for feedback and patch. Thanks to Nebojsa for
+feedback. Thanks to Brian May (@Debian) and Alexei Sheplyakov for
+feedback. Thanks also to Marko Lavikainen for feedback.
+
 version 2.3.0
 --------------
 Thanks to Wesley Leggette again for his feedback and for his many

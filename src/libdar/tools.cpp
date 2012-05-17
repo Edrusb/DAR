@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.2 2006/02/03 21:00:32 edrusb Rel $
+// $Id: tools.cpp,v 1.54.2.3 2006/05/30 22:04:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -299,7 +299,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.54.2.2 2006/02/03 21:00:32 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.54.2.3 2006/05/30 22:04:30 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -1492,6 +1492,7 @@ namespace libdar
         catch(...)
         {
             delete [] name;
+	    throw;
         }
 
         delete [] name;

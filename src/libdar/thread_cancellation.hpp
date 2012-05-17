@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: thread_cancellation.hpp,v 1.5.2.1 2006/02/04 14:47:15 edrusb Rel $
+// $Id: thread_cancellation.hpp,v 1.5.2.3 2006/04/20 13:34:14 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -45,8 +45,6 @@ extern "C"
 #if HAVE_PTHREAD_H
 #include <pthread.h>
 #endif
-#else
-#define pthread_t U_I
 #endif
 }
 #include <list>
@@ -94,6 +92,8 @@ namespace libdar
 	    /// must be called once before any call to thread_cancellation class's methods
 	static void init();
 
+
+#if MUTEX_WORKS
 	    /// marks the thread given in argument as to be canceled
 
 	    //! \param[in] tid the thread ID of the thread where any libdar call must abort
@@ -113,6 +113,7 @@ namespace libdar
 	    /// \return true if the pending thread was still running and
 	    /// false if it has already aborted.
 	static bool clear_pending_request(pthread_t tid);
+#endif
 
 	    /// method for debugging/control purposes
 	static U_I count()

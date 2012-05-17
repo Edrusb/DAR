@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.40.2.1 2006/01/24 17:04:57 edrusb Rel $
+// $Id: filtre.cpp,v 1.40.2.3 2006/06/20 20:28:50 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -133,9 +133,11 @@ namespace libdar
                             {
                                 if(detruire && !flat)
                                 {
+				    bool notusedhere;
+
                                     if(info_details)
                                         dialog.warning(string(gettext("Removing file: ")) + juillet.get_string());
-                                    if(fs.write(e))
+                                    if(fs.write(e, notusedhere))
                                         st.incr_deleted();
                                 }
                             }
@@ -144,6 +146,8 @@ namespace libdar
                                 {
                                     nomme *exists_nom = NULL;
                                     inode *exists = NULL;
+				    bool created = false; // will carry the information whether the restoration had created a new file or overwrote an old one
+				    bool restored = false; // will be true if file restoration succeeded
 
                                         // checking if file to restore already exists, retreiving info if available
                                     if(!flat)
@@ -171,7 +175,8 @@ namespace libdar
                                                 {
                                                     if(info_details)
                                                         dialog.warning(string(gettext("Restoring file: ")) + juillet.get_string());
-                                                    if(fs.write(e)) // e and not e_ino, it may be a hard link now
+						    restored = fs.write(e, created); // e and not e_ino, it may be a hard link now
+                                                    if(restored)
                                                         st.incr_treated();
                                                 }
                                                 else
@@ -218,8 +223,36 @@ namespace libdar
 					{
 					    try
 					    {
-						if(fs.set_ea(e_nom, *(e_ino->get_ea(dialog)), fs_allow_overwrite, fs_warn_overwrite, info_details))
-						    st.incr_ea_treated();
+						bool ea_erase = fs.get_ea_erase();
+
+						try
+						{
+						    bool local_fs_allow_over = fs_allow_overwrite;
+						    bool local_fs_warn_over = fs_warn_overwrite;
+
+						    if(restored && created)
+						    {
+							// this hack is necessary when the directory we are
+							// restoring in has default EA set. The file we have
+							// restored just above has already some EA set, we must
+							// clear them, then we can restore the EA.
+
+							fs.set_ea_erase(true);
+							local_fs_allow_over = true;
+							local_fs_warn_over = false;
+						    }
+						    if(fs.set_ea(e_nom, *(e_ino->get_ea(dialog)),
+								 local_fs_allow_over,
+								 local_fs_warn_over,
+								 info_details))
+							st.incr_ea_treated();
+						}
+						catch(...)
+						{
+						    fs.set_ea_erase(ea_erase);
+						    throw;
+						}
+						fs.set_ea_erase(ea_erase);
 					    }
 					    catch(Erange & e)
 					    {
@@ -299,9 +332,12 @@ namespace libdar
                     st.incr_errored();
                 }
             }
-            else
+            else // eod
                 if(!flat)
-                    (void)fs.write(e); // eod; don't care returned value
+		{
+		    bool notusedhere;
+                    (void)fs.write(e, notusedhere); // eod; don't care returned value
+		}
         }
     }
 
@@ -1235,7 +1271,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.40.2.1 2006/01/24 17:04:57 edrusb Rel $";
+        static char id[]="$Id: filtre.cpp,v 1.40.2.3 2006/06/20 20:28:50 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -1317,10 +1353,25 @@ namespace libdar
                 delete source;
 
 		    // checking for last_modification date change
-		if(check_change && fic->get_last_modif() != tools_get_mtime(info_quoi))
+		if(check_change)
 		{
-		    dialog.warning(string(gettext("WARNING! File modified while reading it for backup: ")) + info_quoi);
-		    ret = false;
+		    bool changed = false;
+
+		    try
+		    {
+			changed = fic->get_last_modif() != tools_get_mtime(info_quoi);
+		    }
+		    catch(Erange & e)
+		    {
+			dialog.warning(tools_printf(gettext("File has been removed while reading it for backup: %S . It has however been properly saved in the archive"), &info_quoi));
+			changed = false;
+		    }
+
+		    if(changed)
+		    {
+			dialog.warning(string(gettext("WARNING! File modified while reading it for backup: ")) + info_quoi);
+			ret = false;
+		    }
 		}
 
 		    // restore atime of source

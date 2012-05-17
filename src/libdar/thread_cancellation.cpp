@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: thread_cancellation.cpp,v 1.4.2.1 2006/02/04 14:47:15 edrusb Rel $
+// $Id: thread_cancellation.cpp,v 1.4.2.2 2006/04/10 19:52:09 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -181,9 +181,9 @@ namespace libdar
 #endif
     }
 
+#if MUTEX_WORKS
     void thread_cancellation::cancel(pthread_t tid, bool x_immediate, U_64 x_flag)
     {
-#if MUTEX_WORKS
 	bool found = false, bug = false;
 	list<thread_cancellation *>::iterator ptr;
 
@@ -227,20 +227,18 @@ namespace libdar
 
 	if(bug)
 	    throw SRC_BUG;
-#else
-	throw Ecompilation(gettext("multi-thread support"));
-#endif
     }
+#endif
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: thread_cancellation.cpp,v 1.4.2.1 2006/02/04 14:47:15 edrusb Rel $";
+	static char id[]="$Id: thread_cancellation.cpp,v 1.4.2.2 2006/04/10 19:52:09 edrusb Exp $";
 	dummy_call(id);
     }
 
+#if MUTEX_WORKS
     bool thread_cancellation::cancel_status(pthread_t tid)
     {
-#if MUTEX_WORKS
 	bool ret, bug = false;
 	list<thread_cancellation *>::iterator ptr;
 
@@ -270,14 +268,11 @@ namespace libdar
 	    throw SRC_BUG;
 
 	return ret;
-#else
-	throw Ecompilation(gettext("multi-thread support"));
-#endif
     }
+
 
     bool thread_cancellation::clear_pending_request(pthread_t tid)
     {
-#if MUTEX_WORKS
 	bool ret = false, bug = false;
 	list<thread_cancellation *>::iterator ptr;
 	list<fields>::iterator it;
@@ -315,9 +310,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	return ret;
-#else
-	throw Ecompilation(gettext("multi-thread support"));
-#endif
     }
+#endif
 
 } // end of namespace
