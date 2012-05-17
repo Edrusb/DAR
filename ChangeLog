@@ -278,20 +278,24 @@ from 2.1.x to 2.2.0
 - user_interaction can now be based on customized C++ class
 - user_interaction_callback now have a context argument
 - added feature: dar_manager now restores directory tree recursively
-- added feature: dar_manager can receive a range of archive number with -D option
+- added feature: dar_manager can receive a range of archive number with -D
+  option
 - added summary at the end of configure script
 - added -j option (--jog) change behavior when virtual memory is exhausted
 - added Native Language Support
-- added feature that proposes removal of slices of an older archive of same basename
+- added feature that proposes removal of slices of an older archive of same
+  basename
 - libz is now optional
 - libbz2 is now optional
 - added openssh's libcrypto dependency
 - added blowfish strong encryption
-- changed archive format number (version "04"), difference occures only when encryption is used
+- changed archive format number (version "04"), difference occures only when
+  encryption is used
 - moved libdar operations (archive creation, listing, testing ...) as method of
   the C++ archive class
 - added thread cancelation routine
-- added feature : password can be read out of command-line (interactively at execution time).
+- added feature : password can be read out of command-line (interactively at
+  execution time).
 - added programming documentation (thanks to Doxygen)
 - optimize CRC computation for speed
 - added warning telling [list of path] is deprecated (better use -g option)
@@ -359,3 +363,21 @@ from 2.2.1 to 2.2.2
   user interaction.
 - added O_BINARY to open() mode in dar_cp, without this will cause some problem
   under Cygwin.
+
+
+from 2.2.2 to 2.2.3
+- error in TUTORIAL (-P only receives relative paths)
+- updated FAQ with memory requirement questions/problem
+- added Bob Barry's script for determining memory requirement
+- added documentation about NLS in doc/NOTES
+- fixed bug concerning the << operator of infinint class. This has no
+  impact as this operator is not used in dar/libdar.
+- added Jakub Holy's script to doc/samples
+- fixed bug with patch transmitted from Debian (Brian May) about the
+  detection of the ext2_fs.h header.
+- added warning in libdar when user asks the nodump flags to be checked against
+  while the nodump feature has not been activated at compilation time.
+- fixed dar man page about --gzip option usage when using an argument
+- now counting as errors the file with too long filename
+- now counting the file excluded due to nodump flag as ignored due filter
+  selection

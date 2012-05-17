@@ -68,7 +68,7 @@ Note that path must be relative to -R option (thus no leading '/' must be used)
 Unlike the -X/-I options, the -P applies to a directory. If a directory
 matches -P option, all its subdirectory will also be excluded.
 note also that -P can receive wilder cards, and they must be quoted not to be
-interpreted by the shell: -P "/home/*/.mozilla/cache" for example.
+interpreted by the shell: -P "home/*/.mozilla/cache" for example.
 Lastly, -P can also be used to exclude a plain file (if you don't want to
 exclude all files of a given name using -X option): -P home/joe/.bashrc
 for example would only exclude joe's .bashrc file not any other file,
@@ -134,8 +134,8 @@ and so on.
 
 That's it, we finished the first step, it may take a long time depending on the
 size of the data to backup, The following step (differential backup) however
-can be done often, and it will stay fast every time (OK, except if a big part of
-your system have changed, in that case you can consider making another full
+can be done often, and it will stay fast every time (OK, except if a big part
+of your system have changed, in that case you can consider making another full
 backup).
 
 Just a little check on the archive you've just made:
@@ -389,12 +389,13 @@ If we can see a line like
         restoring file: /home/denis/my_precious_file
 
 The it stops here, because we got the most recent backup version of our lost
-file. We have to otherwise have to continue with the previous differential backup,
-up to the full backup if it is necessary.
+file. We have to otherwise have to continue with the previous differential
+backup, up to the full backup if it is necessary.
 This method has an advantage over first one, which is not to have *in all case*
 the need to use all the backup done since the full backup.
 
-If you are lazy on the other hand, have a look at dar_manager (at the end of the tutorial)
+If you are lazy on the other hand, have a look at dar_manager (at the end of
+the tutorial)
 '''''''''''''''''''''''''''''''
 
 OK, now you have two files to restore. No problem, just do the second method
@@ -449,8 +450,9 @@ archive!
 
         dar_manager -B my_base.dmd -A ~/Catalogues/CAT_linux_full
 
-The problem however is that when dar_manager will need to recover a file located
-in this archive it will try to open the archive ~/Catalogue/CAT_linux_full
+The problem however is that when dar_manager will need to recover a file
+located in this archive it will try to open the archive
+   ~/Catalogue/CAT_linux_full
 for restoration, which does not contain any data because it is just the
 catalogue of the archive.
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_blowfish.cpp,v 1.2.2.1 2005/02/02 10:51:35 edrusb Rel $
+// $Id: test_blowfish.cpp,v 1.2.2.2 2005/09/11 18:35:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -47,6 +47,7 @@ extern "C"
 #include "crypto.hpp"
 #include "shell_interaction.hpp"
 #include "deci.hpp"
+#include "cygwin_adapt.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -81,7 +82,7 @@ int main()
 
 void f1(user_interaction *dialog)
 {
-    int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT, 0644);
+    int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
     fichier fic = fichier(*dialog, fd);
     blowfish bf = blowfish(*dialog, 10, string("bonjour"), fic);
     char buffer[100] = "bonjour les amis il fait chaud il fait beau ! ";

@@ -1,0 +1,41 @@
+	#########################
+	#			#
+	#   Shared options pro  #
+	#    DAR archiver	#
+	#			#
+	#########################
+
+# Jakub Holy, 25.4.2005
+# This file: /etc/darrc
+# Note: If the user has her $HOME/.darrc, this file is ignored => it must be included with the option -B /etc/darrc to dar
+
+###
+### Files that shall not be compressed (because they're already)
+###
+# archives (Note: .tar is archive, but not compressed => do compress it).
+-Z "*.bz2" -Z "*.deb" -Z "*.gz" -Z "*.Z" -Z "*.zip" -Z "*.rar" -Z "*.tbz2" -Z "*.tgz" -Z "*.jar" -Z "*.ear" -Z "*.war"
+-Z "*.BZ2" -Z "*.DEB" -Z "*.GZ" -Z "*.Z" -Z "*.ZIP" -Z "*.RAR" -Z "*.TBZ2" -Z "*.TGZ" -Z "*.JAR" -Z "*.EAR" -Z "*.WAR"
+# media - images
+-Z "*.gif" -Z "*.jpeg" -Z "*.jpg" -Z "*.png" 
+-Z "*.GIF" -Z "*.PNG" -Z "*.JPEG" -Z "*.JPG"
+# media - audio
+-Z "*.ogg" -Z "*.mp3"
+-Z "*.OGG" -Z "*.MP3"
+# media - video
+-Z "*.avi" -Z "*.mov" -Z "*.mp4" -Z "*.mpg"
+-Z "*.AVI" -Z "*.MOV" -Z "*.MP4" -Z "*.MPG"
+# documents - compressed formats
+-Z "*.pdf" -Z "*.swf" -Z "*.sxw"
+-Z "*.PDF" -Z "*.SWF" -Z "*.SXW"
+# strange formats, binaries and other hard to compress (empirical)
+-Z "*.gpg" -Z "*.rnd" -Z "*.scm" -Z "*.svgz" -Z "*.vlt" -Z "*.zargo" -Z "*.wings" -Z "*.xpi" -Z "*.chm"
+-Z "*.GPG" -Z "*.RND" -Z "*.SCM" -Z "*.SVGZ" -Z "*.VLT" -Z "*.ZARGO" -Z "*.WINGS" -Z "*.XPI" -Z "*.CHM"
+-Z "*.obj" -Z "*.tif" -Z "*.tiff"
+-Z "*.OBJ" -Z "*.TIF" -Z "*.TIFF"
+
+###
+### Ignored files
+###
+-X "*~" -X "*.o" 	
+  # *~ are backups, *.o are compiled unlinked files
+

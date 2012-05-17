@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.21 2004/11/14 00:07:26 edrusb Rel $
+// $Id: filtre.cpp,v 1.21.2.1 2005/09/08 19:20:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -316,16 +316,20 @@ namespace libdar
         compression stock_algo = stockage->get_algo();
 	infinint root_fs_device;
         filesystem_backup fs = filesystem_backup(dialog, fs_racine, info_details, save_ea_root, save_ea_user, nodump, alter_atime, root_fs_device);
+	infinint skipped_dump, fs_errors;
 
         st.clear();
         cat.reset_add();
         ref.reset_compare();
 
-        while(fs.read(e))
+        while(fs.read(e, fs_errors, skipped_dump))
         {
             nomme *nom = dynamic_cast<nomme *>(e);
             directory *dir = dynamic_cast<directory *>(e);
 	    inode *e_ino = dynamic_cast<inode *>(e);
+
+	    st.ignored += skipped_dump;
+	    st.errored += fs_errors;
 
             juillet.enfile(e);
             if(nom != NULL)
@@ -837,7 +841,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.21 2004/11/14 00:07:26 edrusb Rel $";
+        static char id[]="$Id: filtre.cpp,v 1.21.2.1 2005/09/08 19:20:21 edrusb Rel $";
         dummy_call(id);
     }
 

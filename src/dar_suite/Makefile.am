@@ -79,7 +79,7 @@ install-exec-hook :
 
 else
 install-exec-hook:
-	echo "no exectuable packing, UPX not found or disabled"
+	echo "no executable packing, UPX not found or disabled"
 endif
 
 

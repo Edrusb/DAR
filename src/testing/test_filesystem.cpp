@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_filesystem.cpp,v 1.16.2.1 2005/02/02 10:51:35 edrusb Rel $
+// $Id: test_filesystem.cpp,v 1.16.2.2 2005/09/08 19:20:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -164,10 +164,11 @@ static void test()
 {
     entree *p;
     infinint root_fs_device;
+    infinint errors, skipped_dump;
 
     filesystem_backup fs = filesystem_backup(*ui, path("arbo"), true, true, true, false, false, root_fs_device);
 
-    while(fs.read(p))
+    while(fs.read(p, errors, skipped_dump))
     {
         file *f = dynamic_cast<file *>(p);
         cat->add(p);

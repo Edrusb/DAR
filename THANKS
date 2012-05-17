@@ -1,3 +1,13 @@
+version 2.2.3
+--------------
+Thanks to Andrew(ziem) for feedback. Thanks to Bob Barry for his script giving
+a raw estimation of the memory requirement for dar. Thanks again to Wesley
+Leggette for feedback. Thanks to Jakub Holy for feedback and providing some
+helper scripts for dar. Thanks also to Brian May (Debian maintainer for dar)
+for transmitting me feedback and patches. Thanks to Martin Jost for patch and
+feedback about the API tutorial. Thanks to Jeremy C. Reed and to HansS713 for
+feedback.
+
 version 2.2.2
 --------------
 Thanks to Ryan Vietri for feedback. Thanks to Ralph Slooten for feedback,

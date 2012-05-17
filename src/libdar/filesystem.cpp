@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.35.2.3 2005/03/19 19:49:00 edrusb Rel $
+// $Id: filesystem.cpp,v 1.35.2.5 2005/09/08 19:20:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -76,10 +76,10 @@ char *strchr (), *strrchr ();
 #if HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
-#if LIBDAR_NODUMP_FEATURE == linux
+#if LIBDAR_NODUMP_FEATURE == NODUMP_LINUX
 #include <linux/ext2_fs.h>
 #else
-#if LIBDAR_NODUMP_FEATURE == ext2fs
+#if LIBDAR_NODUMP_FEATURE == NODUMP_EXT2FS
 #include <ext2fs/ext2_fs.h>
 #else
 #error "unknown location of ext2_fs.h include file"
@@ -443,10 +443,13 @@ namespace libdar
     }
 
 
-    bool filesystem_backup::read(entree * & ref)
+    bool filesystem_backup::read(entree * & ref, infinint & errors, infinint & skipped_dump)
     {
         bool once_again;
         ref = NULL;
+	errors = 0;
+	skipped_dump = 0;
+
 
         if(current_dir == NULL)
             throw SRC_BUG; // constructor not called or badly implemented.
@@ -518,7 +521,8 @@ namespace libdar
 					    catch(Egeneric & e)
 					    {
 						delete ref;
-						ref = NULL; // we ignore this directory and skip to the next one
+						ref = NULL; // we ignore this directory and skip to the next entry
+						errors++;
 						if(! current_dir->pop(tmp))
 						    throw SRC_BUG;
 					    }
@@ -537,6 +541,7 @@ namespace libdar
 				    // the file has been removed between the time
 				    // the directory has been openned, and the time
 				    // we try to read it, so we ignore it.
+				    // this case is silently ignored and not counted
 			    }
 			    catch(...)
 			    {
@@ -552,13 +557,15 @@ namespace libdar
                         {
                             if(info_details)
                                 get_fs_ui().warning(string(gettext("Ignoring file with NODUMP flag set: ")) + (*current_dir + name).display());
+			    skipped_dump++;
                             once_again = true;
                         }
                     }
                     catch(Erange & e)
                     {
-                        get_fs_ui().warning(string(gettext("Error reading directory contents : ")) + e.get_message() + gettext(" . Ignoring file or directory"));
+                        get_fs_ui().warning(string(gettext("Error reading directory contents: ")) + e.get_message() + gettext(" . Ignoring file or directory"));
                         once_again = true;
+			errors++;
                     }
                 }
             }
@@ -1428,7 +1435,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.35.2.3 2005/03/19 19:49:00 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.35.2.5 2005/09/08 19:20:21 edrusb Rel $";
         dummy_call(id);
     }
 

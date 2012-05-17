@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_elastic.cpp,v 1.2.2.1 2005/02/02 10:51:35 edrusb Rel $
+// $Id: test_elastic.cpp,v 1.2.2.2 2005/09/11 18:35:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -50,6 +50,7 @@ extern "C"
 #include "erreurs.hpp"
 #include "shell_interaction.hpp"
 #include "deci.hpp"
+#include "cygwin_adapt.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -142,7 +143,7 @@ void f3()
     user_interaction *dialog = shell_interaction_init(&cout, &cerr, false);
     try
     {
-	int fd = open("toto", O_RDWR|O_TRUNC|O_CREAT, 0666);
+	int fd = open("toto", O_RDWR|O_TRUNC|O_CREAT|O_BINARY, 0666);
 	fichier fic = fichier(*dialog, fd);
 	const unsigned int taille = 500;
 	char buffer[taille];

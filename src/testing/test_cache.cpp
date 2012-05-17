@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_cache.cpp,v 1.5.2.1 2005/02/02 10:51:35 edrusb Rel $
+// $Id: test_cache.cpp,v 1.5.2.2 2005/09/11 18:35:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -62,6 +62,7 @@ extern "C"
 #include "erreurs.hpp"
 #include "generic_file.hpp"
 #include "shell_interaction.hpp"
+#include "cygwin_adapt.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -119,7 +120,7 @@ void f1()
 
 void f2()
 {
-    int fd = open("titi", O_RDWR|O_TRUNC|O_CREAT, 0666);
+    int fd = open("titi", O_RDWR|O_TRUNC|O_CREAT|O_BINARY, 0666);
     if(fd < 0)
     {
 	printf("%s\n", strerror(errno));

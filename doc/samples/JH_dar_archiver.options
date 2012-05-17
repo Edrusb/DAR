@@ -1,0 +1,28 @@
+#################################
+#				#
+#    DAR Archiver - options	#
+#				#
+#################################
+
+# -m N 		- do not compress files smaller then N [B] 
+# -Z pattern	- matching files are not compressed
+# -P subdir	- ignore (don't backup) directories matching the pattern; relative to -R
+# -X pattern	- exclude files matching pattern; it may not include a file path, only the name
+# -R /home/aja	- the directory to backup
+# -s 700M	- cut the archive into 'slices' (parts) of max. size 700 MB
+# -y [level]	- compress with bzip2 
+# -G 		- generuj zvlast katalog archivu 
+# -D,--empty-dir - vtvor prazdne adresare pro ty excludovane (s -P)
+# -M		- skip other filesystems (tj. namountovane FS).
+# -v		- verbose output
+# --beep	- pipni kdyz je pozadovana uzivatelova akce
+
+# !!! The option -c <archive to create name>, has to be on the cmd line
+# !!! The option -R <directory to archive> as well
+
+## Obecne volby
+-s 700M -m 256 -y -M -v --empty-dir --beep 
+
+## Preskocene adresare
+-P .java/deployment -P .netbeans/var
+-P Trash

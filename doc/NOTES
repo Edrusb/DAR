@@ -25,6 +25,7 @@
   XVI - Examples of file filtering
  XVII - Strong encryption
 XVIII - libdar and thread-safe requirement
+  XIX - Native Language Support / gettext / libintl
 
 
 
@@ -303,11 +304,11 @@ But as memory is accessed through
 a bus which is a fixed number of cables (or integrated circuits), on which only
 two possible voltages are authorized to mean 0 or 1, the total number possible
 value to give to a bus is always a power of 2. With a two cable bus, you can
-have 4 values (00, 01, 10 and 11, where a digit is the state of a cable). Giving
-an value to each cable defines an address to read or write in the memory, which
-is done through another bus. Of course address given to the address bus give
-the position to a *byte* to read. this means the data bus is a 8 cable bus.
-Today, address and data bus are much larger than that of course. But, the
+have 4 values (00, 01, 10 and 11, where a digit is the state of a cable).
+Giving a value to each cable defines an address to read or write in the memory,
+which is done through another bus. Of course address given to the address bus
+give the position to a *byte* to read. this means the data bus is a 8 cable
+bus. Today, address and data bus are much larger than that of course. But, the
 problem remains, that the memory size is always a power of 2. Unfortunately
 1000 is not a power of 2 and approaching 1000 bytes, was decided that a
 "kilobyte" would be 1024 bytes which is 2 power 10. Some time after, and by
@@ -342,7 +343,10 @@ slices in the sense of the metric system, simply use "-s 2000000".
 Starting version 2.2.0, you can alter the meaning of all the suffixes used by
 dar, the --alter=SI-units (which can be shorten to -aSI or -asi) change the
 meaning of the *following* prefixes on the command-line, to the metric system
-(or System International) up to the end of the line or to a --alter=binary-units
+(or System International) up to the end of the line or to a
+
+    --alter=binary-units
+
 arguments (-which can be shortened to -abinary), after which we are back to the
 computer science meaning of kilo, mega, etc. up to the end of the line or up to
 a next --alter=SI-units. Thus in place of -s 2000000 one could use:
@@ -504,13 +508,14 @@ compression, slicing for example). So all layer must have the same interface
 for serving the layer above them. This interface is defined by the pure virtual
 class "generic_file", which provides generic methods for reading, writing,
 skipping, getting the current offset when writing or reading to a file.
-This way the compressor class acts like a file which compresses data wrote to it
-and writes compressed data to another "generic_file". The blowfish and scramble
-classes act the same but in place of compressing/uncompressing they
+This way the compressor class acts like a file which compresses data wrote to
+it and writes compressed data to another "generic_file". The blowfish and
+scramble classes act the same but in place of compressing/uncompressing they
 encrypt/decrypt the data to/from another generic_file object. The slicing we
-have seen above follows the same principle, this is a "sar" object that transfers
-data wrote to it to several fichier objects. Class fichier also inherit
-from generic_file class, and is a wrapper for the plain file system calls.
+have seen above follows the same principle, this is a "sar" object that
+transfers data wrote to it to several fichier objects. Class fichier also
+inherit from generic_file class, and is a wrapper for the plain file system
+calls.
 
 Here are now the layers:
 
@@ -1406,70 +1411,75 @@ Now the inside algorithm:
 XVII - Strong encryption
 ==========================
 
-several cyphers are available. Remind that "scrambling" is not a strong encryption
-cypher, all other are.
+several cyphers are available. Remind that "scrambling" is not a strong
+encryption cypher, all other are.
 
-to be able to use a strong encrypted archive you need to know the three parameters
-used at creation time:
+to be able to use a strong encrypted archive you need to know the three
+parameters used at creation time:
 
 - the cypher used (blowfish, ...)
 - the key or password used
 - the encryption block size used
 
-no information about these parameters is stored in the generated archive. If you
-make an error on just one of them, you will not be able to use your archive. If
-you forgot one of them, nobody can help you, you can just consider the data in this
-archive as lost. This is the drawback of strong encryption.
+no information about these parameters is stored in the generated archive. If
+you make an error on just one of them, you will not be able to use your
+archive. If you forgot one of them, nobody can help you, you can just consider
+the data in this archive as lost. This is the drawback of strong encryption.
 
 
 How is it implemented ?
 ------------------------
 
-To not completely break the possibility to directly access file, the archive is not
-encrypted as a whole (as would do an external program). The encryption is done
-block of data by block of data. Each block can be decrypted, and if you want to read
-some data somewhere you need to decrypt the whole block(s) it is in.
+To not completely break the possibility to directly access file, the archive is
+not encrypted as a whole (as would do an external program). The encryption is
+done block of data by block of data. Each block can be decrypted, and if you
+want to read some data somewhere you need to decrypt the whole block(s) it is
+in.
 
-In consequence, the larger the block size is, the stronger the encryption is. But the
-larger the block size is too, the longer it will take to recover an given file, in
-particular when the file size to restore is much smaller than the encryption block
-size used.
+In consequence, the larger the block size is, the stronger the encryption is.
+But the larger the block size is too, the longer it will take to recover an
+given file, in particular when the file size to restore is much smaller than
+the encryption block size used.
 
 An encryption block size can range from 10 bytes to 4 GB.
 
-If encryption is used as well as compression, compression is done first, then encryption
-is done on compressed data.
+If encryption is used as well as compression, compression is done first, then
+encryption is done on compressed data.
 
-An "elastic buffer" is introduced at the beginning and at the end of the archive, to
-protect against plain text attack.  The elastic buffer size randomly varies and is defined
-at execution time. It is composed of random (srand()) values. Two marks characters '>' and
-'<' delimit the size field, which indicate the byte size of the elastic buffer. The size
-field is randomly placed in the buffer. Last, the buffer is encrypted with the rest of the
-data. Typical elastic buffer size range from 1 byte to 10 kB, for both initial and terminal
-elastic buffers.
+An "elastic buffer" is introduced at the beginning and at the end of the
+archive, to protect against plain text attack.  The elastic buffer size
+randomly varies and is defined at execution time. It is composed of random
+(srand()) values. Two marks characters '>' and '<' delimit the size field,
+which indicate the byte size of the elastic buffer. The size field is randomly
+placed in the buffer. Last, the buffer is encrypted with the rest of the data.
+Typical elastic buffer size range from 1 byte to 10 kB, for both initial and
+terminal elastic buffers.
 
-Elastic buffers are also used inside compression blocks. The underlying cypher may not be
-able to encrypt at the requested block size boundary. If necessary a small elastic buffer
-is appended to the data before encryption, to be able, at restoration time, to know the
-amount of data and the amount of noise around it.
+Elastic buffers are also used inside compression blocks. The underlying cypher
+may not be able to encrypt at the requested block size boundary. If necessary a
+small elastic buffer is appended to the data before encryption, to be able, at
+restoration time, to know the amount of data and the amount of noise around it.
 
 Let's take an example with blowfish. Blowfish encrypts by multipe of 8 bytes
-(blowfish chain block cypher). An elastic buffer is always added to the data of a
-encryption block, its minimal size is 1 byte.
+(blowfish chain block cypher). An elastic buffer is always added to the data of
+a encryption block, its minimal size is 1 byte.
 
-Thus, if you request a encryption block of 3 bytes, theses 3 bytes will be padded by an
-elastic buffer of 5 bytes for theses 8 bytes to be encrypted. This will make a very poor
-compression ratio as only 3 bytes on 8 bytes are significant.
+Thus, if you request a encryption block of 3 bytes, theses 3 bytes will be
+padded by an elastic buffer of 5 bytes for theses 8 bytes to be encrypted. This
+will make a very poor compression ratio as only 3 bytes on 8 bytes are
+significant.
 
-If you request a encryption block of 8 bytes, as there is no room for the minimal elastic
-buffer of 1 byte, a second 8 byte block is used to put the elastic buffer, so the real
-encruption block will be 16 bytes.
+If you request a encryption block of 8 bytes, as there is no room for the
+minimal elastic buffer of 1 byte, a second 8 byte block is used to put the
+elastic buffer, so the real encruption block will be 16 bytes.
 
-Idealy, a encryption block of 7 bytes, will use 8 bytes with 1 byte for the elastic buffer.
+Idealy, a encryption block of 7 bytes, will use 8 bytes with 1 byte for the
+elastic buffer.
 
-This problem tends to disapear when the encryption block size grows, so this should not
-be a problem in normal conditions. Encryption block of 3 bytes is not a good idea to have
-a strong encryption scheme, for information, the default encryption block size is 10kB.
+This problem tends to disapear when the encryption block size grows, so this
+should not be a problem in normal conditions. Encryption block of 3 bytes is
+not a good idea to have a strong encryption scheme, for information, the
+default encryption block size is 10kB.
 
 
 
@@ -1505,7 +1515,8 @@ IMPORTANT:
 As more as before it is mandatory to call get_version() call before any
 other call, when the call returns, libdar is ready for thread safe. Note that
 even if the prototype does not change get_version() *may* now throw an
-exception, so use get_version_noexcept() if you don't want to manage exceptions.
+exception, so use get_version_noexcept() if you don't want to manage
+exceptions.
 
 For more information about libdar and its API, check the doc/api_tutorial.html
 document and the API reference manual under doc/html/index.html. This later
@@ -1513,4 +1524,44 @@ file is built by Doxygen from source files during compilation (make), thus
 you need Doxygen to build the API reference manual. Else a copy of this manual
 is available on dar's homepage.
 
+
+  XIX - Native Language Support / gettext / libintl
+====================================================
+
+Native Language Support (NLS) is the fact a given program can display
+its messages in different languages. For dar, this is implemented using
+the gettext tools. This tool must be installed on the system for dar
+can be able to display messages in another language than English.
+
+Things are the following:
+- On a system without gettext dar will not use gettext at all. But
+you can make dar use the embedded gettext using --with-included-gettext
+option with the configure script (note that the included gettext will
+not be installed, dar will work from the directory it has been built in).
+- On a system with gettext dar will use the system's gettext, unless
+you use --disable-nls option with the configure script. On such a
+system using --with-included-gettext will lead to symbol conflict at
+link time, as the same symbols will be provided and by the included
+libintl and by the system's one.
+
+just for information, gettext() is the name of the call that makes
+translations of string in the program. This call is implemented in the
+library called 'libintl' (intl for Internationalization). Last point,
+gettext by translating strings, makes the Native Language Support (NLS)
+possible, in other words, it let you have the messages of your preferred
+ programs being displayed in you native language for those not having
+the English as mother tong.
+
+This was necessary to say, because you may miss the links between
+"gettext" , "libintl" and "NLS".
+
+READ the ABOUT-NLS file at the root of this package to learn more
+about the way to display dar's messages in your own language. Note
+that not all languages are yet supported, this is up to you to send
+me a translation in your language and/or contact a translating team
+as explained in ABOUT-NLS.
+
+To know which languages are supported by dar, read the po/LINGUAS
+file and check out for the presence of the corresponding *.po files
+in this directory.
 

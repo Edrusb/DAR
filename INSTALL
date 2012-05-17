@@ -176,3 +176,12 @@ example:
         windows to point
         the command
 
+
+Another point reported by "HansS713" on Sourceforge is about network paths.
+the windows notation \\host\file\path cannot be translated replacing \ by
+/ because it would lead to dar see a empty name as directory which is not
+a valid path. The workaround found by "HansS713" is to translate the path
+as follows:
+
+       \\host\file\path     becomes     \\\\host/file/path
+

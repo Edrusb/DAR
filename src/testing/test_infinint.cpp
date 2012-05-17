@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_infinint.cpp,v 1.14.2.1 2005/02/02 10:51:35 edrusb Rel $
+// $Id: test_infinint.cpp,v 1.14.2.2 2005/06/22 12:10:01 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -142,13 +142,46 @@ static void routine1()
 
     f1 = 4+12;
     f2 = f3;
+    cout << f3 << endl;
+    cout << f1 << endl;
     f3 <<= f1;
+    cout << f3 << endl;
+    cout << (123 << 16) << endl;
     f2 <<= 4+12;
     d2 = deci(f2);
     ui->warning(d2.human());
     d3 = deci(f3);
     ui->warning(d3.human());
 
+    try
+    {
+	f1 = 1024;
+	f2 = 2048;
+	f2 -= f1;
+	cout << f2 << endl;
+	f1 = 4;
+	f2 = 1;
+	f1 <<= f2;
+	f3 = 8;
+	cout << f1 << endl;
+	cout << f3 << endl;
+	f3 -= f1;
+	cout << f3 << endl;
+	f1 = 4;
+	f1 <<= (U_I)1;
+	cout << f1 << endl;
+	f1 = 1000;
+	f2 = 1;
+	f1 <<= f2;
+	cout << f1 << endl;
+	f1 = 1000;
+	f1 <<= (U_32)1;
+	cout << f1 << endl;
+    }
+    catch(Egeneric & e)
+    {
+	e.dump();
+    }
 
     f1 = 21;
     f2 = 1;

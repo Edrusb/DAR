@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.cpp,v 1.21.2.2 2005/02/20 16:05:45 edrusb Rel $
+// $Id: archive.cpp,v 1.21.2.3 2005/07/31 17:13:58 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -216,7 +216,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: archive.cpp,v 1.21.2.2 2005/02/20 16:05:45 edrusb Rel $";
+        static char id[]="$Id: archive.cpp,v 1.21.2.3 2005/07/31 17:13:58 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -559,6 +559,10 @@ namespace libdar
             throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"min_compr_size\""));
 	if(crypto_size < 10 && crypto != crypto_none)
 	    throw Elibcall("op_create/op_isolate", gettext("Crypto block size must be greater than 10 bytes"));
+#ifndef	LIBDAR_NODUMP_FEATURE
+	if(nodump)
+	    throw Ecompilation(gettext("nodump flag feature has not been activated at compilation time, it is thus not available"));
+#endif
 
             // end of sanity checks
 

@@ -65,17 +65,18 @@ Disk Archive package include both dar and libdar.
 
 The package is released under a three integer version (like 2.2.0 for example)
 
-- The first integer is called the major, and changes upon very general review of
-  the implementation. (versions 1 had all source files in a single directory, did
-  not used the autoconf configuration script, etc.).
+- The first integer is called the major, and changes upon very general review
+  of the implementation. (versions 1 had all source files in a single directory
+  and did not used the autoconf configuration script, etc.).
 - The second integer (called medium), changes when new features are added.
-- The third integer (called minor), changes when bugs are fixed. Thus if you want
-  a very stable release check the one with the highest minor version.
+- The third integer (called minor), changes when bugs are fixed. Thus if you
+  want a very stable release check the one with the highest minor version.
 
 Over this version of the released package, there is also a version for each
 binary executable (dar, dar_xform, dar_slave, etc.) and for the libdar API.
-Theses versions follow the same rule of major.medium.minor and grow independently
-to each others. To know the version a binary is part of use the -V option.
+Theses versions follow the same rule of major.medium.minor and grow
+independently to each others. To know the version a binary is part of use
+the -V option.
 
 
 RELEASING PROCESS
@@ -85,22 +86,23 @@ Here is the current release process:
 
 - development phase. The source taken from CVS should always compile (except in
    some cases as seen recently when some specific compilation option have not
-   been tested after the addition of a new feature). Each added feature is tested
-   right after addition (usually before CVS archiving), so the CVS development
-   code should stay functional most of the time.
+   been tested after the addition of a new feature). Each added feature is
+   tested right after addition (usually before CVS archiving), so the CVS
+   development code should stay functional most of the time.
    During this phase can take place API discussion, feature requests, etc.
 
-- API frozen phase. In this phase the API does not change, still new features are
-  added while they do not need API change. In this phase, client software can
-  upgrade to the new API, test and send their feedback. We will try to keep
-  at least one month for this phase.
+- API frozen phase. In this phase the API does not change, still new features
+   are added while they do not need API change. In this phase, client software
+   can upgrade to the new API, test and send their feedback. We will try to
+   keep at least one month for this phase.
 
 - Pre-release phase. The pre-release software is provided as a software to be
   tested against the many possible environment. Anyone is welcome to test it
-  use it, toggle it as much as possible. The idea is to be sure that no forgotten
-  compilation situation or option combinaton have been forgotten. Several
-  pre-released versions may be available in each phase depending on the problem
-  seen by pre-releasers. The pre-release phase is at least one month long.
+  use it, toggle it as much as possible. The idea is to be sure that no
+  forgotten compilation situation or option combinaton have been forgotten.
+  Several pre-released versions may be available in each phase depending on the
+  problem seen by pre-releasers. The pre-release phase is at least one month
+  long.
 
 - Release phase. The software is released under an appropriate version (minor
   number starting to zero). Support requests is available, bug fix is the top

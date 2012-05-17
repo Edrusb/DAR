@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: my_config.h,v 1.7.2.1 2005/02/20 16:05:45 edrusb Rel $
+// $Id: my_config.h,v 1.7.2.2 2005/07/31 17:13:58 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -27,6 +27,8 @@
 #define MY_CONFIG_H
 
 #if HAVE_CONFIG_H
+#define NODUMP_LINUX 0
+#define NODUMP_EXT2FS 1
 #include "../config.h"
 
     // workaround for autoconf 2.59

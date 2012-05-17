@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.17 2004/11/07 18:21:38 edrusb Rel $
+// $Id: filesystem.hpp,v 1.17.2.1 2005/09/08 19:20:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -112,7 +112,7 @@ namespace libdar
         ~filesystem_backup() { detruire(); };
 
         void reset_read(infinint & root_fs_device);
-        bool read(entree * & ref);
+        bool read(entree * & ref, infinint & errors, infinint & skipped_dump);
         void skip_read_to_parent_dir();
             //  continue reading in parent directory and
             // ignore all entry not yet read of current directory

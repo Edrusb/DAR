@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.2.2], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.2.3], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -145,7 +145,7 @@ AC_ARG_ENABLE( [libz-linking],
                                                            #endif
                                               }]],
                                               [[
-                                                         z_stream *ptr = NULL;
+                                                         z_stream *ptr = (z_stream *)0;
                                                          deflate(ptr, 0);
                                               ]]),
                                               [ AC_DEFINE(LIBZ_AVAILABLE, 1, [header and linking is available to have libz functions])],
@@ -177,7 +177,7 @@ AC_ARG_ENABLE( [libbz2-linking],
                                                        #endif
                                               }]],
                                               [[
-                                                        bz_stream *ptr = NULL;
+                                                        bz_stream *ptr = (bz_stream *)0;
                                                         BZ2_bzCompress(ptr, 0);
                                               ]]),
                                               [ AC_DEFINE(LIBBZ2_AVAILABLE, 1, [header and linking is available to have libbz2 functions])],
@@ -212,7 +212,7 @@ AC_ARG_ENABLE( [libcrypto-linking],
 						       #endif
                                               }]],
                                               [[
-							BF_encrypt(NULL, NULL);
+							BF_encrypt((unsigned int *)0, (const BF_KEY*)0);
                                               ]]),
                                               [ AC_DEFINE(CRYPTO_AVAILABLE, 1, [header and linking is available to have strong encryption functions])],
                                               [ local_crypto="no" ])
@@ -260,7 +260,7 @@ AC_ARG_ENABLE(  [nodump-flag],
                                                     #endif
                                                     }]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]),
                                 [
-                                AC_DEFINE(LIBDAR_NODUMP_FEATURE, [ext2fs], [if defined, activates the ext2/3 nodump flag feature])
+                                AC_DEFINE(LIBDAR_NODUMP_FEATURE, [NODUMP_EXT2FS], [if defined, activates the ext2/3 nodump flag feature])
                                 local_nodump_feature="yes"
                                 AC_MSG_RESULT([found <ext2fs/ext2_fs.h>])
                                 ],
@@ -272,7 +272,7 @@ AC_ARG_ENABLE(  [nodump-flag],
                                                                     #endif
                                                                     }]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]),
                                                  [
-                                                 AC_DEFINE(LIBDAR_NODUMP_FEATURE, [linux], [if defined, activates the ext2/3 nodump flag feature])
+                                                 AC_DEFINE(LIBDAR_NODUMP_FEATURE, [NODUMP_LINUX], [if defined, activates the ext2/3 nodump flag feature])
                                                  local_nodump_feature="yes"
                                                  AC_MSG_RESULT([found <linux/ext2_fs.h>])
                                                  ],
@@ -456,7 +456,7 @@ AC_ARG_ENABLE(  [thread-safe],
                                                         #endif
                                                      }]],
                                                     [[ pthread_mutex_t mutex;
-                                                       pthread_mutex_init(&mutex, NULL);
+                                                       pthread_mutex_init(&mutex, (const pthread_mutexattr_t*)0);
                                                        pthread_mutex_lock(&mutex);
                                                        pthread_mutex_unlock(&mutex);]]),
                                     [ AC_DEFINE(MUTEX_WORKS, 1, [POSIX mutex (pthread_mutex_t) is available])

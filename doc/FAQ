@@ -1,25 +1,46 @@
 QUESTIONS
 -----------
 
-Q1 - I restore/save all files but dar reported some files have been ignored, what are those ignored files?
+Q1 - I restore/save all files but dar reported some files have been ignored,
+     what are those ignored files?
 Q2 - Dar hangs when using it with pipes, why?
 Q3 - Why, when I restore 1 file, dar report 3 files have been restored?
 Q4 - I cannot find the binary package for my distro, where to look for?
-Q5 - Why, when does dar report "ignored" files while I make a backup without filters?
-Q6 - Can I use different filters between a full backup and a differential backup? Would not dar consider some file not included in the filter to be deleted?
+Q5 - Why, when does dar reports "ignored" files while I make a backup without
+     filters?
+Q6 - Can I use different filters between a full backup and a differential
+     backup? Would not dar consider some file not included in the filter to be
+     deleted?
+Q7 - Once in action dar makes all the system slower and slower, then it stops
+     with the message "killed"
 
 ANSWERS
 --------
 
-A1 - When restoring/saving, all files are considered by default. But if you specify some files to restore or save, all other files are "ignored", this is the case when using -P -X -I or -g.
+A1 - When restoring/saving, all files are considered by default. But if you
+specify some files to restore or save, all other files are "ignored", this is
+the case when using -P -X -I or -g.
 
-A2 - Dar can produce archive on its standard output, if you give '-' as basename. But it cannot read an archive from its standard input. To feed an archive to dar through pipes, you need dar_slave and two pipes. The first pipe transmits orders from dar to dar_slave that tell dar_slave the requested portion of the archive, the second pipe goes the other way and carries from dar_slave the data requested by dar. This way, only needed data get transmitted over pipes, which cannot be possible with a single pipe.
+A2 - Dar can produce archive on its standard output, if you give '-' as
+basename. But it cannot read an archive from its standard input. To feed an
+archive to dar through pipes, you need dar_slave and two pipes. The first pipe
+transmits orders from dar to dar_slave that tell dar_slave the requested
+portion of the archive, the second pipe goes the other way and carries from
+dar_slave the data requested by dar. This way, only needed data get transmitted
+over pipes, which cannot be possible with a single pipe.
 
-A3 - if you restore for example the file usr/bin/emacs dar will first restore usr (if the directory already exists, it will get its date and ownership restored, all existing files will be preserved), the /usr/bin is restored, then usr/bin/emacs is restored. Thus 3 inodes have been restored or modified while only one file has been asked for restoration.
+A3 - if you restore for example the file usr/bin/emacs dar will first restore
+usr (if the directory already exists, it will get its date and ownership
+restored, all existing files will be preserved), the /usr/bin is restored, then
+usr/bin/emacs is restored. Thus 3 inodes have been restored or modified while
+only one file has been asked for restoration.
 
-A4 - For any binary package, ask your distro maintainer to include dar (if not already done), and check on the web site of your preferite distro for a dar package.
+A4 - For any binary package, ask your distro maintainer to include dar (if not
+already done), and check on the web site of your preferite distro for a dar
+package.
 
-Q5 - If you give to dar an argument which is not an option, up to version 2.2.x it is interpreted as "to save that file only". Let's take an example:
+Q5 - If you give to dar an argument which is not an option, up to version 2.2.x
+it is interpreted as "to save that file only". Let's take an examplee:
 
    dar -c my-files -y -s 2045M data
 
@@ -34,13 +55,17 @@ reports
  0 files(s) recorded as deleted from reference backup
  --------------------------------------------
 
-the 147 files are due to the fact dar has excluded 147 files and directories which are not "data" in the current directory.
+the 147 files are due to the fact dar has excluded 147 files and directories
+which are not "data" in the current directory.
 
-Note also that the use arguments out of options like "data" is deprecated since version 2.2.0, you would rather use -g option:
+Note also that the use arguments out of options like "data" is deprecated since
+version 2.2.0, you would rather use -g option:
 
    dar -c my-files -y -s 2045M -g data
 
-In version 2.3.x such arguments which are not options will have another meaning.
+In version 2.3.x such arguments which are not options will have another
+meaning. Note that starting vesion 2.3.x the option -vs will report those entry
+that are skipped
 
 A6 - Yes, you can. No, there is no risk to have dar deleting the files that
 were not selected for the differential backup. Here is the way dar works:
@@ -53,3 +78,35 @@ of reference and the new one built during the backup process, and adds a
 is not present in the new catalogue. Thus, if an "ignored" is present no
 "detruit" will be added for that name. Then all "ignored" entries are
 removed and the catalogue is dumped in the archive.
+
+A7 - Dar needs virtual memory to work. Virtual memory is the RAM + SWAP space.
+Dar memory requirement grows with the amount of file saved, not with the amount
+of data saved. If you have a few huge files you will have little chance to see
+any memory limitation problem. At the opposite, saving a plethora of files
+(either big or small), will make dar request a lot of virtual memory. Dar needs
+this memory to build the catalogue (the contents) of the archive it creates.
+Same thing, for differential backup, except it also needs to load in memory
+the catalogue of the archive of reference, which most of the time will make dar
+using twice more memory when doing a differential backup than a full backup.
+
+Anyway, the solution is:
+1 - read the doc/LIMITATIONS file to understand the problem and be aware of the
+    limitations you will bring at step 3, bellow.
+2 - if you can, add swap space to your system (under Linux, you can either add
+    a swap partition or a swap file, which is less constraining but also a bit
+    less impressive). Bob Barry provided a script that can give you a raw
+    estimation of the required virtual memory (doc/samples/dar_rqck.bash).
+3 - if this is not enough, or if you don't want/can add swap space,
+    recompile dar giving --enable-mode=64 argument to the configure script.
+4 - if this not enough, and you have some money, you can add some RAM on you
+    system
+5 - if all that fails, ask for support on the dar-support mailing-list.
+6 - other solutions, make several smaller archives of the files to backup. For
+    example, make a backup for all in /usr/local another for all in /var and
+    so on. Theses backup can be full or differential. The drawback is not big
+    as you can store theses archive side by side and use them at will.
+    Moreover, you can feed a unique dar_manager database with all theses
+    different archives. This which will hide you the fact that there are
+    several full archives and several differential archives concerning
+    different set of files.
+

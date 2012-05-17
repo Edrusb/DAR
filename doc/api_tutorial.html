@@ -46,7 +46,7 @@ is the primary consumer.<br>
 </div>
 <br>
 <div style="text-align: justify;">The sample code provided here is
-solely illustrative and is not guarunteed to compile. More detailed API
+solely illustrative and is not guaranteed to compile. More detailed API
 documentation is contained in the source code and can be compiled to
 the doc/html directory using Doxygen. The API reference is also
 available <a href="http://dar.linux.free.fr/html/index.html">online</a>.<br>
@@ -71,7 +71,7 @@ libdar;</span> line at the beginning of your source files:<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -91,7 +91,7 @@ explicitly use the namespace in front of libdar objects :<br>
 <code></code>
 <table
  style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -110,7 +110,7 @@ methods. To the left is with exceptions, to the right without:<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -139,7 +139,7 @@ exception. The possible exception types follow:<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: 0px;"
- border="0" cellspacing="2" cellpadding="2">
+ border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top; width: 200px;"><code>class
@@ -219,7 +219,7 @@ data has been encountered<br>
     <tr>
       <td style="vertical-align: top;"><code>class libdar::Escript<br>
       </code></td>
-      <td style="vertical-align: top;">the script excecuted between
+      <td style="vertical-align: top;">the script executed between
 slices returned an error code<br>
       </td>
     </tr>
@@ -233,7 +233,7 @@ arguments given to a libdar call of the API<br>
     <tr>
       <td style="vertical-align: top;"><code>class libdar::Ecompilation<br>
       </code></td>
-      <td style="vertical-align: top;">a requested feature has not beed
+      <td style="vertical-align: top;">a requested feature has not been
 activated at compilation time<br>
       </td>
     </tr>
@@ -247,7 +247,7 @@ activated at compilation time<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -337,7 +337,7 @@ linking against wrong libdar"</code><code> &lt;&lt; std::endl;<br>
   </tbody>
 </table>
 <br>
-<io .h=""><dar>The get_version* family function must be called for
+The get_version* family function must be called for
 several reasons :<br>
 </dar></io>
 <ul>
@@ -363,12 +363,12 @@ get_version* several time if you wish, using any override.<br>
 </ul>
 <h2>2 - Let's see the available features</h2>
 once we have called a function of the <span style="font-style: italic;">get_version*</span>
-funtion it is possible to access the features activated at compilation
+function it is possible to access the features activated at compilation
 time:<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -426,7 +426,7 @@ libcrypto);<br>
 <div style="text-align: justify;">You can do what you want with the
 resulting values. It's possible to display the available libdar
 features or to terminate if you don't find a desired feature. However,
-verifying that features are available is not strictly neccesary because
+verifying that features are available is not strictly necesary because
 libdar will tell you if an operation you call requires a feature that
 has not been activated by throwing an Ecompile exception or returning
 the <span style="font-style: italic;">LIBDAR_ECOMPILATION</span> error
@@ -459,7 +459,7 @@ The question posed by <em>pause()</em> must be answered by returning
 "true" or throwing a <em><strong>Euser_abort</strong></em>
 exception if the user refused the proposition<span
  style="font-weight: bold;"><span style="font-weight: bold;">. </span></span>Don't
-worry about thowing an exception in your code; it will be trapped by
+worry about throwing an exception in your code; it will be trapped by
 libdar if you don't want to manage exceptions, and are using libdar in
 the "no exception" method. (<strong>NOTE</strong>: Unfortunately there
 is currently no way to send
@@ -511,7 +511,7 @@ like this (even if you don't want to use exceptions):<br>
 <code></code><code></code>
 <table
  style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -549,13 +549,13 @@ implemented using an instance of <span style="font-style: italic;">user_interact
 and three static functions in the module<span
  style="font-style: italic;"> dar_suite/shell_interaction.cpp</span> <br>
 <br>
-Pay atttention to the <span style="font-style: italic;">contextual</span>
+Pay attention to the <span style="font-style: italic;">contextual</span>
 value present in the arguments of theses callback functions :<br>
 &nbsp;<br>
 <code></code><code></code>
 <table
  style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -572,8 +572,8 @@ typedef class t_window_type t_win;<br>
 &nbsp; // this is an arbitrary type that here we will say<br>
 &nbsp; // points to a graphical window object wrapped in a C++<br>
 &nbsp; // class. <br>
-&nbsp; // Note that the show() wait_for_click() and so one<br>
-&nbsp; // methods attributed to the t_win class are absolutely<br>
+&nbsp; // Note that the method show() wait_for_click() and so on<br>
+&nbsp; // attributed to the t_win class are absolutely<br>
 &nbsp; // imaginary. Any link to an existing class is a pure <br>
 &nbsp; // coincidence...<br>
       <br>
@@ -604,8 +604,12 @@ std::string string_callback(const std::string &amp;x, bool echo, void
       <br>
 ---------8&lt;-------8&lt;-------8&lt;-------<br>
       <br>
-&nbsp; // So now each window can have it user_interaction object based
+&nbsp; // So now each window can have its user_interaction object based
 on the same<br>
+&nbsp; // user_interaction_callback object pointing to the same
+functions.<br>
+&nbsp; // user_interaction_callback objects can be shared among
+different window objects<br>
       <br>
 libdar::user_interaction_callback dialog = <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -614,7 +618,7 @@ libdar::user_interaction_callback(&amp;warning_callback,
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 (void *)get_current_windows_id());<br>
       <br>
-&nbsp; // just the "context" argument changes, and will be passed asis
+&nbsp; // just the "context" argument changes, and will be passed as is
 from the constructor to the callback<br>
 &nbsp; // functions<br>
       </code><br>
@@ -640,7 +644,7 @@ complex masks:<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: 0px;"
- border="0" cellspacing="2" cellpadding="2">
+ border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top; width: 200px;">class libdar::mask<br>
@@ -705,7 +709,7 @@ that contains the specified path itself<br>
       </td>
       <td style="vertical-align: top;">matches if the string is exactly
 the
-given mask (no wilde card expression)<br>
+given mask (no wild card expression)<br>
       </td>
     </tr>
     <tr>
@@ -725,7 +729,7 @@ Let's play with some masks :<br>
 <code></code><code></code>
 <table
  style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -789,7 +793,7 @@ matches any files)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // lastly, the NOT, AND and OR operation
 can be used recursively.<br>
       </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Frankly, it's
-possible to have masks reference eachother!</code><br>
+possible to have masks reference each other!</code><br>
       <code>&nbsp; libdar::not_mask m7 = m6;<br>
 &nbsp; m6.add_mask(m7);<br>
       <br>
@@ -823,7 +827,7 @@ Now that we have seen masks and exceptions let's start the real thing:<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -869,7 +873,7 @@ the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
 &nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
 &nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
-occurence<br>
+occurrence<br>
 &nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // nor do we want to pause between
 slices<br>
@@ -987,7 +991,7 @@ the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
 &nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
 &nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
-occurence<br>
+occurrence<br>
 &nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // nor do we want to pause between
 slices<br>
@@ -1061,7 +1065,7 @@ libdar<br>
 &nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of error the cause.<br>
       <br>
 if(exception != LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt; std::endl;<br>
       <br>
@@ -1074,13 +1078,13 @@ if(exception != LIBDAR_NOEXCEPT)<br>
 <div style="text-align: justify;">When creating an archive, the created
 archive object can be used only as reference for an isolation or for
 differential backups. You cannot use it for restoration, listing, or
-comparison, because the underlying file descriptors are openned in
+comparison, because the underlying file descriptors are opened in
 write only mode. An implementation which uses file descriptors in
 read-write access is not possible and is not a good idea anyway. Why?
 Because, for example, if you want to test the newly created archive,
 using the newly created object would make the test rely on information
 stored in virtual memory (the archive contents, the data location of a
-file, etc.), not on the file archive itself. If some corruption occured
+file, etc.), not on the file archive itself. If some corruption occurred
 in the file you would not notice it.<br>
 </div>
 <br>
@@ -1091,7 +1095,7 @@ used by the object :<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -1106,7 +1110,7 @@ libdar::close_archive_noexcept(my_arch, exception,<br>
 &nbsp; &nbsp; except_msg);<br>
       <br>
       </code><span class="el"><code>if(exception != LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 std::endl;<br>
@@ -1124,7 +1128,7 @@ this time with the "read" constructor:<br>
 </code>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -1177,7 +1181,7 @@ error the <br>
       <br>
 i</code></span><span class="el"><span class="el"><code>f(exception !=
 LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 std::endl;</code></span><br>
@@ -1194,7 +1198,7 @@ Let's thus start by testing the archive coherence:<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -1237,7 +1241,7 @@ error the <br>
       <br>
       </code></span><span class="el"><span class="el"><code>i</code></span><span
  class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 std::endl;<br>
@@ -1261,7 +1265,7 @@ value of an infinint variable:<br>
 <code></code><code></code>
 <table
  style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -1290,7 +1294,7 @@ there is actually no wrapper available to trap the exceptions that may
 be thrown by the class<span style="font-style: italic;"> deci</span>.
 So you have to protect the code using a<span style="font-style: italic;">
 <span style="font-weight: bold;">try {} catch {}</span></span>&nbsp;
-statment.<br>
+statement.<br>
 </div>
 <br>
 <h2>7 - listing archive contents</h2>
@@ -1298,7 +1302,7 @@ The simple way:<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -1338,7 +1342,7 @@ error the <br>
       <br>
       </code></span><span class="el"><span class="el"><code>i</code></span><span
  class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 endl;<br>
@@ -1352,7 +1356,7 @@ endl;<br>
 the listing by calling the<span style="font-style: italic;"> warning()</span>
 method of the <span style="font-style: italic;">dialog</span> object
 one time for each file listed. The warning text will consist of a
-string for each file with the relavant information in columns that
+string for each file with the relevant information in columns that
 would need to be parsed if individual information was desired. This may
 not be appropriate for you and as such there is another way to get
 listing information. This requires a simple reimplementation of the <em>user_interaction</em>
@@ -1361,7 +1365,7 @@ object.<br>
 The <span style="font-style: italic;">user_interaction</span> class
 has a<span style="font-style: italic;"> </span><span
  style="font-weight: bold; font-style: italic;">listing()</span> method
-which provides seperate arguments for each piece of information that
+which provides separate arguments for each piece of information that
 can be displayed:<br>
 <ul>
   <li>filename, </li>
@@ -1388,11 +1392,11 @@ is empty or not.</em></p>
 In the <span style="font-style: italic;">user_interaction</span> class
 (a virtual class), the <span style="font-style: italic;">listing()</span>
 method is not a pure virtual method, so you are not obliged to
-overwrite it, but it has just an empty implemtation so it does nothing.
+overwrite it, but it has just an empty implementation so it does nothing.
 You understand now that, by default, this method is not used. To
 activate it, you must call&nbsp;<span style="font-style: italic;">
 set_use_listing(true) </span>protected method and of course you will
-have to ovewrite the <span style="font-style: italic;">listing()</span>
+have to overwrite the <span style="font-style: italic;">listing()</span>
 method to have a less silly behavior:<br>
 <br>
 </p>
@@ -1401,7 +1405,7 @@ method to have a less silly behavior:<br>
 <code></code><code></code>
 <table
  style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -1489,7 +1493,7 @@ method :<br>
 <code></code><code></code>
 <table
  style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -1571,7 +1575,7 @@ of the <span style="font-style: italic;">class archive</span>.<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -1657,7 +1661,7 @@ error<br>
       <br>
       </code></span><span class="el"><span class="el"><code>i</code></span><span
  class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 std::endl;<br>
@@ -1677,7 +1681,7 @@ method of <em>class archive</em>.<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -1791,7 +1795,7 @@ error the <br>
       <br>
       </code></span><span class="el"><span class="el"><code>i</code></span><span
  class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 std::endl;<br>
@@ -1806,14 +1810,14 @@ std::endl;<br>
  style="font-style: italic;">catalogue </span>is not an English word
 (one would rather write <span style="font-style: italic;">catalog</span>),
 but that's the name of the C++ class used in libdar, so we will keep
-using it here. Note that you don't have to directly access to this
+using it here. Note that you don't have to directly access this
 class (if you really don't like French).<br>
 </div>
 <br>
 <div style="text-align: justify;">Isolating the catalogue creates a new
 archive that only contains the list of files and their attributes
 (ownership, dates, size, etc.), but no data and no EA are stored in it.
-It is very similar to the same archive one gets if he makes a
+It is very similar to the same archive one gets if one makes a
 differential backup of a filesystem that has not changed since the
 creation of a reference archive. The usage is very similar to the
 archive creation, but it uses a different constructor that has less
@@ -1823,16 +1827,16 @@ arguments :<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
  style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 libdar::archive *my_cat = new libdar::archive(dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-"/tmp",&nbsp; // where is saved the <br>
+"/tmp",&nbsp; // where the extracted <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp; // extracted catalogue<br>
+&nbsp; // catalogue is saved<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 my_arch, // the archive of reference<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1967,7 +1971,7 @@ case of error the <br>
       <br>
       </code></span><span class="el"><span class="el"><code>i</code></span><span
  class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 std::endl;<br>
@@ -1999,7 +2003,7 @@ closed:<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -2014,7 +2018,7 @@ close_archive_noexcept (my_cat, exception,<br>
 &nbsp; &nbsp; except_msg);<br>
       <br>
       </code><span class="el"><code>if(exception != LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 std::endl;</code></span><code> <br>
@@ -2043,7 +2047,7 @@ for exactly the same result.<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -2071,7 +2075,7 @@ the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
 &nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
 &nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
-occurence<br>
+occurrence<br>
 &nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // nor we want to pause between slices<br>
 &nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // rejected directory will be
@@ -2168,7 +2172,7 @@ the basename of the slices <br>
 &nbsp;&nbsp;&nbsp; &nbsp;"dar", // dar's slice extensions<br>
 &nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // we allow slice overwriting<br>
 &nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // but ask to be warned in such
-occurence<br>
+occurrence<br>
 &nbsp;&nbsp;&nbsp;&nbsp; false, // we don't want a verbose output<br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // nor we want to pause between slices<br>
 &nbsp;&nbsp;&nbsp; &nbsp;true,&nbsp; // rejected directory will be
@@ -2241,7 +2245,7 @@ libdar<br>
 &nbsp;&nbsp;&nbsp;&nbsp; except_msg); // and in case of error the cause.<br>
       <br>
 if(exception != LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 std::endl;<br>
@@ -2256,7 +2260,7 @@ anymore. So we destroy it:<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -2273,7 +2277,7 @@ libdar::close_archive_noexcept(my_other_arch,<br>
 &nbsp; &nbsp; except_msg);<br>
       <br>
       </code><span class="el"><code>if(exception != LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 std::endl;<br>
@@ -2291,7 +2295,7 @@ to destroy to cleanly release the memory used:<br>
 <br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -2306,7 +2310,7 @@ libdar::close_archive_noexcept(my_arch, exception,<br>
 &nbsp; &nbsp; except_msg);<br>
       <br>
       </code><span class="el"><code>if(exception != LIBDAR_NOEXCEPT)<br>
-&nbsp; std::cout &lt;&lt; "an error occured: " &lt;&lt; except_msg <br>
+&nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 std::endl;<br>
@@ -2332,7 +2336,7 @@ so you should only need to include this header.<br>
 <code></code><code></code>
 <table
  style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -2362,7 +2366,7 @@ adding <span style="font-style: italic; font-weight: bold;">-ldar</span>
 <code></code><code></code>
 <table
  style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td
@@ -2406,7 +2410,7 @@ files are interpreted by the compiler.<br>
 <code></code><code></code>
 <table
  style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellspacing="2" cellpadding="2">
+ border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td

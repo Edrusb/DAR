@@ -164,7 +164,7 @@ is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -
 Do not consider user ID (uid) or group ID (gid), when comparing with archive of reference (-c -A) while doing a differential backup, when extracting (-x) or when comparing (-d). This is useful when dar is used by a non-privileged user. It will not consider a file has changed just because it has only the uid or gid changed, nor report a comparison mismatch if only
 uid or gid is different.
 .TP 20
--H[num], --hour [num]
+-H[num], --hour[=num]
 if -H is used, two dates are considered equal if they differ from a integer number of hours, and that number is less than or equal to [num]. If not specified num defaults to 1. This is used when making a differential backup, to compare last_modification date of inodes, and at restoration time if the -r option (restore only more recent files) is used. This is to workaround some filesystems (like Samba filesystem) that seems to change the dates of files after having gone from or to daylight saving time (winter/summer time).
 .TP 20
 -E, --execute <string>
@@ -255,10 +255,10 @@ SAVING AND ISOLATION OPTIONS (to use with -c or -C)
 .RS
 .PP
 .TP 20
--z[level], --gzip [level]
+-z[level], --gzip[=level]
 compresses within slices using gzip algorithm (if not specified, no compression is performed). The compression level (an integer from 1 to 9) is optional. -z is equivalent to -z9 which is max compression/slow processing. At the opposite, 1 means less compression and faster processing.
 .TP 20
--y[level], --bzip2 [level]
+-y[level], --bzip2[=level]
 compresses using bzip2 algorithm. See -z above for usage details.
 .TP 20
 -s, --slice <number>

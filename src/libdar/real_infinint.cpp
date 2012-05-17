@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.18 2004/10/22 22:39:17 edrusb Rel $
+// $Id: real_infinint.cpp,v 1.18.2.1 2005/06/22 12:09:56 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -422,9 +422,6 @@ namespace libdar
 
         U_32 byte = bit/8;
         storage::iterator it = field->end();
-        U_I shift_retenue, r1 = 0, r2 = 0;
-        int_tools_bitfield bf;
-        unsigned char mask;
 
         if(*this == 0)
             return *this;
@@ -439,23 +436,29 @@ namespace libdar
 
         if(bit != 0)
         {
+	    U_I shift_retenue, r1 = 0, r2 = 0;
+	    int_tools_bitfield bf;
+	    unsigned char mask;
+
                 // and now the bit translation
+		// we have shift left one byte in place of 'bit' bits, so we shift right
+		// shift_retenue bits:
             shift_retenue = 8 - bit;
-            it = field->rbegin();
+            it = field->begin();
 
                 // the mask for selecting the retenue
             for(register U_I i = 0; i < 8; i++)
-                bf[i] = i < bit ? 1 : 0;
+                bf[i] = i < bit ? 0 : 1;
             int_tools_contract_byte(bf, mask);
 
-            while(it != field->rend())
+            while(it != field->end())
             {
                 r1 = (*it) & mask;
-                r1 >>= shift_retenue;
-                *it <<= bit;
+                r1 <<= bit;
+                *it >>= shift_retenue;
                 *it |= r2;
                 r2 = r1;
-                it--;
+                it++;
             }
             reduce();
         }
@@ -611,7 +614,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: real_infinint.cpp,v 1.18 2004/10/22 22:39:17 edrusb Rel $";
+        static char id[]="$Id: real_infinint.cpp,v 1.18.2.1 2005/06/22 12:09:56 edrusb Rel $";
         dummy_call(id);
     }
 

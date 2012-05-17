@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tronconneuse.cpp,v 1.4.2.1 2005/02/02 10:51:36 edrusb Rel $
+// $Id: test_tronconneuse.cpp,v 1.4.2.2 2005/09/11 18:35:47 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -44,6 +44,7 @@ extern "C"
 #include "tronconneuse.hpp"
 #include "shell_interaction.hpp"
 #include "deci.hpp"
+#include "cygwin_adapt.hpp"
 
 class test : public tronconneuse
 {
@@ -114,7 +115,7 @@ int main()
 
 void f1(user_interaction *dialog)
 {
-    int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT, 0644);
+    int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
     fichier fic = fichier(*dialog, fd);
 
     test *toto = new test(*dialog, 10, fic);
@@ -137,7 +138,7 @@ void f1(user_interaction *dialog)
 
 void f2(user_interaction *dialog)
 {
-    int fd = open("toto", O_RDONLY);
+    int fd = open("toto", O_RDONLY|O_BINARY);
     fichier fic = fichier(*dialog, fd);
 
     test *toto = new test(*dialog, 10, fic);
@@ -182,10 +183,10 @@ void f2(user_interaction *dialog)
 
 void f3(user_interaction *dialog)
 {
-    int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT, 0666);
+    int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0666);
     fichier foc = fichier(*dialog, fd);
 
-    fd = open("titi", O_WRONLY|O_TRUNC|O_CREAT, 0666);
+    fd = open("titi", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0666);
     fichier fic = fichier(*dialog, fd);
 
     WRITE_TO(foc, "Hello les amis");

@@ -32,7 +32,21 @@ pause_every_n_slice.duc  Denis Corbin   pause every N slice instead of every
 automatic_backup    Manuel Iglesias     automatic full/differential backup
                                         script, with automatic mounting unmount
                                         see automatic_backup.txt for more info
+
 automatic_backup.txt Manuel Iglesias    documentation for automatic_backup
 	                                script
 
 dar_backup          Matthew Caron       perl script wrapping: dar+parchive+growisofs
+
+dar_rqck.bash	    Bob Barry           bash script for Linux users to have raw
+                                        estimation of the required amount of
+                                        virtual memory to use to be able to
+                                        save the whole system.
+
+JH-readme.txt      Jakub Holy           description on how to use following
+                   (same author for     JH- prefixed files
+                 the 3 following files)
+JH-dar-make_user_backup.sh		Jakub's script
+JH_darrc				Jakub's darrc file
+JH_dar_archiver.options			Jakub's optional file
+
