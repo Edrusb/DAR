@@ -441,7 +441,7 @@ from 2.2.x to 2.3.0
 - change in API, the warning() method need not be overwritten, but the new protected method
   inherited_warning() must be inherited in its place (same function, same prototype
   as the original warning() method).
-- dar_manager features are now part of libdar. API has been completed with theses new features
+- dar_manager features are now part of libdar. API has been completed with these new features
 - added the "last_slice" context (%c with -E option) when creating an archive
 - dar now check a file has not been modified while it was reading it, if so it reports a warning and returns a specific exit code
 - remove included gettext from the package (it is more a source of conflict with external gettext and if somebody needs internationalization better is to install libintl/gettext on its own).
@@ -467,7 +467,7 @@ from 2.3.0 to 2.3.1
 - set back Nick Alcock's patch which has been dropped from 2.2.x to 2.3.x (patch name is "Do not moan about every single file on a non-ext2 filesystem")
 - fixed compilation problem when thread-safe code is disabled
 - integrated Wiebe Cazemier's patch for dar's man page
-- fixed bug in listing: -as option also listed files that had EA even when theses were not saved in the archive
+- fixed bug in listing: -as option also listed files that had EA even when these were not saved in the archive
 - file permission of installed sample scripts lacked the executable bit
 - fixed a bug that appeared when a file is removed while at the time it is saved by dar
 - avoid having an unnecessary warning appearing when restoring a file in a directory that has default EA set
@@ -587,3 +587,15 @@ from 2.3.8 to 2.3.9
 - Bug fix: during archive diff (only), dar restore atime of file in the backup
   instead of file in the system before opening it for reading.
 - tested dar with valgrind
+
+version 2.3.9 to 2.3.10
+- added patch by Jan-Pascal van Best to have -[ and -] options working with
+  archive merging
+- fixed bug in displaying dates [SF 2922417]
+- enhanced pseudo-random number generation used in dar
+- added an error message when an include/exclude file listing does not
+  contains an invalid path (instead of a self reported bug message).
+- modified message displayed when some slice of an old archive having the
+  same name are present in the destination directory (backup, isolation, merging,
+  dar_xform)
+

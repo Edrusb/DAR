@@ -31,9 +31,9 @@
       <div style="text-align: justify;">
       <h2>Introduction</h2>
       <div style="text-align: justify; margin-left: 40px;">Here take
-place a collection of notes. Theses have been created after
+place a collection of notes. These have been created after
 implementation of a given feature, mainly for further reference but
-also for user information. The ideas behind theses notes are to remind
+also for user information. The ideas behind these notes are to remind
 some choices of implementation, the arguments that lead to this choices
 in on side, and in the other side let the user have a room to be
 informed on the choices done and be able to bring his remarks without
@@ -146,7 +146,7 @@ EA and their value reference EA must reside in memory. As EA can grow
 up to 64 KB by file, this can lead to a quick saturation of the virtual
 memory, which is already enough solicited by the catalogue. <br>
       <br>
-Theses two schemes implies a different pattern for saving EA in
+These two schemes implies a different pattern for saving EA in
 archive. In the first case (no EA in memory except at time of operation
 on it), to avoid skipping in the archive (and ask the user to change of
 disks too often), EA must be stored beside the data of the file (if
@@ -193,7 +193,7 @@ to store the archive.<br>
       <div style="margin-left: 40px;"><br>
       </div>
       <div style="text-align: justify; margin-left: 40px;">Between
-theses two
+these two
 hosts, you could use NFS and nothing special would be necessary to add,
 to use dar as usually. but if for security reasons you don't want to
 use NFS (insecure network, local user must not have access to backups),
@@ -568,11 +568,11 @@ to
 dar, you have to possibility to give the size in byte or using a single
 letter as suffix (k or K, M, T, P, E, Z, Y) thus the possibility to
 provide a size in kilo, mega, tera, peta, exa, zetta or yotta byte,
-with the computer science definition of theses terms (power of 1024) by
+with the computer science definition of these terms (power of 1024) by
 default.<br>
       </div>
       <div style="margin-left: 40px;"><br>
-Theses suffixes are for simplicity and not to have to computer how much
+These suffixes are for simplicity and not to have to computer how much
 make powers of 1024. For example, if you want to fill a CD-R you will
 have to use the "-s 650M" option which is equivalent to "-s
 6815744400", choose the one you prefer, the result is the same :-).
@@ -612,7 +612,7 @@ a third way: I remember some time ago, I bought a hard disk which was
 described as "2.1 GB", (OK, that's several couple of years ago), but in
 fact it had only 2097152 bytes available. This is far from 2202009
 bytes (= 2.1 GiB for computer science meaning), and a bit more than
-2,000,000 bytes (metric system). OK, if it had theses 2202009 bytes
+2,000,000 bytes (metric system). OK, if it had these 2202009 bytes
 (computer science meaning of 2.1 GB), this hard disk would have been
 sold under the label "2.5 GB"! ... just kidding :-)<br>
       </div>
@@ -1144,7 +1144,7 @@ arguments] &lt; /dev/null &amp;</code></div>
       <div style="text-align: justify;">This concerns options -E and
 -F. They both receive a string as
 argument. Thus if the argument must be a command with its own
-arguments, you have to put theses between quotes for they appear as a
+arguments, you have to put these between quotes for they appear as a
 single string to the shell that interprets the dar command-line. For
 example if you want to call<br>
       </div>
@@ -1231,7 +1231,7 @@ it, and compare the resulting CD with the original slice. Upon failure,
 the script return 2 (or 1 if syntax is not correct on the
 command-line). Note that this script is only here for illustration,
 there are many more interesting user scripts made by several dar users.
-Theses are available in the examples part of the documentation.<br>
+These are available in the examples part of the documentation.<br>
       </div>
       <br>
 One could then use it this way:<br>
@@ -1551,7 +1551,7 @@ If for slice the extension and even the filename format cannot be
 customized, (basename.slicenumber.dar) there is not mandatory rule for
 the other type of files.<br>
       <br>
-In the case you have no idea how to name theses, here is what I use:<br>
+In the case you have no idea how to name these, here is what I use:<br>
 configuration files receive "<span style="font-weight: bold;">.dcf</span>"
 as extension, (Dar Configuration file)<br>
 while database receive&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ".<span style="font-weight: bold;">dmd</span>" as extension, (Dar Manager
@@ -1881,20 +1881,20 @@ bind to dar through the -E option, and are launch after slice creation
 or before slice reading.</li>
         <li>- DCF files (Dar Configuration Files), are text files, that
 extend the command line arguments. They must respect a well defined
-syntax (see man page 'conditional syntax' for details). Theses
+syntax (see man page 'conditional syntax' for details). These
 configuration files are bind to dar through the -B option.</li>
       </ul>
       <div style="text-align: justify;"><br>
 In the following we will present two DUC files, and one DCF file.&nbsp;
 All
-theses files are distributed and normally installed under
+these files are distributed and normally installed under
 $prefix/shared/dar directory where $prefix is /usr/local by default, or
 else the path given to --prefix=... configure option.<br>
       <br>
 The discussion here is to show how to use PAR with DAR. Two DUC files
 are available for that. They are intended to be called between slice by
 dar thanks to dar's -E option. the first "dar_par_create.duc" generates
-redundancy files for each slice. Theses files will be required later if
+redundancy files for each slice. These files will be required later if
 corruption occurred on a slice. This script is expected to be used when
 creating an archive (-c option or -C option). <br>
       </div>
@@ -1927,7 +1927,7 @@ replaces respectively by the path, basename, slice number, extension,
 context of the last slice created or the next slice to read depending
 on the operation asked (backup or restore for example). See dar's man
 page and chapter XV of this file below for more. Now, to avoid you
-having to type all theses -E options, a DCF file named "dar_par.dcf" is
+having to type all these -E options, a DCF file named "dar_par.dcf" is
 provided. You can thus replace the -E options and arguments by<br>
       <br>
 &nbsp;&nbsp;&nbsp; <code>-B /usr/local/share/dar/samples/dar_par.dcf</code><br>
@@ -2249,7 +2249,7 @@ OK, here we save all under /h<span style="font-style: italic;">ome/ftp</span>
 and <span style="font-style: italic;">/fake</span> but we do not save
 the contents of "<span style="font-style: italic;">*/.mozilla/*/[Cc]ache</span>"
 like for example "<span style="font-style: italic;">/home/ftp/.mozilla/ftp/abcd.slt/Cache</span>"
-directory and its contents. In theses directories we save any file
+directory and its contents. In these directories we save any file
 matching "<span style="font-style: italic;">*.[Mm][pP][123]</span>"
 files except those ending by a tilde (~ character), Thus for example
 file which name is "<span style="font-style: italic;">toto.mp3</span>"
@@ -2282,7 +2282,7 @@ filtering (-Z and -Y options) that defines which file to compress or to
 not compress, here too the way they work is the same as seen with -X
 and -I options, the <span style="font-style: italic;">-ano-case</span>
 / <span style="font-style: italic;">-acase</span> options do also
-apply here, as well as the -am option. Last all theses filtering (file,
+apply here, as well as the -am option. Last all these filtering (file,
 EA, compression) can also use regular expression in place of glob
 expression (thanks to the <span style="font-style: italic;">-ag</span>
 /<span style="font-style: italic;"> -ar</span> options).<br>
@@ -2359,8 +2359,8 @@ Let's take an example with blowfish. Blowfish encrypts by multiple of 8
 bytes (blowfish chain block cypher). An elastic buffer is always added
 to the data of a encryption block, its minimal size is 1 byte. <br>
       <br>
-Thus, if you request a encryption block of 3 bytes, theses 3 bytes will
-be padded by an elastic buffer of 5 bytes for theses 8 bytes to be
+Thus, if you request a encryption block of 3 bytes, these 3 bytes will
+be padded by an elastic buffer of 5 bytes for these 8 bytes to be
 encrypted. This will make a very poor compression ratio as only 3 bytes
 on 8 bytes are significant.<br>
       <br>
@@ -2503,12 +2503,12 @@ There will thus no be any "detruit" objects, but a file may be present
 or may be missing in a given archive. The solution is thus that once an
 archive has been integrated in the database, the last step is to scan
 the whole database for files that have no date associated with this
-last archive, thus we can assume theses files were not present and add
+last archive, thus we can assume these files were not present and add
 the date of the archive creation with the information that this file
 was removed at that time. Moreover, if the last archive add a file
 which was not know in archives already present in the database, we must
-consider this file was deletes in each of theses previous archives, but
-then we must record the dates of creation for all theses previous
+consider this file was deletes in each of these previous archives, but
+then we must record the dates of creation for all these previous
 archive to be able to put this information properly in the database.
 But, in that case we would not be able to make dar remove a file, as no
 "detruit" object exist (all archive are full backups), and dar_manager
@@ -2524,7 +2524,7 @@ itself. <br>
       <br>
 Assuming we accept to make dar_manager able to rm entries from
 filesystem without relying on dar, we must store the date of the
-archive creation in each archive, and store theses dates for each
+archive creation in each archive, and store these dates for each
 archive in dar_manager databases. Then instead of using the mtime of
 each file, we could do something much more simple in database: for each
 file, record if it was present or not in each archive used to built the
@@ -2640,7 +2640,7 @@ has several advantages but also drawbacks:<br>
         <li>it is not necessary to read or even have available the
 whole archive to perform the following operations : list, extract,
 isolate, feed dar_manager with an archive. This greatly improves
-execution time for theses operations (compare a huge archive listing
+execution time for these operations (compare a huge archive listing
 with 'tar' for illustration)<br>
         </li>
         <li>with archive overall offset to locate each file's data, it
@@ -2662,9 +2662,9 @@ one slice (of course). Thus one cannot test a single slice, one cannot
 recover a file from an orphan slice.<br>
         </li>
       </ul>
-Theses drawbacks have appeared with dar's usage and not at design time
+These drawbacks have appeared with dar's usage and not at design time
 unfortunately. Thus several things have to be taken into account to
-improve dar on theses points:<br>
+improve dar on these points:<br>
       <ul>
         <li>backward compatibility (dar must be able to read old
 archives)</li>
@@ -2708,16 +2708,16 @@ adding this file in the slice contents? <br>
 compressed it may seem it will not fit int the remaining space of the
 slice while it may fit if the compression worked well on its data. To
 complicate a bit more in the opposite way encryption may lead to store
-more data than the expected file size... Difficult in theses terms to
+more data than the expected file size... Difficult in these terms to
 know in advance what to do when reaching the end of a slice.<br>
         </li>
       </ul>
       <ul>
         <li>Now, we have seen that at each slice boundary there is a
 high probability to have a file be split between two slices... The
-question is&nbsp; how to handle theses files? They cannot be restored
+question is&nbsp; how to handle these files? They cannot be restored
 neither from the first nor from the second slice, I guess ignoring
-theses files from slice contents (and only having them at archive
+these files from slice contents (and only having them at archive
 contents) is the best way. Then, any huge file which may be stored
 across several dozen slices for example will not be possible to
 restore unless you have the overall archive contents (as it is today).
@@ -2754,7 +2754,7 @@ files from a single slice... how then to take care of them?<br>
         <li>As last point, there is a very important implementation
 aspect. If you want to have a robust program you have to build it with
 as
-much as possible different independent group of code. Theses groups of
+much as possible different independent group of code. These groups of
 indepedent code
 may be a single function, a module (= a set of function gathered in a
 single file + header file), a class (Object Oriented concept), a
@@ -2771,7 +2771,7 @@ In particular
 one class is responsible of managing the archive slicing while another
 is responsible to defining the archive global layout (some other
 classes are for compression, encryption, file filtering, and so on).
-Theses two first classes (slicing and archive layout) are completely
+These two first classes (slicing and archive layout) are completely
 independent, the slicing class's well defined interface is to provide a
 normal arbitrary long virtual file where to read or write data. Data
 read or wrote to this virtual file is then stored in different smaller

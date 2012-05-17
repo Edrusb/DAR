@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.hpp,v 1.53.2.12 2009/05/21 16:50:18 edrusb Rel $
+// $Id: libdar.hpp,v 1.53.2.14 2010/04/09 16:10:09 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -124,7 +124,7 @@ namespace libdar
 	///  libdar Medium version defined at compilation time
     const U_I LIBDAR_COMPILE_TIME_MEDIUM = 4;
 	///  libdar Minor version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MINOR = 4;
+    const U_I LIBDAR_COMPILE_TIME_MINOR = 5;
 
 	////////////////////////////////////////////////////////////////////////
 	// LIBDAR INITIALIZATION METHODS                                      //
@@ -450,6 +450,8 @@ namespace libdar
 	/// ask that any libdar code running in the thread given as argument be cleanly aborted
 	/// when the execution will reach the next libdar checkpoint
 	/// \param[in] tid is the Thread ID to cancel libdar in
+	/// \param[in] immediate whether to cancel thread immediately or just signal the request to the thread
+	/// \param[in] flag an arbitrary value passed as-is through libdar
     inline extern void cancel_thread(pthread_t tid, bool immediate = true, U_64 flag = 0) { thread_cancellation::cancel(tid, immediate, flag); }
 
 	/// consultation of the cancellation status of a given thread

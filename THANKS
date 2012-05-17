@@ -1,3 +1,12 @@
+version 2.3.10
+--------------
+Thanks to Patrick G. for feedback and help solving the bug [SF 2922417],
+and to Jan-Pascal van Best for his patch.
+
+version 2.3.9
+--------------
+Thanks to Jan-Pascal van Best for bug report and patch.
+
 version 2.3.8
 --------------
 Thanks to smartyxt for bug report. A big thank you to Szymon Juraszczyk for

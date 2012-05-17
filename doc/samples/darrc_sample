@@ -32,7 +32,7 @@ create:
 
 -R /
 
-# we don't save theses directories
+# we don't save these directories
 -P tmp
 -P var/tmp
 -P mnt

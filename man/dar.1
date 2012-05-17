@@ -49,7 +49,7 @@ This, of course, has its limitations, in particular when data corruption occurs 
 Slices have a base name given on the command line, which is completed by a dot, a number, a dot and the extension (dar) to form a filename. On the command line you will never have to give the full file name of a slice.
 .TP 20
 Let's take an example:
-considering the base name "joe", dar will make one or several slices during backup process. The filenames with of theses slices are: joe.1.dar joe.2.dar ... joe.10.dar ... etc.
+considering the base name "joe", dar will make one or several slices during backup process. The filenames with of these slices are: joe.1.dar joe.2.dar ... joe.10.dar ... etc.
 If you want to extract, list, or use this backup as reference, you will only have to use the base name, which is the string "joe" in this example.
 
 .SH OPTIONS
@@ -58,7 +58,7 @@ If you want to extract, list, or use this backup as reference, you will only hav
 .B COMMANDS:
 .PP
 .B Important note:
-Not all system actually support long options (Solaris, FreeBSD, ...). For example --create will not be available on theses systems, and you will have to use -c instead. In the same way, not all system do support optional arguments (FreeBSD without GNU getopt for example), you then need to explicitly give the argument, for example in place of "-z" you will need to give "-z 9", see "EXPLICIT OPTIONAL ARGUMENTS" paragraph near the end of this document.
+Not all system actually support long options (Solaris, FreeBSD, ...). For example --create will not be available on these systems, and you will have to use -c instead. In the same way, not all system do support optional arguments (FreeBSD without GNU getopt for example), you then need to explicitly give the argument, for example in place of "-z" you will need to give "-z 9", see "EXPLICIT OPTIONAL ARGUMENTS" paragraph near the end of this document.
 
 .TP 20
 -c, --create [<path>/]<basename>
@@ -127,7 +127,7 @@ man page for more informations.
 -g, --go-into <path>
 Files or directory to only take in account, as opposed to -P. -g may be present several time on command-line. Same thing here, the difference with -I is that the mask is applied to the path+filename and also concerns directories. By default all files under the -R directory are considered. Else, if one or more -g option is given, just those are selected (if they do not match any -P option). All paths given this way must be relative to the -R directory. This is equivalent as giving <path> out of any option.
 .B Warning,
--g option cannot receive wild-cards, theses would not be interpreted.
+-g option cannot receive wild-cards, these would not be interpreted.
 .TP 20
 -[, --include-from-file <listing_file>
 Files listed in the listing file are included for the operation. No wild card expression is interpreted in the listing file, the null character is not allowed and the carriage return is used to separate file names (one file name per line). Note that this option applies to any files and directory exactly as -g does, with an important difference however: -g option only uses relative paths to the root directory (the directory given with the -R option), while -[ can use absolute path as well. Another difference is when the argument is a directory -g will include all the subdirectories under that directory, while when the same entry is found in a listing file given to -[ only that directory will be included, no subdirectory or subfile would be enrolled in the backup, with -[ you need to list the exact set of file you want to backup. You can thus generate a listing file with the 'find / -print > somefile' command and give 'somefile' as argument to -[ option. Note that however, dar will not save files out of the -R given root directory tree.
@@ -139,7 +139,7 @@ Files listed in the listing file are excluded from the operation. If a directory
 .P
 As seen above, -I -X -P, -g, -[ and -] options are used to select the files to operate on. -I and -X only use the name of files and do not apply to directories, while -P, -g -[ and -] use the filename *and* the path, they *do* apply to directories.
 .P
-since version 2.2.0 two modes of interpretation of theses options exist. The normal original method and the ordered method:
+since version 2.2.0 two modes of interpretation of these options exist. The normal original method and the ordered method:
 .RS
 .TP 5
 the normal method is the default:
@@ -276,7 +276,7 @@ when using k M G T E Z Y prefixes to define a size, use the SI meaning: multiple
 -abinary, --alter=binary[-unit[s]]
 when using k M G T E Z Y prefixes to define a size, use the historical computer science meaning: multiple of 2^10  (a Mega is 1,048,576).
 .P
-The --alter=SI and --alter=binary options can be used several times on the command line. They affect all prefixes which follow, even those found in files included by the -B option, up to the next --alter=binary or --alter=SI occurrence. Note that if in a file included by the -B option, an --alter=binary or --alter=SI is encountered, it affects all the following prefixes, even those outside the included files. For example, when running with the parameters "-B some.dcf -s 1K", 1K may be equal to 1000 or 1024, depending on --alter=binary or --alter=SI being present in the some.dcf file. By default (before any --alter=SI/binary option is reached), binary interpreration of prefixes is done, for compatibility with older versions.
+The --alter=SI and --alter=binary options can be used several times on the command line. They affect all prefixes which follow, even those found in files included by the -B option, up to the next --alter=binary or --alter=SI occurrence. Note that if in a file included by the -B option, an --alter=binary or --alter=SI is encountered, it affects all the following prefixes, even those outside the included files. For example, when running with the parameters "-B some.dcf -s 1K", 1K may be equal to 1000 or 1024, depending on --alter=binary or --alter=SI being present in the some.dcf file. By default (before any --alter=SI/binary option is reached), binary interpretation of prefixes is done, for compatibility with older versions.
 .TP 20
 -Q
 Do not display an initial warning on stderr when not launched from a terminal
@@ -365,7 +365,7 @@ same as -* but for the auxiliary archive of reference (-@ option).
 -D, --empty-dir
 When excluding directories either explicitly using -P or -] options, or implicitly by giving a -g or -[ options (a directory is excluded if it does not match mask given with -g options or -[ options)
 .B dar
-does not store anything about theses. But with -D option, dar stores them as empty directories. This can be useful, if excluding a mount point (like /proc or /dev/pts). At restoration time, dar will then recreate theses directories (if necessary). This option has no meaning with -C and is ignored in that case.
+does not store anything about these. But with -D option, dar stores them as empty directories. This can be useful, if excluding a mount point (like /proc or /dev/pts). At restoration time, dar will then recreate these directories (if necessary). This option has no meaning with -C and is ignored in that case.
 .TP 20
 -Z, --exclude-compression <mask>
 Filenames covered by this mask are not compressed. It is only useful with -z or -y. By default, all file are compressed (if compression is used). This option can be used several times, in that case a file that matches one of the -Z mask will not be compressed.
@@ -533,7 +533,7 @@ an error occurred while executing user command (given with -E or -F option). Mai
 an error has occurred when calling a libdar routine. This means the caller (dar program), did not respect the specification of the API (and this can be considered as a particular case of a bug).
 .TP 10
 8
-the version of dar used is based in finite length integers (it has been compiled with the option --enable-mode=...). This code is returned when an integer overflow occurred. use the full version (based in infinint) to avoid this error.
+the version of dar used is based in finite length integers (it has been compiled with the option --enable-mode=...). This code is returned when an integer overflow occurred. use the full version (based in the so called "infinint" class) to avoid this error.
 .TP 10
 9
 this code indicates an unknown error. I have probably forgotten to update the exception caching code to take care of new exceptions... this is a minor bug you are welcome to report.
@@ -585,7 +585,7 @@ and
 .B /etc/darrc
 if present are read for configuration option. They share the same syntax as file given to -B option. If $HOME/.darrc is not present and only in that case, /etc/darrc is consulted. You can still launch /etc/darrc from .darrc using a statement like
 .B -B /etc/darrc.
-None of theses file need to be present, but if they are they are parsed AFTER any option on the command line and AFTER included files from the command line (files given to the -B option). NOTE: if $HOME is not defined $HOME/.darrc default to /.darrc (at the root of the filesystem).
+None of these file need to be present, but if they are they are parsed AFTER any option on the command line and AFTER included files from the command line (files given to the -B option). NOTE: if $HOME is not defined $HOME/.darrc default to /.darrc (at the root of the filesystem).
 
 Else you can see
 .B conditional syntax
@@ -663,6 +663,9 @@ all:
 Last point, you may have several time the same condition (several
 .B all:
 ) for example. They will be concatenated together.
+
+.SH EXAMPLES
+You can find some more examples of use in the tutorial, mini-howto, sample scripts, and other related documentation. All these are available in dar's source package, and are also installed beside dar in the <--prefix>/share/dar directory. This documentation is also available online at http://dar.linux.free.fr/doc/index.html#2
 
 .SH SEE ALSO
 dar_xform(1), dar_slave(1), dar_manager(1), dar_cp(1)

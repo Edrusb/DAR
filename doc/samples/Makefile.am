@@ -1,5 +1,5 @@
 NO_EXE_SAMPLES = darrc_sample sample1.txt  README automatic_backup.txt JH-readme.txt JH_dar_archiver.options JH_darrc cluster_digital_readme.txt index.html
-EXE_SAMPLES = cdbackup.sh pause_every_n_slice.duc automatic_backup dar_backup dar_rqck.bash JH-dar-make_user_backup.sh cluster_digital_backups.sh dar_par_create.duc dar_par_test.duc MyBackup.sh MyBackup.sh.bash_completion.d.file
+EXE_SAMPLES = cdbackup.sh pause_every_n_slice.duc automatic_backup dar_backup dar_rqck.bash JH-dar-make_user_backup.sh cluster_digital_backups.sh dar_par_create.duc dar_par_test.duc MyBackup.sh.tar.gz
 dist_noinst_DATA = $(NO_EXE_SAMPLES) $(EXE_SAMPLES) dar_par.dcf
 
 

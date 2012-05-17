@@ -2,7 +2,7 @@
 <html><head><title>Libdar API - Tutorial</title>
 
 
-  
+
   <meta content="Denis Corbin" name="author">
   <meta content="Tutorial for using libdar library" name="description"></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
@@ -612,7 +612,7 @@ and three static functions in the module<span style="font-style: italic;"> dar_s
       </div>
       <br>
 Pay attention to the <span style="font-style: italic;">contextual</span>
-value present in the arguments of theses callback functions : </td>
+value present in the arguments of these callback functions : </td>
     </tr>
   </tbody>
 </table>
@@ -624,7 +624,7 @@ value present in the arguments of theses callback functions : </td>
       <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
       </code><code><br>
 &nbsp; // our own callback functions. <br>
-&nbsp; // for the illustration of what theses 'context' arguments<br>
+&nbsp; // for the illustration of what these 'context' arguments<br>
 &nbsp; // can be used for we will imagine the situation where<br>
 &nbsp; // multiple windows or multiple threads may each one use <br>
 &nbsp; // libdar, but all share the same callback functions.<br>
@@ -914,7 +914,7 @@ Instead, since libdar 4.0.0 the <span style="font-style: italic;">fs_root</span>
 argument is expended to an absolute path, so if in the previous
 example, your current directory was <span style="font-style: italic;">/var</span>
 your masks will be used against strings like "<span style="font-style: italic;">/var/tmp/A/some/file</span>". Of course
-there is no difference between theses two libdar revisions when the <span style="font-style: italic;">fs_root</span> argument is an absolute
+there is no difference between these two libdar revisions when the <span style="font-style: italic;">fs_root</span> argument is an absolute
 path.<br>
       <br>
 An exception is the test operation, which has no <span style="font-style: italic;">fs_root</span> argument (because the
@@ -1051,7 +1051,7 @@ full backup<br>
 time of<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
 change the<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of theses files
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of these files
       <br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // we may cross to other filesystems if<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
@@ -1195,7 +1195,7 @@ full backup<br>
 time of<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
 change the<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of theses files
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of these files
       <br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // we may cross to other filesystems if<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
@@ -1315,7 +1315,7 @@ archive <br>
 archive extensions<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; libdar::crypto_blowfish, <br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 20480, // theses three previous
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 20480, // these three previous
 are
 for encryptions<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // not used
@@ -1336,7 +1336,7 @@ archive <br>
 archive extensions<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; libdar::crypto_blowfish, <br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 20480, // theses three previous
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 20480, // these three previous
 are
 for encryptions<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "",&nbsp;&nbsp;&nbsp; // not used
@@ -1443,7 +1443,7 @@ creating an archive as well as when testing it.&nbsp; This object
 reports the number of files treated, as well as the number files with
 errors and the type of error. You can have a look at the API reference
 guide concerning the archive class methods, for more information about
-the uses of theses different fields. Here is
+the uses of these different fields. Here is
 an example, which relies on the <span style="font-style: italic;"><span style="font-weight: bold;">class deci</span> </span>to display the
 value of an infinint variable:<br>
       </div>
@@ -1838,7 +1838,7 @@ user_interaction object is not overwritten) a listing like tar would
 do. In place of <span style="font-weight: bold; font-style: italic;">normal</span>
 you can use <span style="font-style: italic; font-weight: bold;">tree</span>
 or <span style="font-weight: bold; font-style: italic;">xml</span>.
-Note that for theses two new formats the <span style="font-style: italic;">listing()</span> is never used, so even if
+Note that for these two new formats the <span style="font-style: italic;">listing()</span> is never used, so even if
 you provide a object which listing() method is overwritten, the <span style="font-style: italic;">archive::op_listing()</span> method will
 still use the <span style="font-style: italic;">warning()</span>
 method of this <span style="font-style: italic;">user_interaction</span>
@@ -2640,7 +2640,7 @@ full backup<br>
 time of<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
 change the<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of theses files
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of these files
       <br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // we may change of filesystem if<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
@@ -2748,7 +2748,7 @@ full backup<br>
 time of<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // file it opens, which will
 change the<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of theses files
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // ctime date of these files
       <br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // we may change of filesystem if<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // necessary<br>
@@ -2929,20 +2929,20 @@ steps described above assume you
 have a "<span style="font-style: italic;">full</span>" libdar library.
 Beside the <span style="font-style: italic;">full</span> (alias <span style="font-style: italic;">infinint</span>) libdar flavor, libdar
 also comes in 32 and 64 bits
-versions. In theses last ones, in place of internally relying on a
+versions. In these last ones, in place of internally relying on a
 special type (which
 is a C++ class called<span style="font-style: italic;"> infinint</span>)
 to
 handle arbitrary large integers, libdar32 relies on 32 bits integers
 and
 libdar64 relies on 64 bits integers (there are limitations which are
-described in doc/LIMITATIONS). But all theses libdar version (infinint,
+described in doc/LIMITATIONS). But all these libdar version (infinint,
 32bits, 64bits) have the same
 interface and must be used the same way, except for compilation and
 linking.<br>
       </div>
       <br>
-      <div style="text-align: justify;">Theses different libdar
+      <div style="text-align: justify;">These different libdar
 versions can
 coexist on the same system, they
 share the same include files. But the MODE macro must be set to 32
@@ -2988,7 +2988,7 @@ with libdar64. <br>
       <br>
       <div style="text-align: justify;">Note that libdar*.pc files are
 installed in the <span style="font-style: italic;">$(PREFIX)/lib/pkgconfig</span>
-file that should simplify (depending on the point of view) all theses
+file that should simplify (depending on the point of view) all these
 operations.
 For example, if you have all different flavors of libdar installed, the
       <span style="font-style: italic;">$(PREFIX)/lib/pkgconfig</span>
@@ -3389,7 +3389,7 @@ location of most recent file versions</li>
       </ul>
       <div style="text-align: justify;">Well, you might now say that as
 description this is a bit light for a
-tutorial, yes. In fact theses call are really very simple to use, you
+tutorial, yes. In fact these call are really very simple to use, you
 can find a complete description in the reference documentation of the
 API. This documentation is built if doxygen is available and is put
 under doc/html after calling make in the source

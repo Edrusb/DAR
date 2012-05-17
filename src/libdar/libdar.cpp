@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.70.2.5 2008/02/09 11:14:38 edrusb Rel $
+// $Id: libdar.cpp,v 1.70.2.6 2010/02/27 10:07:42 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -37,6 +37,10 @@ extern "C"
 
 #if HAVE_LIBINTL_H
 #include <libintl.h>
+#endif
+
+#if HAVE_STDLIB_H
+#include <stdlib.h>
 #endif
 
 } // end extern "C"
@@ -147,6 +151,7 @@ using namespace std;
 namespace libdar
 {
     static void libdar_init_thread_safe();
+    static void libdar_init_srand();
 
     void get_version(U_I & major, U_I & minor)
     {
@@ -158,6 +163,7 @@ namespace libdar
         major = LIBDAR_COMPILE_TIME_MAJOR;
         minor = LIBDAR_COMPILE_TIME_MINOR;
 	libdar_init_thread_safe();
+	libdar_init_srand();
 	NLS_SWAP_OUT;
     }
 
@@ -185,6 +191,7 @@ namespace libdar
 	medium = LIBDAR_COMPILE_TIME_MEDIUM;
         minor = LIBDAR_COMPILE_TIME_MINOR;
 	libdar_init_thread_safe();
+	libdar_init_srand();
 	NLS_SWAP_OUT;
     }
 
@@ -435,7 +442,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.70.2.5 2008/02/09 11:14:38 edrusb Rel $";
+        static char id[]="$Id: libdar.cpp,v 1.70.2.6 2010/02/27 10:07:42 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -532,6 +539,12 @@ namespace libdar
 	user_group_bases::class_init();
 #endif
     }
+
+    static void libdar_init_srand()
+    {
+	srand(time(NULL)+getpid()+getppid());
+    }
+
 
     statistics op_extract_noexcept(user_interaction & dialog,
 				   archive *ptr,

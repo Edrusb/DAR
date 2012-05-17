@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.39.2.9 2009/04/07 08:45:29 edrusb Rel $
+// $Id: tools.hpp,v 1.39.2.13 2010/04/09 16:10:09 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -500,8 +500,8 @@ namespace libdar
 
 	/// convert string for xml output
 
-	/// \note any < > & ' and " are replaced by adequate sequence for unicode
-	/// `note second point, nothing is done here to replace system native strings to unicode
+	/// \note any < > & quote and double-quote are replaced by adequate sequence for unicode
+	/// \note second point, nothing is done here to replace system native strings to unicode
     extern std::string tools_output2xml(const std::string & src);
 
 	/// Produces the in "dest" the XORed value of "src" for the 'n' first bytes
@@ -511,6 +511,14 @@ namespace libdar
 	/// \param[in] n is the number of byte to convert from src to dest
 	/// \note dest *must* be a valid pointer to an allocated memory area of at least n bytes
     extern void tools_memxor(void *dest, const void *src, size_t n);
+
+
+	/// Produces a pseudo random number x, where 0 <= x < max
+
+	/// \param[in] max defines the range of the random number to return
+	/// \return the returned value ranges from 0 (zero) to max - 1. max
+	/// is never retured, max - 1 can be returned.
+    extern U_I tools_pseudo_random(U_I max);
 
 
 	/// Template for the decomposition of any number in any base (decimal, octal, hexa, etc.)

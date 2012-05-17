@@ -13,13 +13,13 @@ all-local: Doxyfile.tmp
 Doxyfile.tmp:
 	sed -e "s%##VERSION##%@PACKAGE_VERSION@%g" Doxyfile > Doxyfile.tmp
 	cd .. ; $(DOXYGEN) doc/Doxyfile.tmp
+	if [ -d html/search ]; then chmod u+x html/search ; fi
 
 clean-local:
 	rm -rf html Doxyfile.tmp
 
 install-data-hook:
-	$(INSTALL)  -d $(DESTDIR)$(pkgdatadir)/html
-	$(INSTALL) -m 0644 html/* $(DESTDIR)$(pkgdatadir)/html
+	cp -dR --preserve=mode html $(DESTDIR)$(pkgdatadir)
 	$(INSTALL_HTML_MAN)
 
 uninstall-hook:

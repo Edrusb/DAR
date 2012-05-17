@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask_list.hpp,v 1.1.2.2 2008/02/02 14:10:50 edrusb Rel $
+// $Id: mask_list.hpp,v 1.1.2.3 2009/07/25 20:13:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -56,7 +56,9 @@ namespace libdar
             /// \param[in] filename_list_st is the path to the file listing the
             /// filename to select for the operation
             /// \param[in] case_sensit whether comparison is case sensitive or not
-            /// \param[in] prefix add this (absolute) prefix to relative paths of the list
+            /// \param[in] prefix add this prefix to relative paths of the list. The
+	    /// prefix should be either absolute, or "<ROOT>" (in case of operations
+	    /// on an existing archive)
 	    /// \param[in] include whether the mask_list is used for file inclusion or file exclusion
         mask_list(const std::string & filename_list_st, bool case_sensit, const path & prefix, bool include);
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.26.2.5 2008/02/09 17:41:29 edrusb Rel $
+// $Id: generic_file.cpp,v 1.26.2.6 2010/02/23 18:27:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -458,7 +458,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.26.2.5 2008/02/09 17:41:29 edrusb Rel $";
+        static char id[]="$Id: generic_file.cpp,v 1.26.2.6 2010/02/23 18:27:41 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -570,7 +570,7 @@ namespace libdar
                     throw Erange("fichier::open", string(gettext("Cannot open file : ")) + strerror(errno));
 	    }
         }
-        while(errno == ENOSPC);
+        while(filedesc < 0 && errno == ENOSPC);
     }
 
     gf_mode generic_file_get_mode(S_I fd)

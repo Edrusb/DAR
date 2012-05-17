@@ -246,10 +246,10 @@ mailing-list</a>.</li>
       <div style="text-align: justify;">There is still a workaround
 which is to make several smaller archives
 of the files to backup. For example, make a backup for all in
-/usr/local another for all in /var and so on. Theses backup can be full
-or differential. The drawback is not big as you can store theses
+/usr/local another for all in /var and so on. These backup can be full
+or differential. The drawback is not big as you can store these
 archive side by side and use them at will. Moreover, you can feed a
-unique dar_manager database with all theses different archives. This
+unique dar_manager database with all these different archives. This
 which will hide you the fact that there are several full archives and
 several differential archives concerning different set of files.<br>
       </div>
@@ -1240,7 +1240,7 @@ instead of plain usernames and usergroups?</span>
       <p>In each file property there is
 not present the name of the owner nor the name of the group owner, but
 instead are present two numbers, the user ID and the group ID (UID
-&amp; GID in short). In the /etc/password file theses numbers are
+&amp; GID in short). In the /etc/password file these numbers are
 associated names and other properties, like the login shell, the home
 directory, the password (see also /etc/shadow).
 Thus, when you do a directory list (with the 'ls' command for example
@@ -1303,7 +1303,7 @@ restoring</span>
       <p style="margin-left: 40px;">If dar had done else, restoring
 the files owned by <span style="font-style: italic;">'bin'</span> to
 the UID corresponding to <span style="font-style: italic;">'bin',</span>
-theses
+these
 files would have been given UID 2 (the one used by the temporary
 bootable system used to launch dar). But once the real restored system
 would
@@ -1323,7 +1323,7 @@ has launched dar.<br>
       </p>
       <p>But if you really need to move a
 directory tree containing a set of files with different ownership and
-you want to preserve theses different ownership from one live system to
+you want to preserve these different ownership from one live system to
 another, while the corresponding UID/GID do not match between the two
 system, dar can still help you:<br>
       </p>
@@ -1355,7 +1355,7 @@ globally modify ownership of a directory tree user by user</span><br>
 (UID
 100), Paul (UID 101), Jacques (UID 102)<br>
 but on the <span style="font-weight: bold;">destination</span> system,
-theses same users are mapped to
+these same users are mapped to
 different UID: Pierre has UID 101, Paul has UID 102 and Jacques has UID
 100.<br>
       <br>
@@ -1428,7 +1428,7 @@ containing the '-J &lt;key&gt;' option to be passed for dar. The dar's
 of your system to have a chance to read the key you have used for your
 archives,<br>
         </li>
-        <li>add theses extracted catalogue to the dar_manager database
+        <li>add these extracted catalogue to the dar_manager database
 of your choice,</li>
         <li>change the name and path of the added catalogue to point to
 your real encrypted archives (-b and -p options of dar_manager).</li>
@@ -1532,7 +1532,7 @@ during my studies, I can explain briefly here the constraints. A
 program can use several processor if the algorithm it uses is able to
 be parallelized. Such an algorithm can either statically (at
 programming time) or dynamically (at execution time) be cut in several
-independent execution threads. Theses different execution threads must
+independent execution threads. These different execution threads must
 be as much autonomous as possible between them, if you don't want to
 have one thread waiting for another (which is not what we want). The
 constraint is this: if you cannot have different threads with no or
@@ -1660,7 +1660,7 @@ For libdar, this is the same, you must pay attention not having two or
 more different threads acting on the same data. Libdar provides a set
 of classes, which can be seen as a set of type (like a C struct) with
 associated functions (known as methods in the object oriented world).
-From theses classes, your program will create objects: each object *is*
+From these classes, your program will create objects: each object *is*
 a variable. Technically, invoking a method on an object is exactly the
 same as invoking a function giving it as hidden argument a pointer to
 the object ; while semantically, invoking a method is a way to read or
@@ -1672,7 +1672,7 @@ this variable (=this object) at a given time.<br>
       <br>
 Note that internally libdar uses some static variables. By static
 variables, I mean variable that exist even when no thread is running a
-libdar function or method. Theses variables are enclosed in critical
+libdar function or method. These variables are enclosed in critical
 sections for libdar's user may use it normally. In other words, this is
 transparent to you. For example, to cancel a libdar call, the mechanism
 uses an array in which the tid (thread id) by which a call is ran must

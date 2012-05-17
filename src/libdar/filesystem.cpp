@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.45.2.7 2009/03/24 08:52:01 edrusb Rel $
+// $Id: filesystem.cpp,v 1.45.2.8 2009/11/22 12:32:44 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -1311,7 +1311,7 @@ namespace libdar
 		stack_dir.push_back(directory(*x_dir));
 	    }
 
-            ret = false;
+            throw;
         }
 
         return ret;
@@ -1504,7 +1504,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.45.2.7 2009/03/24 08:52:01 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.45.2.8 2009/11/22 12:32:44 edrusb Rel $";
         dummy_call(id);
     }
 

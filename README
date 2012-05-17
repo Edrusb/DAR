@@ -20,7 +20,7 @@ Actually dar is a set of six commands:
 	            support static linking)
         dar_cp
 
-And since version 2.0.0 theses commands are based on a library called
+And since version 2.0.0 these commands are based on a library called
 libdar. This library is part of dar and licensed under the GNU General
 Public License (GPL in the following) like all the source code of the Dar
 suite programs. This imply that you can link libdar to your programs at

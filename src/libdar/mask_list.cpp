@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask_list.cpp,v 1.2.2.4 2008/03/01 20:49:41 edrusb Rel $
+// $Id: mask_list.cpp,v 1.2.2.6 2010/04/06 20:56:23 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -147,7 +147,7 @@ namespace libdar
 	    delete [] buffer;
 
 		// completing relative paths of the list
-	    if(prefix.is_relative())
+	    if(prefix.is_relative() && !prefix.is_subdir_of("<ROOT>", true))
 		throw Erange("mask_list::mask_list", gettext("Mask_list's prefix must be an absolute path"));
 	    else
 	    {
@@ -165,10 +165,12 @@ namespace libdar
 			    *it = current.display();
 			}
 		    }
-		    catch(Erange & e)
+		    catch(Egeneric & e)
 		    {
-			e.dump();
-			throw SRC_BUG;
+			string err = e.get_message();
+			string line = *it;
+
+			throw Erange("mask_list::mask_list", tools_printf(gettext("Error met while reading line\n\t%S\n from file %S: %S"), &line, &filename_list_st, &err));
 		    }
 		    it++;
 		}
@@ -195,7 +197,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: mask_list.cpp,v 1.2.2.4 2008/03/01 20:49:41 edrusb Rel $";
+        static char id[]="$Id: mask_list.cpp,v 1.2.2.6 2010/04/06 20:56:23 edrusb Rel $";
         dummy_call(id);
     }
 

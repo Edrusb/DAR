@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.18 2009/05/09 21:15:56 edrusb Rel $
+// $Id: tools.cpp,v 1.54.2.22 2010/04/09 16:10:09 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -276,7 +276,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.54.2.18 2009/05/09 21:15:56 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.54.2.22 2010/04/09 16:10:09 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -436,12 +436,18 @@ namespace libdar
     string tools_display_date(infinint date)
     {
         time_t pas = 0;
-        string ret;
+	char *str = NULL;
 
         date.unstack(pas);
-        ret = ctime(&pas);
+        str = ctime(&pas);
+	if(str == NULL) // system conversion failed. Using a replacement string
+	    return deci(date).human();
+	else
+	{
+	    string ret = str;
 
-        return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n'
+	    return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n'
+	}
     }
 
     infinint tools_convert_date(const string & repres)
@@ -1300,7 +1306,7 @@ namespace libdar
 		try
 		{
 		    if(warn_overwriting)
-			dialog.pause(tools_printf(gettext("At least one slice of an old archive with the same basename remains in the directory %s , If you do not remove these all first, you will have difficulty identifying the last slice of the archive you are about to create, because it may be hidden in between slices of this older archive. Do we remove the old archive's slices first ?"), c_chemin.c_str()));
+			dialog.pause(tools_printf(gettext("At least one slice of an old archive with the same name remains in the directory %s. It is advised to remove all the old archive's slices before creating an archive of same name. Can I remove these old slices?"), c_chemin.c_str()));
 		    if(!dry_run)
 			tools_unlink_file_mask(dialog, c_chemin, file_mask, info_details);
 		}
@@ -1314,7 +1320,7 @@ namespace libdar
 
     void tools_add_elastic_buffer(generic_file & f, U_32 max_size)
     {
-        elastic tic = (time(NULL) % (max_size - 1)) + 1; // range from 1 to max_size
+        elastic tic = 1 + tools_pseudo_random(max_size); // range from 1 to max_size
         char *buffer = new char[max_size];
 
 	if(buffer == NULL)
@@ -1605,6 +1611,11 @@ namespace libdar
 
 	for (size_t i = 0; i < n; i++)
 	    *d++ ^= *s++;
+    }
+
+    U_I tools_pseudo_random(U_I max)
+    {
+	return (U_I)(max*((float)(rand())/RAND_MAX));
     }
 
 
