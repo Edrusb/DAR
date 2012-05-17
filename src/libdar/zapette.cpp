@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: zapette.cpp,v 1.35 2011/04/17 16:36:36 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -345,12 +341,6 @@ namespace libdar
     {
         S_I tmp = 0;
         make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_END_TRANSMIT, NULL, "", tmp, file_size);
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: zapette.cpp,v 1.35 2011/04/17 16:36:36 edrusb Rel $";
-        dummy_call(id);
     }
 
     bool zapette::skip(const infinint & pos)

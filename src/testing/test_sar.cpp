@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_sar.cpp,v 1.17 2011/04/17 16:36:36 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 #include <iostream>

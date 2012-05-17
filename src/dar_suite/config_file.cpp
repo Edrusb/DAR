@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: config_file.cpp,v 1.11 2011/03/06 13:08:17 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -166,10 +162,4 @@ bool config_file::find_next_target(generic_file &f, infinint & debut, string & n
     }
 
     return found;
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: config_file.cpp,v 1.11 2011/03/06 13:08:17 edrusb Rel $";
-    dummy_call(id);
 }

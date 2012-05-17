@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: int_tools.hpp,v 1.6 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file int_tools.hpp
     /// \brief elementary operation for infinint integers

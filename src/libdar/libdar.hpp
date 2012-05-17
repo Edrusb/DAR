@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: libdar.hpp,v 1.70.2.5 2012/04/15 10:36:44 edrusb Exp $
-//
-/*********************************************************************/
-//
 
     // NOTE : The following comments are used by doxygen to generate the documentation of reference
 

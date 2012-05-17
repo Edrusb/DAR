@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: getopt_decision.h,v 1.6 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file getopt_decision.h
     /// \brief switch routine to define which file to include based on the result of the configure script

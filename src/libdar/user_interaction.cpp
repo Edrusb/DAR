@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: user_interaction.cpp,v 1.35 2011/05/20 10:23:07 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -410,16 +407,6 @@ namespace libdar
 	else
 	    return ret;
     }
-
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: user_interaction.cpp,v 1.35 2011/05/20 10:23:07 edrusb Rel $";
-        dummy_call(id);
-    }
-
-
-
 
 } // end of namespace
 

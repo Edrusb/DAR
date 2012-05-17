@@ -18,10 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar.cpp,v 1.97 2011/03/31 15:52:00 edrusb Rel $
-//
-/*********************************************************************/
-//
+
 #include "../my_config.h"
 #include <string>
 #include <iostream>
@@ -625,13 +622,6 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
         return ret;
     }
 }
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: dar.cpp,v 1.97 2011/03/31 15:52:00 edrusb Rel $";
-    dummy_call(id);
-}
-
 
 static void display_sauv_stat(user_interaction & dialog, const statistics & st)
 {

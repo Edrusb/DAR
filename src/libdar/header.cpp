@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: header.cpp,v 1.34.2.1 2012/02/12 20:43:34 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -236,13 +233,6 @@ namespace libdar
         fichier fic = fichier(dialog, dup(fd));
         write(dialog, fic);
     }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: header.cpp,v 1.34.2.1 2012/02/12 20:43:34 edrusb Exp $";
-        dummy_call(id);
-    }
-
 
     bool header::get_first_slice_size(infinint & size) const
     {

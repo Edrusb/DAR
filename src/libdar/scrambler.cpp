@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: scrambler.cpp,v 1.18 2010/08/31 20:45:04 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -92,13 +89,6 @@ namespace libdar
         }
 
         ref->write((char *)buffer, size);
-    }
-
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: scrambler.cpp,v 1.18 2010/08/31 20:45:04 edrusb Rel $";
-        dummy_call(id);
     }
 
 } // end of namespace

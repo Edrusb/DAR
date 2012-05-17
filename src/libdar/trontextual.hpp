@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: trontextual.hpp,v 1.4.2.1 2012/02/19 17:25:09 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file trontextual.hpp
     /// \brief class trontextual is a contextual variant of class tronc

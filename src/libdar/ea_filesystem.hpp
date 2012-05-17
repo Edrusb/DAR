@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: ea_filesystem.hpp,v 1.9.2.1 2012/02/12 20:43:34 edrusb Exp $
-//
-/*********************************************************************/
-//
 
     /// \file ea_filesystem.hpp
     /// \brief filesystem dependent Extended Attributes operations

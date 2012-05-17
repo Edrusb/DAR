@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: hash_fichier.cpp,v 1.8 2011/06/02 13:17:37 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -168,12 +164,6 @@ namespace libdar
 #else
 	throw Ecompilation(gettext("Missing hashing algorithms support (which is part of strong encryption support, using libgcrypt)"));
 #endif
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: hash_fichier.cpp,v 1.8 2011/06/02 13:17:37 edrusb Rel $";
-        dummy_call(id);
     }
 
     void hash_fichier::dump_hash()

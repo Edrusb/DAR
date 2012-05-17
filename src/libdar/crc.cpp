@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: crc.cpp,v 1.12.2.1 2012/02/12 20:43:34 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -129,12 +126,6 @@ namespace libdar
 	    if(++pointer == end)
 		pointer = begin;
 	}
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: crc.cpp,v 1.12.2.1 2012/02/12 20:43:34 edrusb Exp $";
-        dummy_call(id);
     }
 
     static void n_compute(const char *buffer, U_I length, unsigned char * begin, unsigned char * & pointer, unsigned char * end, U_I crc_size)

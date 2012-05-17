@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sar.hpp,v 1.51.2.1 2011/07/23 16:36:31 edrusb Rel $
-//
-/*********************************************************************/
-
 
     /// \file sar.hpp
     /// \brief the sar class holds all the slicing feature

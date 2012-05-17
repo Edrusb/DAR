@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: my_config.h,v 1.10 2009/12/18 11:48:47 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #ifndef MY_CONFIG_H
 #define MY_CONFIG_H

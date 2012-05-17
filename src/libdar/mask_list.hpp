@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: mask_list.hpp,v 1.8 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file mask_list.hpp
     /// \brief here lies a mask that selects files present in a given list

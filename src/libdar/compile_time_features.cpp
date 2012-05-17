@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: compile_time_features.cpp,v 1.2.2.1 2012/01/12 20:20:47 edrusb Exp $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -61,12 +57,6 @@ namespace libdar
 #else
 	    return false;
 #endif
-	}
-
-	static void dummy_call(char *x)
-	{
-	    static char id[]="$Id: compile_time_features.cpp,v 1.2.2.1 2012/01/12 20:20:47 edrusb Exp $";
-	    dummy_call(id);
 	}
 
 	bool special_alloc()

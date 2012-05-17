@@ -18,12 +18,9 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: memory_file.hpp,v 1.12.2.1 2012/02/19 17:25:09 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file memory_file.hpp
-    /// \brief Memory_file is a generic_file class that only uses virtual memory    /// \ingroup Private
+    /// \brief Memory_file is a generic_file class that only uses virtual memory
     /// \ingroup Private
 
 #ifndef MEMORY_FILE_HPP

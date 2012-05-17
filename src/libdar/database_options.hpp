@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database_options.hpp,v 1.6.2.2 2011/12/13 21:24:54 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file database_options.hpp
     /// \brief this file holds the options for database operations

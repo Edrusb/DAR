@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar.hpp,v 1.7 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file dar.hpp
     /// \brief main module for dar command-line tool

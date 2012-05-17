@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: macro_tools.hpp,v 1.38 2011/04/09 19:55:08 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file macro_tools.hpp
     /// \brief macroscopic tools for libdar internals

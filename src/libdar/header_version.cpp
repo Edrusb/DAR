@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: header_version.cpp,v 1.12 2010/02/20 17:19:03 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -38,11 +34,5 @@ extern "C"
 namespace libdar
 {
 
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: header_version.cpp,v 1.12 2010/02/20 17:19:03 edrusb Rel $";
-        dummy_call(id);
-    }
 
 } // end of namespace

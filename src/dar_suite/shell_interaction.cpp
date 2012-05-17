@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: shell_interaction.cpp,v 1.35 2011/02/11 20:23:41 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -395,8 +392,3 @@ static secu_string interaction_secu_string(const string & message, bool echo, vo
     return ret;
 }
 
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: shell_interaction.cpp,v 1.35 2011/02/11 20:23:41 edrusb Rel $";
-    dummy_call(id);
-}

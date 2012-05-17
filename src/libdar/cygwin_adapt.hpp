@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: cygwin_adapt.hpp,v 1.8 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file cygwin_adapt.hpp
     /// \brief thin adaptation layer to Cygwin specifities

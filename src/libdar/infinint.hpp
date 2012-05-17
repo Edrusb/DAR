@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: infinint.hpp,v 1.12 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
-//
 
     /// \file infinint.hpp
     /// \brief switch module to limitint (32 ou 64 bits integers) or infinint

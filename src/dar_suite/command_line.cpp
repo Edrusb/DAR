@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.156.2.2 2012/04/13 07:59:07 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -1570,12 +1567,6 @@ static void usage(user_interaction & dialog, const char *command_name)
     dialog.printf("       %s -h\n", name.c_str());
     dialog.printf("       %s -V\n", name.c_str());
 #include "dar.usage"
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: command_line.cpp,v 1.156.2.2 2012/04/13 07:59:07 edrusb Exp $";
-    dummy_call(id);
 }
 
 static void show_warranty(user_interaction & dialog)

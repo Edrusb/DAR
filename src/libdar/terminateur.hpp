@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: terminateur.hpp,v 1.15 2011/04/11 17:12:01 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file terminateur.hpp
     /// \brief the terminateur class which defines the position of the catalogue

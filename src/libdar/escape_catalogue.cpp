@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: escape_catalogue.cpp,v 1.25.2.3 2012/04/16 20:56:41 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -587,12 +584,6 @@ namespace libdar
 	min_read_offset = ref.min_read_offset;
 	depth = ref.depth;
 	wait_parent_depth = ref.wait_parent_depth;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: escape_catalogue.cpp,v 1.25.2.3 2012/04/16 20:56:41 edrusb Exp $";
-        dummy_call(id);
     }
 
     void escape_catalogue::destroy()

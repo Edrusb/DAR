@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: secu_string.cpp,v 1.4.2.1 2012/03/29 19:37:43 edrusb Exp $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -106,12 +102,6 @@ namespace libdar
 
 	*string_size += lu;
 	mem[*string_size] = '\0';
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: secu_string.cpp,v 1.4.2.1 2012/03/29 19:37:43 edrusb Exp $";
-        dummy_call(id);
     }
 
     void secu_string::reduce_string_size_to(U_I pos)

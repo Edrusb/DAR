@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: line_tools.hpp,v 1.12 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
-
 
     /// \file line_tools.hpp
     /// \brief a set of general command line targeted routines

@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tronc.cpp,v 1.27 2011/04/17 13:12:30 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -202,12 +199,6 @@ namespace libdar
         return true;
     }
 
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: tronc.cpp,v 1.27 2011/04/17 13:12:30 edrusb Rel $";
-        dummy_call(id);
-    }
 
     U_I tronc::inherited_read(char *a, U_I size)
     {

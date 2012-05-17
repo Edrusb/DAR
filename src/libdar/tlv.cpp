@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tlv.cpp,v 1.4.2.2 2012/02/19 17:25:09 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -79,12 +76,6 @@ namespace libdar
 	    contents.set_raw_data(*value);
 	else
 	    contents.set_raw_data(storage(0));
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: tlv.cpp,v 1.4.2.2 2012/02/19 17:25:09 edrusb Exp $";
-        dummy_call(id);
     }
 
     void tlv::init(generic_file & f)

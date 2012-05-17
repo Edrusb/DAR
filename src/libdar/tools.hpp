@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tools.hpp,v 1.85.2.1 2012/04/09 14:28:33 edrusb Exp $
-//
-/*********************************************************************/
-
 
     /// \defgroup Tools Tools
     /// \brief a set of tool routine

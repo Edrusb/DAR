@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.51.2.1 2012/04/15 10:36:44 edrusb Exp $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -229,12 +225,6 @@ static bool command_line(user_interaction & dialog,
     tools_split_path_basename(argv[optind], chemin, filename);
     tools_check_basename(dialog, *chemin, filename, EXTENSION);
     return true;
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: dar_slave.cpp,v 1.51.2.1 2012/04/15 10:36:44 edrusb Exp $";
-    dummy_call(id);
 }
 
 static void show_usage(user_interaction & dialog, const char *command)

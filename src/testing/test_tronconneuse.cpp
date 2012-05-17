@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_tronconneuse.cpp,v 1.11 2010/02/24 11:26:03 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 

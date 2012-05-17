@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: crc.hpp,v 1.8.2.2 2012/02/19 17:25:08 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file crc.hpp
     /// \brief class crc definition, used to handle Cyclic Redundancy Checks

@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sparse_file.hpp,v 1.20.2.3 2012/02/19 22:15:05 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file sparse_file.hpp
     /// \brief class sparse_file definition, used to handle holes in files

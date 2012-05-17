@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: escape.hpp,v 1.25 2011/04/17 18:43:39 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file escape.hpp
     /// \brief class escape definition, used for sequential reading of archives

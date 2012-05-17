@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.113.2.5 2012/03/30 06:52:03 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -2375,12 +2372,6 @@ namespace libdar
 	    throw Ethread_cancel(false, 0);
     }
 
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: filtre.cpp,v 1.113.2.5 2012/03/30 06:52:03 edrusb Exp $";
-        dummy_call(id);
-    }
 
     static bool save_inode(user_interaction & dialog,
 			   const string & info_quoi,

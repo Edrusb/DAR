@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_erreurs.cpp,v 1.9 2009/12/18 10:10:21 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 #include <iostream>

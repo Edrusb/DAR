@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: defile.cpp,v 1.12 2009/12/18 10:10:21 edrusb Rel $
-//
-/*********************************************************************/
-
 
 #include "../my_config.h"
 #include "defile.hpp"
@@ -58,12 +54,6 @@ namespace libdar
             }
 	}
 	cache = chemin.display();
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: defile.cpp,v 1.12 2009/12/18 10:10:21 edrusb Rel $";
-        dummy_call(id);
     }
 
 } // end of namespace

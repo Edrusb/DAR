@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: erreurs.hpp,v 1.24.2.1 2012/02/25 14:43:44 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file erreurs.hpp
     /// \brief contains all the excetion class thrown by libdar

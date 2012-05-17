@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive.cpp,v 1.135.2.1 2011/08/06 14:28:38 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -615,13 +611,6 @@ namespace libdar
 	    throw;
 	}
 	NLS_SWAP_OUT;
-    }
-
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: archive.cpp,v 1.135.2.1 2011/08/06 14:28:38 edrusb Rel $";
-        dummy_call(id);
     }
 
     statistics archive::op_extract(user_interaction & dialog,

@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: crypto.hpp,v 1.21 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
-//
 
     /// \file crypto.hpp
     /// \brief the crypto algoritm definition

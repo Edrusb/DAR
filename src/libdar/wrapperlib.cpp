@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: wrapperlib.cpp,v 1.18 2010/02/26 18:33:27 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -132,12 +129,6 @@ namespace libdar
         if(bz_ptr != NULL)
             delete bz_ptr;
 #endif
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: wrapperlib.cpp,v 1.18 2010/02/26 18:33:27 edrusb Rel $";
-        dummy_call(id);
     }
 
 ////////////// Zlib routines /////////////

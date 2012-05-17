@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.46.2.1 2012/02/12 20:43:34 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -416,12 +413,6 @@ namespace libdar
 	active_write = ref.active_write;
     }
 
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: generic_file.cpp,v 1.46.2.1 2012/02/12 20:43:34 edrusb Exp $";
-        dummy_call(id);
-    }
 
     gf_mode generic_file_get_mode(S_I fd)
     {

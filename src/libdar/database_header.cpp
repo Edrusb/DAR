@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database_header.cpp,v 1.7.2.1 2011/12/28 18:07:06 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -160,9 +157,3 @@ namespace libdar
     }
 
 } // end of namespace
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: database_header.cpp,v 1.7.2.1 2011/12/28 18:07:06 edrusb Exp $";
-    dummy_call(id);
-}

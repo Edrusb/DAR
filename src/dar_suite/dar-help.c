@@ -21,16 +21,6 @@
 //        which will forward, or give you Chris's email upon his agreement
 //
 /*********************************************************************/
-// $Id: dar-help.c,v 1.11 2009/12/18 11:48:47 edrusb Rel $
-//
-/*********************************************************************/
-
-void no_compiler_warning(char *x)
-{
-    char rcsid[] =
-"$Id: dar-help.c,v 1.11 2009/12/18 11:48:47 edrusb Rel $";
-    no_compiler_warning(rcsid);
-}
 /*
  * Using libxml2 to format the DAR help text.
  *

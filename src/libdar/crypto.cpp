@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: crypto.cpp,v 1.37 2011/05/29 16:00:07 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -99,14 +95,7 @@ namespace libdar
 	}
     }
 
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: crypto.cpp,v 1.37 2011/05/29 16:00:07 edrusb Rel $";
-        dummy_call(id);
-    }
-
 ///////////////////////////// CRYPTO_SYM IMPLEMENTATION ////////////////////////////////
-
 
     crypto_sym::crypto_sym(U_32 block_size,
 			   const secu_string & password,

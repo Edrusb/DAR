@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tlv_list.hpp,v 1.4.2.1 2012/02/19 17:25:09 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file tlv_list.hpp
     /// \brief List of Generic Type Length Value data structures

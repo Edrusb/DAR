@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: secu_string.hpp,v 1.4.2.2 2012/02/19 17:25:09 edrusb Exp $
-//
-/*********************************************************************/
-//
 
     /// \file secu_string.hpp
     /// \brief this file contains the definition of secu_string class, a std::string like class but allocated in secure memory

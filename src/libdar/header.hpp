@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: header.hpp,v 1.19.2.1 2012/02/12 20:43:34 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file header.hpp
     /// \brief slice header structure is defined here

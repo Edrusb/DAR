@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tronconneuse.hpp,v 1.27 2011/04/17 13:12:30 edrusb Rel $
-//
-/*********************************************************************/
-//
 
     /// \file tronconneuse.hpp
     /// \brief defines a block structured file.

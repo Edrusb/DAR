@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: config_file.hpp,v 1.10 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file config_file.hpp
     /// \brief specific routines to manages included files's targets

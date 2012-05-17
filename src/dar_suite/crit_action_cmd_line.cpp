@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: crit_action_cmd_line.cpp,v 1.11 2011/05/27 12:29:18 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 

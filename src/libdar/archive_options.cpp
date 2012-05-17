@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive_options.cpp,v 1.38.2.1 2012/02/25 14:43:44 edrusb Exp $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -1287,14 +1283,6 @@ namespace libdar
 	    throw;
 	}
     }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: archive_options.cpp,v 1.38.2.1 2012/02/25 14:43:44 edrusb Exp $";
-        dummy_call(id);
-    }
-
-
 
 } // end of namespace
 

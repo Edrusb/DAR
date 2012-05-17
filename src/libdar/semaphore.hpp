@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: semaphore.hpp,v 1.4.2.1 2012/02/19 17:25:09 edrusb Exp $
-//
-/*********************************************************************/
-//
 
     /// \file semaphore.hpp
     /// \brief definition of class semaphore, used to manage invocation of backup hook for files

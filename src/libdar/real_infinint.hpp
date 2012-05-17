@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: real_infinint.hpp,v 1.26.2.2 2012/02/25 14:43:44 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file real_infinint.hpp
     /// \brief the original infinint class implementation

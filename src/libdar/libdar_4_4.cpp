@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: libdar_4_4.cpp,v 1.15.2.2 2011/07/21 14:29:01 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -799,12 +796,6 @@ namespace libdar_4_4
 					   progressive_report,
 					   exception,
 					   except_msg));
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: libdar_4_4.cpp,v 1.15.2.2 2011/07/21 14:29:01 edrusb Exp $";
-        dummy_call(id);
     }
 
     void tools_4_4_build_compatible_overwriting_policy(bool allow_over,

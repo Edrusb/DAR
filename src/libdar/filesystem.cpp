@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.77.2.4 2012/04/03 12:24:24 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -1846,12 +1843,6 @@ namespace libdar
 	else
 	    if(unlink(s) < 0)
 		throw Erange("supprime (file)", string(gettext("Cannot remove file ")) + s + " : " + strerror(errno));
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: filesystem.cpp,v 1.77.2.4 2012/04/03 12:24:24 edrusb Exp $";
-        dummy_call(id);
     }
 
     static void make_owner_perm(user_interaction & dialog,

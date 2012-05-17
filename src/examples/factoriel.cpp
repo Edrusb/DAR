@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: factoriel.cpp,v 1.18 2011/01/05 18:04:17 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -123,10 +119,4 @@ static int little_main(user_interaction & ui, int argc, char * const argv[], con
     }
 
     return EXIT_OK;
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: factoriel.cpp,v 1.18 2011/01/05 18:04:17 edrusb Rel $";
-    dummy_call(id);
 }

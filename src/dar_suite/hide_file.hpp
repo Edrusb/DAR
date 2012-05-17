@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: hide_file.hpp,v 1.18 2011/04/17 13:12:29 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file hide_file.hpp
     /// \brief contains class of base to split files in words

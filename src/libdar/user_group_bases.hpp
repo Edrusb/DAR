@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: user_group_bases.hpp,v 1.4 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file user_group_bases.hpp
     /// \brief defines class that speed up the uid to username and gid to group name lookup

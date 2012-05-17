@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: etage.cpp,v 1.24 2010/08/27 20:44:24 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -168,13 +165,6 @@ namespace libdar
 	    throw;
 	}
     }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: etage.cpp,v 1.24 2010/08/27 20:44:24 edrusb Rel $";
-        dummy_call(id);
-    }
-
 
     bool etage::read(string & ref)
     {

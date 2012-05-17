@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: thread_cancellation.hpp,v 1.15 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file thread_cancellation.hpp
     /// \brief to be able to cancel libdar operation while running in a given thread.

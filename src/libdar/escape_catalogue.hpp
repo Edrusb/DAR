@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: escape_catalogue.hpp,v 1.14.2.2 2012/02/19 22:15:05 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file escape_catalogue.hpp
     /// \brief class escape_catalogue definition. Used for sequential writing to archives, as well as several other inherited classes from catalogue.hpp

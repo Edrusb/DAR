@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.31 2011/04/17 13:12:29 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -623,12 +620,6 @@ namespace libdar
 	    lzo_read_start = 0;
 	    lzo_read_size = 0;
 	}
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: compressor.cpp,v 1.31 2011/04/17 13:12:29 edrusb Rel $";
-        dummy_call(id);
     }
 
     void compressor::clean_write()

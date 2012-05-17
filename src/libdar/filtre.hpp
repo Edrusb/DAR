@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filtre.hpp,v 1.42 2011/03/31 15:52:00 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file filtre.hpp
     /// \brief here is all the core routines for the operations

@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database.hpp,v 1.14.2.2 2011/12/28 18:07:06 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file database.hpp
     /// \brief this file holds the database class definition

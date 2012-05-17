@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive_version.hpp,v 1.3 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file archive_version.hpp
     /// \brief class archive_version that rules which archive format to follow

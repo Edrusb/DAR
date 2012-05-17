@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive_options.hpp,v 1.35 2011/04/12 16:31:35 edrusb Rel $
-//
-/*********************************************************************/
-//
 
     /// \file archive_options.hpp
     /// \brief this file contains a set of classes used to transmit options to archive operation

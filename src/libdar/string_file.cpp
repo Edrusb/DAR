@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: string_file.cpp,v 1.8 2011/04/17 13:12:30 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -91,12 +87,6 @@ namespace libdar
 	}
 
 	return ret;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: string_file.cpp,v 1.8 2011/04/17 13:12:30 edrusb Rel $";
-        dummy_call(id);
     }
 
     U_I string_file::inherited_read(char *a, U_I size)

@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.91.2.1 2012/04/09 14:28:33 edrusb Exp $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -330,12 +326,6 @@ namespace libdar
 	    }
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: libdar.cpp,v 1.91.2.1 2012/04/09 14:28:33 edrusb Exp $";
-        dummy_call(id);
     }
 
     char *libdar_str2charptr_noexcept(const std::string & x, U_16 & exception, std::string & except_msg)

@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: semaphore.cpp,v 1.2 2011/06/02 13:17:37 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -143,12 +139,6 @@ namespace libdar
 	match = ref.match->clone();
 	if(match == NULL)
 	    throw Ememory("semaphore::copy_from");
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: semaphore.cpp,v 1.2 2011/06/02 13:17:37 edrusb Rel $";
-        dummy_call(id);
     }
 
     void semaphore::detruit()
