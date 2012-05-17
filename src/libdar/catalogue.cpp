@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.139.2.5 2012/04/12 20:08:29 edrusb Exp $
+// $Id: catalogue.cpp,v 1.144 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -2057,9 +2057,15 @@ namespace libdar
 
         if(status == from_path)
         {
+	    fichier *tmp = NULL;
             if(mode != normal && mode != plain)
                 throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
-            ret = new fichier(chemin, furtive_read_mode);
+            ret = tmp = new fichier(chemin, furtive_read_mode);
+	    if(tmp != NULL)
+		tmp->fadvise(fichier::advise_noreuse);
+		// yep, Linux does not implement this today, but the given advise is correct in regard
+		// to the the posix semantic. Other system might behave correctly in regard to this posix
+		// system call, maybe Linux will in the future, so we are ready.
         }
         else // inode from archive
             if(loc == NULL)
@@ -3578,32 +3584,38 @@ namespace libdar
         current_read->add_children(ref);
     }
 
-    void catalogue::reset_compare()
+    void catalogue::reset_compare() const
     {
-        current_compare = contenu;
-        out_compare = "/";
+	catalogue *me = const_cast<catalogue *>(this);
+	if(me == NULL)
+	    throw SRC_BUG;
+        me->current_compare = me->contenu;
+        me->out_compare = "/";
     }
 
-    bool catalogue::compare(const entree * target, const entree * & extracted)
+    bool catalogue::compare(const entree * target, const entree * & extracted) const
     {
+	catalogue *me = const_cast<catalogue *>(this);
         const mirage *mir = dynamic_cast<const mirage *>(target);
         const directory *dir = dynamic_cast<const directory *>(target);
         const eod *fin = dynamic_cast<const eod *>(target);
         const nomme *nom = dynamic_cast<const nomme *>(target);
 
+	if(me == NULL)
+	    throw SRC_BUG;
         if(mir != NULL)
             dir = dynamic_cast<const directory *>(mir->get_inode());
 
         if(out_compare.degre() > 1) // actually scanning a nonexisting directory
         {
             if(dir != NULL)
-                out_compare += dir->get_name();
+                me->out_compare += dir->get_name();
             else
                 if(fin != NULL)
                 {
                     string tmp_s;
 
-                    if(!out_compare.pop(tmp_s))
+                    if(!me->out_compare.pop(tmp_s))
                     {
                         if(out_compare.is_relative())
                             throw SRC_BUG; // should not be a relative path !!!
@@ -3623,7 +3635,7 @@ namespace libdar
                 directory *tmp = current_compare->get_parent();
                 if(tmp == NULL)
                     throw Erange("catalogue::compare", gettext("root has no parent directory"));
-                current_compare = tmp;
+                me->current_compare = tmp;
                 extracted = target;
                 return true;
             }
@@ -3651,9 +3663,9 @@ namespace libdar
                 {
                     const directory *d_ext = dynamic_cast<const directory *>(dst_ino);
                     if(d_ext != NULL)
-                        current_compare = const_cast<directory *>(d_ext);
+                        me->current_compare = const_cast<directory *>(d_ext);
                     else
-                        out_compare += dir->get_name();
+                        me->out_compare += dir->get_name();
                 }
 
                     // now comparing the objects :
@@ -3686,13 +3698,13 @@ namespace libdar
             else
             {
                 if(dir != NULL)
-                    out_compare += dir->get_name();
+                    me->out_compare += dir->get_name();
                 return false;
             }
         }
     }
 
-    infinint catalogue::update_destroyed_with(catalogue & ref)
+    infinint catalogue::update_destroyed_with(const catalogue & ref)
     {
         directory *current = contenu;
         nomme *ici;
@@ -3757,7 +3769,7 @@ namespace libdar
         return count;
     }
 
-    void catalogue::update_absent_with(catalogue & ref, infinint aborting_next_etoile)
+    void catalogue::update_absent_with(const catalogue & ref, infinint aborting_next_etoile)
     {
         directory *current = contenu;
         nomme *ici;
@@ -4493,7 +4505,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.139.2.5 2012/04/12 20:08:29 edrusb Exp $";
+        static char id[]="$Id: catalogue.cpp,v 1.144 2012/04/27 11:24:30 edrusb Exp $";
         dummy_call(id);
     }
 

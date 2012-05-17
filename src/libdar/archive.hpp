@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive.hpp,v 1.69 2011/04/02 20:14:26 edrusb Rel $
+// $Id: archive.hpp,v 1.70 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -281,29 +281,28 @@ namespace libdar
     private:
 	enum operation { oper_create, oper_isolate, oper_merge };
 
-	pile stack;
-	header_version ver;
-	catalogue *cat;
-	infinint local_cat_size;
-	path *local_path;
-	bool exploitable; //< is false if only the catalogue is available (for reference backup or isolation).
-	bool lax_read_mode; //< whether the archive has been openned in lax mode (unused for creation/merging/isolation)
-	bool sequential_read; //< whether the archive is read in sequential mode
+	pile stack;              //< the different layer through which the archive contents is read or wrote
+	header_version ver;      //< information for the archive header
+	catalogue *cat;          //< archive contents
+	infinint local_cat_size; //< size of the catalogue on disk
+	bool exploitable;        //< is false if only the catalogue is available (for reference backup or isolation).
+	bool lax_read_mode;      //< whether the archive has been openned in lax mode (unused for creation/merging/isolation)
+	bool sequential_read;    //< whether the archive is read in sequential mode
 
 	void free();
 	catalogue & get_cat() { if(cat == NULL) throw SRC_BUG; else return *cat; };
 	const header_version & get_header() const { return ver; };
-	const path & get_path() { if(local_path == NULL) throw SRC_BUG; else return *local_path; };
 
 	bool get_sar_param(infinint & sub_file_size, infinint & first_file_size, infinint & last_file_size,
 			   infinint & total_file_number);
+	const entrepot *get_entrepot(); //< this method may return NULL if no entrepot is used (pipes used for archive building, etc.)
 	infinint get_level2_size();
 	infinint get_cat_size() const { return local_cat_size; };
 
 	statistics op_create_in(user_interaction & dialog,
 				operation op,
 				const path & fs_root,
-				const path & sauv_path,
+				const entrepot & sauv_path_t,
 				archive *ref_arch,
 				const mask & selection,
 				const mask & subtree,
@@ -355,10 +354,10 @@ namespace libdar
 	void op_create_in_sub(user_interaction & dialog,        //< interaction with user
 			      operation op,                     //< the filter operation to bind to
 			      const path & fs_root,             //< root of the filesystem to act on
-			      const path & sauv_path_t,         //< where to create the archive
-			      catalogue  * ref_arch1,           //< catalogue of the archive of reference (a catalogue must be provided in any case, a empty one shall fit for no reference)
-			      catalogue  * ref_arch2,           //< secondary catalogue used for merging, can be NULL if not used
-			      const path * ref_path,            //< path of the archive of archive of reference (NULL if there is no archive of reference used, thus ref_arch (previous arg) is probably an empty archive)
+			      const entrepot & sauv_path_t,     //< where to create the archive
+			      const catalogue * ref_cat1,       //< catalogue of the archive of reference, (cannot be NULL if ref_cat2 is not NULL)
+			      const catalogue * ref_cat2,       //< secondary catalogue used for merging, can be NULL if not used
+			      bool initial_pause,               //< whether we shall pause before starting the archive creation
 			      const mask & selection,           //< filter on filenames
 			      const mask & subtree,             //< filter on directory tree and filenames
 			      const std::string & filename,     //< basename of the archive to create

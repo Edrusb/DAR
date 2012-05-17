@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.4.5], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
+AC_INIT([DAR], [2.5.0_dev], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -139,6 +139,20 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
 		    AC_MSG_RESULT(available)
 		  ],
 		  [AC_MSG_RESULT([not available])])
+
+AC_MSG_CHECKING([for posix_fadvise support])
+AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+			          #if HAVE_FCNTL_H
+				  #include <fcntl.h>
+				  #endif
+				  }]],
+				  [ (void)posix_fadvise(0,0,1,POSIX_FADV_NORMAL); ]),
+		  [
+		     AC_DEFINE(HAVE_POSIX_FADVISE, 1, [whether the system has support for posix_fadvise()])
+		     local_posix_fadvise="yes"
+		     AC_MSG_RESULT(available)
+                  ],
+		  [  AC_MSG_RESULT([not available]) ])
 
 # DAR's features
 
@@ -787,6 +801,13 @@ if  [ "$doxygen" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
+fi
+
+echo -n "   posix fadvise support : "
+if  [ "$local_posix_fadvise" = "yes" ] ; then
+    echo "YES"
+else
+    echo "NO"
 fi
 
 if [ "$static_pb" = "yes" -a "$build_static" = "yes" ]; then

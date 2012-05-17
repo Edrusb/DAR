@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.111.2.6 2012/02/19 22:15:05 edrusb Exp $
+// $Id: catalogue.hpp,v 1.113 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -1049,8 +1049,8 @@ namespace libdar
 
 	    // Comparison methods. The comparision is here also iterative and uses its specific current_compare directory pointer
 
-        void reset_compare();
-        bool compare(const entree * name, const entree * & extracted);
+        void reset_compare() const;
+        bool compare(const entree * name, const entree * & extracted) const;
             // returns true if the ref exists, and gives it back in second argument as it is in the current catalogue.
             // returns false is no entry of that nature exists in the catalogue (in the current directory)
             // if ref is a directory, the operation is normaly relative to the directory itself, but
@@ -1068,10 +1068,10 @@ namespace libdar
 	    // non interative methods
 
         bool direct_read(const path & ref, const nomme * &ret);
-        infinint update_destroyed_with(catalogue & ref);
+        infinint update_destroyed_with(const catalogue & ref);
             // ref must have the same root, else the operation generates an exception
 
-	void update_absent_with(catalogue & ref, infinint aborting_next_etoile);
+	void update_absent_with(const catalogue & ref, infinint aborting_next_etoile);
 	    // in case of abortion, completes missing files as if what could not be
 	    // inspected had not changed since the reference was done
 	    // aborting_last_etoile is the highest etoile reference withing "this" current object.

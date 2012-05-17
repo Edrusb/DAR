@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: compile_time_features.hpp,v 1.1.2.1 2012/01/12 20:20:47 edrusb Exp $
+// $Id: compile_time_features.hpp,v 1.3 2012/02/27 07:54:22 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -98,6 +98,8 @@ namespace libdar
 	    /// returns the detected integer endian of the system
 	endian system_endian();
 
+	    /// returns true if libdar has support for posix_fadvise activated available
+	bool posix_fadvise();
 
 	    /// returns whether libdar has been built with speed optimization for last directory
 	bool fast_dir();

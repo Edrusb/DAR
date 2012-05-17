@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: macro_tools.hpp,v 1.38 2011/04/09 19:55:08 edrusb Rel $
+// $Id: macro_tools.hpp,v 1.39 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -49,6 +49,7 @@ extern "C"
 #include "crypto.hpp"
 #include "escape.hpp"
 #include "pile.hpp"
+#include "entrepot.hpp"
 
     /// \addtogroup Private
     /// @{
@@ -72,7 +73,7 @@ namespace libdar
     extern const std::string LIBDAR_STACK_LABEL_LEVEL1;
 
     extern void macro_tools_open_archive(user_interaction & dialog,
-					 const path &sauv_path,  // path to slices
+					 const entrepot &where,  // slices location
                                          const std::string &basename,  // slice basename
 					 const infinint & min_digits,  // minimum digits for the slice number
                                          const std::string &extension,  // slice extensions

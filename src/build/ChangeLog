@@ -1,3 +1,14 @@
+from 2.4.x to 2.5.0
+- added support for posix_fadvise
+- added entrepot class hierarchy
+- added access to the entrepot through the API (new option)
+- sar and archive now use entrepot
+- dar_slave dar_xform uses entrepot_local
+- split class fichier in two classes, class fichier_global is entrepot
+  independent, class fichier stays tied to entrpot_local (backward
+  compatible with former implementation)
+- class hash_fichier becomes entrepot independent
+
 from 2.4.4 to 2.4.5
 - updated sample scripts to be compatible with dar's --min-digit option
 - added missing included file to be able to compile with gcc-4.7.0
@@ -868,3 +879,4 @@ from version 1.0.0 to version 1.0.1
 - correction of few mistakes that lead the compilation to fail with certain
       C++ compilers
 - bug #1 fixed.
+

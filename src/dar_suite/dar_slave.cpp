@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.51.2.1 2012/04/15 10:36:44 edrusb Exp $
+// $Id: dar_slave.cpp,v 1.53 2012/04/27 11:24:29 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -59,6 +59,7 @@ char *strchr (), *strrchr ();
 #include "libdar.hpp"
 #include "shell_interaction.hpp"
 #include "line_tools.hpp"
+#include "entrepot.hpp"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 
@@ -94,12 +95,15 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
         tuyau *input = NULL;
         tuyau *output = NULL;
         sar *source = NULL;
+	entrepot_local entrep = entrepot_local("", "", "", false);
 
 	if(chemin == NULL)
 	    throw SRC_BUG;
+
+	entrep.set_location(chemin->display());
         try
         {
-            source = new sar(dialog, filename, EXTENSION, *chemin, true, min_digits, false, execute);
+            source = new sar(dialog, filename, EXTENSION, entrep, true, min_digits, false, execute);
             if(source == NULL)
                 throw Ememory("little_main");
 
@@ -233,7 +237,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_slave.cpp,v 1.51.2.1 2012/04/15 10:36:44 edrusb Exp $";
+    static char id[]="$Id: dar_slave.cpp,v 1.53 2012/04/27 11:24:29 edrusb Exp $";
     dummy_call(id);
 }
 

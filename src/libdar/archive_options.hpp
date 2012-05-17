@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive_options.hpp,v 1.35 2011/04/12 16:31:35 edrusb Rel $
+// $Id: archive_options.hpp,v 1.36 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -40,6 +40,7 @@
 #include "hash_fichier.hpp"
 #include "secu_string.hpp"
 #include "nls_swap.hpp"
+#include "entrepot.hpp"
 
 #include <string>
 
@@ -62,6 +63,12 @@ namespace libdar
     public:
 	    /// build an object and set options to their default values
 	archive_options_read();
+
+	    /// the copy constructor, assignment operator and destructor
+	archive_options_read(const archive_options_read & ref) : x_ref_chem(ref.x_ref_chem) { copy_from(ref); };
+	const archive_options_read & operator = (const archive_options_read & ref) { detruit(); copy_from(ref); return *this; };
+	~archive_options_read() { detruit(); };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // set back to default (this is the state just after the object is constructed
@@ -113,6 +120,11 @@ namespace libdar
 	    /// defines whether the user needs detailed output of the operation
 	void set_info_details(bool info_details) { x_info_details = info_details; };
 
+	    /// defines the protocol to use to retrieve slices
+	void set_entrepot(const entrepot & entr) { if(x_entrepot != NULL) delete x_entrepot; x_entrepot = entr.clone(); if(x_entrepot == NULL) throw Ememory("archive_options_read::set_entrepot"); };
+
+	    //////// what follows concerne the use of an external catalogue instead of the archive's internal one
+
 	    /// defines whether or not to use the catalogue from an extracted catalogue (instead of the one embedded in the archive) and which one to use
 	void set_external_catalogue(const path & ref_chem, const std::string & ref_basename) { x_ref_chem = ref_chem, x_ref_basename = ref_basename; external_cat = true; };
 	    /// clear any reference to an external catalogue
@@ -159,6 +171,9 @@ namespace libdar
 
 	void set_ref_slice_min_digits(infinint val) { x_ref_slice_min_digits = val; };
 
+	    /// defines the protocol to use to retrieve slices of the reference archive (where the external catalogue resides)
+	void set_ref_entrepot(const entrepot & entr) { if(x_ref_entrepot != NULL) delete x_ref_entrepot; x_ref_entrepot = entr.clone(); if(x_ref_entrepot == NULL) throw Ememory("archive_options_read::set_entrepot"); };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods (mainly used inside libdar, but kept public and part of the API in the case it is needed)
@@ -174,6 +189,7 @@ namespace libdar
 	bool get_lax() const { return x_lax; };
 	bool get_sequential_read() const { return x_sequential_read; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
+	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
 
 	    // All methods that follow concern the archive where to fetch the (isolated) catalogue from
 	bool is_external_catalogue_set() const { return external_cat; };
@@ -184,6 +200,7 @@ namespace libdar
 	U_32 get_ref_crypto_size() const { return x_ref_crypto_size; };
 	const std::string & get_ref_execute() const { return x_ref_execute; };
 	infinint get_ref_slice_min_digits() const { return x_ref_slice_min_digits; };
+	const entrepot & get_ref_entrepot() const { if(x_ref_entrepot == NULL) throw SRC_BUG; return *x_ref_entrepot; };
 
 
     private:
@@ -197,6 +214,7 @@ namespace libdar
 	bool x_lax;
 	bool x_sequential_read;
 	infinint x_slice_min_digits;
+	entrepot *x_entrepot;
 
 	    // external catalogue relative fields
 	bool external_cat;
@@ -207,6 +225,10 @@ namespace libdar
 	U_32 x_ref_crypto_size;
 	std::string x_ref_execute;
 	infinint x_ref_slice_min_digits;
+	entrepot *x_ref_entrepot;
+
+	void copy_from(const archive_options_read & ref);
+	void detruit();
     };
 
 
@@ -220,8 +242,8 @@ namespace libdar
     public:
 	    // default constructors and destructor.
 
-	archive_options_create() { x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = NULL; clear(); };
-	archive_options_create(const archive_options_create & ref) { copy_from(ref); };
+	archive_options_create();
+	archive_options_create(const archive_options_create & ref);
 	const archive_options_create & operator = (const archive_options_create & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_create() { destroy(); };
 
@@ -374,13 +396,13 @@ namespace libdar
 	void set_fixed_date(const infinint & fixed_date) { x_fixed_date = fixed_date; };
 
 	    /// if not an empty string set the slice permission according to the octal value given.
-	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; };
+	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_permission(x_slice_permission); };
 
 	    /// if not an empty string set the user ownership of slices accordingly
-	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; };
+	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_user_ownership(x_slice_user_ownership); };
 
 	    /// if not an empty string set the group ownership of slices accordingly
-	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; };
+	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_group_ownership(x_slice_group_ownership); };
 
 	    /// how much time to retry saving a file if it changed while being read
 	void set_retry_on_change(const infinint & count_max_per_file, const infinint & global_max_byte_overhead = 0) { x_repeat_count = count_max_per_file; x_repeat_byte = global_max_byte_overhead; };
@@ -408,6 +430,9 @@ namespace libdar
 
 	    /// whether to ignore unknown inode types instead of issuing a warning
 	void set_ignore_unknown_inode_type(bool val) { x_ignore_unknown = val; };
+
+	    /// defines the protocol to use for slices
+	void set_entrepot(const entrepot & entr);
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -456,6 +481,7 @@ namespace libdar
 	const std::string & get_backup_hook_file_execute() const { return x_backup_hook_file_execute; };
 	const mask & get_backup_hook_file_mask() const { return *x_backup_hook_file_mask; };
 	bool get_ignore_unknown_inode_type() const { return x_ignore_unknown; };
+	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
 
     private:
 	archive *x_ref_arch; //< just contains the address of an existing object, no local copy of object is done here
@@ -503,6 +529,7 @@ namespace libdar
 	mask * x_backup_hook_file_mask;
 	std::string x_backup_hook_file_execute;
 	bool x_ignore_unknown;
+	entrepot *x_entrepot;
 
 	void destroy();
 	void copy_from(const archive_options_create & ref);
@@ -524,7 +551,11 @@ namespace libdar
     class archive_options_isolate
     {
     public:
-	archive_options_isolate() { clear(); };
+	archive_options_isolate() { x_entrepot = NULL; clear(); };
+	archive_options_isolate(const archive_options_isolate & ref) { x_entrepot = NULL; copy_from(ref); };
+	const archive_options_isolate & operator = (const archive_options_isolate & ref) { destroy(); copy_from(ref); return *this; };
+	~archive_options_isolate() { destroy(); };
+
 
 	void clear();
 
@@ -579,13 +610,13 @@ namespace libdar
 	void set_empty(bool empty) { x_empty = empty; };
 
 	    /// if not an empty string set the slice permission according to the octal value given.
-	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; };
+	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_permission(x_slice_permission); };
 
 	    /// if not an empty string set the user ownership of slices accordingly
-	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; };
+	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_user_ownership(x_slice_user_ownership); };
 
 	    /// if not an empty string set the group ownership of slices accordingly
-	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; };
+	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_group_ownership(x_slice_group_ownership); };
 
 	    /// specify a user comment in the archive (always in clear text!)
 	void set_user_comment(const std::string & comment) { x_user_comment = comment; };
@@ -599,6 +630,8 @@ namespace libdar
 	    /// whether to add escape sequence aka tape marks to allow sequential reading of the archive
 	void set_sequential_marks(bool sequential) { x_sequential_marks = sequential; };
 
+	    /// defines the protocol to use for slices
+	void set_entrepot(const entrepot & entr);
 
 
 	    /////////////////////////////////////////////////////////////////////
@@ -624,6 +657,8 @@ namespace libdar
 	hash_algo get_hash_algo() const { return x_hash; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	bool get_sequential_marks() const { return x_sequential_marks; };
+	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
+
 
     private:
 	bool x_allow_over;
@@ -646,7 +681,10 @@ namespace libdar
 	hash_algo x_hash;
 	infinint x_slice_min_digits;
 	bool x_sequential_marks;
+	entrepot *x_entrepot;
 
+	void copy_from(const archive_options_isolate & ref);
+	void destroy();
     };
 
 
@@ -748,13 +786,13 @@ namespace libdar
 	void set_keep_compressed(bool keep_compressed) { x_keep_compressed = keep_compressed; };
 
 	    /// if not an empty string set the slice permission according to the octal value given.
-	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; };
+	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_permission(x_slice_permission); };
 
 	    /// if not an empty string set the user ownership of slices accordingly
-	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; };
+	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_user_ownership(x_slice_user_ownership); };
 
 	    /// if not an empty string set the group ownership of slices accordingly
-	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; };
+	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_group_ownership(x_slice_group_ownership); };
 
 	    /// if set to true use a merging mode suitable to build a decremental backup from two full backups (see Notes)
 	void set_decremental_mode(bool mode) { x_decremental = mode; };
@@ -773,6 +811,9 @@ namespace libdar
 
 	    /// defines the minimum digit a slice must have concerning its number, zeros will be prepended as much as necessary to respect this
 	void set_slice_min_digits(infinint val) { x_slice_min_digits = val; };
+
+	    /// defines the protocol to use for slices
+	void set_entrepot(const entrepot & entr);
 
 
 
@@ -811,6 +852,7 @@ namespace libdar
 	const std::string & get_user_comment() const { return x_user_comment; };
 	hash_algo get_hash_algo() const { return x_hash; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
+	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
 
     private:
 	archive * x_ref;
@@ -845,6 +887,7 @@ namespace libdar
 	std::string x_user_comment;
 	hash_algo x_hash;
 	infinint x_slice_min_digits;
+	entrepot *x_entrepot;
 
 	void destroy();
 	void copy_from(const archive_options_merge & ref);

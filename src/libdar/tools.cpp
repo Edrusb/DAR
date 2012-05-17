@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tools.cpp,v 1.102.2.3 2012/04/09 14:28:33 edrusb Exp $
+// $Id: tools.cpp,v 1.106 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -316,7 +316,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.102.2.3 2012/04/09 14:28:33 edrusb Exp $";
+        static char id[]="$Id: tools.cpp,v 1.106 2012/04/27 11:24:30 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -1076,6 +1076,7 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 	dialog.printf(gettext("   Detected system/CPU endian : %s"), endy);
+	dialog.printf(gettext("   Posix fadvise support      : %s"), YES_NO(compile_time::posix_fadvise()));
 	dialog.printf(gettext("   Large dir. speed optimi.   : %s"), YES_NO(compile_time::fast_dir()));
     }
 
@@ -2113,110 +2114,13 @@ namespace libdar
 
     void tools_set_permission(S_I fd, U_I perm)
     {
-	if(fd < 0)
-	    throw SRC_BUG;
-	if(fchmod(fd, (mode_t) perm) < 0)
-	    throw Erange("tools_set_permission", tools_printf(gettext("Error while setting file permission: %s"), strerror(errno)));
-    }
-    void tools_set_ownership(S_I fd, const string & slice_user, const string & slice_group)
-    {
 	NLS_SWAP_IN;
-	uid_t direct_uid = 0;
-	gid_t direct_gid = 0;
-	bool direct_uid_set = false;
-	bool direct_gid_set = false;
-
 	try
 	{
-	    if(slice_user != "")
-	    {
-		direct_uid = tools_str2int(slice_user);
-		direct_uid_set = true;
-	    }
-	}
-	catch(Erange & e)
-	{
-		// given user is not an uid
-	    direct_uid_set = false;
-	}
-
-	try
-	{
-	    if(slice_group != "")
-	    {
-		direct_gid = tools_str2int(slice_group);
-		direct_gid_set = true;
-	    }
-		}
-	catch(Erange & e)
-	{
-		// given group is not a gid
-	    direct_gid_set = false;
-	}
-
-	try
-	{
-	    char *user = tools_str2charptr(slice_user);
-	    try
-	    {
-		char *group = tools_str2charptr(slice_group);
-		try
-		{
-		    uid_t uid = (uid_t)(-1);
-		    gid_t gid = (gid_t)(-1);
-
-		    if(direct_uid_set)
-			uid = direct_uid;
-		    else
-			if(slice_user != "")
-			{
-#ifdef __DYNAMIC__
-			    struct passwd *puser = getpwnam(user);
-			    if(puser == NULL)
-				throw Erange("tools_set_ownership", tools_printf(gettext("Unknown user: %S"), &slice_user));
-			    else
-				uid = puser->pw_uid;
-#else
-			    throw Erange("tools_set_ownership", dar_gettext("Cannot convert username to uid in statically linked binary, either directly provide the UID or run libdar from a dynamically linked executable"));
-#endif
-			}
-
-		    if(direct_gid_set)
-			gid = direct_gid;
-		    else
-			if(slice_group != "")
-			{
-#ifdef __DYNAMIC__
-			    struct group *pgroup = getgrnam(group);
-			    if(pgroup == NULL)
-				throw Erange("tools_set_ownership", tools_printf(gettext("Unknown user: %S"), &slice_user));
-			    else
-				gid = pgroup->gr_gid;
-#else
-			    throw Erange("tools_set_ownership", dar_gettext("Cannot convert group to gid in statically linked binary, either directly provide the GID or run libdar from a dynamically linked executable"));
-#endif
-			}
-
-		    if(uid != (uid_t)(-1) || gid != (gid_t)(-1))
-		    {
-			if(fchown(fd, uid, gid) < 0)
-			    throw Erange("tools_set_ownership", tools_printf(gettext("Error while setting file user ownership: %s"), strerror(errno)));
-		    }
-
-		}
-		catch(...)
-		{
-		    delete [] group;
-		    throw;
-		}
-		delete [] group;
-	    }
-	    catch(...)
-	    {
-		delete [] user;
-		throw;
-	    }
-	    delete [] user;
+	    if(fd < 0)
+		throw SRC_BUG;
+	    if(fchmod(fd, (mode_t) perm) < 0)
+		throw Erange("tools_set_permission", tools_printf(gettext("Error while setting file permission: %s"), strerror(errno)));
 	}
 	catch(...)
 	{
@@ -2224,6 +2128,134 @@ namespace libdar
 	    throw;
 	}
 	NLS_SWAP_OUT;
+    }
+
+    uid_t tools_ownership2uid(const string & user)
+    {
+	uid_t ret = -1;
+
+	NLS_SWAP_IN;
+	try
+	{
+	    bool direct_uid_set = false;
+
+	    if(user.empty())
+		throw Erange("tools_ownership2uid", gettext("An empty given as user name"));
+
+	    try
+	    {
+		ret = tools_str2int(user);
+		direct_uid_set = true;
+	    }
+	    catch(Erange & e)
+	    {
+		    // the given user is not an uid
+	    }
+
+	    if(!direct_uid_set)
+	    {
+		char *c_user = tools_str2charptr(user);
+		try
+		{
+#ifdef __DYNAMIC__
+		    struct passwd *puser = getpwnam(c_user);
+		    if(puser == NULL)
+			throw Erange("tools_ownership2uid", tools_printf(gettext("Unknown user: %s"), c_user));
+		    else
+			ret = puser->pw_uid;
+#else
+		    throw Erange("tools_ownership2uid", dar_gettext("Cannot convert username to uid in statically linked binary, either directly provide the UID or run libdar from a dynamically linked executable"));
+#endif
+		}
+		catch(...)
+		{
+		    delete [] c_user;
+		    throw;
+		}
+		delete [] c_user;
+	    }
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+
+	return ret;
+    }
+
+
+    gid_t tools_ownership2gid(const string & group)
+    {
+	gid_t ret = -1;
+
+	NLS_SWAP_IN;
+	try
+	{
+	    bool direct_gid_set = false;
+
+	    if(group.empty())
+		throw Erange("tools_ownership2gid", gettext("An empty given as group name"));
+
+	    try
+	    {
+		ret = tools_str2int(group);
+		direct_gid_set = true;
+	    }
+	    catch(Erange & e)
+	    {
+		    // the given group is not an gid
+	    }
+
+	    if(!direct_gid_set)
+	    {
+		char *c_group = tools_str2charptr(group);
+		try
+		{
+#ifdef __DYNAMIC__
+		    struct group *pgroup = getgrnam(c_group);
+		    if(pgroup == NULL)
+			throw Erange("tools_ownership2gid", tools_printf(gettext("Unknown group: %s"), c_group));
+		    else
+			ret = pgroup->gr_gid;
+#else
+		    throw Erange("tools_ownership2gid", dar_gettext("Cannot convert username to uid in statically linked binary, either directly provide the UID or run libdar from a dynamically linked executable"));
+#endif
+		}
+		catch(...)
+		{
+		    delete [] c_group;
+		    throw;
+		}
+		delete [] c_group;
+	    }
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+
+	return ret;
+    }
+
+    void tools_set_ownership(int filedesc, const std::string & user, const std::string & group)
+    {
+	uid_t uid = -1;
+	uid_t gid = -1;
+
+	if(user != "")
+	    uid = tools_ownership2uid(user);
+	if(group != "")
+	    gid = tools_ownership2gid(group);
+
+	if(uid != (uid_t)(-1) || gid != (gid_t)(-1))
+	{
+	    if(fchown(filedesc, uid, gid) < 0)
+		throw Erange("tools_set_ownership", tools_printf(gettext("Error while setting file user ownership: %s"), strerror(errno)));
+	}
     }
 
     void tools_memxor(void *dest, const void *src, U_I n)

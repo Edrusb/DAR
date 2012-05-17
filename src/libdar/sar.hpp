@@ -18,13 +18,13 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sar.hpp,v 1.51.2.1 2011/07/23 16:36:31 edrusb Rel $
+// $Id: sar.hpp,v 1.53 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
 
     /// \file sar.hpp
-    /// \brief the sar class holds all the slicing feature
+    /// \brief the sar and trivial_sar classes, they manage the slicing layer
     /// \ingroup Private
 
 #ifndef SAR_HPP
@@ -38,7 +38,7 @@
 #include "header.hpp"
 #include "path.hpp"
 #include "integers.hpp"
-#include "hash_fichier.hpp"
+#include "entrepot.hpp"
 
 namespace libdar
 {
@@ -62,7 +62,7 @@ namespace libdar
 	    /// \param[in] dialog is for user interation (such a requesting a slice and pausing between slices)
 	    /// \param[in] base_name is the basename of all slices of the set (it will be added the ".<slice numer>.extension" to form a filename
 	    /// \param[in] extension is the extension of slice's filenames
-	    /// \param[in] dir is the path where to store or where are stored slices
+	    /// \param[in] where defines where to store or where are stored slices
 	    /// \param[in] by_the_end if true dar will try to open the slice set starting from the last slice else it will try starting from the first
 	    /// \param[in] x_min_digits is the minimum number of digits the slices number is stored with in the filename
 	    /// \param[in] lax if set to true will try workaround problems that would otherwise lead the operation to fail
@@ -74,7 +74,7 @@ namespace libdar
         sar(user_interaction & dialog,
 	    const std::string & base_name,
 	    const std::string & extension,
-	    const path & dir,
+	    const entrepot & where,
 	    bool by_the_end,
 	    const infinint & x_min_digits,
 	    bool lax = false,
@@ -91,11 +91,8 @@ namespace libdar
 	    /// \param[in] x_warn_overwrite if set to true, a warning will be issued before overwriting a slice
 	    /// \param[in] x_allow_overwrite if set to false, no slice overwritting will be allowed
 	    /// \param[in] pause if set to zero no pause will be done between slice creation. If set to 1 a pause between each slice will be done. If set to N a pause each N slice will be done. Pauses must be acknoledged by user for the process to continue
-	    /// \param[in] dir is the path where to store the slices
+	    /// \param[in] where defines where to store the slices
 	    /// \param[in] data_name is a tag that has to be associated with the data.
-	    /// \param[in] slice_permission permission to set for slice to be created (empty string for default behavior)
-	    /// \param[in] slice_user_ownership new slices' uid (empty string for default behavior)
-	    /// \param[in] slice_group_ownership new slices' gid (empty string for default behavior)
 	    /// \param[in] x_hash defines whether a hash file has to be generated for each slice, and wich hash algorithm to use
 	    /// \param[in] x_min_digits is the minimum number of digits the slices number is stored with in the filename
 	    /// \param[in] execute is the command to execute after each slice creation (once it is completed)
@@ -111,18 +108,15 @@ namespace libdar
  	    bool x_warn_overwrite,
 	    bool x_allow_overwrite,
 	    const infinint & pause,
-	    const path & dir,
+	    const entrepot & where,
 	    const label & data_name,
-	    const std::string & slice_permission,
-	    const std::string & slice_user_ownership,
-	    const std::string & slice_group_ownership,
 	    hash_algo x_hash,
 	    const infinint & x_min_digits,
 	    const std::string & execute = "");
 
 	    /// the destructor
 
-   	sar(const sar & ref) : generic_file(ref), mem_ui(ref), archive_dir(ref.archive_dir) { throw Efeature("class sar's copy constructor is not implemented"); };
+   	sar(const sar & ref) : generic_file(ref), mem_ui(ref) { throw Efeature("class sar's copy constructor is not implemented"); };
 
 	    /// destructor
         ~sar();
@@ -154,6 +148,8 @@ namespace libdar
 	    // return the data_name used to link slices toghether
 	const label & get_data_name() const { return of_data_name; };
 
+	const entrepot *get_entrepot() const { return entr; };
+
     protected :
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size);
@@ -161,7 +157,7 @@ namespace libdar
 	void inherited_terminate();
 
     private :
-        path archive_dir;            //< path where to look for slices
+	entrepot *entr;              //< where are stored slices
         std::string base;            //< archive base name
 	std::string ext;             //< archive extension
         std::string hook;            //< command line to execute between slices
@@ -170,13 +166,9 @@ namespace libdar
         infinint first_file_offset;  //< where data start in the first slice
 	infinint other_file_offset;  //< where data start in the slices other than the first
         infinint file_offset;        //< current reading/writing position in the current slice (relative to the whole slice file, including headers)
-	U_I perm;                    //< permission to set when creating slices
-	std::string slice_user;      //< user for new slices
-        std::string slice_group;     //< group for new slice
 	hash_algo hash;              //< whether to build a hashing when creating slices, and if so, which algorithm to use
 	infinint min_digits;         //< minimum number of digits the slices number is stored with in the filename
         bool natural_destruction;    //< whether to execute commands between slices on object destruction
-
             // these following variables are modified by open_file / open_file_init
             // else the are used only for reading
         infinint of_current;         //< number of the open slice
@@ -187,24 +179,23 @@ namespace libdar
         infinint of_last_file_size;  //< size of the last slice (if met)
         label of_internal_name;      //< internal name shared in all slice header
 	label of_data_name;          //< internal name linked to data (transparent to dar_xform and used by isolated catalogue as reference)
-        fichier *of_fd;              //< file object currently openned
+        fichier_global *of_fd;       //< file object currently openned
         char of_flag;                //< flags of the open file
         bool initial;                //< do not launch hook command-line during sar initialization
-	bool lax;                    //< whether to try to go further reading problems
-
             // these are the option flags
         bool opt_warn_overwrite;     //<  a warning must be issued before overwriting a slice
         bool opt_allow_overwrite;    //< is slice overwriting allowed
-
 	    //
         infinint pause;              //< do we pause between slices
 	bool old_sar;                //< true if the read sar has an old header (format <= "07")
+	bool lax;                    //< whether to try to go further reading problems
+
 
         bool skip_forward(U_I x);                                  //< skip forward in sar global contents
         bool skip_backward(U_I x);                                 //< skip backward in sar global contents
         void close_file(bool terminal);                            //< close current openned file, adding (in write mode only) a terminal mark (last slice) or not
-        void open_readonly(const char *fic, const infinint &num);  //< open file of name "filename" for read only "num" is the slice number
-        void open_writeonly(const char *fic, const infinint &num); //< open file of name "filename" for write only "num" is the slice number
+        void open_readonly(const std::string & fic, const infinint &num);  //< open file of name "filename" for read only "num" is the slice number
+        void open_writeonly(const std::string & fic, const infinint &num); //< open file of name "filename" for write only "num" is the slice number
         void open_file_init();            //< initialize some of_* fields
         void open_file(infinint num);     //< close current slice and open the slice 'num'
         void set_offset(infinint offset); //< skip to current slice relative offset
@@ -218,25 +209,27 @@ namespace libdar
     };
 
 
-	/// "trivial sar" emulates the behavior of sar when all data must be keept in a arbitrary length single slice
+	/// "trivial sar" proposes the same interface a sar but does the work slightly differently using different constructors
+	///
+	/// depending on the constructor used trivial sar can:
+	/// - in write mode send the data to a arbitrary long slice (plain file)
+	/// - in read mode let read a single slice from a named pipe
+	/// - in write mode let write a single sliced archive to an anonymous pipe
 
     class trivial_sar : public generic_file , public contextual, protected mem_ui
     {
     public:
 	    /// constructor to build a new single sliced archive
-        trivial_sar(user_interaction & dialog,         //< how to interact with the user
+       trivial_sar(user_interaction & dialog,          //< how to interact with the user
 		    const std::string & base_name,     //< archive basename to create
 		    const std::string & extension,     //< archive extension
-		    const path & dir,                  //< where to store the archive
+ 		    const entrepot & where,            //< where to store the archive
 		    const label & data_name,           //< tag that follows the data when archive is dar_xform'ed
 		    const std::string & execute,       //< command line to execute at end of slice creation
 		    bool allow_over,                   //< whether to allow overwriting
 		    bool warn_over,                    //< whether to warn before overwriting
-		    const std::string & slice_permission,        //< slice permission
-		    const std::string & slice_user_ownership,    //< slice user
-		    const std::string & slice_group_ownership,   //< slice group
 		    hash_algo x_hash,                  //< whether to build a hash of the slice, and which algo to use for that
-	    	    const infinint & min_digits);    //< is the minimum number of digits the slices number is stored with in the filename
+	    	    const infinint & x_min_digits);    //< is the minimum number of digits the slices number is stored with in the filename
 
 	    /// constructor to read a (single sliced) archive from a pipe
 	trivial_sar(user_interaction & dialog,         //< how to interact with the user
@@ -251,7 +244,7 @@ namespace libdar
 		    const std::string & execute);
 
 	    /// copy constructor (disabled)
-	trivial_sar(const trivial_sar & ref) : generic_file(ref), mem_ui(ref), archive_dir("/") { throw SRC_BUG; };
+	trivial_sar(const trivial_sar & ref) : generic_file(ref), mem_ui(ref) { throw SRC_BUG; };
 
 	    /// destructor
 	~trivial_sar();
@@ -274,22 +267,18 @@ namespace libdar
 	void inherited_terminate();
 
     private:
-        generic_file *reference;  //< points to the underlying data, not owned by "this"
+        generic_file *reference;  //< points to the underlying data, owned by "this"
         infinint offset;          //< offset to apply to get the first byte of data out of SAR headers
 	infinint end_of_slice;    //< when end of slice/archive is met, there is an offset by 1 compared to the offset of reference. end_of_slice is set to 1 in that situation, else it is always equal to zero
 	std::string hook;         //< command to execute after slice writing (not used in read-only mode)
 	std::string base;         //< basename of the archive (used for string susbstitution in hook)
 	std::string ext;          //< extension of the archive (used for string substitution in hook)
-	path archive_dir;         //< path of the archiv (used for string substitution in hook)
 	label of_data_name;       //< archive's data name
-	bool old_sar;             //< true if the read sar has an old header (format <= "07")
-	infinint x_min_digits;    //< minimum number of digits in slice name
+	bool old_sar;             //< true if the read sar has an old header (format <= 7)
+	infinint min_digits;      //< minimum number of digits in slice name
+	std::string hook_where;   //< what value to use for %p subsitution in hook
 
 	void init();              //< write the slice header and set the offset field (write mode), or (read-mode),  reads the slice header an set offset field
-	void build(user_interaction & dialog,
-		   generic_file *f,
-		   const label & data_name,
-		   const std::string & execute);
     };
 
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: user_interaction.hpp,v 1.27 2011/01/09 17:25:58 edrusb Rel $
+// $Id: user_interaction.hpp,v 1.28 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -279,7 +279,7 @@ namespace libdar
 	    /// make a newly allocated object which has the same properties as "this".
 
 	    //! This *is* a virtual method, it *must* be overwritten in any inherited class
-	    //! copy constructor and = operator may have to be overwrittent too if necessary
+	    //! copy constructor and = operator may have to be overwritten too if necessary
 	    //! Warning !
 	    //! clone() must throw exception if necessary (Ememory), but never
 	    //! return a NULL pointer !

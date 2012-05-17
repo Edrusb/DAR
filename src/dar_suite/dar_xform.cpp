@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.62.2.1 2012/04/15 10:36:44 edrusb Exp $
+// $Id: dar_xform.cpp,v 1.64 2012/04/27 11:24:29 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -51,6 +51,7 @@ extern "C"
 #include "thread_cancellation.hpp"
 #include "header.hpp"
 #include "line_tools.hpp"
+#include "entrepot.hpp"
 
 using namespace libdar;
 
@@ -111,6 +112,7 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 	    generic_file *dst_sar = NULL;
 	    generic_file *src_sar = NULL;
 	    label data_name;
+	    entrepot_local entrep = entrepot_local(slice_perm, slice_user, slice_group, false);
 
 	    data_name.clear();
 	    try
@@ -138,7 +140,12 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 		}
 		else 	// source not from a pipe
 		{
-		    sar *tmp_sar = new sar(dialog, src, EXTENSION, *src_dir, false, src_min_digits, false, execute_src);
+		    if(src_dir != NULL)
+			entrep.set_location(src_dir->display());
+		    else
+			throw SRC_BUG;
+
+		    sar *tmp_sar = new sar(dialog, src, EXTENSION, entrep, false, src_min_digits, false, execute_src);
 		    if(tmp_sar == NULL)
 			throw Ememory("main");
 		    else
@@ -154,9 +161,21 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 		    if(dst == "-")
 			dst_sar = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name, execute_dst);
 		    else
-			dst_sar = new trivial_sar(dialog, dst, EXTENSION, *dst_dir, data_name, execute_dst, allow, warn, slice_perm, slice_user, slice_group, hash, dst_min_digits);
+		    {
+			if(dst_dir != NULL)
+			    entrep.set_location(dst_dir->display());
+			else
+			    throw SRC_BUG;
+			dst_sar = new trivial_sar(dialog, dst, EXTENSION, entrep, data_name, execute_dst, allow, warn, hash, dst_min_digits);
+		    }
 		else
-		    dst_sar = new sar(dialog, dst, EXTENSION, size, first, warn, allow, pause, *dst_dir, data_name, slice_perm, slice_user, slice_group, hash, dst_min_digits, execute_dst);
+		{
+		    if(dst_dir != NULL)
+			entrep.set_location(dst_dir->display());
+		    else
+			throw SRC_BUG;
+		    dst_sar = new sar(dialog, dst, EXTENSION, size, first, warn, allow, pause, entrep, data_name, hash, dst_min_digits, execute_dst);
+		}
 		if(dst_sar == NULL)
 		    throw Ememory("main");
 
@@ -446,7 +465,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char * const argv[
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.62.2.1 2012/04/15 10:36:44 edrusb Exp $";
+    static char id[]="$Id: dar_xform.cpp,v 1.64 2012/04/27 11:24:29 edrusb Exp $";
     dummy_call(id);
 }
 

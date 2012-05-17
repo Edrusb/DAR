@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: etage.hpp,v 1.11.2.1 2012/02/19 17:25:08 edrusb Exp $
+// $Id: etage.hpp,v 1.13 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -57,8 +57,9 @@ namespace libdar
 
         bool read(std::string & ref);
 
-        std::list<std::string> fichier;
-        infinint last_mod, last_acc;
+        std::list<std::string> fichier; //< holds the list of entry in the directory
+        infinint last_mod;              //< the last_lod of the directory itself
+	infinint last_acc;              //< the last_acc of the directory itself
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(etage);

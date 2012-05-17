@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_hash_fichier.cpp,v 1.2 2010/08/27 20:44:24 edrusb Rel $
+// $Id: test_hash_fichier.cpp,v 1.3 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -67,10 +67,10 @@ int main()
 
 void f1(const string & filename, hash_algo algo)
 {
+    fichier fic = fichier(*ui, filename, gf_write_only, 0644, false);
+    fichier hash_fic = fichier(*ui, filename + "." + hash_algo_to_string(algo), gf_write_only, 0644, false);
     const string message = "bonjour les amis, il fait chaud il fait beau, les mouches pettent et les cailloux fleurissent.";
-    hash_fichier dst = hash_fichier(*ui, filename, gf_write_only, tools_octal2int("0777"), false);
-
-    dst.set_hash_file_name(filename, algo, hash_algo_to_string(algo));
+    hash_fichier dst = hash_fichier(*ui, &fic, filename, &hash_fic, algo);
 
     dst.write(message.c_str(), message.size());
 }

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.77.2.4 2012/04/03 12:24:24 edrusb Exp $
+// $Id: filesystem.cpp,v 1.81 2012/04/15 12:55:50 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -1036,10 +1036,12 @@ namespace libdar
 		    generic_file *ou;
 		    infinint seek;
 
-		    ret = ::open(name, O_WRONLY|O_CREAT|O_BINARY, 0700); // munimum permissions
+		    ret = ::open(name, O_WRONLY|O_CREAT|O_BINARY, 0700); // minimum permissions
 		    if(ret >= 0)
 		    {
 			fichier dest = fichier(get_ui(), ret);
+			    // telling to the system to write data directly to disk not going through the cache
+			dest.fadvise(fichier::advise_dontneed);
 			    // the implicit destruction of dest (exiting the block)
 			    // will close the 'ret' file descriptor (see ~fichier())
 			ou = ref_fil->get_data(file::normal);
@@ -1850,7 +1852,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.77.2.4 2012/04/03 12:24:24 edrusb Exp $";
+        static char id[]="$Id: filesystem.cpp,v 1.81 2012/04/15 12:55:50 edrusb Exp $";
         dummy_call(id);
     }
 

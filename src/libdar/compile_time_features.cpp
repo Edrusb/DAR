@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: compile_time_features.cpp,v 1.2.2.1 2012/01/12 20:20:47 edrusb Exp $
+// $Id: compile_time_features.cpp,v 1.4 2012/02/27 07:54:22 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -65,7 +65,7 @@ namespace libdar
 
 	static void dummy_call(char *x)
 	{
-	    static char id[]="$Id: compile_time_features.cpp,v 1.2.2.1 2012/01/12 20:20:47 edrusb Exp $";
+	    static char id[]="$Id: compile_time_features.cpp,v 1.4 2012/02/27 07:54:22 edrusb Exp $";
 	    dummy_call(id);
 	}
 
@@ -163,6 +163,15 @@ namespace libdar
 	    }
 
 	    return ret;
+	}
+
+	bool posix_fadvise()
+	{
+#if HAVE_POSIX_FADVISE
+	    return true;
+#else
+	    return false;
+#endif
 	}
 
 	bool fast_dir()

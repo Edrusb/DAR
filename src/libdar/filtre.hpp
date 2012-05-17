@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filtre.hpp,v 1.42 2011/03/31 15:52:00 edrusb Rel $
+// $Id: filtre.hpp,v 1.43 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -70,7 +70,7 @@ namespace libdar
                                   const mask &subtree,
                                   pile & stack,
                                   catalogue & cat,
-                                  catalogue &ref,
+                                  const catalogue & ref,
                                   const path & fs_racine,
                                   bool info_details,
                                   statistics & st,
@@ -122,7 +122,7 @@ namespace libdar
 
     extern void filtre_isolate(user_interaction & dialog,
 			       catalogue & cat,
-                               catalogue & ref,
+                               const catalogue & ref,
                                bool info_details);
 
     extern void filtre_merge(user_interaction & dialog,
@@ -130,8 +130,8 @@ namespace libdar
 			     const mask & subtree,
 			     pile & stack,
 			     catalogue & cat,
-			     catalogue * ref1,
-			     catalogue * ref2,
+			     const catalogue * ref1,
+			     const catalogue * ref2,
 			     bool info_details,
 			     statistics & st,
 			     bool make_empty_dir,

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive_options.cpp,v 1.38.2.1 2012/02/25 14:43:44 edrusb Exp $
+// $Id: archive_options.cpp,v 1.40 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -136,6 +136,8 @@ namespace libdar
 
 	    // setting the default values for all options
 
+	detruit();
+
 	x_crypto = crypto_none;
 	x_pass.clear();
 	x_crypto_size = default_crypto_size;
@@ -146,6 +148,9 @@ namespace libdar
 	x_lax = false;
 	x_sequential_read = false;
 	x_slice_min_digits = 0;
+	x_entrepot = new entrepot_local("", "", "", false); // never using furtive_mode to read slices
+	if(x_entrepot == NULL)
+	    throw Ememory("archive_options_read::clear");
 
 	    //
 	external_cat = false;
@@ -156,6 +161,9 @@ namespace libdar
 	x_ref_crypto_size = default_crypto_size;
 	x_ref_execute = "";
 	x_ref_slice_min_digits = 0;
+	x_ref_entrepot = new entrepot_local("", "", "", false); // never using furtive_mode to read slices
+	if(x_ref_entrepot == NULL)
+	    throw Ememory("archive_options_read::clear");
     }
 
     void archive_options_read::set_default_crypto_size()
@@ -207,11 +215,91 @@ namespace libdar
 
     }
 
+    void archive_options_read::copy_from(const archive_options_read & ref)
+    {
+	x_crypto = ref.x_crypto;
+	x_pass = ref.x_pass;
+	x_crypto_size = ref.x_crypto_size;
+	x_input_pipe = ref.x_input_pipe;
+	x_output_pipe = ref.x_output_pipe;
+	x_execute = ref.x_execute;
+	x_info_details = ref.x_info_details;
+	x_lax = ref.x_lax;
+	x_sequential_read = ref.x_sequential_read;
+	x_slice_min_digits = ref.x_slice_min_digits;
+	if(ref.x_entrepot == NULL)
+	    throw SRC_BUG;
+	x_entrepot = ref.x_entrepot->clone();
+	if(x_entrepot == NULL)
+	    throw Ememory("archive_options_read::copy_from");
+
+	    //
+
+	external_cat = ref.external_cat;
+	x_ref_chem = ref.x_ref_chem;
+	x_ref_basename = ref.x_ref_basename;
+	x_ref_crypto = ref.x_ref_crypto;
+	x_ref_pass = ref.x_ref_pass;
+	x_ref_crypto_size = ref.x_ref_crypto_size;
+	x_ref_execute = ref.x_ref_execute;
+	x_ref_slice_min_digits = ref.x_ref_slice_min_digits;
+	if(ref.x_ref_entrepot == NULL)
+	    throw SRC_BUG;
+	x_ref_entrepot = ref.x_ref_entrepot->clone();
+	if(x_ref_entrepot == NULL)
+	    throw Ememory("archive_options_read::copy_from");
+    }
+
+    void archive_options_read::detruit()
+    {
+	if(x_entrepot != NULL)
+	{
+	    delete x_entrepot;
+	    x_entrepot = NULL;
+	}
+	if(x_ref_entrepot != NULL)
+	{
+	    delete x_ref_entrepot;
+	    x_ref_entrepot = NULL;
+	}
+    }
+
+
+
 
 	/////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////
 
+    archive_options_create::archive_options_create()
+    {
+	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = NULL;
+	x_entrepot = NULL;
+	try
+	{
+	    clear();
+	}
+	catch(...)
+	{
+	    destroy();
+	    throw;
+	}
+    }
+
+    archive_options_create::archive_options_create(const archive_options_create & ref)
+    {
+	x_selection = x_subtree = x_ea_mask = x_compr_mask = x_backup_hook_file_mask = NULL;
+	x_entrepot = NULL;
+	try
+	{
+	    copy_from(ref);
+	}
+	catch(...)
+	{
+	    destroy();
+	    throw;
+	}
+    }
 
     void archive_options_create::clear()
     {
@@ -270,6 +358,9 @@ namespace libdar
 	    x_slice_min_digits = 0;
 	    x_backup_hook_file_execute = "";
 	    x_ignore_unknown = false;
+	    x_entrepot = new entrepot_local("", "", "", false); // never using furtive_mode to read slices
+	    if(x_entrepot == NULL)
+		throw Ememory("archive_options_create::clear");
 	}
 	catch(...)
 	{
@@ -369,6 +460,19 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
+    void archive_options_create::set_entrepot(const entrepot & entr)
+    {
+	if(x_entrepot != NULL)
+	    delete x_entrepot;
+
+	x_entrepot = entr.clone();
+	if(x_entrepot == NULL)
+	    throw Ememory("archive_options_create::set_entrepot");
+	x_entrepot->set_permission(x_slice_permission);
+	x_entrepot->set_user_ownership(x_slice_user_ownership);
+	x_entrepot->set_group_ownership(x_slice_group_ownership);
+    }
+
     void archive_options_create::destroy()
     {
 	NLS_SWAP_IN;
@@ -379,6 +483,11 @@ namespace libdar
 	    archive_option_destroy_mask(x_ea_mask);
 	    archive_option_destroy_mask(x_compr_mask);
 	    archive_option_destroy_mask(x_backup_hook_file_mask);
+	    if(x_entrepot != NULL)
+	    {
+		delete x_entrepot;
+		x_entrepot = NULL;
+	    }
 	}
 	catch(...)
 	{
@@ -395,74 +504,72 @@ namespace libdar
 	x_ea_mask = NULL;
 	x_compr_mask = NULL;
 	x_backup_hook_file_mask = NULL;
+	x_entrepot = NULL;
 
-	try
-	{
-	    if(ref.x_selection == NULL)
-		throw SRC_BUG;
-	    if(ref.x_subtree == NULL)
-		throw SRC_BUG;
-	    if(ref.x_ea_mask == NULL)
-		throw SRC_BUG;
-	    if(ref.x_compr_mask == NULL)
-		throw SRC_BUG;
-	    if(ref.x_backup_hook_file_mask == NULL)
-		throw SRC_BUG;
-	    x_selection = ref.x_selection->clone();
-	    x_subtree = ref.x_subtree->clone();
-	    x_ea_mask = ref.x_ea_mask->clone();
-	    x_compr_mask = ref.x_compr_mask->clone();
-	    x_backup_hook_file_mask = ref.x_backup_hook_file_mask->clone();
+	if(ref.x_selection == NULL)
+	    throw SRC_BUG;
+	if(ref.x_subtree == NULL)
+	    throw SRC_BUG;
+	if(ref.x_ea_mask == NULL)
+	    throw SRC_BUG;
+	if(ref.x_compr_mask == NULL)
+	    throw SRC_BUG;
+	if(ref.x_backup_hook_file_mask == NULL)
+	    throw SRC_BUG;
+	x_selection = ref.x_selection->clone();
+	x_subtree = ref.x_subtree->clone();
+	x_ea_mask = ref.x_ea_mask->clone();
+	x_compr_mask = ref.x_compr_mask->clone();
+	x_backup_hook_file_mask = ref.x_backup_hook_file_mask->clone();
 
-	    if(x_selection == NULL || x_subtree == NULL || x_ea_mask == NULL || x_compr_mask == NULL || x_backup_hook_file_mask == NULL)
-		throw Ememory("archive_options_create::copy_from");
+	if(x_selection == NULL || x_subtree == NULL || x_ea_mask == NULL || x_compr_mask == NULL || x_backup_hook_file_mask == NULL)
+	    throw Ememory("archive_options_create::copy_from");
 
-	    x_ref_arch = ref.x_ref_arch;
-	    x_allow_over = ref.x_allow_over;
-	    x_warn_over = ref.x_warn_over;
-	    x_info_details = ref.x_info_details;
-	    x_pause = ref.x_pause;
-	    x_empty_dir = ref.x_empty_dir;
-	    x_compr_algo = ref.x_compr_algo;
-	    x_compression_level = ref.x_compression_level;
-	    x_file_size = ref.x_file_size;
-	    x_first_file_size = ref.x_first_file_size;
-	    x_execute = ref.x_execute;
-	    x_crypto = ref.x_crypto;
-	    x_pass = ref.x_pass;
-	    x_crypto_size = ref.x_crypto_size;
-	    x_min_compr_size = ref.x_min_compr_size;
-	    x_nodump = ref.x_nodump;
-	    x_what_to_check = ref.x_what_to_check;
-	    x_hourshift = ref.x_hourshift;
-	    x_empty = ref.x_empty;
-	    x_alter_atime = ref.x_alter_atime;
-	    x_old_alter_atime = ref.x_old_alter_atime;
-	    x_furtive_read = ref.x_furtive_read;
-	    x_same_fs = ref.x_same_fs;
-	    x_snapshot = ref.x_snapshot;
-	    x_cache_directory_tagging = ref.x_cache_directory_tagging;
-	    x_display_skipped = ref.x_display_skipped;
-	    x_fixed_date = ref.x_fixed_date;
-	    x_slice_permission = ref.x_slice_permission;
-	    x_slice_user_ownership = ref.x_slice_user_ownership;
-	    x_slice_group_ownership = ref.x_slice_group_ownership;
-	    x_repeat_count = ref.x_repeat_count;
-	    x_repeat_byte = ref.x_repeat_byte;
-	    x_sequential_marks = ref.x_sequential_marks;
-	    x_sparse_file_min_size = ref.x_sparse_file_min_size;
-	    x_security_check = ref.x_security_check;
-	    x_user_comment = ref.x_user_comment;
-	    x_hash = ref.x_hash;
-	    x_slice_min_digits = ref.x_slice_min_digits;
-	    x_backup_hook_file_execute = ref.x_backup_hook_file_execute;
-	    x_ignore_unknown = ref.x_ignore_unknown;
-	}
-	catch(...)
-	{
-	    clear();
-	    throw;
-	}
+	x_ref_arch = ref.x_ref_arch;
+	x_allow_over = ref.x_allow_over;
+	x_warn_over = ref.x_warn_over;
+	x_info_details = ref.x_info_details;
+	x_pause = ref.x_pause;
+	x_empty_dir = ref.x_empty_dir;
+	x_compr_algo = ref.x_compr_algo;
+	x_compression_level = ref.x_compression_level;
+	x_file_size = ref.x_file_size;
+	x_first_file_size = ref.x_first_file_size;
+	x_execute = ref.x_execute;
+	x_crypto = ref.x_crypto;
+	x_pass = ref.x_pass;
+	x_crypto_size = ref.x_crypto_size;
+	x_min_compr_size = ref.x_min_compr_size;
+	x_nodump = ref.x_nodump;
+	x_what_to_check = ref.x_what_to_check;
+	x_hourshift = ref.x_hourshift;
+	x_empty = ref.x_empty;
+	x_alter_atime = ref.x_alter_atime;
+	x_old_alter_atime = ref.x_old_alter_atime;
+	x_furtive_read = ref.x_furtive_read;
+	x_same_fs = ref.x_same_fs;
+	x_snapshot = ref.x_snapshot;
+	x_cache_directory_tagging = ref.x_cache_directory_tagging;
+	x_display_skipped = ref.x_display_skipped;
+	x_fixed_date = ref.x_fixed_date;
+	x_slice_permission = ref.x_slice_permission;
+	x_slice_user_ownership = ref.x_slice_user_ownership;
+	x_slice_group_ownership = ref.x_slice_group_ownership;
+	x_repeat_count = ref.x_repeat_count;
+	x_repeat_byte = ref.x_repeat_byte;
+	x_sequential_marks = ref.x_sequential_marks;
+	x_sparse_file_min_size = ref.x_sparse_file_min_size;
+	x_security_check = ref.x_security_check;
+	x_user_comment = ref.x_user_comment;
+	x_hash = ref.x_hash;
+	x_slice_min_digits = ref.x_slice_min_digits;
+	x_backup_hook_file_execute = ref.x_backup_hook_file_execute;
+	x_ignore_unknown = ref.x_ignore_unknown;
+	if(x_entrepot == NULL)
+	    throw SRC_BUG;
+	x_entrepot = x_entrepot->clone();
+	if(x_entrepot == NULL)
+	    throw Ememory("archive_options_create::copy_from");
     }
 
 
@@ -472,26 +579,92 @@ namespace libdar
 
     void archive_options_isolate::clear()
     {
-	x_allow_over = true;
-	x_warn_over = true;
-	x_info_details = false;
-	x_pause = 0;
-	x_algo = none;
-	x_compression_level = 9;
-	x_file_size = 0;
-	x_first_file_size = 0;
-	x_execute = "";
-	x_crypto = crypto_none;
-	x_pass.clear();
-	x_crypto_size = default_crypto_size;
-	x_empty = false;
-	x_slice_permission = "";
-	x_slice_user_ownership = "";
-	x_slice_group_ownership = "";
-	x_user_comment = default_user_comment;
-	x_hash = hash_none;
-	x_slice_min_digits = 0;
-	x_sequential_marks = true;
+	NLS_SWAP_IN;
+	try
+	{
+	    destroy();
+
+	    x_allow_over = true;
+	    x_warn_over = true;
+	    x_info_details = false;
+	    x_pause = 0;
+	    x_algo = none;
+	    x_compression_level = 9;
+	    x_file_size = 0;
+	    x_first_file_size = 0;
+	    x_execute = "";
+	    x_crypto = crypto_none;
+	    x_pass.clear();
+	    x_crypto_size = default_crypto_size;
+	    x_empty = false;
+	    x_slice_permission = "";
+	    x_slice_user_ownership = "";
+	    x_slice_group_ownership = "";
+	    x_user_comment = default_user_comment;
+	    x_hash = hash_none;
+	    x_slice_min_digits = 0;
+	    x_sequential_marks = true;
+	    x_entrepot = new entrepot_local("", "", "", false); // never using furtive_mode to read slices
+	    if(x_entrepot == NULL)
+		throw Ememory("archive_options_isolate::clear");
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
+    void archive_options_isolate::set_entrepot(const entrepot & entr)
+    {
+	if(x_entrepot != NULL)
+	    delete x_entrepot;
+
+	x_entrepot = entr.clone();
+	if(x_entrepot == NULL)
+	    throw Ememory("archive_options_isolate::set_entrepot");
+	x_entrepot->set_permission(x_slice_permission);
+	x_entrepot->set_user_ownership(x_slice_user_ownership);
+	x_entrepot->set_group_ownership(x_slice_group_ownership);
+    }
+
+    void archive_options_isolate::destroy()
+    {
+	if(x_entrepot != NULL)
+	{
+	    delete x_entrepot;
+	    x_entrepot = NULL;
+	}
+    }
+
+    void archive_options_isolate::copy_from(const archive_options_isolate & ref)
+    {
+	x_allow_over = ref.x_allow_over;
+	x_warn_over = ref.x_warn_over;
+	x_info_details = ref.x_info_details;
+	x_pause = ref.x_pause;
+	x_algo = ref.x_algo;
+	x_compression_level = ref.x_compression_level;
+	x_file_size = ref.x_file_size;
+	x_first_file_size = ref.x_first_file_size;
+	x_execute = ref.x_execute;
+	x_crypto = ref.x_crypto;
+	x_pass = ref.x_pass;
+	x_crypto_size = ref.x_crypto_size;
+	x_empty = ref.x_empty;
+	x_slice_permission = ref.x_slice_permission;
+	x_slice_user_ownership = ref.x_slice_user_ownership;
+	x_slice_group_ownership = ref.x_slice_group_ownership;
+	x_user_comment = ref.x_user_comment;
+	x_hash = ref.x_hash;
+	x_slice_min_digits = ref.x_slice_min_digits;
+	x_sequential_marks = ref.x_sequential_marks;
+	if(ref.x_entrepot == NULL)
+	    throw SRC_BUG;
+	x_entrepot = ref.x_entrepot->clone();
+	if(x_entrepot == NULL)
+	    throw Ememory("archive_options_isolate::copy_from");
     }
 
 
@@ -538,6 +711,9 @@ namespace libdar
 	    x_user_comment = default_user_comment;
 	    x_hash = hash_none;
 	    x_slice_min_digits = 0;
+	    x_entrepot = new entrepot_local("", "", "", false); // never using furtive_mode to read slices
+	    if(x_entrepot == NULL)
+		throw Ememory("archive_options_merge::clear");
 	}
 	catch(...)
 	{
@@ -635,6 +811,20 @@ namespace libdar
 
     }
 
+    void archive_options_merge::set_entrepot(const entrepot & entr)
+    {
+	if(x_entrepot != NULL)
+	    delete x_entrepot;
+
+	x_entrepot = entr.clone();
+	if(x_entrepot == NULL)
+	    throw Ememory("archive_options_merge::set_entrepot");
+	x_entrepot->set_permission(x_slice_permission);
+	x_entrepot->set_user_ownership(x_slice_user_ownership);
+	x_entrepot->set_group_ownership(x_slice_group_ownership);
+    }
+
+
     void archive_options_merge::destroy()
     {
 	NLS_SWAP_IN;
@@ -645,6 +835,11 @@ namespace libdar
 	    archive_option_destroy_mask(x_ea_mask);
 	    archive_option_destroy_mask(x_compr_mask);
 	    archive_option_destroy_crit_action(x_overwrite);
+	    if(x_entrepot != NULL)
+	    {
+		delete x_entrepot;
+		x_entrepot = NULL;
+	    }
 	}
 	catch(...)
 	{
@@ -661,6 +856,7 @@ namespace libdar
 	x_ea_mask = NULL;
 	x_compr_mask = NULL;
 	x_overwrite = NULL;
+	x_entrepot = NULL;
 
 	try
 	{
@@ -674,13 +870,17 @@ namespace libdar
 		throw SRC_BUG;
 	    if(ref.x_overwrite == NULL)
 		throw SRC_BUG;
+	    if(ref.x_entrepot == NULL)
+		throw SRC_BUG;
+
 	    x_selection = ref.x_selection->clone();
 	    x_subtree = ref.x_subtree->clone();
 	    x_ea_mask = ref.x_ea_mask->clone();
 	    x_compr_mask = ref.x_compr_mask->clone();
 	    x_overwrite = ref.x_overwrite->clone();
+	    x_entrepot = ref.x_entrepot->clone();
 
-	    if(x_selection == NULL || x_subtree == NULL || x_ea_mask == NULL || x_compr_mask == NULL || x_overwrite == NULL)
+	    if(x_selection == NULL || x_subtree == NULL || x_ea_mask == NULL || x_compr_mask == NULL || x_overwrite == NULL || x_entrepot == NULL)
 		throw Ememory("archive_options_extract::copy_from");
 
 	    x_ref = ref.x_ref;
@@ -1290,7 +1490,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: archive_options.cpp,v 1.38.2.1 2012/02/25 14:43:44 edrusb Exp $";
+        static char id[]="$Id: archive_options.cpp,v 1.40 2012/04/27 11:24:30 edrusb Exp $";
         dummy_call(id);
     }
 

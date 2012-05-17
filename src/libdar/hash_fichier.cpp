@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: hash_fichier.cpp,v 1.8 2011/06/02 13:17:37 edrusb Rel $
+// $Id: hash_fichier.cpp,v 1.9 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 //
@@ -28,6 +28,7 @@
 #include "hash_fichier.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
+#include "path.hpp"
 
 using namespace std;
 
@@ -49,85 +50,31 @@ namespace libdar
 	}
     }
 
-    hash_fichier::hash_fichier(user_interaction & dialog, S_I fd)
-	: fichier(dialog, fd)
-    {
-	if(get_mode() != gf_write_only) // at that time the fichier and generic_file part of the object is already built,
-	    throw SRC_BUG; // so we can call get_mode() to retrieve the openning mode of the file
-	hash_ready = false;
-	x_perm = tools_octal2int("0666");
-	user_ownership = "";
-	group_ownership = "";
-    }
 
-    hash_fichier::hash_fichier(user_interaction & dialog, const char *name, gf_mode m, U_I perm, bool furtive_mode)
-	: fichier(dialog, name, m, perm, furtive_mode)
+    hash_fichier::hash_fichier(user_interaction & dialog,
+			       fichier_global *under,
+			       const std::string & under_filename,
+			       fichier_global *hash_file,
+			       hash_algo algo) : fichier_global(dialog, gf_write_only)
     {
-	if(m != gf_write_only)
+	if(under == NULL)
 	    throw SRC_BUG;
-	hash_ready = false;
-	x_perm = perm;
-	user_ownership = "";
-	group_ownership = "";
-    }
-
-    hash_fichier::hash_fichier(user_interaction & dialog, const std::string & chemin, gf_mode m, U_I perm, bool furtive_mode)
-	: fichier(dialog, chemin, m, perm, furtive_mode)
-    {
-	if(m != gf_write_only)
+	if(hash_file == NULL)
 	    throw SRC_BUG;
-	hash_ready = false;
-	x_perm = perm;
-	user_ownership = "";
-	group_ownership = "";
-    }
+	if(under->get_mode() != gf_write_only)
+	    throw SRC_BUG;
+	if(hash_file->get_mode() != gf_write_only)
+	    throw SRC_BUG;
+	ref = under;
+	hash_ref = hash_file;
+	path tmp = under_filename;
+	ref_filename = tmp.basename();
+	eof = false;
+	hash_dumped = false;
 
-    hash_fichier::~hash_fichier()
-    {
-	try
-	{
-	    terminate();
-	}
-	catch(...)
-	{
-		// ignore all errors
-	}
-    }
-
-    void hash_fichier::inherited_terminate()
-    {
-	if(hash_ready)
-	{
-	    try
-	    {
-		dump_hash();
-	    }
-	    catch(...)
-	    {
-#if CRYPTO_AVAILABLE
-		gcry_md_close(hash_handle);
-#endif
-		hash_ready = false;
-		throw;
-	    }
-#if CRYPTO_AVAILABLE
-	    gcry_md_close(hash_handle);
-#endif
-	    hash_ready = false;
-	}
-
-	fichier::inherited_terminate();
-    }
-
-
-    void hash_fichier::set_hash_file_name(const std::string & filename, hash_algo algo, const string & extension)
-    {
 #if CRYPTO_AVAILABLE
 	gcry_error_t err;
 
-	hash_filename = filename;
-	hash_extension = extension;
-	eof = false;
 	switch(algo)
 	{
 	case hash_none:
@@ -144,27 +91,46 @@ namespace libdar
 
 	err = gcry_md_test_algo(hash_gcrypt);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("hash_fichier::set_hash_file_name",tools_printf(gettext("Error while initializing hash: Hash algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange("hash_fichier::hash_fichier",tools_printf(gettext("Error while initializing hash: Hash algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 	err = gcry_md_open(&hash_handle, hash_gcrypt, 0); // no need of secure memory here
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("hash_fichier::set_hash_file_name",tools_printf(gettext("Error while creating hash handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-
-	hash_ready = true;
+	    throw Erange("hash_fichier::hash_fichier",tools_printf(gettext("Error while creating hash handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 #else
 	throw Ecompilation(gettext("Missing hashing algorithms support (which is part of strong encryption support, using libgcrypt)"));
 #endif
     }
 
-    void hash_fichier::inherited_write(const char *a, U_I size)
+    hash_fichier::~hash_fichier()
+    {
+	try
+	{
+	    terminate();
+	}
+	catch(...)
+	{
+		// ignore all errors
+	}
+	if(ref != NULL)
+	{
+	    delete ref;
+	    ref = NULL;
+	}
+	if(hash_ref != NULL)
+	{
+	    delete hash_ref;
+	    hash_ref = NULL;
+	}
+    }
+
+    U_I hash_fichier::fichier_global_inherited_write(const char *a, U_I size)
     {
 #if CRYPTO_AVAILABLE
-	if(!hash_ready)
-	    throw SRC_BUG;
 	if(eof)
 	    throw SRC_BUG;
 	gcry_md_write(hash_handle, (const void *)a, size);
-	fichier::inherited_write(a, size);
+	ref->write(a, size);
+	return size;
 #else
 	throw Ecompilation(gettext("Missing hashing algorithms support (which is part of strong encryption support, using libgcrypt)"));
 #endif
@@ -172,42 +138,57 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: hash_fichier.cpp,v 1.8 2011/06/02 13:17:37 edrusb Rel $";
+        static char id[]="$Id: hash_fichier.cpp,v 1.9 2012/04/27 11:24:30 edrusb Exp $";
         dummy_call(id);
     }
 
-    void hash_fichier::dump_hash()
+    void hash_fichier::inherited_terminate()
     {
+	if(!hash_dumped)
+	{
+		// avoids subsequent writings (yeld a bug report if that occurs)
+	    eof = true;
+		// avoid a second run of dump_hash()
+	    hash_dumped = true;
+	    try
+	    {
 #if CRYPTO_AVAILABLE
-	    // first we obtain the hash result;
-	const unsigned char *digest = gcry_md_read(hash_handle, hash_gcrypt);
-	const U_I digest_size = gcry_md_get_algo_dlen(hash_gcrypt);
-	user_interaction_blind aveugle;
+		    // first we obtain the hash result;
+		const unsigned char *digest = gcry_md_read(hash_handle, hash_gcrypt);
+		const U_I digest_size = gcry_md_get_algo_dlen(hash_gcrypt);
 
-	    // avoid subsequent writings (yeld a bug report if that occurs)
-	eof = true;
+		try
+		{
+		    string hexa = tools_string_to_hexa(string((char *)digest, digest_size));
 
-	try
-	{
-	    fichier where = fichier(aveugle, hash_filename +"."+hash_extension, gf_write_only, x_perm, false);
-	    string hexa = tools_string_to_hexa(string((char *)digest, digest_size));
-	    path no_path = hash_filename;
-	    string slice_name = no_path.basename();
-
-	    where.change_ownership(user_ownership, group_ownership);
-	    where.write((const char *)hexa.c_str(), hexa.size());
-	    where.write("  ", 2); // two spaces sperator used by md5sum and sha1sum
-	    where.write(slice_name.c_str(), slice_name.size());
-	    where.write("\n", 1); // we finish by a new-line character
-	}
-	catch(Egeneric & e)
-	{
-	    throw Erange("hash_fichier::dump_hash", gettext("Failed writing down the hash: ") + e.get_message());
-	}
+		    if(hash_ref == NULL)
+			throw SRC_BUG;
+		    hash_ref->write((const char *)hexa.c_str(), hexa.size());
+		    hash_ref->write("  ", 2); // two spaces sperator used by md5sum and sha1sum
+		    hash_ref->write(ref_filename.c_str(), ref_filename.size());
+		    hash_ref->write("\n", 1); // we finish by a new-line character
+		}
+		catch(Egeneric & e)
+		{
+		    throw Erange("hash_fichier::dump_hash", gettext("Failed writing down the hash: ") + e.get_message());
+		}
 #endif
-	    // no #else clause (routing used from constructor, if binary lack support
-	    // for strong encryption this has already been returned to the user
-	    // and we must not trouble the destructor for that
+		    // no #else clause (routine used from constructor, if binary lack support
+		    // for strong encryption this has already been returned to the user
+		    // and we must not trouble the destructor for that
+
+	    }
+	    catch(...)
+	    {
+#if CRYPTO_AVAILABLE
+		gcry_md_close(hash_handle);
+#endif
+		throw;
+	    }
+#if CRYPTO_AVAILABLE
+	    gcry_md_close(hash_handle);
+#endif
+	}
     }
 
 

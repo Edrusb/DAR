@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: fichier.cpp,v 1.6 2011/04/17 13:12:29 edrusb Rel $
+// $Id: fichier.cpp,v 1.8 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -95,18 +95,83 @@ using namespace std;
 namespace libdar
 {
 
-    fichier::fichier(user_interaction & dialog, S_I fd) : generic_file(generic_file_get_mode(fd))
+    void fichier_global::inherited_write(const char *a, U_I size)
     {
-	init_dialog(dialog);
+	U_I wrote = 0;
+
+	while(wrote < size)
+	{
+	    wrote += fichier_global_inherited_write(a+wrote, size-wrote);
+	    if(wrote < size)
+	    {
+		if(x_dialog == NULL)
+		    throw SRC_BUG;
+		x_dialog->pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
+	    }
+	}
+    }
+
+    U_I fichier_global::inherited_read(char *a, U_I size)
+    {
+	U_I ret = 0;
+	U_I read = 0;
+	string message;
+
+	while(!fichier_global_inherited_read(a+ret, size-ret, read, message))
+	{
+	    ret += read;
+	    if(x_dialog == NULL)
+		throw SRC_BUG;
+	    x_dialog->pause(message);
+	}
+
+	ret += read;
+
+	return ret;
+    }
+
+    fichier_global::fichier_global(const user_interaction & dialog, gf_mode mode) : generic_file(mode)
+    {
+	x_dialog = dialog.clone();
+	if(x_dialog == NULL)
+	    throw SRC_BUG;
+    }
+
+
+    void fichier_global::copy_from(const fichier_global & ref)
+    {
+	if(ref.x_dialog != NULL)
+	{
+	    x_dialog = ref.x_dialog->clone();
+	    if(x_dialog == NULL)
+		throw Ememory("fichier_global::copy_from");
+	}
+	else
+	    x_dialog = NULL;
+    }
+
+    void fichier_global::copy_parent_from(const fichier_global & ref)
+    {
+	generic_file *me_g = this;
+	const generic_file *you_g = &ref;
+	thread_cancellation *me_t = this;
+	const thread_cancellation *you_t = &ref;
+	*me_g = *you_g;
+	*me_t = *you_t;
+    }
+
+	///////////
+
+    fichier::fichier(user_interaction & dialog, S_I fd) : fichier_global(dialog, generic_file_get_mode(fd))
+    {
         filedesc = fd;
     }
 
     fichier::fichier(user_interaction & dialog, const char *name,
 		     gf_mode m,
 		     U_I perm,
-		     bool furtive_mode) : generic_file(m)
+		     bool furtive_mode) : fichier_global(dialog, m)
     {
-	init_dialog(dialog);
         fichier::open(name, m, perm, furtive_mode);
     }
 
@@ -114,15 +179,14 @@ namespace libdar
 		     const string &chemin,
 		     gf_mode m,
 		     U_I perm,
-		     bool furtive_mode) : generic_file(m)
+		     bool furtive_mode) : fichier_global(dialog, m)
     {
-	init_dialog(dialog);
         fichier::open(chemin.c_str(), m, perm, furtive_mode);
     }
 
-    fichier::fichier(const string & chemin, bool furtive_mode) : generic_file(gf_read_only)
+    fichier::fichier(const string & chemin, bool furtive_mode) : fichier_global(user_interaction_blind(), gf_read_only)
     {
-	x_dialog = NULL; // we should never need it in read_only mode
+	    // in read-only mode the user_interaction is not expected to be used
 	fichier::open(chemin.c_str(), gf_read_only, tools_octal2int("0777"), furtive_mode);
     }
 
@@ -165,6 +229,25 @@ namespace libdar
             filesize = dat.st_size;
 
         return filesize;
+    }
+
+
+    void fichier::fadvise(advise adv) const
+    {
+#if HAVE_POSIX_FADVISE
+	 int ret = posix_fadvise(filedesc, 0, 0, advise_to_int(adv));
+
+	if(ret == EBADF)
+	    throw SRC_BUG; // filedesc not a valid file descriptor !?!
+	if(ret != 0)
+	    throw Erange("fichier::fadvise", string("Set posix advise failed: ") + strerror(errno));
+#endif
+    }
+
+    void fichier::fsync() const
+    {
+	if(fdatasync(filedesc) < 0)
+	    throw Erange("fichier::fsync", string("Failed sync the slice (fdatasync): ") + strerror(errno));
     }
 
     bool fichier::skip(const infinint &q)
@@ -235,7 +318,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: fichier.cpp,v 1.6 2011/04/17 13:12:29 edrusb Rel $";
+        static char id[]="$Id: fichier.cpp,v 1.8 2012/04/27 11:24:30 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -252,10 +335,10 @@ namespace libdar
         return ret;
     }
 
-    U_I fichier::inherited_read(char *a, U_I size)
+    bool fichier::fichier_global_inherited_read(char *a, U_I size, U_I & read, string & message)
     {
-        ssize_t ret;
-        U_I lu = 0;
+        ssize_t ret = -1;
+        read = 0;
 
 #ifdef MUTEX_WORKS
 	check_self_cancellation();
@@ -263,12 +346,12 @@ namespace libdar
         do
         {
 #ifdef SSIZE_MAX
-	    U_I to_read = size - lu > SSIZE_MAX ? SSIZE_MAX : size - lu;
+	    U_I to_read = size - read > SSIZE_MAX ? SSIZE_MAX : size - read;
 #else
-	    U_I to_read = size - lu;
+	    U_I to_read = size - read;
 #endif
 
-            ret = ::read(filedesc, a+lu, to_read);
+            ret = ::read(filedesc, a+read, to_read);
             if(ret < 0)
             {
                 switch(errno)
@@ -277,8 +360,7 @@ namespace libdar
                     break;
                 case EAGAIN:
                     throw SRC_BUG;
-			// non blocking read not compatible with
-                        // generic_file
+			// "non blocking" read is not expected in this implementation
                 case EIO:
                     throw Ehardware("fichier::inherited_read", string(gettext("Error while reading from file: ")) + strerror(errno));
                 default :
@@ -286,14 +368,14 @@ namespace libdar
                 }
             }
             else
-                lu += ret;
+                read += ret;
         }
-        while(lu < size && ret != 0);
+        while(read < size && ret != 0);
 
-        return lu;
+        return true; // we never make partial reading, here
     }
 
-    void fichier::inherited_write(const char *a, U_I size)
+    U_I fichier::fichier_global_inherited_write(const char *a, U_I size)
     {
         ssize_t ret;
         U_I total = 0;
@@ -330,12 +412,9 @@ namespace libdar
                 case EIO:
                     throw Ehardware("fichier::inherited_write", string(gettext("Error while writing to file: ")) + strerror(errno));
                 case ENOSPC:
-		    if(get_mode() == gf_read_only)
-			throw SRC_BUG; // read-only mode should not lead to asking more space !
-		    if(x_dialog == NULL)
-			throw SRC_BUG;
-                    x_dialog->pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
-                    break;
+		    return total; // partial writing, we stop here returning the amount of data wrote so far
+			// because there is no space left on device. The parent class manages the user interaction
+			// to allow abortion or action that frees up some storage space.
                 default :
                     throw Erange("fichier::inherited_write", string(gettext("Error while writing to file: ")) + strerror(errno));
                 }
@@ -343,7 +422,9 @@ namespace libdar
             else
                 total += ret;
         }
-    }
+
+	return total;
+     }
 
     void fichier::open(const char *name, gf_mode m, U_I perm, bool furtive_mode)
     {
@@ -381,9 +462,7 @@ namespace libdar
 		{
 		    if(get_mode() == gf_read_only)
 			throw SRC_BUG; // in read_only mode we do not need to create a new inode !!!
-		    if(x_dialog == NULL)
-			throw SRC_BUG;
-                    x_dialog->pause(gettext("No space left for inode, you have the opportunity to make some room now. When done : can we continue ?"));
+                    get_ui().pause(gettext("No space left for inode, you have the opportunity to make some room now. When done : can we continue ?"));
 		}
                 else
                     throw Erange("fichier::open", string(gettext("Cannot open file : ")) + strerror(errno));
@@ -397,17 +476,39 @@ namespace libdar
 	filedesc = dup(ref.filedesc);
 	if(filedesc <0)
 	    throw Erange("fichier::copy_from", tools_printf(gettext("Cannot dup() filedescriptor while copying \"fichier\" object: %s"), strerror(errno)));
-	if(ref.x_dialog != NULL)
-	    init_dialog(*ref.x_dialog);
-	else
-	    x_dialog = NULL;
     }
 
-    void fichier::init_dialog(user_interaction & dialog)
+    void fichier::copy_parent_from(const fichier & ref)
     {
-	x_dialog = dialog.clone();
-	if(x_dialog == NULL)
-	    throw SRC_BUG;
+	fichier_global *me = this;
+	const fichier_global *you = &ref;
+	*me = *you;
     }
+
+    int fichier::advise_to_int(advise arg) const
+    {
+ #if HAVE_POSIX_FADVISE
+	switch(arg)
+	{
+	case advise_normal:
+	    return POSIX_FADV_NORMAL;
+	case advise_sequential:
+	    return POSIX_FADV_SEQUENTIAL;
+	case advise_random:
+	    return POSIX_FADV_RANDOM;
+	case advise_noreuse:
+	    return POSIX_FADV_NOREUSE;
+	case advise_willneed:
+	    return POSIX_FADV_WILLNEED;
+	case advise_dontneed:
+	    return POSIX_FADV_DONTNEED;
+	default:
+	    throw SRC_BUG;
+	}
+#else
+	return 0;
+#endif
+    }
+
 
 } // end of namespace

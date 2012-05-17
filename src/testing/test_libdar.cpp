@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_libdar.cpp,v 1.45.2.1 2012/02/25 19:57:01 edrusb Exp $
+// $Id: test_libdar.cpp,v 1.47 2012/02/27 07:54:23 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -75,7 +75,7 @@ void f1()
     libdar::compile_time::endian endy;
 
     get_version(maj, med, min);
-    printf("version %u.%u.%u\n", maj, med, min);
+    ui.printf("version %u.%u.%u\n", maj, med, min);
     ea = libdar::compile_time::ea();
     large = libdar::compile_time::largefile();
     nodump = libdar::compile_time::nodump();
@@ -88,18 +88,18 @@ void f1()
     libcrypto = libdar::compile_time::libgcrypt();
     furtive = libdar::compile_time::furtive_read();
     endy = libdar::compile_time::system_endian();
-    printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\nlibz =%s\nlibbz2 = %s\nliblzo = %s\nlibcrypto = %s\nfurtive = %s\nendian = %c\n",
-	   BOOL2STR(ea),
-	   BOOL2STR(large),
-	   BOOL2STR(nodump),
-	   BOOL2STR(special),
-	   bits,
-	   BOOL2STR(libz),
-	   BOOL2STR(libbz2),
-	   BOOL2STR(liblzo2),
-	   BOOL2STR(libcrypto),
-	   BOOL2STR(furtive),
-	   endy);
+    ui.printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\nlibz =%s\nlibbz2 = %s\nliblzo = %s\nlibcrypto = %s\nfurtive = %s\nendian = %c\n",
+	      BOOL2STR(ea),
+	      BOOL2STR(large),
+	      BOOL2STR(nodump),
+	      BOOL2STR(special),
+	      bits,
+	      BOOL2STR(libz),
+	      BOOL2STR(libbz2),
+	      BOOL2STR(liblzo2),
+	      BOOL2STR(libcrypto),
+	      BOOL2STR(furtive),
+	      endy);
 }
 
 void warning(const string &x, void *context)
@@ -110,11 +110,11 @@ void warning(const string &x, void *context)
 bool question(const string & x, void *context)
 {
     bool rep = false;
-	    char r;
+    char r;
 
-	    printf("[%p]%s\n", context, x.c_str());
-	    scanf("%c", &r);
-	    rep = r == 'y';
+    printf("[%p]%s\n", context, x.c_str());
+    scanf("%c", &r);
+    rep = r == 'y';
 
     return rep;
 }
@@ -200,9 +200,9 @@ void f2()
 	return;
     }
     if(ret)
-	printf("found children\n");
+	ui.printf("found children\n");
     else
-	printf("no found children\n");
+	ui.printf("no found children\n");
 
     ret = get_children_of_noexcept(ui, arch, "", code, msg);
     if(code != LIBDAR_NOEXCEPT)
@@ -211,9 +211,9 @@ void f2()
 	return;
     }
     if(ret)
-	printf("found children\n");
+	ui.printf("found children\n");
     else
-	printf("no found children\n");
+	ui.printf("no found children\n");
 
 
     close_archive_noexcept(arch, code, msg);
@@ -248,9 +248,9 @@ void f3()
 	return;
     }
     if(ret)
-	printf("found children\n");
+	ui.printf("found children\n");
     else
-	printf("no found children\n");
+	ui.printf("no found children\n");
 
     close_archive_noexcept(arch, code, msg);
     if(code != LIBDAR_NOEXCEPT)
@@ -292,21 +292,10 @@ void f4()
 
 void f5()
 {
-    user_interaction *dialog = shell_interaction_init(&cout, &cerr, false);
+    string ret;
 
-    try
-    {
-	string ret;
-
-	ret = dialog->get_string("Mot de passe svp :", false);
-	cout << "---[" << ret << "]---" << endl;
-	ret = dialog->get_string("Mot de passe svp :", true);
-	cout << "---[" << ret << "]---" << endl;
-
-    }
-    catch(...)
-    {
-	delete dialog;
-	shell_interaction_close();
-    }
+    ret = ui.get_string("Mot de passe svp :", false);
+    cout << "---[" << ret << "]---" << endl;
+    ret = ui.get_string("Mot de passe svp :", true);
+    cout << "---[" << ret << "]---" << endl;
 }

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tools.hpp,v 1.85.2.1 2012/04/09 14:28:33 edrusb Exp $
+// $Id: tools.hpp,v 1.88 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -665,13 +665,25 @@ namespace libdar
 	/// \param[in] perm file permission to set the file to
     extern void tools_set_permission(S_I fd, U_I perm);
 
-	/// change ownership of the file which descriptor is given
+	/// convert string user name or uid to numeric uid value
 
-	/// \param[in] fd file's descriptor
-	/// \param[in] slice_user the user to set the file to. For empty string, no attempts to change the user ownership is done
-	/// \param[in] slice_group the group to set the file to. For empty string, no attempts to change the group ownership is done
-	/// \note this call may throw Erange exception upon system error
-    extern void tools_set_ownership(S_I fd, const std::string & slice_user, const std::string & slice_group);
+	/// \param[in] user string username
+	/// \return uid value
+    extern uid_t tools_ownership2uid(const std::string & user);
+
+	/// convert string group name or gid to numeric gid value
+
+	/// \param[in] group string username
+	/// \return uid value
+    extern uid_t tools_ownership2gid(const std::string & group);
+
+        /// change ownership of the file which descriptor is given
+
+        /// \param[in] filedesc file's descriptor
+        /// \param[in] slice_user the user to set the file to. For empty string, no attempts to change the user ownership is done
+        /// \param[in] slice_group the group to set the file to. For empty string, no attempts to change the group ownership is done
+        /// \note this call may throw Erange exception upon system error
+    extern void tools_set_ownership(S_I filedesc, const std::string & slice_user, const std::string & slice_group);
 
 	/// Produces in "dest" the XORed value of "dest" and "src"
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: path.hpp,v 1.18.2.1 2012/02/19 17:25:09 edrusb Exp $
+// $Id: path.hpp,v 1.20 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -78,6 +78,7 @@ namespace libdar
 
 	    /// comparison operator
         bool operator == (const path & ref) const;
+	bool operator != (const path & ref) const { return !(*this == ref); };
 
 	    /// get the basename of a path
 

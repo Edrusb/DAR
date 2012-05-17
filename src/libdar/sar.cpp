@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sar.cpp,v 1.82.2.2 2012/01/05 10:41:24 edrusb Exp $
+// $Id: sar.cpp,v 1.86 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -110,7 +110,7 @@ char *strchr (), *strrchr ();
 #include "erreurs.hpp"
 #include "cygwin_adapt.hpp"
 #include "deci.hpp"
-#include "fichier.hpp"
+#include "entrepot.hpp"
 
 using namespace std;
 
@@ -118,17 +118,17 @@ namespace libdar
 {
 
     static bool sar_extract_num(const string & filename, const string & base_name, const infinint & min_digits, const string & ext, infinint & ret);
-    static bool sar_get_higher_number_in_dir(const path & dir, const string & base_name, const infinint & min_digits, const string & ext, infinint & ret);
+    static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_name, const infinint & min_digits, const string & ext, infinint & ret);
     static string sar_make_padded_number(const string & num, const infinint & min_digits);
 
     sar::sar(user_interaction & dialog,
 	     const string & base_name,
 	     const string & extension,
-	     const path & dir,
+	     const entrepot & where,
 	     bool by_the_end,
 	     const infinint & x_min_digits,
 	     bool x_lax,
-	     const string & execute) : generic_file(gf_read_only), mem_ui(dialog), archive_dir(dir)
+	     const string & execute) : generic_file(gf_read_only), mem_ui(dialog)
     {
 	opt_warn_overwrite = true;
 	opt_allow_overwrite = false;
@@ -139,16 +139,18 @@ namespace libdar
         hook = execute;
         set_info_status(CONTEXT_INIT);
 	old_sar = false; // will be set to true at header read time a bit further if necessary
-	perm = 0;
-	slice_user = "";
-	slice_group = "";
 	hash = hash_none;
 	lax = x_lax;
 	min_digits = x_min_digits;
+	entr = NULL;
 
         open_file_init();
 	try
 	{
+	    entr = where.clone();
+	    if(entr == NULL)
+		throw Ememory("sar::sar");
+
 	    if(by_the_end)
 	    {
 		try
@@ -179,6 +181,8 @@ namespace libdar
 		    of_fd = NULL;
 		}
 	    }
+	    if(entr != NULL)
+		delete entr;
 	    throw;
 	}
     }
@@ -191,14 +195,11 @@ namespace libdar
 	     bool x_warn_overwrite,
 	     bool x_allow_overwrite,
 	     const infinint & x_pause,
-	     const path & dir,
+	     const entrepot & where,
 	     const label & data_name,
-	     const string & slice_permission,
-	     const string & slice_user_ownership,
-	     const string & slice_group_ownership,
 	     hash_algo x_hash,
 	     const infinint & x_min_digits,
-	     const string & execute) : generic_file(gf_write_only), mem_ui(dialog), archive_dir(dir)
+	     const string & execute) : generic_file(gf_write_only), mem_ui(dialog)
     {
         if(file_size < header::min_size() + 1)  //< one more byte to store at least one byte of data
             throw Erange("sar::sar", gettext("File size too small"));
@@ -219,9 +220,6 @@ namespace libdar
         first_size = first_file_size;
         hook = execute;
 	pause = x_pause;
-	perm = tools_octal2int(slice_permission);
-	slice_user = slice_user_ownership;
-	slice_group = slice_group_ownership;
 	hash = x_hash;
 	min_digits = x_min_digits;
         set_info_status(CONTEXT_OP);
@@ -233,9 +231,14 @@ namespace libdar
 	of_fd = NULL;
 	of_flag = '\0';
 	old_sar = false; // sar creation does not makes a sar using an old header, this is always false within this constructor
+	entr = NULL;
 
 	try
 	{
+	    entr = where.clone();
+	    if(entr == NULL)
+		throw Ememory("sar::sar");
+
 	    open_file_init();
 	    open_file(1);
 	}
@@ -253,6 +256,8 @@ namespace libdar
 		    of_fd = NULL;
 		}
 	    }
+	    if(entr != NULL)
+		delete entr;
 	    throw;
 	}
     }
@@ -277,6 +282,8 @@ namespace libdar
 	{
 		// ignore all exception
 	}
+	if(entr != NULL)
+	    delete entr;
     }
 
     bool sar::skip(const infinint &pos)
@@ -390,7 +397,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.82.2.2 2012/01/05 10:41:24 edrusb Exp $";
+        static char id[]="$Id: sar.cpp,v 1.86 2012/04/27 11:24:30 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -564,6 +571,16 @@ namespace libdar
 		else
 		    of_fd->write(&flag, 1);
 	    }
+	    of_fd->fsync();
+	    of_fd->fadvise(fichier::advise_dontneed);
+		// well this two previous lines are for Linux
+		// which has a strange implementation of the fadvise posix routine:
+		// this two calls should clear the current slice from the cache under Linux.
+		// On other systems, as the fadvise has already been set top "dontneed" when
+		// the filedescriptor was just openned, the data written to the current slice
+		// should already have not gone through the cache, so this second call is useless
+		// but does not harm.
+
 	    of_fd->terminate();
 
             delete of_fd;
@@ -574,56 +591,57 @@ namespace libdar
 	    throw SRC_BUG;
     }
 
-    void sar::open_readonly(const char *fic, const infinint &num)
+    void sar::open_readonly(const string & fic, const infinint &num)
     {
         header h;
 
         while(of_fd == NULL)
         {
+	    entrepot::io_errors code;
+
                 // launching user command if any
             hook_execute(num);
 
                 // trying to open the file
                 //
-            S_I fd = ::open(fic, O_RDONLY|O_BINARY);
-            if(fd < 0)
+	    try
 	    {
-		try
-		{
-		    if(errno == ENOENT)
-		    {
-			if(!lax)
-			    get_ui().pause(tools_printf(gettext("%s is required for further operation, please provide the file."), fic));
-			else
-			    get_ui().pause(tools_printf(gettext("%s is required for further operation, please provide the file if you have it."), fic));
-			continue; // we restart the while loop
-		    }
-		    else
-			throw Erange("sar::open_readonly", tools_printf(gettext("Error opening %s : "), fic) +  strerror(errno));
-		}
-		catch(Euser_abort & e)
-		{
-		    if(lax)
-		    {
-			get_ui().warning(string(gettext("LAX MODE: Caught exception: "))+ e.get_message());
-			get_ui().pause(tools_printf(gettext("LAX MODE: %s is missing, You have the possibility to create a zero byte length file under the name of this slice, to replace this missing file. This will of course generate error messages about the information that is missing in this slice, but at least libdar will be able to continue. Can we continue now?"), fic));
-			continue; // we restart the while loop
-		    }
-		    else
-			throw;
-		}
+		code = entr->open(get_ui(), fic, gf_read_only, false, false, hash_none, of_fd);
 	    }
-            else
+	    catch(Euser_abort & e)
 	    {
-                of_fd = new fichier(get_ui(), fd);
+		if(lax)
+		{
+		    get_ui().warning(string(gettext("LAX MODE: Caught exception: "))+ e.get_message());
+		    get_ui().pause(tools_printf(gettext("LAX MODE: %S is missing, You have the possibility to create a zero byte length file under the name of this slice, to replace this missing file. This will of course generate error messages about the information that is missing in this slice, but at least libdar will be able to continue. Can we continue now?"), &fic));
+		    continue; // we restart the while loop
+		}
+		else
+		    throw;
+	    }
+
+	    switch(code)
+	    {
+	    case entrepot::io_ok:
 		if(of_fd == NULL)
-		    throw Ememory("sar::open_readonly");
+		    throw SRC_BUG;
+		of_fd->fadvise(fichier::advise_normal);
+		    // we have no advise to give to the system when reading a slice
 		size_of_current = of_fd->get_size();
+		break;
+	    case entrepot::io_absent:
+		if(!lax)
+		    get_ui().pause(tools_printf(gettext("%S is required for further operation, please provide the file."), &fic));
+		else
+		    get_ui().pause(tools_printf(gettext("%S is required for further operation, please provide the file if you have it."), &fic));
+		continue; // we restart the while loop
+	    case entrepot::io_exist:
+		throw SRC_BUG;
+	    default:
+		throw SRC_BUG;
 	    }
 
 
-	    if(of_fd == NULL)
-		throw SRC_BUG;
 
                 // trying to read the header
                 //
@@ -652,11 +670,11 @@ namespace libdar
 		if(!lax)
 		{
 		    close_file(false);
-		    get_ui().pause(tools_printf(gettext("%s has a bad or corrupted header, please provide the correct file."), fic));
+		    get_ui().pause(tools_printf(gettext("%S has a bad or corrupted header, please provide the correct file."), &fic));
 		    continue;
 		}
 		else
-		    get_ui().warning(tools_printf(gettext("LAX MODE: %s has a bad or corrupted header, trying to guess original values and continuing if possible"), fic));
+		    get_ui().warning(tools_printf(gettext("LAX MODE: %S has a bad or corrupted header, trying to guess original values and continuing if possible"), &fic));
             }
 
                 // checking against the magic number
@@ -666,11 +684,11 @@ namespace libdar
 		if(!lax)
 		{
 		    close_file(false);
-		    get_ui().pause(tools_printf(gettext("%s is not a valid file (wrong magic number), please provide the good file."), fic));
+		    get_ui().pause(tools_printf(gettext("%S is not a valid file (wrong magic number), please provide the good file."), &fic));
 		    continue;
 		}
 		else
-		    get_ui().warning(tools_printf(gettext("LAX MODE: In spite of its name, %s does not appear to be a dar slice, assuming a data corruption took place and continuing"), fic));
+		    get_ui().warning(tools_printf(gettext("LAX MODE: In spite of its name, %S does not appear to be a dar slice, assuming a data corruption took place and continuing"), &fic));
             }
 
 	    if(h.is_old_header() && first_file_offset == 0 && num != 1)
@@ -742,7 +760,7 @@ namespace libdar
                 catch(Erange & e)
                 {
                     close_file(false);
-                    get_ui().pause(tools_printf(gettext("Error opening %s : "), fic) + e.get_message() + gettext(" . Retry ?"));
+                    get_ui().pause(tools_printf(gettext("Error opening %S : "), &fic) + e.get_message() + gettext(" . Retry ?"));
                     continue;
                 }
             }
@@ -753,7 +771,7 @@ namespace libdar
 		    if(!lax)
 		    {
 			close_file(false);
-			get_ui().pause(string(fic) + gettext(" is a slice from another backup, please provide the correct slice."));
+			get_ui().pause(fic + gettext(" is a slice from another backup, please provide the correct slice."));
 			continue;
 		    }
 		    else
@@ -830,7 +848,7 @@ namespace libdar
 		if(!lax)
 		{
 		    close_file(false);
-		    get_ui().pause(tools_printf(gettext("Slice %s has an unknown flag (neither terminal nor non_terminal file)."), fic));
+		    get_ui().pause(tools_printf(gettext("Slice %S has an unknown flag (neither terminal nor non_terminal file)."), &fic));
 		    continue;
 		}
 		else
@@ -840,7 +858,7 @@ namespace libdar
 
 			do
 			{
-			    answ = get_ui().get_string(tools_printf(gettext("Due to data corruption, it is not possible to know if slice %s is the last slice of the archive or not. I need your help to figure out this. At the following prompt please answer either one of the following words: \"last\" or \"notlast\" according to the nature of this slice (you can also answer with \"abort\" to abort the program immediately): "), fic), true);
+			    answ = get_ui().get_string(tools_printf(gettext("Due to data corruption, it is not possible to know if slice %S is the last slice of the archive or not. I need your help to figure out this. At the following prompt please answer either one of the following words: \"last\" or \"notlast\" according to the nature of this slice (you can also answer with \"abort\" to abort the program immediately): "), &fic), true);
 			}
 			while(answ != gettext("last") && answ != gettext("notlast") && answ != gettext("abort"));
 
@@ -879,151 +897,165 @@ namespace libdar
         }
     }
 
-    void sar::open_writeonly(const char *fic, const infinint &num)
+    void sar::open_writeonly(const string & fic, const infinint &num)
     {
-	header h;
-        S_I open_mode = perm;
-        S_I fd = -1;
 	bool unlink_on_error = false;
+	bool do_erase = false;
+	entrepot::io_errors code;
 
+	    // open for writing but succeeds only if this file does NOT already exist
 	try
 	{
-		// open succeeds only if this file does NOT already exist
-	     fd = ::open(fic, O_WRONLY|O_BINARY|O_CREAT|O_EXCL, open_mode);
+	    code = entr->open(get_ui(), fic, gf_write_only, true, false, hash, of_fd);
+	}
+	catch(Erange & e)
+	{
+	    string tmp = e.get_message();
+	    get_ui().warning(tools_printf(gettext("failed openning slice %S: %S. Will try to erase it first, if allowed"), &fic, &tmp));
+	    code = entrepot::io_exist;
+	}
 
-	    if(fd < 0) // open failed
+	switch(code)
+	{
+	case entrepot::io_ok:
+	    break;
+	case entrepot::io_exist:
+	    try
 	    {
-		bool do_overwrite = false;
-
-		if(errno == EEXIST) // file already exists
+		code = entr->open(get_ui(), fic, gf_read_only, false, false, hash_none, of_fd);
+		switch(code)
 		{
-		    S_I fd_tmp = ::open(fic, O_RDONLY|O_BINARY);
-
+		case entrepot::io_ok:
+		    if(of_fd == NULL)
+			throw SRC_BUG;
 		    try
 		    {
-			if(fd_tmp >= 0)
+			header h;
+
+			try
 			{
-			    try
-			    {
-				h.read(get_ui(), fd_tmp);
-			    }
-			    catch(Erange & e)
-			    {
-				h.get_set_internal_name() = of_internal_name;
-				h.get_set_internal_name().invert_first_byte();
-				    // this way we are sure that the file is not considered as part of the current SAR
-			    }
-			    if(h.get_set_internal_name() != of_internal_name)
-				do_overwrite = true; // this is not a slice of the current archive
-			    close(fd_tmp);
-			    fd_tmp = -1;
+			    h.read(get_ui(), *of_fd);
 			}
-			else // open read_only failed
-			    do_overwrite = true;     // reading failed, trying overwriting (if allowed)
+			catch(Erange & e)
+			{
+			    h.get_set_internal_name() = of_internal_name;
+			    h.get_set_internal_name().invert_first_byte();
+				// this way we are sure that the file is not considered as part of the current SAR
+			}
+			if(h.get_set_internal_name() != of_internal_name)
+			    do_erase = true; // this is not a slice of the current archive
+			delete of_fd;
+			of_fd = NULL;
 		    }
 		    catch(...)
 		    {
-			if(fd_tmp >= 0)
-			    close(fd_tmp);
+			if(of_fd != NULL)
+			{
+			    delete of_fd;
+			    of_fd = NULL;
+			}
 			throw;
 		    }
-		}
-		else // other error
-		    throw Erange("sar::open_writeonly open()", string(gettext("Error opening file ")) + fic + " : " + strerror(errno));
-
-		if(do_overwrite)
-		{
-		    if(!opt_allow_overwrite)
-			throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
-		    if(opt_warn_overwrite)
-		    {
-			try
-			{
-			    get_ui().pause(string(fic) + gettext(" is about to be overwritten."));
-			    unlink_on_error = true;
-			}
-			catch(...)
-			{
-			    natural_destruction = false;
-			    throw;
-			}
-		    }
-		    else
-			unlink_on_error = true;
-
-			// open with overwriting
-		    fd = ::open(fic, O_WRONLY|O_BINARY|O_TRUNC, open_mode);
-		}
-		else // open without overwriting
-		    fd = ::open(fic, O_WRONLY|O_BINARY, open_mode);
-
-		if(fd < 0)
-		    throw Erange("sar::open_writeonly open()", string(gettext("Error opening file ")) + fic + " : " + strerror(errno));
-		else
-		    tools_set_ownership(fd, slice_user, slice_group);
-	    }
-	    else
-		tools_set_ownership(fd, slice_user, slice_group);
-
-
-	    if(fd < 0)
-		throw SRC_BUG;
-
-		// OK, now that the testing of the existence of the slice that we want to open is
-		// done we can start the main stuf (writing data to the slice)
-
-	    try
-	    {
-		of_flag = flag_type_located_at_end_of_slice;
-
-		if(hash == hash_none)
-		{
-		    of_fd = new fichier(get_ui(), fd);
-		    fd = -1;
-		}
-		else
-		{
-		    hash_fichier *tmp;
-		    of_fd = tmp = new hash_fichier(get_ui(), fd);
-		    fd = -1;
-		    if(tmp != NULL)
-		    {
-			tmp->set_hash_file_name(fic, hash, hash_algo_to_string(hash));
-			tmp->change_permission(perm);
-			tmp->change_ownership(slice_user, slice_group);
-		    }
-		}
-		if(of_fd == NULL)
-		    throw Ememory("sar::open_writeonly");
-
-		h = make_write_header(num, of_flag);
-		h.write(get_ui(), *of_fd);
-		if(num == 1)
-		{
-		    first_file_offset = of_fd->get_position();
-		    if(first_file_offset == 0)
-			throw SRC_BUG;
-		    other_file_offset = first_file_offset; // same header in all slice since release 2.4.0
-		    if(first_file_offset >= first_size)
-			throw Erange("sar::sar", gettext("First slice size is too small to even just be able to drop the slice header"));
-		    if(other_file_offset >= size)
-			throw Erange("sar::sar", gettext("Slice size is too small to even just be able to drop the slice header"));
+		    break;
+		case entrepot::io_exist:
+		    throw SRC_BUG;
+		case entrepot::io_absent:
+		    throw SRC_BUG;
+		default:
+		    throw SRC_BUG;
 		}
 	    }
 	    catch(...)
 	    {
-		if(unlink_on_error)
-		    unlink(fic);
-		throw;
+		do_erase = true;     // reading failed, trying overwriting (if allowed)
+	    }
+
+	    if(do_erase)
+	    {
+		if(!opt_allow_overwrite)
+		    throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
+		if(opt_warn_overwrite)
+		{
+		    try
+		    {
+			get_ui().pause(fic + gettext(" is about to be overwritten."));
+			unlink_on_error = true;
+		    }
+		    catch(...)
+		    {
+			natural_destruction = false;
+			throw;
+		    }
+		}
+		else
+		    unlink_on_error = true;
+
+		    // open with overwriting
+		code = entr->open(get_ui(), fic, gf_write_only, false, true, hash, of_fd);
+	    }
+	    else // open without overwriting
+		if(hash == hash_none)
+		    code = entr->open(get_ui(), fic, gf_write_only, false, false, hash, of_fd);
+		else
+		    throw SRC_BUG; // cannot calculate a hash on a just openned file that is not empty
+
+	    switch(code)
+	    {
+	    case entrepot::io_ok:
+		break;
+	    case entrepot::io_exist:
+		throw SRC_BUG; // not called with fail_if_exists set
+	    case entrepot::io_absent:
+		throw SRC_BUG; // not called in read mode
+	    default:
+		throw SRC_BUG;
+	    }
+	    break;
+	case entrepot::io_absent:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
+
+	if(of_fd == NULL)
+	    throw SRC_BUG;
+
+	try
+	{
+	    header h;
+
+		// telling the system to write data directly to disk not going through the cache
+	    of_fd->fadvise(fichier::advise_dontneed);
+		// useless under Linux, because the corresponding implementation does not avoid the
+		// generated data to pass out of the cache. Maybe some other system can prevent the data
+		// from filling the cache ... so we keep it here in respect to the posix semantic
+
+	    of_flag = flag_type_located_at_end_of_slice;
+	    h = make_write_header(num, of_flag);
+	    h.write(get_ui(), *of_fd);
+	    if(num == 1)
+	    {
+		first_file_offset = of_fd->get_position();
+		if(first_file_offset == 0)
+		    throw SRC_BUG;
+		other_file_offset = first_file_offset; // same header in all slice since release 2.4.0
+		if(first_file_offset >= first_size)
+		    throw Erange("sar::sar", gettext("First slice size is too small to even just be able to drop the slice header"));
+		if(other_file_offset >= size)
+		    throw Erange("sar::sar", gettext("Slice size is too small to even just be able to drop the slice header"));
 	    }
 	}
 	catch(...)
 	{
-	    if(fd >= 0)
-		close(fd);
+	    if(unlink_on_error)
+		entr->unlink(fic);
+	    if(of_fd != NULL)
+	    {
+		delete of_fd;
+		of_fd = NULL;
+	    }
 	    throw;
 	}
-
     }
 
     void sar::open_file_init()
@@ -1041,15 +1073,14 @@ namespace libdar
     {
         if(of_fd == NULL || of_current != num)
         {
-	    const string display = (archive_dir + path(sar_make_filename(base, num, min_digits, ext))).display();
-	    const char *fic = display.c_str();
+	    const string display = sar_make_filename(base, num, min_digits, ext);
 
 	    switch(get_mode())
 	    {
 	    case gf_read_only :
 		close_file(false);
 		    // launch the shell command before reading a slice
-		open_readonly(fic, num);
+		open_readonly(display, num);
 		break;
 	    case gf_write_only :
 
@@ -1091,7 +1122,7 @@ namespace libdar
 		else
 		    initial = false;
 
-		open_writeonly(fic, num);
+		open_writeonly(display, num);
 		break;
 	    default :
 		close_file(false);
@@ -1124,7 +1155,7 @@ namespace libdar
 
             while(of_fd == NULL || of_flag != flag_type_terminal)
             {
-                if(sar_get_higher_number_in_dir(archive_dir, base, min_digits, ext, num))
+                if(sar_get_higher_number_in_dir(*entr, base, min_digits, ext, num))
                 {
                     open_file(num);
                     if(of_flag != flag_type_terminal)
@@ -1138,7 +1169,7 @@ namespace libdar
                         else
                         {
                             close_file(false);
-			    get_ui().pause(string(gettext("The last file of the set is not present in ")) + archive_dir.display() + gettext(" , please provide it."));
+			    get_ui().pause(string(gettext("The last file of the set is not present in ")) + entr->get_url() + gettext(" , please provide it."));
                         }
 		    }
                 }
@@ -1150,7 +1181,7 @@ namespace libdar
                     }
                     else
                     {
-			string chem = archive_dir.display();
+			string chem = entr->get_url();
                         close_file(false);
                         get_ui().pause(tools_printf(gettext("No backup file is present in %S for archive %S, please provide the last file of the set."), &chem, &base));
                     }
@@ -1184,7 +1215,7 @@ namespace libdar
 
 		tools_hook_substitute_and_execute(get_ui(),
 						  hook,
-						  archive_dir.display(),
+						  entr->get_full_path(),
 						  base,
 						  num_str,
 						  sar_make_padded_number(num_str, min_digits),
@@ -1282,39 +1313,24 @@ namespace libdar
         }
     }
 
-    static bool sar_get_higher_number_in_dir(const path & dir, const string & base_name, const infinint & min_digits, const string & ext, infinint & ret)
+static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_name, const infinint & min_digits, const string & ext, infinint & ret)
     {
         infinint cur;
         bool somme = false;
-        struct dirent *entry;
-	const string display = dir.display();
-        const char *folder = display.c_str();
-        DIR *ptr = opendir(folder);
+	string entry;
 
-        try
-        {
-            if(ptr == NULL)
-                throw Erange("sar_get_higher_number_in_dir", string(gettext("Error opening directory ")) + folder + " : " + strerror(errno));
+	entr.read_dir_reset();
 
-            ret = 0;
-            somme = false;
-            while((entry = readdir(ptr)) != NULL)
-                if(sar_extract_num(entry->d_name, base_name, min_digits, ext, cur))
-                {
-                    if(cur > ret)
-                        ret = cur;
-                    somme = true;
-                }
-        }
-        catch(Egeneric & e)
-        {
-            if(ptr != NULL)
-                closedir(ptr);
-            throw;
-        }
+	ret = 0;
+	somme = false;
+	while(entr.read_dir_next(entry))
+	    if(sar_extract_num(entry, base_name, min_digits, ext, cur))
+	    {
+		if(cur > ret)
+		    ret = cur;
+		somme = true;
+	    }
 
-        if(ptr != NULL)
-            closedir(ptr);
         return somme;
     }
 
@@ -1324,96 +1340,106 @@ namespace libdar
     trivial_sar::trivial_sar(user_interaction & dialog,
 			     const std::string & base_name,
 			     const std::string & extension,
-			     const path & dir,
+			     const entrepot & where,
 			     const label & data_name,
 			     const std::string & execute,
 			     bool allow_over,
 			     bool warn_over,
-			     const string & slice_permission,
-			     const string & slice_user_ownership,
-			     const string & slice_group_ownership,
 			     hash_algo x_hash,
-			     const infinint & min_digits) : generic_file(gf_write_only), mem_ui(dialog), archive_dir(dir)
-    {
-	S_I fd;
-	generic_file *tmp = NULL;
+			     const infinint & x_min_digits) : generic_file(gf_write_only), mem_ui(dialog)
+   {
 
 	    // some local variables to be used
 
-	const string filename = sar_make_filename((dir+base_name).display(), 1, min_digits, extension);
-	const char *name = filename.c_str();
+	entrepot::io_errors code;
+	fichier_global *tmp = NULL;
+	const string filename = sar_make_filename(base_name, 1, min_digits, extension);
 
 	    // initializing object fields from constructor arguments
 
+	reference = NULL;
+	offset = 0;
 	end_of_slice = 0;
+	hook = execute;
 	base = base_name;
 	ext = extension;
-	x_min_digits = min_digits;
+	of_data_name = data_name;
+	old_sar = false;
+	min_digits = x_min_digits;
+	hook_where = where.get_full_path();
 
 	    // creating the slice if it does not exist else failing
-
-	fd = ::open(name, O_WRONLY|O_BINARY|O_CREAT|O_EXCL, tools_octal2int(slice_permission));
-
-	if(fd < 0) // open failed
+	try
 	{
-	    if(errno == EEXIST)
+	    code = where.open(dialog, filename, gf_write_only, true, false, x_hash, tmp);
+
+	    switch(code)
 	    {
+	    case entrepot::io_ok:
+		break;
+	    case entrepot::io_exist:
+		if(tmp != NULL)
+		    throw SRC_BUG;
+
 		if(!allow_over)
 		    throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("%S already exists, and overwritten is forbidden, aborting"), &filename));
 		if(warn_over)
 		    dialog.pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
 
-		fd = ::open(name, O_WRONLY|O_BINARY|O_TRUNC, tools_octal2int(slice_permission));
-		if(fd < 0)
-		    throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("Error opening file %s : %s"), name, strerror(errno)));
-	    }
-	    else
-		throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("Error opening file %s : %s"), name, strerror(errno)));
-	}
-
-	try
-	{
-	    tools_set_ownership(fd, slice_user_ownership, slice_group_ownership);
-	    if(x_hash == hash_none)
-		tmp = new fichier(dialog, fd);
-	    else
-	    {
-		hash_fichier *tmp_hash;
-		tmp = tmp_hash = new hash_fichier(dialog, fd);
-		if(tmp_hash != NULL)
+		code = where.open(dialog, filename, gf_write_only, false, true, x_hash, tmp);
+		switch(code)
 		{
-		    tmp_hash->set_hash_file_name(name, x_hash, hash_algo_to_string(x_hash));
-		    tmp_hash->change_permission(tools_octal2int(slice_permission));
-		    tmp_hash->change_ownership(slice_user_ownership, slice_group_ownership);
+		case entrepot::io_ok:
+		    break;
+		case entrepot::io_exist:
+		    throw SRC_BUG;
+		case entrepot::io_absent:
+		    throw SRC_BUG;
+		default:
+		    throw SRC_BUG;
 		}
+		break;
+	    case entrepot::io_absent:
+		if(tmp != NULL)
+		    throw SRC_BUG;
+		else
+		    throw SRC_BUG; // not for the same reason, must know that reporting the same error but on a different line
+	    default:
+		if(tmp != NULL)
+		    throw SRC_BUG;
+		else
+		    throw SRC_BUG; // not for the same reason, must know that reporting the same error but on a different line
 	    }
+
 	    if(tmp == NULL)
-		throw Ememory("trivial_sar::trivial_sar");
+		throw SRC_BUG;
+
+		// telling the system to write data directly to disk not going through the cache
+	    tmp->fadvise(fichier::advise_dontneed);
+		// useless under Linux, because the corresponding implementation does not avoid the
+		// generated data to pass out of the cache. Maybe some other system can prevent the data
+		// from filling the cache ... so we keep it here in respect to the posix semantic
+
+	    set_info_status(CONTEXT_LAST_SLICE);
+	    reference = tmp;
+	    init();
+	    tmp = NULL; // setting it to null only now is necesary to be able to release the object in case of exception thrown
 	}
 	catch(...)
 	{
 	    if(tmp != NULL)
 		delete tmp;
-	    else
-		::close(fd);
 	    throw;
 	}
 
-	try
-	{
-	    build(dialog, tmp, data_name, execute);
-	}
-	catch(...)
-	{
-	    delete tmp;
-	    throw;
-	}
+	if(tmp != NULL)
+	    throw SRC_BUG;
     }
 
 
     trivial_sar::trivial_sar(user_interaction & dialog,
 			     const std::string & pipename,
-			     bool lax) : generic_file(gf_read_only) , mem_ui(dialog), archive_dir("/")
+			     bool lax) : generic_file(gf_read_only) , mem_ui(dialog)
     {
 	reference = NULL;
 	offset = 0;
@@ -1422,9 +1448,10 @@ namespace libdar
 	base = "";
 	ext = "";
 	old_sar = false;
-	x_min_digits = 0;
-	set_info_status(CONTEXT_INIT);
+	min_digits = 0;
+	hook_where = "";
 
+	set_info_status(CONTEXT_INIT);
 	try
 	{
 	    if(pipename == "-")
@@ -1451,45 +1478,24 @@ namespace libdar
     trivial_sar::trivial_sar(user_interaction & dialog,
 			     generic_file *f,
 			     const label & data_name,
-			     const std::string & execute) : generic_file(gf_write_only), mem_ui(dialog), archive_dir("/")
+			     const std::string & execute) : generic_file(gf_write_only), mem_ui(dialog)
     {
-	reference = NULL;
-	offset = 0;
-	end_of_slice = 0;
-	hook = "";
-	base = "";
-	ext = "";
-	old_sar = false;
-	x_min_digits = 0;
-	build(dialog, f, data_name, execute);
-    }
-
-    void trivial_sar::build(user_interaction & dialog,
-			    generic_file *f,
-			    const label & data_name,
-			    const std::string & execute)
-    {
-
-	    // sanity check
-
 	if(f == NULL)
 	    throw SRC_BUG;
 
-	    // contextual object part
+	reference = f;
+	offset = 0;
+	end_of_slice = 0;
+	hook = execute;
+	base = "";
+	ext = "";
+	of_data_name = data_name;
+	old_sar = false;
+	min_digits = 0;
+	hook_where = "";
 
 	set_info_status(CONTEXT_LAST_SLICE);
-
-
-	    // initializing object fields from constructor arguments
-
-	hook = execute;
-	reference = f;
-	old_sar = false;
-	of_data_name = data_name;
-
 	init();
-
-	    // in case of exception the generic_file "f" is not released, this is the duty of the caller to do so.
     }
 
     trivial_sar::~trivial_sar()
@@ -1524,10 +1530,10 @@ namespace libdar
 	    if(get_mode() == gf_write_only)
 		tools_hook_substitute_and_execute(get_ui(),
 						  hook,
-						  archive_dir.display(),
+						  hook_where,
 						  base,
 						  "1",
-						  sar_make_padded_number("1", x_min_digits),
+						  sar_make_padded_number("1", min_digits),
 						  ext,
 						  get_info_status());
 	}

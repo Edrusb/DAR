@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: hash_fichier.hpp,v 1.7.2.1 2012/02/19 17:25:09 edrusb Exp $
+// $Id: hash_fichier.hpp,v 1.9 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -42,8 +42,11 @@ extern "C"
 #endif
 }
 
+#include <string>
+
 #include "generic_file.hpp"
 #include "fichier.hpp"
+#include "integers.hpp"
 
 namespace libdar
 {
@@ -64,17 +67,27 @@ namespace libdar
 
     extern std::string hash_algo_to_string(hash_algo algo);
 
-    class hash_fichier : public fichier
+    class hash_fichier : public fichier_global
     {
     public:
 
-	    // constructors (same as those of class fichier)
+	    /// hash_file constructor
+	    ///
+	    /// \param[in] dialog for user interaction
+	    /// \param[in] under points to an object where to write data to
+	    /// \param[in] under_filename name of the plain file we write to, this argument is required to build the hash file
+	    /// \param[in] hash_file points to an object where to drop the hash file once writings are finished
+	    /// \param[in] algo hash algorithm to use. hash_none is not an acceptable value
+	    /// \note if the constructor succeed, the objects pointed to by under and hash_file are owned and deleted by this hash_file object
 
-	hash_fichier(user_interaction & dialog, S_I fd);
-	hash_fichier(user_interaction & dialog, const char *name, gf_mode m, U_I perm, bool furtive_mode = false);
-        hash_fichier(user_interaction & dialog, const std::string & chemin, gf_mode m, U_I perm,  bool furtive_mode = false);
-	hash_fichier(const std::string & chemin, bool furtive_mode = false) : fichier(chemin, furtive_mode) { throw SRC_BUG; };
-	hash_fichier(const hash_fichier & ref) : fichier(ref) { throw SRC_BUG; };
+        hash_fichier(user_interaction & dialog,
+		     fichier_global *under,
+		     const std::string & under_filename,
+		     fichier_global *hash_file,
+		     hash_algo algo);
+
+	    // copy constructor
+	hash_fichier(const hash_fichier & ref) : fichier_global(ref) { throw SRC_BUG; };
 
 	    // assignment operator
 	const hash_fichier & operator = (const hash_fichier & ref) { throw SRC_BUG; };
@@ -82,53 +95,43 @@ namespace libdar
 	    // destructor
 	~hash_fichier();
 
-	    /// defines the name of the file where to write the hash result
-	    /// when terminate() will be executed for this object
-
-	    /// \param[in] filename is the name to associate the hash to
-	    /// \param[in] algo is the hash algorithm to use
-	    /// \param[in] extension gives the filename to create to drop the hash into "filename.extension" (do not provide the dot in extension)
-	    /// \note the filename is dropped into the hash file to follow the format used by md5sum or sha1sum
-	    /// the filename is not used to 'open' or read the filename, this is just used to add a reference to
-	    /// the hashed file beside the hash result.
-	void set_hash_file_name(const std::string & filename, hash_algo algo, const std::string & extension);
-
-	    /// overriden method from class fichier
-	void change_permission(U_I perm) { x_perm = perm; fichier::change_permission(perm); };
-	void change_ownership(const std::string & user, const std::string & group) { user_ownership = user; group_ownership = group; fichier::change_ownership(user, group); };
+	    // inherited from fichier_global
+	void change_ownership(const std::string & user, const std::string & group) { if(ref == NULL || hash_ref == NULL) throw SRC_BUG; ref->change_ownership(user, group); hash_ref->change_ownership(user, group); };
+	void change_permission(U_I perm) { if(ref == NULL || hash_ref == NULL) throw SRC_BUG; ref->change_permission(perm); hash_ref->change_permission(perm); };
+	infinint get_size() const { if(ref == NULL) throw SRC_BUG; return ref->get_size(); };
+	void fadvise(advise adv) const { if(ref == NULL) throw SRC_BUG; ref->fadvise(adv); };
+	void fsync() const { if(ref == NULL) throw SRC_BUG; ref->fsync(); };
 
 	    // inherited from generic_file
 
-        bool skip(const infinint & pos) { if(pos != fichier::get_position()) throw SRC_BUG; else return true; };
+        bool skip(const infinint & pos) {if(ref == NULL || pos != ref->get_position()) throw SRC_BUG; else return true; };
         bool skip_to_eof() { throw SRC_BUG; };
         bool skip_relative(S_I x) { if(x != 0) throw SRC_BUG; else return true; };
-	    // no need to overwrite the get_position() method
+	infinint get_position() { if(ref == NULL) throw SRC_BUG; return ref->get_position(); };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(hash_fichier);
 #endif
 
     protected:
-	U_I inherited_read(char *a, U_I size) { throw SRC_BUG; };
-        void inherited_write(const char *a, U_I size);
-	    // no need to overwrite inherited_sync_write() method
+	    // inherited from fichier_global
+	U_I fichier_global_inherited_write(const char *a, U_I size);
+	bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) { throw SRC_BUG; };
+
+	    // inherited from generic_file
+	void inherited_sync_write() { if(ref == NULL || hash_ref == NULL) throw SRC_BUG; ref->sync_write(); hash_ref->sync_write(); };
 	void inherited_terminate();
 
     private:
-	bool hash_ready;
-	std::string hash_filename;
-	std::string hash_extension;
-	U_I x_perm;
-	std::string user_ownership;
-	std::string group_ownership;
+	fichier_global *ref;
+	fichier_global *hash_ref;
 #if CRYPTO_AVAILABLE
 	gcry_md_hd_t hash_handle;
 #endif
+	std::string ref_filename;
 	U_I hash_gcrypt;
 	bool eof;
-
-
-	void dump_hash();
+	bool hash_dumped;
     };
 
 	/// @}

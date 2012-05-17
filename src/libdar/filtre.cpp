@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.113.2.5 2012/03/30 06:52:03 edrusb Exp $
+// $Id: filtre.cpp,v 1.117 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -447,7 +447,7 @@ namespace libdar
                            const mask &subtree,
                            pile & stack,
                            catalogue & cat,
-                           catalogue &ref,
+                           const catalogue & ref,
                            const path & fs_racine,
                            bool info_details,
                            statistics & st,
@@ -1256,7 +1256,7 @@ namespace libdar
 
     void filtre_isolate(user_interaction & dialog,
 			catalogue & cat,
-                        catalogue & ref,
+                        const catalogue & ref,
                         bool info_details)
     {
         const entree *e;
@@ -1377,8 +1377,8 @@ namespace libdar
 		      const mask & subtree,
 		      pile & stack,
 		      catalogue & cat,
-		      catalogue * ref1,
-		      catalogue * ref2,
+		      const catalogue * ref1,
+		      const catalogue * ref2,
 		      bool info_details,
 		      statistics & st,
 		      bool make_empty_dir,
@@ -1401,7 +1401,7 @@ namespace libdar
 	stock_algo = stockage->get_algo();
 	thread_cancellation thr_cancel;
 	const eod tmp_eod;
-	catalogue *ref_tab[] = { ref1, ref2, NULL };
+	const catalogue *ref_tab[] = { ref1, ref2, NULL };
 	infinint etiquette_offset = 0;
 	map <infinint, etoile *> corres_copy;
 	const entree *e = NULL;
@@ -2378,7 +2378,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.113.2.5 2012/03/30 06:52:03 edrusb Exp $";
+        static char id[]="$Id: filtre.cpp,v 1.117 2012/04/27 11:24:30 edrusb Exp $";
         dummy_call(id);
     }
 

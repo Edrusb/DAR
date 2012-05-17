@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: macro_tools.cpp,v 1.86.2.1 2012/03/30 06:52:03 edrusb Exp $
+// $Id: macro_tools.cpp,v 1.88 2012/04/27 11:24:30 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -161,7 +161,7 @@ namespace libdar
 
 
     void macro_tools_open_archive(user_interaction & dialog,
-				  const path &sauv_path,
+				  const entrepot &where,
                                   const string &basename,
 				  const infinint & min_digits,
                                   const string &extension,
@@ -247,7 +247,7 @@ namespace libdar
 		tmp = new sar(dialog,
 			      basename,
 			      extension,
-			      sauv_path,
+			      where,
 			      !sequential_read, // not openned by the end in sequential read mode
 			      min_digits,
 			      lax,
@@ -721,7 +721,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: macro_tools.cpp,v 1.86.2.1 2012/03/30 06:52:03 edrusb Exp $";
+        static char id[]="$Id: macro_tools.cpp,v 1.88 2012/04/27 11:24:30 edrusb Exp $";
         dummy_call(id);
     }
 
