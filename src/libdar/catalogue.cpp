@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.47.2.7 2007/07/27 11:27:31 edrusb Rel $
+// $Id: catalogue.cpp,v 1.47.2.8 2007/09/23 17:24:59 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -2436,6 +2436,9 @@ namespace libdar
 	const detruit *pro_det;
 	const nomme *pro_nom;
 	const inode *pro_ino;
+	const hard_link *pro_hard;
+	const ignored *pro_igno;
+	const etiquette *pro_eti;
 
 	ref.reset_read();
 	while(ref.read(projo))
@@ -2445,6 +2448,9 @@ namespace libdar
 	    pro_det = dynamic_cast<const detruit *>(projo);
 	    pro_nom = dynamic_cast<const nomme *>(projo);
 	    pro_ino = dynamic_cast<const inode *>(projo);
+	    pro_hard = dynamic_cast<const hard_link *>(projo);
+	    pro_igno = dynamic_cast<const ignored *>(projo);
+	    pro_eti = dynamic_cast<const etiquette *>(projo);
 
 	    if(pro_eod != NULL)
 	    {
@@ -2458,20 +2464,33 @@ namespace libdar
 	    if(pro_det != NULL)
 		continue;
 
+	    if(pro_igno != NULL)
+		throw SRC_BUG; // ignored should be be kept in catalogue once dump to archive
+
 	    if(pro_nom == NULL)
 		throw SRC_BUG; // neither an eod nor a nomme! what's that?
+
+	    if(pro_hard != NULL)
+		pro_ino = pro_hard->get_inode();
 
 	    if(pro_ino == NULL)
 		throw SRC_BUG; // a nome that is not an inode nor a detruit!? What's that?
 
-	    if(!current->search_children(pro_ino->get_name(), ici))
+	    if(!current->search_children(pro_nom->get_name(), ici))
 	    {
+
+		    // the entry was not found in the catalogue of the archive under creation
+
 		entree *clo_ent = NULL;
 		inode *clo_ino = NULL;
 		directory *clo_dir = NULL;
+
 		try
 		{
-		    clo_ent = pro_ino->clone();
+		    if(pro_eti == NULL)
+			clo_ent = pro_ino->clone();
+		    else
+			clo_ent = pro_eti->get_inode()->file::clone(); // clone and convert from file_etiquette to file
 		    clo_ino = dynamic_cast<inode *>(clo_ent);
 		    clo_dir = dynamic_cast<directory *>(clo_ent);
 
@@ -2481,6 +2500,17 @@ namespace libdar
 			throw SRC_BUG; // clone of an inode is not an inode???
 		    if(clo_dir != NULL ^ pro_dir != NULL)
 			throw SRC_BUG; // both must be NULL or both must be non NULL
+
+			// taking care of hard links
+
+		    if(pro_hard != NULL)
+			clo_ino->change_name(pro_hard->get_name());
+			// note that we duplicate the inode even if it was
+			// hard linked several time. This inode is later converted
+			// in unsaved entry and can only be used for comparison not
+			// for restoration, thus it does not hurt to duplicate it.
+			// this is much simplier than
+
 
 			// converting inode to unsaved entry
 
@@ -2511,7 +2541,7 @@ namespace libdar
 		    throw;
 		}
 	    }
-	    else
+	    else // this entry of the reference archive was found in the current archive
 		if(pro_dir != NULL)
 		{
 		    directory *ici_dir = dynamic_cast<directory *>(ici);
@@ -2559,7 +2589,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: catalogue.cpp,v 1.47.2.7 2007/07/27 11:27:31 edrusb Rel $";
+	static char id[]="$Id: catalogue.cpp,v 1.47.2.8 2007/09/23 17:24:59 edrusb Exp $";
 	dummy_call(id);
     }
 

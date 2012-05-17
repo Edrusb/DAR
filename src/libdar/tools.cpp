@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.11 2007/07/27 11:27:31 edrusb Rel $
+// $Id: tools.cpp,v 1.54.2.13 2007/09/25 19:44:06 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -272,7 +272,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.54.2.11 2007/07/27 11:27:31 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.54.2.13 2007/09/25 19:44:06 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -627,7 +627,10 @@ namespace libdar
             return; // nothing to do
 
 	    // ISO C++ forbids variable-size array
-	const char **argv = new const char*[argvector.size()+1];
+	char **argv = new char * [argvector.size()+1];
+
+	for(register U_I i = 0; i <= argvector.size(); i++)
+	    argv[i] = NULL;
 
 	try
 	{
@@ -635,8 +638,8 @@ namespace libdar
 	    bool loop;
 
 	    for(register U_I i = 0; i < argvector.size(); i++)
-		argv[i] = argvector[i].c_str();
-	    argv[argvector.size()] = NULL;
+		argv[i] = tools_str2charptr(argvector[i]);
+	    argv[argvector.size()] = NULL; // this is already done above but that does not hurt doing it twice :-)
 
 	    do
 	    {
@@ -649,15 +652,21 @@ namespace libdar
 		case -1:
 		    throw Erange("tools_system", string(gettext("Error while calling fork() to launch dar: ")) + strerror(errno));
 		case 0: // fork has succeeded, we are the child process
-		    runson(dialog, (char* const*)&argv);
-			// function that never returns
+		    try
+		    {
+			runson(dialog, argv); // function that never returns or throws exceptions
+			throw SRC_BUG; // just in case the previous function returned
+		    }
+		    catch(...)
+		    {
+			throw SRC_BUG;
+		    }
 		default:
 		    if(wait(&status) <= 0)
 			throw Erange("tools_system",
 				     string(gettext("Unexpected error while waiting for dar to terminate: ")) + strerror(errno));
 		    else // checking the way dar has exit
-			if(!WIFEXITED(status)) // not a normal ending
-			    if(WIFSIGNALED(status)) // exited because of a signal
+			if(WIFSIGNALED(status)) // exited because of a signal
 			    {
 				try
 				{
@@ -674,8 +683,9 @@ namespace libdar
 				{
 				    dialog.pause(gettext(" Continue anyway ?"));
 				}
-			    }
-			    else // normal terminaison but exit code not zero
+ 			    }
+			else // normal terminaison checking exit status code
+			    if(WEXITSTATUS(status) != 0)
 				dialog.pause(string(gettext("DAR sub-process has terminated with exit code "))
 					     + tools_int2str(WEXITSTATUS(status))
 					     + gettext(" Continue anyway ?"));
@@ -685,9 +695,16 @@ namespace libdar
 	}
 	catch(...)
 	{
+	    for(register U_I i = 0; i <= argvector.size(); i++)
+		if(argv[i] != NULL)
+		    delete [] argv[i];
 	    delete argv;
 	    throw;
 	}
+
+	for(register U_I i = 0; i <= argvector.size(); i++)
+	    if(argv[i] != NULL)
+		delete [] argv[i];
 	delete argv;
     }
 
@@ -1055,10 +1072,19 @@ namespace libdar
     static void runson(user_interaction & dialog, char * const argv[])
     {
         if(execvp(argv[0], argv) < 0)
-            dialog.warning(string(gettext("Error while calling execvp:")) + strerror(errno));
+	    dialog.warning(string(gettext("Error while calling execvp:")) + strerror(errno));
         else
-            dialog.warning(gettext("execvp failed but did not returned error code"));
-        exit(0);
+	    dialog.warning(string(gettext("execvp failed but did not returned error code")));
+#ifndef EXIT_ERROR
+#define EXIT_ERROR 2
+	exit(EXIT_ERROR);
+	    // we need the appropriate dar exit status
+	    // but we are in libdar thus cannot include dar_suite.hpp header
+	    // we thus copy
+#undef EXIT_ERROR
+#else
+	exit(EXIT_ERROR);
+#endif
     }
 
     static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension)

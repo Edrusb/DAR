@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database.cpp,v 1.6.2.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: database.cpp,v 1.6.2.2 2007/09/16 14:16:44 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -234,7 +234,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: database.cpp,v 1.6.2.1 2007/07/22 16:34:59 edrusb Rel $";
+	static char id[]="$Id: database.cpp,v 1.6.2.2 2007/09/16 14:16:44 edrusb Exp $";
 	dummy_call(id);
     }
 
@@ -450,7 +450,7 @@ namespace libdar
 		}
 		catch(Erange & e)
 		{
-		    dialog.warning(string(gettext("Error while restoring the following files : "))
+		    dialog.warning(string(gettext("Error while restoring the following files: "))
 				   + tools_concat_vector( " ", ut->second)
 				   + "   : "
 				   + e.get_message());

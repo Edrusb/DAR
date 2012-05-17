@@ -79,7 +79,7 @@ else
 endif
 
 install-exec-hook :
-	cd $(DESTDIR)/$(bindir) ; $(UPX) -9 dar$(EXEEXT) dar_xform$(EXEEXT) dar_slave$(EXEEXT) dar_manager$(EXEEXT) dar_cp$(EXEEXT) $(ALSO_BUILD_INST)
+	cd $(DESTDIR)$(bindir) ; $(UPX) -9 dar$(EXEEXT) dar_xform$(EXEEXT) dar_slave$(EXEEXT) dar_manager$(EXEEXT) dar_cp$(EXEEXT) $(ALSO_BUILD_INST)
 
 else
 install-exec-hook:

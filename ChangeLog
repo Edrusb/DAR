@@ -535,3 +535,11 @@ from 2.3.4 to 2.3.5
 - updated Swedish translation by Peter Landgren
 - updated French translation
 - fixed broken Native Language Support in 2.3.x (where x<5)
+
+from 2.3.5 to 2.3.6
+- fixed Makefile.am in src/dar_suite (removed "/" after $(DESTDIR))
+- fixed bug in regex mask building when not using ordered masks
+- fixing bug that led dar_manager to report no error while some files failed
+  to be restored due to command-line for dar being too large.
+- fixed bug met when user aborts operation while dar is finalizing archive creation [SF #1800507]
+- fixed problem with execvp when dar_manager launches dar

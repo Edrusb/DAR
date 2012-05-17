@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.76.2.3 2007/07/22 16:34:59 edrusb Rel $
+// $Id: command_line.cpp,v 1.76.2.4 2007/08/31 17:14:29 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -1544,7 +1544,7 @@ static void usage(user_interaction & dialog, const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.76.2.3 2007/07/22 16:34:59 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.76.2.4 2007/08/31 17:14:29 edrusb Exp $";
     dummy_call(id);
 }
 
@@ -2496,7 +2496,7 @@ static mask *make_exclude_path_unordered(const string & x, mask_opt opt)
 	if(opt.glob_exp)
 	    ret = new simple_mask((opt.prefix + x).display(), opt.case_sensit);
 	else
-	    ret = new regular_mask(string("^") + (opt.prefix + x).display(), opt.case_sensit);
+	    ret = new regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
     if(ret == NULL)
         throw Ememory("make_exclude_path");
 

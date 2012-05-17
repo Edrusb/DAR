@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: macro_tools.cpp,v 1.25.2.2 2007/07/21 14:39:04 edrusb Rel $
+// $Id: macro_tools.cpp,v 1.25.2.3 2007/09/23 17:24:59 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -69,6 +69,10 @@ namespace libdar
                 if(ptr != NULL)
                     ptr->set_info_status(CONTEXT_OP);
             }
+	    catch(Ebug & e)
+	    {
+		throw;
+	    }
 	    catch(Ethread_cancel & e)
 	    {
 		throw;
@@ -240,7 +244,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: macro_tools.cpp,v 1.25.2.2 2007/07/21 14:39:04 edrusb Rel $";
+        static char id[]="$Id: macro_tools.cpp,v 1.25.2.3 2007/09/23 17:24:59 edrusb Exp $";
         dummy_call(id);
     }
 

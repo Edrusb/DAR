@@ -1,7 +1,13 @@
+version 2.3.6
+--------------
+Thanks to Marco Atzeri for feedback. Thanks to lucatrv for feedback. Thanks
+once again to Jo (aka Jo - ex-bart) for bug feedback. Thanks to Dorphell for
+bug report.
+
 version 2.3.5
 --------------
 Thanks to Sonni Norlov for optimization patch. Thanks again to Peter Landgren
-for Swedish translation and bug report.
+for Swedish translation and bug report. Thanks also to David Fries for patch.
 
 version 2.3.4
 --------------
