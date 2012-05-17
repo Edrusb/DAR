@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive.cpp,v 1.137 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -685,13 +681,6 @@ namespace libdar
 	    throw;
 	}
 	NLS_SWAP_OUT;
-    }
-
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: archive.cpp,v 1.137 2012/04/27 11:24:30 edrusb Exp $";
-        dummy_call(id);
     }
 
     statistics archive::op_extract(user_interaction & dialog,

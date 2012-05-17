@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.113 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file catalogue.hpp
     /// \brief here is defined the many classed which is build of the catalogue

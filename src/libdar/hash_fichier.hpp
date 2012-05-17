@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: hash_fichier.hpp,v 1.9 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file hash_fichier.hpp
     /// \brief class hash_fichier definition.

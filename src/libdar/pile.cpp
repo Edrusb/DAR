@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: pile.cpp,v 1.12.2.1 2012/02/12 20:43:34 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -88,12 +85,6 @@ namespace libdar
 	}
 	else
 	    return NULL;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: pile.cpp,v 1.12.2.1 2012/02/12 20:43:34 edrusb Exp $";
-        dummy_call(id);
     }
 
     generic_file *pile::get_above(const generic_file *ref)

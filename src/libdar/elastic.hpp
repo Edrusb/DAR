@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: elastic.hpp,v 1.9.2.1 2012/02/19 17:25:08 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file elastic.hpp
     /// \brief here is defined the elastic class

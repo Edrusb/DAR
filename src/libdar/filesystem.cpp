@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -17,9 +17,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // to contact the author : http://dar.linux.free.fr/email.html
-/*********************************************************************/
-// $Id: filesystem.cpp,v 1.81 2012/04/15 12:55:50 edrusb Exp $
-//
 /*********************************************************************/
 
 #include "../my_config.h"
@@ -1848,12 +1845,6 @@ namespace libdar
 	else
 	    if(unlink(s) < 0)
 		throw Erange("supprime (file)", string(gettext("Cannot remove file ")) + s + " : " + strerror(errno));
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: filesystem.cpp,v 1.81 2012/04/15 12:55:50 edrusb Exp $";
-        dummy_call(id);
     }
 
     static void make_owner_perm(user_interaction & dialog,

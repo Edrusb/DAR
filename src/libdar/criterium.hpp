@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: criterium.hpp,v 1.14 2011/05/27 12:29:18 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file criterium.hpp
     /// \brief contains classes that let the user define the policy for overwriting files

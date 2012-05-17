@@ -18,10 +18,6 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: integers.cpp,v 1.6 2011/06/02 13:17:37 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -103,12 +99,6 @@ namespace libdar
 		throw SRC_BUG;
 	    else // i < size, thus CPU/system uses neither a little nor a big endian sequence!!!
 		throw Ehardware("is_unsigned_big_endian", tools_printf(gettext("type %s is neither big nor little endian! Do not know how to handle integer in a portable manner on this host, aborting"), type_name));
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: integers.cpp,v 1.6 2011/06/02 13:17:37 edrusb Rel $";
-        dummy_call(id);
     }
 
     void integer_check()

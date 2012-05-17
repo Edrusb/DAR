@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_cp.cpp,v 1.27.2.1 2012/04/15 10:36:44 edrusb Exp $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -336,12 +332,6 @@ static int skip_to_next_readable(int block, char *buffer, int src, int dst, off_
     else
 	return 1; // there is valid char to read
     return 1;
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: dar_cp.cpp,v 1.27.2.1 2012/04/15 10:36:44 edrusb Exp $";
-    dummy_call(id);
 }
 
 static int normal_copy(int block, char *buffer, int src, int dst)

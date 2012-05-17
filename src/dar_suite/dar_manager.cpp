@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.76.2.9 2012/04/15 10:36:44 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -572,13 +569,6 @@ static bool command_line(user_interaction & dialog,
     }
 
     return true;
-}
-
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: dar_manager.cpp,v 1.76.2.9 2012/04/15 10:36:44 edrusb Exp $";
-    dummy_call(id);
 }
 
 static void op_create(user_interaction & dialog, const string & base, bool info_details)

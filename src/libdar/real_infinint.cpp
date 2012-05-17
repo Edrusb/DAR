@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.32.2.1 2012/02/25 14:43:44 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -680,13 +677,6 @@ namespace libdar
             throw SRC_BUG;
 
         field->insert_as_much_as_necessary_const_byte_to_be_as_wider_as(*ref.field, field->begin(), 0x00);
-    }
-
-
-    static void dummy_call(char *x)
-    {
-	static char id[]="$Id: real_infinint.cpp,v 1.32.2.1 2012/02/25 14:43:44 edrusb Exp $";
-        dummy_call(id);
     }
 
     void infinint::setup_endian()

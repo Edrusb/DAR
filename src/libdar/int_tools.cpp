@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: int_tools.cpp,v 1.6.2.1 2012/02/25 14:43:44 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -55,12 +52,6 @@ namespace libdar
             bit[i] = (a & mask) >> (7 - i);
             mask >>= 1;
         }
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: int_tools.cpp,v 1.6.2.1 2012/02/25 14:43:44 edrusb Exp $";
-        dummy_call(id);
     }
 
     void int_tools_contract_byte(const int_tools_bitfield &b, unsigned char & a)

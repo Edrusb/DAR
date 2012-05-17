@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: cache.hpp,v 1.26 2011/04/17 13:12:29 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file cache.hpp
     /// \brief contains the cache class

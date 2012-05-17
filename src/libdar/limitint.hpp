@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: limitint.hpp,v 1.38.2.1 2012/02/25 14:43:44 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file limitint.hpp
     /// \brief the reviewed implementation of infinint based on system limited integers

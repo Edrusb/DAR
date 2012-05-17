@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: libdar_4_4.hpp,v 1.21.2.4 2012/04/15 10:36:44 edrusb Exp $
-//
-/*********************************************************************/
-//
 
     /// \file libdar_4_4.hpp
     /// \brief this file provide an alternative namespace to libdar for OLD API

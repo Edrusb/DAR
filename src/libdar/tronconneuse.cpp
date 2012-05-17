@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tronconneuse.cpp,v 1.29 2011/04/17 13:12:30 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -421,12 +418,6 @@ namespace libdar
 		throw Ememory("tronconneuse::init_encrypte_buf_size");
 	    }
 	}
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: tronconneuse.cpp,v 1.29 2011/04/17 13:12:30 edrusb Rel $";
-        dummy_call(id);
     }
 
     void tronconneuse::position_clear2crypt(const infinint & pos, infinint & file_buf_start, infinint & clear_buf_start, infinint & pos_in_buf, infinint & block_num)

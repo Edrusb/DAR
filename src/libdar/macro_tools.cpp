@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: macro_tools.cpp,v 1.88 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -716,13 +713,6 @@ namespace libdar
 	    throw Erange("macro_tools_lax_search_catalogue", gettext("LAX MODE: Failed to read the catalogue"));
 	else
 	    return ret;
-    }
-
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: macro_tools.cpp,v 1.88 2012/04/27 11:24:30 edrusb Exp $";
-        dummy_call(id);
     }
 
     static void version_check(user_interaction & dialog, const header_version & ver)

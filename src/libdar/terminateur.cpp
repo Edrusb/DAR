@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.22 2011/04/11 17:12:01 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 #include "terminateur.hpp"
@@ -80,12 +77,6 @@ namespace libdar
             f.write((char *)&a, 1);
             --nbbit;
         }
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: terminateur.cpp,v 1.22 2011/04/11 17:12:01 edrusb Rel $";
-        dummy_call(id);
     }
 
     void terminateur::read_catalogue(generic_file & f, bool with_elastic, const archive_version & reading_ver, const infinint & where_from)

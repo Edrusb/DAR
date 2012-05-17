@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: path.cpp,v 1.29.2.4 2011/06/25 14:08:11 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -235,12 +232,6 @@ namespace libdar
 		return false;
 	else // I am shorter in length, cannot be a subdir of "you"
 	    return false;
-    }
-
-    static void dummy_call(char *x)
-    {
-	static char id[]="$Id: path.cpp,v 1.29.2.4 2011/06/25 14:08:11 edrusb Exp $";
-        dummy_call(id);
     }
 
     string path::display() const

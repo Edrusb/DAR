@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: testtools.hpp,v 1.7 2009/12/18 10:10:22 edrusb Rel $
-//
-/*********************************************************************/
 
 #ifndef TESTTOOLS_HPP
 #define TESTTOOLS_HPP

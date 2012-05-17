@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tuyau.cpp,v 1.41 2011/04/19 14:57:24 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -377,12 +374,6 @@ namespace libdar
 	default:
 	    throw SRC_BUG;
 	}
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: tuyau.cpp,v 1.41 2011/04/19 14:57:24 edrusb Rel $";
-        dummy_call(id);
     }
 
     void tuyau::ouverture()

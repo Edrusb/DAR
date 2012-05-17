@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tlv_list.cpp,v 1.3 2011/06/02 13:17:37 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "tlv_list.hpp"
 
@@ -57,12 +54,6 @@ namespace libdar
 	    throw Erange("tlv_list::operator[] const", "index out of range when accessing a tlv_list object");
 
 	return contents[item];
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: tlv_list.cpp,v 1.3 2011/06/02 13:17:37 edrusb Rel $";
-        dummy_call(id);
     }
 
     void tlv_list::init(generic_file & f)

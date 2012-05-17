@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.25 2010/08/27 20:44:24 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -74,12 +70,6 @@ using namespace std;
 
 namespace libdar
 {
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: sar_tools.cpp,v 1.25 2010/08/27 20:44:24 edrusb Rel $";
-        dummy_call(id);
-    }
 
     trivial_sar *sar_tools_open_archive_tuyau(user_interaction & dialog,
 					      S_I fd,

@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: trontextual.cpp,v 1.5 2011/06/02 13:17:37 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 #include "trontextual.hpp"
@@ -51,12 +47,6 @@ namespace libdar
 	ref = dynamic_cast<contextual *>(f);
 	if(ref == NULL)
 	    throw Erange("trontextual::trontextual", "Trontextual must receive a class contextual aware generic file as argument");
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: trontextual.cpp,v 1.5 2011/06/02 13:17:37 edrusb Rel $";
-        dummy_call(id);
     }
 
 } // end of namespace

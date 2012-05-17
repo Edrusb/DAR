@@ -3,12 +3,11 @@
 # Script Name: dar_backups.sh
 # Author: Roi Rodriguez Mendez & Mauro Silvosa Rivera (Cluster Digital S.L.)
 # Fixes by: Jason Lewis - jason at NO dickson SPAM dot st
-# Description: dar_backups.sh is a script to be runned from cron which 
+# Description: dar_backups.sh is a script to be runned from cron which
 #       backups data and stores it locally and optionally remote using scp.
 #       It decides between doing a master or an incremental backup based
 #       on the existance or not of a master one for the actual month.
-# $Id: dar_backups.sh,v 1.1.2.1 2008/07/21 06:19:07 edrusb Rel $ 
-# Revision History: 
+# Revision History:
 #       23.06.2008 - modified to work with latest version of dar which requires -g before each path to backup - Jason Lewis
 #       24.10.2006 - changed script to do differential backups based on the last diff
 #       18.10.2006 - added BACKUP_PATHS variable to simplify adding new paths
@@ -24,7 +23,7 @@ BASE_BAK_DIR=/backup
 ROOT_DIR=/
 # Paths to backup
 # add paths here, in a space seperated list between round brackets.
-# you can escape out spaces with \ or '' 
+# you can escape out spaces with \ or ''
 # Paths should be relative to ROOT_DIR
 #BACKUP_PATH=(my/first/path another\ path/with\ spaces 'yet another/path/with/spaces')
 BACKUP_PATHS=( home user/lib/cgi-bin var/www/cgi-bin var/lib/cvs var/lib/svn var/lib/accounting mysql_backup usr/local/bin etc )

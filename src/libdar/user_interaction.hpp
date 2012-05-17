@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: user_interaction.hpp,v 1.28 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file user_interaction.hpp
     /// \brief defines the interaction between libdar and the user.

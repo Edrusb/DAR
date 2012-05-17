@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tuyau.hpp,v 1.27 2011/04/19 14:57:24 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file tuyau.hpp
     /// \brief defines the implementation of pipe under the generic_file interface.

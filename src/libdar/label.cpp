@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: label.cpp,v 1.9 2011/06/02 13:17:37 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -81,12 +78,6 @@ namespace libdar
 	    i++;
 
 	return i >= LABEL_SIZE;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: label.cpp,v 1.9 2011/06/02 13:17:37 edrusb Rel $";
-        dummy_call(id);
     }
 
     void label::generate_internal_filename()

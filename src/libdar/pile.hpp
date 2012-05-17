@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: pile.hpp,v 1.14.2.1 2012/02/12 20:43:34 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file pile.hpp
     /// \brief class pile definition. Used to manage a stack of generic_file objects

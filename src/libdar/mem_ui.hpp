@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: mem_ui.hpp,v 1.4 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file mem_ui.hpp
     /// \brief class mem_ui definition. This class is to be used as parent class to handle user_interaction object management

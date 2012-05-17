@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: compile_time_features.hpp,v 1.3 2012/02/27 07:54:22 edrusb Exp $
-//
-/*********************************************************************/
-//
 
     /// \file compile_time_features.hpp
     /// \brief nested namespace containing routines that give features activated at compile time

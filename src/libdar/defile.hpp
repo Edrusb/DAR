@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: defile.hpp,v 1.11.2.1 2012/02/19 17:25:08 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file defile.hpp
     /// \brief here is defined the defile class

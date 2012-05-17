@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: thread_cancellation.cpp,v 1.11 2011/01/07 19:53:16 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -230,12 +227,6 @@ namespace libdar
 	    throw SRC_BUG;
     }
 #endif
-
-    static void dummy_call(char *x)
-    {
-	static char id[]="$Id: thread_cancellation.cpp,v 1.11 2011/01/07 19:53:16 edrusb Rel $";
-	dummy_call(id);
-    }
 
 #if MUTEX_WORKS
     bool thread_cancellation::cancel_status(pthread_t tid)

@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_suite.hpp,v 1.17 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
-//
 
     /// \file dar_suite.hpp
     /// \brief contains routine to manage CLI's common initialization and ultimate exception catching

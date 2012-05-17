@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: memory_file.cpp,v 1.10 2011/06/02 13:17:37 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -104,12 +101,6 @@ namespace libdar
 	}
 
 	return ret;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: memory_file.cpp,v 1.10 2011/06/02 13:17:37 edrusb Rel $";
-        dummy_call(id);
     }
 
     void memory_file::inherited_write(const char *a, U_I size)

@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: test_deci.cpp,v 1.8 2011/01/05 18:04:17 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 #include <iostream>

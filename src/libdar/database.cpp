@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database.cpp,v 1.22.2.5 2011/12/28 18:07:06 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -342,12 +339,6 @@ namespace libdar
             throw;
         }
         NLS_SWAP_OUT;
-    }
-
-    static void dummy_call(char *x)
-    {
-	static char id[]="$Id: database.cpp,v 1.22.2.5 2011/12/28 18:07:06 edrusb Exp $";
-	dummy_call(id);
     }
 
     void database::show_contents(user_interaction & dialog) const

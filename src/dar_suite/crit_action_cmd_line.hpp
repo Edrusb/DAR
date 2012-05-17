@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: crit_action_cmd_line.hpp,v 1.5 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file crit_action_cmd_line.hpp
     /// \brief contains routines to convert command-line overwriting criterium to their crit_action counterparts

@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sparse_file.cpp,v 1.23.2.1 2012/02/12 20:43:34 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -522,12 +519,6 @@ namespace libdar
 	    ++curs;
 
 	return curs;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: sparse_file.cpp,v 1.23.2.1 2012/02/12 20:43:34 edrusb Exp $";
-        dummy_call(id);
     }
 
 } // end of namespace

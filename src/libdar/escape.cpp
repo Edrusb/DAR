@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: escape.cpp,v 1.33 2011/06/02 13:17:37 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -193,12 +190,6 @@ namespace libdar
 	while(!found && !read_eof);
 
 	return found;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: escape.cpp,v 1.33 2011/06/02 13:17:37 edrusb Rel $";
-        dummy_call(id);
     }
 
     bool escape::next_to_read_is_mark(sequence_type t)

@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sar.hpp,v 1.53 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
-
 
     /// \file sar.hpp
     /// \brief the sar and trivial_sar classes, they manage the slicing layer

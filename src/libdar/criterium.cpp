@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: criterium.cpp,v 1.18 2011/06/02 13:17:37 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -538,12 +535,6 @@ namespace libdar
 	    to_be_voided.operand.clear();
 	    throw;
 	}
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: criterium.cpp,v 1.18 2011/06/02 13:17:37 edrusb Rel $";
-        dummy_call(id);
     }
 
     bool crit_and::evaluate(const nomme & first, const nomme & second) const

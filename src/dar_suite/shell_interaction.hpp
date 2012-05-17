@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: shell_interaction.hpp,v 1.10 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file shell_interaction.hpp
     /// \brief user_interaction class for command_line tools

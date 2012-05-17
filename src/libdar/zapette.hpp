@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: zapette.hpp,v 1.25 2011/04/17 13:12:30 edrusb Rel $
-//
-/*********************************************************************/
-//
 
     /// \file zapette.hpp
     /// \brief remote control between dar and dar_slave.

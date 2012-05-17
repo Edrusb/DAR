@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: sar_tools.hpp,v 1.16 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
-//
 
     /// \file sar_tools.hpp
     /// \brief a set of tools aims to help Segmentation And Reassemblement (sar) class

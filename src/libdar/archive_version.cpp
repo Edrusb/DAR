@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive_version.cpp,v 1.6 2011/06/02 13:17:37 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -55,12 +51,6 @@ namespace libdar
 	    fix = x_fix;
 	    droot = false;
 	}
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: archive_version.cpp,v 1.6 2011/06/02 13:17:37 edrusb Rel $";
-        dummy_call(id);
     }
 
     void archive_version::dump(generic_file & f) const

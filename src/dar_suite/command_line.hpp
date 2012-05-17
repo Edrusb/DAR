@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: command_line.hpp,v 1.57 2011/03/31 15:52:00 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file command_line.hpp
     /// \brief contains routing in charge of the command-line and included files parsing

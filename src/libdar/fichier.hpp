@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: fichier.hpp,v 1.12 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file fichier.hpp
     /// \brief class fichier_global and class fichier definition. This is a full implementation of a generic_file

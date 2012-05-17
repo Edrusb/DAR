@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: user_group_bases.cpp,v 1.7 2011/06/02 13:17:37 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -126,12 +123,6 @@ namespace libdar
 	    return it->second;
 	else
 	    return empty_string;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: user_group_bases.cpp,v 1.7 2011/06/02 13:17:37 edrusb Rel $";
-        dummy_call(id);
     }
 
     const string & user_group_bases::get_groupname(const infinint & gid) const

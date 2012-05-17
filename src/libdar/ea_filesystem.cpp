@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.24.2.1 2012/02/12 20:43:34 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -287,12 +284,6 @@ namespace libdar
 	}
 
 	return ret;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: ea_filesystem.cpp,v 1.24.2.1 2012/02/12 20:43:34 edrusb Exp $";
-        dummy_call(id);
     }
 
     static vector<string> ea_filesystem_get_ea_list_for(const char *filename)

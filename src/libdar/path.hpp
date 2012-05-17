@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: path.hpp,v 1.20 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file path.hpp
     /// \brief here is the definition of the path class

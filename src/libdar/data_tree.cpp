@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: data_tree.cpp,v 1.15.2.6 2012/03/04 08:40:17 edrusb Rel $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -1351,12 +1348,6 @@ static data_tree *read_from_file(generic_file & f, unsigned char db_version)
         throw Ememory("read_from_file");
 
     return ret;
-}
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: data_tree.cpp,v 1.15.2.6 2012/03/04 08:40:17 edrusb Rel $";
-    dummy_call(id);
 }
 
 static void read_from_file(generic_file &f, archive_num &a)

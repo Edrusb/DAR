@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: etage.hpp,v 1.13 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
 
     /// \file etage.hpp
     /// \brief definition of the etage structure is done here

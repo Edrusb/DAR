@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: tools.cpp,v 1.106 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
-
 
 #include "../my_config.h"
 
@@ -314,12 +310,6 @@ namespace libdar
         basename = path(command_name).basename();
     }
 
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: tools.cpp,v 1.106 2012/04/27 11:24:30 edrusb Exp $";
-        dummy_call(id);
-    }
-
     string::iterator tools_find_last_char_of(string &s, unsigned char v)
     {
 	if(&s == NULL)
@@ -353,7 +343,6 @@ namespace libdar
 
 	return it;
     }
-
 
     void tools_split_path_basename(const char *all, path * &chemin, string & base)
     {

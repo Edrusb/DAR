@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.144 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -4501,12 +4498,6 @@ namespace libdar
         }
 
         get_ui().warning("</Catalog>");
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: catalogue.cpp,v 1.144 2012/04/27 11:24:30 edrusb Exp $";
-        dummy_call(id);
     }
 
     void catalogue::dump(generic_file & f) const

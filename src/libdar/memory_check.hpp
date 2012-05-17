@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: memory_check.hpp,v 1.1.2.4 2012/02/19 17:25:09 edrusb Rel $
-//
-/*********************************************************************/
-//
 
 #ifndef MEMORY_CHECK_HPP
 #define MEMORY_CHECK_HPP

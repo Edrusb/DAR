@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.43.2.5 2012/04/09 12:51:15 edrusb Exp $
-//
-/*********************************************************************/
-//
 
 #include "../my_config.h"
 
@@ -251,13 +247,6 @@ int dar_suite_global(int argc, char * const argv[], const char **env, int (*call
     memory_check_snapshot();
     return ret;
 }
-
-static void dummy_call(char *x)
-{
-    static char id[]="$Id: dar_suite.cpp,v 1.43.2.5 2012/04/09 12:51:15 edrusb Exp $";
-    dummy_call(id);
-}
-
 
 static void jogger()
 {

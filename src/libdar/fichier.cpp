@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: fichier.cpp,v 1.8 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
 
 #include "../my_config.h"
 
@@ -314,12 +311,6 @@ namespace libdar
         }
 
         return true;
-    }
-
-    static void dummy_call(char *x)
-    {
-        static char id[]="$Id: fichier.cpp,v 1.8 2012/04/27 11:24:30 edrusb Exp $";
-        dummy_call(id);
     }
 
     infinint fichier::get_position()

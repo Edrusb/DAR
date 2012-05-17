@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -18,10 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: archive.hpp,v 1.70 2012/04/27 11:24:30 edrusb Exp $
-//
-/*********************************************************************/
-//
 
     /// \file archive.hpp
     /// \brief the archive class is defined in this module

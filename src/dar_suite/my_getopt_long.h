@@ -18,9 +18,6 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: my_getopt_long.h,v 1.4 2011/01/09 17:25:58 edrusb Rel $
-//
-/*********************************************************************/
 
     /// \file my_getopt_long.h
     /// \brief may lead to the definition of getopt_long to solve declaration conflicts in <unistd.h> and <getopt.h>
