@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.30.2.2 2005/03/13 20:07:49 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.30.2.3 2006/01/12 15:06:33 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -90,7 +90,7 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char *argv[], const cha
             if(dst != "-")
 	    {
                 shell_interaction_change_non_interactive_output(&cout);
-		tools_avoid_slice_overwriting(dialog,  dst_dir->display(), dst+".*."+EXTENSION, false, allow, warn);
+		tools_avoid_slice_overwriting(dialog,  dst_dir->display(), dst+".*."+EXTENSION, false, allow, warn, false);
 	    }
             try
             {
@@ -367,7 +367,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.30.2.2 2005/03/13 20:07:49 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.30.2.3 2006/01/12 15:06:33 edrusb Rel $";
     dummy_call(id);
 }
 

@@ -667,5 +667,15 @@ KNOWN BUGS:
     solution
      test the method's argument in place of the object field
 
-    affects version 2.2.x up to 2.2.3
+    affects versions 2.2.x up to 2.2.3
     fixed in version 2.2.4
+
+#36 description
+     when using -I or -X with -l option directory names are also filtered
+     while they should not be, as decribed in the man page
+
+    solution
+     avoid having -X/-I filtering directories
+
+    affected versions 2.2.x up to 2.2.5
+    fixed in 2.2.6

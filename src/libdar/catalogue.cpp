@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.35.2.3 2005/12/05 15:58:04 edrusb Exp $
+// $Id: catalogue.cpp,v 1.35.2.4 2006/01/01 23:10:45 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -1434,7 +1434,7 @@ namespace libdar
 
             if(*it == NULL)
                 throw SRC_BUG; // NULL entry ! should not be
-            if(m.is_covered((*it)->get_name()))
+            if(m.is_covered((*it)->get_name()) || dir != NULL)
             {
                 if(det != NULL)
                 {
@@ -2130,7 +2130,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.35.2.3 2005/12/05 15:58:04 edrusb Exp $";
+        static char id[]="$Id: catalogue.cpp,v 1.35.2.4 2006/01/01 23:10:45 edrusb Rel $";
         dummy_call(id);
     }
 

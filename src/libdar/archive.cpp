@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.cpp,v 1.21.2.3 2005/07/31 17:13:58 edrusb Rel $
+// $Id: archive.cpp,v 1.21.2.4 2006/01/12 15:06:33 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -216,7 +216,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: archive.cpp,v 1.21.2.3 2005/07/31 17:13:58 edrusb Rel $";
+        static char id[]="$Id: archive.cpp,v 1.21.2.4 2006/01/12 15:06:33 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -566,7 +566,7 @@ namespace libdar
 
             // end of sanity checks
 
-	tools_avoid_slice_overwriting(dialog, sauv_path.display(), filename+".*."+extension, info_details, allow_over, warn_over);
+	tools_avoid_slice_overwriting(dialog, sauv_path.display(), filename+".*."+extension, info_details, allow_over, warn_over, empty);
 	real_pass = pass;
 
         try

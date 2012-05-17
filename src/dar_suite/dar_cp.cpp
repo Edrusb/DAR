@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_cp.cpp,v 1.12.2.2 2005/05/08 16:32:29 edrusb Rel $
+// $Id: dar_cp.cpp,v 1.12.2.3 2006/01/16 15:06:22 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -56,7 +56,7 @@ extern "C"
 #include "tools.hpp"
 #include "cygwin_adapt.hpp"
 
-#define DAR_CP_VERSION "1.0.2"
+#define DAR_CP_VERSION "1.0.3"
 
 using namespace libdar;
 using namespace std;
@@ -65,8 +65,14 @@ void show_usage(char *argv0);
 void show_version(char *argv0);
 int open_files(char *src, char *dst, int *fds, int *fdd);
 void copy_max(int src, int dst);
+static int little_main(user_interaction & dialog, int argc, char *argv[], const char **env);
 
-int main(int argc, char *argv[])
+int main(S_I argc, char *argv[], const char **env)
+{
+    return dar_suite_global(argc, argv, env, &little_main);
+}
+
+static int little_main(user_interaction & dialog, int argc, char *argv[], const char **env)
 {
     int fds, fdd;
 
@@ -220,7 +226,7 @@ void copy_max(int src, int dst)
             xfer_before_error(BUF_SIZE/2, buffer, src, dst);
             if(skip_to_next_readable(BUF_SIZE/2, buffer, src, dst, local_missed))
 	    {
-		cout << tools_printf(gettext("Skipping done (missing %d byte(s)), found correct data to read, continuing the copy..."), local_missed) << endl;
+		printf(gettext("Skipping done (missing %.0f byte(s)), found correct data to read, continuing the copy...\n"), (float)local_missed);
 		missed += local_missed;
                 lu = 1;
 	    }
@@ -234,8 +240,8 @@ void copy_max(int src, int dst)
     }
     while(lu > 0);
 
-    cout << tools_printf(gettext("Copy finished. Missing %d byte(s) of data"), missed);
-    cout << tools_printf(gettext(" %f %% of the total amount of data)\n"), (float)(missed)/((float)(taille))*100);
+    printf(gettext("Copy finished. Missing %.0f byte(s) of data\n"), (float)missed);
+    printf(gettext("Which is  %.2f %% of the total amount of data\n"), (float)(missed)/((float)(taille))*100);
 }
 
 void xfer_before_error(int block, char *buffer, int src, int dst)
@@ -334,7 +340,7 @@ int skip_to_next_readable(int block, char *buffer, int src, int dst, off_t & mis
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_cp.cpp,v 1.12.2.2 2005/05/08 16:32:29 edrusb Rel $";
+    static char id[]="$Id: dar_cp.cpp,v 1.12.2.3 2006/01/16 15:06:22 edrusb Rel $";
     dummy_call(id);
 }
 

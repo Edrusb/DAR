@@ -108,7 +108,7 @@ dar_slave_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 dar_manager_SOURCES = dar_suite.cpp dar_suite.hpp dar_manager.cpp shell_interaction.cpp shell_interaction.hpp data_tree.cpp data_tree.hpp database.cpp database.hpp database_header.cpp database_header.hpp dar_manager.usage getopt_decision.h my_getopt_long.h
 dar_manager_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
-dar_cp_SOURCES = dar_cp.cpp
+dar_cp_SOURCES = dar_cp.cpp dar_suite.cpp shell_interaction.cpp
 dar_cp_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 #

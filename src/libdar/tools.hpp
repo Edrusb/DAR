@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.30.2.2 2005/03/13 20:07:53 edrusb Rel $
+// $Id: tools.hpp,v 1.30.2.4 2006/01/16 15:06:22 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -399,8 +399,15 @@ namespace libdar
 	/// \param[in] info_details whether user must be displayed details of the operation
 	/// \param[in] allow_overwriting whether overwriting is allowed by the user
 	/// \param[in] warn_overwriting whether a warning must be issued before overwriting (if allowed)
+	/// \param[in] dry_run do a dry-run exection (no filesystem modification is performed)
 	/// \note may thow exceptions.
-    extern void tools_avoid_slice_overwriting(user_interaction & dialog, const std::string & chemin, const std::string & x_file_mask, bool info_details, bool allow_overwriting, bool warn_overwriting);
+    extern void tools_avoid_slice_overwriting(user_interaction & dialog,
+					      const std::string & chemin,
+					      const std::string & x_file_mask,
+					      bool info_details,
+					      bool allow_overwriting,
+					      bool warn_overwriting,
+					      bool dry_run);
 
 
 	/// append an elastic buffer of given size to the file

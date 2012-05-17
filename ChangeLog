@@ -399,3 +399,10 @@ from 2.2.4 to 2.2.5
   filesystem and nodump feature has been activated.
 - avoid having arrow key be interpreted as escape key (while they remains
   an escape key + one char, as received from the tty).
+- added part of Kyler Klein's patch for OSX (Tiger) (only concerns included gettext)
+
+
+from 2.2.5 to 2.2.6
+- fixed bug #36
+- avoid removing slices when creating archive in dry-run mode (-e option)
+- fixed display problem in dar_cp that lead uncaught exception just before exiting
