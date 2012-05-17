@@ -61,13 +61,13 @@ namespace libdar
         infinint get_first_sub_file_size() const { return first_size; };
         bool get_total_file_number(infinint &num) const { num = of_last_file_num; return of_last_file_known; };
         bool get_last_file_size(infinint &num) const { num = of_last_file_size; return of_last_file_known; };
-        
+
         void set_info_status(std::string s) { status = s; };
         std::string get_info_status() const { return status; };
 
     protected :
         S_I inherited_read(char *a, size_t sz);
-        S_I inherited_write(char *a, size_t sz);
+        S_I inherited_write(const char *a, size_t sz);
 
     private :
         path archive_dir;
@@ -129,8 +129,8 @@ namespace libdar
 
     protected:
         S_I inherited_read(char *a, size_t size) { return reference->read(a, size); };
-        S_I inherited_write(char *a, size_t size) { return reference->write(a, size); };
-    
+        S_I inherited_write(const char *a, size_t size) { return reference->write(a, size); };
+
     private:
         generic_file *reference;
         infinint offset;

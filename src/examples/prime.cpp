@@ -26,6 +26,13 @@
 #include "../my_config.h"
 #include <iostream>
 
+extern "C"
+{
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+} // extern "C"
+
 #include "infinint.hpp"
 #include "deci.hpp"
 #include "integers.hpp"
@@ -40,7 +47,7 @@ int main(S_I argc, char *argv[])
         cout << "usage : " << argv[0] <<  " <number>" << endl;
         exit(1);
     }
-    
+
     deci x = string(argv[1]);
     cout << "converting string to infinint... " << endl;
     infinint num = x.computer();

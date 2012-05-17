@@ -25,6 +25,12 @@
 #pragma implementation
 
 #include "../my_config.h"
+extern "C"
+{
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+}
 
 #include <iostream>
 #include "infinint.hpp"
@@ -101,7 +107,7 @@ namespace libdar
     {
         U_I ret = 0;
         list<Egeneric *>::iterator it = all_instances.begin();
-    
+
         while(it != all_instances.end())
             if(! (*it++)->zombie)
                 ret++;
@@ -111,7 +117,7 @@ namespace libdar
 
     void Egeneric::clear_last_destroyed()
     {
-        list<Egeneric *>::iterator it = destroyed.begin(); 
+        list<Egeneric *>::iterator it = destroyed.begin();
 
         while(it != destroyed.end())
             delete (*it++);
@@ -121,7 +127,7 @@ namespace libdar
 
     void Egeneric::display_last_destroyed()
     {
-        list<Egeneric *>::iterator it = destroyed.begin(); 
+        list<Egeneric *>::iterator it = destroyed.begin();
 
         while(it != destroyed.end())
             (*it++)->dump();
@@ -130,7 +136,7 @@ namespace libdar
     void Egeneric::display_alive()
     {
         list<Egeneric *>::iterator it = all_instances.begin();
-    
+
         while(it != all_instances.end())
         {
             if(! (*it)->zombie)
@@ -139,7 +145,7 @@ namespace libdar
         }
     }
 
-    Ebug::Ebug(const string & file, S_I line) : Egeneric(string("file ") + file + " line " + int_to_string(line), "it seems to be a bug here") {};
+    Ebug::Ebug(const string & file, S_I line) : Egeneric(string("file ") + file + " line " + int_to_string(line), "it seems to be a bug here") {}
     void Ebug::stack(const string & passage, const string & file, const string & line)
     {
         Egeneric::stack(passage, string("in file ") + file + " line " + string(line));

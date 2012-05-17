@@ -50,6 +50,10 @@
 #include <errno.h>
 #endif
 
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
 #include "etage.hpp"
 
 using namespace std;
@@ -61,10 +65,10 @@ namespace libdar
     {
         struct dirent *ret;
         DIR *tmp = opendir(dirname);
-    
+
         if(tmp == NULL)
             throw Erange("filesystem etage::etage" , strerror(errno));
-    
+
         fichier.clear();
         while((ret = readdir(tmp)) != NULL)
             if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
@@ -78,7 +82,7 @@ namespace libdar
         dummy_call(id);
     }
 
-    
+
     bool etage::read(string & ref)
     {
         if(fichier.size() > 0)

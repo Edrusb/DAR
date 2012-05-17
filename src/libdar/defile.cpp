@@ -45,6 +45,7 @@ namespace libdar
             init = false;
 
         if(fin == NULL)
+	{
             if(nom == NULL)
                 throw SRC_BUG; // neither eod nor nomme
             else
@@ -53,12 +54,13 @@ namespace libdar
                 if(dir != NULL)
                     init = true;
             }
+	}
     }
-            
+
     static void dummy_call(char *x)
     {
         static char id[]="$Id: defile.cpp,v 1.5 2003/10/18 14:43:07 edrusb Rel $";
         dummy_call(id);
     }
-    
+
 } // end of namespace

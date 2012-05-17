@@ -38,25 +38,25 @@ namespace libdar
     typedef unsigned char chiffre;
 
     static const U_I PAS = 5;
-    static inline chiffre get_left(unsigned char a) { return (a & 0xF0) >> 4; };
-    static inline chiffre get_right(unsigned char a) { return a & 0x0F; };
-    static inline void set_left(unsigned char & a, chiffre val) { val <<= 4; a &= 0x0F; a |= val; };
-    static inline void set_right(unsigned char & a, chiffre val) { val &= 0x0F; a &= 0xF0; a |= val; };
+    static inline chiffre get_left(unsigned char a) { return (a & 0xF0) >> 4; }
+    static inline chiffre get_right(unsigned char a) { return a & 0x0F; }
+    static inline void set_left(unsigned char & a, chiffre val) { val <<= 4; a &= 0x0F; a |= val; }
+    static inline void set_right(unsigned char & a, chiffre val) { val &= 0x0F; a &= 0xF0; a |= val; }
 
     static inline chiffre digit_htoc(unsigned char c) throw(Edeci)
     {
         E_BEGIN;
         if(c < '0' || c > '9')
-            throw Edeci("deci.cpp : digit_htoc", "invalid decimal digit"); 
-        return chiffre(c - '0'); 
+            throw Edeci("deci.cpp : digit_htoc", "invalid decimal digit");
+        return chiffre(c - '0');
         E_END("deci.cpp : digit_htoc", "");
     }
 
     static inline unsigned char digit_ctoh(chiffre c) throw(Ebug)
     {
         E_BEGIN;
-        if(c > 9) throw SRC_BUG; 
-        return '0' + c; 
+        if(c > 9) throw SRC_BUG;
+        return '0' + c;
         E_END("deci.cpp : digit_ctoh", "");
     }
 
@@ -71,14 +71,14 @@ namespace libdar
             storage::iterator it;
             bool recule = false;
             unsigned char tmp;
-        
+
             decimales = new storage(PAS);
             if(decimales == NULL)
                 throw Ememory("template deci::decicoupe");
-        
+
             decimales->clear(0xFF);
             it = decimales->rbegin();
-        
+
             while(x > 0 || recule)
             {
                 if(x > 0)
@@ -148,7 +148,7 @@ namespace libdar
             }
             else
                 set_right(tmp, digit_htoc(*it));
-        
+
             recule = ! recule;
             if(it != s.rend())
                 it++; // it is a reverse iterator thus ++ for going backward
@@ -160,10 +160,10 @@ namespace libdar
 
     deci::deci(const infinint & x) throw(Ememory, Erange, Ebug)
     {
-        E_BEGIN; 
-        decicoupe(decimales, x); 
+        E_BEGIN;
+        decicoupe(decimales, x);
         reduce();
-        E_END("deci::deci", "infinint"); 
+        E_END("deci::deci", "infinint");
     }
 
     void deci::copy_from(const deci & ref) throw(Ememory, Erange, Ebug)
@@ -171,7 +171,7 @@ namespace libdar
         E_BEGIN;
         if(decimales != NULL)
             throw SRC_BUG;
-    
+
         decimales = new storage(*ref.decimales);
         E_END("deci::copy_from", "");
     }
@@ -206,7 +206,7 @@ namespace libdar
                 tmp = get_right(*it);
             else
                 tmp = get_left(*it);
-           
+
             if(tmp == 0 && leading_zero)
             {
                 if(avance)
@@ -218,6 +218,7 @@ namespace libdar
             }
 
             if(tmp == 0xF)
+	    {
                 if(leading_zero)
                 {
                     if(avance)
@@ -225,6 +226,7 @@ namespace libdar
                 }
                 else
                     throw SRC_BUG;
+	    }
 
             if(tmp != 0 && tmp != 0xF)
                 leading_zero = false;
@@ -272,7 +274,7 @@ namespace libdar
 
             if(c != 0xF)
                 s = s + string(1, digit_ctoh(c));
-            
+
             avance = ! avance;
         }
 

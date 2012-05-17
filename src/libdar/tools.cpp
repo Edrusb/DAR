@@ -25,6 +25,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -103,6 +105,12 @@ char *strchr (), *strrchr ();
 #include <grp.h>
 #endif
 
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+
+} // extern "C"
+
 #include <iostream>
 #include "tools.hpp"
 #include "erreurs.hpp"
@@ -121,18 +129,18 @@ namespace libdar
     static void deadson(S_I sig);
     static bool is_a_slice_available(const string & base, const string & extension);
     static string retreive_basename(const string & base, const string & extension);
-    
+
     char *tools_str2charptr(string x)
     {
         U_I size = x.size();
         char *ret = new char[size+1];
- 
+
         if(ret == NULL)
             throw Ememory("tools_str2charptr");
         for(register unsigned int i = 0; i < size; i++)
             ret[i] = x[i];
         ret[size] = '\0';
-    
+
         return ret;
     }
 
@@ -146,7 +154,7 @@ namespace libdar
     {
         char a[2] = { 0, 0 };
         S_I lu;
-    
+
         s = "";
         do
         {
@@ -188,7 +196,7 @@ namespace libdar
         S_I lu = 0;
         const U_I buf_size = 10240;
         char buffer[buf_size];
-    
+
         s = "";
         do
         {
@@ -208,7 +216,7 @@ namespace libdar
     {
         struct stat buf;
         char *name = tools_str2charptr(p.display());
-    
+
         if(name == NULL)
             throw Ememory("tools_get_filesize");
 
@@ -289,7 +297,7 @@ namespace libdar
         path commande = command_name;
         string tmp = commande.basename();
         char *name = tools_str2charptr(tmp);
-    
+
         return name;
     }
 
@@ -362,7 +370,7 @@ namespace libdar
                 in = new tuyau(0, gf_read_only); // stdin by default
             if(in == NULL)
                 throw Ememory("tools_open_pipes");
-        
+
             if(output != "")
                 out = new tuyau(output, gf_write_only);
             else
@@ -423,7 +431,7 @@ namespace libdar
     {
         infinint tmp = x >= 0 ? x : -x;
         deci d = tmp;
-    
+
         return (x >= 0 ? string("") : string("-")) + d.human();
     }
 
@@ -432,7 +440,7 @@ namespace libdar
         deci d = x;
         infinint t = d.computer();
         U_32 ret = 0;
-    
+
         t.unstack(ret);
         if(t != 0)
             throw Erange("tools_str2int", "cannot convert the string to integer, overflow");
@@ -452,7 +460,7 @@ namespace libdar
     {
         time_t pas = 0;
         string ret;
- 
+
         date.unstack(pas);
         ret = ctime(&pas);
 
@@ -466,7 +474,7 @@ namespace libdar
         else
         {
             char **argv = new char *[argvector.size()+1];
-        
+
             if(argv == NULL)
                 throw Ememory("tools_system");
             try
@@ -474,21 +482,21 @@ namespace libdar
                     // make an (S_I, char *[]) couple
                 for(register U_I i = 0; i <= argvector.size(); i++)
                     argv[i] = NULL;
-            
+
                 try
                 {
                     S_I status;
                     bool loop;
-                
+
                     for(register U_I i = 0; i < argvector.size(); i++)
                         argv[i] = tools_str2charptr(argvector[i]);
-                
+
                     do
                     {
                         deadson(0);
                         loop = false;
                         S_I pid = fork();
-                    
+
                         switch(pid)
                         {
                         case -1:
@@ -502,6 +510,7 @@ namespace libdar
                                              string("Unexpected error while waiting for dar to terminate: ") + strerror(errno));
                             else // checking the way dar has exit
                                 if(!WIFEXITED(status)) // not a normal ending
+				{
                                     if(WIFSIGNALED(status)) // exited because of a signal
                                     {
                                         try
@@ -524,6 +533,7 @@ namespace libdar
                                         user_interaction_pause(string("DAR has terminated with exit code ")
                                                                + tools_int2str(WEXITSTATUS(status))
                                                                + " Continue anyway ?");
+				}
                         }
                     }
                     while(loop);
@@ -581,7 +591,7 @@ namespace libdar
 
         while(it != fin)
             ret += *it++ + separator;
-    
+
         return ret;
     }
 
@@ -610,11 +620,11 @@ namespace libdar
         exit(0);
     }
 
-    const char *tools_get_from_env(const char **env, char *clef)
+    const char *tools_get_from_env(const char **env, const char *clef)
     {
         unsigned int index = 0;
         const char *ret = NULL;
-        
+
         if(env == NULL || clef == NULL)
             return NULL;
 
@@ -634,12 +644,12 @@ namespace libdar
 
         return ret;
     }
-        
-        
+
+
     bool tools_is_member(const string & val, const vector<string> & liste)
     {
         U_I index = 0;
-        
+
         while(index < liste.size() && liste[index] != val)
             index++;
 
@@ -689,7 +699,7 @@ namespace libdar
         {
             ret = false;
         }
-    
+
         return ret;
     }
 
@@ -697,18 +707,18 @@ namespace libdar
     {
         regular_mask suspect = string(".\\.[1-9][0-9]*\\.")+extension;
         string old_path = (loc+base).display();
-        
+
             // is basename is suspect ?
         if(!suspect.is_covered(base))
             return; // not a suspect basename
-        
+
             // is there a slice available ?
         if(is_a_slice_available(old_path, extension))
             return; // yes, thus basename is not a mistake
-        
+
             // removing the suspicious end (.<number>.extension)
             // and checking the avaibility of such a slice
-        
+
         string new_base = retreive_basename(base, extension);
         string new_path = (loc+new_base).display();
         if(is_a_slice_available(new_path, extension))
@@ -732,13 +742,14 @@ namespace libdar
         string cwd;
         try
         {
-            do 
+            do
             {
                 buffer = new char[length];
                 if(buffer == NULL)
                     throw Ememory("tools_getcwd()");
                 ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
                 if(ret == NULL) // could not get the CWD
+		{
                     if(errno == ERANGE) // buffer too small
                     {
                         delete buffer;
@@ -747,9 +758,10 @@ namespace libdar
                     }
                     else // other error
                         throw Erange("tools_getcwd", string("Cannot get full path of current working directory: ") + strerror(errno));
+		}
             }
             while(ret == NULL);
-            
+
             buffer[length - 1] = '\0';
             cwd = buffer;
         }
@@ -769,20 +781,20 @@ namespace libdar
         char *name = tools_str2charptr(base);
         path *chem = NULL;
         bool ret = false;
-        
+
         try
         {
             char *char_chem = NULL;
             string rest;
-            
+
             tools_split_path_basename(name, chem, rest);
             char_chem = tools_str2charptr(chem->display());
-            
+
             try
             {
                 etage contents = char_chem;
                 regular_mask slice = rest + "\\.[1-9][0-9]*\\."+ extension;
-                
+
                 while(!ret && contents.read(rest))
                     ret = slice.is_covered(rest);
             }
@@ -807,7 +819,7 @@ namespace libdar
         delete name;
         if(chem != NULL)
             delete chem;
-        
+
         return ret;
     }
 

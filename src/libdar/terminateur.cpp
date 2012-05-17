@@ -42,7 +42,7 @@ namespace libdar
         size = f.get_position() - size;
 
         euclide(size, BLOCK_SIZE, nbbit, reste);
- 
+
         if(reste != 0)
         {
                 // adding some non informational bytes to get a multiple of BLOCK_SIZE
@@ -54,7 +54,7 @@ namespace libdar
                 // one more for remaing bytes and non informational bytes.
             nbbit++;
         }
-        
+
         last_byte = nbbit % 8;
         nbbit /= 8; // now, nbbit is the number of byte of terminator string (more or less 1)
 
@@ -108,7 +108,7 @@ namespace libdar
                 // considering the first non 0xFF byte of the terminator string (backward reading)
             while(a != 0)
             {
-                if(a & 0x80 == 0)
+                if((a & 0x80) == 0)
                     throw Erange("","");
                 offset++;
                 a <<= 1;

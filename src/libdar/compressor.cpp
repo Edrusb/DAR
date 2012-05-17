@@ -61,7 +61,7 @@ namespace libdar
             throw SRC_BUG;
         if(compression_level > 9)
             throw SRC_BUG;
-        
+
         compr = decompr = NULL;
         switch(algo)
         {
@@ -220,7 +220,7 @@ namespace libdar
         return compressed->read(a, size);
     }
 
-    S_I compressor::none_write(char *a, size_t size)
+    S_I compressor::none_write(const char *a, size_t size)
     {
         return compressed->write(a, size);
     }
@@ -235,7 +235,7 @@ namespace libdar
 
         decompr->wrap.set_next_out(a);
         decompr->wrap.set_avail_out(size);
-  
+
         do
         {
                 // feeding the input buffer if necessary
@@ -276,9 +276,9 @@ namespace libdar
         return decompr->wrap.get_next_out() - a;
     }
 
-    S_I compressor::gzip_write(char *a, size_t size)
+    S_I compressor::gzip_write(const char *a, size_t size)
     {
-        compr->wrap.set_next_in(a);
+        compr->wrap.set_next_in(const_cast<char *>(a));
         compr->wrap.set_avail_in(size);
 
         if(a == NULL)
@@ -325,7 +325,7 @@ namespace libdar
                 compr->wrap.set_avail_out(compr->size);
 
                 ret = compr->wrap.compress(WR_FINISH);
-                
+
                 switch(ret)
                 {
                 case WR_OK:
@@ -341,7 +341,7 @@ namespace libdar
                     throw SRC_BUG;
                 }
             }
-            while(ret != WR_STREAM_END);   
+            while(ret != WR_STREAM_END);
 
             if(compr->wrap.compressReset() != WR_OK)
                 throw SRC_BUG;
@@ -379,7 +379,7 @@ namespace libdar
                 compr->wrap.set_next_out(compr->buffer);
                 compr->wrap.set_avail_out(compr->size);
                 compr->wrap.set_avail_in(0);
-            
+
                 ret = compr->wrap.compress(WR_FINISH);
             }
             while(ret == WR_OK);

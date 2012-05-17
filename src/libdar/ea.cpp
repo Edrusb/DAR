@@ -92,7 +92,7 @@ namespace libdar
             tmp.unstack(tmp2);
         }
         while(tmp2 > 0);
-    
+
         alire = attr.begin();
     }
 
@@ -106,8 +106,8 @@ namespace libdar
     {
         vector<ea_entry>::iterator it = const_cast<ea_attributs &>(*this).attr.begin();
         vector<ea_entry>::iterator fin = const_cast<ea_attributs &>(*this).attr.end();
-    
-    
+
+
         size().dump(f);
         while(it != fin)
         {
@@ -119,7 +119,7 @@ namespace libdar
     void ea_attributs::reset_read() const
     {
         ea_attributs *moi = const_cast<ea_attributs *>(this);
-        moi->alire = moi->attr.begin(); 
+        moi->alire = moi->attr.begin();
     }
 
     bool ea_attributs::read(ea_entry & x) const
@@ -145,6 +145,7 @@ namespace libdar
         while(!diff && read(ea))
             if(ea.mode == ea_insert)
                 if((ea.domain == ea_user && check_ea_user) || (ea.domain == ea_root && check_ea_root))
+		{
                     if(other.find(ea.domain, ea.key, mode, value))
                     {
                         if(value != ea.value) // found but different
@@ -152,6 +153,7 @@ namespace libdar
                     }
                     else // not found
                         diff = true;
+		}
         return diff;
     }
 

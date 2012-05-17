@@ -25,6 +25,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SYS_TYPE_H
 #include <sys/types.h>
 #endif
@@ -44,6 +46,11 @@
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+}
 
 #include <string>
 #include <iostream>
@@ -67,13 +74,13 @@ int main(S_I argc, char *argv[]) throw()
     {
         if(argc != 2 && argc != 3)
             exit(1);
-        
+
         string s = argv[1];
         deci f = s;
         infinint max = f.computer();
         infinint i = 2;
         infinint p = 1;
-        
+
         while(i <= max)
             p *= i++;
 

@@ -56,7 +56,7 @@ namespace libdar
 	// %s %c %d %%  (normal behavior)
 	// %i (matches infinint *)
 	// %S (matches std::string *)
-    extern void ui_printf(char *format, ...);
+    extern void ui_printf(const char *format, ...);
 
 } // end of namespace
 

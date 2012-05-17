@@ -103,7 +103,7 @@ namespace libdar
             // note that the initial value of the argument is not ignored !
             // when the object is null the value of the argument stays the same as before
         template <class T>void unstack(T &v) throw(Ememory, Erange, Ebug)
-            { E_BEGIN; infinint_unstack_to(v); E_END("infinint::unstack", typeid(v).name()); };
+            { E_BEGIN; infinint_unstack_to(v); E_END("infinint::unstack", typeid(v).name()); }
 
         friend bool operator < (const infinint &, const infinint &) throw(Erange, Ebug);
         friend bool operator == (const infinint &, const infinint &) throw(Erange, Ebug);
@@ -118,7 +118,7 @@ namespace libdar
 
         enum endian { big_endian, little_endian, not_initialized };
         typedef unsigned char group[TG];
-     
+
         storage *field;
 
         bool is_valid() const throw();
@@ -146,12 +146,12 @@ namespace libdar
     E_END("operator OP", "infinint, infinint"); \
 }
 
-    OPERATOR(<);
-    OPERATOR(>);
-    OPERATOR(<=);
-    OPERATOR(>=);
-    OPERATOR(==);
-    OPERATOR(!=);
+    OPERATOR(<)
+    OPERATOR(>)
+    OPERATOR(<=)
+    OPERATOR(>=)
+    OPERATOR(==)
+    OPERATOR(!=)
 
     infinint operator + (const infinint &, const infinint &) throw(Erange, Ememory, Ebug);
     infinint operator - (const infinint &, const infinint &) throw(Erange, Ememory, Ebug);
@@ -168,9 +168,9 @@ namespace libdar
     template <class T> inline void euclide(T a, T b, T & q, T &r)
     {
         E_BEGIN;
-        q = a/b; r = a%b; 
+        q = a/b; r = a%b;
         E_END("euclide", "");
-    };
+    }
 
     inline infinint & infinint::operator /= (const infinint & ref) throw(Einfinint, Erange, Ememory, Ebug)
     {
@@ -183,7 +183,7 @@ namespace libdar
     inline infinint & infinint::operator %= (const infinint & ref) throw(Einfinint, Erange, Ememory, Ebug)
     {
         E_BEGIN;
-        *this = *this % ref; 
+        *this = *this % ref;
         return *this;
         E_END("infinint::operator %=", "");
     }

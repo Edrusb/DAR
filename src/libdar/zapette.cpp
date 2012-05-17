@@ -55,7 +55,7 @@ namespace libdar
         char serial_num;
         U_16 size; // size or REQUEST_SIZE_SPECIAL_ORDER
         infinint offset; // offset or REQUEST_OFFSET_END_TRANSMIT or REQUEST_OFFSET_GET_FILESIZE
- 
+
         void write(generic_file *f); // master side
         void read(generic_file *f);  // slave side
     };
@@ -66,7 +66,7 @@ namespace libdar
         char type;
         U_16 size;
         infinint arg;
-    
+
         void write(generic_file *f, char *data); // slave side
         void read(generic_file *f, char *data, U_16 max);  // master side
     };
@@ -135,13 +135,13 @@ namespace libdar
             pas = 0;
             while(pas < size)
                 pas += f->read(data+pas, size-pas);
-        
+
             if(size > max) // need to drop the remaining data
             {
                 char black_hole;
-            
+
                 for(tmp = max; tmp < size; tmp++)
-                    f->read(&black_hole, 1); 
+                    f->read(&black_hole, 1);
                     // might not be very performant code
             }
             arg = 0;
@@ -178,9 +178,9 @@ namespace libdar
     slave_zapette::~slave_zapette()
     {
         if(in != NULL)
-            delete in; 
+            delete in;
         if(out != NULL)
-            delete out; 
+            delete out;
         if(src != NULL)
             delete src;
     }
@@ -198,7 +198,7 @@ namespace libdar
             {
                 req.read(in);
                 ans.serial_num = req.serial_num;
-            
+
                 if(req.size != REQUEST_SIZE_SPECIAL_ORDER)
                 {
                     ans.type = ANSWER_TYPE_DATA;
@@ -272,14 +272,14 @@ namespace libdar
         out = output;
         position = 0;
         serial_counter = 0;
-    
+
             //////////////////////////////
             // retreiving the file size
             //
         S_I tmp = 0;
         make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_GET_FILESIZE, NULL, tmp, file_size);
     }
-    
+
     zapette::~zapette()
     {
         S_I tmp = 0;
@@ -339,7 +339,7 @@ namespace libdar
     {
         static U_16 max_short = ~0;
         U_I lu = 0;
-    
+
         if(size > 0)
         {
             infinint not_used;
@@ -362,7 +362,7 @@ namespace libdar
         return lu;
     }
 
-    S_I zapette::inherited_write(char *a, size_t size)
+    S_I zapette::inherited_write(const char *a, size_t size)
     {
         throw SRC_BUG; // zapette is read-only
     }
@@ -400,7 +400,7 @@ namespace libdar
         default:  // might be a transmission error do to weak transport layer
             throw Erange("zapette::make_transfert", "incoherent answer from peer");
         }
-    
+
             // sanity checks
         if(req.size == REQUEST_SIZE_SPECIAL_ORDER)
         {

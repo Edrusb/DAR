@@ -116,7 +116,7 @@ namespace libdar
                             info_details, pause, empty_dir, algo, compression_level, file_size, first_file_size, root_ea, user_ea,
                             input_pipe, output_pipe, execute, execute_ref, pass, pass_ref, compr_mask, min_compr_size,
                             nodump, hourshift);
-    };
+    }
 
     void op_isolate(const path &sauv_path,
                     const path *ref_path,
@@ -205,7 +205,7 @@ namespace libdar
                     restore_ea_root = false; // not restoring something not saved
                 if((ver.flag & VERSION_FLAG_SAVED_EA_USER) == 0)
                     restore_ea_user = false; // not restoring something not saved
-            
+
                 catalogue *cat = macro_tools_get_catalogue_from(*decoupe, *zip, info_details, tmp);
                 try
                 {
@@ -234,7 +234,7 @@ namespace libdar
                 throw;
             }
             if(zip != NULL)
-                delete zip;         
+                delete zip;
             if(scram != NULL)
                 delete scram;
             if(decoupe != NULL)
@@ -277,7 +277,7 @@ namespace libdar
             throw Elibcall("op_listing", "NULL argument given to selection");
 
 	    // end of sanity checks
-    
+
         try
         {
             generic_file *decoupe = NULL;
@@ -285,13 +285,13 @@ namespace libdar
             scrambler *scram = NULL;
             header_version ver;
 
-            MEM_IN;     
+            MEM_IN;
             try
             {
                 infinint cat_size;
 
                 macro_tools_open_archive(sauv_path, filename, extension, SAR_OPT_DEFAULT, pass, decoupe, scram, zip, ver, input_pipe, output_pipe, execute);
- 
+
                 catalogue *cat = macro_tools_get_catalogue_from(*decoupe, *zip, info_details, cat_size);
                 try
                 {
@@ -302,14 +302,14 @@ namespace libdar
                         infinint first_file_size;
                         infinint last_file_size, file_number;
                         string algo = compression2string(char2compression(ver.algo_zip));
-                    
+
                         ui_printf("Archive version format               : %s\n", ver.edition);
                         ui_printf("Compression algorithm used           : %S\n", &algo);
                         ui_printf("Scrambling                           : %s\n", ((ver.flag & VERSION_FLAG_SCRAMBLED) != 0 ? "yes" : "no"));
                         ui_printf("Catalogue size in archive            : %i bytes\n", &cat_size);
                             // the following field is no more used (lack of pertinence, when included files are used).
                         ui_printf("Command line options used for backup : %S\n", &ver.cmd_line);
-                    
+
                         if(real_decoupe != NULL)
                         {
                             infinint sub_file_size = real_decoupe->get_sub_file_size();
@@ -338,14 +338,14 @@ namespace libdar
                         }
                         else // not reading from a sar
                         {
-                            infinint tmp; 
+                            infinint tmp;
 
                             decoupe->skip_to_eof();
                             tmp = decoupe->get_position();
                             ui_printf("Archive size is: %i bytes\n", &tmp);
                             ui_printf("Previous archive size does not include headers present in each slice\n");
                         }
-                    
+
                         entree_stats stats = cat->get_stats();
                         stats.listing();
                         user_interaction_pause("Continue listing archive contents?");
@@ -434,11 +434,11 @@ namespace libdar
             catalogue *cat = NULL;
 
             inode::set_ignore_owner(ignore_owner);
-        
+
             try
             {
                 infinint cat_size;
-            
+
                 macro_tools_open_archive(sauv_path, filename, extension, SAR_OPT_DEFAULT, pass, decoupe, scram, zip, ver, input_pipe, output_pipe, execute);
                 cat = macro_tools_get_catalogue_from(*decoupe, *zip, info_details, cat_size);
                 filtre_difference(selection, subtree, *cat, fs_root, info_details, st, check_ea_root, check_ea_user);
@@ -514,11 +514,11 @@ namespace libdar
             compressor *zip = NULL;
             header_version ver;
             catalogue *cat = NULL;
-        
+
             try
             {
                 infinint cat_size;
-            
+
                 macro_tools_open_archive(sauv_path, filename, extension, SAR_OPT_DEFAULT, pass, decoupe, scram, zip, ver, input_pipe, output_pipe, execute);
                 cat = macro_tools_get_catalogue_from(*decoupe, *zip, info_details, cat_size);
                 filtre_test(selection, subtree, *cat, info_details, st);
@@ -641,7 +641,7 @@ namespace libdar
             throw Elibcall("op_create/op_isolate", "NULL argument given to fs_root");
         if(&sauv_path == NULL)
             throw Elibcall("op_create/op_isolate", "NULL argument given to sauv_path");
-        if(ref_path == NULL ^ ref_filename == NULL)
+        if((ref_path == NULL) ^ (ref_filename == NULL))
             throw Elibcall("op_create/op_isolate", "ref_filename and ref_path must be both either NULL or not");
         if(&selection == NULL)
             throw Elibcall("op_create/op_isolate", "NULL argument given to selection");
@@ -671,7 +671,7 @@ namespace libdar
             throw Elibcall("op_create/op_isolate", "NULL argument given to compr_mask");
         if(&min_compr_size == NULL)
             throw Elibcall("op_create/op_isolate", "NULL argument given to min_compr_size");
-    
+
             // end of sanity checks
 
         try
@@ -760,7 +760,7 @@ namespace libdar
                     sar_opt &= ~SAR_OPT_PAUSE;
                 if(pause && ref_path != NULL && *ref_path == sauv_path)
                     user_interaction_pause("Ready to start writing the archive? ");
-            
+
                 if(file_size == 0) // one SLICE
                     if(filename == "-") // output to stdout
                         decoupe = sar_tools_open_archive_tuyau(1, gf_write_only); //archive goes to stdout
@@ -768,7 +768,7 @@ namespace libdar
                         decoupe = sar_tools_open_archive_fichier((sauv_path + sar_make_filename(filename, 1, extension)).display(), allow_over, warn_over);
                 else
                     decoupe = new sar(filename, extension, file_size, first_file_size, sar_opt, sauv_path, execute);
-                
+
                 if(decoupe == NULL)
                     throw Ememory("op_create");
 
@@ -827,7 +827,7 @@ namespace libdar
                     user_interaction_warning("Writing archive contents...");
                 current.dump(*zip);
                 zip->flush_write();
-                delete zip; 
+                delete zip;
                 zip = NULL;
                 if(scram != NULL)
                 {

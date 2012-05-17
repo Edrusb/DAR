@@ -48,12 +48,12 @@ protected:
         infinint debut, longueur; // debut is the offset in ref file
         infinint offset; // offset in the resulting file
     };
-        
+
     vector <partie> morceau;
     generic_file *ref;
 
     S_I inherited_read(char *a, size_t size);
-    S_I inherited_write(char *a, size_t size);
+    S_I inherited_write(const char *a, size_t size);
 
     virtual void fill_morceau() = 0;
         // the inherited classes have with this method

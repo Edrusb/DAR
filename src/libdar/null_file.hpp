@@ -44,7 +44,7 @@ namespace libdar
 
     protected :
         int inherited_read(char *a, size_t size) { return 0; };
-        int inherited_write(char *a, size_t size) { return size; };
+        int inherited_write(const char *a, size_t size) { return size; };
     };
 
 } // end of namespace

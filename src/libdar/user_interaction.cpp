@@ -107,7 +107,7 @@ namespace libdar
         dummy_call(id);
     }
 
-    void ui_printf(char *format, ...)
+    void ui_printf(const char *format, ...)
     {
         va_list ap;
         bool end;
@@ -116,7 +116,7 @@ namespace libdar
         string output = "";
 
         U_I test;
-    
+
         copie = new char[taille];
         if(copie == NULL)
             throw Ememory("ui_printf");
@@ -189,7 +189,7 @@ namespace libdar
         if(warning_callback == NULL)
             cerr << "warning_callback not set, use set_warning_callback first" << endl;
         else
-            (*warning_callback)(output);    
+            (*warning_callback)(output);
     }
 
 } // end of namespace

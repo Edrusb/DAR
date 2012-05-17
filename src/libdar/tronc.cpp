@@ -51,7 +51,7 @@ namespace libdar
 
     tronc::tronc(generic_file *f, const infinint & offset, const infinint &size) : generic_file(f->get_mode())
     {
-        ref = f; 
+        ref = f;
         sz = size;
         start = offset;
         current = size; // forces skipping the first time
@@ -59,7 +59,7 @@ namespace libdar
 
     tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode) : generic_file(mode)
     {
-        ref = f; 
+        ref = f;
         sz = size;
         start = offset;
         current = size; // forces skipping the firt time
@@ -92,6 +92,7 @@ namespace libdar
     bool tronc::skip_relative(S_I x)
     {
         if(x < 0)
+	{
             if(current < -x)
             {
                 ref->skip(start);
@@ -100,7 +101,7 @@ namespace libdar
             }
             else
             {
-                bool r = ref->skip_relative(x); 
+                bool r = ref->skip_relative(x);
                 if(r)
                     current -= -x;
                 else
@@ -110,8 +111,10 @@ namespace libdar
                 }
                 return r;
             }
-    
+	}
+
         if(x > 0)
+	{
             if(current + x >= sz)
             {
                 current = sz;
@@ -130,6 +133,7 @@ namespace libdar
                 }
                 return r;
             }
+	}
 
         return true;
     }
@@ -172,7 +176,7 @@ namespace libdar
         return lu;
     }
 
-    S_I tronc::inherited_write(char *a, size_t size)
+    S_I tronc::inherited_write(const char *a, size_t size)
     {
         infinint avail = sz - current;
         U_32 macro_pas = 0, micro_pas;
@@ -197,7 +201,7 @@ namespace libdar
         }
         while(ret > 0);
         current += wrote;
-    
+
         return wrote;
     }
 

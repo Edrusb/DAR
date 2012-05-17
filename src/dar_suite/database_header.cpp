@@ -24,6 +24,8 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -44,6 +46,12 @@
 #include <unistd.h>
 #endif
 
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+} // extern "C"
+
 #include "database_header.hpp"
 #include "compressor.hpp"
 #include "tools.hpp"
@@ -61,14 +69,14 @@ generic_file *database_header_create(const string & filename, bool overwrite)
 {
     char *ptr = tools_str2charptr(filename);
     generic_file *ret = NULL;
-    
+
     try
     {
         struct stat buf;
         S_I fd;
         database_header h;
         compressor *comp;
-        
+
         if(stat(ptr, &buf) >= 0 && !overwrite)
             throw Erange("database_header_create", "Cannot create database, file exists");
         fd = open(ptr, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
@@ -80,7 +88,7 @@ generic_file *database_header_create(const string & filename, bool overwrite)
             close(fd);
             throw Ememory("database_header_create");
         }
-        
+
         h.version = database_version;
         h.options = HEADER_OPTION_NONE;
         h.write(*ret);
@@ -89,7 +97,7 @@ generic_file *database_header_create(const string & filename, bool overwrite)
         if(comp == NULL)
             throw Ememory("database_header_create");
         else
-            ret = comp; 
+            ret = comp;
     }
     catch(...)
     {
@@ -121,7 +129,7 @@ generic_file *database_header_open(const string & filename)
             user_interaction_pause("The format version of the database is too high for that software version, try reading anyway ? ");
         if(h.options != HEADER_OPTION_NONE)
             throw Erange("database_header_open", "Unknown header option in database, aborting\n");
-        
+
         comp = new compressor(gzip, ret);
         if(comp == NULL)
             throw Ememory("database_header_open");
@@ -135,7 +143,7 @@ generic_file *database_header_open(const string & filename)
             delete ret;
         throw;
     }
-    
+
     delete ptr;
     return ret;
 }

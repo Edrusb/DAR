@@ -37,17 +37,17 @@ namespace libdar
 {
 
     extern char *tools_str2charptr(std::string x);
-    extern void tools_write_string(generic_file & f, const std::string & s); 
+    extern void tools_write_string(generic_file & f, const std::string & s);
         // add a '\0' at the end
-    extern void tools_read_string(generic_file & f, std::string & s); 
+    extern void tools_read_string(generic_file & f, std::string & s);
         // read up to '\0' char
-    extern void tools_write_string_all(generic_file & f, const std::string & s); 
+    extern void tools_write_string_all(generic_file & f, const std::string & s);
         // '\0' has no special meaning no '\0' at the end
-    extern void tools_read_string_size(generic_file & f, std::string & s, infinint taille); 
+    extern void tools_read_string_size(generic_file & f, std::string & s, infinint taille);
         // '\0' has no special meaning
     extern infinint tools_get_filesize(const path &p);
     extern infinint tools_get_extended_size(std::string s);
-    extern char *tools_extract_basename(const char *command_name); 
+    extern char *tools_extract_basename(const char *command_name);
     extern void tools_split_path_basename(const char *all, path * &chemin, std::string & base);
     extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base);
     extern void tools_open_pipes(const std::string &input, const std::string & output, tuyau *&in, tuyau *&out);
@@ -74,7 +74,7 @@ namespace libdar
         a = a + b;
         return a;
     }
-    extern const char *tools_get_from_env(const char **env, char *clef);
+    extern const char *tools_get_from_env(const char **env, const char *clef);
 
         // base is the filename a slice
     extern void tools_check_basename(const path & loc, std::string & base, const std::string & extension);

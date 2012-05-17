@@ -63,17 +63,17 @@ namespace libdar
     public :
         generic_file(gf_mode m) { rw = m; clear(value); crc_offset = 0; enable_crc(false); };
         virtual ~generic_file() {};
-    
+
         gf_mode get_mode() const { return rw; };
         S_I read(char *a, size_t size);
-        S_I write(char *a, size_t size);
+        S_I write(const char *a, size_t size);
         S_I write(const std::string & arg);
         S_I read_back(char &a);
         virtual bool skip(const infinint & pos) = 0;
         virtual bool skip_to_eof() = 0;
         virtual bool skip_relative(S_I x) = 0;
         virtual infinint get_position() = 0;
-    
+
         void copy_to(generic_file &ref);
         void copy_to(generic_file &ref, crc & value);
             // generates CRC on copied data
@@ -91,7 +91,7 @@ namespace libdar
             // must provide as much byte as requested up to end of file
             // stay blocked if not enough available
             // returning zero or less than requested means end of file
-        virtual S_I inherited_write(char *a, size_t size) = 0;
+        virtual S_I inherited_write(const char *a, size_t size) = 0;
             // must write all data or block or throw exceptions
             // thus always returns the second argument
 
@@ -100,19 +100,19 @@ namespace libdar
         crc value;
         S_I crc_offset;
         S_I (generic_file::* active_read)(char *a, size_t size);
-        S_I (generic_file::* active_write)(char *a, size_t size);
+        S_I (generic_file::* active_write)(const char *a, size_t size);
 
         void enable_crc(bool mode);
-        void compute_crc(char *a, S_I size);
+        void compute_crc(const char *a, S_I size);
         S_I read_crc(char *a, size_t size);
-        S_I write_crc(char *a, size_t size);
+        S_I write_crc(const char *a, size_t size);
     };
 
     class fichier : public generic_file
     {
     public :
         fichier(S_I fd);
-        fichier(char *name, gf_mode m);
+        fichier(const char *name, gf_mode m);
         fichier(const path & chemin, gf_mode m);
         ~fichier() { close(filedesc); };
 
@@ -126,7 +126,7 @@ namespace libdar
 
     protected :
         S_I inherited_read(char *a, size_t size);
-        S_I inherited_write(char *a, size_t size);
+        S_I inherited_write(const char *a, size_t size);
 
     private :
         S_I filedesc;

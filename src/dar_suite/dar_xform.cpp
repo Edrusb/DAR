@@ -25,9 +25,16 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+} // extern "C"
 
 #include <iostream>
 #include "sar.hpp"
@@ -81,7 +88,7 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
         {
             generic_file *dst_sar = NULL;
             generic_file *src_sar = NULL;
-            
+
             if(dst != "-")
                 shell_interaction_change_non_interactive_output(&cout);
             try
@@ -94,7 +101,7 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
                 if(src == "-")
                 {
                     generic_file *tmp = new tuyau(0, gf_read_only);
-                    
+
                     if(tmp == NULL)
                         throw Ememory("main");
                     try
@@ -115,7 +122,7 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
                     src_sar = new sar(src, EXTENSION, SAR_OPT_DEFAULT, *src_dir, execute_src);
                 if(src_sar == NULL)
                     throw Ememory("main");
-                
+
                 if(size == 0)
                     if(dst == "-")
                         dst_sar = sar_tools_open_archive_tuyau(1, gf_write_only);
@@ -168,7 +175,7 @@ static S_I sub_main(S_I argc, char *argv[], const char **env)
         }
         delete src_dir;
         delete dst_dir;
-        
+
         return EXIT_OK;
     }
     else
@@ -247,7 +254,7 @@ static bool command_line(S_I argc, char *argv[],
                                 user_interaction_warning("invalid size for option -S");
                                 return false;
                             }
-                            
+
                         }
                         else
                             throw Erange("command_line", "only one -S option is allowed");
@@ -289,7 +296,7 @@ static bool command_line(S_I argc, char *argv[],
             case ':':
                 throw Erange("command_line", string("missing parameter to option ") + char(optopt));
             case '?':
-                user_interaction_warning(string("ignoring unknown option ") + char(optopt)); 
+                user_interaction_warning(string("ignoring unknown option ") + char(optopt));
                 break;
             default:
                 throw SRC_BUG;
@@ -307,14 +314,14 @@ static bool command_line(S_I argc, char *argv[],
             user_interaction_warning("too many argument on command line, see -h option for help");
             return false;
         }
-        if(argv[optind] != "")
+        if(strcmp(argv[optind], "") != 0)
             tools_split_path_basename(argv[optind], src_dir, src);
         else
         {
             user_interaction_warning("invalid argument as source archive");
             return false;
         }
-        if(argv[optind+1] != "")
+        if(strcmp(argv[optind+1], "") != 0)
             tools_split_path_basename(argv[optind+1], dst_dir, dst);
         else
         {

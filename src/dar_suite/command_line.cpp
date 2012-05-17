@@ -83,7 +83,7 @@ char *strchr (), *strrchr ();
 using namespace std;
 using namespace libdar;
 
-static const unsigned int min_compr_size_default = 100; 
+static const unsigned int min_compr_size_default = 100;
     // the default value for --mincompr
 
     // return a newly allocated memory (to be deleted by the caller)
@@ -326,10 +326,12 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                && output_pipe == "")
                 throw Erange("get_args", "-o is mandatory when using \"-A -\" with \"-c -\" or \"-C -\"");
             if(ref_filename != NULL && *ref_filename != "-")
+	    {
                 if(ref_root == NULL)
                     throw SRC_BUG;
                 else
                     tools_check_basename(*ref_root, *ref_filename, EXTENSION);
+	    }
             if(algo != none && op != create && op != isolate)
                 user_interaction_warning("-z or -y need only to be used with -c\n");
             if(first_file_size != 0 && file_size == 0)
@@ -354,7 +356,7 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                 delete name;
             }
             if(op == listing && tar_format)
-                only_more_recent = true; 
+                only_more_recent = true;
             if(execute != "" && file_size == 0 && (op == create || op == isolate))
                 user_interaction_warning("-E is not possible (and useless) with -c or -C and without slicing (-s option), -E will be ignored");
             if(execute_ref != "" && ref_filename == NULL)
@@ -366,6 +368,7 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
             if(min_compr_size != min_compr_size_default && op != create)
                 user_interaction_warning("-m is only useful with -c");
             if(hourshift > 0)
+	    {
                 if(op == create)
                 {
                     if(ref_filename == NULL)
@@ -379,7 +382,7 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                     }
                     else
                         user_interaction_warning("-H is only usefule with -c or -x");
-                        
+	    }
 
                 // generating masks
                 // for filenames
@@ -540,7 +543,7 @@ static bool get_args_recursive(vector<string> & inclusions,
                     throw Erange("get_args", string(" missing argument to -")+char(lu));
                 if(filename != "" || sauv_root != NULL)
                     throw Erange("get_args", " only one option of -c -d -t -l -C or -x is allowed");
-                if(optarg != "")
+                if(strcmp(optarg,"") != 0)
                     tools_split_path_basename(optarg, sauv_root, filename);
                 else
                     throw Erange("get_args", string(" invalid argument for option -") + char(lu));
@@ -573,9 +576,9 @@ static bool get_args_recursive(vector<string> & inclusions,
                     throw Erange("get_args", "only one -A option is allowed");
                 if(optarg == NULL)
                     throw Erange("get_args", "missing argument to -A");
-                if(optarg == "")
+                if(strcmp(optarg, "") == 0)
                     throw Erange("get_args", "invalid argument for option -A");
-                if(optarg == "-")
+                if(strcmp(optarg, "-") == 0)
                     throw Erange("get_args", "- not allowed with -A option");
                 ref_filename = new string();
                 if(ref_filename == NULL)
@@ -926,10 +929,10 @@ static bool get_args_recursive(vector<string> & inclusions,
                 user_interaction_warning(string("ignoring unknown option ") + char(optopt));
                 break;
             default:
-                user_interaction_warning(string("ignoring unknown option ") + char(lu)); 
+                user_interaction_warning(string("ignoring unknown option ") + char(lu));
             }
         }
-    
+
     for(S_I i = optind; i < argc; i++)
         l_path_inclus.push_back(argv[i]);
 
@@ -1566,7 +1569,7 @@ static void make_args_from_file(operation op, const char *filename, S_I & argc, 
             throw Ememory("make_args_from_file");
 
         if(info_details)
-            ui_printf("arguments read from %s :", filename); 
+            ui_printf("arguments read from %s :", filename);
         for(S_I i = 0; i < argc; i++)
         {
             argv[i] = mots[i]; // copy of the address of each string
@@ -1714,22 +1717,22 @@ static bool update_with_config_files(const char * home,
         S_I rec_c = 0;
         char **rec_v = NULL;
         bool btmp = true;
-        
-        
+
+
             // trying to open $HOME/.darrc
         strncpy(buffer, home, len+1); // +1 because of final '\0'
         strncat(buffer, "/.darrc", delta);
-        
+
         try
         {
             user_interaction_warning(string("Reading config file: ")+buffer);
             make_args_from_file(op, buffer, rec_c, rec_v, info_details);
-            
+
             try
             {
                 vector<string> inclusions;
                 optind = 0; // reset getopt call
-                
+
                 if(! get_args_recursive(inclusions,
                                         rec_c, rec_v, op, fs_root,
                                         sauv_root, ref_root,
@@ -1777,15 +1780,15 @@ static bool update_with_config_files(const char * home,
                 // below
         }
 
-        
+
         rec_c = 0;
         rec_v = NULL;
-        
+
         if(retour == unknown)
         {
                 // trying to open /etc/darrc
             strncpy(buffer, "/etc/darrc", len+delta);
-            
+
             try
             {
                 make_args_from_file(op, buffer, rec_c, rec_v, info_details);
@@ -1794,7 +1797,7 @@ static bool update_with_config_files(const char * home,
                     vector<string> inclusions;
                     user_interaction_warning(string("Reading config file: ")+buffer);
                     optind = 0; // reset getopt call
-                    
+
                     if(! get_args_recursive(inclusions,
                                             rec_c, rec_v, op, fs_root,
                                             sauv_root, ref_root,
@@ -1847,6 +1850,6 @@ static bool update_with_config_files(const char * home,
         throw;
     }
     delete buffer;
-        
+
     return retour != syntax;
 }

@@ -73,7 +73,7 @@ int main()
     MEM_END;
     return 0;
 }
- 
+
 void f1()
 {
     unlink(FIC1);
@@ -82,7 +82,7 @@ void f1()
     {
         fichier *dump = new fichier(FIC1, gf_read_write);
         fichier *dump2 = new fichier(FIC2, gf_write_only);
-        
+
         eod *v_eod = new eod();
         file *v_file = new file(1024, 102, 0644, 1, 2, "fichier", "." , 1024);
         lien *v_lien = new lien(1025, 103, 0645, 4, 5, "lien", "fichier");
@@ -93,9 +93,9 @@ void f1()
         prise *v_prise = new prise(1030, 108, 0650, 19, 20, "prise");
         detruit *v_detruit = new detruit("ancien fichier", 'f');
         directory *v_sub_dir = new directory(200,20, 0777, 100, 101, "sous-repertoire");
-        
+
         entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, NULL };
-        
+
         for(S_I i = 0; liste[i] != NULL; i++)
         {
             inode *ino = dynamic_cast<inode *>(liste[i]);
@@ -131,12 +131,12 @@ void f1()
         v_dir->add_children(v_tube);
         v_dir->add_children(v_detruit);
         v_dir->add_children(v_prise);
-        
+
         v_dir->listing();
-        
+
         unlink(FIC1);
         unlink(FIC2);
-        
+
         stats.clear();
         dump = new fichier(FIC1, gf_read_write);
         v_dir->dump(*dump);
@@ -146,7 +146,7 @@ void f1()
         v_sub_dir->listing();
 
         delete ref;
-        delete dump;    
+        delete dump;
         delete v_dir;
     }
     catch(Egeneric & e)
@@ -184,7 +184,7 @@ void f2()
         cat.add(new tube(1029, 107, 0652, 16, 17, "tuyau"));
         cat.add(new prise(1030, 108, 0650, 19, 20, "prise"));
         cat.add(new detruit("ancien fichier", 'f'));
-        
+
         cat.listing();
 
         cat.reset_read();
@@ -194,7 +194,7 @@ void f2()
             const nomme *n = dynamic_cast<const nomme *>(ref);
             const directory *d = dynamic_cast<const directory *>(ref);
             string type = "file";
-            
+
             if(e != NULL)
                 cout << " EOF "<< endl;
             if(d != NULL)
@@ -220,7 +220,7 @@ void f2()
             const detruit *d = dynamic_cast<const detruit *>(ref);
             const inode *i = dynamic_cast<const inode *>(ref);
             const entree *was;
-            
+
             if(e != NULL)
                 ok = cat.compare(e, was);
             else
@@ -234,6 +234,7 @@ void f2()
                         if(ok)
                             w = dynamic_cast<const inode *>(was);
                         if(ok && w != NULL)
+			{
                             if(i->same_as(*w))
                                 if(i->is_more_recent_than(*w, 0))
                                     cout << "plus recent" << endl;
@@ -241,6 +242,7 @@ void f2()
                                     cout << "pas plus recent" << endl;
                             else
                                 cout << "pas meme ou pas inode" << endl;
+			}
                     }
                     else
                         cout << "objet inconnu" << endl;
@@ -278,7 +280,7 @@ void f3()
     dif.add(new detruit("ancien fichier", 'f'));
 
     dif.update_destroyed_with(cat);
-    
+
     cat.listing();
     dif.listing();
 }

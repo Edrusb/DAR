@@ -39,7 +39,7 @@ namespace libdar
     public:
         scrambler(const std::string & pass, generic_file & hidden_side);
         ~scrambler() { if(buffer != NULL) delete buffer; };
-    
+
         bool skip(const infinint & pos) { if(ref == NULL) throw SRC_BUG; return ref->skip(pos); };
         bool skip_to_eof() { if(ref==NULL) throw SRC_BUG; return ref->skip_to_eof(); };
         bool skip_relative(S_I x) { if(ref == NULL) throw SRC_BUG; return ref->skip_relative(x); };
@@ -47,7 +47,7 @@ namespace libdar
 
     protected:
         S_I inherited_read(char *a, size_t size);
-        S_I inherited_write(char *a, size_t size);
+        S_I inherited_write(const char *a, size_t size);
 
     private:
         std::string key;

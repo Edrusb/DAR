@@ -38,7 +38,7 @@ namespace libdar
     public :
         tronc(generic_file *f, const infinint &offset, const infinint &size);
         tronc(generic_file *f, const infinint &offset, const infinint &size, gf_mode mode);
-    
+
         bool skip(const infinint & pos);
         bool skip_to_eof();
         bool skip_relative(S_I x);
@@ -46,7 +46,7 @@ namespace libdar
 
     protected :
         S_I inherited_read(char *a, size_t size);
-        S_I inherited_write(char *a, size_t size);
+        S_I inherited_write(const char *a, size_t size);
 
     private :
         infinint start, sz;

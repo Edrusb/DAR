@@ -40,7 +40,7 @@ namespace libdar
         tuyau(int fd, gf_mode mode); // forces the mode of possible
         tuyau(const std::string &filename, gf_mode mode);
         ~tuyau() { close(filedesc); };
-    
+
             // inherited from generic_file
         bool skip(const infinint & pos);
         bool skip_to_eof();
@@ -49,7 +49,7 @@ namespace libdar
 
     protected:
         virtual int inherited_read(char *a, size_t size);
-        virtual int inherited_write(char *a, size_t size);
+        virtual int inherited_write(const char *a, size_t size);
 
     private:
         infinint position;
