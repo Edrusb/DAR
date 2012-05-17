@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: data_tree.cpp,v 1.15 2011/03/20 17:10:11 edrusb Rel $
+// $Id: data_tree.cpp,v 1.15.2.2 2011/06/25 11:15:36 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -195,12 +195,16 @@ namespace libdar
     }
 
 
-    data_tree::lookup data_tree::get_data(archive_num & archive, const infinint & date) const
+    data_tree::lookup data_tree::get_data(archive_num & archive, const infinint & date, bool even_when_removed) const
     {
-	map<archive_num, status>::const_iterator it  = last_mod.begin();
+	map<archive_num, status>::const_iterator it = last_mod.begin();
 	infinint max_seen = 0, max_real = 0;
-	bool presence_seen, presence_real;
-	archive_num archive_seen = 0;
+	    //archive (first argument) carries the last archive number (in the order of the database) in which a valid entry has been
+	    //found, but which is not just a record "et_present" meining that the file existed but has not been saved (differential backup context).
+	archive_num archive_seen = 0; //< last archive number (in the order of the database) in which a valid entry has been found (any state)
+	archive_num archive_even_when_removed = 0; //< last archive number in which a valid entry with data available has been found
+	bool presence_seen; //< whether the last found valid entry indicates file was present or removed
+	bool presence_real; //< whether the last found valid entry not being in an "et_present" state was present or removed
 	lookup ret;
 
 	archive = 0; // 0 is never assigned to an archive number
@@ -238,6 +242,7 @@ namespace libdar
 		    {
 		    case et_saved:
 			presence_real = true;
+			archive_even_when_removed = archive;
 			break;
 		    case et_removed:
 			presence_real = false;
@@ -253,6 +258,12 @@ namespace libdar
 	    ++it;
 	}
 
+	if(even_when_removed && archive_even_when_removed > 0)
+	{
+	    archive = archive_even_when_removed;
+	    presence_seen = presence_real = true;
+	}
+
 	if(archive == 0)
 	    if(archive_seen != 0) // last acceptable entry is a file present but not saved, but no full backup is present in a previous archive
 	    {
@@ -262,7 +273,8 @@ namespace libdar
 	    else
 		ret = not_found;
 	else
-	    if(presence_seen && !presence_real) // last acceptable entry is a file present but not saved, but no full backup is present in a previous archive
+	    if(presence_seen && !presence_real) // last acceptable entry is a file present but not saved,
+		    // but no full backup is present in a previous archive
 	    {
 		archive = archive_seen;
 		ret = not_restorable;
@@ -279,12 +291,13 @@ namespace libdar
 	return ret;
     }
 
-    data_tree::lookup data_tree::get_EA(archive_num & archive, const infinint & date) const
+    data_tree::lookup data_tree::get_EA(archive_num & archive, const infinint & date, bool even_when_removed) const
     {
 	map<archive_num, status>::const_iterator it = last_change.begin();
 	infinint max_seen = 0, max_real = 0;
 	bool presence_seen, presence_real;
 	archive_num archive_seen = 0;
+	archive_num archive_even_when_removed = 0;
 	lookup ret;
 
 	archive = 0; // 0 is never assigned to an archive number
@@ -322,6 +335,7 @@ namespace libdar
 		    {
 		    case et_saved:
 			presence_real = true;
+			archive_even_when_removed = archive;
 			break;
 		    case et_removed:
 			presence_real = false;
@@ -336,6 +350,13 @@ namespace libdar
 
 	    ++it;
 	}
+
+	if(even_when_removed && archive_even_when_removed > 0)
+	{
+	    archive = archive_even_when_removed;
+	    presence_seen = presence_real = true;
+	}
+
 
 	if(archive == 0)
 	    if(archive_seen != 0) // last acceptable entry is a file present but not saved, but no full backup is present in a previous archive
@@ -391,31 +412,41 @@ namespace libdar
 	map<archive_num, status>::iterator it = last_mod.begin();
 	bool presence_max = false;
 	archive_num num_max = 0;
+	infinint last_mtime = 0; // used as deleted_date for EA if last mtime is found
+	bool found_in_archive = false;
 
 	    // checking the last_mod map
 
-	while(it != last_mod.end() && it->first != archive)
+	while(it != last_mod.end())
 	{
-	    if(it->first > num_max)
-	    {
-		num_max = it->first;
-		switch(it->second.present)
+	    if(it->first == archive)
+		found_in_archive = true;
+	    else
+		if(it->first > num_max)
 		{
-		case et_saved:
-		case et_present:
-		    presence_max = true;
-		    break;
-		case et_removed:
-		    presence_max = false;
-		    break;
-		default:
-		    throw SRC_BUG;
+		    num_max = it->first;
+		    switch(it->second.present)
+		    {
+		    case et_saved:
+		    case et_present:
+			presence_max = true;
+			last_mtime = it->second.date; // used as deleted_data for EA
+			break;
+		    case et_removed:
+			presence_max = false;
+			last_mtime = it->second.date; // keeping this date as it is
+			    // not possible to know when the EA have been removed
+			    // since it does not change mtime of file nor of its parent
+			    // directory (this is an heuristic).
+			break;
+		    default:
+			throw SRC_BUG;
+		    }
 		}
-	    }
 	    ++it;
 	}
 
-	if(it == last_mod.end()) // not entry found for asked archive
+	if(!found_in_archive) // not entry found for asked archive
 	{
 	    if(num_max == 0)
 		throw Erange("data_tree::finalize", gettext("Corrupted database, empty entry found"));
@@ -435,33 +466,37 @@ namespace libdar
 	it = last_change.begin();
 	presence_max = false;
 	num_max = 0;
+	found_in_archive = false;
 
-	while(it != last_change.end() && it->first != archive)
+	while(it != last_change.end())
 	{
-	    if(it->first > num_max)
-	    {
-		num_max = it->first;
-		switch(it->second.present)
+	    if(it->first == archive)
+		found_in_archive = true;
+	    else
+		if(it->first > num_max)
 		{
-		case et_saved:
-		case et_present:
-		    presence_max = true;
-		    break;
-		case et_removed:
-		    presence_max = false;
-		    break;
-		default:
-		    throw SRC_BUG;
+		    num_max = it->first;
+		    switch(it->second.present)
+		    {
+		    case et_saved:
+		    case et_present:
+			presence_max = true;
+			break;
+		    case et_removed:
+			presence_max = false;
+			break;
+		    default:
+			throw SRC_BUG;
+		    }
 		}
-	    }
 	    ++it;
 	}
 
-	if(it == last_change.end()) // not entry found for asked archive
+	if(!found_in_archive) // not entry found for asked archive
 	{
 	    if(num_max != 0) // num_max may be equal to zero if this entry never had any EA in any recorded archive
 		if(presence_max)
-		    set_EA(archive, deleted_date, et_removed); // add an entry telling that EA for this file do no more exist in the current archive
+		    set_EA(archive, (last_mtime < deleted_date ? deleted_date : last_mtime), et_removed); // add an entry telling that EA for this file do no more exist in the current archive
 	}
 	    // else, entry found for the current archive
     }
@@ -525,7 +560,7 @@ namespace libdar
 	map<archive_num, status>::const_iterator ut = last_change.begin();
 
 	dialog.printf(gettext("Archive number |  Data                   | status ||  EA                     | status \n"));
-	dialog.printf(        "---------------+-------------------------+--------++-------------------------+----------\n");
+	dialog.printf(gettext("---------------+-------------------------+--------++-------------------------+----------\n"));
 
 	while(it != last_mod.end() || ut != last_change.end())
 	{
@@ -887,7 +922,7 @@ namespace libdar
 	case inode::ea_none:
 	    break;
 	case inode::ea_removed:
-	    result = get_EA(last_archive, 0);
+	    result = tree->get_EA(last_archive, 0, false);
 	    if(result == found_present || result == not_restorable)
 		tree->set_EA(archive, entry->get_last_change(), et_removed);
 		// else no need to add an et_remove entry in the map
@@ -910,10 +945,10 @@ namespace libdar
 	archive_num last_archive;
 	lookup result;
 
-	result = get_data(last_archive, 0);
+	result = get_data(last_archive, 0, false);
 	if(result == found_present || result == not_restorable)
 	    tree->set_data(archive, entry->get_date(), et_removed);
-	result = get_EA(last_archive, 0);
+	result = get_EA(last_archive, 0, false);
 	if(result == found_present || result == not_restorable)
 	    tree->set_EA(archive, entry->get_date(), et_removed);
     }
@@ -968,7 +1003,7 @@ namespace libdar
 
 	data_tree::finalize(archive, deleted_date);
 
-	switch(get_data(tmp_archive, 0))
+	switch(get_data(tmp_archive, 0, false))
 	{
 	case found_present:
 	case found_removed:
@@ -1037,8 +1072,8 @@ namespace libdar
 		throw SRC_BUG;
 	    data_dir *dir = dynamic_cast<data_dir *>(*it);
 
-	    lo_data = (*it)->get_data(ou_data, 0);
-	    lo_ea = (*it)->get_EA(ou_ea, 0);
+	    lo_data = (*it)->get_data(ou_data, 0, false);
+	    lo_ea = (*it)->get_EA(ou_ea, 0, false);
 	    data = lo_data == found_present && (ou_data == num || num == 0);
 	    ea = lo_ea == found_present && (ou_ea == num || num == 0);
 	    name = (*it)->get_name();
@@ -1212,7 +1247,7 @@ namespace libdar
 		if(new_root == NULL)
 		    throw SRC_BUG; // the racine->add method did not add an item for "entry"
 		if(new_root_dir == NULL)
-		    throw SRC_BUG; // the racine->add method did not add an data_dir item
+		    throw SRC_BUG; // the racine->add method did not add a data_dir item
 		data_tree_update_with(entry_dir, archive, new_root_dir);
 	    }
 	}
@@ -1269,7 +1304,7 @@ static data_tree *read_from_file(generic_file & f, unsigned char db_version)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: data_tree.cpp,v 1.15 2011/03/20 17:10:11 edrusb Rel $";
+    static char id[]="$Id: data_tree.cpp,v 1.15.2.2 2011/06/25 11:15:36 edrusb Exp $";
     dummy_call(id);
 }
 

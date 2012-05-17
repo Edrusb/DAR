@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database.cpp,v 1.22 2011/05/20 10:23:07 edrusb Rel $
+// $Id: database.cpp,v 1.22.2.3 2011/06/25 11:15:36 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -309,7 +309,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: database.cpp,v 1.22 2011/05/20 10:23:07 edrusb Rel $";
+	static char id[]="$Id: database.cpp,v 1.22.2.3 2011/06/25 11:15:36 edrusb Exp $";
 	dummy_call(id);
     }
 
@@ -474,8 +474,8 @@ namespace libdar
 		    archive_num num_ea = 0;
 		    data_tree::lookup look_ea, look_data;
 
-		    look_data = ptr->get_data(num_data, opt.get_date());
-		    look_ea = ptr->get_EA(num_ea, opt.get_date());
+		    look_data = ptr->get_data(num_data, opt.get_date(), opt.get_even_when_removed());
+		    look_ea = ptr->get_EA(num_ea, opt.get_date(), opt.get_even_when_removed());
 
 		    switch(look_data)
 		    {
@@ -483,7 +483,8 @@ namespace libdar
 			break;
 		    case data_tree::found_removed:
 			num_data = 0; // we do not restore it
-			dialog.warning(string(gettext("File recorded as removed at this date in database: ")) + anneau.front());
+			if(opt.get_info_details())
+			    dialog.warning(string(gettext("File recorded as removed at this date in database: ")) + anneau.front());
 			break;
 		    case data_tree::not_found:
 			num_data = 0;
@@ -500,14 +501,16 @@ namespace libdar
 		    switch(look_ea)
 		    {
 		    case data_tree::found_present:
+			if(opt.get_even_when_removed()
+			   && look_data == data_tree::found_present
+			   && num_data > num_ea)
+			    num_ea = num_data;
 			break;
 		    case data_tree::found_removed:
 			num_ea = 0; // we do not restore it
 			break;
 		    case data_tree::not_found:
 			num_ea = 0;
-			if(look_data != data_tree::not_found)
-			    dialog.warning(string(gettext("Extended Attribute of file not found in database: ")) + anneau.front());
 			break;
 		    case data_tree::not_restorable:
 			num_ea = 0;
@@ -517,17 +520,19 @@ namespace libdar
 			throw SRC_BUG;
 		    }
 
+			// if there is something to restore for that file
+
 		    if(look_ea == data_tree::found_present || look_data == data_tree::found_present)
 		    {
-			if(num_data == num_ea)
+			if(num_data == num_ea) // both EA and data are located in the same archive
 			{
-			    if(num_data != 0)
+			    if(num_data != 0) // archive is not zero (so it is a real archive)
 			    {
 				command_line[num_data].push_back("-g");
 				command_line[num_data].push_back(anneau.front());
 			    }
-			    else
-				if(opt.get_date() != 0)
+			    else // archive number is zero (not a valid archive number)
+				if(opt.get_date() != 0) // a date was specified
 				{
 				    string fic = anneau.front();
 				    if(opt.get_info_details())
@@ -552,7 +557,8 @@ namespace libdar
 				if(num_data > num_ea) // will restore "EA only" then "data + old EA"
 				{
 				    string fic = anneau.front();
-				    dialog.printf(gettext("Either archives in database are not properly tidied, or file last modification date has been artificially set to an more ancient date. This may lead improper Extended Attribute restoration"));
+				    if(!opt.get_even_when_removed())
+					dialog.printf(gettext("Either archives in database are not properly tidied, or file last modification date has been artificially set to an more ancient date. This may lead improper Extended Attribute restoration for inode %S"), &fic);
 				}
 			}
 		    }

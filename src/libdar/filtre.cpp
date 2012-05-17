@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.113 2011/05/27 12:29:18 edrusb Rel $
+// $Id: filtre.cpp,v 1.113.2.2 2011/06/20 14:02:03 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -2356,7 +2356,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.113 2011/05/27 12:29:18 edrusb Rel $";
+        static char id[]="$Id: filtre.cpp,v 1.113.2.2 2011/06/20 14:02:03 edrusb Exp $";
         dummy_call(id);
     }
 

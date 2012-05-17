@@ -15,6 +15,8 @@
 
 
 
+
+
   
   
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Usage Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
@@ -595,6 +597,8 @@ the volt for electrical potential, the bar for pressure, the watt for
 power, the second for time, etc.), and declined using prefixes: <br>
       </div>
       <div style="margin-left: 40px;"><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prefix (symbol) = ratio<br>
+&nbsp;&nbsp;&nbsp; ================<br>
       <div style="margin-left: 40px;">deci&nbsp; (d) = 0.1<br>
 centi (c) = 0.01<br>
 milli (m) = 0.001<br>
@@ -619,9 +623,9 @@ yotta (Y) = 1,000,000,000,000,000,000,000,000<br>
       <br>
       </div>
       <div style="text-align: justify; margin-left: 40px;">This way two
-milliseconds are 0.002 second, and 5 kilometers are 5,000 meters. All
+milliseconds (noted "2 ms") are 0.002 second, and 5 kilometers (noted "5 km") are 5,000 meters. All
 was fine and nice up to the recent time when computer science appeared:
-In this discipline, the need to measure the size of information storage
+In that discipline, the need to measure the size of information storage
 raised. The smallest size, is the bit (contraction of <span style="font-style: italic;"><span style="font-weight: bold;">bi</span>nary
 digi<span style="font-weight: bold;">t</span></span>), binary because
 it has two possible states: "0" and "1". Grouping bits by 8 computer
@@ -676,7 +680,7 @@ kbit/s ... not 2000 kbit/s <br>
       <div style="text-align: justify; margin-left: 40px;">Anyway, back
 to
 dar, you have to possibility to give the size in byte or using a single
-letter as suffix (k or K, M, T, P, E, Z, Y) thus the possibility to
+letter as suffix (k, M, T, P, E, Z, Y, the base unit being implicitely the byte) thus the possibility to
 provide a size in kilo, mega, tera, peta, exa, zetta or yotta byte,
 with the computer science definition of these terms (power of 1024) by
 default.<br>
@@ -696,9 +700,12 @@ used by dar, the<br>
       <div style="margin-left: 80px;"><code>--alter=SI-units</code><br>
       </div>
       <div style="margin-left: 40px;"><br>
+      <div style="text-align: justify;">
 (which can be shorten to -aSI or -asi) change the meaning of the
 prefixes that follow on the command-line, to the metric system (or
 System International) up to the end of the line or to a <br>
+      </div>
+
       <br>
       </div>
       <div style="margin-left: 80px;"><code>--alter=binary-units</code><br>
@@ -729,8 +736,8 @@ sold under the label "2.5 GB"! ... just kidding :-)<br>
       </div>
       <div style="margin-left: 40px;"><br>
 Note that to distinguish kilo, mega, tera and so on, new
-abbreviations are officially defined, but are not used with dar:<br>
-      <div style="margin-left: 40px;">Ki = 1024 <br>
+abbreviations are officially defined, but are not used within dar:<br>
+      <div style="margin-left: 40px;">ki = 1024 <br>
 Mi = 1024*1024<br>
 GiB = and so on...<br>
 Ti<br>
@@ -738,8 +745,9 @@ Pi<br>
 Ei<br>
 Zi<br>
 Yi<br>
-      <br>For example, we have 1 KiB for 1 kilobytes (= 1024 bytes), and 1 Kibit for
-1 kilobits (= 1024 bits) and 1 kB (= 1000 Bytes) and 1 kbit (= 1000 bits) </div>
+      <br>For example, we have 1 kiB for 1 kilobytes (= 1024 bytes), and 1 kibit for
+1 kilobits (= 1024 bits) and 1 kB (= 1000 Bytes) and 1 kbit (= 1000 bits), ...<br>
+ </div>
       </div>
       </td>
     </tr>
@@ -827,8 +835,8 @@ but, you are totally free to use the filename you want !&nbsp;&nbsp; ;-)<br>
       </div>
 
       <ul style="margin-left: 40px;">
-        <li>when
-dar has finished writing a slice only in backup mode, or before dar
+        <li style="text-align: justify;">when
+dar has finished writing a slice only in backup, isolation or merging modes, or before dar
 needs a slice (DUC files), in reading mode (testing, diffing,
 extracting, ...) and when reading an archive of reference.<br>
         </li>
@@ -838,7 +846,7 @@ extracting, ...) and when reading an archive of reference.<br>
       <h4 style="margin-left: 40px;">A - <a name="DUC"></a>Between slices:</h4>
 
       <div style="text-align: justify; margin-left: 80px;">This concerns -E,
--F and -~ options. They both receive a string as
+-F and -~ options. They all receive a string as
 argument. Thus, if the argument must be a command with its own
 arguments, you have to put these between quotes for they appear as a
 single string to the shell that interprets the dar command-line. For
@@ -885,23 +893,26 @@ the argument string of -E, -F&nbsp; or -~<br>
         <li><code>%p </code>is replaced by the path to the slices</li>
         <li><code>%b </code>is replaced by the basename of the slices</li>
         <li><code>%n</code> is replaced by the number of the slice</li>
+        <li><code>%N</code> is replaced by the number of the slice with padded zeros (it may differ from <code>%n </code>only when --min-digits option is used)<br>
+        </li>
+
         <li><code>%c</code> is replaced by the context replaced by
 "operation", "init" or "last_slice" depending on the context.<br>
         </li>
       </ul>
       <div style="text-align: justify; margin-left: 80px;">The number of the slice (<code>%n</code>)
 is either the just written slice or the next slice to be read. For
-example if you create an new archive (either using -c or -C), in -E option, the %n macro is the number of the last
+example if you create an new archive (either using -c, -C or -+), in -E option, the <code>%n</code> macro is the number of the last
 slice completed. Else (using -t, -d, -A (with -c or -C), -l or -x),
 this is the number of the slice that will be required very soon. While
 %c (the context) is substituted by "init", "operation" or "last_slice".
       <br>
       <br>
       <ul>
-        <li>"init" when the slice is asked before the catalogue is read</li>
-        <li>"operation" once the catalogue is read and/or data
+        <li><span style="font-weight: bold;">init :</span> when the slice is asked before the catalogue is read</li>
+        <li><span style="font-weight: bold;">operation</span> : once the catalogue is read and/or data
 treatment has begun.</li>
-        <li>"last_slice" when the last slice has been written (archive
+        <li><span style="font-weight: bold;">last_slice</span> : when the last slice has been written (archive
 creation only)<br>
         </li>
       </ul>
@@ -909,7 +920,7 @@ creation only)<br>
       
       <div style="margin-left: 80px;"><br>
 
-What the use of this feature? For example you want to burn the band-new
+What the use of this feature? For example you want to burn the brand-new
 slices on CD as soon as they are&nbsp; available.<br>
       <br>
 
@@ -921,12 +932,12 @@ let's build a little script for that:<br>
       
       <div style="margin-left: 120px;"><code>%cat burner</code><br>
       <code></code></div>
-      <div style="margin-left: 160px;"><code>#!/bin/tcsh -f</code><br>
+      <div style="margin-left: 160px;"><code>#!/bin/bash</code><br>
       <code></code><br>
-      <code>if("$1" == "" || "$2" == "") then</code><br>
+      <code>if [ "$1" == "" -o "$2" == "" ] ; then</code><br>
       <code>&nbsp; echo "usage: $0 &lt;filename&gt; &lt;number&gt;"</code><br>
       <code>&nbsp; exit 1</code><br>
-      <code>endif</code><br>
+      <code>fi</code><br>
       <code></code><br>
       <code>mkdir T</code><br>
       <code>mv $1 T</code><br>
@@ -935,10 +946,11 @@ let's build a little script for that:<br>
       <code>rm /tmp/image.iso<br>
 # Now assuming an automount will mount the just newly burnt CD:<br>
 </code>
-      <code>if(! diff /mnt/cdrom/$1 T/$1) then</code><br>
-      <code>&nbsp; exit 2</code><br>
-      <code>else</code><br>
+      <code>if diff /mnt/cdrom/$1 T/$1 ; then</code><br>
       <code>&nbsp; rm -rf T</code><br>
+      <code>else</code><code><br>
+&nbsp; exit 2<br>
+</code>
       <code>endif</code><br>
       <code></code></div>
       <div style="margin-left: 120px;"><code>%</code><br>
@@ -954,7 +966,7 @@ it, and compare the resulting CD with the original slice. Upon failure,
 the script return 2 (or 1 if syntax is not correct on the
 command-line). Note that this script is only here for illustration,
 there are many more interesting user scripts made by several dar users.
-These are available in the examples part of the documentation.<br>
+These are available in the <a href="doc/samples/index.html">examples</a> part of the documentation.<br>
       </div>
       
       <div style="margin-left: 80px;"><br>
@@ -970,7 +982,7 @@ One could then use it this way:<br>
       
       <div style="margin-left: 80px;"><br>
 
-which can make the following DAR command-line:<br>
+which can lead to the following DAR command-line:<br>
       <br>
       </div>
 
@@ -988,8 +1000,8 @@ not change CD from the device, we need to pause between slices (-p
 option). The pause take place after the execution of the command (-E
 option). Thus we could add in the script a command to send a mail or
 play a music to inform us that the slice is burned. The advantage, here
-is that we don't have to come twice by slices, once when the slice is
-ready, once when the slice is burnt.<br>
+is that we don't have to come twice by slices, once the slice is
+ready, and once the slice is burnt.<br>
       </div>
       
       <div style="margin-left: 80px;"><br>
@@ -1053,17 +1065,24 @@ script or a command to fetch the next to be requested slice. It could
 be using ftp, lynx, ssh, etc. I let you do the script as an exercise.
 :-). Note, if you plan to <span style="text-decoration: underline;">share</span> your DUC files, thanks to use the <a href="#DUC_convention">convention fo DUC files</a>. </div>
       <h4 style="margin-left: 40px;">B - <a name="DBP"></a>Before and after saving a file:</h4>
-      <div style="margin-left: 80px;">This concerns the -=, -&lt; and
+      <div style="margin-left: 80px;">
+      <div style="text-align: justify;">This concerns the -=, -&lt; and
 -&gt; options. The -&lt; (include) and -&gt; (exclude) options, let you
 define which file will need a command to be run before and after their
 backup. While the -= option, let you define which command to run for
 those files.<br>
+      </div>
+
       <br>
+      <div style="text-align: justify;">
 Let's suppose you have a very large file changing often that is located
-in /home/my/big/file, and a several databases that each consist of several files
+in /home/my/big/file, and several databases that each consist of several files
 under /home/*/database/data that need to have a coherent status and are
 also changing very often.<br>
+      </div>
+
       <br>
+      <div style="text-align: justify;">
       <div style="text-align: justify;">Saving them without precaution,
 will most probably make your big file flagged as "dirty" in dar's archive, which means that the saved
 status of the file may be a status that never existed for that file:
@@ -1071,22 +1090,27 @@ when dar saves a file it reads the first byte, then the second, etc. up
 to the end of file. While dar is reading the middle of the file, an
 application may change the very begin and then the very end of
 that file, but only modified ending of that file will be saved, leading
-the archive to contain a copy of the file in a state it has never had.<br>
+the archive to contain a copy of the file in a state it never had.<br>
+      </div>
+
       <br>
 For a database this is even worse, two or more files may need to have a coherent status. If dar
 saves one first file while another file is modified at the same time, this will not lead having the currently
 saved files flagged as "dirty", but may lead the database to have
-its files saved in incoherent states wetween them, thus lead you to having saved the database in a corrupted state.<br>
+its files saved in incoherent states between them, thus leading you to have saved the database in a corrupted state.<br>
       <br>
 For that situation not to occur, we will use the following options:<br>
       <br>
-      <div style="margin-left: 40px;"><span style="font-family: monospace;">-R / -&lt; home/my/big/file&nbsp; -&lt; "home/*/database/data"<br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">-R / "-&lt;" home/my/big/file&nbsp; "-&lt;" "home/*/database/data"<br>
       <br>
       </span></div>
       </div>
       </div>
       <div style="text-align: justify;">
-      <div style="margin-left: 80px;">In other words, that says that
+      <div style="margin-left: 80px;">First,
+you must pay attention to quote the -&lt; and -&gt; options for the
+shell not to consider you ask for redirection to stdout or from stdin.
+Back to the example, that says that
 for the files /home/my/big/file and for any "database/data" directory
 (or file) in the home directory of a user, a command will be run before
 and after saving that directory of file. We need thus to define the
@@ -1652,7 +1676,7 @@ follows it. In shorter we could have:<br>
 use regular expressions (regex) using the -aregex option. You can also
 use alternatively both of them using -aglob to return back to glob
 expressions. Each option -aregex / -aglob define the expected type of
-expression if the -I/-X/-P/-g/-u/-U/-Z/-Y options that follows up to
+expression in the -I/-X/-P/-g/-u/-U/-Z/-Y options that follows, up to
 end of line or to the next -aregex / -aglob option.<br>
       <br>
 Last a more complete example:<br>
@@ -1685,13 +1709,12 @@ least one of the -I option given.<br>
 *and*<br>
 &nbsp;3 - path and filename do not match any -P option <br>
 *and*<br>
-&nbsp;4 - if some non option are given (building a [list of path]) the
+&nbsp;4 - if some -g options are given, the
 path
-to the file is one of the member of [list of path] or a subdirectory of
-one of path given to a -g options.<br>
+to the file matches at least one of the -g options.<br>
       <br>
-This is the <span style="font-style: italic;">unordered</span> method (which activated by default), since version 2.2.x there is also an
-      <span style="font-style: italic;">ordered</span> method (-am option) which gives even more power to filters, the dar man mage
+The algorithm we detailed above is the default one, which is historical and called the <span style="font-style: italic;">unordered</span> method, since version 2.2.x there is also an
+      <span style="font-style: italic;">ordered</span> method (activated adding -am option) which gives even more power to filters, the <a href="doc/man/index.html">dar man mage</a>
 will give you all the details.<br>
       <br>
 In parallel of file filtering, you will find Extended Attributes
@@ -2142,9 +2165,15 @@ So, even if you can add decremental backups in a dar_manager database, it is
 not designed to handle them correctly. It is thus better to keep dar_manager only for
 incremental/differential/full backups.<br>
       <br>
-      <h3>Door inodes (Solaris)<a name="door"></a></h3>
+      <br>
+</div>
+      <div style="text-align: justify; text-decoration: underline;">
+      <h3 style="margin-left: 40px;">Door inodes (Solaris)<a name="door"></a></h3>
+      </div>
+      <div style="text-align: justify; margin-left: 40px;">
 
  </div>
+
       <div style="margin-left: 40px;">
       <div style="text-align: justify;">A door inode is a dynamic
 object that is created on top of an empty file, it does exist only when

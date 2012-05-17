@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: data_tree.hpp,v 1.5 2011/01/09 17:25:58 edrusb Rel $
+// $Id: data_tree.hpp,v 1.5.2.2 2011/06/20 14:02:03 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -76,11 +76,11 @@ namespace libdar
 	std::string get_name() const { return filename; };
 	void set_name(const std::string & name) { filename = name; };
 
-	    /// return the archive where to find the data that was defined at this just before or at that date
-	lookup get_data(archive_num & archive, const infinint & date) const;
+	    /// return the archive where to find the data that was defined just before or at the given date
+	lookup get_data(archive_num & archive, const infinint & date, bool even_when_removed) const;
 
 	    /// if EA has been saved alone later, returns in which version for the state of the file at the given date.
-	lookup get_EA(archive_num & archive, const infinint & date) const;
+	lookup get_EA(archive_num & archive, const infinint & date, bool even_when_removed) const;
 
 	    /// return the date of file's last modification date within the give archive and whether the file has been saved or deleted
 	bool read_data(archive_num num, infinint & val, etat & present) const;
@@ -192,6 +192,13 @@ namespace libdar
     };
 
     extern data_dir *data_tree_read(generic_file & f, unsigned char db_version);
+
+	/// lookup routine to find a pointer to the dat_dir object corresponding to the given path
+
+	/// \param[in] chemin is the path to look for
+	/// \param[in] racine is the database to look into
+	/// \param[out] ptr is a pointer to the looked node if found
+	/// \return true if a node could be found in the database
     extern bool data_tree_find(path chemin, const data_dir & racine, const data_tree *& ptr);
     extern void data_tree_update_with(const directory *dir, archive_num archive, data_dir *racine);
     extern archive_num data_tree_permutation(archive_num src, archive_num dst, archive_num x);

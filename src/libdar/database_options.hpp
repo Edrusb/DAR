@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: database_options.hpp,v 1.6 2011/01/09 17:25:58 edrusb Rel $
+// $Id: database_options.hpp,v 1.6.2.1 2011/06/20 14:02:03 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -152,7 +152,7 @@ namespace libdar
     class database_restore_options
     {
     public:
-	database_restore_options() { x_early_release = false; x_info_details = false; x_date = 0; x_extra_options_for_dar.clear(); };
+	database_restore_options() { x_early_release = x_info_details = x_ignore_dar_options_in_database = x_even_when_removed = false; x_date = 0; x_extra_options_for_dar.clear(); };
 
 	    // settings
 
@@ -185,6 +185,11 @@ namespace libdar
 	    /// \note if set to zero, the most recent state available is looked for (this is the default value).
 	void set_date(const infinint & value) { x_date = value; };
 
+	    /// find data or EA if they have been removed at the requested data
+
+	    /// in the case a file has was removed at the request date, the data or EA
+	    /// that will be restored will be the one of it had just before being removed
+	void set_even_when_removed(bool value) { x_even_when_removed = value; };
 
 
 	    // gettings
@@ -193,6 +198,7 @@ namespace libdar
 	const std::vector<std::string> & get_extra_options_for_dar() const { return x_extra_options_for_dar; };
 	const infinint & get_date() const { return x_date; };
 	bool get_ignore_dar_options_in_database() const { return x_ignore_dar_options_in_database; };
+	bool get_even_when_removed() const { return x_even_when_removed; };
 
     private:
 	bool x_early_release;
@@ -200,6 +206,7 @@ namespace libdar
 	std::vector<std::string> x_extra_options_for_dar;
 	infinint x_date;
 	bool x_ignore_dar_options_in_database;
+	bool x_even_when_removed;
     };
 
 

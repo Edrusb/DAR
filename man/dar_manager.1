@@ -1,4 +1,4 @@
-.TH DAR_MANAGER 1 "Jan. 9th, 2011"
+.TH DAR_MANAGER 1 "Jul. 21st, 2011"
 .UC 8
 .SH NAME
 dar_manager - disk archive manager
@@ -20,7 +20,7 @@ dar_manager [-v] [-j] -B [<path>/]<database> -o [list of options to pass to dar]
 
 dar_manager [-v] [-j] -B [<path>/]<database> -d [<path to dar command>]
 
-dar_manager [-v] [-j] -B [<path>/]<database> [-N] [-w <date>] [-e <extra options to dar>] -r [list of files to restore]
+dar_manager [-v] [-j] -B [<path>/]<database> [-N] [-k] [-w <date>] [-e "<extra options to dar>"] -r [list of files to restore]
 
 dar_manager [-v] [-j] -B [<path>/]<database> -u <number>
 
@@ -103,7 +103,15 @@ alters the -r option behavior: still restores the files in the most recent versi
 pass some more options to dar. While the -o options takes all that follows on the command line as argument to pass to dar and write these in the database, the -e option does not alter the database and has only one argument. In other words, if you need to pass several options to dar through the use of the -e option, you need to use quotes (simple quotes ' or double quotes ") to enclose these options. Example:
 .P
 .RS
+.RS
 dar_manager -B database.dmd -e "-w -v -p -b -r -H 1" -r some/files
+.RE
+.P
+while using -o option you must not use quotes:
+.P
+.RS
+dar_manager -B database.dmd -o -w -v -p -b -r -H 1
+.RE
 .RE
 .TP 20
 -u, --used <number>
@@ -126,6 +134,9 @@ a smaller index inside the database.
 .TP 20
 -N, --ignore-options-in-base
 Do not use the options stored in database when calling dar for restoration. This option is only useful while restoring files from dar_manager, either directly (-r option) or using a batch file (-@ option, see below).
+.TP 20
+-k, --ignore-when-removed
+By default, dar_manager does not ask dar to restore file that have been removed at the requested date (or in the latest state available). This is useful for example to restore a directory in the state it has at a given date (only files that existed at that time are restored). However when you want to restore a file that has been destroyed by accident, you need to use -k option so you don't have to determine at which date that file existed to be be able to ask dar_manager to restore that file in the state it had before that date. In other words, -k option gives a behavior of dar_manager backward compatible with dar_manager released beside version 2.3.x of dar.
 .TP 20
 -@, --batch <filename>
 allows you to do several operations on a given database. All operations are defined in the provided <filename> and refer to the same database as defined by the -B switch on command line. This batch file, must thus not contain neither -B, -C, -i nor -j option (-j is global to the batch operation). The batch file expected layout is one command per line, thus several arguments (like -l -v for example) may take place on a given line of the file (-v can be found both on command line for verbose output about the batch operation steps, as well as inside the batch file for verbose output of a particular batched command). Arguments are separated by spaces or tabs, other characters are passed as-is. In consequence, you should only need to use quotes (using " or ') if you intend to use an argument containing space. Last, comments may be placed on any line beginning by a hash character (#).

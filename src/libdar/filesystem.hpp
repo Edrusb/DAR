@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.38 2011/02/27 14:53:47 edrusb Rel $
+// $Id: filesystem.hpp,v 1.38.2.1 2011/07/18 11:31:10 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -307,10 +307,10 @@ namespace libdar
 
 	typedef enum
 	{
-	    done_data_restored,
-	    done_no_change_no_data,
-	    done_no_change_policy,
-	    done_data_removed
+	    done_data_restored,     //< data has been restored to filesystem
+	    done_no_change_no_data, //< no change in filesystem because no data present in archive
+	    done_no_change_policy,  //< no change in filesystem because of overwiting policy decision
+	    done_data_removed       //< data (= whole inode) removed from filesystem
 	} action_done_for_data;
 
 	    /// restore a libdar object to a filesystem entry both data and EA

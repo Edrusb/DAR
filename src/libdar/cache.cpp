@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: cache.cpp,v 1.28 2011/04/17 13:12:29 edrusb Rel $
+// $Id: cache.cpp,v 1.28.2.1 2011/07/20 16:01:38 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -126,7 +126,7 @@ namespace libdar
 	if(!read_mode)
 	{
 	    flush_write();
-	    if(pos != current_position)
+	    if(pos != current_position || pos != ref->get_position())
 		if(ref->skip(pos))
 		{
 		    current_position = pos;
@@ -387,7 +387,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: cache.cpp,v 1.28 2011/04/17 13:12:29 edrusb Rel $";
+        static char id[]="$Id: cache.cpp,v 1.28.2.1 2011/07/20 16:01:38 edrusb Exp $";
         dummy_call(id);
     }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: libdar_4_4.cpp,v 1.15 2011/06/02 13:17:37 edrusb Rel $
+// $Id: libdar_4_4.cpp,v 1.15.2.2 2011/07/21 14:29:01 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -29,6 +29,9 @@
 
 namespace libdar_4_4
 {
+
+    static void fake_version(U_I & major, U_I & medium, U_I & minor);
+
 
     void user_interaction::dar_manager_show_version(U_I number,
 						    const std::string & data_date,
@@ -532,20 +535,30 @@ namespace libdar_4_4
     void get_version(U_I & major, U_I & minor, bool init_libgcrypt)
     {
 	U_I medium;
+	    // this is needed to initialise the real libdar
 	libdar::get_version(major, medium, minor, init_libgcrypt);
+	    // but we must fake libdar 4.4.x (OK, here this is 4.6.x but it stays compatible with 4.4.x)
+	fake_version(major, medium, minor);
     }
 
     void get_version_noexcept(U_I & major, U_I & minor, U_16 & exception, std::string & except_msg, bool init_libgcrypt)
     {
 	U_I medium;
 	libdar::get_version_noexcept(major, medium, minor, exception, except_msg, init_libgcrypt);
+	fake_version(major, medium, minor);
     }
 
     void get_version(U_I & major, U_I & medium, U_I & minor, bool init_libgcrypt)
-    { libdar::get_version(major, medium, minor, init_libgcrypt); }
+    {
+	libdar::get_version(major, medium, minor, init_libgcrypt);
+	fake_version(major, medium, minor);
+    }
 
     void get_version_noexcept(U_I & major, U_I & medium, U_I & minor, U_16 & exception, std::string & except_msg, bool init_libgcrypt)
-    { libdar::get_version_noexcept(major, medium, minor, exception, except_msg, init_libgcrypt); }
+    {
+	libdar::get_version_noexcept(major, medium, minor, exception, except_msg, init_libgcrypt);
+	fake_version(major, medium, minor);
+    }
 
     void get_compile_time_features(bool & ea, bool & largefile, bool & nodump, bool & special_alloc, U_I & bits,
 				   bool & thread_safe,
@@ -790,7 +803,7 @@ namespace libdar_4_4
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar_4_4.cpp,v 1.15 2011/06/02 13:17:37 edrusb Rel $";
+        static char id[]="$Id: libdar_4_4.cpp,v 1.15.2.2 2011/07/21 14:29:01 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -871,5 +884,11 @@ namespace libdar_4_4
 	}
     }
 
+    static void fake_version(U_I & major, U_I & medium, U_I & minor)
+    {
+	major = LIBDAR_COMPILE_TIME_MAJOR;
+	medium = LIBDAR_COMPILE_TIME_MEDIUM;
+	minor = LIBDAR_COMPILE_TIME_MINOR;
+    }
 
 } // end of namespace

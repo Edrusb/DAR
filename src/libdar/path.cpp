@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: path.cpp,v 1.29 2011/03/01 20:45:36 edrusb Rel $
+// $Id: path.cpp,v 1.29.2.4 2011/06/25 14:08:11 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -227,7 +227,10 @@ namespace libdar
 
 	if(me.size() >= you.size())
 	    if(strncmp(me.c_str(), you.c_str(), you.size()) == 0)
-		return true;
+		if(me.size() > you.size())
+		    return me[you.size()] == '/';
+		else
+		    return true;
 	    else // path differs in the common length part, cannot be a subdir of "you"
 		return false;
 	else // I am shorter in length, cannot be a subdir of "you"
@@ -236,7 +239,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: path.cpp,v 1.29 2011/03/01 20:45:36 edrusb Rel $";
+	static char id[]="$Id: path.cpp,v 1.29.2.4 2011/06/25 14:08:11 edrusb Exp $";
         dummy_call(id);
     }
 

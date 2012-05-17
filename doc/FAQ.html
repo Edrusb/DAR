@@ -8,6 +8,8 @@
 
 
 
+
+
   <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -83,7 +85,7 @@ encrypted archives, how to workaround this?</span></a><br>
       <span style="font-weight: bold; font-style: italic;"><a style="font-weight: bold; font-style: italic;" href="#search_for_questions">
 How to search for questions (and their answers) about <span style="font-weight: bold; font-style: italic;">known</span> problems similar to mines?</a><br>
       <a style="font-style: italic; font-weight: bold;" href="#open_failed_excluded">Why dar tells me that he failed to open a directory, while I have excluded this directory?</a><br>
-      <span style="font-weight: bold; font-style: italic;"><br>
+      </span><a style="font-weight: bold; font-style: italic;" href="#security">Dar reports a "SECURITY WARNING! SUSPICIOUS FILE" what does that mean!? </a><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">
       <br>
       </span>
       <h2><span style="font-weight: bold;">
@@ -2256,13 +2258,16 @@ C++ support for gcc.<br>
 This is the drawback of new features!<br>
       <ul>
 
-        <li>Espetially to be able to read dar archive through pipes in
+        <li>Espetially
+to be able to read dar archive through pipes in
 sequential mode, dar inserts so-called "escape sequence" to know
 for example when a new file starts. This way dar can skip to the next
 mark upon archive corruption or if the given file has not to be
 restored. However, if such a sequence of byte is found into a file's
-data, it must be modified not to collide with real escape sequences. This implies to dar to inspect all data added to an archive for
-such sequence of byte, instead of just copying the data to the archive (eventually compressing and cyphering it).</li>
+data, it must be modified not to collide with real escape sequences.
+This implies to dar to inspect all data added to an archive for
+such sequence of byte, instead of just copying the data to the archive
+(eventually compressing and cyphering it).</li>
 
         <li>The other feature that brings an important overhead is the
 sparse file detection mechanism. To be able to detect a hole in a file
@@ -2321,9 +2326,105 @@ directory. But at this point then, its contents has already been read
 thus you may get the message that dar failed to read a given directory
 contents, while you explicitly specify not to include that particular
 directory in the backup.<br>
+      <br>
+      <br>
+      <a name="security"></a><span style="font-weight: bold; font-style: italic;">Dar reports a "SECURITY WARNING! SUSPICIOUS FILE" what does that mean!? </span><br>
+<br>
       </div>
       <div style="margin-left: 40px;">
-<br>
+When dar reports the following message: <br>
+      <br>
+      <div style="margin-left: 40px;"><code>SECURITY WARNING!
+SUSPICIOUS FILE &lt;filepath&gt;: ctime changed since archive of
+reference was done, while no inode or data changed</code><br>
+      </div>
+      <br>
+You should be concerned by finding an explanation to the root cause
+that triggered dar to ring this alarm. As you probably know, a unix
+file has three dates:<br>
+      <ol>
+        <li><span style="font-weight: bold;">atime</span> is changed anytime you read the file's contents or write to it (this is the last <span style="font-weight: bold; text-decoration: underline;">a</span>ccess time)<br>
+        </li>
+        <li><span style="font-weight: bold;">mtime</span> is changed anytime you write to the file's data (this is the last<span style="font-weight: bold;"> <span style="text-decoration: underline;">m</span></span>odification time)<br>
+        </li>
+        <li><span style="font-weight: bold;">ctime</span> is changed anythime ou modify the file's attributs (the is the last <span style="font-weight: bold; text-decoration: underline;">c</span>hange time)<br>
+        </li>
+      </ol>
+In other words:<br>
+      <ul>
+        <li>if you only read the data of file, only its <span style="font-weight: bold;">atime</span> will be updated</li>
+        <li>if you write some data to a file, its <span style="font-weight: bold;">atime</span> and <span style="font-weight: bold;">mtime</span> will change, ctime will stay unchanged</li>
+        <li>if you change ownership, permission, extended attributes, etc, only <span style="font-weight: bold;">ctime</span> will change</li>
+        <li>if you write to a file and modify its atime or mtime to let think the file has not been read or modified, <span style="font-weight: bold;">ctime</span> will change in nay case.<br>
+</li>
+      </ul>
+Yes, the point is that in most (if not all) unix systems, over the kernel itself, user program
+can also manually set the atime and mtime manually to any arbitrary value
+(see the "touch" command for example), but to my knowledge, no system
+provides a mean to manually set the ctime of a file. This value cannot
+thus be faked. <br>
+      <br>
+However, some rootkits and other nasty programs that tend to hide
+themselves from the system administrator use this trick and modify the
+mtime to become more difficult to detect. However the ctime keeps track
+of the date and time of their infamy. However, ctime may also change
+while neither mtime nor atime do, in several almost rare but normal situations.
+Thus, if you are faced to this message, you should first verify the
+following points before thinking your system has been infected by a
+rootkit:<br>
+      <ul>
+        <li>have you added or removed a hardlink pointing to that file and this file's data has not been modified since last backup?</li>
+        <li>have
+you changed this file's extended attributs (including Linux ACL and
+MacOS file forks) while file's data has not been modified since last
+backup?<br>
+        </li>
+        <li>have you recently restored your data and are now performing
+a differential backup taking as reference the archive used to restore
+that same data? Or in other words, does that particular file has just
+been restored from a backup (was removed by accident for example)?<br>
+        </li>
+        <li>have you just moved from a dar version older than release 2.4.0 to dar version 2.4.0 or more recent?<br>
+        </li>
+      </ul>
+How to know atime/mtime/ctime of a file?<br>
+      <ul>
+        <li>mtime is provided by the command: <code>ls -l</code></li>
+        <li>atime is provided by the command : <code>ls -l --time=atime</code></li>
+        <li>ctime is provided by the command : <code>ls -l --time=ctime</code></li>
+      </ul>
+      <span style="text-decoration: underline;">Note:</span>
+With dar
+version older than 2.4.0 (by default, unless -aa option is use) once a
+file has been read for backup, dar set back the atime to the value it
+had before dar read it. This trick was used to accomodate some programs
+like leafnode (NNTP caching program) that base their cache purging
+scheme on the atime of files. When you do a backup using dar 2.3.11 for
+example, file that had their mtime modified are saved as expected and
+their atime is set back to their original values (value they had just
+before dar read them), which has the slide effect to modify the ctime.
+If then you upgrade to dar 2.4.0 or more recent and do a differential
+backup, if that same file has not been modified since, dar will see
+that the ctime has changed while no other metadata did (user,
+ownership, group, mtime), thus this alarm message will show for all
+saved files in the last 2.3.11 archive made. The next differential
+backup made using dar 2.4.0 (or more recent), the problem will not show
+anymore.<br>
+      <br>
+Well, if you cannot find an valid explanation from the one presented
+above, you'd better consider that your system has been infected by a
+rootkit or virus and use all the necessary tools (see below for
+examples) to find some evidence of it.<br>
+      <br>
+      <div style="margin-left: 40px;"><a href="http://rkhunter.sourceforge.net/">Rootkit Hunter</a><br>
+      </div>
+      <div style="margin-left: 40px;"><a href="http://www.unhide-forensics.info/">Unhide</a><br>
+      <a href="http://www.clamav.net/lang/en/">clam anti-virus</a><br>
+and others...<br>
+      </div>
+      <br>
+      <br>
+
 
       </div>
       </td>
@@ -2335,6 +2436,7 @@ directory in the backup.<br>
 </div>
 </div>
 </center>
+
 
 
 </body></html>

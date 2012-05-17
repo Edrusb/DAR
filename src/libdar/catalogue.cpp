@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.139 2011/05/27 13:15:22 edrusb Rel $
+// $Id: catalogue.cpp,v 1.139.2.1 2011/07/20 14:38:07 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -868,7 +868,7 @@ namespace libdar
         xsaved = ref.xsaved;
         ea_saved = ref.ea_saved;
         ea_size = ref.ea_size;
-        *ea_offset = *ea_offset;
+        *ea_offset = *ref.ea_offset;
         if(ea != NULL)
             if(ref.ea == NULL)
             {
@@ -898,7 +898,7 @@ namespace libdar
             if(ref.ea_crc != NULL)
             {
                 ea_crc = new crc(*ref.ea_crc);
-                if(ea_crc != NULL)
+                if(ea_crc == NULL)
                     throw Ememory("inode::operator =");
             }
             // else both ea_crc and ref.ea_crc are NULL, nothing to do.
@@ -4312,7 +4312,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: catalogue.cpp,v 1.139 2011/05/27 13:15:22 edrusb Rel $";
+        static char id[]="$Id: catalogue.cpp,v 1.139.2.1 2011/07/20 14:38:07 edrusb Exp $";
         dummy_call(id);
     }
 

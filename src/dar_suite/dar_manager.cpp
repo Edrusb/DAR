@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.76 2011/05/20 10:23:07 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.76.2.4 2011/07/21 14:29:00 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -71,7 +71,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.5.0"
+#define DAR_MANAGER_VERSION "1.6.0"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
@@ -92,6 +92,7 @@ static bool command_line(user_interaction & dialog,
 			 infinint & date,
                          bool & verbose,
 			 bool & ignore_dat_options,
+			 bool & even_when_removed,
 			 bool recursive); // true if called from op_batch
 static void show_usage(user_interaction & dialog, const char *command);
 static void show_version(user_interaction & dialog, const char *command);
@@ -114,7 +115,8 @@ static void op_restore(user_interaction & dialog,
 		       const string & options_for_dar,
 		       bool info_details,
 		       bool early_release,
-		       bool ignore_dar_options_in_base);
+		       bool ignore_dar_options_in_base,
+		       bool even_when_removed);
 static void op_used(user_interaction & dialog, const database *dat, S_I num, bool info_details);
 static void op_files(user_interaction & dialog, const database *dat, const string & arg, bool info_details);
 static void op_stats(user_interaction & dialog, const database *dat, bool info_details);
@@ -138,7 +140,8 @@ static void action(user_interaction & dialog,
 		   const string & base,
 		   bool info_details,
 		   bool early_release,
-		   bool ignore_database_options);
+		   bool ignore_database_options,
+		   bool even_when_removed);
 static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positive);
 
 
@@ -160,10 +163,11 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
     database *dat = NULL;
     bool partial_read;
     bool ignore_dat_options;
+    bool even_when_removed;
 
     shell_interaction_change_non_interactive_output(&cout);
 
-    if(!command_line(dialog, argc, argv, op, base, arg, num, rest, num2, date, info_details, ignore_dat_options, false))
+    if(!command_line(dialog, argc, argv, op, base, arg, num, rest, num2, date, info_details, ignore_dat_options, even_when_removed, false))
 	return EXIT_SYNTAX;
 
     if(op == none_op)
@@ -212,7 +216,7 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
 	{
 	    try
 	    {
-		action(dialog, op, dat, arg, num, rest, num2, date, base, info_details, true, ignore_dat_options);
+		action(dialog, op, dat, arg, num, rest, num2, date, base, info_details, true, ignore_dat_options, even_when_removed);
 		finalize(dialog, op, dat, base, info_details);
 	    }
 	    catch(Edata & e)
@@ -246,6 +250,7 @@ static bool command_line(user_interaction & dialog,
 			 infinint & date,
                          bool & verbose,
 			 bool & ignore_dat_options,
+			 bool & even_when_removed,
 			 bool recursive)
 {
     S_I lu, min;
@@ -259,6 +264,7 @@ static bool command_line(user_interaction & dialog,
     string chem, filename;
     date = 0;
     ignore_dat_options = false;
+    even_when_removed = false;
     string extra = "";
 
     try
@@ -266,9 +272,9 @@ static bool command_line(user_interaction & dialog,
 
 	(void)line_tools_reset_getopt();
 #if HAVE_GETOPT_LONG
-	while((lu = getopt_long(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:", get_long_opt(), NULL)) != EOF)
+	while((lu = getopt_long(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:k", get_long_opt(), NULL)) != EOF)
 #else
-	    while((lu = getopt(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:")) != EOF)
+	    while((lu = getopt(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:k")) != EOF)
 #endif
 	    {
 		switch(lu)
@@ -432,6 +438,9 @@ static bool command_line(user_interaction & dialog,
 		case 'N':
 		    ignore_dat_options = true;
 		    break;
+		case 'k':
+		    even_when_removed = true;
+		    break;
 		case ';':
 		    if(op != add)
 			dialog.warning(gettext("-; option is only valid after -A option, ignoring it"));
@@ -553,7 +562,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.76 2011/05/20 10:23:07 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.76.2.4 2011/07/21 14:29:00 edrusb Exp $";
     dummy_call(id);
 }
 
@@ -718,7 +727,7 @@ static void op_dar(user_interaction & dialog, database *dat, const string & arg,
     thr.check_self_cancellation();
 }
 
-static void op_restore(user_interaction & dialog, database *dat, const vector<string> & rest, const infinint & date, const string & options_for_dar, bool info_details, bool early_release, bool ignore_dar_options_in_base)
+static void op_restore(user_interaction & dialog, database *dat, const vector<string> & rest, const infinint & date, const string & options_for_dar, bool info_details, bool early_release, bool ignore_dar_options_in_base, bool even_when_removed)
 {
     thread_cancellation thr;
     string_file strfile = string_file(options_for_dar);
@@ -737,6 +746,7 @@ static void op_restore(user_interaction & dialog, database *dat, const vector<st
     dat_opt.set_date(date);
     dat_opt.set_extra_options_for_dar(options);
     dat_opt.set_ignore_dar_options_in_database(ignore_dar_options_in_base);
+    dat_opt.set_even_when_removed(even_when_removed);
     dat->restore(dialog, rest, dat_opt);
 }
 
@@ -816,7 +826,7 @@ static void show_usage(user_interaction & dialog, const char *command)
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -p <number> <path>\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -o [list of options to pass to dar]\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -d [<path to dar command>]\n");
-    dialog.printf("\tdar_manager [options] -B [<path>/]<database> [-w <date>] [-e <options to dar>] -r [list of files to restore]\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> [-w <date>] [-e \"<options to dar>\"] -r [list of files to restore]\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -u <number>\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -f file\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -s\n");
@@ -882,6 +892,7 @@ static const struct option *get_long_opt()
  	{"batch", required_argument, NULL, '@'},
 	{"ignore-options-in-base", no_argument, NULL, 'N'},
 	{"min-digits", required_argument, NULL, ';'},
+	{"ignore-when-removed", no_argument, NULL, 'k'},
         { NULL, 0, NULL, 0 }
     };
 
@@ -1181,6 +1192,7 @@ static void op_batch(user_interaction & dialog, database *dat, const string & fi
     infinint date;
     string arg;
     bool ignore_dat_options;
+    bool even_when_removed;
 
     if(dat == NULL)
 	throw SRC_BUG;
@@ -1227,7 +1239,7 @@ static void op_batch(user_interaction & dialog, database *dat, const string & fi
 	    for(register U_I i = 0; i < mots.size(); ++i)
 		cmdline.set_arg(mots[i], i+1);
 
-	    if(!command_line(dialog, cmdline.argc(), cmdline.argv(), sub_op, faked_base, arg, num, rest, num2, date, sub_info_details, ignore_dat_options, true))
+	    if(!command_line(dialog, cmdline.argc(), cmdline.argv(), sub_op, faked_base, arg, num, rest, num2, date, sub_info_details, ignore_dat_options, even_when_removed, true))
 		throw Erange("op_batch", tools_printf(gettext("Syntax error in batch file: %S"), &line));
 
 	    if(sub_op == create)
@@ -1236,7 +1248,7 @@ static void op_batch(user_interaction & dialog, database *dat, const string & fi
 	    if(sub_op == interactive)
 		throw Erange("op_batch", gettext("Syntax error in batch file: -i option not allowed"));
 
-	    action(dialog, sub_op, dat, arg, num, rest, num2, date, faked_base, sub_info_details, false, ignore_dat_options);
+	    action(dialog, sub_op, dat, arg, num, rest, num2, date, faked_base, sub_info_details, false, ignore_dat_options, even_when_removed);
 	}
 	while(tmp == '\n');
     }
@@ -1308,7 +1320,8 @@ static void action(user_interaction & dialog,
 		   const string & base,
 		   bool info_details,
 		   bool early_release,
-		   bool ignore_database_options)
+		   bool ignore_database_options,
+		   bool even_when_removed)
 {
     switch(op)
     {
@@ -1338,7 +1351,7 @@ static void action(user_interaction & dialog,
 	op_dar(dialog, dat, arg, info_details);
 	break;
     case restore:
-	op_restore(dialog, dat, rest, date, arg, info_details, early_release, ignore_database_options);
+	op_restore(dialog, dat, rest, date, arg, info_details, early_release, ignore_database_options, even_when_removed);
 	break;
     case used:
 	op_used(dialog, dat, num, info_details);

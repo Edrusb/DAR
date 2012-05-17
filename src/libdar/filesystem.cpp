@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.77 2011/04/02 20:14:26 edrusb Rel $
+// $Id: filesystem.cpp,v 1.77.2.1 2011/07/18 11:31:10 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -123,6 +123,10 @@ namespace libdar
     static void supprime(user_interaction & ui, const string & ref);
     static void make_owner_perm(user_interaction & dialog,
 				const inode & ref, const path & ou, bool dir_perm, inode::comparison_fields what_to_check);
+    static void make_date(const inode & ref,
+			  const string & chem,
+			  inode::comparison_fields what_to_check);
+
     static void attach_ea(const string &chemin, inode *ino, const mask & ea_mask);
     static bool is_nodump_flag_set(user_interaction & dialog,
 				   const path & chem, const string & filename,
@@ -958,7 +962,7 @@ namespace libdar
 			    case EPERM:  // filesystem does not support hard link creation
 				    // can't make hard link, trying to duplicate the inode
 				get_ui().warning(tools_printf(gettext("Error creating hard link %s : %s\n Trying to duplicate the inode"),
-								 name, strerror(errno)));
+							      name, strerror(errno)));
 				create_file = true;
 				clear_corres_if_pointing_to(ref_mir->get_etiquette(), old); // always succeeds as the etiquette points to "old"
 				    // need to remove this entry to be able
@@ -972,7 +976,7 @@ namespace libdar
 					// need to remove this entry to be able
 					// to restore EA for other copies
 				    get_ui().warning(tools_printf(gettext("Error creating hard link : %s , the inode to link with [ %s ] has disappeared, re-creating it"),
-								     name, old));
+								  name, old));
 
 				}
 				else
@@ -1255,8 +1259,12 @@ namespace libdar
 	    nomme *exists = NULL;
 
 	    if(ignore_over_restricts)
+		    // only used in sequential_read when a file has been saved several times due
+		    // to its contents being modified at backup time while dar was reading it.
+		    // here when ignore_over_restricts is true it is asked to remove the previously restored copy of
+		    // that file as a better copy has been found in the archive.
 	    {
-		ignore_over_restricts = false; // just on shot state ; exists == NULL : we are ignoring existing entry
+		ignore_over_restricts = false; // just one shot state ; exists == NULL : we are ignoring existing entry
 		supprime(get_ui(), spot_display);
 		if(x_det != NULL)
 		{
@@ -1274,8 +1282,8 @@ namespace libdar
 
 	    try
 	    {
-		inode *exists_nom = dynamic_cast<inode *>(exists);
-		if(exists_nom == NULL && exists != NULL)
+		inode *exists_ino = dynamic_cast<inode *>(exists);
+		if(exists_ino == NULL && exists != NULL)
 		    throw SRC_BUG; // an object from filesystem should always be an inode !?!
 
 		if(exists == NULL)
@@ -1311,6 +1319,11 @@ namespace libdar
 			    {
 				const ea_attributs *ea = x_ino->get_ea();
 				ea_restored = raw_set_ea(x_nom, *ea, spot_display, *ea_mask);
+
+				    // to accomodate MacOS X we set again mtime to its expected value
+				    // because restoring EA modifies mtime on this OS. This does not
+				    // hurt other Unix systems.
+				make_date(*x_ino, spot_display, what_to_check);
 			    }
 			    else
 				ea_restored = true;
@@ -1324,7 +1337,7 @@ namespace libdar
 			ea_restored = false;
 		    }
 		}
-		else
+		else // exists != NULL
 		{
 
 			// conflict: an entry of that name is already present in filesystem
@@ -1336,7 +1349,7 @@ namespace libdar
 			    throw SRC_BUG;
 			else
 			{
-			    action_over_remove(exists_nom, x_det, spot_display, act_data);
+			    action_over_remove(exists_ino, x_det, spot_display, act_data);
 			    data_restored = done_data_removed;
 			    data_created = false;
 			    hard_link = false;
@@ -1349,7 +1362,7 @@ namespace libdar
 		    else
 		    {
 			if(has_data_saved)
-			    action_over_data(exists_nom, x_nom, spot_display, act_data, data_restored);
+			    action_over_data(exists_ino, x_nom, spot_display, act_data, data_restored);
 			else
 			{
 			    data_restored = done_no_change_no_data;
@@ -1363,7 +1376,19 @@ namespace libdar
 			    // here we can restore EA even if no data has been restored
 			    // it will modify EA of the existing file
 			if(act_data != data_remove && has_ea_saved)
-			    ea_restored = action_over_ea(exists_nom, x_nom, spot_display, act_ea);
+			{
+			    ea_restored = action_over_ea(exists_ino, x_nom, spot_display, act_ea);
+
+				// to accomodate MacOS X, we must set again mtime because
+				// restoring EA modifies the mtime date. This does not hurt
+				// other systems.
+			    if(data_restored == done_data_restored)
+				    // set back the mtime to value found in the archive
+				make_date(*x_ino, spot_display, what_to_check);
+			    else
+				    // set back the mtime to value found in filesystem before restoration
+				make_date(*exists_ino, spot_display, what_to_check);
+			}
 
 			if(act_data == data_remove)
 			{
@@ -1780,7 +1805,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.77 2011/04/02 20:14:26 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.77.2.1 2011/07/18 11:31:10 edrusb Exp $";
         dummy_call(id);
     }
 
@@ -1847,6 +1872,7 @@ namespace libdar
 		    //
 #endif
 	    }
+
 	try
 	{
 	    if(what_to_check == inode::cf_all || what_to_check == inode::cf_ignore_owner)
@@ -1860,6 +1886,15 @@ namespace libdar
 		throw;
 		// else (the inode is a symlink), we simply ignore this error
 	}
+
+	make_date(ref, chem, what_to_check);
+    }
+
+    static void make_date(const inode & ref,
+			  const string & chem,
+			  inode::comparison_fields what_to_check)
+    {
+	const lien *ref_lie = dynamic_cast<const lien *>(&ref);
 
 	if(what_to_check == inode::cf_all || what_to_check == inode::cf_ignore_owner || what_to_check == inode::cf_mtime)
 	    if(ref_lie == NULL) // not restoring atime & ctime for symbolic links
