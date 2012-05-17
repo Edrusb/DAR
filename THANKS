@@ -1,3 +1,8 @@
+version 2.3.8
+--------------
+Thanks to smartyxt for bug report. A big thank you to Szymon Juraszczyk for
+double bug report and detailed scenario to reproduce them.
+
 version 2.3.7
 --------------
 Thanks to Don and Andy Shellam for feedback. B0mber for bug report. Thanks to

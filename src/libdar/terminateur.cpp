@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: terminateur.cpp,v 1.14.2.2 2008/05/09 20:58:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -84,18 +84,18 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: terminateur.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: terminateur.cpp,v 1.14.2.2 2008/05/09 20:58:27 edrusb Rel $";
         dummy_call(id);
     }
 
-    void terminateur::read_catalogue(generic_file & f, bool with_elastic)
+    void terminateur::read_catalogue(generic_file & f, bool with_elastic, const dar_version & reading_ver)
     {
         S_I offset = 0;
         unsigned char a;
 
         f.skip_to_eof();
 	if(with_elastic)
-	    (void)elastic(f, elastic_backward);
+	    (void)elastic(f, elastic_backward, reading_ver);
 	    // temporary anomymous elastic skip backward in 'f'
 	    // up to the other elastic buffer end
 

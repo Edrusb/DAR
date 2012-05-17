@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.45.2.5 2008/02/09 17:41:29 edrusb Rel $
+// $Id: filesystem.cpp,v 1.45.2.6 2008/06/14 16:34:05 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -124,7 +124,8 @@ namespace libdar
 				const inode & ref, const path & ou, bool dir_perm, inode::comparison_fields what_to_check);
     static void attach_ea(const string &chemin, inode *ino, const mask & ea_mask);
     static bool is_nodump_flag_set(user_interaction & dialog,
-				   const path & chem, const string & filename);
+				   const path & chem, const string & filename,
+				   bool info);
     static path *get_root_with_symlink(user_interaction & dialog,
 				       const path & root, bool info_details);
     static mode_t get_file_permission(const string & path);
@@ -509,7 +510,7 @@ namespace libdar
                     {
                             // checking the EXT2 nodump flag (if set ignoring the file)
 
-                        if(!no_dump_check || !is_nodump_flag_set(get_fs_ui(), *current_dir, name))
+                        if(!no_dump_check || !is_nodump_flag_set(get_fs_ui(), *current_dir, name, info_details))
                         {
                             ref = make_read_entree(*current_dir, name, true, *ea_mask);
 
@@ -1503,7 +1504,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.45.2.5 2008/02/09 17:41:29 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.45.2.6 2008/06/14 16:34:05 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1606,7 +1607,7 @@ namespace libdar
     }
 
     static bool is_nodump_flag_set(user_interaction & dialog,
-				   const path & chem, const string & filename)
+				   const path & chem, const string & filename, bool info)
     {
 #ifdef LIBDAR_NODUMP_FEATURE
         S_I fd, f = 0;
@@ -1615,7 +1616,10 @@ namespace libdar
 
 	fd = ::open(ptr, O_RDONLY|O_BINARY|O_NONBLOCK);
 	if(fd < 0)
-	    dialog.warning(tools_printf(gettext("Failed to open %S while checking for nodump flag: %s"), &filename, strerror(errno)));
+	{
+	    if(info)
+		dialog.warning(tools_printf(gettext("Failed to open %S while checking for nodump flag: %s"), &filename, strerror(errno)));
+	}
 	else
 	{
 	    try
@@ -1623,7 +1627,10 @@ namespace libdar
 		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
 		{
 		    if(errno != ENOTTY)
-			dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, strerror(errno)));
+		    {
+			if(info)
+			    dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, strerror(errno)));
+		    }
 		    f = 0;
 		}
 	    }
@@ -1634,7 +1641,6 @@ namespace libdar
 	    }
 	    close(fd);
 	}
-
 
         return (f & EXT2_NODUMP_FL) != 0;
 #else

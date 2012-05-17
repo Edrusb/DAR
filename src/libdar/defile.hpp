@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: defile.hpp,v 1.7 2004/11/07 18:21:37 edrusb Rel $
+// $Id: defile.hpp,v 1.7.4.1 2008/05/16 11:00:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -49,12 +49,13 @@ namespace libdar
         defile(const path &racine) : chemin(racine) { init = true; };
 
         void enfile(const entree *e);
-        path get_path() const { return chemin; };
-        std::string get_string() const { return chemin.display(); };
+        const path & get_path() const { return chemin; };
+        const std::string & get_string() const { return cache; };
 
     private :
         path chemin;
         bool init;
+	std::string cache;
     };
 
 } // end of namespace

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.hpp,v 1.9 2004/11/07 18:21:39 edrusb Rel $
+// $Id: terminateur.hpp,v 1.9.4.1 2008/05/09 20:58:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -35,6 +35,7 @@
 #include "../my_config.h"
 #include "infinint.hpp"
 #include "generic_file.hpp"
+#include "header_version.hpp"
 
 namespace libdar
 {
@@ -49,7 +50,7 @@ namespace libdar
     public :
         void set_catalogue_start(infinint xpos) { pos = xpos; };
         void dump(generic_file &f);
-        void read_catalogue(generic_file &f, bool with_elastic);
+        void read_catalogue(generic_file &f, bool with_elastic, const dar_version & reading_ver);
         infinint get_catalogue_start() { return pos; };
 
     private :

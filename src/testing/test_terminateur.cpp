@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_terminateur.cpp,v 1.12 2005/02/22 17:59:50 edrusb Rel $
+// $Id: test_terminateur.cpp,v 1.12.2.1 2008/05/16 11:00:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -50,6 +50,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "shell_interaction.hpp"
 #include "user_interaction.hpp"
+#include "macro_tools.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -91,7 +92,7 @@ static void f1()
     term.set_catalogue_start(grand);
     term.dump(toto);
     toto.skip(0);
-    term.read_catalogue(toto, false);
+    term.read_catalogue(toto, false, macro_tools_supported_version);
     conv = term.get_catalogue_start();
     cout << conv.human() << endl;
 }

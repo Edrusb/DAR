@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: elastic.cpp,v 1.7.2.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: elastic.cpp,v 1.7.2.2 2008/05/09 20:58:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -41,23 +41,28 @@ extern "C"
 
 #include "elastic.hpp"
 #include "infinint.hpp"
+#include "header_version.hpp"
+#include "tools.hpp"
 
 #define SINGLE_MARK 'X'
-#define LOW_MARK '>'
-#define HIGH_MARK '<'
 
 //// elastic buffer structure ////
 //
-//   .......>OOOO<.....
+//   .......LOOOOH.....
 //
 //   where '.' are random bytes and
-//   '>' and '<' are marks
+//   'L' and 'H' are LOW marks and HIGH mark respectively
 //   OOOOO is a byte field giving the size in byte of the total
-//   elastic buffer (big endian).
+//   elastic buffer (big endian), written in base 254 (values corresponding to LOW and HIGH marks cannot be used here)
+//
+// before archive format "07" the size was written in base 256 which sometimes
+// lead this field to containe a low or high mark. At reading time it was not
+// possible to determin the effective size of the elastic buffer due to confusion
+// with this mark value inside the size field.
 //
 //   some trivial elastic buffer is 'X' for a buffer of size 1 (where 'X'
 //     is the "single mark")
-//   and '><' for an elastic buffer of size 2
+//   and 'LH' for an elastic buffer of size 2
 ////////////////////////////////////
 
 using namespace std;
@@ -65,13 +70,23 @@ using namespace std;
 namespace libdar
 {
 
-    elastic::elastic(const char *buffer, U_32 size, elastic_direction dir)
+    elastic::elastic(U_32 size)
+    {
+	if(size == 0)
+	    throw Erange("elastic::elastic", gettext("Zero is not a valid size for an elastic buffer"));
+	if(size >  max_length())
+	    throw Erange("elastic::elastic", gettext("Size too large for an elastic buffer"));
+
+	taille = size;
+    }
+
+    elastic::elastic(const unsigned char *buffer, U_32 size, elastic_direction dir, const dar_version & reading_ver)
     {
 	U_32 pos = (dir == elastic_forward ? 0 : size - 1);
 	const U_32 first_pos = pos;
 	S_I step = (dir == elastic_forward ? +1 : -1);
-	char first_mark = (dir == elastic_forward ? LOW_MARK : HIGH_MARK);
-	char last_mark  = (dir == elastic_forward ? HIGH_MARK : LOW_MARK);
+	unsigned char first_mark = (dir == elastic_forward ? get_low_mark(reading_ver) : get_high_mark(reading_ver));
+	unsigned char last_mark  = (dir == elastic_forward ? get_high_mark(reading_ver) : get_low_mark(reading_ver));
 
 	while(pos < size && buffer[pos] != SINGLE_MARK && buffer[pos] != first_mark)
 	    pos += step;
@@ -86,7 +101,8 @@ namespace libdar
 		throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
 	else // elastic buffer size is greater than one
 	{
-	    U_32 power256 = 1;
+	    U_32 power_base = 1;
+	    U_I base = base_from_version(reading_ver);
 	    const U_32 int_width = sizeof(U_32);
 	    U_32 byte_counter = 0;
 		// now reading total size
@@ -97,13 +113,13 @@ namespace libdar
 	    {
 		if(dir != elastic_forward)
 		{
-		    taille *= 256;
-		    taille += (unsigned char)(buffer[pos]);
+		    taille *= base;
+		    taille += buffer[pos];
 		}
 		else
 		{
-		    taille += power256 * (unsigned char)(buffer[pos]);
-		    power256 *= 256;
+		    taille += power_base * buffer[pos];
+		    power_base *= base;
 		}
 
 		pos += step;
@@ -122,12 +138,12 @@ namespace libdar
 	}
     }
 
-    elastic::elastic(generic_file &f, elastic_direction dir)
+    elastic::elastic(generic_file &f, elastic_direction dir,  const dar_version & reading_ver)
     {
 	U_32 count = 0;
 	S_I (generic_file::*lecture)(char &a) = (dir == elastic_forward ? &generic_file::read_forward : &generic_file::read_back);
-	char first_mark = (dir == elastic_forward ? LOW_MARK : HIGH_MARK);
-	char last_mark  = (dir == elastic_forward ? HIGH_MARK : LOW_MARK);
+	unsigned char first_mark = (dir == elastic_forward ? get_low_mark(reading_ver) : get_high_mark(reading_ver));
+	unsigned char last_mark  = (dir == elastic_forward ? get_high_mark(reading_ver) : get_low_mark(reading_ver));
 	unsigned char a;
 
 	while((f.*lecture)((char &)a) && a != SINGLE_MARK && a != first_mark)
@@ -145,7 +161,8 @@ namespace libdar
 		throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
 	else // elastic buffer size is greater than one
 	{
-	    U_32 power256 = 1;
+	    U_32 power_base = 1;
+	    U_I base = base_from_version(reading_ver);
 	    const U_32 int_width = sizeof(U_32);
 	    U_32 byte_counter = 0;
 		// now reading total size
@@ -155,13 +172,13 @@ namespace libdar
 	    {
 		if(dir != elastic_forward)
 		{
-		    taille *= 256;
+		    taille *= base;
 		    taille += a;
 		}
 		else
 		{
-		    taille += power256 * a;
-		    power256 *= 256;
+		    taille += power_base * a;
+		    power_base *= base;
 		}
 
 		count++;
@@ -194,11 +211,11 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: elastic.cpp,v 1.7.2.1 2007/07/22 16:34:59 edrusb Rel $";
+        static char id[]="$Id: elastic.cpp,v 1.7.2.2 2008/05/09 20:58:27 edrusb Rel $";
         dummy_call(id);
     }
 
-    U_32 elastic::dump(char *buffer, U_32 size) const
+    U_32 elastic::dump(unsigned char *buffer, U_32 size) const
     {
 	if(size < taille)
 	    throw Erange("elastic::dump", gettext("not enough space provided to dump the elastic buffer"));
@@ -208,20 +225,18 @@ namespace libdar
 	    register U_32 pos;
 	    register U_32 cur;
 	    register U_32 len;
-	    infinint infos = taille;
-	    infinint tmp = infos.get_storage_size();
+	    static const unsigned char base = 254;
+	    vector <unsigned char> digits = tools_number_base_decomposition_in_big_endian(taille, (unsigned char)(base));
 
+		// let's randomize a little more
 	    srand(time(NULL)+getpid());
 
 		////
 		// choosing the location of the first marks and following informations
 
-	    len = 0;
-	    tmp.unstack(len);
-		// len is the place taken by the information (in bytes)
-	    if(tmp != 0)
-		throw SRC_BUG;
-		// storage of a U_32 takes more bytes than the max value of U_32 !!!
+	    len = digits.size();
+		// len is the number of byte taken by the size information to encode
+
 	    if(len + 2 > taille) // +2 marks
 		throw SRC_BUG;
 		// a value takes more bytes to be stored as its own value !!!
@@ -236,11 +251,11 @@ namespace libdar
 	    for(pos = 0; pos < cur; ++pos)
 		randomize(buffer+pos);
 
-	    buffer[cur++] = LOW_MARK;
+	    buffer[cur++] = get_low_mark();
 	    pos = 0;
 	    while(pos < len)
-		buffer[cur++] = (char)(infos[pos++]);
-	    buffer[cur++] = HIGH_MARK;
+		buffer[cur++] = digits[pos++];
+	    buffer[cur++] = get_high_mark();
 
 		// filling the rest of the non information byte with random values
 	    for(pos = cur; pos < taille; ++pos)
@@ -252,8 +267,8 @@ namespace libdar
 	    else
 		if(taille == 2)
 		{
-		    buffer[0] = LOW_MARK;
-		    buffer[1] = HIGH_MARK;
+		    buffer[0] = get_low_mark();
+		    buffer[1] = get_high_mark();
 		}
 		else
 		    throw SRC_BUG; // 'taille' is equal to zero (?)
@@ -262,16 +277,38 @@ namespace libdar
     }
 
 
-    void elastic::randomize(char *a) const
+    void elastic::randomize(unsigned char *a) const
     {
 	do
 	{
 	    *a = (unsigned char)(rand() % 256);
 	}
-	while(*a == SINGLE_MARK || *a == LOW_MARK || *a == HIGH_MARK);
+	while(*a == SINGLE_MARK || *a == get_low_mark() || *a == get_high_mark());
+    }
+
+    U_I elastic::base_from_version(const dar_version & reading_ver) const
+    {
+	if(version_greater(reading_ver, "06"))
+	    return 254;
+	else
+	    return 256;
+    }
+
+    unsigned char elastic::get_low_mark(const dar_version & reading_ver) const
+    {
+	if(version_greater(reading_ver, "06"))
+	    return get_low_mark();
+	else
+	    return '>';
+    }
+
+    unsigned char elastic::get_high_mark(const dar_version & reading_ver) const
+    {
+	if(version_greater(reading_ver, "06"))
+	    return get_high_mark();
+	else
+	    return '<';
     }
 
 
 } // end of namespace
-
-

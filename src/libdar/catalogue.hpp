@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.48.2.4 2007/08/24 13:47:05 edrusb Rel $
+// $Id: catalogue.hpp,v 1.48.2.5 2008/05/16 11:00:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -137,8 +137,8 @@ namespace libdar
         nomme(generic_file & f);
         void dump(user_interaction & dialog, generic_file & f) const;
 
-        std::string get_name() const { return xname; };
-        void change_name(const std::string &x) { xname = x; };
+        const std::string & get_name() const { return xname; };
+        void change_name(const std::string & x) { xname = x; };
         bool same_as(const nomme & ref) const { return xname == ref.xname; };
             // no need to have a virtual method, as signature will differ in inherited classes (argument type changes)
 
@@ -423,7 +423,7 @@ namespace libdar
 	     generic_file *ea_loc);
 
         void dump(user_interaction & dialog, generic_file & f) const;
-        std::string get_target() const;
+        const std::string & get_target() const;
         void set_target(std::string x);
 
             // using the method is_more_recent_than() from inode
@@ -468,7 +468,7 @@ namespace libdar
         void reset_read_children() const;
         bool read_children(const nomme * &r) const; // read the direct children of the directory, returns false if no more is available
         void listing(user_interaction & dialog,
-		     const mask &m = bool_mask(true), bool filter_unsaved = false, std::string marge = "") const;
+		     const mask &m = bool_mask(true), bool filter_unsaved = false, const std::string & marge = "") const;
         void tar_listing(user_interaction & dialog,
 			 const mask &m = bool_mask(true), bool filter_unsaved = false, const std::string & beginning = "") const;
 	void xml_listing(user_interaction & dialog,
@@ -763,7 +763,7 @@ namespace libdar
 	    // inspected had not changed since the reference was done
 
         void dump(generic_file & ref) const;
-        void listing(const mask &m = bool_mask(true), bool filter_unsaved = false, std::string marge = "") const;
+        void listing(const mask &m = bool_mask(true), bool filter_unsaved = false, const std::string & marge = "") const;
         void tar_listing(const mask & m = bool_mask(true), bool filter_unsaved = false, const std::string & beginning = "") const;
         void xml_listing(const mask & m = bool_mask(true), bool filter_unsaved = false, const std::string & beginning = "") const;
         entree_stats get_stats() const { return stats; };

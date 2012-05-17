@@ -557,5 +557,14 @@ from 2.3.6 to 2.3.7
 - updated code for clean compilation with gcc-4.2.3
 - updated code for clean compilation with gcc-4.3 20080208 (experimental gcc)
 
-
+from 2.3.7 to 2.3.8
+- fixed bug in libdar met when user supply an empty file as a list of file to
+  include or exclude ( -[ and -] options )
+- fixed bug concerning elastic buffers used beside strong encryption. No
+  security issue here, just in some almost rare situations the generated archive
+  was not readable (testing your archive prevents you loosing data in this
+  situation)
+- added some speed optimizations
+- avoided warning to appear without -v option set, when an error is met while
+  fetching value of nodump flag (flag not supported on filesystem for example).
 

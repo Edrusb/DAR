@@ -14,6 +14,9 @@
 
 
 
+
+
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;"><img style="width: 320px; height: 240px;" alt="DAR's Documentation" src="dar_doc.jpg"><br>
@@ -1517,7 +1520,29 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
+    </tr><tr>
+      <td style="vertical-align: top;">
+      <div style="text-align: right;">June 20th,<br>
+      </div>
+      <div style="text-align: right;">2008<br>
+      </div>
+      </td>
+      <td style="vertical-align: top; text-align: center;">2.3.8<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">07<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">4.4.3<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.4.2<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.3.4<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.4.3<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.2.2<br>
+      </td>
     </tr>
+
 
 
 
@@ -1794,7 +1819,22 @@ something else than just testing it or trying it, it is strongly
 recommended to keep a copy of the source code in a secure place to be
 able to rebuild a dar binary able to read your archives.<br>
       <br>
-      </td>
+      <span style="font-weight: bold;">Having the sources ready for compilation</span><br>
+      <br>
+CVS does not always restore the proper timestamps of files, this lead
+automake, autoconfig and other tools consider that some key file have
+changed and that they must regenerate the configure script. To avoid
+you having to install theses tools in that particular case, read the
+file do the following after having retrieved sources from CVS:<br>
+      <br>
+      <div style="margin-left: 40px;"><span style="font-family: monospace;">cd dar</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">chmod u+x misc/clean_dates</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">misc/clean_dates<br>
+      <br>
+      </span></div>
+Also take the time to read the file named "USING_SOURCE_FROM_CVS"<br>
+      <br>
+</td>
     </tr>
   </tbody>
 </table>

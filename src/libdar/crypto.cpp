@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: crypto.cpp,v 1.12.2.6 2007/07/27 11:27:31 edrusb Rel $
+// $Id: crypto.cpp,v 1.12.2.7 2008/05/09 20:58:27 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -96,7 +96,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: crypto.cpp,v 1.12.2.6 2007/07/27 11:27:31 edrusb Rel $";
+        static char id[]="$Id: crypto.cpp,v 1.12.2.7 2008/05/09 20:58:27 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -117,6 +117,7 @@ namespace libdar
 	    x_weak_mode = !version_greater(reading_ver, "05");
 	else
 	    x_weak_mode = weak_mode;
+	version_copy(reading_version, reading_ver);
 
 	    // self_test();
 	if(x_weak_mode)
@@ -162,7 +163,7 @@ namespace libdar
 	    unsigned char ivec[8];
 	    elastic stic = elastic(size_to_fill - clear_size);
 
-	    stic.dump(const_cast<char *>(clear_buf + clear_size), (U_32)(clear_allocated - clear_size));
+	    stic.dump((unsigned char *)(const_cast<char *>(clear_buf + clear_size)), (U_32)(clear_allocated - clear_size));
 	    make_ivec(block_num, ivec);
 	    BF_cbc_encrypt((const unsigned char *)clear_buf, (unsigned char *)crypt_buf, size_to_fill, &clef, ivec, BF_ENCRYPT);
 	    return size_to_fill;
@@ -182,7 +183,7 @@ namespace libdar
 	make_ivec(block_num, ivec);
 	BF_cbc_encrypt((const unsigned char *)crypt_buf, (unsigned char *)clear_buf, crypt_size, &clef, ivec, BF_DECRYPT);
 
-	elastic stoc = elastic(clear_buf, crypt_size, elastic_backward);
+	elastic stoc = elastic((unsigned char *)clear_buf, crypt_size, elastic_backward, reading_version);
 	return crypt_size - stoc.get_size();
 #else
 	throw Ecompilation(gettext("blowfish strong encryption support"));

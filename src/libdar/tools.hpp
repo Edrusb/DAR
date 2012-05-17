@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.39.2.7 2008/02/09 11:14:39 edrusb Rel $
+// $Id: tools.hpp,v 1.39.2.8 2008/05/09 20:58:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -511,6 +511,32 @@ namespace libdar
 	/// \param[in] n is the number of byte to convert from src to dest
 	/// \note dest *must* be a valid pointer to an allocated memory area of at least n bytes
     extern void tools_memxor(void *dest, const void *src, size_t n);
+
+
+	/// Template for the decomposition of any number in any base (decimal, octal, hexa, etc.)
+
+	/// \param[in] number is the number to decompose
+	/// \param[in] base is the base to decompose the number into
+	/// \return a vector of 'digit' int the specified base, the first begin the less significative
+	/// \note this template does not take care of the possibily existing optimized euclide division
+	/// like what exists for infinint. A specific overriden fonction for this type would be better.
+
+    template <class N, class B> std::vector<B> tools_number_base_decomposition_in_big_endian(N number, const B & base)
+    {
+	std::vector<B> ret;
+
+	if(base <= 0)
+	    throw Erange("tools_number_decoupe_in_big_endian", "base must be strictly positive");
+
+	while(number != 0)
+	{
+	    ret.push_back(number % base);
+	    number /= base;
+	}
+
+	return ret;
+    }
+
 
 } /// end of namespace
 

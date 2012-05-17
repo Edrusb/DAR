@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: crypto.hpp,v 1.8.2.2 2007/07/21 14:39:04 edrusb Rel $
+// $Id: crypto.hpp,v 1.8.2.3 2008/05/09 20:58:27 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -86,6 +86,7 @@ namespace libdar
 	BF_KEY essiv_clef; //< used to build the Initialization Vector
 #endif
 	bool x_weak_mode;
+	dar_version reading_version;
 
 	void make_ivec(const infinint & ref, unsigned char ivec[8]);
 	std::string pkcs5_pass2key(const std::string & password,         //< human provided password

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.15 2008/02/09 17:41:30 edrusb Rel $
+// $Id: tools.cpp,v 1.54.2.16 2008/05/09 20:58:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -276,7 +276,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.54.2.15 2008/02/09 17:41:30 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.54.2.16 2008/05/09 20:58:27 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1321,7 +1321,7 @@ namespace libdar
 	    throw Ememory("tools_add_elastic_buffer");
 	try
 	{
-	    tic.dump(buffer, max_size);
+	    tic.dump((unsigned char *)buffer, max_size);
 	    f.write(buffer, tic.get_size());
 	}
 	catch(...)
@@ -1606,6 +1606,7 @@ namespace libdar
 	for (size_t i = 0; i < n; i++)
 	    *d++ ^= *s++;
     }
+
 
 
 } // end of namespace

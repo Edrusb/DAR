@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: elastic.hpp,v 1.5 2004/12/07 18:04:49 edrusb Rel $
+// $Id: elastic.hpp,v 1.5.4.1 2008/05/09 20:58:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -35,6 +35,7 @@
 #include "erreurs.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
+#include "header_version.hpp"
 
 
 namespace libdar
@@ -51,17 +52,25 @@ namespace libdar
     class elastic
     {
     public:
-	elastic(U_32 size) { if(size == 0) throw Erange("elastic::elastic", gettext("zero is not a valid size for an elastic buffer")); taille = size; };
-	elastic(const char *buffer, U_32 size, elastic_direction dir);
-	elastic(generic_file &f, elastic_direction dir);
+	elastic(U_32 size);
+	elastic(const unsigned char *buffer, U_32 size, elastic_direction dir, const dar_version & reading_ver);
+	elastic(generic_file &f, elastic_direction dir, const dar_version & reading_ver);
 
-	U_32 dump(char *buffer, U_32 size) const;
+	U_32 dump(unsigned char *buffer, U_32 size) const;
 	U_32 get_size() const { return taille; };
+
+	static U_I max_length() { return (U_I)(254)*254*254*254 - 1; };
 
     private:
 	U_32 taille; // max size of elastic buffer is 4GB which is large enough
 
-	void randomize(char *a) const;
+	void randomize(unsigned char *a) const;
+	U_I base_from_version(const dar_version & reading_ver) const;
+	unsigned char get_low_mark(const dar_version & reading_ver) const;
+	unsigned char get_high_mark(const dar_version & reading_ver) const;
+	unsigned char get_low_mark() const { return 255; };
+	unsigned char get_high_mark() const { return 254; };
+
     };
 
 } // end of namespace

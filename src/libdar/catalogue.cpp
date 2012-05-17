@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.47.2.10 2008/02/09 17:41:29 edrusb Rel $
+// $Id: catalogue.cpp,v 1.47.2.11 2008/05/16 11:00:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -1232,7 +1232,7 @@ namespace libdar
             tools_read_string(f, points_to);
     }
 
-    string lien::get_target() const
+    const string & lien::get_target() const
     {
         if(get_saved_status() != s_saved)
             throw SRC_BUG;
@@ -1416,7 +1416,7 @@ namespace libdar
     }
 
     void directory::listing(user_interaction & dialog,
-			    const mask &m, bool filter_unsaved, string marge) const
+			    const mask &m, bool filter_unsaved, const string & marge) const
     {
         vector<nomme *>::const_iterator it = fils.begin();
 	thread_cancellation thr;
@@ -2559,7 +2559,7 @@ namespace libdar
     }
 
 
-    void catalogue::listing(const mask &m, bool filter_unsaved, string marge) const
+    void catalogue::listing(const mask &m, bool filter_unsaved, const string & marge) const
     {
 	cat_ui->printf(gettext("access mode    | user | group | size  |          date                 | [data ][ EA  ][compr] |   filename\n"));
 	cat_ui->printf("---------------+------+-------+-------+-------------------------------+-----------------------+-----------\n");
@@ -2593,7 +2593,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: catalogue.cpp,v 1.47.2.10 2008/02/09 17:41:29 edrusb Rel $";
+	static char id[]="$Id: catalogue.cpp,v 1.47.2.11 2008/05/16 11:00:17 edrusb Rel $";
 	dummy_call(id);
     }
 
