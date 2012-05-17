@@ -52,7 +52,7 @@ namespace libdar
 
         for(register S_I i = 0; i < 8; i++)
         {
-            bit[i] = (a & mask) >> 7 - i;
+            bit[i] = (a & mask) >> (7 - i);
             mask >>= 1;
         }
     }

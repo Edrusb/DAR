@@ -45,7 +45,7 @@ namespace libdar
 
     protected :
         S_I inherited_read(char *a, size_t size);
-        S_I inherited_write(char *a, size_t size);
+        S_I inherited_write(const char *a, size_t size);
 
     private :
         infinint start, sz;

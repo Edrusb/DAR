@@ -104,7 +104,7 @@ namespace libdar
             return (this->*active_read)(a, size);
     }
 
-    S_I generic_file::write(char *a, size_t size)
+    S_I generic_file::write(const char *a, size_t size)
     {
         if(rw == gf_read_only)
             throw Erange("generic_file::write", "writing to a read only generic_file");
@@ -261,7 +261,7 @@ namespace libdar
         }
     }
 
-    void generic_file::compute_crc(char *a, S_I size)
+    void generic_file::compute_crc(const char *a, S_I size)
     {
         for(register S_I i = 0; i < size; i++)
             value[(i+crc_offset)%CRC_SIZE] ^= a[i];
@@ -275,7 +275,7 @@ namespace libdar
         return ret;
     }
 
-    S_I generic_file::write_crc(char *a, size_t size)
+    S_I generic_file::write_crc(const char *a, size_t size)
     {
         S_I ret = inherited_write(a, size);
         compute_crc(a, ret);
@@ -287,7 +287,7 @@ namespace libdar
         filedesc = fd;
     }
 
-    fichier::fichier(char *name, gf_mode m) : generic_file(m)
+    fichier::fichier(const char *name, gf_mode m) : generic_file(m)
     {
         fichier::open(name, m);
     }
@@ -350,10 +350,12 @@ namespace libdar
     bool fichier::skip_relative(S_I x)
     {
         if(x > 0)
+	{
             if(lseek(filedesc, x, SEEK_CUR) < 0)
                 return false;
             else
                 return true;
+	}
 
         if(x < 0)
         {
@@ -423,7 +425,7 @@ namespace libdar
         return lu;
     }
 
-    S_I fichier::inherited_write(char *a, size_t size)
+    S_I fichier::inherited_write(const char *a, size_t size)
     {
         S_I ret;
         size_t total = 0;
@@ -476,10 +478,12 @@ namespace libdar
         {
             filedesc = ::open(name, mode|O_BINARY, perm);
             if(filedesc < 0)
+	    {
                 if(filedesc == ENOSPC)
                     user_interaction_pause("no space left for inode, you have the oportunity to make some room now. When done : can we continue ?");
                 else
                     throw Erange("fichier::open", string("can't open file : ") + strerror(errno));
+	    }
         }
         while(filedesc == ENOSPC);
     }

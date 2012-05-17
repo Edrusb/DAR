@@ -986,10 +986,12 @@ namespace libdar
                     throw SRC_BUG; // unknown inode type
 
                 if(ret < 0)
+		{
                     if(errno != ENOSPC)
                         throw Erange("filesystem_hard_link_write::make_file", string("Could not create inode: ") + name + " : " + strerror(errno));
                     else
                         user_interaction_pause(string("Cannot create inode: ") + strerror(errno) + " Ready to continue ?");
+		}
             }
             while(ret < 0 && errno == ENOSPC);
 

@@ -48,6 +48,12 @@ extern "C"
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
 }
 
 #include "dar_suite.hpp"
@@ -72,7 +78,7 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    if(argc != 3 || argv[1] == "-h")
+    if(argc != 3 || strcmp(argv[1],"-h") == 0)
     {
         show_usage(argv[0]);
         exit(1);
@@ -203,7 +209,7 @@ void copy_max(int src, int dst)
     off_t taille = lseek(src, 0, SEEK_END);
     lseek(src, 0, SEEK_SET);
 
-    printf("Starting the copy of %u byte(s)\n", taille);
+    printf("Starting the copy of %lu byte(s)\n", taille);
     do
     {
         lu = normal_copy(BUF_SIZE, buffer, src, dst);
@@ -216,7 +222,7 @@ void copy_max(int src, int dst)
             xfer_before_error(BUF_SIZE/2, buffer, src, dst);
             if(skip_to_next_readable(BUF_SIZE/2, buffer, src, dst, local_missed))
 	    {
-		printf("Skipping done (missing %u byte(s)), found correct data to read, continuing the copy\n", local_missed);
+		printf("Skipping done (missing %lu byte(s)), found correct data to read, continuing the copy\n", local_missed);
 		missed += local_missed;
                 lu = 1;
 	    }
@@ -229,7 +235,7 @@ void copy_max(int src, int dst)
     }
     while(lu > 0);
 
-    printf("Copy finished. Missing %u byte(s) of data (%.2f %% of the total amount of data)\n", missed, (float)(missed)/((float)(taille))*100);
+    printf("Copy finished. Missing %lu byte(s) of data (%.2f %% of the total amount of data)\n", missed, (float)(missed)/((float)(taille))*100);
 }
 
 void xfer_before_error(int block, char *buffer, int src, int dst)

@@ -556,10 +556,12 @@ namespace libdar
             || perm != ref.perm;
 
         if(*ref.last_mod < *last_mod)
+	{
             if(hourshift > 0)
                 more_recent = more_recent || ! is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod);
             else
                 more_recent = true;
+	}
 
         return more_recent;
     }
@@ -1872,10 +1874,12 @@ namespace libdar
                     string tmp_s;
 
                     if(!out_compare.pop(tmp_s))
+		    {
                         if(out_compare.is_relative())
                             throw SRC_BUG; // should not be a relative path !!!
                         else // both cases are bugs, but need to know which case is generating a bug
                             throw SRC_BUG; // out_compare.degre() > 0 but cannot pop !
+		    }
                 }
 
             return false;

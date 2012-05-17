@@ -109,7 +109,7 @@ namespace libdar
         dummy_call(id);
     }
 
-    void ui_printf(char *format, ...)
+    void ui_printf(const char *format, ...)
     {
         va_list ap;
         bool end;

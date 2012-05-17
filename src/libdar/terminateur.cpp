@@ -111,7 +111,7 @@ namespace libdar
                 // considering the first non 0xFF byte of the terminator string (backward reading)
             while(a != 0)
             {
-                if(a & 0x80 == 0)
+                if((a & 0x80) == 0)
                     throw Erange("","");
                 offset++;
                 a <<= 1;

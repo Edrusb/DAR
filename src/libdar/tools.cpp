@@ -104,6 +104,10 @@ char *strchr (), *strrchr ();
 #if HAVE_GRP_H
 #include <grp.h>
 #endif
+
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
 } // end extern "C"
 
 #include <iostream>
@@ -505,6 +509,7 @@ namespace libdar
                                              string("Unexpected error while waiting for dar to terminate: ") + strerror(errno));
                             else // checking the way dar has exit
                                 if(!WIFEXITED(status)) // not a normal ending
+				{
                                     if(WIFSIGNALED(status)) // exited because of a signal
                                     {
                                         try
@@ -527,6 +532,7 @@ namespace libdar
                                         user_interaction_pause(string("DAR sub-process has terminated with exit code ")
                                                                + tools_int2str(WEXITSTATUS(status))
                                                                + " Continue anyway ?");
+				}
                         }
                     }
                     while(loop);
@@ -613,7 +619,7 @@ namespace libdar
         exit(0);
     }
 
-    const char *tools_get_from_env(const char **env, char *clef)
+    const char *tools_get_from_env(const char **env, const char *clef)
     {
         unsigned int index = 0;
         const char *ret = NULL;
@@ -742,6 +748,7 @@ namespace libdar
 		    throw Ememory("tools_getcwd()");
 		ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
 		if(ret == NULL) // could not get the CWD
+		{
 		    if(errno == ERANGE) // buffer too small
 		    {
 			delete buffer;
@@ -750,6 +757,7 @@ namespace libdar
 		    }
 		    else // other error
 			throw Erange("tools_getcwd", string("Cannot get full path of current working directory: ") + strerror(errno));
+		}
 	    }
 	    while(ret == NULL);
 

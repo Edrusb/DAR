@@ -324,7 +324,7 @@ namespace libdar
         return lu;
     }
 
-    S_I sar::inherited_write(char *a, size_t sz)
+    S_I sar::inherited_write(const char *a, size_t sz)
     {
         infinint to_write = sz;
         infinint max_at_once;
@@ -663,6 +663,7 @@ namespace libdar
                 {
                     open_file(num);
                     if(of_flag != FLAG_TERMINAL)
+		    {
                         if(!ask_user)
                         {
                             close_file();
@@ -674,6 +675,7 @@ namespace libdar
                             close_file();
                             user_interaction_pause(string("The last file of the set is not present in ") + archive_dir.display() + " , please provide it.");
                         }
+		    }
                 }
                 else // not slice available in the directory
                     if(!ask_user)

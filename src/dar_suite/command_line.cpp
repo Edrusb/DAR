@@ -347,10 +347,12 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                && output_pipe == "")
                 throw Erange("get_args", "-o is mandatory when using \"-A -\" with \"-c -\" or \"-C -\"");
             if(ref_filename != NULL && *ref_filename != "-")
+	    {
                 if(ref_root == NULL)
                     throw SRC_BUG;
                 else
                     tools_check_basename(*ref_root, *ref_filename, EXTENSION);
+	    }
             if(algo != none && op != create && op != isolate)
                 user_interaction_warning("-z or -y need only to be used with -c");
             if(first_file_size != 0 && file_size == 0)
@@ -387,12 +389,14 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
             if(min_compr_size != min_compr_size_default && op != create)
                 user_interaction_warning("-m is only useful with -c");
             if(hourshift > 0)
+	    {
                 if(op == create)
                 {
                     if(ref_filename == NULL)
                         user_interaction_warning("-H is only useful with -A option when making a backup");
                 }
                 else
+		{
                     if(op == extract)
                     {
                         if(!only_more_recent)
@@ -400,12 +404,16 @@ bool get_args(const char *home, S_I argc, char *argv[], operation &op, path * &f
                     }
                     else
                         user_interaction_warning("-H is only useful with -c or -x");
+		}
+	    }
             if(alteration != "")
+	    {
                 if(op != listing)
                     user_interaction_warning("-a is currently only available with -l, ignoring -a option");
                 else
                     if(alteration != "s" && alteration != "saved")
                         throw Erange("get_args", string("unkown argument given to -a: ")+ alteration);
+	    }
             if(empty && op != create && op != extract)
                 user_interaction_warning("-e is only useful with -x or -c");
 
@@ -571,7 +579,7 @@ static bool get_args_recursive(vector<string> & inclusions,
                     throw Erange("get_args", string(" missing argument to -")+char(lu));
                 if(filename != "" || sauv_root != NULL)
                     throw Erange("get_args", " only one option of -c -d -t -l -C or -x is allowed");
-                if(optarg != "")
+                if(strncmp(optarg, "", 1) != 0)
                     tools_split_path_basename(optarg, sauv_root, filename);
                 else
                     throw Erange("get_args", string(" invalid argument for option -") + char(lu));
@@ -604,9 +612,9 @@ static bool get_args_recursive(vector<string> & inclusions,
                     throw Erange("get_args", "only one -A option is allowed");
                 if(optarg == NULL)
                     throw Erange("get_args", "missing argument to -A");
-                if(optarg == "")
+                if(strncmp(optarg, "", 1) == 0)
                     throw Erange("get_args", "invalid argument for option -A");
-                if(optarg == "-")
+                if(strcmp(optarg, "-") == 0)
                     throw Erange("get_args", "- not allowed with -A option");
                 ref_filename = new string();
                 if(ref_filename == NULL)

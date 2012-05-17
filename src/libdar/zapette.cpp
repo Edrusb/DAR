@@ -393,7 +393,7 @@ namespace libdar
         return lu;
     }
 
-    S_I zapette::inherited_write(char *a, size_t size)
+    S_I zapette::inherited_write(const char *a, size_t size)
     {
         throw SRC_BUG; // zapette is read-only
     }

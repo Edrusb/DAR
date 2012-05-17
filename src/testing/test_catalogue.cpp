@@ -237,6 +237,7 @@ void f2()
                         if(ok)
                             w = dynamic_cast<const inode *>(was);
                         if(ok && w != NULL)
+			{
                             if(i->same_as(*w))
                                 if(i->is_more_recent_than(*w, 0))
                                     cout << "plus recent" << endl;
@@ -244,6 +245,7 @@ void f2()
                                     cout << "pas plus recent" << endl;
                             else
                                 cout << "pas meme ou pas inode" << endl;
+			}
                     }
                     else
                         cout << "objet inconnu" << endl;

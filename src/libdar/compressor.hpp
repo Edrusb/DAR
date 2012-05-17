@@ -68,7 +68,7 @@ namespace libdar
 
     protected :
         S_I inherited_read(char *a, size_t size) { return (this->*read_ptr)(a, size); };
-        S_I inherited_write(char *a, size_t size) { return (this->*write_ptr)(a, size); };
+        S_I inherited_write(const char *a, size_t size) { return (this->*write_ptr)(a, size); };
 
     private :
         struct xfer
@@ -94,11 +94,11 @@ namespace libdar
             // S_I zip_read(char *a, size_t size);
             // S_I bzip2_read(char *a, size_t size); // using gzip_read, same code thanks to wrapperlib
 
-        S_I (compressor::*write_ptr) (char *a, size_t size);
-        S_I none_write(char *a, size_t size);
-        S_I gzip_write(char *a, size_t size);
-            // S_I zip_write(char *a, size_t size);
-            // S_I bzip2_write(char *a, size_t size); // using gzip_write, same code thanks to wrapperlib
+        S_I (compressor::*write_ptr) (const char *a, size_t size);
+        S_I none_write(const char *a, size_t size);
+        S_I gzip_write(const char *a, size_t size);
+            // S_I zip_write(const char *a, size_t size);
+            // S_I bzip2_write(const char *a, size_t size); // using gzip_write, same code thanks to wrapperlib
     };
 
 } // end of namespace

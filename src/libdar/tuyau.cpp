@@ -151,7 +151,7 @@ namespace libdar
         return lu;
     }
 
-    S_I tuyau::inherited_write(char *a, size_t size)
+    S_I tuyau::inherited_write(const char *a, size_t size)
     {
         size_t total = 0;
 

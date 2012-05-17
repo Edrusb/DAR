@@ -216,6 +216,7 @@ namespace libdar
             }
 
             if(tmp == 0xF)
+	    {
                 if(leading_zero)
                 {
                     if(avance)
@@ -223,6 +224,7 @@ namespace libdar
                 }
                 else
                     throw SRC_BUG;
+	    }
 
             if(tmp != 0 && tmp != 0xF)
                 leading_zero = false;

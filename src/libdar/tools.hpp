@@ -75,7 +75,7 @@ namespace libdar
         a = a + b;
         return a;
     }
-    extern const char *tools_get_from_env(const char **env, char *clef);
+    extern const char *tools_get_from_env(const char **env, const char *clef);
 
         // base is the filename a slice
     extern void tools_check_basename(const path & loc, std::string & base, const std::string & extension);

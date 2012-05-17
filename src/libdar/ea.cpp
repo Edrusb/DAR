@@ -143,6 +143,7 @@ namespace libdar
         while(!diff && read(ea))
             if(ea.mode == ea_insert)
                 if((ea.domain == ea_domain_user && check_ea_user) || (ea.domain == ea_domain_root && check_ea_root))
+		{
                     if(other.find(ea.domain, ea.key, mode, value))
                     {
                         if(value != ea.value) // found but different
@@ -150,6 +151,7 @@ namespace libdar
                     }
                     else // not found
                         diff = true;
+		}
         return diff;
     }
 

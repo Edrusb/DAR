@@ -49,7 +49,7 @@ namespace libdar
             throw SRC_BUG;
 
         U_32 index = ref->get_position() % len;
-        S_I ret = ref->read(a, size);    
+        S_I ret = ref->read(a, size);
 
         for(register S_I i = 0; i < ret; i++)
         {
@@ -59,7 +59,7 @@ namespace libdar
         return ret;
     }
 
-    S_I scrambler::inherited_write(char *a, size_t size)
+    S_I scrambler::inherited_write(const char *a, size_t size)
     {
         unsigned char *ptr = (unsigned char *)a;
         if(ref == NULL)
@@ -82,7 +82,7 @@ namespace libdar
                 throw Ememory("scramble::inherited_write");
             }
         }
-    
+
         for(register size_t i = 0; i < size; i++)
         {
             buffer[i] = (ptr[i] + (unsigned char)(key[index])) % 256;

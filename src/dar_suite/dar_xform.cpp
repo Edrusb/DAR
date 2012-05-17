@@ -30,6 +30,11 @@ extern "C"
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
 #include "getopt_decision.h"
 } // end extern "C"
 
@@ -317,14 +322,14 @@ static bool command_line(S_I argc, char *argv[],
             user_interaction_warning("too many argument on command line, see -h option for help");
             return false;
         }
-        if(argv[optind] != "")
+        if(strncmp(argv[optind], "", 1) != 0)
             tools_split_path_basename(argv[optind], src_dir, src);
         else
         {
             user_interaction_warning("invalid argument as source archive");
             return false;
         }
-        if(argv[optind+1] != "")
+        if(strncmp(argv[optind+1], "", 1) != 0)
             tools_split_path_basename(argv[optind+1], dst_dir, dst);
         else
         {

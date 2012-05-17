@@ -46,7 +46,7 @@ int main()
         path p5 = "/zozo/zizi/zuzu/zaza";
 
         cout << p2.display() << endl;
-        
+
         path *p[5] = { &p1, &p2, &p3, &p4, &p5 };
 
         for(S_I i = 0; i < 5; i++)
@@ -81,7 +81,7 @@ int main()
     {
         e.dump();
     }
-    
+
     try
     {
         path tmp = "";
@@ -90,7 +90,7 @@ int main()
     {
         e.dump();
     }
-    
+
     try
     {
         path t1 = "/toto/tutu";
@@ -109,11 +109,11 @@ int main()
 
 void f2()
 {
-    char *src[] = { "toto", "/titi", "toto/./titi", "/./titi",
-                    "toto/titi/tutu/../../..", "/toto/titi/tutu/../../..",
-                    "././././toto/././././..", "/././././toto/././././..",
-                    "../../../titi/./tutu", "/../../../../toto/../../tutu",
-                    NULL };
+    const char *src[] = { "toto", "/titi", "toto/./titi", "/./titi",
+			  "toto/titi/tutu/../../..", "/toto/titi/tutu/../../..",
+			  "././././toto/././././..", "/././././toto/././././..",
+			  "../../../titi/./tutu", "/../../../../toto/../../tutu",
+			  NULL };
     path conv = "/";
 
     for(S_I i = 0; src[i] != NULL; i++)
