@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.21.2.1 2005/09/08 19:20:21 edrusb Rel $
+// $Id: filtre.cpp,v 1.21.2.2 2006/01/24 12:55:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -841,7 +841,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.21.2.1 2005/09/08 19:20:21 edrusb Rel $";
+        static char id[]="$Id: filtre.cpp,v 1.21.2.2 2006/01/24 12:55:35 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -958,14 +958,28 @@ namespace libdar
                 {
                         // we must record the EA have been dropped since ref backup
                     ea_attributs ea;
+		    crc val;
+
                     ino->ea_set_saved_status(inode::ea_full);
-                    ino->ea_set_offset(stock->get_position());
-                    ea.clear(); // be sure it is empty
+		    ea.clear(); // be sure it is empty
                     if(info_details)
                         dialog.warning(string(gettext("Saving Extended Attributes for ")) + info_quoi);
-                    ea.dump(*stock);
-                    stock->flush_write();
+		    ino->ea_set_offset(stock->get_position());
+		    stock->change_algo(compr_used);
+		    stock->reset_crc();
+		    try
+		    {
+			ea.dump(*stock);
+		    }
+		    catch(...)
+		    {
+			stock->get_crc(val);
+			throw;
+		    }
+		    stock->get_crc(val);
+		    ino->ea_set_crc(val);
                         // no need to detach, as the brand new ea has not been attached
+                    stock->flush_write();
                     ret = true;
                 }
                 break;

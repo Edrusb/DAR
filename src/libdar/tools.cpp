@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.41.2.4 2006/01/12 15:06:33 edrusb Rel $
+// $Id: tools.cpp,v 1.41.2.5 2006/02/02 15:57:33 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -298,7 +298,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.41.2.4 2006/01/12 15:06:33 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.41.2.5 2006/02/02 15:57:33 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1144,7 +1144,32 @@ namespace libdar
 	return ret;
     }
 
-    void tools_avoid_slice_overwriting(user_interaction & dialog, const string & chemin, const string & x_file_mask, bool info_details, bool allow_overwriting, bool warn_overwriting, bool dry_run)
+    void tools_avoid_slice_overwriting(user_interaction & dialog,
+				       const string & chemin,
+				       const string & x_file_mask,
+				       bool info_details,
+				       bool allow_overwriting,
+				       bool warn_overwriting)
+    {
+	    // this call must exist for older program that could rely on it while
+	    // the libdar is of the same major version (3.x.x)
+	tools_avoid_slice_overwriting(dialog,
+				      chemin,
+				      x_file_mask,
+				      info_details,
+				      allow_overwriting,
+				      warn_overwriting,
+				      false);
+    }
+
+
+    void tools_avoid_slice_overwriting(user_interaction & dialog,
+				       const string & chemin,
+				       const string & x_file_mask,
+				       bool info_details,
+				       bool allow_overwriting,
+				       bool warn_overwriting,
+				       bool dry_run)
     {
 	char *c_chemin = tools_str2charptr(chemin);
 	try

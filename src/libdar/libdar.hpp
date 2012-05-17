@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.hpp,v 1.38.2.7 2006/01/19 12:08:55 edrusb Rel $
+// $Id: libdar.hpp,v 1.38.2.8 2006/02/24 14:39:59 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -122,7 +122,7 @@ namespace libdar
 	///  libdar Medium version defined at compilation time
     const U_I LIBDAR_COMPILE_TIME_MEDIUM = 1;
 	///  libdar Minor version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MINOR = 3;
+    const U_I LIBDAR_COMPILE_TIME_MINOR = 4;
 
 	////////////////////////////////////////////////////////////////////////
 	// LIBDAR INITIALIZATION METHODS                                      //

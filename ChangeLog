@@ -406,3 +406,10 @@ from 2.2.5 to 2.2.6
 - fixed bug #36
 - avoid removing slices when creating archive in dry-run mode (-e option)
 - fixed display problem in dar_cp that lead uncaught exception just before exiting
+
+
+from 2.2.6 to 2.2.7
+- updated Swedish translation by Peter Landgren
+- fixed bug #37
+- added old function (modified in 2.2.6) for backward compatibility
+- added German translation by Markus Kamp

@@ -672,10 +672,25 @@ KNOWN BUGS:
 
 #36 description
      when using -I or -X with -l option directory names are also filtered
-     while they should not be, as decribed in the man page
+     while they should not be, as described in the man page
 
     solution
      avoid having -X/-I filtering directories
 
     affected versions 2.2.x up to 2.2.5
     fixed in 2.2.6
+
+#37 description
+    when restoring a file which all EA has been dropped since the archive
+    of reference, dar reports CRC error.
+
+    problem
+    to store that EA has been dropped, dar saves an empty EA list, but
+    did not calculated the CRC value
+
+    solution
+    make the CRC value set when storing an empty list of EA. Note that this
+    bug did not cause any problem except a CRC error message.
+
+    affects versions up to 2.2.6
+    fixed in 2.2.7

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.30.2.4 2006/01/16 15:06:22 edrusb Rel $
+// $Id: tools.hpp,v 1.30.2.5 2006/02/02 15:57:33 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -408,6 +408,14 @@ namespace libdar
 					      bool allow_overwriting,
 					      bool warn_overwriting,
 					      bool dry_run);
+
+	/// [obsolete] for compatibility reason with older program of API 3.1.x (x < 3)
+    extern void tools_avoid_slice_overwriting(user_interaction & dialog,
+					      const std::string & chemin,
+					      const std::string & x_file_mask,
+					      bool info_details,
+					      bool allow_overwriting,
+					      bool warn_overwriting);
 
 
 	/// append an elastic buffer of given size to the file
