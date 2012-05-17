@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.25.2.2 2008/02/09 11:14:38 edrusb Rel $
+// $Id: generic_file.hpp,v 1.25.2.3 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -222,7 +222,7 @@ namespace libdar
 	/// - INIT phase
 	/// - OPERATIONAL phase
 	/// .
-	/// theses are used to help the command launched between slices to
+	/// these are used to help the command launched between slices to
 	/// decide the action to do depending on the context when reading an archive
 	/// (first slice / last slice read, ...)
 	/// the context must also be transfered to dar_slave through the pair of tuyau objects

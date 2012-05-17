@@ -1,4 +1,4 @@
-.TH DAR 1 "Feb 9th, 2008"
+.TH DAR 1 "May 21st, 2009"
 .UC 8
 .SH NAME
 dar - disk archive
@@ -95,6 +95,9 @@ displays version information.
 -v, --verbose[=s[kipped]]
 verbose output. --verbose and --verbose=skipped are independent. --verbose=skipped displays the files being excluded by filters, while --verbose display actions under process.
 .TP 20
+-q, --quiet
+Suppress the final statistics report. If no verbose output is asked beside this option, nothing is displayed if the operation succeeds.
+.TP 20
 -b, --beep
 makes the terminal ring when user action is required (like for example the creation of a new slice using the -p option)
 .TP 20
@@ -174,7 +177,7 @@ where "namespace" is for example "user". Note that the mask may or may not inclu
 .P
 the -am flag here also enables the ordered method, for EA selection too. The ordered versus normal method have been explained above in the file selection note, with some examples using -X and -I. Here this is the same with -U and -u, (just replace -X by -u and -I by -U and remember that the corresponding mask will apply to Extended Attribute selection in place of file selection).
 
-Another point, independently of the -am option the -ae option can be used at restoration time only. If set, when a file is about to be overwritten, all EA will be first erased before restoring those selected for restoration in the archive (according to the -U and -u options given). If not set, the EA of the existing file will be overwritten, those extra EA that are not in the archive or are not selected for restoration in regard to the -u and -U options will be preserved. If you have not used any -u/-U option at backup time and want to restore from a set of full/differential backups the EA exactly as the were you have to use -ae for dar removes the EA that have been removed along the time, else you could get an EA that has been removed in a intermediate differential backup not been removed at restoration time.
+Another point, independently of the -am option the -ae option can be used at restoration time only. If set, when a file is about to be overwritten, all EA will be first erased before restoring those selected for restoration in the archive (according to the -U and -u options given). If not set, the EA of the existing file will be overwritten, those extra EA that are not in the archive or are not selected for restoration in regard to the -u and -U options will be preserved. If you have not used any -u/-U option at backup time and want to restore from a set of full/differential backups the EA exactly as they were, you have to use -ae for dar removes the EA before overwriting their set of EA as stored in the archive. Without -ae option dar will simply add EA to existing ones, thus get a different set of EA for a give file than those recorded at the time of the backup.
 .P
 Last point the -acase and -an options alters the case sensitivity of the  -U and -u masks that follow them on the command-line/included files as they do for -I, -X, -P, -g, -[ and -] as well. Very last point ;-), by default during backup dar set back the atime after having read each file (see -aa/-ac options), this has as side effect to modify the ctime date of each file. But ctime change is used by dar to detect EA changes. In brief, the next time you backup a file that had to be read (thus which contents changed), its EA will be saved even if they had not changed. To avoid this slide effect, you can use the -ac option.
 .RE

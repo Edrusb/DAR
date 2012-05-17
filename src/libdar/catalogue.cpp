@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.47.2.11 2008/05/16 11:00:17 edrusb Rel $
+// $Id: catalogue.cpp,v 1.47.2.12 2009/01/04 15:34:25 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -2247,11 +2247,11 @@ namespace libdar
 	else // ref is an eod
 	{
 	    directory *parent = current_add->get_parent();
-	    delete ref; // all data given throw add becomes owned by the catalogue object
 	    if(parent == NULL)
 		throw Erange("catalogue::add_file", gettext("root has no parent directory, cannot change to it"));
 	    else
 		current_add = parent;
+	    delete ref; // all data given throw add becomes owned by the catalogue object
 	}
     }
 
@@ -2593,7 +2593,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: catalogue.cpp,v 1.47.2.11 2008/05/16 11:00:17 edrusb Rel $";
+	static char id[]="$Id: catalogue.cpp,v 1.47.2.12 2009/01/04 15:34:25 edrusb Rel $";
 	dummy_call(id);
     }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.cpp,v 1.16.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: header.cpp,v 1.16.2.2 2009/01/24 16:01:16 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -77,6 +77,8 @@ namespace libdar
         case EXTENSION_SIZE:
             size_ext = infinint(f.get_gf_ui(), NULL, &f);
             break;
+	case EXTENSION_TLV:
+	    throw Efeature(gettext("Archive format too recent for this version of DAR"));
         default :
             throw Erange("header::read", gettext("Badly formatted SAR header"));
         }
@@ -117,7 +119,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: header.cpp,v 1.16.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: header.cpp,v 1.16.2.2 2009/01/24 16:01:16 edrusb Rel $";
         dummy_call(id);
     }
 

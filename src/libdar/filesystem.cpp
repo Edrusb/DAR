@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.45.2.6 2008/06/14 16:34:05 edrusb Rel $
+// $Id: filesystem.cpp,v 1.45.2.7 2009/03/24 08:52:01 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -1365,7 +1365,7 @@ namespace libdar
 
 		    if(!empty)
 			if(chmod(name, 0700 | get_file_permission(name)) < 0)
-			    get_fs_ui().warning(tools_printf(gettext("Cannot temporary change permissions of %S : "), &spot_display) + strerror(errno));
+			    get_fs_ui().warning(tools_printf(gettext("Cannot temporarily change permissions of %S : "), &spot_display) + strerror(errno));
 
                 }
             }
@@ -1504,7 +1504,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.45.2.6 2008/06/14 16:34:05 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.45.2.7 2009/03/24 08:52:01 edrusb Rel $";
         dummy_call(id);
     }
 

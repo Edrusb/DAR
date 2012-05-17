@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.hpp,v 1.16.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: sar.hpp,v 1.16.2.2 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -95,7 +95,7 @@ namespace libdar
 
         bool natural_destruction;
 
-            // theses following variables are modified by open_file
+            // these following variables are modified by open_file
             // else the are used only for reading
         infinint of_current;
         infinint of_max_seen;
@@ -107,7 +107,7 @@ namespace libdar
         char of_flag;
         bool initial;
 
-            // theses are the option flags
+            // these are the option flags
         bool opt_warn_overwrite;
         bool opt_allow_overwrite;
 

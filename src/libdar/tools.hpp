@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.39.2.8 2008/05/09 20:58:27 edrusb Rel $
+// $Id: tools.hpp,v 1.39.2.9 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -59,7 +59,7 @@ namespace libdar
 	/// \addtogroup Tools
 	/// \brief a set of tool routine
 	///
-	/// theses routines are part of the libdar API for historical
+	/// these routines are part of the libdar API for historical
 	/// reason. They are shared and used by dar, dar_slave, dar_xform,
 	/// and dar_manager command. You should avoid using thoses in
 	/// external program as they may be removed or changed without

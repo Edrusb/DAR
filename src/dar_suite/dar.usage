@@ -13,6 +13,7 @@
 	dialog.printf(gettext("\n"));
 	dialog.printf(gettext("Common options:\n"));
 	dialog.printf(gettext("   -v\t\t   verbose output\n"));
+	dialog.printf(gettext("   -q\t\t   suppress final statistics report\n"));
 	dialog.printf(gettext("   -vs\t\t   display skipped files\n"));
 	dialog.printf(gettext("   -R <path>\t   filesystem root directory (current dir by default)\n"));
 	dialog.printf(gettext("   -X <mask>\t   files to exclude from the operation (none by default)\n"));

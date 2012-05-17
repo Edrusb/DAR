@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.hpp,v 1.24 2005/12/13 20:54:45 edrusb Rel $
+// $Id: command_line.hpp,v 1.24.2.1 2009/04/06 20:23:19 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -85,7 +85,8 @@ extern bool get_args(user_interaction & dialog,
 		     string & aux_execute,
 		     U_32 & aux_crypto_size,
 		     bool & keep_compressed,
-		     infinint & fixed_date);
+		     infinint & fixed_date,
+		     bool & quiet);
 
 
 #endif

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.hpp,v 1.18.2.3 2007/07/22 16:35:00 edrusb Rel $
+// $Id: limitint.hpp,v 1.18.2.4 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -362,7 +362,7 @@ namespace libdar
             last_width = 0x80 >> (pos_s - 1);
         }
 
-            // now we write the preamble except the last byte. All theses are zeros.
+            // now we write the preamble except the last byte. All these are zeros.
 
         unsigned char u = 0x00;
 

@@ -23,7 +23,7 @@ m + minimum size below which no compression will occur. --mincompr a default val
 n - do not allow overwriting            --no-overwrite
 o - path of the output pipe             --output
 p - pause before creating new slice     --pause
-q !
+q - suppress final statistics report    --quiet
 r - do not overwrite more recent file   --recent [=date] (to implement)
 s + size of slice                       --slice
 t + test archive structure              --test

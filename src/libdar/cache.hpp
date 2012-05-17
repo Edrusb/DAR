@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: cache.hpp,v 1.10.2.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: cache.hpp,v 1.10.2.2 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -43,7 +43,7 @@ namespace libdar
 	/// objects that a catalogue can contain. This makes a lot of small read
     	/// or write, which make very poor performances when used over the network
 	/// through a pipe to ssh. When compression is used, the problem disapears
-	/// as the compression engine gather theses many small read or write into
+	/// as the compression engine gather these many small read or write into
 	/// much bigger ones. This in only when there is no compression that
 	/// that this class is useful (and used).
 	/// \ingroup Private

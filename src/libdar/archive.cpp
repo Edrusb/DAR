@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.cpp,v 1.40.2.7 2008/02/09 17:41:28 edrusb Rel $
+// $Id: archive.cpp,v 1.40.2.9 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -308,7 +308,7 @@ namespace libdar
 		    ref_cat1 = ref_arch1->cat;
 		    ref_cat2 = ref_arch2->cat;
 		    if(ref_arch1->ver.algo_zip != ref_arch2->ver.algo_zip && char2compression(ref_arch1->ver.algo_zip) != none && char2compression(ref_arch2->ver.algo_zip) != none && keep_compressed)
-			throw Efeature(gettext("the \"Keep file compressed\" feature is not possible when merging two archives using different compression algorithms (This is for a future version of dar). You can still merge theses two archives but without keeping file compressed (thus you will probably like to use compression (-z or -y options) for the resulting archive"));
+			throw Efeature(gettext("the \"Keep file compressed\" feature is not possible when merging two archives using different compression algorithms (This is for a future version of dar). You can still merge these two archives but without keeping file compressed (thus you will probably like to use compression (-z or -y options) for the resulting archive"));
 		}
 
 	    if(keep_compressed)
@@ -404,7 +404,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: archive.cpp,v 1.40.2.7 2008/02/09 17:41:28 edrusb Rel $";
+        static char id[]="$Id: archive.cpp,v 1.40.2.9 2009/04/07 08:45:29 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -527,7 +527,7 @@ namespace libdar
                     dialog.printf(gettext("Archive version format               : %s\n"), get_header().edition);
                     dialog.printf(gettext("Compression algorithm used           : %S\n"), &algo);
                     dialog.printf(gettext("Scrambling or strong encryption used : %s\n"), ((get_header().flag & VERSION_FLAG_SCRAMBLED) != 0 ? gettext("yes") : gettext("no")));
-                    dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
+                    dialog.printf(gettext("Archive contents size in archive     : %i bytes\n"), &cat_size);
                         // the following field is no more used (lack of pertinence, when included files are used).
                         // dialog.printf(gettext("Command line options used for backup : %S\n"), &(get_header().cmd_line));
 

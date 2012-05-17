@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.hpp,v 1.10.4.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: zapette.hpp,v 1.10.4.2 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -30,7 +30,7 @@
     /// - zapette is the dar side master class
     /// - slave_zapette dar_slave side
     /// .
-    /// theses two classes communicate throw a pair pipes
+    /// these two classes communicate throw a pair pipes
 
 #ifndef ZAPETTE_HPP
 #define ZAPETTE_HPP

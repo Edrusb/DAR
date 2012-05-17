@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.hpp,v 1.9 2006/01/08 16:33:42 edrusb Rel $
+// $Id: header.hpp,v 1.9.2.1 2009/01/24 16:01:16 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -43,6 +43,7 @@ namespace libdar
     const char FLAG_TERMINAL = 'T';
     const char EXTENSION_NO = 'N';
     const char EXTENSION_SIZE = 'S';
+    const char EXTENSION_TLV = 'T';
 
     const U_32 SAUV_MAGIC_NUMBER = 123;
 

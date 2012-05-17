@@ -10,6 +10,8 @@
 
 
 
+
+
   <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -84,6 +86,7 @@ cannot dar use the full power of my multi-processor computer?</a><br>
       <a href="#threadsafe">Is libdar thread-safe, which way you mean it is?</a></span><br>
       <a style="font-weight: bold; font-style: italic;" href="#How_to_solve_configure:_error:_Cannot">How to solve "configure: error: Cannot find size_t type"?</a><br><a style="font-weight: bold; font-style: italic;" href="#search_for_questions">
 How to search for questions (and their answers) about <span style="font-weight: bold; font-style: italic;">known</span> problems similar to mines?</a><br>
+      <a style="font-style: italic; font-weight: bold;" href="#open_failed_excluded">Why dar tells me that he failed to open a directory, while I have excluded this directory?</a><br>
       <span style="font-weight: bold; font-style: italic;"><br>
       <br>
       </span>
@@ -1173,7 +1176,25 @@ Follow for each command the available options (those marked OK):<br>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
       <td style="text-align: center; vertical-align: middle;">--</td>
+    </tr><tr>
+      <td style="vertical-align: top;">-q<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">OK<br>
+      </td>
     </tr>
+
   </tbody>
 </table>
 <br>
@@ -1684,9 +1705,40 @@ development.<br>
 But yes, there is now tones of emails to read to have a chance to find the answer to your problem. Hopefully, there is a <a href="http://news.gmane.org/gmane.comp.sysutils.backup.dar.support">search engine at gmane</a> (see the dark green area at the bottom of the page).<br>
       <br>
 This search engine is available for <a href="http://news.gmane.org/index.php?prefix=gmane.comp.sysutils.backup.dar">all the mailing list archived at gmane</a> used around dar.<br>
+      <br>
+</div><a name="open_failed_excluded"></a><span style="font-style: italic; font-weight: bold;">Why dar tells me that he failed to open a directory, while I have excluded this directory?</span><br>
+      <br>
+      <div style="margin-left: 40px;">Reading the contents of a
+directory is done using the usual system call
+(opendir/readdir/closedir). The first call (opendir) let dar design
+which directory to inspect, the dar call readdir to get the next entry
+in the opened directory. Once nothing has to be read, closedir is
+called. The problem here is that dar cannot start reading a directory
+do some treatment and start reading another directory. In brief, the
+opendir/readdir/closedir system call are not re-entrant. <br>
+      <br>
+This is in particular critical for dar as it does a depth lookup in the
+directory tree. In other words, from the root if we have two
+directories A and B, dar reads A's contents, the contents of its
+subdirectories, then once finished, it read the next entry of the root
+directory (which is B), then read the contents of B and then of each of
+its subdirectories, then once finished for B, it must go back to the
+root again, and read the next entry. In the meanwhile dar had to open
+many directories to get their contents.<br>
+      <br>
+For this reason dar caches the directory contents (when it first meet a
+directory, it read its whole content and stores it in the RAM). This is
+only after, that dar decide whether to include or not a given
+directory. But at this point then, its contents has already been read
+thus you may get the message that dar failed to read a given directory
+contents, while you explicitly specify not to include that particular
+directory in the backup.<br>
+      </div>
+      <div style="margin-left: 40px;">
 <br>
 
       </div>
+
 
 
       </td>

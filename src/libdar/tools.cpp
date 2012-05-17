@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.16 2008/05/09 20:58:27 edrusb Rel $
+// $Id: tools.cpp,v 1.54.2.18 2009/05/09 21:15:56 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -276,7 +276,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.54.2.16 2008/05/09 20:58:27 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.54.2.18 2009/05/09 21:15:56 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1300,7 +1300,7 @@ namespace libdar
 		try
 		{
 		    if(warn_overwriting)
-			dialog.pause(tools_printf(gettext("At least one slice of an old archive with the same basename remains in the directory %s , If you do not remove theses all first, you will have difficulty identifying the last slice of the archive you are about to create, because it may be hidden in between slices of this older archive. Do we remove the old archive's slices first ?"), c_chemin.c_str()));
+			dialog.pause(tools_printf(gettext("At least one slice of an old archive with the same basename remains in the directory %s , If you do not remove these all first, you will have difficulty identifying the last slice of the archive you are about to create, because it may be hidden in between slices of this older archive. Do we remove the old archive's slices first ?"), c_chemin.c_str()));
 		    if(!dry_run)
 			tools_unlink_file_mask(dialog, c_chemin, file_mask, info_details);
 		}
@@ -1514,10 +1514,10 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    delete tmp;
+	    delete [] tmp;
 	    throw;
 	}
-	delete tmp;
+	delete [] tmp;
 
 	return ret;
     }

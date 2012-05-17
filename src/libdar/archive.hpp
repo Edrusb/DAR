@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.hpp,v 1.32.2.1 2007/04/05 18:58:36 edrusb Rel $
+// $Id: archive.hpp,v 1.32.2.2 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -43,7 +43,7 @@ namespace libdar
 
 	/// the archive class realizes the most general operations on archives
 
-	/// the operations corresponds to the one the final user expects, theses
+	/// the operations corresponds to the one the final user expects, these
 	/// are the same abstraction level as the operation realized by the DAR
 	/// command line tool.
 	/// \ingroup API

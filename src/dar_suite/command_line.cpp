@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.76.2.6 2008/02/09 17:41:27 edrusb Rel $
+// $Id: command_line.cpp,v 1.76.2.8 2009/05/09 21:15:56 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -80,7 +80,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "mask_list.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::kR:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::kR:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
@@ -189,7 +189,8 @@ static bool get_args_recursive(user_interaction & dialog,
 			       bool & glob_mode,
 			       bool & keep_compressed,
 			       bool & fixed_date_mode,
-			       infinint & fixed_date);
+			       infinint & fixed_date,
+			       bool & quiet);
 
 static void make_args_from_file(user_interaction & dialog,
                                 operation op, const char *filename, S_I & argc,
@@ -256,7 +257,8 @@ static bool update_with_config_files(user_interaction & dialog,
 				     bool & glob_mode,
 				     bool & keep_compressed,
 				     bool & fixed_date_mode,
-				     infinint & fixed_date);
+				     infinint & fixed_date,
+				     bool & quiet);
 
 static mask *make_include_exclude_name(const string & x, mask_opt opt);
 static mask *make_exclude_path_ordered(const string & x, mask_opt opt);
@@ -313,7 +315,8 @@ bool get_args(user_interaction & dialog,
 	      string & aux_execute,
 	      U_32 & aux_crypto_size,
 	      bool & keep_compressed,
-	      infinint & fixed_date)
+	      infinint & fixed_date,
+	      bool & quiet)
 {
     op = noop;
     fs_root = NULL;
@@ -374,6 +377,7 @@ bool get_args(user_interaction & dialog,
     aux_crypto_size = DEFAULT_CRYPTO_SIZE;
     keep_compressed = false;
     fixed_date = 0;
+    quiet = false;
 
     bool readconfig = true;
     U_I suffix_base = TOOLS_BIN_SUFFIX;
@@ -435,7 +439,8 @@ bool get_args(user_interaction & dialog,
 				   glob_mode,
 				   keep_compressed,
 				   fixed_date_mode,
-				   fixed_date))
+				   fixed_date,
+				   quiet))
                 return false;
 
                 // checking and updating options with configuration file if any
@@ -489,7 +494,8 @@ bool get_args(user_interaction & dialog,
 					      glob_mode,
 					      keep_compressed,
 					      fixed_date_mode,
-					      fixed_date))
+					      fixed_date,
+					      quiet))
                     return false;
 
                 // some sanity checks
@@ -812,7 +818,8 @@ static bool get_args_recursive(user_interaction & dialog,
 			       bool & glob_mode,
 			       bool & keep_compressed,
 			       bool & fixed_date_mode,
-			       infinint & fixed_date)
+			       infinint & fixed_date,
+			       bool & quiet)
 {
     S_I lu;
     S_I rec_c;
@@ -1287,7 +1294,8 @@ static bool get_args_recursive(user_interaction & dialog,
 						 glob_mode,
 						 keep_compressed,
 						 fixed_date_mode,
-						 fixed_date);
+						 fixed_date,
+						 quiet);
                         inclusions.pop_back();
                     }
                     catch(...)
@@ -1527,6 +1535,9 @@ static bool get_args_recursive(user_interaction & dialog,
                 else
                     aux_crypto_size = (U_32)tmp;
                 break;
+	    case 'q':
+		quiet = true;
+		break;
             case '?':
                 dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"),char(optopt)));
                 break;
@@ -1555,7 +1566,7 @@ static void usage(user_interaction & dialog, const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.76.2.6 2008/02/09 17:41:27 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.76.2.8 2009/05/09 21:15:56 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -2004,6 +2015,7 @@ static const struct option *get_long_opt()
 	{"aux-key", required_argument, NULL, '$'},
 	{"aux-execute", required_argument, NULL, '~'},
 	{"aux-crypto-block", required_argument, NULL, '%'},
+	{"quiet", no_argument, NULL, 'q'},
         { NULL, 0, NULL, 0 }
     };
 
@@ -2143,8 +2155,8 @@ static void destroy(S_I argc, char **argv)
 {
     register S_I i = 0;
     for(i = 0; i < argc; ++i)
-        delete argv[i];
-    delete argv;
+        delete [] argv[i];
+    delete [] argv;
 }
 
 static void skip_getopt(S_I argc, char *argv[], S_I next_to_read)
@@ -2229,7 +2241,8 @@ static bool update_with_config_files(user_interaction & dialog,
 				     bool & glob_mode,
 				     bool & keep_compressed,
 				     bool & fixed_date_mode,
-				     infinint & fixed_date)
+				     infinint & fixed_date,
+				     bool & quiet)
 {
     const unsigned int len = strlen(home);
     const unsigned int delta = 20;
@@ -2311,7 +2324,8 @@ static bool update_with_config_files(user_interaction & dialog,
 					glob_mode,
 					keep_compressed,
 					fixed_date_mode,
-					fixed_date))
+					fixed_date,
+					quiet))
                     retour = syntax;
                 else
                     retour = ok;
@@ -2406,7 +2420,8 @@ static bool update_with_config_files(user_interaction & dialog,
 					    glob_mode,
 					    keep_compressed,
 					    fixed_date_mode,
-					    fixed_date))
+					    fixed_date,
+					    quiet))
                         retour = syntax;
                     else
                         retour = ok;
@@ -2428,10 +2443,10 @@ static bool update_with_config_files(user_interaction & dialog,
     }
     catch(...)
     {
-        delete buffer;
+        delete [] buffer;
         throw;
     }
-    delete buffer;
+    delete [] buffer;
 
     return retour != syntax;
 }

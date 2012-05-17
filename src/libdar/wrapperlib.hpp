@@ -18,12 +18,12 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: wrapperlib.hpp,v 1.9.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: wrapperlib.hpp,v 1.9.2.2 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 
     /// \file wrapperlib.hpp
-    /// \brief libz and libbz2 wrapper to have identical interface to theses libraries.
+    /// \brief libz and libbz2 wrapper to have identical interface to these libraries.
     ///
     /// libz and libbz2 library differ in several in the way they return values
     /// in certain circumpstances. This module defines the wrapperlib class

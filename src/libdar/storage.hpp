@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.hpp,v 1.11.4.2 2008/02/09 17:41:30 edrusb Rel $
+// $Id: storage.hpp,v 1.11.4.3 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -166,7 +166,7 @@ namespace libdar
         bool read(iterator & it, unsigned char &a) const
             { E_BEGIN; return read(it, &a, 1) == 1; E_END("storage::read", "unsigned char"); };
 
-            // after one of theses 3 calls, the iterator given in argument are undefined (they may point nowhere)
+            // after one of these 3 calls, the iterator given in argument are undefined (they may point nowhere)
         void insert_null_bytes_at_iterator(iterator it, U_I size);
         void insert_const_bytes_at_iterator(iterator it, unsigned char a, U_I size);
         void insert_bytes_at_iterator(iterator it, unsigned char *a, U_I size);

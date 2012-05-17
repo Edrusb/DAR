@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.hpp,v 1.12.4.2 2007/07/22 16:34:59 edrusb Rel $
+// $Id: compressor.hpp,v 1.12.4.3 2009/05/14 17:33:39 edrusb Rel $
 //
 /*********************************************************************/
     /// \file compressor.hpp
@@ -60,9 +60,11 @@ namespace libdar
         compressor(user_interaction & dialog, compression algo, generic_file & compressed_side, U_I compression_level = 9);
             // compressed_side is not owned by the object and will remains
             // after the objet destruction
+
         compressor(user_interaction & dialog, compression algo, generic_file *compressed_side, U_I compression_level = 9);
             // compressed_side is owned by the object and will be
             // deleted a destructor time
+
         ~compressor();
 
         void flush_write(); // flush all data to compressed_side, and reset the compressor

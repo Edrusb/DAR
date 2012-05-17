@@ -18,11 +18,20 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: macro_tools.cpp,v 1.25.2.4 2008/05/09 20:58:27 edrusb Rel $
+// $Id: macro_tools.cpp,v 1.25.2.5 2009/04/14 20:20:45 edrusb Rel $
 //
 /*********************************************************************/
 
+
 #include "../my_config.h"
+
+extern "C"
+{
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+} // end extern "C"
+
 #include "macro_tools.hpp"
 #include "terminateur.hpp"
 #include "user_interaction.hpp"
@@ -244,7 +253,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: macro_tools.cpp,v 1.25.2.4 2008/05/09 20:58:27 edrusb Rel $";
+        static char id[]="$Id: macro_tools.cpp,v 1.25.2.5 2009/04/14 20:20:45 edrusb Rel $";
         dummy_call(id);
     }
 

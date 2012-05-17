@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.40.2.10 2008/02/09 17:41:29 edrusb Rel $
+// $Id: filtre.cpp,v 1.40.2.11 2009/05/01 16:11:20 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -688,7 +688,10 @@ namespace libdar
                                                 dialog.warning(string(gettext("OK   "))+juillet.get_string());
                                             st.incr_treated();
 					    if(!alter_atime)
-						restore_atime(juillet.get_string(), e_ino);
+					    {
+						const inode * tmp_exists = const_cast<const inode *>(exists);
+						restore_atime(juillet.get_string(), tmp_exists);
+					    }
                                         }
                                         catch(Erange & e)
                                         {
@@ -703,7 +706,10 @@ namespace libdar
 
                                             st.incr_errored();
 					    if(!alter_atime)
-						restore_atime(juillet.get_string(), e_ino);
+					    {
+						const inode * tmp_exists = const_cast<const inode *>(exists);
+						restore_atime(juillet.get_string(), tmp_exists);
+					    }
                                         }
                                     }
                                     else // existing file is not an inode
@@ -1291,7 +1297,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.40.2.10 2008/02/09 17:41:29 edrusb Rel $";
+        static char id[]="$Id: filtre.cpp,v 1.40.2.11 2009/05/01 16:11:20 edrusb Rel $";
         dummy_call(id);
     }
 

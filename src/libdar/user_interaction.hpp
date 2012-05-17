@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.hpp,v 1.18.2.2 2008/02/09 11:14:39 edrusb Rel $
+// $Id: user_interaction.hpp,v 1.18.2.3 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -85,7 +85,7 @@ namespace libdar
 	//! own class, and/or read good C++ book about canonical form
 	//! of a C++ class, as well as how to properly make an inherited class.
 	//! And don't, complain if libdar segfault or core dumps. Libdar
-	//! *needs* to make local copies of theses objects, if the copy constructor
+	//! *needs* to make local copies of these objects, if the copy constructor
 	//!  is not properly defined in your inherited class this will crash the application.
 	//! \ingroup API
     class user_interaction

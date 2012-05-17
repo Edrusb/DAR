@@ -15,7 +15,7 @@ if [ "$1" = "" -a "$2" = "" -a "$3" = "" -a "$4" = "" -a "$6" = "" ]; then
 fi
 
 
-let toto=$3%$6
+toto=$(( $3%$6 ))
 if [ $toto -eq 0 ] ; then
   echo "Pausing after slice $3"
   echo "Press return to continue"

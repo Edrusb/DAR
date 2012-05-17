@@ -568,3 +568,22 @@ from 2.3.7 to 2.3.8
 - avoided warning to appear without -v option set, when an error is met while
   fetching value of nodump flag (flag not supported on filesystem for example).
 
+from 2.3.8 to 2.3.9
+- fixed bashism in doc/examples/pause_every_n_slice.duc sample script
+   [SF 2020090]
+- added Jason Lewis's script "dar_backups.sh" which is an enhanced version
+  of n the script done by Roi Rodriguez Mendez & Mauro Silvosa Rivera.
+- added message asking software upgrade to handle case when new archive format
+  (used by dar >= 2.4.0) is provided to dar
+- very little optimization of the reading process of EA
+- updated FAQ
+- replaced "Catalogue" by "Archive Contents" in output message (-l -v).
+- added Sergey Feo's patch to dar_par.dcf
+- added check against stddef.h header file presence in configure script
+- fixed spelling
+- added Charles's Script in doc/sample
+- added -q option to dar
+- added licensing exception to allow distribution of dar beside OpenSSL library
+- Bug fix: during archive diff (only), dar restore atime of file in the backup
+  instead of file in the system before opening it for reading.
+- tested dar with valgrind

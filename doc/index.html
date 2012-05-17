@@ -3,20 +3,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;"><img style="width: 320px; height: 240px;" alt="DAR's Documentation" src="dar_doc.jpg"><br>
@@ -274,8 +260,10 @@ still uses DAR for his remote backup. <br>
 compile dar from source <span style="font-weight: bold;">you need at
 least</span>:<br>
       <ol>
-        <li>C++ compiler (tested done with <a href="http://gcc.gnu.org/">gcc</a>-3, but other version and
-compiler should work)</li>
+        <li>C++ compiler (tested done with <a href="http://gcc.gnu.org/">gcc</a>-3.x,
+but other version and
+compiler should work. <span style="font-weight: bold; text-decoration: underline;">Note:</span>&nbsp; gcc-3.3.x has a bug that avoids it to compile dar starting dar-2.3.7, more precisely generated objects miss some symbols
+and cannot be linked together [<a href="https://sourceforge.net/tracker/index.php?func=detail&amp;aid=1890720&amp;group_id=65612&amp;atid=511612">SF 1890720</a>]). To compile dar-2.3.8 and above you need at least gcc-3.4.x</li>
         <li>make (tested with <a href="http://www.gnu.org/software/make/">gnu make</a>)</li>
       </ol>
       <br>
@@ -366,7 +354,7 @@ files will go in /usr/{bin | lib | ... }).<br>
       </div>
 
       </div>
-      
+
       </td>
     </tr>
   </tbody>
@@ -573,7 +561,7 @@ options support thanks to the gnu getopt_long() call, this can be
 disabled.<br>
       </td>
     </tr>
-    
+
     <tr>
       <td style="vertical-align: top; text-align: right; width: 33%;">--disable-thread-safe<br>
       </td>
@@ -1522,9 +1510,8 @@ version<br>
       </td>
     </tr><tr>
       <td style="vertical-align: top;">
-      <div style="text-align: right;">June 20th,<br>
-      </div>
-      <div style="text-align: right;">2008<br>
+      
+      <div style="text-align: right;">June 20th, 2008<br>
       </div>
       </td>
       <td style="vertical-align: top; text-align: center;">2.3.8<br>
@@ -1541,7 +1528,25 @@ version<br>
       </td>
       <td style="vertical-align: top; text-align: center;">1.2.2<br>
       </td>
+    </tr><tr>
+      <td style="vertical-align: top; text-align: right;">May 22nd, 2009<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">2.3.9<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">07<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">4.4.4<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.4.2<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.3.4<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.4.3<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;">1.2.2<br>
+      </td>
     </tr>
+
 
 
 
@@ -1611,9 +1616,6 @@ And
 Rotate Automatic Backups - by Tristan Rhodes. SaraB works with DAR to
 schedule and rotate backups. Supports the Towers of Hanoi,
 Grandfather-Father-Son, or any custom backup rotation strategy.</li>
-        <li style="text-align: justify;"><a href="http://trac.bzzzrk.org/bzzzrk/bzsarab">bzSaraB</a> is a merge
-from SaraB and bzbackup<br>
-        </li>
         <li style="text-align: justify;"><a href="http://lazybackup.sourceforge.net/">Lazy Backup</a> by Daniel
 Johnson. Lazy Backup is intended to be so easy even lazy people will do
 their backups</li>
@@ -1626,7 +1628,12 @@ backup (Thanks to Tristan Rhodes for informing about this project)</li>
 Marasco it a rewriting in Perl of SaraB.</li>
         <li style="text-align: justify;"><a href="http://darbinding.sourceforge.net/">Python Bindings</a> by
 Wesley Leggette</li>
-        <li style="text-align: justify;"><a href="http://www.xsteve.at/prg/index.html">Disk archive interface for Emacs</a> by <a href="http://www.xsteve.at/">Stefan Reich&ouml;r</a></li>
+        <li style="text-align: justify;"><a href="http://www.xsteve.at/prg/emacs/dar.html">Disk archive interface for Emacs</a> by <a href="http://www.xsteve.at/">Stefan Reich&ouml;r</a></li>
+        <li style="text-align: justify;"><a href="http://dargui.sourceforge.net/">DarGUI</a> by Malcolm Poole is a front-end to dar providing simple and graphical access to the main features of dar.</li>
+        <li style="text-align: justify;"><a href="http://www.artica.fr/">Artica</a> for Postfix by David Touzeau is a full Postfix Management console. It relies on dar for its integrated backups.<br>
+        </li>
+
+
 
       </ul>
       <div style="text-align: justify;">If I have forgotten or am not
@@ -1658,7 +1665,7 @@ eXecutables</a> home page </li>
 home page</li>
           <li><a href="http://www.gnu.org/software/make/">Gnu Make</a>
 home page</li>
-          <li><a href="http://gcc.gnu.org/">CGG</a> home page<br>
+          <li><a href="http://gcc.gnu.org/">GCC</a> home page<br>
           </li>
         </ul>
       </blockquote>
@@ -1832,7 +1839,7 @@ file do the following after having retrieved sources from CVS:<br>
       <span style="font-family: monospace;">misc/clean_dates<br>
       <br>
       </span></div>
-Also take the time to read the file named "USING_SOURCE_FROM_CVS"<br>
+Also take the time to read the file named "USING_SOURCE_FROM_CVS" located at the root of the directory tree you got from CVS.<br>
       <br>
 </td>
     </tr>

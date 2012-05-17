@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.cpp,v 1.13.2.1 2007/07/27 11:27:31 edrusb Rel $
+// $Id: ea.cpp,v 1.13.2.2 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -29,7 +29,7 @@
 #include "tools.hpp"
 #include "integers.hpp"
 
-// theses MACRO are used only when dumping in file (obsolete since archive format "05")
+// these MACRO are used only when dumping in file (obsolete since archive format "05")
 #define EA_ROOT 0x80
 #define EA_DEL 0x40
 #define EA_DEFAULT_USER_INSERT 0x00
@@ -99,7 +99,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea.cpp,v 1.13.2.1 2007/07/27 11:27:31 edrusb Rel $";
+        static char id[]="$Id: ea.cpp,v 1.13.2.2 2009/04/07 08:45:29 edrusb Rel $";
         dummy_call(id);
     }
 

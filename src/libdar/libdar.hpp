@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.hpp,v 1.53.2.10 2008/06/20 10:33:20 edrusb Rel $
+// $Id: libdar.hpp,v 1.53.2.12 2009/05/21 16:50:18 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -124,7 +124,7 @@ namespace libdar
 	///  libdar Medium version defined at compilation time
     const U_I LIBDAR_COMPILE_TIME_MEDIUM = 4;
 	///  libdar Minor version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MINOR = 3;
+    const U_I LIBDAR_COMPILE_TIME_MINOR = 4;
 
 	////////////////////////////////////////////////////////////////////////
 	// LIBDAR INITIALIZATION METHODS                                      //
@@ -191,9 +191,9 @@ namespace libdar
 
 	//////////
 	// WRAPPER FUNCTIONS AROUND archive class methods to trap exceptions and convert them in error code and message
-	// theses are intended for C program/programmers not enough confident with C++.
+	// these are intended for C program/programmers not enough confident with C++.
 	//
-	// FOR LIBDAR C++ APPLICATIONS, YOU WOULD RATHER USE THE archive C++ CLASS THAN THESES FOLLOWING WRAPPERS
+	// FOR LIBDAR C++ APPLICATIONS, YOU WOULD RATHER USE THE archive C++ CLASS THAN THESE FOLLOWING WRAPPERS
 	//
 	//////////
 

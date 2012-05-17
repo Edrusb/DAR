@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.37.2.4 2008/02/09 17:41:29 edrusb Rel $
+// $Id: sar.cpp,v 1.37.2.5 2009/01/24 16:01:16 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -274,7 +274,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.37.2.4 2008/02/09 17:41:29 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.37.2.5 2009/01/24 16:01:16 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -455,10 +455,15 @@ namespace libdar
 	    {
 		throw;
 	    }
+	    catch(Efeature & e)
+	    {
+		throw;
+	    }
             catch(Egeneric & e)
             {
                 close_file();
-		get_gf_ui().pause(tools_printf(gettext("%s has a bad or corrupted header, please provide the correct file."), fic));
+		string tmp = e.get_message();
+		get_gf_ui().pause(tools_printf(gettext("A problem occurred while opening header of file %s: %S. Try again?"), fic, &tmp));
                 continue;
             }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea_filesystem.cpp,v 1.19.2.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: ea_filesystem.cpp,v 1.19.2.2 2009/02/06 20:25:09 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -224,26 +224,35 @@ namespace libdar
 		if(taille < 0)
 		    throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
 								       a_name, n_ptr, strerror(errno)));
-		value = new char[taille+MARGIN];
-		if(value == NULL)
-		    throw Ememory("filesystem : read_ea_from");
-		try
+		if(taille > 0)
 		{
-		    taille = my_lgetxattr(n_ptr, a_name, value, taille+MARGIN);
-			// if the previous call overflows the buffer this may need to SEGFAULT and so on.
-		    if(taille < 0)
-			throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
-									   a_name, n_ptr, strerror(errno)));
+		    value = new char[taille+MARGIN];
+		    if(value == NULL)
+			throw Ememory("filesystem : read_ea_from");
+		    try
+		    {
+			taille = my_lgetxattr(n_ptr, a_name, value, taille+MARGIN);
+			    // if the previous call overflows the buffer this may leed to SEGFAULT and so on.
+			if(taille < 0)
+			    throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
+									       a_name, n_ptr, strerror(errno)));
+			ea_ent.key = *it;
+			ea_ent.value = string((char *)value, (char *)value+taille);
+			val.add(ea_ent);
+		    }
+		    catch(...)
+		    {
+			delete [] value;
+			throw;
+		    }
+		    delete [] value;
+		}
+		else // trivial case where the value has a length of zero
+		{
 		    ea_ent.key = *it;
-		    ea_ent.value = string((char *)value, (char *)value+taille);
+		    ea_ent.value = string("");
 		    val.add(ea_ent);
 		}
-		catch(...)
-		{
-		    delete [] value;
-		    throw;
-		}
-		delete [] value;
 	    }
 	    it++;
 	}
@@ -251,7 +260,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea_filesystem.cpp,v 1.19.2.1 2007/07/22 16:34:59 edrusb Rel $";
+        static char id[]="$Id: ea_filesystem.cpp,v 1.19.2.2 2009/02/06 20:25:09 edrusb Rel $";
         dummy_call(id);
     }
 

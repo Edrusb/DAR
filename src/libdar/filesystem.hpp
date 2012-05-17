@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.22.2.2 2007/02/23 20:52:44 edrusb Rel $
+// $Id: filesystem.hpp,v 1.22.2.3 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -235,7 +235,7 @@ namespace libdar
 	void detruire();
     };
 
-	/// receive the flow of inode from the restoration filtering routing and promotes theses to real filesystem objects
+	/// receive the flow of inode from the restoration filtering routing and promotes these to real filesystem objects
     class filesystem_restore : public filesystem_hard_link_write, public filesystem_hard_link_read
     {
     public:

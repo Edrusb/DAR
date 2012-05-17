@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.16.2.3 2007/07/22 16:34:59 edrusb Rel $
+// $Id: compressor.cpp,v 1.16.2.4 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -64,7 +64,7 @@ namespace libdar
 
     void compressor::init(compression algo, generic_file *compressed_side, U_I compression_level)
     {
-            // theses are eventually overwritten below
+            // these are eventually overwritten below
         wrapperlib_mode wr_mode = zlib_mode;
         current_algo = algo;
 	current_level = compression_level;
@@ -365,7 +365,7 @@ namespace libdar
         if(decompr != NULL) // zlib
             if(decompr->wrap.decompressReset() != WR_OK)
                 throw SRC_BUG;
-            // keep in the buffer the bytes already read, theses are discarded in case of a call to skip
+            // keep in the buffer the bytes already read, these are discarded in case of a call to skip
     }
 
     void compressor::clean_read()
@@ -376,7 +376,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: compressor.cpp,v 1.16.2.3 2007/07/22 16:34:59 edrusb Rel $";
+        static char id[]="$Id: compressor.cpp,v 1.16.2.4 2009/04/07 08:45:29 edrusb Rel $";
         dummy_call(id);
     }
 

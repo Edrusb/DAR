@@ -14,3 +14,7 @@ test:
 
 # note, that you may need to set the path to dar_par_test.duc
 # and dar_par_create.duc
+
+# fix from Sergey Feo
+default:
+-E "echo Warning: dar_par.dcf will not be used in this operation. Please review command line options. -c or -t should be used before -B ...dar_par.dcf"

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.19.2.2 2007/07/22 16:35:00 edrusb Rel $
+// $Id: real_infinint.cpp,v 1.19.2.4 2009/04/07 08:45:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -160,7 +160,7 @@ namespace libdar
             last_width = 0x80 >> (pos_s - 1);
         }
 
-            // now we write the preamble except the last byte. All theses are zeros.
+            // now we write the preamble except the last byte. All these are zeros.
 
         tmp = 0;
         unsigned char u = 0x00;
@@ -175,7 +175,7 @@ namespace libdar
         }
         while(tmp > 0);
 
-            // now we write the last byte of the preambule, which as only one bit set
+            // now we write the last byte of the preambule, which has only one bit set
 
         if(x.write((char *)&last_width, 1) < 1)
             throw Erange("infinint::dump(generic_file)", gettext("Cannot write data to file"));
@@ -686,7 +686,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: real_infinint.cpp,v 1.19.2.2 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: real_infinint.cpp,v 1.19.2.4 2009/04/07 08:45:29 edrusb Rel $";
         dummy_call(id);
     }
 
