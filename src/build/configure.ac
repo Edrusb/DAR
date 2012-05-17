@@ -537,7 +537,7 @@ AC_CONFIG_COMMANDS([hack-libtool], [
 ])
 
 
-AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile po/Makefile.in po/Makefile doc/mini-howto/Makefile src/libdar/libdar.pc.tmpl doc/man/Makefile])
+AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile doc/mini-howto/Makefile src/libdar/libdar.pc.tmpl doc/man/Makefile])
 AC_OUTPUT
 [echo ""
 echo "--"

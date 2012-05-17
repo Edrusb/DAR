@@ -1,0 +1,11 @@
+#!/bin/tcsh -f
+
+set target = POTFILES.in
+
+cat > $target <<EOF
+# List of source files containing translatable strings.
+# Copyright (C) 1995 Free Software Foundation, Inc.
+
+EOF
+
+find .. -type f \( -name "*.?pp" -o -name "*.usage" \) -print | sed -e "s%../%%" >> $target
