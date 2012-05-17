@@ -40,8 +40,12 @@ lib_LTLIBRARIES = $(MYLIB)
 
 LIBDAR_MAJOR=`grep LIBDAR_COMPILE_TIME_MAJOR libdar.hpp | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -e 's% %%g'`
 LIBDAR_MEDIUM=`grep LIBDAR_COMPILE_TIME_MEDIUM libdar.hpp | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -e 's% %%g'`
+LIBDAR_MEDIUM_000=`grep LIBDAR_COMPILE_TIME_MEDIUM libdar.hpp | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -r -e 's% %%g' -e 's%([^0-9]|^)([0-9]{1})([^0-9]|$$)%0\2%' -e 's%([^0-9]|^)([0-9]{2})([^0-9]|$$)%0\2%'`
 LIBDAR_MINOR=`grep LIBDAR_COMPILE_TIME_MINOR libdar.hpp | cut -f 2 -d "=" | cut -f 1 -d ';' | sed -e 's% %%g'`
-LIBDAR_VERSION_IN=$(LIBDAR_MAJOR):$(LIBDAR_MINOR)
+LIBDAR_LIBTOOL_CURRENT=$(LIBDAR_MAJOR)$(LIBDAR_MEDIUM_000)
+LIBDAR_LIBTOOL_REVISION=$(LIBDAR_MINOR)
+LIBDAR_LIBTOOL_AGE=$(LIBDAR_MEDIUM)
+LIBDAR_VERSION_IN=$(LIBDAR_LIBTOOL_CURRENT):$(LIBDAR_LIBTOOL_REVISION):$(LIBDAR_LIBTOOL_AGE)
 LIBDAR_VERSION_OUT=$(LIBDAR_MAJOR).$(LIBDAR_MEDIUM).$(LIBDAR_MINOR)
 
 # header files required by external applications and that must be installed (make install)

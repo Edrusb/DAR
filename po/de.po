@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2012-02-26 15:43+0100\n"
+"POT-Creation-Date: 2012-03-16 12:05+0100\n"
 "PO-Revision-Date: 2011-07-21 16:13+0200\n"
 "Last-Translator: Markus Kamp <mk_cactus@gmx.de>\n"
 "Language-Team: Deutsch\n"
@@ -3084,28 +3084,28 @@ msgstr "Dateiende erreicht, bevor alle Daten gelesen werden konnten"
 msgid "Unexpected value found in database"
 msgstr "Nicht vorhandene Datei in derDatenbank"
 
-#: src/libdar/data_tree.cpp:612
+#: src/libdar/data_tree.cpp:613
 #, c-format
 msgid ""
 "Archive number |  Data                   | status ||  EA                     "
 "| status \n"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:613
+#: src/libdar/data_tree.cpp:614
 #, c-format
 msgid ""
 "---------------+-------------------------+--------++-------------------------"
 "+----------\n"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:806
+#: src/libdar/data_tree.cpp:807
 #, c-format
 msgid ""
 "Dates of file's %S are not increasing when database's archive number grows. "
 "Concerned file is: %S"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:809
+#: src/libdar/data_tree.cpp:810
 msgid ""
 "Dates are not increasing for all files when database's archive number grows, "
 "working with this database may lead to improper file's restored version. "
@@ -3114,46 +3114,46 @@ msgid ""
 "the database"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:812
+#: src/libdar/data_tree.cpp:813
 msgid "Do you want to ignore the same type of error for other files?"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:849
+#: src/libdar/data_tree.cpp:850
 msgid "Unexpected end of file"
 msgstr "Unerwartetes Dateiende"
 
-#: src/libdar/data_tree.cpp:1134
+#: src/libdar/data_tree.cpp:1135
 #, fuzzy
 msgid "[ Saved ]"
 msgstr "[Gespeichert]"
 
-#: src/libdar/data_tree.cpp:1136 src/libdar/data_tree.cpp:1141
+#: src/libdar/data_tree.cpp:1137 src/libdar/data_tree.cpp:1142
 #, fuzzy
 msgid "[       ]"
 msgstr "[     ENTFERNT       ]"
 
-#: src/libdar/data_tree.cpp:1139
+#: src/libdar/data_tree.cpp:1140
 msgid "[  EA   ]"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1347
+#: src/libdar/data_tree.cpp:1348
 msgid "Unknown record type"
 msgstr "Datenbankeintrag unbekannt"
 
-#: src/libdar/data_tree.cpp:1387
+#: src/libdar/data_tree.cpp:1388
 msgid "removed "
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1388
+#: src/libdar/data_tree.cpp:1389
 msgid "present "
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1389
+#: src/libdar/data_tree.cpp:1390
 #, fuzzy
 msgid "saved   "
 msgstr "[Gespeichert]"
 
-#: src/libdar/data_tree.cpp:1390
+#: src/libdar/data_tree.cpp:1391
 msgid "absent  "
 msgstr ""
 

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2012-02-26 15:43+0100\n"
+"POT-Creation-Date: 2012-03-16 12:05+0100\n"
 "PO-Revision-Date: 2011-07-21 16:13+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -3222,7 +3222,7 @@ msgstr "nådde filslut innan alla väntade data kunde läsas"
 msgid "Unexpected value found in database"
 msgstr "Oväntat värde hitta i databas"
 
-#: src/libdar/data_tree.cpp:612
+#: src/libdar/data_tree.cpp:613
 #, c-format
 msgid ""
 "Archive number |  Data                   | status ||  EA                     "
@@ -3231,14 +3231,14 @@ msgstr ""
 "Arkivnummer     |  Data                   | status ||  "
 "EA                     | status \n"
 
-#: src/libdar/data_tree.cpp:613
+#: src/libdar/data_tree.cpp:614
 #, fuzzy, c-format
 msgid ""
 "---------------+-------------------------+--------++-------------------------"
 "+----------\n"
 msgstr "--------------+-------------------------+-----------------------\n"
 
-#: src/libdar/data_tree.cpp:806
+#: src/libdar/data_tree.cpp:807
 #, c-format
 msgid ""
 "Dates of file's %S are not increasing when database's archive number grows. "
@@ -3246,7 +3246,7 @@ msgid ""
 msgstr ""
 "Fils datum %S ökar ej när databasens arkivnummer växer. Berörd fil är: %S"
 
-#: src/libdar/data_tree.cpp:809
+#: src/libdar/data_tree.cpp:810
 msgid ""
 "Dates are not increasing for all files when database's archive number grows, "
 "working with this database may lead to improper file's restored version. "
@@ -3259,43 +3259,43 @@ msgstr ""
 "fil. Ordna om arkivet inom databasen så att det äldsta är det första arkivet "
 "och det senaste är det sista i databasen"
 
-#: src/libdar/data_tree.cpp:812
+#: src/libdar/data_tree.cpp:813
 msgid "Do you want to ignore the same type of error for other files?"
 msgstr "Vill du ignorera samma feltyp för andra filer?"
 
-#: src/libdar/data_tree.cpp:849
+#: src/libdar/data_tree.cpp:850
 msgid "Unexpected end of file"
 msgstr "Oväntat filslut"
 
-#: src/libdar/data_tree.cpp:1134
+#: src/libdar/data_tree.cpp:1135
 msgid "[ Saved ]"
 msgstr "[ Sparad ]"
 
-#: src/libdar/data_tree.cpp:1136 src/libdar/data_tree.cpp:1141
+#: src/libdar/data_tree.cpp:1137 src/libdar/data_tree.cpp:1142
 msgid "[       ]"
 msgstr "[       ]"
 
-#: src/libdar/data_tree.cpp:1139
+#: src/libdar/data_tree.cpp:1140
 msgid "[  EA   ]"
 msgstr "[  EA   ]"
 
-#: src/libdar/data_tree.cpp:1347
+#: src/libdar/data_tree.cpp:1348
 msgid "Unknown record type"
 msgstr "Okänd posttyp"
 
-#: src/libdar/data_tree.cpp:1387
+#: src/libdar/data_tree.cpp:1388
 msgid "removed "
 msgstr "borttagen"
 
-#: src/libdar/data_tree.cpp:1388
+#: src/libdar/data_tree.cpp:1389
 msgid "present "
 msgstr "närvarande "
 
-#: src/libdar/data_tree.cpp:1389
+#: src/libdar/data_tree.cpp:1390
 msgid "saved   "
 msgstr "sparad  "
 
-#: src/libdar/data_tree.cpp:1390
+#: src/libdar/data_tree.cpp:1391
 msgid "absent  "
 msgstr "frånvarande  "
 

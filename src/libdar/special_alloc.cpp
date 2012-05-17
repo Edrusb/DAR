@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: special_alloc.cpp,v 1.18.2.5 2012/02/25 14:43:44 edrusb Exp $
+// $Id: special_alloc.cpp,v 1.18.2.6 2012/03/10 20:57:21 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -785,7 +785,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: special_alloc.cpp,v 1.18.2.5 2012/02/25 14:43:44 edrusb Exp $";
+        static char id[]="$Id: special_alloc.cpp,v 1.18.2.6 2012/03/10 20:57:21 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -831,8 +831,10 @@ namespace libdar
 	main_alloc.max_percent_full(output);
 #endif
 	main_alloc.garbage_collect();
+#ifdef LIBDAR_NO_OPTIMIZATION
 	if(!main_alloc.is_empty())
 	    main_alloc.dump(output);
+#endif
 #endif
     }
 

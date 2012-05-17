@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.4.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2012-02-26 15:43+0100\n"
+"POT-Creation-Date: 2012-03-16 12:05+0100\n"
 "PO-Revision-Date: 2011-07-21 16:13+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -3333,7 +3333,7 @@ msgstr ""
 msgid "Unexpected value found in database"
 msgstr "Valeur inattendue trouvée dans la base"
 
-#: src/libdar/data_tree.cpp:612
+#: src/libdar/data_tree.cpp:613
 #, c-format
 msgid ""
 "Archive number |  Data                   | status ||  EA                     "
@@ -3342,7 +3342,7 @@ msgstr ""
 "Numéro d'archive | Données                | statut || Attributs "
 "Étendus         | statut\n"
 
-#: src/libdar/data_tree.cpp:613
+#: src/libdar/data_tree.cpp:614
 #, c-format
 msgid ""
 "---------------+-------------------------+--------++-------------------------"
@@ -3351,7 +3351,7 @@ msgstr ""
 "-----------------+------------------------+--------+"
 "+---------------------------+------------\n"
 
-#: src/libdar/data_tree.cpp:806
+#: src/libdar/data_tree.cpp:807
 #, c-format
 msgid ""
 "Dates of file's %S are not increasing when database's archive number grows. "
@@ -3360,7 +3360,7 @@ msgstr ""
 "Les dates de %S ne sont pas croissante avec le numéro des archives. Fichier "
 "concerné : %S"
 
-#: src/libdar/data_tree.cpp:809
+#: src/libdar/data_tree.cpp:810
 msgid ""
 "Dates are not increasing for all files when database's archive number grows, "
 "working with this database may lead to improper file's restored version. "
@@ -3375,44 +3375,44 @@ msgstr ""
 "corriger afin d'avoir les archives les plus anciennes aux numéros les plus "
 "petits et les plus récentes aux numéros les plus grands "
 
-#: src/libdar/data_tree.cpp:812
+#: src/libdar/data_tree.cpp:813
 msgid "Do you want to ignore the same type of error for other files?"
 msgstr ""
 "Voulez-vous ignorer le même type d'erreur pour les prochains fichiers ?"
 
-#: src/libdar/data_tree.cpp:849
+#: src/libdar/data_tree.cpp:850
 msgid "Unexpected end of file"
 msgstr "Fin de fichier inattendue"
 
-#: src/libdar/data_tree.cpp:1134
+#: src/libdar/data_tree.cpp:1135
 msgid "[ Saved ]"
 msgstr "[ Sauvé ]"
 
-#: src/libdar/data_tree.cpp:1136 src/libdar/data_tree.cpp:1141
+#: src/libdar/data_tree.cpp:1137 src/libdar/data_tree.cpp:1142
 msgid "[       ]"
 msgstr "[       ]"
 
-#: src/libdar/data_tree.cpp:1139
+#: src/libdar/data_tree.cpp:1140
 msgid "[  EA   ]"
 msgstr "[Attrib.]"
 
-#: src/libdar/data_tree.cpp:1347
+#: src/libdar/data_tree.cpp:1348
 msgid "Unknown record type"
 msgstr "Type d'enregistrement inconnu"
 
-#: src/libdar/data_tree.cpp:1387
+#: src/libdar/data_tree.cpp:1388
 msgid "removed "
 msgstr "supprimé "
 
-#: src/libdar/data_tree.cpp:1388
+#: src/libdar/data_tree.cpp:1389
 msgid "present "
 msgstr "présent "
 
-#: src/libdar/data_tree.cpp:1389
+#: src/libdar/data_tree.cpp:1390
 msgid "saved   "
 msgstr "sauvé   "
 
-#: src/libdar/data_tree.cpp:1390
+#: src/libdar/data_tree.cpp:1391
 msgid "absent  "
 msgstr "absent  "
 

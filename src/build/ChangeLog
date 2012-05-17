@@ -843,3 +843,12 @@ from 2.4.2 to 2.4.3
   in release 2.4.0. This new implementation also bring some speed improvement
 
 
+from 2.4.3 to 2.4.4
+- fixed man pages in the NAME section: added whatis entry
+- fixed segfault: in the internal error reporting code (delete[] in place of
+  free())
+- fixed bug: dar_manager was not able to read properly the latest generated
+  databases version when having Extended Attributes recorded for some files
+- avoided reporting unreleased memory block when compilation optimization
+  have been used (dar, dar_manager, dar_cp, dar_slave, dar_xform do all
+  reported unreleased memory when gcc optimization was used in "infinint" mode)

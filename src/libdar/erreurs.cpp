@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.20.2.1 2012/02/25 14:43:44 edrusb Exp $
+// $Id: erreurs.cpp,v 1.20.2.2 2012/03/04 08:40:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -140,11 +140,11 @@ namespace libdar
 	catch(...)
 	{
 	    if(symbols != NULL)
-		delete symbols;
+		free(symbols);
 	    throw;
 	}
 	if(symbols != NULL)
-	    delete symbols;
+	    free(symbols);
 #else
 	 Egeneric::stack("stack dump", "execinfo absent, cannot dump the stack information at the time the exception was thrown");
 #endif
@@ -164,7 +164,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: erreurs.cpp,v 1.20.2.1 2012/02/25 14:43:44 edrusb Exp $";
+        static char id[]="$Id: erreurs.cpp,v 1.20.2.2 2012/03/04 08:40:17 edrusb Rel $";
         dummy_call(id);
     }
 

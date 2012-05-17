@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: data_tree.cpp,v 1.15.2.5 2011/12/28 18:07:06 edrusb Exp $
+// $Id: data_tree.cpp,v 1.15.2.6 2012/03/04 08:40:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -162,6 +162,7 @@ namespace libdar
 		last_change[k] = sta;
 		break;
 	    case 2:
+	    case 3:
 		sta.read(f);
 		last_change[k] = sta;
 		break;
@@ -1354,7 +1355,7 @@ static data_tree *read_from_file(generic_file & f, unsigned char db_version)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: data_tree.cpp,v 1.15.2.5 2011/12/28 18:07:06 edrusb Exp $";
+    static char id[]="$Id: data_tree.cpp,v 1.15.2.6 2012/03/04 08:40:17 edrusb Rel $";
     dummy_call(id);
 }
 

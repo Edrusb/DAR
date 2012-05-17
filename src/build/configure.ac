@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.4.3], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.4.4], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -497,6 +497,7 @@ AC_ARG_ENABLE( [debug],
                         CXXFLAGS="-ggdb -Wall"
                         CFLAGS="-ggdb -Wall"
                         debug_static="yes"
+			AC_DEFINE(LIBDAR_NO_OPTIMIZATION, 1, [if defined, informs the code that no optimization has been used for compilation])
                 ],
                 [
                         debug_static="no"
