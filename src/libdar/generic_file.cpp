@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.26.2.1 2007/02/11 16:07:22 edrusb Rel $
+// $Id: generic_file.cpp,v 1.26.2.3 2007/07/27 16:02:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -92,22 +92,20 @@ namespace libdar
 
     void clear(crc & value)
     {
-        for(S_I i = 0; i < CRC_SIZE; i++)
-            value[i] = '\0';
+	memset(value, '\0', CRC_SIZE);
     }
 
     bool same_crc(const crc &a, const crc &b)
     {
-        S_I i = 0;
-        while(i < CRC_SIZE && a[i] == b[i])
-            i++;
+	S_I i = 0;
+	while(i < CRC_SIZE && a[i] == b[i])
+            ++i;
         return i == CRC_SIZE;
     }
 
     void copy_crc(crc & dst, const crc & src)
     {
-        for(S_I i = 0; i < CRC_SIZE; i++)
-            dst[i] = src[i];
+	memcpy(dst, src, CRC_SIZE);
     }
 
     string crc2str(const crc & a)
@@ -133,7 +131,7 @@ namespace libdar
             return (this->*active_read)(a, size);
     }
 
-    S_I generic_file::write(char *a, size_t size)
+    S_I generic_file::write(const char *a, size_t size)
     {
         if(rw == gf_read_only)
             throw Erange("generic_file::write", gettext("Writing to a read only generic_file"));
@@ -143,24 +141,10 @@ namespace libdar
 
     S_I generic_file::write(const string & arg)
     {
-        S_I ret = 0;
         if(arg.size() > int_tools_maxof_agregate(size_t(0)))
             throw SRC_BUG;
-        size_t size = arg.size();
 
-        char *ptr = tools_str2charptr(arg);
-        try
-        {
-            ret = write(ptr, size);
-        }
-        catch(...)
-        {
-            delete [] ptr;
-            throw;
-        }
-        delete [] ptr;
-
-        return ret;
+        return write(arg.c_str(), arg.size());
     }
 
     S_I generic_file::read_back(char &a)
@@ -182,9 +166,27 @@ namespace libdar
 
         do
         {
-            lu = this->read(buffer, BUFFER_SIZE);
+	    try
+	    {
+		lu = this->read(buffer, BUFFER_SIZE);
+	    }
+	    catch(Egeneric & e)
+	    {
+		e.stack("generic_file::copy_to", "read");
+		throw;
+	    }
             if(lu > 0)
-                ret = ref.write(buffer, lu);
+	    {
+		try
+		{
+		    ret = ref.write(buffer, lu);
+		}
+		catch(Egeneric & e)
+		{
+		    e.stack("generic_file::copy_to", "write");
+		    throw;
+		}
+	    }
         }
         while(lu > 0 && ret > 0);
     }
@@ -205,10 +207,26 @@ namespace libdar
         while(wrote < size && ret > 0 && lu > 0)
         {
             pas = size > BUFFER_SIZE ? BUFFER_SIZE : size;
-            lu = read(buffer, pas);
+	    try
+	    {
+		lu = read(buffer, pas);
+	    }
+	    catch(Egeneric & e)
+	    {
+		e.stack("generic_file::copy_to", "read");
+		throw;
+	    }
             if(lu > 0)
             {
-                ret = ref.write(buffer, lu);
+		try
+		{
+		    ret = ref.write(buffer, lu);
+		}
+		catch(Egeneric & e)
+		{
+		    e.stack("generic_file::copy_to", "write");
+		    throw;
+		}
                 wrote += lu;
             }
         }
@@ -255,7 +273,7 @@ namespace libdar
             {
                 register S_I i = 0;
                 while(i < lu1 && buffer1[i] == buffer2[i])
-                    i++;
+                    ++i;
                 if(i < lu1)
                     diff = true;
             }
@@ -290,7 +308,7 @@ namespace libdar
         }
     }
 
-    void generic_file::compute_crc(char *a, S_I size)
+    void generic_file::compute_crc(const char *a, S_I size)
     {
 	S_I initial = crc_offset == 0 ? 0 : CRC_SIZE - crc_offset;
 	S_I final = size < initial ? 0 : ((size - initial) / CRC_SIZE)*CRC_SIZE + initial;
@@ -301,7 +319,7 @@ namespace libdar
 	if(initial > size)
 	    initial = size;
 
-	for(i = 0; i < initial; i++, index++)
+	for(i = 0; i < initial; ++i, ++index)
 	    value[index % CRC_SIZE] ^= a[i];
 
 
@@ -315,13 +333,16 @@ namespace libdar
 	    throw SRC_BUG;
 
 	while(blck < stop)
-	    *bcrc ^= *(blck++);
+	{
+	    *bcrc ^= *blck;
+	    ++blck;
+	}
 
 
 	    // final bytes
 
 	index = 0;
-	for(i = final; i < size; i++, index++)
+	for(i = final; i < size; ++i, ++index)
 	    value[index % CRC_SIZE] ^= a[i];
 
 	crc_offset = (crc_offset + size) % CRC_SIZE;
@@ -334,7 +355,7 @@ namespace libdar
         return ret;
     }
 
-    S_I generic_file::write_crc(char *a, size_t size)
+    S_I generic_file::write_crc(const char *a, size_t size)
     {
         S_I ret = inherited_write(a, size);
         compute_crc(a, ret);
@@ -361,18 +382,7 @@ namespace libdar
 
     fichier::fichier(user_interaction & dialog, const path &chemin, gf_mode m) : generic_file(dialog, m)
     {
-        char *name = tools_str2charptr(chemin.display());
-
-        try
-        {
-            open(name, m);
-        }
-        catch(Egeneric & e)
-        {
-            delete [] name;
-            throw;
-        }
-        delete [] name;
+        open(chemin.display().c_str(), m);
     }
 
     infinint fichier::get_size() const
@@ -446,7 +456,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.26.2.1 2007/02/11 16:07:22 edrusb Rel $";
+        static char id[]="$Id: generic_file.cpp,v 1.26.2.3 2007/07/27 16:02:49 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -494,7 +504,7 @@ namespace libdar
         return lu;
     }
 
-    S_I fichier::inherited_write(char *a, size_t size)
+    S_I fichier::inherited_write(const char *a, size_t size)
     {
         S_I ret;
         size_t total = 0;

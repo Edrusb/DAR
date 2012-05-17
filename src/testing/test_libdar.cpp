@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_libdar.cpp,v 1.33 2005/12/13 20:54:46 edrusb Rel $
+// $Id: test_libdar.cpp,v 1.33.2.2 2007/07/22 16:35:01 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -69,13 +69,13 @@ int main()
 void f1()
 {
     U_I maj, med, min;
-    bool ea, large, nodump, special, thread, libz, libbz2, libcrypto;
+    bool ea, large, nodump, special, thread, libz, libbz2, libcrypto, new_blowfish;
     U_I bits;
 
     get_version(maj, med, min);
     printf("version %u.%u.%u\n", maj, med, min);
-    get_compile_time_features(ea, large, nodump, special, bits, thread, libz, libbz2, libcrypto);
-    printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\nlibz =%s\nlibbz2 = %s\nlibcrypto = %s\n",
+    get_compile_time_features(ea, large, nodump, special, bits, thread, libz, libbz2, libcrypto, new_blowfish);
+    printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\nlibz =%s\nlibbz2 = %s\nlibcrypto = %s\nnew_blowfish = %s\n",
 	   BOOL2STR(ea),
 	   BOOL2STR(large),
 	   BOOL2STR(nodump),
@@ -83,64 +83,23 @@ void f1()
 	   bits,
 	   BOOL2STR(libz),
 	   BOOL2STR(libbz2),
-	   BOOL2STR(libcrypto));
+	   BOOL2STR(libcrypto),
+	   BOOL2STR(new_blowfish));
 }
 
 void warning(const string &x, void *context)
 {
-    U_16 code;
-    string msg;
-    char *ptr = libdar_str2charptr_noexcept(x, code, msg);
-    if(code != LIBDAR_NOEXCEPT)
-    {
-	printf("cannot convert message to char*, cannot display it\n");
-	if(ptr != NULL)
-	    throw SRC_BUG;
-    }
-    else
-    {
-	try
-	{
-	    printf("[%d]%s\n", (U_I)context, ptr);
-	}
-	catch(...)
-	{
-	    delete [] ptr;
-	    throw;
-	}
-	delete [] ptr;
-    }
+    printf("[%d]%s\n", (U_I)context, x.c_str());
 }
 
 bool question(const string & x, void *context)
 {
-    U_16 code;
-    string msg;
     bool rep = false;
-    char *ptr = libdar_str2charptr_noexcept(x, code, msg);
-    if(code != LIBDAR_NOEXCEPT)
-    {
-	printf("cannot convert message to char*, cannot display it\n");
-	if(ptr != NULL)
-	    throw SRC_BUG;
-    }
-    else
-    {
-	try
-	{
 	    char r;
 
-	    printf("[%d]%s\n", (U_I)context, ptr);
+	    printf("[%d]%s\n", (U_I)context, x.c_str());
 	    scanf("%c", &r);
 	    rep = r == 'y';
-	}
-	catch(...)
-	{
-	    delete ptr;
-	    throw;
-	}
-	delete ptr;
-    }
 
     return rep;
 }

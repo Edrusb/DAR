@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: deci.cpp,v 1.10 2004/09/13 13:07:51 edrusb Rel $
+// $Id: deci.cpp,v 1.10.4.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -220,7 +220,7 @@ namespace libdar
                 if(leading_zero)
                 {
                     if(avance)
-                        justif_size++;
+                        ++justif_size;
                 }
                 else
                     throw SRC_BUG;
@@ -229,14 +229,14 @@ namespace libdar
                 leading_zero = false;
 
             if(avance)
-                it++;
+                ++it;
 
             avance = ! avance;
         }
 
         if(justif_size == decimales->size())
         {
-            justif_size--;
+            --justif_size;
             it = decimales->rbegin();
             *it = 0xF0; // need at least one digit
         }
@@ -247,7 +247,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: deci.cpp,v 1.10 2004/09/13 13:07:51 edrusb Rel $";
+        static char id[]="$Id: deci.cpp,v 1.10.4.1 2007/07/22 16:34:59 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -264,7 +264,7 @@ namespace libdar
             if(avance)
             {
                 c = get_right(*it);
-                it++;
+                ++it;
             }
             else
                 c = get_left(*it);
@@ -292,7 +292,7 @@ namespace libdar
             if(avance)
             {
                 c = get_right(*it);
-                it++;
+                ++it;
             }
             else
                 c = get_left(*it);

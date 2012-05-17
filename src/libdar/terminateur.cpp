@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: terminateur.cpp,v 1.14 2005/12/29 02:32:41 edrusb Rel $
+// $Id: terminateur.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -47,11 +47,11 @@ namespace libdar
                 // adding some non informational bytes to get a multiple of BLOCK_SIZE
             S_I bourrage = reste % BLOCK_SIZE;
             a = 0;
-            for(S_I i = bourrage; i < BLOCK_SIZE; i++)
+            for(S_I i = bourrage; i < BLOCK_SIZE; ++i)
                 f.write((char *)&a, 1);
 
                 // one more for remaing bytes and non informational bytes.
-            nbbit++;
+            ++nbbit;
         }
 
         last_byte = nbbit % 8;
@@ -60,7 +60,7 @@ namespace libdar
         if(last_byte != 0)
         {                // making the last byte (starting eof) of the terminator string
             a = 0;
-            for(S_I i = 0; i < last_byte; i++)
+            for(S_I i = 0; i < last_byte; ++i)
             {
                 a >>= 1;
                 a |= 0x80;
@@ -78,13 +78,13 @@ namespace libdar
         while(nbbit > 0)
         {
             f.write((char *)&a, 1);
-            nbbit--;
+            --nbbit;
         }
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: terminateur.cpp,v 1.14 2005/12/29 02:32:41 edrusb Rel $";
+        static char id[]="$Id: terminateur.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -109,7 +109,7 @@ namespace libdar
                     throw Erange("",""); // exception used locally
                 a = (unsigned char)b;
                 if(a == 0xFF)
-                    offset++;
+                    ++offset;
             }
             while(a == 0xFF);
             offset *= 8; // offset is now a number of bits
@@ -119,7 +119,7 @@ namespace libdar
             {
                 if((a & 0x80) == 0)
                     throw Erange("","");
-                offset++;
+                ++offset;
                 a <<= 1;
             }
 

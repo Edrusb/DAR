@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.7 2007/06/21 19:40:37 edrusb Rel $
+// $Id: tools.cpp,v 1.54.2.11 2007/07/27 11:27:31 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -83,14 +83,6 @@ extern "C"
 #include <signal.h>
 #endif
 
-#if HAVE_PWD_H
-#include <pwd.h>
-#endif
-
-#if HAVE_GRP_H
-#include <grp.h>
-#endif
-
 #if HAVE_SYS_TYPE_H
 #include <sys/types.h>
 #endif
@@ -113,27 +105,35 @@ extern "C"
 #include "mask.hpp"
 #include "etage.hpp"
 #include "elastic.hpp"
+#ifdef __DYNAMIC__
+#include "user_group_bases.hpp"
+#endif
 
 using namespace std;
 
 namespace libdar
 {
 
-    static void runson(user_interaction & dialog, char *argv[]);
+#ifdef __DYNAMIC__
+	// Yes, this is a static variable,
+	// it contains the necessary mutex to keep libdar thread-safe
+    static const user_group_bases user_group;
+#endif
+
+    static void runson(user_interaction & dialog, char * const argv[]);
     static void deadson(S_I sig);
     static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension);
     static string retreive_basename(const string & base, const string & extension);
     static string tools_make_word(generic_file &fic, off_t start, off_t end);
 
-    char *tools_str2charptr(string x)
+    char *tools_str2charptr(const string &x)
     {
         U_I size = x.size();
         char *ret = new char[size+1];
 
         if(ret == NULL)
             throw Ememory("tools_str2charptr");
-        for(register unsigned int i = 0; i < size; i++)
-            ret[i] = x[i];
+	memcpy(ret, x.c_str(), size);
         ret[size] = '\0';
 
         return ret;
@@ -165,23 +165,13 @@ namespace libdar
 
     void tools_write_string_all(generic_file & f, const string & s)
     {
-        char *tmp = tools_str2charptr(s);
+        const char *tmp = s.c_str();
 
-        if(tmp == NULL)
-            throw Ememory("tools_write_string_all");
-        try
-        {
-            U_I len = s.size();
-            U_I wrote = 0;
+	U_I len = s.size();
+	U_I wrote = 0;
 
-            while(wrote < len)
-                wrote += f.write(tmp+wrote, len-wrote);
-        }
-        catch(...)
-        {
-            delete [] tmp;
-        }
-        delete [] tmp;
+	while(wrote < len)
+	    wrote += f.write(tmp+wrote, len-wrote);
     }
 
     void tools_read_string_size(generic_file & f, string & s, infinint taille)
@@ -210,23 +200,11 @@ namespace libdar
     infinint tools_get_filesize(const path &p)
     {
         struct stat buf;
-        char *name = tools_str2charptr(p.display());
 
-        if(name == NULL)
-            throw Ememory("tools_get_filesize");
+	if(lstat(p.display().c_str(), &buf) < 0)
+	    throw Erange("tools_get_filesize", tools_printf(gettext("Cannot get file size: %s"), strerror(errno)));
 
-        try
-        {
-            if(lstat(name, &buf) < 0)
-                throw Erange("tools_get_filesize", tools_printf(gettext("Cannot get file size: %s"), strerror(errno)));
-        }
-        catch(...)
-        {
-            delete [] name;
-        }
-
-        delete [] name;
-        return (U_32)buf.st_size;
+	return (U_32)buf.st_size;
     }
 
     infinint tools_get_extended_size(string s, U_I base)
@@ -287,19 +265,14 @@ namespace libdar
         return factor;
     }
 
-    char *tools_extract_basename(const char *command_name)
+    void tools_extract_basename(const char *command_name, string &basename)
     {
-        path commande = command_name;
-        string tmp = commande.basename();
-        char *name = tools_str2charptr(tmp);
-
-        return name;
+        basename = path(command_name).basename();
     }
-
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.54.2.7 2007/06/21 19:40:37 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.54.2.11 2007/07/27 11:27:31 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -336,22 +309,12 @@ namespace libdar
     void tools_split_path_basename(const string & all, string & chemin, string & base)
     {
         path *tmp = NULL;
-        char *ptr = tools_str2charptr(all);
 
-        try
-        {
-            tools_split_path_basename(ptr, tmp, base);
-            if(tmp == NULL)
-                throw SRC_BUG;
-            chemin = tmp->display();
-            delete tmp;
-        }
-        catch(...)
-        {
-            delete [] ptr;
-            throw;
-        }
-        delete [] ptr;
+	tools_split_path_basename(all.c_str(), tmp, base);
+	if(tmp == NULL)
+	    throw SRC_BUG;
+	chemin = tmp->display();
+	delete tmp;
     }
 
     void tools_open_pipes(user_interaction & dialog, const string &input, const string & output, tuyau *&in, tuyau *&out)
@@ -400,37 +363,37 @@ namespace libdar
     string tools_name_of_uid(U_16 uid)
     {
 #ifndef  __DYNAMIC__
-	struct passwd *pwd = NULL;
+	string name = "";
 #else
-        struct passwd *pwd = getpwuid(uid);
+        string name = user_group.get_username(uid);
 #endif
 
-        if(pwd == NULL) // uid not associated with a name
+        if(name.empty()) // uid not associated with a name
         {
             infinint tmp = uid;
             deci d = tmp;
             return d.human();
         }
         else
-            return pwd->pw_name;
+            return name;
     }
 
     string tools_name_of_gid(U_16 gid)
     {
 #ifndef __DYNAMIC__
-	struct group *gr = NULL;
+	string name = "";
 #else
-        struct group *gr = getgrgid(gid);
+        string name = user_group.get_groupname(gid);
 #endif
 
-        if(gr == NULL) // uid not associated with a name
+        if(name.empty()) // uid not associated with a name
         {
             infinint tmp = gid;
             deci d = tmp;
             return d.human();
         }
         else
-            return gr->gr_name;
+            return name;
     }
 
     string tools_uword2str(U_16 x)
@@ -463,10 +426,7 @@ namespace libdar
 
     string tools_addspacebefore(string s, U_I expected_size)
     {
-        while(s.size() < expected_size)
-            s = string(" ") + s;
-
-        return s;
+    	return string(expected_size - s.size(), ' ') + s;
     }
 
     string tools_display_date(infinint date)
@@ -591,7 +551,7 @@ namespace libdar
 	}
 
 	    // second, parsing the string
-	for(c = 0; c < size && scanner.get_etat() != error; c++)
+	for(c = 0; c < size && scanner.get_etat() != error; ++c)
 	    switch(repres[c])
 	    {
 	    case '/':
@@ -663,101 +623,81 @@ namespace libdar
 
     void tools_system(user_interaction & dialog, const vector<string> & argvector)
     {
-        if(argvector.size() == 0)
+        if(argvector.empty())
             return; // nothing to do
-        else
-        {
-            char **argv = new char *[argvector.size()+1];
 
-            if(argv == NULL)
-                throw Ememory("tools_system");
-            try
-            {
-                    // make an (S_I, char *[]) couple
-                for(register U_I i = 0; i <= argvector.size(); i++)
-                    argv[i] = NULL;
+	    // ISO C++ forbids variable-size array
+	const char **argv = new const char*[argvector.size()+1];
 
-                try
-                {
-                    S_I status;
-                    bool loop;
+	try
+	{
+	    S_I status;
+	    bool loop;
 
-                    for(register U_I i = 0; i < argvector.size(); i++)
-                        argv[i] = tools_str2charptr(argvector[i]);
+	    for(register U_I i = 0; i < argvector.size(); i++)
+		argv[i] = argvector[i].c_str();
+	    argv[argvector.size()] = NULL;
 
-                    do
-                    {
-                        deadson(0);
-                        loop = false;
-                        S_I pid = fork();
+	    do
+	    {
+		deadson(0);
+		loop = false;
+		S_I pid = fork();
 
-                        switch(pid)
-                        {
-                        case -1:
-                            throw Erange("tools_system", string(gettext("Error while calling fork() to launch dar: ")) + strerror(errno));
-                        case 0: // fork has succeeded, we are the child process
-                            runson(dialog, argv);
-                                // function that never returns
-                        default:
-                            if(wait(&status) <= 0)
-                                throw Erange("tools_system",
-                                             string(gettext("Unexpected error while waiting for dar to terminate: ")) + strerror(errno));
-                            else // checking the way dar has exit
-                                if(!WIFEXITED(status)) // not a normal ending
-                                    if(WIFSIGNALED(status)) // exited because of a signal
-                                    {
-                                        try
-                                        {
-                                            dialog.pause(string(gettext("DAR terminated upon signal reception: "))
+		switch(pid)
+		{
+		case -1:
+		    throw Erange("tools_system", string(gettext("Error while calling fork() to launch dar: ")) + strerror(errno));
+		case 0: // fork has succeeded, we are the child process
+		    runson(dialog, (char* const*)&argv);
+			// function that never returns
+		default:
+		    if(wait(&status) <= 0)
+			throw Erange("tools_system",
+				     string(gettext("Unexpected error while waiting for dar to terminate: ")) + strerror(errno));
+		    else // checking the way dar has exit
+			if(!WIFEXITED(status)) // not a normal ending
+			    if(WIFSIGNALED(status)) // exited because of a signal
+			    {
+				try
+				{
+				    dialog.pause(string(gettext("DAR terminated upon signal reception: "))
 #if HAVE_DECL_SYS_SIGLIST
-                                                         + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
+						 + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
 #else
-                                                         + tools_int2str(WTERMSIG(status))
+						 + tools_int2str(WTERMSIG(status))
 #endif
-                                                         + gettext(" . Retry to launch dar as previously ?"));
-                                            loop = true;
-                                        }
-                                        catch(Euser_abort & e)
-                                        {
-                                            dialog.pause(gettext(" Continue anyway ?"));
-                                        }
-                                    }
-                                    else // normal terminaison but exit code not zero
-                                        dialog.pause(string(gettext("DAR sub-process has terminated with exit code "))
-                                                     + tools_int2str(WEXITSTATUS(status))
-                                                     + gettext(" Continue anyway ?"));
-                        }
-                    }
-                    while(loop);
-                }
-                catch(...)
-                {
-                    for(register U_I i = 0; i < argvector.size(); i++)
-                        if(argv[i] != NULL)
-                            delete [] argv[i];
-                    throw;
-                }
-                for(register U_I i = 0; i < argvector.size(); i++)
-                    if(argv[i] != NULL)
-                        delete argv[i];
-            }
-            catch(...)
-            {
-                delete [] argv;
-                throw;
-            }
-            delete [] argv;
-        }
+						 + gettext(" . Retry to launch dar as previously ?"));
+				    loop = true;
+				}
+				catch(Euser_abort & e)
+				{
+				    dialog.pause(gettext(" Continue anyway ?"));
+				}
+			    }
+			    else // normal terminaison but exit code not zero
+				dialog.pause(string(gettext("DAR sub-process has terminated with exit code "))
+					     + tools_int2str(WEXITSTATUS(status))
+					     + gettext(" Continue anyway ?"));
+		}
+	    }
+	    while(loop);
+	}
+	catch(...)
+	{
+	    delete argv;
+	    throw;
+	}
+	delete argv;
     }
 
     void tools_write_vector(generic_file & f, const vector<string> & x)
     {
         infinint tmp = x.size();
-        vector<string>::iterator it = const_cast<vector<string> *>(&x)->begin();
-        vector<string>::iterator fin = const_cast<vector<string> *>(&x)->end();
+        vector<string>::const_iterator it = x.begin();
 
         tmp.dump(f);
-        while(it != fin)
+        while(it != x.end())
             tools_write_string(f, *it++);
     }
 
@@ -778,10 +718,9 @@ namespace libdar
     string tools_concat_vector(const string & separator, const vector<string> & x)
     {
         string ret = separator;
-        vector<string>::iterator it = const_cast<vector<string> *>(&x)->begin();
-        vector<string>::iterator fin = const_cast<vector<string> *>(&x)->end();
+        vector<string>::const_iterator it = x.begin();
 
-        while(it != fin)
+        while(it != x.end())
             ret += *it++ + separator;
 
         return ret;
@@ -837,13 +776,14 @@ namespace libdar
 
     void tools_display_features(user_interaction & dialog, bool ea, bool largefile, bool nodump,
                                 bool special_alloc, U_I bits, bool thread_safe,
-                                bool libz, bool libbz2, bool libcrypto)
+                                bool libz, bool libbz2, bool libcrypto, bool new_blowfish)
     {
 #define YES_NO(x) (x ? gettext("YES") : gettext("NO"))
 
         dialog.printf(gettext("   Libz compression (gzip)    : %s\n"), YES_NO(libz));
         dialog.printf(gettext("   Libbz2 compression (bzip2) : %s\n"), YES_NO(libbz2));
         dialog.printf(gettext("   Strong encryption          : %s\n"), YES_NO(libcrypto));
+	dialog.printf(gettext("   New Blowfish implementation: %s\n"), YES_NO(new_blowfish));
         dialog.printf(gettext("   Extended Attributes support: %s\n"), YES_NO(ea));
         dialog.printf(gettext("   Large files support (> 2GB): %s\n"), YES_NO(largefile));
         dialog.printf(gettext("   ext2fs NODUMP flag support : %s\n"), YES_NO(nodump));
@@ -1040,7 +980,6 @@ namespace libdar
     {
         struct utimbuf temps;
         time_t tmp = 0;
-        char *filename;
 
         access.unstack(tmp);
         temps.actime = tmp;
@@ -1048,18 +987,8 @@ namespace libdar
         modif.unstack(tmp);
         temps.modtime = tmp;
 
-        filename = tools_str2charptr(chemin);
-        try
-        {
-            if(utime(filename , &temps) < 0)
-                Erange("tools_make_date", string(gettext("Cannot set last access and last modification time: ")) + strerror(errno));
-        }
-        catch(...)
-        {
-            delete [] filename;
-            throw;
-        }
-        delete [] filename;
+	if(utime(chemin.c_str() , &temps) < 0)
+	    Erange("tools_make_date", string(gettext("Cannot set last access and last modification time: ")) + strerror(errno));
     }
 
     void tools_noexcept_make_date(const string & chem, const infinint & last_acc, const infinint & last_mod)
@@ -1108,7 +1037,7 @@ namespace libdar
     {
         U_I taille = r.size();
 
-        for(U_I x = 0; x < taille; x++)
+        for(U_I x = 0; x < taille; ++x)
             r[x] = toupper(r[x]);
     }
 
@@ -1123,7 +1052,7 @@ namespace libdar
         signal(SIGCHLD, &deadson);
     }
 
-    static void runson(user_interaction & dialog, char *argv[])
+    static void runson(user_interaction & dialog, char * const argv[])
     {
         if(execvp(argv[0], argv) < 0)
             dialog.warning(string(gettext("Error while calling execvp:")) + strerror(errno));
@@ -1134,21 +1063,18 @@ namespace libdar
 
     static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension)
     {
-        char *name = tools_str2charptr(base);
         path *chem = NULL;
         bool ret = false;
 
         try
         {
-            char *char_chem = NULL;
             string rest;
 
-            tools_split_path_basename(name, chem, rest);
-            char_chem = tools_str2charptr(chem->display());
+            tools_split_path_basename(base.c_str(), chem, rest);
 
             try
             {
-                etage contents = etage(ui, char_chem, 0, 0, false);  // we don't care the dates here so we set them to zero
+                etage contents = etage(ui, chem->display().c_str(), 0, 0, false);  // we don't care the dates here so we set them to zero
                 regular_mask slice = regular_mask(rest + "\\.[1-9][0-9]*\\."+ extension, true);
 
                 while(!ret && contents.read(rest))
@@ -1158,27 +1084,18 @@ namespace libdar
             {
                 ret = false;
             }
-            catch(...)
-            {
-                delete [] char_chem;
-                throw;
-            }
-            delete [] char_chem;
         }
         catch(...)
         {
-            delete [] name;
             if(chem != NULL)
                 delete chem;
             throw;
         }
-        delete [] name;
         if(chem != NULL)
             delete chem;
 
         return ret;
     }
-
 
     static string retreive_basename(const string & base, const string & extension)
     {
@@ -1197,15 +1114,15 @@ namespace libdar
 
     void tools_read_range(const string & s, U_I & min, U_I & max)
     {
-        string::iterator it = const_cast<string &>(s).begin();
+        string::const_iterator it = s.begin();
 
         while(it < s.end() && *it != '-')
             it++;
 
         if(it < s.end())
         {
-            min = tools_str2int(string(const_cast<string &>(s).begin(), it));
-            max = tools_str2int(string(++it, const_cast<string &>(s).end()));
+            min = tools_str2int(string(s.begin(), it));
+            max = tools_str2int(string(++it, s.end()));
         }
         else
             min = max = tools_str2int(s);
@@ -1252,7 +1169,7 @@ namespace libdar
             do
             {
                 while(*ptr != '%' && *ptr != '\0')
-                    ptr++;
+                    ++ptr;
                 if(*ptr == '%')
                 {
                     *ptr = '\0';
@@ -1263,7 +1180,7 @@ namespace libdar
                 output += start;
                 if(!end)
                 {
-                    ptr++;
+                    ++ptr;
                     switch(*ptr)
                     {
                     case '%':
@@ -1291,7 +1208,7 @@ namespace libdar
                     default:
                         throw Efeature(tools_printf(gettext("%%%c is not implemented in tools_printf format argument"), *ptr));
                     }
-                    ptr++;
+                    ++ptr;
                     start = ptr;
                 }
             }
@@ -1307,38 +1224,28 @@ namespace libdar
         return output;
     }
 
-    void tools_unlink_file_mask(user_interaction & dialog, const char *c_chemin, const char *file_mask, bool info_details)
+    void tools_unlink_file_mask(user_interaction & dialog, const string & c_chemin, const string & file_mask, bool info_details)
     {
-	simple_mask my_mask = simple_mask(string(file_mask), true);
-	etage dir = etage(dialog, c_chemin, 0, 0, false);
-	path chemin = path(string(c_chemin));
+	simple_mask my_mask = simple_mask(file_mask, true);
+	etage dir = etage(dialog, c_chemin.c_str(), 0, 0, false);
+	path chemin = path(c_chemin);
 	string entry;
 
 	while(dir.read(entry))
 	    if(my_mask.is_covered(entry))
 	    {
-		char *c_entry = tools_str2charptr((chemin + entry).display());
-		try
-		{
-		    if(info_details)
-			dialog.warning(tools_printf(gettext("Removing file %s"), c_entry));
-		    if(unlink(c_entry) != 0)
-			dialog.warning(tools_printf(gettext("ERROR removing file %s : %s"), c_entry, strerror(errno)));
-		}
-		catch(...)
-		{
-		    if(c_entry != NULL)
-			delete [] c_entry;
-		    throw;
-		}
-		delete [] c_entry;
+		const string c_entry = (chemin + entry).display();
+		if(info_details)
+		    dialog.warning(tools_printf(gettext("Removing file %s"), c_entry.c_str()));
+		if(unlink(c_entry.c_str()) != 0)
+		    dialog.warning(tools_printf(gettext("ERROR removing file %s : %s"), c_entry.c_str(), strerror(errno)));
 	    }
     }
 
-    bool tools_do_some_files_match_mask(user_interaction & ui, const char *c_chemin, const char *file_mask)
+    bool tools_do_some_files_match_mask(user_interaction & ui, const string & c_chemin, const string & file_mask)
     {
-	simple_mask my_mask = simple_mask(string(file_mask), true);
-	etage dir = etage(ui, c_chemin, 0, 0, false);
+	simple_mask my_mask = simple_mask(file_mask, true);
+	etage dir = etage(ui, c_chemin.c_str(), 0, 0, false);
 	string entry;
 	bool ret = false;
 
@@ -1349,47 +1256,26 @@ namespace libdar
 	return ret;
     }
 
-    void tools_avoid_slice_overwriting(user_interaction & dialog, const path & chemin, const string & x_file_mask, bool info_details, bool allow_overwriting, bool warn_overwriting, bool dry_run)
+    void tools_avoid_slice_overwriting(user_interaction & dialog, const path & chemin, const string & file_mask, bool info_details, bool allow_overwriting, bool warn_overwriting, bool dry_run)
     {
-	char *c_chemin = tools_str2charptr(chemin.display());
-	try
-	{
-	    char *file_mask = tools_str2charptr(x_file_mask);
-	    try
+	const string c_chemin = chemin.display();
+	if(tools_do_some_files_match_mask(dialog, c_chemin, file_mask))
+	    if(!allow_overwriting)
+		throw Erange("tools_avoid_slice_overwriting", tools_printf(gettext("Overwriting not allowed while a slice of a previous archive with the same basename has been found in the %s directory, Operation aborted"), c_chemin.c_str()));
+	    else
 	    {
-		if(tools_do_some_files_match_mask(dialog, c_chemin, file_mask))
-		    if(!allow_overwriting)
-			throw Erange("tools_avoid_slice_overwriting", tools_printf(gettext("Overwriting not allowed while a slice of a previous archive with the same basename has been found in the %s directory, Operation aborted"), c_chemin));
-		    else
-		    {
-			try
-			{
-			    if(warn_overwriting)
-				dialog.pause(tools_printf(gettext("At least one slice of an old archive with the same basename remains in the directory %s , If you do not remove theses all first, you will have difficulty identifying the last slice of the archive you are about to create, because it may be hidden in between slices of this older archive. Do we remove the old archive's slices first ?"), c_chemin));
-			    if(!dry_run)
-				tools_unlink_file_mask(dialog, c_chemin, file_mask, info_details);
-			}
-			catch(Euser_abort & e)
-			{
-				// nothing to do, just continue
-			}
-		    }
+		try
+		{
+		    if(warn_overwriting)
+			dialog.pause(tools_printf(gettext("At least one slice of an old archive with the same basename remains in the directory %s , If you do not remove theses all first, you will have difficulty identifying the last slice of the archive you are about to create, because it may be hidden in between slices of this older archive. Do we remove the old archive's slices first ?"), c_chemin.c_str()));
+		    if(!dry_run)
+			tools_unlink_file_mask(dialog, c_chemin, file_mask, info_details);
+		}
+		catch(Euser_abort & e)
+		{
+			// nothing to do, just continue
+		}
 	    }
-	    catch(...)
-	    {
-		if(file_mask != NULL)
-		    delete [] file_mask;
-		throw;
-	    }
-	    delete [] file_mask;
-	}
-	catch(...)
-	{
-	    if(c_chemin != NULL)
-		delete [] c_chemin;
-	    throw;
-	}
-	delete [] c_chemin;
     }
 
     void tools_add_elastic_buffer(generic_file & f, U_32 max_size)
@@ -1417,33 +1303,12 @@ namespace libdar
         dev_t id;
         struct stat sstat;
 
-        char *filename = tools_str2charptr(file1);
+	if(stat(file1.c_str(), &sstat) < 0)
+	    throw Erange("tools:tools_are_on_same_filesystem", string(gettext("Cannot get inode information for: ")) +  file1 + " : " + strerror(errno));
+	id = sstat.st_dev;
 
-	try
-	{
-	    if(stat(filename, &sstat) < 0)
-		throw Erange("tools:tools_are_on_same_filesystem", string(gettext("Cannot get inode information for: ")) +  file1 + " : " + strerror(errno));
-	    id = sstat.st_dev;
-	}
-	catch(...)
-	{
-	    delete [] filename;
-	    throw;
-	}
-	delete [] filename;
-
-	filename = tools_str2charptr(file2);
-	try
-	{
-	    if(stat(filename, &sstat) < 0)
-		throw Erange("tools:tools_are_on_same_filesystem", string(gettext("Cannot get inode information for: ")) +  file2 + " : " + strerror(errno));
-	}
-	catch(...)
-	{
-	    delete [] filename;
-	    throw;
-	}
-	delete [] filename;
+	if(stat(file2.c_str(), &sstat) < 0)
+	    throw Erange("tools:tools_are_on_same_filesystem", string(gettext("Cannot get inode information for: ")) +  file2 + " : " + strerror(errno));
 
         return id == sstat.st_dev;
     }
@@ -1478,35 +1343,21 @@ namespace libdar
     {
 	U_I ret = 0, c, size = s.size();
 
-	for(c = 0; c < size; c++)
+	for(c = 0; c < size; ++c)
 	    if(s[c] == a)
-		ret++;
+		++ret;
 	return ret;
     }
 
     infinint tools_get_mtime(const std::string & s)
     {
         struct stat buf;
-        char *name = tools_str2charptr(s);
 
-        if(name == NULL)
-            throw Ememory("tools_get_mtime");
+	if(lstat(s.c_str(), &buf) < 0)
+	    throw Erange("tools_get_mtime", tools_printf(gettext("Cannot get mtime: %s"), strerror(errno)));
 
-        try
-        {
-            if(lstat(name, &buf) < 0)
-                throw Erange("tools_get_mtime", tools_printf(gettext("Cannot get mtime: %s"), strerror(errno)));
-        }
-        catch(...)
-        {
-            delete [] name;
-	    throw;
-        }
-
-        delete [] name;
         return buf.st_mtime;
     }
-
 
     vector<string> tools_split_in_words(generic_file & f)
     {
@@ -1526,7 +1377,7 @@ namespace libdar
                 a = ' '; // to close the last word
             }
 
-            if(quotes.size() == 0) // outside a word
+            if(quotes.empty()) // outside a word
                 switch(a)
                 {
                 case ' ':
@@ -1568,7 +1419,7 @@ namespace libdar
                     if(a == quotes.back()) // "a" is an ending quote
                     {
                         quotes.pop_back();
-                        if(quotes.size() == 0) // reached end of word
+                        if(quotes.empty()) // reached end of word
                         {
                             mots.push_back(tools_make_word(f, start, end));
                             if(a != ' ')
@@ -1591,7 +1442,7 @@ namespace libdar
                     end++;
                 }
         }
-        if(quotes.size() > 0)
+        if(!quotes.empty())
             throw Erange("make_args_from_file", tools_printf(gettext("Parse error: Unmatched %c"), quotes.back()));
 
 	return mots;
@@ -1641,12 +1492,11 @@ namespace libdar
 					      const string & relative_part)
     {
 	string result = "^";
-	string::iterator it = const_cast<string &>(prefix).begin();
-	string::iterator fin = const_cast<string &>(prefix).end();
+	string::const_iterator it = prefix.begin();
 
 	    // prepending any non alpha numeric char of the root by a anti-slash
 
-	for( ; it != fin ; it++)
+	for( ; it != prefix.end() ; ++it)
 	{
  	    if(isalnum(*it) || *it == '/' || *it == ' ')
 		result += *it;
@@ -1665,15 +1515,14 @@ namespace libdar
 
 	    // adapting and adding the relative_part
 
-	it = const_cast<string &>(relative_part).begin();
-	fin = const_cast<string &>(relative_part).end();
+	it = relative_part.begin();
 
-	if(it != fin && *it == '^')
+	if(it != relative_part.end() && *it == '^')
 	    it++; // skipping leading ^
 	else
 	    result += ".*"; // prepending wilde card sub-expression
 
-	for( ; it != fin && *it != '$' ; it++)
+	for( ; it != relative_part.end() && *it != '$' ; ++it)
 	    result += *it;
 
 	result += "(/.+)?$";
@@ -1708,7 +1557,7 @@ namespace libdar
 	    default:
 		ret += src[cur];
 	    }
-	    cur++;
+	    ++cur;
 	}
 
 	return ret;

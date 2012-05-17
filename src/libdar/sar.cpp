@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.37.2.1 2006/12/12 18:25:35 edrusb Rel $
+// $Id: sar.cpp,v 1.37.2.2 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -274,7 +274,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.37.2.1 2006/12/12 18:25:35 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.37.2.2 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -365,7 +365,7 @@ namespace libdar
         return lu;
     }
 
-    S_I sar::inherited_write(char *a, size_t sz)
+    S_I sar::inherited_write(const char *a, size_t sz)
     {
         infinint to_write = sz;
         infinint max_at_once;
@@ -419,7 +419,7 @@ namespace libdar
         }
     }
 
-    void sar::open_readonly(char *fic, const infinint &num)
+    void sar::open_readonly(const char *fic, const infinint &num)
     {
         header h;
 
@@ -520,7 +520,7 @@ namespace libdar
         }
     }
 
-    void sar::open_writeonly(char *fic, const infinint &num)
+    void sar::open_writeonly(const char *fic, const infinint &num)
     {
         struct stat buf;
         header h;
@@ -644,72 +644,65 @@ namespace libdar
     {
         if(of_fd == NULL || of_current != num)
         {
-            char *fic = tools_str2charptr((archive_dir + path(sar_make_filename(base, num, ext))).display());
+	    const string display = (archive_dir + path(sar_make_filename(base, num, ext))).display();
+            const char *fic = display.c_str();
 
-            try
-            {
-                switch(get_mode())
-                {
-                case gf_read_only :
-                    close_file();
-                        // launch the shell command before reading a slice
-                    open_readonly(fic, num);
-                    break;
-                case gf_write_only :
-                    if(of_fd != NULL && (num > of_current || of_max_seen > of_current))
-                    {    // actually openned file is not the last file of the set, thus changing the flag before closing
-                        header h = make_write_header(of_current, FLAG_NON_TERMINAL);
+	    switch(get_mode())
+	    {
+	    case gf_read_only :
+		close_file();
+		    // launch the shell command before reading a slice
+		open_readonly(fic, num);
+		break;
+	    case gf_write_only :
+		if(of_fd != NULL && (num > of_current || of_max_seen > of_current))
+		{    // actually openned file is not the last file of the set, thus changing the flag before closing
+		    header h = make_write_header(of_current, FLAG_NON_TERMINAL);
 
-                        of_fd->skip(0);
-                        h.write(*of_fd);
-                    }
-                    close_file();
+		    of_fd->skip(0);
+		    h.write(*of_fd);
+		}
+		close_file();
 
-                    if(!initial)
-                    {
+		if(!initial)
+		{
 
-                            // launch the shell command after the slice has been written
-                        hook_execute(of_current);
-                        if(pause != 0 && ((num-1) % pause == 0))
-                        {
-                            deci conv = of_current;
-			    bool ready = false;
+			// launch the shell command after the slice has been written
+		    hook_execute(of_current);
+		    if(pause != 0 && ((num-1) % pause == 0))
+		    {
+			deci conv = of_current;
+			bool ready = false;
 
-			    while(!ready)
+			while(!ready)
+			{
+			    try
 			    {
-				try
-				{
-				    get_gf_ui().pause(string(gettext("Finished writing to file ")) + conv.human() + gettext(", ready to continue ? "));
-				    ready = true;
-				}
-				catch(Euser_abort & e)
-				{
-				    get_gf_ui().warning(string(gettext("If you really want to abort the archive creation hit CTRL-C, then press enter.")));
-				    ready = false;
-				}
+				get_gf_ui().pause(string(gettext("Finished writing to file ")) + conv.human() + gettext(", ready to continue ? "));
+				ready = true;
 			    }
-                        }
-                    }
-                    else
-                        initial = false;
+			    catch(Euser_abort & e)
+			    {
+				get_gf_ui().warning(string(gettext("If you really want to abort the archive creation hit CTRL-C, then press enter.")));
+				ready = false;
+			    }
+			}
+		    }
+		}
+		else
+		    initial = false;
 
-                    open_writeonly(fic, num);
-                    break;
-                default :
-                    close_file();
-                    throw SRC_BUG;
-                }
-                of_current = num;
-                if(of_max_seen < of_current)
-                    of_max_seen = of_current;
-                file_offset = of_current == 1 ? first_file_offset : header::size();
-            }
-            catch(Egeneric & e)
-            {
-                delete [] fic;
-                throw;
-            }
-            delete [] fic;
+		open_writeonly(fic, num);
+		break;
+	    default :
+		close_file();
+		throw SRC_BUG;
+	    }
+	    of_current = num;
+	    if(of_max_seen < of_current)
+		of_max_seen = of_current;
+	    file_offset = of_current == 1 ? first_file_offset : header::size();
+
         }
     }
 
@@ -862,8 +855,7 @@ namespace libdar
         MEM_IN;
         if(hook != "")
         {
-            string cmd_line = hook_substitute(archive_dir.display(), base, deci(num).human(), ext, get_info_status());
-            char *ptr = tools_str2charptr(cmd_line);
+            const string cmd_line = hook_substitute(archive_dir.display(), base, deci(num).human(), ext, get_info_status());
             try
             {
                 bool loop = false;
@@ -871,7 +863,7 @@ namespace libdar
                 {
                     try
                     {
-                        S_I code = system(ptr);
+                        S_I code = system(cmd_line.c_str());
                         switch(code)
                         {
                         case 0:
@@ -911,11 +903,9 @@ namespace libdar
             }
             catch(...)
             {
-                delete [] ptr;
                 MEM_OUT;
                 throw;
             }
-            delete [] ptr;
         }
         MEM_OUT;
     }
@@ -960,8 +950,8 @@ namespace libdar
         infinint cur;
         bool somme = false;
         struct dirent *entry;
-        char *folder = tools_str2charptr(dir.display());
-        DIR *ptr = opendir(folder);
+        const string folder = dir.display();
+        DIR *ptr = opendir(folder.c_str());
 
         try
         {
@@ -980,13 +970,11 @@ namespace libdar
         }
         catch(Egeneric & e)
         {
-            delete [] folder;
             if(ptr != NULL)
                 closedir(ptr);
             throw;
         }
 
-        delete [] folder;
         if(ptr != NULL)
             closedir(ptr);
         return somme;

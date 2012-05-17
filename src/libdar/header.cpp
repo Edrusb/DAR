@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $
+// $Id: header.cpp,v 1.16.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -49,6 +49,10 @@ extern "C"
 # else
 #  include <time.h>
 # endif
+#endif
+
+#if HAVE_STRING_H
+#include <string.h>
 #endif
 } // end extern "C"
 
@@ -113,38 +117,37 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: header.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $";
+        static char id[]="$Id: header.cpp,v 1.16.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
     bool header_label_is_equal(const label &a, const label &b)
     {
-        register U_I i = 0;
-        while(i < LABEL_SIZE && a[i] == b[i])
-            i++;
-        return i >= LABEL_SIZE;
+        return memcmp(a, b, LABEL_SIZE) == 0;
     }
 
     void header_generate_internal_filename(label &ret)
     {
-        time_t src1 = time(NULL);
-        pid_t src2 = getpid();
-        U_I wrote = 0;
-        U_I read = 0;
+        const time_t src1 = time(NULL);
 
-        while(read < sizeof(src1) && wrote < LABEL_SIZE)
-            ret[wrote++] = ((char *)(&src1))[read++];
+	if(sizeof(src1) >= LABEL_SIZE)
+	    memcpy(ret, &src1, LABEL_SIZE);
+	else
+	{
+	    const U_I left = LABEL_SIZE - sizeof(src1);
+	    const pid_t src2 = getpid();
 
-        read = 0;
-        while(read < sizeof(src2) && wrote < LABEL_SIZE)
-            ret[wrote++] = ((char *)(&src2))[read++];
+	    if(sizeof(src2) >= left)
+		memcpy(ret, &src1, left);
+	    else
+		memcpy(ret, &src1, sizeof(src2));
+	}
     }
 
     header::header()
     {
         magic = 0;
-        for(U_I i = 0; i < LABEL_SIZE; i++)
-            internal_name[i] = '\0';
+        memset(internal_name, '\0', LABEL_SIZE);
         extension = flag = '\0';
         size_ext = 0;
     }
@@ -160,9 +163,7 @@ namespace libdar
 
     void label_copy(label & left, const label & right)
     {
-        for(U_I i = 0; i < LABEL_SIZE; i++)
-            left[i] = right[i];
-
+    	memcpy(left, right, LABEL_SIZE);
     }
 
 } // end of namespace

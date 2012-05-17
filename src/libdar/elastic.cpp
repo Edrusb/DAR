@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: elastic.cpp,v 1.7 2005/02/22 17:59:35 edrusb Rel $
+// $Id: elastic.cpp,v 1.7.2.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -131,12 +131,12 @@ namespace libdar
 	unsigned char a;
 
 	while((f.*lecture)((char &)a) && a != SINGLE_MARK && a != first_mark)
-	    count++;
+	    ++count;
 
 	if(a != SINGLE_MARK && a != first_mark)
 	    throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
 	else
-	    count++;
+	    ++count;
 
 	if(a == SINGLE_MARK)
 	    if(count == 1)
@@ -194,7 +194,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: elastic.cpp,v 1.7 2005/02/22 17:59:35 edrusb Rel $";
+        static char id[]="$Id: elastic.cpp,v 1.7.2.1 2007/07/22 16:34:59 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -233,7 +233,7 @@ namespace libdar
 		cur = 0;
 
 		// filling non information bytes with random values
-	    for(pos = 0; pos < cur; pos++)
+	    for(pos = 0; pos < cur; ++pos)
 		randomize(buffer+pos);
 
 	    buffer[cur++] = LOW_MARK;
@@ -243,7 +243,7 @@ namespace libdar
 	    buffer[cur++] = HIGH_MARK;
 
 		// filling the rest of the non information byte with random values
-	    for(pos = cur; pos < taille; pos++)
+	    for(pos = cur; pos < taille; ++pos)
 		randomize(buffer+pos);
 	}
 	else

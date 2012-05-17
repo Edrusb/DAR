@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.cpp,v 1.2.2.1 2006/01/24 17:04:57 edrusb Rel $
+// $Id: data_tree.cpp,v 1.2.2.3 2007/07/27 11:27:31 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -74,7 +74,7 @@ namespace libdar
 	{
 	    read_from_file(f, k);
 	    last_mod[k] = infinint(f.get_gf_ui(), NULL, &f);
-	    tmp--;
+	    --tmp;
 	}
 
 	tmp = infinint(f.get_gf_ui(), NULL, &f); // number of entry in last_change map
@@ -82,7 +82,7 @@ namespace libdar
 	{
 	    read_from_file(f, k);
 	    last_change[k] = infinint(f.get_gf_ui(), NULL, &f);
-	    tmp--;
+	    --tmp;
 	}
     }
 
@@ -90,30 +90,28 @@ namespace libdar
     {
 	char tmp = obj_signature();
 	infinint sz;
-	map<archive_num, infinint>::iterator it;
-	map<archive_num, infinint>::iterator fin;
+	map<archive_num, infinint>::const_iterator it = last_mod.begin();
 
 	f.write(&tmp, 1);
 	tools_write_string(f, filename);
+
 	sz = last_mod.size();
 	sz.dump(f);
-	it = const_cast<data_tree *>(this)->last_mod.begin();
-	fin = const_cast<data_tree *>(this)->last_mod.end();
-	while(it != fin)
+	while(it != last_mod.end())
 	{
 	    write_to_file(f, it->first); // key
 	    it->second.dump(f); // value
-	    it++;
+	    ++it;
 	}
+
 	sz = last_change.size();
 	sz.dump(f);
-	it = const_cast<data_tree *>(this)->last_change.begin();
-	fin = const_cast<data_tree *>(this)->last_change.end();
-	while(it != fin)
+	it = last_change.begin();
+	while(it != last_change.end())
 	{
 	    write_to_file(f, it->first); // key
 	    it->second.dump(f); // value
-	    it++;
+	    ++it;
 	}
     }
 
@@ -121,11 +119,10 @@ namespace libdar
     bool data_tree::get_data(archive_num & archive, const infinint & date) const
     {
 	infinint max = 0;
-	map<archive_num, infinint>::iterator it  = const_cast<data_tree *>(this)->last_mod.begin();
-	map<archive_num, infinint>::iterator fin = const_cast<data_tree *>(this)->last_mod.end();
+	map<archive_num, infinint>::const_iterator it  = last_mod.begin();
 
 	archive = 0; // 0 is never assigned to an archive number
-	while(it != fin)
+	while(it != last_mod.end())
 	{
 	    if(it->second >= max  // > and = because there should never be twice the same value
 		   // and we must be able to see a value of 0 (initially max = 0) which is valid.
@@ -134,7 +131,7 @@ namespace libdar
 		max = it->second;
 		archive = it->first;
 	    }
-	    it++;
+	    ++it;
 	}
 
 	return archive != 0;
@@ -143,11 +140,10 @@ namespace libdar
     bool data_tree::get_EA(archive_num & archive, const infinint & date) const
     {
 	infinint max = 0;
-	map<archive_num, infinint>::iterator it  = const_cast<data_tree *>(this)->last_change.begin();
-	map<archive_num, infinint>::iterator fin = const_cast<data_tree *>(this)->last_change.end();
+	map<archive_num, infinint>::const_iterator it = last_change.begin();
 
 	archive = 0; // 0 is never assigned to an archive number
-	while(it != fin)
+	while(it != last_change.end())
 	{
 	    if(it->second >= max  // > and = because there should never be twice the same value
 		   // and we must be able to see a value of 0 (initially max = 0) which is valid.
@@ -156,7 +152,7 @@ namespace libdar
 		max = it->second;
 		archive = it->first;
 	    }
-	    it++;
+	    ++it;
 	}
 
 	return archive != 0;
@@ -164,10 +160,9 @@ namespace libdar
 
     bool data_tree::read_data(archive_num num, infinint & val) const
     {
-	map<archive_num, infinint>::iterator it = const_cast<data_tree *>(this)->last_mod.find(num);
-	map<archive_num, infinint>::iterator fin = const_cast<data_tree *>(this)->last_mod.end();
+	map<archive_num, infinint>::const_iterator it = last_mod.find(num);
 
-	if(it != fin)
+	if(it != last_mod.end())
 	{
 	    val = it->second;
 	    return true;
@@ -178,10 +173,9 @@ namespace libdar
 
     bool data_tree::read_EA(archive_num num, infinint & val) const
     {
-	map<archive_num, infinint>::iterator it = const_cast<data_tree *>(this)->last_change.find(num);
-	map<archive_num, infinint>::iterator fin = const_cast<data_tree *>(this)->last_change.end();
+	map<archive_num, infinint>::const_iterator it = last_change.find(num);
 
-	if(it != fin)
+	if(it != last_change.end())
 	{
 	    val = it->second;
 	    return true;
@@ -193,6 +187,7 @@ namespace libdar
     bool data_tree::remove_all_from(const archive_num & archive)
     {
 	map<archive_num, infinint>::iterator it = last_mod.begin();
+
 	while(it != last_mod.end())
 	{
 	    if(it->first == archive)
@@ -201,7 +196,7 @@ namespace libdar
 		break; // stops the while loop, as there is at most one element with that key
 	    }
 	    else
-		it++;
+		++it;
 	}
 
 	it = last_change.begin();
@@ -213,54 +208,50 @@ namespace libdar
 		break; // stops the while loop, as there is at most one element with that key
 	    }
 	    else
-		it++;
+		++it;
 	}
 
-	return last_mod.size() == 0 && last_change.size() == 0;
+	return last_mod.empty() && last_change.empty();
     }
 
     void data_tree::listing(user_interaction & dialog) const
     {
-	map<archive_num, infinint>::iterator it, fin_it, ut, fin_ut;
+	map<archive_num, infinint>::const_iterator it = last_mod.begin();
+	map<archive_num, infinint>::const_iterator ut = last_change.begin();
 
 	dialog.printf(gettext("Archive number |  Data      |  EA\n"));
 	dialog.printf("---------------+------------+------------\n");
 
-	it = const_cast<data_tree *>(this)->last_mod.begin();
-	fin_it = const_cast<data_tree *>(this)->last_mod.end();
-	ut = const_cast<data_tree *>(this)->last_change.begin();
-	fin_ut = const_cast<data_tree *>(this)->last_change.begin();
-
-	while(it != fin_it || ut != fin_ut)
+	while(it != last_mod.end() || ut != last_change.end())
 	{
-	    if(it != fin_it)
-		if(ut != fin_ut)
+	    if(it != last_mod.end())
+		if(ut != last_change.end())
 		    if(it->first == ut->first)
 		    {
 			display_line(dialog, it->first, &(it->second), &(ut->second));
-			it++;
-			ut++;
+			++it;
+			++ut;
 		    }
 		    else // not in the same archive
 			if(it->first < ut->first) // it only
 			{
 			    display_line(dialog, it->first, &(it->second), NULL);
-			    it++;
+			    ++it;
 			}
 			else // ut only
 			{
 			    display_line(dialog, ut->first, NULL, &(ut->second));
-			    ut++;
+			    ++ut;
 			}
-		else // ut at end of list thus it != fin_it (see while condition)
+		else // ut at end of list thus it != last_mod.end() (see while condition)
 		{
 		    display_line(dialog, it->first, &(it->second), NULL);
-		    it++;
+		    ++it;
 		}
-	    else // it at end of list, this ut != fin_ut (see while condition)
+	    else // it at end of list, this ut != last_change.end() (see while condition)
 	    {
 		display_line(dialog, ut->first, &(ut->second), NULL);
-		ut++;
+		++ut;
 	    }
 	}
     }
@@ -274,7 +265,7 @@ namespace libdar
 	while(it != last_mod.end())
 	{
 	    transfert[data_tree_permutation(src, dst, it->first)] = it->second;
-	    it++;
+	    ++it;
 	}
 	last_mod = transfert;
 
@@ -283,7 +274,7 @@ namespace libdar
 	while(it != last_change.end())
 	{
 	    transfert[data_tree_permutation(src, dst, it->first)] = it->second;
-	    it++;
+	    ++it;
 	}
 	last_change = transfert;
     }
@@ -300,7 +291,7 @@ namespace libdar
 		resultant[it->first-1] = it->second;
 	    else
 		resultant[it->first] = it->second;
-	    it++;
+	    ++it;
 	}
 	last_mod = resultant;
 	resultant.clear();
@@ -311,7 +302,7 @@ namespace libdar
 		resultant[it->first-1] = it->second;
 	    else
 		resultant[it->first] = it->second;
-	    it++;
+	    ++it;
 	}
 	last_change = resultant;
     }
@@ -321,33 +312,31 @@ namespace libdar
     {
 	archive_num most_recent = 0;
 	infinint max = 0;
-	map<archive_num, infinint>::iterator it = const_cast<data_tree *>(this)->last_mod.begin();
-	map<archive_num, infinint>::iterator fin = const_cast<data_tree *>(this)->last_mod.end();
+	map<archive_num, infinint>::const_iterator it = last_mod.begin();
 
-	while(it != fin)
+	while(it != last_mod.end())
 	{
 	    if(it->second >= max)
 		most_recent = it->first;
-	    total_data[it->first]++;
-	    it++;
+	    ++total_data[it->first];
+	    ++it;
 	}
 	if(most_recent > 0)
-	    data[most_recent]++;
+	    ++data[most_recent];
 
-	it = const_cast<data_tree *>(this)->last_change.begin();
-	fin = const_cast<data_tree *>(this)->last_change.end();
+	it = last_change.begin();
 
 	max = 0;
 	most_recent = 0;
-	while(it != fin)
+	while(it != last_change.end())
 	{
 	    if(it->second >= max)
 		most_recent = it->first;
-	    total_ea[it->first]++;
-	    it++;
+	    ++total_ea[it->first];
+	    ++it;
 	}
 	if(most_recent > 0)
-	    ea[most_recent]++;
+	    ++ea[most_recent];
     }
 
 ////////////////////////////////////////////////////////////////
@@ -372,7 +361,7 @@ namespace libdar
 		    throw Erange("data_dir::data_dir", gettext("Unexpected end of file"));
 		rejetons.push_back(entry);
 		entry = NULL;
-		tmp--;
+		--tmp;
 	    }
 	}
 	catch(...)
@@ -402,24 +391,23 @@ namespace libdar
 	while(next != rejetons.end())
 	{
 	    delete *next;
-	    next++;
+	    ++next;
 	}
     }
 
     void data_dir::dump(generic_file & f) const
     {
-	list<data_tree *>::iterator it = const_cast<data_dir *>(this)->rejetons.begin();
-	list<data_tree *>::iterator fin = const_cast<data_dir *>(this)->rejetons.end();
+	list<data_tree *>::const_iterator it = rejetons.begin();
 	infinint tmp = rejetons.size();
 
 	data_tree::dump(f);
 	tmp.dump(f);
-	while(it != fin)
+	while(it != rejetons.end())
 	{
 	    if(*it == NULL)
 		throw SRC_BUG;
 	    (*it)->dump(f);
-	    it++;
+	    ++it;
 	}
     }
 
@@ -472,13 +460,12 @@ namespace libdar
 
     const data_tree *data_dir::read_child(const string & name) const
     {
-	list<data_tree *>::iterator it = const_cast<data_dir *>(this)->rejetons.begin();
-	list<data_tree *>::iterator fin = const_cast<data_dir *>(this)->rejetons.end();
+	list<data_tree *>::const_iterator it = rejetons.begin();
 
-	while(it != fin && *it != NULL && (*it)->get_name() != name)
-	    it++;
+	while(it != rejetons.end() && *it != NULL && (*it)->get_name() != name)
+	    ++it;
 
-	if(it == fin)
+	if(it == rejetons.end())
 	    return NULL;
 	else
 	    if(*it == NULL)
@@ -489,11 +476,10 @@ namespace libdar
 
     void data_dir::read_all_children(vector<string> & fils) const
     {
-	list<data_tree *>::iterator it = const_cast< list<data_tree *> &>(rejetons).begin();
-	list<data_tree *>::iterator fin = const_cast< list<data_tree *> &>(rejetons).end();
+	list<data_tree *>::const_iterator it = rejetons.begin();
 
 	fils.clear();
-	while(it != fin)
+	while(it != rejetons.end())
 	    fils.push_back((*it++)->get_name());
     }
 
@@ -512,7 +498,7 @@ namespace libdar
 		it = rejetons.begin(); // does not seems "it" points to the next item after erase
 	    }
 	    else
-		it++;
+		++it;
 	}
 
 	return data_tree::remove_all_from(archive) && rejetons.size() == 0;
@@ -520,13 +506,12 @@ namespace libdar
 
     void data_dir::show(user_interaction & dialog, archive_num num, string marge) const
     {
-	list<data_tree *>::iterator it = const_cast<data_dir *>(this)->rejetons.begin();
-	list<data_tree *>::iterator fin = const_cast<data_dir *>(this)->rejetons.end();
+	list<data_tree *>::const_iterator it = rejetons.begin();
 	archive_num ou;
 	bool data, ea;
 	string etat, name;
 
-	while(it != fin)
+	while(it != rejetons.end())
 	{
 	    if(*it == NULL)
 		throw SRC_BUG;
@@ -544,7 +529,7 @@ namespace libdar
 	    }
 	    if(dir != NULL)
 		dir->show(dialog, num, marge+name+"/");
-	    it++;
+	    ++it;
 	}
     }
 
@@ -556,7 +541,7 @@ namespace libdar
 	while(it != rejetons.end())
 	{
 	    (*it)->apply_permutation(src, dst);
-	    it++;
+	    ++it;
 	}
     }
 
@@ -569,21 +554,20 @@ namespace libdar
 	while(it != rejetons.end())
 	{
 	    (*it)->skip_out(num);
-	    it++;
+	    ++it;
 	}
     }
 
     void data_dir::compute_most_recent_stats(vector<infinint> & data, vector<infinint> & ea,
 					     vector<infinint> & total_data, vector<infinint> & total_ea) const
     {
-	list<data_tree *>::iterator it = const_cast<data_dir *>(this)->rejetons.begin();
-	list<data_tree *>::iterator fin = const_cast<data_dir *>(this)->rejetons.end();
+	list<data_tree *>::const_iterator it = rejetons.begin();
 
 	data_tree::compute_most_recent_stats(data, ea, total_data, total_ea);
-	while(it != fin)
+	while(it != rejetons.end())
 	{
 	    (*it)->compute_most_recent_stats(data, ea, total_data, total_ea);
-	    it++;
+	    ++it;
 	}
     }
 
@@ -599,7 +583,7 @@ namespace libdar
 	list<data_tree *>::iterator it = rejetons.begin();
 
 	while(it != rejetons.end() && *it != NULL && (*it)->get_name() != name)
-	    it++;
+	    ++it;
 
 	if(it != rejetons.end())
 	    if(*it == NULL)
@@ -735,7 +719,7 @@ static data_tree *read_from_file(generic_file & f)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: data_tree.cpp,v 1.2.2.1 2006/01/24 17:04:57 edrusb Rel $";
+    static char id[]="$Id: data_tree.cpp,v 1.2.2.3 2007/07/27 11:27:31 edrusb Rel $";
     dummy_call(id);
 }
 

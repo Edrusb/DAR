@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: hide_file.cpp,v 1.12 2005/02/22 17:59:21 edrusb Rel $
+// $Id: hide_file.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -48,7 +48,7 @@ bool hide_file::skip(const infinint & pos)
     CHECK_INIT;
     U_I it = 0;
     while(it < morceau.size() && morceau[it].offset + morceau[it].longueur - 1 < pos)
-        it++;
+        ++it;
 
     if(it >= morceau.size())
         return false;
@@ -79,7 +79,7 @@ bool hide_file::skip_relative(S_I x)
             {
                 my_x -= morceau[pos_index].longueur - pos_relicat;
                 pos_relicat = 0;
-                pos_index++;
+                ++pos_index;
             }
             else
             {
@@ -97,7 +97,7 @@ bool hide_file::skip_relative(S_I x)
         {
             if(my_x > pos_relicat)
             {
-                pos_index--;
+                --pos_index;
                 if(pos_index < morceau.size())
                 {
                     my_x -= pos_relicat;
@@ -121,10 +121,10 @@ infinint hide_file::get_position()
 {
     CHECK_INIT;
     if(pos_index >= morceau.size())
-	if(morceau.size() > 0)
-	    return morceau.back().offset + morceau.back().longueur;
-	else
+	if(morceau.empty())
 	    return 0; // empty virtual file
+	else
+	    return morceau.back().offset + morceau.back().longueur;
     else
         return morceau[pos_index].offset + pos_relicat;
 }
@@ -159,7 +159,7 @@ S_I hide_file::inherited_read(char *a, size_t size)
     return lu;
 }
 
-S_I hide_file::inherited_write(char *a, size_t size)
+S_I hide_file::inherited_write(const char *a, size_t size)
 {
     CHECK_INIT;
     throw SRC_BUG; // hide_file alsways is read-only !
@@ -167,7 +167,7 @@ S_I hide_file::inherited_write(char *a, size_t size)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: hide_file.cpp,v 1.12 2005/02/22 17:59:21 edrusb Rel $";
+    static char id[]="$Id: hide_file.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $";
     dummy_call(id);
 }
 

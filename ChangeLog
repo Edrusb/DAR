@@ -526,3 +526,12 @@ from 2.3.3 to 2.3.4
   implementation of the blowfish encryption.
 - improved the returned message when an invalid path is given as argument
 - updated doc/sample/sample1.txt script file
+
+from 2.3.4 to 2.3.5
+- changed displayed message when adding a hard link to an archive while
+  performing a differential backup
+- added back the possibility to use old blowfish implementation (bfw cipher)
+- integrated optimization patch from Sonni Norlov
+- updated Swedish translation by Peter Landgren
+- updated French translation
+- fixed broken Native Language Support in 2.3.x (where x<5)

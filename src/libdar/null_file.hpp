@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: null_file.hpp,v 1.11 2004/12/07 18:04:51 edrusb Rel $
+// $Id: null_file.hpp,v 1.11.4.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -64,7 +64,7 @@ namespace libdar
 	    return 0;
 	};
 
-        int inherited_write(char *a, size_t size)
+        int inherited_write(const char *a, size_t size)
 	{
 #ifdef MUTEX_WORKS
 	    check_self_cancellation();

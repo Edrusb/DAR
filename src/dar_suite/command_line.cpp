@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.76.2.1 2006/10/07 21:23:51 edrusb Rel $
+// $Id: command_line.cpp,v 1.76.2.3 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -536,20 +536,12 @@ bool get_args(user_interaction & dialog,
                 dialog.warning(gettext("ignoring -O option, as it is useless in this situation"));
             if(getuid() != 0 && op == extract && what_to_check == inode::cf_all) // uid == 0 for root
             {
-                char *name = tools_extract_basename(argv[0]);
+		string name;
+                tools_extract_basename(argv[0], name);
 
-                try
-                {
-                    what_to_check = inode::cf_ignore_owner;
-                    string msg = tools_printf(gettext("File ownership will not be restored as %s is not run as root. to avoid this message use -O option"), name);
-                    dialog.pause(msg);
-                }
-                catch(...)
-                {
-                    delete [] name;
-                    throw;
-                }
-                delete [] name;
+		what_to_check = inode::cf_ignore_owner;
+		string msg = tools_printf(gettext("File ownership will not be restored as %s is not run as root. to avoid this message use -O option"), name.c_str());
+		dialog.pause(msg);
             }
             if(execute != "" && file_size == 0 && (op == create || op == isolate || op == merging))
                 dialog.warning(gettext("-E is not possible (and useless) without slicing (-s option), -E will be ignored"));
@@ -650,7 +642,7 @@ bool get_args(user_interaction & dialog,
                 //
             if(algo == none)
             {
-                if(compr_include_exclude.size() > 0)
+                if(!compr_include_exclude.empty())
                     dialog.warning(gettext("-Y and -Z are only useful with compression (-z or -y option for example), ignoring any -Y and -Z option"));
                 if(min_compr_size != min_compr_size_default)
                     dialog.warning(gettext("-m is only useful with compression (-z or -y option for example), ignoring -m"));
@@ -1540,28 +1532,19 @@ static bool get_args_recursive(user_interaction & dialog,
 
 static void usage(user_interaction & dialog, const char *command_name)
 {
-    char *name = tools_extract_basename(command_name);
+    string name;
+    tools_extract_basename(command_name, name);
     shell_interaction_change_non_interactive_output(&cout);
 
-    try
-    {
-        dialog.printf(gettext("usage: %s [ -c | -x | -d | -t | -l | -C | -+ ] [<path>/]<basename> [options...]\n"), name);
-        dialog.printf("       %s -h\n", name);
-        dialog.printf("       %s -V\n", name);
+    dialog.printf(gettext("usage: %s [ -c | -x | -d | -t | -l | -C | -+ ] [<path>/]<basename> [options...]\n"), name.c_str());
+    dialog.printf("       %s -h\n", name.c_str());
+    dialog.printf("       %s -V\n", name.c_str());
 #include "dar.usage"
-    }
-    catch(...)
-    {
-        delete [] name;
-        throw;
-    }
-
-    delete [] name;
 }
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.76.2.1 2006/10/07 21:23:51 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.76.2.3 2007/07/22 16:34:59 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -1919,38 +1902,30 @@ static void show_license(user_interaction & dialog)
 
 static void show_version(user_interaction & dialog, const char *command_name)
 {
-    char *name = tools_extract_basename(command_name);
+    string name;
+    tools_extract_basename(command_name, name);
     U_I maj, med, min, bits;
-    bool ea, largefile, nodump, special_alloc, thread, libz, libbz2, libcrypto;
+    bool ea, largefile, nodump, special_alloc, thread, libz, libbz2, libcrypto, new_blowfish;
 
     get_version(maj, min);
     if(maj > 2)
         get_version(maj, med, min);
     else
         med = 0;
-    get_compile_time_features(ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
+    get_compile_time_features(ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
     shell_interaction_change_non_interactive_output(&cout);
-    try
-    {
-        dialog.warning(tools_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n",  name, ::dar_version())
-                       + "   " + dar_suite_command_line_features()
-                       + "\n"
-                       + (maj > 2 ? tools_printf(gettext(" Using libdar %u.%u.%u built with compilation time options:"), maj, med, min)
-                          : tools_printf(gettext(" Using libdar %u.%u built with compilation time options:"), maj, min)));
-        tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
-        dialog.printf("\n");
-        dialog.warning(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__)
-                       + tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name, PACKAGE_VERSION)
-                       + tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name, name)
-                       + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
-                       + tools_printf(gettext(" type `%s -L | more'\n for details.\n\n"), name));
-    }
-    catch(...)
-    {
-        delete [] name;
-        throw;
-    }
-    delete [] name;
+    dialog.warning(tools_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n",  name.c_str(), ::dar_version())
+		   + "   " + dar_suite_command_line_features()
+		   + "\n"
+		   + (maj > 2 ? tools_printf(gettext(" Using libdar %u.%u.%u built with compilation time options:"), maj, med, min)
+		      : tools_printf(gettext(" Using libdar %u.%u built with compilation time options:"), maj, min)));
+    tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
+    dialog.printf("\n");
+    dialog.warning(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__)
+		   + tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name.c_str(), PACKAGE_VERSION)
+		   + tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name.c_str(), name.c_str())
+		   + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
+		   + tools_printf(gettext(" type `%s -L | more'\n for details.\n\n"), name.c_str()));
 }
 
 #if HAVE_GETOPT_LONG
@@ -2111,7 +2086,7 @@ static void make_args_from_file(user_interaction & dialog, operation op, const c
         argv = new char *[argc];
         if(argv == NULL)
             throw Ememory("make_args_from_file");
-	for(S_I i = 0; i < argc; i++)
+	for(S_I i = 0; i < argc; ++i)
 	    argv[i] = NULL;
 
             // adding a fake "dar" word as first argument (= argv[0])
@@ -2126,7 +2101,7 @@ static void make_args_from_file(user_interaction & dialog, operation op, const c
 
         if(info_details)
             dialog.printf(gettext("Arguments read from %s :"), filename);
-        for(U_I i = 0; i < mots.size(); i++)
+        for(U_I i = 0; i < mots.size(); ++i)
         {
             argv[i+1] = tools_str2charptr(mots[i]); // mots[i] goes to argv[i+1] !
             if(info_details && i > 0)
@@ -2139,7 +2114,7 @@ static void make_args_from_file(user_interaction & dialog, operation op, const c
     {
         if(argv != NULL)
         {
-	    for(S_I i = 0; i < argc; i++)
+	    for(S_I i = 0; i < argc; ++i)
 		if(argv[i] != NULL)
 		    delete[] argv[i];
 	    delete[] argv;
@@ -2156,7 +2131,7 @@ static void make_args_from_file(user_interaction & dialog, operation op, const c
 static void destroy(S_I argc, char **argv)
 {
     register S_I i = 0;
-    for(i = 0; i < argc; i++)
+    for(i = 0; i < argc; ++i)
         delete argv[i];
     delete argv;
 }
@@ -2177,7 +2152,7 @@ static void skip_getopt(S_I argc, char *argv[], S_I next_to_read)
 static void show_args(S_I argc, char *argv[])
 {
     register S_I i;
-    for(i = 0; i < argc; i++)
+    for(i = 0; i < argc; ++i)
         dialog.printf("[%s]\n", argv[i]);
 }
 #endif
@@ -2552,7 +2527,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
 
     try
     {
-        while(listing.size() > 0)
+        while(!listing.empty())
         {
             opt.read_from(listing.front());
             if(listing.front().included)
@@ -2658,7 +2633,7 @@ static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include
 
     try
     {
-	while(listing.size() > 0)
+	while(!listing.empty())
 	{
 	    opt.read_from(listing.front());
 	    if(listing.front().included)

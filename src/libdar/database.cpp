@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database.cpp,v 1.6 2005/12/29 02:32:41 edrusb Rel $
+// $Id: database.cpp,v 1.6.2.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -101,9 +101,9 @@ namespace libdar
 	    tools_read_string(f, dat.chemin);
 	    tools_read_string(f, dat.basename);
 	    coordinate.push_back(dat);
-	    tmp--;
+	    --tmp;
 	}
-	if(coordinate.size() < 1)
+	if(coordinate.empty())
 	    throw Erange("database::database", gettext("Badly formatted database"));
 	tools_read_vector(f, options_to_dar);
 	tools_read_string(f, dar_path);
@@ -140,7 +140,7 @@ namespace libdar
 	    archive_num tmp = coordinate.size();
 
  	    infinint(tmp).dump(*f);
-	    for(archive_num i = 0; i < tmp; i++)
+	    for(archive_num i = 0; i < tmp; ++i)
 	    {
 		tools_write_string(*f, coordinate[i].chemin);
 		tools_write_string(*f, coordinate[i].basename);
@@ -189,7 +189,7 @@ namespace libdar
 	    throw Erange("database::remove_archive", gettext("Incorrect archive range in database"));
 	if(min == 0 || max >= coordinate.size())
 	    throw Erange("database::remove_archive", gettext("Incorrect archive range in database"));
-	for(U_I i = max ; i >= min ; i--)
+	for(U_I i = max ; i >= min ; --i)
 	{
 	    coordinate.erase(coordinate.begin() + i);
 	    if(files == NULL)
@@ -234,7 +234,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: database.cpp,v 1.6 2005/12/29 02:32:41 edrusb Rel $";
+	static char id[]="$Id: database.cpp,v 1.6.2.1 2007/07/22 16:34:59 edrusb Rel $";
 	dummy_call(id);
     }
 
@@ -251,7 +251,7 @@ namespace libdar
 	    dialog.printf("------------+--------------+---------------\n");
 	}
 
-	for(archive_num i = 1; i < coordinate.size(); i++)
+	for(archive_num i = 1; i < coordinate.size(); ++i)
 	{
 	    if(dialog.get_use_dar_manager_contents())
 		dialog.dar_manager_contents(i, coordinate[i].chemin, coordinate[i].basename);
@@ -324,7 +324,7 @@ namespace libdar
 	    dialog.printf(gettext("  archive #   |  most recent/total data |  most recent/total EA\n"));
 	    dialog.printf("--------------+-------------------------+-----------------------\n");
 	}
-	for(archive_num i = 1; i < coordinate.size(); i++)
+	for(archive_num i = 1; i < coordinate.size(); ++i)
 	    if(dialog.get_use_dar_manager_statistics())
 		dialog.dar_manager_statistics(i, stats_data[i], total_data[i], stats_ea[i], total_ea[i]);
 	    else
@@ -347,7 +347,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	    // determination of the archive to restore and files to restore for each selected archive
-	while(anneau.size() > 0)
+	while(!anneau.empty())
 	{
 	    if(data_tree_find(anneau.front(), *files, ptr))
 	    {
@@ -421,7 +421,7 @@ namespace libdar
 
 	    // calling dar for each archive
 
-	if(command_line.size() > 0)
+	if(!command_line.empty())
 	{
 	    string dar_cmd = dar_path != "" ? dar_path : "dar";
 	    map<archive_num, vector<string> >::iterator ut = command_line.begin();

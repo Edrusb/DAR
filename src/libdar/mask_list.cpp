@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask_list.cpp,v 1.2 2006/01/08 16:33:43 edrusb Rel $
+// $Id: mask_list.cpp,v 1.2.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -54,7 +54,7 @@ namespace libdar
     {
         case_s = case_sensit;
         including = include;
-        char *filename_list = tools_str2charptr(filename_list_st);
+        const char *filename_list = filename_list_st.c_str();
         path prefix = prefix_t;
 
         if(!case_sensit)
@@ -64,142 +64,133 @@ namespace libdar
             prefix = path(ptp);
         }
 
-        try
-        {
-            char *buffer = NULL;
-            const U_I buf_size = 20480; // read at most this number of bytes at a time
-            S_I src = ::open(filename_list, O_RDONLY|O_TEXT);
-            list <string> tmp;
+	char *buffer = NULL;
+	const U_I buf_size = 20480; // read at most this number of bytes at a time
+	S_I src = ::open(filename_list, O_RDONLY|O_TEXT);
+	list <string> tmp;
 
-            if(src < 0)
-                throw Erange("mask_list::mask_list", tools_printf(gettext("Cannot open file %s: %s"), filename_list, strerror(errno)));
+	if(src < 0)
+	    throw Erange("mask_list::mask_list", tools_printf(gettext("Cannot open file %s: %s"), filename_list, strerror(errno)));
 
-            try
-            {
-                buffer = new char[buf_size+1]; // one char more to be able to add a '\0' if necessary
-                U_I lu = 0, curs;
-                char *beg = NULL;
-                string current_entry = "";
+	try
+	{
+	    buffer = new char[buf_size+1]; // one char more to be able to add a '\0' if necessary
+	    U_I lu = 0, curs;
+	    char *beg = NULL;
+	    string current_entry = "";
 
-                if(buffer == NULL)
-                    throw Erange("mask_list::mask_list", tools_printf(gettext("Cannot allocate memory for buffer while reading %s"), filename_list));
-                try
-                {
-                    do
-                    {
-                        lu = ::read(src, buffer, buf_size);
+	    if(buffer == NULL)
+		throw Erange("mask_list::mask_list", tools_printf(gettext("Cannot allocate memory for buffer while reading %s"), filename_list));
+	    try
+	    {
+		do
+		{
+		    lu = ::read(src, buffer, buf_size);
 
-                        if(lu > 0)
-                        {
-                            curs = 0;
-                            beg = buffer;
+		    if(lu > 0)
+		    {
+			curs = 0;
+			beg = buffer;
 
-                            do
-                            {
-                                while(curs < lu && buffer[curs] != '\n' && buffer[curs] != '\0')
-                                    curs++;
+			do
+			{
+			    while(curs < lu && buffer[curs] != '\n' && buffer[curs] != '\0')
+				curs++;
 
-                                if(curs < lu)
-                                {
-                                    if(buffer[curs] == '\0')
-                                        throw Erange("mask_list::mask_list", tools_printf(gettext("Found '\0' character in %s, not a plain file, aborting"), filename_list));
-                                    if(buffer[curs] == '\n')
-                                    {
-                                        buffer[curs] = '\0';
-                                        if(!case_s)
-                                            tools_to_upper(beg);
-                                        current_entry += string(beg);
-                                        if(current_entry != "")
-                                            tmp.push_back(current_entry);
-                                        current_entry = "";
-                                        curs++;
-                                        beg = buffer + curs;
-                                    }
-                                    else
-                                        throw SRC_BUG;
-                                }
-                                else // reached end of buffer without having found an end of string
-                                {
-                                    buffer[lu] = '\0';
-                                    if(!case_s)
-                                        tools_to_upper(beg);
-                                    current_entry += string(beg);
-                                }
-                            }
-                            while(curs < lu);
-                        }
-                        else
-                            if(lu < 0)
-                                throw Erange("mask_list::mask_list", tools_printf(gettext("Cannot read file %s : %s"), filename_list, strerror(errno)));
-                    }
-                    while(lu > 0);
+			    if(curs < lu)
+			    {
+				if(buffer[curs] == '\0')
+				    throw Erange("mask_list::mask_list", tools_printf(gettext("Found '\0' character in %s, not a plain file, aborting"), filename_list));
+				if(buffer[curs] == '\n')
+				{
+				    buffer[curs] = '\0';
+				    if(!case_s)
+					tools_to_upper(beg);
+				    current_entry += string(beg);
+				    if(current_entry != "")
+					tmp.push_back(current_entry);
+				    current_entry = "";
+				    curs++;
+				    beg = buffer + curs;
+				}
+				else
+				    throw SRC_BUG;
+			    }
+			    else // reached end of buffer without having found an end of string
+			    {
+				buffer[lu] = '\0';
+				if(!case_s)
+				    tools_to_upper(beg);
+				current_entry += string(beg);
+			    }
+			}
+			while(curs < lu);
+		    }
+		    else
+			if(lu < 0)
+			    throw Erange("mask_list::mask_list", tools_printf(gettext("Cannot read file %s : %s"), filename_list, strerror(errno)));
+		}
+		while(lu > 0);
 
-                    if(current_entry != "")
-                        tmp.push_back(current_entry);
-                }
-                catch(...)
-                {
-                    delete [] buffer;
-                    throw;
-                }
-                delete [] buffer;
+		if(current_entry != "")
+		    tmp.push_back(current_entry);
+	    }
+	    catch(...)
+	    {
+		delete [] buffer;
+		throw;
+	    }
+	    delete [] buffer;
 
-                    // completing relative paths of the list
-                if(prefix.is_relative())
-                    throw Erange("mask_list::mask_list", gettext("Mask_list's prefix must be an absolute path"));
-                else
-                {
-                    path current = "/";
-                    list <string>::iterator it = tmp.begin();
+		// completing relative paths of the list
+	    if(prefix.is_relative())
+		throw Erange("mask_list::mask_list", gettext("Mask_list's prefix must be an absolute path"));
+	    else
+	    {
+		path current = "/";
+		list <string>::iterator it = tmp.begin();
 
-                    while(it != tmp.end())
-                    {
-                        try
-                        {
-                            current = *it;
-                            if(current.is_relative())
-                            {
-                                current = prefix + current;
-                                *it = current.display();
-                            }
-                        }
-                        catch(Erange & e)
-                        {
-                            e.dump();
-                            throw SRC_BUG;
-                        }
-                        it++;
-                    }
-                }
+		while(it != tmp.end())
+		{
+		    try
+		    {
+			current = *it;
+			if(current.is_relative())
+			{
+			    current = prefix + current;
+			    *it = current.display();
+			}
+		    }
+		    catch(Erange & e)
+		    {
+			e.dump();
+			throw SRC_BUG;
+		    }
+		    it++;
+		}
+	    }
 
-                    // we use the features of lists
-                tmp.sort();   // sort the list ( using the string's < operator )
-                tmp.unique(); // remove duplicates
+		// we use the features of lists
+	    tmp.sort();   // sort the list ( using the string's < operator )
+	    tmp.unique(); // remove duplicates
 
-                    // but we need the indexing of vectors
-                contenu.assign(tmp.begin(), tmp.end());
-                taille = contenu.size();
-                if(taille < contenu.size())
-                    throw Erange("mask_list::mask_list", tools_printf(gettext("Too much line in file %s (integer overflow)"), filename_list));
-            }
-            catch(...)
-            {
-                ::close(src);
-                throw;
-            }
-            close(src);
-        }
-        catch(...)
-        {
-            delete filename_list;
-            throw;
-        }
-        delete filename_list;
+		// but we need the indexing of vectors
+	    contenu.assign(tmp.begin(), tmp.end());
+	    taille = contenu.size();
+	    if(taille < contenu.size())
+		throw Erange("mask_list::mask_list", tools_printf(gettext("Too much line in file %s (integer overflow)"), filename_list));
+	}
+	catch(...)
+	{
+	    ::close(src);
+	    throw;
+	}
+	close(src);
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: mask_list.cpp,v 1.2 2006/01/08 16:33:43 edrusb Rel $";
+        static char id[]="$Id: mask_list.cpp,v 1.2.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 

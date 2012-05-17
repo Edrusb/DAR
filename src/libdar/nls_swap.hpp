@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: nls_swap.hpp,v 1.3 2005/04/09 21:43:34 edrusb Rel $
+// $Id: nls_swap.hpp,v 1.3.2.2 2007/08/19 11:42:42 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -35,6 +35,7 @@
 #include "tools.hpp"
 
 #ifdef ENABLE_NLS
+
 #define NLS_SWAP_IN                             \
          string nls_swap_tmp;                   \
          if(textdomain(NULL) != NULL)           \
@@ -48,31 +49,13 @@
 
 #define NLS_SWAP_OUT                                             \
         if(nls_swap_tmp != "")                                   \
-        {                                                        \
-            try                                                  \
-	    {						         \
-                  char *tmp = tools_str2charptr(nls_swap_tmp);   \
-                  try                                            \
-                  {                                              \
-     	              textdomain(tmp);                           \
-                  }                                              \
-                  catch(...)                                     \
-                  {                                              \
-                      delete [] tmp;                             \
-                      throw;                                     \
-                  }                                              \
-                  delete [] tmp;                                 \
-	    }                                                    \
-            catch(...)                                           \
-            {                                                    \
-	    }                                                    \
-        }                                                        \
-        else                                                     \
-            nls_swap_tmp = ""
+            textdomain(nls_swap_tmp.c_str())
 
 #else
+
 #define NLS_SWAP_IN //
 #define NLS_SWAP_OUT //
+
 #endif
 
 

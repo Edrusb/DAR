@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.hpp,v 1.18 2005/09/25 19:05:42 edrusb Rel $
+// $Id: user_interaction.hpp,v 1.18.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -94,6 +94,7 @@ namespace libdar
 
 	    /// class constructor.
 	user_interaction();
+	virtual ~user_interaction() {};
 
 	    /// method used to ask a boolean question to the user.
 
@@ -334,7 +335,6 @@ namespace libdar
 				  bool (*x_answer_callback)(const std::string &x, void *context),
 				  std::string (*x_string_callback)(const std::string &x, bool echo, void *context),
 				  void *context_value);
-
 
 	    /// overwritting method from parent class.
        	void pause(const std::string & message);

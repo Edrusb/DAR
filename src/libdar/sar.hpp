@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.hpp,v 1.16 2005/09/19 21:17:37 edrusb Rel $
+// $Id: sar.hpp,v 1.16.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -81,7 +81,7 @@ namespace libdar
 
     protected :
         S_I inherited_read(char *a, size_t sz);
-        S_I inherited_write(char *a, size_t sz);
+        S_I inherited_write(const char *a, size_t sz);
 
     private :
         path archive_dir;
@@ -117,8 +117,8 @@ namespace libdar
         bool skip_forward(U_I x);
         bool skip_backward(U_I x);
         void close_file();
-        void open_readonly(char *fic, const infinint &num);
-        void open_writeonly(char *fic, const infinint &num);
+        void open_readonly(const char *fic, const infinint &num);
+        void open_writeonly(const char *fic, const infinint &num);
         void open_file_init();
         void open_file(infinint num);
         void set_offset(infinint offset);
@@ -144,7 +144,7 @@ namespace libdar
 
     protected:
         S_I inherited_read(char *a, size_t size) { return reference->read(a, size); };
-        S_I inherited_write(char *a, size_t size) { return reference->write(a, size); };
+        S_I inherited_write(const char *a, size_t size) { return reference->write(a, size); };
 
     private:
         generic_file *reference;

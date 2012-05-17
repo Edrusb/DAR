@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.hpp,v 1.13 2004/12/07 18:04:52 edrusb Rel $
+// $Id: tuyau.hpp,v 1.13.4.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -61,7 +61,7 @@ namespace libdar
 
     protected:
         virtual int inherited_read(char *a, size_t size);
-        virtual int inherited_write(char *a, size_t size);
+        virtual int inherited_write(const char *a, size_t size);
 
     private:
         infinint position;

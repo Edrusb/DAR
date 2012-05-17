@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_catalogue.cpp,v 1.15.2.1 2006/10/22 19:16:03 edrusb Rel $
+// $Id: test_catalogue.cpp,v 1.15.2.2 2007/07/22 16:35:01 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -111,7 +111,7 @@ void f1()
 
         entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, NULL };
 
-        for(S_I i = 0; liste[i] != NULL; i++)
+        for(S_I i = 0; liste[i] != NULL; ++i)
         {
             inode *ino = dynamic_cast<inode *>(liste[i]);
 
@@ -124,7 +124,7 @@ void f1()
         entree_stats stats;
         stats.clear();
         entree *ref = (entree *)1; // != NULL
-        for(S_I i = 0; ref != NULL; i++)
+        for(S_I i = 0; ref != NULL; ++i)
         {
             ref = entree::read(*ui, *dump, "03", stats, corres, none, dump, dump);
             if(ref != NULL)

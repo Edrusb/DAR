@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: ea.cpp,v 1.13 2005/05/08 12:12:00 edrusb Rel $
+// $Id: ea.cpp,v 1.13.2.1 2007/07/27 11:27:31 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -99,17 +99,16 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: ea.cpp,v 1.13 2005/05/08 12:12:00 edrusb Rel $";
+        static char id[]="$Id: ea.cpp,v 1.13.2.1 2007/07/27 11:27:31 edrusb Rel $";
         dummy_call(id);
     }
 
     void ea_attributs::dump(generic_file & f) const
     {
-        vector<ea_entry>::iterator it = const_cast<ea_attributs &>(*this).attr.begin();
-        vector<ea_entry>::iterator fin = const_cast<ea_attributs &>(*this).attr.end();
+        vector<ea_entry>::const_iterator it = attr.begin();
 
         size().dump(f);
-        while(it != fin)
+        while(it != attr.end())
         {
             it->dump(f);
             it++;
@@ -153,12 +152,11 @@ namespace libdar
 
     bool ea_attributs::find(const string & key, string & found_value) const
     {
-        vector<ea_entry>::iterator it = const_cast<vector<ea_entry> &>(attr).begin();
-        vector<ea_entry>::iterator fin = const_cast<vector<ea_entry> &>(attr).end();
+        vector<ea_entry>::const_iterator it = attr.begin();
 
-        while(it != fin && it->key != key)
+        while(it != attr.end() && it->key != key)
             it++;
-        if(it != fin)
+        if(it != attr.end())
         {
 	    found_value = it->value;
             return true;

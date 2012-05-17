@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.cpp,v 1.13.2.1 2007/06/21 20:47:12 edrusb Rel $
+// $Id: path.cpp,v 1.13.2.3 2007/07/27 16:02:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -42,14 +42,14 @@ namespace libdar
 	try
 	{
 	    dirs.clear();
-	    if(s.size() < 1)
+	    if(s.empty())
 		throw Erange("path::path", gettext("Empty string is not a valid path"));
 	    relative = s[0] != '/';
 	    if(!relative)
 		s = string(s.begin()+1, s.end()); // remove the leading '/'
 	    while(path_get_root(s, tmp))
 		dirs.push_back(tmp);
-	    if(dirs.size() == 0 && relative)
+	    if(dirs.empty() && relative)
 		throw Erange("path::path", gettext("Empty string is not a valid path"));
 	    reduce();
 	    reading = dirs.begin();
@@ -89,8 +89,8 @@ namespace libdar
             list<string>::iterator there_fin = (const_cast<path &>(ref)).dirs.end();
             while(here != here_fin && there != there_fin && *here == *there)
             {
-                here++;
-                there++;
+                ++here;
+                ++there;
             }
 
             return here == here_fin && there == there_fin;
@@ -99,7 +99,7 @@ namespace libdar
 
     string path::basename() const
     {
-        if(dirs.size() > 0)
+        if(! dirs.empty())
             return dirs.back();
         else
             return "/";
@@ -109,7 +109,8 @@ namespace libdar
     {
         if(reading != dirs.end())
         {
-            r = *reading++;
+            r = *reading;
+            ++reading;
             return true;
         }
         else
@@ -128,7 +129,7 @@ namespace libdar
             else
                 return false;
         else
-            if(dirs.size() > 0)
+            if(!dirs.empty())
             {
                 arg = dirs.back();
                 dirs.pop_back();
@@ -150,7 +151,7 @@ namespace libdar
             else
                 return false;
         else
-            if(dirs.size() > 0)
+            if(!dirs.empty())
             {
                 relative = false;
                 arg = "/";
@@ -170,7 +171,7 @@ namespace libdar
         {
             if(*it != string("."))
                 dirs.push_back(*it);
-            it++;
+            ++it;
         }
 
         return *this;
@@ -186,8 +187,8 @@ namespace libdar
         while(it_me != fin_me && it_arg != fin_arg
               && (*it_me == *it_arg  || (!case_sensit && tools_is_case_insensitive_equal(*it_me, *it_arg))))
         {
-            it_me++;
-            it_arg++;
+            ++it_me;
+            ++it_arg;
         }
 
         return it_arg == fin_arg;
@@ -195,19 +196,18 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: path.cpp,v 1.13.2.1 2007/06/21 20:47:12 edrusb Rel $";
+        static char id[]="$Id: path.cpp,v 1.13.2.3 2007/07/27 16:02:49 edrusb Rel $";
         dummy_call(id);
     }
 
     string path::display() const
     {
         string ret = relative ? "" : "/";
-        list<string>::iterator it = (const_cast<path *>(this))->dirs.begin();
-        list<string>::iterator it_fin = (const_cast<path *>(this))->dirs.end();
+        list<string>::const_iterator it = dirs.begin();
 
-        if(it != it_fin)
+        if(it != dirs.end())
             ret += *it++;
-        while(it != it_fin)
+        while(it != dirs.end())
             ret = ret + "/" + *it++;
 
         return ret;
@@ -216,7 +216,7 @@ namespace libdar
     void path::reduce()
     {
         dirs.remove(".");
-        if(dirs.size() == 0 && relative)
+        if(relative && dirs.empty())
             dirs.push_back(".");
         else
         {
@@ -232,7 +232,7 @@ namespace libdar
                     it = dirs.erase(it);
                     if(prev != dirs.begin())
                     {
-                        prev--;
+                        --prev;
                         dirs.erase(tmp);
                     }
                     else
@@ -244,10 +244,10 @@ namespace libdar
                 else
                 {
                     prev = it;
-                    it++;
+                    ++it;
                 }
             }
-            if(dirs.size() == 0 && relative)
+            if(relative && dirs.empty())
                 dirs.push_back(".");
         }
     }
@@ -256,17 +256,17 @@ namespace libdar
     {
         string::iterator it = p.begin();
 
-        if(p.size() == 0)
+        if(p.empty())
             return false;
         while(it != p.end() && *it != '/' )
-            it++;
+            ++it;
 
         root = string(p.begin(), it);
         if(it != p.end())
             p = string(it+1, p.end());
         else
             p = "";
-        if(root.size() == 0)
+        if(root.empty())
             throw Erange("path_get_root", gettext("Empty string as subdirectory does not make a valid path"));
 
         return true;

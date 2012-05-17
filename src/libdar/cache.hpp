@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: cache.hpp,v 1.10 2005/04/09 21:43:34 edrusb Rel $
+// $Id: cache.hpp,v 1.10.2.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -81,7 +81,7 @@ namespace libdar
     protected:
 	    // inherited from generic_file
 	S_I inherited_read(char *a, size_t size);
-	S_I inherited_write(char *a, size_t size);
+	S_I inherited_write(const char *a, size_t size);
 
     private:
 	struct buf

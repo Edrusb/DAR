@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tuyau.cpp,v 1.22 2005/12/29 02:32:41 edrusb Rel $
+// $Id: tuyau.cpp,v 1.22.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -154,7 +154,7 @@ namespace libdar
         return lu;
     }
 
-    S_I tuyau::inherited_write(char *a, size_t size)
+    S_I tuyau::inherited_write(const char *a, size_t size)
     {
         size_t total = 0;
 
@@ -192,7 +192,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tuyau.cpp,v 1.22 2005/12/29 02:32:41 edrusb Rel $";
+        static char id[]="$Id: tuyau.cpp,v 1.22.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -200,35 +200,25 @@ namespace libdar
     {
         if(chemin != "")
         {
-            char *ch = tools_str2charptr(chemin);
-            try
-            {
-                S_I flag;
+	    S_I flag;
 
-                switch(get_mode())
-                {
-                case gf_read_only:
-                    flag = O_RDONLY;
-                    break;
-                case gf_write_only:
-                    flag = O_WRONLY;
-                    break;
-                case gf_read_write:
-                    flag = O_RDWR;
-                    break;
-                default:
-                    throw SRC_BUG;
-                }
-                filedesc = ::open(ch, flag|O_BINARY);
-                if(filedesc < 0)
-                    throw Erange("tuyau::ouverture", string(gettext("Error opening pipe: "))+strerror(errno));
-            }
-            catch(...)
-            {
-                delete [] ch;
-                throw;
-            }
-            delete [] ch;
+	    switch(get_mode())
+	    {
+	    case gf_read_only:
+		flag = O_RDONLY;
+		break;
+	    case gf_write_only:
+		flag = O_WRONLY;
+		break;
+	    case gf_read_write:
+		flag = O_RDWR;
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+	    filedesc = ::open(chemin.c_str(), flag|O_BINARY);
+	    if(filedesc < 0)
+		throw Erange("tuyau::ouverture", string(gettext("Error opening pipe: "))+strerror(errno));
         }
         else
             throw SRC_BUG; // no path nor file descriptor

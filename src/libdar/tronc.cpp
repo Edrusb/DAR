@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.cpp,v 1.14 2004/07/31 17:45:25 edrusb Rel $
+// $Id: tronc.cpp,v 1.14.4.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -138,7 +138,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tronc.cpp,v 1.14 2004/07/31 17:45:25 edrusb Rel $";
+        static char id[]="$Id: tronc.cpp,v 1.14.4.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -171,7 +171,7 @@ namespace libdar
         return lu;
     }
 
-    S_I tronc::inherited_write(char *a, size_t size)
+    S_I tronc::inherited_write(const char *a, size_t size)
     {
         infinint avail = sz - current;
         U_32 macro_pas = 0, micro_pas;

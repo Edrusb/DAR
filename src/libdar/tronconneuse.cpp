@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronconneuse.cpp,v 1.7.2.1 2007/01/17 14:43:01 edrusb Rel $
+// $Id: tronconneuse.cpp,v 1.7.2.2 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -150,7 +150,7 @@ namespace libdar
 	return lu;
     }
 
-    S_I tronconneuse::inherited_write(char *a, size_t size)
+    S_I tronconneuse::inherited_write(const char *a, size_t size)
     {
 	size_t lu = 0;
 	bool thread_stop = false;
@@ -213,8 +213,7 @@ namespace libdar
 	    buf = new char[buf_size];
 	    if(buf == NULL)
 		throw Ememory("tronconneuse::copy_from");
-	    for(U_I i = 0; i < buf_byte_data; i++)
-		buf[i] = ref.buf[i];
+	    memcpy(buf, ref.buf, buf_byte_data);
 	    clear_block_size = ref.clear_block_size;
 	    current_position = ref.current_position;
 	    block_num = ref.block_num;
@@ -226,8 +225,7 @@ namespace libdar
 	    encrypted_buf = new char[encrypted_buf_size];
 	    if(encrypted_buf == NULL)
 		throw Ememory("tronconneuse::copy_from");
-	    for(U_I i = 0; i < encrypted_buf_size; i++)
-		encrypted_buf[i] = ref.encrypted_buf[i];
+	    memcpy(encrypted_buf, ref.encrypted_buf, encrypted_buf_size);
 	    weof = ref.weof;
 	}
 	catch(...)
@@ -331,7 +329,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tronconneuse.cpp,v 1.7.2.1 2007/01/17 14:43:01 edrusb Rel $";
+        static char id[]="$Id: tronconneuse.cpp,v 1.7.2.2 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 

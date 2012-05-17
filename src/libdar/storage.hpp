@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.hpp,v 1.11 2004/11/07 18:21:38 edrusb Rel $
+// $Id: storage.hpp,v 1.11.4.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -56,6 +56,7 @@ namespace libdar
     private:
         struct cellule
         {
+	    cellule() : next(NULL), prev(NULL), data(NULL), size(0) {};
             struct cellule *next, *prev;
             unsigned char *data;
             U_32 size;
@@ -95,7 +96,7 @@ namespace libdar
         class iterator
         {
         public :
-            iterator() { ref = NULL; cell = NULL; offset = 0; };
+            iterator() : ref(NULL), cell(NULL), offset(0) {};
                 // default constructor by reference is OK
                 // default destructor is OK
                 // default operator = is OK
@@ -215,7 +216,7 @@ namespace libdar
         E_BEGIN;
         if(cell != NULL)
             if(offset > 0)
-                offset--;
+                --offset;
             else
             {
                 cell = cell->prev;

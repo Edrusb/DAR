@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $
+// $Id: storage.cpp,v 1.16.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -120,13 +120,10 @@ namespace libdar
     {
         E_BEGIN;
         register struct cellule *cur = first;
-        register U_32 i;
 
         while(cur != NULL)
         {
-            i = 0;
-            while(i < cur->size)
-                cur->data[i++] = val;
+	    memset(cur->data, val, cur->size);
             cur = cur->next;
         }
         E_END("storage::clear","");
@@ -139,7 +136,7 @@ namespace libdar
 
         while(ptr != NULL)
         {
-            f.write((char *)(ptr->data), ptr->size);
+            f.write((const char *)(ptr->data), ptr->size);
             ptr = ptr->next;
         }
         E_END("storage::dump", "");
@@ -148,30 +145,70 @@ namespace libdar
     U_I storage::write(iterator & it, unsigned char *a, U_I size)
     {
         E_BEGIN;
-        register U_I i;
 
         if(it.ref != this)
             throw Erange("storage::write", gettext("The iterator is not indexing the object it has been asked to write to"));
 
-        for(i = 0; i < size && it != end(); i++)
-            *(it++) = a[i];
+        U_I wrote = 0;
+	while(wrote < size && it != end())
+	{
+	    U_32 to_write = size - wrote;
+	    U_32 space = it.cell->size - it.offset;
 
-        return i;
+	    if(to_write <= space)
+	    {	// enough room in current data block
+		memcpy(it.cell->data + it.offset, a + wrote, to_write);
+		wrote += to_write;
+		it.offset += to_write;
+	    }
+	    else
+	    {	// more to copy than available in current data block
+		memcpy(it.cell->data + it.offset, a + wrote, space);
+		wrote += space;
+		it.cell = it.cell->next;
+		if(it.cell != NULL)
+		    it.offset = 0;
+		else
+		    it.offset = iterator::OFF_END;
+	    }
+	}
+
+        return wrote;
         E_END("storage::write","");
     }
 
     U_I storage::read(iterator & it, unsigned char *a, U_I size) const
     {
         E_BEGIN;
-        register U_I i;
 
         if(it.ref != this)
             throw Erange("storage::read", gettext("The iterator is not indexing the object it has been asked to read from"));
 
-        for(i = 0; i < size && it != end(); i++)
-            a[i] = *(it++);
+	U_I read = 0;
+	while(read < size && it != end())
+	{
+	    U_32 to_read = size - read;
+	    U_32 space = it.cell->size - it.offset;
 
-        return i;
+	    if(to_read <= space)
+	    {	// enough room in current data block
+		memcpy(a + read, it.cell->data + it.offset, to_read);
+		read += to_read;
+		it.offset += to_read;
+	    }
+	    else
+	    {	// more to copy than available in current data block
+		memcpy(a + read, it.cell->data + it.offset, space);
+		read += space;
+		it.cell = it.cell->next;
+		if(it.cell != NULL)
+		    it.offset = 0;
+		else
+		    it.offset = iterator::OFF_END;
+	    }
+	}
+
+        return read;
         E_END("storage::read","");
     }
 
@@ -246,8 +283,7 @@ namespace libdar
 
                     if(p != NULL)
                     {
-                        for(register U_I i = 0; i < it.offset; i++)
-                            p[i] = it.cell->data[i];
+			memcpy(p, it.cell->data, it.offset);
                         delete [] it.cell->data;
 
                         it.cell->data = p;
@@ -286,11 +322,9 @@ namespace libdar
 
                 if(p != NULL)
                 {
-                    for(register U_I i = 0; i < it.offset; i++)
-                        p[i] = it.cell->data[i];
-                    for(register U_I i = it.offset+number ; i < it.cell->size ; i++)
-                        p[i-number] = it.cell->data[i];
-                    delete [] it.cell->data;
+		    memcpy(p, it.cell->data, it.offset);
+		    memcpy(p + it.offset, it.cell->data + it.offset + number, it.cell->size - it.offset - number);
+		    delete [] it.cell->data;
 
                     it.cell->data = p;
                     it.cell->size -= number;
@@ -390,13 +424,17 @@ namespace libdar
         iterator i_new = begin();
 
         while(i_ref != ref.end())
-            *(i_new++) = *(i_ref++);
+	{
+            *i_new = *i_ref;
+	    ++i_new;
+	    ++i_ref;
+	}
         E_END("storage::copy_from","");
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: storage.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $";
+        static char id[]="$Id: storage.cpp,v 1.16.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -442,12 +480,8 @@ namespace libdar
                     if(p != NULL)
                     {
                         struct cellule *tmp = glisseur->next;
-
-                        for(register U_I i = 0; i < glisseur->size; i++)
-                            p[i] = glisseur->data[i];
-
-                        for(register U_I i = glisseur->size; i < somme; i++)
-                            p[i] = tmp->data[i - glisseur->size];
+			memcpy(p, glisseur->data, glisseur->size);
+			memcpy(p + glisseur->size, tmp->data, somme - glisseur->size);
 
                         delete [] glisseur->data;
 
@@ -563,7 +597,8 @@ namespace libdar
 
             temp.last = temp.first = NULL;
         }
-        reduce();
+	reduce();
+
         E_END("storage::insert_bytes_at_iterator_cmn","");
     }
 
@@ -590,10 +625,9 @@ namespace libdar
         E_BEGIN;
         struct cellule *newone;
         struct cellule *previous = NULL;
-	U_32 dsize;
 
+	U_32 dsize = size;
 	begin = NULL;
-	dsize = size;
         do
         {
             newone = new struct cellule;
@@ -614,8 +648,11 @@ namespace libdar
 
 	    do
 	    {
-		newone->data = new unsigned char[dsize];
-		if(newone->data != NULL)
+		if(dsize > 0)
+		    newone->data = new unsigned char[dsize];
+		else
+		    newone->data = NULL;
+		if(newone->data != NULL || dsize == 0)
 		{
 		    size -= dsize;
 		    newone->size = dsize;

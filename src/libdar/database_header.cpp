@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database_header.cpp,v 1.1 2005/06/27 18:55:30 edrusb Rel $
+// $Id: database_header.cpp,v 1.1.2.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -74,53 +74,40 @@ namespace libdar
 
     generic_file *database_header_create(user_interaction & dialog, const string & filename, bool overwrite)
     {
-	char *ptr = tools_str2charptr(filename);
 	generic_file *ret = NULL;
 
-	try
+	struct stat buf;
+	S_I fd;
+	database_header h;
+	compressor *comp;
+
+	if(stat(filename.c_str(), &buf) >= 0 && !overwrite)
+	    throw Erange("database_header_create", gettext("Cannot create database, file exists"));
+	fd = ::open(filename.c_str(), O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
+	if(fd < 0)
+	    throw Erange("database_header_create", tools_printf(gettext("Cannot create database %S : %s"), &filename, strerror(errno)));
+	ret = new fichier(dialog, fd);
+	if(ret == NULL)
 	{
-	    struct stat buf;
-	    S_I fd;
-	    database_header h;
-	    compressor *comp;
-
-	    if(stat(ptr, &buf) >= 0 && !overwrite)
-		throw Erange("database_header_create", gettext("Cannot create database, file exists"));
-	    fd = ::open(ptr, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
-	    if(fd < 0)
-		throw Erange("database_header_create", tools_printf(gettext("Cannot create database %S : %s"), &filename, strerror(errno)));
-	    ret = new fichier(dialog, fd);
-	    if(ret == NULL)
-	    {
-		close(fd);
-		throw Ememory("database_header_create");
-	    }
-
-	    h.version = database_version;
-	    h.options = HEADER_OPTION_NONE;
-	    h.write(*ret);
-
-	    comp = new compressor(dialog, gzip, ret); // upon success, ret is owned by compr
-	    if(comp == NULL)
-		throw Ememory("database_header_create");
-	    else
-		ret = comp;
+	    close(fd);
+	    throw Ememory("database_header_create");
 	}
-	catch(...)
-	{
-	    delete [] ptr;
-	    if(ret != NULL)
-		delete ret;
-	    throw;
-	}
-	delete [] ptr;
+
+	h.version = database_version;
+	h.options = HEADER_OPTION_NONE;
+	h.write(*ret);
+
+	comp = new compressor(dialog, gzip, ret); // upon success, ret is owned by compr
+	if(comp == NULL)
+	    throw Ememory("database_header_create");
+	else
+	    ret = comp;
 
 	return ret;
     }
 
     generic_file *database_header_open(user_interaction & dialog, const string & filename)
     {
-	char *ptr = tools_str2charptr(filename);
 	generic_file *ret = NULL;
 
 	try
@@ -130,7 +117,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new fichier(dialog, ptr, gf_read_only);
+		ret = new fichier(dialog, filename.c_str(), gf_read_only);
 	    }
 	    catch(Erange & e)
 	    {
@@ -152,13 +139,11 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    delete [] ptr;
 	    if(ret != NULL)
 		delete ret;
 	    throw;
 	}
 
-	delete [] ptr;
 	return ret;
     }
 
@@ -166,6 +151,6 @@ namespace libdar
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: database_header.cpp,v 1.1 2005/06/27 18:55:30 edrusb Rel $";
+    static char id[]="$Id: database_header.cpp,v 1.1.2.1 2007/07/22 16:34:59 edrusb Rel $";
     dummy_call(id);
 }

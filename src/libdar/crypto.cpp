@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: crypto.cpp,v 1.12.2.3 2007/06/21 19:40:37 edrusb Rel $
+// $Id: crypto.cpp,v 1.12.2.6 2007/07/27 11:27:31 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -54,9 +54,7 @@ namespace libdar
     void crypto_split_algo_pass(const string & all, crypto_algo & algo, string & pass)
     {
 	    // split from "algo:pass" syntax
-	string::iterator debut = const_cast<string &>(all).begin();
-	string::iterator fin = const_cast<string &>(all).end();
-	string::iterator it = debut;
+	string::const_iterator it = all.begin();
 	string tmp;
 
 	if(all == "")
@@ -66,14 +64,14 @@ namespace libdar
 	}
 	else
 	{
-	    while(it != fin && *it != ':')
-		it++;
+	    while(it != all.end() && *it != ':')
+		++it;
 
-	    if(it != fin) // a ':' is present in the given string
+	    if(it != all.end()) // a ':' is present in the given string
 	    {
-		tmp = string(debut, it);
-		it++;
-		pass = string(it, fin);
+		tmp = string(all.begin(), it);
+		++it;
+		pass = string(it, all.end());
 		if(tmp == "scrambling" || tmp == "scram")
 		    algo = crypto_scrambling;
 		else
@@ -83,7 +81,10 @@ namespace libdar
 			if(tmp == "blowfish" || tmp == "bf" || tmp == "")
 			    algo = crypto_blowfish; // blowfish is the default cypher ("")
 			else
-			    throw Erange("crypto_split_algo_pass", string(gettext("unknown cryptographic algorithm: ")) + tmp);
+			    if(tmp == "blowfish_weak" || tmp == "bfw")
+				algo = crypto_blowfish_weak;
+			    else
+				throw Erange("crypto_split_algo_pass", string(gettext("unknown cryptographic algorithm: ")) + tmp);
 	    }
 	    else // no ':' using blowfish as default cypher
 	    {
@@ -95,7 +96,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: crypto.cpp,v 1.12.2.3 2007/06/21 19:40:37 edrusb Rel $";
+        static char id[]="$Id: crypto.cpp,v 1.12.2.6 2007/07/27 11:27:31 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -107,17 +108,21 @@ namespace libdar
 		       U_32 block_size,
 		       const string & password,
 		       generic_file & encrypted_side,
-		       const dar_version & reading_ver)
+		       const dar_version & reading_ver,
+		       bool weak_mode)
 	: tronconneuse(dialog, block_size, encrypted_side)
     {
 #if CRYPTO_AVAILABLE
-	version_copy(x_reading_ver, reading_ver);
+	if(!weak_mode)
+	    x_weak_mode = !version_greater(reading_ver, "05");
+	else
+	    x_weak_mode = weak_mode;
 
 	    // self_test();
-	if(version_greater(x_reading_ver, "05"))
-	    dar_set_key(pkcs5_pass2key(password, "", 2000, 56));
-	else
+	if(x_weak_mode)
 	    BF_set_key(&clef, password.size(), (unsigned char *)password.c_str());
+	else
+	    dar_set_key(pkcs5_pass2key(password, "", 2000, 56));
 #else
 	throw Ecompilation(gettext("blowfish strong encryption support"));
 #endif
@@ -198,7 +203,7 @@ namespace libdar
 	    // not worse or better than the one which would result from the % 256 operation.
 	    // We thus keep this algorithm in place for backward compatibility.
 
-	if(!version_greater(x_reading_ver, "05"))
+	if(x_weak_mode)
 	{
 		/// old buggy generated IV
 
@@ -251,6 +256,7 @@ namespace libdar
 				    U_I output_length)
     {
 #if CRYPTO_AVAILABLE
+#if CRYPTO_FULL_BF_AVAILABLE
 	    // Password-based key derivation function (PBKDF2) from PKCS#5 v2.0
 	    // Using HMAC-SHA1 as the underlying pseudorandom function.
 	HMAC_CTX hmac;
@@ -351,6 +357,9 @@ namespace libdar
 
 	return retval;
 #else
+  	throw Ecompilation(gettext("New blowfish implementation support"));
+#endif
+#else
 	throw Ecompilation(gettext("blowfish strong encryption support"));
 #endif
     }
@@ -358,6 +367,7 @@ namespace libdar
     void blowfish::dar_set_key(const string & key)
     {
 #if CRYPTO_AVAILABLE
+#if CRYPTO_FULL_BF_AVAILABLE
 
 	    // Calculate the ESSIV salt.
 	    // Recall that ESSIV(sector) = E_salt(sector); salt = H(key).
@@ -402,6 +412,9 @@ namespace libdar
 	EVP_MD_CTX_destroy(digest_ctx);
 
 	BF_set_key(&clef, key.size(), (const unsigned char *) key.c_str());
+#else
+  	throw Ecompilation(gettext("New blowfish implementation support"));
+#endif
 #else
 	throw Ecompilation(gettext("blowfish strong encryption support"));
 #endif

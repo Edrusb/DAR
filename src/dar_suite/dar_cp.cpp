@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_cp.cpp,v 1.16.2.2 2007/02/24 17:43:02 edrusb Rel $
+// $Id: dar_cp.cpp,v 1.16.2.4 2007/08/24 15:37:07 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -59,7 +59,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "thread_cancellation.hpp"
 
-#define DAR_CP_VERSION "1.2.0"
+#define DAR_CP_VERSION "1.2.1"
 
 using namespace libdar;
 using namespace std;
@@ -127,23 +127,15 @@ static void show_version(user_interaction & dialog, char *argv0)
 /* C++ syntax used*/
     try
     {
-	char *cmd = tools_extract_basename(argv0);
+	string cmd;
+	tools_extract_basename(argv0, cmd);
 	    // never return a NULL pointer but
-	try
-	{
-	    dialog.warning(tools_printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n\n", cmd, DAR_CP_VERSION));
-	    dialog.warning(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__));
-	    dialog.warning(tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd, PACKAGE_VERSION));
-	    dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `dar -W'."), cmd));
-	    dialog.warning(tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;")));
-	    dialog.warning(tools_printf(gettext(" type `dar -L | more'\n for details.\n\n")));
-	}
-	catch(...)
-	{
-	    delete [] cmd;
-	    throw;
-	}
-	delete [] cmd;
+	dialog.warning(tools_printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n\n", cmd.c_str(), DAR_CP_VERSION));
+	dialog.warning(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__));
+	dialog.warning(tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd.c_str(), PACKAGE_VERSION));
+	dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `dar -W'."), cmd.c_str()));
+	dialog.warning(tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;")));
+	dialog.warning(tools_printf(gettext(" type `dar -L | more'\n for details.\n\n")));
     }
     catch(...)
     {
@@ -162,25 +154,16 @@ static int open_files(user_interaction & dialog, char *src, char *dst, int *fds,
     if(val == 0 && S_ISDIR(buf.st_mode))
     {
         tmp = (char *)malloc(strlen(src)+strlen(dst)+1+1);
-        char *tmp2 = NULL;
         if(tmp == NULL)
         {
             dialog.warning(tools_printf(gettext("Memory allocation failed : %s"), strerror(errno)));
             return 0;
         }
-        try
-        {
-            tmp2 = tools_extract_basename(src);
-        }
-        catch(...)
-        {
-            dialog.warning(tools_printf(gettext("Memory allocation failed")));
-            return 0;
-        }
+        string tmp2;
+        tools_extract_basename(src, tmp2);
         strcpy(tmp, dst);
         strcat(tmp, "/");
-        strcat(tmp, tmp2);
-        delete [] tmp2;
+        strcat(tmp, tmp2.c_str());
         dst = tmp; // dst is not dynamically allocated, thus we can
             // loose its reference.
     }
@@ -351,7 +334,7 @@ static int skip_to_next_readable(int block, char *buffer, int src, int dst, off_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_cp.cpp,v 1.16.2.2 2007/02/24 17:43:02 edrusb Rel $";
+    static char id[]="$Id: dar_cp.cpp,v 1.16.2.4 2007/08/24 15:37:07 edrusb Rel $";
     dummy_call(id);
 }
 

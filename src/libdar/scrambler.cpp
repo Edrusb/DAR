@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: scrambler.cpp,v 1.11 2005/04/09 21:43:35 edrusb Rel $
+// $Id: scrambler.cpp,v 1.11.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -51,7 +51,7 @@ namespace libdar
         U_32 index = ref->get_position() % len;
         S_I ret = ref->read(a, size);
 
-        for(register S_I i = 0; i < ret; i++)
+        for(register S_I i = 0; i < ret; ++i)
         {
             ptr[i] = ((S_I)(ptr[i]) - (unsigned char)(key[index])) % 256;
             index = (index + 1)%len;
@@ -59,9 +59,9 @@ namespace libdar
         return ret;
     }
 
-    S_I scrambler::inherited_write(char *a, size_t size)
+    S_I scrambler::inherited_write(const char *a, size_t size)
     {
-        unsigned char *ptr = (unsigned char *)a;
+        const unsigned char *ptr = (const unsigned char *)a;
         if(ref == NULL)
             throw SRC_BUG;
 
@@ -83,7 +83,7 @@ namespace libdar
             }
         }
 
-        for(register size_t i = 0; i < size; i++)
+        for(register size_t i = 0; i < size; ++i)
         {
             buffer[i] = (ptr[i] + (unsigned char)(key[index])) % 256;
             index = (index + 1)%len;
@@ -95,7 +95,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: scrambler.cpp,v 1.11 2005/04/09 21:43:35 edrusb Rel $";
+        static char id[]="$Id: scrambler.cpp,v 1.11.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 

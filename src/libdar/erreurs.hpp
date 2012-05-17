@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.hpp,v 1.15 2005/05/30 15:52:38 edrusb Rel $
+// $Id: erreurs.hpp,v 1.15.2.1 2007/07/27 16:02:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -69,10 +69,19 @@ namespace libdar
 	    /// the exception, as you will not have to create such objects
 	    /// and will only need to get the error message thanks to this
 	    /// method
-        std::string get_message() const { return pile.front().objet; };
+        const std::string & get_message() const { return pile.front().objet; };
 
 	    /// get the call function which has thrown this exception
-	std::string get_source() const { return pile.front().lieu; };
+	const std::string & get_source() const { return pile.front().lieu; };
+
+	    /// retrieve the objet (object) associated to a given "lieu" (location) from the stack
+
+	    /// \param[in] location key to look for the value of
+	    /// \return returns an empty string if key is not found in the stack
+	const std::string & find_object(const std::string & location) const;
+
+	    /// prepend error message by the given string
+	void prepend_message(const std::string & context);
 
 	    /// dump all information of the exception to the standard error
         void dump() const;
@@ -88,6 +97,8 @@ namespace libdar
         };
 
         std::list<niveau> pile;
+
+	static const std::string empty_string;
     };
 
 

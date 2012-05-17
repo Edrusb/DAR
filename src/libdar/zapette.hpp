@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.hpp,v 1.10 2004/11/07 18:21:39 edrusb Rel $
+// $Id: zapette.hpp,v 1.10.4.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -73,7 +73,7 @@ namespace libdar
 
     protected:
         S_I inherited_read(char *a, size_t size);
-        S_I inherited_write(char *a, size_t size);
+        S_I inherited_write(const char *a, size_t size);
 
     private:
         generic_file *in, *out;

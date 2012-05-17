@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.39.2.4 2007/06/21 19:40:37 edrusb Rel $
+// $Id: tools.hpp,v 1.39.2.6 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -71,8 +71,8 @@ namespace libdar
 	/// \param[in] x is the string to convert
 	/// \return the address of newly allocated memory containing the equivalent string as the argument
 	/// \exception Ememory is thrown if the memory allocation failed, this call never return NULL
-	/// \note that the allocated memory must be released by the caller thanks to the "delete []" operator
-    extern char *tools_str2charptr(std::string x);
+	/// \note Do not use this function, use std::string::c_str(). The allocated memory must be released by the caller thanks to the "delete []" operator
+    extern char *tools_str2charptr(const std::string &x);
 
         /// write a string to a file with a '\\0' at then end
 
@@ -115,10 +115,9 @@ namespace libdar
         /// extracts the basename of a file (removing path part)
 
 	/// \param[in] command_name is the full path of the file
-	/// \return the basename of the file
+	/// \param[out] basename the basename of the file
 	/// \exception Ememory can be thrown if memory allocation failed
-	/// \note the returned value has to be release thanks to the "delete []" operator by the caller of this function
-    extern char *tools_extract_basename(const char *command_name);
+    extern void tools_extract_basename(const char *command_name, std::string & basename);
 
         /// split a given full path in path part and basename part
 
@@ -255,11 +254,13 @@ namespace libdar
         /// \param[in] libz whether libz compression is available
         /// \param[in] libbz2 whether libbz2 compression is available
         /// \param[in] libcrypto whether strong encryption is available
+	/// \param[in] new_blowfish whether new blowfish implementation is available
     extern void tools_display_features(user_interaction & dialog,
                                        bool ea, bool largefile, bool nodump, bool special_alloc, U_I bits, bool thread_safe,
                                        bool libz,
                                        bool libbz2,
-                                       bool libcrypto);
+                                       bool libcrypto,
+				       bool new_blowfish);
 
         /// test if two dates are equal taking care of a integer hour of difference
 
@@ -401,7 +402,7 @@ namespace libdar
         /// \param[in] c_chemin directory where file have to looked for
         /// \param[in] file_mask glob expression which designates the files to look for
         /// \return true if some files have found matching the file_mask
-    extern bool tools_do_some_files_match_mask(user_interaction & ui, const char *c_chemin, const char *file_mask);
+    extern bool tools_do_some_files_match_mask(user_interaction & ui, const std::string & c_chemin, const std::string & file_mask);
 
         /// remove files from a given directory
 
@@ -410,7 +411,7 @@ namespace libdar
         /// \param[in] file_mask glob expression which designates the files to remove
         /// \param[in] info_details whether user must be displayed details of the operation
         /// \note This is equivalent to the 'rm' command with shell expansion
-    extern void tools_unlink_file_mask(user_interaction & dialog, const char *c_chemin, const char *file_mask, bool info_details);
+    extern void tools_unlink_file_mask(user_interaction & dialog, const std::string & c_chemin, const std::string & file_mask, bool info_details);
 
 
         /// prevents slice overwriting: check the presence of slice and if necessary ask the user if they can be removed

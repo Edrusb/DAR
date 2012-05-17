@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.hpp,v 1.53.2.5 2007/06/29 20:33:15 edrusb Rel $
+// $Id: libdar.hpp,v 1.53.2.7 2007/08/24 15:37:08 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -122,7 +122,7 @@ namespace libdar
 	///  libdar Major version defined at compilation time
     const U_I LIBDAR_COMPILE_TIME_MAJOR = 4;
 	///  libdar Medium version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MEDIUM = 3;
+    const U_I LIBDAR_COMPILE_TIME_MEDIUM = 4;
 	///  libdar Minor version defined at compilation time
     const U_I LIBDAR_COMPILE_TIME_MINOR = 0;
 
@@ -181,10 +181,13 @@ namespace libdar
 	/// \param[out] libz whether gzip compression is available
 	/// \param[out] libbz2 whether bz2 compression is available
 	/// \param[out] libcrypto whether strong encryption is available
+	/// \param[out] new_blowfish whether new blowfish implementation is available
 	/// \note This function does never throw exceptions, so there is no
 	/// get_compile_time_features_noexcept() function available.
-    extern void get_compile_time_features(bool & ea, bool & largefile, bool & nodump, bool & special_alloc, U_I & bits, bool & thread_safe,
-					  bool & libz, bool & libbz2, bool & libcrypto);
+    extern void get_compile_time_features(bool & ea, bool & largefile, bool & nodump, bool & special_alloc, U_I & bits,
+					  bool & thread_safe,
+					  bool & libz, bool & libbz2, bool & libcrypto,
+					  bool & new_blowfish);
 
 	//////////
 	// WRAPPER FUNCTIONS AROUND archive class methods to trap exceptions and convert them in error code and message

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: wrapperlib.hpp,v 1.9 2005/04/09 21:43:35 edrusb Rel $
+// $Id: wrapperlib.hpp,v 1.9.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -76,7 +76,7 @@ namespace libdar
         wrapperlib & operator = (const wrapperlib & ref);
         ~wrapperlib();
 
-        void set_next_in(char *x) { return (this->*x_set_next_in)(x); };
+        void set_next_in(const char *x) { return (this->*x_set_next_in)(x); };
         void set_avail_in(U_I x) { return (this->*x_set_avail_in)(x); };
         U_I get_avail_in() const { return (this->*x_get_avail_in)(); };
         U_64 get_total_in() const { return (this->*x_get_total_in)(); };
@@ -105,7 +105,7 @@ namespace libdar
 #endif
         S_I level;
 
-        void (wrapperlib::*x_set_next_in)(char *x);
+        void (wrapperlib::*x_set_next_in)(const char *x);
         void (wrapperlib::*x_set_avail_in)(U_I x);
         U_I (wrapperlib::*x_get_avail_in)() const;
         U_64 (wrapperlib::*x_get_total_in)() const;
@@ -132,7 +132,7 @@ namespace libdar
         S_I z_decompressEnd();
         S_I z_compress(S_I flag);
         S_I z_decompress(S_I flag);
-        void z_set_next_in(char *x);
+        void z_set_next_in(const char *x);
         void z_set_avail_in(U_I x);
         U_I z_get_avail_in() const;
         U_64 z_get_total_in() const;
@@ -151,7 +151,7 @@ namespace libdar
         S_I bz_decompressEnd();
         S_I bz_compress(S_I flag);
         S_I bz_decompress(S_I flag);
-        void bz_set_next_in(char *x);
+        void bz_set_next_in(const char *x);
         void bz_set_avail_in(U_I x);
         U_I bz_get_avail_in() const;
         U_64 bz_get_total_in() const;

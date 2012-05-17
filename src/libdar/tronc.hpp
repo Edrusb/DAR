@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.hpp,v 1.9 2004/11/07 18:21:39 edrusb Rel $
+// $Id: tronc.hpp,v 1.9.4.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -65,7 +65,7 @@ namespace libdar
 	    /// inherited from generic_file
         S_I inherited_read(char *a, size_t size);
 	    /// inherited from generic_file
-        S_I inherited_write(char *a, size_t size);
+        S_I inherited_write(const char *a, size_t size);
 
     private :
         infinint start, sz;

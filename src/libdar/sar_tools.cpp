@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar_tools.cpp,v 1.20 2005/12/29 02:32:41 edrusb Rel $
+// $Id: sar_tools.cpp,v 1.20.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -77,14 +77,13 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar_tools.cpp,v 1.20 2005/12/29 02:32:41 edrusb Rel $";
+        static char id[]="$Id: sar_tools.cpp,v 1.20.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
     generic_file *sar_tools_open_archive_fichier(user_interaction & dialog,
 						 const string &filename, bool allow_over, bool warn_over)
     {
-        char *name = tools_str2charptr(filename);
         generic_file *ret = NULL;
         generic_file *tmp = NULL;
 
@@ -95,10 +94,10 @@ namespace libdar
             if(!allow_over || warn_over)
             {
                 struct stat buf;
-                if(lstat(name, &buf) < 0)
+                if(lstat(filename.c_str(), &buf) < 0)
                 {
                     if(errno != ENOENT)
-                        throw Erange("open_archive_fichier", tools_printf(gettext("Error retrieving inode information for %s : %s"), name, strerror(errno)));
+                        throw Erange("open_archive_fichier", tools_printf(gettext("Error retrieving inode information for %s : %s"), filename.c_str(), strerror(errno)));
                 }
                 else
                 {
@@ -109,9 +108,9 @@ namespace libdar
                 }
             }
 
-            fd = ::open(name, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
+            fd = ::open(filename.c_str(), O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
             if(fd < 0)
-                throw Erange("open_archive_fichier", tools_printf(gettext("Error opening file %s : %s"), name, strerror(errno)));
+                throw Erange("open_archive_fichier", tools_printf(gettext("Error opening file %s : %s"), filename.c_str(), strerror(errno)));
             tmp = new fichier(dialog, fd);
             if(tmp == NULL)
                 throw Ememory("open_archive_fichier");
@@ -121,14 +120,12 @@ namespace libdar
         }
         catch(...)
         {
-            delete [] name;
             if(ret != NULL)
                 delete ret;
 	    if(tmp != NULL)
 		delete tmp;
             throw;
         }
-        delete [] name;
 
         return ret;
     }

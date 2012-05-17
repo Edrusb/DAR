@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: macro_tools.cpp,v 1.25.2.1 2007/06/21 19:40:37 edrusb Rel $
+// $Id: macro_tools.cpp,v 1.25.2.2 2007/07/21 14:39:04 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -156,7 +156,10 @@ namespace libdar
             scram = new scrambler(dialog, real_pass, *ret1);
 	    break;
 	case crypto_blowfish:
-	    scram = new blowfish(dialog, crypto_size, real_pass, *ret1, ver.edition);
+	    scram = new blowfish(dialog, crypto_size, real_pass, *ret1, ver.edition, false);
+	    break;
+	case crypto_blowfish_weak:
+	    scram = new blowfish(dialog, crypto_size, real_pass, *ret1, ver.edition, true);
 	    break;
         case crypto_none:
             scram = NULL;
@@ -237,7 +240,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: macro_tools.cpp,v 1.25.2.1 2007/06/21 19:40:37 edrusb Rel $";
+        static char id[]="$Id: macro_tools.cpp,v 1.25.2.2 2007/07/21 14:39:04 edrusb Rel $";
         dummy_call(id);
     }
 

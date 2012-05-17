@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.19.2.1 2007/06/21 19:40:37 edrusb Rel $
+// $Id: real_infinint.cpp,v 1.19.2.2 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -81,21 +81,21 @@ namespace libdar
                 throw Erange("infinint::build_from_file(generic_file)", gettext("Reached end of file before all data could be read"));
 
             if(a == 0)
-                skip++;
+                ++skip;
             else // end of size field
             {
                     // computing the size to read
                 U_I pos = 0;
 
                 int_tools_expand_byte(a, bf);
-                for(S_I i = 0; i < 8; i++)
-                    pos = pos + bf[i];
+                for(S_I i = 0; i < 8; ++i)
+                    pos += bf[i];
                 if(pos != 1)
                     throw Erange("infinint::build_from_file(generic_file)", gettext("Badly formed infinint or not supported format")); // more than 1 bit is set to 1
 
                 pos = 0;
                 while(bf[pos] == 0)
-                    pos++;
+                    ++pos;
                 pos += 1; // bf starts at zero, but bit zero means 1 TG of length
 
                 skip *= 8;
@@ -144,12 +144,12 @@ namespace libdar
         euclide(width, TG, width, justification);
         if(justification != 0)
                 // in case we need to add some bytes to have a width multiple of TG
-            width++;  // we need then one more group to have a width multiple of TG
+            ++width;  // we need then one more group to have a width multiple of TG
 
         euclide(width, 8, width, pos);
         if(pos == 0)
         {
-            width--; // division is exact, only last bit of the preambule is set
+            --width; // division is exact, only last bit of the preambule is set
             last_width = 0x80 >> 7;
                 // as we add the last byte separately width gets shorter by 1 byte
         }
@@ -217,13 +217,17 @@ namespace libdar
         {
             somme = *it_res;
             if(it_a != arg.field->rend())
-                somme += *(it_a--);
+	    {
+                somme += *it_a;
+		--it_a;
+	    }
             somme += retenue;
 
             retenue = somme >> 8;
-            somme = somme & 0xFF;
+            somme &= 0xFF;
 
-            *(it_res--) = somme;
+            *it_res = somme;
+	    --it_res;
         }
 
         if(retenue != 0)
@@ -260,7 +264,10 @@ namespace libdar
         {
             somme = *it_res;
             if(it_a != arg.field->rend())
-                somme -= *(it_a--);
+	    {
+                somme -= *it_a;
+		--it_a;
+	    }
             somme -= retenue;
 
             if(somme < 0)
@@ -272,7 +279,7 @@ namespace libdar
                 if(tmp != 0)
                 {
                     somme = 0x100 - tmp;
-                    retenue++;
+                    ++retenue;
                 }
                 else
                     somme = 0;
@@ -280,7 +287,8 @@ namespace libdar
             else
                 retenue = 0;
 
-            *(it_res--) = somme;
+            *it_res = somme;
+	    --it_res;
         }
 
         reduce(); // it is necessary here !
@@ -306,7 +314,8 @@ namespace libdar
             retenue = produit >> 8;
             produit = produit & 0xFF;
 
-            *(it--) = produit;
+            *it = produit;
+	    --it;
         }
 
         if(retenue != 0)
@@ -335,7 +344,8 @@ namespace libdar
         while(it_t != field->end())
         {
             ret <<= 8; // shift by one byte;
-            ret += arg * (*(it_t++));
+            ret += arg * (*it_t);
+	    ++it_t;
         }
 
             //  ret.reduce();  // not necessary because all operations
@@ -433,7 +443,7 @@ namespace libdar
                 // shift right by "bit" bits
             if(bit != 0)
             {
-                for(register U_I i = 0; i < 8; i++)
+                for(register U_I i = 0; i < 8; ++i)
                     bf[i] = i < shift_retenue ? 0 : 1;
                 int_tools_contract_byte(bf, mask);
 
@@ -445,7 +455,7 @@ namespace libdar
                     *it >>= bit;
                     *it |= r2;
                     r2 = r1;
-                    it++;
+                    ++it;
                 }
                 reduce(); // necessary here
             }
@@ -488,10 +498,10 @@ namespace libdar
         if(*this == 0)
             return *this;
 
-        bit = bit % 8;     // bit gives now the remaining translation after the "byte" translation
+        bit %= 8;     // bit gives now the remaining translation after the "byte" translation
 
         if(bit != 0)
-            byte++;        // to prevent the MSB to be lost (in "out of space" ;-) )
+            ++byte;        // to prevent the MSB to be lost (in "out of space" ;-) )
 
             // this is the "byte" translation
         field->insert_null_bytes_at_iterator(it, byte);
@@ -509,7 +519,7 @@ namespace libdar
             it = field->begin();
 
                 // the mask for selecting the retenue
-            for(register U_I i = 0; i < 8; i++)
+            for(register U_I i = 0; i < 8; ++i)
                 bf[i] = i < bit ? 0 : 1;
             int_tools_contract_byte(bf, mask);
 
@@ -520,7 +530,7 @@ namespace libdar
                 *it >>= shift_retenue;
                 *it |= r2;
                 r2 = r1;
-                it++;
+                ++it;
             }
             reduce();
         }
@@ -574,8 +584,8 @@ namespace libdar
 
                 while(ita != a.field->end() && itb != b.field->end() && *ita == *itb)
                 {
-                    ita++;
-                    itb++;
+                    ++ita;
+                    ++itb;
                 }
 
                 if(ita == a.field->end() && itb == b.field->end())
@@ -612,8 +622,8 @@ namespace libdar
         {
             while(it != field->end() && (*it) == 0 && count < max_a_time)
             {
-                it++;
-                count++;
+                ++it;
+                ++count;
             }
 
             if(it == field->end()) // all zeros
@@ -676,7 +686,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: real_infinint.cpp,v 1.19.2.1 2007/06/21 19:40:37 edrusb Rel $";
+        static char id[]="$Id: real_infinint.cpp,v 1.19.2.2 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -856,7 +866,7 @@ namespace libdar
             while(r <= a)
             {
                 a -= r;
-                q++;
+                ++q;
             }
         }
 

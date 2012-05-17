@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.40.2.6 2007/02/23 20:52:44 edrusb Rel $
+// $Id: filtre.cpp,v 1.40.2.9 2007/07/27 16:02:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -411,7 +411,7 @@ namespace libdar
 			    if(e_hard != NULL)
 			    {
 				if(info_details)
-				    dialog.warning(string(gettext("Adding file to archive: ")) + juillet.get_string());
+				    dialog.warning(string(gettext("Recording hard link to archive: ")) + juillet.get_string());
 				cat.add(e);
 				st.incr_hard_links();
 			    }
@@ -578,29 +578,43 @@ namespace libdar
 		    {
 			throw;
 		    }
+		    catch(Elimitint & e)
+		    {
+			throw;
+		    }
 		    catch(Egeneric & ex)
 		    {
-			nomme *tmp = new ignored(nom->get_name());
-			dialog.warning(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
-			st.incr_errored();
-			file_etiquette *eti = dynamic_cast<file_etiquette *>(e);
+			const string & how = ex.find_object("generic_file::copy_to");
 
-			    // we need to remove "e" from filesystem hard link reference if necessary
-			if(eti != NULL)
-			    fs.forget_etiquette(eti);
-
-			    // now we can destroy the object
-			delete e;
-
-			if(tmp == NULL)
-			    throw Ememory("fitre_sauvegarde");
-			cat.add(tmp);
-
-			if(dir != NULL)
+			if(how != "write") // error did not occured while adding data to the archive
 			{
-			    fs.skip_read_to_parent_dir();
-			    juillet.enfile(&tmp_eod);
-			    dialog.warning(gettext("NO FILE IN THAT DIRECTORY CAN BE SAVED."));
+			    nomme *tmp = new ignored(nom->get_name());
+			    dialog.warning(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
+			    st.incr_errored();
+			    file_etiquette *eti = dynamic_cast<file_etiquette *>(e);
+
+				// we need to remove "e" from filesystem hard link reference if necessary
+			    if(eti != NULL)
+				fs.forget_etiquette(eti);
+
+				// now we can destroy the object
+			    delete e;
+
+			    if(tmp == NULL)
+				throw Ememory("fitre_sauvegarde");
+			    cat.add(tmp);
+
+			    if(dir != NULL)
+			    {
+				fs.skip_read_to_parent_dir();
+				juillet.enfile(&tmp_eod);
+				dialog.warning(gettext("NO FILE IN THAT DIRECTORY CAN BE SAVED."));
+			    }
+			}
+			else
+			{
+			    ex.prepend_message(gettext("Cannot write down the archive: "));
+			    throw; // error occured while adding data to the archive, archive cannot be generated properly
 			}
 		    }
 		}
@@ -1180,6 +1194,10 @@ namespace libdar
 		    {
 			throw;
 		    }
+		    catch(Elimitint & e)
+		    {
+			throw;
+		    }
 		    catch(Egeneric & e)
 		    {
 			dialog.warning(string(gettext("Error while considering file ")) + juillet.get_string() + " : " + e.get_message());
@@ -1273,7 +1291,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.40.2.6 2007/02/23 20:52:44 edrusb Rel $";
+        static char id[]="$Id: filtre.cpp,v 1.40.2.9 2007/07/27 16:02:49 edrusb Rel $";
         dummy_call(id);
     }
 

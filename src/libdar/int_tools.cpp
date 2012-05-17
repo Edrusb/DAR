@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: int_tools.cpp,v 1.3 2004/12/07 18:04:50 edrusb Rel $
+// $Id: int_tools.cpp,v 1.3.4.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -50,7 +50,7 @@ namespace libdar
     {
         unsigned char mask = 0x80;
 
-        for(register S_I i = 0; i < 8; i++)
+        for(register S_I i = 0; i < 8; ++i)
         {
             bit[i] = (a & mask) >> 7 - i;
             mask >>= 1;
@@ -59,7 +59,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: int_tools.cpp,v 1.3 2004/12/07 18:04:50 edrusb Rel $";
+        static char id[]="$Id: int_tools.cpp,v 1.3.4.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -68,7 +68,7 @@ namespace libdar
         E_BEGIN;
         a = 0;
 
-        for(register S_I i = 0; i < 8; i++)
+        for(register S_I i = 0; i < 8; ++i)
         {
             a <<= 1;
             if(b[i] > 1)

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: crypto.hpp,v 1.8.2.1 2007/06/21 19:40:37 edrusb Rel $
+// $Id: crypto.hpp,v 1.8.2.2 2007/07/21 14:39:04 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -51,9 +51,10 @@ namespace libdar
 	/// \ingroup API
     enum crypto_algo
     {
-	crypto_none,        ///< no encryption
-	crypto_scrambling,  ///< scrambling weak encryption
-	crypto_blowfish     ///< blowfish strong encryption
+	crypto_none,          ///< no encryption
+	crypto_scrambling,    ///< scrambling weak encryption
+	crypto_blowfish,      ///< blowfish strong encryption
+	crypto_blowfish_weak  ///< blowfish strong encryption old implementation with frequent IV collision (=weakness)
     };
 
     extern void crypto_split_algo_pass(const std::string & all, crypto_algo & algo, std::string & pass);
@@ -66,7 +67,7 @@ namespace libdar
     {
     public:
 	blowfish(user_interaction & dialog, U_32 block_size, const std::string & password, generic_file & encrypted_side,
-		 const dar_version & reading_ver);
+		 const dar_version & reading_ver, bool weak_mode);
 	    // destructor does not seems to be required for BF_KEY
 
     protected:
@@ -84,7 +85,7 @@ namespace libdar
 	BF_KEY clef;       //< used to encrypt/decrypt the data
 	BF_KEY essiv_clef; //< used to build the Initialization Vector
 #endif
-	dar_version x_reading_ver;
+	bool x_weak_mode;
 
 	void make_ivec(const infinint & ref, unsigned char ivec[8]);
 	std::string pkcs5_pass2key(const std::string & password,         //< human provided password

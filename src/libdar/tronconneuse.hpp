@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronconneuse.hpp,v 1.7 2004/12/07 18:04:52 edrusb Rel $
+// $Id: tronconneuse.hpp,v 1.7.4.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -102,7 +102,7 @@ namespace libdar
 	    /// inherited from generic_file
 
 	    //! this protected inherited method is now private for inherited classes of tronconneuse
-	S_I inherited_write(char *a, size_t size);
+	S_I inherited_write(const char *a, size_t size);
 
     protected:
 	    /// defines the size necessary to encrypt a given amount of clear data

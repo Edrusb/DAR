@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: special_alloc.cpp,v 1.14 2005/06/01 18:54:23 edrusb Rel $
+// $Id: special_alloc.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -86,7 +86,7 @@ namespace libdar
 	try
 	{
 
-	    if(alloc.size() == 0 || alloc.back().reste < taille)
+	    if(alloc.empty() || alloc.back().reste < taille)
 	    {
 		struct segment seg;
 
@@ -99,7 +99,7 @@ namespace libdar
 
 		alloc.push_back(seg);
 
-		if(alloc.size() == 0)
+		if(alloc.empty())
 		    throw SRC_BUG;
 
 		if(alloc.back().reste < taille)
@@ -126,7 +126,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: special_alloc.cpp,v 1.14 2005/06/01 18:54:23 edrusb Rel $";
+        static char id[]="$Id: special_alloc.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -140,7 +140,7 @@ namespace libdar
 	{
 	    rit = alloc.begin();
 	    while(rit != alloc.end() && (ptr < rit->alloc || ptr >= rit->alloc+CHUNK_SIZE))
-		rit++;
+		++rit;
 
 	    if(rit != alloc.end())
 	    {

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.70 2005/12/29 02:32:41 edrusb Rel $
+// $Id: libdar.cpp,v 1.70.2.4 2007/08/19 14:07:41 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -34,6 +34,11 @@ extern "C"
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#if HAVE_LIBINTL_H
+#include <libintl.h>
+#endif
+
 } // end extern "C"
 
 #include <string>
@@ -45,6 +50,9 @@ extern "C"
 #include "user_interaction.hpp"
 #include "archive.hpp"
 #include "nls_swap.hpp"
+#ifdef __DYNAMIC__
+#include "user_group_bases.hpp"
+#endif
 
 #include <list>
 
@@ -427,7 +435,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.70 2005/12/29 02:32:41 edrusb Rel $";
+        static char id[]="$Id: libdar.cpp,v 1.70.2.4 2007/08/19 14:07:41 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -442,10 +450,10 @@ namespace libdar
 	return ret;
     }
 
-
     void get_compile_time_features(bool & ea, bool & largefile, bool & nodump, bool & special_alloc, U_I & bits,
 				   bool & thread_safe,
-				   bool & libz, bool & libbz2, bool & libcrypto)
+				   bool & libz, bool & libbz2, bool & libcrypto,
+				   bool & new_blowfish)
     {
 #ifdef EA_SUPPORT
         ea = true;
@@ -487,10 +495,17 @@ namespace libdar
 #else
 	libbz2 = false;
 #endif
+
 #if CRYPTO_AVAILABLE
 	libcrypto = true;
+#if CRYPTO_FULL_BF_AVAILABLE
+        new_blowfish = true;
+#else
+        new_blowfish = false;
+#endif
 #else
 	libcrypto = false;
+	new_blowfish = false;
 #endif
     }
 
@@ -509,6 +524,12 @@ namespace libdar
 #endif
 	thread_safe_initialized = true;
 	thread_cancellation::init();
+#endif
+  	if(DAR_LOCALEDIR != "")
+	    if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == NULL)
+		throw Erange("", "Cannot open the translated messages directory, native language support will not work");
+#ifdef __DYNAMIC__
+	user_group_bases::class_init();
 #endif
     }
 

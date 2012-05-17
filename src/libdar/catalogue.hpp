@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.48.2.3 2007/02/26 18:29:53 edrusb Rel $
+// $Id: catalogue.hpp,v 1.48.2.4 2007/08/24 13:47:05 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -337,6 +337,7 @@ namespace libdar
     public:
         virtual infinint get_etiquette() const = 0;
         virtual const file_etiquette *get_inode() const = 0;
+	virtual ~etiquette() {};
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(etiquette);

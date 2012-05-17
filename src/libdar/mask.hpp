@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.hpp,v 1.17 2005/11/12 17:27:08 edrusb Rel $
+// $Id: mask.hpp,v 1.17.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -114,8 +114,6 @@ namespace libdar
         simple_mask(const simple_mask & m) : mask(m) { copy_from(m); };
 	    /// assignment operator
         simple_mask & operator = (const simple_mask & m);
-	    /// destructor
-        virtual ~simple_mask() { detruit(); };
 
 	    /// inherited from the mask class
         bool is_covered(const std::string &expression) const;
@@ -123,11 +121,10 @@ namespace libdar
         mask *clone() const { return new simple_mask(*this); };
 
     private :
-        char *the_mask;
+        std::string the_mask;
 	bool case_s;
 
         void copy_from(const simple_mask & m);
-        void detruit() { if(the_mask != NULL) delete [] the_mask; the_mask = NULL; };
     };
 
 

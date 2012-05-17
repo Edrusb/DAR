@@ -1,13 +1,15 @@
+localedir = @localedir@
+
 if BUILD_MODE32
   MYLIB=dar32
-  AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar
+  AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\"
 else
 if BUILD_MODE64
     MYLIB=dar64
-    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\"
 else
     MYLIB=dar
-    AM_CPPFLAGS=-I../libdar
+    AM_CPPFLAGS=-I../libdar -DDAR_LOCALEDIR=\"$(localedir)\"
 endif
 endif
 

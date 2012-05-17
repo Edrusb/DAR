@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.hpp,v 1.18.2.2 2007/06/21 19:40:37 edrusb Rel $
+// $Id: limitint.hpp,v 1.18.2.3 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -266,21 +266,21 @@ namespace libdar
                 throw Erange("limitint::build_from_file(generic_file)", gettext("Reached end of file before all data could be read"));
 
             if(a == 0)
-                skip++;
+                ++skip;
             else // end of size field
             {
                     // computing the size to read
                 U_I pos = 0;
 
                 int_tools_expand_byte(a, bf);
-                for(S_I i = 0; i < 8; i++)
-                    pos = pos + bf[i];
+                for(S_I i = 0; i < 8; ++i)
+                    pos += bf[i];
                 if(pos != 1)
                     throw Erange("limitint::build_from_file(generic_file)", gettext("Badly formed infinint or not supported format")); // more than 1 bit is set to 1
 
                 pos = 0;
                 while(bf[pos] == 0)
-                    pos++;
+                    ++pos;
                 pos += 1; // bf starts at zero, but bit zero means 1 TG of length
 
                 skip *= 8;
@@ -336,7 +336,7 @@ namespace libdar
         while(ptr != fin && *ptr == 0)
         {
             ptr += direction;
-            width--;
+            --width;
         }
         if(width == 0)
             width = 1; // minimum size of information is 1 byte
@@ -347,7 +347,7 @@ namespace libdar
         euclide(width, (const B)(TG), width, justification);
         if(justification != 0)
                 // in case we need to add some bytes to have a width multiple of TG
-            width++;  // we need then one more group to have a width multiple of TG
+            ++width;  // we need then one more group to have a width multiple of TG
 
         euclide(width, (const B)(8), width, pos);
         if(pos == 0)
@@ -456,7 +456,7 @@ namespace libdar
     template <class B> template<class T> limitint<B> limitint<B>::power(const T & exponent) const
     {
 	limitint ret = 1;
-	for(T count = 0; count < exponent; count++)
+	for(T count = 0; count < exponent; ++count)
 	    ret *= *this;
 
 	return ret;

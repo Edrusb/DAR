@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask.cpp,v 1.18 2005/11/09 18:31:53 edrusb Rel $
+// $Id: mask.cpp,v 1.18.2.3 2007/07/27 16:02:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -42,22 +42,10 @@ namespace libdar
 {
 
     simple_mask::simple_mask(const string & wilde_card_expression,
-			     bool case_sensit)
+			     bool case_sensit) : the_mask(wilde_card_expression), case_s(case_sensit)
     {
-        the_mask = tools_str2charptr(wilde_card_expression);
-        if(the_mask == NULL)
-            throw Ememory("simple_mask::simple_mask");
-	case_s = case_sensit;
-	try
-	{
-	    if(!case_s)
-		tools_to_upper(the_mask);
-	}
-	catch(...)
-	{
-	    delete [] the_mask;
-	    throw;
-	}
+	if(!case_s)
+	    tools_to_upper(the_mask);
     }
 
     simple_mask & simple_mask::operator = (const simple_mask & m)
@@ -65,41 +53,25 @@ namespace libdar
 	const mask *src = & m;
 	mask *dst = this;
 	*dst = *src; // explicitely invoke the inherited "mask" class's operator =
-	detruit();
 	copy_from(m);
 	return *this;
     }
 
     bool simple_mask::is_covered(const string &expression) const
     {
-        char *tmp = tools_str2charptr(expression);
-        bool ret;
-
-        if(tmp == NULL)
-            throw Ememory("simple_mask::is_covered");
-
-	try
+	if(!case_s)
 	{
-	    if(!case_s)
-		tools_to_upper(tmp);
-	    ret = fnmatch(the_mask, tmp, FNM_PERIOD) == 0;
+	    string upper = expression;
+	    tools_to_upper(upper);
+	    return fnmatch(the_mask.c_str(), upper.c_str(), FNM_PERIOD) == 0;
 	}
-	catch(...)
-	{
-	    delete [] tmp;
-	    throw;
-	}
-	delete [] tmp;
-
-        return ret;
+	else
+	    return fnmatch(the_mask.c_str(), expression.c_str(), FNM_PERIOD) == 0;
     }
 
     void simple_mask::copy_from(const simple_mask & m)
     {
-        the_mask = new char[strlen(m.the_mask)+1];
-        if(the_mask == NULL)
-            throw Ememory("simple_mask::copy_from");
-        strcpy(the_mask, m.the_mask);
+        the_mask = m.the_mask;
 	case_s = m.case_s;
     }
 
@@ -133,46 +105,21 @@ namespace libdar
 
     bool regular_mask::is_covered(const string & expression) const
     {
-        char *tmp = tools_str2charptr(expression);
-        bool matches;
-
-        try
-        {
-            matches = regexec(&preg, tmp, 0, NULL, 0) != REG_NOMATCH;
-        }
-        catch(...)
-        {
-            delete [] tmp;
-            throw;
-        }
-        delete [] tmp;
-
-        return matches;
+        return regexec(&preg, expression.c_str(), 0, NULL, 0) != REG_NOMATCH;
     }
-
 
     void regular_mask::set_preg(const string & wilde_card_expression, bool x_case_sensit)
     {
-        char *tmp = tools_str2charptr(wilde_card_expression);
+	S_I ret;
 
-        try
-        {
-            S_I ret;
+	if((ret = regcomp(&preg, wilde_card_expression.c_str(), REG_NOSUB|(x_case_sensit ? 0 : REG_ICASE)|REG_EXTENDED)) != 0)
+	{
+	    const S_I msg_size = 1024;
+	    char msg[msg_size];
+	    regerror(ret, &preg, msg, msg_size);
+	    throw Erange("regular_mask::regular_mask", msg);
+	}
 
-            if((ret = regcomp(&preg, tmp, REG_NOSUB|(x_case_sensit ? 0 : REG_ICASE)|REG_EXTENDED)) != 0)
-            {
-                const S_I msg_size = 1024;
-                char msg[msg_size];
-                regerror(ret, &preg, msg, msg_size);
-                throw Erange("regular_mask::regular_mask", msg);
-            }
-        }
-        catch(...)
-        {
-            delete [] tmp;
-            throw;
-        }
-        delete [] tmp;
     }
 
     not_mask & not_mask::operator = (const not_mask & m)
@@ -229,31 +176,29 @@ namespace libdar
 
     bool et_mask::is_covered(const string & expression) const
     {
-        vector<mask *>::iterator it = const_cast<et_mask &>(*this).lst.begin();
-        vector<mask *>::iterator fin = const_cast<et_mask &>(*this).lst.end();
+        vector<mask *>::const_iterator it = lst.begin();
 
-        if(lst.size() == 0)
+        if(lst.empty())
             throw Erange("et_mask::is_covered", gettext("No mask in the list of mask to operate on"));
 
-        while(it != fin && (*it)->is_covered(expression))
-            it++;
+        while(it != lst.end() && (*it)->is_covered(expression))
+            ++it;
 
-        return it == fin;
+        return it == lst.end();
     }
 
     void et_mask::copy_from(const et_mask &m)
     {
-        vector<mask *>::iterator it = const_cast<et_mask &>(m).lst.begin();
-        vector<mask *>::iterator fin = const_cast<et_mask &>(m).lst.end();
+        vector<mask *>::const_iterator it = m.lst.begin();
         mask *tmp;
 
-        while(it != fin && (tmp = (*it)->clone()) != NULL)
+        while(it != m.lst.end() && (tmp = (*it)->clone()) != NULL)
         {
             lst.push_back(tmp);
-            it++;
+            ++it;
         }
 
-        if(it != fin)
+        if(it != m.lst.end())
         {
             detruit();
             throw Ememory("et_mask::copy_from");
@@ -267,29 +212,28 @@ namespace libdar
         while(it != lst.end())
         {
             delete *it;
-            it++;
+            ++it;
         }
         lst.clear();
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: mask.cpp,v 1.18 2005/11/09 18:31:53 edrusb Rel $";
+        static char id[]="$Id: mask.cpp,v 1.18.2.3 2007/07/27 16:02:49 edrusb Rel $";
         dummy_call(id);
     }
 
     bool ou_mask::is_covered(const string & expression) const
     {
-        vector<mask *>::iterator it = const_cast<ou_mask &>(*this).lst.begin();
-        vector<mask *>::iterator fin = const_cast<ou_mask &>(*this).lst.end();
+        vector<mask *>::const_iterator it = lst.begin();
 
-        if(lst.size() == 0)
+        if(lst.empty())
             throw Erange("et_mask::is_covered", gettext("No mask in the list of mask to operate on"));
 
-        while(it != fin && ! (*it)->is_covered(expression))
+        while(it != lst.end() && ! (*it)->is_covered(expression))
             it++;
 
-        return it != fin;
+        return it != lst.end();
     }
 
     bool simple_path_mask::is_covered(const string &ch) const

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.15 2005/12/29 02:32:41 edrusb Rel $
+// $Id: erreurs.cpp,v 1.15.2.1 2007/07/27 16:02:49 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -45,11 +45,34 @@ namespace libdar
     static void inattendue();
     static void notcatched();
 
+    const std::string Egeneric::empty_string = "";
+
     Egeneric::Egeneric(const string &source, const string &message)
     {
         if(!initialized)
             init();
         pile.push_front(niveau(source, message));
+    }
+
+    const string & Egeneric::find_object(const string & location) const
+    {
+	list<niveau>::const_iterator it = pile.begin();
+
+	while(it != pile.end() && it->lieu != location)
+	    it++;
+
+	if(it == pile.end())
+	    return empty_string;
+	else
+	    return it->objet;
+    }
+
+    void Egeneric::prepend_message(const std::string & context)
+    {
+	if(pile.empty())
+	    throw SRC_BUG;
+
+	pile.front().objet = context + pile.front().objet;
     }
 
     void Egeneric::dump() const
@@ -86,7 +109,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: erreurs.cpp,v 1.15 2005/12/29 02:32:41 edrusb Rel $";
+        static char id[]="$Id: erreurs.cpp,v 1.15.2.1 2007/07/27 16:02:49 edrusb Rel $";
         dummy_call(id);
     }
 

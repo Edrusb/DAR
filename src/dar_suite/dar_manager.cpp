@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.48.2.2 2007/02/24 17:43:02 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.48.2.5 2007/08/24 15:37:07 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -47,7 +47,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.4.1"
+#define DAR_MANAGER_VERSION "1.4.2"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
@@ -119,7 +119,7 @@ S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const char **
         op_create(dialog, base, info_details);
         break;
     case add:
-        op_add(dialog, base, arg, rest.size() > 0 ? rest[0] : "", info_details);
+        op_add(dialog, base, arg, rest.empty() ? "" : rest[0], info_details);
         break;
     case listing:
         op_listing(dialog, base, info_details);
@@ -358,7 +358,7 @@ static bool command_line(user_interaction & dialog,
 	    optind++;
 	}
 
-	for(S_I i = optind; i < argc; i++)
+	for(S_I i = optind; i < argc; ++i)
 	    rest.push_back(argv[i]);
 
 	    // sanity checks
@@ -382,7 +382,7 @@ static bool command_line(user_interaction & dialog,
 	case files:
 	case stats:
 	case interactive:
-	    if(rest.size() > 0)
+	    if(!rest.empty())
 		dialog.warning(gettext("Ignoring extra arguments on command line"));
 	    break;
 	case add:
@@ -400,7 +400,7 @@ static bool command_line(user_interaction & dialog,
 	    rest.clear();
 	    break;
 	case restore:
-	    for(unsigned int i = 0; i < rest.size(); i++)
+	    for(unsigned int i = 0; i < rest.size(); ++i)
 		if(!path(rest[i]).is_relative())
 		    throw Erange("command_line", gettext("Arguments to -r must be relative path (never begin by '/')"));
 	    arg = extra;
@@ -438,7 +438,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.48.2.2 2007/02/24 17:43:02 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.48.2.5 2007/08/24 15:37:07 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -808,40 +808,32 @@ static void show_usage(user_interaction & dialog, const char *command)
 
 static void show_version(user_interaction & dialog, const char *command_name)
 {
-    char *name = tools_extract_basename(command_name);
+    string name;
+    tools_extract_basename(command_name, name);
     U_I maj, med, min, bits;
-    bool ea, largefile, nodump, special_alloc, thread, libz, libbz2, libcrypto;
+    bool ea, largefile, nodump, special_alloc, thread, libz, libbz2, libcrypto, new_blowfish;
 
     get_version(maj, min);
     if(maj > 2)
 	get_version(maj, med, min);
     else
 	med = 0;
-    get_compile_time_features(ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
+    get_compile_time_features(ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
     shell_interaction_change_non_interactive_output(&cout);
-    try
-    {
-        dialog.printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n", name, DAR_MANAGER_VERSION);
-	dialog.warning(string("   ") + dar_suite_command_line_features() + "\n");
-	if(maj > 2)
-	    dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
-	else
-	    dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
-        tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto);
-        dialog.printf("\n");
-        dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__);
-        dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name, PACKAGE_VERSION);
-        dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name, "dar")
-		       + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
-		       + tools_printf(gettext(" type `%s -L | more'\n for details.\n\n"), "dar"));
-        dialog.printf("");
-    }
-    catch(...)
-    {
-        delete [] name;
-        throw;
-    }
-    delete [] name;
+    dialog.printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n", name.c_str(), DAR_MANAGER_VERSION);
+    dialog.warning(string("   ") + dar_suite_command_line_features() + "\n");
+    if(maj > 2)
+	dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
+    else
+	dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
+    tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
+    dialog.printf("\n");
+    dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__);
+    dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name.c_str(), PACKAGE_VERSION);
+    dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name.c_str(), "dar")
+		   + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
+		   + tools_printf(gettext(" type `%s -L | more'\n for details.\n\n"), "dar"));
+    dialog.printf("");
 }
 
 #if HAVE_GETOPT_LONG

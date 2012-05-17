@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.45.2.3 2007/02/23 20:52:44 edrusb Rel $
+// $Id: filesystem.cpp,v 1.45.2.4 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -135,178 +135,168 @@ namespace libdar
 
     nomme *filesystem_hard_link_read::make_read_entree(path & lieu, const string & name, bool see_hard_link, const mask & ea_mask)
     {
-        char *ptr_name = name != "" ?
-            tools_str2charptr((lieu + path(name)).display())
-            : tools_str2charptr(lieu.display());
+    	const string display = name.empty() ? lieu.display() : (lieu + path(name)).display();
+	const char *ptr_name = display.c_str();
         nomme *ref = NULL;
 
-        try
-        {
-            struct stat buf;
+	struct stat buf;
 
-            if(lstat(ptr_name, &buf) < 0)
-            {
-                switch(errno)
-                {
-                case EACCES:
-                    get_fs_ui().warning(tools_printf(gettext("Error reading inode of file %s : %s"), ptr_name, strerror(errno)));
-                    break;
-                case ENOENT:
-                    break;
-                default:
-                    throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Cannot read inode for ")) + ptr_name + " : " + strerror(errno));
-                }
+	if(lstat(ptr_name, &buf) < 0)
+	{
+	    switch(errno)
+	    {
+	    case EACCES:
+		get_fs_ui().warning(tools_printf(gettext("Error reading inode of file %s : %s"), ptr_name, strerror(errno)));
+		break;
+	    case ENOENT:
+		break;
+	    default:
+		throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Cannot read inode for ")) + ptr_name + " : " + strerror(errno));
+	    }
 
-                    // the function returns NULL (meaning file does not exists)
-            }
-            else
-            {
-                if(S_ISLNK(buf.st_mode))
-                {
-		    string pointed = tools_readlink(ptr_name);
+		// the function returns NULL (meaning file does not exists)
+	}
+	else
+	{
+	    if(S_ISLNK(buf.st_mode))
+	    {
+		string pointed = tools_readlink(ptr_name);
 
-		    ref = new lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		ref = new lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+			       buf.st_atime,
+			       buf.st_mtime,
+			       name,
+			       pointed,
+			       buf.st_dev);
+	    }
+	    else if(S_ISREG(buf.st_mode))
+	    {
+		if(buf.st_nlink == 1 || ! see_hard_link) // file without hard link
+		    ref = new file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 				   buf.st_atime,
 				   buf.st_mtime,
 				   name,
-				   pointed,
+				   lieu,
+				   buf.st_size,
 				   buf.st_dev);
-                }
-                else if(S_ISREG(buf.st_mode))
-                {
-                    if(buf.st_nlink == 1 || ! see_hard_link) // file without hard link
-                        ref = new file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-                                       buf.st_atime,
-                                       buf.st_mtime,
-                                       name,
-                                       lieu,
-                                       buf.st_size,
-				       buf.st_dev);
-                    else // file with hard link(s)
-                    {
-                        map <node, couple>::iterator it = corres_read.find(node(buf.st_ino, buf.st_dev));
+		else // file with hard link(s)
+		{
+		    map <node, couple>::iterator it = corres_read.find(node(buf.st_ino, buf.st_dev));
 
-                        if(it == corres_read.end()) // inode not seen yet, first link on it
-                        {
-                            file_etiquette *ptr = new file_etiquette(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-                                                                     buf.st_atime,
-                                                                     buf.st_mtime,
-                                                                     name,
-                                                                     lieu,
-                                                                     buf.st_size,
-								     buf.st_dev,
-								     etiquette_counter++);
-                            ref = ptr;
-                            if(ref != NULL)
-                            {
-                                couple tmp;
-                                tmp.count = buf.st_nlink - 1;
-                                tmp.obj = ptr;
-                                corres_read[node(buf.st_ino, buf.st_dev)] = tmp;
-                            }
-                        }
-                        else  // inode already seen previously
-                        {
-				// some sanity checks
-			    if(it->second.obj == NULL)
-				throw SRC_BUG;
-			    if(dynamic_cast<file_etiquette *>(it->second.obj) == NULL)
-				throw SRC_BUG;
-				////
-
-                            ref = new hard_link(name, it->second.obj);
-
-                            if(ref != NULL)
-                            {
-                                it->second.count--;
-                                if(it->second.count == 0)
-                                    corres_read.erase(it);
-                            }
-                        }
-                    }
-                }
-                else if(S_ISDIR(buf.st_mode))
-                {
-                    ref = new directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-                                        buf.st_atime,
-                                        buf.st_mtime,
-                                        name,
-					buf.st_dev);
-                }
-                else if(S_ISCHR(buf.st_mode))
-                    ref = new chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-                                      buf.st_atime,
-                                      buf.st_mtime,
-                                      name,
-                                      major(buf.st_rdev),
-                                      minor(buf.st_rdev), // makedev(major, minor)
-				      buf.st_dev);
-                else if(S_ISBLK(buf.st_mode))
-                    ref = new blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-                                       buf.st_atime,
-                                       buf.st_mtime,
-                                       name,
-                                       major(buf.st_rdev),
-                                       minor(buf.st_rdev), // makedev(major, minor)
-				       buf.st_dev);
-                else if(S_ISFIFO(buf.st_mode))
-                    ref = new tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-                                   buf.st_atime,
-                                   buf.st_mtime,
-                                   name,
-				   buf.st_dev);
-                else if(S_ISSOCK(buf.st_mode))
-                    ref = new prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-                                    buf.st_atime,
-                                    buf.st_mtime,
-                                    name,
-				    buf.st_dev);
-                else
-                    throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Unknown file type ! file name is : ")) + string(ptr_name));
-
-                if(ref == NULL)
-                    throw Ememory("filesystem_hard_link_read::make_read_entree");
-
-                inode *ino = dynamic_cast<inode *>(ref);
-                if(ino != NULL)
-                {
-                    try
-                    {
-                        attach_ea(ptr_name, ino, ea_mask);
-                        if(ino->ea_get_saved_status() != inode::ea_none)
-                            ino->set_last_change(buf.st_ctime);
-                    }
-                    catch(Ebug & e)
-                    {
-                        throw;
-                    }
-                    catch(Euser_abort & e)
-                    {
-                        throw;
-                    }
-		    catch(Ethread_cancel & e)
+		    if(it == corres_read.end()) // inode not seen yet, first link on it
 		    {
-			throw;
+			file_etiquette *ptr = new file_etiquette(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+								 buf.st_atime,
+								 buf.st_mtime,
+								 name,
+								 lieu,
+								 buf.st_size,
+								 buf.st_dev,
+								 etiquette_counter++);
+			ref = ptr;
+			if(ref != NULL)
+			{
+			    couple tmp;
+			    tmp.count = buf.st_nlink - 1;
+			    tmp.obj = ptr;
+			    corres_read[node(buf.st_ino, buf.st_dev)] = tmp;
+			}
 		    }
-                    catch(Ememory & e)
-                    {
-                        throw;
-                    }
-                    catch(Egeneric & ex)
-                    {
-                        get_fs_ui().warning(string(gettext("Error reading EA for "))+ptr_name+ " : " + ex.get_message());
-                            // no throw !
-                            // we must be able to continue without EA
-                    }
-                }
-            }
-        }
-        catch(...)
-        {
-            delete [] ptr_name;
-            throw;
-        }
-        delete [] ptr_name;
+		    else  // inode already seen previously
+		    {
+			    // some sanity checks
+			if(it->second.obj == NULL)
+			    throw SRC_BUG;
+			if(dynamic_cast<file_etiquette *>(it->second.obj) == NULL)
+			    throw SRC_BUG;
+			    ////
+
+			ref = new hard_link(name, it->second.obj);
+
+			if(ref != NULL)
+			{
+			    it->second.count--;
+			    if(it->second.count == 0)
+				corres_read.erase(it);
+			}
+		    }
+		}
+	    }
+	    else if(S_ISDIR(buf.st_mode))
+	    {
+		ref = new directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+				    buf.st_atime,
+				    buf.st_mtime,
+				    name,
+				    buf.st_dev);
+	    }
+	    else if(S_ISCHR(buf.st_mode))
+		ref = new chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+				  buf.st_atime,
+				  buf.st_mtime,
+				  name,
+				  major(buf.st_rdev),
+				  minor(buf.st_rdev), // makedev(major, minor)
+				  buf.st_dev);
+	    else if(S_ISBLK(buf.st_mode))
+		ref = new blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+				   buf.st_atime,
+				   buf.st_mtime,
+				   name,
+				   major(buf.st_rdev),
+				   minor(buf.st_rdev), // makedev(major, minor)
+				   buf.st_dev);
+	    else if(S_ISFIFO(buf.st_mode))
+		ref = new tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+			       buf.st_atime,
+			       buf.st_mtime,
+			       name,
+			       buf.st_dev);
+	    else if(S_ISSOCK(buf.st_mode))
+		ref = new prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+				buf.st_atime,
+				buf.st_mtime,
+				name,
+				buf.st_dev);
+	    else
+		throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Unknown file type ! file name is : ")) + string(ptr_name));
+
+	    if(ref == NULL)
+		throw Ememory("filesystem_hard_link_read::make_read_entree");
+
+	    inode *ino = dynamic_cast<inode *>(ref);
+	    if(ino != NULL)
+	    {
+		try
+		{
+		    attach_ea(ptr_name, ino, ea_mask);
+		    if(ino->ea_get_saved_status() != inode::ea_none)
+			ino->set_last_change(buf.st_ctime);
+		}
+		catch(Ebug & e)
+		{
+		    throw;
+		}
+		catch(Euser_abort & e)
+		{
+		    throw;
+		}
+		catch(Ethread_cancel & e)
+		{
+		    throw;
+		}
+		catch(Ememory & e)
+		{
+		    throw;
+		}
+		catch(Egeneric & ex)
+		{
+		    get_fs_ui().warning(string(gettext("Error reading EA for "))+ptr_name+ " : " + ex.get_message());
+			// no throw !
+			// we must be able to continue without EA
+		}
+	    }
+	}
 
         return ref;
 
@@ -437,8 +427,6 @@ namespace libdar
 
     void filesystem_backup::reset_read(infinint & root_fs_device)
     {
-        char *tmp;
-
         corres_reset();
         if(current_dir != NULL)
             delete current_dir;
@@ -447,39 +435,33 @@ namespace libdar
             throw Ememory("filesystem_backup::reset_read");
         pile.clear();
 
-        tmp = tools_str2charptr(current_dir->display());
-        try
-        {
-            entree *ref = make_read_entree(*current_dir, "", true, *ea_mask);
-            directory *ref_dir = dynamic_cast<directory *>(ref);
-            try
-            {
-                if(ref_dir != NULL)
-		{
-		    pile.push_back(etage(get_fs_ui(), tmp, ref_dir->get_last_access(), ref_dir->get_last_modif(), cache_directory_tagging));
-		    root_fs_device = ref_dir->get_device();
-		}
-                else
-                    if(ref == NULL)
-                        throw Erange("filesystem_backup::reset_read", string(gettext("Non existent file: ")) + tmp);
-                    else
-                        throw Erange("filesystem_backup::reset_read", string(gettext("File must be a directory: "))+ tmp);
-            }
-            catch(...)
-            {
-                if(ref != NULL)
-                    delete ref;
-                throw;
-            }
-            if(ref != NULL)
-                delete ref;
-        }
-        catch(...)
-        {
-            delete [] tmp;
-            throw;
-        }
-        delete [] tmp;
+        const string display = current_dir->display();
+        const char* tmp = display.c_str();
+
+	entree *ref = make_read_entree(*current_dir, "", true, *ea_mask);
+	directory *ref_dir = dynamic_cast<directory *>(ref);
+	try
+	{
+	    if(ref_dir != NULL)
+	    {
+		pile.push_back(etage(get_fs_ui(), tmp, ref_dir->get_last_access(), ref_dir->get_last_modif(), cache_directory_tagging));
+		root_fs_device = ref_dir->get_device();
+	    }
+	    else
+		if(ref == NULL)
+		    throw Erange("filesystem_backup::reset_read", string(gettext("Non existent file: ")) + tmp);
+		else
+		    throw Erange("filesystem_backup::reset_read", string(gettext("File must be a directory: "))+ tmp);
+	}
+	catch(...)
+	{
+	    if(ref != NULL)
+		delete ref;
+	    throw;
+	}
+	if(ref != NULL)
+	    delete ref;
+
     }
 
 
@@ -498,7 +480,7 @@ namespace libdar
         {
             once_again = false;
 
-            if(pile.size() == 0)
+            if(pile.empty())
                 return false; // end of filesystem reading
             else // at least one directory to read
             {
@@ -512,14 +494,14 @@ namespace libdar
 		    if(!alter_atime)
 			tools_noexcept_make_date(current_dir->display(), inner.last_acc, inner.last_mod);
                     pile.pop_back();
-                    if(pile.size() > 0)
-                    {
-                        if(! current_dir->pop(tmp))
-                            throw SRC_BUG;
-                        ref = new eod();
-                    }
-                    else
+                    if(pile.empty())
                         return false; // end of filesystem
+		    else
+		    {
+			if(! current_dir->pop(tmp))
+			    throw SRC_BUG;
+			ref = new eod();
+		    }
                 }
                 else // could read a filename in directory
                 {
@@ -537,44 +519,34 @@ namespace libdar
 
 				if(ref_dir != NULL)
 				{
-				    char *ptr_name;
-
 				    *current_dir += name;
-				    ptr_name = tools_str2charptr(current_dir->display());
+				    const string display = current_dir->display();
+				    const char* ptr_name = display.c_str();
 
 				    try
 				    {
+					pile.push_back(etage(get_fs_ui(), ptr_name, ref_dir->get_last_access(), ref_dir->get_last_modif(),
+							     cache_directory_tagging));
+				    }
+				    catch(Egeneric & e)
+				    {
+					string tmp;
+
+					get_fs_ui().warning(tools_printf(gettext("Cannot read directory contents: %s : "), ptr_name) + e.get_message());
+
 					try
 					{
-					    pile.push_back(etage(get_fs_ui(), ptr_name, ref_dir->get_last_access(), ref_dir->get_last_modif(),
-								 cache_directory_tagging));
+					    pile.push_back(etage());
 					}
 					catch(Egeneric & e)
 					{
-					    string tmp;
-
-					    get_fs_ui().warning(tools_printf(gettext("Cannot read directory contents: %s : "), ptr_name) + e.get_message());
-
-					    try
-					    {
-						pile.push_back(etage());
-					    }
-					    catch(Egeneric & e)
-					    {
-						delete ref;
-						ref = NULL; // we ignore this directory and skip to the next entry
-						errors++;
-						if(! current_dir->pop(tmp))
-						    throw SRC_BUG;
-					    }
+					    delete ref;
+					    ref = NULL; // we ignore this directory and skip to the next entry
+					    errors++;
+					    if(! current_dir->pop(tmp))
+						throw SRC_BUG;
 					}
 				    }
-				    catch(...)
-				    {
-					delete [] ptr_name;
-					throw;
-				    }
-				    delete [] ptr_name;
 				}
 
 				if(ref == NULL)
@@ -623,7 +595,7 @@ namespace libdar
     {
         string tmp;
 
-        if(pile.size() == 0)
+        if(pile.empty())
             throw SRC_BUG;
         else
         {
@@ -670,8 +642,6 @@ namespace libdar
 
     void filesystem_diff::reset_read()
     {
-        char *tmp;
-
         corres_reset();
         if(current_dir != NULL)
             delete current_dir;
@@ -679,42 +649,36 @@ namespace libdar
         filename_pile.clear();
         if(current_dir == NULL)
             throw Ememory("filesystem_diff::reset_read");
-        tmp = tools_str2charptr(current_dir->display());
-        try
-        {
-            entree *ref = make_read_entree(*current_dir, "", true, *ea_mask);
-            directory *ref_dir = dynamic_cast<directory *>(ref);
-            try
-            {
-                if(ref_dir != NULL)
-                {
-                    filename_struct rfst;
+        const string display = current_dir->display();
+        const char* tmp = display.c_str();
 
-                    rfst.last_acc = ref_dir->get_last_access();
-                    rfst.last_mod = ref_dir->get_last_modif();
-                    filename_pile.push_back(rfst);
-                }
-                else
-                    if(ref == NULL)
-                        throw Erange("filesystem_diff::reset_read", string(gettext("Non existent file: ")) + tmp);
-                    else
-                        throw Erange("filesystem_diff::reset_read", string(gettext("File must be a directory: ")) + tmp);
-            }
-            catch(...)
-            {
-                if(ref != NULL)
-                    delete ref;
-                throw;
-            }
-            if(ref != NULL)
-                delete ref;
-        }
-        catch(...)
-        {
-            delete [] tmp;
-            throw;
-        }
-        delete [] tmp;
+	entree *ref = make_read_entree(*current_dir, "", true, *ea_mask);
+	directory *ref_dir = dynamic_cast<directory *>(ref);
+	try
+	{
+	    if(ref_dir != NULL)
+	    {
+		filename_struct rfst;
+
+		rfst.last_acc = ref_dir->get_last_access();
+		rfst.last_mod = ref_dir->get_last_modif();
+		filename_pile.push_back(rfst);
+	    }
+	    else
+		if(ref == NULL)
+		    throw Erange("filesystem_diff::reset_read", string(gettext("Non existent file: ")) + tmp);
+		else
+		    throw Erange("filesystem_diff::reset_read", string(gettext("File must be a directory: ")) + tmp);
+	}
+	catch(...)
+	{
+	    if(ref != NULL)
+		delete ref;
+	    throw;
+	}
+	if(ref != NULL)
+	    delete ref;
+
     }
 
     bool filesystem_diff::read_filename(const string & name, nomme * &ref)
@@ -743,16 +707,16 @@ namespace libdar
 
     void filesystem_diff::skip_read_filename_in_parent_dir()
     {
-        if(filename_pile.size() > 0)
-        {
-            string tmp;
+        if(filename_pile.empty())
+            throw SRC_BUG;
+	else
+	{
+	    string tmp;
 	    if(!alter_atime)
 		tools_noexcept_make_date(current_dir->display(), filename_pile.back().last_acc, filename_pile.back().last_mod);
-            filename_pile.pop_back();
-            current_dir->pop(tmp);
-        }
-        else
-            throw SRC_BUG;
+	    filename_pile.pop_back();
+	    current_dir->pop(tmp);
+	}
     }
 
     void filesystem_diff::detruire()
@@ -932,197 +896,178 @@ namespace libdar
         if(ref_ino == NULL && ref_eti == NULL)
             throw SRC_BUG; // neither an inode nor a hard link
 
-        char *name = tools_str2charptr((ou + ref->get_name()).display());
+	const string display = (ou + ref->get_name()).display();
+	const char *name = display.c_str();
 
-        try
-        {
-            S_I ret = -1; // will carry the system call returned value to create the requested file
+	S_I ret = -1; // will carry the system call returned value to create the requested file
 
-            do
-            {
-		try
+	do
+	{
+	    try
+	    {
+		if(ref_eti != NULL) // we potentially have to make a hard link
 		{
-		    if(ref_eti != NULL) // we potentially have to make a hard link
+		    bool create_file = false;
+		    map<infinint, corres_ino_ea>::iterator it = corres_write.find(ref_eti->get_etiquette());
+		    if(it == corres_write.end()) // first time, we have to create the inode
 		    {
-			bool create_file = false;
-			map<infinint, corres_ino_ea>::iterator it = corres_write.find(ref_eti->get_etiquette());
-			if(it == corres_write.end()) // first time, we have to create the inode
-			{
-			    corres_ino_ea tmp;
-			    tmp.chemin = string(name);
-			    tmp.ea_restored = false;
-			    corres_write[ref_eti->get_etiquette()] = tmp;
-			    create_file = true;
-			}
-			else // the inode already exists, making hard link if possible
-			{
-			    char *old = tools_str2charptr(it->second.chemin);
-			    try
-			    {
-				ret = link(old, name);
-				if(ret < 0)
-				{
-				    switch(errno)
-				    {
-				    case EXDEV:
-				    case EPERM:
-					    // can't make hard link, trying to duplicate the inode
-					get_fs_ui().warning(tools_printf(gettext("Error creating hard link %s : %s\n Trying to duplicate the inode"),
-									 name, strerror(errno)));
-					create_file = true;
-					clear_corres(ref_eti->get_etiquette());
-					    // need to remove this entry to be able
-					    // to restore EA for other copies
-					break;
-				    case ENOENT:
-					if(ref_eti->get_inode()->get_saved_status() == s_saved)
-					{
-					    create_file = true;
-					    clear_corres(ref_eti->get_etiquette());
-						// need to remove this entry to be able
-						// to restore EA for other copies
-					    get_fs_ui().warning(tools_printf(gettext("Error creating hard link : %s , the inode to link with [ %s ] has disappeared, re-creating it"),
-									     name, old));
+			corres_ino_ea tmp;
+			tmp.chemin = display;
+			tmp.ea_restored = false;
+			corres_write[ref_eti->get_etiquette()] = tmp;
+			create_file = true;
+		    }
+		    else // the inode already exists, making hard link if possible
+		    {
+			const char *old = it->second.chemin.c_str();
 
-					}
-					else
-					{
-					    create_file = false; // nothing to do;
-					    get_fs_ui().warning(tools_printf(gettext("Error creating hard link : %s , the inode to link with [ %s ] is not present, cannot restore this hard link"), name, old));
-					}
-					break;
-				    default :
-					    // nothing to do (ret < 0 and create_file == false)
-					break;
-				    }
+			ret = link(old, name);
+			if(ret < 0)
+			{
+			    switch(errno)
+			    {
+			    case EXDEV:
+			    case EPERM:
+				    // can't make hard link, trying to duplicate the inode
+				get_fs_ui().warning(tools_printf(gettext("Error creating hard link %s : %s\n Trying to duplicate the inode"),
+								 name, strerror(errno)));
+				create_file = true;
+				clear_corres(ref_eti->get_etiquette());
+				    // need to remove this entry to be able
+				    // to restore EA for other copies
+				break;
+			    case ENOENT:
+				if(ref_eti->get_inode()->get_saved_status() == s_saved)
+				{
+				    create_file = true;
+				    clear_corres(ref_eti->get_etiquette());
+					// need to remove this entry to be able
+					// to restore EA for other copies
+				    get_fs_ui().warning(tools_printf(gettext("Error creating hard link : %s , the inode to link with [ %s ] has disappeared, re-creating it"),
+								     name, old));
+
 				}
 				else
-				    create_file = false;
+				{
+				    create_file = false; // nothing to do;
+				    get_fs_ui().warning(tools_printf(gettext("Error creating hard link : %s , the inode to link with [ %s ] is not present, cannot restore this hard link"), name, old));
+				}
+				break;
+			    default :
+				    // nothing to do (ret < 0 and create_file == false)
+				break;
 			    }
-			    catch(...)
-			    {
-				delete [] old;
-				throw;
-			    }
-			    delete [] old;
 			}
+			else
+			    create_file = false;
 
-			if(create_file)
+		    }
+
+		    if(create_file)
+		    {
+			file remplacant = file(*ref_eti->get_inode());
+
+			remplacant.change_name(ref->get_name());
+			make_file(&remplacant, ou, dir_perm, what_to_check); // recursive call but with a plain file as argument
+			ref_ino = NULL; // to avoid setting the owner & permission twice (previous line, and below)
+			ret = 0; // to exist from while loop
+		    }
+		    else // hard link made
+			ret = 0; // not necessary, but avoids a warning from compilator (ret might be used uninitialized)
+		}
+		else if(ref_dir != NULL)
+		{
+		    ret = mkdir(name, 0700); // as the directory has been created we are its owner and we will need only
+			// to create files under it so we need all rights for user, by security for now, no right are
+			// allowed for group and others, but this will be set properly at the end, when all files will
+			// be restored in that directory
+		}
+		else if(ref_fil != NULL)
+		{
+		    generic_file *ou;
+		    infinint seek;
+
+		    ret = ::open(name, O_WRONLY|O_CREAT|O_BINARY, 0700); // munimum permissions
+		    if(ret >= 0)
+		    {
+			fichier dest = fichier(get_fs_ui(), ret);
+			    // the implicit destruction of dest (exiting the block)
+			    // will close the 'ret' file descriptor (see ~fichier())
+			ou = ref_fil->get_data(get_fs_ui());
+
+			try
 			{
-			    file remplacant = file(*ref_eti->get_inode());
-
-			    remplacant.change_name(ref->get_name());
-			    make_file(&remplacant, ou, dir_perm, what_to_check); // recursive call but with a plain file as argument
-			    ref_ino = NULL; // to avoid setting the owner & permission twice (previous line, and below)
-			    ret = 0; // to exist from while loop
+			    crc crc_dyn, crc_ori;
+			    ou->skip(0);
+			    ou->copy_to(dest, crc_dyn);
+			    if(ref_fil->get_crc(crc_ori))  // CRC is not present in format "01"
+				if(!same_crc(crc_dyn, crc_ori))
+				    throw Erange("filesystem_hard_link_write::make_file", gettext("Bad CRC, data corruption occurred"));
 			}
-			else // hard link made
-			    ret = 0; // not necessary, but avoids a warning from compilator (ret might be used uninitialized)
-		    }
-		    else if(ref_dir != NULL)
-		    {
-			ret = mkdir(name, 0700); // as the directory has been created we are its owner and we will need only
-			    // to create files under it so we need all rights for user, by security for now, no right are
-			    // allowed for group and others, but this will be set properly at the end, when all files will
-			    // be restored in that directory
-		    }
-		    else if(ref_fil != NULL)
-		    {
-			generic_file *ou;
-			infinint seek;
-
-			ret = ::open(name, O_WRONLY|O_CREAT|O_BINARY, 0700); // munimum permissions
-			if(ret >= 0)
+			catch(...)
 			{
-			    fichier dest = fichier(get_fs_ui(), ret);
-				// the implicit destruction of dest (exiting the block)
-				// will close the 'ret' file descriptor (see ~fichier())
-			    ou = ref_fil->get_data(get_fs_ui());
-
-			    try
-			    {
-				crc crc_dyn, crc_ori;
-				ou->skip(0);
-				ou->copy_to(dest, crc_dyn);
-				if(ref_fil->get_crc(crc_ori))  // CRC is not present in format "01"
-				    if(!same_crc(crc_dyn, crc_ori))
-					throw Erange("filesystem_hard_link_write::make_file", gettext("Bad CRC, data corruption occurred"));
-			    }
-			    catch(...)
-			    {
-				delete ou;
-				throw;
-			    }
 			    delete ou;
+			    throw;
 			}
+			delete ou;
 		    }
-		    else if(ref_lie != NULL)
+		}
+		else if(ref_lie != NULL)
+		    ret = symlink(ref_lie->get_target().c_str() ,name);
+		else if(ref_blo != NULL)
+		    ret = mknod(name, S_IFBLK | 0700, makedev(ref_blo->get_major(), ref_blo->get_minor()));
+		else if(ref_cha != NULL)
+		    ret = mknod(name, S_IFCHR | 0700, makedev(ref_cha->get_major(), ref_cha->get_minor()));
+		else if(ref_tub != NULL)
+		    ret = mknod(name, S_IFIFO | 0700, 0);
+		else if(ref_pri != NULL)
+		{
+		    ret = socket(PF_UNIX, SOCK_STREAM, 0);
+		    if(ret >= 0)
 		    {
-			char *cible = tools_str2charptr(ref_lie->get_target());
-			ret = symlink(cible ,name);
-			delete [] cible;
-		    }
-		    else if(ref_blo != NULL)
-			ret = mknod(name, S_IFBLK | 0700, makedev(ref_blo->get_major(), ref_blo->get_minor()));
-		    else if(ref_cha != NULL)
-			ret = mknod(name, S_IFCHR | 0700, makedev(ref_cha->get_major(), ref_cha->get_minor()));
-		    else if(ref_tub != NULL)
-			ret = mknod(name, S_IFIFO | 0700, 0);
-		    else if(ref_pri != NULL)
-		    {
-			ret = socket(PF_UNIX, SOCK_STREAM, 0);
-			if(ret >= 0)
-			{
-			    S_I sd = ret;
-			    struct sockaddr_un addr;
-			    addr.sun_family = AF_UNIX;
+			S_I sd = ret;
+			struct sockaddr_un addr;
+			addr.sun_family = AF_UNIX;
 
-			    try
-			    {
-				strncpy(addr.sun_path, name, UNIX_PATH_MAX - 1);
-				addr.sun_path[UNIX_PATH_MAX - 1] = '\0';
-				if(bind(sd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-				    throw Erange("filesystem_hard_link_write::make_file (socket bind)", string(gettext("Error creating Unix socket file: ")) + name + " : " + strerror(errno));
-			    }
-			    catch(...)
-			    {
-				shutdown(sd, 2);
-				close(sd);
-				throw;
-			    }
+			try
+			{
+			    strncpy(addr.sun_path, name, UNIX_PATH_MAX - 1);
+			    addr.sun_path[UNIX_PATH_MAX - 1] = '\0';
+			    if(bind(sd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+				throw Erange("filesystem_hard_link_write::make_file (socket bind)", string(gettext("Error creating Unix socket file: ")) + name + " : " + strerror(errno));
+			}
+			catch(...)
+			{
 			    shutdown(sd, 2);
 			    close(sd);
+			    throw;
 			}
+			shutdown(sd, 2);
+			close(sd);
 		    }
+		}
+		else
+		    throw SRC_BUG; // unknown inode type
+
+		if(ret < 0)
+		    if(errno != ENOSPC)
+			throw Erange("filesystem_hard_link_write::make_file", string(gettext("Could not create inode: ")) + name + " : " + strerror(errno));
 		    else
-			throw SRC_BUG; // unknown inode type
+			get_fs_ui().pause(string(gettext("Cannot create inode: ")) + strerror(errno) + gettext(" Ready to continue ?"));
+	    }
+	    catch(Ethread_cancel & e)
+	    {
+		if(ret >= 0) // we need to remove the filesystem entry we were creating
+			// we don't let something uncompletely restored in the filesystem
+			// in any case (immediate cancel or not)
+		    (void)unlink(name); // ignoring exit status
+		throw;
+	    }
+	}
+	while(ret < 0 && errno == ENOSPC);
 
-		    if(ret < 0)
-			if(errno != ENOSPC)
-			    throw Erange("filesystem_hard_link_write::make_file", string(gettext("Could not create inode: ")) + name + " : " + strerror(errno));
-			else
-			    get_fs_ui().pause(string(gettext("Cannot create inode: ")) + strerror(errno) + gettext(" Ready to continue ?"));
-		}
-		catch(Ethread_cancel & e)
-		{
-		    if(ret >= 0) // we need to remove the filesystem entry we were creating
-			    // we don't let something uncompletely restored in the filesystem
-			    // in any case (immediate cancel or not)
-			(void)unlink(name); // ignoring exit status
-		    throw;
-		}
-            }
-            while(ret < 0 && errno == ENOSPC);
-
-            if(ref_ino != NULL && ret >= 0)
-                make_owner_perm(get_fs_ui(), *ref_ino, ou, dir_perm, what_to_check);
-        }
-        catch(...)
-        {
-            delete [] name;
-            throw;
-        }
-        delete [] name;
+	if(ref_ino != NULL && ret >= 0)
+	    make_owner_perm(get_fs_ui(), *ref_ino, ou, dir_perm, what_to_check);
     }
 
     void filesystem_hard_link_write::clear_corres(const infinint & ligne)
@@ -1213,7 +1158,7 @@ namespace libdar
             {
                 string tmp;
                 current_dir->pop(tmp);
-                if(stack_dir.size() > 0)
+                if(!stack_dir.empty())
 		{
 		    if(!empty)
 			make_owner_perm(get_fs_ui(), stack_dir.back(), *current_dir, true, what_to_check);
@@ -1412,19 +1357,13 @@ namespace libdar
                 }
                 else // just setting permission to allow creation of any sub-dir or sub_file
                 {
-                    char *name = tools_str2charptr(spot.display());
-                    try
-                    {
-			if(!empty)
-			    if(chmod(name, 0700 | get_file_permission(name)) < 0)
-				get_fs_ui().warning(tools_printf(gettext("Cannot temporary change permissions of %S : "), &spot_display) + strerror(errno));
-                    }
-                    catch(...)
-                    {
-                        delete [] name;
-                        throw;
-                    }
-                    delete [] name;
+		    const string display = spot.display();
+                    const char *name = display.c_str();
+
+		    if(!empty)
+			if(chmod(name, 0700 | get_file_permission(name)) < 0)
+			    get_fs_ui().warning(tools_printf(gettext("Cannot temporary change permissions of %S : "), &spot_display) + strerror(errno));
+
                 }
             }
         }
@@ -1517,13 +1456,13 @@ namespace libdar
     {
 	string tmp;
 
-	while(stack_dir.size() > 0 && current_dir->pop(tmp))
+	while(!stack_dir.empty() && current_dir->pop(tmp))
 	{
 	    if(!empty)
 		make_owner_perm(get_fs_ui(), stack_dir.back(), *current_dir, true, what_to_check);
 	    stack_dir.pop_back();
 	}
-	if(stack_dir.size() > 0)
+	if(!stack_dir.empty())
 	    throw SRC_BUG;
     }
 
@@ -1534,122 +1473,104 @@ namespace libdar
 
     static void supprime(user_interaction & ui, const path & ref)
     {
-        char *s = tools_str2charptr(ref.display());
+    	const string display = ref.display();
+        const char *s = display.c_str();
 
-        try
-        {
-            struct stat buf;
-            if(lstat(s, &buf) < 0)
-                throw Erange("filesystem supprime", string(gettext("Cannot get inode information about file to remove ")) + s + " : " + strerror(errno));
+	struct stat buf;
+	if(lstat(s, &buf) < 0)
+	    throw Erange("filesystem supprime", string(gettext("Cannot get inode information about file to remove ")) + s + " : " + strerror(errno));
 
-            if(S_ISDIR(buf.st_mode))
-            {
-                etage fils = etage(ui, s, 0, 0, false); // we don't care the access and modification time because directory will be destroyed
-                string tmp;
+	if(S_ISDIR(buf.st_mode))
+	{
+	    etage fils = etage(ui, s, 0, 0, false); // we don't care the access and modification time because directory will be destroyed
+	    string tmp;
 
-		    // first we destroy directory's children
-                while(fils.read(tmp))
-                    supprime(ui, ref+tmp);
+		// first we destroy directory's children
+	    while(fils.read(tmp))
+		supprime(ui, ref+tmp);
 
-		    // then the directory itself
-                if(rmdir(s) < 0)
-                    throw Erange("supprime (dir)", string(gettext("Cannot remove directory ")) + s + " : " + strerror(errno));
-            }
-            else
-                if(unlink(s) < 0)
-                    throw Erange("supprime (file)", string(gettext("Cannot remove file ")) + s + " : " + strerror(errno));
-        }
-        catch(...)
-        {
-            delete [] s;
-            throw;
-        }
+		// then the directory itself
+	    if(rmdir(s) < 0)
+		throw Erange("supprime (dir)", string(gettext("Cannot remove directory ")) + s + " : " + strerror(errno));
+	}
+	else
+	    if(unlink(s) < 0)
+		throw Erange("supprime (file)", string(gettext("Cannot remove file ")) + s + " : " + strerror(errno));
 
-        delete [] s;
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.45.2.3 2007/02/23 20:52:44 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.45.2.4 2007/07/22 16:34:59 edrusb Rel $";
         dummy_call(id);
     }
 
     static void make_owner_perm(user_interaction & dialog,
-				const inode & ref, const path & ou, bool dir_perm,
-				inode::comparison_fields what_to_check)
+		 		const inode & ref, const path & ou, bool dir_perm,
+	 			inode::comparison_fields what_to_check)
     {
-        string chem = (ou + ref.get_name()).display();
-        char *name = tools_str2charptr(chem);
-        const lien *ref_lie = dynamic_cast<const lien *>(&ref);
+	const string chem = (ou + ref.get_name()).display();
+	const lien *ref_lie = dynamic_cast<const lien *>(&ref);
         S_I permission;
 
-        try
-        {
-		// if we are not root (geteuid()!=0) and if we are restoring in an already
-		// existing (!dir_perm) directory (dynamic_cast...), we must try, to have a chance to
-		// be able to create/modify sub-files or sub-directory, so we set the user write access to
-		// that directory. This chmod is allowed only if we own the directory (so
-		// we only set the write bit for user). If this cannot be changed we are not the
-		// owner of the directory, so we will try to restore as much as our permission
-		// allows it (maybe some group or other write bit is set for us).
+	    // if we are not root (geteuid()!=0) and if we are restoring in an already
+	    // existing (!dir_perm) directory (dynamic_cast...), we must try, to have a chance to
+	    // be able to create/modify sub-files or sub-directory, so we set the user write access to
+	    // that directory. This chmod is allowed only if we own the directory (so
+	    // we only set the write bit for user). If this cannot be changed we are not the
+	    // owner of the directory, so we will try to restore as much as our permission
+	    // allows it (maybe some group or other write bit is set for us).
 
-	    if(dynamic_cast<const directory *>(&ref) != NULL && !dir_perm && geteuid() != 0)
+	if(dynamic_cast<const directory *>(&ref) != NULL && !dir_perm && geteuid() != 0)
+	{
+	    mode_t tmp;
+	    try
 	    {
-		mode_t tmp;
-		try
-		{
-		    tmp = get_file_permission(name); // the current permission value
-		}
-		catch(Egeneric & e)
-		{
-		    tmp = ref.get_perm(); // the value at the time of the backup
-		}
-		permission =  tmp | 0200; // add user write access to be able to add some subdirectories and files
+		tmp = get_file_permission(chem.c_str()); // the current permission value
 	    }
-	    else
-		permission = ref.get_perm();
+	    catch(Egeneric & e)
+	    {
+		tmp = ref.get_perm(); // the value at the time of the backup
+	    }
+	    permission =  tmp | 0200; // add user write access to be able to add some subdirectories and files
+	}
+	else
+	    permission = ref.get_perm();
 
-		// restoring fields that are defined by "what_to_check"
+	    // restoring fields that are defined by "what_to_check"
 
-            if(what_to_check == inode::cf_all)
-                if(ref.get_saved_status() == s_saved)
-		{
+	if(what_to_check == inode::cf_all)
+	    if(ref.get_saved_status() == s_saved)
+	    {
 #if HAVE_LCHOWN
-                    if(lchown(name, ref.get_uid(), ref.get_gid()) < 0)
-                        dialog.warning(string(name) + string(gettext("Could not restore original file ownership: ")) + strerror(errno));
+		if(lchown(chem.c_str(), ref.get_uid(), ref.get_gid()) < 0)
+		    dialog.warning(chem + gettext("Could not restore original file ownership: ") + strerror(errno));
 #else
-                    if(dynamic_cast<const lien *>(&ref) == NULL) // not a symbolic link
-			if(chown(name, ref.get_uid(), ref.get_gid()) < 0)
-			    dialog.warning(string(name) + string(gettext("Could not restore original file ownership: ")) + strerror(errno));
-			//
-			// we don't/can't restore ownership for symbolic links (no system call to do that)
-			//
+		if(dynamic_cast<const lien *>(&ref) == NULL) // not a symbolic link
+		    if(chown(chem.c_str(), ref.get_uid(), ref.get_gid()) < 0)
+			dialog.warning(chem + gettext("Could not restore original file ownership: ") + strerror(errno));
+		    //
+		    // we don't/can't restore ownership for symbolic links (no system call to do that)
+		    //
 #endif
-		}
-            try
-            {
-		if(what_to_check == inode::cf_all || what_to_check == inode::cf_ignore_owner)
-		    if(ref_lie == NULL) // not restoring permission for symbolic links
-			if(chmod(name, permission) < 0)
-			    dialog.warning(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, strerror(errno)));
-            }
-            catch(Egeneric &e)
-            {
-                if(ref_lie == NULL)
-                    throw;
-                    // else (the inode is a symlink), we simply ignore this error
-            }
+	    }
+	try
+	{
+	    if(what_to_check == inode::cf_all || what_to_check == inode::cf_ignore_owner)
+		if(ref_lie == NULL) // not restoring permission for symbolic links
+		    if(chmod(chem.c_str(), permission) < 0)
+			dialog.warning(tools_printf(gettext("Cannot restore permissions of %s : %s"), chem.c_str(), strerror(errno)));
+	}
+	catch(Egeneric &e)
+	{
+	    if(ref_lie == NULL)
+		throw;
+		// else (the inode is a symlink), we simply ignore this error
+	}
 
-	    if(what_to_check == inode::cf_all || what_to_check == inode::cf_ignore_owner || what_to_check == inode::cf_mtime)
-		if(ref_lie == NULL) // not restoring atime & ctime for symbolic links
-		    tools_make_date(chem, ref.get_last_access(), ref.get_last_modif());
-        }
-        catch(...)
-        {
-            delete [] name;
-            throw;
-        }
-        delete [] name;
+	if(what_to_check == inode::cf_all || what_to_check == inode::cf_ignore_owner || what_to_check == inode::cf_mtime)
+	    if(ref_lie == NULL) // not restoring atime & ctime for symbolic links
+		tools_make_date(chem, ref.get_last_access(), ref.get_last_modif());
     }
 
     static void attach_ea(const string &chemin, inode *ino, const mask & ea_mask)
@@ -1687,38 +1608,31 @@ namespace libdar
     {
 #ifdef LIBDAR_NODUMP_FEATURE
         S_I fd, f = 0;
-        char *ptr = tools_str2charptr((chem + filename).display());
+        const string display = (chem + filename).display();
+        const char *ptr = display.c_str();
 
-        try
-        {
-            fd = ::open(ptr, O_RDONLY|O_BINARY|O_NONBLOCK);
-            if(fd < 0)
-		dialog.warning(tools_printf(gettext("Failed to open %S while checking for nodump flag: %s"), &filename, strerror(errno)));
-	    else
+	fd = ::open(ptr, O_RDONLY|O_BINARY|O_NONBLOCK);
+	if(fd < 0)
+	    dialog.warning(tools_printf(gettext("Failed to open %S while checking for nodump flag: %s"), &filename, strerror(errno)));
+	else
+	{
+	    try
 	    {
-		try
+		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
 		{
-		    if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
-		    {
-			if(errno != ENOTTY)
-			    dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, strerror(errno)));
-			f = 0;
-		    }
+		    if(errno != ENOTTY)
+			dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, strerror(errno)));
+		    f = 0;
 		}
-		catch(...)
-		{
-		    close(fd);
-		    throw;
-		}
-		close(fd);
 	    }
-        }
-        catch(...)
-        {
-            delete [] ptr;
-            throw;
-        }
-        delete [] ptr;
+	    catch(...)
+	    {
+		close(fd);
+		throw;
+	    }
+	    close(fd);
+	}
+
 
         return (f & EXT2_NODUMP_FL) != 0;
 #else
@@ -1730,50 +1644,44 @@ namespace libdar
 				       const path & root, bool info_details)
     {
 	path *ret = NULL;
-        char *ptr = tools_str2charptr(root.display());
-	try
-	{
-	    struct stat buf;
-            if(lstat(ptr, &buf) < 0) // stat not lstat, thus we eventually get the symlink pointed to inode
-                throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("Cannot get inode information for %s : %s"), ptr, strerror(errno)));
+	const string display = root.display();
+        const char *ptr = display.c_str();
 
-	    if(S_ISDIR(buf.st_mode))
-	    {
-		ret = new path(root);
-		if(ret == NULL)
-		    throw  Ememory("get_root_with_symlink");
-	    }
-            else if(S_ISLNK(buf.st_mode))
-	    {
-		ret = new path(tools_readlink(ptr));
-		if(ret == NULL)
-		    throw Ememory("get_root_with_symlink");
-		if(ret->is_relative())
-		{
-		    string tmp;
-		    path base = root;
+	struct stat buf;
+	if(lstat(ptr, &buf) < 0) // stat not lstat, thus we eventually get the symlink pointed to inode
+	    throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("Cannot get inode information for %s : %s"), ptr, strerror(errno)));
 
-		    if(base.pop(tmp))
-			*ret = base + *ret;
-		    else
-			if(!root.is_relative())
-			    throw SRC_BUG;
-			// symlink name is not "popable" and is absolute, it is thus the filesystem root '/'
-			// and it is a symbolic link !!! How is it possible that "/" be a symlink ?
-			// a symlink to where ???
-		}
-		if(info_details && ! (*ret == root) )
-		    dialog.warning(tools_printf(gettext("Replacing %s in the -R option by the directory pointed to by this symbolic link: "), ptr) + ret->display());
-	    }
-	    else // not a directory given as argument
-		throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("The given path %s must be a directory (or symbolic link to an existing directory)"), ptr));
-	}
-	catch(...)
+	if(S_ISDIR(buf.st_mode))
 	{
-	    delete [] ptr;
-	    throw;
+	    ret = new path(root);
+	    if(ret == NULL)
+		throw  Ememory("get_root_with_symlink");
 	}
-	delete [] ptr;
+	else if(S_ISLNK(buf.st_mode))
+	{
+	    ret = new path(tools_readlink(ptr));
+	    if(ret == NULL)
+		throw Ememory("get_root_with_symlink");
+	    if(ret->is_relative())
+	    {
+		string tmp;
+		path base = root;
+
+		if(base.pop(tmp))
+		    *ret = base + *ret;
+		else
+		    if(!root.is_relative())
+			throw SRC_BUG;
+		    // symlink name is not "popable" and is absolute, it is thus the filesystem root '/'
+		    // and it is a symbolic link !!! How is it possible that "/" be a symlink ?
+		    // a symlink to where ???
+	    }
+	    if(info_details && ! (*ret == root) )
+		dialog.warning(tools_printf(gettext("Replacing %s in the -R option by the directory pointed to by this symbolic link: "), ptr) + ret->display());
+	}
+	else // not a directory given as argument
+	    throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("The given path %s must be a directory (or symbolic link to an existing directory)"), ptr));
+
 	if(ret == NULL)
 	    throw SRC_BUG; // exit without exception, but ret not allocated !
 
@@ -1782,23 +1690,10 @@ namespace libdar
 
     static mode_t get_file_permission(const string & path)
     {
-	mode_t ret;
-	char *ptr = tools_str2charptr(path);
-
-	try
-	{
-	    struct stat buf;
-	    if(lstat(ptr, &buf) < 0)
-		throw Erange("filesystem.cpp:get_file_permission", tools_printf("Cannot read file permission for %s: %s", ptr, strerror(errno)));
-	    ret = buf.st_mode;
-	}
-	catch(...)
-	{
-	    delete [] ptr;
-	    throw;
-	}
-	delete [] ptr;
-	return ret;
+	struct stat buf;
+	if(lstat(path.c_str(), &buf) < 0)
+	    throw Erange("filesystem.cpp:get_file_permission", tools_printf("Cannot read file permission for %s: %s", path.c_str(), strerror(errno)));
+	return buf.st_mode;
     }
 
 } // end of namespace

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_slave.cpp,v 1.33 2006/01/08 16:33:42 edrusb Rel $
+// $Id: dar_slave.cpp,v 1.33.2.3 2007/08/24 15:37:07 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -64,7 +64,7 @@ char *strchr (), *strrchr ();
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.3.2"
+#define DAR_SLAVE_VERSION "1.3.3"
 
 static bool command_line(user_interaction & dialog,
 			 S_I argc, char *argv[], path * &chemin, string & filename,
@@ -217,65 +217,49 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_slave.cpp,v 1.33 2006/01/08 16:33:42 edrusb Rel $";
+    static char id[]="$Id: dar_slave.cpp,v 1.33.2.3 2007/08/24 15:37:07 edrusb Rel $";
     dummy_call(id);
 }
 
 static void show_usage(user_interaction & dialog, const char *command)
 {
-    char *cmd = tools_extract_basename(command);
+    string cmd;
+    tools_extract_basename(command, cmd);
     shell_interaction_change_non_interactive_output(&cout);
 
-    try
-    {
-        dialog.printf("\nusage : \n");
-        dialog.printf("  command1 | %s [options] [<path>/]basename | command2\n", cmd);
-        dialog.printf("  %s [options] [-i input_pipe] [-o output_pipe] [<path>/]basename\n", cmd);
-        dialog.printf("  %s -h\n", cmd);
-        dialog.printf("  %s -V\n\n", cmd);
+    dialog.printf("\nusage : \n");
+    dialog.printf("  command1 | %s [options] [<path>/]basename | command2\n", cmd.c_str());
+    dialog.printf("  %s [options] [-i input_pipe] [-o output_pipe] [<path>/]basename\n", cmd.c_str());
+    dialog.printf("  %s -h\n", cmd.c_str());
+    dialog.printf("  %s -V\n\n", cmd.c_str());
 #include "dar_slave.usage"
-    }
-    catch(...)
-    {
-        delete [] cmd;
-        throw;
-    }
-    delete [] cmd;
 }
 
 static void show_version(user_interaction & dialog, const char *command)
 {
-    char *cmd = tools_extract_basename(command);
+    string cmd;
+    tools_extract_basename(command, cmd);
     U_I maj, med, min, bits;
-    bool ea, largefile, nodump, fastbadalloc, thread, libz, libbz2, libcrypto;
+    bool ea, largefile, nodump, fastbadalloc, thread, libz, libbz2, libcrypto, new_blowfish;
 
     get_version(maj, min);
     if(maj > 2)
 	get_version(maj, med, min);
     else
 	med = 0;
-    get_compile_time_features(ea, largefile, nodump, fastbadalloc, bits, thread, libz, libbz2, libcrypto);
+    get_compile_time_features(ea, largefile, nodump, fastbadalloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
     shell_interaction_change_non_interactive_output(&cout);
-    try
-    {
-        dialog.printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n", cmd, DAR_SLAVE_VERSION);
-	if(maj > 2)
-	    dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
-	else
-	    dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
-        tools_display_features(dialog, ea, largefile, nodump, fastbadalloc, bits, thread, libz, libbz2, libcrypto);
-        dialog.printf("\n");
-        dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__);
-        dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd, PACKAGE_VERSION);
-        dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY;"), cmd)
-		       + tools_printf(gettext(" for details\n type `dar -W'."))
-		       + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
-		       + tools_printf(gettext(" type `dar -L | more'\n for details.\n\n")));
-    }
-    catch(...)
-    {
-        delete [] cmd;
-        throw;
-    }
-    delete [] cmd;
+    dialog.printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n", cmd.c_str(), DAR_SLAVE_VERSION);
+    if(maj > 2)
+	dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
+    else
+	dialog.printf(gettext(" Using libdar %u.%u built with compilation time options:\n"), maj, min);
+    tools_display_features(dialog, ea, largefile, nodump, fastbadalloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
+    dialog.printf("\n");
+    dialog.printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT,  __VERSION__);
+    dialog.printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), cmd.c_str(), PACKAGE_VERSION);
+    dialog.warning(tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY;"), cmd.c_str())
+		   + tools_printf(gettext(" for details\n type `dar -W'."))
+		   + tools_printf(gettext(" This is free software, and you are welcome\n to redistribute it under certain conditions;"))
+		   + tools_printf(gettext(" type `dar -L | more'\n for details.\n\n")));
 }

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: string_file.hpp,v 1.1 2005/09/18 20:49:33 edrusb Rel $
+// $Id: string_file.hpp,v 1.1.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -58,7 +58,7 @@ namespace libdar
     protected:
 	    // inherited from generic_file
 	S_I inherited_read(char *a, size_t size);
-	S_I inherited_write(char *a, size_t size) { throw Efeature("Writing on a string_file is not allowed"); };
+	S_I inherited_write(const char *a, size_t size) { throw Efeature("Writing on a string_file is not allowed"); };
 
     private:
 	std::string data;

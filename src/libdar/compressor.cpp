@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.16.2.2 2007/04/25 20:10:04 edrusb Rel $
+// $Id: compressor.cpp,v 1.16.2.3 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -232,7 +232,7 @@ namespace libdar
         return compressed->read(a, size);
     }
 
-    S_I compressor::none_write(char *a, size_t size)
+    S_I compressor::none_write(const char *a, size_t size)
     {
         return compressed->write(a, size);
     }
@@ -288,7 +288,7 @@ namespace libdar
         return decompr->wrap.get_next_out() - a;
     }
 
-    S_I compressor::gzip_write(char *a, size_t size)
+    S_I compressor::gzip_write(const char *a, size_t size)
     {
         compr->wrap.set_next_in(a);
         compr->wrap.set_avail_in(size);
@@ -376,7 +376,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: compressor.cpp,v 1.16.2.2 2007/04/25 20:10:04 edrusb Rel $";
+        static char id[]="$Id: compressor.cpp,v 1.16.2.3 2007/07/22 16:34:59 edrusb Rel $";
         dummy_call(id);
     }
 

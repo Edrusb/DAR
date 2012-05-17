@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: cache.cpp,v 1.12 2005/12/05 11:56:21 edrusb Rel $
+// $Id: cache.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -126,7 +126,7 @@ namespace libdar
     }
 
 
-    S_I cache::inherited_write(char *a, size_t size)
+    S_I cache::inherited_write(const char *a, size_t size)
     {
 	U_I wrote = 0;
 	U_I avail, min;
@@ -220,7 +220,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: cache.cpp,v 1.12 2005/12/05 11:56:21 edrusb Rel $";
+        static char id[]="$Id: cache.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $";
         dummy_call(id);
     }
 

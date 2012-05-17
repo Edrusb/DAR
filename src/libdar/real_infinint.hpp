@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.hpp,v 1.14.2.1 2007/06/21 19:40:37 edrusb Rel $
+// $Id: real_infinint.hpp,v 1.14.2.2 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -222,7 +222,7 @@ namespace libdar
     template <class T> infinint infinint::power(const T & exponent) const
     {
 	infinint ret = 1;
-	for(T count = 0; count < exponent; count++)
+	for(T count = 0; count < exponent; ++count)
 	    ret *= *this;
 
 	return ret;
@@ -238,7 +238,11 @@ namespace libdar
         storage::iterator it = tmp.field->rbegin();
 
         while(it != tmp.field->rend() && ptr >= debut)
-            *(ptr--) = *(it--);
+	{
+            *ptr = *it;
+            --ptr;
+            --it;
+        }
 
         if(it != tmp.field->rend())
             throw SRC_BUG; // could not put all the data in the returned value !
@@ -277,7 +281,7 @@ namespace libdar
         while(ptr != fin && *ptr == 0)
         {
             ptr += direction;
-            size--;
+            --size;
         }
 
         if(size == 0)
@@ -293,7 +297,8 @@ namespace libdar
 
             while(ptr != fin)
             {
-                *(it++) = *ptr;
+                *it = *ptr;
+                ++it;
                 ptr += direction;
             }
             if(it != field->end())
@@ -322,8 +327,11 @@ namespace libdar
             storage::iterator it = field->rbegin();
 
             while(ptr >= debut && it != field->rend())
-                *(ptr--) = *(it--);
-
+            {
+                *ptr = *it;
+                --ptr;
+                --it;
+	    }
             if(used_endian == big_endian)
                 int_tools_swap_bytes(debut, sizeof(transfert));
             a += transfert;

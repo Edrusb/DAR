@@ -11,23 +11,24 @@ clean-local:
 	rm -f libdar.pc
 endif
 
+localedir = @localedir@
 
 if BUILD_MODE32
   MYLIB=libdar32.la
-  AM_CPPFLAGS=-DLIBDAR_MODE=32 $(CPP_PROF)
+  AM_CPPFLAGS=-DLIBDAR_MODE=32 -DDAR_LOCALEDIR=\"$(localedir)\" $(CPP_PROF)
   VER_SRC=limitint.o
   LIBDAR_SUFFIX=32
   LIBDAR_MODE=-DMODE=32
 else
 if BUILD_MODE64
     MYLIB=libdar64.la
-    AM_CPPFLAGS=-DLIBDAR_MODE=64  $(CPP_PROF)
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -DDAR_LOCALEDIR=\"$(localedir)\" $(CPP_PROF)
     VER_SRC=limitint.o
     LIBDAR_SUFFIX=64
     LIBDAR_MODE=-DMODE=64
 else
     MYLIB=libdar.la
-    AM_CPPFLAGS=  $(CPP_PROF)
+    AM_CPPFLAGS= -DDAR_LOCALEDIR=\"$(localedir)\" $(CPP_PROF)
     VER_SRC=real_infinint.o
     LIBDAR_SUFFIX=
     LIBDAR_MODE=
@@ -44,7 +45,7 @@ LIBDAR_VERSION_IN=$(LIBDAR_MAJOR):$(LIBDAR_MINOR)
 LIBDAR_VERSION_OUT=$(LIBDAR_MAJOR).$(LIBDAR_MEDIUM).$(LIBDAR_MINOR)
 
 
-dist_noinst_DATA = libdar.hpp path.hpp mask.hpp integers.hpp real_infinint.hpp statistics.hpp user_interaction.hpp erreurs.hpp deci.hpp limitint.hpp infinint.hpp compressor.hpp special_alloc.hpp generic_file.hpp wrapperlib.hpp storage.hpp tuyau.hpp tools.hpp catalogue.hpp scrambler.hpp archive.hpp header_version.hpp ea.hpp crypto.hpp int_tools.hpp thread_cancellation.hpp tronconneuse.hpp mask_list.hpp database.hpp data_tree.hpp string_file.hpp
+dist_noinst_DATA = libdar.hpp path.hpp mask.hpp integers.hpp real_infinint.hpp statistics.hpp user_interaction.hpp erreurs.hpp deci.hpp limitint.hpp infinint.hpp compressor.hpp special_alloc.hpp generic_file.hpp wrapperlib.hpp storage.hpp tuyau.hpp tools.hpp catalogue.hpp scrambler.hpp archive.hpp header_version.hpp ea.hpp crypto.hpp int_tools.hpp thread_cancellation.hpp tronconneuse.hpp mask_list.hpp database.hpp data_tree.hpp string_file.hpp user_group_bases.hpp
 install-data-local:
 	mkdir -p $(DESTDIR)$(pkgincludedir)
 	cp ../../config.h $(DESTDIR)$(pkgincludedir)
@@ -71,10 +72,10 @@ libdar.pc : libdar.pc.tmpl
 noinst_HEADERS = defile.hpp ea_filesystem.hpp etage.hpp filesystem.hpp filtre.hpp header.hpp macro_tools.hpp null_file.hpp sar.hpp sar_tools.hpp terminateur.hpp tronc.hpp zapette.hpp test_memory.hpp cygwin_adapt.hpp elastic.hpp nls_swap.hpp database_header.hpp
 
 libdar_la_LDFLAGS = -version-info $(LIBDAR_VERSION_IN)
-libdar_la_SOURCES = catalogue.cpp catalogue.hpp compressor.cpp compressor.hpp deci.cpp deci.hpp defile.cpp defile.hpp ea.cpp ea.hpp ea_filesystem.cpp ea_filesystem.hpp erreurs.cpp erreurs.hpp etage.cpp etage.hpp filesystem.cpp filesystem.hpp filtre.cpp filtre.hpp generic_file.cpp generic_file.hpp header.cpp header_version.cpp real_infinint.cpp libdar.cpp macro_tools.cpp mask.cpp path.cpp sar.cpp sar_tools.cpp scrambler.cpp storage.cpp terminateur.cpp test_memory.cpp tools.cpp tronc.cpp tuyau.cpp user_interaction.cpp wrapperlib.cpp zapette.cpp special_alloc.cpp archive.cpp crypto.cpp cache.cpp cache.hpp int_tools.cpp tronconneuse.cpp elastic.cpp thread_cancellation.cpp mask_list.cpp database.cpp database_header.cpp data_tree.cpp string_file.cpp statistics.cpp
+libdar_la_SOURCES = catalogue.cpp catalogue.hpp compressor.cpp compressor.hpp deci.cpp deci.hpp defile.cpp defile.hpp ea.cpp ea.hpp ea_filesystem.cpp ea_filesystem.hpp erreurs.cpp erreurs.hpp etage.cpp etage.hpp filesystem.cpp filesystem.hpp filtre.cpp filtre.hpp generic_file.cpp generic_file.hpp header.cpp header_version.cpp real_infinint.cpp libdar.cpp macro_tools.cpp mask.cpp path.cpp sar.cpp sar_tools.cpp scrambler.cpp storage.cpp terminateur.cpp test_memory.cpp tools.cpp tronc.cpp tuyau.cpp user_interaction.cpp wrapperlib.cpp zapette.cpp special_alloc.cpp archive.cpp crypto.cpp cache.cpp cache.hpp int_tools.cpp tronconneuse.cpp elastic.cpp thread_cancellation.cpp mask_list.cpp database.cpp database_header.cpp data_tree.cpp string_file.cpp statistics.cpp user_group_bases.cpp
 
 libdar32_la_LDFLAGS = -version-info $(LIBDAR_VERSION_IN)
-libdar32_la_SOURCES = catalogue.cpp catalogue.hpp compressor.cpp compressor.hpp deci.cpp deci.hpp defile.cpp defile.hpp ea.cpp ea.hpp ea_filesystem.cpp ea_filesystem.hpp erreurs.cpp erreurs.hpp etage.cpp etage.hpp filesystem.cpp filesystem.hpp filtre.cpp filtre.hpp generic_file.cpp generic_file.hpp header.cpp header_version.cpp libdar.cpp macro_tools.cpp mask.cpp path.cpp sar.cpp sar_tools.cpp scrambler.cpp terminateur.cpp test_memory.cpp tools.cpp tronc.cpp tuyau.cpp user_interaction.cpp wrapperlib.cpp zapette.cpp special_alloc.cpp limitint.cpp storage.cpp archive.cpp crypto.cpp cache.cpp cache.hpp int_tools.cpp tronconneuse.cpp elastic.cpp thread_cancellation.cpp mask_list.cpp database.cpp database_header.cpp data_tree.cpp string_file.cpp statistics.cpp
+libdar32_la_SOURCES = catalogue.cpp catalogue.hpp compressor.cpp compressor.hpp deci.cpp deci.hpp defile.cpp defile.hpp ea.cpp ea.hpp ea_filesystem.cpp ea_filesystem.hpp erreurs.cpp erreurs.hpp etage.cpp etage.hpp filesystem.cpp filesystem.hpp filtre.cpp filtre.hpp generic_file.cpp generic_file.hpp header.cpp header_version.cpp libdar.cpp macro_tools.cpp mask.cpp path.cpp sar.cpp sar_tools.cpp scrambler.cpp terminateur.cpp test_memory.cpp tools.cpp tronc.cpp tuyau.cpp user_interaction.cpp wrapperlib.cpp zapette.cpp special_alloc.cpp limitint.cpp storage.cpp archive.cpp crypto.cpp cache.cpp cache.hpp int_tools.cpp tronconneuse.cpp elastic.cpp thread_cancellation.cpp mask_list.cpp database.cpp database_header.cpp data_tree.cpp string_file.cpp statistics.cpp user_group_bases.cpp
 
 libdar64_la_LDFLAGS = -version-info $(LIBDAR_VERSION_IN)
-libdar64_la_SOURCES = catalogue.cpp catalogue.hpp compressor.cpp compressor.hpp deci.cpp deci.hpp defile.cpp defile.hpp ea.cpp ea.hpp ea_filesystem.cpp ea_filesystem.hpp erreurs.cpp erreurs.hpp etage.cpp etage.hpp filesystem.cpp filesystem.hpp filtre.cpp filtre.hpp generic_file.cpp generic_file.hpp header.cpp header_version.cpp libdar.cpp macro_tools.cpp mask.cpp path.cpp sar.cpp sar_tools.cpp scrambler.cpp terminateur.cpp test_memory.cpp tools.cpp tronc.cpp tuyau.cpp user_interaction.cpp wrapperlib.cpp zapette.cpp special_alloc.cpp limitint.cpp storage.cpp archive.cpp crypto.cpp cache.cpp cache.hpp int_tools.cpp tronconneuse.cpp elastic.cpp thread_cancellation.cpp mask_list.cpp database.cpp database_header.cpp data_tree.cpp string_file.cpp statistics.cpp
+libdar64_la_SOURCES = catalogue.cpp catalogue.hpp compressor.cpp compressor.hpp deci.cpp deci.hpp defile.cpp defile.hpp ea.cpp ea.hpp ea_filesystem.cpp ea_filesystem.hpp erreurs.cpp erreurs.hpp etage.cpp etage.hpp filesystem.cpp filesystem.hpp filtre.cpp filtre.hpp generic_file.cpp generic_file.hpp header.cpp header_version.cpp libdar.cpp macro_tools.cpp mask.cpp path.cpp sar.cpp sar_tools.cpp scrambler.cpp terminateur.cpp test_memory.cpp tools.cpp tronc.cpp tuyau.cpp user_interaction.cpp wrapperlib.cpp zapette.cpp special_alloc.cpp limitint.cpp storage.cpp archive.cpp crypto.cpp cache.cpp cache.hpp int_tools.cpp tronconneuse.cpp elastic.cpp thread_cancellation.cpp mask_list.cpp database.cpp database_header.cpp data_tree.cpp string_file.cpp statistics.cpp user_group_bases.cpp

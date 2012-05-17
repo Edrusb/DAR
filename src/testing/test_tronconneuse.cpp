@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tronconneuse.cpp,v 1.6 2005/09/11 19:01:16 edrusb Rel $
+// $Id: test_tronconneuse.cpp,v 1.6.2.1 2007/07/22 16:35:01 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -63,8 +63,7 @@ U_32 test::encrypt_data(const infinint & block_num, const char *clear_buf, const
 {
     if(crypt_size < clear_size + 1)
 	throw SRC_BUG;
-    for(register U_32 i = 0; i < clear_size; i++)
-	crypt_buf[i] = clear_buf[i];
+    memcpy(crypt_buf, clear_buf, clear_size);
     crypt_buf[clear_size] = '#';
 
     return clear_size + 1;
@@ -76,8 +75,7 @@ U_32 test::decrypt_data(const infinint & block_num, const char *crypt_buf, const
 	throw SRC_BUG;
     if(crypt_size == 0)
 	return 0;
-    for(register U_32 i = 0; i < crypt_size - 1; i++)
-	clear_buf[i] = crypt_buf[i];
+    memcpy(clear_buf, crypt_buf, crypt_size - 1);
 
     return crypt_size - 1;
 }
@@ -171,7 +169,7 @@ void f2(user_interaction *dialog)
 
     int i;
 
-    for(i = 0; i < taille && toto->read_back(buffer[i]) == 1; i++)
+    for(i = 0; i < taille && toto->read_back(buffer[i]) == 1; ++i)
 	cout << toto->get_position() << endl;
 
     buffer[i] = '\0';

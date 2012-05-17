@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.cpp,v 1.40.2.4 2007/06/21 19:40:37 edrusb Rel $
+// $Id: archive.cpp,v 1.40.2.6 2007/08/24 13:47:05 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -402,7 +402,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: archive.cpp,v 1.40.2.4 2007/06/21 19:40:37 edrusb Rel $";
+        static char id[]="$Id: archive.cpp,v 1.40.2.6 2007/08/24 13:47:05 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -735,10 +735,11 @@ namespace libdar
     bool archive::get_children_of(user_interaction & dialog,
                                   const string & dir)
     {
+	bool ret;
         NLS_SWAP_IN;
         try
         {
-            return get_cat().get_contenu()->callback_for_children_of(dialog, dir);
+            ret = get_cat().get_contenu()->callback_for_children_of(dialog, dir);
         }
         catch(...)
         {
@@ -746,6 +747,8 @@ namespace libdar
             throw;
         }
         NLS_SWAP_OUT;
+
+	return ret;
     }
 
 
@@ -1063,6 +1066,7 @@ namespace libdar
 		{
 		case crypto_scrambling:
 		case crypto_blowfish:
+		case crypto_blowfish_weak:
 		    ver.flag |= VERSION_FLAG_SCRAMBLED;
 		    break;
 		case crypto_none:
@@ -1085,7 +1089,10 @@ namespace libdar
 			scram = new scrambler(dialog, real_pass, *level1);
 			break;
 		    case crypto_blowfish:
-			scram = new blowfish(dialog, crypto_size, real_pass, *level1, macro_tools_supported_version);
+			scram = new blowfish(dialog, crypto_size, real_pass, *level1, macro_tools_supported_version, false);
+			break;
+		    case crypto_blowfish_weak:
+			scram = new blowfish(dialog, crypto_size, real_pass, *level1, macro_tools_supported_version, true);
 			break;
 		    case crypto_none:
 			zip_base = level1;

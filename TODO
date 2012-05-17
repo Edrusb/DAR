@@ -28,7 +28,7 @@ toghether, size would be user defined.
 - decremental backup feature (-> merging with overwrite)
 - option to only process file removal at restoration time (do not restore data)
 - remember the cypher used (algorithm chosen for encryption stored inside the archive)
-this way user does only have to use the password/passphrase
+  this way user does only have to use the password/passphrase
 - binary diff when file size exceed a given size (no diff by default)
 - suppress the summary information at the end of the backup (with -q option)
 - "path" like variable to look for slices (George Foot's original idea)

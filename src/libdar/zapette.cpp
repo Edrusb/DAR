@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: zapette.cpp,v 1.21 2005/12/29 02:32:41 edrusb Rel $
+// $Id: zapette.cpp,v 1.21.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -158,7 +158,7 @@ namespace libdar
             {
                 char black_hole;
 
-                for(tmp = max; tmp < size; tmp++)
+                for(tmp = max; tmp < size; ++tmp)
                     f->read(&black_hole, 1);
                     // might not be very performant code
             }
@@ -317,7 +317,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: zapette.cpp,v 1.21 2005/12/29 02:32:41 edrusb Rel $";
+        static char id[]="$Id: zapette.cpp,v 1.21.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -397,7 +397,7 @@ namespace libdar
         return lu;
     }
 
-    S_I zapette::inherited_write(char *a, size_t size)
+    S_I zapette::inherited_write(const char *a, size_t size)
     {
         throw SRC_BUG; // zapette is read-only
     }

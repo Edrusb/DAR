@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: etage.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $
+// $Id: etage.cpp,v 1.16.2.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -109,21 +109,21 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: etage.cpp,v 1.16 2005/12/29 02:32:41 edrusb Rel $";
+        static char id[]="$Id: etage.cpp,v 1.16.2.1 2007/07/22 16:34:59 edrusb Rel $";
         dummy_call(id);
     }
 
 
     bool etage::read(string & ref)
     {
-        if(fichier.size() > 0)
-        {
-            ref = fichier.front();
-            fichier.pop_front();
-            return true;
-        }
-        else
+        if(fichier.empty())
             return false;
+	else
+	{
+	    ref = fichier.front();
+	    fichier.pop_front();
+	    return true;
+	}
     }
 
 	///////////////////////////////////////////

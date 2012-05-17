@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.47.2.6 2007/02/26 18:29:53 edrusb Rel $
+// $Id: catalogue.cpp,v 1.47.2.7 2007/07/27 11:27:31 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -1339,7 +1339,7 @@ namespace libdar
 
     void directory::dump(user_interaction & dialog, generic_file & f) const
     {
-        vector<nomme *>::iterator x = const_cast<directory *>(this)->fils.begin();
+        vector<nomme *>::const_iterator x = fils.begin();
         inode::dump(dialog, f);
         eod fin;
 
@@ -1418,7 +1418,7 @@ namespace libdar
     void directory::listing(user_interaction & dialog,
 			    const mask &m, bool filter_unsaved, string marge) const
     {
-        vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
+        vector<nomme *>::const_iterator it = fils.begin();
 	thread_cancellation thr;
 
 	thr.check_self_cancellation();
@@ -1477,7 +1477,7 @@ namespace libdar
     void directory::tar_listing(user_interaction & dialog,
 				const mask &m, bool filter_unsaved, const string & beginning) const
     {
-        vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
+        vector<nomme *>::const_iterator it = fils.begin();
         string sep = beginning == "" ? "" : "/";
 	thread_cancellation thr;
 
@@ -1543,7 +1543,7 @@ namespace libdar
 				bool filter_unsaved,
 				const string & beginning) const
     {
-    	vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
+    	vector<nomme *>::const_iterator it = fils.begin();
 	thread_cancellation thr;
 
 	thr.check_self_cancellation();
@@ -1879,7 +1879,7 @@ namespace libdar
 
     void directory::recursive_has_changed_update() const
     {
-	vector<nomme *>::iterator it = const_cast<directory *>(this)->fils.begin();
+	vector<nomme *>::const_iterator it = fils.begin();
 
 	const_cast<directory *>(this)->recursive_has_changed = false;
 	while(it != fils.end())
@@ -2559,7 +2559,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: catalogue.cpp,v 1.47.2.6 2007/02/26 18:29:53 edrusb Rel $";
+	static char id[]="$Id: catalogue.cpp,v 1.47.2.7 2007/07/27 11:27:31 edrusb Rel $";
 	dummy_call(id);
     }
 

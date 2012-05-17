@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: thread_cancellation.cpp,v 1.4.2.2 2006/04/10 19:52:09 edrusb Exp $
+// $Id: thread_cancellation.cpp,v 1.4.2.3 2007/07/24 16:29:31 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -171,12 +171,9 @@ namespace libdar
 #if MUTEX_WORKS
 	if(!initialized)
 	{
-	    initialized = true;
 	    if(pthread_mutex_init(&access, NULL) < 0)
-	    {
-		initialized = false;
 		throw Erange("thread_cancellation::init", string(gettext("Cannot initialize mutex: ")) + strerror(errno));
-	    }
+	    initialized = true;
 	}
 #endif
     }
@@ -232,7 +229,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: thread_cancellation.cpp,v 1.4.2.2 2006/04/10 19:52:09 edrusb Exp $";
+	static char id[]="$Id: thread_cancellation.cpp,v 1.4.2.3 2007/07/24 16:29:31 edrusb Rel $";
 	dummy_call(id);
     }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: factoriel.cpp,v 1.12 2005/04/09 21:43:34 edrusb Rel $
+// $Id: factoriel.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -86,7 +86,10 @@ static int little_main(user_interaction & ui, int argc, char *argv[], const char
     infinint p = 1;
 
     while(i <= max)
-	p *= i++;
+    {
+	p *= i;
+	++i;
+    }
 
     ui.warning("calcul finished, now computing the decimal representation ... ");
     f = deci(p);
@@ -123,6 +126,6 @@ static int little_main(user_interaction & ui, int argc, char *argv[], const char
 
 static void dummy_call(char *x)
 {
-static char id[]="$Id: factoriel.cpp,v 1.12 2005/04/09 21:43:34 edrusb Rel $";
+static char id[]="$Id: factoriel.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $";
 dummy_call(id);
 }

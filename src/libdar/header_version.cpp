@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header_version.cpp,v 1.7 2005/05/08 12:12:01 edrusb Rel $
+// $Id: header_version.cpp,v 1.7.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -34,13 +34,12 @@ namespace libdar
 
     void version_copy(dar_version & dst, const dar_version & src)
     {
-        for(S_I i = 0; i < VERSION_SIZE; i++)
-            dst[i] = src[i];
+    	memcpy(dst, src, VERSION_SIZE);
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: header_version.cpp,v 1.7 2005/05/08 12:12:01 edrusb Rel $";
+        static char id[]="$Id: header_version.cpp,v 1.7.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -49,7 +48,7 @@ namespace libdar
         S_I i = 0;
 
         while(i < VERSION_SIZE && left[i] == right[i])
-            i++;
+            ++i;
 
         return i < VERSION_SIZE && left[i] > right[i];
     }

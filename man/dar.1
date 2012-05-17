@@ -1,4 +1,4 @@
-.TH DAR 1 "FEB 24th, 2007"
+.TH DAR 1 "AUG 28th, 2007"
 .UC 8
 .SH NAME
 dar - disk archive
@@ -240,6 +240,8 @@ same as -E but is applied between slices of the reference archive (-A option).
 .TP 20
 -K, --key [[<algo>]:]<string>
 encrypt/decrypt the archive using the <algo> cipher with the <string> as pass phrase. An encrypted archive can only be read if the same pass phrase is given. Available ciphers are "blowfish" (alias "bf") for strong encryption and "scrambling" (alias "scram") for a very weak encryption. By default if no <algo> or no ':' is given, the blowfish cipher is assumed. If your password contains a column ':' you need to specify the cipher to use (or at least use the initial ':' which is equivalent to 'bf:'). If the <string> is empty the pass phrase will be asked at execution time. Thus, the smallest argument that -K can receive is ':' which means blowfish cipher with the pass phrase asked at execution time.
+.P
+With release 2.3.4 a better implementation of the blowfish algorithm has been used within dar, while recent version can transparently read older implementation (using 'bf' cipher) you can create new archive with this old weakened blowfish implementation using the 'blowfish_weak' or 'bfw' cipher. Note that this way of encryption is strong but weakened by frequent IV collision (same Initial Vectors used often). This feature is kept available for those using old openssl library that do not provide all the header required to implement the new blowfish implementation.
 .P
 Note that giving the pass phrase as argument to -K (or -J see below) may let other users learn pass phrase (thanks to the ps, or top program for examples). It is thus wise to either use an empty pass which will make dar ask the pass phrase at when needed, or use -K (or -J option) from an Dar Command File (see -B option), assuming it has the appropriated permission to avoid other users reading it.
 .TP 20

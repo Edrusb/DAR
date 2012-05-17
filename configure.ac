@@ -1,6 +1,6 @@
  |# Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.3.4], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.3.5], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -198,6 +198,26 @@ AC_ARG_ENABLE( [libcrypto-linking],
                                               ]]),
                                               [ AC_DEFINE(CRYPTO_AVAILABLE, 1, [header and linking is available to have strong encryption functions])],
                                               [ local_crypto="no" ])
+		AC_MSG_CHECKING([prerequisits for full blowfish implementation])
+                AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
+							#if HAVE_OPENSSL_EVP_H
+							#include <openssl/evp.h>
+							#endif
+							#if HAVE_OPENSSL_HMAC_H
+							#include <openssl/hmac.h>
+							#endif
+						}]],
+						[[
+                                                    const EVP_MD *digest = EVP_sha1();
+						    HMAC_CTX hmac;
+						    EVP_MD_size(digest);
+						    HMAC_CTX_init(&hmac);
+                                                ]]),
+						[ AC_DEFINE(CRYPTO_FULL_BF_AVAILABLE, 1, [whether header and linking for new and better blowfish implementation is available])
+						  local_crypto_full_bf="yes"
+                                                  AC_MSG_RESULT(available)  ],
+						[ local_crypto_full_bf="no"
+                                                  AC_MSG_RESULT(not met)    ])
              else
                 AC_MSG_WARN([strong encryption support not available])
              fi
@@ -459,11 +479,6 @@ AC_ARG_ENABLE(  [thread-safe],
                 ]
              )
 
-AC_ARG_ENABLE( [locale-dir],
-               AC_HELP_STRING(--enable-locale-dir, [by default NLS files are installed in $prefix/share/locale. You override this with --enable-locale-dir=<path>]),
-               [ AC_DEFINE_UNQUOTED(DAR_LOCALEDIR, ["$enableval"], [override the default location of *.mo files ($prefix/share/locale by default) ])],
-               [ AC_DEFINE(DAR_LOCALEDIR, ["$prefix/share/locale"], [override the default location of *.mo files ($prefix/share/locale by default) ])])
-
 AC_ARG_ENABLE( [profiling],
 	       AC_HELP_STRING(--enable-profiling, [enable executable profiling]),
                [ profiling="yes" ])
@@ -537,6 +552,13 @@ if [ "$local_crypto" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
+fi
+
+echo -n "   New blowfish implementation: "
+if [ "$local_crypto" = "yes" -a "$local_crypto_full_bf"="yes" ] ; then
+   echo "YES"
+else
+   echo "NO"
 fi
 
 echo -n "   Extended Attributes support: "

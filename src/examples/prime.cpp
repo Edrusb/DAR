@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: prime.cpp,v 1.8 2005/04/09 21:43:34 edrusb Rel $
+// $Id: prime.cpp,v 1.8.2.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -60,7 +60,7 @@ int little_main(user_interaction & ui, S_I argc, char *argv[], const char **env)
         if(num%i == 0)
             break;
         else
-            i++;
+            ++i;
 
     if(i < max)
         cout << argv[1] << " is NOT prime" << endl;
@@ -72,6 +72,6 @@ int little_main(user_interaction & ui, S_I argc, char *argv[], const char **env)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: prime.cpp,v 1.8 2005/04/09 21:43:34 edrusb Rel $";
+    static char id[]="$Id: prime.cpp,v 1.8.2.1 2007/07/22 16:34:59 edrusb Rel $";
     dummy_call(id);
 }

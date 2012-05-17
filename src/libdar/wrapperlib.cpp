@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: wrapperlib.cpp,v 1.14 2005/04/09 21:43:35 edrusb Rel $
+// $Id: wrapperlib.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -136,7 +136,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: wrapperlib.cpp,v 1.14 2005/04/09 21:43:35 edrusb Rel $";
+        static char id[]="$Id: wrapperlib.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -179,7 +179,7 @@ namespace libdar
         return zlib2wrap_code(inflate(z_ptr, wrap2zlib_code(flag)));
     }
 
-    void wrapperlib::z_set_next_in(char *x)
+    void wrapperlib::z_set_next_in(const char *x)
     {
         CHECK_Z;
         z_ptr->next_in = (Bytef *)x;
@@ -237,10 +237,10 @@ namespace libdar
 ////////////// BZlib routines /////////////
 
 #if LIBBZ2_AVAILABLE
-    void wrapperlib::bz_set_next_in(char *x)
+    void wrapperlib::bz_set_next_in(const char *x)
     {
         CHECK_BZ;
-        bz_ptr->next_in = x;
+        bz_ptr->next_in = (char*)x;	// It must be a bug in bz that the input is not a const char*
     }
 
     void wrapperlib::bz_set_avail_in(U_I x)

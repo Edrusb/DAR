@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: hide_file.hpp,v 1.10 2004/10/01 22:05:34 edrusb Rel $
+// $Id: hide_file.hpp,v 1.10.4.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -54,7 +54,7 @@ protected:
     generic_file *ref;
 
     S_I inherited_read(char *a, size_t size);
-    S_I inherited_write(char *a, size_t size);
+    S_I inherited_write(const char *a, size_t size);
 
     virtual void fill_morceau() = 0;
         // the inherited classes have with this method

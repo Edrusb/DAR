@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: shell_interaction.cpp,v 1.27 2005/12/29 02:32:41 edrusb Rel $
+// $Id: shell_interaction.cpp,v 1.27.2.1 2007/07/22 16:34:59 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -303,7 +303,7 @@ static string interaction_string(const string & message, bool echo, void *contex
 	lu = ::read(input, buffer, taille);
 	i = 0;
 	while(i < lu && buffer[i] != '\n')
-	    i++;
+	    ++i;
 	if(i < lu)
 	    fin = true;
 	buffer[i] = '\0';
@@ -319,6 +319,6 @@ static string interaction_string(const string & message, bool echo, void *contex
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: shell_interaction.cpp,v 1.27 2005/12/29 02:32:41 edrusb Rel $";
+    static char id[]="$Id: shell_interaction.cpp,v 1.27.2.1 2007/07/22 16:34:59 edrusb Rel $";
     dummy_call(id);
 }

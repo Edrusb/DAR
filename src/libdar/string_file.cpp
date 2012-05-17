@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: string_file.cpp,v 1.2 2006/01/08 16:33:43 edrusb Rel $
+// $Id: string_file.cpp,v 1.2.2.1 2007/07/22 16:35:00 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -82,7 +82,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: string_file.cpp,v 1.2 2006/01/08 16:33:43 edrusb Rel $";
+        static char id[]="$Id: string_file.cpp,v 1.2.2.1 2007/07/22 16:35:00 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -91,7 +91,7 @@ namespace libdar
 	infinint avail_inf = len - cur;
 	size_t avail = 0;
 	U_I ret;
-	string::iterator it = data.begin();
+	const char* ptr = data.c_str();
 	infinint tmp_sk = cur;
 	U_64 tmp_sk_64 = 0;
 
@@ -111,7 +111,7 @@ namespace libdar
 	    tmp_sk.unstack(tmp_sk_64);
 	    if(tmp_sk_64 > 0)
 	    {
-		it += tmp_sk_64;
+		ptr += tmp_sk_64;
 		tmp_sk_64 = 0;
 	    }
 	}
@@ -120,9 +120,7 @@ namespace libdar
 	    //
 	    // copying the string
 
-	for(size_t i = 0; i < ret; i++)
-	    a[i] = *it++;
-
+	memcpy(a, ptr, ret);
 	cur += ret;
 	return ret;
     }
