@@ -1,4 +1,4 @@
-.TH DAR 1 "JAN 8th, 2006"
+.TH DAR 1 "OCT 30th, 2006"
 .UC 8
 .SH NAME
 dar - disk archive
@@ -167,7 +167,7 @@ the -am flag here also enables the ordered method, for EA selection too. The ord
 
 Another point, independently of the -am option the -ae option can be used at restoration time only. If set, when a file is about to be overwritten, all EA will be first erased before restoring those selected for restoration in the archive (according to the -U and -u options given). If not set, the EA of the existing file will be overwritten, those extra EA that are not in the archive or are not selected for restoration in regard to the -u and -U options will be preserved. If you have not used any -u/-U option at backup time and want to restore from a set of full/differential backups the EA exactly as the were you have to use -ae for dar removes the EA that have been removed along the time, else you could get an EA that has been removed in a intermediate differential backup not been removed at restoration time.
 .P
- Last point the -acase and -an options alters the case sensitivity of the  -U and -u masks that follow them on the command-line/included files as they do for -I, -X, -P, -g, -[ and -] as well. Very last point ;-), by default during backup dar set back the atime after having read each file (see -aa/-ac options), this has as side effect to modify the ctime date of each file. But ctime change is used by dar to detect EA changes. In brief, the next time you backup a file that had to be read (thus which contents changed), its EA will be saved even if they had not changed. To avoid this slide effect, you can use the -ac option.
+Last point the -acase and -an options alters the case sensitivity of the  -U and -u masks that follow them on the command-line/included files as they do for -I, -X, -P, -g, -[ and -] as well. Very last point ;-), by default during backup dar set back the atime after having read each file (see -aa/-ac options), this has as side effect to modify the ctime date of each file. But ctime change is used by dar to detect EA changes. In brief, the next time you backup a file that had to be read (thus which contents changed), its EA will be saved even if they had not changed. To avoid this slide effect, you can use the -ac option.
 .RE
 .B This ends the Extended Attribute selection explication
 let's continue with other options.
@@ -180,23 +180,22 @@ is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -
 is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c, -C or -+ is used). When reading from pipe, standard output is used to send request to dar_slave, but with this option, the file <path> (usually a named pipe) is used instead. When standard output is used, all messages goes to standard error (not only interactive messages). See doc/NOTES for examples of use.
 .TP 20
 -O, --comparison-field[=<flag>]
-When comparing with the archive of reference (-c -A), while doing a differential backup, when extracting (-x) or when comparing (-d) do only consider certain files to determine if a file has changed. The available flags are:
+When comparing with the archive of reference (-c -A) during a differential backup, when extracting (-x) or when comparing (-d) do only consider certain fields. The available flags are:
 .RS
 .TP 15
 ignore-owner
 all fields are considered except ownership.
 .BR
-This is useful when dar is used by a non-privileged user. It will not consider a file has changed just because it has only the uid or gid changed, nor report a comparison mismatch if only
-uid or gid is different.
+This is useful when dar is used by a non-privileged user. It will not consider a file has changed just because of a uid or gid mismatch and at restoration dar will not even try to set the file ownership.
 .TP 15
 mtime
-only inode type and last modification date is considered as well as inode specific attributes like file size for plain files. Ownership is ignored, permission is ignored.
+only inode type and last modification date is considered as well as inode specific attributes like file size for plain files. Ownership is ignored, permission is ignored. During comparison, difference on ownership or permission is ignored and at restoration time dar will not try to set the inode permission and ownership.
 .TP 15
 inode-type
-Only the inode type is considered. Ownership ignored, permission, last modification date  are ignored. Inode specific attributes are still considered (like file size for plain files)
+Only the inode type is considered. Ownership, permission and dates are ignored. Inode specific attributes are still considered (like file size for plain files). Thus comparison will ignore differences for ownership, permission, and dates and at restoration dar will not try to set the ownership, permission and dates.
 .RE
 .P
-When no flag is provided, -O option acts as if the "ignore-owner" flag was set, which is the behavior in older releases (< 2.3.0). Note also that for backward compatibility, --ignore-owner option still exists and is now just an alias to the --comparison-field=ignore-owner option.
+When no flag is provided to this option, -O option acts as if the "ignore-owner" flag was set, which is the behavior in older releases (< 2.3.0). Note also that for backward compatibility, --ignore-owner option still exists and is now just an alias to the --comparison-field=ignore-owner option. Of course if this option is not used, all fields are used for comparison or restoration.
 .TP 20
 -H[num], --hour[=num]
 if -H is used, two dates are considered equal if they differ from a integer number of hours, and that number is less than or equal to [num]. If not specified num defaults to 1. This is used when making a differential backup, to compare last_modification date of inodes, and at restoration time if the -r option (restore only more recent files) is used. This is to workaround some filesystems (like Samba filesystem) that seems to change the dates of files after having gone from or to daylight saving time (winter/summer time).
@@ -298,7 +297,7 @@ set the filters to be interpreted as regular expressions (man
 .B regex(7)
 ) instead of the default glob expression (man
 .B glob(7)
-) This modifies the -I, -X, -g, -P, -Z, -Y, -u and -U options that follows up to an eventual -ag option (see just below). Note that for -P and -g options, the given mask is usually prefixed by the root (-R option) directory, thus the "^" symbol may not work as expected not being at beginning of a line.
+) This modifies the -I, -X, -g, -P, -Z, -Y, -u and -U options that follows up to an eventual -ag option (see just below). Note that for -P and -g options, the given mask matches the relative path part of the files path: Let's take an example, assuming you have provided /usr/local to the -R option, the mask "^foo$" will replaced internally by "^/usr/local/foo$" while the mask "foo$" will be replaced internally by "^/usr/local/.*foo$".
 .TP 20
 -ag, --alter=glob
 This option returns to glob expressions mode (which is the default) after an -ar option has been used, this applies to any -I, -X, -g, -P, -Z, -Y, -u and -U options that follow up to an eventual new -ar option (see just above).

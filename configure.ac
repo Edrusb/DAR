@@ -1,6 +1,6 @@
  |# Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.3.1], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.3.2], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -462,7 +462,7 @@ AC_ARG_ENABLE(  [thread-safe],
 AC_ARG_ENABLE( [locale-dir],
                AC_HELP_STRING(--enable-locale-dir, [by default NLS files are installed in $prefix/share/locale. You override this with --enable-locale-dir=<path>]),
                [ AC_DEFINE_UNQUOTED(DAR_LOCALEDIR, ["$enableval"], [override the default location of *.mo files ($prefix/share/locale by default) ])],
-               [ AC_DEFINE(DAR_LOCALEDIR, [""], [override the default location of *.mo files ($prefix/share/locale by default) ])])
+               [ AC_DEFINE(DAR_LOCALEDIR, ["$prefix/share/locale"], [override the default location of *.mo files ($prefix/share/locale by default) ])])
 
 AC_ARG_ENABLE( [profiling],
 	       AC_HELP_STRING(--enable-profiling, [enable executable profiling]),

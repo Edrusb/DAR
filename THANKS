@@ -1,3 +1,12 @@
+version 2.3.2
+--------------
+Thanks to Thomas Jacob for feedback and patch about bug in Native Language
+Support and also for feedback and investigations about the --recent bug.
+Thanks to Dave Vasilevsky for bug report and design considerations. Thanks
+to Richard Fish for feedback, bug report and patch. Thanks to Stephan for
+feedback about Guus Jansman's Midnight Commander's plugin for Dar. Thanks
+also to Guus Jansman for his work. Thanks to Piotr Oh for feedback.
+
 version 2.3.1
 --------------
 Thanks to Adam Fuksa for bug feedback. Thanks to Nick Alcock and

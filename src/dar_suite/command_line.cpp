@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.76 2005/12/29 02:32:41 edrusb Rel $
+// $Id: command_line.cpp,v 1.76.2.1 2006/10/07 21:23:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -1561,7 +1561,7 @@ static void usage(user_interaction & dialog, const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.76 2005/12/29 02:32:41 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.76.2.1 2006/10/07 21:23:51 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -1971,7 +1971,7 @@ static const struct option *get_long_opt()
         {"slice", required_argument, NULL, 's'},
         {"test", required_argument, NULL, 't'},
         {"exclude-ea", required_argument, NULL, 'u'},
-        {"verbose", no_argument, NULL, 'v'},
+        {"verbose", optional_argument, NULL, 'v'},
         {"no-warn", optional_argument, NULL, 'w'},
         {"extract", required_argument, NULL, 'x'},
         {"bzip2", optional_argument, NULL, 'y'},
@@ -2500,7 +2500,7 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
 	}
 	else // regex
 	{
-	    ret = new regular_mask((opt.prefix.display() + "/(" + x + ")/?.*"), opt.case_sensit);
+  	    ret = new regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
 
 	    if(ret == NULL)
 		throw Ememory("make_exclude_path");

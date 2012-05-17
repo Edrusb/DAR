@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.47.2.3 2006/05/27 15:08:34 edrusb Exp $
+// $Id: catalogue.cpp,v 1.47.2.4 2006/10/22 19:16:03 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -616,19 +616,9 @@ namespace libdar
         return nomme::same_as(ref) && compatible_signature(ref.signature(), signature());
     }
 
-    bool inode::is_more_recent_than(const inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
+    bool inode::is_more_recent_than(const inode & ref, const infinint & hourshift) const
     {
-        bool more_recent = (what_to_check == cf_all && uid != ref.uid)
-            || (what_to_check == cf_all && gid != ref.gid)
-            || ((what_to_check == cf_all || what_to_check == cf_ignore_owner) && perm != ref.perm);
-
-        if(what_to_check != cf_inode_type && *ref.last_mod < *last_mod)
-	    if(hourshift > 0)
-                more_recent = more_recent || ! is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod);
-            else
-                more_recent = true;
-
-        return more_recent;
+        return *ref.last_mod < *last_mod && !is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod);
     }
 
     bool inode::has_changed_since(const inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
@@ -1019,15 +1009,6 @@ namespace libdar
         }
         if(f.write((char *)check, CRC_SIZE) != CRC_SIZE)
             throw Erange("file::dump", gettext("cannot dump CRC data to file"));
-    }
-
-    bool file::is_more_recent_than(const inode & ref, const infinint & hourshift, inode::comparison_fields what_to_check) const
-    {
-        const file *tmp = dynamic_cast<const file *>(&ref);
-        if(tmp != NULL)
-            return inode::is_more_recent_than(*tmp, hourshift, what_to_check) || *size != *(tmp->size);
-        else
-            throw SRC_BUG;
     }
 
     bool file::has_changed_since(const inode & ref, const infinint & hourshift, inode::comparison_fields what_to_check) const
@@ -2479,7 +2460,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: catalogue.cpp,v 1.47.2.3 2006/05/27 15:08:34 edrusb Exp $";
+	static char id[]="$Id: catalogue.cpp,v 1.47.2.4 2006/10/22 19:16:03 edrusb Rel $";
 	dummy_call(id);
     }
 

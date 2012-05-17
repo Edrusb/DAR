@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar.cpp,v 1.43 2005/12/29 02:32:41 edrusb Rel $
+// $Id: dar.cpp,v 1.43.2.1 2006/10/26 20:18:12 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -408,7 +408,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const 
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar.cpp,v 1.43 2005/12/29 02:32:41 edrusb Rel $";
+    static char id[]="$Id: dar.cpp,v 1.43.2.1 2006/10/26 20:18:12 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -429,15 +429,15 @@ static void display_sauv_stat(user_interaction & dialog, const statistics & st)
     dialog.printf(gettext(" %i inode(s) saved\n"), &treated);
     dialog.printf(gettext(" with %i hard link(s) recorded\n"), &hard_links);
     dialog.printf(gettext(" %i inode(s) changed at the moment of the backup\n"), &tooold);
-    dialog.printf(gettext(" %i inode(s) not saved (no file change)\n"), &skipped);
+    dialog.printf(gettext(" %i inode(s) not saved (no inode/file change)\n"), &skipped);
     dialog.printf(gettext(" %i inode(s) failed to save (filesystem error)\n"), &errored);
-    dialog.printf(gettext(" %i files(s) ignored (excluded by filters)\n"), &ignored);
-    dialog.printf(gettext(" %i files(s) recorded as deleted from reference backup\n"), &deleted);
+    dialog.printf(gettext(" %i inode(s) ignored (excluded by filters)\n"), &ignored);
+    dialog.printf(gettext(" %i inode(s) recorded as deleted from reference backup\n"), &deleted);
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" Total number of file considered: %i\n"), &total);
+    dialog.printf(gettext(" Total number of inode considered: %i\n"), &total);
 #ifdef EA_SUPPORT
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" EA saved for %i file(s)\n"), &ea_treated);
+    dialog.printf(gettext(" EA saved for %i inode(s)\n"), &ea_treated);
 #endif
     dialog.printf(" --------------------------------------------\n");
 }
@@ -454,17 +454,17 @@ static void display_rest_stat(user_interaction & dialog, const statistics & st)
     infinint ea_treated = st.get_ea_treated();
 
     dialog.printf("\n\n --------------------------------------------\n");
-    dialog.printf(gettext(" %i file(s) restored\n"), &treated);
-    dialog.printf(gettext(" %i file(s) not restored (not saved in archive)\n"), &skipped);
-    dialog.printf(gettext(" %i file(s) ignored (excluded by filters)\n"), &ignored);
-    dialog.printf(gettext(" %i file(s) less recent than the one on filesystem\n"), &tooold);
-    dialog.printf(gettext(" %i file(s) failed to restore (filesystem error)\n"), &errored);
-    dialog.printf(gettext(" %i file(s) deleted\n"), &deleted);
+    dialog.printf(gettext(" %i inode(s) restored\n"), &treated);
+    dialog.printf(gettext(" %i inode(s) not restored (not saved in archive)\n"), &skipped);
+    dialog.printf(gettext(" %i inode(s) ignored (excluded by filters)\n"), &ignored);
+    dialog.printf(gettext(" %i inode(s) less recent than the one on filesystem\n"), &tooold);
+    dialog.printf(gettext(" %i inode(s) failed to restore (filesystem error)\n"), &errored);
+    dialog.printf(gettext(" %i inode(s) deleted\n"), &deleted);
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" Total number of file considered: %i\n"), &total);
+    dialog.printf(gettext(" Total number of inode considered: %i\n"), &total);
 #ifdef EA_SUPPORT
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" EA restored for %i file(s)\n"), &ea_treated);
+    dialog.printf(gettext(" EA restored for %i inode(s)\n"), &ea_treated);
 #endif
     dialog.printf(" --------------------------------------------\n");
 }
@@ -477,11 +477,11 @@ static void display_diff_stat(user_interaction & dialog, const statistics &st)
     infinint errored = st.get_errored();
 
     dialog.printf("\n\n --------------------------------------------\n");
-    dialog.printf(gettext(" %i file(s) treated\n"), &treated);
-    dialog.printf(gettext(" %i file(s) do not match those on filesystem\n"), &errored);
-    dialog.printf(gettext(" %i file(s) ignored (excluded by filters)\n"), &ignored);
+    dialog.printf(gettext(" %i inode(s) treated\n"), &treated);
+    dialog.printf(gettext(" %i inode(s) do not match those on filesystem\n"), &errored);
+    dialog.printf(gettext(" %i inode(s) ignored (excluded by filters)\n"), &ignored);
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" Total number of file considered: %i\n"), &total);
+    dialog.printf(gettext(" Total number of inode considered: %i\n"), &total);
     dialog.printf(" --------------------------------------------\n");
 }
 
@@ -494,11 +494,11 @@ static void display_test_stat(user_interaction & dialog, const statistics & st)
     infinint skipped = st.get_skipped();
 
     dialog.printf("\n\n --------------------------------------------\n");
-    dialog.printf(gettext(" %i file(s) treated\n"), &treated);
-    dialog.printf(gettext(" %i file(s) with error\n"), &errored);
-    dialog.printf(gettext(" %i file(s) ignored (excluded by filters)\n"), &skipped);
+    dialog.printf(gettext(" %i inode(s) treated\n"), &treated);
+    dialog.printf(gettext(" %i inode(s) with error\n"), &errored);
+    dialog.printf(gettext(" %i inode(s) ignored (excluded by filters)\n"), &skipped);
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" Total number of file considered: %i\n"), &total);
+    dialog.printf(gettext(" Total number of inode considered: %i\n"), &total);
     dialog.printf(" --------------------------------------------\n");
 }
 
@@ -512,12 +512,12 @@ static void display_merge_stat(user_interaction & dialog, const statistics & st)
     infinint ignored = st.get_ignored();
 
     dialog.printf("\n\n --------------------------------------------\n");
-    dialog.printf(gettext(" %i file(s) added to archive\n"), &treated);
+    dialog.printf(gettext(" %i inode(s) added to archive\n"), &treated);
     dialog.printf(gettext(" with %i hard link(s) recorded\n"), &hard_links);
-    dialog.printf(gettext(" %i file(s) ignored (excluded by filters)\n"), &ignored);
-    dialog.printf(gettext(" %i file(s) recorded as deleted\n"), &deleted);
+    dialog.printf(gettext(" %i inode(s) ignored (excluded by filters)\n"), &ignored);
+    dialog.printf(gettext(" %i inode(s) recorded as deleted\n"), &deleted);
     dialog.printf(" --------------------------------------------\n");
-    dialog.printf(gettext(" Total number of file considered: %i\n"), &total);
+    dialog.printf(gettext(" Total number of inode considered: %i\n"), &total);
     dialog.printf(" --------------------------------------------\n");
 }
 

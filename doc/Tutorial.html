@@ -516,7 +516,7 @@ archive:<br>
       <code></code><br>
       <code></code></div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -R
-/ -x /zip/linux_full&nbsp; home/denis/my_precious_file</code><br>
+/ -x /zip/linux_full -g home/denis/my_precious_file</code><br>
       </div>
       <div style="text-align: justify;"><br>
 This would restore only the file /home/denis/my_precious_file from the
@@ -528,14 +528,14 @@ backup.<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -R
-/ -x /zip/linux_diff1&nbsp; home/denis/my_precious_file</code><br>
+/ -x /zip/linux_diff1 -g home/denis/my_precious_file</code><br>
       </div>
       <div style="text-align: justify;"><br>
 and so on, up to the last differential archive.<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -R
-/ -x /zip/linux_diff29&nbsp; home/denis/my_precious_file</code><br>
+/ -x /zip/linux_diff29 -g home/denis/my_precious_file</code><br>
       </div>
       <div style="text-align: justify;"><br>
       <br>
@@ -551,7 +551,7 @@ option (verbose):<br>
       <br>
       </div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -R
-/ -x /zip/linux_diff29 -v home/denis/my_precious_file</code><br>
+/ -x /zip/linux_diff29 -v -g home/denis/my_precious_file</code><br>
       </div>
       <div style="text-align: justify;"><br>
 If we can see a line like<br>
@@ -576,7 +576,7 @@ restored in a previous step:<br>
       <code></code><br>
       <code></code></div>
       <div style="margin-left: 40px; text-align: justify;"><code>dar -x
-/zip/linux_diff29 -R / -r -v home/denis/my_precious_file etc/fstab</code><br>
+/zip/linux_diff29 -R / -r -v -g home/denis/my_precious_file -g etc/fstab</code><br>
       </div>
       <div style="text-align: justify;"><br>
 Check the output to see if one or both of your files got restored. If
@@ -765,6 +765,18 @@ of most recent files in a given archive (-u option), and get overall
 statistics per archive (-s option). Lastly you can specify which dar
 command to use given its path (-d option), by default, dar_manager uses
 the PATH shell variable to choose the dar command.<br>
+      <br>
+An a new feature for those that are really very lazy : dar_manager has
+an interactive mode, so you don't have to remeber all theses
+command-line switch except one:<br>
+      <code><br>
+      </code>
+      <div style="margin-left: 40px;"><code>dar_manager -B my_base.dmd
+-i</code><br>
+      </div>
+      <br>
+Interactive mode allow you to do all operation except restoration which
+can be done as previously explained.<br>
       </div>
       </td>
     </tr>

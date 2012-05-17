@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.16 2005/12/06 23:14:29 edrusb Rel $
+// $Id: compressor.cpp,v 1.16.2.1 2006/10/21 20:39:41 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -67,6 +67,7 @@ namespace libdar
             // theses are eventually overwritten below
         wrapperlib_mode wr_mode = zlib_mode;
         current_algo = algo;
+	current_level = compression_level;
 
         if(compressed_side == NULL)
             throw SRC_BUG;
@@ -202,7 +203,7 @@ namespace libdar
 
     void compressor::change_algo(compression new_algo, U_I new_compression_level)
     {
-        if(new_algo == get_algo())
+        if(new_algo == get_algo() && new_compression_level == current_level)
             return;
 
             // flush data and release zlib memory structures
@@ -375,7 +376,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: compressor.cpp,v 1.16 2005/12/06 23:14:29 edrusb Rel $";
+        static char id[]="$Id: compressor.cpp,v 1.16.2.1 2006/10/21 20:39:41 edrusb Rel $";
         dummy_call(id);
     }
 

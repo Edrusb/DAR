@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.40.2.3 2006/06/20 20:28:50 edrusb Exp $
+// $Id: filtre.cpp,v 1.40.2.5 2006/10/23 19:31:55 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -169,7 +169,7 @@ namespace libdar
                                             // checking the file contents & inode
                                         if(e_ino->get_saved_status() == s_saved || (e_hard != NULL && fs.known_etiquette(e_hard->get_etiquette())))
                                         {
-                                            if(!only_if_more_recent || exists == NULL || !e_ino->same_as(*exists) || e_ino->is_more_recent_than(*exists, hourshift, what_to_check))
+                                            if(!only_if_more_recent || exists == NULL || e_ino->is_more_recent_than(*exists, hourshift))
                                             {
                                                 if(!flat || e_dir == NULL)
                                                 {
@@ -1271,7 +1271,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.40.2.3 2006/06/20 20:28:50 edrusb Exp $";
+        static char id[]="$Id: filtre.cpp,v 1.40.2.5 2006/10/23 19:31:55 edrusb Rel $";
         dummy_call(id);
     }
 

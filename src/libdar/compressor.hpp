@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.hpp,v 1.12 2004/11/07 18:21:37 edrusb Rel $
+// $Id: compressor.hpp,v 1.12.4.1 2006/10/21 20:39:41 edrusb Rel $
 //
 /*********************************************************************/
     /// \file compressor.hpp
@@ -73,7 +73,22 @@ namespace libdar
         void clean_write(); // discard any byte buffered and not yet wrote to compressed_side;
 
         compression get_algo() const { return current_algo; };
-        void change_algo(compression new_algo, U_I new_compression_level = 9);
+
+	    /// changes compression algorithm used by the compressor
+
+	    /// \param[in] new_algo defines the new algorithm to use
+	    /// \param[in] new_compression_level defines the new compression level to use.
+            /// \note valid value for new_compression_level range from 0 (no compression) to
+	    /// 9 (maximum compression).
+        void change_algo(compression new_algo, U_I new_compression_level);
+
+
+	    /// changes the compression algorithm keeping the same compression level
+
+        void change_algo(compression new_algo)
+	{
+	    change_algo(new_algo, current_level);
+	};
 
             // inherited from generic file
         bool skip(const infinint & position) { flush_write(); flush_read(); clean_read(); return compressed->skip(position); };
@@ -100,6 +115,7 @@ namespace libdar
         generic_file *compressed;
         bool compressed_owner;
         compression current_algo;
+	U_I current_level;
 
         void init(compression algo, generic_file *compressed_side, U_I compression_level);
         void terminate();

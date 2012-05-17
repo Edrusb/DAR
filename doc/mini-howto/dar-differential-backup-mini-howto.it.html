@@ -3,29 +3,49 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.3.4: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.3.9: http://docutils.sourceforge.net/" />
 <title>DAR differential backup mini-howto -IT-</title>
 <meta name="author" content="Grzegorz Adam Hankiewicz" />
-<meta name="date" content="2004-12-16 09:25:52 +0000 (Thu, 16 Dec 2004)" />
+<meta name="date" content="2006-10-07 19:22:40 +0200" />
 <meta name="copyright" content="This document has been placed in the public domain." />
 <style type="text/css">
 
 /*
 :Author: David Goodger
 :Contact: goodger@users.sourceforge.net
-:date: Date: 2002/07/19 02:42:22
-:version: Revision: 1.7
-:copyright: This stylesheet has been placed in the public domain.
+:Date: $Date: 2006/10/21 20:39:41 $
+:Version: $Revision: 1.2.4.1 $
+:Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
 */
 
-a.footnote-reference {
-  font-size: smaller ;
-  vertical-align: super }
+/* "! important" is used here to override other ``margin-top`` and
+   ``margin-bottom`` styles that are later in the stylesheet or 
+   more specific.  See http://www.w3.org/TR/CSS1#the-cascade */
+.first {
+  margin-top: 0 ! important }
 
-a.target {
-  color: blue }
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
 
 div.abstract {
   margin: 2em 5em }
@@ -34,11 +54,17 @@ div.abstract p.topic-title {
   font-weight: bold ;
   text-align: center }
 
-div.attention, div.caution, div.danger, div.error, div.hint,
-div.important, div.note, div.tip, div.warning {
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
   margin: 2em ;
   border: medium outset ;
   padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
 
 div.attention p.admonition-title, div.caution p.admonition-title,
 div.danger p.admonition-title, div.error p.admonition-title,
@@ -47,16 +73,52 @@ div.warning p.admonition-title {
   font-weight: bold ;
   font-family: sans-serif }
 
-div.hint p.admonition-title, div.important p.admonition-title,
-div.note p.admonition-title, div.tip p.admonition-title {
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
   font-weight: bold ;
-  font-family: sans-serif }
+  font-style: normal }
 
 div.figure {
   margin-left: 2em }
 
 div.footer, div.header {
   font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin-left: 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
 
 div.system-messages {
   margin: 5em }
@@ -75,14 +137,21 @@ div.system-message p.system-message-title {
 div.topic {
   margin: 2em }
 
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
 h1.title {
   text-align: center }
 
 h2.subtitle {
   text-align: center }
 
-hr {
+hr.docutils {
   width: 75% }
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
 
 ol.arabic {
   list-style: decimal }
@@ -99,11 +168,9 @@ ol.lowerroman {
 ol.upperroman {
   list-style: upper-roman }
 
-dd p:first-child {
-  margin-top: 0px }
-
-li p:first-child {
-  margin-top: 0px }
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
 
 p.caption {
   font-style: italic }
@@ -115,8 +182,33 @@ p.credits {
 p.label {
   white-space: nowrap }
 
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
 p.topic-title {
   font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font-family: serif ;
+  font-size: 100% }
+
+pre.line-block {
+  font-family: serif ;
+  font-size: 100% }
 
 pre.literal-block, pre.doctest-block {
   margin-left: 2em ;
@@ -131,42 +223,61 @@ span.classifier-delimiter {
   font-family: sans-serif ;
   font-weight: bold }
 
-span.field-argument {
-  font-style: italic }
-
 span.interpreted {
   font-family: sans-serif }
 
-span.option-argument {
-  font-style: italic }
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
 
 span.problematic {
   color: red }
 
-table {
-  margin-top: 1em }
+span.section-subtitle {
+  /* font-size relative to parent (<h#> element) */
+  font-size: 80% }
 
 table.citation {
-  border-left: solid thin gray ;
-  padding-left: 0.5ex }
+  border-left: solid thin gray }
 
 table.docinfo {
   margin: 2em 4em }
 
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
 table.footnote {
-  border-left: solid thin black ;
-  padding-left: 0.5ex }
+  border-left: solid thin black }
 
-td.docinfo-name {
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
   font-weight: bold ;
-  text-align: right }
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
 
-td.field-name {
-  font-weight: bold }
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+tt.docutils {
+  background-color: #eeeeee }
+
+ul.auto-toc {
+  list-style-type: none }
 
 </style>
 </head>
 <body>
+<div class="document" id="dar-differential-backup-mini-howto-it">
 <h1 class="title">DAR differential backup mini-howto -IT-</h1>
 <table class="docinfo" frame="void" rules="none">
 <col class="docinfo-name" />
@@ -179,11 +290,11 @@ td.field-name {
 <tr class="field"><th class="docinfo-name">Translator:</th><td class="field-body">David Gervasoni</td>
 </tr>
 <tr><th class="docinfo-name">Contact:</th>
-<td><a class="first last reference" href="mailto:david0&#64;virgilio.it">david0&#64;virgilio.it</a></td></tr>
+<td><a class="first last reference" href="mailto:davidgerva&#64;gmail.com">davidgerva&#64;gmail.com</a></td></tr>
 <tr><th class="docinfo-name">Date:</th>
-<td>2004-12-16 09:25:52 +0000 (Thu, 16 Dec 2004)</td></tr>
+<td>2006-10-07 19:22:40 +0200</td></tr>
 <tr><th class="docinfo-name">Version:</th>
-<td>H2 ($Rev: 402 $ under <a class="reference" href="http://subversion.tigris.org/">Subversion</a> control)</td></tr>
+<td>H5 (424)</td></tr>
 <tr class="field"><th class="docinfo-name">Web site:</th><td class="field-body"><a class="reference" href="http://gradha.sdf-eu.org/textos/backup.en.html">http://gradha.sdf-eu.org/textos/backup.en.html</a></td>
 </tr>
 <tr><th class="docinfo-name">Copyright:</th>
@@ -193,14 +304,13 @@ English, Italian and Spanish.</td>
 </tr>
 </tbody>
 </table>
-<div class="document" id="dar-differential-backup-mini-howto-it">
 <div class="contents topic" id="contents">
 <p class="topic-title first"><a name="contents">Contents</a></p>
 <ul class="simple">
 <li><a class="reference" href="#introduzione" id="id3" name="id3">Introduzione</a></li>
-<li><a class="reference" href="#semplice-utilizzo-di-dar" id="id4" name="id4">Semplice utilizzo di DAR</a></li>
+<li><a class="reference" href="#utilizzo-essenziale-di-dar" id="id4" name="id4">Utilizzo essenziale di DAR</a></li>
 <li><a class="reference" href="#la-politica-di-backup" id="id5" name="id5">La politica di backup</a></li>
-<li><a class="reference" href="#eseguire-backup-di-base-full-backups-con-dar" id="id6" name="id6">Eseguire backup di base (full backups) con DAR</a></li>
+<li><a class="reference" href="#eseguire-backup-di-base-full-backup-con-dar" id="id6" name="id6">Eseguire backup di base (full backup) con DAR</a></li>
 <li><a class="reference" href="#eseguire-backup-differenziali-con-dar" id="id7" name="id7">Eseguire backup differenziali con DAR</a></li>
 <li><a class="reference" href="#qualche-script-per-automatizzare-i-processi" id="id8" name="id8">Qualche script per automatizzare i processi</a></li>
 <li><a class="reference" href="#estrarre-i-backup-su-macchine-vuote" id="id9" name="id9">Estrarre i backup su macchine vuote</a></li>
@@ -213,71 +323,73 @@ English, Italian and Spanish.</td>
 <div class="section" id="introduzione">
 <h1><a class="toc-backref" href="#id3" name="introduzione">Introduzione</a></h1>
 <blockquote>
-<p>Chiunque dovrebbe fare i backup dei propri file importanti. Questo
-onnipresente avviso è generalmente ignorato da molta gente. Anch'io
-l'ho ignorato, fino a quando non ho perso una considerevole mole
-dei miei dati. Non abbastanza contento ho fatto in modo di perderne
-ancora in una serie di successivi incidenti, così decisi che ne avevo
-abbastanza. Quindi ho cercato su <a class="reference" href="http://freshmeat.net/">Freshmeat</a> qualche programma per
-la creazione di backup che supportasse quelli differenziali e ho
-trovato <a class="reference" href="http://dar.linux.free.fr/">DAR</a>.</p>
-<p>Fare un backup completo significa salvare tutti i file che ricadono
-sotto le cartelle interessate dalla politica di backup. Un backup
-differenziale o
-incrementale conterrà invece solo i file il cui contenuto è cambiato
-rispetto al precedente backup, fosse esso completo o differenziale.</p>
+<p>&quot;Chiunque dovrebbe fare le copie di backup dei suoi dati
+importanti&quot;.  Questo avviso presente ovunque è generalmente
+ignorato da molta gente. Anche io l'ho ignorato, fino al giorno
+in cui ho perso una considerevole mole di dati. Non abbastanza
+contento ho fatto in modo di perderne ancora in una serie di
+successivi incidenti, per poi decidere che ne avevo abbastanza. Ho
+cercato quindi su <a class="reference" href="http://freshmeat.net/">Freshmeat</a> qualche programma per la creazione di
+backup che supportasse anche la creazione di backup differenziali
+e ho trovato <a class="reference" href="http://dar.linux.free.fr/">DAR</a>.</p>
+<p>Fare un backup completo (o base) significa salvare tutti i files
+che ricadono sotto le cartelle interessate dalla politica di
+backup. Un backup differenziale o incrementale conterrà invece
+solo i files il cui contenuto è cambiato rispetto al precedente
+backup, fosse esso completo o differenziale.</p>
 <p><a class="reference" href="http://dar.linux.free.fr/">DAR</a> permette di creare facilmente una serie di backup
-differenziali. La soluzione che ho sviluppato esegue ogni notte
-dei backup automatici. Il primo giorno del mese
-viene fatto un backup completo. Il resto del mese vengono fatti
-solo backup differenziali. Nel mio caso pochi file cambiano
-da un giorno all'altro, ogni tanto il codice sorgente del 
-progetto al quale sto lavorando e le e-mail sempre.</p>
-<p>Così se mi serve, posso recuperare con facilità il contenuto,
-di uno specifico giorno, del mio computer. <a class="reference" href="http://dar.linux.free.fr/">DAR</a>
-è un programma semplice da linea di comando mas i può rendere un po' più
-complicato con poche opzioni. Questo piccolo mini-howto vi
-spiegherà la mia specifica configurazione, molto grossolana, ma
-nel mio caso funzionale. Si, ho già collaudato il recupero
-dei dati dai backup. Infatti verso la fine del 2003 mi sono
-trasferito in un altro paese e ho portato con me giusto un CD ROM
-e una <a class="reference" href="http://www.knoppix.org/">Knoppix</a> bootable e ho recuperato l'esatto stato della mia
-vecchia installazione Debian in poche ore. Senza modifiche, senza
-alcuna ulteriore installazione e senza perdere alcun file.</p>
+differenziali. Una soluzione che ho sviluppato esegue ogni notte
+dei backup automatici. Il primo giorno del mese viene fatto un
+backup completo. Il resto del mese vengono fatti solo backup
+differenziali. Per quanto mi riguarda i files che cambiano
+giornalmente non sono molti: il codice sorgente del progetto a
+cui sto lavorando e, più spesso, le e-mail.</p>
+<p>Così, quando mi serve, posso recuperare con facilità il contenuto
+che presentava il mio computer uno specifico giorno.  <a class="reference" href="http://dar.linux.free.fr/">DAR</a> si
+presenta come un programma semplice ed essenziale eseguibile da
+linea di comando, ma si può rendere un po' più complicato con
+poche opzioni. Questo piccolo mini-howto vi illustrerà la mia
+specifica configurazione, molto grossolana, ma, nel mio caso,
+funzionale. Ho già sperimentato il recupero dei dati dalle copie
+di backup. Infatti verso la fine del 2003 mi sono trasferito
+in un altro paese e ho portato con me giusto un CD ROM e una
+<a class="reference" href="http://www.knoppix.org/">Knoppix</a> bootable e ho recuperato l'esatto stato della mia
+vecchia installazione Debian in poche ore. Senza modifiche,
+senza alcuna ulteriore installazione e senza perdere alcun file.</p>
 <p>Questo documento è stato scritto usando la versione 1.3.0 di <a class="reference" href="http://dar.linux.free.fr/">DAR</a>.
-Quando sono passato a DAR 2.0.3 tutto funzionava. Non ho nemmeno
+Quando sono passato alla 2.0.3 tutto funzionava. Non ho nemmeno
 dovuto aggiornare i miei backup. Quindi sembra che l'interfaccia
 e i formati di backup siano stabili o al limite compatibili con
 le versioni precedenti. Comunque non prendete tutto ciò che dico
-quì come garantito. Verificate prima che la versione di <a class="reference" href="http://dar.linux.free.fr/">DAR</a> che
-avete installato funzioni come vi aspettate e potrete recuperare
-i file dai backup senza problemi in futuro.</p>
+(scrivo) quì come garantito. Verificate prima che la versione
+di <a class="reference" href="http://dar.linux.free.fr/">DAR</a> che avete installato funzioni come dovrebbe e potrete,
+in futuro, recuperare i files dai backup senza problemi.</p>
 <p>Per questa versione del testo ho usato reStructuredText (ecco
 spiegato il misterioso markup nella versione txt). Vedi
 <a class="reference" href="http://docutils.sourceforge.net/">http://docutils.sourceforge.net/</a> per maggiori informazioni.</p>
 </blockquote>
 </div>
-<div class="section" id="semplice-utilizzo-di-dar">
-<h1><a class="toc-backref" href="#id4" name="semplice-utilizzo-di-dar">Semplice utilizzo di DAR</a></h1>
+<div class="section" id="utilizzo-essenziale-di-dar">
+<h1><a class="toc-backref" href="#id4" name="utilizzo-essenziale-di-dar">Utilizzo essenziale di DAR</a></h1>
 <blockquote>
-<p><a class="reference" href="http://dar.linux.free.fr/">DAR</a> è molto simile a <a class="reference" href="http://freshmeat.net/projects/tar/">tar</a> nel numero di opzioni che ha: ce n'è
-una per ogni necessità, ma questo comporta una maggiore difficoltà
-iniziale per il nuovo utente. Come sempre, in qualsiasi momento potete
-avere degli aiuti sui comandi disponibili scrivendo
-<tt class="literal"><span class="pre">dar</span> <span class="pre">-h</span></tt> o <tt class="literal"><span class="pre">man</span> <span class="pre">dar</span></tt> dopo che l'avete installato. Come nel
-programma <a class="reference" href="http://freshmeat.net/projects/tar/">tar</a>, esistono una serie di opzioni obbligatorie che
-definiscono il tipo di operazione che intendete fare (creare,
-estrarre, listare etc) e un'ulteriore serie di opzioni che
-modificano la scelta prima effettuate.
+<p><a class="reference" href="http://dar.linux.free.fr/">DAR</a> è molto simile a <a class="reference" href="http://freshmeat.net/projects/tar/">tar</a> nel numero di opzioni che ha: ce
+n'è una per ogni necessità, ma questo comporta una maggiore
+difficoltà iniziale per il nuovo utente. Come sempre, in
+qualsiasi momento, potete avere degli aiuti relativamente ai
+comandi disponibili scrivendo <tt class="docutils literal"><span class="pre">dar</span> <span class="pre">-h</span></tt> o <tt class="docutils literal"><span class="pre">man</span> <span class="pre">dar</span></tt> dopo che
+l'avete installato. Come nel programma <a class="reference" href="http://freshmeat.net/projects/tar/">tar</a>, esistono una serie
+di opzioni obbligatorie che definiscono il tipo di operazione che
+intendete fare (creare, estrarre, listare etc) e un'ulteriore
+serie di opzioni che modificano la scelta prima effettuata.
 Giusto per esempio immaginate di voler fare un backup di una
 cartella della vostra directory /home. Dovrete scrivere qualcosa
 di simile a questo:</p>
 <pre class="literal-block">
-dar -c backup_file_without_extension file1 file2 ... fileN
+dar -c backup_file_without_extension -g file1 -g file2 ... -g fileN
 </pre>
 <p>L'output dovrebbe essere simile al seguente:</p>
 <pre class="literal-block">
-$ dar -c my_backup_file safecopy.py/ translate_chars.py/
+$ dar -c my_backup_file -g safecopy.py/ -g translate_chars.py/
 
 
  --------------------------------------------
@@ -293,17 +405,17 @@ $ ls
 mailbox_date_trimmer/  my_backup_file.1.dar  sdb.py/
 mailbox_reader/        safecopy.py/          translate_chars.py/
 </pre>
-<p>Come avrete notato <a class="reference" href="http://dar.linux.free.fr/">DAR</a> aggiunge al nome del file un numero e
-un'estensione. Il motivo dell'estensione è chiaro, aiutare a
-capire che il file è un backup fatto con <a class="reference" href="http://dar.linux.free.fr/">DAR</a>. Il numero è
-chiamato <em>slice</em> ed è connesso alla possibilità di <a class="reference" href="http://dar.linux.free.fr/">DAR</a> di
-dividere il file di backup in base a grandezze specificate, in
-modo da poterle registrare su diversi supporti. Se per esempio
-voleste creare i backup su CD ROM, ma i backup delle vostre directory sono
-più grandi della capacità del CD ROM, potete specificare a <a class="reference" href="http://dar.linux.free.fr/">DAR</a>
-di dividere l'archivio in tanti file che
-potrete poi memorizzare su diverse unità.</p>
-<p>Volete recuperare questo backup? Abbastanza semplice, scrivete
+<p>Come avrete notato <a class="reference" href="http://dar.linux.free.fr/">DAR</a> aggiunge al nome del file un numero
+e un'estensione. Il motivo dell'estensione è chiaro, aiutare
+a capire che il file è un backup fatto con <a class="reference" href="http://dar.linux.free.fr/">DAR</a>. Il numero
+è chiamato <em>slice</em> ed è connesso alla possibilità di <a class="reference" href="http://dar.linux.free.fr/">DAR</a> di
+dividere il file di backup in base a grandezze specificate,
+in modo da poterle memorizzare su diversi supporti. Se per
+esempio voleste avere i backup su CD ROM, ma i backup delle
+vostre directory sono più grandi della capacità del CD ROM,
+potete chiedere a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> di dividere l'archivio in tanti files
+che potrete poi memorizzare su diverse unità.</p>
+<p>Volete recuperare questo backup? Scrivete semplicemente
 i seguenti comandi:</p>
 <pre class="literal-block">
 $ mkdir temp
@@ -331,145 +443,146 @@ safecopy.py/  translate_chars.py/
 <div class="section" id="la-politica-di-backup">
 <h1><a class="toc-backref" href="#id5" name="la-politica-di-backup">La politica di backup</a></h1>
 <blockquote>
-<p>Il primo passo per creare un buon backup è determinare quali
-parti del vostro sistema ne necessitano. Questo non sta a
-significare che non potete semplicemente fare un backup del
-vostro intero sistema, ma dividerlo in almeno due parti aiuterà
-molto DAR (o qualsiasi altro tool di backup) nel suo lavoro.</p>
-<p>Il sistema che ho in casa conta di due hard disk. Il primo
-hard disk è diviso in una partizione da 3.8 GB dove &quot;vive&quot; il mio
-intero sistema e un'altra partizione da 11 GB dove sono memorizzati
-tutta la mia musica e altri file temporanei, come ad esempio alcuni
-pacchetti Debian fatti da me. Il secondo hard disk ha una partizione
-da 9.4 GB e il suo unico scopo è di servire come backup del disco
-primario. Non mi interessa fare il backup dei file musicali perchè
-ho tutti i cd originali e uno script per estrarre di nuovo le
-tracce e riconvertirle in ogg.</p>
-<p>Della partizione da 3.8 GB di cui voglio fare il backup, generalmente
-fra gli 1.3 e gli 1.5 sono vuoti. Ho diviso logicamente i 2.3 GB usati in
-<em>system</em> e <em>home directories</em> (mentre scrivo, la mia home è di 588 MB).
-La ragione di questa divisione è che, come un normale utente, posso
-solo cambiare il conenuto della mia home e altri file della
-partizione di cui non faccio il backup. Contemporaneamente la parte
-della partizione in cui è memorizzato il sistema rimane abbastanza
-stabile e immutata
-perchè raramente (dis)installo software. Infatti anche della mia
-<em>home</em> directory le sole cose che cambiano sono abitualmente la mia
-cartella <tt class="literal"><span class="pre">Mail</span></tt> e <tt class="literal"><span class="pre">progetti</span></tt>, dove metto documenti come
-questo e altri software che scrivo/modifico.</p>
+<p>Il primo passo per creare backup funzionali è determinare quali
+parti del vostro sistema necessitano di essere archiviate. Questo
+non sta a significare che non potete semplicemente fare un
+backup del vostro intero sistema, ma dividerlo in almeno due
+parti aiuterà molto DAR (o qualsiasi altro tool di backup)
+nel suo lavoro.</p>
+<p>Il sistema inplementato in casa mia conta di due hard disk. Il
+primo hard disk è diviso in una partizione da 3.8 GB, dove risiede
+il mio intero sistema, e un'altra partizione da 11 GB dove
+sono memorizzati tutta la mia musica e altri file temporanei,
+ad esempio alcuni pacchetti Debian fatti da me. Il secondo hard
+disk ha una partizione da 9.4 GB e il suo unico scopo è di servire
+come backup del disco primario. Non mi interessa fare il backup
+dei file musicali perchè ho tutti i cd originali e uno script
+per estrarre di nuovo le tracce e riconvertirle in ogg.</p>
+<p>Della partizione da 3.8 GB di cui voglio fare il backup
+generalmente sono liberi all'incirca 1.3 - 1.5 Gb. Ho diviso
+&quot;logicamente&quot; i 2.3 GB occupati in <em>system</em> e <em>home directories</em>
+(mentre scrivo, la mia home è di 588 MB).  La ragione di questa
+divisione è che, come un normale utente, posso esclusivamente
+modificare il contenuto della mia home directory e alcuni file
+della partizione di cui non ho intenzione di fare il backup.
+Contemporaneamente il settore della partizione in cui risiede
+il sistema rimane abbastanza stabile e immutato perchè raramente
+(dis)installo software. Infatti anche nella mia <em>home</em> directory
+le sole cose che cambiano sono abitualmente la mia cartella
+<tt class="docutils literal"><span class="pre">Mail</span></tt> e <tt class="docutils literal"><span class="pre">progetti</span></tt>, dove metto documenti come questo e
+altri software che scrivo/modifico.</p>
 <p>La distinzione di base fra <em>home directories</em> e <em>system</em>
-può essere anche utile nella normale organizzazione. Se lavori per una
-università spesso tutte le macchine hanno la stessa
-configurazione di base, ma ogni macchina avrà i suoi dati
-registrati. Puoi fare un singolo <em>system backup</em> di una singola
-macchina e più <em>home backup</em> per ogni computer. Un'altra
-configurazione comune è l'esistenza di un server centrale che condivide
-le home directory in NFS. In questo modo dovete solo fare il
-backup del server. Se vi sono utenti con privilegi di alto livello
-permettete loro di fare il backup del sistema delle loro proprie
-macchine, il backup delle home lo possono ignorare visto che
-lo farà il server.</p>
-<p>Una volta che avete deciso di cosa fare i backup dovete decidere
-come configurare <a class="reference" href="http://dar.linux.free.fr/">DAR</a>. Potete usare le opzioni
-o i file di configurazione. Le opzioni sono utili quando non ne
-avete troppe da specificare. I file di configurazione sono invece
-meglio quando volete fare backup differenti, complessi, con
-inclusioni/esclusioni e, più importante, potete usare commenti
-per documentare le opzioni specificate spiegando per esempio
-perchè includete/escludete questa o quella directory.
-Può essere utile ciò se tornate ad utilizzare il computer dopo
-molto tempo e volete sapere il perchè di ogni opzione.</p>
-<p>La mia configurazione fa partire il programma <a class="reference" href="http://dar.linux.free.fr/">DAR</a>
-con una script shell richiamato periodicamente da cron (<a class="reference" href="#qualche-script-per-automatizzare-i-processi">Qualche
-script per automatizzare i processi</a>), così non devo dare a mano
-lunghi comandi. Questo stesso breve
-documento serve per spiegare come fare scripts. Se preferite
+può essere anche utile nella normale organizzazione. Se
+lavori per una università spesso tutte le macchine hanno la
+stessa configurazione di base, ma ogni macchina avrà i suoi
+dati memorizzati. Puoi fare un singolo <em>system backup</em> di una
+singola macchina e più <em>home backup</em> per ogni computer. Un'altra
+configurazione comune è l'esistenza di un server centrale che
+condivide le home directories in NFS. In questo modo dovete solo
+fare il backup del server. Se vi sono utenti con privilegi di
+alto livello permettete loro di fare il backup del sistema delle
+loro proprie macchine, il backup delle home lo possono ignorare
+visto che se ne occuperà il server.</p>
+<p>come configurare <a class="reference" href="http://dar.linux.free.fr/">DAR</a>. Potete usare le opzioni o i file di
+configurazione. Le opzioni sono utili quando non ne avete
+troppe da specificare. I file di configurazione sono invece
+meglio quando volete fare backup differenti, complessi,
+con inclusioni/esclusioni; inoltre potete usare commenti per
+documentare le opzioni specificate spiegando per esempio perchè
+includete/escludete questa o quella directory.  Può essere utile
+ciò se tornate ad utilizzare il computer dopo molto tempo e
+volete sapere il perchè di ogni opzione.</p>
+<p>La mia configurazione fa partire il programma <a class="reference" href="http://dar.linux.free.fr/">DAR</a> con una script
+shell richiamato periodicamente da cron (<a class="reference" href="#qualche-script-per-automatizzare-i-processi">Qualche script per
+automatizzare i processi</a>), così non devo digitare ogni volta
+lunghe stringhe di comando. Questo breve documento vuole anche
+introdurre brevemente alla creazione di tali scripts. Se preferite
 utilizzare i file di configurazione leggete la documentazione
-allegata a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> per sapere come e che sintassi utilizzare.</p>
+allegata a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> per sapere come e quale sintassi utilizzare.</p>
 </blockquote>
 </div>
-<div class="section" id="eseguire-backup-di-base-full-backups-con-dar">
-<h1><a class="toc-backref" href="#id6" name="eseguire-backup-di-base-full-backups-con-dar">Eseguire backup di base (full backups) con DAR</a></h1>
+<div class="section" id="eseguire-backup-di-base-full-backup-con-dar">
+<h1><a class="toc-backref" href="#id6" name="eseguire-backup-di-base-full-backup-con-dar">Eseguire backup di base (full backup) con DAR</a></h1>
 <blockquote>
-<p>Ecco quà l'intera linea di comando che uso per il backup del
-mio <em>sistema</em>, dato da <strong>root</strong>. Non preoccupatevi vedendo
-il gran numero di opzioni date, proseguirò descrivendo il
-motivo di ogniuna di esse:</p>
+<p>Ecco qua sotto l'intera linea di comando che, da <strong>root</strong>,
+devo utilizzare per il backup del mio <em>sistema</em>.  Non dovete
+preoccuparvi vedendo il gran numero di opzioni inserite,
+successivamente descriverò il motivo di ognuna di esse:</p>
 <pre class="literal-block">
 dar -m 256 -y -s 600M -D -R / -c `date -I`_data -Z &quot;*.gz&quot; \
-   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gregorio -P tmp \
+   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gradha -P tmp \
    -P mnt -P dev/pts -P proc -P floppy -P burner -P cdrom
 </pre>
 <ul>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-m</span> <span class="pre">256</span></tt></dt>
-<dd><p class="first last"><a class="reference" href="http://dar.linux.free.fr/">DAR</a> può comprimere i vostri backup. La compressione è
-applicata a ogni file e può essere negativa per file di
-ridotte dimensioni. Di default file con 100 bytes o meno
-non vengono compressi. Con l'opzione <tt class="literal"><span class="pre">-m</span></tt> porti questo
-limite a 256 che sembra funzionare meglio per tutti quei piccoli
-file di configurazione che stanno sotto <tt class="literal"><span class="pre">/etc/</span></tt> e
-<tt class="literal"><span class="pre">/home</span></tt>. Come potete notare questa è un'opzione
-assolutamente facoltativa, quasi per &quot;capriccio&quot;.</p>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-m</span> <span class="pre">256</span></tt></dt>
+<dd><p class="first last"><a class="reference" href="http://dar.linux.free.fr/">DAR</a> può comprimere i backup. La compressione è applicata
+a ogni file e può essere anche inutile per file di ridotte
+dimensioni. Di default, file di 100 bytes o meno non vengono
+compressi. Con l'opzione <tt class="docutils literal"><span class="pre">-m</span></tt> si porta questo limite a 256,
+cosa che sembra funzionare meglio per tutti quei piccoli file
+di configurazione che stanno sotto <tt class="docutils literal"><span class="pre">/etc/</span></tt> e <tt class="docutils literal"><span class="pre">/home</span></tt>. Come
+potete notare questa è un'opzione assolutamente facoltativa,
+quasi un &quot;capriccio&quot;.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-y</span> <span class="pre">[level]</span></tt></dt>
-<dd><p class="first last">Questa opzione attiva la compressione <a class="reference" href="http://sources.redhat.com/bzip2/">Bzip2</a> che di default
-non è attiva. Potete anche specificare un livello di
-compressione tramite un numero che può andare da 0 (nessuna
-compressione) a 9 (miglior compressione, processo lento).
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-y</span> <span class="pre">[level]</span></tt></dt>
+<dd><p class="first last">Questa opzione attiva la compressione <a class="reference" href="http://sources.redhat.com/bzip2/">Bzip2</a> che di default non
+è attiva. Potete anche specificare un livello di compressione
+tramite un numero che può andare da 0 (nessuna compressione,
+processo veloce) a 9 (miglior compressione, processo lento).
 <a class="reference" href="http://sources.redhat.com/bzip2/">Bzip2</a> di default usa il livello 6 che è il rapporto migliore
 velocità/compressione per la maggior parte dei file.
-Personalmente non specifico il livello di compressione, 6
-va più che bene.</p>
+Personalmente non specifico il livello di compressione,
+6 mi va più che bene.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-s</span> <span class="pre">600M</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-s</span> <span class="pre">600M</span></tt></dt>
 <dd><p class="first last">Ecco quà l'opzione di <a class="reference" href="http://dar.linux.free.fr/">DAR</a> che vi permette di definire la
-dimensione dei file di backup o meglio delle slice. La grandezza
-specificata di
-600 MB sarà il massimo spazio occupato dai file creati. Se
-il vostro backup è più grande ritroverete differenti file
-di backup con un numero di progressione prima dell'estensione,
-così potrete salvare ogni file in unità differenti (floppies,
-zip, CDROM, etc). I miei backup sono molto più piccoli di
-questa dimensione e mantengo questa opzione giusto per
-stare tranquillo, nel caso i file diventassero più
-grandi. Se questa opzione vi è utile leggete il manuale di
-dar per saperne di più.</p>
+dimensione dei file di backup o, meglio, delle slice. La
+grandezza specificata, in questo caso di 600 MB, sarà il
+massimo spazio occupato dai file creati. Se il vostro backup
+è più grande, ritroverete differenti file di backup con un
+numero di progressione inserito appena prima dell'estensione,
+cosìcchè potrete salvare ogni file su differenti supporti
+(floppies, zip, CDROM, etc). I miei backup sono molto più
+piccoli di questa dimensione e mantengo questa opzione giusto
+per tranquillità, nel caso i file diventassero più grandi. Se
+pensate che questa opzione possa esservi utile potete leggere
+il manuale di dar per saperne di più.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-D</span></tt></dt>
-<dd><p class="first last">Memorizza il nome e il percorso delle directory escluse dall'opzione <tt class="literal"><span class="pre">-P</span></tt>
-o che non ci sono fra quelle specificate alla linea di
-comando. Questa è una utile opzione
-quando state recuperando un backup dal nulla, così non dovete
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-D</span></tt></dt>
+<dd><p class="first last">Memorizza il nome e il percorso delle directory escluse
+dall'opzione <tt class="docutils literal"><span class="pre">-P</span></tt> o che non ci sono fra quelle specificate
+alla linea di comando. Questa è un'opzione utile quando state
+recuperando un backup dal nulla; in questo modo non dovete
 creare manualmente tutte le directory escluse.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-R</span> <span class="pre">/</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-R</span> <span class="pre">/</span></tt></dt>
 <dd><p class="first last">Specifica la directory di root (directory radice) in cui
 salvare o dalla quale 'leggere' i file interessati dal
-backup. Di default questa è la directory in cui si
-sta lavorando. Se stiamo facendo un <em>backup di sistema</em> quì, ecco che
-questa sarà la directory di root.</p>
+backup. Di default questa è la directory in cui si sta
+lavorando (./). Se stiamo facendo un <em>backup di sistema</em>
+dalla cartella x, ecco che questa sarà la directory di root.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_data</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_data</span></tt></dt>
 <dd><p class="first">Questa è l'opzione obbligatoria di cui vi ho parlato prima
-e definisce la creazione del backup. Per chi non capisce ciò
-che segue, <tt class="literal"><span class="pre">`date</span> <span class="pre">-I`</span></tt> è un trucchetto della shell.
-Brevemente, <tt class="literal"><span class="pre">date</span> <span class="pre">-I</span></tt> restituisce una data con formato
+e definisce la creazione del backup. Per chi non capisce
+ciò che segue <tt class="docutils literal"><span class="pre">`date</span> <span class="pre">-I`</span></tt> è un trucchetto della shell.
+Brevemente, <tt class="docutils literal"><span class="pre">date</span> <span class="pre">-I</span></tt> restituisce una data con formato
 YYYY-MM-DD. L'output del comando fra gli apici singoli sarà
 usato come input dell'opzione -c. In questo modo potete creare
 backup con la data di creazione direttamente nel nome del file.
@@ -481,207 +594,211 @@ echo &quot;La data di oggi è `date -I`&quot;
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-Z</span> <span class="pre">file_pattern</span></tt></dt>
-<dd><p class="first last">Usando come argomento normali estensioni di file, potete decidere quali
-file volete memorizzare nel vostro backup, ma senza
-compressione. Questo ha senso solo se usate anche l'opzione
-<tt class="literal"><span class="pre">-y</span></tt>. Comprimendo file compressi otterrete solo file più
-grandi, spreco di risorse e occupazione della CPU.</p>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-Z</span> <span class="pre">file_pattern</span></tt></dt>
+<dd><p class="first last">Usando come argomento normali estensioni di file potete
+decidere quali file volete memorizzare nel vostro backup senza
+che siano compressi. Questo ha senso solo se usate anche
+l'opzione <tt class="docutils literal"><span class="pre">-y</span></tt>. Comprimendo file compressi otterrete al
+massimo file più grandi, nonchè spreco di risorse e occupazione
+della CPU.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-P</span> <span class="pre">relative_path</span></tt></dt>
-<dd><p class="first last">Con questa opzione dite a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> quali cartelle non volete
-memorizzare nel vostro backup. Quì potreste mettere ad
-esempio la directory /home (Sono l'unico utilizzatore di
-questa macchina, ce ne sono pochi altri, ma solo per
-testare alcune funzioni), directory di sistema che non sono
-realmente dei file, come <tt class="literal"><span class="pre">proc</span></tt>, altri file che potreste
-aver montati sotto <tt class="literal"><span class="pre">mnt</span></tt> (ovvio, il drive in cui metterete
-i file di backup) etc, etc. Notate che i percorsi che inserite
-devono essere relativi a quello specificato con l'opzione <tt class="literal"><span class="pre">-R</span></tt>.</p>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-P</span> <span class="pre">relative_path</span></tt></dt>
+<dd><p class="first last">Con questa opzione dite a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> quali directory non volete
+memorizzare nel vostro backup. Quì potreste mettere ad esempio
+la /home (Sono l'unico utilizzatore di questa macchina, ce
+ne sono pochi altri, ma solo per testare alcune funzioni),
+directory di sistema che non sono realmente dei file, come
+<tt class="docutils literal"><span class="pre">proc</span></tt>, altri file che potreste aver montati sotto <tt class="docutils literal"><span class="pre">mnt</span></tt>
+(come, ovviamente, il drive in cui metterete i file di backup)
+etc, etc. Notate che i percorsi che inserite devono essere
+relativi a quello specificato con l'opzione <tt class="docutils literal"><span class="pre">-R</span></tt>.</p>
 </dd>
 </dl>
 </li>
 </ul>
-<p>Tutto ciò non è stato poi così difficile. Controllate le pagine di
+<p>Tutto ciò non è poi così difficile. Controllate le pagine di
 manuale di <a class="reference" href="http://dar.linux.free.fr/">DAR</a> per maggiori informazioni sulle opzioni che
-vi interessa usare. Ed ecco quì il comando che uso all'interno della
-mia home:</p>
+vi interessa usare. Ed ecco quì il comando che uso all'interno
+della mia home:</p>
 <pre class="literal-block">
-dar -m 256 -y -s 600M -D -R /home/gregorio -c `date -I`_data \
+dar -m 256 -y -s 600M -D -R /home/gradha -c `date -I`_data \
    -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; \
    -P instalacion_manual -P Mail/mail_pa_leer
 </pre>
-<p>Nulla di nuovo sotto il sole. Come potete vedere, molti dei comandi
-sono identici a quelli 'di cui sopra', ho solo cambiato il nome 
-delle directories che voglio escludere con <tt class="literal"><span class="pre">-P</span></tt> e la directory
-radice con l'opzione <tt class="literal"><span class="pre">-R</span></tt>.</p>
+<p>Nulla di nuovo sotto il sole. Come potete vedere molti dei comandi
+sono identici a quelli 'di cui sopra', ho solo cambiato il nome
+delle directories che voglio escludere utilizzando l'opzione
+<tt class="docutils literal"><span class="pre">-P</span></tt> e la directory radice con l'opzione <tt class="docutils literal"><span class="pre">-R</span></tt>.</p>
 </blockquote>
 </div>
 <div class="section" id="eseguire-backup-differenziali-con-dar">
 <h1><a class="toc-backref" href="#id7" name="eseguire-backup-differenziali-con-dar">Eseguire backup differenziali con DAR</a></h1>
 <blockquote>
-<p>Una volta che avete un backup base potete creare backup
-differenziali. Il primo backup differenziale deve essere fatto
-usando il backup base come riferimento. I backup differenziali
-successivi usano come riferimento l'ultimo backup differenziale
-disponibile. Ecco quì il comando per un backup del <em>sistema</em>,
-differenziale:</p>
+<p>Una volta che avete creato un backup base, potete creare quelli
+differenziali. Il primo backup differenziale deve essere creato
+usando quello di base come riferimento. I backup differenziali
+successivi useranno come riferimento l'ultimo backup differenziale
+disponibile. Ecco quì il comando per un backup differenziale
+del <em>sistema</em>:</p>
 <pre class="literal-block">
 dar -m 256 -y -s 600M -D -R / -c `date -I`_diff -Z &quot;*.gz&quot; \
-   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gregorio -P tmp \
+   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gradha -P tmp \
    -P mnt -P dev/pts -P proc -P floppy -P burner -P cdrom \
    -A previous_backup
 </pre>
 <ul>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_diff</span></tt></dt>
-<dd><p class="first last">Ho solo cambiato il nome del file, per un motivo estetico.</p>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-c</span> <span class="pre">`date</span> <span class="pre">-I`_diff</span></tt></dt>
+<dd><p class="first last">Ho solo cambiato il nome del file, per un motivo... &quot;pratico&quot;.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first">
-<dt><tt class="literal"><span class="pre">-A</span> <span class="pre">previous_backup</span></tt></dt>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">-A</span> <span class="pre">previous_backup</span></tt></dt>
 <dd><p class="first last">Questa nuova opzione viene usata per dire a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> dove trova
-il file di backup precedente così può creare un backup
-differenziale invece di uno base. L'unica cosa alla quale dovete
-fare attenzione è che voi non dovete specificare nè
-il numero progressivo nè l'estensione, diversamente <a class="reference" href="http://dar.linux.free.fr/">DAR</a> vi
-farebbe una domanda alla linea di comando.</p>
+il file di backup precedente in modo da creare un backup
+differenziale invece di uno base. L'unica cosa alla quale
+fare attenzione è che voi non dovete specificare nè il numero
+progressivo nè l'estensione, diversamente <a class="reference" href="http://dar.linux.free.fr/">DAR</a> porrebbe una
+richiesta alla linea di comando.</p>
 </dd>
 </dl>
 </li>
 </ul>
-<p>La linea di comando dell'utente è esattamente la stessa. Ecco quà
-per completezza:</p>
+<p>La linea di comando dell'utente è esattamente la stessa. Ecco
+quà per completezza:</p>
 <pre class="literal-block">
-dar -m 256 -y -s 600M -D -R /home/gregorio -c `date -I`_diff \
+dar -m 256 -y -s 600M -D -R /home/gradha -c `date -I`_diff \
    -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; \
    -P instalacion_manual -P Mail/mail_pa_leer -A previous_backup
 </pre>
-<p><a class="reference" href="http://dar.linux.free.fr/">DAR</a> ha un'altra interessante caratteristica che quì non usiamo: i
-<em>cataloghi</em>. Quando create un backup con <a class="reference" href="http://dar.linux.free.fr/">DAR</a>, questo
-contiene i dati, più un <em>catalogo</em>. Questo <em>catalogo</em> contiene
-informazioni circa quali file sono stati salvati, la loro data,
-la loro dimensione dopo la compressione, etc. Potete estrarre il
+<p><a class="reference" href="http://dar.linux.free.fr/">DAR</a> ha un'altra interessante caratteristica che quì non usiamo:
+i <em>cataloghi</em>. Quando create un backup con <a class="reference" href="http://dar.linux.free.fr/">DAR</a> questo contiene
+i dati e un <em>catalogo</em>. Questo <em>catalogo</em> contiene informazioni
+inerenti i file che sono stati salvati: la loro data, la
+loro dimensione dopo la compressione, etc. Potete estrarre il
 <em>catalogo</em> e memorizzarlo separatamente. Perchè dovreste farlo?
 Per implementare backup differenziali in rete, ad esempio.</p>
 <p>Al fine di creare un backup differenziale dovete procurare a <a class="reference" href="http://dar.linux.free.fr/">DAR</a>
-il backup precedente in modo che il programma possa decidere quali
-file sono cambiati e quali no. Facendo questo lavoro su di una
-rete ciò può occupare molta banda. Invece, dopo aver creato il
-backup, potete estrarre il <em>catalogo</em> e inviarlo alla macchina
-che fa i backup. Successivamente, potete usare questo file con
-l'opzione <tt class="literal"><span class="pre">-A</span></tt>, <a class="reference" href="http://dar.linux.free.fr/">DAR</a> lavorerà come se il file del backup base
+il backup precedente in modo che il programma possa decidere
+quali file sono stati modificati e quali no. Facendo questo
+lavoro su di una rete ciò può occupare molta banda. Invece,
+dopo aver creato il backup, potete estrarre il <em>catalogo</em>
+e inviarlo alla macchina designata alla creazione dei backup.
+Successivamente potete usare questo file con l'opzione <tt class="docutils literal"><span class="pre">-A</span></tt>,
+in questo modo <a class="reference" href="http://dar.linux.free.fr/">DAR</a> lavorerà come se il file del backup base
 fosse quello.</p>
-<p>Questo può essere anche utile se usate le slices perchè il
-<em>catalogo</em> è creato per la prima e l'ultima slice. E' più
+<p>Questo può essere anche utile se usate le slices perchè
+il <em>catalogo</em> è creato per la prima e l'ultima slice. E' più
 semplice passare al comando un singolo file piuttosto che dover
-portare con voi tutti i dischi del vostro precedente backup.</p>
+utilizzare tutti i dischi del vostro precedente backup.</p>
 </blockquote>
 </div>
 <div class="section" id="qualche-script-per-automatizzare-i-processi">
 <h1><a class="toc-backref" href="#id8" name="qualche-script-per-automatizzare-i-processi">Qualche script per automatizzare i processi</a></h1>
 <blockquote>
-<p>Come ho detto prima, è venuto il momento di mettere la nostra
-procedura di backup sotto cron. Mettendo il seguente script
-eseguibile per il backup del <em>sistema</em> sotto
-<tt class="literal"><span class="pre">/root/dar_backup.sh</span></tt>:</p>
+<p>Come ho detto prima è venuto il momento di mettere la nostra
+procedura di backup sotto cron. Mettendo il seguente
+script eseguibile per il backup del <em>sistema</em> sotto
+<tt class="docutils literal"><span class="pre">/root/dar_backup.sh</span></tt>:</p>
 <pre class="literal-block">
 #!/bin/sh
 
-DIR=/oldg/backup
+DIR=/var/backups/system
 FILE=${DIR}/`/bin/date -I`_data
 # Commands
 /usr/local/bin/dar -m 256 -y -s 600M -D -R / -c $FILE -Z &quot;*.gz&quot; \
-   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gregorio -P tmp \
+   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gradha -P tmp \
    -P mnt -P dev/pts -P proc -P floppy -P burner \
-   -P cdrom &gt; /dev/null
+   -P cdrom -P var/backups &gt; /dev/null
 /usr/local/bin/dar -t $FILE &gt; /dev/null
-/usr/bin/find $DIR -type f -exec chown .gregorio \{\} \;
+/usr/bin/find $DIR -type f -exec chown .gradha \{\} \;
 /usr/bin/find $DIR -type f -exec chmod 440 \{\} \;
 </pre>
 <p>Alcune cose da notare:</p>
 <ul class="simple">
 <li>DIR è la variabile che rappresenta la directory di destinazione.</li>
 <li>FILE rappresenta il percorso del file di backup di oggi.</li>
-<li>Uso percorsi assoluti per i comandi perchè il mio account di
+<li>Uso percorsi assoluti nei comandi perchè il mio account di
 root non li ha tutti inclusi nell'ambiente di default. Questo
 è potenzialmente un rischio in ambito di sicurezza. Idealmente
-dovreste compilare <a class="reference" href="http://dar.linux.free.fr/">DAR</a> come root e mantenere i binari dove
-li avete creati, così nessuno può toccarli, e eseguirvi anche
-<a class="reference" href="http://www.tripwire.org/">Tripwire</a>.</li>
+dovreste compilare <a class="reference" href="http://dar.linux.free.fr/">DAR</a> come root e mantenere i binari dove li
+avete creati, così nessuno potrà toccarli o eseguirvi <a class="reference" href="http://www.tripwire.org/">Tripwire</a>.</li>
 <li><a class="reference" href="http://dar.linux.free.fr/">DAR</a> genera statistiche dopo ogni esecuzione. A noi non servono
 se eseguite in cron perchè produrrebbero solo mail inutili.
-Solo lo <tt class="literal"><span class="pre">stdout</span></tt> è rediretto a <tt class="literal"><span class="pre">/dev/null</span></tt>. Gli errori saranno
-invece riportati e una mail inviata se qualcosa andasse storto.</li>
-<li>Gli ultimi due comandi <tt class="literal"><span class="pre">find</span></tt> sono opzionali. Li uso per
+Lo <tt class="docutils literal"><span class="pre">stdout</span></tt> è rediretto a <tt class="docutils literal"><span class="pre">/dev/null</span></tt>. Gli errori saranno
+invece riportati in una mail nel caso qualcosa andasse storto.</li>
+<li>Gli ultimi due comandi <tt class="docutils literal"><span class="pre">find</span></tt> sono opzionali. Li uso per
 cambiare i permessi dei file per un normale utente che creerà
-successivamente i backup. Ancora un ulteriore rischio in fatto
-di sicurezza. Root dovrebbe eseguire il backup dei file da
-root e gli utenti i loro. Ma con un sistema mono-user, questo
-non è importante. Se qualche intruso è in grado abbastanza di
-passare attraverso il mio firewall, la mia password di account
-e guardare a tutti i miei backup sono fregato.</li>
+successivamente i backup. Un ulteriore rischio in fatto di
+sicurezza. Root dovrebbe eseguire il backup dei file da root
+e gli utenti i loro. Ma con un sistema mono-user questo non
+è importante. Se un ipotetico intruso è capace di passare
+attraverso il mio firewall, inserire la mia password e quindi
+guardare tutti i miei backup: sono fregato.</li>
 </ul>
-<p>Ora ponete il seguente script, quasi identico al precedente, per
-i backup differenziali sotto <tt class="literal"><span class="pre">/root/dar_diff.sh</span></tt>:</p>
+<p>Ora ponete il seguente script per i backup differenziali,
+quasi identico al precedente, sotto <tt class="docutils literal"><span class="pre">/root/dar_diff.sh</span></tt>:</p>
 <pre class="literal-block">
 #!/bin/sh
 
-DIR=/oldg/backup
+DIR=/var/backups/system
 FILE=${DIR}/`/bin/date -I`_diff
-PREV=`/bin/ls $DIR/*.dar|/usr/bin/tail -n 1|/usr/bin/awk -F '.' '{print $1;}'`
+PREV=`/bin/ls $DIR/*.dar|/usr/bin/tail -n 1`
 /usr/local/bin/dar -m 256 -y -s 600M -D -R / -c $FILE -Z &quot;*.gz&quot; \
-   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gregorio -P tmp -P mnt \
-   -P dev/pts -P proc -P floppy -P burner -P cdrom -A $PREV &gt; /dev/null
+   -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gradha -P tmp -P mnt \
+   -P dev/pts -P proc -P floppy -P burner -P cdrom \
+   -P var/backups -A ${PREV%%.*} &gt; /dev/null
 /usr/local/bin/dar -t $FILE &gt; /dev/null
-/usr/bin/find $DIR -type f -exec chown .gregorio \{\} \;
+/usr/bin/find $DIR -type f -exec chown .gradha \{\} \;
 /usr/bin/find $DIR -type f -exec chmod 440 \{\} \;
 </pre>
-<p>Gli unici due cambiamenti sono le aggiunte dell'opzione <tt class="literal"><span class="pre">-A</span></tt> e
-la generazione della variabile PREV con una linea di comando un po'
-complicata. Vediamo cosa fa questa linea di comando:</p>
+<p>Gli unici due cambiamenti sono le aggiunte dell'opzione <tt class="docutils literal"><span class="pre">-A</span></tt>
+e la generazione della variabile PREV con una linea di comando
+un po' complicata. Vediamo cosa fa questa linea di comando:</p>
 <ul class="simple">
-<li>Primo, il comando <tt class="literal"><span class="pre">ls</span></tt> crea una lista dei file con estensione
-<tt class="literal"><span class="pre">.dar</span></tt> presenti nella directory di backup. Questo output è
-rediretto al comando successivo.</li>
-<li>Di default <tt class="literal"><span class="pre">ls</span></tt> elenca i file in ordine alfabetico. <tt class="literal"><span class="pre">tail</span></tt>
-è usato per ottenere l'ultimo file con l'opzione <tt class="literal"><span class="pre">-n</span> <span class="pre">1</span></tt> che
-ordina di mostrare solo l'ultima riga. Di nuovo l'ultimo filename
-è rediretto al comando successivo.</li>
-<li><a class="reference" href="http://dar.linux.free.fr/">DAR</a> necessita di lavorare con filenames senza il numero di slice
-e senza estensione. Questo significa che se non correggiamo noi
-il nome del file, <a class="reference" href="http://dar.linux.free.fr/">DAR</a> ferma il processo e chiede all'utente se
-effettuare l'operazione in modo automatico o meno. Noi separiamo
-il nome del file con <tt class="literal"><span class="pre">awk</span></tt>. Il comando <tt class="literal"><span class="pre">awk</span></tt> separa le stringhe
-di testo dai punti e stampa a schermo la prima colonna. Il risultato
-è il nome base che possiamo passare a <a class="reference" href="http://dar.linux.free.fr/">DAR</a>.</li>
+<li>Prima di tutto, il comando <tt class="docutils literal"><span class="pre">ls</span></tt> crea una lista dei file
+con estensione <tt class="docutils literal"><span class="pre">.dar</span></tt> presenti nella directory di backup;
+euesto output è rediretto al comando successivo.</li>
+<li>Di default <tt class="docutils literal"><span class="pre">ls</span></tt> elenca i file in ordine alfabetico. <tt class="docutils literal"><span class="pre">tail</span></tt>
+è usato per ottenere l'ultimo file con l'opzione <tt class="docutils literal"><span class="pre">-n</span> <span class="pre">1</span></tt>
+che ordina di mostrare solo l'ultima riga.</li>
+<li><a class="reference" href="http://dar.linux.free.fr/">DAR</a> necessita di lavorare con filenames senza il numero
+di slice e senza estensione. Se non correggiamo noi il nome
+del file, <a class="reference" href="http://dar.linux.free.fr/">DAR</a> fermerà il processo e chiederà all'utente se
+effettuare l'operazione in modo automatico o meno. Separiamo
+quindi il nome del file con una feature Bash, chiamata
+parametro d'espansione. Ci sono diverse possibili espansioni,
+potete digitare <tt class="docutils literal"><span class="pre">man</span> <span class="pre">bash</span></tt> per vederle tutte. Usando <tt class="docutils literal"><span class="pre">%%</span></tt>
+rimuoviamo la più lunga &quot;coda&quot; di caratteri che si trova dopo il
+<tt class="docutils literal"><span class="pre">%%</span></tt>. Il risultato è il nome base che vogliamo passare a <a class="reference" href="http://dar.linux.free.fr/">DAR</a>.</li>
 </ul>
 <p>Ora dobbiamo solo mettere questi due script sotto il controllo
-di cron. Questo è ciò che dobbiamo scrivere dopo il comando <tt class="literal"><span class="pre">crontab</span> <span class="pre">-e</span></tt>:</p>
+di cron. Questo è ciò che dobbiamo scrivere dopo il comando
+<tt class="docutils literal"><span class="pre">crontab</span> <span class="pre">-e</span></tt>:</p>
 <pre class="literal-block">
 15 0 2-31 * * ./dar_diff.sh
 15 0 1    * * ./dar_backup.sh
 </pre>
-<p>Controllate in <tt class="literal"><span class="pre">man</span> <span class="pre">-S</span> <span class="pre">5</span> <span class="pre">crontab</span></tt> la sintassi del comando. In
+<p>Controllate in <tt class="docutils literal"><span class="pre">man</span> <span class="pre">-S</span> <span class="pre">5</span> <span class="pre">crontab</span></tt> la sintassi del comando. In
 breve queste due linee dicono a cron di far partire i processi
-15 minuti dopo la mezzanotte. <tt class="literal"><span class="pre">dar_backup.sh</span></tt> verrà eseguito solo il
-primo giorno del mese. L'altro script verrà eseguito tutti gli
-altri giorni.</p>
+15 minuti dopo la mezzanotte. <tt class="docutils literal"><span class="pre">dar_backup.sh</span></tt> verrà eseguito
+solo il primo giorno del mese. L'altro script verrà eseguito
+tutti gli altri giorni.</p>
 <p>Ecco quì gli scripts di backup per i vostri utenti. Essi sono
 identici, cambiano solo alcune opzioni di <a class="reference" href="http://dar.linux.free.fr/">DAR</a> e i percorsi:</p>
 <pre class="literal-block">
 #!/bin/sh
 # dar_backup.sh
 
-DIR=/oldg/backup_gregorio
+DIR=/var/backups/gradha
 FILE=${DIR}/`/bin/date -I`_data
 # Commands
-/usr/local/bin/dar -m 256 -y -s 600M -D -R /home/gregorio -c $FILE \
+/usr/local/bin/dar -m 256 -y -s 600M -D -R /home/gradha -c $FILE \
    -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; \
    -P instalacion_manual -P Mail/mail_pa_leer &gt; /dev/null
 /usr/local/bin/dar -t $FILE &gt; /dev/null
@@ -690,12 +807,13 @@ FILE=${DIR}/`/bin/date -I`_data
 #!/bin/sh
 # dar_diff.sh
 
-DIR=/oldg/backup_gregorio
+DIR=/var/backups/gradha
 FILE=${DIR}/`/bin/date -I`_diff
-PREV=`/bin/ls $DIR/*.dar|/usr/bin/tail -n 1|/usr/bin/awk -F '.' '{print $1;}'`
-/usr/local/bin/dar -m 256 -y -s 600M -D -R /home/gregorio -c $FILE \
+PREV=`/bin/ls $DIR/*.dar|/usr/bin/tail -n 1`
+/usr/local/bin/dar -m 256 -y -s 600M -D -R /home/gradha -c $FILE \
    -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.zip&quot; \
-   -P instalacion_manual -P Mail/mail_pa_leer -A $PREV &gt; /dev/null
+   -P instalacion_manual -P Mail/mail_pa_leer \
+   -A ${PREV%%.*} &gt; /dev/null
 /usr/local/bin/dar -t $FILE &gt; /dev/null
 /usr/bin/find $DIR -type f -exec chmod 400 \{\} \;
 </pre>
@@ -706,14 +824,14 @@ per i votri utenti.</p>
 <div class="section" id="estrarre-i-backup-su-macchine-vuote">
 <h1><a class="toc-backref" href="#id9" name="estrarre-i-backup-su-macchine-vuote">Estrarre i backup su macchine vuote</a></h1>
 <blockquote>
-<p>Quando viene il momento di recuperare i vostri backup, in base a 
-quello che avete salvato avrete un backup completo del mese,
-più tanti backup differenziali quanti quelli che avete fatto. Il
-processo di recupero dei dati è molto semplice, è uguale a quello
-descritto nel primo paragrafo (<a class="reference" href="#semplice-utilizzo-di-dar">Semplice utilizzo di DAR</a>),
-l'importante è che prima recuperiate il backup base, poi quelli
-differenziale. Questo può essere noioso, così ecco quà un'altro
-script che potete salvare fra i vostri file di backup:</p>
+<p>Venuto il momento di recuperare i vostri backup, in base a quello
+che avete salvato, avrete il backup completo del mese e tanti
+backup differenziali quanti quelli che avete fatto. Il processo
+di recupero dei dati è molto semplice: è uguale a quello descritto
+nel primo paragrafo (<a class="reference" href="#utilizzo-essenziale-di-dar">Utilizzo essenziale di DAR</a>), l'importante
+è che prima recuperiate il backup base e solo successivamente
+quelli differenziali. Questo può essere noioso, così ecco quà
+un'altro script che potete salvare fra i vostri file di backup:</p>
 <pre class="literal-block">
 #!/bin/sh
 
@@ -732,47 +850,47 @@ else
 Usa: script dar_location base_full_backup directory
 
 Dove dar_location è un percorso alla directory con i binari di dar,
-base_full_backup è una data in formato 'YYYY-MM-DD', e directory è
+base_full_backup è una data in formato 'YYYY-MM-DD' e directory è
 il posto dove volete mettere i file recuperati, solitamente '/'
 quando eseguito come root.&quot;
 fi
 </pre>
 <p>Lo script si spiega da solo. L'unica cosa alla quale dovete fare
-attenzione è l'opzione <tt class="literal"><span class="pre">-w</span></tt>, che dice a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> di sovrascrivere i
+attenzione è l'opzione <tt class="docutils literal"><span class="pre">-w</span></tt> che dice a <a class="reference" href="http://dar.linux.free.fr/">DAR</a> di sovrascrivere i
 file trovati. Questo è obbligatorio per i backup differenziali.
-Ah, mettete lo script nella stessa directory dove mettete i file
-di backup. Ecco un'utilizzo di esempio:</p>
+Ricordate di mettere lo script nella stessa directory dove
+mettete i file di backup. Ecco un'utilizzo di esempio:</p>
 <pre class="literal-block">
 ./recover.sh /usr/local/bin/dar 2003-10-01 /tmp/temp_path/
 </pre>
-<p>Prova ad utilizzare questo come utente normale con pochi file
+<p>Provate ad utilizzare questo come utente normale con pochi file
 di backup. Potete mettere i file recuperati in una directory
-temporanea, così non dovete scuotate il vostro ahrd disk per
+temporanea, così non dovete svuotare il vostro hard disk per
 provarlo.</p>
 </blockquote>
 </div>
 <div class="section" id="aggiungere-dei-controlli-allo-script-di-backup">
 <h1><a class="toc-backref" href="#id10" name="aggiungere-dei-controlli-allo-script-di-backup">Aggiungere dei controlli allo script di backup</a></h1>
 <blockquote>
-<p>Denis Corbin suggerisce che lo script che crea i backup
-dovrebbe verificare l'exit status dei comandi <a class="reference" href="http://dar.linux.free.fr/">DAR</a>. Per quanto riguarda
-questo script così semplice, ciò non è di importanza
+<p>Denis Corbin suggerisce che lo script di creazione dei backup
+verifichi anche l'exit status dei comandi di <a class="reference" href="http://dar.linux.free.fr/">DAR</a>. Per quanto
+riguarda questo script così semplice, ciò non è di importanza
 critica perchè <a class="reference" href="http://dar.linux.free.fr/">DAR</a> stesso stamperebbe a schermo un messaggio
 d'errore e cron lo riporterebbe via mail (cosa che normalmente
 non succede se tutto va per il verso giusto)</p>
-<p>Comunque, testare l'exit status può essere utile se state verificando
-il funzionamento dello script e volete sapere quali comandi sono
-eseguiti:</p>
+<p>Comunque testare l'exit status può essere utile se state
+verificando il funzionamento dello script e volete sapere quali
+comandi sono eseguiti:</p>
 <pre class="literal-block">
 #!/bin/sh
 
-DIR=/oldg/backup
+DIR=/var/backups/system
 FILE=${DIR}/`/bin/date -I`_data
 # Commands
 if /usr/local/bin/dar -m 256 -y -s 600M -D -R / -c $FILE -Z &quot;*.gz&quot; \
-      -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gregorio -P tmp \
+      -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; -Z &quot;*.png&quot; -P home/gradha -P tmp \
       -P mnt -P dev/pts -P proc -P floppy -P burner \
-      -P cdrom &gt; /dev/null ; then
+      -P cdrom -P var/backups &gt; /dev/null ; then
    if /usr/local/bin/dar -t $FILE &gt; /dev/null ; then
       echo &quot;Archive created and successfully tested.&quot;
    else
@@ -781,31 +899,30 @@ if /usr/local/bin/dar -m 256 -y -s 600M -D -R / -c $FILE -Z &quot;*.gz&quot; \
 else
    echo &quot;Archive creating FAILED.&quot;
 fi
-/usr/bin/find $DIR -type f -exec chown .gregorio \{\} \;
+/usr/bin/find $DIR -type f -exec chown .gradha \{\} \;
 /usr/bin/find $DIR -type f -exec chmod 440 \{\} \;
 </pre>
-<p>Potete testare questa versione facilmente facendo partire lo
+<p>Potete testare facilmente questa versione facendo partire lo
 script e killando i processi di <a class="reference" href="http://dar.linux.free.fr/">DAR</a> manualmente da un'altro
-terminale o un'altra console con <tt class="literal"><span class="pre">killall</span> <span class="pre">dar</span></tt>, che forzerà
-la fine dei processi <a class="reference" href="http://dar.linux.free.fr/">DAR</a> e vedrete che uno dei rami di fallimento
+terminale o un'altra console con <tt class="docutils literal"><span class="pre">killall</span> <span class="pre">dar</span></tt>, che forzerà la
+fine dei processi <a class="reference" href="http://dar.linux.free.fr/">DAR</a> e vedrete che uno dei rami di fallimento
 sarà raggiunto nello script di backup.</p>
 <p>Un'ulteriore possibile utilizzo per testare il codice può essere
-di rimuovere gli archivi incompleti dall'hard disk se qualcosa
-va male o evitare di testare l'archivio creato quando sapete
-che il primo comando è già fallito. Successivamente può facilmente
-concatenare i comandi di creazione e di test con <tt class="literal"><span class="pre">&amp;&amp;</span></tt> in una
-singola linea di testo. Ciò dice alla shell di eseguire entrambi
-i comandi in sequenza e impedisce l'esecuzione del secondo se il
-primo è fallito.</p>
-<p>Comunque se un fallimento importante avviene nel bel mezzo di un
-backup questa versione dello script lascierà archivi errati
-vaganti. Per prevenire ciò potete fare in modo che lo script esegua
-una <em>positive verification</em>. Ciò crea il backup in una
-directory temporanea insieme con un file <tt class="literal"><span class="pre">*.valid</span></tt>.</p>
-<p>Così un'altro script monitora la directory dove
-i file temporanei sono messi e sposta in una directory definitiva
-i file con <tt class="literal"><span class="pre">*.valid</span></tt> eliminando quelli la cui ultima
-modifica è precedente a un'ora.</p>
+la rimozione di archivi incompleti dall'hard disk se qualcosa
+andasse male o evitare di testare l'archivio creato quando sapete
+che il primo comando è già fallito. Successivamente si possono
+facilmente concatenare i comandi di creazione e di test con
+<tt class="docutils literal"><span class="pre">&amp;&amp;</span></tt> in una singola linea di testo. Ciò indica alla shell di
+eseguire entrambi i comandi in sequenza e impedisce l'esecuzione
+del secondo se il primo è fallito.</p>
+<p>una procedura di backup, questa versione dello script lascierà
+archivi errati vaganti. Per prevenire ciò potete fare in modo che
+lo script esegua una <em>positive verification</em>. Ciò creerà il backup
+in una directory temporanea insieme con un file <tt class="docutils literal"><span class="pre">*.valid</span></tt>.</p>
+<p>Così un'altro script monitora la directory dove i file temporanei
+sono messi e sposta in una directory definitiva i file con
+<tt class="docutils literal"><span class="pre">*.valid</span></tt> eliminando quelli la cui ultima modifica è precedente
+a un'ora.</p>
 </blockquote>
 </div>
 <div class="section" id="idee-per-il-futuro">
@@ -814,62 +931,95 @@ modifica è precedente a un'ora.</p>
 <p>Non ho programmato di aggiornare questo testo presto perchè sono
 molto pigro, ma se voi siete fra quegli hackers imperattivi,
 ecco quà qualcosa che mi piacerebbe inserire:</p>
-<ul class="simple">
-<li>Unificare gli script dei backup base e differenziale in uno unico,
-così se lo script viene eseguito e non esistono backup base
-per il mese orrente, il backup base viene creato. Utile per
+<ul>
+<li><p class="first">Unificare gli script dei backup di base e differenziali in
+uno unico, cosicchè se all'esecuzione dello script non esistono
+backup base per il mese corrente questo venga reato. Utile per
 macchine che rimangono spente molto tempo dopo che il backup
-mensile è stato fatto.</li>
-<li>Aggiornare lo script in modo che creai giornalmente un immagine
-per CD ROM con <a class="reference" href="http://www.fokus.fhg.de/research/cc/glone/employees/joerg.schilling/private/cdrecord.html">cdrecord</a> e la masterizzi automaticamente su un cd
-riscrivibile presente nel drive. Così nel caso l'intero hard disk
-si guasti, si avrebbe l'ultimo backup su media rimovibile. Certo
-la cosa è limitata e non può essere automatica nel caso i backup
-occupino più spazio di un CDROM. La stessa cosa vale per
-ZIP/JAZZ/qualsiasi cosa vogliate.</li>
-<li>Integrazione dei backup generati, con una mini <a class="reference" href="http://www.knoppix.org/">Knoppix</a> bootable
+mensile è stato fatto.</p>
+</li>
+<li><p class="first">Aggiornare lo script in modo che crei giornalmente un immagine
+per CD ROM con <a class="reference" href="http://www.fokus.fhg.de/research/cc/glone/employees/joerg.schilling/private/cdrecord.html">cdrecord</a> e la masterizzi automaticamente su
+un cd riscrivibile presente nel drive. Così nel caso l'intero
+hard disk si guasti sarebbe disponibile l'ultimo backup su un
+media rimovibile. Certo la cosa è limitata e non può essere
+automatica nel caso i backup occupino più spazio di un CDROM. La
+stessa cosa vale per ZIP/JAZZ/qualsiasi cosa vogliate.</p>
+</li>
+<li><p class="first">Integrazione dei backup generati con una mini <a class="reference" href="http://www.knoppix.org/">Knoppix</a> bootable
 o qualsiasi altra ditribuzione che possa essere avviata da
 CDROM. Così avreste un CDROM per recuperare i dati che può
-partire automaticamente e formattare il vostro hard disk.</li>
-<li>Sincronizzazione delle directory di backup attraverso internet
+partire automaticamente e formattare il vostro hard disk.</p>
+</li>
+<li><p class="first">Sincronizzazione delle directory di backup attraverso internet
 con hosts remoti. In questo modo se l'intera macchina è bruciata
-fisicamente ad esempio con la vostra casa, voi avete i vostri
+fisicamente, ad esempio con la vostra casa, voi avete i vostri
 backup in qualche altro posto. Potrebbe essere fatto facilmente
-con programmi come <a class="reference" href="http://rsync.samba.org/">rsync</a> attraverso <a class="reference" href="http://www.openssh.com/">ssh</a> eseguiti tramite cron.</li>
+con programmi come <a class="reference" href="http://rsync.samba.org/">rsync</a> attraverso <a class="reference" href="http://www.openssh.com/">ssh</a> eseguiti tramite cron.</p>
+</li>
+<li><p class="first">Inserimento dei parametri comuni in un file separato da inculdere
+dallo script utilizzando l'opzione di DAR, -B. Per esempio:</p>
+<pre class="literal-block">
+$ cat &gt; /var/backups/system/common.dcf
+-m 256 -y -s 600M -D -R / -Z &quot;*.gz&quot; -Z &quot;*.bz2&quot; -Z &quot;*.zip&quot; \
+-Z &quot;*.png&quot; -P home/gradha -P tmp -P mnt -P dev/pts \
+-P proc -P floppy -P burner -P cdrom -P var/backups
+</pre>
+<p>Successivamente si può utilizzare questo nello script:</p>
+<pre class="literal-block">
+DIR=/var/backups/system
+FILE=${DIR}/`/bin/date -I`_data
+# Commands
+/usr/local/bin/dar -B ${DIR}/common.dcf -c $FILE &gt; /dev/null
+/usr/local/bin/dar -t $FILE &gt; /dev/null
+/usr/bin/find $DIR -type f -exec chown .gradha \{\} \;
+</pre>
+<p>Che può essere riutilizzato anche nella versione differenziale!</p>
+</li>
 </ul>
+<p>In effetti, qualcuno ha già iniziato a creare qualche
+script a proprio uso e consumo e non ha problemi a
+condividerli. Per evitare di &quot;disordinare&quot; questo mini-howto
+ho intenzione di archiviarli <em>come sono</em> nel mio spazio web:
+<a class="reference" href="http://gradha.sdf-eu.org/dar_scripts/">http://gradha.sdf-eu.org/dar_scripts/</a>.</p>
+<p>Sentitevi liberi di inviare i vostri lavori e i vostri
+aggiornamenti e li aggiungerò alla directory. Se avete intenzione
+di inviare un singolo file di script o un <tt class="docutils literal"><span class="pre">.tar.gz</span></tt> con una
+intera suite di backup, inserite un semplice file <tt class="docutils literal"><span class="pre">.txt</span></tt>
+descrittivo che metterò assieme agli altri files, così la
+gente potrà leggere cosa sono e cosa fanno i files prima di
+scaricarli. Usate l'inglese nella vostra descrizione e non
+dimenticate di mettere nome e e-mail così la gente potrà inviarvi
+bugfixes o miglioramenti.</p>
 </blockquote>
 </div>
 <div class="section" id="the-end">
 <h1><a class="toc-backref" href="#id12" name="the-end">The end</a></h1>
 <blockquote>
-And that's the whole <em>magic</em>. Se avete qualche problema, qualcosa
-non è chiaro o sbagliato (il che è peggio) inviatemi un'e-mail. Se
-trovi questo documento utile e lo vuoi tradurre inviami una
-traduzione del file <tt class="literal"><span class="pre">source.en.txt</span></tt> così posso ditribuirla assieme
-a questa versione e gli utenti troveranno più facilmente la versione
-relativa alla loro lingua. Dovreste raggiungere facilmente il codice
-di questo dodumento alla mia home page (link <a class="reference" href="#dar-differential-backup-mini-howto-it">at the beginning of
-the document</a>).</blockquote>
+And that's the whole <em>magic</em>. Se avete qualche problema,
+qualcosa non è chiaro o sbagliato (il che è peggio) inviatemi
+un'e-mail. Se trovi questo documento utile e lo vuoi tradurre
+inviami una traduzione del file <tt class="docutils literal"><span class="pre">source.en.txt</span></tt> così posso
+distribuirla assieme a questa versione e gli utenti troveranno
+più semplice la versione nella loro lingua. Dovreste raggiungere
+facilmente il codice di questo dodumento alla mia home page
+(link <a class="reference" href="#dar-differential-backup-mini-howto-it">at the beginning of the document</a>).</blockquote>
 <blockquote>
 Enjoy!</blockquote>
 </div>
 <div class="section" id="per-finire">
 <h1><a class="toc-backref" href="#id13" name="per-finire">Per finire</a></h1>
 <blockquote>
-<blockquote>
-<em>Coloro che scorgono cattive intenzioni nelle belle cose,
-sono corrotti, senza essere interessanti. Questo è un difetto.
-Quanti scorgono buone intenzioni nelle belle cose, sono spiriti
-raffinati. Per essi c'è speranza.
-&lt;&lt;Oscar Wilde - 1891&gt;&gt;</em></blockquote>
-<p>Non mi sembrava giusto sostituire la conclusione di Grzegorz con la
-mia, così ecco la conclusione in italiano.
-Spero che questa traduzione serva a qualcuno che, anche conoscendo
-l'inglese, trova più comoda la lettura del testo in italiano e spero
-anche di non aver fatto troppi errori. Per _qualsiasi_ cosa vogliate
-comunicarmi, i miei dati sono quì -&gt; (link <a class="reference" href="#dar-differential-backup-mini-howto-it">at the beginning of
-the document</a>).</p>
-</blockquote>
+Versione un po' corretta, con un italiano un po' più
+scorrevole. Ecco lo scopo che mi ero prefissato per questa
+revisione. Non so se l'obbiettivo è stato raggiunto, ma non
+immaginavo che tradurre dall'inglese fosse così difficile. Termini
+che initaliano non sai come rendere, plurali di nomi inglesi
+che in italiano rimangono singolari, modi di dire che, una volta
+tradotti letteralmente, non ti escono più dalla testa.  Spero,
+comunque, che riusciate a capire in modo più agevole questa
+correzione rimanendo, come sempre, a disposizione.  David (link
+<a class="reference" href="#dar-differential-backup-mini-howto-it">at the beginning of the document</a>)</blockquote>
 </div>
 </div>
 </body>

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_catalogue.cpp,v 1.15 2005/11/17 15:24:11 edrusb Rel $
+// $Id: test_catalogue.cpp,v 1.15.2.1 2006/10/22 19:16:03 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -250,7 +250,7 @@ void f2()
                             w = dynamic_cast<const inode *>(was);
                         if(ok && w != NULL)
                             if(i->same_as(*w))
-                                if(i->is_more_recent_than(*w, 0, inode::cf_ignore_owner))
+                                if(i->is_more_recent_than(*w, 0))
 				{
                                     cout << "plus recent" << endl;
 				    cout << "new is " << deci(w->get_last_modif()).human() << " ref " << deci(i->get_last_modif()).human() << endl;

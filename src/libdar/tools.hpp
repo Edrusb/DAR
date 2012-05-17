@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.39.2.1 2006/01/19 14:42:47 edrusb Rel $
+// $Id: tools.hpp,v 1.39.2.2 2006/10/07 21:23:52 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -487,6 +487,15 @@ namespace libdar
 	/// \return the list of words found in this order in the file
 	/// \note The different quotes are taken into account
     extern std::vector<std::string> tools_split_in_words(generic_file & f);
+
+	/// builds a regex from root directory and user provided regex to be applied to the relative path
+
+
+	/// \param[in] prefix is the root portion of the path
+	/// \param[in] relative_part is the user provided regex to be applied to the relative path
+	/// \return the corresponding regex to be applied to full absolute path
+    extern std::string tools_build_regex_for_exclude_mask(const std::string & prefix,
+							  const std::string & relative_part);
 
 } /// end of namespace
 

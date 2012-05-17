@@ -472,3 +472,13 @@ from 2.3.0 to 2.3.1
 - fixed a bug that appeared when a file is removed while at the time it is saved by dar
 - avoid having an unnecessary warning appearing when restoring a file in a directory that has default EA set
 - Cygwin has changed and does not support anymore the path in the form "c:/some/where", you have to use "/cygdrive/c/some/where" instead. Documentation has been updated in consequence.
+
+from 2.3.1 to 2.3.2
+- fixed bug in Native Language Support when --enable-locale-dir was not set (Thomas Jacob's patch)
+- updated Swedish translation by Peter Landgren
+-  --verbose=skipped was not available (only the short -vs form was available)
+- reviewed regex with ordered mask for the feature to better fits user's need (Dave Vasilevsky's feedback)
+- fixed bug where compression algorithm was changed to maximum (fixed with Richard Fish's adequate patch)
+- fixed tutorial with command line evolution (dar's -g option in particular)
+- latest version of Grzegorz Adam Hankiewicz's mini-howto
+- fixed bug concerning restoration of only more recent files

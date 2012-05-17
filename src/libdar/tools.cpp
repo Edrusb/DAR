@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.3 2006/05/30 22:04:30 edrusb Exp $
+// $Id: tools.cpp,v 1.54.2.4 2006/10/07 21:23:52 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -299,7 +299,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.54.2.3 2006/05/30 22:04:30 edrusb Exp $";
+        static char id[]="$Id: tools.cpp,v 1.54.2.4 2006/10/07 21:23:52 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1629,5 +1629,48 @@ namespace libdar
 	return ret;
     }
 
+    string tools_build_regex_for_exclude_mask(const string & prefix,
+					      const string & relative_part)
+    {
+	string result = "^";
+	string::iterator it = const_cast<string &>(prefix).begin();
+	string::iterator fin = const_cast<string &>(prefix).end();
+
+	    // prepending any non alpha numeric char of the root by a anti-slash
+
+	for( ; it != fin ; it++)
+	{
+ 	    if(isalnum(*it) || *it == '/' || *it == ' ')
+		result += *it;
+	    else
+	    {
+		result += '\\';
+		result += *it;
+	    }
+	}
+
+	    // adding a trailing / if necessary
+
+ 	string::reverse_iterator tr = result.rbegin();
+	if(tr == result.rend() || *tr != '/')
+	    result += '/';
+
+	    // adapting and adding the relative_part
+
+	it = const_cast<string &>(relative_part).begin();
+	fin = const_cast<string &>(relative_part).end();
+
+	if(it != fin && *it == '^')
+	    it++; // skipping leading ^
+	else
+	    result += ".*"; // prepending wilde card sub-expression
+
+	for( ; it != fin && *it != '$' ; it++)
+	    result += *it;
+
+	result += "(/.+)?$";
+
+	return result;
+    }
 
 } // end of namespace

@@ -88,7 +88,11 @@ and thread-safe requirement</a><span style="font-weight: bold;"></span><br>
       <span style="font-weight: bold;"></span><a href="#XIX">Dar_manager
 and delete files</a><span style="font-weight: bold;"></span><br>
       <span style="font-weight: bold;"></span><a href="#XX">Native
-Language Support / gettext / libintl</a></div>
+Language Support / gettext / libintl</a><br>
+      <a href="#autonomous_slices">Slices and Protection against loss
+of data</a><br>
+      <br>
+      </div>
       </td>
     </tr>
   </tbody>
@@ -565,7 +569,8 @@ how much bit could be transmitted by second. At some ancient time
 appeared the 1200 bit by second, then 64000, also designed as 64
 Kbit/s. Thus here, kilo stays in the usual meaning of 1000 time the
 base unit (at the exception that the K is uppercase while it should be
-lowercase). You can also find Ethernet 10 Mbit/s which is 10,000,000 bits
+lowercase). You can also find Ethernet 10 Mbit/s which is 10,000,000
+bits
 by seconds, same thing with Token-Ring that had 4, 16 or 100 Mbit by
 seconds (4,000,000 16,000,000 or 100,000,000 bits/s). But, even for
 telecommunications, kilo is not always 1000 times the base unit: the E1
@@ -638,8 +643,9 @@ Pi<br>
 Ei<br>
 Zi<br>
 Yi<br>
-<br> this for example, we have KiB for kilobytes (1024 bytes), and Kibit for kilobits (1024 bits) and keep KB (1000 Bytes) and Kbit (1000 bits)
-      </div>
+      <br>
+this for example, we have KiB for kilobytes (1024 bytes), and Kibit for
+kilobits (1024 bits) and keep KB (1000 Bytes) and Kbit (1000 bits) </div>
       </div>
       </td>
     </tr>
@@ -2263,8 +2269,8 @@ this would cover all .mp3 .mP3 .Mp3 and .MP3 files. One step further,
 the <span style="font-weight: bold; font-style: italic;">-acase</span>
 option makes following filtering arguments become case sensitive (which
 is the default), while the -<span
- style="font-style: italic; font-weight: bold;">ano-case</span> (alias
-      <span style="font-style: italic;">-an</span> in short) set to
+ style="font-style: italic; font-weight: bold;">ano-case</span> (alias <span
+ style="font-style: italic;">-an</span> in short) set to
 case insensitive mode filters arguments that
 follows it. In shorter we have:<br>
       <br>
@@ -2653,7 +2659,199 @@ directory. </div>
   </tbody>
 </table>
 <br>
-<br>
+<hr style="width: 100%; height: 2px;"><a name="autonomous_slices"></a><br>
+<table style="text-align: left; width: 894px; height: 1653px;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: justify;">
+      <h3>Slices and Protection against loss of data</h3>
+      <br>
+I will not tell you that dar is perfect and is the tool your ever
+dreamed about for so long, I am not selling anything. OK, so now, let
+me remind you some important dar's archive structure, as some questions
+recently arised about that point:<br>
+      <br>
+Dar gather gather file's data and EA one after the other in an given
+archive, and for each new file it stores in memory the location of its
+corresponding data in the archive (the location is an offset in byte
+from the beginning
+of the archive, may it be sliced or not). Once all files have
+been&nbsp; treated, dar adds the so called "catalogue" which contains
+all the structure information of the archive being under construction.
+In particular, in the catalogue you will find the list of file with
+their attributes that has been saved as well as the offset where to
+find their
+corresponding data.<br>
+      <br>
+Having this sort of information gathered in a short part of the archive
+has several advantages but also drawbacks:<br>
+      <br>
+      <div style="margin-left: 40px;"><span
+ style="text-decoration: underline;">Advantages:</span><br>
+      </div>
+      <ul style="margin-left: 40px;">
+        <li>it is not necessary to read or even have available the
+whole archive to perform the following operations : list, extract,
+isolate, feed dar_manager with an archive. This greatly improves
+execution time for theses operations (compare a huge archive listing
+with 'tar' for illustration)<br>
+        </li>
+        <li>with archive overall offset to locate each file's data, it
+is possible to reslice an archive without understanding the file's
+contents, thus reslicing is possible without touching compression or
+encryption.</li>
+        <li>no duplication of information occures thus less space is
+used.<br>
+        </li>
+      </ul>
+      <div style="margin-left: 40px;"><span
+ style="text-decoration: underline;">Drawbacks:</span><br>
+      </div>
+      <ul style="margin-left: 40px;">
+        <li>In case of loss of the slice containing the catalogue the
+rest of the archive is useless. This may be caused by user loss or data
+corruption.</li>
+        <li>A lonly slice is not usable, unless the archive has only
+one slice (of course). Thus one cannot test a single slice, one cannot
+recover a file from an orphan slice.<br>
+        </li>
+      </ul>
+Theses drawbacks have appeared with dar's usage and not at design time
+unfortunately. Thus several things have to be taken into account to
+improve dar on theses points:<br>
+      <ul>
+        <li>backward compatibility (dar must be able to read old
+archives)</li>
+        <li>do not break any interesting feature implemented by design</li>
+      </ul>
+To address the first drawback listed above (prevent catalogue loss),
+      <a href="index.html#Tools_sites">Parchive</a> has been proposed
+and is a quite good solution. OK, the Parchive features
+should be one day available from a library thus a closer dar-Parchive
+integration should be possible in the future and dar_par.dcf and other
+scripts should on day be abandoned.<br>
+      <br>
+The second point (autonomous slices) is more difficult to address for
+the following reasons: To be able to use a single slice out of a large
+archive, the slice must contain a list of its contents, thus a part of
+the
+catalogue that correspond to the files in this given slice. Several
+problem
+arise then:<br>
+      <ul>
+        <li>How to know at what portion of the archive to start dumping
+the catalogue portion? Yep, the slice get filled file after file but
+before the slice get fulfilled it must be time to store the slice's
+contents. This slice contents depends on filenames length, date length,
+number of file in the slice, presence or absence of EA, offset in the
+slice... The algorithm to define when to stop saving file and to start
+dumping the catalogue portion should exist but slice size will suffer
+of a certain imprecision.</li>
+      </ul>
+      <div style="margin-left: 40px;">Example, the catalogue portion to
+dump is still smaller than the available space in the slice, but the
+next file's size + catalogue portion is larger than the available space
+in the slice, what do we do? Do we just drop the catalogue portion
+having a slice much smaller than the expected size? Do we partially
+write the next file and then drop the slice contents ignoring that
+file? Do we partially write the next file and drop the slice contents
+adding this file in the slice contents? <br>
+      </div>
+      <ul>
+        <li>Following the previous example, if the 'next' file is to be
+compressed it may seem it will not fit int the remaining space of the
+slice while it may fit if the compression worked well on its data. To
+complicate a bit more in the opposite way encryption may lead to store
+more data than the expected file size... Difficult in theses terms to
+know in advance what to do when reaching the end of a slice.<br>
+        </li>
+      </ul>
+      <ul>
+        <li>Now, we have seen that at each slice boundary there is a
+high probability to have a file be split between two slices... The
+question is&nbsp; how to handle theses files? They cannot be restored
+neither from the first nor from the second slice, I guess ignoring
+theses files from slice contents (and only having them at archive
+contents) is the best way. Then, any huge file which may be stored
+across several dozen slices for example will not be possible to
+restore unless you have the overall archive contents (as it is today).
+Last point in
+that direction, slices containing the middle part of huge file will be
+useless alone, and their contents would report nothing.<br>
+        </li>
+      </ul>
+      <ul>
+        <li>From the contents of the overall archive (today's
+catalogue) the location of
+each file's data location is recorded as the offset from the beginning
+of the archive (as if the archive was a single slice). This sort of
+index is not usable from what would be an slice contents. Instead a
+second type of offset should be recorded in the slice content, this
+type must be a slice relative offset ...<br>
+        </li>
+      </ul>
+      <ul>
+        <li>But now, with all this slice relative information, if we
+reslice an archive the slice's contents will become anywhere int the
+slice, two slice contents may arrive in the same slice or some slice
+may
+lack of slice contents. Moreover the offset used to locate file's data
+will become wrong as the slice boundary will have changed, and next,
+the
+slice content will be wrong too as some file which were on the same
+slice may now be separated by several slices. Last the files we ignored
+becaused they were stored acrossed two slices could become plain usable
+files from a single slice... how then to take care of them?<br>
+        </li>
+      </ul>
+      <ul>
+        <li>As last point, there is a very important implementation
+aspect. If you want to have a robust program you have to build it with
+as
+much as possible different independent group of code. Theses groups of
+indepedent code
+may be a single function, a module (= a set of function gathered in a
+single file + header file), a class (Object Oriented concept), a
+library and so on. Each group provide a well defined interface and hide
+its internals from the outside. This principle is at the root of
+software engineering, an leads to robust programs, portable programs,
+easy to maintain programs, evolutif programs, easy to read and
+documented programs, and so on. <br>
+        </li>
+      </ul>
+      <div style="margin-left: 40px;">Dar has been built wuth this
+principle in mind, it is a set of C++ classes and a few C-like modules.
+In particular
+one class is responsible of managing the archive slicing while another
+is responsible to defining the archive global layout (some other
+classes are for compression, encryption, file filtering, and so on).
+Theses two first classes (slicing and archive layout) are completely
+independent, the slicing class's well defined interface is to provide a
+normal arbitrary long virtual file where to read or write data. Data
+read or wrote to this virtual file is then stored in different smaller
+files: the slices. Thus to the point of view of the archive layout
+class, the archive is always stored in single file (even when the
+archive is sliced). The Archive layout cannot have any information
+about slices size or offset within a slice, this let the two things
+independents. One big advantage of this approach is that reslicing an
+archive is just a data copy from first slicing class to a second
+slicing class with different parameters set (slice size, first slice
+size), in short this is was dar_xform does. There is no need to
+interpret the copied data, thus to decrypt
+or decompress it, then to compress it back and encrypt it again, which
+saves a lot of CPU cycles and thus time.<br>
+      <br>
+      </div>
+In conclusion, the contents slice by slice is rather incompatible with
+dar's design, the catalogue protection as well as each slice protection
+can instead be achieved with Parchive, with some very good results. If
+you have any comments on this explanation, you are welcome to let us
+know on th<span style="font-weight: bold;">e dar-discussion mailing-list</span>.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
 <br>
 </center>
 </body>

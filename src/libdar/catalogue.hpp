@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.48.2.1 2006/01/24 17:04:57 edrusb Rel $
+// $Id: catalogue.hpp,v 1.48.2.2 2006/10/22 19:16:03 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -193,16 +193,18 @@ namespace libdar
 	infinint get_device() const { return *fs_dev; };
 
         bool same_as(const inode & ref) const;
-        virtual bool is_more_recent_than(const inode & ref, const infinint & hourshift,
-					 comparison_fields what_to_check) const;
+        bool is_more_recent_than(const inode & ref, const infinint & hourshift) const;
+	    // used for RESTORATION
         virtual bool has_changed_since(const inode & ref, const infinint & hourshift, comparison_fields what_to_check) const;
             // signature() left as an abstract method
             // clone is abstract too
+	    // used for INCREMENTAL BACKUP
         void compare(user_interaction & dialog, const inode &other, const mask & ea_mask, comparison_fields what_to_check) const;
             // throw Erange exception if a difference has been detected
             // this is not a symetrical comparison, but all what is present
             // in the current object is compared against the argument
             // which may contain supplementary informations
+	    // used for DIFFERENCE
 
 
 
@@ -286,7 +288,6 @@ namespace libdar
         ~file() { detruit(); };
 
         void dump(user_interaction & dialog, generic_file & f) const;
-        bool is_more_recent_than(const inode & ref, const infinint & hourshift, inode::comparison_fields what_to_check) const;
         bool has_changed_since(const inode & ref, const infinint & hourshift, inode::comparison_fields what_to_check) const;
         infinint get_size() const { return *size; };
         infinint get_storage_size() const { return *storage_size; };

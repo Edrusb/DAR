@@ -85,6 +85,13 @@ algorithm?</a><br>
 options can I use with which options?</span></span></a><br>
       <a style="font-style: italic; font-weight: bold;" href="#A14">Why
 dar reports corruption for the archive I have transfered with FTP ?</a><br>
+      <a href="#UIDGID"><span
+ style="font-weight: bold; font-style: italic;">Why DAR does save
+UID/GID
+instead of plain usernames and usergroups?</span></a><br>
+      <a style="font-style: italic;" href="#Dar_Manager_encrypted"><span
+ style="font-weight: bold;">Dar_Manager does not accept
+encrypted archives, how to workaround this?</span></a><br>
       <a href="#A13"><span
  style="font-weight: bold; font-style: italic;"> </span></a><br>
       <h2><span style="text-decoration: underline;">Answers:</span><br>
@@ -1181,6 +1188,260 @@ to be sure you can delete the original file.</p>
     </tr>
   </tbody>
 </table>
+<br>
+<table
+ style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="text-align: justify;"> <span
+ style="font-weight: bold; font-style: italic;">Why DAR does save <a
+ name="UIDGID"></a>UID/GID
+instead of plain usernames and usergroups?</span>
+      <p>In each file property there is
+not present the name of the owner nor the name of the group owner, but
+instead are present two numbers, the user ID and the group ID (UID
+&amp; GID in short). In the /etc/password file theses numbers are
+associated names and other properties, like the login shell, the home
+directory, the password (see also /etc/shadow).
+Thus, when you do a directory list (with the 'ls' command for example
+or with any GUI program for another example), the listing application
+used
+does open each directory, there it finds a list of name and a inode
+number associated, then the listing program fetchs the inode attributes
+for each file and looks among other information for the UID and the
+GID. To be able
+to display the real user name and group name, the listing application
+calls a given standard C library call that will do the lookup in
+/etc/password, eventually NIS system if configured and any other
+additional
+system, [this way applications have not to bother with the many system
+configuration possible, the same API interface is used whatever is the
+system], then lookup returns the name if it exist and the listing
+application display for each
+file found in a directory the attributes and the user name and group
+name as returned by the system.<br>
+      </p>
+      <p>As you can see, the user name and
+group name are not part of any file attribute, but UID and GID *are*
+instead. Dar is a backup tool mainly, it does preserve at much as
+possible the files property to be able to restore them as close as
+possible
+to their original state. Thus a file saved with UID=3 will be restored
+with UID=3. The name corresponding the UID 3 may exist or not,&nbsp;
+may exist and be the same or may exist and be different, the file will
+be anyway restored in UID 3.<br>
+      </p>
+      <span style="text-decoration: underline;">Scenario with dar's way
+of restoring</span><br>
+      <p style="margin-left: 40px;">Thus, when doing backup and
+restoration of a crashed system you can be confident, the restoration
+will not interfere with the bootable system you have used to launch dar
+to restore your disk. Assuming you have UID 1 labeled <span
+ style="font-style: italic;">'bin'</span> in your
+real crashed system, but this UID 1 is labeled <span
+ style="font-style: italic;">'admin'</span> in the boot
+system, while UID 2 is labeled <span style="font-style: italic;">'bin'</span>
+in this boot system, files owned
+by <span style="font-style: italic;">bin</span> in the system to
+restore will be restored under UID 1, not UID 2
+which is used by the temporary boot system. At that time after
+restoration still running the from the boot system, if you do a 'ls'
+you will see that the original files
+owned by <span style="font-style: italic;">'bin'</span> are now owned
+by user <span style="font-style: italic;">'admin'.</span> <br>
+      </p>
+      <p style="margin-left: 40px;">This is really a mirage: in your
+restoration you will also restore the <span style="font-style: italic;">/etc/password</span>
+file and other
+system configuration files (like NIS configuration files if they have
+been used),
+then at reboot time on the newly restored real system, the UID 1 will
+be backed associated to user <span style="font-style: italic;">'bin'</span>
+as expected and files originally owned by user <span
+ style="font-style: italic;">bin</span> will now been listed as owned
+by <span style="font-style: italic;">bin</span> as expected.<br>
+      </p>
+      <span style="text-decoration: underline;"></span><span
+ style="text-decoration: underline;">Scenario with plain name way of
+restoring</span>
+      <p style="margin-left: 40px;">If dar had done else, restoring
+the files owned by <span style="font-style: italic;">'bin'</span> to
+the UID corresponding to <span style="font-style: italic;">'bin',</span>
+theses
+files would have been given UID 2 (the one used by the temporary
+bootable system used to launch dar). But once the real restored system
+would
+have been launched, this UID 2 would have become some other user and
+not <span style="font-style: italic;">'bin'</span> which is mapped to
+UID 1 in the restored <span style="font-style: italic;">/etc/password.</span><br>
+      </p>
+      <p>Now, if you want to change some UID/GID when moving a set of
+files from
+one live system to another system, there is no problem if you are <span
+ style="font-weight: bold;">not</span>
+restoring dar under the <span style="font-style: italic;">'root'</span>
+account. Other account than <span style="font-style: italic;">'root'</span>
+are
+usually not allowed to modify UID/GID, thus restored files by dar will
+have group and user ownership of the dar process, which is the one that
+has launched dar.<br>
+      </p>
+      <p>But if you really need to move a
+directory tree containing a set of files with different ownership and
+you want to preserve theses different ownership from one live system to
+another, while the corresponding UID/GID do not match between the two
+system, dar can still help you:<br>
+      </p>
+      <ul>
+        <li>Save your directory tree on the source live system</li>
+        <li>From the root account in the destination live system do the
+following:</li>
+        <li>restore the archive in a empty directory</li>
+        <li>change the UID of files according to the one used by the
+destination filesystem with the command:</li>
+      </ul>
+      <div style="margin-left: 80px;">find /path/to/restored/archive
+-uid &lt;old UID&gt;&nbsp; -print -exec chown &lt;new name&gt; {} \;<br>
+      <br>
+      </div>
+      <div style="margin-left: 80px;">find /path/to/restored/archive
+-gid &lt;old GID&gt; -print -exec chgrp &lt;new name&gt; {} \;<br>
+      <br>
+      </div>
+The first command will let you remap an UID to another for all files
+under the /path/to/restored/archive directory<br>
+The second command will let you remap a GID to another for all files
+under the /path/to/restored/archive directory<br>
+      <br>
+      <span style="text-decoration: underline;">Example on how to
+globally modify ownership of a directory tree user by user</span><br>
+      <br>
+      <div style="margin-left: 40px;">For example, you have on the <span
+ style="font-weight: bold;">source</span> system three users: Pierre
+(UID
+100), Paul (UID 101), Jacques (UID 102)<br>
+but on the <span style="font-weight: bold;">destination</span> system,
+theses same users are mapped to
+different UID: Pierre has UID 101, Paul has UID 102 and Jacques has UID
+100.<br>
+      <br>
+We temporary need an unused UID on the destination system, we will
+assume UID 680 is not used. Then after the archive restoration in the
+directory /tmp/A we will do the following:<br>
+      <br>
+      </div>
+      <div style="margin-left: 80px;">find /tmp/A -uid 100 -print -exec
+chown 680 {} \;<br>
+find /tmp/A -uid 101 -print -exec chown pierre {} \;<br>
+find /tmp/A -uid 102 -print -exec chown paul {} \;<br>
+find /tmp/A -uid 680 -print -exec chown jacques&nbsp; {} \;<br>
+      <br>
+which is:<br>
+change files of UID 100 to UID 680 (the files of Jacques are now under
+the temporary UID 680 and UID 100 is now freed)<br>
+change files of UID 101 to UID 100 (the files of Pierre get their UID
+of the destination live system, UID 101 is now freed)<br>
+change files of UID 102 to UID 101 (the files of Paul get their UID of
+the destination live system, UID 102 is now freed)<br>
+change files of UID 680 to UID 102 (the files of Jacques which had been
+temporarily moved to UID 680 are now set to their UID on the
+destination live system, UID 680 is no more used).<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px;">You can then move the modified
+files to appropriated destination or
+make a new dar archive to be restored in appropriated place if you want
+to use some of dar's feature like for example only restore files that
+are more recent than those present on filesystem.<br>
+      <br>
+      <br>
+      <br style="font-weight: bold;">
+      </div>
+      <span style="font-weight: bold;"><a name="Dar_Manager_encrypted"></a>Dar_Manager
+does not accept
+encrypted archives, how to workaround this?</span><br>
+      <br>
+Yes, that's true, dar_manager does not accept encrypted archives. The
+first reason is that while dar_manager database cannot be encrypted
+this is not very fair to add them encrypted archives. The second reason
+is because the dar_manager database should hold the key for each
+encrypted archive making this archive the weakest point in your the
+data security: Breaking the database encryption would then provide
+access to any encryption key, and with original archive access it would
+bring access to data of any of the archive added to the database.<br>
+      <br>
+OK, there is however a feature in the pipe to provide to dar_manager
+the support to encrypt its archives, then next another feature to
+provide dar_manager the possibility to store the different archive
+keys, then is needed another feature to have key being passed from
+dar_manager to dar out of command-line (which would expose the keys to
+the sight of other users on your multi-user system), then yet another
+feature to be able to feed the database with the archive keys also
+without using the command-line. ... well there is a lot of feature to
+add and test before you can expect finding it in a released version of
+dar.<br>
+      <br>
+In the meanwhile, you can proceed as follows:<br>
+      <ul>
+        <li>isolate your encrypted archive to unencrypted 'extracted
+catalogue': Do not use the -K option while isolating, you will however
+need to use the -J option to let dar able to read the encrypted
+archive. Note that still for key protection, you are encouraged to use
+a DCF (Dar Command File, which&nbsp; is a plain file with a list of
+options to be passed to dar) file with restricted permissions and
+containing the '-J &lt;key&gt;' option to be passed for dar. The dar's
+-B option would then receive this filename. this will avoid other users
+of your system to have a chance to read the key you have used for your
+archives,<br>
+        </li>
+        <li>add theses extracted catalogue to the dar_manager database
+of your choice,</li>
+        <li>change the name and path of the added catalogue to point to
+your real encrypted archives (-b and -p options of dar_manager).</li>
+      </ul>
+Note that the database is not encrypted this will expose the archive
+file listing (not the file's contents) of your encrypted archives to
+anyone able to read the database, thus it is recommended to set
+restrictive permission to this database file.<br>
+      <br>
+When will come the time to use dar_manager to restore some file, you
+will have to make dar_manager pass the key to dar for it be able to
+restore the needed files from the archive. This can be done in several
+ways: dar_manager's command-line, dar_manager database or dar.dcf file.
+      <br>
+      <ol>
+        <li>dar_manager's command-line: simply pass the -e "-K
+&lt;key&gt;" to dar_manager . Note that this will expose the key twice:
+on dar_manager's command-line and on dar's command-line.<br>
+        </li>
+        <li>dar_manager database: the database can store some constant
+command to be passed to dar. This is done using the -o option, or the
+-i option. The -o option exposes the arguments you want to be passed to
+dar because they are on dar_manager command-line. While the -i option,
+let you do the same thing but in an interactive manner, this is a
+better choice. However, if -i option it is a safe way to feed the
+dar_manager database with the '-K &lt;key&gt;' option to be passed to
+dar, this option will be received by dar on command-line. Thus still
+the key will be visible by other users on your same system.</li>
+        <li>The last and best way is to use a DCF file with restrictive
+permission. This one will receive the '-K &lt;key&gt;' option for dar
+to be able to read the encrypted archives. And dar_manager will ask dar
+to read this file thanks to the '-B &lt;filename&gt;' option you will
+have give either on dar_manager's command-line (-e -B &lt;filename&gt;
+...) or from the stored option in the database (-o -B &lt;filename&gt;).<br>
+        </li>
+      </ol>
+note that you must prevent other users reading any file holding the
+archive key, this covers the dar_manager database as well as the DCF
+files you could temporarily use. Second note, in this workaround
+approach we have assumed that all encrypted archive do share the same
+key.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
 <br>
 </div>
 </div>
