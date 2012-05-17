@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.hpp,v 1.32 2006/01/08 16:33:42 edrusb Rel $
+// $Id: archive.hpp,v 1.32.2.1 2007/04/05 18:58:36 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -439,6 +439,9 @@ namespace libdar
 	    /// dialog object nothing will get sent back to the user
 	bool get_children_of(user_interaction & dialog,
 			     const std::string & dir);
+
+	    /// retrieving statistics about archive contents
+	const entree_stats get_stats() const { if(cat == NULL) throw SRC_BUG; return cat->get_stats(); };
 
 	    /// gives access to internal catalogue (not to be used from the API)
 

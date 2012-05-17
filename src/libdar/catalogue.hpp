@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.48.2.2 2006/10/22 19:16:03 edrusb Rel $
+// $Id: catalogue.hpp,v 1.48.2.3 2007/02/26 18:29:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -756,6 +756,10 @@ namespace libdar
 
         infinint update_destroyed_with(catalogue & ref);
             // ref must have the same root, else the operation generates an exception
+
+	void update_absent_with(catalogue & ref);
+	    // in case of abortion, complete missing files as if what could not be
+	    // inspected had not changed since the reference was done
 
         void dump(generic_file & ref) const;
         void listing(const mask &m = bool_mask(true), bool filter_unsaved = false, std::string marge = "") const;

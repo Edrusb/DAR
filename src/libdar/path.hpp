@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.hpp,v 1.9 2005/11/01 21:54:35 edrusb Rel $
+// $Id: path.hpp,v 1.9.2.1 2007/06/21 20:47:12 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -52,7 +52,7 @@ namespace libdar
 
 	    //! This realizes the string to path convertion function
 	    //! \note empty string is not a valid string (exception thrown)
-        path(std::string s);
+        path(const std::string & s);
 
 	    /// constructor from a char *
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.6 2007/02/17 20:58:38 edrusb Rel $
+// $Id: tools.cpp,v 1.54.2.7 2007/06/21 19:40:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -299,7 +299,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.54.2.6 2007/02/17 20:58:38 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.54.2.7 2007/06/21 19:40:37 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1713,5 +1713,16 @@ namespace libdar
 
 	return ret;
     }
+
+
+    void tools_memxor(void *dest, const void *src, size_t n)
+    {
+	unsigned char *d = (unsigned char *) dest;
+	const unsigned char *s = (const unsigned char *) src;
+
+	for (size_t i = 0; i < n; i++)
+	    *d++ ^= *s++;
+    }
+
 
 } // end of namespace

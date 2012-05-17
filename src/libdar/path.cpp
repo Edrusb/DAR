@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.cpp,v 1.13 2005/11/09 18:31:53 edrusb Rel $
+// $Id: path.cpp,v 1.13.2.1 2007/06/21 20:47:12 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -34,22 +34,31 @@ namespace libdar
 
     static bool path_get_root(string & p, string & root);
 
-    path::path(string s)
+    path::path(const string & chem)
     {
         string tmp;
+	string s = chem;
 
-        dirs.clear();
-        if(s.size() < 1)
-            throw Erange("path::path", gettext("Empty string is not a valid path"));
-        relative = s[0] != '/';
-        if(!relative)
-            s = string(s.begin()+1, s.end()); // remove the leading '/'
-        while(path_get_root(s, tmp))
-            dirs.push_back(tmp);
-        if(dirs.size() == 0 && relative)
-            throw Erange("path::path", gettext("Empty string is not a valid path"));
-        reduce();
-        reading = dirs.begin();
+	try
+	{
+	    dirs.clear();
+	    if(s.size() < 1)
+		throw Erange("path::path", gettext("Empty string is not a valid path"));
+	    relative = s[0] != '/';
+	    if(!relative)
+		s = string(s.begin()+1, s.end()); // remove the leading '/'
+	    while(path_get_root(s, tmp))
+		dirs.push_back(tmp);
+	    if(dirs.size() == 0 && relative)
+		throw Erange("path::path", gettext("Empty string is not a valid path"));
+	    reduce();
+	    reading = dirs.begin();
+	}
+	catch(Erange & e)
+	{
+	    string e_tmp = e.get_message();
+	    throw Erange("path::path", tools_printf(gettext("%S is an not a valid path: %S"), &chem, &e_tmp));
+	}
     }
 
     path::path(const path & ref)
@@ -186,7 +195,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: path.cpp,v 1.13 2005/11/09 18:31:53 edrusb Rel $";
+        static char id[]="$Id: path.cpp,v 1.13.2.1 2007/06/21 20:47:12 edrusb Rel $";
         dummy_call(id);
     }
 

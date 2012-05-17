@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: crypto.hpp,v 1.8 2006/01/08 16:33:42 edrusb Rel $
+// $Id: crypto.hpp,v 1.8.2.1 2007/06/21 19:40:37 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -40,6 +40,7 @@ extern "C"
 #include <string>
 
 #include "tronconneuse.hpp"
+#include "header_version.hpp"
 
 namespace libdar
 {
@@ -64,7 +65,8 @@ namespace libdar
     class blowfish : public tronconneuse
     {
     public:
-	blowfish(user_interaction & dialog, U_32 block_size, const std::string & key, generic_file & encrypted_side);
+	blowfish(user_interaction & dialog, U_32 block_size, const std::string & password, generic_file & encrypted_side,
+		 const dar_version & reading_ver);
 	    // destructor does not seems to be required for BF_KEY
 
     protected:
@@ -79,11 +81,18 @@ namespace libdar
 
     private:
 #if HAVE_OPENSSL_BLOWFISH_H
-	BF_KEY clef;
+	BF_KEY clef;       //< used to encrypt/decrypt the data
+	BF_KEY essiv_clef; //< used to build the Initialization Vector
 #endif
+	dar_version x_reading_ver;
 
 	void make_ivec(const infinint & ref, unsigned char ivec[8]);
-
+	std::string pkcs5_pass2key(const std::string & password,         //< human provided password
+				   const std::string & salt,             //< salt string
+				   U_I iteration_count,                  //< number of time to shake the melange
+				   U_I output_length);                   //< length of the string to return
+	void dar_set_key(const std::string & key);                       //< assign both keys from the given (hash) string
+	void self_test(void);
     };
 
 } // end of namespace

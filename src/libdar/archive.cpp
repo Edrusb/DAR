@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.cpp,v 1.40.2.2 2006/01/19 14:42:47 edrusb Rel $
+// $Id: archive.cpp,v 1.40.2.4 2007/06/21 19:40:37 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -402,7 +402,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: archive.cpp,v 1.40.2.2 2006/01/19 14:42:47 edrusb Rel $";
+        static char id[]="$Id: archive.cpp,v 1.40.2.4 2007/06/21 19:40:37 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -1085,7 +1085,7 @@ namespace libdar
 			scram = new scrambler(dialog, real_pass, *level1);
 			break;
 		    case crypto_blowfish:
-			scram = new blowfish(dialog, crypto_size, real_pass, *level1);
+			scram = new blowfish(dialog, crypto_size, real_pass, *level1, macro_tools_supported_version);
 			break;
 		    case crypto_none:
 			zip_base = level1;
@@ -1201,7 +1201,10 @@ namespace libdar
 		{
 		    if(info_details)
 			dialog.warning(gettext("Adding reference to files that have been destroyed since reference backup..."));
-		    st_ptr->add_to_deleted(cat->update_destroyed_with(*ref_cat1));
+		    if(aborting)
+			cat->update_absent_with(*ref_cat1);
+		    else
+			st_ptr->add_to_deleted(cat->update_destroyed_with(*ref_cat1));
 		}
 
 		if(info_details)

@@ -1,3 +1,10 @@
+version 2.3.4
+--------------
+Thanks once again to Jo (aka Jo - ex-bart) for feedback and clean scenario
+to reproduce an unexpected behavior. Thanks to Norman J Davis for bug
+and patch feedback. Johnathan Burchill for feedback. Thanks to
+Dwayne C. Litzenberger for feedback and patch.
+
 version 2.3.3
 --------------
 Thanks to  Mike P. for bug feedback. Thanks to  "Jo - ex-bart" for feedback
@@ -43,7 +50,8 @@ Thanks to Markus Kamp for German Translation
 
 version 2.2.6
 -------------
-Thanks to Gerald Britton and Halfgaar for reporting bug problem.
+Thanks to Gerald Britton and Halfgaar (Wiebe Cazemier) for reporting bug
+problem.
 
 version 2.2.5
 --------------

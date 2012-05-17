@@ -511,3 +511,18 @@ from 2.3.2 to 2.3.3
 - verbose output did not displayed hard links information
 - merged patch on dar_cp by Andrea Palazzi to have it to return EXIT_DATA_ERROR
   when some data have been reported [SF #1622913]
+
+from 2.3.3 to 2.3.4
+- fixed behavior when differential backup is interrupted (no more store file that
+  would have been read if no interruption had been done as "deleted" since the
+  archive of reference) [SF #1669091].
+- added official method to access catalogue's statistics through the API (for kdar
+  next version).
+- Fixed syntax error in dar_par_create.duc and dar_par_test.duc files (Parchive
+  integration with dar).
+- minor spelling fix in error message (compressor.cpp)
+- added Wiebe Cazemier's two patches for dar man page
+- integrated patch from Dwayne C. Litzenberger to fix weakness in dar's
+  implementation of the blowfish encryption.
+- improved the returned message when an invalid path is given as argument
+- updated doc/sample/sample1.txt script file

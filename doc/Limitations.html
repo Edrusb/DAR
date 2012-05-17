@@ -1,23 +1,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content="text/html; charset=ISO-8859-1"
- http-equiv="content-type">
-  <title>DAR's Limitations</title>
-</head>
-<body
- style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);"
- link="#0000ff" vlink="#000055" alink="#ff0000">
+<html><head>
+
+
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Limitations</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; width: 161px;"><a
- href="index.html"><img
- style="border: 0px solid ; width: 160px; height: 120px;"
- alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
+      <td style="vertical-align: top; width: 161px;"><a href="index.html"><img style="border: 0px solid ; width: 160px; height: 120px;" alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
       </td>
       <td style="vertical-align: top;">
       <h1 style="text-align: center;"><br>
@@ -30,9 +20,7 @@
 <br>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">Here follows a description of
@@ -130,7 +118,7 @@ instead the getopt function proposed from the standard library does not
 support long options, nor optional arguments. On such system you will
 have to use short options only, and to overcome the lack of optional
 argument you need to explicitly set the argument. For example in place
-of "-z" use "-z 9" and so on. All options for dar's features are
+of "-z" use "-z 9" and so on (see <a href="man/index.html">dar's man page</a> section "EXPLICIT OPTIONAL ARGUMENTS"). All options for dar's features are
 available with FreeBSD's getopt, just using short options and explicit
 arguments.<br>
       </div>
@@ -141,8 +129,16 @@ separated library called libgnugetopt. If the include file
 &lt;getopt.h&gt; is also available, the configure script will detect it
 and use this library. This way you can have long options on FreeBSD for
 example.<br>
-      </div>
       <br>
+Another point concerns the comand line length limitation. All system
+(correct me if I am wrong) do limit the size of the command line. If
+you want to add more options to dar than your system can afford, you
+can use the -B option instead an put all dar's arguments (or just some
+of them) in the file pointed to by this -B option. -B can be used
+several times on command line and is recursive (you can use -B from a
+file read by -B option).<br>
+      </div>
+      
       <h3 style="text-align: justify;">Dates</h3>
 Unix files have three dates :<br>
       <ul style="text-align: justify;">
@@ -150,9 +146,9 @@ Unix files have three dates :<br>
         <li>last access date (atime)</li>
         <li>last inode change (ctime)</li>
       </ul>
-      <div style="text-align: justify;">In dar dates are stored as
+      <div style="text-align: justify;">In dar, dates are stored as
 integers (the number of seconds elapsed
-since Jan 1st, 1970). As seen above, the limitation is not due to dar
+since Jan 1st, 1970) as Unix systems do. As seen above, the limitation is not due to dar
 but on the integer used, so if you use infinint, you should be able to
 store any date as far in the future as you want. Of course dar cannot
 stores dates before Jan the 1st of 1970, but it should not be a very
@@ -162,10 +158,10 @@ big problem. ;-)<br>
       <div style="text-align: justify;">There is no standard way under
 Unix
 to change the ctime. So DAR does not save ctime date (except when
-saving EA) nor it tries can restore it. Reading a file (when doing a
+saving EA) nor it can restore it. Reading a file (when doing a
 backup or a comparison) updates the atime of the read files. Some
 applications like leafnode (an NNTP cache) base their expiry time on
-the atime. So since the beginning and still by default, dar sets back
+the atime. So since the beginning (up to 2.3.x releases), dar sets back
 the atime of file it reads. But changing the atime updates the ctime,
 which cannot be set back to its original value. As the ctime was not
 taken in account this was not a problem to me until I got feedback that
@@ -173,7 +169,7 @@ some security tool base their inspection on the ctime (A file that had
 the ctime changed is most probably changed, in particular if the atime
 has not changed, this may indicate a dissimulation). So there is now a
 special mode in which dar does not try to set back the atime of files
-which preserves the ctime.<br>
+which preserves the ctime (see -aa and -ac option in <a href="man/index.html">dar's man page</a>). Starting release 2.4.0, by default dar will not set back the atime and thus preserves the ctime.<br>
       </div>
       </td>
     </tr>
@@ -183,5 +179,5 @@ which preserves the ctime.<br>
 <br>
 <br>
 </center>
-</body>
-</html>
+
+</body></html>

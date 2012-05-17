@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_blowfish.cpp,v 1.4 2005/09/11 19:01:16 edrusb Rel $
+// $Id: test_blowfish.cpp,v 1.4.2.1 2007/06/21 19:40:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -48,6 +48,7 @@ extern "C"
 #include "shell_interaction.hpp"
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"
+#include "macro_tools.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -84,7 +85,7 @@ void f1(user_interaction *dialog)
 {
     int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
     fichier fic = fichier(*dialog, fd);
-    blowfish bf = blowfish(*dialog, 10, string("bonjour"), fic);
+    blowfish bf = blowfish(*dialog, 10, string("bonjour"), fic, macro_tools_supported_version);
     char buffer[100] = "bonjour les amis il fait chaud il fait beau ! ";
 
     bf.write(buffer, strlen(buffer));
@@ -96,7 +97,7 @@ void f1(user_interaction *dialog)
 void f2(user_interaction *dialog)
 {
     fichier fic = fichier(*dialog, "toto", gf_read_only);
-    blowfish bf = blowfish(*dialog, 10, string("bonjour"), fic);
+    blowfish bf = blowfish(*dialog, 10, string("bonjour"), fic, macro_tools_supported_version);
     char buffer[100];
     S_I lu;
     bool ret;

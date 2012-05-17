@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.16.2.1 2006/10/21 20:39:41 edrusb Rel $
+// $Id: compressor.cpp,v 1.16.2.2 2007/04/25 20:10:04 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -376,7 +376,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: compressor.cpp,v 1.16.2.1 2006/10/21 20:39:41 edrusb Rel $";
+        static char id[]="$Id: compressor.cpp,v 1.16.2.2 2007/04/25 20:10:04 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -428,7 +428,7 @@ namespace libdar
         case bzip2:
             return 'y';
         default :
-            throw Erange("char2compression", gettext("unknown compression"));
+            throw Erange("compression2char", gettext("unknown compression"));
         }
     }
 
@@ -445,7 +445,7 @@ namespace libdar
         case bzip2 :
             return "bzip2";
         default :
-            throw Erange("compresion2char", gettext("unknown compression"));
+            throw Erange("compresion2string", gettext("unknown compression"));
         }
     }
 

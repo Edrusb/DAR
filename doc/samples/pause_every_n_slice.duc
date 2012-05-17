@@ -9,7 +9,7 @@
 # will be done.
 #
 
-if [ "$1" = "" -a "$2" = "" -a "$3" = "" -a "$4" == "" -a "$6" == "" ]; then
+if [ "$1" = "" -a "$2" = "" -a "$3" = "" -a "$4" = "" -a "$6" = "" ]; then
   echo "usage: $0 <path> <basename> <slice number> <extension> <context(not used)> <pause every this number of slices>"
   exit 1
 fi

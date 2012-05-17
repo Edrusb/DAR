@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.47.2.5 2007/02/17 20:58:38 edrusb Rel $
+// $Id: catalogue.cpp,v 1.47.2.6 2007/02/26 18:29:53 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -2426,6 +2426,105 @@ namespace libdar
 	return count;
     }
 
+    void catalogue::update_absent_with(catalogue & ref)
+    {
+       	directory *current = contenu;
+	nomme *ici;
+	const entree *projo;
+	const eod *pro_eod;
+	const directory *pro_dir;
+	const detruit *pro_det;
+	const nomme *pro_nom;
+	const inode *pro_ino;
+
+	ref.reset_read();
+	while(ref.read(projo))
+	{
+	    pro_eod = dynamic_cast<const eod *>(projo);
+	    pro_dir = dynamic_cast<const directory *>(projo);
+	    pro_det = dynamic_cast<const detruit *>(projo);
+	    pro_nom = dynamic_cast<const nomme *>(projo);
+	    pro_ino = dynamic_cast<const inode *>(projo);
+
+	    if(pro_eod != NULL)
+	    {
+		directory *tmp = current->get_parent();
+		if(tmp == NULL)
+		    throw SRC_BUG; // reached root for "contenu", and not yet for "ref";
+		current = tmp;
+		continue;
+	    }
+
+	    if(pro_det != NULL)
+		continue;
+
+	    if(pro_nom == NULL)
+		throw SRC_BUG; // neither an eod nor a nomme! what's that?
+
+	    if(pro_ino == NULL)
+		throw SRC_BUG; // a nome that is not an inode nor a detruit!? What's that?
+
+	    if(!current->search_children(pro_ino->get_name(), ici))
+	    {
+		entree *clo_ent = NULL;
+		inode *clo_ino = NULL;
+		directory *clo_dir = NULL;
+		try
+		{
+		    clo_ent = pro_ino->clone();
+		    clo_ino = dynamic_cast<inode *>(clo_ent);
+		    clo_dir = dynamic_cast<directory *>(clo_ent);
+
+			// sanity checks
+
+		    if(clo_ino == NULL)
+			throw SRC_BUG; // clone of an inode is not an inode???
+		    if(clo_dir != NULL ^ pro_dir != NULL)
+			throw SRC_BUG; // both must be NULL or both must be non NULL
+
+			// converting inode to unsaved entry
+
+		    clo_ino->set_saved_status(s_not_saved);
+		    if(clo_ino->ea_get_saved_status() != inode::ea_none)
+			clo_ino->ea_set_saved_status(inode::ea_partial);
+
+			// adding it to the catalogue
+
+		    current->add_children(clo_ino);
+
+			// recusing in case of directory
+
+		    if(clo_dir != NULL)
+			if(current->search_children(pro_ino->get_name(), ici))
+			{
+			    if((void *)ici != (void *)clo_ent)
+				throw SRC_BUG;  // we have just added the entry we were looking for, but could found another one!?!
+			    current = clo_dir;
+			}
+			else
+			    throw SRC_BUG; // cannot find the entry we have just added!!!
+		}
+		catch(...)
+		{
+		    if(clo_ent != NULL)
+			delete clo_ent;
+		    throw;
+		}
+	    }
+	    else
+		if(pro_dir != NULL)
+		{
+		    directory *ici_dir = dynamic_cast<directory *>(ici);
+
+		    if(ici_dir != NULL)
+			current = ici_dir;
+		    else
+			ref.skip_read_to_parent_dir();
+		}
+	}
+    }
+
+
     void catalogue::listing(const mask &m, bool filter_unsaved, string marge) const
     {
 	cat_ui->printf(gettext("access mode    | user | group | size  |          date                 | [data ][ EA  ][compr] |   filename\n"));
@@ -2460,7 +2559,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: catalogue.cpp,v 1.47.2.5 2007/02/17 20:58:38 edrusb Rel $";
+	static char id[]="$Id: catalogue.cpp,v 1.47.2.6 2007/02/26 18:29:53 edrusb Rel $";
 	dummy_call(id);
     }
 

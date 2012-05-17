@@ -19,7 +19,7 @@
 #
 ###
 
-if [ "$1" = "" -a "$2" = "" -a "$3" = "" -a "$4" == "" -a "$5" == "" ]; then
+if [ "$1" = "" -a "$2" = "" -a "$3" = "" -a "$4" = "" -a "$5" = "" ]; then
   echo "usage: $0 <path> <basename> <slice number> <extension> <context>"
   echo "$0 tests and if necessary repairs the given slice using Parchive redundancy  files"
   exit 1

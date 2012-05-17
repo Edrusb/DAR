@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.39.2.3 2007/02/17 20:58:38 edrusb Rel $
+// $Id: tools.hpp,v 1.39.2.4 2007/06/21 19:40:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -502,6 +502,14 @@ namespace libdar
 	/// \note any < > & ' and " are replaced by adequate sequence for unicode
 	/// `note second point, nothing is done here to replace system native strings to unicode
     extern std::string tools_output2xml(const std::string & src);
+
+	/// Produces the in "dest" the XORed value of "src" for the 'n' first bytes
+
+	/// \param[out] dest is the area where to write down the result
+	/// \param[in] src points to vector or array of values to convert
+	/// \param[in] n is the number of byte to convert from src to dest
+	/// \note dest *must* be a valid pointer to an allocated memory area of at least n bytes
+    extern void tools_memxor(void *dest, const void *src, size_t n);
 
 } /// end of namespace
 

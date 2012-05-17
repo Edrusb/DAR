@@ -25,23 +25,32 @@ Moreover with differential backup,
 also stores files that have been deleted since the backup of reference. Thus, when restoring, first a full backup, then additional differential backups, at each restoration you get the exact state of the filesystem at the time of the backup. And of course, the reference backup may be a full or a differential backup itself.
 .PP
 .B dar
-is the first backup program I know that can also remove files during restoration! By the way, in this document, "archive" and "backup" design the same thing, and are used interchangeably.
+is the first backup program I know that can also remove files during restoration! By the way, in this document, "archive" and "backup" mean the same thing, and are used interchangeably.
 .PP
-At the difference of the
+Unlike the
 .B tar
 command,
 .B dar
-is not suited to directly use tapes. So keep using tar for tape archives. Because, even using tar to write a slice on a tape, you will loose all the interest of another feature of
+is not suited for directly writing to tapes. So keep using
+.B tar
+for tape archives. Because, even when using
+.B
+dar
+to write a slice on a tape, you will loose all the interest of another feature of
 .B dar
-which is its ability to directly access the data of saved file even when compression is used. This way and in contrast to the tar command, dar is able to extract a given file much faster from a backup and to also recover files that follow a data corruption (loosing just the file in which data corruption occurred).
+which is its ability to directly access any of the archived files, even when compression is used. This way, and in contrast to the
+.B tar
+command,
+.B dar
+is able to extract a given file much faster from a backup and to also recover files that follow a data corruption (loosing only the file in which data corruption has occurred).
 .PP
-This has of course its limitations, in particular when a data corruption occurs in the vital part of the backup, i.e. the few first bytes of each slice, and the last part of the archive (the catalogue). In case you need to store archive on a bad quality medium, you could protect each slice with a Parchive recovery file. (see NOTES for more information about Parchive, and how to transparently run Parchive from dar)
+This, of course, has its limitations, in particular when data corruption occurs in the vital part of the backup, i.e. the few first bytes of each slice or the last part of the archive (the catalogue). In case you need to store archives on a bad quality medium, you could protect each slice with a Parchive recovery file. (see NOTES for more information about Parchive, and how to transparently run Parchive from dar)
 .PP
-Slices have a base name given on the command line, which is completed by a dot, a number, a dot and the extension (dar) to form a filename. On command line you will never have to give the full file name of a slice.
+Slices have a base name given on the command line, which is completed by a dot, a number, a dot and the extension (dar) to form a filename. On the command line you will never have to give the full file name of a slice.
 .TP 20
 Let's take an example:
-considering the base name "joe", dar will make one or several slices during backup. Theses are files with the names joe.1.dar joe.2.dar ... joe.10.dar ... etc.
-If you want to extract, list, or use these backup as reference, you will only have to use the base name which is the string "joe" here.
+considering the base name "joe", dar will make one or several slices during backup process. The filenames with of theses slices are: joe.1.dar joe.2.dar ... joe.10.dar ... etc.
+If you want to extract, list, or use this backup as reference, you will only have to use the base name, which is the string "joe" in this example.
 
 .SH OPTIONS
 
@@ -64,7 +73,7 @@ lists the contents of the given backup. In general
 will only require the first and the last slice of the archive.
 .TP 20
 -t, --test [<path>/]<basename>
-checks the backup integrity. Even without compression, dar is able to detect at least one error by data file, thanks to a 16 bits CRC recorded in the catalogue. If one error occurred in file's data stored the archive, dar will report it in 100% of all cases. If two error occurred, dar will see them in 93,8% of all cases. If three error occurred, dar will see them in 100% of all cases. If four errors occurred, dar will see them in 90.6% of all cases, etc.
+checks the backup integrity. Even without compression, dar is able to detect at least one error per file in the archive, thanks to a 16 bits CRC recorded per file in the catalogue. If one error has occurred in a file stored in the archive, dar will report it in 100% of all cases. If two errors have occurred, dar will see them in 93,8% of the cases. If three errors occurred, dar will see them in 100% of the cases. If four errors have occurred, dar will see them in 90.6% of the cases, etc.
 .TP 20
 -d, --diff [<path>/]<basename>
 compares saved files in the backup with those in the filesystem.

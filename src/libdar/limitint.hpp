@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.hpp,v 1.18.2.1 2007/01/17 20:18:28 edrusb Rel $
+// $Id: limitint.hpp,v 1.18.2.2 2007/06/21 19:40:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -105,6 +105,9 @@ namespace libdar
 	template <class T> limitint power(const T & exponent) const;
         limitint & operator /= (const limitint & ref);
         limitint & operator %= (const limitint & ref);
+	limitint & operator &= (const limitint & ref);
+	limitint & operator |= (const limitint & ref);
+	limitint & operator ^= (const limitint & ref);
         limitint & operator >>= (U_32 bit);
         limitint & operator >>= (limitint bit);
         limitint & operator <<= (U_32 bit);
@@ -186,6 +189,12 @@ namespace libdar
     template <class B> limitint<B> operator >> (const limitint<B> & a, const limitint<B> & bit);
     template <class B> limitint<B> operator << (const limitint<B> & a, U_32 bit);
     template <class B> limitint<B> operator << (const limitint<B> & a, const limitint<B> & bit);
+    template <class B> limitint<B> operator & (const limitint<B> & a, U_32  bit);
+    template <class B> limitint<B> operator & (const limitint<B> & a, const limitint<B> & bit);
+    template <class B> limitint<B> operator | (const limitint<B> & a, U_32  bit);
+    template <class B> limitint<B> operator | (const limitint<B> & a, const limitint<B> & bit);
+    template <class B> limitint<B> operator ^ (const limitint<B> & a, U_32  bit);
+    template <class B> limitint<B> operator ^ (const limitint<B> & a, const limitint<B> & bit);
 
     template <class T> inline void euclide(T a, T b, T & q, T &r)
     {
@@ -514,6 +523,30 @@ namespace libdar
         E_END("limitint::operator <<=", "limitint");
     }
 
+    template <class B> limitint<B> & limitint<B>::operator &= (const limitint & arg)
+    {
+        E_BEGIN;
+        field &= arg.field;
+        return *this;
+        E_END("limitint::operator &=", "");
+    }
+
+    template <class B> limitint<B> & limitint<B>::operator |= (const limitint & arg)
+    {
+        E_BEGIN;
+        field |= arg.field;
+        return *this;
+        E_END("limitint::operator |=", "");
+    }
+
+    template <class B> limitint<B> & limitint<B>::operator ^= (const limitint & arg)
+    {
+        E_BEGIN;
+        field ^= arg.field;
+        return *this;
+        E_END("limitint::operator ^=", "");
+    }
+
     template <class B> U_32 limitint<B>::operator % (U_32 arg) const
     {
         E_BEGIN;
@@ -594,6 +627,8 @@ namespace libdar
             used_endian = little_endian;
         E_END("limitint::setup_endian", "");
     }
+
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -685,6 +720,61 @@ namespace libdar
         return ret;
         E_END("operator <<", "limitint");
     }
+
+    template <class B> limitint<B> operator & (const limitint<B> & a, U_32 bit)
+    {
+        E_BEGIN;
+        limitint<B> ret = a;
+        ret &= bit;
+        return ret;
+        E_END("operator &", "limitint");
+    }
+
+    template <class B> limitint<B> operator & (const limitint<B> & a, const limitint<B> & bit)
+    {
+        E_BEGIN;
+        limitint<B> ret = a;
+	ret &= bit;
+        return ret;
+        E_END("operator &", "limitint");
+    }
+
+    template <class B> limitint<B> operator | (const limitint<B> & a, U_32 bit)
+    {
+        E_BEGIN;
+        limitint<B> ret = a;
+        ret |= bit;
+        return ret;
+        E_END("operator |", "U_32");
+    }
+
+    template <class B> limitint<B> operator | (const limitint<B> & a, const limitint<B> & bit)
+    {
+        E_BEGIN;
+        limitint<B> ret = a;
+        ret |= bit;
+        return ret;
+        E_END("operator |", "limitint");
+    }
+
+    template <class B> limitint<B> operator ^ (const limitint<B> & a, U_32 bit)
+    {
+        E_BEGIN;
+        limitint<B> ret = a;
+        ret ^= bit;
+        return ret;
+        E_END("operator ^", "U_32");
+    }
+
+    template <class B> limitint<B> operator ^ (const limitint<B> & a, const limitint<B> & bit)
+    {
+        E_BEGIN;
+        limitint<B> ret = a;
+        ret ^= bit;
+        return ret;
+        E_END("operator ^", "limitint");
+    }
+
 
 } // end of namespace
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.19 2005/09/11 19:01:16 edrusb Rel $
+// $Id: real_infinint.cpp,v 1.19.2.1 2007/06/21 19:40:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -346,6 +346,68 @@ namespace libdar
         E_END("infinint::operator *=", "infinint");
     }
 
+    infinint & infinint::operator &= (const infinint & arg)
+    {
+	E_BEGIN;
+	if(! is_valid() || ! arg.is_valid())
+	    throw SRC_BUG;
+
+	make_at_least_as_wider_as(arg);
+
+	storage::iterator it_a = arg.field->rbegin();
+	storage::iterator it_res = field->rbegin();
+
+	while(it_res != field->rend() && it_a != arg.field->rend())
+	    *it_res-- &= *it_a--;
+	while(it_res != field->rend())	// set upper bits to zero when arg is smaller than *this
+	    *it_res-- = 0;
+
+	reduce();
+
+	return *this;
+	E_END("infinint::operator &=", "infinint");
+    }
+
+    infinint & infinint::operator |= (const infinint & arg)
+    {
+	E_BEGIN;
+	if(! is_valid() || ! arg.is_valid())
+	    throw SRC_BUG;
+
+	make_at_least_as_wider_as(arg);
+
+	storage::iterator it_a = arg.field->rbegin();
+	storage::iterator it_res = field->rbegin();
+
+	while(it_res != field->rend() && it_a != arg.field->rend())
+	    *it_res-- |= *it_a--;
+
+	reduce();
+
+	return *this;
+	E_END("infinint::operator |=", "infinint");
+    }
+
+    infinint & infinint::operator ^= (const infinint & arg)
+    {
+	E_BEGIN;
+	if(! is_valid() || ! arg.is_valid())
+	    throw SRC_BUG;
+
+	make_at_least_as_wider_as(arg);
+
+	storage::iterator it_a = arg.field->rbegin();
+	storage::iterator it_res = field->rbegin();
+
+	while(it_res != field->rend() && it_a != arg.field->rend())
+	    *it_res-- ^= *it_a--;
+
+	reduce();
+
+	return *this;
+	E_END("infinint::operator ^=", "infinint");
+    }
+
 
     infinint & infinint::operator >>= (U_32 bit)
     {
@@ -614,7 +676,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: real_infinint.cpp,v 1.19 2005/09/11 19:01:16 edrusb Rel $";
+        static char id[]="$Id: real_infinint.cpp,v 1.19.2.1 2007/06/21 19:40:37 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -703,6 +765,34 @@ namespace libdar
 
         return r;
         E_END("operator %", "infinint");
+    }
+
+
+    infinint operator & (const infinint & a, const infinint & bit)
+    {
+	E_BEGIN;
+	infinint ret = a;
+	ret &= bit;
+	return ret;
+	E_END("operator &", "infinint");
+    }
+
+    infinint operator | (const infinint & a, const infinint & bit)
+    {
+	E_BEGIN;
+	infinint ret = a;
+	ret |= bit;
+	return ret;
+	E_END("operator |", "infinint");
+    }
+
+    infinint operator ^ (const infinint & a, const infinint & bit)
+    {
+	E_BEGIN;
+	infinint ret = a;
+	ret ^= bit;
+	return ret;
+	E_END("operator ^", "infinint");
     }
 
     infinint operator >> (const infinint & a, U_32 bit)

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.hpp,v 1.14 2005/09/25 19:05:42 edrusb Rel $
+// $Id: real_infinint.hpp,v 1.14.2.1 2007/06/21 19:40:37 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -96,6 +96,9 @@ namespace libdar
 	template <class T> infinint power(const T & exponent) const;
         inline infinint & operator /= (const infinint & ref);
         inline infinint & operator %= (const infinint & ref);
+	infinint & operator &= (const infinint & ref);
+	infinint & operator |= (const infinint & ref);
+	infinint & operator ^= (const infinint & ref);
         infinint & operator >>= (U_32 bit);
         infinint & operator >>= (infinint bit);
         infinint & operator <<= (U_32 bit);
@@ -180,6 +183,9 @@ namespace libdar
     infinint operator * (const unsigned char, const infinint &);
     infinint operator / (const infinint &, const infinint &);
     infinint operator % (const infinint &, const infinint &);
+    infinint operator & (const infinint & a, const infinint & bit);
+    infinint operator | (const infinint & a, const infinint & bit);
+    infinint operator ^ (const infinint & a, const infinint & bit);
     infinint operator >> (const infinint & a, U_32 bit);
     infinint operator >> (const infinint & a, const infinint & bit);
     infinint operator << (const infinint & a, U_32 bit);
