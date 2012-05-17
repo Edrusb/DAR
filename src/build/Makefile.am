@@ -1,4 +1,4 @@
-SUBDIRS = intl m4 man src doc misc po
+SUBDIRS = man src doc misc po
 dist_noinst_DATA = BUGS INSTALL README THANKS TODO AUTHORS COPYING ChangeLog NEWS ABOUT-NLS
 ACLOCAL_AMFLAGS = -I m4
 

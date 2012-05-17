@@ -7,7 +7,7 @@ AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
 AC_DEFINE_UNQUOTED(DAR_VERSION, "AC_PACKAGE_VERSION", [dar and dar_suite version, definition in configure.ac])
 
 AM_INIT_AUTOMAKE
-AM_GNU_GETTEXT([use-libtool])
+AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION
 AM_ICONV
 
@@ -492,7 +492,7 @@ AC_SUBST(DOXYGEN_PROG, [doxygen])
 # defaults
 AC_PREFIX_DEFAULT(/usr/local)
 
-AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile m4/Makefile po/Makefile intl/Makefile doc/mini-howto/Makefile ])
+AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile doc/mini-howto/Makefile ])
 AC_OUTPUT
 [echo ""
 echo "--"
