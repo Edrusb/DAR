@@ -7,6 +7,9 @@ AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
 AC_DEFINE_UNQUOTED(DAR_VERSION, "AC_PACKAGE_VERSION", [dar and dar_suite version, definition in configure.ac])
 
 AM_INIT_AUTOMAKE
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION
+AM_ICONV
 
 # Checks for programs.
 AC_PROG_CXX
