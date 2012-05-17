@@ -201,8 +201,8 @@ namespace libdar
                                                 // an existing inode
                                             if(e_ino->ea_get_saved_status() == inode::ea_full // we have EA available in archive
                                                &&
-                                               (exists != NULL && exists->same_as(*e_ino)  // the file now exists in filesystem
-                                                || e_ino->get_saved_status() == s_saved)   // either initially or just restored
+                                               ((exists != NULL && exists->same_as(*e_ino)) // the file now exists in filesystem
+                                                 || e_ino->get_saved_status() == s_saved)   // either initially or just restored
                                                &&
                                                (!flat || e_dir == NULL))                   // we are not in flat mode restoring a directory
                                             {

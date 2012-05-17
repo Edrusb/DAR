@@ -29,6 +29,9 @@ extern "C"
 #if HAVE_FNMATCH_H
 #include <fnmatch.h>
 #endif
+#if HAVE_STRING_H
+#include <string.h>
+#endif
 } // end extern "C"
 
 #include "mask.hpp"

@@ -64,7 +64,7 @@ namespace libdar
 	    return 0;
 	};
 
-        int inherited_write(char *a, size_t size)
+        int inherited_write(const char *a, size_t size)
 	{
 #ifdef MUTEX_WORKS
 	    check_self_cancellation();

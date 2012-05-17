@@ -126,7 +126,7 @@ namespace libdar
     }
 
 
-    S_I cache::inherited_write(char *a, size_t size)
+    S_I cache::inherited_write(const char *a, size_t size)
     {
 	U_I wrote = 0;
 	U_I avail, min;

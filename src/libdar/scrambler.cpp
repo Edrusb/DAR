@@ -59,7 +59,7 @@ namespace libdar
         return ret;
     }
 
-    S_I scrambler::inherited_write(char *a, size_t size)
+    S_I scrambler::inherited_write(const char *a, size_t size)
     {
         unsigned char *ptr = (unsigned char *)a;
         if(ref == NULL)

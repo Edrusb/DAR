@@ -231,7 +231,7 @@ namespace libdar
         return compressed->read(a, size);
     }
 
-    S_I compressor::none_write(char *a, size_t size)
+    S_I compressor::none_write(const char *a, size_t size)
     {
         return compressed->write(a, size);
     }
@@ -287,9 +287,9 @@ namespace libdar
         return decompr->wrap.get_next_out() - a;
     }
 
-    S_I compressor::gzip_write(char *a, size_t size)
+    S_I compressor::gzip_write(const char *a, size_t size)
     {
-        compr->wrap.set_next_in(a);
+        compr->wrap.set_next_in(const_cast<char *>(a));
         compr->wrap.set_avail_in(size);
 
         if(a == NULL)

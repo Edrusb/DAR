@@ -27,9 +27,19 @@
 #include "erreurs.hpp"
 #include "user_interaction.hpp"
 
+extern "C"
+{
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
+} // end extern "C"
+
 #include <list>
 #include <iostream>
-#include <errno.h>
 
 #ifdef LIBDAR_SPECIAL_ALLOC
 

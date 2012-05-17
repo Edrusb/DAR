@@ -490,10 +490,11 @@ namespace libdar
     bool archive::get_children_of(user_interaction & dialog,
 				  const string & dir)
     {
+	bool ret = false;
 	NLS_SWAP_IN;
 	try
 	{
-	    return get_cat().get_contenu()->callback_for_children_of(dialog, dir);
+	    ret = get_cat().get_contenu()->callback_for_children_of(dialog, dir);
 	}
 	catch(...)
 	{
@@ -501,6 +502,7 @@ namespace libdar
 	    throw;
 	}
 	NLS_SWAP_OUT;
+	return ret;
     }
 
 

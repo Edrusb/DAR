@@ -45,6 +45,10 @@ extern "C"
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
 } // end extern "C"
 
 #include "database_header.hpp"

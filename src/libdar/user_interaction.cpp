@@ -218,7 +218,7 @@ namespace libdar
         dummy_call(id);
     }
 
-    void user_interaction::printf(char *format, ...)
+    void user_interaction::printf(const char *format, ...)
     {
 	va_list ap;
 	va_start(ap, format);

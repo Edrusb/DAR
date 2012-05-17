@@ -84,7 +84,7 @@ namespace libdar
 
     protected :
         S_I inherited_read(char *a, size_t sz);
-        S_I inherited_write(char *a, size_t sz);
+        S_I inherited_write(const char *a, size_t sz);
 
     private :
         path archive_dir;
@@ -146,7 +146,7 @@ namespace libdar
 
     protected:
         S_I inherited_read(char *a, size_t size) { return reference->read(a, size); };
-        S_I inherited_write(char *a, size_t size) { return reference->write(a, size); };
+        S_I inherited_write(const char *a, size_t size) { return reference->write(a, size); };
 
     private:
         generic_file *reference;

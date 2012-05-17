@@ -594,10 +594,12 @@ void data_dir::remove_child(const string & name)
         it++;
 
     if(it != rejetons.end())
+    {
         if(*it == NULL)
             throw SRC_BUG;
         else
             rejetons.erase(it);
+    }
 }
 
 ////////////////////////////////////////////////////////////////

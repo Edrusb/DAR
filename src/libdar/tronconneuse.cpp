@@ -150,7 +150,7 @@ namespace libdar
 	return lu;
     }
 
-    S_I tronconneuse::inherited_write(char *a, size_t size)
+    S_I tronconneuse::inherited_write(const char *a, size_t size)
     {
 	size_t lu = 0;
 

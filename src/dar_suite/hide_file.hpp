@@ -54,7 +54,7 @@ protected:
     generic_file *ref;
 
     S_I inherited_read(char *a, size_t size);
-    S_I inherited_write(char *a, size_t size);
+    S_I inherited_write(const char *a, size_t size);
 
     virtual void fill_morceau() = 0;
         // the inherited classes have with this method

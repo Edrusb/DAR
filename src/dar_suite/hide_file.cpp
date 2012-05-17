@@ -159,7 +159,7 @@ S_I hide_file::inherited_read(char *a, size_t size)
     return lu;
 }
 
-S_I hide_file::inherited_write(char *a, size_t size)
+S_I hide_file::inherited_write(const char *a, size_t size)
 {
     CHECK_INIT;
     throw SRC_BUG; // hide_file alsways is read-only !

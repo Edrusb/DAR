@@ -51,6 +51,10 @@ extern "C"
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
 } // end extern "C"
 
 #include "etage.hpp"
@@ -66,7 +70,7 @@ namespace libdar
         DIR *tmp = opendir(dirname);
 
         if(tmp == NULL)
-            throw Erange("filesystem etage::etage" , string(gettext("Error openning directory: ")) + dirname + " : " + strerror(errno));
+             throw Erange("filesystem etage::etage" , string(gettext("Error openning directory: ")) + dirname + " : " + strerror(errno));
 
         fichier.clear();
         while((ret = readdir(tmp)) != NULL)

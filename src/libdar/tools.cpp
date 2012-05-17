@@ -41,6 +41,10 @@ char *strchr (), *strrchr ();
 # endif
 #endif
 
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -359,7 +363,7 @@ namespace libdar
         try
         {
             if(input != "")
-                in = new tuyau(dialog, input, gf_read_only);
+                 in = new tuyau(dialog, input, gf_read_only);
             else
                 in = new tuyau(dialog, 0, gf_read_only); // stdin by default
             if(in == NULL)
@@ -506,7 +510,8 @@ namespace libdar
                                 throw Erange("tools_system",
                                              string(gettext("Unexpected error while waiting for dar to terminate: ")) + strerror(errno));
                             else // checking the way dar has exit
-                                if(!WIFEXITED(status)) // not a normal ending
+				if(!WIFEXITED(status)) // not a normal ending
+				{
                                     if(WIFSIGNALED(status)) // exited because of a signal
                                     {
                                         try
@@ -529,6 +534,7 @@ namespace libdar
                                         dialog.pause(string(gettext("DAR sub-process has terminated with exit code "))
 						     + tools_int2str(WEXITSTATUS(status))
 						     + gettext(" Continue anyway ?"));
+				}
                         }
                     }
                     while(loop);
@@ -600,9 +606,7 @@ namespace libdar
         return a;
     }
 
-
-
-    const char *tools_get_from_env(const char **env, char *clef)
+    const char *tools_get_from_env(const char **env, const char *clef)
     {
         unsigned int index = 0;
         const char *ret = NULL;
@@ -739,6 +743,7 @@ namespace libdar
 		    throw Ememory("tools_getcwd()");
 		ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
 		if(ret == NULL) // could not get the CWD
+		{
 		    if(errno == ERANGE) // buffer too small
 		    {
 			delete buffer;
@@ -747,6 +752,7 @@ namespace libdar
 		    }
 		    else // other error
 			throw Erange("tools_getcwd", string(gettext("Cannot get full path of current working directory: ")) + strerror(errno));
+		}
 	    }
 	    while(ret == NULL);
 
@@ -924,7 +930,7 @@ namespace libdar
             dialog.warning(string(gettext("Error while calling execvp:")) + strerror(errno));
         else
             dialog.warning(gettext("execvp failed but did not returned error code"));
-        exit(0);
+         exit(0);
     }
 
     static bool is_a_slice_available(const string & base, const string & extension)
@@ -1007,7 +1013,7 @@ namespace libdar
     }
 
 
-    string tools_printf(char *format, ...)
+    string tools_printf(const char *format, ...)
     {
         va_list ap;
 	va_start(ap, format);
@@ -1025,7 +1031,7 @@ namespace libdar
 	return output;
     }
 
-    string tools_vprintf(char *format, va_list ap)
+    string tools_vprintf(const char *format, va_list ap)
     {
         bool end;
         U_32 taille = strlen(format)+1;
@@ -1178,6 +1184,7 @@ namespace libdar
 	    try
 	    {
 		if(tools_do_some_files_match_mask(c_chemin, file_mask))
+		{
 		    if(!allow_overwriting)
 			throw Erange("tools_avoid_slice_overwriting", tools_printf(gettext("Overwriting not allowed while a slice of a previous archive with the same basename has been found in the %s directory, Operation aborted"), c_chemin));
 		    else
@@ -1194,6 +1201,7 @@ namespace libdar
 				// nothing to do, just continue
 			}
 		    }
+		}
 	    }
 	    catch(...)
 	    {

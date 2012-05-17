@@ -417,10 +417,12 @@ bool get_args(user_interaction & dialog,
                && output_pipe == "")
                 throw Erange("get_args", gettext("-o is mandatory when using \"-A -\" with \"-c -\" or \"-C -\""));
             if(ref_filename != NULL && *ref_filename != "-")
+	    {
                 if(ref_root == NULL)
                     throw SRC_BUG;
                 else
                     tools_check_basename(dialog, *ref_root, *ref_filename, EXTENSION);
+	    }
             if(algo != none && op != create && op != isolate)
                 dialog.warning(gettext("-z or -y need only to be used with -c or -C"));
             if(first_file_size != 0 && file_size == 0)
@@ -457,6 +459,7 @@ bool get_args(user_interaction & dialog,
             if(min_compr_size != min_compr_size_default && op != create)
                 dialog.warning(gettext("-m is only useful with -c"));
             if(hourshift > 0)
+	    {
                 if(op == create)
                 {
                     if(ref_filename == NULL)
@@ -470,13 +473,14 @@ bool get_args(user_interaction & dialog,
                     }
                     else
                         dialog.warning(gettext("-H is only useful with -c or -x"));
+	    }
 	    if(alteration != "" && op != listing)
 		dialog.warning(gettext("-as is only available with -l, ignoring -as option"));
 	    if(empty && op != create && op != extract)
 		dialog.warning(gettext("-e is only useful with -x or -c"));
 	    if(op != create && (on_fly_root != NULL || on_fly_filename != NULL))
 		throw Erange("get_args", gettext("-G option is only available with -c"));
-	    if(on_fly_root != NULL ^ on_fly_filename != NULL)
+	    if((on_fly_root != NULL) ^ (on_fly_filename != NULL))
 		throw SRC_BUG;
 	    if(alter_atime && op != create && op != diff)
 		dialog.warning(gettext("-aa is only useful with -c or -d"));
@@ -669,7 +673,7 @@ static bool get_args_recursive(user_interaction & dialog,
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(filename != "" || sauv_root != NULL)
                     throw Erange("get_args", gettext(" Only one option of -c -d -t -l -C or -x is allowed"));
-                if(optarg != "")
+                if(strncmp(optarg, "", 1) != 0)
                     tools_split_path_basename(optarg, sauv_root, filename);
                 else
                     throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));

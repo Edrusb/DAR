@@ -24,6 +24,14 @@
 //
 
 #include "../my_config.h"
+
+extern "C"
+{
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+} // end extern "C"
+
 #include <iostream>
 #include <locale.h>
 #include <new>
@@ -58,7 +66,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 	// gettext settings
     try
     {
-	if(DAR_LOCALEDIR != "")
+	if(strncmp(DAR_LOCALEDIR, "", 1) != 0)
 	    if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == NULL)
 		throw Erange("", "Cannot open the translated messages directory, native language support will not work");
 	if(setlocale(LC_MESSAGES, "") == NULL || setlocale(LC_CTYPE, "") == NULL)

@@ -48,6 +48,12 @@ extern "C"
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
 }
 
 #include <iostream>
@@ -82,7 +88,7 @@ static int little_main(user_interaction & dialog, int argc, char *argv[], const 
         exit(0);
     }
 
-    if(argc != 3 || argv[1] == "-h")
+    if(argc != 3 || strcmp(argv[1], "-h") == 0)
     {
         show_usage(argv[0]);
         exit(1);

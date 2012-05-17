@@ -323,10 +323,10 @@ namespace libdar
                            struct cellule *&res_first, struct cellule * & res_last)
     {
         E_BEGIN;
-        if(a_first == NULL ^ a_last == NULL)
+	if((a_first == NULL) ^ (a_last == NULL))
             throw SRC_BUG;
 
-        if(b_first == NULL ^ b_last == NULL)
+        if((b_first == NULL) ^ (b_last == NULL))
             throw SRC_BUG;
 
         if(a_last != NULL && b_first != NULL)

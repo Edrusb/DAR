@@ -134,7 +134,7 @@ namespace libdar
 	    //! - \%i (matches infinint *)
 	    //! - \%S (matches std::string *)
 	    //! .
-	void printf(char *format, ...);
+	void printf(const char *format, ...);
 
 	    /// for libdar to know if it is interesting to use listing() or to keep reporting
 	    /// listing thanks to the warning() method.

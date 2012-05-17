@@ -61,7 +61,7 @@ namespace libdar
 
     protected:
         virtual int inherited_read(char *a, size_t size);
-        virtual int inherited_write(char *a, size_t size);
+        virtual int inherited_write(const char *a, size_t size);
 
     private:
         infinint position;

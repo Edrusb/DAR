@@ -24,6 +24,14 @@
 //
 
 #include "../my_config.h"
+
+extern "C"
+{
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+} // extern "C"
+
 #include <iostream>
 
 #include "infinint.hpp"

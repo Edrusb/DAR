@@ -213,7 +213,8 @@ namespace libdar
     inline void storage::iterator::skip_less_one()
     {
         E_BEGIN;
-        if(cell != NULL)
+          if(cell != NULL)
+	  {
             if(offset > 0)
                 offset--;
             else
@@ -224,6 +225,7 @@ namespace libdar
                 else
                     offset = OFF_BEGIN;
             }
+	  }
         E_END("storage::iterator::slik_plus_one", "");
     }
 

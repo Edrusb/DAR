@@ -43,7 +43,8 @@ namespace libdar
         else
             init = false;
 
-        if(fin == NULL)
+         if(fin == NULL)
+	 {
             if(nom == NULL)
                 throw SRC_BUG; // neither eod nor nomme
             else
@@ -52,6 +53,7 @@ namespace libdar
                 if(dir != NULL)
                     init = true;
             }
+	 }
     }
 
     static void dummy_call(char *x)

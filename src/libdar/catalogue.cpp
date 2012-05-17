@@ -590,11 +590,13 @@ namespace libdar
             || (!ignore_owner && gid != ref.gid)
             || perm != ref.perm;
 
-        if(*ref.last_mod < *last_mod)
+         if(*ref.last_mod < *last_mod)
+	 {
             if(hourshift > 0)
                 more_recent = more_recent || ! is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod);
             else
                 more_recent = true;
+	 }
 
         return more_recent;
     }
@@ -1404,14 +1406,14 @@ namespace libdar
 			    string f = local_flag(*ino);
 			    string g = (*it)->get_name();
 
-			    dialog.printf("%S%S\t%S\t%S\t%S\t%S\t%S\t%S\n", &marge, &a, &b, &c, &d, &e, &f, &g);
+			     dialog.printf("%S%S\t%S\t%S\t%S\t%S\t%S\t%S\n", &marge, &a, &b, &c, &d, &e, &f, &g);
 			}
                 }
 
                 if(d != NULL)
                 {
                     d->listing(dialog, m, filter_unsaved, marge + "|  ");
-                    dialog.printf("%S+---\n", &marge);
+		    dialog.printf("%S+---\n", &marge);
                 }
             }
 
@@ -1968,11 +1970,13 @@ namespace libdar
                 {
                     string tmp_s;
 
-                    if(!out_compare.pop(tmp_s))
+                     if(!out_compare.pop(tmp_s))
+		     {
                         if(out_compare.is_relative())
                             throw SRC_BUG; // should not be a relative path !!!
                         else // both cases are bugs, but need to know which case is generating a bug
                             throw SRC_BUG; // out_compare.degre() > 0 but cannot pop !
+		     }
                 }
 
             return false;

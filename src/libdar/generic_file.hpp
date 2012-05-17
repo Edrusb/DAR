@@ -115,7 +115,7 @@ namespace libdar
 	    /// read data from the generic_file
         S_I read(char *a, size_t size);
 	    /// write data to the generic_file
-        S_I write(char *a, size_t size);
+        S_I write(const char *a, size_t size);
 	    /// write a string to the generic_file
         S_I write(const std::string & arg);
 	    /// skip back one char, read on char and skip back one char
@@ -156,7 +156,7 @@ namespace libdar
             // must provide as much byte as requested up to end of file
             // stay blocked if not enough available
             // returning zero or less than requested means end of file
-        virtual S_I inherited_write(char *a, size_t size) = 0;
+        virtual S_I inherited_write(const char *a, size_t size) = 0;
             // must write all data or block or throw exceptions
             // thus always returns the second argument
 
@@ -166,12 +166,12 @@ namespace libdar
         S_I crc_offset;
 	user_interaction *gf_ui;
         S_I (generic_file::* active_read)(char *a, size_t size);
-        S_I (generic_file::* active_write)(char *a, size_t size);
+        S_I (generic_file::* active_write)(const char *a, size_t size);
 
         void enable_crc(bool mode);
-        void compute_crc(char *a, S_I size);
+        void compute_crc(const char *a, S_I size);
         S_I read_crc(char *a, size_t size);
-        S_I write_crc(char *a, size_t size);
+        S_I write_crc(const char *a, size_t size);
 
 	void detruire() { if(gf_ui != NULL) delete gf_ui; };
 	void copy_from(const generic_file & ref);
@@ -196,7 +196,7 @@ namespace libdar
 
     protected :
         S_I inherited_read(char *a, size_t size);
-        S_I inherited_write(char *a, size_t size);
+        S_I inherited_write(const char *a, size_t size);
 
     private :
         S_I filedesc;
