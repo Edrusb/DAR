@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_cp.cpp,v 1.16.2.1 2006/01/19 14:42:47 edrusb Rel $
+// $Id: dar_cp.cpp,v 1.16.2.2 2007/02/24 17:43:02 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -59,7 +59,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "thread_cancellation.hpp"
 
-#define DAR_CP_VERSION "1.1.0"
+#define DAR_CP_VERSION "1.2.0"
 
 using namespace libdar;
 using namespace std;
@@ -67,7 +67,7 @@ using namespace std;
 static void show_usage(user_interaction & dialog, char *argv0);
 static void show_version(user_interaction & dialog, char *argv0);
 static int open_files(user_interaction & dialog, char *src, char *dst, int *fds, int *fdd);
-static void copy_max(user_interaction & dialog, int src, int dst);
+static int copy_max(user_interaction & dialog, int src, int dst);
 static int little_main(user_interaction & dialog, int argc, char *argv[], const char **env);
 static void xfer_before_error(int block, char *buffer, int src, int dst);
 static int skip_to_next_readable(int block, char *buffer, int src, int dst, off_t & missed);
@@ -102,10 +102,9 @@ static int little_main(user_interaction & dialog, int argc, char *argv[], const 
 	    {
 		try
 		{
-		    copy_max(dialog, fds, fdd);
+		    ret = copy_max(dialog, fds, fdd);
 		    close(fds);
 		    close(fdd);
-		    ret = EXIT_OK;
 		}
 		catch(Erange & e)
 		{
@@ -210,7 +209,7 @@ static int open_files(user_interaction & dialog, char *src, char *dst, int *fds,
         return 1;
 }
 
-static void copy_max(user_interaction & dialog, int src, int dst)
+static int copy_max(user_interaction & dialog, int src, int dst)
 {
     thread_cancellation thr;
 
@@ -256,6 +255,7 @@ static void copy_max(user_interaction & dialog, int src, int dst)
 
     printf(gettext("Copy finished. Missing %.0f byte(s) of data\n"), (float)missed);
     printf(gettext("Which is  %.2f %% of the total amount of data\n"), (float)(missed)/((float)(taille))*100);
+    return missed == 0 ? EXIT_OK : EXIT_DATA_ERROR;
 }
 
 static void xfer_before_error(int block, char *buffer, int src, int dst)
@@ -351,7 +351,7 @@ static int skip_to_next_readable(int block, char *buffer, int src, int dst, off_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_cp.cpp,v 1.16.2.1 2006/01/19 14:42:47 edrusb Rel $";
+    static char id[]="$Id: dar_cp.cpp,v 1.16.2.2 2007/02/24 17:43:02 edrusb Rel $";
     dummy_call(id);
 }
 

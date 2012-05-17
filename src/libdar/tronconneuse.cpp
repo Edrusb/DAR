@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronconneuse.cpp,v 1.7 2005/04/09 21:43:35 edrusb Rel $
+// $Id: tronconneuse.cpp,v 1.7.2.1 2007/01/17 14:43:01 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -153,6 +153,8 @@ namespace libdar
     S_I tronconneuse::inherited_write(char *a, size_t size)
     {
 	size_t lu = 0;
+	bool thread_stop = false;
+	Ethread_cancel caught = Ethread_cancel(false, 0);
 
 	if(weof)
 	    throw SRC_BUG; // write_end_of_file has been called no further write is allowed
@@ -164,11 +166,21 @@ namespace libdar
 		buf[buf_byte_data++] = a[lu++];
 	    if(buf_byte_data >= clear_block_size) // we have a complete buffer to encrypt
 	    {
-		flush();
+		try
+		{
+		    flush();
+		}
+		catch(Ethread_cancel & e)
+		{
+		    thread_stop = true;
+		    caught = e;
+		}
 		block_num++;
 	    }
 	}
 	current_position += infinint(size);
+	if(thread_stop)
+	    throw caught;
 	return size;
     }
 
@@ -257,10 +269,37 @@ namespace libdar
 
 	if(buf_byte_data > 0)
 	{
+	    U_32 encrypted_count;
+
 	    init_buf();
-	    encrypted->write(encrypted_buf, encrypt_data(block_num, buf, buf_byte_data, buf_size, encrypted_buf, encrypted_buf_size));
-	    buf_byte_data = 0;
-	    buf_offset += infinint(clear_block_size);
+	    encrypted_count = encrypt_data(block_num, buf, buf_byte_data, buf_size, encrypted_buf, encrypted_buf_size);
+	    try
+	    {
+		encrypted->write(encrypted_buf, encrypted_count);
+		buf_byte_data = 0;
+		buf_offset += infinint(clear_block_size);
+	    }
+	    catch(Ethread_cancel & e)
+	    {
+		    // at this step, the pending encrypted data could not be wrote to disk
+		    // (Ethread_cancel exception has been thrown before)
+		    // but we have returned to the upper layer (and probably several yet)
+		    // the position of the clear data stream which may have already been recorded
+		    // in the catalogue above, thus we cannot just drop this pending encrypted data
+		    // as it would make reference to inexistant data in the catalogue above
+		    // By chance the thread_cancellation mechanism in clean termination is now carried
+		    // by the exception we just caugth here so we may retry to write the encrypted data
+		    // no new Ethread_cancel exception will be thrown this time.
+
+		encrypted->write(encrypted_buf, encrypted_count);
+		buf_byte_data = 0;
+		buf_offset += infinint(clear_block_size);
+
+		    // Now that we have cleanly completed the action at this level,
+		    // we can propagate the exception toward the caller
+
+		throw;
+	    }
 	}
     }
 
@@ -292,7 +331,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tronconneuse.cpp,v 1.7 2005/04/09 21:43:35 edrusb Rel $";
+        static char id[]="$Id: tronconneuse.cpp,v 1.7.2.1 2007/01/17 14:43:01 edrusb Rel $";
         dummy_call(id);
     }
 

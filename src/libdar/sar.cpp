@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.37 2005/12/29 02:32:41 edrusb Rel $
+// $Id: sar.cpp,v 1.37.2.1 2006/12/12 18:25:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -129,8 +129,16 @@ namespace libdar
         hook = execute;
         status = CONTEXT_INIT;
 
-        open_file_init();
-        open_file(1);
+	try
+	{
+	    open_file_init();
+	    open_file(1);
+	}
+	catch(...)
+	{
+	    close_file();
+	    throw;
+	}
     }
 
     sar::sar(user_interaction & dialog,
@@ -266,7 +274,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.37 2005/12/29 02:32:41 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.37.2.1 2006/12/12 18:25:35 edrusb Rel $";
         dummy_call(id);
     }
 

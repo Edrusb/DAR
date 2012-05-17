@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.cpp,v 1.26 2005/12/13 20:54:45 edrusb Rel $
+// $Id: generic_file.cpp,v 1.26.2.1 2007/02/11 16:07:22 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -446,7 +446,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: generic_file.cpp,v 1.26 2005/12/13 20:54:45 edrusb Rel $";
+        static char id[]="$Id: generic_file.cpp,v 1.26.2.1 2007/02/11 16:07:22 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -551,12 +551,12 @@ namespace libdar
         {
             filedesc = ::open(name, mode|O_BINARY, perm);
             if(filedesc < 0)
-                if(filedesc == ENOSPC)
+                if(errno == ENOSPC)
                     get_gf_ui().pause(gettext("No space left for inode, you have the opportunity to make some room now. When done : can we continue ?"));
                 else
                     throw Erange("fichier::open", string(gettext("Cannot open file : ")) + strerror(errno));
         }
-        while(filedesc == ENOSPC);
+        while(errno == ENOSPC);
     }
 
     gf_mode generic_file_get_mode(S_I fd)

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.4 2006/10/07 21:23:52 edrusb Rel $
+// $Id: tools.cpp,v 1.54.2.6 2007/02/17 20:58:38 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -299,7 +299,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.54.2.4 2006/10/07 21:23:52 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.54.2.6 2007/02/17 20:58:38 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -399,7 +399,11 @@ namespace libdar
 
     string tools_name_of_uid(U_16 uid)
     {
+#ifndef  __DYNAMIC__
+	struct passwd *pwd = NULL;
+#else
         struct passwd *pwd = getpwuid(uid);
+#endif
 
         if(pwd == NULL) // uid not associated with a name
         {
@@ -413,7 +417,11 @@ namespace libdar
 
     string tools_name_of_gid(U_16 gid)
     {
+#ifndef __DYNAMIC__
+	struct group *gr = NULL;
+#else
         struct group *gr = getgrgid(gid);
+#endif
 
         if(gr == NULL) // uid not associated with a name
         {
@@ -1671,6 +1679,39 @@ namespace libdar
 	result += "(/.+)?$";
 
 	return result;
+    }
+
+    string tools_output2xml(const string & src)
+    {
+	string ret = "";
+	U_I cur = 0, size = src.size();
+
+	while(cur < size)
+	{
+	    switch(src[cur])
+	    {
+	    case '<':
+		ret += "&lt;";
+		break;
+	    case '>':
+		ret += "&gt;";
+	        break;
+	    case '&':
+		ret += "&amp;";
+		break;
+	    case '\'':
+		ret += "&apos;";
+		break;
+	    case'\"':
+		ret += "&quot;";
+    	        break;
+	    default:
+		ret += src[cur];
+	    }
+	    cur++;
+	}
+
+	return ret;
     }
 
 } // end of namespace

@@ -1,3 +1,11 @@
+version 2.3.3
+--------------
+Thanks to  Mike P. for bug feedback. Thanks to  "Jo - ex-bart" for feedback
+and very useful scenario to reproduce the reported bugs. Thanks to "Marius"
+for feedback. Thanks to Veysel Ozer for feedback and patch. Thanks to tianmiao
+for feedback and bug report. Thanks to Oliver Winker for feedback and
+investigations. Thanks to Andrea Palazzi for patch.
+
 version 2.3.2
 --------------
 Thanks to Thomas Jacob for feedback and patch about bug in Native Language

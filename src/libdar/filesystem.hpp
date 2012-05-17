@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.hpp,v 1.22.2.1 2006/06/20 20:28:50 edrusb Exp $
+// $Id: filesystem.hpp,v 1.22.2.2 2007/02/23 20:52:44 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -89,7 +89,18 @@ namespace libdar
             nlink_t count;
             file_etiquette *obj;
         };
-        std::map <ino_t, couple> corres_read;
+
+	struct node
+	{
+	    node(ino_t num, dev_t dev) { numnode = num; device = dev; };
+
+		// this operator is required to use the type node in a std::map
+	    bool operator < (const node & ref) const { return numnode < ref.numnode || (numnode == ref.numnode && device < ref.device); };
+	    ino_t numnode;
+	    dev_t device;
+	};
+
+        std::map <node, couple> corres_read;
 	infinint etiquette_counter;
 
 	user_interaction *fs_ui;

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.47.2.4 2006/10/22 19:16:03 edrusb Rel $
+// $Id: catalogue.cpp,v 1.47.2.5 2007/02/17 20:58:38 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -1561,7 +1561,7 @@ namespace libdar
 
 	    if(m.is_covered((*it)->get_name()) || dir != NULL)
 	    {
-		string name = (*it)->get_name();
+		string name = tools_output2xml((*it)->get_name());
 
 		if(det != NULL)
 		{
@@ -1715,7 +1715,7 @@ namespace libdar
 			    break;
 			case 'l': // soft link
 			    if(data_st == s_saved)
-				target = sym->get_target();
+				target = tools_output2xml(sym->get_target());
 			    else
 				target = "";
 			    dialog.printf("%S<Symlink name=\"%S\" target=\"%S\">\n",
@@ -2460,7 +2460,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: catalogue.cpp,v 1.47.2.4 2006/10/22 19:16:03 edrusb Rel $";
+	static char id[]="$Id: catalogue.cpp,v 1.47.2.5 2007/02/17 20:58:38 edrusb Rel $";
 	dummy_call(id);
     }
 

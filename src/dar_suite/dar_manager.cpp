@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.48 2006/01/08 16:33:42 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.48.2.2 2007/02/24 17:43:02 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -47,7 +47,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.4.0"
+#define DAR_MANAGER_VERSION "1.4.1"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
@@ -346,6 +346,18 @@ static bool command_line(user_interaction & dialog,
 		    break; // stop reading arguments
 	    }
 
+
+	    // related to bug #1598138 on sourceforge
+	    // when providing -o'-B dar.dcf' on command line getopt
+	    // finds -o option with no argument and keep optind pointing on
+	    // the -o'B dar dcf' argument. We must thus tail out the leading -o
+	    // from this argument before feeding the 'rest' list variable
+	if(optind < argc && strncmp(argv[optind], "-o", 2) == 0)
+	{
+	    rest.push_back(argv[optind]+2); // argv[optind] is a 'char *' applying '+2' to it skips the 2 leading char '-o'.
+	    optind++;
+	}
+
 	for(S_I i = optind; i < argc; i++)
 	    rest.push_back(argv[i]);
 
@@ -426,7 +438,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.48 2006/01/08 16:33:42 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.48.2.2 2007/02/24 17:43:02 edrusb Rel $";
     dummy_call(id);
 }
 

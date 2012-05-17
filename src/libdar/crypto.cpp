@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: crypto.cpp,v 1.12.2.1 2006/02/04 14:47:15 edrusb Rel $
+// $Id: crypto.cpp,v 1.12.2.2 2007/01/17 20:18:28 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -86,7 +86,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: crypto.cpp,v 1.12.2.1 2006/02/04 14:47:15 edrusb Rel $";
+        static char id[]="$Id: crypto.cpp,v 1.12.2.2 2007/01/17 20:18:28 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -182,6 +182,11 @@ namespace libdar
 
 	high = upper % (U_32)(0xFFFF); // for bytes (high weight)
 	low = ref % (U_32)(0xFFFF); // for bytes (lowest weight)
+
+	    // There has been confusion: the modulo is used below to get the last 8 bits of the integer
+	    // it has thus to be made on 256 ( % 256 in place of % 8) However the resulting ivec is
+	    // not worse or better than the one which would result from the % 256 operation.
+	    // We thus keep this algorithm in place for backward compatibility.
 
 	ivec[0] = low % 8;
 	ivec[1] = (low >> 8) % 8;

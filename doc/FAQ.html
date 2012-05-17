@@ -28,7 +28,6 @@
   </tbody>
 </table>
 <br>
-<hr style="width: 100%; height: 2px;"><br>
 <table
  style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
  border="0" cellspacing="2" cellpadding="2">
@@ -84,7 +83,7 @@ algorithm?</a><br>
  style="font-weight: bold; font-style: italic;">Which
 options can I use with which options?</span></span></a><br>
       <a style="font-style: italic; font-weight: bold;" href="#A14">Why
-dar reports corruption for the archive I have transfered with FTP ?</a><br>
+dar reports corruption for the archive I have transfered with FTP?</a><br>
       <a href="#UIDGID"><span
  style="font-weight: bold; font-style: italic;">Why DAR does save
 UID/GID
@@ -92,8 +91,15 @@ instead of plain usernames and usergroups?</span></a><br>
       <a style="font-style: italic;" href="#Dar_Manager_encrypted"><span
  style="font-weight: bold;">Dar_Manager does not accept
 encrypted archives, how to workaround this?</span></a><br>
+      <a href="#staticOSX"><span
+ style="font-weight: bold; font-style: italic;">How to overcome the
+lack of static linking on MacOS X?</span></a><br>
       <a href="#A13"><span
- style="font-weight: bold; font-style: italic;"> </span></a><br>
+ style="font-weight: bold; font-style: italic;"> </span></a><span
+ style="font-weight: bold; font-style: italic;"><a href="#parallel">Why
+cannot dar use the full power of my multi-processor computer?</a><br>
+      <br>
+      </span>
       <h2><span style="text-decoration: underline;">Answers:</span><br>
       </h2>
       <span style="font-style: italic; font-weight: bold;"><a name="A1"
@@ -1162,7 +1168,7 @@ Follow for each command the available options (those marked OK):<br>
       <td> <a name="A14"></a><span
  style="font-weight: bold; font-style: italic;">Why dar reports
 corruption of the archive I have
-transfered with FTP ?</span>
+transfered with FTP?</span>
       <p style="text-align: justify;">Dar archive are binary files,
 they must be transfered in
 binary mode
@@ -1356,9 +1362,10 @@ to use some of dar's feature like for example only restore files that
 are more recent than those present on filesystem.<br>
       <br>
       <br>
-      <br style="font-weight: bold;">
+      <br style="font-weight: bold; font-style: italic;">
       </div>
-      <span style="font-weight: bold;"><a name="Dar_Manager_encrypted"></a>Dar_Manager
+      <span style="font-weight: bold; font-style: italic;"><a
+ name="Dar_Manager_encrypted"></a>Dar_Manager
 does not accept
 encrypted archives, how to workaround this?</span><br>
       <br>
@@ -1437,6 +1444,170 @@ archive key, this covers the dar_manager database as well as the DCF
 files you could temporarily use. Second note, in this workaround
 approach we have assumed that all encrypted archive do share the same
 key.<br>
+      <br>
+      <br>
+      <span style="font-weight: bold; font-style: italic;">How to <a
+ name="staticOSX"></a>overcome the lack of static linking on MacOS X?</span><br>
+      <br>
+The answer comes from Dave Vasilevsky in an email to the dar-support
+mailing-list. I let him explain how to do:<br
+ style="font-style: italic;">
+      <br style="font-style: italic;">
+      <div style="margin-left: 40px;"><span style="font-style: italic;">Pure-static
+executables aren't used on OS X.
+However, Mac OS X does have other ways to build portable binaries.
+HOWTO build portable binaries on OS X?</span><br
+ style="font-style: italic;">
+      <br style="font-style: italic;">
+      <span style="font-style: italic;">First, you have to make sure
+that dar only uses operating-system
+libraries that exist on the oldest version of OS X that you care about.
+      </span><br style="font-style: italic;">
+      <span style="font-style: italic;">You do this by specifying one
+of Apple's SDKs, for example: </span><br style="font-style: italic;">
+      <br style="font-style: italic;">
+      </div>
+      <div style="font-style: italic; margin-left: 80px;">export
+CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.2.8.sdk" <br>
+export LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.2.8.sdk" <br>
+      </div>
+      <div style="margin-left: 40px;"><br style="font-style: italic;">
+      <br style="font-style: italic;">
+      <span style="font-style: italic;">Second, you have to make sure
+that any non-system libraries that dar
+links to are linked in statically. To do this edit
+dar/src/dar_suite/Makefile, changing LDADD to
+'..</span><i style="font-style: italic;" class="moz-txt-slash"><span
+ class="moz-txt-tag">/</span>libdar<span class="moz-txt-tag">/</span></i><span
+ style="font-style: italic;">.libs/libdar.a'. If any other non-system
+libs are used (such
+as gettext), change the makefiles so they are also linked in
+statically.
+Apple should really give us a way to force the linker to do this
+automatically! </span><br style="font-style: italic;">
+      <br style="font-style: italic;">
+      <span style="font-style: italic;">Some caveats: </span><br
+ style="font-style: italic;">
+      <br style="font-style: italic;">
+      <span style="font-style: italic;">* If you build for 10.3 or
+lower, you will not get EA support, and
+therefore you will not be able to save special Mac information like </span><br
+ style="font-style: italic;">
+      <span style="font-style: italic;">resource forks. </span><br
+ style="font-style: italic;">
+      <span style="font-style: italic;">* To work on both ppc and x86
+Macs, you need to build a universal
+binary. For instructions, use Google </span><img
+ style="font-style: italic;"
+ src="chrome://editor/content/images/smile_n.gif" alt=":-)"
+ class="moz-txt-smily" height="19" width="19" align="middle"><span
+ style="font-style: italic;"> </span><br style="font-style: italic;">
+      <span style="font-style: italic;">* To make a 10.2-compatible
+binary, you must build with GCC 3.3. </span><br
+ style="font-style: italic;">
+      <span style="font-style: italic;">* These instructions won't work
+for the 10.1 SDK, that one is harder to
+use. </span><br style="font-style: italic;">
+      </div>
+      <br>
+      <span style="font-weight: bold; font-style: italic;"><a
+ name="parallel"></a>Why cannot dar use the full power of my
+multi-processor computer?</span><br>
+      <br>
+      <div style="margin-left: 40px;">Parallel computing programming is
+a science by itself. For having done a specialization in that area
+during my studies, I can explain briefly here the constraints. A
+program can use several processor if the algorithm it uses is able to
+be parallelized. Such an algorithm can either statically (at
+programming time) or dynamically (at execution time) be cut in several
+independent execution threads. Theses different execution thread must
+be as much autonomous as possible between them, if you don't want to
+have one thread waiting for another (which is not what we want). The
+constraint is this : if you cannot have different thread with no or
+very little communication and dependence, parallelization does not
+worth it.<br>
+      <br>
+Back to dar. From a very abstracted point of view, dar works by
+fetching files from the filesystem and by appending their data in a
+single file (the archive). For each file, dar records in memory the
+location of the data and once all files have been treated, this
+location information (contained in the so called "catalogue") is added
+at the end of the archive.<br>
+      <br>
+One could say that to parallelize file treatment. Instead of proceeding
+file by file, let's do all file at the same time (or rather let's say N
+files at the same time). OK, but first you would have an important loss
+of performance at disk level as the disk heads would spend most of the
+time seeking from one of the N file's data to another of the N file's
+data. The second point would be that to add a file to the archive you
+must know the position of the end of the last added file, which is not
+possible to know in advance because of compression and/or
+encryption.&nbsp; thus a given thread would have to wait that another
+has finished to be able to drop in turn the data of the file it owns...
+As you can guess, parallelizing this way would bring worse performance
+than the sequential algorithm.<br>
+      <br>
+Another possibility is to have several thread doing : <br>
+      <ul>
+        <li>file lookup (report which file are present on filesystem)</li>
+        <li>file filtering (determine which file to save, which file to
+compress, and so on)</li>
+        <li>file compression</li>
+        <li>file encryption</li>
+      </ul>
+This would be a bit better, but : File lookup is very fast and does not
+consume much CPU, as well as file filtering.&nbsp; Instead file
+compression or file encryption are very CPU intensive. Thus, first, if
+you only use compression OR encryption parallelizing this way will not
+bring you much extra power as the encryption or the compression are not
+possible to parallelize, rawly you will get the same execution time as
+the sequential execution. Second if you use no compression and no
+encryption, your CPU will stay idle most of the time and the time to
+execute dar will only depend on the speed of your hard disk, so you
+will not get any improvement here. Last, only if you use both
+encryption and compression you could gain some performance having
+parallelization, but dar could only use at most two CPU! no more! And
+second, the gain of time will be less than 2 (it will not be twice
+faster, but much less) as for a given amount of data, compression needs
+much more time to proceed than encryption. Thus the encryption thread
+will most of the time wait for compressed data.<br>
+      <br>
+OK, you have maybe found also another possibility : having N threads
+for compression and M threads for encryption. Assuming&nbsp; encryption
+is faster than compression, we could choose N &gt; M.&nbsp; We could
+also have a fixed value for N and a dynamic value for M depending on
+how fast compression is running. Well, this would let dar be able to
+compress and encrypt several files at the same time, assuming that
+reading data and data writing time is negligible compared to
+compression time (which must be demonstrated as several files have
+potentially to be read at the same time), we could maybe have a real
+performance gain. But, ... while several files can now be compressed at
+the same time, only one can be written to disk at a given time. Thus,
+during the time the compression of a file has started and the time it
+has finished all other threads have to keep their compressed data in
+memory. Then a next thread can drop its data to the archive while all
+other keep compressing to memory (RAM). We will quickly lack of RAM! Or
+your computer will start to swap, or you have to store the data back to
+disk in a temporary file, which file will have to be read again and
+wrote back to archive. So, doing so will bring disk performance
+degradation, as disk will server for read file's data, writing its
+compressed data to temporary file, reading back its compressed data,
+writing its compressed data to archive.<br>
+      <br>
+Last, when using parallelization there is a always a cost due to
+inter-process communication and concurrent I/O operations on the
+hardware (here, hard disk are used at the same time to read files to
+backup and to write them into the archive). This cost becomes
+negligible when the number of parallel thread increase, assuming all
+thread are well busy ... here there is a bottleneck, which is the
+archive creation that seems to avoid a real impressive parallelization.<br>
+      <br>
+Conclusion, unless you can find another way to parallelize dar, it will
+not bring noticeable improvement to have a parallelized version of dar.
+Parallelization is strongly related to the algorithm used, some
+algorithms are well adapted to this operation some others are not.<br>
+      </div>
+      <br>
       </td>
     </tr>
   </tbody>

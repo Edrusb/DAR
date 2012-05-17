@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.39.2.2 2006/10/07 21:23:52 edrusb Rel $
+// $Id: tools.hpp,v 1.39.2.3 2007/02/17 20:58:38 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -496,6 +496,12 @@ namespace libdar
 	/// \return the corresponding regex to be applied to full absolute path
     extern std::string tools_build_regex_for_exclude_mask(const std::string & prefix,
 							  const std::string & relative_part);
+
+	/// convert string for xml output
+
+	/// \note any < > & ' and " are replaced by adequate sequence for unicode
+	/// `note second point, nothing is done here to replace system native strings to unicode
+    extern std::string tools_output2xml(const std::string & src);
 
 } /// end of namespace
 

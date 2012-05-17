@@ -351,13 +351,13 @@ fi
 if type >/dev/null 2>&1 $DarName
   then
     DarFound=true
-  else 
+  else
     DarFound=false
 fi
 if type >/dev/null 2>&1 $DarManagerName
   then
     DarManagerFound=true
-  else 
+  else
     DarManagerFound=false
 fi
 if ! ($DarFound && $DarManagerFound)
@@ -443,7 +443,7 @@ ReferenceBackupOption="-A "
 DarOptions="-R "$OriginDir
 #
 # Compress data inside the backup using bzip2: -y[CompressLevel].
-# CompressLevel: 0 minimum; 9 maximun. Compress Files > 100Mb: -m 0. 
+# CompressLevel: 0 minimum; 9 maximun. Compress Files > 100Mb: -m 0.
 if $CompressWithBZip2
   then
     DarOptions=$DarOptions" -y9"
@@ -496,7 +496,7 @@ fi
 #########################################################
 #Set Include/Exclude Files Options.
 ###############
-# Files you don't want to backup: -X "*~" -X ".*~" 		
+# Files you don't want to backup: -X "*~" -X ".*~"
 if [ "$FilesToIgnore" != "" ]
   then
     InclExclFilesOption='-X "'`Stream "$FilesToIgnore" |  sed 's/ /" -X "/g'`'"'
@@ -522,7 +522,7 @@ fi
 #########################################################
 #Set Include/Exclude directories Options.
 ###############
-# $OriginDir in $DestinationDir? 
+# $OriginDir in $DestinationDir?
 echo $DestinationDir | grep $OriginDir &> /dev/null
 if [ $? -eq 0 ]
   then
@@ -580,7 +580,7 @@ fi
 # Enclose each directory in "" just in case there are metacharacters in the name.
 if [ "$SubDirsToBackup" != "" ]
   then
-    IncludeExclDirsOption='"'`Stream "$SubDirsToBackup" |  sed 's/ /" "/g'`'" '$IncludeExclDirsOption
+    IncludeExclDirsOption='-g"'`Stream "$SubDirsToBackup" | sed 's/ /" -g "/g'`'" '$IncludeExclDirsOption
 fi
 #
 #########################################################
@@ -854,7 +854,7 @@ End
       then
         echo "###"
         echo "$CommandName: $FullBackupBaseName created successfully."
-        echo "############"        
+        echo "############"
         echo "$CommandName: Creating $DataBaseName."
         AddToDataBaseOption=$AddToDataBaseOption$FullBackupPath
         if ($DarManagerName $CreateDataBaseOption)

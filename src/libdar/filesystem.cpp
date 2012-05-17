@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.45.2.2 2006/06/20 20:28:50 edrusb Exp $
+// $Id: filesystem.cpp,v 1.45.2.3 2007/02/23 20:52:44 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -184,7 +184,7 @@ namespace libdar
 				       buf.st_dev);
                     else // file with hard link(s)
                     {
-                        map <ino_t, couple>::iterator it = corres_read.find(buf.st_ino);
+                        map <node, couple>::iterator it = corres_read.find(node(buf.st_ino, buf.st_dev));
 
                         if(it == corres_read.end()) // inode not seen yet, first link on it
                         {
@@ -202,7 +202,7 @@ namespace libdar
                                 couple tmp;
                                 tmp.count = buf.st_nlink - 1;
                                 tmp.obj = ptr;
-                                corres_read[buf.st_ino] = tmp;
+                                corres_read[node(buf.st_ino, buf.st_dev)] = tmp;
                             }
                         }
                         else  // inode already seen previously
@@ -314,7 +314,7 @@ namespace libdar
 
     void filesystem_hard_link_read::forget_etiquette(file_etiquette *obj)
     {
-        map<ino_t, couple>::iterator it = corres_read.begin();
+	map<node, couple>::iterator it = corres_read.begin();
 
         while(it != corres_read.end() && it->second.obj != obj)
             it++;
@@ -1570,7 +1570,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.45.2.2 2006/06/20 20:28:50 edrusb Exp $";
+        static char id[]="$Id: filesystem.cpp,v 1.45.2.3 2007/02/23 20:52:44 edrusb Rel $";
         dummy_call(id);
     }
 

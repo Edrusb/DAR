@@ -1,6 +1,6 @@
  |# Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.3.2], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.3.3], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -502,6 +502,14 @@ AC_SUBST(DOXYGEN_PROG, [doxygen])
 # defaults
 AC_PREFIX_DEFAULT(/usr/local)
 
+# hack from litool mailing-list to know from source point of view whether we are compiling for dynamic or static way
+
+AC_CONFIG_COMMANDS([hack-libtool], [
+				    sed 's,^pic_flag=,pic_flag=-D__DYNAMIC__,' libtool > libtoolT \
+				    && mv -f libtoolT libtool && chmod 755 libtool
+])
+
+
 AC_CONFIG_FILES([Makefile man/Makefile src/Makefile src/libdar/Makefile src/dar_suite/Makefile src/testing/Makefile src/examples/Makefile doc/Makefile doc/samples/Makefile misc/Makefile po/Makefile.in m4/Makefile po/Makefile doc/mini-howto/Makefile src/libdar/libdar.pc.tmpl doc/man/Makefile])
 AC_OUTPUT
 [echo ""
@@ -630,3 +638,4 @@ fi
 
 echo ""
 ]
+

@@ -10,10 +10,11 @@
 
         Original Design & Development: Denis Corbin
 
-        Several patches are from by Wesley Leggette, Dave Vasilevsky,
+        Several patches are from Wesley Leggette, Dave Vasilevsky,
             Nick Alcock, Brian May, Martin Jost, Jurgen Menden, Todd Vierling
             Omer Enbar, David Rose, Alex Kohlmeyer, Dietrich Rothe,
-	    Moritz Franosch, John Little, Chris Martin, Michael Roitzsch.
+	    Moritz Franosch, John Little, Chris Martin, Michael Roitzsch,
+            Andrea Palazzi.
 
         Translations of program messages are from:
 	    Peter Landgren for Swedish
@@ -26,13 +27,11 @@
 
 No answer to support requests will be done out of mailing-list or other public
 area: your questions and their answers may be interesting to others. For all
-and to all, if you need support thanks to read
+and to all, if you need support thanks to read the URL to know how to proceed:
 
      http://dar.linux.free.fr/#help
 
                                                   Sharing must be both ways.
-
-to know how to proceed.
 
         else for non support requests, you
         need to add "[EARTH IS BEAUTIFUL]" in the subject
@@ -49,14 +48,15 @@ An extract of Denis Corbin's resume:
         1995      3 months Erasmus project in Bologna (Italy).
         1996      Military Service: 28e Regiment Transmission Armee de Terre
                   Formation Equipex-RITA, operator on the RITTER network.
+                  Preparation Militaire PMTE.
         1997-2000 Software developer, Team leader, Project leader for
                   Netcomsystems (today Spirent Communications). Designed
                   software for the Smartbits network test equipment. Worked
-                  in cooperation with Californian team, have spent few weeks in
+                  in cooperation with Californian team, has spent few weeks in
                   Los Angeles.
         2000-2002 Network Design, architecture and network support for DCN
                   of Alcatel Submarine Networks, (worked mainly in France,
-                  and spend several weeks in USA, Chile and Brazil).
+                  and spent several weeks in USA, Chile and Brazil).
         2002-2003 DNS maintainer and Firewall admin for the GPRS network of
                   Bouygues Telecom (small french mobile operator).
         2003-2004 Network Design and support for SFR's wap and SMS platform,
@@ -72,9 +72,10 @@ An extract of Denis Corbin's resume:
               L2 protocols (Ethernet, Token Ring: frame format, detail behavior
                        and structure of switch and hub equipments. ATM, FR,
                        protocols, E1, T1, T3 and E3 WAN links).
-              L3 protocols (IP, OSI, OSPF, RIP, ISIS, ESIS, BGP, HSRP, VRRP...)
+              L3 protocols (IPv4, IPv6, OSI, OSPF, RIP, ISIS, ESIS, BGP, HSRP,
+              VRRP, DECNET, IPX, IGMP, PIM, ICMP, MLD, ...)
               L4 protocols (UDP, TCP).
-              QoS (CBQ, TBF, RED, etc.)
+              QoS (CBQ, TBF, RED, WRED, etc.)
               DNS configuration and administrative interfaces to network
               databases (like the RIPE).
               Firewall admin (Checkpoint, Netscreen, Linux iptables),
@@ -87,8 +88,9 @@ An extract of Denis Corbin's resume:
              HPOVO, HPOVPI.
 
 	Good practice of the following equipments:
-             Cisco switches and routers (3550 SMI/EMI, 7200, 3600, 1700, 2500, 4500, 6500)
-             Checkpoint Firewalls 4.1, NG and AI
+             Cisco switches and routers (3550 SMI/EMI, 3750, 7200, 3600, 1700,
+             2500, 4500, 6500, 2500, 2960)
+             Checkpoint Firewalls 4.1, NG and AI,
              Alteon L4-L7 load balancers
              Netscreen Firewalls (today Juniper's)
              SunOS/Solaris network and hardware administration (less practice

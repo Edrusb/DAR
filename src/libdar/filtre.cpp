@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.40.2.5 2006/10/23 19:31:55 edrusb Rel $
+// $Id: filtre.cpp,v 1.40.2.6 2007/02/23 20:52:44 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -410,6 +410,8 @@ namespace libdar
 
 			    if(e_hard != NULL)
 			    {
+				if(info_details)
+				    dialog.warning(string(gettext("Adding file to archive: ")) + juillet.get_string());
 				cat.add(e);
 				st.incr_hard_links();
 			    }
@@ -1271,7 +1273,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.40.2.5 2006/10/23 19:31:55 edrusb Rel $";
+        static char id[]="$Id: filtre.cpp,v 1.40.2.6 2007/02/23 20:52:44 edrusb Rel $";
         dummy_call(id);
     }
 

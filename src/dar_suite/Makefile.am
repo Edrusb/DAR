@@ -119,5 +119,5 @@ dar_cp_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 dar_static_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp shell_interaction.cpp shell_interaction.hpp dar.usage
 dar_static_DEPENDENCIES = ../libdar/lib$(MYLIB).la
-dar_static_LDFLAGS = -all-static
+dar_static_LDFLAGS = -all-static @LTLIBINTL@
 

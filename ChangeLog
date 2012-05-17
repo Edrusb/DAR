@@ -482,3 +482,32 @@ from 2.3.1 to 2.3.2
 - fixed tutorial with command line evolution (dar's -g option in particular)
 - latest version of Grzegorz Adam Hankiewicz's mini-howto
 - fixed bug concerning restoration of only more recent files
+
+from 2.3.2 to 2.3.3
+- avoid using getpwuid() and getgrgid() for static linking.
+- fixed typo in dar's man page
+- update FAQ
+- fixed bug: uncaught exception thrown when CTRC-C was hit while dar waits an
+  answer from the user [SF #1612205]
+- fixed bug: unusable archive generated when CTRC-C was hit and blowfish
+  encryption used [SF #1632273]
+- added a check to verify that the libdar used is compatible with the current
+  dar suite programs [SF #1587643]
+- fixed bug: added workaround for the right arithmetic shift operator (the
+  binary produced by gcc-3.4.2 produces computes "v>>s" equal to "v" when when
+  v is a integer field composed of s exactly bits. It should rather compute it
+  to zero...).
+  this problem leads 32 bits generated archive incompatible with 64 bits
+  generated archive only when blowfish is used.
+- fixed bug met when the inode space is exhausted, thanks to "Jo - Ex-Bart" for
+  this new feedback. [SF #1632738]
+- replaced &, <, >, ' and " in XML listing by &...; corresponding sequence.
+  [SF #1597403]
+- dar_manager can receive arguments after stick to -o options (it is an error
+  in regard to documentation, but no warning was issued in that case, leading
+  to confusion for some users) [SF #1598138]
+- updated Veysel Ozer's automatic_backup script
+- fixed hard link detection problem [SF #1667400]
+- verbose output did not displayed hard links information
+- merged patch on dar_cp by Andrea Palazzi to have it to return EXIT_DATA_ERROR
+  when some data have been reported [SF #1622913]

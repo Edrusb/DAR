@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.29.2.2 2006/02/04 14:47:15 edrusb Rel $
+// $Id: dar_suite.cpp,v 1.29.2.4 2007/01/17 15:28:54 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -125,7 +125,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 	    get_version(maj, med, min);
 	else
 	    med = 0;
-	if(maj != LIBDAR_COMPILE_TIME_MAJOR)
+	if(maj != LIBDAR_COMPILE_TIME_MAJOR || med < LIBDAR_COMPILE_TIME_MEDIUM)
 	{
 	    GENERAL_REPORT(tools_printf(gettext("We have linked with an incompatible version of libdar. Expecting version %d.%d.x but having linked with version %d.%d.%d"), LIBDAR_COMPILE_TIME_MAJOR, LIBDAR_COMPILE_TIME_MEDIUM, maj, med, min));
 	    ret = EXIT_ERROR;
@@ -217,7 +217,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
     }
 
     if(thread_cancellation::count() != 0)
-	throw SRC_BUG;
+	GENERAL_REPORT(string(gettext("SANITY CHECK: AT LEAST ONE OBJECT HAS NOT BEEN DESTROYED AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END")));
 
 	// restoring terminal settings
     try
@@ -238,7 +238,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.29.2.2 2006/02/04 14:47:15 edrusb Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.29.2.4 2007/01/17 15:28:54 edrusb Rel $";
     dummy_call(id);
 }
 

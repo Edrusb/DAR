@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.hpp,v 1.18 2005/12/05 11:56:21 edrusb Rel $
+// $Id: limitint.hpp,v 1.18.2.1 2007/01/17 20:18:28 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -149,6 +149,7 @@ namespace libdar
 
     private :
         static const int TG = 4;
+	static const U_32 sizeof_field = sizeof(B);
 
         enum endian { big_endian, little_endian, not_initialized };
         typedef unsigned char group[TG];
@@ -477,7 +478,10 @@ namespace libdar
     template <class B> limitint<B> & limitint<B>::operator >>= (U_32 bit)
     {
         E_BEGIN;
-        field >>= bit;
+	if(bit >= sizeof_field)
+	    field = 0;
+	else
+	    field >>= bit;
         return *this;
         E_END("limitint::operator >>=", "U_32");
     }
