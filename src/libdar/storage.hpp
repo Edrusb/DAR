@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.hpp,v 1.11.4.3 2009/04/07 08:45:29 edrusb Rel $
+// $Id: storage.hpp,v 1.11.4.4 2011/01/22 15:34:17 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -159,6 +159,11 @@ namespace libdar
         iterator rend() const
             { E_BEGIN; iterator ret; ret.cell = NULL, ret.offset = iterator::OFF_BEGIN; ret.ref = this; return ret; E_END("storage::rend", ""); };
 
+	    /// write data to the storage at the location pointed to by it
+
+	    /// \param[in,out] it where to write data to, at the end this iterator points just after the data that has been wrote
+	    /// \param[in] a gives to the address where is located the data to write to the storage object
+	    /// \param[in] size how much bytes to write to the storage
         U_I write(iterator & it, unsigned char *a, U_I size);
         U_I read(iterator & it, unsigned char *a, U_I size) const;
         bool write(iterator & it, unsigned char a)

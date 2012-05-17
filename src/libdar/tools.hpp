@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.39.2.13 2010/04/09 16:10:09 edrusb Rel $
+// $Id: tools.hpp,v 1.39.2.16 2011/01/21 19:18:24 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -122,17 +122,17 @@ namespace libdar
         /// split a given full path in path part and basename part
 
         /// \param[in] all is the path to split
-        /// \param[out] chemin is the resulting path part
+        /// \param[out] chemin is the resulting path part, it points to a newly allocated path object
         /// \param[out] base is the resulting basename
-        /// \note chemin argument must be release by the call thanks to the "delete" operator.
+        /// \note chemin argument must be release by the caller thanks to the "delete" operator.
     extern void tools_split_path_basename(const char *all, path * &chemin, std::string & base);
 
         /// split a given full path in path part and basename part
 
         /// \param[in] all is the path to split
-        /// \param[out] chemin is the resulting path part
+        /// \param[out] chemin is the resulting path part, it points to a newly allocated path object
         /// \param[out] base is the resulting basename
-        /// \note chemin argument must be release by the call thanks to the "delete" operator.
+        /// \note chemin argument must be release by the caller thanks to the "delete" operator.
     extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base);
 
         /// open a pair of tuyau objects encapsulating two named pipes.
@@ -268,7 +268,7 @@ namespace libdar
         /// \param[in] date1 first date to compare
         /// \param[in] date2 second date to compare to
         /// \return whether dates are equal or not
-    extern bool is_equal_with_hourshift(const infinint & hourshift, const infinint & date1, const infinint & date2);
+    extern bool tools_is_equal_with_hourshift(const infinint & hourshift, const infinint & date1, const infinint & date2);
 
         /// ascii to integer conversion
 
@@ -396,41 +396,42 @@ namespace libdar
         /// .
     extern std::string tools_vprintf(const char *format, va_list ap);
 
-        /// test the presence of files corresponding to a given mask in a directory
+        /// test the presence of files corresponding to a given mask in a directory (regex mask)
 
         /// \param[in,out] ui for user interaction
-        /// \param[in] c_chemin directory where file have to looked for
-        /// \param[in] file_mask glob expression which designates the files to look for
+        /// \param[in] c_chemin directory where file have to be looked for
+        /// \param[in] file_mask regex expression which designates the files to look for
         /// \return true if some files have found matching the file_mask
-    extern bool tools_do_some_files_match_mask(user_interaction & ui, const std::string & c_chemin, const std::string & file_mask);
+    extern bool tools_do_some_files_match_mask_regex(user_interaction & ui, const std::string & c_chemin, const std::string & file_mask);
+
 
         /// remove files from a given directory
 
         /// \param[in,out] dialog for user interaction
         /// \param[in] c_chemin directory where files have to be removed
-        /// \param[in] file_mask glob expression which designates the files to remove
+        /// \param[in] file_mask regex expression which designates the files to remove
         /// \param[in] info_details whether user must be displayed details of the operation
-        /// \note This is equivalent to the 'rm' command with shell expansion
-    extern void tools_unlink_file_mask(user_interaction & dialog, const std::string & c_chemin, const std::string & file_mask, bool info_details);
+        /// \note This is equivalent to the 'rm' command with regex expression in place of glob one
+    extern void tools_unlink_file_mask_regex(user_interaction & dialog, const std::string & c_chemin, const std::string & file_mask, bool info_details);
 
 
         /// prevents slice overwriting: check the presence of slice and if necessary ask the user if they can be removed
 
 	/// \param[in,out] dialog for user interaction
 	/// \param[in] chemin where slice is about to be created
-	/// \param[in] x_file_mask mask corresponding to slices that will be generated
+	/// \param[in] x_file_mask mask corresponding to slices that will be generated (regex)
 	/// \param[in] info_details whether user must be displayed details of the operation
 	/// \param[in] allow_overwriting whether overwriting is allowed by the user
 	/// \param[in] warn_overwriting whether a warning must be issued before overwriting (if allowed)
 	/// \param[in] dry_run do a dry-run exection (no filesystem modification is performed)
 	/// \note may thow exceptions.
-    extern void tools_avoid_slice_overwriting(user_interaction & dialog,
-					      const path & chemin,
-					      const std::string & x_file_mask,
-					      bool info_details,
-					      bool allow_overwriting,
-					      bool warn_overwriting,
-					      bool dry_run);
+    extern void tools_avoid_slice_overwriting_regex(user_interaction & dialog,
+						    const path & chemin,
+						    const std::string & x_file_mask,
+						    bool info_details,
+						    bool allow_overwriting,
+						    bool warn_overwriting,
+						    bool dry_run);
 
         /// append an elastic buffer of given size to the file
 

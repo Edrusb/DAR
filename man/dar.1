@@ -210,7 +210,7 @@ Only the inode type is considered. Ownership, permission and dates are ignored. 
 When no flag is provided to this option, -O option acts as if the "ignore-owner" flag was set, which is the behavior in older releases (< 2.3.0). Note also that for backward compatibility, --ignore-owner option still exists and is now just an alias to the --comparison-field=ignore-owner option. Of course if this option is not used, all fields are used for comparison or restoration.
 .TP 20
 -H[num], --hour[=num]
-if -H is used, two dates are considered equal if they differ from a integer number of hours, and that number is less than or equal to [num]. If not specified num defaults to 1. This is used when making a differential backup, to compare last_modification date of inodes, and at restoration time if the -r option (restore only more recent files) is used. This is to workaround some filesystems (like Samba filesystem) that seems to change the dates of files after having gone from or to daylight saving time (winter/summer time).
+if -H is used, two dates are considered equal if they differ from a integer number of hours, and that number is less than or equal to [num]. If not specified num defaults to 1. This is used when making a differential backup, to compare last_modification date of inodes, at restoration time if the -r option (restore only more recent files) is used and last, when comparing an archive with a filesystem (-d option). This is to workaround some filesystems (like Samba filesystem) that seems to change the dates of files after having gone from or to daylight saving time (winter/summer time).
 .TP 20
 -E, --execute <string>
 the string is a

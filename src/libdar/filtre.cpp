@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.40.2.11 2009/05/01 16:11:20 edrusb Rel $
+// $Id: filtre.cpp,v 1.40.2.12 2010/09/12 16:32:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -645,7 +645,8 @@ namespace libdar
 			   const mask & ea_mask,
 			   bool alter_atime,
 			   inode::comparison_fields what_to_check,
-			   bool display_skipped)
+			   bool display_skipped,
+			   const infinint & hourshift)
     {
         const entree *e;
         defile juillet = fs_racine;
@@ -683,7 +684,7 @@ namespace libdar
                                     {
                                         try
                                         {
-                                            e_ino->compare(dialog, *exists, ea_mask, what_to_check);
+                                            e_ino->compare(dialog, *exists, ea_mask, what_to_check, hourshift);
                                             if(info_details)
                                                 dialog.warning(string(gettext("OK   "))+juillet.get_string());
                                             st.incr_treated();
@@ -1297,7 +1298,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.40.2.11 2009/05/01 16:11:20 edrusb Rel $";
+        static char id[]="$Id: filtre.cpp,v 1.40.2.12 2010/09/12 16:32:51 edrusb Rel $";
         dummy_call(id);
     }
 

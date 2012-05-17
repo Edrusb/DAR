@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.cpp,v 1.19.2.4 2009/04/07 08:45:29 edrusb Rel $
+// $Id: real_infinint.cpp,v 1.19.2.5 2011/01/04 16:27:13 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -686,7 +686,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: real_infinint.cpp,v 1.19.2.4 2009/04/07 08:45:29 edrusb Rel $";
+        static char id[]="$Id: real_infinint.cpp,v 1.19.2.5 2011/01/04 16:27:13 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -701,6 +701,24 @@ namespace libdar
         else
             used_endian = little_endian;
         E_END("infinint::setup_endian", "");
+    }
+
+    bool infinint::is_system_big_endian()
+    {
+	if(used_endian == not_initialized)
+	    setup_endian();
+
+	switch(used_endian)
+	{
+	case big_endian:
+	    return true;
+	case little_endian:
+	    return false;
+	case not_initialized:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
     }
 
 ///////////////////////////////////////////////////////////////////////

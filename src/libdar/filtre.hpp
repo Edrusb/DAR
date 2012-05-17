@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.hpp,v 1.21 2005/11/21 22:46:32 edrusb Rel $
+// $Id: filtre.hpp,v 1.21.2.1 2010/09/12 16:32:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -93,7 +93,8 @@ namespace libdar
 				  const mask & ea_mask,
 				  bool alter_time,
 				  inode::comparison_fields what_to_check,
-				  bool display_skipped);
+				  bool display_skipped,
+				  const infinint & hourshift);
 
     extern void filtre_test(user_interaction & dialog,
 			    const mask &filtre,

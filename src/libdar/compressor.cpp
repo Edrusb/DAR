@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: compressor.cpp,v 1.16.2.4 2009/04/07 08:45:29 edrusb Rel $
+// $Id: compressor.cpp,v 1.16.2.5 2010/07/28 13:23:28 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -241,6 +241,7 @@ namespace libdar
     {
         S_I ret;
         S_I flag = WR_NO_FLUSH;
+	U_I mem_avail_out = 0;
 
         if(size == 0)
             return 0;
@@ -256,6 +257,14 @@ namespace libdar
                 decompr->wrap.set_next_in(decompr->buffer);
                 decompr->wrap.set_avail_in(compressed->read(decompr->buffer,
                                                             decompr->size));
+
+		if(decompr->wrap.get_avail_in() == 0)
+		    mem_avail_out = decompr->wrap.get_avail_out();
+		    // could not add compressed data, so if no more clear data is produced
+		    // we must break the endless loop if WR_STREAM_END is not returned by decompress()
+		    // this situation can occur upon data corruption
+		else
+		    mem_avail_out = 0;
             }
 
             ret = decompr->wrap.decompress(flag);
@@ -283,7 +292,7 @@ namespace libdar
                 throw SRC_BUG;
             }
         }
-        while(decompr->wrap.get_avail_out() > 0 && ret != WR_STREAM_END);
+        while(decompr->wrap.get_avail_out() != mem_avail_out && ret != WR_STREAM_END);
 
         return decompr->wrap.get_next_out() - a;
     }
@@ -376,7 +385,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: compressor.cpp,v 1.16.2.4 2009/04/07 08:45:29 edrusb Rel $";
+        static char id[]="$Id: compressor.cpp,v 1.16.2.5 2010/07/28 13:23:28 edrusb Rel $";
         dummy_call(id);
     }
 

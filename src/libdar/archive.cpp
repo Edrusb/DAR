@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.cpp,v 1.40.2.9 2009/04/07 08:45:29 edrusb Rel $
+// $Id: archive.cpp,v 1.40.2.12 2010/09/12 16:32:51 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -269,13 +269,13 @@ namespace libdar
 		throw Ememory("archive::archive[merge]");
 
 	    if(!empty)
-		tools_avoid_slice_overwriting(dialog,
-					      sauv_path,
-					      filename+".*."+extension,
-					      info_details,
-					      allow_over,
-					      warn_over,
-					      empty);
+		tools_avoid_slice_overwriting_regex(dialog,
+						    sauv_path,
+						    string("^")+filename+"\\.[0-9]+\\."+extension+"$",
+						    info_details,
+						    allow_over,
+						    warn_over,
+						    empty);
 
 	    if(ref_arch1 == NULL)
 		if(ref_arch2 == NULL)
@@ -404,7 +404,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: archive.cpp,v 1.40.2.9 2009/04/07 08:45:29 edrusb Rel $";
+        static char id[]="$Id: archive.cpp,v 1.40.2.12 2010/09/12 16:32:51 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -614,7 +614,8 @@ namespace libdar
                                 inode::comparison_fields what_to_check,
                                 bool alter_atime,
 				bool display_skipped,
-				statistics * progressive_report)
+				statistics * progressive_report,
+				const infinint & hourshift)
     {
         statistics st = false;  // false => no lock for this internal object
 	statistics *st_ptr = progressive_report == NULL ? &st : progressive_report;
@@ -649,7 +650,8 @@ namespace libdar
 				  *st_ptr,
 				  ea_mask,
 				  alter_atime, what_to_check,
-				  display_skipped);
+				  display_skipped,
+				  hourshift);
             }
             catch(Euser_abort & e)
             {
@@ -832,13 +834,13 @@ namespace libdar
 
             // end of sanity checks
 
-	tools_avoid_slice_overwriting(dialog,
-				      sauv_path,
-				      filename+".*."+extension,
-				      info_details,
-				      allow_over,
-				      warn_over,
-				      empty);
+	tools_avoid_slice_overwriting_regex(dialog,
+					    sauv_path,
+					    string("^")+filename+"\\.[0-9]+\\."+extension+"$",
+					    info_details,
+					    allow_over,
+					    warn_over,
+					    empty);
 
 	catalogue *ref_cat = NULL;
 	const path *ref_path = NULL;

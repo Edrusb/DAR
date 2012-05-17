@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.22 2010/04/09 16:10:09 edrusb Rel $
+// $Id: tools.cpp,v 1.54.2.24 2010/09/12 16:32:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -276,7 +276,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.54.2.22 2010/04/09 16:10:09 edrusb Rel $";
+        static char id[]="$Id: tools.cpp,v 1.54.2.24 2010/09/12 16:32:51 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -822,7 +822,7 @@ namespace libdar
         dialog.printf(gettext("   Thread safe support        : %s\n"), YES_NO(thread_safe));
     }
 
-    bool is_equal_with_hourshift(const infinint & hourshift, const infinint & date1, const infinint & date2)
+    bool tools_is_equal_with_hourshift(const infinint & hourshift, const infinint & date1, const infinint & date2)
     {
         infinint delta = date1 > date2 ? date1-date2 : date2-date1;
         infinint num, rest;
@@ -1262,9 +1262,9 @@ namespace libdar
         return output;
     }
 
-    void tools_unlink_file_mask(user_interaction & dialog, const string & c_chemin, const string & file_mask, bool info_details)
+    void tools_unlink_file_mask_regex(user_interaction & dialog, const string & c_chemin, const string & file_mask, bool info_details)
     {
-	simple_mask my_mask = simple_mask(file_mask, true);
+	regular_mask my_mask = regular_mask(file_mask, true);
 	etage dir = etage(dialog, c_chemin.c_str(), 0, 0, false);
 	path chemin = path(c_chemin);
 	string entry;
@@ -1280,9 +1280,9 @@ namespace libdar
 	    }
     }
 
-    bool tools_do_some_files_match_mask(user_interaction & ui, const string & c_chemin, const string & file_mask)
+    bool tools_do_some_files_match_mask_regex(user_interaction & ui, const string & c_chemin, const string & file_mask)
     {
-	simple_mask my_mask = simple_mask(file_mask, true);
+	regular_mask my_mask = regular_mask(file_mask, true);
 	etage dir = etage(ui, c_chemin.c_str(), 0, 0, false);
 	string entry;
 	bool ret = false;
@@ -1294,10 +1294,10 @@ namespace libdar
 	return ret;
     }
 
-    void tools_avoid_slice_overwriting(user_interaction & dialog, const path & chemin, const string & file_mask, bool info_details, bool allow_overwriting, bool warn_overwriting, bool dry_run)
+    void tools_avoid_slice_overwriting_regex(user_interaction & dialog, const path & chemin, const string & file_mask, bool info_details, bool allow_overwriting, bool warn_overwriting, bool dry_run)
     {
 	const string c_chemin = chemin.display();
-	if(tools_do_some_files_match_mask(dialog, c_chemin, file_mask))
+	if(tools_do_some_files_match_mask_regex(dialog, c_chemin, file_mask))
 	{
 	    if(!allow_overwriting)
 		throw Erange("tools_avoid_slice_overwriting", tools_printf(gettext("Overwriting not allowed while a slice of a previous archive with the same basename has been found in the %s directory, Operation aborted"), c_chemin.c_str()));
@@ -1308,7 +1308,7 @@ namespace libdar
 		    if(warn_overwriting)
 			dialog.pause(tools_printf(gettext("At least one slice of an old archive with the same name remains in the directory %s. It is advised to remove all the old archive's slices before creating an archive of same name. Can I remove these old slices?"), c_chemin.c_str()));
 		    if(!dry_run)
-			tools_unlink_file_mask(dialog, c_chemin, file_mask, info_details);
+			tools_unlink_file_mask_regex(dialog, c_chemin, file_mask, info_details);
 		}
 		catch(Euser_abort & e)
 		{

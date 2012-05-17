@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.hpp,v 1.32.2.2 2009/04/07 08:45:29 edrusb Rel $
+// $Id: archive.hpp,v 1.32.2.3 2010/09/12 16:32:51 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -374,6 +374,7 @@ namespace libdar
 	    /// \param[in] what_to_check fields to consider wien comparing inodes with those on filesystem (see inode::comparison_fields enumeration)
 	    /// \param[in] alter_atime whether to alter atime or ctime in the filesystem when reading files to compare
 	    /// \param[in] display_skipped whether to display files that have been excluded by filters
+	    /// \param[in] hourshift dates with up to this exact interger number of hour of difference are considered equal dates
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
 	    /// during the call (see the returned value to know the useful fields and their meining),
 	    /// NULL can be given in argument if you only need the result at the end of the operation through the returned value of this call
@@ -393,7 +394,8 @@ namespace libdar
 			   inode::comparison_fields what_to_check,
 			   bool alter_atime,
 			   bool display_skipped,
-			   statistics * progressive_report);
+			   statistics * progressive_report,
+			   const infinint & hourshift = 0);
 
 
 	    /// test the archive integrity

@@ -599,3 +599,24 @@ version 2.3.9 to 2.3.10
   same name are present in the destination directory (backup, isolation, merging,
   dar_xform)
 
+version 2.3.10 to 2.3.11
+- fixed bug in the detection code of an existing archive of the same name when
+  creating a new archive (improperly considered some files sharing a part of
+  the archive basename as old slices of an archive of the same base name).
+- fixed a display bug. When using -v to see which arguments get passed to dar
+  by mean of configuration file (DCF file, ~/.darrc or /etc/darrc) the last
+  argument found in file was not displayed.
+- fixed two bugs (one in decompression routine, the other in decryption routine)
+  that lead dar to segfault or run into an endless loop when reading a very
+  corrupted archive.
+- added -H option with -d option
+- fixed bug leading Dar to report some files to be removed at restoration time
+  to be of different type than the expected one when the reference used for
+  that archive (difference backup) was an extracted catalogue.
+- fixed bug in dar's command_line parsing leading dar to free twice the same
+  block of memory when an argument containing a double slash was given to
+  -G [SF 3162716].
+- probable fix (problem difficult to reproduce) for double memory release in
+  the storage class [SF 3163389]
+
+

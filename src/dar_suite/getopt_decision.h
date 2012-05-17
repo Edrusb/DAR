@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: getopt_decision.h,v 1.3 2004/11/12 21:58:17 edrusb Rel $
+// $Id: getopt_decision.h,v 1.3.4.1 2010/12/21 20:54:08 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -38,6 +38,10 @@
     // we assume that if unistd.h does not know getopt() it does nor know getopt_long()
   #include <getopt.h>
  #endif
+#endif
+
+#ifndef EOF
+#define EOF -1
 #endif
 
 #endif

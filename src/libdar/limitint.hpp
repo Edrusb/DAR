@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: limitint.hpp,v 1.18.2.4 2009/04/07 08:45:29 edrusb Rel $
+// $Id: limitint.hpp,v 1.18.2.5 2011/01/04 16:27:13 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -142,6 +142,8 @@ namespace libdar
         bool operator <= (const limitint &x) const { return field <= x.field; };
         bool operator != (const limitint &x) const { return field != x.field; };
         bool operator >= (const limitint &x) const { return field >= x.field; };
+
+	static bool is_system_big_endian();
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(limitint);
@@ -629,6 +631,23 @@ namespace libdar
     }
 
 
+    template <class B> bool limitint<B>::is_system_big_endian()
+    {
+	if(used_endian == not_initialized)
+	    setup_endian();
+
+	switch(used_endian)
+	{
+	case big_endian:
+	    return true;
+	case little_endian:
+	    return false;
+	case not_initialized:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
+    }
 
 
 ///////////////////////////////////////////////////////////////////////

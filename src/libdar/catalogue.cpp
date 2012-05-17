@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.47.2.12 2009/01/04 15:34:25 edrusb Rel $
+// $Id: catalogue.cpp,v 1.47.2.13 2010/09/12 16:32:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -618,18 +618,22 @@ namespace libdar
 
     bool inode::is_more_recent_than(const inode & ref, const infinint & hourshift) const
     {
-        return *ref.last_mod < *last_mod && !is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod);
+        return *ref.last_mod < *last_mod && !tools_is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod);
     }
 
     bool inode::has_changed_since(const inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
     {
-        return (what_to_check != cf_inode_type && (hourshift > 0 ? ! is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod) : *ref.last_mod != *last_mod))
+        return (what_to_check != cf_inode_type && (hourshift > 0 ? ! tools_is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod) : *ref.last_mod != *last_mod))
             || (what_to_check == cf_all && uid != ref.uid)
             || (what_to_check == cf_all && gid != ref.gid)
             || (what_to_check != cf_mtime && what_to_check != cf_inode_type && perm != ref.perm);
     }
 
-    void inode::compare(user_interaction & dialog, const inode &other, const mask & ea_mask, comparison_fields what_to_check) const
+    void inode::compare(user_interaction & dialog,
+			const inode &other,
+			const mask & ea_mask,
+			comparison_fields what_to_check,
+			const infinint & hourshift) const
     {
         if(!same_as(other))
             throw Erange("inode::compare",gettext("different file type"));
@@ -639,6 +643,9 @@ namespace libdar
             throw Erange("inode.compare", gettext("different owner group"));
         if((what_to_check == cf_all || what_to_check == cf_ignore_owner) && get_perm() != other.get_perm())
             throw Erange("inode.compare", gettext("different permission"));
+	if((what_to_check == cf_all || what_to_check == cf_ignore_owner || what_to_check == cf_mtime)
+	   && !tools_is_equal_with_hourshift(hourshift, get_last_modif(), other.get_last_modif()))
+	    throw Erange("inode.compare", gettext("difference of last modification date"));
         sub_compare(dialog, other);
 
 	switch(ea_get_saved_status())
@@ -668,7 +675,8 @@ namespace libdar
 	case ea_fake:
 	    if(other.ea_get_saved_status() != ea_none)
 	    {
-		if(get_last_change() < other.get_last_change())
+		if(!tools_is_equal_with_hourshift(get_last_change(), other.get_last_change(), hourshift)
+		   && get_last_change() < other.get_last_change())
 		    throw Erange("inode::compare", gettext("inode last change date (ctime) greater, EA might be different"));
 	    }
 	    else
@@ -2593,7 +2601,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: catalogue.cpp,v 1.47.2.12 2009/01/04 15:34:25 edrusb Rel $";
+	static char id[]="$Id: catalogue.cpp,v 1.47.2.13 2010/09/12 16:32:51 edrusb Rel $";
 	dummy_call(id);
     }
 

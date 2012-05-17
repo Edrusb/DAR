@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.70.2.6 2010/02/27 10:07:42 edrusb Rel $
+// $Id: libdar.cpp,v 1.70.2.8 2011/01/01 18:06:10 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -41,6 +41,10 @@ extern "C"
 
 #if HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+
+#if HAVE_TIME_H
+#include <time.h>
 #endif
 
 } // end extern "C"
@@ -442,7 +446,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.70.2.6 2010/02/27 10:07:42 edrusb Rel $";
+        static char id[]="$Id: libdar.cpp,v 1.70.2.8 2011/01/01 18:06:10 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -631,7 +635,8 @@ namespace libdar
 				bool display_skipped,
 				statistics * progressive_report,
 				U_16 & exception,
-				std::string & except_msg)
+				std::string & except_msg,
+				const infinint & hourshift = 0)
     {
 	statistics ret;
 	NLS_SWAP_IN;
@@ -647,7 +652,8 @@ namespace libdar
 			   what_to_check,
 			   alter_atime,
 			   display_skipped,
-			   progressive_report);
+			   progressive_report,
+			   hourshift);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
 	return ret;

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.37.2.5 2009/01/24 16:01:16 edrusb Rel $
+// $Id: sar.cpp,v 1.37.2.6 2010/08/06 14:00:14 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -274,7 +274,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.37.2.5 2009/01/24 16:01:16 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.37.2.6 2010/08/06 14:00:14 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -642,6 +642,7 @@ namespace libdar
         of_max_seen = 0;
         of_last_file_known = false;
         of_fd = NULL;
+	of_flag = '\0';
         first_file_offset = 0; // means that the sizes have to be determined from file or wrote to file
     }
 

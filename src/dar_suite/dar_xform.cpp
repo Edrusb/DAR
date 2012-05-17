@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.36.2.7 2008/02/09 20:11:27 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.36.2.10 2011/03/12 15:39:36 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -52,7 +52,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_XFORM_VERSION "1.4.2"
+#define DAR_XFORM_VERSION "1.4.3"
 
 static bool command_line(user_interaction & dialog,
 			 S_I argc, char *argv[],
@@ -101,7 +101,7 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char *argv[], const cha
 		if(dst != "-")
 		{
 		    shell_interaction_change_non_interactive_output(&cout);
-		    tools_avoid_slice_overwriting(dialog,  dst_dir->display(), dst+".*."+EXTENSION, false, allow, warn, false);
+		    tools_avoid_slice_overwriting_regex(dialog,  dst_dir->display(), string("^")+dst+"\\.[0-9]+\\."+EXTENSION+"$", false, allow, warn, false);
 		}
 
 		thr.check_self_cancellation();
@@ -396,7 +396,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.36.2.7 2008/02/09 20:11:27 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.36.2.10 2011/03/12 15:39:36 edrusb Rel $";
     dummy_call(id);
 }
 

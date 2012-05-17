@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.45.2.8 2009/11/22 12:32:44 edrusb Rel $
+// $Id: filesystem.cpp,v 1.45.2.9 2010/10/14 21:19:35 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -1197,7 +1197,7 @@ namespace libdar
                                 if(warn_overwrite)
                                     get_fs_ui().pause(tools_printf(gettext("%S is about to be removed from filesystem, continue ? "), &spot_display));
 
-                                if(tolower(exists->signature()) == tolower(x_det->get_signature()))
+                                if(compatible_signature(exists->signature(), x_det->get_signature()))
 				{
 				    if(!empty)
 					supprime(get_fs_ui(), spot);
@@ -1504,7 +1504,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.45.2.8 2009/11/22 12:32:44 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.45.2.9 2010/10/14 21:19:35 edrusb Rel $";
         dummy_call(id);
     }
 

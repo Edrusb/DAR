@@ -1,6 +1,6 @@
- |# Process this file with autoconf to produce a configure script.
+# Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.3.10], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.3.11], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -95,6 +95,9 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
 
 AC_MSG_CHECKING([for optreset presence])
 AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+		  	           #if HAVE_STDIO_H
+				   #include <stdio.h>
+ 				   #endif
                                    #if HAVE_GETOPT_H
                                    #include <getopt.h>
                                    #else
@@ -320,6 +323,9 @@ AC_ARG_ENABLE(  [gnugetopt],
 
 AC_MSG_CHECKING([for getopt() availability]);
 AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+				   #if HAVE_STDIO_H
+				   #include <stdio.h>
+				   #endif
                                    #if HAVE_GETOPT_H
                                    #include <getopt.h>
                                    #else

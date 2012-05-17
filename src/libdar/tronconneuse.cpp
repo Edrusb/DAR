@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronconneuse.cpp,v 1.7.2.3 2008/02/09 17:41:30 edrusb Rel $
+// $Id: tronconneuse.cpp,v 1.7.2.4 2010/07/28 13:23:28 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -252,7 +252,14 @@ namespace libdar
 	{
 	    position_clear2crypt(current_position, crypt_offset, buf_offset, tmp_ret, block_num);
 	    if(encrypted->skip(crypt_offset + initial_shift))
+	    {
 		buf_byte_data = decrypt_data(block_num, encrypted_buf, encrypted->read(encrypted_buf, encrypted_buf_size), buf, clear_block_size);
+		if(buf_byte_data > buf_size)
+		{
+		    buf_byte_data = clear_block_size;
+		    throw Erange("tronconneuse::fill_buff", gettext("Data corruption may have occurred, cannot decrypt data"));
+		}
+	    }
 	    else
 		buf_byte_data = 0; // no data could be read as the requested position could not be reached
 	}
@@ -336,7 +343,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tronconneuse.cpp,v 1.7.2.3 2008/02/09 17:41:30 edrusb Rel $";
+        static char id[]="$Id: tronconneuse.cpp,v 1.7.2.4 2010/07/28 13:23:28 edrusb Rel $";
         dummy_call(id);
     }
 

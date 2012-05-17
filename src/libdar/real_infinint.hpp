@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: real_infinint.hpp,v 1.14.2.2 2007/07/22 16:35:00 edrusb Rel $
+// $Id: real_infinint.hpp,v 1.14.2.3 2011/01/04 16:27:13 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -134,6 +134,8 @@ namespace libdar
         friend bool operator != (const infinint &, const infinint &);
         friend bool operator >= (const infinint &, const infinint &);
         friend void euclide(infinint a, const infinint &b, infinint &q, infinint &r);
+
+	static bool is_system_big_endian();
 
     private :
         static const int TG = 4;

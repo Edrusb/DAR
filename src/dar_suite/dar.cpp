@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar.cpp,v 1.43.2.3 2009/04/06 20:23:19 edrusb Rel $
+// $Id: dar.cpp,v 1.43.2.4 2010/09/12 16:32:51 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -331,7 +331,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const 
 				   input_pipe, output_pipe, execute, info_details);
                 st = arch->op_diff(dialog, *fs_root, *selection, *subtree, info_details, *ea_mask,
 				   what_to_check,
-				   alter_atime, display_skipped, NULL);
+				   alter_atime, display_skipped, NULL, hourshift);
 		if(!quiet)
 		    display_diff_stat(dialog, st);
                 if(st.get_errored() > 0 || st.get_deleted() > 0)
@@ -415,7 +415,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char *argv[], const 
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar.cpp,v 1.43.2.3 2009/04/06 20:23:19 edrusb Rel $";
+    static char id[]="$Id: dar.cpp,v 1.43.2.4 2010/09/12 16:32:51 edrusb Rel $";
     dummy_call(id);
 }
 

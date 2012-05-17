@@ -1,7 +1,14 @@
+version 2.3.11
+--------------
+Thanks to Douglas for bug report and feedback. Thanks to Jean-Christophe Arnu
+and Jonathan (via Sourceforge) for bug reports.
+
 version 2.3.10
 --------------
 Thanks to Patrick G. for feedback and help solving the bug [SF 2922417],
-and to Jan-Pascal van Best for his patch.
+and to Jan-Pascal van Best for his patch. Thanks to TONG for feedback and
+bug report.
+
 
 version 2.3.9
 --------------

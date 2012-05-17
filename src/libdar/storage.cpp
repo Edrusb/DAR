@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.cpp,v 1.16.2.2 2008/02/09 17:41:30 edrusb Rel $
+// $Id: storage.cpp,v 1.16.2.4 2011/01/22 22:37:12 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -74,6 +74,8 @@ namespace libdar
         catch(...)
         {
             detruit(first);
+	    first = NULL;
+	    last = NULL;
             throw;
         }
         E_END("storage::storage", "generic_file, U_32");
@@ -442,7 +444,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: storage.cpp,v 1.16.2.2 2008/02/09 17:41:30 edrusb Rel $";
+        static char id[]="$Id: storage.cpp,v 1.16.2.4 2011/01/22 22:37:12 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -524,11 +526,12 @@ namespace libdar
     {
         E_BEGIN;
         if(it.ref != this)
-            throw Erange("storage::insert_bytes_at_iterator_cmn", gettext("The iterator is not indexing the object it has been asked to insert byte into"));
+            throw Erange("storage::insert_bytes_at_iterator_cmn", gettext("The iterator is not indexing the object it has been defined for"));
 
         if(it.cell != NULL)
         {
-            storage temp = size+it.cell->size;
+            storage temp = size+it.cell->size; // we create a chain of cellules containing enough
+		// place to hold the current cellule's data plus the bytes to insert.
             struct cellule *before, *after;
             iterator gliss = temp.begin();
 
@@ -541,15 +544,17 @@ namespace libdar
                 gliss += size;
             temp.write(gliss, it.cell->data+it.offset, it.cell->size-it.offset);
 
-            before = it.cell->prev;
-            after = it.cell->next;
-            it.cell->prev = NULL;
-            it.cell->next = NULL;
-
             if(temp.first == NULL || temp.last == NULL)
                 throw SRC_BUG;
 
+		// now we move the chain of cellule from the temp object into the current object (this)
+		// first we release the cellule that has been copied to "temp" object
+            before = it.cell->prev;
+            after = it.cell->next;
+	    it.cell->prev = NULL;
+            it.cell->next = NULL;
             detruit(it.cell);
+	    it.cell = NULL;
 
             if(before != NULL)
                 before->next = temp.first;
@@ -563,7 +568,10 @@ namespace libdar
                 last = temp.last;
             temp.last->next = after;
 
-            temp.first = temp.last = NULL; // to make automatic destruction of "temp" while exiting of the block, keep the data untouched
+            temp.first = temp.last = NULL;
+		// this way when "temp" object will be destroyed
+		// it will not affect the chain of cells which is now
+		// part of "this" (current object).
         }
         else // it_cell == NULL
         {
@@ -620,7 +628,10 @@ namespace libdar
             if(c->size == 0 && c->data != NULL)
                 throw SRC_BUG;
             if(c->data != NULL)
+	    {
                 delete [] c->data;
+		c->data = NULL;
+	    }
             t = c->next;
             delete c;
             c = t;
@@ -651,6 +662,7 @@ namespace libdar
             else
             {
                 detruit(begin);
+		begin = NULL;
                 throw Ememory("storage::make_alloc");
             }
 
@@ -673,6 +685,7 @@ namespace libdar
 		    {
 			newone->size = 0;
 			detruit(begin);
+			begin = NULL;
 			throw Ememory("storage::make_alloc");
 		    }
 	    }
@@ -717,7 +730,11 @@ namespace libdar
             catch(Ememory & e)
             {
                 if(begin != NULL)
+		{
                     detruit(begin);
+		    begin = NULL;
+		    end = NULL;
+		}
 
                 throw;
             }

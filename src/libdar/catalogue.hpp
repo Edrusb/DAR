@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.hpp,v 1.48.2.5 2008/05/16 11:00:17 edrusb Rel $
+// $Id: catalogue.hpp,v 1.48.2.6 2010/09/12 16:32:51 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -199,7 +199,11 @@ namespace libdar
             // signature() left as an abstract method
             // clone is abstract too
 	    // used for INCREMENTAL BACKUP
-        void compare(user_interaction & dialog, const inode &other, const mask & ea_mask, comparison_fields what_to_check) const;
+        void compare(user_interaction & dialog,
+		     const inode &other,
+		     const mask & ea_mask,
+		     comparison_fields what_to_check,
+		     const infinint & hourshift) const;
             // throw Erange exception if a difference has been detected
             // this is not a symetrical comparison, but all what is present
             // in the current object is compared against the argument

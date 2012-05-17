@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.76.2.8 2009/05/09 21:15:56 edrusb Rel $
+// $Id: command_line.cpp,v 1.76.2.13 2011/03/12 15:39:36 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -581,7 +581,8 @@ bool get_args(user_interaction & dialog,
                             dialog.warning(gettext("-H is only useful with -r option when extracting"));
                     }
                     else
-                        dialog.warning(gettext("-H is only useful with -c or -x"));
+			if(op != diff)
+			    dialog.warning(gettext("-H is only useful with -c, -d or -x options"));
 	    }
 
             if(alteration != "" && op != listing)
@@ -1463,6 +1464,7 @@ static bool get_args_recursive(user_interaction & dialog,
                 catch(...)
                 {
                     delete on_fly_filename;
+		    on_fly_filename = NULL;
                     throw;
                 }
                 break;
@@ -1566,7 +1568,7 @@ static void usage(user_interaction & dialog, const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.76.2.8 2009/05/09 21:15:56 edrusb Rel $";
+    static char id[]="$Id: command_line.cpp,v 1.76.2.13 2011/03/12 15:39:36 edrusb Rel $";
     dummy_call(id);
 }
 
@@ -1942,7 +1944,15 @@ static void show_version(user_interaction & dialog, const char *command_name)
 		   + (maj > 2 ? tools_printf(gettext(" Using libdar %u.%u.%u built with compilation time options:"), maj, med, min)
 		      : tools_printf(gettext(" Using libdar %u.%u built with compilation time options:"), maj, min)));
     tools_display_features(dialog, ea, largefile, nodump, special_alloc, bits, thread, libz, libbz2, libcrypto, new_blowfish);
+    dialog.printf(gettext("   Detected system/CPU endian : %s"), infinint::is_system_big_endian() ? gettext("little") : gettext("big"));
+	// In the above line, the big/little endian displayed is intentionnaly inverted
+	// at display time. This is because the meaning of the endiannes was not interpreted
+	// correctly, it was thought that a big endian integer had the big digit (most significant bit
+	// at the end, but this is not the definition. The definitiona is that a big endian
+	// is an integer that is "started" being read by the big end (most significant bit),
+	// which is the opposite (origin: Guliver's Travels by Jonathan Swift).
     dialog.printf("\n");
+
     dialog.warning(tools_printf(gettext(" compiled the %s with %s version %s\n"), __DATE__, CC_NAT, __VERSION__)
 		   + tools_printf(gettext(" %s is part of the Disk ARchive suite (Release %s)\n"), name.c_str(), PACKAGE_VERSION)
 		   + tools_printf(gettext(" %s comes with ABSOLUTELY NO WARRANTY; for details\n type `%s -W'."), name.c_str(), name.c_str())
@@ -2106,6 +2116,8 @@ static void make_args_from_file(user_interaction & dialog, operation op, const c
 	    // now converting the mots of type vector<string> to argc/argv arguments
 	    //
         argc = mots.size()+1;
+	if(argc < 0)
+	    throw SRC_BUG; // integer overflow occurred
         argv = new char *[argc];
         if(argv == NULL)
             throw Ememory("make_args_from_file");
@@ -2124,11 +2136,11 @@ static void make_args_from_file(user_interaction & dialog, operation op, const c
 
         if(info_details)
             dialog.printf(gettext("Arguments read from %s :"), filename);
-        for(U_I i = 0; i < mots.size(); ++i)
+        for(U_I i = 0; i < mots.size() ; ++i)
         {
             argv[i+1] = tools_str2charptr(mots[i]); // mots[i] goes to argv[i+1] !
-            if(info_details && i > 0)
-                dialog.printf(" \"%s\"", argv[i]);
+            if(info_details)
+                dialog.printf(" \"%s\"", argv[i+1]);
         }
         if(info_details)
             dialog.printf("\n");
