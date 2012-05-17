@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: cache.cpp,v 1.28.2.1 2011/07/20 16:01:38 edrusb Exp $
+// $Id: cache.cpp,v 1.28.2.2 2012/04/16 19:12:04 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -302,12 +302,18 @@ namespace libdar
 	    while(wrote < size)
 	    {
 		avail = buffer_cache.size - buffer_cache.next;
-		if(avail == 0)
+		if(avail == 0) // we need to flush the cache
 		{
 		    flush_write();
 		    avail = buffer_cache.size - buffer_cache.next;
 		    if(avail == 0)
 			throw SRC_BUG;
+		    if(avail < size - wrote)
+		    {
+			ref->write(a + wrote, size - wrote);
+			wrote = size;
+			continue; // ending the while loop now, as there's no data left to copy
+		    }
 		}
 		min = avail > (size-wrote) ? (size-wrote) : avail;
 
@@ -319,7 +325,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    current_position = ref->get_position();
+	    current_position = ref->get_position() + buffer_cache.next;
 	    throw;
 	}
     }
@@ -387,7 +393,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: cache.cpp,v 1.28.2.1 2011/07/20 16:01:38 edrusb Exp $";
+        static char id[]="$Id: cache.cpp,v 1.28.2.2 2012/04/16 19:12:04 edrusb Exp $";
         dummy_call(id);
     }
 

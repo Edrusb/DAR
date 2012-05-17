@@ -18,7 +18,7 @@
 //
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
-// $Id: escape_catalogue.cpp,v 1.25.2.2 2012/02/12 20:43:34 edrusb Exp $
+// $Id: escape_catalogue.cpp,v 1.25.2.3 2012/04/16 20:56:41 edrusb Exp $
 //
 /*********************************************************************/
 
@@ -443,9 +443,10 @@ namespace libdar
 			{
 			    get_ui().warning(gettext("Uncompleted archive! Assuming it has been interrupted during the backup process. If an error has been reported just above, simply ignore it, this is about the file that was saved at the time of the interruption."));
 			    ceci->status = ec_eod;
-			    ref = new eod();
-			    if(ref != NULL)
-				--(ceci->depth);
+			    ref = get_r_eod_address();
+			    if(ref == NULL)
+				throw SRC_BUG;
+			    --(ceci->depth);
 			}
 			else
 			{
@@ -513,9 +514,10 @@ namespace libdar
 		case ec_eod:
 		    if(depth > 0)
 		    {
-			ref = new eod();
-			if(ref != NULL)
-			    --(ceci->depth);
+			ref = get_r_eod_address();
+			if(ref == NULL)
+			    throw SRC_BUG;
+			--(ceci->depth);
 		    }
 		    else
 			ceci->status = ec_marks;
@@ -589,7 +591,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: escape_catalogue.cpp,v 1.25.2.2 2012/02/12 20:43:34 edrusb Exp $";
+        static char id[]="$Id: escape_catalogue.cpp,v 1.25.2.3 2012/04/16 20:56:41 edrusb Exp $";
         dummy_call(id);
     }
 

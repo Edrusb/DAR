@@ -9,6 +9,15 @@ from 2.4.x to 2.5.0
   compatible with former implementation)
 - class hash_fichier becomes entrepot independent
 
+from 2.4.5 to 2.4.6
+- fixed bug met while interrupting compressed archive creation, resulting
+  the archive is only readable in --sequential-read mode
+- fixed bug met while reading an interrupted archive in sequential read
+  mode leading dar to not release some objects from memory at the end of
+  the operation.
+- fixed message reporting unknown system group when converting gid to name
+  (was reporting unknow "user" instead of "group")
+
 from 2.4.4 to 2.4.5
 - updated sample scripts to be compatible with dar's --min-digit option
 - added missing included file to be able to compile with gcc-4.7.0
