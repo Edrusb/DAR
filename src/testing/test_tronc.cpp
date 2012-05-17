@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_tronc.cpp,v 1.12 2005/02/22 17:59:50 edrusb Rel $
+// $Id: test_tronc.cpp,v 1.12.2.1 2008/02/09 17:41:30 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -40,6 +40,10 @@ extern "C"
 
 #if HAVE_ERRNO_H
 #include <errno.h>
+#endif
+
+#if HAVE_STRING_H
+#include <string.h>
 #endif
 } // end extern "C"
 

@@ -1,23 +1,15 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <title>Libdar API - Tutorial</title>
+<html><head><title>Libdar API - Tutorial</title>
+
+
+  
   <meta content="Denis Corbin" name="author">
-  <meta content="Tutorial for using libdar library" name="description">
-</head>
-<body
- style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);"
- link="#0000ff" vlink="#000055" alink="#ff0000">
+  <meta content="Tutorial for using libdar library" name="description"></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top; width: 161px;"><a
- href="index.html"><img
- style="border: 0px solid ; width: 160px; height: 120px;"
- alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
+      <td style="vertical-align: top; width: 161px;"><a href="index.html"><img style="border: 0px solid ; width: 160px; height: 120px;" alt="Dar Documentation" src="dar_s_doc.jpg"></a><br>
       </td>
       <td style="vertical-align: top;">
       <h1 style="text-align: center;"> LIBDAR <br>
@@ -35,9 +27,7 @@
 <div style="text-align: center;"><br>
 </div>
 <hr style="width: 100%; height: 2px;"><br>
-<table
- style="width: 90%; margin-right: auto; margin-left: auto; text-align: left;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; margin-right: auto; margin-left: auto; text-align: left;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -86,9 +76,7 @@ the doc/html directory using Doxygen.<br>
 </table>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -103,21 +91,17 @@ would only say that you are welcome to provide the necessary bindings
 yourself. :-) </div>
       <h4>Libdar namespace</h4>
 All libdar symbols are defined under
-the <span style="font-style: italic; font-weight: bold;">libdar </span><span
- style="font-weight: bold;">namespace</span>. You
+the <span style="font-style: italic; font-weight: bold;">libdar </span><span style="font-weight: bold;">namespace</span>. You
 can either add the <span style="font-style: italic;">using namespace
 libdar;</span> line at the beginning of your source files: </td>
     </tr>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>using
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>using
 namespace libdar;<br>
       </code><br>
       <code>get_version(....);<br>
@@ -126,9 +110,7 @@ namespace libdar;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top; text-align: justify;">&nbsp;or,
@@ -139,22 +121,17 @@ explicitly use the namespace in front of libdar objects : </td>
 </table>
 <br>
 <code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
 libdar::get_version(....);<br>
       </code></td>
     </tr>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -168,19 +145,15 @@ methods. To the left is with exceptions, to the right without:<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 example
 code <span style="font-weight: bold;">using exceptions</span><br>
       <br>
       </code> </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
 example
 code <span style="font-weight: bold;">not using</span> exceptions</code><br>
       </td>
@@ -188,17 +161,13 @@ code <span style="font-weight: bold;">not using</span> exceptions</code><br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top; text-align: justify;">All
 exceptions used by <span style="font-style: italic;">libdar</span>
-inherit from the pure virtual <span style="font-style: italic;"><span
- style="font-weight: bold;">class Egeneric</span>.</span> The only
-method you will need to know about for any exception is the <span
- style="font-style: italic; font-weight: bold;">get_message()</span>
+inherit from the pure virtual <span style="font-style: italic;"><span style="font-weight: bold;">class Egeneric</span>.</span> The only
+method you will need to know about for any exception is the <span style="font-style: italic; font-weight: bold;">get_message()</span>
 call, which returns a message string describing the message (in human
 language). The type of the error is defined by the class of the
 exception. The possible exception types follow: </td>
@@ -206,9 +175,7 @@ exception. The possible exception types follow: </td>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top; width: 200px;"><code>class
@@ -318,9 +285,7 @@ activated at compilation time<br>
 <br>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -330,13 +295,10 @@ activated at compilation time<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>&nbsp;&nbsp;
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>&nbsp;&nbsp;
       <br>
 &nbsp;&nbsp;&nbsp; // we'll want to display some messages<br>
 #include &lt;io.h&gt;<br>
@@ -352,8 +314,7 @@ void my_sample_function()<br>
 &nbsp;&nbsp; {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; libdar::U_I maj, med, min;<br>
       <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // first we <span
- style="font-weight: bold;">MUST </span>call
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // first we <span style="font-weight: bold;">MUST </span>call
 get_version()<br>
       <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; libdar::<span style="font-weight: bold;">get_version</span>(maj,
@@ -377,8 +338,7 @@ std::endl;<br>
       <br>
 &nbsp;&nbsp; <br>
       </code> </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>&nbsp;&nbsp;
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>&nbsp;&nbsp;
       <br>
 &nbsp;&nbsp;&nbsp; // we'll want to display some messages<br>
 #include &lt;io.h&gt;<br>
@@ -422,9 +382,7 @@ linking against wrong libdar"</code><code> &lt;&lt; std::endl;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">The get_version() function must
@@ -463,13 +421,10 @@ time:<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
       <br>
 void my_sample_function()<br>
 {<br>
@@ -507,8 +462,7 @@ libcrypto);<br>
 }<br>
       <br>
       </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code>
       <code><br>
       <br>
 &nbsp;// here there is no difference because no exceptions<br>
@@ -519,9 +473,7 @@ libcrypto);<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -543,17 +495,14 @@ code if you are not using exceptions).<br>
       <h3>The generic <span style="font-style: italic;">user_interaction</span>
 class</h3>
 To be able to report messages to the user and prompt for feedback a
-special class called<span style="font-style: italic;"> <span
- style="font-weight: bold;">user_interaction </span></span>has been
+special class called<span style="font-style: italic;"> <span style="font-weight: bold;">user_interaction </span></span>has been
 introduced. Simply put, <span style="font-style: italic;">user_interaction</span>
 is a virtual class which you can derive to provide user interaction (a
 GUI's graphical interaction, for example). There are four methods whose
 prototypes you must override:<br>
       </div>
       <br style="font-style: italic; font-weight: bold;">
-      <span style="font-style: italic; font-weight: bold;">void&nbsp;</span><span
- style="font-style: italic; font-weight: bold;" class="el">pause</span><span
- style="font-style: italic; font-weight: bold;"> (const std::string
+      <span style="font-style: italic; font-weight: bold;">void&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">pause</span><span style="font-style: italic; font-weight: bold;"> (const std::string
 &amp;message);</span><br>
       <div style="margin-left: 40px; text-align: justify;">this method
 is
@@ -562,8 +511,7 @@ called by libdar when the library needs a yes or no ("continue" or
 answer to a question, which is provided by the string <em>message</em>.
 The question posed by <em>pause()</em> must be answered by returning
 normally (= "true") or throwing a <em><strong>Euser_abort</strong></em>
-exception if the user refused the proposition<span
- style="font-weight: bold;"><span style="font-weight: bold;">. </span></span>Don't
+exception if the user refused the proposition<span style="font-weight: bold;"><span style="font-weight: bold;">. </span></span>Don't
 worry about throwing an exception in your code; it will be trapped by
 libdar if you don't want to manage exceptions, and are using libdar in
 the "no exception" method. But if you really don't want to throw
@@ -571,28 +519,20 @@ exception from your code see next:<br>
       <span style="font-weight: bold;"><span style="font-weight: bold;"><br>
       <br>
       </span></span></div>
-      <span style="font-weight: bold;"><span
- style="font-style: italic; font-weight: bold;">bool </span><span
- style="font-style: italic; font-weight: bold;" class="el">pause</span><span
- style="font-style: italic; font-weight: bold;">2(const std::string
+      <span style="font-weight: bold;"><span style="font-style: italic; font-weight: bold;">bool </span><span style="font-style: italic; font-weight: bold;" class="el">pause</span><span style="font-style: italic; font-weight: bold;">2(const std::string
 &amp;message);</span></span><span style="font-weight: bold;"><br>
       </span>
-      <div style="margin-left: 40px;">This is an alternative method to<span
- style="font-style: italic;"> pause()</span> as seen above. In place of
+      <div style="margin-left: 40px;">This is an alternative method to<span style="font-style: italic;"> pause()</span> as seen above. In place of
 defining a <span style="font-style: italic;">pause()</span> method in
-your inherited class, you can redefine the <span
- style="font-style: italic;">pause2()</span> method. The only
+your inherited class, you can redefine the <span style="font-style: italic;">pause2()</span> method. The only
 difference with <span style="font-style: italic;">pause()</span> is
 that the user answer to the question is returned by a boolean value,
-your code does no more have to throw a <span
- style="font-style: italic;">Euser_abort</span> exception to say "no".
+your code does no more have to throw a <span style="font-style: italic;">Euser_abort</span> exception to say "no".
 Note that <span style="font-weight: bold;">you must not redefine both
 pause() and pause2(). </span><span style="text-decoration: underline;"><br>
       </span></div>
       <span style="font-weight: bold;"><br>
-      </span><span style="font-style: italic; font-weight: bold;">void </span><span
- style="font-style: italic; font-weight: bold;" class="el">inherited_warning</span><span
- style="font-style: italic; font-weight: bold;"> (const std::string
+      </span><span style="font-style: italic; font-weight: bold;">void </span><span style="font-style: italic; font-weight: bold;" class="el">inherited_warning</span><span style="font-style: italic; font-weight: bold;"> (const std::string
 &amp;message);</span><br>
       <div style="margin-left: 40px; text-align: justify;">libdar calls
 this <span style="font-weight: bold;">protected</span> method (through
@@ -604,13 +544,10 @@ information. In API 3.0.x this method did not exist,&nbsp; but the
 public warning() method itself was pure virtual and thus needed to be
 overwritten. Today, the <span style="font-style: italic;">warning()</span>
 method is no more pure virtual nor it is even virtual, so the user
-defined implementation of message display has to be done in the <span
- style="font-style: italic;">inherited_warning()</span> method.<br>
+defined implementation of message display has to be done in the <span style="font-style: italic;">inherited_warning()</span> method.<br>
       </div>
       <br>
-      <span style="font-style: italic; font-weight: bold;">std::string&nbsp;</span><span
- style="font-style: italic; font-weight: bold;" class="el">get_string</span><span
- style="font-style: italic; font-weight: bold;"> (const std::string
+      <span style="font-style: italic; font-weight: bold;">std::string&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">get_string</span><span style="font-style: italic; font-weight: bold;"> (const std::string
 &amp;message, bool echo);</span><br>
       <div style="margin-left: 40px; text-align: justify;">This call is
 used
@@ -618,17 +555,12 @@ to get an arbitrary answer from the user. This is mainly used to get a
 password from the user (when no password has been supplied for an
 encrypted archive), the <span style="font-style: italic;">echo </span>argument
 indicates if the user response should be displayed back on the screen
-(again, very useful for handling password input). If <span
- style="font-style: italic;">echo</span> is set to "false" the
+(again, very useful for handling password input). If <span style="font-style: italic;">echo</span> is set to "false" the
 implementation of <span style="font-style: italic;">get_string() </span>should
 hide the characters typed by the user.<br>
       </div>
       <br style="font-style: italic; font-weight: bold;">
-      <span style="font-style: italic; font-weight: bold;">&nbsp;</span><span
- style="font-style: italic; font-weight: bold;" class="el">user_interaction</span><span
- style="font-style: italic; font-weight: bold;"> *&nbsp;</span><span
- style="font-style: italic; font-weight: bold;" class="el">clone</span><span
- style="font-style: italic; font-weight: bold;">
+      <span style="font-style: italic; font-weight: bold;">&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">user_interaction</span><span style="font-style: italic; font-weight: bold;"> *&nbsp;</span><span style="font-style: italic; font-weight: bold;" class="el">clone</span><span style="font-style: italic; font-weight: bold;">
 () const;</span><br>
 A deep copy
 operation must be implemented here. This is because libdar stores the
@@ -641,13 +573,10 @@ like this (even if you don't want to use exceptions): </td>
 </table>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
       </code><code>user_interaction
 *my_own_class::clone() const<br>
 {<br>
@@ -664,16 +593,12 @@ Ememory("user_interaction_callback::clone");<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
       <h3>The callback interaction class</h3>
-      <div style="text-align: justify;">An inherited class from<span
- style="font-style: italic;"> user_interaction</span> called <span
- style="font-weight: bold; font-style: italic;">user_interaction_callback</span>
+      <div style="text-align: justify;">An inherited class from<span style="font-style: italic;"> user_interaction</span> called <span style="font-weight: bold; font-style: italic;">user_interaction_callback</span>
 provides an implementation of the user interaction based on callback
 functions. This allows you to replace the three interactions methods
 (pause, warning and get_string) by three normal functions of your
@@ -681,11 +606,9 @@ choice, which must be given to the <span style="font-style: italic;">user_intera
 constructor. The <span style="font-style: italic;">clone()</span>
 method is implemented internally, leaving only the three callback
 functions to be implemented. Look at <span style="font-style: italic;">
-dar</span>'s command line code for a practical example. <span
- style="font-style: italic;">dar</span>'s user interaction code is
+dar</span>'s command line code for a practical example. <span style="font-style: italic;">dar</span>'s user interaction code is
 implemented using an instance of <span style="font-style: italic;">user_interaction_callback</span>
-and three static functions in the module<span
- style="font-style: italic;"> dar_suite/shell_interaction.cpp</span> <br>
+and three static functions in the module<span style="font-style: italic;"> dar_suite/shell_interaction.cpp</span> <br>
       </div>
       <br>
 Pay attention to the <span style="font-style: italic;">contextual</span>
@@ -695,13 +618,10 @@ value present in the arguments of theses callback functions : </td>
 </table>
 <br>
 <div style="text-align: justify;"><code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
       </code><code><br>
 &nbsp; // our own callback functions. <br>
 &nbsp; // for the illustration of what theses 'context' arguments<br>
@@ -771,9 +691,7 @@ from the constructor to the callback<br>
 <br>
 </div>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -782,8 +700,7 @@ from the constructor to the callback<br>
 files
 will be considered and which will not. Libdar implements masks as
 several classes that all inherit from a virtual class that defines the
-way masks are used. This root class is the <span
- style="font-weight: bold; font-style: italic;">class mask</span> and
+way masks are used. This root class is the <span style="font-weight: bold; font-style: italic;">class mask</span> and
 provides the <span style="font-style: italic;">is_covered()</span>
 method which libdar uses to determine which files are considered. There
 are many different basic masks classes you can use to build fairly
@@ -793,9 +710,7 @@ complex masks: </div>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top; width: 200px;">class libdar::mask<br>
@@ -881,9 +796,7 @@ in a given file<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">Let's play with some masks : </td>
@@ -892,13 +805,10 @@ in a given file<br>
 </table>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code><br>
       </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // all files will be
 elected by this mask</code><br>
       <code>&nbsp; libdar::bool_mask m1 = true;&nbsp;&nbsp;&nbsp; <br>
@@ -940,8 +850,7 @@ only files that are selected by both m2 AND m4</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // we can make more silly things like
 this, where m5 will select files<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // that match m2 AND m4 AND m3. But <span
- style="font-style: italic;">m3 =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // that match m2 AND m4 AND m3. But <span style="font-style: italic;">m3 =
 not m2</span> so now m5 will never<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // match any file...<br>
 &nbsp; m5.add_mask(m3);<br>
@@ -967,9 +876,7 @@ possible to have masks reference each other!</code><br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">Now that you've seen the power
@@ -1006,20 +913,14 @@ strings like "<span style="font-style: italic;">tmp/A/some/file</span>"
 Instead, since libdar 4.0.0 the <span style="font-style: italic;">fs_root</span>
 argument is expended to an absolute path, so if in the previous
 example, your current directory was <span style="font-style: italic;">/var</span>
-your masks will be used against strings like "<span
- style="font-style: italic;">/var/tmp/A/some/file</span>". Of course
-there is no difference between theses two libdar revisions when the <span
- style="font-style: italic;">fs_root</span> argument is an absolute
+your masks will be used against strings like "<span style="font-style: italic;">/var/tmp/A/some/file</span>". Of course
+there is no difference between theses two libdar revisions when the <span style="font-style: italic;">fs_root</span> argument is an absolute
 path.<br>
       <br>
-An exception is the test operation, which has no <span
- style="font-style: italic;">fs_root</span> argument (because the
-operation is not relative to an existing filesystem), however the <span
- style="font-style: italic;">subtree</span> argument exist to receive a
+An exception is the test operation, which has no <span style="font-style: italic;">fs_root</span> argument (because the
+operation is not relative to an existing filesystem), however the <span style="font-style: italic;">subtree</span> argument exist to receive a
 mask for comparing the path of file to include or exclude from the test
-operation. In this case the situation is as if the <span
- style="font-style: italic;">fs_root</span> was set to the value "<span
- style="font-style: italic;">&lt;ROOT&gt;</span>". For example, masks
+operation. In this case the situation is as if the <span style="font-style: italic;">fs_root</span> was set to the value "<span style="font-style: italic;">&lt;ROOT&gt;</span>". For example, masks
 will be compared to <span style="font-style: italic;">&lt;ROOT&gt;/some/file</span>
 when performing an archive test operation.<br>
       </div>
@@ -1032,13 +933,10 @@ Now that we have seen masks and exceptions let's start the real thing:<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;">
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;">
       <p><code>&nbsp; // creating an archive is simple; it is just<br>
 &nbsp; // a matter of calling the "create" constructor<br>
 &nbsp; // of the archive class. It may be used for full or<br>
@@ -1133,7 +1031,8 @@ all files will be compressed except<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // will not be compressed<br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved regardless of<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
-&nbsp;&nbsp;&nbsp;&nbsp; cf_all,// useless here as we don't make a
+&nbsp;&nbsp;&nbsp;&nbsp; libdar::inode::cf_all,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // useless here as we don't make a
 differential<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // backup.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
@@ -1176,8 +1075,7 @@ if you don't want to have statistics of the<br>
 operation you can set this parameter to NULL<br>
       </code> </p>
       </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>&nbsp;&nbsp;
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>&nbsp;&nbsp;
 // creating an archive is simple; it is just<br>
 &nbsp; // a matter of calling the "create" constructor<br>
 &nbsp; // of the archive class. It may be used for full or<br>
@@ -1201,8 +1099,7 @@ std::string except_msg;</code><br>
       <br>
       <code><span class="el">libdar::archive *my_arch
 =&nbsp;&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">libdar::create_archive_noexcept</span>(dialog,</span></code><span
- class="el"><code>&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: bold;">libdar::create_archive_noexcept</span>(dialog,</span></code><span class="el"><code>&nbsp; <br>
 &nbsp;&nbsp;&nbsp;&nbsp; "/home",&nbsp; // saving all under this "root"<br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
 &nbsp;&nbsp;&nbsp; &nbsp;NULL,&nbsp;&nbsp;&nbsp;&nbsp; // we do a full
@@ -1279,7 +1176,8 @@ all files will be compressed except<br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved regardless of<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
       </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;
-cf_all,// useless here as we don't make a differential<br>
+libdar::inode::cf_all,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // useless here as we don't make a differential<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // backup.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
 this field is used to define which fields have<br>
@@ -1307,8 +1205,7 @@ false, // we are not doing a snapshot of the filesystem<br>
 true,&nbsp; // we don't save directories marked as caching<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
 directory by some applications.</code><br>
-      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; false, // w</code></span><span
- class="el"><code>e
+      </span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp; false, // w</code></span><span class="el"><code>e
 are not considering the cache directory<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
 tagging standard.<br>
@@ -1339,9 +1236,7 @@ if(exception != LIBDAR_NOEXCEPT)<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -1369,18 +1264,14 @@ used by the object : </div>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 &nbsp;&nbsp;&nbsp;&nbsp; delete my_arch;<br>
       <br>
       </code> </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
 libdar::close_archive_noexcept(my_arch, exception,<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp; except_msg);<br>
@@ -1396,9 +1287,7 @@ std::endl;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -1413,13 +1302,10 @@ this time with the "read" constructor: </td>
 </table>
 <code><br>
 </code>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 my_arch = new </code><code>libdar::archive(dialog,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "/tmp",&nbsp; // where is the
@@ -1440,8 +1326,7 @@ name<br>
 command executed for now<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; false); // no verbose output<br>
       </code> </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
 my_arch = </code><code>libdar::open_archive_noexcept(</code><code>dialog,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "/tmp",&nbsp; // where is the
@@ -1480,9 +1365,7 @@ std::endl;</code></span><br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;"><br>
@@ -1492,13 +1375,10 @@ Let's thus start by testing the archive coherence: </td>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 ret = my_arch-&gt;<span class="el">op_test</span>(<span class="el"></span>dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 libdar::bool_mask(true), <br>
@@ -1516,11 +1396,9 @@ false,&nbsp; /</code><code>/ we don't want to see the skipped files<br>
 NULL);&nbsp; // we don't want a progressive report</code><code></code><br>
       <br>
       </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
       <br>
-      <span class="el">ret = libdar::op_test_noexcept(</span></code><span
- class="el"><code><span class="el"></span>dialog,<br>
+      <span class="el">ret = libdar::op_test_noexcept(</span></code><span class="el"><code><span class="el"></span>dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 my_arch,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the archive
 to test<br>
@@ -1543,8 +1421,7 @@ error the <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // cause of the error<br>
       <br>
-      </code></span><span class="el"><span class="el"><code>i</code></span><span
- class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
+      </code></span><span class="el"><span class="el"><code>i</code></span><span class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
 &nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
@@ -1555,9 +1432,7 @@ std::endl;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -1569,8 +1444,7 @@ reports the number of files treated, as well as the number files with
 errors and the type of error. You can have a look at the API reference
 guide concerning the archive class methods, for more information about
 the uses of theses different fields. Here is
-an example, which relies on the <span style="font-style: italic;"><span
- style="font-weight: bold;">class deci</span> </span>to display the
+an example, which relies on the <span style="font-style: italic;"><span style="font-weight: bold;">class deci</span> </span>to display the
 value of an infinint variable:<br>
       </div>
       </td>
@@ -1579,16 +1453,12 @@ value of an infinint variable:<br>
 </table>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);">&nbsp;&nbsp;
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);">&nbsp;&nbsp;
       <code>&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp; // we need the <span
- style="font-style: italic;">class deci</span> to display the value of
+&nbsp;&nbsp;&nbsp;&nbsp; // we need the <span style="font-style: italic;">class deci</span> to display the value of
 an infinint:<br>
       </code><code></code><code>#include "deci.hpp"<br>
       <br>
@@ -1604,9 +1474,7 @@ libdar::&lt;&lt; ret.treated &lt;&lt; std::endl;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -1627,8 +1495,7 @@ enabled will let a concurrent thread reading its value to display the
 current number of file treated for example. Note that there is a little
 overhead passing a variable to progressive_report, due to the mutex
 that need be used to avoid one reading data while it is updated by
-another thread. Follows a example of use of this <span
- style="font-style: italic;">progressive report</span> feature:<br>
+another thread. Follows a example of use of this <span style="font-style: italic;">progressive report</span> feature:<br>
       </div>
       </td>
     </tr>
@@ -1636,13 +1503,10 @@ another thread. Follows a example of use of this <span
 </table>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
 &nbsp; &nbsp; <br>
 &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; // we need a variable that will be
 visible by two threads: <br>
@@ -1677,9 +1541,7 @@ some_function_to_update_the_display_with(report);<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -1693,13 +1555,10 @@ The simple way:<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 my_arch-&gt;<span class="el">op_listing</span>(<span class="el"></span>dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 false, // not a verbose output<br>
@@ -1713,11 +1572,9 @@ bool_mask(true), <br>
 false);// do not filter unsaved files&nbsp; <br>
       </code><br>
       </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
       <br>
-li<span class="el">bdar::op_test_listing(</span></code><span class="el"><code><span
- class="el"></span>dialog,<br>
+li<span class="el">bdar::op_test_listing(</span></code><span class="el"><code><span class="el"></span>dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>false,
 // not a verbose output<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; normal, // using the tar-like format<br>
@@ -1733,8 +1590,7 @@ error the <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // cause of the error<br>
       <br>
-      </code></span><span class="el"><span class="el"><code>i</code></span><span
- class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
+      </code></span><span class="el"><span class="el"><code>i</code></span><span class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
 &nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
@@ -1745,9 +1601,7 @@ endl;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -1763,10 +1617,8 @@ listing information. This requires a simple reimplementation of the <em>user_int
 object.<br>
       </div>
       <br>
-      <div style="text-align: justify;">The <span
- style="font-style: italic;">user_interaction</span> class
-has a<span style="font-style: italic;"> </span><span
- style="font-weight: bold; font-style: italic;">listing()</span> method
+      <div style="text-align: justify;">The <span style="font-style: italic;">user_interaction</span> class
+has a<span style="font-style: italic;"> </span><span style="font-weight: bold; font-style: italic;">listing()</span> method
 which provides separate arguments for each piece of information that
 can be displayed:<br>
       </div>
@@ -1794,8 +1646,7 @@ linked several times. See </em><strong>man 2 stat</strong> <em> for
 more information. Note however that in the last arguments of this call,
 you may easily know whether a file is a directory or not and whether it
 is empty or not.</em></div>
-      <div style="text-align: justify;">In the <span
- style="font-style: italic;">user_interaction</span> class
+      <div style="text-align: justify;">In the <span style="font-style: italic;">user_interaction</span> class
 (a virtual class), the <span style="font-style: italic;">listing()</span>
 method is not a pure virtual method, so you are not obliged to
 overwrite it, but it has just an empty implementation so it does
@@ -1813,13 +1664,10 @@ method to have a less silly behavior: </div>
 </div>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;&nbsp;&nbsp;
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;&nbsp;&nbsp;
 // here follows the definition of our own implementation of<br>
 &nbsp;&nbsp;&nbsp; // of a user_interaction class <br>
       <br>
@@ -1869,8 +1717,7 @@ we call the protected method set_use_listing()<br>
 &nbsp;&nbsp;&nbsp;&nbsp; // for example this can be done in the class
 constructor :<br>
       <br>
-&nbsp;&nbsp;&nbsp;&nbsp; my_user_interaction() { <span
- style="font-weight: bold;">set_use_listing(true);</span> };<br>
+&nbsp;&nbsp;&nbsp;&nbsp; my_user_interaction() { <span style="font-weight: bold;">set_use_listing(true);</span> };<br>
 };<br>
       <br>
       </code> </td>
@@ -1878,9 +1725,7 @@ constructor :<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -1892,19 +1737,15 @@ exactly as we did
 before, only replacing the <span style="font-style: italic;">dialog</span>
 object by one of the <span style="font-style: italic;">my_user_interaction</span>
 class. Then this <span style="font-style: italic;">listing()</span>
-method will be called for each file to be listed, in place of the <span
- style="font-style: italic;">warning()</span> method.<br>
+method will be called for each file to be listed, in place of the <span style="font-style: italic;">warning()</span> method.<br>
       </div>
       <br>
       <div style="text-align: justify;">As seen at the beginning of
 this
 tutorial, there is a child class of <span style="font-style: italic;">user_interaction</span>
-based on callback functions which is called <span
- style="font-style: italic;">user_interaction_callback</span>. The <span
- style="font-style: italic;">listing()</span> method must also be
+based on callback functions which is called <span style="font-style: italic;">user_interaction_callback</span>. The <span style="font-style: italic;">listing()</span> method must also be
 activated here. This is done automatically when you give a callback
-function to the object, thanks to the <span
- style="font-weight: bold; font-style: italic;">set_listing_callback()</span>
+function to the object, thanks to the <span style="font-weight: bold; font-style: italic;">set_listing_callback()</span>
 method : </div>
       </td>
     </tr>
@@ -1912,13 +1753,10 @@ method : </div>
 </table>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
       </code><code><br>
 &nbsp; // our mandatory callback functions:<br>
       <br>
@@ -1988,9 +1826,7 @@ for listing the archive contents.<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -2002,10 +1838,8 @@ user_interaction object is not overwritten) a listing like tar would
 do. In place of <span style="font-weight: bold; font-style: italic;">normal</span>
 you can use <span style="font-style: italic; font-weight: bold;">tree</span>
 or <span style="font-weight: bold; font-style: italic;">xml</span>.
-Note that for theses two new formats the <span
- style="font-style: italic;">listing()</span> is never used, so even if
-you provide a object which listing() method is overwritten, the <span
- style="font-style: italic;">archive::op_listing()</span> method will
+Note that for theses two new formats the <span style="font-style: italic;">listing()</span> is never used, so even if
+you provide a object which listing() method is overwritten, the <span style="font-style: italic;">archive::op_listing()</span> method will
 still use the <span style="font-style: italic;">warning()</span>
 method of this <span style="font-style: italic;">user_interaction</span>
 object to report the archive contents.<br>
@@ -2035,9 +1869,7 @@ archive class.<br>
       <div style="text-align: justify;">In the following example, we
 will use
 the <span style="font-style: italic;">user_interaction_callback</span>
-class, but you can use your own inherited class from <span
- style="font-style: italic;">user_interaction</span>, and its <span
- style="font-style: italic;">listing()</span> class. <br>
+class, but you can use your own inherited class from <span style="font-style: italic;">user_interaction</span>, and its <span style="font-style: italic;">listing()</span> class. <br>
       </div>
       </td>
     </tr>
@@ -2045,13 +1877,10 @@ class, but you can use your own inherited class from <span
 </table>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>&nbsp;
       </code><code><br>
 &nbsp; // our mandatory callback functions:<br>
       <br>
@@ -2148,33 +1977,26 @@ s<span style="font-weight: bold;">ome_archive.get_children_of(dialog,
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
       <h2><br>
       </h2>
       <h2>8 - comparing with filesystem</h2>
-We can compare file in an archive with the filesystem by calling the<span
- style="font-weight: bold; font-style: italic;"> op_diff</span> method
+We can compare file in an archive with the filesystem by calling the<span style="font-weight: bold; font-style: italic;"> op_diff</span> method
 of the <span style="font-style: italic;">class archive</span>. </td>
     </tr>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 &nbsp;&nbsp;&nbsp;&nbsp; ret = my_arch-&gt;op_diff(dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-"/home", // what directory to take<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/home", // what directory to take<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // as root we shall<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // compare the archive<br>
@@ -2192,7 +2014,9 @@ false,&nbsp;&nbsp; // no verbose output<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // comparing all available EA<br>
       </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-cf_all,&nbsp; // consider any fields for electing<br>
+libdar::inode::cf_all,&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// consider any fields for electing<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // differences<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2210,8 +2034,7 @@ NULL);&nbsp;&nbsp; // we don't use progessive report<br>
       <br>
       <br>
       </code> </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       <br>
 &nbsp; ret = </code><code>libdar::op_diff_noexcept(dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2236,8 +2059,9 @@ false,&nbsp;&nbsp; // no verbose output<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // comparing all available EA</code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-cf_all,&nbsp; // comparing any fields for electing<br>
+libdar::inode::cf_all,&nbsp; <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// comparing any fields for electing<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // differences<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 false, &nbsp; // do not set back atime<br>
@@ -2262,8 +2086,7 @@ except_msg); // and in case of<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
 error<br>
       <br>
-      </code></span><span class="el"><span class="el"><code>i</code></span><span
- class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
+      </code></span><span class="el"><span class="el"><code>i</code></span><span class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
 &nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
@@ -2275,9 +2098,7 @@ std::endl;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">Simple, no?<br>
@@ -2298,21 +2119,16 @@ file changed status</li>
       </ul>
       <br style="font-style: italic;">
       <h2>9 - restoring files</h2>
-Restoration of files is done by calling the&nbsp;<span
- style="font-style: italic;"> </span><span
- style="font-weight: bold; font-style: italic;">op_extract</span>
+Restoration of files is done by calling the&nbsp;<span style="font-style: italic;"> </span><span style="font-weight: bold; font-style: italic;">op_extract</span>
 method of <em>class archive</em>. </td>
     </tr>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 ret = my_arch-&gt;<span class="el">op_extract</span>(<span class="el"></span>dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 "/tmp",&nbsp;&nbsp; // where to restore files to<br>
@@ -2354,7 +2170,9 @@ false,// restore even if a file is more<br>
 &nbsp;&nbsp;&nbsp;&nbsp; false,//
 restore directory structure &nbsp;&nbsp; <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-cf_all,// consider any valuable field to define<br>
+libdar::inode::cf_all,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// consider any valuable field to define<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // if a file is more recent on filesystem.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2382,11 +2200,9 @@ false,// don't erase EA present in filesystem <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 NULL);// no progressive report used<br>
       </code> </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
       <br>
-      <span class="el">ret = libdar::op_extract_noexcept(</span></code><span
- class="el"><code><span class="el"></span>dialog,<br>
+      <span class="el">ret = libdar::op_extract_noexcept(</span></code><span class="el"><code><span class="el"></span>dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 my_arch,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the archive
 to test<br>
@@ -2424,12 +2240,11 @@ more<br>
 false,// restore directory structure
 &nbsp;&nbsp; <br>
       </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-cf_all,// consider any valuable field to define<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// if a file is more recent on filesystem<br>
-      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// defines also that we will restore<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // permission, mtime
+libdar::inode::cf_all,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // consider any valuable field to define<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // if a file is more recent on filesystem<br>
+      </code></span><span class="el"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // defines also that we will restore<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; // permission, mtime
 and ownership</code><br>
       </span><span class="el"><code>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
 false,// don't warn if a file to be <br>
@@ -2457,8 +2272,7 @@ error the <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // cause of the error<br>
       <br>
-      </code></span><span class="el"><span class="el"><code>i</code></span><span
- class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
+      </code></span><span class="el"><span class="el"><code>i</code></span><span class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
 &nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
@@ -2469,13 +2283,10 @@ std::endl;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top;">Here the <span
- style="font-style: italic;">what_to_check</span>
+      <td style="vertical-align: top;">Here the <span style="font-style: italic;">what_to_check</span>
 argument serves two roles: <br>
       <ol style="text-align: justify;">
         <li>Which field are to be ignored when looking if a file is
@@ -2488,8 +2299,7 @@ having a plethora of failure to restore ownership messages).<br>
         </li>
       </ol>
       <h2>10 - isolating the catalogue</h2>
-      <div style="text-align: justify;">OK, I know, <span
- style="font-style: italic;">catalogue </span>is not an English word
+      <div style="text-align: justify;">OK, I know, <span style="font-style: italic;">catalogue </span>is not an English word
 (one would rather write <span style="font-style: italic;">catalog</span>),
 but that's the name of the C++ class used in libdar, so we will keep
 using it here. Note that you don't have to directly access this
@@ -2511,17 +2321,13 @@ arguments :<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 libdar::archive *my_cat = new libdar::archive(dialog,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-"/tmp",&nbsp; // where the extracted <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/tmp",&nbsp; // where the extracted <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp; // catalogue is saved<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 my_arch, // the archive of reference<br>
@@ -2578,8 +2384,7 @@ false); // not a dry-run execution<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; <br>
       </code><br>
       </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code>&nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>
       <span class="el">libdar::archive *my_cat = <br>
 &nbsp;&nbsp;&nbsp; libdar::op_isolate_noexcept(dialog,<br>
@@ -2655,8 +2460,7 @@ case of error the <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // cause of the error<br>
       <br>
-      </code></span><span class="el"><span class="el"><code>i</code></span><span
- class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
+      </code></span><span class="el"><span class="el"><code>i</code></span><span class="el"><span class="el"><code>f(exception != LIBDAR_NOEXCEPT)<br>
 &nbsp; std::cout &lt;&lt; "an error occurred: " &lt;&lt; except_msg <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
@@ -2667,9 +2471,7 @@ std::endl;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -2678,8 +2480,7 @@ objects. <span style="font-style: italic;">my_arch</span> is a
 read-only object
 created by the "read" constructor. You can do any operations with it,
 like file restoration, file comparison, archive testing, as we have
-done in the previous sections. The second archive object is <span
- style="font-style: italic;">my_cat</span> which is a write only
+done in the previous sections. The second archive object is <span style="font-style: italic;">my_cat</span> which is a write only
 object. It can only be used as a reference for another backup (a
 differential backup) or as a reference for a subsequent catalogue
 isolation (which would just clone the already isolated catalogue object
@@ -2699,18 +2500,14 @@ closed: </div>
 </table>
 <br>
 <div style="text-align: justify;">
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 delete my_cat; &nbsp;&nbsp; <br>
       </code><br>
       </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code><br>
 close_archive_noexcept (my_cat, exception,<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp; except_msg);<br>
@@ -2720,20 +2517,16 @@ close_archive_noexcept (my_cat, exception,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &lt;&lt;
 std::endl;</code></span><code> <br>
-      <span class="el"></span></code><span class="el"><span class="el"><span
- class="el"><code><br>
+      <span class="el"></span></code><span class="el"><span class="el"><span class="el"><code><br>
       </code></span></span></span> </td>
     </tr>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top;">and we keep the <span
- style="font-style: italic;">my_arch</span>
+      <td style="vertical-align: top;">and we keep the <span style="font-style: italic;">my_arch</span>
 object for our last operation:<br>
       <h2>11 - creating a differential backup</h2>
       <div style="text-align: justify;">This operation is the same as
@@ -2753,13 +2546,10 @@ for exactly the same result.<br>
 </table>
 <br>
 </div>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>&nbsp;
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>&nbsp;
       <br>
 libdar::archive *my_other_arch = <br>
 &nbsp; &nbsp;&nbsp; new libdar::archive(dialog, <br>
@@ -2835,7 +2625,8 @@ all files will be compressed except<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // will not be compressed<br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved whatever is<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
-&nbsp;&nbsp;&nbsp;&nbsp; cf_all,// check all fields when looking for
+&nbsp;&nbsp;&nbsp;&nbsp; libdar::inode::cf_all,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // check all fields when looking for
 changes since<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
 archive of reference<br>
@@ -2863,17 +2654,14 @@ tagging standard.<br>
 see the skipped files</code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp; NULL); // no progressive report</code><br>
       </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code>
       </code><br>
       <code><span class="el">libdar::archive *my_other_arch
 =&nbsp;&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp; libdar::create_archive_noexcept(dialog,</span></code><span
- class="el"><code>&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp; libdar::create_archive_noexcept(dialog,</span></code><span class="el"><code>&nbsp; <br>
 &nbsp;&nbsp;&nbsp;&nbsp; "/home",&nbsp; // saving all under this "root"<br>
 &nbsp;&nbsp;&nbsp; &nbsp;"/tmp",&nbsp;&nbsp; // where the slices will go<br>
-      </code></span><span class="el"><code><span
- style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; my_arch,&nbsp; //
+      </code></span><span class="el"><code><span style="font-weight: bold;">&nbsp;&nbsp;&nbsp;&nbsp; my_arch,&nbsp; //
 differential backup </span></code></span><span class="el"><code><br>
 &nbsp;&nbsp;&nbsp; &nbsp;not_mask(simple_mask("*~", true)), <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
@@ -2944,7 +2732,8 @@ all files will be compressed except<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // will not be compressed<br>
 &nbsp;&nbsp;&nbsp; &nbsp;false, // all files will be saved whatever is<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; // the nodump flag value<br>
-&nbsp;&nbsp;&nbsp; </code></span><span class="el"><code>cf_all, //
+&nbsp;&nbsp;&nbsp; libdar::inode::</code></span><span class="el"><code>cf_all, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
 check all fields when looking for changes since<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //
 archive of reference</code><br>
@@ -2989,9 +2778,7 @@ std::endl;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -3003,18 +2790,14 @@ anymore. So we destroy it: </div>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 &nbsp;&nbsp;&nbsp;&nbsp; delete my_other_arch;<br>
       <br>
       </code> </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
 libdar::close_archive_noexcept(my_other_arch,<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp; exception,<br>
@@ -3033,9 +2816,7 @@ std::endl;<br>
 </table>
 <br>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top; text-align: justify;">So, we are
@@ -3048,18 +2829,14 @@ to destroy to cleanly release the memory used:<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code><br>
 &nbsp;&nbsp;&nbsp;&nbsp; delete my_arch;<br>
       <br>
       </code> </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code><br>
 libdar::close_archive_noexcept(my_arch, exception,<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 &nbsp; &nbsp; except_msg);<br>
@@ -3075,9 +2852,7 @@ std::endl;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">For more detailed information
@@ -3088,8 +2863,7 @@ documentation from the source code using Doxygen. <br>
       <h2>12 - Compilation &amp; Linking<br>
       </h2>
       <h3>Compilation</h3>
-All the symbols found in the libdar API are defined via <span
- style="font-style: italic; font-weight: bold;">&lt;dar/libdar.h&gt;</span>
+All the symbols found in the libdar API are defined via <span style="font-style: italic; font-weight: bold;">&lt;dar/libdar.h&gt;</span>
 so you should only need to include this header.<br>
       </td>
     </tr>
@@ -3097,13 +2871,10 @@ so you should only need to include this header.<br>
 </table>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><br>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><br>
       <code></code>&gt; cat my_prog.cpp<span style="font-weight: bold;"><br>
 #include &lt;dar/libdar.h&gt;</span><br>
       <br>
@@ -3119,9 +2890,7 @@ main()<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -3136,14 +2905,10 @@ adding <span style="font-style: italic; font-weight: bold;">-ldar</span>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code><code></code><span
- style="font-weight: bold;"></span><br>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code><code></code><span style="font-weight: bold;"></span><br>
 &gt; gcc <span style="font-weight: bold;">-ldar</span> my_prog.o -o
 my_prog<br>
       <br>
@@ -3152,9 +2917,7 @@ my_prog<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -3164,8 +2927,7 @@ my_prog<br>
 linking
 steps described above assume you
 have a "<span style="font-style: italic;">full</span>" libdar library.
-Beside the <span style="font-style: italic;">full</span> (alias <span
- style="font-style: italic;">infinint</span>) libdar flavor, libdar
+Beside the <span style="font-style: italic;">full</span> (alias <span style="font-style: italic;">infinint</span>) libdar flavor, libdar
 also comes in 32 and 64 bits
 versions. In theses last ones, in place of internally relying on a
 special type (which
@@ -3185,8 +2947,7 @@ versions can
 coexist on the same system, they
 share the same include files. But the MODE macro must be set to 32
 or 64 when compiling for linking with libdar32 or libdar64
-respectively. The MODE macro defines the way the "<span
- style="font-style: italic;">class infinint" </span>type is
+respectively. The MODE macro defines the way the "<span style="font-style: italic;">class infinint" </span>type is
 implemented in libdar, and thus changes the way the libdar headers
 files are interpreted by the compiler. </div>
       </td>
@@ -3195,13 +2956,10 @@ files are interpreted by the compiler. </div>
 </table>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>&gt;
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>&gt;
 cat my_prog.cpp<span style="font-weight: bold;"><br>
       </span>#include &lt;dar/libdar.h&gt;<br>
       <br>
@@ -3222,9 +2980,7 @@ my_prog<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; margin-right: auto; margin-left: auto; text-align: left;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; margin-right: auto; margin-left: auto; text-align: left;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">and replace 32 by 64 to link
@@ -3253,13 +3009,10 @@ you have <span style="font-style: italic;">pkg-config</span> installed)<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>&gt;
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>&gt;
 gcc <span style="font-weight: bold;">`pkg-config --cflags libdar32`</span>
 -c
 my_prog.cpp<br>
@@ -3275,9 +3028,7 @@ my_prog<br>
 </table>
 <br>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;"><br>
@@ -3293,8 +3044,7 @@ aborting a thread form the outside (like sending it a KILL signal) will
 most of the time let some memory allocated or even worse can lead to
 dead-lock
 situation, when the killed thread was in a critical section and had not
-got&nbsp; the opportunity to release a <span
- style="font-style: italic;">mutex</span>.
+got&nbsp; the opportunity to release a <span style="font-style: italic;">mutex</span>.
 For that reason, libdar proposes a set
 of calls to abort any processing libdar call which is ran by a given
 thread. <br>
@@ -3305,13 +3055,10 @@ thread. <br>
 </table>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>&nbsp;&nbsp;
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>&nbsp;&nbsp;
       <span style="font-style: italic;"></span>&nbsp; // next is the
 thread ID in which we want to have
 lidbar call canceled<br>
@@ -3346,17 +3093,14 @@ under process.<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
       <div style="text-align: justify;">As seen above, cancellation can
 be
 very simple. What now succeeds when
-you ask for a cancellation this way? Well, an exception of type <span
- style="font-weight: bold; font-style: italic;">Ethread_cancel</span>
+you ask for a cancellation this way? Well, an exception of type <span style="font-weight: bold; font-style: italic;">Ethread_cancel</span>
 is thrown. All along his path, memory is released and mutex are freed.
 Last, the exception appears to the libdar caller. So, you can catch it
 to define a specific comportment. If you don't want to use exceptions a
@@ -3367,13 +3111,10 @@ special returned code is used.<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>try<br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 255); width: 50%;"><code>try<br>
 {<br>
 &nbsp; &nbsp; </code><code>libdar::archive *my_arch =<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; new
@@ -3387,12 +3128,10 @@ catch(libdar::Ethread_cancel &amp; e)<br>
       <br>
       </code><code> </code><br>
       </td>
-      <td
- style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code><br>
+      <td style="vertical-align: top; background-color: rgb(153, 255, 153); width: 50px;"><code></code><code><br>
       </code><code>U_16 ex;<br>
 std::string msg;<br>
-      <span class="el"></span></code><span class="el"><span class="el"><span
- class="el"><code>archive *my_arch =<br>
+      <span class="el"></span></code><span class="el"><span class="el"><span class="el"><code>archive *my_arch =<br>
 &nbsp;&nbsp; libdar::open_archive_noexcept(...,ex,msg);<br>
       <br>
 switch(ex)<br>
@@ -3411,9 +3150,7 @@ case ...<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -3428,17 +3165,13 @@ cancellation process if it has not yet been engaged.<br>
 </table>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);">&nbsp;pthread_t
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);">&nbsp;pthread_t
 tid;<br>
 &nbsp;&nbsp; <br>
-&nbsp;&nbsp; // how to know if the thread <span
- style="font-style: italic;">tid</span> is under cancellation process ?<br>
+&nbsp;&nbsp; // how to know if the thread <span style="font-style: italic;">tid</span> is under cancellation process ?<br>
 if(<span style="font-weight: bold;">libdar::cancel_status</span>(tid))<br>
 &nbsp;&nbsp;&nbsp;&nbsp; cout &lt;&lt; "thread cancellation is under
 progress for thread : " &lt;&lt; tid &lt;&lt; endl;<br>
@@ -3460,13 +3193,10 @@ cancellation for thread "&lt;&lt; tid &lt;&lt; endl;<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td style="vertical-align: top;">Last point, back to the<span
- style="font-weight: bold; font-style: italic;"> Ethread_cancel</span>
+      <td style="vertical-align: top;">Last point, back to the<span style="font-weight: bold; font-style: italic;"> Ethread_cancel</span>
 exception, this class has two methods you may find useful, when you
 catch it: </td>
     </tr>
@@ -3474,13 +3204,10 @@ catch it: </td>
 </table>
 <br>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>try<br>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code></code>try<br>
 {<br>
 &nbsp;&nbsp; ... some libdar calls<br>
 }<br>
@@ -3516,27 +3243,21 @@ invoked by :<br>
 libdar::cancel_thread(thread_id, true, 19);<br>
 &nbsp;&nbsp; // then the<span style="font-style: italic;"> flag</span>
 variable in the catch() statement above would have received<br>
-      <div style="text-align: justify;">&nbsp;&nbsp; // the value <span
- style="font-style: italic;">19</span>.<br>
+      <div style="text-align: justify;">&nbsp;&nbsp; // the value <span style="font-style: italic;">19</span>.<br>
       </div>
       </td>
     </tr>
   </tbody>
 </table>
 <div style="text-align: justify;"><br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
       <h2 style="text-align: justify;">14 - Dar_manager API</h2>
       <br>
-      <div style="text-align: justify;">For more about <span
- style="font-style: italic;">dar_manager</span>, please read the&nbsp;<span
- style="font-style: italic;"></span>man page where are described in
-detail the available features. Note that for <span
- style="font-style: italic;">dar_manager</span> there is not
+      <div style="text-align: justify;">For more about <span style="font-style: italic;">dar_manager</span>, please read the&nbsp;<span style="font-style: italic;"></span>man page where are described in
+detail the available features. Note that for <span style="font-style: italic;">dar_manager</span> there is not
 a "<span style="font-style: italic;">without exception</span>" flavor,
 your
 program
@@ -3561,13 +3282,10 @@ Two constructor are available: </td>
 <br>
 </div>
 <code></code><code></code>
-<table
- style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;"
- border="1" cellpadding="2" cellspacing="2">
+<table style="width: 90%; height: 51px; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <td
- style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>#include
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);"><code>#include
 &lt;dar/database.hpp&gt;<br>
       </code><code><span style="font-weight: bold;"></span><br>
 void my_sample_function(user_interaction &amp; dialog)<br>
@@ -3576,8 +3294,7 @@ void my_sample_function(user_interaction &amp; dialog)<br>
 database (no archive in it) called "base"<br>
       <br>
 &nbsp; &nbsp; database other&nbsp; = database(dialog,
-"/tmp/existing_base.dmd", false);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"/tmp/existing_base.dmd", false);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // we have created a database called "other" which contains <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 // (in RAM) all information that were contained in the <br>
@@ -3592,9 +3309,7 @@ database (no archive in it) called "base"<br>
   </tbody>
 </table>
 <br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -3678,8 +3393,7 @@ tutorial, yes. In fact theses call are really very simple to use, you
 can find a complete description in the reference documentation of the
 API. This documentation is built if doxygen is available and is put
 under doc/html after calling make in the source
-package. It is also available from <a
- href="http://dar.linux.free.fr/html/">dar's
+package. It is also available from <a href="http://dar.linux.free.fr/html/">dar's
 homepage</a>. </div>
       </td>
     </tr>
@@ -3687,9 +3401,7 @@ homepage</a>. </div>
 </table>
 <br>
 <hr style="width: 100%; height: 2px;"><br>
-<table
- style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
- border="0" cellspacing="2" cellpadding="2">
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td style="vertical-align: top;">
@@ -3707,5 +3419,5 @@ Denis Corbin.<br>
 </table>
 <br>
 </center>
-</body>
-</html>
+
+</body></html>

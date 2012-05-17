@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: statistics.cpp,v 1.5.2.2 2006/02/04 14:47:15 edrusb Rel $
+// $Id: statistics.cpp,v 1.5.2.3 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -29,6 +29,10 @@ extern "C"
 {
 #if HAVE_ERRNO_H
 #include <errno.h>
+#endif
+
+#if HAVE_STRING_H
+#include <string.h>
 #endif
 }
 
@@ -107,7 +111,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: statistics.cpp,v 1.5.2.2 2006/02/04 14:47:15 edrusb Rel $";
+        static char id[]="$Id: statistics.cpp,v 1.5.2.3 2008/02/09 17:41:29 edrusb Rel $";
         dummy_call(id);
     }
 

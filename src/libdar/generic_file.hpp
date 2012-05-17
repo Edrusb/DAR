@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: generic_file.hpp,v 1.25.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: generic_file.hpp,v 1.25.2.2 2008/02/09 11:14:38 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -190,7 +190,7 @@ namespace libdar
     {
     public :
         fichier(user_interaction & dialog, S_I fd);
-        fichier(user_interaction & dialog, char *name, gf_mode m);
+        fichier(user_interaction & dialog, const char *name, gf_mode m);
         fichier(user_interaction & dialog, const path & chemin, gf_mode m);
         ~fichier() { close(filedesc); };
 

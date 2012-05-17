@@ -1,6 +1,6 @@
  |# Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT([DAR], [2.3.6], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
+AC_INIT([DAR], [2.3.7], [http://sourceforge.net/tracker/?group_id=65612&atid=511612])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -21,7 +21,13 @@ AC_PROG_RANLIB
 # Checks for libraries.
 AC_CHECK_LIB(socket, [socket], [], [])
 AC_CHECK_LIB(nsl, [endnetconfig], [], [])
-AC_CHECK_LIB(dl, [dlsym], [], [])
+
+AC_ARG_ENABLE( [libdl-linking],
+	       AC_HELP_STRING(--disable-libdl-linking, [ignore any libdl and avoid linking against it]),
+               [],
+               [
+                 AC_CHECK_LIB(dl, [dlsym], [], [])
+               ])
 
 # Checks for header files.
 AC_HEADER_DIRENT
@@ -555,7 +561,7 @@ else
 fi
 
 echo -n "   New blowfish implementation: "
-if [ "$local_crypto" = "yes" -a "$local_crypto_full_bf"="yes" ] ; then
+if [ "$local_crypto" = "yes" -a "$local_crypto_full_bf" = "yes" ] ; then
    echo "YES"
 else
    echo "NO"

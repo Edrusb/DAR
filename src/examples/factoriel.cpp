@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: factoriel.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: factoriel.cpp,v 1.12.2.2 2008/02/09 17:41:28 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -45,6 +45,10 @@ extern "C"
 
 #if HAVE_ERRNO_H
 #include <errno.h>
+#endif
+
+#if HAVE_STRING_H
+#include <string.h>
 #endif
 } // end extern "C"
 
@@ -126,6 +130,6 @@ static int little_main(user_interaction & ui, int argc, char *argv[], const char
 
 static void dummy_call(char *x)
 {
-static char id[]="$Id: factoriel.cpp,v 1.12.2.1 2007/07/22 16:34:59 edrusb Rel $";
+static char id[]="$Id: factoriel.cpp,v 1.12.2.2 2008/02/09 17:41:28 edrusb Rel $";
 dummy_call(id);
 }

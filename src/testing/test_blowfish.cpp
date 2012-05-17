@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_blowfish.cpp,v 1.4.2.2 2007/07/21 14:39:04 edrusb Rel $
+// $Id: test_blowfish.cpp,v 1.4.2.3 2008/02/09 17:41:30 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -37,6 +37,9 @@ extern "C"
 #endif
 #if HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
+#if HAVE_STRING_H
+#include <string.h>
 #endif
 }
 

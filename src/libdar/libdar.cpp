@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: libdar.cpp,v 1.70.2.4 2007/08/19 14:07:41 edrusb Rel $
+// $Id: libdar.cpp,v 1.70.2.5 2008/02/09 11:14:38 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -435,7 +435,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: libdar.cpp,v 1.70.2.4 2007/08/19 14:07:41 edrusb Rel $";
+        static char id[]="$Id: libdar.cpp,v 1.70.2.5 2008/02/09 11:14:38 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -525,7 +525,7 @@ namespace libdar
 	thread_safe_initialized = true;
 	thread_cancellation::init();
 #endif
-  	if(DAR_LOCALEDIR != "")
+  	if(string(DAR_LOCALEDIR) != string(""))
 	    if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == NULL)
 		throw Erange("", "Cannot open the translated messages directory, native language support will not work");
 #ifdef __DYNAMIC__

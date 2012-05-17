@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: thread_cancellation.cpp,v 1.4.2.3 2007/07/24 16:29:31 edrusb Rel $
+// $Id: thread_cancellation.cpp,v 1.4.2.4 2008/02/09 17:41:30 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -28,6 +28,10 @@ extern "C"
 {
 #if HAVE_ERRNO_H
 #include <errno.h>
+#endif
+
+#if HAVE_STRING_H
+#include <string.h>
 #endif
 }
 
@@ -229,7 +233,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: thread_cancellation.cpp,v 1.4.2.3 2007/07/24 16:29:31 edrusb Rel $";
+	static char id[]="$Id: thread_cancellation.cpp,v 1.4.2.4 2008/02/09 17:41:30 edrusb Rel $";
 	dummy_call(id);
     }
 

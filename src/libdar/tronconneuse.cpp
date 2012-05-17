@@ -18,11 +18,18 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronconneuse.cpp,v 1.7.2.2 2007/07/22 16:35:00 edrusb Rel $
+// $Id: tronconneuse.cpp,v 1.7.2.3 2008/02/09 17:41:30 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
+
+extern "C"
+{
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+}
 
 #include "tronconneuse.hpp"
 #include "tools.hpp"
@@ -329,7 +336,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tronconneuse.cpp,v 1.7.2.2 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: tronconneuse.cpp,v 1.7.2.3 2008/02/09 17:41:30 edrusb Rel $";
         dummy_call(id);
     }
 

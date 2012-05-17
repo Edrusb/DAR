@@ -18,12 +18,19 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: string_file.cpp,v 1.2.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: string_file.cpp,v 1.2.2.2 2008/02/09 17:41:30 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
+
+extern "C"
+{
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+}
 
 #include "string_file.hpp"
 
@@ -82,7 +89,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: string_file.cpp,v 1.2.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: string_file.cpp,v 1.2.2.2 2008/02/09 17:41:30 edrusb Rel $";
         dummy_call(id);
     }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.hpp,v 1.39.2.6 2007/07/22 16:35:00 edrusb Rel $
+// $Id: tools.hpp,v 1.39.2.7 2008/02/09 11:14:39 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -294,7 +294,7 @@ namespace libdar
         /// \param[in] clef the key or variable name too look for
         /// \return NULL if the key could not be find or a pointer to the env data giving the value of the requested key
         /// \note the returned value must not be released by any mean as it is just a pointer to an system allocated memory (the env vector).
-    extern const char *tools_get_from_env(const char **env, char *clef);
+    extern const char *tools_get_from_env(const char **env, const char *clef);
 
         /// does sanity checks on a slice name, check presence and detect whether the given basename is not rather a filename
 
@@ -382,7 +382,7 @@ namespace libdar
         /// - \%i (matches infinint *)
         /// - \%S (matches std::string *)
         /// .
-    extern std::string tools_printf(char *format, ...);
+    extern std::string tools_printf(const char *format, ...);
 
         /// make printf-like formating to a std::string
 
@@ -394,7 +394,7 @@ namespace libdar
         /// - \%i (matches infinint *)
         /// - \%S (matches std::string *)
         /// .
-    extern std::string tools_vprintf(char *format, va_list ap);
+    extern std::string tools_vprintf(const char *format, va_list ap);
 
         /// test the presence of files corresponding to a given mask in a directory
 

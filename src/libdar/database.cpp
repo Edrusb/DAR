@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database.cpp,v 1.6.2.2 2007/09/16 14:16:44 edrusb Exp $
+// $Id: database.cpp,v 1.6.2.3 2007/10/08 20:05:54 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -234,7 +234,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: database.cpp,v 1.6.2.2 2007/09/16 14:16:44 edrusb Exp $";
+	static char id[]="$Id: database.cpp,v 1.6.2.3 2007/10/08 20:05:54 edrusb Rel $";
 	dummy_call(id);
     }
 
@@ -375,7 +375,7 @@ namespace libdar
 		    }
 		    if(num_ea != 0)
 		    {
-			command_line[num_data].push_back("-g");
+			command_line[num_ea].push_back("-g");
 			command_line[num_ea].push_back(anneau.front());
 		    }
 		    if(num_data != 0 && num_ea != 0)

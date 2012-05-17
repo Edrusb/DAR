@@ -18,11 +18,18 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: erreurs.cpp,v 1.15.2.1 2007/07/27 16:02:49 edrusb Rel $
+// $Id: erreurs.cpp,v 1.15.2.2 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
+
+extern "C"
+{
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+} // end extern "C"
 
 #include <iostream>
 #include "erreurs.hpp"
@@ -109,7 +116,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: erreurs.cpp,v 1.15.2.1 2007/07/27 16:02:49 edrusb Rel $";
+        static char id[]="$Id: erreurs.cpp,v 1.15.2.2 2008/02/09 17:41:29 edrusb Rel $";
         dummy_call(id);
     }
 

@@ -543,3 +543,19 @@ from 2.3.5 to 2.3.6
   to be restored due to command-line for dar being too large.
 - fixed bug met when user aborts operation while dar is finalizing archive creation [SF #1800507]
 - fixed problem with execvp when dar_manager launches dar
+
+from 2.3.6 to 2.3.7
+- fixed bug in dar_manager about the localization of the archive in which to find the latest EA
+- fixed bug in configure script to properly report full blowfish encryption support
+- fixed a bug in the statistics calculus of dar_manager for most recent files per archive
+- removed inappropriate internal error check
+- added --disable-libdl-linking option
+- fixed mistake in API tutorial
+- updated Swedish translation by Peter Landgren
+- fixed bug in the file filtering based on listing file ( -[ option )
+- fixed typo and spelling errors in documentation
+- updated code for clean compilation with gcc-4.2.3
+- updated code for clean compilation with gcc-4.3 20080208 (experimental gcc)
+
+
+

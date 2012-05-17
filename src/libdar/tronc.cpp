@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tronc.cpp,v 1.14.4.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: tronc.cpp,v 1.14.4.2 2008/02/09 17:41:30 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -93,6 +93,7 @@ namespace libdar
     bool tronc::skip_relative(S_I x)
     {
         if(x < 0)
+	{
             if(current < -x)
             {
                 ref->skip(start);
@@ -111,8 +112,10 @@ namespace libdar
                 }
                 return r;
             }
+	}
 
         if(x > 0)
+	{
             if(current + x >= sz)
             {
                 current = sz;
@@ -131,6 +134,7 @@ namespace libdar
                 }
                 return r;
             }
+	}
 
         return true;
     }
@@ -138,7 +142,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tronc.cpp,v 1.14.4.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: tronc.cpp,v 1.14.4.2 2008/02/09 17:41:30 edrusb Rel $";
         dummy_call(id);
     }
 

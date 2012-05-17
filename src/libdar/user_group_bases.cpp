@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_group_bases.cpp,v 1.1.2.1 2007/07/24 16:29:32 edrusb Rel $
+// $Id: user_group_bases.cpp,v 1.1.2.2 2008/02/09 18:52:28 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -42,6 +42,10 @@ extern "C"
 
 #if HAVE_ERRNO_H
 #include <errno.h>
+#endif
+
+#if HAVE_STRING_H
+#include <string.h>
 #endif
 }
 

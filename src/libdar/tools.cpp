@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: tools.cpp,v 1.54.2.13 2007/09/25 19:44:06 edrusb Exp $
+// $Id: tools.cpp,v 1.54.2.15 2008/02/09 17:41:30 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -93,6 +93,10 @@ extern "C"
 
 #if HAVE_CTYPE_H
 #include <ctype.h>
+#endif
+
+#if HAVE_STDLIB_H
+#include <stdlib.h>
 #endif
 } // end extern "C"
 
@@ -272,7 +276,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: tools.cpp,v 1.54.2.13 2007/09/25 19:44:06 edrusb Exp $";
+        static char id[]="$Id: tools.cpp,v 1.54.2.15 2008/02/09 17:41:30 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -755,7 +759,7 @@ namespace libdar
 
 
 
-    const char *tools_get_from_env(const char **env, char *clef)
+    const char *tools_get_from_env(const char **env, const char *clef)
     {
         unsigned int index = 0;
         const char *ret = NULL;
@@ -893,6 +897,7 @@ namespace libdar
 		    throw Ememory("tools_getcwd()");
 		ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
 		if(ret == NULL) // could not get the CWD
+		{
 		    if(errno == ERANGE) // buffer too small
 		    {
 			delete buffer;
@@ -901,6 +906,7 @@ namespace libdar
 		    }
 		    else // other error
 			throw Erange("tools_getcwd", string(gettext("Cannot get full path of current working directory: ")) + strerror(errno));
+		}
 	    }
 	    while(ret == NULL);
 
@@ -1155,7 +1161,7 @@ namespace libdar
     }
 
 
-    string tools_printf(char *format, ...)
+    string tools_printf(const char *format, ...)
     {
         va_list ap;
         va_start(ap, format);
@@ -1173,7 +1179,7 @@ namespace libdar
         return output;
     }
 
-    string tools_vprintf(char *format, va_list ap)
+    string tools_vprintf(const char *format, va_list ap)
     {
         bool end;
         U_32 taille = strlen(format)+1;
@@ -1286,6 +1292,7 @@ namespace libdar
     {
 	const string c_chemin = chemin.display();
 	if(tools_do_some_files_match_mask(dialog, c_chemin, file_mask))
+	{
 	    if(!allow_overwriting)
 		throw Erange("tools_avoid_slice_overwriting", tools_printf(gettext("Overwriting not allowed while a slice of a previous archive with the same basename has been found in the %s directory, Operation aborted"), c_chemin.c_str()));
 	    else
@@ -1302,6 +1309,7 @@ namespace libdar
 			// nothing to do, just continue
 		}
 	    }
+	}
     }
 
     void tools_add_elastic_buffer(generic_file & f, U_32 max_size)

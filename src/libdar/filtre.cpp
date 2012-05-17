@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filtre.cpp,v 1.40.2.9 2007/07/27 16:02:49 edrusb Rel $
+// $Id: filtre.cpp,v 1.40.2.10 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -216,7 +216,7 @@ namespace libdar
 					    // an existing inode
 					if(e_ino->ea_get_saved_status() == inode::ea_full // we have EA available in archive
 					   &&
-					   (exists != NULL && exists->same_as(*e_ino)  // the file now exists in filesystem
+					   ((exists != NULL && exists->same_as(*e_ino))  // the file now exists in filesystem
 					    || e_ino->get_saved_status() == s_saved)   // either initially or just restored
 					   &&
 					   (!flat || e_dir == NULL))                   // we are not in flat mode restoring a directory
@@ -1291,7 +1291,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filtre.cpp,v 1.40.2.9 2007/07/27 16:02:49 edrusb Rel $";
+        static char id[]="$Id: filtre.cpp,v 1.40.2.10 2008/02/09 17:41:29 edrusb Rel $";
         dummy_call(id);
     }
 

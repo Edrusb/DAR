@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_suite.cpp,v 1.29.2.4 2007/01/17 15:28:54 edrusb Rel $
+// $Id: dar_suite.cpp,v 1.29.2.6 2008/02/09 17:41:28 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -96,7 +96,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 	// gettext settings
     try
     {
-	if(DAR_LOCALEDIR != "")
+	if(string(DAR_LOCALEDIR) != string(""))
 	    if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == NULL)
 		throw Erange("", "Cannot open the translated messages directory, native language support will not work");
 	if(setlocale(LC_MESSAGES, "") == NULL || setlocale(LC_CTYPE, "") == NULL)
@@ -217,7 +217,9 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
     }
 
     if(thread_cancellation::count() != 0)
+    {
 	GENERAL_REPORT(string(gettext("SANITY CHECK: AT LEAST ONE OBJECT HAS NOT BEEN DESTROYED AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END")));
+    }
 
 	// restoring terminal settings
     try
@@ -238,7 +240,7 @@ int dar_suite_global(int argc, char *argv[], const char **env, int (*call)(user_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_suite.cpp,v 1.29.2.4 2007/01/17 15:28:54 edrusb Rel $";
+    static char id[]="$Id: dar_suite.cpp,v 1.29.2.6 2008/02/09 17:41:28 edrusb Rel $";
     dummy_call(id);
 }
 

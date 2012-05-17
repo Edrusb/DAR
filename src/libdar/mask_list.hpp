@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask_list.hpp,v 1.1.2.1 2006/02/02 16:39:49 edrusb Rel $
+// $Id: mask_list.hpp,v 1.1.2.2 2008/02/02 14:10:50 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -69,10 +69,47 @@ namespace libdar
         U_I size() const { return contenu.size(); };
 
     private:
-        std::vector <std::string> contenu;
+
+	    // we need to change to lexicographical order relation ship for the '/' character be the most lower of all. This way
+	    // the first entry listed from a set a file sharing the same first characters will be the one corresponding
+	    // to the directory with this common prefix.
+
+	class my_char
+	{
+	public:
+	    my_char() { val = 0; };
+	    my_char(const char x) : val(x) {};
+	    bool operator < (const my_char & x) const
+	    {
+		if(val == '/')
+		    if(x.val == '/')
+			return false;
+		    else
+			return true;
+		else
+		    if(x.val == '/')
+			return false;
+		    else
+			return val < x.val;
+	    };
+
+	    operator char() const
+	    {
+		return val;
+	    };
+
+	private:
+	    char val;
+	};
+
+        std::vector <std::basic_string<my_char> > contenu;
         U_I taille;
         bool case_s;
         bool including;   // mask is used for including files (not for excluding files)
+
+	std::list<std::basic_string<my_char> > convert_list_string_char(const std::list<std::string> & src) const;
+	std::basic_string<my_char> convert_string_char(const std::string & src) const;
+	std::string convert_string_my_char(const std::basic_string<my_char> & src) const;
     };
 
         /// @}

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_manager.cpp,v 1.48.2.5 2007/08/24 15:37:07 edrusb Rel $
+// $Id: dar_manager.cpp,v 1.48.2.7 2008/02/09 20:11:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -26,6 +26,10 @@
 
 extern "C"
 {
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
 #include "getopt_decision.h"
 } // end extern "C"
 
@@ -47,7 +51,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.4.2"
+#define DAR_MANAGER_VERSION "1.4.3"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
@@ -438,7 +442,7 @@ static bool command_line(user_interaction & dialog,
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_manager.cpp,v 1.48.2.5 2007/08/24 15:37:07 edrusb Rel $";
+    static char id[]="$Id: dar_manager.cpp,v 1.48.2.7 2008/02/09 20:11:27 edrusb Rel $";
     dummy_call(id);
 }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: catalogue.cpp,v 1.47.2.8 2007/09/23 17:24:59 edrusb Exp $
+// $Id: catalogue.cpp,v 1.47.2.10 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -130,7 +130,7 @@ namespace libdar
 
     void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state)
     {
-	if(sig & SAVED_FAKE_BIT == 0)
+	if((sig & SAVED_FAKE_BIT) == 0)
 	    if(islower(sig))
 		state = s_saved;
 	    else
@@ -790,7 +790,7 @@ namespace libdar
             if(ea != NULL)
                 return ea;
             else
-                if(*ea_offset != 0 && storage != NULL)
+                if(storage != NULL)  // ea_offset may be equal to zero if the first inode saved had only EA modified since archive of reference
                 {
                     crc val;
                     storage->skip(*ea_offset);
@@ -2284,10 +2284,12 @@ namespace libdar
 		    string tmp_s;
 
 		    if(!out_compare.pop(tmp_s))
+		    {
 			if(out_compare.is_relative())
 			    throw SRC_BUG; // should not be a relative path !!!
 			else // both cases are bugs, but need to know which case is generating a bug
 			    throw SRC_BUG; // out_compare.degre() > 0 but cannot pop !
+		    }
 		}
 
 	    return false;
@@ -2498,7 +2500,7 @@ namespace libdar
 
 		    if(clo_ino == NULL)
 			throw SRC_BUG; // clone of an inode is not an inode???
-		    if(clo_dir != NULL ^ pro_dir != NULL)
+		    if((clo_dir != NULL) ^ (pro_dir != NULL))
 			throw SRC_BUG; // both must be NULL or both must be non NULL
 
 			// taking care of hard links
@@ -2525,6 +2527,7 @@ namespace libdar
 			// recusing in case of directory
 
 		    if(clo_dir != NULL)
+		    {
 			if(current->search_children(pro_ino->get_name(), ici))
 			{
 			    if((void *)ici != (void *)clo_ent)
@@ -2533,6 +2536,7 @@ namespace libdar
 			}
 			else
 			    throw SRC_BUG; // cannot find the entry we have just added!!!
+		    }
 		}
 		catch(...)
 		{
@@ -2589,7 +2593,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-	static char id[]="$Id: catalogue.cpp,v 1.47.2.8 2007/09/23 17:24:59 edrusb Exp $";
+	static char id[]="$Id: catalogue.cpp,v 1.47.2.10 2008/02/09 17:41:29 edrusb Rel $";
 	dummy_call(id);
     }
 

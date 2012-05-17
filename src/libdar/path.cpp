@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: path.cpp,v 1.13.2.3 2007/07/27 16:02:49 edrusb Rel $
+// $Id: path.cpp,v 1.13.2.4 2008/02/02 14:10:50 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -185,7 +185,7 @@ namespace libdar
         list<string>::iterator fin_arg = (const_cast<path &>(p)).dirs.end();
 
         while(it_me != fin_me && it_arg != fin_arg
-              && (*it_me == *it_arg  || (!case_sensit && tools_is_case_insensitive_equal(*it_me, *it_arg))))
+              && ((case_sensit && *it_me == *it_arg)  || (!case_sensit && tools_is_case_insensitive_equal(*it_me, *it_arg))))
         {
             ++it_me;
             ++it_arg;
@@ -196,7 +196,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: path.cpp,v 1.13.2.3 2007/07/27 16:02:49 edrusb Rel $";
+        static char id[]="$Id: path.cpp,v 1.13.2.4 2008/02/02 14:10:50 edrusb Rel $";
         dummy_call(id);
     }
 

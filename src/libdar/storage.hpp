@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.hpp,v 1.11.4.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: storage.hpp,v 1.11.4.2 2008/02/09 17:41:30 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -215,6 +215,7 @@ namespace libdar
     {
         E_BEGIN;
         if(cell != NULL)
+	{
             if(offset > 0)
                 --offset;
             else
@@ -225,6 +226,7 @@ namespace libdar
                 else
                     offset = OFF_BEGIN;
             }
+	}
         E_END("storage::iterator::slik_plus_one", "");
     }
 

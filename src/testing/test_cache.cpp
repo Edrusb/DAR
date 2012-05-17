@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_cache.cpp,v 1.7 2005/09/11 19:01:16 edrusb Rel $
+// $Id: test_cache.cpp,v 1.7.2.1 2008/02/09 11:14:39 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -132,7 +132,7 @@ void f2()
 		    10,
 		    10, 3, 20,
 		    10, 3, 20);
-    char *buf = "coucou les amis";
+    const char *buf = "coucou les amis";
     c.write(buf, strlen(buf));
     c.write(" ", 1);
     c.write("!", 1);

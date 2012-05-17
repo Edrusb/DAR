@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: special_alloc.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: special_alloc.cpp,v 1.14.2.2 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -39,6 +39,10 @@ extern "C"
 {
 #if HAVE_PTHREAD_H
 #include <pthread.h>
+#endif
+
+#if HAVE_STRING_H
+#include <string.h>
 #endif
 }
 static bool alloc_mutex_initialized = false;
@@ -126,7 +130,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: special_alloc.cpp,v 1.14.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: special_alloc.cpp,v 1.14.2.2 2008/02/09 17:41:29 edrusb Rel $";
         dummy_call(id);
     }
 

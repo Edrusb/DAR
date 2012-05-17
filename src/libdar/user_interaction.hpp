@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.hpp,v 1.18.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: user_interaction.hpp,v 1.18.2.2 2008/02/09 11:14:39 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -237,7 +237,7 @@ namespace libdar
 	    //! - \%i (matches infinint *)
 	    //! - \%S (matches std::string *)
 	    //! .
-	void printf(char *format, ...);
+	void printf(const char *format, ...);
 
 	    /// for libdar to know if it is interesting to use listing(), dar_manager_show_files(),
 	    /// dar_manager_contents(), dar_manager_statistics() or to keep reporting listing thanks

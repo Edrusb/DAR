@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: command_line.cpp,v 1.76.2.4 2007/08/31 17:14:29 edrusb Exp $
+// $Id: command_line.cpp,v 1.76.2.6 2008/02/09 17:41:27 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -504,10 +504,13 @@ bool get_args(user_interaction & dialog,
             if(filename != "-")
                 tools_check_basename(dialog, *sauv_root, filename, EXTENSION);
 	    if(op == merging && aux_filename != NULL)
+	    {
 		if(aux_root == NULL)
 		    throw SRC_BUG;
 		else
 		    tools_check_basename(dialog, *aux_root, *aux_filename, EXTENSION);
+	    }
+
             if(fs_root == NULL)
                 fs_root = new path(".");
 	    if(fixed_date_mode && op != create)
@@ -524,10 +527,13 @@ bool get_args(user_interaction & dialog,
                && output_pipe == "")
                 throw Erange("get_args", gettext("-o is mandatory when using \"-A -\" with \"-c -\" \"-C -\" or \"-+ -\""));
             if(ref_filename != NULL && *ref_filename != "-")
+	    {
                 if(ref_root == NULL)
                     throw SRC_BUG;
                 else
                     tools_check_basename(dialog, *ref_root, *ref_filename, EXTENSION);
+	    }
+
             if(algo != none && op != create && op != isolate && op != merging)
                 dialog.warning(gettext("-z or -y need only to be used with -c -C or -+ options"));
             if(first_file_size != 0 && file_size == 0)
@@ -548,12 +554,15 @@ bool get_args(user_interaction & dialog,
             if(execute_ref != "" && ref_filename == NULL)
                 dialog.warning(gettext("-F is only useful with -A option, for the archive of reference"));
             if(pass_ref != "" && ref_filename == NULL)
+	    {
                 dialog.warning(gettext("-J is only useful with -A option, for the archive of reference"));
+	    }
             if(flat && op != extract)
                 dialog.warning(gettext("-f in only available with -x option, ignoring"));
             if(min_compr_size != min_compr_size_default && op != create && op != merging)
                 dialog.warning(gettext("-m is only useful with -c"));
             if(hourshift > 0)
+	    {
                 if(op == create)
                 {
                     if(ref_filename == NULL)
@@ -567,13 +576,15 @@ bool get_args(user_interaction & dialog,
                     }
                     else
                         dialog.warning(gettext("-H is only useful with -c or -x"));
+	    }
+
             if(alteration != "" && op != listing)
                 dialog.warning(gettext("-as is only available with -l, ignoring -as option"));
             if(empty && op != create && op != extract && op != merging)
                 dialog.warning(gettext("-e is only useful with -x, -c or -+ options"));
             if(op != create && op != merging && (on_fly_root != NULL || on_fly_filename != NULL))
                 throw Erange("get_args", gettext("-G option is only available with -c or -+ options"));
-            if(on_fly_root != NULL ^ on_fly_filename != NULL)
+            if((on_fly_root != NULL) ^ (on_fly_filename != NULL))
                 throw SRC_BUG;
             if(alter_atime && op != create && op != diff)
                 dialog.warning(gettext("-aa is only useful with -c or -d"));
@@ -828,7 +839,7 @@ static bool get_args_recursive(user_interaction & dialog,
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(filename != "" || sauv_root != NULL)
                     throw Erange("get_args", gettext(" Only one option of -c -d -t -l -C -x or -+ is allowed"));
-                if(optarg != "")
+                if(string(optarg) != string(""))
                     tools_split_path_basename(optarg, sauv_root, filename);
                 else
                     throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
@@ -876,7 +887,7 @@ static bool get_args_recursive(user_interaction & dialog,
 			    deci tmp = string(optarg);
 			    fixed_date = tmp.computer();
 			}
-			catch(Edeci)
+			catch(Edeci & e)
 			{
 				// fallback to human readable string
 
@@ -1544,7 +1555,7 @@ static void usage(user_interaction & dialog, const char *command_name)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: command_line.cpp,v 1.76.2.4 2007/08/31 17:14:29 edrusb Exp $";
+    static char id[]="$Id: command_line.cpp,v 1.76.2.6 2008/02/09 17:41:27 edrusb Rel $";
     dummy_call(id);
 }
 

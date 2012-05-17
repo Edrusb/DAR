@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: int_tools.cpp,v 1.3.4.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: int_tools.cpp,v 1.3.4.2 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -52,14 +52,14 @@ namespace libdar
 
         for(register S_I i = 0; i < 8; ++i)
         {
-            bit[i] = (a & mask) >> 7 - i;
+            bit[i] = (a & mask) >> (7 - i);
             mask >>= 1;
         }
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: int_tools.cpp,v 1.3.4.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: int_tools.cpp,v 1.3.4.2 2008/02/09 17:41:29 edrusb Rel $";
         dummy_call(id);
     }
 

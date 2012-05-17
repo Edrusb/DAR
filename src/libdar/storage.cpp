@@ -18,11 +18,19 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: storage.cpp,v 1.16.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: storage.cpp,v 1.16.2.2 2008/02/09 17:41:30 edrusb Rel $
 //
 /*********************************************************************/
 
 #include "../my_config.h"
+
+extern "C"
+{
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+} // end of extern "C"
+
 #include "storage.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
@@ -357,10 +365,10 @@ namespace libdar
                            struct cellule *&res_first, struct cellule * & res_last)
     {
         E_BEGIN;
-        if(a_first == NULL ^ a_last == NULL)
+        if((a_first == NULL) ^ (a_last == NULL))
             throw SRC_BUG;
 
-        if(b_first == NULL ^ b_last == NULL)
+        if((b_first == NULL) ^ (b_last == NULL))
             throw SRC_BUG;
 
         if(a_last != NULL && b_first != NULL)
@@ -434,7 +442,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: storage.cpp,v 1.16.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: storage.cpp,v 1.16.2.2 2008/02/09 17:41:30 edrusb Rel $";
         dummy_call(id);
     }
 

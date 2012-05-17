@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: data_tree.cpp,v 1.2.2.3 2007/07/27 11:27:31 edrusb Rel $
+// $Id: data_tree.cpp,v 1.2.2.5 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -317,7 +317,10 @@ namespace libdar
 	while(it != last_mod.end())
 	{
 	    if(it->second >= max)
+	    {
 		most_recent = it->first;
+		max = it->second;
+	    }
 	    ++total_data[it->first];
 	    ++it;
 	}
@@ -331,7 +334,10 @@ namespace libdar
 	while(it != last_change.end())
 	{
 	    if(it->second >= max)
+	    {
 		most_recent = it->first;
+		max = it->second;
+	    }
 	    ++total_ea[it->first];
 	    ++it;
 	}
@@ -586,10 +592,12 @@ namespace libdar
 	    ++it;
 
 	if(it != rejetons.end())
+	{
 	    if(*it == NULL)
 		throw SRC_BUG;
 	    else
 		rejetons.erase(it);
+	}
     }
 
 
@@ -719,7 +727,7 @@ static data_tree *read_from_file(generic_file & f)
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: data_tree.cpp,v 1.2.2.3 2007/07/27 11:27:31 edrusb Rel $";
+    static char id[]="$Id: data_tree.cpp,v 1.2.2.5 2008/02/09 17:41:29 edrusb Rel $";
     dummy_call(id);
 }
 

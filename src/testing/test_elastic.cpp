@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_elastic.cpp,v 1.4 2005/09/11 19:01:16 edrusb Rel $
+// $Id: test_elastic.cpp,v 1.4.2.1 2008/02/09 11:14:39 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -147,7 +147,7 @@ void f3()
 	fichier fic = fichier(*dialog, fd);
 	const unsigned int taille = 500;
 	char buffer[taille];
-	char *ttt =  "Bonjour les amis comment ça va ? ";
+	const char *ttt =  "Bonjour les amis comment ça va ? ";
 	elastic tic = 1, toc = 1;
 
 	fic.write(ttt, strlen(ttt));

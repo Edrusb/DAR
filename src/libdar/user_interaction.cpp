@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: user_interaction.cpp,v 1.29 2005/11/01 21:54:35 edrusb Rel $
+// $Id: user_interaction.cpp,v 1.29.2.1 2008/02/09 11:14:39 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -169,7 +169,7 @@ namespace libdar
     }
 
 
-    void user_interaction::printf(char *format, ...)
+    void user_interaction::printf(const char *format, ...)
     {
 	va_list ap;
 	va_start(ap, format);
@@ -391,7 +391,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: user_interaction.cpp,v 1.29 2005/11/01 21:54:35 edrusb Rel $";
+        static char id[]="$Id: user_interaction.cpp,v 1.29.2.1 2008/02/09 11:14:39 edrusb Rel $";
         dummy_call(id);
     }
 

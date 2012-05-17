@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: filesystem.cpp,v 1.45.2.4 2007/07/22 16:34:59 edrusb Rel $
+// $Id: filesystem.cpp,v 1.45.2.5 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -1050,10 +1050,12 @@ namespace libdar
 		    throw SRC_BUG; // unknown inode type
 
 		if(ret < 0)
+		{
 		    if(errno != ENOSPC)
 			throw Erange("filesystem_hard_link_write::make_file", string(gettext("Could not create inode: ")) + name + " : " + strerror(errno));
 		    else
 			get_fs_ui().pause(string(gettext("Cannot create inode: ")) + strerror(errno) + gettext(" Ready to continue ?"));
+		}
 	    }
 	    catch(Ethread_cancel & e)
 	    {
@@ -1501,7 +1503,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: filesystem.cpp,v 1.45.2.4 2007/07/22 16:34:59 edrusb Rel $";
+        static char id[]="$Id: filesystem.cpp,v 1.45.2.5 2008/02/09 17:41:29 edrusb Rel $";
         dummy_call(id);
     }
 

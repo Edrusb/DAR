@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: archive.cpp,v 1.40.2.6 2007/08/24 13:47:05 edrusb Rel $
+// $Id: archive.cpp,v 1.40.2.7 2008/02/09 17:41:28 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -317,10 +317,12 @@ namespace libdar
 		    throw SRC_BUG;
 		algo = char2compression(ref_arch1->ver.algo_zip);
 		if(algo == none && ref_cat2 != NULL)
+		{
 		    if(ref_arch2 == NULL)
 			throw SRC_BUG;
 		    else
 			algo = char2compression(ref_arch2->ver.algo_zip);
+		}
 	    }
 
 		// then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
@@ -402,7 +404,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: archive.cpp,v 1.40.2.6 2007/08/24 13:47:05 edrusb Rel $";
+        static char id[]="$Id: archive.cpp,v 1.40.2.7 2008/02/09 17:41:28 edrusb Rel $";
         dummy_call(id);
     }
 

@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_cp.cpp,v 1.16.2.4 2007/08/24 15:37:07 edrusb Rel $
+// $Id: dar_cp.cpp,v 1.16.2.7 2008/02/09 20:11:27 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -48,6 +48,12 @@ extern "C"
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
 }
 
 #include <iostream>
@@ -59,7 +65,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "thread_cancellation.hpp"
 
-#define DAR_CP_VERSION "1.2.1"
+#define DAR_CP_VERSION "1.2.2"
 
 using namespace libdar;
 using namespace std;
@@ -92,7 +98,7 @@ static int little_main(user_interaction & dialog, int argc, char *argv[], const 
         ret = EXIT_OK;
     }
     else
-	if(argc != 3 || argv[1] == "-h")
+	if(argc != 3 || string(argv[1]) == string("-h"))
 	{
 	    show_usage(dialog, argv[0]);
 	    ret = EXIT_SYNTAX;
@@ -334,7 +340,7 @@ static int skip_to_next_readable(int block, char *buffer, int src, int dst, off_
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_cp.cpp,v 1.16.2.4 2007/08/24 15:37:07 edrusb Rel $";
+    static char id[]="$Id: dar_cp.cpp,v 1.16.2.7 2008/02/09 20:11:27 edrusb Rel $";
     dummy_call(id);
 }
 

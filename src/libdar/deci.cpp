@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: deci.cpp,v 1.10.4.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: deci.cpp,v 1.10.4.2 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -217,6 +217,7 @@ namespace libdar
             }
 
             if(tmp == 0xF)
+	    {
                 if(leading_zero)
                 {
                     if(avance)
@@ -224,6 +225,7 @@ namespace libdar
                 }
                 else
                     throw SRC_BUG;
+	    }
 
             if(tmp != 0 && tmp != 0xF)
                 leading_zero = false;
@@ -247,7 +249,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: deci.cpp,v 1.10.4.1 2007/07/22 16:34:59 edrusb Rel $";
+        static char id[]="$Id: deci.cpp,v 1.10.4.2 2008/02/09 17:41:29 edrusb Rel $";
         dummy_call(id);
     }
 

@@ -4,6 +4,12 @@
 
 
 
+
+
+
+
+
+
   <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -75,7 +81,10 @@ encrypted archives, how to workaround this?</span></a><br>
 lack of static linking on MacOS X?</span></a><br>
       <a href="#A13"><span style="font-weight: bold; font-style: italic;"> </span></a><span style="font-weight: bold; font-style: italic;"><a href="#parallel">Why
 cannot dar use the full power of my multi-processor computer?</a><br>
-      <a href="#threadsafe">Is libdar thread-safe, which way you mean it is?</a><br>
+      <a href="#threadsafe">Is libdar thread-safe, which way you mean it is?</a></span><br>
+      <a style="font-weight: bold; font-style: italic;" href="#How_to_solve_configure:_error:_Cannot">How to solve "configure: error: Cannot find size_t type"?</a><br><a style="font-weight: bold; font-style: italic;" href="#search_for_questions">
+How to search for questions (and their answers) about <span style="font-weight: bold; font-style: italic;">known</span> problems similar to mines?</a><br>
+      <span style="font-weight: bold; font-style: italic;"><br>
       <br>
       </span>
       <h2><span style="text-decoration: underline;">Answers:</span><br>
@@ -1502,11 +1511,11 @@ during my studies, I can explain briefly here the constraints. A
 program can use several processor if the algorithm it uses is able to
 be parallelized. Such an algorithm can either statically (at
 programming time) or dynamically (at execution time) be cut in several
-independent execution threads. Theses different execution thread must
+independent execution threads. Theses different execution threads must
 be as much autonomous as possible between them, if you don't want to
 have one thread waiting for another (which is not what we want). The
-constraint is this : if you cannot have different thread with no or
-very little communication and dependence, parallelization does not
+constraint is this: if you cannot have different threads with no or
+very little communication and dependence then parallelization does not
 worth it.<br>
       <br>
 Back to dar. From a very abstracted point of view, dar works by
@@ -1516,7 +1525,7 @@ location of the data and once all files have been treated, this
 location information (contained in the so called "catalogue") is added
 at the end of the archive.<br>
       <br>
-One could say that to parallelize file treatment. Instead of proceeding
+One could say that to parallelize file treatment, instead of proceeding
 file by file, let's do all file at the same time (or rather let's say N
 files at the same time). OK, but first you would have an important loss
 of performance at disk level as the disk heads would spend most of the
@@ -1538,11 +1547,13 @@ compress, and so on)</li>
         <li>file encryption</li>
       </ul>
 This would be a bit better, but : File lookup is very fast and does not
-consume much CPU, as well as file filtering.&nbsp; Instead file
+consume much CPU, as well as file filtering.&nbsp; Instead, file
 compression or file encryption are very CPU intensive. Thus, first, if
 you only use compression OR encryption parallelizing this way will not
 bring you much extra power as the encryption or the compression are not
-possible to parallelize, rawly you will get the same execution time as
+possible to parallelize (compressing a file is done sequentially, same
+thing when encrypting it). Rawly you will get the same execution time
+as
 the sequential execution. Second if you use no compression and no
 encryption, your CPU will stay idle most of the time and the time to
 execute dar will only depend on the speed of your hard disk, so you
@@ -1571,7 +1582,7 @@ memory. Then a next thread can drop its data to the archive while all
 other keep compressing to memory (RAM). We will quickly lack of RAM! Or
 your computer will start to swap, or you have to store the data back to
 disk in a temporary file, which file will have to be read again and
-wrote back to archive. So, doing so will bring disk performance
+wrote back to archive. So, doing so will bring huge disk performance
 degradation, as disk will server for read file's data, writing its
 compressed data to temporary file, reading back its compressed data,
 writing its compressed data to archive.<br>
@@ -1652,14 +1663,37 @@ and the thread can continue its execution out of libdar code. As you
 see, several thread may read or write this array of tid at the same
 time. thanks to a set of mutex this is transparent to you and for this
 reason, libdar can be said to be thread-safe.<br>
+      <br style="font-weight: bold; font-style: italic;">
+</div><span style="font-weight: bold; font-style: italic;"><a name="How_to_solve_configure:_error:_Cannot"></a>How to solve "configure: error: Cannot find size_t type"?</span><br>
+      <div style="margin-left: 40px;">
+      <br>
+This error shows when you lack support for C++ compilation. Check the
+gcc compiler has been compiled with C++ support activated, or if you
+are using gcc binary from a distro, double check you have installed the
+C++ support for gcc.<br>
       <br>
       </div>
+      <span style="font-weight: bold; font-style: italic;"><a name="search_for_questions"></a>How to search for questions (and their answers) about known problems similar to mines?</span><br>
+      <div style="margin-left: 40px;"><br>
+Before sending an email to the dar-support mailing-list, you are asked
+to first look in the already sent email if there your problem has not
+been yet exposed and solved. This will first for you the fastest way to
+get an answer to your problem, and for me a way to preserve time for
+development.<br>
+      <br>
+But yes, there is now tones of emails to read to have a chance to find the answer to your problem. Hopefully, there is a <a href="http://news.gmane.org/gmane.comp.sysutils.backup.dar.support">search engine at gmane</a> (see the dark green area at the bottom of the page).<br>
+      <br>
+This search engine is available for <a href="http://news.gmane.org/index.php?prefix=gmane.comp.sysutils.backup.dar">all the mailing list archived at gmane</a> used around dar.<br>
+<br>
+
+      </div>
+
 
       </td>
     </tr>
   </tbody>
 </table>
-<br>
+
 <br>
 </div>
 </div>

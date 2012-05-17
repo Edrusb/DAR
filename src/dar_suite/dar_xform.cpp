@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: dar_xform.cpp,v 1.36.2.4 2007/08/24 15:37:07 edrusb Rel $
+// $Id: dar_xform.cpp,v 1.36.2.7 2008/02/09 20:11:27 edrusb Rel $
 //
 /*********************************************************************/
 //
@@ -30,6 +30,11 @@ extern "C"
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
 #include "getopt_decision.h"
 } // end extern "C"
 
@@ -47,7 +52,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_XFORM_VERSION "1.4.1"
+#define DAR_XFORM_VERSION "1.4.2"
 
 static bool command_line(user_interaction & dialog,
 			 S_I argc, char *argv[],
@@ -356,7 +361,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
             dialog.warning(gettext("Too many argument on command line, see -h option for help"));
             return false;
         }
-        if(argv[optind] != "")
+        if(string(argv[optind]) != string(""))
 	{
             tools_split_path_basename(argv[optind], src_dir, src);
 	    tools_check_basename(dialog, *src_dir, src, EXTENSION);
@@ -366,7 +371,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
             dialog.warning(gettext("Invalid argument as source archive"));
             return false;
         }
-        if(argv[optind+1] != "")
+        if(string(argv[optind+1]) != string(""))
             tools_split_path_basename(argv[optind+1], dst_dir, dst);
         else
         {
@@ -391,7 +396,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: dar_xform.cpp,v 1.36.2.4 2007/08/24 15:37:07 edrusb Rel $";
+    static char id[]="$Id: dar_xform.cpp,v 1.36.2.7 2008/02/09 20:11:27 edrusb Rel $";
     dummy_call(id);
 }
 

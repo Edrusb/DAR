@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: sar.cpp,v 1.37.2.2 2007/07/22 16:35:00 edrusb Rel $
+// $Id: sar.cpp,v 1.37.2.4 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -274,7 +274,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: sar.cpp,v 1.37.2.2 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: sar.cpp,v 1.37.2.4 2008/02/09 17:41:29 edrusb Rel $";
         dummy_call(id);
     }
 
@@ -730,6 +730,7 @@ namespace libdar
                 {
                     open_file(num);
                     if(of_flag != FLAG_TERMINAL)
+		    {
                         if(!ask_user)
                         {
                             close_file();
@@ -741,6 +742,7 @@ namespace libdar
                             close_file();
 			    get_gf_ui().pause(string(gettext("The last file of the set is not present in ")) + archive_dir.display() + gettext(" , please provide it."));
                         }
+		    }
                 }
                 else // not slice available in the directory
                     if(!ask_user)
@@ -833,7 +835,7 @@ namespace libdar
                     {
                         get_gf_ui().pause(gettext("last char of user command-line to execute is '%', (use '%%' instead to avoid this message). Ignore it and continue ?"));
                     }
-                    catch(Euser_abort)
+                    catch(Euser_abort & e)
                     {
                         natural_destruction = false;
                         throw Escript("sar::hook_substitute",gettext("unknown substitution string at end of string: %"));

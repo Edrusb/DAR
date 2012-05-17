@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: defile.cpp,v 1.8 2005/12/01 17:47:30 edrusb Rel $
+// $Id: defile.cpp,v 1.8.2.1 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -47,6 +47,7 @@ namespace libdar
             init = false;
 
         if(fin == NULL)
+	{
             if(nom == NULL)
                 throw SRC_BUG; // neither eod nor nomme
             else
@@ -55,11 +56,12 @@ namespace libdar
                 if(dir != NULL)
                     init = true;
             }
+	}
     }
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: defile.cpp,v 1.8 2005/12/01 17:47:30 edrusb Rel $";
+        static char id[]="$Id: defile.cpp,v 1.8.2.1 2008/02/09 17:41:29 edrusb Rel $";
         dummy_call(id);
     }
 

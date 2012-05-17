@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: database_header.cpp,v 1.1.2.1 2007/07/22 16:34:59 edrusb Rel $
+// $Id: database_header.cpp,v 1.1.2.2 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -45,6 +45,11 @@ extern "C"
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
 } // end extern "C"
 
 #include "database_header.hpp"
@@ -151,6 +156,6 @@ namespace libdar
 
 static void dummy_call(char *x)
 {
-    static char id[]="$Id: database_header.cpp,v 1.1.2.1 2007/07/22 16:34:59 edrusb Rel $";
+    static char id[]="$Id: database_header.cpp,v 1.1.2.2 2008/02/09 17:41:29 edrusb Rel $";
     dummy_call(id);
 }

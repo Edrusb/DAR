@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: test_path.cpp,v 1.7 2004/05/11 20:28:56 edrusb Rel $
+// $Id: test_path.cpp,v 1.7.4.1 2008/02/09 11:14:39 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -108,11 +108,11 @@ int main()
 
 void f2()
 {
-    char *src[] = { "toto", "/titi", "toto/./titi", "/./titi",
-                    "toto/titi/tutu/../../..", "/toto/titi/tutu/../../..",
-                    "././././toto/././././..", "/././././toto/././././..",
-                    "../../../titi/./tutu", "/../../../../toto/../../tutu",
-                    NULL };
+    const char *src[] = { "toto", "/titi", "toto/./titi", "/./titi",
+			  "toto/titi/tutu/../../..", "/toto/titi/tutu/../../..",
+			  "././././toto/././././..", "/././././toto/././././..",
+			  "../../../titi/./tutu", "/../../../../toto/../../tutu",
+			  NULL };
     path conv = "/";
 
     for(S_I i = 0; src[i] != NULL; i++)

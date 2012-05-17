@@ -18,7 +18,7 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: mask_list.cpp,v 1.2.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: mask_list.cpp,v 1.2.2.3 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 
@@ -36,6 +36,10 @@ extern "C"
 
 #if HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
+
+#if HAVE_STRING_H
+#include <string.h>
 #endif
 
 } // end extern "C"
@@ -171,11 +175,12 @@ namespace libdar
 	    }
 
 		// we use the features of lists
-	    tmp.sort();   // sort the list ( using the string's < operator )
-	    tmp.unique(); // remove duplicates
+	    list<basic_string<my_char> > my_tmp = convert_list_string_char(tmp);
+	    my_tmp.sort();   // sort the list ( using the string's < operator )
+	    my_tmp.unique(); // remove duplicates
 
 		// but we need the indexing of vectors
-	    contenu.assign(tmp.begin(), tmp.end());
+	    contenu.assign(my_tmp.begin(), my_tmp.end());
 	    taille = contenu.size();
 	    if(taille < contenu.size())
 		throw Erange("mask_list::mask_list", tools_printf(gettext("Too much line in file %s (integer overflow)"), filename_list));
@@ -190,44 +195,92 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: mask_list.cpp,v 1.2.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: mask_list.cpp,v 1.2.2.3 2008/02/09 17:41:29 edrusb Rel $";
         dummy_call(id);
     }
 
     bool mask_list::is_covered(const string & expression) const
     {
         U_I min = 0, max = taille-1, tmp;
-        string hidden;
-        const string *target = NULL;
+        basic_string<my_char> target;
         bool ret;
 
         if(case_s)
-            target = & expression;
+            target = convert_string_char(expression);
         else
         {
-            hidden = expression;
+            string hidden = expression;
             tools_to_upper(hidden);
-            target = & hidden;
+            target = convert_string_char(hidden);
         }
 
             // divide & conquer algorithm on a sorted list
         while(max - min > 1)
         {
             tmp = (min + max)/2;
-            if(contenu[tmp] < *target)
+            if(contenu[tmp] < target)
                 min = tmp;
             else
-                if(contenu[tmp] == *target)
+                if(contenu[tmp] == target)
                     max = min = tmp;
                 else
                     max = tmp;
         }
 
-        ret = contenu[max] == *target || contenu[min] == *target;
-        if(including) // if including files, we must also include directories leading to a listed file
-            ret = ret || path(contenu[max]).is_subdir_of(expression, case_s) || path(contenu[min]).is_subdir_of(expression, case_s);
+        ret = contenu[max] == target || contenu[min] == target;
+        if(including && !ret) // if including files, we must also include directories leading to a listed file
+	{
+	    string c_max = convert_string_my_char(contenu[max]);
+            ret = path(c_max).is_subdir_of(expression, case_s);
+	}
 
         return ret;
     }
+
+
+	//////// private routines implementation
+
+
+    list<basic_string<mask_list::my_char> > mask_list::convert_list_string_char(const list<string> & src) const
+    {
+	list<basic_string<my_char> > ret;
+	list<string>::const_iterator it = src.begin();
+
+	while(it != src.end())
+	{
+	    ret.push_back(convert_string_char(*it));
+	    ++it;
+	}
+	return ret;
+    }
+
+    basic_string<mask_list::my_char> mask_list::convert_string_char(const string & src) const
+    {
+	basic_string<my_char> ret;
+
+	string::const_iterator ut = src.begin();
+	while(ut != src.end())
+	{
+	    ret += my_char(*ut);
+	    ++ut;
+	}
+
+	return ret;
+    }
+
+    string mask_list::convert_string_my_char(const basic_string<mask_list::my_char> & src) const
+    {
+	string ret;
+
+	basic_string<my_char>::const_iterator ut = src.begin();
+	while(ut != src.end())
+	{
+	    ret += char(*ut);
+	    ++ut;
+	}
+
+	return ret;
+    }
+
 
 } // end of namespace

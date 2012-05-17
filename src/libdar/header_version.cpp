@@ -18,12 +18,19 @@
 //
 // to contact the author : dar.linux@free.fr
 /*********************************************************************/
-// $Id: header_version.cpp,v 1.7.2.1 2007/07/22 16:35:00 edrusb Rel $
+// $Id: header_version.cpp,v 1.7.2.2 2008/02/09 17:41:29 edrusb Rel $
 //
 /*********************************************************************/
 //
 
 #include "../my_config.h"
+
+extern "C"
+{
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+} // end of extern "C"
 
 #include "header_version.hpp"
 #include "integers.hpp"
@@ -39,7 +46,7 @@ namespace libdar
 
     static void dummy_call(char *x)
     {
-        static char id[]="$Id: header_version.cpp,v 1.7.2.1 2007/07/22 16:35:00 edrusb Rel $";
+        static char id[]="$Id: header_version.cpp,v 1.7.2.2 2008/02/09 17:41:29 edrusb Rel $";
         dummy_call(id);
     }
 
