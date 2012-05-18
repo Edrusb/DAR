@@ -66,12 +66,18 @@ steps to follow to build the configure script and Makefiles):
 Then you are ready to build dar as detailed in the documentation, in brief,
 the following commands should correspond to most needs:
 
-	./configure
+	./configure --enable-mode=64
 	make
 	make install-strip
 
 For your information the following diagram may help you. Be aware that this
 is a bit simplified.
+
+If you just want to build a fresh tarball simply use:
+
+       ./configure
+       make dist
+
 
 PACKAGING
 ==========
