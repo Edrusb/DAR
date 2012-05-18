@@ -1,4 +1,4 @@
-Follows a copy from Patrick Nagel site at http://www.patrick-nagel.net/ftpbackup/
+Follows a copy from Patrick Nagel site at http://www.patrick-nagel.net/scripts/ftpbackup
 
 -----------------------------------------------
 
