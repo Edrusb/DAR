@@ -528,6 +528,7 @@ AC_ARG_ENABLE( [pedantic],
 AC_ARG_ENABLE( [build-usage],
                 AC_HELP_STRING(--enable-build-usage, [re-build C++ generated usage files with Chris Martin's dar-help program, non-developper should not activate that option]),
                [
+	       	export CPPFLAGS="$CPPFLAGS -I/usr/include/libxml2"
                 AC_CHECK_HEADER([libxml/tree.h], [AC_DEFINE(HAVE_LIBXML_TREE_H, [1], [defined if libxml/tree.h is present])], [AC_MSG_ERROR([Cannot find libxml/tree.h header file])])
                 AC_CHECK_HEADER([libxml/parser.h], [AC_DEFINE(HAVE_LIBXML_PARSER_H, [1], [defined if libxml/parser.h is present])], [AC_MSG_ERROR([Cannot find libxml/parser.h header file])])
                 AC_CHECK_LIB(xml2, [reference], [], [AC_MSG_ERROR([library xml2 not found])])

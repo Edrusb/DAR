@@ -17,6 +17,8 @@ from 2.4.5 to 2.4.6
   the operation.
 - fixed message reporting unknown system group when converting gid to name
   (was reporting unknow "user" instead of "group")
+- modifies the end of messages shown by -h option to point to man page for
+  more _options_ rather than _details_
 
 from 2.4.4 to 2.4.5
 - updated sample scripts to be compatible with dar's --min-digit option
