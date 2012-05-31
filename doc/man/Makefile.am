@@ -8,7 +8,7 @@ TARGET=dar.html dar_slave.html dar_xform.html dar_manager.html dar_cp.html
 	cp ../../man/$@ .
 
 %.html: %.1
-	sed -e 's%\-%\\-%g' < ./$< | groff -man -Thtml | sed 's%<table%<table border=\"0\"%g' > $@
+	sed -e 's%\-%\\-%g' < ./$< | groff -man -Thtml | sed -e 's%<table%<table border=\"0\"%g' -e 's/&minus;/-/g' > $@
 
 all-local: $(TARGET)
 
