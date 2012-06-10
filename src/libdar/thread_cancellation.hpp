@@ -85,12 +85,6 @@ namespace libdar
 	void block_delayed_cancellation(bool mode);
 
 
-	    /// mandatory initialization static method
-
-	    /// must be called once before any call to thread_cancellation class's methods
-	static void init();
-
-
 #if MUTEX_WORKS
 	    /// marks the thread given in argument as to be canceled
 
@@ -144,7 +138,6 @@ namespace libdar
 	    // class's static variables and types
 
 	static pthread_mutex_t access;                 ///< mutex for the access to "info"
-	static bool initialized;                       ///< true if the mutex has been initialized
 	static std::list<thread_cancellation *> info;  ///< list of all object
 	static std::list<fields> preborn;              ///< canceled thread that still not have a thread_cancellation object to deal with cancellation
 

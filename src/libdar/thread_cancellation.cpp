@@ -36,8 +36,7 @@ extern "C"
 #include "thread_cancellation.hpp"
 #include "tools.hpp"
 
-#define CRITICAL_START if(!initialized)                                     \
-             throw Elibcall("thread_cancellation", dar_gettext("Thread-safe not initialized for libdar, read manual or contact maintainer of the application that uses libdar")); \
+#define CRITICAL_START                                                      \
              sigset_t Critical_section_mask_memory;                         \
              tools_block_all_signals(Critical_section_mask_memory);         \
              pthread_mutex_lock(&access)
@@ -52,8 +51,7 @@ namespace libdar
 
 	// class static variables
 #if MUTEX_WORKS
-    pthread_mutex_t thread_cancellation::access;
-    bool thread_cancellation::initialized = false;
+    pthread_mutex_t thread_cancellation::access = PTHREAD_MUTEX_INITIALIZER;
     list<thread_cancellation *> thread_cancellation::info;
     list<thread_cancellation::fields> thread_cancellation::preborn;
 #endif
@@ -167,17 +165,6 @@ namespace libdar
 #endif
     }
 
-    void thread_cancellation::init()
-    {
-#if MUTEX_WORKS
-	if(!initialized)
-	{
-	    if(pthread_mutex_init(&access, NULL) < 0)
-		throw Erange("thread_cancellation::init", string(dar_gettext("Cannot initialize mutex: ")) + strerror(errno));
-	    initialized = true;
-	}
-#endif
-    }
 
 #if MUTEX_WORKS
     void thread_cancellation::cancel(pthread_t tid, bool x_immediate, U_64 x_flag)

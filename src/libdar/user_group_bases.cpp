@@ -1,4 +1,4 @@
-//*********************************************************************/
+/*********************************************************************/
 // dar - disk archive - a backup/restoration program
 // Copyright (C) 2002-2052 Denis Corbin
 //
@@ -54,8 +54,7 @@ extern "C"
 using namespace std;
 
 #if MUTEX_WORKS
-#define CRITICAL_START if(!class_initialized)                                     \
-             throw Elibcall("user_group_bases", gettext("Thread-safe not initialized for libdar, read manual or contact maintainer of the application that uses libdar")); \
+#define CRITICAL_START                                                      \
              sigset_t Critical_section_mask_memory;                         \
              tools_block_all_signals(Critical_section_mask_memory);         \
              pthread_mutex_lock(&lock_fill)
@@ -71,9 +70,8 @@ namespace libdar
 {
 
     const std::string user_group_bases::empty_string = "";
-    bool user_group_bases::class_initialized = false;
 #if MUTEX_WORKS
-    pthread_mutex_t user_group_bases::lock_fill;
+    pthread_mutex_t user_group_bases::lock_fill = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
     void user_group_bases::fill() const
@@ -137,17 +135,6 @@ namespace libdar
 	    return empty_string;
     }
 
-    void user_group_bases::class_init()
-    {
-#if MUTEX_WORKS
-	if(!class_initialized)
-	    if(pthread_mutex_init(&lock_fill, NULL) < 0)
-		throw Erange("user_group_bases::class_init", string(gettext("Cannot initialize mutex: ")) + strerror(errno));
-#endif
-	class_initialized = true;
-    }
-
 } // end of namespace
 
 #endif
-

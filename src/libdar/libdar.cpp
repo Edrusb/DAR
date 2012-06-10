@@ -353,22 +353,6 @@ namespace libdar
 
 	    srand(time(NULL)+getpid()+getppid());
 
-
-		// initializing mutex
-
-#ifdef MUTEX_WORKS
-#ifdef LIBDAR_SPECIAL_ALLOC
-	    special_alloc_init_for_thread_safe();
-#endif
-	    thread_cancellation::init();
-#endif
-
-		// building the (later read only) database of user/UID and group/GID of the system
-
-#ifdef __DYNAMIC__
-	    user_group_bases::class_init();
-#endif
-
 		// initializing LIBLZO2
 
 #if HAVE_LIBLZO2

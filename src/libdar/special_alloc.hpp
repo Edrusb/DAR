@@ -65,7 +65,6 @@ namespace libdar
 	// libdar global initialization function
 	// this makes libdar thread-safe if POSIX mutex
 	// are available
-    extern void special_alloc_init_for_thread_safe();
 
     extern void *special_alloc_new(size_t taille);
     extern void special_alloc_delete(void *ptr);

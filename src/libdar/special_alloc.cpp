@@ -41,12 +41,9 @@ extern "C"
 #include <string.h>
 #endif
 }
-static bool alloc_mutex_initialized = false;
-static pthread_mutex_t alloc_mutex;
+static pthread_mutex_t alloc_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 #define CRITICAL_START                                                  \
-    if(!alloc_mutex_initialized)					\
-	throw Elibcall("alloc_mutex_initialized", gettext("Thread-safe not initialized for libdar, read manual or contact maintainer of the application that uses libdar"));                                                       \
     sigset_t Critical_section_mem_mask_memory;				\
     tools_block_all_signals(Critical_section_mem_mask_memory);		\
     pthread_mutex_lock(&alloc_mutex)
@@ -799,23 +796,6 @@ namespace libdar
 	}
 
 	CRITICAL_END;
-    }
-
-    void special_alloc_init_for_thread_safe()
-    {
-#ifdef MUTEX_WORKS
-	if(alloc_mutex_initialized)
-	    throw SRC_BUG; // should not be initialized twice
-	alloc_mutex_initialized = true;
-	    // we must not be in multi-thread
-	    // environment at that time.
-
-	if(pthread_mutex_init(&alloc_mutex, NULL) < 0)
-	{
-	    alloc_mutex_initialized = false;
-	    throw Erange("special_alloca_init_for_thread_safe", string(gettext("Cannot initialize mutex: ")) + strerror(errno));
-	}
-#endif
     }
 
     void special_alloc_garbage_collect(ostream & output)

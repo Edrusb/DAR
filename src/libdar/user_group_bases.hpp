@@ -65,9 +65,6 @@ namespace libdar
 	    /// \note if the entry is not known, returns an empty string
 	const std::string & get_groupname(const infinint & gid) const;
 
-	    /// initialize mutex for the class, to be called only once for all and before any object instantiation
-
-	static void class_init();
 
     private:
 	bool filled;
@@ -85,8 +82,6 @@ namespace libdar
 	    // for this reason, here the mutex is 'static'
 	static pthread_mutex_t lock_fill;
 #endif
-	static bool class_initialized;
-
     };
 
 
