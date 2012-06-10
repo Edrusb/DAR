@@ -694,7 +694,7 @@ namespace libdar
     {
     public:
 
-	archive_options_merge() { x_selection = x_subtree = x_ea_mask = x_compr_mask = NULL; x_overwrite = NULL; clear(); };
+	archive_options_merge() { x_selection = x_subtree = x_ea_mask = x_compr_mask = NULL; x_overwrite = NULL; x_entrepot = NULL; clear(); };
 	archive_options_merge(const archive_options_merge & ref) { copy_from(ref); };
 	const archive_options_merge & operator = (const archive_options_merge & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_merge() { destroy(); };
@@ -851,7 +851,7 @@ namespace libdar
 	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
 
     private:
-	archive * x_ref;
+	archive * x_ref;    //< points to an external existing object, must never be deleted by "this"
 	mask * x_selection;
 	mask * x_subtree;
 	bool x_allow_over;

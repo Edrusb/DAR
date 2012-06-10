@@ -124,6 +124,8 @@ namespace libdar
 
     archive_options_read::archive_options_read() : x_ref_chem(default_ref_chem)
     {
+	x_entrepot = NULL;
+	x_ref_entrepot = NULL;
 	clear();
     }
 
