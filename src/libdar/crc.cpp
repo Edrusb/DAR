@@ -153,12 +153,14 @@ namespace libdar
 	{
 	    U_I partial_cursor = 0;
 
-	    if(crc_size % 8 == 0)
+		// But we cannot use optimized method on some systems if we are not aligned to the size boundary
+	    if(crc_size % 8 == 0 && (U_64)(buffer + cursor) % 8 == 0)
 		B_compute_block(U_64(0), buffer + cursor, length - cursor, begin, pointer, end, partial_cursor);
-	    else if(crc_size % 4 == 0)
+	    else if(crc_size % 4 == 0 && (U_64)(buffer + cursor) % 4 == 0)
 		B_compute_block(U_32(0), buffer + cursor, length - cursor, begin, pointer, end, partial_cursor);
-	    else if(crc_size % 2 == 0)
+	    else if(crc_size % 2 == 0 && (U_64)(buffer + cursor) % 2 == 0)
 		B_compute_block(U_16(0), buffer + cursor, length - cursor, begin, pointer, end, partial_cursor);
+		/// warning, adding a new type here need modifying crc_n::alloc() to provide aligned crc storage
 
 	    cursor += partial_cursor;
 	}
@@ -387,7 +389,20 @@ namespace libdar
     void crc_n::alloc(U_I width)
     {
 	size = width;
-	cyclic = new unsigned char[size];
+
+	    // the following trick is to have cyclic aligned at its boundary size
+	    // (its allocated address is a multiple of it size)
+	    // some CPU need that (sparc), and it does not hurt for other ones.
+	if(width % 8 == 0)
+	    cyclic = (unsigned char *)(new U_64);
+	else if(width % 4 == 0)
+	    cyclic = (unsigned char *)(new U_32);
+	else if(width % 2 == 0)
+	    cyclic = (unsigned char *)(new U_16);
+	else
+		// end of the trick and back to default situation
+		// this trick allows use of 2, 4 or 8 bytes operations in when n_compute calls B_compute_block
+	    cyclic = new unsigned char[size];
 	if(cyclic == NULL)
 	    throw Ememory("crc::copy_from");
 	pointer = cyclic;
