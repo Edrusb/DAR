@@ -2612,6 +2612,9 @@ namespace libdar
 
 					    // updating the last modification date of file
 					fic->set_last_modif(tools_get_mtime(info_quoi));
+
+					    // updating the size of the file
+					fic->change_size(tools_get_size(info_quoi));
 				    }
 				    else
 				    {

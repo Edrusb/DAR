@@ -511,6 +511,7 @@ namespace libdar
 
         bool has_changed_since(const inode & ref, const infinint & hourshift, inode::comparison_fields what_to_check) const;
         infinint get_size() const { return *size; };
+	void change_size(const infinint & s) const { *size = s; };
         infinint get_storage_size() const { return *storage_size; };
         void set_storage_size(const infinint & s) { *storage_size = s; };
         virtual generic_file *get_data(get_data_mode mode) const; // returns a newly allocated object in read_only mode
