@@ -267,7 +267,7 @@ namespace libdar
 	{
 	case gf_write_only:
 	    throw Efeature("Skipping not implemented in write mode for escape class");
-		// if the buffer is neither empty not full, we cannot know what to do with this date
+		// if the buffer is neither empty not full, we cannot know what to do with this data
 		// either place it asis in the below file, or escape it in the below file.
 	case gf_read_only:
 	    break;

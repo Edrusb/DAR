@@ -2601,7 +2601,20 @@ namespace libdar
 				if(current_repeat_count < repeat_count)
 				{
 				    current_repeat_count++;
-				    infinint wasted = stock->get_position() - start;
+				    infinint current_pos_tmp = stock->get_position();
+				    infinint wasted = 0;
+
+				    try
+				    {
+					stock->skip(start);
+				    }
+				    catch(...)
+				    {
+					wasted = current_pos_tmp - start;
+					if(stock->get_position() != current_pos_tmp)
+					    throw SRC_BUG;
+				    }
+
 				    if(repeat_byte == 0 || (current_wasted_bytes + wasted < repeat_byte))
 				    {
 					if(info_details)
