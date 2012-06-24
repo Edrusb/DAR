@@ -545,6 +545,12 @@ namespace libdar
 	/// \return the mtime of the given file
     extern infinint tools_get_mtime(const std::string & s);
 
+	/// returns the size of the given plain file
+
+	/// \param[in] s path of the file to get the size
+	/// \return the size if the file in byte
+    extern infinint tools_get_size(const std::string & s);
+
 	/// returns the last change date of the given file
 
 	/// \param[in] s path of the file to get the last ctime

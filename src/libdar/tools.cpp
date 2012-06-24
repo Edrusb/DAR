@@ -1654,6 +1654,20 @@ namespace libdar
         return buf.st_mtime;
     }
 
+    infinint tools_get_size(const std::string & s)
+    {
+        struct stat buf;
+
+	if(lstat(s.c_str(), &buf) < 0)
+	    throw Erange("tools_get_size", tools_printf(dar_gettext("Cannot get last modification date: %s"), strerror(errno)));
+
+	if(!S_ISREG(buf.st_mode))
+	    throw Erange("tools_get_size", tools_printf(dar_gettext("Cannot get size of %S: not a plain file"), &s));
+
+	return buf.st_size;
+    }
+
+
     infinint tools_get_ctime(const std::string & s)
     {
         struct stat buf;
