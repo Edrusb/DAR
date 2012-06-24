@@ -842,7 +842,35 @@ static void show_usage(user_interaction & dialog, const char *command)
     dialog.printf("\tdar_manager -h\n");
     dialog.printf("\tdar_manager -V\n");
     dialog.printf("\n");
-#include "dar_manager.usage"
+    dialog.printf(gettext("\n"));
+    dialog.printf(gettext("Commands:\n"));
+    dialog.printf(gettext("   -C <database>   creates an empty database\n"));
+    dialog.printf(gettext("   -B <database>   specify the database to use (read or modify)\n"));
+    dialog.printf(gettext("   -A <archive>    add an archive to the database\n"));
+    dialog.printf(gettext("   -l\t\t   gives information about the archive compiled in the database\n"));
+    dialog.printf(gettext("   -D <number[-number]> delete an archive from the database\n"));
+    dialog.printf(gettext("   -b <number>\t   change the basename to use for the give archive number\n"));
+    dialog.printf(gettext("   -p <number>\t   change the path to use for the given archive number\n"));
+    dialog.printf(gettext("   -o <options>    specify a list of option to always pass to dar\n"));
+    dialog.printf(gettext("   -d <dar's path> specify the path to dar\n"));
+    dialog.printf(gettext("   -r <files>\t   restores the given files\n"));
+    dialog.printf(gettext("   -w <date>\t   only with -r, restores in state just before the given date\n"));
+    dialog.printf(gettext("   -u <number>\t   list the most recent files contained in the given archive\n"));
+    dialog.printf(gettext("   -f <file>\t   list the archives where the given file is present\n"));
+    dialog.printf(gettext("   -s\t\t   shows the number of most recent file by archive\n"));
+    dialog.printf(gettext("   -m <number>\t   move an archive within a given database.\n"));
+    dialog.printf(gettext("   -i\t\t   user interactive mode\n"));
+    dialog.printf(gettext("   -c\t\t   check database for dates order\n"));
+    dialog.printf(gettext("   -L <filename>   execute on a given database a batch of action as defined by\n"));
+    dialog.printf(gettext("\t\t   the provided file.\n"));
+    dialog.printf(gettext("   -h\t\t   displays this help information\n"));
+    dialog.printf(gettext("   -V\t\t   displays software version\n"));
+    dialog.printf(gettext("\n"));
+    dialog.printf(gettext("Options:\n"));
+    dialog.printf(gettext("   -v\t\t   display more information about what is going on\n"));
+    dialog.printf(gettext("   -j\t\t   ask user what to do when memory is exhausted\n"));
+    dialog.printf(gettext("\n"));
+    dialog.printf(gettext("See man page for more options.\n"));
 }
 
 static void show_version(user_interaction & dialog, const char *command_name)

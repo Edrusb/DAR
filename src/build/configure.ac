@@ -525,16 +525,6 @@ AC_ARG_ENABLE( [pedantic],
                ],
                [])
 
-AC_ARG_ENABLE( [build-usage],
-                AC_HELP_STRING(--enable-build-usage, [re-build C++ generated usage files with Chris Martin's dar-help program, non-developper should not activate that option]),
-               [
-	       	export CPPFLAGS="$CPPFLAGS -I/usr/include/libxml2"
-                AC_CHECK_HEADER([libxml/tree.h], [AC_DEFINE(HAVE_LIBXML_TREE_H, [1], [defined if libxml/tree.h is present])], [AC_MSG_ERROR([Cannot find libxml/tree.h header file])])
-                AC_CHECK_HEADER([libxml/parser.h], [AC_DEFINE(HAVE_LIBXML_PARSER_H, [1], [defined if libxml/parser.h is present])], [AC_MSG_ERROR([Cannot find libxml/parser.h header file])])
-                AC_CHECK_LIB(xml2, [reference], [], [AC_MSG_ERROR([library xml2 not found])])
-                build_usage="yes"
-               ],
-               [build_usage="no"])
 
 AC_ARG_ENABLE( [build-html],
 	       AC_HELP_STRING(--disable-build-html, [don't build programming documentation (in particular libdar API documentation) and html man page]),
@@ -648,7 +638,6 @@ AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
 LDFLAGS=$MEM_LDFLAGS
 
 AM_CONDITIONAL([MAKE_ALL_DIR], [test $examples = "yes"])
-AM_CONDITIONAL([MAKE_USAGE], [test $build_usage = "yes"])
 AM_CONDITIONAL([BUILD_DAR_STATIC], [test $build_static = "yes" -a $static_pb = "no"])
 AM_CONDITIONAL([DEBUG_STATIC], [test $debug_static = "yes" -a $static_pb = "no"])
 AM_CONDITIONAL([BUILD_MODE32], [test "$build_mode" = "32"])

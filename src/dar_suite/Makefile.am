@@ -1,26 +1,4 @@
 #
-# conditional part: --enable-build-usage
-#
-
-if MAKE_USAGE
-
-%.usage: %.xml dar-help$(EXEEXT)
-	./dar-help$(EXEEXT) $< > $@
-
-noinst_PROGRAMS = dar-help
-dar_help_SOURCES = dar-help.c
-dar_help_LDFLAGS = -pthread
-
-command_line.cpp : dar.usage
-dar_xform.cpp : dar_xform.usage
-dar_slave.cpp : dar_slave.usage
-dar_manager.cpp : dar_manager.usage
-
-endif
-
-dist_noinst_DATA = dar.xml dar_xform.xml dar_slave.xml dar_manager.xml
-
-#
 # conditionnal part: --enable-build-static
 #
 

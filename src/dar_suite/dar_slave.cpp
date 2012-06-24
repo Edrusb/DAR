@@ -242,7 +242,14 @@ static void show_usage(user_interaction & dialog, const char *command)
     dialog.printf("  %s [options] [-i input_pipe] [-o output_pipe] [<path>/]basename\n", cmd.c_str());
     dialog.printf("  %s -h\n", cmd.c_str());
     dialog.printf("  %s -V\n\n", cmd.c_str());
-#include "dar_slave.usage"
+    dialog.printf(gettext("\n"));
+    dialog.printf(gettext("Common options:\n"));
+    dialog.printf(gettext("   -i <named pipe> pipe to use instead of std input to read orders from dar\n"));
+    dialog.printf(gettext("   -o <named pipe> pipe to use instead of std output to write data to dar\n"));
+    dialog.printf(gettext("   -E <string>\t   command line to execute between slices of the archive\n"));
+    dialog.printf(gettext("   -j\t\t   ask user what to do when memory is exhausted\n"));
+    dialog.printf(gettext("\n"));
+    dialog.printf(gettext("See man page for more options.\n"));
 }
 
 static void show_version(user_interaction & dialog, const char *command)
