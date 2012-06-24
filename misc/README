@@ -1,12 +1,10 @@
-What will you find in this directory ?
+What will you find in this directory?
 
 --------------------
-| IMPORTANT !
+| IMPORTANT!
 |   as there is so many distro today (yep, the Slackware hegemony is over...)
 |   I do not produce anymore binary packages. Ask your preferred distro
 |   maintainer team to upgrade their packages or wait for they do so.
-|   The following scripts are provided for convenience and are now obsoleted
-|   there are thus no more maintained not much used.
 --------------------
 
 many script that help(ed) build the releases:
@@ -14,13 +12,6 @@ many script that help(ed) build the releases:
 - batch_linux
 - match_linux_ea
 - make_cygwin_dist
-- make_rpm
-
-the RPM spec files for releases
-- *.rpm.spec
-
-DAR's logo to be included in RPM packages:
-- dar.gif
 
 a helper program to translate documentation to DOS format
 - todos.c
