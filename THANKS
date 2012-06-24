@@ -1,3 +1,9 @@
+version 2.4.6
+--------------
+Thanks to Per Grahn for bug report and problem analysis. Thanks to Brian May
+I forgot so many times to underline his constribution by porting dar/libdar
+to Debian for that many years.
+
 version 2.4.5
 --------------
 Thanks to Piotr Domanski and Paolo Sala for bug report. Thanks to Andreas

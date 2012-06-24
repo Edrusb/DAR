@@ -1,13 +1,24 @@
 from 2.4.5 to 2.4.6
-- fixed bug met while interrupting compressed archive creation, resulting
-  the archive is only readable in --sequential-read mode
-- fixed bug met while reading an interrupted archive in sequential read
-  mode leading dar to not release some objects from memory at the end of
-  the operation.
+- fixed bug met while interrupting compressed archive creation, the resulting
+  archive was only readable in --sequential-read mode
+- fixed bug met while reading an interrupted archive in sequential reading
+  mode. It lead dar to not release some objects from memory at the end of
+  the operation, which displayed an ugly error message from libdar selfcheck
+  routine.
 - fixed message reporting unknown system group when converting gid to name
-  (was reporting unknow "user" instead of "group")
+  (was reporting unknow "user" instead of unknown "group")
+- removing the $Id:$ macro from file as we moved from CVS to GIT
+- updating package to distribute Patrick Nagel's scripts and documentation
+- updated URL pointing to Patrick Nagel's web site
+- updating documentation describing how to get source code from GIT (no more
+  from CVS)
+- fixed typo in configure.ac
+- added info on how to build a brand-new dar tarball from source in GIT
 - modifies the end of messages shown by -h option to point to man page for
   more _options_ rather than _details_
+- replaced &minus; in the HTML generated documentation by a standard ASCII dash
+- fixed alignement bug in CRC calculation that lead libdar based application to
+  crash on sparc-based systems.
 
 from 2.4.4 to 2.4.5
 - updated sample scripts to be compatible with dar's --min-digit option
