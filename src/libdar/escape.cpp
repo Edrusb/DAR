@@ -23,6 +23,13 @@
 
 #include "escape.hpp"
 
+extern "C"
+{
+#ifdef HAVE_STRIN_H
+#include <string.h>
+#endif
+} // extern "C"
+
 using namespace std;
 
 extern "C"
@@ -63,8 +70,6 @@ namespace libdar
 	escape_seq_offset_in_buffer = 0;
 	escaped_data_count_since_last_skip = 0;
 	unjumpable = x_unjumpable;
-	if(get_mode() == gf_read_write)
-	    throw SRC_BUG; // escape implementation does not support this mode
 	for(U_I i = 0 ; i < ESCAPE_SEQUENCE_LENGTH; ++i)
 	    fixed_sequence[i] = usual_fixed_sequence[i];
     }
@@ -124,7 +129,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	    // check whether we are not in write mode !!!
-	if(get_mode() == gf_read_write)
+	if(get_mode() != gf_read_only)
 	    throw SRC_BUG; // escape implementation does not support this mode
 
 	read_eof = false; // may be have been set because we reached a mark while reading data, so we now need to unset it
@@ -265,19 +270,71 @@ namespace libdar
 
 	switch(x_below->get_mode())
 	{
-	case gf_write_only:
-	    throw Efeature("Skipping not implemented in write mode for escape class");
-		// if the buffer is neither empty not full, we cannot know what to do with this data
-		// either place it asis in the below file, or escape it in the below file.
 	case gf_read_only:
-	    break;
+	    read_eof = false;
+	    flush_or_clean();
+	    return x_below->skip(pos);
+	case gf_write_only:
+	case gf_read_write:
+		// only backward skipping is allowed in that mode
+	    if(get_position() < pos)
+		throw Efeature("Skipping forward not implemented in write mode for escape class");
+	    else
+	    {
+		char tmp_buffer[WRITE_BUFFER_SIZE];
+		infinint cur_below = x_below->get_position();
+		U_I trouve;
+
+		try
+		{
+		    if(pos >= ESCAPE_SEQUENCE_LENGTH)
+		    {
+			U_I lu = 0;
+
+			if(!x_below->skip(pos - ESCAPE_SEQUENCE_LENGTH))
+			    throw SRC_BUG; // should succeed or throw an exception in that situation (backward skipping)
+			lu = x_below->read(tmp_buffer, ESCAPE_SEQUENCE_LENGTH);
+			write_buffer_size = lu;
+		    }
+		    else
+		    {
+			U_I width = 0;
+			U_I lu = 0;
+			infinint tmp = pos;
+			tmp.unstack(width);
+			if(tmp != 0)
+			    throw SRC_BUG;
+			width = ESCAPE_SEQUENCE_LENGTH - width;
+			if(!x_below->skip(0));
+			throw SRC_BUG;  // should succeed or throw an exception in that situation (backward skipping)
+			lu = x_below->read(tmp_buffer, width);
+			write_buffer_size = lu;
+		    }
+		}
+		catch(...)
+		{
+		    x_below->skip(cur_below);
+		    throw;
+		}
+		(void)memcpy(write_buffer, tmp_buffer, write_buffer_size);
+		trouve = trouve_amorce(write_buffer, write_buffer_size, fixed_sequence);
+		if(trouve == 0) // we read a whole escape sequence
+		    write_buffer_size = 0; // so we know that we can restart the lookup process here from scratch
+		else if(trouve == write_buffer_size) // no start of escape sequence found
+		    write_buffer_size = 0; // so we know that we can restart the lookup process here from scratch
+		else // partial escape sequence found, moving at the beginning of the write_buffer for further lookup
+		{
+		    (void)memmove(write_buffer, write_buffer + trouve, write_buffer_size - trouve);
+		    write_buffer_size -= trouve;
+		}
+
+		return true;
+	    }
+	    throw SRC_BUG; // that statement should never be reached
 	default:
 	    throw SRC_BUG; // this mode is not allowed
 	}
 
-	read_eof = false;
-	flush_or_clean();
-	return x_below->skip(pos);
     }
 
     bool escape::skip_to_eof()

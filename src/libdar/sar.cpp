@@ -196,7 +196,7 @@ namespace libdar
 	     const label & data_name,
 	     hash_algo x_hash,
 	     const infinint & x_min_digits,
-	     const string & execute) : generic_file(gf_write_only), mem_ui(dialog)
+	     const string & execute) : generic_file(gf_read_write), mem_ui(dialog)
     {
         if(file_size < header::min_size() + 1)  //< one more byte to store at least one byte of data
             throw Erange("sar::sar", gettext("File size too small"));
@@ -262,7 +262,7 @@ namespace libdar
     void sar::inherited_terminate()
     {
         close_file(true);
-        if(get_mode() == gf_write_only && natural_destruction)
+        if(get_mode() == gf_read_write && natural_destruction)
 	{
 	    set_info_status(CONTEXT_LAST_SLICE);
             hook_execute(of_current);
@@ -555,7 +555,7 @@ namespace libdar
         if(of_fd != NULL)
         {
 	    char flag = terminal ? flag_type_terminal : flag_type_non_terminal;
-	    if(get_mode() == gf_write_only)
+	    if(get_mode() == gf_read_write)
 	    {
 		if(of_fd->get_position() != of_fd->get_size())
 		    bug = true; // we should be at the end of the file
@@ -897,7 +897,7 @@ namespace libdar
 	    // open for writing but succeeds only if this file does NOT already exist
 	try
 	{
-	    code = entr->open(get_ui(), fic, gf_write_only, true, false, hash, of_fd);
+	    code = entr->open(get_ui(), fic, gf_read_write, true, false, hash, of_fd);
 	}
 	catch(Erange & e)
 	{
@@ -982,11 +982,11 @@ namespace libdar
 		    unlink_on_error = true;
 
 		    // open with overwriting
-		code = entr->open(get_ui(), fic, gf_write_only, false, true, hash, of_fd);
+		code = entr->open(get_ui(), fic, gf_read_write, false, true, hash, of_fd);
 	    }
 	    else // open without overwriting
 		if(hash == hash_none)
-		    code = entr->open(get_ui(), fic, gf_write_only, false, false, hash, of_fd);
+		    code = entr->open(get_ui(), fic, gf_read_write, false, false, hash, of_fd);
 		else
 		    throw SRC_BUG; // cannot calculate a hash on a just openned file that is not empty
 
@@ -1068,22 +1068,20 @@ namespace libdar
 
 	    switch(get_mode())
 	    {
-	    case gf_read_only :
+	    case gf_read_only:
 		close_file(false);
 		    // launch the shell command before reading a slice
 		open_readonly(display, num);
 		break;
-	    case gf_write_only :
+	    case gf_write_only:
+	    case gf_read_write:
+
+		if(num < of_current)
+		    throw Erange("sar::open_file", "Skipping backward would imply accessing/modifying previous slice");
 
 		    // adding the trailing flag
-
 		if(of_fd != NULL)
-		{
-		    if(num > of_current || of_max_seen > of_current)
-			close_file(false);
-		    else // last slice of the set (at least it seems so)
-			throw SRC_BUG; // should not skip backward in write_only mode
-		}
+		    close_file(false);
 
 		if(!initial)
 		{
@@ -1337,7 +1335,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 			     bool allow_over,
 			     bool warn_over,
 			     hash_algo x_hash,
-			     const infinint & x_min_digits) : generic_file(gf_write_only), mem_ui(dialog)
+			     const infinint & x_min_digits) : generic_file(gf_read_write), mem_ui(dialog)
    {
 
 	    // some local variables to be used
@@ -1362,7 +1360,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	    // creating the slice if it does not exist else failing
 	try
 	{
-	    code = where.open(dialog, filename, gf_write_only, true, false, x_hash, tmp);
+	    code = where.open(dialog, filename, gf_read_write, true, false, x_hash, tmp);
 
 	    switch(code)
 	    {
@@ -1377,7 +1375,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 		if(warn_over)
 		    dialog.pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
 
-		code = where.open(dialog, filename, gf_write_only, false, true, x_hash, tmp);
+		code = where.open(dialog, filename, gf_read_write, false, true, x_hash, tmp);
 		switch(code)
 		{
 		case entrepot::io_ok:
@@ -1507,10 +1505,18 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
     {
 	if(reference != NULL)
 	{
-	    if(get_mode() == gf_write_only)
+	    char last = flag_type_terminal;
+
+	    switch(get_mode())
 	    {
-		char last = flag_type_terminal;
+	    case gf_read_only:
+		break; // explicitely accepting other value
+	    case gf_write_only:
+	    case gf_read_write:
 		reference->write(&last, 1); // adding the trailing flag
+		break;
+	    default:
+		throw SRC_BUG;
 	    }
 
 	    delete reference; // this closes the slice so we can now eventually play with it:
@@ -1518,7 +1524,12 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	}
 	if(hook != "")
 	{
-	    if(get_mode() == gf_write_only)
+	    switch(get_mode())
+	    {
+	    case gf_read_only:
+		break;
+	    case gf_write_only:
+	    case gf_read_write:
 		tools_hook_substitute_and_execute(get_ui(),
 						  hook,
 						  hook_where,
@@ -1527,6 +1538,10 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 						  sar_make_padded_number("1", min_digits),
 						  ext,
 						  get_info_status());
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
 	}
     }
 
@@ -1562,8 +1577,19 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
     {
         header tete;
 
-	if(reference->get_mode() == gf_write_only)
+	switch(reference->get_mode())
 	{
+	case gf_read_only:
+	    tete.read(get_ui(), *reference);
+	    if(tete.get_set_flag() == flag_type_non_terminal)
+		throw Erange("trivial_sar::trivial_sar", gettext("This archive has slices and is not possible to read from a pipe"));
+		// if flag is flag_type_located_at_end_of_slice, we will warn at end of slice
+	    offset = reference->get_position();
+	    of_data_name = tete.get_set_data_name();
+	    old_sar = tete.is_old_header();
+	    break;
+	case gf_write_only:
+	case gf_read_write:
 	    tete.get_set_magic() = SAUV_MAGIC_NUMBER;
 	    tete.get_set_internal_name().generate_internal_filename();
 	    tete.get_set_flag() = flag_type_terminal;
@@ -1576,20 +1602,10 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 		tete.get_set_data_name() = of_data_name;
 	    tete.write(get_ui(), *reference);
 	    offset = reference->get_position();
+	    break;
+	default:
+	    throw SRC_BUG;
 	}
-	else
-	    if(reference->get_mode() == gf_read_only)
-	    {
-		tete.read(get_ui(), *reference);
-		if(tete.get_set_flag() == flag_type_non_terminal)
-                    throw Erange("trivial_sar::trivial_sar", gettext("This archive has slices and is not possible to read from a pipe"));
-		    // if flag is flag_type_located_at_end_of_slice, we will warn at end of slice
-                offset = reference->get_position();
-		of_data_name = tete.get_set_data_name();
-		old_sar = tete.is_old_header();
-	    }
-	    else
-		throw Efeature(gettext("Read-write mode not supported for \"trivial_sar\""));
     }
 
     U_I trivial_sar::inherited_read(char *a, U_I size)
@@ -1597,21 +1613,18 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	U_I ret = reference->read(a, size);
 	tuyau *tmp = dynamic_cast<tuyau *>(reference);
 
-	if(tmp == NULL)
-	    throw SRC_BUG; // should always read over a tuyau object
-	else
-	    if(!tmp->has_next_to_read())
+	if(tmp != NULL && !tmp->has_next_to_read())
+	{
+	    if(ret > 0)
 	    {
-		if(ret > 0)
-		{
-		    --ret;
-		    if(a[ret] != flag_type_terminal)
-			throw Erange("trivial_sar::inherited_read", gettext("This archive is not single sliced, more data exists in the next slices but cannot be read from the current pipe, aborting"));
-		    else
-			end_of_slice = 1;
-		}
-		    // else assuming EOF has already been reached
+		--ret;
+		if(a[ret] != flag_type_terminal)
+		    throw Erange("trivial_sar::inherited_read", gettext("This archive is not single sliced, more data exists in the next slices but cannot be read from the current pipe, aborting"));
+		else
+		    end_of_slice = 1;
 	    }
+		// else assuming EOF has already been reached
+	}
 
 	return ret;
     }

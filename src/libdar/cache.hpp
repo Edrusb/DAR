@@ -116,7 +116,7 @@ namespace libdar
 
 	void flush_write();
 	void fulfill_read();
-	void clear_read() { if(read_mode) buffer_cache.clear(); };
+	void clear_read() { if(read_mode) buffer_cache.clear(); ref->skip(current_position); };
     };
 
 	/// @}

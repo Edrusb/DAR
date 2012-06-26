@@ -87,12 +87,13 @@ namespace libdar
 	    seqt_failed_backup    //< placed after inode information if the file could not be openned at backup time
 	};
 
-	    // the archive layout of marks is :
-	    // ... <seqt_file> <inode> [<file data> [<seqt_changed> <new copy of data> [...] ] <seqt_file_crc> <CRC>[<seqt_dirty>]] [<seqt_ea> <EA> <sqt_ea_crc> <CRC>] ...
+	    // the archive layout of marks is for each entry:
+	    // #seqt_file# <inode> [<file data> [#seqt_changed# <new copy of data> [...] ] #seqt_file_crc# <CRC>[#seqt_dirty#]] [#seqt_ea# <EA> #seqt_ea_crc# <CRC>]
 	    // this previous sequence that we will call <SEQ> is repeated for each file, then on the overall archive we have :
-	    // <seqt_data_name> <data_name> <SEQ> ... <SEQ> <seqt_catalogue> <catalogue> <terminator>
+	    // #seqt_data_name# <data_name> <SEQ> ... <SEQ> #seqt_catalogue# <catalogue> <terminator>
 
-	    // the provided "below" object must exist during the whole live of the escape object, the escape object does not own this "below" object
+	    // the provided "below" object must exist during the whole live of the escape object,
+	    // the escape object does not own this "below" object
 	    // it must be destroyed by the caller/creator of the escape object.
 
 
@@ -191,6 +192,7 @@ namespace libdar
 		clean_data();
 		break;
 	    case gf_write_only:
+	    case gf_read_write:
 		flush_write();
 		break;
 	    default:

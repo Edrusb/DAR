@@ -182,9 +182,10 @@ namespace libdar
 	    {
 		bool ret;
 
+		current_position = pos;
 		clear_read();
 		ret = ref->skip(pos);
-		current_position = pos;
+
 		return ret;
 	    }
     }
@@ -290,7 +291,7 @@ namespace libdar
 
 	if(read_mode)
 	{
-	    clear_read();
+ 	    clear_read();
 	    read_mode = false;
 	}
 

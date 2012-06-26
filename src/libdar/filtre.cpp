@@ -2602,7 +2602,6 @@ namespace libdar
 				{
 				    current_repeat_count++;
 				    infinint current_pos_tmp = stock->get_position();
-				    infinint wasted = 0;
 
 				    try
 				    {
@@ -2610,24 +2609,33 @@ namespace libdar
 				    }
 				    catch(...)
 				    {
-					wasted = current_pos_tmp - start;
+					current_wasted_bytes += current_pos_tmp - start;
 					if(stock->get_position() != current_pos_tmp)
 					    throw SRC_BUG;
 				    }
 
-				    if(repeat_byte == 0 || (current_wasted_bytes + wasted < repeat_byte))
+				    if(repeat_byte == 0 || (current_wasted_bytes < repeat_byte))
 				    {
 					if(info_details)
 					    dialog.warning(tools_printf(gettext("WARNING! File modified while reading it for backup. Performing retry %i of %i"), &current_repeat_count, &repeat_count));
-					current_wasted_bytes += wasted;
-					cat.pre_add_waste_mark(stock);
+					if(stock->get_position() != start)
+					    cat.pre_add_waste_mark(stock);
 					loop = true;
 
 					    // updating the last modification date of file
 					fic->set_last_modif(tools_get_mtime(info_quoi));
 
 					    // updating the size of the file
-					fic->change_size(tools_get_size(info_quoi));
+					infinint new_size = tools_get_size(info_quoi);
+					if(new_size < fic->get_size())
+					    throw SRC_BUG;
+					    // current code may fail if file is smaller than previous time:
+					    // the archive may not end a the end of slice if the resaved file was
+					    // larger than it is now the new time we save it, the resulting
+					    // archive open would fail in direct mode (it should work in
+					    // sequential reading mode if not disabled by -at option.
+					else
+					    fic->change_size(new_size);
 				    }
 				    else
 				    {
