@@ -23,6 +23,14 @@
 
 extern "C"
 {
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -179,7 +187,7 @@ namespace libdar
 
         if(ret == NULL)
             throw Ememory("tools_str2charptr");
-	memcpy(ret, x.c_str(), size);
+	(void)memcpy(ret, x.c_str(), size);
         ret[size] = '\0';
 
         return ret;

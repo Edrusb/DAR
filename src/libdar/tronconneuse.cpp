@@ -26,6 +26,24 @@ extern "C"
 #if HAVE_STRING_H
 #include <string.h>
 #endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
+#if STDC_HEADERS
+# include <string.h>
+#else
+# if !HAVE_STRCHR
+#  define strchr index
+#  define strrchr rindex
+# endif
+char *strchr (), *strrchr ();
+# if !HAVE_MEMCPY
+#  define memcpy(d, s, n) bcopy ((s), (d), (n))
+#  define memmove(d, s, n) bcopy ((s), (d), (n))
+# endif
+#endif
 }
 
 #include "tronconneuse.hpp"
@@ -249,7 +267,7 @@ namespace libdar
 	    buf = new char[buf_size];
 	    if(buf == NULL)
 		throw Ememory("tronconneuse::copy_from");
-	    memcpy(buf, ref.buf, buf_byte_data);
+	    (void)memcpy(buf, ref.buf, buf_byte_data);
 	    clear_block_size = ref.clear_block_size;
 	    current_position = ref.current_position;
 	    block_num = ref.block_num;
@@ -261,7 +279,7 @@ namespace libdar
 	    encrypted_buf = new char[encrypted_buf_size];
 	    if(encrypted_buf == NULL)
 		throw Ememory("tronconneuse::copy_from");
-	    memcpy(encrypted_buf, ref.encrypted_buf, encrypted_buf_size);
+	    (void)memcpy(encrypted_buf, ref.encrypted_buf, encrypted_buf_size);
 	    weof = ref.weof;
 	    reof = ref.reof;
 	    reading_ver = ref.reading_ver;

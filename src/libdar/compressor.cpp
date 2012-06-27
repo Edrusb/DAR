@@ -40,6 +40,24 @@ extern "C"
 #include <string.h>
 #endif
 
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
+#if STDC_HEADERS
+# include <string.h>
+#else
+# if !HAVE_STRCHR
+#  define strchr index
+#  define strrchr rindex
+# endif
+char *strchr (), *strrchr ();
+# if !HAVE_MEMCPY
+#  define memcpy(d, s, n) bcopy ((s), (d), (n))
+#  define memmove(d, s, n) bcopy ((s), (d), (n))
+# endif
+#endif
+
 } // end extern "C"
 
 #include "tools.hpp"
@@ -486,7 +504,7 @@ namespace libdar
 
 	    if(available > to_read)
 	    {
-		memcpy(a+read, lzo_read_buffer+lzo_read_start, to_read);
+		(void)memcpy(a+read, lzo_read_buffer+lzo_read_start, to_read);
 		lzo_read_start += to_read;
 		read += to_read;
 	    }
@@ -494,7 +512,7 @@ namespace libdar
 	    {
 		if(available > 0)
 		{
-		    memcpy(a+read, lzo_read_buffer+lzo_read_start, available);
+		    (void)memcpy(a+read, lzo_read_buffer+lzo_read_start, available);
 		    lzo_read_start += available;
 		    read += available;
 		}
@@ -524,13 +542,13 @@ namespace libdar
 
 	    if(to_write < space)
 	    {
-		memcpy(lzo_write_buffer + lzo_write_size, a + wrote, to_write);
+		(void)memcpy(lzo_write_buffer + lzo_write_size, a + wrote, to_write);
 		wrote += to_write;
 		lzo_write_size += to_write;
 	    }
 	    else
 	    {
-		memcpy(lzo_write_buffer + lzo_write_size, a + wrote, space);
+		(void)memcpy(lzo_write_buffer + lzo_write_size, a + wrote, space);
 		wrote += space;
 		lzo_write_size += space;
 		lzo_compress_buffer_and_write();

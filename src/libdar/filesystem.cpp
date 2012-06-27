@@ -23,6 +23,14 @@
 
 extern "C"
 {
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
 #if STDC_HEADERS
 # include <string.h>
 #else

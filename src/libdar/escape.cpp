@@ -30,6 +30,24 @@ extern "C"
 #if HAVE_STRING_H
 #include <string.h>
 #endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
+#if STDC_HEADERS
+# include <string.h>
+#else
+# if !HAVE_STRCHR
+#  define strchr index
+#  define strrchr rindex
+# endif
+char *strchr (), *strrchr ();
+# if !HAVE_MEMCPY
+#  define memcpy(d, s, n) bcopy ((s), (d), (n))
+#  define memmove(d, s, n) bcopy ((s), (d), (n))
+# endif
+#endif
 } // end extern "C"
 
 
@@ -561,7 +579,7 @@ namespace libdar
 			    throw SRC_BUG; // should never seen this if() condition
 			if(write_buffer_size + yet_in_a > WRITE_BUFFER_SIZE)
 			    throw SRC_BUG; // not possible to reach normally, because yet_in_a < missing_for_sequence < SEQUENCE_LENGTH
-			memcpy(write_buffer + write_buffer_size, a+written, yet_in_a);
+			(void)memcpy(write_buffer + write_buffer_size, a+written, yet_in_a);
 			written = size;
 		    }
 		}
@@ -606,7 +624,7 @@ namespace libdar
 		    remains = size - written;
 		    if(remains >= ESCAPE_SEQUENCE_LENGTH - 1)
 			throw SRC_BUG; // how possible is to not be able to fully determine the sequence ???
-		    memcpy(write_buffer, a + written, remains);
+		    (void)memcpy(write_buffer, a + written, remains);
 		    write_buffer_size = remains;
 		    written = size;
 		}

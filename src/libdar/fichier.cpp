@@ -23,6 +23,14 @@
 
 extern "C"
 {
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -59,10 +67,6 @@ char *strchr (), *strrchr ();
 
 #if HAVE_LIMITS_H
 #include <limits.h>
-#endif
-
-#if HAVE_STRING_H
-#include <string.h>
 #endif
 
 } // end extern "C"

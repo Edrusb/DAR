@@ -67,7 +67,7 @@ namespace libdar
 
     void label::clear()
     {
-	(void)memset((void *)val, 0, LABEL_SIZE);
+	(void)memset(val, 0, LABEL_SIZE);
     }
 
     bool label::is_cleared() const

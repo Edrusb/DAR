@@ -45,6 +45,14 @@ extern "C"
 # endif
 #endif
 
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -94,9 +102,6 @@ char *strchr (), *strrchr ();
 #include <stdlib.h>
 #endif
 
-#if HAVE_STRINGS_H
-#include <strings.h>
-#endif
 
 } // end extern "C"
 
@@ -490,7 +495,7 @@ namespace libdar
 			    place = 0;
 			    avail.unstack(place);
 			}
-			bzero(a+lu, place);
+			(void)memset(a+lu, 0, place);
 			lu += place;
 			file_offset += place;
 		    }

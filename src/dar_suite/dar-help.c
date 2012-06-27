@@ -39,6 +39,14 @@
 #include <unistd.h>
 #endif
 
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -476,7 +484,7 @@ output_string(char *s)
 	    lineout(sqzd);
 	    xfree(sqzd);
 		/* so it starts in in column "indent" */
-	    memset(line, ' ', indent - 1);
+	    (void)memset(line, ' ', indent - 1);
 	    line[indent - 1] = '\0';
 	}
 	if (!eol) {
