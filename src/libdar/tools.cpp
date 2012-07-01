@@ -2335,7 +2335,7 @@ namespace libdar
 	    euclide(size, ratio, crc_size, r);
 	    if(r > 0)
 		++crc_size;
-	    crc_size *= 4;   // smallest value is 4 bytes, 4 bytes more per each additional 8 Gbyte of data
+	    crc_size *= 4;   // smallest value is 4 bytes, 4 bytes more per each additional 1 Gbyte of data
 	}
 	else
 	    crc_size = 1; // minimal value for no data to protect by checksum
