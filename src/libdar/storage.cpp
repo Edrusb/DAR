@@ -26,6 +26,25 @@ extern "C"
 #if HAVE_STRING_H
 #include <string.h>
 #endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
+#if STDC_HEADERS
+# include <string.h>
+#else
+# if !HAVE_STRCHR
+#  define strchr index
+#  define strrchr rindex
+# endif
+char *strchr (), *strrchr ();
+# if !HAVE_MEMCPY
+#  define memcpy(d, s, n) bcopy ((s), (d), (n))
+#  define memmove(d, s, n) bcopy ((s), (d), (n))
+# endif
+#endif
+
 } // end of extern "C"
 
 #include "storage.hpp"
@@ -119,7 +138,7 @@ namespace libdar
 
         while(cur != NULL)
         {
-	    memset(cur->data, val, cur->size);
+	    (void)memset(cur->data, val, cur->size);
             cur = cur->next;
         }
     }
@@ -149,14 +168,14 @@ namespace libdar
 	    if(to_write <= space)
 	    {
 		    // enough room in current data block
-		memcpy(it.cell->data + it.offset, a + wrote, to_write);
+		(void)memcpy(it.cell->data + it.offset, a + wrote, to_write);
 		wrote += to_write;
 		it.offset += to_write;
 	    }
 	    else
 	    {
 		    // more to copy than available in current data block
-		memcpy(it.cell->data + it.offset, a + wrote, space);
+		(void)memcpy(it.cell->data + it.offset, a + wrote, space);
 		wrote += space;
 		it.cell = it.cell->next;
 		if(it.cell != NULL)
@@ -183,14 +202,14 @@ namespace libdar
 	    if(to_read <= space)
 	    {
 		    // enough room in current data block
-		memcpy(a + read, it.cell->data + it.offset, to_read);
+		(void)memcpy(a + read, it.cell->data + it.offset, to_read);
 		read += to_read;
 		it.offset += to_read;
 	    }
 	    else
 	    {
 		    // more to copy than available in current data block
-		memcpy(a + read, it.cell->data + it.offset, space);
+		(void)memcpy(a + read, it.cell->data + it.offset, space);
 		read += space;
 		it.cell = it.cell->next;
 		if(it.cell != NULL)
@@ -267,7 +286,7 @@ namespace libdar
 
                     if(p != NULL)
                     {
-			memcpy(p, it.cell->data, it.offset);
+			(void)memcpy(p, it.cell->data, it.offset);
                         delete [] it.cell->data;
 
                         it.cell->data = p;
@@ -306,8 +325,8 @@ namespace libdar
 
                 if(p != NULL)
                 {
-		    memcpy(p, it.cell->data, it.offset);
-		    memcpy(p + it.offset, it.cell->data + it.offset + number, it.cell->size - it.offset - number);
+		    (void)memcpy(p, it.cell->data, it.offset);
+		    (void)memcpy(p + it.offset, it.cell->data + it.offset + number, it.cell->size - it.offset - number);
                     delete [] it.cell->data;
 
                     it.cell->data = p;
@@ -449,8 +468,8 @@ namespace libdar
                     {
                         struct cellule *tmp = glisseur->next;
 
-			memcpy(p, glisseur->data, glisseur->size);
-			memcpy(p + glisseur->size, tmp->data, somme - glisseur->size);
+			(void)memcpy(p, glisseur->data, glisseur->size);
+			(void)memcpy(p + glisseur->size, tmp->data, somme - glisseur->size);
                         delete [] glisseur->data;
 
                         glisseur->data = p;

@@ -455,7 +455,7 @@ namespace libdar_4_4
 	// but we keep the major to 4 (to avoid alarming external programs expecting the libdar API version 4)
     const U_I LIBDAR_COMPILE_TIME_MEDIUM = 6;
 	///  libdar Minor version defined at compilation time
-    const U_I LIBDAR_COMPILE_TIME_MINOR = 5;
+    const U_I LIBDAR_COMPILE_TIME_MINOR = 6;
 
 	////////////////////////////////////////////////////////////////////////
 	// LIBDAR INITIALIZATION METHODS                                      //

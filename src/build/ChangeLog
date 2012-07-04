@@ -9,6 +9,16 @@ from 2.4.x to 2.5.0
   compatible with former implementation)
 - class hash_fichier becomes entrepot independent
 
+from 2.4.6 to 2.4.7
+- fixing memory allocation bug in crc class, that lead glibc aborting dar
+- reviewed code and replaced some remaining occurences of bzero/bcopy by
+  their recommended replacement version
+- fixed compilation problem under Solaris
+- fixed bug that could lead a file to be wrongly reported as different from the
+  one on filesystem, when that file has been changed while it was saved, then
+  saved a second time but has its size modified since the first time it was
+  saved.
+
 from 2.4.5 to 2.4.6
 - fixed bug met while interrupting compressed archive creation, the resulting
   archive was only readable in --sequential-read mode

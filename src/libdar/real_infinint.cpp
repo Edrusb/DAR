@@ -685,7 +685,7 @@ namespace libdar
             used_endian = big_endian;
         else
             used_endian = little_endian;
-	bzero(zeroed_field, ZEROED_SIZE);
+	(void)memset(zeroed_field, 0, ZEROED_SIZE);
     }
 
     bool infinint::is_system_big_endian()

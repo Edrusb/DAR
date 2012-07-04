@@ -30,6 +30,20 @@ extern "C"
 #if HAVE_STRINGS_H
 #include <strings.h>
 #endif
+
+#if STDC_HEADERS
+# include <string.h>
+#else
+# if !HAVE_STRCHR
+#  define strchr index
+#  define strrchr rindex
+# endif
+char *strchr (), *strrchr ();
+# if !HAVE_MEMCPY
+#  define memcpy(d, s, n) bcopy ((s), (d), (n))
+#  define memmove(d, s, n) bcopy ((s), (d), (n))
+# endif
+#endif
 } // end extern "C"
 
 #include "sparse_file.hpp"
@@ -72,7 +86,7 @@ namespace libdar
 		// the first to finish will avoid other new thread to change these values executing this code,
 		// while the thread already executing this code, will just redo the same thing as what has been done by the first thread to finish
 		// thread (zero the area to zeros).
-	    bzero(zeroed_field, SPARSE_FIXED_ZEROED_BLOCK);
+	    (void)memset(zeroed_field, 0, SPARSE_FIXED_ZEROED_BLOCK);
 	    initialized = true;
 	}
 
@@ -175,13 +189,13 @@ namespace libdar
 		    {
 			if(needed < available)
 			{
-			    bzero(a + lu, needed);
+			    (void)memset(a + lu, 0, needed);
 			    zero_count += available - needed;
 			    lu += needed;
 			}
 			else
 			{
-			    bzero(a + lu, available);
+			    (void)memset(a + lu, 0, available);
 			    lu += available;
 				// zero_count is already null, due to previous call to unstack()
 			}

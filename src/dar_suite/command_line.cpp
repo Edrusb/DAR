@@ -36,6 +36,15 @@ extern "C"
 #include <fcntl.h>
 #endif
 #include "getopt_decision.h"
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
 #if STDC_HEADERS
 # include <string.h>
 #else

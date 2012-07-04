@@ -23,12 +23,28 @@
 
 extern "C"
 {
-#if HAVE_STRINGS_H
-#include <strings.h>
-#endif
 #if HAVE_STRING_H
 #include <string.h>
 #endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
+#if STDC_HEADERS
+# include <string.h>
+#else
+# if !HAVE_STRCHR
+#  define strchr index
+#  define strrchr rindex
+# endif
+char *strchr (), *strrchr ();
+# if !HAVE_MEMCPY
+#  define memcpy(d, s, n) bcopy ((s), (d), (n))
+#  define memmove(d, s, n) bcopy ((s), (d), (n))
+# endif
+#endif
+
 } // end extern "C"
 
 #include <iostream>
@@ -369,7 +385,7 @@ namespace libdar
 
     void crc_n::clear()
     {
-	memset(cyclic, 0, size);
+	(void)memset(cyclic, 0, size);
 	pointer = cyclic;
     }
 
@@ -390,19 +406,26 @@ namespace libdar
     {
 	size = width;
 
+	    //////////////////////////////////////////////////////////////////////
 	    // the following trick is to have cyclic aligned at its boundary size
 	    // (its allocated address is a multiple of it size)
 	    // some CPU need that (sparc), and it does not hurt for other ones.
 	if(width % 8 == 0)
-	    cyclic = (unsigned char *)(new U_64);
+	    cyclic = (unsigned char *)(new U_64[width/8]);
 	else if(width % 4 == 0)
-	    cyclic = (unsigned char *)(new U_32);
+	    cyclic = (unsigned char *)(new U_32[width/4]);
 	else if(width % 2 == 0)
-	    cyclic = (unsigned char *)(new U_16);
+	    cyclic = (unsigned char *)(new U_16[width/2]);
 	else
-		// end of the trick and back to default situation
-		// this trick allows use of 2, 4 or 8 bytes operations in when n_compute calls B_compute_block
 	    cyclic = new unsigned char[size];
+	    // end of the trick and back to default situation
+	    //////////////////////////////////////////////////////////////////////
+	    // WARNING! this trick allows the use of 2, 4 or 8 bytes operations //
+	    // instead of byte by byte one, in n_compute calls B_compute_block  //
+	    // CODE MUST BE ADAPTED THERE AND IN destroy() IF CHANGED HERE!!!   //
+	    //////////////////////////////////////////////////////////////////////
+
+
 	if(cyclic == NULL)
 	    throw Ememory("crc::copy_from");
 	pointer = cyclic;

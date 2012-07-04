@@ -23,6 +23,14 @@
 
 extern "C"
 {
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
+
 #if STDC_HEADERS
 # include <string.h>
 #else
@@ -62,7 +70,7 @@ char *strchr (), *strrchr ();
 using namespace libdar;
 using namespace std;
 
-#define DAR_SLAVE_VERSION "1.4.2"
+#define DAR_SLAVE_VERSION "1.4.3"
 
 static bool command_line(user_interaction & dialog,
 			 S_I argc, char * const argv[], path * &chemin, string & filename,

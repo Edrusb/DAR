@@ -30,6 +30,20 @@ extern "C"
 #if HAVE_STRINGS_H
 #include <strings.h>
 #endif
+
+#if STDC_HEADERS
+# include <string.h>
+#else
+# if !HAVE_STRCHR
+#  define strchr index
+#  define strrchr rindex
+# endif
+char *strchr (), *strrchr ();
+# if !HAVE_MEMCPY
+#  define memcpy(d, s, n) bcopy ((s), (d), (n))
+#  define memmove(d, s, n) bcopy ((s), (d), (n))
+# endif
+#endif
 }
 
 #include "crypto.hpp"
@@ -201,7 +215,7 @@ namespace libdar
 	gcry_cipher_close(essiv_clef);
 	if(ivec != NULL)
 	{
-	    bzero(ivec, algo_block_size);
+	    (void)memset(ivec, 0, algo_block_size);
 	    gcry_free(ivec);
 	}
 #endif
@@ -413,8 +427,8 @@ namespace libdar
 			gcry_md_write(hmac, (const unsigned char *) salt.c_str(), salt.size());
 			gcry_md_write(hmac, ii, 4);
 			tmp_md = gcry_md_read(hmac, GCRY_MD_SHA1);
-			memcpy(Uj, tmp_md, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
-			memcpy(Ti, tmp_md, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+			(void)memcpy(Uj, tmp_md, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+			(void)memcpy(Ti, tmp_md, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
 
 			for (U_32 j = 2; j <= iteration_count; ++j)
 			{
@@ -423,7 +437,7 @@ namespace libdar
 			    gcry_md_reset(hmac);
 			    gcry_md_write(hmac, (const unsigned char *) Uj, UjLen);
 			    tmp_md = gcry_md_read(hmac, GCRY_MD_SHA1);
-			    memcpy(Uj, tmp_md, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+			    (void)memcpy(Uj, tmp_md, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
 			    tools_memxor(Ti, tmp_md, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
 			}
 
@@ -436,20 +450,20 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    memset(Uj, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+		    (void)memset(Uj, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
 		    gcry_free(Uj);
 		    throw;
 		}
-		memset(Uj, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+		(void)memset(Uj, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
 		gcry_free(Uj);
 	    }
 	    catch(...)
 	    {
-		memset(Ti, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+		(void)memset(Ti, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
 		gcry_free(Ti);
 		throw;
 	    }
-	    memset(Ti, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
+	    (void)memset(Ti, 0, gcry_md_get_algo_dlen(GCRY_MD_SHA1));
 	    gcry_free(Ti);
 	}
 	catch(...)
@@ -495,11 +509,11 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    memset(digest, 0, digest_len); // attempt to scrub memory
+	    (void)memset(digest, 0, digest_len); // attempt to scrub memory
 	    gcry_free(digest);
 	    throw;
 	}
-	memset(digest, 0, digest_len); // attempt to scrub memory
+	(void)memset(digest, 0, digest_len); // attempt to scrub memory
 	gcry_free(digest);
 #else
 	throw Ecompilation(gettext("Strong encryption support"));

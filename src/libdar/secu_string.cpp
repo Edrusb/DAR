@@ -29,6 +29,22 @@ extern "C"
 #if HAVE_STRINGS_H
 #include <strings.h>
 #endif
+
+#if STDC_HEADERS
+# include <string.h>
+#else
+# if !HAVE_STRCHR
+#  define strchr index
+#  define strrchr rindex
+# endif
+char *strchr (), *strrchr ();
+# if !HAVE_MEMCPY
+#  define memcpy(d, s, n) bcopy ((s), (d), (n))
+#  define memmove(d, s, n) bcopy ((s), (d), (n))
+# endif
+#endif
+
+
 #if HAVE_GCRYPT_H
 #include <gcrypt.h>
 #endif
@@ -82,7 +98,7 @@ namespace libdar
 	if(size + *string_size >= *allocated_size)
 	    throw Esecu_memory("secu_string::append");
 
-	memcpy(mem + *string_size, ptr, size);
+	(void)memcpy(mem + *string_size, ptr, size);
 	*string_size += size;
 	mem[*string_size] = '\0';
     }
@@ -187,38 +203,38 @@ namespace libdar
 #if CRYPTO_AVAILABLE
 	    if(string_size != NULL)
 	    {
-		bzero(string_size, sizeof(U_I));
+		(void)memset(string_size, 0, sizeof(U_I));
 		gcry_free(string_size);
 		string_size = NULL;
 	    }
 	    if(mem != NULL)
 	    {
-		bzero(mem, *allocated_size);
+		(void)memset(mem, 0, *allocated_size);
 		gcry_free(mem);
 		mem = NULL;
 	    }
 	    if(allocated_size != NULL)
 	    {
-		bzero(allocated_size, sizeof(U_I));
+		(void)memset(allocated_size, 0, sizeof(U_I));
 		gcry_free(allocated_size);
 		allocated_size = NULL;
 	    }
 #else
 	    if(string_size != NULL)
 	    {
-		bzero(string_size, sizeof(U_I));
+		(void)memset(string_size, 0, sizeof(U_I));
 		delete string_size;
 		string_size = NULL;
 	    }
 	    if(mem != NULL)
 	    {
-		bzero(mem, *allocated_size);
+		(void)memset(mem, 0, *allocated_size);
 		delete [] mem;
 		mem = NULL;
 	    }
 	    if(allocated_size != NULL)
 	    {
-		bzero(allocated_size, sizeof(U_I));
+		(void)memset(allocated_size, 0, sizeof(U_I));
 		delete allocated_size;
 		allocated_size = NULL;
 	    }
