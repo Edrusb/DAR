@@ -126,6 +126,7 @@ static void op_batch(user_interaction & dialog, database *dat, const string & fi
 static database *read_base(user_interaction & dialog,
 			   const string & base,
 			   bool partial,
+			   bool partial_read_only,
 			   bool check_order);
 static void write_base(user_interaction & dialog, const string & filename, const database *base, bool overwrite);
 static vector<string> read_vector(user_interaction & dialog);
@@ -162,7 +163,8 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
     bool info_details;
     infinint date;
     database *dat = NULL;
-    bool partial_read;
+    bool partial_read = false;
+    bool partial_read_only = false;
     bool ignore_dat_options;
     bool even_when_removed;
     bool check_order;
@@ -192,6 +194,8 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
 	partial_read = false;
 	break;
     case listing:
+	partial_read_only = true;
+	break;
     case chbase:
     case where:
     case options:
@@ -213,7 +217,7 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
 	    else
 		dialog.warning(gettext("Decompressing and loading database to memory..."));
 	}
-	dat = read_base(dialog, base, partial_read, check_order);
+	dat = read_base(dialog, base, partial_read, partial_read_only, check_order);
 	try
 	{
 	    try
@@ -906,7 +910,7 @@ static const struct option *get_long_opt()
 }
 #endif
 
-static database *read_base(user_interaction & dialog, const string & base, bool partial, bool check_order)
+static database *read_base(user_interaction & dialog, const string & base, bool partial, bool partial_read_only, bool check_order)
 {
     database *ret = NULL;
 
@@ -915,6 +919,7 @@ static database *read_base(user_interaction & dialog, const string & base, bool 
 	database_open_options dat_opt;
 	dat_opt.set_warn_order(check_order);
 	dat_opt.set_partial(partial);
+	dat_opt.set_partial_read_only(partial_read_only);
         ret = new database(dialog, base, dat_opt);
         if(ret == NULL)
             throw Ememory("read_base");

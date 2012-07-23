@@ -206,11 +206,11 @@ namespace libdar
 	std::vector<struct archive_data> coordinate; //< list of archive used to build the database
 	std::vector<std::string> options_to_dar;     //< options to use when calling dar for restoration
 	std::string dar_path;                        //< path to dar
-	data_dir *files;                             //< structure containing files and they status in the set of archive used for that database
-	storage *data_files;                         //< when reading archive in partial mode, this is where is located the "not readed" part of the archive
+	data_dir *files;                             //< structure containing files and their status in the set of archive used for that database (is set to NULL in partial mode)
+	storage *data_files;                         //< when reading archive in partial mode, this is where is located the "not readed" part of the archive (is set to NULL in partial-read-only mode)
 	bool check_order_asked;                      //< whether order check has been asked
 
-	void build(user_interaction & dialog, generic_file & f, bool partial, unsigned char db_version);  //< used by constructors
+	void build(user_interaction & dialog, generic_file & f, bool partial, bool read_only, unsigned char db_version);  //< used by constructors
 	archive_num get_real_archive_num(archive_num num, bool revert) const;
 
 	const infinint & get_root_last_mod(const archive_num & num) const;

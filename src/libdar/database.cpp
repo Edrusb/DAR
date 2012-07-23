@@ -78,7 +78,7 @@ namespace libdar
 	try
 	{
 	    check_order_asked = opt.get_warn_order();
-	    build(dialog, *f, opt.get_partial(), db_version);
+	    build(dialog, *f, opt.get_partial(), opt.get_partial_read_only(), db_version);
 	}
 	catch(...)
 	{
@@ -88,7 +88,7 @@ namespace libdar
 	delete f;
     }
 
-    void database::build(user_interaction & dialog, generic_file & f, bool partial, const unsigned char db_version)
+    void database::build(user_interaction & dialog, generic_file & f, bool partial, bool read_only, const unsigned char db_version)
     {
 	NLS_SWAP_IN;
 	try
@@ -130,8 +130,16 @@ namespace libdar
 	    }
 	    else
 	    {
-		files = NULL;
-		data_files = file2storage(f);
+		if(!read_only)
+		{
+		    files = NULL;
+		    data_files = file2storage(f);
+		}
+		else
+		{
+		    files = NULL;
+		    data_files = NULL;
+		}
 	    }
 	}
 	catch(...)
@@ -152,6 +160,9 @@ namespace libdar
 
     void database::dump(user_interaction & dialog, const std::string & filename, const database_dump_options & opt) const
     {
+	if(files == NULL && data_files == NULL)
+	    throw Erange("database::dump", gettext("Cannot write down a read-only database"));
+
 	generic_file *f = database_header_create(dialog, filename, opt.get_overwrite());
 	if(f == NULL)
 	    throw Ememory("database::dump");
