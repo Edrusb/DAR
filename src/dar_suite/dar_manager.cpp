@@ -663,7 +663,7 @@ static void op_del(user_interaction & dialog, database *dat, S_I min, archive_nu
 
     thr.check_self_cancellation();
     if(info_details)
-	dialog.warning(gettext("Removing information from the archive..."));
+	dialog.warning(gettext("Removing information from the database..."));
     dat->remove_archive(rmin, max, opt);
     thr.check_self_cancellation();
 }
@@ -1075,7 +1075,7 @@ static void op_interactive(user_interaction & dialog, database *dat, string base
 		signed_int_to_archive_num(tmp_si, num, tmp_sign);
 		opt_remove.set_revert_archive_numbering(!tmp_sign);
 		dialog.pause(tools_printf(gettext("Are you sure to remove archive number %d ?"), tmp_si));
-		dialog.warning(gettext("Removing information from the archive..."));
+		dialog.warning(gettext("Removing information from the database..."));
 		dat->remove_archive(num, num, opt_remove);
 		saved = false;
 		break;
