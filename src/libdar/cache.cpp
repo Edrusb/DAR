@@ -121,6 +121,7 @@ namespace libdar
 
 	shifted_mode = shift_mode;
 	failed_increase = false;
+	max_alloc_size = 0;
     }
 
     cache::~cache()
@@ -324,13 +325,24 @@ namespace libdar
 		    flush_write();
 		    avail = buffer_cache.size - buffer_cache.next;
 		    if(avail == 0)
-			throw SRC_BUG;
-		    if(avail < size - wrote)
 		    {
-			ref->write(a + wrote, size - wrote);
-			wrote = size;
-			continue; // ending the while loop now, as there's no data left to copy
+			if(buffer_cache.size == 0) // memory allocation failure in flush_write() after atempt to increase the cache size
+			{  // We do at best. The previous failure has thrown an exception, but this cache object is not destroyed yet
+			   // so we may still receive write() requests from the an upper layer while it is flushing its data
+			    ref->write(a + wrote, size - wrote);
+			    wrote = size;
+			    continue; // ending the while loop now, as there's no data left to copy
+			}
+			else
+			    throw SRC_BUG;
 		    }
+		    else
+			if(avail < size - wrote) // less data in cache than to be wrote => not going through the cache
+			{
+			    ref->write(a + wrote, size - wrote);
+			    wrote = size;
+			    continue; // ending the while loop now, as there's no data left to copy
+			}
 		}
 		min = avail > (size-wrote) ? (size-wrote) : avail;
 
@@ -350,7 +362,7 @@ namespace libdar
 
     void cache::flush_write()
     {
-	if(get_mode() == gf_read_only || read_mode)
+	if(get_mode() == gf_read_only || read_mode || buffer_cache.buffer == NULL)
 	    return; // nothing to flush
 
 	    // computing stats
@@ -373,16 +385,24 @@ namespace libdar
 	    if(stat_write_overused*100 > write_overused_rate*stat_write_counter) // need to increase the cache
 	    {
 		U_I tmp = buffer_cache.size * 2;
-		if(buffer_cache.size < tmp)
+		if(buffer_cache.size < tmp && (max_alloc_size == 0 || tmp < max_alloc_size) )
 		{
 		    delete [] buffer_cache.buffer;
-		    buffer_cache.buffer = NULL;
-		    buffer_cache.size = tmp;
-		    buffer_cache.buffer = new char[buffer_cache.size];
+		    buffer_cache.buffer = new char[tmp];
 		    if(buffer_cache.buffer == NULL)
-			throw Ememory("cache::flush_write");
+		    {
+			max_alloc_size = buffer_cache.size;
+			buffer_cache.buffer = new char[buffer_cache.size];
+			if(buffer_cache.buffer == NULL)
+			{
+			    buffer_cache.size = 0;
+			    throw Ememory("cache::flush_write");
+			}
+		    }
+		    else
+			buffer_cache.size = tmp;
 		}
-		    // else nothing is done, as we cannot get larger buffer
+		    // else nothing is done, as we cannot get a larger buffer
 	    }
 	    else
 		if((stat_write_counter - stat_write_overused)*100 < write_unused_rate*stat_write_counter) // need to decrease the cache
@@ -391,11 +411,14 @@ namespace libdar
 		    if(tmp < buffer_cache.size && tmp > 0)
 		    {
 			delete [] buffer_cache.buffer;
-			buffer_cache.buffer = NULL;
-			buffer_cache.size = tmp;
 			buffer_cache.buffer = new char[buffer_cache.size];
 			if(buffer_cache.buffer == NULL)
+			{
+			    buffer_cache.size = 0;
 			    throw Ememory("cache::flush_write");
+			}
+			else
+			    buffer_cache.size = tmp;
 		    }
 			// else nothing is done, as we cannot have a smaller buffer
 		}

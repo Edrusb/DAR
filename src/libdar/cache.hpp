@@ -59,6 +59,8 @@ namespace libdar
 	      U_I unused_write_ratio = 10,        //< same as unused_read_ratio but for writing operations
 	      U_I observation_write_number = 100, //< same as observation_read_number but for writing operations
 	      U_I max_size_hit_write_ratio = 50); //< same as max_size_hit_read_ratio but for writing operations
+	cache(const cache & ref) : generic_file(gf_read_only) { throw SRC_BUG; };
+	const cache & operator = (const cache & ref) { throw SRC_BUG; };
 
 	~cache();
 
@@ -98,6 +100,7 @@ namespace libdar
 	bool read_mode;                   //< true if in read mode, false if in write mode
 	bool shifted_mode;                //< whether to half flush and shift or totally flush data
 	bool failed_increase;             //< whether we failed increasing the cache size
+	U_I max_alloc_size;               //< if set to non zero value, retains the maximum size not to exceed for block allocation
 
 	U_I read_obs;
 	U_I read_unused_rate;
