@@ -383,8 +383,10 @@ static bool command_line(user_interaction & dialog, S_I argc, char *argv[],
     {
         if(src_dir != NULL)
             delete src_dir;
+	src_dir = NULL;
         if(dst_dir != NULL)
             delete dst_dir;
+	dst_dir = NULL;
         throw;
     }
     return true;
