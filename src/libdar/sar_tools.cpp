@@ -83,6 +83,7 @@ namespace libdar
 					      S_I fd,
 					      gf_mode mode,
 					      const label & data_name,
+					      bool slice_header_format_07,
 					      const std::string & execute)
     {
         generic_file *tmp = NULL;
@@ -93,7 +94,9 @@ namespace libdar
             tmp = new tuyau(dialog, fd, mode);
             if(tmp == NULL)
                 throw Ememory("sar_tools_open_archive_tuyau");
-            ret = new trivial_sar(dialog, tmp, data_name, execute);
+            ret = new trivial_sar(dialog, tmp, data_name,
+				  slice_header_format_07,
+				  execute);
             if(ret == NULL)
                 throw Ememory("sar_tools_open_archive_tuyau");
 	    else

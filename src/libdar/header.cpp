@@ -139,8 +139,6 @@ namespace libdar
 		    // this works also for single sliced archives.
 		}
 	    }
-	    else
-		throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe, only using dar_slave or normal plain file (slice) method"));
 	    old_header = true;
             break;
         case extension_size:
@@ -218,8 +216,25 @@ namespace libdar
         f.write((char *)&tmp, sizeof(magic));
         internal_name.dump(f);
         f.write(&flag, 1);
-        f.write(tmp_ext, 1); // since release 2.4.0, tlv is always used to store optional information
-	build_tlv_list(ui).dump(f);
+	if(old_header)
+	{
+	    if(first_size != NULL && slice_size != NULL && *first_size != *slice_size)
+	    {
+		tmp_ext[0] = extension_size;
+		f.write(tmp_ext, 1);
+		slice_size->dump(f);
+	    }
+	    else
+	    {
+		tmp_ext[0] = extension_none;
+		f.write(tmp_ext, 1);
+	    }
+	}
+	else
+	{
+	    f.write(tmp_ext, 1); // since release 2.4.0, tlv is always used to store optional information
+	    build_tlv_list(ui).dump(f);
+	}
     }
 
     void header::read(user_interaction & dialog, S_I fd, bool lax)

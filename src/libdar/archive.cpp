@@ -1511,7 +1511,8 @@ namespace libdar
 		    if(file_size == 0) // one SLICE
 			if(filename == "-") // output to stdout
 			{
-			    trivial_sar *tvs = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name, execute); //archive goes to stdout
+			    trivial_sar *tvs = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name,
+									    false, execute); //archive goes to stdout
 			    tmp = tvs;
 			    if(tvs != NULL)
 				data_name = tvs->get_data_name();
@@ -1531,7 +1532,8 @@ namespace libdar
 							       slice_user_ownership,
 							       slice_group_ownership,
 							       hash,
-							       slice_min_digits);
+							       slice_min_digits,
+							       false);
 			    tmp = tvs;
 			    if(tvs != NULL)
 				data_name = tvs->get_data_name();
@@ -1554,6 +1556,7 @@ namespace libdar
 					   slice_group_ownership,
 					   hash,
 					   slice_min_digits,
+					   false,
 					   execute);
 			tmp = rsr;
 			if(rsr != NULL)

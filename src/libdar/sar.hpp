@@ -114,6 +114,7 @@ namespace libdar
 	    const std::string & slice_group_ownership,
 	    hash_algo x_hash,
 	    const infinint & x_min_digits,
+	    bool format_07_compatible,
 	    const std::string & execute = "");
 
 	    /// the destructor
@@ -194,7 +195,7 @@ namespace libdar
 
 	    //
         infinint pause;              //< do we pause between slices
-	bool old_sar;                //< true if the read sar has an old header (format <= "07")
+	bool old_sar;                //< in read-mode, is true if the read sar has an old header (format <= "07"), in write mode, is true if it is requested to build old slice headers
 
         bool skip_forward(U_I x);                                  //< skip forward in sar global contents
         bool skip_backward(U_I x);                                 //< skip backward in sar global contents
@@ -232,7 +233,9 @@ namespace libdar
 		    const std::string & slice_user_ownership,    //< slice user
 		    const std::string & slice_group_ownership,   //< slice group
 		    hash_algo x_hash,                  //< whether to build a hash of the slice, and which algo to use for that
-	    	    const infinint & min_digits);    //< is the minimum number of digits the slices number is stored with in the filename
+	    	    const infinint & min_digits,       //< is the minimum number of digits the slices number is stored with in the filename
+		    bool format_07_compatible);        //< build a slice header backward compatible with 2.3.x
+
 
 	    /// constructor to read a (single sliced) archive from a pipe
 	trivial_sar(user_interaction & dialog,         //< how to interact with the user
@@ -244,6 +247,7 @@ namespace libdar
 	trivial_sar(user_interaction & dialog,
 		    generic_file * f, //< in case of exception the generic_file "f" is not released, this is the duty of the caller to do so, else (success), the object becomes owned by the trivial_sar and must not be released by the caller.
 		    const label & data_name,
+		    bool format_07_compatible,
 		    const std::string & execute);
 
 	    /// copy constructor (disabled)
@@ -278,10 +282,10 @@ namespace libdar
 	std::string ext;          //< extension of the archive (used for string substitution in hook)
 	path archive_dir;         //< path of the archiv (used for string substitution in hook)
 	label of_data_name;       //< archive's data name
-	bool old_sar;             //< true if the read sar has an old header (format <= "07")
+	bool old_sar;             //< true if the read sar has an old header (format <= "07") or the to be written is must keep a version 07 format.
 	infinint x_min_digits;    //< minimum number of digits in slice name
 
-	void init();              //< write the slice header and set the offset field (write mode), or (read-mode),  reads the slice header an set offset field
+	void init();              //< write the slice header and set the offset field (write mode), or (read-mode) reads the slice header an set offset field
 	void build(user_interaction & dialog,
 		   generic_file *f,
 		   const label & data_name,

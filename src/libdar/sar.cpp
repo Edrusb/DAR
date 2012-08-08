@@ -200,6 +200,7 @@ namespace libdar
 	     const string & slice_group_ownership,
 	     hash_algo x_hash,
 	     const infinint & x_min_digits,
+	     bool format_07_compatible,
 	     const string & execute) : generic_file(gf_write_only), mem_ui(dialog), archive_dir(dir)
     {
         if(file_size < header::min_size() + 1)  //< one more byte to store at least one byte of data
@@ -234,7 +235,7 @@ namespace libdar
 	    of_data_name = data_name;
 	of_fd = NULL;
 	of_flag = '\0';
-	old_sar = false; // sar creation does not makes a sar using an old header, this is always false within this constructor
+	old_sar = format_07_compatible;
 
 	try
 	{
@@ -515,10 +516,11 @@ namespace libdar
         infinint max_at_once;
         infinint tmp_wrote;
         U_I micro_wrote;
+	U_I trailer_size = old_sar ? 0 : 1;
 
         while(to_write > 0)
         {
-            max_at_once = of_current == 1 ? (first_size - file_offset) - 1 : (size - file_offset) - 1;
+            max_at_once = of_current == 1 ? (first_size - file_offset) - trailer_size : (size - file_offset) - trailer_size;
             tmp_wrote = max_at_once > to_write ? to_write : max_at_once;
             if(tmp_wrote > 0)
             {
@@ -555,10 +557,19 @@ namespace libdar
 	    char flag = terminal ? flag_type_terminal : flag_type_non_terminal;
 	    if(get_mode() == gf_write_only)
 	    {
-		if(of_fd->get_position() != of_fd->get_size())
-		    bug = true; // we should be at the end of the file
+		if(old_sar)
+		{
+		    header h = make_write_header(of_current, terminal ? flag_type_terminal : flag_type_non_terminal);
+		    of_fd->skip(0);
+		    h.write(get_ui(), *of_fd);
+		}
 		else
-		    of_fd->write(&flag, 1);
+		{
+		    if(of_fd->get_position() != of_fd->get_size())
+			bug = true; // we should be at the end of the file
+		    else
+			of_fd->write(&flag, 1);
+		}
 	    }
 	    of_fd->terminate();
 
@@ -999,7 +1010,7 @@ namespace libdar
 		    first_file_offset = of_fd->get_position();
 		    if(first_file_offset == 0)
 			throw SRC_BUG;
-		    other_file_offset = first_file_offset; // same header in all slice since release 2.4.0
+		    other_file_offset = h.is_old_header() ? header::min_size() : first_file_offset;
 		    if(first_file_offset >= first_size)
 			throw Erange("sar::sar", gettext("First slice size is too small to even just be able to drop the slice header"));
 		    if(other_file_offset >= size)
@@ -1162,9 +1173,22 @@ namespace libdar
         hh.get_set_internal_name() = of_internal_name;
 	hh.get_set_data_name() = of_data_name;
         hh.get_set_flag() = flag;
-	hh.set_slice_size(size);
-	if(size != first_size)
-	    hh.set_first_slice_size(first_size);
+	if(old_sar)
+	{
+	    if(num == 1)
+	    {
+		hh.set_slice_size(size);
+		if(size != first_size)
+		    hh.set_first_slice_size(first_size);
+	    }
+	    hh.set_format_07_compatibility();
+	}
+	else
+	{
+	    hh.set_slice_size(size);
+	    if(size != first_size)
+		hh.set_first_slice_size(first_size);
+	}
 
         return hh;
     }
@@ -1329,7 +1353,8 @@ namespace libdar
 			     const string & slice_user_ownership,
 			     const string & slice_group_ownership,
 			     hash_algo x_hash,
-			     const infinint & min_digits) : generic_file(gf_write_only), mem_ui(dialog), archive_dir(dir)
+			     const infinint & min_digits,
+			     bool format_07_compatible) : generic_file(gf_write_only), mem_ui(dialog), archive_dir(dir)
     {
 	S_I fd;
 	generic_file *tmp = NULL;
@@ -1345,6 +1370,7 @@ namespace libdar
 	base = base_name;
 	ext = extension;
 	x_min_digits = min_digits;
+	old_sar = format_07_compatible;
 
 	    // creating the slice if it does not exist else failing
 
@@ -1447,6 +1473,7 @@ namespace libdar
     trivial_sar::trivial_sar(user_interaction & dialog,
 			     generic_file *f,
 			     const label & data_name,
+			     bool format_07_compatible,
 			     const std::string & execute) : generic_file(gf_write_only), mem_ui(dialog), archive_dir("/")
     {
 	reference = NULL;
@@ -1455,7 +1482,7 @@ namespace libdar
 	hook = "";
 	base = "";
 	ext = "";
-	old_sar = false;
+	old_sar = format_07_compatible;
 	x_min_digits = 0;
 	build(dialog, f, data_name, execute);
     }
@@ -1480,7 +1507,6 @@ namespace libdar
 
 	hook = execute;
 	reference = f;
-	old_sar = false;
 	of_data_name = data_name;
 
 	init();
@@ -1506,7 +1532,7 @@ namespace libdar
     {
 	if(reference != NULL)
 	{
-	    if(get_mode() == gf_write_only)
+	    if(get_mode() == gf_write_only && !old_sar)
 	    {
 		char last = flag_type_terminal;
 		reference->write(&last, 1); // adding the trailing flag
@@ -1573,6 +1599,8 @@ namespace libdar
 	    }
 	    else
 		tete.get_set_data_name() = of_data_name;
+	    if(old_sar)
+		tete.set_format_07_compatibility();
 	    tete.write(get_ui(), *reference);
 	    offset = reference->get_position();
 	}
@@ -1603,9 +1631,14 @@ namespace libdar
 	    {
 		if(ret > 0)
 		{
-		    --ret;
-		    if(a[ret] != flag_type_terminal)
-			throw Erange("trivial_sar::inherited_read", gettext("This archive is not single sliced, more data exists in the next slices but cannot be read from the current pipe, aborting"));
+		    if(!old_sar)
+		    {
+			--ret;
+			if(a[ret] != flag_type_terminal)
+			    throw Erange("trivial_sar::inherited_read", gettext("This archive is not single sliced, more data exists in the next slices but cannot be read from the current pipe, aborting"));
+			else
+			    end_of_slice = 1;
+		    }
 		    else
 			end_of_slice = 1;
 		}

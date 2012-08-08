@@ -725,7 +725,7 @@ namespace libdar
     {
 	try
 	{
-	    ver.read(where);
+ 	    ver.read(where);
 	}
 	catch(Ebug & e)
 	{

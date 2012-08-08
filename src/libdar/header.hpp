@@ -111,6 +111,7 @@ namespace libdar
 	void unset_slice_size() { if(slice_size != NULL) { delete slice_size; slice_size = NULL; } };
 
 	bool is_old_header() const { return old_header; };
+	void set_format_07_compatibility() { old_header = true; };
 
     private:
         magic_number magic;    //< constant string for all Dar archives
@@ -119,8 +120,7 @@ namespace libdar
         char flag;             //< whether slice is the last of the archive or not
         infinint *first_size;  //< size of the first slice
 	infinint *slice_size;  //< size of slices (except first slice if specified else and last if not fulfilled)
-	bool old_header;       //< true if the header has been read from an old archive (before release 2.4.0)
-
+	bool old_header;       //< true if the header has been read from an old archive (before release 2.4.0, format 07 and below) and if true when writing, create an old slice header (compatible with format 07).
 
         void copy_from(const header & ref);
 	void free_pointers();
