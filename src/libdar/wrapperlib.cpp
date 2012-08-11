@@ -21,11 +21,15 @@
 
 #include "../my_config.h"
 
+#include <new>
+
 #include "wrapperlib.hpp"
 #include "erreurs.hpp"
 
 #define CHECK_Z if(z_ptr == NULL) throw SRC_BUG
 #define CHECK_BZ if(bz_ptr == NULL) throw SRC_BUG
+
+using namespace std;
 
 namespace libdar
 {
@@ -45,7 +49,7 @@ namespace libdar
         {
         case zlib_mode:
 #if LIBZ_AVAILABLE
-            z_ptr = new z_stream;
+            z_ptr = new (nothrow) z_stream;
             if(z_ptr == NULL)
                 throw Ememory("wrapperlib::wrapperlib");
 #if LIBBZ2_AVAILABLE
@@ -75,7 +79,7 @@ namespace libdar
 #endif
         case bzlib_mode:
 #if LIBBZ2_AVAILABLE
-            bz_ptr = new bz_stream;
+            bz_ptr = new (nothrow) bz_stream;
             if(bz_ptr == NULL)
                 throw Ememory("wrapperlib::wrapperlib");
 #if LIBZ_AVAILABLE

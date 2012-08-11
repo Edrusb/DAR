@@ -26,6 +26,7 @@
 #include "memory_check.hpp"
 
 #include <list>
+#include <new>
 #include <errno.h>
 
 #ifdef LIBDAR_SPECIAL_ALLOC
@@ -291,7 +292,7 @@ namespace libdar
 
 	try
 	{
-	    alloc_table = (U_64 *)new char[alloc_table_size*sizeof(U_64) + alloc_area_size];
+	    alloc_table = (U_64 *)new (nothrow) char[alloc_table_size*sizeof(U_64) + alloc_area_size];
 	    if(alloc_table == NULL)
 		throw Ememory("cluster::cluster");
 	    alloc_area = (char *)(alloc_table + alloc_table_size);
@@ -452,7 +453,7 @@ namespace libdar
 	sum_percent = 0;
 	num_cluster = 0;
 #endif
-	tmp = new cluster(block_size, table_size_64, this);
+	tmp = new (nothrow) cluster(block_size, table_size_64, this);
 	if(tmp == NULL)
 	    throw Ememory("sized::sized");
 	try
@@ -511,7 +512,7 @@ namespace libdar
 			throw SRC_BUG;
 		    if((*clusters.begin()) == NULL)
 			throw SRC_BUG;
-		    cluster *tmp = new cluster((*clusters.begin())->get_block_size(), table_size_64, this);
+		    cluster *tmp = new (nothrow) cluster((*clusters.begin())->get_block_size(), table_size_64, this);
 		    if(tmp == NULL)
 			throw Ememory("sized::alloc");
 		    try
@@ -648,7 +649,7 @@ namespace libdar
 	else
 	{
 	    memory_check_special_new_sized(size);
-	    sized *tmp = new sized(size);
+	    sized *tmp = new (nothrow) sized(size);
 	    if(tmp == NULL)
 		throw SRC_BUG;
 	    try

@@ -242,7 +242,7 @@ namespace libdar
 
 		    if(ret == NULL)
 		    {
-			ret = new ea_attributs();
+			ret = new (nothrow) ea_attributs();
 			if(ret == NULL)
 			    throw Ememory("read_ea");
 			ret->clear();
@@ -250,7 +250,7 @@ namespace libdar
 
 		    if(taille > 0)
 		    {
-			value = new char[taille+MARGIN];
+			value = new (nothrow) char[taille+MARGIN];
 			if(value == NULL)
 			    throw Ememory("filesystem : read_ea_from");
 			try
@@ -309,7 +309,7 @@ namespace libdar
                                                                        filename, strerror(errno)));
         }
 
-        liste = new char[taille+MARGIN];
+        liste = new (nothrow) char[taille+MARGIN];
         if(liste == NULL)
             throw Ememory("filesystem : get_ea_list_for");
         try

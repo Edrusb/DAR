@@ -28,6 +28,8 @@
 
 #include "../my_config.h"
 
+#include <new>
+
 #include "catalogue.hpp"
 
 namespace libdar
@@ -111,7 +113,7 @@ namespace libdar
 
 	    /// the inherited pure virtual methods from class action that must be implemented
 	void get_action(const nomme & first, const nomme & second, over_action_data & data, over_action_ea & ea) const { data = x_data; ea = x_ea; };
-	crit_action *clone() const { return new crit_constant_action(*this); };
+	crit_action *clone() const { return new (std::nothrow) crit_constant_action(*this); };
 
     private:
 	over_action_data x_data;
@@ -180,7 +182,7 @@ namespace libdar
 		x_go_false->get_action(first, second, data, ea);
 	};
 
-	crit_action *clone() const { return new testing(*this); };
+	crit_action *clone() const { return new (std::nothrow) testing(*this); };
 
     private:
 	criterium *x_input;
@@ -212,7 +214,7 @@ namespace libdar
 
 	void get_action(const nomme & first, const nomme & second, over_action_data & data, over_action_ea & ea) const;
 
-	crit_action *clone() const { return new crit_chain(*this); };
+	crit_action *clone() const { return new (std::nothrow) crit_chain(*this); };
 
     private:
 	std::vector<crit_action *> sequence;
@@ -235,7 +237,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const { return dynamic_cast<const inode *>(&first) != NULL || dynamic_cast<const mirage *>(&first) != NULL; };
-	criterium *clone() const { return new crit_in_place_is_inode(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_is_inode(*this); };
     };
 
 
@@ -245,7 +247,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const { return dynamic_cast<const directory *>(&first) != NULL; };
-	criterium *clone() const { return new crit_in_place_is_dir(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_is_dir(*this); };
     };
 
 
@@ -255,7 +257,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_is_file(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_is_file(*this); };
     };
 
 	/// returns true if the first entry is a inode with several hard links (whatever is the second entry)
@@ -266,7 +268,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const { return dynamic_cast<const mirage *>(&first) != NULL; };
-	criterium *clone() const { return new crit_in_place_is_hardlinked_inode(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_is_hardlinked_inode(*this); };
     };
 
 
@@ -278,7 +280,7 @@ namespace libdar
 	    const mirage * tmp = dynamic_cast<const mirage *>(&first);
 	    return tmp != NULL && tmp->is_first_mirage();
 	};
-	criterium *clone() const { return new crit_in_place_is_new_hardlinked_inode(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_is_new_hardlinked_inode(*this); };
     };
 
 
@@ -292,7 +294,7 @@ namespace libdar
 	crit_in_place_data_more_recent(const infinint & hourshift = 0) : x_hourshift(hourshift) {};
 
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_data_more_recent(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_data_more_recent(*this); };
 
     private:
 	infinint x_hourshift;
@@ -310,7 +312,7 @@ namespace libdar
 	crit_in_place_data_more_recent_or_equal_to(const infinint & date, const infinint & hourshift = 0) : x_hourshift(hourshift), x_date(date) {};
 
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_data_more_recent_or_equal_to(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_data_more_recent_or_equal_to(*this); };
 
     private:
 	infinint x_hourshift;
@@ -326,7 +328,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_data_bigger(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_data_bigger(*this); };
     };
 
 
@@ -339,7 +341,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_data_saved(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_data_saved(*this); };
     };
 
 
@@ -349,7 +351,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_data_dirty(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_data_dirty(*this); };
     };
 
 	/// return true if the entry is a sparse file (or hard linked sparse file)
@@ -358,7 +360,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_data_sparse(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_data_sparse(*this); };
     };
 
 
@@ -373,7 +375,7 @@ namespace libdar
 	    const inode *tmp = dynamic_cast<const inode *>(&first);
 	    return tmp != NULL && tmp->ea_get_saved_status() != inode::ea_none && tmp->ea_get_saved_status() != inode::ea_removed;
 	};
-	criterium *clone() const { return new crit_in_place_EA_present(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_EA_present(*this); };
     };
 
 
@@ -390,7 +392,7 @@ namespace libdar
 	crit_in_place_EA_more_recent(const infinint & hourshift = 0) : x_hourshift(hourshift) {};
 
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_EA_more_recent(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_EA_more_recent(*this); };
 
     private:
 	infinint x_hourshift;
@@ -408,7 +410,7 @@ namespace libdar
 	crit_in_place_EA_more_recent_or_equal_to(const infinint & date, const infinint & hourshift = 0) : x_hourshift(hourshift), x_date(date) {};
 
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_EA_more_recent_or_equal_to(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_EA_more_recent_or_equal_to(*this); };
 
     private:
 	infinint x_hourshift;
@@ -424,7 +426,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_more_EA(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_more_EA(*this); };
     };
 
 
@@ -437,7 +439,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_EA_bigger(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_EA_bigger(*this); };
     };
 
 
@@ -449,7 +451,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_in_place_EA_saved(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_in_place_EA_saved(*this); };
     };
 
 
@@ -462,7 +464,7 @@ namespace libdar
     {
     public:
 	bool evaluate(const nomme &first, const nomme &second) const;
-	criterium *clone() const { return new crit_same_type(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_same_type(*this); };
     };
 
 
@@ -477,7 +479,7 @@ namespace libdar
 	~crit_not() { destroy(); };
 
 	bool evaluate(const nomme & first, const nomme & second) const { return ! x_crit->evaluate(first, second); };
-	criterium *clone() const { return new crit_not(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_not(*this); };
 
     protected:
 	const criterium *x_crit;
@@ -504,7 +506,7 @@ namespace libdar
 	void gobe(crit_and & to_be_voided);
 
 	virtual bool evaluate(const nomme & first, const nomme & second) const;
-	criterium *clone() const { return new crit_and(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_and(*this); };
 
     protected:
 	std::vector<criterium *> operand;
@@ -520,7 +522,7 @@ namespace libdar
 	crit_or() { clear(); };
 
 	bool evaluate(const nomme & first, const nomme & second) const;
-	criterium *clone() const { return new crit_or(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_or(*this); };
 
     };
 
@@ -530,7 +532,7 @@ namespace libdar
 	crit_invert(const criterium & crit) : crit_not(crit) {};
 
 	bool evaluate(const nomme & first, const nomme & second) const { return x_crit->evaluate(second, first); };
-	criterium *clone() const { return new crit_invert(*this); };
+	criterium *clone() const { return new (std::nothrow) crit_invert(*this); };
     };
 
 

@@ -51,6 +51,8 @@ char *strchr (), *strrchr ();
 
 }
 
+#include <new>
+
 #include "cache.hpp"
 
 using namespace std;
@@ -95,7 +97,7 @@ namespace libdar
 
 	ref = & hidden;
 
-	buffer_cache.buffer = new char[initial_size];
+	buffer_cache.buffer = new (nothrow) char[initial_size];
 	if(buffer_cache.buffer == NULL)
 	    throw Ememory("cache::cache");
 	buffer_cache.size = initial_size;
@@ -388,11 +390,11 @@ namespace libdar
 		if(buffer_cache.size < tmp && (max_alloc_size == 0 || tmp < max_alloc_size) )
 		{
 		    delete [] buffer_cache.buffer;
-		    buffer_cache.buffer = new char[tmp];
+		    buffer_cache.buffer = new (nothrow) char[tmp];
 		    if(buffer_cache.buffer == NULL)
 		    {
 			max_alloc_size = buffer_cache.size;
-			buffer_cache.buffer = new char[buffer_cache.size];
+			buffer_cache.buffer = new (nothrow) char[buffer_cache.size];
 			if(buffer_cache.buffer == NULL)
 			{
 			    buffer_cache.size = 0;
@@ -411,7 +413,7 @@ namespace libdar
 		    if(tmp < buffer_cache.size && tmp > 0)
 		    {
 			delete [] buffer_cache.buffer;
-			buffer_cache.buffer = new char[buffer_cache.size];
+			buffer_cache.buffer = new (nothrow) char[buffer_cache.size];
 			if(buffer_cache.buffer == NULL)
 			{
 			    buffer_cache.size = 0;
@@ -522,7 +524,7 @@ namespace libdar
 	if(newsize < last)
 	    throw SRC_BUG;
 
-	tmp = new char[newsize];
+	tmp = new (nothrow) char[newsize];
 	if(tmp == NULL)
 	    throw Ememory("cache::buf::resize");
 

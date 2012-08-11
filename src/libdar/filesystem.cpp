@@ -106,6 +106,7 @@ char *strchr (), *strrchr ();
 
 
 #include <map>
+#include <new>
 
 #include "filesystem.hpp"
 #include "tools.hpp"
@@ -176,75 +177,76 @@ namespace libdar
 		{
 		    string pointed = tools_readlink(ptr_name);
 
-		    ref = new lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-				   buf.st_atime,
-				   buf.st_mtime,
-				   buf.st_ctime,
-				   name,
-				   pointed,
-				   buf.st_dev);
+		    ref = new (nothrow) lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+					     buf.st_atime,
+					     buf.st_mtime,
+					     buf.st_ctime,
+					     name,
+					     pointed,
+					     buf.st_dev);
 		}
 		else if(S_ISREG(buf.st_mode))
-		    ref = new file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-				   buf.st_atime,
-				   buf.st_mtime,
-				   buf.st_ctime,
-				   name,
-				   lieu,
-				   buf.st_size,
-				   buf.st_dev,
-				   furtive_read_mode);
+		    ref = new (nothrow) file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+					     buf.st_atime,
+					     buf.st_mtime,
+					     buf.st_ctime,
+					     name,
+					     lieu,
+					     buf.st_size,
+					     buf.st_dev,
+					     furtive_read_mode);
 		else if(S_ISDIR(buf.st_mode))
-		    ref = new directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-					buf.st_atime,
-					buf.st_mtime,
-					buf.st_ctime,
-					name,
-					buf.st_dev);
+		    ref = new (nothrow) directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+						  buf.st_atime,
+						  buf.st_mtime,
+						  buf.st_ctime,
+						  name,
+						  buf.st_dev);
 		else if(S_ISCHR(buf.st_mode))
-		    ref = new chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-				      buf.st_atime,
-				      buf.st_mtime,
-				      buf.st_ctime,
-				      name,
-				      major(buf.st_rdev),
-				      minor(buf.st_rdev), // makedev(major, minor)
-				      buf.st_dev);
+		    ref = new (nothrow) chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+						buf.st_atime,
+						buf.st_mtime,
+						buf.st_ctime,
+						name,
+						major(buf.st_rdev),
+						minor(buf.st_rdev), // makedev(major, minor)
+						buf.st_dev);
 		else if(S_ISBLK(buf.st_mode))
-		    ref = new blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-				       buf.st_atime,
-				       buf.st_mtime,
-				       buf.st_ctime,
-				       name,
-				       major(buf.st_rdev),
-				       minor(buf.st_rdev), // makedev(major, minor)
-				       buf.st_dev);
+		    ref = new (nothrow) blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+						 buf.st_atime,
+						 buf.st_mtime,
+						 buf.st_ctime,
+						 name,
+						 major(buf.st_rdev),
+						 minor(buf.st_rdev), // makedev(major, minor)
+						 buf.st_dev);
 		else if(S_ISFIFO(buf.st_mode))
-		    ref = new tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-				   buf.st_atime,
-				   buf.st_mtime,
-				   buf.st_ctime,
-				   name,
-				   buf.st_dev);
+		    ref = new (nothrow) tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+					     buf.st_atime,
+					     buf.st_mtime,
+					     buf.st_ctime,
+					     name,
+					     buf.st_dev);
 		else if(S_ISSOCK(buf.st_mode))
-		    ref = new prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-				    buf.st_atime,
-				    buf.st_mtime,
-				    buf.st_ctime,
-				    name,
-				    buf.st_dev);
+		    ref = new (nothrow) prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+					      buf.st_atime,
+					      buf.st_mtime,
+					      buf.st_ctime,
+					      name,
+					      buf.st_dev);
 #if HAVE_DOOR
 		else if(S_ISDOOR(buf.st_mode))
-		    ref = new door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-				   buf.st_atime,
-				   buf.st_mtime,
-				   buf.st_ctime,
-				   name,
-				   lieu,
-				   buf.st_dev);
+		    ref = new (nothrow) door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+					     buf.st_atime,
+					     buf.st_mtime,
+					     buf.st_ctime,
+					     name,
+					     lieu,
+					     buf.st_dev);
 #endif
 		else
 		    throw Edata(string(gettext("Unknown file type! file name is: ")) + string(ptr_name));
+
 
 		    //
 		    // Extended Attributes Considerations
@@ -299,7 +301,7 @@ namespace libdar
 
 			if(ino_ref == NULL)
 			    throw SRC_BUG;
-			tmp_et = new etoile(ino_ref, etiquette_counter++);
+			tmp_et = new (nothrow) etoile(ino_ref, etiquette_counter++);
 			if(tmp_et == NULL)
 			    throw Ememory("filesystem_hard_link_read::make_read_entree");
 			try
@@ -322,7 +324,7 @@ namespace libdar
 			    throw;
 			}
 
-			ref = new mirage(name, tmp_et);
+			ref = new (nothrow) mirage(name, tmp_et);
 		    }
 		    else // inode already seen creating a new mirage on the given etoile
 		    {
@@ -332,7 +334,7 @@ namespace libdar
 
 			if(ref != NULL)
 			    delete ref;  // we don't need this just created inode as it is already attached to the etoile object
-			ref = new mirage(name, it->second.obj);
+			ref = new (nothrow) mirage(name, it->second.obj);
 			if(ref != NULL)
 			{
 			    it->second.count--;
@@ -436,12 +438,20 @@ namespace libdar
 	try
 	{
 	    if(ref.fs_root != NULL)
-		fs_root = new path(*ref.fs_root);
+	    {
+		fs_root = new (nothrow) path(*ref.fs_root);
+		if(fs_root == NULL)
+		    throw Ememory("filesystem_backup::copy_from");
+	    }
 	    else
 		fs_root = NULL;
 
 	    if(ref.current_dir != NULL)
-		current_dir = new path(*ref.current_dir);
+	    {
+		current_dir = new (nothrow) path(*ref.current_dir);
+		if(current_dir == NULL)
+		    throw Ememory("filesystem_backup::copy_from");
+	    }
 	    else
 		current_dir = NULL;
 	    info_details = ref.info_details;
@@ -467,7 +477,7 @@ namespace libdar
         corres_reset();
         if(current_dir != NULL)
             delete current_dir;
-        current_dir = new path(*fs_root);
+        current_dir = new (nothrow) path(*fs_root);
         if(current_dir == NULL)
             throw Ememory("filesystem_backup::reset_read");
         pile.clear();
@@ -537,7 +547,7 @@ namespace libdar
 		    {
                         if(! current_dir->pop(tmp))
                             throw SRC_BUG;
-                        ref = new eod();
+                        ref = new (nothrow) eod();
                     }
                 }
                 else // could read a filename in directory
@@ -693,7 +703,7 @@ namespace libdar
         corres_reset();
         if(current_dir != NULL)
             delete current_dir;
-        current_dir = new path(*fs_root);
+        current_dir = new (nothrow) path(*fs_root);
         filename_pile.clear();
         if(current_dir == NULL)
             throw Ememory("filesystem_diff::reset_read");
@@ -794,11 +804,19 @@ namespace libdar
 	    filesystem_hard_link_read *proto_me = this;
 	    *proto_me = *proto_ref;
 	    if(ref.fs_root != NULL)
-		fs_root = new path(*ref.fs_root);
+	    {
+		fs_root = new (nothrow) path(*ref.fs_root);
+		if(fs_root == NULL)
+		    throw Ememory("filesystem_diff::copy_from");
+	    }
 	    else
 		fs_root = NULL;
 	    if(ref.current_dir != NULL)
-		current_dir = new path(*ref.current_dir);
+	    {
+		current_dir = new (nothrow) path(*ref.current_dir);
+		if(current_dir == NULL)
+		    throw Ememory("filesystem_diff::copy_from");
+	    }
 	    else
 		current_dir = NULL;
 	    info_details = ref.info_details;
@@ -1238,7 +1256,7 @@ namespace libdar
         stack_dir.clear();
         if(current_dir != NULL)
             delete current_dir;
-        current_dir = new path(*fs_root);
+        current_dir = new (nothrow) path(*fs_root);
         if(current_dir == NULL)
             throw Ememory("filesystem_write::reset_write");
 	ignore_over_restricts = false;
@@ -1500,11 +1518,11 @@ namespace libdar
 	}
     }
 
- void filesystem_restore::action_over_data(const inode *in_place,
-					   const nomme *to_be_added,
-					   const string & spot,
-					   over_action_data action,
-					   action_done_for_data & data_done)
+    void filesystem_restore::action_over_data(const inode *in_place,
+					      const nomme *to_be_added,
+					      const string & spot,
+					      over_action_data action,
+					      action_done_for_data & data_done)
     {
 	const mirage *tba_mir = dynamic_cast<const mirage *>(to_be_added);
 	const inode *tba_ino = tba_mir == NULL ? dynamic_cast<const inode *>(to_be_added) : tba_mir->get_inode();
@@ -2031,13 +2049,13 @@ namespace libdar
 
 	if(S_ISDIR(buf.st_mode))
 	{
-	    ret = new path(root);
+	    ret = new (nothrow) path(root);
 	    if(ret == NULL)
 		throw  Ememory("get_root_with_symlink");
 	}
 	else if(S_ISLNK(buf.st_mode))
 	{
-	    ret = new path(tools_readlink(ptr));
+	    ret = new (nothrow) path(tools_readlink(ptr));
 	    if(ret == NULL)
 		throw Ememory("get_root_with_symlink");
 	    if(ret->is_relative())

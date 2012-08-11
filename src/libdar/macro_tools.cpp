@@ -30,6 +30,8 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include <new>
+
 #include "macro_tools.hpp"
 #include "terminateur.hpp"
 #include "user_interaction.hpp"
@@ -130,7 +132,7 @@ namespace libdar
 		label tmp;
 
 		tmp.clear(); // we do not want here to change the catalogue internal data name read from archive
-                ret = new catalogue(dialog, cata_stack, ver.edition, char2compression(ver.algo_zip), data_loc, ea_loc, lax_mode, tmp);
+                ret = new (nothrow) catalogue(dialog, cata_stack, ver.edition, char2compression(ver.algo_zip), data_loc, ea_loc, lax_mode, tmp);
 		data_ctxt->set_info_status(CONTEXT_OP);
 		cata_ctxt->set_info_status(CONTEXT_OP);
             }
@@ -194,7 +196,7 @@ namespace libdar
 		    {
 			if(info_details)
 			    dialog.warning(gettext("Opening standard input to read the archive..."));
-			tmp = new trivial_sar(dialog,
+			tmp = new (nothrow) trivial_sar(dialog,
 					      basename,
 					      lax);
 		    }
@@ -202,7 +204,7 @@ namespace libdar
 		    {
 			if(info_details)
 			    dialog.printf(gettext("Opening named pipe %S as input to read the archive..."), &input_pipe);
-			tmp = new trivial_sar(dialog,
+			tmp = new (nothrow) trivial_sar(dialog,
 					      input_pipe,
 					      lax);
 		    }
@@ -216,7 +218,7 @@ namespace libdar
 		    {
 			dialog.printf(gettext("Opening a pair of pipes to read the archive, expecting dar_slave at the other ends..."));
 			tools_open_pipes(dialog, input_pipe, output_pipe, in, out);
-			tmp = new zapette(dialog, in, out);
+			tmp = new (nothrow) zapette(dialog, in, out);
 			if(tmp == NULL)
 			{
 			    delete in;
@@ -241,7 +243,7 @@ namespace libdar
 	    {
 		if(info_details)
 		    dialog.warning(gettext("Opening the archive using the multi-slice abstraction layer..."));
-		tmp = new sar(dialog,
+		tmp = new (nothrow) sar(dialog,
 			      basename,
 			      extension,
 			      sauv_path,
@@ -311,7 +313,7 @@ namespace libdar
 	    {
 		if(info_details)
 		    dialog.printf(gettext("Opening construction layer..."));
-		tmp = new tronc(stack.top(), 0, second_terminateur_offset, false);
+		tmp = new (nothrow) tronc(stack.top(), 0, second_terminateur_offset, false);
 		if(tmp == NULL)
 		    throw Ememory("macro_tools_open_archive");
 		else
@@ -361,14 +363,14 @@ namespace libdar
 		{
 		    crypto_sym *tmp_ptr = NULL;
 
-		    tmp = tmp_ptr = new crypto_sym(crypto_size, real_pass, *(stack.top()), true, ver.edition, crypto);
+		    tmp = tmp_ptr = new (nothrow) crypto_sym(crypto_size, real_pass, *(stack.top()), true, ver.edition, crypto);
 		    if(tmp_ptr != NULL)
 			tmp_ptr->set_initial_shift(ver.initial_offset);
 		}
 		else // archive openned by the beginning
 		{
 		    crypto_sym *tmp_ptr;
-		    tmp = tmp_ptr = new crypto_sym(crypto_size, real_pass, *(stack.top()), false, ver.edition, crypto);
+		    tmp = tmp_ptr = new (nothrow) crypto_sym(crypto_size, real_pass, *(stack.top()), false, ver.edition, crypto);
 
 		    if(tmp_ptr != NULL)
 		    {
@@ -385,7 +387,7 @@ namespace libdar
 	    case crypto_scrambling:
 		if(info_details)
 		    dialog.warning(gettext("Opening cyphering layer..."));
-		tmp = new scrambler(real_pass, *(stack.top()));
+		tmp = new (nothrow) scrambler(real_pass, *(stack.top()));
 		break;
 	    default:
 		throw Erange("macro_tools_open_archive", gettext("Unknown encryption algorithm"));
@@ -447,7 +449,7 @@ namespace libdar
 		set<escape::sequence_type> unjump;
 
 		unjump.insert(escape::seqt_catalogue);
-		tmp = new escape(stack.top(), unjump);
+		tmp = new (nothrow) escape(stack.top(), unjump);
 		if(tmp == NULL)
 		    throw Ememory("open_archive");
 		stack.push(tmp);
@@ -461,7 +463,7 @@ namespace libdar
 		if(info_details)
 		    dialog.warning(gettext("Opening the cache layer for better performance..."));
 
-		tmp = new cache(*(stack.top()), false);
+		tmp = new (nothrow) cache(*(stack.top()), false);
 		if(tmp == NULL)
 		    dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
 		else
@@ -509,7 +511,7 @@ namespace libdar
 		}
 		while(!ok);
 	    }
-	    tmp = new compressor(char2compression(ver.algo_zip), *(stack.top()));
+	    tmp = new (nothrow)  compressor(char2compression(ver.algo_zip), *(stack.top()));
 
 	    if(tmp == NULL)
 		throw Ememory("open_archive");
@@ -662,7 +664,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new catalogue(dialog, *zip, edition, compr_algo, data_loc, ea_loc, even_partial_catalogue, layer1_data_name);
+		ret = new (nothrow) catalogue(dialog, *zip, edition, compr_algo, data_loc, ea_loc, even_partial_catalogue, layer1_data_name);
 		if(ret == NULL)
 		    throw Ememory("macro_tools_lax_search_catalogue");
 		stats = ret->get_stats();

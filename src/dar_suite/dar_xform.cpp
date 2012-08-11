@@ -35,6 +35,8 @@ extern "C"
 } // end extern "C"
 
 #include <iostream>
+#include <new>
+
 #include "sar.hpp"
 #include "sar_tools.hpp"
 #include "user_interaction.hpp"
@@ -122,7 +124,7 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 		shell_interaction_set_beep(beep);
 		if(src == "-")
 		{
-		    trivial_sar *tmp_sar = new trivial_sar(dialog, src, false);
+		    trivial_sar *tmp_sar = new (nothrow) trivial_sar(dialog, src, false);
 		    if(tmp_sar == NULL)
 			throw Ememory("sub_main");
 
@@ -134,7 +136,7 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 		}
 		else 	// source not from a pipe
 		{
-		    sar *tmp_sar = new sar(dialog, src, EXTENSION, *src_dir, false, src_min_digits, false, execute_src);
+		    sar *tmp_sar = new (nothrow) sar(dialog, src, EXTENSION, *src_dir, false, src_min_digits, false, execute_src);
 		    if(tmp_sar == NULL)
 			throw Ememory("main");
 		    else
@@ -150,9 +152,9 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 		    if(dst == "-")
 			dst_sar = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name, execute_dst);
 		    else
-			dst_sar = new trivial_sar(dialog, dst, EXTENSION, *dst_dir, data_name, execute_dst, allow, warn, slice_perm, slice_user, slice_group, hash, dst_min_digits);
+			dst_sar = new (nothrow) trivial_sar(dialog, dst, EXTENSION, *dst_dir, data_name, execute_dst, allow, warn, slice_perm, slice_user, slice_group, hash, dst_min_digits);
 		else
-		    dst_sar = new sar(dialog, dst, EXTENSION, size, first, warn, allow, pause, *dst_dir, data_name, slice_perm, slice_user, slice_group, hash, dst_min_digits, execute_dst);
+		    dst_sar = new (nothrow) sar(dialog, dst, EXTENSION, size, first, warn, allow, pause, *dst_dir, data_name, slice_perm, slice_user, slice_group, hash, dst_min_digits, execute_dst);
 		if(dst_sar == NULL)
 		    throw Ememory("main");
 

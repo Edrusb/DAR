@@ -48,6 +48,8 @@ extern "C"
 
 #include <vector>
 #include <string>
+#include <new>
+
 #include "dar_suite.hpp"
 #include "macro_tools.hpp"
 #include "data_tree.hpp"
@@ -605,7 +607,7 @@ static void op_add(user_interaction & dialog, database *dat, const string &arg, 
     tools_split_path_basename(arg, arch_path, arch_base);
     read_options.set_info_details(info_details);
     read_options.set_slice_min_digits(min_digits);
-    archive *arch = new archive(dialog, path(arch_path), arch_base, EXTENSION, read_options);
+    archive *arch = new (nothrow) archive(dialog, path(arch_path), arch_base, EXTENSION, read_options);
     if(arch == NULL)
 	throw Ememory("dar_manager.cpp:op_add");
 
@@ -920,7 +922,7 @@ static database *read_base(user_interaction & dialog, const string & base, bool 
 	dat_opt.set_warn_order(check_order);
 	dat_opt.set_partial(partial);
 	dat_opt.set_partial_read_only(partial_read_only);
-        ret = new database(dialog, base, dat_opt);
+        ret = new (nothrow) database(dialog, base, dat_opt);
         if(ret == NULL)
             throw Ememory("read_base");
     }
@@ -1048,7 +1050,7 @@ static void op_interactive(user_interaction & dialog, database *dat, string base
 		tools_split_path_basename(input, input, input2);
 		read_options.clear();
 		read_options.set_info_details(true);
-		arch = new archive(dialog, path(input), input2, EXTENSION, read_options);
+		arch = new (nothrow) archive(dialog, path(input), input2, EXTENSION, read_options);
 		if(arch == NULL)
 		    throw Ememory("dar_manager.cpp:op_interactive");
 		try

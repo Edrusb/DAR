@@ -21,6 +21,8 @@
 
 #include "../my_config.h"
 
+#include <new>
+
 #include "archive_options.hpp"
 
 using namespace std;
@@ -54,7 +56,7 @@ namespace libdar
     inline void archive_option_clean_mask(mask * & ptr, bool all)
     {
 	archive_option_destroy_mask(ptr);
-	ptr = new bool_mask(all);
+	ptr = new (nothrow) bool_mask(all);
 	if(ptr == NULL)
 	    throw Ememory("archive_options_clean_mask");
     }
@@ -283,6 +285,8 @@ namespace libdar
 	    archive_option_check_mask(selection);
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
+	    if(x_selection == NULL)
+		throw Ememory("archive_options_create::set_selection");
 	}
 	catch(...)
 	{
@@ -300,6 +304,8 @@ namespace libdar
 	    archive_option_check_mask(subtree);
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
+	    if(x_subtree == NULL)
+		throw Ememory("archive_options_create::set_subtree");
 	}
 	catch(...)
 	{
@@ -317,6 +323,8 @@ namespace libdar
 	    archive_option_check_mask(ea_mask);
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
+	    if(x_ea_mask == NULL)
+		throw Ememory("archive_options_create::set_ea_mask");
 	}
 	catch(...)
 	{
@@ -334,6 +342,8 @@ namespace libdar
 	    archive_option_check_mask(compr_mask);
 	    archive_option_destroy_mask(x_compr_mask);
 	    x_compr_mask = compr_mask.clone();
+	    if(x_compr_mask == NULL)
+		throw Ememory("archive_options_create::set_compr_mask");
 	}
 	catch(...)
 	{
@@ -551,6 +561,8 @@ namespace libdar
 	    archive_option_check_mask(selection);
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
+	    if(x_selection == NULL)
+		throw Ememory("archive_options_merge::set_selection");
 	}
 	catch(...)
 	{
@@ -568,6 +580,8 @@ namespace libdar
 	    archive_option_check_mask(subtree);
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
+	    if(x_subtree == NULL)
+		throw Ememory("archive_options_merge::set_subtree");
 	}
         catch(...)
         {
@@ -604,6 +618,8 @@ namespace libdar
 	    archive_option_check_mask(ea_mask);
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
+	    if(x_ea_mask == NULL)
+		throw Ememory("archive_options_merge::set_ea_mask");
 	}
 	catch(...)
 	{
@@ -621,6 +637,8 @@ namespace libdar
 	    archive_option_check_mask(compr_mask);
 	    archive_option_destroy_mask(x_compr_mask);
 	    x_compr_mask = compr_mask.clone();
+	    if(x_compr_mask == NULL)
+		throw Ememory("archive_options_merge::set_compr_mask");
 	}
 	catch(...)
 	{
@@ -922,6 +940,8 @@ namespace libdar
 	    archive_option_check_mask(selection);
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
+	    if(x_selection == NULL)
+		throw Ememory("archive_options_listing::set_selection");
 	}
 	catch(...)
 	{
@@ -939,6 +959,8 @@ namespace libdar
 	    archive_option_check_mask(subtree);
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
+	    if(x_subtree == NULL)
+		throw Ememory("archive_options_listing::set_subtree");
 	}
 	catch(...)
 	{
@@ -990,6 +1012,8 @@ namespace libdar
 		throw SRC_BUG;
 	    x_selection = ref.x_selection->clone();
 	    x_subtree = ref.x_subtree->clone();
+	    if(x_selection == NULL || x_subtree == NULL)
+		throw Ememory("archive_options_listing::copy_from");
 
 	    x_info_details = ref.x_info_details;
 	    x_list_mode = ref.x_list_mode;
@@ -1048,6 +1072,8 @@ namespace libdar
 	    archive_option_check_mask(selection);
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
+	    if(x_selection == NULL)
+		throw Ememory("archive_options_diff::set_selection");
 	}
         catch(...)
         {
@@ -1065,6 +1091,8 @@ namespace libdar
 	    archive_option_check_mask(subtree);
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
+	    if(x_subtree == NULL)
+		throw Ememory("archive_options_diff::set_subtree");
 	}
         catch(...)
         {
@@ -1082,6 +1110,8 @@ namespace libdar
 	    archive_option_check_mask(ea_mask);
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
+	    if(x_ea_mask == NULL)
+		throw Ememory("archive_options_dif::set_ea_mask");
 	}
         catch(...)
         {
@@ -1211,6 +1241,8 @@ namespace libdar
 	    archive_option_check_mask(selection);
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
+	    if(x_selection == NULL)
+		throw Ememory("archive_options_test::set_selection");
 	}
         catch(...)
         {
@@ -1228,6 +1260,8 @@ namespace libdar
 	    archive_option_check_mask(subtree);
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
+	    if(x_subtree == NULL)
+		throw Ememory("archive_option_test::set_subtree");
 	}
         catch(...)
         {

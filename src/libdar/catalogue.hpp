@@ -37,6 +37,7 @@ extern "C"
 
 #include <vector>
 #include <map>
+#include <new>
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "path.hpp"
@@ -160,7 +161,7 @@ namespace libdar
         eod(generic_file & f) {};
             // dump defined by entree
         unsigned char signature() const { return 'z'; };
-        entree *clone() const { return new eod(); };
+        entree *clone() const { return new (std::nothrow) eod(); };
 
 
 #ifdef LIBDAR_SPECIAL_ALLOC
@@ -430,7 +431,7 @@ namespace libdar
 	~mirage() { star_ref->drop_ref(this); };
 
 	unsigned char signature() const { return 'm'; };
-	entree *clone() const { return new mirage(*this); };
+	entree *clone() const { return new (std::nothrow) mirage(*this); };
 
 	inode *get_inode() const { if(star_ref == NULL) throw SRC_BUG; return star_ref->get_inode(); };
 	infinint get_etiquette() const { return star_ref->get_etiquette(); };
@@ -535,7 +536,7 @@ namespace libdar
 	bool get_sparse_file_detection_read() const { return (file_data_status_read & FILE_DATA_WITH_HOLE) != 0; };
 	bool get_sparse_file_detection_write() const { return (file_data_status_write & FILE_DATA_WITH_HOLE) != 0; };
 
-        entree *clone() const { return new file(*this); };
+        entree *clone() const { return new (std::nothrow) file(*this); };
 
         compression get_compression_algo_read() const { return algo_read; };
 
@@ -633,7 +634,7 @@ namespace libdar
             // using the method is_more_recent_than() from inode
             // using method has_changed_since() from inode class
         unsigned char signature() const { return mk_signature('l', get_saved_status()); };
-        entree *clone() const { return new lien(*this); };
+        entree *clone() const { return new (std::nothrow) lien(*this); };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(lien);
@@ -714,7 +715,7 @@ namespace libdar
 	    // recursively remove all mirage entries
 	void remove_all_mirages_and_reduce_dirs();
 
-        entree *clone() const { return new directory(*this); };
+        entree *clone() const { return new (std::nothrow) directory(*this); };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(directory);
@@ -805,7 +806,7 @@ namespace libdar
             // using method is_more_recent_than() from device class
             // using method has_changed_since() from device class
         unsigned char signature() const { return mk_signature('c', get_saved_status()); };
-        entree *clone() const { return new chardev(*this); };
+        entree *clone() const { return new (std::nothrow) chardev(*this); };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(chardev);
@@ -837,7 +838,7 @@ namespace libdar
             // using method is_more_recent_than() from device class
             // using method has_changed_since() from device class
         unsigned char signature() const { return mk_signature('b', get_saved_status()); };
-        entree *clone() const { return new blockdev(*this); };
+        entree *clone() const { return new (std::nothrow) blockdev(*this); };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(blockdev);
@@ -865,7 +866,7 @@ namespace libdar
             // using method is_more_recent_than() from inode class
             // using method has_changed_since() from inode class
         unsigned char signature() const { return mk_signature('p', get_saved_status()); };
-        entree *clone() const { return new tube(*this); };
+        entree *clone() const { return new (std::nothrow) tube(*this); };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(tube);
@@ -893,7 +894,7 @@ namespace libdar
             // using method is_more_recent_than() from inode class
             // using method has_changed_since() from inode class
         unsigned char signature() const { return mk_signature('s', get_saved_status()); };
-        entree *clone() const { return new prise(*this); };
+        entree *clone() const { return new (std::nothrow) prise(*this); };
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(prise);
@@ -911,7 +912,7 @@ namespace libdar
         unsigned char get_signature() const { return signe; };
         void set_signature(unsigned char x) { signe = x; };
         unsigned char signature() const { return 'x'; };
-        entree *clone() const { return new detruit(*this); };
+        entree *clone() const { return new (std::nothrow) detruit(*this); };
 
 	const infinint & get_date() const { return del_date; };
 	void set_date(const infinint & ref) { del_date = ref; };
@@ -935,7 +936,7 @@ namespace libdar
         ignored(generic_file & f) : nomme(f) { throw SRC_BUG; };
 
         unsigned char signature() const { return 'i'; };
-        entree *clone() const { return new ignored(*this); };
+        entree *clone() const { return new (std::nothrow) ignored(*this); };
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(ignored);
 #endif
@@ -957,7 +958,7 @@ namespace libdar
 		    escape *ptr) : inode(dialog, f, reading_ver, s_not_saved, ea_loc, ptr) { throw SRC_BUG; };
 
         unsigned char signature() const { return 'j'; };
-        entree *clone() const { return new ignored_dir(*this); };
+        entree *clone() const { return new (std::nothrow) ignored_dir(*this); };
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(ignored_dir);
 #endif

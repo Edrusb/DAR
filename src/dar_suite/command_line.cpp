@@ -69,6 +69,7 @@ extern "C"
 #include <vector>
 #include <deque>
 #include <iostream>
+#include <new>
 
 #include "deci.hpp"
 #include "command_line.hpp"
@@ -376,7 +377,11 @@ bool get_args(user_interaction & dialog,
 	}
 
 	if(p.fs_root == NULL)
-	    p.fs_root = new path(".");
+	{
+	    p.fs_root = new (nothrow) path(".");
+	    if(p.fs_root == NULL)
+		throw Ememory("get_args");
+	}
 	if(rec.fixed_date_mode && p.op != create)
 	    throw Erange("get_args", gettext("-af option is only available with -c"));
 	if(p.ref_filename != NULL && p.op == listing)
@@ -562,7 +567,7 @@ bool get_args(user_interaction & dialog,
 						      tools_relative2absolute_path(*p.fs_root, tools_getcwd()));
 	else
 	{
-	    p.compress_mask = new bool_mask(true);
+	    p.compress_mask = new (nothrow) bool_mask(true);
 	    if(p.compress_mask == NULL)
 		throw Ememory("get_args");
 	}
@@ -630,7 +635,7 @@ bool get_args(user_interaction & dialog,
 	case merging:
 	    if(p.overwrite == NULL)
 	    {
-		p.overwrite = new crit_constant_action(data_preserve, EA_merge_preserve);
+		p.overwrite = new (nothrow) crit_constant_action(data_preserve, EA_merge_preserve);
 		if(p.overwrite == NULL)
 		    throw Ememory("get_args");
 	    }
@@ -789,7 +794,7 @@ static bool get_args_recursive(recursive_param & rec,
 			p.snapshot = true;
 		    else
 		    {
-			p.ref_filename = new string();
+			p.ref_filename = new (nothrow) string();
 			if(p.ref_filename == NULL)
 			    throw Ememory("get_args");
 			try
@@ -892,7 +897,7 @@ static bool get_args_recursive(recursive_param & rec,
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 else
-                    p.fs_root = new path(optarg, true);
+                    p.fs_root = new (nothrow) path(optarg, true);
                 if(p.fs_root == NULL)
                     throw Ememory("get_args");
                 break;
@@ -1368,7 +1373,7 @@ static bool get_args_recursive(recursive_param & rec,
                     throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 		else
 		{
-		    p.aux_filename = new string();
+		    p.aux_filename = new (nothrow) string();
 		    if(p.aux_filename == NULL)
 			throw Ememory("get_args");
 		    try
@@ -2130,7 +2135,7 @@ static void make_args_from_file(user_interaction & dialog, operation op, const v
         argc = mots.size()+1;
 	if(argc < 0)
 	    throw SRC_BUG; // integer overflow occurred
-        argv = new char *[argc];
+        argv = new (nothrow) char *[argc];
         if(argv == NULL)
             throw Ememory("make_args_from_file");
 	for(S_I i = 0; i < argc; ++i)
@@ -2138,7 +2143,7 @@ static void make_args_from_file(user_interaction & dialog, operation op, const v
 
             // adding a fake "dar" word as first argument (= argv[0])
             //
-	char *pseudo_command = new char[strlen(command)+1];
+	char *pseudo_command = new (nothrow) char[strlen(command)+1];
 	if(pseudo_command == NULL)
 	    throw Ememory("make_args_from_file");
         strncpy(pseudo_command, command, strlen(command));
@@ -2336,9 +2341,9 @@ static mask *make_include_exclude_name(const string & x, mask_opt opt)
     mask *ret = NULL;
 
     if(opt.glob_exp)
-	ret = new simple_mask(x, opt.case_sensit);
+	ret = new (nothrow) simple_mask(x, opt.case_sensit);
     else
-	ret = new regular_mask(x, opt.case_sensit);
+	ret = new (nothrow) regular_mask(x, opt.case_sensit);
 
     if(ret == NULL)
         throw Ememory("make_include_exclude_name");
@@ -2350,12 +2355,16 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
 {
     mask *ret = NULL;
     if(opt.file_listing)
-        ret = new mask_list(x, opt.case_sensit, opt.prefix, false);
+    {
+        ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, false);
+	if(ret == NULL)
+	    throw Ememory("make_exclude_path");
+    }
     else // not file listing mask
     {
 	if(opt.glob_exp)
 	{
-	    ou_mask *val = new ou_mask();
+	    ou_mask *val = new (nothrow) ou_mask();
 
 	    if(val == NULL)
 		throw Ememory("make_exclude_path");
@@ -2366,7 +2375,7 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
 	}
 	else // regex
 	{
-  	    ret = new regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
+  	    ret = new (nothrow) regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
 
 	    if(ret == NULL)
 		throw Ememory("make_exclude_path");
@@ -2382,12 +2391,12 @@ static mask *make_exclude_path_unordered(const string & x, mask_opt opt)
     mask *ret = NULL;
 
     if(opt.file_listing)
-        ret = new mask_list(x, opt.case_sensit, opt.prefix, false);
+        ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, false);
     else
 	if(opt.glob_exp)
-	    ret = new simple_mask((opt.prefix + x).display(), opt.case_sensit);
+	    ret = new (nothrow) simple_mask((opt.prefix + x).display(), opt.case_sensit);
 	else
-	    ret = new regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
+	    ret = new (nothrow) regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
     if(ret == NULL)
         throw Ememory("make_exclude_path");
 
@@ -2399,9 +2408,9 @@ static mask *make_include_path(const string & x, mask_opt opt)
     mask *ret = NULL;
 
     if(opt.file_listing)
-        ret = new mask_list(x, opt.case_sensit, opt.prefix, true);
+        ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, true);
     else
-        ret = new simple_path_mask(opt.prefix +x, opt.case_sensit);
+        ret = new (nothrow) simple_path_mask(opt.prefix +x, opt.case_sensit);
     if(ret == NULL)
         throw Ememory("make_include_path");
 
@@ -2440,7 +2449,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
 		    else  // need to create ou_mask
 		    {
   		        tmp_mask = (*make_include_mask)(listing.front().mask, opt);
-			tmp_ou_mask = new ou_mask();
+			tmp_ou_mask = new (nothrow) ou_mask();
 			if(tmp_ou_mask == NULL)
 			    throw Ememory("make_ordered_mask");
 			tmp_ou_mask->add_mask(*ret_mask);
@@ -2456,7 +2465,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
 		if(ret_mask == NULL)
 		{
   		    tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
-		    ret_mask = new not_mask(*tmp_mask);
+		    ret_mask = new (nothrow) not_mask(*tmp_mask);
 		    if(ret_mask == NULL)
 			throw Ememory("make_ordered_mask");
 		    delete tmp_mask;
@@ -2474,7 +2483,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
 		    else // need to create et_mask
 		    {
 		        tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
-			tmp_et_mask = new et_mask();
+			tmp_et_mask = new (nothrow) et_mask();
 			if(tmp_et_mask == NULL)
 			    throw Ememory("make_ordered_mask");
 			tmp_et_mask->add_mask(*ret_mask);
@@ -2491,7 +2500,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
 
 	if(ret_mask == NULL)
 	{
-	    ret_mask = new bool_mask(true);
+	    ret_mask = new (nothrow) bool_mask(true);
 	    if(ret_mask == NULL)
 		throw Ememory("get_args");
 	}
@@ -2526,7 +2535,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
 
 static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include_mask) (const string & x, mask_opt opt), mask *(*make_exclude_mask)(const string & x, mask_opt opt), const path & prefix)
 {
-    et_mask *ret_mask = new et_mask();
+    et_mask *ret_mask = new (nothrow) et_mask();
     ou_mask tmp_include, tmp_exclude;
     mask *tmp_mask = NULL;
     mask_opt opt = prefix;

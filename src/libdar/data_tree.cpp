@@ -39,6 +39,8 @@ extern "C"
 } // end extern "C"
 
 #include <iomanip>
+#include <new>
+
 #include "data_tree.hpp"
 #include "tools.hpp"
 #include "user_interaction.hpp"
@@ -911,9 +913,9 @@ namespace libdar
 	if(fils == NULL) // brand-new data_tree to build
 	{
 	    if(is_dir)
-		ret = new data_dir(name);
+		ret = new (nothrow) data_dir(name);
 	    else
-		ret = new data_tree(name);
+		ret = new (nothrow) data_tree(name);
 	    if(ret == NULL)
 		throw Ememory("data_dir::find_or_addition");
 	    add_child(ret);
@@ -924,7 +926,7 @@ namespace libdar
 	    const data_dir *fils_dir = dynamic_cast<const data_dir *>(fils);
 	    if(fils_dir == NULL && is_dir) // need to upgrade data_tree to data_dir
 	    {
-		ret = new data_dir(*fils); // upgrade data_tree in an empty data_dir
+		ret = new (nothrow) data_dir(*fils); // upgrade data_tree in an empty data_dir
 		if(ret == NULL)
 		    throw Ememory("data_dir::find_or_addition");
 		try
@@ -1338,9 +1340,9 @@ static data_tree *read_from_file(generic_file & f, unsigned char db_version)
         return NULL; // nothing more to read
 
     if(sign == data_tree::signature())
-        ret = new data_tree(f, db_version);
+        ret = new (nothrow) data_tree(f, db_version);
     else if(sign == data_dir::signature())
-        ret = new data_dir(f, db_version);
+        ret = new (nothrow) data_dir(f, db_version);
     else
         throw Erange("read_from_file", gettext("Unknown record type"));
 
