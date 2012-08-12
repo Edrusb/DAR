@@ -272,6 +272,10 @@ namespace libdar
 	    {
 		(*warning_callback)(message + '\n', context_val);
 	    }
+	    catch(Egeneric & e)
+	    {
+		throw Elibcall("user_interaction_callback::warning", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
+	    }
 	    catch(...)
 	    {
 		throw Elibcall("user_interaction_callback::warning", dar_gettext("No exception allowed from libdar callbacks"));
@@ -289,6 +293,10 @@ namespace libdar
 	    {
 		return (*string_callback)(message, echo, context_val);
 	    }
+	    catch(Egeneric & e)
+	    {
+		throw Elibcall("user_interaction_callback::get_string", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
+	    }
 	    catch(...)
 	    {
 		throw Elibcall("user_interaction_callback::get_string", dar_gettext("No exception allowed from libdar callbacks"));
@@ -305,6 +313,10 @@ namespace libdar
 	    try
 	    {
 		return (*secu_string_callback)(message, echo, context_val);
+	    }
+	    catch(Egeneric & e)
+	    {
+		throw Elibcall("user_interaction_callback::get_secu_string", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
 	    }
 	    catch(...)
 	    {
@@ -329,6 +341,10 @@ namespace libdar
 	    {
 		(*tar_listing_callback)(flag, perm, uid, gid, size, date, filename, is_dir, has_children, context_val);
 	    }
+	    catch(Egeneric & e)
+	    {
+		throw Elibcall("user_interaction_callback::listing", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
+	    }
 	    catch(...)
 	    {
 		throw Elibcall("user_interaction_callback::listing", dar_gettext("No exception allowed from libdar callbacks"));
@@ -346,6 +362,10 @@ namespace libdar
 	    {
 		(*dar_manager_show_files_callback)(filename, available_data, available_ea, context_val);
 	    }
+	    catch(Egeneric & e)
+	    {
+		throw Elibcall("user_interaction_callback::dar_manager_show_files", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
+	    }
 	    catch(...)
 	    {
 		throw Elibcall("user_interaction_callback::dar_manager_show_files", dar_gettext("No exception allowed from libdar callbacks"));
@@ -362,6 +382,10 @@ namespace libdar
 	    try
 	    {
 		(*dar_manager_contents_callback)(number, chemin, archive_name, context_val);
+	    }
+	    catch(Egeneric & e)
+	    {
+		throw Elibcall("user_interaction_callback::dar_manager_contents", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
 	    }
 	    catch(...)
 	    {
@@ -382,6 +406,10 @@ namespace libdar
 	    {
 		(*dar_manager_statistics_callback)(number, data_count, total_data, ea_count, total_ea, context_val);
 	    }
+	    catch(Egeneric & e)
+	    {
+		throw Elibcall("user_interaction_callback::dar_manager_statistics", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
+	    }
 	    catch(...)
 	    {
 		throw Elibcall("user_interaction_callback::dar_manager_statistics", dar_gettext("No exception allowed from libdar callbacks"));
@@ -400,6 +428,10 @@ namespace libdar
 	    try
 	    {
 		(*dar_manager_show_version_callback)(number, data_date, data_presence, ea_date, ea_presence, context_val);
+	    }
+	    catch(Egeneric & e)
+	    {
+		throw Elibcall("user_interaction_callback::dar_manager_show_version", string(dar_gettext("No exception allowed from libdar callbacks")) + ": " + e.get_message());
 	    }
 	    catch(...)
 	    {
