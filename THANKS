@@ -1,3 +1,9 @@
+version 2.4.8
+--------------
+Thanks to Fred "Querty" and Jeremy Faith for bug report, and to Mario Metzler
+for bug report and help resolving the reported bug. Last, thanks again to
+Philippe Naudin for improvement suggestion.
+
 version 2.4.7
 --------------
 Thanks to Vladimir Mosgalin (once again) for bug report and proposed fix.

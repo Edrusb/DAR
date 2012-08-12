@@ -1860,7 +1860,7 @@ namespace libdar
 
 		// first we destroy directory's children
 	    while(fils.read(tmp))
-		supprime(ui, ref+tmp);
+		supprime(ui, (path(ref)+tmp).display());
 
 		// then the directory itself
 	    if(rmdir(s) < 0)

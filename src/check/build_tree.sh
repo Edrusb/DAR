@@ -7,6 +7,7 @@ fi
 
 SUB1=S"$2"B
 SUB2=S"$2"B2
+SUB3=S"$2"B3
 
 mkdir "$1"
 cd "$1"
@@ -27,6 +28,15 @@ echo "some chars in the middle of holes" >> sparse.txt
 dd bs=4096 conv=notrunc if=/dev/zero  count=10 >> sparse.txt 2> /dev/null
 cp sparse.txt sparse2.txt
 mkfifo tube1
+cd ..
+
+mkdir "$SUB3"
+cd "$SUB3"
+ln ../plain_file.txt
+mkdir T
+cd T
+touch "another plain file" > titi.txt
+cd ..
 cd ..
 
 ln "$SUB2/sparse2.txt" "hard_linked_sparse.txt"

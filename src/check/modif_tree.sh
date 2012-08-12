@@ -7,6 +7,7 @@ fi
 
 SUB1=S"$2"B
 SUB2=S"$2"B2
+SUB3=S"$2"B3
 
 cd "$1"
 
@@ -19,6 +20,8 @@ cd "$SUB2"
 rm -f symlink.txt
 rm -f tube1
 cd ..
+
+rm -rf "$SUB3"
 
 cd "$SUB1"
 rm  blockdev
