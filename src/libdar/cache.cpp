@@ -49,6 +49,8 @@ char *strchr (), *strrchr ();
 # endif
 #endif
 
+#define MAX_BUFFER_SIZE 10485760
+
 }
 
 #include <new>
@@ -387,6 +389,8 @@ namespace libdar
 	    if(stat_write_overused*100 > write_overused_rate*stat_write_counter) // need to increase the cache
 	    {
 		U_I tmp = buffer_cache.size * 2;
+		if(tmp > MAX_BUFFER_SIZE)
+		    tmp = MAX_BUFFER_SIZE;
 		if(buffer_cache.size < tmp && (max_alloc_size == 0 || tmp < max_alloc_size) )
 		{
 		    delete [] buffer_cache.buffer;
@@ -406,25 +410,11 @@ namespace libdar
 		}
 		    // else nothing is done, as we cannot get a larger buffer
 	    }
-	    else
-		if((stat_write_counter - stat_write_overused)*100 < write_unused_rate*stat_write_counter) // need to decrease the cache
-		{
-		    U_I tmp = buffer_cache.size / 2;
-		    if(tmp < buffer_cache.size && tmp > 0)
-		    {
-			delete [] buffer_cache.buffer;
-			buffer_cache.buffer = new (nothrow) char[buffer_cache.size];
-			if(buffer_cache.buffer == NULL)
-			{
-			    buffer_cache.size = 0;
-			    throw Ememory("cache::flush_write");
-			}
-			else
-			    buffer_cache.size = tmp;
-		    }
-			// else nothing is done, as we cannot have a smaller buffer
-		}
-		// else we keep the same cache size
+		// we no more try to reduce the cache size
+		// the reason is to avoid unnecessary memory allocation and release
+		// as the cache size is bounded by a maximum, we are ready to pay
+		// the penalty of wasted memory to gain some CPU cycles
+
 	    stat_write_overused = 0;
 	    stat_write_counter = 0;
 	}
@@ -468,7 +458,7 @@ namespace libdar
 #ifdef SSIZE_MAX
 		    if(tmp <= SSIZE_MAX && buffer_cache.size < tmp)
 #else
-		    if(buffer_cache.size < tmp)
+		    if(tmp <= MAX_BUFFER_SIZE && buffer_cache.size < tmp)
 #endif
 		    {
 			try
@@ -486,16 +476,10 @@ namespace libdar
 		    }
 		}
 	    }
-	    else
-		if(stat_read_unused * 100 < read_unused_rate * stat_read_counter) // need to decrease cache size
-		{
-		    U_I tmp = 2 * buffer_cache.size / 3;
-		    if(tmp < buffer_cache.size && tmp > 0 && tmp > buffer_cache.last) // so we have enough room in the new buffer for in place data
-			buffer_cache.resize(tmp);
-			// else nothing is done, as we cannot get a smaller buffer
-		    failed_increase = false;
-		}
-		// else the cache size does not need to be changed
+		// we no more try to reduce the cache size
+		// the reason is to avoid unnecessary memory allocation and release
+		// as the cache size is bounded by a maximum, we are ready to pay
+		// the penalty of wasted memory to gain some CPU cycles
 	    stat_read_counter = 0;
 	    stat_read_unused = 0;
 	    stat_read_overused = 0;
