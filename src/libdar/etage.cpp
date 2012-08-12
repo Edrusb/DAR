@@ -70,6 +70,8 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include <new>
+
 #include "etage.hpp"
 #include "tools.hpp"
 #include "infinint.hpp"
@@ -194,7 +196,7 @@ namespace libdar
 	    path chem = path(cpath)+string(filename);
 	    fichier fic = fichier(dialog, chem.display(), gf_read_only, tools_octal2int("0777"), false);
 	    U_I len = strlen(CACHE_DIR_TAG_FILENAME_CONTENTS);
-	    char *buffer = new char[len+1];
+	    char *buffer = new (nothrow) char[len+1];
 	    S_I lu;
 
 	    if(buffer == NULL)

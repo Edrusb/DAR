@@ -20,8 +20,11 @@
 /*********************************************************************/
 
 #include "../my_config.h"
+
 #include <string>
 #include <iostream>
+#include <new>
+
 #include "erreurs.hpp"
 #include "user_interaction.hpp"
 #include "command_line.hpp"
@@ -125,8 +128,10 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 			else
 			    read_options.set_sequential_read(true);
 		    }
-		    arch = new archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
+		    arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
 				       read_options);
+		    if(arch == NULL)
+			throw Ememory("little_main");
 		}
 
 		if(param.aux_root != NULL && param.aux_filename != NULL)
@@ -147,8 +152,10 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 			read_options.set_slice_min_digits(param.aux_num_digits);
 			if(param.sequential_read)
 			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
-			aux = new archive(dialog, *param.aux_root, *param.aux_filename, EXTENSION,
+			aux = new (nothrow) archive(dialog, *param.aux_root, *param.aux_filename, EXTENSION,
 					  read_options);
+			if(aux == NULL)
+			    throw Ememory("little_main");
 		    }
 		}
 
@@ -204,9 +211,11 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    if(param.backup_hook_mask != NULL)
 			create_options.set_backup_hook(param.backup_hook_execute, *param.backup_hook_mask);
 		    create_options.set_ignore_unknown_inode_type(param.ignore_unknown_inode);
-		    cur = new archive(dialog, *param.fs_root, *param.sauv_root, param.filename, EXTENSION,
+		    cur = new (nothrow) archive(dialog, *param.fs_root, *param.sauv_root, param.filename, EXTENSION,
 				      create_options,
 				      &st);
+		    if(cur == NULL)
+			throw Ememory("little_main");
 		    if(!param.quiet)
 			display_sauv_stat(dialog, st);
 		    break;
@@ -243,13 +252,15 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    merge_options.set_user_comment(param.user_comment);
 		    merge_options.set_hash_algo(param.hash);
 		    merge_options.set_slice_min_digits(param.num_digits);
-		    cur = new archive(dialog,            // user_interaction &
+		    cur = new (nothrow) archive(dialog,            // user_interaction &
 				      *param.sauv_root,  //const path &
 				      arch,              // archive *
 				      param.filename,    // const string &
 				      EXTENSION,         // const string &
 				      merge_options,
 				      &st);              // statistics*
+		    if(cur == NULL)
+			throw Ememory("little_main");
 		    if(!param.quiet)
 			display_merge_stat(dialog, st);
 		    break;
@@ -316,8 +327,10 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 			isolate_options.set_slice_min_digits(param.aux_num_digits);
 			isolate_options.set_user_comment(param.user_comment);
 			isolate_options.set_sequential_marks(param.use_sequential_marks);
-			arch = new archive(dialog, *param.aux_root, cur, *param.aux_filename, EXTENSION,
+			arch = new (nothrow) archive(dialog, *param.aux_root, cur, *param.aux_filename, EXTENSION,
 					   isolate_options);
+			if(arch == NULL)
+			    throw Ememory("little_main");
 		    }
 		}
 		break;
@@ -333,7 +346,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		read_options.set_info_details(param.info_details);
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.ref_num_digits);
-		arch = new archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
+		arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
 				   read_options);
 		if(arch == NULL)
 		    throw Ememory("little_main");
@@ -361,8 +374,10 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		isolate_options.set_hash_algo(param.hash);
 		isolate_options.set_slice_min_digits(param.num_digits);
 		isolate_options.set_sequential_marks(param.use_sequential_marks);
-                cur = new archive(dialog, *param.sauv_root, arch, param.filename, EXTENSION,
+                cur = new (nothrow) archive(dialog, *param.sauv_root, arch, param.filename, EXTENSION,
 				  isolate_options);
+		if(cur == NULL)
+		    throw Ememory("little_main");
                 break;
             case extract:
 		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
@@ -392,11 +407,13 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
 		}
 
-		arch = new archive(dialog,
+		arch = new (nothrow) archive(dialog,
 				   *param.sauv_root,
 				   param.filename,
 				   EXTENSION,
 				   read_options);
+		if(arch == NULL)
+		    throw Ememory("little_main");
 
 		extract_options.clear();
 		extract_options.set_selection(*param.selection);
@@ -470,11 +487,13 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    read_options.set_ref_execute(param.execute_ref);
 		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
 		}
-		arch = new archive(dialog,
+		arch = new (nothrow) archive(dialog,
 				   *param.sauv_root,
 				   param.filename,
 				   EXTENSION,
 				   read_options);
+		if(arch == NULL)
+		    throw Ememory("little_main");
 
 		diff_options.clear();
 		diff_options.set_selection(*param.selection);
@@ -522,11 +541,13 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    read_options.set_ref_execute(param.execute_ref);
 		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
 		}
-		arch = new archive(dialog,
+		arch = new (nothrow) archive(dialog,
 				   *param.sauv_root,
 				   param.filename,
 				   EXTENSION,
 				   read_options);
+		if(arch == NULL)
+		    throw Ememory("little_main");
 
 		test_options.clear();
 		test_options.set_selection(*param.selection);
@@ -555,11 +576,13 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
 
-		arch = new archive(dialog,
+		arch = new (nothrow) archive(dialog,
 				   *param.sauv_root,
 				   param.filename,
 				   EXTENSION,
 				   read_options);
+		if(arch == NULL)
+		    throw Ememory("little_main");
 
 		if(param.quiet)
 		    arch->summary(dialog);

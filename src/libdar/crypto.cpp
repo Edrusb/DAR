@@ -46,6 +46,8 @@ char *strchr (), *strrchr ();
 #endif
 }
 
+#include <new>
+
 #include "crypto.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
@@ -313,7 +315,7 @@ namespace libdar
 	infinint tmp;
 	gcry_error_t err;
 
-	sect = new unsigned char[size];
+	sect = new (nothrow) unsigned char[size];
 	if(sect == NULL)
 	    throw Ememory("crypto_sym::make_ivec");
 

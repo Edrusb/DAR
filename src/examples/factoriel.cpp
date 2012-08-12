@@ -112,11 +112,5 @@ static int little_main(user_interaction & ui, int argc, char * const argv[], con
 	}
     }
 
-    infinint *tmp;
-    {
-	tmp = new infinint(19237);
-	delete tmp;
-    }
-
     return EXIT_OK;
 }

@@ -47,10 +47,14 @@ char *strchr (), *strrchr ();
 
 } // end of extern "C"
 
+#include <new>
+
 #include "storage.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "integers.hpp"
+
+using namespace std;
 
 namespace libdar
 {
@@ -282,7 +286,7 @@ namespace libdar
             {
                 if(it.offset > 0)
                 {
-                    unsigned char *p = new unsigned char[it.offset];
+                    unsigned char *p = new (nothrow) unsigned char[it.offset];
 
                     if(p != NULL)
                     {
@@ -321,7 +325,7 @@ namespace libdar
             }
             else // can_rem >= number
             {
-                unsigned char *p = new unsigned char[it.cell->size - number];
+                unsigned char *p = new (nothrow) unsigned char[it.cell->size - number];
 
                 if(p != NULL)
                 {
@@ -462,7 +466,7 @@ namespace libdar
 
                 if(somme < failed_alloc)
                 {
-                    unsigned char *p = new unsigned char[somme];
+                    unsigned char *p = new (nothrow) unsigned char[somme];
 
                     if(p != NULL)
                     {
@@ -624,7 +628,7 @@ namespace libdar
 	{
 	    do
 	    {
-		newone = new struct cellule;
+		newone = new (nothrow) struct cellule;
 		if(newone != NULL)
 		{
 		    newone->prev = previous;
@@ -643,7 +647,7 @@ namespace libdar
 
 		do
 		{
-		    newone->data = new unsigned char[dsize];
+		    newone->data = new (nothrow) unsigned char[dsize];
 		    if(newone->data != NULL)
 		    {
 			size -= dsize;

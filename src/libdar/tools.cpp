@@ -119,6 +119,8 @@ extern "C"
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <new>
+
 #include "nls_swap.hpp"
 #include "tools.hpp"
 #include "erreurs.hpp"
@@ -161,7 +163,7 @@ namespace libdar
 #ifdef __DYNAMIC__
 	if(user_group == NULL)
 	{
-	    user_group = new user_group_bases();
+	    user_group = new (nothrow) user_group_bases();
 	    if(user_group == NULL)
 		throw Ememory("tools_init");
 	}
@@ -183,7 +185,7 @@ namespace libdar
     char *tools_str2charptr(const string &x)
     {
         U_I size = x.size();
-        char *ret = new char[size+1];
+        char *ret = new (nothrow) char[size+1];
 
         if(ret == NULL)
             throw Ememory("tools_str2charptr");
@@ -362,12 +364,12 @@ namespace libdar
 	if(it != src.end()) // path separator found (pointed to by "it")
 	{
 	    base = string(it + 1, src.end());
-	    chemin = new path(string(src.begin(), it), true);
+	    chemin = new (nothrow) path(string(src.begin(), it), true);
 	}
 	else
 	{
 	    base = src;
-	    chemin = new path(".");
+	    chemin = new (nothrow) path(".");
 	}
 
 	if(chemin == NULL)
@@ -391,16 +393,16 @@ namespace libdar
         try
         {
             if(input != "")
-                in = new tuyau(dialog, input, gf_read_only);
+                in = new (nothrow) tuyau(dialog, input, gf_read_only);
             else
-                in = new tuyau(dialog, 0, gf_read_only); // stdin by default
+                in = new (nothrow) tuyau(dialog, 0, gf_read_only); // stdin by default
             if(in == NULL)
                 throw Ememory("tools_open_pipes");
 
             if(output != "")
-                out = new tuyau(dialog, output, gf_write_only);
+                out = new (nothrow) tuyau(dialog, output, gf_write_only);
             else
-                out = new tuyau(dialog, 1, gf_write_only); // stdout by default
+                out = new (nothrow) tuyau(dialog, 1, gf_write_only); // stdout by default
             if(out == NULL)
                 throw Ememory("tools_open_pipes");
 
@@ -747,7 +749,7 @@ namespace libdar
             return; // nothing to do
 
 	    // ISO C++ forbids variable-size array
-	char **argv = new char * [argvector.size()+1];
+	char **argv = new (nothrow) char * [argvector.size()+1];
 
 	for(register U_I i = 0; i <= argvector.size(); i++)
 	    argv[i] = NULL;
@@ -839,7 +841,7 @@ namespace libdar
 
 	    try
 	    {
-		tube = new tuyau(dialog);
+		tube = new (nothrow) tuyau(dialog);
 		if(tube == NULL)
 		    throw Ememory("tools_system_with_pipe");
 
@@ -1144,7 +1146,7 @@ namespace libdar
 	{
 	    do
 	    {
-		buffer = new char[length];
+		buffer = new (nothrow) char[length];
 		if(buffer == NULL)
 		    throw Ememory("tools_getcwd()");
 		ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
@@ -1192,7 +1194,7 @@ namespace libdar
 	{
 	    do
 	    {
-		buffer = new char[length];
+		buffer = new (nothrow) char[length];
 		if(buffer == NULL)
 		    throw Ememory("tools_readlink");
 		lu = readlink(root, buffer, length-1); // length-1 to have room to add '\0' at the end
@@ -1454,7 +1456,7 @@ namespace libdar
 
         U_I test;
 
-        copie = new char[taille];
+        copie = new (nothrow) char[taille];
         if(copie == NULL)
             throw Ememory("tools_printf");
         try
@@ -1583,7 +1585,7 @@ namespace libdar
     void tools_add_elastic_buffer(generic_file & f, U_32 max_size)
     {
         elastic tic = 1 + tools_pseudo_random(max_size); // range from 1 to max_size
-        char *buffer = new char[max_size];
+        char *buffer = new (nothrow) char[max_size];
 
 	if(buffer == NULL)
 	    throw Ememory("tools_add_elastic_buffer");
@@ -1940,7 +1942,7 @@ namespace libdar
     static string tools_make_word(generic_file &fic, off_t start, off_t end)
     {
 	off_t longueur = end - start + 1;
-	char *tmp = new char[longueur+1];
+	char *tmp = new (nothrow) char[longueur+1];
 	string ret;
 
 	if(tmp == NULL)

@@ -39,6 +39,8 @@ extern "C"
 } // end extern "C"
 
 #include <string>
+#include <new>
+
 #include "zapette.hpp"
 #include "infinint.hpp"
 #include "tools.hpp"
@@ -231,7 +233,7 @@ namespace libdar
                         {
                             if(buffer != NULL)
                                 delete [] buffer;
-                            buffer = new char[req.size];
+                            buffer = new (nothrow) char[req.size];
                             if(buffer == NULL)
                                 throw Ememory("slave_zapette::action");
                             else

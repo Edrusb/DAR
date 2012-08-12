@@ -105,6 +105,8 @@ char *strchr (), *strrchr ();
 
 } // end extern "C"
 
+#include <new>
+
 #include "sar.hpp"
 #include "deci.hpp"
 #include "user_interaction.hpp"
@@ -622,7 +624,7 @@ namespace libdar
 	    }
             else
 	    {
-                of_fd = new fichier(get_ui(), fd);
+                of_fd = new (nothrow) fichier(get_ui(), fd);
 		if(of_fd == NULL)
 		    throw Ememory("sar::open_readonly");
 		size_of_current = of_fd->get_size();
@@ -985,13 +987,13 @@ namespace libdar
 
 		if(hash == hash_none)
 		{
-		    of_fd = new fichier(get_ui(), fd);
+		    of_fd = new (nothrow) fichier(get_ui(), fd);
 		    fd = -1;
 		}
 		else
 		{
 		    hash_fichier *tmp;
-		    of_fd = tmp = new hash_fichier(get_ui(), fd);
+		    of_fd = tmp = new (nothrow) hash_fichier(get_ui(), fd);
 		    fd = -1;
 		    if(tmp != NULL)
 		    {
@@ -1397,11 +1399,11 @@ namespace libdar
 	{
 	    tools_set_ownership(fd, slice_user_ownership, slice_group_ownership);
 	    if(x_hash == hash_none)
-		tmp = new fichier(dialog, fd);
+		tmp = new (nothrow) fichier(dialog, fd);
 	    else
 	    {
 		hash_fichier *tmp_hash;
-		tmp = tmp_hash = new hash_fichier(dialog, fd);
+		tmp = tmp_hash = new (nothrow) hash_fichier(dialog, fd);
 		if(tmp_hash != NULL)
 		{
 		    tmp_hash->set_hash_file_name(name, x_hash, hash_algo_to_string(x_hash));
@@ -1450,9 +1452,9 @@ namespace libdar
 	try
 	{
 	    if(pipename == "-")
-		reference = new tuyau(dialog, 0);
+		reference = new (nothrow) tuyau(dialog, 0);
 	    else
-		reference = new tuyau(dialog, pipename, gf_read_only);
+		reference = new (nothrow) tuyau(dialog, pipename, gf_read_only);
 
 	    if(reference == NULL)
 		throw Ememory("trivial_sar::trivial_sar");

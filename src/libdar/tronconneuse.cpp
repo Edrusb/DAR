@@ -46,6 +46,8 @@ char *strchr (), *strrchr ();
 #endif
 }
 
+#include <new>
+
 #include "tronconneuse.hpp"
 #include "tools.hpp"
 
@@ -264,7 +266,7 @@ namespace libdar
 	    buf_offset = ref.buf_offset;
 	    buf_byte_data = ref.buf_byte_data;
 	    buf_size = ref.buf_size;
-	    buf = new char[buf_size];
+	    buf = new (nothrow) char[buf_size];
 	    if(buf == NULL)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(buf, ref.buf, buf_byte_data);
@@ -276,7 +278,7 @@ namespace libdar
 		// objets share the same generic_file reference
 
 	    encrypted_buf_size = ref.encrypted_buf_size;
-	    encrypted_buf = new char[encrypted_buf_size];
+	    encrypted_buf = new (nothrow) char[encrypted_buf_size];
 	    if(encrypted_buf == NULL)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(encrypted_buf, ref.encrypted_buf, encrypted_buf_size);
@@ -417,7 +419,7 @@ namespace libdar
 	if(encrypted_buf == NULL)
 	{
 	    encrypted_buf_size = encrypted_block_size_for(clear_block_size);
-	    encrypted_buf = new char[encrypted_buf_size];
+	    encrypted_buf = new (nothrow) char[encrypted_buf_size];
 	    if(encrypted_buf == NULL)
 	    {
 		encrypted_buf_size = 0;
@@ -429,7 +431,7 @@ namespace libdar
 	    buf_size = clear_block_allocated_size_for(clear_block_size);
 	    if(buf_size < clear_block_size)
 		throw SRC_BUG; // buf_size must be larger than or equal to clear_block_size
-	    buf = new char[buf_size];
+	    buf = new (nothrow) char[buf_size];
 	    if(buf == NULL)
 	    {
 		buf_size = 0;

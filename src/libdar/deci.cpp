@@ -67,7 +67,7 @@ namespace libdar
 	    bool recule = false;
 	    unsigned char tmp;
 
-	    decimales = new storage(PAS);
+	    decimales = new (nothrow) storage(PAS);
 	    if(decimales == NULL)
 		throw Ememory("template deci::decicoupe");
 
@@ -131,7 +131,7 @@ namespace libdar
 	    if(size == 0) // empty string
 		throw Erange("deci::deci(string s)", gettext("an empty string is an invalid argument"));
 
-	    decimales = new storage(size);
+	    decimales = new (nothrow) storage(size);
 	    if(decimales == NULL)
 		throw Ememory("deci::deci(string s)");
 	    decimales->clear(0xFF); // FF is not a valid couple of decimal digit
@@ -189,7 +189,7 @@ namespace libdar
         if(decimales != NULL)
             throw SRC_BUG;
 
-        decimales = new storage(*ref.decimales);
+        decimales = new (nothrow) storage(*ref.decimales);
 	if(decimales == NULL)
 	    throw SRC_BUG;
     }
