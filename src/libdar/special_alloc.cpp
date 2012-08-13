@@ -193,7 +193,7 @@ namespace libdar
 
 	U_I find_free_slot_in(U_I table_integer) const;
 	void set_slot_in(U_I table_integer, U_I bit_offset, bool value);
-	void examination_status(ostream & output) const; // debugging, displays the list of unallocated blocks
+	void examination_status(ostream & output) const; // debugging, displays the list of allocated blocks that remain
     };
 
 	//////////////////////////////////////////////
@@ -418,8 +418,8 @@ namespace libdar
 	output << "         block_size           = " << block_size << endl;
 	output << "         available_blocks      = " <<  available_blocks << endl;
 	output << "         max_available_blocks = " << max_available_blocks << endl;
-	output << "         which makes " << counted << " unallocated block(s)" << endl;
-	output << "         Follows list of unallocated blocks : " << endl;
+	output << "         which makes " << counted << " unreleased block(s)" << endl;
+	output << "         Follows the list of unreleased blocks for that cluster: " << endl;
 	examination_status(output);
 	output << endl << endl;
     }
@@ -433,7 +433,7 @@ namespace libdar
 	    for(U_I offset = 0; offset < 64; ++offset)
 	    {
 		if((alloc_table[table_ptr] & mask) != 0)
-		    output << "                 unallocated memory (" << block_size << ") at: 0x" << hex << (U_I)(alloc_area + block_size * ( 64 * table_ptr + offset)) << dec << endl;
+		    output << "                 unreleased memory (" << block_size << " bytes) at: 0x" << hex << (U_I)(alloc_area + block_size * ( 64 * table_ptr + offset)) << dec << endl;
 		mask >>= 1;
 	    }
 	}
@@ -581,7 +581,7 @@ namespace libdar
     void sized::dump(ostream & output) const
     {
 	list<cluster *>::const_iterator it = clusters.begin();
-	output << "   this sized object bytes blocks contains " << clusters.size() << " clusters among which the following are not empty" << endl;
+	output << "   " << clusters.size() << " cluster(s) contain unreleased blocks of memory:" << endl;
 
 	while(it != clusters.end())
 	{
@@ -609,7 +609,7 @@ namespace libdar
 	    ++tmp_num;
 	}
 
-	return tmp_sum / tmp_num;
+	return tmp_num > 0 ? tmp_sum / tmp_num : 0;
     }
 #endif
 

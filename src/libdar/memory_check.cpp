@@ -188,7 +188,17 @@ void operator delete (void * p) throw()
     desalloc(p);
 }
 
+void operator delete (void * p, const std::nothrow_t& nothrow_constant) throw()
+{
+    desalloc(p);
+}
+
 void operator delete[] (void * p) throw()
+{
+    desalloc(p);
+}
+
+void operator delete[] (void * p, const std::nothrow_t& nothrow_constant) throw()
 {
     desalloc(p);
 }

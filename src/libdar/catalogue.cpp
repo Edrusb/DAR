@@ -2055,78 +2055,109 @@ namespace libdar
         if(status == empty)
             throw Erange("file::get_data", gettext("data has been cleaned, object is now empty"));
 
-        if(status == from_path)
-        {
-            if(mode != normal && mode != plain)
-                throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
-            ret = new (nothrow) fichier(chemin, furtive_read_mode);
-        }
-        else // inode from archive
-            if(loc == NULL)
-                throw SRC_BUG; // set_archive_localisation never called or with a bad argument
-            else
-                if(loc->get_mode() == gf_write_only)
-                    throw SRC_BUG; // cannot get data from a write-only file !!!
-                else
-                {
-                    pile *data = new (nothrow) pile();
-                    if(data == NULL)
-                        throw Ememory("file::get_data");
+	try
+	{
+	    if(status == from_path)
+	    {
+		if(mode != normal && mode != plain)
+		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
+		ret = new (nothrow) fichier(chemin, furtive_read_mode);
+	    }
+	    else // inode from archive
+		if(loc == NULL)
+		    throw SRC_BUG; // set_archive_localisation never called or with a bad argument
+		else
+		    if(loc->get_mode() == gf_write_only)
+			throw SRC_BUG; // cannot get data from a write-only file !!!
+		    else
+		    {
+			pile *data = new (nothrow) pile();
+			if(data == NULL)
+			    throw Ememory("file::get_data");
 
-                    try
-                    {
-                        generic_file *tmp;
+			try
+			{
+			    generic_file *tmp;
 
-                        if(get_escape_layer() == NULL)
-                            tmp = new (nothrow) tronc(loc, *offset, *storage_size, gf_read_only);
-                        else
-                            tmp = new (nothrow) tronc(get_escape_layer(), *offset, gf_read_only);
-                        if(tmp == NULL)
-                            throw Ememory("file::get_data");
-                        else
-                        {
-                            data->push(tmp);
-                            data->skip(0); // set the reading cursor at the beginning
-                        }
+			    if(get_escape_layer() == NULL)
+				tmp = new (nothrow) tronc(loc, *offset, *storage_size, gf_read_only);
+			    else
+				tmp = new (nothrow) tronc(get_escape_layer(), *offset, gf_read_only);
+			    if(tmp == NULL)
+				throw Ememory("file::get_data");
+			    try
+			    {
+				data->push(tmp);
+			    }
+			    catch(...)
+			    {
+				delete tmp;
+				throw;
+			    }
+			    data->skip(0); // set the reading cursor at the beginning
 
-                        if(*size > 0 && get_compression_algo_read() != none && mode != keep_compressed)
-                        {
-                            tmp = new (nothrow) compressor(get_compression_algo_read(), *data->top());
-                            if(tmp == NULL)
-                                throw Ememory("file::get_data");
-                            data->push(tmp);
-                        }
+			    if(*size > 0 && get_compression_algo_read() != none && mode != keep_compressed)
+			    {
+				tmp = new (nothrow) compressor(get_compression_algo_read(), *data->top());
+				if(tmp == NULL)
+				    throw Ememory("file::get_data");
+				try
+				{
+				    data->push(tmp);
+				}
+				catch(...)
+				{
+				    delete tmp;
+				    throw;
+				}
+			    }
 
-                        if(get_sparse_file_detection_read() && mode != keep_compressed && mode != keep_hole)
-                        {
-                            sparse_file *stmp = new (nothrow) sparse_file(data->top());
-                            if(stmp == NULL)
-                                throw Ememory("file::get_data");
-                            data->push(stmp);
+			    if(get_sparse_file_detection_read() && mode != keep_compressed && mode != keep_hole)
+			    {
+				sparse_file *stmp = new (nothrow) sparse_file(data->top());
+				if(stmp == NULL)
+				    throw Ememory("file::get_data");
+				try
+				{
+				    data->push(stmp);
+				}
+				catch(...)
+				{
+				    delete stmp;
+				    throw;
+				}
 
-                            switch(mode)
-                            {
-                            case keep_compressed:
-                            case keep_hole:
-                                throw SRC_BUG;
-                            case normal:
-                                break;
-                            case plain:
-                                stmp->copy_to_without_skip(true);
-                                break;
-                            default:
-                                throw SRC_BUG;
-                            }
-                        }
+				switch(mode)
+				{
+				case keep_compressed:
+				case keep_hole:
+				    throw SRC_BUG;
+				case normal:
+				    break;
+				case plain:
+				    stmp->copy_to_without_skip(true);
+				    break;
+				default:
+				    throw SRC_BUG;
+				}
+			    }
 
-                        ret = data;
-                    }
-                    catch(...)
-                    {
-                        delete data;
-                        throw;
-                    }
-                }
+			    ret = data;
+			}
+			catch(...)
+			{
+			    delete data;
+			    throw;
+			}
+		    }
+	}
+	catch(...)
+	{
+	    if(ret != NULL)
+		delete ret;
+	    ret = NULL;
+	    throw;
+	}
 
         if(ret == NULL)
             throw Ememory("file::get_data");
