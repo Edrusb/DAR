@@ -94,6 +94,7 @@ namespace libdar
 	    /// \param[in] slice_group_ownership new slices' gid (empty string for default behavior)
 	    /// \param[in] x_hash defines whether a hash file has to be generated for each slice, and wich hash algorithm to use
 	    /// \param[in] x_min_digits is the minimum number of digits the slices number is stored with in the filename
+	    /// \param[in] format_07_compatible when set to true, creates a slice header in the archive format of version 7 instead of the highest version known
 	    /// \param[in] execute is the command to execute after each slice creation (once it is completed)
 	    /// \note if the data_name is set to "label_clear()" value, the data_name's value will be
 	    /// equal to the internal_name (which is the most common situation, met when creating a new archive)
