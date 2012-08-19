@@ -802,7 +802,7 @@ if [ "$static_pb" = "yes" -a "$build_static" = "yes" ]; then
    echo "    should bring you to the essentials."
    echo ""
    echo "You also might want to speed up the compilation process running ./configure"
-   echo "with the --disable-shared option"
+   echo "with the --disable-static option"
    echo ""
 fi
 
