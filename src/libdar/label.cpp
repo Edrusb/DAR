@@ -130,7 +130,7 @@ namespace libdar
 
     void label::copy_from(const label & ref)
     {
-	bcopy(ref.val, val, LABEL_SIZE);
+	(void)memcpy(val, ref.val, LABEL_SIZE);
     }
 
     const label label_zero;
