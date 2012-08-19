@@ -171,11 +171,11 @@ namespace libdar
 	    U_I partial_cursor = 0;
 
 		// But we cannot use optimized method on some systems if we are not aligned to the size boundary
-	    if(crc_size % 8 == 0 && (U_64)(buffer + cursor) % 8 == 0)
+	    if(crc_size % 8 == 0 && (U_I)(buffer + cursor) % 8 == 0)
 		B_compute_block(U_64(0), buffer + cursor, length - cursor, begin, pointer, end, partial_cursor);
-	    else if(crc_size % 4 == 0 && (U_64)(buffer + cursor) % 4 == 0)
+	    else if(crc_size % 4 == 0 && (U_I)(buffer + cursor) % 4 == 0)
 		B_compute_block(U_32(0), buffer + cursor, length - cursor, begin, pointer, end, partial_cursor);
-	    else if(crc_size % 2 == 0 && (U_64)(buffer + cursor) % 2 == 0)
+	    else if(crc_size % 2 == 0 && (U_I)(buffer + cursor) % 2 == 0)
 		B_compute_block(U_16(0), buffer + cursor, length - cursor, begin, pointer, end, partial_cursor);
 		/// warning, adding a new type here need modifying crc_n::alloc() to provide aligned crc storage
 
