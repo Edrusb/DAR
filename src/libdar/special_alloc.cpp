@@ -569,8 +569,8 @@ namespace libdar
 
 	    if(it == clusters.end())
 		throw SRC_BUG; // cannot release previously recorded cluster
-//	    if(it == next_free_in_table)
-//		++next_free_in_table;
+	    if(it == next_free_in_table)
+		++next_free_in_table;
 	    delete pending_release;
 	    pending_release = NULL;
 	    clusters.erase(it);
