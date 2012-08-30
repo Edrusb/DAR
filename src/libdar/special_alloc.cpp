@@ -226,7 +226,7 @@ namespace libdar
 
 
 	//////////////////////////////////////////////
-	//  global_alloc class implementation
+	//  zone class implementation
 	//
 
     void zone::record_me(void *ptr, U_I allocated)
@@ -277,7 +277,7 @@ namespace libdar
 
     cluster::cluster(U_I x_block_size, U_I table_size_64, sized *x_holder)
     {
-	block_size = x_block_size;
+	block_size = x_block_size > 0 ? x_block_size : 1; // trivial case of zero handled by 1 byte length pointed areas
 	alloc_table_size = table_size_64;
 	next_free_in_table = 0;
 	max_available_blocks = table_size_64 * 64;
@@ -447,7 +447,14 @@ namespace libdar
     {
 	cluster * tmp = NULL;
 
-	table_size_64 = average_table_size / (64 * block_size) + 1;
+	if(block_size > 0)
+	{
+	    table_size_64 = average_table_size / (64 * block_size) + 1;
+	    if(table_size_64 < 1)
+		table_size_64 = 1;
+	}
+	else
+	    table_size_64 = 1;
 	pending_release = NULL;
 #ifdef LIBDAR_DEBUG_MEMORY
 	sum_percent = 0;
@@ -563,6 +570,8 @@ namespace libdar
 
 	    if(it == clusters.end())
 		throw SRC_BUG; // cannot release previously recorded cluster
+	    if(it == next_free_in_table)
+		++next_free_in_table;
 	    delete pending_release;
 	    pending_release = NULL;
 	    clusters.erase(it);
@@ -822,22 +831,26 @@ namespace libdar
     void special_alloc_garbage_collect(ostream & output)
     {
 #ifdef MUTEX_WORKS
-#ifdef LIBDAR_DEBUG_MEMORY
-	main_alloc.max_percent_full(output);
-#endif
-	main_alloc.garbage_collect();
 
-// testing whether all memory blocks are released
-// was disabled when compiler optimization was used
-// because it lead to 'false positive', but in fact
-// the 'false positive' was due to a bug (bug found by Andreas Wolff on Cygwin)
-// thus we re-enable the systematic control of proper memory release
-// by precaution we do not totally remove the possibility to disable it
-// when compiler optimization is activated.
-// #ifdef LIBDAR_NO_OPTIMIZATION
-	if(!main_alloc.is_empty())
-	    main_alloc.dump(output);
-// #endif
+	CRITICAL_START;
+
+	try
+	{
+#ifdef LIBDAR_DEBUG_MEMORY
+	    main_alloc.max_percent_full(output);
+#endif
+	    main_alloc.garbage_collect();
+
+	    if(!main_alloc.is_empty())
+		main_alloc.dump(output);
+	}
+	catch(...)
+	{
+	    CRITICAL_END;
+	    throw;
+	}
+
+	CRITICAL_END;
 #endif
     }
 
