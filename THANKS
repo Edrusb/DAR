@@ -3,7 +3,7 @@ version 2.4.8
 Thanks to Mario for help investigating the reason of strange messages reported
 by libdar whe virtual memory is exhausted. Thanks to Fred "Querty" (aka Richard)
 and Jeremy Faith for bugs report, and to Mario Metzler for bug report and help
-resolving the reported bug. Last, thanks again to Philippe Naudin for
+resolving the reported bug. Last, thanks again to Philippe Naudin this time for
 improvement suggestion.
 
 version 2.4.7
