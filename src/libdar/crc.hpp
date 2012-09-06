@@ -30,6 +30,7 @@
 
 #include <string>
 #include <list>
+#include <new>
 
 #include "integers.hpp"
 #include "storage.hpp"
@@ -86,7 +87,7 @@ namespace libdar
 
 
     protected:
-	crc *clone() const { return new crc_i(*this); };
+	crc *clone() const { return new (std::nothrow) crc_i(*this); };
 
     private:
 
@@ -123,7 +124,7 @@ namespace libdar
 #endif
 
     protected:
-	crc *clone() const { return new crc_n(*this); };
+	crc *clone() const { return new (std::nothrow) crc_n(*this); };
 
     private:
 

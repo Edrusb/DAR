@@ -28,6 +28,8 @@ extern "C"
 #endif
 }
 
+#include <new>
+
 #include "line_tools.hpp"
 #include "deci.hpp"
 #include "erreurs.hpp"
@@ -45,7 +47,7 @@ argc_argv::argc_argv(S_I size)
     x_argc = size;
     if(x_argc > 0)
     {
-	x_argv = new char *[size];
+	x_argv = new (nothrow) char *[size];
 	if(x_argv == NULL)
 	    throw Ememory("argc_argv::argc_argv");
 
@@ -83,7 +85,7 @@ void argc_argv::set_arg(const string & arg, S_I index)
 	x_argv[index] = NULL;
     }
 
-    x_argv[index] = new char[arg.size() + 1];
+    x_argv[index] = new (nothrow) char[arg.size() + 1];
     if(x_argv[index] == NULL)
 	throw Ememory("argc_argv::set_arg");
     strncpy(x_argv[index], arg.c_str(), arg.size());
@@ -101,7 +103,7 @@ void argc_argv::set_arg(generic_file & f, U_I size, S_I index)
 	x_argv[index] = NULL;
     }
 
-    x_argv[index] = new char [size+1];
+    x_argv[index] = new (nothrow) char [size+1];
     if(x_argv[index] == NULL)
 	throw Ememory("argc_argv::set_arg");
 
@@ -123,7 +125,7 @@ void argc_argv::resize(S_I size)
 		x_argv[i] = NULL;
 	    }
 
-    tmp = new char*[size];
+    tmp = new (nothrow) char*[size];
     if(tmp == NULL)
 	throw Ememory("argc_argv::resize");
 

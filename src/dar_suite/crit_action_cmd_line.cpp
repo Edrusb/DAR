@@ -21,6 +21,8 @@
 
 #include "../my_config.h"
 
+#include <new>
+
 #include "crit_action_cmd_line.hpp"
 #include "tools.hpp"
 #include "deci.hpp"
@@ -75,7 +77,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 	    {
 		if(*it != ';')
 		    throw SRC_BUG;
-		ret = ret_chain = new crit_chain();
+		ret = ret_chain = new (nothrow) crit_chain();
 		if(ret == NULL)
 		    throw Ememory("crit_action_create_from_string");
 		tmp = crit_action_create_from_string(dialog, string(argument.begin(), it), hourshift);
@@ -132,7 +134,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 		    throw SRC_BUG;
 		if(fin + 1 == argument.end())
 		{
-		    go_false = new crit_constant_action(data_undefined, EA_undefined);
+		    go_false = new (nothrow) crit_constant_action(data_undefined, EA_undefined);
 		    if(go_false == NULL)
 			throw Ememory("crit_action_create_from_string");
 		}
@@ -143,7 +145,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 			throw SRC_BUG;
 		}
 
-		ret = new testing(*crit, *go_true, *go_false);
+		ret = new (nothrow) testing(*crit, *go_true, *go_false);
 		if(ret == NULL)
 		    throw Ememory("crit_action_create_from_string");
 		delete crit;
@@ -232,7 +234,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 		throw Erange("crit_action_create_from_string", tools_printf(gettext("Unknown policy for EA '%c' in expression %S"), *(argument.begin() +1), &argument));
 	    }
 
-	    ret = new crit_constant_action(data, ea);
+	    ret = new (nothrow) crit_constant_action(data, ea);
 	    if(ret == NULL)
 		throw Ememory("crit_action_create_from_string");
 	    else
@@ -276,7 +278,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 	    {
 		if(*it != '|')
 		    throw SRC_BUG;
-		ret = ret_or = new crit_or();
+		ret = ret_or = new (nothrow) crit_or();
 		if(ret == NULL)
 		    throw Ememory("criterium_create_from_string");
 		tmp = criterium_create_from_string(dialog, string(argument.begin(), it), hourshift);
@@ -317,7 +319,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 	    {
 		if(*it != '&')
 		    throw SRC_BUG;
-		ret = ret_and = new crit_and();
+		ret = ret_and = new (nothrow) crit_and();
 		if(ret == NULL)
 		    throw Ememory("criterium_create_from_string");
 		tmp = criterium_create_from_string(dialog, string(argument.begin(), it), hourshift);
@@ -365,7 +367,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		    tmp = criterium_create_from_string(dialog, string(argument.begin() + 1, argument.end()), hourshift);
 		    if(tmp == NULL)
 			throw SRC_BUG;
-		    ret = new crit_not(*tmp);
+		    ret = new (nothrow) crit_not(*tmp);
 		    delete tmp;
 		    tmp = NULL;
 		    if(ret == NULL)
@@ -375,7 +377,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		    tmp = criterium_create_from_string(dialog, string(argument.begin() + 1, argument.end()), hourshift);
 		    if(tmp == NULL)
 			throw SRC_BUG;
-		    ret = new crit_invert(*tmp);
+		    ret = new (nothrow) crit_invert(*tmp);
 		    delete tmp;
 		    tmp = NULL;
 		    if(ret == NULL)
@@ -427,10 +429,10 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		switch(*argument.begin())
 		{
 		case 'R':
-		    ret = new crit_in_place_data_more_recent_or_equal_to(date, hourshift);
+		    ret = new (nothrow) crit_in_place_data_more_recent_or_equal_to(date, hourshift);
 		    break;
 		case 'r':
-		    ret = new crit_in_place_EA_more_recent_or_equal_to(date, hourshift);
+		    ret = new (nothrow) crit_in_place_EA_more_recent_or_equal_to(date, hourshift);
 		    break;
 		default:
 		    throw SRC_BUG;
@@ -450,52 +452,52 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 	    switch(*argument.begin())
 	    {
 	    case 'I':
-		ret = new crit_in_place_is_inode();
+		ret = new (nothrow) crit_in_place_is_inode();
 		break;
 	    case 'D':
-		ret = new crit_in_place_is_dir();
+		ret = new (nothrow) crit_in_place_is_dir();
 		break;
 	    case 'F':
-		ret = new crit_in_place_is_file();
+		ret = new (nothrow) crit_in_place_is_file();
 		break;
 	    case 'H':
-		ret = new crit_in_place_is_hardlinked_inode();
+		ret = new (nothrow) crit_in_place_is_hardlinked_inode();
 		break;
 	    case 'A':
-		ret = new crit_in_place_is_new_hardlinked_inode();
+		ret = new (nothrow) crit_in_place_is_new_hardlinked_inode();
 		break;
 	    case 'R':
-		ret = new crit_in_place_data_more_recent(hourshift);
+		ret = new (nothrow) crit_in_place_data_more_recent(hourshift);
 		break;
 	    case 'B':
-		ret = new crit_in_place_data_bigger();
+		ret = new (nothrow) crit_in_place_data_bigger();
 		break;
 	    case 'S':
-		ret = new crit_in_place_data_saved();
+		ret = new (nothrow) crit_in_place_data_saved();
 		break;
 	    case 'Y':
-		ret = new crit_in_place_data_dirty();
+		ret = new (nothrow) crit_in_place_data_dirty();
 		break;
 	    case 'X':
-		ret = new crit_in_place_data_sparse();
+		ret = new (nothrow) crit_in_place_data_sparse();
 		break;
 	    case 'e':
-		ret = new crit_in_place_EA_present();
+		ret = new (nothrow) crit_in_place_EA_present();
 		break;
 	    case 'r':
-		ret = new crit_in_place_EA_more_recent(hourshift);
+		ret = new (nothrow) crit_in_place_EA_more_recent(hourshift);
 		break;
 	    case 'm':
-		ret = new crit_in_place_more_EA();
+		ret = new (nothrow) crit_in_place_more_EA();
 		break;
 	    case 'b':
-		ret = new crit_in_place_EA_bigger();
+		ret = new (nothrow) crit_in_place_EA_bigger();
 		break;
 	    case 's':
-		ret = new crit_in_place_EA_saved();
+		ret = new (nothrow) crit_in_place_EA_saved();
 		break;
 	    case 'T':
-		ret = new crit_same_type();
+		ret = new (nothrow) crit_same_type();
 		break;
 	    default:
 		throw Erange("criterium_create_from_string", string(gettext("Unknown character found while parsing conditional string: ")) + argument);

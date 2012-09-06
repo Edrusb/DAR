@@ -26,6 +26,7 @@
 #include "memory_check.hpp"
 
 #include <list>
+#include <new>
 #include <errno.h>
 
 #ifdef LIBDAR_SPECIAL_ALLOC
@@ -189,7 +190,7 @@ namespace libdar
 
 	U_I find_free_slot_in(U_I table_integer) const;
 	void set_slot_in(U_I table_integer, U_I bit_offset, bool value);
-	void examination_status(ostream & output) const; // debugging, displays the list of unallocated blocks
+	void examination_status(ostream & output) const; // debugging, displays the list of allocated blocks that remain
     };
 
 	//////////////////////////////////////////////
@@ -222,7 +223,7 @@ namespace libdar
 
 
 	//////////////////////////////////////////////
-	//  global_alloc class implementation
+	//  zone class implementation
 	//
 
     void zone::record_me(void *ptr, U_I allocated)
@@ -273,7 +274,7 @@ namespace libdar
 
     cluster::cluster(U_I x_block_size, U_I table_size_64, sized *x_holder)
     {
-	block_size = x_block_size;
+	block_size = x_block_size > 0 ? x_block_size : 1; // trivial case of zero handled by 1 byte length pointed areas
 	alloc_table_size = table_size_64;
 	next_free_in_table = 0;
 	max_available_blocks = table_size_64 * 64;
@@ -288,7 +289,7 @@ namespace libdar
 
 	try
 	{
-	    alloc_table = (U_64 *)new char[alloc_table_size*sizeof(U_64) + alloc_area_size];
+	    alloc_table = (U_64 *)new (nothrow) char[alloc_table_size*sizeof(U_64) + alloc_area_size];
 	    if(alloc_table == NULL)
 		throw Ememory("cluster::cluster");
 	    alloc_area = (char *)(alloc_table + alloc_table_size);
@@ -414,8 +415,8 @@ namespace libdar
 	output << "         block_size           = " << block_size << endl;
 	output << "         available_blocks      = " <<  available_blocks << endl;
 	output << "         max_available_blocks = " << max_available_blocks << endl;
-	output << "         which makes " << counted << " unallocated block(s)" << endl;
-	output << "         Follows list of unallocated blocks : " << endl;
+	output << "         which makes " << counted << " unreleased block(s)" << endl;
+	output << "         Follows the list of unreleased blocks for that cluster: " << endl;
 	examination_status(output);
 	output << endl << endl;
     }
@@ -429,7 +430,7 @@ namespace libdar
 	    for(U_I offset = 0; offset < 64; ++offset)
 	    {
 		if((alloc_table[table_ptr] & mask) != 0)
-		    output << "                 unallocated memory (" << block_size << ") at: 0x" << hex << (U_I)(alloc_area + block_size * ( 64 * table_ptr + offset)) << dec << endl;
+		    output << "                 unreleased memory (" << block_size << " bytes) at: 0x" << hex << (U_I)(alloc_area + block_size * ( 64 * table_ptr + offset)) << dec << endl;
 		mask >>= 1;
 	    }
 	}
@@ -443,13 +444,20 @@ namespace libdar
     {
 	cluster * tmp = NULL;
 
-	table_size_64 = average_table_size / (64 * block_size) + 1;
+	if(block_size > 0)
+	{
+	    table_size_64 = average_table_size / (64 * block_size) + 1;
+	    if(table_size_64 < 1)
+		table_size_64 = 1;
+	}
+	else
+	    table_size_64 = 1;
 	pending_release = NULL;
 #ifdef LIBDAR_DEBUG_MEMORY
 	sum_percent = 0;
 	num_cluster = 0;
 #endif
-	tmp = new cluster(block_size, table_size_64, this);
+	tmp = new (nothrow) cluster(block_size, table_size_64, this);
 	if(tmp == NULL)
 	    throw Ememory("sized::sized");
 	try
@@ -508,7 +516,7 @@ namespace libdar
 			throw SRC_BUG;
 		    if((*clusters.begin()) == NULL)
 			throw SRC_BUG;
-		    cluster *tmp = new cluster((*clusters.begin())->get_block_size(), table_size_64, this);
+		    cluster *tmp = new (nothrow) cluster((*clusters.begin())->get_block_size(), table_size_64, this);
 		    if(tmp == NULL)
 			throw Ememory("sized::alloc");
 		    try
@@ -559,6 +567,8 @@ namespace libdar
 
 	    if(it == clusters.end())
 		throw SRC_BUG; // cannot release previously recorded cluster
+	    if(it == next_free_in_table)
+		++next_free_in_table;
 	    delete pending_release;
 	    pending_release = NULL;
 	    clusters.erase(it);
@@ -577,7 +587,7 @@ namespace libdar
     void sized::dump(ostream & output) const
     {
 	list<cluster *>::const_iterator it = clusters.begin();
-	output << "   this sized object bytes blocks contains " << clusters.size() << " clusters among which the following are not empty" << endl;
+	output << "   " << clusters.size() << " cluster(s) contain unreleased blocks of memory:" << endl;
 
 	while(it != clusters.end())
 	{
@@ -605,7 +615,7 @@ namespace libdar
 	    ++tmp_num;
 	}
 
-	return tmp_sum / tmp_num;
+	return tmp_num > 0 ? tmp_sum / tmp_num : 0;
     }
 #endif
 
@@ -645,7 +655,7 @@ namespace libdar
 	else
 	{
 	    memory_check_special_new_sized(size);
-	    sized *tmp = new sized(size);
+	    sized *tmp = new (nothrow) sized(size);
 	    if(tmp == NULL)
 		throw SRC_BUG;
 	    try
@@ -801,22 +811,26 @@ namespace libdar
     void special_alloc_garbage_collect(ostream & output)
     {
 #ifdef MUTEX_WORKS
-#ifdef LIBDAR_DEBUG_MEMORY
-	main_alloc.max_percent_full(output);
-#endif
-	main_alloc.garbage_collect();
 
-// testing whether all memory blocks are released
-// was disabled when compiler optimization was used
-// because it lead to 'false positive', but in fact
-// the 'false positive' was due to a bug (bug found by Andreas Wolff on Cygwin)
-// thus we re-enable the systematic control of proper memory release
-// by precaution we do not totally remove the possibility to disable it
-// when compiler optimization is activated.
-// #ifdef LIBDAR_NO_OPTIMIZATION
-	if(!main_alloc.is_empty())
-	    main_alloc.dump(output);
-// #endif
+	CRITICAL_START;
+
+	try
+	{
+#ifdef LIBDAR_DEBUG_MEMORY
+	    main_alloc.max_percent_full(output);
+#endif
+	    main_alloc.garbage_collect();
+
+	    if(!main_alloc.is_empty())
+		main_alloc.dump(output);
+	}
+	catch(...)
+	{
+	    CRITICAL_END;
+	    throw;
+	}
+
+	CRITICAL_END;
 #endif
     }
 

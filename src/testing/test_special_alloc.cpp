@@ -28,35 +28,55 @@
 #include <iostream>
 
 using namespace libdar;
+using namespace std;
 
 int main()
 {
     U_I maj, med, min;
 
     get_version(maj, med, min);
+
 #ifdef LIBDAR_SPECIAL_ALLOC
-    const int max = 3;
+
+    const int block_size = 1024;
+    const int max = 66;
     void *ptr[max];
-#endif
 
-#ifdef LIBDAR_SPECIAL_ALLOC
+    try
+    {
 
-    for(int i = 0; i < max; i++)
-        ptr[i] = special_alloc_new(1000);
-    for(int i = 0; i < max; i++)
-        special_alloc_delete(ptr[i]);
+	for(int i = 0; i < max; ++i)
+	    ptr[i] = special_alloc_new(block_size);
+	for(int i = 0; i < max; ++i)
+	    special_alloc_delete(ptr[i]);
 
+	for(int i = 0; i < max; ++i)
+	    ptr[i] = special_alloc_new(block_size);
+	for(int i = 0; i < max; ++i)
+	    special_alloc_delete(ptr[max-i-1]);
 
-    for(int i = 0; i < max; i++)
-        ptr[i] = special_alloc_new(1000);
-    for(int i = 0; i < max - 1; i++)
-        special_alloc_delete(ptr[i]);
-    for(int i = 0; i < max - 1; i++)
-        ptr[i] = special_alloc_new(10*i);
-    special_alloc_delete(ptr[max - 1]);
-    for(int i = 0; i < max - 1; i++)
-        special_alloc_delete(ptr[i]);
+	for(int i = 0; i < max; ++i)
+	    ptr[i] = special_alloc_new(block_size);
 
+	for(int i = 0; i < max - 1; ++i)
+	    special_alloc_delete(ptr[i]);
+
+	for(int i = 0; i < max - 1; ++i)
+	    ptr[i] = special_alloc_new(10*i);
+
+	special_alloc_delete(ptr[max - 1]);
+	for(int i = 0; i < max - 1; ++i)
+	    special_alloc_delete(ptr[i]);
+
+    }
+    catch(Egeneric & e)
+    {
+	e.dump();
+    }
+    catch(...)
+    {
+	cout << "unknown exception caught" << endl;
+    }
 #endif
 
 }

@@ -45,7 +45,7 @@ namespace libdar
     public:
 	database_open_options() { clear(); };
 
-	void clear() { x_partial = false; x_warn_order = true; };
+	void clear() { x_partial = false; x_partial_read_only = false; x_warn_order = true; };
 
 	    // setings
 
@@ -55,6 +55,15 @@ namespace libdar
 	    /// \note if value is set to true, the database loading is quick but only some database methods are available (see the database class documentation)
 	void set_partial(bool value) { x_partial = value; };
 
+
+	    /// partial and read only option
+
+	    /// \param[in] value when set, the database is in partial mode *and* in read-only. It cannot be dumped or modified.
+	    /// \note if value is set to true, all restriction found for partial mode apply, and in addition, the database cannot be dumped (written back to file)
+
+	void set_partial_read_only(bool value) { x_partial_read_only = x_partial = value; };
+
+
 	    /// warning about file ordering in database
 
 	    /// \param[in] value whether to warn when file chronological ordering does not respect the order of archives
@@ -62,10 +71,12 @@ namespace libdar
 
 	    // gettings
 	bool get_partial() const { return x_partial; };
+	bool get_partial_read_only() const { return x_partial_read_only; };
 	bool get_warn_order() const { return x_warn_order; };
 
     private:
 	bool x_partial;
+	bool x_partial_read_only;
 	bool x_warn_order;
     };
 

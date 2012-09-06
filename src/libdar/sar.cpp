@@ -105,6 +105,8 @@ char *strchr (), *strrchr ();
 
 } // end extern "C"
 
+#include <new>
+
 #include "sar.hpp"
 #include "deci.hpp"
 #include "user_interaction.hpp"
@@ -201,6 +203,7 @@ namespace libdar
 	     const label & data_name,
 	     hash_algo x_hash,
 	     const infinint & x_min_digits,
+	     bool format_07_compatible,
 	     const string & execute) : generic_file(gf_read_write), mem_ui(dialog)
     {
         if(file_size < header::min_size() + 1)  //< one more byte to store at least one byte of data
@@ -232,7 +235,7 @@ namespace libdar
 	    of_data_name = data_name;
 	of_fd = NULL;
 	of_flag = '\0';
-	old_sar = false; // sar creation does not makes a sar using an old header, this is always false within this constructor
+	old_sar = format_07_compatible;
 	entr = NULL;
 
 	try
@@ -522,10 +525,11 @@ namespace libdar
         infinint max_at_once;
         infinint tmp_wrote;
         U_I micro_wrote;
+	U_I trailer_size = old_sar ? 0 : 1;
 
         while(to_write > 0)
         {
-            max_at_once = of_current == 1 ? (first_size - file_offset) - 1 : (size - file_offset) - 1;
+            max_at_once = of_current == 1 ? (first_size - file_offset) - trailer_size : (size - file_offset) - trailer_size;
             tmp_wrote = max_at_once > to_write ? to_write : max_at_once;
             if(tmp_wrote > 0)
             {
@@ -562,10 +566,19 @@ namespace libdar
 	    char flag = terminal ? flag_type_terminal : flag_type_non_terminal;
 	    if(get_mode() == gf_read_write)
 	    {
-		if(of_fd->get_position() != of_fd->get_size())
-		    bug = true; // we should be at the end of the file
+		if(old_sar)
+		{
+		    header h = make_write_header(of_current, terminal ? flag_type_terminal : flag_type_non_terminal);
+		    of_fd->skip(0);
+		    h.write(get_ui(), *of_fd);
+		}
 		else
-		    of_fd->write(&flag, 1);
+		{
+		    if(of_fd->get_position() != of_fd->get_size())
+			bug = true; // we should be at the end of the file
+		    else
+			of_fd->write(&flag, 1);
+		}
 	    }
 	    of_fd->fsync();
 	    of_fd->fadvise(fichier::advise_dontneed);
@@ -1191,9 +1204,22 @@ namespace libdar
         hh.get_set_internal_name() = of_internal_name;
 	hh.get_set_data_name() = of_data_name;
         hh.get_set_flag() = flag;
-	hh.set_slice_size(size);
-	if(size != first_size)
-	    hh.set_first_slice_size(first_size);
+	if(old_sar)
+	{
+	    if(num == 1)
+	    {
+		hh.set_slice_size(size);
+		if(size != first_size)
+		    hh.set_first_slice_size(first_size);
+	    }
+	    hh.set_format_07_compatibility();
+	}
+	else
+	{
+	    hh.set_slice_size(size);
+	    if(size != first_size)
+		hh.set_first_slice_size(first_size);
+	}
 
         return hh;
     }
@@ -1340,8 +1366,9 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 			     bool allow_over,
 			     bool warn_over,
 			     hash_algo x_hash,
-			     const infinint & x_min_digits) : generic_file(gf_read_write), mem_ui(dialog)
-   {
+			     const infinint & x_min_digits,
+			     bool format_07_compatible) : generic_file(gf_read_write), mem_ui(dialog)
+    {
 
 	    // some local variables to be used
 
@@ -1361,6 +1388,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	old_sar = false;
 	min_digits = x_min_digits;
 	hook_where = where.get_full_path();
+	old_sar = format_07_compatible;
 
 	    // creating the slice if it does not exist else failing
 	try
@@ -1449,9 +1477,9 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	try
 	{
 	    if(pipename == "-")
-		reference = new tuyau(dialog, 0);
+		reference = new (nothrow) tuyau(dialog, 0);
 	    else
-		reference = new tuyau(dialog, pipename, gf_read_only);
+		reference = new (nothrow) tuyau(dialog, pipename, gf_read_only);
 
 	    if(reference == NULL)
 		throw Ememory("trivial_sar::trivial_sar");
@@ -1472,6 +1500,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
     trivial_sar::trivial_sar(user_interaction & dialog,
 			     generic_file *f,
 			     const label & data_name,
+			     bool format_07_compatible,
 			     const std::string & execute) : generic_file(gf_write_only), mem_ui(dialog)
     {
 	if(f == NULL)
@@ -1484,7 +1513,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	base = "";
 	ext = "";
 	of_data_name = data_name;
-	old_sar = false;
+	old_sar = format_07_compatible;
 	min_digits = 0;
 	hook_where = "";
 
@@ -1518,7 +1547,8 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 		break; // explicitely accepting other value
 	    case gf_write_only:
 	    case gf_read_write:
-		reference->write(&last, 1); // adding the trailing flag
+		if(!old_sar)
+		    reference->write(&last, 1); // adding the trailing flag
 		break;
 	    default:
 		throw SRC_BUG;
@@ -1605,6 +1635,8 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	    }
 	    else
 		tete.get_set_data_name() = of_data_name;
+	    if(old_sar)
+		tete.set_format_07_compatibility();
 	    tete.write(get_ui(), *reference);
 	    offset = reference->get_position();
 	    break;
@@ -1622,9 +1654,14 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	{
 	    if(ret > 0)
 	    {
-		--ret;
-		if(a[ret] != flag_type_terminal)
-		    throw Erange("trivial_sar::inherited_read", gettext("This archive is not single sliced, more data exists in the next slices but cannot be read from the current pipe, aborting"));
+		if(!old_sar)
+		{
+		    --ret;
+		    if(a[ret] != flag_type_terminal)
+			throw Erange("trivial_sar::inherited_read", gettext("This archive is not single sliced, more data exists in the next slices but cannot be read from the current pipe, aborting"));
+		    else
+			end_of_slice = 1;
+		}
 		else
 		    end_of_slice = 1;
 	    }

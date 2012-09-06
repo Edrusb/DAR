@@ -17,6 +17,7 @@
 
 
 
+
   
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR/LIBDAR Internals - Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
@@ -569,7 +570,7 @@ Class fichier [=file] also inherit from generic_file class, and is a
 wrapper
 for the plain file system calls. Some new classes have been added with
 format 8, in particular the escape class, which inserts escape sequence
-mark at requested position, and modifies data wrote to it to never look
+mark at requested position, and modifies data wrote for it never looks
 like an escape sequence mark. To reduce the level of context switch
 when reading the catalogue (which makes a ton of small read), a cache
 class is also present, it gather small writes made to it into larger
@@ -596,14 +597,16 @@ Here are now all currently possible layers together:<br>
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-+-----+ | +-------+ |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-+----------+ <br>
-sparse&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |spars| | |sparse | |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | caching&nbsp; |<br>
++-----+ | +-------+ |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+sparse&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |spars| | |sparse |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| <br>
 file&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |file | |
-|file&nbsp;&nbsp; | |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | layer
-for|<br>
-detection&nbsp;&nbsp; |detec| | |detect.| |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | catalogue|<br>
-layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-----+ | +-------+ |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +----------+<br>
+|file&nbsp;&nbsp; | |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+detection&nbsp;&nbsp; |detec| | |detect.| |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-----+ | +-------+
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
 </code>
       <code>(optional)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp; |&nbsp; &nbsp;&nbsp;&nbsp;
@@ -667,8 +670,7 @@ V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Terminator</code><br>
 |</code><br>
       <code>cipher&nbsp;&nbsp;
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (encrypted)
-data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+data / cache if no encryption |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 |</code><br>
       <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 +--------------------------------------------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

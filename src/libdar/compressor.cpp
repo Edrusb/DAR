@@ -60,6 +60,7 @@ char *strchr (), *strrchr ();
 
 } // end extern "C"
 
+#include <new>
 #include "tools.hpp"
 #include "compressor.hpp"
 
@@ -136,10 +137,10 @@ namespace libdar
         case gzip:
             read_ptr = &compressor::gzip_read;
             write_ptr = &compressor::gzip_write;
-            compr = new xfer(BUFFER_SIZE, wr_mode);
+            compr = new (nothrow) xfer(BUFFER_SIZE, wr_mode);
             if(compr == NULL)
                 throw Ememory("compressor::compressor");
-            decompr = new xfer(BUFFER_SIZE, wr_mode);
+            decompr = new (nothrow) xfer(BUFFER_SIZE, wr_mode);
             if(decompr == NULL)
             {
                 delete compr;
@@ -211,10 +212,10 @@ namespace libdar
 	    lzo_read_reached_eof = false;
 	    try
 	    {
-		lzo_read_buffer = new char[LZO_CLEAR_BUFFER_SIZE];
-		lzo_write_buffer = new char[LZO_CLEAR_BUFFER_SIZE];
-		lzo_compressed = new char[LZO_COMPRESSED_BUFFER_SIZE];
-		lzo_wrkmem = new char[LZO1X_999_MEM_COMPRESS];
+		lzo_read_buffer = new (nothrow) char[LZO_CLEAR_BUFFER_SIZE];
+		lzo_write_buffer = new (nothrow) char[LZO_CLEAR_BUFFER_SIZE];
+		lzo_compressed = new (nothrow) char[LZO_COMPRESSED_BUFFER_SIZE];
+		lzo_wrkmem = new (nothrow) char[LZO1X_999_MEM_COMPRESS];
 		if(lzo_read_buffer == NULL || lzo_write_buffer == NULL || lzo_compressed == NULL || lzo_wrkmem == NULL)
 		    throw Ememory("compressor::init");
 	    }
@@ -373,7 +374,7 @@ namespace libdar
 
     compressor::xfer::xfer(U_I sz, wrapperlib_mode mode) : wrap(mode)
     {
-        buffer = new char[sz];
+        buffer = new (nothrow) char[sz];
         if(buffer == NULL)
             throw Ememory("compressor::xfer::xfer");
         size = sz;

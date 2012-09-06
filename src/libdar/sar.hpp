@@ -91,6 +91,7 @@ namespace libdar
 	    /// \param[in] data_name is a tag that has to be associated with the data.
 	    /// \param[in] x_hash defines whether a hash file has to be generated for each slice, and wich hash algorithm to use
 	    /// \param[in] x_min_digits is the minimum number of digits the slices number is stored with in the filename
+	    /// \param[in] format_07_compatible when set to true, creates a slice header in the archive format of version 7 instead of the highest version known
 	    /// \param[in] execute is the command to execute after each slice creation (once it is completed)
 	    /// \note if the data_name is set to "label_clear()" value, the data_name's value will be
 	    /// equal to the internal_name (which is the most common situation, met when creating a new archive)
@@ -108,6 +109,7 @@ namespace libdar
 	    const label & data_name,
 	    hash_algo x_hash,
 	    const infinint & x_min_digits,
+	    bool format_07_compatible,
 	    const std::string & execute = "");
 
 	    /// the destructor
@@ -183,9 +185,8 @@ namespace libdar
         bool opt_allow_overwrite;    //< is slice overwriting allowed
 	    //
         infinint pause;              //< do we pause between slices
-	bool old_sar;                //< true if the read sar has an old header (format <= "07")
+	bool old_sar;                //< in read-mode, is true if the read sar has an old header (format <= "07"), in write mode, is true if it is requested to build old slice headers
 	bool lax;                    //< whether to try to go further reading problems
-
 
         bool skip_forward(U_I x);                                  //< skip forward in sar global contents
         bool skip_backward(U_I x);                                 //< skip backward in sar global contents
@@ -225,7 +226,9 @@ namespace libdar
 		    bool allow_over,                   //< whether to allow overwriting
 		    bool warn_over,                    //< whether to warn before overwriting
 		    hash_algo x_hash,                  //< whether to build a hash of the slice, and which algo to use for that
-	    	    const infinint & x_min_digits);    //< is the minimum number of digits the slices number is stored with in the filename
+	    	    const infinint & min_digits,       //< is the minimum number of digits the slices number is stored with in the filename
+		    bool format_07_compatible);        //< build a slice header backward compatible with 2.3.x
+
 
 	    /// constructor to read a (single sliced) archive from a pipe
 	trivial_sar(user_interaction & dialog,         //< how to interact with the user
@@ -237,6 +240,7 @@ namespace libdar
 	trivial_sar(user_interaction & dialog,
 		    generic_file * f, //< in case of exception the generic_file "f" is not released, this is the duty of the caller to do so, else (success), the object becomes owned by the trivial_sar and must not be released by the caller.
 		    const label & data_name,
+		    bool format_07_compatible,
 		    const std::string & execute);
 
 	    /// copy constructor (disabled)
@@ -270,7 +274,7 @@ namespace libdar
 	std::string base;         //< basename of the archive (used for string susbstitution in hook)
 	std::string ext;          //< extension of the archive (used for string substitution in hook)
 	label of_data_name;       //< archive's data name
-	bool old_sar;             //< true if the read sar has an old header (format <= 7)
+	bool old_sar;             //< true if the read sar has an old header (format <= "07") or the to be written is must keep a version 07 format.
 	infinint min_digits;      //< minimum number of digits in slice name
 	std::string hook_where;   //< what value to use for %p subsitution in hook
 

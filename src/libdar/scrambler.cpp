@@ -21,6 +21,8 @@
 
 #include "../my_config.h"
 
+#include <new>
+
 #include "scrambler.hpp"
 
 using namespace std;
@@ -72,7 +74,7 @@ namespace libdar
                 delete [] buffer;
                 buffer = NULL;
             }
-            buffer = new unsigned char[size];
+            buffer = new (nothrow) unsigned char[size];
             if(buffer != NULL)
                 buf_size = size;
             else

@@ -66,7 +66,7 @@ static void f1()
     where.set_location("./test");
     try
     {
-        sar sar1 = sar(*ui, "destination", "txt", 100, 110, true, false, 0, where, data_name, hash_none, 0);
+	sar sar1 = sar(*ui, "destination", "txt", 100, 110, true, false, 0, where, data_name, hash_none, false, 0);
         fichier src = fichier(*ui, "./test/source.txt", gf_read_only, tools_octal2int("0777"), false);
         src.copy_to(sar1);
     }

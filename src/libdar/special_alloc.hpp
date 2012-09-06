@@ -35,6 +35,7 @@
 
 #include "../my_config.h"
 #include <iostream>
+#include <new>
 
 #ifdef LIBDAR_SPECIAL_ALLOC
 
@@ -54,9 +55,11 @@ extern "C"
 
 #define USE_SPECIAL_ALLOC(BASE_TYPE) \
         void *operator new(size_t taille) { return special_alloc_new(taille); };                \
+	void *operator new(size_t taille, const std::nothrow_t& nothrow_constant) { return special_alloc_new(taille); }; \
         void *operator new(size_t taille, BASE_TYPE * & place) { return (void *) place; };      \
         void *operator new(size_t taille, void * & place) { return place; };                    \
-        void operator delete(void *ptr) { special_alloc_delete(ptr); }
+        void operator delete(void *ptr) throw() { special_alloc_delete(ptr); }                  \
+        void operator delete(void* ptr, const std::nothrow_t& nothrow_constant) throw() { special_alloc_delete(ptr); }
 
 namespace libdar
 {

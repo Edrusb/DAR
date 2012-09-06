@@ -39,6 +39,8 @@ extern "C"
 } // end extern "C"
 
 #include <typeinfo>
+#include <new>
+
 #include "storage.hpp"
 #include "integers.hpp"
 #include "int_tools.hpp"
@@ -296,7 +298,7 @@ namespace libdar
             ptr -= direction;
         }
 
-        field = new storage(size);
+        field = new (std::nothrow) storage(size);
         if(field != NULL)
         {
             storage::iterator it = field->begin();

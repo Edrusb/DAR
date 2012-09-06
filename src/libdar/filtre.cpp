@@ -779,9 +779,9 @@ namespace libdar
 				    dialog.warning(string(gettext(SKIPPED)) + juillet.get_string());
 
 				if(dir != NULL && make_empty_dir)
-				    ig = ignode = new ignored_dir(*dir);
+				    ig = ignode = new (nothrow) ignored_dir(*dir);
 				else
-				    ig = new ignored(nom->get_name());
+				    ig = new (nothrow) ignored(nom->get_name());
 				    // necessary to not record deleted files at comparison
 				    // time in case files are just not covered by filters
 				st.incr_ignored();
@@ -863,7 +863,7 @@ namespace libdar
 
 			    if(how != "write") // error did not occured while adding data to the archive
 			    {
-				nomme *tmp = new ignored(nom->get_name());
+				nomme *tmp = new (nothrow) ignored(nom->get_name());
 				dialog.warning(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
 				st.incr_errored();
 
@@ -1304,7 +1304,7 @@ namespace libdar
                     if(e_mir != NULL)
                     {
 			    // we reached this statement thus e_mir != NULL and e_ino != NULL, thus this is a new etiquette
-			etoile *mizar = new etoile(f_ino, e_mir->get_etiquette());
+			etoile *mizar = new (nothrow) etoile(f_ino, e_mir->get_etiquette());
 			    // note about etiquette: the cloned object has the same etiquette
 			    // and thus each etiquette correspond to two instances
 			if(mizar == NULL)
@@ -1312,7 +1312,7 @@ namespace libdar
 			try
 			{
 			    f_ino = NULL; // must not be released by the catch stament below as it is now managed by mizar
-			    f = new mirage(e_mir->get_name(), mizar);
+			    f = new (nothrow) mirage(e_mir->get_name(), mizar);
 			    if(f == NULL)
 				throw Ememory("filtre_isolate");
 			    corres[e_mir->get_etiquette()] = mizar;
@@ -1345,7 +1345,7 @@ namespace libdar
 			{
 			    if(alcor == NULL)
 				throw SRC_BUG;
-			    f = new mirage(e_mir->get_name(), alcor);
+			    f = new (nothrow) mirage(e_mir->get_name(), alcor);
 			}
 			else
 			    f = e->clone();
@@ -1440,7 +1440,7 @@ namespace libdar
 
 		try
 		{
-		    crit_chain *decr_crit_chain = new crit_chain();
+		    crit_chain *decr_crit_chain = new (nothrow) crit_chain();
 		    if(decr_crit_chain == NULL)
 			throw Ememory("filtre_merge");
 		    decr = decr_crit_chain;
@@ -1983,7 +1983,7 @@ namespace libdar
 
 							if(make_empty_dir)
 							{
-							    if_removed = new ignored_dir(*al_dir);
+							    if_removed = new (nothrow) ignored_dir(*al_dir);
 							    if(if_removed == NULL)
 								throw Ememory("filtre_merge");
 							}
@@ -2063,7 +2063,7 @@ namespace libdar
 						else
 						    firm = e->signature();
 
-						dolly = new detruit(the_name, firm, ref_tab[index]->get_current_reading_dir().get_last_modif());
+						dolly = new (nothrow) detruit(the_name, firm, ref_tab[index]->get_current_reading_dir().get_last_modif());
 						if(dolly == NULL)
 						    throw Ememory("filtre_merge");
 						dolly_nom = dynamic_cast<nomme *>(dolly);
@@ -2110,7 +2110,7 @@ namespace libdar
 				{
 				    if(e_dir != NULL && make_empty_dir)
 				    {
-					ignored_dir *igndir = new ignored_dir(*e_dir);
+					ignored_dir *igndir = new (nothrow) ignored_dir(*e_dir);
 					if(igndir == NULL)
 					    throw Ememory("filtre_merge");
 					else
@@ -2482,7 +2482,7 @@ namespace libdar
 				{
 					// creating the sparse_file to copy data to destination
 
-				    dst_hole = new sparse_file(stock, hole_size);
+				    dst_hole = new (nothrow) sparse_file(stock, hole_size);
 				    if(dst_hole == NULL)
 					throw Ememory("save_inode");
 				    dest = dst_hole;
@@ -2811,7 +2811,7 @@ namespace libdar
 		place_ino->set_last_change(add_ino->get_last_change());
 		break;
 	    case inode::ea_full:
-		tmp_ea = new ea_attributs(*add_ino->get_ea()); // we clone the EA of add_ino
+		tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea()); // we clone the EA of add_ino
 		if(tmp_ea == NULL)
 		    throw Ememory("filtre::do_EA_transfert");
 		try
@@ -2848,7 +2848,7 @@ namespace libdar
 	case EA_merge_preserve:
 	    if(place_ino->ea_get_saved_status() == inode::ea_full && add_ino->ea_get_saved_status() == inode::ea_full) // we have something to merge
 	    {
-		tmp_ea = new ea_attributs();
+		tmp_ea = new (nothrow) ea_attributs();
 		if(tmp_ea == NULL)
 		    throw Ememory("filtre.cpp:do_EA_transfert");
 		try
@@ -2872,7 +2872,7 @@ namespace libdar
 		if(add_ino->ea_get_saved_status() == inode::ea_full)
 		{
 		    place_ino->ea_set_saved_status(inode::ea_full); // it was not the case else we would have executed the above block
-		    tmp_ea = new ea_attributs(*add_ino->get_ea());   // we clone the EA set of to_add
+		    tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea());   // we clone the EA set of to_add
 		    if(tmp_ea == NULL)
 			throw Ememory("filtre.cpp:do_EA_transfert");
 		    try
@@ -2896,7 +2896,7 @@ namespace libdar
 	case EA_merge_overwrite:
 	    if(place_ino->ea_get_saved_status() == inode::ea_full && add_ino->ea_get_saved_status() == inode::ea_full)
 	    {
-		tmp_ea = new ea_attributs();
+		tmp_ea = new (nothrow) ea_attributs();
 		if(tmp_ea == NULL)
 		    throw Ememory("filtre.cpp:do_EA_transfert");
 		try
@@ -2920,7 +2920,7 @@ namespace libdar
 		if(add_ino->ea_get_saved_status() == inode::ea_full)
 		{
 		    place_ino->ea_set_saved_status(inode::ea_full); // it was not the case else we would have executed the above block
-		    tmp_ea = new ea_attributs(*add_ino->get_ea());
+		    tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea());
 		    if(tmp_ea == NULL)
 			throw Ememory("filtre.cpp:do_EA_transfert");
 		    try
@@ -2989,13 +2989,13 @@ namespace libdar
 			throw Ememory("filtre:make_clone");
 
 		    infinint shift_etiquette = ref_mir->get_etiquette() + etiquette_offset;
-		    filante = new etoile(dollinode, shift_etiquette);
+		    filante = new (nothrow) etoile(dollinode, shift_etiquette);
 		    if(filante == NULL)
 			throw Ememory("make_clone");
 		    try
 		    {
 			dolly = NULL; // the inode is now managed by filante
-			dolly = new mirage(the_name, filante);
+			dolly = new (nothrow) mirage(the_name, filante);
 			if(dolly == NULL)
 			    throw Ememory("make_clone");
 			try
@@ -3029,7 +3029,7 @@ namespace libdar
 		}
 	    }
 	    else // already added to archive
-		dolly = new mirage(the_name, it->second); // we make a new mirage pointing to the etoile already involved in the catalogue under construction
+		dolly = new (nothrow) mirage(the_name, it->second); // we make a new mirage pointing to the etoile already involved in the catalogue under construction
 	}
 	else // not a hard_link file
 	    dolly = ref->clone();  // we just clone the entry
@@ -3060,7 +3060,11 @@ namespace libdar
 
     static const crit_action *make_overwriting_for_only_deleted()
     {
-	return new testing(crit_invert(crit_in_place_is_inode()), crit_constant_action(data_preserve, EA_preserve), crit_constant_action(data_overwrite, EA_overwrite));
+	const crit_action *ret = new (nothrow) testing(crit_invert(crit_in_place_is_inode()), crit_constant_action(data_preserve, EA_preserve), crit_constant_action(data_overwrite, EA_overwrite));
+	if(ret == NULL)
+	    throw Ememory("make_overwriting_fir_only_deleted");
+
+	return ret;
     }
 
 } // end of namespace

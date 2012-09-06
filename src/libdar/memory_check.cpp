@@ -167,17 +167,38 @@ void * operator new (size_t size) throw (std::bad_alloc)
     return alloc(size);
 }
 
+void * operator new (size_t size, const std::nothrow_t& nothrow_constant) throw ()
+{
+    return alloc(size);
+}
+
 void * operator new[] (size_t size) throw (std::bad_alloc)
 {
     return alloc(size);
 }
+
+void * operator new[] (size_t size, const std::nothrow_t& nothrow_constant) throw ()
+{
+    return alloc(size);
+}
+
 
 void operator delete (void * p) throw()
 {
     desalloc(p);
 }
 
+void operator delete (void * p, const std::nothrow_t& nothrow_constant) throw()
+{
+    desalloc(p);
+}
+
 void operator delete[] (void * p) throw()
+{
+    desalloc(p);
+}
+
+void operator delete[] (void * p, const std::nothrow_t& nothrow_constant) throw()
 {
     desalloc(p);
 }

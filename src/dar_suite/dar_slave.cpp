@@ -50,6 +50,7 @@ char *strchr (), *strrchr ();
 
 #include <string>
 #include <iostream>
+#include <new>
 
 #include "user_interaction.hpp"
 #include "zapette.hpp"
@@ -107,7 +108,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 	entrep.set_location(chemin->display());
         try
         {
-            source = new sar(dialog, filename, EXTENSION, entrep, true, min_digits, false, execute);
+	    source = new (nothrow) sar(dialog, filename, EXTENSION, entrep, true, min_digits, false, execute);
             if(source == NULL)
                 throw Ememory("little_main");
 

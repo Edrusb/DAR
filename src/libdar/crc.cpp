@@ -49,6 +49,7 @@ char *strchr (), *strrchr ();
 
 #include <iostream>
 #include <sstream>
+#include <new>
 
 #include "generic_file.hpp"
 #include "crc.hpp"
@@ -170,11 +171,11 @@ namespace libdar
 	    U_I partial_cursor = 0;
 
 		// But we cannot use optimized method on some systems if we are not aligned to the size boundary
-	    if(crc_size % 8 == 0 && (U_64)(buffer + cursor) % 8 == 0)
+	    if(crc_size % 8 == 0 && (U_I)(buffer + cursor) % 8 == 0)
 		B_compute_block(U_64(0), buffer + cursor, length - cursor, begin, pointer, end, partial_cursor);
-	    else if(crc_size % 4 == 0 && (U_64)(buffer + cursor) % 4 == 0)
+	    else if(crc_size % 4 == 0 && (U_I)(buffer + cursor) % 4 == 0)
 		B_compute_block(U_32(0), buffer + cursor, length - cursor, begin, pointer, end, partial_cursor);
-	    else if(crc_size % 2 == 0 && (U_64)(buffer + cursor) % 2 == 0)
+	    else if(crc_size % 2 == 0 && (U_I)(buffer + cursor) % 2 == 0)
 		B_compute_block(U_16(0), buffer + cursor, length - cursor, begin, pointer, end, partial_cursor);
 		/// warning, adding a new type here need modifying crc_n::alloc() to provide aligned crc storage
 
@@ -411,13 +412,13 @@ namespace libdar
 	    // (its allocated address is a multiple of it size)
 	    // some CPU need that (sparc), and it does not hurt for other ones.
 	if(width % 8 == 0)
-	    cyclic = (unsigned char *)(new U_64[width/8]);
+	    cyclic = (unsigned char *)(new (nothrow) U_64[width/8]);
 	else if(width % 4 == 0)
-	    cyclic = (unsigned char *)(new U_32[width/4]);
+	    cyclic = (unsigned char *)(new (nothrow) U_32[width/4]);
 	else if(width % 2 == 0)
-	    cyclic = (unsigned char *)(new U_16[width/2]);
+	    cyclic = (unsigned char *)(new (nothrow) U_16[width/2]);
 	else
-	    cyclic = new unsigned char[size];
+	    cyclic = new (nothrow) unsigned char[size];
 	    // end of the trick and back to default situation
 	    //////////////////////////////////////////////////////////////////////
 	    // WARNING! this trick allows the use of 2, 4 or 8 bytes operations //
@@ -464,7 +465,7 @@ namespace libdar
     {
 	crc *ret = NULL;
 	if(old)
-	    ret = new crc_n(crc::OLD_CRC_SIZE, f);
+	    ret = new (nothrow) crc_n(crc::OLD_CRC_SIZE, f);
 	else
 	{
 	    infinint taille = f; // reading the crc size
@@ -475,10 +476,10 @@ namespace libdar
 		taille.unstack(s);
 		if(taille > 0)
 		    throw SRC_BUG;
-		ret = new crc_n(s, f);
+		ret = new (nothrow) crc_n(s, f);
 	    }
 	    else
-		ret = new crc_i(taille, f);
+		ret = new (nothrow) crc_i(taille, f);
 	}
 
 	if(ret == NULL)
@@ -498,10 +499,10 @@ namespace libdar
 	    if(width > 0)
 		throw SRC_BUG;
 
-	    ret = new crc_n(s);
+	    ret = new (nothrow) crc_n(s);
 	}
 	else
-	    ret = new crc_i(width);
+	    ret = new (nothrow) crc_i(width);
 
 	if(ret == NULL)
 	    throw Ememory("create_crc_from_size");

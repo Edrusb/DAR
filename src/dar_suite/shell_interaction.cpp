@@ -99,11 +99,11 @@ static secu_string interaction_secu_string(const string & message, bool echo, vo
 user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool silent)
 {
     has_terminal = false;
-    user_interaction *ret = new user_interaction_callback(interaction_warning,
-							  interaction_pause,
-							  interaction_string,
-							  interaction_secu_string,
-							  NULL);
+    user_interaction *ret = new (nothrow) user_interaction_callback(interaction_warning,
+								    interaction_pause,
+								    interaction_string,
+								    interaction_secu_string,
+								    NULL);
     if(ret == NULL)
 	throw Ememory("shell_interaction_init");
 

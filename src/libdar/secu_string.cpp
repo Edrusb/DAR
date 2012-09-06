@@ -56,6 +56,8 @@ char *strchr (), *strrchr ();
 #endif
 }
 
+#include <new>
+
 #include "erreurs.hpp"
 #include "secu_string.hpp"
 
@@ -142,7 +144,7 @@ namespace libdar
 	    if(allocated_size == NULL)
 		throw Esecu_memory("secu_string::secus_string");
 #else
-	    allocated_size = new U_I;
+	    allocated_size = new (nothrow) U_I;
 	    if(allocated_size == NULL)
 		throw Ememory("secu_string::secus_string");
 #endif
@@ -154,7 +156,7 @@ namespace libdar
 	    if(mem == NULL)
 		throw Esecu_memory("secu_string::secus_string");
 #else
-	    mem = new char[*allocated_size];
+	    mem = new (nothrow) char[*allocated_size];
 	    if(mem == NULL)
 		throw Ememory("secu_string::secus_string");
 #endif
@@ -164,7 +166,7 @@ namespace libdar
 	    if(string_size == NULL)
 		throw Esecu_memory("secu_string::secus_string");
 #else
-	    string_size = new U_I;
+	    string_size = new (nothrow) U_I;
 	    if(string_size == NULL)
 		throw Ememory("secu_string::secus_string");
 #endif

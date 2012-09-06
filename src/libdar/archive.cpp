@@ -28,6 +28,8 @@ extern "C"
 #endif
 } // extern "C"
 
+#include <new>
+
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "archive.hpp"
@@ -220,13 +222,15 @@ namespace libdar
 				    generic_file *ea_loc = stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED);
 				    generic_file *data_loc = stack.get_by_label(LIBDAR_STACK_LABEL_CLEAR);
 
-				    cat = new escape_catalogue(dialog,
-							       ver.edition,
-							       char2compression(ver.algo_zip),
-							       data_loc,
-							       ea_loc,
-							       esc,
-							       options.get_lax());
+				    cat = new (nothrow) escape_catalogue(dialog,
+									 ver.edition,
+									 char2compression(ver.algo_zip),
+									 data_loc,
+									 ea_loc,
+									 esc,
+									 options.get_lax());
+				    if(cat == NULL)
+					throw Ememory("archive::archive");
 				}
 				else
 				    throw SRC_BUG;
@@ -241,6 +245,10 @@ namespace libdar
 			    throw;
 			}
 			catch(Euser_abort & e)
+			{
+			    throw;
+			}
+			catch(Ememory & e)
 			{
 			    throw;
 			}
@@ -1541,13 +1549,14 @@ namespace libdar
 		    // **********  building the level 1 generic_file layer *********** //
 
 		if(empty)
-		    tmp = new null_file(gf_write_only);
+		    tmp = new (nothrow) null_file(gf_write_only);
 		    // data_name is unchanged because all the archive goes to a black hole.
 		else
 		    if(file_size == 0) // one SLICE
 			if(filename == "-") // output to stdout
 			{
-			    trivial_sar *tvs = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name, execute); //archive goes to stdout
+			    trivial_sar *tvs = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name,
+									    false, execute); //archive goes to stdout
 			    tmp = tvs;
 			    if(tvs != NULL)
 				data_name = tvs->get_data_name();
@@ -1555,16 +1564,17 @@ namespace libdar
 			}
 			else
 			{
-			    trivial_sar *tvs = new trivial_sar(dialog,
-							       filename,
-							       extension,
-							       sauv_path_t, // entrepot !!
-							       data_name,
-							       execute,
-							       allow_over,
-							       warn_over,
-							       hash,
-							       slice_min_digits);
+			    trivial_sar *tvs = new (nothrow) trivial_sar(dialog,
+									 filename,
+									 extension,
+									 sauv_path_t, // entrepot !!
+									 data_name,
+									 execute,
+									 allow_over,
+									 warn_over,
+									 hash,
+									 slice_min_digits,
+									 false);
 			    tmp = tvs;
 			    if(tvs != NULL)
 				data_name = tvs->get_data_name();
@@ -1572,19 +1582,20 @@ namespace libdar
 			}
 		    else
 		    {
-			sar *rsr = new sar(dialog,
-					   filename,
-					   extension,
-					   file_size,
-					   first_file_size,
-					   warn_over,
-					   allow_over,
-					   pause,
-					   sauv_path_t, // entrepot !!
-					   data_name,
-					   hash,
-					   slice_min_digits,
-					   execute);
+			sar *rsr = new (nothrow) sar(dialog,
+						     filename,
+						     extension,
+						     file_size,
+						     first_file_size,
+						     warn_over,
+						     allow_over,
+						     pause,
+						     sauv_path_t, // entrepot !!
+						     data_name,
+						     hash,
+						     slice_min_digits,
+						     false,
+						     execute);
 			tmp = rsr;
 			if(rsr != NULL)
 			    data_name = rsr->get_data_name();
@@ -1661,17 +1672,17 @@ namespace libdar
 		    switch(crypto)
 		    {
 		    case crypto_scrambling:
-			tmp = new scrambler(real_pass, *(stack.top()));
+			tmp = new (nothrow) scrambler(real_pass, *(stack.top()));
 			break;
 		    case crypto_blowfish:
 		    case crypto_aes256:
 		    case crypto_twofish256:
 		    case crypto_serpent256:
 		    case crypto_camellia256:
-			tmp = new crypto_sym(crypto_size, real_pass, *(stack.top()), false, macro_tools_supported_version, crypto);
+			tmp = new (nothrow) crypto_sym(crypto_size, real_pass, *(stack.top()), false, macro_tools_supported_version, crypto);
 			break;
 		    case crypto_none:
-			tmp = new cache(*(stack.top()), false);
+			tmp = new (nothrow) cache(*(stack.top()), false);
 			break;
 		    default:
 			throw SRC_BUG; // cryto value should have been checked before
@@ -1696,7 +1707,7 @@ namespace libdar
 		    set<escape::sequence_type> unjump;
 
 		    unjump.insert(escape::seqt_catalogue);
-		    tmp = esc = new escape(stack.top(), unjump);
+		    tmp = esc = new (nothrow) escape(stack.top(), unjump);
 		    if(tmp == NULL)
 			throw Ememory("op_create_in_sub");
 		    else
@@ -1708,7 +1719,7 @@ namespace libdar
 
 		    // ********** building the level2 layer (compression) ************************ //
 
-		tmp = new compressor(empty ? none : algo, *(stack.top()), compression_level);
+		tmp = new (nothrow) compressor(empty ? none : algo, *(stack.top()), compression_level);
 		if(tmp == NULL)
 		    throw Ememory("op_create_in_sub");
 		else
@@ -1740,20 +1751,20 @@ namespace libdar
 
 		if(op == oper_isolate)
 		    if(add_marks_for_sequential_reading && !empty)
-			cat = new escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), ref_cat1->get_data_name(), esc);
+			cat = new (nothrow) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), ref_cat1->get_data_name(), esc);
 		    else
-			cat = new catalogue(dialog, ref_cat1->get_root_dir_last_modif(), ref_cat1->get_data_name());
+			cat = new (nothrow) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), ref_cat1->get_data_name());
 		else
 		    if(op == oper_merge)
 			if(add_marks_for_sequential_reading && !empty)
-			    cat = new escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), data_name, esc);
+			    cat = new (nothrow) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), data_name, esc);
 			else
-			    cat = new catalogue(dialog, ref_cat1->get_root_dir_last_modif(), data_name);
+			    cat = new (nothrow) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), data_name);
 		    else // op == oper_create
 			if(add_marks_for_sequential_reading && !empty)
-			    cat = new escape_catalogue(dialog, root_mtime, data_name, esc);
+			    cat = new (nothrow) escape_catalogue(dialog, root_mtime, data_name, esc);
 			else
-			    cat = new catalogue(dialog, root_mtime, data_name);
+			    cat = new (nothrow) catalogue(dialog, root_mtime, data_name);
 
 		if(cat == NULL)
 		    throw Ememory("archive::op_create_in_sub");

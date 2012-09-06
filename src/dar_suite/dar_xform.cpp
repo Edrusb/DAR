@@ -35,6 +35,8 @@ extern "C"
 } // end extern "C"
 
 #include <iostream>
+#include <new>
+
 #include "sar.hpp"
 #include "sar_tools.hpp"
 #include "user_interaction.hpp"
@@ -109,6 +111,7 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 	    generic_file *src_sar = NULL;
 	    label data_name;
 	    entrepot_local entrep = entrepot_local(slice_perm, slice_user, slice_group, false);
+	    bool format_07_compatible = false;
 
 	    data_name.clear();
 	    try
@@ -124,9 +127,10 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 		shell_interaction_set_beep(beep);
 		if(src == "-")
 		{
-		    trivial_sar *tmp_sar = new trivial_sar(dialog, src, false);
+		    trivial_sar *tmp_sar = new (nothrow) trivial_sar(dialog, src, false);
 		    if(tmp_sar == NULL)
 			throw Ememory("sub_main");
+		    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
 
 		    src_sar = tmp_sar;
 		    if(src_sar != NULL)
@@ -141,11 +145,12 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 		    else
 			throw SRC_BUG;
 
-		    sar *tmp_sar = new sar(dialog, src, EXTENSION, entrep, false, src_min_digits, false, execute_src);
+		    sar *tmp_sar = new (nothrow) sar(dialog, src, EXTENSION, entrep, false, src_min_digits, false, execute_src);
 		    if(tmp_sar == NULL)
 			throw Ememory("main");
 		    else
 			tmp_sar->set_info_status(CONTEXT_OP);
+		    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
 		    src_sar = tmp_sar;
 		    if(src_sar != NULL)
 			data_name = tmp_sar->get_data_name();
@@ -155,14 +160,25 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 
 		if(size == 0)
 		    if(dst == "-")
-			dst_sar = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name, execute_dst);
+			dst_sar = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name,
+							       format_07_compatible, execute_dst);
 		    else
 		    {
 			if(dst_dir != NULL)
 			    entrep.set_location(dst_dir->display());
 			else
 			    throw SRC_BUG;
-			dst_sar = new trivial_sar(dialog, dst, EXTENSION, entrep, data_name, execute_dst, allow, warn, hash, dst_min_digits);
+			dst_sar = new (nothrow) trivial_sar(dialog,
+							    dst,
+							    EXTENSION,
+							    entrep,
+							    data_name,
+							    execute_dst,
+							    allow,
+							    warn,
+							    hash,
+							    dst_min_digits,
+							    format_07_compatible);
 		    }
 		else
 		{
@@ -170,7 +186,20 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 			entrep.set_location(dst_dir->display());
 		    else
 			throw SRC_BUG;
-		    dst_sar = new sar(dialog, dst, EXTENSION, size, first, warn, allow, pause, entrep, data_name, hash, dst_min_digits, execute_dst);
+		    dst_sar = new (nothrow) sar(dialog,
+						dst,
+						EXTENSION,
+						size,
+						first,
+						warn,
+						allow,
+						pause,
+						entrep,
+						data_name,
+						hash,
+						dst_min_digits,
+						format_07_compatible,
+						execute_dst);
 		}
 		if(dst_sar == NULL)
 		    throw Ememory("main");
@@ -452,8 +481,10 @@ static bool command_line(user_interaction & dialog, S_I argc, char * const argv[
     {
         if(src_dir != NULL)
             delete src_dir;
+	src_dir = NULL;
         if(dst_dir != NULL)
             delete dst_dir;
+	dst_dir = NULL;
         throw;
     }
     return true;

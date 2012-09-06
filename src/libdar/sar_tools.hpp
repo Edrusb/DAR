@@ -44,6 +44,7 @@ namespace libdar
 						     S_I fd,
 						     gf_mode mode,
 						     const label & data_name,
+						     bool slice_header_format_07,
 						     const std::string & execute);
 
 } // end of namespace
