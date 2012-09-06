@@ -108,7 +108,7 @@ namespace libdar
             if(ref->skip(start + sz))
 		current = sz;
 	    else
-		set_back_current_position();
+		(void)ref->skip(start + current);
             return false;
         }
         else
@@ -117,7 +117,7 @@ namespace libdar
 	    if(ret)
 		current = pos;
 	    else
-		set_back_current_position();
+		(void)ref->skip(start + current);
 	    return ret;
         }
     }
@@ -131,16 +131,19 @@ namespace libdar
 
 	if(limited)
 	{
-	    ret =  ref->skip(start + sz);
+	    ret = ref->skip(start + sz);
 	    if(ret)
 		current = sz;
 	    else
-		set_back_current_position();
+		(void)ref->skip(start + current);
 	}
 	else
 	{
 	    ret = ref->skip_to_eof();
-	    set_back_current_position();
+	    if(ret)
+		set_back_current_position();
+	    else
+		(void)skip(start + current);
 	}
 
 	return ret;
@@ -155,7 +158,7 @@ namespace libdar
 	{
             if(current < -x)
             {
-                ref->skip(start);
+                (void)ref->skip(start);
                 current = 0;
                 return false;
             }
@@ -165,10 +168,7 @@ namespace libdar
                 if(r)
                     current -= -x;
                 else
-                {
-                    ref->skip(start);
-                    current = 0;
-                }
+                    ref->skip(start + current);
                 return r;
             }
 	}
@@ -178,7 +178,7 @@ namespace libdar
             if(limited && current + x >= sz)
             {
                 current = sz;
-                ref->skip(start+sz);
+                (void)ref->skip(start + sz);
                 return false;
             }
             else
@@ -187,19 +187,7 @@ namespace libdar
                 if(r)
                     current += x;
                 else
-                {
-		    if(limited)
-		    {
-			ref->skip(start+sz);
-			current = sz;
-		    }
-		    else
-		    {
-			ref->skip_to_eof();
-			set_back_current_position();
-		    }
-
-                }
+		    (void)ref->skip(start + current);
                 return r;
             }
 	}
