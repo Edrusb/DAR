@@ -77,18 +77,17 @@ namespace libdar
 
 	    if(where == NULL)
 		throw Ememory("archive::archive");
+	    cat = NULL;
 
 	    try
 	    {
-		where->set_location(chem.display());
-
-		cat = NULL;
 		infinint second_terminateur_offset = 0;
 		infinint ref_second_terminateur_offset = 0;
 		header_version ref_ver;
 		escape *esc = NULL;
 		lax_read_mode = options.get_lax();
 		sequential_read = options.get_sequential_read(); // updating the archive object's field
+		where->set_location(chem);
 
 		try
 		{
@@ -132,7 +131,7 @@ namespace libdar
 
 			try
 			{
-			    ref_where->set_location(options.get_ref_path().display());
+			    ref_where->set_location(options.get_ref_path());
 			    try
 			    {
 				if(options.get_ref_basename() == "-")
@@ -306,13 +305,12 @@ namespace libdar
 	    catch(...)
 	    {
 		free();
-		NLS_SWAP_OUT;
 		throw;
 	    }
 	}
 	catch(...)
 	{
-	    free();
+	    NLS_SWAP_OUT;
 	    throw;
 	}
 	NLS_SWAP_OUT;
@@ -334,7 +332,7 @@ namespace libdar
 	    entrepot *sauv_path_t = options.get_entrepot().clone();
 	    if(sauv_path_t == NULL)
 		throw Ememory("archive::archive");
-	    sauv_path_t->set_location(sauv_path.display());
+	    sauv_path_t->set_location(sauv_path);
 
 	    try
 	    {
@@ -426,7 +424,7 @@ namespace libdar
 	    entrepot *sauv_path_t = options.get_entrepot().clone();
 	    if(sauv_path == NULL)
 		throw Ememory("archive::archive");
-	    sauv_path_t->set_location(sauv_path.display());
+	    sauv_path_t->set_location(sauv_path);
 
 	    try
 	    {
@@ -561,7 +559,7 @@ namespace libdar
 
 		// end of sanity checks
 
-	    sauv_path_t->set_location(sauv_path.display());
+	    sauv_path_t->set_location(sauv_path);
 
 	    if(!options.get_empty() && sauv_path_t_local != NULL)
 		tools_avoid_slice_overwriting_regex(dialog,

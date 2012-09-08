@@ -24,7 +24,19 @@
 
 
     /// \file entrepot.hpp
-    /// \brief defines the entrepot interface
+    /// \brief defines the entrepot interface and the entrepot_local inherited class
+    /// entrepot interface defines a generic way to interact with files (slices)
+    /// on a filesystem. It is used to instanciate file-like objects in order
+    /// to read or write data to such file.
+    /// The entrepot_local is the only implementation of a entrepot interface
+    /// it correspond to local filesystems. The reason of existence of the entrepot
+    /// stuff is to allow external application like webdar to drop/read slices over
+    /// the network using FTP protocol for example. External applications only define
+    /// Their own implementation of the entrepot interface and file-like objects they
+    /// generates, libdar uses them throught the generic interface. This avoids having
+    /// network related stuff inside libdar, which for security reason and function
+    /// separation is not wanted.
+
     /// \ingroup Private
 
 #ifndef ENTREPOT_HPP
@@ -63,24 +75,24 @@ namespace libdar
 	    /// destructor
 	virtual ~entrepot() {};
 
-	    /// says if two operators points to the same directory
+	    /// says whether two entrepot objects points to the same location
 	bool operator == (const entrepot & ref) const { return get_url() == ref.get_url(); };
 
 
-	    /// defines the directory where to proceed to future open() -- this is a "chdir" equivalent
+	    /// defines the directory where to proceed to future open() -- this is a "chdir" semantics
 	void set_location(const path & chemin);
 
 	    /// defines the root to use if set_location is given a relative path
 	void set_root(const path & p_root) { if(p_root.is_relative()) throw Erange("entrepot::set_root", std::string(gettext("root's entrepot must be an absolute path: ")) + p_root.display()); root = p_root; };
 
-	    /// set default permission and ownership for files to create thanks to the open() method
+	    /// set default permission and ownership for files to be created thanks to the open() method
 	void set_user_ownership(const std::string & x_user) { user = x_user; };
 	void set_group_ownership(const std::string & x_group) { group = x_group; };
 	void set_permission(const std::string & x_perm) { perm = x_perm; };
 
-	const path & get_location() const { return where; };
-	const path & get_root() const { return root; };
-	std::string get_full_path() const { return (get_root() + get_location()).display(); };
+	const path & get_location() const { return where; }; //< retreives relative to root path the current location points to
+	const path & get_root() const { return root; };      //< retrieves the given root location
+	path get_full_path() const;
 	virtual std::string get_url() const = 0; //< defines an URL-like normalized full location of slices
 	const std::string & get_user_ownership() const { return user; };
 	const std::string & get_group_ownership() const { return group; };
@@ -145,7 +157,7 @@ namespace libdar
 	entrepot_local & operator = (const entrepot_local & ref);
 	~entrepot_local() { detruit(); };
 
-	std::string get_url() const { return std::string("file://") + get_full_path(); };
+	std::string get_url() const { return std::string("file://") + get_full_path().display(); };
 
 	void read_dir_reset();
 	bool read_dir_next(std::string & filename);

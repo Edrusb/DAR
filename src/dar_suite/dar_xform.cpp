@@ -141,7 +141,7 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 		else 	// source not from a pipe
 		{
 		    if(src_dir != NULL)
-			entrep.set_location(src_dir->display());
+			entrep.set_location(*src_dir);
 		    else
 			throw SRC_BUG;
 
@@ -165,7 +165,7 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 		    else
 		    {
 			if(dst_dir != NULL)
-			    entrep.set_location(dst_dir->display());
+			    entrep.set_location(*dst_dir);
 			else
 			    throw SRC_BUG;
 			dst_sar = new (nothrow) trivial_sar(dialog,
@@ -183,7 +183,7 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 		else
 		{
 		    if(dst_dir != NULL)
-			entrep.set_location(dst_dir->display());
+			entrep.set_location(*dst_dir);
 		    else
 			throw SRC_BUG;
 		    dst_sar = new (nothrow) sar(dialog,

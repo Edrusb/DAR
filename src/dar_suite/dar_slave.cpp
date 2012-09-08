@@ -105,7 +105,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 	if(chemin == NULL)
 	    throw SRC_BUG;
 
-	entrep.set_location(chemin->display());
+	entrep.set_location(*chemin);
         try
         {
 	    source = new (nothrow) sar(dialog, filename, EXTENSION, entrep, true, min_digits, false, execute);

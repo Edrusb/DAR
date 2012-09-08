@@ -1235,7 +1235,7 @@ namespace libdar
 
 		tools_hook_substitute_and_execute(get_ui(),
 						  hook,
-						  entr->get_full_path(),
+						  entr->get_full_path().display(),
 						  base,
 						  num_str,
 						  sar_make_padded_number(num_str, min_digits),
@@ -1387,7 +1387,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	of_data_name = data_name;
 	old_sar = false;
 	min_digits = x_min_digits;
-	hook_where = where.get_full_path();
+	hook_where = where.get_full_path().display();
 	old_sar = format_07_compatible;
 
 	    // creating the slice if it does not exist else failing

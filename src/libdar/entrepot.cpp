@@ -66,6 +66,14 @@ namespace libdar
 	}
     }
 
+    path entrepot::get_full_path() const
+    {
+	if(get_location().is_relative())
+	    return get_root() + get_location();
+	else
+	    return get_location();
+    }
+
     entrepot::io_errors entrepot::open(user_interaction & dialog,
 				       const std::string & filename,
 				       gf_mode mode,
@@ -233,7 +241,7 @@ namespace libdar
     {
 	U_I o_mode = O_BINARY;
 	int fd = -1;
-	string fullname = (get_root() + get_location() + path(filename)).display();
+	string fullname = (get_full_path() + path(filename)).display();
 
 	switch(mode)
 	{
