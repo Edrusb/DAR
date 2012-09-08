@@ -41,6 +41,7 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include <new>
 #include "entrepot.hpp"
 #include "cygwin_adapt.hpp"
 #include "tools.hpp"
@@ -126,11 +127,11 @@ namespace libdar
 				if(hash_file == NULL)
 				    throw SRC_BUG;
 
-				ret = new hash_fichier(dialog,
-						       data,
-						       filename,
-						       hash_file,
-						       algo);
+				ret = new (nothrow) hash_fichier(dialog,
+								 data,
+								 filename,
+								 hash_file,
+								 algo);
 				if(ret == NULL)
 				    throw Ememory("entrepot::entrepot");
 				else
@@ -212,7 +213,7 @@ namespace libdar
 	detruit();
 	user_interaction_blind aveugle;
 
-	contents = new etage(aveugle, get_location().display().c_str(), 0, 0, false, furtive_mode);
+	contents = new (nothrow) etage(aveugle, get_location().display().c_str(), 0, 0, false, furtive_mode);
 	if(contents == NULL)
 	    throw Ememory("entrepot_local::read_dir_reset");
     }
@@ -292,7 +293,7 @@ namespace libdar
 	    if(mode != gf_read_only)
 		tools_set_ownership(fd, get_user_ownership(), get_group_ownership());
 
-	    ret = new fichier(dialog, fd);
+	    ret = new (nothrow) fichier(dialog, fd);
 	    if(ret == NULL)
 		throw Ememory("entrepot_local::inherited_open");
 	}

@@ -1781,9 +1781,9 @@ namespace libdar
 			{
 			    label data_name;
 			    data_name.clear();
-			    void_cat = new catalogue(dialog,
-						     0,
-						     data_name);
+			    void_cat = new (nothrow) catalogue(dialog,
+							       0,
+							       data_name);
 			    if(void_cat == NULL)
 				throw Ememory("archive::op_create_in_sub");
 			    ref_cat_ptr = void_cat;
