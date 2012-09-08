@@ -1,20 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
   <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -94,7 +79,7 @@ How to search for questions (and their answers) about <span style="font-weight: 
       <a href="#copy"><span style="font-weight: bold;"><span style="font-style: italic;">Can dar help copy a large directory tree?</span><span style="font-weight: bold; font-style: italic;">
      </span></span></a><br>
 <span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;">
-      
+
       </span>
       <h2><span style="font-weight: bold;">
       </span></h2><br>
@@ -2471,12 +2456,12 @@ Many backup/copy tools do not take care of file forks (MacOS X)... dar does,</li
 Many backup/copy tools do not take any precautions while working on a live system... dar does.</li>
       </ol>
 
-      
+
 Using the following command will do the trick:<br>
 
       <br>
 
-      
+
       <div style="margin-left: 40px;"><code>dar -c - -R &lt;srcdir&gt; -N --retry-on-change 3 | dar -x - --sequential-read -N -R &lt;dstdir&gt;</code><br>
       <code></code></div>
       <code>
@@ -2493,7 +2478,7 @@ Here is an example: we will copy the content of /home/my to /home2/my:<br>
 
 first we create the destination directory:<br>
 
-      
+
       <div style="margin-left: 40px;"><code>mkdir /home2/my<br>
       <br>
       </code></div>
@@ -2501,7 +2486,7 @@ first we create the destination directory:<br>
 
       then we run dar:<br>
 
-      
+
       <div style="margin-left: 40px;"><code>dar -c - -R /home/my -N --retry-on-change 3 | dar -x - --sequential-read -N -R /home2/my</code><span style="font-weight: bold;"></span><br>
       <span style="font-weight: bold;"><br>
       </span></div>
