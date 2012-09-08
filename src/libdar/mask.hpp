@@ -354,7 +354,7 @@ namespace libdar
         bool is_covered(const std::string &chemin) const;
 
 	    /// inherited from the mask class
-        mask *clone() const { return new same_path_mask(*this); };
+        mask *clone() const { return new (std::nothrow) same_path_mask(*this); };
 
     private :
         std::string chemin;
@@ -378,7 +378,7 @@ namespace libdar
 	bool is_covered(const path &chemin) const { return chemin.is_subdir_of(chemin, case_s); };
 
 	    /// inherited from the mask class
-	mask *clone() const { return new exclude_dir_mask(*this); };
+	mask *clone() const { return new (std::nothrow) exclude_dir_mask(*this); };
 
     private:
 	std::string chemin;

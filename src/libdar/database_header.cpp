@@ -89,7 +89,7 @@ namespace libdar
 	fd = ::open(filename.c_str(), O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
 	if(fd < 0)
 	    throw Erange("database_header_create", tools_printf(gettext("Cannot create database %S : %s"), &filename, strerror(errno)));
-	ret = new fichier(dialog, fd);
+	ret = new (nothrow) fichier(dialog, fd);
 	if(ret == NULL)
 	{
 	    close(fd);
@@ -100,7 +100,7 @@ namespace libdar
 	h.options = HEADER_OPTION_NONE;
 	h.write(*ret);
 
-	comp = new compressor(gzip, ret); // upon success, ret is owned by compr
+	comp = new (nothrow) compressor(gzip, ret); // upon success, ret is owned by compr
 	if(comp == NULL)
 	    throw Ememory("database_header_create");
 	else
@@ -120,7 +120,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new fichier(dialog, filename.c_str(), gf_read_only, tools_octal2int("0777"), false);
+		ret = new (nothrow) fichier(dialog, filename.c_str(), gf_read_only, tools_octal2int("0777"), false);
 	    }
 	    catch(Erange & e)
 	    {
@@ -135,7 +135,7 @@ namespace libdar
 	    if(h.options != HEADER_OPTION_NONE)
 		throw Erange("database_header_open", gettext("Unknown header option in database, aborting\n"));
 
-	    comp = new compressor(gzip, ret);
+	    comp = new (nothrow) compressor(gzip, ret);
 	    if(comp == NULL)
 		throw Ememory("database_header_open");
 	    else
