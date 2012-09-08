@@ -517,7 +517,7 @@ namespace libdar
 	std::string get_string(const std::string & message, bool echo) { return "user_interaction_blind, is blindly answering no"; };
 	secu_string get_secu_string(const std::string & message, bool echo) { return secu_string(); };
 
-	user_interaction *clone() const { user_interaction *ret = new user_interaction_blind(); if(ret == NULL) throw Ememory("user_interaction_blind::clone"); return ret; };
+	user_interaction *clone() const { user_interaction *ret = new (std::nothrow) user_interaction_blind(); if(ret == NULL) throw Ememory("user_interaction_blind::clone"); return ret; };
 
     protected:
 	void inherited_warning(const std::string & message) {}; // do not display any warning, this is "bind user_interaction" !

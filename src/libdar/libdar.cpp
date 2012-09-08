@@ -57,6 +57,7 @@ extern "C"
 
 #include <string>
 #include <iostream>
+#include <new>
 #include "libdar.hpp"
 #include "erreurs.hpp"
 #include "infinint.hpp"
@@ -227,8 +228,8 @@ namespace libdar
 	archive *ret = NULL;
         NLS_SWAP_IN;
 	WRAPPER_IN
-	    ret = new archive(dialog, chem,  basename,  extension,
-			      options);
+	    ret = new (nothrow) archive(dialog, chem,  basename,  extension,
+					options);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
 	return ret;
@@ -247,13 +248,13 @@ namespace libdar
 	archive *arch_ret = NULL;
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    arch_ret = new archive(dialog,
-				   fs_root,
-				   sauv_path,
-				   filename,
-				   extension,
-				   options,
-				   progressive_report);
+	    arch_ret = new (nothrow) archive(dialog,
+					     fs_root,
+					     sauv_path,
+					     filename,
+					     extension,
+					     options,
+					     progressive_report);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
 	return arch_ret;
@@ -272,14 +273,14 @@ namespace libdar
 	archive *ret = NULL;
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    ret = new archive(dialog,
-			      sauv_path,
-			      ref_arch,
-			      filename,
-			      extension,
-			      options);
+	    ret = new (nothrow) archive(dialog,
+					sauv_path,
+					ref_arch,
+					filename,
+					extension,
+					options);
 	WRAPPER_OUT(exception, except_msg)
-	NLS_SWAP_OUT;
+        NLS_SWAP_OUT;
 	return ret;
     }
 
@@ -296,13 +297,13 @@ namespace libdar
 	archive *ret = NULL;
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    ret = new archive(dialog,
-			      sauv_path,
-			      ref_arch1,
-			      filename,
-			      extension,
-			      options,
-			      progressive_report);
+	    ret = new (nothrow) archive(dialog,
+					sauv_path,
+					ref_arch1,
+					filename,
+					extension,
+					options,
+					progressive_report);
 	WRAPPER_OUT(exception, except_msg)
 	NLS_SWAP_OUT;
 	return ret;
