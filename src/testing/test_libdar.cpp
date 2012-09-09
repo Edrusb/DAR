@@ -72,7 +72,7 @@ void f1()
     libdar::compile_time::endian endy;
 
     get_version(maj, med, min);
-    printf("version %u.%u.%u\n", maj, med, min);
+    printf("version %u.%u.%u\n", (unsigned int)maj, (unsigned int)med, (unsigned int)min);
     ea = libdar::compile_time::ea();
     large = libdar::compile_time::largefile();
     nodump = libdar::compile_time::nodump();
@@ -90,7 +90,7 @@ void f1()
 	   BOOL2STR(large),
 	   BOOL2STR(nodump),
 	   BOOL2STR(special),
-	   bits,
+	   (unsigned int)bits,
 	   BOOL2STR(libz),
 	   BOOL2STR(libbz2),
 	   BOOL2STR(liblzo2),
