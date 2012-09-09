@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
 "POT-Creation-Date: 2012-07-04 19:19+0200\n"
-"PO-Revision-Date: 2012-04-15 11:26+0200\n"
+"PO-Revision-Date: 2012-09-09 10:28+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -1636,7 +1636,7 @@ msgstr "Impossible d'obtenir la date de dernière modification : %s"
 #: src/libdar/tools.cpp:1672
 #, c-format
 msgid "Cannot get size of %S: not a plain file"
-msgstr ""
+msgstr "Impossible de connaître la taill de %S: ce n'est pas un fichier plein"
 
 #: src/libdar/tools.cpp:1683
 #, c-format
@@ -1723,9 +1723,9 @@ msgstr ""
 "exécutable lié dynamiquement"
 
 #: src/libdar/tools.cpp:2203
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown group: %S"
-msgstr "Utilisateur inconnu : %S"
+msgstr "Groupe inconnu : %S"
 
 #: src/libdar/tools.cpp:2207
 msgid ""
@@ -4965,9 +4965,9 @@ msgstr "   -v\t\t mode verbeux\n"
 
 #: src/dar_suite/dar_manager.usage:29 src/dar_suite/dar_slave.usage:8
 #: src/dar_suite/dar_xform.usage:22
-#, fuzzy, c-format
+#, c-format
 msgid "See man page for more options.\n"
-msgstr "Voir la page de manuel pour plus de détails.\n"
+msgstr "Voir la page de manuel pour plus d'options.\n"
 
 #: src/dar_suite/dar.cpp:111
 msgid "Considering the (first) archive of reference:"
