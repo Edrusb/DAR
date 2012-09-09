@@ -52,7 +52,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_XFORM_VERSION "1.5.2"
+#define DAR_XFORM_VERSION "1.5.3"
 
 static bool command_line(user_interaction & dialog,
 			 S_I argc, char * const argv[],
