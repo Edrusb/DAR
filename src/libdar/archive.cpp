@@ -422,7 +422,7 @@ namespace libdar
         try
         {
 	    entrepot *sauv_path_t = options.get_entrepot().clone();
-	    if(sauv_path == NULL)
+	    if(sauv_path_t == NULL)
 		throw Ememory("archive::archive");
 	    sauv_path_t->set_location(sauv_path);
 
