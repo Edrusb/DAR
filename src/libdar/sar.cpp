@@ -204,7 +204,7 @@ namespace libdar
 	     hash_algo x_hash,
 	     const infinint & x_min_digits,
 	     bool format_07_compatible,
-	     const string & execute) : generic_file(gf_read_write), mem_ui(dialog)
+	     const string & execute) : generic_file(gf_write_only), mem_ui(dialog)
     {
         if(file_size < header::min_size() + 1)  //< one more byte to store at least one byte of data
             throw Erange("sar::sar", gettext("File size too small"));
@@ -564,7 +564,7 @@ namespace libdar
         if(of_fd != NULL)
         {
 	    char flag = terminal ? flag_type_terminal : flag_type_non_terminal;
-	    if(get_mode() == gf_read_write)
+	    if(get_mode() == gf_read_write || get_mode() == gf_write_only)
 	    {
 		if(old_sar)
 		{
@@ -1367,7 +1367,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 			     bool warn_over,
 			     hash_algo x_hash,
 			     const infinint & x_min_digits,
-			     bool format_07_compatible) : generic_file(gf_read_write), mem_ui(dialog)
+			     bool format_07_compatible) : generic_file(gf_write_only), mem_ui(dialog)
     {
 
 	    // some local variables to be used
