@@ -915,7 +915,7 @@ namespace libdar
 	    // open for writing but succeeds only if this file does NOT already exist
 	try
 	{
-	    code = entr->open(get_ui(), fic, gf_read_write, true, false, hash, of_fd);
+	    code = entr->open(get_ui(), fic, gf_write_only, true, false, hash, of_fd);
 	}
 	catch(Erange & e)
 	{
@@ -1393,7 +1393,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	    // creating the slice if it does not exist else failing
 	try
 	{
-	    code = where.open(dialog, filename, gf_read_write, true, false, x_hash, tmp);
+	    code = where.open(dialog, filename, gf_write_only, true, false, x_hash, tmp);
 
 	    switch(code)
 	    {
@@ -1408,7 +1408,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 		if(warn_over)
 		    dialog.pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
 
-		code = where.open(dialog, filename, gf_read_write, false, true, x_hash, tmp);
+		code = where.open(dialog, filename, gf_write_only, false, true, x_hash, tmp);
 		switch(code)
 		{
 		case entrepot::io_ok:

@@ -88,7 +88,7 @@ namespace libdar
 
 	    // sanity check
 	if(algo != hash_none && (mode != gf_write_only || !(erase || fail_if_exists)))
-	    throw SRC_BUG;
+	    throw SRC_BUG; // if hashing is asked, we cannot accept an open on a existing file without erasing its contents
 
 	    // creating the file to write data to
 	code = inherited_open(dialog,
