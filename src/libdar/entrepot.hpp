@@ -162,7 +162,7 @@ namespace libdar
 	void read_dir_reset();
 	bool read_dir_next(std::string & filename);
 
-	entrepot *clone() const { return new entrepot_local(*this); };
+	entrepot *clone() const { return new (nothrow) entrepot_local(*this); };
 
     protected:
 	io_errors inherited_open(user_interaction & dialog,
