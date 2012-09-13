@@ -1374,7 +1374,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 
 	entrepot::io_errors code;
 	fichier_global *tmp = NULL;
-	const string filename = sar_make_filename(base_name, 1, min_digits, extension);
+	const string filename = sar_make_filename(base_name, 1, x_min_digits, extension);
 
 	    // initializing object fields from constructor arguments
 
