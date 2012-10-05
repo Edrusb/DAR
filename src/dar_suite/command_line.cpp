@@ -1141,7 +1141,7 @@ static bool get_args_recursive(recursive_param & rec,
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
 		tmp_string = line_tools_get_full_path_from_PATH(rec.dar_dcf_path, optarg);
                 if(find(rec.inclusions.begin(), rec.inclusions.end(), tmp_string) != rec.inclusions.end())
-                    throw Erange("geta_args", tools_printf(gettext("File inclusion loop detected. The file %s includes itself directly or through other files (-B option)"), optarg));
+                    throw Erange("get_args", tools_printf(gettext("File inclusion loop detected. The file %s includes itself directly or through other files (-B option)"), optarg));
                 else
                 {
                     bool ret;
@@ -1151,7 +1151,7 @@ static bool get_args_recursive(recursive_param & rec,
 		    }
 		    catch(Erange & e)
 		    {
-			Erange modif = Erange("included_file", e.get_message());
+			Erange modif = Erange("get_args", tools_printf(gettext("Error in included file (%s): "), optarg) + e.get_message());
 			throw modif;
 		    }
 #if DEBOGGAGE
