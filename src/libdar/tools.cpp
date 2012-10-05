@@ -324,6 +324,8 @@ namespace libdar
     {
 	if(&s == NULL)
 	    throw SRC_BUG;
+	if(s.empty())
+	    return s.end();
 
 	string::iterator back, it = s.begin();
 	bool valid = (it != s.end()) && (*it == v);
@@ -334,7 +336,7 @@ namespace libdar
 	    it = find(it + 1, s.end(), v);
 	}
 
-	if(!valid && back == s.begin())
+	if(!valid && (back == s.begin())) // no char found at all (back has been sticked at the beginning and the first character is not the one we look for
 	    return s.end();
 	else
 	    return back;
