@@ -527,6 +527,9 @@ namespace libdar
 			{
 			    e_ino = dynamic_cast<inode *>(e_mir->get_inode());
 			    e_file = dynamic_cast<file *>(e_mir->get_inode());
+			    if(e_ino == NULL)
+				throw SRC_BUG;
+			    e_ino->change_name(e_mir->get_name());
 			}
 		    }
 
