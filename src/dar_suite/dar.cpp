@@ -270,6 +270,9 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 
 		    // making some room in memory
 
+		if(param.info_details)
+		    dialog.warning(gettext("Making room in memory..."));
+
 		if(arch != NULL)
 		{
 		    delete arch;
@@ -295,7 +298,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 			throw SRC_BUG;
 		    if(param.op == create)
 		    {
-			if(param.info_details)
+			if(!param.quiet)
 			    dialog.warning(gettext("Now performing on-fly isolation..."));
 			if(cur == NULL)
 			    throw SRC_BUG;
@@ -328,7 +331,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 			isolate_options.set_user_comment(param.user_comment);
 			isolate_options.set_sequential_marks(param.use_sequential_marks);
 			arch = new (nothrow) archive(dialog, *param.aux_root, cur, *param.aux_filename, EXTENSION,
-					   isolate_options);
+						     isolate_options);
 			if(arch == NULL)
 			    throw Ememory("little_main");
 		    }
@@ -347,7 +350,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.ref_num_digits);
 		arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
-				   read_options);
+					     read_options);
 		if(arch == NULL)
 		    throw Ememory("little_main");
 		else
@@ -375,7 +378,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		isolate_options.set_slice_min_digits(param.num_digits);
 		isolate_options.set_sequential_marks(param.use_sequential_marks);
                 cur = new (nothrow) archive(dialog, *param.sauv_root, arch, param.filename, EXTENSION,
-				  isolate_options);
+					    isolate_options);
 		if(cur == NULL)
 		    throw Ememory("little_main");
                 break;
@@ -408,10 +411,10 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		}
 
 		arch = new (nothrow) archive(dialog,
-				   *param.sauv_root,
-				   param.filename,
-				   EXTENSION,
-				   read_options);
+					     *param.sauv_root,
+					     param.filename,
+					     EXTENSION,
+					     read_options);
 		if(arch == NULL)
 		    throw Ememory("little_main");
 
@@ -609,6 +612,9 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 	}
 	catch(...)
 	{
+	    if(!param.quiet)
+		dialog.warning(gettext("Final memory cleanup..."));
+
 	    if(arch != NULL)
 	    {
 		delete arch;
@@ -626,6 +632,9 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 	    }
 	    throw;
 	}
+
+	if(param.info_details)
+	    dialog.warning(gettext("Final memory cleanup..."));
 	if(arch != NULL)
 	{
 	    delete arch;
