@@ -1635,13 +1635,21 @@ namespace libdar
 	sigset_t all;
 
 	sigfillset(&all);
+#if HAVE_LIBPTHREAD
+	if(pthread_sigmask(SIG_BLOCK, &all, &old_mask) != 0)
+#else
 	if(sigprocmask(SIG_BLOCK, &all, &old_mask) != 0)
+#endif
 	    throw Erange("tools_block_all_signals", string(dar_gettext("Cannot block signals: "))+strerror(errno));
     }
 
     void tools_set_back_blocked_signals(sigset_t old_mask)
     {
+#if HAVE_LIBPTHREAD
+	if(pthread_sigmask(SIG_SETMASK, &old_mask, NULL))
+#else
 	if(sigprocmask(SIG_SETMASK, &old_mask, NULL))
+#endif
 	    throw Erange("tools_set_back_block_all_signals", string(dar_gettext("Cannot unblock signals: "))+strerror(errno));
     }
 
