@@ -33,7 +33,6 @@ extern "C"
 #if HAVE_LIMITS_H
 #include <limits.h>
 #endif
-
 }
 #include <string>
 
