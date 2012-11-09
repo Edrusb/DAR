@@ -5,6 +5,18 @@ if [ ! -f AUTHORS ] ; then
   exit 1
 fi
 
+# if 'make' fails because of a lack of 'Makefile' in the po subdirectory
+# you probably have to tune the following environment variable according
+# to your system.
+NLSPATH='/usr/share/locale/%L/LC_MESSAGES/%N.cat'
+export NLSPATH
+# if you can't figure out the problem and can avoid having
+# translated messages do the following
+#
+#    cp po/Makefile.sos po/Makefile
+#
+#
+
 cp src/build/configure.ac .
 cp src/build/Makefile.am .
 

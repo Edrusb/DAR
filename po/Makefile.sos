@@ -1,0 +1,11 @@
+#
+#  This is a void Makefile that let compile dar/libdar
+#  if you have problem building the source from GIT
+#
+
+all:
+clean:
+distclean:
+dist:
+distdir:
+
