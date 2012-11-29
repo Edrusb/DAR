@@ -600,7 +600,7 @@ AC_ARG_ENABLE( [execinfo],
 	       AC_HELP_STRING(--disable-execinfo, [disable reporting stack information on self diagnostic bugs even]),
 	       [AC_MSG_WARN([ignoring execinfo even if available])],
 	       [
-	       AC_CHECK_LIB(execinfo, backtrace, [], []),
+	       AC_CHECK_LIB(execinfo, backtrace, [], [])
 	       AC_CHECK_HEADERS([execinfo.h])
 	       ]
 	     )

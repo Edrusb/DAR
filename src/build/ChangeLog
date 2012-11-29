@@ -2,6 +2,7 @@ from 2.4.8 to 2.4.9
 - fixed bug: during differential backup dar saved unchanged hard linked inode
   when a hard link on that inode was out of the -R root directory.
 - Adapted patch provided by Kevin Wormington (new messages displayed)
+- Fixed syntax error in configure script about execinfo detection
 
 from 2.4.7 to 2.4.8
 - documentation fixes and updates
