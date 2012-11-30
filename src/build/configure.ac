@@ -10,7 +10,6 @@ AM_INIT_AUTOMAKE
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION
 XGETTEXT_EXTRA_OPTIONS='--keyword=dar_gettext'
-AM_ICONV
 
 # Checks for programs.
 AC_PROG_CXX
