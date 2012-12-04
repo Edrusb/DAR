@@ -23,6 +23,8 @@ dist_noinst_DATA = build_tree.sh main.sh modif_tree.sh routine.sh loop.sh
 noinst_PROGRAMS = all_features
 check_PROGRAMS = permission
 LDADD = -L../libdar -l$(MYLIB)
+AM_LDFLAGS = @LTLIBINTL@
+
 permission:
 	chmod a+x $(dist_noinst_DATA) loop.sh
 	./loop.sh
