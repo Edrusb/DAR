@@ -210,7 +210,7 @@ static int copy_max(user_interaction & dialog, int src, int dst)
     off_t taille = lseek(src, 0, SEEK_END);
     lseek(src, 0, SEEK_SET);
 
-    dialog.warning(tools_printf(gettext("Starting the copy of %d byte(s)"), taille));
+    dialog.warning(tools_printf(gettext("Starting the copy of %u byte(s)"), taille));
     do
     {
 	thr.check_self_cancellation();
