@@ -597,9 +597,10 @@ namespace libdar
 						{
 							// both are inodes
 
-						    if(f_ino->signature() == e_ino->signature())
+						    if(f_ino->signature() == e_ino->signature()
+						       && f_file != NULL) // restricting security check to plain files only
 						    {
-							    // same inode type
+							    // both are plain file or hard-linked plain files
 
 							if(f_ino->get_uid() == e_ino->get_uid()
 							   && f_ino->get_gid() == e_ino->get_gid()
@@ -608,21 +609,15 @@ namespace libdar
 							{
 								// same inode information
 
-							    if(f_file == NULL || e_file == NULL
-							       || f_file->get_size() == e_file->get_size())
+							    if(f_ino->has_last_change() && e_ino->has_last_change())
 							    {
-								    // file size is unchanged
+								    // both inode ctime has been recorded
 
-								if(f_ino->has_last_change() && e_ino->has_last_change())
+								if(f_ino->get_last_change() != e_ino->get_last_change())
 								{
-									// both inode ctime has been recorded
+								    string tmp = juillet.get_string();
 
-								    if(f_ino->get_last_change() != e_ino->get_last_change())
-								    {
-									string tmp = juillet.get_string();
-
-									dialog.printf(gettext("SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of reference was done, while no inode or data changed"), &tmp);
-								    }
+								    dialog.printf(gettext("SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of reference was done, while no other inode information changed"), &tmp);
 								}
 							    }
 							}
