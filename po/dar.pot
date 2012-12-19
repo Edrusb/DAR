@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: dar 2.4.8\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2012-09-09 10:38+0200\n"
+"POT-Creation-Date: 2012-12-19 12:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -140,15 +140,15 @@ msgstr ""
 msgid "Failed writing down the hash: "
 msgstr ""
 
-#: src/libdar/sparse_file.cpp:157
+#: src/libdar/sparse_file.cpp:162
 msgid "Incoherent structure in data carrying sparse files: unknown mark"
 msgstr ""
 
-#: src/libdar/sparse_file.cpp:308
+#: src/libdar/sparse_file.cpp:313
 msgid "Cannot skip forward to restore a hole"
 msgstr ""
 
-#: src/libdar/sparse_file.cpp:322
+#: src/libdar/sparse_file.cpp:327
 msgid "Data corruption or unknown sparse_file mark found in file's data"
 msgstr ""
 
@@ -1140,226 +1140,226 @@ msgstr ""
 msgid "Unknown suffix [%c] in string %S"
 msgstr ""
 
-#: src/libdar/tools.cpp:424
+#: src/libdar/tools.cpp:426
 msgid "Cannot read \"fcntl\" file's flags : "
 msgstr ""
 
-#: src/libdar/tools.cpp:430
+#: src/libdar/tools.cpp:432
 msgid "Cannot set \"fcntl\" file's flags : "
 msgstr ""
 
-#: src/libdar/tools.cpp:501 src/libdar/tools.cpp:506 src/libdar/tools.cpp:518
-#: src/libdar/tools.cpp:523
+#: src/libdar/tools.cpp:503 src/libdar/tools.cpp:508 src/libdar/tools.cpp:520
+#: src/libdar/tools.cpp:525
 msgid "Invalid number: "
 msgstr ""
 
-#: src/libdar/tools.cpp:598
+#: src/libdar/tools.cpp:600
 msgid "date before 1970 is not allowed"
 msgstr ""
 
-#: src/libdar/tools.cpp:603
+#: src/libdar/tools.cpp:605
 msgid "Incorrect month"
 msgstr ""
 
-#: src/libdar/tools.cpp:608
+#: src/libdar/tools.cpp:610
 msgid "Incorrect day of month"
 msgstr ""
 
-#: src/libdar/tools.cpp:613
+#: src/libdar/tools.cpp:615
 msgid "Incorrect hour"
 msgstr ""
 
-#: src/libdar/tools.cpp:618
+#: src/libdar/tools.cpp:620
 msgid "Incorrect minute"
 msgstr ""
 
-#: src/libdar/tools.cpp:623
+#: src/libdar/tools.cpp:625
 msgid "Incorrect second"
 msgstr ""
 
-#: src/libdar/tools.cpp:627
+#: src/libdar/tools.cpp:629
 msgid "Bad formatted date expression"
 msgstr ""
 
-#: src/libdar/tools.cpp:740
+#: src/libdar/tools.cpp:742
 msgid "Given date must be in the past"
 msgstr ""
 
-#: src/libdar/tools.cpp:775 src/libdar/tools.cpp:861
+#: src/libdar/tools.cpp:777 src/libdar/tools.cpp:863
 msgid "Error while calling fork() to launch dar: "
 msgstr ""
 
-#: src/libdar/tools.cpp:789 src/libdar/tools.cpp:891
+#: src/libdar/tools.cpp:791 src/libdar/tools.cpp:893
 msgid "Unexpected error while waiting for dar to terminate: "
 msgstr ""
 
-#: src/libdar/tools.cpp:795 src/libdar/tools.cpp:897
+#: src/libdar/tools.cpp:797 src/libdar/tools.cpp:899
 msgid "DAR terminated upon signal reception: "
 msgstr ""
 
-#: src/libdar/tools.cpp:801 src/libdar/tools.cpp:903
+#: src/libdar/tools.cpp:803 src/libdar/tools.cpp:905
 msgid " . Retry to launch dar as previously ?"
 msgstr ""
 
-#: src/libdar/tools.cpp:806 src/libdar/tools.cpp:813 src/libdar/tools.cpp:908
-#: src/libdar/tools.cpp:915
+#: src/libdar/tools.cpp:808 src/libdar/tools.cpp:815 src/libdar/tools.cpp:910
+#: src/libdar/tools.cpp:917
 msgid " Continue anyway ?"
 msgstr ""
 
-#: src/libdar/tools.cpp:811 src/libdar/tools.cpp:913
+#: src/libdar/tools.cpp:813 src/libdar/tools.cpp:915
 msgid "DAR sub-process has terminated with exit code "
-msgstr ""
-
-#: src/libdar/tools.cpp:1023
-#, c-format
-msgid "   Libz compression (gzip)    : %s\n"
-msgstr ""
-
-#: src/libdar/tools.cpp:1024
-#, c-format
-msgid "   Libbz2 compression (bzip2) : %s\n"
 msgstr ""
 
 #: src/libdar/tools.cpp:1025
 #, c-format
-msgid "   Liblzo2 compression (lzo)  : %s\n"
+msgid "   Libz compression (gzip)    : %s\n"
 msgstr ""
 
 #: src/libdar/tools.cpp:1026
 #, c-format
-msgid "   Strong encryption          : %s\n"
+msgid "   Libbz2 compression (bzip2) : %s\n"
 msgstr ""
 
 #: src/libdar/tools.cpp:1027
 #, c-format
-msgid "   Extended Attributes support: %s\n"
+msgid "   Liblzo2 compression (lzo)  : %s\n"
 msgstr ""
 
 #: src/libdar/tools.cpp:1028
 #, c-format
-msgid "   Large files support (> 2GB): %s\n"
+msgid "   Strong encryption          : %s\n"
 msgstr ""
 
 #: src/libdar/tools.cpp:1029
 #, c-format
-msgid "   ext2fs NODUMP flag support : %s\n"
+msgid "   Extended Attributes support: %s\n"
 msgstr ""
 
 #: src/libdar/tools.cpp:1030
 #, c-format
-msgid "   Special allocation scheme  : %s\n"
+msgid "   Large files support (> 2GB): %s\n"
+msgstr ""
+
+#: src/libdar/tools.cpp:1031
+#, c-format
+msgid "   ext2fs NODUMP flag support : %s\n"
 msgstr ""
 
 #: src/libdar/tools.cpp:1032
 #, c-format
-msgid "   Integer size used          : unlimited\n"
+msgid "   Special allocation scheme  : %s\n"
 msgstr ""
 
 #: src/libdar/tools.cpp:1034
 #, c-format
-msgid "   Integer size used          : %d bits\n"
+msgid "   Integer size used          : unlimited\n"
 msgstr ""
 
-#: src/libdar/tools.cpp:1035
+#: src/libdar/tools.cpp:1036
 #, c-format
-msgid "   Thread safe support        : %s\n"
+msgid "   Integer size used          : %d bits\n"
 msgstr ""
 
 #: src/libdar/tools.cpp:1037
 #, c-format
+msgid "   Thread safe support        : %s\n"
+msgstr ""
+
+#: src/libdar/tools.cpp:1039
+#, c-format
 msgid "   Furtive read mode support  : %s\n"
 msgstr ""
 
-#: src/libdar/tools.cpp:1066
+#: src/libdar/tools.cpp:1068
 msgid "big"
 msgstr ""
 
-#: src/libdar/tools.cpp:1069
+#: src/libdar/tools.cpp:1071
 msgid "little"
 msgstr ""
 
-#: src/libdar/tools.cpp:1072
+#: src/libdar/tools.cpp:1074
 msgid "error!"
 msgstr ""
 
-#: src/libdar/tools.cpp:1077
+#: src/libdar/tools.cpp:1079
 #, c-format
 msgid "   Detected system/CPU endian : %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:1078
+#: src/libdar/tools.cpp:1080
 #, c-format
 msgid "   Large dir. speed optimi.   : %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:1122
+#: src/libdar/tools.cpp:1124
 #, c-format
 msgid ""
 "Warning, %S seems more to be a slice name than a base name. Do you want to "
 "replace it by %S ?"
 msgstr ""
 
-#: src/libdar/tools.cpp:1127
+#: src/libdar/tools.cpp:1129
 #, c-format
 msgid "OK, keeping %S as basename"
 msgstr ""
 
-#: src/libdar/tools.cpp:1162
+#: src/libdar/tools.cpp:1164
 msgid "Cannot get full path of current working directory: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1189
+#: src/libdar/tools.cpp:1191
 msgid "NULL argument given to tools_readlink()"
 msgstr ""
 
-#: src/libdar/tools.cpp:1191
+#: src/libdar/tools.cpp:1193
 msgid "Empty string given as argument to tools_readlink()"
 msgstr ""
 
-#: src/libdar/tools.cpp:1215
+#: src/libdar/tools.cpp:1217
 #, c-format
 msgid "Cannot read file information for %s : %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:1268
+#: src/libdar/tools.cpp:1270
 msgid "Cannot set last access and last modification time: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1304
+#: src/libdar/tools.cpp:1306
 msgid "NULL given as argument"
 msgstr ""
 
-#: src/libdar/tools.cpp:1335
+#: src/libdar/tools.cpp:1337
 msgid "Aborting program: child process died unexpectedly"
 msgstr ""
 
-#: src/libdar/tools.cpp:1341
+#: src/libdar/tools.cpp:1343
 #, c-format
 msgid "Error trying to run %s: %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:1343
+#: src/libdar/tools.cpp:1345
 msgid "execvp() failed but did not returned error code"
-msgstr ""
-
-#: src/libdar/tools.cpp:1540
-#, c-format
-msgid "Removing file %s"
 msgstr ""
 
 #: src/libdar/tools.cpp:1542
 #, c-format
+msgid "Removing file %s"
+msgstr ""
+
+#: src/libdar/tools.cpp:1544
+#, c-format
 msgid "Error removing file %s: %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:1567
+#: src/libdar/tools.cpp:1569
 #, c-format
 msgid ""
 "Overwriting not allowed while a slice of a previous archive with the same "
 "basename has been found in the %s directory, Operation aborted"
 msgstr ""
 
-#: src/libdar/tools.cpp:1573
+#: src/libdar/tools.cpp:1575
 #, c-format
 msgid ""
 "At least one slice of an old archive with the same name remains in the "
@@ -1367,127 +1367,127 @@ msgid ""
 "creating an archive of same name. Can I remove these old slices?"
 msgstr ""
 
-#: src/libdar/tools.cpp:1611 src/libdar/tools.cpp:1615
+#: src/libdar/tools.cpp:1613 src/libdar/tools.cpp:1617
 #, c-format
 msgid "Cannot get inode information for %s: %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:1624
+#: src/libdar/tools.cpp:1626
 msgid "Current Working Directory cannot be a relative path"
 msgstr ""
 
-#: src/libdar/tools.cpp:1637
+#: src/libdar/tools.cpp:1643
 msgid "Cannot block signals: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1643
+#: src/libdar/tools.cpp:1653
 msgid "Cannot unblock signals: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1661 src/libdar/tools.cpp:1671
+#: src/libdar/tools.cpp:1671 src/libdar/tools.cpp:1681
 #, c-format
 msgid "Cannot get last modification date: %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:1674
+#: src/libdar/tools.cpp:1684
 #, c-format
 msgid "Cannot get size of %S: not a plain file"
 msgstr ""
 
-#: src/libdar/tools.cpp:1685
+#: src/libdar/tools.cpp:1695
 #, c-format
 msgid "Cannot get mtime: %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:1774
+#: src/libdar/tools.cpp:1784
 #, c-format
 msgid "Parse error: Unmatched `%c'"
 msgstr ""
 
-#: src/libdar/tools.cpp:1817
+#: src/libdar/tools.cpp:1827
 msgid "Unknown substitution string: %"
 msgstr ""
 
-#: src/libdar/tools.cpp:1824
+#: src/libdar/tools.cpp:1834
 msgid ""
 "last char of user command-line to execute is '%', (use '%%' instead to avoid "
 "this message)"
 msgstr ""
 
-#: src/libdar/tools.cpp:1878
+#: src/libdar/tools.cpp:1888
 msgid "execve() failed. (process table is full ?)"
 msgstr ""
 
-#: src/libdar/tools.cpp:1880
+#: src/libdar/tools.cpp:1890
 msgid "system() call failed: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1882
+#: src/libdar/tools.cpp:1892
 #, c-format
 msgid "execution of [ %S ] returned error code: %d"
 msgstr ""
 
-#: src/libdar/tools.cpp:1889
+#: src/libdar/tools.cpp:1899
 msgid "Error during user command line execution: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1889
+#: src/libdar/tools.cpp:1899
 msgid " . Retry command-line ?"
 msgstr ""
 
-#: src/libdar/tools.cpp:1894
+#: src/libdar/tools.cpp:1904
 msgid "Ignore previous error on user command line and continue ?"
 msgstr ""
 
-#: src/libdar/tools.cpp:1934
+#: src/libdar/tools.cpp:1944
 msgid "Fatal error on user command line: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1955
+#: src/libdar/tools.cpp:1965
 msgid "End of file reached while skipping to the begin of a word"
 msgstr ""
 
-#: src/libdar/tools.cpp:1966
+#: src/libdar/tools.cpp:1976
 msgid "Reached end of file while reading a word"
 msgstr ""
 
-#: src/libdar/tools.cpp:2099 src/libdar/tools.cpp:2105
+#: src/libdar/tools.cpp:2109 src/libdar/tools.cpp:2115
 msgid "Badly formated octal number"
 msgstr ""
 
-#: src/libdar/tools.cpp:2132
+#: src/libdar/tools.cpp:2142
 #, c-format
 msgid "Error while setting file permission: %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:2189
+#: src/libdar/tools.cpp:2199
 #, c-format
 msgid "Unknown user: %S"
 msgstr ""
 
-#: src/libdar/tools.cpp:2193
+#: src/libdar/tools.cpp:2203
 msgid ""
 "Cannot convert username to uid in statically linked binary, either directly "
 "provide the UID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:2205
+#: src/libdar/tools.cpp:2215
 #, c-format
 msgid "Unknown group: %S"
 msgstr ""
 
-#: src/libdar/tools.cpp:2209
+#: src/libdar/tools.cpp:2219
 msgid ""
 "Cannot convert group to gid in statically linked binary, either directly "
 "provide the GID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:2216
+#: src/libdar/tools.cpp:2226
 #, c-format
 msgid "Error while setting file user ownership: %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:2376
+#: src/libdar/tools.cpp:2386
 msgid "Error while fetching hostname: "
 msgstr ""
 
@@ -1545,245 +1545,245 @@ msgstr ""
 msgid "Warning! No file in that directory will be restored: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:552
+#: src/libdar/filtre.cpp:555
 msgid "Recording hard link into the archive: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:621
+#: src/libdar/filtre.cpp:620
 #, c-format
 msgid ""
 "SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of "
-"reference was done, while no inode or data changed"
+"reference was done, while no other inode information changed"
 msgstr ""
 
-#: src/libdar/filtre.cpp:867
+#: src/libdar/filtre.cpp:865
 msgid "Error while saving "
 msgstr ""
 
-#: src/libdar/filtre.cpp:882
+#: src/libdar/filtre.cpp:880
 msgid "NO FILE IN THAT DIRECTORY CAN BE SAVED."
 msgstr ""
 
-#: src/libdar/filtre.cpp:887
+#: src/libdar/filtre.cpp:885
 msgid "Cannot write down the archive: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:965
+#: src/libdar/filtre.cpp:963
 msgid "SKIPPED (hard link in sequential read mode): "
 msgstr ""
 
-#: src/libdar/filtre.cpp:995
+#: src/libdar/filtre.cpp:993
 msgid "OK   "
 msgstr ""
 
-#: src/libdar/filtre.cpp:1006 src/libdar/filtre.cpp:1038
+#: src/libdar/filtre.cpp:1004 src/libdar/filtre.cpp:1036
 msgid "DIFF "
 msgstr ""
 
-#: src/libdar/filtre.cpp:1038
+#: src/libdar/filtre.cpp:1036
 msgid ": file not present in filesystem"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1090
+#: src/libdar/filtre.cpp:1088
 msgid "ERR  "
 msgstr ""
 
-#: src/libdar/filtre.cpp:1150
+#: src/libdar/filtre.cpp:1148
 msgid "Can't read saved data."
 msgstr ""
 
-#: src/libdar/filtre.cpp:1176
+#: src/libdar/filtre.cpp:1174
 msgid "CRC error: data corruption."
 msgstr ""
 
-#: src/libdar/filtre.cpp:1212
+#: src/libdar/filtre.cpp:1210
 msgid "OK  "
 msgstr ""
 
-#: src/libdar/filtre.cpp:1247
+#: src/libdar/filtre.cpp:1245
 msgid "ERR "
 msgstr ""
 
-#: src/libdar/filtre.cpp:1268
+#: src/libdar/filtre.cpp:1266
 msgid "Preparing the archive contents for isolation..."
 msgstr ""
 
-#: src/libdar/filtre.cpp:1422
+#: src/libdar/filtre.cpp:1420
 msgid ""
 "Decremental mode is useless when merging is not applied to both an archive "
 "of reference and an auxiliary archive of reference. Ignore decremental mode "
 "and continue?"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1524
+#: src/libdar/filtre.cpp:1522
 msgid "first"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1527
+#: src/libdar/filtre.cpp:1525
 msgid "second"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1530
+#: src/libdar/filtre.cpp:1528
 msgid "next"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1533
+#: src/libdar/filtre.cpp:1531
 #, c-format
 msgid "Merging/filtering files from the %s archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1615
+#: src/libdar/filtre.cpp:1613
 msgid "overwritten"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1619 src/libdar/filtre.cpp:1663
+#: src/libdar/filtre.cpp:1617 src/libdar/filtre.cpp:1661
 msgid "dropped from the archive and marked as already saved"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1622
+#: src/libdar/filtre.cpp:1620
 msgid "removed"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1627
+#: src/libdar/filtre.cpp:1625
 #, c-format
 msgid "Data of file %S is about to be %S, proceed?"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1656
+#: src/libdar/filtre.cpp:1654
 msgid "replaced"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1659
+#: src/libdar/filtre.cpp:1657
 msgid "removed from the archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1666
+#: src/libdar/filtre.cpp:1664
 msgid "merged with possible overwriting"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1671
+#: src/libdar/filtre.cpp:1669
 #, c-format
 msgid "EA of file %S are about to be %S, proceed?"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1730
+#: src/libdar/filtre.cpp:1728
 #, c-format
 msgid ""
 "EA of file %S from first archive have been updated with those of same named "
 "file of the auxiliary archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1739
+#: src/libdar/filtre.cpp:1737
 #, c-format
 msgid ""
 "EA of file %S from first archive have been dropped and marked as already "
 "saved"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1748 src/libdar/filtre.cpp:1871
+#: src/libdar/filtre.cpp:1746 src/libdar/filtre.cpp:1869
 #, c-format
 msgid "EA of file %S from first archive have been removed"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1760
+#: src/libdar/filtre.cpp:1758
 #, c-format
 msgid "Data of file %S from first archive has been preserved from overwriting"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1811
+#: src/libdar/filtre.cpp:1809
 #, c-format
 msgid ""
 "Data of file %S taken from the first archive of reference has been removed"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1814
+#: src/libdar/filtre.cpp:1812
 #, c-format
 msgid ""
 "Data of file %S taken from the first archive of reference has been "
 "overwritten"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1844
+#: src/libdar/filtre.cpp:1842
 #, c-format
 msgid "EA of file %S has been overwritten"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1848 src/libdar/filtre.cpp:1864
+#: src/libdar/filtre.cpp:1846 src/libdar/filtre.cpp:1862
 #, c-format
 msgid "EA of file %S has been overwritten and marked as already saved"
 msgstr ""
 
-#: src/libdar/filtre.cpp:1854 src/libdar/filtre.cpp:1859
+#: src/libdar/filtre.cpp:1852 src/libdar/filtre.cpp:1857
 #, c-format
 msgid ""
 "EA of file %S from first archive have been updated with those of the same "
 "named file of the auxiliary archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:2137
+#: src/libdar/filtre.cpp:2135
 msgid " not merged (user choice)"
 msgstr ""
 
-#: src/libdar/filtre.cpp:2141
+#: src/libdar/filtre.cpp:2139
 msgid "No file in this directory will be considered for merging."
 msgstr ""
 
-#: src/libdar/filtre.cpp:2161
+#: src/libdar/filtre.cpp:2159
 msgid "Error while considering file "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2165
+#: src/libdar/filtre.cpp:2163
 msgid "Warning! No file in this directory will be considered for merging: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2201
+#: src/libdar/filtre.cpp:2199
 msgid ""
 "File selection has been aborted. Now building the resulting archive with the "
 "already selected files"
 msgstr ""
 
-#: src/libdar/filtre.cpp:2352
+#: src/libdar/filtre.cpp:2350
 msgid "Adding Hard link to archive: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2410
+#: src/libdar/filtre.cpp:2408
 msgid "Adding file to archive: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2511
+#: src/libdar/filtre.cpp:2509
 msgid "Copied data does not match CRC"
 msgstr ""
 
-#: src/libdar/filtre.cpp:2595
+#: src/libdar/filtre.cpp:2593
 #, c-format
 msgid ""
 "File has disappeared while we were reading it, cannot check whether it has "
 "changed during its backup: %S"
 msgstr ""
 
-#: src/libdar/filtre.cpp:2608
+#: src/libdar/filtre.cpp:2606
 #, c-format
 msgid ""
 "WARNING! File modified while reading it for backup. Performing retry %i of %i"
 msgstr ""
 
-#: src/libdar/filtre.cpp:2621
+#: src/libdar/filtre.cpp:2619
 msgid ""
 "WARNING! File modified while reading it for backup. No more retry for that "
 "file to not exceed the wasted byte limit. File is "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2628
+#: src/libdar/filtre.cpp:2626
 msgid ""
 "WARNING! File modified while reading it for backup, but no more retry "
 "allowed: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2681
+#: src/libdar/filtre.cpp:2679
 msgid "Saving Extended Attributes for "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2737
+#: src/libdar/filtre.cpp:2735
 msgid "Error saving Extended Attributes for "
 msgstr ""
 
@@ -1808,7 +1808,7 @@ msgid ""
 "directory will not be saved"
 msgstr ""
 
-#: src/libdar/libdar_4_4.cpp:481 src/dar_suite/dar.cpp:594
+#: src/libdar/libdar_4_4.cpp:481 src/dar_suite/dar.cpp:597
 msgid "Continue listing archive contents?"
 msgstr ""
 
@@ -2322,13 +2322,13 @@ msgstr ""
 #: src/libdar/database.cpp:535
 msgid ""
 "File found in database but impossible to restore (only found \"unchanged\" "
-"in differential backups)"
+"in differential backups): "
 msgstr ""
 
 #: src/libdar/database.cpp:557
 msgid ""
 "Extended Attribute of file found in database but impossible to restore (only "
-"found \"unchanged\" in differential backups)"
+"found \"unchanged\" in differential backups): "
 msgstr ""
 
 #: src/libdar/database.cpp:579
@@ -4322,149 +4322,157 @@ msgstr ""
 msgid "Considering the (second alias auxiliary) archive of reference:"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:299
+#: src/dar_suite/dar.cpp:274
+msgid "Making room in memory..."
+msgstr ""
+
+#: src/dar_suite/dar.cpp:302
 msgid "Now performing on-fly isolation..."
 msgstr ""
 
-#: src/dar_suite/dar.cpp:461
+#: src/dar_suite/dar.cpp:464
 msgid "All files asked could not be restored"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:515
+#: src/dar_suite/dar.cpp:518
 msgid "Some file comparisons failed"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:562
+#: src/dar_suite/dar.cpp:565
 msgid ""
 "Some files are corrupted in the archive and it will not be possible to "
 "restore them"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:663
+#: src/dar_suite/dar.cpp:616 src/dar_suite/dar.cpp:637
+msgid "Final memory cleanup..."
+msgstr ""
+
+#: src/dar_suite/dar.cpp:672
 #, c-format
 msgid " %i inode(s) saved\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:664
+#: src/dar_suite/dar.cpp:673
 #, c-format
 msgid "   including %i hard link(s) treated\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:665
+#: src/dar_suite/dar.cpp:674
 #, c-format
 msgid ""
 " %i inode(s) changed at the moment of the backup and could not be saved "
 "properly\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:666
+#: src/dar_suite/dar.cpp:675
 #, c-format
 msgid " %i byte(s) have been wasted in the archive to resave changing files"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:667
+#: src/dar_suite/dar.cpp:676
 #, c-format
 msgid " %i inode(s) not saved (no inode/file change)\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:668
+#: src/dar_suite/dar.cpp:677
 #, c-format
 msgid " %i inode(s) failed to be saved (filesystem error)\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:669 src/dar_suite/dar.cpp:697
-#: src/dar_suite/dar.cpp:755
+#: src/dar_suite/dar.cpp:678 src/dar_suite/dar.cpp:706
+#: src/dar_suite/dar.cpp:764
 #, c-format
 msgid " %i inode(s) ignored (excluded by filters)\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:670
+#: src/dar_suite/dar.cpp:679
 #, c-format
 msgid " %i inode(s) recorded as deleted from reference backup\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:672 src/dar_suite/dar.cpp:701
-#: src/dar_suite/dar.cpp:762
+#: src/dar_suite/dar.cpp:681 src/dar_suite/dar.cpp:710
+#: src/dar_suite/dar.cpp:771
 #, c-format
 msgid " Total number of inode(s) considered: %i\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:675 src/dar_suite/dar.cpp:759
+#: src/dar_suite/dar.cpp:684 src/dar_suite/dar.cpp:768
 #, c-format
 msgid " EA saved for %i inode(s)\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:693
+#: src/dar_suite/dar.cpp:702
 #, c-format
 msgid " %i inode(s) restored\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:694
+#: src/dar_suite/dar.cpp:703
 #, c-format
 msgid "    including %i hard link(s)\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:695
+#: src/dar_suite/dar.cpp:704
 #, c-format
 msgid " %i inode(s) not restored (not saved in archive)\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:696
+#: src/dar_suite/dar.cpp:705
 #, c-format
 msgid " %i inode(s) not restored (overwriting policy decision)\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:698
+#: src/dar_suite/dar.cpp:707
 #, c-format
 msgid " %i inode(s) failed to restore (filesystem error)\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:699
+#: src/dar_suite/dar.cpp:708
 #, c-format
 msgid " %i inode(s) deleted\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:704
+#: src/dar_suite/dar.cpp:713
 #, c-format
 msgid " EA restored for %i inode(s)\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:717 src/dar_suite/dar.cpp:734
+#: src/dar_suite/dar.cpp:726 src/dar_suite/dar.cpp:743
 #, c-format
 msgid " %i item(s) treated\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:718
+#: src/dar_suite/dar.cpp:727
 #, c-format
 msgid " %i item(s) do not match those on filesystem\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:719 src/dar_suite/dar.cpp:736
+#: src/dar_suite/dar.cpp:728 src/dar_suite/dar.cpp:745
 #, c-format
 msgid " %i item(s) ignored (excluded by filters)\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:721 src/dar_suite/dar.cpp:738
+#: src/dar_suite/dar.cpp:730 src/dar_suite/dar.cpp:747
 #, c-format
 msgid " Total number of items considered: %i\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:735
+#: src/dar_suite/dar.cpp:744
 #, c-format
 msgid " %i item(s) with error\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:753
+#: src/dar_suite/dar.cpp:762
 #, c-format
 msgid " %i inode(s) added to archive\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:754
+#: src/dar_suite/dar.cpp:763
 #, c-format
 msgid " with %i hard link(s) recorded\n"
 msgstr ""
 
-#: src/dar_suite/dar.cpp:756
+#: src/dar_suite/dar.cpp:765
 #, c-format
 msgid " %i inode(s) recorded as deleted\n"
 msgstr ""
@@ -4524,7 +4532,7 @@ msgstr ""
 
 #: src/dar_suite/dar_cp.cpp:213
 #, c-format
-msgid "Starting the copy of %d byte(s)"
+msgid "Starting the copy of %u byte(s)"
 msgstr ""
 
 #: src/dar_suite/dar_cp.cpp:223
@@ -4884,6 +4892,11 @@ msgstr ""
 msgid ""
 "File inclusion loop detected. The file %s includes itself directly or "
 "through other files (-B option)"
+msgstr ""
+
+#: src/dar_suite/command_line.cpp:1154
+#, c-format
+msgid "Error in included file (%s): "
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:1172 src/dar_suite/command_line.cpp:2244
