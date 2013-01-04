@@ -29,6 +29,7 @@
 
 #include "../my_config.h"
 
+#include "erreurs.hpp"
 #include "path.hpp"
 #include "scrambler.hpp"
 #include "statistics.hpp"
@@ -142,8 +143,8 @@ namespace libdar
 	    /// Moreover, having two objets one copy of the other may lead to unexpected behaviors while
 	    /// merging or creating, isolating or merging archives.
 
-	archive(const archive & ref) : stack(ref.stack) { throw Efeature(gettext("Archive copy constructor is not implemented")); };
-	archive & operator = (const archive & ref) { throw Efeature(gettext("Archive assignment operator is not implemented")); };
+	archive(const archive & ref) : stack(ref.stack) { throw Efeature(dar_gettext("Archive copy constructor is not implemented")); };
+	archive & operator = (const archive & ref) { throw Efeature(dar_gettext("Archive assignment operator is not implemented")); };
 
 	    /// the destructor
 	~archive() { free(); };

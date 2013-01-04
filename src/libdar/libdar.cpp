@@ -37,10 +37,6 @@ extern "C"
 #endif
 #endif
 
-#if HAVE_LIBINTL_H
-#include <libintl.h>
-#endif
-
 #if HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
