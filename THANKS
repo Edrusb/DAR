@@ -3,7 +3,8 @@ version 2.4.9
 Thanks to "JBThiel" for bug report on dar-support mailing-list. Thanks to
 Kevin Wormington for feedback and tests. Thanks to Neil Darlow for feedbacks
 and patch about syntax error in configure script. Thanks to Aleksey Naumov for
-feedback, bug report and help.
+feedback, bug report and help. Thanks to Martin Zuther and Marcin Garski for
+bug report and the excellent provided test scenario to reproduce the bug.
 
 version 2.4.8
 --------------
