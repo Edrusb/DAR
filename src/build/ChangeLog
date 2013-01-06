@@ -9,6 +9,28 @@ from 2.4.x to 2.5.0
   compatible with former implementation)
 - class hash_fichier becomes entrepot independent
 
+from 2.4.8 to 2.4.9
+- fixed bug: during differential backup dar saved unchanged hard linked inode
+  when a hard link on that inode was out of the -R root directory. This also
+  has the effect to always save files with long names on NTFS filesystems (!)
+- Adapted patch provided by Kevin Wormington (new messages displayed)
+- Fixed syntax error in configure script about execinfo detection
+- Removed unused AM_ICONV macro from configure script
+- fixed bug met under Cygwin when auxiliary test command failed to link when
+  libgcrypt was not available.
+- updated mini-howto by Grzegorz Adam Hankiewicz
+- updating French message translations
+- restricted security warning for plain files and hard linked plain files
+- fixed display bug in dar_cp when manipulating files larger than 2 GB
+- fixed SEGFAULT met when adding to a dar_manager database an archive which
+  base name is an empty string
+- improved error message, reporting the -B included file in which a syntax error
+  has been met
+- modified dar_manager database to consider both ctime and mtime as timestamp
+  value for data of saved files. This suppresses the warning about badly ordered
+  archives in database when at some files have been restores from a old
+  backup.
+
 from 2.4.7 to 2.4.8
 - documentation fixes and updates
 - improved database listing efficiency

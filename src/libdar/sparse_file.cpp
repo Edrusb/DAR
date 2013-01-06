@@ -44,6 +44,11 @@ char *strchr (), *strrchr ();
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
 # endif
 #endif
+
+#if HAVE_LIMITS_H
+#include <limits.h>
+#endif
+
 } // end extern "C"
 
 #include "sparse_file.hpp"

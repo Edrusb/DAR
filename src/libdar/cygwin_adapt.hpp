@@ -41,12 +41,12 @@ extern "C"
 } // end extern "C"
 
 #ifndef O_TEXT
-// zero is neutral in ORed expression where it expected to be used
+// zero is neutral in ORed expression where it is expected to be used
 #define O_TEXT 0
 #endif
 
 #ifndef O_BINARY
-// zero is neutral in ORed expression where it expected to be used
+// zero is neutral in ORed expression where it is expected to be used
 #define O_BINARY 0
 #endif
 

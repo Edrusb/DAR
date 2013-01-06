@@ -527,6 +527,9 @@ namespace libdar
 			{
 			    e_ino = dynamic_cast<inode *>(e_mir->get_inode());
 			    e_file = dynamic_cast<file *>(e_mir->get_inode());
+			    if(e_ino == NULL)
+				throw SRC_BUG;
+			    e_ino->change_name(e_mir->get_name());
 			}
 		    }
 
@@ -586,7 +589,7 @@ namespace libdar
 						f_file = dynamic_cast<const file *>(f_ino);
 					    }
 
-						// Now checking for filesystem dissimulation
+						// Now checking for filesystem dissimulated modifications
 
 					    if(security_check)
 					    {
@@ -594,9 +597,12 @@ namespace libdar
 						{
 							// both are inodes
 
-						    if(f_ino->signature() == e_ino->signature())
+						    if(compatible_signature(f_ino->signature(), e_ino->signature())
+							   // both are of the same type of inode
+						       && f_file != NULL)
+							    // both are plain files (no warning issued for other inode types)
 						    {
-							    // same inode type
+							    // both are plain file or hard-linked plain files
 
 							if(f_ino->get_uid() == e_ino->get_uid()
 							   && f_ino->get_gid() == e_ino->get_gid()
@@ -605,21 +611,15 @@ namespace libdar
 							{
 								// same inode information
 
-							    if(f_file == NULL || e_file == NULL
-							       || f_file->get_size() == e_file->get_size())
+							    if(f_ino->has_last_change() && e_ino->has_last_change())
 							    {
-								    // file size is unchanged
+								    // both inode ctime has been recorded
 
-								if(f_ino->has_last_change() && e_ino->has_last_change())
+								if(f_ino->get_last_change() != e_ino->get_last_change())
 								{
-									// both inode ctime has been recorded
+								    string tmp = juillet.get_string();
 
-								    if(f_ino->get_last_change() != e_ino->get_last_change())
-								    {
-									string tmp = juillet.get_string();
-
-									dialog.printf(gettext("SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of reference was done, while no inode or data changed"), &tmp);
-								    }
+								    dialog.printf(gettext("SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of reference was done, while no other inode information changed"), &tmp);
 								}
 							    }
 							}

@@ -26,9 +26,10 @@
 #ifndef NLS_SWAP_HPP
 #define NLS_SWAP_HPP
 
+#include "../my_config.h"
+
 #include <string>
 
-#include "../my_config.h"
 #include "tools.hpp"
 
 #ifdef ENABLE_NLS

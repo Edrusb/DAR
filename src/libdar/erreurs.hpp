@@ -27,6 +27,7 @@
 #define ERREURS_HPP
 
 #include "../my_config.h"
+
 #include <string>
 #include <list>
 #include "integers.hpp"

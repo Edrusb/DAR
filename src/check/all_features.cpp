@@ -26,6 +26,35 @@
 using namespace libdar;
 using namespace std;
 
+///////////////
+    // strange() is an unused function that invokes three symbols defined in <libintl.h>
+    // without this trick for some reason I still cannot understand, the linking fails on Cygwin
+    // having libdar missing _libintl_bindtextdomain symbols to link with.
+    // The point that is strange is that invoking these three symbols here do not lead to
+    // define any associated _libintl_ prefixed symbols here, just to refer to them one more time,
+    // so the linking of all_features should still fails! (while here it succeeds...)
+    // Looking at <libintl.h> header files, it seems that three modes are available:
+    // 1:  _INTL_REDIRECT_INLINE
+    // 2:  _INTL_REDIRECT_MACROS
+    // 3:  _INTL_REDIRECT_ASM
+    // seen the output of g++ -E the option selected under Cygwin is the asm one when
+    // compiling all_features.cpp as well as while compiling libdar, all three methods
+    // make the gettext/textdomain/bindtextdomain to point (either by macro, inlined function,
+    // or assembler definition to the associated _libintl_ prefixed function, which symbol
+    // is missing at linking time while the -lint is properly given on command-line.
+    // calling gettext/textdomain/bindtext in strange() below do not define any symbol
+    // ... so why does it makes linking succeed? ... why does it fails else? I admin my
+    // limited understanding here. Anyway, this fix works and has no impact at execution time
+    // just making the all_feature.cpp binary slightly larger, binary that is only used
+    // when invoking 'make check'.
+void strange()
+{
+    bindtextdomain("", "");
+    textdomain("");
+    string tmp = gettext("");
+}
+    // end of the strange trick!
+//////////////
 
 int main()
 {

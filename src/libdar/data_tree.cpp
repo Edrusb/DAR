@@ -953,15 +953,16 @@ namespace libdar
 	data_tree * tree = find_or_addition(entry->get_name(), entry_dir != NULL, archive);
 	archive_num last_archive;
 	lookup result;
+	infinint last_mod = entry->get_last_modif() > entry->get_last_change() ? entry->get_last_modif() : entry->get_last_change();
 
 	switch(entry->get_saved_status())
 	{
 	case s_saved:
 	case s_fake:
-	    tree->set_data(archive, entry->get_last_modif(), et_saved);
+	    tree->set_data(archive, last_mod, et_saved);
 	    break;
 	case s_not_saved:
-	    tree->set_data(archive, entry->get_last_modif(), et_present);
+	    tree->set_data(archive, last_mod, et_present);
 	    break;
 	default:
 	    throw SRC_BUG;

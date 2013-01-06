@@ -96,10 +96,10 @@ namespace libdar
 
 	    /// \param[in] archive is the number of the archive to finalize
 	    /// \param[in] deleted_date date of deletion to use for inode removal when no
-	    /// information can be grabbed from the archive (this date is take from the
+	    /// information can be grabbed from the archive (this date is taken from the
 	    /// parent dir last modification date)
 	    /// \param[in] ignore_archive_greater_or_equal ignore archives which number
-	    /// is greater or equal "ingore_archive_greater_or_equal" as if they were not
+	    /// is greater or equal than "ignore_archive_greater_or_equal" as if they were not
 	    /// present in the database. If set to zero, no archive is ignored.
 	virtual void finalize(const archive_num & archive,
 			      const infinint & deleted_date,
