@@ -3,12 +3,13 @@
 # This file is distributed under the same license as the DAR package.
 # Denis Corbin <dar.linux@free.fr>, 2011.
 #
+#: src/check/all_features.cpp:54
 msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.4.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2012-12-19 12:28+0100\n"
+"POT-Creation-Date: 2013-01-05 19:34+0100\n"
 "PO-Revision-Date: 2012-12-19 12:33+0100\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -18,11 +19,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/libdar/archive.hpp:145
+#: src/libdar/archive.hpp:146
 msgid "Archive copy constructor is not implemented"
 msgstr "Le constructeur de recopie pour la classe archive n'est pas implémenté"
 
-#: src/libdar/archive.hpp:146
+#: src/libdar/archive.hpp:147
 msgid "Archive assignment operator is not implemented"
 msgstr "L'opérateur d'assignation la classe archive n'est pas implémenté"
 
@@ -657,15 +658,15 @@ msgstr ""
 "\"compressReset appelé alors que \"compressInit\" n'a jamais été invoqué au "
 "préalable"
 
-#: src/libdar/erreurs.hpp:107
+#: src/libdar/erreurs.hpp:108
 msgid "Lack of Memory"
 msgstr "Manque de mémoire"
 
-#: src/libdar/erreurs.hpp:119
+#: src/libdar/erreurs.hpp:120
 msgid "Lack of Secured Memory"
 msgstr "Manque de mémoire sécurisée"
 
-#: src/libdar/erreurs.hpp:161
+#: src/libdar/erreurs.hpp:162
 msgid ""
 "Cannot handle such a too large integer. Use a full version of libdar "
 "(compiled to rely on the \"infinint\" integer type) to solve this problem"
@@ -673,11 +674,11 @@ msgstr ""
 "Impossible de gérer un entier aussi grand. Utiliser la version complète de "
 "libdar (compilé pour utiliser le type \"infinint\") pour résoudre ce problème"
 
-#: src/libdar/erreurs.hpp:292
+#: src/libdar/erreurs.hpp:293
 msgid "Thread cancellation requested, aborting as soon as possible"
 msgstr "Demande d'arrêt de file d'exécution reçue, arrêt immédiat"
 
-#: src/libdar/erreurs.hpp:292
+#: src/libdar/erreurs.hpp:293
 msgid "Thread cancellation requested, aborting as properly as possible"
 msgstr ""
 "Demande d'arrêt de file d'exécution reçue, on termine proprement l'opération "
@@ -1821,7 +1822,10 @@ msgstr "Enregistrement de lien dur dans l'archive : "
 msgid ""
 "SECURITY WARNING! SUSPICIOUS FILE %S: ctime changed since archive of "
 "reference was done, while no other inode information changed"
-msgstr "AVERTISSEMENT DE SECURITÉ ! FICHIER SUSPECT %S : la date ctime a changé depuis que l'archive de référence a été faite, alors qu'aucune autre propriété de cette inode n'a changé"
+msgstr ""
+"AVERTISSEMENT DE SECURITÉ ! FICHIER SUSPECT %S : la date ctime a changé "
+"depuis que l'archive de référence a été faite, alors qu'aucune autre "
+"propriété de cette inode n'a changé"
 
 #: src/libdar/filtre.cpp:865
 msgid "Error while saving "
@@ -2485,64 +2489,64 @@ msgstr ""
 msgid "Incomplete label"
 msgstr "label incomplet"
 
-#: src/libdar/libdar.cpp:153
+#: src/libdar/libdar.cpp:149
 msgid "Caught an unknown Egeneric exception: "
 msgstr "Une exception Egeneric inconnue a été interceptée : "
 
-#: src/libdar/libdar.cpp:158
+#: src/libdar/libdar.cpp:154
 msgid "Caught a none libdar exception"
 msgstr "Une exception non \"libdar\" a été interceptée"
 
-#: src/libdar/libdar.cpp:176 src/libdar/libdar.cpp:198
+#: src/libdar/libdar.cpp:172 src/libdar/libdar.cpp:194
 msgid "Argument given to \"major\" is a NULL pointer"
 msgstr "valeur NULL donnée à \"major\""
 
-#: src/libdar/libdar.cpp:178
+#: src/libdar/libdar.cpp:174
 msgid "Argument given to \"minor\" is a NULL pointer"
 msgstr "Valeur NULL donnée à \"minor\""
 
-#: src/libdar/libdar.cpp:200
+#: src/libdar/libdar.cpp:196
 msgid "Argument given to \"medium\" is a NULL pointer"
 msgstr "Valeur NULL donnée à \"medium\""
 
-#: src/libdar/libdar.cpp:202
+#: src/libdar/libdar.cpp:198
 msgid "argument given to \"minor\" is a NULL pointer"
 msgstr "Valeur NULL donnée à \"minor\""
 
-#: src/libdar/libdar.cpp:322
+#: src/libdar/libdar.cpp:318
 msgid "Invalid NULL pointer given to close_archive"
 msgstr "valeur NULL donnée à \"close_archive\""
 
-#: src/libdar/libdar.cpp:377
+#: src/libdar/libdar.cpp:373
 msgid "Initialization problem for liblzo2 library"
 msgstr "Problème d'initialisation pour la bibliothèque liblzo2"
 
-#: src/libdar/libdar.cpp:394 src/libdar/libdar.cpp:416
+#: src/libdar/libdar.cpp:390 src/libdar/libdar.cpp:412
 #, c-format
 msgid "Too old version for libgcrypt, minimum required version is %s\n"
 msgstr ""
 "Version trop ancienne pour libgcrypt, la version minimale requise est %s\n"
 
-#: src/libdar/libdar.cpp:403
+#: src/libdar/libdar.cpp:399
 #, c-format
 msgid "Error while activating libgcrypt's memory guard: %s/%s"
 msgstr "Erreur lors de l'activation du garde de mémoire de libgcrypt : %s/%s"
 
-#: src/libdar/libdar.cpp:407
+#: src/libdar/libdar.cpp:403
 #, c-format
 msgid "Error while telling libgcrypt that initialization is finished: %s/%s"
 msgstr ""
 "Erreur lors de la communication à libgcrypt que l'initialisation est "
 "terminée : %s/%s"
 
-#: src/libdar/libdar.cpp:412
+#: src/libdar/libdar.cpp:408
 msgid "libgcrypt not initialized and libdar not allowed to do so"
 msgstr ""
 "libgcrypt n'a pas été initialisée et libdar n'est pas autorisé à le faire"
 
-#: src/libdar/libdar.cpp:450 src/libdar/libdar.cpp:470
-#: src/libdar/libdar.cpp:489 src/libdar/libdar.cpp:511
-#: src/libdar/libdar.cpp:531
+#: src/libdar/libdar.cpp:446 src/libdar/libdar.cpp:466
+#: src/libdar/libdar.cpp:485 src/libdar/libdar.cpp:507
+#: src/libdar/libdar.cpp:527
 msgid "Invalid NULL argument given to 'ptr'"
 msgstr "valeur NULL donnée à \"ptr\""
 
@@ -2713,7 +2717,10 @@ msgstr ""
 msgid ""
 "Extended Attribute of file found in database but impossible to restore (only "
 "found \"unchanged\" in differential backups): "
-msgstr "Attributs Étendus du fichier trouvés dans la base mais impossibles à restaurer (ne sont présents que comme \"inchangés\" dans des archives différentielles)"
+msgstr ""
+"Attributs Étendus du fichier trouvés dans la base mais impossibles à "
+"restaurer (ne sont présents que comme \"inchangés\" dans des archives "
+"différentielles)"
 
 #: src/libdar/database.cpp:579
 #, c-format
