@@ -15,7 +15,10 @@ from 2.4.8 to 2.4.9
   base name is an empty string
 - improved error message, reporting the -B included file in which a syntax error
   has been met
-
+- modified dar_manager database to consider both ctime and mtime as timestamp
+  value for data of saved files. This suppresses the warning about badly ordered
+  archives in database when at some files have been restores from a old
+  backup.
 
 from 2.4.7 to 2.4.8
 - documentation fixes and updates

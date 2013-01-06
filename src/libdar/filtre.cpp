@@ -589,7 +589,7 @@ namespace libdar
 						f_file = dynamic_cast<const file *>(f_ino);
 					    }
 
-						// Now checking for filesystem dissimulation
+						// Now checking for filesystem dissimulated modifications
 
 					    if(security_check)
 					    {
@@ -597,8 +597,10 @@ namespace libdar
 						{
 							// both are inodes
 
-						    if(f_ino->signature() == e_ino->signature()
-						       && f_file != NULL) // restricting security check to plain files only
+						    if(compatible_signature(f_ino->signature(), e_ino->signature())
+							   // both are of the same type of inode
+						       && f_file != NULL)
+							    // both are plain files (no warning issued for other inode types)
 						    {
 							    // both are plain file or hard-linked plain files
 

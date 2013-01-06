@@ -4,7 +4,9 @@ Thanks to "JBThiel" for bug report on dar-support mailing-list. Thanks to
 Kevin Wormington for feedback and tests. Thanks to Neil Darlow for feedbacks
 and patch about syntax error in configure script. Thanks to Aleksey Naumov for
 feedback, bug report and help. Thanks to Martin Zuther and Marcin Garski for
-bug report with provided test scenario to reproduce the bug.
+bug report with provided test scenario to reproduce the bug. Thanks to Brian
+May at Debian and Graham Cobb for feedback and proposal for a modified behavior
+of dar_manager.
 
 version 2.4.8
 --------------
