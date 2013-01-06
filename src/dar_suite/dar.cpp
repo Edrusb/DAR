@@ -271,7 +271,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    // making some room in memory
 
 		if(param.info_details)
-		    dialog.warning(gettext("Making room in memory..."));
+		    dialog.warning(gettext("Making room in memory (releasing memory used by archive of reference)..."));
 
 		if(arch != NULL)
 		{
