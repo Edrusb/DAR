@@ -557,19 +557,21 @@ namespace libdar
 
 
 	    // if this file was stored as "removed" in the archive we tend to remove from the database
-	    // this "removed" information is propagated to the next archive if it exist and has no information recorded about this file
+	    // this "removed" information is propagated to the next archive if both:
+	    //   - the next archive exists and has no information recorded about this file
+	    //   - this entry does not only exist in the archive about to be removed
 	if(archive_to_remove < last_archive)
 	{
 	    infinint del_date;
 	    etat status;
-	    if(read_data(archive_to_remove, del_date, status))
+	    if(last_mod.size() > 1 && read_data(archive_to_remove, del_date, status))
 		if(status == et_removed)
 		{
 		    infinint tmp;
 		    if(!read_data(archive_to_remove + 1, tmp, status))
 			set_data(archive_to_remove + 1, del_date, et_removed);
 		}
-	    if(read_EA(archive_to_remove, del_date, status))
+	    if(last_change.size() > 1 && read_EA(archive_to_remove, del_date, status))
 		if(status == et_removed)
 		{
 		    infinint tmp;
@@ -996,10 +998,10 @@ namespace libdar
 	archive_num last_archive;
 	lookup result;
 
-	result = get_data(last_archive, 0, false);
+	result = tree->get_data(last_archive, 0, false);
 	if(result == found_present || result == not_restorable)
 	    tree->set_data(archive, entry->get_date(), et_removed);
-	result = get_EA(last_archive, 0, false);
+	result = tree->get_EA(last_archive, 0, false);
 	if(result == found_present || result == not_restorable)
 	    tree->set_EA(archive, entry->get_date(), et_removed);
     }
