@@ -125,6 +125,9 @@ namespace libdar
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(data_tree);
 #endif
+	    // fix corruption case that was brought by bug in release 2.4.0 to 2.4.9
+	virtual bool fix_corruption(); // return true whether corruption could be fixed (meaning this entry can be safely removed from base)
+
     private:
 	struct status
 	{
@@ -190,6 +193,10 @@ namespace libdar
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(data_dir);
 #endif
+
+	virtual bool fix_corruption(); // inherited from data_tree
+
+
     private:
 	std::list<data_tree *> rejetons;          //< subdir and subfiles of the current dir
 

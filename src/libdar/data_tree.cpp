@@ -756,6 +756,30 @@ namespace libdar
 	const trecord & operator = (const trecord & ref) { date = ref.date; set = ref.set; return *this; };
     };
 
+
+bool data_tree::fix_corruption()
+    {
+	bool ret = true;
+	map<archive_num, status>::iterator it = last_mod.begin();
+
+	while(it != last_mod.end() && ret)
+	{
+	    if(it->second.present != et_removed && it->second.present != et_absent)
+		ret = false;
+	    ++it;
+	}
+
+        it = last_change.begin();
+	while(it != last_change.end() && ret)
+	{
+	    if(it->second.present != et_removed && it->second.present != et_absent)
+		ret = false;
+	    ++it;
+	}
+
+	return ret;
+    }
+
     bool data_tree::check_map_order(user_interaction & dialog,
 				    const map<archive_num, status> the_map,
 				    const path & current_path,
@@ -1062,7 +1086,9 @@ namespace libdar
 	case found_removed:
 	    break; // acceptable result
 	case not_found:
-	    throw SRC_BUG; // unacceptable result, at least the data_tree::finalize() method should have throw exception or added an entry
+	    if(fix_corruption())
+		throw Edata("This is to signal the caller of this method that this object has to be removed from database"); // exception caugth in data_dir::finalize_except_self
+		throw Erange("data_dir::finalize", gettext("This database has been corrupted probably due to a bug in release 2.4.0 to 2.4.9, and it has not been possible to cleanup this corruption, please rebuild the database from archives or extracted \"catalogues\", if the database has never been used by one of the previously mentioned released, you are welcome to open a bug report and provide as much as possible details about the circumstances"));
 	case not_restorable:
 	    break;  // also an acceptable result;
 	default:
@@ -1083,8 +1109,17 @@ namespace libdar
 	{
 	    if(*it == NULL)
 		throw SRC_BUG;
-	    (*it)->finalize(archive, deleted_date, ignore_archives_greater_or_equal);
-	    ++it;
+	    try
+	    {
+		(*it)->finalize(archive, deleted_date, ignore_archives_greater_or_equal);
+		++it;
+	    }
+	    catch(Edata & e)
+	    {
+		delete (*it);
+		rejetons.erase(it);
+		it = rejetons.begin();
+	    }
 	}
     }
 
@@ -1190,6 +1225,21 @@ namespace libdar
 	    (*it)->compute_most_recent_stats(data, ea, total_data, total_ea);
 	    ++it;
 	}
+    }
+
+    bool data_dir::fix_corruption()
+    {
+	while(rejetons.begin() != rejetons.end() && *(rejetons.begin()) != NULL && (*(rejetons.begin()))->fix_corruption())
+	{
+	    delete *(rejetons.begin());
+	    rejetons.erase(rejetons.begin());
+	}
+
+	if(rejetons.begin() != rejetons.end())
+	    return false;
+	else
+	    return data_tree::fix_corruption();
+
     }
 
     void data_dir::add_child(data_tree *fils)
