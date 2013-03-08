@@ -266,11 +266,18 @@ namespace libdar
 
     bool generic_file::diff(generic_file & f, const infinint & crc_size, crc * & value)
     {
+	infinint err_offset;
+	return diff(f, crc_size, value, err_offset);
+    }
+
+    bool generic_file::diff(generic_file & f, const infinint & crc_size, crc * & value, infinint & err_offset)
+    {
         char buffer1[BUFFER_SIZE];
         char buffer2[BUFFER_SIZE];
         U_I lu1 = 0, lu2 = 0;
         bool diff = false;
 
+	err_offset = 0;
 	if(terminated)
 	    throw SRC_BUG;
 
@@ -293,12 +300,28 @@ namespace libdar
 		    while(i < lu1 && buffer1[i] == buffer2[i])
 			++i;
 		    if(i < lu1)
+		    {
 			diff = true;
+			err_offset = lu1 - i;
+			if(err_offset < get_position())
+			    err_offset = get_position() - err_offset;
+			else
+			    throw SRC_BUG;
+		    }
 		    else
 			value->compute(buffer1, lu1);
 		}
 		else
+		{
+		    U_I min = lu1 > lu2 ? lu2 : lu1;
+
 		    diff = true;
+		    err_offset = min;
+		    if(err_offset <= get_position())
+			err_offset = get_position() - err_offset;
+		    else
+			throw SRC_BUG;
+		}
 	    }
 	    while(!diff && lu1 > 0);
 	}

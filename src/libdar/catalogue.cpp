@@ -2324,8 +2324,9 @@ namespace libdar
 
 		    try
 		    {
-			if(me->diff(*you, crc_size, value))
-			    throw Erange("file::sub_compare", gettext("different file data"));
+			infinint err_offset;
+			if(me->diff(*you, crc_size, value, err_offset))
+			    throw Erange("file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
 			else
 			{
 			    if(original != NULL)

@@ -190,6 +190,17 @@ namespace libdar
 	    /// \note value has to be deleted by the caller when no more needed
         bool diff(generic_file & f, const infinint & crc_size, crc * & value);
 
+	    /// compare the contents with the object in argument, also providing the offset of the first difference met
+	    /// \param[in] f is the file to compare the current object with
+	    /// \param[in] crc_size is the width of the CRC to use for calculation
+	    /// \param[out] value is the computed checksum, its value can be used for additional
+	    /// \param[out] err_offset in case of difference, holds the offset of the first difference met
+	    /// testing if this method returns false (no difference between files). The given checksum
+	    /// has to be set to the expected width by the caller.
+	    /// \return true if arg differ from "this", else false is returned and err_offset is set
+	    /// \note value has to be deleted by the caller when no more needed
+	bool diff(generic_file & f, const infinint & crc_size, crc * & value, infinint & err_offset);
+
             /// reset CRC on read or writen data
 
 	    /// \param[in] width is the width to use for the CRC
