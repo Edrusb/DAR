@@ -303,7 +303,7 @@ namespace libdar
 		    {
 			diff = true;
 			err_offset = lu1 - i;
-			if(err_offset < get_position())
+			if(err_offset <= get_position())
 			    err_offset = get_position() - err_offset;
 			else
 			    throw SRC_BUG;
