@@ -9,6 +9,24 @@ from 2.4.x to 2.5.0
   compatible with former implementation)
 - class hash_fichier becomes entrepot independent
 
+from 2.4.9 to to 2.4.10
+- fixing libdar about dar_manager database corruption that occurred when
+  deleting the first archive of a base containing a plain file only
+  existing in that first archive.
+- Added code to cleanup databases instead of aborting and reporting
+  that previously described type of database corruption.
+- Added feature when comparing archive with filesystem in order to report
+  the offset of the first difference found in a file. This was necessary to
+  help solving the following bug:
+- fixed bug in sparse file detection mechanism that could lead in some very
+  particular (and rare) situations to the loss of one byte from file being
+  saved. In that case testing the archive reported a CRC error for that
+  file. So if you keep testing achives in your backup process and have not
+  detect any problem, you can then keep relying on your old backups. This
+  bug also expressed when merging archives: dar aborted and reported that a
+  merged file had a different CRC than the one stored in the archive of
+  reference.
+
 from 2.4.8 to 2.4.9
 - fixed bug: during differential backup dar saved unchanged hard linked inode
   when a hard link on that inode was out of the -R root directory. This also

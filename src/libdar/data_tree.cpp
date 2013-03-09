@@ -557,19 +557,21 @@ namespace libdar
 
 
 	    // if this file was stored as "removed" in the archive we tend to remove from the database
-	    // this "removed" information is propagated to the next archive if it exist and has no information recorded about this file
+	    // this "removed" information is propagated to the next archive if both:
+	    //   - the next archive exists and has no information recorded about this file
+	    //   - this entry does not only exist in the archive about to be removed
 	if(archive_to_remove < last_archive)
 	{
 	    infinint del_date;
 	    etat status;
-	    if(read_data(archive_to_remove, del_date, status))
+	    if(last_mod.size() > 1 && read_data(archive_to_remove, del_date, status))
 		if(status == et_removed)
 		{
 		    infinint tmp;
 		    if(!read_data(archive_to_remove + 1, tmp, status))
 			set_data(archive_to_remove + 1, del_date, et_removed);
 		}
-	    if(read_EA(archive_to_remove, del_date, status))
+	    if(last_change.size() > 1 && read_EA(archive_to_remove, del_date, status))
 		if(status == et_removed)
 		{
 		    infinint tmp;
@@ -753,6 +755,30 @@ namespace libdar
 	trecord(const trecord & ref) { date = ref.date; set = ref.set; };
 	const trecord & operator = (const trecord & ref) { date = ref.date; set = ref.set; return *this; };
     };
+
+
+bool data_tree::fix_corruption()
+    {
+	bool ret = true;
+	map<archive_num, status>::iterator it = last_mod.begin();
+
+	while(it != last_mod.end() && ret)
+	{
+	    if(it->second.present != et_removed && it->second.present != et_absent)
+		ret = false;
+	    ++it;
+	}
+
+        it = last_change.begin();
+	while(it != last_change.end() && ret)
+	{
+	    if(it->second.present != et_removed && it->second.present != et_absent)
+		ret = false;
+	    ++it;
+	}
+
+	return ret;
+    }
 
     bool data_tree::check_map_order(user_interaction & dialog,
 				    const map<archive_num, status> the_map,
@@ -996,10 +1022,10 @@ namespace libdar
 	archive_num last_archive;
 	lookup result;
 
-	result = get_data(last_archive, 0, false);
+	result = tree->get_data(last_archive, 0, false);
 	if(result == found_present || result == not_restorable)
 	    tree->set_data(archive, entry->get_date(), et_removed);
-	result = get_EA(last_archive, 0, false);
+	result = tree->get_EA(last_archive, 0, false);
 	if(result == found_present || result == not_restorable)
 	    tree->set_EA(archive, entry->get_date(), et_removed);
     }
@@ -1060,7 +1086,9 @@ namespace libdar
 	case found_removed:
 	    break; // acceptable result
 	case not_found:
-	    throw SRC_BUG; // unacceptable result, at least the data_tree::finalize() method should have throw exception or added an entry
+	    if(fix_corruption())
+		throw Edata("This is to signal the caller of this method that this object has to be removed from database"); // exception caugth in data_dir::finalize_except_self
+		throw Erange("data_dir::finalize", gettext("This database has been corrupted probably due to a bug in release 2.4.0 to 2.4.9, and it has not been possible to cleanup this corruption, please rebuild the database from archives or extracted \"catalogues\", if the database has never been used by one of the previously mentioned released, you are welcome to open a bug report and provide as much as possible details about the circumstances"));
 	case not_restorable:
 	    break;  // also an acceptable result;
 	default:
@@ -1081,8 +1109,17 @@ namespace libdar
 	{
 	    if(*it == NULL)
 		throw SRC_BUG;
-	    (*it)->finalize(archive, deleted_date, ignore_archives_greater_or_equal);
-	    ++it;
+	    try
+	    {
+		(*it)->finalize(archive, deleted_date, ignore_archives_greater_or_equal);
+		++it;
+	    }
+	    catch(Edata & e)
+	    {
+		delete (*it);
+		rejetons.erase(it);
+		it = rejetons.begin();
+	    }
 	}
     }
 
@@ -1188,6 +1225,21 @@ namespace libdar
 	    (*it)->compute_most_recent_stats(data, ea, total_data, total_ea);
 	    ++it;
 	}
+    }
+
+    bool data_dir::fix_corruption()
+    {
+	while(rejetons.begin() != rejetons.end() && *(rejetons.begin()) != NULL && (*(rejetons.begin()))->fix_corruption())
+	{
+	    delete *(rejetons.begin());
+	    rejetons.erase(rejetons.begin());
+	}
+
+	if(rejetons.begin() != rejetons.end())
+	    return false;
+	else
+	    return data_tree::fix_corruption();
+
     }
 
     void data_dir::add_child(data_tree *fils)

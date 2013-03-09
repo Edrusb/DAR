@@ -638,6 +638,7 @@ namespace libdar
 			    throw SRC_BUG; // not possible to reach normally, because yet_in_a < missing_for_sequence < SEQUENCE_LENGTH
 			(void)memcpy(write_buffer + write_buffer_size, a+written, yet_in_a);
 			written = size;
+			write_buffer_size += yet_in_a;
 		    }
 		}
 	    }
