@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2013-01-06 16:45+0100\n"
+"POT-Creation-Date: 2013-03-09 13:05+0100\n"
 "PO-Revision-Date: 2011-07-21 16:13+0200\n"
 "Last-Translator: Markus Kamp <mk_cactus@gmx.de>\n"
 "Language-Team: Deutsch\n"
@@ -3011,28 +3011,28 @@ msgstr "Lese eine Datei die nur geschrieben werden darf"
 msgid "Writing to a read only generic_file"
 msgstr "Schreibe eine Datei, die nur gelesen werden darf"
 
-#: src/libdar/generic_file.cpp:278
+#: src/libdar/generic_file.cpp:285
 msgid "Cannot compare files in write only mode"
 msgstr "Im Schreibmodus können keine Dateien verglichen werden"
 
-#: src/libdar/generic_file.cpp:352
+#: src/libdar/generic_file.cpp:375
 #, fuzzy
 msgid "Cannot sync write on a read-only generic_file"
 msgstr "Schreibe eine Datei, die nur gelesen werden darf"
 
-#: src/libdar/generic_file.cpp:442
+#: src/libdar/generic_file.cpp:465
 msgid "File mode is neither read nor write"
 msgstr "Dateimodus ist weder Lesen noch Schreiben"
 
-#: src/libdar/generic_file.cpp:455
+#: src/libdar/generic_file.cpp:478
 msgid "read only"
 msgstr "Nur Lesen"
 
-#: src/libdar/generic_file.cpp:458
+#: src/libdar/generic_file.cpp:481
 msgid "write only"
 msgstr "Nur Schreiben"
 
-#: src/libdar/generic_file.cpp:461
+#: src/libdar/generic_file.cpp:484
 msgid "read and write"
 msgstr "Lesen und Schreiben"
 
@@ -3104,28 +3104,28 @@ msgstr "Dateiende erreicht, bevor alle Daten gelesen werden konnten"
 msgid "Unexpected value found in database"
 msgstr "Nicht vorhandene Datei in derDatenbank"
 
-#: src/libdar/data_tree.cpp:612
+#: src/libdar/data_tree.cpp:614
 #, c-format
 msgid ""
 "Archive number |  Data                   | status ||  EA                     "
 "| status \n"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:613
+#: src/libdar/data_tree.cpp:615
 #, c-format
 msgid ""
 "---------------+-------------------------+--------++-------------------------"
 "+----------\n"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:806
+#: src/libdar/data_tree.cpp:832
 #, c-format
 msgid ""
 "Dates of file's %S are not increasing when database's archive number grows. "
 "Concerned file is: %S"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:809
+#: src/libdar/data_tree.cpp:835
 msgid ""
 "Dates are not increasing for all files when database's archive number grows, "
 "working with this database may lead to improper file's restored version. "
@@ -3134,46 +3134,56 @@ msgid ""
 "the database"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:812
+#: src/libdar/data_tree.cpp:838
 msgid "Do you want to ignore the same type of error for other files?"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:849
+#: src/libdar/data_tree.cpp:875
 msgid "Unexpected end of file"
 msgstr "Unerwartetes Dateiende"
 
-#: src/libdar/data_tree.cpp:1135
+#: src/libdar/data_tree.cpp:1091
+msgid ""
+"This database has been corrupted probably due to a bug in release 2.4.0 to "
+"2.4.9, and it has not been possible to cleanup this corruption, please "
+"rebuild the database from archives or extracted \"catalogues\", if the "
+"database has never been used by one of the previously mentioned released, "
+"you are welcome to open a bug report and provide as much as possible details "
+"about the circumstances"
+msgstr ""
+
+#: src/libdar/data_tree.cpp:1172
 #, fuzzy
 msgid "[ Saved ]"
 msgstr "[Gespeichert]"
 
-#: src/libdar/data_tree.cpp:1137 src/libdar/data_tree.cpp:1142
+#: src/libdar/data_tree.cpp:1174 src/libdar/data_tree.cpp:1179
 #, fuzzy
 msgid "[       ]"
 msgstr "[     ENTFERNT       ]"
 
-#: src/libdar/data_tree.cpp:1140
+#: src/libdar/data_tree.cpp:1177
 msgid "[  EA   ]"
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1348
+#: src/libdar/data_tree.cpp:1400
 msgid "Unknown record type"
 msgstr "Datenbankeintrag unbekannt"
 
-#: src/libdar/data_tree.cpp:1382
+#: src/libdar/data_tree.cpp:1434
 msgid "removed "
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1383
+#: src/libdar/data_tree.cpp:1435
 msgid "present "
 msgstr ""
 
-#: src/libdar/data_tree.cpp:1384
+#: src/libdar/data_tree.cpp:1436
 #, fuzzy
 msgid "saved   "
 msgstr "[Gespeichert]"
 
-#: src/libdar/data_tree.cpp:1385
+#: src/libdar/data_tree.cpp:1437
 msgid "absent  "
 msgstr ""
 
@@ -3269,7 +3279,7 @@ msgid ""
 "Adding an explicit escape sequence of type seqt_not_a_sequence is forbidden"
 msgstr ""
 
-#: src/libdar/escape.cpp:689
+#: src/libdar/escape.cpp:690
 #, fuzzy
 msgid "Unknown escape sequence type"
 msgstr "Datenbankeintrag unbekannt"
@@ -3534,86 +3544,87 @@ msgstr ""
 msgid "not same size: %i <--> %i"
 msgstr "Grüße nicht identisch"
 
-#: src/libdar/catalogue.cpp:2328
-msgid "different file data"
-msgstr "unterschiedlicher Dateiinhalt"
+#: src/libdar/catalogue.cpp:2329
+#, c-format
+msgid "different file data, offset of first difference is: %i"
+msgstr ""
 
-#: src/libdar/catalogue.cpp:2336
+#: src/libdar/catalogue.cpp:2337
 msgid ""
 "Same data but CRC value could not be verified because we did not guessed "
 "properly its width (sequential read restriction)"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2338
+#: src/libdar/catalogue.cpp:2339
 msgid "Same data but stored CRC does not match the data!?!"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2427
+#: src/libdar/catalogue.cpp:2428
 #, fuzzy
 msgid "symbolic link does not point to the same target: "
 msgstr "Symbolischer Link zeigt auf ein anderes Ziel"
 
-#: src/libdar/catalogue.cpp:2528
+#: src/libdar/catalogue.cpp:2529
 msgid ""
 "LAX MODE: Error met building a catalogue entry, skipping this entry and "
 "continuing. Skipped error is: "
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2571
+#: src/libdar/catalogue.cpp:2572
 msgid "missing data to build a directory"
 msgstr "Fehlende Daten,um einen Ordner zu erstellen"
 
-#: src/libdar/catalogue.cpp:2748
+#: src/libdar/catalogue.cpp:2749
 #, fuzzy, c-format
 msgid "Cannot remove nonexistent entry %S from catalogue"
 msgstr ""
 "Kann Datei %S nicht wiederherstellen: 'Nicht vorhandene Datei in der "
 "Datenbank"
 
-#: src/libdar/catalogue.cpp:2843
+#: src/libdar/catalogue.cpp:2844
 msgid "listing() method must be given"
 msgstr "listing()-Methode muss angegeben werden"
 
-#: src/libdar/catalogue.cpp:2850
+#: src/libdar/catalogue.cpp:2851
 msgid "argument must be a relative path"
 msgstr "Argument muss ein relativer Pfad sein"
 
-#: src/libdar/catalogue.cpp:3117 src/libdar/catalogue.cpp:3120
+#: src/libdar/catalogue.cpp:3118 src/libdar/catalogue.cpp:3121
 msgid "missing data to build a special device"
 msgstr "Fehlende Daten um ein spezielles Gerät(device) anzusprechen"
 
-#: src/libdar/catalogue.cpp:3147
+#: src/libdar/catalogue.cpp:3148
 #, fuzzy, c-format
 msgid "devices have not the same major number: %d <--> %d"
 msgstr "Geräte haben nicht die gleiche höhere Nummer"
 
-#: src/libdar/catalogue.cpp:3149
+#: src/libdar/catalogue.cpp:3150
 #, fuzzy, c-format
 msgid "devices have not the same minor number: %d <--> %d"
 msgstr "Geräte haben nicht die gleiche niedrigere Nummer"
 
-#: src/libdar/catalogue.cpp:3156
+#: src/libdar/catalogue.cpp:3157
 #, fuzzy
 msgid "missing data to build"
 msgstr "Fehlende Daten zur Erstellung von"
 
-#: src/libdar/catalogue.cpp:3236 src/libdar/catalogue.cpp:3254
-#: src/libdar/catalogue.cpp:3256
+#: src/libdar/catalogue.cpp:3237 src/libdar/catalogue.cpp:3255
+#: src/libdar/catalogue.cpp:3257
 msgid "incoherent catalogue structure"
 msgstr "Inkoherente Katalogstruktur"
 
-#: src/libdar/catalogue.cpp:3247
+#: src/libdar/catalogue.cpp:3248
 msgid ""
 "LAX MODE: catalogue label does not match archive label, as if it was an "
 "extracted catalogue, assuming data corruption occurred and fixing the "
 "catalogue to be considered an a plain internal catalogue"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3299
+#: src/libdar/catalogue.cpp:3300
 msgid "CRC failed for table of contents (aka \"catalogue\")"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3301
+#: src/libdar/catalogue.cpp:3302
 msgid ""
 "LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This "
 "may even lead dar to see files in the archive that never existed, but this "
@@ -3621,43 +3632,43 @@ msgid ""
 "proceed anyway?"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3360
+#: src/libdar/catalogue.cpp:3361
 msgid "root does not have a parent directory"
 msgstr "root hat keinen übergeordneten Ordner"
 
-#: src/libdar/catalogue.cpp:3400
+#: src/libdar/catalogue.cpp:3401
 msgid "no current directory defined"
 msgstr "Kein aktueller Ordner definiert"
 
-#: src/libdar/catalogue.cpp:3404
+#: src/libdar/catalogue.cpp:3405
 msgid "root directory has no parent directory"
 msgstr "Das Stammverzeichnis hat keinen übergeordneten Ordner"
 
-#: src/libdar/catalogue.cpp:3426
+#: src/libdar/catalogue.cpp:3427
 #, fuzzy
 msgid "no current reading directory defined"
 msgstr "Kein aktueller Ordner definiert"
 
-#: src/libdar/catalogue.cpp:3498 src/libdar/catalogue.cpp:3512
+#: src/libdar/catalogue.cpp:3499 src/libdar/catalogue.cpp:3513
 msgid " is not present in the archive"
 msgstr "Der root-Ordner hat keinen übergeordneten Ordner"
 
-#: src/libdar/catalogue.cpp:3590
+#: src/libdar/catalogue.cpp:3591
 #, fuzzy
 msgid "Cannot recurs in a non directory entry"
 msgstr "Der Ordner kann nicht entfernt werden"
 
-#: src/libdar/catalogue.cpp:3593
+#: src/libdar/catalogue.cpp:3594
 msgid ""
 "The entry to recurs in does not exist, cannot add further entry to that "
 "absent subdirectory"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3656
+#: src/libdar/catalogue.cpp:3657
 msgid "root has no parent directory"
 msgstr "root hat keinen übergeordneten Ordner"
 
-#: src/libdar/catalogue.cpp:4015
+#: src/libdar/catalogue.cpp:4016
 #, fuzzy, c-format
 msgid ""
 "access mode    | user | group | size  |          date                 | "
@@ -3666,17 +3677,17 @@ msgstr ""
 "Zugriffsmodus  | User | Gruppe| Größe |          Datum                | "
 "[Daten][ EA ][Kompr] |  Dateiname\n"
 
-#: src/libdar/catalogue.cpp:4060
+#: src/libdar/catalogue.cpp:4061
 #, fuzzy, c-format
 msgid "%S [%c] [ REMOVED ENTRY ] (%S)  %S\n"
 msgstr "%S[ ENTFERNT ]    %S\n"
 
-#: src/libdar/catalogue.cpp:4091 src/libdar/catalogue.cpp:4224
+#: src/libdar/catalogue.cpp:4092 src/libdar/catalogue.cpp:4225
 #, fuzzy
 msgid "      Extended Attribute: ["
 msgstr "   Unterstützung erweit. Attr.: %s\n"
 
-#: src/libdar/catalogue.cpp:4130
+#: src/libdar/catalogue.cpp:4131
 #, fuzzy, c-format
 msgid ""
 "[data ][ EA  ][compr][S]| permission | user  | group | size  |          "
@@ -3685,19 +3696,19 @@ msgstr ""
 "[Daten][ EA  ][Kompr] | Rechte     | User  | Gruppe| Größe |          "
 "Datum                |    Dateiname\n"
 
-#: src/libdar/catalogue.cpp:4853
+#: src/libdar/catalogue.cpp:4854
 msgid "[DIRTY]"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:4855 src/libdar/catalogue.cpp:4871
+#: src/libdar/catalogue.cpp:4856 src/libdar/catalogue.cpp:4872
 msgid "[Saved]"
 msgstr "[Gespeichert]"
 
-#: src/libdar/catalogue.cpp:4858 src/libdar/catalogue.cpp:4874
+#: src/libdar/catalogue.cpp:4859 src/libdar/catalogue.cpp:4875
 msgid "[InRef]"
 msgstr "[In Referenz] "
 
-#: src/libdar/catalogue.cpp:4897
+#: src/libdar/catalogue.cpp:4898
 msgid "[Worse]"
 msgstr "[Schlechter]"
 
@@ -6273,6 +6284,9 @@ msgstr ""
 #, fuzzy, c-format
 msgid "Absolute value too high for an archive number: %d"
 msgstr "Ungültige Archivnummer: "
+
+#~ msgid "different file data"
+#~ msgstr "unterschiedlicher Dateiinhalt"
 
 #~ msgid "unary operator"
 #~ msgstr "Unärer Operator"

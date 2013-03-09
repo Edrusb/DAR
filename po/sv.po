@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2013-01-06 16:45+0100\n"
+"POT-Creation-Date: 2013-03-09 13:05+0100\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -3164,27 +3164,27 @@ msgstr "Läsning av en 'write only generic_file'"
 msgid "Writing to a read only generic_file"
 msgstr "Skrivning till en 'read only generic-file'"
 
-#: src/libdar/generic_file.cpp:278
+#: src/libdar/generic_file.cpp:285
 msgid "Cannot compare files in write only mode"
 msgstr "Kan ej jämföra filer i skrivmod"
 
-#: src/libdar/generic_file.cpp:352
+#: src/libdar/generic_file.cpp:375
 msgid "Cannot sync write on a read-only generic_file"
 msgstr "Kan ej synka skrivning med en skrivskyddad allmän fil."
 
-#: src/libdar/generic_file.cpp:442
+#: src/libdar/generic_file.cpp:465
 msgid "File mode is neither read nor write"
 msgstr "Filtillstånd är varken läsning eller skrivning"
 
-#: src/libdar/generic_file.cpp:455
+#: src/libdar/generic_file.cpp:478
 msgid "read only"
 msgstr "enbart läsning"
 
-#: src/libdar/generic_file.cpp:458
+#: src/libdar/generic_file.cpp:481
 msgid "write only"
 msgstr "enbart skrivning"
 
-#: src/libdar/generic_file.cpp:461
+#: src/libdar/generic_file.cpp:484
 msgid "read and write"
 msgstr "läs och skriv"
 
@@ -3244,7 +3244,7 @@ msgstr "nådde filslut innan alla väntade data kunde läsas"
 msgid "Unexpected value found in database"
 msgstr "Oväntat värde hitta i databas"
 
-#: src/libdar/data_tree.cpp:612
+#: src/libdar/data_tree.cpp:614
 #, c-format
 msgid ""
 "Archive number |  Data                   | status ||  EA                     "
@@ -3253,14 +3253,14 @@ msgstr ""
 "Arkivnummer     |  Data                   | status ||  "
 "EA                     | status \n"
 
-#: src/libdar/data_tree.cpp:613
+#: src/libdar/data_tree.cpp:615
 #, fuzzy, c-format
 msgid ""
 "---------------+-------------------------+--------++-------------------------"
 "+----------\n"
 msgstr "--------------+-------------------------+-----------------------\n"
 
-#: src/libdar/data_tree.cpp:806
+#: src/libdar/data_tree.cpp:832
 #, c-format
 msgid ""
 "Dates of file's %S are not increasing when database's archive number grows. "
@@ -3268,7 +3268,7 @@ msgid ""
 msgstr ""
 "Fils datum %S ökar ej när databasens arkivnummer växer. Berörd fil är: %S"
 
-#: src/libdar/data_tree.cpp:809
+#: src/libdar/data_tree.cpp:835
 msgid ""
 "Dates are not increasing for all files when database's archive number grows, "
 "working with this database may lead to improper file's restored version. "
@@ -3281,43 +3281,53 @@ msgstr ""
 "fil. Ordna om arkivet inom databasen så att det äldsta är det första arkivet "
 "och det senaste är det sista i databasen"
 
-#: src/libdar/data_tree.cpp:812
+#: src/libdar/data_tree.cpp:838
 msgid "Do you want to ignore the same type of error for other files?"
 msgstr "Vill du ignorera samma feltyp för andra filer?"
 
-#: src/libdar/data_tree.cpp:849
+#: src/libdar/data_tree.cpp:875
 msgid "Unexpected end of file"
 msgstr "Oväntat filslut"
 
-#: src/libdar/data_tree.cpp:1135
+#: src/libdar/data_tree.cpp:1091
+msgid ""
+"This database has been corrupted probably due to a bug in release 2.4.0 to "
+"2.4.9, and it has not been possible to cleanup this corruption, please "
+"rebuild the database from archives or extracted \"catalogues\", if the "
+"database has never been used by one of the previously mentioned released, "
+"you are welcome to open a bug report and provide as much as possible details "
+"about the circumstances"
+msgstr ""
+
+#: src/libdar/data_tree.cpp:1172
 msgid "[ Saved ]"
 msgstr "[ Sparad ]"
 
-#: src/libdar/data_tree.cpp:1137 src/libdar/data_tree.cpp:1142
+#: src/libdar/data_tree.cpp:1174 src/libdar/data_tree.cpp:1179
 msgid "[       ]"
 msgstr "[       ]"
 
-#: src/libdar/data_tree.cpp:1140
+#: src/libdar/data_tree.cpp:1177
 msgid "[  EA   ]"
 msgstr "[  EA   ]"
 
-#: src/libdar/data_tree.cpp:1348
+#: src/libdar/data_tree.cpp:1400
 msgid "Unknown record type"
 msgstr "Okänd posttyp"
 
-#: src/libdar/data_tree.cpp:1382
+#: src/libdar/data_tree.cpp:1434
 msgid "removed "
 msgstr "borttagen"
 
-#: src/libdar/data_tree.cpp:1383
+#: src/libdar/data_tree.cpp:1435
 msgid "present "
 msgstr "närvarande "
 
-#: src/libdar/data_tree.cpp:1384
+#: src/libdar/data_tree.cpp:1436
 msgid "saved   "
 msgstr "sparad  "
 
-#: src/libdar/data_tree.cpp:1385
+#: src/libdar/data_tree.cpp:1437
 msgid "absent  "
 msgstr "frånvarande  "
 
@@ -3427,7 +3437,7 @@ msgstr ""
 "Lägga till en tydlig escape-sekvens av typen 'seqt_not_a_sequence' är "
 "förbjudet"
 
-#: src/libdar/escape.cpp:689
+#: src/libdar/escape.cpp:690
 msgid "Unknown escape sequence type"
 msgstr "Okänd escape-sekvenstyp"
 
@@ -3688,11 +3698,12 @@ msgstr "kan ej läsa CRC: inget escape-märke hittat för denna fil"
 msgid "not same size: %i <--> %i"
 msgstr "inte samma storlek: %i <--> %i"
 
-#: src/libdar/catalogue.cpp:2328
-msgid "different file data"
-msgstr "olika fildata"
+#: src/libdar/catalogue.cpp:2329
+#, c-format
+msgid "different file data, offset of first difference is: %i"
+msgstr ""
 
-#: src/libdar/catalogue.cpp:2336
+#: src/libdar/catalogue.cpp:2337
 msgid ""
 "Same data but CRC value could not be verified because we did not guessed "
 "properly its width (sequential read restriction)"
@@ -3700,15 +3711,15 @@ msgstr ""
 "Samma data men CRC-värdet kunde inte verifieras, ty vi gissade inte korrekt "
 "dess bredd (sekvensiell läsbegränsning)"
 
-#: src/libdar/catalogue.cpp:2338
+#: src/libdar/catalogue.cpp:2339
 msgid "Same data but stored CRC does not match the data!?!"
 msgstr "Samma data men lagrat CRC matchar inte data!?!"
 
-#: src/libdar/catalogue.cpp:2427
+#: src/libdar/catalogue.cpp:2428
 msgid "symbolic link does not point to the same target: "
 msgstr "symbolisk länk pekar inte på samma mål"
 
-#: src/libdar/catalogue.cpp:2528
+#: src/libdar/catalogue.cpp:2529
 msgid ""
 "LAX MODE: Error met building a catalogue entry, skipping this entry and "
 "continuing. Skipped error is: "
@@ -3716,47 +3727,47 @@ msgstr ""
 "LAX MODE: fel vid skapnde av mapp, hoppar över detta data och fortsätter. "
 "Överhoppat fel var: "
 
-#: src/libdar/catalogue.cpp:2571
+#: src/libdar/catalogue.cpp:2572
 msgid "missing data to build a directory"
 msgstr "data saknas till att bygga en mapp"
 
-#: src/libdar/catalogue.cpp:2748
+#: src/libdar/catalogue.cpp:2749
 #, c-format
 msgid "Cannot remove nonexistent entry %S from catalogue"
 msgstr "Kan ej flytta obefintligt data %S från katalog"
 
-#: src/libdar/catalogue.cpp:2843
+#: src/libdar/catalogue.cpp:2844
 msgid "listing() method must be given"
 msgstr "list()-metod måste anges"
 
-#: src/libdar/catalogue.cpp:2850
+#: src/libdar/catalogue.cpp:2851
 msgid "argument must be a relative path"
 msgstr "argumentet måste vara en relativ sökväg"
 
-#: src/libdar/catalogue.cpp:3117 src/libdar/catalogue.cpp:3120
+#: src/libdar/catalogue.cpp:3118 src/libdar/catalogue.cpp:3121
 msgid "missing data to build a special device"
 msgstr "data saknas till att skapa en specialenhet"
 
-#: src/libdar/catalogue.cpp:3147
+#: src/libdar/catalogue.cpp:3148
 #, c-format
 msgid "devices have not the same major number: %d <--> %d"
 msgstr "enheter har inte samma 'major'-tal: %d <--> %d"
 
-#: src/libdar/catalogue.cpp:3149
+#: src/libdar/catalogue.cpp:3150
 #, c-format
 msgid "devices have not the same minor number: %d <--> %d"
 msgstr "enheter har inte samma 'minor'-tal: %d <--> %d"
 
-#: src/libdar/catalogue.cpp:3156
+#: src/libdar/catalogue.cpp:3157
 msgid "missing data to build"
 msgstr "data saknas för att bygga"
 
-#: src/libdar/catalogue.cpp:3236 src/libdar/catalogue.cpp:3254
-#: src/libdar/catalogue.cpp:3256
+#: src/libdar/catalogue.cpp:3237 src/libdar/catalogue.cpp:3255
+#: src/libdar/catalogue.cpp:3257
 msgid "incoherent catalogue structure"
 msgstr "osammanhängande katalogstruktur"
 
-#: src/libdar/catalogue.cpp:3247
+#: src/libdar/catalogue.cpp:3248
 msgid ""
 "LAX MODE: catalogue label does not match archive label, as if it was an "
 "extracted catalogue, assuming data corruption occurred and fixing the "
@@ -3766,12 +3777,12 @@ msgstr ""
 "extraherad katalog, antar dataförstörelse skett och fixar till katalogen som "
 "en enkel intern katalog"
 
-#: src/libdar/catalogue.cpp:3299
+#: src/libdar/catalogue.cpp:3300
 msgid "CRC failed for table of contents (aka \"catalogue\")"
 msgstr ""
 "CRC misslyckades för innehållsförtäckning (också känts som \"katalog\")"
 
-#: src/libdar/catalogue.cpp:3301
+#: src/libdar/catalogue.cpp:3302
 msgid ""
 "LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This "
 "may even lead dar to see files in the archive that never existed, but this "
@@ -3782,31 +3793,31 @@ msgstr ""
 "att dar ser filer i arkivet, vilka aldrig funnits men detta kommer sannolikt "
 "leda till andar fel vid återställande av filer. Skall vi fortsätta ändå?"
 
-#: src/libdar/catalogue.cpp:3360
+#: src/libdar/catalogue.cpp:3361
 msgid "root does not have a parent directory"
 msgstr "rot har inte någon föräldramapp"
 
-#: src/libdar/catalogue.cpp:3400
+#: src/libdar/catalogue.cpp:3401
 msgid "no current directory defined"
 msgstr "ingen aktuell mapp definierad"
 
-#: src/libdar/catalogue.cpp:3404
+#: src/libdar/catalogue.cpp:3405
 msgid "root directory has no parent directory"
 msgstr "rotmappen har ingen föräldramapp"
 
-#: src/libdar/catalogue.cpp:3426
+#: src/libdar/catalogue.cpp:3427
 msgid "no current reading directory defined"
 msgstr "ingen aktuell läsmapp definierad"
 
-#: src/libdar/catalogue.cpp:3498 src/libdar/catalogue.cpp:3512
+#: src/libdar/catalogue.cpp:3499 src/libdar/catalogue.cpp:3513
 msgid " is not present in the archive"
 msgstr " är inte närvarande i arkivet"
 
-#: src/libdar/catalogue.cpp:3590
+#: src/libdar/catalogue.cpp:3591
 msgid "Cannot recurs in a non directory entry"
 msgstr "Kan ej gå rekursivt i en icke-mapp"
 
-#: src/libdar/catalogue.cpp:3593
+#: src/libdar/catalogue.cpp:3594
 msgid ""
 "The entry to recurs in does not exist, cannot add further entry to that "
 "absent subdirectory"
@@ -3814,11 +3825,11 @@ msgstr ""
 "Posten at gå rekursivt in i saknas, kqan ej lägga till ytterligare poster "
 "till den obefintliga undermappen."
 
-#: src/libdar/catalogue.cpp:3656
+#: src/libdar/catalogue.cpp:3657
 msgid "root has no parent directory"
 msgstr "rot har ingen föräldramapp"
 
-#: src/libdar/catalogue.cpp:4015
+#: src/libdar/catalogue.cpp:4016
 #, c-format
 msgid ""
 "access mode    | user | group | size  |          date                 | "
@@ -3827,16 +3838,16 @@ msgstr ""
 "access mod       | anvd | grupp | storl |         datum                 | "
 "[data ][ EA  ][kompr][S] |   filnamn\n"
 
-#: src/libdar/catalogue.cpp:4060
+#: src/libdar/catalogue.cpp:4061
 #, c-format
 msgid "%S [%c] [ REMOVED ENTRY ] (%S)  %S\n"
 msgstr "%S [%c] [ FLYTTAD ENTRY ] (%S)  %S\n"
 
-#: src/libdar/catalogue.cpp:4091 src/libdar/catalogue.cpp:4224
+#: src/libdar/catalogue.cpp:4092 src/libdar/catalogue.cpp:4225
 msgid "      Extended Attribute: ["
 msgstr "      Extended Attribut: ["
 
-#: src/libdar/catalogue.cpp:4130
+#: src/libdar/catalogue.cpp:4131
 #, c-format
 msgid ""
 "[data ][ EA  ][compr][S]| permission | user  | group | size  |          "
@@ -3845,19 +3856,19 @@ msgstr ""
 "[data ][ EA  ][kompr][S] | behörighet  | anvd |  grupp | storl |           "
 "datum               |    filnamn\n"
 
-#: src/libdar/catalogue.cpp:4853
+#: src/libdar/catalogue.cpp:4854
 msgid "[DIRTY]"
 msgstr "[SMUTS]"
 
-#: src/libdar/catalogue.cpp:4855 src/libdar/catalogue.cpp:4871
+#: src/libdar/catalogue.cpp:4856 src/libdar/catalogue.cpp:4872
 msgid "[Saved]"
 msgstr "[Sparad]"
 
-#: src/libdar/catalogue.cpp:4858 src/libdar/catalogue.cpp:4874
+#: src/libdar/catalogue.cpp:4859 src/libdar/catalogue.cpp:4875
 msgid "[InRef]"
 msgstr "[InRef]"
 
-#: src/libdar/catalogue.cpp:4897
+#: src/libdar/catalogue.cpp:4898
 msgid "[Worse]"
 msgstr "[Värre]"
 
@@ -6399,6 +6410,9 @@ msgstr "Avsluta genom att mata in en tom rad\n"
 #, c-format
 msgid "Absolute value too high for an archive number: %d"
 msgstr "Absolutvärdet för stort för arkiv nummer: %d"
+
+#~ msgid "different file data"
+#~ msgstr "olika fildata"
 
 #~ msgid ""
 #~ "Archive format older than \"08\" (release 2.4.0) cannot be read through a "
