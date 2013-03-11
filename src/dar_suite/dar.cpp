@@ -75,7 +75,12 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		  argc,
 		  argv,
 		  param))
-        return EXIT_SYNTAX;
+    {
+	if(param.op == version_or_help)
+	    return EXIT_OK;
+	else
+	    return EXIT_SYNTAX;
+    }
     else // get_args is OK, we've got a valid command line
     {
 	archive *arch = NULL;

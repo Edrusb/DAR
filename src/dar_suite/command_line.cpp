@@ -995,6 +995,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'h':
                 usage(*rec.dialog, argv[0]);
+		p.op = version_or_help;
                 return false;
             case 'L':
                 show_license(*rec.dialog);
@@ -1029,6 +1030,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'V':
                 show_version(*rec.dialog, argv[0]);
+		p.op = version_or_help;
                 return false;
             case ':':
                 throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
