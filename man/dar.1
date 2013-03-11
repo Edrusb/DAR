@@ -279,9 +279,10 @@ The --alter=SI and --alter=binary options can be used several times on the comma
 -Q
 Do not display an initial warning on stderr when not launched from a terminal
 (when launched from a cronjob for example). This means that all
-questions to the user will be answered with 'no', which most of the time
+questions to the user will be answered by 'no', which most of the time
 will abort the program. Please note that this option cannot be used in
-a configuration file, it must be given on the command line. Since
+a configuration file, it must also be given on the command line as is "-Q" not combined
+with any other option like -QV for it to be detected. Since
 version 2.2.2, giving this option also forces the non-interactive mode,
 even if dar is launched from a terminal. This makes it possible for dar
 to run in the background. When you do, it's recommended to redirect
