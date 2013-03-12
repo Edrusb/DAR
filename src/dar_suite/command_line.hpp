@@ -188,4 +188,9 @@ extern bool get_args(user_interaction & dialog,
 
     /// @}
 
+#if HAVE_GETOPT_LONG
+const struct option *get_long_opt();
+#endif
+
+const char *get_short_opt();
 #endif

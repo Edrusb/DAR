@@ -40,7 +40,7 @@ test_compressor_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 test_mask_SOURCES = test_mask.cpp
 test_mask_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
-test_tuyau_SOURCES = test_tuyau.cpp ../dar_suite/shell_interaction.cpp ../dar_suite/dar_suite.cpp
+test_tuyau_SOURCES = test_tuyau.cpp ../dar_suite/shell_interaction.cpp ../dar_suite/dar_suite.cpp ../dar_suite/line_tools.cpp
 test_tuyau_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 test_deci_SOURCES = test_deci.cpp
@@ -58,7 +58,7 @@ test_sar_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 test_filesystem_SOURCES = test_filesystem.cpp ../dar_suite/shell_interaction.cpp
 test_filesystem_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
-test_scrambler_SOURCES = test_scrambler.cpp  ../dar_suite/dar_suite.cpp ../dar_suite/shell_interaction.cpp
+test_scrambler_SOURCES = test_scrambler.cpp  ../dar_suite/dar_suite.cpp ../dar_suite/shell_interaction.cpp ../dar_suite/line_tools.cpp
 test_scrambler_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 test_generic_file_SOURCES = test_generic_file.cpp ../dar_suite/shell_interaction.cpp

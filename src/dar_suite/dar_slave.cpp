@@ -66,6 +66,7 @@ char *strchr (), *strrchr ();
 #include "line_tools.hpp"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
+#define OPT_STRING "i:o:hVE:Qj"
 
 using namespace libdar;
 using namespace std;
@@ -82,7 +83,14 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 
 int main(S_I argc, char * const argv[], const char **env)
 {
-    return dar_suite_global(argc, argv, env, &little_main);
+     return dar_suite_global(argc,
+			     argv,
+			     env,
+			     OPT_STRING,
+#if HAVE_GETOPT_LONG
+			     NULL,
+#endif
+			     &little_main);
 }
 
 static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
@@ -163,7 +171,7 @@ static bool command_line(user_interaction & dialog,
         return false;
     }
 
-    while((lu = getopt(argc, argv, "i:o:hVE:Qj")) != EOF)
+    while((lu = getopt(argc, argv, OPT_STRING)) != EOF)
     {
         switch(lu)
         {

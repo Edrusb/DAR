@@ -82,6 +82,47 @@ void line_tools_split_at_first_space(const char *field, std::string & before_spa
 
 void line_tools_get_min_digits(std::string arg, infinint & num, infinint & ref_num, infinint & aux_num);
 
+    /// test the presence of a set of argument on the command line
+    ///
+    /// \param[in] arguments is the list of options to look for
+    /// \param[in] argc is the number of argument on the command line
+    /// \param[in] argv is the list of arguments on the command line
+    /// \param[in] getopt_string is the parsing string to pass to getopt
+#if HAVE_GETOPT_LONG
+    /// \param[in] long_options is the optional list of long options  (an NULL pointer is acceptable for no long option)
+#endif
+    /// \param[out] presence is a subset of arguments containing the option found on command-line
+extern void line_tools_look_for(const std::vector<char> & arguments,
+				S_I argc,
+				char *const argv[],
+				const char *getopt_string,
+#if HAVE_GETOPT_LONG
+				const struct option *long_options,
+#endif
+				std::vector<char> & presence);
+
+
+    /// test the presence of -Q and -j options on the command line
+    ///
+    /// \param[in] argc is the number of argument on the command line
+    /// \param[in] argv is the list of arguments on the command line
+    /// \param[in] getopt_string is the parsing string to pass to getopt
+#if HAVE_GETOPT_LONG
+    /// \param[in] long_options is the optional list of long options (an NULL pointer is acceptable for no long option)
+#endif
+    /// \param[out] j_is_present is set to true if -j option or its equivalent long option has been found on command-line
+    /// \param[out] Q_is_present is set to true if -Q option or its equivalent long option has been found on command-line
+extern void line_tools_look_for_jQ(S_I argc,
+				   char *const argv[],
+				   const char *getopt_string,
+#if HAVE_GETOPT_LONG
+				   const struct option *long_options,
+#endif
+				   bool & j_is_present,
+				   bool & Q_is_present);
+
+
+
     /// @}
 
 #endif

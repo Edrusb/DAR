@@ -26,9 +26,17 @@ extern "C"
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#include "getopt_decision.h"
 }
 
 #include <new>
+#include <algorithm>
 
 #include "line_tools.hpp"
 #include "deci.hpp"
@@ -556,6 +564,73 @@ void line_tools_get_min_digits(string the_arg, infinint & num, infinint & ref_nu
     }
 }
 
+void line_tools_look_for(const vector<char> & arguments,
+			 S_I argc,
+			 char *const argv[],
+			 const char *getopt_string,
+#if HAVE_GETOPT_LONG
+			 const struct option *long_options,
+#endif
+			 vector<char> & presence)
+{
+    S_I lu;
+    presence.clear();
+
+    (void)line_tools_reset_getopt();
+#if HAVE_GETOPT_LONG
+    const struct option *ptr_long_opt = long_options;
+    const struct option voided = { NULL, 0, NULL, 0 };
+    if(long_options == NULL)
+	ptr_long_opt = &voided;
+
+    while((lu = getopt_long(argc, argv, getopt_string, ptr_long_opt, NULL)) != EOF)
+#else
+     while((lu = getopt(argc, argv, getopt_string)) != EOF)
+#endif
+    {
+	 vector<char>::const_iterator it = find(arguments.begin(), arguments.end(), (char)lu);
+
+	if(it != arguments.end())
+	    presence.push_back(lu);
+    }
+    (void)line_tools_reset_getopt();
+}
+
+void line_tools_look_for_jQ(S_I argc,
+			    char *const argv[],
+			    const char *getopt_string,
+#if HAVE_GETOPT_LONG
+			    const struct option *long_options,
+#endif
+			    bool & j_is_present,
+			    bool & Q_is_present)
+{
+    vector<char> arguments;
+    vector<char> presence;
+    vector<char>::const_iterator it;
+
+    j_is_present = false;
+    Q_is_present = false;
+
+    arguments.push_back('j');
+    arguments.push_back('Q');
+    line_tools_look_for(arguments,
+			argc,
+			argv,
+			getopt_string,
+#if HAVE_GETOPT_LONG
+			long_options,
+#endif
+			presence);
+
+    it = find(presence.begin(), presence.end(), 'j');
+    if(it != presence.end())
+	j_is_present = true;
+
+    it = find(presence.begin(), presence.end(), 'Q');
+    if(it != presence.end())
+	Q_is_present = true;
+}
 
 static string build(string::iterator a, string::iterator b)
 {

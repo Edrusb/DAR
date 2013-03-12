@@ -383,6 +383,7 @@ namespace libdar
         /// \param[in] argc is the number of argument on the command line
         /// \param[in] argv is the list of argument on the command line
         /// \return true if the argument is present in the list
+	/// \note THIS ROUTINE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE VERSION OF LIBDAR
     extern bool tools_look_for(const char *argument, S_I argc, char *const argv[]);
 
 

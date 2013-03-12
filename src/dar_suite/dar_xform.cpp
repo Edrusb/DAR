@@ -54,6 +54,8 @@ using namespace libdar;
 
 #define DAR_XFORM_VERSION "1.5.3"
 
+#define OPT_STRING  "s:S:p::wnhbVE:F:a::Qj^:3:;:"
+
 static bool command_line(user_interaction & dialog,
 			 S_I argc, char * const argv[],
                          path * & src_dir, string & src,
@@ -79,7 +81,14 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char *const argv[], con
 
 int main(S_I argc, char *const argv[], const char **env)
 {
-    return dar_suite_global(argc, argv, env, &sub_main);
+    return dar_suite_global(argc,
+			    argv,
+			    env,
+			    OPT_STRING,
+#if HAVE_GETOPT_LONG
+			    NULL,
+#endif
+			    &sub_main);
 }
 
 static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
@@ -279,7 +288,7 @@ static bool command_line(user_interaction & dialog, S_I argc, char * const argv[
 
     try
     {
-        while((lu = getopt(argc, argv, "s:S:p::wnhbVE:F:a::Qj^:3:;:")) != EOF)
+        while((lu = getopt(argc, argv, OPT_STRING)) != EOF)
         {
             switch(lu)
             {
