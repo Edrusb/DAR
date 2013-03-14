@@ -1,25 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Usage Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -159,7 +139,7 @@ On the remote backup server you would type: <br>
 CAT_backup_name -z</code><br>
       </div>
       <div style="margin-left: 40px;"><br>
-if the catalogue is too big to fit on a floppy, you can slit it as
+if the catalogue is too big to fit on a floppy, you can split it as
 usually using dar:<br>
       <br>
       </div>
@@ -381,7 +361,7 @@ Questions", the netcat program can be very helpful if you plane to
 backup over the network.<br>
       </div>
 
-      
+
       <div style="margin-left: 40px;"><br>
       </div>
 
@@ -490,12 +470,12 @@ on flower:<br>
       <code>nc -w 3 honey 5001 | dar -A - -o toslave -c - -R / -z | nc
 -w 3 honey 5002</code><br>
       </div>
-      
+
       <div style="margin-left: 40px;"><br>
       <br>
       </div>
 
-      
+
       <div style="text-align: justify; margin-left: 80px;">with netcat
 the
 data goes in clear over the network. You could use ssh instead if you
@@ -767,7 +747,7 @@ DAR can be run in background:<br>
       <br>
       </div>
 
-      
+
       <div style="margin-left: 80px;"><code>dar [command-line
 arguments] &lt; /dev/null &amp;</code></div>
       </td>
@@ -799,7 +779,7 @@ the other type of files.<br>
 In the case you have no idea how to name these, here is the extensions I use:<br>
       </div>
 
-      
+
       <div style="margin-left: 80px;">"<span style="font-weight: bold;">*.dcf</span>": Dar Configuration file, aka DCF files (used with dar's -B option)<br>
 "<span style="font-weight: bold;">*.dmd</span>": Dar Manager
 Database, aka DMD files (used with dar_manager's -B and -C options) <br>
@@ -808,7 +788,7 @@ Database, aka DMD files (used with dar_manager's -B and -C options) <br>
 "*<span style="font-weight: bold;">.dfl</span>": Dar Filter List, aka DFL files (used with dar's -[ or -] options)<br>
       </div>
 
-      
+
       <div style="margin-left: 40px;"><br>
 
 but, you are totally free to use the filename you want !&nbsp;&nbsp; ;-)<br>
@@ -853,13 +833,13 @@ arguments, you have to put these between quotes for they appear as a
 single string to the shell that interprets the dar command-line. For
 example if you want to call<br>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
       </div>
 
       <div style="margin-left: 120px;"><code>df .</code><br>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
 
 [<span style="font-style: italic;">This is two worlds: "df" (the
@@ -868,7 +848,7 @@ following on DAR command-line:<br>
       <br>
       </div>
 
-      
+
       <div style="margin-left: 120px;"><code>-E "df ."</code><br>
       </div>
       <div style="margin-left: 80px;">
@@ -877,14 +857,14 @@ or<br>
 
       <div style="margin-left: 120px;"><code>-E 'df .'</code><br>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
       <br>
 
 DAR provides several substitution strings in that context:<br>
       </div>
 
-      
+
 <ul style="margin-left: 80px;">
         <li style="text-align: justify;"><code>%%</code> is replaced by
 a single <code>%</code> Thus if you need a <code>%</code> in you
@@ -918,7 +898,7 @@ creation only)<br>
         </li>
       </ul>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
 
 What the use of this feature? For example you want to burn the brand-new
@@ -929,8 +909,8 @@ let's build a little script for that:<br>
       <br>
       </div>
 
-      
-      
+
+
       <div style="margin-left: 120px;"><code>%cat burner</code><br>
       <code></code></div>
       <div style="margin-left: 160px;"><code>#!/bin/bash</code><br>
@@ -956,7 +936,7 @@ let's build a little script for that:<br>
       <code></code></div>
       <div style="margin-left: 120px;"><code>%</code><br>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
       </div>
 
@@ -969,29 +949,29 @@ command-line). Note that this script is only here for illustration,
 there are many more interesting user scripts made by several dar users.
 These are available in the <a href="doc/samples/index.html">examples</a> part of the documentation.<br>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
 
 One could then use it this way:<br>
       <br>
       </div>
 
-      
+
       <div style="margin-left: 120px;"><code>-E "./burner %p/%b.%n.dar
 %n"</code><br>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
 
 which can lead to the following DAR command-line:<br>
       <br>
       </div>
 
-      
+
       <div style="margin-left: 120px;"><code>dar -c ~/tmp/example -z -R
 / usr/local -s 650M -E "./burner %p/%b.%n.dar %n" -p</code><br>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
       </div>
 
@@ -1004,14 +984,14 @@ play a music to inform us that the slice is burned. The advantage, here
 is that we don't have to come twice by slices, once the slice is
 ready, and once the slice is burnt.<br>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
 
 Another example:<br>
       <br>
       </div>
 
-      
+
       <div style="text-align: justify; margin-left: 80px;">you want to send a huge file by
 email. (OK that's better to use FTP,
 but sometimes, people think than the less you can do the more they
@@ -1019,7 +999,7 @@ control you, and thus they disable many services, either by fear of the
 unknown, either by stupidity). So let's suppose that you only have mail available to
 transfer your data:<br>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
       </div>
 
@@ -1028,7 +1008,7 @@ my_huge_file -E
 "uuencode %b.%n.dar %b.%n.dar | mail -s 'slice %n' your@email.address ;
 rm %b.%n.dar ; sleep 300"</code><br>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
       </div>
 
@@ -1038,7 +1018,7 @@ system does not allow larger emails. We save only one file:
 "my_huge_file" (but we could even save the whole filesystem it would
 also work). The command we execute each time a slice is ready is:<br>
       </div>
-      
+
       <div style="margin-left: 80px;"><br>
       </div>
 
@@ -1057,8 +1037,8 @@ the slices are saved in the current directory.<br>
       <br>
       </div>
 
-      
-      
+
+
       <div style="margin-left: 80px;">Last example, is while
 extracting: in
 the case the slices cannot all be present in the filesystem, you need a
@@ -1142,7 +1122,7 @@ saved or has been completely saved.<br>
       <br>
       </div>
 
-      
+
       <div style="margin-left: 80px;"><span style="font-family: monospace;">cat /root/scripts/before_after_backup.sh<br>
 #!/bin/sh</span><br style="font-family: monospace;">
       <span style="font-family: monospace;"></span><code><br>
@@ -1173,7 +1153,7 @@ context="$3"<br>
       <span style="font-family: monospace;"><span style="font-family: monospace;">&nbsp; &nbsp;&nbsp; # do nothing, or warn that no action is defined for that file</span></span><br style="font-family: monospace;">
       <span style="font-family: monospace;"><span style="font-family: monospace;">fi</span></span><br>
       <span style="font-family: monospace;"><span style="font-family: monospace;"></span></span></div>
-      
+
       <div style="margin-left: 40px;"><span style="font-family: monospace;"><span style="font-family: monospace;"></span></span><br>
       <span style="font-family: monospace;"><span style="font-family: monospace;">
       </span></span><br style="font-family: serif;">
@@ -1198,7 +1178,7 @@ before and after saving our </span><span style="font-family: monospace;">/home/m
 <hr style="width: 100%; height: 2px;"><br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
 <tbody><tr><td style="vertical-align: top;">
-      
+
       <div style="text-align: justify;">
       <h3><a name="DUC_convention"></a><span style="text-decoration: underline;">Convention for DUC files</span></h3>
       <div style="margin-left: 40px;">Since version 1.2.0 dar's user
@@ -1215,8 +1195,8 @@ the following<br>
       <br>
       </div>
 
-      
-      
+
+
       </div>
       <div style="margin-left: 80px; text-align: justify;"><code>example.duc
 %p %b %n %e %c [other optional arguments]</code><br>
@@ -1267,7 +1247,7 @@ been identified, for example, dar is not ran under a controlling
 terminal).<br>
       </div>
 
-      
+
       <br>
 </div>
       </td></tr></tbody>
@@ -1300,17 +1280,17 @@ the following<br>
       <br>
       </div>
 
-      
-      
 
-      
 
-      
-      
+
+
+
+
+
       <div style="margin-left: 80px;"><code>example.duc
 %p %f %u %g %c [other optional arguments]</code><br>
       </div>
-      
+
       <div style="margin-left: 40px;"><br>
 
 
@@ -1523,7 +1503,7 @@ of course. This point is defined by the percentage of redundancy you
 defined for a given file. But,... check the official PAR site here: <br>
       </div>
 
-      
+
       <div style="margin-left: 40px;"><br>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://parchive.sourceforge.net/">http://parchive.sourceforge.net</a><br>
@@ -1639,7 +1619,7 @@ without excluding a particular directory for example you want to save
 all mp3 files and only MP3 files,<br>
       <br>
       </div>
-      
+
       <div style="margin-left: 80px; text-align: justify;"><code>dar -c
 toto -R / -I "*.mp3" -I "*.MP3" home/ftp</code><br>
 
@@ -1755,7 +1735,7 @@ necessary details to use this new feature.<br>
     <tr>
       <td style="vertical-align: top;">
       <h3><a name="Decremental_Backup"></a><span style="text-decoration: underline;">Decremental Backup</span></h3>
-      
+
       <div style="margin-left: 40px;"><br>
       </div>
 
@@ -2012,29 +1992,29 @@ t1 +&nbsp;&nbsp;&nbsp; 0 &nbsp;&nbsp; 0 &nbsp;&nbsp; 0</code><br>
       </code>&nbsp;<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; f1 &nbsp; f2 &nbsp; f3 &nbsp; f4 &nbsp;  </code><br>
       </div>
 
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
 
-      
-      
-      
-      
-      
-      
 
-      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <br>
       <div style="margin-left: 40px;">
 Thus obtaining the latest version of the system is as easy as done
@@ -2088,12 +2068,12 @@ archives, and will require disk space to store both of them.<br>
       <br>
       </div>
 
-      
-      
-      
-      
+
+
+
+
       </div>
-      
+
       <div style="text-align: justify; margin-left: 40px;">Seen
 this, the dar
 implementation is to let the user do a normal full backup at each
@@ -2118,7 +2098,7 @@ to create a decremental back with data in it. Only the new full backup
 can be replaced by
 its extracted catalogue.<br>
       </div>
-      
+
       <div style="margin-left: 40px;"><br>
       </div>
 
