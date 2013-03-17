@@ -1,8 +1,9 @@
 from 2.4.10 to 2.4.11
-- updated man page about -Q option that cannot be combined with other
-  options (use -Q -V instead of -QV).
 - Modified behavior of 'dar -h' and 'dar -V', both now return 0 as exist
   status instead of 1 (that means syntax error).
+- fixed typo in documentation
+- fixed memory leakage met when dar fails a merging operation because the
+  resulting archive is specified in an directory that do not exist.
 
 from 2.4.9 to to 2.4.10
 - fixing libdar about dar_manager database corruption that occurred when

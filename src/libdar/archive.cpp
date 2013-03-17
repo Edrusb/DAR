@@ -481,137 +481,148 @@ namespace libdar
 	    if(local_path == NULL)
 		throw Ememory("archive::archive[merge]");
 
-	    if(ref_arch1 != NULL)
-		ref_arch1->check_against_isolation(dialog, false);
-		// this avoid to merge an archive from an isolated catalogue
-		// there is no way to know whether the corresponding merging of the real archive exists, nor to know the data_name of this
-		// hypothetical merged archive. Thus we forbid the use of isolated catalogue for merging.
-
-
-	    if(ref_arch2 != NULL)
-		ref_arch2->check_against_isolation(dialog, false);
-		// same remark as above for ref_arch1
-
-
-		// end of sanity checks
-
-	    if(!options.get_empty())
-		tools_avoid_slice_overwriting_regex(dialog,
-						    sauv_path,
-						    string("^")+filename+"\\.[0-9]+\\."+extension+"(\\.(md5|sha1))?$",
-						    options.get_info_details(),
-						    options.get_allow_over(),
-						    options.get_warn_over(),
-						    options.get_empty());
-
-	    if(ref_arch1 == NULL)
-		if(ref_arch2 == NULL)
-		    throw Elibcall("archive::archive[merge]", string(gettext("Both reference archive are NULL, cannot merge archive from nothing")));
-		else
-		    if(ref_arch2->cat == NULL)
-			throw SRC_BUG; // an archive should always have a catalogue available
-		    else
-			if(ref_arch2->exploitable)
-			    ref_cat1 = ref_arch2->cat;
-			else
-			    throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
-	    else
-		if(ref_arch2 == NULL)
-		    if(ref_arch1->cat == NULL)
-			throw SRC_BUG; // an archive should always have a catalogue available
-		    else
-			if(ref_arch1->exploitable)
-			    ref_cat1 = ref_arch1->cat;
-			else
-			    throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
-		else // both catalogues available
-		{
-		    if(!ref_arch1->exploitable || !ref_arch2->exploitable)
-			throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
-		    if(ref_arch1->cat == NULL)
-			throw SRC_BUG;
-		    if(ref_arch2->cat == NULL)
-			throw SRC_BUG;
-		    ref_cat1 = ref_arch1->cat;
-		    ref_cat2 = ref_arch2->cat;
-		    if(ref_arch1->ver.algo_zip != ref_arch2->ver.algo_zip && char2compression(ref_arch1->ver.algo_zip) != none && char2compression(ref_arch2->ver.algo_zip) != none && options.get_keep_compressed())
-			throw Efeature(gettext("the \"Keep file compressed\" feature is not possible when merging two archives using different compression algorithms (This is for a future version of dar). You can still merge these two archives but without keeping file compressed (thus you will probably like to use compression (-z or -y options) for the resulting archive"));
-		}
-
-	    if(options.get_keep_compressed())
+	    try
 	    {
+
+		if(ref_arch1 != NULL)
+		    ref_arch1->check_against_isolation(dialog, false);
+		    // this avoid to merge an archive from an isolated catalogue
+		    // there is no way to know whether the corresponding merging of the real archive exists, nor to know the data_name of this
+		    // hypothetical merged archive. Thus we forbid the use of isolated catalogue for merging.
+
+
+		if(ref_arch2 != NULL)
+		    ref_arch2->check_against_isolation(dialog, false);
+		    // same remark as above for ref_arch1
+
+
+		    // end of sanity checks
+
+		if(!options.get_empty())
+		    tools_avoid_slice_overwriting_regex(dialog,
+							sauv_path,
+							string("^")+filename+"\\.[0-9]+\\."+extension+"(\\.(md5|sha1))?$",
+							options.get_info_details(),
+							options.get_allow_over(),
+							options.get_warn_over(),
+							options.get_empty());
+
 		if(ref_arch1 == NULL)
-		    throw SRC_BUG;
-
-		algo_kept = char2compression(ref_arch1->ver.algo_zip);
-		if(algo_kept == none && ref_cat2 != NULL)
-		{
 		    if(ref_arch2 == NULL)
-			throw SRC_BUG;
+			throw Elibcall("archive::archive[merge]", string(gettext("Both reference archive are NULL, cannot merge archive from nothing")));
 		    else
-			algo_kept = char2compression(ref_arch2->ver.algo_zip);
-		}
-	    }
+			if(ref_arch2->cat == NULL)
+			    throw SRC_BUG; // an archive should always have a catalogue available
+			else
+			    if(ref_arch2->exploitable)
+				ref_cat1 = ref_arch2->cat;
+			    else
+				throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+		else
+		    if(ref_arch2 == NULL)
+			if(ref_arch1->cat == NULL)
+			    throw SRC_BUG; // an archive should always have a catalogue available
+			else
+			    if(ref_arch1->exploitable)
+				ref_cat1 = ref_arch1->cat;
+			    else
+				throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+		    else // both catalogues available
+		    {
+			if(!ref_arch1->exploitable || !ref_arch2->exploitable)
+			    throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+			if(ref_arch1->cat == NULL)
+			    throw SRC_BUG;
+			if(ref_arch2->cat == NULL)
+			    throw SRC_BUG;
+			ref_cat1 = ref_arch1->cat;
+			ref_cat2 = ref_arch2->cat;
+			if(ref_arch1->ver.algo_zip != ref_arch2->ver.algo_zip && char2compression(ref_arch1->ver.algo_zip) != none && char2compression(ref_arch2->ver.algo_zip) != none && options.get_keep_compressed())
+			    throw Efeature(gettext("the \"Keep file compressed\" feature is not possible when merging two archives using different compression algorithms (This is for a future version of dar). You can still merge these two archives but without keeping file compressed (thus you will probably like to use compression (-z or -y options) for the resulting archive"));
+		    }
 
-		// then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
-	    op_create_in_sub(dialog,
-			     oper_merge,
-			     path(FAKE_ROOT),
-			     sauv_path,
-			     ref_cat1,
-			     ref_cat2,
-			     NULL,  // ref_path
-			     options.get_selection(),
-			     options.get_subtree(),
-			     filename,
-			     extension,
-			     options.get_allow_over(),
-			     options.get_overwriting_rules(),
-			     options.get_warn_over(),
-			     options.get_info_details(),
-			     options.get_pause(),
-			     options.get_empty_dir(),
-			     options.get_keep_compressed() ? algo_kept : options.get_compression(),
-			     options.get_compression_level(),
-			     options.get_slice_size(),
-			     options.get_first_slice_size(),
-			     options.get_ea_mask(),
-			     options.get_execute(),
-			     options.get_crypto_algo(),
-			     options.get_crypto_pass(),
-			     options.get_crypto_size(),
-			     options.get_compr_mask(),
-			     options.get_min_compr_size(),
-			     false,   // nodump
-			     0,       // hourshift
-			     options.get_empty(),
-			     true,    // alter_atime
-			     false,   // furtive_read_mode
-			     false,   // same_fs
-			     inode::cf_all,   // what_to_check
-			     false,   // snapshot
-			     false,   // cache_directory_tagging
-			     options.get_display_skipped(),
-			     options.get_keep_compressed(),
-			     0,       // fixed_date
-			     options.get_slice_permission(),
-			     options.get_slice_user_ownership(),
-			     options.get_slice_group_ownership(),
-			     0,  // repeat_count
-			     0,  // repeat_byte
-			     options.get_decremental_mode(),
-			     options.get_sequential_marks(),
-			     false,  // security_check
-			     options.get_sparse_file_min_size(),
-			     options.get_user_comment(),
-			     options.get_hash_algo(),
-			     options.get_slice_min_digits(),
-			     "",      // backup_hook_file_execute
-			     bool_mask(false), //backup_hook_file_mask
-			     false,
-			     st_ptr);
-	    exploitable = false;
-	    stack.terminate();
+		if(options.get_keep_compressed())
+		{
+		    if(ref_arch1 == NULL)
+			throw SRC_BUG;
+
+		    algo_kept = char2compression(ref_arch1->ver.algo_zip);
+		    if(algo_kept == none && ref_cat2 != NULL)
+		    {
+			if(ref_arch2 == NULL)
+			    throw SRC_BUG;
+			else
+			    algo_kept = char2compression(ref_arch2->ver.algo_zip);
+		    }
+		}
+
+		    // then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
+		op_create_in_sub(dialog,
+				 oper_merge,
+				 path(FAKE_ROOT),
+				 sauv_path,
+				 ref_cat1,
+				 ref_cat2,
+				 NULL,  // ref_path
+				 options.get_selection(),
+				 options.get_subtree(),
+				 filename,
+				 extension,
+				 options.get_allow_over(),
+				 options.get_overwriting_rules(),
+				 options.get_warn_over(),
+				 options.get_info_details(),
+				 options.get_pause(),
+				 options.get_empty_dir(),
+				 options.get_keep_compressed() ? algo_kept : options.get_compression(),
+				 options.get_compression_level(),
+				 options.get_slice_size(),
+				 options.get_first_slice_size(),
+				 options.get_ea_mask(),
+				 options.get_execute(),
+				 options.get_crypto_algo(),
+				 options.get_crypto_pass(),
+				 options.get_crypto_size(),
+				 options.get_compr_mask(),
+				 options.get_min_compr_size(),
+				 false,   // nodump
+				 0,       // hourshift
+				 options.get_empty(),
+				 true,    // alter_atime
+				 false,   // furtive_read_mode
+				 false,   // same_fs
+				 inode::cf_all,   // what_to_check
+				 false,   // snapshot
+				 false,   // cache_directory_tagging
+				 options.get_display_skipped(),
+				 options.get_keep_compressed(),
+				 0,       // fixed_date
+				 options.get_slice_permission(),
+				 options.get_slice_user_ownership(),
+				 options.get_slice_group_ownership(),
+				 0,  // repeat_count
+				 0,  // repeat_byte
+				 options.get_decremental_mode(),
+				 options.get_sequential_marks(),
+				 false,  // security_check
+				 options.get_sparse_file_min_size(),
+				 options.get_user_comment(),
+				 options.get_hash_algo(),
+				 options.get_slice_min_digits(),
+				 "",      // backup_hook_file_execute
+				 bool_mask(false), //backup_hook_file_mask
+				 false,
+				 st_ptr);
+		exploitable = false;
+		stack.terminate();
+
+	    }
+	    catch(...)
+	    {
+		if(local_path != NULL)
+		    delete local_path;
+		throw;
+	    }
 	}
 	catch(...)
 	{
