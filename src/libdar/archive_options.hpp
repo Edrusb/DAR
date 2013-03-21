@@ -898,6 +898,8 @@ namespace libdar
     class archive_options_extract
     {
     public:
+	enum t_dirty { dirty_ignore, dirty_warn, dirty_ok };
+
 	archive_options_extract() { x_selection = x_subtree = x_ea_mask = NULL; x_overwrite = NULL; clear(); };
 	archive_options_extract(const archive_options_extract & ref) { copy_from(ref); };
 	const archive_options_extract & operator = (const archive_options_extract & ref) { destroy(); copy_from(ref); return *this; };
@@ -947,6 +949,9 @@ namespace libdar
 	    ///\param[in] warn useless if ignored is false. If warn is true, a warning is issued before restoring each dirty file (default behavior)
 	void set_dirty_behavior(bool ignore, bool warn) { x_dirty = ignore ? dirty_ignore : (warn ? dirty_warn : dirty_ok); };
 
+	    /// alternative method to modify dirty behavior
+	void set_dirty_behavior(t_dirty val) { x_dirty = val; };
+
 	    /// overwriting policy
 	void set_overwriting_rules(const crit_action & over);
 
@@ -964,8 +969,6 @@ namespace libdar
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
-
-	enum t_dirty { dirty_ignore, dirty_warn, dirty_ok };
 
 	const mask & get_selection() const { if(x_selection == NULL) throw SRC_BUG; return *x_selection; };
 	const mask & get_subtree() const { if(x_subtree == NULL) throw SRC_BUG; return *x_subtree; };
