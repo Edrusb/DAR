@@ -2228,33 +2228,48 @@ namespace libdar
             {
                 if(check == NULL)
                 {
-                    if(get_escape_layer()->skip_to_next_mark(escape::seqt_file_crc, false))
-                    {
-                        crc *tmp = NULL;
-
-			    // first, recording storage_size (needed when isolating a catalogue in sequential read mode)
-			if(*storage_size == 0)
+		    try
+		    {
+			if(get_escape_layer()->skip_to_next_mark(escape::seqt_file_crc, false))
 			{
-			    infinint pos = get_escape_layer()->get_position();
-			    if(pos < *offset)
+			    crc *tmp = NULL;
+
+				// first, recording storage_size (needed when isolating a catalogue in sequential read mode)
+			    if(*storage_size == 0)
+			    {
+				infinint pos = get_escape_layer()->get_position();
+				if(pos < *offset)
+				    throw SRC_BUG;
+				else
+				    *storage_size = pos - *offset;
+			    }
+			    else
+				throw SRC_BUG; // how is this possible ??? it should always be zero in sequential read mode !
+
+			    tmp = create_crc_from_file(*(get_escape_layer()));
+			    if(tmp == NULL)
 				throw SRC_BUG;
 			    else
-				*storage_size = pos - *offset;
+			    {
+				const_cast<file *>(this)->check = tmp;
+				tmp = NULL; // object now owned by "this"
+			    }
 			}
 			else
-			    throw SRC_BUG; // how is this possible ??? it should always be zero in sequential read mode !
-
-			tmp = create_crc_from_file(*(get_escape_layer()));
-			if(tmp == NULL)
-			    throw SRC_BUG;
-			else
+			    throw Erange("file::file", gettext("can't read data CRC: No escape mark found for that file"));
+		    }
+		    catch(...)
+		    {
+			    // we assign a default crc to the object
+			    // to avoid trying reading it again later on
+			if(check == NULL)
 			{
-			    const_cast<file *>(this)->check = tmp;
-			    tmp = NULL; // object now owned by "this"
+			    const_cast<file *>(this)->check = new (nothrow) crc_n(1);
+			    if(check == NULL)
+				throw Ememory("file::file");
 			}
-                    }
-                    else
-                        throw Erange("file::file", gettext("can't read data CRC: No escape mark found for that file"));
+			throw;
+		    }
                 }
 
                 if(check == NULL)
