@@ -2372,6 +2372,67 @@ namespace libdar
 	    throw Ethread_cancel(false, 0);
     }
 
+    void filtre_sequentially_read_all_catalogue(catalogue & cat,
+						user_interaction & dialog)
+    {
+	const entree *e;
+	thread_cancellation thr_cancel;
+	defile juillet = FAKE_ROOT;
+
+	cat.reset_read();
+
+	try
+	{
+	    while(cat.read(e))
+	    {
+		const file *e_file = dynamic_cast<const file *>(e);
+		const inode *e_ino = dynamic_cast<const inode *>(e);
+		const mirage *e_mir = dynamic_cast<const mirage *>(e);
+		const crc *check = NULL;
+
+		juillet.enfile(e);
+
+		thr_cancel.check_self_cancellation();
+		if(e_mir != NULL)
+		{
+		    if(!e_mir->is_inode_dumped())
+		    {
+			e_file = dynamic_cast<const file *>(e_mir->get_inode());
+			e_ino = e_mir->get_inode();
+		    }
+		}
+
+		try
+		{
+		    if(e_file != NULL)
+			(void)e_file->get_crc(check);
+		}
+		catch(Erange & e)
+		{
+		    dialog.warning(string(gettext("failed reading CRC from file: ")) + juillet.get_string());
+		}
+
+		if(e_mir != NULL && (e_ino != NULL || e_file != NULL))
+		    e_mir->set_inode_dumped(true);
+
+		try
+		{
+		    if(e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_full)
+			e_ino->ea_get_crc(check);
+		}
+		catch(Erange & e)
+		{
+		    dialog.warning(string(gettext("Failed reading CRC for EA: ")) + juillet.get_string());
+		}
+	    }
+	}
+	catch(Erange & e)
+	{
+	    dialog.warning(string(gettext("Error met while reading next entry: ")) + juillet.get_string());
+	}
+    }
+
+
 
     static bool save_inode(user_interaction & dialog,
 			   const string & info_quoi,

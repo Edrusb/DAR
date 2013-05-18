@@ -1357,6 +1357,9 @@ namespace libdar
 
     void inode::ea_get_crc(const crc * & ptr) const
     {
+	if(ea_get_saved_status() != ea_full)
+	    throw SRC_BUG;
+
         if(esc != NULL && ea_crc == NULL)
         {
             if(esc->skip_to_next_mark(escape::seqt_ea_crc, false))

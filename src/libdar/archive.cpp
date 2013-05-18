@@ -1155,7 +1155,11 @@ namespace libdar
 		    cat->reset_read();
 		}
 		else
-		    (void)op_test(dialog, archive_options_test(), NULL);
+		{
+		    if(cat == NULL)
+			throw SRC_BUG;
+		    filtre_sequentially_read_all_catalogue(*cat, dialog);
+		}
 	    }
 
 	    stack.clear();
