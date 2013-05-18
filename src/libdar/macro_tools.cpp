@@ -271,7 +271,9 @@ namespace libdar
 		throw SRC_BUG;
 	    second_terminateur_offset = 0;
 
-	    if(sequential_read || tmp_ctxt->is_an_old_start_end_archive())
+	    if(sequential_read
+	       || tmp_ctxt->is_an_old_start_end_archive()
+	       || stack.get_position() == 0) //< sar layer failed openning the last slice and failed back openning the first slice
 		stack.skip(0);
 	    else
 	    {
@@ -304,7 +306,7 @@ namespace libdar
 	    }
 
 	    if(second_terminateur_offset == 0 && !sequential_read && ver.edition > 7)
-		throw Erange("macro_tools_open_archive", gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. You need to use sequential reading mode to have a chance to use this corrupted archive"));
+		dialog.pause(gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. If you have an external catalog given as reference we can continue, OK ?"));
 
 
 		// *************  adding a tronc to hide last terminator and trailer_version ******* //
