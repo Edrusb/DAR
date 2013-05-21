@@ -182,13 +182,17 @@ namespace libdar
 
     void secu_string::copy_from(const secu_string & ref)
     {
-	if(*ref.allocated_size > 0)
-	{
-	    if(ref.mem == NULL)
-		throw SRC_BUG;
-	    init(*ref.allocated_size - 1);
-	    (void)memcpy(mem, ref.mem, *ref.string_size + 1); // +1 to copy the ending '\0'
-	}
+	if(ref.allocated_size == NULL)
+	    throw SRC_BUG;
+	if(*ref.allocated_size == 0)
+	    throw SRC_BUG;
+	if(ref.mem == NULL)
+	    throw SRC_BUG;
+	if(ref.string_size == NULL)
+	    throw SRC_BUG;
+
+	init(*(ref.allocated_size) - 1);
+	(void)memcpy(mem, ref.mem, *ref.string_size + 1); // +1 to copy the ending '\0'
 	*string_size = *ref.string_size;
     }
 
@@ -202,45 +206,39 @@ namespace libdar
 
     void secu_string::clean_and_destroy()
     {
+	if(string_size != NULL)
+	{
+	    (void)memset(string_size, 0, sizeof(U_I));
 #if CRYPTO_AVAILABLE
-	    if(string_size != NULL)
-	    {
-		(void)memset(string_size, 0, sizeof(U_I));
-		gcry_free(string_size);
-		string_size = NULL;
-	    }
-	    if(mem != NULL)
-	    {
-		(void)memset(mem, 0, *allocated_size);
-		gcry_free(mem);
-		mem = NULL;
-	    }
-	    if(allocated_size != NULL)
-	    {
-		(void)memset(allocated_size, 0, sizeof(U_I));
-		gcry_free(allocated_size);
-		allocated_size = NULL;
-	    }
+	    gcry_free(string_size);
 #else
-	    if(string_size != NULL)
-	    {
-		(void)memset(string_size, 0, sizeof(U_I));
-		delete string_size;
-		string_size = NULL;
-	    }
-	    if(mem != NULL)
-	    {
-		(void)memset(mem, 0, *allocated_size);
-		delete [] mem;
-		mem = NULL;
-	    }
-	    if(allocated_size != NULL)
-	    {
-		(void)memset(allocated_size, 0, sizeof(U_I));
-		delete allocated_size;
-		allocated_size = NULL;
-	    }
+	    delete string_size;
 #endif
+	    string_size = NULL;
+	}
+	if(mem != NULL)
+	{
+	    if(allocated_size == NULL)
+		throw SRC_BUG;
+	    (void)memset(mem, 0, *allocated_size);
+#if CRYPTO_AVAILABLE
+	    gcry_free(mem);
+#else
+	    delete [] mem;
+#endif
+	    mem = NULL;
+	}
+	if(allocated_size != NULL)
+	{
+	    (void)memset(allocated_size, 0, sizeof(U_I));
+#if CRYPTO_AVAILABLE
+	    gcry_free(allocated_size);
+#else
+	    delete allocated_size;
+#endif
+	    allocated_size = NULL;
+
+	}
     }
 
 } // end of namespace
