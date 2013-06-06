@@ -184,7 +184,7 @@ namespace libdar
     {
 	if(ref.allocated_size == NULL)
 	    throw SRC_BUG;
-	if(*ref.allocated_size == 0)
+	if(*(ref.allocated_size) == 0)
 	    throw SRC_BUG;
 	if(ref.mem == NULL)
 	    throw SRC_BUG;
@@ -192,8 +192,8 @@ namespace libdar
 	    throw SRC_BUG;
 
 	init(*(ref.allocated_size) - 1);
-	(void)memcpy(mem, ref.mem, *ref.string_size + 1); // +1 to copy the ending '\0'
-	*string_size = *ref.string_size;
+	(void)memcpy(mem, ref.mem, *(ref.string_size) + 1); // +1 to copy the ending '\0'
+	*string_size = *(ref.string_size);
     }
 
     bool secu_string::compare_with(const char *ptr, U_I size) const
