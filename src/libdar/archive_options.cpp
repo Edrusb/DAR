@@ -573,7 +573,7 @@ namespace libdar
 	x_slice_min_digits = ref.x_slice_min_digits;
 	x_backup_hook_file_execute = ref.x_backup_hook_file_execute;
 	x_ignore_unknown = ref.x_ignore_unknown;
-	if(x_entrepot == NULL)
+	if(x_entrepot != NULL)
 	    throw SRC_BUG;
 	x_entrepot = x_entrepot->clone();
 	if(x_entrepot == NULL)
