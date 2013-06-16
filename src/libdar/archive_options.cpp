@@ -575,7 +575,7 @@ namespace libdar
 	x_ignore_unknown = ref.x_ignore_unknown;
 	if(x_entrepot != NULL)
 	    throw SRC_BUG;
-	x_entrepot = x_entrepot->clone();
+	x_entrepot = ref.x_entrepot->clone();
 	if(x_entrepot == NULL)
 	    throw Ememory("archive_options_create::copy_from");
     }
