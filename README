@@ -5,8 +5,8 @@
 PRESENTATION
 ================
 dar is a shell command, that makes backup of a directory tree and files.
-It has been tested under Linux, Windows (95, 2000, NT, XP), OpenSolaris,
-FreeBSD and NetBSD, it has been reported as working under Mac OS X 10.3
+It has been tested under Linux, Windows (95, 2000, NT, XP, 7), OpenSolaris,
+FreeBSD and NetBSD, and has been reported as working under Mac OS X 10.3
 (where it takes care of file forks but not of the ACL).
 
 External GUI are possible and exist thanks to the libdar library and its API,
@@ -22,10 +22,10 @@ Actually dar is a set of six commands over libdar library:
         dar_cp
 
 This library is part of dar and licensed under the GNU General
-Public License (GPL in the following) like all the source code of the Dar
+Public License (GPL in the following), like all the source code of the Dar
 suite programs. This imply that you can link libdar to your programs at
-the condition that your programs are also covered by the GPL too, which says
-in particular that you must provide source code of your program. See
+the condition that your programs are also covered by the GPL, which says
+in particular that you must provide source code of your programs. See
 COPYING file for details.
 
 
