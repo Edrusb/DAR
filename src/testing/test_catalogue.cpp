@@ -161,7 +161,7 @@ void f1()
     }
     catch(Egeneric & e)
     {
-        e.dump();
+        cerr << e.dump_str();
     }
 }
 
@@ -189,7 +189,7 @@ void f2()
         }
         catch(Egeneric & e)
         {
-            e.dump();
+            cerr << e.dump_str();
         }
         cat.add(new file(1024, 102, 0644, 1, 2, 3, "fichier", ".", 1024, 0, false));
         cat.add(new lien(1025, 103, 0645, 4, 5, 6,  "lien", "fichier", 0));
@@ -269,7 +269,7 @@ void f2()
     }
     catch(Egeneric &e)
     {
-        e.dump();
+	cerr << e.dump_str();
     }
 }
 

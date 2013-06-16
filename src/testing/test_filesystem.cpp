@@ -221,6 +221,6 @@ static void re_test()
     }
     catch(Egeneric & e)
     {
-	e.dump();
+	cerr << e.dump_str();
     }
 }

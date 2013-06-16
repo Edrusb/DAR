@@ -71,7 +71,7 @@ int main()
     }
     catch(Egeneric & e)
     {
-	e.dump();
+	cerr << e.dump_str();
     }
     catch(...)
     {

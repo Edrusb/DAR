@@ -104,20 +104,28 @@ namespace libdar
 
     void Egeneric::dump() const
     {
+	cerr << dump_str();
+    }
+
+    string Egeneric::dump_str() const
+    {
+	string ret;
         list<niveau> & tmp = const_cast< list<niveau> & >(pile);
         list<niveau>::iterator it;
 
         it = tmp.begin();
 
-        cerr << "---- exception type = ["  << exceptionID() << "] ----------" << endl;
-        cerr << "[source]" << endl;
+        ret +=  "---- exception type = [" + exceptionID() + "] ----------\n";
+        ret +=  "[source]\n";
         while(it != tmp.end())
         {
-            cerr << '\t' << it->lieu << " : " << it->objet << endl;
+            ret += "\t" + it->lieu + " : " + it->objet + "\n";
             it++;
         }
-        cerr << "[most outside call]" << endl;
-        cerr << "-----------------------------------" << endl << endl;
+        ret += "[most outside call]\n";
+        ret += "-----------------------------------\n\n";
+
+	return ret;
     }
 
     Ebug::Ebug(const string & file, S_I line) : Egeneric(tools_printf(gettext("File %S line %d"), &file, line), gettext("it seems to be a bug here"))

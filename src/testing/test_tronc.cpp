@@ -123,7 +123,7 @@ void f1()
 	    }
 	    catch(Egeneric & e)
 	    {
-		e.dump();
+		cerr << e.dump_str();
 	    }
 
 	    t->skip_to_eof();
@@ -144,14 +144,14 @@ void f1()
 	}
 	catch(Egeneric &f)
 	{
-	    f.dump();
+	    cerr << f.dump_str();
 	}
 	if(ui != NULL)
 	    delete ui;
     }
     catch(Egeneric & f)
     {
-	f.dump();
+	cerr << f.dump_str();
     }
 }
 
@@ -226,13 +226,13 @@ void f2()
 	}
 	catch(Egeneric &e)
 	{
-	    e.dump();
+	    cerr << e.dump_str();
 	}
 	if(ui != NULL)
 	    delete ui;
     }
     catch(Egeneric & f)
     {
-	f.dump();
+	cerr << f.dump_str();
     }
 }

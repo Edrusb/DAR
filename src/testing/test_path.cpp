@@ -73,7 +73,7 @@ int main()
     }
     catch(Egeneric & e)
     {
-        e.dump();
+        cerr << e.dump_str();
     }
 
     try
@@ -82,7 +82,7 @@ int main()
     }
     catch(Egeneric & e)
     {
-        e.dump();
+        cerr << e.dump_str();
     }
 
     try
@@ -93,7 +93,7 @@ int main()
     }
     catch(Egeneric & e)
     {
-        e.dump();
+        cerr << e.dump_str();
     }
     f2();
 }

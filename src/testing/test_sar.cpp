@@ -72,7 +72,7 @@ static void f1()
     }
     catch(Egeneric &e)
     {
-        e.dump();
+        cerr << e.dump_str();
     }
 }
 
@@ -89,7 +89,7 @@ static void f2()
     }
     catch(Egeneric &e)
     {
-        e.dump();
+        cerr << e.dump_str();
     }
 }
 
@@ -157,7 +157,7 @@ static void f3()
     }
     catch(Egeneric & e)
     {
-        e.dump();
+        cerr << e.dump_str();
     }
 }
 
@@ -179,7 +179,7 @@ void f4()
     }
     catch(Egeneric & e)
     {
-	e.dump();
+	cerr << e.dump_str();
     }
 
 }

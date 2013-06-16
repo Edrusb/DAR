@@ -108,7 +108,7 @@ static void f1()
     }
     catch(Egeneric & e)
     {
-        e.dump();
+        cerr << e.dump_str();
     }
 
     try
@@ -131,7 +131,7 @@ static void f1()
         }
         catch(Erange &e)
         {
-            e.dump();
+            cerr << e.dump_str();
             c2.skip(pos2);
         }
 
@@ -141,7 +141,7 @@ static void f1()
         }
         catch(Erange &e)
         {
-            e.dump();
+            cerr << e.dump_str();
             c3.skip(pos3);
         }
 
@@ -152,7 +152,7 @@ static void f1()
     }
     catch(Egeneric & e)
     {
-        e.dump();
+        cerr << e.dump_str();
     }
     unlink("tutu.none");
     unlink("tutu.gz");

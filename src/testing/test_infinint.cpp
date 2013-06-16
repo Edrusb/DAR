@@ -172,7 +172,7 @@ static void routine1()
     }
     catch(Egeneric & e)
     {
-	e.dump();
+	cerr << e.dump_str();
     }
 
     f1 = 21;

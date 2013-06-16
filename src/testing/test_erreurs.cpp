@@ -94,11 +94,11 @@ void f4()
 
     x.stack("ajout", "par ici");
     x.stack("crotte", "par ila");
-    dec.dump();
+    cerr << dec.dump_str();
 
     y = new Erange(x);
-    y->dump();
-    y->dump();
+    cerr << y->dump_str();
+    cerr << y->dump_str();
     delete y;
 }
 
@@ -115,7 +115,7 @@ int main()
     }
     catch(Egeneric & e)
     {
-        e.dump();
+        cerr << e.dump_str();
     }
 
     try
@@ -124,7 +124,7 @@ int main()
     }
     catch(Egeneric & e)
     {
-        e.dump();
+        cerr << e.dump_str();
     }
 
 }

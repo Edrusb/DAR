@@ -211,14 +211,14 @@ int dar_suite_global(int argc, char * const argv[], const char **env, int (*call
     }
     catch(Egeneric & e)
     {
-	e.dump();
+	cerr << e.dump_str();
 	GENERAL_REPORT(string(gettext("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER")));
 	ret = EXIT_BUG;
     }
     catch(...)
     {
 	Ebug x = SRC_BUG;
-	x.dump();
+	cerr << x.dump_str();
 	GENERAL_REPORT(string(gettext("CAUGHT A NON (LIB)DAR EXCEPTION")));
 	GENERAL_REPORT(string(gettext("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER")));
 	ret = EXIT_BUG;

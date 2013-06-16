@@ -80,7 +80,12 @@ namespace libdar
 	void prepend_message(const std::string & context);
 
 	    /// dump all information of the exception to the standard error
-        void dump() const;
+	    ///
+	    /// \note deprecated call, replaced by dump_str()
+	void dump() const;
+
+	    /// return a string result of the exception information dump
+	std::string dump_str() const;
 
     protected :
         virtual std::string exceptionID() const = 0;
