@@ -301,28 +301,60 @@ namespace libdar
             delete [] buffer;
     }
 
-    zapette::zapette(user_interaction & dialog, generic_file *input, generic_file *output) : generic_file(gf_read_only), mem_ui(dialog)
+    zapette::zapette(user_interaction & dialog,
+		     generic_file *input,
+		     generic_file *output,
+		     bool by_the_end) : generic_file(gf_read_only), mem_ui(dialog)
     {
-        if(input == NULL)
-            throw SRC_BUG;
-        if(output == NULL)
-            throw SRC_BUG;
-        if(input->get_mode() == gf_write_only)
-            throw Erange("zapette::zapette", gettext("Cannot read on input"));
-        if(output->get_mode() == gf_read_only)
-            throw Erange("zapette::zapette", gettext("Cannot write on output"));
+	if(input == NULL)
+	    throw SRC_BUG;
+	if(output == NULL)
+	    throw SRC_BUG;
+	if(input->get_mode() == gf_write_only)
+	    throw Erange("zapette::zapette", gettext("Cannot read on input"));
+	if(output->get_mode() == gf_read_only)
+	    throw Erange("zapette::zapette", gettext("Cannot write on output"));
 
-        in = input;
-        out = output;
-        position = 0;
-        serial_counter = 0;
+	in = input;
+	out = output;
+	position = 0;
+	serial_counter = 0;
 	contextual::set_info_status(CONTEXT_INIT);
 
-            //////////////////////////////
-            // retreiving the file size
-            //
-        S_I tmp = 0;
-        make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_GET_FILESIZE, NULL, "", tmp, file_size);
+	    //////////////////////////////
+	    // retreiving the file size
+	    //
+	S_I tmp = 0;
+	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_GET_FILESIZE, NULL, "", tmp, file_size);
+
+	    //////////////////////////////
+	    // positionning cursor for next read
+	    // depending on the by_the_end value
+	    //
+
+	try
+	{
+	    if(by_the_end)
+	    {
+		try
+		{
+		    skip_to_eof();
+		}
+		catch(Erange & e)
+		{
+		    string tmp = e.get_message();
+		    dialog.printf(gettext("Failed driving dar_slave to the end of archive: %S. Trying to open the archive from the first bytes"), &tmp);
+		    skip(0);
+		}
+	    }
+	    else
+		skip(0);
+	}
+	catch(...)
+	{
+	    terminate();
+	    throw;
+	}
     }
 
     zapette::~zapette()

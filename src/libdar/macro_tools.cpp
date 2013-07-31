@@ -218,7 +218,7 @@ namespace libdar
 		    {
 			dialog.printf(gettext("Opening a pair of pipes to read the archive, expecting dar_slave at the other ends..."));
 			tools_open_pipes(dialog, input_pipe, output_pipe, in, out);
-			tmp = new (nothrow) zapette(dialog, in, out);
+			tmp = new (nothrow) zapette(dialog, in, out, true);
 			if(tmp == NULL)
 			{
 			    delete in;
