@@ -352,7 +352,10 @@ namespace libdar
 	    {
 	    case crypto_none:
 		if(info_details)
-		    dialog.warning(gettext("No cyphering layer opened"));
+		    dialog.warning(gettext("No cyphering layer opened, adding cache layer for performance"));
+		tmp = new (nothrow) cache (*(stack.top()), false);
+		if(tmp == NULL)
+		    dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
 		break;
 	    case crypto_blowfish:
 	    case crypto_aes256:
@@ -395,13 +398,10 @@ namespace libdar
 		throw Erange("macro_tools_open_archive", gettext("Unknown encryption algorithm"));
 	    }
 
-	    if(crypto != crypto_none)
-	    {
-		if(tmp == NULL)
-		    throw Ememory("open_archive");
-		stack.push(tmp);
-		tmp = NULL;
-	    }
+	    if(tmp == NULL)
+		throw Ememory("open_archive");
+	    stack.push(tmp);
+	    tmp = NULL;
 
 	    stack.add_label(LIBDAR_STACK_LABEL_UNCYPHERED);
 
@@ -456,23 +456,6 @@ namespace libdar
 		    throw Ememory("open_archive");
 		stack.push(tmp);
 		tmp = NULL;
-	    }
-
-		// *********** if not crypto nor escape layer adding cache layer for better performances
-
-	    if(crypto == crypto_none && (ver.flag & VERSION_FLAG_SEQUENCE_MARK) == 0)
-	    {
-		if(info_details)
-		    dialog.warning(gettext("Opening the cache layer for better performance..."));
-
-		tmp = new (nothrow) cache(*(stack.top()), false);
-		if(tmp == NULL)
-		    dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
-		else
-		{
-		    stack.push(tmp);
-		    tmp = NULL;
-		}
 	    }
 
 	    stack.add_label(LIBDAR_STACK_LABEL_CLEAR);

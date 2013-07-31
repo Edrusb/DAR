@@ -71,7 +71,6 @@ extern "C"
 #include "pile.hpp"
 #include "sparse_file.hpp"
 #include "fichier.hpp"
-#include "cache.hpp"
 #include "macro_tools.hpp"
 #include "null_file.hpp"
 
