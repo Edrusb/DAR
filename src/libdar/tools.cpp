@@ -2141,6 +2141,19 @@ namespace libdar
 	if(fchmod(fd, (mode_t) perm) < 0)
 	    throw Erange("tools_set_permission", tools_printf(gettext("Error while setting file permission: %s"), strerror(errno)));
     }
+
+
+    U_I tools_get_permission(S_I fd)
+    {
+	struct stat buf;
+	int err = fstat(fd, &buf);
+
+	if(err < 0)
+	    throw Erange("tools_get_permission", string(gettext("Cannot get effective permission give a file descriptor: ")) + strerror(errno));
+
+	return buf.st_mode & ~(S_IFMT);
+    }
+
     void tools_set_ownership(S_I fd, const string & slice_user, const string & slice_group)
     {
 	NLS_SWAP_IN;

@@ -668,6 +668,13 @@ namespace libdar
 	/// \param[in] perm file permission to set the file to
     extern void tools_set_permission(S_I fd, U_I perm);
 
+	/// obtain the permission of the file which descriptor is given
+
+	/// \param[in] fd file's descriptor
+	/// \return permission of the given file
+	/// \note in case of error exception may be thrown
+    extern U_I tools_get_permission(S_I fd);
+
 	/// change ownership of the file which descriptor is given
 
 	/// \param[in] fd file's descriptor

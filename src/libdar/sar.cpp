@@ -143,6 +143,7 @@ namespace libdar
         hook = execute;
         set_info_status(CONTEXT_INIT);
 	old_sar = false; // will be set to true at header read time a bit further if necessary
+	force_perm = false;
 	perm = 0;
 	slice_user = "";
 	slice_group = "";
@@ -224,6 +225,7 @@ namespace libdar
         first_size = first_file_size;
         hook = execute;
 	pause = x_pause;
+	force_perm = slice_permission != "";
 	perm = tools_octal2int(slice_permission);
 	slice_user = slice_user_ownership;
 	slice_group = slice_group_ownership;
@@ -898,6 +900,7 @@ namespace libdar
 	try
 	{
 		// open succeeds only if this file does NOT already exist
+		// note about permission: umask is used when creating the file with ::open
 	     fd = ::open(fic, O_WRONLY|O_BINARY|O_CREAT|O_EXCL, open_mode);
 
 	    if(fd < 0) // open failed
@@ -998,12 +1001,14 @@ namespace libdar
 		    if(tmp != NULL)
 		    {
 			tmp->set_hash_file_name(fic, hash, hash_algo_to_string(hash));
-			tmp->change_permission(perm);
 			tmp->change_ownership(slice_user, slice_group);
 		    }
 		}
 		if(of_fd == NULL)
 		    throw Ememory("sar::open_writeonly");
+
+		if(force_perm)
+		    of_fd->change_permission(perm);
 
 		h = make_write_header(num, of_flag);
 		h.write(get_ui(), *of_fd);
@@ -1360,6 +1365,7 @@ namespace libdar
     {
 	S_I fd;
 	generic_file *tmp = NULL;
+	fichier *tmp_fic = NULL;
 
 	    // some local variables to be used
 
@@ -1399,20 +1405,27 @@ namespace libdar
 	{
 	    tools_set_ownership(fd, slice_user_ownership, slice_group_ownership);
 	    if(x_hash == hash_none)
-		tmp = new (nothrow) fichier(dialog, fd);
+		tmp = tmp_fic = new (nothrow) fichier(dialog, fd);
 	    else
 	    {
 		hash_fichier *tmp_hash;
-		tmp = tmp_hash = new (nothrow) hash_fichier(dialog, fd);
+		tmp = tmp_fic = tmp_hash = new (nothrow) hash_fichier(dialog, fd);
 		if(tmp_hash != NULL)
 		{
 		    tmp_hash->set_hash_file_name(name, x_hash, hash_algo_to_string(x_hash));
-		    tmp_hash->change_permission(tools_octal2int(slice_permission));
 		    tmp_hash->change_ownership(slice_user_ownership, slice_group_ownership);
 		}
 	    }
 	    if(tmp == NULL)
 		throw Ememory("trivial_sar::trivial_sar");
+
+	    if(slice_permission != "")
+	    {
+		if(tmp_fic == NULL)
+		    throw SRC_BUG;
+		else
+		    tmp_fic->change_permission(tools_octal2int(slice_permission));
+	    }
 	}
 	catch(...)
 	{

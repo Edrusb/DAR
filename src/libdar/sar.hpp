@@ -168,6 +168,7 @@ namespace libdar
         infinint first_file_offset;  //< where data start in the first slice
 	infinint other_file_offset;  //< where data start in the slices other than the first
         infinint file_offset;        //< current reading/writing position in the current slice (relative to the whole slice file, including headers)
+	bool force_perm;             //< enforce slice permission with perm field value below
 	U_I perm;                    //< permission to set when creating slices
 	std::string slice_user;      //< user for new slices
         std::string slice_group;     //< group for new slice

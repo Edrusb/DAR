@@ -91,7 +91,7 @@ namespace libdar
 	void set_hash_file_name(const std::string & filename, hash_algo algo, const std::string & extension);
 
 	    /// overriden method from class fichier
-	void change_permission(U_I perm) { x_perm = perm; fichier::change_permission(perm); };
+	void change_permission(U_I perm) { x_perm = perm; force_perm = true; fichier::change_permission(perm); };
 	void change_ownership(const std::string & user, const std::string & group) { user_ownership = user; group_ownership = group; fichier::change_ownership(user, group); };
 
 	    // inherited from generic_file
@@ -115,6 +115,7 @@ namespace libdar
 	bool hash_ready;
 	std::string hash_filename;
 	std::string hash_extension;
+	bool force_perm;
 	U_I x_perm;
 	std::string user_ownership;
 	std::string group_ownership;

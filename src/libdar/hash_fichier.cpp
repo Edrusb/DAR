@@ -51,7 +51,15 @@ namespace libdar
 	if(get_mode() != gf_write_only) // at that time the fichier and generic_file part of the object is already built,
 	    throw SRC_BUG; // so we can call get_mode() to retrieve the openning mode of the file
 	hash_ready = false;
-	x_perm = tools_octal2int("0666");
+	force_perm = false;
+	try
+	{
+	    x_perm = tools_get_permission(fd);
+	}
+	catch(Erange & e)
+	{
+	    throw Erange("hash_fichier::hash_fichier", string(gettext("Cannot determine the permission to use for hash files: "))+ e.get_message());
+	}
 	user_ownership = "";
 	group_ownership = "";
     }
@@ -62,6 +70,7 @@ namespace libdar
 	if(m != gf_write_only)
 	    throw SRC_BUG;
 	hash_ready = false;
+	force_perm = false;
 	x_perm = perm;
 	user_ownership = "";
 	group_ownership = "";
@@ -73,6 +82,7 @@ namespace libdar
 	if(m != gf_write_only)
 	    throw SRC_BUG;
 	hash_ready = false;
+	force_perm = false;
 	x_perm = perm;
 	user_ownership = "";
 	group_ownership = "";
@@ -185,6 +195,8 @@ namespace libdar
 	    string slice_name = no_path.basename();
 
 	    where.change_ownership(user_ownership, group_ownership);
+	    if(force_perm)
+		where.change_permission(x_perm); // needed to set it explicitely to avoid umask reducing permission
 	    where.write((const char *)hexa.c_str(), hexa.size());
 	    where.write("  ", 2); // two spaces sperator used by md5sum and sha1sum
 	    where.write(slice_name.c_str(), slice_name.size());
