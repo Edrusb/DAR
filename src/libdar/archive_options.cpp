@@ -169,11 +169,12 @@ namespace libdar
     void archive_options_read::set_default_crypto_size()
     {
 	x_crypto_size = default_crypto_size;
+	x_ref_crypto_size = default_crypto_size;
     }
 
     void archive_options_read::unset_external_catalogue()
     {
-	x_ref_chem = default_ref_chem ;
+	x_ref_chem = default_ref_chem;
 	x_ref_basename = "";
 	external_cat = false;
     }
@@ -705,6 +706,7 @@ namespace libdar
 	    x_first_file_size = 0;
 	    x_execute = "";
 	    x_crypto = crypto_none;
+	    x_crypto_size = default_crypto_size;
 	    x_pass.clear();
 	    x_min_compr_size = default_min_compr_size;
 	    x_empty = false;

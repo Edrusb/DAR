@@ -772,7 +772,7 @@ namespace libdar
 	    /// defines file size under which to never compress
 	void set_min_compr_size(const infinint & min_compr_size) { x_min_compr_size = min_compr_size; };
 
-	    /// defines whether we need to store ignored directories as empty
+	    /// defines whether we do a dry-run execution
 	void set_empty(bool empty) { x_empty = empty; };
 
 	    /// whether to display files that have been excluded by filters
