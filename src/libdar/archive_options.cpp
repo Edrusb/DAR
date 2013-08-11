@@ -904,7 +904,6 @@ namespace libdar
 	    x_ref = ref.x_ref;
 	    x_allow_over = ref.x_allow_over;
 	    x_warn_over = ref.x_warn_over;
-	    x_overwrite = ref.x_overwrite;
 	    x_info_details = ref.x_info_details;
 	    x_pause = ref.x_pause;
 	    x_empty_dir = ref.x_empty_dir;
