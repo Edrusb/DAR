@@ -148,10 +148,10 @@ namespace libdar
 
 
 	    /// optional method to use if you want file listing splitted in several fields.
-	    /// If want to use this feature, you have then to supply an implementation for this method,
+	    /// If you need to use this feature, you have then to supply an implementation for this method,
 	    /// in your inherited class which will be called by libdar in place of the warning method
-	    /// You will also have to call the set_use_listing() method has been called with true as parameter
-	    /// from the constructor of your inherited class to tell libdar that the listing() method is
+	    /// You then also have to call the set_use_listing() method with true as parameter
+	    /// from the constructor of your inherited class (for example) to tell libdar that the listing() method is
 	    /// to be used in place of the warning() method for archive listing.
 
 	    //! \param[in] flag is the given information about the EA, compression, presence of saved data.

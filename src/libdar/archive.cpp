@@ -1116,6 +1116,155 @@ namespace libdar
 	return ret;
     }
 
+
+    const vector<list_entry> archive::get_children_in_table(const string & dir) const
+    {
+	vector <list_entry> ret;
+
+	NLS_SWAP_IN;
+        try
+        {
+	    const directory *parent = NULL;
+	    const nomme *tmp_ptr = NULL;
+
+	    parent = get_cat().get_contenu();
+	    if(parent == NULL)
+		throw SRC_BUG;
+
+	    if(dir != "")
+	    {
+		path search = dir;
+		string tmp;
+		bool loop = true;
+
+		while(loop)
+		{
+		    loop = search.pop_front(tmp);
+		    if(!loop)
+			    // failed because now, search is a one level path
+			tmp = search.basename();
+		    loop = parent->search_children(tmp, tmp_ptr);
+		    parent = dynamic_cast<const directory *>(tmp_ptr);
+		    if(parent == NULL)
+			throw Erange("archive::get_children_in_table", tools_printf("%S entry does not exist", &dir));
+		}
+	    }
+
+		// parent now points to the requested entry we need to provide content of
+
+            if(parent == NULL)
+		throw SRC_BUG;
+
+	    parent->reset_read_children();
+	    while(parent->read_children(tmp_ptr))
+	    {
+		if(tmp_ptr == NULL)
+		    throw SRC_BUG;
+
+		list_entry ent;
+		const inode *tmp_inode = dynamic_cast<const inode *>(tmp_ptr);
+		const file *tmp_file = dynamic_cast<const file *>(tmp_ptr);
+		const lien *tmp_lien = dynamic_cast<const lien *>(tmp_ptr);
+		const device *tmp_device = dynamic_cast<const device *>(tmp_ptr);
+		const mirage *tmp_mir = dynamic_cast<const mirage *>(tmp_ptr);
+
+		ent.set_name(tmp_ptr->get_name());
+
+		if(tmp_mir == NULL)
+		{
+		    ent.set_hard_link(false);
+		    ent.set_type(get_base_signature(tmp_ptr->signature()));
+		}
+		else
+		{
+		    ent.set_hard_link(true);
+		    ent.set_type(get_base_signature(tmp_mir->get_inode()->signature()));
+		}
+
+		if(tmp_inode != NULL)
+		{
+		    ent.set_uid(tmp_inode->get_uid());
+		    ent.set_gid(tmp_inode->get_gid());
+		    ent.set_perm(tmp_inode->get_perm());
+		    ent.set_last_access(tmp_inode->get_last_access());
+		    ent.set_last_modif(tmp_inode->get_last_modif());
+		    ent.set_saved_status(tmp_inode->get_saved_status());
+		    ent.set_ea_status(tmp_inode->ea_get_saved_status());
+		    if(tmp_inode->has_last_change())
+			ent.set_last_change(tmp_inode->get_last_change());
+		}
+
+		if(tmp_file != NULL)
+		{
+		    ent.set_file_size(tmp_file->get_size());
+		    ent.set_storage_size(tmp_file->get_storage_size());
+		    ent.set_is_sparse_file(tmp_file->get_sparse_file_detection_read());
+		    ent.set_compression_algo(tmp_file->get_compression_algo_read());
+		    ent.set_dirtiness(tmp_file->is_dirty());
+		}
+
+		if(tmp_lien != NULL)
+		    ent.set_link_target(tmp_lien->get_target());
+
+		if(tmp_device != NULL)
+		{
+		    ent.set_major(tmp_device->get_major());
+		    ent.set_minor(tmp_device->get_minor());
+		}
+
+		    // fill a new entry in the table
+		ret.push_back(ent);
+	    }
+
+	}
+        catch(...)
+        {
+	    NLS_SWAP_OUT;
+            throw;
+	}
+        NLS_SWAP_OUT;
+
+	return ret;
+
+    }
+
+    void archive::init_catalogue(user_interaction & dialog) const
+    {
+	NLS_SWAP_IN;
+        try
+        {
+	    if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
+	    {
+		if(only_contains_an_isolated_catalogue())
+			// this is easy... asking just an entry
+			//from the catalogue makes its whole being read
+		{
+		    const entree *tmp;
+		    if(cat == NULL)
+			throw SRC_BUG;
+		    cat->read(tmp); // should be enough to have the whole catalogue being read
+		    cat->reset_read();
+		}
+		else
+		{
+			// here we have a plain archive, doing the test operation
+			// is the simplest way to read the whole archive and thus get its contents
+			// (i.e.: the catalogue)
+		    (void)const_cast<archive *>(this)->op_test(dialog, archive_options_test(), NULL);
+		}
+	    }
+
+	    if(cat == NULL)
+		throw SRC_BUG;
+	}
+        catch(...)
+        {
+	    NLS_SWAP_OUT;
+            throw;
+	}
+        NLS_SWAP_OUT;
+    }
+
     const catalogue & archive::get_catalogue() const
     {
 	NLS_SWAP_IN;
@@ -1123,7 +1272,7 @@ namespace libdar
 	try
 	{
 	    if(exploitable && sequential_read)
-		throw Elibcall("archive::get_catalogue", "Dropping all filedescriptors for an archive in sequential read mode that has not yet been read need passing a \"user_interaction\" object to the argument of archive::get_catalogue");
+		throw Elibcall("archive::get_catalogue", "Reading the catalogue of an archive open in sequential read mode while it has not yet been read need passing a \"user_interaction\" object to the argument of archive::get_catalogue or call init_catalogue() first ");
 
 	    if(cat == NULL)
 		throw SRC_BUG;
@@ -1142,36 +1291,8 @@ namespace libdar
 
     const catalogue & archive::get_catalogue(user_interaction & dialog) const
     {
-	NLS_SWAP_IN;
-
-	try
-	{
-	    if(exploitable && sequential_read)
-	    {
-		if(only_contains_an_isolated_catalogue())
-		{
-		    const entree *tmp;
-		    if(cat == NULL)
-			throw SRC_BUG;
-		    cat->read(tmp); // should be enough to have the whole catalogue being read
-		    cat->reset_read();
-		}
-		else
-		    (void)const_cast<archive *>(this)->op_test(dialog, archive_options_test(), NULL);
-	    }
-
-	    if(cat == NULL)
-		throw SRC_BUG;
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-
-	NLS_SWAP_OUT;
-
-	return *cat;
+	init_catalogue(dialog);
+	return get_catalogue();
     }
 
     void archive::drop_all_filedescriptors()

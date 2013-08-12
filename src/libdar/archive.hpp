@@ -28,6 +28,7 @@
 #define ARCHIVE_HPP
 
 #include "../my_config.h"
+#include <vector>
 
 #include "erreurs.hpp"
 #include "path.hpp"
@@ -37,6 +38,7 @@
 #include "escape.hpp"
 #include "escape_catalogue.hpp"
 #include "pile.hpp"
+#include "list_entry.hpp"
 
 namespace libdar
 {
@@ -176,7 +178,8 @@ namespace libdar
 			      statistics *progressive_report);
 
 	    /// display a summary of the archive
-
+	    ///
+	    /// \note see also get_stats() method
 	void summary(user_interaction & dialog);
 
 
@@ -184,6 +187,12 @@ namespace libdar
 
 	    /// \param[in,out] dialog for user interaction
 	    /// \param[in] options list of optional parameters to use for the operation
+	    /// \note this call covers the whole listing and uses the user_interaction
+	    /// to provide the archive contents (in particular using its listing() method
+	    /// if set and activated by its set_use_listing() method). There is however two
+	    /// alternative way to get archive contents:
+	    /// . archive::get_children_of() method
+	    /// . archive::init_catalogue()+get_children_in_table()
 	void op_listing(user_interaction & dialog,
 			const archive_options_listing & options);
 
@@ -246,8 +255,23 @@ namespace libdar
 	bool get_children_of(user_interaction & dialog,
 			     const std::string & dir);
 
+	    /// getting information about the given directory (alternative to get_children_of)
+	    ///
+	    /// \param[in] dir relative path the directory to get information about, use empty string for root directory
+	    /// \return a table information about all subdir and subfile for the given directory
+	    /// \note at the difference of get_children_of, this call does not rely on a user_interaction class
+	    /// to provide the information, but rather returns a table of children. To allow new fields to
+	    /// be added to the future the table contains an object that provide a method per field.
+	    /// \note before calling this method on this object, a single call to init_catalogue() is
+	    /// mandatory
+	const std::vector<list_entry> get_children_in_table(const std::string & dir) const;
+
 	    /// retrieving statistics about archive contents
 	const entree_stats get_stats() const { if(cat == NULL) throw SRC_BUG; return cat->get_stats(); };
+
+	    /// necessary to get the catalogue fully loaded in memory in any situation
+	    /// in particular in sequential reading mode
+	void init_catalogue(user_interaction & dialog) const;
 
 	    /// gives access to internal catalogue (not to be used from the API)
 
@@ -257,6 +281,7 @@ namespace libdar
 	    /// \note this method is not usable (throws an exception) if the archive has been
 	    /// open in sequential read mode and the catalogue has not yet been read; use the
 	    /// same method but with user_interaction argument instead, in that situation
+	    /// or call init_catalogue() first.
 	const catalogue & get_catalogue() const;
 
 	    /// gives access to internal catalogue (not to be used from the API) even in sequential read mode
@@ -287,7 +312,7 @@ namespace libdar
 	bool sequential_read;    //< whether the archive is read in sequential mode
 
 	void free();
-	catalogue & get_cat() { if(cat == NULL) throw SRC_BUG; else return *cat; };
+	const catalogue & get_cat() const { if(cat == NULL) throw SRC_BUG; else return *cat; };
 	const header_version & get_header() const { return ver; };
 
 	bool get_sar_param(infinint & sub_file_size, infinint & first_file_size, infinint & last_file_size,

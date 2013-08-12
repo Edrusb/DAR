@@ -45,7 +45,7 @@ namespace libdar
     extern void filtre_restore(user_interaction & dialog, //< for user interaction
 			       const mask &filtre,        //< which filename to restore
                                const mask & subtree,      //< which directory and paths to restore
-                               catalogue & cat,           //< table of content to extract information from
+                               const catalogue & cat,     //< table of content to extract information from
                                const path & fs_racine,    //< root path under which to restore directiry tree and files
                                bool fs_warn_overwrite,    //< whether to warn before overwriting (to be replaced by overwriting policy)
                                bool info_details,         //< whether to be verbose
@@ -96,7 +96,7 @@ namespace libdar
     extern void filtre_difference(user_interaction & dialog,
 				  const mask &filtre,
                                   const mask &subtree,
-                                  catalogue & cat,
+                                  const catalogue & cat,
                                   const path & fs_racine,
                                   bool info_details,
 				  statistics & st,
@@ -111,7 +111,7 @@ namespace libdar
     extern void filtre_test(user_interaction & dialog,
 			    const mask &filtre,
                             const mask &subtree,
-                            catalogue & cat,
+                            const catalogue & cat,
                             bool info_details,
 			    bool empty,
                             statistics & st,

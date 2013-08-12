@@ -499,6 +499,14 @@ namespace libdar
         }
     }
 
+    unsigned char get_base_signature(unsigned char a)
+    {
+	unsigned char ret = tolower(a & ~SAVED_FAKE_BIT);
+	if(ret == 'e')
+	    ret = 'f';
+	return ret;
+    }
+
     nomme::nomme(generic_file & f)
     {
         tools_read_string(f, xname);
@@ -2631,14 +2639,14 @@ namespace libdar
     void directory::add_children(nomme *r)
     {
 	directory *d = dynamic_cast<directory *>(r);
-	nomme *ancien_nomme;
+	const nomme *ancien_nomme;
 
 	if(r == NULL)
 	    throw SRC_BUG;
 
 	if(search_children(r->get_name(), ancien_nomme))  // same entry already present
 	{
-	    directory *a_dir = dynamic_cast<directory *>(ancien_nomme);
+	    const directory *a_dir = dynamic_cast<const directory *>(ancien_nomme);
 
 	    if(a_dir != NULL && d != NULL) // both directories : merging them
 	    {
@@ -2646,7 +2654,7 @@ namespace libdar
 		list<nomme *>::iterator xit = d->ordered_fils.begin();
 		while(xit != d->ordered_fils.end())
 		{
-		    a_dir->add_children(*xit);
+		    const_cast<directory *>(a_dir)->add_children(*xit);
 		    ++xit;
 		}
 
@@ -2801,10 +2809,10 @@ namespace libdar
 	it = ordered_fils.begin();
     }
 
-    bool directory::search_children(const string &name, nomme * & ptr)
+    bool directory::search_children(const string &name, const nomme * & ptr) const
     {
 #ifdef LIBDAR_FAST_DIR
-	map<string, nomme *>::iterator ut = fils.find(name);
+	map<string, nomme *>::const_iterator ut = fils.find(name);
 
 	if(ut != fils.end())
 	{
@@ -2817,7 +2825,7 @@ namespace libdar
 	else
 	    ptr = NULL;
 #else
-	list<nomme *>::iterator ot = ordered_fils.begin();
+	list<nomme *>::const_iterator ot = ordered_fils.begin();
 
 	while(ot != ordered_fils.end() && *ot != NULL && (*ot)->get_name() != name)
 	    ++ot;
@@ -2844,7 +2852,7 @@ namespace libdar
 	const mirage *next_mir = NULL;
 	string segment;
 	bool loop = true;
-	nomme *tmp_nom;
+	const nomme *tmp_nom;
 
 	if(!dialog.get_use_listing())
 	    throw Erange("directory::callback_for_children_of", gettext("listing() method must be given"));
@@ -2868,7 +2876,7 @@ namespace libdar
 		    loop = false;
 		}
 
-		if(const_cast<directory *>(current)->search_children(segment, tmp_nom))
+		if(current->search_children(segment, tmp_nom))
 		{
 		    next_nom = const_cast<const nomme *>(tmp_nom);
 		    next_mir = dynamic_cast<const mirage *>(next_nom);
@@ -3401,23 +3409,23 @@ namespace libdar
     bool catalogue::read_if_present(string *name, const nomme * & ref) const
     {
 	catalogue *ceci = const_cast<catalogue *>(this);
-	nomme *tmp;
+	const nomme *tmp;
 
-	if(ceci->current_read == NULL)
+	if(current_read == NULL)
 	    throw Erange("catalogue::read_if_present", gettext("no current directory defined"));
 	if(name == NULL) // we have to go to parent directory
 	{
-	    if(ceci->current_read->get_parent() == NULL)
+	    if(current_read->get_parent() == NULL)
 		throw Erange("catalogue::read_if_present", gettext("root directory has no parent directory"));
 	    else
-		ceci->current_read = ceci->current_read->get_parent();
+		ceci->current_read = current_read->get_parent();
 	    ref = NULL;
 	    return true;
 	}
 	else // looking for a real filename
-	    if(ceci->current_read->search_children(*name, tmp))
+	    if(current_read->search_children(*name, tmp))
 	    {
-		directory *d = dynamic_cast<directory *>(tmp);
+		directory *d = dynamic_cast<directory *>(const_cast<nomme *>(tmp));
 		if(d != NULL) // this is a directory need to chdir to it
 		    ceci->current_read = d;
 		ref = tmp;
@@ -3487,16 +3495,16 @@ namespace libdar
 	case -1: // providing path to sub_tree
 	    if(sub_tree->read_subdir(tmp))
 	    {
-		nomme *xtmp;
+		const nomme *xtmp;
 
-		if(current_read->search_children(tmp, xtmp))
+		if(const_cast<directory *>(current_read)->search_children(tmp, xtmp))
 		{
 		    ref = xtmp;
-		    directory *dir = dynamic_cast<directory *>(xtmp);
+		    const directory *dir = dynamic_cast<const directory *>(xtmp);
 
 		    if(dir != NULL)
 		    {
-			current_read = dir;
+			current_read = const_cast<directory *>(dir);
 			return true;
 		    }
 		    else
@@ -3586,13 +3594,13 @@ namespace libdar
 
     void catalogue::re_add_in(const string &subdirname)
     {
-	nomme *sub = NULL;
+	const nomme *sub = NULL;
 
-	if(current_add->search_children(subdirname, sub))
+	if(const_cast<const directory *>(current_add)->search_children(subdirname, sub))
 	{
-	    directory *subdir = dynamic_cast<directory *>(sub);
+	    const directory *subdir = dynamic_cast<const directory *>(sub);
 	    if(subdir != NULL)
-		current_add = subdir;
+		current_add = const_cast<directory *>(subdir);
 	    else
 		throw Erange("catalogue::re_add_in", gettext("Cannot recurs in a non directory entry"));
 	}
@@ -3660,7 +3668,7 @@ namespace libdar
 	}
 	else // scanning an existing directory
 	{
-	    nomme *found;
+	    const nomme *found;
 
 	    if(fin != NULL)
 	    {
@@ -3739,7 +3747,7 @@ namespace libdar
     infinint catalogue::update_destroyed_with(const catalogue & ref)
     {
 	directory *current = contenu;
-	nomme *ici;
+	const nomme *ici;
 	const entree *projo;
 	const eod *pro_eod;
 	const directory *pro_dir;
@@ -3801,10 +3809,10 @@ namespace libdar
 	    else
 		if(pro_dir != NULL)
 		{
-		    directory *ici_dir = dynamic_cast<directory *>(ici);
+		    const directory *ici_dir = dynamic_cast<const directory *>(ici);
 
 		    if(ici_dir != NULL)
-			current = ici_dir;
+			current = const_cast<directory *>(ici_dir);
 		    else
 			ref.skip_read_to_parent_dir();
 		}
@@ -3816,7 +3824,7 @@ namespace libdar
     void catalogue::update_absent_with(const catalogue & ref, infinint aborting_next_etoile)
     {
 	directory *current = contenu;
-	nomme *ici;
+	const nomme *ici;
 	const entree *projo;
 	const eod *pro_eod;
 	const directory *pro_dir;
@@ -3987,17 +3995,17 @@ namespace libdar
 	    {
 		if(pro_dir != NULL)
 		{
-		    directory *ici_dir = dynamic_cast<directory *>(ici);
+		    const directory *ici_dir = dynamic_cast<const directory *>(ici);
 
 		    if(ici_dir != NULL)
-			current = ici_dir;
+			current = const_cast<directory *>(ici_dir);
 		    else
 			ref.skip_read_to_parent_dir();
 		}
 
 		if(pro_mir != NULL)
 		{
-		    mirage *ici_mir = dynamic_cast<mirage *>(ici);
+		    const mirage *ici_mir = dynamic_cast<const mirage *>(ici);
 
 		    if(ici_mir != NULL && corres_clone.find(pro_mir->get_etiquette()) == corres_clone.end())
 		    {
@@ -4901,13 +4909,7 @@ namespace libdar
 
 	const file *fic = dynamic_cast<const file *>(&ref);
 	if(fic != NULL && fic->get_saved_status() == s_saved)
-	    if(fic->get_storage_size() == 0)
-		ret += "[     ]";
-	    else
-		if(fic->get_size() >= fic->get_storage_size())
-		    ret += "[" + tools_addspacebefore(deci(((fic->get_size() - fic->get_storage_size())*100)/fic->get_size()).human(), 4) +"%]";
-		else
-		    ret += gettext("[Worse]");
+	    ret += tools_get_compression_ratio(fic->get_storage_size(), fic->get_size());
 	else
 	    ret += "[-----]";
 

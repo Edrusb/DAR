@@ -152,6 +152,7 @@ namespace libdar
 
     extern bool compatible_signature(unsigned char a, unsigned char b);
     extern unsigned char mk_signature(unsigned char base, saved_status state);
+    extern unsigned char get_base_signature(unsigned char a);
 
 	/// the End of Directory entry class
     class eod : public entree
@@ -686,7 +687,7 @@ namespace libdar
 	    // as side effect the reset_read_children() method must be called.
 
         directory * get_parent() const { return parent; };
-        bool search_children(const std::string &name, nomme *&ref);
+        bool search_children(const std::string &name, const nomme *&ref) const;
 	bool callback_for_children_of(user_interaction & dialog, const std::string & sdir, bool isolated = false) const;
 
             // using is_more_recent_than() from inode class
@@ -1066,7 +1067,6 @@ namespace libdar
 
 	    // non interative methods
 
-        bool direct_read(const path & ref, const nomme * &ret);
         infinint update_destroyed_with(const catalogue & ref);
             // ref must have the same root, else the operation generates an exception
 
