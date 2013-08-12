@@ -2413,4 +2413,16 @@ namespace libdar
 	return ret;
     }
 
+    string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size)
+    {
+	if(storage_size == 0)
+	    return "[     ]";
+	else
+	    if(file_size >= storage_size)
+		return "[" + tools_addspacebefore(deci(((file_size - storage_size)*100)/file_size).human(), 4) +"%]";
+	    // we can divide by file_size above, because it is never null in that case: file_size >= storage_size > 0
+	    else
+		return gettext("[Worse]");
+    }
+
 } // end of namespace

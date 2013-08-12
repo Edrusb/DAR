@@ -779,6 +779,10 @@ namespace libdar
 
     extern std::string tools_get_date_utc();
 
+	/// return the string about compression ratio
+
+    extern std::string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size);
+
 } /// end of namespace
 
 #endif

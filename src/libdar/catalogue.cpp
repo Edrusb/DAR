@@ -498,6 +498,14 @@ namespace libdar
         }
     }
 
+    unsigned char get_base_signature(unsigned char a)
+    {
+	unsigned char ret = tolower(a & ~SAVED_FAKE_BIT);
+	if(ret == 'e')
+	    ret = 'f';
+	return ret;
+    }
+
     nomme::nomme(generic_file & f)
     {
         tools_read_string(f, xname);
