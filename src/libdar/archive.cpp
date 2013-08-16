@@ -1124,33 +1124,8 @@ namespace libdar
 	NLS_SWAP_IN;
         try
         {
-	    const directory *parent = NULL;
+	    const directory * parent = get_dir_object(dir);
 	    const nomme *tmp_ptr = NULL;
-
-	    parent = get_cat().get_contenu();
-	    if(parent == NULL)
-		throw SRC_BUG;
-
-	    if(dir != "")
-	    {
-		path search = dir;
-		string tmp;
-		bool loop = true;
-
-		while(loop)
-		{
-		    loop = search.pop_front(tmp);
-		    if(!loop)
-			    // failed because now, search is a one level path
-			tmp = search.basename();
-		    loop = parent->search_children(tmp, tmp_ptr);
-		    parent = dynamic_cast<const directory *>(tmp_ptr);
-		    if(parent == NULL)
-			throw Erange("archive::get_children_in_table", tools_printf("%S entry does not exist", &dir));
-		}
-	    }
-
-		// parent now points to the requested entry we need to provide content of
 
             if(parent == NULL)
 		throw SRC_BUG;
@@ -1203,7 +1178,7 @@ namespace libdar
 		    ent.set_dirtiness(tmp_file->is_dirty());
 		}
 
-		if(tmp_lien != NULL)
+		if(tmp_lien != NULL && tmp_lien->get_saved_status() == s_saved)
 		    ent.set_link_target(tmp_lien->get_target());
 
 		if(tmp_device != NULL)
@@ -1225,7 +1200,33 @@ namespace libdar
         NLS_SWAP_OUT;
 
 	return ret;
+    }
 
+    bool archive::has_subdirectory(const std::string & dir) const
+    {
+	bool ret = false;
+
+	NLS_SWAP_IN;
+        try
+        {
+	    const directory *parent = get_dir_object(dir);
+	    const nomme *tmp_ptr = NULL;
+
+	    parent->reset_read_children();
+	    while(parent->read_children(tmp_ptr) && !ret)
+	    {
+		if(dynamic_cast<const directory *>(tmp_ptr) != NULL)
+		    ret = true;
+	    }
+	}
+        catch(...)
+        {
+	    NLS_SWAP_OUT;
+            throw;
+	}
+        NLS_SWAP_OUT;
+
+	return ret;
     }
 
     void archive::init_catalogue(user_interaction & dialog) const
@@ -2257,6 +2258,39 @@ namespace libdar
         return level2->get_position();
     }
 
+    const directory *archive::get_dir_object(const string & dir) const
+    {
+	const directory *parent = NULL;
+	const nomme *tmp_ptr = NULL;
+
+	parent = get_cat().get_contenu();
+	if(parent == NULL)
+	    throw SRC_BUG;
+
+	if(dir != "")
+	{
+	    path search = dir;
+	    string tmp;
+	    bool loop = true;
+
+	    while(loop)
+	    {
+		loop = search.pop_front(tmp);
+		if(!loop) // failed because now, search is a one level path
+		    tmp = search.basename();
+		if(parent->search_children(tmp, tmp_ptr))
+		    parent = dynamic_cast<const directory *>(tmp_ptr);
+		else
+		    parent = NULL;
+
+		if(parent == NULL)
+		    throw Erange("archive::get_children_in_table", tools_printf("%S entry does not exist", &dir));
+	    }
+	}
+	    // else returning the root of the archive
+
+	return parent;
+    }
 
 
 } // end of namespace

@@ -266,6 +266,9 @@ namespace libdar
 	    /// mandatory
 	const std::vector<list_entry> get_children_in_table(const std::string & dir) const;
 
+	    /// returns true if the pointed directory has one or more subdirectories
+	bool has_subdirectory(const std::string & dir) const;
+
 	    /// retrieving statistics about archive contents
 	const entree_stats get_stats() const { if(cat == NULL) throw SRC_BUG; return cat->get_stats(); };
 
@@ -437,6 +440,7 @@ namespace libdar
 	bool only_contains_an_isolated_catalogue() const; //< true if the current archive only contains an isolated catalogue
 	void check_against_isolation(user_interaction & dialog, bool lax) const; //< throw Erange exception if the archive only contains an isolated catalogue
 	void check_header_version() const;
+	const directory *get_dir_object(const std::string & dir) const;
     };
 
 } // end of namespace
