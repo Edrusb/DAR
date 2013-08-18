@@ -661,6 +661,10 @@ namespace libdar
 	/// \return the corresponding octal string
     extern std::string tools_int2octal(const U_I & perm);
 
+	/// convert a permission number into its string representation (rwxrwxrwx)
+
+    extern std::string tools_get_permission_string(char type, U_32 perm, bool hard);
+
 	/// change the permission of the file which descriptor is given
 
 	/// \param[in] fd file's descriptor

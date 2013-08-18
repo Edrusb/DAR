@@ -2135,6 +2135,74 @@ namespace libdar
 	return string("0") + ret;  // leading zero for octal format indication
     }
 
+    string tools_get_permission_string(char type, U_32 perm, bool hard)
+    {
+	string ret = hard ? "*" : " ";
+
+	if(type == 'f') // plain files
+	    type = '-';
+	if(type == 'o') // door "files"
+	    type = 'D';
+	ret += type;
+
+	if((perm & 0400) != 0)
+	    ret += 'r';
+	else
+	    ret += '-';
+	if((perm & 0200) != 0)
+	    ret += 'w';
+	else
+	    ret += '-';
+	if((perm & 0100) != 0)
+	    if((perm & 04000) != 0)
+		ret += 's';
+	    else
+		ret += 'x';
+	else
+	    if((perm & 04000) != 0)
+		ret += 'S';
+	    else
+		ret += '-';
+	if((perm & 040) != 0)
+	    ret += 'r';
+	else
+	    ret += '-';
+	if((perm & 020) != 0)
+	    ret += 'w';
+	else
+	    ret += '-';
+	if((perm & 010) != 0)
+	    if((perm & 02000) != 0)
+		ret += 's';
+	    else
+		ret += 'x';
+	else
+	    if((perm & 02000) != 0)
+		ret += 'S';
+	    else
+		ret += '-';
+	if((perm & 04) != 0)
+	    ret += 'r';
+	else
+	    ret += '-';
+	if((perm & 02) != 0)
+	    ret += 'w';
+	else
+	    ret += '-';
+	if((perm & 01) != 0)
+	    if((perm & 01000) != 0)
+		ret += 't';
+	    else
+		ret += 'x';
+	else
+	    if((perm & 01000) != 0)
+		ret += 'T';
+	    else
+		ret += '-';
+
+	return ret;
+    }
+
     void tools_set_permission(S_I fd, U_I perm)
     {
 	NLS_SWAP_IN;

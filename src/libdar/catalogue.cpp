@@ -4735,7 +4735,6 @@ namespace libdar
 
     static string local_perm(const inode &ref, bool hard)
     {
-	string ret = hard ? "*" : " ";
 	saved_status st;
 	char type;
 
@@ -4743,67 +4742,7 @@ namespace libdar
 	if(!extract_base_and_status(ref.signature(), (unsigned char &)type, st))
 	    throw SRC_BUG;
 
-	if(type == 'f') // plain files
-	    type = '-';
-	if(type == 'o') // door "files"
-	    type = 'D';
-	ret += type;
-	if((perm & 0400) != 0)
-	    ret += 'r';
-	else
-	    ret += '-';
-	if((perm & 0200) != 0)
-	    ret += 'w';
-	else
-	    ret += '-';
-	if((perm & 0100) != 0)
-	    if((perm & 04000) != 0)
-		ret += 's';
-	    else
-		ret += 'x';
-	else
-	    if((perm & 04000) != 0)
-		ret += 'S';
-	    else
-		ret += '-';
-	if((perm & 040) != 0)
-	    ret += 'r';
-	else
-	    ret += '-';
-	if((perm & 020) != 0)
-	    ret += 'w';
-	else
-	    ret += '-';
-	if((perm & 010) != 0)
-	    if((perm & 02000) != 0)
-		ret += 's';
-	    else
-		ret += 'x';
-	else
-	    if((perm & 02000) != 0)
-		ret += 'S';
-	    else
-		ret += '-';
-	if((perm & 04) != 0)
-	    ret += 'r';
-	else
-	    ret += '-';
-	if((perm & 02) != 0)
-	    ret += 'w';
-	else
-	    ret += '-';
-	if((perm & 01) != 0)
-	    if((perm & 01000) != 0)
-		ret += 't';
-	    else
-		ret += 'x';
-	else
-	    if((perm & 01000) != 0)
-		ret += 'T';
-	    else
-		ret += '-';
-
-	return ret;
+	return tools_get_permission_string(type, perm, hard);
     }
 
     static string local_uid(const inode & ref)

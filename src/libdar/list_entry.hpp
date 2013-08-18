@@ -75,7 +75,7 @@ namespace libdar
 
 	std::string get_uid() const { return deci(uid).human(); };
 	std::string get_gid() const { return deci(gid).human(); };
-	std::string get_perm() const { return tools_int2str(perm); };
+	std::string get_perm() const { return tools_get_permission_string(type, perm, hard_link); };
 	std::string get_last_access() const { return last_access != 0 ? tools_display_date(last_access) : ""; };
 	std::string get_last_modif() const { return last_modif != 0 ? tools_display_date(last_modif) : ""; };
 	std::string get_last_change() const { return last_change != 0 ? tools_display_date(last_change) : ""; };
