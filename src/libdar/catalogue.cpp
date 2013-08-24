@@ -1949,7 +1949,7 @@ namespace libdar
         {
             dirty = ref.dirty;
 
-            if(ref.check != NULL || get_escape_layer() != NULL)
+            if(ref.check != NULL || (get_escape_layer() != NULL && ref.get_saved_status() == s_saved))
             {
 		if(ref.check == NULL)
 		{

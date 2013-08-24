@@ -24,11 +24,11 @@
     /// \ingroup Private
     ///
     /// This class inherits from the class catalogue and implements
-    /// the pre_add(...) method, which role is to add a escape sequence followed
+    /// the pre_add(...) method, which role is to add an escape sequence followed
     /// by an entry dump (usually used at the end of archive is the so called catalogue part
-    /// of the archive. This sequence followed by entry dump is added uncompressed
+    /// of the archive. This sequence followed by entry dump is added
     /// before each file's data all along the archive.
-    /// Ohter inherited classes, implement the escape specific part, used when performing
+    /// Other inherited classes, implement the escape specific part, used when performing
     /// sequential reading of the catalogue
 
 #ifndef ESCAPE_CATALOGUE_HPP
