@@ -52,7 +52,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_XFORM_VERSION "1.5.3"
+#define DAR_XFORM_VERSION "1.5.4"
 
 #define OPT_STRING  "s:S:p::wnhbVE:F:a::Qj^:3:;:"
 

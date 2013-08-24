@@ -2149,7 +2149,7 @@ namespace libdar
 	int err = fstat(fd, &buf);
 
 	if(err < 0)
-	    throw Erange("tools_get_permission", string(gettext("Cannot get effective permission give a file descriptor: ")) + strerror(errno));
+	    throw Erange("tools_get_permission", string(gettext("Cannot get effective permission given a file descriptor: ")) + strerror(errno));
 
 	return buf.st_mode & ~(S_IFMT);
     }
