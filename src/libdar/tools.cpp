@@ -1156,7 +1156,7 @@ namespace libdar
 		{
 		    if(errno == ERANGE) // buffer too small
 		    {
-			delete buffer;
+			delete [] buffer;
 			buffer = NULL;
 			length += step;
 		    }

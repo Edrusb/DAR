@@ -211,10 +211,10 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		delete buffer;
+		delete [] buffer;
 		throw;
 	    }
-	    delete buffer;
+	    delete [] buffer;
 	}
 
 	return ret;

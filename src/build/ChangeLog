@@ -18,6 +18,8 @@ from 2.4.10 to 2.4.11
 - fixing bug (segfault) met when hitting CTRL-C while reading an archive in
   sequential mode
 - fixing libdar.pc for pkg-config for the cflags given to external applications
+- fixed memory allocation/desallocation mismatches (delete vs delete [] )
+  concerning four vector of chars.
 
 
 from 2.4.9 to to 2.4.10
