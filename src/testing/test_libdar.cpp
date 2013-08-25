@@ -204,7 +204,7 @@ void f2()
     ret = get_children_of_noexcept(ui, arch, "", code, msg);
     if(code != LIBDAR_NOEXCEPT)
     {
-	ui.printf("exception looking for children of root\n", &msg);
+	ui.printf("exception looking for children of root: %S\n", &msg);
 	return;
     }
     if(ret)
