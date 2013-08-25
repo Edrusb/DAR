@@ -20,6 +20,7 @@ from 2.4.10 to 2.4.11
 - fixing libdar.pc for pkg-config for the cflags given to external applications
 - fixed memory allocation/desallocation mismatches (delete vs delete [] )
   concerning four vector of chars.
+- fixed error in logical expression leading a sanity test to be useless
 
 from 2.4.9 to to 2.4.10
 - fixing libdar about dar_manager database corruption that occurred when

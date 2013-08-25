@@ -586,7 +586,7 @@ namespace libdar
 	    tm get_struct() const { return when; };
 	    void add_digit(char a)
 	    {
-		if(a < 48 && a > 57) // ascii code for zero is 48, for nine is 57
+		if(a < 48 || a > 57) // ascii code for zero is 48, for nine is 57
 		    throw SRC_BUG;
 		tmp = tmp*10 + (a-48);
 	    };
