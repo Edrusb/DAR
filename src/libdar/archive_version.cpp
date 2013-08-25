@@ -77,7 +77,7 @@ namespace libdar
 	if(lu < sizeof(tmp))
 	    throw Erange("archive_version::read", gettext("Reached End of File while reading archive version"));
 
-	if(tmp[0] == 'd' && tmp[1] == 'r' && tmp[3] == 'o')
+	if(tmp[0] == 'd' && tmp[1] == 'r' && tmp[2] == 'o')
 	{
 	    droot = true;
 	    version = 0;

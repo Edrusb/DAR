@@ -21,7 +21,6 @@ from 2.4.10 to 2.4.11
 - fixed memory allocation/desallocation mismatches (delete vs delete [] )
   concerning four vector of chars.
 
-
 from 2.4.9 to to 2.4.10
 - fixing libdar about dar_manager database corruption that occurred when
   deleting the first archive of a base containing a plain file only
