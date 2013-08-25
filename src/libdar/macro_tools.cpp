@@ -293,16 +293,6 @@ namespace libdar
 
 	    read_header_version(dialog, lax, stack, ver);
 
-
-		// checking whether the read data was not a catalogue (old format) catalogue stard with the "droot" string.
-	    if(ver.edition.is_droot() && ver.algo_zip == 'o')
-	    {
-		second_terminateur_offset = 0;
-		dialog.warning(gettext("Could not find archive information at the end of the last slice, assuming an old archive and trying to read at the beginning of the first slice..."));
-		stack.skip(0);
-		read_header_version(dialog, lax, stack, ver);
-	    }
-
 	    if(second_terminateur_offset == 0 && !sequential_read && ver.edition > 7)
 		throw Erange("macro_tools_open_archive", gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. You need to use sequential reading mode to have a chance to use this corrupted archive"));
 

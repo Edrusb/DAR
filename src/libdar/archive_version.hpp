@@ -64,15 +64,9 @@ namespace libdar
 	void read(generic_file & f);
 	std::string display() const;
 
-	bool is_droot() const { return droot; };
-	    // the string read from file (read()) is "dro", which is the start of a catalogue
-	    // this may be the case with new versions where a header_version is placed where ought to be the catalogue
-	    // in this situation, we can know that this an old archive and must re-read the archive in the old way
-
     private:
 	U_16 version;
 	unsigned char fix;
-	bool droot;
 
 	U_I value() const { return (U_I)(version)*256 + fix; };
 	static unsigned char to_digit(unsigned char val);
