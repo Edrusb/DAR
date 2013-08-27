@@ -218,7 +218,7 @@ namespace libdar
 		    {
 			dialog.printf(gettext("Opening a pair of pipes to read the archive, expecting dar_slave at the other ends..."));
 			tools_open_pipes(dialog, input_pipe, output_pipe, in, out);
-			tmp = new (nothrow) zapette(dialog, in, out);
+			tmp = new (nothrow) zapette(dialog, in, out, true);
 			if(tmp == NULL)
 			{
 			    delete in;
@@ -271,7 +271,9 @@ namespace libdar
 		throw SRC_BUG;
 	    second_terminateur_offset = 0;
 
-	    if(sequential_read || tmp_ctxt->is_an_old_start_end_archive())
+	    if(sequential_read
+	       || tmp_ctxt->is_an_old_start_end_archive()
+	       || stack.get_position() == 0) //< sar layer failed openning the last slice and failed back openning the first slice
 		stack.skip(0);
 	    else
 	    {
@@ -294,7 +296,7 @@ namespace libdar
 	    read_header_version(dialog, lax, stack, ver);
 
 	    if(second_terminateur_offset == 0 && !sequential_read && ver.edition > 7)
-		throw Erange("macro_tools_open_archive", gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. You need to use sequential reading mode to have a chance to use this corrupted archive"));
+		dialog.pause(gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. If you have an external catalog given as reference we can continue, OK ?"));
 
 
 		// *************  adding a tronc to hide last terminator and trailer_version ******* //
@@ -340,7 +342,10 @@ namespace libdar
 	    {
 	    case crypto_none:
 		if(info_details)
-		    dialog.warning(gettext("No cyphering layer opened"));
+		    dialog.warning(gettext("No cyphering layer opened, adding cache layer for performance"));
+		tmp = new (nothrow) cache (*(stack.top()), false);
+		if(tmp == NULL)
+		    dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
 		break;
 	    case crypto_blowfish:
 	    case crypto_aes256:
@@ -383,13 +388,10 @@ namespace libdar
 		throw Erange("macro_tools_open_archive", gettext("Unknown encryption algorithm"));
 	    }
 
-	    if(crypto != crypto_none)
-	    {
-		if(tmp == NULL)
-		    throw Ememory("open_archive");
-		stack.push(tmp);
-		tmp = NULL;
-	    }
+	    if(tmp == NULL)
+		throw Ememory("open_archive");
+	    stack.push(tmp);
+	    tmp = NULL;
 
 	    stack.add_label(LIBDAR_STACK_LABEL_UNCYPHERED);
 
@@ -444,23 +446,6 @@ namespace libdar
 		    throw Ememory("open_archive");
 		stack.push(tmp);
 		tmp = NULL;
-	    }
-
-		// *********** if not crypto nor escape layer adding cache layer for better performances
-
-	    if(crypto == crypto_none && (ver.flag & VERSION_FLAG_SEQUENCE_MARK) == 0)
-	    {
-		if(info_details)
-		    dialog.warning(gettext("Opening the cache layer for better performance..."));
-
-		tmp = new (nothrow) cache(*(stack.top()), false);
-		if(tmp == NULL)
-		    dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
-		else
-		{
-		    stack.push(tmp);
-		    tmp = NULL;
-		}
 	    }
 
 	    stack.add_label(LIBDAR_STACK_LABEL_CLEAR);

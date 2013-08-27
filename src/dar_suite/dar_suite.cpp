@@ -56,6 +56,7 @@ extern "C"
 #include "thread_cancellation.hpp"
 #include "memory_check.hpp"
 #include "special_alloc.hpp"
+#include "line_tools.hpp"
 
 #define GENERAL_REPORT(msg) 	if(ui != NULL)\
                                 {\
@@ -88,7 +89,14 @@ void dar_suite_reset_signal_handler()
 #endif
 }
 
-int dar_suite_global(int argc, char * const argv[], const char **env, int (*call)(user_interaction & dialog, int, char * const [], const char **env))
+int dar_suite_global(int argc,
+		     char * const argv[],
+		     const char **env,
+		     const char *getopt_string,
+#if HAVE_GETOPT_LONG
+		     const struct option *long_options,
+#endif
+		     int (*call)(user_interaction & dialog, int, char * const [], const char **env))
 {
     int ret = EXIT_OK;
 
@@ -116,8 +124,16 @@ int dar_suite_global(int argc, char * const argv[], const char **env, int (*call
     try
     {
 	U_I min, med, maj;
-	bool silent = tools_look_for("-Q", argc, argv);
-	bool jog = tools_look_for("-j", argc, argv) || tools_look_for("--jog", argc, argv);
+	bool silent;
+	bool jog;
+	line_tools_look_for_jQ(argc,
+			      argv,
+			      getopt_string,
+#if HAVE_GETOPT_LONG
+			      long_options,
+#endif
+			      jog,
+			      silent);
 	ui = shell_interaction_init(&cerr, &cerr, silent);
 
 	if(jog)

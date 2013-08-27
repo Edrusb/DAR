@@ -9,6 +9,30 @@ from 2.4.x to 2.5.0
   compatible with former implementation)
 - class hash_fichier becomes entrepot independent
 
+from 2.4.10 to 2.4.11
+- Modified behavior of 'dar -h' and 'dar -V', both now return 0 as exist
+  status instead of 1 (which means syntax error).
+- Fixed bug: -Q is now available with -V under the collapsed form -QV or -VQ
+- fixed typo in documentation
+- fixed memory leakage met when dar fails a merging operation because the
+  resulting archive is specified in an directory that does not exist.
+- fixed bug met when isolating a differential backup in sequential read mode
+- fixed bug about slice file permission not taking care about umask variable
+  when the --hash feature is used.
+- fixed performance issue when reading an archive over a pair of piles using
+  dar_slave (possibly over ssh) when the archive makes use of escape marks and
+  when no encryption is used
+- added target "full-from-diff" in /etc/darrc default file
+- fixed bug avoiding reading an truncated archive in direct access mode with
+  the help of an external catalogue.
+- new and better implementation of archive extraction in sequential read mode
+- fixing bug (segfault) met when hitting CTRL-C while reading an archive in
+  sequential mode
+- fixing libdar.pc for pkg-config for the cflags given to external applications
+- fixed memory allocation/desallocation mismatches (delete vs delete [] )
+  concerning four vector of chars.
+- fixed error in logical expression leading a sanity test to be useless
+
 from 2.4.9 to to 2.4.10
 - fixing libdar about dar_manager database corruption that occurred when
   deleting the first archive of a base containing a plain file only

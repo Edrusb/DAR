@@ -435,7 +435,7 @@ from the application to the initialization of libgcrypt before calling
 get_version(). For more details see libgcrypt documentation.</li></ul>
       <ul>
 
-      
+
       </ul>
 
       <br>
@@ -449,10 +449,10 @@ properly before ending the program. It is mandatory to invoke the
 following function before exiting your program if you invoked
 get_version() previously. It is a good idea to implement this right now
 not to forget later:<br>
-      
+
       </div>
-      
-      
+
+
       </td>
     </tr>
   </tbody>
@@ -475,7 +475,7 @@ not to forget later:<br>
   <tbody>
     <tr>
       <td style="vertical-align: top;">
-      
+
       <div style="text-align: justify;">In particular, closes_and_clean()
 makes the necessary for memory to be released in the proper order. <span style="text-decoration: underline;">Not
 calling close_and_clean() at the end of your program may result in uncaught exception message from libdar at the end of
@@ -2602,9 +2602,9 @@ linking.<br>
       <div style="text-align: justify;">These different libdar
 versions can
 coexist on the same system, they
-share the same include files. But the MODE macro must be set to 32
+share the same include files. But the LIBDAR_MODE macro must be set to 32
 or 64 when compiling for linking with libdar32 or libdar64
-respectively. The MODE macro defines the way the "<span style="font-style: italic;">class infinint" </span>type is
+respectively. The LIBDAR_MODE macro defines the way the "<span style="font-style: italic;">class infinint" </span>type is
 implemented in libdar, and thus changes the way the libdar headers
 files are interpreted by the compiler. </div>
       </td>
@@ -2625,7 +2625,7 @@ main()<br>
 &nbsp;&nbsp; libdar::get_version(...);<br>
 &nbsp;&nbsp; ...<br>
 }<br>
-&gt; gcc -c <span style="font-weight: bold;">-DMODE=32</span>
+&gt; gcc -c <span style="font-weight: bold;">-DLIBDAR_MODE=32</span>
 my_prog.cpp<br>
       <br>
       <code></code><code></code><span style="font-weight: bold;"></span><br>

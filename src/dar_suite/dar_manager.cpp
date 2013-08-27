@@ -70,12 +70,13 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.7.4"
+#define DAR_MANAGER_VERSION "1.7.5"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
 #define INVALID_ARG "Invalid argument given to -%c (requires integer)"
+#define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:"
 
 enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, move, interactive, check, batch };
 
@@ -151,7 +152,14 @@ static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positi
 
 int main(S_I argc, char *const argv[], const char **env)
 {
-    return dar_suite_global(argc, argv, env, &little_main);
+    return dar_suite_global(argc,
+			    argv,
+			    env,
+			    OPT_STRING,
+#if HAVE_GETOPT_LONG
+			    get_long_opt(),
+#endif
+			    &little_main);
 }
 
 S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
@@ -282,9 +290,9 @@ static bool command_line(user_interaction & dialog,
 
 	(void)line_tools_reset_getopt();
 #if HAVE_GETOPT_LONG
-	while((lu = getopt_long(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:", get_long_opt(), NULL)) != EOF)
+	while((lu = getopt_long(argc, argv, OPT_STRING, get_long_opt(), NULL)) != EOF)
 #else
-	    while((lu = getopt(argc, argv, "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:")) != EOF)
+	    while((lu = getopt(argc, argv, OPT_STRING)) != EOF)
 #endif
 	    {
 		switch(lu)

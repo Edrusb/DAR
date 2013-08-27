@@ -43,7 +43,12 @@ int little_main(user_interaction & ui, S_I argc, char * const argv[], const char
 
 int main(S_I argc, char * const argv[], const char **env)
 {
-    return dar_suite_global(argc, argv, env, &little_main);
+    return dar_suite_global(argc,
+			    argv,
+			    env,
+			    "",
+			    NULL,
+			    &little_main);
 }
 
 int little_main(user_interaction & ui, S_I argc, char * const argv[], const char **env)

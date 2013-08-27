@@ -138,7 +138,7 @@ static void usage(user_interaction & dialog, const char *command_name);
 static void split_compression_algo(const char *arg, compression & algo, U_I & level);
 
 #if HAVE_GETOPT_LONG
-static const struct option *get_long_opt();
+const struct option *get_long_opt();
 #endif
 
 struct recursive_param
@@ -695,6 +695,10 @@ bool get_args(user_interaction & dialog,
     return true;
 }
 
+const char *get_short_opt() { return OPT_STRING; }
+
+
+
 static bool get_args_recursive(recursive_param & rec,
 			       line_param & p,
 			       S_I argc,
@@ -995,6 +999,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'h':
                 usage(*rec.dialog, argv[0]);
+		p.op = version_or_help;
                 return false;
             case 'L':
                 show_license(*rec.dialog);
@@ -1029,6 +1034,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'V':
                 show_version(*rec.dialog, argv[0]);
+		p.op = version_or_help;
                 return false;
             case ':':
                 throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
@@ -2048,7 +2054,7 @@ static void show_version(user_interaction & dialog, const char *command_name)
 }
 
 #if HAVE_GETOPT_LONG
-static const struct option *get_long_opt()
+const struct option *get_long_opt()
 {
     static const struct option ret[] = {
         {"beep", no_argument, NULL, 'b' },

@@ -586,7 +586,7 @@ namespace libdar
 	    tm get_struct() const { return when; };
 	    void add_digit(char a)
 	    {
-		if(a < 48 && a > 57) // ascii code for zero is 48, for nine is 57
+		if(a < 48 || a > 57) // ascii code for zero is 48, for nine is 57
 		    throw SRC_BUG;
 		tmp = tmp*10 + (a-48);
 	    };
@@ -1157,7 +1157,7 @@ namespace libdar
 		{
 		    if(errno == ERANGE) // buffer too small
 		    {
-			delete buffer;
+			delete [] buffer;
 			buffer = NULL;
 			length += step;
 		    }
@@ -2202,6 +2202,19 @@ namespace libdar
 
 	return ret;
     }
+
+
+    U_I tools_get_permission(S_I fd)
+    {
+	struct stat buf;
+	int err = fstat(fd, &buf);
+
+	if(err < 0)
+	    throw Erange("tools_get_permission", string(gettext("Cannot get effective permission given a file descriptor: ")) + strerror(errno));
+
+	return buf.st_mode & ~(S_IFMT);
+    }
+
 
     void tools_set_permission(S_I fd, U_I perm)
     {

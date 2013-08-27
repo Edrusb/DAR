@@ -55,7 +55,14 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 
 int main(S_I argc, char * const argv[], const char **env)
 {
-    return dar_suite_global(argc, argv, env, &little_main);
+    return dar_suite_global(argc,
+			    argv,
+			    env,
+			    get_short_opt(),
+#if HAVE_GETOPT_LONG
+			    get_long_opt(),
+#endif
+			    &little_main);
 }
 
 static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
@@ -75,7 +82,12 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		  argc,
 		  argv,
 		  param))
-        return EXIT_SYNTAX;
+    {
+	if(param.op == version_or_help)
+	    return EXIT_OK;
+	else
+	    return EXIT_SYNTAX;
+    }
     else // get_args is OK, we've got a valid command line
     {
 	archive *arch = NULL;

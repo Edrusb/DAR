@@ -383,6 +383,7 @@ namespace libdar
         /// \param[in] argc is the number of argument on the command line
         /// \param[in] argv is the list of argument on the command line
         /// \return true if the argument is present in the list
+	/// \note THIS ROUTINE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE VERSION OF LIBDAR
     extern bool tools_look_for(const char *argument, S_I argc, char *const argv[]);
 
 
@@ -670,6 +671,15 @@ namespace libdar
 	/// \param[in] fd file's descriptor
 	/// \param[in] perm file permission to set the file to
     extern void tools_set_permission(S_I fd, U_I perm);
+
+	/// obtain the permission of the file which descriptor is given
+
+	/// \param[in] fd file's descriptor
+	/// \return permission of the given file
+	/// \note in case of error exception may be thrown
+    extern U_I tools_get_permission(S_I fd);
+
+	/// change ownership of the file which descriptor is given
 
 	/// convert string user name or uid to numeric uid value
 

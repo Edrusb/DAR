@@ -70,7 +70,25 @@ using namespace libdar;
     /// @{
 
 extern void dar_suite_reset_signal_handler();
-extern int dar_suite_global(int argc, char * const argv[], const char **env, int (*call)(user_interaction & dialog, int, char *const [], const char **env));
+
+    /// common routine for all dar command-line tools to initialize environment and convert uncaught exceptions to exit status code
+    /// \param[in] argc is the number of argument on the command line
+    /// \param[in] argv is the list of arguments on the command line
+    /// \param[in] env is the environment variables table obtained from main()
+    /// \param[in] getopt_string is the parsing string to pass to getopt
+#if HAVE_GETOPT_LONG
+    /// \param[in] long_options is the optional list of long options (an NULL pointer is acceptable for no long option)
+#endif
+    /// \param[in] call is a callback function to run once user interaction is initialized and to catch from the exceptions
+    /// \return the application exist status to use
+extern int dar_suite_global(int argc,
+			    char * const argv[],
+			    const char **env,
+			    const char *getopt_string,
+#if HAVE_GETOPT_LONG
+			    const struct option *long_options,
+#endif
+			    int (*call)(user_interaction & dialog, int, char *const [], const char **env));
 
 extern std::string dar_suite_command_line_features();
 

@@ -43,7 +43,7 @@ using namespace libdar;
     /// \addtogroup CMDLINE
     /// @{
 
-enum operation { noop, extract, create, diff, test, listing, isolate, merging };
+enum operation { noop, extract, create, diff, test, listing, isolate, merging, version_or_help };
     // noop stands for no-operation. get_args() never returns such value,
     // it is just necessary within the command_line module
 
@@ -188,4 +188,9 @@ extern bool get_args(user_interaction & dialog,
 
     /// @}
 
+#if HAVE_GETOPT_LONG
+const struct option *get_long_opt();
+#endif
+
+const char *get_short_opt();
 #endif

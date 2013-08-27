@@ -61,7 +61,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "thread_cancellation.hpp"
 
-#define DAR_CP_VERSION "1.2.7"
+#define DAR_CP_VERSION "1.2.8"
 
 using namespace libdar;
 using namespace std;
@@ -80,7 +80,14 @@ static int little_main(user_interaction & dialog, int argc, char * const argv[],
 
 int main(int argc, char * const argv[], const char **env)
 {
-    return dar_suite_global(argc, argv, env, &little_main);
+     return dar_suite_global(argc,
+			     argv,
+			     env,
+			     "h",
+#if HAVE_GETOPT_LONG
+			     NULL,
+#endif
+			     &little_main);
 }
 
 static int little_main(user_interaction & dialog, int argc, char * const argv[], const char **env)

@@ -526,7 +526,7 @@ namespace libdar
 	{
 	    if(tmp != NULL)
 	    {
-		delete tmp;
+		delete [] tmp;
 		tmp = NULL;
 	    }
 	    throw;

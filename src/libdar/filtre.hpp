@@ -142,6 +142,9 @@ namespace libdar
 			     bool decremental_mode,
 			     const infinint & sparse_file_min_size);
 
+    void filtre_sequentially_read_all_catalogue(catalogue & cat,
+						user_interaction & dialog);
+
 	/// @}
 
 } // end of namespace
