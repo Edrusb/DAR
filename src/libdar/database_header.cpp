@@ -55,7 +55,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 using namespace std;
 
@@ -89,7 +89,7 @@ namespace libdar
 	fd = ::open(filename.c_str(), O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
 	if(fd < 0)
 	    throw Erange("database_header_create", tools_printf(gettext("Cannot create database %S : %s"), &filename, strerror(errno)));
-	ret = new (nothrow) fichier(dialog, fd);
+	ret = new (nothrow) fichier_local(dialog, fd);
 	if(ret == NULL)
 	{
 	    close(fd);
@@ -120,7 +120,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new (nothrow) fichier(dialog, filename.c_str(), gf_read_only, tools_octal2int("0777"), false);
+		ret = new (nothrow) fichier_local(dialog, filename.c_str(), gf_read_only, tools_octal2int("0777"), false);
 	    }
 	    catch(Erange & e)
 	    {

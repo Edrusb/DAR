@@ -42,7 +42,7 @@ extern "C"
 #include "deci.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 using namespace std;
 using namespace libdar;
@@ -468,7 +468,7 @@ string line_tools_get_full_path_from_PATH(const vector<string> & the_path, const
 	    {
 		string where = (path(*it) + filename).display();
 
-		fichier tmp = fichier(aveugle, where, gf_read_only, tools_octal2int("0777"), false);
+		fichier_local tmp = fichier_local(aveugle, where, gf_read_only, tools_octal2int("0777"), false);
 		found = true;
 		ret = where;
 	    }

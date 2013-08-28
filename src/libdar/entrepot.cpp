@@ -45,6 +45,7 @@ extern "C"
 #include "entrepot.hpp"
 #include "cygwin_adapt.hpp"
 #include "tools.hpp"
+#include "fichier_local.hpp"
 
 using namespace std;
 
@@ -293,7 +294,7 @@ namespace libdar
 	    if(mode != gf_read_only)
 		tools_set_ownership(fd, get_user_ownership(), get_group_ownership());
 
-	    ret = new (nothrow) fichier(dialog, fd);
+	    ret = new (nothrow) fichier_local(dialog, fd);
 	    if(ret == NULL)
 		throw Ememory("entrepot_local::inherited_open");
 	}

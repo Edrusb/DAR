@@ -61,7 +61,7 @@ extern "C"
 #include "generic_file.hpp"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 #include "../dar_suite/shell_interaction.hpp"
 #include "../dar_suite/dar_suite.hpp"
 
@@ -107,7 +107,7 @@ static int little_main(user_interaction & ui, int argc, char * const argv[], con
 	    ui.warning(string("cannot open file for test ! ") + strerror(errno));
 	else
 	{
-	    fichier fic = fichier(ui, fd);
+	    fichier_local fic = fichier_local(ui, fd);
 	    infinint cp;
 
 	    p.dump(fic);

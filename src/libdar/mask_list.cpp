@@ -47,7 +47,7 @@ extern "C"
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "cygwin_adapt.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 #include "nls_swap.hpp"
 
 using namespace std;
@@ -62,7 +62,7 @@ namespace libdar
 	{
 	    case_s = case_sensit;              //< object's field
 	    including = include;               //< object's field
-	    fichier source = filename_list_st; //< where we read data from
+	    fichier_local source = filename_list_st; //< where we read data from
 	    char *buffer = NULL;               //< hold the just read data
 	    static const U_I buf_size = 20480; //< size of buffer: we read at most this number of bytes at a time
 	    list <string> tmp;                 //< list of all raw lines read, without any prefix

@@ -54,7 +54,7 @@ extern "C"
 #include "header.hpp"
 #include "tlv_list.hpp"
 #include "tools.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 using namespace std;
 namespace libdar
@@ -97,7 +97,7 @@ namespace libdar
         magic_number tmp;
 	tlv_list tempo;
 	char extension;
-	fichier *f_fic = dynamic_cast<fichier *>(&f);
+	fichier_local *f_fic = dynamic_cast<fichier_local *>(&f);
 
 	free_pointers();
 	old_header = false;
@@ -241,13 +241,13 @@ namespace libdar
 
     void header::read(user_interaction & dialog, S_I fd, bool lax)
     {
-        fichier fic = fichier(dialog, dup(fd));
+        fichier_local fic = fichier_local(dialog, dup(fd));
         read(dialog, fic, lax);
     }
 
     void header::write(user_interaction & dialog, S_I fd) const
     {
-        fichier fic = fichier(dialog, dup(fd));
+        fichier_local fic = fichier_local(dialog, dup(fd));
         write(dialog, fic);
     }
 

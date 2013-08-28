@@ -73,7 +73,7 @@ extern "C"
 #include "shell_interaction.hpp"
 #include "cygwin_adapt.hpp"
 #include "label.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 static user_interaction *ui = NULL;
 
@@ -170,7 +170,7 @@ static void test()
                 crc *val = NULL;
 		infinint crc_size = 1;
 
-                fichier sortie = fichier(*ui, dup(1));
+                fichier_local sortie = fichier_local(*ui, dup(1));
                 entree->copy_to(sortie, crc_size, val);
 		if(val == NULL)
 		    throw SRC_BUG;

@@ -107,9 +107,9 @@ namespace libdar
 	    /// \param[in] fail_if_exists tells whether the underlying implementation have to fail throwing Erange("exists") if the file already exist when write access is required
 	    /// \param[in] erase tells whether the underlying implementation will empty an existing file before writing to it
 	    /// \param[in] algo defines the hash file to create, other value than hash_none are acceptes only in writeonly mode with erase or fail_if_exist set
-	    /// \param[out] ret points to the newly allocated object. It is the duty of the caller to delete it when no more needed. Note that this argument meaninfull only if the return code is "io_errors::io_ok".
+	    /// \param[out] ret points to the newly allocated object. It is the duty of the caller to delete it when no more needed. Note that this argument is meaninful only if the return code is "io_errors::io_ok".
 	    /// \return the status of the open operation, other problem have to be reported throwing an exception
-	    /// by the caller when no more needed.
+	    /// by the called inherited class
 	io_errors open(user_interaction & dialog,
 		       const std::string & filename,
 		       gf_mode mode,
@@ -118,7 +118,7 @@ namespace libdar
 		       hash_algo algo,
 		       fichier_global * & ret) const;
 
-	    /// routines to read existing files in the current directory
+	    /// routines to read existing files in the current directory (see set_location() / set_root() methods)
 	virtual void read_dir_reset() = 0;
 	virtual bool read_dir_next(std::string & filename) = 0;
 
@@ -148,7 +148,9 @@ namespace libdar
     };
 
 
-	/// the local filesystem entrepot
+	/// implementation for entrepot to access to local filesystem
+	///
+	/// entrepot_local generates objects of class "fichier" inherited class of fichier_global
 
     class entrepot_local : public entrepot
     {

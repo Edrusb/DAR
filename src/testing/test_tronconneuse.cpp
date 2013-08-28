@@ -62,7 +62,7 @@ char *strchr (), *strrchr ();
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"
 #include "macro_tools.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 class test : public tronconneuse
 {
@@ -132,7 +132,7 @@ int main()
 void f1(user_interaction *dialog)
 {
     int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
-    fichier fic = fichier(*dialog, fd);
+    fichier_local fic = fichier_local(*dialog, fd);
 
     test *toto = new test(*dialog, 10, fic);
     if(toto == NULL)
@@ -155,7 +155,7 @@ void f1(user_interaction *dialog)
 void f2(user_interaction *dialog)
 {
     int fd = open("toto", O_RDONLY|O_BINARY);
-    fichier fic = fichier(*dialog, fd);
+    fichier_local fic = fichier_local(*dialog, fd);
 
     test *toto = new test(*dialog, 10, fic);
     if(toto == NULL)
@@ -200,10 +200,10 @@ void f2(user_interaction *dialog)
 void f3(user_interaction *dialog)
 {
     int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0666);
-    fichier foc = fichier(*dialog, fd);
+    fichier_local foc = fichier_local(*dialog, fd);
 
     fd = open("titi", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0666);
-    fichier fic = fichier(*dialog, fd);
+    fichier_local fic = fichier_local(*dialog, fd);
 
     WRITE_TO(foc, "Hello les amis");
     WRITE_TO(fic, "Hello les amis");

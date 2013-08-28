@@ -49,7 +49,7 @@ extern "C"
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"
 #include "macro_tools.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -143,7 +143,7 @@ void f3()
     try
     {
 	int fd = open("toto", O_RDWR|O_TRUNC|O_CREAT|O_BINARY, 0666);
-	fichier fic = fichier(*dialog, fd);
+	fichier_local fic = fichier_local(*dialog, fd);
 	const unsigned int taille = 500;
 	unsigned char buffer[taille];
 	const char *ttt =  "Bonjour les amis comment ça va ? ";

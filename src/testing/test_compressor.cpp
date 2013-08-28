@@ -41,7 +41,7 @@ extern "C"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
 #include "shell_interaction.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 using namespace libdar;
 
@@ -68,12 +68,12 @@ static void f1()
 
     try
     {
-        fichier src1 = fichier(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
-        fichier src2 = fichier(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
-        fichier src3 = fichier(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
-        fichier dst1 = fichier(*ui, ::open("tutu.none", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
-        fichier dst2 = fichier(*ui, ::open("tutu.gz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
-        fichier dst3 = fichier(*ui, ::open("tutu.bz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
+        fichier_local src1 = fichier_local(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
+        fichier_local src2 = fichier_local(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
+        fichier_local src3 = fichier_local(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
+        fichier_local dst1 = fichier_local(*ui, ::open("tutu.none", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
+        fichier_local dst2 = fichier_local(*ui, ::open("tutu.gz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
+        fichier_local dst3 = fichier_local(*ui, ::open("tutu.bz",O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
 
         compressor c1 = compressor(none, dst1);
         compressor c2 = compressor(gzip, dst2);
@@ -113,12 +113,12 @@ static void f1()
 
     try
     {
-        fichier src1 = fichier(*ui, "tutu.none", gf_read_only, tools_octal2int("0777"), false);
-        fichier src2 = fichier(*ui, "tutu.gz", gf_read_only, tools_octal2int("0777"), false);
-        fichier src3 = fichier(*ui, "tutu.bz", gf_read_only, tools_octal2int("0777"), false);
-        fichier dst1 = fichier(*ui, ::open("tutu.none.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
-        fichier dst2 = fichier(*ui, ::open("tutu.gz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
-        fichier dst3 = fichier(*ui, ::open("tutu.bz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
+        fichier_local src1 = fichier_local(*ui, "tutu.none", gf_read_only, tools_octal2int("0777"), false);
+        fichier_local src2 = fichier_local(*ui, "tutu.gz", gf_read_only, tools_octal2int("0777"), false);
+        fichier_local src3 = fichier_local(*ui, "tutu.bz", gf_read_only, tools_octal2int("0777"), false);
+        fichier_local dst1 = fichier_local(*ui, ::open("tutu.none.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
+        fichier_local dst2 = fichier_local(*ui, ::open("tutu.gz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
+        fichier_local dst3 = fichier_local(*ui, ::open("tutu.bz.bak", O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0644));
 
         compressor c1 = compressor(none, src1);
         compressor c2 = compressor(gzip, src2);

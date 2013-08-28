@@ -49,7 +49,7 @@ extern "C"
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"
 #include "macro_tools.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -85,7 +85,7 @@ int main()
 void f1(user_interaction *dialog)
 {
     int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
-    fichier fic = fichier(*dialog, fd);
+    fichier_local fic = fichier_local(*dialog, fd);
     string pass = "bonjour";
     crypto_sym bf = crypto_sym(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish);
     char buffer[100] = "bonjour les amis il fait chaud il fait beau ! ";
@@ -98,7 +98,7 @@ void f1(user_interaction *dialog)
 
 void f2(user_interaction *dialog)
 {
-    fichier fic = fichier(*dialog, "toto", gf_read_only, tools_octal2int("0777"), false);
+    fichier_local fic = fichier_local(*dialog, "toto", gf_read_only, tools_octal2int("0777"), false);
     string pass = "bonjour";
     crypto_sym bf = crypto_sym(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish);
     char buffer[100];

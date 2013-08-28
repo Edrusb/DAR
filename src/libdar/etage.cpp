@@ -78,7 +78,7 @@ extern "C"
 #include "generic_file.hpp"
 #include "cygwin_adapt.hpp"
 #include "user_interaction.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 #define CACHE_DIR_TAG_FILENAME "CACHEDIR.TAG"
 #define CACHE_DIR_TAG_FILENAME_CONTENTS "Signature: 8a477f597d28d172789f06886806bc55"
@@ -194,7 +194,7 @@ namespace libdar
 	else // we need to inspect the few first bytes of the file
 	{
 	    path chem = path(cpath)+string(filename);
-	    fichier fic = fichier(dialog, chem.display(), gf_read_only, tools_octal2int("0777"), false);
+	    fichier_local fic = fichier_local(dialog, chem.display(), gf_read_only, tools_octal2int("0777"), false);
 	    U_I len = strlen(CACHE_DIR_TAG_FILENAME_CONTENTS);
 	    char *buffer = new (nothrow) char[len+1];
 	    S_I lu;

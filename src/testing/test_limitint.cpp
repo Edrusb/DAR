@@ -50,7 +50,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "erreurs.hpp"
 #include "generic_file.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 
 static void routine_limitint(user_interaction & dialog);
@@ -112,7 +112,7 @@ static void routine_limitint(user_interaction & dialog)
 
         try
         {
-            fichier tmp = fichier(dialog, fd);
+            fichier_local tmp = fichier_local(dialog, fd);
             r2.read(tmp);
         }
         catch(Elimitint & e)

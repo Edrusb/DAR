@@ -70,7 +70,7 @@ extern "C"
 #include "defile.hpp"
 #include "pile.hpp"
 #include "sparse_file.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 #include "macro_tools.hpp"
 #include "null_file.hpp"
 
@@ -2069,12 +2069,12 @@ namespace libdar
 
 	    if(status == from_path)
 	    {
-		fichier *tmp = NULL;
+		fichier_local *tmp = NULL;
 		if(mode != normal && mode != plain)
 		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
-		ret = tmp = new (nothrow) fichier(chemin, furtive_read_mode);
+		ret = tmp = new (nothrow) fichier_local(chemin, furtive_read_mode);
 		if(tmp != NULL)
-		    tmp->fadvise(fichier::advise_noreuse);
+		    tmp->fadvise(fichier_global::advise_noreuse);
 		    // yep, Linux does not implement this today, but the given advise is correct in regard
 		    // to the the posix semantic. Other system might behave correctly in regard to this posix
 		    // system call, maybe Linux will in the future, so we are ready.

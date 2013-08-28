@@ -240,7 +240,7 @@ namespace libdar
 	///////////////////////////////////////////////////////////////////////
 
 #include "generic_file.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 #include "user_interaction.hpp"
 
 namespace libdar
@@ -252,7 +252,7 @@ namespace libdar
 
     template <class B> limitint<B>::limitint(user_interaction & dialog, S_I fd)
     {
-	fichier f = fichier(dialog, dup(fd));
+	fichier_local f = fichier_local(dialog, dup(fd));
 	build_from_file(f);
     }
 
@@ -263,7 +263,7 @@ namespace libdar
 
     template <class B> void limitint<B>::dump(user_interaction & dialog, S_I fd) const
     {
-        fichier f = fichier(dialog, dup(fd));
+        fichier_local f = fichier_local(dialog, dup(fd));
         dump(f);
     }
 

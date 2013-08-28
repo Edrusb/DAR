@@ -60,7 +60,7 @@ extern "C"
 #include "generic_file.hpp"
 #include "shell_interaction.hpp"
 #include "cygwin_adapt.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -95,7 +95,7 @@ int main()
 
 void f1()
 {
-    fichier f = fichier(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
+    fichier_local f = fichier_local(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
     cache c = cache(f,
 		    10,
 		    10, 3, 20,
@@ -123,7 +123,7 @@ void f2()
 	printf("%s\n", strerror(errno));
 	return;
     }
-    fichier g = fichier(*ui, fd);
+    fichier_local g = fichier_local(*ui, fd);
     cache c = cache(g,
 		    10,
 		    10, 3, 20,

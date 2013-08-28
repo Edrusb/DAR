@@ -47,7 +47,7 @@ extern "C"
 #include "shell_interaction.hpp"
 #include "user_interaction.hpp"
 #include "macro_tools.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -72,7 +72,7 @@ int main()
 
 static void f1()
 {
-    fichier toto = fichier(*ui, ::open("toto", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644));
+    fichier_local toto = fichier_local(*ui, ::open("toto", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644));
     terminateur term;
 
     infinint grand = 1;

@@ -54,7 +54,7 @@ extern "C"
 #include "integers.hpp"
 #include "shell_interaction.hpp"
 #include "cygwin_adapt.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 using namespace libdar;
 
@@ -76,13 +76,13 @@ void f1()
 	get_version(maj, med, min);
 	string p = "test/source.txt";
 	user_interaction *ui = shell_interaction_init(&cout, &cerr, false);
-	fichier h = fichier(*ui, p, gf_read_only, tools_octal2int("0777"), false);
+	fichier_local h = fichier_local(*ui, p, gf_read_only, tools_octal2int("0777"), false);
 
 	display_read(*ui, h);
 
 	try
 	{
-	    fichier f = fichier(*ui, "test/source.txt", gf_read_only, tools_octal2int("0777"), false);
+	    fichier_local f = fichier_local(*ui, "test/source.txt", gf_read_only, tools_octal2int("0777"), false);
 	    tronc *t;
 
 	    t = new tronc(&f, 0, infinint(10));
@@ -111,7 +111,7 @@ void f1()
 	    S_I fd = ::open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0666);
 	    if(fd < 0)
 		ui->warning(strerror(errno));
-	    fichier g = fichier(*ui, fd);
+	    fichier_local g = fichier_local(*ui, fd);
 	    f.skip(0);
 	    f.copy_to(g);
 	    t = new tronc(&g, 10, infinint(10));
@@ -165,7 +165,7 @@ void f2()
 
 	try
 	{
-	    fichier f = fichier(*ui, "test/source.txt", gf_read_only, tools_octal2int("0777"), false);
+	    fichier_local f = fichier_local(*ui, "test/source.txt", gf_read_only, tools_octal2int("0777"), false);
 	    tronc *t;
 
 	    t = new tronc(&f, 1);
@@ -202,7 +202,7 @@ void f2()
 	    S_I fd = ::open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0666);
 	    if(fd < 0)
 		ui->warning(strerror(errno));
-	    fichier g = fichier(*ui, fd);
+	    fichier_local g = fichier_local(*ui, fd);
 	    g.skip(0);
 	    display_read(*ui, g);
 

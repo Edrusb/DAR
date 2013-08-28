@@ -65,7 +65,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "no_comment.hpp"
 #include "line_tools.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 #include "deci.hpp"
 
 using namespace libdar;
@@ -1258,7 +1258,7 @@ static void op_batch(user_interaction & dialog, database *dat, const string & fi
     if(fd < 0)
 	throw Erange("op_batch", tools_printf(gettext("Cannot open file %S : %s"), &filename, strerror(errno)));
 
-    fichier batch_file = fichier(dialog, fd); // the object batch_file will close fd upon destructor call.
+    fichier_local batch_file = fichier_local(dialog, fd); // the object batch_file will close fd upon destructor call.
 
     no_comment proper = no_comment(batch_file); // removing the comments from file
 

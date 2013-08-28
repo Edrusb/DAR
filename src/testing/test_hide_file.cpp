@@ -34,7 +34,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "shell_interaction.hpp"
 #include "user_interaction.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 using namespace libdar;
 
@@ -59,10 +59,10 @@ int main()
 
 void f1()
 {
-    fichier src = fichier(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
+    fichier_local src = fichier_local(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
     no_comment strip = no_comment(src);
     int fd = ::open("titi", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
-    fichier dst = fichier(*ui, fd);
+    fichier_local dst = fichier_local(*ui, fd);
 
     strip.copy_to(dst);
 }
@@ -75,11 +75,11 @@ void f2()
     cibles.push_back("all");
     cibles.push_back("default");
 
-    fichier src = fichier(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
+    fichier_local src = fichier_local(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
     config_file strip = config_file(cibles, src);
 
     int fd = ::open("tutu", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
-    fichier dst = fichier(*ui, fd);
+    fichier_local dst = fichier_local(*ui, fd);
 
     strip.copy_to(dst);
 }

@@ -115,7 +115,7 @@ char *strchr (), *strrchr ();
 #include "catalogue.hpp"
 #include "ea_filesystem.hpp"
 #include "cygwin_adapt.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 #ifndef UNIX_PATH_MAX
 #define UNIX_PATH_MAX 108
@@ -1062,11 +1062,11 @@ namespace libdar
 		    ret = ::open(name, O_WRONLY|O_CREAT|O_BINARY, 0700); // minimum permissions
 		    if(ret >= 0)
 		    {
-			fichier dest = fichier(get_ui(), ret);
+			fichier_local dest = fichier_local(get_ui(), ret);
 			    // telling to the system to write data directly to disk not going through the cache
-			dest.fadvise(fichier::advise_dontneed);
+			dest.fadvise(fichier_global::advise_dontneed);
 			    // the implicit destruction of dest (exiting the block)
-			    // will close the 'ret' file descriptor (see ~fichier())
+			    // will close the 'ret' file descriptor (see ~fichier_local())
 			ou = ref_fil->get_data(file::normal);
 
 			try

@@ -42,7 +42,7 @@ extern "C"
 #include "erreurs.hpp"
 #include "generic_file.hpp"
 #include "tools.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 namespace libdar
 {
@@ -52,7 +52,7 @@ namespace libdar
 
     infinint::infinint(user_interaction & dialog, S_I fd)
     {
-	fichier f = fichier(dialog, dup(fd));
+	fichier_local f = fichier_local(dialog, dup(fd));
 	build_from_file(f);
     }
 
@@ -64,7 +64,7 @@ namespace libdar
 
     void infinint::dump(user_interaction & dialog, S_I fd) const
     {
-        fichier f = fichier(dialog, dup(fd));
+        fichier_local f = fichier_local(dialog, dup(fd));
         dump(f);
     }
 

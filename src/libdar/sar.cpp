@@ -581,7 +581,7 @@ namespace libdar
 		}
 	    }
 	    of_fd->fsync();
-	    of_fd->fadvise(fichier::advise_dontneed);
+	    of_fd->fadvise(fichier_global::advise_dontneed);
 		// well this two previous lines are for Linux
 		// which has a strange implementation of the fadvise posix routine:
 		// this two calls should clear the current slice from the cache under Linux.
@@ -634,7 +634,7 @@ namespace libdar
 	    case entrepot::io_ok:
 		if(of_fd == NULL)
 		    throw SRC_BUG;
-		of_fd->fadvise(fichier::advise_normal);
+		of_fd->fadvise(fichier_global::advise_normal);
 		    // we have no advise to give to the system when reading a slice
 		size_of_current = of_fd->get_size();
 		break;
@@ -1034,7 +1034,7 @@ namespace libdar
 	    header h;
 
 		// telling the system to write data directly to disk not going through the cache
-	    of_fd->fadvise(fichier::advise_dontneed);
+	    of_fd->fadvise(fichier_global::advise_dontneed);
 		// useless under Linux, because the corresponding implementation does not avoid the
 		// generated data to pass out of the cache. Maybe some other system can prevent the data
 		// from filling the cache ... so we keep it here in respect to the posix semantic
@@ -1437,7 +1437,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 		throw SRC_BUG;
 
 		// telling the system to write data directly to disk not going through the cache
-	    tmp->fadvise(fichier::advise_dontneed);
+	    tmp->fadvise(fichier_global::advise_dontneed);
 		// useless under Linux, because the corresponding implementation does not avoid the
 		// generated data to pass out of the cache. Maybe some other system can prevent the data
 		// from filling the cache ... so we keep it here in respect to the posix semantic

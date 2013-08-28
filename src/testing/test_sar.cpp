@@ -29,7 +29,7 @@
 #include "integers.hpp"
 #include "shell_interaction.hpp"
 #include "libdar.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 #include "entrepot.hpp"
 
 using namespace libdar;
@@ -67,7 +67,7 @@ static void f1()
     try
     {
 	sar sar1 = sar(*ui, "destination", "txt", 100, 110, true, false, 0, where, data_name, hash_none, false, 0);
-        fichier src = fichier(*ui, "./test/source.txt", gf_read_only, tools_octal2int("0777"), false);
+        fichier_local src = fichier_local(*ui, "./test/source.txt", gf_read_only, tools_octal2int("0777"), false);
         src.copy_to(sar1);
     }
     catch(Egeneric &e)
@@ -83,7 +83,7 @@ static void f2()
     try
     {
         sar sar2 = sar(*ui, "destination", "txt", where, 0, false);
-        fichier dst = fichier(*ui, "./test/destination.txt", gf_write_only, tools_octal2int("0777"), false);
+        fichier_local dst = fichier_local(*ui, "./test/destination.txt", gf_write_only, tools_octal2int("0777"), false);
 
         sar2.copy_to(dst);
     }
@@ -101,7 +101,7 @@ static void f3()
     try
     {
         sar sar3 = sar(*ui, "destination", "txt", where, 0, false);
-        fichier src = fichier(*ui, "./test/source.txt", gf_read_only, tools_octal2int("0777"), false);
+        fichier_local src = fichier_local(*ui, "./test/source.txt", gf_read_only, tools_octal2int("0777"), false);
 
         display(sar3.get_position());
         display(src.get_position());

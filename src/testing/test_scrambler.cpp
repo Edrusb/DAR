@@ -34,7 +34,7 @@ extern "C"
 #include "dar_suite.hpp"
 #include "generic_file.hpp"
 #include "integers.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 #include "tools.hpp"
 
 using namespace libdar;
@@ -59,8 +59,8 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
         return EXIT_SYNTAX;
     }
 
-    fichier *src = new fichier(dialog, argv[1], gf_read_only, tools_octal2int("0777"), false);
-    fichier *dst = new fichier(dialog, argv[2], gf_write_only, tools_octal2int("0777"), false);
+    fichier_local *src = new fichier_local(dialog, argv[1], gf_read_only, tools_octal2int("0777"), false);
+    fichier_local *dst = new fichier_local(dialog, argv[2], gf_write_only, tools_octal2int("0777"), false);
     std::string pass = "bonjour";
     scrambler *scr = new scrambler(secu_string(pass.c_str(), pass.size()), *dst);
 
@@ -70,9 +70,9 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
     delete dst; dst = NULL;
     delete src; src = NULL;
 
-    src = new fichier(dialog, argv[2], gf_read_only, tools_octal2int("0777"), false);
+    src = new fichier_local(dialog, argv[2], gf_read_only, tools_octal2int("0777"), false);
     scr = new scrambler(secu_string(pass.c_str(), pass.size()), *src);
-    dst = new fichier(dialog, argv[3], gf_write_only, tools_octal2int("0777"), false);
+    dst = new fichier_local(dialog, argv[3], gf_write_only, tools_octal2int("0777"), false);
 
     scr->copy_to(*dst);
 

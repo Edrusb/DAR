@@ -88,7 +88,7 @@ extern "C"
 #include "mask_list.hpp"
 #include "crit_action_cmd_line.hpp"
 #include "criterium.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 #include "libdar_4_4.hpp"
 
 #define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:<:>:=:"
@@ -2156,7 +2156,7 @@ static void make_args_from_file(user_interaction & dialog, operation op, const v
     if(fd < 0)
         throw Erange("make_args_from_file", tools_printf(gettext("Cannot open file %S : %s"), &filename, strerror(errno)));
 
-    fichier conf = fichier(dialog, fd); // the object conf will close fd
+    fichier_local conf = fichier_local(dialog, fd); // the object conf will close fd
 
         ////////
         // removing the comments from file

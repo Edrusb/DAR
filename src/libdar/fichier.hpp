@@ -20,9 +20,11 @@
 /*********************************************************************/
 
     /// \file fichier.hpp
-    /// \brief class fichier_global and class fichier definition. This is a full implementation of a generic_file
-    /// applied to a plain file. class fichier_global is an virtual class independent of the location (see class entrepot),
-    /// while class fichier is an complete inherited implementation of fichier_global class for the local filesystem location (entrepot)
+    /// \brief class fichier_global definition. This class is a pure virtual class
+    /// class fichier_global is an abstraction of files objects whetever is their localisation
+    /// like local filesystem, remote ftp server, etc. inherited classes (like fichier_local)
+    /// provide full implementation
+
     /// \ingroup Private
 
 #ifndef FICHIER_HPP
@@ -140,74 +142,6 @@ namespace libdar
 	void detruit() { if(x_dialog != NULL) { delete x_dialog; x_dialog = NULL; } };
     };
 
-
-	///////////////////
-
-    class fichier : public fichier_global
-    {
-    public :
-
-	    // constructors
-        fichier(user_interaction & dialog, S_I fd);
-        fichier(user_interaction & dialog, const char *name, gf_mode m, U_I mode, bool furtive_mode);
-        fichier(user_interaction & dialog, const std::string & chemin, gf_mode m, U_I mode, bool furtive_mode);
-	fichier(const std::string & chemin, bool furtive_mode = false); // builds a read-only object
-	fichier(const fichier & ref) : fichier_global(ref) { copy_from(ref); };
-
-	    // assignment operator
-	const fichier & operator = (const fichier & ref) { detruit(); copy_parent_from(ref); copy_from(ref); return *this; };
-
-	    // destructor
-	~fichier() { detruit(); };
-
-
-	    /// set the ownership of the file
-	virtual void change_ownership(const std::string & user, const std::string & group);
-
-	    /// change the permission of the file
-	virtual void change_permission(U_I perm);
-
-	    /// return the size of the file
-        infinint get_size() const;
-
-	    /// set posix_fadvise for the whole file
-	void fadvise(advise adv) const;
-
-	    /// sync the data to disk
-
-	    /// this is necessary under Linux for better efficiency
-	    /// before calling fadvise(advise_dontneed) else write pending blocks
-	    /// would stay in the cache more time than necessary
-	void fsync() const;
-
-            // inherited from generic_file
-        bool skip(const infinint & pos);
-        bool skip_to_eof();
-        bool skip_relative(S_I x);
-        infinint get_position();
-
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(fichier);
-#endif
-    protected :
-
-	    // inherited from generic_file grand-parent class
-	void inherited_sync_write() {};
-	void inherited_terminate() {};
-
-	    // inherited from fichier_global parent class
-	U_I fichier_global_inherited_write(const char *a, U_I size);
-        bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message);
-
-    private :
-        S_I filedesc;
-
-        void open(const char *name, gf_mode m,  U_I perm, bool furtive_mode);
-	void copy_from(const fichier & ref);
-	void copy_parent_from(const fichier & ref);
-	void detruit() { close(filedesc); filedesc = -1; };
-	int advise_to_int(advise arg) const;
-    };
 
 	/// @}
 
