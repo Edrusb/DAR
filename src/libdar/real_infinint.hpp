@@ -82,7 +82,6 @@ namespace libdar
 	{ copy_from(ref); }
 
 	    // read an infinint from a file
-	infinint(user_interaction & dialog, S_I fd);
 	infinint(generic_file & x);
 
         ~infinint()
@@ -91,7 +90,6 @@ namespace libdar
         const infinint & operator = (const infinint & ref)
 	{ detruit(); copy_from(ref); return *this; };
 
-        void dump(user_interaction & dialog, int fd) const; // write byte sequence to file
         void dump(generic_file &x) const; // write byte sequence to file
         void read(generic_file &f) { detruit(); build_from_file(f); };
 

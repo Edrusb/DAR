@@ -58,9 +58,11 @@ static void routine_real_infinint(user_interaction & dialog);
 
 using namespace libdar;
 
+user_interaction *ui = NULL;
+
 int main()
 {
-    user_interaction *ui = shell_interaction_init(&cout, &cerr, false);
+    ui = shell_interaction_init(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
 
@@ -80,21 +82,15 @@ int main()
 
 static void routine_real_infinint(user_interaction & dialog)
 {
-    int fd = ::open("toto", O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0644);
+    fichier_local fic = fichier_local(*ui, "toto", gf_read_write, 0644, false);
+    infinint r1 = 1;
 
-    if(fd >= 0)
-    {
-        infinint r1 = 1;
+    r1 <<= 32;
+    r1--;
 
-        r1 <<= 32;
-        r1--;
-
-        r1.dump(dialog, fd);
-        r1++;
-        r1.dump(dialog, fd);
-
-        close(fd);
-    }
+    r1.dump(fic);
+    r1++;
+    r1.dump(fic);
 }
 
 static void routine_limitint(user_interaction & dialog)
@@ -104,22 +100,11 @@ static void routine_limitint(user_interaction & dialog)
         //
         //
 
-    int fd = ::open("toto", O_RDONLY | O_BINARY);
-    if(fd > 0)
-    {
-        infinint r1 = infinint(dialog, fd);
-        infinint r2;
+    fichier_local fic = fichier_local("toto", false);
+    infinint r1 = infinint(fic);
+    infinint r2;
 
-        try
-        {
-            fichier_local tmp = fichier_local(dialog, fd);
-            r2.read(tmp);
-        }
-        catch(Elimitint & e)
-        {
-            dialog.warning(e.get_message());
-        }
-    }
+    r2.read(fic);
 
     U_32 twopower32_1 = ~0;
     U_32 twopower31 = 1 << 31;

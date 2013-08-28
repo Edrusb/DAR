@@ -80,8 +80,6 @@ namespace libdar
 
         void read(user_interaction & ui, generic_file & f, bool lax = false );
         void write(user_interaction &, generic_file & f) const;
-        void read(user_interaction & dialog, S_I fd, bool lax = false);
-        void write(user_interaction & dialog, S_I fd) const;
 
 	    /// minimal size of a header in an archive
 

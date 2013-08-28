@@ -107,10 +107,8 @@ namespace libdar
 #endif
 
 	    // read an limitint from a file
-        limitint(user_interaction & dialog, S_I fd);
 	limitint(generic_file & x);
 
-        void dump(user_interaction & dialog, S_I fd) const; // write byte sequence to file
         void dump(generic_file &x) const; // write byte sequence to file
         void read(generic_file &f) { build_from_file(f); };
 
@@ -240,7 +238,6 @@ namespace libdar
 	///////////////////////////////////////////////////////////////////////
 
 #include "generic_file.hpp"
-#include "fichier_local.hpp"
 #include "user_interaction.hpp"
 
 namespace libdar
@@ -249,23 +246,11 @@ namespace libdar
     template <class B> typename limitint<B>::endian limitint<B>::used_endian = not_initialized;
 
 
-
-    template <class B> limitint<B>::limitint(user_interaction & dialog, S_I fd)
-    {
-	fichier_local f = fichier_local(dialog, dup(fd));
-	build_from_file(f);
-    }
-
     template <class B> limitint<B>::limitint(generic_file & x)
     {
 	build_from_file(x);
     }
 
-    template <class B> void limitint<B>::dump(user_interaction & dialog, S_I fd) const
-    {
-        fichier_local f = fichier_local(dialog, dup(fd));
-        dump(f);
-    }
 
     template <class B> void limitint<B>::build_from_file(generic_file & x)
     {

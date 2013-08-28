@@ -50,6 +50,7 @@ extern "C"
 #include "macro_tools.hpp"
 #include "shell_interaction.hpp"
 #include "generic_file.hpp"
+#include "fichier_local.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -86,21 +87,22 @@ static void routine1()
 
     ui->warning(d1.human() + " " + d2.human() + " " + d3.human());
 
-    S_I fd = ::open("toto", O_RDWR | O_CREAT | O_TRUNC | O_BINARY, 0644);
-    if(fd >= 0)
-    {
-        f1.dump(*ui, fd);
-        close(fd);
-        fd = ::open("toto", O_RDONLY|O_BINARY);
-        if(fd >= 0)
-        {
-            f3 = infinint(*ui, fd);
-            d3 = deci(f3);
-            ui->warning(d3.human());
-        }
-        close(fd);
-        fd = -1;
-    }
+    fichier_local *fic = new (nothrow) fichier_local(*ui, "toto", gf_write_only, 0600, false);
+    if(fic == NULL)
+	throw Ememory("routine1");
+    f1.dump(*fic);
+    delete fic;
+    fic = NULL;
+
+    fic = new (nothrow) fichier_local("toto", false);
+    if(fic == NULL)
+	throw Ememory("routine1");
+
+    f3 = infinint(*fic);
+    d3 = deci(f3);
+    ui->warning(d3.human());
+    delete fic;
+    fic = NULL;
 
     f1 += 3;
     d1 = deci(f1);

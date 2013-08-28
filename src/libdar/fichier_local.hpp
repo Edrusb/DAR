@@ -60,8 +60,8 @@ namespace libdar
 
 	    // constructors
         fichier_local(user_interaction & dialog, S_I fd);
-        fichier_local(user_interaction & dialog, const char *name, gf_mode m, U_I mode, bool furtive_mode);
-        fichier_local(user_interaction & dialog, const std::string & chemin, gf_mode m, U_I mode, bool furtive_mode);
+        fichier_local(user_interaction & dialog, const char *name, gf_mode m, U_I perm, bool furtive_mode);
+        fichier_local(user_interaction & dialog, const std::string & chemin, gf_mode m, U_I perm, bool furtive_mode);
 	fichier_local(const std::string & chemin, bool furtive_mode = false); // builds a read-only object
 	fichier_local(const fichier_local & ref) : fichier_global(ref) { copy_from(ref); };
 

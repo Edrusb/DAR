@@ -102,19 +102,20 @@ namespace libdar
         filedesc = fd;
     }
 
-    fichier_local::fichier_local(user_interaction & dialog, const char *name,
-		     gf_mode m,
-		     U_I perm,
-		     bool furtive_mode) : fichier_global(dialog, m)
+    fichier_local::fichier_local(user_interaction & dialog,
+				 const char *name,
+				 gf_mode m,
+				 U_I perm,
+				 bool furtive_mode) : fichier_global(dialog, m)
     {
         fichier_local::open(name, m, perm, furtive_mode);
     }
 
     fichier_local::fichier_local(user_interaction & dialog,
-		     const string &chemin,
-		     gf_mode m,
-		     U_I perm,
-		     bool furtive_mode) : fichier_global(dialog, m)
+				 const string &chemin,
+				 gf_mode m,
+				 U_I perm,
+				 bool furtive_mode) : fichier_global(dialog, m)
     {
         fichier_local::open(chemin.c_str(), m, perm, furtive_mode);
     }

@@ -54,7 +54,7 @@ extern "C"
 #include "header.hpp"
 #include "tlv_list.hpp"
 #include "tools.hpp"
-#include "fichier_local.hpp"
+#include "fichier.hpp"
 
 using namespace std;
 namespace libdar
@@ -97,7 +97,7 @@ namespace libdar
         magic_number tmp;
 	tlv_list tempo;
 	char extension;
-	fichier_local *f_fic = dynamic_cast<fichier_local *>(&f);
+	fichier_global *f_fic = dynamic_cast<fichier_global *>(&f);
 
 	free_pointers();
 	old_header = false;
@@ -237,18 +237,6 @@ namespace libdar
 	    f.write(tmp_ext, 1); // since release 2.4.0, tlv is always used to store optional information
 	    build_tlv_list(ui).dump(f);
 	}
-    }
-
-    void header::read(user_interaction & dialog, S_I fd, bool lax)
-    {
-        fichier_local fic = fichier_local(dialog, dup(fd));
-        read(dialog, fic, lax);
-    }
-
-    void header::write(user_interaction & dialog, S_I fd) const
-    {
-        fichier_local fic = fichier_local(dialog, dup(fd));
-        write(dialog, fic);
     }
 
     bool header::get_first_slice_size(infinint & size) const

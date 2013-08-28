@@ -42,7 +42,6 @@ extern "C"
 #include "erreurs.hpp"
 #include "generic_file.hpp"
 #include "tools.hpp"
-#include "fichier_local.hpp"
 
 namespace libdar
 {
@@ -50,22 +49,9 @@ namespace libdar
     infinint::endian infinint::used_endian = not_initialized;
     U_8 infinint::zeroed_field[ZEROED_SIZE];
 
-    infinint::infinint(user_interaction & dialog, S_I fd)
-    {
-	fichier_local f = fichier_local(dialog, dup(fd));
-	build_from_file(f);
-    }
-
     infinint::infinint(generic_file & x)
     {
 	build_from_file(x);
-    }
-
-
-    void infinint::dump(user_interaction & dialog, S_I fd) const
-    {
-        fichier_local f = fichier_local(dialog, dup(fd));
-        dump(f);
     }
 
     void infinint::build_from_file(generic_file & x)
