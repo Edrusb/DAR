@@ -24,18 +24,15 @@
 
 
     /// \file entrepot.hpp
-    /// \brief defines the entrepot interface and the entrepot_local inherited class
-    /// entrepot interface defines a generic way to interact with files (slices)
-    /// on a filesystem. It is used to instanciate file-like objects in order
-    /// to read or write data to such file.
-    /// The entrepot_local is the only implementation of a entrepot interface
-    /// it correspond to local filesystems. The reason of existence of the entrepot
-    /// stuff is to allow external application like webdar to drop/read slices over
-    /// the network using FTP protocol for example. External applications only define
-    /// Their own implementation of the entrepot interface and file-like objects they
-    /// generates, libdar uses them throught the generic interface. This avoids having
-    /// network related stuff inside libdar, which for security reason and function
-    /// separation is not wanted.
+    /// \brief defines the entrepot interface.
+    /// Entrepot interface defines a generic way to interact with files (slices)
+    /// on a filesystem. It is used to instanciate file-like objects (from class inherited
+    /// from class fichier_global, in order to read or write data to such file.
+    /// The entrepot_local and fichier_local classes are the only one classes
+    /// available from libdar to implement the entrepot and fichier classes interfaces
+    /// respectively. External applications like webdar can implement entrepot_ftp
+    /// and fichier_ftp classes to provide transparent access to dar backup localted on a
+    /// remote ftp server. More can follow in the future.
 
     /// \ingroup Private
 
@@ -145,45 +142,6 @@ namespace libdar
 	std::string user;
 	std::string group;
 	std::string perm;
-    };
-
-
-	/// implementation for entrepot to access to local filesystem
-	///
-	/// entrepot_local generates objects of class "fichier" inherited class of fichier_global
-
-    class entrepot_local : public entrepot
-    {
-    public:
-	entrepot_local(const std::string & perm, const std::string & user, const std::string & group, bool x_furtive_mode);
-	entrepot_local(const entrepot_local & ref): entrepot(ref) { copy_from(ref); };
-	entrepot_local & operator = (const entrepot_local & ref);
-	~entrepot_local() { detruit(); };
-
-	std::string get_url() const { return std::string("file://") + get_full_path().display(); };
-
-	void read_dir_reset();
-	bool read_dir_next(std::string & filename);
-
-	entrepot *clone() const { return new (std::nothrow) entrepot_local(*this); };
-
-    protected:
-	io_errors inherited_open(user_interaction & dialog,
-				 const std::string & filename,
-				 gf_mode mode,
-				 bool fail_if_exists,
-				 bool erase,
-				 fichier_global * & ret) const;
-
-	void inherited_unlink(const std::string & filename) const;
-	void read_dir_flush() { detruit(); };
-
-    private:
-	bool furtive_mode;
-	etage *contents;
-
-	void copy_from(const entrepot_local & ref) { furtive_mode = ref.furtive_mode; contents = NULL; };
-	void detruit() { if(contents != NULL) { delete contents; contents = NULL; } };
     };
 
 	/// @}

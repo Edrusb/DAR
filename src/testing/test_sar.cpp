@@ -30,7 +30,7 @@
 #include "shell_interaction.hpp"
 #include "libdar.hpp"
 #include "fichier_local.hpp"
-#include "entrepot.hpp"
+#include "entrepot_local.hpp"
 
 using namespace libdar;
 

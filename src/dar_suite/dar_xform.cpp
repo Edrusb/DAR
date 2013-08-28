@@ -49,7 +49,7 @@ extern "C"
 #include "thread_cancellation.hpp"
 #include "header.hpp"
 #include "line_tools.hpp"
-#include "entrepot.hpp"
+#include "entrepot_local.hpp"
 
 using namespace libdar;
 

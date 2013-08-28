@@ -52,6 +52,7 @@ extern "C"
 #include "erreurs_ext.hpp"
 #include "cache.hpp"
 #include "entrepot.hpp"
+#include "entrepot_local.hpp"
 
 #define GLOBAL_ELASTIC_BUFFER_SIZE 10240
 

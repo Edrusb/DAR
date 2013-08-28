@@ -32,7 +32,7 @@ extern "C"
 #include "escape.hpp"
 #include "cygwin_adapt.hpp"
 #include "shell_interaction.hpp"
-#include "fichier.hpp"
+#include "fichier_local.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -58,7 +58,7 @@ int main()
 void f1()
 {
     set<escape::sequence_type> nojump;
-    fichier below = fichier(*ui, "escape_below", gf_write_only, tools_octal2int("0777"), false);
+    fichier_local below = fichier_local(*ui, "escape_below", gf_write_only, tools_octal2int("0777"), false);
     escape tested = escape(&below, nojump);
 
     const char *seq1 = "bonjour les amis";
@@ -82,7 +82,7 @@ void f2()
     set<escape::sequence_type> nojump;
     const U_I buf_size = 100;
     unsigned char buffer[buf_size];
-    fichier below = fichier(*ui, "escape_below", gf_read_only, tools_octal2int("0777"), false);
+    fichier_local below = fichier_local(*ui, "escape_below", gf_read_only, tools_octal2int("0777"), false);
     escape tested = escape(&below, nojump);
     S_I lu = 0;
 

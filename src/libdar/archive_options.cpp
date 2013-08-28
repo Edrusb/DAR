@@ -24,6 +24,7 @@
 #include <new>
 
 #include "archive_options.hpp"
+#include "entrepot_local.hpp"
 
 using namespace std;
 

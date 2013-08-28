@@ -64,7 +64,7 @@ char *strchr (), *strrchr ();
 #include "libdar.hpp"
 #include "shell_interaction.hpp"
 #include "line_tools.hpp"
-#include "entrepot.hpp"
+#include "entrepot_local.hpp"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define OPT_STRING "i:o:hVE:Qj"
