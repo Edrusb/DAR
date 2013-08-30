@@ -361,8 +361,6 @@ namespace libdar
 				bool display_skipped,
 				const infinint & fixed_date,
 				const std::string & slice_permission,
-				const std::string & slice_user_ownership,
-				const std::string & slice_group_ownership,
 				const infinint & repeat_count,
 				const infinint & repeat_byte,
 				bool add_marks_for_sequential_reading,
@@ -417,8 +415,6 @@ namespace libdar
 			      bool keep_compressed,             //< keep file compressed when merging
 			      const infinint & fixed_date,      //< whether to ignore any archive of reference and only save file which modification is more recent that the given "fixed_date" date
 			      const std::string & slice_permission,      //< permissions of slices that will be created
-			      const std::string & slice_user_ownership,  //< user ownership of slices that will be created
-			      const std::string & slice_group_ownership, //< group ownership of slices that will be created
 			      const infinint & repeat_count,             //< max number of retry to save a file that have changed while it was read for backup
 			      const infinint & repeat_byte,              //< max amount of wasted data used to save a file that have changed while it was read for backup
 			      bool decremental,                          //< in the merging context only, whether to build a decremental backup from the two archives of reference

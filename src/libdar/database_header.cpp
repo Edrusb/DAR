@@ -80,31 +80,32 @@ namespace libdar
 	generic_file *ret = NULL;
 
 	struct stat buf;
-	S_I fd;
 	database_header h;
 	compressor *comp;
 
 	if(stat(filename.c_str(), &buf) >= 0 && !overwrite)
 	    throw Erange("database_header_create", gettext("Cannot create database, file exists"));
-	fd = ::open(filename.c_str(), O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0666);
-	if(fd < 0)
-	    throw Erange("database_header_create", tools_printf(gettext("Cannot create database %S : %s"), &filename, strerror(errno)));
-	ret = new (nothrow) fichier_local(dialog, fd);
+	ret = new (nothrow) fichier_local(dialog, filename, gf_write_only, 0666, true, true, false);
 	if(ret == NULL)
+	    throw Ememory("database_header_create");
+
+	try
 	{
-	    close(fd);
-	    throw Ememory("database_header_create");
+	    h.version = database_version;
+	    h.options = HEADER_OPTION_NONE;
+	    h.write(*ret);
+
+	    comp = new (nothrow) compressor(gzip, ret); // upon success, ret is owned by compr
+	    if(comp == NULL)
+		throw Ememory("database_header_create");
+	    else
+		ret = comp;
 	}
-
-	h.version = database_version;
-	h.options = HEADER_OPTION_NONE;
-	h.write(*ret);
-
-	comp = new (nothrow) compressor(gzip, ret); // upon success, ret is owned by compr
-	if(comp == NULL)
-	    throw Ememory("database_header_create");
-	else
-	    ret = comp;
+	catch(...)
+	{
+	    delete ret;
+	    throw;
+	}
 
 	return ret;
     }
@@ -120,7 +121,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new (nothrow) fichier_local(dialog, filename.c_str(), gf_read_only, tools_octal2int("0777"), false);
+		ret = new (nothrow) fichier_local(filename, false);
 	    }
 	    catch(Erange & e)
 	    {
@@ -128,6 +129,7 @@ namespace libdar
 	    }
 	    if(ret == NULL)
 		throw Ememory("database_header_open");
+
 	    h.read(*ret);
 	    if(h.version > database_version)
 		throw Erange("database_header_open", gettext("The format version of this database is too high for that software version, use a more recent software to read or modify this database"));

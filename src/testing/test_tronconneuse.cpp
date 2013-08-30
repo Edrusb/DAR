@@ -131,8 +131,7 @@ int main()
 
 void f1(user_interaction *dialog)
 {
-    int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
-    fichier_local fic = fichier_local(*dialog, fd);
+    fichier_local fic = fichier_local(*dialog, "toto", gf_write_only, 0666, false, true, false);
 
     test *toto = new test(*dialog, 10, fic);
     if(toto == NULL)
@@ -154,8 +153,7 @@ void f1(user_interaction *dialog)
 
 void f2(user_interaction *dialog)
 {
-    int fd = open("toto", O_RDONLY|O_BINARY);
-    fichier_local fic = fichier_local(*dialog, fd);
+    fichier_local fic = fichier_local(*dialog, "toto", gf_read_only, 0666, false, false, false);
 
     test *toto = new test(*dialog, 10, fic);
     if(toto == NULL)
@@ -199,11 +197,8 @@ void f2(user_interaction *dialog)
 
 void f3(user_interaction *dialog)
 {
-    int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0666);
-    fichier_local foc = fichier_local(*dialog, fd);
-
-    fd = open("titi", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0666);
-    fichier_local fic = fichier_local(*dialog, fd);
+    fichier_local foc = fichier_local(*dialog, "toto", gf_write_only, 0666, false, false, false);
+    fichier_local fic = fichier_local(*dialog, "titi", gf_write_only, 0666, false, true, false);
 
     WRITE_TO(foc, "Hello les amis");
     WRITE_TO(fic, "Hello les amis");

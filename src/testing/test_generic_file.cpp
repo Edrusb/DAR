@@ -68,14 +68,14 @@ int main(S_I argc, char *argv[])
         return -1;
     }
 
-    fichier_local f1 = fichier_local(*ui, argv[1], gf_read_only, tools_octal2int("0777"), false);
+    fichier_local f1 = fichier_local(*ui, argv[1], gf_read_only, 0, false, false, false);
     S_I fd = ::open(argv[2], O_WRONLY|O_CREAT|O_TRUNC|O_BINARY);
     if(fd < 0)
     {
         cout << "cannot open "<< argv[2] << endl;
         return -1;
     }
-    fichier_local f2 = fichier_local(*ui, fd);
+    fichier_local f2 = fichier_local(*ui, argv[2], gf_write_only, 0666, false, true, false);
 
     f1.reset_crc(crc::OLD_CRC_SIZE);
     f2.reset_crc(crc::OLD_CRC_SIZE);

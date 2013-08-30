@@ -91,8 +91,8 @@ void f1()
     unlink(FIC2);
     try
     {
-        fichier_local *dump = new fichier_local(*ui, FIC1, gf_read_write, tools_octal2int("0644"), false);
-        fichier_local *dump2 = new fichier_local(*ui, FIC2, gf_write_only, tools_octal2int("0777"), false);
+        fichier_local *dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, false, false);
+        fichier_local *dump2 = new fichier_local(*ui, FIC2, gf_write_only, 0777, false, true, false);
 	std::map <infinint, etoile *> corres;
 
         eod *v_eod = new eod();
@@ -149,7 +149,7 @@ void f1()
         unlink(FIC2);
 
         stats.clear();
-        dump = new fichier_local(*ui, FIC1, gf_read_write, tools_octal2int("0644"), false);
+        dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
         v_dir->dump(*dump, false);
         dump->skip(0);
         ref = entree::read(*ui, *dump, macro_tools_supported_version, stats, corres, none, dump, dump, false, false, NULL);
@@ -220,7 +220,7 @@ void f2()
         }
 
         unlink(FIC1);
-        fichier_local f = fichier_local(*ui, FIC1, gf_read_write, tools_octal2int("0644"), false);
+        fichier_local f = fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
 
         cat.dump(f);
         f.skip(0);

@@ -82,7 +82,6 @@ namespace libdar
     };
 
 
-    extern gf_mode generic_file_get_mode(S_I fd);
     extern const char * generic_file_get_name(gf_mode mode);
 
 	/// this is the interface class from which all other data transfer classes inherit

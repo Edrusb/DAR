@@ -55,7 +55,6 @@ namespace libdar
     {
 	user = "";
 	group = "";
-	perm = "";
     }
 
     void entrepot::set_location(const path & chemin)
@@ -78,6 +77,8 @@ namespace libdar
     entrepot::io_errors entrepot::open(user_interaction & dialog,
 				       const std::string & filename,
 				       gf_mode mode,
+				       bool force_permission,
+				       U_I permission,
 				       bool fail_if_exists,
 				       bool erase,
 				       hash_algo algo,
@@ -94,6 +95,8 @@ namespace libdar
 	code = inherited_open(dialog,
 			      filename,
 			      mode,
+			      force_permission,
+			      permission,
 			      fail_if_exists,
 			      erase,
 			      data);
@@ -117,8 +120,10 @@ namespace libdar
 			    code = inherited_open(dialog,
 						  filename+"."+hash_algo_to_string(algo),
 						  gf_write_only,
-						  false,
-						  true,
+						  force_permission,
+						  permission,
+						  fail_if_exists,
+						  erase,
 						  hash_file);
 
 			    switch(code)

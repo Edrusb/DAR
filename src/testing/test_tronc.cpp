@@ -76,13 +76,13 @@ void f1()
 	get_version(maj, med, min);
 	string p = "test/source.txt";
 	user_interaction *ui = shell_interaction_init(&cout, &cerr, false);
-	fichier_local h = fichier_local(*ui, p, gf_read_only, tools_octal2int("0777"), false);
+	fichier_local h = fichier_local(*ui, p, gf_read_only, 0777, false, true, false);
 
 	display_read(*ui, h);
 
 	try
 	{
-	    fichier_local f = fichier_local(*ui, "test/source.txt", gf_read_only, tools_octal2int("0777"), false);
+	    fichier_local f = fichier_local(*ui, "test/source.txt", gf_read_only, 0777, false, false, false);
 	    tronc *t;
 
 	    t = new tronc(&f, 0, infinint(10));
@@ -108,10 +108,7 @@ void f1()
 	    cout << f.get_position() << endl;
 
 	    delete t;
-	    S_I fd = ::open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0666);
-	    if(fd < 0)
-		ui->warning(strerror(errno));
-	    fichier_local g = fichier_local(*ui, fd);
+	    fichier_local g = fichier_local(*ui, "test/destination.txt", gf_read_write, 0666, false, true, false);
 	    f.skip(0);
 	    f.copy_to(g);
 	    t = new tronc(&g, 10, infinint(10));
@@ -165,7 +162,7 @@ void f2()
 
 	try
 	{
-	    fichier_local f = fichier_local(*ui, "test/source.txt", gf_read_only, tools_octal2int("0777"), false);
+	    fichier_local f = fichier_local(*ui, "test/source.txt", gf_read_only, 0666, false, false, false);
 	    tronc *t;
 
 	    t = new tronc(&f, 1);
@@ -199,10 +196,7 @@ void f2()
 
 		/////// now testing writing mode
 
-	    S_I fd = ::open("test/destination.txt", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0666);
-	    if(fd < 0)
-		ui->warning(strerror(errno));
-	    fichier_local g = fichier_local(*ui, fd);
+	    fichier_local g = fichier_local(*ui, "test/destination.txt", gf_read_write, 0666, false, true, false);
 	    g.skip(0);
 	    display_read(*ui, g);
 

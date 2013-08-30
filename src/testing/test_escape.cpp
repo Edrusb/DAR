@@ -58,7 +58,7 @@ int main()
 void f1()
 {
     set<escape::sequence_type> nojump;
-    fichier_local below = fichier_local(*ui, "escape_below", gf_write_only, tools_octal2int("0777"), false);
+    fichier_local below = fichier_local(*ui, "escape_below", gf_write_only, 0666, false, true, false);
     escape tested = escape(&below, nojump);
 
     const char *seq1 = "bonjour les amis";
@@ -82,7 +82,7 @@ void f2()
     set<escape::sequence_type> nojump;
     const U_I buf_size = 100;
     unsigned char buffer[buf_size];
-    fichier_local below = fichier_local(*ui, "escape_below", gf_read_only, tools_octal2int("0777"), false);
+    fichier_local below = fichier_local(*ui, "escape_below", gf_read_only, 0666, false, false, false);
     escape tested = escape(&below, nojump);
     S_I lu = 0;
 

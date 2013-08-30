@@ -147,6 +147,7 @@ namespace libdar
 	lax = x_lax;
 	min_digits = x_min_digits;
 	entr = NULL;
+	force_perm = false;
 
         open_file_init();
 	try
@@ -201,6 +202,8 @@ namespace libdar
 	     const infinint & x_pause,
 	     const entrepot & where,
 	     const label & data_name,
+	     bool force_permission,
+	     U_I permission,
 	     hash_algo x_hash,
 	     const infinint & x_min_digits,
 	     bool format_07_compatible,
@@ -233,6 +236,8 @@ namespace libdar
 	    of_data_name = of_internal_name;
 	else
 	    of_data_name = data_name;
+	force_perm = force_permission;
+	perm = permission;
 	of_fd = NULL;
 	of_flag = '\0';
 	old_sar = format_07_compatible;
@@ -615,7 +620,15 @@ namespace libdar
                 //
 	    try
 	    {
-		code = entr->open(get_ui(), fic, gf_read_only, false, false, hash_none, of_fd);
+		code = entr->open(get_ui(),
+				  fic,
+				  gf_read_only,
+				  false, //< force permission
+				  0,     //< permission to enforce (not used here)
+				  false, //<  fail if exists
+				  false, //<  erase
+				  hash_none,
+				  of_fd);
 	    }
 	    catch(Euser_abort & e)
 	    {
@@ -915,7 +928,15 @@ namespace libdar
 	    // open for writing but succeeds only if this file does NOT already exist
 	try
 	{
-	    code = entr->open(get_ui(), fic, gf_write_only, true, false, hash, of_fd);
+	    code = entr->open(get_ui(),
+			      fic,
+			      gf_write_only,
+			      force_perm,
+			      perm,
+			      true,   //< fail_if_exists
+			      false,  //< erase
+			      hash,
+			      of_fd);
 	}
 	catch(Erange & e)
 	{
@@ -931,7 +952,15 @@ namespace libdar
 	case entrepot::io_exist:
 	    try
 	    {
-		code = entr->open(get_ui(), fic, gf_read_only, false, false, hash_none, of_fd);
+		code = entr->open(get_ui(),
+				  fic,
+				  gf_read_only,
+				  false,  //< force permission
+				  0,      //< permission to enforce (not used here)
+				  false,  //< fail if exists
+				  false,  //< erase
+				  hash_none,
+				  of_fd);
 		switch(code)
 		{
 		case entrepot::io_ok:
@@ -1000,11 +1029,27 @@ namespace libdar
 		    unlink_on_error = true;
 
 		    // open with overwriting
-		code = entr->open(get_ui(), fic, gf_read_write, false, true, hash, of_fd);
+		code = entr->open(get_ui(),
+				  fic,
+				  gf_read_write,
+				  force_perm,
+				  perm,
+				  false,    //< fail if exists
+				  true,     //< erase
+				  hash,
+				  of_fd);
 	    }
 	    else // open without overwriting
 		if(hash == hash_none)
-		    code = entr->open(get_ui(), fic, gf_read_write, false, false, hash, of_fd);
+		    code = entr->open(get_ui(),
+				      fic,
+				      gf_read_write,
+				      force_perm,
+				      perm,
+				      false, //< fail if exists
+				      false, //< erase
+				      hash,
+				      of_fd);
 		else
 		    throw SRC_BUG; // cannot calculate a hash on a just openned file that is not empty
 
@@ -1365,6 +1410,8 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 			     const std::string & execute,
 			     bool allow_over,
 			     bool warn_over,
+			     bool force_permission,
+			     U_I permission,
 			     hash_algo x_hash,
 			     const infinint & x_min_digits,
 			     bool format_07_compatible) : generic_file(gf_write_only), mem_ui(dialog)
@@ -1393,7 +1440,15 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	    // creating the slice if it does not exist else failing
 	try
 	{
-	    code = where.open(dialog, filename, gf_write_only, true, false, x_hash, tmp);
+	    code = where.open(dialog,
+			      filename,
+			      gf_write_only,
+			      force_permission,
+			      permission,
+			      true,    //< fail if exists
+			      false,   //< erase
+			      x_hash,
+			      tmp);
 
 	    switch(code)
 	    {
@@ -1408,7 +1463,15 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 		if(warn_over)
 		    dialog.pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
 
-		code = where.open(dialog, filename, gf_write_only, false, true, x_hash, tmp);
+		code = where.open(dialog,
+				  filename,
+				  gf_write_only,
+				  force_permission,
+				  permission,
+				  false,  //< fail if exists
+				  true,   //< erase
+				  x_hash,
+				  tmp);
 		switch(code)
 		{
 		case entrepot::io_ok:
@@ -1445,7 +1508,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	    set_info_status(CONTEXT_LAST_SLICE);
 	    reference = tmp;
 	    init();
-	    tmp = NULL; // setting it to null only now is necesary to be able to release the object in case of exception thrown
+	    tmp = NULL; // setting it to null only now was necesary to be able to release the object in case of exception
 	}
 	catch(...)
 	{

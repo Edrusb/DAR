@@ -88,7 +88,7 @@ using namespace std;
 namespace libdar
 {
 	// check if the given file is a tag tellig if the current directory is a cache directory
-    static bool cache_directory_tagging_check(user_interaction & dialog, const char *cpath, const char *filename);
+    static bool cache_directory_tagging_check(const char *cpath, const char *filename);
 
 
     etage::etage(user_interaction &ui,
@@ -144,7 +144,7 @@ namespace libdar
 		if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
 		{
 		    if(cache_directory_tagging)
-			is_cache_dir = cache_directory_tagging_check(ui, dirname, ret->d_name);
+			is_cache_dir = cache_directory_tagging_check(dirname, ret->d_name);
 		    fichier.push_back(string(ret->d_name));
 		}
 	    closedir(tmp);
@@ -185,7 +185,7 @@ namespace libdar
 	///////////////////////////////////////////
 
 
-    static bool cache_directory_tagging_check(user_interaction & dialog, const char *cpath, const char *filename)
+    static bool cache_directory_tagging_check(const char *cpath, const char *filename)
     {
 	bool ret = false;
 
@@ -193,28 +193,43 @@ namespace libdar
 	    ret = false;
 	else // we need to inspect the few first bytes of the file
 	{
-	    path chem = path(cpath)+string(filename);
-	    fichier_local fic = fichier_local(dialog, chem.display(), gf_read_only, tools_octal2int("0777"), false);
-	    U_I len = strlen(CACHE_DIR_TAG_FILENAME_CONTENTS);
-	    char *buffer = new (nothrow) char[len+1];
-	    S_I lu;
-
-	    if(buffer == NULL)
-		throw Ememory("etage:cache_directory_tagging_check");
 	    try
 	    {
-		lu = fic.read(buffer, len);
-		if(lu < 0 || (U_I)(lu) < len)
-		    ret = false;
-		else
-		    ret = strncmp(buffer, CACHE_DIR_TAG_FILENAME_CONTENTS, len) == 0;
+		path chem = path(cpath)+string(filename);
+		fichier_local fic = fichier_local(chem.display(), false);
+		U_I len = strlen(CACHE_DIR_TAG_FILENAME_CONTENTS);
+		char *buffer = new (nothrow) char[len+1];
+		S_I lu;
+
+		if(buffer == NULL)
+		    throw Ememory("etage:cache_directory_tagging_check");
+		try
+		{
+		    lu = fic.read(buffer, len);
+		    if(lu < 0 || (U_I)(lu) < len)
+			ret = false;
+		    else
+			ret = strncmp(buffer, CACHE_DIR_TAG_FILENAME_CONTENTS, len) == 0;
+		}
+		catch(...)
+		{
+		    delete [] buffer;
+		    throw;
+		}
+		delete [] buffer;
+	    }
+	    catch(Ememory & e)
+	    {
+		throw;
+	    }
+	    catch(Ebug & e)
+	    {
+		throw;
 	    }
 	    catch(...)
 	    {
-		delete [] buffer;
-		throw;
+		ret = false;
 	    }
-	    delete [] buffer;
 	}
 
 	return ret;

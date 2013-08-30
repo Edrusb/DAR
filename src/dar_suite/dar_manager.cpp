@@ -1252,14 +1252,8 @@ static void op_batch(user_interaction & dialog, database *dat, const string & fi
 
     if(info_details)
 	dialog.warning(gettext("Opening and reading the batch file..."));
-    int fd = -1;
-    fd = open(filename.c_str(), O_RDONLY|O_BINARY);
 
-    if(fd < 0)
-	throw Erange("op_batch", tools_printf(gettext("Cannot open file %S : %s"), &filename, strerror(errno)));
-
-    fichier_local batch_file = fichier_local(dialog, fd); // the object batch_file will close fd upon destructor call.
-
+    fichier_local batch_file = fichier_local(filename, false);
     no_comment proper = no_comment(batch_file); // removing the comments from file
 
 	// reading it line by line and executing corresponding action

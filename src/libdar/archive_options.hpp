@@ -392,13 +392,13 @@ namespace libdar
 	void set_fixed_date(const infinint & fixed_date) { x_fixed_date = fixed_date; };
 
 	    /// if not an empty string set the slice permission according to the octal value given.
-	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_permission(x_slice_permission); };
+	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; };
 
 	    /// if not an empty string set the user ownership of slices accordingly
-	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_user_ownership(x_slice_user_ownership); };
+	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; };
 
 	    /// if not an empty string set the group ownership of slices accordingly
-	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_group_ownership(x_slice_group_ownership); };
+	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; };
 
 	    /// how much time to retry saving a file if it changed while being read
 	void set_retry_on_change(const infinint & count_max_per_file, const infinint & global_max_byte_overhead = 0) { x_repeat_count = count_max_per_file; x_repeat_byte = global_max_byte_overhead; };
@@ -606,13 +606,13 @@ namespace libdar
 	void set_empty(bool empty) { x_empty = empty; };
 
 	    /// if not an empty string set the slice permission according to the octal value given.
-	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_permission(x_slice_permission); };
+	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; };
 
 	    /// if not an empty string set the user ownership of slices accordingly
-	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_user_ownership(x_slice_user_ownership); };
+	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; };
 
 	    /// if not an empty string set the group ownership of slices accordingly
-	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_group_ownership(x_slice_group_ownership); };
+	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; };
 
 	    /// specify a user comment in the archive (always in clear text!)
 	void set_user_comment(const std::string & comment) { x_user_comment = comment; };
@@ -782,13 +782,13 @@ namespace libdar
 	void set_keep_compressed(bool keep_compressed) { x_keep_compressed = keep_compressed; };
 
 	    /// if not an empty string set the slice permission according to the octal value given.
-	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_permission(x_slice_permission); };
+	void set_slice_permission(const std::string & slice_permission) { x_slice_permission = slice_permission; };
 
 	    /// if not an empty string set the user ownership of slices accordingly
-	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_user_ownership(x_slice_user_ownership); };
+	void set_slice_user_ownership(const std::string & slice_user_ownership) { x_slice_user_ownership = slice_user_ownership; };
 
 	    /// if not an empty string set the group ownership of slices accordingly
-	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; if(x_entrepot == NULL) throw SRC_BUG; x_entrepot->set_group_ownership(x_slice_group_ownership); };
+	void set_slice_group_ownership(const std::string & slice_group_ownership) { x_slice_group_ownership = slice_group_ownership; };
 
 	    /// if set to true use a merging mode suitable to build a decremental backup from two full backups (see Notes)
 	void set_decremental_mode(bool mode) { x_decremental = mode; };

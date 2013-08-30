@@ -108,7 +108,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
         tuyau *input = NULL;
         tuyau *output = NULL;
         sar *source = NULL;
-	entrepot_local entrep = entrepot_local("", "", "", false);
+	entrepot_local entrep = entrepot_local("", "", false);
 
 	if(chemin == NULL)
 	    throw SRC_BUG;

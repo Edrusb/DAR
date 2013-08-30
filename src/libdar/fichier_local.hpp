@@ -59,9 +59,14 @@ namespace libdar
     public :
 
 	    // constructors
-        fichier_local(user_interaction & dialog, S_I fd);
-        fichier_local(user_interaction & dialog, const char *name, gf_mode m, U_I perm, bool furtive_mode);
-        fichier_local(user_interaction & dialog, const std::string & chemin, gf_mode m, U_I perm, bool furtive_mode);
+
+        fichier_local(user_interaction & dialog,
+		      const std::string & chemin,
+		      gf_mode m,
+		      U_I permission,
+		      bool fail_if_exists,
+		      bool erase,
+		      bool furtive_mode);
 	fichier_local(const std::string & chemin, bool furtive_mode = false); // builds a read-only object
 	fichier_local(const fichier_local & ref) : fichier_global(ref) { copy_from(ref); };
 
@@ -113,7 +118,13 @@ namespace libdar
     private :
         S_I filedesc;
 
-        void open(const char *name, gf_mode m,  U_I perm, bool furtive_mode);
+	void open(const std::string & chemin,
+		  gf_mode m,
+		  U_I permission,
+		  bool fail_if_exists,
+		  bool erase,
+		  bool furtive_mode);
+
 	void copy_from(const fichier_local & ref);
 	void copy_parent_from(const fichier_local & ref);
 	void detruit() { close(filedesc); filedesc = -1; };

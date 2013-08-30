@@ -89,6 +89,8 @@ namespace libdar
 	    /// \param[in] pause if set to zero no pause will be done between slice creation. If set to 1 a pause between each slice will be done. If set to N a pause each N slice will be done. Pauses must be acknoledged by user for the process to continue
 	    /// \param[in] where defines where to store the slices
 	    /// \param[in] data_name is a tag that has to be associated with the data.
+	    /// \param[in] force_perm if true slice permission will be forced to the value given in the next argument
+	    /// \param[in] permission value to use to set permission of slices
 	    /// \param[in] x_hash defines whether a hash file has to be generated for each slice, and wich hash algorithm to use
 	    /// \param[in] x_min_digits is the minimum number of digits the slices number is stored with in the filename
 	    /// \param[in] format_07_compatible when set to true, creates a slice header in the archive format of version 7 instead of the highest version known
@@ -107,6 +109,8 @@ namespace libdar
 	    const infinint & pause,
 	    const entrepot & where,
 	    const label & data_name,
+	    bool force_permission,
+	    U_I permission,
 	    hash_algo x_hash,
 	    const infinint & x_min_digits,
 	    bool format_07_compatible,
@@ -177,6 +181,8 @@ namespace libdar
         infinint of_last_file_size;  //< size of the last slice (if met)
         label of_internal_name;      //< internal name shared in all slice header
 	label of_data_name;          //< internal name linked to data (transparent to dar_xform and used by isolated catalogue as reference)
+	bool force_perm;             //< true if any future slice has its permission to be set explicitely
+	U_I perm;                    //< if force_perm is true, value to use for slice permission
         fichier_global *of_fd;       //< file object currently openned
         char of_flag;                //< flags of the open file
         bool initial;                //< do not launch hook command-line during sar initialization
@@ -217,7 +223,7 @@ namespace libdar
     {
     public:
 	    /// constructor to build a new single sliced archive
-       trivial_sar(user_interaction & dialog,          //< how to interact with the user
+	trivial_sar(user_interaction & dialog,         //< how to interact with the user
 		    const std::string & base_name,     //< archive basename to create
 		    const std::string & extension,     //< archive extension
  		    const entrepot & where,            //< where to store the archive
@@ -225,6 +231,8 @@ namespace libdar
 		    const std::string & execute,       //< command line to execute at end of slice creation
 		    bool allow_over,                   //< whether to allow overwriting
 		    bool warn_over,                    //< whether to warn before overwriting
+		    bool force_permission,             //< whether to enforce slice permission or not
+		    U_I permission,                    //< value of permission to use if permission enforcement is used
 		    hash_algo x_hash,                  //< whether to build a hash of the slice, and which algo to use for that
 	    	    const infinint & min_digits,       //< is the minimum number of digits the slices number is stored with in the filename
 		    bool format_07_compatible);        //< build a slice header backward compatible with 2.3.x

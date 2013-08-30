@@ -52,11 +52,10 @@ using namespace std;
 namespace libdar
 {
 
-    entrepot_local::entrepot_local(const std::string & perm, const std::string & user, const std::string & group, bool x_furtive_mode)
+    entrepot_local::entrepot_local(const std::string & user, const std::string & group, bool x_furtive_mode)
     {
 	furtive_mode = x_furtive_mode;
 	contents = NULL;
-	set_permission(perm);
 	set_user_ownership(user);
 	set_group_ownership(group);
 	set_root(tools_getcwd());
@@ -103,76 +102,51 @@ namespace libdar
     entrepot::io_errors entrepot_local::inherited_open(user_interaction & dialog,
 						       const std::string & filename,
 						       gf_mode mode,
+						       bool force_permission,
+						       U_I permission,
 						       bool fail_if_exists,
 						       bool erase,
 						       fichier_global * & ret) const
     {
-	U_I o_mode = O_BINARY;
-	int fd = -1;
 	string fullname = (get_full_path() + path(filename)).display();
+	U_I perm = force_permission ? permission : 0666;
 
-	switch(mode)
-	{
-	case gf_read_only:
-	    o_mode |= O_RDONLY;
-	    break;
-	case gf_write_only:
-	    o_mode |= O_WRONLY;
-	    break;
-	case gf_read_write:
-	    o_mode |= O_RDWR;
-	    break;
-	default:
-	    throw SRC_BUG;
-	}
 
-	if(mode != gf_read_only)
-	{
-	    o_mode |= O_CREAT;
-
-	     if(fail_if_exists)
-		 o_mode |= O_EXCL;
-
-	     if(erase)
-		 o_mode |= O_TRUNC;
-	}
-
+	ret = new (nothrow) fichier_local(dialog,
+					  fullname,
+					  mode,
+					  perm,
+					  fail_if_exists,
+					  erase,
+					  false);
+	if(ret == NULL)
+	    throw Ememory("entrepot_local::inherited_open");
 	try
 	{
-	    if(mode != gf_read_only)
-		fd = ::open(fullname.c_str(), o_mode, tools_octal2int(get_permission()));
-	    else
-		fd = ::open(fullname.c_str(), o_mode);
-
-	    if(fd < 0)
+	    if(force_permission)
+		ret->change_permission(permission); // this is necessary if the file already exists
+	    if(get_user_ownership() != "" || get_group_ownership() != "")
 	    {
-		switch(errno)
+		try
 		{
-		case EEXIST:
-		    return io_exist;
-		case ENOENT:
-		    return io_absent;
-		default:
-		    throw Erange("entrepot_local::inherited_open", string(gettext("Failed openning file:")) + strerror(errno));
+		    ret->change_ownership(get_user_ownership(),
+					  get_group_ownership());
+		}
+		catch(Ebug & e)
+		{
+		    throw;
+		}
+		catch(Egeneric & e)
+		{
+		    e.prepend_message("Failed setting user and/or group ownership: ");
+		    throw Edata(e.get_message());
 		}
 	    }
-
-	    if(mode != gf_read_only)
-		tools_set_ownership(fd, get_user_ownership(), get_group_ownership());
-
-	    ret = new (nothrow) fichier_local(dialog, fd);
-	    if(ret == NULL)
-		throw Ememory("entrepot_local::inherited_open");
 	}
 	catch(...)
 	{
-	    if(fd >= 0)
-		close(fd);
-	    if(ret != NULL)
-	    {
-		delete ret;
-		ret = NULL;
-	    }
+	    delete ret;
+	    ret = NULL;
 	    throw;
 	}
 

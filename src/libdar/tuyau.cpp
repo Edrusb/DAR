@@ -90,6 +90,8 @@ using namespace std;
 namespace libdar
 {
 
+    static gf_mode generic_file_get_mode(S_I fd);
+
     tuyau::tuyau(user_interaction & dialog, S_I fd) : generic_file(generic_file_get_mode(fd)), mem_ui(dialog)
     {
 	gf_mode tmp;
@@ -477,6 +479,30 @@ namespace libdar
 
 	return true;
     }
+
+    static gf_mode generic_file_get_mode(S_I fd)
+    {
+	S_I flags = fcntl(fd, F_GETFL) & O_ACCMODE;
+        gf_mode ret;
+
+        switch(flags)
+        {
+        case O_RDONLY:
+            ret = gf_read_only;
+            break;
+        case O_WRONLY:
+            ret = gf_write_only;
+            break;
+        case O_RDWR:
+            ret = gf_read_write;
+            break;
+        default:
+            throw Erange("generic_file_get_mode", gettext("File mode is neither read nor write"));
+        }
+
+        return ret;
+    }
+
 
 } // end of namespace
 

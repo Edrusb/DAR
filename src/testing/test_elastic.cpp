@@ -142,8 +142,7 @@ void f3()
     user_interaction *dialog = shell_interaction_init(&cout, &cerr, false);
     try
     {
-	int fd = open("toto", O_RDWR|O_TRUNC|O_CREAT|O_BINARY, 0666);
-	fichier_local fic = fichier_local(*dialog, fd);
+	fichier_local fic = fichier_local(*dialog, "toto", gf_read_write, 0666, false, true, false);
 	const unsigned int taille = 500;
 	unsigned char buffer[taille];
 	const char *ttt =  "Bonjour les amis comment ça va ? ";

@@ -78,6 +78,7 @@ namespace libdar
 
 	    if(where == NULL)
 		throw Ememory("archive::archive");
+
 	    cat = NULL;
 
 	    try
@@ -333,6 +334,8 @@ namespace libdar
 	    entrepot *sauv_path_t = options.get_entrepot().clone();
 	    if(sauv_path_t == NULL)
 		throw Ememory("archive::archive");
+	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
+	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
 	    sauv_path_t->set_location(sauv_path);
 
 	    try
@@ -376,8 +379,6 @@ namespace libdar
 				   options.get_display_skipped(),
 				   options.get_fixed_date(),
 				   options.get_slice_permission(),
-				   options.get_slice_user_ownership(),
-				   options.get_slice_group_ownership(),
 				   options.get_repeat_count(),
 				   options.get_repeat_byte(),
 				   options.get_sequential_marks(),
@@ -425,6 +426,8 @@ namespace libdar
 	    entrepot *sauv_path_t = options.get_entrepot().clone();
 	    if(sauv_path_t == NULL)
 		throw Ememory("archive::archive");
+	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
+	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
 	    sauv_path_t->set_location(sauv_path);
 
 	    try
@@ -468,8 +471,6 @@ namespace libdar
 				   false,
 				   0,
 				   options.get_slice_permission(),
-				   options.get_slice_user_ownership(),
-				   options.get_slice_group_ownership(),
 				   0, // repeat count
 				   0, // repeat byte
 				   options.get_sequential_marks(),
@@ -527,6 +528,9 @@ namespace libdar
 	{
 	    if(sauv_path_t == NULL)
 		throw Ememory("archive::archive(merge)");
+	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
+	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
+	    sauv_path_t->set_location(sauv_path);
 
 	    try
 	    {
@@ -668,8 +672,6 @@ namespace libdar
 				 options.get_keep_compressed(),
 				 0,       // fixed_date
 				 options.get_slice_permission(),
-				 options.get_slice_user_ownership(),
-				 options.get_slice_group_ownership(),
 				 0,  // repeat_count
 				 0,  // repeat_byte
 				 options.get_decremental_mode(),
@@ -1405,8 +1407,6 @@ namespace libdar
 				     bool display_skipped,
 				     const infinint & fixed_date,
 				     const string & slice_permission,
-				     const string & slice_user_ownership,
-				     const string & slice_group_ownership,
 				     const infinint & repeat_count,
 				     const infinint & repeat_byte,
 				     bool add_marks_for_sequential_reading,
@@ -1565,8 +1565,6 @@ namespace libdar
 			 false,   // keep_compressed
 			 fixed_date,
 			 slice_permission,
-			 slice_user_ownership,
-			 slice_group_ownership,
 			 repeat_count,
 			 repeat_byte,
 			 false,   // decremental mode
@@ -1625,8 +1623,6 @@ namespace libdar
 				   bool keep_compressed,
 				   const infinint & fixed_date,
 				   const string & slice_permission,
-				   const string & slice_user_ownership,
-				   const string & slice_group_ownership,
 				   const infinint & repeat_count,
 				   const infinint & repeat_byte,
 				   bool decremental,
@@ -1655,6 +1651,8 @@ namespace libdar
 	    compressor *compr_ptr = NULL;
 	    tronconneuse *tronco_ptr = NULL;
 	    thread_cancellation thr_cancel;
+	    bool force_permission = (slice_permission != "");
+	    U_I permission = force_permission ? tools_octal2int(slice_permission) : 0; // 0 or anything else, this does not matter
 
 	    if(op == oper_isolate)
 	    {
@@ -1707,6 +1705,8 @@ namespace libdar
 									 execute,
 									 allow_over,
 									 warn_over,
+									 force_permission,
+									 permission,
 									 hash,
 									 slice_min_digits,
 									 false);
@@ -1727,6 +1727,8 @@ namespace libdar
 						     pause,
 						     sauv_path_t, // entrepot !!
 						     data_name,
+						     force_permission,
+						     permission,
 						     hash,
 						     slice_min_digits,
 						     false,

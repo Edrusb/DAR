@@ -100,21 +100,22 @@ static int little_main(user_interaction & ui, int argc, char * const argv[], con
     ui.warning("calcul finished, now computing the decimal representation ... ");
     f = deci(p);
     ui.warning(f.human());
+
     if(argc == 3)
     {
-	S_I fd = ::open(argv[2], O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644);
-	if(fd < 0)
-	    ui.warning(string("cannot open file for test ! ") + strerror(errno));
-	else
-	{
-	    fichier_local fic = fichier_local(ui, fd);
-	    infinint cp;
+	fichier_local fic = fichier_local(ui,
+					  argv[2],
+					  gf_read_write,
+					  0666,
+					  false,
+					  true,
+					  false);
+	infinint cp;
 
-	    p.dump(fic);
-	    fic.skip(0);
-	    cp = infinint(fic);
-	    ui.warning(string("read from file: ") + deci(cp).human());
-	}
+	p.dump(fic);
+	fic.skip(0);
+	cp = infinint(fic);
+	ui.warning(string("read from file: ") + deci(cp).human());
     }
 
     return EXIT_OK;

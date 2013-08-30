@@ -84,8 +84,7 @@ int main()
 
 void f1(user_interaction *dialog)
 {
-    int fd = open("toto", O_WRONLY|O_TRUNC|O_CREAT|O_BINARY, 0644);
-    fichier_local fic = fichier_local(*dialog, fd);
+    fichier_local fic = fichier_local(*dialog, "toto", gf_write_only, 0666, false, true, false);
     string pass = "bonjour";
     crypto_sym bf = crypto_sym(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish);
     char buffer[100] = "bonjour les amis il fait chaud il fait beau ! ";
@@ -98,7 +97,7 @@ void f1(user_interaction *dialog)
 
 void f2(user_interaction *dialog)
 {
-    fichier_local fic = fichier_local(*dialog, "toto", gf_read_only, tools_octal2int("0777"), false);
+    fichier_local fic = fichier_local(*dialog, "toto", gf_read_only, 0666, false, false, false);
     string pass = "bonjour";
     crypto_sym bf = crypto_sym(10, secu_string(pass.c_str(), pass.size()), fic, false, macro_tools_supported_version, crypto_blowfish);
     char buffer[100];

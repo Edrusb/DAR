@@ -72,7 +72,7 @@ int main()
 
 static void f1()
 {
-    fichier_local toto = fichier_local(*ui, ::open("toto", O_RDWR|O_CREAT|O_TRUNC|O_BINARY, 0644));
+    fichier_local toto = fichier_local(*ui, "toto", gf_read_write, 0666, false, true, false);
     terminateur term;
 
     infinint grand = 1;

@@ -2152,11 +2152,7 @@ static void make_args_from_file(user_interaction & dialog, operation op, const v
     argv = NULL;
     argc = 0;
 
-    S_I fd = ::open(filename.c_str(), O_RDONLY|O_BINARY);
-    if(fd < 0)
-        throw Erange("make_args_from_file", tools_printf(gettext("Cannot open file %S : %s"), &filename, strerror(errno)));
-
-    fichier_local conf = fichier_local(dialog, fd); // the object conf will close fd
+    fichier_local conf = fichier_local(filename, false); // the object conf will close fd
 
         ////////
         // removing the comments from file

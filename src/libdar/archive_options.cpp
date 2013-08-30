@@ -149,7 +149,7 @@ namespace libdar
 	x_lax = false;
 	x_sequential_read = false;
 	x_slice_min_digits = 0;
-	x_entrepot = new (nothrow) entrepot_local("", "", "", false); // never using furtive_mode to read slices
+	x_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
 	if(x_entrepot == NULL)
 	    throw Ememory("archive_options_read::clear");
 
@@ -162,7 +162,7 @@ namespace libdar
 	x_ref_crypto_size = default_crypto_size;
 	x_ref_execute = "";
 	x_ref_slice_min_digits = 0;
-	x_ref_entrepot = new (nothrow) entrepot_local("", "", "", false); // never using furtive_mode to read slices
+	x_ref_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
 	if(x_ref_entrepot == NULL)
 	    throw Ememory("archive_options_read::clear");
     }
@@ -360,7 +360,7 @@ namespace libdar
 	    x_slice_min_digits = 0;
 	    x_backup_hook_file_execute = "";
 	    x_ignore_unknown = false;
-	    x_entrepot = new (nothrow) entrepot_local("", "", "", false); // never using furtive_mode to read slices
+	    x_entrepot = new (nothrow) entrepot_local( "", "", false); // never using furtive_mode to read slices
 	    if(x_entrepot == NULL)
 		throw Ememory("archive_options_create::clear");
 	}
@@ -478,9 +478,6 @@ namespace libdar
 	x_entrepot = entr.clone();
 	if(x_entrepot == NULL)
 	    throw Ememory("archive_options_create::set_entrepot");
-	x_entrepot->set_permission(x_slice_permission);
-	x_entrepot->set_user_ownership(x_slice_user_ownership);
-	x_entrepot->set_group_ownership(x_slice_group_ownership);
     }
 
     void archive_options_create::destroy()
@@ -614,7 +611,7 @@ namespace libdar
 	    x_hash = hash_none;
 	    x_slice_min_digits = 0;
 	    x_sequential_marks = true;
-	    x_entrepot = new (nothrow) entrepot_local("", "", "", false); // never using furtive_mode to read slices
+	    x_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
 	    if(x_entrepot == NULL)
 		throw Ememory("archive_options_isolate::clear");
 	}
@@ -634,9 +631,6 @@ namespace libdar
 	x_entrepot = entr.clone();
 	if(x_entrepot == NULL)
 	    throw Ememory("archive_options_isolate::set_entrepot");
-	x_entrepot->set_permission(x_slice_permission);
-	x_entrepot->set_user_ownership(x_slice_user_ownership);
-	x_entrepot->set_group_ownership(x_slice_group_ownership);
     }
 
     void archive_options_isolate::destroy()
@@ -722,7 +716,7 @@ namespace libdar
 	    x_user_comment = default_user_comment;
 	    x_hash = hash_none;
 	    x_slice_min_digits = 0;
-	    x_entrepot = new (nothrow) entrepot_local("", "", "", false); // never using furtive_mode to read slices
+	    x_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
 	    if(x_entrepot == NULL)
 		throw Ememory("archive_options_merge::clear");
 	}
@@ -838,9 +832,6 @@ namespace libdar
 	x_entrepot = entr.clone();
 	if(x_entrepot == NULL)
 	    throw Ememory("archive_options_merge::set_entrepot");
-	x_entrepot->set_permission(x_slice_permission);
-	x_entrepot->set_user_ownership(x_slice_user_ownership);
-	x_entrepot->set_group_ownership(x_slice_group_ownership);
     }
 
 

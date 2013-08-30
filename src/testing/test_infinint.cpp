@@ -87,7 +87,7 @@ static void routine1()
 
     ui->warning(d1.human() + " " + d2.human() + " " + d3.human());
 
-    fichier_local *fic = new (nothrow) fichier_local(*ui, "toto", gf_write_only, 0600, false);
+    fichier_local *fic = new (nothrow) fichier_local(*ui, "toto", gf_write_only, 0600, false, true, false);
     if(fic == NULL)
 	throw Ememory("routine1");
     f1.dump(*fic);

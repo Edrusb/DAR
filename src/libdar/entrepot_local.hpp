@@ -64,7 +64,7 @@ namespace libdar
     class entrepot_local : public entrepot
     {
     public:
-	entrepot_local(const std::string & perm, const std::string & user, const std::string & group, bool x_furtive_mode);
+	entrepot_local(const std::string & user, const std::string & group, bool x_furtive_mode);
 	entrepot_local(const entrepot_local & ref): entrepot(ref) { copy_from(ref); };
 	entrepot_local & operator = (const entrepot_local & ref);
 	~entrepot_local() { detruit(); };
@@ -80,9 +80,12 @@ namespace libdar
 	io_errors inherited_open(user_interaction & dialog,
 				 const std::string & filename,
 				 gf_mode mode,
+				 bool force_permission,
+				 U_I permission,
 				 bool fail_if_exists,
 				 bool erase,
 				 fichier_global * & ret) const;
+
 
 	void inherited_unlink(const std::string & filename) const;
 	void read_dir_flush() { detruit(); };

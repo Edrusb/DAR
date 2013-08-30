@@ -2525,4 +2525,5 @@ namespace libdar
 		return gettext("[Worse]");
     }
 
+
 } // end of namespace

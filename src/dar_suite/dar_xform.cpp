@@ -119,8 +119,10 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 	    generic_file *dst_sar = NULL;
 	    generic_file *src_sar = NULL;
 	    label data_name;
-	    entrepot_local entrep = entrepot_local(slice_perm, slice_user, slice_group, false);
+	    entrepot_local entrep = entrepot_local(slice_user, slice_group, false);
 	    bool format_07_compatible = false;
+	    bool force_perm = slice_perm != "";
+	    U_I perm = force_perm ? tools_octal2int(slice_perm) : 0;
 
 	    data_name.clear();
 	    try
@@ -185,6 +187,8 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 							    execute_dst,
 							    allow,
 							    warn,
+							    force_perm,
+							    perm,
 							    hash,
 							    dst_min_digits,
 							    format_07_compatible);
@@ -205,6 +209,8 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 						pause,
 						entrep,
 						data_name,
+						force_perm,
+						perm,
 						hash,
 						dst_min_digits,
 						format_07_compatible,

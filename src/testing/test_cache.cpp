@@ -95,7 +95,7 @@ int main()
 
 void f1()
 {
-    fichier_local f = fichier_local(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
+    fichier_local f = fichier_local(*ui, "toto", gf_read_only, 0, false, false, false);
     cache c = cache(f,
 		    10,
 		    10, 3, 20,
@@ -123,7 +123,7 @@ void f2()
 	printf("%s\n", strerror(errno));
 	return;
     }
-    fichier_local g = fichier_local(*ui, fd);
+    fichier_local g = fichier_local(*ui, "titi", gf_read_write, 0666, false, true, false);
     cache c = cache(g,
 		    10,
 		    10, 3, 20,

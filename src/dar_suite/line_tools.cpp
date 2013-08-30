@@ -428,7 +428,6 @@ string line_tools_get_full_path_from_PATH(const vector<string> & the_path, const
 {
     string ret;
     bool no_path = false;
-    user_interaction_blind aveugle;
 
     if(filename == NULL)
 	throw SRC_BUG;
@@ -468,7 +467,7 @@ string line_tools_get_full_path_from_PATH(const vector<string> & the_path, const
 	    {
 		string where = (path(*it) + filename).display();
 
-		fichier_local tmp = fichier_local(aveugle, where, gf_read_only, tools_octal2int("0777"), false);
+		fichier_local tmp = fichier_local(where, false);
 		found = true;
 		ret = where;
 	    }

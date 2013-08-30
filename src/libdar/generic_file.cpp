@@ -444,39 +444,15 @@ namespace libdar
 	active_write = ref.active_write;
     }
 
-
-    gf_mode generic_file_get_mode(S_I fd)
-    {
-	S_I flags = fcntl(fd, F_GETFL) & O_ACCMODE;
-        gf_mode ret;
-
-        switch(flags)
-        {
-        case O_RDONLY:
-            ret = gf_read_only;
-            break;
-        case O_WRONLY:
-            ret = gf_write_only;
-            break;
-        case O_RDWR:
-            ret = gf_read_write;
-            break;
-        default:
-            throw Erange("generic_file_get_mode", gettext("File mode is neither read nor write"));
-        }
-
-        return ret;
-    }
-
     const char * generic_file_get_name(gf_mode mode)
     {
-        char *ret = NULL;
+	char *ret = NULL;
 
         switch(mode)
-        {
-        case gf_read_only:
-            ret = gettext("read only");
-            break;
+	{
+	case gf_read_only:
+	    ret = gettext("read only");
+	    break;
         case gf_write_only:
             ret = gettext("write only");
             break;
@@ -486,8 +462,8 @@ namespace libdar
         default:
             throw SRC_BUG;
         }
-
         return ret;
     }
+
 
 } // end of namespace

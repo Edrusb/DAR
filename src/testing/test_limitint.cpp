@@ -82,7 +82,7 @@ int main()
 
 static void routine_real_infinint(user_interaction & dialog)
 {
-    fichier_local fic = fichier_local(*ui, "toto", gf_read_write, 0644, false);
+    fichier_local fic = fichier_local(*ui, "toto", gf_read_write, 0666, false, true, false);
     infinint r1 = 1;
 
     r1 <<= 32;

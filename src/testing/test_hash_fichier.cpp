@@ -64,8 +64,8 @@ int main()
 
 void f1(const string & filename, hash_algo algo)
 {
-    fichier_local fic = fichier_local(*ui, filename, gf_write_only, 0644, false);
-    fichier_local hash_fic = fichier_local(*ui, filename + "." + hash_algo_to_string(algo), gf_write_only, 0644, false);
+    fichier_local fic = fichier_local(*ui, filename, gf_write_only, 0644, false, true, false);
+    fichier_local hash_fic = fichier_local(*ui, filename + "." + hash_algo_to_string(algo), gf_write_only, 0644, false, true, false);
     const string message = "bonjour les amis, il fait chaud il fait beau, les mouches pettent et les cailloux fleurissent.";
     hash_fichier dst = hash_fichier(*ui, &fic, filename, &hash_fic, algo);
 

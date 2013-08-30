@@ -1059,63 +1059,59 @@ namespace libdar
 		    generic_file *ou;
 		    infinint seek;
 
-		    ret = ::open(name, O_WRONLY|O_CREAT|O_BINARY, 0700); // minimum permissions
-		    if(ret >= 0)
+		    fichier_local dest = fichier_local(get_ui(), display, gf_write_only, 0700, false, true, false);
+			// telling to the system to write data directly to disk not going through the cache
+		    dest.fadvise(fichier_global::advise_dontneed);
+			// the implicit destruction of dest (exiting the block)
+			// will close the 'ret' file descriptor (see ~fichier_local())
+		    ou = ref_fil->get_data(file::normal);
+
+		    try
 		    {
-			fichier_local dest = fichier_local(get_ui(), ret);
-			    // telling to the system to write data directly to disk not going through the cache
-			dest.fadvise(fichier_global::advise_dontneed);
-			    // the implicit destruction of dest (exiting the block)
-			    // will close the 'ret' file descriptor (see ~fichier_local())
-			ou = ref_fil->get_data(file::normal);
+			const crc *crc_ori = NULL;
+			crc *crc_dyn = NULL;
+			infinint crc_size;
 
 			try
 			{
-			    const crc *crc_ori = NULL;
-			    crc *crc_dyn = NULL;
-			    infinint crc_size;
 
-			    try
+			    if(!ref_fil->get_crc_size(crc_size))
+				crc_size = tools_file_size_to_crc_size(ref_fil->get_size());
+
+			    ou->skip(0);
+			    ou->copy_to(dest, crc_size, crc_dyn);
+
+			    if(crc_dyn == NULL)
+				throw SRC_BUG;
+
+			    if(ref_fil->get_crc(crc_ori))
 			    {
-
-				if(!ref_fil->get_crc_size(crc_size))
-				    crc_size = tools_file_size_to_crc_size(ref_fil->get_size());
-
-				ou->skip(0);
-				ou->copy_to(dest, crc_size, crc_dyn);
-
-				if(crc_dyn == NULL)
+				if(crc_ori == NULL)
 				    throw SRC_BUG;
-
-				if(ref_fil->get_crc(crc_ori))
-				{
-				    if(crc_ori == NULL)
-					throw SRC_BUG;
-				    if(typeid(*crc_dyn) != typeid(*crc_ori))
-					throw SRC_BUG;
-				    if(*crc_dyn != *crc_ori)
-					throw Erange("filesystem_hard_link_write::make_file", gettext("Bad CRC, data corruption occurred"));
-					// else nothing to do, nor to signal
-				}
-				    // else this is a very old archive
+				if(typeid(*crc_dyn) != typeid(*crc_ori))
+				    throw SRC_BUG;
+				if(*crc_dyn != *crc_ori)
+				    throw Erange("filesystem_hard_link_write::make_file", gettext("Bad CRC, data corruption occurred"));
+				    // else nothing to do, nor to signal
 			    }
-			    catch(...)
-			    {
-				if(crc_dyn != NULL)
-				    delete crc_dyn;
-				throw;
-			    }
-			    if(crc_dyn != NULL)
-				delete crc_dyn;
+				// else this is a very old archive
 			}
 			catch(...)
 			{
-			    if(ou != NULL)
-				delete ou;
+			    if(crc_dyn != NULL)
+				delete crc_dyn;
 			    throw;
 			}
-			delete ou;
+			if(crc_dyn != NULL)
+			    delete crc_dyn;
 		    }
+		    catch(...)
+		    {
+			if(ou != NULL)
+			    delete ou;
+			throw;
+		    }
+		    delete ou;
 		}
 		else if(ref_lie != NULL)
 		    ret = symlink(ref_lie->get_target().c_str(), name);

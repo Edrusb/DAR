@@ -83,10 +83,9 @@ namespace libdar
 	    /// defines the root to use if set_location is given a relative path
 	void set_root(const path & p_root) { if(p_root.is_relative()) throw Erange("entrepot::set_root", std::string(gettext("root's entrepot must be an absolute path: ")) + p_root.display()); root = p_root; };
 
-	    /// set default permission and ownership for files to be created thanks to the open() method
+	    /// set default ownership for files to be created thanks to the open() methods
 	void set_user_ownership(const std::string & x_user) { user = x_user; };
 	void set_group_ownership(const std::string & x_group) { group = x_group; };
-	void set_permission(const std::string & x_perm) { perm = x_perm; };
 
 	const path & get_location() const { return where; }; //< retreives relative to root path the current location points to
 	const path & get_root() const { return root; };      //< retrieves the given root location
@@ -94,13 +93,14 @@ namespace libdar
 	virtual std::string get_url() const = 0; //< defines an URL-like normalized full location of slices
 	const std::string & get_user_ownership() const { return user; };
 	const std::string & get_group_ownership() const { return group; };
-	const std::string & get_permission() const { return perm; };
 
 	    /// defines the way to open a file and return a "class fichier_global" object as last argument upon success
 	    ///
 	    /// \param[in] dialog for user interaction
 	    /// \param[in] filename is the full path+name of the file to open (read/create/write to)
 	    /// \param[in] mode defines which way to open the file (read-only, read-write or write-only)
+	    /// \param[in] force_permission whether to set the file permission to the value given in the permission argument
+	    /// \param[in] permission, if force_permission is set, change the file permission to that value
 	    /// \param[in] fail_if_exists tells whether the underlying implementation have to fail throwing Erange("exists") if the file already exist when write access is required
 	    /// \param[in] erase tells whether the underlying implementation will empty an existing file before writing to it
 	    /// \param[in] algo defines the hash file to create, other value than hash_none are acceptes only in writeonly mode with erase or fail_if_exist set
@@ -110,6 +110,8 @@ namespace libdar
 	io_errors open(user_interaction & dialog,
 		       const std::string & filename,
 		       gf_mode mode,
+		       bool force_permission,
+		       U_I permission,
 		       bool fail_if_exists,
 		       bool erase,
 		       hash_algo algo,
@@ -128,9 +130,12 @@ namespace libdar
 	virtual io_errors inherited_open(user_interaction & dialog,     //< for user interaction
 					 const std::string & filename,  //< filename to open
 					 gf_mode mode,                  //< mode to use
+					 bool force_permission,         //< set the permission of the file to open
+					 U_I permission,                //< value of the permission to assign when force_permission is true
 					 bool fail_if_exists,           //< whether to fail if file exists (write mode)
 					 bool erase,                    //< whether to erase file if file already exists (write mode)
 					 fichier_global * & ret) const = 0; //< the created object upon successful operation
+
 
 	virtual void inherited_unlink(const std::string & filename) const = 0;
 
@@ -141,7 +146,6 @@ namespace libdar
         path root;
 	std::string user;
 	std::string group;
-	std::string perm;
     };
 
 	/// @}

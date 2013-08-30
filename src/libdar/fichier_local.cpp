@@ -97,33 +97,21 @@ namespace libdar
 {
 
 
-    fichier_local::fichier_local(user_interaction & dialog, S_I fd) : fichier_global(dialog, generic_file_get_mode(fd))
-    {
-        filedesc = fd;
-    }
-
     fichier_local::fichier_local(user_interaction & dialog,
-				 const char *name,
+				 const string & chemin,
 				 gf_mode m,
-				 U_I perm,
+				 U_I permission,
+				 bool fail_if_exists,
+				 bool erase,
 				 bool furtive_mode) : fichier_global(dialog, m)
     {
-        fichier_local::open(name, m, perm, furtive_mode);
-    }
-
-    fichier_local::fichier_local(user_interaction & dialog,
-				 const string &chemin,
-				 gf_mode m,
-				 U_I perm,
-				 bool furtive_mode) : fichier_global(dialog, m)
-    {
-        fichier_local::open(chemin.c_str(), m, perm, furtive_mode);
+	fichier_local::open(chemin, m, permission, fail_if_exists, erase, furtive_mode);
     }
 
     fichier_local::fichier_local(const string & chemin, bool furtive_mode) : fichier_global(user_interaction_blind(), gf_read_only)
     {
 	    // in read-only mode the user_interaction is not expected to be used
-	fichier_local::open(chemin.c_str(), gf_read_only, tools_octal2int("0777"), furtive_mode);
+	fichier_local::open(chemin, gf_read_only, 0, false, false, furtive_mode);
     }
 
     void fichier_local::change_ownership(const std::string & user, const std::string & group)
@@ -356,49 +344,82 @@ namespace libdar
 	return total;
      }
 
-    void fichier_local::open(const char *name, gf_mode m, U_I perm, bool furtive_mode)
+    void fichier_local::open(const string & chemin,
+			     gf_mode m,
+			     U_I permission,
+			     bool fail_if_exists,
+			     bool erase,
+			     bool furtive_mode)
     {
-        S_I mode;
+	U_I o_mode = O_BINARY;
+	const char *name = chemin.c_str();
 
         switch(m)
         {
         case gf_read_only :
-            mode = O_RDONLY;
+            o_mode |= O_RDONLY;
             break;
         case gf_write_only :
-            mode = O_WRONLY|O_CREAT;
+	    o_mode |= O_WRONLY;
             break;
         case gf_read_write :
-            mode = O_RDWR|O_CREAT;
+            o_mode |= O_RDWR;
             break;
         default:
             throw SRC_BUG;
         }
 
+	if(m != gf_read_only)
+	{
+	    o_mode |= O_CREAT;
+
+	     if(fail_if_exists)
+		 o_mode |= O_EXCL;
+
+	     if(erase)
+		 o_mode |= O_TRUNC;
+	}
+
+
 #if FURTIVE_READ_MODE_AVAILABLE
 	if(furtive_mode) // only used for read-only, but available for write-only and read-write modes
-	    mode |= O_NOATIME;
+	    o_mode |= O_NOATIME;
 #else
 	if(furtive_mode)
 	    throw Ecompilation(gettext("Furtive read mode"));
 #endif
-
-        do
-        {
-            filedesc = ::open(name, mode|O_BINARY, perm);
-            if(filedesc < 0)
+	try
+	{
+	    do
 	    {
-                if(errno == ENOSPC)
+		if(m != gf_read_only)
+		    filedesc = ::open(name, o_mode, permission);
+		else
+		    filedesc = ::open(name, o_mode);
+
+		if(filedesc < 0)
 		{
-		    if(get_mode() == gf_read_only)
-			throw SRC_BUG; // in read_only mode we do not need to create a new inode !!!
-                    get_ui().pause(gettext("No space left for inode, you have the opportunity to make some room now. When done : can we continue ?"));
+		    if(errno == ENOSPC)
+		    {
+			if(get_mode() == gf_read_only)
+			    throw SRC_BUG; // in read_only mode we do not need to create a new inode !!!
+			get_ui().pause(gettext("No space left for inode, you have the opportunity to make some room now. When done : can we continue ?"));
+		    }
+		    else
+			throw Erange("fichier_local::open", string(gettext("Cannot open file : ")) + strerror(errno));
 		}
-                else
-                    throw Erange("fichier_local::open", string(gettext("Cannot open file : ")) + strerror(errno));
 	    }
-        }
-        while(filedesc < 0 && errno == ENOSPC);
+	    while(filedesc < 0 && errno == ENOSPC);
+	}
+	catch(...)
+	{
+	    if(filedesc >= 0)
+	    {
+		::close(filedesc);
+		filedesc = -1;
+	    }
+	    throw;
+	}
     }
 
     void fichier_local::copy_from(const fichier_local & ref)
