@@ -1,11 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
-  
-  <meta content="text/html; charset=us-ascii" http-equiv="content-type">
-  <title>DAR - Frequently Asked Questions</title>
 
-  
-</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+
+  <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -2488,7 +2485,7 @@ disable this feature adding the "-asecu" switch to the command-line.<br>
 The answer is "yes" and even for more than one reason:<br>
       </div>
 
-      
+
       <ol style="margin-left: 40px;">
 <li>Many backup/copy tools do not take care of hard linked
 inode (hard linked plain files, named pipes, char devices, block
@@ -2504,12 +2501,12 @@ Using the following command will do the trick:<br>
       <br>
       </div>
 
-      
-      
+
+
       <div style="margin-left: 80px;"><code>dar -c - -R &lt;srcdir&gt; --retry-on-change 3 | dar -x - --sequential-read -R &lt;dstdir&gt;</code><br>
       <code></code></div>
 
-      
+
       <div style="margin-left: 40px;"><code> </code><br>
       <code>
 &lt;srcdir&gt;</code> contents will be copied to <code>&lt;dstdir&gt;</code>
@@ -2524,9 +2521,9 @@ Here is an example: we will copy the content of /home/my to /home2/my:<br>
 first we create the destination directory:<br>
       </div>
 
-      
-      
-      
+
+
+
       <div style="margin-left: 80px;"><code>mkdir /home2/my<br>
       <br>
       </code></div>
@@ -2534,13 +2531,13 @@ first we create the destination directory:<br>
 then we run dar:<br>
       </div>
 
-      
+
       <div style="margin-left: 80px;"><code>dar -c - -R /home/my --retry-on-change 3 | dar -x - --sequential-read -R /home2/my</code><span style="font-weight: bold;"></span><br>
       <span style="font-weight: bold;"><br>
       </span></div>
 
-      
-      
+
+
       <div style="margin-left: 40px;">The "--retry-on-change" let dar
 retry the copy of a file up to three times if that file has changed at
 the time dar was reading it. You can increase this number at will. If a
@@ -2576,12 +2573,12 @@ Any better idea? Feel free to contact dar's author for an update of
 this documentation!<br>
       </div>
 
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
       <span style="font-style: italic; font-weight: bold;"></span><br>
       <br>
       <a name="compression"></a><span style="font-style: italic; font-weight: bold;">Does dar compress per
@@ -2625,7 +2622,7 @@ How to activate compression with dar? Use the <span style="font-weight: bold;">-
 option (or -z in short), telling the algorithm to use and the
 compression level (--compression=bzip2:9 or -zgip:7 for example), you
 may not mention the compression ratio (which default to 9) and even not
-mention the compression algoritm which default to gzip. Thus -z or
+mention the compression algorithm which default to gzip. Thus -z or
 -zlzo are correct.<br>
       <br>
 To select file to compress or not compress, several options are
@@ -2656,7 +2653,7 @@ each other, or how to use <span style="font-weight: bold;">regular expression</s
       </span>
       <div style="margin-left: 40px;">The <span style="text-decoration: underline;">minimum
 slice size is around 20 bytes</span>,
-but you will only be able to strore 3 to 4 bytes of information per slice, due
+but you will only be able to store 3 to 4 bytes of information per slice, due
 to the slice header that need around 15 bytes in each slice. <span style="text-decoration: underline; font-weight: bold;">But there is no
 maximum slice size!</span> In other words you can give to <span style="font-weight: bold;">-s</span> and <span style="font-weight: bold;">-S options</span>
 a as long as required positive integer, thanks to its internal own
@@ -2666,7 +2663,7 @@ integers. This has a slightly memory and CPU penalty in regard to using native c
 implementation in dar.<br>
       <br>
 You can make use of suffixes like 'k' for kilo, M for mega, G for giga
-etc... (<a href="usage_notes.html#bytes_bits_kilo">all sufixes are
+etc... (<a href="usage_notes.html#bytes_bits_kilo">all suffixes are
 listed here</a>) to simplify your work. See also
 the <span style="font-weight: bold;">-aSI </span>and <span style="font-weight: bold;">-abinary</span> options to swap meaning
 between ko (= 1000 octets) kio (= 1024 octets).<br>
@@ -2692,7 +2689,7 @@ of archives and remote directories just like local files.</div>
       <span style="font-weight: bold; font-style: italic;"><a name="tar"></a>how
 dar compares to tar?<br>
       </span><br>
-      <div style="margin-left: 40px;">Here follows a table that provide
+      <div style="margin-left: 40px;">Here follows a table that provides
 comparison on main points between tar
 and dar, if you find errors or inconsistencies, thanks to report them to dar maintainer.<br>
       </div>
@@ -2748,7 +2745,7 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can directly and quicky restore a file from a large archive<br>
+            <td style="vertical-align: top;">can directly and quickly restore a file from a large archive<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -2830,7 +2827,7 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
           <tr>
             <td style="vertical-align: top;">can cipher archive with strong encryption<br>
             </td>
-            <td style="vertical-align: top;">no, (yes, with external tools, that require unciphering the whole archive in order to use it)<br>
+            <td style="vertical-align: top;">no, (yes, with external tools, that require decrypting the whole archive in order to use it)<br>
             </td>
             <td style="vertical-align: top;">yes (blowfish, aes, twofish, camellia, serpent, etc.)<br>
             </td>
@@ -2942,7 +2939,7 @@ saving a particular set of files or directories<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can privode on-fly calculated hash file of volumes (aka slices)<br>
+            <td style="vertical-align: top;">can provide on-fly calculated hash file of volumes (aka slices)<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -3003,5 +3000,6 @@ star: yes </td>
 </div>
 </div>
 </center>
+
 
 </body></html>
