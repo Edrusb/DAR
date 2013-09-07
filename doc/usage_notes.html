@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Usage Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -573,8 +574,8 @@ dar_slave -i toslave -o todar backup</code><br>
       <div style="text-align: justify; margin-left: 40px;">you probably
 know
 a bit the metric system, where a dimension is expressed by a base unit
-(the meter for distance, the liter for volume, the joule for energy,
-the volt for electrical potential, the bar for pressure, the watt for
+(the meter for distance, the liter for volume, the Joule for energy,
+the Volt for electrical potential, the bar for pressure, the Watt for
 power, the second for time, etc.), and declined using prefixes: <br>
       </div>
       <div style="margin-left: 40px;"><br>
@@ -610,10 +611,10 @@ In that discipline, the need to measure the size of information storage
 raised. The smallest size, is the bit (contraction of <span style="font-style: italic;"><span style="font-weight: bold;">bi</span>nary
 digi<span style="font-weight: bold;">t</span></span>), binary because
 it has two possible states: "0" and "1". Grouping bits by 8 computer
-scientists called it a <span style="font-style: italic;">byte</span>.
+scientists called it a <span style="font-style: italic;">byte</span> or an <span style="font-style: italic;">octet</span>.
 A byte has 256 different states, (2 power 8). The ASCII (American
 Standard Code for Information Interchange) code arrived and assigned a
-letter or more generally a character to some value of a byte, (A is
+letter or more generally a character to some well defined values of a byte, (A is
 assigned to 65, space to 32, etc). And as most text is composed of a
 set of character, they started to count size in byte. Time after time,
 following technology evolution, memory size approached 1000 bytes. <br>
@@ -623,8 +624,8 @@ following technology evolution, memory size approached 1000 bytes. <br>
       <div style="text-align: justify; margin-left: 40px;">But as
 memory is
 accessed through a bus which is a fixed number of cables (or integrated
-circuits), on which only two possible voltages are authorized to mean 0
-or 1, the total amount of byte that a bus can address is always a power
+circuits), on which only two possible voltages are authorized (to mean 0
+or 1), the total amount of byte that a bus can address is always a power
 of 2. With a two cable bus, you can have 4 values (00, 01, 10 and 11,
 where a digit is the state of a cable) so you can address 4 bytes.
 Giving a value to each cable defines an address to read or write in the
@@ -650,8 +651,7 @@ kbit/s. Thus here, kilo stays in the usual meaning of 1000 time the
 base unit. You can also find Ethernet 10 Mbit/s which is 10,000,000
 bits
 by seconds, same thing with Token-Ring that had rates at 4, 16 or 100
-Mbit by
-seconds (4,000,000 16,000,000 or 100,000,000 bits/s). But, even for
+Mbit/s (4,000,000 16,000,000 or 100,000,000 bits/s). But, even for
 telecommunications, kilo is not always 1000 times the base unit: the E1
 bandwidth at 2Mbit/s for example, is in fact 32*64kbit/s thus 2048
 kbit/s ... not 2000 kbit/s <br>
@@ -675,16 +675,16 @@ Now, if you want 2 Megabytes slices in the sense of the metric system,
 simply use "-s 2000000" or read below:<br>
       <br>
 Starting version 2.2.0, you can alter the meaning of all the suffixes
-used by dar, the<br>
+used by dar, using the following option.<br>
       <code></code><br>
       <code></code></div>
       <div style="margin-left: 80px;"><code>--alter=SI-units</code><br>
       </div>
       <div style="margin-left: 40px;"><br>
       <div style="text-align: justify;">
-(which can be shorten to -aSI or -asi) change the meaning of the
-prefixes that follow on the command-line, to the metric system (or
-System International) up to the end of the line or to a <br>
+(which can be shorten to -aSI or -asi) It changes the meaning of the
+prefixes that follow on the command-line, to follow the metric system (or
+System International) way of counting, up to the end of the line or to a <br>
       </div>
 
       <br>
@@ -706,9 +706,9 @@ a next --alter=SI-units. Thus in place of -s 2000000 one could use:<br>
       </div>
       <div style="text-align: justify; margin-left: 40px;">Yes, and to
 make
-things more confuse, marketing arrived and made sellers count gigabits
-a third way: I remember some time ago, I bought a hard disk which was
-described as "2.1 GB", (OK, that's several couple of years ago!), but in
+things more confuse, marketing/sales arrived and made sellers count gigabits
+a third way: I remember some&nbsp; time ago, I bought a hard disk which was
+described as "2.1 GB", (OK, that's now long ago!), but in
 fact it had only 2097152 bytes available. This is far from 2202009
 bytes (= 2.1 GiB for computer science meaning), and a bit more than
 2,000,000 bytes (metric system). OK, if it had these 2202009 bytes
@@ -2182,6 +2182,7 @@ such entries.<br>
 
 <br>
 <br>
+
 
 
 </body></html>
