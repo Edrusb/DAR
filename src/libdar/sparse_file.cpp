@@ -170,7 +170,15 @@ namespace libdar
 			    read_as_escape(true);
 			    try
 			    {
-				zero_count.read(*this);
+				try
+				{
+				    zero_count.read(*this);
+				}
+				catch(Egeneric &e)
+				{
+				    e.prepend_message("Error while reading the size of a hole:");
+				    throw;
+				}
 			    }
 			    catch(...)
 			    {
