@@ -107,6 +107,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	min_hole_size = hole_size;
+	UI_min_hole_size = 0;
 	min_hole_size.unstack(UI_min_hole_size);
 	if(min_hole_size > 0) // hole size is larger than maximum buffer
 	    UI_min_hole_size = 0; // disabling hole lookup inside buffers (faster execution)
