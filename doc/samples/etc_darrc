@@ -139,4 +139,4 @@ bell:
 #
 
 full-from-diff:
--/ '{\!(~I)}[Rr] {~S}[O*] P* ; {~s}[*o] *p'
+-/ '{!(~I)}[Rr] {~S}[O*] P* ; {~s}[*o] *p'
