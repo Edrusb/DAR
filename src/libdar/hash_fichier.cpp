@@ -50,6 +50,7 @@ namespace libdar
     {
 	if(get_mode() != gf_write_only) // at that time the fichier and generic_file part of the object is already built,
 	    throw SRC_BUG; // so we can call get_mode() to retrieve the openning mode of the file
+	only_hash = false;
 	hash_ready = false;
 	force_perm = false;
 	try
@@ -69,6 +70,7 @@ namespace libdar
     {
 	if(m != gf_write_only)
 	    throw SRC_BUG;
+	only_hash = false;
 	hash_ready = false;
 	force_perm = false;
 	x_perm = perm;
@@ -81,6 +83,7 @@ namespace libdar
     {
 	if(m != gf_write_only)
 	    throw SRC_BUG;
+	only_hash = false;
 	hash_ready = false;
 	force_perm = false;
 	x_perm = perm;
@@ -170,7 +173,8 @@ namespace libdar
 	if(eof)
 	    throw SRC_BUG;
 	gcry_md_write(hash_handle, (const void *)a, size);
-	fichier::inherited_write(a, size);
+	if(!only_hash)
+	    fichier::inherited_write(a, size);
 #else
 	throw Ecompilation(gettext("Missing hashing algorithms support (which is part of strong encryption support, using libgcrypt)"));
 #endif

@@ -13,7 +13,7 @@ AM_CPPFLAGS=-I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"
 endif
 endif
 
-noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_string_file test_escape test_hash_fichier test_old_api
+noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_string_file test_escape test_hash_fichier test_old_api make_sparse_file
 AM_LDFLAGS = -all-static @LTLIBINTL@
 
 LDADD = -L../libdar -l$(MYLIB)
@@ -103,3 +103,5 @@ test_hash_fichier_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 test_old_api_SOURCES = test_old_api.cpp
 test_old_api_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+
+make_sparse_file_SOURCES = make_sparse_file.c

@@ -104,6 +104,8 @@ namespace libdar
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(hash_fichier);
 #endif
+	    /// for debugging purposes only
+	void set_only_hash() { only_hash = true; };
 
     protected:
 	U_I inherited_read(char *a, U_I size) { throw SRC_BUG; };
@@ -112,6 +114,7 @@ namespace libdar
 	void inherited_terminate();
 
     private:
+	bool only_hash; //< if set, avoids copying data to file, only compute hash (debugging purpose)
 	bool hash_ready;
 	std::string hash_filename;
 	std::string hash_extension;

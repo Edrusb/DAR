@@ -34,22 +34,35 @@ extern "C"
 
 using namespace libdar;
 
-void f1(const string & filename, hash_algo algo);
+void f1(const string & src_filename, const string & dst_filename, hash_algo algo);
+void error(const string & argv0);
+libdar::hash_algo str2hash(const string & val);
 
 static user_interaction *ui = NULL;
 
-int main()
+int main(int argc, char *argv[])
 {
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    ui = shell_interaction_init(&cout, &cerr, false);
+    ui = shell_interaction_init(&cout, &cerr, true);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
+
     try
     {
-	f1("md5-toto", hash_md5);
-	f1("sha1-toto", hash_sha1);
+	try
+	{
+	    if(argc != 4)
+		error(argv[0]);
+	    else
+		f1(argv[1], argv[2], str2hash(argv[3]));
+	}
+	catch(Egeneric & e)
+	{
+	    ui->warning(e.get_message());
+	    e.dump();
+	}
     }
     catch(...)
     {
@@ -61,12 +74,27 @@ int main()
 	delete ui;
 }
 
-void f1(const string & filename, hash_algo algo)
+void f1(const string & src_filename, const string & dst_filename, hash_algo algo)
 {
-    const string message = "bonjour les amis, il fait chaud il fait beau, les mouches pettent et les cailloux fleurissent.";
-    hash_fichier dst = hash_fichier(*ui, filename, gf_write_only, tools_octal2int("0777"), false);
+    hash_fichier dst = hash_fichier(*ui, dst_filename, gf_write_only, tools_octal2int("0777"), false);
+    fichier src = fichier(src_filename);
 
-    dst.set_hash_file_name(filename, algo, hash_algo_to_string(algo));
+    dst.set_only_hash();
+    dst.set_hash_file_name(src_filename, algo, hash_algo_to_string(algo));
 
-    dst.write(message.c_str(), message.size());
+    src.copy_to(dst);
+}
+
+void error(const string & argv0)
+{
+    ui->printf("usage: %S <source filename> <dest filename> <hash algo>", &argv0);
+}
+
+libdar::hash_algo str2hash(const string & val)
+{
+    if(val == "md5")
+	return libdar::hash_md5;
+    if(val == "sha1")
+	return libdar::hash_sha1;
+    throw Erange("str2hash", "unknown hash algorithm");
 }
