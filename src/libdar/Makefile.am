@@ -59,7 +59,7 @@ install-data-local:
 	for file in $(dist_noinst_DATA) gettext.h libdar_my_config.h ; do sed -e 's%#include \"../my_config.h\"%INC_MY_CONFIG_FILE_H%g' -e "s%#include \"%#include \"$(pkgincludedir)/%g" -e "s%INC_MY_CONFIG_FILE_H%#include \"$(pkgincludedir)/libdar_my_config.h\"%g" "$$file" > $(DESTDIR)$(pkgincludedir)/"$$file"  ; done
 	rm libdar_my_config.h gettext.h
 	for file in $(DESTDIR)$(pkgincludedir)/* ; do sed -e 's%HAVE_%LIBDAR_HAS_%g' -e 's%PACKAGE%DAR_PACKAGE%g' -e 's%SIZEOF_%LIBDAR_SIZEOF_%g' -e 's%LSTAT_FOLLOWS_SLASHED_SYMLINK%LIBDAR_LSTAT_FOLLOWS_SLASHED_SYMLINK%g' -e 's%VERSION%LIBDAR_VERSION%g' -e 's%MUTEX_WORKS%LIBDAR_MUTEX_WORKS%g' -e 's%OS_BITS%LIBDAR_OS_BITS%g' -e 's%_AVAILABLE%_AVAILABLE_FOR_LIBDAR%g' -e 's%STDC_HEADERS%LIBDAR_STDC_HEADERS%g' -e 's%ENABLE_NLS%DAR_ENABLE_NLS%g' -e 's%HAVE_GETTEXT%DAR_HAS_GETTEXT%g' "$$file" > "$$file.tmp" && mv "$$file.tmp" "$$file" ; done
-	grep DAR $(DESTDIR)$(pkgincludedir)/libdar_config.h | grep -v "#undef" >  $(DESTDIR)$(pkgincludedir)/config.h.tmp
+	egrep 'LIBDAR|DAR_' $(DESTDIR)$(pkgincludedir)/libdar_config.h | grep -v "#undef" >  $(DESTDIR)$(pkgincludedir)/config.h.tmp
 	mv  $(DESTDIR)$(pkgincludedir)/config.h.tmp  $(DESTDIR)$(pkgincludedir)/libdar_config.h
 	chmod 0644 $(DESTDIR)$(pkgincludedir)/*
 	$(INSTALL) -d $(DESTDIR)$(libdir)/pkgconfig
