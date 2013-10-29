@@ -1,8 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
+  
+  <meta content="text/html; charset=us-ascii" http-equiv="content-type">
+  <title>DAR - Frequently Asked Questions</title>
 
-
-  <meta content="text/html; charset=us-ascii" http-equiv="content-type"><title>DAR - Frequently Asked Questions</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+  
+</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -91,8 +94,8 @@ what does that mean!? </a><br>
       <a style="font-style: italic; font-weight: bold;" href="#compression">Does dar compress per file or the whole archive?</a><br>
       <span style="font-style: italic; font-weight: bold;"><a href="#sizes">What slice size can I use with dar?</a><br>
       </span><a href="#fuse"><span style="font-weight: bold; font-style: italic;">Is there a dar </span><span style="font-weight: bold; font-style: italic;">fuse</span></a><span style="font-weight: bold; font-style: italic;"><a href="#fuse">
-filesystem?</a><br><a href="#tar">
-how dar compares to tar?</a><br>
+filesystem?</a><br>
+      <a href="#tar">how dar compares to tar?</a><br>
       </span><span style="font-weight: bold; font-style: italic;"><span style="font-weight: bold; font-style: italic;"> </span>
       <h2><span style="font-weight: bold;"> </span></h2>
       <br>
@@ -2058,8 +2061,10 @@ test, extract file, list the contents of a given slice from an archive?</span><b
       <div style="margin-left: 40px;"> </div>
       <div style="margin-left: 40px;">Well
 this is due to dar's design. Since release 2.4.0 two feature can help
-you be close to that point, namely --sequential-reading which asks dar
-to read the archive sequentially and -al option which asks dar to be
+you be close to that point, namely <span style="font-weight: bold;">--sequential-reading</span>
+which asks dar
+to read the archive sequentially and <span style="font-weight: bold;">-al</span>
+option which asks dar to be
 relaxed on sanity and coherence checks. You can put a single slice into
 a given directory, and create as much empty files as necessary to
 simulate slices of that archive which has lower numbers than the real
@@ -2087,7 +2092,31 @@ last ressort method upon heavy archive corruption. It is still a good
 option to test your archive once on destination medium and if possible
 in addition to add redundancy data using Parchive to be able to repair
 an archive corrupted due to media problem.<br>
+      <br style="font-weight: bold; text-decoration: underline;">
+
+      <span style="font-weight: bold; text-decoration: underline;">Alternative:</span>
+<br>
+      Once missing slices have been replaced by empty files (using the touch command for example),
+<br><br>if you have the last slice of the archive, you can avoid using
+--sequential-read mode and only use the lax mode (-al option). You can
+then use the testing operation to known what file can be retrieved from
+the archive. if you have not the last slice, you must use
+--sequential-read mode in addition to lax mode (-al option)
+<br><br>
+If you want to know what particular files a slice contains, you can add the following option: 
+<br>
+      <div style="margin-left: 40px;">	-<span style="font-family: monospace;">E "echo '************* Opening slice %N **********'"</span><br>
       </div>
+<br>all in one:<br></div>
+      <div style="margin-left: 80px;"><span style="font-family: monospace;">	touch &lt;archive&gt;.&lt;missing slice&gt;.dar</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">	
+dar -t &lt;archive&gt; -al -E "echo '****** Opening slice %N ******'" -v &gt; result.txt</span><br style="font-family: monospace;">
+      <span style="font-family: monospace;">	
+less result.txt</span><br>
+      </div>
+
+    
+      
       <div style="margin-left: 40px;">
       <div style="margin-left: 40px;"> </div>
       <br>
@@ -2364,8 +2393,6 @@ directory in the backup.<br>
       <a name="security"></a><span style="font-style: italic; font-weight: bold;">Dar reports a "SECURITY
 WARNING! SUSPICIOUS FILE" what does that mean!? </span><br>
       <br>
-
-
       <div style="margin-left: 40px;">When dar reports the following
 message: <br>
       <br>
@@ -2476,68 +2503,54 @@ Last point, if you can explain the cause of the alarm and are annoyed
 by it (you have hundred of files concerned for example ) you can
 disable this feature adding the "-asecu" switch to the command-line.<br>
       <br>
-</div>
+      </div>
       <br>
-
       <span style="font-weight: bold;"><span style="font-style: italic;"><a name="copy"></a> Can dar help copy a large directory tree?</span><span style="font-style: italic; font-weight: bold;"> </span><br>
       </span><br>
-      <div style="margin-left: 40px;">
-The answer is "yes" and even for more than one reason:<br>
+      <div style="margin-left: 40px;">The answer is "yes" and even for
+more than one reason:<br>
       </div>
-
-
       <ol style="margin-left: 40px;">
-<li>Many backup/copy tools do not take care of hard linked
+        <li>Many backup/copy tools do not take care of hard linked
 inode (hard linked plain files, named pipes, char devices, block
-devices, symlinks)... dar does,</li><li>Many backup/copy tools do not take care of sparse files...
-dar does,</li><li>Many backup/copy tools do not take care of Extended
-Attributes... dar does,</li><li>Many backup/copy tools do not take care of Posix ACL
-(Linux)... dar does,</li><li>Many backup/copy tools do not take care of file forks
-(MacOS X)... dar does,</li><li>Many backup/copy tools do not take any precautions while
+devices, symlinks)... dar does,</li>
+        <li>Many backup/copy tools do not take care of sparse files...
+dar does,</li>
+        <li>Many backup/copy tools do not take care of Extended
+Attributes... dar does,</li>
+        <li>Many backup/copy tools do not take care of Posix ACL
+(Linux)... dar does,</li>
+        <li>Many backup/copy tools do not take care of file forks
+(MacOS X)... dar does,</li>
+        <li>Many backup/copy tools do not take any precautions while
 working on a live system... dar does.</li>
       </ol>
-      <div style="margin-left: 40px;">
-Using the following command will do the trick:<br>
+      <div style="margin-left: 40px;">Using the following command will
+do the trick:<br>
       <br>
       </div>
-
-
-
-      <div style="margin-left: 80px;"><code>dar -c - -R &lt;srcdir&gt; --retry-on-change 3 | dar -x - --sequential-read -R &lt;dstdir&gt;</code><br>
+      <div style="margin-left: 80px;"><code>dar -c - -R &lt;srcdir&gt;
+--retry-on-change 3 | dar -x - --sequential-read -R &lt;dstdir&gt;</code><br>
       <code></code></div>
-
-
       <div style="margin-left: 40px;"><code> </code><br>
-      <code>
-&lt;srcdir&gt;</code> contents will be copied to <code>&lt;dstdir&gt;</code>
+      <code>&lt;srcdir&gt;</code> contents will be copied to <code>&lt;dstdir&gt;</code>
 both must exist before running this command, and <code>&lt;dstdir&gt;</code>
 should
 be an empty dir. <br>
       <br>
-
 Here is an example: we will copy the content of /home/my to /home2/my:<br>
       <br>
-
 first we create the destination directory:<br>
       </div>
-
-
-
-
       <div style="margin-left: 80px;"><code>mkdir /home2/my<br>
       <br>
       </code></div>
-      <div style="margin-left: 40px;">
-then we run dar:<br>
+      <div style="margin-left: 40px;">then we run dar:<br>
       </div>
-
-
-      <div style="margin-left: 80px;"><code>dar -c - -R /home/my --retry-on-change 3 | dar -x - --sequential-read -R /home2/my</code><span style="font-weight: bold;"></span><br>
+      <div style="margin-left: 80px;"><code>dar -c - -R /home/my
+--retry-on-change 3 | dar -x - --sequential-read -R /home2/my</code><span style="font-weight: bold;"></span><br>
       <span style="font-weight: bold;"><br>
       </span></div>
-
-
-
       <div style="margin-left: 40px;">The "--retry-on-change" let dar
 retry the copy of a file up to three times if that file has changed at
 the time dar was reading it. You can increase this number at will. If a
@@ -2546,7 +2559,6 @@ warning is issued about that file and it is flagged as dirty in the
 data flow, the second dar command will then ask you whether you want it
 to be restored (here copied) on not.<br>
       <br>
-
 "piping" ('|' shell syntax) the first dar's output to the second dar's
 input makes the operation not requiering any temporary storage, only
 virtual memory is used to perform this copy. Compression is thus not
@@ -2557,10 +2569,8 @@ should compare the copied data to the original one, before removing it,
 as no backup file has been dropped down to filesystem. This can simply
 be done using:<br>
       <br>
-
 &nbsp;&nbsp;&nbsp; <code>diff -r &lt;srcdir&gt; &lt;dstdir&gt;</code><br>
       <br>
-
 But, no, diff will not check extended Attributes, File Forks or Posix
 ACL, hard linked inodes, etc. If you want a more controlable way of
 copying a large directory, simply use dar with a real archive file,
@@ -2568,17 +2578,9 @@ compare the archive toward the original filesystem, restore the archive
 contents to its new place, and compare the restored filesystem toward
 the original archive. <br>
       <br>
-
 Any better idea? Feel free to contact dar's author for an update of
 this documentation!<br>
       </div>
-
-
-
-
-
-
-
       <span style="font-style: italic; font-weight: bold;"></span><br>
       <br>
       <a name="compression"></a><span style="font-style: italic; font-weight: bold;">Does dar compress per
@@ -2605,8 +2607,10 @@ archive</span>,
 in particular already compressed files (like *.jpeg, *.mpeg, some *.avi
 files and of course the *.gz, *.bz2 or *.lzo files). Avoiding
 compressing already compressed files save CPU cycles (in other words
-it speeds up backup process time). And while compressing an already compressed file
-takes time for nothing, it also leads to require more storage space than
+it speeds up backup process time). And while compressing an already
+compressed file
+takes time for nothing, it also leads to require more storage space
+than
 if that same file was not compressed a second time.<br>
       <br>
       <span style="font-weight: bold;">In brief</span>,
@@ -2628,11 +2632,13 @@ mention the compression algorithm which default to gzip. Thus -z or
 To select file to compress or not compress, several options are
 available: <span style="font-weight: bold;">--exclude-compression</span>
 (or -Z in short --- the uppercase Z here) <span style="font-weight: bold;">--include-compression</span>
-(or -Y in short). Both take as argument a mask that based on their names
+(or -Y in short). Both take as argument a mask that based on their
+names
 define files that have to be compressed or not to be compressed. For
 example -Z "*.avi" -Z "*.mp?" -Z "*.mpeg" will avoid compressing MPEG,
 MP3, MP2 and AVI files. Note that dar provides in its /etc/darrc
-default configuration file, a long list of -Z options to avoid compressing
+default configuration file, a long list of -Z options to avoid
+compressing
 most common compressed files, that you can activate by simply adding <span style="font-weight: bold;">compress-exclusion</span> on dar
 command-line.<br>
       <br>
@@ -2644,8 +2650,10 @@ which takes a size as argument: --mincompr 1k will avoid compressing
 files which size is less than or equal to 1024 bytes. You should find
 all details about these options in <a href="man/dar.html">dar man page</a>.
 Check also the <span style="font-weight: bold;">-am</span> and <span style="font-weight: bold;">-ar</span> options to understand how <span style="font-weight: bold;">--exclude-compression </span>and <span style="font-weight: bold;">--include-compression</span> interact with
-each other, or how to use <span style="font-weight: bold;">regular expression</span>s in place of <span style="font-weight: bold;">glob expressions</span> in masks.<br>
-</div>
+each other, or how to use <span style="font-weight: bold;">regular
+expression</span>s in place of <span style="font-weight: bold;">glob
+expressions</span> in masks.<br>
+      </div>
       <br>
       <br>
       <span style="font-style: italic; font-weight: bold;"><a name="sizes"></a>What slice size can I use with dar?<br>
@@ -2653,12 +2661,15 @@ each other, or how to use <span style="font-weight: bold;">regular expression</s
       </span>
       <div style="margin-left: 40px;">The <span style="text-decoration: underline;">minimum
 slice size is around 20 bytes</span>,
-but you will only be able to store 3 to 4 bytes of information per slice, due
+but you will only be able to store 3 to 4 bytes of information per
+slice, due
 to the slice header that need around 15 bytes in each slice. <span style="text-decoration: underline; font-weight: bold;">But there is no
 maximum slice size!</span> In other words you can give to <span style="font-weight: bold;">-s</span> and <span style="font-weight: bold;">-S options</span>
 a as long as required positive integer, thanks to its internal own
-integer type named "<span style="font-weight: bold;">infinint</span>" dar is able to handle arbitrarily large
-integers. This has a slightly memory and CPU penalty in regard to using native computer
+integer type named "<span style="font-weight: bold;">infinint</span>"
+dar is able to handle arbitrarily large
+integers. This has a slightly memory and CPU penalty in regard to using
+native computer
 32 or 64 bits integers, but has the advantage to provide a long term
 implementation in dar.<br>
       <br>
@@ -2669,8 +2680,10 @@ the <span style="font-weight: bold;">-aSI </span>and <span style="font-weight: b
 between ko (= 1000 octets) kio (= 1024 octets).<br>
       <br>
 Last point dar/libdar can be compiled using the --enable-mode=64 option
-given to ./configure while building dar. This replaces the "infinint" type by 64 bits
-integers, for better performances and reduced memory usage. However this
+given to ./configure while building dar. This replaces the "infinint"
+type by 64 bits
+integers, for better performances and reduced memory usage. However
+this
 has some drawback on archive size and dates. See the <a href="Limitations.html">limitations</a> for more details.<br>
       </div>
       <br>
@@ -2689,9 +2702,11 @@ of archives and remote directories just like local files.</div>
       <span style="font-weight: bold; font-style: italic;"><a name="tar"></a>how
 dar compares to tar?<br>
       </span><br>
-      <div style="margin-left: 40px;">Here follows a table that provides
+      <div style="margin-left: 40px;">Here follows a table that
+provides
 comparison on main points between tar
-and dar, if you find errors or inconsistencies, thanks to report them to dar maintainer.<br>
+and dar, if you find errors or inconsistencies, thanks to report them
+to dar maintainer.<br>
       </div>
       <span style="font-style: italic; font-weight: bold;"></span><br>
       <table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
@@ -2699,15 +2714,18 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
           <tr>
             <td style="vertical-align: top; font-weight: bold; text-align: center; background-color: rgb(153, 153, 153);">features<br>
             </td>
-            <td style="vertical-align: top; width: 30%; font-weight: bold; text-align: center; background-color: rgb(153, 153, 153);">tar (aka Tape ARchive)<br>
+            <td style="vertical-align: top; width: 30%; font-weight: bold; text-align: center; background-color: rgb(153, 153, 153);">tar
+(aka Tape ARchive)<br>
             </td>
-            <td style="vertical-align: top; width: 30%; font-weight: bold; text-align: center; background-color: rgb(153, 153, 153);">dar (aka Disk ARchive)<br>
+            <td style="vertical-align: top; width: 30%; font-weight: bold; text-align: center; background-color: rgb(153, 153, 153);">dar
+(aka Disk ARchive)<br>
             </td>
           </tr>
           <tr>
             <td style="vertical-align: top;">Licensing<br>
             </td>
-            <td style="vertical-align: top;">GPL v2 or more recent (GNU tar)<br>
+            <td style="vertical-align: top;">GPL v2 or more recent (GNU
+tar)<br>
             </td>
             <td style="vertical-align: top;">GPL v2 or more recent<br>
             </td>
@@ -2729,7 +2747,8 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can sequentially read archive<br>
+            <td style="vertical-align: top;">can sequentially read
+archive<br>
             </td>
             <td style="vertical-align: top;">yes<br>
             </td>
@@ -2737,7 +2756,8 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can sequentially write archive<br>
+            <td style="vertical-align: top;">can sequentially write
+archive<br>
             </td>
             <td style="vertical-align: top;">yes<br>
             </td>
@@ -2745,7 +2765,8 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can directly and quickly restore a file from a large archive<br>
+            <td style="vertical-align: top;">can directly and quickly
+restore a file from a large archive<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -2755,13 +2776,15 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
           <tr>
             <td style="vertical-align: top;">can compress data<br>
             </td>
-            <td style="vertical-align: top;">not alone, the resulting archive can be compressed with gzip and other compression tools.<br>
+            <td style="vertical-align: top;">not alone, the resulting
+archive can be compressed with gzip and other compression tools.<br>
             </td>
             <td style="vertical-align: top;">yes<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can avoid compressing already compressed files<br>
+            <td style="vertical-align: top;">can avoid compressing
+already compressed files<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -2769,23 +2792,30 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can extract files after data corruption<br>
+            <td style="vertical-align: top;">can extract files after
+data corruption<br>
             </td>
-            <td style="vertical-align: top;">no (yes, if corruption is not noticed by tar)<br>
+            <td style="vertical-align: top;">no (yes, if corruption is
+not noticed by tar)<br>
             </td>
             <td style="vertical-align: top;">yes<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">provide reparation mechanism<br>
+            <td style="vertical-align: top;">provide reparation
+mechanism<br>
             </td>
-            <td style="vertical-align: top;">no (yes, with external software like <a href="http://parchive.sourceforge.net/">Parchive</a>)<br>
+            <td style="vertical-align: top;">no (yes, with external
+software like <a href="http://parchive.sourceforge.net/">Parchive</a>)<br>
             </td>
-            <td style="vertical-align: top;">no (yes, with external software like <a href="http://parchive.sourceforge.net/">Parchive</a>)<br>
+            <td style="vertical-align: top;">no (yes, with external
+software like <a href="http://parchive.sourceforge.net/">Parchive</a>)<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">provide a mode that help using an strongly corrupted archive without external reparation mechanism<br>
+            <td style="vertical-align: top;">provide a mode that help
+using an strongly corrupted archive without external reparation
+mechanism<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -2801,7 +2831,8 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can make differential backup<br>
+            <td style="vertical-align: top;">can make differential
+backup<br>
             </td>
             <td style="vertical-align: top;">yes (using GNU tar)<br>
             </td>
@@ -2825,23 +2856,29 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can cipher archive with strong encryption<br>
+            <td style="vertical-align: top;">can cipher archive with
+strong encryption<br>
             </td>
-            <td style="vertical-align: top;">no, (yes, with external tools, that require decrypting the whole archive in order to use it)<br>
+            <td style="vertical-align: top;">no, (yes, with external
+tools, that require decrypting the whole archive in order to use it)<br>
             </td>
-            <td style="vertical-align: top;">yes (blowfish, aes, twofish, camellia, serpent, etc.)<br>
+            <td style="vertical-align: top;">yes (blowfish, aes,
+twofish, camellia, serpent, etc.)<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can split an archive in multi-volume<br>
+            <td style="vertical-align: top;">can split an archive in
+multi-volume<br>
             </td>
-            <td style="vertical-align: top;">yes, multiple of 1024 octets<br>
+            <td style="vertical-align: top;">yes, multiple of 1024
+octets<br>
             </td>
             <td style="vertical-align: top;">yes, at 1 byte resolution.<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can define for the initial volume a different size than the following ones<br>
+            <td style="vertical-align: top;">can define for the initial
+volume a different size than the following ones<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -2849,7 +2886,8 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">let the user define a command to run between volumes<br>
+            <td style="vertical-align: top;">let the user define a
+command to run between volumes<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -2857,7 +2895,8 @@ and dar, if you find errors or inconsistencies, thanks to report them to dar mai
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can save and restore Extended Attributes<br>
+            <td style="vertical-align: top;">can save and restore
+Extended Attributes<br>
             </td>
             <td style="vertical-align: top;">GNU tar: no?<br>
 star:&nbsp; yes<br>
@@ -2866,11 +2905,13 @@ star:&nbsp; yes<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">maximum file size in archive<br>
+            <td style="vertical-align: top;">maximum file size in
+archive<br>
             </td>
             <td style="vertical-align: top;">8 Gio<br>
             </td>
-            <td style="vertical-align: top;">no limit (limit might come but because of the underlying OS)<br>
+            <td style="vertical-align: top;">no limit (limit might come
+but because of the underlying OS)<br>
             </td>
           </tr>
           <tr>
@@ -2878,11 +2919,14 @@ star:&nbsp; yes<br>
             </td>
             <td style="vertical-align: top;">only in file headers<br>
             </td>
-            <td style="vertical-align: top;">yes, in any part of the archive (slice header, archive header, saved file's data, saved file's EA, table of contents).<br>
+            <td style="vertical-align: top;">yes, in any part of the
+archive (slice header, archive header, saved file's data, saved file's
+EA, table of contents).<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">portable software (exists for Unix, Windows, MaC, etc.)<br>
+            <td style="vertical-align: top;">portable software (exists
+for Unix, Windows, MaC, etc.)<br>
             </td>
             <td style="vertical-align: top;">yes<br>
             </td>
@@ -2890,7 +2934,8 @@ star:&nbsp; yes<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can properly backup a live filesystem<br>
+            <td style="vertical-align: top;">can properly backup a live
+filesystem<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -2898,7 +2943,8 @@ star:&nbsp; yes<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">provide a mean to run a command before and after<br>
+            <td style="vertical-align: top;">provide a mean to run a
+command before and after<br>
 saving a particular set of files or directories<br>
             </td>
             <td style="vertical-align: top;">no<br>
@@ -2907,7 +2953,8 @@ saving a particular set of files or directories<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can properly save hard linked inode<br>
+            <td style="vertical-align: top;">can properly save hard
+linked inode<br>
             </td>
             <td style="vertical-align: top;">only plain files<br>
             </td>
@@ -2915,7 +2962,8 @@ saving a particular set of files or directories<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can detect sparse files and restore them as such<br>
+            <td style="vertical-align: top;">can detect sparse files
+and restore them as such<br>
             </td>
             <td style="vertical-align: top;">yes<br>
             </td>
@@ -2923,7 +2971,8 @@ saving a particular set of files or directories<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can merge two archive into a new one<br>
+            <td style="vertical-align: top;">can merge two archive into
+a new one<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -2931,7 +2980,8 @@ saving a particular set of files or directories<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can update an archive with new files<br>
+            <td style="vertical-align: top;">can update an archive with
+new files<br>
             </td>
             <td style="vertical-align: top;">yes<br>
             </td>
@@ -2939,7 +2989,8 @@ saving a particular set of files or directories<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can provide on-fly calculated hash file of volumes (aka slices)<br>
+            <td style="vertical-align: top;">can provide on-fly
+calculated hash file of volumes (aka slices)<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -2955,16 +3006,17 @@ saving a particular set of files or directories<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can take care of the nodump flag<br>
+            <td style="vertical-align: top;">can take care of the
+nodump flag<br>
             </td>
             <td style="vertical-align: top;">GNU tar: no?<br>
-
 star: yes </td>
             <td style="vertical-align: top;">yes<br>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can understand the <a href="http://www.brynosaurus.com/cachedir/">caching directory tagging standard</a><br>
+            <td style="vertical-align: top;">can understand the <a href="http://www.brynosaurus.com/cachedir/">caching directory tagging
+standard</a><br>
             </td>
             <td style="vertical-align: top;">yes<br>
             </td>
@@ -2972,7 +3024,8 @@ star: yes </td>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">provides a dry-run execution mode<br>
+            <td style="vertical-align: top;">provides a dry-run
+execution mode<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -2980,7 +3033,8 @@ star: yes </td>
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: top;">can provide a summary of an archive<br>
+            <td style="vertical-align: top;">can provide a summary of
+an archive<br>
             </td>
             <td style="vertical-align: top;">no<br>
             </td>
@@ -2989,7 +3043,6 @@ star: yes </td>
           </tr>
         </tbody>
       </table>
-
       <br>
       <br>
       </td>
@@ -3000,6 +3053,5 @@ star: yes </td>
 </div>
 </div>
 </center>
-
 
 </body></html>
