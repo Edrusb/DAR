@@ -302,25 +302,20 @@ namespace libdar
 		    if(i < lu1)
 		    {
 			diff = true;
-			err_offset = lu1 - i;
-			if(err_offset <= get_position())
-			    err_offset = get_position() - err_offset;
-			else
-			    throw SRC_BUG;
+			err_offset += i;
 		    }
 		    else
+		    {
+			err_offset += lu1;
 			value->compute(buffer1, lu1);
+		    }
 		}
 		else
 		{
 		    U_I min = lu1 > lu2 ? lu2 : lu1;
 
 		    diff = true;
-		    err_offset = min;
-		    if(err_offset <= get_position())
-			err_offset = get_position() - err_offset;
-		    else
-			throw SRC_BUG;
+		    err_offset += min;
 		}
 	    }
 	    while(!diff && lu1 > 0);
