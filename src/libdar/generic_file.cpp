@@ -465,7 +465,7 @@ namespace libdar
 
     const char * generic_file_get_name(gf_mode mode)
     {
-        char *ret = NULL;
+	const char *ret = NULL;
 
         switch(mode)
         {

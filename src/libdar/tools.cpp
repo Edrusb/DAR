@@ -1048,7 +1048,7 @@ namespace libdar
 
     void tools_display_features(user_interaction & dialog)
     {
-	char *endy = NULL;
+	const char *endy = NULL;
 
 	tools_display_features(dialog,
 			       compile_time::ea(),
