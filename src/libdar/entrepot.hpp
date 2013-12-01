@@ -100,7 +100,7 @@ namespace libdar
 	    /// \param[in] filename is the full path+name of the file to open (read/create/write to)
 	    /// \param[in] mode defines which way to open the file (read-only, read-write or write-only)
 	    /// \param[in] force_permission whether to set the file permission to the value given in the permission argument
-	    /// \param[in] permission, if force_permission is set, change the file permission to that value
+	    /// \param[in] permission if force_permission is set, change the file permission to that value
 	    /// \param[in] fail_if_exists tells whether the underlying implementation have to fail throwing Erange("exists") if the file already exist when write access is required
 	    /// \param[in] erase tells whether the underlying implementation will empty an existing file before writing to it
 	    /// \param[in] algo defines the hash file to create, other value than hash_none are acceptes only in writeonly mode with erase or fail_if_exist set

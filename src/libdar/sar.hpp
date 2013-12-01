@@ -89,7 +89,7 @@ namespace libdar
 	    /// \param[in] pause if set to zero no pause will be done between slice creation. If set to 1 a pause between each slice will be done. If set to N a pause each N slice will be done. Pauses must be acknoledged by user for the process to continue
 	    /// \param[in] where defines where to store the slices
 	    /// \param[in] data_name is a tag that has to be associated with the data.
-	    /// \param[in] force_perm if true slice permission will be forced to the value given in the next argument
+	    /// \param[in] force_permission if true slice permission will be forced to the value given in the next argument
 	    /// \param[in] permission value to use to set permission of slices
 	    /// \param[in] x_hash defines whether a hash file has to be generated for each slice, and wich hash algorithm to use
 	    /// \param[in] x_min_digits is the minimum number of digits the slices number is stored with in the filename
