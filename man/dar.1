@@ -362,6 +362,19 @@ By default slice number contained in filename do not have any padded zeros, whic
 .TP 20
 --pipe-fd <num>
 will read further arguments from the file-descriptor <num>. The arguments read through this file-descriptor must follow a TLV (Type/Length/Value) list format. This option is not intended for human use, but for other programs launching dar like dar_manager. This feature has been added to overcome the command line length limit.
+.TP 20
+-4, --fsa-familly <fam>[,<fam>[,<fam>[...]]]
+Filesystem specific attributes (FSA) are those attributes like nodump flag, immutable, compressed attributes for ext2/3/4 filesystem, creation_time for HFS+ and NTFS and so on that are specific to a given filesystem. These attributes are grouped by familly named. Currently the faavailable familly name of FSA is:
+.RS
+.TP 5
+hfs_plus
+which contains the creation time date found on HFS+ filesystems
+.TP 5
+linux_extX
+which contains the nodump, immutable undeleted and compressed flags of linux ext2/3/4 filesystems
+.RE
+At backup time all FSA that have been activated at compilation time are saved. At comparison time, saved FSA are compared to those present on filesystem, but if the equivalent FSA cannot be read because the destination filesystem does not support an error is reported for that file. At restoration time all FSA are tried to be restored. If the destination filesystem does not support those FSA a warning is returned and file is restored as best as possible. To avoid failure at comparison time or warning at restoration time it is possible to reduce the FSA tobe considered to a give set of familly thanks to this --fsa-familly option. By default all FSA are taken into consideration.
+
 .PP
 .B SAVING, ISOLATION AND MERGING OPTIONS (to use with -c, -C or -+)
 .PP
