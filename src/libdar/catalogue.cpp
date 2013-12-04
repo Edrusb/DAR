@@ -80,6 +80,10 @@ extern "C"
 #define INODE_FLAG_EA_NONE  0x03
 #define INODE_FLAG_EA_FAKE  0x04
 #define INODE_FLAG_EA_REMO  0x05
+#define INODE_FLAG_FSA_MASK 0x18
+#define INODE_FLAG_FSA_NONE 0x00
+#define INODE_FLAG_FSA_PART 0x08
+#define INODE_FLAG_FSA_FULL 0x10
 
 #define MIRAGE_ALONE 'X'
 #define MIRAGE_WITH_INODE '>'
@@ -526,22 +530,15 @@ namespace libdar
                  const string & xname,
                  const infinint & fs_device) : nomme(xname)
     {
+	nullifyptr();
         uid = xuid;
         gid = xgid;
         perm = xperm;
         xsaved = s_not_saved;
         ea_saved = ea_none;
-        ea_offset = NULL;
-        ea = NULL;
-        ea_crc = NULL;
-        last_acc = NULL;
-        last_mod = NULL;
-        ea_offset = NULL;
+	fsa_saved = fsa_none;
         ea_size = 0;
-        last_cha = NULL;
-        fs_dev = NULL;
-        storage = NULL;
-        esc = NULL;
+	fsa_size = 0;
         edit = 0;
 
         try
@@ -550,38 +547,16 @@ namespace libdar
             last_mod = new (nothrow) infinint(last_modif);
             last_cha = new (nothrow) infinint(last_change);
             ea_offset = new (nothrow) infinint(0);
+	    fsa_offset = new (nothrow) infinint(0);
             fs_dev = new (nothrow) infinint(fs_device);
-            if(last_acc == NULL || last_mod == NULL || ea_offset == NULL || last_cha == NULL || fs_dev == NULL)
+            if(last_acc == NULL || last_mod == NULL || ea_offset == NULL
+	       || last_cha == NULL || fs_dev == NULL || fsa_offset == NULL)
                 throw Ememory("inde::inode");
         }
         catch(...)
         {
-            if(last_acc != NULL)
-            {
-                delete last_acc;
-                last_acc = NULL;
-            }
-            if(last_mod != NULL)
-            {
-                delete last_mod;
-                last_mod = NULL;
-            }
-            if(ea_offset != NULL)
-            {
-                delete ea_offset;
-                ea_offset = NULL;
-            }
-            if(last_cha != NULL)
-            {
-                delete last_cha;
-                last_cha = NULL;
-            }
-            if(fs_dev != NULL)
-            {
-                delete fs_dev;
-                fs_dev = NULL;
-            }
-            throw;
+	    destroy();
+	    throw;
         }
     }
 
@@ -595,92 +570,90 @@ namespace libdar
         U_16 tmp;
         unsigned char flag;
 
-        xsaved = saved;
-        edit = reading_ver;
-        esc = ptr;
-        last_acc = NULL;
-        last_mod = NULL;
-        last_cha = NULL;
-        ea_offset = NULL;
-        fs_dev = NULL;
-        ea_crc = NULL;
+	nullifyptr();
 
-        if(reading_ver > 1)
-        {
-            f.read((char *)(&flag), 1);
-            flag &= INODE_FLAG_EA_MASK;
-            switch(flag)
-            {
-            case INODE_FLAG_EA_FULL:
-                ea_saved = ea_full;
-                break;
-            case INODE_FLAG_EA_PART:
-                ea_saved = ea_partial;
-                break;
-            case INODE_FLAG_EA_NONE:
-                ea_saved = ea_none;
-                break;
-            case INODE_FLAG_EA_FAKE:
-                ea_saved = ea_fake;
-                break;
-            case INODE_FLAG_EA_REMO:
-                ea_saved = ea_removed;
-                break;
-            default:
-                throw Erange("inode::inode", gettext("badly structured inode: unknown inode flag"));
-            }
-        }
-        else
-            ea_saved = ea_none;
+	try
+	{
+	    xsaved = saved;
+	    edit = reading_ver;
+	    esc = ptr;
 
-        if(reading_ver <= 7)
-        {
-            if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-                throw Erange("inode::inode", gettext("missing data to build an inode"));
-            uid = ntohs(tmp);
-            if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-                throw Erange("inode::inode", gettext("missing data to build an inode"));
-            gid = ntohs(tmp);
-        }
-        else // archive format >= "08"
-        {
-            uid = infinint(f);
-            gid = infinint(f);
-        }
+	    if(reading_ver > 1)
+	    {
+		f.read((char *)(&flag), 1);
+		unsigned char ea_flag = flag & INODE_FLAG_EA_MASK;
+		switch(ea_flag)
+		{
+		case INODE_FLAG_EA_FULL:
+		    ea_saved = ea_full;
+		    break;
+		case INODE_FLAG_EA_PART:
+		    ea_saved = ea_partial;
+		    break;
+		case INODE_FLAG_EA_NONE:
+		    ea_saved = ea_none;
+		    break;
+		case INODE_FLAG_EA_FAKE:
+		    ea_saved = ea_fake;
+		    break;
+		case INODE_FLAG_EA_REMO:
+		    ea_saved = ea_removed;
+		    break;
+		default:
+		    throw Erange("inode::inode", gettext("badly structured inode: unknown inode flag"));
+		}
+	    }
+	    else
+		ea_saved = ea_none;
 
-        if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-            throw Erange("inode::inode", gettext("missing data to build an inode"));
-        perm = ntohs(tmp);
+	    if(reading_ver <= 7)
+	    {
+		    // UID and GID were stored on 16 bits each
 
-        try
-        {
-            fs_dev = new (nothrow) infinint(0); // the filesystemID is not saved in archive
-            last_acc = new (nothrow) infinint(f);
-            last_mod = new (nothrow) infinint(f);
-            if(reading_ver >= 8)
-            {
-                last_cha = new (nothrow) infinint(f);
-                if(last_acc == NULL || last_mod == NULL || last_cha == NULL)
-                    throw Ememory("inode::inode(file)");
+		if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
+		    throw Erange("inode::inode", gettext("missing data to build an inode"));
+		uid = ntohs(tmp);
+		if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
+		    throw Erange("inode::inode", gettext("missing data to build an inode"));
+		gid = ntohs(tmp);
+	    }
+	    else // archive format >= "08"
+	    {
+		uid = infinint(f);
+		gid = infinint(f);
+	    }
 
-                if(ea_saved == ea_full)
-                    ea_size = infinint(f);
-            }
-            else // archive format <= 7
-            {
-                if(last_acc == NULL || last_mod == NULL)
-                    throw Ememory("inode::inode(file)");
-                ea_size = 0; // meaning EA size unknown (old format)
-            }
+	    if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
+		throw Erange("inode::inode", gettext("missing data to build an inode"));
+	    perm = ntohs(tmp);
 
-            if(esc == NULL) // reading a full entry from catalogue
-            {
-                switch(ea_saved)
-                {
-                case ea_full:
-                    ea_offset = new (nothrow) infinint(f);
-                    if(ea_offset == NULL)
-                        throw Ememory("inode::inode(file)");
+	    fs_dev = new (nothrow) infinint(0); // the filesystemID is not saved in archive
+	    last_acc = new (nothrow) infinint(f);
+	    last_mod = new (nothrow) infinint(f);
+	    if(reading_ver >= 8)
+	    {
+		last_cha = new (nothrow) infinint(f);
+		if(last_acc == NULL || last_mod == NULL || last_cha == NULL || fs_dev == NULL)
+		    throw Ememory("inode::inode(file)");
+
+		if(ea_saved == ea_full)
+		    ea_size = infinint(f);
+	    }
+	    else // archive format <= 7
+	    {
+		if(last_acc == NULL || last_mod == NULL || fs_dev == NULL)
+		    throw Ememory("inode::inode(file)");
+		ea_size = 0; // meaning EA size unknown (old format)
+	    }
+
+	    if(esc == NULL) // reading a full entry from catalogue
+	    {
+		switch(ea_saved)
+		{
+		case ea_full:
+		    ea_offset = new (nothrow) infinint(f);
+		    if(ea_offset == NULL)
+			throw Ememory("inode::inode(file)");
 
 		    if(reading_ver <= 7)
 		    {
@@ -698,192 +671,133 @@ namespace libdar
 			if(ea_crc == NULL)
 			    throw SRC_BUG;
 		    }
-                    break;
-                case ea_partial:
-                case ea_fake:
-                    ea_offset = new (nothrow) infinint(0);
-                    if(ea_offset == NULL)
-                        throw Ememory("inode::inode(file)");
-                    if(reading_ver <= 7)
-                    {
-                        last_cha = new (nothrow) infinint(f);
-                        if(last_cha == NULL)
-                            throw Ememory("inode::inode(file)");
-                    }
-                    break;
-                case ea_none:
-                case ea_removed:
-                    ea_offset = new (nothrow) infinint(0);
-                    if(ea_offset == NULL)
-                        throw Ememory("inode::inode(file)");
-                    if(reading_ver <= 7)
-                    {
-                        last_cha = new (nothrow) infinint(0);
-                        if(last_cha == NULL)
-                            throw Ememory("inode::inode(file)");
-                    }
-                    break;
-                default:
-                    throw SRC_BUG;
-                }
-            }
-            else // reading a small dump using escape sequence marks
-            {
-                    // header version is greater than or equal to "08" (small dump appeared at
-                    // this version of archive format) ea_offset ea_CRC have been dumped a bit
-                    // further in that case, for now we set them manually to a default value,
-                    // and will fetch their real value upon request by get_ea() or ea_get_crc()
-                    // methods
+		    break;
+		case ea_partial:
+		case ea_fake:
+		    ea_offset = new (nothrow) infinint(0);
+		    if(ea_offset == NULL)
+			throw Ememory("inode::inode(file)");
+		    if(reading_ver <= 7)
+		    {
+			last_cha = new (nothrow) infinint(f);
+			if(last_cha == NULL)
+			    throw Ememory("inode::inode(file)");
+		    }
+		    break;
+		case ea_none:
+		case ea_removed:
+		    ea_offset = new (nothrow) infinint(0);
+		    if(ea_offset == NULL)
+			throw Ememory("inode::inode(file)");
+		    if(reading_ver <= 7)
+		    {
+			last_cha = new (nothrow) infinint(0);
+			if(last_cha == NULL)
+			    throw Ememory("inode::inode(file)");
+		    }
+		    break;
+		default:
+		    throw SRC_BUG;
+		}
+	    }
+	    else // reading a small dump using escape sequence marks
+	    {
+		    // header version is greater than or equal to "08" (small dump appeared at
+		    // this version of archive format) ea_offset ea_CRC have been dumped a bit
+		    // further in that case, for now we set them manually to a default value,
+		    // and will fetch their real value upon request by get_ea() or ea_get_crc()
+		    // methods
 
-                ea_offset = new (nothrow) infinint(0);
-                if(ea_offset == NULL)
-                    throw Ememory("inode::inode(file)");
-            }
-            ea = NULL; // in any case
+		ea_offset = new (nothrow) infinint(0);
+		if(ea_offset == NULL)
+		    throw Ememory("inode::inode(file)");
+	    }
+	    ea = NULL; // in any case
 
-                // to be able later to read EA from archive file
-            if(ea_loc == NULL)
-                throw SRC_BUG;
-            storage = ea_loc;
+		// to be able later to read EA and FSA from archive file
+	    if(ea_loc == NULL)
+		throw SRC_BUG;
+	    storage = ea_loc;
+
+	    if(reading_ver >= 9)
+	    {
+		unsigned char fsa_flag = flag & INODE_FLAG_FSA_MASK;
+
+		switch(fsa_flag)
+		{
+		case INODE_FLAG_FSA_NONE:
+		    fsa_saved = fsa_none;
+		    break;
+		case INODE_FLAG_FSA_PART:
+		    fsa_saved = fsa_partial;
+		    break;
+		case INODE_FLAG_FSA_FULL:
+		    fsa_saved = fsa_full;
+		    break;
+		default:
+		    throw Erange("inode::inode", gettext("badly structured inode: unknown inode flag for FSA"));
+		}
+
+		if(fsa_saved != fsa_none)
+		{
+		    fsa_famillies = new (nothrow) infinint(f);
+		    if(fsa_famillies == NULL)
+			throw Ememory("inode::inode(file)");
+		}
+
+		if(esc == NULL)
+		{
+		    switch(fsa_saved)
+		    {
+		    case fsa_full:
+			fsa_size = infinint(f);
+			fsa_offset = new (nothrow) infinint(f);
+			fsa_crc = create_crc_from_file(f);
+			if(fsa_offset == NULL || fsa_crc == NULL)
+			    throw Ememory("inode::inode(file)");
+			break;
+		    case fsa_partial:
+		    case fsa_none:
+			fsa_size = 0;
+			fsa_offset = new infinint(0);
+			if(fsa_offset == NULL)
+			    throw Ememory("inode::inode(file)");
+			break;
+		    default:
+			throw SRC_BUG;
+		    }
+		}
+		else  // reading a small dump using escape sequence marks
+		{
+		    fsa_size = 0;
+		    fsa_offset = new (nothrow) infinint(0);
+		    if(fsa_offset == NULL)
+			throw Ememory("inode::inode(file)");
+		}
+	    }
+	    else // older archive than version 9 do not support FSA
+		fsa_saved = fsa_none;
         }
         catch(...)
         {
-            if(last_acc != NULL)
-            {
-                delete last_acc;
-                last_acc = NULL;
-            }
-            if(last_mod != NULL)
-            {
-                delete last_mod;
-                last_mod = NULL;
-            }
-            if(last_cha != NULL)
-            {
-                delete last_cha;
-                last_cha = NULL;
-            }
-            if(ea_offset != NULL)
-            {
-                delete ea_offset;
-                ea_offset = NULL;
-            }
-            if(fs_dev != NULL)
-            {
-                delete fs_dev;
-                fs_dev = NULL;
-            }
-	    if(ea_crc != NULL)
-	    {
-		delete ea_crc;
-		ea_crc = NULL;
-	    }
-            throw;
+	    destroy();
+	    throw;
         }
     }
 
     inode::inode(const inode & ref) : nomme(ref)
     {
-        uid = ref.uid;
-        gid = ref.gid;
-        perm = ref.perm;
-        xsaved = ref.xsaved;
-        ea_saved = ref.ea_saved;
-        storage = ref.storage;
-        esc = ref.esc;
-        ea_size = ref.ea_size;
+	nullifyptr();
 
-        last_acc = NULL;
-        last_mod = NULL;
-        last_cha = NULL;
-        ea_offset = NULL;
-        ea = NULL;
-        ea_crc = NULL;
-        fs_dev = NULL;
         try
         {
-            edit = ref.edit;
-            last_acc = new (nothrow) infinint(*ref.last_acc);
-            last_mod = new (nothrow) infinint(*ref.last_mod);
-            last_cha = new (nothrow) infinint(*ref.last_cha);
-            fs_dev = new (nothrow) infinint(*ref.fs_dev);
-            if(last_acc == NULL || last_mod == NULL || last_cha == NULL || fs_dev == NULL)
-                throw Ememory("inode::inode(inode)");
-
-            switch(ea_saved)
-            {
-            case ea_full:
-                ea_offset = new (nothrow) infinint(*ref.ea_offset);
-                if(ea_offset == NULL)
-                    throw Ememory("inode::inode(inode)");
-                if(ref.ea_crc != NULL)
-                {
-                    ea_crc = ref.ea_crc->clone();
-                    if(ea_crc == NULL)
-                        throw Ememory("inode::inode(inode)");
-                }
-
-                if(ref.ea != NULL) // might be NULL if build from a file
-                {
-                    ea = new (nothrow) ea_attributs(*ref.ea);
-                    if(ea == NULL)
-                        throw Ememory("inode::inode(const inode &)");
-                }
-                else
-                    ea = NULL;
-                break;
-            case ea_partial:
-            case ea_fake:
-            case ea_none:
-            case ea_removed:
-                ea_offset = new (nothrow) infinint(0);
-                if(ea_offset == NULL)
-                    throw Ememory("inode::inode(inode)");
-                ea = NULL;
-                break;
-            default:
-                throw SRC_BUG;
-            }
+	    copy_from(ref);
         }
-        catch(...)
-        {
-            if(last_acc != NULL)
-            {
-                delete last_acc;
-                last_acc = NULL;
-            }
-            if(last_mod != NULL)
-            {
-                delete last_mod;
-                last_mod = NULL;
-            }
-            if(ea != NULL)
-            {
-                delete ea;
-                ea = NULL;
-            }
-            if(ea_offset != NULL)
-            {
-                delete ea_offset;
-                ea_offset = NULL;
-            }
-            if(last_cha != NULL)
-            {
-                delete last_cha;
-                last_cha = NULL;
-            }
-            if(ea_crc != NULL)
-            {
-                delete ea_crc;
-                ea_crc = NULL;
-            }
-            if(fs_dev != NULL)
-            {
-                delete fs_dev;
-                fs_dev = NULL;
-            }
-            throw;
-        }
+	catch(...)
+	{
+	    destroy();
+	    throw;
+	}
     }
 
     const inode & inode::operator = (const inode & ref)
@@ -893,126 +807,15 @@ namespace libdar
 
         *me = *nref; // copying the "nomme" part of the object
 
-            // some sanity checks
-
-        if(last_acc == NULL)
-            throw SRC_BUG;
-        if(last_mod == NULL)
-            throw SRC_BUG;
-        if(ea_offset == NULL)
-            throw SRC_BUG;
-        if(last_cha == NULL)
-            throw SRC_BUG;
-        if(fs_dev == NULL)
-            throw SRC_BUG;
-        if(ref.last_acc == NULL)
-            throw SRC_BUG;
-        if(ref.last_mod == NULL)
-            throw SRC_BUG;
-        if(ref.ea_offset == NULL)
-            throw SRC_BUG;
-        if(ref.last_cha == NULL)
-            throw SRC_BUG;
-        if(ref.fs_dev == NULL)
-            throw SRC_BUG;
-            // storage is a pointer to an independant object it may be NULL, thus we do not check its value.
-
-            // now copying the inode part
-        esc = ref.esc; // may be NULL, no control needed, we just copy the possible address to an external escape object (which must exist).
-        uid = ref.uid;
-        gid = ref.gid;
-        perm = ref.perm;
-        *last_acc = *ref.last_acc;
-        *last_mod = *ref.last_mod;
-        xsaved = ref.xsaved;
-        ea_saved = ref.ea_saved;
-        ea_size = ref.ea_size;
-        *ea_offset = *ref.ea_offset;
-        if(ea != NULL)
-            if(ref.ea == NULL)
-            {
-                delete ea;
-                ea = NULL;
-            }
-            else
-                *ea = *ref.ea;
-        else // ea == NULL
-            if(ref.ea != NULL)
-            {
-                ea = new (nothrow) ea_attributs(*ref.ea);
-                if(ea == NULL)
-                    throw Ememory("inode::operator =");
-            }
-            // else nothing to do (both ea and ref.ea are NULL)
-        *last_cha = *ref.last_cha;
-        if(ea_crc != NULL)
-            if(ref.ea_crc == NULL)
-            {
-                delete ea_crc;
-                ea_crc = NULL;
-            }
-            else // both ea_crc and ref.ea_crc not NULL
-		if(ea_crc->get_size() == ref.ea_crc->get_size())
-		    *ea_crc = *(ref.ea_crc);
-		else
-		{
-		    delete ea_crc;
-		    ea_crc = ref.ea_crc->clone();
-		}
-        else // ea_crc == NULL
-            if(ref.ea_crc != NULL)
-            {
-                ea_crc = ref.ea_crc->clone();
-                if(ea_crc == NULL)
-                    throw Ememory("inode::operator =");
-            }
-            // else both ea_crc and ref.ea_crc are NULL, nothing to do.
-
-        *fs_dev = *ref.fs_dev;
-        storage = ref.storage; // yes, we copy the address not the object
-        edit = ref.edit;
+	destroy();
+	copy_from(ref);
 
         return *this;
     }
 
     inode::~inode()
     {
-            // we must not release memory pointed to by esc, we do not own that object
-        if(last_acc != NULL)
-        {
-            delete last_acc;
-            last_acc = NULL;
-        }
-        if(last_mod != NULL)
-        {
-            delete last_mod;
-            last_mod = NULL;
-        }
-        if(ea != NULL)
-        {
-            delete ea;
-            ea = NULL;
-        }
-        if(ea_offset != NULL)
-        {
-            delete ea_offset;
-            ea_offset = NULL;
-        }
-        if(last_cha != NULL)
-        {
-            delete last_cha;
-            last_cha = NULL;
-        }
-        if(ea_crc != NULL)
-        {
-            delete ea_crc;
-            ea_crc = NULL;
-        }
-        if(fs_dev != NULL)
-        {
-            delete fs_dev;
-            fs_dev = NULL;
-        }
+	destroy();
     }
 
     bool inode::same_as(const inode & ref) const
@@ -1239,7 +1042,9 @@ namespace libdar
             if(ea != NULL)
                 return ea;
             else
-                if(storage != NULL) // ea_offset may be equal to zero if the first inode saved had only EA modified since archive of reference
+                if(storage != NULL)
+			// ea_offset may be equal to zero if the first inode saved had only EA modified since archive of reference
+			// cannot use its value to know whether we fully read inode from catalogue or read a small dump in sequential read mode
                 {
 		    crc *val = NULL;
 		    const crc *my_crc = NULL;
@@ -1402,7 +1207,7 @@ namespace libdar
                     const_cast<inode *>(this)->ea_crc = tmp;
                         // this is to avoid trying to fetch the CRC a new time if decision
                         // has been taken to continue the operation after the exception
-                        // thrown below has been catched.
+                        // thrown below has been caught.
 		    tmp = NULL;  // the object is now owned by "this"
                 }
                 catch(...)
@@ -1446,6 +1251,351 @@ namespace libdar
         else
             *last_cha = x_time;
     }
+
+    void inode::fsa_attach(filesystem_specific_attribute_list *ref)
+    {
+        if(ref != NULL && fsal == NULL)
+        {
+            fsal = ref;
+            fsa_size = fsal->storage_size();
+        }
+        else
+            throw SRC_BUG;
+        if(fsa_saved != fsa_full)
+            throw SRC_BUG;
+    }
+
+    void inode::fsa_detach() const
+    {
+        if(fsal != NULL)
+        {
+            delete fsal;
+            const_cast<inode *>(this)->fsal = NULL;
+        }
+    }
+
+    const filesystem_specific_attribute_list *inode::get_fsa() const
+    {
+        switch(fsa_saved)
+        {
+        case fsa_full:
+            if(fsal != NULL)
+                return fsal;
+            else
+                if(storage != NULL) // lsa_offset may be equal to zero if the first inode saved had only EA modified since archive of reference
+                {
+		    crc *val = NULL;
+		    const crc *my_crc = NULL;
+
+		    try
+		    {
+			if(esc == NULL)
+			    storage->skip(*fsa_offset);
+			else
+			{
+			    if(!esc->skip_to_next_mark(escape::seqt_fsa, false))
+				throw Erange("inode::get_fsa", string("Error while fetching FSA from archive: No escape mark found for that file"));
+			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
+			}
+
+			storage->reset_crc(tools_file_size_to_crc_size(fsa_get_size()));
+
+			try
+			{
+			    try
+			    {
+				const_cast<inode *>(this)->fsal = new (nothrow) filesystem_specific_attribute_list();
+				if(fsal == NULL)
+				    throw Ememory("inode::get_fsa");
+				try
+				{
+				    const_cast<inode *>(this)->fsal->read(*storage);
+				}
+				catch(...)
+				{
+				    delete fsal;
+				    const_cast<inode *>(this)->fsal = NULL;
+				    throw;
+				}
+			    }
+			    catch(Euser_abort & e)
+			    {
+				throw;
+			    }
+			    catch(Ebug & e)
+			    {
+				throw;
+			    }
+			    catch(Ethread_cancel & e)
+			    {
+				throw;
+			    }
+			    catch(Egeneric & e)
+			    {
+				throw Erange("inode::get_fda", string("Error while reading FSA from archive: ") + e.get_message());
+			    }
+			}
+			catch(...)
+			{
+			    val = storage->get_crc(); // keeps storage in coherent status
+			    throw;
+			}
+			val = storage->get_crc();
+			if(val == NULL)
+			    throw SRC_BUG;
+
+			fsa_get_crc(my_crc); // fsa_get_crc() will eventually fetch the CRC for FSA from the archive (sequential reading)
+			if(my_crc == NULL)
+			    throw SRC_BUG;
+
+			if(typeid(*val) != typeid(*my_crc) || *val != *my_crc)
+			    throw Erange("inode::get_fsa", gettext("CRC error detected while reading FSA"));
+		    }
+		    catch(...)
+		    {
+			if(val != NULL)
+			    delete val;
+			throw;
+		    }
+		    if(val != NULL)
+			delete val;
+                    return fsal;
+                }
+                else
+                    throw SRC_BUG;
+                // no need of break here
+            throw SRC_BUG; // but ... instead of break we use some more radical precaution.
+        default:
+            throw SRC_BUG;
+        }
+    }
+
+    infinint inode::fsa_get_size() const
+    {
+        if(fsa_saved == fsa_full)
+            return fsa_size;
+        else
+            throw SRC_BUG;
+    }
+
+
+    void inode::fsa_set_crc(const crc & val)
+    {
+	if(fsa_crc != NULL)
+	{
+	    delete fsa_crc;
+	    fsa_crc = NULL;
+	}
+	fsa_crc = val.clone();
+	if(fsa_crc == NULL)
+	    throw Ememory("inode::fsa_set_crc");
+    }
+
+    void inode::fsa_get_crc(const crc * & ptr) const
+    {
+	if(fsa_get_saved_status() != fsa_full)
+	    throw SRC_BUG;
+
+        if(esc != NULL && fsa_crc == NULL)
+        {
+            if(esc->skip_to_next_mark(escape::seqt_fsa_crc, false))
+            {
+                crc *tmp = NULL;
+
+                try
+                {
+		    tmp = create_crc_from_file(*esc, false);
+		    if(tmp == NULL)
+			throw SRC_BUG;
+                    const_cast<inode *>(this)->fsa_crc = tmp;
+		    tmp = NULL; // the object is now owned by "this"
+                }
+                catch(...)
+                {
+		    if(tmp != NULL)
+			delete tmp;
+                    throw;
+                }
+            }
+            else // fsa_crc mark not found
+            {
+                crc *tmp = new (nothrow) crc_n(1); // creating a default CRC
+                if(tmp == NULL)
+                    throw Ememory("inode::fsa_get_crc");
+                try
+                {
+                    tmp->clear();
+                    const_cast<inode *>(this)->fsa_crc = tmp;
+                        // this is to avoid trying to fetch the CRC a new time if decision
+                        // has been taken to continue the operation after the exception
+                        // thrown below has been caught.
+		    tmp = NULL;  // the object is now owned by "this"
+                }
+                catch(...)
+                {
+                    delete tmp;
+                    throw;
+                }
+                throw Erange("inode::fsa_get_crc", gettext("Error while reading CRC for FSA from the archive: No escape mark found for that file"));
+            }
+        }
+
+        if(fsa_crc == NULL)
+            throw SRC_BUG;
+        else
+            ptr = fsa_crc;
+    }
+
+    bool inode::fsa_get_crc_size(infinint & val) const
+    {
+        if(fsa_crc != NULL)
+        {
+            val = fsa_crc->get_size();
+            return true;
+        }
+        else
+            return false;
+    }
+
+    void inode::nullifyptr()
+    {
+        last_acc = NULL;
+        last_mod = NULL;
+        last_cha = NULL;
+        ea_offset = NULL;
+	ea = NULL;
+        ea_crc = NULL;
+	fsa_famillies = NULL;
+	fsa_offset = NULL;
+	fsal = NULL;
+	fsa_crc = NULL;
+        fs_dev = NULL;
+	storage = NULL;
+	esc = NULL;
+    }
+
+    void inode::destroy()
+    {
+        if(last_acc != NULL)
+        {
+            delete last_acc;
+            last_acc = NULL;
+        }
+        if(last_mod != NULL)
+        {
+            delete last_mod;
+            last_mod = NULL;
+        }
+        if(last_cha != NULL)
+        {
+            delete last_cha;
+            last_cha = NULL;
+        }
+        if(ea_offset != NULL)
+        {
+            delete ea_offset;
+            ea_offset = NULL;
+        }
+        if(ea != NULL)
+        {
+            delete ea;
+            ea = NULL;
+        }
+        if(ea_crc != NULL)
+        {
+            delete ea_crc;
+            ea_crc = NULL;
+        }
+	if(fsa_famillies != NULL)
+	{
+	    delete fsa_famillies;
+	    fsa_famillies = NULL;
+	}
+	if(fsa_offset != NULL)
+	{
+	    delete fsa_offset;
+	    fsa_offset = NULL;
+	}
+	if(fsal != NULL)
+	{
+	    delete fsal;
+	    fsal = NULL;
+	}
+	if(fsa_crc != NULL)
+	{
+	    delete fsa_crc;
+	    fsa_crc = NULL;
+	}
+        if(fs_dev != NULL)
+        {
+            delete fs_dev;
+            fs_dev = NULL;
+        }
+
+            // we must not release memory pointed to by storage, we do not own that object
+
+            // we must not release memory pointed to by esc, we do not own that object
+    }
+
+    template <class T> void copy_ptr(const T *src, T * & dst)
+    {
+	if(src == NULL)
+	    dst = NULL;
+	else
+	{
+	    dst = new (nothrow) T(*src);
+	    if(dst == NULL)
+		throw Ememory("copy_ptr template");
+	}
+    }
+
+    void inode::copy_from(const inode & ref)
+    {
+	try
+	{
+	    uid = ref.uid;
+	    gid = ref.gid;
+	    perm = ref.perm;
+	    copy_ptr(ref.last_acc, last_acc);
+	    copy_ptr(ref.last_mod, last_mod);
+	    copy_ptr(ref.last_cha, last_cha);
+	    xsaved = ref.xsaved;
+	    ea_saved = ref.ea_saved;
+	    fsa_saved = ref.fsa_saved;
+	    copy_ptr(ref.ea_offset, ea_offset);
+	    copy_ptr(ref.ea, ea);
+	    ea_size = ref.ea_size;
+	    if(ref.ea_crc != NULL)
+	    {
+		ea_crc = (ref.ea_crc)->clone();
+		if(ea_crc == NULL)
+		    throw Ememory("inode::copy_from");
+	    }
+	    else
+		ea_crc = NULL;
+	    copy_ptr(ref.fsa_famillies, fsa_famillies);
+	    copy_ptr(ref.fsa_offset, fsa_offset);
+	    copy_ptr(ref.fsal, fsal);
+	    if(ref.fsa_crc != NULL)
+	    {
+		fsa_crc = (ref.fsa_crc)->clone();
+		if(fsa_crc == NULL)
+		    throw Ememory("inode::copy_from");
+	    }
+	    else
+		fsa_crc = NULL;
+	    copy_ptr(ref.fs_dev, fs_dev);
+	    storage = ref.storage; // yes copying the value of the pointer
+	    edit = ref.edit;
+	    esc = ref.esc; // yes copying the value of the pointer
+	}
+	catch(...)
+	{
+	    destroy();
+	    throw;
+	}
+    }
+
 
     etoile::etoile(inode *host, const infinint & etiquette_number)
     {

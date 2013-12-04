@@ -79,12 +79,40 @@ namespace libdar
 	}
     }
 
+///////////////////////////////////////////////////////////////////////////////////
+
+    const infinint FSA_SCOPE_BIT_HFS_PLUS = 1;
+    const infinint FSA_SCOPE_BIT_LINUX_EXTX = 2;
+
+    infinint fsa_scope_to_infinint(const fsa_scope & val)
+    {
+	infinint ret = 0;
+
+	if(val.find(filesystem_specific_attribute::hfs_plus) != val.end())
+	    ret |= FSA_SCOPE_BIT_HFS_PLUS;
+	if(val.find(filesystem_specific_attribute::linux_extX) != val.end())
+	    ret |= FSA_SCOPE_BIT_LINUX_EXTX;
+
+	return ret;
+    }
+
+    fsa_scope infinint_to_fsa_scope(const infinint & ref)
+    {
+	fsa_scope ret;
+
+	ret.clear();
+	if((ref & FSA_SCOPE_BIT_HFS_PLUS) != 0)
+	    ret.insert(filesystem_specific_attribute::hfs_plus);
+	if((ref & FSA_SCOPE_BIT_LINUX_EXTX) != 0)
+	    ret.insert(filesystem_specific_attribute::linux_extX);
+
+	return ret;
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////
 
     const U_I FAM_SIG_WIDTH = 1;
     const U_I NAT_SIG_WIDTH = 2;
-    const U_I FSA_CRC_SIZE = 2;
 
 #define FSA_READ(FSA_TYPE, FAMILLY, TARGET)		   \
 	try						   \
@@ -127,7 +155,7 @@ namespace libdar
 	    if(*it != NULL)
 	    {
 		set<filesystem_specific_attribute::familly>::const_iterator f = scope.find((*it)->get_familly());
-		if(scope.size() == 0 || f != scope.end())
+		if(scope.empty() || f != scope.end())
 		{
 		    vector<filesystem_specific_attribute *>::const_iterator ut = ref.fsa.begin();
 		    while(ut != ref.fsa.end() && *ut != NULL && !(*it)->is_same_type_as(**ut))
@@ -159,181 +187,106 @@ namespace libdar
     {
 	infinint size = infinint(f);
 	U_I sub_size;
-	crc *c_calc = NULL;
 
-	if(f.crc_status())
-	    throw SRC_BUG;
-	f.reset_crc(FSA_CRC_SIZE);
-	try
+	do
 	{
-	    do
-	    {
-		sub_size = 0;
-		size.unstack(sub_size);
-		if(size > 0 && sub_size == 0)
-		    throw SRC_BUG;
+	    sub_size = 0;
+	    size.unstack(sub_size);
+	    if(size > 0 && sub_size == 0)
+		throw SRC_BUG;
 
-		while(sub_size > 0)
+	    while(sub_size > 0)
+	    {
+		char buffer[FAM_SIG_WIDTH + NAT_SIG_WIDTH + 1];
+		filesystem_specific_attribute::familly fam;
+		filesystem_specific_attribute::nature nat;
+		filesystem_specific_attribute *ptr = NULL;
+
+		f.read(buffer, FAM_SIG_WIDTH);
+		buffer[FAM_SIG_WIDTH] = '\0';
+		fam = signature_to_familly(buffer);
+
+		f.read(buffer, NAT_SIG_WIDTH);
+		buffer[NAT_SIG_WIDTH] = '\0';
+		nat = signature_to_nature(buffer);
+
+		switch(nat)
 		{
-		    char buffer[FAM_SIG_WIDTH + NAT_SIG_WIDTH + 1];
-		    filesystem_specific_attribute::familly fam;
-		    filesystem_specific_attribute::nature nat;
-		    filesystem_specific_attribute *ptr = NULL;
-
-		    f.read(buffer, FAM_SIG_WIDTH);
-		    buffer[FAM_SIG_WIDTH] = '\0';
-		    fam = signature_to_familly(buffer);
-
-		    f.read(buffer, NAT_SIG_WIDTH);
-		    buffer[NAT_SIG_WIDTH] = '\0';
-		    nat = signature_to_nature(buffer);
-
-		    switch(nat)
-		    {
-		    case filesystem_specific_attribute::nat_unset:
-			throw SRC_BUG;
-		    case filesystem_specific_attribute::creation_date:
-			ptr = new (nothrow) fsa_creation_date(f, fam);
-			break;
-		    case filesystem_specific_attribute::compressed:
-			ptr = new (nothrow) fsa_compressed(f, fam);
-			break;
-		    case filesystem_specific_attribute::no_dump:
-			ptr = new (nothrow) fsa_nodump(f, fam);
-			break;
-		    case filesystem_specific_attribute::immutable:
-			ptr = new (nothrow) fsa_immutable(f, fam);
-			break;
-		    case filesystem_specific_attribute::undeletable:
-			ptr = new (nothrow) fsa_undeleted(f, fam);
-			break;
-		    default:
-			throw SRC_BUG;
-		    }
-
-		    if(ptr == NULL)
-			throw Ememory("filesystem_specific_attribute_list::read");
-		    fsa.push_back(ptr);
-		    ptr = NULL;
-
-		    --sub_size;
+		case filesystem_specific_attribute::nat_unset:
+		    throw SRC_BUG;
+		case filesystem_specific_attribute::creation_date:
+		    ptr = new (nothrow) fsa_creation_date(f, fam);
+		    break;
+		case filesystem_specific_attribute::compressed:
+		    ptr = new (nothrow) fsa_compressed(f, fam);
+		    break;
+		case filesystem_specific_attribute::no_dump:
+		    ptr = new (nothrow) fsa_nodump(f, fam);
+		    break;
+		case filesystem_specific_attribute::immutable:
+		    ptr = new (nothrow) fsa_immutable(f, fam);
+		    break;
+		case filesystem_specific_attribute::undeletable:
+		    ptr = new (nothrow) fsa_undeleted(f, fam);
+		    break;
+		default:
+		    throw SRC_BUG;
 		}
+
+		if(ptr == NULL)
+		    throw Ememory("filesystem_specific_attribute_list::read");
+		fsa.push_back(ptr);
+		ptr = NULL;
+
+		--sub_size;
 	    }
-	    while(size > 0);
-
 	}
-	catch(...)
-	{
-		// keep f in coherent status in regard to crc calculation
-	    c_calc = f.get_crc();
-	    if(c_calc != NULL)
-		delete c_calc;
-	    throw;
-	}
-
-	try
-	{
-	    c_calc = f.get_crc();
-	    if(c_calc == NULL)
-		throw SRC_BUG;
-	    crc_n *c_calc_n = dynamic_cast<crc_n *>(c_calc);
-	    crc_n c_read = crc_n(FSA_CRC_SIZE, f);
-	    if(c_calc_n == NULL)
-		throw SRC_BUG;
-	    if(*c_calc_n != c_read)
-		throw Edata(gettext("data corruption met while reading Filesystem Specific Attribute"));
-	}
-	catch(...)
-	{
-	    if(c_calc != NULL)
-	    {
-		delete c_calc;
-		c_calc = NULL;
-	    }
-	    throw;
-	}
-
-	if(c_calc != NULL)
-	{
-	    delete c_calc;
-	    c_calc = NULL;
-	}
+	while(size > 0);
     }
 
     void filesystem_specific_attribute_list::write(generic_file & f) const
     {
 	infinint size = fsa.size();
 	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
-	crc *ptr = NULL;
 
-	if(f.crc_status())
-	    throw SRC_BUG;
-	f.reset_crc(FSA_CRC_SIZE);
+	size.dump(f);
 
-	try
+	while(it != fsa.end())
 	{
+	    string tmp;
 
-	    size.dump(f);
-
-	    while(it != fsa.end())
-	    {
-		string tmp;
-
-		if(*it == NULL)
-		    throw SRC_BUG;
-
-		tmp = familly_to_signature((*it)->get_familly());
-		f.write(tmp.c_str(), tmp.size());
-		tmp = nature_to_signature((*it)->get_nature());
-		f.write(tmp.c_str(), tmp.size());
-		(*it)->write(f);
-
-		++it;
-	    }
-	}
-	catch(...)
-	{
-	    ptr = f.get_crc();
-	    if(ptr != NULL)
-		delete ptr;
-	    throw;
-	}
-
-	try
-	{
-	    ptr = f.get_crc();
-	    if(ptr == NULL)
+	    if(*it == NULL)
 		throw SRC_BUG;
-	    ptr->dump(f);
-	}
-	catch(...)
-	{
-	    if(ptr != NULL)
-	    {
-		delete ptr;
-		ptr = NULL;
-	    }
-	    throw;
-	}
 
-	if(ptr != NULL)
-	{
-	    delete ptr;
-	    ptr = NULL;
+	    tmp = familly_to_signature((*it)->get_familly());
+	    f.write(tmp.c_str(), tmp.size());
+	    tmp = nature_to_signature((*it)->get_nature());
+	    f.write(tmp.c_str(), tmp.size());
+	    (*it)->write(f);
+
+	    ++it;
 	}
     }
 
-    void filesystem_specific_attribute_list::get_fsa_from_filesystem_for(const string & target)
+    void filesystem_specific_attribute_list::get_fsa_from_filesystem_for(const string & target,
+									 const fsa_scope & scope)
     {
 	filesystem_specific_attribute *ptr = NULL;
 
 	clear();
 
-	FSA_READ(fsa_creation_date, filesystem_specific_attribute::hfs_plus, target);
-	FSA_READ(fsa_compressed, filesystem_specific_attribute::linux_extX, target);
-	FSA_READ(fsa_nodump, filesystem_specific_attribute::linux_extX, target);
-	FSA_READ(fsa_immutable, filesystem_specific_attribute::linux_extX, target);
-	FSA_READ(fsa_undeleted, filesystem_specific_attribute::linux_extX, target);
+	if(scope.empty() || scope.find(filesystem_specific_attribute::hfs_plus) != scope.end())
+	{
+	    FSA_READ(fsa_creation_date, filesystem_specific_attribute::hfs_plus, target);
+	}
+
+	if(scope.empty() || scope.find(filesystem_specific_attribute::linux_extX) != scope.end())
+	{
+	    FSA_READ(fsa_compressed, filesystem_specific_attribute::linux_extX, target);
+	    FSA_READ(fsa_nodump, filesystem_specific_attribute::linux_extX, target);
+	    FSA_READ(fsa_immutable, filesystem_specific_attribute::linux_extX, target);
+	    FSA_READ(fsa_undeleted, filesystem_specific_attribute::linux_extX, target);
+	}
     }
 
     void filesystem_specific_attribute_list::set_fsa_to_filesystem_for(const string & target,
@@ -375,6 +328,39 @@ namespace libdar
 
 	return *(fsa[arg]);
     }
+
+    infinint filesystem_specific_attribute_list::storage_size() const
+    {
+	infinint ret = 0;
+	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
+
+	while(it != fsa.end())
+	{
+	    if(*it == NULL)
+		throw SRC_BUG;
+	    ret += (*it)->storage_size();
+	    ++it;
+	}
+
+	return ret;
+    }
+
+    void filesystem_specific_attribute_list::copy_from(const filesystem_specific_attribute_list & ref)
+    {
+	vector<filesystem_specific_attribute *>::const_iterator it = ref.fsa.begin();
+	fsa.clear();
+
+	while(it != ref.fsa.end())
+	{
+	    if(*it == NULL)
+		throw SRC_BUG;
+	    fsa.push_back((*it)->clone());
+	    ++it;
+	}
+
+	familles = ref.familles;
+    }
+
 
     string filesystem_specific_attribute_list::familly_to_signature(filesystem_specific_attribute::familly f)
     {

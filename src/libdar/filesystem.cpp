@@ -248,13 +248,14 @@ namespace libdar
 		    throw Edata(string(gettext("Unknown file type! file name is: ")) + string(ptr_name));
 
 
-		    //
-		    // Extended Attributes Considerations
-		    //
-
 		inode *ino = dynamic_cast<inode *>(ref);
 		if(ino != NULL)
 		{
+
+			//
+			// Extended Attributes Considerations
+			//
+
 		    try
 		    {
 			attach_ea(ptr_name, ino, ea_mask);
@@ -281,6 +282,13 @@ namespace libdar
 			    // no throw !
 			    // we must be able to continue without EA
 		    }
+
+
+		    //
+		    // Filesystem Specific Attributes Considerations
+		    //
+
+
 		}
 
 		    //

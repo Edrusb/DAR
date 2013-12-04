@@ -84,7 +84,9 @@ namespace libdar
 	    seqt_ea_crc,          //< placed before the CRC of file's EA
 	    seqt_changed,         //< placed before new copy of file's data if file's data changed while reading it for backup
 	    seqt_dirty,           //< placed after data CRC if file is dirty
-	    seqt_failed_backup    //< placed after inode information if the file could not be openned at backup time
+	    seqt_failed_backup,   //< placed after inode information if the file could not be openned at backup time
+	    seqt_fsa,             //< placed before FSA data
+	    seqt_fsa_crc          //< place before the CRC of file's FSA
 	};
 
 	    // the archive layout of marks is for each entry:

@@ -50,6 +50,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "label.hpp"
 #include "escape.hpp"
+#include "filesystem_specific_attribute.hpp"
 
 namespace libdar
 {
@@ -214,11 +215,14 @@ namespace libdar
 	    cf_inode_type    //< only consider the file type
 	};
 
-        inode(const infinint & xuid, const infinint & xgid, U_16 xperm,
+        inode(const infinint & xuid,
+	      const infinint & xgid,
+	      U_16 xperm,
               const infinint & last_access,
               const infinint & last_modif,
 	      const infinint & last_change,
-              const std::string & xname, const infinint & device);
+              const std::string & xname,
+	      const infinint & device);
         inode(user_interaction & dialog,
 	      generic_file & f,
 	      const archive_version & reading_ver,
@@ -262,11 +266,11 @@ namespace libdar
 
 
             //////////////////////////////////
-            // EXTENDED ATTRIBUTS Methods
+            // EXTENDED ATTRIBUTES Methods
             //
 
         enum ea_status { ea_none, ea_partial, ea_fake, ea_full, ea_removed };
-            // ea_none    : no EA present for this inode in filesystem
+            // ea_none    : no EA  present for this inode in filesystem
             // ea_partial : EA present in filesystem but not stored (ctime used to check changes)
 	    // ea_fake    : EA present in filesystem but not attached to this inode (isolation context) no more used in archive version "08" and above, ea_partial or ea_full stays a valid status in isolated catalogue because pointers to EA and data are no more removed during isolation process.
             // ea_full    : EA present in filesystem and attached to this inode
@@ -280,15 +284,15 @@ namespace libdar
         void ea_attach(ea_attributs *ref);
         const ea_attributs *get_ea() const;              //   #<-- EA_FULL *and* EA_REMOVED# for this call only
         void ea_detach() const; //discards any future call to get_ea() !
-	infinint ea_get_size() const; //returns the size of EA (still valid if ea have been detached)
+	infinint ea_get_size() const; //returns the size of EA (still valid if ea have been detached) mainly used to define CRC width
 
             // III : to record where is dump the EA in the archive #EA_FULL only#
         void ea_set_offset(const infinint & pos) { *ea_offset = pos; };
         void ea_set_crc(const crc & val);
-	void ea_get_crc(const crc * & ptr) const; //< the argument is set the an allocated crc object owned by this "inode" object, this reference stays valid while the "inode" object exists and MUST NOT be deleted by the caller in any case
+	void ea_get_crc(const crc * & ptr) const; //< the argument is set to point to an allocated crc object owned by this "inode" object, this reference stays valid while the "inode" object exists and MUST NOT be deleted by the caller in any case
 	bool ea_get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
 
-            // IV : to know/record if EA have been modified # any EA status#
+            // IV : to know/record if EA and FSA have been modified # any EA status# and FSA status #
         infinint get_last_change() const;
         void set_last_change(const infinint & x_time);
 	bool has_last_change() const { return last_cha != NULL; };
@@ -298,10 +302,39 @@ namespace libdar
 	    // using get_last_change() (depends on the version of the archive read).
 
 
-	    // V : for archive migration (merging)
+	    // V : for archive migration (merging) EA and FSA concerned
         void change_ea_location(generic_file *loc) { storage = loc; };
 
-            ////////////////////////
+
+            //////////////////////////////////
+            // FILESYSTEM SPECIFIC ATTRIBUTES Methods
+            //
+	    // there is not "remove status for FSA, either the inode contains
+	    // full copy of FSA or only remembers the famillies of FSA found in the unchanged inode
+	    // FSA none is used when the file has no FSA because:
+	    //  - either the underlying filesystem has no known FSA
+	    //  - or the underlying filesystem FSA support has not been activated at compilation time
+	    //  - or the fsa_scope requested at execution time exclude the filesystem FSA famillies available here
+	enum fsa_status { fsa_none, fsa_partial, fsa_full };
+
+	    // I : which FSA are present
+	fsa_status fsa_get_saved_status() const { return fsa_saved; };
+	    /// gives the set of FSA familly recorded for that inode
+	fsa_scope fsa_get_famillies() const { if(fsa_famillies == NULL) throw SRC_BUG; return infinint_to_fsa_scope(*fsa_famillies); };
+
+
+
+	    // II : add or drop FSA list to the inode
+	void fsa_attach(filesystem_specific_attribute_list *ref);
+	const filesystem_specific_attribute_list *get_fsa() const; // #<-- FSA_FULL only
+	void fsa_detach() const; // discard any future call to get_fsa() !
+	infinint fsa_get_size() const; // returns the size of FSA (still valid if fsal has been detached) / mainly used to define CRC size
+
+	    // III : to record where FSA are dumped in the archive (only if fsa_status not empty !)
+	void fsa_set_offset(const infinint & pos) { *fsa_offset = pos; };
+	void fsa_set_crc(const crc & val);
+	void fsa_get_crc(const crc * & ptr) const;
+	bool fsa_get_crc_size(infinint & val) const;
 
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(inode);
@@ -316,24 +349,38 @@ namespace libdar
         void inherited_dump(generic_file & f, bool small) const;
 
     private :
-        infinint uid;
-        infinint gid;
-        U_16 perm;
-        infinint *last_acc, *last_mod;
-        saved_status xsaved;
-        ea_status ea_saved;
+        infinint uid;            //< inode owner's user ID
+        infinint gid;            //< inode owner's group ID
+        U_16 perm;               //< inode's permission
+        infinint *last_acc;      //< last access time (atime)
+	infinint *last_mod;      //< last modification time (mtime)
+        infinint *last_cha;      //< last inode meta data change (ctime)
+        saved_status xsaved;     //< inode data status
+        ea_status ea_saved;      //< inode Extended Attribute status
+	fsa_status fsa_saved;    //< inode Filesystem Specific Attribute status
+
             //  the following is used only if ea_saved == full
-        infinint *ea_offset;
-        ea_attributs *ea;
-	infinint ea_size;
-            // the following is used if ea_saved == full or ea_saved == partial
-        infinint *last_cha;
-        crc *ea_crc;
-	infinint *fs_dev;
-	generic_file *storage; // where are stored EA
-	archive_version edit;   // need to know EA format used in archive file
+        infinint *ea_offset;     //< offset in archive where to find EA
+        ea_attributs *ea;        //< Extended Attributes read or to be written down
+	infinint ea_size;        //< storage size required by EA
+            // the following is used if ea_saved == full or ea_saved == partial or
+        crc *ea_crc;             //< CRC computed on EA
+
+	infinint *fsa_famillies; //< list of FSA famillies present for that inode (set to NULL in fsa_none mode)
+	infinint *fsa_offset;    //< offset in archive where to find FSA  # always allocated (to be reviewed)
+	filesystem_specific_attribute_list *fsal; //< Filesystem Specific Attributes read or to be written down # only allocated if fsa_saved if set to FULL
+	infinint fsa_size;       //< storage size required for FSA
+	crc *fsa_crc;            //< CRC computed on FSA
+	    //
+	infinint *fs_dev;        //< filesystem ID on which resides the inode (only used when read from filesystem)
+	generic_file *storage;   //< where are stored EA and FSA
+	archive_version edit;    //< need to know EA format used in archive file
 
 	escape *esc;  // if not NULL, the object is partially build from archive (at archive generation, dump() was called with small set to true)
+
+	void nullifyptr();
+	void destroy();
+	void copy_from(const inode & ref);
 
 	static const ea_attributs empty_ea;
     };
