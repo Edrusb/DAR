@@ -70,6 +70,8 @@ namespace libdar
 	void pre_add_ea_crc(const entree *ref, compressor *compr) const;
 	void pre_add_waste_mark(compressor *compr) const;
 	void pre_add_failed_mark(compressor *compr) const;
+	void pre_add_fsa(const entree *ref, compressor *compr) const;
+	void pre_add_fsa_crc(const entree *ref, compressor *compr) const;
 	escape *get_escape_layer() const { return esc; };
 
 	void reset_read() const;

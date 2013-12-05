@@ -1086,6 +1086,8 @@ namespace libdar
 	virtual void pre_add_ea_crc(const entree *ref, compressor *compr) const {};
 	virtual void pre_add_waste_mark(compressor *compr) const {};
 	virtual void pre_add_failed_mark(compressor *compr) const {};
+	virtual void pre_add_fsa(const entree *ref, compressor *compr) const {};
+	virtual void pre_add_fsa_crc(const entree *ref, compressor *compr) const {};
 	virtual escape *get_escape_layer() const { return NULL; };
 
         void add(entree *ref); // add at end of catalogue (sequential point of view)

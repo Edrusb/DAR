@@ -276,6 +276,64 @@ namespace libdar
 	ceci->esc->add_mark_at_current_position(escape::seqt_failed_backup);
     }
 
+    void escape_catalogue::pre_add_fsa(const entree *ref, compressor *compr) const
+    {
+	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
+	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
+	const inode *ref_ino = dynamic_cast<const inode *>(ref);
+
+	if(ref_mir != NULL)
+	    ref_ino = ref_mir->get_inode();
+
+	if(ref_ino != NULL)
+	{
+	    if(ref_ino->fsa_get_saved_status() == inode::fsa_full)
+	    {
+		if(compr == NULL)
+		    throw SRC_BUG;
+		compr->flush_write();
+
+		if(ceci->esc == NULL)
+		    throw SRC_BUG;
+		else
+		    ceci->esc->add_mark_at_current_position(escape::seqt_fsa);
+	    }
+		// else, nothing to do.
+	}
+	    // else, nothing to do.
+    }
+
+    void escape_catalogue::pre_add_fsa_crc(const entree *ref, compressor *compr) const
+    {
+	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
+	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
+	const inode *ref_ino = dynamic_cast<const inode *>(ref);
+
+	if(ref_mir != NULL)
+	    ref_ino = ref_mir->get_inode();
+
+	if(ref_ino != NULL)
+	{
+	    if(ref_ino->fsa_get_saved_status() == inode::fsa_full)
+	    {
+		const crc * c = NULL;
+
+		ref_ino->fsa_get_crc(c);
+
+		if(compr == NULL)
+		    throw SRC_BUG;
+		compr->flush_write();
+
+		if(ceci->esc == NULL)
+		    throw SRC_BUG;
+		ceci->esc->add_mark_at_current_position(escape::seqt_fsa_crc);
+		c->dump(*(ceci->esc));
+	    }
+		// else, nothing to do.
+	}
+	    // else, nothing to do.
+    }
+
     void escape_catalogue::reset_read() const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);

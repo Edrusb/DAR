@@ -73,6 +73,12 @@ namespace libdar
 			const inode * ref, bool info_details, compression compr_used);
     static void restore_atime(const string & chemin, const inode * & ptr);
 
+    static bool save_fsa(user_interaction & dialog,
+			 const string & info_quoi,
+			 inode * & ino,
+			 compressor *stock,
+			 bool info_details);
+
 	/// merge two sets of EA
 
 	/// \param[in] ref1 is the first EA set
@@ -668,6 +674,15 @@ namespace libdar
 						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
 					    ;
 
+					bool avoid_saving_fsa =
+					    snapshot
+						// don't backup if doing a snapshot
+					    || (fixed_date > 0 && e_ino != NULL && e_ino->fsa_get_saved_status() != inode::fsa_none && e_ino->get_last_change() < fixed_date)
+						// don't backup if older than given date (if reference date given)
+					    || (fixed_date == 0 && e_ino != NULL && e_ino->fsa_get_saved_status() == inode::fsa_full && f_ino != NULL && f_ino->fsa_get_saved_status() != inode::fsa_none && e_ino->get_last_change() <= f_ino->get_last_change())
+						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
+					    ;
+
 					bool sparse_file_detection =
 					    e_file != NULL
 					    && e_file->get_size() > sparse_file_min_size
@@ -688,6 +703,12 @@ namespace libdar
 					{
 					    if(e_ino->ea_get_saved_status() == inode::ea_full)
 						e_ino->ea_set_saved_status(inode::ea_partial);
+					}
+
+					if(avoid_saving_fsa)
+					{
+					    if(e_ino->fsa_get_saved_status() == inode::fsa_full)
+						e_ino->fsa_set_saved_status(inode::fsa_partial);
 					}
 
 					if(change_to_remove_ea)
@@ -747,6 +768,16 @@ namespace libdar
 					    if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, info_details, stock_algo))
 						st.incr_ea_treated();
 					    cat.pre_add_ea_crc(e, stockage);
+					}
+
+					    // PERFORMING ACTION FOR FSA
+
+					if(e_ino->fsa_get_saved_status() == inode::fsa_full)
+					{
+					    cat.pre_add_fsa(e, stockage);
+					    if(save_fsa(dialog, juillet.get_string(), e_ino, stockage, info_details))
+						st.incr_fsa_treated();
+					    cat.pre_add_fsa_crc(e, stockage);
 					}
 
 					    // CLEANING UP MEMORY FOR PLAIN FILES
@@ -2834,6 +2865,81 @@ namespace libdar
 	    tools_noexcept_make_date(chemin, ptr_f->get_last_access(), ptr_f->get_last_modif());
     }
 
+    static bool save_fsa(user_interaction & dialog,
+			 const string & info_quoi,
+			 inode * & ino,
+			 compressor *stock,
+			 bool info_details)
+    {
+        bool ret = false;
+        try
+        {
+            switch(ino->fsa_get_saved_status())
+            {
+            case inode::fsa_full: // if there is something to save
+		if(ino->get_fsa() != NULL)
+		{
+		    crc * val = NULL;
+
+		    try
+		    {
+			if(info_details)
+			    dialog.warning(string(gettext("Saving Filesystem Specific Attributes for ")) + info_quoi);
+			ino->fsa_set_offset(stock->get_position());
+			stock->change_algo(none); // never compress EA (no size or filename consideration)
+			stock->reset_crc(tools_file_size_to_crc_size(ino->fsa_get_size())); // start computing CRC for any read/write on stock
+			try
+			{
+			    ino->get_fsa()->write(*stock);
+			}
+			catch(...)
+			{
+			    val = stock->get_crc(); // this keeps "stock" in a coherent status
+			    throw;
+			}
+			val = stock->get_crc();
+			ino->fsa_set_crc(*val);
+			ino->fsa_detach();
+			stock->flush_write();
+			ret = true;
+		    }
+		    catch(...)
+		    {
+			if(val != NULL)
+			    delete val;
+			throw;
+		    }
+		    if(val != NULL)
+			delete val;
+		}
+		else
+		    throw SRC_BUG;
+		break;
+            case inode::fsa_partial:
+	    case inode::fsa_none:
+		break;
+            default:
+                throw SRC_BUG;
+            }
+        }
+        catch(Ebug & e)
+        {
+            throw;
+        }
+        catch(Euser_abort & e)
+        {
+            throw;
+        }
+	catch(Ethread_cancel & e)
+	{
+	    throw;
+	}
+        catch(Egeneric & e)
+        {
+            dialog.warning(string(gettext("Error saving Filesystem Specific Attributes for ")) + info_quoi + ": " + e.get_message());
+        }
+        return ret;
+    }
 
     static void do_EA_transfert(user_interaction &dialog, over_action_ea action, inode *place_ino, const inode *add_ino)
     {
