@@ -544,11 +544,9 @@ namespace libdar
             last_acc = last_access;
             last_mod = last_modif;
             last_cha = new (nothrow) infinint(last_change);
-            ea_offset = new (nothrow) infinint(0);
 	    fsa_offset = new (nothrow) infinint(0);
             fs_dev = new (nothrow) infinint(fs_device);
-            if(ea_offset == NULL
-	       || last_cha == NULL || fs_dev == NULL || fsa_offset == NULL)
+            if(last_cha == NULL || fs_dev == NULL || fsa_offset == NULL)
                 throw Ememory("inde::inode");
         }
         catch(...)
@@ -676,9 +674,6 @@ namespace libdar
 		    break;
 		case ea_partial:
 		case ea_fake:
-		    ea_offset = new (nothrow) infinint(0);
-		    if(ea_offset == NULL)
-			throw Ememory("inode::inode(file)");
 		    if(reading_ver <= 7)
 		    {
 			last_cha = new (nothrow) infinint(f);
@@ -688,9 +683,6 @@ namespace libdar
 		    break;
 		case ea_none:
 		case ea_removed:
-		    ea_offset = new (nothrow) infinint(0);
-		    if(ea_offset == NULL)
-			throw Ememory("inode::inode(file)");
 		    if(reading_ver <= 7)
 		    {
 			last_cha = new (nothrow) infinint(0);
@@ -706,13 +698,9 @@ namespace libdar
 	    {
 		    // header version is greater than or equal to "08" (small dump appeared at
 		    // this version of archive format) ea_offset ea_CRC have been dumped a bit
-		    // further in that case, for now we set them manually to a default value,
-		    // and will fetch their real value upon request by get_ea() or ea_get_crc()
+		    // further in that case, we will fetch their real value upon request
+		    // by get_ea() or ea_get_crc()
 		    // methods
-
-		ea_offset = new (nothrow) infinint(0);
-		if(ea_offset == NULL)
-		    throw Ememory("inode::inode(file)");
 	    }
 	    ea = NULL; // in any case
 
@@ -968,6 +956,8 @@ namespace libdar
             switch(ea_saved)
             {
             case ea_full:
+		if(ea_offset == NULL)
+		    throw SRC_BUG;
                 ea_offset->dump(r);
                 if(ea_crc == NULL)
                     throw SRC_BUG;
@@ -997,11 +987,17 @@ namespace libdar
                 delete ea;
                 ea = NULL;
             }
+	    if(ea_offset != NULL)
+	    {
+		delete ea_offset;
+		ea_offset = NULL;
+	    }
             break;
         case ea_full:
             if(ea != NULL)
                 throw SRC_BUG;
-            *ea_offset = 0;
+	    if(ea_offset != NULL)
+		throw SRC_BUG;
             break;
         case ea_partial:
         case ea_fake:
@@ -1010,6 +1006,11 @@ namespace libdar
                 delete ea;
                 ea = NULL;
             }
+	    if(ea_offset != NULL)
+	    {
+		delete ea_offset;
+		ea_offset = NULL;
+	    }
             break;
         default:
             throw SRC_BUG;
@@ -1043,18 +1044,20 @@ namespace libdar
             if(ea != NULL)
                 return ea;
             else
-                if(storage != NULL)
-			// ea_offset may be equal to zero if the first inode saved had only EA modified since archive of reference
-			// cannot use its value to know whether we fully read inode from catalogue or read a small dump in sequential read mode
+                if(storage != NULL) // reading from archive
                 {
 		    crc *val = NULL;
 		    const crc *my_crc = NULL;
 
 		    try
 		    {
-			if(esc == NULL)
+			if(esc == NULL) // direct read mode
+			{
+			    if(ea_offset == NULL)
+				throw SRC_BUG;
 			    storage->skip(*ea_offset);
-			else
+			}
+			else // sequential read mode
 			{
 			    if(!esc->skip_to_next_mark(escape::seqt_ea, false))
 				throw Erange("inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
@@ -1157,7 +1160,7 @@ namespace libdar
 		    if(ea_size == NULL)
 			throw Ememory("inode::ea_get_size");
 		}
-		else // else we stick with value 0
+		else // else we stick with value 0, meaning that we read an old archive
 		    return 0;
             }
             return *ea_size;
