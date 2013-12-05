@@ -96,6 +96,7 @@ namespace libdar
 	void incr_errored() { (this->*increment)(&errored); };       ///< increment by one the errored counter
 	void incr_deleted() { (this->*increment)(&deleted); };       ///< increment by one the deleted counter
 	void incr_ea_treated() { (this->*increment)(&ea_treated); }; ///< increment by one the ea_treated counter
+	void incr_fsa_treated() { (this->*increment)(&fsa_treated); }; ///< increment by one the fsa treated counter
 
 	void add_to_ignored(const infinint & val) { (this->*add_to)(&ignored, val); };  ///< increment the ignored counter by a given value
 	void add_to_errored(const infinint & val) { (this->*add_to)(&errored, val); };  ///< increment the errored counter by a given value
@@ -105,6 +106,7 @@ namespace libdar
 	void sub_from_treated(const infinint & val) { (this->*sub_from)(&treated, val); };
 	void sub_from_ea_treated(const infinint & val) { (this->*sub_from)(&ea_treated, val); };
 	void sub_from_hard_links(const infinint & val) { (this->*sub_from)(&hard_links, val); };
+	void sub_from_fsa_treated(const infinint & val) { (this->*sub_from)(&fsa_treated, val); };
 
 	infinint get_treated() const { return (this->*returned)(&treated); };     ///< returns the current value of the treated counter
 	infinint get_hard_links() const { return (this->*returned)(&hard_links); }; ///< returns the current value of the hard_links counter
@@ -115,6 +117,7 @@ namespace libdar
 	infinint get_deleted() const { return (this->*returned)(&deleted); };     ///< returns the current value of the deleted counter
 	infinint get_ea_treated() const { return (this->*returned)(&ea_treated); };  ///< returns the current value of the ea_treated counter
 	infinint get_byte_amount() const { return (this->*returned)(&byte_amount); };  ///< returns the current value of the byte_amount counter
+	infinint get_fsa_treated() const { return (this->*returned)(&fsa_treated); }; ///< returns the current value of the fsa_treated counter
 
 	void decr_treated() { (this->*decrement)(&treated); };        ///< decrement by one the treated counter
 	void decr_hard_links() { (this->*decrement)(&hard_links); };  ///< decrement by one the hard_links counter
@@ -124,6 +127,7 @@ namespace libdar
 	void decr_errored() { (this->*decrement)(&errored); };        ///< decrement by one the errored counter
 	void decr_deleted() { (this->*decrement)(&deleted); };        ///< decrement by one the deleted counter
 	void decr_ea_treated() { (this->*decrement)(&ea_treated); };  ///< decrement by one the ea_treated counter
+	void decr_fsa_treated() { (this->*decrement)(&fsa_treated); };///< decrement by one the fsa_treated counter
 
 	void set_byte_amount(const infinint & val) { (this->*set_to)(&byte_amount, val); }; ///< set to the given value the byte_amount counter
 
@@ -145,6 +149,7 @@ namespace libdar
         infinint deleted;       ///< deleted file seen / number of files deleted during the operation [restoration]
         infinint ea_treated;    ///< number of EA saved / number of EA restored
 	infinint byte_amount;   ///< auxilliary counter, holds the wasted bytes due to repeat on change feature for example.
+	infinint fsa_treated;   ///< number of FSA saved / number of FSA restored
 
 
 	void (statistics::*increment)(infinint * var);                    ///< generic method for incrementing a variable

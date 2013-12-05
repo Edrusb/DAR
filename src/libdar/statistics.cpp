@@ -46,11 +46,11 @@ namespace libdar
 	if(locking)
 	{
 	    LOCK_IN;
-	    treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = byte_amount = 0;
+	    treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = byte_amount = fsa_treated = 0;
 	    LOCK_OUT;
 	}
 	else
-	    treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = byte_amount = 0;
+	    treated = hard_links = skipped = ignored = tooold = errored = deleted = ea_treated = byte_amount = fsa_treated = 0;
     }
 
     infinint statistics::total() const
@@ -124,6 +124,7 @@ namespace libdar
 	deleted = ref.deleted;
 	ea_treated = ref.ea_treated;
 	byte_amount = ref.byte_amount;
+	fsa_treated = ref.fsa_treated;
     }
 
     void statistics::dump(user_interaction & dialog) const
@@ -139,6 +140,7 @@ namespace libdar
 	dialog.printf("deleted = %i", &deleted);
 	dialog.printf("ea_treated = %i", &ea_treated);
 	dialog.printf("byte_amount = %i", &byte_amount);
+	dialog.printf("fsa_treated = %i", &fsa_treated);
 	dialog.printf("------------------------------------");
     }
 
