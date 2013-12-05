@@ -624,6 +624,7 @@ namespace libdar
 
 	    last_acc = infinint(f);
 	    last_mod = infinint(f);
+
 	    if(reading_ver >= 8)
 	    {
 		last_cha = new (nothrow) infinint(f);
@@ -936,7 +937,25 @@ namespace libdar
         default:
             throw SRC_BUG; // unknown value for ea_saved
         }
+
+	switch(fsa_saved)
+	{
+	case fsa_none:
+	    flag |= INODE_FLAG_FSA_NONE;
+	    break;
+	case fsa_partial:
+	    flag |= INODE_FLAG_FSA_PART;
+	    break;
+	case fsa_full:
+	    flag |= INODE_FLAG_FSA_FULL;
+	    break;
+	default:
+	    throw SRC_BUG; // unknown value for fsa_saved
+	}
+
         nomme::inherited_dump(r, small);
+
+	    // unix inode part
 
         r.write((char *)(&flag), 1);
         uid.dump(r);
@@ -948,6 +967,9 @@ namespace libdar
         if(last_cha == NULL)
             throw SRC_BUG;
         last_cha->dump(r);
+
+	    // EA part
+
         if(ea_saved == ea_full)
             ea_get_size().dump(r);
 
@@ -972,6 +994,41 @@ namespace libdar
                 throw SRC_BUG;
             }
         }
+
+	    // FSA part
+
+	if(fsa_saved != fsa_none)
+	{
+	    if(fsa_famillies == NULL)
+		throw SRC_BUG;
+	    fsa_famillies->dump(r);
+	}
+	if(fsa_saved == fsa_full)
+	{
+	    if(fsa_size == NULL)
+		throw SRC_BUG;
+	    fsa_size->dump(r);
+	}
+
+	if(!small)
+	{
+	    switch(fsa_saved)
+	    {
+	    case fsa_full:
+		if(fsa_offset == NULL)
+		    throw SRC_BUG;
+		fsa_offset->dump(r);
+		if(fsa_crc == NULL)
+		    throw SRC_BUG;
+		fsa_crc->dump(r);
+		break;
+	    case fsa_partial:
+	    case fsa_none:
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+	}
     }
 
     void inode::ea_set_saved_status(ea_status status)
