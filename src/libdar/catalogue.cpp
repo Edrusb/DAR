@@ -544,9 +544,8 @@ namespace libdar
             last_acc = last_access;
             last_mod = last_modif;
             last_cha = new (nothrow) infinint(last_change);
-	    fsa_offset = new (nothrow) infinint(0);
             fs_dev = new (nothrow) infinint(fs_device);
-            if(last_cha == NULL || fs_dev == NULL || fsa_offset == NULL)
+            if(last_cha == NULL || fs_dev == NULL)
                 throw Ememory("inde::inode");
         }
         catch(...)
@@ -697,9 +696,9 @@ namespace libdar
 	    else // reading a small dump using escape sequence marks
 	    {
 		    // header version is greater than or equal to "08" (small dump appeared at
-		    // this version of archive format) ea_offset ea_CRC have been dumped a bit
-		    // further in that case, we will fetch their real value upon request
-		    // by get_ea() or ea_get_crc()
+		    // this version of archive format) ea_offset is not used (sequential read mode)
+		    // while ea_CRC have been dumped a bit further in that case, we will fetch
+		    // its value upon request by get_ea() or ea_get_crc()
 		    // methods
 	    }
 	    ea = NULL; // in any case
@@ -735,22 +734,25 @@ namespace libdar
 			throw Ememory("inode::inode(file)");
 		}
 
+		if(fsa_saved == fsa_full)
+		{
+		    fsa_size = new (nothrow) infinint(f);
+		    if(fsa_size == NULL)
+			throw Ememory("inde::inode(file)");
+		}
+
 		if(esc == NULL)
 		{
 		    switch(fsa_saved)
 		    {
 		    case fsa_full:
-			fsa_size = new (nothrow) infinint(f);
 			fsa_offset = new (nothrow) infinint(f);
 			fsa_crc = create_crc_from_file(f);
-			if(fsa_size == NULL || fsa_offset == NULL || fsa_crc == NULL)
+			if(fsa_offset == NULL || fsa_crc == NULL)
 			    throw Ememory("inode::inode(file)");
 			break;
 		    case fsa_partial:
 		    case fsa_none:
-			fsa_offset = new infinint(0);
-			if(fsa_offset == NULL)
-			    throw Ememory("inode::inode(file)");
 			break;
 		    default:
 			throw SRC_BUG;
@@ -758,9 +760,10 @@ namespace libdar
 		}
 		else  // reading a small dump using escape sequence marks
 		{
-		    fsa_offset = new (nothrow) infinint(0);
-		    if(fsa_offset == NULL)
-			throw Ememory("inode::inode(file)");
+			// fsa_offset is not used and fsa_CRC have been dumped a bit
+			// further in that case (sequential read mode),
+			// and will be fetched by get_fsa() or ea_get_crc()
+			// methods
 		}
 	    }
 	    else // older archive than version 9 do not support FSA
@@ -1313,7 +1316,11 @@ namespace libdar
 		    try
 		    {
 			if(esc == NULL)
+			{
+			    if(fsa_offset == NULL)
+				throw SRC_BUG;
 			    storage->skip(*fsa_offset);
+			}
 			else
 			{
 			    if(!esc->skip_to_next_mark(escape::seqt_fsa, false))
