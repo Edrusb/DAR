@@ -91,7 +91,7 @@ namespace libdar
 	    if(*it != NULL)
 	    {
 		set<fsa_familly>::const_iterator f = scope.find((*it)->get_familly());
-		if(scope.empty() || f != scope.end())
+		if(f != scope.end())
 		{
 		    vector<filesystem_specific_attribute *>::const_iterator ut = ref.fsa.begin();
 		    while(ut != ref.fsa.end() && *ut != NULL && !(*it)->is_same_type_as(**ut))
@@ -211,12 +211,12 @@ namespace libdar
 
 	clear();
 
-	if(scope.empty() || scope.find(fsaf_hfs_plus) != scope.end())
+	if(scope.find(fsaf_hfs_plus) != scope.end())
 	{
 	    FSA_READ(fsa_creation_date, fsaf_hfs_plus, target);
 	}
 
-	if(scope.empty() || scope.find(fsaf_linux_extX) != scope.end())
+	if(scope.find(fsaf_linux_extX) != scope.end())
 	{
 	    FSA_READ(fsa_compressed, fsaf_linux_extX, target);
 	    FSA_READ(fsa_nodump, fsaf_linux_extX, target);

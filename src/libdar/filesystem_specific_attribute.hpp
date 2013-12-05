@@ -54,7 +54,7 @@ namespace libdar
 	    /// be built, that is object containing the value of the FSA found on the filesystem.
 	filesystem_specific_attribute(fsa_familly f, const std::string & target) { fam = f; nat = fsan_unset; };
 
-	    /// as well as this constructor
+	    /// \note the same note as for the first constructor do apply here
 	filesystem_specific_attribute(generic_file & f, fsa_familly xfam) { fam = xfam; nat = fsan_unset; };
 
 	    /// virtual destructor for inherited classes
@@ -113,7 +113,7 @@ namespace libdar
 	    /// gives the set of FSA familly present in the list
 	fsa_scope get_fsa_famillies() const { return familles; };
 
-	    /// compare two list of FSA to see whether they have equal FSA with identical values
+	    /// compare two lists of FSA to see whether they have equal FSA with identical values within the given familly scope
 	bool is_equal_to(const filesystem_specific_attribute_list & ref, const fsa_scope & scope) const;
 
 	    /// read FSA list from archive

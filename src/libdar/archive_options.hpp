@@ -37,6 +37,7 @@
 #include "secu_string.hpp"
 #include "nls_swap.hpp"
 #include "entrepot.hpp"
+#include "fsa_familly.hpp"
 
 #include <string>
 
@@ -430,6 +431,9 @@ namespace libdar
 	    /// defines the protocol to use for slices
 	void set_entrepot(const entrepot & entr);
 
+	    /// defines the FSA (Filesystem Specific Attribute) to only consider (by default all FSA activated at compilation time are considered)
+	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
+
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
@@ -478,6 +482,7 @@ namespace libdar
 	const mask & get_backup_hook_file_mask() const { return *x_backup_hook_file_mask; };
 	bool get_ignore_unknown_inode_type() const { return x_ignore_unknown; };
 	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
+	const fsa_scope & get_fsa_scope() const { return x_scope; };
 
     private:
 	archive *x_ref_arch; //< just contains the address of an existing object, no local copy of object is done here
@@ -526,6 +531,7 @@ namespace libdar
 	std::string x_backup_hook_file_execute;
 	bool x_ignore_unknown;
 	entrepot *x_entrepot;
+	fsa_scope x_scope;
 
 	void destroy();
 	void copy_from(const archive_options_create & ref);
@@ -811,6 +817,8 @@ namespace libdar
 	    /// defines the protocol to use for slices
 	void set_entrepot(const entrepot & entr);
 
+	    /// defines the FSA (Filesystem Specific Attribute) to only consider (by default all FSA are considered)
+	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
 
 
 	    /////////////////////////////////////////////////////////////////////
@@ -849,6 +857,7 @@ namespace libdar
 	hash_algo get_hash_algo() const { return x_hash; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
+	const fsa_scope & get_fsa_scope() const { return x_scope; };
 
     private:
 	archive * x_ref;    //< points to an external existing object, must never be deleted by "this"
@@ -884,6 +893,7 @@ namespace libdar
 	hash_algo x_hash;
 	infinint x_slice_min_digits;
 	entrepot *x_entrepot;
+	fsa_scope x_scope;
 
 	void destroy();
 	void copy_from(const archive_options_merge & ref);
@@ -966,6 +976,9 @@ namespace libdar
 	    /// \note setting both set_only_deleted() and set_ignore_deleted() will not restore anything, almost equivalent to a dry-run execution
 	void set_ignore_deleted(bool val) { x_ignore_deleted = val; };
 
+	    /// defines the FSA (Filesystem Specific Attribute) to only consider (by default all FSA activated at compilation time are considered)
+	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -985,6 +998,7 @@ namespace libdar
 	const crit_action & get_overwriting_rules() const { if(x_overwrite == NULL) throw SRC_BUG; return *x_overwrite; };
 	bool get_only_deleted() const { return x_only_deleted; };
 	bool get_ignore_deleted() const { return x_ignore_deleted; };
+	const fsa_scope & get_fsa_scope() const { return x_scope; };
 
     private:
 	mask * x_selection;
@@ -1002,6 +1016,7 @@ namespace libdar
 	crit_action *x_overwrite;
 	bool x_only_deleted;
 	bool x_ignore_deleted;
+	fsa_scope x_scope;
 
 	void destroy();
 	void copy_from(const archive_options_extract & ref);
@@ -1011,7 +1026,7 @@ namespace libdar
 
 
 	/////////////////////////////////////////////////////////
-	////////// OPTIONS FOR LISTING AN ARCHIVE ////////////////
+	////////// OPTIONS FOR LISTING AN ARCHIVE ///////////////
 	/////////////////////////////////////////////////////////
 
     	/// class holding optional parameters used to list the contents of an existing archive
@@ -1124,6 +1139,9 @@ namespace libdar
 	    /// whether to compare symlink mtime (symlink mtime)
 	void set_compare_symlink_date(bool compare_symlink_date) { x_compare_symlink_date = compare_symlink_date; };
 
+	    /// defines the FSA (Filesystem Specific Attribute) to only consider (by default all FSA activated at compilation time are considered)
+	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -1138,6 +1156,7 @@ namespace libdar
 	bool get_display_skipped() const { return x_display_skipped; };
 	const infinint & get_hourshift() const { return x_hourshift; };
 	bool get_compare_symlink_date() const { return x_compare_symlink_date; };
+	const fsa_scope & get_fsa_scope() const { return x_scope; };
 
     private:
 	mask * x_selection;
@@ -1151,6 +1170,7 @@ namespace libdar
 	bool x_display_skipped;
 	infinint x_hourshift;
 	bool x_compare_symlink_date;
+	fsa_scope x_scope;
 
 	void destroy();
 	void copy_from(const archive_options_diff & ref);

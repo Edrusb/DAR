@@ -71,6 +71,17 @@ namespace libdar
 	}
     }
 
+    fsa_scope all_fsa_familly()
+    {
+	fsa_scope ret;
+
+	ret.insert(fsaf_hfs_plus);
+	ret.insert(fsaf_linux_extX);
+
+	return ret;
+    }
+
+
     const infinint FSA_SCOPE_BIT_HFS_PLUS = 1;
     const infinint FSA_SCOPE_BIT_LINUX_EXTX = 2;
 
