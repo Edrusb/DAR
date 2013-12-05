@@ -289,7 +289,7 @@ namespace libdar
             // III : to record where is dump the EA in the archive #EA_FULL only#
         void ea_set_offset(const infinint & pos) { *ea_offset = pos; };
         void ea_set_crc(const crc & val);
-	void ea_get_crc(const crc * & ptr) const; //< the argument is set to point to an allocated crc object owned by this "inode" object, this reference stays valid while the "inode" object exists and MUST NOT be deleted by the caller in any case
+	void ea_get_crc(const crc * & ptr) const; //< the argument is set to point to an allocated crc object owned by this "inode" object, this reference stats valid while the "inode" object exists and MUST NOT be deleted by the caller in any case
 	bool ea_get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
 
             // IV : to know/record if EA and FSA have been modified # any EA status# and FSA status #
