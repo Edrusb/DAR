@@ -544,12 +544,12 @@ namespace libdar
         try
         {
             last_acc = last_access;
-            last_mod = new (nothrow) infinint(last_modif);
+            last_mod = last_modif;
             last_cha = new (nothrow) infinint(last_change);
             ea_offset = new (nothrow) infinint(0);
 	    fsa_offset = new (nothrow) infinint(0);
             fs_dev = new (nothrow) infinint(fs_device);
-            if(last_mod == NULL || ea_offset == NULL
+            if(ea_offset == NULL
 	       || last_cha == NULL || fs_dev == NULL || fsa_offset == NULL)
                 throw Ememory("inde::inode");
         }
@@ -629,11 +629,11 @@ namespace libdar
 
 	    fs_dev = new (nothrow) infinint(0); // the filesystemID is not saved in archive
 	    last_acc = infinint(f);
-	    last_mod = new (nothrow) infinint(f);
+	    last_mod = infinint(f);
 	    if(reading_ver >= 8)
 	    {
 		last_cha = new (nothrow) infinint(f);
-		if(last_mod == NULL || last_cha == NULL || fs_dev == NULL)
+		if(last_cha == NULL || fs_dev == NULL)
 		    throw Ememory("inode::inode(file)");
 
 		if(ea_saved == ea_full)
@@ -641,7 +641,7 @@ namespace libdar
 	    }
 	    else // archive format <= 7
 	    {
-		if(last_mod == NULL || fs_dev == NULL)
+		if(fs_dev == NULL)
 		    throw Ememory("inode::inode(file)");
 		ea_size = 0; // meaning EA size unknown (old format)
 	    }
@@ -825,12 +825,12 @@ namespace libdar
 
     bool inode::is_more_recent_than(const inode & ref, const infinint & hourshift) const
     {
-        return *ref.last_mod < *last_mod && !tools_is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod);
+        return ref.last_mod < last_mod && !tools_is_equal_with_hourshift(hourshift, ref.last_mod, last_mod);
     }
 
     bool inode::has_changed_since(const inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
     {
-        return (what_to_check != cf_inode_type && (hourshift > 0 ? ! tools_is_equal_with_hourshift(hourshift, *ref.last_mod, *last_mod) : *ref.last_mod != *last_mod))
+        return (what_to_check != cf_inode_type && (hourshift > 0 ? ! tools_is_equal_with_hourshift(hourshift, ref.last_mod, last_mod) : ref.last_mod != last_mod))
             || (what_to_check == cf_all && uid != ref.uid)
             || (what_to_check == cf_all && gid != ref.gid)
             || (what_to_check != cf_mtime && what_to_check != cf_inode_type && perm != ref.perm);
@@ -956,9 +956,7 @@ namespace libdar
         tmp = htons(perm);
         r.write((char *)&tmp, sizeof(tmp));
         last_acc.dump(r);
-        if(last_mod == NULL)
-            throw SRC_BUG;
-        last_mod->dump(r);
+        last_mod.dump(r);
         if(last_cha == NULL)
             throw SRC_BUG;
         last_cha->dump(r);
@@ -1457,7 +1455,6 @@ namespace libdar
 
     void inode::nullifyptr()
     {
-        last_mod = NULL;
         last_cha = NULL;
         ea_offset = NULL;
 	ea = NULL;
@@ -1473,11 +1470,6 @@ namespace libdar
 
     void inode::destroy()
     {
-        if(last_mod != NULL)
-        {
-            delete last_mod;
-            last_mod = NULL;
-        }
         if(last_cha != NULL)
         {
             delete last_cha;
@@ -1549,7 +1541,7 @@ namespace libdar
 	    gid = ref.gid;
 	    perm = ref.perm;
 	    last_acc = ref.last_acc;
-	    copy_ptr(ref.last_mod, last_mod);
+	    last_mod = ref.last_mod;
 	    copy_ptr(ref.last_cha, last_cha);
 	    xsaved = ref.xsaved;
 	    ea_saved = ref.ea_saved;

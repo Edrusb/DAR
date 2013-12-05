@@ -237,9 +237,9 @@ namespace libdar
         const infinint & get_gid() const { return gid; };
         U_16 get_perm() const { return perm; };
         infinint get_last_access() const { return last_acc; };
-        infinint get_last_modif() const { return *last_mod; };
+        infinint get_last_modif() const { return last_mod; };
         void set_last_access(const infinint & x_time) { last_acc = x_time; };
-        void set_last_modif(const infinint & x_time) { *last_mod = x_time; };
+        void set_last_modif(const infinint & x_time) { last_mod = x_time; };
         saved_status get_saved_status() const { return xsaved; };
         void set_saved_status(saved_status x) { xsaved = x; };
 	infinint get_device() const { return *fs_dev; };
@@ -353,7 +353,7 @@ namespace libdar
         infinint gid;            //< inode owner's group ID
         U_16 perm;               //< inode's permission
         infinint last_acc;       //< last access time (atime)
-	infinint *last_mod;      //< last modification time (mtime)
+	infinint last_mod;       //< last modification time (mtime)
         infinint *last_cha;      //< last inode meta data change (ctime)
         saved_status xsaved;     //< inode data status
         ea_status ea_saved;      //< inode Extended Attribute status
