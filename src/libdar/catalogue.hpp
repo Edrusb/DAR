@@ -362,7 +362,7 @@ namespace libdar
             //  the following is used only if ea_saved == full
         infinint *ea_offset;     //< offset in archive where to find EA
         ea_attributs *ea;        //< Extended Attributes read or to be written down
-	infinint ea_size;        //< storage size required by EA
+	infinint *ea_size;       //< storage size required by EA
             // the following is used if ea_saved == full or ea_saved == partial or
         crc *ea_crc;             //< CRC computed on EA
 

@@ -537,7 +537,6 @@ namespace libdar
         xsaved = s_not_saved;
         ea_saved = ea_none;
 	fsa_saved = fsa_none;
-        ea_size = 0;
 	fsa_size = 0;
         edit = 0;
 
@@ -628,22 +627,26 @@ namespace libdar
 	    perm = ntohs(tmp);
 
 	    fs_dev = new (nothrow) infinint(0); // the filesystemID is not saved in archive
+	    if(fs_dev == NULL)
+		throw Ememory("inode::inode(file)");
 	    last_acc = infinint(f);
 	    last_mod = infinint(f);
 	    if(reading_ver >= 8)
 	    {
 		last_cha = new (nothrow) infinint(f);
-		if(last_cha == NULL || fs_dev == NULL)
+		if(last_cha == NULL)
 		    throw Ememory("inode::inode(file)");
 
 		if(ea_saved == ea_full)
-		    ea_size = infinint(f);
+		{
+		    ea_size = new (nothrow) infinint(f);
+		    if(ea_size == NULL)
+			throw Ememory("inode::inode(file)");
+		}
 	    }
 	    else // archive format <= 7
 	    {
-		if(fs_dev == NULL)
-		    throw Ememory("inode::inode(file)");
-		ea_size = 0; // meaning EA size unknown (old format)
+		    // ea_size stays NULL meaning EA size unknown (old format)
 	    }
 
 	    if(esc == NULL) // reading a full entry from catalogue
@@ -1019,14 +1022,19 @@ namespace libdar
 
     void inode::ea_attach(ea_attributs *ref)
     {
+        if(ea_saved != ea_full)
+            throw SRC_BUG;
+
         if(ref != NULL && ea == NULL)
         {
+	    if(ea_size != NULL)
+		throw SRC_BUG;
+            ea_size = new (nothrow) infinint(ea->space_used());
+	    if(ea_size == NULL)
+		throw Ememory("inode::ea_attach");
             ea = ref;
-            ea_size = ea->space_used();
         }
         else
-            throw SRC_BUG;
-        if(ea_saved != ea_full)
             throw SRC_BUG;
     }
 
@@ -1139,13 +1147,18 @@ namespace libdar
     {
         if(ea_saved == ea_full)
         {
-            if(ea_size == 0) // reading an old archive
+            if(ea_size == NULL) // reading an old archive
             {
                 if(ea != NULL)
-                    const_cast<inode *>(this)->ea_size = ea->space_used();
-                    // else we stick with value 0
+		{
+                    const_cast<inode *>(this)->ea_size = new (nothrow) infinint (ea->space_used());
+		    if(ea_size == NULL)
+			throw Ememory("inode::ea_get_size");
+		}
+		else // else we stick with value 0
+		    return 0;
             }
-            return ea_size;
+            return *ea_size;
         }
         else
             throw SRC_BUG;
@@ -1458,6 +1471,7 @@ namespace libdar
         last_cha = NULL;
         ea_offset = NULL;
 	ea = NULL;
+	ea_size = NULL;
         ea_crc = NULL;
 	fsa_famillies = NULL;
 	fsa_offset = NULL;
@@ -1485,6 +1499,11 @@ namespace libdar
             delete ea;
             ea = NULL;
         }
+	if(ea_size != NULL)
+	{
+	    delete ea_size;
+	    ea_size = NULL;
+	}
         if(ea_crc != NULL)
         {
             delete ea_crc;
@@ -1548,7 +1567,7 @@ namespace libdar
 	    fsa_saved = ref.fsa_saved;
 	    copy_ptr(ref.ea_offset, ea_offset);
 	    copy_ptr(ref.ea, ea);
-	    ea_size = ref.ea_size;
+	    copy_ptr(ref.ea_size, ea_size);
 	    if(ref.ea_crc != NULL)
 	    {
 		ea_crc = (ref.ea_crc)->clone();
