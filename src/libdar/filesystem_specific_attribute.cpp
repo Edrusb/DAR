@@ -45,70 +45,6 @@ namespace libdar
 	    && get_nature() == ref.get_nature();
     }
 
-    string filesystem_specific_attribute::familly_to_string(filesystem_specific_attribute::familly f)
-    {
-	switch(f)
-	{
-	case hfs_plus:
-	    return "HFS+";
-	case linux_extX:
-	    return "ext2/3/4";
-	default:
-	    throw SRC_BUG;
-	}
-    }
-
-    string filesystem_specific_attribute::nature_to_string(nature n)
-    {
-	switch(n)
-	{
-	case nat_unset:
-	    throw SRC_BUG;
-	case creation_date:
-	    return gettext("creation date");
-	case compressed:
-	    return gettext("compressed");
-	case no_dump:
-	    return gettext("no dump flag");
-	case immutable:
-	    return gettext("immutable");
-	case undeletable:
-	    return gettext("undeletable");
-	default:
-	    throw SRC_BUG;
-	}
-    }
-
-///////////////////////////////////////////////////////////////////////////////////
-
-    const infinint FSA_SCOPE_BIT_HFS_PLUS = 1;
-    const infinint FSA_SCOPE_BIT_LINUX_EXTX = 2;
-
-    infinint fsa_scope_to_infinint(const fsa_scope & val)
-    {
-	infinint ret = 0;
-
-	if(val.find(filesystem_specific_attribute::hfs_plus) != val.end())
-	    ret |= FSA_SCOPE_BIT_HFS_PLUS;
-	if(val.find(filesystem_specific_attribute::linux_extX) != val.end())
-	    ret |= FSA_SCOPE_BIT_LINUX_EXTX;
-
-	return ret;
-    }
-
-    fsa_scope infinint_to_fsa_scope(const infinint & ref)
-    {
-	fsa_scope ret;
-
-	ret.clear();
-	if((ref & FSA_SCOPE_BIT_HFS_PLUS) != 0)
-	    ret.insert(filesystem_specific_attribute::hfs_plus);
-	if((ref & FSA_SCOPE_BIT_LINUX_EXTX) != 0)
-	    ret.insert(filesystem_specific_attribute::linux_extX);
-
-	return ret;
-    }
-
 ///////////////////////////////////////////////////////////////////////////////////
 
     const U_I FAM_SIG_WIDTH = 1;
@@ -154,7 +90,7 @@ namespace libdar
 	{
 	    if(*it != NULL)
 	    {
-		set<filesystem_specific_attribute::familly>::const_iterator f = scope.find((*it)->get_familly());
+		set<fsa_familly>::const_iterator f = scope.find((*it)->get_familly());
 		if(scope.empty() || f != scope.end())
 		{
 		    vector<filesystem_specific_attribute *>::const_iterator ut = ref.fsa.begin();
@@ -198,8 +134,8 @@ namespace libdar
 	    while(sub_size > 0)
 	    {
 		char buffer[FAM_SIG_WIDTH + NAT_SIG_WIDTH + 1];
-		filesystem_specific_attribute::familly fam;
-		filesystem_specific_attribute::nature nat;
+		fsa_familly fam;
+		fsa_nature nat;
 		filesystem_specific_attribute *ptr = NULL;
 
 		f.read(buffer, FAM_SIG_WIDTH);
@@ -212,21 +148,21 @@ namespace libdar
 
 		switch(nat)
 		{
-		case filesystem_specific_attribute::nat_unset:
+		case fsan_unset:
 		    throw SRC_BUG;
-		case filesystem_specific_attribute::creation_date:
+		case fsan_creation_date:
 		    ptr = new (nothrow) fsa_creation_date(f, fam);
 		    break;
-		case filesystem_specific_attribute::compressed:
+		case fsan_compressed:
 		    ptr = new (nothrow) fsa_compressed(f, fam);
 		    break;
-		case filesystem_specific_attribute::no_dump:
+		case fsan_no_dump:
 		    ptr = new (nothrow) fsa_nodump(f, fam);
 		    break;
-		case filesystem_specific_attribute::immutable:
+		case fsan_immutable:
 		    ptr = new (nothrow) fsa_immutable(f, fam);
 		    break;
-		case filesystem_specific_attribute::undeletable:
+		case fsan_undeletable:
 		    ptr = new (nothrow) fsa_undeleted(f, fam);
 		    break;
 		default:
@@ -275,17 +211,17 @@ namespace libdar
 
 	clear();
 
-	if(scope.empty() || scope.find(filesystem_specific_attribute::hfs_plus) != scope.end())
+	if(scope.empty() || scope.find(fsaf_hfs_plus) != scope.end())
 	{
-	    FSA_READ(fsa_creation_date, filesystem_specific_attribute::hfs_plus, target);
+	    FSA_READ(fsa_creation_date, fsaf_hfs_plus, target);
 	}
 
-	if(scope.empty() || scope.find(filesystem_specific_attribute::linux_extX) != scope.end())
+	if(scope.empty() || scope.find(fsaf_linux_extX) != scope.end())
 	{
-	    FSA_READ(fsa_compressed, filesystem_specific_attribute::linux_extX, target);
-	    FSA_READ(fsa_nodump, filesystem_specific_attribute::linux_extX, target);
-	    FSA_READ(fsa_immutable, filesystem_specific_attribute::linux_extX, target);
-	    FSA_READ(fsa_undeleted, filesystem_specific_attribute::linux_extX, target);
+	    FSA_READ(fsa_compressed, fsaf_linux_extX, target);
+	    FSA_READ(fsa_nodump, fsaf_linux_extX, target);
+	    FSA_READ(fsa_immutable, fsaf_linux_extX, target);
+	    FSA_READ(fsa_undeleted, fsaf_linux_extX, target);
 	}
     }
 
@@ -307,7 +243,7 @@ namespace libdar
 		}
 		catch(Erange & e)
 		{
-		    string fsa_name = filesystem_specific_attribute::familly_to_string((*it)->get_familly()) + "/" + filesystem_specific_attribute::nature_to_string((*it)->get_nature());
+		    string fsa_name = fsa_familly_to_string((*it)->get_familly()) + "/" + fsa_nature_to_string((*it)->get_nature());
 		    string msg = e.get_message();
 
 		    ui.printf("Error while setting filesystem specific attribute %s: %s",
@@ -362,16 +298,16 @@ namespace libdar
     }
 
 
-    string filesystem_specific_attribute_list::familly_to_signature(filesystem_specific_attribute::familly f)
+    string filesystem_specific_attribute_list::familly_to_signature(fsa_familly f)
     {
 	string ret;
 
 	switch(f)
 	{
-	case filesystem_specific_attribute::hfs_plus:
+	case fsaf_hfs_plus:
 	    ret = "h";
 	    break;
-	case filesystem_specific_attribute::linux_extX:
+	case fsaf_linux_extX:
 	    ret = "l";
 	    break;
 	default:
@@ -387,27 +323,27 @@ namespace libdar
 	return ret;
     }
 
-    string filesystem_specific_attribute_list::nature_to_signature(filesystem_specific_attribute::nature n)
+    string filesystem_specific_attribute_list::nature_to_signature(fsa_nature n)
     {
 	string ret;
 
 	switch(n)
 	{
-	case filesystem_specific_attribute::nat_unset:
+	case fsan_unset:
 	    throw SRC_BUG;
-	case filesystem_specific_attribute::creation_date:
+	case fsan_creation_date:
 	    ret = "aa";
 	    break;
-	case filesystem_specific_attribute::compressed:
+	case fsan_compressed:
 	    ret = "ab";
 	    break;
-	case filesystem_specific_attribute::no_dump:
+	case fsan_no_dump:
 	    ret = "ac";
 	    break;
-	case filesystem_specific_attribute::immutable:
+	case fsan_immutable:
 	    ret = "ad";
 	    break;
-	case filesystem_specific_attribute::undeletable:
+	case fsan_undeletable:
 	    ret = "ae";
 	    break;
 	default:
@@ -423,33 +359,33 @@ namespace libdar
 	return ret;
     }
 
-    filesystem_specific_attribute::familly filesystem_specific_attribute_list::signature_to_familly(const string & sig)
+    fsa_familly filesystem_specific_attribute_list::signature_to_familly(const string & sig)
     {
 	if(sig.size() != FAM_SIG_WIDTH)
 	    throw SRC_BUG;
 	if(sig == "h")
-	    return filesystem_specific_attribute::hfs_plus;
+	    return fsaf_hfs_plus;
 	if(sig == "l")
-	    return filesystem_specific_attribute::linux_extX;
+	    return fsaf_linux_extX;
 	if(sig == "X")
 	    throw SRC_BUG;  // resevered for field extension if necessary in the future
 	throw SRC_BUG;
     }
 
-    filesystem_specific_attribute::nature filesystem_specific_attribute_list::signature_to_nature(const string & sig)
+    fsa_nature filesystem_specific_attribute_list::signature_to_nature(const string & sig)
     {
 	if(sig.size() != NAT_SIG_WIDTH)
 	    throw SRC_BUG;
 	if(sig == "aa")
-	    return filesystem_specific_attribute::creation_date;
+	    return fsan_creation_date;
 	if(sig == "ab")
-	    return filesystem_specific_attribute::compressed;
+	    return fsan_compressed;
 	if(sig == "ac")
-	    return filesystem_specific_attribute::no_dump;
+	    return fsan_no_dump;
 	if(sig == "ad")
-	    return filesystem_specific_attribute::immutable;
+	    return fsan_immutable;
 	if(sig == "ae")
-	    return filesystem_specific_attribute::undeletable;
+	    return fsan_undeletable;
 	if(sig == "XX")
 	    throw SRC_BUG;  // resevered for field extension if necessary in the future
 	throw SRC_BUG;
@@ -458,20 +394,20 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////////////////////
 
 
-    fsa_creation_date::fsa_creation_date(filesystem_specific_attribute::familly f, const string & target):
+    fsa_creation_date::fsa_creation_date(fsa_familly f, const string & target):
 	filesystem_specific_attribute(f, target)
     {
-	if(f != filesystem_specific_attribute::hfs_plus)
+	if(f != fsaf_hfs_plus)
 	    throw Efeature("unknown familly for create_date Filesysttem Specific Attribute");
-	set_nature(filesystem_specific_attribute::creation_date);
+	set_nature(fsan_creation_date);
 	throw Erange("fsa_creation_date::fsa_creation_date", "not yet implemented");
     }
 
-    fsa_creation_date::fsa_creation_date(generic_file & f, familly fam): filesystem_specific_attribute(f, fam)
+    fsa_creation_date::fsa_creation_date(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam)
     {
-	if(fam != filesystem_specific_attribute::hfs_plus)
+	if(fam != fsaf_hfs_plus)
 	    throw Efeature("unknown familly for create_date Filesysttem Specific Attribute");
-	set_nature(filesystem_specific_attribute::creation_date);
+	set_nature(fsan_creation_date);
 	date.read(f);
     }
 

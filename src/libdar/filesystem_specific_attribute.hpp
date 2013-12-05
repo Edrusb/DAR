@@ -28,11 +28,11 @@
 
 #include <string>
 #include <vector>
-#include <set>
 #include <new>
 
 #include "integers.hpp"
 #include "crc.hpp"
+#include "fsa_familly.hpp"
 
 namespace libdar
 {
@@ -45,11 +45,6 @@ namespace libdar
     class filesystem_specific_attribute
     {
     public:
-	enum familly { hfs_plus, linux_extX };
-	enum nature { nat_unset, creation_date, compressed, no_dump, immutable, undeletable };
-
-	static std::string familly_to_string(familly f);
-	static std::string nature_to_string(nature n);
 
 	    // public methods
 
@@ -57,10 +52,10 @@ namespace libdar
 	    /// \note when the underlying filesystem does not support the requested EA the constructor
 	    /// of the inherited class should throw an exception of type Erange. Only valid object should
 	    /// be built, that is object containing the value of the FSA found on the filesystem.
-	filesystem_specific_attribute(familly f, const std::string & target) { fam = f; nat = nat_unset; };
+	filesystem_specific_attribute(fsa_familly f, const std::string & target) { fam = f; nat = fsan_unset; };
 
 	    /// as well as this constructor
-	filesystem_specific_attribute(generic_file & f, familly xfam) { fam = xfam; nat = nat_unset; };
+	filesystem_specific_attribute(generic_file & f, fsa_familly xfam) { fam = xfam; nat = fsan_unset; };
 
 	    /// virtual destructor for inherited classes
 	virtual ~filesystem_specific_attribute() {};
@@ -73,10 +68,10 @@ namespace libdar
 	bool operator != (const filesystem_specific_attribute & ref) const { return ! (*this == ref); };
 
 	    /// obtain the familly of the FSA
-	familly get_familly() const { return fam; };
+	fsa_familly get_familly() const { return fam; };
 
 	    /// obtain the nature of the FSA
-	nature get_nature() const { return nat; };
+	fsa_nature get_nature() const { return nat; };
 
 	    /// provides a human readable value of the FSA
 	virtual std::string show_val() const = 0;
@@ -94,19 +89,13 @@ namespace libdar
 	virtual filesystem_specific_attribute *clone() const = 0;
 
     protected:
-	void set_familly(const familly & val) { fam = val; };
-	void set_nature(const nature & val) { nat = val; };
+	void set_familly(const fsa_familly & val) { fam = val; };
+	void set_nature(const fsa_nature & val) { nat = val; };
 
     private:
-	familly fam;
-	nature nat;
+	fsa_familly fam;
+	fsa_nature nat;
     };
-
-///////////////////////////////////////////////////////////////////////////
-
-    typedef std::set<filesystem_specific_attribute::familly> fsa_scope;
-    infinint fsa_scope_to_infinint(const fsa_scope & val);
-    fsa_scope infinint_to_fsa_scope(const infinint & ref);
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -157,10 +146,10 @@ namespace libdar
 
 	void copy_from(const filesystem_specific_attribute_list & ref);
 
-	static std::string familly_to_signature(filesystem_specific_attribute::familly f);
-	static std::string nature_to_signature(filesystem_specific_attribute::nature n);
-	static filesystem_specific_attribute::familly signature_to_familly(const std::string & sig);
-	static filesystem_specific_attribute::nature signature_to_nature(const std::string & sig);
+	static std::string familly_to_signature(fsa_familly f);
+	static std::string nature_to_signature(fsa_nature n);
+	static fsa_familly signature_to_familly(const std::string & sig);
+	static fsa_nature signature_to_nature(const std::string & sig);
     };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -180,8 +169,8 @@ namespace libdar
     class fsa_creation_date : public filesystem_specific_attribute
     {
     public:
-	fsa_creation_date(filesystem_specific_attribute::familly f, const std::string & target);
-	fsa_creation_date(generic_file & f, familly fam);
+	fsa_creation_date(fsa_familly f, const std::string & target);
+	fsa_creation_date(generic_file & f, fsa_familly fam);
 
 //>>> see fstat64 field st_birthtimespec renamed st_birthtim by POSIX 2008
 
@@ -202,8 +191,8 @@ namespace libdar
     class fsa_compressed : public filesystem_specific_attribute
     {
     public:
-       	fsa_compressed(filesystem_specific_attribute::familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
-	fsa_compressed(generic_file & f, familly fam): filesystem_specific_attribute(f, fam) {};
+       	fsa_compressed(fsa_familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
+	fsa_compressed(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
 
 	    // inherited from filesystem_specific_attribute
 	virtual bool operator == (const filesystem_specific_attribute & ref) const { return true; };
@@ -218,8 +207,8 @@ namespace libdar
     class fsa_nodump : public filesystem_specific_attribute
     {
     public:
-       	fsa_nodump(filesystem_specific_attribute::familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
-	fsa_nodump(generic_file & f, familly fam): filesystem_specific_attribute(f, fam) {};
+       	fsa_nodump(fsa_familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
+	fsa_nodump(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
 
 	    // inherited from filesystem_specific_attribute
 	virtual bool operator == (const filesystem_specific_attribute & ref) const { return true; };
@@ -234,8 +223,8 @@ namespace libdar
     class fsa_immutable : public filesystem_specific_attribute
     {
     public:
-       	fsa_immutable(filesystem_specific_attribute::familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
-	fsa_immutable(generic_file & f, familly fam): filesystem_specific_attribute(f, fam) {};
+       	fsa_immutable(fsa_familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
+	fsa_immutable(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
 
 	    // inherited from filesystem_specific_attribute
 	virtual bool operator == (const filesystem_specific_attribute & ref) const { return true; };
@@ -250,8 +239,8 @@ namespace libdar
     class fsa_undeleted : public filesystem_specific_attribute
     {
     public:
-       	fsa_undeleted(filesystem_specific_attribute::familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
-	fsa_undeleted(generic_file & f, familly fam): filesystem_specific_attribute(f, fam) {};
+       	fsa_undeleted(fsa_familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
+	fsa_undeleted(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
 
 	    // inherited from filesystem_specific_attribute
 	virtual bool operator == (const filesystem_specific_attribute & ref) const { return true; };
