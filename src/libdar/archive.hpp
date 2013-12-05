@@ -372,6 +372,7 @@ namespace libdar
 				const std::string & backup_hook_file_execute,
 				const mask & backup_hook_file_mask,
 				bool ignore_unknown,
+				const fsa_scope & scope,
 				statistics * progressive_report);
 
 	void op_create_in_sub(user_interaction & dialog,        //< interaction with user
@@ -427,6 +428,7 @@ namespace libdar
 			      const std::string & backup_hook_file_execute, //< command to execute before and after files to backup
 			      const mask & backup_hook_file_mask,         //< files elected to have a command executed before and after their backup
 			      bool ignore_unknown,                        //< whether to warn when an unknown inode type is met
+			      const fsa_scope & scope,                    //< FSA scope for the operation
 			      statistics * st_ptr);             //< statistics must not be NULL !
 
 	void disable_natural_destruction();

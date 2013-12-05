@@ -390,6 +390,7 @@ namespace libdar
 				   options.get_backup_hook_file_execute(),
 				   options.get_backup_hook_file_mask(),
 				   options.get_ignore_unknown_inode_type(),
+				   options.get_fsa_scope(),
 				   progressive_report);
 		exploitable = false;
 		stack.terminate();
@@ -482,6 +483,7 @@ namespace libdar
 				   "",                 // backup_hook_file_execute
 				   bool_mask(false),   // backup_hook_file_mask
 				   false,
+				   all_fsa_familly(),
 				   NULL);
 		    // we ignore returned value;
 		exploitable = false;
@@ -684,6 +686,7 @@ namespace libdar
 				 "",      // backup_hook_file_execute
 				 bool_mask(false), //backup_hook_file_mask
 				 false,
+				 options.get_fsa_scope(),
 				 st_ptr);
 		exploitable = false;
 		stack.terminate();
@@ -761,7 +764,8 @@ namespace libdar
 			       options.get_overwriting_rules(),
 			       options.get_dirty_behavior(),
 			       options.get_only_deleted(),
-			       options.get_ignore_deleted());
+			       options.get_ignore_deleted(),
+			       options.get_fsa_scope());
             }
             catch(Euser_abort & e)
             {
@@ -967,7 +971,8 @@ namespace libdar
 				  options.get_what_to_check(),
 				  options.get_display_skipped(),
 				  options.get_hourshift(),
-				  options.get_compare_symlink_date());
+				  options.get_compare_symlink_date(),
+				  options.get_fsa_scope());
             }
             catch(Euser_abort & e)
             {
@@ -1418,6 +1423,7 @@ namespace libdar
 				     const string & backup_hook_file_execute,
 				     const mask & backup_hook_file_mask,
 				     bool ignore_unknown,
+				     const fsa_scope & scope,
 				     statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -1577,6 +1583,7 @@ namespace libdar
 			 backup_hook_file_execute,
 			 backup_hook_file_mask,
 			 ignore_unknown,
+			 scope,
 			 st_ptr);
 
 	return *st_ptr;
@@ -1635,6 +1642,7 @@ namespace libdar
 				   const string & backup_hook_file_execute,
 				   const mask & backup_hook_file_mask,
 				   bool ignore_unknown,
+				   const fsa_scope & scope,
 				   statistics * st_ptr)
     {
 	try
@@ -1959,7 +1967,8 @@ namespace libdar
 					      sparse_file_min_size,
 					      backup_hook_file_execute,
 					      backup_hook_file_mask,
-					      ignore_unknown);
+					      ignore_unknown,
+					      scope);
 			}
 			catch(...)
 			{
@@ -1999,7 +2008,8 @@ namespace libdar
 				     overwrite,
 				     warn_over,
 				     decremental,
-				     sparse_file_min_size);
+				     sparse_file_min_size,
+				     scope);
 			break;
 		    default:
 			throw SRC_BUG;

@@ -133,7 +133,8 @@ namespace libdar
 			const crit_action & x_overwrite,
 			archive_options_extract::t_dirty dirty,
 			bool only_deleted,
-			bool not_deleted)
+			bool not_deleted,
+			const fsa_scope & scope)
     {
 	defile juillet = fs_racine; // 'juillet' is in reference to 14th of July ;-) when takes place the "defile'" on the Champs-Elysees.
 	const eod tmp_eod;
@@ -468,7 +469,8 @@ namespace libdar
 			   const infinint & sparse_file_min_size,
 			   const string & backup_hook_file_execute,
 			   const mask & backup_hook_file_mask,
-			   bool ignore_unknown)
+			   bool ignore_unknown,
+			   const fsa_scope & scope)
     {
         entree *e = NULL;
         const entree *f = NULL;
@@ -929,7 +931,8 @@ namespace libdar
 			   inode::comparison_fields what_to_check,
 			   bool display_skipped,
 			   const infinint & hourshift,
-			   bool compare_symlink_date)
+			   bool compare_symlink_date,
+			   const fsa_scope & scope)
     {
         const entree *e;
         defile juillet = fs_racine;
@@ -1387,7 +1390,8 @@ namespace libdar
 		      const crit_action & over_action,
 		      bool warn_overwrite,
 		      bool decremental_mode,
-		      const infinint & sparse_file_min_size)
+		      const infinint & sparse_file_min_size,
+		      const fsa_scope & scope)
     {
 	compressor *stockage;
 	compression stock_algo;

@@ -60,7 +60,8 @@ namespace libdar
 			       const crit_action & x_overwrite, //< how and whether to overwrite files
  			       archive_options_extract::t_dirty dirty, //< whether to restore dirty files
 			       bool only_deleted,         //< whether to only consider deleted files
-			       bool not_deleted);         //< <wether to consider deleted files
+			       bool not_deleted,          //< wether to consider deleted files
+			       const fsa_scope & scope);  //< scope of FSA to take into account
 
     extern void filtre_sauvegarde(user_interaction & dialog,
 				  const mask &filtre,
@@ -91,7 +92,8 @@ namespace libdar
 				  const infinint & sparse_file_min_size,
 				  const std::string & backup_hook_file_execute,
 				  const mask & backup_hook_file_mask,
-				  bool ignore_unknown);
+				  bool ignore_unknown,
+				  const fsa_scope & scope);
 
     extern void filtre_difference(user_interaction & dialog,
 				  const mask &filtre,
@@ -106,7 +108,8 @@ namespace libdar
 				  inode::comparison_fields what_to_check,
 				  bool display_skipped,
 				  const infinint & hourshift,
-				  bool compare_symlink_date);
+				  bool compare_symlink_date,
+				  const fsa_scope & scope);
 
     extern void filtre_test(user_interaction & dialog,
 			    const mask &filtre,
@@ -140,7 +143,8 @@ namespace libdar
 			     const crit_action & overwrite,
 			     bool warn_overwrite,
 			     bool decremental_mode,
-			     const infinint & sparse_file_min_size);
+			     const infinint & sparse_file_min_size,
+			     const fsa_scope & scope);
 
     void filtre_sequentially_read_all_catalogue(catalogue & cat,
 						user_interaction & dialog);
