@@ -543,13 +543,13 @@ namespace libdar
 
         try
         {
-            last_acc = new (nothrow) infinint(last_access);
+            last_acc = last_access;
             last_mod = new (nothrow) infinint(last_modif);
             last_cha = new (nothrow) infinint(last_change);
             ea_offset = new (nothrow) infinint(0);
 	    fsa_offset = new (nothrow) infinint(0);
             fs_dev = new (nothrow) infinint(fs_device);
-            if(last_acc == NULL || last_mod == NULL || ea_offset == NULL
+            if(last_mod == NULL || ea_offset == NULL
 	       || last_cha == NULL || fs_dev == NULL || fsa_offset == NULL)
                 throw Ememory("inde::inode");
         }
@@ -628,12 +628,12 @@ namespace libdar
 	    perm = ntohs(tmp);
 
 	    fs_dev = new (nothrow) infinint(0); // the filesystemID is not saved in archive
-	    last_acc = new (nothrow) infinint(f);
+	    last_acc = infinint(f);
 	    last_mod = new (nothrow) infinint(f);
 	    if(reading_ver >= 8)
 	    {
 		last_cha = new (nothrow) infinint(f);
-		if(last_acc == NULL || last_mod == NULL || last_cha == NULL || fs_dev == NULL)
+		if(last_mod == NULL || last_cha == NULL || fs_dev == NULL)
 		    throw Ememory("inode::inode(file)");
 
 		if(ea_saved == ea_full)
@@ -641,7 +641,7 @@ namespace libdar
 	    }
 	    else // archive format <= 7
 	    {
-		if(last_acc == NULL || last_mod == NULL || fs_dev == NULL)
+		if(last_mod == NULL || fs_dev == NULL)
 		    throw Ememory("inode::inode(file)");
 		ea_size = 0; // meaning EA size unknown (old format)
 	    }
@@ -955,9 +955,7 @@ namespace libdar
         gid.dump(r);
         tmp = htons(perm);
         r.write((char *)&tmp, sizeof(tmp));
-        if(last_acc == NULL)
-            throw SRC_BUG;
-        last_acc->dump(r);
+        last_acc.dump(r);
         if(last_mod == NULL)
             throw SRC_BUG;
         last_mod->dump(r);
@@ -1459,7 +1457,6 @@ namespace libdar
 
     void inode::nullifyptr()
     {
-        last_acc = NULL;
         last_mod = NULL;
         last_cha = NULL;
         ea_offset = NULL;
@@ -1476,11 +1473,6 @@ namespace libdar
 
     void inode::destroy()
     {
-        if(last_acc != NULL)
-        {
-            delete last_acc;
-            last_acc = NULL;
-        }
         if(last_mod != NULL)
         {
             delete last_mod;
@@ -1556,7 +1548,7 @@ namespace libdar
 	    uid = ref.uid;
 	    gid = ref.gid;
 	    perm = ref.perm;
-	    copy_ptr(ref.last_acc, last_acc);
+	    last_acc = ref.last_acc;
 	    copy_ptr(ref.last_mod, last_mod);
 	    copy_ptr(ref.last_cha, last_cha);
 	    xsaved = ref.xsaved;
