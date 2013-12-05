@@ -1120,6 +1120,7 @@ namespace libdar
 			throw;
 		    }
 		    delete ou;
+		    ret = 0; // to report a successful operation at the end of the if/else if chain
 		}
 		else if(ref_lie != NULL)
 		    ret = symlink(ref_lie->get_target().c_str(), name);
