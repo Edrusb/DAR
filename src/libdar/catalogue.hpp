@@ -287,7 +287,7 @@ namespace libdar
 	infinint ea_get_size() const; //returns the size of EA (still valid if ea have been detached) mainly used to define CRC width
 
             // III : to record where is dump the EA in the archive #EA_FULL only#
-        void ea_set_offset(const infinint & pos) { *ea_offset = pos; };
+        void ea_set_offset(const infinint & pos);
         void ea_set_crc(const crc & val);
 	void ea_get_crc(const crc * & ptr) const; //< the argument is set to point to an allocated crc object owned by this "inode" object, this reference stats valid while the "inode" object exists and MUST NOT be deleted by the caller in any case
 	bool ea_get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
@@ -331,7 +331,7 @@ namespace libdar
 	infinint fsa_get_size() const; // returns the size of FSA (still valid if fsal has been detached) / mainly used to define CRC size
 
 	    // III : to record where FSA are dumped in the archive (only if fsa_status not empty !)
-	void fsa_set_offset(const infinint & pos) { *fsa_offset = pos; };
+	void fsa_set_offset(const infinint & pos);
 	void fsa_set_crc(const crc & val);
 	void fsa_get_crc(const crc * & ptr) const;
 	bool fsa_get_crc_size(infinint & val) const;

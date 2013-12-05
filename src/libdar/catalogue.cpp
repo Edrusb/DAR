@@ -1172,6 +1172,18 @@ namespace libdar
             throw SRC_BUG;
     }
 
+    void inode::ea_set_offset(const infinint & pos)
+    {
+	if(ea_offset == NULL)
+	{
+	    ea_offset = new (nothrow) infinint(pos);
+	    if(ea_offset == NULL)
+		throw Ememory("inode::ea_set_offset");
+	}
+	else
+	    *ea_offset = pos;
+    }
+
     void inode::ea_set_crc(const crc & val)
     {
 	if(ea_crc != NULL)
@@ -1411,6 +1423,17 @@ namespace libdar
             throw SRC_BUG;
     }
 
+    void inode::fsa_set_offset(const infinint & pos)
+    {
+	if(fsa_offset == NULL)
+	{
+	    fsa_offset = new (nothrow) infinint(pos);
+	    if(fsa_offset == NULL)
+		throw Ememory("inode::fsa_set_offset");
+	}
+	else
+	    *fsa_offset = pos;
+    }
 
     void inode::fsa_set_crc(const crc & val)
     {
