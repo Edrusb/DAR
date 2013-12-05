@@ -131,8 +131,13 @@ namespace libdar
 				       const fsa_scope & scope,
 				       user_interaction & ui) const;
 
+	    /// whether the list has at least one FSA
+	bool empty() const { return fsa.empty(); };
+
+
 	    /// access to members of the list
 	U_I size() const { return fsa.size(); };
+
 
 	    /// provide reference to FSA given its index
 	const filesystem_specific_attribute & operator [] (U_I arg) const;

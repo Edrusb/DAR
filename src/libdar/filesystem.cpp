@@ -283,12 +283,35 @@ namespace libdar
 			    // we must be able to continue without EA
 		    }
 
-
 		    //
 		    // Filesystem Specific Attributes Considerations
 		    //
 
-
+		    filesystem_specific_attribute_list *fsal = new (nothrow) filesystem_specific_attribute_list();
+		    if(fsal == NULL)
+			throw Ememory("filesystem_hard_link_read::make_entree");
+		    try
+		    {
+			fsal->get_fsa_from_filesystem_for(display, sc);
+			if(!fsal->empty())
+			{
+			    ino->fsa_set_saved_status(inode::fsa_full);
+			    ino->fsa_attach(fsal);
+			    fsal = NULL; // now managed by *ino
+			}
+			else
+			{
+			    ino->fsa_set_saved_status(inode::fsa_none);
+			    delete fsal;
+			    fsal = NULL;
+			}
+		    }
+		    catch(...)
+		    {
+			if(fsal != NULL)
+			    delete fsal;
+			throw;
+		    }
 		}
 
 		    //
@@ -385,8 +408,9 @@ namespace libdar
 					 bool x_furtive_read_mode,
 					 bool x_cache_directory_tagging,
 					 infinint & root_fs_device,
-					 bool x_ignore_unknown)
-	: mem_ui(dialog), filesystem_hard_link_read(dialog, x_furtive_read_mode)
+					 bool x_ignore_unknown,
+					 const fsa_scope & scope)
+	: mem_ui(dialog), filesystem_hard_link_read(dialog, x_furtive_read_mode, scope)
     {
 	fs_root = NULL;
 	current_dir = NULL;
@@ -679,7 +703,7 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_diff::filesystem_diff(user_interaction & dialog, const path &root, bool x_info_details, const mask & x_ea_mask, bool x_alter_atime, bool x_furtive_read_mode) : mem_ui(dialog), filesystem_hard_link_read(dialog, x_furtive_read_mode)
+    filesystem_diff::filesystem_diff(user_interaction & dialog, const path &root, bool x_info_details, const mask & x_ea_mask, bool x_alter_atime, bool x_furtive_read_mode) : mem_ui(dialog), filesystem_hard_link_read(dialog, x_furtive_read_mode, get_fsa_scope())
     {
 	fs_root = NULL;
 	ea_mask = NULL;
@@ -1222,7 +1246,7 @@ namespace libdar
 					   bool x_warn_remove_no_match,
 					   bool x_empty,
 					   const crit_action *x_overwrite,
-					   bool x_only_overwrite) : mem_ui(dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, true)
+					   bool x_only_overwrite) : mem_ui(dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, true, get_fsa_scope())
     {
 	fs_root = NULL;
 	ea_mask = NULL;

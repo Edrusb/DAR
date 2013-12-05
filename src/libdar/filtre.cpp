@@ -494,7 +494,8 @@ namespace libdar
 						 furtive_read_mode,
 						 cache_directory_tagging,
 						 root_fs_device,
-						 ignore_unknown);
+						 ignore_unknown,
+						 scope);
 	thread_cancellation thr_cancel;
 	infinint skipped_dump, fs_errors;
 	infinint wasted_bytes = 0;

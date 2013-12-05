@@ -318,6 +318,7 @@ namespace libdar
 	enum fsa_status { fsa_none, fsa_partial, fsa_full };
 
 	    // I : which FSA are present
+	void fsa_set_saved_status(fsa_status status);
 	fsa_status fsa_get_saved_status() const { return fsa_saved; };
 	    /// gives the set of FSA familly recorded for that inode
 	fsa_scope fsa_get_famillies() const { if(fsa_famillies == NULL) throw SRC_BUG; return infinint_to_fsa_scope(*fsa_famillies); };

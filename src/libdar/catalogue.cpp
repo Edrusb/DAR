@@ -1039,6 +1039,8 @@ namespace libdar
         {
         case ea_none:
         case ea_removed:
+        case ea_partial:
+        case ea_fake:
             if(ea != NULL)
             {
                 delete ea;
@@ -1055,19 +1057,6 @@ namespace libdar
                 throw SRC_BUG;
 	    if(ea_offset != NULL)
 		throw SRC_BUG;
-            break;
-        case ea_partial:
-        case ea_fake:
-            if(ea != NULL)
-            {
-                delete ea;
-                ea = NULL;
-            }
-	    if(ea_offset != NULL)
-	    {
-		delete ea_offset;
-		ea_offset = NULL;
-	    }
             break;
         default:
             throw SRC_BUG;
@@ -1335,20 +1324,71 @@ namespace libdar
             *last_cha = x_time;
     }
 
+    void inode::fsa_set_saved_status(fsa_status status)
+    {
+	if(status == fsa_saved)
+	    return;
+	switch(status)
+	{
+	case fsa_none:
+	case fsa_partial:
+	    if(fsal != NULL)
+	    {
+		delete fsal;
+		fsal = NULL;
+	    }
+	    if(fsa_offset != NULL)
+	    {
+		delete fsa_offset;
+		fsa_offset = NULL;
+	    }
+	    break;
+	case fsa_full:
+	    if(fsal != NULL)
+		throw SRC_BUG;
+	    if(fsa_offset != NULL)
+		throw SRC_BUG;
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	fsa_saved = status;
+    }
+
     void inode::fsa_attach(filesystem_specific_attribute_list *ref)
     {
+        if(fsa_saved != fsa_full)
+            throw SRC_BUG;
+
         if(ref != NULL && fsal == NULL)
         {
-	    if(fsa_size != NULL)
+	    if(fsa_size != NULL || fsal != NULL || fsa_famillies != NULL)
 		throw SRC_BUG;
-            fsa_size = new (nothrow) infinint (fsal->storage_size());
-	    if(fsa_size == NULL)
-		throw Ememory("inode::fsa_attach");
-            fsal = ref;
+	    try
+	    {
+		fsa_size = new (nothrow) infinint (fsal->storage_size());
+		fsa_famillies = new(nothrow) infinint(fsa_scope_to_infinint(fsal->get_fsa_famillies()));
+		if(fsa_size == NULL || fsa_famillies == NULL)
+		    throw Ememory("inode::fsa_attach");
+	    }
+	    catch(...)
+	    {
+		if(fsa_size != NULL)
+		{
+		    delete fsa_size;
+		    fsa_size = NULL;
+		}
+		if(fsa_famillies != NULL)
+		{
+		    delete fsa_famillies;
+		    fsa_famillies = NULL;
+		}
+		throw;
+	    }
+	    fsal = ref;
         }
         else
-            throw SRC_BUG;
-        if(fsa_saved != fsa_full)
             throw SRC_BUG;
     }
 

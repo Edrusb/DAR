@@ -51,6 +51,7 @@ extern "C"
 #include "infinint.hpp"
 #include "etage.hpp"
 #include "criterium.hpp"
+#include "fsa_familly.hpp"
 
 namespace libdar
 {
@@ -66,7 +67,8 @@ namespace libdar
 
     public:
 	filesystem_hard_link_read(user_interaction & dialog,
-				  bool x_furtive_read_mode) : mem_ui(dialog) { furtive_read_mode = x_furtive_read_mode; };
+				  bool x_furtive_read_mode,
+				  const fsa_scope & scope) : mem_ui(dialog) { furtive_read_mode = x_furtive_read_mode; sc = scope; };
 
 	    // the copy of the current object would make copy of addresses in
 	    // corres_read that could be released twice ... thus, copy constructor and
@@ -79,6 +81,9 @@ namespace libdar
 	const infinint & get_last_etoile_ref() const { return etiquette_counter; };
 
 	virtual ~filesystem_hard_link_read() {};
+
+	    /// provide the FSA scope used by the object
+	const fsa_scope get_fsa_scope() const { return sc; };
 
     protected:
 	    // reset the whole list of hard linked inodes (hard linked inode stay alive but are no more referenced by the current object)
@@ -120,6 +125,7 @@ namespace libdar
         std::map <node, couple> corres_read;
 	infinint etiquette_counter;
 	bool furtive_read_mode;
+	fsa_scope sc;
 
     };
 
@@ -139,8 +145,9 @@ namespace libdar
 			  bool furtive_read_mode,
 			  bool x_cache_directory_tagging,
 			  infinint & root_fs_device,
-			  bool x_ignore_unknown);
-        filesystem_backup(const filesystem_backup & ref) : mem_ui(ref.get_ui()), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode) { copy_from(ref); };
+			  bool x_ignore_unknown,
+			  const fsa_scope & scope);
+        filesystem_backup(const filesystem_backup & ref) : mem_ui(ref.get_ui()), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode, get_fsa_scope()) { copy_from(ref); };
         const filesystem_backup & operator = (const filesystem_backup & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_backup() { detruire(); };
 
@@ -178,7 +185,7 @@ namespace libdar
 			const mask & x_ea_mask,
 			bool alter_atime,
 			bool furtive_read_mode);
-        filesystem_diff(const filesystem_diff & ref) : mem_ui(ref.get_ui()), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode) { copy_from(ref); };
+        filesystem_diff(const filesystem_diff & ref) : mem_ui(ref.get_ui()), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode, get_fsa_scope()) { copy_from(ref); };
         const filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_diff() { detruire(); };
 
@@ -293,7 +300,7 @@ namespace libdar
 			   const crit_action *x_overwrite,
 			   bool x_only_overwrite);
 	    /// copy constructor is forbidden (throws an exception)
-        filesystem_restore(const filesystem_restore & ref) : mem_ui(ref), filesystem_hard_link_write(ref), filesystem_hard_link_read(get_ui(), true) { throw SRC_BUG; };
+        filesystem_restore(const filesystem_restore & ref) : mem_ui(ref), filesystem_hard_link_write(ref), filesystem_hard_link_read(get_ui(), true, get_fsa_scope()) { throw SRC_BUG; };
 	    /// assignment operator is forbidden (throws an exception)
         const filesystem_restore & operator = (const filesystem_restore  & ref) { throw SRC_BUG; };
 	    /// destructor
