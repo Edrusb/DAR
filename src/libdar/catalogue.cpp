@@ -537,7 +537,6 @@ namespace libdar
         xsaved = s_not_saved;
         ea_saved = ea_none;
 	fsa_saved = fsa_none;
-	fsa_size = 0;
         edit = 0;
 
         try
@@ -753,15 +752,14 @@ namespace libdar
 		    switch(fsa_saved)
 		    {
 		    case fsa_full:
-			fsa_size = infinint(f);
+			fsa_size = new (nothrow) infinint(f);
 			fsa_offset = new (nothrow) infinint(f);
 			fsa_crc = create_crc_from_file(f);
-			if(fsa_offset == NULL || fsa_crc == NULL)
+			if(fsa_size == NULL || fsa_offset == NULL || fsa_crc == NULL)
 			    throw Ememory("inode::inode(file)");
 			break;
 		    case fsa_partial:
 		    case fsa_none:
-			fsa_size = 0;
 			fsa_offset = new infinint(0);
 			if(fsa_offset == NULL)
 			    throw Ememory("inode::inode(file)");
@@ -772,7 +770,6 @@ namespace libdar
 		}
 		else  // reading a small dump using escape sequence marks
 		{
-		    fsa_size = 0;
 		    fsa_offset = new (nothrow) infinint(0);
 		    if(fsa_offset == NULL)
 			throw Ememory("inode::inode(file)");
@@ -1141,6 +1138,11 @@ namespace libdar
             delete ea;
             const_cast<ea_attributs *&>(ea) = NULL;
         }
+	if(ea_size != NULL)
+	{
+	    delete ea_size;
+	    const_cast<inode *>(this)->ea_size = NULL;
+	}
     }
 
     infinint inode::ea_get_size() const
@@ -1265,8 +1267,12 @@ namespace libdar
     {
         if(ref != NULL && fsal == NULL)
         {
+	    if(fsa_size != NULL)
+		throw SRC_BUG;
+            fsa_size = new (nothrow) infinint (fsal->storage_size());
+	    if(fsa_size == NULL)
+		throw Ememory("inode::fsa_attach");
             fsal = ref;
-            fsa_size = fsal->storage_size();
         }
         else
             throw SRC_BUG;
@@ -1281,6 +1287,11 @@ namespace libdar
             delete fsal;
             const_cast<inode *>(this)->fsal = NULL;
         }
+	if(fsa_size != NULL)
+	{
+	    delete fsa_size;
+	    const_cast<inode *>(this)->fsa_size = NULL;
+	}
     }
 
     const filesystem_specific_attribute_list *inode::get_fsa() const
@@ -1382,7 +1393,10 @@ namespace libdar
     infinint inode::fsa_get_size() const
     {
         if(fsa_saved == fsa_full)
-            return fsa_size;
+	    if(fsa_size != NULL)
+		return *fsa_size;
+	    else
+		throw SRC_BUG;
         else
             throw SRC_BUG;
     }
@@ -1476,6 +1490,7 @@ namespace libdar
 	fsa_famillies = NULL;
 	fsa_offset = NULL;
 	fsal = NULL;
+	fsa_size = NULL;
 	fsa_crc = NULL;
         fs_dev = NULL;
 	storage = NULL;
@@ -1523,6 +1538,11 @@ namespace libdar
 	{
 	    delete fsal;
 	    fsal = NULL;
+	}
+	if(fsa_size != NULL)
+	{
+	    delete fsa_size;
+	    fsa_size = NULL;
 	}
 	if(fsa_crc != NULL)
 	{
@@ -1579,6 +1599,7 @@ namespace libdar
 	    copy_ptr(ref.fsa_famillies, fsa_famillies);
 	    copy_ptr(ref.fsa_offset, fsa_offset);
 	    copy_ptr(ref.fsal, fsal);
+	    copy_ptr(ref.fsa_size, fsa_size);
 	    if(ref.fsa_crc != NULL)
 	    {
 		fsa_crc = (ref.fsa_crc)->clone();

@@ -369,7 +369,7 @@ namespace libdar
 	infinint *fsa_famillies; //< list of FSA famillies present for that inode (set to NULL in fsa_none mode)
 	infinint *fsa_offset;    //< offset in archive where to find FSA  # always allocated (to be reviewed)
 	filesystem_specific_attribute_list *fsal; //< Filesystem Specific Attributes read or to be written down # only allocated if fsa_saved if set to FULL
-	infinint fsa_size;       //< storage size required for FSA
+	infinint *fsa_size;      //< storage size required for FSA
 	crc *fsa_crc;            //< CRC computed on FSA
 	    //
 	infinint *fs_dev;        //< filesystem ID on which resides the inode (only used when read from filesystem)
