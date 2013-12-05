@@ -622,9 +622,6 @@ namespace libdar
 		throw Erange("inode::inode", gettext("missing data to build an inode"));
 	    perm = ntohs(tmp);
 
-	    fs_dev = new (nothrow) infinint(0); // the filesystemID is not saved in archive
-	    if(fs_dev == NULL)
-		throw Ememory("inode::inode(file)");
 	    last_acc = infinint(f);
 	    last_mod = infinint(f);
 	    if(reading_ver >= 8)

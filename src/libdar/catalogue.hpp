@@ -242,7 +242,7 @@ namespace libdar
         void set_last_modif(const infinint & x_time) { last_mod = x_time; };
         saved_status get_saved_status() const { return xsaved; };
         void set_saved_status(saved_status x) { xsaved = x; };
-	infinint get_device() const { return *fs_dev; };
+	infinint get_device() const { if(fs_dev == NULL) throw SRC_BUG; return *fs_dev; };
 
         bool same_as(const inode & ref) const;
         bool is_more_recent_than(const inode & ref, const infinint & hourshift) const;
