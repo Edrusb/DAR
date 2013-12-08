@@ -184,7 +184,8 @@ namespace libdar
 			bool x_info_details,
 			const mask & x_ea_mask,
 			bool alter_atime,
-			bool furtive_read_mode);
+			bool furtive_read_mode,
+			const fsa_scope & scope);
         filesystem_diff(const filesystem_diff & ref) : mem_ui(ref.get_ui()), filesystem_hard_link_read(ref.get_ui(), ref.furtive_read_mode, get_fsa_scope()) { copy_from(ref); };
         const filesystem_diff & operator = (const filesystem_diff & ref) { detruire(); copy_from(ref); return *this; };
         ~filesystem_diff() { detruire(); };

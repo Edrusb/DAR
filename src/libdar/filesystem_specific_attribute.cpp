@@ -126,7 +126,7 @@ namespace libdar
     }
 
 
-    bool filesystem_specific_attribute_list::is_equal_to(const filesystem_specific_attribute_list & ref, const fsa_scope & scope) const
+    bool filesystem_specific_attribute_list::is_included_in(const filesystem_specific_attribute_list & ref, const fsa_scope & scope) const
     {
 	bool ret = true;
 	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
@@ -136,32 +136,38 @@ namespace libdar
 
 	while(ret && it != fsa.end())
 	{
-	    if(*it != NULL)
+	    if(rt == ref.fsa.end())
 	    {
-		set<fsa_familly>::const_iterator f = scope.find((*it)->get_familly());
-		if(f != scope.end())
-		{
-		    vector<filesystem_specific_attribute *>::const_iterator ut = ref.fsa.begin();
-		    while(ut != ref.fsa.end() && *ut != NULL && !(*it)->is_same_type_as(**ut))
-			++ut;
-		    if(ut != ref.fsa.end()) // did not reached end of list
-		    {
-			if(*ut == NULL) // because found a NULL pointer
-			    throw SRC_BUG;
-			else // or because found the same type FSA
-			{
-			    if((**it) != (**ut))
-				ret = false;      // FSA value differ so we abort and return false
-				// else nothing to do, found FSA of same type and it has the same value,  checking next FSA
-			}
-		    }
-			// else nothing to do
-		}
-		    // else ignoring this FSA as it is out of familly scope
+		ret = false;
+		continue; // skip the rest of the while loop
 	    }
-	    else
+
+	    if(*it == NULL)
 		throw SRC_BUG;
-	    ++it;
+	    if(*rt == NULL)
+		throw SRC_BUG;
+
+	    if(scope.find((*it)->get_familly()) == scope.end())
+	    {
+		    // this FSA is out of the scope, skipping it
+		++it;
+		continue; // skip the rest of the while loop
+	    }
+
+	    while(rt != ref.fsa.end() && *(*rt) < *(*it))
+	    {
+		++rt;
+		if(*rt == NULL)
+		    throw SRC_BUG;
+	    }
+
+	    if(rt == ref.fsa.end())
+		ret = false;
+	    else
+		if(*(*rt) == *(*it))
+		    ++it;
+		else
+		    ret = false;
 	}
 
 	return ret;

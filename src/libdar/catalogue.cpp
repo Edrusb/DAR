@@ -829,7 +829,8 @@ namespace libdar
                         const mask & ea_mask,
                         comparison_fields what_to_check,
                         const infinint & hourshift,
-			bool symlink_date) const
+			bool symlink_date,
+			const fsa_scope & scope) const
     {
 	bool do_mtime_test = dynamic_cast<const lien *>(&other) == NULL || symlink_date;
 
@@ -910,6 +911,41 @@ namespace libdar
         default:
             throw SRC_BUG;
         }
+
+	switch(fsa_get_saved_status())
+	{
+	case fsa_full:
+	    if(other.fsa_get_saved_status() == fsa_full)
+	    {
+		const filesystem_specific_attribute_list *me = get_fsa();
+		const filesystem_specific_attribute_list *you = other.get_fsa();
+
+		if(me == NULL)
+		    throw SRC_BUG;
+		if(you == NULL)
+		    throw SRC_BUG;
+
+		if(!me->is_included_in(*you, scope))
+                    throw Erange("inode::compare", gettext("different Filesystem Specific Attributes"));
+	    }
+	    else
+		throw Erange("inode::compare", gettext("No Filesystem Specific Attribute to compare with"));
+	    break;
+	case fsa_partial:
+	    if(other.fsa_get_saved_status() != fsa_none)
+	    {
+		if(!tools_is_equal_with_hourshift(get_last_change(), other.get_last_change(), hourshift)
+                   && get_last_change() < other.get_last_change())
+                    throw Erange("inode::compare", gettext("inode last change date (ctime) greater, FSA might be different"));
+	    }
+	    else
+		throw Erange("inode::compare", gettext("Filesystem Specific Attribute are missing"));
+	    break;
+	case fsa_none:
+	    break; // nothing to check
+	default:
+	    throw SRC_BUG;
+	}
     }
 
     void inode::inherited_dump(generic_file & r, bool small) const

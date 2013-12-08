@@ -979,7 +979,8 @@ namespace libdar
 					     info_details,
 					     ea_mask,
 					     alter_atime,
-					     furtive_read_mode);
+					     furtive_read_mode,
+					     scope);
 	thread_cancellation thr_cancel;
 
         st.clear();
@@ -1030,7 +1031,7 @@ namespace libdar
 				    {
 					try
 					{
-					    e_ino->compare(*exists, ea_mask, what_to_check, hourshift, compare_symlink_date);
+					    e_ino->compare(*exists, ea_mask, what_to_check, hourshift, compare_symlink_date, scope);
 					    if(info_details)
 						dialog.warning(string(gettext("OK   "))+juillet.get_string());
 					    if(e_dir == NULL || !cat.read_second_time_dir())

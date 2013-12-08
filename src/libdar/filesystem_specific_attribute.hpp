@@ -64,7 +64,7 @@ namespace libdar
 	bool is_same_type_as(const filesystem_specific_attribute & ref) const;
 
 	    /// provides a mean to compare objects values
-	virtual bool operator == (const filesystem_specific_attribute & ref) const { return fam == ref.fam && nat == ref.nat && equal_value_to(ref); };
+	virtual bool operator == (const filesystem_specific_attribute & ref) const { return is_same_type_as(ref) && equal_value_to(ref); };
 	bool operator != (const filesystem_specific_attribute & ref) const { return ! (*this == ref); };
 
 	    /// used to provided a sorted list of FSA
@@ -124,7 +124,7 @@ namespace libdar
 	fsa_scope get_fsa_famillies() const { return familles; };
 
 	    /// compare two lists of FSA to see whether they have equal FSA with identical values within the given familly scope
-	bool is_equal_to(const filesystem_specific_attribute_list & ref, const fsa_scope & scope) const;
+	bool is_included_in(const filesystem_specific_attribute_list & ref, const fsa_scope & scope) const;
 
 	    /// read FSA list from archive
 	void read(generic_file & f);

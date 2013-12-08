@@ -255,7 +255,8 @@ namespace libdar
 		     const mask & ea_mask,
 		     comparison_fields what_to_check,
 		     const infinint & hourshift,
-		     bool symlink_date) const;
+		     bool symlink_date,
+		     const fsa_scope & scope) const;
 
             // throw Erange exception if a difference has been detected
             // this is not a symetrical comparison, but all what is present

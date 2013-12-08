@@ -703,7 +703,15 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    filesystem_diff::filesystem_diff(user_interaction & dialog, const path &root, bool x_info_details, const mask & x_ea_mask, bool x_alter_atime, bool x_furtive_read_mode) : mem_ui(dialog), filesystem_hard_link_read(dialog, x_furtive_read_mode, get_fsa_scope())
+    filesystem_diff::filesystem_diff(user_interaction & dialog,
+				     const path &root,
+				     bool x_info_details,
+				     const mask & x_ea_mask,
+				     bool x_alter_atime,
+				     bool x_furtive_read_mode,
+				     const fsa_scope & scope) :
+	mem_ui(dialog),
+	filesystem_hard_link_read(dialog, x_furtive_read_mode, scope)
     {
 	fs_root = NULL;
 	ea_mask = NULL;
