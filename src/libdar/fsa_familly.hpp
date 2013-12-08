@@ -50,7 +50,7 @@ namespace libdar
 
     typedef std::set<fsa_familly> fsa_scope;
 
-    extern fsa_scope all_fsa_familly();
+    extern fsa_scope all_fsa_famillies();
     extern infinint fsa_scope_to_infinint(const fsa_scope & val);
     extern fsa_scope infinint_to_fsa_scope(const infinint & ref);
 

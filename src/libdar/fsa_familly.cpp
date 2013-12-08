@@ -71,7 +71,7 @@ namespace libdar
 	}
     }
 
-    fsa_scope all_fsa_familly()
+    fsa_scope all_fsa_famillies()
     {
 	fsa_scope ret;
 

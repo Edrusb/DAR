@@ -1246,7 +1246,9 @@ namespace libdar
 					   bool x_warn_remove_no_match,
 					   bool x_empty,
 					   const crit_action *x_overwrite,
-					   bool x_only_overwrite) : mem_ui(dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, true, get_fsa_scope())
+					   bool x_only_overwrite,
+					   const fsa_scope & scope) :
+	mem_ui(dialog), filesystem_hard_link_write(dialog), filesystem_hard_link_read(dialog, true, scope)
     {
 	fs_root = NULL;
 	ea_mask = NULL;
@@ -1293,7 +1295,7 @@ namespace libdar
 	ignore_over_restricts = false;
     }
 
-    void filesystem_restore::write(const entree *x, action_done_for_data & data_restored, bool & ea_restored, bool & data_created, bool & hard_link)
+    void filesystem_restore::write(const entree *x, action_done_for_data & data_restored, bool & ea_restored, bool & data_created, bool & hard_link, bool & fsa_restored)
     {
 	const eod *x_eod = dynamic_cast<const eod *>(x);
 	const nomme *x_nom = dynamic_cast<const nomme *>(x);
@@ -1305,6 +1307,7 @@ namespace libdar
 	data_restored = done_no_change_no_data;
 	ea_restored = false;
 	data_created = false;
+	fsa_restored = false;
 	hard_link = x_mir != NULL && known_etiquette(x_mir->get_etiquette());
 
 	if(x_mir != NULL)
@@ -1335,6 +1338,7 @@ namespace libdar
 	{
 	    bool has_data_saved = (x_ino != NULL && x_ino->get_saved_status() == s_saved) || x_det != NULL;
 	    bool has_ea_saved = x_ino != NULL && (x_ino->ea_get_saved_status() == inode::ea_full || x_ino->ea_get_saved_status() == inode::ea_removed);
+	    bool has_fsa_saved = x_ino != NULL && x_ino->fsa_get_saved_status() == inode::fsa_full;
 	    path spot = *current_dir + x_nom->get_name();
 	    string spot_display = spot.display();
 
@@ -1354,6 +1358,7 @@ namespace libdar
 		    data_created = false;
 		    hard_link = false;
 		    ea_restored = false;
+		    fsa_restored = false;
 		    if(!stack_dir.empty())
 			stack_dir.back().set_restore_date(true);
 		    return;
@@ -1392,8 +1397,24 @@ namespace libdar
 			if(!stack_dir.empty())
 			    stack_dir.back().set_restore_date(true);
 
-			    // we must try to restore EA only if data could be restored
+			    // we must try to restore EA or FSA only if data could be restored
 			    // as in the current situation no file existed before
+
+			if(has_fsa_saved)
+			{
+			    if(info_details)
+				get_ui().warning(string(gettext("Restoring file's FSA: ")) + spot_display);
+
+			    if(!empty)
+			    {
+				const filesystem_specific_attribute_list * fsa = x_ino->get_fsa();
+				if(fsa == NULL)
+				    throw SRC_BUG;
+
+				fsa_restored = fsa->set_fsa_to_filesystem_for(spot_display, get_fsa_scope(), get_ui());
+			    }
+			}
+
 			if(has_ea_saved)
 			{
 			    if(info_details)
@@ -1412,13 +1433,15 @@ namespace libdar
 			    else
 				ea_restored = true;
 			}
+
 		    }
-		    else
+		    else // no existing inode but no data to restore
 		    {
 			data_restored = done_no_change_no_data;
 			data_created = false;
 			hard_link = false;
 			ea_restored = false;
+			fsa_restored = false;
 		    }
 		}
 		else // exists != NULL
@@ -1440,12 +1463,13 @@ namespace libdar
 			    data_created = false;
 			    hard_link = false;
 			    ea_restored = false;
+			    fsa_restored = false;
 
 				// recording that we must set back the mtime of the parent directory
 			    if(!stack_dir.empty())
 				stack_dir.back().set_restore_date(true);
 			}
-		    else // a normal inode (or hard linked one)
+		    else // a normal inode (or hard linked one) is to be restored
 		    {
 			if(has_data_saved)
 			    action_over_data(exists_ino, x_nom, spot_display, act_data, data_restored);
@@ -1461,19 +1485,25 @@ namespace libdar
 
 			    // here we can restore EA even if no data has been restored
 			    // it will modify EA of the existing file
-			if(act_data != data_remove && has_ea_saved)
+			if(act_data != data_remove)
 			{
-			    ea_restored = action_over_ea(exists_ino, x_nom, spot_display, act_ea);
+			    if(has_fsa_saved)
+				fsa_restored = action_over_fsa(exists_ino, x_nom, spot_display, act_ea);
 
-				// to accomodate MacOS X, we must set again mtime because
-				// restoring EA modifies the mtime date. This does not hurt
-				// other systems.
-			    if(data_restored == done_data_restored)
-				    // set back the mtime to value found in the archive
-				make_date(*x_ino, spot_display, what_to_check);
-			    else
-				    // set back the mtime to value found in filesystem before restoration
-				make_date(*exists_ino, spot_display, what_to_check);
+			    if(has_ea_saved)
+			    {
+				ea_restored = action_over_ea(exists_ino, x_nom, spot_display, act_ea);
+
+				    // to accomodate MacOS X, we must set again mtime because
+				    // restoring EA modifies the mtime date. This does not hurt
+				    // other systems.
+				if(data_restored == done_data_restored)
+					// set back the mtime to value found in the archive
+				    make_date(*x_ino, spot_display, what_to_check);
+				else
+					// set back the mtime to value found in filesystem before restoration
+				    make_date(*exists_ino, spot_display, what_to_check);
+			    }
 			}
 
 			if(act_data == data_remove)
@@ -1612,10 +1642,15 @@ namespace libdar
 	    else // not both in_place and to_be_added are directories
 	    {
 		ea_attributs *ea = NULL; // saving original EA of existing inode
-		bool got_it = true;
+		filesystem_specific_attribute_list fsa; // saving original FSA of existing inode
+		bool got_ea = true;
+		bool got_fsa = true;
 
 		try
 		{
+
+			// reading EA present on filesystem
+
 		    try
 		    {
 			ea = ea_filesystem_read_ea(spot, bool_mask(true));
@@ -1626,9 +1661,27 @@ namespace libdar
 		    }
 		    catch(Egeneric & ex)
 		    {
-			got_it = false;
+			got_ea = false;
 			get_ui().warning(tools_printf(gettext("Existing EA for %S could not be read and preserved: "), &spot) + ex.get_message());
 		    }
+
+			// reading FSA present on filesystem
+
+		    try
+		    {
+			fsa.get_fsa_from_filesystem_for(spot, all_fsa_famillies());
+		    }
+		    catch(Ethread_cancel & e)
+		    {
+			throw;
+		    }
+		    catch(Egeneric & ex)
+		    {
+			got_fsa = false;
+			get_ui().warning(tools_printf(gettext("Existing FSA for %S could not be read and preserved: "), &spot) + ex.get_message());
+		    }
+
+			// removing current entry and creating the new entry in place
 
 		    if(!empty)
 		    {
@@ -1637,9 +1690,11 @@ namespace libdar
 			data_done = done_data_restored;
 		    }
 
+			// restoring EA that were present on filesystem
+
 		    try // if possible and available restoring original EA
 		    {
-			if(got_it && !empty)
+			if(got_ea && !empty)
 			    if(ea != NULL) // if ea is NULL no EA is present in the original file, thus nothing has to be restored
 				(void)ea_filesystem_write_ea(spot, *ea, bool_mask(true));
 			    // we don't care about the return value, here, errors are returned through exceptions
@@ -1653,7 +1708,23 @@ namespace libdar
 		    {
 			if(ea != NULL && ea->size() > 0)
 			    get_ui().warning(tools_printf(gettext("Existing EA for %S could not be preserved : "), &spot) + e.get_message());
+		    }
 
+			// restoring FSA that were present on filesystem
+
+		    try // if possible and available restoring original FSA
+		    {
+			if(got_fsa && !empty)
+			    fsa.set_fsa_to_filesystem_for(spot, all_fsa_famillies(), get_ui());
+		    }
+		    catch(Ethread_cancel & e)
+		    {
+			throw;
+		    }
+		    catch(Egeneric & e)
+		    {
+			if(ea != NULL && ea->size() > 0)
+			    get_ui().warning(tools_printf(gettext("Existing FSA for %S could not be preserved : "), &spot) + e.get_message());
 		    }
 		}
 		catch(...)
@@ -1824,6 +1895,130 @@ namespace libdar
 	    break;
 	case EA_undefined:
 	    throw Erange("filesystem_restore::action_over_detruit", tools_printf(gettext("%S: Overwriting policy (EA) is undefined for that file, do not know whether overwriting is allowed or not!"), &spot));
+	case EA_ask:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
+
+	return ret;
+    }
+
+    bool filesystem_restore::action_over_fsa(const inode *in_place, const nomme *to_be_added, const string & spot, over_action_ea action)
+    {
+	bool ret = false;
+	const inode *tba_ino = dynamic_cast<const inode *>(to_be_added);
+	const mirage *tba_mir = dynamic_cast<const mirage *>(to_be_added);
+
+	if(tba_mir != NULL)
+	    tba_ino = tba_mir->get_inode();
+
+	if(tba_ino == NULL)
+	    throw SRC_BUG;
+
+	if(in_place == NULL || to_be_added == NULL)
+	    throw SRC_BUG;
+
+	if(action == EA_ask)
+	    action = crit_ask_user_for_FSA_action(get_ui(), spot, in_place, to_be_added);
+
+
+	    // modifying the FSA action when the in place inode has not FSA
+
+	if(in_place->fsa_get_saved_status() != inode::fsa_full) // no EA in filesystem
+	{
+	    if(action == EA_merge_preserve || action == EA_merge_overwrite)
+		action = EA_overwrite; // merging when in_place has no EA is equivalent to overwriting
+	}
+
+	switch(action)
+	{
+	case EA_preserve:
+	case EA_preserve_mark_already_saved:
+		// nothing to do
+	    ret = false;
+	    break;
+	case EA_overwrite:
+	case EA_overwrite_mark_already_saved:
+	    if(tba_ino->fsa_get_saved_status() != inode::fsa_full)
+		throw SRC_BUG;
+	    if(warn_overwrite)
+	    {
+		try
+		{
+		    get_ui().pause(tools_printf(gettext("FSA for %S are about to be overwritten, OK?"), &spot));
+		}
+		catch(Euser_abort & e)
+		{
+		    const directory *tba_dir = dynamic_cast<const directory *>(to_be_added);
+		    if(tba_dir != NULL && tba_ino->same_as(*in_place))
+			return false;
+		    else
+			throw;
+		}
+	    }
+
+	    if(tba_mir != NULL && known_etiquette(tba_mir->get_etiquette()))
+	    {
+		if(info_details)
+		    get_ui().printf(gettext("FSA for %S have not been overwritten because this file is a hard link pointing to an already restored inode"), &spot);
+		ret = false;
+	    }
+	    else
+	    {
+		if(info_details)
+		    get_ui().warning(string(gettext("Restoring file's FSA: ")) + spot);
+
+		if(empty)
+		{
+		    const filesystem_specific_attribute_list * fsa = tba_ino->get_fsa();
+		    if(fsa == NULL)
+			throw SRC_BUG;
+
+		    ret = fsa->set_fsa_to_filesystem_for(spot, get_fsa_scope(), get_ui());
+		}
+		else
+		    ret = true;
+	    }
+	    break;
+	case EA_clear:
+	    break;
+	case EA_merge_preserve:
+	case EA_merge_overwrite:
+	    if(in_place->fsa_get_saved_status() != inode::fsa_full)
+		throw SRC_BUG; // should have been redirected to EA_overwrite !
+
+	    if(warn_overwrite)
+	    {
+		try
+		{
+		    get_ui().pause(tools_printf(gettext("FSA for %S are about to be merged, OK?"), &spot));
+		}
+		catch(Euser_abort & e)
+		{
+		    return false;
+		}
+	    }
+
+	    if(tba_ino->fsa_get_saved_status() == inode::fsa_full)
+	    {
+		const filesystem_specific_attribute_list *tba_ea = tba_ino->get_fsa();
+		const filesystem_specific_attribute_list *ip_ea = in_place->get_fsa();
+		filesystem_specific_attribute_list result;
+
+		if(action == EA_merge_preserve)
+		    result = *tba_ea + *ip_ea;
+		else // action == EA_merge_overwrite
+		    result = *ip_ea + *tba_ea; // the + operator on ea_attributs is not reflexive !!!
+
+		if(!empty)
+		    ret = result.set_fsa_to_filesystem_for(spot, get_fsa_scope(), get_ui());
+		else
+		    ret = true;
+	    }
+	    break;
+	case EA_undefined:
+	    throw Erange("filesystem_restore::action_over_detruit", tools_printf(gettext("%S: Overwriting policy (FSA) is undefined for that file, do not know whether overwriting is allowed or not!"), &spot));
 	case EA_ask:
 	    throw SRC_BUG;
 	default:

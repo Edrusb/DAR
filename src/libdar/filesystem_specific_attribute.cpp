@@ -27,7 +27,9 @@ extern "C"
 }
 
 #include <new>
+#include <algorithm>
 
+#include "integers.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "filesystem_specific_attribute.hpp"
@@ -37,12 +39,48 @@ using namespace std;
 namespace libdar
 {
 
+    static bool compare_for_sort(const filesystem_specific_attribute *a, const filesystem_specific_attribute *b);
+
+    template <class T> bool binary_find_in_sorted_list(const vector<T*> & table, const T *val, U_I & index)
+    {
+	U_I min = 0;
+	U_I max = table.size();
+
+	if(val == NULL)
+	    throw SRC_BUG;
+
+	do
+	{
+	    index = (min + max)/2;
+	    if(table[index] == NULL)
+		throw SRC_BUG;
+	    if(*(table[index]) < *val)
+		min = index + 1;
+	    else
+		max = index;
+	}
+	while(*(table[index]) != *val && max - min > 0);
+
+	return *(table[index]) == *val;
+    }
+
 ///////////////////////////////////////////////////////////////////////////////////
 
     bool filesystem_specific_attribute::is_same_type_as(const filesystem_specific_attribute & ref) const
     {
 	return get_familly() == ref.get_familly()
 	    && get_nature() == ref.get_nature();
+    }
+
+    bool filesystem_specific_attribute::operator < (const filesystem_specific_attribute & ref) const
+    {
+	if(fam < ref.fam)
+	    return true;
+	else
+	    if(fam > ref.fam)
+		return false;
+	    else
+	        return nat < ref.nat;
     }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +100,13 @@ namespace libdar
 	{                                                  \
 	    /* nothing to do */				   \
 	}
+
+    static bool compare_for_sort(const filesystem_specific_attribute *a, const filesystem_specific_attribute *b)
+    {
+	if(a == NULL || b == NULL)
+	    throw SRC_BUG;
+	return *a < *b;
+    }
 
 
     void filesystem_specific_attribute_list::clear()
@@ -85,6 +130,9 @@ namespace libdar
     {
 	bool ret = true;
 	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
+	vector<filesystem_specific_attribute *>::const_iterator rt = ref.fsa.begin();
+
+	throw SRC_BUG; // implementation a revoir sachant que les listes sont triees
 
 	while(ret && it != fsa.end())
 	{
@@ -178,6 +226,9 @@ namespace libdar
 	    }
 	}
 	while(size > 0);
+
+	update_familles();
+	sort_fsa();
     }
 
     void filesystem_specific_attribute_list::write(generic_file & f) const
@@ -223,13 +274,16 @@ namespace libdar
 	    FSA_READ(fsa_immutable, fsaf_linux_extX, target);
 	    FSA_READ(fsa_undeleted, fsaf_linux_extX, target);
 	}
+	update_familles();
+	sort_fsa();
     }
 
-    void filesystem_specific_attribute_list::set_fsa_to_filesystem_for(const string & target,
+    bool filesystem_specific_attribute_list::set_fsa_to_filesystem_for(const string & target,
 								       const fsa_scope & scope,
 								       user_interaction & ui) const
     {
 	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
+	bool ret = false;
 
 	while(it != fsa.end())
 	{
@@ -240,6 +294,7 @@ namespace libdar
 		try
 		{
 		    (*it)->set_to_fs(target);
+		    ret = true;
 		}
 		catch(Erange & e)
 		{
@@ -253,6 +308,8 @@ namespace libdar
 	    }
 	    ++it;
 	}
+
+	return ret;
     }
 
     const filesystem_specific_attribute & filesystem_specific_attribute_list::operator [] (U_I arg) const
@@ -281,6 +338,25 @@ namespace libdar
 	return ret;
     }
 
+    filesystem_specific_attribute_list filesystem_specific_attribute_list::operator + (const filesystem_specific_attribute_list & arg) const
+    {
+	filesystem_specific_attribute_list ret = *this;
+	vector<filesystem_specific_attribute *>::const_iterator it = arg.fsa.begin();
+
+	while(it != arg.fsa.end())
+	{
+	    if(*it == NULL)
+		throw SRC_BUG;
+	    ret.add(*(*it));
+	    ++it;
+	}
+
+	ret.update_familles();
+	ret.sort_fsa();
+
+	return ret;
+    }
+
     void filesystem_specific_attribute_list::copy_from(const filesystem_specific_attribute_list & ref)
     {
 	vector<filesystem_specific_attribute *>::const_iterator it = ref.fsa.begin();
@@ -295,6 +371,74 @@ namespace libdar
 	}
 
 	familles = ref.familles;
+    }
+
+    void filesystem_specific_attribute_list::update_familles()
+    {
+	vector<filesystem_specific_attribute *>::iterator it = fsa.begin();
+
+	familles.clear();
+	while(it != fsa.end())
+	{
+	    if(*it == NULL)
+		throw SRC_BUG;
+	    familles.insert((*it)->get_familly());
+	    ++it;
+	}
+    }
+
+    void filesystem_specific_attribute_list::sort_fsa()
+    {
+	sort(fsa.begin(), fsa.end(), compare_for_sort);
+    }
+
+    void filesystem_specific_attribute_list::add(const filesystem_specific_attribute & ref)
+    {
+	U_I index = 0;
+
+	if(binary_find_in_sorted_list(fsa, &ref, index))
+	{
+	    if(fsa[index] == NULL)
+		throw SRC_BUG;
+	    else
+	    {
+		filesystem_specific_attribute *rep = ref.clone();
+		if(rep == NULL)
+		    throw Ememory("filesystem_specific_attribute_list::add");
+		try
+		{
+		    delete fsa[index];
+		    fsa[index] = rep;
+		}
+		catch(...)
+		{
+		    delete rep;
+		    throw;
+		}
+	    }
+	}
+	else
+	{
+	    filesystem_specific_attribute *rep = ref.clone();
+	    if(rep == NULL)
+		throw Ememory("filesystem_specific_attribute_list::add");
+
+	    try
+	    {
+		for(U_I i = fsa.size() ; i > index ; --i)
+		{
+		    fsa[i] = fsa[i-1];
+		    fsa[i-1] = NULL;
+		}
+
+		fsa[index] = rep;
+	    }
+	    catch(...)
+	    {
+		delete rep;
+		throw;
+	    }
+	}
     }
 
 
@@ -411,16 +555,6 @@ namespace libdar
 	date.read(f);
     }
 
-    bool fsa_creation_date::operator == (const filesystem_specific_attribute & ref) const
-    {
-	const fsa_creation_date * ref_s = dynamic_cast<const fsa_creation_date *>(&ref);
-
-	if(ref_s != NULL)
-	    return ref_s->date == date;
-	else
-	    return false;
-    }
-
     string fsa_creation_date::show_val() const
     {
 	return tools_display_date(date);
@@ -435,6 +569,16 @@ namespace libdar
     void fsa_creation_date::set_to_fs(const string & target)
     {
 	throw Efeature("hfs+ create date writing");
+    }
+
+    bool fsa_creation_date::equal_value_to(const filesystem_specific_attribute & ref) const
+    {
+	const fsa_creation_date *ref_ptr = dynamic_cast<const fsa_creation_date *>(&ref);
+
+	if(ref_ptr != NULL)
+	    return date == ref_ptr->date;
+	else
+	    return false;
     }
 
 } // end of namespace

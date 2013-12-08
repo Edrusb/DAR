@@ -64,8 +64,15 @@ namespace libdar
 	bool is_same_type_as(const filesystem_specific_attribute & ref) const;
 
 	    /// provides a mean to compare objects values
-	virtual bool operator == (const filesystem_specific_attribute & ref) const = 0;
+	virtual bool operator == (const filesystem_specific_attribute & ref) const { return fam == ref.fam && nat == ref.nat && equal_value_to(ref); };
 	bool operator != (const filesystem_specific_attribute & ref) const { return ! (*this == ref); };
+
+	    /// used to provided a sorted list of FSA
+	bool operator < (const filesystem_specific_attribute & ref) const;
+	bool operator >= (const filesystem_specific_attribute & ref) const { return !(*this < ref); };
+	bool operator > (const filesystem_specific_attribute & ref) const { return ref < *this; };
+	bool operator <= (const filesystem_specific_attribute & ref) const { return !(*this > ref); };
+
 
 	    /// obtain the familly of the FSA
 	fsa_familly get_familly() const { return fam; };
@@ -91,6 +98,9 @@ namespace libdar
     protected:
 	void set_familly(const fsa_familly & val) { fam = val; };
 	void set_nature(const fsa_nature & val) { nat = val; };
+
+	    /// should return true if the value of the argument is equal to the one of 'this' false in any other case (even for object of another inherited class)
+	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const = 0;
 
     private:
 	fsa_familly fam;
@@ -127,7 +137,12 @@ namespace libdar
 					 const fsa_scope & scope);
 
 	    /// set FSA list to filesystem
-	void set_fsa_to_filesystem_for(const std::string & target,
+	    /// \param [in] target path of file to restore FSA to
+	    /// \param [in] scope list of FSA famillies to only consider
+	    /// \param [in] ui user interaction object
+	    /// \return true if some FSA have effectively been set, false if no FSA
+	    /// could be set either because list was empty of all FSA in the list where out of scope
+	bool set_fsa_to_filesystem_for(const std::string & target,
 				       const fsa_scope & scope,
 				       user_interaction & ui) const;
 
@@ -145,11 +160,20 @@ namespace libdar
 	    /// give the storage size for the EA
 	infinint storage_size() const;
 
+	    /// addition operator
+	    ///
+	    /// \note this operator is not reflexive (or symetrical if you prefer). Here "a + b" may differ from "b + a"
+	    /// all FSA of the arg are added with overwriting to the FSA of 'this'
+	filesystem_specific_attribute_list operator + (const filesystem_specific_attribute_list & arg) const;
+
     private:
-	std::vector<filesystem_specific_attribute *> fsa;
+	std::vector<filesystem_specific_attribute *> fsa; //< sorted list of FSA
 	fsa_scope familles;
 
 	void copy_from(const filesystem_specific_attribute_list & ref);
+	void update_familles();
+	void add(const filesystem_specific_attribute & ref); // add an entry without updating the "familles" field
+	void sort_fsa();
 
 	static std::string familly_to_signature(fsa_familly f);
 	static std::string nature_to_signature(fsa_nature n);
@@ -180,12 +204,14 @@ namespace libdar
 //>>> see fstat64 field st_birthtimespec renamed st_birthtim by POSIX 2008
 
 	    // inherited from filesystem_specific_attribute
-	virtual bool operator == (const filesystem_specific_attribute & ref) const;
 	virtual std::string show_val() const;
 	virtual void write(generic_file & f) const;
 	virtual void set_to_fs(const std::string & target);
 	virtual infinint storage_size() const { return date.get_storage_size(); };
 	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
+
+    protected:
+	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const;
 
     private:
 	infinint date;
@@ -200,12 +226,14 @@ namespace libdar
 	fsa_compressed(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
 
 	    // inherited from filesystem_specific_attribute
-	virtual bool operator == (const filesystem_specific_attribute & ref) const { return true; };
 	virtual std::string show_val() const { return ""; };
 	virtual void write(generic_file & f) const {};
 	virtual void set_to_fs(const std::string & target) {};
 	virtual infinint storage_size() const { return sizeof(char); };
 	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
+
+    protected:
+	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const { return true; };
     };
 
 
@@ -216,12 +244,14 @@ namespace libdar
 	fsa_nodump(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
 
 	    // inherited from filesystem_specific_attribute
-	virtual bool operator == (const filesystem_specific_attribute & ref) const { return true; };
 	virtual std::string show_val() const { return ""; };
 	virtual void write(generic_file & f) const {};
 	virtual void set_to_fs(const std::string & target) {};
 	virtual infinint storage_size() const { return sizeof(char); };
 	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
+
+    protected:
+	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const { return true; };
     };
 
 
@@ -232,12 +262,14 @@ namespace libdar
 	fsa_immutable(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
 
 	    // inherited from filesystem_specific_attribute
-	virtual bool operator == (const filesystem_specific_attribute & ref) const { return true; };
 	virtual std::string show_val() const { return ""; };
 	virtual void write(generic_file & f) const {};
 	virtual void set_to_fs(const std::string & target) {};
 	virtual infinint storage_size() const { return sizeof(char); };
 	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
+
+    protected:
+	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const { return true; };
     };
 
 
@@ -248,12 +280,14 @@ namespace libdar
 	fsa_undeleted(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
 
 	    // inherited from filesystem_specific_attribute
-	virtual bool operator == (const filesystem_specific_attribute & ref) const { return true; };
 	virtual std::string show_val() const { return ""; };
 	virtual void write(generic_file & f) const {};
 	virtual void set_to_fs(const std::string & target) {};
 	virtual infinint storage_size() const { return sizeof(char); };
 	virtual filesystem_specific_attribute *clone() const { return  cloner(this); };
+
+    protected:
+	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const { return true; };
     };
 
 

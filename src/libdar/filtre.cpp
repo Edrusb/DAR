@@ -160,7 +160,8 @@ namespace libdar
 						       warn_remove_no_match,
 						       empty,
 						       &overwrite,
-						       only_deleted);
+						       only_deleted,
+						       scope);
 		// if only_deleted, we set the filesystem to only overwrite mode (no creatation if not existing)
 		// we also filter to only restore directories and detruit objects.
 
@@ -209,6 +210,7 @@ namespace libdar
 			    filesystem_restore::action_done_for_data data_restored = filesystem_restore::done_no_change_no_data; // will be true if file's data have been restored (depending on overwriting policy)
 			    bool ea_restored = false; // will be true if file's EA have been restored (depending on overwriting policy)
 			    bool hard_link = false; // will be true if data_restored is true and only lead to a hard link creation or file replacement by a hard link to an already existing inode
+			    bool fsa_restored = false; // will be true if file's FSA have been restored (depending on overwriting policy)
 			    bool first_time = true; // if quite dirty file (saved several time), need to record in sequential reading whether this is the first time we restore it (not used in direct access reading).
 			    bool created_retry; // when restoring several dirty copies (in sequential read), we not forget whether the file
 				// has been created or not the first time (which is kept in "created"), for each try, we thus use created_retry
@@ -260,7 +262,7 @@ namespace libdar
 
 				try
 				{
-				    fs.write(e, data_restored, ea_restored, created_retry, hard_link); // e and not e_ino, it may be a hard link
+				    fs.write(e, data_restored, ea_restored, created_retry, hard_link, fsa_restored); // e and not e_ino, it may be a hard link
 				    if(tmp_exc.active)
 				    { // restoration succeeded so we drop any pending exception
 					tmp_exc.active = false;
@@ -299,7 +301,7 @@ namespace libdar
 				if(e_nom == NULL)
 				    throw SRC_BUG;
 				detruit killer = *e_nom;
-				bool  tmp_ea_restored, tmp_created_retry, tmp_hard_link;
+				bool  tmp_ea_restored, tmp_created_retry, tmp_hard_link, tmp_fsa_restored;
 				filesystem_restore::action_done_for_data tmp_data_restored;
 
 				switch(dirty)
@@ -317,7 +319,7 @@ namespace libdar
 					    dialog.warning(tools_printf(gettext("Removing the dirty file %S"), &tmp));
 				    }
 				    fs.ignore_overwrite_restrictions_for_next_write();
-				    fs.write(&killer, tmp_data_restored, tmp_ea_restored, tmp_created_retry, tmp_hard_link);
+				    fs.write(&killer, tmp_data_restored, tmp_ea_restored, tmp_created_retry, tmp_hard_link, tmp_fsa_restored);
 				    break;
 				case archive_options_extract::dirty_ok:
 				    break;
@@ -352,6 +354,9 @@ namespace libdar
 
 			    if(ea_restored)
 				st.incr_ea_treated();
+
+			    if(fsa_restored)
+				st.incr_fsa_treated();
 			}
 			else // oject not covered by filters
 			{
@@ -431,7 +436,7 @@ namespace libdar
 		    {
 			bool notusedhere;
 			filesystem_restore::action_done_for_data tmp;
-			fs.write(e, tmp, notusedhere, notusedhere, notusedhere); // eod; don't care returned value
+			fs.write(e, tmp, notusedhere, notusedhere, notusedhere, notusedhere); // eod; don't care returned value
 		    }
 		}
 	    }

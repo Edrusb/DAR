@@ -363,7 +363,7 @@ namespace libdar
 	    x_entrepot = new (nothrow) entrepot_local( "", "", false); // never using furtive_mode to read slices
 	    if(x_entrepot == NULL)
 		throw Ememory("archive_options_create::clear");
-	    x_scope = all_fsa_familly();
+	    x_scope = all_fsa_famillies();
 	}
 	catch(...)
 	{
@@ -721,7 +721,7 @@ namespace libdar
 	    x_entrepot = new (nothrow) entrepot_local("", "", false); // never using furtive_mode to read slices
 	    if(x_entrepot == NULL)
 		throw Ememory("archive_options_merge::clear");
-	    x_scope = all_fsa_familly();
+	    x_scope = all_fsa_famillies();
 	}
 	catch(...)
 	{
@@ -957,7 +957,7 @@ namespace libdar
 	    x_dirty = dirty_warn;
 	    x_only_deleted = false;
 	    x_ignore_deleted = false;
-	    x_scope = all_fsa_familly();
+	    x_scope = all_fsa_famillies();
 	}
 	catch(...)
 	{
@@ -1255,7 +1255,7 @@ namespace libdar
 	    x_display_skipped = false;
 	    x_hourshift = 0;
 	    x_compare_symlink_date = true;
-	    x_scope = all_fsa_familly();
+	    x_scope = all_fsa_famillies();
 	}
         catch(...)
         {

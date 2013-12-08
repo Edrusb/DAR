@@ -257,6 +257,8 @@ namespace libdar
 	    /// \param[in] spot the path where to restore these EA (full path required, including the filename of 'e')
 	    /// \param[in] ea_mask the EA entry to restore from the list_ea (other entries are ignored)
 	    /// \return true if EA could be restored, false if "e" is a hard link to an inode that has its EA already restored previously
+	    /// \note the list_ea EA are restored to spot path, the object e is only here to validate that this operation
+	    /// has not already been done through another hard linked inode to that same inode
         bool raw_set_ea(const nomme *e,
 			const ea_attributs & list_ea,
 			const std::string & spot,
@@ -298,7 +300,8 @@ namespace libdar
 			   bool x_warn_remove_no_match,
 			   bool empty,
 			   const crit_action *x_overwrite,
-			   bool x_only_overwrite);
+			   bool x_only_overwrite,
+			   const fsa_scope & scope);
 	    /// copy constructor is forbidden (throws an exception)
         filesystem_restore(const filesystem_restore & ref) : mem_ui(ref), filesystem_hard_link_write(ref), filesystem_hard_link_read(get_ui(), true, get_fsa_scope()) { throw SRC_BUG; };
 	    /// assignment operator is forbidden (throws an exception)
@@ -324,9 +327,15 @@ namespace libdar
 	    /// \param[out] ea_restored  true if EA has been restored, false if either no EA to restore or if forbidden by overwriting policy
 	    /// \param[out] data_created true if data has been restored leading to file creation, false in any other case
 	    /// \param[out] hard_link true when data_restored is true and only a hard link to an already existing inode has been created
+	    /// \param[out] fsa_restored true if FSA has been restored, false if either no FSA to restore or if forbidden by overwriting policy
 	    /// \note any failure to restore data or EA that is not due to its absence in "x" nor to an interdiction from the overwriting policy is signaled
 	    /// through an exception.
-	void write(const entree *x, action_done_for_data & data_restored, bool & ea_restored, bool & data_created, bool & hard_link);
+	void write(const entree *x,
+		   action_done_for_data & data_restored,
+		   bool & ea_restored,
+		   bool & data_created,
+		   bool & hard_link,
+		   bool & fsa_restored);
 
 
 	    /// ask for no warning or user interaction for the next write operation
@@ -366,14 +375,31 @@ namespace libdar
 	void restore_stack_dir_ownership();
 
 	    // subroutines of write()
-	void action_over_remove(const inode *in_place, const detruit *to_be_added, const std::string & spot, over_action_data action);
+
+	    /// perform action due to the overwriting policy when the "to be added" entry is a detruit object
+	void action_over_remove(const inode *in_place,
+				const detruit *to_be_added,
+				const std::string & spot,
+				over_action_data action);
+	    /// perform action for data due to the overwriting policy when the "to be added" entry is not a detruit
 	void action_over_data(const inode *in_place,
 			      const nomme *to_be_added,
 			      const std::string & spot,
 			      over_action_data action,
 			      action_done_for_data & data_done);
-	bool action_over_ea(const inode *in_place, const nomme *to_be_added, const std::string & spot, over_action_ea action);
+	    /// perform action for EA due to overwriting policy
+	bool action_over_ea(const inode *in_place,
+			    const nomme *to_be_added,
+			    const std::string & spot,
+			    over_action_ea action);
+	    /// perform action for FSA due to overwriting policy
+	bool action_over_fsa(const inode *in_place,
+			    const nomme *to_be_added,
+			    const std::string & spot,
+			    over_action_ea action);
+
     };
+
 
 	/// @}
 

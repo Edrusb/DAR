@@ -649,7 +649,7 @@ namespace libdar
 
 	    while(loop)
 	    {
-		dialog.printf(gettext("Conflict found while selecting file to retain in the resulting archive:"));
+		dialog.printf(gettext("Conflict found while selecting the file to retain in the resulting archive:"));
 		dialog.printf(gettext("User Decision requested for data of file %S"), &full_name);
 		crit_show_entry_info(dialog, full_name, already_here, dolly);
 
@@ -720,7 +720,7 @@ namespace libdar
 
 	    while(loop)
 	    {
-		dialog.printf(gettext("Conflict found while selecting file to retain in the resulting archive:"));
+		dialog.printf(gettext("Conflict found while selecting the file to retain in the resulting archive:"));
 		dialog.printf(gettext("User Decision requested for EA of file %S"), &full_name);
 		crit_show_entry_info(dialog, full_name, already_here, dolly);
 
@@ -757,6 +757,74 @@ namespace libdar
 			break;
 		    case 'r':
 			ret = EA_clear;
+			loop = false;
+			break;
+		    case '*':
+			ret = EA_undefined;
+			loop = false;
+			break;
+		    case 'a':
+			resp = dialog.get_string(tools_printf(gettext("Warning, are you sure you want to abort (please answer \"%S\" to confirm)? "), &confirm), true);
+			if(resp == confirm)
+			    throw Ethread_cancel(false, 0);
+			else
+			    dialog.warning(gettext("Cancellation no confirmed"));
+			break;
+		    default:
+			dialog.warning(string(gettext("Unknown choice: ")) + resp);
+		    }
+		}
+	    }
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+
+	return ret;
+    }
+
+
+    over_action_ea crit_ask_user_for_FSA_action(user_interaction & dialog, const string & full_name, const entree *already_here, const entree *dolly)
+    {
+	over_action_ea ret = EA_undefined;
+
+	NLS_SWAP_IN;
+	try
+	{
+	    const string confirm = gettext("yes");
+	    bool loop = true;
+	    string resp;
+
+	    while(loop)
+	    {
+		dialog.printf(gettext("Conflict found while selecting the file to retain in the resulting archive:"));
+		dialog.printf(gettext("User Decision requested for FSA of file %S"), &full_name);
+		crit_show_entry_info(dialog, full_name, already_here, dolly);
+
+		resp = dialog.get_string(gettext("\nYour decision about file's FSA:\n[p]reserve\n[o]verwrite\nmark [s]aved and preserve\nmark saved and overwri[t]e\n[*] keep undefined\n[a]bort\n  Your choice? "), true);
+		if(resp.size() != 1)
+		    dialog.warning(gettext("Please answer by the character between brackets ('[' and ']') and press return"));
+		else
+		{
+		    switch(*resp.begin())
+		    {
+		    case 'p':
+			ret = EA_preserve;
+			loop = false;
+			break;
+		    case 'o':
+			ret = EA_overwrite;
+			loop = false;
+			break;
+		    case 's':
+			ret = EA_preserve_mark_already_saved;
+			loop = false;
+			break;
+		    case 't':
+			ret = EA_overwrite_mark_already_saved;
 			loop = false;
 			break;
 		    case '*':

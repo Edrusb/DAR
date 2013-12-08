@@ -545,6 +545,15 @@ namespace libdar
 	/// \return the action decided by the user. The user may also choose to abort, which will throw an Euser_abort exception
     extern over_action_ea crit_ask_user_for_EA_action(user_interaction & dialog, const std::string & full_name, const entree *already_here, const entree *dolly);
 
+	/// ask user for FSA action
+
+	/// \param[in] dialog for user interaction
+	/// \param[in] full_name full path to the entry do ask decision for
+	/// \param[in] already_here pointer to the object 'in place'
+	/// \param[in] dolly pointer to the object 'to be added'
+	/// \return the action decided by the user. The user may also choose to abort, which will throw an Euser_abort exception
+    extern over_action_ea crit_ask_user_for_FSA_action(user_interaction & dialog, const std::string & full_name, const entree *already_here, const entree *dolly);
+
 	/// ask user for Data action
 
 	/// \param[in] dialog for user interaction
@@ -553,6 +562,7 @@ namespace libdar
 	/// \param[in] dolly pointer to the object 'to be added'
 	/// \return the action decided by the user. The user may also choose to abort, which will throw an Euser_abort exception
     extern over_action_data crit_ask_user_for_data_action(user_interaction & dialog, const std::string & full_name, const entree *already_here, const entree *dolly);
+
 
 	/// show information suited for user comparison and decision for entry in conflict
 
