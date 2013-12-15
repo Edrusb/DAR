@@ -40,6 +40,7 @@ extern "C"
 #include "compressor.hpp"
 #include "sparse_file.hpp"
 #include "semaphore.hpp"
+#include "deci.hpp"
 
 using namespace std;
 
@@ -1149,10 +1150,10 @@ namespace libdar
         const entree *e;
         defile juillet = FAKE_ROOT;
         null_file black_hole = null_file(gf_write_only);
-        ea_attributs ea;
         infinint offset;
         const eod tmp_eod;
 	thread_cancellation thr_cancel;
+	string perimeter;
 
         st.clear();
         cat.reset_read();
@@ -1166,6 +1167,7 @@ namespace libdar
 
             juillet.enfile(e);
 	    thr_cancel.check_self_cancellation();
+	    perimeter = "";
             try
             {
 		if(e_mir != NULL)
@@ -1184,6 +1186,7 @@ namespace libdar
                             // checking data file if any
                         if(e_file != NULL && e_file->get_saved_status() == s_saved)
                         {
+			    perimeter = gettext("Data");
 			    if(!empty)
 			    {
 				generic_file *dat = e_file->get_data(file::normal);
@@ -1235,12 +1238,34 @@ namespace libdar
                             // checking inode EA if any
                         if(e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_full)
                         {
+			    if(perimeter == "")
+				perimeter = "EA";
+			    else
+				perimeter += " + EA";
 			    if(!empty)
 			    {
 				ea_attributs tmp = *(e_ino->get_ea());
+				perimeter += "(" + deci(tmp.size()).human() +")";
 				e_ino->ea_detach();
 			    }
                         }
+
+			    // checking FSA if any
+			if(e_ino != NULL && e_ino->fsa_get_saved_status() == inode::fsa_full)
+			{
+			    if(perimeter == "")
+				perimeter = "FSA";
+			    else
+				perimeter += " + FSA";
+			    if(!empty)
+			    {
+				const filesystem_specific_attribute_list *tmp = e_ino->get_fsa();
+				if(tmp == NULL)
+				    throw SRC_BUG;
+				perimeter += "(" + deci(tmp->size()).human() + ")";
+				e_ino->fsa_detach();
+			    }
+			}
 
 			if(e_dir == NULL || !cat.read_second_time_dir())
 			    st.incr_treated();
@@ -1250,7 +1275,7 @@ namespace libdar
 
                             // still no exception raised, this all is fine
                         if(info_details)
-                            dialog.warning(string(gettext("OK  ")) + juillet.get_string());
+                            dialog.warning(string(gettext("OK  ")) + juillet.get_string() + "  " + perimeter);
                     }
                     else // excluded by filter
                     {

@@ -50,6 +50,8 @@ namespace libdar
     {
     public :
 	    /// constructor to build a "deci" object from a string representing decimals
+	    /// \note may throw Edeci exception if the given string does not correspond to a
+	    /// positive integer in decimal notation
         deci(std::string s);
 
 	    /// constructor to build a "deci" from an infinint
@@ -70,7 +72,7 @@ namespace libdar
 
 	    /// this produce a infinint from the decimal stored in the current object
         infinint computer() const;
-	    /// this produce a string fromr the decimal stored in the current object
+	    /// this produce a string from the decimal stored in the current object
         std::string human() const;
 
 #ifdef LIBDAR_SPECIAL_ALLOC
