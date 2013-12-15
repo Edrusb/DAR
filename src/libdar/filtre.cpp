@@ -116,7 +116,7 @@ namespace libdar
 	/// \note EA_preserve EA_preserve_mark_already_saved and EA_clear are left intentionnaly unimplemented!
 	/// \note the NULL given as argument means that the object is not an inode
 
-    static void do_EA_transfert(user_interaction &dialog, over_action_ea action, inode *in_place, const inode *to_add);
+    static void do_EFSA_transfert(user_interaction &dialog, over_action_ea action, inode *in_place, const inode *to_add);
 
 
 	/// overwriting policy when only restoring detruit objects
@@ -1498,12 +1498,12 @@ namespace libdar
 		    //   and both have the same modification date (R&~R)
 		    //   and this is the first time we meet this hard linked inode, or this is not a hard linked inode (A|!H)
 		    // else data is taken as is (P*) from the "in place" archive
-		    // EA are recorded as present when:
-		    //   both entries have EA present (e&~e)
-		    //   and both EA set have the same date (r&~r)
+		    // EA and FSA are recorded as present when:
+		    //   both entries have EA/FSA present (e&~e)
+		    //   and both EA/FSA set have the same date (r&~r)
 		    // OR
-		    //  none entry has EA present
-		    // else the EA (or the absence of EA) is taken from the "in place" archive
+		    //  none entry has EA/FSA present
+		    // else the EA/FSA (or the absence of EA/FSA) is taken from the "in place" archive
 
 		try
 		{
@@ -1560,6 +1560,8 @@ namespace libdar
 	    }
 	}
 
+	    /// End of Step 0
+
 	try
 	{
 
@@ -1570,7 +1572,7 @@ namespace libdar
 		// STEP 1:
 		// we merge catalogues (pointed to by ref_tab[]) of each archive and produce a resulting catalogue 'cat'
 		// the merging resolves overwriting conflicts following the "criterium" rule
-		// each object of the catalogue is cloned, this is the clones that get added to the resulting catalogue
+		// each object of the catalogue is cloned, these clones get added to the resulting catalogue in step 2
 
 	    try
 	    {
@@ -1594,7 +1596,7 @@ namespace libdar
 			    ptr = gettext("second");
 			    break;
 			default:
-			    ptr = gettext("next"); // not yet used, but room is open for future evolutions
+			    ptr = gettext("next"); // not yet used, but room is made for future evolutions
 			    break;
 			}
 			dialog.printf(gettext("Merging/filtering files from the %s archive"), ptr);
@@ -1735,7 +1737,7 @@ namespace libdar
 							default:
 							    throw SRC_BUG;
 							}
-							dialog.pause(tools_printf(gettext("EA of file %S are about to be %S, proceed?"), &full_name, &action));
+							dialog.pause(tools_printf(gettext("EA and FSA of file %S are about to be %S, proceed?"), &full_name, &action));
 						    }
 						    catch(Euser_abort & e)
 						    {
@@ -1777,7 +1779,12 @@ namespace libdar
 
 						if(act_ea == EA_ask)
 						{
-						    if(dolly_ino != NULL && al_ino != NULL && (dolly_ino->ea_get_saved_status() != inode::ea_none || al_ino->ea_get_saved_status() != inode::ea_none))
+						    if(dolly_ino != NULL && al_ino != NULL
+						       && (dolly_ino->ea_get_saved_status() != inode::ea_none
+							   || al_ino->ea_get_saved_status() != inode::ea_none
+							   || dolly_ino->fsa_get_saved_status() != inode::fsa_none
+							   || al_ino->fsa_get_saved_status() != inode::fsa_none)
+							)
 							act_ea = crit_ask_user_for_EA_action(dialog, full_name, already_here, dolly);
 						    else
 							act_ea = EA_preserve; // whatever what we want is, as no EA exist for both inplace and to be added objects, there is just no need to ask for that.
@@ -1794,9 +1801,10 @@ namespace libdar
 						case EA_merge_preserve:
 						case EA_merge_overwrite:
 						    if(info_details)
-							dialog.warning(tools_printf(gettext("EA of file %S from first archive have been updated with those of same named file of the auxiliary archive"), &full_name));
-						    do_EA_transfert(dialog, act_ea, const_cast<inode *>(al_ino), dolly_ino);
+							dialog.warning(tools_printf(gettext("EA and FSA of file %S from first archive have been updated with those of same named file of the auxiliary archive"), &full_name));
+						    do_EFSA_transfert(dialog, act_ea, const_cast<inode *>(al_ino), dolly_ino);
 						    break;
+
 						case EA_preserve_mark_already_saved:
 
 						    if(al_ino != NULL && al_ino->ea_get_saved_status() == inode::ea_full)
@@ -1805,9 +1813,16 @@ namespace libdar
 							if(info_details)
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been dropped and marked as already saved"), &full_name));
 						    }
+						    if(al_ino != NULL && al_ino->fsa_get_saved_status() == inode::fsa_full)
+						    {
+							const_cast<inode *>(al_ino)->fsa_set_saved_status(inode::fsa_partial);
+							if(info_details)
+							    dialog.warning(tools_printf(gettext("FSA of file %S from first archive have been dropped and marked as already saved"), &full_name));
+						    }
 						    break;
+
 						case EA_clear:
-						    if(al_ino->ea_get_saved_status() != inode::ea_none)
+						    if(al_ino != NULL && al_ino->ea_get_saved_status() != inode::ea_none)
 						    {
 							if(al_ino->ea_get_saved_status() == inode::ea_full)
 							    st.decr_ea_treated();
@@ -1815,7 +1830,17 @@ namespace libdar
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
 							const_cast<inode *>(al_ino)->ea_set_saved_status(inode::ea_none);
 						    }
+						    if(al_ino != NULL && al_ino->fsa_get_saved_status() != inode::fsa_none)
+						    {
+							if(al_ino->fsa_get_saved_status() == inode::fsa_full)
+							    st.decr_fsa_treated();
+							if(info_details)
+							    dialog.warning(tools_printf(gettext("FSA of file %S from first archive have been removed"), &full_name));
+							const_cast<inode *>(al_ino)->fsa_set_saved_status(inode::fsa_none);
+						    }
+
 						    break;
+
 						default:
 						    throw SRC_BUG;
 						}
@@ -1892,7 +1917,11 @@ namespace libdar
 
 						if(act_ea == EA_ask && act_data != data_remove)
 						{
-						    if(dolly_ino != NULL && al_ino != NULL && (dolly_ino->ea_get_saved_status() != inode::ea_none || al_ino->ea_get_saved_status() != inode::ea_none))
+						    if(dolly_ino != NULL && al_ino != NULL &&
+						       (dolly_ino->ea_get_saved_status() != inode::ea_none
+							|| al_ino->ea_get_saved_status() != inode::ea_none
+							|| dolly_ino->fsa_get_saved_status() != inode::fsa_none
+							|| al_ino->fsa_get_saved_status() != inode::fsa_none))
 							act_ea = crit_ask_user_for_EA_action(dialog, full_name, already_here, dolly);
 						    else
 							act_ea = EA_overwrite; // no need to ask here neither as both entries have no EA.
@@ -1904,7 +1933,7 @@ namespace libdar
 						    {
 						    case EA_preserve:
 						    case EA_undefined: // remaining ea_undefined at the end of the evaluation defaults to ea_preserve
-							do_EA_transfert(dialog, EA_overwrite, dolly_ino, al_ino);
+							do_EFSA_transfert(dialog, EA_overwrite, dolly_ino, al_ino);
 							break;
 						    case EA_overwrite:
 							if(info_details)
@@ -1919,17 +1948,17 @@ namespace libdar
 						    case EA_merge_preserve:
 							if(info_details)
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been updated with those of the same named file of the auxiliary archive"), &full_name));
-							do_EA_transfert(dialog, EA_merge_overwrite, dolly_ino, al_ino);
+							do_EFSA_transfert(dialog, EA_merge_overwrite, dolly_ino, al_ino);
 							break;
 						    case EA_merge_overwrite:
 							if(info_details)
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been updated with those of the same named file of the auxiliary archive"), &full_name));
-							do_EA_transfert(dialog, EA_merge_preserve, dolly_ino, al_ino);
+							do_EFSA_transfert(dialog, EA_merge_preserve, dolly_ino, al_ino);
 							break;
 						    case EA_preserve_mark_already_saved:
 							if(info_details)
 							    dialog.warning(tools_printf(gettext("EA of file %S has been overwritten and marked as already saved"), &full_name));
-							do_EA_transfert(dialog, EA_overwrite_mark_already_saved, dolly_ino, al_ino);
+							do_EFSA_transfert(dialog, EA_overwrite_mark_already_saved, dolly_ino, al_ino);
 							break;
 						    case EA_clear:
 							if(al_ino->ea_get_saved_status() != inode::ea_none)
@@ -2153,8 +2182,14 @@ namespace libdar
 						st.incr_deleted();
 
 
-					    if(e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_full)
-						st.incr_ea_treated();
+					    if(e_ino != NULL)
+					    {
+						if(e_ino->ea_get_saved_status() == inode::ea_full)
+						    st.incr_ea_treated();
+
+						if(e_ino->fsa_get_saved_status() == inode::fsa_full)
+						    st.incr_fsa_treated();
+					    }
 
 					    if(e_dir != NULL) // we must chdir also for the *reading* method of this catalogue object
 					    {
@@ -2290,7 +2325,7 @@ namespace libdar
 
 	    // STEP 2:
 	    // 'cat' is now completed
-	    // we must copy the file's data and EA to the archive
+	    // we must copy the file's data, EA and FSA to the archive
 
 
 	if(info_details)
@@ -2410,6 +2445,14 @@ namespace libdar
 			    e_ino->change_ea_location(stockage);
 			cat.pre_add_ea_crc(e, stockage);
 		    }
+
+			// saving inode's FSA
+		    if(e_ino->fsa_get_saved_status() == inode::fsa_full)
+		    {
+			cat.pre_add_fsa(e, stockage);
+			(void)save_fsa(dialog, juillet.get_string(), e_ino, stockage, info_details);
+			cat.pre_add_fsa_crc(e, stockage);
+		    }
 		}
 		else // not an inode
 		{
@@ -2484,8 +2527,13 @@ namespace libdar
 
 		try
 		{
-		    if(e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_full)
-			e_ino->ea_get_crc(check);
+		    if(e_ino != NULL)
+		    {
+			if(e_ino->ea_get_saved_status() == inode::ea_full)
+			    e_ino->ea_get_crc(check);
+			if(e_ino->fsa_get_saved_status() == inode::fsa_full)
+			    e_ino->fsa_get_crc(check);
+		    }
 		}
 		catch(Erange & e)
 		{
@@ -2972,9 +3020,10 @@ namespace libdar
         return ret;
     }
 
-    static void do_EA_transfert(user_interaction &dialog, over_action_ea action, inode *place_ino, const inode *add_ino)
+    static void do_EFSA_transfert(user_interaction &dialog, over_action_ea action, inode *place_ino, const inode *add_ino)
     {
 	ea_attributs *tmp_ea = NULL;
+	filesystem_specific_attribute_list *tmp_fsa = NULL;
 
 	switch(action)
 	{
@@ -2997,11 +3046,19 @@ namespace libdar
 	if(place_ino == NULL) // in_place is not an inode thus cannot have any EA
 	    return;           // nothing can be done neither here as the resulting object (in_place) cannot handle EA
 
-	    // in the following we know that both in_place and to_add are inode, we use them thanks to their inode * pointers (place_ino and add_ino)
+	    // in the following we know that both in_place and to_add are inode, we manipulate them thanks to their inode * pointers (place_ino and add_ino)
 
 	switch(action)
 	{
 	case EA_overwrite:
+
+		// overwriting last change date
+
+	    if(add_ino->has_last_change())
+		place_ino->set_last_change(add_ino->get_last_change());
+
+		// EA Consideration (for overwriting)
+
 	    switch(add_ino->ea_get_saved_status())
 	    {
 	    case inode::ea_none:
@@ -3011,12 +3068,11 @@ namespace libdar
 	    case inode::ea_partial:
 	    case inode::ea_fake:
 		place_ino->ea_set_saved_status(inode::ea_partial);
-		place_ino->set_last_change(add_ino->get_last_change());
 		break;
 	    case inode::ea_full:
 		tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea()); // we clone the EA of add_ino
 		if(tmp_ea == NULL)
-		    throw Ememory("filtre::do_EA_transfert");
+		    throw Ememory("filtre::do_EFSA_transfert");
 		try
 		{
 		    if(place_ino->ea_get_saved_status() == inode::ea_full) // then we must drop the old EA:
@@ -3025,7 +3081,6 @@ namespace libdar
 			place_ino->ea_set_saved_status(inode::ea_full);
 		    place_ino->ea_attach(tmp_ea);
 		    tmp_ea = NULL;
-		    place_ino->set_last_change(add_ino->get_last_change());
 		}
 		catch(...)
 		{
@@ -3040,20 +3095,77 @@ namespace libdar
 	    default:
 		throw SRC_BUG;
 	    }
-	    break; // end of case EA_overwrite for action
+
+		// FSA Considerations (for overwriting)
+
+	    switch(add_ino->fsa_get_saved_status())
+	    {
+	    case inode::fsa_none:
+		place_ino->fsa_set_saved_status(inode::fsa_none);
+		break;
+	    case inode::fsa_partial:
+		place_ino->fsa_set_saved_status(inode::fsa_partial);
+		break;
+	    case inode::fsa_full:
+		tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa()); // we clone the FSA of add_ino
+		if(tmp_fsa == NULL)
+		    throw Ememory("filtre::do_EFSA_transfer");
+		try
+		{
+		    if(place_ino->fsa_get_saved_status() == inode::fsa_full) // we must drop the old FSA
+			place_ino->fsa_detach();
+		    else
+			place_ino->fsa_set_saved_status(inode::fsa_full);
+		    place_ino->fsa_attach(tmp_fsa);
+		    tmp_fsa = NULL;
+		}
+		catch(...)
+		{
+		    if(tmp_fsa != NULL)
+		    {
+			delete tmp_fsa;
+			tmp_fsa = NULL;
+		    }
+		    throw;
+		}
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+	    break; // end of case EA_FSA_overwrite for action
+
 	case EA_overwrite_mark_already_saved:
-	    if(add_ino->ea_get_saved_status() != inode::ea_none)
+
+		// Overwriting Date
+
+	    if(add_ino->has_last_change())
 		place_ino->set_last_change(add_ino->get_last_change());
+
+		// EA considerations
+
 	    place_ino->ea_set_saved_status(add_ino->ea_get_saved_status()); // at this step, ea_full may be set, it will be changed to ea_partial below.
 	    if(place_ino->ea_get_saved_status() == inode::ea_full || place_ino->ea_get_saved_status() == inode::ea_fake)
 		place_ino->ea_set_saved_status(inode::ea_partial);
+
+		// FSA considerations
+
+	    place_ino->fsa_set_saved_status(add_ino->fsa_get_saved_status()); // at this step fsa_full may be set, will be changed to fsa_partial below
+	    if(place_ino->fsa_get_saved_status() == inode::fsa_full)
+		place_ino->fsa_set_saved_status(inode::fsa_partial);
+
 	    break;
+
 	case EA_merge_preserve:
+
+		// no last change date modification (preserve context)
+
+		// EA considerations
+
 	    if(place_ino->ea_get_saved_status() == inode::ea_full && add_ino->ea_get_saved_status() == inode::ea_full) // we have something to merge
 	    {
 		tmp_ea = new (nothrow) ea_attributs();
 		if(tmp_ea == NULL)
-		    throw Ememory("filtre.cpp:do_EA_transfert");
+		    throw Ememory("filtre.cpp:do_EFSA_transfert");
 		try
 		{
 		    merge_ea(*place_ino->get_ea(), *add_ino->get_ea(), *tmp_ea);
@@ -3077,7 +3189,7 @@ namespace libdar
 		    place_ino->ea_set_saved_status(inode::ea_full); // it was not the case else we would have executed the above block
 		    tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea());   // we clone the EA set of to_add
 		    if(tmp_ea == NULL)
-			throw Ememory("filtre.cpp:do_EA_transfert");
+			throw Ememory("filtre.cpp:do_EFSA_transfert");
 		    try
 		    {
 			place_ino->ea_attach(tmp_ea);
@@ -3095,13 +3207,75 @@ namespace libdar
 		}
 		// else nothing is done: either res_ino has full EA but ref_ino has not
 		// or res_ino has not full EA nor do has ref_ino and nothing can be done neither
+
+
+		// FSA considerations
+
+	    if(place_ino->fsa_get_saved_status() == inode::fsa_full && add_ino->fsa_get_saved_status() == inode::fsa_full) // we have something to merge
+	    {
+		tmp_fsa = new (nothrow) filesystem_specific_attribute_list();
+		if(tmp_fsa == NULL)
+		    throw Ememory("filtre.cpp::do_EFSA_transfer");
+
+		try
+		{
+		    *tmp_fsa = *add_ino->get_fsa() + *place_ino->get_fsa(); // overwriting add_ino with place_ino's FSA
+		    place_ino->fsa_detach();
+		    place_ino->fsa_attach(tmp_fsa);
+		    tmp_fsa = NULL;
+		}
+		catch(...)
+		{
+		    if(tmp_fsa != NULL)
+		    {
+			delete tmp_fsa;
+			tmp_fsa = NULL;
+		    }
+		    throw;
+		}
+	    }
+	    else
+	    {
+		if(add_ino->fsa_get_saved_status() == inode::fsa_full)
+		{
+		    place_ino->fsa_set_saved_status(inode::fsa_full);
+		    tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa());
+		    if(tmp_fsa == NULL)
+			throw Ememory("filtre.cpp:do_EFSA_transfert");
+		    try
+		    {
+			place_ino->fsa_attach(tmp_fsa);
+			tmp_fsa = NULL;
+		    }
+		    catch(...)
+		    {
+			if(tmp_fsa != NULL)
+			{
+			    delete tmp_fsa;
+			    tmp_fsa = NULL;
+			}
+			throw;
+		    }
+		}
+		    // else nothing to be done (in_place eventually has FSA and add_ino does nothing to add)
+	    }
+
 	    break;
+
 	case EA_merge_overwrite:
+
+		// last change date transfert
+
+	    if(add_ino->has_last_change())
+		place_ino->set_last_change(add_ino->get_last_change());
+
+		// EA considerations
+
 	    if(place_ino->ea_get_saved_status() == inode::ea_full && add_ino->ea_get_saved_status() == inode::ea_full)
 	    {
 		tmp_ea = new (nothrow) ea_attributs();
 		if(tmp_ea == NULL)
-		    throw Ememory("filtre.cpp:do_EA_transfert");
+		    throw Ememory("filtre.cpp:do_EFSA_transfert");
 		try
 		{
 		    merge_ea(*add_ino->get_ea(), *place_ino->get_ea(), *tmp_ea);
@@ -3125,7 +3299,7 @@ namespace libdar
 		    place_ino->ea_set_saved_status(inode::ea_full); // it was not the case else we would have executed the above block
 		    tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea());
 		    if(tmp_ea == NULL)
-			throw Ememory("filtre.cpp:do_EA_transfert");
+			throw Ememory("filtre.cpp:do_EFSA_transfert");
 		    try
 		    {
 			place_ino->ea_attach(tmp_ea);
@@ -3143,7 +3317,61 @@ namespace libdar
 		}
 		// else nothing is done: either res_ino has full EA but ref_ino has not
 		// or res_ino has not full EA nor do has ref_ino and nothing can be done neither
+
+		// FSA considerations
+
+	    if(place_ino->fsa_get_saved_status() == inode::fsa_full && add_ino->fsa_get_saved_status() == inode::fsa_full) // we have something to merge
+	    {
+		tmp_fsa = new (nothrow) filesystem_specific_attribute_list();
+		if(tmp_fsa == NULL)
+		    throw Ememory("filtre.cpp::do_EFSA_transfer");
+
+		try
+		{
+		    *tmp_fsa = *place_ino->get_fsa() + *add_ino->get_fsa(); // overwriting place_ino with add_ino's FSA
+		    place_ino->fsa_detach();
+		    place_ino->fsa_attach(tmp_fsa);
+		    tmp_fsa = NULL;
+		}
+		catch(...)
+		{
+		    if(tmp_fsa != NULL)
+		    {
+			delete tmp_fsa;
+			tmp_fsa = NULL;
+		    }
+		    throw;
+		}
+	    }
+	    else
+	    {
+		if(add_ino->fsa_get_saved_status() == inode::fsa_full)
+		{
+		    place_ino->fsa_set_saved_status(inode::fsa_full);
+		    tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa());
+		    if(tmp_fsa == NULL)
+			throw Ememory("filtre.cpp:do_EFSA_transfert");
+		    try
+		    {
+			place_ino->fsa_attach(tmp_fsa);
+			tmp_fsa = NULL;
+		    }
+		    catch(...)
+		    {
+			if(tmp_fsa != NULL)
+			{
+			    delete tmp_fsa;
+			    tmp_fsa = NULL;
+			}
+			throw;
+		    }
+		}
+		    // else nothing to be done (in_place eventually has FSA and add_ino does nothing to add)
+	    }
+
+
 	    break;
+
 	default:
 	    throw SRC_BUG;
 	}
