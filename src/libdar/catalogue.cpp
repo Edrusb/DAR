@@ -122,6 +122,7 @@ namespace libdar
     static void unmk_signature(unsigned char sig, unsigned char & base, saved_status & state, bool isolated);
     static bool local_check_dirty_seq(escape *ptr);
     static void local_display_ea(user_interaction & dialog, const inode * ino, const string &prefix, const string &suffix, bool xml_output = false);
+    static string local_fsa_fam_to_string(const inode & ref);
 
     static inline string yes_no(bool val) { return (val ? "yes" : "no"); }
 
@@ -4502,8 +4503,8 @@ namespace libdar
 
 	if(!get_ui().get_use_listing())
 	{
-	    get_ui().printf(gettext("[data ][ EA  ][compr][S]| permission | user  | group | size  |          date                 |    filename\n"));
-	    get_ui().printf("------------------------+------------+-------+-------+-------+-------------------------------+------------\n");
+	    get_ui().printf(gettext("[data ][ EA  ][FSA][compr][S]| permission | user  | group | size  |          date                 |    filename\n"));
+	    get_ui().printf(gettext("-----------------------------+------------+-------+-------+-------+-------------------------------+------------\n"));
 	}
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
@@ -5200,6 +5201,8 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 
+	ret += "[" + local_fsa_fam_to_string(ref) + "]";
+
 	const file *fic = dynamic_cast<const file *>(&ref);
 	if(fic != NULL && fic->get_saved_status() == s_saved)
 	    ret += tools_get_compression_ratio(fic->get_storage_size(), fic->get_size());
@@ -5334,6 +5337,37 @@ namespace libdar
 		dialog.warning(prefix + key + suffix);
 	    }
 	}
+    }
+
+    static string local_fsa_fam_to_string(const inode & ref)
+    {
+	string ret = "";
+
+	if(ref.fsa_get_saved_status() != inode::fsa_none)
+	{
+	    fsa_scope sc = ref.fsa_get_famillies();
+	    bool upper = ref.fsa_get_saved_status() == inode::fsa_full;
+	    if(sc.find(fsaf_hfs_plus) != sc.end())
+		if(upper)
+		    ret += "H";
+		else
+		    ret += "h";
+	    else
+		ret += "-";
+
+	    if(sc.find(fsaf_linux_extX) != sc.end())
+		if(upper)
+		    ret += "L";
+		else
+		    ret += "l";
+	    else
+		ret += "-";
+	    ret += "-";
+	}
+	else
+	    ret = "---";
+
+	return ret;
     }
 
 } // end of namespace
