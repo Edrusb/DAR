@@ -504,10 +504,16 @@ namespace libdar
 	    fsa.push_back(ptr);
 	    ptr = NULL;
 #endif
-#ifdef EXT2_JOURNAL_DATA_FL
+#ifdef EXT3_JOURNAL_DATA_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_data_journalling, (f & EXT3_JOURNAL_DATA_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#else
+  #ifdef EXT2_JOURNAL_DATA_FL
 	    create_or_throw(ptr, fsaf_linux_extX, fsan_data_journalling, (f & EXT2_JOURNAL_DATA_FL) != 0);
 	    fsa.push_back(ptr);
 	    ptr = NULL;
+  #endif
 #endif
 #ifdef	EXT2_SECRM_FL
 	    create_or_throw(ptr, fsaf_linux_extX, fsan_secure_deletion, (f & EXT2_SECRM_FL) != 0);

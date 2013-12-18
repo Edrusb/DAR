@@ -1110,7 +1110,7 @@ namespace libdar
         {
 	    if(ea_size != NULL)
 		throw SRC_BUG;
-            ea_size = new (nothrow) infinint(ea->space_used());
+            ea_size = new (nothrow) infinint(ref->space_used());
 	    if(ea_size == NULL)
 		throw Ememory("inode::ea_attach");
             ea = ref;
@@ -1224,11 +1224,6 @@ namespace libdar
             delete ea;
             const_cast<ea_attributs *&>(ea) = NULL;
         }
-	if(ea_size != NULL)
-	{
-	    delete ea_size;
-	    const_cast<inode *>(this)->ea_size = NULL;
-	}
     }
 
     infinint inode::ea_get_size() const
@@ -1400,12 +1395,12 @@ namespace libdar
 
         if(ref != NULL && fsal == NULL)
         {
-	    if(fsa_size != NULL || fsal != NULL || fsa_famillies != NULL)
+	    if(fsa_size != NULL || fsa_famillies != NULL)
 		throw SRC_BUG;
 	    try
 	    {
-		fsa_size = new (nothrow) infinint (fsal->storage_size());
-		fsa_famillies = new(nothrow) infinint(fsa_scope_to_infinint(fsal->get_fsa_famillies()));
+		fsa_size = new (nothrow) infinint (ref->storage_size());
+		fsa_famillies = new(nothrow) infinint(fsa_scope_to_infinint(ref->get_fsa_famillies()));
 		if(fsa_size == NULL || fsa_famillies == NULL)
 		    throw Ememory("inode::fsa_attach");
 	    }
@@ -1436,11 +1431,6 @@ namespace libdar
             delete fsal;
             const_cast<inode *>(this)->fsal = NULL;
         }
-	if(fsa_size != NULL)
-	{
-	    delete fsa_size;
-	    const_cast<inode *>(this)->fsa_size = NULL;
-	}
     }
 
     const filesystem_specific_attribute_list *inode::get_fsa() const
@@ -4388,8 +4378,8 @@ namespace libdar
 	defile juillet = FAKE_ROOT;
 	const eod tmp_eod;
 
-	get_ui().printf(gettext("access mode    | user | group | size  |          date                 | [data ][ EA  ][compr][S]|   filename\n"));
-	get_ui().printf("---------------+------+-------+-------+-------------------------------+-------------------------+-----------\n");
+	get_ui().printf(gettext("access mode    | user | group | size  |          date                 | [data ][ EA  ][FSA][compr][S]|   filename\n"));
+	get_ui().printf(gettext("---------------+------+-------+-------+-------------------------------+------------------------------+-----------\n"));
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
 

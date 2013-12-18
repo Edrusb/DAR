@@ -714,6 +714,10 @@ namespace libdar
 	    return 'I';
 	case seqt_failed_backup:
 	    return '!';
+	case seqt_fsa:
+	    return 'S';
+	case seqt_fsa_crc:
+	    return 's';
 	default:
 	    throw SRC_BUG;
 	}
@@ -743,6 +747,10 @@ namespace libdar
 	    return seqt_dirty;
 	case '!':
 	    return seqt_failed_backup;
+	case 'S':
+	    return seqt_fsa;
+	case 's':
+	    return seqt_fsa_crc;
 	default:
 	    throw Erange("escape::char2type", gettext("Unknown escape sequence type"));
 	}
