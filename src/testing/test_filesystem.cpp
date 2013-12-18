@@ -155,8 +155,9 @@ static void test()
     infinint root_fs_device;
     infinint errors, skipped_dump;
     bool_mask all = true;
+    fsa_scope sc;
 
-    filesystem_backup fs = filesystem_backup(*ui, path("arbo"), true, bool_mask(true), false, false, false,false, root_fs_device, false);
+    filesystem_backup fs = filesystem_backup(*ui, path("arbo"), true, bool_mask(true), false, false, false,false, root_fs_device, false, sc);
 
     while(fs.read(p, errors, skipped_dump))
     {
@@ -207,18 +208,19 @@ static void re_test()
 	path where = "algi";
 	bool_mask all = true;
 	crit_constant_action todo =  crit_constant_action(data_preserve, EA_preserve);
-	filesystem_restore fs = filesystem_restore(*ui, where, true, true, all, inode::cf_all, true, false, &todo, false);
-	bool hasbeencreated, ea_restored, hard_link;
+	fsa_scope sc;
+	filesystem_restore fs = filesystem_restore(*ui, where, true, true, all, inode::cf_all, true, false, &todo, false, sc);
+	bool hasbeencreated, ea_restored, hard_link, fsa_restored;
 	libdar::filesystem_restore::action_done_for_data  data_restored;
 
 	cat->reset_read();
 
 	while(cat->read(e))
- 	    fs.write(e, data_restored, ea_restored, hasbeencreated, hard_link);
+ 	    fs.write(e, data_restored, ea_restored, hasbeencreated, hard_link, fsa_restored);
 
 	fs.reset_write();
-	fs.write(&det1, data_restored, ea_restored, hasbeencreated, hard_link);
-	fs.write(&det2, data_restored, ea_restored, hasbeencreated, hard_link);
+	fs.write(&det1, data_restored, ea_restored, hasbeencreated, hard_link, fsa_restored);
+	fs.write(&det2, data_restored, ea_restored, hasbeencreated, hard_link, fsa_restored);
     }
     catch(Egeneric & e)
     {
