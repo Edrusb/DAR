@@ -1017,7 +1017,7 @@ namespace libdar
     void tools_display_features(user_interaction & dialog, bool ea, bool largefile, bool nodump,
                                 bool special_alloc, U_I bits, bool thread_safe,
                                 bool libz, bool libbz2, bool liblzo2, bool libcrypto,
-				bool furtive_read)
+				bool furtive_read, bool FSA_extX, bool FSA_HFSP)
     {
 	NLS_SWAP_IN;
 	try
@@ -1037,6 +1037,8 @@ namespace libdar
 	    dialog.printf(gettext("   Thread safe support        : %s\n"), YES_NO(thread_safe));
 
 	    dialog.printf(gettext("   Furtive read mode support  : %s\n"), YES_NO(furtive_read));
+	    dialog.printf(gettext("   Linux ext2/3/4 FSA support : %s\n"), YES_NO(FSA_extX));
+	    dialog.printf(gettext("   Mac OS X HFS+ FSA support  : %s\n"), YES_NO(FSA_HFSP));
 	}
 	catch(...)
 	{
@@ -1061,7 +1063,9 @@ namespace libdar
 			       compile_time::libbz2(),
 			       compile_time::liblzo(),
 			       compile_time::libgcrypt(),
-			       compile_time::furtive_read());
+			       compile_time::furtive_read(),
+			       compile_time::FSA_linux_extX(),
+			       compile_time::FSA_HFS_plus());
 	switch(compile_time::system_endian())
 	{
 	case compile_time::big:

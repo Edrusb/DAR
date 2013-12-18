@@ -598,7 +598,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_APPEND_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
@@ -611,7 +611,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_COMPR_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
@@ -624,7 +624,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_NODUMP_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
@@ -637,7 +637,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_IMMUTABLE_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
@@ -650,7 +650,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_JOURNAL_DATA_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
@@ -663,7 +663,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_SECRM_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
@@ -676,7 +676,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_NOTAIL_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
@@ -689,7 +689,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_UNRM_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
@@ -702,7 +702,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_NOATIME_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
@@ -715,7 +715,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_DIRSYNC_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
@@ -728,7 +728,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_SYNC_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string(fsan_append_only).c_str(),
 				      target.c_str());
@@ -741,7 +741,7 @@ namespace libdar
 			    else
 				f &= ~EXT2_TOPDIR_FL;
 #else
-			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());

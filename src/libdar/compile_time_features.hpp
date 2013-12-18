@@ -99,6 +99,12 @@ namespace libdar
 
 	    /// returns whether libdar has been built with speed optimization for last directory
 	bool fast_dir();
+
+	    /// returns whether libdar has been built with support for linux ext2/3/4 FSA
+	bool FSA_linux_extX();
+
+	    /// returns whether libdar has been built with support for HFS+ FSA
+	bool FSA_HFS_plus();
     }
 
 } // end of namespace

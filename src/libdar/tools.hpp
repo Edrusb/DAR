@@ -307,6 +307,8 @@ namespace libdar
 	/// \param[in] liblzo2 whether lzo compression is available
         /// \param[in] libcrypto whether strong encryption is available
 	/// \param[in] furtive_read whether furtive read access is available
+	/// \param[in] FSA_extX whether extX FSA are supported
+	/// \param[in] FSA_HFSP whether HFS+ FSA are supported
 	/// \note this routine is deprecated, as it needs a change in its interface
 	/// upon each new feature addition, use the other tools_display_features()
 	/// routing, with a single argument (see below).
@@ -321,7 +323,9 @@ namespace libdar
                                        bool libbz2,
 				       bool liblzo2,
                                        bool libcrypto,
-				       bool furtive_read);
+				       bool furtive_read,
+				       bool FSA_extX,
+				       bool FSA_HFSP);
 
         /// display the compilation time features of libdar
 

@@ -52,11 +52,7 @@ namespace libdar
 
 	bool nodump()
 	{
-#ifdef LIBDAR_NODUMP_FEATURE
-	    return true;
-#else
-	    return false;
-#endif
+	    return FSA_linux_extX();
 	}
 
 	bool special_alloc()
@@ -172,6 +168,21 @@ namespace libdar
 	    return false;
 #endif
 	}
+
+	bool FSA_linux_extX()
+	{
+#ifdef LIBDAR_NODUMP_FEATURE
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
+	bool FSA_HFS_plus()
+	{
+	    return false;
+	}
+
 
     } // end of compile_time nested namespace
 } // end of libdar namespace
