@@ -351,8 +351,8 @@ AC_ARG_ENABLE(  [ea-support],
 
 AC_MSG_CHECKING([ext2fs.h availability])
 AC_ARG_ENABLE(  [nodump-flag],
-                AC_HELP_STRING(--disable-nodump-flag, [deactivate the "ext2/3 nodump flag" feature check]),
-                [AC_MSG_RESULT([nodump flag disabled])],
+                AC_HELP_STRING(--disable-nodump-flag, [disable the ext2/3/4 Filesystem Specific Attribute support, in particular the --nodump feature]),
+                [AC_MSG_RESULT([extX FSA disabled])],
                 [AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
                                                     #include <ext2fs/ext2_fs.h>
                                                     #if HAVE_SYS_IOCTL_H
@@ -709,12 +709,15 @@ else
   echo "NO"
 fi
 
-echo -n "   ext2fs NODUMP flag support : "
+echo -n "   extX FSA / nodump support  : "
 if [ "$local_nodump_feature" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
 fi
+
+echo -n "   HFS+ FSA support           : "
+echo "NO"
 
 echo -n "   Special allocation scheme  : "
 if [ "$local_special_alloc" = "yes" ] ; then
@@ -792,7 +795,7 @@ else
   echo "NO"
 fi
 
-echo -n "   posix fadvise support : "
+echo -n "   posix fadvise support  : "
 if  [ "$local_posix_fadvise" = "yes" ] ; then
     echo "YES"
 else
