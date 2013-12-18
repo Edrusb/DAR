@@ -754,7 +754,7 @@ else
    echo "NO"
 fi
 
-echo -n "   posix fadvise support  : "
+echo -n "   posix fadvise support      : "
 if  [ "$local_posix_fadvise" = "yes" ] ; then
     echo "YES"
 else
