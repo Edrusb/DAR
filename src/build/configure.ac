@@ -754,6 +754,13 @@ else
    echo "NO"
 fi
 
+echo -n "   posix fadvise support  : "
+if  [ "$local_posix_fadvise" = "yes" ] ; then
+    echo "YES"
+else
+    echo "NO"
+fi
+
 echo ""
 echo "  DAR SUITE command line programs:"
 echo -n "   Long options available : "
@@ -793,13 +800,6 @@ if  [ "$doxygen" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
-fi
-
-echo -n "   posix fadvise support  : "
-if  [ "$local_posix_fadvise" = "yes" ] ; then
-    echo "YES"
-else
-    echo "NO"
 fi
 
 if [ "$static_pb" = "yes" -a "$build_static" = "yes" ]; then
