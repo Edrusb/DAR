@@ -771,8 +771,13 @@ namespace libdar
 		else // not reading from a sar
 		{
 		    infinint arch_size = get_level2_size();
-		    dialog.printf(gettext("Archive size is: %i bytes\n"), &arch_size);
-		    dialog.printf(gettext("Previous archive size does not include headers present in each slice\n"));
+		    if(arch_size > 0)
+		    {
+			dialog.printf(gettext("Archive size is: %i bytes\n"), &arch_size);
+			dialog.printf(gettext("Previous archive size does not include headers present in each slice\n"));
+		    }
+		    else
+			dialog.printf(gettext("Archive size is unknown (reading from a pipe)"));
 		}
 	    }
 	    catch(Erange & e)
@@ -2170,12 +2175,19 @@ namespace libdar
 
     infinint archive::get_level2_size()
     {
+	generic_file *level1 = stack.get_by_label(LIBDAR_STACK_LABEL_LEVEL1);
 	compressor *level2 = NULL;
+
 	stack.find_first_from_top(level2);
 	if(level2 == NULL)
 	    throw SRC_BUG;
-        level2->skip_to_eof();
-        return level2->get_position();
+	if(dynamic_cast<trivial_sar *>(level1) == NULL)
+	{
+	    level2->skip_to_eof();
+	    return level2->get_position();
+	}
+	else
+	    return 0;
     }
 
     const directory *archive::get_dir_object(const string & dir) const
