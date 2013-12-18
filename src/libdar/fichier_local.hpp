@@ -102,6 +102,11 @@ namespace libdar
         bool skip_relative(S_I x);
         infinint get_position();
 
+	    /// provide the low level filedescriptor to the call and terminate()
+	    ///
+	    /// \note this the caller duty to close() the provided filedescriptor
+	S_I give_fd_and_terminate() { int ret = filedesc; filedesc = -1; terminate(); return ret; };
+
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(fichier_local);
 #endif
@@ -127,7 +132,7 @@ namespace libdar
 
 	void copy_from(const fichier_local & ref);
 	void copy_parent_from(const fichier_local & ref);
-	void detruit() { close(filedesc); filedesc = -1; };
+	void detruit() { if(filedesc >= 0) close(filedesc); filedesc = -1; };
 	int advise_to_int(advise arg) const;
     };
 

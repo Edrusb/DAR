@@ -158,6 +158,9 @@ namespace libdar
 
     void fichier_local::fadvise(advise adv) const
     {
+	if(is_terminated())
+	    throw SRC_BUG;
+
 #if HAVE_POSIX_FADVISE
 	 int ret = posix_fadvise(filedesc, 0, 0, advise_to_int(adv));
 
@@ -170,6 +173,9 @@ namespace libdar
 
     void fichier_local::fsync() const
     {
+	if(is_terminated())
+	    throw SRC_BUG;
+
 	if(fdatasync(filedesc) < 0)
 	    throw Erange("fichier_local::fsync", string("Failed sync the slice (fdatasync): ") + strerror(errno));
     }
