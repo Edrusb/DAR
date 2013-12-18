@@ -63,6 +63,8 @@ extern "C"
 #include "filesystem_specific_attribute.hpp"
 #include "cygwin_adapt.hpp"
 #include "deci.hpp"
+#include "fichier_local.hpp"
+#include "compile_time_features.hpp"
 
 using namespace std;
 
@@ -459,9 +461,20 @@ namespace libdar
     void filesystem_specific_attribute_list::fill_extX_FSA_with(const std::string & target)
     {
 #ifdef LIBDAR_NODUMP_FEATURE
-	S_I fd = open(target.c_str(), O_RDONLY|O_BINARY|O_NONBLOCK);
+	S_I fd = -1;
+
+	try
+	{
+	    fichier_local ftmp = fichier_local(target, compile_time::furtive_read());
+	    fd = ftmp.give_fd_and_terminate();
+	}
+	catch(Egeneric & e)
+	{
+	    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading (opening) extX familly FSA: ")) + e.get_message());
+	}
+
 	if(fd < 0)
-	    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading (opening) extX familly FSA: ")) + strerror(errno));
+	    throw SRC_BUG;
 
 	try
 	{
@@ -562,9 +575,20 @@ namespace libdar
 
 	if(has_extX_FSA)
 	{
-	    S_I fd = open(target.c_str(), O_RDONLY|O_BINARY|O_NONBLOCK);
+	    S_I fd = -1;
+
+	    try
+	    {
+		fichier_local ftmp = fichier_local(target, compile_time::furtive_read());
+		fd = ftmp.give_fd_and_terminate();
+	    }
+	    catch(Egeneric & e)
+	    {
+		throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed setting (opening) extX familly FSA: ")) + e.get_message());
+	    }
+
 	    if(fd < 0)
-		throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed setting (opening) extX familly FSA: ")) + strerror(errno));
+		throw SRC_BUG;
 
 	    try
 	    {
