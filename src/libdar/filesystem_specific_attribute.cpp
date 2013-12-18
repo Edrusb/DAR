@@ -23,7 +23,35 @@
 
 extern "C"
 {
-
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+#ifdef LIBDAR_NODUMP_FEATURE
+#if HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
+#if LIBDAR_NODUMP_FEATURE == NODUMP_LINUX
+#include <linux/ext2_fs.h>
+#else
+#if LIBDAR_NODUMP_FEATURE == NODUMP_EXT2FS
+#include <ext2fs/ext2_fs.h>
+#else
+#error "unknown location of ext2_fs.h include file"
+#endif
+#endif
+#endif
 }
 
 #include <new>
@@ -33,6 +61,8 @@ extern "C"
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "filesystem_specific_attribute.hpp"
+#include "cygwin_adapt.hpp"
+#include "deci.hpp"
 
 using namespace std;
 
@@ -88,18 +118,6 @@ namespace libdar
     const U_I FAM_SIG_WIDTH = 1;
     const U_I NAT_SIG_WIDTH = 2;
 
-#define FSA_READ(FSA_TYPE, FAMILLY, TARGET)		   \
-	try						   \
-	{						   \
-	    ptr = new (nothrow) FSA_TYPE(FAMILLY, TARGET); \
-	    if(ptr == NULL)                                \
-		throw SRC_BUG;                             \
-	    fsa.push_back(ptr);                            \
-	}                                                  \
-	catch(Erange & e)                                  \
-	{                                                  \
-	    /* nothing to do */				   \
-	}
 
     static bool compare_for_sort(const filesystem_specific_attribute *a, const filesystem_specific_attribute *b)
     {
@@ -205,19 +223,21 @@ namespace libdar
 		case fsan_unset:
 		    throw SRC_BUG;
 		case fsan_creation_date:
-		    ptr = new (nothrow) fsa_creation_date(f, fam);
+		    ptr = new (nothrow) fsa_infinint(f, fam, nat);
 		    break;
+		case fsan_append_only:
 		case fsan_compressed:
-		    ptr = new (nothrow) fsa_compressed(f, fam);
-		    break;
 		case fsan_no_dump:
-		    ptr = new (nothrow) fsa_nodump(f, fam);
-		    break;
 		case fsan_immutable:
-		    ptr = new (nothrow) fsa_immutable(f, fam);
-		    break;
+		case fsan_data_journalling:
+		case fsan_secure_deletion:
+		case fsan_no_tail_merging:
 		case fsan_undeletable:
-		    ptr = new (nothrow) fsa_undeleted(f, fam);
+		case fsan_noatime_update:
+		case fsan_synchronous_directory:
+		case fsan_synchronous_update:
+		case fsan_top_of_dir_hierarchy:
+		    ptr = new (nothrow) fsa_bool(f, fam, nat);
 		    break;
 		default:
 		    throw SRC_BUG;
@@ -264,21 +284,16 @@ namespace libdar
     void filesystem_specific_attribute_list::get_fsa_from_filesystem_for(const string & target,
 									 const fsa_scope & scope)
     {
-	filesystem_specific_attribute *ptr = NULL;
-
 	clear();
 
 	if(scope.find(fsaf_hfs_plus) != scope.end())
 	{
-	    FSA_READ(fsa_creation_date, fsaf_hfs_plus, target);
+		// throw Efeature("reading HFS+ FSA familly");
 	}
 
 	if(scope.find(fsaf_linux_extX) != scope.end())
 	{
-	    FSA_READ(fsa_compressed, fsaf_linux_extX, target);
-	    FSA_READ(fsa_nodump, fsaf_linux_extX, target);
-	    FSA_READ(fsa_immutable, fsaf_linux_extX, target);
-	    FSA_READ(fsa_undeleted, fsaf_linux_extX, target);
+	    fill_extX_FSA_with(target);
 	}
 	update_familles();
 	sort_fsa();
@@ -288,32 +303,13 @@ namespace libdar
 								       const fsa_scope & scope,
 								       user_interaction & ui) const
     {
-	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
 	bool ret = false;
 
-	while(it != fsa.end())
-	{
-	    if(*it == NULL)
-		throw SRC_BUG;
-	    if(scope.find((*it)->get_familly()) != scope.end())
-	    {
-		try
-		{
-		    (*it)->set_to_fs(target);
-		    ret = true;
-		}
-		catch(Erange & e)
-		{
-		    string fsa_name = fsa_familly_to_string((*it)->get_familly()) + "/" + fsa_nature_to_string((*it)->get_nature());
-		    string msg = e.get_message();
+	if(scope.find(fsaf_linux_extX) != scope.end())
+	    ret |= set_extX_FSA_to(ui, target);
 
-		    ui.printf("Error while setting filesystem specific attribute %s: %s",
-			      &fsa_name,
-			      &msg);
-		}
-	    }
-	    ++it;
-	}
+	if(scope.find(fsaf_hfs_plus) != scope.end())
+	    ret |= set_hfs_FSA_to(ui, target);
 
 	return ret;
     }
@@ -330,14 +326,16 @@ namespace libdar
 
     infinint filesystem_specific_attribute_list::storage_size() const
     {
-	infinint ret = 0;
+	infinint ret = infinint(size()).get_storage_size();
 	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
+	infinint overhead = familly_to_signature(fsaf_hfs_plus).size()
+	    + nature_to_signature(fsan_creation_date).size();
 
 	while(it != fsa.end())
 	{
 	    if(*it == NULL)
 		throw SRC_BUG;
-	    ret += (*it)->storage_size();
+	    ret += (*it)->storage_size() + overhead;
 	    ++it;
 	}
 
@@ -393,11 +391,6 @@ namespace libdar
 	}
     }
 
-    void filesystem_specific_attribute_list::sort_fsa()
-    {
-	sort(fsa.begin(), fsa.end(), compare_for_sort);
-    }
-
     void filesystem_specific_attribute_list::add(const filesystem_specific_attribute & ref)
     {
 	U_I index = 0;
@@ -448,6 +441,342 @@ namespace libdar
     }
 
 
+    void filesystem_specific_attribute_list::sort_fsa()
+    {
+	sort(fsa.begin(), fsa.end(), compare_for_sort);
+    }
+
+    template <class T, class U> void create_or_throw(T *& ref, fsa_familly f, fsa_nature n, const U & val)
+    {
+	if(ref != NULL)
+	    throw SRC_BUG;
+
+	ref = new (std::nothrow) T(f, n, val);
+	if(ref == NULL)
+	    throw Ememory("template create_or_throw");
+    }
+
+    void filesystem_specific_attribute_list::fill_extX_FSA_with(const std::string & target)
+    {
+#ifdef LIBDAR_NODUMP_FEATURE
+	S_I fd = open(target.c_str(), O_RDONLY|O_BINARY|O_NONBLOCK);
+	if(fd < 0)
+	    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading (opening) extX familly FSA: ")) + strerror(errno));
+
+	try
+	{
+	    S_I f = 0;
+	    fsa_bool * ptr = NULL;
+
+	    if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
+		throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading extX familly FSA: ")) + strerror(errno));
+
+#ifdef EXT2_APPEND_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_append_only, (f & EXT2_APPEND_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+#ifdef EXT2_COMPR_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_compressed, (f & EXT2_COMPR_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+#ifdef EXT2_NODUMP_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_no_dump, (f & EXT2_NODUMP_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+#ifdef EXT2_IMMUTABLE_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_immutable, (f & EXT2_IMMUTABLE_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+#ifdef EXT2_JOURNAL_DATA_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_data_journalling, (f & EXT2_JOURNAL_DATA_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+#ifdef	EXT2_SECRM_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_secure_deletion, (f & EXT2_SECRM_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+#ifdef EXT2_NOTAIL_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_no_tail_merging, (f & EXT2_NOTAIL_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+#ifdef	EXT2_UNRM_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_undeletable, (f & EXT2_UNRM_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+#ifdef EXT2_NOATIME_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_noatime_update, (f & EXT2_NOATIME_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+#ifdef EXT2_DIRSYNC_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_synchronous_directory, (f & EXT2_DIRSYNC_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+#ifdef EXT2_SYNC_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_synchronous_update, (f & EXT2_SYNC_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+#ifdef EXT2_TOPDIR_FL
+	    create_or_throw(ptr, fsaf_linux_extX, fsan_top_of_dir_hierarchy, (f & EXT2_TOPDIR_FL) != 0);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+#endif
+	}
+	catch(...)
+	{
+	    close(fd);
+	    throw;
+	}
+	close(fd);
+#else
+	    // nothing to do, as this FSA has not been activated at compilation time
+#endif
+    }
+
+    bool filesystem_specific_attribute_list::set_extX_FSA_to(user_interaction & ui, const std::string & target) const
+    {
+	bool ret = false;
+	bool has_extX_FSA = false;
+	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
+
+	while(!has_extX_FSA && it != fsa.end())
+	{
+	    if(*it == NULL)
+		throw SRC_BUG;
+	    if((*it)->get_familly() == fsaf_linux_extX)
+		has_extX_FSA = true;
+	    ++it;
+	}
+
+#ifdef LIBDAR_NODUMP_FEATURE
+
+	if(has_extX_FSA)
+	{
+	    S_I fd = open(target.c_str(), O_RDONLY|O_BINARY|O_NONBLOCK);
+	    if(fd < 0)
+		throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed setting (opening) extX familly FSA: ")) + strerror(errno));
+
+	    try
+	    {
+		S_I f = 0;
+		const fsa_bool *it_bool = NULL;
+
+		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
+		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading exiting extX familly FSA: ")) + strerror(errno));
+
+		for(it = fsa.begin() ; it != fsa.end() ; ++it)
+		{
+		    if(*it == NULL)
+			throw SRC_BUG;
+
+		    it_bool = dynamic_cast<const fsa_bool *>(*it);
+
+		    if((*it)->get_familly() == fsaf_linux_extX)
+		    {
+			switch((*it)->get_nature())
+			{
+			case fsan_unset:
+			    throw SRC_BUG;
+			case fsan_creation_date:
+			    throw SRC_BUG; // unknown nature for this familly type
+			case fsan_append_only:
+			    if(it_bool == NULL)
+				throw SRC_BUG; // should be a boolean
+#ifdef EXT2_APPEND_FL
+			    if(it_bool->get_value())
+				f |= EXT2_APPEND_FL;
+			    else
+				f &= ~EXT2_APPEND_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string((*it)->get_nature()).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			case fsan_compressed:
+#ifdef EXT2_COMPR_FL
+			    if(it_bool->get_value())
+				f |= EXT2_COMPR_FL;
+			    else
+				f &= ~EXT2_COMPR_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string((*it)->get_nature()).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			case fsan_no_dump:
+#ifdef EXT2_NODUMP_FL
+			    if(it_bool->get_value())
+				f |= EXT2_NODUMP_FL;
+			    else
+				f &= ~EXT2_NODUMP_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string((*it)->get_nature()).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			case fsan_immutable:
+#ifdef EXT2_IMMUTABLE_FL
+			    if(it_bool->get_value())
+				f |= EXT2_IMMUTABLE_FL;
+			    else
+				f &= ~EXT2_IMMUTABLE_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string((*it)->get_nature()).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			case fsan_data_journalling:
+#ifdef EXT2_JOURNAL_DATA_FL
+			    if(it_bool->get_value())
+				f |= EXT2_JOURNAL_DATA_FL;
+			    else
+				f &= ~EXT2_JOURNAL_DATA_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string((*it)->get_nature()).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			case fsan_secure_deletion:
+#ifdef EXT2_SECRM_FL
+			    if(it_bool->get_value())
+				f |= EXT2_SECRM_FL;
+			    else
+				f &= ~EXT2_SECRM_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string((*it)->get_nature()).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			case fsan_no_tail_merging:
+#ifdef EXT2_NOTAIL_FL
+			    if(it_bool->get_value())
+				f |= EXT2_NOTAIL_FL;
+			    else
+				f &= ~EXT2_NOTAIL_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string((*it)->get_nature()).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			case fsan_undeletable:
+#ifdef EXT2_UNRM_FL
+			    if(it_bool->get_value())
+				f |= EXT2_UNRM_FL;
+			    else
+				f &= ~EXT2_UNRM_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string((*it)->get_nature()).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			case fsan_noatime_update:
+#ifdef EXT2_NOATIME_FL
+			    if(it_bool->get_value())
+				f |= EXT2_NOATIME_FL;
+			    else
+				f &= ~EXT2_NOATIME_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string((*it)->get_nature()).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			case fsan_synchronous_directory:
+#ifdef EXT2_DIRSYNC_FL
+			    if(it_bool->get_value())
+				f |= EXT2_DIRSYNC_FL;
+			    else
+				f &= ~EXT2_DIRSYNC_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string((*it)->get_nature()).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			case fsan_synchronous_update:
+#ifdef EXT2_SYNC_FL
+			    if(it_bool->get_value())
+				f |= EXT2_SYNC_FL;
+			    else
+				f &= ~EXT2_SYNC_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string(fsan_append_only).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			case fsan_top_of_dir_hierarchy:
+#ifdef EXT2_TOPDIR_FL
+			    if(it_bool->get_value())
+				f |= EXT2_TOPDIR_FL;
+			    else
+				f &= ~EXT2_TOPDIR_FL;
+#else
+			    ui.printf(gettext("Warning: FSA %s/%s support has not been activated at compilation time, cannot restore it for inode %s"),
+				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_nature_to_string((*it)->get_nature()).c_str(),
+				      target.c_str());
+#endif
+			    break;
+			default:
+			    throw SRC_BUG;
+			}
+		    }
+		}
+
+		if(ioctl(fd, EXT2_IOC_SETFLAGS, &f) < 0)
+		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed set extX familly FSA: ")) + strerror(errno));
+		ret = true;
+	    }
+	    catch(...)
+	    {
+		close(fd);
+		throw;
+	    }
+	    close(fd);
+	}
+
+#else
+	if(has_extX_FSA)
+	{
+	    ui.printf(gettext("Warning! %S Filesystem Specific Attribute support have not been activated at compilation time and could not be restored for %s"),
+		      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+		      target.c_str());
+	}
+#endif
+
+	return ret;
+    }
+
     string filesystem_specific_attribute_list::familly_to_signature(fsa_familly f)
     {
 	string ret;
@@ -484,17 +813,41 @@ namespace libdar
 	case fsan_creation_date:
 	    ret = "aa";
 	    break;
+	case fsan_append_only:
+	    ret = "ba";
+	    break;
 	case fsan_compressed:
-	    ret = "ab";
+	    ret = "bb";
 	    break;
 	case fsan_no_dump:
-	    ret = "ac";
+	    ret = "bc";
 	    break;
 	case fsan_immutable:
-	    ret = "ad";
+	    ret = "bd";
+	    break;
+	case fsan_data_journalling:
+	    ret = "be";
+	    break;
+	case fsan_secure_deletion:
+	    ret = "bf";
+	    break;
+	case fsan_no_tail_merging:
+	    ret = "bg";
 	    break;
 	case fsan_undeletable:
-	    ret = "ae";
+	    ret = "bh";
+	    break;
+	case fsan_noatime_update:
+	    ret = "bi";
+	    break;
+	case fsan_synchronous_directory:
+	    ret = "bj";
+	    break;
+	case fsan_synchronous_update:
+	    ret = "bk";
+	    break;
+	case fsan_top_of_dir_hierarchy:
+	    ret = "bl";
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -528,64 +881,107 @@ namespace libdar
 	    throw SRC_BUG;
 	if(sig == "aa")
 	    return fsan_creation_date;
-	if(sig == "ab")
+	if(sig == "ba")
+	    return fsan_append_only;
+	if(sig == "bb")
 	    return fsan_compressed;
-	if(sig == "ac")
+	if(sig == "bc")
 	    return fsan_no_dump;
-	if(sig == "ad")
+	if(sig == "bd")
 	    return fsan_immutable;
-	if(sig == "ae")
+	if(sig == "be")
+	    return fsan_data_journalling;
+	if(sig == "bf")
+	    return fsan_secure_deletion;
+	if(sig == "bg")
+	    return fsan_no_tail_merging;
+	if(sig == "bh")
 	    return fsan_undeletable;
+	if(sig == "bi")
+	    return fsan_noatime_update;
+	if(sig == "bj")
+	    return fsan_synchronous_directory;
+	if(sig == "bk")
+	    return fsan_synchronous_update;
+	if(sig == "bl")
+	    return fsan_top_of_dir_hierarchy;
+
 	if(sig == "XX")
 	    throw SRC_BUG;  // resevered for field extension if necessary in the future
 	throw SRC_BUG;
     }
 
+
+
 ///////////////////////////////////////////////////////////////////////////////////
 
-
-    fsa_creation_date::fsa_creation_date(fsa_familly f, const string & target):
-	filesystem_specific_attribute(f, target)
+    fsa_bool::fsa_bool(generic_file & f, fsa_familly fam, fsa_nature nat):
+	filesystem_specific_attribute(f, fam, nat)
     {
-	if(f != fsaf_hfs_plus)
-	    throw Efeature("unknown familly for create_date Filesysttem Specific Attribute");
-	set_nature(fsan_creation_date);
-	throw Erange("fsa_creation_date::fsa_creation_date", "not yet implemented");
+	char ch;
+	S_I lu = f.read(&ch, 1);
+
+	if(lu == 1)
+	{
+	    switch(ch)
+	    {
+	    case 'T':
+		val = true;
+		break;
+	    case 'F':
+		val = false;
+		break;
+	    default:
+		throw Edata(gettext("Unexepected value for boolean FSA, data corruption may have occurred"));
+	    }
+	}
+	else
+	    throw Erange("fsa_bool::fsa_bool", string(gettext("Error while reading FSA: ")) + strerror(errno));
     }
 
-    fsa_creation_date::fsa_creation_date(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam)
+
+    bool fsa_bool::equal_value_to(const filesystem_specific_attribute & ref) const
     {
-	if(fam != fsaf_hfs_plus)
-	    throw Efeature("unknown familly for create_date Filesysttem Specific Attribute");
-	set_nature(fsan_creation_date);
-	date.read(f);
-    }
+	const fsa_bool *ptr = dynamic_cast<const fsa_bool *>(&ref);
 
-    string fsa_creation_date::show_val() const
-    {
-	return tools_display_date(date);
-    }
-
-
-    void fsa_creation_date::write(generic_file & f) const
-    {
-	date.dump(f);
-    }
-
-    void fsa_creation_date::set_to_fs(const string & target)
-    {
-	throw Efeature("hfs+ create date writing");
-    }
-
-    bool fsa_creation_date::equal_value_to(const filesystem_specific_attribute & ref) const
-    {
-	const fsa_creation_date *ref_ptr = dynamic_cast<const fsa_creation_date *>(&ref);
-
-	if(ref_ptr != NULL)
-	    return date == ref_ptr->date;
+	if(ptr != NULL)
+	    return val == ptr->val;
 	else
 	    return false;
     }
+
+///////////////////////////////////////////////////////////////////////////////////
+
+    fsa_infinint::fsa_infinint(generic_file & f, fsa_familly fam, fsa_nature nat):
+	filesystem_specific_attribute(f, fam, nat)
+    {
+	val.read(f);
+	mode = integer;
+    }
+
+    string fsa_infinint::show_val() const
+    {
+	switch(mode)
+	{
+	case integer:
+	    return deci(val).human();
+	case date:
+	    return tools_display_date(val);
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
+    bool fsa_infinint::equal_value_to(const filesystem_specific_attribute & ref) const
+    {
+	const fsa_infinint *ptr = dynamic_cast<const fsa_infinint *>(&ref);
+
+	if(ptr != NULL)
+	    return val == ptr->val;
+	else
+	    return false;
+    }
+
 
 } // end of namespace
 

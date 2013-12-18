@@ -1433,13 +1433,20 @@ namespace libdar
 				const ea_attributs *ea = x_ino->get_ea();
 				ea_restored = raw_set_ea(x_nom, *ea, spot_display, *ea_mask);
 
-				    // to accomodate MacOS X we set again mtime to its expected value
-				    // because restoring EA modifies mtime on this OS. This does not
-				    // hurt other Unix systems.
-				make_date(*x_ino, spot_display, what_to_check);
 			    }
 			    else
 				ea_restored = true;
+			}
+
+			    // to accomodate MacOS X we set again mtime to its expected value
+			    // because restoring EA modifies mtime on this OS.
+			    // same point but concerning extX FSA, setting them may modify atime
+			    // unless furtive read is available.
+			    // This does not hurt other Unix systems.
+			if(has_fsa_saved || has_ea_saved)
+			{
+			    if(!empty)
+				make_date(*x_ino, spot_display, what_to_check);
 			}
 
 		    }

@@ -43,7 +43,20 @@ namespace libdar
     enum fsa_familly { fsaf_hfs_plus, fsaf_linux_extX };
 	// note: adding new fsa_familly need updating all_fsa_familly()
 
-    enum fsa_nature { fsan_unset, fsan_creation_date, fsan_compressed, fsan_no_dump, fsan_immutable, fsan_undeletable };
+    enum fsa_nature { fsan_unset,
+		      fsan_creation_date,
+		      fsan_append_only,
+		      fsan_compressed,
+		      fsan_no_dump,
+		      fsan_immutable,
+		      fsan_data_journalling,
+		      fsan_secure_deletion,
+		      fsan_no_tail_merging,
+		      fsan_undeletable,
+		      fsan_noatime_update,
+		      fsan_synchronous_directory,
+		      fsan_synchronous_update,
+		      fsan_top_of_dir_hierarchy };
 
     extern std::string fsa_familly_to_string(fsa_familly f);
     extern std::string fsa_nature_to_string(fsa_nature n);

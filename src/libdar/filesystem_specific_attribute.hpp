@@ -41,21 +41,26 @@ namespace libdar
 
 
 	/// Filesystem Specific Attributes (FSA) class
+	///
+	/// this class handle the storage of attributes into and from the archive
+	/// the have not filesystem specific knownledge. This aspect is managed
+	/// by filesystem_specific_attribute_list that upon system call will create
+	/// the liste of FSA and given the list of FSA will try to set them back to the
+	/// filesystem
 
     class filesystem_specific_attribute
     {
     public:
 
-	    // public methods
+	    /// constructor used to before reading the FSA from filesystem
 
-	    /// inherited class must provide their equivalent constructor to the following one:
 	    /// \note when the underlying filesystem does not support the requested EA the constructor
 	    /// of the inherited class should throw an exception of type Erange. Only valid object should
 	    /// be built, that is object containing the value of the FSA found on the filesystem.
-	filesystem_specific_attribute(fsa_familly f, const std::string & target) { fam = f; nat = fsan_unset; };
+	filesystem_specific_attribute(fsa_familly f) { fam = f; nat = fsan_unset; };
 
-	    /// \note the same note as for the first constructor do apply here
-	filesystem_specific_attribute(generic_file & f, fsa_familly xfam) { fam = xfam; nat = fsan_unset; };
+	    /// constructor used to read a FSA from a libdar archive
+	filesystem_specific_attribute(generic_file & f, fsa_familly xfam, fsa_nature xnat) { fam = xfam; nat = xnat; };
 
 	    /// virtual destructor for inherited classes
 	virtual ~filesystem_specific_attribute() {};
@@ -86,10 +91,7 @@ namespace libdar
 	    /// write down  to libdar archive
 	virtual void write(generic_file & f) const = 0;
 
-	    ///set attribute to an existing inode in filesystem
-	virtual void set_to_fs(const std::string & target) = 0;
-
-	    /// give the storage size for the EA
+	    /// give the storage size for the FSA
 	virtual infinint storage_size() const = 0;
 
 	    /// provides a way to copy objects without having to know the more specific class of the object
@@ -175,6 +177,14 @@ namespace libdar
 	void add(const filesystem_specific_attribute & ref); // add an entry without updating the "familles" field
 	void sort_fsa();
 
+	void fill_extX_FSA_with(const std::string & target);
+
+	    /// \note return true if some FSA could be set
+	bool set_extX_FSA_to(user_interaction & ui, const std::string & target) const;
+
+	    /// \note return true if some FSA could be set
+	bool set_hfs_FSA_to(user_interaction & ui, const std::string & target) const { throw Efeature("setting of HFS+ FSA"); };
+
 	static std::string familly_to_signature(fsa_familly f);
 	static std::string nature_to_signature(fsa_nature n);
 	static fsa_familly signature_to_familly(const std::string & sig);
@@ -194,102 +204,55 @@ namespace libdar
 	return ret;
     }
 
+///////////////////////////////////////////////////////////////////////////
 
-    class fsa_creation_date : public filesystem_specific_attribute
+    class fsa_bool : public filesystem_specific_attribute
     {
     public:
-	fsa_creation_date(fsa_familly f, const std::string & target);
-	fsa_creation_date(generic_file & f, fsa_familly fam);
+	fsa_bool(fsa_familly f, fsa_nature n, bool xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); };
+	fsa_bool(generic_file & f, fsa_familly fam, fsa_nature nat);
 
-//>>> see fstat64 field st_birthtimespec renamed st_birthtim by POSIX 2008
+	bool get_value() const { return val; };
 
-	    // inherited from filesystem_specific_attribute
-	virtual std::string show_val() const;
-	virtual void write(generic_file & f) const;
-	virtual void set_to_fs(const std::string & target);
-	virtual infinint storage_size() const { return date.get_storage_size(); };
+	    /// inherited from filesystem_specific_attribute
+	virtual std::string show_val() const { return val ? gettext("true") : gettext("false"); };
+	virtual void write(generic_file & f) const { f.write(val ? "T" : "F", 1); };
+	virtual infinint storage_size() const { return 1; };
 	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
 
     protected:
 	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const;
 
     private:
-	infinint date;
+	bool val;
     };
 
 ///////////////////////////////////////////////////////////////////////////
 
-    class fsa_compressed : public filesystem_specific_attribute
+    class fsa_infinint : public filesystem_specific_attribute
     {
     public:
-       	fsa_compressed(fsa_familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
-	fsa_compressed(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
+	fsa_infinint(fsa_familly f, fsa_nature n, bool xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); mode = integer; };
+	fsa_infinint(generic_file & f, fsa_familly fam, fsa_nature nat);
 
-	    // inherited from filesystem_specific_attribute
-	virtual std::string show_val() const { return ""; };
-	virtual void write(generic_file & f) const {};
-	virtual void set_to_fs(const std::string & target) {};
-	virtual infinint storage_size() const { return sizeof(char); };
+	const infinint & get_value() const { return val; };
+
+	enum show_mode { integer, date };
+	void set_show_mode(show_mode m) { mode = m; };
+
+	    /// inherited from filesystem_specific_attribute
+	virtual std::string show_val() const;
+	virtual void write(generic_file & f) const { val.dump(f); };
+	virtual infinint storage_size() const { return val.get_storage_size(); };
 	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
 
     protected:
-	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const { return true; };
+	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const;
+
+    private:
+	infinint val;
+	show_mode mode;
     };
-
-
-    class fsa_nodump : public filesystem_specific_attribute
-    {
-    public:
-       	fsa_nodump(fsa_familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
-	fsa_nodump(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
-
-	    // inherited from filesystem_specific_attribute
-	virtual std::string show_val() const { return ""; };
-	virtual void write(generic_file & f) const {};
-	virtual void set_to_fs(const std::string & target) {};
-	virtual infinint storage_size() const { return sizeof(char); };
-	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
-
-    protected:
-	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const { return true; };
-    };
-
-
-    class fsa_immutable : public filesystem_specific_attribute
-    {
-    public:
-       	fsa_immutable(fsa_familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
-	fsa_immutable(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
-
-	    // inherited from filesystem_specific_attribute
-	virtual std::string show_val() const { return ""; };
-	virtual void write(generic_file & f) const {};
-	virtual void set_to_fs(const std::string & target) {};
-	virtual infinint storage_size() const { return sizeof(char); };
-	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
-
-    protected:
-	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const { return true; };
-    };
-
-
-    class fsa_undeleted : public filesystem_specific_attribute
-    {
-    public:
-       	fsa_undeleted(fsa_familly f, const std::string & target): filesystem_specific_attribute(f, target) {};
-	fsa_undeleted(generic_file & f, fsa_familly fam): filesystem_specific_attribute(f, fam) {};
-
-	    // inherited from filesystem_specific_attribute
-	virtual std::string show_val() const { return ""; };
-	virtual void write(generic_file & f) const {};
-	virtual void set_to_fs(const std::string & target) {};
-	virtual infinint storage_size() const { return sizeof(char); };
-	virtual filesystem_specific_attribute *clone() const { return  cloner(this); };
-
-    protected:
-	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const { return true; };
-    };
-
 
 	/// @}
 

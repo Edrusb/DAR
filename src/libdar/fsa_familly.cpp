@@ -58,14 +58,30 @@ namespace libdar
 	    throw SRC_BUG;
 	case fsan_creation_date:
 	    return gettext("creation date");
+	case fsan_append_only:
+	    return gettext("append only");
 	case fsan_compressed:
 	    return gettext("compressed");
 	case fsan_no_dump:
 	    return gettext("no dump flag");
 	case fsan_immutable:
 	    return gettext("immutable");
+	case fsan_data_journalling:
+	    return gettext("journalized");
+	case fsan_secure_deletion:
+	    return gettext("secure deletion");
+	case fsan_no_tail_merging:
+	    return gettext("no tail merging");
 	case fsan_undeletable:
 	    return gettext("undeletable");
+	case fsan_noatime_update:
+	    return gettext("no atime update");
+	case fsan_synchronous_directory:
+	    return gettext("synchronous directory");
+	case fsan_synchronous_update:
+	    return gettext("synchronous update");
+	case fsan_top_of_dir_hierarchy:
+	    return gettext("to of directory hierarchy");
 	default:
 	    throw SRC_BUG;
 	}
