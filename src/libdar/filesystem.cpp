@@ -1418,8 +1418,14 @@ namespace libdar
 				const filesystem_specific_attribute_list * fsa = x_ino->get_fsa();
 				if(fsa == NULL)
 				    throw SRC_BUG;
-
-				fsa_restored = fsa->set_fsa_to_filesystem_for(spot_display, get_fsa_scope(), get_ui());
+				try
+				{
+				    fsa_restored = fsa->set_fsa_to_filesystem_for(spot_display, get_fsa_scope(), get_ui());
+				}
+				catch(Erange & e)
+				{
+				    get_ui().warning(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
+				}
 			    }
 			}
 
@@ -1431,8 +1437,14 @@ namespace libdar
 			    if(!empty)
 			    {
 				const ea_attributs *ea = x_ino->get_ea();
-				ea_restored = raw_set_ea(x_nom, *ea, spot_display, *ea_mask);
-
+				try
+				{
+				    ea_restored = raw_set_ea(x_nom, *ea, spot_display, *ea_mask);
+				}
+				catch(Erange & e)
+				{
+				    get_ui().warning(tools_printf(gettext("Restoration of EA for %S aborted: "), &spot_display) + e.get_message());
+				}
 			    }
 			    else
 				ea_restored = true;
@@ -1440,7 +1452,7 @@ namespace libdar
 
 			    // to accomodate MacOS X we set again mtime to its expected value
 			    // because restoring EA modifies mtime on this OS.
-			    // same point but concerning extX FSA, setting them may modify atime
+			    // Same point but concerning extX FSA, setting them may modify atime
 			    // unless furtive read is available.
 			    // This does not hurt other Unix systems.
 			if(has_fsa_saved || has_ea_saved)
@@ -1503,15 +1515,37 @@ namespace libdar
 			if(act_data != data_remove)
 			{
 			    if(has_fsa_saved)
-				fsa_restored = action_over_fsa(exists_ino, x_nom, spot_display, act_ea);
+			    {
+				try
+				{
+				    fsa_restored = action_over_fsa(exists_ino, x_nom, spot_display, act_ea);
+				}
+				catch(Erange & e)
+				{
+				    get_ui().warning(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
+				}
+			    }
 
 			    if(has_ea_saved)
 			    {
-				ea_restored = action_over_ea(exists_ino, x_nom, spot_display, act_ea);
+				try
+				{
+				    ea_restored = action_over_ea(exists_ino, x_nom, spot_display, act_ea);
+				}
+				catch(Erange & e)
+				{
+				    get_ui().warning(tools_printf(gettext("Restoration of EA for %S aborted: "), &spot_display) + e.get_message());
+				}
+			    }
 
-				    // to accomodate MacOS X, we must set again mtime because
-				    // restoring EA modifies the mtime date. This does not hurt
-				    // other systems.
+			    if(has_fsa_saved || has_ea_saved)
+			    {
+				    // to accomodate MacOS X we set again mtime to its expected value
+				    // because restoring EA modifies mtime on this OS.
+				    // Same point but concerning extX FSA, setting them may modify atime
+				    // unless furtive read is available.
+				    // This does not hurt other Unix systems.
+
 				if(data_restored == done_data_restored)
 					// set back the mtime to value found in the archive
 				    make_date(*x_ino, spot_display, what_to_check);
@@ -1519,6 +1553,7 @@ namespace libdar
 					// set back the mtime to value found in filesystem before restoration
 				    make_date(*exists_ino, spot_display, what_to_check);
 			    }
+
 			}
 
 			if(act_data == data_remove)
