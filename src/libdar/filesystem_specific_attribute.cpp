@@ -65,6 +65,7 @@ extern "C"
 #include "deci.hpp"
 #include "fichier_local.hpp"
 #include "compile_time_features.hpp"
+#include "capabilities.hpp"
 
 using namespace std;
 
@@ -598,11 +599,13 @@ namespace libdar
 
 	    try
 	    {
-		S_I f = 0;
+		S_I f = 0;      // will contain the desirable flag bits field
+		S_I f_orig = 0; // will contain the original flag bits field
 		const fsa_bool *it_bool = NULL;
 
-		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
+		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f_orig) < 0)
 		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading exiting extX familly FSA: ")) + strerror(errno));
+		f = f_orig;
 
 		for(it = fsa.begin() ; it != fsa.end() ; ++it)
 		{
@@ -674,6 +677,12 @@ namespace libdar
 #endif
 			    break;
 			case fsan_data_journalling:
+#ifdef EXT3_JOURNAL_DATA_FL
+			    if(it_bool->get_value())
+				f |= EXT3_JOURNAL_DATA_FL;
+			    else
+				f &= ~EXT3_JOURNAL_DATA_FL;
+#else
 #ifdef EXT2_JOURNAL_DATA_FL
 			    if(it_bool->get_value())
 				f |= EXT2_JOURNAL_DATA_FL;
@@ -684,6 +693,7 @@ namespace libdar
 				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
+#endif
 #endif
 			    break;
 			case fsan_secure_deletion:
@@ -783,9 +793,100 @@ namespace libdar
 		    }
 		}
 
-		if(ioctl(fd, EXT2_IOC_SETFLAGS, &f) < 0)
-		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed set extX familly FSA: ")) + strerror(errno));
-		ret = true;
+		    // now that f has been totally computed
+		    // we must handle the point that some FSA flag
+		    // need specific privileged to be set or cleared
+
+		S_I mask_IMMUT = 0;   // will carry the mask for flags that need the IMMUTABLE capability
+		S_I mask_SYS_RES = 0; // will carry the mask for flags that need the SYS_RESOURCE capability
+#ifdef EXT2_APPEND_FL
+		mask_IMMUT |= EXT2_APPEND_FL;
+#endif
+#ifdef EXT2_IMMUTABLE_FL
+		mask_IMMUT |= EXT2_IMMUTABLE_FL;
+#endif
+#ifdef EXT3_JOURNAL_DATA_FL
+		mask_SYS_RES |= EXT3_JOURNAL_DATA_FL;
+#else
+#ifdef EXT3_JOURNAL_DATA_FL
+		mask_SYS_RES |= EXT2_JOURNAL_DATA_FL;
+#endif
+#endif
+		    // now that masks have been computed, we will proceed
+		    // in several steps:
+		    // - first setting the flag that do not need any privileges (abort upon error)
+		    // - second set the flags that need IMMUTABLE capability (warn and continue upon error)
+		    // - third set the flags that need SYS_RESOURCE capability (warn and continue upon error)
+
+		    // STEP 1: non privileged flags
+
+		S_I tmp_f = (f & ~mask_IMMUT & ~mask_SYS_RES) | (f_orig & (mask_IMMUT | mask_SYS_RES));
+
+
+		if(tmp_f != f_orig)
+		{
+		    if(ioctl(fd, EXT2_IOC_SETFLAGS, &tmp_f) < 0)
+			throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed set extX familly FSA: ")) + strerror(errno ));
+		    ret = true; // some flags have been set or cleared
+		}
+
+		f_orig = tmp_f; // f_orig has been modified with the new values of the non priviledged flag bits
+
+		    // STEP 2 : setting the IMMUTABLE flags only
+
+		if((f & mask_IMMUT) != (f_orig & mask_IMMUT)) // some immutable flags need to be changed
+		{
+		    tmp_f = (f & mask_IMMUT) | (f_orig & ~mask_IMMUT); // only diff is IMMUTABLE flags
+		    switch(capability_LINUX_IMMUTABLE(ui, true))
+		    {
+		    case capa_set:
+		    case capa_unknown:
+			if(ioctl(fd, EXT2_IOC_SETFLAGS, &tmp_f) < 0)
+			{
+			    string tmp = strerror(errno);
+			    ui.printf("Failed setting FSA extX IMMUTABLE flags for %s: %", target.c_str(), tmp.c_str());
+			}
+			else
+			{
+			    f_orig = tmp_f; // f_orig now integrates the IMMUTABLE flags that we could set
+			    ret = true; // some flags have been set or cleared
+			}
+			break;
+		    case capa_clear:
+			ui.printf(gettext("Not setting FSA extX IMMUTABLE flags for %s due to of lack of capability"), target.c_str());
+			break;
+		    default:
+			throw SRC_BUG;
+		    }
+		}
+
+		    /////// setting the SYS_RESOURCE flags only
+
+		if((f & mask_SYS_RES) != (f_orig & mask_SYS_RES)) // some SYS_RESOURCE flags need to be changed
+		{
+		    tmp_f = (f & mask_SYS_RES) | (f_orig & ~mask_SYS_RES); // only diff is the SYS_RES flags
+		    switch(capability_SYS_RESOURCE(ui, true))
+		    {
+		    case capa_set:
+		    case capa_unknown:
+			if(ioctl(fd, EXT2_IOC_SETFLAGS, &tmp_f) < 0)
+			{
+			    string tmp = strerror(errno);
+			    ui.printf("Failed setting FSA extX SYSTEME RESOURCE flags for %s: %", target.c_str(), tmp.c_str());
+			}
+			else
+			{
+			    f_orig = tmp_f; // f_orig now integrates the SYS_RESOURCE flags that we could set
+			    ret = true; // some flags have been set or cleared
+			}
+			break;
+		    case capa_clear:
+			ui.printf(gettext("Not setting FSA extX SYSTEME RESOURCE flags for %s due to of lack of capability"), target.c_str());
+			break;
+		    default:
+			throw SRC_BUG;
+		    }
+		}
 	    }
 	    catch(...)
 	    {

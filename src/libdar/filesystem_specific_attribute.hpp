@@ -183,7 +183,7 @@ namespace libdar
 	bool set_extX_FSA_to(user_interaction & ui, const std::string & target) const;
 
 	    /// \note return true if some FSA could be set
-	bool set_hfs_FSA_to(user_interaction & ui, const std::string & target) const { throw Efeature("setting of HFS+ FSA"); };
+	bool set_hfs_FSA_to(user_interaction & ui, const std::string & target) const { return false; };
 
 	static std::string familly_to_signature(fsa_familly f);
 	static std::string nature_to_signature(fsa_nature n);
