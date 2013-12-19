@@ -678,6 +678,7 @@ static void display_sauv_stat(user_interaction & dialog, const statistics & st)
     infinint errored = st.get_errored();
     infinint deleted = st.get_deleted();
     infinint ea_treated = st.get_ea_treated();
+    infinint fsa_treated = st.get_fsa_treated();
     infinint byte_count = st.get_byte_amount();
 
     dialog.printf("\n\n --------------------------------------------\n");
@@ -695,6 +696,7 @@ static void display_sauv_stat(user_interaction & dialog, const statistics & st)
     dialog.printf(" --------------------------------------------\n");
     dialog.printf(gettext(" EA saved for %i inode(s)\n"), &ea_treated);
 #endif
+    dialog.printf(gettext(" FSA saved for %i inode(s)\n"), &fsa_treated);
     dialog.printf(" --------------------------------------------\n");
 }
 
@@ -709,6 +711,7 @@ static void display_rest_stat(user_interaction & dialog, const statistics & st)
     infinint errored = st.get_errored();
     infinint deleted = st.get_deleted();
     infinint ea_treated = st.get_ea_treated();
+    infinint fsa_treated = st.get_fsa_treated();
 
     dialog.printf("\n\n --------------------------------------------\n");
     dialog.printf(gettext(" %i inode(s) restored\n"), &treated);
@@ -724,6 +727,7 @@ static void display_rest_stat(user_interaction & dialog, const statistics & st)
     dialog.printf(" --------------------------------------------\n");
     dialog.printf(gettext(" EA restored for %i inode(s)\n"), &ea_treated);
 #endif
+    dialog.printf(gettext(" FSA restored for %i inode(s)\n"), &fsa_treated);
     dialog.printf(" --------------------------------------------\n");
 }
 
@@ -769,6 +773,7 @@ static void display_merge_stat(user_interaction & dialog, const statistics & st)
     infinint deleted = st.get_deleted();
     infinint ignored = st.get_ignored();
     infinint ea_treated = st.get_ea_treated();
+    infinint fsa_treated = st.get_fsa_treated();
 
     dialog.printf("\n\n --------------------------------------------\n");
     dialog.printf(gettext(" %i inode(s) added to archive\n"), &treated);
@@ -779,6 +784,7 @@ static void display_merge_stat(user_interaction & dialog, const statistics & st)
     dialog.printf(" --------------------------------------------\n");
     dialog.printf(gettext(" EA saved for %i inode(s)\n"), &ea_treated);
 #endif
+    dialog.printf(gettext(" FSA saved for %i inode(s)\n"), &fsa_treated);
     dialog.printf(" --------------------------------------------\n");
     dialog.printf(gettext(" Total number of inode(s) considered: %i\n"), &total);
     dialog.printf(" --------------------------------------------\n");
