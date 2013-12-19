@@ -27,6 +27,7 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([],
 # Checks for libraries.
 AC_CHECK_LIB(socket, [socket], [], [])
 AC_CHECK_LIB(nsl, [endnetconfig], [], [])
+AC_CHECK_LIB(cap, [cap_get_proc], [], [])
 
 AC_ARG_ENABLE( [libdl-linking],
                AC_HELP_STRING(--disable-libdl-linking, [ignore any libdl and avoid linking against it]),
@@ -41,7 +42,7 @@ AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 
 
-AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h])
+AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h])
 
 
 AC_SYS_LARGEFILE
@@ -152,6 +153,25 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
 		     AC_MSG_RESULT(available)
                   ],
 		  [  AC_MSG_RESULT([not available]) ])
+
+
+AC_MSG_CHECKING([for POSIX.1e capabilities support])
+AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+		                  #if HAVE_SYS_CAPABILITY_H
+				  #include <sys/capability.h>
+				  #endif
+				  #if HAVE_SYS_TYPES_H
+				  #include <sys/types.h>
+				  #endif
+				  }]],
+				  [ cap_t capaset = cap_get_proc();
+				    (void)cap_free((void *)capset);
+                                  ]),
+	           [
+		      AC_DEFINE(HAVE_CAPABILITIES, 1, [whether the system has support for POSIX.1e capabilities])
+		      AC_MSG_RESULT(available)
+		   ],
+		   [  AC_MSG_RESULT([not available])  ])
 
 # DAR's features
 
