@@ -2042,7 +2042,7 @@ namespace libdar
 	    {
 		try
 		{
-		    get_ui().pause(tools_printf(gettext("FSA for %S are about to be merged, OK?"), &spot));
+		    get_ui().pause(tools_printf(gettext("FSA for %S are about to be overwritten, OK?"), &spot));
 		}
 		catch(Euser_abort & e)
 		{
@@ -2052,14 +2052,14 @@ namespace libdar
 
 	    if(tba_ino->fsa_get_saved_status() == inode::fsa_full)
 	    {
-		const filesystem_specific_attribute_list *tba_ea = tba_ino->get_fsa();
-		const filesystem_specific_attribute_list *ip_ea = in_place->get_fsa();
+		const filesystem_specific_attribute_list *tba_fsa = tba_ino->get_fsa();
+		const filesystem_specific_attribute_list *ip_fsa = in_place->get_fsa();
 		filesystem_specific_attribute_list result;
 
 		if(action == EA_merge_preserve)
-		    result = *tba_ea + *ip_ea;
+		    result = *tba_fsa + *ip_fsa;
 		else // action == EA_merge_overwrite
-		    result = *ip_ea + *tba_ea; // the + operator on ea_attributs is not reflexive !!!
+		    result = *ip_fsa + *tba_fsa; // the + operator on FSA is not reflexive !!!
 
 		if(!empty)
 		    ret = result.set_fsa_to_filesystem_for(spot, get_fsa_scope(), get_ui());
