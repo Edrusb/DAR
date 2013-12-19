@@ -93,8 +93,10 @@ namespace libdar
 		max = index;
 	}
 	while(*(table[index]) != *val && max - min > 0);
+	if(max - min <= 0)
+	    index = min;
 
-	return *(table[index]) == *val;
+	return min < table.size() && (table[index])->is_same_type_as(*val);
     }
 
 ///////////////////////////////////////////////////////////////////////////////////
