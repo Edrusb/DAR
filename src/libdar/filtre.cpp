@@ -563,6 +563,7 @@ namespace libdar
 				    cat.add(e);
 				    e = NULL;
 				    st.incr_hard_links();
+				    st.incr_treated();
 				    if(e_mir != NULL)
 				    {
 					if(e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == inode::ea_full)
