@@ -899,7 +899,7 @@ namespace libdar
 #else
 	if(has_extX_FSA)
 	{
-	    ui.printf(gettext("Warning! %S Filesystem Specific Attribute support have not been activated at compilation time and could not be restored for %s"),
+	    ui.printf(gettext("Warning! %s Filesystem Specific Attribute support have not been activated at compilation time and could not be restored for %s"),
 		      fsa_familly_to_string(fsaf_linux_extX).c_str(),
 		      target.c_str());
 	}
