@@ -178,8 +178,8 @@ namespace libdar
 		// now, action !
 
 	    if(my_lsetxattr(p_chemin, key.c_str(), value.c_str(), value.size(), 0) < 0)
-		throw Erange("ea_filesystem write_ea", tools_printf(gettext("Aborting operations for the EA of %S : error while adding EA %s : %s"),
-								    &chemin,  key.c_str(), strerror(errno)));
+		throw Erange("ea_filesystem write_ea", tools_printf(gettext("Error while adding EA %s : %s"),
+								    key.c_str(), strerror(errno)));
 	    else
 		num++;
 	}
@@ -207,8 +207,8 @@ namespace libdar
 	    if(my_lremovexattr(p_chemin, k) < 0)
 	    {
 		if(errno != ENOATTR)
-		    throw Erange("ea_filesystem write_ea", tools_printf(gettext("Aborting operations for the EAs of %S : error while removing %s : %s"),
-									&chemin,  k, strerror(errno)));
+		    throw Erange("ea_filesystem write_ea", tools_printf(gettext("Error while removing %s : %s"),
+									k, strerror(errno)));
 	    }
 	    else
 		num++;
