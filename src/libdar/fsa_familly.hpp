@@ -21,7 +21,7 @@
 
     /// \file fsa_familly.hpp
     /// \brief filesystem specific attributes available famillies and fsa_scope definition
-    /// \ingroup Private
+    /// \ingroup API
 
 #ifndef FSA_FAMILLY_HPP
 #define FSA_FAMILLY_HPP
@@ -34,15 +34,15 @@
 
 namespace libdar
 {
-	/// \addtogroup Private
+	/// \addtogroup API
 	/// @{
 
 
 	/// FSA familly
-
     enum fsa_familly { fsaf_hfs_plus, fsaf_linux_extX };
 	// note: adding new fsa_familly need updating all_fsa_familly()
 
+	/// FSA nature
     enum fsa_nature { fsan_unset,
 		      fsan_creation_date,
 		      fsan_append_only,
@@ -63,10 +63,11 @@ namespace libdar
 
     typedef std::set<fsa_familly> fsa_scope;
 
+	/// provides a scope containing all FSA famillies
     extern fsa_scope all_fsa_famillies();
+
     extern infinint fsa_scope_to_infinint(const fsa_scope & val);
     extern fsa_scope infinint_to_fsa_scope(const infinint & ref);
-
 
 	/// @}
 

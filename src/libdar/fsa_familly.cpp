@@ -98,8 +98,8 @@ namespace libdar
     }
 
 
-    const infinint FSA_SCOPE_BIT_HFS_PLUS = 1;
-    const infinint FSA_SCOPE_BIT_LINUX_EXTX = 2;
+    const U_I FSA_SCOPE_BIT_HFS_PLUS = 1;
+    const U_I FSA_SCOPE_BIT_LINUX_EXTX = 2;
 
     infinint fsa_scope_to_infinint(const fsa_scope & val)
     {
