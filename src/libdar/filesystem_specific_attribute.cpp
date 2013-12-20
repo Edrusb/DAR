@@ -155,8 +155,6 @@ namespace libdar
 	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
 	vector<filesystem_specific_attribute *>::const_iterator rt = ref.fsa.begin();
 
-	throw SRC_BUG; // implementation a revoir sachant que les listes sont triees
-
 	while(ret && it != fsa.end())
 	{
 	    if(rt == ref.fsa.end())
