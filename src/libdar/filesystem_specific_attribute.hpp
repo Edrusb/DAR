@@ -33,6 +33,7 @@
 #include "integers.hpp"
 #include "crc.hpp"
 #include "fsa_familly.hpp"
+#include "special_alloc.hpp"
 
 namespace libdar
 {
@@ -96,6 +97,10 @@ namespace libdar
 
 	    /// provides a way to copy objects without having to know the more specific class of the object
 	virtual filesystem_specific_attribute *clone() const = 0;
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(filesystem_specific_attribute);
+#endif
 
     protected:
 	void set_familly(const fsa_familly & val) { fam = val; };
@@ -168,6 +173,10 @@ namespace libdar
 	    /// all FSA of the arg are added with overwriting to the FSA of 'this'
 	filesystem_specific_attribute_list operator + (const filesystem_specific_attribute_list & arg) const;
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(filesystem_specific_attribute_list);
+#endif
+
     private:
 	std::vector<filesystem_specific_attribute *> fsa; //< sorted list of FSA
 	fsa_scope familles;
@@ -220,6 +229,11 @@ namespace libdar
 	virtual infinint storage_size() const { return 1; };
 	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(fsa_bool);
+#endif
+
+
     protected:
 	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const;
 
@@ -245,6 +259,11 @@ namespace libdar
 	virtual void write(generic_file & f) const { val.dump(f); };
 	virtual infinint storage_size() const { return val.get_storage_size(); };
 	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(fsa_infinint);
+#endif
+
 
     protected:
 	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const;

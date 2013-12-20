@@ -36,6 +36,7 @@
 #include "tools.hpp"
 #include "compressor.hpp"
 #include "integers.hpp"
+#include "special_alloc.hpp"
 
 namespace libdar
 {
@@ -110,6 +111,9 @@ namespace libdar
 	void set_major(int val) { major = val; };
 	void set_minor(int val) { minor = val; };
 
+#ifdef LIBDAR_SPECIAL_ALLOC
+        USE_SPECIAL_ALLOC(list_entry);
+#endif
     private:
 	std::string my_name;
 	bool hard_link;
