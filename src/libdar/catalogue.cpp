@@ -1109,7 +1109,10 @@ namespace libdar
         if(ref != NULL && ea == NULL)
         {
 	    if(ea_size != NULL)
-		throw SRC_BUG;
+	    {
+		delete ea_size;
+		ea_size = NULL;
+	    }
             ea_size = new (nothrow) infinint(ref->space_used());
 	    if(ea_size == NULL)
 		throw Ememory("inode::ea_attach");
@@ -1395,8 +1398,16 @@ namespace libdar
 
         if(ref != NULL && fsal == NULL)
         {
-	    if(fsa_size != NULL || fsa_famillies != NULL)
-		throw SRC_BUG;
+	    if(fsa_size != NULL)
+	    {
+		delete fsa_size;
+		fsa_size = NULL;
+	    }
+	    if(fsa_famillies != NULL)
+	    {
+		delete fsa_famillies;
+		fsa_famillies = NULL;
+	    }
 	    try
 	    {
 		fsa_size = new (nothrow) infinint (ref->storage_size());
