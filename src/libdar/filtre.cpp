@@ -110,10 +110,10 @@ namespace libdar
 	/// transfer EA from one inode to another as defined by the given action
 
 	/// \param[in] dialog for user interaction
-	/// \param[in] action is the action to perform with EA, argument may be NULL
-	/// \param[in,out] in_place is the "in place" inode, the resulting EA operation is placed as EA of this object, argument may be NULL
+	/// \param[in] action is the action to perform with EA and FSA
+	/// \param[in,out] in_place is the "in place" inode, the resulting EA/FSA operation is placed as EA/FSA of this object, argument may be NULL
 	/// \param[in] to_add is the "to be added" inode
-	/// \note EA_preserve EA_preserve_mark_already_saved and EA_clear are left intentionnaly unimplemented!
+	/// \note actions set to EA_preserve EA_preserve_mark_already_saved and EA_clear are left intentionnaly unimplemented!
 	/// \note the NULL given as argument means that the object is not an inode
 
     static void do_EFSA_transfert(user_interaction &dialog, over_action_ea action, inode *in_place, const inode *to_add);
@@ -2442,7 +2442,11 @@ namespace libdar
 		    {
 			cat.pre_add_ea(e, stockage);
 			if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, info_details, stock_algo))
-			    e_ino->change_ea_location(stockage);
+			{
+			    if(e_ino->fsa_get_saved_status() != inode::fsa_full)
+				e_ino->change_ea_location(stockage);
+				// change stockage location will be done only after copying FSA (see below)
+			}
 			cat.pre_add_ea_crc(e, stockage);
 		    }
 
@@ -2450,7 +2454,9 @@ namespace libdar
 		    if(e_ino->fsa_get_saved_status() == inode::fsa_full)
 		    {
 			cat.pre_add_fsa(e, stockage);
-			(void)save_fsa(dialog, juillet.get_string(), e_ino, stockage, info_details);
+			if(save_fsa(dialog, juillet.get_string(), e_ino, stockage, info_details))
+			    e_ino->change_ea_location(stockage);
+			    // now we can change ea/fsa_location to "stockage"
 			cat.pre_add_fsa_crc(e, stockage);
 		    }
 		}
@@ -3046,9 +3052,10 @@ namespace libdar
 	if(place_ino == NULL) // in_place is not an inode thus cannot have any EA
 	    return;           // nothing can be done neither here as the resulting object (in_place) cannot handle EA
 
-	    // in the following we know that both in_place and to_add are inode, we manipulate them thanks to their inode * pointers (place_ino and add_ino)
+	    // in the following we know that both in_place and to_add are inode,
+	    //we manipulate them thanks to their inode * pointers (place_ino and add_ino)
 
-	switch(action)
+	switch(action) // action concerns both EA and FSA in spite of the name of its values
 	{
 	case EA_overwrite:
 
