@@ -471,11 +471,23 @@ namespace libdar
 	}
 	catch(Egeneric & e)
 	{
-	    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading (opening) extX familly FSA: ")) + e.get_message());
+	    if(!compile_time::furtive_read())
+		throw; // not a problem about furtive read mode
+
+	    try // trying openning not using furtive read mode
+	    {
+		fichier_local ftmp = fichier_local(target, false);
+		fd = ftmp.give_fd_and_terminate();
+	    }
+	    catch(Egeneric & e)
+	    {
+		fd = -1;
+		    // we assume this FSA familly is not supported for that file
+	    }
 	}
 
 	if(fd < 0)
-	    throw SRC_BUG;
+	    return; // silently aborting assuming FSA familly not supported for that file
 
 	try
 	{
@@ -483,7 +495,7 @@ namespace libdar
 	    fsa_bool * ptr = NULL;
 
 	    if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
-		throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading extX familly FSA: ")) + strerror(errno));
+		return; // assuming there is no support for that FSA familly
 
 #ifdef EXT2_APPEND_FL
 	    create_or_throw(ptr, fsaf_linux_extX, fsan_append_only, (f & EXT2_APPEND_FL) != 0);
