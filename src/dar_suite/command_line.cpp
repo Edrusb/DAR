@@ -91,7 +91,7 @@ extern "C"
 #include "fichier_local.hpp"
 #include "libdar_4_4.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:<:>:=:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:<:>:=:4:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
@@ -136,6 +136,7 @@ static void show_warranty(user_interaction & dialog);
 static void show_version(user_interaction & dialog, const char *command_name);
 static void usage(user_interaction & dialog, const char *command_name);
 static void split_compression_algo(const char *arg, compression & algo, U_I & level);
+static fsa_scope string_to_fsa(const string & arg);
 
 #if HAVE_GETOPT_LONG
 const struct option *get_long_opt();
@@ -315,6 +316,7 @@ bool get_args(user_interaction & dialog,
     p.list_ea = false;
     p.ignore_unknown_inode = false;
     p.no_compare_symlink_date = true;
+    p.scope.clear();
 
     try
     {
@@ -1566,6 +1568,23 @@ static bool get_args_recursive(recursive_param & rec,
 		tmp_pre_mask.glob_exp = rec.glob_mode;
                 rec.backup_hook_include_exclude.push_back(tmp_pre_mask);
 		break;
+	    case '4':
+		if(optarg == NULL)
+		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		p.scope = string_to_fsa(optarg);
+		if(p.info_details)
+		{
+		    string list;
+		    set<fsa_familly>::iterator it = p.scope.begin();
+		    while(it != p.scope.end())
+		    {
+			list += " ";
+			list += fsa_familly_to_string(*it);
+			++it;
+		    }
+		    rec.dialog->warning(string("FSA family in scope:") + list);
+		}
+		break;
             case '?':
                 rec.dialog->warning(tools_printf(gettext("Ignoring unknown option -%c"),char(optopt)));
                 break;
@@ -2139,6 +2158,7 @@ const struct option *get_long_opt()
 	{"backup-hook-include", required_argument, NULL, '<'},
 	{"backup-hook-exclude", required_argument, NULL, '>'},
 	{"backup-hook-execute", required_argument, NULL, '='},
+	{"fsa-scope", required_argument, NULL, '4'},
         { NULL, 0, NULL, 0 }
     };
 
@@ -2724,6 +2744,33 @@ static void split_compression_algo(const char *arg, compression & algo, U_I & le
 		level = 9; // default compression level
 	}
     }
+}
+
+static fsa_scope string_to_fsa(const string & arg)
+{
+    fsa_scope ret;
+    vector<string> fams = line_tools_split(arg, ',');
+
+    ret.clear();
+    if(arg != "none")
+    {
+	for(vector<string>::iterator it = fams.begin();
+	    it != fams.end();
+	    ++it)
+	{
+	    if(*it == "extX"
+	       || *it == "ext"
+	       || *it == "extx")
+		ret.insert(fsaf_linux_extX);
+	    else if(*it == "HFS+"
+		    || *it == "hfs+")
+		ret.insert(fsaf_hfs_plus);
+	    else
+		throw Erange("string_to_fsa", string(gettext("unknown FSA family: %S")) + (*it));
+	}
+    }
+
+    return ret;
 }
 
 static void add_non_options(S_I argc, char * const argv[], vector<string> & non_options)

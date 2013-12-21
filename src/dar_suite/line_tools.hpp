@@ -122,6 +122,9 @@ extern void line_tools_look_for_jQ(S_I argc,
 				   bool & Q_is_present);
 
 
+    /// split a line in words given the separator character (sep)
+
+extern std::vector<std::string> line_tools_split(const std::string & val, char sep);
 
     /// @}
 

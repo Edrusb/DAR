@@ -220,6 +220,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    create_options.set_user_comment(param.user_comment);
 		    create_options.set_hash_algo(param.hash);
 		    create_options.set_slice_min_digits(param.num_digits);
+		    create_options.set_fsa_scope(param.scope);
 		    if(param.backup_hook_mask != NULL)
 			create_options.set_backup_hook(param.backup_hook_execute, *param.backup_hook_mask);
 		    create_options.set_ignore_unknown_inode_type(param.ignore_unknown_inode);
@@ -264,6 +265,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    merge_options.set_user_comment(param.user_comment);
 		    merge_options.set_hash_algo(param.hash);
 		    merge_options.set_slice_min_digits(param.num_digits);
+		    merge_options.set_fsa_scope(param.scope);
 		    cur = new (nothrow) archive(dialog,            // user_interaction &
 				      *param.sauv_root,  //const path &
 				      arch,              // archive *
@@ -465,6 +467,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		}
 		extract_options.set_only_deleted(param.only_deleted);
 		extract_options.set_ignore_deleted(param.not_deleted);
+		extract_options.set_fsa_scope(param.scope);
 
                 st = arch->op_extract(dialog,
 				      *param.fs_root,
@@ -521,6 +524,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		diff_options.set_display_skipped(param.display_skipped);
 		diff_options.set_hourshift(param.hourshift);
 		diff_options.set_compare_symlink_date(param.no_compare_symlink_date);
+		diff_options.set_fsa_scope(param.scope);
                 st = arch->op_diff(dialog, *param.fs_root,
 				   diff_options,
 				   NULL);

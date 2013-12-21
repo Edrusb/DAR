@@ -37,6 +37,8 @@ extern "C"
 
 #include <new>
 #include <algorithm>
+#include <vector>
+#include <string>
 
 #include "line_tools.hpp"
 #include "deci.hpp"
@@ -631,6 +633,31 @@ void line_tools_look_for_jQ(S_I argc,
 	Q_is_present = true;
 }
 
+
+vector<string> line_tools_split(const string & val, char sep)
+{
+    vector<string> ret;
+    string::const_iterator be = val.begin();
+    string::const_iterator ne = val.begin();
+
+    while(ne != val.end())
+    {
+	if(*ne != sep)
+	    ++ne;
+	else
+	{
+	    ret.push_back(string(be, ne));
+	    ++ne;
+	    be = ne;
+	}
+    }
+
+    if(be != val.end())
+	ret.push_back(string(be, ne));
+
+    return ret;
+}
+
 static string build(string::iterator a, string::iterator b)
 {
     string ret = "";
@@ -640,3 +667,5 @@ static string build(string::iterator a, string::iterator b)
 
     return ret;
 }
+
+

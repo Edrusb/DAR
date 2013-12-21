@@ -38,7 +38,7 @@ Since release 2.4.0, a "relax" reading mode is available that let dar to either 
 .B dar
 can take care of POSIX Extended Attributes (EA in short) that are used under Linux to carry File Access Control List (FACL) as well as security attributes for SELinux, under MacOS X EA are used to store file forks as well as on any other filesystem that support POSIX EA. EA also have room for user to add any key / value paire to any file, this is known as user EA. These attributes are not specific to any particular filesystem, they exist the same way under ext3/4, HFS+ and any other filesystem. At the opposit, Filesystem Specific Attributes (FSA in short) are, as you can guess, specific to one or several filesystem(s). For example the Birth date of a file exists for HFS+ and NTFS but not for ext2/3/4 filesystem. The immutable attribute exists for ext2/3/4 but not for NTFS while the nodump files does not exists for NTFS but exists for HFS+, ext2/3/4 and many other Unix filesystems. For
 .B dar
-an inode (file, symlink, named pipe, socket, device, door, directory, ...)  is thus not only a piece of data to backup and restore but also a set of common attributes (permission, ownership, atime, mtime, ctime, ...) eventually followed by its EA set and/or FSA. FSA are grouped by familly each more or less corresponding to a given filesystem supported. For example extX familly carries FSA of ext2, ext3 and ext4 filesystems. HFS+ those of MacOS X HFS+ filesystem. Some familly may be disabled at compilation time if the uderlying system used to compile dar/libdar has not enough support for it. In that case dar is not able to save or restore attributes of such familly, but archive merging is not affected and FSA are taken into consideration normally. For more details on how to act on FSA famillies see option "-4".
+an inode (file, symlink, named pipe, socket, device, door, directory, ...)  is thus not only a piece of data to backup and restore but also a set of common attributes (permission, ownership, atime, mtime, ctime, ...) eventually followed by its EA set and/or FSA. FSA are grouped by family each more or less corresponding to a given filesystem supported. For example extX family carries FSA of ext2, ext3 and ext4 filesystems. HFS+ those of MacOS X HFS+ filesystem. Some family may be disabled at compilation time if the uderlying system used to compile dar/libdar has not enough support for it. In that case dar is not able to save or restore attributes of such family, but archive merging is not affected and FSA are taken into consideration normally. For more details on how to act on FSA families see option "-4".
 .PP
 A few words about slice before going deeper in detail: a slice is just a simple file which name is composed of a "basename" followed by a dot, then a number, again a dot and the extension (dar) to form the filename of that slice. On the command line you will never have to give the full file name of a slice, just the basename. The number between the dots is the slice number, which starts from 1 and may be arbitrary large (as large as your system can support the corresponding filename).
 .TP 20
@@ -185,6 +185,24 @@ Last point the -acase and -an options alters the case sensitivity of the  -U and
 let's continue with other options.
 .P
 .TP 20
+-4 --fsa-scope <family>[,<family>[, ...]
+Reduce the scope of Filesystem Specific Attribute (FSA) to be considered for the operation. FSA are grouped by family. Current available families are:
+.RS
+.TP 5
+extX
+this family takes care of Linux ext2/3/4 flag attributes set by chattr(1) and read by lsattr(1). Dar only considers flags that are possible to set or clear by users (or privileged user): append-only, compressed, no_dump (Yes, dar can save files having the nodump flag set and restore then afterward with that flag set!), immutable, data-journaling, secure-deletion, no-tail-merging, undeletable, noatime-update, synchronous-directory, synchronous-update, top-of-directory-hierarchy. Note that "extx" and "ext" are aliases for this FSA family. In spite of its name, this family of attributes is not limited to ext2/3/4 filesystems.
+.TP 5
+ HFS+
+this family takes care of Mac OS X HFS+ birth date of files, in addition of commonly found dates like atime (last access time), ctime (last meta data change) and mtime (last data change).
+.TP 5
+none
+"none" is not a FSA familly but can be used alone to ignore all FSA families.
+.P
+By default no restriction is done and FSA of all families are considered at restoration time, but if a family has not been activated at compilation time a warning is issued for each file that cannot have its FSA restored completely (unless this family is excluded from the scope thanks to the -4 option). At backup time, if an FSA family has not been activated at compilation time, no warning is issued and FSA of that family are ignored. Still at backup time, you can also ignore FSA that have compilation time support by excluding them from the operation thanks to this -4 option.
+.P
+Example of use: --fsa extX,HFS+
+.RE
+.TP 20
 -i, --input <path>
 is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c, -C or -+ is used). When reading from pipe, standard input is used, but with this option, the file <path> (usually a named pipe) is used instead.  This option is to receive output from dar_slave program (see doc/usage_notes.html for examples of use). Note that when --sequential-read is used, dar uses a single pipe and does no more rely on dar_slave, -i option can be used to tell dar which named pipe to read the archive from, instead of the standard input.
 .TP 20
@@ -192,7 +210,7 @@ is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -
 is available when reading from pipe (basename is "-" for -x, -l, -t, -d or for -A when -c, -C or -+ is used). When reading from pipe, standard output is used to send request to dar_slave, but with this option, the file <path> (usually a named pipe) is used instead. When standard output is used, all messages goes to standard error (not only interactive messages). See doc/usage_notes.html for examples of use.
 .TP 20
 -O, --comparison-field[=<flag>]
-When comparing with the archive of reference (-c -A) during a differential backup, when extracting (-x) or when comparing (-d) do only consider certain fields. The available flags are:
+When comparing with the archive of reference (-c -A) during a differential backup, when extracting (-x) or when comparing (-d) do only considers certain fields. The available flags are:
 .RS
 .TP 15
 ignore-owner
@@ -368,8 +386,8 @@ By default slice number contained in filename do not have any padded zeros, whic
 --pipe-fd <num>
 will read further arguments from the file-descriptor <num>. The arguments read through this file-descriptor must follow a TLV (Type/Length/Value) list format. This option is not intended for human use, but for other programs launching dar like dar_manager. This feature has been added to overcome the command line length limit.
 .TP 20
--4, --fsa-familly <fam>[,<fam>[,<fam>[...]]]
-Filesystem specific attributes (FSA) are those attributes like nodump flag, immutable, compressed attributes for ext2/3/4 filesystem, creation_time for HFS+ and NTFS and so on that are specific to a given filesystem. These attributes are grouped by familly named. Currently the faavailable familly name of FSA is:
+-4, --fsa-family <fam>[,<fam>[,<fam>[...]]]
+Filesystem specific attributes (FSA) are those attributes like nodump flag, immutable, compressed attributes for ext2/3/4 filesystem, creation_time for HFS+ and NTFS and so on that are specific to a given filesystem. These attributes are grouped by family named. Currently the faavailable family name of FSA is:
 .RS
 .TP 5
 hfs_plus
@@ -378,7 +396,7 @@ which contains the creation time date found on HFS+ filesystems
 linux_extX
 which contains the nodump, immutable undeleted and compressed flags of linux ext2/3/4 filesystems
 .RE
-At backup time all FSA that have been activated at compilation time are saved. At comparison time, saved FSA are compared to those present on filesystem, but if the equivalent FSA cannot be read because the destination filesystem does not support an error is reported for that file. At restoration time all FSA are tried to be restored. If the destination filesystem does not support those FSA a warning is returned and file is restored as best as possible. To avoid failure at comparison time or warning at restoration time it is possible to reduce the FSA tobe considered to a give set of familly thanks to this --fsa-familly option. By default all FSA are taken into consideration.
+At backup time all FSA that have been activated at compilation time are saved. At comparison time, saved FSA are compared to those present on filesystem, but if the equivalent FSA cannot be read because the destination filesystem does not support an error is reported for that file. At restoration time all FSA are tried to be restored. If the destination filesystem does not support those FSA a warning is returned and file is restored as best as possible. To avoid failure at comparison time or warning at restoration time it is possible to reduce the FSA tobe considered to a give set of family thanks to this --fsa-family option. By default all FSA are taken into consideration.
 
 .PP
 .B SAVING, ISOLATION AND MERGING OPTIONS (to use with -c, -C or -+)
@@ -558,7 +576,7 @@ Using this option when merging an archive with itself (used both as archive of r
 .P
 As seem previously -u and -U options can be used to filter which EA entry to consider and which to ignore. The question here is to explain how this filtering mechanism interacts with the different policies we just presented above. For files that are not in conflict (found only as 'in place' or as 'to be added'), only the EA entries matching the EA filter are kept. For files in conflict, the overwriting policy is evaluated first, then the filtering mechanism is applied *after* it. Thus for example, using the following [ -/ "Po" -u "*test" ], when merging two archives, only EA ending with "test" will be retained, and when a conflict takes place, this "*test" ending EA will be taken from the 'to be added' file if it has some EA of that type, its other EA entry will be ignored as well as any EA entry of the 'in place' file even those ending by "test". At restoration in using the same options, file without conflict will get restored but only EA entry ending with "test" will be restored, and for file with conflict (already present in filesystem), EA set of file in filesystem will be removed and replaced the EA entries of the file in archive that ends by "test", if some exist.
 .P
-the situation is similar with FSA familly scope and overwriting policy. Only FSA of a familly present in the scope will be retained, the overwriting policy acts first then the FSA scope is applied. Note however that any FSA present on filesystem and excluded from the FSA scope are not touched.
+the situation is similar with FSA family scope and overwriting policy. Only FSA of a family present in the scope will be retained, the overwriting policy acts first then the FSA scope is applied. Note however that any FSA present on filesystem and excluded from the FSA scope are not touched.
 .P
 Well, now let's see how to bring some more fun using conditional statements in all these actions. The structure to use is the following:
 .TP 5

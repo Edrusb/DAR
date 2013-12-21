@@ -128,6 +128,7 @@ struct line_param
     bool list_ea;                 //< whether to list Extended Attribute of files
     bool ignore_unknown_inode;    //< whether to ignore unknown inode types
     bool no_compare_symlink_date; //< whether to report difference in dates of symlinks while diffing an archive with filesystem
+    fsa_scope scope;              //< FSA scope to consider for the operation
 
 	// constructor for line_param
     line_param()
