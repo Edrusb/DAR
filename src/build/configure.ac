@@ -398,11 +398,43 @@ AC_ARG_ENABLE(  [nodump-flag],
                                                  ],
                                                  [
                                                      AC_MSG_RESULT([NOT FOUND])
-                                                     AC_MSG_WARN([cannot find ext2_fs.h header file, nodump-flag feature will not be activated])
+                                                     AC_MSG_WARN([cannot find ext2_fs.h header file, nodump-flag and extX FSA features will not be available])
                                                  ])
                                 ])
 
                 ])
+
+AC_MSG_CHECKING([birth time availability])
+AC_ARG_ENABLE( [birthtime],
+	       AC_HELP_STRING(--disable-birthtime, [disable the HFS+ Filesystem Specific Attribute support]),
+	       [AC_MSG_RESULT([hfs+ FSA disabled])],
+	       [AC_LINK_IFELSE(AC_LANG_PROGRAM([[
+						extern "C" {
+	       					#if HAVE_SYS_TYPE_H
+						#include <sys/types.h>
+						#endif
+						#if HAVE_SYS_STAT_H
+						#include <sys/stat.h>
+						#endif
+						#if HAVE_UNISTD_H
+						#include <unistd.h>
+						#endif
+						}]],
+						[[
+						struct stat tmp;
+						int ret = stat("/", &tmp);
+						return tmp.st_birthtime;
+						]])
+				[
+				AC_DEFINE(LIBDAR_BIRTHTIME, 1, [if defined, activates the support for HFS+ create time FSA])
+				local_birthtime="yes"
+				AC_MSG_RESULT([found])
+				],
+				[
+				AC_MSG_RESULT([NOT FOUND])
+				AC_MSG_WARN([Cannot find support for birthtime, HFS+ FSA support will not be available])
+				])
+		])
 
 AC_ARG_ENABLE(  [gnugetopt],
                 AC_HELP_STRING(--disable-gnugetopt, [avoid linking with libgnugetopt]),
@@ -737,7 +769,11 @@ else
 fi
 
 echo -n "   HFS+ FSA support           : "
-echo "NO"
+if [ "$local_birthtime" = "yes" ] ; then
+  echo "YES"
+else
+  echo "NO"
+fi
 
 echo -n "   Special allocation scheme  : "
 if [ "$local_special_alloc" = "yes" ] ; then

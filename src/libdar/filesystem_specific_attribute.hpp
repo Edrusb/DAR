@@ -173,6 +173,13 @@ namespace libdar
 	    /// all FSA of the arg are added with overwriting to the FSA of 'this'
 	filesystem_specific_attribute_list operator + (const filesystem_specific_attribute_list & arg) const;
 
+	    /// look for the FSA of given familly and nature
+	    /// \param[in] fam family of the FSA to look for
+	    /// \param[in] nat nature of the FSA to look for
+	    /// \param[in, out] ptr points to the FSA if found
+	    /// \return true if such an FSA has been found and set ptr accordingly else return false
+	bool find(fsa_family fam, fsa_nature nat, const filesystem_specific_attribute *&ptr) const;
+
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(filesystem_specific_attribute_list);
 #endif
@@ -187,12 +194,13 @@ namespace libdar
 	void sort_fsa();
 
 	void fill_extX_FSA_with(const std::string & target);
+	void fill_HFS_FSA_with(const std::string & target);
 
 	    /// \note return true if some FSA could be set
 	bool set_extX_FSA_to(user_interaction & ui, const std::string & target) const;
 
 	    /// \note return true if some FSA could be set
-	bool set_hfs_FSA_to(user_interaction & ui, const std::string & target) const { return false; };
+	bool set_hfs_FSA_to(user_interaction & ui, const std::string & target) const;
 
 	static std::string family_to_signature(fsa_family f);
 	static std::string nature_to_signature(fsa_nature n);

@@ -52,6 +52,9 @@ extern "C"
 #endif
 #endif
 #endif
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 }
 
 #include <new>
@@ -74,7 +77,7 @@ namespace libdar
 
     static bool compare_for_sort(const filesystem_specific_attribute *a, const filesystem_specific_attribute *b);
 
-    template <class T> bool binary_find_in_sorted_list(const vector<T*> & table, const T *val, U_I & index)
+    template <class T> bool binary_search_in_sorted_list(const vector<T*> & table, const T *val, U_I & index)
     {
 	U_I min = 0;
 	U_I max = table.size();
@@ -92,7 +95,8 @@ namespace libdar
 	    else
 		max = index;
 	}
-	while(*(table[index]) != *val && max - min > 0);
+	while(!table[index]->is_same_type_as(*val) && max - min > 0);
+
 	if(max - min <= 0)
 	    index = min;
 
@@ -291,7 +295,7 @@ namespace libdar
 
 	if(scope.find(fsaf_hfs_plus) != scope.end())
 	{
-		// throw Efeature("reading HFS+ FSA family");
+	    fill_HFS_FSA_with(target);
 	}
 
 	if(scope.find(fsaf_linux_extX) != scope.end())
@@ -364,6 +368,20 @@ namespace libdar
 	return ret;
     }
 
+    bool filesystem_specific_attribute_list::find(fsa_family fam, fsa_nature nat, const filesystem_specific_attribute *&ptr) const
+    {
+	fsa_bool tmp = fsa_bool(fam, nat, true);
+	U_I index;
+
+	if(binary_search_in_sorted_list(fsa, (filesystem_specific_attribute *)(&tmp), index))
+	{
+	    ptr = fsa[index];
+	    return true;
+	}
+	else
+	    return false;
+    }
+
     void filesystem_specific_attribute_list::copy_from(const filesystem_specific_attribute_list & ref)
     {
 	vector<filesystem_specific_attribute *>::const_iterator it = ref.fsa.begin();
@@ -398,7 +416,7 @@ namespace libdar
     {
 	U_I index = 0;
 
-	if(binary_find_in_sorted_list(fsa, &ref, index))
+	if(binary_search_in_sorted_list(fsa, &ref, index))
 	{
 	    if(fsa[index] == NULL)
 		throw SRC_BUG;
@@ -572,6 +590,24 @@ namespace libdar
 	close(fd);
 #else
 	    // nothing to do, as this FSA has not been activated at compilation time
+#endif
+    }
+
+    void filesystem_specific_attribute_list::fill_HFS_FSA_with(const std::string & target)
+    {
+#ifdef LIBDAR_BIRTHTIME
+	struct stat tmp;
+	int lu = stat(target.c_str(), &tmp);
+
+	if(lu < 0)
+	    return; // silently aborting assuming FSA family not supported for that file
+	else
+	{
+	    fsa_infinint * ptr = NULL;
+	    create_or_throw(ptr, fsaf_hfs_plus, fsan_creation_date, tmp.st_birthtime);
+	    fsa.push_back(ptr);
+	    ptr = NULL;
+	}
 #endif
     }
 
@@ -918,6 +954,14 @@ namespace libdar
 #endif
 
 	return ret;
+    }
+
+    bool filesystem_specific_attribute_list::set_hfs_FSA_to(user_interaction & ui, const std::string & target) const
+    {
+	    // the birthtime is set with the different other dates of that inode, so
+	    // here we just check that this FSA list provides a birthtime info:
+	const filesystem_specific_attribute *tmp = NULL;
+	return find(fsaf_hfs_plus, fsan_creation_date, tmp);
     }
 
     string filesystem_specific_attribute_list::family_to_signature(fsa_family f)

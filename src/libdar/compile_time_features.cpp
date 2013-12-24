@@ -178,9 +178,13 @@ namespace libdar
 #endif
 	}
 
-	bool FSA_HFS_plus()
+	bool FSA_birthtime()
 	{
+#ifdef LIBDAR_BIRTHTIME
+	    return true;
+#else
 	    return false;
+#endif
 	}
 
 

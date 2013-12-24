@@ -396,14 +396,17 @@ namespace libdar
         /// \param[in] chem the path to the file to set
         /// \param[in] last_acc last access date to use
         /// \param[in] last_mod last modification date to use
-    extern void tools_noexcept_make_date(const std::string & chem, const infinint & last_acc, const infinint & last_mod);
+	/// \param[in] birth creation date of the file, if not known, use the value of last_mod for efficiency
+    extern void tools_noexcept_make_date(const std::string & chem, const infinint & last_acc, const infinint & last_mod, const infinint & birth);
 
         /// set dates of a given file, may throw exception
 
         /// \param[in] chemin the path to the file to set
         /// \param[in] access last access date to use
         /// \param[in] modif last modification date to use
-    extern void tools_make_date(const std::string & chemin, infinint access, infinint modif);
+	/// \param[in] birth time of creation of the file
+	/// \note if birth time is not known, it should be set to the value of modif for efficiency
+    extern void tools_make_date(const std::string & chemin, infinint access, infinint modif, infinint birth);
 
         /// compare two string in case insensitive manner
 

@@ -104,7 +104,7 @@ namespace libdar
 	bool FSA_linux_extX();
 
 	    /// returns whether libdar has been built with support for HFS+ FSA
-	bool FSA_HFS_plus();
+	bool FSA_birthtime();
     }
 
 } // end of namespace

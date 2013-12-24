@@ -1065,7 +1065,7 @@ namespace libdar
 			       compile_time::libgcrypt(),
 			       compile_time::furtive_read(),
 			       compile_time::FSA_linux_extX(),
-			       compile_time::FSA_HFS_plus());
+			       compile_time::FSA_birthtime());
 	switch(compile_time::system_endian())
 	{
 	case compile_time::big:
@@ -1260,27 +1260,54 @@ namespace libdar
         return count < argc;
     }
 
-    void tools_make_date(const string & chemin, infinint access, infinint modif)
+    void tools_make_date(const string & chemin, infinint access, infinint modif, infinint birth)
     {
         struct utimbuf temps;
         time_t tmp = 0;
 
         access.unstack(tmp);
-        temps.actime = tmp;
+	if(tmp != 0)
+	    throw Erange("tools_make_date", "cannot set atime of file, value too high for the system integer type");
+
+	    // the first time, setting modification time to the value of birth time
+	    // systems that supports birth time update birth time if the given mtime is more recent than the current birth time
+	    // so here we assume birth < modif (if not the birth time will be set to modif)
+	    // we run a second time the same call but with the real mtime, which should not change the birthtime if this
+	    // one is as expected older than mtime.
+	else
+	    temps.actime = tmp;
+
+	if(birth != modif)
+	{
+	    tmp = 0;
+	    birth.unstack(tmp);
+	    if(tmp != 0)
+		throw Erange("tools_make_date", "cannot set birth time of file, value too high for the system integer type");
+	    else
+		temps.modtime = tmp;
+
+	    if(utime(chemin.c_str() , &temps) < 0)
+		Erange("tools_make_date", string(dar_gettext("Cannot set birth time: ")) + strerror(errno));
+	}
+
+	    // we set atime and mtime here
         tmp = 0;
         modif.unstack(tmp);
-        temps.modtime = tmp;
+	if(tmp != 0)
+	    throw Erange("tools_make_date", "cannot set last modification time of file, value too high for the system integer type");
+	else
+	    temps.modtime = tmp;
 
 	if(utime(chemin.c_str() , &temps) < 0)
 	    Erange("tools_make_date", string(dar_gettext("Cannot set last access and last modification time: ")) + strerror(errno));
     }
 
-    void tools_noexcept_make_date(const string & chem, const infinint & last_acc, const infinint & last_mod)
+    void tools_noexcept_make_date(const string & chem, const infinint & last_acc, const infinint & last_mod, const infinint & birth)
     {
         try
         {
             if(last_acc != 0 || last_mod != 0)
-                tools_make_date(chem, last_acc, last_mod);
+                tools_make_date(chem, last_acc, last_mod, birth);
                 // else the directory could not be openned properly
                 // and time could not be retrieved, so we don't try
                 // to restore them
