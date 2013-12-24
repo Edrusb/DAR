@@ -728,8 +728,8 @@ namespace libdar
 
 		if(fsa_saved != fsa_none)
 		{
-		    fsa_famillies = new (nothrow) infinint(f);
-		    if(fsa_famillies == NULL)
+		    fsa_families = new (nothrow) infinint(f);
+		    if(fsa_families == NULL)
 			throw Ememory("inode::inode(file)");
 		}
 
@@ -1036,9 +1036,9 @@ namespace libdar
 
 	if(fsa_saved != fsa_none)
 	{
-	    if(fsa_famillies == NULL)
+	    if(fsa_families == NULL)
 		throw SRC_BUG;
-	    fsa_famillies->dump(r);
+	    fsa_families->dump(r);
 	}
 	if(fsa_saved == fsa_full)
 	{
@@ -1403,16 +1403,16 @@ namespace libdar
 		delete fsa_size;
 		fsa_size = NULL;
 	    }
-	    if(fsa_famillies != NULL)
+	    if(fsa_families != NULL)
 	    {
-		delete fsa_famillies;
-		fsa_famillies = NULL;
+		delete fsa_families;
+		fsa_families = NULL;
 	    }
 	    try
 	    {
 		fsa_size = new (nothrow) infinint (ref->storage_size());
-		fsa_famillies = new(nothrow) infinint(fsa_scope_to_infinint(ref->get_fsa_famillies()));
-		if(fsa_size == NULL || fsa_famillies == NULL)
+		fsa_families = new(nothrow) infinint(fsa_scope_to_infinint(ref->get_fsa_families()));
+		if(fsa_size == NULL || fsa_families == NULL)
 		    throw Ememory("inode::fsa_attach");
 	    }
 	    catch(...)
@@ -1422,10 +1422,10 @@ namespace libdar
 		    delete fsa_size;
 		    fsa_size = NULL;
 		}
-		if(fsa_famillies != NULL)
+		if(fsa_families != NULL)
 		{
-		    delete fsa_famillies;
-		    fsa_famillies = NULL;
+		    delete fsa_families;
+		    fsa_families = NULL;
 		}
 		throw;
 	    }
@@ -1652,7 +1652,7 @@ namespace libdar
 	ea = NULL;
 	ea_size = NULL;
         ea_crc = NULL;
-	fsa_famillies = NULL;
+	fsa_families = NULL;
 	fsa_offset = NULL;
 	fsal = NULL;
 	fsa_size = NULL;
@@ -1689,10 +1689,10 @@ namespace libdar
             delete ea_crc;
             ea_crc = NULL;
         }
-	if(fsa_famillies != NULL)
+	if(fsa_families != NULL)
 	{
-	    delete fsa_famillies;
-	    fsa_famillies = NULL;
+	    delete fsa_families;
+	    fsa_families = NULL;
 	}
 	if(fsa_offset != NULL)
 	{
@@ -1761,7 +1761,7 @@ namespace libdar
 	    }
 	    else
 		ea_crc = NULL;
-	    copy_ptr(ref.fsa_famillies, fsa_famillies);
+	    copy_ptr(ref.fsa_families, fsa_families);
 	    copy_ptr(ref.fsa_offset, fsa_offset);
 	    copy_ptr(ref.fsal, fsal);
 	    copy_ptr(ref.fsa_size, fsa_size);
@@ -5346,7 +5346,7 @@ namespace libdar
 
 	if(ref.fsa_get_saved_status() != inode::fsa_none)
 	{
-	    fsa_scope sc = ref.fsa_get_famillies();
+	    fsa_scope sc = ref.fsa_get_families();
 	    bool upper = ref.fsa_get_saved_status() == inode::fsa_full;
 	    if(sc.find(fsaf_hfs_plus) != sc.end())
 		if(upper)

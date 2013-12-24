@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -lt 1 ]; then
-   echo "usage: $0 <list of test familly>"
+   echo "usage: $0 <list of test family>"
    echo "example: $0 A1 B1 B2 B3"
    exit 1
 fi

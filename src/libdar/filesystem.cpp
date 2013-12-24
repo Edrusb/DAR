@@ -1719,7 +1719,7 @@ namespace libdar
 
 		    try
 		    {
-			fsa.get_fsa_from_filesystem_for(spot, all_fsa_famillies());
+			fsa.get_fsa_from_filesystem_for(spot, all_fsa_families());
 		    }
 		    catch(Ethread_cancel & e)
 		    {
@@ -1765,7 +1765,7 @@ namespace libdar
 		    try // if possible and available restoring original FSA
 		    {
 			if(got_fsa && !empty)
-			    fsa.set_fsa_to_filesystem_for(spot, all_fsa_famillies(), get_ui());
+			    fsa.set_fsa_to_filesystem_for(spot, all_fsa_families(), get_ui());
 		    }
 		    catch(Ethread_cancel & e)
 		    {

@@ -19,12 +19,12 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file fsa_familly.hpp
-    /// \brief filesystem specific attributes available famillies and fsa_scope definition
+    /// \file fsa_family.hpp
+    /// \brief filesystem specific attributes available families and fsa_scope definition
     /// \ingroup API
 
-#ifndef FSA_FAMILLY_HPP
-#define FSA_FAMILLY_HPP
+#ifndef FSA_FAMILY_HPP
+#define FSA_FAMILY_HPP
 
 #include <string>
 #include <set>
@@ -38,9 +38,9 @@ namespace libdar
 	/// @{
 
 
-	/// FSA familly
-    enum fsa_familly { fsaf_hfs_plus, fsaf_linux_extX };
-	// note: adding new fsa_familly need updating all_fsa_familly()
+	/// FSA family
+    enum fsa_family { fsaf_hfs_plus, fsaf_linux_extX };
+	// note: adding new fsa_family need updating all_fsa_family()
 
 	/// FSA nature
     enum fsa_nature { fsan_unset,
@@ -58,13 +58,13 @@ namespace libdar
 		      fsan_synchronous_update,
 		      fsan_top_of_dir_hierarchy };
 
-    extern std::string fsa_familly_to_string(fsa_familly f);
+    extern std::string fsa_family_to_string(fsa_family f);
     extern std::string fsa_nature_to_string(fsa_nature n);
 
-    typedef std::set<fsa_familly> fsa_scope;
+    typedef std::set<fsa_family> fsa_scope;
 
-	/// provides a scope containing all FSA famillies
-    extern fsa_scope all_fsa_famillies();
+	/// provides a scope containing all FSA families
+    extern fsa_scope all_fsa_families();
 
     extern infinint fsa_scope_to_infinint(const fsa_scope & val);
     extern fsa_scope infinint_to_fsa_scope(const infinint & ref);

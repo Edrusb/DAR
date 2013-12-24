@@ -82,7 +82,7 @@ _ + retry on change                      --retry-on-change <count[:max byte]>
 1 + sparse-file detection tunning        --sparse-file-min-size <int>
 2 + dirty file behavior                  --dirty-behavior {ignore|no-warn}
 3 + create a hash algorithm (+algo)      --hash <algo>
-4 + filesystem specific attr. familly    --fsa-familly <fam1,fam2,fam3,...>
+4 + filesystem specific attr. family     --fsa-scope <fam1,fam2,fam3,...>
 5 !
 6 !
 7 !

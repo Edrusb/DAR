@@ -1575,11 +1575,11 @@ static bool get_args_recursive(recursive_param & rec,
 		if(p.info_details)
 		{
 		    string list;
-		    set<fsa_familly>::iterator it = p.scope.begin();
+		    set<fsa_family>::iterator it = p.scope.begin();
 		    while(it != p.scope.end())
 		    {
 			list += " ";
-			list += fsa_familly_to_string(*it);
+			list += fsa_family_to_string(*it);
 			++it;
 		    }
 		    rec.dialog->warning(string("FSA family in scope:") + list);

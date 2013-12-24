@@ -311,18 +311,18 @@ namespace libdar
             // FILESYSTEM SPECIFIC ATTRIBUTES Methods
             //
 	    // there is not "remove status for FSA, either the inode contains
-	    // full copy of FSA or only remembers the famillies of FSA found in the unchanged inode
+	    // full copy of FSA or only remembers the families of FSA found in the unchanged inode
 	    // FSA none is used when the file has no FSA because:
 	    //  - either the underlying filesystem has no known FSA
 	    //  - or the underlying filesystem FSA support has not been activated at compilation time
-	    //  - or the fsa_scope requested at execution time exclude the filesystem FSA famillies available here
+	    //  - or the fsa_scope requested at execution time exclude the filesystem FSA families available here
 	enum fsa_status { fsa_none, fsa_partial, fsa_full };
 
 	    // I : which FSA are present
 	void fsa_set_saved_status(fsa_status status);
 	fsa_status fsa_get_saved_status() const { return fsa_saved; };
-	    /// gives the set of FSA familly recorded for that inode
-	fsa_scope fsa_get_famillies() const { if(fsa_famillies == NULL) throw SRC_BUG; return infinint_to_fsa_scope(*fsa_famillies); };
+	    /// gives the set of FSA family recorded for that inode
+	fsa_scope fsa_get_families() const { if(fsa_families == NULL) throw SRC_BUG; return infinint_to_fsa_scope(*fsa_families); };
 
 
 
@@ -368,7 +368,7 @@ namespace libdar
             // the following is used if ea_saved == full or ea_saved == partial or
         crc *ea_crc;             //< CRC computed on EA
 
-	infinint *fsa_famillies; //< list of FSA famillies present for that inode (set to NULL in fsa_none mode)
+	infinint *fsa_families; //< list of FSA families present for that inode (set to NULL in fsa_none mode)
 	infinint *fsa_offset;    //< offset in archive where to find FSA  # always allocated (to be reviewed)
 	filesystem_specific_attribute_list *fsal; //< Filesystem Specific Attributes read or to be written down # only allocated if fsa_saved if set to FULL
 	infinint *fsa_size;      //< storage size required for FSA

@@ -32,7 +32,7 @@
 
 #include "integers.hpp"
 #include "crc.hpp"
-#include "fsa_familly.hpp"
+#include "fsa_family.hpp"
 #include "special_alloc.hpp"
 
 namespace libdar
@@ -58,10 +58,10 @@ namespace libdar
 	    /// \note when the underlying filesystem does not support the requested EA the constructor
 	    /// of the inherited class should throw an exception of type Erange. Only valid object should
 	    /// be built, that is object containing the value of the FSA found on the filesystem.
-	filesystem_specific_attribute(fsa_familly f) { fam = f; nat = fsan_unset; };
+	filesystem_specific_attribute(fsa_family f) { fam = f; nat = fsan_unset; };
 
 	    /// constructor used to read a FSA from a libdar archive
-	filesystem_specific_attribute(generic_file & f, fsa_familly xfam, fsa_nature xnat) { fam = xfam; nat = xnat; };
+	filesystem_specific_attribute(generic_file & f, fsa_family xfam, fsa_nature xnat) { fam = xfam; nat = xnat; };
 
 	    /// virtual destructor for inherited classes
 	virtual ~filesystem_specific_attribute() {};
@@ -80,8 +80,8 @@ namespace libdar
 	bool operator <= (const filesystem_specific_attribute & ref) const { return !(*this > ref); };
 
 
-	    /// obtain the familly of the FSA
-	fsa_familly get_familly() const { return fam; };
+	    /// obtain the family of the FSA
+	fsa_family get_family() const { return fam; };
 
 	    /// obtain the nature of the FSA
 	fsa_nature get_nature() const { return nat; };
@@ -103,14 +103,14 @@ namespace libdar
 #endif
 
     protected:
-	void set_familly(const fsa_familly & val) { fam = val; };
+	void set_family(const fsa_family & val) { fam = val; };
 	void set_nature(const fsa_nature & val) { nat = val; };
 
 	    /// should return true if the value of the argument is equal to the one of 'this' false in any other case (even for object of another inherited class)
 	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const = 0;
 
     private:
-	fsa_familly fam;
+	fsa_family fam;
 	fsa_nature nat;
     };
 
@@ -127,10 +127,10 @@ namespace libdar
 	    /// clear all attributes
 	void clear();
 
-	    /// gives the set of FSA familly present in the list
-	fsa_scope get_fsa_famillies() const { return familles; };
+	    /// gives the set of FSA family present in the list
+	fsa_scope get_fsa_families() const { return familes; };
 
-	    /// compare two lists of FSA to see whether they have equal FSA with identical values within the given familly scope
+	    /// compare two lists of FSA to see whether they have equal FSA with identical values within the given family scope
 	bool is_included_in(const filesystem_specific_attribute_list & ref, const fsa_scope & scope) const;
 
 	    /// read FSA list from archive
@@ -145,7 +145,7 @@ namespace libdar
 
 	    /// set FSA list to filesystem
 	    /// \param [in] target path of file to restore FSA to
-	    /// \param [in] scope list of FSA famillies to only consider
+	    /// \param [in] scope list of FSA families to only consider
 	    /// \param [in] ui user interaction object
 	    /// \return true if some FSA have effectively been set, false if no FSA
 	    /// could be set either because list was empty of all FSA in the list where out of scope
@@ -179,11 +179,11 @@ namespace libdar
 
     private:
 	std::vector<filesystem_specific_attribute *> fsa; //< sorted list of FSA
-	fsa_scope familles;
+	fsa_scope familes;
 
 	void copy_from(const filesystem_specific_attribute_list & ref);
-	void update_familles();
-	void add(const filesystem_specific_attribute & ref); // add an entry without updating the "familles" field
+	void update_familes();
+	void add(const filesystem_specific_attribute & ref); // add an entry without updating the "familes" field
 	void sort_fsa();
 
 	void fill_extX_FSA_with(const std::string & target);
@@ -194,9 +194,9 @@ namespace libdar
 	    /// \note return true if some FSA could be set
 	bool set_hfs_FSA_to(user_interaction & ui, const std::string & target) const { return false; };
 
-	static std::string familly_to_signature(fsa_familly f);
+	static std::string family_to_signature(fsa_family f);
 	static std::string nature_to_signature(fsa_nature n);
-	static fsa_familly signature_to_familly(const std::string & sig);
+	static fsa_family signature_to_family(const std::string & sig);
 	static fsa_nature signature_to_nature(const std::string & sig);
     };
 
@@ -218,8 +218,8 @@ namespace libdar
     class fsa_bool : public filesystem_specific_attribute
     {
     public:
-	fsa_bool(fsa_familly f, fsa_nature n, bool xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); };
-	fsa_bool(generic_file & f, fsa_familly fam, fsa_nature nat);
+	fsa_bool(fsa_family f, fsa_nature n, bool xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); };
+	fsa_bool(generic_file & f, fsa_family fam, fsa_nature nat);
 
 	bool get_value() const { return val; };
 
@@ -246,8 +246,8 @@ namespace libdar
     class fsa_infinint : public filesystem_specific_attribute
     {
     public:
-	fsa_infinint(fsa_familly f, fsa_nature n, bool xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); mode = integer; };
-	fsa_infinint(generic_file & f, fsa_familly fam, fsa_nature nat);
+	fsa_infinint(fsa_family f, fsa_nature n, bool xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); mode = integer; };
+	fsa_infinint(generic_file & f, fsa_family fam, fsa_nature nat);
 
 	const infinint & get_value() const { return val; };
 

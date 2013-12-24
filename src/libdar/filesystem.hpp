@@ -51,7 +51,7 @@ extern "C"
 #include "infinint.hpp"
 #include "etage.hpp"
 #include "criterium.hpp"
-#include "fsa_familly.hpp"
+#include "fsa_family.hpp"
 
 namespace libdar
 {

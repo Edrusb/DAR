@@ -196,7 +196,7 @@ this family takes care of Linux ext2/3/4 flag attributes set by chattr(1) and re
 this family takes care of Mac OS X HFS+ birth date of files, in addition of commonly found dates like atime (last access time), ctime (last meta data change) and mtime (last data change).
 .TP 5
 none
-"none" is not a FSA familly but can be used alone to ignore all FSA families.
+"none" is not a FSA family but can be used alone to ignore all FSA families.
 .P
 By default no restriction is done and FSA of all families are considered at restoration time, but if a family has not been activated at compilation time a warning is issued for each file that cannot have its FSA restored completely (unless this family is excluded from the scope thanks to the -4 option). At backup time, if an FSA family has not been activated at compilation time, no warning is issued and FSA of that family are ignored. Still at backup time, you can also ignore FSA that have compilation time support by excluding them from the operation thanks to this -4 option.
 .P

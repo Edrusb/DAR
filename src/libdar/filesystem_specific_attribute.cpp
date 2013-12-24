@@ -103,7 +103,7 @@ namespace libdar
 
     bool filesystem_specific_attribute::is_same_type_as(const filesystem_specific_attribute & ref) const
     {
-	return get_familly() == ref.get_familly()
+	return get_family() == ref.get_family()
 	    && get_nature() == ref.get_nature();
     }
 
@@ -168,7 +168,7 @@ namespace libdar
 	    if(*rt == NULL)
 		throw SRC_BUG;
 
-	    if(scope.find((*it)->get_familly()) == scope.end())
+	    if(scope.find((*it)->get_family()) == scope.end())
 	    {
 		    // this FSA is out of the scope, skipping it
 		++it;
@@ -209,13 +209,13 @@ namespace libdar
 	    while(sub_size > 0)
 	    {
 		char buffer[FAM_SIG_WIDTH + NAT_SIG_WIDTH + 1];
-		fsa_familly fam;
+		fsa_family fam;
 		fsa_nature nat;
 		filesystem_specific_attribute *ptr = NULL;
 
 		f.read(buffer, FAM_SIG_WIDTH);
 		buffer[FAM_SIG_WIDTH] = '\0';
-		fam = signature_to_familly(buffer);
+		fam = signature_to_family(buffer);
 
 		f.read(buffer, NAT_SIG_WIDTH);
 		buffer[NAT_SIG_WIDTH] = '\0';
@@ -256,7 +256,7 @@ namespace libdar
 	}
 	while(size > 0);
 
-	update_familles();
+	update_familes();
 	sort_fsa();
     }
 
@@ -274,7 +274,7 @@ namespace libdar
 	    if(*it == NULL)
 		throw SRC_BUG;
 
-	    tmp = familly_to_signature((*it)->get_familly());
+	    tmp = family_to_signature((*it)->get_family());
 	    f.write(tmp.c_str(), tmp.size());
 	    tmp = nature_to_signature((*it)->get_nature());
 	    f.write(tmp.c_str(), tmp.size());
@@ -291,14 +291,14 @@ namespace libdar
 
 	if(scope.find(fsaf_hfs_plus) != scope.end())
 	{
-		// throw Efeature("reading HFS+ FSA familly");
+		// throw Efeature("reading HFS+ FSA family");
 	}
 
 	if(scope.find(fsaf_linux_extX) != scope.end())
 	{
 	    fill_extX_FSA_with(target);
 	}
-	update_familles();
+	update_familes();
 	sort_fsa();
     }
 
@@ -331,7 +331,7 @@ namespace libdar
     {
 	infinint ret = infinint(size()).get_storage_size();
 	vector<filesystem_specific_attribute *>::const_iterator it = fsa.begin();
-	infinint overhead = familly_to_signature(fsaf_hfs_plus).size()
+	infinint overhead = family_to_signature(fsaf_hfs_plus).size()
 	    + nature_to_signature(fsan_creation_date).size();
 
 	while(it != fsa.end())
@@ -358,7 +358,7 @@ namespace libdar
 	    ++it;
 	}
 
-	ret.update_familles();
+	ret.update_familes();
 	ret.sort_fsa();
 
 	return ret;
@@ -377,19 +377,19 @@ namespace libdar
 	    ++it;
 	}
 
-	familles = ref.familles;
+	familes = ref.familes;
     }
 
-    void filesystem_specific_attribute_list::update_familles()
+    void filesystem_specific_attribute_list::update_familes()
     {
 	vector<filesystem_specific_attribute *>::iterator it = fsa.begin();
 
-	familles.clear();
+	familes.clear();
 	while(it != fsa.end())
 	{
 	    if(*it == NULL)
 		throw SRC_BUG;
-	    familles.insert((*it)->get_familly());
+	    familes.insert((*it)->get_family());
 	    ++it;
 	}
     }
@@ -449,7 +449,7 @@ namespace libdar
 	sort(fsa.begin(), fsa.end(), compare_for_sort);
     }
 
-    template <class T, class U> void create_or_throw(T *& ref, fsa_familly f, fsa_nature n, const U & val)
+    template <class T, class U> void create_or_throw(T *& ref, fsa_family f, fsa_nature n, const U & val)
     {
 	if(ref != NULL)
 	    throw SRC_BUG;
@@ -482,12 +482,12 @@ namespace libdar
 	    catch(Egeneric & e)
 	    {
 		fd = -1;
-		    // we assume this FSA familly is not supported for that file
+		    // we assume this FSA family is not supported for that file
 	    }
 	}
 
 	if(fd < 0)
-	    return; // silently aborting assuming FSA familly not supported for that file
+	    return; // silently aborting assuming FSA family not supported for that file
 
 	try
 	{
@@ -495,7 +495,7 @@ namespace libdar
 	    fsa_bool * ptr = NULL;
 
 	    if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
-		return; // assuming there is no support for that FSA familly
+		return; // assuming there is no support for that FSA family
 
 #ifdef EXT2_APPEND_FL
 	    create_or_throw(ptr, fsaf_linux_extX, fsan_append_only, (f & EXT2_APPEND_FL) != 0);
@@ -585,7 +585,7 @@ namespace libdar
 	{
 	    if(*it == NULL)
 		throw SRC_BUG;
-	    if((*it)->get_familly() == fsaf_linux_extX)
+	    if((*it)->get_family() == fsaf_linux_extX)
 		has_extX_FSA = true;
 	    ++it;
 	}
@@ -603,7 +603,7 @@ namespace libdar
 	    }
 	    catch(Egeneric & e)
 	    {
-		throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed setting (opening) extX familly FSA: ")) + e.get_message());
+		throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed setting (opening) extX family FSA: ")) + e.get_message());
 	    }
 
 	    if(fd < 0)
@@ -616,7 +616,7 @@ namespace libdar
 		const fsa_bool *it_bool = NULL;
 
 		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f_orig) < 0)
-		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading exiting extX familly FSA: ")) + strerror(errno));
+		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading exiting extX family FSA: ")) + strerror(errno));
 		f = f_orig;
 
 		for(it = fsa.begin() ; it != fsa.end() ; ++it)
@@ -626,14 +626,14 @@ namespace libdar
 
 		    it_bool = dynamic_cast<const fsa_bool *>(*it);
 
-		    if((*it)->get_familly() == fsaf_linux_extX)
+		    if((*it)->get_family() == fsaf_linux_extX)
 		    {
 			switch((*it)->get_nature())
 			{
 			case fsan_unset:
 			    throw SRC_BUG;
 			case fsan_creation_date:
-			    throw SRC_BUG; // unknown nature for this familly type
+			    throw SRC_BUG; // unknown nature for this family type
 			case fsan_append_only:
 			    if(it_bool == NULL)
 				throw SRC_BUG; // should be a boolean
@@ -644,7 +644,7 @@ namespace libdar
 				f &= ~EXT2_APPEND_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
 #endif
@@ -657,7 +657,7 @@ namespace libdar
 				f &= ~EXT2_COMPR_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
 #endif
@@ -670,7 +670,7 @@ namespace libdar
 				f &= ~EXT2_NODUMP_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
 #endif
@@ -683,7 +683,7 @@ namespace libdar
 				f &= ~EXT2_IMMUTABLE_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
 #endif
@@ -702,7 +702,7 @@ namespace libdar
 				f &= ~EXT2_JOURNAL_DATA_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
 #endif
@@ -716,7 +716,7 @@ namespace libdar
 				f &= ~EXT2_SECRM_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
 #endif
@@ -729,7 +729,7 @@ namespace libdar
 				f &= ~EXT2_NOTAIL_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
 #endif
@@ -742,7 +742,7 @@ namespace libdar
 				f &= ~EXT2_UNRM_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
 #endif
@@ -755,7 +755,7 @@ namespace libdar
 				f &= ~EXT2_NOATIME_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
 #endif
@@ -768,7 +768,7 @@ namespace libdar
 				f &= ~EXT2_DIRSYNC_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
 #endif
@@ -781,7 +781,7 @@ namespace libdar
 				f &= ~EXT2_SYNC_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string(fsan_append_only).c_str(),
 				      target.c_str());
 #endif
@@ -794,7 +794,7 @@ namespace libdar
 				f &= ~EXT2_TOPDIR_FL;
 #else
 			    ui.printf(gettext("Warning: FSA %s/%s support has not been found at compilation time, cannot restore it for inode %s"),
-				      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+				      fsa_family_to_string(fsaf_linux_extX).c_str(),
 				      fsa_nature_to_string((*it)->get_nature()).c_str(),
 				      target.c_str());
 #endif
@@ -838,7 +838,7 @@ namespace libdar
 		if(tmp_f != f_orig)
 		{
 		    if(ioctl(fd, EXT2_IOC_SETFLAGS, &tmp_f) < 0)
-			throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed set extX familly FSA: ")) + strerror(errno ));
+			throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed set extX family FSA: ")) + strerror(errno ));
 		    ret = true; // some flags have been set or cleared
 		}
 
@@ -912,7 +912,7 @@ namespace libdar
 	if(has_extX_FSA)
 	{
 	    ui.printf(gettext("Warning! %s Filesystem Specific Attribute support have not been activated at compilation time and could not be restored for %s"),
-		      fsa_familly_to_string(fsaf_linux_extX).c_str(),
+		      fsa_family_to_string(fsaf_linux_extX).c_str(),
 		      target.c_str());
 	}
 #endif
@@ -920,7 +920,7 @@ namespace libdar
 	return ret;
     }
 
-    string filesystem_specific_attribute_list::familly_to_signature(fsa_familly f)
+    string filesystem_specific_attribute_list::family_to_signature(fsa_family f)
     {
 	string ret;
 
@@ -1005,7 +1005,7 @@ namespace libdar
 	return ret;
     }
 
-    fsa_familly filesystem_specific_attribute_list::signature_to_familly(const string & sig)
+    fsa_family filesystem_specific_attribute_list::signature_to_family(const string & sig)
     {
 	if(sig.size() != FAM_SIG_WIDTH)
 	    throw SRC_BUG;
@@ -1058,7 +1058,7 @@ namespace libdar
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-    fsa_bool::fsa_bool(generic_file & f, fsa_familly fam, fsa_nature nat):
+    fsa_bool::fsa_bool(generic_file & f, fsa_family fam, fsa_nature nat):
 	filesystem_specific_attribute(f, fam, nat)
     {
 	char ch;
@@ -1095,7 +1095,7 @@ namespace libdar
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-    fsa_infinint::fsa_infinint(generic_file & f, fsa_familly fam, fsa_nature nat):
+    fsa_infinint::fsa_infinint(generic_file & f, fsa_family fam, fsa_nature nat):
 	filesystem_specific_attribute(f, fam, nat)
     {
 	val.read(f);

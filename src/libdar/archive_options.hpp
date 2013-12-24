@@ -37,7 +37,7 @@
 #include "secu_string.hpp"
 #include "nls_swap.hpp"
 #include "entrepot.hpp"
-#include "fsa_familly.hpp"
+#include "fsa_family.hpp"
 
 #include <string>
 

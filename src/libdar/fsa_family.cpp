@@ -30,14 +30,14 @@ extern "C"
 
 #include "erreurs.hpp"
 #include "tools.hpp"
-#include "fsa_familly.hpp"
+#include "fsa_family.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    string fsa_familly_to_string(fsa_familly f)
+    string fsa_family_to_string(fsa_family f)
     {
 	switch(f)
 	{
@@ -87,7 +87,7 @@ namespace libdar
 	}
     }
 
-    fsa_scope all_fsa_famillies()
+    fsa_scope all_fsa_families()
     {
 	fsa_scope ret;
 
