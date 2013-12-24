@@ -316,7 +316,7 @@ bool get_args(user_interaction & dialog,
     p.list_ea = false;
     p.ignore_unknown_inode = false;
     p.no_compare_symlink_date = true;
-    p.scope.clear();
+    p.scope = all_fsa_families();
 
     try
     {
