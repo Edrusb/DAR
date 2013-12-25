@@ -78,7 +78,7 @@ using namespace libdar;
 #define INVALID_ARG "Invalid argument given to -%c (requires integer)"
 #define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:"
 
-enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, move, interactive, check, batch };
+enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, moving, interactive, check, batch };
 
 static S_I little_main(user_interaction & dialog, S_I argc, char *const argv[], const char **env);
 static bool command_line(user_interaction & dialog,
@@ -197,7 +197,7 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
     case used:
     case files:
     case stats:
-    case move:
+    case moving:
     case interactive:
     case check:
     case batch:
@@ -404,7 +404,7 @@ static bool command_line(user_interaction & dialog,
 		case 'm':
 		    if(op != none_op)
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
-		    op = move;
+		    op = moving;
 		    if(optarg == NULL)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    num = tools_str2int(optarg);
@@ -555,7 +555,7 @@ static bool command_line(user_interaction & dialog,
 	    break;
 	case options:
 	    break;
-	case move:
+	case moving:
 	    if(rest.size() != 1)
 	    {
 		dialog.warning(gettext("Missing argument to command line, aborting"));
@@ -1321,7 +1321,7 @@ static void finalize(user_interaction & dialog, operation op, database *dat, con
     case where:
     case options:
     case dar:
-    case move:
+    case moving:
     case batch:
 	if(info_details)
 	    dialog.warning(gettext("Compressing and writing back database to file..."));
@@ -1385,7 +1385,7 @@ static void action(user_interaction & dialog,
     case stats:
 	op_stats(dialog, dat, info_details);
 	break;
-    case move:
+    case moving:
 	op_move(dialog, dat, num, num2, info_details);
 	break;
     case interactive:
