@@ -93,7 +93,7 @@ function GO {
   if [ "$disable" = "yes" ] ; then
     echo "$label = DISABLED"
   else
-    echo -n "$label = "
+    printf "$label = "
     if [ "$debug" != "yes" ];  then
       { $* >/dev/null && echo "OK" ; } || { echo "$label FAILED" && echo "--------> $1 FAILED : $*" && exit 1 ; }
     else
