@@ -19,8 +19,8 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 AC_MSG_CHECKING([for C++ compiler usability])
-AC_COMPILE_IFELSE(AC_LANG_PROGRAM([],
-                                  [ class test { public: int test; }; ]),
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
+                                  [ class test { public: int test; }; ])],
                   [AC_MSG_RESULT(ok)],
                   [AC_MSG_ERROR([No C++ compiler found])])
 
@@ -73,12 +73,13 @@ AC_HEADER_TIME
 AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror utime fdopendir])
 
 AC_MSG_CHECKING([for getopt() in <unistd.h>])
-AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                     #if HAVE_UNISTD_H
                                     #include <unistd.h>
                                     #endif
                                     }]],
-                                    [ getopt(0, 0, 0); ]),
+                                    [ getopt(0, 0, 0); ])
+		  ],
                   [
                     AC_DEFINE(HAVE_GETOPT_IN_UNISTD_H, 1, [a getopt() call is declared in <unistd.h>])
                     AC_MSG_RESULT(present)
@@ -86,12 +87,13 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
                    [AC_MSG_RESULT(absent)])
 
 AC_MSG_CHECKING([for getopt_long() in <unistd.h>])
-AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                     #if HAVE_UNISTD_H
                                     #include <unistd.h>
                                     #endif
                                     }]],
-                                    [ getopt_long(0, 0, 0, 0, 0); ]),
+                                    [ getopt_long(0, 0, 0, 0, 0); ])
+		  ],
                   [
                     AC_DEFINE(HAVE_GETOPT_LONG_IN_UNISTD_H, 1, [a getopt_long() call is declared in <unistd.h>])
                     AC_MSG_RESULT(present)
@@ -100,7 +102,7 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
 
 
 AC_MSG_CHECKING([for optreset presence])
-AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		                   #if HAVE_STDIO_H
 				   #include <stdio.h>
 				   #endif
@@ -111,7 +113,8 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
                                    #include <unistd.h>
                                    #endif
                                    #endif
-                                   }]], [ int x = optreset; return 0; ]),
+                                   }]], [ int x = optreset; return 0; ])
+                  ],
                   [
                    AC_DEFINE(HAVE_OPTRESET, 1, [the optreset external variable exists to reset getopt standard call])
                    AC_MSG_RESULT(available)
@@ -119,7 +122,7 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
                   [AC_MSG_RESULT([not available])])
 
 AC_MSG_CHECKING([for Door file support])
-AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		 	            #if HAVE_SYS_STAT_H
 				    #include <sys/stat.h>
 				    #endif
@@ -132,7 +135,8 @@ AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[extern "C" {
 				      return 0;
 				    else
 				      return 1;
-				  ]),
+				  ])
+		  ],
 		  [
 		    AC_DEFINE(HAVE_DOOR, 1, [whether the system has the necessary routine to handle Door files])
 		    AC_MSG_RESULT(available)
@@ -156,7 +160,7 @@ AC_ARG_ENABLE( [libz-linking],
                                         local_libz="no"
                                        ])
                if test "$local_libz" = "yes" ; then
-               AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
+               AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                            #if HAVE_ZLIB_H
                                                            #include <zlib.h>
                                                            #endif
@@ -164,9 +168,10 @@ AC_ARG_ENABLE( [libz-linking],
                                               [[
                                                          z_stream *ptr = (z_stream *)0;
                                                          deflate(ptr, 0);
-                                              ]]),
-                                              [ AC_DEFINE(LIBZ_AVAILABLE, 1, [header and linking is available to have libz functions])],
-                                              [ local_libz="no" ])
+                                              ]])
+    			      ],
+                              [ AC_DEFINE(LIBZ_AVAILABLE, 1, [header and linking is available to have libz functions])],
+                              [ local_libz="no" ])
                else
                  AC_MSG_WARN([libz compression support not available])
                fi
@@ -188,7 +193,7 @@ AC_ARG_ENABLE( [libbz2-linking],
                                        local_libbz2="no"
                                       ])
               if test "$local_libbz2" = "yes" ; then
-                 AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
+                 AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                        #if HAVE_BZLIB_H
                                                        #include <bzlib.h>
                                                        #endif
@@ -196,9 +201,10 @@ AC_ARG_ENABLE( [libbz2-linking],
                                               [[
                                                         bz_stream *ptr = (bz_stream *)0;
                                                         BZ2_bzCompress(ptr, 0);
-                                              ]]),
-                                              [ AC_DEFINE(LIBBZ2_AVAILABLE, 1, [header and linking is available to have libbz2 functions])],
-                                              [ local_libbz2="no" ])
+                                              ]])
+				],
+                                [ AC_DEFINE(LIBBZ2_AVAILABLE, 1, [header and linking is available to have libbz2 functions])],
+                                [ local_libbz2="no" ])
              else
                 AC_MSG_WARN([libbz2 compression support not available])
              fi
@@ -219,16 +225,17 @@ AC_ARG_ENABLE( [liblzo2-linking],
                                        local_liblzo2="no"
                                       ])
               if test "$local_liblzo2" = "yes" ; then
-                 AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
+                 AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                        #if HAVE_LZO_LZO1X_H
                                                        #include <lzo/lzo1x.h>
                                                        #endif
                                               }]],
                                               [[
 						        int x = lzo1x_1_compress(0, 0, 0, 0, 0);
-                                              ]]),
-                                              [ AC_DEFINE(LIBLZO2_AVAILABLE, 1, [header and linking is available to have lzo functions])],
-                                              [ local_liblzo2="no" ])
+                                              ]])
+				],
+                                [ AC_DEFINE(LIBLZO2_AVAILABLE, 1, [header and linking is available to have lzo functions])],
+                                [ local_liblzo2="no" ])
              else
                 AC_MSG_WARN([lzo compression support not available])
              fi
@@ -254,7 +261,7 @@ AC_ARG_ENABLE( [libgcrypt-linking],
               if test "$local_crypto" = "yes" ; then
                  AC_DEFINE(MIN_VERSION_GCRYPT, "1.4.0", [libgcrypt minimum version])
 		 AC_MSG_CHECKING([for libgcrypt usability])
-                 AC_RUN_IFELSE(AC_LANG_PROGRAM([[ extern "C"
+                 AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
 		 				  {
                                                        #if HAVE_GCRYPT_H
                                                        #include <gcrypt.h>
@@ -271,18 +278,19 @@ AC_ARG_ENABLE( [libgcrypt-linking],
 						 }
                                                  else
   						   exit(0);
-                                              ]]),
-                                              [ AC_DEFINE(CRYPTO_AVAILABLE, 1, [header and linking is available to have strong encryption works])
-					        AC_MSG_RESULT([ok])
-					      ],
-					      [
-					         if test "$?" = "1" ; then
-						   AC_MSG_RESULT([failed: need libgcypt >= MIN_VERSION_GCRYPT, disabling strong encryption support])
-						 else
- 						   AC_MSG_RESULT([failed: libgcrypt is unusable, cannot even call gcry_check_version(). Disabling strong encryption support])
-						 fi
-						 local_crypto="yes"
-					      ])
+                                              ]])
+			        ],
+                                [ AC_DEFINE(CRYPTO_AVAILABLE, 1, [header and linking is available to have strong encryption works])
+				  AC_MSG_RESULT([ok])
+				],
+				[
+				  if test "$?" = "1" ; then
+				    AC_MSG_RESULT([failed: need libgcypt >= MIN_VERSION_GCRYPT, disabling strong encryption support])
+				  else
+ 				    AC_MSG_RESULT([failed: libgcrypt is unusable, cannot even call gcry_check_version(). Disabling strong encryption support])
+				  fi
+				  local_crypto="yes"
+				])
              else
                 AC_MSG_WARN([strong encryption support not available])
              fi
@@ -297,7 +305,7 @@ AC_ARG_ENABLE(  [ea-support],
                 [ AC_CHECK_HEADERS([attr/xattr.h])
                   AC_CHECK_LIB(attr, [lgetxattr], [], [])
                   AC_MSG_CHECKING([for Unix Extended Attribute support])
-                  AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+                  AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                                      #if HAVE_SYS_TYPES_H
                                                      #include <sys/types.h>
                                                      #endif
@@ -305,62 +313,65 @@ AC_ARG_ENABLE(  [ea-support],
                                                      #include <attr/xattr.h>
                                                      #endif
                                                     }]],
-                                                    [ lgetxattr((char *)0, (char *)0, (void *)0, 0); ]),
+                                                    [ lgetxattr((char *)0, (char *)0, (void *)0, 0); ])
+				 ],
                                  [
                                         AC_DEFINE(EA_SUPPORT, [], [if defined, activates support for Extended Attributes])
                                         local_ea_support="yes"
                                         AC_MSG_RESULT([yes])
                                  ],
                                  [
-                  AC_MSG_RESULT([no])
-                  AC_CHECK_HEADERS([sys/xattr.h])
-                  AC_CHECK_LIB(c, [fgetxattr])
-                  AC_MSG_CHECKING([for Mac OS X Extended Attribute support])
-                  AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
-                                                     #if HAVE_SYS_XATTR_H
-                                                     #include <sys/xattr.h>
-                                                     #endif
-                                                    }]],
-                                                    [ getxattr((char *)0, (char *)0, (void *)0, 0, 0, XATTR_NOFOLLOW); ]),
-                                    [
-                                        AC_DEFINE(EA_SUPPORT, [], [if defined, activates support for Extended Attributes])
-                                        AC_DEFINE(OSX_EA_SUPPORT, [], [if defined, activates support for Mac OS X Extended Attributes])
-                                        local_ea_support="yes"
-                                        AC_MSG_RESULT([yes])
-                                    ],
-                                    [ AC_MSG_RESULT([no]) ],
-                                    )
-                                 ]
-                                 )
-                ]
-             )
+				        AC_MSG_RESULT([no])
+					AC_CHECK_HEADERS([sys/xattr.h])
+					AC_CHECK_LIB(c, [fgetxattr])
+                  			AC_MSG_CHECKING([for Mac OS X Extended Attribute support])
+                  			AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+                                                                         #if HAVE_SYS_XATTR_H
+                                                     			 #include <sys/xattr.h>
+                                                     			 #endif
+                                                    		       }]],
+                                                                       [ getxattr((char *)0, (char *)0, (void *)0, 0, 0, XATTR_NOFOLLOW); ])
+                                                       ],
+                                 		       [
+ 						          AC_DEFINE(EA_SUPPORT, [], [if defined, activates support for Extended Attributes])
+                                        		  AC_DEFINE(OSX_EA_SUPPORT, [], [if defined, activates support for Mac OS X Extended Attributes])
+                                        		  local_ea_support="yes"
+                                        		  AC_MSG_RESULT([yes])
+                                 		       ],
+                                 		       [ AC_MSG_RESULT([no]) ])
+                                 ])
+                 ]
+              )
 
 AC_MSG_CHECKING([ext2fs.h availability])
 AC_ARG_ENABLE(  [nodump-flag],
                 AC_HELP_STRING(--disable-nodump-flag, [deactivate the "ext2/3 nodump flag" feature check]),
                 [AC_MSG_RESULT([nodump flag disabled])],
-                [AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+                [AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                                     #include <ext2fs/ext2_fs.h>
                                                     #if HAVE_SYS_IOCTL_H
                                                     #include <sys/ioctl.h>
                                                     #endif
-                                                    }]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]),
+                                                    }]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]
+						)
+				],
                                 [
                                 AC_DEFINE(LIBDAR_NODUMP_FEATURE, [NODUMP_EXT2FS], [if defined, activates the ext2/3 nodump flag feature])
                                 local_nodump_feature="yes"
                                 AC_MSG_RESULT([found <ext2fs/ext2_fs.h>])
                                 ],
                                 [
-                                AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+                                AC_LINK_IFELSE(  [AC_LANG_PROGRAM([[extern "C" {
                                                                     #include <linux/ext2_fs.h>
                                                                     #if HAVE_SYS_IOCTL_H
                                                                     #include <sys/ioctl.h>
                                                                     #endif
-                                                                    }]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]),
+                                                                    }]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]])
+						 ],
                                                  [
-                                                 AC_DEFINE(LIBDAR_NODUMP_FEATURE, [NODUMP_LINUX], [if defined, activates the ext2/3 nodump flag feature])
-                                                 local_nodump_feature="yes"
-                                                 AC_MSG_RESULT([found <linux/ext2_fs.h>])
+                                                   AC_DEFINE(LIBDAR_NODUMP_FEATURE, [NODUMP_LINUX], [if defined, activates the ext2/3 nodump flag feature])
+                                                   local_nodump_feature="yes"
+                                                   AC_MSG_RESULT([found <linux/ext2_fs.h>])
                                                  ],
                                                  [
                                                      AC_MSG_RESULT([NOT FOUND])
@@ -377,7 +388,7 @@ AC_ARG_ENABLE(  [gnugetopt],
              )
 
 AC_MSG_CHECKING([for getopt() availability]);
-AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		                   #if HAVE_STDIO_H
 				   #include <stdio.h>
 				   #endif
@@ -388,14 +399,15 @@ AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
                                    #include <unistd.h>
                                    #endif
                                    #endif
-                                   }]], [ getopt(0, 0, 0); ]),
+                                   }]], [ getopt(0, 0, 0); ])
+		  ],
                   [
 		    AC_MSG_RESULT([ok])
                   ],
                   [AC_MSG_ERROR([absent but required])])
 
 AC_MSG_CHECKING([for getopt_long() availability]);
-AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		                   #if HAVE_STDIO_H
 				   #include <stdio.h>
 				   #endif
@@ -406,7 +418,8 @@ AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
                                    #include <unistd.h>
                                    #endif
                                    #endif
-                                   }]], [ getopt_long(0, 0, 0, 0, 0); ]),
+                                   }]], [ getopt_long(0, 0, 0, 0, 0); ])
+		  ],
                   [
 		    local_have_getopt_long="yes"
                     AC_DEFINE(HAVE_GETOPT_LONG, 1, [whether getopt_long() is available])
@@ -455,7 +468,7 @@ AC_ARG_ENABLE( [furtive-read],
 	         AC_MSG_WARN([Furtive read mode disabled])
                ],
                [ AC_MSG_CHECKING([furtive read mode availability])
-                 AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
+                 AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 					         #if HAVE_SYS_TYPE_H
 						 #include <sys/types.h>
 						 #endif
@@ -478,16 +491,18 @@ AC_ARG_ENABLE( [furtive-read],
 						 #else
 						 syntaxically incorrect statement here to force compilation to fail!
 						 #endif
-						 ]]),
-						 [ AC_DEFINE(FURTIVE_READ_MODE_AVAILABLE, 1, [furtive read mode is available])
-						 AC_MSG_RESULT(available)
-						 local_furtive_read_mode="yes"
-						 ],
-						 [AC_MSG_RESULT(no available)
-						 local_furtive_read_mode="no"
-						 ])
+						 ]])
+				],
+				[ AC_DEFINE(FURTIVE_READ_MODE_AVAILABLE, 1, [furtive read mode is available])
+				  AC_MSG_RESULT(available)
+				  local_furtive_read_mode="yes"
+				],
+				[ AC_MSG_RESULT(no available)
+				  local_furtive_read_mode="no"
+				])
 	       ]
  	    )
+
 
 
 AC_ARG_ENABLE( [debug],
@@ -578,7 +593,7 @@ AC_ARG_ENABLE(  [thread-safe],
                 ],
                 [ AC_CHECK_LIB(pthread, [pthread_mutex_init], [], [])
                   AC_MSG_CHECKING([for POSIX mutex])
-                  AC_LINK_IFELSE(AC_LANG_PROGRAM([[extern "C" {
+                  AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                                         #if HAVE_PTHREAD_H
                                                         #include <pthread.h>
                                                         #endif
@@ -586,12 +601,13 @@ AC_ARG_ENABLE(  [thread-safe],
                                                     [[ pthread_mutex_t mutex;
                                                        pthread_mutex_init(&mutex, (const pthread_mutexattr_t*)0);
                                                        pthread_mutex_lock(&mutex);
-                                                       pthread_mutex_unlock(&mutex);]]),
-                                    [ AC_DEFINE(MUTEX_WORKS, 1, [POSIX mutex (pthread_mutex_t) is available])
+                                                       pthread_mutex_unlock(&mutex);]])
+				 ],
+                                 [ AC_DEFINE(MUTEX_WORKS, 1, [POSIX mutex (pthread_mutex_t) is available])
                                       local_mutex_works="yes"
                                       AC_MSG_RESULT(yes)
-                                    ],
-                                    [ AC_MSG_RESULT(no)])
+                                 ],
+                                 [ AC_MSG_RESULT(no)])
                 ]
              )
 
@@ -621,15 +637,16 @@ AC_ARG_ENABLE( [dar-static],
 
 MEM_LDFLAGS=$LDFLAGS
 LDFLAGS="-static"
-AC_LINK_IFELSE(AC_LANG_PROGRAM([[ extern "C" {
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #include <stdio.h>
                                              }
                                ]],
                                [
                                   printf("Hello World!");
-                               ]),
-              [static_pb="no"],
-              [static_pb="yes"])
+                               ])
+	       ],
+               [static_pb="no"],
+               [static_pb="yes"])
 LDFLAGS=$MEM_LDFLAGS
 
 AM_CONDITIONAL([MAKE_ALL_DIR], [test $examples = "yes"])
