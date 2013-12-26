@@ -175,8 +175,12 @@ namespace libdar
     {
 	if(is_terminated())
 	    throw SRC_BUG;
-
-	if(fdatasync(filedesc) < 0)
+#if HAVE_FDATASYNC
+	S_I st = ::fdatasync(filedesc);
+#else
+	S_I st = ::fsync(filedesc);
+#endif
+	if(st < 0)
 	    throw Erange("fichier_local::fsync", string("Failed sync the slice (fdatasync): ") + strerror(errno));
     }
 

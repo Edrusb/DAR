@@ -183,6 +183,24 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		   ],
 		   [  AC_MSG_RESULT([not available])  ])
 
+
+AC_MSG_CHECKING([for fdatasync() availability])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+			           #if HAVE_UNISTD_H
+				   #include <unistd.h>
+				   #endif
+				   }]],
+				   [
+				   (void)fdatasync(0);
+				   ])
+		   ],
+		   [ AC_DEFINE(HAVE_FDATASYNC, 1, [whether the system provides fdatasync() system call])
+		     AC_MSG_RESULT(available)
+		   ],
+		   [ AC_MSG_RESULT([not available])
+		   ])
+
+
 # DAR's features
 
 AC_ARG_ENABLE( [libz-linking],
