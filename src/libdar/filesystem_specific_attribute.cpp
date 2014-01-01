@@ -216,6 +216,7 @@ namespace libdar
 		fsa_family fam;
 		fsa_nature nat;
 		filesystem_specific_attribute *ptr = NULL;
+		fsa_infinint *ptr_infinint = NULL;
 
 		f.read(buffer, FAM_SIG_WIDTH);
 		buffer[FAM_SIG_WIDTH] = '\0';
@@ -230,7 +231,9 @@ namespace libdar
 		case fsan_unset:
 		    throw SRC_BUG;
 		case fsan_creation_date:
-		    ptr = new (nothrow) fsa_infinint(f, fam, nat);
+		    ptr = ptr_infinint = new (nothrow) fsa_infinint(f, fam, nat);
+		    if(ptr_infinint != NULL)
+			ptr_infinint->set_show_mode(fsa_infinint::date);
 		    break;
 		case fsan_append_only:
 		case fsan_compressed:
