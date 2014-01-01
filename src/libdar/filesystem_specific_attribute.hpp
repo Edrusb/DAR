@@ -254,7 +254,7 @@ namespace libdar
     class fsa_infinint : public filesystem_specific_attribute
     {
     public:
-	fsa_infinint(fsa_family f, fsa_nature n, bool xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); mode = integer; };
+	fsa_infinint(fsa_family f, fsa_nature n, infinint xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); mode = integer; };
 	fsa_infinint(generic_file & f, fsa_family fam, fsa_nature nat);
 
 	const infinint & get_value() const { return val; };
