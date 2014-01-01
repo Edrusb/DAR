@@ -961,10 +961,23 @@ namespace libdar
 
     bool filesystem_specific_attribute_list::set_hfs_FSA_to(user_interaction & ui, const std::string & target) const
     {
+	bool ret = false;
+
 	    // the birthtime is set with the different other dates of that inode, so
 	    // here we just check that this FSA list provides a birthtime info:
 	const filesystem_specific_attribute *tmp = NULL;
-	return find(fsaf_hfs_plus, fsan_creation_date, tmp);
+
+	ret = find(fsaf_hfs_plus, fsan_creation_date, tmp);
+#ifndef LIBDAR_BIRTHTIME
+	if(ret)
+	    ui.printf(gettext("Birth Time attribute cannot be restored for %s because no FSA familly able to carry that attribute could been activated at compilation time."),
+		       target.c_str());
+	    // here we just warn, but the birthtime restoration will be tried (calling twice utime()),
+	    // however we have no mean to be sure that this attribute will be set as we have no mean to
+	    // read it on that system (or seen the compilation time features availables).
+#endif
+
+	return ret;
     }
 
     string filesystem_specific_attribute_list::family_to_signature(fsa_family f)
