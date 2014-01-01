@@ -423,7 +423,7 @@ AC_ARG_ENABLE( [birthtime],
 						[[
 						struct stat tmp;
 						int ret = stat("/", &tmp);
-						return tmp.st_birthtime;
+						time_t birth = tmp.st_birthtime;
 						]])
 				[
 				AC_DEFINE(LIBDAR_BIRTHTIME, 1, [if defined, activates the support for HFS+ create time FSA])
