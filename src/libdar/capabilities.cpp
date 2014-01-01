@@ -25,6 +25,10 @@ extern "C"
 {
 #if HAVE_SYS_CAPABILITY_H
 #include <sys/capability.h>
+#else
+#if HAVE_LINUX_CAPABILITY_H
+#include <linux/capability.h>
+#endif
 #endif
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
