@@ -807,6 +807,22 @@ possible values are [     ] or [Saved] or [InRef] or[DIRTY]. [     ] means that 
 .TP 10
 [EA]
 possible values are " " (empty string) or [     ] or [InRef], [Saved] or [Suppr]. It Shows whether Extended Attributes are present and saved ([Saved]), are present but not saved ([     ]) which means there is no change since backup of reference, if there is no EA saved for this file (empty string) or if some EA were present in the archive of reference but none is currently available ([Suppr]). [InRef] was used when isolating a catalogue (release 2.3.x and before) from an archive and means that the file was saved in the reference archive.
+.TP
+[FSA]
+Each character represent a FSA Family:
+.RS
+.TP 5
+"L"
+is the first character (L/l/-) representing ext2/3/4 FSA family
+.TP 5
+"H"
+is the second character (H/h/-) representing HFS+ FSA family
+.TP 5
+"-"
+the third character is reserved for future FSA family and is always a dash for now.
+.P
+Uppercase means the FSA set is saved, lowercase means the FSA is present in the archive of reference and has not changed since that time. Last a dash (-) means no FSA of that family has been saved for that file.
+.RE
 .TP 10
 [compr]
 possible values are [....%] or [-----] or [     ] or [worse]. Shows if the file has been compressed and the compression ratio "compressed/uncompressed" ([...%], for example [ 33%] means that the compressed data takes a third of the corresponding uncompressed data, thus the lower is this ratio, the better is the compression), or if the file is stored without compression ([    ] see -Y and -Z options) or if the file is not subject to compression because it is not a saved regular file ([----]), or if the file takes more space compressed than its original size ([worse]), due to compression overhead. Note that the compression ratio used here is the inverse of what compression tools usually provide (uncompressed/compressed). The reason of this choice is that the ratio used here has the advantage to always stay between 0 and 100%, which is much more easy to work with to provide a well formatted output.
