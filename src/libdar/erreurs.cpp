@@ -131,7 +131,7 @@ namespace libdar
     Ebug::Ebug(const string & file, S_I line) : Egeneric(tools_printf(gettext("File %S line %d"), &file, line), gettext("it seems to be a bug here"))
     {
 	    // adding the current stack if possible
-#if HAVE_EXECINFO_H
+#if BACKTRACE_AVAILABLE
 	const int buf_size = 20;
 	void *buffer[buf_size];
 	int size = backtrace(buffer, buf_size);
@@ -151,7 +151,7 @@ namespace libdar
 	if(symbols != NULL)
 	    free(symbols);
 #else
-	 Egeneric::stack("stack dump", "execinfo absent, cannot dump the stack information at the time the exception was thrown");
+	 Egeneric::stack("stack dump", "backtrace() call absent, cannot dump the stack information at the time the exception was thrown");
 #endif
     }
 

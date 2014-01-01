@@ -695,11 +695,26 @@ AC_ARG_ENABLE( [execinfo],
 	       AC_HELP_STRING(--disable-execinfo, [disable reporting stack information on self diagnostic bugs even]),
 	       [AC_MSG_WARN([ignoring execinfo even if available])],
 	       [
-	       AC_CHECK_LIB(execinfo, backtrace, [], [])
 	       AC_CHECK_HEADERS([execinfo.h])
+	       AC_CHECK_LIB(execinfo, [backtrace], [], [])
+	       AC_MSG_CHECKING([for backtrace() usability])
+	       AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+	       				       #if HAVE_EXECINFO_H
+					       #include <execinfo.h>
+					       #endif
+					       }]],
+					       [[
+					       const int buf_size = 20;
+					       void *buffer[buf_size];
+					       int x = backtrace(buffer, buf_size);
+					       ]])
+			       ],
+			       [ AC_DEFINE(BACKTRACE_AVAILABLE, 1, [backtrace() call supported])
+			         AC_MSG_RESULT(yes)
+			       ],
+			       [ AC_MSG_RESULT(no) ])
 	       ]
 	     )
-
 
 
 AC_ARG_ENABLE( [profiling],
