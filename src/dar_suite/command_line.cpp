@@ -2766,7 +2766,7 @@ static fsa_scope string_to_fsa(const string & arg)
 		    || *it == "hfs+")
 		ret.insert(fsaf_hfs_plus);
 	    else
-		throw Erange("string_to_fsa", string(gettext("unknown FSA family: %S")) + (*it));
+		throw Erange("string_to_fsa", string(gettext("unknown FSA family: ")) + (*it));
 	}
     }
 
