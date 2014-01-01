@@ -1266,7 +1266,7 @@ namespace libdar
         time_t tmp = 0;
 
         access.unstack(tmp);
-	if(tmp != 0)
+	if(access != 0)
 	    throw Erange("tools_make_date", "cannot set atime of file, value too high for the system integer type");
 
 	    // the first time, setting modification time to the value of birth time
@@ -1281,7 +1281,7 @@ namespace libdar
 	{
 	    tmp = 0;
 	    birth.unstack(tmp);
-	    if(tmp != 0)
+	    if(birth != 0)
 		throw Erange("tools_make_date", "cannot set birth time of file, value too high for the system integer type");
 	    else
 		temps.modtime = tmp;
@@ -1293,7 +1293,7 @@ namespace libdar
 	    // we set atime and mtime here
         tmp = 0;
         modif.unstack(tmp);
-	if(tmp != 0)
+	if(modif != 0)
 	    throw Erange("tools_make_date", "cannot set last modification time of file, value too high for the system integer type");
 	else
 	    temps.modtime = tmp;
