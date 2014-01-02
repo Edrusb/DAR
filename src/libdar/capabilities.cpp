@@ -67,6 +67,8 @@ namespace libdar
 
     capa_status capability_FOWNER(user_interaction & ui, bool verbose) { return cap_check(CAP_FOWNER, ui, verbose, "File Owner for all files"); }
 
+    capa_status capability_CHOWN(user_interaction & ui, bool verbose) { return cap_check(CAP_CHOWN, ui, verbose, "change ownership"); }
+
     static capa_status cap_check(cap_value_t capa, user_interaction & ui, bool verbose, const std::string & capa_name)
     {
 	capa_status ret = capa_unknown;

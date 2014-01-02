@@ -411,16 +411,21 @@ bool get_args(user_interaction & dialog,
 	    throw Erange("get_args", gettext("-S option requires the use of -s"));
 	if(p.what_to_check != inode::cf_all && (p.op == isolate || (p.op == create && p.ref_root == NULL) || p.op == test || p.op == listing || p.op == merging))
 	    dialog.warning(gettext("ignoring -O option, as it is useless in this situation"));
-	if(getuid() != 0 && p.op == extract && p.what_to_check == inode::cf_all) // uid == 0 for root
+	if(p.what_to_check == inode::cf_all
+	   && p.op == extract
+	   && capability_CHOWN(dialog, p.info_details)
+	   && getuid() != 0) // uid == 0 for root
 	{
 	    p.what_to_check = inode::cf_ignore_owner;
-	    string msg = tools_printf(gettext("File ownership will not be restored as %s is not run as root. to avoid this message use -O option"), cmd.c_str());
+	    string msg = tools_printf(gettext("File ownership will not be restored as %s has not the CHOWN capability nor is running as root. to avoid this message use -O option"), cmd.c_str());
 	    dialog.pause(msg);
 	}
-	if(p.furtive_read_mode && capability_FOWNER(dialog, p.info_details) != libdar::capa_set && getuid() != 0)
+	if(p.furtive_read_mode
+	   && capability_FOWNER(dialog, p.info_details) != libdar::capa_set
+	   && getuid() != 0)
 	{
 	    if(p.op == create || p.op == diff)
-		dialog.warning(gettext("Furtive read mode has been disabled as dar has not the FOWNER capability nor is running as root"));
+		dialog.printf(gettext("Furtive read mode has been disabled as %s has not the FOWNER capability nor is running as root"), cmd.c_str());
 	    p.furtive_read_mode = false;
 	}
 

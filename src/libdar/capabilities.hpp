@@ -47,6 +47,8 @@ namespace libdar
 
     extern capa_status capability_FOWNER(user_interaction & ui, bool verbose);
 
+    extern capa_status capability_CHOWN(user_interaction & ui, bool verbose);
+
 
 	/// @}
 
