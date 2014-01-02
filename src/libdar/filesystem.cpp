@@ -2019,7 +2019,7 @@ namespace libdar
 		if(info_details)
 		    get_ui().warning(string(gettext("Restoring file's FSA: ")) + spot);
 
-		if(empty)
+		if(!empty)
 		{
 		    const filesystem_specific_attribute_list * fsa = tba_ino->get_fsa();
 		    if(fsa == NULL)
