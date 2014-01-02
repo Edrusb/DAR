@@ -417,10 +417,10 @@ bool get_args(user_interaction & dialog,
 	    string msg = tools_printf(gettext("File ownership will not be restored as %s is not run as root. to avoid this message use -O option"), cmd.c_str());
 	    dialog.pause(msg);
 	}
-	if(getuid() != 0 && p.furtive_read_mode)
+	if(p.furtive_read_mode && capability_FOWNER(dialog, p.info_details) != libdar::capa_set && getuid() != 0)
 	{
 	    if(p.op == create || p.op == diff)
-		dialog.warning(gettext("Furtive read mode has been disabled as dar is not run as root"));
+		dialog.warning(gettext("Furtive read mode has been disabled as dar has not the FOWNER capability nor is running as root"));
 	    p.furtive_read_mode = false;
 	}
 

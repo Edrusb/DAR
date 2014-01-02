@@ -55,6 +55,8 @@ namespace libdar
 
     capa_status capability_SYS_RESOURCE(user_interaction & ui, bool verbose) { return capa_unknown; };
 
+    capa_status capability_FOWNER(user_interaction & ui, bool verbose) { return capa_unknown; };
+
 #else
 
     static capa_status cap_check(cap_value_t capa, user_interaction & ui, bool verbose, const std::string & capa_name);
@@ -62,6 +64,8 @@ namespace libdar
     capa_status capability_LINUX_IMMUTABLE(user_interaction & ui, bool verbose) { return cap_check(CAP_LINUX_IMMUTABLE, ui, verbose, "Immutable"); }
 
     capa_status capability_SYS_RESOURCE(user_interaction & ui, bool verbose) { return cap_check(CAP_SYS_RESOURCE, ui, verbose, "System Resource"); }
+
+    capa_status capability_FOWNER(user_interaction & ui, bool verbose) { return cap_check(CAP_FOWNER, ui, verbose, "File Owner for all files"); }
 
     static capa_status cap_check(cap_value_t capa, user_interaction & ui, bool verbose, const std::string & capa_name)
     {

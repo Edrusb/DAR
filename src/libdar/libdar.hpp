@@ -87,6 +87,7 @@ extern "C"
 #include "crypto.hpp"
 #include "thread_cancellation.hpp"
 #include "compile_time_features.hpp"
+#include "capabilities.hpp"
 
     /// \addtogroup API
     /// @{

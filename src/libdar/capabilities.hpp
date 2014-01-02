@@ -32,7 +32,7 @@
 
 namespace libdar
 {
-	/// \addtogroup Private
+	/// \addtogroup API
 	/// @{
 
 	// return from the EFFECTIVE set the value of the associated capability for the calling thread
@@ -44,6 +44,8 @@ namespace libdar
     extern capa_status capability_LINUX_IMMUTABLE(user_interaction & ui, bool verbose);
 
     extern capa_status capability_SYS_RESOURCE(user_interaction & ui, bool verbose);
+
+    extern capa_status capability_FOWNER(user_interaction & ui, bool verbose);
 
 
 	/// @}
