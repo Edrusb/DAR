@@ -85,6 +85,9 @@ namespace libdar
 	if(val == NULL)
 	    throw SRC_BUG;
 
+	if(max == 0) // empty table
+	    return false;
+
 	do
 	{
 	    index = (min + max)/2;
