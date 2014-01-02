@@ -5348,22 +5348,9 @@ namespace libdar
 	{
 	    fsa_scope sc = ref.fsa_get_families();
 	    bool upper = ref.fsa_get_saved_status() == inode::fsa_full;
-	    if(sc.find(fsaf_hfs_plus) != sc.end())
-		if(upper)
-		    ret += "H";
-		else
-		    ret += "h";
-	    else
+	    ret = fsa_scope_to_string(upper, sc);
+	    if(ret.size() < 3)
 		ret += "-";
-
-	    if(sc.find(fsaf_linux_extX) != sc.end())
-		if(upper)
-		    ret += "L";
-		else
-		    ret += "l";
-	    else
-		ret += "-";
-	    ret += "-";
 	}
 	else
 	    ret = "---";

@@ -68,6 +68,7 @@ namespace libdar
 
     extern infinint fsa_scope_to_infinint(const fsa_scope & val);
     extern fsa_scope infinint_to_fsa_scope(const infinint & ref);
+    extern std::string fsa_scope_to_string(bool saved, const fsa_scope & scope);
 
 	/// @}
 

@@ -888,8 +888,10 @@ namespace libdar
 		bool in_place_ea_recent = al_inode->get_last_change() >= do_inode->get_last_change();
 		bool al_ea_saved = al_inode->ea_get_saved_status() == inode::ea_full;
 		bool do_ea_saved = do_inode->ea_get_saved_status() == inode::ea_full;
+		bool al_fsa_saved = al_inode->fsa_get_saved_status() == inode::fsa_full;
+		bool do_fsa_saved = do_inode->fsa_get_saved_status() == inode::fsa_full;
 
-		dialog.printf(gettext("Data more recent :\t  %S  \t  %S"), in_place_data_recent ? &me : &notme , in_place_data_recent ? &notme : &me);
+		dialog.printf(gettext("Data more recent :\t  %S  \t\t  %S"), in_place_data_recent ? &me : &notme , in_place_data_recent ? &notme : &me);
 		if(al_file != NULL && do_file != NULL)
 		{
 		    infinint al_size = al_file->get_size();
@@ -899,7 +901,7 @@ namespace libdar
 		    bool al_sparse = al_file->get_sparse_file_detection_read();
 		    bool do_sparse = do_file->get_sparse_file_detection_read();
 
-		    dialog.printf(gettext("Data size        :\t  %i  \t  %i"), &al_size, &do_size);
+		    dialog.printf(gettext("Data size        :\t  %i  \t\t  %i"), &al_size, &do_size);
 		    dialog.printf(gettext("Sparse file      :\t  %S  \t\t  %S"), al_sparse ? &yes : &no, do_sparse ? &yes : &no);
 		    dialog.printf(gettext("Dirty file       :\t  %S  \t\t  %S"), al_dirty ? &yes : &no, do_dirty ? &yes : &no);
 		}
@@ -907,6 +909,13 @@ namespace libdar
 		dialog.printf(gettext("EA full saved    :\t  %S  \t\t  %S"),al_ea_saved ? &yes:&no , do_ea_saved ? &yes:&no);
 		if(al_ea_saved || do_ea_saved)
 		    dialog.printf(gettext("EA more recent   :\t  %S  \t\t  %S"),in_place_ea_recent ? &me : &notme , in_place_data_recent ? &notme : &me);
+		dialog.printf(gettext("FSA full saved   :\t  %S  \t\t  %S"), al_fsa_saved ? &yes:&no , do_fsa_saved ? &yes:&no);
+		if(al_fsa_saved || do_fsa_saved)
+		{
+		    string al_fam = al_fsa_saved ? fsa_scope_to_string(al_fsa_saved, al_inode->fsa_get_families()) : "-";
+		    string do_fam = do_fsa_saved ? fsa_scope_to_string(do_fsa_saved, do_inode->fsa_get_families()) : "-";
+		    dialog.printf(gettext("FSA familly      :\t  %S  \t\t  %S"), &al_fam, &do_fam);
+		}
 
 		if(al_ea_saved && do_ea_saved)
 		{
@@ -917,7 +926,7 @@ namespace libdar
 		    dialog.printf(gettext("EA number        :\t  %i  \t\t  %i"), &al_tmp, &do_tmp);
 		    al_tmp = al_ea->space_used();
 		    do_tmp = do_ea->space_used();
-		    dialog.printf(gettext("EA size          :\t  %i  \t  %i"), &al_tmp, &do_tmp);
+		    dialog.printf(gettext("EA size          :\t  %i  \t\t  %i"), &al_tmp, &do_tmp);
 		}
 	    }
 	}

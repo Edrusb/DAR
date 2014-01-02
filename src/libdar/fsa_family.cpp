@@ -126,6 +126,34 @@ namespace libdar
 	return ret;
     }
 
+    string fsa_scope_to_string(bool saved, const fsa_scope & scope)
+    {
+	string ret = "";
+
+	    // first letter
+
+	if(scope.find(fsaf_hfs_plus) != scope.end())
+	    if(saved)
+		ret += "H";
+	    else
+		ret += "h";
+	else
+	    ret += "-";
+
+	    // second letter
+
+	if(scope.find(fsaf_linux_extX) != scope.end())
+	    if(saved)
+		ret += "L";
+	    else
+		ret += "l";
+	else
+	    ret += "-";
+
+	return ret;
+    }
+
+
 
 } // end of namespace
 
