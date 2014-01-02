@@ -13,6 +13,9 @@ mkdir "$1"
 cd "$1"
 
 echo "this is the content of a plain file" > plain_file.txt
+if [ -x `which chattr` ] ; then
+   chattr +cdS plain_file.txt
+fi
 
 mkdir "$SUB1"
 cd "$SUB1"
