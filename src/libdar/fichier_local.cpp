@@ -120,7 +120,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	    // this method cannot be inlined to avoid cyclic dependency in headers files
-	    // fichier.hpp would then needs tools.hpp, which need limitint.hpp which relies
+	    // fichier_global.hpp would then needs tools.hpp, which need limitint.hpp which relies
 	    // back on fichier.hpp
 	tools_set_ownership(filedesc, user, group);
     }
@@ -131,7 +131,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	    // this method cannot be inlined to avoid cyclic dependency in headers files
-	    // fichier.hpp would then needs tools.hpp, which need limitint.hpp which relies
+	    // fichier_global.hpp would then needs tools.hpp, which need limitint.hpp which relies
 	    // back on fichier.hpp
 	tools_set_permission(filedesc, perm);
     }

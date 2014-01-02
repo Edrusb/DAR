@@ -46,7 +46,7 @@
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "user_interaction.hpp"
-#include "fichier.hpp"
+#include "fichier_global.hpp"
 #include "hash_fichier.hpp"
 #include "etage.hpp"
 #include "path.hpp"

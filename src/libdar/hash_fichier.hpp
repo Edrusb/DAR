@@ -42,7 +42,7 @@ extern "C"
 #include <string>
 
 #include "generic_file.hpp"
-#include "fichier.hpp"
+#include "fichier_global.hpp"
 #include "integers.hpp"
 
 namespace libdar

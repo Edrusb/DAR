@@ -77,7 +77,7 @@ char *strchr (), *strrchr ();
 #include "tools.hpp"
 #include "cygwin_adapt.hpp"
 #include "int_tools.hpp"
-#include "fichier.hpp"
+#include "fichier_global.hpp"
 #include "tools.hpp"
 
 #include <iostream>

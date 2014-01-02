@@ -19,7 +19,7 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file fichier.hpp
+    /// \file fichier_global.hpp
     /// \brief class fichier_global definition. This class is a pure virtual class
     /// class fichier_global is an abstraction of files objects whetever is their localisation
     /// like local filesystem, remote ftp server, etc. inherited classes (like fichier_local)
@@ -27,8 +27,8 @@
 
     /// \ingroup Private
 
-#ifndef FICHIER_HPP
-#define FICHIER_HPP
+#ifndef FICHIER_GLOBAL_HPP
+#define FICHIER_GLOBAL_HPP
 
 
 #include "../my_config.h"

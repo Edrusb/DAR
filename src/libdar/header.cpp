@@ -54,7 +54,7 @@ extern "C"
 #include "header.hpp"
 #include "tlv_list.hpp"
 #include "tools.hpp"
-#include "fichier.hpp"
+#include "fichier_global.hpp"
 
 using namespace std;
 namespace libdar

@@ -43,7 +43,7 @@ extern "C"
 #include "crc.hpp"
 #include "user_interaction.hpp"
 #include "mem_ui.hpp"
-#include "fichier.hpp"
+#include "fichier_global.hpp"
 
 #include <string>
 
