@@ -448,7 +448,8 @@ namespace libdar
 
 	    try
 	    {
-		for(U_I i = fsa.size() ; i > index ; --i)
+		fsa.resize(fsa.size()+1, NULL);
+		for(U_I i = fsa.size()-1 ; i > index ; --i)
 		{
 		    fsa[i] = fsa[i-1];
 		    fsa[i-1] = NULL;
