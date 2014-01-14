@@ -4,8 +4,8 @@ Thanks to Dan on dar-support mailing-list for feedback. Thanks to
 Aymeric Petit for feedback. Thanks to Alexey Dubinin for bug report.
 Thanks to Thomas Jarosch for his patches generated using cppcheck
 tool. Thanks to Misty de Meo, Fabian Stanke, Ryan Schmidt and Jan Gossmann
-and for their feedback and patches for compilation and message displaying
-fixes under MAC OS X
+and for their feedback and patches for compilation and message display
+fixes under MAC OS X.
 
 version 2.4.10
 --------------
