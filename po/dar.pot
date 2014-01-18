@@ -7,10 +7,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.4.11\n"
+"Project-Id-Version: dar 2.4.12\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2013-08-24 22:06+0200\n"
+"POT-Creation-Date: 2014-01-18 10:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/libdar/archive.hpp:146
+#: src/libdar/archive.hpp:148
 msgid "Archive copy constructor is not implemented"
 msgstr ""
 
-#: src/libdar/archive.hpp:147
+#: src/libdar/archive.hpp:149
 msgid "Archive assignment operator is not implemented"
 msgstr ""
 
@@ -119,41 +119,41 @@ msgid ""
 "initializing cache"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:61
+#: src/libdar/hash_fichier.cpp:62
 msgid "Cannot determine the permission to use for hash files: "
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:153
+#: src/libdar/hash_fichier.cpp:156
 #, c-format
 msgid ""
 "Error while initializing hash: Hash algorithm not available in libgcrypt: %s/"
 "%s"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:157
+#: src/libdar/hash_fichier.cpp:160
 #, c-format
 msgid "Error while creating hash handle: %s/%s"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:161 src/libdar/hash_fichier.cpp:175
+#: src/libdar/hash_fichier.cpp:164 src/libdar/hash_fichier.cpp:179
 msgid ""
 "Missing hashing algorithms support (which is part of strong encryption "
 "support, using libgcrypt)"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:207
+#: src/libdar/hash_fichier.cpp:211
 msgid "Failed writing down the hash: "
 msgstr ""
 
-#: src/libdar/sparse_file.cpp:162
+#: src/libdar/sparse_file.cpp:163
 msgid "Incoherent structure in data carrying sparse files: unknown mark"
 msgstr ""
 
-#: src/libdar/sparse_file.cpp:313
+#: src/libdar/sparse_file.cpp:322
 msgid "Cannot skip forward to restore a hole"
 msgstr ""
 
-#: src/libdar/sparse_file.cpp:327
+#: src/libdar/sparse_file.cpp:336
 msgid "Data corruption or unknown sparse_file mark found in file's data"
 msgstr ""
 
@@ -240,29 +240,29 @@ msgid ""
 "permit to recover some files, at most)?"
 msgstr ""
 
-#: src/libdar/archive.cpp:468 src/libdar/archive.cpp:1242
+#: src/libdar/archive.cpp:468 src/libdar/archive.cpp:1343
 msgid "NULL argument given to \"sauv_path\""
 msgstr ""
 
-#: src/libdar/archive.cpp:470 src/libdar/archive.cpp:1248
+#: src/libdar/archive.cpp:470 src/libdar/archive.cpp:1349
 msgid "NULL argument given to \"filename\""
 msgstr ""
 
-#: src/libdar/archive.cpp:472 src/libdar/archive.cpp:1250
+#: src/libdar/archive.cpp:472 src/libdar/archive.cpp:1351
 msgid "NULL argument given to \"extension\""
 msgstr ""
 
-#: src/libdar/archive.cpp:474 src/libdar/archive.cpp:1252
+#: src/libdar/archive.cpp:474 src/libdar/archive.cpp:1353
 msgid "Compression_level must be between 1 and 9 included"
 msgstr ""
 
-#: src/libdar/archive.cpp:476 src/libdar/archive.cpp:1254
+#: src/libdar/archive.cpp:476 src/libdar/archive.cpp:1355
 msgid ""
 "\"first_file_size\" cannot be different from zero if \"file_size\" is equal "
 "to zero"
 msgstr ""
 
-#: src/libdar/archive.cpp:478 src/libdar/archive.cpp:1262
+#: src/libdar/archive.cpp:478 src/libdar/archive.cpp:1363
 msgid "Crypto block size must be greater than 10 bytes"
 msgstr ""
 
@@ -279,12 +279,12 @@ msgid ""
 "options) for the resulting archive"
 msgstr ""
 
-#: src/libdar/archive.cpp:649 src/libdar/archive.cpp:867
+#: src/libdar/archive.cpp:649 src/libdar/archive.cpp:872
 msgid "This archive is not exploitable, check documentation for more"
 msgstr ""
 
-#: src/libdar/archive.cpp:651 src/libdar/archive.cpp:869
-#: src/libdar/archive.cpp:1240
+#: src/libdar/archive.cpp:651 src/libdar/archive.cpp:874
+#: src/libdar/archive.cpp:1341
 msgid "NULL argument given to \"fs_root\""
 msgstr ""
 
@@ -292,7 +292,7 @@ msgstr ""
 msgid "Error while restoring data: "
 msgstr ""
 
-#: src/libdar/archive.cpp:732 src/libdar/archive.cpp:944
+#: src/libdar/archive.cpp:732 src/libdar/archive.cpp:949
 msgid ""
 "This archive is not exploitable, check the archive class usage in the API "
 "documentation"
@@ -377,17 +377,22 @@ msgstr ""
 msgid "Archive total size is : %i bytes\n"
 msgstr ""
 
-#: src/libdar/archive.cpp:774
+#: src/libdar/archive.cpp:776
 #, c-format
 msgid "Archive size is: %i bytes\n"
 msgstr ""
 
-#: src/libdar/archive.cpp:775
+#: src/libdar/archive.cpp:777
 #, c-format
 msgid "Previous archive size does not include headers present in each slice\n"
 msgstr ""
 
-#: src/libdar/archive.cpp:787
+#: src/libdar/archive.cpp:780
+#, c-format
+msgid "Archive size is unknown (reading from a pipe)"
+msgstr ""
+
+#: src/libdar/archive.cpp:792
 #, c-format
 msgid ""
 "\n"
@@ -397,59 +402,59 @@ msgid ""
 "from this archive alone\n"
 msgstr ""
 
-#: src/libdar/archive.cpp:835
+#: src/libdar/archive.cpp:840
 msgid "Error while listing archive contents: "
 msgstr ""
 
-#: src/libdar/archive.cpp:909
+#: src/libdar/archive.cpp:914
 msgid "Error while comparing archive with filesystem: "
 msgstr ""
 
-#: src/libdar/archive.cpp:956
+#: src/libdar/archive.cpp:961
 msgid ""
 "WARNING! This is an isolated catalogue, no data or EA is present in this "
 "archive, only the catalogue structure can be checked"
 msgstr ""
 
-#: src/libdar/archive.cpp:988
+#: src/libdar/archive.cpp:993
 msgid "A problem occurred while reading this archive contents: "
 msgstr ""
 
-#: src/libdar/archive.cpp:1003
+#: src/libdar/archive.cpp:1008
 msgid "Error while testing archive: "
 msgstr ""
 
-#: src/libdar/archive.cpp:1244
+#: src/libdar/archive.cpp:1345
 msgid "NULL argument given to \"selection\""
 msgstr ""
 
-#: src/libdar/archive.cpp:1246
+#: src/libdar/archive.cpp:1347
 msgid "NULL argument given to \"subtree\""
 msgstr ""
 
-#: src/libdar/archive.cpp:1256
+#: src/libdar/archive.cpp:1357
 msgid "NULL argument given to \"execute\""
 msgstr ""
 
-#: src/libdar/archive.cpp:1258
+#: src/libdar/archive.cpp:1359
 msgid "NULL argument given to \"compr_mask\""
 msgstr ""
 
-#: src/libdar/archive.cpp:1260
+#: src/libdar/archive.cpp:1361
 msgid "NULL argument given to \"min_compr_size\""
 msgstr ""
 
-#: src/libdar/archive.cpp:1264
+#: src/libdar/archive.cpp:1365
 msgid "NULL argument given to \"ea_mask\""
 msgstr ""
 
-#: src/libdar/archive.cpp:1267
+#: src/libdar/archive.cpp:1368
 msgid ""
 "nodump flag feature has not been activated at compilation time, it is thus "
 "not available"
 msgstr ""
 
-#: src/libdar/archive.cpp:1323
+#: src/libdar/archive.cpp:1424
 #, c-format
 msgid ""
 "WARNING! The archive is located in the directory to backup, this may create "
@@ -458,81 +463,81 @@ msgid ""
 "(see -h for help). Do you really want to continue?"
 msgstr ""
 
-#: src/libdar/archive.cpp:1528
+#: src/libdar/archive.cpp:1629
 msgid "Ready to start writing down the archive?"
 msgstr ""
 
-#: src/libdar/archive.cpp:1613 src/libdar/macro_tools.cpp:347
+#: src/libdar/archive.cpp:1714 src/libdar/macro_tools.cpp:347
 msgid ""
 "WARNING: support for secure memory was not available at compilation time, in "
 "case of heavy memory load, this may lead the password you are about to "
 "provide to be wrote to disk (swap space) in clear. You have been warned!"
 msgstr ""
 
-#: src/libdar/archive.cpp:1614 src/libdar/macro_tools.cpp:348
+#: src/libdar/archive.cpp:1715 src/libdar/macro_tools.cpp:348
 #, c-format
 msgid "Archive %S requires a password: "
 msgstr ""
 
-#: src/libdar/archive.cpp:1615
+#: src/libdar/archive.cpp:1716
 msgid "Please confirm your password: "
 msgstr ""
 
-#: src/libdar/archive.cpp:1619
+#: src/libdar/archive.cpp:1720
 msgid "The two passwords are not identical. Aborting"
 msgstr ""
 
-#: src/libdar/archive.cpp:1635
+#: src/libdar/archive.cpp:1736
 msgid "Current implementation does not support this (new) crypto algorithm"
 msgstr ""
 
-#: src/libdar/archive.cpp:1736
+#: src/libdar/archive.cpp:1837
 #, c-format
 msgid "Error while fetching information for %S: "
 msgstr ""
 
-#: src/libdar/archive.cpp:1864
+#: src/libdar/archive.cpp:1965
 msgid ""
 "Adding reference to files that have been destroyed since reference backup..."
 msgstr ""
 
-#: src/libdar/archive.cpp:1872
+#: src/libdar/archive.cpp:1973
 msgid "Writing archive contents..."
 msgstr ""
 
-#: src/libdar/archive.cpp:1953
+#: src/libdar/archive.cpp:2054
 msgid "Error while saving data: "
 msgstr ""
 
-#: src/libdar/archive.cpp:1999
+#: src/libdar/archive.cpp:2100
 msgid ""
 "Cannot get data name of the archive, this archive is not completely "
 "initialized"
 msgstr ""
 
-#: src/libdar/archive.cpp:2024
+#: src/libdar/archive.cpp:2125
 msgid ""
 "This archive contains an isolated catalogue, it cannot be used for this "
 "operation. It can only be used as reference for a incremental/differential "
 "backup or as backup of the original archive's catalogue"
 msgstr ""
 
-#: src/libdar/archive.cpp:2031
+#: src/libdar/archive.cpp:2132
 msgid ""
 "LAX MODE: Archive seems to be only an isolated catalogue (no data in it), "
 "Can I assume data corruption occurred and consider the archive as being a "
 "real archive?"
 msgstr ""
 
-#: src/libdar/archive.cpp:2036
+#: src/libdar/archive.cpp:2137
 msgid "Error while fetching archive properties: "
 msgstr ""
 
-#: src/libdar/archive.cpp:2051
+#: src/libdar/archive.cpp:2152
 msgid "Not supported flag or archive corruption"
 msgstr ""
 
-#: src/libdar/archive.cpp:2068
+#: src/libdar/archive.cpp:2169
 msgid "Sorry, file size is unknown at this step of the program.\n"
 msgstr ""
 
@@ -1493,6 +1498,10 @@ msgstr ""
 
 #: src/libdar/tools.cpp:2399
 msgid "Error while fetching hostname: "
+msgstr ""
+
+#: src/libdar/tools.cpp:2425 src/libdar/catalogue.cpp:4921
+msgid "[Worse]"
 msgstr ""
 
 #: src/libdar/header_version.hpp:91 src/libdar/header_version.hpp:108
@@ -2832,23 +2841,23 @@ msgstr ""
 msgid "Cannot compare files in write only mode"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:375
+#: src/libdar/generic_file.cpp:370
 msgid "Cannot sync write on a read-only generic_file"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:465
+#: src/libdar/generic_file.cpp:460
 msgid "File mode is neither read nor write"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:478
+#: src/libdar/generic_file.cpp:473
 msgid "read only"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:481
+#: src/libdar/generic_file.cpp:476
 msgid "write only"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:484
+#: src/libdar/generic_file.cpp:479
 msgid "read and write"
 msgstr ""
 
@@ -3220,185 +3229,185 @@ msgstr ""
 msgid "Entry information CRC failure"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:622
+#: src/libdar/catalogue.cpp:630
 msgid "badly structured inode: unknown inode flag"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:631 src/libdar/catalogue.cpp:634
-#: src/libdar/catalogue.cpp:644
+#: src/libdar/catalogue.cpp:639 src/libdar/catalogue.cpp:642
+#: src/libdar/catalogue.cpp:652
 msgid "missing data to build an inode"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1037
+#: src/libdar/catalogue.cpp:1045
 msgid "different file type"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1042
+#: src/libdar/catalogue.cpp:1050
 #, c-format
 msgid "different owner (uid): %i <--> %i"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1048
+#: src/libdar/catalogue.cpp:1056
 #, c-format
 msgid "different owner group (gid): %i <--> %i"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1054
+#: src/libdar/catalogue.cpp:1062
 #, c-format
 msgid "different permission: %S <--> %S"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1062
+#: src/libdar/catalogue.cpp:1070
 #, c-format
 msgid "difference of last modification date: %S <--> %S"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1075
+#: src/libdar/catalogue.cpp:1083
 msgid "different Extended Attributes"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1080
+#: src/libdar/catalogue.cpp:1088
 msgid "no Extended Attribute to compare with"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1082 src/libdar/catalogue.cpp:1103
+#: src/libdar/catalogue.cpp:1090 src/libdar/catalogue.cpp:1111
 msgid ""
 "Cannot compare EA: EA support has not been activated at compilation time"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1096
+#: src/libdar/catalogue.cpp:1104
 msgid "inode last change date (ctime) greater, EA might be different"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1101
+#: src/libdar/catalogue.cpp:1109
 msgid "no Extended Attributes to compare with"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1296
+#: src/libdar/catalogue.cpp:1304
 msgid "CRC error detected while reading EA"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1405
+#: src/libdar/catalogue.cpp:1413
 msgid ""
 "Error while reading CRC for EA from the archive: No escape mark found for "
 "that file"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1447
+#: src/libdar/catalogue.cpp:1455
 msgid "Hard links of directories are not supported"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1575
+#: src/libdar/catalogue.cpp:1583
 msgid "Incoherent catalogue structure: hard linked inode's data not found"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1612
+#: src/libdar/catalogue.cpp:1620
 msgid "Incoherent catalogue structure: hard linked data is not an inode"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1649
+#: src/libdar/catalogue.cpp:1657
 msgid "Incoherent catalogue structure: duplicated hard linked inode's data"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:1663
+#: src/libdar/catalogue.cpp:1671
 msgid ""
 "Incoherent catalogue structure: unknown status flag for hard linked inode"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2055
+#: src/libdar/catalogue.cpp:2061
 msgid "cannot provide data from a \"not saved\" file object"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2058
+#: src/libdar/catalogue.cpp:2064
 msgid "data has been cleaned, object is now empty"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2261
+#: src/libdar/catalogue.cpp:2267
 msgid "can't read data CRC: No escape mark found for that file"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2309
+#: src/libdar/catalogue.cpp:2315
 #, c-format
 msgid "not same size: %i <--> %i"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2346
+#: src/libdar/catalogue.cpp:2352
 #, c-format
 msgid "different file data, offset of first difference is: %i"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2354
+#: src/libdar/catalogue.cpp:2360
 msgid ""
 "Same data but CRC value could not be verified because we did not guessed "
 "properly its width (sequential read restriction)"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2356
+#: src/libdar/catalogue.cpp:2362
 msgid "Same data but stored CRC does not match the data!?!"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2445
+#: src/libdar/catalogue.cpp:2451
 msgid "symbolic link does not point to the same target: "
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2546
+#: src/libdar/catalogue.cpp:2552
 msgid ""
 "LAX MODE: Error met building a catalogue entry, skipping this entry and "
 "continuing. Skipped error is: "
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2589
+#: src/libdar/catalogue.cpp:2595
 msgid "missing data to build a directory"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2766
+#: src/libdar/catalogue.cpp:2772
 #, c-format
 msgid "Cannot remove nonexistent entry %S from catalogue"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2861
+#: src/libdar/catalogue.cpp:2867
 msgid "listing() method must be given"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:2868
+#: src/libdar/catalogue.cpp:2874
 msgid "argument must be a relative path"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3135 src/libdar/catalogue.cpp:3138
+#: src/libdar/catalogue.cpp:3141 src/libdar/catalogue.cpp:3144
 msgid "missing data to build a special device"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3165
+#: src/libdar/catalogue.cpp:3171
 #, c-format
 msgid "devices have not the same major number: %d <--> %d"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3167
+#: src/libdar/catalogue.cpp:3173
 #, c-format
 msgid "devices have not the same minor number: %d <--> %d"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3174
+#: src/libdar/catalogue.cpp:3180
 msgid "missing data to build"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3254 src/libdar/catalogue.cpp:3272
-#: src/libdar/catalogue.cpp:3274
+#: src/libdar/catalogue.cpp:3260 src/libdar/catalogue.cpp:3278
+#: src/libdar/catalogue.cpp:3280
 msgid "incoherent catalogue structure"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3265
+#: src/libdar/catalogue.cpp:3271
 msgid ""
 "LAX MODE: catalogue label does not match archive label, as if it was an "
 "extracted catalogue, assuming data corruption occurred and fixing the "
 "catalogue to be considered an a plain internal catalogue"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3317
+#: src/libdar/catalogue.cpp:3323
 msgid "CRC failed for table of contents (aka \"catalogue\")"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3319
+#: src/libdar/catalogue.cpp:3325
 msgid ""
 "LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This "
 "may even lead dar to see files in the archive that never existed, but this "
@@ -3406,77 +3415,73 @@ msgid ""
 "proceed anyway?"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3378
+#: src/libdar/catalogue.cpp:3384
 msgid "root does not have a parent directory"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3418
+#: src/libdar/catalogue.cpp:3424
 msgid "no current directory defined"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3422
+#: src/libdar/catalogue.cpp:3428
 msgid "root directory has no parent directory"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3444
+#: src/libdar/catalogue.cpp:3450
 msgid "no current reading directory defined"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3516 src/libdar/catalogue.cpp:3530
+#: src/libdar/catalogue.cpp:3522 src/libdar/catalogue.cpp:3536
 msgid " is not present in the archive"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3608
+#: src/libdar/catalogue.cpp:3614
 msgid "Cannot recurs in a non directory entry"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3611
+#: src/libdar/catalogue.cpp:3617
 msgid ""
 "The entry to recurs in does not exist, cannot add further entry to that "
 "absent subdirectory"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:3674
+#: src/libdar/catalogue.cpp:3680
 msgid "root has no parent directory"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:4033
+#: src/libdar/catalogue.cpp:4039
 #, c-format
 msgid ""
 "access mode    | user | group | size  |          date                 | "
 "[data ][ EA  ][compr][S]|   filename\n"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:4078
+#: src/libdar/catalogue.cpp:4084
 #, c-format
 msgid "%S [%c] [ REMOVED ENTRY ] (%S)  %S\n"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:4109 src/libdar/catalogue.cpp:4242
+#: src/libdar/catalogue.cpp:4115 src/libdar/catalogue.cpp:4248
 msgid "      Extended Attribute: ["
 msgstr ""
 
-#: src/libdar/catalogue.cpp:4148
+#: src/libdar/catalogue.cpp:4154
 #, c-format
 msgid ""
 "[data ][ EA  ][compr][S]| permission | user  | group | size  |          "
 "date                 |    filename\n"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:4871
+#: src/libdar/catalogue.cpp:4877
 msgid "[DIRTY]"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:4873 src/libdar/catalogue.cpp:4889
+#: src/libdar/catalogue.cpp:4879 src/libdar/catalogue.cpp:4895
 msgid "[Saved]"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:4876 src/libdar/catalogue.cpp:4892
+#: src/libdar/catalogue.cpp:4882 src/libdar/catalogue.cpp:4898
 msgid "[InRef]"
-msgstr ""
-
-#: src/libdar/catalogue.cpp:4915
-msgid "[Worse]"
 msgstr ""
 
 #: src/libdar/criterium.cpp:136

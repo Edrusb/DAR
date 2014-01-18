@@ -1,3 +1,43 @@
+from 2.4.11 to 2.4.12
+- for correctness fixed delete vs delete[] on vector of char (not incidence
+  reported)
+- fixed out of range access in routine used to read very old archive format
+- fixed error in logical expression leading a sanity test to be useless
+- removed duplicated variable assignment
+- updated FAQ
+- fixed typo and spelling errors
+- fixed bug (reported by Torsten Bronger) in the escape layer leading libdar
+  to wrongly reporting a file as corrupted at reading time
+- fixed bug in the sparse file detection mechanism that lead the minimum size
+  hole detection to become a multiple of the default value or specified one.
+  This implied a less efficient reduction of sparse files because smaller
+  holes in files were ignored
+- fixed and updated man page about --go-into option
+- updated full-from-diff target in /etc/darrc default file
+- added a debug option in hash_file class (option only used from testing
+  tools) to troubleshoot sha1/md5 hash problem on slices larger than
+  (2**38)+63 bytes, bug reported by Mike Lenzen and understood by Yuriy
+  Kaminskiy at libgcrypt. Note: This bug is still open due to an integer
+  overflow in libgcrypt.
+- backported from current development code an additional and more simple
+  way to read an archive using the libdar API. This API extension is not used
+  by dar command-line tools for now.
+- Fixing installation of libdar header files on Darwin, where "DARwin" macros
+  were not filtered out from the generated libdar header files.
+- Fixing self reported bug 'generic_file.cpp line 309' met while comparing an
+  archive with a filesystem
+- Update code in order to compile with gcc-4.8.2 in g++11 mode (partial
+  implementation and adaptation of Fabian Stanke's patch)
+- Fixing bug met while performing a verbose archive listing in sequential
+  read mode
+- Added Ryan Schmidt's Patch to properly display status at end of ./configure
+  script under BSD systems (in particular Mac OS X)
+- Updating configure.ac script to fix warning reported by autoconf when
+  generating the ./configure script
+- Addressed portability problem with BSD systems that do not provide a -d
+  option to the 'cp' command, preventing proper installation of the Doxygen
+  documentation. Fix based on patch provided by Jan Gosmann.
+
 from 2.4.10 to 2.4.11
 - Modified behavior of 'dar -h' and 'dar -V', both now return 0 as exist
   status instead of 1 (which means syntax error).
