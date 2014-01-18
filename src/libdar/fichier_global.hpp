@@ -21,7 +21,7 @@
 
     /// \file fichier_global.hpp
     /// \brief class fichier_global definition. This class is a pure virtual class
-    /// class fichier_global is an abstraction of files objects whetever is their localisation
+    /// class fichier_global is an abstraction of files objects whatever is their localisation
     /// like local filesystem, remote ftp server, etc. inherited classes (like fichier_local)
     /// provide full implementation
 

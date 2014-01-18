@@ -51,11 +51,13 @@ namespace libdar
 
 #ifndef HAVE_CAPABILITIES
 
-    capa_status capability_LINUX_IMMUTABLE(user_interaction & ui, bool verbose) { return capa_unknown; };
+    capa_status capability_LINUX_IMMUTABLE(user_interaction & ui, bool verbose) { return capa_unknown; }
 
-    capa_status capability_SYS_RESOURCE(user_interaction & ui, bool verbose) { return capa_unknown; };
+    capa_status capability_SYS_RESOURCE(user_interaction & ui, bool verbose) { return capa_unknown; }
 
-    capa_status capability_FOWNER(user_interaction & ui, bool verbose) { return capa_unknown; };
+    capa_status capability_FOWNER(user_interaction & ui, bool verbose) { return capa_unknown; }
+
+    capa_status capability_CHOWN(user_interaction & ui, bool verbose) { return capa_unknown; }
 
 #else
 

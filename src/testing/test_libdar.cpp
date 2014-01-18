@@ -101,7 +101,7 @@ void f1()
 
 void warning(const string &x, void *context)
 {
-    printf("[%p]%s\n", context, x.c_str());
+    printf("[%d]%s\n", context, x.c_str());
 }
 
 bool question(const string & x, void *context)
@@ -230,7 +230,7 @@ void f3()
     string msg;
     read_options.clear();
     read_options.set_info_details(true);
-    archive *arch = open_archive_noexcept(ui, ".", "titi", "dar", read_options, code, msg);
+    archive *arch = open_archive_noexcept(ui, ".", "toto", "dar", read_options, code, msg);
     if(code != LIBDAR_NOEXCEPT)
     {
 	ui.printf("exception openning archive: %S\n", &msg);
@@ -249,12 +249,24 @@ void f3()
     else
 	ui.printf("no found children\n");
 
+    arch->init_catalogue(ui);
+    vector<list_entry> contents = arch->get_children_in_table("etc");
+    vector<list_entry>::iterator it = contents.begin();
+    while(it != contents.end())
+    {
+	string line = it->get_name() + " " + (it->has_data_present_in_the_archive() ? "SAVED" : "not saved") + "\n";
+	cout << line;
+	++it;
+    }
+
     close_archive_noexcept(arch, code, msg);
     if(code != LIBDAR_NOEXCEPT)
     {
 	ui.printf("exception closing: %S\n", &msg);
 	return;
     }
+
+
 }
 
 void f4()

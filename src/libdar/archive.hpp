@@ -315,6 +315,7 @@ namespace libdar
 	bool sequential_read;    //< whether the archive is read in sequential mode
 
 	void free();
+
 	const catalogue & get_cat() const { if(cat == NULL) throw SRC_BUG; else return *cat; };
 	const header_version & get_header() const { return ver; };
 

@@ -28,6 +28,9 @@ extern "C"
 #endif
 } // end extern "C"
 
+
+#include <new>
+
 #include "libdar.hpp"
 #include "hash_fichier.hpp"
 #include "shell_interaction.hpp"
@@ -35,39 +38,110 @@ extern "C"
 
 using namespace libdar;
 
-void f1(const string & filename, hash_algo algo);
+void f1(const string & src_filename, const string & dst_filename, hash_algo algo);
+void error(const string & argv0);
+libdar::hash_algo str2hash(const string & val);
 
 static user_interaction *ui = NULL;
 
-int main()
+int main(int argc, char *argv[])
 {
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    ui = shell_interaction_init(&cout, &cerr, false);
+    ui = shell_interaction_init(&cout, &cerr, true);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
+
     try
     {
-	f1("md5-toto", hash_md5);
-	f1("sha1-toto", hash_sha1);
+	try
+	{
+	    try
+	    {
+		if(argc != 4)
+		    error(argv[0]);
+		else
+		    f1(argv[1], argv[2], str2hash(argv[3]));
+	    }
+	    catch(Egeneric & e)
+	    {
+		ui->warning(e.get_message());
+		e.dump();
+	    }
+	}
+	catch(...)
+	{
+	    if(ui != NULL)
+		delete ui;
+	    throw;
+	}
+	if(ui != NULL)
+	    delete ui;
+    }
+    catch(Egeneric & e)
+    {
+	cout << e.dump_str() << endl;
+    }
+}
+
+void f1(const string & src_filename, const string & dst_filename, hash_algo algo)
+{
+    fichier_local *dst_hash = new (nothrow) fichier_local(*ui,
+							  src_filename + "." + hash_algo_to_string(algo),
+							  gf_write_only,
+							  tools_octal2int("0777"),
+							  true, // fail if exsts
+							  false, // erase
+							  false); // furtive read mode
+    fichier_local *dst_data = new (nothrow) fichier_local(*ui,
+							  dst_filename,
+							  gf_write_only,
+							  tools_octal2int("0777"),
+							  false,
+							  false,
+							  false);
+
+    try
+    {
+	if(dst_hash == NULL
+	   || dst_data == NULL)
+	    throw Ememory("f1");
+	else
+	{
+	    hash_fichier dst = hash_fichier(*ui,
+					    dst_data,
+					    src_filename,
+					    dst_hash,
+					    algo);
+	    dst_hash = NULL; // now owned by dst
+	    dst_data = NULL; // now owned by dst
+	    fichier_local src = fichier_local(src_filename);
+
+	    dst.set_only_hash();
+	    src.copy_to(dst);
+	}
     }
     catch(...)
     {
-	if(ui != NULL)
-	    delete ui;
+	if(dst_hash != NULL)
+	    delete dst_hash;
+	if(dst_data != NULL)
+	    delete dst_data;
 	throw;
     }
-    if(ui != NULL)
-	delete ui;
 }
 
-void f1(const string & filename, hash_algo algo)
+void error(const string & argv0)
 {
-    fichier_local fic = fichier_local(*ui, filename, gf_write_only, 0644, false, true, false);
-    fichier_local hash_fic = fichier_local(*ui, filename + "." + hash_algo_to_string(algo), gf_write_only, 0644, false, true, false);
-    const string message = "bonjour les amis, il fait chaud il fait beau, les mouches pettent et les cailloux fleurissent.";
-    hash_fichier dst = hash_fichier(*ui, &fic, filename, &hash_fic, algo);
+    ui->printf("usage: %S <source filename> <dest filename> <hash algo>", &argv0);
+}
 
-    dst.write(message.c_str(), message.size());
+libdar::hash_algo str2hash(const string & val)
+{
+    if(val == "md5")
+	return libdar::hash_md5;
+    if(val == "sha1")
+	return libdar::hash_sha1;
+    throw Erange("str2hash", "unknown hash algorithm");
 }

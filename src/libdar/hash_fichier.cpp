@@ -61,6 +61,7 @@ namespace libdar
 	    throw SRC_BUG;
 	if(hash_file->get_mode() != gf_write_only)
 	    throw SRC_BUG;
+	only_hash = false;
 	ref = under;
 	hash_ref = hash_file;
 	path tmp = under_filename;
@@ -125,7 +126,8 @@ namespace libdar
 	if(eof)
 	    throw SRC_BUG;
 	gcry_md_write(hash_handle, (const void *)a, size);
-	ref->write(a, size);
+	if(!only_hash)
+	    ref->write(a, size);
 	return size;
 #else
 	throw Ecompilation(gettext("Missing hashing algorithms support (which is part of strong encryption support, using libgcrypt)"));

@@ -409,7 +409,7 @@ namespace libdar
 	U_I returned = 0;
 
 	    // #############  if EOF -> stop
-	if(read_eof)
+	if(read_eof && already_read == read_buffer_size)
 	    return 0; // eof reached. (real eof or next to read is a real mark)
 
 	    // ############# if read_buffer not empty (we copy as needed and available data from the buffer into "a") up to the first mark

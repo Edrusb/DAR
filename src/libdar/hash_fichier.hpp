@@ -109,6 +109,8 @@ namespace libdar
 #ifdef LIBDAR_SPECIAL_ALLOC
         USE_SPECIAL_ALLOC(hash_fichier);
 #endif
+	    /// for debugging purposes only
+	void set_only_hash() { only_hash = true; };
 
     protected:
 	    // inherited from fichier_global
@@ -122,6 +124,7 @@ namespace libdar
     private:
 	fichier_global *ref;
 	fichier_global *hash_ref;
+	bool only_hash; //< if set, avoids copying data to file, only compute hash (debugging purpose)
 #if CRYPTO_AVAILABLE
 	gcry_md_hd_t hash_handle;
 #endif

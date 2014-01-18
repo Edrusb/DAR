@@ -1,0 +1,24 @@
+#!/bin/sh
+
+if [ -z "$1" -o -z "$2" -o ! -z "$3" ] ; then
+   echo "usage: $0 <src> <dst>"
+   exit 1
+fi
+
+TMP_SRC=dar_install_cp_test_src
+TMP_DST=dar_install_cp_test_dst
+
+if mkdir "$TMP_DST" && mkdir "$TMP_SRC" ; then
+  if cp -dR --preserve=mode $TMP_SRC $TMP_DST ; then
+     rm -rf "$TMP_SRC" "$TMP_DST"
+     exec cp -dR --preserve=mode "$1" "$2"
+  else
+     # BSD-like Unix that does not support -d or --preserve options
+     rm -rf "$TMP_SRC" "$TMP_DST"
+     exec cp -pR "$1" "$2"
+  fi
+else
+  rm -rf "$TMP_SRC" "$TMP_DST"
+  echo "Impossible to create $TMP_DST or $TMP_SRC in order to determine capabilities of the 'cp' command"
+  exit 2
+fi

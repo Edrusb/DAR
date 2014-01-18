@@ -1,5 +1,5 @@
 SUBDIRS = samples mini-howto man
-dist_noinst_DATA = COMMAND_LINE Doxyfile
+dist_noinst_DATA = COMMAND_LINE Doxyfile portable_cp
 dist_pkgdata_DATA = README Features.html Limitations.html Notes.html Tutorial.html Good_Backup_Practice.html FAQ.html api_tutorial.html dar_doc.jpg dar_s_doc.jpg index.html dar-catalog.dtd Known_Bugs.html authentification.html dar_key.txt old_dar_key.txt from_sources.html api_4_4.html downloading.html presentation.html usage_notes.html
 
 INSTALL_HTML_MAN = $(INSTALL) -d $(DESTDIR)$(pkgdatadir)/man ; $(INSTALL) -m 0644 man/*.html $(DESTDIR)$(pkgdatadir)/man
@@ -19,7 +19,7 @@ clean-local:
 	rm -rf html Doxyfile.tmp
 
 install-data-hook:
-	cp -dR --preserve=mode html $(DESTDIR)$(pkgdatadir)
+	./portable_cp html $(DESTDIR)$(pkgdatadir)
 	$(INSTALL_HTML_MAN)
 
 uninstall-hook:

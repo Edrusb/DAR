@@ -1,4 +1,4 @@
-.TH DAR 1 "Jan. 6th, 2013"
+.TH DAR 1 "Jan. 18th, 2014"
 .UC 8
 .SH NAME
 dar \- create, test, list, extract, compare, merge, isolate  dar archives
@@ -123,7 +123,7 @@ Do not consider file or directory sub-tree given by the path. -P may be present 
 man page for more information.
 .TP 20
 -g, --go-into <path>
-Files or directory to only take in account, as opposed to -P. -g may be present several time on command-line. Same thing here, the difference with -I is that the mask is applied to the path+filename and also concerns directories. By default all files under the -R directory are considered. Else, if one or more -g option is given, just those are selected (if they do not match any -P option). All paths given this way must be relative to the -R directory. This is equivalent as giving <path> out of any option.
+Files or directory to only take in account, as opposed to -P. -g may be present several time on command-line. Same thing here, the difference with -I is that the mask is applied to the path+filename and also concerns directories. By default all files under the -R directory are considered. Else, if one or more -g option is given, just those are selected (if they do not match any -P option). All paths given this way must be relative to the -R directory, which defaults to current directory.
 .B Warning,
 -g option cannot receive wildcards, these would not be interpreted.
 .TP 20
