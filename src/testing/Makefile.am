@@ -106,4 +106,4 @@ test_old_api_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 make_sparse_file_SOURCES = make_sparse_file.c
 
-hashsum_SOURRCES = hashsum.c
+hashsum_SOURCES = hashsum.c
