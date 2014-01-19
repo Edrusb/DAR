@@ -520,7 +520,7 @@ namespace libdar
 				  U_16 & exception,
 				  std::string & except_msg)
     {
-	bool ret;
+	bool ret = false;
 	NLS_SWAP_IN;
 	WRAPPER_IN
 	    if(ptr == NULL)

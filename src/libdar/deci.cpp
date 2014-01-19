@@ -65,7 +65,7 @@ namespace libdar
 	    T r_t;
 	    storage::iterator it;
 	    bool recule = false;
-	    unsigned char tmp;
+	    unsigned char tmp = 0;
 
 	    decimales = new (nothrow) storage(PAS);
 	    if(decimales == NULL)
