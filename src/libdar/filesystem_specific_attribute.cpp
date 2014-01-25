@@ -69,6 +69,7 @@ extern "C"
 #include "fichier_local.hpp"
 #include "compile_time_features.hpp"
 #include "capabilities.hpp"
+#include "erreurs.hpp"
 
 using namespace std;
 
@@ -295,18 +296,19 @@ namespace libdar
     }
 
     void filesystem_specific_attribute_list::get_fsa_from_filesystem_for(const string & target,
-									 const fsa_scope & scope)
+									 const fsa_scope & scope,
+									 bool is_symlink)
     {
 	clear();
 
 	if(scope.find(fsaf_hfs_plus) != scope.end())
 	{
-	    fill_HFS_FSA_with(target);
+	    fill_HFS_FSA_with(target, is_symlink);
 	}
 
 	if(scope.find(fsaf_linux_extX) != scope.end())
 	{
-	    fill_extX_FSA_with(target);
+	    fill_extX_FSA_with(target, is_symlink);
 	}
 	update_familes();
 	sort_fsa();
@@ -484,123 +486,128 @@ namespace libdar
 	    throw Ememory("template create_or_throw");
     }
 
-    void filesystem_specific_attribute_list::fill_extX_FSA_with(const std::string & target)
+    void filesystem_specific_attribute_list::fill_extX_FSA_with(const std::string & target,
+								bool is_symlink)
     {
 #ifdef LIBDAR_NODUMP_FEATURE
 	S_I fd = -1;
 
-	try
+	if(!is_symlink) // symlink do not have their own extX FSA: restoring FSA of a symlink change the FSA of the target of the symlink
 	{
-	    fichier_local ftmp = fichier_local(target, compile_time::furtive_read());
-	    fd = ftmp.give_fd_and_terminate();
-	}
-	catch(Egeneric & e)
-	{
-	    if(!compile_time::furtive_read())
-		throw; // not a problem about furtive read mode
-
-	    try // trying openning not using furtive read mode
+	    try
 	    {
-		fichier_local ftmp = fichier_local(target, false);
+		fichier_local ftmp = fichier_local(target, compile_time::furtive_read());
 		fd = ftmp.give_fd_and_terminate();
 	    }
 	    catch(Egeneric & e)
 	    {
-		fd = -1;
-		    // we assume this FSA family is not supported for that file
+		if(!compile_time::furtive_read())
+		    throw; // not a problem about furtive read mode
+
+		try // trying openning not using furtive read mode
+		{
+		    fichier_local ftmp = fichier_local(target, false);
+		    fd = ftmp.give_fd_and_terminate();
+		}
+		catch(Egeneric & e)
+		{
+		    fd = -1;
+			// we assume this FSA family is not supported for that file
+		}
 	    }
-	}
 
-	if(fd < 0)
-	    return; // silently aborting assuming FSA family not supported for that file
+	    if(fd < 0)
+		return; // silently aborting assuming FSA family not supported for that file
 
-	try
-	{
-	    S_I f = 0;
-	    fsa_bool * ptr = NULL;
+	    try
+	    {
+		S_I f = 0;
+		fsa_bool * ptr = NULL;
 
-	    if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
-		return; // assuming there is no support for that FSA family
+		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f) < 0)
+		    return; // assuming there is no support for that FSA family
 
 #ifdef EXT2_APPEND_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_append_only, (f & EXT2_APPEND_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_append_only, (f & EXT2_APPEND_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #endif
 #ifdef EXT2_COMPR_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_compressed, (f & EXT2_COMPR_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_compressed, (f & EXT2_COMPR_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #endif
 #ifdef EXT2_NODUMP_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_no_dump, (f & EXT2_NODUMP_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_no_dump, (f & EXT2_NODUMP_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #endif
 #ifdef EXT2_IMMUTABLE_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_immutable, (f & EXT2_IMMUTABLE_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_immutable, (f & EXT2_IMMUTABLE_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #endif
 #ifdef EXT3_JOURNAL_DATA_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_data_journalling, (f & EXT3_JOURNAL_DATA_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_data_journalling, (f & EXT3_JOURNAL_DATA_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #else
-  #ifdef EXT2_JOURNAL_DATA_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_data_journalling, (f & EXT2_JOURNAL_DATA_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
-  #endif
+#ifdef EXT2_JOURNAL_DATA_FL
+		create_or_throw(ptr, fsaf_linux_extX, fsan_data_journalling, (f & EXT2_JOURNAL_DATA_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
+#endif
 #endif
 #ifdef	EXT2_SECRM_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_secure_deletion, (f & EXT2_SECRM_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_secure_deletion, (f & EXT2_SECRM_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #endif
 #ifdef EXT2_NOTAIL_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_no_tail_merging, (f & EXT2_NOTAIL_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_no_tail_merging, (f & EXT2_NOTAIL_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #endif
 #ifdef	EXT2_UNRM_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_undeletable, (f & EXT2_UNRM_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_undeletable, (f & EXT2_UNRM_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #endif
 #ifdef EXT2_NOATIME_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_noatime_update, (f & EXT2_NOATIME_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_noatime_update, (f & EXT2_NOATIME_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #endif
 #ifdef EXT2_DIRSYNC_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_synchronous_directory, (f & EXT2_DIRSYNC_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_synchronous_directory, (f & EXT2_DIRSYNC_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #endif
 #ifdef EXT2_SYNC_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_synchronous_update, (f & EXT2_SYNC_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_synchronous_update, (f & EXT2_SYNC_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #endif
 #ifdef EXT2_TOPDIR_FL
-	    create_or_throw(ptr, fsaf_linux_extX, fsan_top_of_dir_hierarchy, (f & EXT2_TOPDIR_FL) != 0);
-	    fsa.push_back(ptr);
-	    ptr = NULL;
+		create_or_throw(ptr, fsaf_linux_extX, fsan_top_of_dir_hierarchy, (f & EXT2_TOPDIR_FL) != 0);
+		fsa.push_back(ptr);
+		ptr = NULL;
 #endif
-	}
-	catch(...)
-	{
+	    }
+	    catch(...)
+	    {
+		close(fd);
+		throw;
+	    }
 	    close(fd);
-	    throw;
 	}
-	close(fd);
 #else
 	    // nothing to do, as this FSA has not been activated at compilation time
 #endif
     }
 
-    void filesystem_specific_attribute_list::fill_HFS_FSA_with(const std::string & target)
+    void filesystem_specific_attribute_list::fill_HFS_FSA_with(const std::string & target,
+							       bool is_symlink)
     {
 #ifdef LIBDAR_BIRTHTIME
 	struct stat tmp;
@@ -641,7 +648,8 @@ namespace libdar
 
 	    try
 	    {
-		fichier_local ftmp = fichier_local(target, compile_time::furtive_read());
+		bool furtive = capability_FOWNER(ui, false) == capa_set ? compile_time::furtive_read() : false;
+		fichier_local ftmp = fichier_local(target, furtive);
 		fd = ftmp.give_fd_and_terminate();
 	    }
 	    catch(Egeneric & e)

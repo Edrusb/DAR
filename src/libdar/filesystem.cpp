@@ -292,7 +292,7 @@ namespace libdar
 			throw Ememory("filesystem_hard_link_read::make_entree");
 		    try
 		    {
-			fsal->get_fsa_from_filesystem_for(display, sc);
+			fsal->get_fsa_from_filesystem_for(display, sc, S_ISLNK(buf.st_mode));
 			if(!fsal->empty())
 			{
 			    ino->fsa_set_saved_status(inode::fsa_full);
@@ -1639,6 +1639,7 @@ namespace libdar
 	const inode *tba_ino = tba_mir == NULL ? dynamic_cast<const inode *>(to_be_added) : tba_mir->get_inode();
 	const directory *tba_dir = dynamic_cast<const directory *>(to_be_added);
 	const detruit *tba_det = dynamic_cast<const detruit *>(to_be_added);
+	const lien *in_place_symlink = dynamic_cast<const lien *>(in_place);
 
 	if(tba_ino == NULL)
 	    throw SRC_BUG;
@@ -1719,7 +1720,9 @@ namespace libdar
 
 		    try
 		    {
-			fsa.get_fsa_from_filesystem_for(spot, all_fsa_families());
+			fsa.get_fsa_from_filesystem_for(spot,
+							all_fsa_families(),
+							in_place_symlink != NULL);
 		    }
 		    catch(Ethread_cancel & e)
 		    {
