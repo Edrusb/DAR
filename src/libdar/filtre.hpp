@@ -48,14 +48,15 @@ namespace libdar
                                const catalogue & cat,     //< table of content to extract information from
                                const path & fs_racine,    //< root path under which to restore directiry tree and files
                                bool fs_warn_overwrite,    //< whether to warn before overwriting (to be replaced by overwriting policy)
-                               bool info_details,         //< whether to be verbose
+                               bool info_details,         //< whether to display processing messages
+			       bool display_treated,      //< whether to display treated files
+			       bool display_skipped,      //< whether to display skipped files
                                statistics & st,           //< statistics result about the operation
                                const mask & ea_mask,      //< defines EA to restore/not restore
                                bool flat,                 //< if true, directories are not restores, all files are placed directly at in fs_racine directory
 			       inode::comparison_fields what_to_check, //< which file properties to restore
 			       bool warn_remove_no_match, //< wether to warn for file to remove not matching the expected type
 			       bool empty,                //< dry-run execution
-			       bool display_skipped,      //< whether to display skipped files
 			       bool empty_dir,            //< whether to restore directories that do contain any file to restore
 			       const crit_action & x_overwrite, //< how and whether to overwrite files
  			       archive_options_extract::t_dirty dirty, //< whether to restore dirty files
@@ -71,6 +72,8 @@ namespace libdar
                                   const catalogue & ref,
                                   const path & fs_racine,
                                   bool info_details,
+				  bool display_treated,
+				  bool display_skipped,
                                   statistics & st,
                                   bool make_empty_dir,
 				  const mask & ea_mask,
@@ -84,7 +87,6 @@ namespace libdar
 				  inode::comparison_fields what_to_check,
 				  bool snapshot,
 				  bool cache_directory_tagging,
-				  bool display_skipped,
 				  bool security_check,
 				  const infinint & repeat_count,
 				  const infinint & repeat_byte,
@@ -101,12 +103,13 @@ namespace libdar
                                   const catalogue & cat,
                                   const path & fs_racine,
                                   bool info_details,
+				  bool display_treated,
+				  bool display_skipped,
 				  statistics & st,
 				  const mask & ea_mask,
 				  bool alter_time,
 				  bool furtive_read_mode,
 				  inode::comparison_fields what_to_check,
-				  bool display_skipped,
 				  const infinint & hourshift,
 				  bool compare_symlink_date,
 				  const fsa_scope & scope);
@@ -116,9 +119,11 @@ namespace libdar
                             const mask &subtree,
                             const catalogue & cat,
                             bool info_details,
+			    bool display_treated,
+			    bool display_skipped,
 			    bool empty,
-                            statistics & st,
-			    bool display_skipped);
+                            statistics & st);
+
 
     extern void filtre_isolate(user_interaction & dialog,
 			       catalogue & cat,
@@ -133,12 +138,13 @@ namespace libdar
 			     const catalogue * ref1,
 			     const catalogue * ref2,
 			     bool info_details,
+			     bool display_treated,
+			     bool display_skipped,
 			     statistics & st,
 			     bool make_empty_dir,
 			     const mask & ea_mask,
 			     const mask & compr_mask,
 			     const infinint & min_compr_size,
-			     bool display_skipped,
 			     bool keep_compressed,
 			     const crit_action & overwrite,
 			     bool warn_overwrite,

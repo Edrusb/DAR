@@ -75,6 +75,7 @@ namespace libdar
         try
         {
 	    entrepot *where = options.get_entrepot().clone();
+	    bool info_details = options.get_info_details();
 
 	    if(where == NULL)
 		throw Ememory("archive::archive");
@@ -93,6 +94,9 @@ namespace libdar
 
 		try
 		{
+		    if(info_details)
+			dialog.printf(gettext("Opening archive %s ..."), basename.c_str());
+
 			// we open the main archive to get the different layers (level1, scram and level2).
 		    macro_tools_open_archive(dialog,
 					     *where,
@@ -130,6 +134,10 @@ namespace libdar
 			entrepot *ref_where = options.get_ref_entrepot().clone();
 			if(ref_where == NULL)
 			    throw Ememory("archive::archive");
+
+			if(info_details)
+			    dialog.printf(gettext("Opening the archive of reference %s to retreive the isolated catalog ... "), options.get_ref_basename().c_str());
+
 
 			try
 			{
@@ -188,6 +196,9 @@ namespace libdar
 
 			ref_ver.algo_zip = ver.algo_zip; // set the default encryption to use to the one of the main archive
 
+			if(info_details)
+			    dialog.warning(gettext("Loading isolated catalogue in memory..."));
+
 			cat = macro_tools_get_derivated_catalogue_from(dialog,
 								       stack,
 								       ref_stack,
@@ -209,6 +220,9 @@ namespace libdar
 			try
 			{
 			    if(!options.get_sequential_read())
+			    {
+				if(info_details)
+				    dialog.warning(gettext("Loading catalogue in memory..."));
 				cat = macro_tools_get_catalogue_from(dialog,
 								     stack,
 								     ver,
@@ -216,6 +230,7 @@ namespace libdar
 								     local_cat_size,
 								     second_terminateur_offset,
 								     options.get_lax());
+			    }
 			    else
 			    {
 				if(esc != NULL)
@@ -223,6 +238,8 @@ namespace libdar
 				    generic_file *ea_loc = stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED);
 				    generic_file *data_loc = stack.get_by_label(LIBDAR_STACK_LABEL_CLEAR);
 
+				    if(info_details)
+					dialog.warning(gettext("Creating catalogue object to be filled with archive sequential read..."));
 				    cat = new (nothrow) escape_catalogue(dialog,
 									 ver.edition,
 									 char2compression(ver.algo_zip),
@@ -354,6 +371,8 @@ namespace libdar
 				   options.get_allow_over(),
 				   options.get_warn_over(),
 				   options.get_info_details(),
+				   options.get_display_treated(),
+				   options.get_display_skipped(),
 				   options.get_pause(),
 				   options.get_empty_dir(),
 				   options.get_compression(),
@@ -376,7 +395,6 @@ namespace libdar
 				   options.get_comparison_fields(),
 				   options.get_snapshot(),
 				   options.get_cache_directory_tagging(),
-				   options.get_display_skipped(),
 				   options.get_fixed_date(),
 				   options.get_slice_permission(),
 				   options.get_repeat_count(),
@@ -447,6 +465,8 @@ namespace libdar
 				   options.get_allow_over(),
 				   options.get_warn_over(),
 				   options.get_info_details(),
+				   false, // display treated
+				   false, // display skipped
 				   options.get_pause(),
 				   false,
 				   options.get_compression(),
@@ -459,18 +479,17 @@ namespace libdar
 				   options.get_crypto_pass(),
 				   options.get_crypto_size(),
 				   bool_mask(false),
-				   0,
-				   false,
-				   0,
+				   0,      // min_compr_size
+				   false,  //nodump
+				   0,      // hourshift
 				   options.get_empty(),
-				   false,
-				   false,
-				   false,
+				   false,  // alter_atime
+				   false,  // furtive_read_mode
+				   false,  //same_fs
 				   inode::cf_all,
-				   false,
-				   false,
-				   false,
-				   0,
+				   false,  // snapshot
+				   false,  // cache_directory_tagging
+				   0,      // fixed_date
 				   options.get_slice_permission(),
 				   0, // repeat count
 				   0, // repeat byte
@@ -648,6 +667,8 @@ namespace libdar
 				 options.get_overwriting_rules(),
 				 options.get_warn_over(),
 				 options.get_info_details(),
+				 options.get_display_treated(),
+				 options.get_display_skipped(),
 				 options.get_pause(),
 				 options.get_empty_dir(),
 				 options.get_keep_compressed() ? algo_kept : options.get_compression(),
@@ -670,7 +691,6 @@ namespace libdar
 				 inode::cf_all,   // what_to_check
 				 false,   // snapshot
 				 false,   // cache_directory_tagging
-				 options.get_display_skipped(),
 				 options.get_keep_compressed(),
 				 0,       // fixed_date
 				 options.get_slice_permission(),
@@ -753,13 +773,14 @@ namespace libdar
 			       tools_relative2absolute_path(fs_root, tools_getcwd()),
 			       options.get_warn_over(),
 			       options.get_info_details(),
+			       options.get_display_treated(),
+			       options.get_display_skipped(),
                                *st_ptr,
 			       options.get_ea_mask(),
                                options.get_flat(),
 			       options.get_what_to_check(),
 			       options.get_warn_remove_no_match(),
 			       options.get_empty(),
-			       options.get_display_skipped(),
 			       options.get_empty_dir(),
 			       options.get_overwriting_rules(),
 			       options.get_dirty_behavior(),
@@ -969,12 +990,13 @@ namespace libdar
 				  get_cat(),
 				  tools_relative2absolute_path(fs_root, tools_getcwd()),
 				  options.get_info_details(),
+				  options.get_display_treated(),
+				  options.get_display_skipped(),
 				  *st_ptr,
 				  options.get_ea_mask(),
 				  options.get_alter_atime(),
 				  options.get_furtive_read_mode(),
 				  options.get_what_to_check(),
-				  options.get_display_skipped(),
 				  options.get_hourshift(),
 				  options.get_compare_symlink_date(),
 				  options.get_fsa_scope());
@@ -1064,9 +1086,10 @@ namespace libdar
 				    options.get_subtree(),
 				    get_cat(),
 				    options.get_info_details(),
+				    options.get_display_treated(),
+				    options.get_display_skipped(),
 				    options.get_empty(),
-				    *st_ptr,
-				    options.get_display_skipped());
+				    *st_ptr);
 		}
 		catch(Erange & e)
 		{
@@ -1392,6 +1415,8 @@ namespace libdar
                                      bool allow_over,
 				     bool warn_over,
 				     bool info_details,
+				     bool display_treated,
+				     bool display_skipped,
 				     const infinint & pause,
                                      bool empty_dir,
 				     compression algo,
@@ -1414,7 +1439,6 @@ namespace libdar
 				     inode::comparison_fields what_to_check,
                                      bool snapshot,
                                      bool cache_directory_tagging,
-				     bool display_skipped,
 				     const infinint & fixed_date,
 				     const string & slice_permission,
 				     const infinint & repeat_count,
@@ -1550,6 +1574,8 @@ namespace libdar
 			 allow_over ? crit_constant_action(data_overwrite, EA_overwrite) : crit_constant_action(data_preserve, EA_preserve), // we do not have any overwriting policy in this environement (archive creation and isolation), so we create one on-fly
 			 warn_over,
 			 info_details,
+			 display_treated,
+			 display_skipped,
 			 pause,
 			 empty_dir,
 			 algo,
@@ -1572,7 +1598,6 @@ namespace libdar
 			 what_to_check,
 			 snapshot,
 			 cache_directory_tagging,
-			 display_skipped,
 			 false,   // keep_compressed
 			 fixed_date,
 			 slice_permission,
@@ -1609,6 +1634,8 @@ namespace libdar
 				   const crit_action & overwrite,
 				   bool warn_over,
 				   bool info_details,
+				   bool display_treated,
+				   bool display_skipped,
 				   const infinint & pause,
 				   bool empty_dir,
 				   compression algo,
@@ -1631,7 +1658,6 @@ namespace libdar
 				   inode::comparison_fields what_to_check,
 				   bool snapshot,
 				   bool cache_directory_tagging,
-				   bool display_skipped,
 				   bool keep_compressed,
 				   const infinint & fixed_date,
 				   const string & slice_permission,
@@ -1695,12 +1721,20 @@ namespace libdar
 		    // **********  building the level 1 generic_file layer *********** //
 
 		if(empty)
+		{
+		    if(info_details)
+			dialog.warning(gettext("Creating low layer: Writing archive into a black hole object (equivalent to /dev/null)..."));
+
 		    tmp = new (nothrow) null_file(gf_write_only);
 		    // data_name is unchanged because all the archive goes to a black hole.
+		}
 		else
 		    if(file_size == 0) // one SLICE
 			if(filename == "-") // output to stdout
 			{
+			    if(info_details)
+				dialog.warning(gettext("Creating low layer: Writing archive into standard output object..."));
+
 			    trivial_sar *tvs = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name,
 									    false, execute); //archive goes to stdout
 			    tmp = tvs;
@@ -1710,6 +1744,8 @@ namespace libdar
 			}
 			else
 			{
+			    if(info_details)
+				dialog.warning(gettext("Creating low layer: Writing archive into a plain file object..."));
 			    trivial_sar *tvs = new (nothrow) trivial_sar(dialog,
 									 filename,
 									 extension,
@@ -1730,6 +1766,8 @@ namespace libdar
 			}
 		    else
 		    {
+			if(info_details)
+			    dialog.warning(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
 			sar *rsr = new (nothrow) sar(dialog,
 						     filename,
 						     extension,
@@ -1807,6 +1845,8 @@ namespace libdar
 		    // It also servers of backup copy for normal reading if the end of the archive
 		    // is corrupted.
 
+		if(info_details)
+		    dialog.warning(gettext("Writing down the archive header..."));
 		ver.write(stack);
 
 		    // now we can add the initial offset in the archive_header datastructure, which will be written
@@ -1822,6 +1862,8 @@ namespace libdar
 		    switch(crypto)
 		    {
 		    case crypto_scrambling:
+			if(info_details)
+			    dialog.warning(gettext("Adding a new layer on top: scrambler object..."));
 			tmp = new (nothrow) scrambler(real_pass, *(stack.top()));
 			break;
 		    case crypto_blowfish:
@@ -1829,9 +1871,13 @@ namespace libdar
 		    case crypto_twofish256:
 		    case crypto_serpent256:
 		    case crypto_camellia256:
+			if(info_details)
+			    dialog.warning(gettext("Adding a new layer on top: Strong encryption object..."));
 			tmp = new (nothrow) crypto_sym(crypto_size, real_pass, *(stack.top()), false, macro_tools_supported_version, crypto);
 			break;
 		    case crypto_none:
+			if(info_details)
+			    dialog.warning(gettext("Adding a new layer on top: Caching layer for better performances..."));
 			tmp = new (nothrow) cache(*(stack.top()), false);
 			break;
 		    default:
@@ -1847,7 +1893,11 @@ namespace libdar
 		    }
 
 		    if(crypto != crypto_none) // initial elastic buffer
+		    {
+			if(info_details)
+			    dialog.warning(gettext("Writing down the initial elastic buffer through the encryption layer..."));
 			tools_add_elastic_buffer(stack, GLOBAL_ELASTIC_BUFFER_SIZE);
+		    }
 		}
 
 		    // ********** if required building the escape layer  ***** //
@@ -1856,6 +1906,8 @@ namespace libdar
 		{
 		    set<escape::sequence_type> unjump;
 
+		    if(info_details)
+			dialog.warning(gettext("Adding a new layer on top: Escape layer to allow sequential reading..."));
 		    unjump.insert(escape::seqt_catalogue);
 		    tmp = esc = new (nothrow) escape(stack.top(), unjump);
 		    if(tmp == NULL)
@@ -1869,6 +1921,8 @@ namespace libdar
 
 		    // ********** building the level2 layer (compression) ************************ //
 
+		if(info_details && algo != none)
+		    dialog.warning(gettext("Adding a new layer on top: compression..."));
 		tmp = new (nothrow) compressor(empty ? none : algo, *(stack.top()), compression_level);
 		if(tmp == NULL)
 		    throw Ememory("op_create_in_sub");
@@ -1878,10 +1932,14 @@ namespace libdar
 		    tmp = NULL;
 		}
 
+		if(info_details)
+		    dialog.warning(gettext("All layers have been created successfully"));
+
 		    // ********** building the catalogue (empty for now) ************************* //
 
 		infinint root_mtime;
-
+		if(info_details)
+		    dialog.warning(gettext("Building the catalog object..."));
 		try
 		{
 		    if(fs_root.display() != "<ROOT>")
@@ -1943,6 +2001,8 @@ namespace libdar
 
 			try
 			{
+			    if(info_details)
+				dialog.warning(gettext("Processing files for backup..."));
 			    filtre_sauvegarde(dialog,
 					      selection,
 					      subtree,
@@ -1951,6 +2011,8 @@ namespace libdar
 					      *ref_cat_ptr,
 					      fs_root,
 					      info_details,
+					      display_treated,
+					      display_skipped,
 					      *st_ptr,
 					      empty_dir,
 					      ea_mask,
@@ -1964,7 +2026,6 @@ namespace libdar
 					      what_to_check,
 					      snapshot,
 					      cache_directory_tagging,
-					      display_skipped,
 					      security_check,
 					      repeat_count,
 					      repeat_byte,
@@ -1991,10 +2052,15 @@ namespace libdar
 			}
 			break;
 		    case oper_isolate:
+			if(info_details)
+			    dialog.warning(gettext("Creating an isolated catalogue..."));
 			st_ptr->clear(); // clear st, as filtre_isolate does not use it
 			filtre_isolate(dialog, *cat, *ref_cat1, info_details);
 			break;
 		    case oper_merge:
+			if(info_details)
+			    dialog.warning(gettext("Processing files for merging..."));
+
 			filtre_merge(dialog,
 				     selection,
 				     subtree,
@@ -2003,12 +2069,13 @@ namespace libdar
 				     ref_cat1,
 				     ref_cat2,
 				     info_details,
+				     display_treated,
+				     display_skipped,
 				     *st_ptr,
 				     empty_dir,
 				     ea_mask,
 				     compr_mask,
 				     min_compr_size,
-				     display_skipped,
 				     keep_compressed,
 				     overwrite,
 				     warn_over,
@@ -2066,12 +2133,14 @@ namespace libdar
 		}
 
 		if(info_details)
-		    dialog.warning(gettext("Writing archive contents..."));
+		    dialog.warning(gettext("Writing down archive contents..."));
 		cat->dump(stack);
 		stack.top()->sync_write();
 
 		    // releasing the compression layer
 
+		if(info_details && algo != none)
+		    dialog.warning(gettext("Closing the compression layer..."));
 		if(!stack.pop_and_close_if_type_is(compr_ptr))
 		    throw SRC_BUG;
 
@@ -2079,6 +2148,8 @@ namespace libdar
 
 		if(esc != NULL)
 		{
+		    if(info_details)
+			dialog.warning(gettext("Closing the escape layer..."));
 		    if(!add_marks_for_sequential_reading)
 			throw SRC_BUG;
 		    esc = NULL; // intentionnally set to NULL here, only the pointer type is used by pop_and_close
@@ -2088,18 +2159,27 @@ namespace libdar
 
 		    // *********** writing down the first terminator at the end of the archive  *************** //
 
+		if(info_details)
+		    dialog.warning(gettext("Writing down the first archive terminator..."));
 		coord.dump(stack); // since format "04" the terminateur is encrypted
 		if(crypto != crypto_none)
+		{
+		    if(info_details)
+			dialog.warning(gettext("writing down the final elastic buffer through the encryption layer..."));
 		    tools_add_elastic_buffer(stack, GLOBAL_ELASTIC_BUFFER_SIZE);
-		    // terminal elastic buffer (after terminateur to protect against
-		    // plain text attack on the terminator string)
-
+			// terminal elastic buffer (after terminateur to protect against
+			// plain text attack on the terminator string)
+		}
 
 		    // releasing memory by calling destructors and releases file descriptors
 
 		tronco_ptr = dynamic_cast<tronconneuse *>(stack.top());
 		if(tronco_ptr != NULL)
+		{
+		    if(info_details)
+			dialog.warning(gettext("Closing the encryption layer..."));
 		    tronco_ptr->write_end_of_file();
+		}
 
 		if(!stack.pop_and_close_if_type_is(tronco_ptr))
 		{
@@ -2109,13 +2189,19 @@ namespace libdar
 
 		    // *********** writing down the trailier_version with the second terminateur *************** //
 
+		if(info_details)
+		    dialog.warning(gettext("Writing down archive trailer..."));
 		coord.set_catalogue_start(stack.get_position());
 		ver.write(stack);
+		if(info_details)
+		    dialog.warning(gettext("Writing down the second archive terminator..."));
 		coord.dump(stack);
 		stack.sync_write();
 
-
 		    // *********** closing the archive ******************** //
+
+		if(info_details)
+		    dialog.warning(gettext("Closing archive low layer..."));
 
 		stack.clear(); // closing all generic_files remaining in the stack
 
@@ -2124,6 +2210,9 @@ namespace libdar
 
 		if(aborting)
 		    throw Ethread_cancel(false, flag);
+
+		if(info_details)
+		    dialog.warning(gettext("Archive is closed."));
 	    }
 	    catch(...)
 	    {

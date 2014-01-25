@@ -271,7 +271,18 @@ namespace libdar
 	void set_warn_over(bool warn_over) { x_warn_over = warn_over; };
 
 	    /// defines whether the user needs detailed output of the operation
+	    ///
+	    /// \note in API 5.5.x and before this switch drove the displaying
+	    /// of processing messages and treated files. now it only drives the
+	    /// display of processing messages, use set_display_treated to define
+	    /// whether files under treatement should be display or not
 	void set_info_details(bool info_details) { x_info_details = info_details; };
+
+	    /// defines whether to show treated files
+	void set_display_treated(bool display_treated) { x_display_treated = display_treated; };
+
+	    /// whether to display files that have been excluded by filters
+	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
 
 	    /// set a pause beteween slices. Set to zero does not pause at all, set to 1 makes libdar pauses each slice, set to 2 makes libdar pause each 2 slices and so on.
 	void set_pause(const infinint & pause) { x_pause = pause; };
@@ -386,9 +397,6 @@ namespace libdar
 	    /// whether to consider the Cache Directory Tagging Standard
 	void set_cache_directory_tagging(bool cache_directory_tagging) { x_cache_directory_tagging = cache_directory_tagging; };
 
-	    /// whether to display files that have been excluded by filters
-	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
-
 	    /// whether to ignore any archive of reference and only save file which modification is more recent that the given "fixed_date". To not use this feature set fixed_date value of zero (which is the value by default)
 	void set_fixed_date(const infinint & fixed_date) { x_fixed_date = fixed_date; };
 
@@ -443,6 +451,8 @@ namespace libdar
 	bool get_allow_over() const { return x_allow_over; };
 	bool get_warn_over() const { return x_warn_over; };
 	bool get_info_details() const { return x_info_details; };
+	bool get_display_treated() const { return x_display_treated; };
+	bool get_display_skipped() const { return x_display_skipped; };
 	const infinint & get_pause() const { return x_pause; };
 	bool get_empty_dir() const { return x_empty_dir; };
 	compression get_compression() const { return x_compr_algo; };
@@ -465,7 +475,6 @@ namespace libdar
 	bool get_same_fs() const { return x_same_fs; };
 	bool get_snapshot() const { return x_snapshot; };
 	bool get_cache_directory_tagging() const { return x_cache_directory_tagging; };
-	bool get_display_skipped() const { return x_display_skipped; };
 	const infinint & get_fixed_date() const { return x_fixed_date; };
 	const std::string & get_slice_permission() const { return x_slice_permission; };
 	const std::string & get_slice_user_ownership() const { return x_slice_user_ownership; };
@@ -491,6 +500,8 @@ namespace libdar
 	bool x_allow_over;
 	bool x_warn_over;
 	bool x_info_details;
+	bool x_display_treated;
+	bool x_display_skipped;
 	infinint x_pause;
 	bool x_empty_dir;
 	compression x_compr_algo;
@@ -514,7 +525,6 @@ namespace libdar
 	bool x_same_fs;
 	bool x_snapshot;
 	bool x_cache_directory_tagging;
-	bool x_display_skipped;
 	infinint x_fixed_date;
 	std::string x_slice_permission;
 	std::string x_slice_user_ownership;
@@ -728,7 +738,18 @@ namespace libdar
 	void set_overwriting_rules(const crit_action & overwrite);
 
 	    /// defines whether the user needs detailed output of the operation
+	    ///
+	    /// \note in API 5.5.x and before this switch drove the displaying
+	    /// of processing messages and treated files. now it only drives the
+	    /// display of processing messages, use set_display_treated to define
+	    /// whether files under treatement should be display or not
 	void set_info_details(bool info_details) { x_info_details = info_details; };
+
+	    /// defines whether to show treated files
+	void set_display_treated(bool display_treated) { x_display_treated = display_treated; };
+
+	    /// whether to display files that have been excluded by filters
+	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
 
 	    /// set a pause beteween slices. Set to zero does not pause at all, set to 1 makes libdar pauses each slice, set to 2 makes libdar pause each 2 slices and so on.
 	void set_pause(const infinint & pause) { x_pause = pause; };
@@ -781,9 +802,6 @@ namespace libdar
 	    /// defines whether we do a dry-run execution
 	void set_empty(bool empty) { x_empty = empty; };
 
-	    /// whether to display files that have been excluded by filters
-	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
-
 	    /// make dar ignore the 'algo' argument and do not uncompress / compress files that are selected for merging
 	void set_keep_compressed(bool keep_compressed) { x_keep_compressed = keep_compressed; };
 
@@ -831,6 +849,8 @@ namespace libdar
 	bool get_warn_over() const { return x_warn_over; };
 	const crit_action & get_overwriting_rules() const { if(x_overwrite == NULL) throw SRC_BUG; return *x_overwrite; };
 	bool get_info_details() const { return x_info_details; };
+	bool get_display_treated() const { return x_display_treated; };
+	bool get_display_skipped() const { return x_display_skipped; };
 	const infinint & get_pause() const { return x_pause; };
 	bool get_empty_dir() const { return x_empty_dir; };
 	compression get_compression() const { return x_compr_algo; };
@@ -845,7 +865,6 @@ namespace libdar
 	const mask & get_compr_mask() const { if(x_compr_mask == NULL) throw SRC_BUG; return *x_compr_mask; };
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
 	bool get_empty() const { return x_empty; };
-	bool get_display_skipped() const { return x_display_skipped; };
 	bool get_keep_compressed() const { return x_keep_compressed; };
 	const std::string & get_slice_permission() const { return x_slice_permission; };
 	const std::string & get_slice_user_ownership() const { return x_slice_user_ownership; };
@@ -867,6 +886,8 @@ namespace libdar
 	bool x_warn_over;
 	crit_action * x_overwrite;
 	bool x_info_details;
+	bool x_display_treated;
+	bool x_display_skipped;
 	infinint x_pause;
 	bool x_empty_dir;
 	compression x_compr_algo;
@@ -881,7 +902,6 @@ namespace libdar
 	mask * x_compr_mask;
 	infinint x_min_compr_size;
 	bool x_empty;
-	bool x_display_skipped;
 	bool x_keep_compressed;
 	std::string x_slice_permission;
 	std::string x_slice_user_ownership;
@@ -930,7 +950,18 @@ namespace libdar
 	void set_warn_over(bool warn_over) { x_warn_over = warn_over; };
 
 	    /// defines whether the user needs detailed output of the operation
+	    ///
+	    /// \note in API 5.5.x and before this switch drove the displaying
+	    /// of processing messages and treated files. now it only drives the
+	    /// display of processing messages, use set_display_treated to define
+	    /// whether files under treatement should be display or not
 	void set_info_details(bool info_details) { x_info_details = info_details; };
+
+	    /// defines whether to show treated files
+	void set_display_treated(bool display_treated) { x_display_treated = display_treated; };
+
+	    /// whether to display files that have been excluded by filters
+	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
 
 	    /// defines which Extended Attributes to save
 	void set_ea_mask(const mask & ea_mask);
@@ -946,9 +977,6 @@ namespace libdar
 
 	    /// defines whether we need to store ignored directories as empty
 	void set_empty(bool empty) { x_empty = empty; };
-
-	    /// whether to display files that have been excluded by filters
-	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
 
 	    /// whether to restore directories where no file has been triggered for backup (no file/inode change, excluded files,...)
 	void set_empty_dir(bool empty_dir) { x_empty_dir = empty_dir; };
@@ -987,12 +1015,13 @@ namespace libdar
 	const mask & get_subtree() const { if(x_subtree == NULL) throw SRC_BUG; return *x_subtree; };
 	bool get_warn_over() const { return x_warn_over; };
 	bool get_info_details() const { return x_info_details; };
+	bool get_display_treated() const { return x_display_treated; };
+	bool get_display_skipped() const { return x_display_skipped; };
 	const mask & get_ea_mask() const { if(x_ea_mask == NULL) throw SRC_BUG; return *x_ea_mask; };
 	bool get_flat() const { return x_flat; };
 	inode::comparison_fields get_what_to_check() const { return x_what_to_check; };
 	bool get_warn_remove_no_match() const { return x_warn_remove_no_match; };
 	bool get_empty() const { return x_empty; };
-	bool get_display_skipped() const { return x_display_skipped; };
 	bool get_empty_dir() const { return x_empty_dir; };
 	t_dirty get_dirty_behavior() const { return x_dirty; }
 	const crit_action & get_overwriting_rules() const { if(x_overwrite == NULL) throw SRC_BUG; return *x_overwrite; };
@@ -1005,12 +1034,13 @@ namespace libdar
 	mask * x_subtree;
 	bool x_warn_over;
 	bool x_info_details;
+	bool x_display_treated;
+	bool x_display_skipped;
 	mask * x_ea_mask;
 	bool x_flat;
 	inode::comparison_fields x_what_to_check;
 	bool x_warn_remove_no_match;
 	bool x_empty;
-	bool x_display_skipped;
 	bool x_empty_dir;
 	t_dirty x_dirty;
 	crit_action *x_overwrite;
@@ -1107,7 +1137,18 @@ namespace libdar
 	void set_subtree(const mask & subtree);
 
 	    /// whether the user needs detailed output of the operation
+	    ///
+	    /// \note in API 5.5.x and before this switch drove the displaying
+	    /// of processing messages and treated files. now it only drives the
+	    /// display of processing messages, use set_display_treated to define
+	    /// whether files under treatement should be display or not
 	void set_info_details(bool info_details) { x_info_details = info_details; };
+
+	    /// defines whether to show treated files
+	void set_display_treated(bool display_treated) { x_display_treated = display_treated; };
+
+	    /// whether to display files that have been excluded by filters
+	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
 
 	    /// defines the Extended Attributes to compare
 	void set_ea_mask(const mask & ea_mask);
@@ -1130,9 +1171,6 @@ namespace libdar
 	    /// whether to use furtive read mode (if activated, alter_atime() has no meaning/use)
 	void set_furtive_read_mode(bool furtive_read);
 
-	    /// whether to display files that have been excluded by filters
-	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
-
 	    /// ignore differences of at most this integer number of hours while looking for changes in dates
 	void set_hourshift(const infinint & hourshift) { x_hourshift = hourshift; };
 
@@ -1149,11 +1187,12 @@ namespace libdar
 	const mask & get_selection() const { if(x_selection == NULL) throw SRC_BUG; return *x_selection; };
 	const mask & get_subtree() const { if(x_subtree == NULL) throw SRC_BUG; return *x_subtree; };
 	bool get_info_details() const { return x_info_details; };
+	bool get_display_treated() const { return x_display_treated; };
+	bool get_display_skipped() const { return x_display_skipped; };
 	const mask & get_ea_mask() const { if(x_ea_mask == NULL) throw SRC_BUG; return *x_ea_mask; };
 	inode::comparison_fields get_what_to_check() const { return x_what_to_check; };
 	bool get_alter_atime() const { return x_alter_atime; };
 	bool get_furtive_read_mode() const { return x_furtive_read; };
-	bool get_display_skipped() const { return x_display_skipped; };
 	const infinint & get_hourshift() const { return x_hourshift; };
 	bool get_compare_symlink_date() const { return x_compare_symlink_date; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
@@ -1162,12 +1201,13 @@ namespace libdar
 	mask * x_selection;
 	mask * x_subtree;
 	bool x_info_details;
+	bool x_display_treated;
+	bool x_display_skipped;
 	mask * x_ea_mask;
 	inode::comparison_fields x_what_to_check;
 	bool x_alter_atime;
 	bool x_old_alter_atime;
 	bool x_furtive_read;
-	bool x_display_skipped;
 	infinint x_hourshift;
 	bool x_compare_symlink_date;
 	fsa_scope x_scope;
@@ -1204,13 +1244,21 @@ namespace libdar
 	void set_subtree(const mask & subtree);
 
 	    /// whether the user needs detailed output of the operation
+	    ///
+	    /// \note in API 5.5.x and before this switch drove the displaying
+	    /// of processing messages and treated files. now it only drives the
+	    /// display of processing messages, use set_display_treated to define
+	    /// whether files under treatement should be display or not
 	void set_info_details(bool info_details) { x_info_details = info_details; };
-
-	    /// dry-run exectution if set to true
-	void set_empty(bool empty) { x_empty = empty; };
 
 	    /// whether to display files that have been excluded by filters
 	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
+
+	    /// defines whether to show treated files
+	void set_display_treated(bool display_treated) { x_display_treated = display_treated; };
+
+	    /// dry-run exectution if set to true
+	void set_empty(bool empty) { x_empty = empty; };
 
 
 	    /////////////////////////////////////////////////////////////////////
@@ -1219,15 +1267,17 @@ namespace libdar
 	const mask & get_selection() const { if(x_selection == NULL) throw SRC_BUG; return *x_selection; };
 	const mask & get_subtree() const { if(x_subtree == NULL) throw SRC_BUG; return *x_subtree; };
 	bool get_info_details() const { return x_info_details; };
-	bool get_empty() const { return x_empty; };
+	bool get_display_treated() const { return x_display_treated; };
 	bool get_display_skipped() const { return x_display_skipped; };
+	bool get_empty() const { return x_empty; };
 
     private:
 	mask * x_selection;
 	mask * x_subtree;
 	bool x_info_details;
-	bool x_empty;
+	bool x_display_treated;
 	bool x_display_skipped;
+	bool x_empty;
 
 	void destroy();
 	void copy_from(const archive_options_test & ref);

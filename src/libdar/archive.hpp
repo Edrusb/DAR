@@ -337,6 +337,8 @@ namespace libdar
 				bool allow_over,
 				bool warn_over,
 				bool info_details,
+				bool display_treated,
+				bool display_skipped,
 				const infinint & pause,
 				bool empty_dir,
 				compression algo,
@@ -359,7 +361,6 @@ namespace libdar
 				inode::comparison_fields what_to_check,
 				bool snapshot,
 				bool cache_directory_tagging,
-				bool display_skipped,
 				const infinint & fixed_date,
 				const std::string & slice_permission,
 				const infinint & repeat_count,
@@ -391,6 +392,8 @@ namespace libdar
 			      const crit_action & overwrite,    //< whether and how to allow overwriting (for files inside the archive)
 			      bool warn_over,                   //< whether to warn before overwriting
 			      bool info_details,                //< whether to display detailed informations
+			      bool display_created,             //< whether to display treated files
+			      bool display_skipped,             //< display skipped files for the operation
 			      const infinint & pause,           //< whether to pause between slices
 			      bool empty_dir,                   //< whether to store excluded dir as empty directories
 			      compression algo,                 //< compression algorithm
@@ -413,7 +416,6 @@ namespace libdar
 			      inode::comparison_fields what_to_check,  //< fields to consider wien comparing inodes (see inode::comparison_fields enumeration)
 			      bool snapshot,                    //< make as if all file had not changed
 			      bool cache_directory_tagging,     //< avoid saving directory which follow the cache directory tagging
-			      bool display_skipped,             //< display skipped files for the operation
 			      bool keep_compressed,             //< keep file compressed when merging
 			      const infinint & fixed_date,      //< whether to ignore any archive of reference and only save file which modification is more recent that the given "fixed_date" date
 			      const std::string & slice_permission,      //< permissions of slices that will be created

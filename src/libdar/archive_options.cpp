@@ -320,6 +320,8 @@ namespace libdar
 	    x_allow_over = true;
 	    x_warn_over = true;
 	    x_info_details = false;
+	    x_display_treated = false;
+	    x_display_skipped = false;
 	    x_pause = 0;
 	    x_empty_dir = false;
 	    x_compr_algo = none;
@@ -345,7 +347,6 @@ namespace libdar
 	    x_same_fs = false;
 	    x_snapshot = false;
 	    x_cache_directory_tagging = false;
-	    x_display_skipped = false;
 	    x_fixed_date = 0;
 	    x_slice_permission = "";
 	    x_slice_user_ownership = "";
@@ -537,6 +538,8 @@ namespace libdar
 	x_allow_over = ref.x_allow_over;
 	x_warn_over = ref.x_warn_over;
 	x_info_details = ref.x_info_details;
+	x_display_treated = ref.x_display_treated;
+	x_display_skipped = ref.x_display_skipped;
 	x_pause = ref.x_pause;
 	x_empty_dir = ref.x_empty_dir;
 	x_compr_algo = ref.x_compr_algo;
@@ -558,7 +561,6 @@ namespace libdar
 	x_same_fs = ref.x_same_fs;
 	x_snapshot = ref.x_snapshot;
 	x_cache_directory_tagging = ref.x_cache_directory_tagging;
-	x_display_skipped = ref.x_display_skipped;
 	x_fixed_date = ref.x_fixed_date;
 	x_slice_permission = ref.x_slice_permission;
 	x_slice_user_ownership = ref.x_slice_user_ownership;
@@ -695,6 +697,8 @@ namespace libdar
 	    x_allow_over = true;
 	    x_warn_over = true;
 	    x_info_details = false;
+	    x_display_treated = false;
+	    x_display_skipped = false;
 	    x_pause = 0;
 	    x_empty_dir = false;
 	    x_compr_algo = none;
@@ -707,7 +711,6 @@ namespace libdar
 	    x_pass.clear();
 	    x_min_compr_size = default_min_compr_size;
 	    x_empty = false;
-	    x_display_skipped = false;
 	    x_keep_compressed = false;
 	    x_slice_permission = "";
 	    x_slice_user_ownership = "";
@@ -900,6 +903,8 @@ namespace libdar
 	    x_allow_over = ref.x_allow_over;
 	    x_warn_over = ref.x_warn_over;
 	    x_info_details = ref.x_info_details;
+	    x_display_treated = ref.x_display_treated;
+	    x_display_skipped = ref.x_display_skipped;
 	    x_pause = ref.x_pause;
 	    x_empty_dir = ref.x_empty_dir;
 	    x_compr_algo = ref.x_compr_algo;
@@ -912,7 +917,6 @@ namespace libdar
 	    x_crypto_size = ref.x_crypto_size;
 	    x_min_compr_size = ref.x_min_compr_size;
 	    x_empty = ref.x_empty;
-	    x_display_skipped = ref.x_display_skipped;
 	    x_keep_compressed = ref.x_keep_compressed;
 	    x_slice_permission = ref.x_slice_permission;
 	    x_slice_user_ownership = ref.x_slice_user_ownership;
@@ -948,11 +952,12 @@ namespace libdar
 	    archive_option_clean_crit_action(x_overwrite);
 	    x_warn_over = true;
 	    x_info_details = false;
+	    x_display_treated = false;
+	    x_display_skipped = false;
 	    x_flat = false;
 	    x_what_to_check = default_comparison_fields;
 	    x_warn_remove_no_match = true;
 	    x_empty = false;
-	    x_display_skipped = false;
 	    x_empty_dir = true;
 	    x_dirty = dirty_warn;
 	    x_only_deleted = false;
@@ -1088,11 +1093,12 @@ namespace libdar
 
 	    x_warn_over = ref.x_warn_over;
 	    x_info_details = ref.x_info_details;
+	    x_display_treated = ref.x_display_treated;
+	    x_display_skipped = ref.x_display_skipped;
 	    x_flat = ref.x_flat;
 	    x_what_to_check = ref.x_what_to_check;
 	    x_warn_remove_no_match = ref.x_warn_remove_no_match;
 	    x_empty = ref.x_empty;
-	    x_display_skipped = ref.x_display_skipped;
 	    x_empty_dir = ref.x_empty_dir;
 	    x_dirty = ref.x_dirty;
 	    x_only_deleted = ref.x_only_deleted;
@@ -1243,6 +1249,8 @@ namespace libdar
 	    archive_option_clean_mask(x_selection);
 	    archive_option_clean_mask(x_subtree);
 	    x_info_details = false;
+	    x_display_treated = false;
+	    x_display_skipped = false;
 	    archive_option_clean_mask(x_ea_mask);
 	    x_what_to_check = inode::cf_all;
 	    x_alter_atime = true;
@@ -1252,7 +1260,6 @@ namespace libdar
 #else
 	    x_furtive_read = false;
 #endif
-	    x_display_skipped = false;
 	    x_hourshift = 0;
 	    x_compare_symlink_date = true;
 	    x_scope = all_fsa_families();
@@ -1392,11 +1399,12 @@ namespace libdar
 		throw Ememory("archive_options_extract::copy_from");
 
 	    x_info_details = ref.x_info_details;
+	    x_display_treated = ref.x_display_treated;
+	    x_display_skipped = ref.x_display_skipped;
 	    x_what_to_check = ref.x_what_to_check;
 	    x_alter_atime = ref.x_alter_atime;
 	    x_old_alter_atime = ref.x_old_alter_atime;
 	    x_furtive_read = ref.x_furtive_read;
-	    x_display_skipped = ref.x_display_skipped;
 	    x_hourshift = ref.x_hourshift;
 	    x_compare_symlink_date = ref.x_compare_symlink_date;
 	    x_scope = ref.x_scope;
@@ -1424,8 +1432,9 @@ namespace libdar
 	    archive_option_clean_mask(x_selection);
 	    archive_option_clean_mask(x_subtree);
 	    x_info_details = false;
-	    x_empty = false;
+	    x_display_treated = false;
 	    x_display_skipped = false;
+	    x_empty = false;
 	}
         catch(...)
         {
@@ -1511,8 +1520,9 @@ namespace libdar
 		throw Ememory("archive_options_extract::copy_from");
 
 	    x_info_details = ref.x_info_details;
-	    x_empty = ref.x_empty;
+	    x_display_treated = ref.x_display_treated;
 	    x_display_skipped = ref.x_display_skipped;
+	    x_empty = ref.x_empty;
 	}
 	catch(...)
 	{

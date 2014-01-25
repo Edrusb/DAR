@@ -64,7 +64,9 @@ struct line_param
     mask * subtree;               //< filter files for the operation based on path+filename
     bool allow_over;              //< whether to allow slice overwriting
     bool warn_over;               //< whether to warn before overwriting files or slices
-    bool info_details;            //< whether to be verbose
+    bool info_details;            //< whether to show processing messages
+    bool display_treated;         //< whether to show treated files
+    bool display_skipped;         //< whether to display skipped files
     compression algo;             //< compression algorithm to use when generating an archive
     U_I compression_level;        //< compression level to use when generating an archive
     infinint pause;               //< whether to pause between slices
@@ -92,7 +94,6 @@ struct line_param
     bool cache_directory_tagging; //< whether to ignore directory contents where a the cache directory tagging files is found
     U_32 crypto_size;             //< block size by which to cypher data
     U_32 crypto_size_ref;         //< block size by which to uncypher data from the archive of reference
-    bool display_skipped;         //< whether to display skipped files
     archive_options_listing::listformat list_mode; //< type of listing to follow
     path * aux_root;              //< where is the auxiliary archive of reference [used for merging but also when creating an archive, for the on-fly isolation]
     string * aux_filename;        //< basename of the auxiliary archive if reference (NULL => no auxiliary of reference)

@@ -88,11 +88,11 @@ displays version information.
 .PP
 .B GENERAL OPTIONS:
 .TP 20
--v, --verbose[=s[kipped]]
-verbose output. --verbose and --verbose=skipped are independent. --verbose=skipped displays the files being excluded by filters, while --verbose display actions under process. You can still use dar's exit status to known which way the operation ended (seen EXIT CODES at the end of this document).
+-v, --verbose[={s[kipped]|t[reated]|m[essages]|a[ll]}]
+verbose output for skipped files, treated files and/or processing messages. By default --verbose without argument is equivalent to "-vt -vm" for backward compatiblity with releases prior version 2.5.0. You can activate verbosity independently for treated files, skipped files and processing messages, by calling several times the verbose option with different arguments. For example to see details about skipped and treated files and not about processing messages use the following without the quotes "--verbose=skipped --verbose=treated" which is equivalent to "-vs -vt". The -vt option is not available for archive isolation and is useless for archive listing (always set unless -q is used). Note: When using dar from a script better use dar's exit status to known which way the operation has ended (seen EXIT CODES at the end of this document). See also -Q and -q options.
 .TP 20
 -q, --quiet
-Suppress the final statistics report. If no verbose output is asked beside this option, nothing is displayed if the operation succeeds.
+Suppress the final statistics report. If no verbose output is asked beside this option, nothing is displayed if the operation succeeds. When using dar from a script better use dar's exit status to known which way the operation has ended (seen EXIT CODES at the end of this document)
 .TP 20
 -b, --beep
 makes the terminal ring when user action is required (like for example the creation of a new slice using the -p option)

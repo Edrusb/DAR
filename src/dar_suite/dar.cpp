@@ -153,7 +153,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    if(param.op == merging)
 		    {
 			if(param.info_details)
-			    dialog.warning(gettext("Considering the (second alias auxiliary) archive of reference:"));
+			    dialog.warning(gettext("Considering the second (alias auxiliary) archive of reference:"));
 			crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass);
 			read_options.clear();
 			read_options.set_crypto_algo(aux_crypto);
@@ -187,6 +187,8 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    create_options.set_allow_over(param.allow_over);
 		    create_options.set_warn_over(param.warn_over);
 		    create_options.set_info_details(param.info_details);
+		    create_options.set_display_treated(param.display_treated);
+		    create_options.set_display_skipped(param.display_skipped);
 		    create_options.set_pause(param.pause);
 		    create_options.set_empty_dir(param.empty_dir);
 		    create_options.set_compression(param.algo);
@@ -208,7 +210,6 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    create_options.set_same_fs(param.same_fs);
 		    create_options.set_snapshot(param.snapshot);
 		    create_options.set_cache_directory_tagging(param.cache_directory_tagging);
-		    create_options.set_display_skipped(param.display_skipped);
 		    create_options.set_fixed_date(param.fixed_date);
 		    create_options.set_slice_permission(param.slice_perm);
 		    create_options.set_slice_user_ownership(param.slice_user);
@@ -241,6 +242,8 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    merge_options.set_overwriting_rules(*param.overwrite);
 		    merge_options.set_warn_over(param.warn_over);
 		    merge_options.set_info_details(param.info_details);
+		    merge_options.set_display_treated(param.display_treated);
+		    merge_options.set_display_skipped(param.display_skipped);
 		    merge_options.set_pause(param.pause);
 		    merge_options.set_empty_dir(param.empty_dir);
 		    merge_options.set_compression(param.algo);
@@ -254,7 +257,6 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    merge_options.set_compr_mask(*param.compress_mask);
 		    merge_options.set_min_compr_size(param.min_compr_size);
 		    merge_options.set_empty(param.empty);
-		    merge_options.set_display_skipped(param.display_skipped);
 		    merge_options.set_keep_compressed(param.keep_compressed);
 		    merge_options.set_slice_permission(param.slice_perm);
 		    merge_options.set_slice_user_ownership(param.slice_user);
@@ -437,12 +439,13 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		extract_options.set_subtree(*param.subtree);
 		extract_options.set_warn_over(param.warn_over);
 		extract_options.set_info_details(param.info_details);
+		extract_options.set_display_treated(param.display_treated);
+		extract_options.set_display_skipped(param.display_skipped);
 		extract_options.set_ea_mask(*param.ea_mask);
 		extract_options.set_flat(param.flat);
 		extract_options.set_what_to_check(param.what_to_check);
 		extract_options.set_warn_remove_no_match(param.warn_remove_no_match);
 		extract_options.set_empty(param.empty);
-		extract_options.set_display_skipped(param.display_skipped);
 		extract_options.set_empty_dir(!param.empty_dir);
 		    // the inversion above (!) is due to the fact this option is
 		    // set with the same -D option that is used at backup time to
@@ -517,11 +520,12 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		diff_options.set_selection(*param.selection);
 		diff_options.set_subtree(*param.subtree);
 		diff_options.set_info_details(param.info_details);
+		diff_options.set_display_treated(param.display_treated);
+		diff_options.set_display_skipped(param.display_skipped);
 		diff_options.set_ea_mask(*param.ea_mask);
 		diff_options.set_what_to_check(param.what_to_check);
 		diff_options.set_alter_atime(param.alter_atime);
 		diff_options.set_furtive_read_mode(param.furtive_read_mode);
-		diff_options.set_display_skipped(param.display_skipped);
 		diff_options.set_hourshift(param.hourshift);
 		diff_options.set_compare_symlink_date(param.no_compare_symlink_date);
 		diff_options.set_fsa_scope(param.scope);
@@ -572,8 +576,9 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		test_options.set_selection(*param.selection);
 		test_options.set_subtree(*param.subtree);
 		test_options.set_info_details(param.info_details);
-		test_options.set_empty(param.empty);
+		test_options.set_display_treated(param.display_treated);
 		test_options.set_display_skipped(param.display_skipped);
+		test_options.set_empty(param.empty);
                 st = arch->op_test(dialog, test_options, NULL);
 		if(!param.quiet)
 		    display_test_stat(dialog, st);

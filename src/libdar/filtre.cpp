@@ -58,6 +58,7 @@ namespace libdar
 			   inode * & ino,            //< inode to save to archive
 			   compressor *stock,        //< where to write to
 			   bool info_details,        //< verbose output to user
+			   bool display_treated,     //< add an information line before treating a file
 			   compression compr_used,   //< compression to use to write data
 			   bool alter_atime,         //< whether to set back atime of filesystem
 			   bool check_change,        //< whether to check file change during backup
@@ -69,16 +70,22 @@ namespace libdar
 			   const infinint & hole_size,   //< the threshold for hole detection, set to zero completely disable the sparse file detection mechanism
 			   semaphore * sem,
 			   infinint & new_wasted_bytes); //< new amount of wasted bytes to return to the caller.
+
     static bool save_ea(user_interaction & dialog,
-			const string & info_quoi, inode * & ino, compressor *stock,
-			const inode * ref, bool info_details, compression compr_used);
+			const string & info_quoi,
+			inode * & ino,
+			compressor *stock,
+			const inode * ref,
+			bool display_treated,
+			compression compr_used);
+
     static void restore_atime(const string & chemin, const inode * & ptr);
 
     static bool save_fsa(user_interaction & dialog,
 			 const string & info_quoi,
 			 inode * & ino,
 			 compressor *stock,
-			 bool info_details);
+			 bool display_treated);
 
 	/// merge two sets of EA
 
@@ -129,13 +136,14 @@ namespace libdar
 			const path & fs_racine,
 			bool fs_warn_overwrite,
 			bool info_details,
+			bool display_treated,
+			bool display_skipped,
 			statistics & st,
 			const mask & ea_mask,
 			bool flat,
 			inode::comparison_fields what_to_check,
 			bool warn_remove_no_match,
 			bool empty,
-			bool display_skipped,
 			bool empty_dir,
 			const crit_action & x_overwrite,
 			archive_options_extract::t_dirty dirty,
@@ -460,6 +468,8 @@ namespace libdar
                            const catalogue & ref,
                            const path & fs_racine,
                            bool info_details,
+			   bool display_treated,
+			   bool display_skipped,
                            statistics & st,
                            bool make_empty_dir,
 			   const mask & ea_mask,
@@ -473,7 +483,6 @@ namespace libdar
 			   inode::comparison_fields what_to_check,
 			   bool snapshot,
 			   bool cache_directory_tagging,
-			   bool display_skipped,
 			   bool security_check,
 			   const infinint & repeat_count,
 			   const infinint & repeat_byte,
@@ -567,7 +576,7 @@ namespace libdar
 				    if(e_mir != NULL)
 				    {
 					if(e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == inode::ea_full)
-					    if(info_details)
+					    if(display_treated)
 						dialog.warning(string(gettext("Recording hard link into the archive: "))+juillet.get_string());
 				    }
 				    else
@@ -747,6 +756,7 @@ namespace libdar
 						       e_ino,
 						       stockage,
 						       info_details,
+						       display_treated,
 						       stock_algo,
 						       alter_atime,
 						       true,   // check_change
@@ -772,7 +782,7 @@ namespace libdar
 					{
 					    if(e_ino->ea_get_saved_status() == inode::ea_full)
 						cat.pre_add_ea(e, stockage);
-					    if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, info_details, stock_algo))
+					    if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, display_treated, stock_algo))
 						st.incr_ea_treated();
 					    cat.pre_add_ea_crc(e, stockage);
 					}
@@ -782,7 +792,7 @@ namespace libdar
 					if(e_ino->fsa_get_saved_status() == inode::fsa_full)
 					{
 					    cat.pre_add_fsa(e, stockage);
-					    if(save_fsa(dialog, juillet.get_string(), e_ino, stockage, info_details))
+					    if(save_fsa(dialog, juillet.get_string(), e_ino, stockage, display_treated))
 						st.incr_fsa_treated();
 					    cat.pre_add_fsa_crc(e, stockage);
 					}
@@ -963,12 +973,14 @@ namespace libdar
                            const mask &subtree,
                            const catalogue & cat,
                            const path & fs_racine,
-                           bool info_details, statistics & st,
+			   bool info_details,
+			   bool display_treated,
+			   bool display_skipped,
+			   statistics & st,
 			   const mask & ea_mask,
 			   bool alter_atime,
 			   bool furtive_read_mode,
 			   inode::comparison_fields what_to_check,
-			   bool display_skipped,
 			   const infinint & hourshift,
 			   bool compare_symlink_date,
 			   const fsa_scope & scope)
@@ -1034,7 +1046,7 @@ namespace libdar
 					try
 					{
 					    e_ino->compare(*exists, ea_mask, what_to_check, hourshift, compare_symlink_date, scope);
-					    if(info_details)
+					    if(display_treated)
 						dialog.warning(string(gettext("OK   "))+juillet.get_string());
 					    if(e_dir == NULL || !cat.read_second_time_dir())
 						st.incr_treated();
@@ -1144,9 +1156,10 @@ namespace libdar
                      const mask &subtree,
                      const catalogue & cat,
                      bool info_details,
+		     bool display_treated,
+		     bool display_skipped,
 		     bool empty,
-                     statistics & st,
-		     bool display_skipped)
+                     statistics & st)
     {
         const entree *e;
         defile juillet = FAKE_ROOT;
@@ -1275,7 +1288,7 @@ namespace libdar
 			    e_mir->set_inode_wrote(true);
 
                             // still no exception raised, this all is fine
-                        if(info_details)
+                        if(display_treated)
                             dialog.warning(string(gettext("OK  ")) + juillet.get_string() + "  " + perimeter);
                     }
                     else // excluded by filter
@@ -1444,12 +1457,13 @@ namespace libdar
 		      const catalogue * ref1,
 		      const catalogue * ref2,
 		      bool info_details,
+		      bool display_treated,
+		      bool display_skipped,
 		      statistics & st,
 		      bool make_empty_dir,
 		      const mask & ea_mask,
 		      const mask & compr_mask,
 		      const infinint & min_compr_size,
-		      bool display_skipped,
 		      bool keep_compressed,
 		      const crit_action & over_action,
 		      bool warn_overwrite,
@@ -1600,7 +1614,7 @@ namespace libdar
 			    ptr = gettext("next"); // not yet used, but room is made for future evolutions
 			    break;
 			}
-			dialog.printf(gettext("Merging/filtering files from the %s archive"), ptr);
+			dialog.printf(gettext("Merging/filtering files from the %s archive..."), ptr);
 		    }
 
 		    while(ref_tab[index]->read(e)) // examining the content of the current archive of reference, each entry one by one
@@ -1801,7 +1815,7 @@ namespace libdar
 						case EA_overwrite_mark_already_saved:
 						case EA_merge_preserve:
 						case EA_merge_overwrite:
-						    if(info_details)
+						    if(display_treated)
 							dialog.warning(tools_printf(gettext("EA and FSA of file %S from first archive have been updated with those of same named file of the auxiliary archive"), &full_name));
 						    do_EFSA_transfert(dialog, act_ea, const_cast<inode *>(al_ino), dolly_ino);
 						    break;
@@ -1811,13 +1825,13 @@ namespace libdar
 						    if(al_ino != NULL && al_ino->ea_get_saved_status() == inode::ea_full)
 						    {
 							const_cast<inode *>(al_ino)->ea_set_saved_status(inode::ea_partial);
-							if(info_details)
+							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been dropped and marked as already saved"), &full_name));
 						    }
 						    if(al_ino != NULL && al_ino->fsa_get_saved_status() == inode::fsa_full)
 						    {
 							const_cast<inode *>(al_ino)->fsa_set_saved_status(inode::fsa_partial);
-							if(info_details)
+							if(display_treated)
 							    dialog.warning(tools_printf(gettext("FSA of file %S from first archive have been dropped and marked as already saved"), &full_name));
 						    }
 						    break;
@@ -1827,7 +1841,7 @@ namespace libdar
 						    {
 							if(al_ino->ea_get_saved_status() == inode::ea_full)
 							    st.decr_ea_treated();
-							if(info_details)
+							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
 							const_cast<inode *>(al_ino)->ea_set_saved_status(inode::ea_none);
 						    }
@@ -1835,7 +1849,7 @@ namespace libdar
 						    {
 							if(al_ino->fsa_get_saved_status() == inode::fsa_full)
 							    st.decr_fsa_treated();
-							if(info_details)
+							if(display_treated)
 							    dialog.warning(tools_printf(gettext("FSA of file %S from first archive have been removed"), &full_name));
 							const_cast<inode *>(al_ino)->fsa_set_saved_status(inode::fsa_none);
 						    }
@@ -1896,7 +1910,7 @@ namespace libdar
 
 						    // drop data if necessary
 
-						if(info_details)
+						if(display_treated)
 						{
 						    switch(act_data)
 						    {
@@ -1937,34 +1951,34 @@ namespace libdar
 							do_EFSA_transfert(dialog, EA_overwrite, dolly_ino, al_ino);
 							break;
 						    case EA_overwrite:
-							if(info_details)
+							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S has been overwritten"), &full_name));
 							break; // nothing to do
 						    case EA_overwrite_mark_already_saved:
-							if(info_details)
+							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S has been overwritten and marked as already saved"), &full_name));
 							if(dolly_ino != NULL && dolly_ino->ea_get_saved_status() == inode::ea_full)
 							    dolly_ino->ea_set_saved_status(inode::ea_partial);
 							break;
 						    case EA_merge_preserve:
-							if(info_details)
+							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been updated with those of the same named file of the auxiliary archive"), &full_name));
 							do_EFSA_transfert(dialog, EA_merge_overwrite, dolly_ino, al_ino);
 							break;
 						    case EA_merge_overwrite:
-							if(info_details)
+							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been updated with those of the same named file of the auxiliary archive"), &full_name));
 							do_EFSA_transfert(dialog, EA_merge_preserve, dolly_ino, al_ino);
 							break;
 						    case EA_preserve_mark_already_saved:
-							if(info_details)
+							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S has been overwritten and marked as already saved"), &full_name));
 							do_EFSA_transfert(dialog, EA_overwrite_mark_already_saved, dolly_ino, al_ino);
 							break;
 						    case EA_clear:
 							if(al_ino->ea_get_saved_status() != inode::ea_none)
 							{
-							    if(info_details)
+							    if(display_treated)
 								dialog.warning(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
 							    dolly_ino->ea_set_saved_status(inode::ea_none);
 							}
@@ -2416,6 +2430,7 @@ namespace libdar
 				   e_ino,
 				   stockage,
 				   info_details,
+				   display_treated,
 				   stock_algo,
 				   true,       // alter_atime
 				   false,      // check_change
@@ -2442,7 +2457,7 @@ namespace libdar
 		    if(e_ino->ea_get_saved_status() == inode::ea_full)
 		    {
 			cat.pre_add_ea(e, stockage);
-			if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, info_details, stock_algo))
+			if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, display_treated, stock_algo))
 			{
 			    if(e_ino->fsa_get_saved_status() != inode::fsa_full)
 				e_ino->change_ea_location(stockage);
@@ -2455,7 +2470,7 @@ namespace libdar
 		    if(e_ino->fsa_get_saved_status() == inode::fsa_full)
 		    {
 			cat.pre_add_fsa(e, stockage);
-			if(save_fsa(dialog, juillet.get_string(), e_ino, stockage, info_details))
+			if(save_fsa(dialog, juillet.get_string(), e_ino, stockage, display_treated))
 			    e_ino->change_ea_location(stockage);
 			    // now we can change ea/fsa_location to "stockage"
 			cat.pre_add_fsa_crc(e, stockage);
@@ -2465,7 +2480,7 @@ namespace libdar
 		{
 		    cat.pre_add(e, stockage);
 		    if(e_mir != NULL && (e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == inode::ea_full))
-			if(info_details)
+			if(display_treated)
 			    dialog.warning(string(gettext("Adding Hard link to archive: "))+juillet.get_string());
 		}
 
@@ -2561,6 +2576,7 @@ namespace libdar
 			   inode * & ino,
 			   compressor *stock,
 			   bool info_details,
+			   bool display_treated,
 			   compression compr_used,
 			   bool alter_atime,
 			   bool check_change,
@@ -2589,7 +2605,7 @@ namespace libdar
 	}
 	if(compute_crc && (keep_mode != file::normal && keep_mode != file::plain))
 	    throw SRC_BUG; // cannot compute crc if data is compressed or hole datastructure not interpreted
-        if(info_details)
+        if(display_treated)
             dialog.warning(string(gettext("Adding file to archive: ")) + info_quoi);
 
         file *fic = dynamic_cast<file *>(ino);
@@ -2866,8 +2882,12 @@ namespace libdar
     }
 
     static bool save_ea(user_interaction & dialog,
-			const string & info_quoi, inode * & ino, compressor *stock,
-			const inode * ref, bool info_details, compression compr_used)
+			const string & info_quoi,
+			inode * & ino,
+			compressor *stock,
+			const inode * ref,
+			bool display_treated,
+			compression compr_used)
     {
         bool ret = false;
         try
@@ -2881,7 +2901,7 @@ namespace libdar
 
 		    try
 		    {
-			if(info_details)
+			if(display_treated)
 			    dialog.warning(string(gettext("Saving Extended Attributes for ")) + info_quoi);
 			ino->ea_set_offset(stock->get_position());
 			stock->change_algo(compr_used); // always compress EA (no size or filename consideration)
@@ -2955,7 +2975,7 @@ namespace libdar
 			 const string & info_quoi,
 			 inode * & ino,
 			 compressor *stock,
-			 bool info_details)
+			 bool display_treated)
     {
         bool ret = false;
         try
@@ -2969,7 +2989,7 @@ namespace libdar
 
 		    try
 		    {
-			if(info_details)
+			if(display_treated)
 			    dialog.warning(string(gettext("Saving Filesystem Specific Attributes for ")) + info_quoi);
 			ino->fsa_set_offset(stock->get_position());
 			stock->change_algo(none); // never compress EA (no size or filename consideration)

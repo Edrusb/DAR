@@ -254,6 +254,8 @@ bool get_args(user_interaction & dialog,
     p.allow_over = true;
     p.warn_over = true;
     p.info_details = false;
+    p.display_treated = false;
+    p.display_skipped = false;
     p.algo = none;
     p.compression_level = 9;
     p.pause = 0;
@@ -279,7 +281,6 @@ bool get_args(user_interaction & dialog,
     p.cache_directory_tagging = false;
     p.crypto_size = DEFAULT_CRYPTO_SIZE;
     p.crypto_size_ref = DEFAULT_CRYPTO_SIZE;
-    p.display_skipped = false;
     p.list_mode = archive_options_listing::normal;
     p.aux_pass.clear();
     p.aux_execute = "";
@@ -823,10 +824,23 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'v':
 		if(optarg == NULL)
+		{
 		    p.info_details = true;
+		    p.display_treated = true;
+		}
 		else
-		    if (strcasecmp("skipped", optarg) == 0 || strcasecmp("s", optarg) == 0)
+		    if(strcasecmp("skipped", optarg) == 0 || strcasecmp("s", optarg) == 0)
 			p.display_skipped = true;
+		    else if(strcasecmp("treated", optarg) == 0 || strcasecmp("t", optarg) == 0)
+			p.display_treated = true;
+		    else if(strcasecmp("messages", optarg) == 0 || strcasecmp("m", optarg) == 0)
+			p.info_details = true;
+		    else if(strcasecmp("all", optarg) == 0 || strcasecmp("a", optarg) == 0)
+		    {
+			p.info_details = true;
+			p.display_skipped = true;
+			p.display_treated = true;
+		    }
 		    else
 			throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;

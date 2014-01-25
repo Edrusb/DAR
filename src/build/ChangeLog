@@ -8,6 +8,19 @@ from 2.4.x to 2.5.0
   independent, class fichier stays tied to entrpot_local (backward
   compatible with former implementation)
 - class hash_fichier becomes entrepot independent
+- extended libdar API with an additional and more simple way to read an
+  archive: archive::get_children_in_table() method
+- added support for extX (see lsattr) and HFS+ (birthtime date) FSA
+- dar is now able to skip backward when a file is found to be "dirty" at
+  backup time (changed at the time it was read). This avoid wasting space in
+  archive but is only possible if the backward position is located in the
+  current slice and if backward skipping is supported by the destination of
+  the archive (not supported when archive is output to stdout for example)
+- if system provides it, dar uses linux capabilities to check for the ability
+  to set file ownership when not run as root.
+- removing dar-help tool used to build dar -h message, tool become useless
+  for a long time now.
+- added more specific -vm and -vt verbose options
 
 from 2.4.11 to 2.4.12
 - for correctness fixed delete vs delete[] on vector of char (not incidence
