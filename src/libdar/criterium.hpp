@@ -169,7 +169,7 @@ namespace libdar
 	    /// \param[in] go_false is the action to use for evaluation if the criterium states false
 	testing(const criterium & input, const crit_action & go_true, const crit_action & go_false);
 	testing(const testing & ref) : crit_action(ref) { copy_from(ref); if(!check()) throw Ememory("testing::testing(const testing &)"); };
-	const testing & operator = (const testing & ref) { free(); copy_from(ref); if(!check()) throw Ememory("testing::testing(const testing &)"); };
+	const testing & operator = (const testing & ref) { free(); copy_from(ref); if(!check()) throw Ememory("testing::testing(const testing &)"); return *this; };
 	~testing() { free(); };
 
 
