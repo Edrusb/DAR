@@ -85,7 +85,7 @@ namespace libdar
 	unsigned char first_mark = (dir == elastic_forward ? get_low_mark(reading_ver) : get_high_mark(reading_ver));
 	unsigned char last_mark  = (dir == elastic_forward ? get_high_mark(reading_ver) : get_low_mark(reading_ver));
 
-	while(pos >= 0 && pos < size && buffer[pos] != SINGLE_MARK && buffer[pos] != first_mark)
+	while(pos < size && buffer[pos] != SINGLE_MARK && buffer[pos] != first_mark)
 	    pos += step;
 
 	if(pos >= size)
