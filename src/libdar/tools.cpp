@@ -156,7 +156,6 @@ namespace libdar
     static void abort_on_deadson(S_I sig);
     static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension);
     static string retreive_basename(const string & base, const string & extension);
-    static string tools_make_word(generic_file &fic, off_t start, off_t end);
 
     void tools_init()
     {
@@ -1701,10 +1700,10 @@ namespace libdar
     {
 	vector <string> mots;
 	vector <char> quotes;
+	string current = "";
 	char a;
-	off_t start = 0;
-	off_t end = 0;
 	bool loop = true;
+	bool escaped = false;
 
 
         while(loop)
@@ -1715,6 +1714,21 @@ namespace libdar
                 a = ' '; // to close the last word
             }
 
+	    if(escaped)
+	    {
+		current += a; // added without consideration of quoting of any sort
+		escaped = false;
+		continue; // continuing at beginning of the while loop
+	    }
+	    else
+	    {
+		if(a == '\\')
+		{
+		    escaped = true;
+		    continue; // continuing at beginning of the while loop
+		}
+	    }
+
             if(quotes.empty()) // outside a word
                 switch(a)
                 {
@@ -1722,18 +1736,15 @@ namespace libdar
                 case '\t':
                 case '\n':
                 case '\r':
-                    start++;
                     break;
                 case '"':
                 case '\'':
                 case '`':
                     quotes.push_back(a);
-                    end = start;
-                    start++;
                     break;
                 default:
                     quotes.push_back(' '); // the quote space means no quote
-                    end = start;
+		    current += a; // a new argument is starting
                     break;
                 }
             else // inside a word
@@ -1742,13 +1753,14 @@ namespace libdar
                 case '\t':
                     if(quotes.back() != ' ')
                     {
-                        end++;
+			    // this is the end of the wor(l)d ;-)
+			    // ...once again... 1000, 1999, 2012, and the next ones to come...
                         break;
                     }
                         // no break !
                 case '\n':
                 case '\r':
-                    a = ' ';
+                    a = ' '; // replace carriage return inside quoted string by a space
                         // no break !
                 case ' ':
                 case '"':
@@ -1759,25 +1771,21 @@ namespace libdar
                         quotes.pop_back();
                         if(quotes.empty()) // reached end of word
                         {
-                            mots.push_back(tools_make_word(f, start, end));
-                            if(a != ' ')
-                                end++;  // skip the trailing quote
-                            if(! f.skip(end+1))
-                                loop = false; // reached end of file
-                            start = end+1;
+                            mots.push_back(current);
+			    current = "";
                         }
                         else
-                            end++;
+                            current += a;
                     }
                     else // "a" is a nested starting quote
                     {
                         if(a != ' ') // quote ' ' does not have ending quote
                             quotes.push_back(a);
-                        end++;
+                        current += a;
                     }
                     break;
                 default:
-                    end++;
+                    current += a;
                 }
         }
         if(!quotes.empty())
@@ -1949,45 +1957,6 @@ namespace libdar
 /*************************************************************/
 
 
-    static string tools_make_word(generic_file &fic, off_t start, off_t end)
-    {
-	off_t longueur = end - start + 1;
-	char *tmp = new (nothrow) char[longueur+1];
-	string ret;
-
-	if(tmp == NULL)
-	    throw Ememory("make_word");
-	try
-	{
-	    S_I lu = 0, delta;
-
-	    if(! fic.skip(start))
-		throw Erange("tools_make_word", dar_gettext("End of file reached while skipping to the begin of a word"));
-
-	    do
-	    {
-		delta = fic.read(tmp+lu, longueur-lu);
-		if(delta > 0)
-		    lu += delta;
-		else
-		    if(delta < 0)
-			throw SRC_BUG;
-		    else // delta == 0
-			throw Erange("make_word", dar_gettext("Reached end of file while reading a word"));
-	    }
-	    while(lu < longueur);
-	    tmp[longueur] = '\0';
-	    ret = tmp;
-	}
-	catch(...)
-	{
-	    delete [] tmp;
-	    throw;
-	}
-	delete [] tmp;
-
-	return ret;
-    }
 
     string tools_build_regex_for_exclude_mask(const string & prefix,
 					      const string & relative_part)

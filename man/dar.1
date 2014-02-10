@@ -256,9 +256,11 @@ to be able to randomly access data in an archive, it is not encrypted globally b
 same as --crypto-block but for the archive of reference (same default value). --crypto-block-ref is a synonym.
 .TP 20
 -B, --batch <filename>
-You can put in the file any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occurs in case of loop (a file includes itself) and DAR aborts immediately. Comments are allowed, and must start by a hash `#' character on each line. Note that for a line to be considered as comment the hash character must be the first character of the line (space or tab can still precede the hash). See
+You can put in the file any option or argument as used on command line, that will be parsed as if they were in place of the "-B <filename>" option. This way you can overcome the command line size limitation. Commands in the file may be disposed on several lines, and -B option can also be used inside files, leading a file to include other files. But an error occurs in case of loop (a file includes itself) and DAR aborts immediately. Comments are allowed, and must start by a hash `#' character on each line. Note that for a line to be considered as a comment the hash character must be the first character of the line (space or tab can still precede the hash). See
 .B Conditional Syntax
 bellow for a more rich syntax in configuration files. See also the environment variable DAR_DCF_PATH in the ENVIRONMENT section at the end of this document.
+.P
+Note that you can use quotes simple (\') double (") and back-quotes (`) inside such file, but they need to be balanced (have an ending one). To use such character without the meaning of a quote, for example as an apostrophe, you need to escape it using a back-slack ("That\\'s an example"). Of course to add a single back-slash as a normal character in the file you will have to double it ("c:\\\\windows" for example)
 .TP 20
 -N, --noconf
 Do not try to read neither ~/.darrc nor /etc/darrc configuration files. See
