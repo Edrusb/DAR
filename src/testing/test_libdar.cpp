@@ -101,7 +101,7 @@ void f1()
 
 void warning(const string &x, void *context)
 {
-    printf("[%d]%s\n", context, x.c_str());
+    cout << "[" << context << "]" << x.c_str() << endl;
 }
 
 bool question(const string & x, void *context)

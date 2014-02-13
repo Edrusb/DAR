@@ -44,9 +44,9 @@ extern "C"
 
 #include <string>
 #include <vector>
-#include <new>
 
 #include "path.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -58,7 +58,7 @@ namespace libdar
 
 	/// this is a pure virtual class that is used in API call
 	/// any of the following mask classes inherit from this class
-    class mask
+    class mask : public on_pool
     {
     public :
         virtual ~mask() {};
@@ -102,7 +102,7 @@ namespace libdar
         bool is_covered(const path & chemin) const { return val; };
 
 	    /// inherited from the mask class
-        mask *clone() const { return new (std::nothrow) bool_mask(val); };
+        mask *clone() const { return new (get_pool()) bool_mask(val); };
 
     private :
         bool val;
@@ -129,7 +129,7 @@ namespace libdar
         bool is_covered(const std::string &expression) const;
 
 	    /// inherited from the mask class
-        mask *clone() const { return new (std::nothrow) simple_mask(*this); };
+        mask *clone() const { return new (get_pool()) simple_mask(*this); };
 
     private :
         std::string the_mask;
@@ -163,7 +163,7 @@ namespace libdar
         bool is_covered(const std::string & expression) const;
 
 	    /// inherited from the mask class
-        mask *clone() const { return new (std::nothrow) regular_mask(*this); };
+        mask *clone() const { return new (get_pool()) regular_mask(*this); };
 
     private :
         regex_t preg;
@@ -200,7 +200,7 @@ namespace libdar
         bool is_covered(const path & chemin) const { return !ref->is_covered(chemin); };
 
 	    /// inherited from the mask class
-        mask *clone() const { return new (std::nothrow) not_mask(*this); };
+        mask *clone() const { return new (get_pool()) not_mask(*this); };
 
     private :
         mask *ref;
@@ -243,7 +243,7 @@ namespace libdar
         bool is_covered(const path & chemin) const { return t_is_covered(chemin); };
 
 	    /// inherited from the mask class
-        mask *clone() const { return new (std::nothrow) et_mask(*this); };
+        mask *clone() const { return new (get_pool()) et_mask(*this); };
 
 	    /// the number of mask on which is done the *AND* operator
 
@@ -295,7 +295,7 @@ namespace libdar
         bool is_covered(const path & chemin) const { return t_is_covered(chemin); }
 ;
 	    /// inherited from the mask class
-        mask *clone() const { return new (std::nothrow) ou_mask(*this); };
+        mask *clone() const { return new (get_pool()) ou_mask(*this); };
 
     private:
 	template<class T> bool t_is_covered(const T & expression) const
@@ -331,7 +331,7 @@ namespace libdar
         bool is_covered(const path & chemin) const;
 
 	    /// inherited from the mask class
-        mask *clone() const { return new (std::nothrow) simple_path_mask(*this); };
+        mask *clone() const { return new (get_pool()) simple_path_mask(*this); };
 
     private :
         path chemin;
@@ -354,7 +354,7 @@ namespace libdar
         bool is_covered(const std::string &chemin) const;
 
 	    /// inherited from the mask class
-        mask *clone() const { return new (std::nothrow) same_path_mask(*this); };
+        mask *clone() const { return new (get_pool()) same_path_mask(*this); };
 
     private :
         std::string chemin;
@@ -378,7 +378,7 @@ namespace libdar
 	bool is_covered(const path &chemin) const { return chemin.is_subdir_of(chemin, case_s); };
 
 	    /// inherited from the mask class
-	mask *clone() const { return new (std::nothrow) exclude_dir_mask(*this); };
+	mask *clone() const { return new (get_pool()) exclude_dir_mask(*this); };
 
     private:
 	std::string chemin;

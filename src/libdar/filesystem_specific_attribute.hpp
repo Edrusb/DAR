@@ -28,12 +28,11 @@
 
 #include <string>
 #include <vector>
-#include <new>
 
 #include "integers.hpp"
 #include "crc.hpp"
 #include "fsa_family.hpp"
-#include "special_alloc.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -49,7 +48,7 @@ namespace libdar
 	/// the liste of FSA and given the list of FSA will try to set them back to the
 	/// filesystem
 
-    class filesystem_specific_attribute
+    class filesystem_specific_attribute : public on_pool
     {
     public:
 
@@ -98,10 +97,6 @@ namespace libdar
 	    /// provides a way to copy objects without having to know the more specific class of the object
 	virtual filesystem_specific_attribute *clone() const = 0;
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(filesystem_specific_attribute);
-#endif
-
     protected:
 	void set_family(const fsa_family & val) { fam = val; };
 	void set_nature(const fsa_nature & val) { nat = val; };
@@ -116,7 +111,7 @@ namespace libdar
 
 ///////////////////////////////////////////////////////////////////////////
 
-    class filesystem_specific_attribute_list
+    class filesystem_specific_attribute_list : public on_pool
     {
     public:
 	filesystem_specific_attribute_list() {};
@@ -181,10 +176,6 @@ namespace libdar
 	    /// \return true if such an FSA has been found and set ptr accordingly else return false
 	bool find(fsa_family fam, fsa_nature nat, const filesystem_specific_attribute *&ptr) const;
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(filesystem_specific_attribute_list);
-#endif
-
     private:
 	std::vector<filesystem_specific_attribute *> fsa; //< sorted list of FSA
 	fsa_scope familes;
@@ -211,11 +202,11 @@ namespace libdar
 
 ///////////////////////////////////////////////////////////////////////////
 
-    template <class T> T *cloner(const T *x)
+    template <class T> T *cloner(const T *x, memory_pool *p)
     {
 	if(x == NULL)
 	    throw SRC_BUG;
-	T *ret = new (std::nothrow) T(*x);
+	T *ret = new (p) T(*x);
 	if(ret == NULL)
 	    throw Ememory("cloner template");
 
@@ -236,12 +227,7 @@ namespace libdar
 	virtual std::string show_val() const { return val ? gettext("true") : gettext("false"); };
 	virtual void write(generic_file & f) const { f.write(val ? "T" : "F", 1); };
 	virtual infinint storage_size() const { return 1; };
-	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
-
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(fsa_bool);
-#endif
-
+	virtual filesystem_specific_attribute *clone() const { return cloner(this, get_pool()); };
 
     protected:
 	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const;
@@ -267,12 +253,7 @@ namespace libdar
 	virtual std::string show_val() const;
 	virtual void write(generic_file & f) const { val.dump(f); };
 	virtual infinint storage_size() const { return val.get_storage_size(); };
-	virtual filesystem_specific_attribute *clone() const { return cloner(this); };
-
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(fsa_infinint);
-#endif
-
+	virtual filesystem_specific_attribute *clone() const { return cloner(this, get_pool()); };
 
     protected:
 	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const;

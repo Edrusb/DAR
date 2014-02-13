@@ -36,8 +36,6 @@ extern "C"
 #endif
 } // end extern "C"
 
-#include <new>
-
 #include "real_infinint.hpp"
 #include "erreurs.hpp"
 #include "generic_file.hpp"
@@ -94,7 +92,7 @@ namespace libdar
 
                 try
                 {
-                    field = new (std::nothrow) storage(x, skip);
+                    field = new (get_pool()) storage(x, skip);
                 }
                 catch(...)
                 {
@@ -642,7 +640,7 @@ namespace libdar
     {
         if(ref.is_valid())
         {
-            field = new (std::nothrow) storage(*(ref.field));
+            field = new (get_pool()) storage(*(ref.field));
             if(field == NULL)
                 throw Ememory("infinint::copy_from");
         }

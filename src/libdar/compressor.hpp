@@ -105,7 +105,7 @@ namespace libdar
 	void inherited_sync_write() { flush_write(); };
 	void inherited_terminate() { local_terminate(); };
     private :
-        struct xfer
+        struct xfer : public on_pool
         {
             wrapperlib wrap;
             char *buffer;

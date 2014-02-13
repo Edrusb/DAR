@@ -106,9 +106,6 @@ namespace libdar
         bool skip_relative(S_I x) { if(x != 0) throw SRC_BUG; else return true; };
 	infinint get_position() { if(ref == NULL) throw SRC_BUG; return ref->get_position(); };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(hash_fichier);
-#endif
 	    /// for debugging purposes only
 	void set_only_hash() { only_hash = true; };
 

@@ -36,7 +36,7 @@
 #include "tools.hpp"
 #include "compressor.hpp"
 #include "integers.hpp"
-#include "special_alloc.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -49,7 +49,7 @@ namespace libdar
 	/// This has the advantage to let the possiblity to add new fields in the future
 	/// without breaking anything in API user programs.
 	/// \ingroup API
-    class list_entry
+    class list_entry : public on_pool
     {
     public:
 	list_entry();
@@ -111,9 +111,6 @@ namespace libdar
 	void set_major(int val) { major = val; };
 	void set_minor(int val) { minor = val; };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(list_entry);
-#endif
     private:
 	std::string my_name;
 	bool hard_link;

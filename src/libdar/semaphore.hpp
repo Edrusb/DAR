@@ -31,6 +31,7 @@
 #include "mem_ui.hpp"
 #include "mask.hpp"
 #include "catalogue.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -62,7 +63,7 @@ namespace libdar
 	/// be saved once the backup is completed, may it be normally or due to an exception being thrown.
 
 
-    class semaphore : public mem_ui
+    class semaphore : public mem_ui, public on_pool
     {
     public:
 
@@ -104,9 +105,6 @@ namespace libdar
 	    /// to tell that the backup is completed for the last "raised" entry.
 	void lower();
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(semaphore);
-#endif
     private:
 	infinint count;       //< is the number of subdirectories currently saved in the last directory that matched the mask
 	std::string chem;     //< path of the file that has to be call in the "end" context when count will drop to zero

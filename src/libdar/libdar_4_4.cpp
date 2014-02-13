@@ -21,8 +21,6 @@
 
 #include "../my_config.h"
 
-#include <new>
-
 #include "libdar_4_4.hpp"
 #include "libdar.hpp"
 
@@ -816,19 +814,19 @@ namespace libdar_4_4
 	    if(allow_over)
 	    {
 		if(ea_erase)
-		    overwrite = new (std::nothrow) libdar::crit_constant_action(libdar::data_overwrite, libdar::EA_overwrite);
+		    overwrite = new libdar::crit_constant_action(libdar::data_overwrite, libdar::EA_overwrite);
 		else
-		    overwrite = new (std::nothrow) libdar::crit_constant_action(libdar::data_overwrite, libdar::EA_merge_overwrite);
+		    overwrite = new libdar::crit_constant_action(libdar::data_overwrite, libdar::EA_merge_overwrite);
 		if(overwrite == NULL)
 		    throw Ememory("tools_build_compatible_overwriting_policy");
 
-		tmp1 = new (std::nothrow) libdar::crit_constant_action(libdar::data_preserve, libdar::EA_preserve);
+		tmp1 = new libdar::crit_constant_action(libdar::data_preserve, libdar::EA_preserve);
 		if(tmp1 == NULL)
 		    throw Ememory("tools_build_compatible_overwriting_policy");
 
 		if(more_recent)
 		{
-		    tmp2 = new (std::nothrow) libdar::testing(libdar::crit_invert(libdar::crit_in_place_data_more_recent(hourshift)), *overwrite, *tmp1);
+		    tmp2 = new libdar::testing(libdar::crit_invert(libdar::crit_in_place_data_more_recent(hourshift)), *overwrite, *tmp1);
 		    if(tmp2 == NULL)
 			throw Ememory("tools_build_compatible_overwriting_policy");
 
@@ -839,7 +837,7 @@ namespace libdar_4_4
 
 		if(!detruire)
 		{
-		    tmp2 = new (std::nothrow) libdar::testing(libdar::crit_invert(libdar::crit_in_place_is_inode()), *overwrite, *tmp1);
+		    tmp2 = new libdar::testing(libdar::crit_invert(libdar::crit_in_place_is_inode()), *overwrite, *tmp1);
 		    if(tmp2 == NULL)
 			throw Ememory("tools_build_compatible_overwriting_policy");
 		    delete overwrite;
@@ -852,7 +850,7 @@ namespace libdar_4_4
 	    }
 	    else
 	    {
-		overwrite = new (std::nothrow) libdar::crit_constant_action(libdar::data_preserve, libdar::EA_preserve);
+		overwrite = new libdar::crit_constant_action(libdar::data_preserve, libdar::EA_preserve);
 		if(overwrite == NULL)
 		    throw Ememory("tools_build_compatible_overwriting_policy");
 	    }

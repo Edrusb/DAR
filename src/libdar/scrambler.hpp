@@ -45,7 +45,7 @@ namespace libdar
     public:
         scrambler(const secu_string & pass, generic_file & hidden_side);
 	scrambler(const scrambler & ref) : generic_file(ref) { throw SRC_BUG; };
-        ~scrambler() { if(buffer != NULL) delete [] buffer; };
+        ~scrambler() { if(buffer != NULL) meta_delete(buffer); };
 
 	const scrambler & operator = (const scrambler & ref) { throw SRC_BUG; };
 
@@ -54,9 +54,6 @@ namespace libdar
         bool skip_relative(S_I x) { if(ref == NULL) throw SRC_BUG; return ref->skip_relative(x); };
         infinint get_position() { if(ref == NULL) throw SRC_BUG; return ref->get_position(); };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(scrambler);
-#endif
     protected:
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size);

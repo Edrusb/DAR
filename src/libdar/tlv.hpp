@@ -28,6 +28,7 @@
 
 #include "memory_file.hpp"
 #include "storage.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -38,7 +39,7 @@ namespace libdar
 
 	/// this structure holds arbitrary type of data
 	/// this is used in particular for the slice header
-    class tlv
+    class tlv : public on_pool
     {
     public:
 
@@ -63,9 +64,6 @@ namespace libdar
 	void set_contents(const memory_file & contents);  //< the generic_file object is provided to dump data to the tlv object
         void get_contents(memory_file & contents) const;  //< the generic_file object is provided to read data from the tlv object
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(tlv);
-#endif
     private:
 	U_16 type;
 	storage *value;

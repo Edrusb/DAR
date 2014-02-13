@@ -32,9 +32,9 @@
 #include <string>
 #include "infinint.hpp"
 #include "generic_file.hpp"
-#include "special_alloc.hpp"
 #include "mask.hpp"
 #include "header_version.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -44,7 +44,7 @@ namespace libdar
 
 	/// the class ea_attributs manages the set of EA that can be associated to an inode
 
-    class ea_attributs
+    class ea_attributs : public on_pool
     {
     public:
         ea_attributs() { alire = attr.begin(); };
@@ -69,10 +69,6 @@ namespace libdar
 	    /// \note this operator is not reflexive (or symetrical if you prefer) unlike it is in arithmetic. Here instead
 	    /// "a + b" is possibly not equal to "b + a"
 	ea_attributs operator + (const ea_attributs & arg) const;
-
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(ea_attributs);
-#endif
 
     private:
 	std::map<std::string, std::string> attr;

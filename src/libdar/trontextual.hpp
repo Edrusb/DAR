@@ -45,9 +45,6 @@ namespace libdar
 	bool is_an_old_start_end_archive() const { if(ref == NULL) throw SRC_BUG; return ref->is_an_old_start_end_archive(); };
 	const label & get_data_name() const { if(ref == NULL) throw SRC_BUG; return ref->get_data_name(); };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(trontextual);
-#endif
     private:
 	contextual *ref;   //< this is just a pointer to data owned by the inherited class tronc part of this object
 

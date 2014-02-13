@@ -56,9 +56,6 @@ namespace libdar
         bool skip_relative(signed int x) { return false; };
         infinint get_position() { return 0; };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(null_file);
-#endif
     protected :
         U_I inherited_read(char *a, U_I size)
 	{

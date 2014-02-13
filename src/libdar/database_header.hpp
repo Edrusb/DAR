@@ -41,19 +41,27 @@ namespace libdar
 	/// create the header for a dar_manager database
 
 	/// \param[in] dialog is used for user interaction
+	/// \param[in] pool memory pool to use or NULL for default memory allocation
 	/// \param[in] filename is the file's name to create/overwrite
 	/// \param[in] overwrite set to true to allow file overwriting (else generates an error if file exists)
 	/// \return the database header has been read and checked the database can now be read from the returned generic_file pointed by the returned value
 	/// then it must be destroyed with the delete operator.
-    extern generic_file *database_header_create(user_interaction & dialog, const std::string & filename, bool overwrite);
+    extern generic_file *database_header_create(user_interaction & dialog,
+						memory_pool *pool,
+						const std::string & filename,
+						bool overwrite);
 
 	/// read the header of a dar_manager database
 
 	/// \param[in] dialog for user interaction
+	/// \param[in] pool memory pool to use or NULL for default memory allocation
 	/// \param[in] filename is the filename to read from
 	/// \param[out] db_version version of the database
 	/// \return the generic_file where the database header has been put
-    extern generic_file *database_header_open(user_interaction & dialog, const std::string & filename, unsigned char & db_version);
+    extern generic_file *database_header_open(user_interaction & dialog,
+					      memory_pool *pool,
+					      const std::string & filename,
+					      unsigned char & db_version);
 
     extern const unsigned char database_header_get_supported_version();
 

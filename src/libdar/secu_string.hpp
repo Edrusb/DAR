@@ -36,7 +36,7 @@
 
 #include <string>
 #include "integers.hpp"
-#include "special_alloc.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -54,7 +54,7 @@ namespace libdar
 	/// not yet secured, where from the read() method that fetches data directly from a
 	/// filedescriptor (read() low-level system call) which might be a tty for example
 
-    class secu_string
+    class secu_string : public on_pool
     {
     public:
 	    /// to know if secure memory is available
@@ -139,9 +139,6 @@ namespace libdar
 	    /// up to the first new-line character.
 	U_I size() const { return *string_size; }; // returns the size of the string
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(secu_string);
-#endif
     private:
 	U_I *allocated_size;
 	char *mem;

@@ -232,8 +232,10 @@ namespace libdar
                         if(req.size > buf_size)
                         {
                             if(buffer != NULL)
-                                delete [] buffer;
-                            buffer = new (nothrow) char[req.size];
+			    {
+				meta_delete(buffer);
+				meta_new(buffer, req.size);
+			    }
                             if(buffer == NULL)
                                 throw Ememory("slave_zapette::action");
                             else
@@ -294,11 +296,12 @@ namespace libdar
         catch(...)
         {
             if(buffer != NULL)
-                delete [] buffer;
+		meta_delete(buffer);
             throw;
         }
+
         if(buffer != NULL)
-            delete [] buffer;
+	    meta_delete(buffer);
     }
 
     zapette::zapette(user_interaction & dialog,

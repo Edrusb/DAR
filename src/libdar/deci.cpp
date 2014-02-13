@@ -53,7 +53,7 @@ namespace libdar
         return '0' + c;
     }
 
-    template <class T> void decicoupe(storage * &decimales, T x)
+    template <class T> void decicoupe(storage * &decimales, T x, memory_pool *p)
     {
 	NLS_SWAP_IN;
 
@@ -67,7 +67,7 @@ namespace libdar
 	    bool recule = false;
 	    unsigned char tmp;
 
-	    decimales = new (nothrow) storage(PAS);
+	    decimales = new (p) storage(PAS);
 	    if(decimales == NULL)
 		throw Ememory("template deci::decicoupe");
 
@@ -131,7 +131,7 @@ namespace libdar
 	    if(size == 0) // empty string
 		throw Erange("deci::deci(string s)", gettext("an empty string is an invalid argument"));
 
-	    decimales = new (nothrow) storage(size);
+	    decimales = new (get_pool()) storage(size);
 	    if(decimales == NULL)
 		throw Ememory("deci::deci(string s)");
 	    decimales->clear(0xFF); // FF is not a valid couple of decimal digit
@@ -173,7 +173,7 @@ namespace libdar
     {
 	try
 	{
-	    decicoupe(decimales, x);
+	    decicoupe(decimales, x, get_pool());
 	    reduce();
 	}
 	catch(...)
@@ -189,7 +189,7 @@ namespace libdar
         if(decimales != NULL)
             throw SRC_BUG;
 
-        decimales = new (nothrow) storage(*ref.decimales);
+        decimales = new (get_pool()) storage(*ref.decimales);
 	if(decimales == NULL)
 	    throw SRC_BUG;
     }

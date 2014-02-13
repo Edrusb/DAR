@@ -21,9 +21,6 @@
 
 #include "../my_config.h"
 
-#include <iostream>
-#include <fstream>
-#include <string>
 #include "erreurs.hpp"
 #include "memory_check.hpp"
 
@@ -164,7 +161,10 @@ void desalloc(void *p)
 
 void * operator new (size_t size) throw (std::bad_alloc)
 {
-    return alloc(size);
+    void *ret = alloc(size);
+    if(ret == NULL)
+	throw std::bad_alloc();
+    return ret;
 }
 
 void * operator new (size_t size, const std::nothrow_t& nothrow_constant) throw ()
@@ -174,7 +174,10 @@ void * operator new (size_t size, const std::nothrow_t& nothrow_constant) throw 
 
 void * operator new[] (size_t size) throw (std::bad_alloc)
 {
-    return alloc(size);
+    ret = alloc(size);
+    if(ret == NULL)
+	throw std::bad_alloc();
+    return ret;
 }
 
 void * operator new[] (size_t size, const std::nothrow_t& nothrow_constant) throw ()
@@ -214,7 +217,7 @@ void memory_check_snapshot()
     while(curs < DEBUG_MEM_SIZE)
     {
 	if(debug_mem_alloc[curs].ptr != NULL)
-	    fprintf(debug_mem_output, "address = %p   size = %ld\n",
+	    fprintf(debug_mem_output, "address = %p   size = %d\n",
 		    debug_mem_alloc[curs].ptr,
 		    debug_mem_alloc[curs].size);
 	++curs;

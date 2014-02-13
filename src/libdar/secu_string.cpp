@@ -56,8 +56,6 @@ char *strchr (), *strrchr ();
 #endif
 }
 
-#include <new>
-
 #include "erreurs.hpp"
 #include "secu_string.hpp"
 
@@ -144,7 +142,7 @@ namespace libdar
 	    if(allocated_size == NULL)
 		throw Esecu_memory("secu_string::secus_string");
 #else
-	    allocated_size = new (nothrow) U_I;
+	    meta_new(allocated_size, 1);
 	    if(allocated_size == NULL)
 		throw Ememory("secu_string::secus_string");
 #endif
@@ -156,7 +154,7 @@ namespace libdar
 	    if(mem == NULL)
 		throw Esecu_memory("secu_string::secus_string");
 #else
-	    mem = new (nothrow) char[*allocated_size];
+	    meta_new(mem, *allocated_size);
 	    if(mem == NULL)
 		throw Ememory("secu_string::secus_string");
 #endif
@@ -166,7 +164,7 @@ namespace libdar
 	    if(string_size == NULL)
 		throw Esecu_memory("secu_string::secus_string");
 #else
-	    string_size = new (nothrow) U_I;
+	    meta_new(string_size, 1);
 	    if(string_size == NULL)
 		throw Ememory("secu_string::secus_string");
 #endif
@@ -212,7 +210,7 @@ namespace libdar
 #if CRYPTO_AVAILABLE
 	    gcry_free(string_size);
 #else
-	    delete string_size;
+	    meta_delete(string_size);
 #endif
 	    string_size = NULL;
 	}
@@ -224,7 +222,7 @@ namespace libdar
 #if CRYPTO_AVAILABLE
 	    gcry_free(mem);
 #else
-	    delete [] mem;
+	    meta_delete(mem);
 #endif
 	    mem = NULL;
 	}
@@ -234,7 +232,7 @@ namespace libdar
 #if CRYPTO_AVAILABLE
 	    gcry_free(allocated_size);
 #else
-	    delete allocated_size;
+	    meta_delete(allocated_size);
 #endif
 	    allocated_size = NULL;
 

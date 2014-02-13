@@ -66,8 +66,6 @@ char *strchr (), *strrchr ();
 #endif
 } // end extern "C"
 
-#include <new>
-
 #include "sar_tools.hpp"
 #include "erreurs.hpp"
 #include "user_interaction.hpp"
@@ -82,6 +80,7 @@ namespace libdar
 {
 
     trivial_sar *sar_tools_open_archive_tuyau(user_interaction & dialog,
+					      memory_pool *pool,
 					      S_I fd,
 					      gf_mode mode,
 					      const label & data_name,
@@ -93,12 +92,12 @@ namespace libdar
 
         try
         {
-            tmp = new (nothrow) tuyau(dialog, fd, mode);
+            tmp = new (pool) tuyau(dialog, fd, mode);
             if(tmp == NULL)
                 throw Ememory("sar_tools_open_archive_tuyau");
-            ret = new (nothrow) trivial_sar(dialog, tmp, data_name,
-					    slice_header_format_07,
-					    execute);
+            ret = new (pool) trivial_sar(dialog, tmp, data_name,
+					 slice_header_format_07,
+					 execute);
             if(ret == NULL)
                 throw Ememory("sar_tools_open_archive_tuyau");
 	    else

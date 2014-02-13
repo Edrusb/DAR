@@ -73,6 +73,27 @@ AC_FUNC_UTIME_NULL
 AC_HEADER_TIME
 AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror utime fdopendir])
 
+AC_MSG_CHECKING([for c++11 support])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
+				   [ thread_local static int test = 0; ])
+                  ],
+		  [ AC_MSG_RESULT(yes) ],
+		  [
+		     AC_MSG_RESULT([no])
+		     AC_MSG_CHECKING([for c++ support with -std=c++11 option set])
+		     CXXFLAGS="$CXXFLAGS -std=c++11"
+		     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
+							[ thread_local static int test = 0; ])
+					],
+					[ AC_MSG_RESULT(yes) ],
+					[
+					   AC_MSG_RESULT(no)
+					   AC_MSG_ERROR([C++ compiler lack support for c++11 standard])
+					]
+                     )
+		   ])
+
+
 AC_MSG_CHECKING([for getopt() in <unistd.h>])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                     #if HAVE_UNISTD_H
@@ -599,8 +620,8 @@ AC_ARG_ENABLE( [furtive-read],
 AC_ARG_ENABLE( [debug],
                 AC_HELP_STRING(--enable-debug, [build targets with debugging option and no optimization]),
                 [
-                        CXXFLAGS="-ggdb -Wall"
-                        CFLAGS="-ggdb -Wall"
+                        CXXFLAGS="$CXXFLAGS -ggdb -Wall"
+                        CFLAGS="$CFLAGS -ggdb -Wall"
                         debug_static="yes"
 			AC_DEFINE(LIBDAR_NO_OPTIMIZATION, 1, [if defined, informs the code that no optimization has been used for compilation])
                 ],

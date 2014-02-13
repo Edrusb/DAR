@@ -107,11 +107,7 @@ namespace libdar
 	    /// \note this the caller duty to close() the provided filedescriptor
 	S_I give_fd_and_terminate() { int ret = filedesc; filedesc = -1; terminate(); return ret; };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(fichier_local);
-#endif
     protected :
-
 	    // inherited from generic_file grand-parent class
 	void inherited_sync_write() {};
 	void inherited_terminate() {};

@@ -50,7 +50,7 @@ namespace libdar
 	/// retreive later without any other knowledge which bytes are information and which byte are from the
 	/// elastic buffer. The main purpose is for strong encryption
 	/// \ingroup Private
-    class elastic
+    class elastic : public on_pool
     {
     public:
 	elastic(U_32 size);
@@ -61,10 +61,6 @@ namespace libdar
 	U_32 get_size() const { return taille; };
 
 	static U_I max_length() { return (U_I)(254)*254*254*254 - 1; };
-
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(elastic);
-#endif
 
     private:
 	U_32 taille; // max size of elastic buffer is 4GB which is large enough

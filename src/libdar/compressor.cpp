@@ -60,7 +60,6 @@ char *strchr (), *strrchr ();
 
 } // end extern "C"
 
-#include <new>
 #include "tools.hpp"
 #include "compressor.hpp"
 
@@ -137,10 +136,10 @@ namespace libdar
         case gzip:
             read_ptr = &compressor::gzip_read;
             write_ptr = &compressor::gzip_write;
-            compr = new (nothrow) xfer(BUFFER_SIZE, wr_mode);
+            compr = new (get_pool()) xfer(BUFFER_SIZE, wr_mode);
             if(compr == NULL)
                 throw Ememory("compressor::compressor");
-            decompr = new (nothrow) xfer(BUFFER_SIZE, wr_mode);
+            decompr = new (get_pool()) xfer(BUFFER_SIZE, wr_mode);
             if(decompr == NULL)
             {
                 delete compr;
@@ -212,10 +211,10 @@ namespace libdar
 	    lzo_read_reached_eof = false;
 	    try
 	    {
-		lzo_read_buffer = new (nothrow) char[LZO_CLEAR_BUFFER_SIZE];
-		lzo_write_buffer = new (nothrow) char[LZO_CLEAR_BUFFER_SIZE];
-		lzo_compressed = new (nothrow) char[LZO_COMPRESSED_BUFFER_SIZE];
-		lzo_wrkmem = new (nothrow) char[LZO1X_999_MEM_COMPRESS];
+		meta_new(lzo_read_buffer, LZO_CLEAR_BUFFER_SIZE);
+		meta_new(lzo_write_buffer, LZO_CLEAR_BUFFER_SIZE);
+		meta_new(lzo_compressed, LZO_COMPRESSED_BUFFER_SIZE);
+		meta_new(lzo_wrkmem, LZO1X_999_MEM_COMPRESS);
 		if(lzo_read_buffer == NULL || lzo_write_buffer == NULL || lzo_compressed == NULL || lzo_wrkmem == NULL)
 		    throw Ememory("compressor::init");
 	    }
@@ -223,22 +222,22 @@ namespace libdar
 	    {
 		if(lzo_read_buffer != NULL)
 		{
-		    delete [] lzo_read_buffer;
+		    meta_delete(lzo_read_buffer);
 		    lzo_read_buffer = NULL;
 		}
 		if(lzo_write_buffer != NULL)
 		{
-		    delete [] lzo_write_buffer;
+		    meta_delete(lzo_write_buffer);
 		    lzo_write_buffer = NULL;
 		}
 		if(lzo_compressed != NULL)
 		{
-		    delete [] lzo_compressed;
+		    meta_delete(lzo_compressed);
 		    lzo_compressed = NULL;
 		}
 		if(lzo_wrkmem != NULL)
 		{
-		    delete [] lzo_wrkmem;
+		    meta_delete(lzo_wrkmem);
 		    lzo_wrkmem = NULL;
 		}
 		throw;
@@ -269,13 +268,13 @@ namespace libdar
 	if(decompr != NULL)
 	    delete decompr;
 	if(lzo_read_buffer != NULL)
-	    delete [] lzo_read_buffer;
+	    meta_delete(lzo_read_buffer);
 	if(lzo_write_buffer != NULL)
-	    delete [] lzo_write_buffer;
+	    meta_delete(lzo_write_buffer);
 	if(lzo_compressed != NULL)
-	    delete [] lzo_compressed;
+	    meta_delete(lzo_compressed);
 	if(lzo_wrkmem != NULL)
-	    delete [] lzo_wrkmem;
+	    meta_delete(lzo_wrkmem);
 	if(compressed_owner)
 	    if(compressed != NULL)
 		delete compressed;
@@ -331,7 +330,7 @@ namespace libdar
 	{
 	    flush_read();
 	    clean_read();
-	    delete [] lzo_read_buffer;
+	    meta_delete(lzo_read_buffer);
 	    lzo_read_buffer = NULL;
 	}
 
@@ -339,19 +338,19 @@ namespace libdar
 	{
 	    flush_write();
 	    clean_write();
-	    delete [] lzo_write_buffer;
+	    meta_delete(lzo_write_buffer);
 	    lzo_write_buffer = NULL;
 	}
 
 	if(lzo_compressed != NULL)
 	{
-	    delete [] lzo_compressed;
+	    meta_delete(lzo_compressed);
 	    lzo_compressed = NULL;
 	}
 
 	if(lzo_wrkmem != NULL)
 	{
-	    delete [] lzo_wrkmem;
+	    meta_delete(lzo_wrkmem);
 	    lzo_wrkmem = NULL;
 	}
     }
@@ -371,10 +370,9 @@ namespace libdar
         init(new_algo, compressed, new_compression_level);
     }
 
-
     compressor::xfer::xfer(U_I sz, wrapperlib_mode mode) : wrap(mode)
     {
-        buffer = new (nothrow) char[sz];
+        meta_new(buffer, sz);
         if(buffer == NULL)
             throw Ememory("compressor::xfer::xfer");
         size = sz;
@@ -382,7 +380,7 @@ namespace libdar
 
     compressor::xfer::~xfer()
     {
-        delete [] buffer;
+        meta_delete(buffer);
     }
 
     U_I compressor::none_read(char *a, U_I size)

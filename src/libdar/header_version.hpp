@@ -31,6 +31,7 @@
 #include "generic_file.hpp"
 #include "tools.hpp"
 #include "archive_version.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -49,7 +50,7 @@ namespace libdar
 
 
 	/// manages of the archive header and trailer
-    struct header_version
+    struct header_version : public on_pool
     {
         archive_version edition;
         char algo_zip;
@@ -91,7 +92,7 @@ namespace libdar
 		    throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
 		if(edition > 7)
 		{
-		    crc *coh = create_crc_from_file(f);
+		    crc *coh = create_crc_from_file(f, get_pool());
 
 		    if(coh == NULL)
 			throw SRC_BUG;

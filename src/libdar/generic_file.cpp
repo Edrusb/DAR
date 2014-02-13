@@ -285,7 +285,7 @@ namespace libdar
             throw Erange("generic_file::diff", gettext("Cannot compare files in write only mode"));
         skip(0);
         f.skip(0);
-	value = create_crc_from_size(crc_size);
+	value = create_crc_from_size(crc_size, get_pool());
 	if(value == NULL)
 	    throw SRC_BUG;
 	try
@@ -339,7 +339,7 @@ namespace libdar
             throw SRC_BUG; // crc still active, previous CRC value never read
 	if(checksum != NULL)
 	    throw SRC_BUG; // checksum is only created when crc mode is activated
-	checksum = create_crc_from_size(width);
+	checksum = create_crc_from_size(width, get_pool());
         enable_crc(true);
     }
 

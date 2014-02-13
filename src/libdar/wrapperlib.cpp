@@ -21,8 +21,6 @@
 
 #include "../my_config.h"
 
-#include <new>
-
 #include "wrapperlib.hpp"
 #include "erreurs.hpp"
 
@@ -49,7 +47,7 @@ namespace libdar
         {
         case zlib_mode:
 #if LIBZ_AVAILABLE
-            z_ptr = new (nothrow) z_stream;
+	    meta_new(z_ptr, 1);
             if(z_ptr == NULL)
                 throw Ememory("wrapperlib::wrapperlib");
 #if LIBBZ2_AVAILABLE
@@ -79,7 +77,7 @@ namespace libdar
 #endif
         case bzlib_mode:
 #if LIBBZ2_AVAILABLE
-            bz_ptr = new (nothrow) bz_stream;
+	    meta_new(bz_ptr, 1);
             if(bz_ptr == NULL)
                 throw Ememory("wrapperlib::wrapperlib");
 #if LIBZ_AVAILABLE
@@ -127,11 +125,11 @@ namespace libdar
     {
 #if LIBZ_AVAILABLE
         if(z_ptr != NULL)
-            delete z_ptr;
+	    meta_delete(z_ptr);
 #endif
 #if LIBBZ2_AVAILABLE
         if(bz_ptr != NULL)
-            delete bz_ptr;
+	    meta_delete(bz_ptr);
 #endif
     }
 

@@ -36,9 +36,9 @@
 #include "generic_file.hpp"
 #include "infinint.hpp"
 #include "catalogue.hpp"
-#include "special_alloc.hpp"
 #include "user_interaction.hpp"
 #include "path.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -54,7 +54,7 @@ namespace libdar
 	/// the data associated to a given file are the different modification dates
 	/// that this file has been found in the archive the database has been feed by
 	/// \ingroup Private
-    class data_tree
+    class data_tree : public on_pool
     {
     public:
 	enum lookup { found_present, found_removed, not_found, not_restorable };
@@ -122,9 +122,6 @@ namespace libdar
 	virtual char obj_signature() const { return signature(); };
 	static char signature() { return 't'; };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(data_tree);
-#endif
 	    // fix corruption case that was brought by bug in release 2.4.0 to 2.4.9
 	virtual bool fix_corruption(); // return true whether corruption could be fixed (meaning this entry can be safely removed from base)
 
@@ -190,10 +187,6 @@ namespace libdar
 	char obj_signature() const { return signature(); };
 	static char signature() { return 'd'; };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(data_dir);
-#endif
-
 	virtual bool fix_corruption(); // inherited from data_tree
 
 
@@ -205,7 +198,7 @@ namespace libdar
 	data_tree *find_or_addition(const std::string & name, bool is_dir, const archive_num & archive);
     };
 
-    extern data_dir *data_tree_read(generic_file & f, unsigned char db_version);
+    extern data_dir *data_tree_read(generic_file & f, unsigned char db_version, memory_pool *pool);
 
 	/// lookup routine to find a pointer to the dat_dir object corresponding to the given path
 

@@ -656,6 +656,14 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 
 	if(param.info_details)
 	    dialog.warning(gettext("Final memory cleanup..."));
+
+	if(arch != NULL)
+	    cerr << arch->free_and_check_memory() << endl;
+	if(aux != NULL)
+	    cerr << aux->free_and_check_memory() << endl;
+	if(cur != NULL)
+	    cerr << cur->free_and_check_memory() << endl;
+
 	if(arch != NULL)
 	{
 	    delete arch;

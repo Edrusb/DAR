@@ -30,11 +30,10 @@
 
 #include <string>
 #include <list>
-#include <new>
-
 #include "integers.hpp"
 #include "storage.hpp"
 #include "infinint.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -42,7 +41,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    class crc
+    class crc : public on_pool
     {
     public:
 	static const U_I OLD_CRC_SIZE = 2;
@@ -61,8 +60,8 @@ namespace libdar
 	virtual crc *clone() const = 0;
     };
 
-    extern crc *create_crc_from_file(generic_file & f, bool old = false);
-    extern crc *create_crc_from_size(infinint width);
+    extern crc *create_crc_from_file(generic_file & f, memory_pool *pool, bool old = false);
+    extern crc *create_crc_from_size(infinint width, memory_pool *pool);
 
     class crc_i : public crc
     {
@@ -81,13 +80,8 @@ namespace libdar
 	std::string crc2str() const;
 	infinint get_size() const { return size; };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(crc_i);
-#endif
-
-
     protected:
-	crc *clone() const { return new (std::nothrow) crc_i(*this); };
+	crc *clone() const { return new (get_pool()) crc_i(*this); };
 
     private:
 
@@ -119,12 +113,8 @@ namespace libdar
 	std::string crc2str() const;
 	infinint get_size() const { return size; };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(crc_n);
-#endif
-
     protected:
-	crc *clone() const { return new (std::nothrow) crc_n(*this); };
+	crc *clone() const { return new (get_pool()) crc_n(*this); };
 
     private:
 

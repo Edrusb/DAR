@@ -60,7 +60,6 @@ extern "C"
 #include <typeinfo>
 #include <algorithm>
 #include <map>
-#include <new>
 #include "catalogue.hpp"
 #include "tools.hpp"
 #include "tronc.hpp"
@@ -266,6 +265,7 @@ namespace libdar
     }
 
     entree *entree::read(user_interaction & dialog,
+			 memory_pool *pool,
                          generic_file & f,
                          const archive_version & reading_ver,
                          entree_stats & stats,
@@ -305,34 +305,34 @@ namespace libdar
             switch(type)
             {
             case 'f':
-                ret = new (nothrow) file(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc, ptr);
+                ret = new (pool) file(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc, ptr);
                 break;
             case 'l':
-                ret = new (nothrow) lien(dialog, f, reading_ver, saved, ea_loc, ptr);
+                ret = new (pool) lien(dialog, f, reading_ver, saved, ea_loc, ptr);
                 break;
             case 'c':
-                ret = new (nothrow) chardev(dialog, f, reading_ver, saved, ea_loc, ptr);
+                ret = new (pool) chardev(dialog, f, reading_ver, saved, ea_loc, ptr);
                 break;
             case 'b':
-                ret = new (nothrow) blockdev(dialog, f, reading_ver, saved, ea_loc, ptr);
+                ret = new (pool) blockdev(dialog, f, reading_ver, saved, ea_loc, ptr);
                 break;
             case 'p':
-                ret = new (nothrow) tube(dialog, f, reading_ver, saved, ea_loc, ptr);
+                ret = new (pool) tube(dialog, f, reading_ver, saved, ea_loc, ptr);
                 break;
             case 's':
-                ret = new (nothrow) prise(dialog, f, reading_ver, saved, ea_loc, ptr);
+                ret = new (pool) prise(dialog, f, reading_ver, saved, ea_loc, ptr);
                 break;
             case 'd':
-                ret = new (nothrow) directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, lax, only_detruit, ptr);
+                ret = new (pool) directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, lax, only_detruit, ptr);
                 break;
             case 'm':
-                ret = new (nothrow) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, mirage::fmt_mirage, lax, ptr);
+                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, mirage::fmt_mirage, lax, ptr);
                 break;
             case 'h': // old hard-link object
-                ret = new (nothrow) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, mirage::fmt_hard_link, lax, ptr);
+                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, mirage::fmt_hard_link, lax, ptr);
                 break;
             case 'e': // old etiquette object
-                ret = new (nothrow) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, lax, ptr);
+                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, lax, ptr);
                 break;
             case 'z':
                 if(saved != s_saved)
@@ -342,7 +342,7 @@ namespace libdar
                     else
                         dialog.warning(gettext("LAX MODE: Unexpected saved status for end of directory entry, assuming data corruption occurred, ignoring and continuing"));
                 }
-                ret = new (nothrow) eod(f);
+                ret = new (pool) eod(f);
                 break;
             case 'x':
                 if(saved != s_saved)
@@ -352,10 +352,10 @@ namespace libdar
                     else
                         dialog.warning(gettext("LAX MODE: Unexpected saved status for class \"detruit\" object, assuming data corruption occurred, ignoring and continuing"));
                 }
-                ret = new (nothrow) detruit(f, reading_ver);
+                ret = new (pool) detruit(f, reading_ver);
                 break;
 	    case 'o':
-		ret = new (nothrow) door(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc, ptr);
+		ret = new (pool) door(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc, ptr);
 		break;
             default :
                 if(!lax)
@@ -389,7 +389,7 @@ namespace libdar
 
 	    try
 	    {
-		crc *crc_read = create_crc_from_file(f);
+		crc *crc_read = create_crc_from_file(f, pool);
 		if(crc_read == NULL)
 		    throw SRC_BUG;
 
@@ -544,8 +544,8 @@ namespace libdar
         {
             last_acc = last_access;
             last_mod = last_modif;
-            last_cha = new (nothrow) infinint(last_change);
-            fs_dev = new (nothrow) infinint(fs_device);
+            last_cha = new (get_pool()) infinint(last_change);
+            fs_dev = new (get_pool()) infinint(fs_device);
             if(last_cha == NULL || fs_dev == NULL)
                 throw Ememory("inde::inode");
         }
@@ -628,13 +628,13 @@ namespace libdar
 
 	    if(reading_ver >= 8)
 	    {
-		last_cha = new (nothrow) infinint(f);
+		last_cha = new (get_pool()) infinint(f);
 		if(last_cha == NULL)
 		    throw Ememory("inode::inode(file)");
 
 		if(ea_saved == ea_full)
 		{
-		    ea_size = new (nothrow) infinint(f);
+		    ea_size = new (get_pool()) infinint(f);
 		    if(ea_size == NULL)
 			throw Ememory("inode::inode(file)");
 		}
@@ -649,23 +649,23 @@ namespace libdar
 		switch(ea_saved)
 		{
 		case ea_full:
-		    ea_offset = new (nothrow) infinint(f);
+		    ea_offset = new (get_pool()) infinint(f);
 		    if(ea_offset == NULL)
 			throw Ememory("inode::inode(file)");
 
 		    if(reading_ver <= 7)
 		    {
-			ea_crc = create_crc_from_file(f, true);
+			ea_crc = create_crc_from_file(f, get_pool(), true);
 			if(ea_crc == NULL)
 			    throw SRC_BUG;
 
-			last_cha = new (nothrow) infinint(f);
+			last_cha = new (get_pool()) infinint(f);
 			if(last_cha == NULL)
 			    throw Ememory("inode::inode(file)");
 		    }
 		    else // archive format >= 8
 		    {
-			ea_crc = create_crc_from_file(f, false);
+			ea_crc = create_crc_from_file(f, get_pool(), false);
 			if(ea_crc == NULL)
 			    throw SRC_BUG;
 		    }
@@ -674,7 +674,7 @@ namespace libdar
 		case ea_fake:
 		    if(reading_ver <= 7)
 		    {
-			last_cha = new (nothrow) infinint(f);
+			last_cha = new (get_pool()) infinint(f);
 			if(last_cha == NULL)
 			    throw Ememory("inode::inode(file)");
 		    }
@@ -683,7 +683,7 @@ namespace libdar
 		case ea_removed:
 		    if(reading_ver <= 7)
 		    {
-			last_cha = new (nothrow) infinint(0);
+			last_cha = new (get_pool()) infinint(0);
 			if(last_cha == NULL)
 			    throw Ememory("inode::inode(file)");
 		    }
@@ -728,14 +728,14 @@ namespace libdar
 
 		if(fsa_saved != fsa_none)
 		{
-		    fsa_families = new (nothrow) infinint(f);
+		    fsa_families = new (get_pool()) infinint(f);
 		    if(fsa_families == NULL)
 			throw Ememory("inode::inode(file)");
 		}
 
 		if(fsa_saved == fsa_full)
 		{
-		    fsa_size = new (nothrow) infinint(f);
+		    fsa_size = new (get_pool()) infinint(f);
 		    if(fsa_size == NULL)
 			throw Ememory("inde::inode(file)");
 		}
@@ -745,8 +745,8 @@ namespace libdar
 		    switch(fsa_saved)
 		    {
 		    case fsa_full:
-			fsa_offset = new (nothrow) infinint(f);
-			fsa_crc = create_crc_from_file(f);
+			fsa_offset = new (get_pool()) infinint(f);
+			fsa_crc = create_crc_from_file(f, get_pool());
 			if(fsa_offset == NULL || fsa_crc == NULL)
 			    throw Ememory("inode::inode(file)");
 			break;
@@ -1113,7 +1113,7 @@ namespace libdar
 		delete ea_size;
 		ea_size = NULL;
 	    }
-            ea_size = new (nothrow) infinint(ref->space_used());
+            ea_size = new (get_pool()) infinint(ref->space_used());
 	    if(ea_size == NULL)
 		throw Ememory("inode::ea_attach");
             ea = ref;
@@ -1161,7 +1161,7 @@ namespace libdar
 			    {
 				if(edit <= 1)
 				    throw SRC_BUG;   // EA do not exist in that archive format
-				const_cast<ea_attributs *&>(ea) = new (nothrow) ea_attributs(*storage, edit);
+				const_cast<ea_attributs *&>(ea) = new (get_pool()) ea_attributs(*storage, edit);
 				if(ea == NULL)
 				    throw Ememory("inode::get_ea");
 			    }
@@ -1237,7 +1237,7 @@ namespace libdar
             {
                 if(ea != NULL)
 		{
-                    const_cast<inode *>(this)->ea_size = new (nothrow) infinint (ea->space_used());
+                    const_cast<inode *>(this)->ea_size = new (get_pool()) infinint (ea->space_used());
 		    if(ea_size == NULL)
 			throw Ememory("inode::ea_get_size");
 		}
@@ -1254,7 +1254,7 @@ namespace libdar
     {
 	if(ea_offset == NULL)
 	{
-	    ea_offset = new (nothrow) infinint(pos);
+	    ea_offset = new (get_pool()) infinint(pos);
 	    if(ea_offset == NULL)
 		throw Ememory("inode::ea_set_offset");
 	}
@@ -1288,9 +1288,9 @@ namespace libdar
                 try
                 {
                     if(edit >= 8)
-                        tmp = create_crc_from_file(*esc, false);
+                        tmp = create_crc_from_file(*esc, get_pool(), false);
                     else // archive format <= 7
-                        tmp = create_crc_from_file(*esc, true);
+                        tmp = create_crc_from_file(*esc, get_pool(), true);
 		    if(tmp == NULL)
 			throw SRC_BUG;
                     const_cast<inode *>(this)->ea_crc = tmp;
@@ -1305,7 +1305,7 @@ namespace libdar
             }
             else
             {
-                crc *tmp = new (nothrow) crc_n(1); // creating a default CRC
+                crc *tmp = new (get_pool()) crc_n(1); // creating a default CRC
                 if(tmp == NULL)
                     throw Ememory("inode::ea_get_crc");
                 try
@@ -1410,8 +1410,8 @@ namespace libdar
 	    }
 	    try
 	    {
-		fsa_size = new (nothrow) infinint (ref->storage_size());
-		fsa_families = new(nothrow) infinint(fsa_scope_to_infinint(ref->get_fsa_families()));
+		fsa_size = new (get_pool()) infinint (ref->storage_size());
+		fsa_families = new(get_pool()) infinint(fsa_scope_to_infinint(ref->get_fsa_families()));
 		if(fsa_size == NULL || fsa_families == NULL)
 		    throw Ememory("inode::fsa_attach");
 	    }
@@ -1478,7 +1478,7 @@ namespace libdar
 			{
 			    try
 			    {
-				const_cast<inode *>(this)->fsal = new (nothrow) filesystem_specific_attribute_list();
+				const_cast<inode *>(this)->fsal = new (get_pool()) filesystem_specific_attribute_list();
 				if(fsal == NULL)
 				    throw Ememory("inode::get_fsa");
 				try
@@ -1559,7 +1559,7 @@ namespace libdar
     {
 	if(fsa_offset == NULL)
 	{
-	    fsa_offset = new (nothrow) infinint(pos);
+	    fsa_offset = new (get_pool()) infinint(pos);
 	    if(fsa_offset == NULL)
 		throw Ememory("inode::fsa_set_offset");
 	}
@@ -1592,7 +1592,7 @@ namespace libdar
 
                 try
                 {
-		    tmp = create_crc_from_file(*esc, false);
+		    tmp = create_crc_from_file(*esc, get_pool(), false);
 		    if(tmp == NULL)
 			throw SRC_BUG;
                     const_cast<inode *>(this)->fsa_crc = tmp;
@@ -1607,7 +1607,7 @@ namespace libdar
             }
             else // fsa_crc mark not found
             {
-                crc *tmp = new (nothrow) crc_n(1); // creating a default CRC
+                crc *tmp = new (get_pool()) crc_n(1); // creating a default CRC
                 if(tmp == NULL)
                     throw Ememory("inode::fsa_get_crc");
                 try
@@ -1725,13 +1725,13 @@ namespace libdar
             // we must not release memory pointed to by esc, we do not own that object
     }
 
-    template <class T> void copy_ptr(const T *src, T * & dst)
+    template <class T> void copy_ptr(const T *src, T * & dst, memory_pool *p)
     {
 	if(src == NULL)
 	    dst = NULL;
 	else
 	{
-	    dst = new (nothrow) T(*src);
+	    dst = new (p) T(*src);
 	    if(dst == NULL)
 		throw Ememory("copy_ptr template");
 	}
@@ -1746,13 +1746,13 @@ namespace libdar
 	    perm = ref.perm;
 	    last_acc = ref.last_acc;
 	    last_mod = ref.last_mod;
-	    copy_ptr(ref.last_cha, last_cha);
+	    copy_ptr(ref.last_cha, last_cha, get_pool());
 	    xsaved = ref.xsaved;
 	    ea_saved = ref.ea_saved;
 	    fsa_saved = ref.fsa_saved;
-	    copy_ptr(ref.ea_offset, ea_offset);
-	    copy_ptr(ref.ea, ea);
-	    copy_ptr(ref.ea_size, ea_size);
+	    copy_ptr(ref.ea_offset, ea_offset, get_pool());
+	    copy_ptr(ref.ea, ea, get_pool());
+	    copy_ptr(ref.ea_size, ea_size, get_pool());
 	    if(ref.ea_crc != NULL)
 	    {
 		ea_crc = (ref.ea_crc)->clone();
@@ -1761,10 +1761,10 @@ namespace libdar
 	    }
 	    else
 		ea_crc = NULL;
-	    copy_ptr(ref.fsa_families, fsa_families);
-	    copy_ptr(ref.fsa_offset, fsa_offset);
-	    copy_ptr(ref.fsal, fsal);
-	    copy_ptr(ref.fsa_size, fsa_size);
+	    copy_ptr(ref.fsa_families, fsa_families, get_pool());
+	    copy_ptr(ref.fsa_offset, fsa_offset, get_pool());
+	    copy_ptr(ref.fsal, fsal, get_pool());
+	    copy_ptr(ref.fsa_size, fsa_size, get_pool());
 	    if(ref.fsa_crc != NULL)
 	    {
 		fsa_crc = (ref.fsa_crc)->clone();
@@ -1773,7 +1773,7 @@ namespace libdar
 	    }
 	    else
 		fsa_crc = NULL;
-	    copy_ptr(ref.fs_dev, fs_dev);
+	    copy_ptr(ref.fs_dev, fs_dev, get_pool());
 	    storage = ref.storage; // yes copying the value of the pointer
 	    edit = ref.edit;
 	    esc = ref.esc; // yes copying the value of the pointer
@@ -1934,7 +1934,7 @@ namespace libdar
 
             if(fmt == fmt_file_etiquette)
             {
-                nomme *tmp_ptr = new (nothrow) file(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc, ptr);
+                nomme *tmp_ptr = new (get_pool()) file(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc, ptr);
                 entree_ptr = tmp_ptr;
                 if(tmp_ptr != NULL)
                 {
@@ -1946,7 +1946,7 @@ namespace libdar
                     throw Ememory("mirage::init");
             }
             else
-                entree_ptr = entree::read(dialog, f, reading_ver, fake_stats, corres, default_algo, data_loc, ea_loc, lax, false, ptr);
+                entree_ptr = entree::read(dialog, get_pool(), f, reading_ver, fake_stats, corres, default_algo, data_loc, ea_loc, lax, false, ptr);
 
             ino_ptr = dynamic_cast<inode *>(entree_ptr);
             if(ino_ptr == NULL || dynamic_cast<directory *>(entree_ptr) != NULL)
@@ -1970,7 +1970,7 @@ namespace libdar
                 {
                         // we can now create the etoile and add it in the corres map;
 
-                    star_ref = new (nothrow) etoile(ino_ptr, tmp_tiquette);
+                    star_ref = new (get_pool()) etoile(ino_ptr, tmp_tiquette);
                     try
                     {
                         if(star_ref == NULL)
@@ -2091,9 +2091,9 @@ namespace libdar
 
         try
         {
-            offset = new (nothrow) infinint(0);
-            size = new (nothrow) infinint(taille);
-            storage_size = new (nothrow) infinint(0);
+            offset = new (get_pool()) infinint(0);
+            size = new (get_pool()) infinint(taille);
+            storage_size = new (get_pool()) infinint(0);
             if(offset == NULL || size == NULL || storage_size == NULL)
                 throw Ememory("file::file");
         }
@@ -2142,7 +2142,7 @@ namespace libdar
         dirty = false;
         try
         {
-            size = new (nothrow) infinint(f);
+            size = new (get_pool()) infinint(f);
             if(size == NULL)
                 throw Ememory("file::file(generic_file)");
 
@@ -2150,12 +2150,12 @@ namespace libdar
             {
                 if(saved == s_saved)
                 {
-                    offset = new (nothrow) infinint(f);
+                    offset = new (get_pool()) infinint(f);
                     if(offset == NULL)
                         throw Ememory("file::file(generic_file)");
                     if(reading_ver > 1)
                     {
-                        storage_size = new (nothrow) infinint(f);
+                        storage_size = new (get_pool()) infinint(f);
                         if(storage_size == NULL)
                             throw Ememory("file::file(generic_file)");
                         if(reading_ver > 7)
@@ -2188,7 +2188,7 @@ namespace libdar
                     }
                     else // version is "01"
                     {
-                        storage_size = new (nothrow) infinint(*size);
+                        storage_size = new (get_pool()) infinint(*size);
                         if(storage_size == NULL)
                             throw Ememory("file::file(generic_file)");
                         *storage_size *= 2;
@@ -2200,7 +2200,7 @@ namespace libdar
 
                     if(reading_ver >= 8)
                     {
-			check = create_crc_from_file(f);
+			check = create_crc_from_file(f, get_pool());
                         if(check == NULL)
                             throw Ememory("file::file");
                     }
@@ -2208,8 +2208,8 @@ namespace libdar
                 }
                 else // not saved
                 {
-                    offset = new (nothrow) infinint(0);
-                    storage_size = new (nothrow) infinint(0);
+                    offset = new (get_pool()) infinint(0);
+                    storage_size = new (get_pool()) infinint(0);
                     if(offset == NULL || storage_size == NULL)
                         throw Ememory("file::file(generic_file)");
                 }
@@ -2223,7 +2223,7 @@ namespace libdar
                             // for archive version >= 8, the crc is only present
                             // if the archive does contain file data
 
-                        check = create_crc_from_file(f, true);
+                        check = create_crc_from_file(f, get_pool(), true);
                         if(check == NULL)
                             throw Ememory("file::file");
                     }
@@ -2248,13 +2248,13 @@ namespace libdar
                     // Now that all data has been read, setting default value for the undumped ones:
 
                 if(saved == s_saved)
-                    offset = new (nothrow) infinint(0); // can only be set from post_constructor
+                    offset = new (get_pool()) infinint(0); // can only be set from post_constructor
                 else
-                    offset = new (nothrow) infinint(0);
+                    offset = new (get_pool()) infinint(0);
                 if(offset == NULL)
                     throw Ememory("file::file(generic_file)");
 
-                storage_size = new (nothrow) infinint(0); // cannot known the storage_size at that time
+                storage_size = new (get_pool()) infinint(0); // cannot known the storage_size at that time
                 if(storage_size == NULL)
                     throw Ememory("file::file(generic_file)");
 
@@ -2309,9 +2309,9 @@ namespace libdar
             }
             else
                 check = NULL;
-            offset = new (nothrow) infinint(*ref.offset);
-            size = new (nothrow) infinint(*ref.size);
-            storage_size = new (nothrow) infinint(*ref.storage_size);
+            offset = new (get_pool()) infinint(*ref.offset);
+            size = new (get_pool()) infinint(*ref.size);
+            storage_size = new (get_pool()) infinint(*ref.storage_size);
             if(offset == NULL || size == NULL || storage_size == NULL)
                 throw Ememory("file::file(file)");
         }
@@ -2409,7 +2409,7 @@ namespace libdar
 		fichier_local *tmp = NULL;
 		if(mode != normal && mode != plain)
 		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
-		ret = tmp = new (nothrow) fichier_local(chemin, furtive_read_mode);
+		ret = tmp = new (get_pool()) fichier_local(chemin, furtive_read_mode);
 		if(tmp != NULL)
 		    tmp->fadvise(fichier_global::advise_noreuse);
 		    // yep, Linux does not implement this today, but the given advise is correct in regard
@@ -2424,7 +2424,7 @@ namespace libdar
 			throw SRC_BUG; // cannot get data from a write-only file !!!
 		    else
 		    {
-			pile *data = new (nothrow) pile();
+			pile *data = new (get_pool()) pile();
 			if(data == NULL)
 			    throw Ememory("file::get_data");
 
@@ -2433,9 +2433,9 @@ namespace libdar
 			    generic_file *tmp;
 
 			    if(get_escape_layer() == NULL)
-				tmp = new (nothrow) tronc(loc, *offset, *storage_size, gf_read_only);
+				tmp = new (get_pool()) tronc(loc, *offset, *storage_size, gf_read_only);
 			    else
-				tmp = new (nothrow) tronc(get_escape_layer(), *offset, gf_read_only);
+				tmp = new (get_pool()) tronc(get_escape_layer(), *offset, gf_read_only);
 			    if(tmp == NULL)
 				throw Ememory("file::get_data");
 			    try
@@ -2451,7 +2451,7 @@ namespace libdar
 
 			    if(*size > 0 && get_compression_algo_read() != none && mode != keep_compressed)
 			    {
-				tmp = new (nothrow) compressor(get_compression_algo_read(), *data->top());
+				tmp = new (get_pool()) compressor(get_compression_algo_read(), *data->top());
 				if(tmp == NULL)
 				    throw Ememory("file::get_data");
 				try
@@ -2467,7 +2467,7 @@ namespace libdar
 
 			    if(get_sparse_file_detection_read() && mode != keep_compressed && mode != keep_hole)
 			    {
-				sparse_file *stmp = new (nothrow) sparse_file(data->top());
+				sparse_file *stmp = new (get_pool()) sparse_file(data->top());
 				if(stmp == NULL)
 				    throw Ememory("file::get_data");
 				try
@@ -2599,7 +2599,7 @@ namespace libdar
 			    else
 				throw SRC_BUG; // how is this possible ??? it should always be zero in sequential read mode !
 
-			    tmp = create_crc_from_file(*(get_escape_layer()));
+			    tmp = create_crc_from_file(*(get_escape_layer()), get_pool());
 			    if(tmp == NULL)
 				throw SRC_BUG;
 			    else
@@ -2617,7 +2617,7 @@ namespace libdar
 			    // to avoid trying reading it again later on
 			if(check == NULL)
 			{
-			    const_cast<file *>(this)->check = new (nothrow) crc_n(1);
+			    const_cast<file *>(this)->check = new (get_pool()) crc_n(1);
 			    if(check == NULL)
 				throw Ememory("file::file");
 			}
@@ -2739,7 +2739,7 @@ namespace libdar
 
 	if(status == from_path)
 	{
-	    ret = new (nothrow) null_file(gf_read_only);
+	    ret = new (get_pool()) null_file(gf_read_only);
 	    if(ret == NULL)
 		throw Ememory("door::get_data");
 	}
@@ -2878,7 +2878,7 @@ namespace libdar
 	    {
 		try
 		{
-		    p = entree::read(dialog, f, reading_ver, stats, corres, default_algo, data_loc, ea_loc, lax, only_detruit, ptr);
+		    p = entree::read(dialog, get_pool(), f, reading_ver, stats, corres, default_algo, data_loc, ea_loc, lax, only_detruit, ptr);
 		}
 		catch(Euser_abort & e)
 		{
@@ -3550,7 +3550,7 @@ namespace libdar
 
 	try
 	{
-	    contenu = new (nothrow) directory(0,0,0,0,root_last_modif,0,"root",0);
+	    contenu = new (get_pool()) directory(0,0,0,0,root_last_modif,0,"root",0);
 	    if(contenu == NULL)
 		throw Ememory("catalogue::catalogue(path)");
 	    current_compare = contenu;
@@ -3625,7 +3625,7 @@ namespace libdar
 		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 
 		stats.clear();
-		contenu = new (nothrow) directory(dialog, ff, reading_ver, st, stats, corres, default_algo, data_loc, ea_loc, lax, only_detruit, NULL);
+		contenu = new (get_pool()) directory(dialog, ff, reading_ver, st, stats, corres, default_algo, data_loc, ea_loc, lax, only_detruit, NULL);
 		if(contenu == NULL)
 		    throw Ememory("catalogue::catalogue(path)");
 		if(only_detruit)
@@ -3655,7 +3655,7 @@ namespace libdar
 
 		try
 		{
-		    read_crc = create_crc_from_file(ff);
+		    read_crc = create_crc_from_file(ff, get_pool());
 		}
 		catch(Egeneric & e)
 		{
@@ -3814,7 +3814,7 @@ namespace libdar
 
 	if(sub_tree != NULL)
 	    delete sub_tree;
-	sub_tree = new (nothrow) path(sub);
+	sub_tree = new (get_pool()) path(sub);
 	if(sub_tree == NULL)
 	    throw Ememory("catalogue::reset_sub_read");
 	sub_count = -1; // must provide the path to subtree;
@@ -4143,7 +4143,7 @@ namespace libdar
 		else
 		    firm = pro_nom->signature();
 
-		detruit *det_tmp = new (nothrow) detruit(pro_nom->get_name(), firm, current->get_last_modif());
+		detruit *det_tmp = new (get_pool()) detruit(pro_nom->get_name(), firm, current->get_last_modif());
 		if(det_tmp == NULL)
 		    throw Ememory("catalogue::update_destroyed_with");
 		try
@@ -4265,7 +4265,7 @@ namespace libdar
 			    map<infinint, etoile *>::iterator it = corres_clone.find(pro_mir->get_etiquette());
 			    if(it == corres_clone.end())
 			    {
-				clo_eto = new (nothrow) etoile(clo_ino, aborting_next_etoile++);
+				clo_eto = new (get_pool()) etoile(clo_ino, aborting_next_etoile++);
 				if(clo_eto == NULL)
 				    throw Ememory("catalogue::update_absent_with");
 				else
@@ -4274,7 +4274,7 @@ namespace libdar
 				try
 				{
 				    corres_clone[pro_mir->get_etiquette()] = clo_eto;
-				    clo_mir = new (nothrow) mirage(pro_mir->get_name(), clo_eto);
+				    clo_mir = new (get_pool()) mirage(pro_mir->get_name(), clo_eto);
 				    if(clo_mir == NULL)
 					throw Ememory("catalogue::update_absent_with");
 				}
@@ -4293,7 +4293,7 @@ namespace libdar
 				clo_ent = NULL;
 
 				    // so we add a new reference to the existing hard linked structure
-				clo_mir = new (nothrow) mirage(pro_mir->get_name(), it->second);
+				clo_mir = new (get_pool()) mirage(pro_mir->get_name(), it->second);
 				if(clo_mir == NULL)
 				    throw Ememory("catalogue::update_absent_with");
 			    }
@@ -4971,7 +4971,7 @@ namespace libdar
 		re_add_in(ent_dir->get_name());
 	    if(ent_eod != NULL)
 	    {
-		eod *tmp = new (nothrow) eod();
+		eod *tmp = new (get_pool()) eod();
 		if(tmp == NULL)
 		    throw Ememory("catalogue::copy_detruits_from");
 		try
@@ -4986,7 +4986,7 @@ namespace libdar
 	    }
 	    if(ent_det != NULL)
 	    {
-		detruit *cp = new (nothrow) detruit(*ent_det);
+		detruit *cp = new (get_pool()) detruit(*ent_det);
 		if(cp == NULL)
 		    throw Ememory("catalogue::copy_detruits_from");
 		try
@@ -5035,7 +5035,7 @@ namespace libdar
 	{
 	    if(ref.contenu == NULL)
 		throw SRC_BUG;
-	    contenu = new (nothrow) directory(*ref.contenu);
+	    contenu = new (get_pool()) directory(*ref.contenu);
 	    if(contenu == NULL)
 		throw Ememory("catalogue::catalogue(const catalogue &)");
 	    current_compare = contenu;
@@ -5043,7 +5043,7 @@ namespace libdar
 	    current_read = contenu;
 	    if(ref.sub_tree != NULL)
 	    {
-		sub_tree = new (nothrow) path(*ref.sub_tree);
+		sub_tree = new (get_pool()) path(*ref.sub_tree);
 		if(sub_tree == NULL)
 		    throw Ememory("catalogue::partial_copy_from");
 	    }

@@ -35,7 +35,6 @@ extern "C"
 #include <iomanip>
 #include <iostream>
 #include <deque>
-#include <new>
 #include "database.hpp"
 #include "user_interaction.hpp"
 #include "deci.hpp"
@@ -46,7 +45,7 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-static storage *file2storage(generic_file &f);
+static storage *file2storage(generic_file &f, memory_pool *pool);
 static void memory2file(storage &s, generic_file &f);
 
 namespace libdar
@@ -62,7 +61,7 @@ namespace libdar
 	coordinate.push_back(dat); // coordinate[0] is never used, but must exist
 	options_to_dar.clear();
 	dar_path = "";
-	files = new (nothrow) data_dir("."); // "." or whaterver else (this name is not used)
+	files = new (get_pool()) data_dir("."); // "." or whaterver else (this name is not used)
 	if(files == NULL)
 	    throw Ememory("database::database");
 	data_files = NULL;
@@ -72,7 +71,7 @@ namespace libdar
     database::database(user_interaction & dialog, const string & base, const database_open_options & opt)
     {
 	unsigned char db_version;
-	generic_file *f = database_header_open(dialog, base, db_version);
+	generic_file *f = database_header_open(dialog, get_pool(), base, db_version);
 
 	if(f == NULL)
 	    throw Ememory("database::database");
@@ -122,7 +121,7 @@ namespace libdar
 
 	    if(!partial)
 	    {
-		files = data_tree_read(f, db_version);
+		files = data_tree_read(f, db_version, get_pool());
 		if(files == NULL)
 		    throw Ememory("database::database");
 		if(files->get_name() != ".")
@@ -134,7 +133,7 @@ namespace libdar
 		if(!read_only)
 		{
 		    files = NULL;
-		    data_files = file2storage(f);
+		    data_files = file2storage(f, get_pool());
 		}
 		else
 		{
@@ -164,7 +163,7 @@ namespace libdar
 	if(files == NULL && data_files == NULL)
 	    throw Erange("database::dump", gettext("Cannot write down a read-only database"));
 
-	generic_file *f = database_header_create(dialog, filename, opt.get_overwrite());
+	generic_file *f = database_header_create(dialog, get_pool(), filename, opt.get_overwrite());
 	if(f == NULL)
 	    throw Ememory("database::dump");
 
@@ -670,7 +669,7 @@ namespace libdar
 			    dialog.printf("Arguments sent through anonymous pipe are:");
 			    dialog.warning(tools_concat_vector(" ", argvpipe));
 			}
-			tools_system_with_pipe(dialog, dar_cmd, argvpipe);
+			tools_system_with_pipe(dialog, dar_cmd, argvpipe, get_pool());
 		    }
 		    catch(Erange & e)
 		    {
@@ -720,9 +719,9 @@ namespace libdar
 
 } // end of namespace
 
-static storage *file2storage(generic_file &f)
+static storage *file2storage(generic_file &f, memory_pool *pool)
 {
-    storage *st = new (nothrow) storage(0);
+    storage *st = new (pool) storage(0);
     const U_I taille = 102400;
     unsigned char buffer[taille];
     S_I lu;

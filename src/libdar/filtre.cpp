@@ -54,6 +54,7 @@ namespace libdar
 	// return true if file has not change
 	// throw exceptions in case of error
     static bool save_inode(user_interaction & dialog,//< how to report to user
+			   memory_pool *pool,        //< set to NULL or points to the memory_pool to use
 			   const string &info_quoi,  //< full path name of the file to save (including its name)
 			   inode * & ino,            //< inode to save to archive
 			   compressor *stock,        //< where to write to
@@ -101,7 +102,10 @@ namespace libdar
 	/// \param[in,out] hard_link_base is the datastructure that gather/maps hard_links information
 	/// \param[in] etiquette_offset is the offset to apply to etiquette (to not mix several hard-link sets using the same etiquette number in different archives)
 	/// \return a pointer to the new allocated clone object (to be deleted by the delete operator by the caller)
-    static entree *make_clone(const nomme *ref, map<infinint, etoile*> & hard_link_base, const infinint & etiquette_offset);
+    static entree *make_clone(const nomme *ref,
+			      memory_pool *pool,
+			      map<infinint, etoile*> & hard_link_base,
+			      const infinint & etiquette_offset);
 
 	/// remove an entry hardlink from a given hard_link database
 
@@ -123,13 +127,18 @@ namespace libdar
 	/// \note actions set to EA_preserve EA_preserve_mark_already_saved and EA_clear are left intentionnaly unimplemented!
 	/// \note the NULL given as argument means that the object is not an inode
 
-    static void do_EFSA_transfert(user_interaction &dialog, over_action_ea action, inode *in_place, const inode *to_add);
+    static void do_EFSA_transfert(user_interaction &dialog,
+				  memory_pool *pool,
+				  over_action_ea action,
+				  inode *in_place,
+				  const inode *to_add);
 
 
 	/// overwriting policy when only restoring detruit objects
-    static const crit_action *make_overwriting_for_only_deleted();
+    static const crit_action *make_overwriting_for_only_deleted(memory_pool *pool);
 
     void filtre_restore(user_interaction & dialog,
+			memory_pool *pool,
 			const mask & filtre,
 			const mask & subtree,
 			const catalogue & cat,
@@ -155,7 +164,7 @@ namespace libdar
 	const eod tmp_eod;
 	const entree *e;
 	thread_cancellation thr_cancel;
-	const crit_action * when_only_deleted = only_deleted ? make_overwriting_for_only_deleted() : NULL;
+	const crit_action * when_only_deleted = only_deleted ? make_overwriting_for_only_deleted(pool) : NULL;
 	const crit_action & overwrite = only_deleted ? *when_only_deleted : x_overwrite;
 
 	try
@@ -461,6 +470,7 @@ namespace libdar
     }
 
     void filtre_sauvegarde(user_interaction & dialog,
+			   memory_pool *pool,
 			   const mask &filtre,
                            const mask &subtree,
                            pile & stack,
@@ -752,6 +762,7 @@ namespace libdar
 					    // PERFORMING ACTION FOR INODE
 
 					if(!save_inode(dialog,
+						       pool,
 						       juillet.get_string(),
 						       e_ino,
 						       stockage,
@@ -830,9 +841,9 @@ namespace libdar
 				    dialog.warning(string(gettext(SKIPPED)) + juillet.get_string());
 
 				if(dir != NULL && make_empty_dir)
-				    ig = ignode = new (nothrow) ignored_dir(*dir);
+				    ig = ignode = new (pool) ignored_dir(*dir);
 				else
-				    ig = new (nothrow) ignored(nom->get_name());
+				    ig = new (pool) ignored(nom->get_name());
 				    // necessary to not record deleted files at comparison
 				    // time in case files are just not covered by filters
 				st.incr_ignored();
@@ -914,7 +925,7 @@ namespace libdar
 
 			    if(how != "write") // error did not occured while adding data to the archive
 			    {
-				nomme *tmp = new (nothrow) ignored(nom->get_name());
+				nomme *tmp = new (pool) ignored(nom->get_name());
 				dialog.warning(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
 				st.incr_errored();
 
@@ -969,6 +980,7 @@ namespace libdar
     }
 
     void filtre_difference(user_interaction & dialog,
+			   memory_pool *pool,
 			   const mask &filtre,
                            const mask &subtree,
                            const catalogue & cat,
@@ -1152,6 +1164,7 @@ namespace libdar
     }
 
     void filtre_test(user_interaction & dialog,
+		     memory_pool *pool,
 		     const mask &filtre,
                      const mask &subtree,
                      const catalogue & cat,
@@ -1332,6 +1345,7 @@ namespace libdar
     }
 
     void filtre_isolate(user_interaction & dialog,
+			memory_pool *pool,
 			catalogue & cat,
                         const catalogue & ref,
                         bool info_details)
@@ -1384,7 +1398,7 @@ namespace libdar
                     if(e_mir != NULL)
                     {
 			    // we reached this statement thus e_mir != NULL and e_ino != NULL, thus this is a new etiquette
-			etoile *mizar = new (nothrow) etoile(f_ino, e_mir->get_etiquette());
+			etoile *mizar = new (pool) etoile(f_ino, e_mir->get_etiquette());
 			    // note about etiquette: the cloned object has the same etiquette
 			    // and thus each etiquette correspond to two instances
 			if(mizar == NULL)
@@ -1392,7 +1406,7 @@ namespace libdar
 			try
 			{
 			    f_ino = NULL; // must not be released by the catch stament below as it is now managed by mizar
-			    f = new (nothrow) mirage(e_mir->get_name(), mizar);
+			    f = new (pool) mirage(e_mir->get_name(), mizar);
 			    if(f == NULL)
 				throw Ememory("filtre_isolate");
 			    corres[e_mir->get_etiquette()] = mizar;
@@ -1425,7 +1439,7 @@ namespace libdar
 			{
 			    if(alcor == NULL)
 				throw SRC_BUG;
-			    f = new (nothrow) mirage(e_mir->get_name(), alcor);
+			    f = new (pool) mirage(e_mir->get_name(), alcor);
 			}
 			else
 			    f = e->clone();
@@ -1450,6 +1464,7 @@ namespace libdar
 
 
     void filtre_merge(user_interaction & dialog,
+		      memory_pool *pool,
 		      const mask & filtre,
 		      const mask & subtree,
 		      pile & stack,
@@ -1522,7 +1537,7 @@ namespace libdar
 
 		try
 		{
-		    crit_chain *decr_crit_chain = new (nothrow) crit_chain();
+		    crit_chain *decr_crit_chain = new (pool) crit_chain();
 		    if(decr_crit_chain == NULL)
 			throw Ememory("filtre_merge");
 		    decr = decr_crit_chain;
@@ -1632,7 +1647,7 @@ namespace libdar
 			    {
 				if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || filtre.is_covered(e_nom->get_name())))
 				{
-				    entree *dolly = make_clone(e_nom, corres_copy, etiquette_offset);
+				    entree *dolly = make_clone(e_nom, pool, corres_copy, etiquette_offset);
 
 					// now that we have a clone object we must add the copied object to the catalogue, respecting the overwriting constaints
 
@@ -1817,7 +1832,7 @@ namespace libdar
 						case EA_merge_overwrite:
 						    if(display_treated)
 							dialog.warning(tools_printf(gettext("EA and FSA of file %S from first archive have been updated with those of same named file of the auxiliary archive"), &full_name));
-						    do_EFSA_transfert(dialog, act_ea, const_cast<inode *>(al_ino), dolly_ino);
+						    do_EFSA_transfert(dialog, pool, act_ea, const_cast<inode *>(al_ino), dolly_ino);
 						    break;
 
 						case EA_preserve_mark_already_saved:
@@ -1948,7 +1963,7 @@ namespace libdar
 						    {
 						    case EA_preserve:
 						    case EA_undefined: // remaining ea_undefined at the end of the evaluation defaults to ea_preserve
-							do_EFSA_transfert(dialog, EA_overwrite, dolly_ino, al_ino);
+							do_EFSA_transfert(dialog, pool, EA_overwrite, dolly_ino, al_ino);
 							break;
 						    case EA_overwrite:
 							if(display_treated)
@@ -1963,17 +1978,17 @@ namespace libdar
 						    case EA_merge_preserve:
 							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been updated with those of the same named file of the auxiliary archive"), &full_name));
-							do_EFSA_transfert(dialog, EA_merge_overwrite, dolly_ino, al_ino);
+							do_EFSA_transfert(dialog, pool, EA_merge_overwrite, dolly_ino, al_ino);
 							break;
 						    case EA_merge_overwrite:
 							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been updated with those of the same named file of the auxiliary archive"), &full_name));
-							do_EFSA_transfert(dialog, EA_merge_preserve, dolly_ino, al_ino);
+							do_EFSA_transfert(dialog, pool, EA_merge_preserve, dolly_ino, al_ino);
 							break;
 						    case EA_preserve_mark_already_saved:
 							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S has been overwritten and marked as already saved"), &full_name));
-							do_EFSA_transfert(dialog, EA_overwrite_mark_already_saved, dolly_ino, al_ino);
+							do_EFSA_transfert(dialog, pool, EA_overwrite_mark_already_saved, dolly_ino, al_ino);
 							break;
 						    case EA_clear:
 							if(al_ino->ea_get_saved_status() != inode::ea_none)
@@ -2094,7 +2109,7 @@ namespace libdar
 
 							if(make_empty_dir)
 							{
-							    if_removed = new (nothrow) ignored_dir(*al_dir);
+							    if_removed = new (pool) ignored_dir(*al_dir);
 							    if(if_removed == NULL)
 								throw Ememory("filtre_merge");
 							}
@@ -2174,7 +2189,7 @@ namespace libdar
 						else
 						    firm = e->signature();
 
-						dolly = new (nothrow) detruit(the_name, firm, ref_tab[index]->get_current_reading_dir().get_last_modif());
+						dolly = new (pool) detruit(the_name, firm, ref_tab[index]->get_current_reading_dir().get_last_modif());
 						if(dolly == NULL)
 						    throw Ememory("filtre_merge");
 						dolly_nom = dynamic_cast<nomme *>(dolly);
@@ -2227,7 +2242,7 @@ namespace libdar
 				{
 				    if(e_dir != NULL && make_empty_dir)
 				    {
-					ignored_dir *igndir = new (nothrow) ignored_dir(*e_dir);
+					ignored_dir *igndir = new (pool) ignored_dir(*e_dir);
 					if(igndir == NULL)
 					    throw Ememory("filtre_merge");
 					else
@@ -2426,6 +2441,7 @@ namespace libdar
 		    cat.pre_add(e, stockage);
 
 		    if(!save_inode(dialog,
+				   pool,
 				   juillet.get_string(),
 				   e_ino,
 				   stockage,
@@ -2572,6 +2588,7 @@ namespace libdar
 
 
     static bool save_inode(user_interaction & dialog,
+			   memory_pool *pool,
 			   const string & info_quoi,
 			   inode * & ino,
 			   compressor *stock,
@@ -2681,7 +2698,7 @@ namespace libdar
 				{
 					// creating the sparse_file to copy data to destination
 
-				    dst_hole = new (nothrow) sparse_file(stock, hole_size);
+				    dst_hole = new (pool) sparse_file(stock, hole_size);
 				    if(dst_hole == NULL)
 					throw Ememory("save_inode");
 				    dest = dst_hole;
@@ -3047,7 +3064,11 @@ namespace libdar
         return ret;
     }
 
-    static void do_EFSA_transfert(user_interaction &dialog, over_action_ea action, inode *place_ino, const inode *add_ino)
+    static void do_EFSA_transfert(user_interaction &dialog,
+				  memory_pool *pool,
+				  over_action_ea action,
+				  inode *place_ino,
+				  const inode *add_ino)
     {
 	ea_attributs *tmp_ea = NULL;
 	filesystem_specific_attribute_list *tmp_fsa = NULL;
@@ -3098,7 +3119,7 @@ namespace libdar
 		place_ino->ea_set_saved_status(inode::ea_partial);
 		break;
 	    case inode::ea_full:
-		tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea()); // we clone the EA of add_ino
+		tmp_ea = new (pool) ea_attributs(*add_ino->get_ea()); // we clone the EA of add_ino
 		if(tmp_ea == NULL)
 		    throw Ememory("filtre::do_EFSA_transfert");
 		try
@@ -3135,7 +3156,7 @@ namespace libdar
 		place_ino->fsa_set_saved_status(inode::fsa_partial);
 		break;
 	    case inode::fsa_full:
-		tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa()); // we clone the FSA of add_ino
+		tmp_fsa = new (pool) filesystem_specific_attribute_list(*add_ino->get_fsa()); // we clone the FSA of add_ino
 		if(tmp_fsa == NULL)
 		    throw Ememory("filtre::do_EFSA_transfer");
 		try
@@ -3191,7 +3212,7 @@ namespace libdar
 
 	    if(place_ino->ea_get_saved_status() == inode::ea_full && add_ino->ea_get_saved_status() == inode::ea_full) // we have something to merge
 	    {
-		tmp_ea = new (nothrow) ea_attributs();
+		tmp_ea = new (pool) ea_attributs();
 		if(tmp_ea == NULL)
 		    throw Ememory("filtre.cpp:do_EFSA_transfert");
 		try
@@ -3215,7 +3236,7 @@ namespace libdar
 		if(add_ino->ea_get_saved_status() == inode::ea_full)
 		{
 		    place_ino->ea_set_saved_status(inode::ea_full); // it was not the case else we would have executed the above block
-		    tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea());   // we clone the EA set of to_add
+		    tmp_ea = new (pool) ea_attributs(*add_ino->get_ea());   // we clone the EA set of to_add
 		    if(tmp_ea == NULL)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");
 		    try
@@ -3241,7 +3262,7 @@ namespace libdar
 
 	    if(place_ino->fsa_get_saved_status() == inode::fsa_full && add_ino->fsa_get_saved_status() == inode::fsa_full) // we have something to merge
 	    {
-		tmp_fsa = new (nothrow) filesystem_specific_attribute_list();
+		tmp_fsa = new (pool) filesystem_specific_attribute_list();
 		if(tmp_fsa == NULL)
 		    throw Ememory("filtre.cpp::do_EFSA_transfer");
 
@@ -3267,7 +3288,7 @@ namespace libdar
 		if(add_ino->fsa_get_saved_status() == inode::fsa_full)
 		{
 		    place_ino->fsa_set_saved_status(inode::fsa_full);
-		    tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa());
+		    tmp_fsa = new (pool) filesystem_specific_attribute_list(*add_ino->get_fsa());
 		    if(tmp_fsa == NULL)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");
 		    try
@@ -3301,7 +3322,7 @@ namespace libdar
 
 	    if(place_ino->ea_get_saved_status() == inode::ea_full && add_ino->ea_get_saved_status() == inode::ea_full)
 	    {
-		tmp_ea = new (nothrow) ea_attributs();
+		tmp_ea = new (pool) ea_attributs();
 		if(tmp_ea == NULL)
 		    throw Ememory("filtre.cpp:do_EFSA_transfert");
 		try
@@ -3325,7 +3346,7 @@ namespace libdar
 		if(add_ino->ea_get_saved_status() == inode::ea_full)
 		{
 		    place_ino->ea_set_saved_status(inode::ea_full); // it was not the case else we would have executed the above block
-		    tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea());
+		    tmp_ea = new (pool) ea_attributs(*add_ino->get_ea());
 		    if(tmp_ea == NULL)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");
 		    try
@@ -3350,7 +3371,7 @@ namespace libdar
 
 	    if(place_ino->fsa_get_saved_status() == inode::fsa_full && add_ino->fsa_get_saved_status() == inode::fsa_full) // we have something to merge
 	    {
-		tmp_fsa = new (nothrow) filesystem_specific_attribute_list();
+		tmp_fsa = new (pool) filesystem_specific_attribute_list();
 		if(tmp_fsa == NULL)
 		    throw Ememory("filtre.cpp::do_EFSA_transfer");
 
@@ -3376,7 +3397,7 @@ namespace libdar
 		if(add_ino->fsa_get_saved_status() == inode::fsa_full)
 		{
 		    place_ino->fsa_set_saved_status(inode::fsa_full);
-		    tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa());
+		    tmp_fsa = new (pool) filesystem_specific_attribute_list(*add_ino->get_fsa());
 		    if(tmp_fsa == NULL)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");
 		    try
@@ -3420,7 +3441,10 @@ namespace libdar
     }
 
 
-    static entree *make_clone(const nomme *ref, map<infinint, etoile*> & hard_link_base, const infinint & etiquette_offset)
+    static entree *make_clone(const nomme *ref,
+			      memory_pool *pool,
+			      map<infinint, etoile*> & hard_link_base,
+			      const infinint & etiquette_offset)
     {
 	entree *dolly = NULL; // will be the address of the cloned object
 	string the_name;
@@ -3448,13 +3472,13 @@ namespace libdar
 			throw Ememory("filtre:make_clone");
 
 		    infinint shift_etiquette = ref_mir->get_etiquette() + etiquette_offset;
-		    filante = new (nothrow) etoile(dollinode, shift_etiquette);
+		    filante = new (pool) etoile(dollinode, shift_etiquette);
 		    if(filante == NULL)
 			throw Ememory("make_clone");
 		    try
 		    {
 			dolly = NULL; // the inode is now managed by filante
-			dolly = new (nothrow) mirage(the_name, filante);
+			dolly = new (pool) mirage(the_name, filante);
 			if(dolly == NULL)
 			    throw Ememory("make_clone");
 			try
@@ -3488,7 +3512,7 @@ namespace libdar
 		}
 	    }
 	    else // already added to archive
-		dolly = new (nothrow) mirage(the_name, it->second); // we make a new mirage pointing to the etoile already involved in the catalogue under construction
+		dolly = new (pool) mirage(the_name, it->second); // we make a new mirage pointing to the etoile already involved in the catalogue under construction
 	}
 	else // not a hard_link file
 	    dolly = ref->clone();  // we just clone the entry
@@ -3517,9 +3541,9 @@ namespace libdar
 	}
     }
 
-    static const crit_action *make_overwriting_for_only_deleted()
+    static const crit_action *make_overwriting_for_only_deleted(memory_pool *pool)
     {
-	const crit_action *ret = new (nothrow) testing(crit_invert(crit_in_place_is_inode()), crit_constant_action(data_preserve, EA_preserve), crit_constant_action(data_overwrite, EA_overwrite));
+	const crit_action *ret = new (pool) testing(crit_invert(crit_in_place_is_inode()), crit_constant_action(data_preserve, EA_preserve), crit_constant_action(data_overwrite, EA_overwrite));
 	if(ret == NULL)
 	    throw Ememory("make_overwriting_fir_only_deleted");
 

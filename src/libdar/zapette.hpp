@@ -111,7 +111,7 @@ namespace libdar
 	/// through a pair of pipes slave_zapette return information about
 	/// a given local archive (single or multi slices).
 	/// \ingroup Private
-    class slave_zapette
+    class slave_zapette : public on_pool
     {
     public:
 

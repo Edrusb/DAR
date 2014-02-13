@@ -52,6 +52,7 @@ extern "C"
 #include "etage.hpp"
 #include "criterium.hpp"
 #include "fsa_family.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -60,7 +61,7 @@ namespace libdar
 
 	/// keep trace of hard links when reading the filesystem
 
-    class filesystem_hard_link_read : virtual protected mem_ui
+    class filesystem_hard_link_read : virtual protected mem_ui, virtual public on_pool
     {
             // this class is not to be used directly
             // it only provides some routine for the inherited classes
@@ -219,7 +220,7 @@ namespace libdar
 
 	/// keep trace of already written inodes to restore hard links
 
-    class filesystem_hard_link_write : virtual protected mem_ui
+    class filesystem_hard_link_write : virtual protected mem_ui, virtual public on_pool
     {
             // this class is not to be used directly
             // it only provides routines to its inherited classes

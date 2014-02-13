@@ -41,6 +41,7 @@ namespace libdar
 	/// \brief create an container to write a archive to a pipe
 	/// \ingroup Private
     extern trivial_sar *sar_tools_open_archive_tuyau(user_interaction & dialog,
+						     memory_pool *pool,
 						     S_I fd,
 						     gf_mode mode,
 						     const label & data_name,

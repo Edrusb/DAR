@@ -171,8 +171,8 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 
 		if(size == 0)
 		    if(dst == "-")
-			dst_sar = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name,
-							       format_07_compatible, execute_dst);
+			dst_sar = sar_tools_open_archive_tuyau(dialog, NULL, 1, gf_write_only, data_name,
+						 	       format_07_compatible, execute_dst);
 		    else
 		    {
 			if(dst_dir != NULL)

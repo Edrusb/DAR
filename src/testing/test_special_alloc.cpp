@@ -22,52 +22,41 @@
 #include "../my_config.h"
 
 #include "libdar.hpp"
-#include "special_alloc.hpp"
 #include "user_interaction.hpp"
+#include "on_pool.hpp"
 
 #include <iostream>
+#include <new>
 
 using namespace libdar;
 using namespace std;
 
+class example : public on_pool
+{
+public:
+    example() { val = 0; };
+    example(int x): val(x) {};
+
+    int get_val() const { return val; };
+    void set_val(int x) { val = x; };
+
+    memory_pool *my_get_pool() { return get_pool(); };
+
+private:
+    int val;
+};
+
+void f1();
+
 int main()
 {
     U_I maj, med, min;
-
     get_version(maj, med, min);
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-
-    const int block_size = 1024;
-    const int max = 66;
-    void *ptr[max];
 
     try
     {
-
-	for(int i = 0; i < max; ++i)
-	    ptr[i] = special_alloc_new(block_size);
-	for(int i = 0; i < max; ++i)
-	    special_alloc_delete(ptr[i]);
-
-	for(int i = 0; i < max; ++i)
-	    ptr[i] = special_alloc_new(block_size);
-	for(int i = 0; i < max; ++i)
-	    special_alloc_delete(ptr[max-i-1]);
-
-	for(int i = 0; i < max; ++i)
-	    ptr[i] = special_alloc_new(block_size);
-
-	for(int i = 0; i < max - 1; ++i)
-	    special_alloc_delete(ptr[i]);
-
-	for(int i = 0; i < max - 1; ++i)
-	    ptr[i] = special_alloc_new(10*i);
-
-	special_alloc_delete(ptr[max - 1]);
-	for(int i = 0; i < max - 1; ++i)
-	    special_alloc_delete(ptr[i]);
-
+	f1();
     }
     catch(Egeneric & e)
     {
@@ -77,6 +66,53 @@ int main()
     {
 	cout << "unknown exception caught" << endl;
     }
-#endif
 
+    return 0;
+}
+
+void f1()
+{
+    memory_pool mem;
+    example a = 1;
+    example *ptr1 = new (nothrow) example;
+    example *ptr2 = new (&mem) example;
+
+    try
+    {
+	if(ptr1 == NULL || ptr2 == NULL)
+	    throw Ememory("f1");
+
+	cout << a.get_val() << endl;
+	cout << ptr1->get_val() << endl;
+	cout << ptr2->get_val() << endl;
+
+	if(a.my_get_pool() != NULL)
+	    cout << "Strange!" << endl;
+	if(ptr1->my_get_pool() != NULL)
+	    cout << "Very strange!" << endl;
+	if(ptr2->my_get_pool() != &mem)
+	    cout << "Extremely strange!" << endl;
+    }
+
+    catch(...)
+    {
+	if(ptr1 != NULL)
+	    delete ptr1;
+	if(ptr2 != NULL)
+	    delete ptr2;
+	throw;
+    }
+
+    if(ptr1 != NULL)
+	delete ptr1;
+    if(ptr2 != NULL)
+	delete ptr2;
+
+    if(! mem.is_empty())
+	cout << mem.dump() << endl;
+    else
+    {
+	cout << mem.dump() << endl;
+	cout << "ALL memory has been released" << endl;
+    }
 }

@@ -43,6 +43,7 @@ namespace libdar
 	/// @}
 
     extern void filtre_restore(user_interaction & dialog, //< for user interaction
+			       memory_pool *pool,         //< set to NULL or point to the memory pool to use for memory allocation
 			       const mask &filtre,        //< which filename to restore
                                const mask & subtree,      //< which directory and paths to restore
                                const catalogue & cat,     //< table of content to extract information from
@@ -65,6 +66,7 @@ namespace libdar
 			       const fsa_scope & scope);  //< scope of FSA to take into account
 
     extern void filtre_sauvegarde(user_interaction & dialog,
+				  memory_pool *pool,
 				  const mask &filtre,
                                   const mask &subtree,
                                   pile & stack,
@@ -98,6 +100,7 @@ namespace libdar
 				  const fsa_scope & scope);
 
     extern void filtre_difference(user_interaction & dialog,
+				  memory_pool *pool,
 				  const mask &filtre,
                                   const mask &subtree,
                                   const catalogue & cat,
@@ -115,6 +118,7 @@ namespace libdar
 				  const fsa_scope & scope);
 
     extern void filtre_test(user_interaction & dialog,
+			    memory_pool *pool,
 			    const mask &filtre,
                             const mask &subtree,
                             const catalogue & cat,
@@ -126,11 +130,13 @@ namespace libdar
 
 
     extern void filtre_isolate(user_interaction & dialog,
+			       memory_pool *pool,
 			       catalogue & cat,
                                const catalogue & ref,
                                bool info_details);
 
     extern void filtre_merge(user_interaction & dialog,
+			     memory_pool *pool,
 			     const mask & filtre,
 			     const mask & subtree,
 			     pile & stack,

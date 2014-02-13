@@ -30,6 +30,7 @@
 
 #include "integers.hpp"
 #include "generic_file.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -37,7 +38,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    class label
+    class label : public on_pool
     {
     public:
 	label(); // builds a label equal to 'zero'
@@ -66,9 +67,6 @@ namespace libdar
 
 	static U_I common_size() { return LABEL_SIZE; };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(label);
-#endif
     private:
 	static const U_I LABEL_SIZE = 10;
 

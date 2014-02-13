@@ -106,7 +106,6 @@ char *strchr (), *strrchr ();
 
 
 #include <map>
-#include <new>
 
 #include "filesystem.hpp"
 #include "tools.hpp"
@@ -133,12 +132,17 @@ namespace libdar
 			  const string & chem,
 			  inode::comparison_fields what_to_check);
 
-    static void attach_ea(const string &chemin, inode *ino, const mask & ea_mask);
+    static void attach_ea(const string &chemin,
+			  inode *ino,
+			  const mask & ea_mask,
+			  memory_pool *pool);
     static bool is_nodump_flag_set(user_interaction & dialog,
 				   const path & chem, const string & filename,
 				   bool info);
     static path *get_root_with_symlink(user_interaction & dialog,
-				       const path & root, bool info_details);
+				       const path & root,
+				       bool info_details,
+				       memory_pool *pool);
     static mode_t get_file_permission(const string & path);
 
 ///////////////////////////////////////////////////////////////////
@@ -177,72 +181,72 @@ namespace libdar
 		{
 		    string pointed = tools_readlink(ptr_name);
 
-		    ref = new (nothrow) lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-					     buf.st_atime,
-					     buf.st_mtime,
-					     buf.st_ctime,
-					     name,
-					     pointed,
-					     buf.st_dev);
-		}
-		else if(S_ISREG(buf.st_mode))
-		    ref = new (nothrow) file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-					     buf.st_atime,
-					     buf.st_mtime,
-					     buf.st_ctime,
-					     name,
-					     lieu,
-					     buf.st_size,
-					     buf.st_dev,
-					     furtive_read_mode);
-		else if(S_ISDIR(buf.st_mode))
-		    ref = new (nothrow) directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						  buf.st_atime,
-						  buf.st_mtime,
-						  buf.st_ctime,
-						  name,
-						  buf.st_dev);
-		else if(S_ISCHR(buf.st_mode))
-		    ref = new (nothrow) chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (get_pool()) lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						buf.st_atime,
 						buf.st_mtime,
 						buf.st_ctime,
 						name,
-						major(buf.st_rdev),
-						minor(buf.st_rdev), // makedev(major, minor)
+						pointed,
 						buf.st_dev);
+		}
+		else if(S_ISREG(buf.st_mode))
+		    ref = new (get_pool()) file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+						buf.st_atime,
+						buf.st_mtime,
+						buf.st_ctime,
+						name,
+						lieu,
+						buf.st_size,
+						buf.st_dev,
+						furtive_read_mode);
+		else if(S_ISDIR(buf.st_mode))
+		    ref = new (get_pool()) directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+						     buf.st_atime,
+						     buf.st_mtime,
+						     buf.st_ctime,
+						     name,
+						     buf.st_dev);
+		else if(S_ISCHR(buf.st_mode))
+		    ref = new (get_pool()) chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+						   buf.st_atime,
+						   buf.st_mtime,
+						   buf.st_ctime,
+						   name,
+						   major(buf.st_rdev),
+						   minor(buf.st_rdev), // makedev(major, minor)
+						   buf.st_dev);
 		else if(S_ISBLK(buf.st_mode))
-		    ref = new (nothrow) blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (get_pool()) blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+						    buf.st_atime,
+						    buf.st_mtime,
+						    buf.st_ctime,
+						    name,
+						    major(buf.st_rdev),
+						    minor(buf.st_rdev), // makedev(major, minor)
+						    buf.st_dev);
+		else if(S_ISFIFO(buf.st_mode))
+		    ref = new (get_pool()) tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+						buf.st_atime,
+						buf.st_mtime,
+						buf.st_ctime,
+						name,
+						buf.st_dev);
+		else if(S_ISSOCK(buf.st_mode))
+		    ref = new (get_pool()) prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						 buf.st_atime,
 						 buf.st_mtime,
 						 buf.st_ctime,
 						 name,
-						 major(buf.st_rdev),
-						 minor(buf.st_rdev), // makedev(major, minor)
 						 buf.st_dev);
-		else if(S_ISFIFO(buf.st_mode))
-		    ref = new (nothrow) tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-					     buf.st_atime,
-					     buf.st_mtime,
-					     buf.st_ctime,
-					     name,
-					     buf.st_dev);
-		else if(S_ISSOCK(buf.st_mode))
-		    ref = new (nothrow) prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-					      buf.st_atime,
-					      buf.st_mtime,
-					      buf.st_ctime,
-					      name,
-					      buf.st_dev);
 #if HAVE_DOOR
 		else if(S_ISDOOR(buf.st_mode))
-		    ref = new (nothrow) door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-					     buf.st_atime,
-					     buf.st_mtime,
-					     buf.st_ctime,
-					     name,
-					     lieu,
-					     buf.st_dev);
+		    ref = new (get_pool()) door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+						buf.st_atime,
+						buf.st_mtime,
+						buf.st_ctime,
+						name,
+						lieu,
+						buf.st_dev);
 #endif
 		else
 		    throw Edata(string(gettext("Unknown file type! file name is: ")) + string(ptr_name));
@@ -258,7 +262,7 @@ namespace libdar
 
 		    try
 		    {
-			attach_ea(ptr_name, ino, ea_mask);
+			attach_ea(ptr_name, ino, ea_mask, get_pool());
 		    }
 		    catch(Ebug & e)
 		    {
@@ -287,7 +291,7 @@ namespace libdar
 		    // Filesystem Specific Attributes Considerations
 		    //
 
-		    filesystem_specific_attribute_list *fsal = new (nothrow) filesystem_specific_attribute_list();
+		    filesystem_specific_attribute_list *fsal = new (get_pool()) filesystem_specific_attribute_list();
 		    if(fsal == NULL)
 			throw Ememory("filesystem_hard_link_read::make_entree");
 		    try
@@ -332,7 +336,7 @@ namespace libdar
 
 			if(ino_ref == NULL)
 			    throw SRC_BUG;
-			tmp_et = new (nothrow) etoile(ino_ref, etiquette_counter++);
+			tmp_et = new (get_pool()) etoile(ino_ref, etiquette_counter++);
 			if(tmp_et == NULL)
 			    throw Ememory("filesystem_hard_link_read::make_read_entree");
 			try
@@ -355,7 +359,7 @@ namespace libdar
 			    throw;
 			}
 
-			ref = new (nothrow) mirage(name, tmp_et);
+			ref = new (get_pool()) mirage(name, tmp_et);
 		    }
 		    else // inode already seen creating a new mirage on the given etoile
 		    {
@@ -365,7 +369,7 @@ namespace libdar
 
 			if(ref != NULL)
 			    delete ref;  // we don't need this just created inode as it is already attached to the etoile object
-			ref = new (nothrow) mirage(name, it->second.obj);
+			ref = new (get_pool()) mirage(name, it->second.obj);
 			if(ref != NULL)
 			{
 			    it->second.count--;
@@ -417,7 +421,7 @@ namespace libdar
 	ea_mask = NULL;
 	try
 	{
-	    fs_root = get_root_with_symlink(get_ui(), root, x_info_details);
+	    fs_root = get_root_with_symlink(get_ui(), root, x_info_details, get_pool());
 	    if(fs_root == NULL)
 		throw Ememory("filesystem_backup::filesystem_backup");
 	    info_details = x_info_details;
@@ -471,7 +475,7 @@ namespace libdar
 	{
 	    if(ref.fs_root != NULL)
 	    {
-		fs_root = new (nothrow) path(*ref.fs_root);
+		fs_root = new (get_pool()) path(*ref.fs_root);
 		if(fs_root == NULL)
 		    throw Ememory("filesystem_backup::copy_from");
 	    }
@@ -480,7 +484,7 @@ namespace libdar
 
 	    if(ref.current_dir != NULL)
 	    {
-		current_dir = new (nothrow) path(*ref.current_dir);
+		current_dir = new (get_pool()) path(*ref.current_dir);
 		if(current_dir == NULL)
 		    throw Ememory("filesystem_backup::copy_from");
 	    }
@@ -509,7 +513,7 @@ namespace libdar
         corres_reset();
         if(current_dir != NULL)
             delete current_dir;
-        current_dir = new (nothrow) path(*fs_root);
+        current_dir = new (get_pool()) path(*fs_root);
         if(current_dir == NULL)
             throw Ememory("filesystem_backup::reset_read");
         pile.clear();
@@ -579,7 +583,7 @@ namespace libdar
 		    {
                         if(! current_dir->pop(tmp))
                             throw SRC_BUG;
-                        ref = new (nothrow) eod();
+                        ref = new (get_pool()) eod();
                     }
                 }
                 else // could read a filename in directory
@@ -718,7 +722,7 @@ namespace libdar
 	current_dir = NULL;
 	try
 	{
-	    fs_root = get_root_with_symlink(get_ui(), root, x_info_details);
+	    fs_root = get_root_with_symlink(get_ui(), root, x_info_details, get_pool());
 	    if(fs_root == NULL)
 		throw Ememory("filesystem_diff::filesystem_diff");
 	    info_details = x_info_details;
@@ -743,7 +747,7 @@ namespace libdar
         corres_reset();
         if(current_dir != NULL)
             delete current_dir;
-        current_dir = new (nothrow) path(*fs_root);
+        current_dir = new (get_pool()) path(*fs_root);
         filename_pile.clear();
         if(current_dir == NULL)
             throw Ememory("filesystem_diff::reset_read");
@@ -845,7 +849,7 @@ namespace libdar
 	    *proto_me = *proto_ref;
 	    if(ref.fs_root != NULL)
 	    {
-		fs_root = new (nothrow) path(*ref.fs_root);
+		fs_root = new (get_pool()) path(*ref.fs_root);
 		if(fs_root == NULL)
 		    throw Ememory("filesystem_diff::copy_from");
 	    }
@@ -853,7 +857,7 @@ namespace libdar
 		fs_root = NULL;
 	    if(ref.current_dir != NULL)
 	    {
-		current_dir = new (nothrow) path(*ref.current_dir);
+		current_dir = new (get_pool()) path(*ref.current_dir);
 		if(current_dir == NULL)
 		    throw Ememory("filesystem_diff::copy_from");
 	    }
@@ -966,7 +970,7 @@ namespace libdar
 
                 // Clearing all EA
                 //
-	    ea_filesystem_clear_ea(spot, bool_mask(true));
+	    ea_filesystem_clear_ea(spot, bool_mask(true), get_pool());
 	    ret = true;
         }
         catch(Euser_abort & e)
@@ -1264,7 +1268,7 @@ namespace libdar
 	overwrite = NULL;
 	try
 	{
-	    fs_root = get_root_with_symlink(get_ui(), root, x_info_details);
+	    fs_root = get_root_with_symlink(get_ui(), root, x_info_details, get_pool());
 	    if(fs_root == NULL)
 		throw Ememory("filesystem_write::filesystem_write");
 	    ea_mask = x_ea_mask.clone();
@@ -1297,7 +1301,7 @@ namespace libdar
         stack_dir.clear();
         if(current_dir != NULL)
             delete current_dir;
-        current_dir = new (nothrow) path(*fs_root);
+        current_dir = new (get_pool()) path(*fs_root);
         if(current_dir == NULL)
             throw Ememory("filesystem_write::reset_write");
 	ignore_over_restricts = false;
@@ -1704,7 +1708,7 @@ namespace libdar
 
 		    try
 		    {
-			ea = ea_filesystem_read_ea(spot, bool_mask(true));
+			ea = ea_filesystem_read_ea(spot, bool_mask(true), get_pool());
 		    }
 		    catch(Ethread_cancel & e)
 		    {
@@ -2261,14 +2265,14 @@ namespace libdar
 	    }
     }
 
-    static void attach_ea(const string &chemin, inode *ino, const mask & ea_mask)
+    static void attach_ea(const string &chemin, inode *ino, const mask & ea_mask, memory_pool *pool)
     {
         ea_attributs *eat = NULL;
         try
         {
             if(ino == NULL)
                 throw SRC_BUG;
-            eat = ea_filesystem_read_ea(chemin, ea_mask);
+            eat = ea_filesystem_read_ea(chemin, ea_mask, pool);
             if(eat != NULL)
             {
 		if(eat->size() <= 0)
@@ -2334,7 +2338,9 @@ namespace libdar
     }
 
     static path *get_root_with_symlink(user_interaction & dialog,
-				       const path & root, bool info_details)
+				       const path & root,
+				       bool info_details,
+				       memory_pool *pool)
     {
 	path *ret = NULL;
 	const string display = root.display();
@@ -2346,13 +2352,13 @@ namespace libdar
 
 	if(S_ISDIR(buf.st_mode))
 	{
-	    ret = new (nothrow) path(root);
+	    ret = new (pool) path(root);
 	    if(ret == NULL)
 		throw  Ememory("get_root_with_symlink");
 	}
 	else if(S_ISLNK(buf.st_mode))
 	{
-	    ret = new (nothrow) path(tools_readlink(ptr));
+	    ret = new (pool) path(tools_readlink(ptr));
 	    if(ret == NULL)
 		throw Ememory("get_root_with_symlink");
 	    if(ret->is_relative())

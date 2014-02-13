@@ -57,7 +57,6 @@ extern "C"
 #endif
 }
 
-#include <new>
 #include <algorithm>
 
 #include "integers.hpp"
@@ -235,7 +234,7 @@ namespace libdar
 		case fsan_unset:
 		    throw SRC_BUG;
 		case fsan_creation_date:
-		    ptr = ptr_infinint = new (nothrow) fsa_infinint(f, fam, nat);
+		    ptr = ptr_infinint = new (get_pool()) fsa_infinint(f, fam, nat);
 		    if(ptr_infinint != NULL)
 			ptr_infinint->set_show_mode(fsa_infinint::date);
 		    break;
@@ -251,7 +250,7 @@ namespace libdar
 		case fsan_synchronous_directory:
 		case fsan_synchronous_update:
 		case fsan_top_of_dir_hierarchy:
-		    ptr = new (nothrow) fsa_bool(f, fam, nat);
+		    ptr = new (get_pool()) fsa_bool(f, fam, nat);
 		    break;
 		default:
 		    throw SRC_BUG;
@@ -476,12 +475,12 @@ namespace libdar
 	sort(fsa.begin(), fsa.end(), compare_for_sort);
     }
 
-    template <class T, class U> void create_or_throw(T *& ref, fsa_family f, fsa_nature n, const U & val)
+    template <class T, class U> void create_or_throw(T *& ref, memory_pool *pool, fsa_family f, fsa_nature n, const U & val)
     {
 	if(ref != NULL)
 	    throw SRC_BUG;
 
-	ref = new (std::nothrow) T(f, n, val);
+	ref = new (pool) T(f, n, val);
 	if(ref == NULL)
 	    throw Ememory("template create_or_throw");
     }
@@ -528,68 +527,68 @@ namespace libdar
 		    return; // assuming there is no support for that FSA family
 
 #ifdef EXT2_APPEND_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_append_only, (f & EXT2_APPEND_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_append_only, (f & EXT2_APPEND_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
 #ifdef EXT2_COMPR_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_compressed, (f & EXT2_COMPR_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_compressed, (f & EXT2_COMPR_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
 #ifdef EXT2_NODUMP_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_no_dump, (f & EXT2_NODUMP_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_no_dump, (f & EXT2_NODUMP_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
 #ifdef EXT2_IMMUTABLE_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_immutable, (f & EXT2_IMMUTABLE_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_immutable, (f & EXT2_IMMUTABLE_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
 #ifdef EXT3_JOURNAL_DATA_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_data_journalling, (f & EXT3_JOURNAL_DATA_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_data_journalling, (f & EXT3_JOURNAL_DATA_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #else
 #ifdef EXT2_JOURNAL_DATA_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_data_journalling, (f & EXT2_JOURNAL_DATA_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_data_journalling, (f & EXT2_JOURNAL_DATA_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
 #endif
 #ifdef	EXT2_SECRM_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_secure_deletion, (f & EXT2_SECRM_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_secure_deletion, (f & EXT2_SECRM_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
 #ifdef EXT2_NOTAIL_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_no_tail_merging, (f & EXT2_NOTAIL_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_no_tail_merging, (f & EXT2_NOTAIL_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
 #ifdef	EXT2_UNRM_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_undeletable, (f & EXT2_UNRM_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_undeletable, (f & EXT2_UNRM_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
 #ifdef EXT2_NOATIME_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_noatime_update, (f & EXT2_NOATIME_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_noatime_update, (f & EXT2_NOATIME_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
 #ifdef EXT2_DIRSYNC_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_synchronous_directory, (f & EXT2_DIRSYNC_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_synchronous_directory, (f & EXT2_DIRSYNC_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
 #ifdef EXT2_SYNC_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_synchronous_update, (f & EXT2_SYNC_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_synchronous_update, (f & EXT2_SYNC_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
 #ifdef EXT2_TOPDIR_FL
-		create_or_throw(ptr, fsaf_linux_extX, fsan_top_of_dir_hierarchy, (f & EXT2_TOPDIR_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_top_of_dir_hierarchy, (f & EXT2_TOPDIR_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif

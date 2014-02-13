@@ -28,8 +28,6 @@ extern "C"
 #endif
 } // extern "C"
 
-#include <new>
-
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "archive.hpp"
@@ -80,6 +78,7 @@ namespace libdar
 	    if(where == NULL)
 		throw Ememory("archive::archive");
 
+	    pool = NULL;
 	    cat = NULL;
 
 	    try
@@ -92,6 +91,8 @@ namespace libdar
 		sequential_read = options.get_sequential_read(); // updating the archive object's field
 		where->set_location(chem);
 
+		init_pool();
+
 		try
 		{
 		    if(info_details)
@@ -99,6 +100,7 @@ namespace libdar
 
 			// we open the main archive to get the different layers (level1, scram and level2).
 		    macro_tools_open_archive(dialog,
+					     pool,
 					     *where,
 					     basename,
 					     options.get_slice_min_digits(),
@@ -151,6 +153,7 @@ namespace libdar
 
 				    // we open the archive of reference also to get its different layers (ref_stack)
 				macro_tools_open_archive(dialog,
+							 pool,
 							 *ref_where,
 							 options.get_ref_basename(),
 							 options.get_ref_slice_min_digits(),
@@ -200,6 +203,7 @@ namespace libdar
 			    dialog.warning(gettext("Loading isolated catalogue in memory..."));
 
 			cat = macro_tools_get_derivated_catalogue_from(dialog,
+								       pool,
 								       stack,
 								       ref_stack,
 								       ref_ver,
@@ -224,6 +228,7 @@ namespace libdar
 				if(info_details)
 				    dialog.warning(gettext("Loading catalogue in memory..."));
 				cat = macro_tools_get_catalogue_from(dialog,
+								     pool,
 								     stack,
 								     ver,
 								     options.get_info_details(),
@@ -240,13 +245,13 @@ namespace libdar
 
 				    if(info_details)
 					dialog.warning(gettext("Creating catalogue object to be filled with archive sequential read..."));
-				    cat = new (nothrow) escape_catalogue(dialog,
-									 ver.edition,
-									 char2compression(ver.algo_zip),
-									 data_loc,
-									 ea_loc,
-									 esc,
-									 options.get_lax());
+				    cat = new (pool) escape_catalogue(dialog,
+								      ver.edition,
+								      char2compression(ver.algo_zip),
+								      data_loc,
+								      ea_loc,
+								      esc,
+								      options.get_lax());
 				    if(cat == NULL)
 					throw Ememory("archive::archive");
 				}
@@ -287,6 +292,7 @@ namespace libdar
 					label tmp;
 					tmp.clear(); // this way we do not modify the catalogue data name even in lax mode
 					cat = macro_tools_lax_search_catalogue(dialog,
+									       pool,
 									       stack,
 									       ver.edition,
 									       char2compression(ver.algo_zip),
@@ -299,6 +305,7 @@ namespace libdar
 					dialog.printf(gettext("LAX MODE: Could not find a whole catalogue in the archive. If you have an isolated catalogue, stop here and use it as backup of the internal catalogue, else continue but be advised that all data will not be able to be retrieved..."));
 					dialog.pause(gettext("LAX MODE: Do you want to try finding portions of the original catalogue if some remain (this may take even more time and in any case, it will only permit to recover some files, at most)?"));
 					cat = macro_tools_lax_search_catalogue(dialog,
+									       pool,
 									       stack,
 									       ver.edition,
 									       char2compression(ver.algo_zip),
@@ -348,79 +355,90 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
-	    entrepot *sauv_path_t = options.get_entrepot().clone();
-	    if(sauv_path_t == NULL)
-		throw Ememory("archive::archive");
-	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
-	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
-	    sauv_path_t->set_location(sauv_path);
+	    pool = NULL;
+	    cat = NULL;
+	    init_pool();
 
 	    try
 	    {
-		sequential_read = false; // updating the archive field
+		entrepot *sauv_path_t = options.get_entrepot().clone();
+		if(sauv_path_t == NULL)
+		    throw Ememory("archive::archive");
+		sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
+		sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
+		sauv_path_t->set_location(sauv_path);
 
-		(void)op_create_in(dialog,
-				   oper_create,
-				   tools_relative2absolute_path(fs_root, tools_getcwd()),
-				   *sauv_path_t,
-				   options.get_reference(),
-				   options.get_selection(),
-				   options.get_subtree(),
-				   filename,
-				   extension,
-				   options.get_allow_over(),
-				   options.get_warn_over(),
-				   options.get_info_details(),
-				   options.get_display_treated(),
-				   options.get_display_skipped(),
-				   options.get_pause(),
-				   options.get_empty_dir(),
-				   options.get_compression(),
-				   options.get_compression_level(),
-				   options.get_slice_size(),
-				   options.get_first_slice_size(),
-				   options.get_ea_mask(),
-				   options.get_execute(),
-				   options.get_crypto_algo(),
-				   options.get_crypto_pass(),
-				   options.get_crypto_size(),
-				   options.get_compr_mask(),
-				   options.get_min_compr_size(),
-				   options.get_nodump(),
-				   options.get_hourshift(),
-				   options.get_empty(),
-				   options.get_alter_atime(),
-				   options.get_furtive_read_mode(),
-				   options.get_same_fs(),
-				   options.get_comparison_fields(),
-				   options.get_snapshot(),
-				   options.get_cache_directory_tagging(),
-				   options.get_fixed_date(),
-				   options.get_slice_permission(),
-				   options.get_repeat_count(),
-				   options.get_repeat_byte(),
-				   options.get_sequential_marks(),
-				   options.get_security_check(),
-				   options.get_sparse_file_min_size(),
-				   options.get_user_comment(),
-				   options.get_hash_algo(),
-				   options.get_slice_min_digits(),
-				   options.get_backup_hook_file_execute(),
-				   options.get_backup_hook_file_mask(),
-				   options.get_ignore_unknown_inode_type(),
-				   options.get_fsa_scope(),
-				   progressive_report);
-		exploitable = false;
-		stack.terminate();
+		try
+		{
+		    sequential_read = false; // updating the archive field
+		    (void)op_create_in(dialog,
+				       oper_create,
+				       tools_relative2absolute_path(fs_root, tools_getcwd()),
+				       *sauv_path_t,
+				       options.get_reference(),
+				       options.get_selection(),
+				       options.get_subtree(),
+				       filename,
+				       extension,
+				       options.get_allow_over(),
+				       options.get_warn_over(),
+				       options.get_info_details(),
+				       options.get_display_treated(),
+				       options.get_display_skipped(),
+				       options.get_pause(),
+				       options.get_empty_dir(),
+				       options.get_compression(),
+				       options.get_compression_level(),
+				       options.get_slice_size(),
+				       options.get_first_slice_size(),
+				       options.get_ea_mask(),
+				       options.get_execute(),
+				       options.get_crypto_algo(),
+				       options.get_crypto_pass(),
+				       options.get_crypto_size(),
+				       options.get_compr_mask(),
+				       options.get_min_compr_size(),
+				       options.get_nodump(),
+				       options.get_hourshift(),
+				       options.get_empty(),
+				       options.get_alter_atime(),
+				       options.get_furtive_read_mode(),
+				       options.get_same_fs(),
+				       options.get_comparison_fields(),
+				       options.get_snapshot(),
+				       options.get_cache_directory_tagging(),
+				       options.get_fixed_date(),
+				       options.get_slice_permission(),
+				       options.get_repeat_count(),
+				       options.get_repeat_byte(),
+				       options.get_sequential_marks(),
+				       options.get_security_check(),
+				       options.get_sparse_file_min_size(),
+				       options.get_user_comment(),
+				       options.get_hash_algo(),
+				       options.get_slice_min_digits(),
+				       options.get_backup_hook_file_execute(),
+				       options.get_backup_hook_file_mask(),
+				       options.get_ignore_unknown_inode_type(),
+				       options.get_fsa_scope(),
+				       progressive_report);
+		    exploitable = false;
+		    stack.terminate();
+		}
+		catch(...)
+		{
+		    if(sauv_path_t != NULL)
+			delete sauv_path_t;
+		    throw;
+		}
+		if(sauv_path_t != NULL)
+		    delete sauv_path_t;
 	    }
 	    catch(...)
 	    {
-		if(sauv_path_t != NULL)
-		    delete sauv_path_t;
+		free();
 		throw;
 	    }
-	    if(sauv_path_t != NULL)
-		delete sauv_path_t;
 	}
         catch(...)
         {
@@ -442,80 +460,92 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
-	    entrepot *sauv_path_t = options.get_entrepot().clone();
-	    if(sauv_path_t == NULL)
-		throw Ememory("archive::archive");
-	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
-	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
-	    sauv_path_t->set_location(sauv_path);
+	    cat = NULL;
+	    pool = NULL;
+	    init_pool();
 
 	    try
 	    {
-		sequential_read = false; // updating the archive field
+		entrepot *sauv_path_t = options.get_entrepot().clone();
+		if(sauv_path_t == NULL)
+		    throw Ememory("archive::archive");
+		sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
+		sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
+		sauv_path_t->set_location(sauv_path);
 
-		(void)op_create_in(dialog,
-				   oper_isolate,
-				   path("."),
-				   *sauv_path_t,
-				   ref_arch,
-				   bool_mask(false),
-				   bool_mask(false),
-				   filename,
-				   extension,
-				   options.get_allow_over(),
-				   options.get_warn_over(),
-				   options.get_info_details(),
-				   false, // display treated
-				   false, // display skipped
-				   options.get_pause(),
-				   false,
-				   options.get_compression(),
-				   options.get_compression_level(),
-				   options.get_slice_size(),
-				   options.get_first_slice_size(),
-				   bool_mask(true),
-				   options.get_execute(),
-				   options.get_crypto_algo(),
-				   options.get_crypto_pass(),
-				   options.get_crypto_size(),
-				   bool_mask(false),
-				   0,      // min_compr_size
-				   false,  //nodump
-				   0,      // hourshift
-				   options.get_empty(),
-				   false,  // alter_atime
-				   false,  // furtive_read_mode
-				   false,  //same_fs
-				   inode::cf_all,
-				   false,  // snapshot
-				   false,  // cache_directory_tagging
-				   0,      // fixed_date
-				   options.get_slice_permission(),
-				   0, // repeat count
-				   0, // repeat byte
-				   options.get_sequential_marks(),
-				   false, // security check
-				   0, // sparse file min size (0 = no detection)
-				   options.get_user_comment(),
-				   options.get_hash_algo(),
-				   options.get_slice_min_digits(),
-				   "",                 // backup_hook_file_execute
-				   bool_mask(false),   // backup_hook_file_mask
-				   false,
-				   all_fsa_families(),
-				   NULL);
-		    // we ignore returned value;
-		exploitable = false;
-		stack.terminate();
+		try
+		{
+		    sequential_read = false; // updating the archive field
+
+		    (void)op_create_in(dialog,
+				       oper_isolate,
+				       path("."),
+				       *sauv_path_t,
+				       ref_arch,
+				       bool_mask(false),
+				       bool_mask(false),
+				       filename,
+				       extension,
+				       options.get_allow_over(),
+				       options.get_warn_over(),
+				       options.get_info_details(),
+				       false, // display treated
+				       false, // display skipped
+				       options.get_pause(),
+				       false,
+				       options.get_compression(),
+				       options.get_compression_level(),
+				       options.get_slice_size(),
+				       options.get_first_slice_size(),
+				       bool_mask(true),
+				       options.get_execute(),
+				       options.get_crypto_algo(),
+				       options.get_crypto_pass(),
+				       options.get_crypto_size(),
+				       bool_mask(false),
+				       0,      // min_compr_size
+				       false,  //nodump
+				       0,      // hourshift
+				       options.get_empty(),
+				       false,  // alter_atime
+				       false,  // furtive_read_mode
+				       false,  //same_fs
+				       inode::cf_all,
+				       false,  // snapshot
+				       false,  // cache_directory_tagging
+				       0,      // fixed_date
+				       options.get_slice_permission(),
+				       0, // repeat count
+				       0, // repeat byte
+				       options.get_sequential_marks(),
+				       false, // security check
+				       0, // sparse file min size (0 = no detection)
+				       options.get_user_comment(),
+				       options.get_hash_algo(),
+				       options.get_slice_min_digits(),
+				       "",                 // backup_hook_file_execute
+				       bool_mask(false),   // backup_hook_file_mask
+				       false,
+				       all_fsa_families(),
+				       NULL);
+			// we ignore returned value;
+		    exploitable = false;
+		    stack.terminate();
+		}
+		catch(...)
+		{
+		    if(sauv_path_t != NULL)
+			delete sauv_path_t;
+		    throw;
+		}
+		if(sauv_path_t != NULL)
+		    delete sauv_path_t;
 	    }
 	    catch(...)
 	    {
-		if(sauv_path_t != NULL)
-		    delete sauv_path_t;
+		free();
 		throw;
 	    }
-	    if(sauv_path_t != NULL)
-		delete sauv_path_t;
         }
         catch(...)
         {
@@ -547,180 +577,191 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    if(sauv_path_t == NULL)
-		throw Ememory("archive::archive(merge)");
-	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
-	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
-	    sauv_path_t->set_location(sauv_path);
+	    pool = NULL;
+	    cat = NULL;
+	    init_pool();
 
 	    try
 	    {
-
-		exploitable = false;
-		sequential_read = false; // updating the archive field
-
-		    // sanity checks as much as possible to avoid libdar crashing due to bad arguments
-		    // useless arguments are not reported.
-
-		if(&sauv_path == NULL)
-		    throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"sauv_path\""));
-		if(&filename == NULL)
-		    throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"filename\""));
-		if(&extension == NULL)
-		    throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"extension\""));
-		if(options.get_compression_level() > 9 || options.get_compression_level() < 1)
-		    throw Elibcall("op_create/op_isolate", gettext("Compression_level must be between 1 and 9 included"));
-		if(options.get_slice_size() == 0 && options.get_first_slice_size() != 0)
-		    throw Elibcall("op_create/op_isolate", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
-		if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_none)
-		    throw Elibcall("op_create/op_isolate", gettext("Crypto block size must be greater than 10 bytes"));
-
-		if(ref_arch1 != NULL)
-		    ref_arch1->check_against_isolation(dialog, false);
-		    // this avoid to merge an archive from an isolated catalogue
-		    // there is no way to know whether the corresponding merging of the real archive exists, nor to know the data_name of this
-		    // hypothetical merged archive. Thus we forbid the use of isolated catalogue for merging.
-
-
-		if(ref_arch2 != NULL)
-		    ref_arch2->check_against_isolation(dialog, false);
-		    // same remark as above for ref_arch1
-
-
-		    // end of sanity checks
-
+		if(sauv_path_t == NULL)
+		    throw Ememory("archive::archive(merge)");
+		sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
+		sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
 		sauv_path_t->set_location(sauv_path);
 
-		if(!options.get_empty() && sauv_path_t_local != NULL)
-		    tools_avoid_slice_overwriting_regex(dialog,
-							sauv_path,
-							string("^")+filename+"\\.[0-9]+\\."+extension+"(\\.(md5|sha1))?$",
-							options.get_info_details(),
-							options.get_allow_over(),
-							options.get_warn_over(),
-							options.get_empty());
-
-		if(ref_arch1 == NULL)
-		    if(ref_arch2 == NULL)
-			throw Elibcall("archive::archive[merge]", string(gettext("Both reference archive are NULL, cannot merge archive from nothing")));
-		    else
-			if(ref_arch2->cat == NULL)
-			    throw SRC_BUG; // an archive should always have a catalogue available
-			else
-			    if(ref_arch2->exploitable)
-				ref_cat1 = ref_arch2->cat;
-			    else
-				throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
-		else
-		    if(ref_arch2 == NULL)
-			if(ref_arch1->cat == NULL)
-			    throw SRC_BUG; // an archive should always have a catalogue available
-			else
-			    if(ref_arch1->exploitable)
-				ref_cat1 = ref_arch1->cat;
-			    else
-				throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
-		    else // both catalogues available
-		    {
-			if(!ref_arch1->exploitable || !ref_arch2->exploitable)
-			    throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
-			if(ref_arch1->cat == NULL)
-			    throw SRC_BUG;
-			if(ref_arch2->cat == NULL)
-			    throw SRC_BUG;
-			ref_cat1 = ref_arch1->cat;
-			ref_cat2 = ref_arch2->cat;
-			if(ref_arch1->ver.algo_zip != ref_arch2->ver.algo_zip && char2compression(ref_arch1->ver.algo_zip) != none && char2compression(ref_arch2->ver.algo_zip) != none && options.get_keep_compressed())
-			    throw Efeature(gettext("the \"Keep file compressed\" feature is not possible when merging two archives using different compression algorithms (This is for a future version of dar). You can still merge these two archives but without keeping file compressed (thus you will probably like to use compression (-z or -y options) for the resulting archive"));
-		    }
-
-		if(options.get_keep_compressed())
+		try
 		{
+		    exploitable = false;
+		    sequential_read = false; // updating the archive field
+
+			// sanity checks as much as possible to avoid libdar crashing due to bad arguments
+			// useless arguments are not reported.
+
+		    if(&sauv_path == NULL)
+			throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"sauv_path\""));
+		    if(&filename == NULL)
+			throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"filename\""));
+		    if(&extension == NULL)
+			throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"extension\""));
+		    if(options.get_compression_level() > 9 || options.get_compression_level() < 1)
+			throw Elibcall("op_create/op_isolate", gettext("Compression_level must be between 1 and 9 included"));
+		    if(options.get_slice_size() == 0 && options.get_first_slice_size() != 0)
+			throw Elibcall("op_create/op_isolate", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
+		    if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_none)
+			throw Elibcall("op_create/op_isolate", gettext("Crypto block size must be greater than 10 bytes"));
+
+		    if(ref_arch1 != NULL)
+			ref_arch1->check_against_isolation(dialog, false);
+			// this avoid to merge an archive from an isolated catalogue
+			// there is no way to know whether the corresponding merging of the real archive exists, nor to know the data_name of this
+			// hypothetical merged archive. Thus we forbid the use of isolated catalogue for merging.
+
+
+		    if(ref_arch2 != NULL)
+			ref_arch2->check_against_isolation(dialog, false);
+			// same remark as above for ref_arch1
+
+
+			// end of sanity checks
+
+		    sauv_path_t->set_location(sauv_path);
+
+		    if(!options.get_empty() && sauv_path_t_local != NULL)
+			tools_avoid_slice_overwriting_regex(dialog,
+							    sauv_path,
+							    string("^")+filename+"\\.[0-9]+\\."+extension+"(\\.(md5|sha1))?$",
+							    options.get_info_details(),
+							    options.get_allow_over(),
+							    options.get_warn_over(),
+							    options.get_empty());
+
 		    if(ref_arch1 == NULL)
+			if(ref_arch2 == NULL)
+			    throw Elibcall("archive::archive[merge]", string(gettext("Both reference archive are NULL, cannot merge archive from nothing")));
+			else
+			    if(ref_arch2->cat == NULL)
+				throw SRC_BUG; // an archive should always have a catalogue available
+			    else
+				if(ref_arch2->exploitable)
+				    ref_cat1 = ref_arch2->cat;
+				else
+				    throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+		    else
+			if(ref_arch2 == NULL)
+			    if(ref_arch1->cat == NULL)
+				throw SRC_BUG; // an archive should always have a catalogue available
+			    else
+				if(ref_arch1->exploitable)
+				    ref_cat1 = ref_arch1->cat;
+				else
+				    throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+			else // both catalogues available
+			{
+			    if(!ref_arch1->exploitable || !ref_arch2->exploitable)
+				throw Elibcall("archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+			    if(ref_arch1->cat == NULL)
+				throw SRC_BUG;
+			    if(ref_arch2->cat == NULL)
+				throw SRC_BUG;
+			    ref_cat1 = ref_arch1->cat;
+			    ref_cat2 = ref_arch2->cat;
+			    if(ref_arch1->ver.algo_zip != ref_arch2->ver.algo_zip && char2compression(ref_arch1->ver.algo_zip) != none && char2compression(ref_arch2->ver.algo_zip) != none && options.get_keep_compressed())
+				throw Efeature(gettext("the \"Keep file compressed\" feature is not possible when merging two archives using different compression algorithms (This is for a future version of dar). You can still merge these two archives but without keeping file compressed (thus you will probably like to use compression (-z or -y options) for the resulting archive"));
+			}
+
+		    if(options.get_keep_compressed())
+		    {
+			if(ref_arch1 == NULL)
+			    throw SRC_BUG;
+
+			algo_kept = char2compression(ref_arch1->ver.algo_zip);
+			if(algo_kept == none && ref_cat2 != NULL)
+			{
+			    if(ref_arch2 == NULL)
+				throw SRC_BUG;
+			    else
+				algo_kept = char2compression(ref_arch2->ver.algo_zip);
+			}
+		    }
+		    if(ref_cat1 == NULL)
 			throw SRC_BUG;
 
-		    algo_kept = char2compression(ref_arch1->ver.algo_zip);
-		    if(algo_kept == none && ref_cat2 != NULL)
-		    {
-			if(ref_arch2 == NULL)
-			    throw SRC_BUG;
-			else
-			    algo_kept = char2compression(ref_arch2->ver.algo_zip);
-		    }
+			// then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
+		    op_create_in_sub(dialog,
+				     oper_merge,
+				     path(FAKE_ROOT),
+				     *sauv_path_t,
+				     ref_cat1,
+				     ref_cat2,
+				     false,  // initial_pause
+				     options.get_selection(),
+				     options.get_subtree(),
+				     filename,
+				     extension,
+				     options.get_allow_over(),
+				     options.get_overwriting_rules(),
+				     options.get_warn_over(),
+				     options.get_info_details(),
+				     options.get_display_treated(),
+				     options.get_display_skipped(),
+				     options.get_pause(),
+				     options.get_empty_dir(),
+				     options.get_keep_compressed() ? algo_kept : options.get_compression(),
+				     options.get_compression_level(),
+				     options.get_slice_size(),
+				     options.get_first_slice_size(),
+				     options.get_ea_mask(),
+				     options.get_execute(),
+				     options.get_crypto_algo(),
+				     options.get_crypto_pass(),
+				     options.get_crypto_size(),
+				     options.get_compr_mask(),
+				     options.get_min_compr_size(),
+				     false,   // nodump
+				     0,       // hourshift
+				     options.get_empty(),
+				     true,    // alter_atime
+				     false,   // furtive_read_mode
+				     false,   // same_fs
+				     inode::cf_all,   // what_to_check
+				     false,   // snapshot
+				     false,   // cache_directory_tagging
+				     options.get_keep_compressed(),
+				     0,       // fixed_date
+				     options.get_slice_permission(),
+				     0,  // repeat_count
+				     0,  // repeat_byte
+				     options.get_decremental_mode(),
+				     options.get_sequential_marks(),
+				     false,  // security_check
+				     options.get_sparse_file_min_size(),
+				     options.get_user_comment(),
+				     options.get_hash_algo(),
+				     options.get_slice_min_digits(),
+				     "",      // backup_hook_file_execute
+				     bool_mask(false), //backup_hook_file_mask
+				     false,
+				     options.get_fsa_scope(),
+				     st_ptr);
+		    exploitable = false;
+		    stack.terminate();
 		}
-		if(ref_cat1 == NULL)
-		    throw SRC_BUG;
+		catch(...)
+		{
+		    if(sauv_path_t != NULL)
+			delete sauv_path_t;
+		    throw;
+		}
 
-		    // then we call op_create_in_sub which will call filter_merge operation to build the archive described by the catalogue
-		op_create_in_sub(dialog,
-				 oper_merge,
-				 path(FAKE_ROOT),
-				 *sauv_path_t,
-				 ref_cat1,
-				 ref_cat2,
-				 false,  // initial_pause
-				 options.get_selection(),
-				 options.get_subtree(),
-				 filename,
-				 extension,
-				 options.get_allow_over(),
-				 options.get_overwriting_rules(),
-				 options.get_warn_over(),
-				 options.get_info_details(),
-				 options.get_display_treated(),
-				 options.get_display_skipped(),
-				 options.get_pause(),
-				 options.get_empty_dir(),
-				 options.get_keep_compressed() ? algo_kept : options.get_compression(),
-				 options.get_compression_level(),
-				 options.get_slice_size(),
-				 options.get_first_slice_size(),
-				 options.get_ea_mask(),
-				 options.get_execute(),
-				 options.get_crypto_algo(),
-				 options.get_crypto_pass(),
-				 options.get_crypto_size(),
-				 options.get_compr_mask(),
-				 options.get_min_compr_size(),
-				 false,   // nodump
-				 0,       // hourshift
-				 options.get_empty(),
-				 true,    // alter_atime
-				 false,   // furtive_read_mode
-				 false,   // same_fs
-				 inode::cf_all,   // what_to_check
-				 false,   // snapshot
-				 false,   // cache_directory_tagging
-				 options.get_keep_compressed(),
-				 0,       // fixed_date
-				 options.get_slice_permission(),
-				 0,  // repeat_count
-				 0,  // repeat_byte
-				 options.get_decremental_mode(),
-				 options.get_sequential_marks(),
-				 false,  // security_check
-				 options.get_sparse_file_min_size(),
-				 options.get_user_comment(),
-				 options.get_hash_algo(),
-				 options.get_slice_min_digits(),
-				 "",      // backup_hook_file_execute
-				 bool_mask(false), //backup_hook_file_mask
-				 false,
-				 options.get_fsa_scope(),
-				 st_ptr);
-		exploitable = false;
-		stack.terminate();
+		if(sauv_path_t != NULL)
+		    delete sauv_path_t;
+		sauv_path_t = NULL;
 	    }
 	    catch(...)
 	    {
-		if(sauv_path_t != NULL)
-		    delete sauv_path_t;
+		free();
 		throw;
 	    }
-
-	    if(sauv_path_t != NULL)
-		delete sauv_path_t;
-	    sauv_path_t = NULL;
 	}
 	catch(...)
 	{
@@ -753,10 +794,10 @@ namespace libdar
 		// the isolated catalogue can be used to extract data (since format "08") but only
 		// associated with the real plain archive, not alone.
 
-                // end of sanity checks
+		// end of sanity checks
 
 	    fs_root.explode_undisclosed();
-            enable_natural_destruction();
+	    enable_natural_destruction();
 
 		/// calculating and setting the " recursive_has_changed" fields of directories to their values
 	    if(options.get_empty_dir() == false)
@@ -764,9 +805,10 @@ namespace libdar
 		/// we can now use the directory::get_recursive_has_changed() to avoid recursion in a directory where
 		/// no file has been saved.
 
-            try
-            {
-                filtre_restore(dialog,
+	    try
+	    {
+		filtre_restore(dialog,
+			       pool,
 			       options.get_selection(),
 			       options.get_subtree(),
 			       get_cat(),
@@ -775,9 +817,9 @@ namespace libdar
 			       options.get_info_details(),
 			       options.get_display_treated(),
 			       options.get_display_skipped(),
-                               *st_ptr,
+			       *st_ptr,
 			       options.get_ea_mask(),
-                               options.get_flat(),
+			       options.get_flat(),
 			       options.get_what_to_check(),
 			       options.get_warn_remove_no_match(),
 			       options.get_empty(),
@@ -787,23 +829,23 @@ namespace libdar
 			       options.get_only_deleted(),
 			       options.get_ignore_deleted(),
 			       options.get_fsa_scope());
-            }
-            catch(Euser_abort & e)
-            {
-                disable_natural_destruction();
-                throw;
-            }
+	    }
+	    catch(Euser_abort & e)
+	    {
+		disable_natural_destruction();
+		throw;
+	    }
 	    catch(Ethread_cancel & e)
 	    {
 		disable_natural_destruction();
 		throw;
 	    }
-            catch(Erange &e)
-            {
-                string msg = string(gettext("Error while restoring data: ")) + e.get_message();
-                dialog.warning(msg);
-                throw Edata(msg);
-            }
+	    catch(Erange &e)
+	    {
+		string msg = string(gettext("Error while restoring data: ")) + e.get_message();
+		dialog.warning(msg);
+		throw Edata(msg);
+	    }
         }
         catch(...)
         {
@@ -985,6 +1027,7 @@ namespace libdar
             try
             {
                 filtre_difference(dialog,
+				  pool,
 				  options.get_selection(),
 				  options.get_subtree(),
 				  get_cat(),
@@ -1082,6 +1125,7 @@ namespace libdar
 		    }
 		    else
 			filtre_test(dialog,
+				    pool,
 				    options.get_selection(),
 				    options.get_subtree(),
 				    get_cat(),
@@ -1367,6 +1411,7 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
+
     void archive::drop_all_filedescriptors(user_interaction & dialog)
     {
 	NLS_SWAP_IN;
@@ -1397,6 +1442,24 @@ namespace libdar
 	}
 
 	NLS_SWAP_OUT;
+    }
+
+    string archive::free_and_check_memory() const
+    {
+	string ret = "";
+
+	const_cast<archive *>(this)->free();
+	if(pool != NULL)
+	{
+#ifdef LIBDAR_DEBUG_MEMORY
+	    ret += pool->max_percent_full();
+#endif
+	    pool->garbage_collect();
+	    if(!pool->is_empty())
+		ret += pool->dump();
+	}
+
+	return ret;
     }
 
 	////////////////////
@@ -1725,7 +1788,7 @@ namespace libdar
 		    if(info_details)
 			dialog.warning(gettext("Creating low layer: Writing archive into a black hole object (equivalent to /dev/null)..."));
 
-		    tmp = new (nothrow) null_file(gf_write_only);
+		    tmp = new (pool) null_file(gf_write_only);
 		    // data_name is unchanged because all the archive goes to a black hole.
 		}
 		else
@@ -1735,7 +1798,7 @@ namespace libdar
 			    if(info_details)
 				dialog.warning(gettext("Creating low layer: Writing archive into standard output object..."));
 
-			    trivial_sar *tvs = sar_tools_open_archive_tuyau(dialog, 1, gf_write_only, data_name,
+			    trivial_sar *tvs = sar_tools_open_archive_tuyau(dialog, pool, 1, gf_write_only, data_name,
 									    false, execute); //archive goes to stdout
 			    tmp = tvs;
 			    if(tvs != NULL)
@@ -1746,19 +1809,19 @@ namespace libdar
 			{
 			    if(info_details)
 				dialog.warning(gettext("Creating low layer: Writing archive into a plain file object..."));
-			    trivial_sar *tvs = new (nothrow) trivial_sar(dialog,
-									 filename,
-									 extension,
-									 sauv_path_t, // entrepot !!
-									 data_name,
-									 execute,
-									 allow_over,
-									 warn_over,
-									 force_permission,
-									 permission,
-									 hash,
-									 slice_min_digits,
-									 false);
+			    trivial_sar *tvs = new (pool) trivial_sar(dialog,
+								      filename,
+								      extension,
+								      sauv_path_t, // entrepot !!
+								      data_name,
+								      execute,
+								      allow_over,
+								      warn_over,
+								      force_permission,
+								      permission,
+								      hash,
+								      slice_min_digits,
+								      false);
 			    tmp = tvs;
 			    if(tvs != NULL)
 				data_name = tvs->get_data_name();
@@ -1768,22 +1831,22 @@ namespace libdar
 		    {
 			if(info_details)
 			    dialog.warning(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
-			sar *rsr = new (nothrow) sar(dialog,
-						     filename,
-						     extension,
-						     file_size,
-						     first_file_size,
-						     warn_over,
-						     allow_over,
-						     pause,
-						     sauv_path_t, // entrepot !!
-						     data_name,
-						     force_permission,
-						     permission,
-						     hash,
-						     slice_min_digits,
-						     false,
-						     execute);
+			sar *rsr = new (pool) sar(dialog,
+						  filename,
+						  extension,
+						  file_size,
+						  first_file_size,
+						  warn_over,
+						  allow_over,
+						  pause,
+						  sauv_path_t, // entrepot !!
+						  data_name,
+						  force_permission,
+						  permission,
+						  hash,
+						  slice_min_digits,
+						  false,
+						  execute);
 			tmp = rsr;
 			if(rsr != NULL)
 			    data_name = rsr->get_data_name();
@@ -1864,7 +1927,7 @@ namespace libdar
 		    case crypto_scrambling:
 			if(info_details)
 			    dialog.warning(gettext("Adding a new layer on top: scrambler object..."));
-			tmp = new (nothrow) scrambler(real_pass, *(stack.top()));
+			tmp = new (pool) scrambler(real_pass, *(stack.top()));
 			break;
 		    case crypto_blowfish:
 		    case crypto_aes256:
@@ -1873,12 +1936,12 @@ namespace libdar
 		    case crypto_camellia256:
 			if(info_details)
 			    dialog.warning(gettext("Adding a new layer on top: Strong encryption object..."));
-			tmp = new (nothrow) crypto_sym(crypto_size, real_pass, *(stack.top()), false, macro_tools_supported_version, crypto);
+			tmp = new (pool) crypto_sym(crypto_size, real_pass, *(stack.top()), false, macro_tools_supported_version, crypto);
 			break;
 		    case crypto_none:
 			if(info_details)
 			    dialog.warning(gettext("Adding a new layer on top: Caching layer for better performances..."));
-			tmp = new (nothrow) cache(*(stack.top()), false);
+			tmp = new (pool) cache(*(stack.top()), false);
 			break;
 		    default:
 			throw SRC_BUG; // cryto value should have been checked before
@@ -1909,7 +1972,7 @@ namespace libdar
 		    if(info_details)
 			dialog.warning(gettext("Adding a new layer on top: Escape layer to allow sequential reading..."));
 		    unjump.insert(escape::seqt_catalogue);
-		    tmp = esc = new (nothrow) escape(stack.top(), unjump);
+		    tmp = esc = new (pool) escape(stack.top(), unjump);
 		    if(tmp == NULL)
 			throw Ememory("op_create_in_sub");
 		    else
@@ -1923,7 +1986,7 @@ namespace libdar
 
 		if(info_details && algo != none)
 		    dialog.warning(gettext("Adding a new layer on top: compression..."));
-		tmp = new (nothrow) compressor(empty ? none : algo, *(stack.top()), compression_level);
+		tmp = new (pool) compressor(empty ? none : algo, *(stack.top()), compression_level);
 		if(tmp == NULL)
 		    throw Ememory("op_create_in_sub");
 		else
@@ -1959,20 +2022,20 @@ namespace libdar
 
 		if(op == oper_isolate)
 		    if(add_marks_for_sequential_reading && !empty)
-			cat = new (nothrow) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), ref_cat1->get_data_name(), esc);
+			cat = new (pool) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), ref_cat1->get_data_name(), esc);
 		    else
-			cat = new (nothrow) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), ref_cat1->get_data_name());
+			cat = new (pool) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), ref_cat1->get_data_name());
 		else
 		    if(op == oper_merge)
 			if(add_marks_for_sequential_reading && !empty)
-			    cat = new (nothrow) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), data_name, esc);
+			    cat = new (pool) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), data_name, esc);
 			else
-			    cat = new (nothrow) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), data_name);
+			    cat = new (pool) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), data_name);
 		    else // op == oper_create
 			if(add_marks_for_sequential_reading && !empty)
-			    cat = new (nothrow) escape_catalogue(dialog, root_mtime, data_name, esc);
+			    cat = new (pool) escape_catalogue(dialog, root_mtime, data_name, esc);
 			else
-			    cat = new (nothrow) catalogue(dialog, root_mtime, data_name);
+			    cat = new (pool) catalogue(dialog, root_mtime, data_name);
 
 		if(cat == NULL)
 		    throw Ememory("archive::op_create_in_sub");
@@ -1991,9 +2054,9 @@ namespace libdar
 			{
 			    label data_name;
 			    data_name.clear();
-			    void_cat = new (nothrow) catalogue(dialog,
-							       0,
-							       data_name);
+			    void_cat = new (pool) catalogue(dialog,
+							    0,
+							    data_name);
 			    if(void_cat == NULL)
 				throw Ememory("archive::op_create_in_sub");
 			    ref_cat_ptr = void_cat;
@@ -2004,6 +2067,7 @@ namespace libdar
 			    if(info_details)
 				dialog.warning(gettext("Processing files for backup..."));
 			    filtre_sauvegarde(dialog,
+					      pool,
 					      selection,
 					      subtree,
 					      stack,
@@ -2055,13 +2119,14 @@ namespace libdar
 			if(info_details)
 			    dialog.warning(gettext("Creating an isolated catalogue..."));
 			st_ptr->clear(); // clear st, as filtre_isolate does not use it
-			filtre_isolate(dialog, *cat, *ref_cat1, info_details);
+			filtre_isolate(dialog, pool, *cat, *ref_cat1, info_details);
 			break;
 		    case oper_merge:
 			if(info_details)
 			    dialog.warning(gettext("Processing files for merging..."));
 
 			filtre_merge(dialog,
+				     pool,
 				     selection,
 				     subtree,
 				     stack,
@@ -2248,6 +2313,22 @@ namespace libdar
             delete cat;
 	    cat = NULL;
 	}
+	if(pool != NULL)
+	{
+	    delete pool;
+	    pool = NULL;
+	}
+    }
+
+    void archive::init_pool()
+    {
+	pool = NULL;
+
+#ifdef LIBDAR_SPECIAL_ALLOC
+	pool = new (nothrow) memory_pool();
+	if(pool == NULL)
+	    throw Ememory("archive::archive (read) for memory_pool");
+#endif
     }
 
     void archive::disable_natural_destruction()

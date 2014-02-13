@@ -70,8 +70,6 @@ extern "C"
 #endif
 } // end extern "C"
 
-#include <new>
-
 #include "etage.hpp"
 #include "tools.hpp"
 #include "infinint.hpp"

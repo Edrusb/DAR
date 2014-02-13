@@ -51,9 +51,6 @@ namespace libdar
 	bool skip_relative(S_I x);
 	infinint get_position() { return cur; };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(string_file);
-#endif
     protected:
 	    // inherited from generic_file
 	U_I inherited_read(char *a, U_I size);

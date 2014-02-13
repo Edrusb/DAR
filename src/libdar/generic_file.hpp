@@ -64,6 +64,7 @@ extern "C"
 #include "crc.hpp"
 #include "user_interaction.hpp"
 #include "mem_ui.hpp"
+#include "on_pool.hpp"
 
 #include <string>
 
@@ -97,7 +98,7 @@ namespace libdar
 	/// Thus, it is blocked until all bytes are written or occures an exception
 	/// inconsequences the returned value is always the value of the argument
 	/// "size".
-    class generic_file
+    class generic_file : public on_pool
     {
     public :
 	    /// main constructor

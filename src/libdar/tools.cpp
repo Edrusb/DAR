@@ -119,7 +119,6 @@ extern "C"
 #include <iostream>
 #include <algorithm>
 #include <sstream>
-#include <new>
 
 #include "nls_swap.hpp"
 #include "tools.hpp"
@@ -154,7 +153,7 @@ namespace libdar
     static void runson(user_interaction & dialog, char * const argv[]);
     static void ignore_deadson(S_I sig);
     static void abort_on_deadson(S_I sig);
-    static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension);
+    static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension, memory_pool *pool);
     static string retreive_basename(const string & base, const string & extension);
     static string tools_make_word(generic_file &fic, off_t start, off_t end);
 
@@ -356,7 +355,7 @@ namespace libdar
 	return it;
     }
 
-    void tools_split_path_basename(const char *all, path * &chemin, string & base)
+    void tools_split_path_basename(const char *all, path * &chemin, string & base, memory_pool *pool)
     {
         chemin = NULL;
 	string src = all;
@@ -366,45 +365,50 @@ namespace libdar
 	if(it != src.end()) // path separator found (pointed to by "it")
 	{
 	    base = string(it + 1, src.end());
-	    chemin = new (nothrow) path(string(src.begin(), it), true);
+	    chemin = new (pool) path(string(src.begin(), it), true);
 	}
 	else
 	{
 	    base = src;
-	    chemin = new (nothrow) path(".");
+	    chemin = new (pool) path(".");
 	}
 
 	if(chemin == NULL)
 	    throw Ememory("tools_split_path_basename");
     }
 
-    void tools_split_path_basename(const string & all, string & chemin, string & base)
+    void tools_split_path_basename(const string & all, string & chemin, string & base, memory_pool *pool)
     {
         path *tmp = NULL;
 
-	tools_split_path_basename(all.c_str(), tmp, base);
+	tools_split_path_basename(all.c_str(), tmp, base, pool);
 	if(tmp == NULL)
 	    throw SRC_BUG;
 	chemin = tmp->display();
 	delete tmp;
     }
 
-    void tools_open_pipes(user_interaction & dialog, const string &input, const string & output, tuyau *&in, tuyau *&out)
+    void tools_open_pipes(user_interaction & dialog,
+			  const string &input,
+			  const string & output,
+			  tuyau *&in,
+			  tuyau *&out,
+			  memory_pool *pool)
     {
         in = out = NULL;
         try
         {
             if(input != "")
-                in = new (nothrow) tuyau(dialog, input, gf_read_only);
+                in = new (pool) tuyau(dialog, input, gf_read_only);
             else
-                in = new (nothrow) tuyau(dialog, 0, gf_read_only); // stdin by default
+                in = new (pool) tuyau(dialog, 0, gf_read_only); // stdin by default
             if(in == NULL)
                 throw Ememory("tools_open_pipes");
 
             if(output != "")
-                out = new (nothrow) tuyau(dialog, output, gf_write_only);
+                out = new (pool) tuyau(dialog, output, gf_write_only);
             else
-                out = new (nothrow) tuyau(dialog, 1, gf_write_only); // stdout by default
+                out = new (pool) tuyau(dialog, 1, gf_write_only); // stdout by default
             if(out == NULL)
                 throw Ememory("tools_open_pipes");
 
@@ -832,7 +836,10 @@ namespace libdar
 	delete argv;
     }
 
-    void tools_system_with_pipe(user_interaction & dialog, const string & dar_cmd, const vector<string> & argvpipe)
+    void tools_system_with_pipe(user_interaction & dialog,
+				const string & dar_cmd,
+				const vector<string> & argvpipe,
+				memory_pool *pool)
     {
 	const char *argv[] = { dar_cmd.c_str(), "--pipe-fd", NULL, NULL };
 	bool loop = false;
@@ -843,7 +850,7 @@ namespace libdar
 
 	    try
 	    {
-		tube = new (nothrow) tuyau(dialog);
+		tube = new (pool) tuyau(dialog);
 		if(tube == NULL)
 		    throw Ememory("tools_system_with_pipe");
 
@@ -1101,7 +1108,7 @@ namespace libdar
             return num <= hourshift;
     }
 
-    void tools_check_basename(user_interaction & dialog, const path & loc, string & base, const string & extension)
+    void tools_check_basename(user_interaction & dialog, const path & loc, string & base, const string & extension, memory_pool *pool)
     {
 	NLS_SWAP_IN;
 	try
@@ -1114,7 +1121,7 @@ namespace libdar
 		return; // not a suspect basename
 
 		// is there a slice available ?
-	    if(is_a_slice_available(dialog, old_path, extension))
+	    if(is_a_slice_available(dialog, old_path, extension, pool))
 		return; // yes, thus basename is not a mistake
 
 		// removing the suspicious end (.<number>.extension)
@@ -1122,7 +1129,7 @@ namespace libdar
 
 	    string new_base = retreive_basename(base, extension);
 	    string new_path = (loc+new_base).display();
-	    if(is_a_slice_available(dialog, new_path, extension))
+	    if(is_a_slice_available(dialog, new_path, extension, pool))
 	    {
 		try
 		{
@@ -1387,7 +1394,7 @@ namespace libdar
 #endif
     }
 
-    static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension)
+    static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension, memory_pool *pool)
     {
         path *chem = NULL;
         bool ret = false;
@@ -1396,7 +1403,7 @@ namespace libdar
         {
             string rest;
 
-            tools_split_path_basename(base.c_str(), chem, rest);
+            tools_split_path_basename(base.c_str(), chem, rest, pool);
 
             try
             {
@@ -1527,6 +1534,10 @@ namespace libdar
                         test = va_arg(ap, U_I);
                         output += deci(test).human();
                         break;
+		    case 'x':
+			test = va_arg(ap, U_I);
+			output += tools_string_to_hexa(deci(test).human());
+			break;
                     case 's':
                         output += va_arg(ap, char *);
                         break;

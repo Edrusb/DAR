@@ -30,6 +30,7 @@
 #include <iostream>
 #include "storage.hpp"
 #include "infinint.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -46,7 +47,7 @@ namespace libdar
 	/// the decimal value. In the other side, objects of this class can
 	/// be built from a integer as well as from a string representing
 	/// the decimals of an integer.
-    class deci
+    class deci : public on_pool
     {
     public :
 	    /// constructor to build a "deci" object from a string representing decimals
@@ -75,10 +76,6 @@ namespace libdar
 	    /// this produce a string from the decimal stored in the current object
         std::string human() const;
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(deci);
-#endif
-
     private :
         storage *decimales;
 
@@ -94,7 +91,6 @@ namespace libdar
 	/// do for standard types.
 	/// \ingroup Tools
     extern std::ostream & operator << (std::ostream & ref, const infinint & arg);
-
 
 	/// @}
 

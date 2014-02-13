@@ -29,6 +29,7 @@
 
 #include "../my_config.h"
 #include <vector>
+#include <string>
 
 #include "erreurs.hpp"
 #include "path.hpp"
@@ -39,6 +40,7 @@
 #include "escape_catalogue.hpp"
 #include "pile.hpp"
 #include "list_entry.hpp"
+#include "memory_pool.hpp"
 
 namespace libdar
 {
@@ -303,11 +305,15 @@ namespace libdar
 
 	void drop_all_filedescriptors(user_interaction & dialog);
 
+	    /// check that the internal memory_pool has all its block properly freeed
+	std::string free_and_check_memory() const;
+
     private:
 	enum operation { oper_create, oper_isolate, oper_merge };
 
 	pile stack;              //< the different layer through which the archive contents is read or wrote
 	header_version ver;      //< information for the archive header
+	memory_pool *pool;       //< points to local_pool or inherited pool or to NULL if no memory_pool has to be used
 	catalogue *cat;          //< archive contents
 	infinint local_cat_size; //< size of the catalogue on disk
 	bool exploitable;        //< is false if only the catalogue is available (for reference backup or isolation).
@@ -315,6 +321,7 @@ namespace libdar
 	bool sequential_read;    //< whether the archive is read in sequential mode
 
 	void free();
+	void init_pool();
 
 	const catalogue & get_cat() const { if(cat == NULL) throw SRC_BUG; else return *cat; };
 	const header_version & get_header() const { return ver; };

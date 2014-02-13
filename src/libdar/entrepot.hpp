@@ -42,7 +42,6 @@
 #include "../my_config.h"
 
 #include <string>
-#include <new>
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "user_interaction.hpp"
@@ -50,6 +49,7 @@
 #include "hash_fichier.hpp"
 #include "etage.hpp"
 #include "path.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -58,7 +58,7 @@ namespace libdar
 
 	/// the Entrepot interface
 
-    class entrepot
+    class entrepot : public on_pool
     {
     public:
 	enum io_errors

@@ -44,6 +44,7 @@ extern "C"
 } // end extern "C"
 
 #include "integers.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -69,7 +70,7 @@ namespace libdar
 	/// have libb2 acting exactly as libz does.
 	/// \ingroup Private
 
-    class wrapperlib
+    class wrapperlib : public on_pool
     {
     public:
         wrapperlib(wrapperlib_mode mode);

@@ -67,7 +67,6 @@ char *strchr (), *strrchr ();
 } // end extern "C"
 
 #include <iostream>
-#include <new>
 
 #include "user_interaction.hpp"
 #include "erreurs.hpp"
@@ -443,7 +442,7 @@ namespace libdar
 
     user_interaction * user_interaction_callback::clone() const
     {
-	user_interaction *ret = new (nothrow) user_interaction_callback(*this); // copy constructor
+	user_interaction *ret = new (get_pool()) user_interaction_callback(*this); // copy constructor
 	if(ret == NULL)
 	    throw Ememory("user_interaction_callback::clone");
 	else

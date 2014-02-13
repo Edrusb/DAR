@@ -124,7 +124,7 @@ void f1()
         entree *ref = (entree *)1; // != NULL
         for(S_I i = 0; ref != NULL; ++i)
         {
-            ref = entree::read(*ui, *dump, macro_tools_supported_version, stats, corres, none, dump, dump, false, false, NULL);
+            ref = entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, dump, false, false, NULL);
             if(ref != NULL)
             {
                 ref->dump(*dump2, false);
@@ -152,7 +152,7 @@ void f1()
         dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
         v_dir->dump(*dump, false);
         dump->skip(0);
-        ref = entree::read(*ui, *dump, macro_tools_supported_version, stats, corres, none, dump, dump, false, false, NULL);
+        ref = entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, dump, false, false, NULL);
         v_sub_dir = dynamic_cast<directory *>(ref);
 
         delete ref;

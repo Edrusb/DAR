@@ -68,26 +68,28 @@ namespace libdar
     extern const std::string LIBDAR_STACK_LABEL_UNCYPHERED;
     extern const std::string LIBDAR_STACK_LABEL_LEVEL1;
 
-    extern void macro_tools_open_archive(user_interaction & dialog,
-					 const entrepot &where,  // slices location
-                                         const std::string &basename,  // slice basename
-					 const infinint & min_digits,  // minimum digits for the slice number
-                                         const std::string &extension,  // slice extensions
-					 crypto_algo crypto, // encryption algorithm
-                                         const secu_string &pass, // pass key for crypto/scrambling
-					 U_32 crypto_size,    // crypto block size
-					 pile & stack, // the stack of generic_file resulting of the archive openning
-                                         header_version &ver, // header read from raw data
-                                         const std::string &input_pipe, // named pipe for input when basename is "-" (dar_slave)
-                                         const std::string &output_pipe, // named pipe for output when basename is "-" (dar_slave)
-                                         const std::string & execute, // command to execute between slices
-					 infinint & second_terminateur_offset, // where to start looking for the second terminateur (set to zero if there is only one terminateur).
+    extern void macro_tools_open_archive(user_interaction & dialog,     //< for user interaction
+					 memory_pool *pool,             //< whether memory_pool allocation has to be performed
+					 const entrepot &where,         //< slices location
+                                         const std::string &basename,   //< slice basename
+					 const infinint & min_digits,   //< minimum digits for the slice number
+                                         const std::string &extension,  //< slice extensions
+					 crypto_algo crypto,            //< encryption algorithm
+                                         const secu_string &pass,       //< pass key for crypto/scrambling
+					 U_32 crypto_size,              //< crypto block size
+					 pile & stack,                  //< the stack of generic_file resulting of the archive openning
+                                         header_version &ver,           //< header read from raw data
+                                         const std::string &input_pipe, //< named pipe for input when basename is "-" (dar_slave)
+                                         const std::string &output_pipe,       //< named pipe for output when basename is "-" (dar_slave)
+                                         const std::string & execute,          //< command to execute between slices
+					 infinint & second_terminateur_offset, //< where to start looking for the second terminateur (set to zero if there is only one terminateur).
 					 bool lax,  // whether we skip&warn the usual verifications
 					 bool sequential_read, // whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
 					 bool info_details); // be or not verbose about the archive openning
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 
     extern catalogue *macro_tools_get_derivated_catalogue_from(user_interaction & dialog,
+							       memory_pool *pool,
 							       pile & data_stack,  // where to get the files and EA from
 							       pile & cata_stack,  // where to get the catalogue from
 							       const header_version & ver, // version format as defined in the header of the archive to read
@@ -97,6 +99,7 @@ namespace libdar
 							        bool lax_mode);         // whether to do relaxed checkings
 
     extern catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
+						     memory_pool *pool,
 						     pile & stack,  // raw data access object
 						     const header_version & ver, // version format as defined in the header of the archive to read
                                                      bool info_details, // verbose display (throught user_interaction)
@@ -105,6 +108,7 @@ namespace libdar
 						     bool lax_mode);
 
     extern catalogue *macro_tools_lax_search_catalogue(user_interaction & dialog,
+						       memory_pool *pool,
 						       pile & stack,
 						       const archive_version & edition,
 						       compression compr_algo,

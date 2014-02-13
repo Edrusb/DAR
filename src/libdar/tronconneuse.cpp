@@ -46,8 +46,6 @@ char *strchr (), *strrchr ();
 #endif
 }
 
-#include <new>
-
 #include "tronconneuse.hpp"
 #include "tools.hpp"
 

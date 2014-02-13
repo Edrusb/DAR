@@ -28,6 +28,7 @@
 
 #include "tlv.hpp"
 #include "generic_file.hpp"
+#include "on_pool.hpp"
 
 #include <vector>
 
@@ -37,7 +38,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    class tlv_list
+    class tlv_list : public on_pool
     {
     public:
 	tlv_list() {};                            //< builds an empty list
@@ -51,9 +52,6 @@ namespace libdar
 	void clear() { contents.clear(); };
 	void add(const tlv & next) { contents.push_back(next); };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(tlv_list);
-#endif
     private:
 	std::vector<tlv> contents;
 

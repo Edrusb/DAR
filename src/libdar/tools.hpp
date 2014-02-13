@@ -58,6 +58,7 @@ extern "C"
 #include "tuyau.hpp"
 #include "integers.hpp"
 #include "tlv_list.hpp"
+#include "memory_pool.hpp"
 
 #define TOOLS_SI_SUFFIX 1000
 #define TOOLS_BIN_SUFFIX 1024
@@ -151,16 +152,18 @@ namespace libdar
         /// \param[in] all is the path to split
         /// \param[out] chemin is the resulting path part, it points to a newly allocated path object
         /// \param[out] base is the resulting basename
+	/// \param[in] pool memory pool to use for allocation or NULL for default memory allocation
         /// \note chemin argument must be release by the caller thanks to the "delete" operator.
-    extern void tools_split_path_basename(const char *all, path * &chemin, std::string & base);
+    extern void tools_split_path_basename(const char *all, path * &chemin, std::string & base, memory_pool *pool = NULL);
 
         /// split a given full path in path part and basename part
 
         /// \param[in] all is the path to split
         /// \param[out] chemin is the resulting path part, it points to a newly allocated path object
         /// \param[out] base is the resulting basename
+	/// \param[in] pool memory pool to use for allocation or NULL for default memory allocation
         /// \note chemin argument must be release by the caller thanks to the "delete" operator.
-    extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base);
+    extern void tools_split_path_basename(const std::string &all, std::string & chemin, std::string & base, memory_pool *pool = NULL);
 
         /// open a pair of tuyau objects encapsulating two named pipes.
 
@@ -169,9 +172,14 @@ namespace libdar
         /// \param[in] output path to the output named pipe
         /// \param[out] in resulting tuyau object for input
         /// \param[out] out resulting tuyau object for output
+	/// \param[in] pool memory pool to use for allocation or NULL for default memory allocation
         /// \note in and out parameters must be released by the caller thanks to the "delete" operator
-    extern void tools_open_pipes(user_interaction & dialog, const std::string &input, const std::string & output,
-                                 tuyau *&in, tuyau *&out);
+    extern void tools_open_pipes(user_interaction & dialog,
+				 const std::string &input,
+				 const std::string & output,
+                                 tuyau *&in,
+				 tuyau *&out,
+				 memory_pool *pool = NULL);
 
         /// set blocking/not blocking mode for reading on a file descriptor
 
@@ -255,9 +263,13 @@ namespace libdar
 	/// \param[in,out] dialog for user interaction
 	/// \param[in] dar_cmd the path to the executable to run
 	/// \param[in] argvpipe the list of arguments to pass through anonymous pipe
+	/// \param[in] pool memory pool to use or NULL for default memory allocation
 	/// \note the command to execute must understand the --pipe-fd option that
 	/// gives the filedescriptor to read from the command-line options
-    extern void tools_system_with_pipe(user_interaction & dialog, const std::string & dar_cmd, const std::vector<std::string> & argvpipe);
+    extern void tools_system_with_pipe(user_interaction & dialog,
+				       const std::string & dar_cmd,
+				       const std::vector<std::string> & argvpipe,
+				       memory_pool *pool = NULL);
 
         /// write a list of string to file
 
@@ -366,9 +378,13 @@ namespace libdar
         /// \param[in] loc the path where resides the slice
         /// \param[in,out] base the basename of the slice
         /// \param[in] extension the extension of dar's slices
+	/// \param[in] pool memory pool to use of NULL for default memory allocation
         /// \note if user accepted the change of slice name proposed by libdar through dialog the base argument is changed
     extern void tools_check_basename(user_interaction & dialog,
-                                     const path & loc, std::string & base, const std::string & extension);
+                                     const path & loc,
+				     std::string & base,
+				     const std::string & extension,
+				     memory_pool *pool = NULL);
 
         /// get current working directory
 
@@ -449,7 +465,8 @@ namespace libdar
         /// \param[in] ... list of argument to use against the format string
         /// \return the resulting string
         /// \note the supported masks for the format are:
-        /// - \%s \%c \%d \%\%  (normal behavior)
+        /// - \%s \%c \%d \%\%  (usual behavior)
+	/// - \%x display an integer under hexadecimal notation
         /// - \%i (matches infinint *)
         /// - \%S (matches std::string *)
         /// .

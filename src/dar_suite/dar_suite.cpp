@@ -55,7 +55,6 @@ extern "C"
 #include "libdar.hpp"
 #include "thread_cancellation.hpp"
 #include "memory_check.hpp"
-#include "special_alloc.hpp"
 #include "line_tools.hpp"
 
 #define GENERAL_REPORT(msg) 	if(ui != NULL)\
@@ -257,9 +256,6 @@ int dar_suite_global(int argc,
     {
 	ret = EXIT_UNKNOWN_ERROR;
     }
-#ifdef LIBDAR_SPECIAL_ALLOC
-    special_alloc_garbage_collect(cerr);
-#endif
     memory_check_snapshot();
     return ret;
 }

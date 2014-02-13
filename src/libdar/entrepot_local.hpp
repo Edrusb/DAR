@@ -42,7 +42,6 @@
 #include "../my_config.h"
 
 #include <string>
-#include <new>
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "user_interaction.hpp"
@@ -74,7 +73,7 @@ namespace libdar
 	void read_dir_reset();
 	bool read_dir_next(std::string & filename);
 
-	entrepot *clone() const { return new (std::nothrow) entrepot_local(*this); };
+	entrepot *clone() const { return new (get_pool()) entrepot_local(*this); };
 
     protected:
 	io_errors inherited_open(user_interaction & dialog,

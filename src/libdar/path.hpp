@@ -32,7 +32,7 @@
 #include <list>
 #include <string>
 #include "erreurs.hpp"
-#include "special_alloc.hpp"
+#include "on_pool.hpp"
 
 #define FAKE_ROOT path(string("<ROOT>"), true)
 
@@ -47,7 +47,7 @@ namespace libdar
 	/// by libdar
 	/// \ingroup API
 
-    class path
+    class path : public on_pool
     {
     public :
 	    /// constructor from a string
@@ -154,9 +154,6 @@ namespace libdar
 	    /// \brief if the current object is an undisclosed path, tries to convert it back to normal path
 	void explode_undisclosed() const;
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(path);
-#endif
     private :
         std::list<std::string>::iterator reading;
         std::list<std::string> dirs;

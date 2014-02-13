@@ -56,8 +56,8 @@ extern "C"
 #include <typeinfo>
 #include "integers.hpp"
 #include "erreurs.hpp"
-#include "special_alloc.hpp"
 #include "int_tools.hpp"
+#include "on_pool.hpp"
 
 
 #define ZEROED_SIZE 50
@@ -84,7 +84,7 @@ namespace libdar
 	/// byte of information that this type can handle, and it is also assumed that
 	/// the bytes of information are contiguous.
 
-    template<class B> class limitint
+    template<class B> class limitint : public on_pool
     {
     public :
 
@@ -157,10 +157,6 @@ namespace libdar
         bool operator >= (const limitint &x) const { return field >= x.field; };
 
 	static bool is_system_big_endian();
-
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(limitint);
-#endif
 
         B debug_get_max() const { return max_value; };
         B debug_get_bytesize() const { return bytesize; };

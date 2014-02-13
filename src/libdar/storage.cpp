@@ -47,8 +47,6 @@ char *strchr (), *strrchr ();
 
 } // end of extern "C"
 
-#include <new>
-
 #include "storage.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"
@@ -286,12 +284,13 @@ namespace libdar
             {
                 if(it.offset > 0)
                 {
-                    unsigned char *p = new (nothrow) unsigned char[it.offset];
+		    unsigned char *p = NULL;
+                    meta_new(p, it.offset);
 
                     if(p != NULL)
                     {
 			(void)memcpy(p, it.cell->data, it.offset);
-                        delete [] it.cell->data;
+                        meta_delete(it.cell->data);
 
                         it.cell->data = p;
                         it.cell->size -= can_rem;
@@ -325,13 +324,14 @@ namespace libdar
             }
             else // can_rem >= number
             {
-                unsigned char *p = new (nothrow) unsigned char[it.cell->size - number];
+		unsigned char *p = NULL;
+                meta_new(p, it.cell->size - number);
 
                 if(p != NULL)
                 {
 		    (void)memcpy(p, it.cell->data, it.offset);
 		    (void)memcpy(p + it.offset, it.cell->data + it.offset + number, it.cell->size - it.offset - number);
-                    delete [] it.cell->data;
+                    meta_delete(it.cell->data);
 
                     it.cell->data = p;
                     it.cell->size -= number;
@@ -466,7 +466,8 @@ namespace libdar
 
                 if(somme < failed_alloc)
                 {
-                    unsigned char *p = new (nothrow) unsigned char[somme];
+		    unsigned char *p = NULL;
+                    meta_new(p, somme);
 
                     if(p != NULL)
                     {
@@ -474,7 +475,7 @@ namespace libdar
 
 			(void)memcpy(p, glisseur->data, glisseur->size);
 			(void)memcpy(p + glisseur->size, tmp->data, somme - glisseur->size);
-                        delete [] glisseur->data;
+                        meta_delete(glisseur->data);
 
                         glisseur->data = p;
                         glisseur->size = somme;
@@ -607,11 +608,11 @@ namespace libdar
                 throw SRC_BUG;
             if(c->data != NULL)
 	    {
-                delete [] c->data;
+                meta_delete(c->data);
 		c->data = NULL;
 	    }
             t = c->next;
-            delete c;
+            meta_delete(c);
             c = t;
         }
     }
@@ -628,7 +629,7 @@ namespace libdar
 	{
 	    do
 	    {
-		newone = new (nothrow) struct cellule;
+		meta_new(newone, 1);
 		if(newone != NULL)
 		{
 		    newone->prev = previous;
@@ -647,7 +648,7 @@ namespace libdar
 
 		do
 		{
-		    newone->data = new (nothrow) unsigned char[dsize];
+		    meta_new(newone->data, dsize);
 		    if(newone->data != NULL)
 		    {
 			size -= dsize;

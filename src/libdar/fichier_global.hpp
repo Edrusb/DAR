@@ -97,10 +97,6 @@ namespace libdar
 	    /// would stay in the cache more time than necessary
 	virtual void fsync() const = 0;
 
-
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(fichier_global);
-#endif
     protected :
 	user_interaction & get_ui() { if(x_dialog == NULL) throw SRC_BUG; return *x_dialog; };
 

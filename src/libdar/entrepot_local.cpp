@@ -41,7 +41,6 @@ extern "C"
 #endif
 } // end extern "C"
 
-#include <new>
 #include "entrepot_local.hpp"
 #include "cygwin_adapt.hpp"
 #include "tools.hpp"
@@ -79,7 +78,7 @@ namespace libdar
 	detruit();
 	user_interaction_blind aveugle;
 
-	contents = new (nothrow) etage(aveugle, get_location().display().c_str(), 0, 0, false, furtive_mode);
+	contents = new (get_pool()) etage(aveugle, get_location().display().c_str(), 0, 0, false, furtive_mode);
 	if(contents == NULL)
 	    throw Ememory("entrepot_local::read_dir_reset");
     }
@@ -112,13 +111,13 @@ namespace libdar
 	U_I perm = force_permission ? permission : 0666;
 
 
-	ret = new (nothrow) fichier_local(dialog,
-					  fullname,
-					  mode,
-					  perm,
-					  fail_if_exists,
-					  erase,
-					  false);
+	ret = new (get_pool()) fichier_local(dialog,
+					     fullname,
+					     mode,
+					     perm,
+					     fail_if_exists,
+					     erase,
+					     false);
 	if(ret == NULL)
 	    throw Ememory("entrepot_local::inherited_open");
 	try

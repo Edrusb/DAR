@@ -46,8 +46,6 @@ char *strchr (), *strrchr ();
 #endif
 }
 
-#include <new>
-
 #include "crypto.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"

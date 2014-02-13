@@ -36,6 +36,7 @@
 #include "data_tree.hpp"
 #include "storage.hpp"
 #include "database_options.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -45,7 +46,7 @@ namespace libdar
 	/// use of this class interface. This class also defines internally
 	/// the data structure of the database.
 	/// \ingroup API
-    class database
+    class database : public on_pool
     {
     public:
 	    /// this constructor build an empty database

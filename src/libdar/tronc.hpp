@@ -73,9 +73,6 @@ namespace libdar
 	    /// inherited from generic_file
         infinint get_position() { return current; };
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(tronc);
-#endif
     protected :
 	    /// inherited from generic_file
         U_I inherited_read(char *a, U_I size);

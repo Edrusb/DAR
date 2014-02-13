@@ -82,7 +82,7 @@ static void f1()
         src1.copy_to(c1);
         src2.copy_to(c2);
         src3.copy_to(c3);
-
+/*
             // ajout d'un deuxieme block de donnees indentiques
         c2.flush_write();
         pos2 = c2.get_position();
@@ -104,7 +104,7 @@ static void f1()
         c3.flush_write(); // to be sure all data is written to file
         dst3.skip(pos3 / 2);
         dst3.write("A", 1);
-
+*/
     }
     catch(Egeneric & e)
     {

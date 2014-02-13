@@ -105,8 +105,6 @@ char *strchr (), *strrchr ();
 
 } // end extern "C"
 
-#include <new>
-
 #include "sar.hpp"
 #include "deci.hpp"
 #include "user_interaction.hpp"
@@ -1540,9 +1538,9 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	try
 	{
 	    if(pipename == "-")
-		reference = new (nothrow) tuyau(dialog, 0);
+		reference = new (get_pool()) tuyau(dialog, 0);
 	    else
-		reference = new (nothrow) tuyau(dialog, pipename, gf_read_only);
+		reference = new (get_pool()) tuyau(dialog, pipename, gf_read_only);
 
 	    if(reference == NULL)
 		throw Ememory("trivial_sar::trivial_sar");

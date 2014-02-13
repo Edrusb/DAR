@@ -53,8 +53,6 @@ char *strchr (), *strrchr ();
 
 }
 
-#include <new>
-
 #include "cache.hpp"
 
 using namespace std;
@@ -81,7 +79,7 @@ namespace libdar
 		 U_I max_size_hit_read_ratio,
 		 U_I unused_write_ratio,
 		 U_I observation_write_number,
-		 U_I max_size_hit_write_ratio) : generic_file(hidden.get_mode())
+		 U_I max_size_hit_write_ratio) : generic_file(hidden.get_mode()), buffer_cache(get_pool())
     {
 	    // sanity checks
 	if(&hidden == NULL)
@@ -99,9 +97,7 @@ namespace libdar
 
 	ref = & hidden;
 
-	buffer_cache.buffer = new (nothrow) char[initial_size];
-	if(buffer_cache.buffer == NULL)
-	    throw Ememory("cache::cache");
+	buffer_cache.alloc(initial_size);
 	buffer_cache.size = initial_size;
 	buffer_cache.next = 0;
 	buffer_cache.last = 0;
@@ -394,20 +390,25 @@ namespace libdar
 		    tmp = MAX_BUFFER_SIZE;
 		if(buffer_cache.size < tmp && (max_alloc_size == 0 || tmp < max_alloc_size) )
 		{
-		    delete [] buffer_cache.buffer;
-		    buffer_cache.buffer = new (nothrow) char[tmp];
-		    if(buffer_cache.buffer == NULL)
+		    buffer_cache.release();
+		    try
+		    {
+			buffer_cache.alloc(tmp);
+			buffer_cache.size = tmp;
+		    }
+		    catch(Ememory & e)
 		    {
 			max_alloc_size = buffer_cache.size;
-			buffer_cache.buffer = new (nothrow) char[buffer_cache.size];
-			if(buffer_cache.buffer == NULL)
+			try
+			{
+			    buffer_cache.alloc(buffer_cache.size);
+			}
+			catch(Ememory & e)
 			{
 			    buffer_cache.size = 0;
 			    throw Ememory("cache::flush_write");
 			}
 		    }
-		    else
-			buffer_cache.size = tmp;
 		}
 		    // else nothing is done, as we cannot get a larger buffer
 	    }
@@ -502,35 +503,63 @@ namespace libdar
 
 ///////////////////////////// cache::buf methods /////////////////////////////////
 
-    void cache::buf::resize(U_I newsize)
+    void cache::buf::alloc(size_t size)
     {
-	char *tmp = NULL;
+	if(buffer != NULL)
+	    throw SRC_BUG;
+
+	if(pool != NULL)
+	    buffer = (char *)pool->alloc(size);
+	else
+	    buffer = new (nothrow) char[size];
+
+	if(buffer == NULL)
+	    throw Ememory("cache::buf::alloc");
+    }
+
+    void cache::buf::release()
+    {
+	if(buffer == NULL)
+	    throw SRC_BUG;
+
+	if(pool != NULL)
+	    pool->release(buffer);
+	else
+	    delete [] buffer;
+	buffer = NULL;
+    }
+
+    void cache::buf::resize(size_t newsize)
+    {
+	char *tmp = buffer;
 
 	if(newsize < last)
 	    throw SRC_BUG;
 
-	tmp = new (nothrow) char[newsize];
 	if(tmp == NULL)
-	    throw Ememory("cache::buf::resize");
+	    throw SRC_BUG;
 
+	buffer = NULL; // current buffer is kept alive and referred by tmp
 	try
 	{
-	    (void)memcpy(tmp, buffer, last);
-	    if(buffer == NULL)
-		throw SRC_BUG;
-	    delete[] buffer;
-	    buffer = tmp;
+	    alloc(newsize);
+	    (void)memcpy(buffer, tmp, last);
 	    size = newsize;
 	}
 	catch(...)
 	{
-	    if(tmp != NULL)
-	    {
-		delete [] tmp;
-		tmp = NULL;
-	    }
+		// releasing new buffer and putting back the old one in place
+	    if(buffer != NULL)
+		release();
+	    buffer = tmp;
 	    throw;
 	}
+
+	    // releasing the old buffer
+	if(pool)
+	    pool->release(tmp);
+	else
+	    delete [] tmp;
     }
 
     void cache::buf::shift_by_half()

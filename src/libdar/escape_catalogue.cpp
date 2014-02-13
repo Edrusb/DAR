@@ -21,8 +21,6 @@
 
 #include "../my_config.h"
 
-#include <new>
-
 #include "escape_catalogue.hpp"
 #include "macro_tools.hpp"
 
@@ -411,6 +409,7 @@ namespace libdar
 			try
 			{
 			    ref = entree::read(get_ui(),
+					       get_pool(),
 					       *esc,
 					       x_reading_ver,
 					       ceci->access_stats(),
@@ -531,10 +530,15 @@ namespace libdar
 					ea_comp->flush_read();
 				}
 
-				ceci->cat_det = new (nothrow) catalogue(get_ui(), *x_ea_loc, x_reading_ver, x_default_algo, x_data_loc, x_ea_loc,
-							      x_lax,  // lax
-							      tmp,    // we do not modify the catalogue data_name even in lax mode
-							      only_detruit);  // only_detruit
+				ceci->cat_det = new (get_pool()) catalogue(get_ui(),
+									   *x_ea_loc,
+									   x_reading_ver,
+									   x_default_algo,
+									   x_data_loc,
+									   x_ea_loc,
+									   x_lax,  // lax
+									   tmp,    // we do not modify the catalogue data_name even in lax mode
+									   only_detruit);  // only_detruit
 
 				if(ceci->cat_det == NULL)
 				    throw Ememory("escape_catalogue::read");
@@ -638,7 +642,7 @@ namespace libdar
 	if(ref.cat_det == NULL)
 	    cat_det = NULL;
 	else
-	    cat_det = new (nothrow) catalogue(*ref.cat_det);
+	    cat_det = new (get_pool()) catalogue(*ref.cat_det);
 	if(cat_det == NULL)
 	    throw Ememory("escape_catalogue::copy_from");
 	min_read_offset = ref.min_read_offset;

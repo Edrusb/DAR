@@ -49,8 +49,6 @@ extern "C"
 #endif
 } // end extern "C"
 
-#include <new>
-
 #include "header.hpp"
 #include "tlv_list.hpp"
 #include "tools.hpp"
@@ -122,7 +120,7 @@ namespace libdar
         case extension_none:
 	    if(f_fic != NULL)
 	    {
-		slice_size = new (nothrow) infinint(f_fic->get_size());
+		slice_size = new (get_pool()) infinint(f_fic->get_size());
 		if(slice_size == NULL)
 		{
 		    if(!lax)
@@ -130,7 +128,7 @@ namespace libdar
 		    else
 		    {
 			ui.warning(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
-			slice_size = new (nothrow) infinint(0);
+			slice_size = new (get_pool()) infinint(0);
 			if(slice_size == NULL)
 			    throw Ememory("header::read");
 		    }
@@ -144,7 +142,7 @@ namespace libdar
 	    old_header = true;
             break;
         case extension_size:
-	    slice_size = new (nothrow) infinint(f);
+	    slice_size = new (get_pool()) infinint(f);
 	    if(slice_size == NULL)
 	    {
 		if(!lax)
@@ -152,14 +150,14 @@ namespace libdar
 		else
 		{
 		    ui.warning(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
-		    slice_size = new (nothrow) infinint(0);
+		    slice_size = new (get_pool()) infinint(0);
 		    if(slice_size == NULL)
 			throw Ememory("header::read");
 		}
 	    }
 	    if(f_fic != NULL)
 	    {
-		first_size = new (nothrow) infinint(f_fic->get_size());
+		first_size = new (get_pool()) infinint(f_fic->get_size());
 		if(first_size == NULL)
 		{
 		    if(!lax)
@@ -167,7 +165,7 @@ namespace libdar
 		    else
 		    {
 			ui.warning(gettext("LAX MODE: first slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
-			first_size = new (nothrow) infinint(0);
+			first_size = new (get_pool()) infinint(0);
 			if(first_size == NULL)
 			    throw Ememory("header::read");
 		    }
@@ -189,7 +187,7 @@ namespace libdar
 	    fill_from(ui, tempo); // from the TLV list, set the different fields of the current header object
 	    if(slice_size == NULL && f_fic != NULL)
 	    {
-		slice_size = new (nothrow) infinint(f_fic->get_size());
+		slice_size = new (get_pool()) infinint(f_fic->get_size());
 		if(slice_size == NULL)
 		    throw Ememory("header::read");
 	    }
@@ -200,7 +198,7 @@ namespace libdar
 	    else
 	    {
 		ui.warning(gettext("LAX MODE: Unknown data in slice header, ignoring and continuing"));
-		slice_size = new (nothrow) infinint(0);
+		slice_size = new (get_pool()) infinint(0);
 		if(slice_size == NULL)
 		    throw Ememory("header::read");
 	    }
@@ -254,7 +252,7 @@ namespace libdar
     {
 	if(first_size == NULL)
 	{
-	    first_size = new (nothrow) infinint();
+	    first_size = new (get_pool()) infinint();
 	    if(first_size == NULL)
 		throw Ememory("header::set_first_file_size");
 	}
@@ -276,7 +274,7 @@ namespace libdar
     {
 	if(slice_size == NULL)
 	{
-	    slice_size = new (nothrow) infinint();
+	    slice_size = new (get_pool()) infinint();
 	    if(slice_size == NULL)
 		throw Ememory("header::set_slice_size");
 	}
@@ -298,7 +296,7 @@ namespace libdar
 	{
 	    if(ref.first_size != NULL)
 	    {
-		first_size = new (nothrow) infinint();
+		first_size = new (get_pool()) infinint();
 		if(first_size == NULL)
 		    throw Ememory("header::copy_from");
 		*first_size = *ref.first_size;
@@ -306,7 +304,7 @@ namespace libdar
 
 	    if(ref.slice_size != NULL)
 	    {
-		slice_size = new (nothrow) infinint();
+		slice_size = new (get_pool()) infinint();
 		if(slice_size == NULL)
 		    throw Ememory("header::copy_from");
 		*slice_size = *ref.slice_size;
@@ -348,13 +346,13 @@ namespace libdar
 	    switch(extension[index].get_type())
 	    {
 	    case tlv_first_size:
-		first_size = new (nothrow) infinint();
+		first_size = new (get_pool()) infinint();
 		if(first_size == NULL)
 		    throw Ememory("header::fill_from");
 		first_size->read(tmp);
 		break;
 	    case tlv_size:
-		slice_size = new (nothrow) infinint();
+		slice_size = new (get_pool()) infinint();
 		if(slice_size == NULL)
 		    throw Ememory("header::fill_from");
 		slice_size->read(tmp);

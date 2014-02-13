@@ -28,8 +28,6 @@ extern "C"
 #endif
 }
 
-#include <new>
-
 #include "tlv.hpp"
 
 using namespace std;
@@ -69,7 +67,7 @@ namespace libdar
 	    delete value;
 	    value = NULL;
 	}
-	value = new (nothrow) storage(contents.get_raw_data());
+	value = new (get_pool()) storage(contents.get_raw_data());
 	if(value == NULL)
 	    throw Ememory("tlv::set_contents");
     }
@@ -91,7 +89,7 @@ namespace libdar
 	length.read(f);
 	if(length > 0)
 	{
-	    value = new (nothrow) storage(f, length);
+	    value = new (get_pool()) storage(f, length);
 	    if(value == NULL)
 		throw Ememory("tlv::init");
 	}
@@ -104,7 +102,7 @@ namespace libdar
 	type = ref.type;
 	if(ref.value != NULL)
 	{
-	    value = new (nothrow) storage(*(ref.value));
+	    value = new (get_pool()) storage(*(ref.value));
 	    if(value == NULL)
 		throw Ememory("tlv::copy_from");
 	}

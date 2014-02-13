@@ -31,6 +31,7 @@
 #include <list>
 #include <string>
 #include "infinint.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -42,7 +43,7 @@ namespace libdar
 	/// contains the contents of a directory, and can then be stored beside
 	/// other etage structures corresponding to subdirectories
 	/// \ingroup Private
-    struct etage
+    struct etage : public on_pool
     {
 	etage() { fichier.clear(); last_mod = 0; last_acc = 0; }; // required to fake an empty dir when one is impossible to open
         etage(user_interaction & ui,
@@ -57,10 +58,6 @@ namespace libdar
         std::list<std::string> fichier; //< holds the list of entry in the directory
         infinint last_mod;              //< the last_lod of the directory itself
 	infinint last_acc;              //< the last_acc of the directory itself
-
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(etage);
-#endif
     };
 
 } // end of namespace

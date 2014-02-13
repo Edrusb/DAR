@@ -59,7 +59,7 @@ namespace libdar
 	      U_I unused_write_ratio = 10,        //< same as unused_read_ratio but for writing operations
 	      U_I observation_write_number = 100, //< same as observation_read_number but for writing operations
 	      U_I max_size_hit_write_ratio = 50); //< same as max_size_hit_read_ratio but for writing operations
-	cache(const cache & ref) : generic_file(gf_read_only) { throw SRC_BUG; };
+	cache(const cache & ref) : generic_file(gf_read_only), buffer_cache(ref.get_pool()) { throw SRC_BUG; };
 	const cache & operator = (const cache & ref) { throw SRC_BUG; };
 
 	~cache();
@@ -84,11 +84,14 @@ namespace libdar
 	    U_I size; // allocated size
 	    U_I next; // next to read or next place to write to
 	    U_I last; // first to not read in the cache
+	    memory_pool *pool; // memory_pool to use or NULL to use default allocation
 
-	    buf() { buffer = NULL; size = next = last = 0; };
+	    buf(memory_pool *p) { pool = p; buffer = NULL; size = next = last = 0; };
 	    buf(const buf &ref) { throw SRC_BUG; };
-	    ~buf() { if(buffer != NULL) delete [] buffer; };
-	    void resize(U_I newsize);
+	    ~buf() { if(buffer != NULL) release(); };
+	    void alloc(size_t size);
+	    void release();
+	    void resize(size_t newsize);
 	    void shift_by_half();
 	    void clear() { next = last = 0; };
 	};

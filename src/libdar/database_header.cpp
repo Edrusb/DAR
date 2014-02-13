@@ -75,7 +75,7 @@ namespace libdar
 	void write(generic_file & f) { f.write((char *)&version, 1); f.write((char *)&options, 1); };
     };
 
-    generic_file *database_header_create(user_interaction & dialog, const string & filename, bool overwrite)
+    generic_file *database_header_create(user_interaction & dialog, memory_pool *pool, const string & filename, bool overwrite)
     {
 	generic_file *ret = NULL;
 
@@ -85,7 +85,7 @@ namespace libdar
 
 	if(stat(filename.c_str(), &buf) >= 0 && !overwrite)
 	    throw Erange("database_header_create", gettext("Cannot create database, file exists"));
-	ret = new (nothrow) fichier_local(dialog, filename, gf_write_only, 0666, true, true, false);
+	ret = new (pool) fichier_local(dialog, filename, gf_write_only, 0666, true, true, false);
 	if(ret == NULL)
 	    throw Ememory("database_header_create");
 
@@ -95,7 +95,7 @@ namespace libdar
 	    h.options = HEADER_OPTION_NONE;
 	    h.write(*ret);
 
-	    comp = new (nothrow) compressor(gzip, ret); // upon success, ret is owned by compr
+	    comp = new (pool) compressor(gzip, ret); // upon success, ret is owned by compr
 	    if(comp == NULL)
 		throw Ememory("database_header_create");
 	    else
@@ -110,7 +110,7 @@ namespace libdar
 	return ret;
     }
 
-    generic_file *database_header_open(user_interaction & dialog, const string & filename, unsigned char & db_version)
+    generic_file *database_header_open(user_interaction & dialog, memory_pool *pool, const string & filename, unsigned char & db_version)
     {
 	generic_file *ret = NULL;
 
@@ -121,7 +121,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new (nothrow) fichier_local(filename, false);
+		ret = new (pool) fichier_local(filename, false);
 	    }
 	    catch(Erange & e)
 	    {
@@ -137,7 +137,7 @@ namespace libdar
 	    if(h.options != HEADER_OPTION_NONE)
 		throw Erange("database_header_open", gettext("Unknown header option in database, aborting\n"));
 
-	    comp = new (nothrow) compressor(gzip, ret);
+	    comp = new (pool) compressor(gzip, ret);
 	    if(comp == NULL)
 		throw Ememory("database_header_open");
 	    else

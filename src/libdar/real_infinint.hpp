@@ -39,11 +39,11 @@ extern "C"
 } // end extern "C"
 
 #include <typeinfo>
-#include <new>
 
 #include "storage.hpp"
 #include "integers.hpp"
 #include "int_tools.hpp"
+#include "on_pool.hpp"
 
 #define ZEROED_SIZE 50
 
@@ -56,7 +56,7 @@ namespace libdar
 
 	/// can only handle positive integer numbers
 	/// \ingroup Private
-    class infinint
+    class infinint : public on_pool
     {
     public :
 
@@ -141,9 +141,6 @@ namespace libdar
 
 	static bool is_system_big_endian();
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(infinint);
-#endif
     private :
         static const int TG = 4;
 

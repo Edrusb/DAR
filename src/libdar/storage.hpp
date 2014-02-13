@@ -26,7 +26,7 @@
 #include "../my_config.h"
 #include "erreurs.hpp"
 #include "integers.hpp"
-#include "special_alloc.hpp"
+#include "on_pool.hpp"
 
 #ifdef LIBDAR_MODE
 #include "infinint.hpp"
@@ -54,7 +54,7 @@ namespace libdar
 	/// used to store infinint
 	/// \ingroup Private
 
-    class storage
+    class storage : public on_pool
     {
     private:
         struct cellule
@@ -96,7 +96,7 @@ namespace libdar
         void clear(unsigned char val = 0);
         void dump(generic_file & f) const;
 
-        class iterator
+        class iterator : public on_pool
         {
         public :
             iterator() : ref(NULL), cell(NULL), offset(0) {};
@@ -182,9 +182,6 @@ namespace libdar
         void remove_bytes_at_iterator(iterator it, U_I number);
         void remove_bytes_at_iterator(iterator it, infinint number);
 
-#ifdef LIBDAR_SPECIAL_ALLOC
-        USE_SPECIAL_ALLOC(storage);
-#endif
     private:
         struct cellule *first, *last;
 
@@ -196,12 +193,12 @@ namespace libdar
                       struct cellule *&res_first, struct cellule * & res_last);
 
             ///////////////////////////////
-            // STATIC statments :
-            //
+            // these were STATIC statments, but now object methods
+            // because they rely on on_pool templates that require object field
 
-        static void detruit(struct cellule *c);
-        static void make_alloc(U_32 size, struct cellule * & begin, struct cellule * & end);
-        static void make_alloc(infinint size, cellule * & begin, struct cellule * & end);
+        void detruit(struct cellule *c);
+        void make_alloc(U_32 size, struct cellule * & begin, struct cellule * & end);
+        void make_alloc(infinint size, cellule * & begin, struct cellule * & end);
 
         friend class storage::iterator;
     };

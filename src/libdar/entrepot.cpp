@@ -41,7 +41,6 @@ extern "C"
 #endif
 } // end extern "C"
 
-#include <new>
 #include "entrepot.hpp"
 #include "cygwin_adapt.hpp"
 #include "tools.hpp"
@@ -132,11 +131,11 @@ namespace libdar
 				if(hash_file == NULL)
 				    throw SRC_BUG;
 
-				ret = new (nothrow) hash_fichier(dialog,
-								 data,
-								 filename,
-								 hash_file,
-								 algo);
+				ret = new (get_pool()) hash_fichier(dialog,
+								    data,
+								    filename,
+								    hash_file,
+								    algo);
 				if(ret == NULL)
 				    throw Ememory("entrepot::entrepot");
 				else

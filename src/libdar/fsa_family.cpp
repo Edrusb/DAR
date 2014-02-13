@@ -26,8 +26,6 @@ extern "C"
 
 }
 
-#include <new>
-
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "fsa_family.hpp"
