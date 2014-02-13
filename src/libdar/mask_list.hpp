@@ -77,7 +77,7 @@ namespace libdar
 	class my_char
 	{
 	public:
-	    my_char() { val = 0; };
+	    my_char() = default;
 	    my_char(const char x) : val(x) {};
 	    bool operator < (const my_char & x) const
 	    {
