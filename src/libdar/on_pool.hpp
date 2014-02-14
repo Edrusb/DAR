@@ -57,7 +57,19 @@ namespace libdar
 	    /// the get_pool() method can return the pool used for allocation, else it returns NULL.
 	    /// The consequence is that objects dynamically created within an array (new []) cannot know
 	    /// the whether they have been allocated using a memory pool or not
-	on_pool() { dynamic = (alloc_not_constructed == this); alloc_not_constructed = NULL; };
+	on_pool() { dynamic_init(); };
+
+	    /// copy constructor
+	    ///
+	    /// \note the default copy constructor is not adequate as it would copy the value of dynamic
+	    /// of the source object whatever is the way the new object is created (dynamically allocated or not)
+	on_pool(const on_pool & ref) { dynamic_init(); };
+
+	    /// the assignment operator
+	    ///
+	    /// \note the assignement operator must not modify the field "dynamic" so we must not use
+	    /// the default operator
+	const on_pool & operator = (const on_pool & ref) { return *this; };
 
 	    /// virtual destructor as this class will have inherited classes
 	virtual ~on_pool() {};
@@ -163,6 +175,8 @@ namespace libdar
 	    // created as local or temporary variable (on the stack).
 	bool dynamic;
 
+	    /// used from constructors to setup field "dynamic"
+	void dynamic_init() const { const_cast<on_pool *>(this)->dynamic = (alloc_not_constructed == this); alloc_not_constructed = NULL; };
 
 	    /// does the whole magic of memory allocation with and without memory_pool
 	    ///
