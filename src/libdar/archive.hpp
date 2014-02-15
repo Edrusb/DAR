@@ -40,7 +40,7 @@
 #include "escape_catalogue.hpp"
 #include "pile.hpp"
 #include "list_entry.hpp"
-#include "memory_pool.hpp"
+#include "on_pool.hpp"
 
 namespace libdar
 {
@@ -51,7 +51,7 @@ namespace libdar
 	/// are the same abstraction level as the operation realized by the DAR
 	/// command line tool.
 	/// \ingroup API
-    class archive
+    class archive : public on_pool
     {
     public:
 

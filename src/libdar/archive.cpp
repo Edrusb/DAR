@@ -2315,8 +2315,17 @@ namespace libdar
 	}
 	if(pool != NULL)
 	{
-	    delete pool;
-	    pool = NULL;
+	    if(get_pool() == NULL)
+	    {
+		delete pool;
+		pool = NULL;
+	    }
+	    else
+	    {
+		if(pool != get_pool())
+		    throw SRC_BUG;
+		pool = NULL;
+	    }
 	}
     }
 
@@ -2325,9 +2334,14 @@ namespace libdar
 	pool = NULL;
 
 #ifdef LIBDAR_SPECIAL_ALLOC
-	pool = new (nothrow) memory_pool();
-	if(pool == NULL)
-	    throw Ememory("archive::archive (read) for memory_pool");
+	if(get_pool() == NULL)
+	{
+	    pool = new (nothrow) memory_pool();
+	    if(pool == NULL)
+		throw Ememory("archive::archive (read) for memory_pool");
+	}
+	else
+	    pool = get_pool();
 #endif
     }
 
