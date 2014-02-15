@@ -112,6 +112,7 @@ namespace libdar
             // these are eventually overwritten below
         wrapperlib_mode wr_mode = zlib_mode;
         current_algo = algo;
+	suspended = false;
 	current_level = compression_level;
 
         if(compressed_side == NULL)

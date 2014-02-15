@@ -77,6 +77,9 @@ namespace libdar
 
         compression get_algo() const { return current_algo; };
 
+	void suspend_compression() { if(!suspended) { suspended_compr = current_algo; change_algo(none); suspended = true; } };
+	void resume_compression() { if(suspended) { change_algo(suspended_compr); suspended = false; } };
+
 	    /// changes compression algorithm used by the compressor
 
 	    /// \param[in] new_algo defines the new algorithm to use
@@ -140,6 +143,8 @@ namespace libdar
         generic_file *compressed;
         bool compressed_owner;
         compression current_algo;
+	bool suspended;
+	compression suspended_compr;
 	U_I current_level;
 
         void init(compression algo, generic_file *compressed_side, U_I compression_level);
