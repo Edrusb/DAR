@@ -60,7 +60,6 @@ namespace libdar
 			   compressor *stock,        //< where to write to
 			   bool info_details,        //< verbose output to user
 			   bool display_treated,     //< add an information line before treating a file
-			   compression compr_used,   //< compression to use to write data
 			   bool alter_atime,         //< whether to set back atime of filesystem
 			   bool check_change,        //< whether to check file change during backup
 			   bool compute_crc,         //< whether to recompute the CRC
@@ -77,8 +76,7 @@ namespace libdar
 			inode * & ino,
 			compressor *stock,
 			const inode * ref,
-			bool display_treated,
-			compression compr_used);
+			bool display_treated);
 
     static void restore_atime(const string & chemin, const inode * & ptr);
 
@@ -768,7 +766,6 @@ namespace libdar
 						       stockage,
 						       info_details,
 						       display_treated,
-						       stock_algo,
 						       alter_atime,
 						       true,   // check_change
 						       true,   // compute_crc
@@ -793,7 +790,7 @@ namespace libdar
 					{
 					    if(e_ino->ea_get_saved_status() == inode::ea_full)
 						cat.pre_add_ea(e, stockage);
-					    if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, display_treated, stock_algo))
+					    if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, display_treated))
 						st.incr_ea_treated();
 					    cat.pre_add_ea_crc(e, stockage);
 					}
@@ -965,7 +962,7 @@ namespace libdar
 	    catch(Ethread_cancel & e)
 	    {
 		if(!e.immediate_cancel())
-		    stockage->change_algo(stock_algo);
+		    stockage->resume_compression();
 		throw Ethread_cancel_with_attr(e.immediate_cancel(), e.get_flag(), fs.get_last_etoile_ref());
 	    }
 	}
@@ -976,7 +973,7 @@ namespace libdar
 	    throw;
 	}
 
-        stockage->change_algo(stock_algo);
+	stockage->resume_compression();
     }
 
     void filtre_difference(user_interaction & dialog,
@@ -2447,7 +2444,6 @@ namespace libdar
 				   stockage,
 				   info_details,
 				   display_treated,
-				   stock_algo,
 				   true,       // alter_atime
 				   false,      // check_change
 				   compute_file_crc,
@@ -2473,7 +2469,7 @@ namespace libdar
 		    if(e_ino->ea_get_saved_status() == inode::ea_full)
 		    {
 			cat.pre_add_ea(e, stockage);
-			if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, display_treated, stock_algo))
+			if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, display_treated))
 			{
 			    if(e_ino->fsa_get_saved_status() != inode::fsa_full)
 				e_ino->change_efsa_location(stockage);
@@ -2508,12 +2504,12 @@ namespace libdar
 	catch(Ethread_cancel & e)
 	{
 	    cat.tail_catalogue_to_current_read();
-	    stockage->change_algo(stock_algo);
+	    stockage->resume_compression();
 	    thr_cancel.block_delayed_cancellation(false);
 	    throw;
 	}
 
-	stockage->change_algo(stock_algo);
+	stockage->resume_compression();
 	thr_cancel.block_delayed_cancellation(false);
 
 	if(abort)
@@ -2594,7 +2590,6 @@ namespace libdar
 			   compressor *stock,
 			   bool info_details,
 			   bool display_treated,
-			   compression compr_used,
 			   bool alter_atime,
 			   bool check_change,
 			   bool compute_crc,
@@ -2614,8 +2609,7 @@ namespace libdar
 	    return true;
 	if(stock == NULL)
             throw SRC_BUG;
-        if(ino->get_saved_status() != s_saved)
-	{
+        if(ino->get_saved_status() != s_saved)	{
 	    if(sem != NULL)
 		sem->raise(info_quoi, ino, false);
             return ret;
@@ -2688,9 +2682,9 @@ namespace libdar
 			    source->skip(0);
 
 			    if(keep_mode == file::keep_compressed)
-				stock->change_algo(none);
+				stock->suspend_compression();
 			    else
-				stock->change_algo(fic->get_compression_algo_write());
+				stock->resume_compression();
 
 			    try
 			    {
@@ -2903,8 +2897,7 @@ namespace libdar
 			inode * & ino,
 			compressor *stock,
 			const inode * ref,
-			bool display_treated,
-			compression compr_used)
+			bool display_treated)
     {
         bool ret = false;
         try
@@ -2921,7 +2914,7 @@ namespace libdar
 			if(display_treated)
 			    dialog.warning(string(gettext("Saving Extended Attributes for ")) + info_quoi);
 			ino->ea_set_offset(stock->get_position());
-			stock->change_algo(compr_used); // always compress EA (no size or filename consideration)
+			stock->resume_compression();  // always compress EA (no size or filename consideration)
 			stock->reset_crc(tools_file_size_to_crc_size(ino->ea_get_size())); // start computing CRC for any read/write on stock
 			try
 			{

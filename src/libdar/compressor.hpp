@@ -80,21 +80,6 @@ namespace libdar
 	void suspend_compression() { if(!suspended) { suspended_compr = current_algo; change_algo(none); suspended = true; } };
 	void resume_compression() { if(suspended) { change_algo(suspended_compr); suspended = false; } };
 
-	    /// changes compression algorithm used by the compressor
-
-	    /// \param[in] new_algo defines the new algorithm to use
-	    /// \param[in] new_compression_level defines the new compression level to use.
-            /// \note valid value for new_compression_level range from 0 (no compression) to
-	    /// 9 (maximum compression).
-        void change_algo(compression new_algo, U_I new_compression_level);
-
-
-	    /// changes the compression algorithm keeping the same compression level
-
-        void change_algo(compression new_algo)
-	{
-	    change_algo(new_algo, current_level);
-	};
 
             // inherited from generic file
         bool skip(const infinint & pos) { flush_write(); flush_read(); clean_read(); return compressed->skip(pos); };
@@ -165,6 +150,21 @@ namespace libdar
 
 	void lzo_compress_buffer_and_write();
 	void lzo_read_and_uncompress_to_buffer();
+
+	    /// changes compression algorithm used by the compressor
+
+	    /// \param[in] new_algo defines the new algorithm to use
+	    /// \param[in] new_compression_level defines the new compression level to use.
+            /// \note valid value for new_compression_level range from 0 (no compression) to
+	    /// 9 (maximum compression).
+        void change_algo(compression new_algo, U_I new_compression_level);
+
+
+	    /// changes the compression algorithm keeping the same compression level
+
+        void change_algo(compression new_algo)
+	{ change_algo(new_algo, current_level);	};
+
     };
 
 	/// @}
