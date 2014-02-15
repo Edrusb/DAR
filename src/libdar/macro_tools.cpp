@@ -94,7 +94,7 @@ namespace libdar
     {
         terminateur term;
         catalogue *ret = NULL;
-	generic_file *ea_loc = data_stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED);
+	compressor *efsa_loc = dynamic_cast<compressor *>(data_stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED));
 	generic_file *data_loc = data_stack.get_by_label(LIBDAR_STACK_LABEL_CLEAR);
 	generic_file *crypto = cata_stack.get_by_label(LIBDAR_STACK_LABEL_UNCYPHERED);
 	contextual *data_ctxt = NULL;
@@ -106,6 +106,9 @@ namespace libdar
 
 	cata_stack.find_first_from_top(cata_ctxt);
 	if(cata_ctxt == NULL)
+	    throw SRC_BUG;
+
+	if(efsa_loc == NULL)
 	    throw SRC_BUG;
 
         if(info_details)
@@ -133,7 +136,7 @@ namespace libdar
 		label tmp;
 
 		tmp.clear(); // we do not want here to change the catalogue internal data name read from archive
-                ret = new (pool) catalogue(dialog, cata_stack, ver.edition, char2compression(ver.algo_zip), data_loc, ea_loc, lax_mode, tmp);
+                ret = new (pool) catalogue(dialog, cata_stack, ver.edition, char2compression(ver.algo_zip), data_loc, efsa_loc, lax_mode, tmp);
 		data_ctxt->set_info_status(CONTEXT_OP);
 		cata_ctxt->set_info_status(CONTEXT_OP);
             }
@@ -537,9 +540,11 @@ namespace libdar
 	infinint fraction = 101;
 	escape *esc = NULL;
 	compressor *zip = NULL;
-	generic_file *ea_loc = stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED);
+	compressor *efsa_loc = dynamic_cast<compressor *>(stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED));
 	generic_file *data_loc = stack.get_by_label(LIBDAR_STACK_LABEL_CLEAR);
 
+	if(efsa_loc == NULL)
+	    throw SRC_BUG;
 
 	    // obtaining from the user the fraction of the archive to inspect
 
@@ -642,7 +647,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new (pool) catalogue(dialog, *zip, edition, compr_algo, data_loc, ea_loc, even_partial_catalogue, layer1_data_name);
+		ret = new (pool) catalogue(dialog, *zip, edition, compr_algo, data_loc, efsa_loc, even_partial_catalogue, layer1_data_name);
 		if(ret == NULL)
 		    throw Ememory("macro_tools_lax_search_catalogue");
 		stats = ret->get_stats();

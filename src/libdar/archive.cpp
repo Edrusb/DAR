@@ -108,7 +108,8 @@ namespace libdar
 					     options.get_crypto_algo(),
 					     options.get_crypto_pass(),
 					     options.get_crypto_size(),
-					     stack, ver,
+					     stack,
+					     ver,
 					     options.get_input_pipe(),
 					     options.get_output_pipe(),
 					     options.get_execute(),
@@ -240,8 +241,11 @@ namespace libdar
 			    {
 				if(esc != NULL)
 				{
-				    generic_file *ea_loc = stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED);
+				    compressor *efsa_loc = dynamic_cast<compressor *>(stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED));
 				    generic_file *data_loc = stack.get_by_label(LIBDAR_STACK_LABEL_CLEAR);
+
+				    if(efsa_loc == NULL)
+					throw SRC_BUG;
 
 				    if(info_details)
 					dialog.warning(gettext("Creating catalogue object to be filled with archive sequential read..."));
@@ -249,7 +253,7 @@ namespace libdar
 								      ver.edition,
 								      char2compression(ver.algo_zip),
 								      data_loc,
-								      ea_loc,
+								      efsa_loc,
 								      esc,
 								      options.get_lax());
 				    if(cat == NULL)

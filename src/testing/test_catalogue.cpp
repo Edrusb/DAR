@@ -93,6 +93,7 @@ void f1()
     {
         fichier_local *dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, false, false);
         fichier_local *dump2 = new fichier_local(*ui, FIC2, gf_write_only, 0777, false, true, false);
+	compressor comp = compressor(none, *dump, 1);
 	std::map <infinint, etoile *> corres;
 
         eod *v_eod = new eod();
@@ -124,7 +125,7 @@ void f1()
         entree *ref = (entree *)1; // != NULL
         for(S_I i = 0; ref != NULL; ++i)
         {
-            ref = entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, dump, false, false, NULL);
+            ref = entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, &comp, false, false, NULL);
             if(ref != NULL)
             {
                 ref->dump(*dump2, false);
@@ -152,7 +153,7 @@ void f1()
         dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
         v_dir->dump(*dump, false);
         dump->skip(0);
-        ref = entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, dump, false, false, NULL);
+        ref = entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, &comp, false, false, NULL);
         v_sub_dir = dynamic_cast<directory *>(ref);
 
         delete ref;
@@ -221,10 +222,11 @@ void f2()
 
         unlink(FIC1);
         fichier_local f = fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
+	compressor comp = compressor(none, f, 1);
 
         cat.dump(f);
         f.skip(0);
-        catalogue lst = catalogue(*ui, f, macro_tools_supported_version, none, &f, &f, false, lax_label);
+        catalogue lst = catalogue(*ui, f, macro_tools_supported_version, none, &f, &comp, false, lax_label);
         lst.listing(false, tmp, tmp, false, false, "");
         bool ok;
 

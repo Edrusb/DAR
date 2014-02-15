@@ -272,7 +272,7 @@ namespace libdar
                          std::map <infinint, etoile *> & corres,
                          compression default_algo,
                          generic_file *data_loc,
-                         generic_file *ea_loc,
+                         compressor *efsa_loc,
                          bool lax,
                          bool only_detruit,
                          escape *ptr)
@@ -305,34 +305,34 @@ namespace libdar
             switch(type)
             {
             case 'f':
-                ret = new (pool) file(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc, ptr);
+                ret = new (pool) file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
                 break;
             case 'l':
-                ret = new (pool) lien(dialog, f, reading_ver, saved, ea_loc, ptr);
+                ret = new (pool) lien(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'c':
-                ret = new (pool) chardev(dialog, f, reading_ver, saved, ea_loc, ptr);
+                ret = new (pool) chardev(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'b':
-                ret = new (pool) blockdev(dialog, f, reading_ver, saved, ea_loc, ptr);
+                ret = new (pool) blockdev(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'p':
-                ret = new (pool) tube(dialog, f, reading_ver, saved, ea_loc, ptr);
+                ret = new (pool) tube(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 's':
-                ret = new (pool) prise(dialog, f, reading_ver, saved, ea_loc, ptr);
+                ret = new (pool) prise(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'd':
-                ret = new (pool) directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, lax, only_detruit, ptr);
+                ret = new (pool) directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, ptr);
                 break;
             case 'm':
-                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, mirage::fmt_mirage, lax, ptr);
+                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, mirage::fmt_mirage, lax, ptr);
                 break;
             case 'h': // old hard-link object
-                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, mirage::fmt_hard_link, lax, ptr);
+                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, mirage::fmt_hard_link, lax, ptr);
                 break;
             case 'e': // old etiquette object
-                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, ea_loc, lax, ptr);
+                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, lax, ptr);
                 break;
             case 'z':
                 if(saved != s_saved)
@@ -355,7 +355,7 @@ namespace libdar
                 ret = new (pool) detruit(f, reading_ver);
                 break;
 	    case 'o':
-		ret = new (pool) door(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc, ptr);
+		ret = new (pool) door(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
 		break;
             default :
                 if(!lax)
@@ -560,7 +560,7 @@ namespace libdar
                  generic_file & f,
                  const archive_version & reading_ver,
                  saved_status saved,
-                 generic_file *ea_loc,
+                 compressor *efsa_loc,
                  escape *ptr) : nomme(f)
     {
         U_16 tmp;
@@ -703,9 +703,9 @@ namespace libdar
 	    ea = NULL; // in any case
 
 		// to be able later to read EA and FSA from archive file
-	    if(ea_loc == NULL)
+	    if(efsa_loc == NULL)
 		throw SRC_BUG;
-	    storage = ea_loc;
+	    storage = efsa_loc;
 
 	    if(reading_ver >= 9)
 	    {
@@ -1472,51 +1472,62 @@ namespace libdar
 			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
 			}
 
-			storage->reset_crc(tools_file_size_to_crc_size(fsa_get_size()));
-
+			storage->suspend_compression();
 			try
 			{
+			    storage->reset_crc(tools_file_size_to_crc_size(fsa_get_size()));
+
 			    try
 			    {
-				const_cast<inode *>(this)->fsal = new (get_pool()) filesystem_specific_attribute_list();
-				if(fsal == NULL)
-				    throw Ememory("inode::get_fsa");
 				try
 				{
-				    const_cast<inode *>(this)->fsal->read(*storage);
+				    const_cast<inode *>(this)->fsal = new (get_pool()) filesystem_specific_attribute_list();
+				    if(fsal == NULL)
+					throw Ememory("inode::get_fsa");
+				    try
+				    {
+					const_cast<inode *>(this)->fsal->read(*storage);
+				    }
+				    catch(...)
+				    {
+					delete fsal;
+					const_cast<inode *>(this)->fsal = NULL;
+					throw;
+				    }
 				}
-				catch(...)
+				catch(Euser_abort & e)
 				{
-				    delete fsal;
-				    const_cast<inode *>(this)->fsal = NULL;
 				    throw;
 				}
+				catch(Ebug & e)
+				{
+				    throw;
+				}
+				catch(Ethread_cancel & e)
+				{
+				    throw;
+				}
+				catch(Egeneric & e)
+				{
+				    throw Erange("inode::get_fda", string("Error while reading FSA from archive: ") + e.get_message());
+				}
 			    }
-			    catch(Euser_abort & e)
+			    catch(...)
 			    {
+				val = storage->get_crc(); // keeps storage in coherent status
 				throw;
 			    }
-			    catch(Ebug & e)
-			    {
-				throw;
-			    }
-			    catch(Ethread_cancel & e)
-			    {
-				throw;
-			    }
-			    catch(Egeneric & e)
-			    {
-				throw Erange("inode::get_fda", string("Error while reading FSA from archive: ") + e.get_message());
-			    }
+
+			    val = storage->get_crc();
+			    if(val == NULL)
+				throw SRC_BUG;
 			}
 			catch(...)
 			{
-			    val = storage->get_crc(); // keeps storage in coherent status
+			    storage->resume_compression();
 			    throw;
 			}
-			val = storage->get_crc();
-			if(val == NULL)
-			    throw SRC_BUG;
+			storage->resume_compression();
 
 			fsa_get_crc(my_crc); // fsa_get_crc() will eventually fetch the CRC for FSA from the archive (sequential reading)
 			if(my_crc == NULL)
@@ -1825,7 +1836,7 @@ namespace libdar
                    std::map <infinint, etoile *> & corres,
                    compression default_algo,
                    generic_file *data_loc,
-                   generic_file *ea_loc,
+                   compressor *efsa_loc,
                    mirage_format fmt,
                    bool lax,
                    escape *ptr) : nomme(f)
@@ -1838,7 +1849,7 @@ namespace libdar
              corres,
              default_algo,
              data_loc,
-             ea_loc,
+             efsa_loc,
              fmt,
              lax,
              ptr);
@@ -1852,7 +1863,7 @@ namespace libdar
                    std::map <infinint, etoile *> & corres,
                    compression default_algo,
                    generic_file *data_loc,
-                   generic_file *ea_loc,
+                   compressor *efsa_loc,
                    bool lax,
                    escape *ptr) : nomme("TEMP")
     {
@@ -1864,7 +1875,7 @@ namespace libdar
              corres,
              default_algo,
              data_loc,
-             ea_loc,
+             efsa_loc,
              fmt_file_etiquette,
              lax,
              ptr);
@@ -1878,7 +1889,7 @@ namespace libdar
                       std::map <infinint, etoile *> & corres,
                       compression default_algo,
                       generic_file *data_loc,
-                      generic_file *ea_loc,
+                      compressor *efsa_loc,
                       mirage_format fmt,
                       bool lax,
                       escape *ptr)
@@ -1934,7 +1945,7 @@ namespace libdar
 
             if(fmt == fmt_file_etiquette)
             {
-                nomme *tmp_ptr = new (get_pool()) file(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc, ptr);
+                nomme *tmp_ptr = new (get_pool()) file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
                 entree_ptr = tmp_ptr;
                 if(tmp_ptr != NULL)
                 {
@@ -1946,7 +1957,7 @@ namespace libdar
                     throw Ememory("mirage::init");
             }
             else
-                entree_ptr = entree::read(dialog, get_pool(), f, reading_ver, fake_stats, corres, default_algo, data_loc, ea_loc, lax, false, ptr);
+                entree_ptr = entree::read(dialog, get_pool(), f, reading_ver, fake_stats, corres, default_algo, data_loc, efsa_loc, lax, false, ptr);
 
             ino_ptr = dynamic_cast<inode *>(entree_ptr);
             if(ino_ptr == NULL || dynamic_cast<directory *>(entree_ptr) != NULL)
@@ -2124,8 +2135,8 @@ namespace libdar
                saved_status saved,
                compression default_algo,
                generic_file *data_loc,
-               generic_file *ea_loc,
-               escape *ptr) : inode(dialog, f, reading_ver, saved, ea_loc, ptr)
+               compressor *efsa_loc,
+               escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
         chemin = "";
         status = from_cat;
@@ -2133,7 +2144,7 @@ namespace libdar
         offset = NULL;
         storage_size = NULL;
         check = NULL;
-        algo_read = default_algo; // only used for archive format "03" and older
+        algo_read = default_algo;  // only used for archive format "03" and older
         algo_write = default_algo; // may be changed later using change_compression_algo_write()
         furtive_read_mode = false; // no used in that "status" mode
         file_data_status_read = 0;
@@ -2183,7 +2194,7 @@ namespace libdar
                             else
 			    {
                                 algo_read = default_algo;
-				algo_write= algo_read;
+				algo_write = algo_read;
 			    }
                     }
                     else // version is "01"
@@ -2765,8 +2776,8 @@ namespace libdar
 	       generic_file & f,
 	       const archive_version & reading_ver,
 	       saved_status saved,
-	       generic_file *ea_loc,
-	       escape *ptr) : inode(dialog, f, reading_ver, saved, ea_loc, ptr)
+	       compressor *efsa_loc,
+	       escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
 	if(saved == s_saved)
 	    tools_read_string(f, points_to);
@@ -2852,10 +2863,10 @@ namespace libdar
 			 std::map <infinint, etoile *> & corres,
 			 compression default_algo,
 			 generic_file *data_loc,
-			 generic_file *ea_loc,
+			 compressor *efsa_loc,
 			 bool lax,
 			 bool only_detruit,
-			 escape *ptr) : inode(dialog, f, reading_ver, saved, ea_loc, ptr)
+			 escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
 	entree *p;
 	nomme *t;
@@ -2878,7 +2889,7 @@ namespace libdar
 	    {
 		try
 		{
-		    p = entree::read(dialog, get_pool(), f, reading_ver, stats, corres, default_algo, data_loc, ea_loc, lax, only_detruit, ptr);
+		    p = entree::read(dialog, get_pool(), f, reading_ver, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, ptr);
 		}
 		catch(Euser_abort & e)
 		{
@@ -3475,8 +3486,8 @@ namespace libdar
 		   generic_file & f,
 		   const archive_version & reading_ver,
 		   saved_status saved,
-		   generic_file *ea_loc,
-		   escape *ptr) : inode(dialog, f, reading_ver, saved, ea_loc, ptr)
+		   compressor *efsa_loc,
+		   escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
 	U_16 tmp;
 
@@ -3574,7 +3585,7 @@ namespace libdar
 			 const archive_version & reading_ver,
 			 compression default_algo,
 			 generic_file *data_loc,
-			 generic_file *ea_loc,
+			 compressor *efsa_loc,
 			 bool lax,
 			 const label & lax_layer1_data_name,
 			 bool only_detruit) : mem_ui(dialog), out_compare("/")
@@ -3625,7 +3636,7 @@ namespace libdar
 		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 
 		stats.clear();
-		contenu = new (get_pool()) directory(dialog, ff, reading_ver, st, stats, corres, default_algo, data_loc, ea_loc, lax, only_detruit, NULL);
+		contenu = new (get_pool()) directory(dialog, ff, reading_ver, st, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, NULL);
 		if(contenu == NULL)
 		    throw Ememory("catalogue::catalogue(path)");
 		if(only_detruit)

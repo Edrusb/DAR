@@ -55,7 +55,7 @@ namespace libdar
 			 const archive_version & reading_ver,  //< archive format
 			 compression default_algo,         //< default compression algorithm
 			 generic_file *data_loc,           //< at which layer to read data from
-			 generic_file *ea_loc,             //< at which layer to read EA from
+			 compressor *efsa_loc,             //< at which layer to read EA from
 			 escape *esc_ptr,                  //< the escape layer of the stack
 			 bool lax = false);                //< whether to use lax mode
         escape_catalogue(const escape_catalogue & ref) : catalogue(ref) { copy_from(ref); };
@@ -96,7 +96,7 @@ namespace libdar
 	archive_version x_reading_ver;
 	compression x_default_algo;
 	generic_file *x_data_loc;
-	generic_file *x_ea_loc;
+	compressor *x_efsa_loc;
 	bool x_lax;
 	std::map <infinint, etoile *> corres;
         state status;

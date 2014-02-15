@@ -37,7 +37,7 @@ namespace libdar
 	x_reading_ver = macro_tools_supported_version;
 	x_default_algo = none;
 	x_data_loc = NULL;
-	x_ea_loc = NULL;
+	x_efsa_loc = NULL;
 	x_lax = false;
 	corres.clear();
 	status = ec_completed; // yes, with that constructor, the catalogue contains all known object and entree do not miss any field
@@ -55,7 +55,7 @@ namespace libdar
 				       const archive_version & reading_ver,
 				       compression default_algo,
 				       generic_file *data_loc,
-				       generic_file *ea_loc,
+				       compressor *efsa_loc,
 				       escape *esc_ptr,
 				       bool lax) : catalogue(dialog,
 							     0,
@@ -65,7 +65,7 @@ namespace libdar
 	x_reading_ver = reading_ver;
 	x_default_algo = default_algo;
 	x_data_loc = data_loc;
-	x_ea_loc = ea_loc;
+	x_efsa_loc = efsa_loc;
 	x_lax = lax;
 	corres.clear();
 	status = ec_init; // with that constructor, the catalogue starts empty and get completed entry by entry each time a one asks for its contents (read() method)
@@ -416,7 +416,7 @@ namespace libdar
 					       ceci->corres,
 					       ceci->x_default_algo,
 					       ceci->x_data_loc,
-					       ceci->x_ea_loc,
+					       ceci->x_efsa_loc,
 					       false, // lax mode
 					       false, // only_detruit
 					       ceci->esc);
@@ -520,22 +520,16 @@ namespace libdar
 				    // this situation is either an extracted catalogue, or a normal archive which only has detruit objects
 				    // in any case, it does not hurt considering the whole catalogue
 
-				if(x_ea_loc == NULL)
+				if(x_efsa_loc == NULL)
 				    throw SRC_BUG;
-				else
-				{
-				    compressor *ea_comp = dynamic_cast<compressor *>(x_ea_loc);
 
-				    if(ea_comp != NULL)
-					ea_comp->flush_read();
-				}
-
+				x_efsa_loc->flush_read();
 				ceci->cat_det = new (get_pool()) catalogue(get_ui(),
-									   *x_ea_loc,
+									   *x_efsa_loc,
 									   x_reading_ver,
 									   x_default_algo,
 									   x_data_loc,
-									   x_ea_loc,
+									   x_efsa_loc,
 									   x_lax,  // lax
 									   tmp,    // we do not modify the catalogue data_name even in lax mode
 									   only_detruit);  // only_detruit
@@ -635,7 +629,7 @@ namespace libdar
 	x_reading_ver = ref.x_reading_ver;
 	x_default_algo = ref.x_default_algo;
 	x_data_loc = ref.x_data_loc;
-	x_ea_loc = ref.x_ea_loc;
+	x_efsa_loc = ref.x_efsa_loc;
 	x_lax = ref.x_lax;
 	corres = ref.corres;
 	status = ref.status;

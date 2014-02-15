@@ -2476,7 +2476,7 @@ namespace libdar
 			if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, display_treated, stock_algo))
 			{
 			    if(e_ino->fsa_get_saved_status() != inode::fsa_full)
-				e_ino->change_ea_location(stockage);
+				e_ino->change_efsa_location(stockage);
 				// change stockage location will be done only after copying FSA (see below)
 			}
 			cat.pre_add_ea_crc(e, stockage);
@@ -2487,7 +2487,7 @@ namespace libdar
 		    {
 			cat.pre_add_fsa(e, stockage);
 			if(save_fsa(dialog, juillet.get_string(), e_ino, stockage, display_treated))
-			    e_ino->change_ea_location(stockage);
+			    e_ino->change_efsa_location(stockage);
 			    // now we can change ea/fsa_location to "stockage"
 			cat.pre_add_fsa_crc(e, stockage);
 		    }
@@ -3009,22 +3009,31 @@ namespace libdar
 			if(display_treated)
 			    dialog.warning(string(gettext("Saving Filesystem Specific Attributes for ")) + info_quoi);
 			ino->fsa_set_offset(stock->get_position());
-			stock->change_algo(none); // never compress EA (no size or filename consideration)
-			stock->reset_crc(tools_file_size_to_crc_size(ino->fsa_get_size())); // start computing CRC for any read/write on stock
+			stock->suspend_compression(); // never compress EA (no size or filename consideration)
 			try
 			{
-			    ino->get_fsa()->write(*stock);
+			    stock->reset_crc(tools_file_size_to_crc_size(ino->fsa_get_size())); // start computing CRC for any read/write on stock
+			    try
+			    {
+				ino->get_fsa()->write(*stock);
+			    }
+			    catch(...)
+			    {
+				val = stock->get_crc(); // this keeps "stock" in a coherent status
+				throw;
+			    }
+			    val = stock->get_crc();
+			    ino->fsa_set_crc(*val);
+			    ino->fsa_detach();
+			    stock->flush_write();
+			    ret = true;
 			}
 			catch(...)
 			{
-			    val = stock->get_crc(); // this keeps "stock" in a coherent status
+			    stock->resume_compression();
 			    throw;
 			}
-			val = stock->get_crc();
-			ino->fsa_set_crc(*val);
-			ino->fsa_detach();
-			stock->flush_write();
-			ret = true;
+			stock->resume_compression();
 		    }
 		    catch(...)
 		    {

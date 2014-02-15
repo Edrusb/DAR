@@ -101,7 +101,7 @@ namespace libdar
 			    std::map <infinint, etoile *> & corres,
 			    compression default_algo,
 			    generic_file *data_loc,
-			    generic_file *ea_loc,
+			    compressor *efsa_loc,
 			    bool lax,
 			    bool only_detruit,
 			    escape *ptr);
@@ -217,7 +217,7 @@ namespace libdar
 	      generic_file & f,
 	      const archive_version & reading_ver,
 	      saved_status saved,
-	      generic_file *ea_loc,
+	      compressor *efsa_loc,
 	      escape *ptr);      // if ptr is not NULL, reading a partial dump(), which was done with "small" set to true
         inode(const inode & ref);
 	const inode & operator = (const inode & ref);
@@ -294,7 +294,7 @@ namespace libdar
 
 
 	    // V : for archive migration (merging) EA and FSA concerned
-        void change_ea_location(generic_file *loc) { storage = loc; };
+        void change_efsa_location(compressor *loc) { storage = loc; };
 
 
             //////////////////////////////////
@@ -361,7 +361,7 @@ namespace libdar
 	crc *fsa_crc;            //< CRC computed on FSA
 	    //
 	infinint *fs_dev;        //< filesystem ID on which resides the inode (only used when read from filesystem)
-	generic_file *storage;   //< where are stored EA and FSA
+	compressor *storage;     //< where are stored EA and FSA
 	archive_version edit;    //< need to know EA format used in archive file
 
 	escape *esc;  // if not NULL, the object is partially build from archive (at archive generation, dump() was called with small set to true)
@@ -444,7 +444,7 @@ namespace libdar
 	       std::map <infinint, etoile *> & corres,
 	       compression default_algo,
 	       generic_file *data_loc,
-	       generic_file *ea_loc,
+	       compressor *efsa_loc,
 	       mirage_format fmt,
 	       bool lax,
 	       escape *ptr);
@@ -456,7 +456,7 @@ namespace libdar
 	       std::map <infinint, etoile *> & corres,
 	       compression default_algo,
 	       generic_file *data_loc,
-	       generic_file *ea_loc,
+	       compressor *efsa_loc,
 	       bool lax,
 	       escape *ptr);
 	mirage(const mirage & ref) : nomme (ref) { star_ref = ref.star_ref; if(star_ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
@@ -498,7 +498,7 @@ namespace libdar
 		  std::map <infinint, etoile *> & corres,
 		  compression default_algo,
 		  generic_file *data_loc,
-		  generic_file *ea_loc,
+		  compressor *efsa_loc,
 		  mirage_format fmt,
 		  bool lax,
 		  escape *ptr);
@@ -536,7 +536,7 @@ namespace libdar
 	     saved_status saved,
 	     compression default_algo,
 	     generic_file *data_loc,
-	     generic_file *ea_loc,
+	     compressor *efsa_loc,
 	     escape *ptr);
         ~file() { detruit(); };
 
@@ -624,8 +624,8 @@ namespace libdar
              saved_status saved,
              compression default_algo,
              generic_file *data_loc,
-             generic_file *ea_loc,
-             escape *ptr) : file(dialog, f, reading_ver, saved, default_algo, data_loc, ea_loc, ptr) {};
+             compressor *efsa_loc,
+             escape *ptr) : file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr) {};
 
         unsigned char signature() const { return mk_signature('o', get_saved_status()); };
 
@@ -648,7 +648,7 @@ namespace libdar
 	     generic_file & f,
 	     const archive_version & reading_ver,
 	     saved_status saved,
-	     generic_file *ea_loc,
+	     compressor *efsa_loc,
 	     escape *ptr);
 
         const std::string & get_target() const;
@@ -688,7 +688,7 @@ namespace libdar
 		  std::map <infinint, etoile *> & corres,
 		  compression default_algo,
 		  generic_file *data_loc,
-		  generic_file *ea_loc,
+		  compressor *efsa_loc,
 		  bool lax,
 		  bool only_detruit, // objects of other class than detruit and directory are not built in memory
 		  escape *ptr);
@@ -770,7 +770,7 @@ namespace libdar
 	       generic_file & f,
 	       const archive_version & reading_ver,
 	       saved_status saved,
-	       generic_file *ea_loc,
+	       compressor *efsa_loc,
 	       escape *ptr);
 
         int get_major() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xmajor; };
@@ -811,8 +811,8 @@ namespace libdar
 		generic_file & f,
 		const archive_version & reading_ver,
 		saved_status saved,
-		generic_file *ea_loc,
-		escape *ptr) : device(dialog, f, reading_ver, saved, ea_loc, ptr) {};
+		compressor *efsa_loc,
+		escape *ptr) : device(dialog, f, reading_ver, saved, efsa_loc, ptr) {};
 
             // using dump from device class
             // using method is_more_recent_than() from device class
@@ -839,8 +839,8 @@ namespace libdar
 		 generic_file & f,
 		 const archive_version & reading_ver,
 		 saved_status saved,
-		 generic_file *ea_loc,
-		 escape *ptr) : device(dialog, f, reading_ver, saved, ea_loc, ptr) {};
+		 compressor *efsa_loc,
+		 escape *ptr) : device(dialog, f, reading_ver, saved, efsa_loc, ptr) {};
 
             // using dump from device class
             // using method is_more_recent_than() from device class
@@ -863,8 +863,8 @@ namespace libdar
 	     generic_file & f,
 	     const archive_version & reading_ver,
 	     saved_status saved,
- 	     generic_file *ea_loc,
-	     escape *ptr) : inode(dialog, f, reading_ver, saved, ea_loc, ptr) {};
+ 	     compressor *efsa_loc,
+	     escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr) {};
 
             // using dump from inode class
             // using method is_more_recent_than() from inode class
@@ -887,8 +887,8 @@ namespace libdar
 	      generic_file & f,
 	      const archive_version & reading_ver,
 	      saved_status saved,
-	      generic_file *ea_loc,
-	      escape *ptr) : inode(dialog, f, reading_ver, saved, ea_loc, ptr) {};
+	      compressor *efsa_loc,
+	      escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr) {};
 
             // using dump from inode class
             // using method is_more_recent_than() from inode class
@@ -944,8 +944,8 @@ namespace libdar
         ignored_dir(user_interaction & dialog,
 		    generic_file & f,
 		    const archive_version & reading_ver,
-		    generic_file *ea_loc,
-		    escape *ptr) : inode(dialog, f, reading_ver, s_not_saved, ea_loc, ptr) { throw SRC_BUG; };
+		    compressor *efsa_loc,
+		    escape *ptr) : inode(dialog, f, reading_ver, s_not_saved, efsa_loc, ptr) { throw SRC_BUG; };
 
         unsigned char signature() const { return 'j'; };
         entree *clone() const { return new (get_pool()) ignored_dir(*this); };
@@ -967,7 +967,7 @@ namespace libdar
 		  const archive_version & reading_ver,
 		  compression default_algo,
 		  generic_file *data_loc,
-		  generic_file *ea_loc,
+		  compressor *efsa_loc,
 		  bool lax,
 		  const label & lax_layer1_data_name, //< ignored unless in lax mode, in lax mode unless it is a cleared label, forces the catalogue label to be equal to the lax_layer1_data_name for it be considered a plain internal catalogue, even in case of corruption
 		  bool only_detruit = false); //< if set to true, only directories and detruit objects are read from the archive
