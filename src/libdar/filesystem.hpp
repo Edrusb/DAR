@@ -248,7 +248,8 @@ namespace libdar
         void make_file(const nomme * ref,                       //< object to restore in filesystem
 		       const path & ou,                         //< where to restore it
 		       bool dir_perm,                           //< false for already existing directories, this makes dar set the minimum available permission to be able to restore files in that directory at a later time
-		       inode::comparison_fields what_to_check); //< defines whether to restore permission, ownership, dates, etc.
+		       inode::comparison_fields what_to_check,  //< defines whether to restore permission, ownership, dates, etc.
+		       const fsa_scope & scope);                //< fsa scope to use for restoration
             // generate inode or make a hard link on an already restored or existing inode.
 
 

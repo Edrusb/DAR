@@ -127,10 +127,15 @@ namespace libdar
 
     static void supprime(user_interaction & ui, const string & ref);
     static void make_owner_perm(user_interaction & dialog,
-				const inode & ref, const path & ou, bool dir_perm, inode::comparison_fields what_to_check);
+				const inode & ref,
+				const path & ou,
+				bool dir_perm,
+				inode::comparison_fields what_to_check,
+				const fsa_scope & scope);
     static void make_date(const inode & ref,
 			  const string & chem,
-			  inode::comparison_fields what_to_check);
+			  inode::comparison_fields what_to_check,
+			  const fsa_scope & scope);
 
     static void attach_ea(const string &chemin,
 			  inode *ino,
@@ -998,7 +1003,11 @@ namespace libdar
         return corres_write.find(eti) != corres_write.end();
     }
 
-    void filesystem_hard_link_write::make_file(const nomme * ref, const path & ou, bool dir_perm, inode::comparison_fields what_to_check)
+    void filesystem_hard_link_write::make_file(const nomme * ref,
+					       const path & ou,
+					       bool dir_perm,
+					       inode::comparison_fields what_to_check,
+					       const fsa_scope & scope)
     {
         const directory *ref_dir = dynamic_cast<const directory *>(ref);
         const file *ref_fil = dynamic_cast<const file *>(ref);
@@ -1229,7 +1238,7 @@ namespace libdar
 	while(ret < 0 && errno == ENOSPC);
 
 	if(ref_ino != NULL && ret >= 0)
-	    make_owner_perm(get_ui(), *ref_ino, ou, dir_perm, what_to_check);
+	    make_owner_perm(get_ui(), *ref_ino, ou, dir_perm, what_to_check, scope);
 
     }
 
@@ -1336,7 +1345,7 @@ namespace libdar
 	    if(!stack_dir.empty())
 	    {
 		if(!empty && stack_dir.back().get_restore_date())
-		    make_owner_perm(get_ui(), stack_dir.back(), *current_dir, true, what_to_check);
+		    make_owner_perm(get_ui(), stack_dir.back(), *current_dir, true, what_to_check, get_fsa_scope());
 	    }
 	    else
 		throw SRC_BUG;
@@ -1401,7 +1410,7 @@ namespace libdar
 			    get_ui().warning(string(gettext("Restoring file's data: ")) + spot_display);
 
 			if(!empty)
-			    make_file(x_nom, *current_dir, false, what_to_check);
+			    make_file(x_nom, *current_dir, false, what_to_check, get_fsa_scope());
 			data_created = true;
 			data_restored = done_data_restored;
 
@@ -1462,7 +1471,8 @@ namespace libdar
 			if(has_fsa_saved || has_ea_saved)
 			{
 			    if(!empty)
-				make_date(*x_ino, spot_display, what_to_check);
+				make_date(*x_ino, spot_display, what_to_check,
+					  get_fsa_scope());
 			}
 
 		    }
@@ -1503,7 +1513,16 @@ namespace libdar
 		    else // a normal inode (or hard linked one) is to be restored
 		    {
 			if(has_data_saved)
-			    action_over_data(exists_ino, x_nom, spot_display, act_data, data_restored);
+			{
+			    try
+			    {
+				action_over_data(exists_ino, x_nom, spot_display, act_data, data_restored);
+			    }
+			    catch(Egeneric & e)
+			    {
+
+			    }
+			}
 			else // no data saved in the object to restore
 			{
 			    data_restored = done_no_change_no_data;
@@ -1552,10 +1571,12 @@ namespace libdar
 
 				if(data_restored == done_data_restored)
 					// set back the mtime to value found in the archive
-				    make_date(*x_ino, spot_display, what_to_check);
+				    make_date(*x_ino, spot_display, what_to_check,
+					      get_fsa_scope());
 				else
 					// set back the mtime to value found in filesystem before restoration
-				    make_date(*exists_ino, spot_display, what_to_check);
+				    make_date(*exists_ino, spot_display, what_to_check,
+					      get_fsa_scope());
 			    }
 
 			}
@@ -1691,7 +1712,7 @@ namespace libdar
 	    if(tba_dir != NULL && tba_ino->same_as(*in_place))
 	    {
 		if(!empty)
-		    make_owner_perm(get_ui(), *tba_ino, *current_dir, false, what_to_check);
+		    make_owner_perm(get_ui(), *tba_ino, *current_dir, false, what_to_check, get_fsa_scope());
 		data_done = done_data_restored;
 	    }
 	    else // not both in_place and to_be_added are directories
@@ -1743,7 +1764,7 @@ namespace libdar
 		    if(!empty)
 		    {
 			supprime(get_ui(), spot); // this destroyes EA, (removes inode, or hard link to inode)
-			make_file(to_be_added, *current_dir, false, what_to_check);
+			make_file(to_be_added, *current_dir, false, what_to_check, get_fsa_scope());
 			data_done = done_data_restored;
 		    }
 
@@ -2116,7 +2137,7 @@ namespace libdar
 	while(!stack_dir.empty() && current_dir->pop(tmp))
 	{
 	    if(!empty)
-		make_owner_perm(get_ui(), stack_dir.back(), *current_dir, true, what_to_check);
+		make_owner_perm(get_ui(), stack_dir.back(), *current_dir, true, what_to_check, get_fsa_scope());
 	    stack_dir.pop_back();
 	}
 	if(stack_dir.size() > 0)
@@ -2157,7 +2178,8 @@ namespace libdar
     static void make_owner_perm(user_interaction & dialog,
 				const inode & ref,
 				const path & ou, bool dir_perm,
-				inode::comparison_fields what_to_check)
+				inode::comparison_fields what_to_check,
+				const fsa_scope & scope)
     {
         const string chem = (ou + ref.get_name()).display();
         const char *name = chem.c_str();
@@ -2232,12 +2254,13 @@ namespace libdar
 		// else (the inode is a symlink), we simply ignore this error
 	}
 
-	make_date(ref, chem, what_to_check);
+	make_date(ref, chem, what_to_check, scope);
     }
 
     static void make_date(const inode & ref,
 			  const string & chem,
-			  inode::comparison_fields what_to_check)
+			  inode::comparison_fields what_to_check,
+			  const fsa_scope & scope)
     {
 	const lien *ref_lie = dynamic_cast<const lien *>(&ref);
 
@@ -2245,8 +2268,9 @@ namespace libdar
 	    if(ref_lie == NULL) // not restoring atime & ctime for symbolic links
 	    {
 		infinint birthtime = ref.get_last_modif();
+		fsa_scope::iterator it = scope.find(fsaf_hfs_plus);
 
-		if(ref.fsa_get_saved_status() == inode::fsa_full)
+		if(ref.fsa_get_saved_status() == inode::fsa_full && it != scope.end())
 		{
 		    const filesystem_specific_attribute_list * fsa = ref.get_fsa();
 		    const filesystem_specific_attribute *ptr = NULL;
