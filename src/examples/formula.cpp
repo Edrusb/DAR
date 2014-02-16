@@ -61,7 +61,7 @@ int little_main(user_interaction & ui, S_I argc, char * const argv[], const char
     else
     {
 	string formula = crit_action_canonize_string(argv[1]);
-	deci tmp = calculus(formula);
+	libdar::deci tmp = calculus(formula);
 
 	cout << tmp.human() << endl;
 
@@ -114,7 +114,7 @@ static infinint calculus(const string & formula)
 	return calculus(string(formula.begin() + 1, formula.end() - 1));
     else  // assuming an integer
     {
-	deci tmp = formula;
+	libdar::deci tmp = formula;
 	return tmp.computer();
     }
 }

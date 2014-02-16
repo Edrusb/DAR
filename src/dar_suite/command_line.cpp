@@ -786,7 +786,10 @@ static bool get_args_recursive(recursive_param & rec,
 			try
 			{
 				// trying to read a simple integer
-			    deci tmp = string(optarg);
+			        // note that the namespace specification is necessary
+			        // due to similar existing name in std namespace under
+			        // certain OS (FreeBSD 10.0)
+			    libdar::deci tmp = string(optarg);
 			    p.fixed_date = tmp.computer();
 			}
 			catch(Edeci & e)
@@ -886,7 +889,10 @@ static bool get_args_recursive(recursive_param & rec,
             case 'p':
 		if(optarg != NULL)
 		{
-		    deci conv = string(optarg);
+			// note that the namespace specification is necessary
+			// due to similar existing name in std namespace under
+			// certain OS (FreeBSD 10.0)
+		    libdar::deci conv = string(optarg);
 		    p.pause = conv.computer();
 		}
 		else
@@ -1265,7 +1271,10 @@ static bool get_args_recursive(recursive_param & rec,
                 {
                     try
                     {
-                        p.hourshift = deci(string(optarg)).computer();
+			    // note that the namespace specification is necessary
+			    // due to similar existing name in std namespace under
+			    // certain OS (FreeBSD 10.0)
+                        p.hourshift = libdar::deci(string(optarg)).computer();
                     }
                     catch(Edeci & e)
                     {

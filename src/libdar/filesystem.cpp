@@ -117,7 +117,7 @@ char *strchr (), *strrchr ();
 #include "fichier_local.hpp"
 
 #ifndef UNIX_PATH_MAX
-#define UNIX_PATH_MAX 108
+#define UNIX_PATH_MAX 104
 #endif
 
 using namespace std;

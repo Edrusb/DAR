@@ -373,7 +373,10 @@ static bool command_line(user_interaction & dialog, S_I argc, char * const argv[
             case 'p':
 		if(optarg != NULL)
 		{
-		    deci conv = string(optarg);
+			// note that the namespace specification is necessary
+			// due to similar existing name in std namespace under
+			// certain OS (FreeBSD 10.0)
+		    libdar::deci conv = string(optarg);
 		    pause = conv.computer();
 		}
 		else

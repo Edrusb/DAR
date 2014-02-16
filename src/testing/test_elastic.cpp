@@ -145,7 +145,7 @@ void f3()
 	fichier_local fic = fichier_local(*dialog, "toto", gf_read_write, 0666, false, true, false);
 	const unsigned int taille = 500;
 	unsigned char buffer[taille];
-	const char *ttt =  "Bonjour les amis comment ça va ? ";
+	const char *ttt =  "Bonjour les amis comment ca va ? ";
 	elastic tic = 1, toc = 1;
 
 	fic.write(ttt, strlen(ttt));

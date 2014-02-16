@@ -59,7 +59,7 @@ int little_main(user_interaction & ui, S_I argc, char * const argv[], const char
         exit(1);
     }
 
-    deci x = string(argv[1]);
+    libdar::deci x = string(argv[1]);
     cout << "converting string to infinint... " << endl;
     infinint num = x.computer();
     cout << "checking whether the number is a prime factor... " << endl;

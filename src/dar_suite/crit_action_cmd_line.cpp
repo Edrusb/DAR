@@ -412,7 +412,10 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		case 'r':
 		    try
 		    {
-			deci tmp = sub_arg;
+			    // note that the namespace specification is necessary
+			    // due to similar existing name in std namespace under
+			    // certain OS (FreeBSD 10.0)
+			libdar::deci tmp = sub_arg;
 			date = tmp.computer();
 		    }
 		    catch(Edeci & e)
