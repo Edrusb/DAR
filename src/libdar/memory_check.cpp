@@ -174,7 +174,7 @@ void * operator new (size_t size, const std::nothrow_t& nothrow_constant) throw 
 
 void * operator new[] (size_t size) throw (std::bad_alloc)
 {
-    ret = alloc(size);
+    void *ret = alloc(size);
     if(ret == NULL)
 	throw std::bad_alloc();
     return ret;
@@ -217,7 +217,7 @@ void memory_check_snapshot()
     while(curs < DEBUG_MEM_SIZE)
     {
 	if(debug_mem_alloc[curs].ptr != NULL)
-	    fprintf(debug_mem_output, "address = %p   size = %d\n",
+	    fprintf(debug_mem_output, "address = %p   size = %ld\n",
 		    debug_mem_alloc[curs].ptr,
 		    debug_mem_alloc[curs].size);
 	++curs;
