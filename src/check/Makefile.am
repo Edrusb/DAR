@@ -35,7 +35,7 @@ permission_SOURCES =
 
 clean-local:
 	chmod u+x $(dist_noinst_DATA)
-	OPT=tmp.file DAR=none ./routine.sh NONE
+	if [ -x /bin/bash ] ; then OPT=tmp.file DAR=none ./routine.sh NONE ; fi
 	rm -f tmp.file
 
 

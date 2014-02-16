@@ -466,7 +466,10 @@ static bool command_line(user_interaction & dialog,
 		    {
 			try
 			{
-			    deci tmp = string(optarg);
+				// note that the namespace specification is necessary
+				// due to similar existing name in std namespace under
+				// certain OS (FreeBSD 10.0)
+			    libdar::deci tmp = string(optarg);
 			    date = tmp.computer();
 			}
 			catch(Edeci & e)

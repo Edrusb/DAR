@@ -4,17 +4,19 @@
 
 if MAKE_USAGE
 
-%.usage: %.xml dar-help$(EXEEXT)
+SUFFIXES= .usage .xml
+
+.xml.usage:
 	./dar-help$(EXEEXT) $< > $@
 
 noinst_PROGRAMS = dar-help
 dar_help_SOURCES = dar-help.c
 dar_help_LDFLAGS = -pthread
 
-command_line.cpp : dar.usage
-dar_xform.cpp : dar_xform.usage
-dar_slave.cpp : dar_slave.usage
-dar_manager.cpp : dar_manager.usage
+command_line.cpp : dar-help dar.usage
+dar_xform.cpp : dar-help dar_xform.usage
+dar_slave.cpp : dar-help dar_slave.usage
+dar_manager.cpp : dar-help dar_manager.usage
 
 endif
 

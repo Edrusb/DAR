@@ -29,6 +29,9 @@
 extern "C"
 {
 #if HAVE_GCRYPT_H
+#ifndef GCRYPT_NO_DEPRECATED
+#define GCRYPT_NO_DEPRECATED
+#endif
 #include <gcrypt.h>
 #endif
 }

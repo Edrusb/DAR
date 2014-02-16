@@ -221,8 +221,11 @@ void line_tools_repeat_param(const string & cmd, infinint & repeat_count, infini
 
     try
     {
-	deci x1 = tmp1;
-	deci x2 = tmp2;
+	    // note that the namespace specification is necessary
+	    // due to similar existing name in std namespace under
+	    // certain OS (FreeBSD 10.0)
+	libdar::deci x1 = tmp1;
+	libdar::deci x2 = tmp2;
 
 	repeat_count = x1.computer();
 	repeat_byte = x2.computer();
@@ -520,14 +523,20 @@ void line_tools_get_min_digits(string the_arg, infinint & num, infinint & ref_nu
 	it1 = tools_find_first_char_of(the_arg, ',');
 	if(it1 == the_arg.end()) // a single number is provided
 	{
-	    deci tmp = the_arg;
+		// note that the namespace specification is necessary
+		// due to similar existing name in std namespace under
+		// certain OS (FreeBSD 10.0)
+	    libdar::deci tmp = the_arg;
 	    num = tmp.computer();
 	}
 	else // at least two numbers are provided
 	{
 	    if(the_arg.begin() != it1)
 	    {
-		deci convert = string(the_arg.begin(), it1);
+		    // note that the namespace specification is necessary
+		    // due to similar existing name in std namespace under
+		    // certain OS (FreeBSD 10.0)
+		libdar::deci convert = string(the_arg.begin(), it1);
 		num = convert.computer();
 	    }
 		// else we ignore the leading ','
@@ -539,20 +548,29 @@ void line_tools_get_min_digits(string the_arg, infinint & num, infinint & ref_nu
 	    it2 = tools_find_first_char_of(tmp2, ',');
 	    if(it2 == tmp2.end()) // just two number have been provided
 	    {
-		deci convert = tmp2;
+		    // note that the namespace specification is necessary
+		    // due to similar existing name in std namespace under
+		    // certain OS (FreeBSD 10.0)
+		libdar::deci convert = tmp2;
 		ref_num = convert.computer();
 	    }
 	    else
 	    {
 		if(tmp2.begin() != it2)
 		{
-		    deci convert = string(tmp2.begin(), it2);
+			// note that the namespace specification is necessary
+			// due to similar existing name in std namespace under
+			// certain OS (FreeBSD 10.0)
+		    libdar::deci convert = string(tmp2.begin(), it2);
 		    ref_num = convert.computer();
 		}
 		++it2;
 		if(it2 != tmp2.end())
 		{
-		    deci convert = string(it2, tmp2.end());
+			// note that the namespace specification is necessary
+			// due to similar existing name in std namespace under
+			// certain OS (FreeBSD 10.0)
+		    libdar::deci convert = string(it2, tmp2.end());
 		    aux_num = convert.computer();
 		}
 	    }
@@ -585,14 +603,14 @@ void line_tools_look_for(const vector<char> & arguments,
 
     while((lu = getopt_long(argc, argv, getopt_string, ptr_long_opt, NULL)) != EOF)
 #else
-     while((lu = getopt(argc, argv, getopt_string)) != EOF)
+	while((lu = getopt(argc, argv, getopt_string)) != EOF)
 #endif
-    {
-	 vector<char>::const_iterator it = find(arguments.begin(), arguments.end(), (char)lu);
+	{
+	    vector<char>::const_iterator it = find(arguments.begin(), arguments.end(), (char)lu);
 
-	if(it != arguments.end())
-	    presence.push_back(lu);
-    }
+	    if(it != arguments.end())
+		presence.push_back(lu);
+	}
     (void)line_tools_reset_getopt();
 }
 

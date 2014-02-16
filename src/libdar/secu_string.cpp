@@ -46,6 +46,9 @@ char *strchr (), *strrchr ();
 
 
 #if HAVE_GCRYPT_H
+#ifndef GCRYPT_NO_DEPRECATED
+#define GCRYPT_NO_DEPRECATED
+#endif
 #include <gcrypt.h>
 #endif
 #if HAVE_ERRNO_H

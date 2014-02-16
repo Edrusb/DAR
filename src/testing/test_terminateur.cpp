@@ -80,7 +80,7 @@ static void f1()
     for(S_I i=2;i<30;i++)
         grand *= i;
 
-    deci conv = grand;
+    libdar::deci conv = grand;
     cout << conv.human() << endl;
     term.set_catalogue_start(grand);
     term.dump(toto);

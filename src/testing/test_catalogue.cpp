@@ -255,7 +255,7 @@ void f2()
                                 if(i->is_more_recent_than(*w, 0))
 				{
                                     cout << "plus recent" << endl;
-				    cout << "new is " << deci(w->get_last_modif()).human() << " ref " << deci(i->get_last_modif()).human() << endl;
+				    cout << "new is " << libdar::deci(w->get_last_modif()).human() << " ref " << libdar::deci(i->get_last_modif()).human() << endl;
 				}
                                 else
                                     cout << "pas plus recent" << endl;

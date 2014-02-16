@@ -223,13 +223,8 @@ namespace libdar
 		tmp = escape::inherited_read(a + lu, needed);
 		if(has_escaped_data_since_last_skip())
 		    data_escaped = true;
-		if(tmp < 0)
-		    throw SRC_BUG;
-		else
-		{
-		    offset += tmp;
-		    lu += tmp;
-		}
+		offset += tmp;
+		lu += tmp;
 
 		if(tmp < needed)
 		{

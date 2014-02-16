@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#ifndef GCRYPT_NO_DEPRECATED
+#define GCRYPT_NO_DEPRECATED
+#endif
 #include <gcrypt.h>
 #include <unistd.h>
 #include <sys/types.h>

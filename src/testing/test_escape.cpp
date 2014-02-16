@@ -118,5 +118,5 @@ void f2()
 	cout << "OK" << endl;
     else
 	cout << "NOK" << endl;
-    cout << deci(tested.get_position()).human() << endl;
+    cout << libdar::deci(tested.get_position()).human() << endl;
 }

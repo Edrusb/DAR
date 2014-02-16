@@ -273,11 +273,13 @@ namespace libdar
     basic_string<mask_list::my_char> mask_list::convert_string_char(const string & src)
     {
 	basic_string<my_char> ret;
+	my_char tmp;
 
 	string::const_iterator ut = src.begin();
 	while(ut != src.end())
 	{
-	    ret += my_char(*ut);
+ 	    tmp = *ut;
+	    ret += tmp;
 	    ++ut;
 	}
 

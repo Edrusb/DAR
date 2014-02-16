@@ -86,7 +86,7 @@ static int little_main(user_interaction & ui, int argc, char * const argv[], con
 	exit(1);
 
     string s = argv[1];
-    deci f = s;
+    libdar::deci f = s;
     infinint max = f.computer();
     infinint i = 2;
     infinint p = 1;
@@ -98,7 +98,7 @@ static int little_main(user_interaction & ui, int argc, char * const argv[], con
     }
 
     ui.warning("calcul finished, now computing the decimal representation ... ");
-    f = deci(p);
+    f = libdar::deci(p);
     ui.warning(f.human());
     if(argc == 3)
     {
@@ -113,7 +113,7 @@ static int little_main(user_interaction & ui, int argc, char * const argv[], con
 	    p.dump(fic);
 	    fic.skip(0);
 	    cp = infinint(fic);
-	    ui.warning(string("read from file: ") + deci(cp).human());
+	    ui.warning(string("read from file: ") + libdar::deci(cp).human());
 	}
     }
 

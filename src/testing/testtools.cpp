@@ -32,7 +32,7 @@ using namespace std;
 
 void display(const infinint & x)
 {
-    deci vu = x;
+    libdar::deci vu = x;
     cout << vu.human() << endl;
 }
 

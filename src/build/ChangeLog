@@ -1,3 +1,14 @@
+from 2.4.12 to 2.4.13
+- adding initialization value for two variable to avoid unappropriate warning
+  when compiling with -Wall option
+- reducing UNIX_PATH_MAX when not defined from 108 to 104 bytes to accomodate BSD systems
+- fixing assignment operator of class criterium that was not returning any value
+- adding support for back-slash of quoting characters in DCF files
+- fixed compilation issues with clang / FreeBSD
+- fixed compilation warning due to deprecated symbols in libgcrypt header files
+- rewrote gnu make specific rules to legacy ones
+- removed old unused stuff from misc subdirectory
+
 from 2.4.11 to 2.4.12
 - for correctness fixed delete vs delete[] on vector of char (not incidence
   reported)
