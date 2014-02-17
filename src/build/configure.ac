@@ -260,11 +260,13 @@ AC_ARG_ENABLE( [libgcrypt-linking],
                                         ])
               if test "$local_crypto" = "yes" ; then
                  AC_DEFINE(MIN_VERSION_GCRYPT, "1.4.0", [libgcrypt minimum version])
+		 min_version_gcrypt_hash_bug="1.6.0"
+		 AC_DEFINE_UNQUOTED(MIN_VERSION_GCRYPT_HASH_BUG, "$min_version_gcrypt_hash_bug", [ligcrypt minimum version without hash bug])
 		 AC_MSG_CHECKING([for libgcrypt usability])
                  AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
 		 				  {
                                                        #if HAVE_GCRYPT_H
-                                                       #include <gcrypt.h>
+                                                       #include <gcrypt.h>OB
                                                        #endif
                                                   }
 						  #include <iostream>
@@ -282,6 +284,22 @@ AC_ARG_ENABLE( [libgcrypt-linking],
 			        ],
                                 [ AC_DEFINE(CRYPTO_AVAILABLE, 1, [header and linking is available to have strong encryption works])
 				  AC_MSG_RESULT([ok])
+                                  AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
+				  				    {
+								     #if HAVE_GCRYPT_H
+                                                                     #include <gcrypt.h>
+                                                                     #endif
+                                                                    }
+								 ]],
+								 [[
+								     if(!gcry_check_version(MIN_VERSION_GCRYPT_HASH_BUG))
+								       exit(1);
+								     else
+								       exit(0);
+ 								 ]])
+						],
+						[],
+						[ libgcrypt_hash_bug="yes" ])
 				],
 				[
 				  if test "$?" = "1" ; then
@@ -806,7 +824,7 @@ else
   echo "NO"
 fi
 
-if [ "$static_pb" = "yes" -a "$build_static" = "yes" ]; then
+if [ "$static_pb" = "yes" -a "$build_static" = "yes" ] ; then
    echo ""
    echo "  Note:"
    echo ""
@@ -820,6 +838,18 @@ if [ "$static_pb" = "yes" -a "$build_static" = "yes" ]; then
    echo "You also might want to speed up the compilation process running ./configure"
    echo "with the --disable-static option"
    echo ""
+fi
+
+if [ "$libgcrypt_hash_bug" = "yes" ] ; then
+   echo ""
+   echo ""
+   echo "#################### W A R N I N G ##################################"
+   echo ""
+   echo "libgcrypt version is lower than $min_version_gcrypt_hash_bug and has a bug"
+   echo "concerning hash calculation for large files. Expect sha1 and md5 hash"
+   echo "results for slices larger than 256 Gio (gibioctet) to be incorrect."
+   echo ""
+   echo "#################### W A R N I N G ##################################"
 fi
 
 echo ""

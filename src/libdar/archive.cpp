@@ -61,6 +61,8 @@ using namespace std;
 namespace libdar
 {
 
+    static void check_libgcrypt_hash_bug(user_interaction & dialog, hash_algo hash, const infinint & first_file_size, const infinint & file_size);
+
 	// opens an already existing archive
 
     archive::archive(user_interaction & dialog,
@@ -476,6 +478,8 @@ namespace libdar
 		throw Elibcall("op_create/op_isolate", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
 	    if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_none)
 		throw Elibcall("op_create/op_isolate", gettext("Crypto block size must be greater than 10 bytes"));
+
+	    check_libgcrypt_hash_bug(dialog, options.get_hash_algo(), options.get_first_slice_size(), options.get_slice_size());
 
 	    local_path = new (nothrow) path(sauv_path);
 	    if(local_path == NULL)
@@ -1368,6 +1372,8 @@ namespace libdar
 	    throw Ecompilation(gettext("nodump flag feature has not been activated at compilation time, it is thus not available"));
 #endif
 
+	check_libgcrypt_hash_bug(dialog, hash, first_file_size, file_size);
+
             // end of sanity checks
 
 	sauv_path.explode_undisclosed();
@@ -2224,5 +2230,15 @@ namespace libdar
 	return parent;
     }
 
+
+    static void check_libgcrypt_hash_bug(user_interaction & dialog, hash_algo hash, const infinint & first_file_size, const infinint & file_size)
+    {
+	if(hash != hash_none && !crypto_min_ver_libgcrypt_no_bug())
+	{
+	    const infinint limit = tools_get_extended_size("256G", 1024);
+	    if(file_size >= limit || first_file_size >= limit)
+		dialog.pause(tools_printf(gettext("libgcrypt version < %s. Ligcrypt used has a bug that leads md5 and sha1 hash results to be erroneous for files larger than 256 Gio (gibioctet), do you really want to spend CPU cycles calculating a useless hash?"), MIN_VERSION_GCRYPT_HASH_BUG));
+	}
+    }
 
 } // end of namespace
