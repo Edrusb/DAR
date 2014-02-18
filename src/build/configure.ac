@@ -266,7 +266,7 @@ AC_ARG_ENABLE( [libgcrypt-linking],
                  AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
 		 				  {
                                                        #if HAVE_GCRYPT_H
-                                                       #include <gcrypt.h>OB
+                                                       #include <gcrypt.h>
                                                        #endif
                                                   }
 						  #include <iostream>
