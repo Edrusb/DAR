@@ -109,6 +109,7 @@ namespace libdar
 	}
     }
 
+
 ///////////////////////////// CRYPTO_SYM IMPLEMENTATION ////////////////////////////////
 
     crypto_sym::crypto_sym(U_32 block_size,
