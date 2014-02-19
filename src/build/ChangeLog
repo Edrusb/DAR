@@ -8,6 +8,13 @@ from 2.4.12 to 2.4.13
 - fixed compilation warning due to deprecated symbols in libgcrypt header files
 - rewrote gnu make specific rules to legacy ones
 - removed old unused stuff from misc subdirectory
+- adding warning at compilation time if libgcrypt used is older than 1.6.0
+- adding warning at execution time if hash computation is requested with slices
+  greater than 256 Gio and ligbcrypt dynamically or statically linked is older
+  than 1.6.0
+- fixed bug in hourshift (-H option) when comparing dates from an old extracted
+  catalogue (archive format 7 or older).
+
 
 from 2.4.11 to 2.4.12
 - for correctness fixed delete vs delete[] on vector of char (not incidence

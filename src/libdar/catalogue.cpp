@@ -1099,7 +1099,7 @@ namespace libdar
         case ea_fake:
             if(other.ea_get_saved_status() != ea_none && other.ea_get_saved_status() != ea_removed)
             {
-                if(!tools_is_equal_with_hourshift(get_last_change(), other.get_last_change(), hourshift)
+                if(!tools_is_equal_with_hourshift(hourshift, get_last_change(), other.get_last_change())
                    && get_last_change() < other.get_last_change())
                     throw Erange("inode::compare", gettext("inode last change date (ctime) greater, EA might be different"));
             }
