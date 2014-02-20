@@ -53,7 +53,7 @@ namespace libdar
 	bool operator != (const datetime & ref) const { return ! (*this == ref); };
 	bool operator >= (const datetime & ref) const { return ! (*this < ref); };
 	bool operator > (const datetime & ref) const { return ref < *this; };
-	bool operator <= (const datetime & ref) const { ref >= *this; };
+	bool operator <= (const datetime & ref) const { return ref >= *this; };
 
 	    // arithmetic on time
 	datetime operator - (const datetime & ref) const;
