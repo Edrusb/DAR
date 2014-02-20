@@ -75,19 +75,19 @@ namespace libdar
 	void set_name(const std::string & name) { filename = name; };
 
 	    /// return the archive where to find the data that was defined just before or at the given date
-	lookup get_data(archive_num & archive, const infinint & date, bool even_when_removed) const;
+	lookup get_data(archive_num & archive, const datetime & date, bool even_when_removed) const;
 
 	    /// if EA has been saved alone later, returns in which version for the state of the file at the given date.
-	lookup get_EA(archive_num & archive, const infinint & date, bool even_when_removed) const;
+	lookup get_EA(archive_num & archive, const datetime & date, bool even_when_removed) const;
 
 	    /// return the date of file's last modification date within the give archive and whether the file has been saved or deleted
-	bool read_data(archive_num num, infinint & val, etat & present) const;
+	bool read_data(archive_num num, datetime & val, etat & present) const;
 
 	    /// return the date of last inode change and whether the EA has been saved or deleted
-	bool read_EA(archive_num num, infinint & val, etat & present) const;
+	bool read_EA(archive_num num, datetime & val, etat & present) const;
 
-	void set_data(const archive_num & archive, const infinint & date, etat present) { status sta = { date, present }; last_mod[archive] = sta; };
-	void set_EA(const archive_num & archive, const infinint & date, etat present) { status sta = { date, present }; last_change[archive] = sta; };
+	void set_data(const archive_num & archive, const datetime & date, etat present) { status sta = { date, present }; last_mod[archive] = sta; };
+	void set_EA(const archive_num & archive, const datetime & date, etat present) { status sta = { date, present }; last_change[archive] = sta; };
 
 	    /// check date order between archives withing the database ; throw Erange if problem found with date order
 	virtual bool check_order(user_interaction & dialog, const path & current_path, bool & initial_warn) const { return check_map_order(dialog, last_mod, current_path, "data", initial_warn) && check_map_order(dialog, last_change, current_path, "EA", initial_warn); };
@@ -102,7 +102,7 @@ namespace libdar
 	    /// is greater or equal than "ignore_archive_greater_or_equal" as if they were not
 	    /// present in the database. If set to zero, no archive is ignored.
 	virtual void finalize(const archive_num & archive,
-			      const infinint & deleted_date,
+			      const datetime & deleted_date,
 			      const archive_num & ignore_archive_greater_or_equal);
 
 	    /// return true if the corresponding file is no more located in any archive (thus, the object is no more usefull in the base)
@@ -128,10 +128,11 @@ namespace libdar
     private:
 	struct status
 	{
-	    infinint date;                     //< date of the event
+	    datetime date;                     //< date of the event
 	    etat present;                      //< file's status in the archive
 	    void dump(generic_file & f) const; //< write the struct to file
-	    void read(generic_file &f);        //< set the struct from file
+	    void read(generic_file &f,         //< set the struct from file
+		      unsigned char db_version);
 	};
 
 
@@ -169,12 +170,12 @@ namespace libdar
 	const data_tree *read_child(const std::string & name) const;
 	void read_all_children(std::vector<std::string> & fils) const;
 	virtual void finalize_except_self(const archive_num & archive,
-					  const infinint & deleted_date,
+					  const datetime & deleted_date,
 					  const archive_num & ignore_archives_greater_or_equal);
 
 	    // inherited methods
 	bool check_order(user_interaction & dialog, const path & current_path, bool & initial_warn) const;
-	void finalize(const archive_num & archive, const infinint & deleted_date, const archive_num & ignore_archives_greater_or_equal);
+	void finalize(const archive_num & archive, const datetime & deleted_date, const archive_num & ignore_archives_greater_or_equal);
 	bool remove_all_from(const archive_num & archive_to_remove, const archive_num & last_archive);
 
 	    /// list the most recent files owned by that archive (or by any archive if num == 0)

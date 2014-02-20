@@ -37,6 +37,7 @@
 #include "compressor.hpp"
 #include "integers.hpp"
 #include "on_pool.hpp"
+#include "datetime.hpp"
 
 namespace libdar
 {
@@ -77,9 +78,9 @@ namespace libdar
 	std::string get_uid() const { return deci(uid).human(); };
 	std::string get_gid() const { return deci(gid).human(); };
 	std::string get_perm() const { return tools_get_permission_string(type, perm, hard_link); };
-	std::string get_last_access() const { return last_access != 0 ? tools_display_date(last_access) : ""; };
-	std::string get_last_modif() const { return last_modif != 0 ? tools_display_date(last_modif) : ""; };
-	std::string get_last_change() const { return last_change != 0 ? tools_display_date(last_change) : ""; };
+	std::string get_last_access() const { return last_access.is_null() ? "" : tools_display_date(last_access); };
+	std::string get_last_modif() const { return last_modif.is_null() ? "" : tools_display_date(last_modif); };
+	std::string get_last_change() const { return last_change.is_null() ? "" : tools_display_date(last_change); };
 	std::string get_file_size() const { return deci(file_size).human(); };
 	std::string get_compression_ratio() const { return tools_get_compression_ratio(storage_size, file_size); };
 	bool is_sparse() const { return sparse_file; };
@@ -97,11 +98,11 @@ namespace libdar
 	void set_uid(const infinint & val) { uid = val; };
 	void set_gid(const infinint & val) { gid = val; };
 	void set_perm(U_16 val) { perm = val; };
-	void set_last_access(const infinint & val) { last_access = val; };
-	void set_last_modif(const infinint & val) { last_modif = val; };
+	void set_last_access(const datetime & val) { last_access = val; };
+	void set_last_modif(const datetime & val) { last_modif = val; };
 	void set_saved_status(saved_status val) { data_status = val; };
 	void set_ea_status(inode::ea_status val) { ea_status = val; };
-	void set_last_change(const infinint & val) { last_change = val; };
+	void set_last_change(const datetime & val) { last_change = val; };
 	void set_file_size(const infinint & val) { file_size = val; };
 	void set_storage_size(const infinint & val) { storage_size = val; };
 	void set_is_sparse_file(bool val) { sparse_file = val; };
@@ -118,11 +119,11 @@ namespace libdar
 	infinint uid;
 	infinint gid;
 	U_16 perm;
-	infinint last_access;
-	infinint last_modif;
+	datetime last_access;
+	datetime last_modif;
 	saved_status data_status;
 	inode::ea_status ea_status;
-	infinint last_change;
+	datetime last_change;
 	infinint file_size;
 	infinint storage_size;
 	bool sparse_file;

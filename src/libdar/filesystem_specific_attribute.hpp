@@ -129,7 +129,7 @@ namespace libdar
 	bool is_included_in(const filesystem_specific_attribute_list & ref, const fsa_scope & scope) const;
 
 	    /// read FSA list from archive
-	void read(generic_file & f);
+	void read(generic_file & f, archive_version ver);
 
 	    /// write FSA list to archive
 	void write(generic_file & f) const;
@@ -241,13 +241,10 @@ namespace libdar
     class fsa_infinint : public filesystem_specific_attribute
     {
     public:
-	fsa_infinint(fsa_family f, fsa_nature n, infinint xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); mode = integer; };
+	fsa_infinint(fsa_family f, fsa_nature n, infinint xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); };
 	fsa_infinint(generic_file & f, fsa_family fam, fsa_nature nat);
 
 	const infinint & get_value() const { return val; };
-
-	enum show_mode { integer, date };
-	void set_show_mode(show_mode m) { mode = m; };
 
 	    /// inherited from filesystem_specific_attribute
 	virtual std::string show_val() const;
@@ -260,7 +257,29 @@ namespace libdar
 
     private:
 	infinint val;
-	show_mode mode;
+    };
+
+///////////////////////////////////////////////////////////////////////////
+
+    class fsa_time : public filesystem_specific_attribute
+    {
+    public:
+	fsa_time(fsa_family f, fsa_nature n, datetime xval) : filesystem_specific_attribute(f), val(xval) { set_nature(n); };
+	fsa_time(generic_file & f, archive_version ver, fsa_family fam, fsa_nature nat);
+
+	const datetime & get_value() const { return val; };
+
+	    /// inherited from filesystem_specific_attribute
+	virtual std::string show_val() const;
+	virtual void write(generic_file & f) const { val.dump(f); };
+	virtual infinint storage_size() const { return val.get_storage_size(); };
+	virtual filesystem_specific_attribute *clone() const { return cloner(this, get_pool()); };
+
+    protected:
+	virtual bool equal_value_to(const filesystem_specific_attribute & ref) const;
+
+    private:
+	datetime val;
     };
 
 	/// @}

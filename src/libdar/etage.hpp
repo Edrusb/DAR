@@ -32,6 +32,7 @@
 #include <string>
 #include "infinint.hpp"
 #include "on_pool.hpp"
+#include "datetime.hpp"
 
 namespace libdar
 {
@@ -45,19 +46,19 @@ namespace libdar
 	/// \ingroup Private
     struct etage : public on_pool
     {
-	etage() { fichier.clear(); last_mod = 0; last_acc = 0; }; // required to fake an empty dir when one is impossible to open
+	etage() { fichier.clear(); last_mod = datetime(0); last_acc = datetime(0); }; // required to fake an empty dir when one is impossible to open
         etage(user_interaction & ui,
 	      const char *dirname,
-	      const infinint & x_last_acc,
-	      const infinint & x_last_mod,
+	      const datetime & x_last_acc,
+	      const datetime & x_last_mod,
 	      bool cache_directory_tagging,
 	      bool furtive_read_mode);
 
         bool read(std::string & ref);
 
         std::list<std::string> fichier; //< holds the list of entry in the directory
-        infinint last_mod;              //< the last_lod of the directory itself
-	infinint last_acc;              //< the last_acc of the directory itself
+        datetime last_mod;              //< the last_lod of the directory itself
+	datetime last_acc;              //< the last_acc of the directory itself
     };
 
 } // end of namespace

@@ -350,7 +350,7 @@ namespace libdar
 
 		// pseudo random generator
 
-	    srand(time(NULL)+getpid()+getppid());
+	    srand(::time(NULL)+getpid()+getppid());
 
 		// initializing LIBLZO2
 

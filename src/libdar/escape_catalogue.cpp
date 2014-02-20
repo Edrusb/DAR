@@ -30,7 +30,7 @@ namespace libdar
 {
 
     escape_catalogue::escape_catalogue(user_interaction & dialog,
-				       const infinint & root_last_modif,
+				       const datetime & root_last_modif,
 				       const label & data_name, escape *esc_ptr) : catalogue(dialog, root_last_modif, data_name)
     {
 	set_esc(esc_ptr);
@@ -58,7 +58,7 @@ namespace libdar
 				       compressor *efsa_loc,
 				       escape *esc_ptr,
 				       bool lax) : catalogue(dialog,
-							     0,
+							     datetime(0),
 							     label_zero)
     {
 	set_esc(esc_ptr);

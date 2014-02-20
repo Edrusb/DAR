@@ -35,11 +35,8 @@ namespace libdar
 	uid = 0;
 	gid = 0;
 	perm = 0;
-	last_access = 0;
-	last_modif = 0;
 	data_status = s_saved;
 	ea_status = inode::ea_none;
-	last_change = 0;
 	file_size = 0;
 	storage_size = 0;
 	sparse_file = 0;

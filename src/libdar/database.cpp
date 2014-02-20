@@ -106,9 +106,9 @@ namespace libdar
 		tools_read_string(f, dat.chemin);
 		tools_read_string(f, dat.basename);
 		if(db_version >= 3)
-		    dat.root_last_mod.read(f);
+		    dat.root_last_mod.read(f, db2archive_version(db_version));
 		else
-		    dat.root_last_mod = 0;
+		    dat.root_last_mod = datetime(0);
 		coordinate.push_back(dat);
 		--tmp;
 	    }
@@ -709,7 +709,7 @@ namespace libdar
 	    return num;
     }
 
-    const infinint & database::get_root_last_mod(const archive_num & num) const
+    const datetime & database::get_root_last_mod(const archive_num & num) const
     {
 	if(num >= coordinate.size())
 	    throw SRC_BUG;

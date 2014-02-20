@@ -91,8 +91,8 @@ namespace libdar
 
     etage::etage(user_interaction &ui,
 		 const char *dirname,
-		 const infinint & x_last_acc,
-		 const infinint & x_last_mod,
+		 const datetime & x_last_acc,
+		 const datetime & x_last_mod,
 		 bool cache_directory_tagging,
 		 bool furtive_read_mode)
     {

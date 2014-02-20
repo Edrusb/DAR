@@ -78,7 +78,7 @@ namespace libdar
 	detruit();
 	user_interaction_blind aveugle;
 
-	contents = new (get_pool()) etage(aveugle, get_location().display().c_str(), 0, 0, false, furtive_mode);
+	contents = new (get_pool()) etage(aveugle, get_location().display().c_str(), datetime(0), datetime(0), false, furtive_mode);
 	if(contents == NULL)
 	    throw Ememory("entrepot_local::read_dir_reset");
     }

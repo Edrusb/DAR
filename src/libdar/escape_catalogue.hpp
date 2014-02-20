@@ -49,7 +49,7 @@ namespace libdar
     {
     public:
         escape_catalogue(user_interaction & dialog,
-			 const infinint & root_last_modif,
+			 const datetime & root_last_modif,
 			 const label & data_name, escape *esc_ptr);
         escape_catalogue(user_interaction & dialog,        //< user interaction
 			 const archive_version & reading_ver,  //< archive format

@@ -220,7 +220,7 @@ namespace libdar
 	    vector <unsigned char> digits = tools_number_base_decomposition_in_big_endian(taille, (unsigned char)(base));
 
 		// let's randomize a little more
-	    srand(time(NULL)+getpid());
+	    srand(::time(NULL)+getpid());
 
 		////
 		// choosing the location of the first marks and following informations

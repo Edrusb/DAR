@@ -81,7 +81,7 @@ namespace libdar
 
     void label::generate_internal_filename()
     {
-	const time_t src1 = time(NULL);
+	const time_t src1 = ::time(NULL);
 	const pid_t src2 = getpid();
 	const uid_t src3 = getuid();
 	unsigned char *dest = (unsigned char *)(&val);

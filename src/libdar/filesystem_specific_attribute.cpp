@@ -201,7 +201,7 @@ namespace libdar
 	return ret;
     }
 
-    void filesystem_specific_attribute_list::read(generic_file & f)
+    void filesystem_specific_attribute_list::read(generic_file & f, archive_version ver)
     {
 	infinint size = infinint(f);
 	U_I sub_size;
@@ -219,7 +219,6 @@ namespace libdar
 		fsa_family fam;
 		fsa_nature nat;
 		filesystem_specific_attribute *ptr = NULL;
-		fsa_infinint *ptr_infinint = NULL;
 
 		f.read(buffer, FAM_SIG_WIDTH);
 		buffer[FAM_SIG_WIDTH] = '\0';
@@ -234,9 +233,7 @@ namespace libdar
 		case fsan_unset:
 		    throw SRC_BUG;
 		case fsan_creation_date:
-		    ptr = ptr_infinint = new (get_pool()) fsa_infinint(f, fam, nat);
-		    if(ptr_infinint != NULL)
-			ptr_infinint->set_show_mode(fsa_infinint::date);
+		    ptr = new (get_pool()) fsa_time(f, ver, fam, nat);
 		    break;
 		case fsan_append_only:
 		case fsan_compressed:
@@ -1170,25 +1167,39 @@ namespace libdar
 	filesystem_specific_attribute(f, fam, nat)
     {
 	val.read(f);
-	mode = integer;
     }
 
     string fsa_infinint::show_val() const
     {
-	switch(mode)
-	{
-	case integer:
-	    return deci(val).human();
-	case date:
-	    return tools_display_date(val);
-	default:
-	    throw SRC_BUG;
-	}
+	return deci(val).human();
     }
 
     bool fsa_infinint::equal_value_to(const filesystem_specific_attribute & ref) const
     {
 	const fsa_infinint *ptr = dynamic_cast<const fsa_infinint *>(&ref);
+
+	if(ptr != NULL)
+	    return val == ptr->val;
+	else
+	    return false;
+    }
+
+///////////////////////////////////////////////////////////////////////////////////
+
+    fsa_time::fsa_time(generic_file & f, archive_version ver, fsa_family fam, fsa_nature nat):
+	filesystem_specific_attribute(f, fam, nat)
+    {
+	val.read(f, ver);
+    }
+
+    string fsa_time::show_val() const
+    {
+	return tools_display_date(val);
+    }
+
+    bool fsa_time::equal_value_to(const filesystem_specific_attribute & ref) const
+    {
+	const fsa_time *ptr = dynamic_cast<const fsa_time *>(&ref);
 
 	if(ptr != NULL)
 	    return val == ptr->val;

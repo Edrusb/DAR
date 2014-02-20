@@ -525,9 +525,9 @@ namespace libdar
     const ea_attributs inode::empty_ea;
 
     inode::inode(const infinint & xuid, const infinint & xgid, U_16 xperm,
-                 const infinint & last_access,
-                 const infinint & last_modif,
-                 const infinint & last_change,
+                 const datetime & last_access,
+                 const datetime & last_modif,
+                 const datetime & last_change,
                  const string & xname,
                  const infinint & fs_device) : nomme(xname)
     {
@@ -544,7 +544,7 @@ namespace libdar
         {
             last_acc = last_access;
             last_mod = last_modif;
-            last_cha = new (get_pool()) infinint(last_change);
+            last_cha = new (get_pool()) datetime(last_change);
             fs_dev = new (get_pool()) infinint(fs_device);
             if(last_cha == NULL || fs_dev == NULL)
                 throw Ememory("inde::inode");
@@ -623,12 +623,12 @@ namespace libdar
 		throw Erange("inode::inode", gettext("missing data to build an inode"));
 	    perm = ntohs(tmp);
 
-	    last_acc = infinint(f);
-	    last_mod = infinint(f);
+	    last_acc.read(f, reading_ver);
+	    last_mod.read(f, reading_ver);
 
 	    if(reading_ver >= 8)
 	    {
-		last_cha = new (get_pool()) infinint(f);
+		last_cha = new (get_pool()) datetime(f, reading_ver);
 		if(last_cha == NULL)
 		    throw Ememory("inode::inode(file)");
 
@@ -659,7 +659,7 @@ namespace libdar
 			if(ea_crc == NULL)
 			    throw SRC_BUG;
 
-			last_cha = new (get_pool()) infinint(f);
+			last_cha = new (get_pool()) datetime(f, reading_ver);
 			if(last_cha == NULL)
 			    throw Ememory("inode::inode(file)");
 		    }
@@ -674,7 +674,7 @@ namespace libdar
 		case ea_fake:
 		    if(reading_ver <= 7)
 		    {
-			last_cha = new (get_pool()) infinint(f);
+			last_cha = new (get_pool()) datetime(f, reading_ver);
 			if(last_cha == NULL)
 			    throw Ememory("inode::inode(file)");
 		    }
@@ -683,7 +683,7 @@ namespace libdar
 		case ea_removed:
 		    if(reading_ver <= 7)
 		    {
-			last_cha = new (get_pool()) infinint(0);
+			last_cha = new (get_pool()) datetime();
 			if(last_cha == NULL)
 			    throw Ememory("inode::inode(file)");
 		    }
@@ -893,7 +893,7 @@ namespace libdar
         case ea_fake:
             if(other.ea_get_saved_status() != ea_none && other.ea_get_saved_status() != ea_removed)
             {
-                if(!tools_is_equal_with_hourshift(get_last_change(), other.get_last_change(), hourshift)
+                if(!tools_is_equal_with_hourshift(hourshift, get_last_change(), other.get_last_change())
                    && get_last_change() < other.get_last_change())
                     throw Erange("inode::compare", gettext("inode last change date (ctime) greater, EA might be different"));
             }
@@ -935,7 +935,7 @@ namespace libdar
 	case fsa_partial:
 	    if(other.fsa_get_saved_status() != fsa_none)
 	    {
-		if(!tools_is_equal_with_hourshift(get_last_change(), other.get_last_change(), hourshift)
+		if(!tools_is_equal_with_hourshift(hourshift, get_last_change(), other.get_last_change())
                    && get_last_change() < other.get_last_change())
                     throw Erange("inode::compare", gettext("inode last change date (ctime) greater, FSA might be different"));
 	    }
@@ -1343,7 +1343,7 @@ namespace libdar
             return false;
     }
 
-    infinint inode::get_last_change() const
+    datetime inode::get_last_change() const
     {
         if(last_cha == NULL)
             throw SRC_BUG;
@@ -1351,7 +1351,7 @@ namespace libdar
             return *last_cha;
     }
 
-    void inode::set_last_change(const infinint & x_time)
+    void inode::set_last_change(const datetime & x_time)
     {
         if(last_cha == NULL)
             throw SRC_BUG;
@@ -1486,7 +1486,7 @@ namespace libdar
 					throw Ememory("inode::get_fsa");
 				    try
 				    {
-					const_cast<inode *>(this)->fsal->read(*storage);
+					const_cast<inode *>(this)->fsal->read(*storage, edit);
 				    }
 				    catch(...)
 				    {
@@ -2076,9 +2076,9 @@ namespace libdar
 
 
     file::file(const infinint & xuid, const infinint & xgid, U_16 xperm,
-               const infinint & last_access,
-               const infinint & last_modif,
-               const infinint & last_change,
+               const datetime & last_access,
+               const datetime & last_modif,
+               const datetime & last_change,
                const string & src,
                const path & che,
                const infinint & taille,
@@ -2761,9 +2761,9 @@ namespace libdar
     }
 
     lien::lien(const infinint & uid, const infinint & gid, U_16 perm,
-	       const infinint & last_access,
-	       const infinint & last_modif,
-	       const infinint & last_change,
+	       const datetime & last_access,
+	       const datetime & last_modif,
+	       const datetime & last_change,
 	       const string & name,
 	       const string & target,
 	       const infinint & fs_device) : inode(uid, gid, perm, last_access, last_modif, last_change, name, fs_device)
@@ -2817,9 +2817,9 @@ namespace libdar
     const eod directory::fin;
 
     directory::directory(const infinint & xuid, const infinint & xgid, U_16 xperm,
-			 const infinint & last_access,
-			 const infinint & last_modif,
-			 const infinint & last_change,
+			 const datetime & last_access,
+			 const datetime & last_modif,
+			 const datetime & last_change,
 			 const string & xname,
 			 const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device)
     {
@@ -3469,9 +3469,9 @@ namespace libdar
     }
 
     device::device(const infinint & uid, const infinint & gid, U_16 perm,
-		   const infinint & last_access,
-		   const infinint & last_modif,
-		   const infinint & last_change,
+		   const datetime & last_access,
+		   const datetime & last_modif,
+		   const datetime & last_change,
 		   const string & name,
 		   U_16 major,
 		   U_16 minor,
@@ -3536,9 +3536,9 @@ namespace libdar
 	    throw Erange("detruit::detruit", gettext("missing data to build"));
 
 	if(reading_ver > 7)
-	    del_date.read(f);
+	    del_date.read(f,reading_ver);
 	else
-	    del_date = 0;
+	    del_date = datetime(0);
     }
 
     void detruit::inherited_dump(generic_file & f, bool small) const
@@ -3555,13 +3555,13 @@ namespace libdar
 	tmp.specific_dump(f, small); // dump an empty directory
     }
 
-    catalogue::catalogue(user_interaction & dialog, const infinint & root_last_modif, const label & data_name) : mem_ui(dialog), out_compare("/")
+    catalogue::catalogue(user_interaction & dialog, const datetime & root_last_modif, const label & data_name) : mem_ui(dialog), out_compare("/")
     {
 	contenu = NULL;
 
 	try
 	{
-	    contenu = new (get_pool()) directory(0,0,0,0,root_last_modif,0,"root",0);
+	    contenu = new (get_pool()) directory(0,0,0,datetime(0),root_last_modif,datetime(0),"root",0);
 	    if(contenu == NULL)
 		throw Ememory("catalogue::catalogue(path)");
 	    current_compare = contenu;
@@ -4435,7 +4435,7 @@ namespace libdar
 			if(e_det != NULL)
 			{
 			    string tmp = e_nom->get_name();
-			    string tmp_date = e_det->get_date() != 0 ? tools_display_date(e_det->get_date()) : "Unknown date";
+			    string tmp_date = !e_det->get_date().is_null() ? tools_display_date(e_det->get_date()) : "Unknown date";
 			    saved_status poub;
 			    char type;
 
@@ -4557,7 +4557,7 @@ namespace libdar
 			if(e_det != NULL)
 			{
 			    string tmp = e_nom->get_name();
-			    string tmp_date = e_det->get_date() != 0 ? tools_display_date(e_det->get_date()) : "Unknown date";
+			    string tmp_date = ! e_det->get_date().is_null() ? tools_display_date(e_det->get_date()) : "Unknown date";
 			    if(get_ui().get_use_listing())
 				get_ui().listing(REMOVE_TAG, "xxxxxxxxxx", "", "", "", tmp_date, beginning+sep+tmp, false, false);
 			    else
@@ -5248,11 +5248,11 @@ namespace libdar
 	    user = local_uid(*e_ino);
 	    group = local_gid(*e_ino);
 	    permissions = local_perm(*e_ino, e_hard != NULL);
-	    atime = deci(e_ino->get_last_access()).human();
-	    mtime = deci(e_ino->get_last_modif()).human();
+	    atime = deci(e_ino->get_last_access().get_value()).human();
+	    mtime = deci(e_ino->get_last_modif().get_value()).human();
 	    if(e_ino->has_last_change())
 	    {
-		ctime = deci(e_ino->get_last_change()).human();
+		ctime = deci(e_ino->get_last_change().get_value()).human();
 		if(ctime == "0")
 		    ctime = "";
 	    }

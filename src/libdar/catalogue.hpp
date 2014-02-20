@@ -50,6 +50,7 @@ extern "C"
 #include "escape.hpp"
 #include "on_pool.hpp"
 #include "filesystem_specific_attribute.hpp"
+#include "datetime.hpp"
 
 namespace libdar
 {
@@ -208,9 +209,9 @@ namespace libdar
         inode(const infinint & xuid,
 	      const infinint & xgid,
 	      U_16 xperm,
-              const infinint & last_access,
-              const infinint & last_modif,
-	      const infinint & last_change,
+              const datetime & last_access,
+              const datetime & last_modif,
+	      const datetime & last_change,
               const std::string & xname,
 	      const infinint & device);
         inode(user_interaction & dialog,
@@ -226,10 +227,10 @@ namespace libdar
         const infinint & get_uid() const { return uid; };
         const infinint & get_gid() const { return gid; };
         U_16 get_perm() const { return perm; };
-        infinint get_last_access() const { return last_acc; };
-        infinint get_last_modif() const { return last_mod; };
-        void set_last_access(const infinint & x_time) { last_acc = x_time; };
-        void set_last_modif(const infinint & x_time) { last_mod = x_time; };
+        datetime get_last_access() const { return last_acc; };
+        datetime get_last_modif() const { return last_mod; };
+        void set_last_access(const datetime & x_time) { last_acc = x_time; };
+        void set_last_modif(const datetime & x_time) { last_mod = x_time; };
         saved_status get_saved_status() const { return xsaved; };
         void set_saved_status(saved_status x) { xsaved = x; };
 	infinint get_device() const { if(fs_dev == NULL) throw SRC_BUG; return *fs_dev; };
@@ -284,8 +285,8 @@ namespace libdar
 	bool ea_get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
 
             // IV : to know/record if EA and FSA have been modified # any EA status# and FSA status #
-        infinint get_last_change() const;
-        void set_last_change(const infinint & x_time);
+        datetime get_last_change() const;
+        void set_last_change(const datetime & x_time);
 	bool has_last_change() const { return last_cha != NULL; };
 	    // old format did provide last_change only when EA were present, since archive
 	    // format 8, this field is always present even in absence of EA. Thus it is
@@ -340,9 +341,10 @@ namespace libdar
         infinint uid;            //< inode owner's user ID
         infinint gid;            //< inode owner's group ID
         U_16 perm;               //< inode's permission
-        infinint last_acc;       //< last access time (atime)
-	infinint last_mod;       //< last modification time (mtime)
-        infinint *last_cha;      //< last inode meta data change (ctime)
+        datetime last_acc;       //< last access time (atime)
+	datetime last_mod;       //< last modification time (mtime)
+        datetime *last_cha;
+      //< last inode meta data change (ctime)
         saved_status xsaved;     //< inode data status
         ea_status ea_saved;      //< inode Extended Attribute status
 	fsa_status fsa_saved;    //< inode Filesystem Specific Attribute status
@@ -362,7 +364,7 @@ namespace libdar
 	    //
 	infinint *fs_dev;        //< filesystem ID on which resides the inode (only used when read from filesystem)
 	compressor *storage;     //< where are stored EA and FSA
-	archive_version edit;    //< need to know EA format used in archive file
+	archive_version edit;    //< need to know EA and FSA format used in archive file
 
 	escape *esc;  // if not NULL, the object is partially build from archive (at archive generation, dump() was called with small set to true)
 
@@ -521,9 +523,9 @@ namespace libdar
 	static const U_8 FILE_DATA_IS_DIRTY = 0x02;  //< data modified while being saved
 
         file(const infinint & xuid, const infinint & xgid, U_16 xperm,
-             const infinint & last_access,
-             const infinint & last_modif,
-	     const infinint & last_change,
+             const datetime & last_access,
+             const datetime & last_modif,
+	     const datetime & last_change,
              const std::string & src,
              const path & che,
              const infinint & taille,
@@ -610,10 +612,12 @@ namespace libdar
     class door : public file
     {
     public:
-        door(const infinint & xuid, const infinint & xgid, U_16 xperm,
-             const infinint & last_access,
-             const infinint & last_modif,
-             const infinint & last_change,
+        door(const infinint & xuid,
+	     const infinint & xgid,
+	     U_16 xperm,
+             const datetime & last_access,
+             const datetime & last_modif,
+             const datetime & last_change,
              const std::string & src,
              const path & che,
              const infinint & fs_device) : file(xuid, xgid, xperm, last_access, last_modif,
@@ -638,9 +642,9 @@ namespace libdar
     {
     public :
         lien(const infinint & uid, const infinint & gid, U_16 perm,
-             const infinint & last_access,
-             const infinint & last_modif,
-	     const infinint & last_change,
+             const datetime & last_access,
+             const datetime & last_modif,
+	     const datetime & last_change,
              const std::string & name,
 	     const std::string & target,
 	     const infinint & fs_device);
@@ -672,10 +676,12 @@ namespace libdar
     class directory : public inode
     {
     public :
-        directory(const infinint & xuid, const infinint & xgid, U_16 xperm,
-                  const infinint & last_access,
-                  const infinint & last_modif,
-		  const infinint & last_change,
+        directory(const infinint & xuid,
+		  const infinint & xgid,
+		  U_16 xperm,
+                  const datetime & last_access,
+                  const datetime & last_modif,
+		  const datetime & last_change,
                   const std::string & xname,
 		  const infinint & device);
         directory(const directory &ref); // only the inode part is build, no children is duplicated (empty dir)
@@ -759,9 +765,9 @@ namespace libdar
     {
     public :
         device(const infinint & uid, const infinint & gid, U_16 perm,
-               const infinint & last_access,
-               const infinint & last_modif,
-	       const infinint &last_change,
+               const datetime & last_access,
+               const datetime & last_modif,
+	       const datetime &last_change,
                const std::string & name,
                U_16 major,
                U_16 minor,
@@ -795,9 +801,9 @@ namespace libdar
     {
     public:
         chardev(const infinint & uid, const infinint & gid, U_16 perm,
-                const infinint & last_access,
-                const infinint & last_modif,
-		const infinint & last_change,
+                const datetime & last_access,
+                const datetime & last_modif,
+		const datetime & last_change,
                 const std::string & name,
                 U_16 major,
                 U_16 minor,
@@ -826,9 +832,9 @@ namespace libdar
     {
     public:
         blockdev(const infinint & uid, const infinint & gid, U_16 perm,
-                 const infinint & last_access,
-                 const infinint & last_modif,
-		 const infinint & last_change,
+                 const datetime & last_access,
+                 const datetime & last_modif,
+		 const datetime & last_change,
                  const std::string & name,
                  U_16 major,
                  U_16 minor,
@@ -854,9 +860,9 @@ namespace libdar
     {
     public :
         tube(const infinint & xuid, const infinint & xgid, U_16 xperm,
-             const infinint & last_access,
-             const infinint & last_modif,
-	     const infinint & last_change,
+             const datetime & last_access,
+             const datetime & last_modif,
+	     const datetime & last_change,
              const std::string & xname,
 	     const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device) { set_saved_status(s_saved); };
         tube(user_interaction & dialog,
@@ -878,9 +884,9 @@ namespace libdar
     {
     public :
         prise(const infinint & xuid, const infinint & xgid, U_16 xperm,
-              const infinint & last_access,
-              const infinint & last_modif,
-	      const infinint & last_change,
+              const datetime & last_access,
+              const datetime & last_modif,
+	      const datetime & last_change,
               const std::string & xname,
 	      const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device) { set_saved_status(s_saved); };
         prise(user_interaction & dialog,
@@ -901,7 +907,7 @@ namespace libdar
     class detruit : public nomme
     {
     public :
-        detruit(const std::string & name, unsigned char firm, const infinint & date) : nomme(name) , del_date(date) { signe = firm; };
+        detruit(const std::string & name, unsigned char firm, const datetime & date) : nomme(name) , del_date(date) { signe = firm; };
         detruit(generic_file & f, const archive_version & reading_ver);
 	detruit(const nomme &ref) : nomme(ref.get_name()), del_date(0) { signe = ref.signature(); };
 
@@ -910,15 +916,15 @@ namespace libdar
         unsigned char signature() const { return 'x'; };
         entree *clone() const { return new (get_pool()) detruit(*this); };
 
-	const infinint & get_date() const { return del_date; };
-	void set_date(const infinint & ref) { del_date = ref; };
+	const datetime & get_date() const { return del_date; };
+	void set_date(const datetime & ref) { del_date = ref; };
 
     protected:
         void inherited_dump(generic_file & f, bool small) const;
 
     private :
         unsigned char signe;
-	infinint del_date;
+	datetime del_date;
     };
 
 	/// the present file to ignore (not to be recorded as deleted later)
@@ -960,7 +966,7 @@ namespace libdar
     {
     public :
         catalogue(user_interaction & dialog,
-		  const infinint & root_last_modif,
+		  const datetime & root_last_modif,
 		  const label & data_name);
         catalogue(user_interaction & dialog,
 		  generic_file & f,
@@ -1091,12 +1097,12 @@ namespace libdar
         const directory *get_contenu() const { return contenu; }; // used by data_tree
 
 	const label & get_data_name() const { return ref_data_name; };
-	infinint get_root_dir_last_modif() const { return contenu->get_last_modif(); };
+	datetime get_root_dir_last_modif() const { return contenu->get_last_modif(); };
 
 	    /// recursive evaluation of directories that have changed (make the directory::get_recurisve_has_changed() method of entry in this catalogue meaningful)
 	void launch_recursive_has_changed_update() const { contenu->recursive_has_changed_update(); };
 
-	infinint get_root_mtime() const { return contenu->get_last_modif(); };
+	datetime get_root_mtime() const { return contenu->get_last_modif(); };
 
 	    /// reset all pointers to the root (a bit better than reset_add() + reset_read() + reset_compare() + reset_sub_read())
 	void reset_all();

@@ -187,18 +187,18 @@ namespace libdar
 		    string pointed = tools_readlink(ptr_name);
 
 		    ref = new (get_pool()) lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						buf.st_atime,
-						buf.st_mtime,
-						buf.st_ctime,
+						datetime(buf.st_atime, datetime::tu_seconde),
+						datetime(buf.st_mtime, datetime::tu_seconde),
+						datetime(buf.st_ctime, datetime::tu_seconde),
 						name,
 						pointed,
 						buf.st_dev);
 		}
 		else if(S_ISREG(buf.st_mode))
 		    ref = new (get_pool()) file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						buf.st_atime,
-						buf.st_mtime,
-						buf.st_ctime,
+						datetime(buf.st_atime, datetime::tu_seconde),
+						datetime(buf.st_mtime, datetime::tu_seconde),
+						datetime(buf.st_ctime, datetime::tu_seconde),
 						name,
 						lieu,
 						buf.st_size,
@@ -206,49 +206,49 @@ namespace libdar
 						furtive_read_mode);
 		else if(S_ISDIR(buf.st_mode))
 		    ref = new (get_pool()) directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						     buf.st_atime,
-						     buf.st_mtime,
-						     buf.st_ctime,
+						     datetime(buf.st_atime, datetime::tu_seconde),
+						     datetime(buf.st_mtime, datetime::tu_seconde),
+						     datetime(buf.st_ctime, datetime::tu_seconde),
 						     name,
 						     buf.st_dev);
 		else if(S_ISCHR(buf.st_mode))
 		    ref = new (get_pool()) chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						   buf.st_atime,
-						   buf.st_mtime,
-						   buf.st_ctime,
+						   datetime(buf.st_atime, datetime::tu_seconde),
+						   datetime(buf.st_mtime, datetime::tu_seconde),
+						   datetime(buf.st_ctime, datetime::tu_seconde),
 						   name,
 						   major(buf.st_rdev),
 						   minor(buf.st_rdev), // makedev(major, minor)
 						   buf.st_dev);
 		else if(S_ISBLK(buf.st_mode))
 		    ref = new (get_pool()) blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						    buf.st_atime,
-						    buf.st_mtime,
-						    buf.st_ctime,
+						    datetime(buf.st_atime, datetime::tu_seconde),
+						    datetime(buf.st_mtime, datetime::tu_seconde),
+						    datetime(buf.st_ctime, datetime::tu_seconde),
 						    name,
 						    major(buf.st_rdev),
 						    minor(buf.st_rdev), // makedev(major, minor)
 						    buf.st_dev);
 		else if(S_ISFIFO(buf.st_mode))
 		    ref = new (get_pool()) tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						buf.st_atime,
-						buf.st_mtime,
-						buf.st_ctime,
+						datetime(buf.st_atime, datetime::tu_seconde),
+						datetime(buf.st_mtime, datetime::tu_seconde),
+						datetime(buf.st_ctime, datetime::tu_seconde),
 						name,
 						buf.st_dev);
 		else if(S_ISSOCK(buf.st_mode))
 		    ref = new (get_pool()) prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						 buf.st_atime,
-						 buf.st_mtime,
-						 buf.st_ctime,
+						 datetime(buf.st_atime, datetime::tu_seconde),
+						 datetime(buf.st_mtime, datetime::tu_seconde),
+						 datetime(buf.st_ctime, datetime::tu_seconde),
 						 name,
 						 buf.st_dev);
 #if HAVE_DOOR
 		else if(S_ISDOOR(buf.st_mode))
 		    ref = new (get_pool()) door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						buf.st_atime,
-						buf.st_mtime,
-						buf.st_ctime,
+						datetime(buf.st_atime, datetime::tu_seconde),
+						datetime(buf.st_mtime, datetime::tu_seconde),
+						datetime(buf.st_ctime, datetime::tu_seconde),
 						name,
 						lieu,
 						buf.st_dev);
@@ -2159,7 +2159,7 @@ namespace libdar
 
 	if(S_ISDIR(buf.st_mode))
 	{
-	    etage fils = etage(ui, s, 0, 0, false, false); // we don't care the access and modification time because directory will be destroyed
+	    etage fils = etage(ui, s, datetime(0), datetime(0), false, false); // we don't care the access and modification time because directory will be destroyed
 	    string tmp;
 
 		// first we destroy directory's children
@@ -2267,7 +2267,7 @@ namespace libdar
 	if(what_to_check == inode::cf_all || what_to_check == inode::cf_ignore_owner || what_to_check == inode::cf_mtime)
 	    if(ref_lie == NULL) // not restoring atime & ctime for symbolic links
 	    {
-		infinint birthtime = ref.get_last_modif();
+		datetime birthtime = ref.get_last_modif();
 		fsa_scope::iterator it = scope.find(fsaf_hfs_plus);
 
 		if(ref.fsa_get_saved_status() == inode::fsa_full && it != scope.end())

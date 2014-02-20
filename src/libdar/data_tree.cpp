@@ -45,6 +45,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "deci.hpp"
 #include "path.hpp"
+#include "datetime.hpp"
 
 using namespace std;
 using namespace libdar;
@@ -54,9 +55,9 @@ static void read_from_file(generic_file &f, archive_num &a);
 static void write_to_file(generic_file &f, archive_num a);
 static void display_line(user_interaction & dialog,
 			 archive_num num,
-			 const infinint *data,
+			 const datetime *data,
 			 data_tree::etat data_presence,
-			 const infinint *ea,
+			 const datetime *ea,
 			 data_tree::etat ea_presence);
 
 #define ETAT_SAVED 'S'
@@ -88,11 +89,11 @@ namespace libdar
 	}
     }
 
-    void data_tree::status::read(generic_file & f)
+    void data_tree::status::read(generic_file & f, unsigned char db_version)
     {
 	char tmp;
 
-	date.read(f);
+	date.read(f, db2archive_version(db_version));
 	if(f.read(&tmp, 1) != 1)
 	    throw Erange("data_tree::status::read", gettext("reached End of File before all expected data could be read"));
 	switch(tmp)
@@ -139,7 +140,7 @@ namespace libdar
 		break;
 	    case 2:
 	    case 3:
-		sta.read(f);
+		sta.read(f, db_version);
 		last_mod[k] = sta;
 		break;
 	    default: // unsupported database version
@@ -161,7 +162,7 @@ namespace libdar
 		break;
 	    case 2:
 	    case 3:
-		sta.read(f);
+		sta.read(f, db_version);
 		last_change[k] = sta;
 		break;
 	    default:
@@ -201,10 +202,10 @@ namespace libdar
     }
 
 
-    data_tree::lookup data_tree::get_data(archive_num & archive, const infinint & date, bool even_when_removed) const
+    data_tree::lookup data_tree::get_data(archive_num & archive, const datetime & date, bool even_when_removed) const
     {
 	map<archive_num, status>::const_iterator it = last_mod.begin();
-	infinint max_seen = 0, max_real = 0;
+	datetime max_seen = datetime(0), max_real = datetime(0);
 	    //archive (first argument) carries the last archive number (in the order of the database) in which a valid entry has been
 	    //found, but which is not just a record "et_present" meaning that the file existed but has not been saved (differential backup context) or "et_absent" (no entry in the corresponding archive).
 	archive_num archive_seen = 0; //< last archive number (in the order of the database) in which a valid entry has been found (any state)
@@ -218,7 +219,7 @@ namespace libdar
 	{
 	    if(it->second.date >= max_seen  // > and = because there should never be twice the same value
 		   // and we must be able to see a value of 0 (initially max = 0) which is valid.
-	       && (date == 0 || it->second.date <= date))
+	       && (date.is_null() || it->second.date <= date))
 	    {
 		max_seen = it->second.date;
 		archive_seen = it->first;
@@ -239,7 +240,7 @@ namespace libdar
 
 	    if(it->second.date >= max_real  // > and = because there should never be twice the same value
 		   // and we must be able to see a value of 0 (initially max = 0) which is valid.
-	       && (date == 0 || it->second.date <= date))
+	       && (date.is_null() || it->second.date <= date))
 	    {
 		if(it->second.present != et_present)
 		{
@@ -303,10 +304,10 @@ namespace libdar
 	return ret;
     }
 
-    data_tree::lookup data_tree::get_EA(archive_num & archive, const infinint & date, bool even_when_removed) const
+    data_tree::lookup data_tree::get_EA(archive_num & archive, const datetime & date, bool even_when_removed) const
     {
 	map<archive_num, status>::const_iterator it = last_change.begin();
-	infinint max_seen = 0, max_real = 0;
+	datetime max_seen = datetime(0), max_real = datetime(0);
 	bool presence_seen = false, presence_real = false;
 	archive_num archive_seen = 0;
 	archive_num archive_even_when_removed = 0;
@@ -317,7 +318,7 @@ namespace libdar
 	{
 	    if(it->second.date >= max_seen  // > and = because there should never be twice the same value
 		   // and we must be able to see a value of 0 (initially max = 0) which is valid.
-	       && (date == 0 || it->second.date <= date))
+	       && (date.is_null() || it->second.date <= date))
 	    {
 		max_seen = it->second.date;
 		archive_seen = it->first;
@@ -338,7 +339,7 @@ namespace libdar
 
 	    if(it->second.date >= max_real  // > and = because there should never be twice the same value
 		   // and we must be able to see a value of 0 (initially max = 0) which is valid.
-	       && (date == 0 || it->second.date <= date))
+	       && (date.is_null() || it->second.date <= date))
 	    {
 		if(it->second.present != et_present)
 		{
@@ -395,7 +396,7 @@ namespace libdar
 	return ret;
     }
 
-    bool data_tree::read_data(archive_num num, infinint & val, etat & present) const
+    bool data_tree::read_data(archive_num num, datetime & val, etat & present) const
     {
 	map<archive_num, status>::const_iterator it = last_mod.find(num);
 
@@ -409,7 +410,7 @@ namespace libdar
 	    return false;
     }
 
-    bool data_tree::read_EA(archive_num num, infinint & val, etat & present) const
+    bool data_tree::read_EA(archive_num num, datetime & val, etat & present) const
     {
 	map<archive_num, status>::const_iterator it = last_change.find(num);
 
@@ -423,12 +424,12 @@ namespace libdar
 	    return false;
     }
 
-    void data_tree::finalize(const archive_num & archive, const infinint & deleted_date, const archive_num & ignore_archives_greater_or_equal)
+    void data_tree::finalize(const archive_num & archive, const datetime & deleted_date, const archive_num & ignore_archives_greater_or_equal)
     {
 	map<archive_num, status>::iterator it = last_mod.begin();
 	bool presence_max = false;
 	archive_num num_max = 0;
-	infinint last_mtime = 0; // used as deleted_date for EA if last mtime is found
+	datetime last_mtime = datetime(0); // used as deleted_date for EA if last mtime is found
 	bool found_in_archive = false;
 
 	    // checking the last_mod map
@@ -476,7 +477,7 @@ namespace libdar
 		if(deleted_date > last_mtime)
 		    set_data(archive, deleted_date, et_absent); // add an entry telling that this file does no more exist in the current archive
 		else
-		    set_data(archive, last_mtime + 1, et_absent);
+		    set_data(archive, last_mtime + datetime(1), et_absent);
 	    }
 	    else // the entry has been seen previously but as removed in the latest state,
 		// if we already have an et_absent entry (which is possible during a reordering archive operation within a database), we can (and must) suppress it.
@@ -561,19 +562,19 @@ namespace libdar
 	    //   - this entry does not only exist in the archive about to be removed
 	if(archive_to_remove < last_archive)
 	{
-	    infinint del_date;
+	    datetime del_date;
 	    etat status;
 	    if(last_mod.size() > 1 && read_data(archive_to_remove, del_date, status))
 		if(status == et_removed)
 		{
-		    infinint tmp;
+		    datetime tmp;
 		    if(!read_data(archive_to_remove + 1, tmp, status))
 			set_data(archive_to_remove + 1, del_date, et_removed);
 		}
 	    if(last_change.size() > 1 && read_EA(archive_to_remove, del_date, status))
 		if(status == et_removed)
 		{
-		    infinint tmp;
+		    datetime tmp;
 		    if(!read_EA(archive_to_remove + 1, tmp, status))
 			set_EA(archive_to_remove + 1, del_date, et_removed);
 		}
@@ -703,7 +704,7 @@ namespace libdar
 					      vector<infinint> & total_data, vector<infinint> & total_ea) const
     {
 	archive_num most_recent = 0;
-	infinint max = 0;
+	datetime max = datetime(0);
 	map<archive_num, status>::const_iterator it = last_mod.begin();
 
 	while(it != last_mod.end())
@@ -723,7 +724,7 @@ namespace libdar
 	    ++data[most_recent];
 
 	most_recent = 0;
-	max = 0;
+	max = datetime(0);
 	it = last_change.begin();
 
 	while(it != last_change.end())
@@ -747,10 +748,10 @@ namespace libdar
 
     struct trecord
     {
-	infinint date;
+	datetime date;
 	bool set;
 
-	trecord() { set = false; date = 0; };
+	trecord() { set = false; date = datetime(0); };
 	trecord(const trecord & ref) { date = ref.date; set = ref.set; };
 	const trecord & operator = (const trecord & ref) { date = ref.date; set = ref.set; return *this; };
     };
@@ -793,7 +794,7 @@ bool data_tree::fix_corruption()
 	vector<trecord> dates = vector<trecord>(dates_size);
 	map<archive_num, status>::const_iterator it = the_map.begin();
 	vector<trecord>::iterator rec_it;
-	infinint last_date = 0;
+	datetime last_date = datetime(0);
 
 	    // now the algorithm
 
@@ -978,7 +979,7 @@ bool data_tree::fix_corruption()
 	data_tree * tree = find_or_addition(entry->get_name(), entry_dir != NULL, archive);
 	archive_num last_archive;
 	lookup result;
-	infinint last_mod = entry->get_last_modif() > entry->get_last_change() ? entry->get_last_modif() : entry->get_last_change();
+	datetime last_mod = entry->get_last_modif() > entry->get_last_change() ? entry->get_last_modif() : entry->get_last_change();
 
 	switch(entry->get_saved_status())
 	{
@@ -998,7 +999,7 @@ bool data_tree::fix_corruption()
 	case inode::ea_none:
 	    break;
 	case inode::ea_removed:
-	    result = tree->get_EA(last_archive, 0, false);
+	    result = tree->get_EA(last_archive, datetime(0), false);
 	    if(result == found_present || result == not_restorable)
 		tree->set_EA(archive, entry->get_last_change(), et_removed);
 		// else no need to add an et_remove entry in the map
@@ -1021,10 +1022,10 @@ bool data_tree::fix_corruption()
 	archive_num last_archive;
 	lookup result;
 
-	result = tree->get_data(last_archive, 0, false);
+	result = tree->get_data(last_archive, datetime(0), false);
 	if(result == found_present || result == not_restorable)
 	    tree->set_data(archive, entry->get_date(), et_removed);
-	result = tree->get_EA(last_archive, 0, false);
+	result = tree->get_EA(last_archive, datetime(0), false);
 	if(result == found_present || result == not_restorable)
 	    tree->set_EA(archive, entry->get_date(), et_removed);
     }
@@ -1071,15 +1072,15 @@ bool data_tree::fix_corruption()
 	return ret;
     }
 
-    void data_dir::finalize(const archive_num & archive, const infinint & deleted_date, const archive_num & ignore_archives_greater_or_equal)
+    void data_dir::finalize(const archive_num & archive, const datetime & deleted_date, const archive_num & ignore_archives_greater_or_equal)
     {
-	infinint new_deleted_date;
+	datetime new_deleted_date;
 	archive_num tmp_archive;
 	etat tmp_presence;
 
 	data_tree::finalize(archive, deleted_date, ignore_archives_greater_or_equal);
 
-	switch(get_data(tmp_archive, 0, false))
+	switch(get_data(tmp_archive, datetime(0), false))
 	{
 	case found_present:
 	case found_removed:
@@ -1100,7 +1101,7 @@ bool data_tree::fix_corruption()
 	finalize_except_self(archive, new_deleted_date, ignore_archives_greater_or_equal);
     }
 
-    void data_dir::finalize_except_self(const archive_num & archive, const infinint & deleted_date, const archive_num & ignore_archives_greater_or_equal)
+    void data_dir::finalize_except_self(const archive_num & archive, const datetime & deleted_date, const archive_num & ignore_archives_greater_or_equal)
     {
 	list<data_tree *>::iterator it = rejetons.begin();
 
@@ -1159,8 +1160,8 @@ bool data_tree::fix_corruption()
 		throw SRC_BUG;
 	    data_dir *dir = dynamic_cast<data_dir *>(*it);
 
-	    lo_data = (*it)->get_data(ou_data, 0, false);
-	    lo_ea = (*it)->get_EA(ou_ea, 0, false);
+	    lo_data = (*it)->get_data(ou_data, datetime(0), false);
+	    lo_ea = (*it)->get_EA(ou_ea, datetime(0), false);
 	    data = lo_data == found_present && (ou_data == num || num == 0);
 	    ea = lo_ea == found_present && (ou_ea == num || num == 0);
 	    name = (*it)->get_name();
@@ -1332,7 +1333,7 @@ bool data_tree::fix_corruption()
 	    if(entry_ino == NULL)
 		if(entry_det != NULL)
 		{
-		    if(entry_det->get_date() != 0)
+		    if(!entry_det->get_date().is_null())
 			racine->add(entry_det, archive);
 			// else this is an old archive that does not store date with detruit objects
 		}
@@ -1424,9 +1425,9 @@ static void write_to_file(generic_file &f, archive_num a)
 
 static void display_line(user_interaction & dialog,
 			 archive_num num,
-			 const infinint *data,
+			 const datetime *data,
 			 data_tree::etat data_presence,
-			 const infinint *ea,
+			 const datetime *ea,
 			 data_tree::etat ea_presence)
 {
 

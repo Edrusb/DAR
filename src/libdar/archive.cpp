@@ -2011,7 +2011,7 @@ namespace libdar
 
 		    // ********** building the catalogue (empty for now) ************************* //
 
-		infinint root_mtime;
+		datetime root_mtime;
 		if(info_details)
 		    dialog.warning(gettext("Building the catalog object..."));
 		try
@@ -2020,8 +2020,8 @@ namespace libdar
 			root_mtime = tools_get_mtime(fs_root.display());
 		    else
 		    {
-			infinint mtime1 = ref_cat1 != NULL ? ref_cat1->get_root_mtime() : 0;
-			infinint mtime2 = ref_cat2 != NULL ? ref_cat2->get_root_mtime() : 0;
+			datetime mtime1 = ref_cat1 != NULL ? ref_cat1->get_root_mtime() : datetime(0);
+			datetime mtime2 = ref_cat2 != NULL ? ref_cat2->get_root_mtime() : datetime(0);
 			root_mtime = mtime1 > mtime2 ? mtime1 : mtime2;
 		    }
 		}
@@ -2066,7 +2066,7 @@ namespace libdar
 			    label data_name;
 			    data_name.clear();
 			    void_cat = new (pool) catalogue(dialog,
-							    0,
+							    datetime(0),
 							    data_name);
 			    if(void_cat == NULL)
 				throw Ememory("archive::op_create_in_sub");

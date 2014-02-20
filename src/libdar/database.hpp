@@ -201,7 +201,7 @@ namespace libdar
 	{
 	    std::string chemin;      //< path to the archive
 	    std::string basename;    //< basename of the archive
-	    infinint root_last_mod;  //< last modification date of the root directory
+	    datetime root_last_mod;  //< last modification date of the root directory
 	};
 
 	std::vector<struct archive_data> coordinate; //< list of archive used to build the database
@@ -214,7 +214,7 @@ namespace libdar
 	void build(user_interaction & dialog, generic_file & f, bool partial, bool read_only, unsigned char db_version);  //< used by constructors
 	archive_num get_real_archive_num(archive_num num, bool revert) const;
 
-	const infinint & get_root_last_mod(const archive_num & num) const;
+	const datetime & get_root_last_mod(const archive_num & num) const;
     };
 
 } // end of namespace

@@ -59,6 +59,7 @@ extern "C"
 #include "integers.hpp"
 #include "tlv_list.hpp"
 #include "memory_pool.hpp"
+#include "datetime.hpp"
 
 #define TOOLS_SI_SUFFIX 1000
 #define TOOLS_BIN_SUFFIX 1024
@@ -210,6 +211,7 @@ namespace libdar
         /// \param[in] x the integer to convert
         /// \return the decimal representation of the given integer
     extern std::string tools_int2str(S_I x);
+    extern std::string tools_uint2str(U_I x);
 
         /// convert an integer written in decimal notation to the corresponding value
 
@@ -243,7 +245,7 @@ namespace libdar
 
         /// \param[in] date the date in second
         /// \return the human representation corresponding to the argument
-    extern std::string tools_display_date(infinint date);
+    extern std::string tools_display_date(const datetime & date);
 
 	/// convert a human readable date representation in number of second since the system reference date
 
@@ -353,7 +355,7 @@ namespace libdar
         /// \param[in] date1 first date to compare
         /// \param[in] date2 second date to compare to
         /// \return whether dates are equal or not
-    extern bool tools_is_equal_with_hourshift(const infinint & hourshift, const infinint & date1, const infinint & date2);
+    extern bool tools_is_equal_with_hourshift(const infinint & hourshift, const datetime & date1, const datetime & date2);
 
         /// template function to add two vectors
 
@@ -413,7 +415,7 @@ namespace libdar
         /// \param[in] last_acc last access date to use
         /// \param[in] last_mod last modification date to use
 	/// \param[in] birth creation date of the file, if not known, use the value of last_mod for efficiency
-    extern void tools_noexcept_make_date(const std::string & chem, const infinint & last_acc, const infinint & last_mod, const infinint & birth);
+    extern void tools_noexcept_make_date(const std::string & chem, const datetime & last_acc, const datetime & last_mod, const datetime & birth);
 
         /// set dates of a given file, may throw exception
 
@@ -422,7 +424,7 @@ namespace libdar
         /// \param[in] modif last modification date to use
 	/// \param[in] birth time of creation of the file
 	/// \note if birth time is not known, it should be set to the value of modif for efficiency
-    extern void tools_make_date(const std::string & chemin, infinint access, infinint modif, infinint birth);
+    extern void tools_make_date(const std::string & chemin, const datetime & access, const datetime & modif, const datetime & birth);
 
         /// compare two string in case insensitive manner
 

@@ -96,7 +96,7 @@ int main()
     ui = shell_interaction_init(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
-    cat = new catalogue(*ui, 120, data_name);
+    cat = new catalogue(*ui, datetime(120), data_name);
     build();
     test();
     {
@@ -203,8 +203,8 @@ static void re_test()
     try
     {
 	const entree *e;
-	detruit det1 = detruit("lien", 'l' | 0x80, 129);
-	detruit det2 = detruit("dev1", 'd', 192);
+	detruit det1 = detruit("lien", 'l' | 0x80, datetime(129));
+	detruit det2 = detruit("dev1", 'd', datetime(192));
 	path where = "algi";
 	bool_mask all = true;
 	crit_constant_action todo =  crit_constant_action(data_preserve, EA_preserve);

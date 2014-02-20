@@ -97,15 +97,15 @@ void f1()
 	std::map <infinint, etoile *> corres;
 
         eod *v_eod = new eod();
-        file *v_file = new file(1024, 102, 0644, 1, 2, 3, "fichier", "." , 1024, 0, false);
-        lien *v_lien = new lien(1025, 103, 0645, 4, 5, 6, "lien", "fichier", 0);
-        directory *v_dir = new directory(1026, 104, 0646, 7, 8, 9, "repertoire", 0);
-        chardev *v_char = new chardev(1027, 105, 0647, 10, 11, 12,  "char device", 104, 202, 0);
-        blockdev *v_block = new blockdev(1028, 106, 0651, 13, 14, 15,  "block device", 105, 203, 0);
-        tube *v_tube = new tube(1029, 107, 0652, 16, 17, 18, "tuyau", 0);
-        prise *v_prise = new prise(1030, 108, 0650, 19, 20, 21,  "prise", 0);
-        detruit *v_detruit = new detruit("ancien fichier", 'f', 192);
-        directory *v_sub_dir = new directory(200,20, 0777, 100, 101, 102, "sous-repertoire", 0);
+        file *v_file = new file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", "." , 1024, 0, false);
+        lien *v_lien = new lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6), "lien", "fichier", 0);
+        directory *v_dir = new directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0);
+        chardev *v_char = new chardev(1027, 105, 0647, datetime(10), datetime(11), datetime(12),  "char device", 104, 202, 0);
+        blockdev *v_block = new blockdev(1028, 106, 0651, datetime(13), datetime(14), datetime(15),  "block device", 105, 203, 0);
+        tube *v_tube = new tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18), "tuyau", 0);
+        prise *v_prise = new prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21),  "prise", 0);
+        detruit *v_detruit = new detruit("ancien fichier", 'f', datetime(192));
+        directory *v_sub_dir = new directory(200,20, 0777, datetime(100), datetime(101), datetime(102), "sous-repertoire", 0);
 	mirage *v_mir = new mirage("Zorro mirage", new etoile(dynamic_cast<inode *>(v_prise->clone()), 10));
 
         entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, v_mir, NULL };
@@ -175,7 +175,7 @@ void f2()
     try
     {
 	label data_name;
-        catalogue cat = catalogue(*ui, 12, data_name);
+        catalogue cat = catalogue(*ui, datetime(12), data_name);
         const entree *ref;
 	bool_mask tmp = true;
 	label lax_label;
@@ -192,15 +192,15 @@ void f2()
         {
             cerr << e.dump_str();
         }
-        cat.add(new file(1024, 102, 0644, 1, 2, 3, "fichier", ".", 1024, 0, false));
-        cat.add(new lien(1025, 103, 0645, 4, 5, 6,  "lien", "fichier", 0));
-        cat.add(new directory(1026, 104, 0646, 7, 8, 9, "repertoire", 0));
-        cat.add(new chardev(1027, 105, 0647, 10, 11, 12,  "char device", 104, 202, 0));
-        cat.add(new blockdev(1028, 106, 0651, 13, 14, 15, "block device", 105, 203, 0));
+        cat.add(new file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".", 1024, 0, false));
+        cat.add(new lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6),  "lien", "fichier", 0));
+        cat.add(new directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0));
+        cat.add(new chardev(1027, 105, 0647, datetime(10), datetime(11), datetime(12),  "char device", 104, 202, 0));
+        cat.add(new blockdev(1028, 106, 0651, datetime(13), datetime(14), datetime(15), "block device", 105, 203, 0));
         cat.add(new eod());
-        cat.add(new tube(1029, 107, 0652, 16, 17, 18, "tuyau", 0));
-        cat.add(new prise(1030, 108, 0650, 19, 20, 21,  "prise", 0));
-        cat.add(new detruit("ancien fichier", 102, 'f'));
+        cat.add(new tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18), "tuyau", 0));
+        cat.add(new prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21),  "prise", 0));
+        cat.add(new detruit("ancien fichier", 'f', datetime(102)));
 
         cat.listing(false, tmp, tmp, false, false, "");
 
@@ -257,7 +257,7 @@ void f2()
                                 if(i->is_more_recent_than(*w, 0))
 				{
                                     cout << "plus recent" << endl;
-				    cout << "new is " << libdar::deci(w->get_last_modif()).human() << " ref " << libdar::deci(i->get_last_modif()).human() << endl;
+				    cout << "new is " << tools_display_date(w->get_last_modif()) << " ref " << tools_display_date(i->get_last_modif()) << endl;
 				}
                                 else
                                     cout << "pas plus recent" << endl;
@@ -278,29 +278,29 @@ void f2()
 void f3()
 {
     label data_name;
-    catalogue cat = catalogue(*ui, 180, data_name);
-    catalogue dif = catalogue(*ui, 190, data_name);
+    catalogue cat = catalogue(*ui, datetime(180), data_name);
+    catalogue dif = catalogue(*ui, datetime(190), data_name);
     bool_mask tmp = true;
 
     cat.reset_add();
     dif.reset_add();
 
-    cat.add(new file(1024, 102, 0644, 1, 2, 3, "fichier", ".", 1024, 0, false));
-    cat.add(new lien(1025, 103, 0645, 4, 5, 6, "lien", "fichier", 0));
-    cat.add(new directory(1026, 104, 0646, 7, 8, 9, "repertoire", 0));
-    cat.add(new chardev(1027, 105, 0647, 10, 11, 12, "char device", 104, 202, 0));
-    cat.add(new blockdev(1028, 106, 0651, 13, 14, 15, "block device", 105, 203, 0));
+    cat.add(new file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".", 1024, 0, false));
+    cat.add(new lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6), "lien", "fichier", 0));
+    cat.add(new directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0));
+    cat.add(new chardev(1027, 105, 0647, datetime(10), datetime(11), datetime(12), "char device", 104, 202, 0));
+    cat.add(new blockdev(1028, 106, 0651, datetime(13), datetime(14), datetime(15), "block device", 105, 203, 0));
     cat.add(new eod());
-    cat.add(new tube(1029, 107, 0652, 16, 17, 18, "tuyau", 0));
-    cat.add(new prise(1030, 108, 0650, 19, 20, 21, "prise", 0));
-    cat.add(new detruit("ancien fichier", 'f', 190));
+    cat.add(new tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18), "tuyau", 0));
+    cat.add(new prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21), "prise", 0));
+    cat.add(new detruit("ancien fichier", 'f', datetime(190)));
 
 
-    dif.add(new file(1024, 102, 0644, 1, 2, 3, "fichier", ".",  1024, 0, false));
-    dif.add(new lien(1025, 103, 0645, 4, 5, 6, "lien", "fichier", 0));
-    dif.add(new tube(1029, 107, 0652, 16, 17, 18,  "tuyau", 0));
-    dif.add(new prise(1030, 108, 0650, 19, 20, 21, "prise", 0));
-    dif.add(new detruit("ancien fichier", 'f', 12));
+    dif.add(new file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".",  1024, 0, false));
+    dif.add(new lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6), "lien", "fichier", 0));
+    dif.add(new tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18),  "tuyau", 0));
+    dif.add(new prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21), "prise", 0));
+    dif.add(new detruit("ancien fichier", 'f', datetime(12)));
 
     dif.update_destroyed_with(cat);
 
@@ -317,7 +317,7 @@ void f4()
 	//
 
 
-    tube *v_tube = new tube(1029, 107, 0652, 16, 17, 18, "tuyau", 0);
+    tube *v_tube = new tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18), "tuyau", 0);
     etoile *deneb = new etoile(v_tube, 100);
 
     cout << deneb->get_ref_count() << endl;

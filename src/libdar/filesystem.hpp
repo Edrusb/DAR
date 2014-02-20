@@ -202,8 +202,8 @@ namespace libdar
     private:
         struct filename_struct
         {
-            infinint last_acc;
-            infinint last_mod;
+            datetime last_acc;
+            datetime last_mod;
         };
 
         path *fs_root;

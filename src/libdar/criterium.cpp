@@ -231,8 +231,8 @@ namespace libdar
     {
 	const inode *first_i = get_inode(&first);
 	const inode *second_i = get_inode(&second);
-	infinint first_date = first_i != NULL ? first_i->get_last_modif() : 0;
-	infinint second_date = second_i != NULL ? second_i->get_last_modif() : 0;
+	datetime first_date = first_i != NULL ? first_i->get_last_modif() : datetime(0);
+	datetime second_date = second_i != NULL ? second_i->get_last_modif() : datetime(0);
 
 	return first_i == NULL || first_date >= second_date || tools_is_equal_with_hourshift(x_hourshift, first_date, second_date);
     }
@@ -240,7 +240,7 @@ namespace libdar
     bool crit_in_place_data_more_recent_or_equal_to::evaluate(const nomme &first, const nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
-	infinint first_date = first_i != NULL ? first_i->get_last_modif() : 0;
+	datetime first_date = first_i != NULL ? first_i->get_last_modif() : datetime(0);
 
 	return first_i == NULL || first_date >= x_date || tools_is_equal_with_hourshift(x_hourshift, first_date, x_date);
     }
@@ -295,7 +295,7 @@ namespace libdar
 	const inode *first_i = get_inode(&first);
 	const inode *second_i = get_inode(&second);
 
-	infinint ctime_f, ctime_s;
+	datetime ctime_f, ctime_s;
 
 	if(first_i != NULL)
 	{
@@ -303,14 +303,14 @@ namespace libdar
 	    {
 	    case inode::ea_none:
 	    case inode::ea_removed:
-		ctime_f = 0;
+		ctime_f = datetime(0);
 		break;
 	    default:
 		ctime_f = first_i->get_last_change();
 	    }
 	}
 	else
-	    ctime_f = 0;
+	    ctime_f = datetime(0);
 
 
 	if(second_i != NULL)
@@ -336,7 +336,7 @@ namespace libdar
     {
 	const inode *first_i = get_inode(&first);
 
-	infinint ctime_f;
+	datetime ctime_f;
 
 	if(first_i != NULL)
 	{
@@ -344,14 +344,14 @@ namespace libdar
 	    {
 	    case inode::ea_none:
 	    case inode::ea_removed:
-		ctime_f = 0;
+		ctime_f = datetime(0);
 		break;
 	    default:
 		ctime_f = first_i->get_last_change();
 	    }
 	}
 	else
-	    ctime_f = 0;
+	    ctime_f = datetime(0);
 
 
 	return ctime_f >= x_date || tools_is_equal_with_hourshift(x_hourshift, ctime_f, x_date);

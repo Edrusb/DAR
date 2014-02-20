@@ -495,6 +495,15 @@ namespace libdar
         return tmp.str();
     }
 
+    string tools_uint2str(U_I x)
+    {
+	ostringstream tmp;
+
+	tmp << x;
+
+        return tmp.str();
+    }
+
 
     U_I tools_str2int(const string & x)
     {
@@ -549,20 +558,23 @@ namespace libdar
     	return string(expected_size - s.size(), ' ') + s;
     }
 
-    string tools_display_date(infinint date)
+    string tools_display_date(const datetime & date)
     {
         time_t pas = 0;
-	char *str = NULL;
 
-        date.unstack(pas);
-        str = ctime(&pas);
-	if(str == NULL) // system conversion failed. Using a replacement string
-	    return deci(date).human();
+	if(!date.get_value(pas)) // conversion to system type failed. Using a replacement string
+	    return deci(date.get_value(datetime::tu_seconde)).human();
 	else
 	{
-	    string ret = str;
+	    char *str = ctime(&pas);
+	    if(str == NULL) // ctime failed
+		return tools_int2str(pas);
+	    else
+	    {
+		string ret = str;
 
-	    return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n'
+		return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n'
+	    }
 	}
     }
 
@@ -644,7 +656,7 @@ namespace libdar
 	};
 
 	    // then we define local variables
-	time_t now = time(NULL), when;
+	time_t now = ::time(NULL), when;
 	scan scanner = scan(*(localtime(&now)));
 	U_I c, size = repres.size(), ret;
 	struct tm tmp;
@@ -1091,10 +1103,16 @@ namespace libdar
 	dialog.printf(gettext("   Large dir. speed optimi.   : %s"), YES_NO(compile_time::fast_dir()));
     }
 
-    bool tools_is_equal_with_hourshift(const infinint & hourshift, const infinint & date1, const infinint & date2)
+    bool tools_is_equal_with_hourshift(const infinint & hourshift, const datetime & date1, const datetime & date2)
     {
-        infinint delta = date1 > date2 ? date1-date2 : date2-date1;
         infinint num, rest;
+        datetime t_delta = date1 > date2 ? date1-date2 : date2-date1;
+	infinint delta;
+
+	if(!t_delta.is_integer_value_of(datetime::tu_seconde))
+	    return false;
+
+	delta = t_delta.get_value(datetime::tu_seconde);
 
             // delta = num*3600 + rest
             // with 0 <= rest < 3600
@@ -1266,13 +1284,12 @@ namespace libdar
         return count < argc;
     }
 
-    void tools_make_date(const string & chemin, infinint access, infinint modif, infinint birth)
+    void tools_make_date(const std::string & chemin, const datetime & access, const datetime & modif, const datetime & birth)
     {
         struct utimbuf temps;
         time_t tmp = 0;
 
-        access.unstack(tmp);
-	if(access != 0)
+	if(!access.get_value(tmp))
 	    throw Erange("tools_make_date", "cannot set atime of file, value too high for the system integer type");
 
 	    // the first time, setting modification time to the value of birth time
@@ -1285,9 +1302,7 @@ namespace libdar
 
 	if(birth != modif)
 	{
-	    tmp = 0;
-	    birth.unstack(tmp);
-	    if(birth != 0)
+	    if(!birth.get_value(tmp))
 		throw Erange("tools_make_date", "cannot set birth time of file, value too high for the system integer type");
 	    else
 		temps.modtime = tmp;
@@ -1297,9 +1312,7 @@ namespace libdar
 	}
 
 	    // we set atime and mtime here
-        tmp = 0;
-        modif.unstack(tmp);
-	if(modif != 0)
+	if(!modif.get_value(tmp))
 	    throw Erange("tools_make_date", "cannot set last modification time of file, value too high for the system integer type");
 	else
 	    temps.modtime = tmp;
@@ -1308,11 +1321,11 @@ namespace libdar
 	    Erange("tools_make_date", string(dar_gettext("Cannot set last access and last modification time: ")) + strerror(errno));
     }
 
-    void tools_noexcept_make_date(const string & chem, const infinint & last_acc, const infinint & last_mod, const infinint & birth)
+    void tools_noexcept_make_date(const string & chem, const datetime & last_acc, const datetime & last_mod, const datetime & birth)
     {
         try
         {
-            if(last_acc != 0 || last_mod != 0)
+            if(!last_acc.is_null() || !last_mod.is_null())
                 tools_make_date(chem, last_acc, last_mod, birth);
                 // else the directory could not be openned properly
                 // and time could not be retrieved, so we don't try
@@ -1406,7 +1419,7 @@ namespace libdar
 
             try
             {
-                etage contents = etage(ui, chem->display().c_str(), 0, 0, false, false);  // we don't care the dates here so we set them to zero
+                etage contents = etage(ui, chem->display().c_str(), datetime(0), datetime(0), false, false);  // we don't care the dates here so we set them to zero
                 regular_mask slice = regular_mask(rest + "\\.[1-9][0-9]*\\."+ extension, true);
 
                 while(!ret && contents.read(rest))
@@ -1572,7 +1585,7 @@ namespace libdar
     {
 	regular_mask my_mask = regular_mask(file_mask, true);
 
-	etage dir = etage(dialog, c_chemin.c_str(), 0, 0, false, false);
+	etage dir = etage(dialog, c_chemin.c_str(), datetime(0), datetime(0), false, false);
 	path chemin = path(c_chemin);
 	string entry;
 
@@ -1591,7 +1604,7 @@ namespace libdar
     {
 	regular_mask my_mask = regular_mask(file_mask, true);
 
-	etage dir = etage(ui, c_chemin.c_str(), 0, 0, false, false);
+	etage dir = etage(ui, c_chemin.c_str(), datetime(0), datetime(0), false, false);
 	string entry;
 	bool ret = false;
 
@@ -2517,7 +2530,7 @@ namespace libdar
     string tools_get_date_utc()
     {
 	string ret;
-	time_t now = time(NULL);
+	datetime now = datetime(::time(NULL), datetime::tu_seconde);
 
 	ret = tools_display_date(now);
 
