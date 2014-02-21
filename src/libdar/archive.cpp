@@ -2319,6 +2319,7 @@ namespace libdar
 
     void archive::free()
     {
+	stack.clear();
         if(cat != NULL)
 	{
             delete cat;
