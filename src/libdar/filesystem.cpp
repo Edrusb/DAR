@@ -2279,9 +2279,9 @@ namespace libdar
 			throw SRC_BUG;
 		    if(fsa->find(fsaf_hfs_plus, fsan_creation_date, ptr))
 		    {
-			const fsa_infinint *ptr_int = dynamic_cast<const fsa_infinint *>(ptr);
-			if(ptr_int != NULL)
-			    birthtime = ptr_int->get_value();
+			const fsa_time *ptr_time = dynamic_cast<const fsa_time *>(ptr);
+			if(ptr_time != NULL)
+			    birthtime = ptr_time->get_value();
 		    }
 		}
 

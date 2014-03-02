@@ -613,8 +613,8 @@ namespace libdar
 	    return; // silently aborting assuming FSA family not supported for that file
 	else
 	{
-	    fsa_infinint * ptr = NULL;
-	    create_or_throw(ptr, get_pool(), fsaf_hfs_plus, fsan_creation_date, tmp.st_birthtime);
+	    fsa_date * ptr = NULL;
+	    create_or_throw(ptr, get_pool(), fsaf_hfs_plus, fsan_creation_date, datetime(tmp.st_birthtime));
 	    fsa.push_back(ptr);
 	    ptr = NULL;
 	}
