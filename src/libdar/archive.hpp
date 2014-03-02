@@ -305,7 +305,12 @@ namespace libdar
 
 	void drop_all_filedescriptors(user_interaction & dialog);
 
-	    /// check that the internal memory_pool has all its block properly freeed
+	    /// check that the internal memory_pool has all its blocks properly freeed
+	    ///
+	    /// \return an empty string in normal situation, else a status report about the
+	    /// still allocated blocks that remain in the internal memory_pool
+	    /// \note this must be the last call done to that object before destruction and it must
+	    /// be done only once
 	std::string free_and_check_memory() const;
 
     private:
@@ -319,6 +324,7 @@ namespace libdar
 	bool exploitable;        //< is false if only the catalogue is available (for reference backup or isolation).
 	bool lax_read_mode;      //< whether the archive has been openned in lax mode (unused for creation/merging/isolation)
 	bool sequential_read;    //< whether the archive is read in sequential mode
+	bool freed_and_checked;  //< whether free_and_check has been run
 
 	void free();
 	void init_pool();

@@ -37,7 +37,12 @@ namespace libdar
 	while(it != carte.end())
 	{
 	    if(it->second != NULL)
+	    {
+		if(!it->second->is_empty())
+		    throw SRC_BUG;
 		delete it->second;
+		it->second = NULL;
+	    }
 	    ++it;
 	}
     }

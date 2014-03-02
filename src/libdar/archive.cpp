@@ -82,6 +82,7 @@ namespace libdar
 
 	    pool = NULL;
 	    cat = NULL;
+	    freed_and_checked = false;
 
 	    try
 	    {
@@ -363,6 +364,7 @@ namespace libdar
         {
 	    pool = NULL;
 	    cat = NULL;
+	    freed_and_checked = false;
 	    init_pool();
 
 	    try
@@ -468,6 +470,7 @@ namespace libdar
         {
 	    cat = NULL;
 	    pool = NULL;
+	    freed_and_checked = false;
 	    init_pool();
 
 	    try
@@ -579,6 +582,7 @@ namespace libdar
 	compression algo_kept = none;
 	entrepot *sauv_path_t = options.get_entrepot().clone();
 	entrepot_local *sauv_path_t_local = dynamic_cast<entrepot_local *>(sauv_path_t);
+	freed_and_checked = false;
 
 	NLS_SWAP_IN;
 	try
@@ -793,6 +797,8 @@ namespace libdar
         {
                 // sanity checks
 
+	    if(freed_and_checked)
+		throw Erange("catalogue::op_extract", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
             if(!exploitable)
                 throw Elibcall("op_extract", gettext("This archive is not exploitable, check documentation for more"));
             if(&fs_root == NULL)
@@ -879,6 +885,8 @@ namespace libdar
 
 		// sanity checks
 
+	    if(freed_and_checked)
+		throw Erange("catalogue::summary", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(!exploitable)
 		throw Elibcall("summary", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
 
@@ -963,6 +971,8 @@ namespace libdar
 
         try
         {
+	    if(freed_and_checked)
+		throw Erange("catalogue::op_listing", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
             enable_natural_destruction();
             try
             {
@@ -1019,6 +1029,8 @@ namespace libdar
 
                 // sanity checks
 
+	    if(freed_and_checked)
+		throw Erange("catalogue::op_diff", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
             if(!exploitable)
                 throw Elibcall("op_diff", gettext("This archive is not exploitable, check documentation for more"));
             if(&fs_root == NULL)
@@ -1099,6 +1111,8 @@ namespace libdar
 
                 // sanity checks
 
+	    if(freed_and_checked)
+		throw Erange("catalogue::op_test", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
             if(!exploitable)
                 throw Elibcall("op_test", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
 
@@ -1187,6 +1201,8 @@ namespace libdar
         NLS_SWAP_IN;
         try
         {
+	    if(freed_and_checked)
+		throw Erange("catalogue::get_children_of", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
 	    {
 		if(only_contains_an_isolated_catalogue())
@@ -1231,6 +1247,8 @@ namespace libdar
 	    const directory * parent = get_dir_object(dir);
 	    const nomme *tmp_ptr = NULL;
 
+	    if(freed_and_checked)
+		throw Erange("catalogue::get_children_in_table", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
             if(parent == NULL)
 		throw SRC_BUG;
 
@@ -1316,6 +1334,8 @@ namespace libdar
 	    const directory *parent = get_dir_object(dir);
 	    const nomme *tmp_ptr = NULL;
 
+	    if(freed_and_checked)
+		throw Erange("catalogue::has_subdirectory", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    parent->reset_read_children();
 	    while(parent->read_children(tmp_ptr) && !ret)
 	    {
@@ -1338,6 +1358,8 @@ namespace libdar
 	NLS_SWAP_IN;
         try
         {
+	    if(freed_and_checked)
+		throw Erange("catalogue::init_catalogue", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
 	    {
 		if(only_contains_an_isolated_catalogue())
@@ -1375,6 +1397,8 @@ namespace libdar
 
 	try
 	{
+	    if(freed_and_checked)
+		throw Erange("catalogue::get_catalogue", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(exploitable && sequential_read)
 		throw Elibcall("archive::get_catalogue", "Reading the catalogue of an archive open in sequential read mode while it has not yet been read need passing a \"user_interaction\" object to the argument of archive::get_catalogue or call init_catalogue() first ");
 
@@ -1405,6 +1429,8 @@ namespace libdar
 
 	try
 	{
+	    if(freed_and_checked)
+		throw Erange("catalogue::drop_all_filedescriptors", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(exploitable && sequential_read)
 		throw Elibcall("archive::drop_all_filedescriptiors", "Dropping all filedescriptors for an archive in sequential read mode that has not yet been read need passing a \"user_interaction\" object to the argument of archive::drop_all_filedescriptors");
 
@@ -1427,6 +1453,8 @@ namespace libdar
 
 	try
 	{
+	    if(freed_and_checked)
+		throw Erange("catalogue::drop_all_filedescriptors(user_interaction)", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
 	    if(exploitable && sequential_read)
 	    {
 		if(only_contains_an_isolated_catalogue())
@@ -1456,8 +1484,18 @@ namespace libdar
     string archive::free_and_check_memory() const
     {
 	string ret = "";
+	archive *me = const_cast<archive *>(this);
 
-	const_cast<archive *>(this)->free();
+	if(freed_and_checked)
+	    throw Erange("catalogue::free_and_check_memory", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
+	me->freed_and_checked = true;
+	me->stack.clear();
+	if(me->cat != NULL)
+	{
+	    delete me->cat;
+	    me->cat = NULL;
+	}
+
 	if(pool != NULL)
 	{
 #ifdef LIBDAR_DEBUG_MEMORY
@@ -2319,7 +2357,6 @@ namespace libdar
 
     void archive::free()
     {
-	stack.clear();
         if(cat != NULL)
 	{
             delete cat;
