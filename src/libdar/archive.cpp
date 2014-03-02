@@ -337,7 +337,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		free();
+		free_all();
 		throw;
 	    }
 	}
@@ -444,7 +444,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		free();
+		free_all();
 		throw;
 	    }
 	}
@@ -552,7 +552,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		free();
+		free_all();
 		throw;
 	    }
         }
@@ -772,7 +772,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		free();
+		free_all();
 		throw;
 	    }
 	}
@@ -1488,13 +1488,11 @@ namespace libdar
 
 	if(freed_and_checked)
 	    throw Erange("catalogue::free_and_check_memory", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
+
+	if(me == NULL)
+	    throw SRC_BUG;
 	me->freed_and_checked = true;
-	me->stack.clear();
-	if(me->cat != NULL)
-	{
-	    delete me->cat;
-	    me->cat = NULL;
-	}
+	me->free_except_memory_pool();
 
 	if(pool != NULL)
 	{
@@ -2355,13 +2353,20 @@ namespace libdar
 	}
     }
 
-    void archive::free()
+    void archive::free_except_memory_pool()
     {
-        if(cat != NULL)
+	stack.clear();
+	if(cat != NULL)
 	{
-            delete cat;
+	    delete cat;
 	    cat = NULL;
 	}
+    }
+
+    void archive::free_all()
+    {
+	free_except_memory_pool();
+
 	if(pool != NULL)
 	{
 	    if(get_pool() == NULL)

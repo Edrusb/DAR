@@ -151,7 +151,7 @@ namespace libdar
 	archive & operator = (const archive & ref) { throw Efeature(dar_gettext("Archive assignment operator is not implemented")); };
 
 	    /// the destructor
-	~archive() { free(); };
+	~archive() { free_all(); };
 
 
 	    /// extraction of data from an archive
@@ -326,7 +326,8 @@ namespace libdar
 	bool sequential_read;    //< whether the archive is read in sequential mode
 	bool freed_and_checked;  //< whether free_and_check has been run
 
-	void free();
+	void free_except_memory_pool();
+	void free_all();
 	void init_pool();
 
 	const catalogue & get_cat() const { if(cat == NULL) throw SRC_BUG; else return *cat; };
