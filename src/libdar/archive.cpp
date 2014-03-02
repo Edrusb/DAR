@@ -2572,12 +2572,14 @@ namespace libdar
 
     static void check_libgcrypt_hash_bug(user_interaction & dialog, hash_algo hash, const infinint & first_file_size, const infinint & file_size)
     {
+#if CRYPTO_AVAILABLE
 	if(hash != hash_none && !crypto_min_ver_libgcrypt_no_bug())
 	{
 	    const infinint limit = tools_get_extended_size("256G", 1024);
 	    if(file_size >= limit || first_file_size >= limit)
 		dialog.pause(tools_printf(gettext("libgcrypt version < %s. Ligcrypt used has a bug that leads md5 and sha1 hash results to be erroneous for files larger than 256 Gio (gibioctet), do you really want to spend CPU cycles calculating a useless hash?"), MIN_VERSION_GCRYPT_HASH_BUG));
 	}
+#endif
     }
 
 } // end of namespace

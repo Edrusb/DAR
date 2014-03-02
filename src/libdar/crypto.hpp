@@ -66,9 +66,13 @@ namespace libdar
 
     extern void crypto_split_algo_pass(const secu_string & all, crypto_algo & algo, secu_string & pass);
     inline bool crypto_min_ver_libgcrypt_no_bug()
-    { return gcry_check_version(MIN_VERSION_GCRYPT_HASH_BUG); }
-
-
+    {
+#if CRYPTO_AVAILABLE
+	return gcry_check_version(MIN_VERSION_GCRYPT_HASH_BUG);
+#else
+	return true;
+#endif
+    }
 
 	/// implementation of encryption using symetrical cryptography used in libgcrypt (among which is blowfish)
 	//
