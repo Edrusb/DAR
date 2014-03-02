@@ -31,7 +31,8 @@ namespace libdar
 
     bool datetime::operator < (const datetime & ref) const
     {
-	time_unit c = min(uni, ref.uni);
+	    // using the unit having the less precision to perform the comparison
+	time_unit c = max(uni, ref.uni);
 
 	return get_value(c) < ref.get_value(c);
     }
@@ -39,7 +40,8 @@ namespace libdar
 
     bool datetime::operator == (const datetime & ref) const
     {
-	time_unit c = min(uni, ref.uni);
+	    // using the unit having the less precision to perform the comparison
+	time_unit c = max(uni, ref.uni);
 
 	return get_value(c) == ref.get_value(c);
     }
@@ -48,6 +50,8 @@ namespace libdar
     datetime datetime::operator - (const datetime & ref) const
     {
 	datetime ret;
+
+	    // using the most precised unit to avoid loosing accuracy
 	ret.uni = min(uni, ref.uni);
 
 	if(*this < ref)
@@ -61,6 +65,7 @@ namespace libdar
     {
 	datetime ret;
 
+	    // using the mist precised unit to avoid loosing accuracy
 	ret.uni = min(uni, ref.uni);
 	ret.val = get_value(ret.uni) + ref.get_value(ret.uni);
 
@@ -134,6 +139,14 @@ namespace libdar
 	    return a;
 	else
 	    return b;
+    }
+
+    datetime::time_unit datetime::max(time_unit a, time_unit b)
+    {
+	if(a < b)
+	    return b;
+	else
+	    return a;
     }
 
     const char datetime::time_unit_to_char(time_unit a)

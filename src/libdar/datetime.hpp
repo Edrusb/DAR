@@ -87,6 +87,7 @@ namespace libdar
 	time_unit uni;
 
 	static time_unit min(time_unit a, time_unit b);
+	static time_unit max(time_unit a, time_unit b);
 	static const char time_unit_to_char(time_unit a);
 	static time_unit char_to_time_unit(const char a);
     };
