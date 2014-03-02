@@ -614,7 +614,7 @@ namespace libdar
 	else
 	{
 	    fsa_infinint * ptr = NULL;
-	    create_or_throw(ptr, fsaf_hfs_plus, fsan_creation_date, tmp.st_birthtime);
+	    create_or_throw(ptr, get_pool(), fsaf_hfs_plus, fsan_creation_date, tmp.st_birthtime);
 	    fsa.push_back(ptr);
 	    ptr = NULL;
 	}

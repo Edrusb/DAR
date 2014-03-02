@@ -1188,7 +1188,7 @@ namespace libdar
 			{
 			    strncpy(addr.sun_path, name, UNIX_PATH_MAX - 1);
 			    addr.sun_path[UNIX_PATH_MAX - 1] = '\0';
-			    if(bind(sd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+			    if(::bind(sd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
 				throw Erange("filesystem_hard_link_write::make_file (socket bind)", string(gettext("Error creating Unix socket file: ")) + name + " : " + strerror(errno));
 			}
 			catch(...)

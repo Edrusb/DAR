@@ -323,8 +323,8 @@ namespace libdar
 			if(tmp != 0)
 			    throw SRC_BUG;
 			width = ESCAPE_SEQUENCE_LENGTH - width;
-			if(!x_below->skip(0));
-			throw SRC_BUG;  // should succeed or throw an exception in that situation (backward skipping)
+			if(!x_below->skip(0))
+			    throw SRC_BUG;  // should succeed or throw an exception in that situation (backward skipping)
 			lu = x_below->read(tmp_buffer, width);
 			write_buffer_size = lu;
 		    }
