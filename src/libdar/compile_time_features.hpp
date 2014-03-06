@@ -105,6 +105,12 @@ namespace libdar
 
 	    /// returns whether libdar has been built with support for HFS+ FSA
 	bool FSA_birthtime();
+
+	    /// returns whether libdar is able to read timestamps at a microsecond accuracy
+	bool microsecond_read();
+
+	    /// returns whether libdar is able to write timestamps at a microsecond accuracy
+	bool microsecond_write();
     }
 
 } // end of namespace

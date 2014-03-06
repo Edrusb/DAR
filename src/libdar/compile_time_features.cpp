@@ -187,6 +187,23 @@ namespace libdar
 #endif
 	}
 
+	bool microsecond_read()
+	{
+#ifdef LIBDAR_MICROSECOND_READ_ACCURACY
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
+	bool microsecond_write()
+	{
+#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
+	    return true;
+#else
+	    return false;
+#endif
+	}
 
     } // end of compile_time nested namespace
 } // end of libdar namespace

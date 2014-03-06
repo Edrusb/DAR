@@ -1069,6 +1069,7 @@ namespace libdar
     void tools_display_features(user_interaction & dialog)
     {
 	const char *endy = NULL;
+	string time_accuracy = "";
 
 	tools_display_features(dialog,
 			       compile_time::ea(),
@@ -1101,6 +1102,16 @@ namespace libdar
 	dialog.printf(gettext("   Detected system/CPU endian : %s"), endy);
 	dialog.printf(gettext("   Posix fadvise support      : %s"), YES_NO(compile_time::posix_fadvise()));
 	dialog.printf(gettext("   Large dir. speed optimi.   : %s"), YES_NO(compile_time::fast_dir()));
+	if(compile_time::microsecond_read())
+	    time_accuracy = "1 microsecond";
+	else
+	    time_accuracy = "1 s";
+	dialog.printf(gettext("   Timestamp read accuracy    : %S\n"), &time_accuracy);
+	if(compile_time::microsecond_write())
+	    time_accuracy = "1 microsecond";
+	else
+	    time_accuracy = "1 s";
+	dialog.printf(gettext("   Timestamp write accuracy   : %S\n"), &time_accuracy);
     }
 
     bool tools_is_equal_with_hourshift(const infinint & hourshift, const datetime & date1, const datetime & date2)

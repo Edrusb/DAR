@@ -42,7 +42,7 @@ AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 
 
-AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h])
+AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h])
 
 
 AC_SYS_LARGEFILE
@@ -220,6 +220,73 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		   ],
 		   [ AC_MSG_RESULT([not available])
 		   ])
+
+
+AC_MSG_CHECKING([for the possibility to set timestamps at a microsecond precision])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+				     #if HAVE_SYS_TYPES_H
+				     #include <sys/types.h>
+				     #endif
+				     #if HAVE_SYS_STAT_H
+				     #include <sys/stat.h>
+				     #endif
+				     #if HAVE_UNISTD_H
+				     #include <unistd.h>
+				     #endif
+				     #if HAVE_UTIMES_H
+				     #include <utimes.h>
+				     #endif
+				     #if HAVE_SYS_TIME_H
+				     #include <sys/time.h>
+				     #endif
+				     }]],
+				     [[
+				       struct timeval tv[2];
+				       tv[0].tv_sec = 1000;
+    				       tv[1].tv_usec = 2000;
+
+				       (void)utimes("/tmp/testfile.tmp", tv);
+				       	/* note that this test program is only compiled+linked not run */
+					return 0;
+			             ]])
+                  ],
+		  [
+		    AC_DEFINE(LIBDAR_MICROSECOND_WRITE_ACCURACY, 1, [support for timestamps microsecond write accuracy])
+		    local_microsecond_write=yes
+		    AC_MSG_RESULT(available)
+                  ],
+		  [ AC_MSG_RESULT([not available])
+		  ])
+
+AC_MSG_CHECKING([for the possibility to read timestamps at a microsecond precision])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+				     #define  _POSIX_C_SOURCE 200809L
+				     #if HAVE_SYS_TYPES_H
+				     #include <sys/types.h>
+				     #endif
+				     #if HAVE_SYS_STAT_H
+				     #include <sys/stat.h>
+				     #endif
+				     #if HAVE_UNISTD_H
+				     #include <unistd.h>
+				     #endif
+				     }]],
+				     [[
+				       struct stat st;
+				       if(st.st_atim.tv_nsec != 0)
+				         return 0;
+				       else
+				         return 1;
+					 /* whatever, this test program is only compiled no run */
+			             ]])
+		 ],
+		 [  AC_DEFINE(_POSIX_C_SOURCE, 200809L, [activates POSIX.1-2008 symbols in order to allow microsecond time setting])
+		    AC_DEFINE(LIBDAR_MICROSECOND_READ_ACCURACY, 1, [support for timestamps microsecond read accuracy])
+		    local_microsecond_read=yes
+		    AC_MSG_RESULT(available)
+                  ],
+		  [ AC_MSG_RESULT([not available])
+		  ])
 
 
 # DAR's features
@@ -908,6 +975,20 @@ fi
 
 printf "   posix fadvise support      : "
 if  [ "$local_posix_fadvise" = "yes" ] ; then
+    echo "YES"
+else
+    echo "NO"
+fi
+
+printf "   microsecond read accuracy  : "
+if [ "$local_microsecond_read" = "yes" ] ; then
+    echo "YES"
+else
+    echo "NO"
+fi
+
+printf "   microsecond write accuracy : "
+if [ "$local_microsecond_write" = "yes" ] ; then
     echo "YES"
 else
     echo "NO"
