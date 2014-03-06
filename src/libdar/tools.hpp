@@ -307,39 +307,6 @@ namespace libdar
         /// \return true if val has been found as a member of the list
     extern bool tools_is_member(const std::string & val, const std::vector<std::string> & liste);
 
-        /// display the compilation time features of libdar
-
-        /// \param[in,out] dialog for user interaction
-        /// \param[in] ea whether Extended Attribute support is available
-        /// \param[in] largefile whether large file support is available
-        /// \param[in] nodump whether nodump flag support is available
-        /// \param[in] special_alloc whether special allocation is activated
-        /// \param[in] bits infinint version used
-        /// \param[in] thread_safe whether thread safe support is available
-        /// \param[in] libz whether libz compression is available
-        /// \param[in] libbz2 whether libbz2 compression is available
-	/// \param[in] liblzo2 whether lzo compression is available
-        /// \param[in] libcrypto whether strong encryption is available
-	/// \param[in] furtive_read whether furtive read access is available
-	/// \param[in] FSA_extX whether extX FSA are supported
-	/// \param[in] FSA_HFSP whether HFS+ FSA are supported
-	/// \note this routine is deprecated, as it needs a change in its interface
-	/// upon each new feature addition, use the other tools_display_features()
-	/// routing, with a single argument (see below).
-    extern void tools_display_features(user_interaction & dialog,
-                                       bool ea,
-				       bool largefile,
-				       bool nodump,
-				       bool special_alloc,
-				       U_I bits,
-				       bool thread_safe,
-                                       bool libz,
-                                       bool libbz2,
-				       bool liblzo2,
-                                       bool libcrypto,
-				       bool furtive_read,
-				       bool FSA_extX,
-				       bool FSA_HFSP);
 
         /// display the compilation time features of libdar
 

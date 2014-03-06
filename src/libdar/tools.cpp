@@ -1032,31 +1032,59 @@ namespace libdar
         return index <liste.size();
     }
 
-    void tools_display_features(user_interaction & dialog, bool ea, bool largefile, bool nodump,
-                                bool special_alloc, U_I bits, bool thread_safe,
-                                bool libz, bool libbz2, bool liblzo2, bool libcrypto,
-				bool furtive_read, bool FSA_extX, bool FSA_HFSP)
+    void tools_display_features(user_interaction & dialog)
     {
 	NLS_SWAP_IN;
 	try
 	{
-	    dialog.printf(gettext("   Libz compression (gzip)    : %s\n"), YES_NO(libz));
-	    dialog.printf(gettext("   Libbz2 compression (bzip2) : %s\n"), YES_NO(libbz2));
-	    dialog.printf(gettext("   Liblzo2 compression (lzo)  : %s\n"), YES_NO(liblzo2));
-	    dialog.printf(gettext("   Strong encryption          : %s\n"), YES_NO(libcrypto));
-	    dialog.printf(gettext("   Extended Attributes support: %s\n"), YES_NO(ea));
-	    dialog.printf(gettext("   Large files support (> 2GB): %s\n"), YES_NO(largefile));
-	    dialog.printf(gettext("   ext2fs NODUMP flag support : %s\n"), YES_NO(nodump));
-	    dialog.printf(gettext("   Special allocation scheme  : %s\n"), YES_NO(special_alloc));
-	    if(bits == 0)
+	    const char *endy = NULL;
+	    string time_accuracy = "";
+
+	    dialog.printf(gettext("   Libz compression (gzip)    : %s\n"), YES_NO(compile_time::libz()));
+	    dialog.printf(gettext("   Libbz2 compression (bzip2) : %s\n"), YES_NO(compile_time::libbz2()));
+	    dialog.printf(gettext("   Liblzo2 compression (lzo)  : %s\n"), YES_NO(compile_time::liblzo()));
+	    dialog.printf(gettext("   Strong encryption          : %s\n"), YES_NO(compile_time::libgcrypt()));
+	    dialog.printf(gettext("   Extended Attributes support: %s\n"), YES_NO(compile_time::ea()));
+	    dialog.printf(gettext("   Large files support (> 2GB): %s\n"), YES_NO(compile_time::largefile()));
+	    dialog.printf(gettext("   ext2fs NODUMP flag support : %s\n"), YES_NO(compile_time::nodump()));
+	    dialog.printf(gettext("   Special allocation scheme  : %s\n"), YES_NO(compile_time::special_alloc()));
+	    if(compile_time::bits() == 0)
 		dialog.printf(gettext("   Integer size used          : unlimited\n"));
 	    else
-		dialog.printf(gettext("   Integer size used          : %d bits\n"), bits);
-	    dialog.printf(gettext("   Thread safe support        : %s\n"), YES_NO(thread_safe));
+		dialog.printf(gettext("   Integer size used          : %d bits\n"), compile_time::bits());
+	    dialog.printf(gettext("   Thread safe support        : %s\n"), YES_NO(compile_time::thread_safe()));
+	    dialog.printf(gettext("   Furtive read mode support  : %s\n"), YES_NO(compile_time::furtive_read()));
+	    dialog.printf(gettext("   Linux ext2/3/4 FSA support : %s\n"), YES_NO(compile_time::FSA_linux_extX()));
+	    dialog.printf(gettext("   Mac OS X HFS+ FSA support  : %s\n"), YES_NO(compile_time::FSA_birthtime()));
 
-	    dialog.printf(gettext("   Furtive read mode support  : %s\n"), YES_NO(furtive_read));
-	    dialog.printf(gettext("   Linux ext2/3/4 FSA support : %s\n"), YES_NO(FSA_extX));
-	    dialog.printf(gettext("   Mac OS X HFS+ FSA support  : %s\n"), YES_NO(FSA_HFSP));
+	    switch(compile_time::system_endian())
+	    {
+	    case compile_time::big:
+		endy = gettext("big");
+		break;
+	    case compile_time::little:
+		endy = gettext("little");
+		break;
+	    case compile_time::error:
+		endy = gettext("error!");
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+	    dialog.printf(gettext("   Detected system/CPU endian : %s"), endy);
+	    dialog.printf(gettext("   Posix fadvise support      : %s"), YES_NO(compile_time::posix_fadvise()));
+	    dialog.printf(gettext("   Large dir. speed optimi.   : %s"), YES_NO(compile_time::fast_dir()));
+	    if(compile_time::microsecond_read())
+		time_accuracy = "1 microsecond";
+	    else
+		time_accuracy = "1 s";
+	    dialog.printf(gettext("   Timestamp read accuracy    : %S\n"), &time_accuracy);
+	    if(compile_time::microsecond_write())
+		time_accuracy = "1 microsecond";
+	    else
+		time_accuracy = "1 s";
+	    dialog.printf(gettext("   Timestamp write accuracy   : %S\n"), &time_accuracy);
+
 	}
 	catch(...)
 	{
@@ -1064,54 +1092,6 @@ namespace libdar
 	    throw;
 	}
 	NLS_SWAP_OUT;
-    }
-
-    void tools_display_features(user_interaction & dialog)
-    {
-	const char *endy = NULL;
-	string time_accuracy = "";
-
-	tools_display_features(dialog,
-			       compile_time::ea(),
-			       compile_time::largefile(),
-			       compile_time::nodump(),
-			       compile_time::special_alloc(),
-			       compile_time::bits(),
-			       compile_time::thread_safe(),
-			       compile_time::libz(),
-			       compile_time::libbz2(),
-			       compile_time::liblzo(),
-			       compile_time::libgcrypt(),
-			       compile_time::furtive_read(),
-			       compile_time::FSA_linux_extX(),
-			       compile_time::FSA_birthtime());
-	switch(compile_time::system_endian())
-	{
-	case compile_time::big:
-	    endy = gettext("big");
-	    break;
-	case compile_time::little:
-	    endy = gettext("little");
-	    break;
-	case compile_time::error:
-	    endy = gettext("error!");
-	    break;
-	default:
-	    throw SRC_BUG;
-	}
-	dialog.printf(gettext("   Detected system/CPU endian : %s"), endy);
-	dialog.printf(gettext("   Posix fadvise support      : %s"), YES_NO(compile_time::posix_fadvise()));
-	dialog.printf(gettext("   Large dir. speed optimi.   : %s"), YES_NO(compile_time::fast_dir()));
-	if(compile_time::microsecond_read())
-	    time_accuracy = "1 microsecond";
-	else
-	    time_accuracy = "1 s";
-	dialog.printf(gettext("   Timestamp read accuracy    : %S\n"), &time_accuracy);
-	if(compile_time::microsecond_write())
-	    time_accuracy = "1 microsecond";
-	else
-	    time_accuracy = "1 s";
-	dialog.printf(gettext("   Timestamp write accuracy   : %S\n"), &time_accuracy);
     }
 
     bool tools_is_equal_with_hourshift(const infinint & hourshift, const datetime & date1, const datetime & date2)
