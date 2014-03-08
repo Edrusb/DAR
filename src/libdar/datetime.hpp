@@ -41,9 +41,11 @@ namespace libdar
     class datetime : public on_pool
     {
     public:
-	enum time_unit { tu_seconde };
+	    // time units must be sorted: the first is the smallest step, last is the largest increment.
+	    // this makes the comparison operators (<, >, <=, >=,...) become naturally defined on that type
+	enum time_unit { tu_microsecond, tu_second };
 
-	datetime(const infinint & value = 0, time_unit unit = tu_seconde) { val = value; uni = unit; };
+	datetime(const infinint & value = 0, time_unit unit = tu_second) { val = value; uni = unit; };
 	datetime(generic_file &x, archive_version ver) { read(x, ver); };
 
 	    // comparison operators
@@ -59,18 +61,23 @@ namespace libdar
 	datetime operator - (const datetime & ref) const;
 	datetime operator + (const datetime & ref) const;
 
-	    /// tell wether the time can be fully specified in the given time unit
-	    /// \param[in] unit time unit to check
-	    /// \return true if the time is an integer number of the time unit
-	bool is_integer_value_of(time_unit unit) const;
+	    /// tells wether the time can be fully specified in the given time unit
+	    ///
+	    /// \param[in] target time unit to get the value in
+	    /// \param[out] newval value of the datetime in the target unit
+	    /// \return true if the time is an integer number of the target time unit,
+	    /// newval is then the exact time value expressed in that unit. Else, false
+	    /// is returned and newval is rounded down time value to the integer
+	    /// value just below, in the target unit
+	bool is_integer_value_of(time_unit target, infinint & newval) const;
 
-	    /// tell which largest unit can fully store the date
-	time_unit reduce_to_largest_uni() const;
+	time_unit get_unit() const { return uni; };
+	infinint get_raw_value() const { return val; };
 
-	infinint get_value(time_unit unit = tu_seconde) const;
+	infinint get_value(time_unit unit = tu_second) const;
 
 	    /// return a time in second as in the time_t argument
-
+	    ///
 	    /// \param[out] val the time value in second
 	    /// \return false if the value cannot cast in a time_t variable
 	bool get_value(time_t & val) const;
@@ -86,10 +93,20 @@ namespace libdar
 	infinint val;
 	time_unit uni;
 
+	    /// reduce the value to the largest unit possible
+	void reduce_to_largest_unit() const;
+
+
 	static time_unit min(time_unit a, time_unit b);
 	static time_unit max(time_unit a, time_unit b);
 	static const char time_unit_to_char(time_unit a);
 	static time_unit char_to_time_unit(const char a);
+
+	    /// return the factor between two units
+	    ///
+	    /// \note "from" must be larger than "to" (from >= to), else an exception is thrown
+	    /// \return the factor f, which makes the following to be true: from = f*to
+	static infinint get_scaling_factor(time_unit source, time_unit dest);
     };
 
 	/// converts dar_manager database version to dar archive version in order to properly read time fields

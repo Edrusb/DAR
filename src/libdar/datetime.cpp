@@ -29,6 +29,8 @@ using namespace std;
 namespace libdar
 {
 
+    static infinint one_million = infinint(1000)*infinint(1000);
+
     bool datetime::operator < (const datetime & ref) const
     {
 	    // using the unit having the less precision to perform the comparison
@@ -72,39 +74,63 @@ namespace libdar
 	return ret;
     }
 
-    bool datetime::is_integer_value_of(time_unit unit) const
+    bool datetime::is_integer_value_of(time_unit target, infinint & newval) const
     {
-	if(unit == uni)
+	if(target <= uni)
+	{
+	    newval = val * get_scaling_factor(uni, target);
 	    return true;
+	}
 	else
-	    throw Efeature("convertion from a time unit to another");
+	{
+	    infinint f = get_scaling_factor(target, uni);
+		// target = f*uni
+	    infinint  r;
+	    euclide(val, f, newval, r);
+		// val = f*newval + r
+	    return r == 0;
+	}
     }
 
-    datetime::time_unit datetime::reduce_to_largest_uni() const
+    void datetime::reduce_to_largest_unit() const
     {
+	infinint newval;
+	datetime *me = const_cast<datetime *>(this);
+
+	if(me == NULL)
+	    throw SRC_BUG;
+
 	switch(uni)
 	{
-	case tu_seconde:
+	case tu_microsecond:
+	    if(!is_integer_value_of(tu_second, newval))
+		break; // cannot reduce the unit further
+	    else
+	    {
+		me->val = newval;
+		me->uni = tu_second;
+	    }
+		/* no break ! */
+	case tu_second:
+		// nothing to do, this is the largest known unit
 	    break;
 	default:
 	    throw SRC_BUG;
 	}
-
-	return uni;
     }
 
     infinint datetime::get_value(time_unit unit) const
     {
-	if(unit == uni)
-	    return val;
-	else
-	    throw Efeature("Time Unit Conversion");
+	infinint ret;
+	(void) is_integer_value_of(unit, ret);
+	return ret;
     }
 
     bool datetime::get_value(time_t & val) const
     {
-	infinint tmp = get_value(tu_seconde);
+	infinint tmp;
 
+	(void) is_integer_value_of(tu_second, tmp);
 	val = 0;
 	tmp.unstack(val);
 
@@ -113,7 +139,10 @@ namespace libdar
 
     void datetime::dump(generic_file &x) const
     {
-	const char tmp = time_unit_to_char(uni);
+	char tmp;
+
+	reduce_to_largest_unit();
+	tmp = time_unit_to_char(uni);
 	x.write(&tmp, 1);
 	val.dump(x);
     }
@@ -121,7 +150,7 @@ namespace libdar
     void datetime::read(generic_file &f, archive_version ver)
     {
 	if(ver < 9)
-	    uni = tu_seconde;
+	    uni = tu_second;
 	else
 	{
 	    char tmp;
@@ -153,7 +182,7 @@ namespace libdar
     {
 	switch(a)
 	{
-	case tu_seconde:
+	case tu_second:
 	    return 's';
 	default:
 	    throw SRC_BUG;
@@ -165,10 +194,38 @@ namespace libdar
 	switch(a)
 	{
 	case 's':
-	    return tu_seconde;
+	    return tu_second;
 	default:
 	    throw SRC_BUG;
 	}
+    }
+
+    infinint datetime::get_scaling_factor(time_unit source, time_unit dest)
+    {
+	infinint factor = 1;
+
+	if(dest > source)
+	    throw SRC_BUG;
+
+	switch(source)
+	{
+	case tu_second:
+	    if(dest == tu_second)
+		break;
+	    else
+		factor *= one_million;
+		/* no break ! */
+	case tu_microsecond:
+	    if(dest == tu_microsecond)
+		break;
+	    factor *= 1; //< to be set properly for a smaller unit than microsecond
+	    throw SRC_BUG;
+		/* no break ! */
+	default:
+	    throw SRC_BUG;
+	}
+
+	return factor;
     }
 
     archive_version db2archive_version(unsigned char db_version)

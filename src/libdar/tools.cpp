@@ -563,7 +563,7 @@ namespace libdar
         time_t pas = 0;
 
 	if(!date.get_value(pas)) // conversion to system type failed. Using a replacement string
-	    return deci(date.get_value(datetime::tu_seconde)).human();
+	    return deci(date.get_value(datetime::tu_second)).human();
 	else
 	{
 	    char *str = ctime(&pas);
@@ -1100,14 +1100,12 @@ namespace libdar
         datetime t_delta = date1 > date2 ? date1-date2 : date2-date1;
 	infinint delta;
 
-	if(!t_delta.is_integer_value_of(datetime::tu_seconde))
+	if(!t_delta.is_integer_value_of(datetime::tu_second, delta))
 	    return false;
 
-	delta = t_delta.get_value(datetime::tu_seconde);
-
-            // delta = num*3600 + rest
+            // delta = 3600*num + rest
             // with 0 <= rest < 3600
-            // (this euclidian division)
+            // (this is euclidian division)
         euclide(delta, 3600, num, rest);
 
         if(rest != 0)
@@ -2521,7 +2519,7 @@ namespace libdar
     string tools_get_date_utc()
     {
 	string ret;
-	datetime now = datetime(::time(NULL), datetime::tu_seconde);
+	datetime now = datetime(::time(NULL), datetime::tu_second);
 
 	ret = tools_display_date(now);
 
