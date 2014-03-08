@@ -614,7 +614,15 @@ namespace libdar
 	else
 	{
 	    fsa_date * ptr = NULL;
-	    create_or_throw(ptr, get_pool(), fsaf_hfs_plus, fsan_creation_date, datetime(tmp.st_birthtime));
+#ifdef LIBDAR_MICROSECOND_READ_ACCURACY
+	    datetime birthtime = datetime(tmp.st_birthtim.tv_sec, tmp.st_birthtim.tv_nsec);
+	    if(birthtime.is_null())
+		birthtime = datetime(tmp.st_birthtime, datetime::tu_second);
+#else
+	    datetime birthtime = datetime(tmp.st_birthtime, datetime::tu_second);
+#endif
+	    create_or_throw(ptr, get_pool(), fsaf_hfs_plus, fsan_creation_date, birthtime);
+
 	    fsa.push_back(ptr);
 	    ptr = NULL;
 	}

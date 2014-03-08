@@ -273,6 +273,11 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 				     }]],
 				     [[
 				       struct stat st;
+				        /* tv_nsec is nanosecond, but for now we
+					   do not keep more precised timing than microseconds
+					   because we have not portable way to restore nanoseconds
+					   but only seconds and microsecond
+ 					*/
 				       if(st.st_atim.tv_nsec != 0)
 				         return 0;
 				       else

@@ -95,6 +95,10 @@ extern "C"
 #include <utime.h>
 #endif
 
+#if HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
 #if HAVE_CTYPE_H
 #include <ctype.h>
 #endif
@@ -561,8 +565,9 @@ namespace libdar
     string tools_display_date(const datetime & date)
     {
         time_t pas = 0;
+	time_t usec = 0;
 
-	if(!date.get_value(pas)) // conversion to system type failed. Using a replacement string
+	if(!date.get_value(pas, usec)) // conversion to system type failed. Using a replacement string
 	    return deci(date.get_value(datetime::tu_second)).human();
 	else
 	{
@@ -1275,38 +1280,75 @@ namespace libdar
 
     void tools_make_date(const std::string & chemin, const datetime & access, const datetime & modif, const datetime & birth)
     {
+#if LIBDAR_MICROSECOND_WRITE_ACCURACY
+	struct timeval temps[2];
+#else
         struct utimbuf temps;
+#endif
         time_t tmp = 0;
+	time_t usec = 0;
+	int ret;
 
-	if(!access.get_value(tmp))
+	if(!access.get_value(tmp, usec))
 	    throw Erange("tools_make_date", "cannot set atime of file, value too high for the system integer type");
 
 	    // the first time, setting modification time to the value of birth time
-	    // systems that supports birth time update birth time if the given mtime is more recent than the current birth time
+	    // systems that supports birth time update birth time if the given mtime is older than the current birth time
 	    // so here we assume birth < modif (if not the birth time will be set to modif)
 	    // we run a second time the same call but with the real mtime, which should not change the birthtime if this
 	    // one is as expected older than mtime.
 	else
+	{
+#if LIBDAR_MICROSECOND_WRITE_ACCURACY
+	    temps[0].tv_sec = tmp;
+	    temps[0].tv_usec = usec;
+#else
 	    temps.actime = tmp;
+#endif
+	}
 
 	if(birth != modif)
 	{
-	    if(!birth.get_value(tmp))
+	    if(!birth.get_value(tmp, usec))
 		throw Erange("tools_make_date", "cannot set birth time of file, value too high for the system integer type");
 	    else
+	    {
+#if LIBDAR_MICROSECOND_WRITE_ACCURACY
+		temps[1].tv_sec = tmp;
+		temps[1].tv_usec = usec;
+#else
 		temps.modtime = tmp;
+#endif
+	    }
 
-	    if(utime(chemin.c_str() , &temps) < 0)
+#if LIBDAR_MICROSECOND_WRITE_ACCURACY
+	    ret = utimes(chemin.c_str(), temps);
+#else
+	    ret = utime(chemin.c_str() , &temps);
+#endif
+	    if(ret < 0)
 		Erange("tools_make_date", string(dar_gettext("Cannot set birth time: ")) + strerror(errno));
 	}
 
 	    // we set atime and mtime here
-	if(!modif.get_value(tmp))
+	if(!modif.get_value(tmp, usec))
 	    throw Erange("tools_make_date", "cannot set last modification time of file, value too high for the system integer type");
 	else
+	{
+#if LIBDAR_MICROSECOND_WRITE_ACCURACY
+	    temps[1].tv_sec = tmp;
+	    temps[1].tv_usec = usec;
+#else
 	    temps.modtime = tmp;
+#endif
+	}
 
-	if(utime(chemin.c_str() , &temps) < 0)
+#if LIBDAR_MICROSECOND_WRITE_ACCURACY
+	ret = utimes(chemin.c_str(), temps);
+#else
+	ret = utime(chemin.c_str() , &temps);
+#endif
+	if(ret < 0)
 	    Erange("tools_make_date", string(dar_gettext("Cannot set last access and last modification time: ")) + strerror(errno));
     }
 
@@ -1707,14 +1749,22 @@ namespace libdar
 	return ret;
     }
 
-    infinint tools_get_mtime(const std::string & s)
+    datetime tools_get_mtime(const std::string & s)
     {
         struct stat buf;
 
 	if(lstat(s.c_str(), &buf) < 0)
 	    throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get last modification date: %s"), strerror(errno)));
 
-        return buf.st_mtime;
+#ifdef LIBDAR_MICROSECOND_READ_ACCURACY
+	datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec);
+	if(val.is_null()) // assuming an error avoids getting time that way
+	    val = datetime(buf.st_mtime, datetime::tu_second);
+#else
+	datetime val = datetime(buf.st_mtime, datetime::tu_second);
+#endif
+
+        return val;
     }
 
     infinint tools_get_size(const std::string & s)
@@ -1731,14 +1781,21 @@ namespace libdar
     }
 
 
-    infinint tools_get_ctime(const std::string & s)
+    datetime tools_get_ctime(const std::string & s)
     {
         struct stat buf;
 
 	if(lstat(s.c_str(), &buf) < 0)
 	    throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get mtime: %s"), strerror(errno)));
 
-        return buf.st_ctime;
+#ifdef LIBDAR_MICROSECOND_READ_ACCURACY
+	datetime ret = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec);
+	if(ret.is_null()) // assuming an error avoids getting time that way
+	    ret = datetime(buf.st_ctime, datetime::tu_second);
+#else
+	datetime ret = datetime(buf.st_ctime, datetime::tu_second);
+#endif
+        return ret;
     }
 
     vector<string> tools_split_in_words(generic_file & f)

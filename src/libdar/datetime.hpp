@@ -26,6 +26,22 @@
 #ifndef DATETIME_HPP
 #define DATETIME_HPP
 
+extern "C"
+{
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#if HAVE_UTIME_H
+#include <utime.h>
+#endif
+
+#if HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
+} // end extern "C"
+
 #include "../my_config.h"
 #include "on_pool.hpp"
 #include "infinint.hpp"
@@ -46,6 +62,7 @@ namespace libdar
 	enum time_unit { tu_microsecond, tu_second };
 
 	datetime(const infinint & value = 0, time_unit unit = tu_second) { val = value; uni = unit; };
+	datetime(const infinint & second, const infinint & nanosecond);
 	datetime(generic_file &x, archive_version ver) { read(x, ver); };
 
 	    // comparison operators
@@ -78,9 +95,11 @@ namespace libdar
 
 	    /// return a time in second as in the time_t argument
 	    ///
-	    /// \param[out] val the time value in second
-	    /// \return false if the value cannot cast in a time_t variable
-	bool get_value(time_t & val) const;
+	    /// \param[out] second the time value in second
+	    /// \param[out] microsecond is the remaining time fraction as microsecond to add to second to get the exact time value
+	    /// \return true if the time value is exactly defined by second + microsecond, false is return else and argument
+	    /// value are undefined. This can be the case is time_t value is to narrow to contain the time value
+	bool get_value(time_t & second, time_t & microsecond) const;
 
 	void dump(generic_file &x) const;
 	void read(generic_file &f, archive_version ver);

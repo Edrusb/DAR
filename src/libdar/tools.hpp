@@ -537,7 +537,7 @@ namespace libdar
 
 	/// \param[in] s path of the file to get the last mtime
 	/// \return the mtime of the given file
-    extern infinint tools_get_mtime(const std::string & s);
+    extern datetime tools_get_mtime(const std::string & s);
 
 	/// returns the size of the given plain file
 
@@ -549,7 +549,7 @@ namespace libdar
 
 	/// \param[in] s path of the file to get the last ctime
 	/// \return the ctime of the given file
-    extern infinint tools_get_ctime(const std::string & s);
+    extern datetime tools_get_ctime(const std::string & s);
 
 	/// read a file and split its contents in words
 

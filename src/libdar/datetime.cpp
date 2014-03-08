@@ -29,7 +29,18 @@ using namespace std;
 namespace libdar
 {
 
-    static infinint one_million = infinint(1000)*infinint(1000);
+    static const infinint one_thousand = 1000;
+    static const infinint one_million = infinint(1000)*infinint(1000);
+    static const infinint one_billion = one_million*infinint(1000);
+
+    datetime::datetime(const infinint & second, const infinint & nanosecond)
+    {
+	val = second;
+	val *= one_billion; // now hodling nanosecond
+	val += nanosecond; // adding the subsecond part
+	val /= one_thousand; // now holding microsecond
+	uni = tu_microsecond;
+    }
 
     bool datetime::operator < (const datetime & ref) const
     {
@@ -39,7 +50,6 @@ namespace libdar
 	return get_value(c) < ref.get_value(c);
     }
 
-
     bool datetime::operator == (const datetime & ref) const
     {
 	    // using the unit having the less precision to perform the comparison
@@ -47,7 +57,6 @@ namespace libdar
 
 	return get_value(c) == ref.get_value(c);
     }
-
 
     datetime datetime::operator - (const datetime & ref) const
     {
@@ -126,15 +135,36 @@ namespace libdar
 	return ret;
     }
 
-    bool datetime::get_value(time_t & val) const
+    bool datetime::get_value(time_t & second, time_t & microsecond) const
     {
-	infinint tmp;
+	infinint f;
+	infinint q, r;
+	bool ret = false;
 
-	(void) is_integer_value_of(tu_second, tmp);
-	val = 0;
-	tmp.unstack(val);
+	switch(uni)
+	{
+	case tu_second:
+	    q = val;
+	    second = 0;
+	    microsecond = 0;
+	    q.unstack(second);
+	    ret = (q == 0);
+	    break;
+	case tu_microsecond:
+	    f = get_scaling_factor(tu_second, tu_microsecond);
+	    euclide(val, f, q, r);
+	    second = 0;
+	    microsecond = 0;
+	    q.unstack(second);
+	    ret = (q == 0);
+	    r.unstack(microsecond);
+	    ret = ret && (r == 0);
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
 
-	return tmp == 0;
+	return ret;
     }
 
     void datetime::dump(generic_file &x) const
@@ -184,6 +214,8 @@ namespace libdar
 	{
 	case tu_second:
 	    return 's';
+	case tu_microsecond:
+	    return 'u';
 	default:
 	    throw SRC_BUG;
 	}
@@ -195,6 +227,8 @@ namespace libdar
 	{
 	case 's':
 	    return tu_second;
+	case 'u':
+	    return tu_microsecond;
 	default:
 	    throw SRC_BUG;
 	}

@@ -181,24 +181,40 @@ namespace libdar
 	    }
 	    else
 	    {
+#ifdef LIBDAR_MICROSECOND_READ_ACCURACY
+		datetime atime = datetime(buf.st_atim.tv_sec, buf.st_atim.tv_nsec);
+		datetime mtime = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec);
+		datetime ctime = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec);
+
+		if(atime.is_null())
+		    atime = datetime(buf.st_atime, datetime::tu_second);
+		if(mtime.is_null())
+		    mtime = datetime(buf.st_mtime, datetime::tu_second);
+		if(ctime.is_null())
+		    ctime = datetime(buf.st_ctime, datetime::tu_second);
+#else
+		datetime atime = datetime(buf.st_atime, datetime::tu_second);
+		datetime mtime = datetime(buf.st_mtime, datetime::tu_second);
+		datetime ctime = datetime(buf.st_ctime, datetime::tu_second);
+#endif
 
 		if(S_ISLNK(buf.st_mode))
 		{
 		    string pointed = tools_readlink(ptr_name);
 
 		    ref = new (get_pool()) lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						datetime(buf.st_atime, datetime::tu_second),
-						datetime(buf.st_mtime, datetime::tu_second),
-						datetime(buf.st_ctime, datetime::tu_second),
+						atime,
+						mtime,
+						ctime,
 						name,
 						pointed,
 						buf.st_dev);
 		}
 		else if(S_ISREG(buf.st_mode))
 		    ref = new (get_pool()) file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						datetime(buf.st_atime, datetime::tu_second),
-						datetime(buf.st_mtime, datetime::tu_second),
-						datetime(buf.st_ctime, datetime::tu_second),
+						atime,
+						mtime,
+						ctime,
 						name,
 						lieu,
 						buf.st_size,
@@ -206,49 +222,49 @@ namespace libdar
 						furtive_read_mode);
 		else if(S_ISDIR(buf.st_mode))
 		    ref = new (get_pool()) directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						     datetime(buf.st_atime, datetime::tu_second),
-						     datetime(buf.st_mtime, datetime::tu_second),
-						     datetime(buf.st_ctime, datetime::tu_second),
+						     atime,
+						     mtime,
+						     ctime,
 						     name,
 						     buf.st_dev);
 		else if(S_ISCHR(buf.st_mode))
 		    ref = new (get_pool()) chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						   datetime(buf.st_atime, datetime::tu_second),
-						   datetime(buf.st_mtime, datetime::tu_second),
-						   datetime(buf.st_ctime, datetime::tu_second),
+						   atime,
+						   mtime,
+						   ctime,
 						   name,
 						   major(buf.st_rdev),
 						   minor(buf.st_rdev), // makedev(major, minor)
 						   buf.st_dev);
 		else if(S_ISBLK(buf.st_mode))
 		    ref = new (get_pool()) blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						    datetime(buf.st_atime, datetime::tu_second),
-						    datetime(buf.st_mtime, datetime::tu_second),
-						    datetime(buf.st_ctime, datetime::tu_second),
+						    atime,
+						    mtime,
+						    ctime,
 						    name,
 						    major(buf.st_rdev),
 						    minor(buf.st_rdev), // makedev(major, minor)
 						    buf.st_dev);
 		else if(S_ISFIFO(buf.st_mode))
 		    ref = new (get_pool()) tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						datetime(buf.st_atime, datetime::tu_second),
-						datetime(buf.st_mtime, datetime::tu_second),
-						datetime(buf.st_ctime, datetime::tu_second),
+						atime,
+						mtime,
+						ctime,
 						name,
 						buf.st_dev);
 		else if(S_ISSOCK(buf.st_mode))
 		    ref = new (get_pool()) prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						 datetime(buf.st_atime, datetime::tu_second),
-						 datetime(buf.st_mtime, datetime::tu_second),
-						 datetime(buf.st_ctime, datetime::tu_second),
+						 atime,
+						 mtime,
+						 ctime,
 						 name,
 						 buf.st_dev);
 #if HAVE_DOOR
 		else if(S_ISDOOR(buf.st_mode))
 		    ref = new (get_pool()) door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						datetime(buf.st_atime, datetime::tu_second),
-						datetime(buf.st_mtime, datetime::tu_second),
-						datetime(buf.st_ctime, datetime::tu_second),
+						atime,
+						mtime,
+						ctime,
 						name,
 						lieu,
 						buf.st_dev);
