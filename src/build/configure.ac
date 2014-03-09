@@ -260,7 +260,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 
 AC_MSG_CHECKING([for the possibility to read timestamps at a microsecond precision])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
-				     #define  _POSIX_C_SOURCE 200809L
+				     #define _XOPEN_SOURCE 700
 				     #if HAVE_SYS_TYPES_H
 				     #include <sys/types.h>
 				     #endif
@@ -285,7 +285,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 					 /* whatever, this test program is only compiled no run */
 			             ]])
 		 ],
-		 [  AC_DEFINE(_POSIX_C_SOURCE, 200809L, [activates POSIX.1-2008 symbols in order to allow microsecond time setting])
+		 [  AC_DEFINE(_XOPEN_SOURCE, 700, [activates POSIX.1-2008 symbols in order to allow microsecond time setting])
 		    AC_DEFINE(LIBDAR_MICROSECOND_READ_ACCURACY, 1, [support for timestamps microsecond read accuracy])
 		    local_microsecond_read=yes
 		    AC_MSG_RESULT(available)
