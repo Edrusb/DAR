@@ -5248,11 +5248,11 @@ namespace libdar
 	    user = local_uid(*e_ino);
 	    group = local_gid(*e_ino);
 	    permissions = local_perm(*e_ino, e_hard != NULL);
-	    atime = deci(e_ino->get_last_access().get_value()).human();
-	    mtime = deci(e_ino->get_last_modif().get_value()).human();
+	    atime = deci(e_ino->get_last_access().get_second_value()).human();
+	    mtime = deci(e_ino->get_last_modif().get_second_value()).human();
 	    if(e_ino->has_last_change())
 	    {
-		ctime = deci(e_ino->get_last_change().get_value()).human();
+		ctime = deci(e_ino->get_last_change().get_second_value()).human();
 		if(ctime == "0")
 		    ctime = "";
 	    }

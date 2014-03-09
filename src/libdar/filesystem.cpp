@@ -182,20 +182,20 @@ namespace libdar
 	    else
 	    {
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-		datetime atime = datetime(buf.st_atim.tv_sec, buf.st_atim.tv_nsec);
-		datetime mtime = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec);
-		datetime ctime = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec);
+		datetime atime = datetime(buf.st_atim.tv_sec, buf.st_atim.tv_nsec, datetime::tu_nanosecond);
+		datetime mtime = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec, datetime::tu_nanosecond);
+		datetime ctime = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec, datetime::tu_nanosecond);
 
 		if(atime.is_null())
-		    atime = datetime(buf.st_atime, datetime::tu_second);
+		    atime = datetime(buf.st_atime, 0, datetime::tu_second);
 		if(mtime.is_null())
-		    mtime = datetime(buf.st_mtime, datetime::tu_second);
+		    mtime = datetime(buf.st_mtime, 0, datetime::tu_second);
 		if(ctime.is_null())
-		    ctime = datetime(buf.st_ctime, datetime::tu_second);
+		    ctime = datetime(buf.st_ctime, 0, datetime::tu_second);
 #else
-		datetime atime = datetime(buf.st_atime, datetime::tu_second);
-		datetime mtime = datetime(buf.st_mtime, datetime::tu_second);
-		datetime ctime = datetime(buf.st_ctime, datetime::tu_second);
+		datetime atime = datetime(buf.st_atime, 0, datetime::tu_second);
+		datetime mtime = datetime(buf.st_mtime, 0, datetime::tu_second);
+		datetime ctime = datetime(buf.st_ctime, 0, datetime::tu_second);
 #endif
 
 		if(S_ISLNK(buf.st_mode))

@@ -565,14 +565,14 @@ namespace libdar
     string tools_display_date(const datetime & date)
     {
         time_t pas = 0;
-	time_t usec = 0;
+	time_t frac = 0;
 
-	if(!date.get_value(pas, usec)) // conversion to system type failed. Using a replacement string
-	    return deci(date.get_value(datetime::tu_second)).human();
+	if(!date.get_value(pas, frac, datetime::tu_second)) // conversion to system type failed. Using a replacement string
+	    return deci(date.get_second_value()).human();
 	else
 	{
 	    char *str = ctime(&pas);
-	    if(str == NULL) // ctime failed
+	    if(str == NULL) // ctime() failed
 		return tools_int2str(pas);
 	    else
 	    {
@@ -1105,8 +1105,10 @@ namespace libdar
         datetime t_delta = date1 > date2 ? date1-date2 : date2-date1;
 	infinint delta;
 
-	if(!t_delta.is_integer_value_of(datetime::tu_second, delta))
+	if(!t_delta.is_integer_second())
 	    return false;
+	else
+	    delta = t_delta.get_second_value();
 
             // delta = 3600*num + rest
             // with 0 <= rest < 3600
@@ -1289,7 +1291,7 @@ namespace libdar
 	time_t usec = 0;
 	int ret;
 
-	if(!access.get_value(tmp, usec))
+	if(!access.get_value(tmp, usec, datetime::tu_microsecond))
 	    throw Erange("tools_make_date", "cannot set atime of file, value too high for the system integer type");
 
 	    // the first time, setting modification time to the value of birth time
@@ -1309,7 +1311,7 @@ namespace libdar
 
 	if(birth != modif)
 	{
-	    if(!birth.get_value(tmp, usec))
+	    if(!birth.get_value(tmp, usec,datetime::tu_microsecond))
 		throw Erange("tools_make_date", "cannot set birth time of file, value too high for the system integer type");
 	    else
 	    {
@@ -1331,7 +1333,7 @@ namespace libdar
 	}
 
 	    // we set atime and mtime here
-	if(!modif.get_value(tmp, usec))
+	if(!modif.get_value(tmp, usec, datetime::tu_microsecond))
 	    throw Erange("tools_make_date", "cannot set last modification time of file, value too high for the system integer type");
 	else
 	{
@@ -1757,11 +1759,11 @@ namespace libdar
 	    throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get last modification date: %s"), strerror(errno)));
 
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-	datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec);
+	datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec, datetime::tu_nanosecond);
 	if(val.is_null()) // assuming an error avoids getting time that way
-	    val = datetime(buf.st_mtime, datetime::tu_second);
+	    val = datetime(buf.st_mtime, 0, datetime::tu_second);
 #else
-	datetime val = datetime(buf.st_mtime, datetime::tu_second);
+	datetime val = datetime(buf.st_mtime, 0, datetime::tu_second);
 #endif
 
         return val;
@@ -1789,11 +1791,11 @@ namespace libdar
 	    throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get mtime: %s"), strerror(errno)));
 
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-	datetime ret = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec);
+	datetime ret = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec, datetime::tu_nanosecond);
 	if(ret.is_null()) // assuming an error avoids getting time that way
-	    ret = datetime(buf.st_ctime, datetime::tu_second);
+	    ret = datetime(buf.st_ctime, 0, datetime::tu_second);
 #else
-	datetime ret = datetime(buf.st_ctime, datetime::tu_second);
+	datetime ret = datetime(buf.st_ctime, 0, datetime::tu_second);
 #endif
         return ret;
     }
@@ -2576,7 +2578,7 @@ namespace libdar
     string tools_get_date_utc()
     {
 	string ret;
-	datetime now = datetime(::time(NULL), datetime::tu_second);
+	datetime now = datetime(::time(NULL), 0, datetime::tu_second);
 
 	ret = tools_display_date(now);
 

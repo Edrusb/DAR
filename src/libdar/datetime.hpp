@@ -59,10 +59,19 @@ namespace libdar
     public:
 	    // time units must be sorted: the first is the smallest step, last is the largest increment.
 	    // this makes the comparison operators (<, >, <=, >=,...) become naturally defined on that type
-	enum time_unit { tu_microsecond, tu_second };
+	enum time_unit { tu_nanosecond, tu_microsecond, tu_second };
 
-	datetime(const infinint & value = 0, time_unit unit = tu_second) { val = value; uni = unit; };
-	datetime(const infinint & second, const infinint & nanosecond);
+	    /// constructor based on the number of second ellasped since the end of 1969
+	datetime(const infinint & value = 0) { sec = value; frac = 0; uni = tu_second; };
+
+	    /// general constructor
+	    ///
+	    /// \param[in] sec the number of second since the dawn of computer time (1970)
+	    /// \param[in] subsec the fraction of the time below 1 second expressed in the time unit given as next argument
+	    /// \param[in] the time unit in which is expressed the previous argument
+	datetime(time_t second, time_t subsec, time_unit unit) { sec = second; frac = subsec; uni = unit; if(uni == tu_second && subsec != 0) throw SRC_BUG; };
+
+	    /// constructor reading data dump() into a generic_file
 	datetime(generic_file &x, archive_version ver) { read(x, ver); };
 
 	    // comparison operators
@@ -78,42 +87,62 @@ namespace libdar
 	datetime operator - (const datetime & ref) const;
 	datetime operator + (const datetime & ref) const;
 
-	    /// tells wether the time can be fully specified in the given time unit
-	    ///
-	    /// \param[in] target time unit to get the value in
-	    /// \param[out] newval value of the datetime in the target unit
-	    /// \return true if the time is an integer number of the target time unit,
-	    /// newval is then the exact time value expressed in that unit. Else, false
-	    /// is returned and newval is rounded down time value to the integer
-	    /// value just below, in the target unit
-	bool is_integer_value_of(time_unit target, infinint & newval) const;
+	    /// return the integer number of second
+	infinint get_second_value() const { return sec; };
 
+	    /// return the subsecond time fraction expressed in the given time unit
+	infinint get_subsecond_value(time_unit unit) const;
+
+	    /// returns the time unit used internally to store the subsecond time fraction
 	time_unit get_unit() const { return uni; };
-	infinint get_raw_value() const { return val; };
 
-	infinint get_value(time_unit unit = tu_second) const;
-
-	    /// return a time in second as in the time_t argument
+	    /// return a time as time_t arguments
 	    ///
 	    /// \param[out] second the time value in second
-	    /// \param[out] microsecond is the remaining time fraction as microsecond to add to second to get the exact time value
-	    /// \return true if the time value is exactly defined by second + microsecond, false is return else and argument
-	    /// value are undefined. This can be the case is time_t value is to narrow to contain the time value
-	bool get_value(time_t & second, time_t & microsecond) const;
+	    /// \param[out] subsecond is the remaining time fraction as expressed in the unit given as next argument
+	    /// \param[in] unit the unit of the subsecond fraction of the timestamp
+	    /// \return true upon success, false if the value cannot be represented by system types (overflow)
+	bool get_value(time_t & second, time_t & subsecond, time_unit unit) const;
 
+
+	    /// write down this to file
 	void dump(generic_file &x) const;
+
+	    /// read this from file
 	void read(generic_file &f, archive_version ver);
 
-	bool is_null() const { return val == 0; };
+	    /// return true if the datetime is exactly January 1st, 1970, 0 h 0 mn 0 s
+	bool is_null() const { return sec == 0 && frac == 0; };
 
-	infinint get_storage_size() const { return val.get_storage_size() + 1; };
+	    /// return true if the datetime is an integer number of second (subsecond part is zero)
+	bool is_integer_second() const { return frac == 0; };
+
+	    /// return the storage it would require to dump this object
+	infinint get_storage_size() const { return sec.get_storage_size() + frac.get_storage_size() + 1; };
 
     private:
-	infinint val;
-	time_unit uni;
+	    // the date must not be stored as a single integer
+	    // to avoid reducing the possible addressable dates
+	    // when compiling using  32 or 64 bits integer in place
+	    // of infinint. The fraction cannot handle smaller unit
+	    // than nanosecond if using 32 bits integer.
+
+	infinint sec;  //< the date as number of second ellapsed since 1969
+	infinint frac; //< the fraction of the date expressed in the unit defined by the "uni" field
+	time_unit uni; //< the time unit used to store the subsecond fraction of the timestamp.
 
 	    /// reduce the value to the largest unit possible
 	void reduce_to_largest_unit() const;
+
+	    /// tells wether the time can be fully specified in the given time unit
+	    ///
+	    /// \param[in] target time unit to get the subsecond time fraction in
+	    /// \param[out] newval value of the subsecond time fracion in the target unit
+	    /// \return true if the time is an integer number of the target time unit,
+	    /// newval is then the exact subsecond time fraction expressed in that unit. Else, false
+	    /// is returned and newval is rounded down time value to the integer
+	    /// value just below, what is the correct subsecond time fraction expressed in the target unit
+	bool is_subsecond_an_integer_value_of(time_unit target, infinint & newval) const;
 
 
 	static time_unit min(time_unit a, time_unit b);
@@ -126,6 +155,9 @@ namespace libdar
 	    /// \note "from" must be larger than "to" (from >= to), else an exception is thrown
 	    /// \return the factor f, which makes the following to be true: from = f*to
 	static infinint get_scaling_factor(time_unit source, time_unit dest);
+
+	    /// return the max subsecond value that makes exactly one second for the given unit
+	static infinint how_much_to_make_1_second(time_unit unit);
     };
 
 	/// converts dar_manager database version to dar archive version in order to properly read time fields
