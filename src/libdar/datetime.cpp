@@ -183,7 +183,7 @@ namespace libdar
 	if(tmp != 0)
 	    return false;
 
-	if(unit < tu_second && uni < tu_second)
+	if(unit < tu_second && uni < tu_second && frac != 0)
 	{
 	    (void) is_subsecond_an_integer_value_of(unit, tmp);
 	    subsecond = 0;

@@ -1311,7 +1311,7 @@ namespace libdar
 
 	if(birth != modif)
 	{
-	    if(!birth.get_value(tmp, usec,datetime::tu_microsecond))
+	    if(!birth.get_value(tmp, usec, datetime::tu_microsecond))
 		throw Erange("tools_make_date", "cannot set birth time of file, value too high for the system integer type");
 	    else
 	    {
