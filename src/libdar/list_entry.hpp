@@ -84,6 +84,23 @@ namespace libdar
 	time_t get_last_access_s() const { return datetime2time_t(last_access); };
 	time_t get_last_modif_s() const { return datetime2time_t(last_modif); };
 	time_t get_last_change_s() const { return datetime2time_t(last_change); };
+
+	    /// yet an alternative method to get last access time
+	    ///
+	    /// \param[in] tu time unit to be used to store fraction (libdar::datetime::tu_microsecond, libdar::datetime::tu_nanosecond,...)
+	    /// \param[out] second integer number of second
+	    /// \param[out] fraction remaining part of the time (expressed as tu unit) to be added to "second" to get the exact time
+	void get_last_access(datetime::time_unit tu, time_t & second, time_t & fraction) const
+	{ last_access.get_value(second, fraction, tu); }
+
+	    /// yet an alternative method to get the last modification date (see get_last_access() for details)
+	void get_last_modif(datetime::time_unit tu, time_t & second, time_t & fraction)	const
+	{ last_modif.get_value(second, fraction, tu); }
+
+	    /// yet an alternative method to get the last change date (see get_last_access() for details)
+	void get_last_change(datetime::time_unit tu, time_t & second, time_t & fraction) const
+	{ last_change.get_value(second, fraction, tu); }
+
 	std::string get_file_size() const { return deci(file_size).human(); };
 	std::string get_compression_ratio() const { return tools_get_compression_ratio(storage_size, file_size); };
 	bool is_sparse() const { return sparse_file; };
