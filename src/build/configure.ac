@@ -24,6 +24,38 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
                   [AC_MSG_RESULT(ok)],
                   [AC_MSG_ERROR([No C++ compiler found])])
 
+# Defining _XOPEN_SOURCE to get extra field in struct stat
+AC_DEFINE(_XOPEN_SOURCE, 700, [activates POSIX.1-2008 symbols in order to allow microsecond time setting])
+
+###########
+## THE FOLLOWING "DEFINE" USED TO RE-ENABLE FULL LIBC FEATURES ON DIFFERENT OPERATING SYSTEMS
+## HAVE BEEN BORROWED FROM PYTHON's configure.in
+##
+##
+
+# The later defininition of _XOPEN_SOURCE disables certain features
+# on Linux, so we need _GNU_SOURCE to re-enable them (makedev, tm_zone).
+AC_DEFINE(_GNU_SOURCE, 1, [Define on Linux to activate all library features])
+
+# The later defininition of _XOPEN_SOURCE and _POSIX_C_SOURCE disables
+# certain features on NetBSD, so we need _NETBSD_SOURCE to re-enable
+# them.
+AC_DEFINE(_NETBSD_SOURCE, 1, [Define on NetBSD to activate all library features])
+
+# The later defininition of _XOPEN_SOURCE and _POSIX_C_SOURCE disables
+# certain features on FreeBSD, so we need __BSD_VISIBLE to re-enable
+# them.
+AC_DEFINE(__BSD_VISIBLE, 1, [Define on FreeBSD to activate all library features])
+
+# The later defininition of _XOPEN_SOURCE and _POSIX_C_SOURCE disables
+# certain features on Mac OS X, so we need _DARWIN_C_SOURCE to re-enable
+# them.
+AC_DEFINE(_DARWIN_C_SOURCE, 1, [Define on Darwin to activate all library features])
+
+##
+##
+###########
+
 # Checks for libraries.
 AC_CHECK_LIB(socket, [socket], [], [])
 AC_CHECK_LIB(nsl, [endnetconfig], [], [])
@@ -260,7 +292,6 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 
 AC_MSG_CHECKING([for the possibility to read timestamps at a microsecond precision])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
-				     #define _XOPEN_SOURCE 700
 				     #if HAVE_SYS_TYPES_H
 				     #include <sys/types.h>
 				     #endif
@@ -285,7 +316,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 					 /* whatever, this test program is only compiled no run */
 			             ]])
 		 ],
-		 [  AC_DEFINE(_XOPEN_SOURCE, 700, [activates POSIX.1-2008 symbols in order to allow microsecond time setting])
+		 [
 		    AC_DEFINE(LIBDAR_MICROSECOND_READ_ACCURACY, 1, [support for timestamps microsecond read accuracy])
 		    local_microsecond_read=yes
 		    AC_MSG_RESULT(available)
