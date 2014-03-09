@@ -1,11 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 
-  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-  <title>DAR's Limitations</title>
 
-
-</head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's Limitations</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
@@ -134,7 +131,7 @@ suite program will abort with an error message asking you to use the
 "full" version of dar program.<br>
       </div>
       <div style="margin-left: 40px;"><br>
-      </div>
+</div>
       <h3 style="text-align: justify;">Command line</h3>
       <div style="text-align: justify; margin-left: 40px;">On several
 systems,
@@ -170,22 +167,29 @@ several times on command line and is recursive (you can use -B from a
 file read by -B option).<br>
       </div>
       <h3 style="text-align: justify;">Dates</h3>
-      <div style="margin-left: 40px;">Unix files have three dates :<br>
+      <div style="margin-left: 40px;">Unix files have up to four dates :<br>
       </div>
       <ul style="text-align: justify; margin-left: 40px;">
         <li>last modification date (mtime)</li>
         <li>last access date (atime)</li>
+        
         <li>last inode change (ctime)</li>
+        <li>creation date (birthtime) [not all Unix system support this date, Linux does not for example]<br>
+        </li>
+
       </ul>
-      <div style="text-align: justify; margin-left: 40px;">In dar,
-dates are stored as
+      <div style="text-align: justify; margin-left: 40px;">In
+dar, these dates are stored as
 integers (the number of seconds elapsed
-since Jan 1st, 1970) as Unix systems do. As seen above, the limitation
+since Jan 1st, 1970) as Unix systems do, since release 2.5.0 it can
+also save, store and restore the microsecond part of these dates on
+system that support it. As seen above, the limitation
 is not due to dar
 but on the integer used, so if you use infinint, you should be able to
 store any date as far in the future as you want. Of course dar cannot
 stores dates before Jan the 1st of 1970, but it should not be a very
-big problem. ;-)<br>
+big problem as there should not be surviving files older than that
+epoch ;-) <br>
       </div>
       <div style="margin-left: 40px;"><br>
       </div>
@@ -196,12 +200,12 @@ to change the ctime. So Dar is not able to restore the ctime date of
 files.<br>
       </div><br>
       <h3>Symlinks</h3>
-      <div style="margin-left: 40px; text-align: justify;">Unix systems
+      <div style="margin-left: 40px; text-align: justify;">On system that provide the lutimes() system call, the dates of a symlink can be restored. Other Unix systems
 do not provide a way to modify the last modification date (aka mtime)
-of an existing symlink.Worse If you modify the mtime of an existing
+of an existing symlink. Worse If you modify the mtime of an existing
 symlink, you end modifying the mtime of the file targeted by that
 symlink, keeping untouched the mtime of the symlink itself! For that
-reason, dar is not able to restore mtime of symlink, it does not even
+reason, without lutimes() support, odar is not able to restore mtime of symlink, it does not even
 try to do this, to not mess the mtime of inodes that could be pointed
 by a symlink.<br>
       </div>
@@ -215,5 +219,6 @@ by a symlink.<br>
 <br>
 <br>
 </center>
+
 
 </body></html>
