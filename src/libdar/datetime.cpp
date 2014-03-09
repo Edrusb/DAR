@@ -155,6 +155,8 @@ namespace libdar
 		me->frac = newval;
 		me->uni = tu_second;
 	    }
+		/* no break ! */
+	case tu_second:
 		// cannot reduce further as
 		// this is the largest known time unit
 		// so we break here
