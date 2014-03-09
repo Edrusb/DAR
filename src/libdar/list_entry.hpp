@@ -48,7 +48,7 @@ namespace libdar
 	/// to read the information. Each information uses its own method, thus it will require
 	/// several call to different method to get the full description of the object.
 	/// This has the advantage to let the possiblity to add new fields in the future
-	/// without breaking anything in API user programs.
+	/// without breaking anything in API, and in consequences in user programs.
 	/// \ingroup API
     class list_entry : public on_pool
     {
@@ -81,6 +81,9 @@ namespace libdar
 	std::string get_last_access() const { return last_access.is_null() ? "" : tools_display_date(last_access); };
 	std::string get_last_modif() const { return last_modif.is_null() ? "" : tools_display_date(last_modif); };
 	std::string get_last_change() const { return last_change.is_null() ? "" : tools_display_date(last_change); };
+	time_t get_last_access_s() const { return datetime2time_t(last_access); };
+	time_t get_last_modif_s() const { return datetime2time_t(last_modif); };
+	time_t get_last_change_s() const { return datetime2time_t(last_change); };
 	std::string get_file_size() const { return deci(file_size).human(); };
 	std::string get_compression_ratio() const { return tools_get_compression_ratio(storage_size, file_size); };
 	bool is_sparse() const { return sparse_file; };
@@ -89,6 +92,7 @@ namespace libdar
 	std::string get_link_target() const { return target; };
 	std::string get_major() const { return tools_int2str(major); };
 	std::string get_minor() const { return tools_int2str(minor); };
+
 
 	    // methods for libdar to setup the object
 
@@ -132,6 +136,8 @@ namespace libdar
 	std::string target;
 	int major;
 	int minor;
+
+	static time_t datetime2time_t(const datetime & val);
     };
 
 } // end of namespace

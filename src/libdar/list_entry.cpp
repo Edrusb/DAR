@@ -45,7 +45,16 @@ namespace libdar
 	target = "";
 	major = 0;
 	minor = 0;
-  }
+    }
 
+    time_t list_entry::datetime2time_t(const datetime & val)
+    {
+	time_t ret = 0;
+	time_t unused;
+
+	(void) val.get_value(ret, unused, datetime::tu_second);
+
+	return ret;
+    }
 
 } // end of namespace
