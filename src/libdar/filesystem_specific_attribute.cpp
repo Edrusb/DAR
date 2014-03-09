@@ -613,13 +613,13 @@ namespace libdar
 	    return; // silently aborting assuming FSA family not supported for that file
 	else
 	{
-	    fsa_date * ptr = NULL;
+	    fsa_time * ptr = NULL;
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
-	    datetime birthtime = datetime(tmp.st_birthtim.tv_sec, tmp.st_birthtim.tv_nsec);
+	    datetime birthtime = datetime(tmp.st_birthtim.tv_sec, tmp.st_birthtim.tv_nsec, datetime::tu_nanosecond);
 	    if(birthtime.is_null())
-		birthtime = datetime(tmp.st_birthtime, datetime::tu_second);
+		birthtime = datetime(tmp.st_birthtime, 0, datetime::tu_second);
 #else
-	    datetime birthtime = datetime(tmp.st_birthtime, datetime::tu_second);
+	    datetime birthtime = datetime(tmp.st_birthtime, 0, datetime::tu_second);
 #endif
 	    create_or_throw(ptr, get_pool(), fsaf_hfs_plus, fsan_creation_date, birthtime);
 

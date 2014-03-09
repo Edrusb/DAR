@@ -71,6 +71,14 @@ char *strchr (), *strrchr ();
 
 } // end extern "C"
 
+    // L_ctermid should be defined from stdio.h but this is not
+    // the case under cygwin! So we define it ourself with a
+    // somehow arbitrarily large value taking the risk it to be
+    // too short and having ctermid() writing over the
+#ifndef L_ctermid
+#define L_ctermid 200
+#endif
+
 #include "integers.hpp"
 #include "shell_interaction.hpp"
 #include "erreurs.hpp"
