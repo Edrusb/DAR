@@ -1089,7 +1089,7 @@ namespace libdar
 	    else
 		time_accuracy = "1 s";
 	    dialog.printf(gettext("   Timestamp write accuracy   : %S\n"), &time_accuracy);
-
+	    dialog.printf(gettext("   Restores dates of symlinks : %s\n"), YES_NO(compile_time::symlink_restore_dates()));
 	}
 	catch(...)
 	{
@@ -1280,9 +1280,9 @@ namespace libdar
         return count < argc;
     }
 
-    void tools_make_date(const std::string & chemin, const datetime & access, const datetime & modif, const datetime & birth)
+    void tools_make_date(const std::string & chemin, bool symlink, const datetime & access, const datetime & modif, const datetime & birth)
     {
-#if LIBDAR_MICROSECOND_WRITE_ACCURACY
+#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
 	struct timeval temps[2];
 #else
         struct utimbuf temps;
@@ -1301,7 +1301,7 @@ namespace libdar
 	    // one is as expected older than mtime.
 	else
 	{
-#if LIBDAR_MICROSECOND_WRITE_ACCURACY
+#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
 	    temps[0].tv_sec = tmp;
 	    temps[0].tv_usec = usec;
 #else
@@ -1315,7 +1315,7 @@ namespace libdar
 		throw Erange("tools_make_date", "cannot set birth time of file, value too high for the system integer type");
 	    else
 	    {
-#if LIBDAR_MICROSECOND_WRITE_ACCURACY
+#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
 		temps[1].tv_sec = tmp;
 		temps[1].tv_usec = usec;
 #else
@@ -1323,9 +1323,17 @@ namespace libdar
 #endif
 	    }
 
-#if LIBDAR_MICROSECOND_WRITE_ACCURACY
-	    ret = utimes(chemin.c_str(), temps);
+#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
+#ifdef HAVE_LUTIMES
+	    ret = lutimes(chemin.c_str(), temps);
 #else
+	    if(symlink)
+		return; // not able to restore dates of symlinks
+	    ret = utimes(chemin.c_str(), temps);
+#endif
+#else
+	    if(symlink)
+		return; // not able to restore dates of symlinks
 	    ret = utime(chemin.c_str() , &temps);
 #endif
 	    if(ret < 0)
@@ -1337,7 +1345,7 @@ namespace libdar
 	    throw Erange("tools_make_date", "cannot set last modification time of file, value too high for the system integer type");
 	else
 	{
-#if LIBDAR_MICROSECOND_WRITE_ACCURACY
+#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
 	    temps[1].tv_sec = tmp;
 	    temps[1].tv_usec = usec;
 #else
@@ -1345,21 +1353,29 @@ namespace libdar
 #endif
 	}
 
-#if LIBDAR_MICROSECOND_WRITE_ACCURACY
-	ret = utimes(chemin.c_str(), temps);
+#ifdef LIBDAR_MICROSECOND_WRITE_ACCURACY
+#ifdef HAVE_LUTIMES
+	ret = lutimes(chemin.c_str(), temps);
 #else
+	if(symlink)
+	    return; // not able to restore dates of symlinks
+	ret = utimes(chemin.c_str(), temps);
+#endif
+#else
+	if(symlink)
+	    return; // not able to restore dates of symlinks
 	ret = utime(chemin.c_str() , &temps);
 #endif
 	if(ret < 0)
 	    Erange("tools_make_date", string(dar_gettext("Cannot set last access and last modification time: ")) + strerror(errno));
     }
 
-    void tools_noexcept_make_date(const string & chem, const datetime & last_acc, const datetime & last_mod, const datetime & birth)
+    void tools_noexcept_make_date(const string & chem, bool symlink, const datetime & last_acc, const datetime & last_mod, const datetime & birth)
     {
         try
         {
             if(!last_acc.is_null() || !last_mod.is_null())
-                tools_make_date(chem, last_acc, last_mod, birth);
+                tools_make_date(chem, symlink, last_acc, last_mod, birth);
                 // else the directory could not be openned properly
                 // and time could not be retrieved, so we don't try
                 // to restore them

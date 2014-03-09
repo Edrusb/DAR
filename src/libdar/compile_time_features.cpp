@@ -205,5 +205,14 @@ namespace libdar
 #endif
 	}
 
+	bool symlink_restore_dates()
+	{
+#ifdef HAVE_LUTIMES
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
     } // end of compile_time nested namespace
 } // end of libdar namespace

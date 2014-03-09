@@ -379,19 +379,21 @@ namespace libdar
         /// set dates of a given file, no exception thrown
 
         /// \param[in] chem the path to the file to set
+	/// \param[in] symlink true if the file is a symlink
         /// \param[in] last_acc last access date to use
         /// \param[in] last_mod last modification date to use
 	/// \param[in] birth creation date of the file, if not known, use the value of last_mod for efficiency
-    extern void tools_noexcept_make_date(const std::string & chem, const datetime & last_acc, const datetime & last_mod, const datetime & birth);
+    extern void tools_noexcept_make_date(const std::string & chem, bool symlink, const datetime & last_acc, const datetime & last_mod, const datetime & birth);
 
         /// set dates of a given file, may throw exception
 
         /// \param[in] chemin the path to the file to set
+	/// \param[in] symlink true if the file is a symlink
         /// \param[in] access last access date to use
         /// \param[in] modif last modification date to use
 	/// \param[in] birth time of creation of the file
 	/// \note if birth time is not known, it should be set to the value of modif for efficiency
-    extern void tools_make_date(const std::string & chemin, const datetime & access, const datetime & modif, const datetime & birth);
+    extern void tools_make_date(const std::string & chemin, bool symlink, const datetime & access, const datetime & modif, const datetime & birth);
 
         /// compare two string in case insensitive manner
 

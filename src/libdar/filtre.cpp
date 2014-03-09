@@ -2781,7 +2781,7 @@ namespace libdar
 
 				// restore atime of source
 			    if(!alter_atime)
-				tools_noexcept_make_date(info_quoi, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
+				tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
 			    throw;
 			}
 			delete source;
@@ -2866,7 +2866,7 @@ namespace libdar
 
 			    // restore atime of source
 			if(!alter_atime)
-			    tools_noexcept_make_date(info_quoi, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
+			    tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
 		    }
 		    else
 			throw SRC_BUG; // saved_status == s_saved, but no data available, and no exception raised;
@@ -2978,7 +2978,7 @@ namespace libdar
     {
 	const file * ptr_f = dynamic_cast<const file *>(ptr);
 	if(ptr_f != NULL)
-	    tools_noexcept_make_date(chemin, ptr_f->get_last_access(), ptr_f->get_last_modif(), ptr_f->get_last_modif());
+	    tools_noexcept_make_date(chemin, false, ptr_f->get_last_access(), ptr_f->get_last_modif(), ptr_f->get_last_modif());
     }
 
     static bool save_fsa(user_interaction & dialog,

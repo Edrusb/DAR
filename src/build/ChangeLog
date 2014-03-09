@@ -21,6 +21,9 @@ from 2.4.x to 2.5.0
 - removing dar-help tool used to build dar -h message, tool become useless
   for a long time now.
 - added more specific -vm and -vt verbose options
+- added support for microsecond timestamps (atime, mtime, ctime, birthtime)
+- added support for lutime() to restore atime/mtimes of symlink on system
+  that supports it.
 
 from 2.4.12 to 2.4.13
 - adding initialization value for two variable to avoid unappropriate warning

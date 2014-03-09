@@ -294,6 +294,26 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		  ])
 
 
+AC_MSG_CHECKING([for lutimes() availability])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
+			           #if HAVE_SYS_TIME_H
+				   #include <sys/time.h>
+				   #endif
+				   } // extern "C"
+				   ]],
+				   [[
+  				      struct timeval tv[2];
+				      int lu = lutimes("/tmp/noway", tv);
+                                   ]])
+	          ],
+		  [ AC_DEFINE(HAVE_LUTIMES, 1, [if lutimes() system call is available])
+		    local_lutimes=yes
+		    AC_MSG_RESULT(available)
+		  ],
+		  [ AC_MSG_RESULT([not available])]
+                )
+
+
 # DAR's features
 
 AC_ARG_ENABLE( [libz-linking],
@@ -994,6 +1014,13 @@ fi
 
 printf "   microsecond write accuracy : "
 if [ "$local_microsecond_write" = "yes" ] ; then
+    echo "YES"
+else
+    echo "NO"
+fi
+
+printf "   can restore symlink dates  : "
+if [ "$local_lutimes" = "yes" ] ; then
     echo "YES"
 else
     echo "NO"

@@ -111,6 +111,9 @@ namespace libdar
 
 	    /// returns whether libdar is able to write timestamps at a microsecond accuracy
 	bool microsecond_write();
+
+	    /// returns whether libdar is able to restore dates of symlinks
+	bool symlink_restore_dates();
     }
 
 } // end of namespace

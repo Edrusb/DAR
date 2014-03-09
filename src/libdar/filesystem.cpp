@@ -596,7 +596,7 @@ namespace libdar
                     string tmp;
 
 		    if(!alter_atime && !furtive_read_mode)
-			tools_noexcept_make_date(current_dir->display(), inner.last_acc, inner.last_mod, inner.last_mod);
+			tools_noexcept_make_date(current_dir->display(), false, inner.last_acc, inner.last_mod, inner.last_mod);
                     pile.pop_back();
                     if(pile.empty())
                         return false; // end of filesystem
@@ -714,7 +714,7 @@ namespace libdar
         else
         {
 	    if(!alter_atime && !furtive_read_mode)
-		tools_noexcept_make_date(current_dir->display(), pile.back().last_acc, pile.back().last_mod, pile.back().last_mod);
+		tools_noexcept_make_date(current_dir->display(), false, pile.back().last_acc, pile.back().last_mod, pile.back().last_mod);
             pile.pop_back();
         }
 
@@ -834,7 +834,7 @@ namespace libdar
 
 	string tmp;
 	if(!alter_atime && !furtive_read_mode)
-	    tools_noexcept_make_date(current_dir->display(), filename_pile.back().last_acc, filename_pile.back().last_mod, filename_pile.back().last_mod);
+	    tools_noexcept_make_date(current_dir->display(), false, filename_pile.back().last_acc, filename_pile.back().last_mod, filename_pile.back().last_mod);
 	filename_pile.pop_back();
 	current_dir->pop(tmp);
     }
@@ -2281,28 +2281,27 @@ namespace libdar
 	const lien *ref_lie = dynamic_cast<const lien *>(&ref);
 
 	if(what_to_check == inode::cf_all || what_to_check == inode::cf_ignore_owner || what_to_check == inode::cf_mtime)
-	    if(ref_lie == NULL) // not restoring atime & ctime for symbolic links
+	{
+	    datetime birthtime = ref.get_last_modif();
+	    fsa_scope::iterator it = scope.find(fsaf_hfs_plus);
+
+	    if(ref.fsa_get_saved_status() == inode::fsa_full && it != scope.end())
 	    {
-		datetime birthtime = ref.get_last_modif();
-		fsa_scope::iterator it = scope.find(fsaf_hfs_plus);
+		const filesystem_specific_attribute_list * fsa = ref.get_fsa();
+		const filesystem_specific_attribute *ptr = NULL;
 
-		if(ref.fsa_get_saved_status() == inode::fsa_full && it != scope.end())
+		if(fsa == NULL)
+		    throw SRC_BUG;
+		if(fsa->find(fsaf_hfs_plus, fsan_creation_date, ptr))
 		{
-		    const filesystem_specific_attribute_list * fsa = ref.get_fsa();
-		    const filesystem_specific_attribute *ptr = NULL;
-
-		    if(fsa == NULL)
-			throw SRC_BUG;
-		    if(fsa->find(fsaf_hfs_plus, fsan_creation_date, ptr))
-		    {
-			const fsa_time *ptr_time = dynamic_cast<const fsa_time *>(ptr);
-			if(ptr_time != NULL)
-			    birthtime = ptr_time->get_value();
-		    }
+		    const fsa_time *ptr_time = dynamic_cast<const fsa_time *>(ptr);
+		    if(ptr_time != NULL)
+			birthtime = ptr_time->get_value();
 		}
-
-		tools_make_date(chem, ref.get_last_access(), ref.get_last_modif(), birthtime);
 	    }
+
+	    tools_make_date(chem, ref_lie != NULL, ref.get_last_access(), ref.get_last_modif(), birthtime);
+	}
     }
 
     static void attach_ea(const string &chemin, inode *ino, const mask & ea_mask, memory_pool *pool)
