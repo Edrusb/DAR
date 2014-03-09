@@ -48,7 +48,19 @@ namespace libdar
 	target = "";
 	major = 0;
 	minor = 0;
-  }
+    }
+
+    time_t list_entry::infinint2time_t(infinint val)
+    {
+	time_t ret = 0;
+
+	val.unstack(ret);
+	if(val != 0)
+	    throw Erange("list_entry::infinint_to_time_t", gettext("system type time_t is not able too small to store a time/date"));
+
+	return ret;
+    }
+
 
 
 } // end of namespace

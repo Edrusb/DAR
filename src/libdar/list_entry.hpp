@@ -27,6 +27,21 @@
 #ifndef LIST_ENTRY_HPP
 #define LIST_ENTRY_HPP
 
+extern "C"
+{
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#if HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+}
+
 #include <string>
 
 #include "../my_config.h"
@@ -46,7 +61,7 @@ namespace libdar
 	/// to read the information. Each information uses its own method, thus it will require
 	/// several call to different method to get the full description of the object.
 	/// This has the advantage to let the possiblity to add new fields in the future
-	/// without breaking anything in API user programs.
+	/// without breaking anything in API, and in consequences in user programs.
 	/// \ingroup API
     class list_entry
     {
@@ -77,8 +92,11 @@ namespace libdar
 	std::string get_gid() const { return deci(gid).human(); };
 	std::string get_perm() const { return tools_int2str(perm); };
 	std::string get_last_access() const { return last_access != 0 ? tools_display_date(last_access) : ""; };
+	time_t get_last_access_s() const { return infinint2time_t(last_access); };
 	std::string get_last_modif() const { return last_modif != 0 ? tools_display_date(last_modif) : ""; };
+	time_t get_last_modif_s() const { return infinint2time_t(last_modif); };
 	std::string get_last_change() const { return last_change != 0 ? tools_display_date(last_change) : ""; };
+	time_t get_last_change_s() const { return infinint2time_t(last_change); };
 	std::string get_file_size() const { return deci(file_size).human(); };
 	std::string get_compression_ratio() const { return tools_get_compression_ratio(storage_size, file_size); };
 	bool is_sparse() const { return sparse_file; };
@@ -87,6 +105,7 @@ namespace libdar
 	std::string get_link_target() const { return target; };
 	std::string get_major() const { return tools_int2str(major); };
 	std::string get_minor() const { return tools_int2str(minor); };
+
 
 	    // methods for libdar to setup the object
 
@@ -130,6 +149,8 @@ namespace libdar
 	std::string target;
 	int major;
 	int minor;
+
+	static time_t infinint2time_t(infinint val);
     };
 
 } // end of namespace
