@@ -14,6 +14,8 @@ from 2.4.12 to 2.4.13
   than 1.6.0
 - fixed bug in hourshift (-H option) when comparing dates from an old extracted
   catalogue (archive format 7 or older).
+- fixed documentation bug about the meaning of the compression ratio
+- fixed a display bug about the "compression flag" displayed for uncompressed files
 
 
 from 2.4.11 to 2.4.12
