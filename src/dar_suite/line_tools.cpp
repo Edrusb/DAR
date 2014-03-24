@@ -676,6 +676,85 @@ vector<string> line_tools_split(const string & val, char sep)
     return ret;
 }
 
+void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
+							bool detruire,
+							bool more_recent,
+							const infinint & hourshift,
+							bool ea_erase,
+							const crit_action * & overwrite)
+{
+    crit_action *tmp1 = NULL;
+    crit_action *tmp2 = NULL; // tmp1 and tmp2 are used for construction of the overwriting policy
+    overwrite = NULL;
+
+    try
+    {
+	if(allow_over)
+	{
+	    if(ea_erase)
+		overwrite = new crit_constant_action(data_overwrite, EA_overwrite);
+	    else
+		overwrite = new crit_constant_action(data_overwrite, EA_merge_overwrite);
+	    if(overwrite == NULL)
+		throw Ememory("tools_build_compatible_overwriting_policy");
+
+	    tmp1 = new crit_constant_action(data_preserve, EA_preserve);
+	    if(tmp1 == NULL)
+		throw Ememory("tools_build_compatible_overwriting_policy");
+
+	    if(more_recent)
+	    {
+		tmp2 = new testing(crit_invert(crit_in_place_data_more_recent(hourshift)), *overwrite, *tmp1);
+		if(tmp2 == NULL)
+		    throw Ememory("tools_build_compatible_overwriting_policy");
+
+		delete overwrite;
+		overwrite = tmp2;
+		tmp2 = NULL;
+	    }
+
+	    if(!detruire)
+	    {
+		tmp2 = new testing(crit_invert(crit_in_place_is_inode()), *overwrite, *tmp1);
+		if(tmp2 == NULL)
+		    throw Ememory("tools_build_compatible_overwriting_policy");
+		delete overwrite;
+		overwrite = tmp2;
+		tmp2 = NULL;
+	    }
+
+	    delete tmp1;
+	    tmp1 = NULL;
+	}
+	else
+	{
+	    overwrite = new crit_constant_action(data_preserve, EA_preserve);
+	    if(overwrite == NULL)
+		throw Ememory("tools_build_compatible_overwriting_policy");
+	}
+
+	if(overwrite == NULL)
+	    throw SRC_BUG;
+	if(tmp1 != NULL)
+	    throw SRC_BUG;
+	if(tmp2 != NULL)
+	    throw SRC_BUG;
+    }
+    catch(...)
+    {
+	if(tmp1 != NULL)
+	    delete tmp1;
+	if(tmp2 != NULL)
+	    delete tmp2;
+	if(overwrite != NULL)
+	{
+	    delete overwrite;
+	    overwrite = NULL;
+	}
+	throw;
+    }
+}
+
 static string build(string::iterator a, string::iterator b)
 {
     string ret = "";

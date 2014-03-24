@@ -89,7 +89,6 @@ extern "C"
 #include "crit_action_cmd_line.hpp"
 #include "criterium.hpp"
 #include "fichier_local.hpp"
-#include "libdar_4_4.hpp"
 
 #define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:<:>:=:4:"
 
@@ -651,12 +650,12 @@ bool get_args(user_interaction & dialog,
 	case extract:
 	    if(p.overwrite == NULL)
 	    {
-		libdar_4_4::tools_4_4_build_compatible_overwriting_policy(p.allow_over,
-									  rec.detruire,
-									  rec.only_more_recent,
-									  p.hourshift,
-									  rec.ea_erase,
-									  p.overwrite);
+		line_tools_4_4_build_compatible_overwriting_policy(p.allow_over,
+								   rec.detruire,
+								   rec.only_more_recent,
+								   p.hourshift,
+								   rec.ea_erase,
+								   p.overwrite);
 		if(p.overwrite == NULL)
 		    throw Ememory("get_args");
 	    }

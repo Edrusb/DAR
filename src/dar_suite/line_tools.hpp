@@ -32,6 +32,7 @@
 #include "infinint.hpp"
 #include "tlv_list.hpp"
 #include "integers.hpp"
+#include "criterium.hpp"
 
 using namespace libdar;
 
@@ -125,6 +126,13 @@ extern void line_tools_look_for_jQ(S_I argc,
     /// split a line in words given the separator character (sep)
 
 extern std::vector<std::string> line_tools_split(const std::string & val, char sep);
+
+extern void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
+							       bool detruire,
+							       bool more_recent,
+							       const libdar::infinint & hourshift,
+							       bool ea_erase,
+							       const libdar::crit_action * & overwrite);
 
     /// @}
 
