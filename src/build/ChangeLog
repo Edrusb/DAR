@@ -1,22 +1,22 @@
 from 2.4.12 to 2.4.13
-- adding initialization value for two variable to avoid unappropriate warning
+- adding initialization value for two variable to avoid inappropriate warning
   when compiling with -Wall option
-- reducing UNIX_PATH_MAX when not defined from 108 to 104 bytes to accomodate BSD systems
+- reducing UNIX_PATH_MAX when not defined from 108 to 104 bytes to accommodate BSD systems
 - fixing assignment operator of class criterium that was not returning any value
 - adding support for back-slash of quoting characters in DCF files
 - fixed compilation issues with clang / FreeBSD
 - fixed compilation warning due to deprecated symbols in libgcrypt header files
 - rewrote gnu make specific rules to legacy ones
-- removed old unused stuff from misc subdirectory
+- removed old unused stuff from misc sub-directory
 - adding warning at compilation time if libgcrypt used is older than 1.6.0
 - adding warning at execution time if hash computation is requested with slices
   greater than 256 Gio and ligbcrypt dynamically or statically linked is older
   than 1.6.0
-- fixed bug in hourshift (-H option) when comparing dates from an old extracted
+- fixed bug in hour-shift (-H option) when comparing dates from an old extracted
   catalogue (archive format 7 or older).
 - fixed documentation bug about the meaning of the compression ratio
 - fixed a display bug about the "compression flag" displayed for uncompressed files
-
+- fixed unhandled when giving non number argument to -1 option
 
 from 2.4.11 to 2.4.12
 - for correctness fixed delete vs delete[] on vector of char (not incidence
