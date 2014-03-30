@@ -131,16 +131,20 @@ namespace libdar
 		delete ctrl;
 	};
 
-        void write(generic_file &f)
+        void write(generic_file &f) const
 	{
+	    header_version *me = const_cast <header_version *>(this);
 	    crc *ctrl = NULL;
+
+	    if(me == NULL)
+		throw SRC_BUG;
 
 		// preparing the data
 
 	    if(initial_offset != 0)
-		flag |= VERSION_FLAG_INITIAL_OFFSET; // adding it to the flag
+		me->flag |= VERSION_FLAG_INITIAL_OFFSET; // adding it to the flag
 	    else
-		flag &= ~VERSION_FLAG_INITIAL_OFFSET; // removing it from the flag
+		me->flag &= ~VERSION_FLAG_INITIAL_OFFSET; // removing it from the flag
 
 		// writing down the data
 
