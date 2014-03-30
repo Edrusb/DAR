@@ -60,11 +60,9 @@ namespace libdar
 
 	/// this class was a struct before release 2.4.0, now promoted
 	/// to a class it hides the fields and uses TLV to store the
-	/// fields in the archive. A new fields are easily identified
-	/// by old implementations, and optional known fields can be
-	/// recognized after those. This makes the header easier to
+	/// fields in the archive. This makes the header easier to
 	/// extend by adding new fields, while letting a chance for the
-	/// old implementation to use more recent archives
+	/// old implementation to be able to use more recent archives
 	/// the main use of TLV is to handle optional fields easily.
 
     class header : public on_pool
