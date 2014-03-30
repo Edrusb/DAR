@@ -259,27 +259,26 @@ namespace libdar
     }
 
 
-    archive *isolate_archive_noexcept(user_interaction & dialog,
-				      const path &sauv_path,
-				      archive *ref_arch,
-				      const std::string & filename,
-				      const std::string & extension,
-				      const archive_options_isolate & options,
-				      U_16 & exception,
-				      std::string & except_msg)
+    void op_isolate_noexcept(user_interaction & dialog,
+			     archive *ptr,
+			     const path &sauv_path,
+			     const std::string & filename,
+			     const std::string & extension,
+			     const archive_options_isolate & options,
+			     U_16 & exception,
+			     std::string & except_msg)
     {
-	archive *ret = NULL;
 	NLS_SWAP_IN;
 	WRAPPER_IN
-	    ret = new archive(dialog,
-			      sauv_path,
-			      ref_arch,
-			      filename,
-			      extension,
-			      options);
+	    if(ptr == NULL)
+		throw Elibcall("op_isolate_noexcept", gettext("Invald NULL argument given to 'ptr'"));
+	ptr->op_isolate(dialog,
+			sauv_path,
+			filename,
+			extension,
+			options);
 	WRAPPER_OUT(exception, except_msg)
         NLS_SWAP_OUT;
-	return ret;
     }
 
     archive *merge_archive_noexcept(user_interaction & dialog,

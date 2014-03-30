@@ -246,8 +246,8 @@ namespace libdar
 	/// for an explaination of the two extra arguments exception and except_msg check
 	/// the get_version_noexcept function
     extern archive *isolate_archive_noexcept(user_interaction & dialog,
+					     archive *ptr,
 					     const path &sauv_path,
-					     archive *ref_arch,
 					     const std::string & filename,
 					     const std::string & extension,
 					     const archive_options_isolate & options,

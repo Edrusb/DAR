@@ -128,13 +128,6 @@ namespace libdar
 			    bool empty,
                             statistics & st);
 
-
-    extern void filtre_isolate(user_interaction & dialog,
-			       memory_pool *pool,
-			       catalogue & cat,
-                               const catalogue & ref,
-                               bool info_details);
-
     extern void filtre_merge(user_interaction & dialog,
 			     memory_pool *pool,
 			     const mask & filtre,

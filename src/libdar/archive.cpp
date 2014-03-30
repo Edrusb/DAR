@@ -52,8 +52,6 @@ extern "C"
 #include "entrepot.hpp"
 #include "entrepot_local.hpp"
 
-#define GLOBAL_ELASTIC_BUFFER_SIZE 10240
-
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"
 
 using namespace std;
@@ -456,113 +454,6 @@ namespace libdar
         NLS_SWAP_OUT;
     }
 
-	// creates an isolated catalogue
-
-    archive::archive(user_interaction & dialog,
-                     const path &sauv_path,
-                     archive *ref_arch,
-                     const string & filename,
-                     const string & extension,
-		     const archive_options_isolate & options)
-    {
-        NLS_SWAP_IN;
-        try
-        {
-	    cat = NULL;
-	    pool = NULL;
-	    freed_and_checked = false;
-	    init_pool();
-
-	    try
-	    {
-		entrepot *sauv_path_t = options.get_entrepot().clone();
-		if(sauv_path_t == NULL)
-		    throw Ememory("archive::archive");
-		sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
-		sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
-		sauv_path_t->set_location(sauv_path);
-
-		try
-		{
-		    sequential_read = false; // updating the archive field
-
-		    (void)op_create_in(dialog,
-				       oper_isolate,
-				       path("."),
-				       *sauv_path_t,
-				       ref_arch,
-				       bool_mask(false),
-				       bool_mask(false),
-				       filename,
-				       extension,
-				       options.get_allow_over(),
-				       options.get_warn_over(),
-				       options.get_info_details(),
-				       false, // display treated
-				       false, // display skipped
-				       options.get_pause(),
-				       false,
-				       options.get_compression(),
-				       options.get_compression_level(),
-				       options.get_slice_size(),
-				       options.get_first_slice_size(),
-				       bool_mask(true),
-				       options.get_execute(),
-				       options.get_crypto_algo(),
-				       options.get_crypto_pass(),
-				       options.get_crypto_size(),
-				       bool_mask(false),
-				       0,      // min_compr_size
-				       false,  //nodump
-				       0,      // hourshift
-				       options.get_empty(),
-				       false,  // alter_atime
-				       false,  // furtive_read_mode
-				       false,  //same_fs
-				       inode::cf_all,
-				       false,  // snapshot
-				       false,  // cache_directory_tagging
-				       0,      // fixed_date
-				       options.get_slice_permission(),
-				       0, // repeat count
-				       0, // repeat byte
-				       options.get_sequential_marks(),
-				       false, // security check
-				       0, // sparse file min size (0 = no detection)
-				       options.get_user_comment(),
-				       options.get_hash_algo(),
-				       options.get_slice_min_digits(),
-				       "",                 // backup_hook_file_execute
-				       bool_mask(false),   // backup_hook_file_mask
-				       false,
-				       all_fsa_families(),
-				       NULL);
-			// we ignore returned value;
-		    exploitable = false;
-		    stack.terminate();
-		}
-		catch(...)
-		{
-		    if(sauv_path_t != NULL)
-			delete sauv_path_t;
-		    throw;
-		}
-		if(sauv_path_t != NULL)
-		    delete sauv_path_t;
-	    }
-	    catch(...)
-	    {
-		free_all();
-		throw;
-	    }
-        }
-        catch(...)
-        {
-            NLS_SWAP_OUT;
-            throw;
-        }
-        NLS_SWAP_OUT;
-    }
 
 	// merge constructor
 
@@ -608,20 +499,19 @@ namespace libdar
 			// useless arguments are not reported.
 
 		    if(&sauv_path == NULL)
-			throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"sauv_path\""));
+			throw Elibcall("op_merge", gettext("NULL argument given to \"sauv_path\""));
 		    if(&filename == NULL)
-			throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"filename\""));
+			throw Elibcall("op_merge", gettext("NULL argument given to \"filename\""));
 		    if(&extension == NULL)
-			throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"extension\""));
+			throw Elibcall("op_merge", gettext("NULL argument given to \"extension\""));
 		    if(options.get_compression_level() > 9 || options.get_compression_level() < 1)
-			throw Elibcall("op_create/op_isolate", gettext("Compression_level must be between 1 and 9 included"));
+			throw Elibcall("op_merge", gettext("Compression_level must be between 1 and 9 included"));
 		    if(options.get_slice_size() == 0 && options.get_first_slice_size() != 0)
-			throw Elibcall("op_create/op_isolate", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
+			throw Elibcall("op_merge", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
 		    if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_none)
-			throw Elibcall("op_create/op_isolate", gettext("Crypto block size must be greater than 10 bytes"));
+			throw Elibcall("op_merge", gettext("Crypto block size must be greater than 10 bytes"));
 
 		    check_libgcrypt_hash_bug(dialog, options.get_hash_algo(), options.get_first_slice_size(), options.get_slice_size());
-
 
 		    if(ref_arch1 != NULL)
 			ref_arch1->check_against_isolation(dialog, false);
@@ -1194,6 +1084,93 @@ namespace libdar
         return *st_ptr;
     }
 
+
+    void archive::op_isolate(user_interaction & dialog,
+			     const path &sauv_path,
+			     const string & filename,
+			     const string & extension,
+			     const archive_options_isolate & options)
+    {
+        NLS_SWAP_IN;
+        try
+        {
+	    entrepot *sauv_path_t = options.get_entrepot().clone();
+	    if(sauv_path_t == NULL)
+		throw Ememory("archive::archive");
+	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
+	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
+	    sauv_path_t->set_location(sauv_path);
+
+	    try
+	    {
+		pile layers;
+		header_version isol_ver;
+		label isol_data_name;
+
+		macro_tools_create_layers(dialog,
+					  layers,
+					  isol_ver,
+					  get_pool(),
+					  *sauv_path_t,
+					  filename,
+					  extension,
+					  options.get_allow_over(),
+					  options.get_warn_over(),
+					  options.get_info_details(),
+					  options.get_pause(),
+					  options.get_compression(),
+					  options.get_compression_level(),
+					  options.get_slice_size(),
+					  options.get_first_slice_size(),
+					  options.get_execute(),
+					  options.get_crypto_algo(),
+					  options.get_crypto_pass(),
+					  options.get_crypto_size(),
+					  options.get_empty(),
+					  options.get_slice_permission(),
+					  options.get_sequential_marks(),
+					  options.get_user_comment(),
+					  options.get_hash_algo(),
+					  options.get_slice_min_digits(),
+					  isol_data_name);
+
+		if(cat == NULL)
+		    throw SRC_BUG;
+
+		if(isol_data_name == cat->get_data_name())
+		    throw SRC_BUG;
+		    // data_name generated just above by slice layer
+		    // should never equal the data_name of the catalogue
+		    // when performing isolation
+
+		macro_tools_close_layers(dialog,
+					 layers,
+					 isol_ver,
+					 *cat,
+					 options.get_info_details(),
+					 options.get_crypto_algo(),
+					 options.get_compression(),
+					 options.get_empty());
+	    }
+	    catch(...)
+	    {
+		if(sauv_path_t != NULL)
+		    delete sauv_path_t;
+		throw;
+	    }
+
+	    if(sauv_path_t != NULL)
+		delete sauv_path_t;
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
+    }
+
+
     bool archive::get_children_of(user_interaction & dialog,
                                   const string & dir)
     {
@@ -1570,31 +1547,31 @@ namespace libdar
             // useless arguments are not reported.
 
         if(&fs_root == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"fs_root\""));
+            throw Elibcall("op_create_in", gettext("NULL argument given to \"fs_root\""));
         if(&sauv_path_t == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"sauv_path_t\""));
+            throw Elibcall("op_create_in", gettext("NULL argument given to \"sauv_path_t\""));
         if(&selection == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"selection\""));
+            throw Elibcall("op_create_in", gettext("NULL argument given to \"selection\""));
         if(&subtree == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"subtree\""));
+            throw Elibcall("op_create_in", gettext("NULL argument given to \"subtree\""));
         if(&filename == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"filename\""));
+            throw Elibcall("op_create_in", gettext("NULL argument given to \"filename\""));
         if(&extension == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"extension\""));
+            throw Elibcall("op_create_in", gettext("NULL argument given to \"extension\""));
         if(compression_level > 9 || compression_level < 1)
-            throw Elibcall("op_create/op_isolate", gettext("Compression_level must be between 1 and 9 included"));
+            throw Elibcall("op_create_in", gettext("Compression_level must be between 1 and 9 included"));
         if(file_size == 0 && first_file_size != 0)
-            throw Elibcall("op_create/op_isolate", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
+            throw Elibcall("op_create_in", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
         if(&execute == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"execute\""));
+            throw Elibcall("op_create_in", gettext("NULL argument given to \"execute\""));
         if(&compr_mask == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"compr_mask\""));
+            throw Elibcall("op_create_in", gettext("NULL argument given to \"compr_mask\""));
         if(&min_compr_size == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"min_compr_size\""));
+            throw Elibcall("op_create_in", gettext("NULL argument given to \"min_compr_size\""));
         if(crypto_size < 10 && crypto != crypto_none)
-            throw Elibcall("op_create/op_isolate", gettext("Crypto block size must be greater than 10 bytes"));
+            throw Elibcall("op_create_in", gettext("Crypto block size must be greater than 10 bytes"));
 	if(&ea_mask == NULL)
-	    throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"ea_mask\""));
+	    throw Elibcall("op_create_in", gettext("NULL argument given to \"ea_mask\""));
 #ifndef	LIBDAR_NODUMP_FEATURE
 	if(nodump)
 	    throw Ecompilation(gettext("nodump flag feature has not been activated at compilation time, it is thus not available"));
@@ -1788,20 +1765,16 @@ namespace libdar
     {
 	try
 	{
-	    stack.clear();
+	    stack.clear(); // [object member variable]
 	    cat = NULL;    // [object member variable]
 	    bool aborting = false;
 	    infinint aborting_next_etoile = 0;
 	    U_64 flag = 0;     // carries the sar option flag
-	    terminateur coord;
+
 	    label data_name;
 	    generic_file *tmp = NULL;
 	    escape *esc = NULL;
-	    compressor *compr_ptr = NULL;
-	    tronconneuse *tronco_ptr = NULL;
 	    thread_cancellation thr_cancel;
-	    bool force_permission = (slice_permission != "");
-	    U_I permission = force_permission ? tools_octal2int(slice_permission) : 0; // 0 or anything else, this does not matter
 
 	    if(op == oper_isolate)
 	    {
@@ -1811,8 +1784,6 @@ namespace libdar
 		    // as its own layer1 leading dar to thing that it is a normal archive with data.
 		sleep(1);
 	    }
-
-	    data_name.clear();
 
 	    if(ref_cat1 == NULL && op != oper_create)
 		SRC_BUG;
@@ -1828,251 +1799,62 @@ namespace libdar
 		if(pause != 0 && initial_pause)
 		    dialog.pause(gettext("Ready to start writing down the archive?"));
 
-		    // **********  building the level 1 generic_file layer *********** //
+		macro_tools_create_layers(dialog,
+					  stack, // this object field is set!
+					  ver,   // this object field is set!
+					  pool,  // this object field
+					  sauv_path_t,
+					  filename,
+					  extension,
+					  allow_over,
+					  warn_over,
+					  info_details,
+					  pause,
+					  algo,
+					  compression_level,
+					  file_size,
+					  first_file_size,
+					  execute,
+					  crypto,
+					  pass,
+					  crypto_size,
+					  empty,
+					  slice_permission,
+					  add_marks_for_sequential_reading,
+					  user_comment,
+					  hash,
+					  slice_min_digits,
+					  data_name);
 
-		if(empty)
-		{
-		    if(info_details)
-			dialog.warning(gettext("Creating low layer: Writing archive into a black hole object (equivalent to /dev/null)..."));
-
-		    tmp = new (pool) null_file(gf_write_only);
-		    // data_name is unchanged because all the archive goes to a black hole.
-		}
-		else
-		    if(file_size == 0) // one SLICE
-			if(filename == "-") // output to stdout
-			{
-			    if(info_details)
-				dialog.warning(gettext("Creating low layer: Writing archive into standard output object..."));
-
-			    trivial_sar *tvs = sar_tools_open_archive_tuyau(dialog, pool, 1, gf_write_only, data_name,
-									    false, execute); //archive goes to stdout
-			    tmp = tvs;
-			    if(tvs != NULL)
-				data_name = tvs->get_data_name();
-				// if tvs == NULL, then tmp == NULL is true, this case is handled below
-			}
-			else
-			{
-			    if(info_details)
-				dialog.warning(gettext("Creating low layer: Writing archive into a plain file object..."));
-			    trivial_sar *tvs = new (pool) trivial_sar(dialog,
-								      filename,
-								      extension,
-								      sauv_path_t, // entrepot !!
-								      data_name,
-								      execute,
-								      allow_over,
-								      warn_over,
-								      force_permission,
-								      permission,
-								      hash,
-								      slice_min_digits,
-								      false);
-			    tmp = tvs;
-			    if(tvs != NULL)
-				data_name = tvs->get_data_name();
-				// if tvs == NULL, then level1 == NULL is true, this case is handled below
-			}
-		    else
-		    {
-			if(info_details)
-			    dialog.warning(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
-			sar *rsr = new (pool) sar(dialog,
-						  filename,
-						  extension,
-						  file_size,
-						  first_file_size,
-						  warn_over,
-						  allow_over,
-						  pause,
-						  sauv_path_t, // entrepot !!
-						  data_name,
-						  force_permission,
-						  permission,
-						  hash,
-						  slice_min_digits,
-						  false,
-						  execute);
-			tmp = rsr;
-			if(rsr != NULL)
-			    data_name = rsr->get_data_name();
-			    // if rsr == NULL, then level1 == NULL is true, this case is handled below
-		    }
-
-
-		if(tmp == NULL)
-		    throw Ememory("op_create_in_sub");
-		else
-		{
-		    stack.push(tmp);
-		    tmp = NULL;
-		}
-
-		    // ******** creating and writing the archive header ******************* //
-
-		ver.edition = macro_tools_supported_version;
-		ver.algo_zip = compression2char(algo);
-		ver.cmd_line = user_comment;
-		ver.flag = 0;
-
-		    // optaining a password on-fly if necessary
-
-		if(crypto != crypto_none && real_pass.size() == 0)
-		{
-		    if(!secu_string::is_string_secured())
-			dialog.warning(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password you are about to provide to be wrote to disk (swap space) in clear. You have been warned!"));
-		    secu_string t1 = dialog.get_secu_string(tools_printf(gettext("Archive %S requires a password: "), &filename), false);
-		    secu_string t2 = dialog.get_secu_string(gettext("Please confirm your password: "), false);
-		    if(t1 == t2)
-			real_pass = t1;
-		    else
-			throw Erange("op_create_in_sub", gettext("The two passwords are not identical. Aborting"));
-		}
-
-		switch(crypto)
-		{
-		case crypto_scrambling:
-		case crypto_blowfish:
-		case crypto_aes256:
-		case crypto_twofish256:
-		case crypto_serpent256:
-		case crypto_camellia256:
-		    ver.flag |= VERSION_FLAG_SCRAMBLED;
-		    break;
-		case crypto_none:
-		    break; // no bit to set;
-		default:
-		    throw Erange("libdar:op_create_in_sub",gettext("Current implementation does not support this (new) crypto algorithm"));
-		}
-
-		if(add_marks_for_sequential_reading)
-		    ver.flag |= VERSION_FLAG_SEQUENCE_MARK;
-
-		    // we drop the header at the beginning of the archive in any case (to be able to
-		    // know whether sequential reading is possible or not, and if sequential reading
-		    // is asked, be able to get the required parameter to read the archive.
-		    // It also servers of backup copy for normal reading if the end of the archive
-		    // is corrupted.
-
-		if(info_details)
-		    dialog.warning(gettext("Writing down the archive header..."));
-		ver.write(stack);
-
-		    // now we can add the initial offset in the archive_header datastructure, which will be written
-		    // a second time, but at the end of the archive. If we start reading the archive from the end
-		    // we must know where ended the initial archive header.
-
-		ver.initial_offset = stack.get_position();
-
-		    // ************ building the encryption layer if required ****** //
-
-		if(!empty)
-		{
-		    switch(crypto)
-		    {
-		    case crypto_scrambling:
-			if(info_details)
-			    dialog.warning(gettext("Adding a new layer on top: scrambler object..."));
-			tmp = new (pool) scrambler(real_pass, *(stack.top()));
-			break;
-		    case crypto_blowfish:
-		    case crypto_aes256:
-		    case crypto_twofish256:
-		    case crypto_serpent256:
-		    case crypto_camellia256:
-			if(info_details)
-			    dialog.warning(gettext("Adding a new layer on top: Strong encryption object..."));
-			tmp = new (pool) crypto_sym(crypto_size, real_pass, *(stack.top()), false, macro_tools_supported_version, crypto);
-			break;
-		    case crypto_none:
-			if(info_details)
-			    dialog.warning(gettext("Adding a new layer on top: Caching layer for better performances..."));
-			tmp = new (pool) cache(*(stack.top()), false);
-			break;
-		    default:
-			throw SRC_BUG; // cryto value should have been checked before
-		    }
-
-		    if(tmp == NULL)
-			throw Ememory("op_create_in_sub");
-		    else
-		    {
-			stack.push(tmp);
-			tmp = NULL;
-		    }
-
-		    if(crypto != crypto_none) // initial elastic buffer
-		    {
-			if(info_details)
-			    dialog.warning(gettext("Writing down the initial elastic buffer through the encryption layer..."));
-			tools_add_elastic_buffer(stack, GLOBAL_ELASTIC_BUFFER_SIZE);
-		    }
-		}
-
-		    // ********** if required building the escape layer  ***** //
-
-		if(add_marks_for_sequential_reading && ! empty)
-		{
-		    set<escape::sequence_type> unjump;
-
-		    if(info_details)
-			dialog.warning(gettext("Adding a new layer on top: Escape layer to allow sequential reading..."));
-		    unjump.insert(escape::seqt_catalogue);
-		    tmp = esc = new (pool) escape(stack.top(), unjump);
-		    if(tmp == NULL)
-			throw Ememory("op_create_in_sub");
-		    else
-		    {
-			stack.push(tmp);
-			tmp = NULL;
-		    }
-		}
-
-		    // ********** building the level2 layer (compression) ************************ //
-
-		if(info_details && algo != none)
-		    dialog.warning(gettext("Adding a new layer on top: compression..."));
-		tmp = new (pool) compressor(empty ? none : algo, *(stack.top()), compression_level);
-		if(tmp == NULL)
-		    throw Ememory("op_create_in_sub");
-		else
-		{
-		    stack.push(tmp);
-		    tmp = NULL;
-		}
-
-		if(info_details)
-		    dialog.warning(gettext("All layers have been created successfully"));
+		stack.find_first_from_bottom(esc);
+		if(add_marks_for_sequential_reading && esc == NULL)
+		    throw SRC_BUG;
 
 		    // ********** building the catalogue (empty for now) ************************* //
 
 		datetime root_mtime;
-		if(info_details)
-		    dialog.warning(gettext("Building the catalog object..."));
-		try
-		{
-		    if(fs_root.display() != "<ROOT>")
-			root_mtime = tools_get_mtime(fs_root.display());
-		    else
-		    {
-			datetime mtime1 = ref_cat1 != NULL ? ref_cat1->get_root_mtime() : datetime(0);
-			datetime mtime2 = ref_cat2 != NULL ? ref_cat2->get_root_mtime() : datetime(0);
-			root_mtime = mtime1 > mtime2 ? mtime1 : mtime2;
-		    }
-		}
-		catch(Erange & e)
-		{
-		    string tmp = fs_root.display();
-		    throw Erange("archive::op_create_in_sub", tools_printf(gettext("Error while fetching information for %S: "), &tmp) + e.get_message());
-		}
 
-		if(op == oper_isolate)
-		    if(add_marks_for_sequential_reading && !empty)
-			cat = new (pool) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), ref_cat1->get_data_name(), esc);
-		    else
-			cat = new (pool) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), ref_cat1->get_data_name());
-		else
+		if(op != oper_isolate)
+		{
+		    if(info_details)
+			dialog.warning(gettext("Building the catalog object..."));
+		    try
+		    {
+			if(fs_root.display() != "<ROOT>")
+			    root_mtime = tools_get_mtime(fs_root.display());
+			else // case of merging operation for example
+			{
+			    datetime mtime1 = ref_cat1 != NULL ? ref_cat1->get_root_mtime() : datetime(0);
+			    datetime mtime2 = ref_cat2 != NULL ? ref_cat2->get_root_mtime() : datetime(0);
+			    root_mtime = mtime1 > mtime2 ? mtime1 : mtime2;
+			}
+		    }
+		    catch(Erange & e)
+		    {
+			string tmp = fs_root.display();
+			throw Erange("archive::op_create_in_sub", tools_printf(gettext("Error while fetching information for %S: "), &tmp) + e.get_message());
+		    }
+
 		    if(op == oper_merge)
 			if(add_marks_for_sequential_reading && !empty)
 			    cat = new (pool) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), data_name, esc);
@@ -2084,8 +1866,12 @@ namespace libdar
 			else
 			    cat = new (pool) catalogue(dialog, root_mtime, data_name);
 
-		if(cat == NULL)
-		    throw Ememory("archive::op_create_in_sub");
+		    if(cat == NULL)
+			throw Ememory("archive::op_create_in_sub");
+		}
+		else // isolation
+		    cat = NULL; // cat is not used for that operation
+
 
 		    // *********** now we can perform the data filtering operation (adding data to the archive) *************** //
 
@@ -2165,8 +1951,7 @@ namespace libdar
 		    case oper_isolate:
 			if(info_details)
 			    dialog.warning(gettext("Creating an isolated catalogue..."));
-			st_ptr->clear(); // clear st, as filtre_isolate does not use it
-			filtre_isolate(dialog, pool, *cat, *ref_cat1, info_details);
+			    // nothing to be done here, we only drop down the reference catalogue below
 			break;
 		    case oper_merge:
 			if(info_details)
@@ -2223,17 +2008,6 @@ namespace libdar
 		    }
 		}
 
-		    // *********** writing down the catalogue of the archive *************** //
-
-		if(add_marks_for_sequential_reading && !empty)
-		{
-		    if(esc != NULL)
-			esc->add_mark_at_current_position(escape::seqt_catalogue);
-		    else
-			throw SRC_BUG;
-		}
-
-		coord.set_catalogue_start(stack.get_position());
 		if(ref_cat1 != NULL && op == oper_create)
 		{
 		    if(info_details)
@@ -2244,78 +2018,14 @@ namespace libdar
 			st_ptr->add_to_deleted(cat->update_destroyed_with(*ref_cat1));
 		}
 
-		if(info_details)
-		    dialog.warning(gettext("Writing down archive contents..."));
-		cat->dump(stack);
-		stack.top()->sync_write();
-
-		    // releasing the compression layer
-
-		if(info_details && algo != none)
-		    dialog.warning(gettext("Closing the compression layer..."));
-		if(!stack.pop_and_close_if_type_is(compr_ptr))
-		    throw SRC_BUG;
-
-		    // releasing the escape layer
-
-		if(esc != NULL)
-		{
-		    if(info_details)
-			dialog.warning(gettext("Closing the escape layer..."));
-		    if(!add_marks_for_sequential_reading)
-			throw SRC_BUG;
-		    esc = NULL; // intentionnally set to NULL here, only the pointer type is used by pop_and_close
-		    if(!stack.pop_and_close_if_type_is(esc))
-			throw SRC_BUG;
-		}
-
-		    // *********** writing down the first terminator at the end of the archive  *************** //
-
-		if(info_details)
-		    dialog.warning(gettext("Writing down the first archive terminator..."));
-		coord.dump(stack); // since format "04" the terminateur is encrypted
-		if(crypto != crypto_none)
-		{
-		    if(info_details)
-			dialog.warning(gettext("writing down the final elastic buffer through the encryption layer..."));
-		    tools_add_elastic_buffer(stack, GLOBAL_ELASTIC_BUFFER_SIZE);
-			// terminal elastic buffer (after terminateur to protect against
-			// plain text attack on the terminator string)
-		}
-
-		    // releasing memory by calling destructors and releases file descriptors
-
-		tronco_ptr = dynamic_cast<tronconneuse *>(stack.top());
-		if(tronco_ptr != NULL)
-		{
-		    if(info_details)
-			dialog.warning(gettext("Closing the encryption layer..."));
-		    tronco_ptr->write_end_of_file();
-		}
-
-		if(!stack.pop_and_close_if_type_is(tronco_ptr))
-		{
-		    scrambler *ptr = NULL;
-		    (void)stack.pop_and_close_if_type_is(ptr);
-		}
-
-		    // *********** writing down the trailier_version with the second terminateur *************** //
-
-		if(info_details)
-		    dialog.warning(gettext("Writing down archive trailer..."));
-		coord.set_catalogue_start(stack.get_position());
-		ver.write(stack);
-		if(info_details)
-		    dialog.warning(gettext("Writing down the second archive terminator..."));
-		coord.dump(stack);
-		stack.sync_write();
-
-		    // *********** closing the archive ******************** //
-
-		if(info_details)
-		    dialog.warning(gettext("Closing archive low layer..."));
-
-		stack.clear(); // closing all generic_files remaining in the stack
+		macro_tools_close_layers(dialog,
+					 stack,
+					 ver,
+					 *cat,
+					 info_details,
+					 crypto,
+					 algo,
+					 empty);
 
 		thr_cancel.block_delayed_cancellation(false);
 		    // release pending delayed cancellation (if any)
@@ -2323,8 +2033,6 @@ namespace libdar
 		if(aborting)
 		    throw Ethread_cancel(false, flag);
 
-		if(info_details)
-		    dialog.warning(gettext("Archive is closed."));
 	    }
 	    catch(...)
 	    {

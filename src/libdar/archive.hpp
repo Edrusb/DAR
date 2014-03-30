@@ -99,22 +99,6 @@ namespace libdar
 		statistics * progressive_report);
 
 
-	    /// this constructor isolates a catalogue of a given archive [this is the "isolate" constructor]
-
-	    /// \param[in,out] dialog for user interaction
-	    /// \param[in] sauv_path the path where to create slices
-	    /// \param[in] ref_arch the archive to take as reference (NULL for a full backup)
-	    /// \param[in] filename base name of the slices ("-" for standard output)
-	    /// \param[in] extension slices extension ("dar")
-	    /// \param[in] options optional parameters to use for the operation
-	archive(user_interaction & dialog,
-		const path &sauv_path,
-		archive *ref_arch,
-		const std::string & filename,
-		const std::string & extension,
-		const archive_options_isolate & options);
-
-
 	    /// this constructor builds an archive from two given archive [this is the "merge" constructor]
 
 	    /// \param[in,out] dialog for user interaction
@@ -244,6 +228,20 @@ namespace libdar
 			   const archive_options_test & options,
 			   statistics * progressive_report);
 
+
+	    /// this methodes isolates the catalogue of a the current archive into a separated archive
+
+	    /// \param[in,out] dialog for user interaction
+	    /// \param[in] sauv_path the path where to create slices
+	    /// \param[in] ref_arch the archive to take as reference (NULL for a full backup)
+	    /// \param[in] filename base name of the slices ("-" for standard output)
+	    /// \param[in] extension slices extension ("dar")
+	    /// \param[in] options optional parameters to use for the operation
+	void op_isolate(user_interaction & dialog,
+		const path &sauv_path,
+		const std::string & filename,
+		const std::string & extension,
+		const archive_options_isolate & options);
 
 	    /// getting information about a given directory
 

@@ -268,7 +268,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    merge_options.set_hash_algo(param.hash);
 		    merge_options.set_slice_min_digits(param.num_digits);
 		    merge_options.set_fsa_scope(param.scope);
-		    cur = new (nothrow) archive(dialog,            // user_interaction &
+		    cur = new (nothrow) archive(dialog,  // user_interaction &
 				      *param.sauv_root,  //const path &
 				      arch,              // archive *
 				      param.filename,    // const string &
@@ -346,10 +346,11 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 			isolate_options.set_slice_min_digits(param.aux_num_digits);
 			isolate_options.set_user_comment(param.user_comment);
 			isolate_options.set_sequential_marks(param.use_sequential_marks);
-			arch = new (nothrow) archive(dialog, *param.aux_root, cur, *param.aux_filename, EXTENSION,
-						     isolate_options);
-			if(arch == NULL)
-			    throw Ememory("little_main");
+			cur->op_isolate(dialog,
+					*param.aux_root,
+					*param.aux_filename,
+					EXTENSION,
+					isolate_options);
 		    }
 		}
 		break;
@@ -393,11 +394,12 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		isolate_options.set_hash_algo(param.hash);
 		isolate_options.set_slice_min_digits(param.num_digits);
 		isolate_options.set_sequential_marks(param.use_sequential_marks);
-                cur = new (nothrow) archive(dialog, *param.sauv_root, arch, param.filename, EXTENSION,
-					    isolate_options);
-		if(cur == NULL)
-		    throw Ememory("little_main");
-                break;
+                arch->op_isolate(dialog,
+				 *param.sauv_root,
+				 param.filename,
+				 EXTENSION,
+				 isolate_options);
+		break;
             case extract:
 		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
 		read_options.clear();

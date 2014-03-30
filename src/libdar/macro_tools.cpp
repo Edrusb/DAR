@@ -35,6 +35,7 @@ extern "C"
 #include "user_interaction.hpp"
 #include "zapette.hpp"
 #include "sar.hpp"
+#include "sar_tools.hpp"
 #include "elastic.hpp"
 #include "tronc.hpp"
 #include "trontextual.hpp"
@@ -43,6 +44,7 @@ extern "C"
 #include "escape_catalogue.hpp"
 #include "tronc.hpp"
 #include "cache.hpp"
+#include "null_file.hpp"
 
 using namespace std;
 
@@ -807,5 +809,389 @@ namespace libdar
 
 	return width;
     }
+
+    void macro_tools_create_layers(user_interaction & dialog,
+				   pile & layers,
+				   header_version & ver,
+				   memory_pool *pool,
+				   const entrepot & sauv_path_t,
+				   const string & filename,
+				   const string & extension,
+				   bool allow_over,
+				   bool warn_over,
+				   bool info_details,
+				   const infinint & pause,
+				   compression algo,
+				   U_I compression_level,
+				   const infinint & file_size,
+				   const infinint & first_file_size,
+				   const string & execute,
+				   crypto_algo crypto,
+				   const secu_string & pass,
+				   U_32 crypto_size,
+				   bool empty,
+				   const string & slice_permission,
+				   bool add_marks_for_sequential_reading,
+				   const string & user_comment,
+				   hash_algo hash,
+				   const infinint & slice_min_digits,
+				   label & data_name)
+    {
+	try
+	{
+	    generic_file *tmp = NULL;
+	    escape *esc = NULL;
+	    bool force_permission = (slice_permission != "");
+	    U_I permission = force_permission ? tools_octal2int(slice_permission) : 0; // 0 or anything else, this does not matter
+
+	    layers.clear();
+
+		// data_name is provided for sar/trivial_sar/remote sar objects (thanks to zapette/slave_zapette).
+		// Clearing data_name which sets it to "zero" makes these sar-like object to set their data_name to
+		// their internal_name (which is generated pseudo-randomly at that time).
+		//
+		// once the sar-like object (inherited from contextual class) is created set data_name to the randomly
+		// generated value which get available to the caller of this function
+	    data_name.clear();
+
+	    secu_string real_pass = pass;
+
+	    try
+	    {
+
+		    // **********  building the level 1 generic_file layer *********** //
+
+		if(empty)
+		{
+		    if(info_details)
+			dialog.warning(gettext("Creating low layer: Writing archive into a black hole object (equivalent to /dev/null)..."));
+
+		    tmp = new (pool) null_file(gf_write_only);
+		    // data_name is unchanged, this has no importance because all the archive goes to a black hole.
+		}
+		else
+		    if(file_size == 0) // one SLICE
+			if(filename == "-") // output to stdout
+			{
+			    if(info_details)
+				dialog.warning(gettext("Creating low layer: Writing archive into standard output object..."));
+
+			    trivial_sar *tvs = sar_tools_open_archive_tuyau(dialog, pool, 1, gf_write_only, data_name,
+									    false, execute); //archive goes to stdout
+			    tmp = tvs;
+			    if(tvs != NULL)
+				data_name = tvs->get_data_name();
+				// if tvs == NULL, then tmp == NULL is true, this case is handled below
+			}
+			else
+			{
+			    if(info_details)
+				dialog.warning(gettext("Creating low layer: Writing archive into a plain file object..."));
+			    trivial_sar *tvs = new (pool) trivial_sar(dialog,
+								      filename,
+								      extension,
+								      sauv_path_t, // entrepot !!
+								      data_name,
+								      execute,
+								      allow_over,
+								      warn_over,
+								      force_permission,
+								      permission,
+								      hash,
+								      slice_min_digits,
+								      false);
+			    tmp = tvs;
+			    if(tvs != NULL)
+				data_name = tvs->get_data_name();
+				// if tvs == NULL, then level1 == NULL is true, this case is handled below
+			}
+		    else
+		    {
+			if(info_details)
+			    dialog.warning(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
+			sar *rsr = new (pool) sar(dialog,
+						  filename,
+						  extension,
+						  file_size,
+						  first_file_size,
+						  warn_over,
+						  allow_over,
+						  pause,
+						  sauv_path_t, // entrepot !!
+						  data_name,
+						  force_permission,
+						  permission,
+						  hash,
+						  slice_min_digits,
+						  false,
+						  execute);
+			tmp = rsr;
+			if(rsr != NULL)
+			    data_name = rsr->get_data_name();
+			    // if rsr == NULL, then level1 == NULL is true, this case is handled below
+		    }
+
+
+		if(tmp == NULL)
+		    throw Ememory("op_create_in_sub");
+		else
+		{
+		    layers.push(tmp);
+		    tmp = NULL;
+		}
+
+		    // ******** creating and writing the archive header ******************* //
+
+		ver.edition = macro_tools_supported_version;
+		ver.algo_zip = compression2char(algo);
+		ver.cmd_line = user_comment;
+		ver.flag = 0;
+
+		    // optaining a password on-fly if necessary
+
+		if(crypto != crypto_none && real_pass.size() == 0)
+		{
+		    if(!secu_string::is_string_secured())
+			dialog.warning(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password you are about to provide to be wrote to disk (swap space) in clear. You have been warned!"));
+		    secu_string t1 = dialog.get_secu_string(tools_printf(gettext("Archive %S requires a password: "), &filename), false);
+		    secu_string t2 = dialog.get_secu_string(gettext("Please confirm your password: "), false);
+		    if(t1 == t2)
+			real_pass = t1;
+		    else
+			throw Erange("op_create_in_sub", gettext("The two passwords are not identical. Aborting"));
+		}
+
+		switch(crypto)
+		{
+		case crypto_scrambling:
+		case crypto_blowfish:
+		case crypto_aes256:
+		case crypto_twofish256:
+		case crypto_serpent256:
+		case crypto_camellia256:
+		    ver.flag |= VERSION_FLAG_SCRAMBLED;
+		    break;
+		case crypto_none:
+		    break; // no bit to set;
+		default:
+		    throw Erange("libdar:op_create_in_sub",gettext("Current implementation does not support this (new) crypto algorithm"));
+		}
+
+		if(add_marks_for_sequential_reading)
+		    ver.flag |= VERSION_FLAG_SEQUENCE_MARK;
+
+		    // we drop the header at the beginning of the archive in any case (to be able to
+		    // know whether sequential reading is possible or not, and if sequential reading
+		    // is asked, be able to get the required parameter to read the archive.
+		    // It also servers of backup copy for normal reading if the end of the archive
+		    // is corrupted.
+
+		if(info_details)
+		    dialog.warning(gettext("Writing down the archive header..."));
+		ver.write(layers);
+
+		    // now we can add the initial offset in the archive_header datastructure, which will be written
+		    // a second time, but at the end of the archive. If we start reading the archive from the end
+		    // we must know where ended the initial archive header.
+
+		ver.initial_offset = layers.get_position();
+
+		    // ************ building the encryption layer if required ****** //
+
+		if(!empty)
+		{
+		    switch(crypto)
+		    {
+		    case crypto_scrambling:
+			if(info_details)
+			    dialog.warning(gettext("Adding a new layer on top: scrambler object..."));
+			tmp = new (pool) scrambler(real_pass, *(layers.top()));
+			break;
+		    case crypto_blowfish:
+		    case crypto_aes256:
+		    case crypto_twofish256:
+		    case crypto_serpent256:
+		    case crypto_camellia256:
+			if(info_details)
+			    dialog.warning(gettext("Adding a new layer on top: Strong encryption object..."));
+			tmp = new (pool) crypto_sym(crypto_size, real_pass, *(layers.top()), false, macro_tools_supported_version, crypto);
+			break;
+		    case crypto_none:
+			if(info_details)
+			    dialog.warning(gettext("Adding a new layer on top: Caching layer for better performances..."));
+			tmp = new (pool) cache(*(layers.top()), false);
+			break;
+		    default:
+			throw SRC_BUG; // cryto value should have been checked before
+		    }
+
+		    if(tmp == NULL)
+			throw Ememory("op_create_in_sub");
+		    else
+		    {
+			layers.push(tmp);
+			tmp = NULL;
+		    }
+
+		    if(crypto != crypto_none) // initial elastic buffer
+		    {
+			if(info_details)
+			    dialog.warning(gettext("Writing down the initial elastic buffer through the encryption layer..."));
+			tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE);
+		    }
+		}
+
+		    // ********** if required building the escape layer  ***** //
+
+		if(add_marks_for_sequential_reading && ! empty)
+		{
+		    set<escape::sequence_type> unjump;
+
+		    if(info_details)
+			dialog.warning(gettext("Adding a new layer on top: Escape layer to allow sequential reading..."));
+		    unjump.insert(escape::seqt_catalogue);
+		    tmp = esc = new (pool) escape(layers.top(), unjump);
+		    if(tmp == NULL)
+			throw Ememory("op_create_in_sub");
+		    else
+		    {
+			layers.push(tmp);
+			tmp = NULL;
+		    }
+		}
+
+		    // ********** building the level2 layer (compression) ************************ //
+
+		if(info_details && algo != none)
+		    dialog.warning(gettext("Adding a new layer on top: compression..."));
+		tmp = new (pool) compressor(empty ? none : algo, *(layers.top()), compression_level);
+		if(tmp == NULL)
+		    throw Ememory("op_create_in_sub");
+		else
+		{
+		    layers.push(tmp);
+		    tmp = NULL;
+		}
+
+		if(info_details)
+		    dialog.warning(gettext("All layers have been created successfully"));
+	    }
+	    catch(...)
+	    {
+		if(tmp != NULL)
+		{
+		    delete tmp;
+		    tmp = NULL;
+		}
+		throw;
+	    }
+	}
+	catch(Erange &e)
+	{
+	    string msg = string(gettext("Error creating archive layers: ")) + e.get_message();
+	    throw Edata(msg);
+	}
+    }
+
+
+    void macro_tools_close_layers(user_interaction & dialog,
+				  pile & layers,
+				  const header_version & ver,
+				  const catalogue & cat,
+				  bool info_details,
+				  crypto_algo crypto,
+				  compression algo,
+				  bool empty)
+    {
+	terminateur coord;
+	escape *esc = NULL;
+	layers.find_first_from_bottom(esc);
+	compressor *compr_ptr = NULL;
+	tronconneuse *tronco_ptr = NULL;
+
+	    // *********** writing down the catalogue of the archive *************** //
+
+	if(esc != NULL)
+	    esc->add_mark_at_current_position(escape::seqt_catalogue);
+
+	coord.set_catalogue_start(layers.get_position());
+
+	if(info_details)
+	    dialog.warning(gettext("Writing down archive contents..."));
+	cat.dump(layers);
+	layers.top()->sync_write();
+
+	    // releasing the compression layer
+
+	if(info_details && algo != none)
+	    dialog.warning(gettext("Closing the compression layer..."));
+	if(!layers.pop_and_close_if_type_is(compr_ptr))
+	    throw SRC_BUG;
+
+	    // releasing the escape layer
+
+	if(esc != NULL)
+	{
+	    if(info_details)
+		dialog.warning(gettext("Closing the escape layer..."));
+	    esc = NULL; // intentionnally set to NULL here, only the pointer type is used by pop_and_close
+	    if(!layers.pop_and_close_if_type_is(esc))
+		throw SRC_BUG;
+	}
+
+	    // *********** writing down the first terminator at the end of the archive  *************** //
+
+	if(info_details)
+	    dialog.warning(gettext("Writing down the first archive terminator..."));
+	coord.dump(layers); // since format "04" the terminateur is encrypted
+
+	if(crypto != crypto_none)
+	{
+	    if(info_details)
+		dialog.warning(gettext("writing down the final elastic buffer through the encryption layer..."));
+	    tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE);
+		// terminal elastic buffer (after terminateur to protect against
+		// plain text attack on the terminator string)
+	}
+
+	    // releasing memory by calling destructors and releases file descriptors
+
+	tronco_ptr = dynamic_cast<tronconneuse *>(layers.top());
+	if(tronco_ptr != NULL)
+	{
+	    if(info_details)
+		dialog.warning(gettext("Closing the encryption layer..."));
+	    tronco_ptr->write_end_of_file();
+	}
+
+	if(!layers.pop_and_close_if_type_is(tronco_ptr))
+	{
+	    scrambler *ptr = NULL;
+	    (void)layers.pop_and_close_if_type_is(ptr);
+	}
+
+	    // *********** writing down the trailier_version with the second terminateur *************** //
+
+	if(info_details)
+	    dialog.warning(gettext("Writing down archive trailer..."));
+	coord.set_catalogue_start(layers.get_position());
+	ver.write(layers);
+
+	if(info_details)
+	    dialog.warning(gettext("Writing down the second archive terminator..."));
+	coord.dump(layers);
+	layers.sync_write();
+
+	    // *********** closing the archive ******************** //
+
+	if(info_details)
+	    dialog.warning(gettext("Closing archive low layer..."));
+
+	layers.clear(); // closing all generic_files remaining in the layers
+
+	if(info_details)
+	    dialog.warning(gettext("Archive is closed."));
+    }
+
 
 } // end of namespace
