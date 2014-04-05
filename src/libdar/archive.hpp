@@ -233,7 +233,6 @@ namespace libdar
 
 	    /// \param[in,out] dialog for user interaction
 	    /// \param[in] sauv_path the path where to create slices
-	    /// \param[in] ref_arch the archive to take as reference (NULL for a full backup)
 	    /// \param[in] filename base name of the slices ("-" for standard output)
 	    /// \param[in] extension slices extension ("dar")
 	    /// \param[in] options optional parameters to use for the operation

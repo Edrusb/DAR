@@ -131,14 +131,14 @@ namespace libdar
 	/// \param[in]  sauv_path_t where to create the archive
 	/// \param[in]  filename archive base name
 	/// \param[in]  extension archive extension
-	/// \param[in]  allow_ver whether to allow slice overwriting
+	/// \param[in]  allow_over whether to allow slice overwriting
 	/// \param[in]  warn_over whether to warn before overwriting
 	/// \param[in]  info_details whether to display detailed information
 	/// \param[in]  pause how many slices to wait before pausing (0 to never wait)
 	/// \param[in]  algo compression algorithm
 	/// \param[in]  compression_level compression level
-	/// \param[in]  slice_size size of the slices
-	/// \param[in]  first_slice_size size of the first slice
+	/// \param[in]  file_size size of the slices
+	/// \param[in]  first_file_size size of the first slice
 	/// \param[in]  execute command to execute after each slice creation
 	/// \param[in]  crypto cipher algorithm to use
 	/// \param[in]  pass password/passphrase to use for encryption
@@ -178,13 +178,14 @@ namespace libdar
 
 	/// dumps the catalogue and close all the archive layers to terminate the archive
 	///
-	/// \param[in]  dialog for user interaction
-	/// \param[in]  layers the archive layers to close
-	/// \param[in]  ver the archive "header" to be dropped at end of archive
-	/// \param[in]  cat the catalogue to dump in the layer before closing the archive
-	/// \param[in]  info_details whether to display detailed information
-	/// \param[in]  crypto cipher algorithm used in "layers"
-	/// \param[in]  empty dry-run execution (null_file at bottom of the stack)
+	/// \param[in] dialog for user interaction
+	/// \param[in] layers the archive layers to close
+	/// \param[in] ver the archive "header" to be dropped at end of archive
+	/// \param[in] cat the catalogue to dump in the layer before closing the archive
+	/// \param[in] info_details whether to display detailed information
+	/// \param[in] crypto cipher algorithm used in "layers"
+	/// \param[in] algo compression algorithm used
+	/// \param[in] empty dry-run execution (null_file at bottom of the stack)
     void macro_tools_close_layers(user_interaction & dialog,
 				  pile & layers,
 				  const header_version & ver,
