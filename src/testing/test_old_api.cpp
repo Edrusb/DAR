@@ -20,11 +20,9 @@
 /*********************************************************************/
 
 #include "../my_config.h"
+#include "libdar.hpp"
 
-
-#include "libdar_4_4.hpp"
-
-using namespace libdar_4_4;
+using namespace libdar;
 
 int main()
 {
