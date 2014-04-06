@@ -142,6 +142,7 @@ namespace libdar
 	/// \param[in]  execute command to execute after each slice creation
 	/// \param[in]  crypto cipher algorithm to use
 	/// \param[in]  pass password/passphrase to use for encryption
+	/// \param[in]  crypto_size size of crypto blocks
 	/// \param[in]  empty dry-run execution (null_file at bottom of the stack)
 	/// \param[in]  slice_permission permission to set the slices to
 	/// \param[in]  add_marks_for_sequential_reading whether to add an escape layer in the stack
