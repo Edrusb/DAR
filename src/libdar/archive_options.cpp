@@ -332,6 +332,7 @@ namespace libdar
 	    x_crypto_size = default_crypto_size;
 	    x_min_compr_size = default_min_compr_size;
 	    x_nodump = false;
+	    exclude_by_ea = "";
 	    x_what_to_check = default_comparison_fields;
 	    x_hourshift = 0;
 	    x_empty = false;

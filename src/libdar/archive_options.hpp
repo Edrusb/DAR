@@ -337,6 +337,11 @@ namespace libdar
 	    /// defines whether to ignore files with the nodump flag set
 	void set_nodump(bool nodump) { x_nodump = nodump; };
 
+	    /// defines whether to ignore files having a given EA
+	    /// \note if ea_name is set to "" the default ea_name "user.libdar_no_backup" is used.
+	void set_exclude_by_ea(const std::string & ea_name)
+	{ exclude_by_ea = (ea_name == "" ? "user.libdar_no_backup" : ea_name); };
+
 	    /// set the fields to consider when comparing inodes with reference archive (see inode::comparison_fields enumeration in catalogue.hpp)
 	void set_what_to_check(inode::comparison_fields what_to_check) { x_what_to_check = what_to_check; };
 
@@ -468,6 +473,7 @@ namespace libdar
 	const mask & get_compr_mask() const { if(x_compr_mask == NULL) throw SRC_BUG; return *x_compr_mask; };
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
 	bool get_nodump() const { return x_nodump; };
+	const std::string & get_exclude_by_ea() const { return exclude_by_ea; };
 	inode::comparison_fields get_comparison_fields() const { return x_what_to_check; };
 	const infinint & get_hourshift() const { return x_hourshift; };
 	bool get_empty() const { return x_empty; };
@@ -517,6 +523,7 @@ namespace libdar
 	mask * x_compr_mask; //< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
 	infinint x_min_compr_size;
 	bool x_nodump;
+	std::string exclude_by_ea;
 	inode::comparison_fields x_what_to_check;
 	infinint x_hourshift;
 	bool x_empty;

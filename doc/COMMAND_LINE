@@ -83,7 +83,7 @@ _ + retry on change                      --retry-on-change <count[:max byte]>
 2 + dirty file behavior                  --dirty-behavior {ignore|no-warn}
 3 + create a hash algorithm (+algo)      --hash <algo>
 4 + filesystem specific attr. family     --fsa-scope <fam1,fam2,fam3,...>
-5 !
+5 + exclude file having a given EA set   --exclude-by-ea [<ea name>]
 6 !
 7 !
 8 !

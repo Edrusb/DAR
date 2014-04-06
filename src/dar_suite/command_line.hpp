@@ -84,6 +84,8 @@ struct line_param
     bool flat;                    //< whether to ignore directory structure when restoring data
     infinint min_compr_size;      //< below which size to never try compressing files
     bool nodump;                  //< whether to ignore files having the "nodump" flag set when performing a backup
+    bool exclude_by_ea;           //< whether inode have to be check against a given EA before backup
+    string ea_name_for_exclusion; //< EA name to use for file exclusion, or empty string for the default EA name
     infinint hourshift;           //< consider equal two dates that have an integer hour of difference equal or less than hourshift
     bool warn_remove_no_match;    //< whether to warn file about to be removed during a restoration, when they to no match the expected type of file
     bool filter_unsaved;          //< whether to not list files that are not saved in the archive

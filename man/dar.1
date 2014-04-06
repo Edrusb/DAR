@@ -494,6 +494,9 @@ Here are some examples of date:
 --nodump
 do not save files which have the 'd' flag set (see chattr(1) lsattr(1) ext2 commands). This option may not be available if the system dar has been compiled on did not provide support for ext2 flags. Note that this option does nothing with -+ option (merging) as no filesystem is used for that operation.
 .TP 20
+-5, --exclude-by-ea[=<extended attribute name>]
+exclude from backup, inodes that have been set with the EA given in argument. If not argument is given to that option (-5 or --exclude-by-ea is used alone on command line) the default EA used to exclude files from backup is "user.libdar_no_backup". To set this attribute to a given file, use the following command: "setfattr -n user.libdar_no_backup <filename>", to remove it: "setfattr -x user.libdar_no_backup <filename>".
+.TP 20
 -M, --no-mount-points
 stay in the same filesystem as the root directory (see -R option), subdirectory that are mounting points for other filesystems will not be saved (or saved empty if -D option is used). This option is useless and ignored for merging operation.
 .TP 20
@@ -866,6 +869,9 @@ must be replaced by -H 1
 .TP 20
 -0
 must be replaced by -0 ref
+.TP 20
+-5
+must be replaced by -5 ""
 .P
 .B important !
 When using GNU getopt(), optional arguments are available by sticking the argument to the short option: "-z" for example is available as well as "-z9". But "-z 9" is wrong, it will be read as "-z" option and "9", a command line argument (not an argument to the -z option). In the other side, when using a non GNU getopt this time, "-z" becomes an option that always requires an argument, and thus "-z 9" is read as "-z" option with "9" as argument, while "-z9" will be rejected as a unknown option, and "-z" alone will generate an error as no argument is provided. In consequences, you

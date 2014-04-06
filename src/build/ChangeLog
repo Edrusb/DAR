@@ -27,7 +27,8 @@ from 2.4.x to 2.5.0
 - removed backward compatible API with old libdar 4.4.x
 - simplified implementation of archive isolation made possible thanks to
   archive isolation evolution features brought by release 2.4.0.
-
+- added feature: exclude-by-ea. Avoid saving inodes that have a particular
+  EA set.
 
 from 2.4.12 to 2.4.13
 - adding initialization value for two variable to avoid unappropriate warning

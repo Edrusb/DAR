@@ -202,6 +202,8 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 		    create_options.set_compr_mask(*param.compress_mask);
 		    create_options.set_min_compr_size(param.min_compr_size);
 		    create_options.set_nodump(param.nodump);
+		    if(param.exclude_by_ea)
+			create_options.set_exclude_by_ea(param.ea_name_for_exclusion);
 		    create_options.set_what_to_check(param.what_to_check);
 		    create_options.set_hourshift(param.hourshift);
 		    create_options.set_empty(param.empty);

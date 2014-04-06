@@ -499,7 +499,8 @@ namespace libdar
 			   const string & backup_hook_file_execute,
 			   const mask & backup_hook_file_mask,
 			   bool ignore_unknown,
-			   const fsa_scope & scope)
+			   const fsa_scope & scope,
+			   const string & exclude_by_ea)
     {
         entree *e = NULL;
         const entree *f = NULL;
@@ -569,9 +570,12 @@ namespace libdar
 		    {
 			try
 			{
+			    string tmp_val;
+
 			    if(subtree.is_covered(juillet.get_path())
 			       && (dir != NULL || filtre.is_covered(nom->get_name()))
-			       && (! same_fs || e_ino == NULL || e_ino->get_device() == root_fs_device))
+			       && (! same_fs || e_ino == NULL || e_ino->get_device() == root_fs_device)
+			       && (e_ino == NULL || exclude_by_ea == "" || e_ino->ea_get_saved_status() != inode::ea_full || e_ino->get_ea() == NULL || !e_ino->get_ea()->find(exclude_by_ea, tmp_val)))
 			    {
 				if(known_hard_link)
 				{

@@ -374,6 +374,7 @@ namespace libdar
 				const mask & compr_mask,
 				const infinint & min_compr_size,
 				bool nodump,
+				const std::string & exclude_by_ea,
 				const infinint & hourshift,
 				bool empty,
 				bool alter_atime,
@@ -429,6 +430,7 @@ namespace libdar
 			      const mask & compr_mask,          //< files to compress
 			      const infinint & min_compr_size,  //< file size under which to not compress files
 			      bool nodump,                      //< whether to consider the "nodump" filesystem flag
+			      const std::string & exclude_by_ea,//< if not empty the ea to use for inode exclusion from backup operation
 			      const infinint & hourshift,       //< hourshift (see man page -H option)
 			      bool empty,                       //< whether to make an "dry-run" execution
 			      bool alter_atime,                 //< whether to alter atime date (by opposition to ctime) when reading files

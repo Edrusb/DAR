@@ -405,6 +405,7 @@ namespace libdar
 				       options.get_compr_mask(),
 				       options.get_min_compr_size(),
 				       options.get_nodump(),
+				       options.get_exclude_by_ea(),
 				       options.get_hourshift(),
 				       options.get_empty(),
 				       options.get_alter_atime(),
@@ -648,6 +649,7 @@ namespace libdar
 				     options.get_compr_mask(),
 				     options.get_min_compr_size(),
 				     false,   // nodump
+				     "",      // exclude_by_ea
 				     0,       // hourshift
 				     options.get_empty(),
 				     true,    // alter_atime
@@ -1543,6 +1545,7 @@ namespace libdar
                                      const mask & compr_mask,
                                      const infinint & min_compr_size,
                                      bool nodump,
+				     const string & exclude_by_ea,
                                      const infinint & hourshift,
                                      bool empty,
                                      bool alter_atime,
@@ -1704,6 +1707,7 @@ namespace libdar
 			 compr_mask,
 			 min_compr_size,
 			 nodump,
+			 exclude_by_ea,
 			 hourshift,
 			 empty,
 			 alter_atime,
@@ -1764,6 +1768,7 @@ namespace libdar
 				   const mask & compr_mask,
 				   const infinint & min_compr_size,
 				   bool nodump,
+				   const string & exclude_by_ea,
 				   const infinint & hourshift,
 				   bool empty,
 				   bool alter_atime,
@@ -1958,7 +1963,8 @@ namespace libdar
 					      backup_hook_file_execute,
 					      backup_hook_file_mask,
 					      ignore_unknown,
-					      scope);
+					      scope,
+					      exclude_by_ea);
 			}
 			catch(...)
 			{

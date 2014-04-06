@@ -90,7 +90,7 @@ extern "C"
 #include "criterium.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:<:>:=:4:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:<:>:=:4:5::"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
@@ -270,6 +270,8 @@ bool get_args(user_interaction & dialog,
     p.flat = false;
     p.min_compr_size = min_compr_size_default;
     p.nodump = false;
+    p.exclude_by_ea = false;
+    p.ea_name_for_exclusion = "";
     p.hourshift = 0;
     p.warn_remove_no_match = true;
     p.filter_unsaved = false;
@@ -1612,6 +1614,13 @@ static bool get_args_recursive(recursive_param & rec,
 		    rec.dialog->warning(string("FSA family in scope:") + list);
 		}
 		break;
+	    case '5':
+		p.exclude_by_ea = true;
+		if(optarg != NULL)
+		    p.ea_name_for_exclusion = optarg;
+		else
+		    p.ea_name_for_exclusion = "";
+		break;
             case '?':
                 rec.dialog->warning(tools_printf(gettext("Ignoring unknown option -%c"),char(optopt)));
                 break;
@@ -1722,7 +1731,7 @@ static void usage(user_interaction & dialog, const char *command_name)
     dialog.printf(gettext("   -T\t\t   tree output format\n"));
     dialog.printf(gettext("   -as\t\t   only list files saved in the archive\n"));
     dialog.printf(gettext("\n\n"));
-    dialog.printf(gettext("Type \"man dar\" for more details and for all available options.\n"));
+    dialog.printf(gettext("Type \"man dar\" for more details and for all other available options.\n"));
 }
 
 static void show_warranty(user_interaction & dialog)
@@ -2186,6 +2195,7 @@ const struct option *get_long_opt()
 	{"backup-hook-exclude", required_argument, NULL, '>'},
 	{"backup-hook-execute", required_argument, NULL, '='},
 	{"fsa-scope", required_argument, NULL, '4'},
+	{"exclude-by-ea", optional_argument, NULL, '5'},
         { NULL, 0, NULL, 0 }
     };
 

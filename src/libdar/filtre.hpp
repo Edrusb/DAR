@@ -97,7 +97,8 @@ namespace libdar
 				  const std::string & backup_hook_file_execute,
 				  const mask & backup_hook_file_mask,
 				  bool ignore_unknown,
-				  const fsa_scope & scope);
+				  const fsa_scope & scope,
+				  const std::string & exclude_by_ea);
 
     extern void filtre_difference(user_interaction & dialog,
 				  memory_pool *pool,
