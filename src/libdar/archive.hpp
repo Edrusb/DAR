@@ -99,6 +99,15 @@ namespace libdar
 		statistics * progressive_report);
 
 
+	    /// WARNING this is a deprecated constructor, use the op_isolate() method for better performances
+	archive(user_interaction & dialog,
+		const path & sauv_path,
+		archive *ref_arch,
+		const std::string & filename,
+		const std::string & extension,
+		const archive_options_isolate & options);
+
+
 	    /// this constructor builds an archive from two given archive [this is the "merge" constructor]
 
 	    /// \param[in,out] dialog for user interaction
@@ -241,6 +250,7 @@ namespace libdar
 		const std::string & filename,
 		const std::string & extension,
 		const archive_options_isolate & options);
+
 
 	    /// getting information about a given directory
 

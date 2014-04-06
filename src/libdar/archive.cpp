@@ -455,6 +455,33 @@ namespace libdar
     }
 
 
+	// DEPRECATED way to isolate an archive DO NOT USE IT unless you know what you are doing.
+    archive::archive(user_interaction & dialog,
+		     const path & sauv_path,
+		     archive *ref_arch,
+		     const std::string & filename,
+		     const std::string & extension,
+		     const archive_options_isolate & options)
+    {
+	pool = NULL;
+	cat = NULL;
+	local_cat_size = 0;
+	exploitable = false;
+	lax_read_mode = false;
+	sequential_read = false;
+	freed_and_checked = true;
+
+	if(ref_arch == NULL)
+	    throw Elibcall("deprecated isolate constructor", "NULL argument given to \"ref_arch\"");
+
+	ref_arch->op_isolate(dialog,
+			     sauv_path,
+			     filename,
+			     extension,
+			     options);
+    }
+
+
 	// merge constructor
 
     archive::archive(user_interaction & dialog,
