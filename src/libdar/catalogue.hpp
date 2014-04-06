@@ -247,7 +247,8 @@ namespace libdar
 		     comparison_fields what_to_check,
 		     const infinint & hourshift,
 		     bool symlink_date,
-		     const fsa_scope & scope) const;
+		     const fsa_scope & scope,
+		     bool isolated_mode) const; //< do not try to compare pointed to data, EA of FSA (suitable for isolated catalogue)
 
             // throw Erange exception if a difference has been detected
             // this is not a symetrical comparison, but all what is present
@@ -281,7 +282,7 @@ namespace libdar
             // III : to record where is dump the EA in the archive #EA_FULL only#
         void ea_set_offset(const infinint & pos);
         void ea_set_crc(const crc & val);
-	void ea_get_crc(const crc * & ptr) const; //< the argument is set to point to an allocated crc object owned by this "inode" object, this reference stats valid while the "inode" object exists and MUST NOT be deleted by the caller in any case
+	void ea_get_crc(const crc * & ptr) const; //< the argument is set to point to an allocated crc object owned by this "inode" object, this reference stays valid while the "inode" object exists and MUST NOT be deleted by the caller in any case
 	bool ea_get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
 
             // IV : to know/record if EA and FSA have been modified # any EA status# and FSA status #
@@ -330,7 +331,7 @@ namespace libdar
 	bool fsa_get_crc_size(infinint & val) const;
 
     protected:
-        virtual void sub_compare(const inode & other) const {};
+        virtual void sub_compare(const inode & other, bool isolated_mode) const {};
 
 	    /// escape generic_file relative methods
 	escape *get_escape_layer() const { return esc; };
@@ -584,7 +585,7 @@ namespace libdar
 	void set_dirty(bool value) { dirty = value; };
 
     protected:
-        void sub_compare(const inode & other) const;
+        void sub_compare(const inode & other, bool isolated_mode) const;
         void inherited_dump(generic_file & f, bool small) const;
 	void post_constructor(generic_file & f);
 
@@ -664,7 +665,7 @@ namespace libdar
         entree *clone() const { return new (get_pool()) lien(*this); };
 
     protected :
-        void sub_compare(const inode & other) const;
+        void sub_compare(const inode & other, bool isolated_mode) const;
         void inherited_dump(generic_file & f, bool small) const;
 
 
@@ -789,7 +790,7 @@ namespace libdar
             // signature is left pure abstract
 
     protected :
-        void sub_compare(const inode & other) const;
+        void sub_compare(const inode & other, bool isolated_mode) const;
         void inherited_dump(generic_file & f, bool small) const;
 
     private :

@@ -996,7 +996,8 @@ namespace libdar
 			   inode::comparison_fields what_to_check,
 			   const infinint & hourshift,
 			   bool compare_symlink_date,
-			   const fsa_scope & scope)
+			   const fsa_scope & scope,
+			   bool isolated_mode)
     {
         const entree *e;
         defile juillet = fs_racine;
@@ -1058,7 +1059,7 @@ namespace libdar
 				    {
 					try
 					{
-					    e_ino->compare(*exists, ea_mask, what_to_check, hourshift, compare_symlink_date, scope);
+					    e_ino->compare(*exists, ea_mask, what_to_check, hourshift, compare_symlink_date, scope, isolated_mode);
 					    if(display_treated)
 						dialog.warning(string(gettext("OK   "))+juillet.get_string());
 					    if(e_dir == NULL || !cat.read_second_time_dir())

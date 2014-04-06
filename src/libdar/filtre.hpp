@@ -116,7 +116,8 @@ namespace libdar
 				  inode::comparison_fields what_to_check,
 				  const infinint & hourshift,
 				  bool compare_symlink_date,
-				  const fsa_scope & scope);
+				  const fsa_scope & scope,
+				  bool isolated_mode);
 
     extern void filtre_test(user_interaction & dialog,
 			    memory_pool *pool,

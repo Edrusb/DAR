@@ -941,6 +941,7 @@ namespace libdar
     {
         statistics st = false;  // false => no lock for this internal object
 	statistics *st_ptr = progressive_report == NULL ? &st : progressive_report;
+	bool isolated_mode = false;
 
         NLS_SWAP_IN;
         try
@@ -955,11 +956,15 @@ namespace libdar
             if(&fs_root == NULL)
                 throw Elibcall("op_diff", gettext("NULL argument given to \"fs_root\""));
 
-	    check_against_isolation(dialog, lax_read_mode);
-		// this avoid to try diffing archive directly from an isolated catalogue
-		// the isolated catalogue can be used to compaire data (since format "08") but only
-		// associated with the real plain archive, not alone.
-
+	    try
+	    {
+		check_against_isolation(dialog, lax_read_mode);
+	    }
+	    catch(Erange & e)
+	    {
+		dialog.warning("This archive contains an isolated catalogue, only meta data can be used for comparison, CRC will be used to compare data, but using CRC to compare EA or FSA could return false difference as for both, the CRC is global to the set of attributes and the resulting CRC is sensible to the order the operating system provides these attributes");
+		isolated_mode = true;
+	    }
                 // end of sanity checks
 
 	    fs_root.explode_undisclosed();
@@ -982,7 +987,8 @@ namespace libdar
 				  options.get_what_to_check(),
 				  options.get_hourshift(),
 				  options.get_compare_symlink_date(),
-				  options.get_fsa_scope());
+				  options.get_fsa_scope(),
+				  isolated_mode);
             }
             catch(Euser_abort & e)
             {

@@ -696,7 +696,7 @@ namespace libdar
 	    {
 		    // header version is greater than or equal to "08" (small dump appeared at
 		    // this version of archive format) ea_offset is not used (sequential read mode)
-		    // while ea_CRC have been dumped a bit further in that case, we will fetch
+		    // while ea_CRC has been dumped a bit further in that case, we will fetch
 		    // its value upon request by get_ea() or ea_get_crc()
 		    // methods
 	    }
@@ -831,7 +831,8 @@ namespace libdar
                         comparison_fields what_to_check,
                         const infinint & hourshift,
 			bool symlink_date,
-			const fsa_scope & scope) const
+			const fsa_scope & scope,
+			bool isolated_mode) const
     {
 	bool do_mtime_test = dynamic_cast<const lien *>(&other) == NULL || symlink_date;
 
@@ -864,17 +865,20 @@ namespace libdar
             throw Erange("inode.compare", tools_printf(gettext("difference of last modification date: %S <--> %S"), &s1, &s2));
 	}
 
-        sub_compare(other);
+        sub_compare(other, isolated_mode);
 
         switch(ea_get_saved_status())
         {
         case ea_full:
             if(other.ea_get_saved_status() == ea_full)
             {
-                const ea_attributs *me = get_ea(); // this pointer must not be freed
-                const ea_attributs *you = other.get_ea(); // this pointer must not be freed neither
-                if(me->diff(*you, ea_mask))
-                    throw Erange("inode::compare", gettext("different Extended Attributes"));
+		if(!isolated_mode)
+		{
+		    const ea_attributs *me = get_ea(); // this pointer must not be freed
+		    const ea_attributs *you = other.get_ea(); // this pointer must not be freed neither
+		    if(me->diff(*you, ea_mask))
+			throw Erange("inode::compare", gettext("different Extended Attributes"));
+		}
             }
             else
             {
@@ -918,16 +922,19 @@ namespace libdar
 	case fsa_full:
 	    if(other.fsa_get_saved_status() == fsa_full)
 	    {
-		const filesystem_specific_attribute_list *me = get_fsa();
-		const filesystem_specific_attribute_list *you = other.get_fsa();
+		if(!isolated_mode)
+		{
+		    const filesystem_specific_attribute_list *me = get_fsa();
+		    const filesystem_specific_attribute_list *you = other.get_fsa();
 
-		if(me == NULL)
-		    throw SRC_BUG;
-		if(you == NULL)
-		    throw SRC_BUG;
+		    if(me == NULL)
+			throw SRC_BUG;
+		    if(you == NULL)
+			throw SRC_BUG;
 
-		if(!me->is_included_in(*you, scope))
-                    throw Erange("inode::compare", gettext("different Filesystem Specific Attributes"));
+		    if(!me->is_included_in(*you, scope))
+			throw Erange("inode::compare", gettext("different Filesystem Specific Attributes"));
+		}
 	    }
 	    else
 		throw Erange("inode::compare", gettext("No Filesystem Specific Attribute to compare with"));
@@ -2658,7 +2665,7 @@ namespace libdar
 	    return false;
     }
 
-    void file::sub_compare(const inode & other) const
+    void file::sub_compare(const inode & other, bool isolated_mode) const
     {
 	const file *f_other = dynamic_cast<const file *>(&other);
 	if(f_other == NULL)
@@ -2673,60 +2680,108 @@ namespace libdar
 
 	if(get_saved_status() == s_saved && f_other->get_saved_status() == s_saved)
 	{
-	    generic_file *me = get_data(normal);
-	    if(me == NULL)
-		throw SRC_BUG;
-	    try
+	    if(!isolated_mode)
 	    {
-		generic_file *you = f_other->get_data(normal);
-		if(you == NULL)
+		generic_file *me = get_data(normal);
+		if(me == NULL)
 		    throw SRC_BUG;
 		try
 		{
-		    crc *value = NULL;
-		    const crc *original = NULL;
-		    infinint crc_size;
-
-		    if(has_crc())
-		    {
-			if(get_crc(original))
-			{
-			    if(original == NULL)
-				throw SRC_BUG;
-			    crc_size = original->get_size();
-			}
-			else
-			    throw SRC_BUG; // has a crc but cannot get it?!?
-		    }
-		    else // we must not fetch the crc yet, especially when perfoming a sequential read
-			crc_size = tools_file_size_to_crc_size(f_other->get_size());
-
+		    generic_file *you = f_other->get_data(normal);
+		    if(you == NULL)
+			throw SRC_BUG;
 		    try
 		    {
-			infinint err_offset;
-			if(me->diff(*you, crc_size, value, err_offset))
-			    throw Erange("file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
-			else
+			crc *value = NULL;
+			const crc *original = NULL;
+			infinint crc_size;
+
+			if(has_crc())
 			{
-			    if(original != NULL)
+			    if(get_crc(original))
 			    {
-				if(value == NULL)
+				if(original == NULL)
 				    throw SRC_BUG;
-				if(original->get_size() != value->get_size())
-				    throw Erange("file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
-				if(*original != *value)
-				    throw Erange("file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
+				crc_size = original->get_size();
+			    }
+			    else
+				throw SRC_BUG; // has a crc but cannot get it?!?
+			}
+			else // we must not fetch the crc yet, especially when perfoming a sequential read
+			    crc_size = tools_file_size_to_crc_size(f_other->get_size());
+
+			try
+			{
+			    infinint err_offset;
+			    if(me->diff(*you, crc_size, value, err_offset))
+				throw Erange("file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
+			    else
+			    {
+				if(original != NULL)
+				{
+				    if(value == NULL)
+					throw SRC_BUG;
+				    if(original->get_size() != value->get_size())
+					throw Erange("file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
+				    if(*original != *value)
+					throw Erange("file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
+				}
 			    }
 			}
+			catch(...)
+			{
+			    if(value != NULL)
+				delete value;
+			    throw;
+			}
+			if(value != NULL)
+			    delete value;
 		    }
 		    catch(...)
 		    {
-			if(value != NULL)
-			    delete value;
+			delete you;
 			throw;
 		    }
-		    if(value != NULL)
-			delete value;
+		    delete you;
+		}
+		catch(...)
+		{
+		    delete me;
+		    throw;
+		}
+		delete me;
+	    }
+	    else // isolated mode
+	    {
+		if(check == NULL)
+		    throw SRC_BUG;
+
+		generic_file *you = f_other->get_data(normal);
+		if(you == NULL)
+		    throw SRC_BUG;
+
+		try
+		{
+		    crc *other_crc = create_crc_from_size(check->get_size(), get_pool());
+		    if(other_crc == NULL)
+			throw SRC_BUG;
+
+		    try
+		    {
+			null_file ignore = gf_write_only;
+
+			you->copy_to(ignore, check->get_size(), other_crc);
+
+			if(check->get_size() != other_crc->get_size()
+			   || *check != *other_crc)
+			    throw Erange("file::compare", tools_printf(gettext("CRC difference concerning file's data (comparing with an isolated catalogue)")));
+		    }
+		    catch(...)
+		    {
+			delete other_crc;
+			throw;
+		    }
+		    delete other_crc;
 		}
 		catch(...)
 		{
@@ -2735,12 +2790,6 @@ namespace libdar
 		}
 		delete you;
 	    }
-	    catch(...)
-	    {
-		delete me;
-		throw;
-	    }
-	    delete me;
 	}
     }
 
@@ -2796,7 +2845,7 @@ namespace libdar
 	points_to = x;
     }
 
-    void lien::sub_compare(const inode & other) const
+    void lien::sub_compare(const inode & other, bool isolated_mode) const
     {
 	const lien *l_other = dynamic_cast<const lien *>(&other);
 	if(l_other == NULL)
@@ -3516,7 +3565,7 @@ namespace libdar
 	}
     }
 
-    void device::sub_compare(const inode & other) const
+    void device::sub_compare(const inode & other, bool isolated_mode) const
     {
 	const device *d_other = dynamic_cast<const device *>(&other);
 	if(d_other == NULL)

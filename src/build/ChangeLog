@@ -29,6 +29,9 @@ from 2.4.x to 2.5.0
   archive isolation evolution features brought by release 2.4.0.
 - added feature: exclude-by-ea. Avoid saving inodes that have a particular
   EA set.
+- added feature: comparison of an isolated catalogue with a filesystem,
+  relying on embedded data CRC and inode metadata in absence of the saved
+  data.
 
 from 2.4.12 to 2.4.13
 - adding initialization value for two variable to avoid unappropriate warning
