@@ -15,6 +15,7 @@
 
 
 
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's FEATURES</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -366,6 +367,53 @@ marginally used they are ignored by <span style="font-style: italic;">dar</span>
   </tbody>
 </table>
 <br>
+<br>
+
+
+  
+    
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+<tbody><tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">FILESYSTEM SPECIFIC ATTRIBUTES (FSA)<br>
+      </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">MacOSX/FreeBSD Birthdate, Linux FS attributes</span><br>
+      </td>
+      <td style="vertical-align: top;">keyword: --fsa-family<br>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">
+      <div style="text-align: justify;"><span style="font-style: italic;"></span>
+Since release 2.5.0 dar is able to take care of filesystem specific
+attributes. Those are grouped by family strongly linked to the
+filesystem the have been read from, but perpendicularly each FSA has is
+designated also by a function. This way it is possible to translate FSA
+from a filesystem into another filesystem when there is a equivalency
+in role. </div>
+      <br>
+      <div style="text-align: justify;">currently two family are present:<br>
+      <ul>
+        <li><span style="font-weight: bold;">HFS+</span> family contains only one function : the <span style="font-weight: bold;">birthtime</span>.
+In addition to ctime, mtime and atime, dar can backup, compare and
+restore all four dates of a given inode (well ctime is not possible to
+restore).<br>
+        </li>
+        <li><span style="font-weight: bold;">extX </span>family
+contains 12 functions (append_only, compressed, no_dump, immutable,
+journaling, secure_deletion, no_tail_merging, undeletable,
+noatime_update, synchronous_directory, synchronous_update,
+top_of_dir_hierarchy) found on ext2/3/4 and some other Linux
+filesystems. Dar can thus save and restore all of those for each file
+depending on the capabilities or permissions dar has at restoration
+time.<br>
+        </li>
+      </ul>
+</div></td></tr></tbody>
+</table>
 <br>
 <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -1101,6 +1149,7 @@ of data, which let dar able to take into account and avoid saving them.<br>
 
 <br>
 </center>
+
 
 
 </body></html>
