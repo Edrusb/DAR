@@ -239,7 +239,7 @@ namespace libdar
 		case fsan_compressed:
 		case fsan_no_dump:
 		case fsan_immutable:
-		case fsan_data_journalling:
+		case fsan_data_journaling:
 		case fsan_secure_deletion:
 		case fsan_no_tail_merging:
 		case fsan_undeletable:
@@ -544,12 +544,12 @@ namespace libdar
 		ptr = NULL;
 #endif
 #ifdef EXT3_JOURNAL_DATA_FL
-		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_data_journalling, (f & EXT3_JOURNAL_DATA_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_data_journaling, (f & EXT3_JOURNAL_DATA_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #else
 #ifdef EXT2_JOURNAL_DATA_FL
-		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_data_journalling, (f & EXT2_JOURNAL_DATA_FL) != 0);
+		create_or_throw(ptr, get_pool(), fsaf_linux_extX, fsan_data_journaling, (f & EXT2_JOURNAL_DATA_FL) != 0);
 		fsa.push_back(ptr);
 		ptr = NULL;
 #endif
@@ -743,7 +743,7 @@ namespace libdar
 				      target.c_str());
 #endif
 			    break;
-			case fsan_data_journalling:
+			case fsan_data_journaling:
 #ifdef EXT3_JOURNAL_DATA_FL
 			    if(it_bool->get_value())
 				f |= EXT3_JOURNAL_DATA_FL;
@@ -1044,7 +1044,7 @@ namespace libdar
 	case fsan_immutable:
 	    ret = "bd";
 	    break;
-	case fsan_data_journalling:
+	case fsan_data_journaling:
 	    ret = "be";
 	    break;
 	case fsan_secure_deletion:
@@ -1109,7 +1109,7 @@ namespace libdar
 	if(sig == "bd")
 	    return fsan_immutable;
 	if(sig == "be")
-	    return fsan_data_journalling;
+	    return fsan_data_journaling;
 	if(sig == "bf")
 	    return fsan_secure_deletion;
 	if(sig == "bg")

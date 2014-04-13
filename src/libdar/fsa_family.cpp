@@ -64,7 +64,7 @@ namespace libdar
 	    return gettext("no dump flag");
 	case fsan_immutable:
 	    return gettext("immutable");
-	case fsan_data_journalling:
+	case fsan_data_journaling:
 	    return gettext("journalized");
 	case fsan_secure_deletion:
 	    return gettext("secure deletion");

@@ -49,7 +49,7 @@ namespace libdar
 		      fsan_compressed,
 		      fsan_no_dump,
 		      fsan_immutable,
-		      fsan_data_journalling,
+		      fsan_data_journaling,
 		      fsan_secure_deletion,
 		      fsan_no_tail_merging,
 		      fsan_undeletable,
