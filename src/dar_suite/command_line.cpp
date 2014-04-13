@@ -93,8 +93,8 @@ extern "C"
 #define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:<:>:=:4:5::"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
-#define MISSING_ARG "Missing argument to -%c"
-#define INVALID_ARG "Invalid argument for -%c option"
+#define MISSING_ARG "Missing argument to -%c option"
+#define INVALID_ARG "Invalid argument given to -%c option"
 #define INVALID_SIZE "Invalid size given with option -%c"
 
 #define DEFAULT_CRYPTO_SIZE 10240
@@ -1488,9 +1488,16 @@ static bool get_args_recursive(recursive_param & rec,
 		{
 		    if(optarg == NULL)
                         throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
-                    p.sparse_file_min_size = tools_get_extended_size(optarg, rec.suffix_base);
-                    if(p.sparse_file_min_size == sparse_file_min_size_default)
-                        rec.dialog->warning(tools_printf(gettext("%d is the default value for --sparse-file-min-size, no need to specify it on command line, ignoring"), sparse_file_min_size_default));
+		    try
+		    {
+			p.sparse_file_min_size = tools_get_extended_size(optarg, rec.suffix_base);
+			if(p.sparse_file_min_size == sparse_file_min_size_default)
+			    rec.dialog->warning(tools_printf(gettext("%d is the default value for --sparse-file-min-size, no need to specify it on command line, ignoring"), sparse_file_min_size_default));
+		    }
+		    catch(Edeci & e)
+		    {
+			throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+		    }
 		}
 		break;
 	    case '2':

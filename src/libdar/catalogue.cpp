@@ -5264,7 +5264,7 @@ namespace libdar
 
 	const file *fic = dynamic_cast<const file *>(&ref);
 	if(fic != NULL && fic->get_saved_status() == s_saved)
-	    ret += tools_get_compression_ratio(fic->get_storage_size(), fic->get_size());
+	    ret += tools_get_compression_ratio(fic->get_storage_size(), fic->get_size(), fic->get_compression_algo_read() != none);
 	else
 	    ret += "[-----]";
 

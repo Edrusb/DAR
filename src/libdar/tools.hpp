@@ -794,7 +794,7 @@ namespace libdar
 
 	/// return the string about compression ratio
 
-    extern std::string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size);
+    extern std::string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size, bool compressed);
 
 } /// end of namespace
 
