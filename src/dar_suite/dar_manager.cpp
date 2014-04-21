@@ -70,7 +70,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.7.6"
+#define DAR_MANAGER_VERSION "1.7.7"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"

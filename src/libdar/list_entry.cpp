@@ -56,7 +56,7 @@ namespace libdar
 
 	val.unstack(ret);
 	if(val != 0)
-	    throw Erange("list_entry::infinint_to_time_t", gettext("system type time_t is not able too small to store a time/date"));
+	    throw Erange("list_entry::infinint_to_time_t", gettext("system type time_t is too small to store a time/date"));
 
 	return ret;
     }
