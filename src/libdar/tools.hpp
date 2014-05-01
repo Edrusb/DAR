@@ -796,6 +796,10 @@ namespace libdar
 
     extern std::string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size, bool compressed);
 
+	/// wrapper routint to strerror_r
+    extern std::string tools_strerror_r(int errno);
+
+
 } /// end of namespace
 
 #endif

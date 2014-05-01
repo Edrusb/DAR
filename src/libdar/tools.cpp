@@ -2613,4 +2613,28 @@ namespace libdar
 		return gettext("[Worse]");
     }
 
+#define MSGSIZE 200
+
+    string tools_strerror_r(int err)
+    {
+	char buffer[MSGSIZE];
+	string ret;
+
+#if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE
+	    // we expect the XSI-compliant strerror_r
+	int val = strerror_r(err, buffer, MSGSIZE);
+	if(val != 0)
+	    strncpy(buffer, "Error code to message conversion failed", MSGSIZE);
+#else
+	char *val = strerror_r(err, buffer, MSGSIZE);
+	if(val != buffer)
+	    strncpy(buffer, val, MSGSIZE);
+#endif
+	buffer[MSGSIZE] = '\0';
+	ret = buffer;
+
+	return ret;
+    }
+
+
 } // end of namespace
