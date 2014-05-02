@@ -97,7 +97,9 @@ void f1()
 {
     fichier f = fichier(*ui, "toto", gf_read_only, tools_octal2int("0777"), false);
     cache c = cache(f,
+		    false,
 		    10,
+		    1000,
 		    10, 3, 20,
 		    10, 3, 20);
     char buffer[200];
@@ -125,7 +127,9 @@ void f2()
     }
     fichier g = fichier(*ui, fd);
     cache c = cache(g,
+		    false,
 		    10,
+		    1000,
 		    10, 3, 20,
 		    10, 3, 20);
     const char *buf = "coucou les amis";

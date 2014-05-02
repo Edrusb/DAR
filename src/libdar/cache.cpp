@@ -76,6 +76,7 @@ namespace libdar
     cache::cache(generic_file & hidden,
 		 bool shift_mode,
 		 U_I initial_size,
+		 U_I max_size,
 		 U_I unused_read_ratio,
 		 U_I observation_read_number,
 		 U_I max_size_hit_read_ratio,
@@ -96,7 +97,8 @@ namespace libdar
 	    throw Erange("cache::cache", gettext("too high value (> 50) given as unused_read_ratio argument, while initializing cache"));
 	if(unused_write_ratio >= max_size_hit_write_ratio)
 	    throw Erange("cache::cache", gettext("unused_write_ratio must be less than max_size_hit_write_ratio, while initializing cache"));
-
+	if(max_size < initial_size && max_size != 0)
+	    throw Erange("cache::cache", gettext("max_size must be greater or equal to initial_size, while initializing cache"));
 	ref = & hidden;
 
 	buffer_cache.buffer = new (nothrow) char[initial_size];
@@ -125,7 +127,7 @@ namespace libdar
 
 	shifted_mode = shift_mode;
 	failed_increase = false;
-	max_alloc_size = 0;
+	max_alloc_size = max_size;
     }
 
     cache::~cache()
@@ -456,9 +458,9 @@ namespace libdar
 		{
 		    U_I tmp = buffer_cache.size * 2;
 #ifdef SSIZE_MAX
-		    if(tmp <= SSIZE_MAX && buffer_cache.size < tmp)
+		    if(tmp <= SSIZE_MAX && buffer_cache.size < tmp && (tmp <= max_alloc_size || max_alloc_size == 0))
 #else
-		    if(tmp <= MAX_BUFFER_SIZE && buffer_cache.size < tmp)
+   		    if(tmp <= MAX_BUFFER_SIZE && buffer_cache.size < tmp && (tmp <= max_alloc_size || max_alloc_size == 0))
 #endif
 		    {
 			try
@@ -473,6 +475,9 @@ namespace libdar
 			{
 			    failed_increase = true;
 			}
+
+			if(failed_increase)
+			    max_alloc_size = buffer_cache.size;
 		    }
 		}
 	    }

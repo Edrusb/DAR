@@ -353,7 +353,7 @@ namespace libdar
 	    case crypto_none:
 		if(info_details)
 		    dialog.warning(gettext("No cyphering layer opened, adding cache layer for performance"));
-		tmp = new (nothrow) cache (*(stack.top()), false);
+		tmp = new (nothrow) cache(*(stack.top()), false);
 		if(tmp == NULL)
 		    dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
 		break;
