@@ -11,6 +11,7 @@
 
 
 
+
   <meta content="Denis Corbin" name="author">
   <meta content="Tutorial for using libdar library" name="description"></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
@@ -481,7 +482,16 @@ makes the necessary for memory to be released in the proper order. <span style="
 calling close_and_clean() at the end of your program may result in uncaught exception message from libdar at the end of
 the execution</span>. This depends on the compiler, libc and option activated in libdar at compilation time.<br>
       <br>
-<br>
+      <h2>1 ter - Intercepting signals</h2>
+libdar by itself does not make use of any signal (see signal(2) and
+kill(2)). However, gpgme library with which libdar may be linked to
+support asymetrical strong encryption (i.e. encryption using
+public/private kes) uses the signal PIPE. Your application shall thus
+either ignore it (signal(SIGPIPE, SIG_IGN)) or provide an adhoc handle.
+By default a the PIPE signal leads the receiver processus to terminate.<br>
+      <br>
+
+      <br>
 
 
       </div>
@@ -3112,6 +3122,7 @@ Denis Corbin.<br>
 </table>
 <br>
 </center>
+
 
 
 </body></html>

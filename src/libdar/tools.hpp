@@ -47,6 +47,9 @@ extern "C"
 #if HAVE_SIGNAL_H
 #include <signal.h>
 #endif
+#if HAVE_GPGME_H
+#include <gpgme.h>
+#endif
 }
 
 #include <string>
@@ -797,8 +800,12 @@ namespace libdar
     extern std::string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size, bool compressed);
 
 	/// wrapper routint to strerror_r
-    extern std::string tools_strerror_r(int errno);
+    extern std::string tools_strerror_r(int errnum);
 
+#ifdef GPGME_SUPPORT
+	/// wrapper routint to gpgme_strerror_r
+    std::string tools_gpgme_strerror_r(gpgme_error_t err);
+#endif
 
 } /// end of namespace
 

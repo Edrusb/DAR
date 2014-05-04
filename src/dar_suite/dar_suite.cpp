@@ -85,6 +85,10 @@ void dar_suite_reset_signal_handler()
     signal(SIGHUP, &signal_abort_delayed);
     signal(SIGUSR1, &signal_abort_delayed);
     signal(SIGUSR2, &signal_abort_now);
+#if GPGME_SUPPORT
+	// for GPGME:
+    signal(SIGPIPE, SIG_IGN);
+#endif
 #endif
 }
 

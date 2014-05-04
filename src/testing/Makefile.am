@@ -2,20 +2,20 @@ localedir = @localedir@
 
 if BUILD_MODE32
 MYLIB=dar32
-AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"
+AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" $(GPGME_CFLAGS)
 else
 if BUILD_MODE64
 MYLIB=dar64
-AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"
+AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" $(GPGME_CFLAGS)
 else
 MYLIB=dar
-AM_CPPFLAGS=-I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"
+AM_CPPFLAGS=-I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" $(GPGME_CFLAGS)
 endif
 endif
 
-noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_string_file test_escape test_hash_fichier moving_file make_sparse_file hashsum
+noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_string_file test_escape test_hash_fichier moving_file make_sparse_file hashsum test_crypto_asym
 AM_LDFLAGS = -all-static @LTLIBINTL@
-LDADD = -L../libdar -l$(MYLIB)
+LDADD = -L../libdar -l$(MYLIB) $(GPGME_LIBS)
 noinst_HEADERS = testtools.hpp
 
 test_hide_file_SOURCES = test_hide_file.cpp ../dar_suite/no_comment.cpp ../dar_suite/hide_file.cpp ../dar_suite/config_file.cpp ../dar_suite/shell_interaction.cpp
@@ -104,3 +104,7 @@ moving_file_SOURCES = moving_file.cpp
 make_sparse_file_SOURCES = make_sparse_file.c
 
 hashsum_SOURCES = hashsum.c
+
+test_crypto_asym_SOURCES = test_crypto_asym.cpp ../dar_suite/shell_interaction.cpp
+test_crypto_asym_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+

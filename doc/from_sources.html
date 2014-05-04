@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation - Compiling From Source</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -39,7 +40,10 @@ for additional steps)
 	<span style="font-weight: bold;">you need at least</span>:<br>
       </div>
       <ol style="margin-left: 40px; text-align: justify;">
-        <li>a C++ compiler supporting g++11 syntax (for <a href="http://gcc.gnu.org/">gcc</a> that means version 4.8. minimum). For version older than dar-2.5.0 g++11 support is not required but if using gcc you need at least version 3.4.x.</li>
+        <li>a C++ compiler supporting g++11 syntax (for <a href="http://gcc.gnu.org/">gcc</a>
+that means version 4.8. minimum). For version older than dar-2.5.0
+g++11 support is not required but if using gcc you need at least
+version 3.4.x.</li>
         <li>a linker like "ld" the <a href="http://www.gnu.org/software/binutils/">GNU Linker</a><br>
         </li>
         <li>make (tested with <a href="http://www.gnu.org/software/make/">gnu make</a>)</li>
@@ -65,8 +69,10 @@ it for all distro thanks to
 its glibc, this is not true for FreeBSD for example)</li>
         <li style="text-align: justify;"><a href="http://www.gnupg.org/related_software/libraries.en.html">libgcryt</a>
 version 1.4.0 or greater for symetric strong encryption (blowfish, aes,
-etc.) and hash (sha1, md5) support<br>
+etc.) and hash (sha1, md5) support</li>
+        <li style="text-align: justify;"><a href="https://www.gnupg.org/">gpgme</a> library version 1.2.0 or greater for asymetric strong encryption (RSA, DSA, etc.)<br>
         </li>
+
         <li style="text-align: justify;"><a href="http://www.stack.nl/%7Edimitri/doxygen/index.html">doxygen</a>
 for generation of source code documentation</li>
         <li><a href="http://upx.sourceforge.net/">upx</a> to generate
@@ -91,8 +97,10 @@ library dar will compile but will not be able to compress or uncompress
 an archive using the lzo algorithm</li>
         <li>If you lack <span style="font-weight: bold;">libgcrypt </span>dar
 will still compile but you will not be able to use strong encryption
-nor hash file generation for each slice<br>
+nor hash file generation for each slice</li>
+        <li>if you lack <span style="font-weight: bold;">gpgme</span> dar will still compile but you will not be able to use strong encryption with asymetric algorithms (those using public keys)<br>
         </li>
+
         <li>If you lack <span style="font-weight: bold;">Doxygen</span>
 dar will still compile but you will not have the reference
 documentation for libdar after calling <span style="font-style: italic;">make</span></li>
@@ -338,6 +346,13 @@ available neither a hashing of generated slices.<br>
       </td>
     </tr>
     <tr>
+      <td style="vertical-align: top; text-align: right;">--disable-gpgme-linking<br>
+      </td>
+      <td style="vertical-align: top;">Disable
+linking with gpgme library. Asymetric strong encryption algorithms will not be available<br>
+      </td>
+    </tr>
+<tr>
       <td style="vertical-align: top; text-align: right; width: 33%;">--disable-build-html<br>
       </td>
       <td style="vertical-align: top;">Do not build API documentation
@@ -551,84 +566,13 @@ configuration file. Then you can proceed to source compilation as <a href="#comp
 </table>
 
 <br>
-
-<br>
-
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">
-      <div style="text-align: justify;">
-      <h3 style="text-decoration: underline;"><a name="compile_with_ea"></a>5
-- EA Support &amp; Compilation Problems</h3>
-[<span style="font-style: italic; font-weight: bold;">this
-paragraph should no more concern anyone today, it will be removed at
-next major release (release 2.5.0). However, if you have found it of
-some use, please send a mail to the maintainer</span>]<br>
-      <br>
-      <div style="margin-left: 40px;">If you just want to compile DAR
-with
-EA support available, you just need the attr-x.x.x.src.tar.gz package
-to have the libattr library and header files installed. If you want to
-use EA, then you need to have EA support in your kernel.<br>
-      <br>
-[<span style="font-style: italic;">What follows in this chapter is
-becoming obsolete, you may skip it as today EA support is available in
-standard in at least Linux kernels</span>]<br>
-      <br>
-I personally got some problem to compile dar with EA support, due to EA
-package installation problem:<br>
-      <br>
-when installing EA package, the /usr/include/attr directory is not
-created nor the xattr.h file put in it. To solve this problem, create
-it manually, and copy the xattr.h (and also attributes.h even if it is
-not required by dar) to it, giving it proper permission (world
-readable). These include files can be found in the "include" subdir of
-the xattr package: as root type the following replacing &lt;package&gt;
-by the path where your package has been compiled:<br>
-      <br>
-      </div>
-      </div>
-      <div style="margin-left: 80px; text-align: justify;"><code>cd
-/usr/include<br>
-mkdir attr<br>
-chmod 0755 attr<br>
-cp &lt;package&gt;/include/xattr.h &lt;package&gt;/include/attributes.h
-attr<br>
-cd attr<br>
-chmod 0644 *</code><br>
-      </div>
-      <div style="text-align: justify; margin-left: 40px;"><br>
-The second problem is while linking, the static library version does
-not exist. You can built it using the following command (after package
-compilation):<br>
-      <br>
-as previously as root type:<br>
-      <br>
-      </div>
-      <div style="margin-left: 80px; text-align: justify;"><code>chdir
-&lt;package&gt;/libattr<br>
-ar r libattr.a syscalls.o libattr.o<br>
-mv libattr.a /usr/lib<br>
-chmod 0644 /usr/lib/libattr.a</code><br>
-      </div>
-      <div style="text-align: justify; margin-left: 40px;"><br>
-dar should now be able to compile with support for EA activated.</div>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<br>
-
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
 
   <tbody>
     <tr>
       <td style="vertical-align: top;"><span style="font-weight: bold; text-decoration: underline;"></span>
       <div style="text-align: justify;">
-      <h3><a style="font-weight: bold; text-decoration: underline;" name="Tools_sites">6 - Related Softwares</a></h3>
+      <h3><a style="font-weight: bold; text-decoration: underline;" name="Tools_sites">5 - Related Softwares</a></h3>
       <blockquote>
         <ul>
           <li><a href="http://www.gnu.org/software/tar/tar.html">TAR
@@ -666,5 +610,6 @@ home page</li>
 <br>
 
 <br>
+
 
 </body></html>

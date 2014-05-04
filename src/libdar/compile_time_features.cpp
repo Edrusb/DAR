@@ -214,5 +214,15 @@ namespace libdar
 #endif
 	}
 
+
+	bool public_key_cipher()
+	{
+#ifdef GPGME_SUPPORT
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
     } // end of compile_time nested namespace
 } // end of libdar namespace

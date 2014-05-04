@@ -114,6 +114,9 @@ namespace libdar
 
 	    /// returns whether libdar is able to restore dates of symlinks
 	bool symlink_restore_dates();
+
+	    /// returns whether public key cipher (relying on gpgme) are available
+	bool public_key_cipher();
     }
 
 } // end of namespace

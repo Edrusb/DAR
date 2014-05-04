@@ -1045,22 +1045,23 @@ namespace libdar
 	    const char *endy = NULL;
 	    string time_accuracy = "";
 
-	    dialog.printf(gettext("   Libz compression (gzip)    : %s\n"), YES_NO(compile_time::libz()));
-	    dialog.printf(gettext("   Libbz2 compression (bzip2) : %s\n"), YES_NO(compile_time::libbz2()));
-	    dialog.printf(gettext("   Liblzo2 compression (lzo)  : %s\n"), YES_NO(compile_time::liblzo()));
-	    dialog.printf(gettext("   Strong encryption          : %s\n"), YES_NO(compile_time::libgcrypt()));
-	    dialog.printf(gettext("   Extended Attributes support: %s\n"), YES_NO(compile_time::ea()));
-	    dialog.printf(gettext("   Large files support (> 2GB): %s\n"), YES_NO(compile_time::largefile()));
-	    dialog.printf(gettext("   ext2fs NODUMP flag support : %s\n"), YES_NO(compile_time::nodump()));
-	    dialog.printf(gettext("   Special allocation scheme  : %s\n"), YES_NO(compile_time::special_alloc()));
+	    dialog.printf(gettext("   Libz compression (gzip)      : %s\n"), YES_NO(compile_time::libz()));
+	    dialog.printf(gettext("   Libbz2 compression (bzip2)   : %s\n"), YES_NO(compile_time::libbz2()));
+	    dialog.printf(gettext("   Liblzo2 compression (lzo)    : %s\n"), YES_NO(compile_time::liblzo()));
+	    dialog.printf(gettext("   Strong encryption (libgcrypt): %s\n"), YES_NO(compile_time::libgcrypt()));
+	    dialog.printf(gettext("   Public key ciphers (gpgme)   : %s\n"), YES_NO(compile_time::public_key_cipher()));
+	    dialog.printf(gettext("   Extended Attributes support  : %s\n"), YES_NO(compile_time::ea()));
+	    dialog.printf(gettext("   Large files support (> 2GB)  : %s\n"), YES_NO(compile_time::largefile()));
+	    dialog.printf(gettext("   ext2fs NODUMP flag support   : %s\n"), YES_NO(compile_time::nodump()));
+	    dialog.printf(gettext("   Special allocation scheme    : %s\n"), YES_NO(compile_time::special_alloc()));
 	    if(compile_time::bits() == 0)
-		dialog.printf(gettext("   Integer size used          : unlimited\n"));
+		dialog.printf(gettext("   Integer size used            : unlimited\n"));
 	    else
-		dialog.printf(gettext("   Integer size used          : %d bits\n"), compile_time::bits());
-	    dialog.printf(gettext("   Thread safe support        : %s\n"), YES_NO(compile_time::thread_safe()));
-	    dialog.printf(gettext("   Furtive read mode support  : %s\n"), YES_NO(compile_time::furtive_read()));
-	    dialog.printf(gettext("   Linux ext2/3/4 FSA support : %s\n"), YES_NO(compile_time::FSA_linux_extX()));
-	    dialog.printf(gettext("   Mac OS X HFS+ FSA support  : %s\n"), YES_NO(compile_time::FSA_birthtime()));
+		dialog.printf(gettext("   Integer size used            : %d bits\n"), compile_time::bits());
+	    dialog.printf(gettext("   Thread safe support          : %s\n"), YES_NO(compile_time::thread_safe()));
+	    dialog.printf(gettext("   Furtive read mode support    : %s\n"), YES_NO(compile_time::furtive_read()));
+	    dialog.printf(gettext("   Linux ext2/3/4 FSA support   : %s\n"), YES_NO(compile_time::FSA_linux_extX()));
+	    dialog.printf(gettext("   Mac OS X HFS+ FSA support    : %s\n"), YES_NO(compile_time::FSA_birthtime()));
 
 	    switch(compile_time::system_endian())
 	    {
@@ -1076,20 +1077,20 @@ namespace libdar
 	    default:
 		throw SRC_BUG;
 	    }
-	    dialog.printf(gettext("   Detected system/CPU endian : %s"), endy);
-	    dialog.printf(gettext("   Posix fadvise support      : %s"), YES_NO(compile_time::posix_fadvise()));
-	    dialog.printf(gettext("   Large dir. speed optimi.   : %s"), YES_NO(compile_time::fast_dir()));
+	    dialog.printf(gettext("   Detected system/CPU endian   : %s"), endy);
+	    dialog.printf(gettext("   Posix fadvise support        : %s"), YES_NO(compile_time::posix_fadvise()));
+	    dialog.printf(gettext("   Large dir. speed optimi.     : %s"), YES_NO(compile_time::fast_dir()));
 	    if(compile_time::microsecond_read())
 		time_accuracy = "1 microsecond";
 	    else
 		time_accuracy = "1 s";
-	    dialog.printf(gettext("   Timestamp read accuracy    : %S\n"), &time_accuracy);
+	    dialog.printf(gettext("   Timestamp read accuracy      : %S\n"), &time_accuracy);
 	    if(compile_time::microsecond_write())
 		time_accuracy = "1 microsecond";
 	    else
 		time_accuracy = "1 s";
-	    dialog.printf(gettext("   Timestamp write accuracy   : %S\n"), &time_accuracy);
-	    dialog.printf(gettext("   Restores dates of symlinks : %s\n"), YES_NO(compile_time::symlink_restore_dates()));
+	    dialog.printf(gettext("   Timestamp write accuracy     : %S\n"), &time_accuracy);
+	    dialog.printf(gettext("   Restores dates of symlinks   : %s\n"), YES_NO(compile_time::symlink_restore_dates()));
 	}
 	catch(...)
 	{
@@ -2615,18 +2616,18 @@ namespace libdar
 
 #define MSGSIZE 200
 
-    string tools_strerror_r(int err)
+    string tools_strerror_r(int errnum)
     {
 	char buffer[MSGSIZE];
 	string ret;
 
 #if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE
 	    // we expect the XSI-compliant strerror_r
-	int val = strerror_r(err, buffer, MSGSIZE);
+	int val = strerror_r(errnum, buffer, MSGSIZE);
 	if(val != 0)
 	    strncpy(buffer, "Error code to message conversion failed", MSGSIZE);
 #else
-	char *val = strerror_r(err, buffer, MSGSIZE);
+	char *val = strerror_r(errnum, buffer, MSGSIZE);
 	if(val != buffer)
 	    strncpy(buffer, val, MSGSIZE);
 #endif
@@ -2636,5 +2637,19 @@ namespace libdar
 	return ret;
     }
 
+
+#ifdef GPGME_SUPPORT
+    string tools_gpgme_strerror_r(gpgme_error_t err)
+    {
+	char buffer[MSGSIZE];
+	string ret;
+
+	(void)gpgme_strerror_r(err, buffer, MSGSIZE);
+	buffer[MSGSIZE] = '\0';
+	ret = buffer;
+
+	return ret;
+    }
+#endif
 
 } // end of namespace

@@ -38,11 +38,17 @@ using namespace libdar;
     /// \addtogroup CMDLINE
     /// @{
 
-user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool silent);
-    // arg are output ostream object (on which are sent non interactive messages)
-    // and interact ostream object (on which are sent message that require a user interaction)
+    ///////////////
+    // THIS AN OLD IMPLEMENTATION (a la C) THAT SHOULD BE REVIEWED USING A INHERITED CLASS FROM LIBDAR::USER_INTERACTION_CALLBACK
+    ///////////////
 
-    // the argument returned must be freed with a call to "delete"
+    /// create and return the address of the (unique) shell_interaction object
+    ///
+    /// \param[in] out defines where are sent non interactive messages (informative messages)
+    /// \param[in] interact defines where are sent interactive messages (those requiring an answer or confirmation) from the user
+    /// \param[in] silent whether to send a warning message if the process is not attached to a terminal
+    /// \note the returned object must be freed by a call to "delete"
+user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool silent);
 
 void shell_interaction_change_non_interactive_output(ostream *out);
 void shell_interaction_read_char(char & a);

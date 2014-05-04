@@ -52,6 +52,10 @@ extern "C"
 #include <time.h>
 #endif
 
+#if HAVE_GPGME_H
+#include <gpgme.h>
+#endif
+
 } // end extern "C"
 
 #include <string>
@@ -397,6 +401,16 @@ namespace libdar
 		    throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s\n"), MIN_VERSION_GCRYPT));
 #endif
 
+#if GPGME_SUPPORT
+	    if(gpgme_check_version(GPGME_MIN_VERSION) == NULL)
+	    {
+		string tmp = "GPGME_SUPPORT";
+		throw Erange("libdar_init_gpgme", tools_printf(gettext("gpgme version requirement is not satisfied, requires version > %s"), tmp.c_str()));
+	    }
+
+	    if(gpgme_err_code(gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP)) != GPG_ERR_NO_ERROR)
+		throw Erange("libdar_init_gpgme", tools_printf(gettext("gpgme engine not available: %s"), gpgme_get_protocol_name(GPGME_PROTOCOL_OpenPGP)));
+#endif
 	    tools_init();
 
 		 // so now libdar is ready for use!

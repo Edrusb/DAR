@@ -68,13 +68,14 @@ AC_ARG_ENABLE( [libdl-linking],
                  AC_CHECK_LIB(dl, [dlsym], [], [])
                ])
 
+
 # Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 
 
-AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h])
+AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h gpgme.h])
 
 
 AC_SYS_LARGEFILE
@@ -854,6 +855,27 @@ AC_ARG_ENABLE(  [thread-safe],
                 ]
              )
 
+
+AC_ARG_ENABLE(  [gpgme-linking],
+		AC_HELP_STRING(--disable-gpgme-linking, [disable linking with gpgme which disables asymetric crypto algorithms]),
+		[
+		  AC_MSG_WARN([asymetrical encryption support has been disabled by user])
+		  local_gpgme="no"
+                ],
+		[
+		  gpgme_min_version="1.2.0"
+		  AC_DEFINE_UNQUOTED(GPGME_MIN_VERSION, "$gpgme_min_version", [minimum version expected of GPGME])
+		  AM_PATH_GPGME($gpgme_min_version,
+		      		[
+				  local_gpgme="yes"
+				  AC_DEFINE(GPGME_SUPPORT, 1, [GPGME is available to support public key based ciphering])
+				],
+				[]
+			       )
+		]
+	     )
+
+
 AC_ARG_ENABLE( [execinfo],
 	       AC_HELP_STRING(--disable-execinfo, [disable reporting stack information on self diagnostic bugs even]),
 	       [AC_MSG_WARN([ignoring execinfo even if available])],
@@ -961,6 +983,13 @@ fi
 
 printf "   Strong encryption support  : "
 if [ "$local_crypto" = "yes" ] ; then
+  echo "YES"
+else
+  echo "NO"
+fi
+
+printf "   Public key cipher support  : "
+if [ "$local_gpgme" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"

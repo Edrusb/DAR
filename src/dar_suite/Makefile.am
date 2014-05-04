@@ -34,14 +34,14 @@ system_path = @sysconfdir@
 
 if BUILD_MODE32
     MYLIB=dar32
-    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
+    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS)
 else
 if BUILD_MODE64
     MYLIB=dar64
-    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS)
 else
     MYLIB=dar
-    AM_CPPFLAGS=-I../libdar -DDAR_LOCALEDIR=\"$(localedir)\"  -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
+    AM_CPPFLAGS=-I../libdar -DDAR_LOCALEDIR=\"$(localedir)\"  -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS)
 endif
 endif
 
@@ -73,7 +73,7 @@ endif
 #
 
 bin_PROGRAMS = dar dar_xform dar_slave dar_manager dar_cp $(ALSO_BUILD)
-LDADD = -L../libdar -l$(MYLIB)
+LDADD = -L../libdar -l$(MYLIB) $(GPGME_LIBS)
 if DEBUG_STATIC
 AM_LDFLAGS = -all-static @LTLIBINTL@ $(LD_PROF)
 else
