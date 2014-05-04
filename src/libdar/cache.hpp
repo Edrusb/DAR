@@ -53,6 +53,7 @@ namespace libdar
 	cache(generic_file & hidden, 	          //< is the file to cache, it is never deleted by the cache object,
 	      bool shift_mode,                    //< if true, when all cached data has been read, half of the data is flushed from the cache, the other half is shifted and new data take place to fill the cache. This is necessary for sequential reading, but has some CPU overhead.
 	      U_I initial_size = 10240,           //< is the initial size of the cache for reading (read this amount of data at a time)
+	      U_I max_size = 10485760,            //< this is the maximum size the cache may have in any case, if set to zero, the cache size is not bounded
               U_I unused_read_ratio = 10,         //< is the ratio of cached data effectively asked for reading below which the cache size is divided by two in other words, if during observation_read_number fullfilment of the cache, less than unused_read_ratio percent of data has been effectively asked for reading, then the cache size is divided by two
 	      U_I observation_read_number = 100,  //< period of cache size consideration
 	      U_I max_size_hit_read_ratio = 50,   //< is the ratio above which the cache size is doubled. In other words, if during observation_read_number times of cache fullfilment, more than max_size_hit_read_ratio percent time all the cached data has been asked for reading the cache size is doubled. To have fixed size read caching, you can set unused_read_ratio to zero and max_size_hit_read_ratio to 101 or above.

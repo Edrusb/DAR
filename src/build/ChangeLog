@@ -33,6 +33,13 @@ from 2.4.x to 2.5.0
   relying on embedded data CRC and inode metadata in absence of the saved
   data.
 
+from 2.4.13 to 2.4.14
+- limiting memory consumtion of the cache layer to stay below 10 MiB, under
+  certain circumstances (very large archive), it could grow up to an insane
+  value like 50% or the available RAM. reducing to 10 MiB does not impact
+  performance in a noticable manner while it avoids system to swap out when
+  the cache layer becomes huge.
+
 from 2.4.12 to 2.4.13
 - adding initialization value for two variables to avoid inappropriate
   warning when compiling with -Wall option

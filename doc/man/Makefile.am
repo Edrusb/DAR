@@ -16,6 +16,6 @@ copyman:
 all-local: $(TARGET)
 
 clean-local:
-	rm -f $(TARGET) *.1 copyman
+	rm -f $(TARGET) *.1 copyman dar.html dar_slave.html dar_xform.html dar_manager.html dar_cp.html
 
 endif

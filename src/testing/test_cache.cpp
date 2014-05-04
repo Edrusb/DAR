@@ -97,7 +97,9 @@ void f1()
 {
     fichier_local f = fichier_local(*ui, "toto", gf_read_only, 0, false, false, false);
     cache c = cache(f,
+		    false,
 		    10,
+		    1000,
 		    10, 3, 20,
 		    10, 3, 20);
     char buffer[200];
@@ -125,7 +127,9 @@ void f2()
     }
     fichier_local g = fichier_local(*ui, "titi", gf_read_write, 0666, false, true, false);
     cache c = cache(g,
+		    false,
 		    10,
+		    1000,
 		    10, 3, 20,
 		    10, 3, 20);
     const char *buf = "coucou les amis";
