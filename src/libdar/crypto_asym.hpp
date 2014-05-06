@@ -57,7 +57,7 @@ namespace libdar
     public:
 	    /// create an object for ciphering (write-only)
 	    ///
-	    /// \param[in] for user interaction
+	    /// \param[in] ui for user interaction
 	    /// \param[in] below where to write down encrypted data
 	    /// \param[in] recipients_email list of email of recipient that will be able to read the encrypted data
 	    /// \note this assumes the GnuPG keyring has the public keys of the recipient listed
