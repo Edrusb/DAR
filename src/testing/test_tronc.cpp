@@ -75,7 +75,10 @@ void f1()
     {
 	get_version(maj, med, min);
 	string p = "test/source.txt";
-	user_interaction *ui = shell_interaction_init(&cout, &cerr, false);
+	shell_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
+	if(ui == NULL)
+	    cout << "ERREUR !" << endl;
+
 	fichier_local h = fichier_local(*ui, p, gf_read_only, 0777, false, true, false);
 
 	display_read(*ui, h);
@@ -158,7 +161,9 @@ void f2()
     try
     {
 	string p = "test/source.txt";
-	user_interaction *ui = shell_interaction_init(&cout, &cerr, false);
+	user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
+	if(ui == NULL)
+	    cout << "ERREUR !" << endl;
 
 	try
 	{

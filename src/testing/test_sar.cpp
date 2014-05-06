@@ -47,7 +47,7 @@ int main()
 {
     U_I major, medium, minor;
     get_version(major, medium, minor);
-    ui = shell_interaction_init(&cout, &cerr, false);
+    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
     data_name.clear();
@@ -55,7 +55,6 @@ int main()
     f2();
     f3();
     f4();
-    shell_interaction_close();
     if(ui != NULL)
 	delete ui;
 }

@@ -51,7 +51,7 @@ static void display_rest_stat(user_interaction & dialog, const statistics & st);
 static void display_diff_stat(user_interaction & dialog, const statistics &st);
 static void display_test_stat(user_interaction & dialog, const statistics & st);
 static void display_merge_stat(user_interaction & dialog, const statistics & st);
-static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env);
+static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env);
 
 int main(S_I argc, char * const argv[], const char **env)
 {
@@ -65,7 +65,7 @@ int main(S_I argc, char * const argv[], const char **env)
 			    &little_main);
 }
 
-static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
+static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
     S_I ret = EXIT_OK;
     line_param param;
@@ -93,11 +93,11 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
 	archive *arch = NULL;
 	archive *aux = NULL;
 	archive *cur = NULL;
-        shell_interaction_set_beep(param.beep);
+        dialog.set_beep(param.beep);
 
         if(param.filename != "-"
 	   || (param.output_pipe != "" && param.op != create && param.op != isolate && param.op != merging))
-            shell_interaction_change_non_interactive_output(&cout);
+            dialog.change_non_interactive_output(&cout);
             // standart output can be used to send non interactive
             // messages
 

@@ -36,6 +36,7 @@
 #include "catalogue.hpp"
 #include "archive.hpp"
 #include "criterium.hpp"
+#include "shell_interaction.hpp"
 
 using namespace std;
 using namespace libdar;
@@ -182,7 +183,7 @@ struct line_param
 
     /// main routine to extract parameters from command-line and included files
 
-extern bool get_args(user_interaction & dialog,
+extern bool get_args(shell_interaction & dialog,
 		     const char *home,
 		     const vector<string> & dar_dcf_path,
 		     const vector<string> & dar_duc_path,

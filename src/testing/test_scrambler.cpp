@@ -39,7 +39,7 @@ extern "C"
 
 using namespace libdar;
 
-S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env);
+S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env);
 
 int main(S_I argc, char * const argv[])
 {
@@ -51,7 +51,7 @@ int main(S_I argc, char * const argv[])
 			    &little_main);
 }
 
-S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
+S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
     if(argc != 4)
     {

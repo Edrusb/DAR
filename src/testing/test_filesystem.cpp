@@ -93,7 +93,7 @@ int main()
     label data_name;
 
     get_version(maj, med, min);
-    ui = shell_interaction_init(&cout, &cerr, false);
+    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
     cat = new catalogue(*ui, datetime(120), data_name);
@@ -104,7 +104,6 @@ int main()
         del();
     }
     delete cat;
-    shell_interaction_close();
     if(ui != NULL)
 	delete ui;
 }

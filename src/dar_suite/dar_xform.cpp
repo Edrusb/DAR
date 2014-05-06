@@ -61,7 +61,7 @@ using namespace libdar;
 
 #define OPT_STRING  "s:S:p::wnhbVE:F:a::Qj^:3:;:"
 
-static bool command_line(user_interaction & dialog,
+static bool command_line(shell_interaction & dialog,
 			 S_I argc, char * const argv[],
                          path * & src_dir, string & src,
                          path * & dst_dir, string & dst,
@@ -80,9 +80,9 @@ static bool command_line(user_interaction & dialog,
 			 infinint & src_min_digits,
 			 infinint & dst_min_digits);
 
-static void show_usage(user_interaction & dialog, const char *command_name);
-static void show_version(user_interaction & dialog, const char *command_name);
-static S_I sub_main(user_interaction & dialog, S_I argc, char *const argv[], const char **env);
+static void show_usage(shell_interaction & dialog, const char *command_name);
+static void show_version(shell_interaction & dialog, const char *command_name);
+static S_I sub_main(shell_interaction & dialog, S_I argc, char *const argv[], const char **env);
 
 int main(S_I argc, char *const argv[], const char **env)
 {
@@ -96,7 +96,7 @@ int main(S_I argc, char *const argv[], const char **env)
 			    &sub_main);
 }
 
-static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
+static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
     path *src_dir = NULL;
     path *dst_dir = NULL;
@@ -133,13 +133,13 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
 	    {
 		if(dst != "-")
 		{
-		    shell_interaction_change_non_interactive_output(&cout);
+		    dialog.change_non_interactive_output(&cout);
 		    tools_avoid_slice_overwriting_regex(dialog,  dst_dir->display(), string("^")+dst+"\\.[0-9]+\\."+EXTENSION+"(\\.(md5|sha1))?$", false, allow, warn, false);
 		}
 
 		thr.check_self_cancellation();
 
-		shell_interaction_set_beep(beep);
+		dialog.set_beep(beep);
 		if(src == "-")
 		{
 		    trivial_sar *tmp_sar = new (nothrow) trivial_sar(dialog, src, false);
@@ -284,7 +284,7 @@ static S_I sub_main(user_interaction & dialog, S_I argc, char * const argv[], co
     return ret;
 }
 
-static bool command_line(user_interaction & dialog, S_I argc, char * const argv[],
+static bool command_line(shell_interaction & dialog, S_I argc, char * const argv[],
                          path * & src_dir, string & src,
                          path * & dst_dir, string & dst,
                          infinint & first_file_size,
@@ -512,11 +512,11 @@ static bool command_line(user_interaction & dialog, S_I argc, char * const argv[
     return true;
 }
 
-static void show_usage(user_interaction & dialog, const char *command_name)
+static void show_usage(shell_interaction & dialog, const char *command_name)
 {
     string name;
     tools_extract_basename(command_name, name);
-    shell_interaction_change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(&cout);
 
     dialog.printf("usage :\t %s [options] [<path>/]<basename> [<path>/]<basename>\n", name.c_str());
     dialog.printf("       \t %s -h\n",name.c_str());
@@ -545,14 +545,14 @@ static void show_usage(user_interaction & dialog, const char *command_name)
     dialog.printf(gettext("See man page for more options.\n"));
 }
 
-static void show_version(user_interaction & dialog, const char *command_name)
+static void show_version(shell_interaction & dialog, const char *command_name)
 {
     string name;
     tools_extract_basename(command_name, name);
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    shell_interaction_change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(&cout);
 
     dialog.printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n\n", name.c_str(), DAR_XFORM_VERSION);
     if(maj > 2)

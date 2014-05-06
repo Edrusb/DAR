@@ -37,7 +37,7 @@
 using namespace libdar;
 using namespace std;
 
-int little_main(user_interaction & ui, S_I argc, char * const argv[], const char **env);
+int little_main(shell_interaction & ui, S_I argc, char * const argv[], const char **env);
 
 static infinint calculus(const string & formula); // recusive call
 
@@ -51,7 +51,7 @@ int main(S_I argc, char * const argv[], const char **env)
 			    &little_main);
 }
 
-int little_main(user_interaction & ui, S_I argc, char * const argv[], const char **env)
+int little_main(shell_interaction & ui, S_I argc, char * const argv[], const char **env)
 {
     if(argc != 2)
     {

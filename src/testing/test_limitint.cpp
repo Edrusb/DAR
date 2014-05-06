@@ -62,7 +62,7 @@ user_interaction *ui = NULL;
 
 int main()
 {
-    ui = shell_interaction_init(&cout, &cerr, false);
+    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
 
@@ -75,7 +75,6 @@ int main()
     {
         routine_real_infinint(*ui);
     }
-    shell_interaction_close();
     if(ui != NULL)
 	delete ui;
 }

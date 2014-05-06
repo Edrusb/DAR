@@ -48,7 +48,6 @@ int main(int argc, char *argv[])
     }
 
     get_version(maj, med, min);
-    ui = shell_interaction_init(&cout, &cerr, true);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
 

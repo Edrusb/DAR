@@ -58,7 +58,7 @@ int main(S_I argc, char *argv[])
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    ui = shell_interaction_init(&cout, &cerr, false);
+    ui = new (nothrow) shell_interaction(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
 
@@ -102,7 +102,6 @@ int main(S_I argc, char *argv[])
 	else
 	    cout << "CRC PROBLEM" << endl;
 
-	shell_interaction_close();
 	if(ui != NULL)
 	    delete ui;
     }

@@ -130,10 +130,10 @@ static const U_I sparse_file_min_size_default = 15;
     // the default value for --sparse-file-min-size
 
     // return a newly allocated memory (to be deleted by the caller)
-static void show_license(user_interaction & dialog);
-static void show_warranty(user_interaction & dialog);
-static void show_version(user_interaction & dialog, const char *command_name);
-static void usage(user_interaction & dialog, const char *command_name);
+static void show_license(shell_interaction & dialog);
+static void show_warranty(shell_interaction & dialog);
+static void show_version(shell_interaction & dialog, const char *command_name);
+static void usage(shell_interaction & dialog, const char *command_name);
 static void split_compression_algo(const char *arg, compression & algo, U_I & level);
 static fsa_scope string_to_fsa(const string & arg);
 
@@ -144,7 +144,7 @@ const struct option *get_long_opt();
 struct recursive_param
 {
 	// input parameters
-    user_interaction *dialog;
+    shell_interaction *dialog;
     const char *home;
     const vector<string> dar_dcf_path;
     const vector<string> dar_duc_path;
@@ -168,12 +168,12 @@ struct recursive_param
     bool detruire;
     bool no_inter;
 
-    recursive_param(user_interaction & x_dialog,
+    recursive_param(shell_interaction & x_dialog,
 		    const char *x_home,
 		    const vector<string> & x_dar_dcf_path,
 		    const vector<string> & x_dar_duc_path): dar_dcf_path(x_dar_dcf_path), dar_duc_path(x_dar_duc_path)
     {
-	dialog = x_dialog.clone();
+	dialog = new (nothrow) shell_interaction(x_dialog);
 	if(dialog == NULL)
 	    throw Ememory("recursive_param::recursive_param");
 	home = x_home;
@@ -234,7 +234,7 @@ static void add_non_options(S_I argc, char * const argv[], vector<string> & non_
 static void show_args(S_I argc, char *argv[]);
 #endif
 
-bool get_args(user_interaction & dialog,
+bool get_args(shell_interaction & dialog,
               const char *home,
 	      const vector<string> & dar_dcf_path,
 	      const vector<string> & dar_duc_path,
@@ -1639,11 +1639,11 @@ static bool get_args_recursive(recursive_param & rec,
     return true;
 }
 
-static void usage(user_interaction & dialog, const char *command_name)
+static void usage(shell_interaction & dialog, const char *command_name)
 {
     string name;
     tools_extract_basename(command_name, name);
-    shell_interaction_change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(&cout);
 
     dialog.printf(gettext("usage: %s [ -c | -x | -d | -t | -l | -C | -+ ] [<path>/]<basename> [options...]\n"), name.c_str());
     dialog.printf("       %s -h\n", name.c_str());
@@ -1741,9 +1741,9 @@ static void usage(user_interaction & dialog, const char *command_name)
     dialog.printf(gettext("Type \"man dar\" for more details and for all other available options.\n"));
 }
 
-static void show_warranty(user_interaction & dialog)
+static void show_warranty(shell_interaction & dialog)
 {
-    shell_interaction_change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(&cout);
     dialog.printf("                     NO WARRANTY\n");
     dialog.printf("\n");
     dialog.printf("  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY\n");
@@ -1768,9 +1768,9 @@ static void show_warranty(user_interaction & dialog)
     dialog.printf("\n");
 }
 
-static void show_license(user_interaction & dialog)
+static void show_license(shell_interaction & dialog)
 {
-    shell_interaction_change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(&cout);
     dialog.printf("             GNU GENERAL PUBLIC LICENSE\n");
     dialog.printf("                Version 2, June 1991\n");
     dialog.printf("\n");
@@ -2093,14 +2093,14 @@ static void show_license(user_interaction & dialog)
     dialog.printf("\n");
 }
 
-static void show_version(user_interaction & dialog, const char *command_name)
+static void show_version(shell_interaction & dialog, const char *command_name)
 {
     string name;
     tools_extract_basename(command_name, name);
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    shell_interaction_change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(&cout);
     dialog.warning(tools_printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n",  name.c_str(), ::dar_version())
 		   + "   " + dar_suite_command_line_features()
 		   + "\n"

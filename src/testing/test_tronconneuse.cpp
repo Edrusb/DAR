@@ -106,10 +106,9 @@ void f3(user_interaction *dialog);
 int main()
 {
     U_I maj, med, min;
-    user_interaction *dialog = NULL;
 
     get_version(maj, med, min);
-    dialog = shell_interaction_init(&cout, &cerr, false);
+    user_interaction *dialog = new (nothrow) shell_interaction(&cout, &cerr, false);
     try
     {
 	f1(dialog);
@@ -124,7 +123,6 @@ int main()
     {
 	cout << "unknown exception caught" << endl;
     }
-    shell_interaction_close();
     if(dialog != NULL)
 	delete dialog;
 }

@@ -27,7 +27,7 @@
 #define DAR_SUITE_HPP
 
 #include "../my_config.h"
-#include "user_interaction.hpp"
+#include "shell_interaction.hpp"
 
 #define EXIT_OK 0           // all that was asked is done
 #define EXIT_SYNTAX 1       // syntax error on command line
@@ -88,7 +88,7 @@ extern int dar_suite_global(int argc,
 #if HAVE_GETOPT_LONG
 			    const struct option *long_options,
 #endif
-			    int (*call)(user_interaction & dialog, int, char *const [], const char **env));
+			    int (*call)(shell_interaction & dialog, int, char *const [], const char **env));
 
 extern std::string dar_suite_command_line_features();
 

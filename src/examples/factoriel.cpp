@@ -68,7 +68,7 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-static int little_main(user_interaction & ui, int argc, char * const argv[], const char **env);
+static int little_main(shell_interaction & ui, int argc, char * const argv[], const char **env);
 
 int main(S_I argc, char * const argv[], const char **env)
 {
@@ -80,7 +80,7 @@ int main(S_I argc, char * const argv[], const char **env)
 			    &little_main);
 }
 
-static int little_main(user_interaction & ui, int argc, char * const argv[], const char **env)
+static int little_main(shell_interaction & ui, int argc, char * const argv[], const char **env)
 {
     if(argc != 2 && argc != 3)
 	exit(1);

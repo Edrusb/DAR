@@ -52,11 +52,13 @@ void f1(user_interaction *dialog, const char *filename);
 
 int main(int argc, char *argv[])
 {
-    user_interaction *dialog = NULL;
+    user_interaction *dialog = new (nothrow) shell_interaction(&cout, &cerr, false);
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    dialog = shell_interaction_init(&cout, &cerr, false);
+    if(dialog == NULL)
+	cout << "ERREUR !" << endl;
+
     try
     {
       if(argc != 2)
@@ -71,7 +73,7 @@ int main(int argc, char *argv[])
     {
 	cout << "unknown exception caught" << endl;
     }
-    shell_interaction_close();
+
     if(dialog != NULL)
 	delete dialog;
  }

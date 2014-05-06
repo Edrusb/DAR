@@ -48,7 +48,7 @@ int main()
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    ui = shell_interaction_init(&cout, &cerr, false);
+    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
     f1();

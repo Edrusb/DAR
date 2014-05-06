@@ -58,7 +58,6 @@ extern "C"
 #include "tools.hpp"
 #include "cygwin_adapt.hpp"
 #include "dar_suite.hpp"
-#include "user_interaction.hpp"
 #include "thread_cancellation.hpp"
 
 #define DAR_CP_VERSION "1.2.8"
@@ -66,17 +65,17 @@ extern "C"
 using namespace libdar;
 using namespace std;
 
-static void show_usage(user_interaction & dialog, char *argv0);
-static void show_version(user_interaction & dialog, char *argv0);
-static int open_files(user_interaction & dialog, char *src, char *dst, int *fds, int *fdd);
-static int copy_max(user_interaction & dialog, int src, int dst);
-static int little_main(user_interaction & dialog, int argc, char * const argv[], const char **env);
+static void show_usage(shell_interaction & dialog, char *argv0);
+static void show_version(shell_interaction & dialog, char *argv0);
+static int open_files(shell_interaction & dialog, char *src, char *dst, int *fds, int *fdd);
+static int copy_max(shell_interaction & dialog, int src, int dst);
+static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env);
 static void xfer_before_error(int block, char *buffer, int src, int dst);
 static int skip_to_next_readable(int block, char *buffer, int src, int dst, off_t & missed);
     /* return 0 if not found any more readable data, else return 1 */
 static int normal_copy(int block, char *buffer, int src, int dst);
     /* return the number of copied bytes (negative value upon error, zero at end of file) */
-static int little_main(user_interaction & dialog, int argc, char * const argv[], const char **env);
+static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env);
 
 int main(int argc, char * const argv[], const char **env)
 {
@@ -90,7 +89,7 @@ int main(int argc, char * const argv[], const char **env)
 			     &little_main);
 }
 
-static int little_main(user_interaction & dialog, int argc, char * const argv[], const char **env)
+static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env)
 {
     int fds, fdd;
     int ret = EXIT_OK;
@@ -126,12 +125,12 @@ static int little_main(user_interaction & dialog, int argc, char * const argv[],
     return ret;
 }
 
-static void show_usage(user_interaction & dialog, char *argv0)
+static void show_usage(shell_interaction & dialog, char *argv0)
 {
     dialog.warning(tools_printf(gettext("usage : %s <source> <destination>\n"), argv0));
 }
 
-static void show_version(user_interaction & dialog, char *argv0)
+static void show_version(shell_interaction & dialog, char *argv0)
 {
 /* C++ syntax used*/
     try
@@ -154,7 +153,7 @@ static void show_version(user_interaction & dialog, char *argv0)
 /* END of C++ syntax used*/
 }
 
-static int open_files(user_interaction & dialog, char *src, char *dst, int *fds, int *fdd)
+static int open_files(shell_interaction & dialog, char *src, char *dst, int *fds, int *fdd)
 {
     struct stat buf;
     int val = stat(dst, &buf);
@@ -201,7 +200,7 @@ static int open_files(user_interaction & dialog, char *src, char *dst, int *fds,
         return 1;
 }
 
-static int copy_max(user_interaction & dialog, int src, int dst)
+static int copy_max(shell_interaction & dialog, int src, int dst)
 {
     thread_cancellation thr;
 

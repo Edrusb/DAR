@@ -28,8 +28,11 @@
 
 int main()
 {
-    user_interaction *dialog = shell_interaction_init(&cout, &cerr, false);
+    user_interaction *dialog = new (nothrow) shell_interaction(&cout, &cerr, false);
     U_I min, med, maj;
+
+    if(dialog == NULL)
+	cout << "ERREUR !" << endl;
 
 	// initializing libdar
     get_version(maj, med, min);
@@ -89,7 +92,7 @@ int main()
     {
 	cout << "unknown exception caught" << endl;
     }
-    shell_interaction_close();
+
     if(dialog != NULL)
 	delete dialog;
 }

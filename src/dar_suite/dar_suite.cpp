@@ -50,7 +50,6 @@ extern "C"
 
 #include "integers.hpp"
 #include "dar_suite.hpp"
-#include "shell_interaction.hpp"
 #include "erreurs.hpp"
 #include "libdar.hpp"
 #include "thread_cancellation.hpp"
@@ -59,7 +58,7 @@ extern "C"
 
 #define GENERAL_REPORT(msg) 	if(ui != NULL)\
                                 {\
-                                    shell_interaction_change_non_interactive_output(&cerr);\
+                                    ui->change_non_interactive_output(&cerr);\
 	                            ui->warning(msg);\
 				}\
 	                        else\
@@ -71,7 +70,7 @@ using namespace libdar;
 
 static void jogger();
 
-static user_interaction *ui = NULL;
+static shell_interaction *ui = NULL;
 static void signals_abort(int l, bool now);
 static void signal_abort_delayed(int l);
 static void signal_abort_now(int l);
@@ -99,7 +98,7 @@ int dar_suite_global(int argc,
 #if HAVE_GETOPT_LONG
 		     const struct option *long_options,
 #endif
-		     int (*call)(user_interaction & dialog, int, char * const [], const char **env))
+		     int (*call)(shell_interaction & dialog, int, char * const [], const char **env))
 {
     int ret = EXIT_OK;
 
@@ -137,7 +136,9 @@ int dar_suite_global(int argc,
 #endif
 			      jog,
 			      silent);
-	ui = shell_interaction_init(&cerr, &cerr, silent);
+	ui = new (nothrow) shell_interaction(&cerr, &cerr, silent);
+	if(ui == NULL)
+	    throw Ememory("dar_suite_global");
 
 	if(jog)
 	    std::set_new_handler(&jogger);
@@ -252,9 +253,9 @@ int dar_suite_global(int argc,
 	// restoring terminal settings
     try
     {
-	shell_interaction_close();
 	if(ui != NULL)
 	    delete ui;
+	ui = NULL;
     }
     catch(...)
     {

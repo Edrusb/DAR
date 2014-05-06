@@ -63,7 +63,7 @@ using namespace libdar;
 static const unsigned int buffer_size = 10000;
 static bool xmit = true;
 
-static int little_main(user_interaction & dialog, int argc, char * const argv[], const char **env);
+static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env);
 static void action_xmit(user_interaction & dialog, tuyau *in, tuyau *out, U_32 duration);
 static void action_loop(tuyau *in, tuyau *out);
 static void stop_xmit(int l);
@@ -78,12 +78,12 @@ int main(int argc, char * const argv[])
 			    &little_main);
 }
 
-static int little_main(user_interaction & dialog, int argc, char * const argv[], const char **env)
+static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env)
 {
     tuyau *in = NULL, *out = NULL;
     U_32 duration;
 
-    shell_interaction_change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(&cout);
     if(argc != 4)
     {
         dialog.printf("usage : %s <input> <output> <seconds>\n", argv[0]);

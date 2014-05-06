@@ -84,8 +84,8 @@ using namespace libdar;
 
 enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, moving, interactive, check, batch };
 
-static S_I little_main(user_interaction & dialog, S_I argc, char *const argv[], const char **env);
-static bool command_line(user_interaction & dialog,
+static S_I little_main(shell_interaction & dialog, S_I argc, char *const argv[], const char **env);
+static bool command_line(shell_interaction & dialog,
 			 S_I argc, char * const argv[],
                          operation & op,
                          string & base,
@@ -99,21 +99,21 @@ static bool command_line(user_interaction & dialog,
 			 bool & even_when_removed,
 			 bool & check_order,
 			 bool recursive); // true if called from op_batch
-static void show_usage(user_interaction & dialog, const char *command);
-static void show_version(user_interaction & dialog, const char *command);
+static void show_usage(shell_interaction & dialog, const char *command);
+static void show_version(shell_interaction & dialog, const char *command);
 
 #if HAVE_GETOPT_LONG
 static const struct option *get_long_opt();
 #endif
-static void op_create(user_interaction & dialog, const string & base, bool info_details);
-static void op_add(user_interaction & dialog, database *dat, const string &arg, string fake, const infinint & min_digits, bool info_details);
-static void op_listing(user_interaction & dialog, const database *dat, bool info_details);
-static void op_del(user_interaction & dialog, database *dat, S_I min, archive_num max, bool info_details);
-static void op_chbase(user_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details);
-static void op_where(user_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details);
-static void op_options(user_interaction & dialog, database *dat, const vector<string> & rest, bool info_details);
-static void op_dar(user_interaction & dialog, database *dat, const string & arg, bool info_details);
-static void op_restore(user_interaction & dialog,
+static void op_create(shell_interaction & dialog, const string & base, bool info_details);
+static void op_add(shell_interaction & dialog, database *dat, const string &arg, string fake, const infinint & min_digits, bool info_details);
+static void op_listing(shell_interaction & dialog, const database *dat, bool info_details);
+static void op_del(shell_interaction & dialog, database *dat, S_I min, archive_num max, bool info_details);
+static void op_chbase(shell_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details);
+static void op_where(shell_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details);
+static void op_options(shell_interaction & dialog, database *dat, const vector<string> & rest, bool info_details);
+static void op_dar(shell_interaction & dialog, database *dat, const string & arg, bool info_details);
+static void op_restore(shell_interaction & dialog,
 		       database *dat,
 		       const vector<string> & rest,
 		       const infinint & date,
@@ -122,23 +122,23 @@ static void op_restore(user_interaction & dialog,
 		       bool early_release,
 		       bool ignore_dar_options_in_base,
 		       bool even_when_removed);
-static void op_used(user_interaction & dialog, const database *dat, S_I num, bool info_details);
-static void op_files(user_interaction & dialog, const database *dat, const string & arg, bool info_details);
-static void op_stats(user_interaction & dialog, const database *dat, bool info_details);
-static void op_move(user_interaction & dialog, database *dat, S_I src, archive_num dst, bool info_details);
-static void op_interactive(user_interaction & dialog, database *dat, string base);
-static void op_check(user_interaction & dialog, const database *dat, bool info_details);
-static void op_batch(user_interaction & dialog, database *dat, const string & filename, bool info_details);
+static void op_used(shell_interaction & dialog, const database *dat, S_I num, bool info_details);
+static void op_files(shell_interaction & dialog, const database *dat, const string & arg, bool info_details);
+static void op_stats(shell_interaction & dialog, const database *dat, bool info_details);
+static void op_move(shell_interaction & dialog, database *dat, S_I src, archive_num dst, bool info_details);
+static void op_interactive(shell_interaction & dialog, database *dat, string base);
+static void op_check(shell_interaction & dialog, const database *dat, bool info_details);
+static void op_batch(shell_interaction & dialog, database *dat, const string & filename, bool info_details);
 
-static database *read_base(user_interaction & dialog,
+static database *read_base(shell_interaction & dialog,
 			   const string & base,
 			   bool partial,
 			   bool partial_read_only,
 			   bool check_order);
-static void write_base(user_interaction & dialog, const string & filename, const database *base, bool overwrite);
-static vector<string> read_vector(user_interaction & dialog);
-static void finalize(user_interaction & dialog, operation op, database *dat, const string & base, bool info_details);
-static void action(user_interaction & dialog,
+static void write_base(shell_interaction & dialog, const string & filename, const database *base, bool overwrite);
+static vector<string> read_vector(shell_interaction & dialog);
+static void finalize(shell_interaction & dialog, operation op, database *dat, const string & base, bool info_details);
+static void action(shell_interaction & dialog,
 		   operation op,
 		   database *dat,
 		   const string & arg,
@@ -166,7 +166,7 @@ int main(S_I argc, char *const argv[], const char **env)
 			    &little_main);
 }
 
-S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
+S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
     operation op;
     string base;
@@ -183,7 +183,7 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
     bool even_when_removed;
     bool check_order;
 
-    shell_interaction_change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(&cout);
 
     if(!command_line(dialog, argc, argv, op, base, arg, num, rest, num2, date, info_details, ignore_dat_options, even_when_removed, check_order, false))
 	return EXIT_SYNTAX;
@@ -259,7 +259,7 @@ S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const 
     return EXIT_OK;
 }
 
-static bool command_line(user_interaction & dialog,
+static bool command_line(shell_interaction & dialog,
 			 S_I argc, char *const argv[],
                          operation & op,
                          string & base,
@@ -592,7 +592,7 @@ static bool command_line(user_interaction & dialog,
     return true;
 }
 
-static void op_create(user_interaction & dialog, const string & base, bool info_details)
+static void op_create(shell_interaction & dialog, const string & base, bool info_details)
 {
     database dat; // created empty;
 
@@ -606,7 +606,7 @@ static void op_create(user_interaction & dialog, const string & base, bool info_
         dialog.warning(gettext("Database has been successfully created empty."));
 }
 
-static void op_add(user_interaction & dialog, database *dat, const string &arg, string fake, const infinint & min_digits, bool info_details)
+static void op_add(shell_interaction & dialog, database *dat, const string &arg, string fake, const infinint & min_digits, bool info_details)
 {
     thread_cancellation thr;
     string arch_path, arch_base;
@@ -656,7 +656,7 @@ static void op_add(user_interaction & dialog, database *dat, const string &arg, 
 	throw Edata(gettext("Some files do not follow chronological order when archive index increases withing the database, this can lead dar_manager to restored a wrong version of these files"));
 }
 
-static void op_listing(user_interaction & dialog, const database *dat, bool info_details)
+static void op_listing(shell_interaction & dialog, const database *dat, bool info_details)
 {
     if(dat == NULL)
 	throw SRC_BUG;
@@ -664,7 +664,7 @@ static void op_listing(user_interaction & dialog, const database *dat, bool info
     dat->show_contents(dialog);
 }
 
-static void op_del(user_interaction & dialog, database *dat, S_I min, archive_num max, bool info_details)
+static void op_del(shell_interaction & dialog, database *dat, S_I min, archive_num max, bool info_details)
 {
     thread_cancellation thr;
     database_remove_options opt;
@@ -685,7 +685,7 @@ static void op_del(user_interaction & dialog, database *dat, S_I min, archive_nu
     thr.check_self_cancellation();
 }
 
-static void op_chbase(user_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details)
+static void op_chbase(shell_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details)
 {
     thread_cancellation thr;
     database_change_basename_options opt;
@@ -705,7 +705,7 @@ static void op_chbase(user_interaction & dialog, database *dat, S_I num, const s
     thr.check_self_cancellation();
 }
 
-static void op_where(user_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details)
+static void op_where(shell_interaction & dialog, database *dat, S_I num, const string & arg, bool info_details)
 {
     thread_cancellation thr;
     database_change_path_options opt;
@@ -725,7 +725,7 @@ static void op_where(user_interaction & dialog, database *dat, S_I num, const st
     thr.check_self_cancellation();
 }
 
-static void op_options(user_interaction & dialog, database *dat, const vector<string> & rest, bool info_details)
+static void op_options(shell_interaction & dialog, database *dat, const vector<string> & rest, bool info_details)
 {
     thread_cancellation thr;
 
@@ -739,7 +739,7 @@ static void op_options(user_interaction & dialog, database *dat, const vector<st
     thr.check_self_cancellation();
 }
 
-static void op_dar(user_interaction & dialog, database *dat, const string & arg, bool info_details)
+static void op_dar(shell_interaction & dialog, database *dat, const string & arg, bool info_details)
 {
     thread_cancellation thr;
 
@@ -753,7 +753,7 @@ static void op_dar(user_interaction & dialog, database *dat, const string & arg,
     thr.check_self_cancellation();
 }
 
-static void op_restore(user_interaction & dialog, database *dat, const vector<string> & rest, const infinint & date, const string & options_for_dar, bool info_details, bool early_release, bool ignore_dar_options_in_base, bool even_when_removed)
+static void op_restore(shell_interaction & dialog, database *dat, const vector<string> & rest, const infinint & date, const string & options_for_dar, bool info_details, bool early_release, bool ignore_dar_options_in_base, bool even_when_removed)
 {
     thread_cancellation thr;
     string_file strfile = string_file(options_for_dar);
@@ -776,7 +776,7 @@ static void op_restore(user_interaction & dialog, database *dat, const vector<st
     dat->restore(dialog, rest, dat_opt);
 }
 
-static void op_used(user_interaction & dialog, const database *dat, S_I num, bool info_details)
+static void op_used(shell_interaction & dialog, const database *dat, S_I num, bool info_details)
 {
     thread_cancellation thr;
     database_used_options opt;
@@ -793,7 +793,7 @@ static void op_used(user_interaction & dialog, const database *dat, S_I num, boo
     dat->show_files(dialog, rnum, opt);
 }
 
-static void op_files(user_interaction & dialog, const database *dat, const string & arg, bool info_details)
+static void op_files(shell_interaction & dialog, const database *dat, const string & arg, bool info_details)
 {
     thread_cancellation thr;
 
@@ -804,7 +804,7 @@ static void op_files(user_interaction & dialog, const database *dat, const strin
     dat->show_version(dialog, arg);
 }
 
-static void op_stats(user_interaction & dialog, const database *dat, bool info_details)
+static void op_stats(shell_interaction & dialog, const database *dat, bool info_details)
 {
     thread_cancellation thr;
 
@@ -817,7 +817,7 @@ static void op_stats(user_interaction & dialog, const database *dat, bool info_d
     dat->show_most_recent_stats(dialog);
 }
 
-static void op_move(user_interaction & dialog, database *dat, S_I src, archive_num dst, bool info_details)
+static void op_move(shell_interaction & dialog, database *dat, S_I src, archive_num dst, bool info_details)
 {
     thread_cancellation thr;
     bool date_order_problem = false;
@@ -841,7 +841,7 @@ static void op_move(user_interaction & dialog, database *dat, S_I src, archive_n
 	throw Edata(gettext("Some files do not follow chronological order when archive index increases withing the database, this can lead dar_manager to restored a wrong version of these files"));
 }
 
-static void show_usage(user_interaction & dialog, const char *command)
+static void show_usage(shell_interaction & dialog, const char *command)
 {
     dialog.printf("usage :\n\n");
     dialog.printf("\tdar_manager [options] -C [<path>/]<database>\n");
@@ -894,14 +894,14 @@ static void show_usage(user_interaction & dialog, const char *command)
     dialog.printf(gettext("See man page for more options.\n"));
 }
 
-static void show_version(user_interaction & dialog, const char *command_name)
+static void show_version(shell_interaction & dialog, const char *command_name)
 {
     string name;
     tools_extract_basename(command_name, name);
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    shell_interaction_change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(&cout);
     dialog.printf("\n %s version %s, Copyright (C) 2002-2052 Denis Corbin\n", name.c_str(), DAR_MANAGER_VERSION);
     dialog.warning(string("   ") + dar_suite_command_line_features() + "\n");
     if(maj > 2)
@@ -955,7 +955,7 @@ static const struct option *get_long_opt()
 }
 #endif
 
-static database *read_base(user_interaction & dialog, const string & base, bool partial, bool partial_read_only, bool check_order)
+static database *read_base(shell_interaction & dialog, const string & base, bool partial, bool partial_read_only, bool check_order)
 {
     database *ret = NULL;
 
@@ -979,7 +979,7 @@ static database *read_base(user_interaction & dialog, const string & base, bool 
     return ret;
 }
 
-static void write_base(user_interaction & dialog, const string & filename, const database *base, bool overwrite)
+static void write_base(shell_interaction & dialog, const string & filename, const database *base, bool overwrite)
 {
     thread_cancellation thr;
     database_dump_options dat_opt;
@@ -990,7 +990,7 @@ static void write_base(user_interaction & dialog, const string & filename, const
     thr.block_delayed_cancellation(false);
 }
 
-static void op_interactive(user_interaction & dialog, database *dat, string base)
+static void op_interactive(shell_interaction & dialog, database *dat, string base)
 {
     char choice;
     bool saved = true;
@@ -1038,7 +1038,7 @@ static void op_interactive(user_interaction & dialog, database *dat, string base
 
 		// user's choice selection
 
-	    shell_interaction_read_char(choice);
+	    dialog.read_char(choice);
 	    thr.check_self_cancellation();
 	    dialog.printf("\n\n");
 
@@ -1217,7 +1217,7 @@ static void op_interactive(user_interaction & dialog, database *dat, string base
 	throw SRC_BUG;
 }
 
-static void op_check(user_interaction & dialog, const database *dat, bool info_details)
+static void op_check(shell_interaction & dialog, const database *dat, bool info_details)
 {
     thread_cancellation thr;
 
@@ -1233,7 +1233,7 @@ static void op_check(user_interaction & dialog, const database *dat, bool info_d
     thr.check_self_cancellation();
 }
 
-static void op_batch(user_interaction & dialog, database *dat, const string & filename, bool info_details)
+static void op_batch(shell_interaction & dialog, database *dat, const string & filename, bool info_details)
 {
     const string pseudo_cmd = "dar_manager"; // to take the place of the command on the simulated command-line
     string line;
@@ -1311,7 +1311,7 @@ static void op_batch(user_interaction & dialog, database *dat, const string & fi
     }
 }
 
-static vector<string> read_vector(user_interaction & dialog)
+static vector<string> read_vector(shell_interaction & dialog)
 {
     vector<string> ret;
     string tmp;
@@ -1331,7 +1331,7 @@ static vector<string> read_vector(user_interaction & dialog)
     return ret;
 }
 
-static void finalize(user_interaction & dialog, operation op, database *dat, const string & base, bool info_details)
+static void finalize(shell_interaction & dialog, operation op, database *dat, const string & base, bool info_details)
 {
     switch(op)
     {
@@ -1361,7 +1361,7 @@ static void finalize(user_interaction & dialog, operation op, database *dat, con
     }
 }
 
-static void action(user_interaction & dialog,
+static void action(shell_interaction & dialog,
 		   operation op,
 		   database *dat,
 		   const string & arg,

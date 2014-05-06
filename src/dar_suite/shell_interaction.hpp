@@ -27,6 +27,13 @@
 #ifndef SHELL_INTERACTION_HPP
 #define SHELL_INTERACTION_HPP
 
+extern "C"
+{
+#if HAVE_TERMIOS_H
+#include <termios.h>
+#endif
+} // end extern "C"
+
 #include "../my_config.h"
 #include <iostream>
 
@@ -38,22 +45,59 @@ using namespace libdar;
     /// \addtogroup CMDLINE
     /// @{
 
-    ///////////////
-    // THIS AN OLD IMPLEMENTATION (a la C) THAT SHOULD BE REVIEWED USING A INHERITED CLASS FROM LIBDAR::USER_INTERACTION_CALLBACK
-    ///////////////
+class shell_interaction : public user_interaction_callback
+{
+public:
+	/// constructor
+	///
+	/// \param[in] out defines where are sent non interactive messages (informative messages)
+	/// \param[in] interact defines where are sent interactive messages (those requiring an answer or confirmation) from the user
+	/// \param[in] silent whether to send a warning message if the process is not attached to a terminal
+	/// \note out and interact must exist during the whole life of the shell_interaction object, its remains the duty
+	/// of the caller to releases theses ostream objects if necessary.
+    shell_interaction(ostream *out, ostream *interact, bool silent);
 
-    /// create and return the address of the (unique) shell_interaction object
-    ///
-    /// \param[in] out defines where are sent non interactive messages (informative messages)
-    /// \param[in] interact defines where are sent interactive messages (those requiring an answer or confirmation) from the user
-    /// \param[in] silent whether to send a warning message if the process is not attached to a terminal
-    /// \note the returned object must be freed by a call to "delete"
-user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool silent);
+	/// copy constructor
+    shell_interaction(const shell_interaction & ref);
 
-void shell_interaction_change_non_interactive_output(ostream *out);
-void shell_interaction_read_char(char & a);
-void shell_interaction_close();
-void shell_interaction_set_beep(bool mode);
+	/// destructor
+    ~shell_interaction();
+
+    void change_non_interactive_output(ostream *out);
+    void read_char(char & a);
+    void set_beep(bool mode) { beep = mode; };
+
+
+	    /// overwritting method from parent class.
+    virtual user_interaction *clone() const { user_interaction *ret = new (get_pool()) shell_interaction(*this); if(ret == NULL) throw Ememory("shell_interaction::clone"); return ret; };
+
+private:
+	// data type
+
+    enum mode { m_initial, m_inter, m_noecho };
+
+	// object fields and methods
+
+    S_I input;               //< filedescriptor to read from the user's answers
+    ostream *output;         //< holds the destination for non interactive messages
+    ostream *inter;          //< holds the destination for interactive messages
+    bool beep;               //< whether to issue bell char before displaying a new interactive message
+    termios initial;         //< controlling terminal configuration when the object has been created
+    termios interaction;     //< controlling terminal configuration to use when requiring user interaction
+    termios initial_noecho;  //< controlling terminal configuration to use when noecho has been requested
+    bool has_terminal;       //< true if a terminal could be found
+
+    void set_term_mod(mode m);
+
+	// class fields and methods
+
+    static const U_I bufsize;
+
+    static bool interaction_pause(const string &message, void *context);
+    static void interaction_warning(const string & message, void *context);
+    static string interaction_string(const string & message, bool echo, void *context);
+    static secu_string interaction_secu_string(const string & message, bool echo, void *context);
+};
 
     /// @}
 

@@ -139,7 +139,10 @@ void f2()
 
 void f3()
 {
-    user_interaction *dialog = shell_interaction_init(&cout, &cerr, false);
+    user_interaction *dialog = new (nothrow) shell_interaction(&cout, &cerr, false);
+    if(dialog == NULL)
+	cout << "ERREUR !" << endl;
+
     try
     {
 	fichier_local fic = fichier_local(*dialog, "toto", gf_read_write, 0666, false, true, false);
@@ -213,7 +216,7 @@ void f3()
     {
 	cout << "unknown exception caught" << endl;
     }
-    shell_interaction_close();
+
     if(dialog != NULL)
 	delete dialog;
 }

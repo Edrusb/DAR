@@ -23,10 +23,6 @@
 
 extern "C"
 {
-#if HAVE_TERMIOS_H
-#include <termios.h>
-#endif
-
 #if HAVE_ERRNO_H
 #include <errno.h>
 #endif
@@ -69,12 +65,17 @@ char *strchr (), *strrchr ();
 #include <limits.h>
 #endif
 
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
+
 } // end extern "C"
 
     // L_ctermid should be defined from stdio.h but this is not
     // the case under cygwin! So we define it ourself with a
     // somehow arbitrarily large value taking the risk it to be
-    // too short and having ctermid() writing over the
+    // too short and having ctermid() writing over the reserved buffer
+    // space
 #ifndef L_ctermid
 #define L_ctermid 200
 #endif
@@ -85,41 +86,34 @@ char *strchr (), *strrchr ();
 #include "tools.hpp"
 #include "integers.hpp"
 #include "cygwin_adapt.hpp"
+#include "tools.hpp"
 
 using namespace std;
 using namespace libdar;
 
-static S_I input = -1;
-static ostream *output = NULL;
-static ostream *inter = NULL;
-static bool beep = false;
-static termios initial;
-static termios interaction;
-static termios initial_noecho;
-static bool has_terminal = false;
+#ifdef SSIZE_MAX
+const U_I shell_interaction::bufsize = 1024 > SSIZE_MAX ? SSIZE_MAX : 1024;
+#else
+const U_I shell_interaction::bufsize = 1024;
+#endif
 
-static void set_term_mod(const struct termios & etat);
-static bool interaction_pause(const string &message, void *context);
-static void interaction_warning(const string & message, void *context);
-static string interaction_string(const string & message, bool echo, void *context);
-static secu_string interaction_secu_string(const string & message, bool echo, void *context);
 
-user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool silent)
+shell_interaction::shell_interaction(ostream *out, ostream *interact, bool silent):
+    user_interaction_callback(interaction_warning,
+			      interaction_pause,
+			      interaction_string,
+			      interaction_secu_string,
+			      (void *)this)
 {
     has_terminal = false;
-    user_interaction *ret = new (nothrow) user_interaction_callback(interaction_warning,
-								    interaction_pause,
-								    interaction_string,
-								    interaction_secu_string,
-								    NULL);
-    if(ret == NULL)
-	throw Ememory("shell_interaction_init");
+    beep = false;
 
-        // checking and recording parameters to static variable
+	// updating object fields
     if(out != NULL)
         output = out;
     else
         throw SRC_BUG;
+
     if(interact != NULL)
         inter = interact;
     else
@@ -132,8 +126,6 @@ user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool s
         // standart input for piping data while still having user interaction
         // possible.
 
-    if(input >= 0)
-        close(input);
 
         // terminal settings
     try
@@ -165,8 +157,8 @@ user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool s
 		    interaction = term;
 
 			// checking now that we can change to character mode
-		    set_term_mod(interaction);
-		    set_term_mod(initial);
+		    set_term_mod(m_inter);
+		    set_term_mod(m_initial);
 			// but we don't need it right now, so swapping back to line mode
 		    has_terminal = true;
 		}
@@ -179,47 +171,38 @@ user_interaction *shell_interaction_init(ostream *out, ostream *interact, bool s
 	if(e.get_message() == "")
 	{
 	    if(!silent)
-		ret->warning(gettext("No terminal found for user interaction. All questions will be assumed a negative answer (less destructive choice), which most of the time will abort the program."));
+		warning(gettext("No terminal found for user interaction. All questions will be assumed a negative answer (less destructive choice), which most of the time will abort the program."));
 	}
 	else
 	    throw;
     }
-    return ret;
 }
 
-void shell_interaction_change_non_interactive_output(ostream *out)
+	/// copy constructor
+shell_interaction::shell_interaction(const shell_interaction & ref) : user_interaction_callback(ref)
 {
-    if(out != NULL)
-        output = out;
+    if(ref.input >= 0)
+    {
+	input = dup(ref.input);
+	if(input < 0)
+	    throw Erange("shell_interaction::shell_interaction", string("Failed dup()-licating file descriptor: ") + tools_strerror_r(errno));
+    }
     else
-        throw SRC_BUG;
+	input = ref.input;
+    output = ref.output;
+    inter = ref.inter;
+    beep = ref.beep;
+    initial = ref.initial;
+    interaction = ref.interaction;
+    initial_noecho = ref.initial_noecho;
+    has_terminal = ref.has_terminal;
 }
 
-void shell_interaction_set_beep(bool mode)
-{
-    beep = mode;
-}
 
-void shell_interaction_read_char(char & a)
-{
-    sigset_t old_mask;
-
-    if(input < 0)
-	throw SRC_BUG;
-
-    tools_block_all_signals(old_mask);
-    set_term_mod(interaction);
-    if(read(input, &a, 1) < 0)
-	throw Erange("shell_interaction_read_char", string(gettext("Error reading character: ")) + strerror(errno));
-    tools_blocking_read(input, true);
-    set_term_mod(initial);
-    tools_set_back_blocked_signals(old_mask);
-}
-
-void shell_interaction_close()
+shell_interaction::~shell_interaction()
 {
     if(has_terminal)
-	set_term_mod(initial);
+	set_term_mod(m_initial);
 
     if(input >= 0)
     {
@@ -228,32 +211,71 @@ void shell_interaction_close()
     }
 }
 
-static void set_term_mod(const struct termios & etat)
+
+void shell_interaction::change_non_interactive_output(ostream *out)
 {
-    if(tcsetattr(input, TCSANOW, const_cast<struct termios *>(&etat)) < 0)
+    if(out != NULL)
+        output = out;
+    else
+        throw SRC_BUG;
+}
+
+void shell_interaction::read_char(char & a)
+{
+    sigset_t old_mask;
+
+    if(input < 0)
+	throw SRC_BUG;
+
+    tools_block_all_signals(old_mask);
+    set_term_mod(m_inter);
+    if(read(input, &a, 1) < 0)
+	throw Erange("shell_interaction_read_char", string(gettext("Error reading character: ")) + strerror(errno));
+    tools_blocking_read(input, true);
+    set_term_mod(m_initial);
+    tools_set_back_blocked_signals(old_mask);
+}
+
+void shell_interaction::set_term_mod(shell_interaction::mode m)
+{
+    termios *ptr = NULL;
+    switch(m)
+    {
+    case m_initial:
+	ptr = &initial;
+	break;
+    case m_inter:
+	ptr = &interaction;
+	break;
+    case m_noecho:
+	ptr = &initial_noecho;
+	break;
+    default:
+	throw SRC_BUG;
+    }
+
+    if(tcsetattr(input, TCSANOW, ptr) < 0)
         throw Erange("shell_interaction : set_term_mod", string(gettext("Error while changing user terminal properties: ")) + strerror(errno));
 }
 
-static bool interaction_pause(const string &message, void *context)
+bool shell_interaction::interaction_pause(const string &message, void *context)
 {
-    const U_I expected_buf_size = 1024;
-#ifdef SSIZE_MAX
-    const U_I bufsize = expected_buf_size > SSIZE_MAX ? SSIZE_MAX : expected_buf_size;
-#else
-    const U_I bufsize = expected_buf_size;
-#endif
+    shell_interaction *obj = (shell_interaction *)(context);
     char buffer[bufsize];
     char & a = buffer[0];
     char & b = buffer[1];
     bool ret;
 
-    if(!has_terminal)
+    if(obj == NULL)
+	throw SRC_BUG;
+
+    if(!obj->has_terminal)
         return false;
 
-    if(input < 0)
+    if(obj->input < 0)
         throw SRC_BUG;
 
-    set_term_mod(interaction);
+    obj->set_term_mod(shell_interaction::m_inter);
     try
     {
 	sigset_t old_mask;
@@ -264,26 +286,26 @@ static bool interaction_pause(const string &message, void *context)
         {
 		// flushing any character remaining in the input stream
 
-	    tools_blocking_read(input, false);
-	    while(read(input, buffer, bufsize) >= 0)
+	    tools_blocking_read(obj->input, false);
+	    while(read(obj->input, buffer, bufsize) >= 0)
 		;
-	    tools_blocking_read(input, true);
+	    tools_blocking_read(obj->input, true);
 
 		// now asking the user
 
-            *inter << message << gettext(" [return = YES | Esc = NO]") << (beep ? "\007\007\007" : "") << endl;
+            *(obj->inter) << message << gettext(" [return = YES | Esc = NO]") << (obj->beep ? "\007\007\007" : "") << endl;
 	    tools_block_all_signals(old_mask);
-	    tmp_ret = read(input, &a, 1);
+	    tmp_ret = read(obj->input, &a, 1);
 	    errno_bk = errno;
 
 		// checking if another character is available in the pipe
 
-	    tools_blocking_read(input, false);
+	    tools_blocking_read(obj->input, false);
 	    errno_sup = EAGAIN+1; // = something different from EAGAIN, whatever it is...
 	    usleep(10000); // let a change for any other typed character to reach the input device
-	    tmp_sup = read(input, &b, 1);
+	    tmp_sup = read(obj->input, &b, 1);
 	    errno_sup = errno;
-	    tools_blocking_read(input, true);
+	    tools_blocking_read(obj->input, true);
 
 		// checking error conditions
 
@@ -295,30 +317,35 @@ static bool interaction_pause(const string &message, void *context)
         while((a != 27 && a != '\n') || tmp_sup != -1 || errno_sup != EAGAIN);
 
         if(a != 27)
-            *inter << gettext("Continuing...") << endl;
+            *(obj->inter) << gettext("Continuing...") << endl;
         else
-            *inter << gettext("Escaping...") << endl;
+            *(obj->inter) << gettext("Escaping...") << endl;
 
         ret = a != 27; // 27 is escape key
     }
     catch(...)
     {
-        set_term_mod(initial);
+        obj->set_term_mod(shell_interaction::m_initial);
         throw;
     }
-    set_term_mod(initial);
+    obj->set_term_mod(shell_interaction::m_initial);
 
     return ret;
 }
 
-static void interaction_warning(const string & message, void *context)
+void shell_interaction::interaction_warning(const string & message, void *context)
 {
-    if(output == NULL)
+    shell_interaction *obj = (shell_interaction *)(context);
+
+    if(obj == NULL)
+	throw SRC_BUG;
+
+    if(obj->output == NULL)
         throw SRC_BUG; // shell_interaction has not been properly initialized
-    *output << message;
+    *(obj->output) << message;
 }
 
-static string interaction_string(const string & message, bool echo, void *context)
+string shell_interaction::interaction_string(const string & message, bool echo, void *context)
 {
     string ret;
     const U_I expected_taille = 100;
@@ -330,16 +357,21 @@ static string interaction_string(const string & message, bool echo, void *contex
     U_I lu, i;
     char buffer[taille+1];
     bool fin = false;
+    shell_interaction *obj = (shell_interaction *)(context);
+
+    if(obj == NULL)
+	throw SRC_BUG;
+
 
     if(!echo)
-	set_term_mod(initial_noecho);
+	obj->set_term_mod(shell_interaction::m_initial);
 
-    if(output == NULL || input < 0)
+    if(obj->output == NULL || obj->input < 0)
 	throw SRC_BUG;  // shell_interaction has not been properly initialized
-    *inter << message;
+    *(obj->inter) << message;
     do
     {
-	lu = ::read(input, buffer, taille);
+	lu = ::read(obj->input, buffer, taille);
 	i = 0;
 	while(i < lu && buffer[i] != '\n')
 	    ++i;
@@ -350,13 +382,13 @@ static string interaction_string(const string & message, bool echo, void *contex
     }
     while(!fin);
     if(!echo)
-	*inter << endl;
-    set_term_mod(initial);
+	*(obj->inter) << endl;
+    obj->set_term_mod(shell_interaction::m_initial);
 
     return ret;
 }
 
-static secu_string interaction_secu_string(const string & message, bool echo, void *context)
+secu_string shell_interaction::interaction_secu_string(const string & message, bool echo, void *context)
 {
     const U_I expected_taille = 1000;
 #ifdef SSIZE_MAX
@@ -367,18 +399,23 @@ static secu_string interaction_secu_string(const string & message, bool echo, vo
     secu_string ret = taille;
     bool fin = false;
     U_I last = 0, i = 0;
+    shell_interaction *obj = (shell_interaction *)(context);
+
+    if(obj == NULL)
+	throw SRC_BUG;
+
 
     if(!echo)
-	set_term_mod(initial_noecho);
+	obj->set_term_mod(shell_interaction::m_noecho);
 
     try
     {
-	if(output == NULL || input < 0)
+	if(obj->output == NULL || obj->input < 0)
 	    throw SRC_BUG;  // shell_interaction has not been properly initialized
-	*inter << message;
+	*(obj->inter) << message;
 	do
 	{
-	    ret.append(input, taille - ret.size());
+	    ret.append(obj->input, taille - ret.size());
 	    i = last;
 	    while(i < ret.size() && ret.c_str()[i] != '\n')
 		++i;
@@ -396,14 +433,14 @@ static secu_string interaction_secu_string(const string & message, bool echo, vo
 	while(!fin);
 
 	if(!echo)
-	    *inter << endl;
+	    *(obj->inter) << endl;
     }
     catch(...)
     {
-	set_term_mod(initial);
+	obj->set_term_mod(shell_interaction::m_initial);
 	throw;
     }
-    set_term_mod(initial);
+    obj->set_term_mod(shell_interaction::m_initial);
 
     return ret;
 }

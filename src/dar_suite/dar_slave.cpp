@@ -74,13 +74,13 @@ using namespace std;
 
 #define DAR_SLAVE_VERSION "1.4.5"
 
-static bool command_line(user_interaction & dialog,
+static bool command_line(shell_interaction & dialog,
 			 S_I argc, char * const argv[], path * &chemin, string & filename,
                          string &input_pipe, string &output_pipe, string & execute,
 			 infinint & min_digits);
-static void show_usage(user_interaction & dialog, const char *command);
-static void show_version(user_interaction & dialog, const char *command);
-static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env);
+static void show_usage(shell_interaction & dialog, const char *command);
+static void show_version(shell_interaction & dialog, const char *command);
+static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env);
 
 int main(S_I argc, char * const argv[], const char **env)
 {
@@ -94,7 +94,7 @@ int main(S_I argc, char * const argv[], const char **env)
 			     &little_main);
 }
 
-static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[], const char **env)
+static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)
 {
     path *chemin = NULL;
     string filename;
@@ -161,7 +161,7 @@ static S_I little_main(user_interaction & dialog, S_I argc, char * const argv[],
         return EXIT_SYNTAX;
 }
 
-static bool command_line(user_interaction & dialog,
+static bool command_line(shell_interaction & dialog,
 			 S_I argc,char * const argv[], path * &chemin, string & filename,
                          string &input_pipe, string &output_pipe, string & execute,
     			 infinint & min_digits)
@@ -248,11 +248,11 @@ static bool command_line(user_interaction & dialog,
     return true;
 }
 
-static void show_usage(user_interaction & dialog, const char *command)
+static void show_usage(shell_interaction & dialog, const char *command)
 {
     string cmd;
     tools_extract_basename(command, cmd);
-    shell_interaction_change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(&cout);
 
     dialog.printf("\nusage : \n");
     dialog.printf("  command1 | %s [options] [<path>/]basename | command2\n", cmd.c_str());
@@ -269,14 +269,14 @@ static void show_usage(user_interaction & dialog, const char *command)
     dialog.printf(gettext("See man page for more options.\n"));
 }
 
-static void show_version(user_interaction & dialog, const char *command)
+static void show_version(shell_interaction & dialog, const char *command)
 {
     string cmd;
     tools_extract_basename(command, cmd);
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    shell_interaction_change_non_interactive_output(&cout);
+    dialog.change_non_interactive_output(&cout);
     dialog.printf("\n %s version %s Copyright (C) 2002-2052 Denis Corbin\n\n", cmd.c_str(), DAR_SLAVE_VERSION);
     if(maj > 2)
 	dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);
