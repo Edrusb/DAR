@@ -32,7 +32,7 @@
 using namespace std;
 using namespace libdar;
 
-static user_interaction *ui = NULL;
+static shell_interaction ui = shell_interaction(&cout, &cerr, false);
 
 void encrypt(const string & src, const string & dst);
 void decrypt(const string & src, const string & dst);
@@ -48,8 +48,6 @@ int main(int argc, char *argv[])
     }
 
     get_version(maj, med, min);
-    if(ui == NULL)
-	cout << "ERREUR !" << endl;
 
     try
     {
@@ -58,11 +56,11 @@ int main(int argc, char *argv[])
     }
     catch(Egeneric & e)
     {
-	ui->printf("Exception caught: %S", &(e.get_message()));
+	ui.printf("Exception caught: %S", &(e.get_message()));
     }
     catch(...)
     {
-	ui->printf("unknown exception caught");
+	ui.printf("unknown exception caught");
     }
 
     return 0;
@@ -70,18 +68,17 @@ int main(int argc, char *argv[])
 
 void encrypt(const string & src, const string & dst)
 {
-    fichier_local fsrc = fichier_local(*ui, src, gf_read_only, 0, false, false, false);
-    fichier_local fdst = fichier_local(*ui, dst, gf_write_only, 0644, false, true, false);
+    fichier_local fsrc = fichier_local(ui, src, gf_read_only, 0, false, false, false);
+    fichier_local fdst = fichier_local(ui, dst, gf_write_only, 0644, false, true, false);
     vector<string> recipients;
 
     recipients.push_back("dar.linux@free.fr");
-    recipients.push_back("denis.corbin@free.fr");
 
 	// must use a pointer to be sure crypto_asym
 	// object is destroyed before fdst
-    crypto_asym *cr = new crypto_asym(*ui, &fdst, recipients);
+    crypto_asym *cr = new crypto_asym(ui, &fdst, recipients);
     if(cr == NULL)
-	ui->printf("Allocation failure");
+	ui.printf("Allocation failure");
     else
     {
 	try
@@ -99,14 +96,14 @@ void encrypt(const string & src, const string & dst)
 
 void decrypt(const string & src, const string & dst)
 {
-    fichier_local fsrc = fichier_local(*ui, src, gf_read_only, 0, false, false, false);
-    fichier_local fdst = fichier_local(*ui, dst, gf_write_only, 0644, false, true, false);
+    fichier_local fsrc = fichier_local(ui, src, gf_read_only, 0, false, false, false);
+    fichier_local fdst = fichier_local(ui, dst, gf_write_only, 0644, false, true, false);
 
 	// same thing here, using pointer to be sure the crypto_asym objet
 	// is destroyed before fsrc
-    crypto_asym *decr = new crypto_asym(*ui, &fsrc);
+    crypto_asym *decr = new crypto_asym(ui, &fsrc);
     if(decr == NULL)
-	ui->printf("Allocation failure");
+	ui.printf("Allocation failure");
     else
     {
 	try
