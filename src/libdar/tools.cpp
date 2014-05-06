@@ -2631,7 +2631,7 @@ namespace libdar
 	if(val != buffer)
 	    strncpy(buffer, val, MSGSIZE);
 #endif
-	buffer[MSGSIZE] = '\0';
+	buffer[MSGSIZE-1] = '\0';
 	ret = buffer;
 
 	return ret;
@@ -2645,7 +2645,7 @@ namespace libdar
 	string ret;
 
 	(void)gpgme_strerror_r(err, buffer, MSGSIZE);
-	buffer[MSGSIZE] = '\0';
+	buffer[MSGSIZE-1] = '\0';
 	ret = buffer;
 
 	return ret;
