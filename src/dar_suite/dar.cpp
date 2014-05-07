@@ -114,6 +114,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    archive_options_listing listing_options;
 	    archive_options_diff diff_options;
 	    archive_options_test test_options;
+	    bool no_cipher_given;
 
             switch(param.op)
             {
@@ -121,11 +122,17 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    case merging:
 		if(param.ref_filename != NULL && param.ref_root != NULL)
 		{
-		    line_tools_crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass);
+		    line_tools_crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass, no_cipher_given);
 		    if(param.op == merging && param.aux_root != NULL && param.info_details)
 			dialog.warning(gettext("Considering the (first) archive of reference:"));
 		    read_options.clear();
-		    read_options.set_crypto_algo(crypto);
+		    if(no_cipher_given)
+			    // since archive format 9 crypto algo used
+			    // is stored in the archive, it will be used
+			    // unless we specify explicitely the cipher to use
+			read_options.set_crypto_algo(libdar::crypto_none);
+		    else
+			read_options.set_crypto_algo(crypto);
 		    read_options.set_crypto_pass(tmp_pass);
 		    read_options.set_crypto_size(param.crypto_size_ref);
 		    read_options.set_input_pipe(param.input_pipe);
@@ -154,9 +161,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    {
 			if(param.info_details)
 			    dialog.warning(gettext("Considering the second (alias auxiliary) archive of reference:"));
-			line_tools_crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass);
+			line_tools_crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass, no_cipher_given);
 			read_options.clear();
-			read_options.set_crypto_algo(aux_crypto);
+			if(no_cipher_given)
+				// since archive format 9 crypto algo used
+				// is stored in the archive, it will be used
+				// unless we specify explicitely the cipher to use
+			    read_options.set_crypto_algo(libdar::crypto_none);
+			else
+			    read_options.set_crypto_algo(aux_crypto);
 			read_options.set_crypto_pass(tmp_pass);
 			read_options.set_crypto_size(param.aux_crypto_size);
 			read_options.set_execute(param.aux_execute);
@@ -171,7 +184,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    }
 		}
 
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
 
 		switch(param.op)
 		{
@@ -320,7 +333,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    dialog.warning(gettext("Now performing on-fly isolation..."));
 			if(cur == NULL)
 			    throw SRC_BUG;
-			line_tools_crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass);
+			line_tools_crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass, no_cipher_given);
 			isolate_options.clear();
 			isolate_options.set_allow_over(param.allow_over);
 			isolate_options.set_warn_over(param.warn_over);
@@ -357,9 +370,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		}
 		break;
             case isolate:
-		line_tools_crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass, no_cipher_given);
 		read_options.clear();
-		read_options.set_crypto_algo(crypto);
+		if(no_cipher_given)
+			// since archive format 9 crypto algo used
+			// is stored in the archive, it will be used
+			// unless we specify explicitely the cipher to use
+		    read_options.set_crypto_algo(libdar::crypto_none);
+		else
+		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
 		read_options.set_crypto_size(param.crypto_size_ref);
 		read_options.set_input_pipe(param.input_pipe);
@@ -375,7 +394,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		else
 		    arch->drop_all_filedescriptors(dialog);
 
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
 		isolate_options.clear();
 		isolate_options.set_allow_over(param.allow_over);
 		isolate_options.set_warn_over(param.warn_over);
@@ -403,9 +422,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 				 isolate_options);
 		break;
             case extract:
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
 		read_options.clear();
-		read_options.set_crypto_algo(crypto);
+		if(no_cipher_given)
+			// since archive format 9 crypto algo used
+			// is stored in the archive, it will be used
+			// unless we specify explicitely the cipher to use
+		    read_options.set_crypto_algo(libdar::crypto_none);
+		else
+		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
 		read_options.set_crypto_size(param.crypto_size);
 		read_options.set_input_pipe(param.input_pipe);
@@ -421,9 +446,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
 
-		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
+		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass, no_cipher_given);
 		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
-		    read_options.set_ref_crypto_algo(ref_crypto);
+		    if(no_cipher_given)
+			    // since archive format 9 crypto algo used
+			    // is stored in the archive, it will be used
+			    // unless we specify explicitely the cipher to use
+			read_options.set_ref_crypto_algo(libdar::crypto_none);
+		    else
+  		        read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
 		    read_options.set_ref_crypto_size(param.crypto_size_ref);
 		    read_options.set_ref_execute(param.execute_ref);
@@ -486,9 +517,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
                     throw Edata(gettext("All files asked could not be restored"));
                 break;
             case diff:
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
 		read_options.clear();
-		read_options.set_crypto_algo(crypto);
+		if(no_cipher_given)
+			// since archive format 9 crypto algo used
+			// is stored in the archive, it will be used
+			// unless we specify explicitely the cipher to use
+		    read_options.set_crypto_algo(libdar::crypto_none);
+		else
+ 		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
 		read_options.set_crypto_size(param.crypto_size);
 		read_options.set_input_pipe(param.input_pipe);
@@ -504,9 +541,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
 
-		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
+		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass, no_cipher_given);
 		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
-		    read_options.set_ref_crypto_algo(ref_crypto);
+		    if(no_cipher_given)
+			    // since archive format 9 crypto algo used
+			    // is stored in the archive, it will be used
+			    // unless we specify explicitely the cipher to use
+			read_options.set_ref_crypto_algo(libdar::crypto_none);
+		    else
+			read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
 		    read_options.set_ref_crypto_size(param.crypto_size_ref);
 		    read_options.set_ref_execute(param.execute_ref);
@@ -542,9 +585,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
                     throw Edata(gettext("Some file comparisons failed"));
                 break;
 	    case test:
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
 		read_options.clear();
-		read_options.set_crypto_algo(crypto);
+		if(no_cipher_given)
+			// since archive format 9 crypto algo used
+			// is stored in the archive, it will be used
+			// unless we specify explicitely the cipher to use
+		    read_options.set_crypto_algo(libdar::crypto_none);
+		else
+		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
 		read_options.set_crypto_size(param.crypto_size);
 		read_options.set_input_pipe(param.input_pipe);
@@ -560,9 +609,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
 
-		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
+		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass, no_cipher_given);
 		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
-		    read_options.set_ref_crypto_algo(ref_crypto);
+		    if(no_cipher_given)
+			    // since archive format 9 crypto algo used
+			    // is stored in the archive, it will be used
+			    // unless we specify explicitely the cipher to use
+			read_options.set_ref_crypto_algo(libdar::crypto_none);
+		    else
+			read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
 		    read_options.set_ref_crypto_size(param.crypto_size_ref);
 		    read_options.set_ref_execute(param.execute_ref);
@@ -591,9 +646,15 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
                 break;
 
             case listing:
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
 		read_options.clear();
-		read_options.set_crypto_algo(crypto);
+		if(no_cipher_given)
+			// since archive format 9 crypto algo used
+			// is stored in the archive, it will be used
+			// unless we specify explicitely the cipher to use
+		    read_options.set_crypto_algo(libdar::crypto_none);
+		else
+		    read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
 		read_options.set_crypto_size(param.crypto_size);
 		read_options.set_input_pipe(param.input_pipe);

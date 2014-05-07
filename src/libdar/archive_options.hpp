@@ -81,6 +81,11 @@ namespace libdar
 
 
 	    /// defines the the crypto cypher to use to read the archive (default is crypto_none)
+	    /// \note since release 2.5.0 you may and should provide crypto_none in any case (the default value)
+	    /// for libdar uses the algorithm stored in the archive. However you way override this
+	    /// (in case of corruption for example) by explicitely specifying a crypto algorithm
+	    /// in that case the value of the crypto algorithm stored in the archive is ignored
+	    /// and the algorithm used to decipher is the one specified here.
 	void set_crypto_algo(crypto_algo val) { x_crypto = val; };
 
 	    /// defines the password or passphrase to decrypt (unused if encryption is not set)

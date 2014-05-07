@@ -328,6 +328,9 @@ namespace libdar
 	    if(info_details)
 		dialog.warning(gettext("Considering cyphering layer..."));
 
+	    if((ver.flag & VERSION_FLAG_SCRAMBLED) != 0 && ver.edition >= 9 && crypto == crypto_none && ver.sym != crypto_none)
+		crypto = ver.sym; // using the crypto algorithm recorded in the archive
+
 	    if(((ver.flag & VERSION_FLAG_SCRAMBLED) != 0) && crypto == crypto_none)
 	    {
 		if(lax)
@@ -946,6 +949,7 @@ namespace libdar
 		ver.algo_zip = compression2char(algo);
 		ver.cmd_line = user_comment;
 		ver.flag = 0;
+		ver.sym = crypto;
 
 		    // optaining a password on-fly if necessary
 

@@ -755,9 +755,10 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
     }
 }
 
-void line_tools_crypto_split_algo_pass(const secu_string & all, crypto_algo & algo, secu_string & pass)
+void line_tools_crypto_split_algo_pass(const secu_string & all, crypto_algo & algo, secu_string & pass, bool & no_cipher_given)
 {
-	// split from "algo:pass" syntax
+	// split from "algo:pass" "algo" "pass" "algo:" ":pass" syntaxes
+
     const char *it = all.c_str();
     const char *fin = all.c_str() + all.size(); // points past the last byte of the secu_string "all"
     secu_string tmp;
@@ -774,9 +775,15 @@ void line_tools_crypto_split_algo_pass(const secu_string & all, crypto_algo & al
 
 	if(it != fin) // a ':' is present in the given string
 	{
+		// tmp holds the string before ':'
 	    tmp = secu_string(all.c_str(), it - all.c_str());
 	    ++it;
+
+		// pass holds the string after ':'
 	    pass = secu_string(it, fin - it);
+
+	    no_cipher_given = (tmp == "");
+
 	    if(tmp == "scrambling" || tmp == "scram")
 		algo = crypto_scrambling;
 	    else
@@ -802,6 +809,7 @@ void line_tools_crypto_split_algo_pass(const secu_string & all, crypto_algo & al
 	}
 	else // no ':' using blowfish as default cypher
 	{
+	    no_cipher_given = true;
 	    algo = crypto_blowfish;
 	    pass = all;
 	}

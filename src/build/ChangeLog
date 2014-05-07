@@ -32,6 +32,8 @@ from 2.4.x to 2.5.0
 - added feature: comparison of an isolated catalogue with a filesystem,
   relying on embedded data CRC and inode metadata in absence of the saved
   data.
+- This new archive format (version 9) holds the ciphering algorithm used
+  at creation time, only the passphrase is required at reading time.
 
 from 2.4.13 to 2.4.14
 - limiting memory consumtion of the cache layer to stay below 10 MiB, under
