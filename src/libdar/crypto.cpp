@@ -56,58 +56,6 @@ using namespace std;
 namespace libdar
 {
 
-    void crypto_split_algo_pass(const secu_string & all, crypto_algo & algo, secu_string & pass)
-    {
-	    // split from "algo:pass" syntax
-	const char *it = all.c_str();
-	const char *fin = all.c_str() + all.size(); // points past the last byte of the secu_string "all"
-	secu_string tmp;
-
-	if(all.size() == 0)
-	{
-	    algo = crypto_none;
-	    pass.clear();
-	}
-	else
-	{
-	    while(it != fin && *it != ':')
-		++it;
-
-	    if(it != fin) // a ':' is present in the given string
-	    {
-		tmp = secu_string(all.c_str(), it - all.c_str());
-		++it;
-		pass = secu_string(it, fin - it);
-		if(tmp == "scrambling" || tmp == "scram")
-		    algo = crypto_scrambling;
-		else
-		    if(tmp == "none")
-			algo = crypto_none;
-		    else
-			if(tmp == "blowfish" || tmp == "bf" || tmp == "")
-			    algo = crypto_blowfish; // blowfish is the default cypher ("")
-			else
-			    if(tmp == "aes" || tmp == "aes256")
-				algo = crypto_aes256;
-			    else
-				if(tmp == "twofish" || tmp == "twofish256")
-				    algo = crypto_twofish256;
-				else
-				    if(tmp == "serpent" || tmp == "serpent256")
-					algo = crypto_serpent256;
-				    else
-					if(tmp == "camellia" || tmp == "camellia256")
-					    algo = crypto_camellia256;
-					else
-					    throw Erange("crypto_split_algo_pass", string(gettext("unknown cryptographic algorithm: ")) + tmp.c_str());
-	    }
-	    else // no ':' using blowfish as default cypher
-	    {
-		algo = crypto_blowfish;
-		pass = all;
-	    }
-	}
-    }
 
 
 ///////////////////////////// CRYPTO_SYM IMPLEMENTATION ////////////////////////////////

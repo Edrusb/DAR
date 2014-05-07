@@ -134,6 +134,8 @@ extern void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 							       bool ea_erase,
 							       const libdar::crit_action * & overwrite);
 
+extern void line_tools_crypto_split_algo_pass(const secu_string & all, crypto_algo & algo, secu_string & pass);
+
     /// @}
 
 #endif

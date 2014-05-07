@@ -40,7 +40,6 @@ extern "C"
 #include <string>
 
 #include "tronconneuse.hpp"
-#include "header_version.hpp"
 #include "secu_string.hpp"
 
 namespace libdar
@@ -64,7 +63,6 @@ namespace libdar
 	/// \ingroup Private
 	/// @}
 
-    extern void crypto_split_algo_pass(const secu_string & all, crypto_algo & algo, secu_string & pass);
     inline bool crypto_min_ver_libgcrypt_no_bug()
     {
 #if CRYPTO_AVAILABLE

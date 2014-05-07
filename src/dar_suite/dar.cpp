@@ -121,7 +121,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    case merging:
 		if(param.ref_filename != NULL && param.ref_root != NULL)
 		{
-		    crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass);
+		    line_tools_crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass);
 		    if(param.op == merging && param.aux_root != NULL && param.info_details)
 			dialog.warning(gettext("Considering the (first) archive of reference:"));
 		    read_options.clear();
@@ -154,7 +154,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    {
 			if(param.info_details)
 			    dialog.warning(gettext("Considering the second (alias auxiliary) archive of reference:"));
-			crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass);
+			line_tools_crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass);
 			read_options.clear();
 			read_options.set_crypto_algo(aux_crypto);
 			read_options.set_crypto_pass(tmp_pass);
@@ -171,7 +171,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    }
 		}
 
-		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
 
 		switch(param.op)
 		{
@@ -320,7 +320,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    dialog.warning(gettext("Now performing on-fly isolation..."));
 			if(cur == NULL)
 			    throw SRC_BUG;
-			crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass);
+			line_tools_crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass);
 			isolate_options.clear();
 			isolate_options.set_allow_over(param.allow_over);
 			isolate_options.set_warn_over(param.warn_over);
@@ -357,7 +357,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		}
 		break;
             case isolate:
-		crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass);
 		read_options.clear();
 		read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -375,7 +375,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		else
 		    arch->drop_all_filedescriptors(dialog);
 
-		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
 		isolate_options.clear();
 		isolate_options.set_allow_over(param.allow_over);
 		isolate_options.set_warn_over(param.warn_over);
@@ -403,7 +403,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 				 isolate_options);
 		break;
             case extract:
-		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
 		read_options.clear();
 		read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -421,7 +421,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
 
-		    crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
+		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
 		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
 		    read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
@@ -486,7 +486,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
                     throw Edata(gettext("All files asked could not be restored"));
                 break;
             case diff:
-		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
 		read_options.clear();
 		read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -504,7 +504,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
 
-		    crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
+		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
 		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
 		    read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
@@ -542,7 +542,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
                     throw Edata(gettext("Some file comparisons failed"));
                 break;
 	    case test:
-		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
 		read_options.clear();
 		read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
@@ -560,7 +560,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
 
-		    crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
+		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass);
 		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
 		    read_options.set_ref_crypto_algo(ref_crypto);
 		    read_options.set_ref_crypto_pass(ref_tmp_pass);
@@ -591,7 +591,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
                 break;
 
             case listing:
-		crypto_split_algo_pass(param.pass, crypto, tmp_pass);
+		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass);
 		read_options.clear();
 		read_options.set_crypto_algo(crypto);
 		read_options.set_crypto_pass(tmp_pass);
