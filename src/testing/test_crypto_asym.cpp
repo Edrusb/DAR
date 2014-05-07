@@ -34,16 +34,17 @@ using namespace libdar;
 
 static shell_interaction ui = shell_interaction(&cout, &cerr, false);
 
-void encrypt(const string & src, const string & dst);
+void encrypt(vector<string> recipients, const string & src, const string & dst);
 void decrypt(const string & src, const string & dst);
 
 int main(int argc, char *argv[])
 {
     U_I maj, med, min;
 
-    if(argc < 4)
+    if(argc < 3)
     {
-	cout << "usage: " << argv[0] << "<source file> <filename 2> <filename 3>" << endl;
+	cout << "usage: " << argv[0] << " crypt <source file> <dest file> <recipient's email> [... <recipient's email>]" << endl;
+	cout << "       " << argv[0] << " decrypt <source file> <dest file>" << endl;
 	return 1;
     }
 
@@ -51,8 +52,23 @@ int main(int argc, char *argv[])
 
     try
     {
-	encrypt(argv[1], argv[2]);
-	decrypt(argv[2], argv[3]);
+	if(strcmp(argv[1], "crypt") == 0)
+	{
+	    vector<string> recip;
+
+	    for(signed int i = 4; i < argc; ++i)
+		recip.push_back(argv[i]);
+	    if(recip.empty())
+		cout << "ERROR: need at least one email in the recipient list" << endl;
+	    else
+		encrypt(recip, argv[2], argv[3]);
+	}
+	else if(strcmp(argv[1], "decrypt") == 0)
+	{
+	    decrypt(argv[2], argv[3]);
+	}
+	else
+	    cout << "ERROR: first argument must either be 'crypt' or 'decrypt'" << endl;
     }
     catch(Egeneric & e)
     {
@@ -67,14 +83,11 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void encrypt(const string & src, const string & dst)
+void encrypt(vector<string> recipients, const string & src, const string & dst)
 {
     fichier_local fsrc = fichier_local(ui, src, gf_read_only, 0, false, false, false);
     fichier_local fdst = fichier_local(ui, dst, gf_write_only, 0644, false, true, false);
-    vector<string> recipients;
     crypto_asym engine = ui;
-
-    recipients.push_back("dar.linux@free.fr");
 
     engine.encrypt(recipients, fsrc, fdst);
 }
