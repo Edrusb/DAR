@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
     catch(Egeneric & e)
     {
 	ui.printf("Exception caught: %S", &(e.get_message()));
+	cout << e.dump_str() << endl;
     }
     catch(...)
     {
@@ -71,50 +72,18 @@ void encrypt(const string & src, const string & dst)
     fichier_local fsrc = fichier_local(ui, src, gf_read_only, 0, false, false, false);
     fichier_local fdst = fichier_local(ui, dst, gf_write_only, 0644, false, true, false);
     vector<string> recipients;
+    crypto_asym engine = ui;
 
     recipients.push_back("dar.linux@free.fr");
 
-	// must use a pointer to be sure crypto_asym
-	// object is destroyed before fdst
-    crypto_asym *cr = new crypto_asym(ui, &fdst, recipients);
-    if(cr == NULL)
-	ui.printf("Allocation failure");
-    else
-    {
-	try
-	{
-	    fsrc.copy_to(*cr);
-	}
-	catch(...)
-	{
-	    delete cr;
-	    throw;
-	}
-	delete cr;
-    }
+    engine.encrypt(recipients, fsrc, fdst);
 }
 
 void decrypt(const string & src, const string & dst)
 {
     fichier_local fsrc = fichier_local(ui, src, gf_read_only, 0, false, false, false);
     fichier_local fdst = fichier_local(ui, dst, gf_write_only, 0644, false, true, false);
+    crypto_asym engine = ui;
 
-	// same thing here, using pointer to be sure the crypto_asym objet
-	// is destroyed before fsrc
-    crypto_asym *decr = new crypto_asym(ui, &fsrc);
-    if(decr == NULL)
-	ui.printf("Allocation failure");
-    else
-    {
-	try
-	{
-	    decr->copy_to(fdst);
-	}
-	catch(...)
-	{
-	    delete decr;
-	    throw;
-	}
-	delete decr;
-    }
+    engine.decrypt(fsrc, fdst);
 }

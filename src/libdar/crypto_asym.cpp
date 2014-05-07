@@ -30,6 +30,7 @@ extern "C"
 #include "tools.hpp"
 #include "crypto_asym.hpp"
 #include "integers.hpp"
+#include "generic_file_overlay_for_gpgme.hpp"
 
 #include <string>
 
@@ -42,144 +43,70 @@ namespace libdar
     static gpgme_error_t read_passphrase(void *hook, const char *uid_hint, const char *passphrase_info, int prev_was_bad, int fd);
 #endif
 
-#if MUTEX_WORKS
-    pthread_mutex_t crypto_asym::lock_wait = PTHREAD_MUTEX_INITIALIZER;
-#endif
 
-
-    crypto_asym::crypto_asym(user_interaction & ui, generic_file *below, const vector<string> & recipients_email):
-	generic_file(gf_write_only),
-	mem_ui(ui),
-	ciphered(below)
+    void crypto_asym::encrypt(const vector<string> & recipients_email, generic_file & clear, generic_file & ciphered)
     {
 #if GPGME_SUPPORT
 	gpgme_key_t *ciphering_keys = NULL;
 
-	build_context();
+	build_key_list(recipients_email, ciphering_keys);
 	try
 	{
-	    build_key_list(recipients_email, ciphering_keys);
+	    generic_file_overlay_for_gpgme o_clear = &clear;
+	    generic_file_overlay_for_gpgme o_ciphered = &ciphered;
 
-	    try
+	    gpgme_error_t err = gpgme_op_encrypt(context,
+						 ciphering_keys,
+						 (gpgme_encrypt_flags_t)0,
+						 o_clear.get_gpgme_handle(),
+						 o_ciphered.get_gpgme_handle());
+	    switch(gpgme_err_code(err))
 	    {
-		build_pipes_and_the_clear_overlay();
-		try
-		{
-		    gpgme_error_t err = gpgme_op_encrypt_start(context,
-							       ciphering_keys,
-							       (gpgme_encrypt_flags_t)0,
-							       clear->get_gpgme_handle(),
-							       ciphered.get_gpgme_handle());
-		    switch(gpgme_err_code(err))
-		    {
-		    case GPG_ERR_NO_ERROR:
-			break;
-		    case GPG_ERR_INV_VALUE:
-			throw SRC_BUG;
-		    case GPG_ERR_UNUSABLE_PUBKEY:
-			throw Erange("crypto_asym::crypto_asym", gettext("Key found but users are not all trusted"));
-		    default:
-			throw SRC_BUG;
-		    }
-		}
-		catch(...)
-		{
-		    release_pipes_and_the_clear_overlay();
-		    throw;
-		}
+	    case GPG_ERR_NO_ERROR:
+		break;
+	    case GPG_ERR_INV_VALUE:
+		throw SRC_BUG;
+	    case GPG_ERR_UNUSABLE_PUBKEY:
+		throw Erange("crypto_asym::encrypt", gettext("Key found but users are not all trusted"));
+	    default:
+		throw Erange("crypto_asym::encrypt", string(gettext("Unexpected error reported by GPGME: ")) + tools_gpgme_strerror_r(err));
 	    }
-	    catch(...)
-	    {
-		release_key_list(ciphering_keys);
-		throw;
-	    }
-		// ciphering_keys is local, we must now release it
-		// even if no exception occurred
+	}
+	catch(...)
+	{
 	    release_key_list(ciphering_keys);
-	}
-	catch(...)
-	{
-	    release_context();
 	    throw;
 	}
+	release_key_list(ciphering_keys);
 #else
 	throw Efeature("Asymetric Strong encryption algorithms using GPGME");
 #endif
     }
 
-    crypto_asym::crypto_asym(user_interaction &ui, generic_file *below):
-	generic_file(gf_read_only),
-	mem_ui(ui),
-	ciphered(below)
+    void crypto_asym::decrypt(generic_file & ciphered, generic_file & clear)
     {
 #if GPGME_SUPPORT
-	build_context();
-	try
+	generic_file_overlay_for_gpgme o_clear = &clear;
+	generic_file_overlay_for_gpgme o_ciphered = &ciphered;
+	gpgme_error_t err = gpgme_op_decrypt(context, o_ciphered.get_gpgme_handle(), o_clear.get_gpgme_handle());
+
+	switch(gpgme_err_code(err))
 	{
-	    build_pipes_and_the_clear_overlay();
-	    try
-	    {
-		gpgme_error_t err = gpgme_op_decrypt_start(context, ciphered.get_gpgme_handle(), clear->get_gpgme_handle());
-		switch(gpgme_err_code(err))
-		{
-		case GPG_ERR_NO_ERROR:
-		    break;
-		case GPG_ERR_INV_VALUE:
-		    throw SRC_BUG;
-		default:
-		    throw SRC_BUG;
-		}
-	    }
-	    catch(...)
-	    {
-		release_pipes_and_the_clear_overlay();
-		throw;
-	    }
-	}
-	catch(...)
-	{
-	    release_context();
-	    throw;
+	case GPG_ERR_NO_ERROR:
+	    break;
+	case GPG_ERR_INV_VALUE:
+	    throw SRC_BUG;
+	case GPG_ERR_NO_DATA:
+	    throw Erange("crypto_asym::decrypt", gettext("No data to decrypt"));
+	case GPG_ERR_DECRYPT_FAILED:
+	    throw Erange("crypto_asym::decrypt", gettext("Invalid Cipher text"));
+	case GPG_ERR_BAD_PASSPHRASE:
+	    throw Erange("crypto_asym::decrypt", gettext("Failed retreiving passphrase"));
+	default:
+	    throw Erange("crypto_asym::decrypt", string(gettext("Unexpected error reported by GPGME: ")) + tools_gpgme_strerror_r(err));
 	}
 #else
 	throw Efeature("Asymetric Strong encryption algorithms using GPGME");
-#endif
-    }
-
-    void crypto_asym::inherited_terminate()
-    {
-#if GPGME_SUPPORT
-	gpgme_error_t err;
-
-	    // first closing the clear_side object
-	if(clear_side == writer_side)
-	    writer_side->terminate();
-
-	    // extract from gpgme documentation:
-	    // In a multi-threaded environment, only one thread should ever call gpgme_wait at any time, irregardless if ctx is specified or not
-
-#if MUTEX_WORKS
-	    // acquiring lock_wait before calling gpgme_wait
-	sigset_t mask_memory;
-	tools_block_all_signals(mask_memory);
-	pthread_mutex_lock(&lock_wait);
-
-	try
-	{
-#endif
-	    (void)gpgme_wait(context, &err, true);
-#if MUTEX_WORKS
-		// setting backup blocked signals to their initial values
-	}
-	catch(...)
-	{
-		// no re-throw;
-	}
-	pthread_mutex_unlock(&lock_wait);
-	tools_set_back_blocked_signals(mask_memory);
-#endif
-	release_pipes_and_the_clear_overlay();
-	release_context();
 #endif
     }
 
@@ -192,7 +119,6 @@ namespace libdar
 	    throw Erange("crypto_asym::crypto_asym", string(gettext("Failed creating GPGME context: ")) + tools_gpgme_strerror_r(err));
 
 	err = gpgme_set_protocol(context, GPGME_PROTOCOL_OpenPGP);
-
 	if(gpgme_err_code(err) != GPG_ERR_NO_ERROR)
 	    throw Erange("crypto_asym::crypto_asym", string(gettext("Failed setting GPGME context with OpenPGP protocol: ")) + tools_gpgme_strerror_r(err));
 
@@ -235,7 +161,7 @@ namespace libdar
 		case GPG_ERR_INV_VALUE:
 		    throw SRC_BUG;
 		default:
-		    throw SRC_BUG;
+		    throw Erange("crypto_asym::decrypt", string(gettext("Unexpected error reported by GPGME: ")) + tools_gpgme_strerror_r(err));
 		}
 
 		found = false;
@@ -284,7 +210,7 @@ namespace libdar
 			}
 			break;
 		    default:
-			throw SRC_BUG; // unknown condition met
+			throw Erange("crypto_asym::decrypt", string(gettext("Unexpected error reported by GPGME: ")) + tools_gpgme_strerror_r(err));
 		    }
 		}
 		while(!found && !eof);
@@ -333,76 +259,6 @@ namespace libdar
 	}
     }
 
-    void crypto_asym::build_pipes_and_the_clear_overlay()
-    {
-#if GPGME_SUPPORT
-	reader_side = NULL;
-	writer_side = NULL;
-	clear_side = NULL;
-	clear = NULL;
-
-	try
-	{
-	    writer_side = new (get_pool()) tuyau(get_ui());
-	    if(writer_side == NULL)
-		throw Ememory("crypto_asym::build_pipes_and_clear_overlay");
-	    reader_side = new (get_pool()) tuyau(get_ui(), writer_side->get_read_fd());
-	    if(reader_side == NULL)
-		throw Ememory("crypto_asym::build_pipes_and_clear_overlay");
-	    writer_side->do_not_close_read_fd(); // read fd will be closed by reader_side's destructor
-	    switch(get_mode())
-	    {
-	    case gf_read_only:
-		    // unciphering data
-		clear_side = reader_side;
-		clear = new (get_pool()) generic_file_overlay_for_gpgme(writer_side);
-		break;
-	    case gf_write_only:
-		clear_side = writer_side;
-		clear = new (get_pool()) generic_file_overlay_for_gpgme(reader_side);
-		break;
-	    case gf_read_write:
-		throw SRC_BUG;
-	    default:
-		throw SRC_BUG;
-	    }
-	    if(clear == NULL)
-		throw Ememory("crypto_asym::build_pipes_and_clear_overlay");
-	}
-	catch(...)
-	{
-	    release_pipes_and_the_clear_overlay();
-	    throw;
-	}
-#endif
-    }
-
-    void crypto_asym::release_pipes_and_the_clear_overlay()
-    {
-#if GPGME_SUPPORT
-	if(clear != NULL)
-	{
-	    delete clear;
-	    clear = NULL;
-	}
-	if(reader_side != NULL)
-	{
-	    delete reader_side;
-	    reader_side = NULL;
-	}
-	if(writer_side != NULL)
-	{
-	    delete writer_side;
-	    writer_side = NULL;
-	}
-	if(clear_side != NULL)
-	{
-		// no not delete, it's juste a pointer
-	    clear_side = NULL;
-	}
-#endif
-    }
-
 #if GPGME_SUPPORT
     static gpgme_error_t read_passphrase(void *hook, const char *uid_hint, const char *passphrase_info, int prev_was_bad, int fd)
     {
@@ -439,7 +295,7 @@ namespace libdar
 	    wrote = write(fd, "\n", 1);
 	    if(wrote != 1)
 		obj->get_ui().warning(gettext("Failed sending CR after the passphrase"));
-	    ret = GPG_ERR_CANCELED;
+	    ret = GPG_ERR_NO_ERROR;
 	}
 
 	return ret;
