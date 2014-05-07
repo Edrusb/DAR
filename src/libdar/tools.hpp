@@ -804,7 +804,7 @@ namespace libdar
 
 #ifdef GPGME_SUPPORT
 	/// wrapper routint to gpgme_strerror_r
-    std::string tools_gpgme_strerror_r(gpgme_error_t err);
+    extern std::string tools_gpgme_strerror_r(gpgme_error_t err);
 #endif
 
 } /// end of namespace
