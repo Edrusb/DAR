@@ -114,7 +114,8 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
 		  [
 		     AC_MSG_RESULT([no])
 		     AC_MSG_CHECKING([for c++ support with -std=c++11 option set])
-		     CXXFLAGS="$CXXFLAGS -std=c++11"
+		     CXXSTDFLAGS="-std=c++11"
+		     CXXFLAGS="$CXXFLAGS $CXXSTDFLAGS"
 		     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
 							[ thread_local static int test = 0; ])
 					],
@@ -762,8 +763,10 @@ AC_ARG_ENABLE( [furtive-read],
 AC_ARG_ENABLE( [debug],
                 AC_HELP_STRING(--enable-debug, [build targets with debugging option and no optimization]),
                 [
-                        CXXFLAGS="$CXXFLAGS -ggdb -Wall"
-                        CFLAGS="$CFLAGS -ggdb -Wall"
+		# yes we modify user variable here to remove any optimization
+                        CXXFLAGS="$CXXSTDFLAGS -ggdb -Wall"
+                        CFLAGS="-ggdb -Wall"
+			LDFLAGS="-ggdb -Wall"
                         debug_static="yes"
 			AC_DEFINE(LIBDAR_NO_OPTIMIZATION, 1, [if defined, informs the code that no optimization has been used for compilation])
                 ],
@@ -919,7 +922,7 @@ MEM_LDFLAGS=$LDFLAGS
 LDFLAGS="-static"
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #include <stdio.h>
-                                             }
+            				      }
                                ]],
                                [
                                   printf("Hello World!");
