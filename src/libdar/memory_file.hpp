@@ -44,8 +44,10 @@ namespace libdar
 
 
 	    // memory_storage specific methods
+
 	void reset() { if(is_terminated()) throw SRC_BUG; position = 0; data = storage(0); };
 	infinint size() const { return data.size(); };
+
 
 	    // virtual method inherited from generic_file
 
@@ -56,6 +58,9 @@ namespace libdar
 
 
     protected:
+
+	    // virtual method inherited from generic_file
+
 	U_I inherited_read(char *a, U_I size);
 	void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() {};
