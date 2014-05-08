@@ -248,6 +248,7 @@ void line_tools_tlv_list2argv(user_interaction & dialog, const tlv_list & list, 
     for(register S_I i = 0; i < arg.argc() ; i++)
     {
 	if(list[i].get_type() != 0)
+		// we only use type 0 here
 	    throw Erange("line_tools_tlv_list2argv", gettext("Unknown TLV record type"));
 	list[i].get_contents(mem);
 	transfert = 0;

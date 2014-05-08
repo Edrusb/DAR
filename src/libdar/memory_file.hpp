@@ -39,10 +39,7 @@ namespace libdar
     {
     public:
 
-	    // Constructors & Destructor
-	    //
-	    //
-
+	    /// Constructors & Destructor
 	memory_file(gf_mode m) : generic_file(m), data(0) { position = 0; };
 
 	    // virtual method inherited from generic_file

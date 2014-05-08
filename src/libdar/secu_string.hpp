@@ -58,27 +58,26 @@ namespace libdar
     {
     public:
 	    /// to know if secure memory is available
-
+	    ///
 	    /// it is advised that the user program of class secu_string uses this call before using objects of that class
 	    /// and if returned false, advise the user that the necessary support for secure memory
 	    /// is not present, that any sensitive data may be swapped out under heavy memory load and thus
 	    /// may lead secure password to be wrote to disk in clear.
 	static bool is_string_secured();
 
-	    /// constructor
-
+	    /// constructor 1
+	    ///
 	    /// create the allocated string in secure memory
 	    /// \param[in] size is the amount of secured memory to obtain when creating the object
 	secu_string(U_I size = 0) { init(size); };
 
-	    /// constructor
-
+	    /// constructor 2
+	    ///
 	    /// create the string from a pointer to a (secure) string or from a portion of it
 	secu_string(const char *ptr, U_I size) { init(size); append(ptr, size); };
 
 	    /// the copy constructor
 	secu_string(const secu_string & ref) { copy_from(ref); };
-
 
 	    /// the assignment operator
 	secu_string & operator = (const secu_string & ref) { clean_and_destroy(); copy_from(ref); return *this; };
@@ -116,11 +115,11 @@ namespace libdar
 	    /// \param[in] pos is the length of the string to set, it must be smaller or equal to the current size
 	void reduce_string_size_to(U_I pos);
 
-	    /// clear the string (ans set its allocated string to zero)
+	    /// clear the string (set its allocated string to zero)
 	void clear() { clean_and_destroy(); init(0); };
 
 	    /// clear and resize the string to the defined allocated size
-
+	    ///
 	    /// \param[in] size is the amount of secure memory to allocated
 	void clear_and_resize(U_I size) { clean_and_destroy(); init(size); };
 
