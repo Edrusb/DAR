@@ -36,9 +36,12 @@ namespace libdar
 	/// @{
 
 	/// Type Length Value Structure
-
+	///
 	/// this structure holds arbitrary type of data
 	/// this is used in particular for the slice header
+	/// \note a tlv is a memory_file, that way it holds the
+	/// *V*alue and *L*ength of the data. Only the *T*ype field needs
+	/// to be added to the memory_file datastructure
     class tlv : public memory_file
     {
     public:
