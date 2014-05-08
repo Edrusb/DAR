@@ -52,7 +52,7 @@ public:
     void set_arg(generic_file & f, U_I size, S_I index);
 
     S_I argc() const { return x_argc; };
-    char* const * argv() const { return x_argv; }; // well the const method is a bit silly, as the call has the possibility to modify what is pointed to by the returned value...
+    char* const * argv() const { return x_argv; }; // well, the const method is a bit silly, as the caller has the possibility to modify what is pointed to by the returned value...
 
 private:
     S_I x_argc;
