@@ -1000,7 +1000,10 @@ namespace libdar
 		    ver.flag |= VERSION_FLAG_HAS_CRYPTED_KEY;
 
 		    char variable_size;
+		    dialog.warning(gettext("Generating random key for symmetric encryption..."));
 		    gcry_randomize(&variable_size, 1, GCRY_VERY_STRONG_RANDOM);
+		    if(info_details)
+			dialog.warning(gettext("Key generated"));
 		    gnupg_key_size += variable_size; // yes we do not use constant sized key but +0 to +255 bytes length
 		    secu_memory_file clear(gnupg_key_size, true);
 		    crypto_asym engine(dialog);

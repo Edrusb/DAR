@@ -24,6 +24,7 @@
 #include <string>
 #include <iostream>
 #include <new>
+#include <vector>
 
 #include "erreurs.hpp"
 #include "user_interaction.hpp"
@@ -115,6 +116,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    archive_options_diff diff_options;
 	    archive_options_test test_options;
 	    bool no_cipher_given;
+	    vector<string> recipients;
 
             switch(param.op)
             {
@@ -122,7 +124,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 	    case merging:
 		if(param.ref_filename != NULL && param.ref_root != NULL)
 		{
-		    line_tools_crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass, no_cipher_given);
+		    line_tools_crypto_split_algo_pass(param.pass_ref,
+						      crypto,
+						      tmp_pass,
+						      no_cipher_given,
+						      recipients);
 		    if(param.op == merging && param.aux_root != NULL && param.info_details)
 			dialog.warning(gettext("Considering the (first) archive of reference:"));
 		    read_options.clear();
@@ -161,7 +167,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    {
 			if(param.info_details)
 			    dialog.warning(gettext("Considering the second (alias auxiliary) archive of reference:"));
-			line_tools_crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass, no_cipher_given);
+			line_tools_crypto_split_algo_pass(param.aux_pass,
+							  aux_crypto,
+							  tmp_pass,
+							  no_cipher_given,
+							  recipients);
 			read_options.clear();
 			if(no_cipher_given)
 				// since archive format 9 crypto algo used
@@ -184,7 +194,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    }
 		}
 
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
+		line_tools_crypto_split_algo_pass(param.pass,
+						  crypto,
+						  tmp_pass,
+						  no_cipher_given,
+						  recipients);
 
 		switch(param.op)
 		{
@@ -212,6 +226,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.set_crypto_algo(crypto);
 		    create_options.set_crypto_pass(tmp_pass);
 		    create_options.set_crypto_size(param.crypto_size);
+		    create_options.set_gnupg_recipients(recipients);
 		    create_options.set_compr_mask(*param.compress_mask);
 		    create_options.set_min_compr_size(param.min_compr_size);
 		    create_options.set_nodump(param.nodump);
@@ -269,6 +284,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    merge_options.set_crypto_algo(crypto);
 		    merge_options.set_crypto_pass(tmp_pass);
 		    merge_options.set_crypto_size(param.crypto_size);
+		    merge_options.set_gnupg_recipients(recipients);
 		    merge_options.set_compr_mask(*param.compress_mask);
 		    merge_options.set_min_compr_size(param.min_compr_size);
 		    merge_options.set_empty(param.empty);
@@ -333,7 +349,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    dialog.warning(gettext("Now performing on-fly isolation..."));
 			if(cur == NULL)
 			    throw SRC_BUG;
-			line_tools_crypto_split_algo_pass(param.aux_pass, aux_crypto, tmp_pass, no_cipher_given);
+			line_tools_crypto_split_algo_pass(param.aux_pass,
+							  aux_crypto,
+							  tmp_pass,
+							  no_cipher_given,
+							  recipients);
 			isolate_options.clear();
 			isolate_options.set_allow_over(param.allow_over);
 			isolate_options.set_warn_over(param.warn_over);
@@ -353,6 +373,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			isolate_options.set_crypto_algo(aux_crypto);
 			isolate_options.set_crypto_pass(tmp_pass);
 			isolate_options.set_crypto_size(param.aux_crypto_size);
+			isolate_options.set_gnupg_recipients(recipients);
 			isolate_options.set_empty(param.empty);
 			isolate_options.set_slice_permission(param.slice_perm);
 			isolate_options.set_slice_user_ownership(param.slice_user);
@@ -370,7 +391,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		}
 		break;
             case isolate:
-		line_tools_crypto_split_algo_pass(param.pass_ref, crypto, tmp_pass, no_cipher_given);
+		line_tools_crypto_split_algo_pass(param.pass_ref,
+						  crypto,
+						  tmp_pass,
+						  no_cipher_given,
+						  recipients);
 		read_options.clear();
 		if(no_cipher_given)
 			// since archive format 9 crypto algo used
@@ -394,7 +419,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		else
 		    arch->drop_all_filedescriptors(dialog);
 
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
+		line_tools_crypto_split_algo_pass(param.pass,
+						  crypto,
+						  tmp_pass,
+						  no_cipher_given,
+						  recipients);
 		isolate_options.clear();
 		isolate_options.set_allow_over(param.allow_over);
 		isolate_options.set_warn_over(param.warn_over);
@@ -407,6 +436,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		isolate_options.set_crypto_algo(crypto);
 		isolate_options.set_crypto_pass(tmp_pass);
 		isolate_options.set_crypto_size(param.crypto_size);
+		isolate_options.set_gnupg_recipients(recipients);
 		isolate_options.set_empty(param.empty);
 		isolate_options.set_slice_permission(param.slice_perm);
 		isolate_options.set_slice_user_ownership(param.slice_user);
@@ -422,7 +452,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 				 isolate_options);
 		break;
             case extract:
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
+		line_tools_crypto_split_algo_pass(param.pass,
+						  crypto,
+						  tmp_pass,
+						  no_cipher_given,
+						  recipients);
 		read_options.clear();
 		if(no_cipher_given)
 			// since archive format 9 crypto algo used
@@ -446,7 +480,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
 
-		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass, no_cipher_given);
+		    line_tools_crypto_split_algo_pass(param.pass_ref,
+						      ref_crypto,
+						      ref_tmp_pass,
+						      no_cipher_given,
+						      recipients);
 		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
 		    if(no_cipher_given)
 			    // since archive format 9 crypto algo used
@@ -517,7 +555,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
                     throw Edata(gettext("All files asked could not be restored"));
                 break;
             case diff:
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
+		line_tools_crypto_split_algo_pass(param.pass,
+						  crypto,
+						  tmp_pass,
+						  no_cipher_given,
+						  recipients);
 		read_options.clear();
 		if(no_cipher_given)
 			// since archive format 9 crypto algo used
@@ -541,7 +583,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
 
-		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass, no_cipher_given);
+		    line_tools_crypto_split_algo_pass(param.pass_ref,
+						      ref_crypto,
+						      ref_tmp_pass,
+						      no_cipher_given,
+						      recipients);
 		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
 		    if(no_cipher_given)
 			    // since archive format 9 crypto algo used
@@ -585,7 +631,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
                     throw Edata(gettext("Some file comparisons failed"));
                 break;
 	    case test:
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
+		line_tools_crypto_split_algo_pass(param.pass,
+						  crypto,
+						  tmp_pass,
+						  no_cipher_given,
+						  recipients);
 		read_options.clear();
 		if(no_cipher_given)
 			// since archive format 9 crypto algo used
@@ -609,7 +659,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    secu_string ref_tmp_pass;
 		    crypto_algo ref_crypto;
 
-		    line_tools_crypto_split_algo_pass(param.pass_ref, ref_crypto, ref_tmp_pass, no_cipher_given);
+		    line_tools_crypto_split_algo_pass(param.pass_ref,
+						      ref_crypto,
+						      ref_tmp_pass,
+						      no_cipher_given,
+						      recipients);
 		    read_options.set_external_catalogue(*param.ref_root, *param.ref_filename);
 		    if(no_cipher_given)
 			    // since archive format 9 crypto algo used
@@ -646,7 +700,11 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
                 break;
 
             case listing:
-		line_tools_crypto_split_algo_pass(param.pass, crypto, tmp_pass, no_cipher_given);
+		line_tools_crypto_split_algo_pass(param.pass,
+						  crypto,
+						  tmp_pass,
+						  no_cipher_given,
+						  recipients);
 		read_options.clear();
 		if(no_cipher_given)
 			// since archive format 9 crypto algo used

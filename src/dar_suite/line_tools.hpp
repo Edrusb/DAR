@@ -29,6 +29,7 @@
 #include "../my_config.h"
 
 #include <string>
+#include <vector>
 #include "infinint.hpp"
 #include "tlv_list.hpp"
 #include "integers.hpp"
@@ -134,7 +135,17 @@ extern void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 							       bool ea_erase,
 							       const libdar::crit_action * & overwrite);
 
-extern void line_tools_crypto_split_algo_pass(const secu_string & all, crypto_algo & algo, secu_string & pass, bool & no_cipher_given);
+    /// split the argument to -K, -J and -$ in their different parts
+    /// \param[in] all is what the user provided on command-line
+    /// \param[out] algo is the symmetrical algorithm to use
+    /// \param[out] pass is either the passphrase
+    /// \param[out] no_cipher_given is true if the use did not specified the cipher (which defaults to blowfish)
+    /// \param[out] recipients emails recipients to use (empty list if gnupg has not to be used)
+extern void line_tools_crypto_split_algo_pass(const secu_string & all,
+					      crypto_algo & algo,
+					      secu_string & pass,
+					      bool & no_cipher_given,
+					      std::vector<std::string> & recipients);
 
     /// @}
 

@@ -756,13 +756,18 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
     }
 }
 
-void line_tools_crypto_split_algo_pass(const secu_string & all, crypto_algo & algo, secu_string & pass, bool & no_cipher_given)
+void line_tools_crypto_split_algo_pass(const secu_string & all,
+				       crypto_algo & algo,
+				       secu_string & pass,
+				       bool & no_cipher_given,
+				       vector<string> & recipients)
 {
 	// split from "algo:pass" "algo" "pass" "algo:" ":pass" syntaxes
 
     const char *it = all.c_str();
     const char *fin = all.c_str() + all.size(); // points past the last byte of the secu_string "all"
     secu_string tmp;
+    recipients.clear();
 
     if(all.size() == 0)
     {
@@ -806,7 +811,15 @@ void line_tools_crypto_split_algo_pass(const secu_string & all, crypto_algo & al
 				    if(tmp == "camellia" || tmp == "camellia256")
 					algo = crypto_camellia256;
 				    else
-					throw Erange("crypto_split_algo_pass", string(gettext("unknown cryptographic algorithm: ")) + tmp.c_str());
+					if(tmp == "gnupg")
+					{
+					    secu_string emails;
+					    line_tools_crypto_split_algo_pass(pass, algo, emails, no_cipher_given, recipients);
+					    recipients = line_tools_split(emails.c_str(), ',');
+					    pass.clear();
+					}
+					else
+					    throw Erange("crypto_split_algo_pass", string(gettext("unknown cryptographic algorithm: ")) + tmp.c_str());
 	}
 	else // no ':' using blowfish as default cypher
 	{
