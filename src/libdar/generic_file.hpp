@@ -107,13 +107,12 @@ namespace libdar
 	    /// copy constructor
 	generic_file(const generic_file &ref) { copy_from(ref); };
 
-
 	    /// virtual destructor, this let inherited destructor to be called even from a generic_file pointer to an inherited class
+	virtual ~generic_file() { destroy(); };
 
 	    /// destructor-like call, except that it is allowed to throw exceptions
 	void terminate() const;
 
-	virtual ~generic_file() { destroy(); };
 
 	    /// assignment operator
 	const generic_file & operator = (const generic_file & ref) { destroy(); copy_from(ref); return *this; };

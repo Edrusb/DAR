@@ -47,8 +47,7 @@ namespace libdar
 	void dump(generic_file & f) const;        //< dump tlv_list to file
 	void read(generic_file & f) { init(f); }; //< erase and read a list from a file
 	U_I size() const { return contents.size(); };
-	tlv & operator[] (U_I item);
-	tlv operator[] (U_I item) const;
+	tlv & operator[] (U_I item) const;
 	void clear() { contents.clear(); };
 	void add(const tlv & next) { contents.push_back(next); };
 

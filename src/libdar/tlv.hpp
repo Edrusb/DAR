@@ -39,38 +39,27 @@ namespace libdar
 
 	/// this structure holds arbitrary type of data
 	/// this is used in particular for the slice header
-    class tlv : public on_pool
+    class tlv : public memory_file
     {
     public:
 
 	    // constructors & Co.
 
-	tlv() { type = 0; value = NULL; };
+	tlv() { type = 0; };
 	tlv(generic_file & f) { init(f); };
-	tlv(const tlv & ref) { copy_from(ref); };
-	~tlv() { detruit(); };
 
-	const tlv & operator = (const tlv & ref) { detruit(); copy_from(ref); return *this; };
+	    // methods (dump / setup tlv datastructure to/from file)
 
-	    // methods (read / write tlv datastructure to file)
-
-	void read(generic_file & f); //< same as the constructor but on an existing object
-	void write(generic_file & f) const; //< dumps the tlv contents to file
-
-	    // methods to fill the tlv object
+	void setup(generic_file & f); //< same as the constructor but on an existing object
+	void dump(generic_file & f) const; //< dumps the tlv contents to file
 
 	U_16 get_type() const { return type; };      //< get the TLV type
 	void set_type(U_16 val) { type = val; };     //< set the TLV type
-	void set_contents(const memory_file & contents);  //< the generic_file object is provided to dump data to the tlv object
-        void get_contents(memory_file & contents) const;  //< the generic_file object is provided to read data from the tlv object
 
     private:
 	U_16 type;
-	storage *value;
 
 	void init(generic_file & f);
-	void copy_from(const tlv & ref);
-	void detruit() { if(value != NULL) { delete value; value = NULL; } };
     };
 
 	/// @}

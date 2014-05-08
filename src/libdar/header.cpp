@@ -337,30 +337,31 @@ namespace libdar
     void header::fill_from(user_interaction & ui, const tlv_list & extension)
     {
 	U_I taille = extension.size();
-	memory_file tmp = memory_file(gf_read_write);
 
 	free_pointers();
-	for(U_I index = 0; index < taille; index++)
+	for(U_I index = 0; index < taille; ++index)
 	{
-	    extension[index].get_contents(tmp);
 	    switch(extension[index].get_type())
 	    {
 	    case tlv_first_size:
 		first_size = new (get_pool()) infinint();
 		if(first_size == NULL)
 		    throw Ememory("header::fill_from");
-		first_size->read(tmp);
+		extension[index].skip(0);
+		first_size->read(extension[index]);
 		break;
 	    case tlv_size:
 		slice_size = new (get_pool()) infinint();
 		if(slice_size == NULL)
 		    throw Ememory("header::fill_from");
-		slice_size->read(tmp);
+		extension[index].skip(0);
+		slice_size->read(extension[index]);
 		break;
 	    case tlv_data_name:
 		try
 		{
-		    data_name.read(tmp);
+		    extension[index].skip(0);
+		    data_name.read(extension[index]);
 		}
 		catch(Erange & e)
 		{
@@ -377,30 +378,26 @@ namespace libdar
     {
 	tlv_list ret;
 	tlv tmp;
-	memory_file pseudo_fic = memory_file(gf_read_write);
 
 	if(first_size != NULL)
 	{
-	    pseudo_fic.reset();
-	    first_size->dump(pseudo_fic);
+	    tmp.reset();
+	    first_size->dump(tmp);
 	    tmp.set_type(tlv_first_size);
-	    tmp.set_contents(pseudo_fic);
 	    ret.add(tmp);
 	}
 
 	if(slice_size != NULL)
 	{
-	    pseudo_fic.reset();
-	    slice_size->dump(pseudo_fic);
+	    tmp.reset();
+	    slice_size->dump(tmp);
 	    tmp.set_type(tlv_size);
-	    tmp.set_contents(pseudo_fic);
 	    ret.add(tmp);
 	}
 
-	pseudo_fic.reset();
-	data_name.dump(pseudo_fic);
+	tmp.reset();
+	data_name.dump(tmp);
 	tmp.set_type(tlv_data_name);
-	tmp.set_contents(pseudo_fic);
 	ret.add(tmp);
 
 	return ret;

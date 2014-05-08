@@ -33,7 +33,7 @@ extern "C"
 
 namespace libdar
 {
-    const U_I HEADER_CRC_SIZE = 2;                    //< size of the CRC (deprecated, now only used when reading old archives)
+    const U_I HEADER_CRC_SIZE = 2; //< CRC width (deprecated, now only used when reading old archives)
 
 
     static char sym_crypto_to_char(crypto_algo a);
@@ -91,7 +91,7 @@ namespace libdar
 	{
 	    infinint key_size = f;
 
-	    crypted_key = new (get_pool()) memory_file(gf_read_write);
+	    crypted_key = new (get_pool()) memory_file();
 	    if(crypted_key == NULL)
 		throw Ememory("header_version::read");
 	    if(f.copy_to(*crypted_key, key_size) != key_size)
@@ -186,10 +186,9 @@ namespace libdar
 
 	if(crypted_key != NULL)
 	{
-	    infinint key_size = crypted_key->get_data_size();
-
-	    key_size.dump(f);
-	    crypted_key->copy_to(f, key_size);
+	    crypted_key->size().dump(f);
+	    crypted_key->skip(0);
+	    crypted_key->copy_to(f);
 	}
 
 	ctrl = f.get_crc();

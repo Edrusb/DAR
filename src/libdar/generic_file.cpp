@@ -426,9 +426,6 @@ namespace libdar
 
     void generic_file::copy_from(const generic_file & ref)
     {
-	if(terminated)
-	    throw SRC_BUG;
-
 	rw = ref.rw;
 	if(ref.checksum != NULL)
 	    checksum = ref.checksum->clone();

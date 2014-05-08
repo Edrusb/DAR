@@ -40,28 +40,20 @@ namespace libdar
     public:
 
 	    /// Constructors & Destructor
-	memory_file(gf_mode m) : generic_file(m), data(0) { position = 0; };
+	memory_file() : generic_file(gf_read_write), data(0) { position = 0; };
+
+
+	    // memory_storage specific methods
+	void reset() { if(is_terminated()) throw SRC_BUG; position = 0; data = storage(0); };
+	infinint size() const { return data.size(); };
 
 	    // virtual method inherited from generic_file
-	    //
-	    //
 
 	bool skip(const infinint & pos);
 	bool skip_to_eof();
 	bool skip_relative(S_I x);
 	infinint get_position() { if(is_terminated()) throw SRC_BUG; return position; };
-	void reset() { if(is_terminated()) throw SRC_BUG; position = 0; data = storage(0); };
 
-	    // raw access to stored data
-	    //
-	    //
-
-	    /// returns the size taken by the object's raw data
-	infinint get_data_size() const { if(is_terminated()) throw SRC_BUG; return data.size(); };
-
-	    /// return the raw data
-	const storage & get_raw_data() const { if(is_terminated()) throw SRC_BUG; return data; };
-	void set_raw_data(const storage & val) { if(is_terminated()) throw SRC_BUG; data = val; position = 0; };
 
     protected:
 	U_I inherited_read(char *a, U_I size);

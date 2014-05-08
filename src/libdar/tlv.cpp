@@ -35,49 +35,23 @@ using namespace std;
 namespace libdar
 {
 
-    void tlv::write(generic_file & f) const
+    void tlv::dump(generic_file & f) const
     {
 	U_16 tmp;
+	tlv *me = const_cast<tlv *>(this);
 
+	if(me == NULL)
+	    throw SRC_BUG;
 	tmp = htons(type);
 	f.write((char *)&tmp, 2);
-	if(value != NULL)
-	{
-	    value->size().dump(f);
-	    value->dump(f);
-	}
-	else
-	    infinint(0).dump(f);
+	size().dump(f);
+	me->skip(0);
+	me->copy_to(f);
     }
 
-    void tlv::read(generic_file & f)
+    void tlv::setup(generic_file & f)
     {
-	if(value != NULL)
-	{
-	    delete value;
-	    value = NULL;
-	}
 	init(f);
-    }
-
-    void tlv::set_contents(const memory_file & contents)
-    {
-	if(value != NULL)
-	{
-	    delete value;
-	    value = NULL;
-	}
-	value = new (get_pool()) storage(contents.get_raw_data());
-	if(value == NULL)
-	    throw Ememory("tlv::set_contents");
-    }
-
-    void tlv::get_contents(memory_file & contents) const
-    {
-	if(value != NULL)
-	    contents.set_raw_data(*value);
-	else
-	    contents.set_raw_data(storage(0));
     }
 
     void tlv::init(generic_file & f)
@@ -87,27 +61,9 @@ namespace libdar
 	f.read((char *)&type, 2);
 	type = ntohs(type);
 	length.read(f);
-	if(length > 0)
-	{
-	    value = new (get_pool()) storage(f, length);
-	    if(value == NULL)
-		throw Ememory("tlv::init");
-	}
-	else
-	    value = NULL;
-    }
-
-    void tlv::copy_from(const tlv & ref)
-    {
-	type = ref.type;
-	if(ref.value != NULL)
-	{
-	    value = new (get_pool()) storage(*(ref.value));
-	    if(value == NULL)
-		throw Ememory("tlv::copy_from");
-	}
-	else
-	    value = NULL;
+	reset();
+	if(f.copy_to(*this, length) != length)
+	    throw Erange("tlv::init",gettext("Missing data to initiate a TLV object"));
     }
 
 } // end of namespace

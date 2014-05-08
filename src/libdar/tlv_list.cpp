@@ -35,25 +35,21 @@ namespace libdar
 	number.dump(f);
 	while(it != fin)
 	{
-	    it->write(f);
+	    it->dump(f);
 	    it++;
 	}
     }
 
-    tlv & tlv_list::operator[] (U_I item)
+    tlv & tlv_list::operator[] (U_I item) const
     {
+	tlv_list *me = const_cast<tlv_list *>(this);
+
 	if(item > contents.size())
 	    throw Erange("tlv_list::operator[]", "index out of range when accessing a tlv_list object");
+	if(me == NULL)
+	    throw SRC_BUG;
 
-	return contents[item];
-    }
-
-    tlv tlv_list::operator[] (U_I item) const
-    {
-	if(item > contents.size())
-	    throw Erange("tlv_list::operator[] const", "index out of range when accessing a tlv_list object");
-
-	return contents[item];
+	return me->contents[item];
     }
 
     void tlv_list::init(generic_file & f)

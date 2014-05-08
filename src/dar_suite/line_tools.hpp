@@ -61,7 +61,7 @@ private:
 
 extern void line_tools_slice_ownership(const std::string & cmd, std::string & slice_permission, std::string & slice_user_ownership, std::string & slice_group_ownership);
 extern void line_tools_repeat_param(const std::string & cmd, infinint & repeat_count, infinint & repeat_byte);
-extern void line_tools_tlv_list2argv(user_interaction & dialog, const tlv_list & list, argc_argv & arg);
+extern void line_tools_tlv_list2argv(user_interaction & dialog, tlv_list & list, argc_argv & arg);
 
     /// returns the old position of parsing (next argument to parse)
 extern S_I line_tools_reset_getopt();

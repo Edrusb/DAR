@@ -2464,15 +2464,13 @@ namespace libdar
     {
 	vector<string>::const_iterator it = data.begin();
 	tlv tmp;
-	tmp.set_type(type);
-	memory_file mem = memory_file(gf_write_only);
 	tlv_list ret;
 
+	tmp.set_type(type);
 	while(it != data.end())
 	{
-	    mem.reset();
-	    mem.write(it->c_str(), it->size());
-	    tmp.set_contents(mem);
+	    tmp.reset();
+	    tmp.write(it->c_str(), it->size());
 	    ret.add(tmp);
 	    it++;
 	}

@@ -238,9 +238,9 @@ void line_tools_repeat_param(const string & cmd, infinint & repeat_count, infini
     }
 }
 
-void line_tools_tlv_list2argv(user_interaction & dialog, const tlv_list & list, argc_argv & arg)
+void line_tools_tlv_list2argv(user_interaction & dialog, tlv_list & list, argc_argv & arg)
 {
-    memory_file mem = memory_file(gf_read_write);
+    memory_file mem = memory_file();
     U_I transfert = 0;
     infinint size;
 
@@ -250,13 +250,13 @@ void line_tools_tlv_list2argv(user_interaction & dialog, const tlv_list & list, 
 	if(list[i].get_type() != 0)
 		// we only use type 0 here
 	    throw Erange("line_tools_tlv_list2argv", gettext("Unknown TLV record type"));
-	list[i].get_contents(mem);
+	size = list[i].size();
 	transfert = 0;
-	size = mem.get_data_size();
 	size.unstack(transfert);
 	if(size != 0)
 	    throw Erange("line_tools_tlv_list2argv", "Too long argument found in TLV to be handled by standard library routine");
-	arg.set_arg(mem, transfert, i);
+	list[i].skip(0);
+	arg.set_arg(list[i], transfert, i);
     }
 }
 
