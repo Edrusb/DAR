@@ -143,6 +143,8 @@ namespace libdar
 	/// \param[in]  crypto cipher algorithm to use
 	/// \param[in]  pass password/passphrase to use for encryption
 	/// \param[in]  crypto_size size of crypto blocks
+	/// \param[in]  gnupg_recipients list of email recipients'public keys to encrypt a randomly chosen key with
+	/// \param[in]  gnupg_key_size size of the randomly chosen key that will be encrypted using gnupg inside the archive
 	/// \param[in]  empty dry-run execution (null_file at bottom of the stack)
 	/// \param[in]  slice_permission permission to set the slices to
 	/// \param[in]  add_marks_for_sequential_reading whether to add an escape layer in the stack
@@ -169,6 +171,8 @@ namespace libdar
 					  crypto_algo crypto,
 					  const secu_string & pass,
 					  U_32 crypto_size,
+					  const std::vector<std::string> & gnupg_recipients,
+					  U_I gnupg_key_size,
 					  bool empty,
 					  const std::string & slice_permission,
 					  bool add_marks_for_sequential_reading,

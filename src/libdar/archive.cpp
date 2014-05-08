@@ -402,6 +402,8 @@ namespace libdar
 				       options.get_crypto_algo(),
 				       options.get_crypto_pass(),
 				       options.get_crypto_size(),
+				       options.get_gnupg_recipients(),
+				       options.get_gnupg_key_size(),
 				       options.get_compr_mask(),
 				       options.get_min_compr_size(),
 				       options.get_nodump(),
@@ -646,6 +648,8 @@ namespace libdar
 				     options.get_crypto_algo(),
 				     options.get_crypto_pass(),
 				     options.get_crypto_size(),
+				     options.get_gnupg_recipients(),
+				     options.get_gnupg_key_size(),
 				     options.get_compr_mask(),
 				     options.get_min_compr_size(),
 				     false,   // nodump
@@ -1161,6 +1165,8 @@ namespace libdar
 					  options.get_crypto_algo(),
 					  options.get_crypto_pass(),
 					  options.get_crypto_size(),
+					  options.get_gnupg_recipients(),
+					  options.get_gnupg_key_size(),
 					  options.get_empty(),
 					  options.get_slice_permission(),
 					  options.get_sequential_marks(),
@@ -1548,6 +1554,8 @@ namespace libdar
                                      crypto_algo crypto,
                                      const secu_string & pass,
                                      U_32 crypto_size,
+				     const vector<string> & gnupg_recipients,
+				     U_I gnupg_key_size,
                                      const mask & compr_mask,
                                      const infinint & min_compr_size,
                                      bool nodump,
@@ -1710,6 +1718,8 @@ namespace libdar
 			 crypto,
 			 pass,
 			 crypto_size,
+			 gnupg_recipients,
+			 gnupg_key_size,
 			 compr_mask,
 			 min_compr_size,
 			 nodump,
@@ -1771,6 +1781,8 @@ namespace libdar
 				   crypto_algo crypto,
 				   const secu_string & pass,
 				   U_32 crypto_size,
+				   const vector<string> & gnupg_recipients,
+				   U_I gnupg_key_size,
 				   const mask & compr_mask,
 				   const infinint & min_compr_size,
 				   bool nodump,
@@ -1856,6 +1868,8 @@ namespace libdar
 					  crypto,
 					  pass,
 					  crypto_size,
+					  gnupg_recipients,
+					  gnupg_key_size,
 					  empty,
 					  slice_permission,
 					  add_marks_for_sequential_reading,
@@ -1986,11 +2000,6 @@ namespace libdar
 			    delete void_cat;
 			    void_cat = NULL;
 			}
-			break;
-		    case oper_isolate:
-			if(info_details)
-			    dialog.warning(gettext("Creating an isolated catalogue..."));
-			    // nothing to be done here, we only drop down the reference catalogue below
 			break;
 		    case oper_merge:
 			if(info_details)

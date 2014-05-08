@@ -74,7 +74,7 @@ namespace libdar
 	    /// constructor 2
 	    ///
 	    /// create the string from a pointer to a (secure) string or from a portion of it
-	secu_string(const char *ptr, U_I size) { init(size); append(ptr, size); };
+	secu_string(const char *ptr, U_I size) { init(size); append_at(0, ptr, size); };
 
 	    /// the copy constructor
 	secu_string(const secu_string & ref) { copy_from(ref); };
@@ -91,26 +91,32 @@ namespace libdar
 	~secu_string() { clean_and_destroy(); };
 
 	    /// fill the object with data
-
-	    /// reads at most size bytes of data directly from the filedescriptor,
+	    ///
+	    /// set at most size bytes of data directly from the filedescriptor,
 	    /// \param[in] fd the filedescriptor to read data from
 	    /// \param[in] size is the maximum number of byte read
-	    /// \note each read call clears and reset the string, as well as the allocation size
-	void read(int fd, U_I size);
+	    /// \note each call to set clears and reset the string, as well as the allocation size
+	void set(int fd, U_I size);
 
-	    /// append some data to the string
-
+	    /// append some data to the string at a given offset
+	    ///
+	    /// \param[in] offset defines at which offset in the secu_string will be placed the string to append
 	    /// \param[in] ptr is the address of the string to append
 	    /// \param[in] size is the number of byte to append
 	    /// \note this call does not change the allocation size, (unlike read()), it adds the data pointed by the arguments
 	    /// to the object while there is enough place to do so.
 	    /// clear_and_resize() must be used first to define enough secure memory to append the expected amount of data
 	    /// in one or several call to append.
-	void append(const char *ptr, U_I size);
+	void append_at(U_I offset, const char *ptr, U_I size);
 
 	    /// append some data to the string
-	void append(int fd, U_I size);
+	void append_at(U_I offset, int fd, U_I size);
 
+	    /// append some data at the end of the string
+	void append(const char *ptr, U_I size) { append_at(*string_size, ptr, size); };
+
+	    /// append some data at the end of the string
+	void append(int fd, U_I size) { append_at(*string_size, fd, size); };
 	    /// shorten the string (do not change the allocated size)
 	    /// \param[in] pos is the length of the string to set, it must be smaller or equal to the current size
 	void reduce_string_size_to(U_I pos);
@@ -123,7 +129,11 @@ namespace libdar
 	    /// \param[in] size is the amount of secure memory to allocated
 	void clear_and_resize(U_I size) { clean_and_destroy(); init(size); };
 
+	    /// clear and keep same storage space
 	void clear_and_not_resize() {  string_size = 0; };
+
+	    /// clear and allocate a given size area filled with random numbers
+	void clear_and_randomize(U_I size);
 
 	    /// get access to the secure string
 
@@ -133,18 +143,18 @@ namespace libdar
 	const char*c_str() const { return mem == NULL ? throw SRC_BUG : mem; };
 
 	    /// get the size of the string
-
-	    /// this is the amount of data read from the filedescriptor
-	    /// up to the first new-line character.
 	U_I size() const { return *string_size; }; // returns the size of the string
+
+	    /// get the size of the allocated secure space
+	U_I max_size() const { return *allocated_size; };
 
     private:
 	U_I *allocated_size;
 	char *mem;
 	U_I *string_size;
 
-	void init(U_I size);
-	void copy_from(const secu_string & ref);
+	void init(U_I size);   //< to be used at creation time or after clean_and_destroy() only
+	void copy_from(const secu_string & ref); //< to be used at creation time or after clean_and_destroy() only
 	bool compare_with(const char *ptr, U_I size) const;
 	void clean_and_destroy();
     };

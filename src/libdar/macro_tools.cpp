@@ -28,6 +28,13 @@ extern "C"
 #if HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
+
+#if HAVE_GCRYPT_H
+#ifndef GCRYPT_NO_DEPRECATED
+#define GCRYPT_NO_DEPRECATED
+#endif
+#include <gcrypt.h>
+#endif
 } // end extern "C"
 
 #include "macro_tools.hpp"
@@ -45,6 +52,8 @@ extern "C"
 #include "tronc.hpp"
 #include "cache.hpp"
 #include "null_file.hpp"
+#include "secu_memory_file.hpp"
+#include "crypto_asym.hpp"
 
 using namespace std;
 
@@ -341,7 +350,31 @@ namespace libdar
 		    throw Erange("macro_tools_open_archive", tools_printf(gettext("The archive %S is encrypted and no encryption cipher has been given, cannot open archive."), &basename));
 	    }
 
-	    if(crypto != crypto_none && pass == "")
+	    if(ver.flag & VERSION_FLAG_HAS_CRYPTED_KEY) // we will find the passphrase from the header's encrypted key
+	    {
+		if(ver.crypted_key == NULL)
+		    throw SRC_BUG;
+
+		    // detemining the size of the unencrypted key
+
+		infinint i_size = ver.crypted_key->size();
+		U_I size = 0;
+		i_size.unstack(size);
+		if(i_size != 0)
+		    throw SRC_BUG;
+
+		    // unciphering the encrypted key using GnuPG user's keyring, asking for passphrase if necessary
+
+		secu_memory_file clear_key = secu_memory_file(size, false);
+		crypto_asym engine(dialog);
+		engine.decrypt(*ver.crypted_key, clear_key);
+
+		    // substitution of the pass by the clear_key if decrypt succeeded (else it throws an exception)
+
+		real_pass = clear_key.get_contents();
+	    }
+
+	    if(crypto != crypto_none && real_pass == "")
 	    {
 		if(!secu_string::is_string_secured())
 		    dialog.warning(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password you are about to provide to be wrote to disk (swap space) in clear. You have been warned!"));
@@ -832,6 +865,8 @@ namespace libdar
 				   crypto_algo crypto,
 				   const secu_string & pass,
 				   U_32 crypto_size,
+				   const vector<string> & gnupg_recipients,
+				   U_I gnupg_key_size,
 				   bool empty,
 				   const string & slice_permission,
 				   bool add_marks_for_sequential_reading,
@@ -951,12 +986,35 @@ namespace libdar
 		ver.flag = 0;
 		ver.sym = crypto;
 
+		if(crypto != crypto_none || !gnupg_recipients.empty())
+		{
+		    if(!secu_string::is_string_secured())
+			dialog.warning(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password/passphrase you may be about to provide to be wrote to disk (swap space) in clear. You have been warned!"));
+		}
+
+		if(!gnupg_recipients.empty())
+		{
+		    ver.crypted_key = new (pool) memory_file();
+		    if(ver.crypted_key == NULL)
+			throw Ememory("macro_tools_create_layers");
+		    ver.flag |= VERSION_FLAG_HAS_CRYPTED_KEY;
+
+		    char variable_size;
+		    gcry_randomize(&variable_size, 1, GCRY_VERY_STRONG_RANDOM);
+		    gnupg_key_size += variable_size; // yes we do not use constant sized key but +0 to +255 bytes length
+		    secu_memory_file clear(gnupg_key_size, true);
+		    crypto_asym engine(dialog);
+
+		    engine.encrypt(gnupg_recipients, clear, *ver.crypted_key);
+		    real_pass = clear.get_contents();
+		    if(crypto == crypto_none)
+			crypto = crypto_blowfish;
+		}
+
 		    // optaining a password on-fly if necessary
 
 		if(crypto != crypto_none && real_pass.size() == 0)
 		{
-		    if(!secu_string::is_string_secured())
-			dialog.warning(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password you are about to provide to be wrote to disk (swap space) in clear. You have been warned!"));
 		    secu_string t1 = dialog.get_secu_string(tools_printf(gettext("Archive %S requires a password: "), &filename), false);
 		    secu_string t2 = dialog.get_secu_string(gettext("Please confirm your password: "), false);
 		    if(t1 == t2)

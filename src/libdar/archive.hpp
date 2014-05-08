@@ -371,6 +371,8 @@ namespace libdar
 				crypto_algo crypto,
 				const secu_string & pass,
 				U_32 crypto_size,
+				const std::vector<std::string> & gnupg_recipients,
+				U_I gnupg_key_size,
 				const mask & compr_mask,
 				const infinint & min_compr_size,
 				bool nodump,
@@ -427,6 +429,8 @@ namespace libdar
 			      crypto_algo crypto,               //< crypt algorithm
 			      const secu_string & pass,         //< password ("" for onfly request of password)
 			      U_32 crypto_size,                 //< size of crypto blocks
+			      const std::vector<std::string> & gnupg_recipients, //< list of email recipients to encrypted a randomly chosen key inside the archive
+			      U_I gnupg_key_size,               //< size of the randomly chosen key encrypted inside the archive using GnuPG
 			      const mask & compr_mask,          //< files to compress
 			      const infinint & min_compr_size,  //< file size under which to not compress files
 			      bool nodump,                      //< whether to consider the "nodump" filesystem flag

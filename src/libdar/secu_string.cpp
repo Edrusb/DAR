@@ -76,7 +76,7 @@ namespace libdar
 #endif
     }
 
-    void secu_string::read(int fd, U_I size)
+    void secu_string::set(int fd, U_I size)
     {
 	clean_and_destroy();
 	init(size);
@@ -96,30 +96,39 @@ namespace libdar
 	    mem[*string_size] = '\0';
     }
 
-    void secu_string::append(const char *ptr, U_I size)
+    void secu_string::append_at(U_I offset, const char *ptr, U_I size)
     {
-	if(size + *string_size >= *allocated_size)
+	if(offset > *string_size)
+	    throw Erange("secu_string::append", gettext("appending data over secure_memory its end"));
+
+	if(size + offset >= *allocated_size)
 	    throw Esecu_memory("secu_string::append");
 
-	(void)memcpy(mem + *string_size, ptr, size);
-	*string_size += size;
+	(void)memcpy(mem + offset, ptr, size);
+	offset += size;
+	if(*string_size < offset)
+	    *string_size = offset;
 	mem[*string_size] = '\0';
     }
 
-    void secu_string::append(int fd, U_I size)
+    void secu_string::append_at(U_I offset, int fd, U_I size)
     {
-	if(*string_size + size > *allocated_size)
+	if(offset > *string_size)
+	    throw Erange("secu_string::append", gettext("appending data over secure_memory its end"));
+
+	if(size + offset >= *allocated_size)
 	    throw Erange("secu_string::append", gettext("Cannot receive that much data in regard to the allocated memory"));
-	S_I lu = ::read(fd, mem + *string_size, size);
+	S_I lu = ::read(fd, mem + offset, size);
 	if(lu < 0)
 	{
 	    mem[*string_size] = '\0';
 	    throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + strerror(errno));
 	}
-	if(*string_size + lu > *allocated_size)
+	if(lu + offset >= *allocated_size)
 	    throw SRC_BUG;
-
-	*string_size += lu;
+	offset += lu;
+	if(*string_size < offset)
+	    *string_size = offset;
 	mem[*string_size] = '\0';
     }
 
@@ -130,6 +139,14 @@ namespace libdar
 
 	*string_size = pos;
 	mem[*string_size] = '\0';
+    }
+
+    void secu_string::clear_and_randomize(U_I size)
+    {
+	clean_and_destroy();
+	init(size);
+	*string_size = size;
+	gcry_randomize(mem, size, GCRY_VERY_STRONG_RANDOM);
     }
 
     void secu_string::init(U_I size)

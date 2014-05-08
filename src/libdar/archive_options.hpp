@@ -333,6 +333,17 @@ namespace libdar
 	    /// set the size of the encryption by block to use
 	void set_crypto_size(U_32 crypto_size) { x_crypto_size = crypto_size; };
 
+	    /// set the list of recipients that will be able to read the archive
+	    /// \note this is based on GnuPG keyring and assumes the user running libdar has its keyring
+	    /// containing for each recipient a valid public key. If a list of recipient is given the crypto_pass
+	    /// (see above) is not used, but the crypto_algo stays used to encrypt the archive using a randomly generated key
+	    /// which is encrypted using the public keys of the recipients and dropped that way encrypted inside the archive.
+	    /// \note if crypto_algo is not set while a list of recipient is given, the crypto algo will default to blowfish
+	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
+
+	    /// change the size of the randomly generated key encrypted using gnupg, the size is in bytes (i.e.: octets)
+	void set_gnupg_key_size(U_I gnupg_key_size) { x_gnupg_key_size = gnupg_key_size; };
+
 	    /// defines files to compress
 	void set_compr_mask(const mask & compr_mask);
 
@@ -475,6 +486,8 @@ namespace libdar
 	crypto_algo get_crypto_algo() const { return x_crypto; };
 	const secu_string & get_crypto_pass() const { return x_pass; };
 	U_32 get_crypto_size() const { return x_crypto_size; };
+	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
+	U_I get_gnupg_key_size() const { return x_gnupg_key_size; };
 	const mask & get_compr_mask() const { if(x_compr_mask == NULL) throw SRC_BUG; return *x_compr_mask; };
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
 	bool get_nodump() const { return x_nodump; };
@@ -525,6 +538,8 @@ namespace libdar
 	crypto_algo x_crypto;
 	secu_string x_pass;
 	U_32 x_crypto_size;
+	std::vector<std::string> x_gnupg_recipients;
+	U_I x_gnupg_key_size;
 	mask * x_compr_mask; //< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
 	infinint x_min_compr_size;
 	bool x_nodump;
@@ -631,6 +646,13 @@ namespace libdar
 	    /// size of the encryption by block to use
 	void set_crypto_size(U_32 crypto_size) { x_crypto_size = crypto_size; };
 
+	    /// set the list of recipients that will be able to read the archive
+	    /// \note more details for the same option of archive_options_create
+	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
+
+	    /// change the size of the randomly generated key encrypted using gnupg, the size is in bytes (i.e.: octets)
+	void set_gnupg_key_size(U_I gnupg_key_size) { x_gnupg_key_size = gnupg_key_size; };
+
 	    /// whether to make a dry-run operation
 	void set_empty(bool empty) { x_empty = empty; };
 
@@ -674,6 +696,8 @@ namespace libdar
 	crypto_algo get_crypto_algo() const { return x_crypto; };
 	const secu_string & get_crypto_pass() const { return x_pass; };
 	U_32 get_crypto_size() const { return x_crypto_size; };
+	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
+	U_I get_gnupg_key_size() const { return x_gnupg_key_size; };
 	bool get_empty() const { return x_empty; };
 	const std::string & get_slice_permission() const { return x_slice_permission; };
 	const std::string & get_slice_user_ownership() const { return x_slice_user_ownership; };
@@ -698,6 +722,8 @@ namespace libdar
 	crypto_algo x_crypto;
 	secu_string x_pass;
 	U_32 x_crypto_size;
+	std::vector<std::string> x_gnupg_recipients;
+	U_I x_gnupg_key_size;
 	bool x_empty;
 	std::string x_slice_permission;
 	std::string x_slice_user_ownership;
@@ -806,6 +832,13 @@ namespace libdar
 	    /// set the size of the encryption by block to use
 	void set_crypto_size(U_32 crypto_size) { x_crypto_size = crypto_size; };
 
+	    /// set the list of recipients that will be able to read the archive
+	    /// \note more details for the same option of archive_options_create
+	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
+
+	    /// change the size of the randomly generated key encrypted using gnupg, the size is in bytes (i.e.: octets)
+	void set_gnupg_key_size(U_I gnupg_key_size) { x_gnupg_key_size = gnupg_key_size; };
+
 	    /// defines files to compress
 	void set_compr_mask(const mask & compr_mask);
 
@@ -875,6 +908,8 @@ namespace libdar
 	crypto_algo get_crypto_algo() const { return x_crypto; };
 	const secu_string & get_crypto_pass() const { return x_pass; };
 	U_32 get_crypto_size() const { return x_crypto_size; };
+	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
+	U_I get_gnupg_key_size() const { return x_gnupg_key_size; };
 	const mask & get_compr_mask() const { if(x_compr_mask == NULL) throw SRC_BUG; return *x_compr_mask; };
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
 	bool get_empty() const { return x_empty; };
@@ -912,6 +947,8 @@ namespace libdar
 	crypto_algo x_crypto;
 	secu_string x_pass;
 	U_32 x_crypto_size;
+	std::vector<std::string> x_gnupg_recipients;
+	U_I x_gnupg_key_size;
 	mask * x_compr_mask;
 	infinint x_min_compr_size;
 	bool x_empty;
