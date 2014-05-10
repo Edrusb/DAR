@@ -56,7 +56,28 @@ using namespace std;
 namespace libdar
 {
 
-
+    string crypto_algo_2_string(crypto_algo algo)
+    {
+	switch(algo)
+	{
+	case crypto_none:
+	    return gettext("none");
+	case crypto_scrambling:
+	    return gettext("scrambling (weak encryption)");
+	case crypto_blowfish:
+	    return "blowfish";
+	case crypto_aes256:
+	    return "AES 256";
+	case crypto_twofish256:
+	    return "twofish 256";
+	case crypto_serpent256:
+	    return "serpent 256";
+	case crypto_camellia256:
+	    return "camellia 256";
+	default:
+	    throw SRC_BUG;
+	}
+    }
 
 ///////////////////////////// CRYPTO_SYM IMPLEMENTATION ////////////////////////////////
 

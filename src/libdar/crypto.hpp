@@ -72,6 +72,8 @@ namespace libdar
 #endif
     }
 
+    std::string crypto_algo_2_string(crypto_algo algo);
+
 	/// implementation of encryption using symetrical cryptography used in libgcrypt (among which is blowfish)
 	//
 	//
@@ -86,7 +88,7 @@ namespace libdar
 		   generic_file & encrypted_side,
 		   bool no_initial_shift,
 		   const archive_version & reading_ver,
-		   crypto_algo algo); //< must be a symetrical algo (else an exception is thrown)
+		   crypto_algo algo);
 	~crypto_sym() { detruit(); };
 
     protected:

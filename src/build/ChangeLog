@@ -22,8 +22,8 @@ from 2.4.x to 2.5.0
   for a long time now.
 - added more specific -vm and -vt verbose options
 - added support for microsecond timestamps (atime, mtime, ctime, birthtime)
-- added support for lutime() to restore atime/mtimes of symlink on system
-  that supports it.
+- added support for lutime() to restore atime/mtimes of symlink on systems
+  that support it.
 - removed backward compatible API with old libdar 4.4.x
 - simplified implementation of archive isolation made possible thanks to
   archive isolation evolution features brought by release 2.4.0.
@@ -34,6 +34,7 @@ from 2.4.x to 2.5.0
   data.
 - This new archive format (version 9) holds the ciphering algorithm used
   at creation time, only the passphrase is required at reading time.
+- Adding support for asymetric encryption (GnuPG) relying on gpgme
 
 from 2.4.13 to 2.4.14
 - limiting memory consumtion of the cache layer to stay below 10 MiB, under

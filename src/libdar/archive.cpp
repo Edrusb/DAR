@@ -819,12 +819,15 @@ namespace libdar
 	    infinint first_file_size;
 	    infinint last_file_size, file_number;
 	    string algo = compression2string(char2compression(get_header().algo_zip));
+	    string sym = ver.edition >= 9 ? crypto_algo_2_string(ver.sym) : ((ver.flag & VERSION_FLAG_SCRAMBLED) != 0 ? gettext("yes") : gettext("no"));
+	    string asym = ver.edition >= 9 && (ver.flag & VERSION_FLAG_HAS_CRYPTED_KEY) != 0 ? "gnupg" : gettext("none");
 	    infinint cat_size = get_cat_size();
 	    const header_version ver = get_header();
 
-	    dialog.printf(gettext("Archive version format               : %s\n"), get_header().edition.display().c_str());
+	    dialog.printf(gettext("Archive version format               : %s\n"), ver.edition.display().c_str());
 	    dialog.printf(gettext("Compression algorithm used           : %S\n"), &algo);
-	    dialog.printf(gettext("Scrambling or strong encryption used : %s\n"), ((ver.flag & VERSION_FLAG_SCRAMBLED) != 0 ? gettext("yes") : gettext("no")));
+	    dialog.printf(gettext("Symmetric key encryption used        : %S\n"), &sym);
+	    dialog.printf(gettext("Asymmetric key encryption used       : %S\n"), &asym);
 	    dialog.printf(gettext("Sequential reading marks             : %s\n"), ((ver.flag & VERSION_FLAG_SEQUENCE_MARK) != 0 ? gettext("present") : gettext("absent")));
 	    dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
 
