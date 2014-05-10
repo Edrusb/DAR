@@ -31,6 +31,7 @@ extern "C"
 #include "crypto_asym.hpp"
 #include "integers.hpp"
 #include "generic_file_overlay_for_gpgme.hpp"
+#include "thread_cancellation.hpp"
 
 #include <string>
 
@@ -263,23 +264,30 @@ namespace libdar
     static gpgme_error_t read_passphrase(void *hook, const char *uid_hint, const char *passphrase_info, int prev_was_bad, int fd)
     {
 	crypto_asym *obj = (crypto_asym *)(hook);
-	string precision = gettext("Passphrase required");
+	const char * precision = gettext("Passphrase required for key %s :");
+	string message;
 	secu_string pass;
 	ssize_t wrote;
 	gpgme_error_t ret = GPG_ERR_NO_ERROR;
+	thread_cancellation th;
 
 	if(obj == NULL)
 	    throw SRC_BUG;
 
 	if(uid_hint != NULL)
-	    precision += tools_printf(gettext(" [User ID = %s]"), uid_hint);
-	if(passphrase_info != NULL)
-	    precision += tools_printf(gettext(" [Info = %s]"), passphrase_info);
-	precision += ":";
+	    message = tools_printf(precision, uid_hint);
+	else
+	{
+	    if(passphrase_info != NULL)
+		message = tools_printf(precision, passphrase_info);
+	    else
+		message = tools_printf(precision, "");
+	}
 
 	if(prev_was_bad)
 	    obj->get_ui().warning(gettext("Error, invalid passphrase given, try again:"));
-	pass = obj->get_ui().get_secu_string(precision, false);
+	pass = obj->get_ui().get_secu_string(message, false);
+	th.check_self_cancellation();
 
 	wrote = write(fd, pass.c_str(), pass.size());
 	if(wrote < 0 || (U_I)(wrote) != pass.size())
