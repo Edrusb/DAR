@@ -367,6 +367,8 @@ namespace libdar
 
 		secu_memory_file clear_key = secu_memory_file(size, false);
 		crypto_asym engine(dialog);
+		ver.crypted_key->skip(0);
+		clear_key.skip(0);
 		engine.decrypt(*ver.crypted_key, clear_key);
 
 		    // substitution of the pass by the clear_key if decrypt succeeded (else it throws an exception)
@@ -999,15 +1001,20 @@ namespace libdar
 			throw Ememory("macro_tools_create_layers");
 		    ver.flag |= VERSION_FLAG_HAS_CRYPTED_KEY;
 
+			// generating random key for symmetric encryption
+
 		    char variable_size;
 		    dialog.warning(gettext("Generating random key for symmetric encryption..."));
 		    gcry_randomize(&variable_size, 1, GCRY_VERY_STRONG_RANDOM);
-		    if(info_details)
-			dialog.warning(gettext("Key generated"));
-		    gnupg_key_size += variable_size; // yes we do not use constant sized key but +0 to +255 bytes length
+		    gnupg_key_size += variable_size; // yes we do not use constant sized key but add from +0 to +255 bytes to its specified length
 		    secu_memory_file clear(gnupg_key_size, true);
-		    crypto_asym engine(dialog);
+		    dialog.warning(gettext("Key generated"));
 
+			// encrypting the symmetric key with asymetric algorithm
+
+		    crypto_asym engine(dialog);
+		    clear.skip(0);
+		    ver.crypted_key->skip(0);
 		    engine.encrypt(gnupg_recipients, clear, *ver.crypted_key);
 		    real_pass = clear.get_contents();
 		    if(crypto == crypto_none)
