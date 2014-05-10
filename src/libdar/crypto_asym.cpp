@@ -58,7 +58,7 @@ namespace libdar
 
 	    gpgme_error_t err = gpgme_op_encrypt(context,
 						 ciphering_keys,
-						 (gpgme_encrypt_flags_t)0,
+						 (gpgme_encrypt_flags_t)(GPGME_ENCRYPT_NO_ENCRYPT_TO|GPGME_ENCRYPT_ALWAYS_TRUST),
 						 o_clear.get_gpgme_handle(),
 						 o_ciphered.get_gpgme_handle());
 	    switch(gpgme_err_code(err))
@@ -225,14 +225,14 @@ namespace libdar
 		if(!found)
 		{
 		    get_ui().printf(gettext("No valid key could be find for recipient %S"), &(recipients_email[i]));
-		    get_ui().pause("Do you want to abort the operation to fix this key issue first?");
+		    get_ui().pause("Do you want to continue without this recipient?");
 		    ++offset;
 		}
 	    }
 
 		// if no recipient could be found at all aborting the operation
 
-	    if(offset >= size)
+	    if(offset + 1 >= size)
 		throw Erange("crypto_asym::build_key_list", gettext("No recipient remain with a valid key, encryption is impossible, aborting"));
 
 		// the key list must end wth a NULL entry

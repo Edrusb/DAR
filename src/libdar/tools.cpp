@@ -2642,7 +2642,16 @@ namespace libdar
 	char buffer[MSGSIZE];
 	string ret;
 
-	(void)gpgme_strerror_r(err, buffer, MSGSIZE);
+	switch(gpgme_strerror_r(err, buffer, MSGSIZE))
+	{
+	case 0:
+	    break;
+	case ERANGE:
+	    strncpy(buffer, "Lack of memory to display gpgme error message", MSGSIZE);
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
 	buffer[MSGSIZE-1] = '\0';
 	ret = buffer;
 
