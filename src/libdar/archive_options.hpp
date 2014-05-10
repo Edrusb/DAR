@@ -342,7 +342,8 @@ namespace libdar
 	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
 
 	    /// change the size of the randomly generated key encrypted using gnupg, the size is in bytes (i.e.: octets)
-	void set_gnupg_key_size(U_I gnupg_key_size) { x_gnupg_key_size = gnupg_key_size; };
+	    /// \note if set to zero, will use the default key length
+	void set_gnupg_key_size(U_I gnupg_key_size);
 
 	    /// defines files to compress
 	void set_compr_mask(const mask & compr_mask);
@@ -651,7 +652,8 @@ namespace libdar
 	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
 
 	    /// change the size of the randomly generated key encrypted using gnupg, the size is in bytes (i.e.: octets)
-	void set_gnupg_key_size(U_I gnupg_key_size) { x_gnupg_key_size = gnupg_key_size; };
+	    /// \note if set to zero, will use the default key length
+	void set_gnupg_key_size(U_I gnupg_key_size);
 
 	    /// whether to make a dry-run operation
 	void set_empty(bool empty) { x_empty = empty; };
@@ -837,7 +839,8 @@ namespace libdar
 	void set_gnupg_recipients(const std::vector<std::string> & gnupg_recipients) { x_gnupg_recipients = gnupg_recipients; };
 
 	    /// change the size of the randomly generated key encrypted using gnupg, the size is in bytes (i.e.: octets)
-	void set_gnupg_key_size(U_I gnupg_key_size) { x_gnupg_key_size = gnupg_key_size; };
+	    /// \note if set to zero, will use the default key length
+	void set_gnupg_key_size(U_I gnupg_key_size);
 
 	    /// defines files to compress
 	void set_compr_mask(const mask & compr_mask);

@@ -84,7 +84,7 @@ _ + retry on change                      --retry-on-change <count[:max byte]>
 3 + create a hash algorithm (+algo)      --hash <algo>
 4 + filesystem specific attr. family     --fsa-scope <fam1,fam2,fam3,...>
 5 + exclude file having a given EA set   --exclude-by-ea [<ea name>]
-6 !
+6 + define internal key lengh with gnupg --key-length <length in bytes>
 7 !
 8 !
 9 !
