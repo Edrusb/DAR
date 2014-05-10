@@ -2429,10 +2429,8 @@ namespace libdar
 		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
 		ret = tmp = new (get_pool()) fichier_local(chemin, furtive_read_mode);
 		if(tmp != NULL)
-		    tmp->fadvise(fichier_global::advise_noreuse);
-		    // yep, Linux does not implement this today, but the given advise is correct in regard
-		    // to the the posix semantic. Other system might behave correctly in regard to this posix
-		    // system call, maybe Linux will in the future, so we are ready.
+			// telling *tmp to flush the data from the cache as soon as possible
+		    tmp->fadvise(fichier_global::advise_dontneed);
 	    }
 	    else // inode from archive
 		if(loc == NULL)

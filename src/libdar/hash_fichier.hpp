@@ -100,7 +100,6 @@ namespace libdar
 	void change_permission(U_I perm) { if(ref == NULL || hash_ref == NULL) throw SRC_BUG; ref->change_permission(perm); hash_ref->change_permission(perm); };
 	infinint get_size() const { if(ref == NULL) throw SRC_BUG; return ref->get_size(); };
 	void fadvise(advise adv) const { if(ref == NULL) throw SRC_BUG; ref->fadvise(adv); };
-	void fsync() const { if(ref == NULL) throw SRC_BUG; ref->fsync(); };
 
 	    // inherited from generic_file
 

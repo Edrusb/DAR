@@ -300,6 +300,9 @@ namespace libdar
         }
         while(read < size && ret != 0);
 
+	if(adv == advise_dontneed)
+	    fadvise(adv);
+
         return true; // we never make partial reading, here
     }
 
@@ -351,6 +354,13 @@ namespace libdar
                 total += ret;
         }
 
+	if(adv == advise_dontneed)
+		// we should call fsync() here but we do not to to avoid blocking the process:
+		// we assume the system has flushed some blocks of possibly previous writes
+		// so we just inform the system to remove from cache blocks associated to this
+		// file that have already been flushed.
+	    fadvise(adv);
+
 	return total;
      }
 
@@ -363,6 +373,7 @@ namespace libdar
     {
 	U_I o_mode = O_BINARY;
 	const char *name = chemin.c_str();
+	adv = advise_normal;
 
         switch(m)
         {

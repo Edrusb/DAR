@@ -159,6 +159,7 @@ namespace libdar
 		    hash_ref->write("  ", 2); // two spaces sperator used by md5sum and sha1sum
 		    hash_ref->write(ref_filename.c_str(), ref_filename.size());
 		    hash_ref->write("\n", 1); // we finish by a new-line character
+		    hash_ref->terminate();
 		}
 		catch(Egeneric & e)
 		{

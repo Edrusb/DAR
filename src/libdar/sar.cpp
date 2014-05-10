@@ -583,15 +583,6 @@ namespace libdar
 			of_fd->write(&flag, 1);
 		}
 	    }
-	    of_fd->fsync();
-	    of_fd->fadvise(fichier_global::advise_dontneed);
-		// well this two previous lines are for Linux
-		// which has a strange implementation of the fadvise posix routine:
-		// this two calls should clear the current slice from the cache under Linux.
-		// On other systems, as the fadvise has already been set top "dontneed" when
-		// the filedescriptor was just openned, the data written to the current slice
-		// should already have not gone through the cache, so this second call is useless
-		// but does not harm.
 
 	    of_fd->terminate();
 

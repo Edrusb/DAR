@@ -1129,7 +1129,7 @@ namespace libdar
 		    infinint seek;
 
 		    fichier_local dest = fichier_local(get_ui(), display, gf_write_only, 0700, false, true, false);
-			// telling to the system to write data directly to disk not going through the cache
+			// telling to 'dest' to flush data from the cache as soon as possible
 		    dest.fadvise(fichier_global::advise_dontneed);
 			// the implicit destruction of dest (exiting the block)
 			// will close the 'ret' file descriptor (see ~fichier_local())

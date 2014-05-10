@@ -89,13 +89,6 @@ namespace libdar
 	    /// set posix_fadvise for the whole file
 	void fadvise(advise adv) const;
 
-	    /// sync the data to disk
-
-	    /// this is necessary under Linux for better efficiency
-	    /// before calling fadvise(advise_dontneed) else write pending blocks
-	    /// would stay in the cache more time than necessary
-	void fsync() const;
-
             // inherited from generic_file
         bool skip(const infinint & pos);
         bool skip_to_eof();
@@ -109,8 +102,8 @@ namespace libdar
 
     protected :
 	    // inherited from generic_file grand-parent class
-	void inherited_sync_write() {};
-	void inherited_terminate() {};
+	void inherited_sync_write() { fsync(); };
+	void inherited_terminate() { if(adv == advise_dontneed) fadvise(adv); };
 
 	    // inherited from fichier_global parent class
 	U_I fichier_global_inherited_write(const char *a, U_I size);
@@ -118,6 +111,7 @@ namespace libdar
 
     private :
         S_I filedesc;
+	advise adv;
 
 	void open(const std::string & chemin,
 		  gf_mode m,
@@ -130,6 +124,14 @@ namespace libdar
 	void copy_parent_from(const fichier_local & ref);
 	void detruit() { if(filedesc >= 0) close(filedesc); filedesc = -1; };
 	int advise_to_int(advise arg) const;
+
+	    /// sync the data to disk
+
+	    /// this is necessary under Linux for better efficiency
+	    /// before calling fadvise(advise_dontneed) else write pending blocks
+	    /// would stay in the cache more time than necessary
+	void fsync() const;
+
     };
 
 	/// @}

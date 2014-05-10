@@ -90,13 +90,6 @@ namespace libdar
 	    /// set posix_fadvise for the whole file
 	virtual void fadvise(advise adv) const = 0;
 
-	    /// sync the data to disk
-
-	    /// this is necessary under Linux for better efficiency
-	    /// before calling fadvise(advise_dontneed) else write pending blocks
-	    /// would stay in the cache more time than necessary
-	virtual void fsync() const = 0;
-
     protected :
 	user_interaction & get_ui() { if(x_dialog == NULL) throw SRC_BUG; return *x_dialog; };
 
