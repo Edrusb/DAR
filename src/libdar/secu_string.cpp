@@ -146,7 +146,9 @@ namespace libdar
 	clean_and_destroy();
 	init(size);
 	*string_size = size;
+#if CRYPTO_AVAILABLE
 	gcry_randomize(mem, size, GCRY_STRONG_RANDOM);
+#endif
     }
 
     void secu_string::init(U_I size)

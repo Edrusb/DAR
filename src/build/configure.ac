@@ -75,7 +75,7 @@ AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 
 
-AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h gpgme.h])
+AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h])
 
 
 AC_SYS_LARGEFILE
@@ -866,15 +866,20 @@ AC_ARG_ENABLE(  [gpgme-linking],
 		  local_gpgme="no"
                 ],
 		[
-		  gpgme_min_version="1.2.0"
-		  AC_DEFINE_UNQUOTED(GPGME_MIN_VERSION, "$gpgme_min_version", [minimum version expected of GPGME])
-		  AM_PATH_GPGME($gpgme_min_version,
+		  if[ "$local_crypto" != "no" ] ; then
+  		    gpgme_min_version="1.2.0"
+		    AC_DEFINE_UNQUOTED(GPGME_MIN_VERSION, "$gpgme_min_version", [minimum version expected of GPGME])
+		    AC_CHECK_HEADERS([gpgme.h])
+		    AM_PATH_GPGME($gpgme_min_version,
 		      		[
 				  local_gpgme="yes"
 				  AC_DEFINE(GPGME_SUPPORT, 1, [GPGME is available to support public key based ciphering])
 				],
 				[]
 			       )
+                 else
+		    AC_MSG_ERROR([Public key support (GPGME linking) requires libgcrypt (strong encryption support)])
+                 fi
 		]
 	     )
 

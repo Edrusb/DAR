@@ -146,6 +146,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    read_options.set_execute(param.execute_ref);
 		    read_options.set_info_details(param.info_details);
 		    read_options.set_slice_min_digits(param.ref_num_digits);
+		    read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		    if(param.sequential_read)
 		    {
 			if(param.op == merging)
@@ -185,6 +186,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			read_options.set_execute(param.aux_execute);
 			read_options.set_info_details(param.info_details);
 			read_options.set_slice_min_digits(param.aux_num_digits);
+			read_options.set_ignore_signature_check_failure(param.blind_signatures);
 			if(param.sequential_read)
 			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
 			aux = new (nothrow) archive(dialog, *param.aux_root, *param.aux_filename, EXTENSION,
@@ -227,6 +229,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.set_crypto_pass(tmp_pass);
 		    create_options.set_crypto_size(param.crypto_size);
 		    create_options.set_gnupg_recipients(recipients);
+		    create_options.set_gnupg_key_size(param.gnupg_key_size);
+		    if(recipients.empty() && !param.signatories.empty())
+			throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
+		    create_options.set_gnupg_signatories(param.signatories);
 		    create_options.set_compr_mask(*param.compress_mask);
 		    create_options.set_min_compr_size(param.min_compr_size);
 		    create_options.set_nodump(param.nodump);
@@ -285,6 +291,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    merge_options.set_crypto_pass(tmp_pass);
 		    merge_options.set_crypto_size(param.crypto_size);
 		    merge_options.set_gnupg_recipients(recipients);
+		    merge_options.set_gnupg_key_size(param.gnupg_key_size);
+		    if(recipients.empty() && !param.signatories.empty())
+			throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
+		    merge_options.set_gnupg_signatories(param.signatories);
 		    merge_options.set_compr_mask(*param.compress_mask);
 		    merge_options.set_min_compr_size(param.min_compr_size);
 		    merge_options.set_empty(param.empty);
@@ -374,6 +384,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			isolate_options.set_crypto_pass(tmp_pass);
 			isolate_options.set_crypto_size(param.aux_crypto_size);
 			isolate_options.set_gnupg_recipients(recipients);
+			isolate_options.set_gnupg_key_size(param.gnupg_key_size);
+			if(recipients.empty() && !param.signatories.empty())
+			    throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
+			isolate_options.set_gnupg_signatories(param.signatories);
 			isolate_options.set_empty(param.empty);
 			isolate_options.set_slice_permission(param.slice_perm);
 			isolate_options.set_slice_user_ownership(param.slice_user);
@@ -412,6 +426,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_info_details(param.info_details);
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.ref_num_digits);
+		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
 					     read_options);
 		if(arch == NULL)
@@ -437,6 +452,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		isolate_options.set_crypto_pass(tmp_pass);
 		isolate_options.set_crypto_size(param.crypto_size);
 		isolate_options.set_gnupg_recipients(recipients);
+		isolate_options.set_gnupg_key_size(param.gnupg_key_size);
+		if(recipients.empty() && !param.signatories.empty())
+		    throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
+		isolate_options.set_gnupg_signatories(param.signatories);
 		isolate_options.set_empty(param.empty);
 		isolate_options.set_slice_permission(param.slice_perm);
 		isolate_options.set_slice_user_ownership(param.slice_user);
@@ -474,6 +493,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_lax(param.lax);
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
+		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 
 		if(param.ref_filename != NULL && param.ref_root != NULL)
 		{
@@ -577,6 +597,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_lax(param.lax);
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
+		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 
 		if(param.ref_filename != NULL && param.ref_root != NULL)
 		{
@@ -653,6 +674,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_lax(param.lax);
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
+		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 
 		if(param.ref_filename != NULL && param.ref_root != NULL)
 		{
@@ -722,6 +744,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_lax(param.lax);
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
+		read_options.set_ignore_signature_check_failure(param.blind_signatures);
 
 		arch = new (nothrow) archive(dialog,
 				   *param.sauv_root,
@@ -732,12 +755,18 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    throw Ememory("little_main");
 
 		if(param.quiet)
+		{
+		    const vector<signator> & gnupg_signed = arch->get_signatories();
 		    arch->summary(dialog);
+		    line_tools_display_signatories(dialog, gnupg_signed);
+		}
 		else
 		{
 		    if(param.info_details)
 		    {
+			const vector<signator> & gnupg_signed = arch->get_signatories();
 			arch->summary(dialog);
+			line_tools_display_signatories(dialog, gnupg_signed);
 			dialog.pause(gettext("Continue listing archive contents?"));
 		    }
 		    listing_options.clear();

@@ -151,6 +151,7 @@ namespace libdar
 	x_entrepot = new (get_pool()) entrepot_local("", "", false); // never using furtive_mode to read slices
 	if(x_entrepot == NULL)
 	    throw Ememory("archive_options_read::clear");
+	x_ignore_signature_check_failure = false;
 
 	    //
 	external_cat = false;
@@ -233,7 +234,7 @@ namespace libdar
 	x_entrepot = ref.x_entrepot->clone();
 	if(x_entrepot == NULL)
 	    throw Ememory("archive_options_read::copy_from");
-
+	x_ignore_signature_check_failure = ref.x_ignore_signature_check_failure;
 	    //
 
 	external_cat = ref.external_cat;
@@ -333,6 +334,7 @@ namespace libdar
 	    x_crypto_size = default_crypto_size;
 	    x_gnupg_recipients.clear();
 	    x_gnupg_key_size = default_gnupg_key_size;
+	    x_gnupg_signatories.clear();
 	    x_min_compr_size = default_min_compr_size;
 	    x_nodump = false;
 	    exclude_by_ea = "";
@@ -563,6 +565,7 @@ namespace libdar
 	x_crypto_size = ref.x_crypto_size;
 	x_gnupg_recipients = ref.x_gnupg_recipients;
 	x_gnupg_key_size = ref.x_gnupg_key_size;
+	x_gnupg_signatories = ref.x_gnupg_signatories;
 	x_min_compr_size = ref.x_min_compr_size;
 	x_nodump = ref.x_nodump;
 	x_what_to_check = ref.x_what_to_check;
@@ -622,6 +625,7 @@ namespace libdar
 	    x_crypto_size = default_crypto_size;
 	    x_gnupg_recipients.clear();
 	    x_gnupg_key_size = default_gnupg_key_size;
+	    x_gnupg_signatories.clear();
 	    x_empty = false;
 	    x_slice_permission = "";
 	    x_slice_user_ownership = "";
@@ -685,6 +689,7 @@ namespace libdar
 	x_crypto_size = ref.x_crypto_size;
 	x_gnupg_recipients = ref.x_gnupg_recipients;
 	x_gnupg_key_size = ref.x_gnupg_key_size;
+	x_gnupg_signatories = ref.x_gnupg_signatories;
 	x_empty = ref.x_empty;
 	x_slice_permission = ref.x_slice_permission;
 	x_slice_user_ownership = ref.x_slice_user_ownership;
@@ -736,6 +741,7 @@ namespace libdar
 	    x_crypto_size = default_crypto_size;
 	    x_gnupg_recipients.clear();
 	    x_gnupg_key_size = default_gnupg_key_size;
+	    x_gnupg_signatories.clear();
 	    x_min_compr_size = default_min_compr_size;
 	    x_empty = false;
 	    x_keep_compressed = false;
@@ -952,6 +958,7 @@ namespace libdar
 	    x_crypto_size = ref.x_crypto_size;
 	    x_gnupg_recipients = ref.x_gnupg_recipients;
 	    x_gnupg_key_size = ref.x_gnupg_key_size;
+	    x_gnupg_signatories = ref.x_gnupg_signatories;
 	    x_min_compr_size = ref.x_min_compr_size;
 	    x_empty = ref.x_empty;
 	    x_keep_compressed = ref.x_keep_compressed;

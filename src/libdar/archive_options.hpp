@@ -126,6 +126,9 @@ namespace libdar
 	    /// defines the protocol to use to retrieve slices
 	void set_entrepot(const entrepot & entr) { if(x_entrepot != NULL) delete x_entrepot; x_entrepot = entr.clone(); if(x_entrepot == NULL) throw Ememory("archive_options_read::set_entrepot"); };
 
+	    /// whether to warn (true) or ignore (false) signature failure (default is true)
+	void set_ignore_signature_check_failure(bool val) { x_ignore_signature_check_failure = val; };
+
 	    //////// what follows concerne the use of an external catalogue instead of the archive's internal one
 
 	    /// defines whether or not to use the catalogue from an extracted catalogue (instead of the one embedded in the archive) and which one to use
@@ -178,6 +181,7 @@ namespace libdar
 	void set_ref_entrepot(const entrepot & entr) { if(x_ref_entrepot != NULL) delete x_ref_entrepot; x_ref_entrepot = entr.clone(); if(x_ref_entrepot == NULL) throw Ememory("archive_options_read::set_entrepot"); };
 
 
+
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods (mainly used inside libdar, but kept public and part of the API in the case it is needed)
 
@@ -193,6 +197,7 @@ namespace libdar
 	bool get_sequential_read() const { return x_sequential_read; };
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
+	bool get_ignore_signature_check_failure() const { return x_ignore_signature_check_failure; };
 
 	    // All methods that follow concern the archive where to fetch the (isolated) catalogue from
 	bool is_external_catalogue_set() const { return external_cat; };
@@ -218,6 +223,8 @@ namespace libdar
 	bool x_sequential_read;
 	infinint x_slice_min_digits;
 	entrepot *x_entrepot;
+	bool x_ignore_signature_check_failure;
+
 
 	    // external catalogue relative fields
 	bool external_cat;
@@ -344,6 +351,9 @@ namespace libdar
 	    /// change the size of the randomly generated key encrypted using gnupg, the size is in bytes (i.e.: octets)
 	    /// \note if set to zero, will use the default key length
 	void set_gnupg_key_size(U_I gnupg_key_size);
+
+	    /// the private keys matching the email of the provided list are used to sign the archive random key
+	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
 
 	    /// defines files to compress
 	void set_compr_mask(const mask & compr_mask);
@@ -489,6 +499,7 @@ namespace libdar
 	U_32 get_crypto_size() const { return x_crypto_size; };
 	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
 	U_I get_gnupg_key_size() const { return x_gnupg_key_size; };
+	const std::vector<std::string> & get_gnupg_signatories() const { return x_gnupg_signatories; };
 	const mask & get_compr_mask() const { if(x_compr_mask == NULL) throw SRC_BUG; return *x_compr_mask; };
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
 	bool get_nodump() const { return x_nodump; };
@@ -541,6 +552,7 @@ namespace libdar
 	U_32 x_crypto_size;
 	std::vector<std::string> x_gnupg_recipients;
 	U_I x_gnupg_key_size;
+	std::vector<std::string> x_gnupg_signatories;
 	mask * x_compr_mask; //< points to a local copy of mask (must be allocated / releases by the archive_option_create objects)
 	infinint x_min_compr_size;
 	bool x_nodump;
@@ -655,6 +667,9 @@ namespace libdar
 	    /// \note if set to zero, will use the default key length
 	void set_gnupg_key_size(U_I gnupg_key_size);
 
+	    /// the private keys matching the email of the provided list are used to sign the archive random key
+	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
+
 	    /// whether to make a dry-run operation
 	void set_empty(bool empty) { x_empty = empty; };
 
@@ -700,6 +715,7 @@ namespace libdar
 	U_32 get_crypto_size() const { return x_crypto_size; };
 	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
 	U_I get_gnupg_key_size() const { return x_gnupg_key_size; };
+	const std::vector<std::string> & get_gnupg_signatories() const { return x_gnupg_signatories; };
 	bool get_empty() const { return x_empty; };
 	const std::string & get_slice_permission() const { return x_slice_permission; };
 	const std::string & get_slice_user_ownership() const { return x_slice_user_ownership; };
@@ -726,6 +742,7 @@ namespace libdar
 	U_32 x_crypto_size;
 	std::vector<std::string> x_gnupg_recipients;
 	U_I x_gnupg_key_size;
+	std::vector<std::string> x_gnupg_signatories;
 	bool x_empty;
 	std::string x_slice_permission;
 	std::string x_slice_user_ownership;
@@ -842,6 +859,9 @@ namespace libdar
 	    /// \note if set to zero, will use the default key length
 	void set_gnupg_key_size(U_I gnupg_key_size);
 
+	    /// the private keys matching the email of the provided list are used to sign the archive random key
+	void set_gnupg_signatories(const std::vector<std::string> & gnupg_signatories) { x_gnupg_signatories = gnupg_signatories; };
+
 	    /// defines files to compress
 	void set_compr_mask(const mask & compr_mask);
 
@@ -913,6 +933,7 @@ namespace libdar
 	U_32 get_crypto_size() const { return x_crypto_size; };
 	const std::vector<std::string> & get_gnupg_recipients() const { return x_gnupg_recipients; };
 	U_I get_gnupg_key_size() const { return x_gnupg_key_size; };
+	const std::vector<std::string> & get_gnupg_signatories() const { return x_gnupg_signatories; };
 	const mask & get_compr_mask() const { if(x_compr_mask == NULL) throw SRC_BUG; return *x_compr_mask; };
 	const infinint & get_min_compr_size() const { return x_min_compr_size; };
 	bool get_empty() const { return x_empty; };
@@ -952,6 +973,7 @@ namespace libdar
 	U_32 x_crypto_size;
 	std::vector<std::string> x_gnupg_recipients;
 	U_I x_gnupg_key_size;
+	std::vector<std::string> x_gnupg_signatories;
 	mask * x_compr_mask;
 	infinint x_min_compr_size;
 	bool x_empty;

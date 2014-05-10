@@ -45,22 +45,79 @@ namespace libdar
 #endif
 
 
+    void crypto_asym::set_signatories(const std::vector<std::string> & signatories)
+    {
+#if GPGME_SUPPORT
+	gpgme_key_t *signatories_key = NULL;
+
+	if(signatories.empty())
+	{
+	    gpgme_signers_clear(context);
+	    has_signatories = false;
+	}
+	else
+	{
+	    build_key_list(signatories, signatories_key, true);
+	    try
+	    {
+		gpgme_signers_clear(context);
+		gpgme_key_t *ptr = signatories_key;
+		gpgme_error_t err;
+
+		if(ptr == NULL)
+		    throw SRC_BUG;  // build_key_list failed
+		while(*ptr != NULL)
+		{
+		    err = gpgme_signers_add(context, *ptr);
+		    switch(gpgme_err_code(err))
+		    {
+		    case GPG_ERR_NO_ERROR:
+			break;
+		    default:
+			throw Erange("crypto_asym::encrypt", string(gettext("Unexpected error reported by GPGME: ")) + tools_gpgme_strerror_r(err));
+		    }
+		    ++ptr;
+		}
+	    }
+	    catch(...)
+	    {
+		release_key_list(signatories_key);
+		gpgme_signers_clear(context);
+		has_signatories = false;
+		throw;
+	    }
+	    release_key_list(signatories_key);
+	    has_signatories = true;
+	}
+#else
+	throw Efeature("Asymetric Strong encryption algorithms using GPGME");
+#endif
+    }
+
     void crypto_asym::encrypt(const vector<string> & recipients_email, generic_file & clear, generic_file & ciphered)
     {
 #if GPGME_SUPPORT
 	gpgme_key_t *ciphering_keys = NULL;
 
-	build_key_list(recipients_email, ciphering_keys);
+	build_key_list(recipients_email, ciphering_keys, false);
 	try
 	{
 	    generic_file_overlay_for_gpgme o_clear = &clear;
 	    generic_file_overlay_for_gpgme o_ciphered = &ciphered;
+	    gpgme_error_t err;
 
-	    gpgme_error_t err = gpgme_op_encrypt(context,
-						 ciphering_keys,
-						 (gpgme_encrypt_flags_t)(GPGME_ENCRYPT_NO_ENCRYPT_TO|GPGME_ENCRYPT_ALWAYS_TRUST),
-						 o_clear.get_gpgme_handle(),
-						 o_ciphered.get_gpgme_handle());
+	    if(!has_signatories)
+		err = gpgme_op_encrypt(context,
+				       ciphering_keys,
+				       (gpgme_encrypt_flags_t)(GPGME_ENCRYPT_NO_ENCRYPT_TO|GPGME_ENCRYPT_ALWAYS_TRUST),
+				       o_clear.get_gpgme_handle(),
+				       o_ciphered.get_gpgme_handle());
+	    else
+		err = gpgme_op_encrypt_sign(context,
+					    ciphering_keys,
+					    (gpgme_encrypt_flags_t)(GPGME_ENCRYPT_NO_ENCRYPT_TO|GPGME_ENCRYPT_ALWAYS_TRUST),
+					    o_clear.get_gpgme_handle(),
+					    o_ciphered.get_gpgme_handle());
 	    switch(gpgme_err_code(err))
 	    {
 	    case GPG_ERR_NO_ERROR:
@@ -89,11 +146,13 @@ namespace libdar
 #if GPGME_SUPPORT
 	generic_file_overlay_for_gpgme o_clear = &clear;
 	generic_file_overlay_for_gpgme o_ciphered = &ciphered;
-	gpgme_error_t err = gpgme_op_decrypt(context, o_ciphered.get_gpgme_handle(), o_clear.get_gpgme_handle());
+	gpgme_error_t err = gpgme_op_decrypt_verify(context, o_ciphered.get_gpgme_handle(), o_clear.get_gpgme_handle());
 
+	signing_result.clear();
 	switch(gpgme_err_code(err))
 	{
 	case GPG_ERR_NO_ERROR:
+	    fill_signing_result();
 	    break;
 	case GPG_ERR_INV_VALUE:
 	    throw SRC_BUG;
@@ -128,7 +187,7 @@ namespace libdar
     }
 
 #if GPGME_SUPPORT
-    void crypto_asym::build_key_list(const vector<string> & recipients_email, gpgme_key_t * & ciphering_keys)
+    void crypto_asym::build_key_list(const vector<string> & recipients_email, gpgme_key_t * & ciphering_keys, bool signatories)
     {
 	U_I size = recipients_email.size() + 1;
 
@@ -193,6 +252,16 @@ namespace libdar
 				   || ciphering_keys[i - offset]->disabled
 				   || ciphering_keys[i - offset]->invalid)
 				    found = false;
+				if(signatories)
+				{
+				    if(!ciphering_keys[i - offset]->can_sign)
+					found = false;
+				}
+				else
+				{
+				    if(!ciphering_keys[i - offset]->can_encrypt)
+					found = false;
+				}
 			    }
 
 			    if(!found && id->next != NULL)
@@ -224,7 +293,10 @@ namespace libdar
 
 		if(!found)
 		{
-		    get_ui().printf(gettext("No valid key could be find for recipient %S"), &(recipients_email[i]));
+		    if(signatories)
+			get_ui().printf(gettext("No valid signing key could be find for %S"), &(recipients_email[i]));
+		    else
+			get_ui().printf(gettext("No valid encryption key could be find for %S"), &(recipients_email[i]));
 		    get_ui().pause("Do you want to continue without this recipient?");
 		    ++offset;
 		}
@@ -233,7 +305,12 @@ namespace libdar
 		// if no recipient could be found at all aborting the operation
 
 	    if(offset + 1 >= size)
-		throw Erange("crypto_asym::build_key_list", gettext("No recipient remain with a valid key, encryption is impossible, aborting"));
+	    {
+		if(signatories)
+		    throw Erange("crypto_asym::build_key_list", gettext("No signatory remain with a valid key, signing is impossible, aborting"));
+		else
+		    throw Erange("crypto_asym::build_key_list", gettext("No recipient remain with a valid key, encryption is impossible, aborting"));
+	    }
 
 		// the key list must end wth a NULL entry
 
@@ -246,7 +323,6 @@ namespace libdar
 	    throw;
 	}
     }
-#endif
 
     void crypto_asym::release_key_list(gpgme_key_t * & ciphering_keys)
     {
@@ -260,7 +336,47 @@ namespace libdar
 	}
     }
 
-#if GPGME_SUPPORT
+    void crypto_asym::fill_signing_result()
+    {
+	gpgme_verify_result_t inter = gpgme_op_verify_result(context);
+	gpgme_signature_t res = NULL;
+	signator tmp;
+
+	signing_result.clear();
+
+	if(inter != NULL)
+	    res = inter->signatures;
+	else
+	    res = NULL;
+
+	while(res != NULL)
+	{
+	    if(res->summary & (GPGME_SIGSUM_VALID|GPGME_SIGSUM_GREEN))
+		tmp.result = signator::good;
+	    else if(res->summary & GPGME_SIGSUM_RED)
+		tmp.result = signator::bad;
+	    else if(res->summary & GPGME_SIGSUM_KEY_MISSING)
+		tmp.result = signator::unknown_key;
+	    else
+		tmp.result = signator::error;
+
+	    if(res->summary & GPGME_SIGSUM_KEY_REVOKED)
+		tmp.key_validity = signator::revoked;
+	    else if(res->summary & GPGME_SIGSUM_KEY_EXPIRED)
+		tmp.key_validity = signator::expired;
+	    else
+		tmp.key_validity = signator::valid;
+
+	    tmp.fingerprint = res->fpr;
+
+	    tmp.signing_date = datetime(res->timestamp);
+	    tmp.signature_expiration_date = datetime(res->exp_timestamp);
+
+	    res = res->next;
+	    signing_result.push_back(tmp);
+	}
+    }
+
     static gpgme_error_t read_passphrase(void *hook, const char *uid_hint, const char *passphrase_info, int prev_was_bad, int fd)
     {
 	crypto_asym *obj = (crypto_asym *)(hook);

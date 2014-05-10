@@ -90,7 +90,7 @@ extern "C"
 #include "criterium.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:<:>:=:4:5::6:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:<:>:=:4:5::6:7:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -267,6 +267,8 @@ bool get_args(shell_interaction & dialog,
     p.execute_ref = "";
     p.pass.clear();
     p.gnupg_key_size = 0;
+    p.signatories.clear();
+    p.blind_signatures = false;
     p.pass_ref.clear();
     p.flat = false;
     p.min_compr_size = min_compr_size_default;
@@ -1362,6 +1364,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.no_compare_symlink_date = false;
 		else if(strcasecmp("test-self-reported-bug", optarg) == 0)
 		    throw SRC_BUG; // testing the way a internal error is reported
+		else if(strcasecmp("b", optarg) == 0 || strcasecmp("blind-to-signatures", optarg) == 0)
+		    p.blind_signatures = true;
 		else
 		    throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;
@@ -1637,6 +1641,17 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.gnupg_key_size = 0;
 		    ks.unstack(p.gnupg_key_size);
 		    if(ks > 0)
+			throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+		}
+		else
+		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		break;
+	    case '7':
+		if(optarg != NULL)
+		{
+		    if(strlen(optarg) != 0)
+			p.signatories = line_tools_split(optarg, ',');
+		    else
 			throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 		}
 		else
@@ -2218,6 +2233,7 @@ const struct option *get_long_opt()
 	{"fsa-scope", required_argument, NULL, '4'},
 	{"exclude-by-ea", optional_argument, NULL, '5'},
 	{"key-length", required_argument, NULL, '6' },
+	{"sign", required_argument, NULL, '7' },
         { NULL, 0, NULL, 0 }
     };
 

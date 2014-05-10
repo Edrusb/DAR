@@ -26,6 +26,12 @@
 #include "fichier_local.hpp"
 #include "crypto_asym.hpp"
 
+extern "C"
+{
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+}
 
 #include <string>
 #include <vector>

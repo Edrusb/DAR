@@ -724,6 +724,16 @@ the % character.
 -3, --hash <algo>
 When creating, isolating or merging an archive, beside each slice is generated an on-fly hash file using the specified algorithm. Available algorithm are "md5" and "sha1", by default no hash file is generated. The hash file generated is named based on the name of the slice with the .md5 or .sha1 extension added to it at the end. These hash files can be processes by md5sum and sha1sum usual commands (md5sum -c <hash file>) to verify that the slice has not been corrupted. Note that the result is different than generating the hash file using md5sum or sha1sum once the slice is created, in particular if the media is faulty: calling md5sum or sha1sum on the written slice will make you compute the hash result on an already corrupted file, thus the corruption will not be seen when testing the file against the hash at a later time. Note also that the creation of a hash file is not available when producing the archive on a pipe ("dar -c -").
 .TP 20
+.RS
+-7, --sign email[,email[,...email]]
+When creating an archive with public key encryption (read -K option) it is also possible to sign it with one or more of your private key(s). At the difference of the hash feature above, only the randomly generated key used to cipher the archive, key that is dropped at the beginning and at the end of the archive, is signed. If the archive is modified at some place, that part will not be possible to decipher, but signature verification will stay quick and valid, unless the part that has been tempered is the key inside the archive in which case signature check will report a failure and archive will not be readable at all. If the signature is valid and the archive could be extracted without error, the whole archive can be assumed to be signed by the gnupg key owners.
+.P
+A summay information about the signature information is displayed while listing an archive in summary mode "dar -l <archive> -q". For any operation involving a signed archive, a short message only shows if the archive is signed an one or more signature check failed, no message is displayed in case of successful signature check. This warning may be disabled using the --alter=blind-to-signatures command.
+.RE
+.TP 20
+-ab, --alter=blind-to-signatures
+do not check whether an encrypted archive with public key that has also been signed have correct signatures.
+.TP 20
 -<, --backup-hook-include <mask>
 The mask is applied to path+filename during backup operation only. If a given file matches the mask, a user command (see -= option below) will be run before proceeding to the backup and once the backup will be completed. See also -> option below. IMPORTANT: if using the short option, you need to enclose it between quotes: '-<' for the shell not to interpret the < as a redirection.
 .TP 20

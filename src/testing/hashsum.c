@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#if CRYPTO_AVAILABLE
 #ifndef GCRYPT_NO_DEPRECATED
 #define GCRYPT_NO_DEPRECATED
 #endif
 #include <gcrypt.h>
+#endif
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -21,16 +23,18 @@
 #define MIN_VERSION_GCRYPT "1.4.0"
 
 void usage(const char *cmd);
+#if CRYPTO_AVAILABLE
 int init_libgcrypt();
 int get_hash_algo(const char *algo);
 int set_hash_handle(int algo, gcry_md_hd_t *hash_handle);
 void feed_hash_from(int fd, gcry_md_hd_t *hash_handle);
 void show_hash(int algo, gcry_md_hd_t *hash_handle, const char *filename);
 void release_hash(gcry_md_hd_t *hash_handle);
-
+#endif
 
 int main(int argc, char *argv[])
 {
+#if CRYPTO_AVAILABLE
     int fd = -1;
 
     if(argc != 3)
@@ -74,6 +78,7 @@ int main(int argc, char *argv[])
 	    return EXIT_SYNTAX;
 	}
     }
+#endif
 }
 
 void usage(const char *cmd)
@@ -81,6 +86,7 @@ void usage(const char *cmd)
     printf("usage: %s <filename> {sha1|md5}\n", cmd);
 }
 
+#if CRYPTO_AVAILABLE
 int init_libgcrypt()
 {
     if(!gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P))
@@ -215,3 +221,5 @@ void convert_to_hexa(const char *digest, const unsigned int digest_size, char *h
 
 
 }
+
+#endif

@@ -35,6 +35,7 @@ from 2.4.x to 2.5.0
 - This new archive format (version 9) holds the ciphering algorithm used
   at creation time, only the passphrase is required at reading time.
 - Adding support for public key encryption (GnuPG) relying on gpgme
+- Adding support for public key signature of an archive
 
 from 2.4.13 to 2.4.14
 - limiting memory consumtion of the cache layer to stay below 10 MiB, under

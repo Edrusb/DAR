@@ -830,6 +830,69 @@ void line_tools_crypto_split_algo_pass(const secu_string & all,
     }
 }
 
+void line_tools_display_signatories(user_interaction & ui, const vector<signator> & gnupg_signed)
+{
+    vector<signator>::const_iterator it = gnupg_signed.begin();
+    string tmp;
+
+    if(gnupg_signed.empty())
+	return;
+
+    ui.printf(gettext("+-----------------+----------------+----------------------------------------+-------------------------+"));
+    ui.printf(gettext("| Signature Status|  Key Status    |  Finger Print                          | Signature Date          |"));
+    ui.printf(gettext("+-----------------+----------------+----------------------------------------+-------------------------+"));
+    while(it != gnupg_signed.end())
+    {
+	tmp = "";
+
+	switch(it->result)
+	{
+	case signator::good:
+	    tmp += "|      Good       |";
+	    break;
+	case signator::bad:
+	    tmp += "|    BAD !!!      |";
+	    break;
+	case signator::unknown_key:
+	    tmp += "|   Unknown Key   |";
+	    break;
+	case signator::error:
+	    tmp += "|  System Error   |";
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	switch(it->key_validity)
+	{
+	case signator::valid:
+	    tmp += "    Valid       |";
+	    break;
+	case signator::expired:
+	    tmp += "   EXPIRED      |";
+	    break;
+	case signator::revoked:
+	    tmp += "   REVOKED      |";
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+	tmp += it->fingerprint + "|";
+	tmp += tools_display_date(it->signing_date) + " |";
+	ui.warning(tmp);
+	if(it->key_validity == signator::expired)
+	{
+	    tmp = "                  |" + tools_display_date(it->signature_expiration_date);
+	    ui.warning(tmp);
+	}
+
+	++it;
+    }
+    ui.printf(gettext("------------------+----------------+----------------------------------------+-------------------------+"));
+    ui.printf(" For more information about a key, use the command: gpg --list-key <fingeprint>");
+}
+
+///////////////////
 
 static string build(string::iterator a, string::iterator b)
 {

@@ -7,7 +7,7 @@ Status flags:
 ---------------
 letters usage:
 ---------------
-a * alteration of operation             --alter   argument: s[aved] | SI[-unit[s]] | binary[-unit[s]] | a[time] | c[time] | m[ask] | n[o-case] | case | r[egex] | g[lob] | e[rase_ea] | k[eep-compressed] | f[ixed_date] | d[ecremental] | l[axist] | t[ape-marks] | h[oles-recheck] | secu | list-ea | i[gnore-unknown-inode-type] | do-not-compare-symlink-mtime | test-self-reported-bug
+a * alteration of operation             --alter   argument: s[aved] | SI[-unit[s]] | binary[-unit[s]] | a[time] | c[time] | m[ask] | n[o-case] | case | r[egex] | g[lob] | e[rase_ea] | k[eep-compressed] | f[ixed-date] | d[ecremental] | l[axist] | t[ape-marks] | h[oles-recheck] | secu | list-ea | i[gnore-unknown-inode-type] | do-not-compare-symlink-mtime | test-self-reported-bug | b[lind-to-signatures]
 b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff
@@ -85,7 +85,7 @@ _ + retry on change                      --retry-on-change <count[:max byte]>
 4 + filesystem specific attr. family     --fsa-scope <fam1,fam2,fam3,...>
 5 + exclude file having a given EA set   --exclude-by-ea [<ea name>]
 6 + define internal key lengh with gnupg --key-length <length in bytes>
-7 !
+7 + define keys used to sign the archive --sign <comma separated list of emails>
 8 !
 9 !
 " + anonymous pipe descriptor to read conf from. --pipe-fd

@@ -51,6 +51,7 @@ extern "C"
 #include "cache.hpp"
 #include "entrepot.hpp"
 #include "entrepot_local.hpp"
+#include "crypto_sym.hpp"
 
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"
 
@@ -117,7 +118,8 @@ namespace libdar
 					     second_terminateur_offset,
 					     options.get_lax(),
 					     options.get_sequential_read(),
-					     options.get_info_details());
+					     options.get_info_details(),
+					     gnupg_signed);
 		    try
 		    {
 			check_header_version();
@@ -148,6 +150,8 @@ namespace libdar
 			    ref_where->set_location(options.get_ref_path());
 			    try
 			    {
+				vector<signator> tmp;
+
 				if(options.get_ref_basename() == "-")
 				    throw Erange("archive::archive", gettext("Reading the archive of reference from pipe or standard input is not possible"));
 				if(options.get_ref_basename() == "+")
@@ -169,7 +173,8 @@ namespace libdar
 							 ref_second_terminateur_offset,
 							 options.get_lax(),
 							 false, // sequential_read is never used to retreive the isolated catalogue (well, that's possible and easy to add this feature), see later ...
-							 options.get_info_details());
+							 options.get_info_details(),
+							 tmp);
 			    }
 			    catch(Euser_abort & e)
 			    {
@@ -322,6 +327,8 @@ namespace libdar
 			    }
 			}
 		    }
+		    if(!options.get_ignore_signature_check_failure())
+			check_gnupg_signed(dialog);
 		    exploitable = true;
 		}
 		catch(...)
@@ -404,6 +411,7 @@ namespace libdar
 				       options.get_crypto_size(),
 				       options.get_gnupg_recipients(),
 				       options.get_gnupg_key_size(),
+				       options.get_gnupg_signatories(),
 				       options.get_compr_mask(),
 				       options.get_min_compr_size(),
 				       options.get_nodump(),
@@ -650,6 +658,7 @@ namespace libdar
 				     options.get_crypto_size(),
 				     options.get_gnupg_recipients(),
 				     options.get_gnupg_key_size(),
+				     options.get_gnupg_signatories(),
 				     options.get_compr_mask(),
 				     options.get_min_compr_size(),
 				     false,   // nodump
@@ -1170,6 +1179,7 @@ namespace libdar
 					  options.get_crypto_size(),
 					  options.get_gnupg_recipients(),
 					  options.get_gnupg_key_size(),
+					  options.get_gnupg_signatories(),
 					  options.get_empty(),
 					  options.get_slice_permission(),
 					  options.get_sequential_marks(),
@@ -1559,6 +1569,7 @@ namespace libdar
                                      U_32 crypto_size,
 				     const vector<string> & gnupg_recipients,
 				     U_I gnupg_key_size,
+				     const vector<string> & gnupg_signatories,
                                      const mask & compr_mask,
                                      const infinint & min_compr_size,
                                      bool nodump,
@@ -1723,6 +1734,7 @@ namespace libdar
 			 crypto_size,
 			 gnupg_recipients,
 			 gnupg_key_size,
+			 gnupg_signatories,
 			 compr_mask,
 			 min_compr_size,
 			 nodump,
@@ -1786,6 +1798,7 @@ namespace libdar
 				   U_32 crypto_size,
 				   const vector<string> & gnupg_recipients,
 				   U_I gnupg_key_size,
+				   const vector<string> & gnupg_signatories,
 				   const mask & compr_mask,
 				   const infinint & min_compr_size,
 				   bool nodump,
@@ -1873,6 +1886,7 @@ namespace libdar
 					  crypto_size,
 					  gnupg_recipients,
 					  gnupg_key_size,
+					  gnupg_signatories,
 					  empty,
 					  slice_permission,
 					  add_marks_for_sequential_reading,
@@ -2156,6 +2170,17 @@ namespace libdar
 	else
 	    pool = get_pool();
 #endif
+    }
+
+    void archive::check_gnupg_signed(user_interaction & dialog) const
+    {
+	vector<signator>::const_iterator it = gnupg_signed.begin();
+
+	while(it != gnupg_signed.end() && it->result == signator::good)
+	    ++it;
+
+	if(it != gnupg_signed.end())
+	    dialog.pause(gettext("WARNING! Incorrect signature found for archive, continue anyway?"));
     }
 
     void archive::disable_natural_destruction()

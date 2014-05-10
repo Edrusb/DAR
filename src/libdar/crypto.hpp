@@ -21,29 +21,26 @@
 
     /// \file crypto.hpp
     /// \brief the crypto algoritm definition
-    /// \ingroup Private
+    /// \ingroup API
 
 #ifndef CRYPTO_HPP
 #define CRYPTO_HPP
 
 extern "C"
 {
-#if HAVE_GCRYPT_H
-#ifndef GCRYPT_NO_DEPRECATED
-#define GCRYPT_NO_DEPRECATED
-#endif
-#include <gcrypt.h>
-#endif
+
 }
 
 #include "../my_config.h"
 #include <string>
 
-#include "tronconneuse.hpp"
-#include "secu_string.hpp"
+#include "datetime.hpp"
 
 namespace libdar
 {
+
+	/// \ingroup Private
+	/// @}
 
 	/// the different cypher available for encryption (strong or weak)
 
@@ -60,66 +57,28 @@ namespace libdar
 	crypto_camellia256    ///< camellia 256 strong encryption
     };
 
-	/// \ingroup Private
-	/// @}
 
-    inline bool crypto_min_ver_libgcrypt_no_bug()
+    struct signator
     {
-#if CRYPTO_AVAILABLE
-	return gcry_check_version(MIN_VERSION_GCRYPT_HASH_BUG);
-#else
-	return true;
-#endif
-    }
-
-    std::string crypto_algo_2_string(crypto_algo algo);
-
-	/// implementation of encryption using symetrical cryptography used in libgcrypt (among which is blowfish)
-	//
-	//
-
-	/// inherited class from tronconneuse class
-	/// \ingroup Private
-    class crypto_sym : public tronconneuse
-    {
-    public:
-	crypto_sym(U_32 block_size,
-		   const secu_string & password,
-		   generic_file & encrypted_side,
-		   bool no_initial_shift,
-		   const archive_version & reading_ver,
-		   crypto_algo algo);
-	~crypto_sym() { detruit(); };
-
-    protected:
-	U_32 encrypted_block_size_for(U_32 clear_block_size);
-	U_32 clear_block_allocated_size_for(U_32 clear_block_size);
-	U_32 encrypt_data(const infinint & block_num,
-			  const char *clear_buf, const U_32 clear_size, const U_32 clear_allocated,
-			  char *crypt_buf, U_32 crypt_size);
-	U_32 decrypt_data(const infinint & block_num,
-			  const char *crypt_buf, const U_32 crypt_size,
-			  char *clear_buf, U_32 clear_size);
-
-    private:
-#if CRYPTO_AVAILABLE
-	gcry_cipher_hd_t clef;       //< used to encrypt/decrypt the data
-	gcry_cipher_hd_t essiv_clef; //< used to build the Initialization Vector
-#endif
-	size_t algo_block_size;         //< the block size of the algorithm
-	unsigned char *ivec;            //< algo_block_size allocated in secure memory to be used as Initial Vector
-	U_I algo_id;                    //< algo ID in libgcrypt
-	archive_version reading_version;
-
-	secu_string pkcs5_pass2key(const secu_string & password,         //< human provided password
-				   const std::string & salt,             //< salt string
-				   U_I iteration_count,                  //< number of time to shake the melange
-				   U_I output_length);                   //< length of the string to return
-	void dar_set_essiv(const secu_string & key);                     //< assign essiv from the given (hash) string
-	void make_ivec(const infinint & ref, unsigned char *ivec, U_I size);
-	void self_test(void);
-	void detruit();
+	enum
+	{
+	    good,         //< good signature
+	    bad,          //< key correct bug signature tempered
+	    unknown_key,  //< no key found to check the signature
+	    error         //< signature failed to be checked for other error
+	} result;         //< status of the signing
+	enum
+	{
+	    valid,        //< the key we have is neither expired nor revoked
+	    expired,      //< the key we have has expired
+	    revoked       //< the key we have has been revoked
+	} key_validity;   //< validity of the key used to verify the signature
+	std::string fingerprint; //< fingerprint of the key
+	datetime signing_date;   //< date of signature
+	datetime signature_expiration_date; //< date of expiration of this signature
     };
+
+    extern std::string crypto_algo_2_string(crypto_algo algo);
 
 	/// @}
 

@@ -44,7 +44,7 @@ extern "C"
 
 #include "libdar.hpp"
 #include "erreurs.hpp"
-#include "crypto.hpp"
+#include "crypto_sym.hpp"
 #include "shell_interaction.hpp"
 #include "deci.hpp"
 #include "cygwin_adapt.hpp"

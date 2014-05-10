@@ -41,6 +41,7 @@
 #include "pile.hpp"
 #include "list_entry.hpp"
 #include "on_pool.hpp"
+#include "crypto.hpp"
 
 namespace libdar
 {
@@ -281,6 +282,9 @@ namespace libdar
 	    /// retrieving statistics about archive contents
 	const entree_stats get_stats() const { if(cat == NULL) throw SRC_BUG; return cat->get_stats(); };
 
+	    /// retrieving signature information about the archive
+	const std::vector<signator> & get_signatories() const { return gnupg_signed; };
+
 	    /// necessary to get the catalogue fully loaded in memory in any situation
 	    /// in particular in sequential reading mode
 	void init_catalogue(user_interaction & dialog) const;
@@ -332,10 +336,12 @@ namespace libdar
 	bool lax_read_mode;      //< whether the archive has been openned in lax mode (unused for creation/merging/isolation)
 	bool sequential_read;    //< whether the archive is read in sequential mode
 	bool freed_and_checked;  //< whether free_and_check has been run
+	std::vector<signator> gnupg_signed; //< list of signature found in the archive (reading an existing archive)
 
 	void free_except_memory_pool();
 	void free_all();
 	void init_pool();
+	void check_gnupg_signed(user_interaction & dialog) const;
 
 	const catalogue & get_cat() const { if(cat == NULL) throw SRC_BUG; else return *cat; };
 	const header_version & get_header() const { return ver; };
@@ -373,6 +379,7 @@ namespace libdar
 				U_32 crypto_size,
 				const std::vector<std::string> & gnupg_recipients,
 				U_I gnupg_key_size,
+				const std::vector<std::string> & gnupg_signatories,
 				const mask & compr_mask,
 				const infinint & min_compr_size,
 				bool nodump,
@@ -431,6 +438,7 @@ namespace libdar
 			      U_32 crypto_size,                 //< size of crypto blocks
 			      const std::vector<std::string> & gnupg_recipients, //< list of email recipients to encrypted a randomly chosen key inside the archive
 			      U_I gnupg_key_size,               //< size of the randomly chosen key encrypted inside the archive using GnuPG
+			      const std::vector<std::string> & gnupg_signatories, //< list of email recipients to use for signature
 			      const mask & compr_mask,          //< files to compress
 			      const infinint & min_compr_size,  //< file size under which to not compress files
 			      bool nodump,                      //< whether to consider the "nodump" filesystem flag

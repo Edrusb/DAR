@@ -87,7 +87,8 @@ namespace libdar
 					 infinint & second_terminateur_offset, //< where to start looking for the second terminateur (set to zero if there is only one terminateur).
 					 bool lax,  // whether we skip&warn the usual verifications
 					 bool sequential_read, // whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
-					 bool info_details); // be or not verbose about the archive openning
+					 bool info_details,    // be or not verbose about the archive openning
+					 std::vector<signator> & gnupg_signed); // list of existing signature found for that archive (valid or not)
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 
     extern catalogue *macro_tools_get_derivated_catalogue_from(user_interaction & dialog,
@@ -145,6 +146,7 @@ namespace libdar
 	/// \param[in]  crypto_size size of crypto blocks
 	/// \param[in]  gnupg_recipients list of email recipients'public keys to encrypt a randomly chosen key with
 	/// \param[in]  gnupg_key_size size of the randomly chosen key that will be encrypted using gnupg inside the archive
+	/// \param[in]  gnupg_signatories list of email which associated signature has to be used to sign the archive
 	/// \param[in]  empty dry-run execution (null_file at bottom of the stack)
 	/// \param[in]  slice_permission permission to set the slices to
 	/// \param[in]  add_marks_for_sequential_reading whether to add an escape layer in the stack
@@ -173,6 +175,7 @@ namespace libdar
 					  U_32 crypto_size,
 					  const std::vector<std::string> & gnupg_recipients,
 					  U_I gnupg_key_size,
+					  const std::vector<std::string> & gnupg_signatories,
 					  bool empty,
 					  const std::string & slice_permission,
 					  bool add_marks_for_sequential_reading,

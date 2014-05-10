@@ -53,6 +53,7 @@ extern "C"
 #include "cache.hpp"
 #include "null_file.hpp"
 #include "secu_memory_file.hpp"
+#include "crypto_sym.hpp"
 #include "crypto_asym.hpp"
 
 using namespace std;
@@ -191,7 +192,8 @@ namespace libdar
 				  infinint & second_terminateur_offset,
 				  bool lax,
 				  bool sequential_read,
-				  bool info_details)
+				  bool info_details,
+				  vector<signator> & gnupg_signed)
     {
 	secu_string real_pass = pass;
 	generic_file *tmp = NULL;
@@ -370,6 +372,7 @@ namespace libdar
 		ver.crypted_key->skip(0);
 		clear_key.skip(0);
 		engine.decrypt(*ver.crypted_key, clear_key);
+		gnupg_signed = engine.verify();
 
 		    // substitution of the pass by the clear_key if decrypt succeeded (else it throws an exception)
 
@@ -869,6 +872,7 @@ namespace libdar
 				   U_32 crypto_size,
 				   const vector<string> & gnupg_recipients,
 				   U_I gnupg_key_size,
+				   const vector<string> & gnupg_signatories,
 				   bool empty,
 				   const string & slice_permission,
 				   bool add_marks_for_sequential_reading,
@@ -996,6 +1000,7 @@ namespace libdar
 
 		if(!gnupg_recipients.empty())
 		{
+#if GPGME_SUPPORT
 		    ver.crypted_key = new (pool) memory_file();
 		    if(ver.crypted_key == NULL)
 			throw Ememory("macro_tools_create_layers");
@@ -1013,12 +1018,17 @@ namespace libdar
 			// encrypting the symmetric key with asymetric algorithm
 
 		    crypto_asym engine(dialog);
+		    if(!gnupg_signatories.empty())
+			engine.set_signatories(gnupg_signatories);
 		    clear.skip(0);
 		    ver.crypted_key->skip(0);
 		    engine.encrypt(gnupg_recipients, clear, *ver.crypted_key);
 		    real_pass = clear.get_contents();
 		    if(crypto == crypto_none)
 			crypto = crypto_blowfish;
+#else
+		    throw Ecompilation("Strong Encryption support");
+#endif
 		}
 
 		    // optaining a password on-fly if necessary
