@@ -16,6 +16,7 @@
 
 
 
+
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR's FEATURES</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -270,6 +271,7 @@ huge archive.<br>
 </table>
 <br>
 <br>
+<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
@@ -366,6 +368,7 @@ marginally used they are ignored by <span style="font-style: italic;">dar</span>
     </tr>
   </tbody>
 </table>
+<br>
 <br>
 <br>
 
@@ -644,7 +647,6 @@ to reactivate it afterward for example.<br>
 
 <br>
 <br>
-<br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
@@ -672,6 +674,39 @@ prevent a clear text attack or codebook attack. </td>
 <br>
 <br>
 
+<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top; text-align: left; width: 33%; font-weight: bold;">PUBLIC KEY ENCRYPTION<br>
+ </td>
+      <td style="vertical-align: top;">references: <a href="man/index.html">man dar</a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">keywords: -K, --key-length, Gnupg, gpgme<br>
+</td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top; text-align: justify;"><span style="font-style: italic;"></span>When
+using strong encryption as seen above, to read an archive the user
+needs to give the passphrase that has been used at creation time.
+Another possibility is to let dar choose a random passphrase to encrypt
+the archive with the strong encryption algorithm listed above. Then dar
+encrypts this random passphrase with the public key of a list of
+recipients (assuming you have setup your GnuPG keyring accordingly) and
+drops that encrypted passphrase inside the archive. All of these
+recipients (assuming they own the corresponding private key) will be
+able to read the archive without having to know the passphrase used for
+strong encryption. <br>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+<br>
 <br>
 
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -701,7 +736,6 @@ corrupted.<br>
 
 <br>
 
-<br>
 <br>
 <br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -947,6 +981,7 @@ support available on your system.<br>
 </table>
 <br>
 <br>
+<br>
 
 <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
 
@@ -983,6 +1018,7 @@ a cost! ;-)<br>
 
 <br>
 <br>
+<br>
 <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
@@ -1004,6 +1040,7 @@ report any problem but will not create, remove or modify any file.<br>
     </tr>
   </tbody>
 </table>
+<br>
 <br>
 <br>
 
@@ -1041,6 +1078,7 @@ next file.<br>
 
 <br>
 <br>
+<br>
 
 
 <table style="text-align: left; width: 90%; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -1072,6 +1110,7 @@ archive creation.<br>
 </table>
 
 
+<br>
 <br>
 <br>
 
