@@ -42,7 +42,10 @@ from 2.4.13 to 2.4.14
   certain circumstances (very large archive), it could grow up to an insane
   value like 50% or the available RAM. reducing to 10 MiB does not impact
   performance in a noticable manner while it avoids system to swap out when
-  the cache layer becomes huge.
+  the libdar cache layer becomes huge.
+- added --with-pkgconfigdir to define an alternative path for libdar
+  pkgconfig file
+- modified some Makefile.am for better FreeBSD support
 
 from 2.4.12 to 2.4.13
 - adding initialization value for two variables to avoid inappropriate

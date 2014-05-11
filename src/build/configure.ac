@@ -10,6 +10,20 @@ AM_INIT_AUTOMAKE
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION
 XGETTEXT_EXTRA_OPTIONS='--keyword=dar_gettext'
+AM_ICONV
+
+
+# have a specific variable for pkgconfig, setting the default value:
+AC_SUBST(pkgconfigdir, [${libdir}/pkgconfig])
+AC_ARG_WITH([pkgconfigdir],
+	    AC_HELP_STRING(--with-pkgconfigdir=DIR, [defines an alternative directory to install pkconfig files, default is '${libdir}/pkgconfig']),
+	    [
+	       if [ ! -z "$withval" ] ; then
+  	         AC_SUBST(pkgconfigdir, $withval)
+               fi
+	    ],
+	    []
+           )
 
 # Checks for programs.
 AC_PROG_CXX
@@ -463,7 +477,8 @@ AC_ARG_ENABLE( [libgcrypt-linking],
                                          local_crypto="no"
                                         ])
               if test "$local_crypto" = "yes" ; then
-                 AC_DEFINE(MIN_VERSION_GCRYPT, "1.4.0", [libgcrypt minimum version])
+	         min_version_gcrypt="1.4.0"
+                 AC_DEFINE(MIN_VERSION_GCRYPT, $min_version_gcrypt, [libgcrypt minimum version])
 		 min_version_gcrypt_hash_bug="1.6.0"
 		 AC_DEFINE_UNQUOTED(MIN_VERSION_GCRYPT_HASH_BUG, "$min_version_gcrypt_hash_bug", [ligcrypt minimum version without hash bug])
 		 AC_MSG_CHECKING([for libgcrypt usability])
@@ -507,7 +522,7 @@ AC_ARG_ENABLE( [libgcrypt-linking],
 				],
 				[
 				  if test "$?" = "1" ; then
-				    AC_MSG_RESULT([failed: need libgcypt >= MIN_VERSION_GCRYPT, disabling strong encryption support])
+				    AC_MSG_RESULT([failed: need libgcypt >= $min_version_gcrypt, disabling strong encryption support])
 				  else
  				    AC_MSG_RESULT([failed: libgcrypt is unusable, cannot even call gcry_check_version(). Disabling strong encryption support])
 				  fi
@@ -866,7 +881,7 @@ AC_ARG_ENABLE(  [gpgme-linking],
 		  local_gpgme="no"
                 ],
 		[
-		  if[ "$local_crypto" != "no" ] ; then
+		  if test $local_crypto != no ; then
   		    gpgme_min_version="1.2.0"
 		    AC_DEFINE_UNQUOTED(GPGME_MIN_VERSION, "$gpgme_min_version", [minimum version expected of GPGME])
 		    AC_CHECK_HEADERS([gpgme.h])

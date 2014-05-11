@@ -19,14 +19,23 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
+#include "../my_config.h"
+
 extern "C"
 {
 #if HAVE_ERRNO_H
-#incldue <errno.h>
+#include <errno.h>
+#endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+#include <strings.h>
 #endif
 } // end of extern "C"
 
-#include "../my_config.h"
 #include "tools.hpp"
 #include "crypto_asym.hpp"
 #include "integers.hpp"
