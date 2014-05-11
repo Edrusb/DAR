@@ -12,6 +12,7 @@ clean-local:
 endif
 
 localedir = @localedir@
+pkgconfigdir = @pkgconfigdir@
 
 if BUILD_MODE32
   MYLIB=libdar32.la
@@ -62,11 +63,11 @@ install-data-local:
 	egrep 'LIBDAR|DAR_' $(DESTDIR)$(pkgincludedir)/libdar_config.h | grep -v "#undef" >  $(DESTDIR)$(pkgincludedir)/config.h.tmp
 	mv  $(DESTDIR)$(pkgincludedir)/config.h.tmp  $(DESTDIR)$(pkgincludedir)/libdar_config.h
 	chmod 0644 $(DESTDIR)$(pkgincludedir)/*
-	$(INSTALL) -d $(DESTDIR)$(libdir)/pkgconfig
-	$(INSTALL) -m 0644 libdar.pc $(DESTDIR)$(libdir)/pkgconfig/libdar$(LIBDAR_SUFFIX).pc
+	$(INSTALL) -d $(DESTDIR)$(pkgconfigdir)
+	$(INSTALL) -m 0644 libdar.pc $(DESTDIR)$(pkgconfigdir)/libdar$(LIBDAR_SUFFIX).pc
 
 uninstall-local:
-	rm -rf $(DESTDIR)$(pkgincludedir) $(DESTDIR)$(libdir)/pkgconfig/libdar$(LIBDAR_SUFFIX).pc
+	rm -rf $(DESTDIR)$(pkgincludedir) $(DESTDIR)$(pkgconfigdir)/libdar$(LIBDAR_SUFFIX).pc
 
 all-local : libdar.pc
 
