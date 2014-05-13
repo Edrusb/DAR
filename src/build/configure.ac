@@ -478,7 +478,7 @@ AC_ARG_ENABLE( [libgcrypt-linking],
                                         ])
               if test "$local_crypto" = "yes" ; then
 	         min_version_gcrypt="1.4.0"
-                 AC_DEFINE(MIN_VERSION_GCRYPT, $min_version_gcrypt, [libgcrypt minimum version])
+                 AC_DEFINE_UNQUOTED(MIN_VERSION_GCRYPT, "$min_version_gcrypt", [libgcrypt minimum version])
 		 min_version_gcrypt_hash_bug="1.6.0"
 		 AC_DEFINE_UNQUOTED(MIN_VERSION_GCRYPT_HASH_BUG, "$min_version_gcrypt_hash_bug", [ligcrypt minimum version without hash bug])
 		 AC_MSG_CHECKING([for libgcrypt usability])
