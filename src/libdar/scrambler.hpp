@@ -49,6 +49,7 @@ namespace libdar
 
 	const scrambler & operator = (const scrambler & ref) { throw SRC_BUG; };
 
+	bool skippable(skippability direction, const infinint & amount) { return ref->skippable(direction, amount); };
         bool skip(const infinint & pos) { if(ref == NULL) throw SRC_BUG; return ref->skip(pos); };
         bool skip_to_eof() { if(ref==NULL) throw SRC_BUG; return ref->skip_to_eof(); };
         bool skip_relative(S_I x) { if(ref == NULL) throw SRC_BUG; return ref->skip_relative(x); };

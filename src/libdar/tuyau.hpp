@@ -72,6 +72,7 @@ namespace libdar
 	void do_not_close_read_fd();
 
             // inherited from generic_file
+	bool skippable(skippability direction, const infinint & amount);
         bool skip(const infinint & pos);
         bool skip_to_eof();
         bool skip_relative(signed int x);

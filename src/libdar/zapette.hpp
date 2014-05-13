@@ -64,6 +64,7 @@ namespace libdar
         ~zapette();
 
             // inherited methods from generic_file
+	bool skippable(skippability direction, const infinint & amount) { return true; };
         bool skip(const infinint &pos);
         bool skip_to_eof() { if(is_terminated()) throw SRC_BUG; position = file_size; return true; };
         bool skip_relative(S_I x);

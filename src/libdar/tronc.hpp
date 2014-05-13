@@ -65,6 +65,8 @@ namespace libdar
 	};
 
 	    /// inherited from generic_file
+	bool skippable(skippability direction, const infinint & amount);
+	    /// inherited from generic_file
         bool skip(const infinint & pos);
 	    /// inherited from generic_file
         bool skip_to_eof();

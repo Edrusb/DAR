@@ -145,8 +145,18 @@ namespace libdar
 	    /// read one char
 	S_I read_forward(char &a) { if(terminated) throw SRC_BUG; return read(&a, 1); };
 
-	    /// skip at the absolute position
 
+	enum skippability { skip_backward, skip_forward };
+
+	    /// whether the implementation is able to skip
+	    /// \note the capability to skip does not mean that skip_relative() or
+	    /// skip() will succeed, but rather that the inherited class implementation
+	    /// does not by construction forbid the requested skip (like inherited class
+	    /// providing a generic_file interface of an anonymous pipe for example)
+	virtual bool skippable(skippability direction, const infinint & amount) = 0;
+
+	    /// skip at the absolute position
+	    ///
 	    /// \param[in] pos the offset in byte where next read/write operation must start
 	    /// \return true if operation was successfull and false if the requested position is not valid (after end of file)
 	    /// \note if requested position is not valid the reading/writing cursor must be set to the closest valid position

@@ -95,7 +95,7 @@ namespace libdar
 	void copy_to(generic_file & ref, const infinint & crc_size, crc * & value);
 
 	    // indirectly inherited from generic_file
-
+	bool skippable(skippability direction, const infinint & amount) { return false; };
 	bool skip(const infinint & pos) { if(pos != offset) throw Efeature("skip in sparse_file"); else return true; };
 	bool skip_to_eof() { throw Efeature("skip in sparse_file"); };
 	bool skip_relative(S_I x)  { if(x != 0) throw Efeature("skip in sparse_file"); return true; };

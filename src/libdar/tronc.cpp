@@ -95,6 +95,15 @@ namespace libdar
 	limited = false;
     }
 
+    bool tronc::skippable(skippability direction, const infinint & amount)
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	return ref->skippable(direction, amount);
+    }
+
+
     bool tronc::skip(const infinint & pos)
     {
 	if(is_terminated())

@@ -101,6 +101,17 @@ namespace libdar
 	return *this;
     }
 
+    bool tronconneuse::skippable(skippability direction, const infinint & amount)
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(encrypted->get_mode() != gf_read_only)
+	    return false;
+	else
+	    return encrypted->skippable(direction, amount);
+    }
+
     bool tronconneuse::skip(const infinint & pos)
     {
 	bool ret;

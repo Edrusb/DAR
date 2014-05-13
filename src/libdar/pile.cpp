@@ -154,6 +154,21 @@ namespace libdar
 	stack.back().labels.push_back(label);
     }
 
+    bool pile::skippable(skippability direction, const infinint & amount)
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(stack.size() > 0)
+	{
+	    if(stack.back().ptr == NULL)
+		throw SRC_BUG;
+	    return stack.back().ptr->skippable(direction, amount);
+	}
+	else
+	    throw Erange("pile::skip", "Error: skippable() on empty stack");
+    }
+
     bool pile::skip(const infinint & pos)
     {
 	if(is_terminated())

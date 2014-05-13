@@ -131,6 +131,7 @@ namespace libdar
 	    // thus incorrectly consider it as normal data. Such event should only occure upon archive corruption and will be detected
 	    // by checksum mechanisms.
 
+	bool skippable(skippability direction, const infinint & amount);
 	bool skip(const infinint & pos);
 	bool skip_to_eof();
 	bool skip_relative(S_I x);

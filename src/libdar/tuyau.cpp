@@ -196,6 +196,14 @@ namespace libdar
 	    throw Erange("tuyau::get_read_fd", "Pipe's other end is not known, there is no reason to ask not to close a filedescriptor on it");
     }
 
+    bool tuyau::skippable(skippability direction, const infinint & amount)
+    {
+	if(get_mode() == gf_read_only)
+	    return direction == skip_forward;
+	else
+	    return false;
+    }
+
     bool tuyau::skip(const infinint & pos)
     {
 	if(is_terminated())

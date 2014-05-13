@@ -138,6 +138,37 @@ namespace libdar
 	}
     }
 
+    bool cache::skippable(skippability direction, const infinint & amount)
+    {
+	infinint in_cache;
+
+	if(read_mode)
+	{
+	    switch(direction)
+	    {
+	    case skip_forward:
+		in_cache = buffer_cache.last - buffer_cache.next;
+		break;
+	    case skip_backward:
+		in_cache = buffer_cache.next;
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+
+	    if(in_cache < amount)
+		return true;
+	    else
+		return ref->skippable(direction, amount - in_cache);
+	}
+	else // write mode
+	{
+		// current implementation does not permit to skip back in cache
+		// in write mode
+		return ref->skippable(direction, amount - in_cache);
+	}
+    }
+
     bool cache::skip(const infinint & pos)
     {
 	if(is_terminated())
@@ -161,7 +192,8 @@ namespace libdar
 		return true;
 	}
 	else // read mode
-	    if(current_position <= pos + buffer_cache.next && pos <= current_position + buffer_cache.last - buffer_cache.next) // requested position already in the cache
+	    if(current_position <= pos + buffer_cache.next && pos <= current_position + buffer_cache.last - buffer_cache.next)
+		    // requested position already in the cache
 	    {
 		if(pos < current_position)
 		{

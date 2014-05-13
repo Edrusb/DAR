@@ -46,6 +46,7 @@ namespace libdar
 	string_file(const std::string & contents): generic_file(gf_read_only) { data = contents; cur = 0; len = data.size(); };
 
 	    // inherited from generic_file
+	bool skippable(skippability direction, const infinint & amount) { return true; };
 	bool skip(const infinint & pos);
 	bool skip_to_eof() { cur = len; return true; };
 	bool skip_relative(S_I x);

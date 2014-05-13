@@ -82,6 +82,7 @@ namespace libdar
 
 
             // inherited from generic file
+	bool skippable(skippability direction, const infinint & amount) { return compressed->skippable(direction, amount); };
         bool skip(const infinint & pos) { flush_write(); flush_read(); clean_read(); return compressed->skip(pos); };
         bool skip_to_eof()  { flush_write(); flush_read(); clean_read(); return compressed->skip_to_eof(); };
         bool skip_relative(S_I x) { flush_write(); flush_read(); clean_read(); return compressed->skip_relative(x); };

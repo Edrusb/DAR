@@ -90,6 +90,7 @@ namespace libdar
 	void fadvise(advise adv) const;
 
             // inherited from generic_file
+	bool skippable(skippability direction, const infinint & amount) { return true; };
         bool skip(const infinint & pos);
         bool skip_to_eof();
         bool skip_relative(S_I x);

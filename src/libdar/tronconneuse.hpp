@@ -80,6 +80,8 @@ namespace libdar
 	virtual ~tronconneuse() { detruit(); }; // must not write pure virtual method from here, directly or not
 
 	    /// inherited from generic_file
+	bool skippable(skippability direction, const infinint & amount);
+	    /// inherited from generic_file
 	bool skip(const infinint & pos);
 	    /// inherited from generic_file
 	bool skip_to_eof();

@@ -274,6 +274,22 @@ namespace libdar
 	    return false;
     }
 
+    bool escape::skippable(skippability direction, const infinint & amount)
+    {
+	switch(x_below->get_mode())
+	{
+	case gf_read_only:
+	    return x_below->skippable(direction, amount);
+	case gf_write_only:
+	case gf_read_write:
+	    if(direction == skip_forward)
+		return false;
+	    else
+		return x_below->skippable(direction, amount);
+	default:
+	    throw SRC_BUG;
+	}
+    }
 
     bool escape::skip(const infinint & pos)
     {

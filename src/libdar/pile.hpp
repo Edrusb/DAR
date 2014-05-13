@@ -132,6 +132,7 @@ namespace libdar
 	    // inherited methods from generic_file
 	    // they all apply to the top generic_file object, they fail by Erange() exception if the stack is empty
 
+	bool skippable(skippability direction, const infinint & amount);
 	bool skip(const infinint & pos);
 	bool skip_to_eof();
 	bool skip_relative(S_I x);
