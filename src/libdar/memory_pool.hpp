@@ -41,10 +41,15 @@ namespace libdar
     class memory_pool
     {
     public:
+#ifdef LIBDAR_SPECIAL_ALLOC
 	memory_pool() { carte.clear(); };
+#else
+	memory_pool() { throw Efeature("Special allocation"); };
+#endif
 	memory_pool(const memory_pool & ref) { throw SRC_BUG ; };
 	const memory_pool & operator = (const memory_pool & ref) { throw SRC_BUG; };
 	~memory_pool();
+
 
 	    /// allocate a memory block of requested size
 	    ///

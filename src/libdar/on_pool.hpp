@@ -51,6 +51,8 @@ namespace libdar
     class on_pool
     {
     public:
+#ifdef LIBDAR_SPECIAL_ALLOC
+
 	    /// constructor
 	    ///
 	    /// \note If an object has been created by new (not new[], temporary, or local variable)
@@ -73,7 +75,7 @@ namespace libdar
 
 	    /// virtual destructor as this class will have inherited classes
 	virtual ~on_pool() {};
-
+#endif
 
 	    /// the usual new operator is wrapped to allow proper delete operation later on (throws std::bad_alloc upon allocation failure)
 	    ///
@@ -97,7 +99,6 @@ namespace libdar
 	    ///
 	    /// \note memory allocation done this way does not use the default C++ new[] operator, which may be slower than using memory pool
 	void *operator new[](size_t n_byte, const std::nothrow_t & nothrow_value) { return alloc(n_byte, NULL); };
-
 
 	    /// this operator allocates a single object on a memory pool
 	    ///
@@ -136,28 +137,42 @@ namespace libdar
 	    /// \note if the object has not been dynamically allocated, that's to say is a local variable
 	    /// or a temporary object, get_pool() must not be called as it will return unpredictable
 	    /// result and could most probably crash the application if the returned data is used
+#ifdef LIBDAR_SPECIAL_ALLOC
 	memory_pool *get_pool() const { return dynamic ? (((pool_ptr *)this) - 1)->reserve : NULL; };
-
+#else
+	memory_pool *get_pool() const { return NULL; };
+#endif
 
 	template <class T> void meta_new(T * & ptr, size_t num)
 	{
+#ifdef LIBDAR_SPECIAL_ALLOC
 	    size_t byte = num * sizeof(T);
 
 	    if(get_pool() != NULL)
 		ptr = (T *)get_pool()->alloc(byte);
 	    else
 		ptr = (T *)new (std::nothrow) char [byte];
+#else
+	    ptr = new (std::nothrow) T[num];
+#endif
 	}
+
+
 
 	template <class T> void meta_delete(T * ptr)
 	{
+#ifdef LIBDAR_SPECIAL_ALLOC
 	    if(get_pool() != NULL)
 		get_pool()->release(ptr);
 	    else
 		delete [] (char *)(ptr);
+#else
+	    delete [] ptr;
+#endif
 	}
 
     private:
+#ifdef LIBDAR_SPECIAL_ALLOC
 
 	    /// this data structure is placed at the beginning of any allocated block
 	    ///
@@ -177,6 +192,7 @@ namespace libdar
 
 	    /// used from constructors to setup field "dynamic"
 	void dynamic_init() const { const_cast<on_pool *>(this)->dynamic = (alloc_not_constructed == this); alloc_not_constructed = NULL; };
+#endif
 
 	    /// does the whole magic of memory allocation with and without memory_pool
 	    ///
@@ -191,7 +207,9 @@ namespace libdar
 	    /// \note may throw exceptions if the given address has never been allocated or is NULL
 	static void dealloc(void *ptr);
 
+#ifdef LIBDAR_SPECIAL_ALLOC
 	thread_local static on_pool * alloc_not_constructed;
+#endif
     };
 
 	/// @}
