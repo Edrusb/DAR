@@ -317,7 +317,7 @@ namespace libdar
 			throw Ememory("filesystem_hard_link_read::make_entree");
 		    try
 		    {
-			fsal->get_fsa_from_filesystem_for(display, sc, S_ISLNK(buf.st_mode));
+			fsal->get_fsa_from_filesystem_for(display, sc, buf.st_mode);
 			if(!fsal->empty())
 			{
 			    ino->fsa_set_saved_status(inode::fsa_full);

@@ -293,18 +293,18 @@ namespace libdar
 
     void filesystem_specific_attribute_list::get_fsa_from_filesystem_for(const string & target,
 									 const fsa_scope & scope,
-									 bool is_symlink)
+									 mode_t itype)
     {
 	clear();
 
 	if(scope.find(fsaf_hfs_plus) != scope.end())
 	{
-	    fill_HFS_FSA_with(target, is_symlink);
+	    fill_HFS_FSA_with(target, itype);
 	}
 
 	if(scope.find(fsaf_linux_extX) != scope.end())
 	{
-	    fill_extX_FSA_with(target, is_symlink);
+	    fill_extX_FSA_with(target, itype);
 	}
 	update_familes();
 	sort_fsa();
@@ -483,12 +483,13 @@ namespace libdar
     }
 
     void filesystem_specific_attribute_list::fill_extX_FSA_with(const std::string & target,
-								bool is_symlink)
+								mode_t itype)
     {
 #ifdef LIBDAR_NODUMP_FEATURE
 	S_I fd = -1;
 
-	if(!is_symlink) // symlink do not have their own extX FSA: restoring FSA of a symlink change the FSA of the target of the symlink
+	    // symlink do not have their own extX FSA: restoring FSA of a symlink change the FSA of the target of the symlink
+	if(S_ISREG(itype) || S_ISDIR(itype))
 	{
 	    try
 	    {
@@ -603,7 +604,7 @@ namespace libdar
     }
 
     void filesystem_specific_attribute_list::fill_HFS_FSA_with(const std::string & target,
-							       bool is_symlink)
+							       mode_t itype)
     {
 #ifdef LIBDAR_BIRTHTIME
 	struct stat tmp;
