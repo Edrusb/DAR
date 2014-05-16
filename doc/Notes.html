@@ -4,6 +4,7 @@
 
 
 
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR/LIBDAR Internals - Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -315,22 +316,77 @@ let dar be almost sure that several slices are from the same archive
 (problem car arise if two archives of same basename have their slices
 mixed together: dar will see that and report it to the user).<br>
       <br>
-The new and not yet described field is the "data_name". A new feature
+The new and not yet described field is the "data_name". The data_name
+field is also present in the archive catalogue (the table of content)
+of each archive. It may be the same value as the one in the slice
+headers (normal archives) or another value if the archive results from
+a catalogue isolation process.<br>
+      <br>
+Why this field? A new feature
 with release 2.4.0 is the ability to use an extracted catalogue to
-backup a internal catalogue of a given archive. However dar must be
-(almost) sure that the extracted catalogue is not extracted from an
-other archive than the one the user is trying to use it with. For this
-reason, the data_name identifier is kept identical between an archive
-and any of its extracted catalogue. Dar_xform also does not modify
-data_name, thus one can reslice an extracted catalog or a given archive
-and still be able to use these new archive or extracted catalogue with
-older archive or extracted catalogues. Instead the merging operation
-creates a new archive with a different data_name, to avoid one to use a
-isolated catalogue of the original archive to backup the internal
-catalogue of a merged archive.<br>
+backup a internal catalogue of a given archive. Comparing the data_name
+value of the catalogue resulting from the isolation operation to the
+data_name value present int the slices of an archive to rescue, dar can
+be (almost) sure that the extracted catalogue matches the data present
+in the archive the user is trying to use it with.<br>
+      <br>
+In brief:<br>
       </div>
       </div>
       <br>
+      <table style="text-align: left; width: 1038px; height: 124px; margin-left: auto; margin-right: 0px;" border="1" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="vertical-align: top; font-weight: bold; text-align: center; width: 20%;">Fields</td>
+            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Normal Archive<br>
+            </td>
+            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Resliced Using dar_xform<br>
+            </td>
+            <td style="vertical-align: top; width: 20%; font-weight: bold; text-align: center;">Resulting From Isolation<br>
+            </td>
+            <td style="vertical-align: top; text-align: center; width: 20%;">&nbsp;<span style="font-weight: bold;">isolated archive <br>
+resliced with dar_xform</span><br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; font-weight: bold;">internal_name (slice header)<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">A<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">B<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">C<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">D<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; font-weight: bold;">data_name (slice header)<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">A<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">A<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">C<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">C<br>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: top; font-weight: bold;">data_name (archive catalogue)<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">A<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">A<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">A<br>
+            </td>
+            <td style="vertical-align: top; text-align: center;">A<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+<br>
 
       <h4>Archive Level</h4>
       <div style="margin-left: 40px;">
