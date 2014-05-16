@@ -123,18 +123,25 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 	    generic_file *dst_sar = NULL;
 	    generic_file *src_sar = NULL;
 	    label data_name;
+	    label internal_name;
 	    entrepot_local entrep = entrepot_local(slice_user, slice_group, false);
 	    bool format_07_compatible = false;
 	    bool force_perm = slice_perm != "";
 	    U_I perm = force_perm ? tools_octal2int(slice_perm) : 0;
 
 	    data_name.clear();
+	    internal_name.generate_internal_filename();
 	    try
 	    {
 		if(dst != "-")
 		{
 		    dialog.change_non_interactive_output(&cout);
-		    tools_avoid_slice_overwriting_regex(dialog,  dst_dir->display(), string("^")+dst+"\\.[0-9]+\\."+EXTENSION+"(\\.(md5|sha1))?$", false, allow, warn, false);
+		    tools_avoid_slice_overwriting_regex(dialog,
+							dst_dir->display(), string("^")+dst+"\\.[0-9]+\\."+EXTENSION+"(\\.(md5|sha1))?$",
+							false,
+							allow,
+							warn,
+							false);
 		}
 
 		thr.check_self_cancellation();
@@ -175,8 +182,14 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 
 		if(size == 0)
 		    if(dst == "-")
-			dst_sar = sar_tools_open_archive_tuyau(dialog, NULL, 1, gf_write_only, data_name,
-						 	       format_07_compatible, execute_dst);
+			dst_sar = sar_tools_open_archive_tuyau(dialog,
+							       NULL,
+							       1,
+							       gf_write_only,
+							       internal_name,
+							       data_name,
+						 	       format_07_compatible,
+							       execute_dst);
 		    else
 		    {
 			if(dst_dir != NULL)
@@ -187,6 +200,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 							    dst,
 							    EXTENSION,
 							    entrep,
+							    internal_name,
 							    data_name,
 							    execute_dst,
 							    allow,
@@ -212,6 +226,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 						allow,
 						pause,
 						entrep,
+						internal_name,
 						data_name,
 						force_perm,
 						perm,

@@ -37,6 +37,7 @@ using namespace libdar;
 static user_interaction *ui = NULL;
 
 static label data_name;
+static label internal_name;
 
 static void f1();
 static void f2();
@@ -51,6 +52,7 @@ int main()
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
     data_name.clear();
+    internal_name.generate_internal_filename();
     f1();
     f2();
     f3();
@@ -65,7 +67,7 @@ static void f1()
     where.set_location("./test");
     try
     {
-	sar sar1 = sar(*ui, "destination", "txt", 100, 110, true, false, 0, where, data_name, false, 0, hash_none, false, 0);
+	sar sar1 = sar(*ui, "destination", "txt", 100, 110, true, false, 0, where, internal_name, data_name, false, 0, hash_none, false, 0);
         fichier_local src = fichier_local(*ui, "./test/source.txt", gf_read_only, 0666, false, false, false);
         src.copy_to(sar1);
     }

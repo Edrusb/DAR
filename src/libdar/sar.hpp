@@ -88,17 +88,16 @@ namespace libdar
 	    /// \param[in] x_allow_overwrite if set to false, no slice overwritting will be allowed
 	    /// \param[in] pause if set to zero no pause will be done between slice creation. If set to 1 a pause between each slice will be done. If set to N a pause each N slice will be done. Pauses must be acknoledged by user for the process to continue
 	    /// \param[in] where defines where to store the slices
-	    /// \param[in] data_name is a tag that has to be associated with the data. If the given data_name is "zero", the data_name of the sar object is set to the internal_name generated for that new object (which is pseudo-randomly chose and always increases with time).
+	    /// \param[in] internal_name is a tag common to all slice of the archive
+	    /// \param[in] data_name is a tag that has to be associated with the data.
 	    /// \param[in] force_permission if true slice permission will be forced to the value given in the next argument
 	    /// \param[in] permission value to use to set permission of slices
 	    /// \param[in] x_hash defines whether a hash file has to be generated for each slice, and wich hash algorithm to use
 	    /// \param[in] x_min_digits is the minimum number of digits the slices number is stored with in the filename
 	    /// \param[in] format_07_compatible when set to true, creates a slice header in the archive format of version 7 instead of the highest version known
 	    /// \param[in] execute is the command to execute after each slice creation (once it is completed)
-	    /// \note if the data_name is set to "label_clear()" value, the data_name's value will be
-	    /// equal to the internal_name (which is the most common situation, met when creating a new archive)
-	    /// Specifying an explicit data_name is useful when dar_xform'ing an archive for the new archive keeps the same tag
-      	    /// which will let it be extracted from an isolated catalogue of the original archive.
+	    /// \note data_name should be equal to internal_name except when reslicing an archive as dar_xform does in which
+	    /// case internal_name is randomly, and data_name is kept from the source archive
         sar(user_interaction  & dialog,
 	    const std::string & base_name,
 	    const std::string & extension,
@@ -108,6 +107,7 @@ namespace libdar
 	    bool x_allow_overwrite,
 	    const infinint & pause,
 	    const entrepot & where,
+	    const label & internal_name,
 	    const label & data_name,
 	    bool force_permission,
 	    U_I permission,
@@ -228,6 +228,7 @@ namespace libdar
 		    const std::string & base_name,     //< archive basename to create
 		    const std::string & extension,     //< archive extension
  		    const entrepot & where,            //< where to store the archive
+		    const label & internal_nale,       //< tag common to all slices of the archive
 		    const label & data_name,           //< tag that follows the data when archive is dar_xform'ed
 		    const std::string & execute,       //< command line to execute at end of slice creation
 		    bool allow_over,                   //< whether to allow overwriting
@@ -248,6 +249,7 @@ namespace libdar
 	    /// constructor to write a (single sliced) archive to a anonymous pipe
 	trivial_sar(user_interaction & dialog,
 		    generic_file * f, //< in case of exception the generic_file "f" is not released, this is the duty of the caller to do so, else (success), the object becomes owned by the trivial_sar and must not be released by the caller.
+		    const label & internal_name,
 		    const label & data_name,
 		    bool format_07_compatible,
 		    const std::string & execute);
@@ -287,7 +289,7 @@ namespace libdar
 	infinint min_digits;      //< minimum number of digits in slice name
 	std::string hook_where;   //< what value to use for %p subsitution in hook
 
-	void init();              //< write the slice header and set the offset field (write mode), or (read-mode),  reads the slice header an set offset field
+	void init(const label & internal_name); //< write the slice header and set the offset field (write mode), or (read-mode),  reads the slice header an set offset field
     };
 
 

@@ -83,6 +83,7 @@ namespace libdar
 					      memory_pool *pool,
 					      S_I fd,
 					      gf_mode mode,
+					      const label & internal_name,
 					      const label & data_name,
 					      bool slice_header_format_07,
 					      const std::string & execute)
@@ -95,7 +96,10 @@ namespace libdar
             tmp = new (pool) tuyau(dialog, fd, mode);
             if(tmp == NULL)
                 throw Ememory("sar_tools_open_archive_tuyau");
-            ret = new (pool) trivial_sar(dialog, tmp, data_name,
+            ret = new (pool) trivial_sar(dialog,
+					 tmp,
+					 internal_name,
+					 data_name,
 					 slice_header_format_07,
 					 execute);
             if(ret == NULL)

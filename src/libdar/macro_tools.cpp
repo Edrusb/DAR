@@ -879,7 +879,8 @@ namespace libdar
 				   const string & user_comment,
 				   hash_algo hash,
 				   const infinint & slice_min_digits,
-				   label & data_name)
+				   const label & internal_name,
+				   const label & data_name)
     {
 	try
 	{
@@ -889,14 +890,6 @@ namespace libdar
 	    U_I permission = force_permission ? tools_octal2int(slice_permission) : 0; // 0 or anything else, this does not matter
 
 	    layers.clear();
-
-		// data_name is provided for sar/trivial_sar/remote sar objects (thanks to zapette/slave_zapette).
-		// Clearing data_name which sets it to "zero" makes these sar-like object to set their data_name to
-		// their internal_name (which is generated pseudo-randomly at that time).
-		//
-		// once the sar-like object (inherited from contextual class) is created set data_name to the randomly
-		// generated value which get available to the caller of this function
-	    data_name.clear();
 
 	    secu_string real_pass = pass;
 
@@ -911,7 +904,6 @@ namespace libdar
 			dialog.warning(gettext("Creating low layer: Writing archive into a black hole object (equivalent to /dev/null)..."));
 
 		    tmp = new (pool) null_file(gf_write_only);
-		    // data_name is unchanged, this has no importance because all the archive goes to a black hole.
 		}
 		else
 		    if(file_size == 0) // one SLICE
@@ -920,59 +912,55 @@ namespace libdar
 			    if(info_details)
 				dialog.warning(gettext("Creating low layer: Writing archive into standard output object..."));
 
-			    trivial_sar *tvs = sar_tools_open_archive_tuyau(dialog, pool, 1, gf_write_only, data_name,
-									    false, execute); //archive goes to stdout
-			    tmp = tvs;
-			    if(tvs != NULL)
-				data_name = tvs->get_data_name();
-				// if tvs == NULL, then tmp == NULL is true, this case is handled below
+			    tmp = sar_tools_open_archive_tuyau(dialog,
+							       pool,
+							       1,
+							       gf_write_only,
+							       internal_name,
+							       data_name,
+							       false,
+							       execute); //archive goes to stdout
 			}
 			else
 			{
 			    if(info_details)
 				dialog.warning(gettext("Creating low layer: Writing archive into a plain file object..."));
-			    trivial_sar *tvs = new (pool) trivial_sar(dialog,
-								      filename,
-								      extension,
-								      sauv_path_t, // entrepot !!
-								      data_name,
-								      execute,
-								      allow_over,
-								      warn_over,
-								      force_permission,
-								      permission,
-								      hash,
-								      slice_min_digits,
-								      false);
-			    tmp = tvs;
-			    if(tvs != NULL)
-				data_name = tvs->get_data_name();
-				// if tvs == NULL, then level1 == NULL is true, this case is handled below
+			    tmp = new (pool) trivial_sar(dialog,
+							 filename,
+							 extension,
+							 sauv_path_t, // entrepot !!
+							 internal_name,
+							 data_name,
+							 execute,
+							 allow_over,
+							 warn_over,
+							 force_permission,
+							 permission,
+							 hash,
+							 slice_min_digits,
+							 false);
 			}
 		    else
 		    {
 			if(info_details)
 			    dialog.warning(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
-			sar *rsr = new (pool) sar(dialog,
-						  filename,
-						  extension,
-						  file_size,
-						  first_file_size,
-						  warn_over,
-						  allow_over,
-						  pause,
-						  sauv_path_t, // entrepot !!
-						  data_name,
-						  force_permission,
-						  permission,
-						  hash,
-						  slice_min_digits,
-						  false,
-						  execute);
-			tmp = rsr;
-			if(rsr != NULL)
-			    data_name = rsr->get_data_name();
-			    // if rsr == NULL, then level1 == NULL is true, this case is handled below
+			tmp = new (pool) sar(dialog,
+					     filename,
+					     extension,
+					     file_size,
+					     first_file_size,
+					     warn_over,
+					     allow_over,
+					     pause,
+					     sauv_path_t, // entrepot !!
+					     internal_name,
+					     data_name,
+					     force_permission,
+					     permission,
+					     hash,
+					     slice_min_digits,
+					     false,
+					     execute);
 		    }
 
 

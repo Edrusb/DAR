@@ -199,6 +199,7 @@ namespace libdar
 	     bool x_allow_overwrite,
 	     const infinint & x_pause,
 	     const entrepot & where,
+	     const label & internal_name,
 	     const label & data_name,
 	     bool force_permission,
 	     U_I permission,
@@ -229,11 +230,8 @@ namespace libdar
 	hash = x_hash;
 	min_digits = x_min_digits;
         set_info_status(CONTEXT_OP);
-	of_internal_name.generate_internal_filename();
-	if(data_name.is_cleared())
-	    of_data_name = of_internal_name;
-	else
-	    of_data_name = data_name;
+	of_internal_name = internal_name;
+	of_data_name = data_name;
 	force_perm = force_permission;
 	perm = permission;
 	of_fd = NULL;
@@ -1395,6 +1393,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 			     const std::string & base_name,
 			     const std::string & extension,
 			     const entrepot & where,
+			     const label & internal_name,
 			     const label & data_name,
 			     const std::string & execute,
 			     bool allow_over,
@@ -1496,7 +1495,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 
 	    set_info_status(CONTEXT_LAST_SLICE);
 	    reference = tmp;
-	    init();
+	    init(internal_name);
 	    tmp = NULL; // setting it to null only now was necesary to be able to release the object in case of exception
 	}
 	catch(...)
@@ -1515,6 +1514,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 			     const std::string & pipename,
 			     bool lax) : generic_file(gf_read_only) , mem_ui(dialog)
     {
+	label for_init;
 	reference = NULL;
 	offset = 0;
 	end_of_slice = 0;
@@ -1536,7 +1536,8 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	    if(reference == NULL)
 		throw Ememory("trivial_sar::trivial_sar");
 
-	    init();
+	    for_init.clear();
+	    init(for_init);
 	}
 	catch(...)
 	{
@@ -1551,6 +1552,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 
     trivial_sar::trivial_sar(user_interaction & dialog,
 			     generic_file *f,
+			     const label & internal_name,
 			     const label & data_name,
 			     bool format_07_compatible,
 			     const std::string & execute) : generic_file(gf_write_only), mem_ui(dialog)
@@ -1570,7 +1572,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	hook_where = "";
 
 	set_info_status(CONTEXT_LAST_SLICE);
-	init();
+	init(internal_name);
     }
 
     trivial_sar::~trivial_sar()
@@ -1660,7 +1662,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
             throw Erange("trivial_sar::get_position", gettext("Position out of range"));
     }
 
-    void trivial_sar::init()
+    void trivial_sar::init(const label & internal_name)
     {
         header tete;
 
@@ -1678,15 +1680,9 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	case gf_write_only:
 	case gf_read_write:
 	    tete.get_set_magic() = SAUV_MAGIC_NUMBER;
-	    tete.get_set_internal_name().generate_internal_filename();
+	    tete.get_set_internal_name() = internal_name;
 	    tete.get_set_flag() = flag_type_terminal;
-	    if(of_data_name.is_cleared())
-	    {
-		tete.get_set_data_name() = tete.get_set_internal_name();
-		of_data_name = tete.get_set_data_name();
-	    }
-	    else
-		tete.get_set_data_name() = of_data_name;
+	    tete.get_set_data_name() = of_data_name;
 	    if(old_sar)
 		tete.set_format_07_compatibility();
 	    tete.write(get_ui(), *reference);

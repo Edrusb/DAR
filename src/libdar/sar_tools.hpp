@@ -44,6 +44,7 @@ namespace libdar
 						     memory_pool *pool,
 						     S_I fd,
 						     gf_mode mode,
+						     const label & internal_name,
 						     const label & data_name,
 						     bool slice_header_format_07,
 						     const std::string & execute);

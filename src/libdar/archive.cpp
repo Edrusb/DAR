@@ -1157,6 +1157,15 @@ namespace libdar
 		pile layers;
 		header_version isol_ver;
 		label isol_data_name;
+		label internal_name;
+
+		do
+		{
+		    isol_data_name.generate_internal_filename();
+		}
+		while(isol_data_name == cat->get_data_name());
+		internal_name = isol_data_name;
+
 
 		macro_tools_create_layers(dialog,
 					  layers,
@@ -1186,6 +1195,7 @@ namespace libdar
 					  options.get_user_comment(),
 					  options.get_hash_algo(),
 					  options.get_slice_min_digits(),
+					  internal_name,
 					  isol_data_name);
 
 		if(cat == NULL)
@@ -1837,19 +1847,10 @@ namespace libdar
 	    infinint aborting_next_etoile = 0;
 	    U_64 flag = 0;     // carries the sar option flag
 
-	    label data_name;
+	    label internal_name;
 	    generic_file *tmp = NULL;
 	    escape *esc = NULL;
 	    thread_cancellation thr_cancel;
-
-	    if(op == oper_isolate)
-	    {
-		    // sleeping one second is mandatory to be sure the label that will soon be generated for
-		    // layer1 is not equal to the label of the archive of reference. Else, for short archives
-		    // that are on-fly isolated, the on-fly extracted catalogue may end with the same data_name
-		    // as its own layer1 leading dar to thing that it is a normal archive with data.
-		sleep(1);
-	    }
 
 	    if(ref_cat1 == NULL && op != oper_create)
 		SRC_BUG;
@@ -1857,6 +1858,7 @@ namespace libdar
 		throw SRC_BUG;
 
 	    secu_string real_pass = pass;
+	    internal_name.generate_internal_filename();
 
 	    try
 	    {
@@ -1893,54 +1895,48 @@ namespace libdar
 					  user_comment,
 					  hash,
 					  slice_min_digits,
-					  data_name);
+					  internal_name,
+					  internal_name); // data_name is equal to internal_name in the current situation
 
 		stack.find_first_from_bottom(esc);
 		if(add_marks_for_sequential_reading && esc == NULL)
 		    throw SRC_BUG;
 
 		    // ********** building the catalogue (empty for now) ************************* //
-
 		datetime root_mtime;
 
-		if(op != oper_isolate)
+		if(info_details)
+		    dialog.warning(gettext("Building the catalog object..."));
+		try
 		{
-		    if(info_details)
-			dialog.warning(gettext("Building the catalog object..."));
-		    try
+		    if(fs_root.display() != "<ROOT>")
+			root_mtime = tools_get_mtime(fs_root.display());
+		    else // case of merging operation for example
 		    {
-			if(fs_root.display() != "<ROOT>")
-			    root_mtime = tools_get_mtime(fs_root.display());
-			else // case of merging operation for example
-			{
-			    datetime mtime1 = ref_cat1 != NULL ? ref_cat1->get_root_mtime() : datetime(0);
-			    datetime mtime2 = ref_cat2 != NULL ? ref_cat2->get_root_mtime() : datetime(0);
-			    root_mtime = mtime1 > mtime2 ? mtime1 : mtime2;
-			}
+			datetime mtime1 = ref_cat1 != NULL ? ref_cat1->get_root_mtime() : datetime(0);
+			datetime mtime2 = ref_cat2 != NULL ? ref_cat2->get_root_mtime() : datetime(0);
+			root_mtime = mtime1 > mtime2 ? mtime1 : mtime2;
 		    }
-		    catch(Erange & e)
-		    {
-			string tmp = fs_root.display();
-			throw Erange("archive::op_create_in_sub", tools_printf(gettext("Error while fetching information for %S: "), &tmp) + e.get_message());
-		    }
-
-		    if(op == oper_merge)
-			if(add_marks_for_sequential_reading && !empty)
-			    cat = new (pool) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), data_name, esc);
-			else
-			    cat = new (pool) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), data_name);
-		    else // op == oper_create
-			if(add_marks_for_sequential_reading && !empty)
-			    cat = new (pool) escape_catalogue(dialog, root_mtime, data_name, esc);
-			else
-			    cat = new (pool) catalogue(dialog, root_mtime, data_name);
-
-		    if(cat == NULL)
-			throw Ememory("archive::op_create_in_sub");
 		}
-		else // isolation
-		    cat = NULL; // cat is not used for that operation
+		catch(Erange & e)
+		{
+		    string tmp = fs_root.display();
+		    throw Erange("archive::op_create_in_sub", tools_printf(gettext("Error while fetching information for %S: "), &tmp) + e.get_message());
+		}
 
+		if(op == oper_merge)
+		    if(add_marks_for_sequential_reading && !empty)
+			cat = new (pool) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), internal_name, esc);
+		    else
+			cat = new (pool) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), internal_name);
+		else // op == oper_create
+		    if(add_marks_for_sequential_reading && !empty)
+			cat = new (pool) escape_catalogue(dialog, root_mtime, internal_name, esc);
+		    else
+			cat = new (pool) catalogue(dialog, root_mtime, internal_name);
+
+		if(cat == NULL)
+		    throw Ememory("archive::op_create_in_sub");
 
 		    // *********** now we can perform the data filtering operation (adding data to the archive) *************** //
 
@@ -1954,6 +1950,8 @@ namespace libdar
 		    case oper_create:
 			if(ref_cat1 == NULL)
 			{
+				// using a empty catalogue as reference if no reference is given
+
 			    label data_name;
 			    data_name.clear();
 			    void_cat = new (pool) catalogue(dialog,
