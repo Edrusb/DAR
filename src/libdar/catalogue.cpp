@@ -2350,18 +2350,19 @@ namespace libdar
 			infinint err_offset;
 			if(me->diff(*you, crc_size, value, err_offset))
 			    throw Erange("file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
-			else
+
+			    // data is the same, comparing the CRC values
+
+			if(get_crc(original))
 			{
-			    if(original != NULL)
-			    {
-				if(value == NULL)
-				    throw SRC_BUG;
-				if(original->get_size() != value->get_size())
-				    throw Erange("file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
-				if(*original != *value)
-				    throw Erange("file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
-			    }
+			    if(value == NULL)
+				throw SRC_BUG;
+			    if(original->get_size() != value->get_size())
+				throw Erange("file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
+			    if(*original != *value)
+				throw Erange("file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
 			}
+			    // else old archive without CRC
 		    }
 		    catch(...)
 		    {
