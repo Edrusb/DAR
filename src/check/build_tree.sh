@@ -13,8 +13,10 @@ mkdir "$1"
 cd "$1"
 
 echo "this is the content of a plain file" > plain_file.txt
+setfattr -n user.coucou -v hello plain_file.txt
 
 mkdir "$SUB1"
+setfattr -n user.cuicui -v hellu "$SUB1"
 cd "$SUB1"
 ln ../plain_file.txt hard_linked_inode.txt
 cd ..
@@ -45,6 +47,7 @@ mkfifo tube2
 cd "$SUB1"
 ln ../tube2 hard_linked_pipe
 mknod chardev c 1 1
+setfacl -m u:bin:rw- chardev
 mknod blockdev b 1 1
 ln chardev chardev_hard
 ln blockdev blockdev_hard
