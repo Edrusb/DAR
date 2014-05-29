@@ -4913,7 +4913,7 @@ namespace libdar
 
         const file *fic = dynamic_cast<const file *>(&ref);
         if(fic != NULL && fic->get_saved_status() == s_saved)
-            if(fic->get_storage_size() == 0 || fic->get_compression_algo_read() == none)
+            if((fic->get_storage_size() == 0 || fic->get_compression_algo_read() == none) && !fic->get_sparse_file_detection_read())
                 ret += "[     ]";
             else
                 if(fic->get_size() >= fic->get_storage_size())
