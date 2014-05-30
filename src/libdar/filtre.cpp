@@ -2418,7 +2418,10 @@ namespace libdar
 		try
 		{
 		    if(e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_full)
+		    {
+			(void)e_ino->get_ea();
 			e_ino->ea_get_crc(check);
+		    }
 		}
 		catch(Erange & e)
 		{

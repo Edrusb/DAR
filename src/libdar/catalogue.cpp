@@ -1253,6 +1253,9 @@ namespace libdar
 			    if(!esc->skip_to_next_mark(escape::seqt_ea, false))
 				throw Erange("inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
 			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
+			    if(ea_offset == NULL)
+				throw SRC_BUG;
+			    *ea_offset = storage->get_position();
 			}
 
 			if(ea_get_size() == 0)
