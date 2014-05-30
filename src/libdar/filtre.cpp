@@ -2450,9 +2450,15 @@ namespace libdar
 		    if(e_ino != NULL)
 		    {
 			if(e_ino->ea_get_saved_status() == inode::ea_full)
+			{
+			    (void)e_ino->get_ea();
 			    e_ino->ea_get_crc(check);
+			}
 			if(e_ino->fsa_get_saved_status() == inode::fsa_full)
+			{
+			    (void)e_ino->get_fsa();
 			    e_ino->fsa_get_crc(check);
+			}
 		    }
 		}
 		catch(Erange & e)

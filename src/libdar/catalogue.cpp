@@ -1155,6 +1155,9 @@ namespace libdar
 			    if(!esc->skip_to_next_mark(escape::seqt_ea, false))
 				throw Erange("inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
 			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
+			    if(ea_offset == NULL)
+				throw SRC_BUG;
+			    *ea_offset = storage->get_position();
 			}
 
 			if(ea_get_size() == 0)
@@ -2713,18 +2716,20 @@ namespace libdar
 			    infinint err_offset;
 			    if(me->diff(*you, crc_size, value, err_offset))
 				throw Erange("file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
-			    else
+			    // data is the same, comparing the CRC values
+
+			    if(get_crc(original))
 			    {
-				if(original != NULL)
-				{
-				    if(value == NULL)
-					throw SRC_BUG;
-				    if(original->get_size() != value->get_size())
-					throw Erange("file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
-				    if(*original != *value)
-					throw Erange("file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
-				}
+				if(value == NULL)
+				    throw SRC_BUG;
+				if(original->get_size() != value->get_size())
+				    throw Erange("file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
+				if(*original != *value)
+				    throw Erange("file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
 			    }
+
+			    // else old archive without CRC
+
 			}
 			catch(...)
 			{
@@ -5259,10 +5264,11 @@ namespace libdar
 	}
 
 	ret += "[" + local_fsa_fam_to_string(ref) + "]";
-
 	const file *fic = dynamic_cast<const file *>(&ref);
 	if(fic != NULL && fic->get_saved_status() == s_saved)
-	    ret += tools_get_compression_ratio(fic->get_storage_size(), fic->get_size(), fic->get_compression_algo_read() != none);
+	    ret += tools_get_compression_ratio(fic->get_storage_size(),
+					       fic->get_size(),
+					       fic->get_compression_algo_read() != none || fic->get_sparse_file_detection_read());
 	else
 	    ret += "[-----]";
 
