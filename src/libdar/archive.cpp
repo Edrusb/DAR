@@ -253,15 +253,40 @@ namespace libdar
 				    if(efsa_loc == NULL)
 					throw SRC_BUG;
 
-				    if(info_details)
-					dialog.warning(gettext("Creating catalogue object to be filled with archive sequential read..."));
-				    cat = new (pool) escape_catalogue(dialog,
-								      ver.edition,
-								      char2compression(ver.algo_zip),
-								      data_loc,
-								      efsa_loc,
-								      esc,
-								      options.get_lax());
+				    if(esc->skip_to_next_mark(escape::seqt_catalogue, false))
+				    {
+					if(info_details)
+					    dialog.warning(gettext("No data found in that archive, sequentially reading the catalogue found at the end of the archive..."));
+
+					contextual *layer1 = NULL;
+					label lab = label_zero;
+					stack.find_first_from_bottom(layer1);
+					if(layer1 != NULL)
+					    lab = layer1->get_data_name();
+
+					cat = new (pool) catalogue(dialog,
+								   stack,
+								   ver.edition,
+								   char2compression(ver.algo_zip),
+								   data_loc,
+								   efsa_loc,
+								   options.get_lax(),
+								   lab,
+								   false); // only detruit
+				    }
+				    else
+				    {
+					if(info_details)
+					    dialog.warning(gettext("The catalogue will be filled while sequentially reading the archive, preparing the data structure..."));
+
+					cat = new (pool) escape_catalogue(dialog,
+									  ver.edition,
+									  char2compression(ver.algo_zip),
+									  data_loc,
+									  efsa_loc,
+									  esc,
+									  options.get_lax());
+				    }
 				    if(cat == NULL)
 					throw Ememory("archive::archive");
 				}

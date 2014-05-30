@@ -1155,9 +1155,7 @@ namespace libdar
 			    if(!esc->skip_to_next_mark(escape::seqt_ea, false))
 				throw Erange("inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
 			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
-			    if(ea_offset == NULL)
-				throw SRC_BUG;
-			    *ea_offset = storage->get_position();
+			    const_cast<inode *>(this)->ea_set_offset(storage->get_position());
 			}
 
 			if(ea_get_size() == 0)
@@ -1480,6 +1478,7 @@ namespace libdar
 			    if(!esc->skip_to_next_mark(escape::seqt_fsa, false))
 				throw Erange("inode::get_fsa", string("Error while fetching FSA from archive: No escape mark found for that file"));
 			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
+			    const_cast<inode *>(this)->fsa_set_offset(storage->get_position());
 			}
 
 			storage->suspend_compression();
@@ -3520,6 +3519,28 @@ namespace libdar
 	}
     }
 
+    void directory::set_all_mirage_s_inode_dumped_field_to(bool val)
+    {
+	list<nomme *>::iterator curs = ordered_fils.begin();
+
+	while(curs != ordered_fils.end())
+	{
+	    if(*curs == NULL)
+		throw SRC_BUG;
+	    directory *d = dynamic_cast<directory *>(*curs);
+	    mirage *m = dynamic_cast<mirage *>(*curs);
+
+		// recursive call
+	    if(d != NULL)
+		d->set_all_mirage_s_inode_dumped_field_to(val);
+
+	    if(m != NULL)
+		m->set_inode_dumped(val);
+
+	    ++curs;
+	}
+    }
+
     device::device(const infinint & uid, const infinint & gid, U_16 perm,
 		   const datetime & last_access,
 		   const datetime & last_modif,
@@ -4970,6 +4991,15 @@ namespace libdar
 	}
 
 	get_ui().warning("</Catalog>");
+    }
+
+    void catalogue::reset_dump() const
+    {
+	directory * d = const_cast<directory *>(contenu);
+
+	if(d == NULL)
+	    throw SRC_BUG;
+	d->set_all_mirage_s_inode_dumped_field_to(false);
     }
 
     void catalogue::dump(generic_file & f) const

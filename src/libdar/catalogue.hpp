@@ -720,27 +720,34 @@ namespace libdar
             // using method has_changed_since() from inode class
         unsigned char signature() const { return mk_signature('d', get_saved_status()); };
 
-	    // some data has changed since archive of reference in this directory or subdirectories
+	    /// detemine whether some data has changed since archive of reference in this directory or subdirectories
 	bool get_recursive_has_changed() const { return recursive_has_changed; };
-	    // update the recursive_has_changed field
+
+	    /// ask recursive update for the recursive_has_changed field
 	void recursive_has_changed_update() const;
 
-	    // get then number of "nomme" entry contained in this directory and subdirectories (recursive call)
+	    /// get then number of "nomme" entry contained in this directory and subdirectories (recursive call)
 	infinint get_tree_size() const;
-	    // get the number of entry having some EA set in the directory tree (recursive call)
+
+	    /// get the number of entry having some EA set in the directory tree (recursive call)
 	infinint get_tree_ea_num() const;
-	    // get the number of entry that are hard linked inode (aka mirage in dar implementation) (recursive call)
+
+	    /// get the number of entry that are hard linked inode (aka mirage in dar implementation) (recursive call)
 	infinint get_tree_mirage_num() const;
+
 	    // for each mirage found (hard link implementation) in the directory tree, add its etiquette to the returned
 	    // list with the number of reference that has been found in the tree. (map[etiquette] = number of occurence)
 	    // from outside of class directory, the given argument is expected to be an empty map.
 	void get_etiquettes_found_in_tree(std::map<infinint, infinint> & already_found) const;
 
-	    // whether this directory is empty or not
+	    /// whether this directory is empty or not
 	bool is_empty() const { return ordered_fils.empty(); };
 
-	    // recursively remove all mirage entries
+	    /// recursively remove all mirage entries
 	void remove_all_mirages_and_reduce_dirs();
+
+	    /// set the value of inode_dumped for all mirage (recusively)
+	void set_all_mirage_s_inode_dumped_field_to(bool val);
 
         entree *clone() const { return new (get_pool()) directory(*this); };
 
@@ -1070,7 +1077,12 @@ namespace libdar
 	    // inspected had not changed since the reference was done
 	    // aborting_last_etoile is the highest etoile reference withing "this" current object.
 
+	    /// before dumping the catalogue, need to set all hardlinked inode they have not been saved once
+	void reset_dump() const;
+
+	    /// write down the whole catalogue to file
         void dump(generic_file & f) const;
+
         void listing(bool isolated,
 		     const mask &selection,
 		     const mask & subtree,

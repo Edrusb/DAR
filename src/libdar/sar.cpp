@@ -1018,7 +1018,7 @@ namespace libdar
 		    // open with overwriting
 		code = entr->open(get_ui(),
 				  fic,
-				  gf_read_write,
+				  gf_write_only,
 				  force_perm,
 				  perm,
 				  false,    //< fail if exists
@@ -1030,7 +1030,7 @@ namespace libdar
 		if(hash == hash_none)
 		    code = entr->open(get_ui(),
 				      fic,
-				      gf_read_write,
+				      gf_write_only,
 				      force_perm,
 				      perm,
 				      false, //< fail if exists

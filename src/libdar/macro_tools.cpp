@@ -1188,6 +1188,7 @@ namespace libdar
 
 	if(info_details)
 	    dialog.warning(gettext("Writing down archive contents..."));
+	cat.reset_dump();
 	cat.dump(layers);
 	layers.top()->sync_write();
 

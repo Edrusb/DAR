@@ -101,6 +101,7 @@ namespace libdar
 
 
 	    /// WARNING this is a deprecated constructor, use the op_isolate() method for better performances
+	    /// \note this method will be remove from the API in a future version of libdar
 	archive(user_interaction & dialog,
 		const path & sauv_path,
 		archive *ref_arch,

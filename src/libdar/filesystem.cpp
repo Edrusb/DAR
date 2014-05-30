@@ -1255,7 +1255,6 @@ namespace libdar
 
 	if(ref_ino != NULL && ret >= 0)
 	    make_owner_perm(get_ui(), *ref_ino, ou, dir_perm, what_to_check, scope);
-
     }
 
     void filesystem_hard_link_write::clear_corres_if_pointing_to(const infinint & ligne, const string & path)
@@ -1437,27 +1436,6 @@ namespace libdar
 			    // we must try to restore EA or FSA only if data could be restored
 			    // as in the current situation no file existed before
 
-			if(has_fsa_saved)
-			{
-			    if(info_details)
-				get_ui().warning(string(gettext("Restoring file's FSA: ")) + spot_display);
-
-			    if(!empty)
-			    {
-				const filesystem_specific_attribute_list * fsa = x_ino->get_fsa();
-				if(fsa == NULL)
-				    throw SRC_BUG;
-				try
-				{
-				    fsa_restored = fsa->set_fsa_to_filesystem_for(spot_display, get_fsa_scope(), get_ui());
-				}
-				catch(Erange & e)
-				{
-				    get_ui().warning(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
-				}
-			    }
-			}
-
 			if(has_ea_saved)
 			{
 			    if(info_details)
@@ -1479,18 +1457,32 @@ namespace libdar
 				ea_restored = true;
 			}
 
-			    // to accomodate MacOS X we set again mtime to its expected value
-			    // because restoring EA modifies mtime on this OS.
-			    // Same point but concerning extX FSA, setting them may modify atime
-			    // unless furtive read is available.
-			    // This does not hurt other Unix systems.
-			if(has_fsa_saved || has_ea_saved)
+			if(has_fsa_saved)
 			{
+			    if(info_details)
+				get_ui().warning(string(gettext("Restoring file's FSA: ")) + spot_display);
+
 			    if(!empty)
-				make_date(*x_ino, spot_display, what_to_check,
-					  get_fsa_scope());
+			    {
+				const filesystem_specific_attribute_list * fsa = x_ino->get_fsa();
+				if(fsa == NULL)
+				    throw SRC_BUG;
+				try
+				{
+				    fsa_restored = fsa->set_fsa_to_filesystem_for(spot_display, get_fsa_scope(), get_ui());
+				}
+				catch(Erange & e)
+				{
+				    get_ui().warning(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
+				}
+			    }
 			}
 
+			    // now that FSA has been read (if sequential mode is used)
+			    // we can restore dates in particular creation date from HFS+ FSA if present
+			if(!empty)
+			    make_date(*x_ino, spot_display, what_to_check,
+				      get_fsa_scope());
 		    }
 		    else // no existing inode but no data to restore
 		    {
@@ -2269,8 +2261,6 @@ namespace libdar
 		throw;
 		// else (the inode is a symlink), we simply ignore this error
 	}
-
-	make_date(ref, chem, what_to_check, scope);
     }
 
     static void make_date(const inode & ref,
