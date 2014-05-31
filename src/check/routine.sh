@@ -205,6 +205,7 @@ GO "A1-7" 0 check_hash $hash $catf.*.dar
 mkdir $dst
 GO "A1-8" 0 $DAR -N -x $full -R $dst -B $OPT
 GO "A1-9" 0 my_diff  $src $dst
+GO "A1-A" 0 $DAR -N -d $full -R $dst -B $OPT
 rm -rf $dst
 fi
 
