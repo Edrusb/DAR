@@ -110,6 +110,38 @@ namespace libdar
 	return val;
     }
 
+    datetime datetime::loose_diff(const datetime & ref) const
+    {
+	datetime val = *this;
+	time_unit max_capa = tu_second;
+
+	if(*this < ref)
+	    throw SRC_BUG; // negative date would result of the operation
+
+	val.sec -= ref.sec;
+
+	    // using the less precised unit to avoid loosing accuracy
+	val.uni = max(uni, ref.uni);
+#if LIBDAR_MICROSECOND_READ_ACCURACY && LIBDAR_MICROSECOND_WRITE_ACCURACY
+	max_capa = tu_microsecond;
+#endif
+	if(val.uni < max_capa)
+	    val.uni = max_capa;
+	infinint me_frac = get_subsecond_value(val.uni);
+	infinint ref_frac = ref.get_subsecond_value(val.uni);
+
+	if(me_frac >= ref_frac)
+	    val.frac = me_frac - ref_frac;
+	else
+	{
+	    --val.sec; // removing 1 second
+	    val.frac = me_frac + how_much_to_make_1_second(val.uni);
+	    val.frac -= ref_frac;
+	}
+
+	return val;
+    }
+
     bool datetime::is_subsecond_an_integer_value_of(time_unit target, infinint & newval) const
     {
 	if(target <= uni)

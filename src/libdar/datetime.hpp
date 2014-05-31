@@ -87,6 +87,9 @@ namespace libdar
 	datetime operator - (const datetime & ref) const;
 	datetime operator + (const datetime & ref) const;
 
+	    /// at the difference of operator - provides the difference using the less precise unit used between the two elements
+	datetime loose_diff(const datetime & ref) const;
+
 	    /// return the integer number of second
 	infinint get_second_value() const { return sec; };
 

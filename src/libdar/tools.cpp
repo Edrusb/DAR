@@ -1103,7 +1103,7 @@ namespace libdar
     bool tools_is_equal_with_hourshift(const infinint & hourshift, const datetime & date1, const datetime & date2)
     {
         infinint num, rest;
-        datetime t_delta = date1 > date2 ? date1-date2 : date2-date1;
+	datetime t_delta = date1 > date2 ? date1.loose_diff(date2) : date2.loose_diff(date1);
 	infinint delta;
 
 	if(!t_delta.is_integer_second())
