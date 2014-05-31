@@ -1360,7 +1360,10 @@ namespace libdar
 	    if(!stack_dir.empty())
 	    {
 		if(!empty && stack_dir.back().get_restore_date())
+		{
 		    make_owner_perm(get_ui(), stack_dir.back(), *current_dir, true, what_to_check, get_fsa_scope());
+		    make_date(stack_dir.back(), (*current_dir + stack_dir.back().get_name()).display(), what_to_check, get_fsa_scope());
+		}
 	    }
 	    else
 		throw SRC_BUG;
@@ -2185,7 +2188,8 @@ namespace libdar
 
     static void make_owner_perm(user_interaction & dialog,
 				const inode & ref,
-				const path & ou, bool dir_perm,
+				const path & ou,
+				bool dir_perm,
 				inode::comparison_fields what_to_check,
 				const fsa_scope & scope)
     {
