@@ -206,7 +206,7 @@ namespace libdar
 	     hash_algo x_hash,
 	     const infinint & x_min_digits,
 	     bool format_07_compatible,
-	     const string & execute) : generic_file(gf_write_only), mem_ui(dialog)
+	     const string & execute) : generic_file(gf_read_write), mem_ui(dialog)
     {
         if(file_size < header::min_size() + 1)  //< one more byte to store at least one byte of data
             throw Erange("sar::sar", gettext("File size too small"));
@@ -917,7 +917,7 @@ namespace libdar
 	{
 	    code = entr->open(get_ui(),
 			      fic,
-			      gf_write_only,
+			      gf_read_write, // yes, no more writeonly as stated in the name of this method
 			      force_perm,
 			      perm,
 			      true,   //< fail_if_exists
@@ -1018,7 +1018,7 @@ namespace libdar
 		    // open with overwriting
 		code = entr->open(get_ui(),
 				  fic,
-				  gf_write_only,
+				  gf_read_write, // yes, no more write only as stated in the name of this method
 				  force_perm,
 				  perm,
 				  false,    //< fail if exists
@@ -1030,7 +1030,7 @@ namespace libdar
 		if(hash == hash_none)
 		    code = entr->open(get_ui(),
 				      fic,
-				      gf_write_only,
+				      gf_read_write, // yes, no more write only as stated in the name of this method
 				      force_perm,
 				      perm,
 				      false, //< fail if exists
@@ -1402,7 +1402,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 			     U_I permission,
 			     hash_algo x_hash,
 			     const infinint & x_min_digits,
-			     bool format_07_compatible) : generic_file(gf_write_only), mem_ui(dialog)
+			     bool format_07_compatible) : generic_file(gf_read_write), mem_ui(dialog)
     {
 
 	    // some local variables to be used
@@ -1430,7 +1430,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	{
 	    code = where.open(dialog,
 			      filename,
-			      gf_write_only,
+			      gf_read_write,
 			      force_permission,
 			      permission,
 			      true,    //< fail if exists
@@ -1453,7 +1453,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 
 		code = where.open(dialog,
 				  filename,
-				  gf_write_only,
+				  gf_read_write,
 				  force_permission,
 				  permission,
 				  false,  //< fail if exists

@@ -51,12 +51,12 @@ namespace libdar
 {
 
 	// returns false if file has changed during backup (inode is saved however, but the saved data may be invalid)
-	// return true if file has not change
+	// return true if file has not change, false if file need not resaving or does not add wasted bytes in archive
 	// throw exceptions in case of error
     static bool save_inode(user_interaction & dialog,//< how to report to user
 			   memory_pool *pool,        //< set to NULL or points to the memory_pool to use
 			   const string &info_quoi,  //< full path name of the file to save (including its name)
-			   inode * & ino,            //< inode to save to archive
+			   entree * & e,             //< entree to save to archive
 			   compressor *stock,        //< where to write to
 			   bool info_details,        //< verbose output to user
 			   bool display_treated,     //< add an information line before treating a file
@@ -594,7 +594,7 @@ namespace libdar
 				    else
 					throw SRC_BUG; // known_hard_link is true and e_mir == NULL !???
 				}
-				else
+				else // not a hard link or known hard linked inode
 				{
 				    const inode *f_ino = NULL;
 				    const file *f_file = NULL;
@@ -757,16 +757,13 @@ namespace libdar
 						e_file->change_compression_algo_write(none);
 					}
 
-					    // PRE RECORDING THE INODE (for sequential reading)
 
-					cat.pre_add(e, stockage);
-
-					    // PERFORMING ACTION FOR INODE
+					    // PERFORMING ACTION FOR ENTRY (entree dump, eventually data dump)
 
 					if(!save_inode(dialog,
 						       pool,
 						       juillet.get_string(),
-						       e_ino,
+						       e,
 						       stockage,
 						       info_details,
 						       display_treated,
@@ -780,10 +777,10 @@ namespace libdar
 						       sparse_file_min_size,
 						       &sem,
 						       wasted_bytes))
-					{
-					    st.set_byte_amount(wasted_bytes);
-					    st.incr_tooold();
-					}
+					    st.incr_tooold(); // counting a new dirty file in archive
+
+
+					st.set_byte_amount(wasted_bytes);
 
 					if(!avoid_saving_inode)
 					    st.incr_treated();
@@ -2326,7 +2323,7 @@ namespace libdar
 		    if(!save_inode(dialog,
 				   pool,
 				   juillet.get_string(),
-				   e_ino,
+				   e_var,
 				   stockage,
 				   info_details,
 				   display_treated,
@@ -2478,7 +2475,7 @@ namespace libdar
     static bool save_inode(user_interaction & dialog,
 			   memory_pool *pool,
 			   const string & info_quoi,
-			   inode * & ino,
+			   entree * & e,
 			   compressor *stock,
 			   bool info_details,
 			   bool display_treated,
@@ -2486,7 +2483,7 @@ namespace libdar
 			   bool check_change,
 			   bool compute_crc,
 			   file::get_data_mode keep_mode,
-			   const catalogue &cat,
+			   const catalogue & cat,
 			   const infinint & repeat_count,
 			   const infinint & repeat_byte,
 			   const infinint & hole_size,
@@ -2495,291 +2492,367 @@ namespace libdar
     {
 	bool ret = true;
 	infinint current_repeat_count = 0;
+	infinint storage_size;
 	bool loop;
+	inode *ino = dynamic_cast<inode *>(e);
+	bool resave_uncompressed = false;
+	infinint rewinder = stock->get_position(); // we skip back here is data must be saved uncompressed
 
-        if(ino == NULL)
-	    return true;
-	if(stock == NULL)
-            throw SRC_BUG;
-        if(ino->get_saved_status() != s_saved)	{
-	    if(sem != NULL)
-		sem->raise(info_quoi, ino, false);
-            return ret;
-	}
-	if(compute_crc && (keep_mode != file::normal && keep_mode != file::plain))
-	    throw SRC_BUG; // cannot compute crc if data is compressed or hole datastructure not interpreted
-        if(display_treated)
-            dialog.warning(string(gettext("Adding file to archive: ")) + info_quoi);
+	do // loop if resave_uncompressed is set, this is the OUTER LOOP
+	{
+		// PRE RECORDING THE INODE (for sequential reading)
 
-        file *fic = dynamic_cast<file *>(ino);
+	    cat.pre_add(e, stock);
 
-        if(fic != NULL)
-        {
-	    if(sem != NULL)
-		sem->raise(info_quoi, ino, true);
+		// TREATING SPECIAL CASES
 
-	    try
+	    if(ino == NULL)
+		return true;
+	    if(stock == NULL)
+		throw SRC_BUG;
+	    if(ino->get_saved_status() != s_saved)
 	    {
+		if(sem != NULL)
+		    sem->raise(info_quoi, ino, false);
+		return ret;
+	    }
+	    if(compute_crc && (keep_mode != file::normal && keep_mode != file::plain))
+		throw SRC_BUG; // cannot compute crc if data is compressed or hole datastructure not interpreted
 
-		do
+		// TREATNG INODE THAT NEED DATA SAVING
+
+	    if(display_treated)
+	    {
+		if(resave_uncompressed)
+		    dialog.warning(string(gettext("Resaving file without compression: ")) + info_quoi);
+		else
+		    dialog.warning(string(gettext("Adding file to archive: ")) + info_quoi);
+	    }
+
+	    file *fic = dynamic_cast<file *>(e);
+
+	    if(fic != NULL)
+	    {
+		if(sem != NULL)
+		    sem->raise(info_quoi, ino, true);
+
+		try
 		{
-		    stock->flush_write(); // sanity action
-
-		    loop = false;
-		    infinint start = stock->get_position();
-		    generic_file *source = NULL;
-
-		    try
+		    do // while "loop" is true, this is the INNER LOOP
 		    {
-			switch(keep_mode)
-			{
-			case file::keep_compressed:
-			    if(fic->get_compression_algo_read() != fic->get_compression_algo_write())
-				keep_mode = file::keep_hole;
-			    source = fic->get_data(keep_mode);
-			    break;
-			case file::keep_hole:
-			    source = fic->get_data(keep_mode);
-			    break;
-			case file::normal:
-			    if(fic->get_sparse_file_detection_read()) // source file already holds a sparse_file structure
-				source = fic->get_data(file::plain); // we must hide the holes for it can be redetected
-			    else
-				source = fic->get_data(file::normal);
-			    break;
-			case file::plain:
-			    throw SRC_BUG; // save_inode must never be called with this value
-			default:
-			    throw SRC_BUG; // unknown value for keep_mode
-			}
-		    }
-		    catch(...)
-		    {
-			cat.pre_add_failed_mark(stock);
-			throw;
-		    }
+			stock->flush_write(); // sanity action
 
-		    if(source != NULL)
-		    {
+			loop = false;
+			infinint start = stock->get_position();
+			generic_file *source = NULL;
+
 			try
 			{
-			    generic_file *dest = stock;
-			    sparse_file *dst_hole = NULL;
-			    infinint crc_size = tools_file_size_to_crc_size(fic->get_size());
-			    crc * val = NULL;
-			    const crc * original = NULL;
-			    bool crc_available = false;
+			    switch(keep_mode)
+			    {
+			    case file::keep_compressed:
+				if(fic->get_compression_algo_read() != fic->get_compression_algo_write())
+				    keep_mode = file::keep_hole;
+				source = fic->get_data(keep_mode);
+				break;
+			    case file::keep_hole:
+				source = fic->get_data(keep_mode);
+				break;
+			    case file::normal:
+				if(fic->get_sparse_file_detection_read()) // source file already holds a sparse_file structure
+				    source = fic->get_data(file::plain); // we must hide the holes for it can be redetected
+				else
+				    source = fic->get_data(file::normal);
+				break;
+			    case file::plain:
+				throw SRC_BUG; // save_inode must never be called with this value
+			    default:
+				throw SRC_BUG; // unknown value for keep_mode
+			    }
+			}
+			catch(...)
+			{
+			    cat.pre_add_failed_mark(stock);
+			    throw;
+			}
 
-			    fic->set_offset(start);
-			    source->skip(0);
-
-			    if(keep_mode == file::keep_compressed || fic->get_compression_algo_write() == none)
-				stock->suspend_compression();
-			    else
-				stock->resume_compression();
-
+			if(source != NULL)
+			{
 			    try
 			    {
-				if(fic->get_sparse_file_detection_write() && keep_mode != file::keep_compressed && keep_mode != file::keep_hole)
-				{
-					// creating the sparse_file to copy data to destination
+				generic_file *dest = stock;
+				sparse_file *dst_hole = NULL;
+				infinint crc_size = tools_file_size_to_crc_size(fic->get_size());
+				crc * val = NULL;
+				const crc * original = NULL;
+				bool crc_available = false;
 
-				    dst_hole = new (pool) sparse_file(stock, hole_size);
-				    if(dst_hole == NULL)
-					throw Ememory("save_inode");
-				    dest = dst_hole;
-				}
+				fic->set_offset(start);
+				source->skip(0);
 
-				if(!compute_crc)
-				    crc_available = fic->get_crc(original);
+				if(keep_mode == file::keep_compressed || fic->get_compression_algo_write() == none)
+				    stock->suspend_compression();
 				else
-				    crc_available = false;
+				    stock->resume_compression();
 
-				source->copy_to(*dest, crc_size, val);
-				if(val == NULL)
-				    throw SRC_BUG;
-
-				if(compute_crc)
-				    fic->set_crc(*val);
-				else
+				try
 				{
-				    if(keep_mode == file::normal && crc_available)
+				    if(fic->get_sparse_file_detection_write() && keep_mode != file::keep_compressed && keep_mode != file::keep_hole)
 				    {
-					if(original == NULL)
-					    throw SRC_BUG;
-					if(typeid(*original) != typeid(*val))
-					    throw SRC_BUG;
-					if(*original != *val)
-					    throw Erange("save_inode", gettext("Copied data does not match CRC"));
+					    // creating the sparse_file to copy data to destination
+
+					dst_hole = new (pool) sparse_file(stock, hole_size);
+					if(dst_hole == NULL)
+					    throw Ememory("save_inode");
+					dest = dst_hole;
 				    }
+
+				    if(!compute_crc)
+					crc_available = fic->get_crc(original);
+				    else
+					crc_available = false;
+
+				    source->copy_to(*dest, crc_size, val);
+				    if(val == NULL)
+					throw SRC_BUG;
+
+				    if(compute_crc)
+					fic->set_crc(*val);
+				    else
+				    {
+					if(keep_mode == file::normal && crc_available)
+					{
+					    if(original == NULL)
+						throw SRC_BUG;
+					    if(typeid(*original) != typeid(*val))
+						throw SRC_BUG;
+					    if(*original != *val)
+						throw Erange("save_inode", gettext("Copied data does not match CRC"));
+					}
+				    }
+
+				    if(dst_hole != NULL)
+				    {
+					dst_hole->sync_write();
+					if(!dst_hole->has_seen_hole() && !dst_hole->has_escaped_data())
+					    fic->set_sparse_file_detection_write(false);
+					    // here we drop the sparse_file datastructure as no hole
+					    // could be read. This will speed up extraction when used
+					    // normally (not with sequential reading, as the inode info
+					    // is already written to file and cannot be changed.
+					    // Reading as sparse_file datastructure a plain normal data
+					    // is possible while there is no data to escape, this is just
+					    // a bit more slower.).
+				    }
+				    source->terminate();
+				}
+				catch(...)
+				{
+				    if(dst_hole != NULL)
+				    {
+					delete dst_hole;
+					dst_hole = NULL;
+					dest = NULL;
+				    }
+				    if(val != NULL)
+				    {
+					delete val;
+					val = NULL;
+				    }
+				    throw;
 				}
 
-				if(dst_hole != NULL)
-				{
-				    dst_hole->sync_write();
-				    if(!dst_hole->has_seen_hole() && !dst_hole->has_escaped_data())
-					fic->set_sparse_file_detection_write(false);
-					// here we drop the sparse_file datastructure as no hole
-					// could be read. This will speed up extraction when used
-					// normally (not with sequential reading, as the inode info
-					// is already written to file and cannot be changed.
-					// Reading as sparse_file datastructure a plain normal data
-					// is possible while there is no data to escape, this is just
-					// a bit more slower.).
-				}
-				source->terminate();
-			    }
-			    catch(...)
-			    {
-				if(dst_hole != NULL)
-				{
-				    delete dst_hole;
-				    dst_hole = NULL;
-				    dest = NULL;
-				}
 				if(val != NULL)
 				{
 				    delete val;
 				    val = NULL;
 				}
+
+				if(dst_hole != NULL)
+				{
+				    dst_hole->terminate();
+				    delete dst_hole;
+				    dst_hole = NULL;
+				    dest = NULL;
+				}
+
+				stock->sync_write();
+
+				if(stock->get_position() >= start)
+				{
+				    storage_size = stock->get_position() - start;
+				    fic->set_storage_size(storage_size);
+				}
+				else
+				    throw SRC_BUG;
+			    }
+			    catch(...)
+			    {
+				delete source;
+				source = NULL;
+
+				    // restore atime of source
+				if(!alter_atime)
+				    tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
 				throw;
 			    }
-
-			    if(val != NULL)
-			    {
-				delete val;
-				val = NULL;
-			    }
-
-			    if(dst_hole != NULL)
-			    {
-				dst_hole->terminate();
-				delete dst_hole;
-				dst_hole = NULL;
-				dest = NULL;
-			    }
-
-			    stock->sync_write();
-
-			    if(stock->get_position() >= start)
-				fic->set_storage_size(stock->get_position() - start);
-			    else
-				throw SRC_BUG;
-			}
-			catch(...)
-			{
 			    delete source;
 			    source = NULL;
 
-				// restore atime of source
-			    if(!alter_atime)
-				tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
-			    throw;
-			}
-			delete source;
-			source = NULL;
+				//////////////////////////////
+				// adding the data CRC if escape marks are used
 
+			    cat.pre_add_crc(ino, stock);
 
-			    // adding the data CRC if escape marks are used
-			cat.pre_add_crc(ino, stock);
+				//////////////////////////////
+				// checking if compressed data is smaller than uncompressed one
 
-			    // checking for last_modification date change
-			if(check_change)
-			{
-			    bool changed = false;
-
-			    try
+			    if(fic->get_size() <= storage_size
+			       && keep_mode != file::keep_compressed
+			       && fic->get_compression_algo_write() != none)
 			    {
-				changed = fic->get_last_modif() != tools_get_mtime(info_quoi);
-			    }
-			    catch(Erange & e)
-			    {
-				dialog.warning(tools_printf(gettext("File has disappeared while we were reading it, cannot check whether it has changed during its backup: %S"), &info_quoi));
-				changed = false;
-			    }
+				infinint current_pos_tmp = stock->get_position();
 
-			    if(changed)
-			    {
-				if(current_repeat_count < repeat_count)
+				if(current_pos_tmp <= rewinder)
+				    throw SRC_BUG; // we are positionned before the stard of the current inode dump!
+				if(stock->skippable(generic_file::skip_backward, current_pos_tmp - rewinder))
 				{
-				    current_repeat_count++;
-				    infinint current_pos_tmp = stock->get_position();
-
 				    try
 				    {
-					stock->skip(start);
+					stock->skip(rewinder);
+					if(!resave_uncompressed)
+					    resave_uncompressed = true;
+					else
+					    throw SRC_BUG; // should only be tried once per inode
+					fic->change_compression_algo_write(none);
+					break; // stop the inner loop
+				    }
+				    catch(Ebug & e)
+				    {
+					throw;
 				    }
 				    catch(...)
 				    {
-					current_wasted_bytes += current_pos_tmp - start;
+					if(info_details)
+					    dialog.warning(info_quoi + gettext(" : Failed resaving uncompressed the inode data"));
+					    // ignoring the error and continuing
+					resave_uncompressed = false;
 					if(stock->get_position() != current_pos_tmp)
 					    throw SRC_BUG;
 				    }
+				}
+			    }
+			    else
+				resave_uncompressed = false;
 
-				    if(repeat_byte == 0 || (current_wasted_bytes < repeat_byte))
+
+				//////////////////////////////
+				// checking for last_modification date change
+
+			    if(check_change)
+			    {
+				bool changed = false;
+
+				try
+				{
+				    changed = fic->get_last_modif() != tools_get_mtime(info_quoi);
+				}
+				catch(Erange & e)
+				{
+				    dialog.warning(tools_printf(gettext("File has disappeared while we were reading it, cannot check whether it has changed during its backup: %S"), &info_quoi));
+				    changed = false;
+				}
+
+				if(changed)
+				{
+				    if(current_repeat_count < repeat_count)
 				    {
-					if(info_details)
-					    dialog.warning(tools_printf(gettext("WARNING! File modified while reading it for backup. Performing retry %i of %i"), &current_repeat_count, &repeat_count));
-					if(stock->get_position() != start)
-					    cat.pre_add_waste_mark(stock);
-					loop = true;
+					current_repeat_count++;
+					infinint current_pos_tmp = stock->get_position();
 
-					    // updating the last modification date of file
-					fic->set_last_modif(tools_get_mtime(info_quoi));
+					try
+					{
+					    if(stock->skippable(generic_file::skip_backward, storage_size))
+						stock->skip(start);
+					    else
+						throw Erange("",""); // used locally, not propagated over this try / catch block
+					}
+					catch(...)
+					{
+					    current_wasted_bytes += current_pos_tmp - start;
+					    if(stock->get_position() != current_pos_tmp)
+						throw SRC_BUG;
+					}
 
-					    // updating the size of the file
-					infinint new_size = tools_get_size(info_quoi);
-					if(new_size < fic->get_size())
-					    throw SRC_BUG;
-					    // current code may fail if file is smaller than previous time:
-					    // the archive may not end a the end of slice if the resaved file was
-					    // larger than it is now the new time we save it, the resulting
-					    // archive open would fail in direct mode (it should work in
-					    // sequential reading mode if not disabled by -at option.
+					if(repeat_byte == 0 || (current_wasted_bytes < repeat_byte))
+					{
+					    if(info_details)
+						dialog.warning(tools_printf(gettext("WARNING! File modified while reading it for backup. Performing retry %i of %i"), &current_repeat_count, &repeat_count));
+					    if(stock->get_position() != start)
+						cat.pre_add_waste_mark(stock);
+					    loop = true;
+
+						// updating the last modification date of file
+					    fic->set_last_modif(tools_get_mtime(info_quoi));
+
+						// updating the size of the file
+					    infinint new_size = tools_get_size(info_quoi);
+					    if(new_size < fic->get_size())
+						throw SRC_BUG;
+						// current code may fail if file is smaller than previous time:
+						// the archive may not end a the end of slice if the resaved file was
+						// larger than it is now the new time we save it, the resulting
+						// archive open would fail in direct mode (it should work in
+						// sequential reading mode if not disabled by -at option.
+					    else
+						fic->change_size(new_size);
+					}
 					else
-					    fic->change_size(new_size);
+					{
+					    dialog.warning(string(gettext("WARNING! File modified while reading it for backup. No more retry for that file to not exceed the wasted byte limit. File is ")) + info_quoi);
+					    fic->set_dirty(true);
+					    ret = false;
+					}
 				    }
 				    else
 				    {
-					dialog.warning(string(gettext("WARNING! File modified while reading it for backup. No more retry for that file to not exceed the wasted byte limit. File is ")) + info_quoi);
+					dialog.warning(string(gettext("WARNING! File modified while reading it for backup, but no more retry allowed: ")) + info_quoi);
 					fic->set_dirty(true);
+					cat.pre_add_dirty(stock); // when in sequential reading
 					ret = false;
 				    }
 				}
-				else
-				{
-				    dialog.warning(string(gettext("WARNING! File modified while reading it for backup, but no more retry allowed: ")) + info_quoi);
-				    fic->set_dirty(true);
-				    cat.pre_add_dirty(stock); // when in sequential reading
-				    ret = false;
-				}
 			    }
-			}
 
-			    // restore atime of source
-			if(!alter_atime)
-			    tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
+				//////////////////////////////
+				// restore atime of source
+
+			    if(!alter_atime)
+				tools_noexcept_make_date(info_quoi, false, ino->get_last_access(), ino->get_last_modif(), ino->get_last_modif());
+
+			}
+			else
+			    throw SRC_BUG; // saved_status == s_saved, but no data available, and no exception raised;
 		    }
-		    else
-			throw SRC_BUG; // saved_status == s_saved, but no data available, and no exception raised;
+		    while(loop); // INNER LOOP
 		}
-		while(loop);
-	    }
-	    catch(...)
-	    {
+		catch(...)
+		{
+		    if(sem != NULL)
+			sem->lower();
+		    throw;
+		}
 		if(sem != NULL)
 		    sem->lower();
-		throw;
 	    }
-	    if(sem != NULL)
-		sem->lower();
+	    else // fic == NULL
+		if(sem != NULL)
+		{
+		    sem->raise(info_quoi, ino, true);
+		    sem->lower();
+		}
 	}
-	else // fil != NULL
-	    if(sem != NULL)
-	    {
-		sem->raise(info_quoi, ino, true);
-		sem->lower();
-	    }
+	while(resave_uncompressed); // OUTER LOOP
 
 	return ret;
     }

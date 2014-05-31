@@ -26,7 +26,7 @@
     /// This class inherits from the class catalogue and implements
     /// the pre_add(...) method, which role is to add an escape sequence followed
     /// by an entry dump (usually used at the end of archive is the so called catalogue part
-    /// of the archive. This sequence followed by entry dump is added
+    /// of the archive). This sequence followed by entry dump is added
     /// before each file's data all along the archive.
     /// Other inherited classes, implement the escape specific part, used when performing
     /// sequential reading of the catalogue

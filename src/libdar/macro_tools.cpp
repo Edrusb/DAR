@@ -895,6 +895,9 @@ namespace libdar
 
 	    try
 	    {
+		    // note:
+		    // the escape object if present in the stack needs read access from below it when skipping backward
+		    // is requested (bad compression ration, changed filed at the time of backup, etc.)
 
 		    // **********  building the level 1 generic_file layer *********** //
 
@@ -903,7 +906,7 @@ namespace libdar
 		    if(info_details)
 			dialog.warning(gettext("Creating low layer: Writing archive into a black hole object (equivalent to /dev/null)..."));
 
-		    tmp = new (pool) null_file(gf_write_only);
+		    tmp = new (pool) null_file(gf_read_write);
 		}
 		else
 		    if(file_size == 0) // one SLICE
@@ -1068,52 +1071,50 @@ namespace libdar
 
 		    // ************ building the encryption layer if required ****** //
 
-		if(!empty)
+		switch(crypto)
 		{
-		    switch(crypto)
-		    {
-		    case crypto_scrambling:
-			if(info_details)
-			    dialog.warning(gettext("Adding a new layer on top: scrambler object..."));
-			tmp = new (pool) scrambler(real_pass, *(layers.top()));
-			break;
-		    case crypto_blowfish:
-		    case crypto_aes256:
-		    case crypto_twofish256:
-		    case crypto_serpent256:
-		    case crypto_camellia256:
-			if(info_details)
-			    dialog.warning(gettext("Adding a new layer on top: Strong encryption object..."));
-			tmp = new (pool) crypto_sym(crypto_size, real_pass, *(layers.top()), false, macro_tools_supported_version, crypto);
-			break;
-		    case crypto_none:
-			if(info_details)
-			    dialog.warning(gettext("Adding a new layer on top: Caching layer for better performances..."));
-			tmp = new (pool) cache(*(layers.top()), false);
-			break;
-		    default:
-			throw SRC_BUG; // cryto value should have been checked before
-		    }
-
-		    if(tmp == NULL)
-			throw Ememory("op_create_in_sub");
-		    else
-		    {
-			layers.push(tmp);
-			tmp = NULL;
-		    }
-
-		    if(crypto != crypto_none) // initial elastic buffer
-		    {
-			if(info_details)
-			    dialog.warning(gettext("Writing down the initial elastic buffer through the encryption layer..."));
-			tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE);
-		    }
+		case crypto_scrambling:
+		    if(info_details)
+			dialog.warning(gettext("Adding a new layer on top: scrambler object..."));
+		    tmp = new (pool) scrambler(real_pass, *(layers.top()));
+		    break;
+		case crypto_blowfish:
+		case crypto_aes256:
+		case crypto_twofish256:
+		case crypto_serpent256:
+		case crypto_camellia256:
+		    if(info_details)
+			dialog.warning(gettext("Adding a new layer on top: Strong encryption object..."));
+		    tmp = new (pool) crypto_sym(crypto_size, real_pass, *(layers.top()), false, macro_tools_supported_version, crypto);
+		    break;
+		case crypto_none:
+		    if(info_details)
+			dialog.warning(gettext("Adding a new layer on top: Caching layer for better performances..."));
+		    tmp = new (pool) cache(*(layers.top()), false);
+		    break;
+		default:
+		    throw SRC_BUG; // cryto value should have been checked before
 		}
+
+		if(tmp == NULL)
+		    throw Ememory("op_create_in_sub");
+		else
+		{
+		    layers.push(tmp);
+		    tmp = NULL;
+		}
+
+		if(crypto != crypto_none) // initial elastic buffer
+		{
+		    if(info_details)
+			dialog.warning(gettext("Writing down the initial elastic buffer through the encryption layer..."));
+		    tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE);
+		}
+
 
 		    // ********** if required building the escape layer  ***** //
 
-		if(add_marks_for_sequential_reading && ! empty)
+		if(add_marks_for_sequential_reading)
 		{
 		    set<escape::sequence_type> unjump;
 
@@ -1134,7 +1135,7 @@ namespace libdar
 
 		if(info_details && algo != none)
 		    dialog.warning(gettext("Adding a new layer on top: compression..."));
-		tmp = new (pool) compressor(empty ? none : algo, *(layers.top()), compression_level);
+		tmp = new (pool) compressor(algo, *(layers.top()), compression_level);
 		if(tmp == NULL)
 		    throw Ememory("op_create_in_sub");
 		else
