@@ -1545,18 +1545,6 @@ namespace libdar
 			    // it will modify EA of the existing file
 			if(act_data != data_remove)
 			{
-			    if(has_fsa_saved)
-			    {
-				try
-				{
-				    fsa_restored = action_over_fsa(exists_ino, x_nom, spot_display, act_ea);
-				}
-				catch(Erange & e)
-				{
-				    get_ui().warning(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
-				}
-			    }
-
 			    if(has_ea_saved)
 			    {
 				try
@@ -1566,6 +1554,18 @@ namespace libdar
 				catch(Erange & e)
 				{
 				    get_ui().warning(tools_printf(gettext("Restoration of EA for %S aborted: "), &spot_display) + e.get_message());
+				}
+			    }
+
+			    if(has_fsa_saved)
+			    {
+				try
+				{
+				    fsa_restored = action_over_fsa(exists_ino, x_nom, spot_display, act_ea);
+				}
+				catch(Erange & e)
+				{
+				    get_ui().warning(tools_printf(gettext("Restoration of FSA for %S aborted: "), &spot_display) + e.get_message());
 				}
 			    }
 
