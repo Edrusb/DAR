@@ -97,7 +97,7 @@ function GO {
   else
     printf "$label = "
     if [ "$debug" != "yes" ] ;  then
-	$* >/dev/null
+	$* 1>/dev/null 2> /dev/null
     else
 	echo "--- debug -----"
 	$*
@@ -110,7 +110,7 @@ function GO {
     done
 
     if [ $is_valid = "yes" ] ; then
-        echo "OK"
+	echo "OK"
     else
 	echo "$label FAILED"
 	echo "--------> $1 FAILED : $*"
