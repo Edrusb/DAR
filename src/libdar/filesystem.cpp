@@ -128,7 +128,7 @@ namespace libdar
     static void supprime(user_interaction & ui, const string & ref);
     static void make_owner_perm(user_interaction & dialog,
 				const inode & ref,
-				const path & ou,
+				const string & chem,
 				bool dir_perm,
 				inode::comparison_fields what_to_check,
 				const fsa_scope & scope);
@@ -1254,7 +1254,7 @@ namespace libdar
 	while(ret < 0 && errno == ENOSPC);
 
 	if(ref_ino != NULL && ret >= 0)
-	    make_owner_perm(get_ui(), *ref_ino, ou, dir_perm, what_to_check, scope);
+	    make_owner_perm(get_ui(), *ref_ino, display, dir_perm, what_to_check, scope);
     }
 
     void filesystem_hard_link_write::clear_corres_if_pointing_to(const infinint & ligne, const string & path)
@@ -1361,8 +1361,10 @@ namespace libdar
 	    {
 		if(!empty && stack_dir.back().get_restore_date())
 		{
-		    make_owner_perm(get_ui(), stack_dir.back(), *current_dir, true, what_to_check, get_fsa_scope());
-		    make_date(stack_dir.back(), (*current_dir + stack_dir.back().get_name()).display(), what_to_check, get_fsa_scope());
+		    string chem = (*current_dir + stack_dir.back().get_name()).display();
+
+		    make_owner_perm(get_ui(), stack_dir.back(), chem, true, what_to_check, get_fsa_scope());
+		    make_date(stack_dir.back(), chem, what_to_check, get_fsa_scope());
 		}
 	    }
 	    else
@@ -1723,7 +1725,7 @@ namespace libdar
 	    if(tba_dir != NULL && tba_ino->same_as(*in_place))
 	    {
 		if(!empty)
-		    make_owner_perm(get_ui(), *tba_ino, *current_dir, false, what_to_check, get_fsa_scope());
+		    make_owner_perm(get_ui(), *tba_ino, spot, false, what_to_check, get_fsa_scope());
 		data_done = done_data_restored;
 	    }
 	    else // not both in_place and to_be_added are directories
@@ -2147,8 +2149,9 @@ namespace libdar
 
 	while(!stack_dir.empty() && current_dir->pop(tmp))
 	{
+	    string chem = (*current_dir + stack_dir.back().get_name()).display();
 	    if(!empty)
-		make_owner_perm(get_ui(), stack_dir.back(), *current_dir, true, what_to_check, get_fsa_scope());
+		make_owner_perm(get_ui(), stack_dir.back(), chem, true, what_to_check, get_fsa_scope());
 	    stack_dir.pop_back();
 	}
 	if(stack_dir.size() > 0)
@@ -2188,12 +2191,11 @@ namespace libdar
 
     static void make_owner_perm(user_interaction & dialog,
 				const inode & ref,
-				const path & ou,
+				const string & chem,
 				bool dir_perm,
 				inode::comparison_fields what_to_check,
 				const fsa_scope & scope)
     {
-        const string chem = (ou + ref.get_name()).display();
         const char *name = chem.c_str();
         const lien *ref_lie = dynamic_cast<const lien *>(&ref);
         S_I permission;
