@@ -295,7 +295,7 @@ bool get_args(shell_interaction & dialog,
     p.slice_perm = "";
     p.slice_user = "";
     p.slice_group = "";
-    p.repeat_count = 0;
+    p.repeat_count = 3; // 3 retry by default
     p.repeat_byte = 0;
     p.decremental = false;
 #if FURTIVE_READ_MODE_AVAILABLE
