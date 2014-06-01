@@ -294,6 +294,9 @@ namespace libdar
 
     bool sar::skippable(skippability direction, const infinint & amount)
     {
+	if(hash != hash_none)
+	    return false;
+
 	switch(direction)
 	{
 	case generic_file::skip_backward:
@@ -945,7 +948,7 @@ namespace libdar
 	{
 	    code = entr->open(get_ui(),
 			      fic,
-			      gf_read_write, // yes, no more writeonly as stated in the name of this method
+			      hash == hash_none ? gf_read_write : gf_write_only, // yes, no more writeonly as stated in the name of this method
 			      force_perm,
 			      perm,
 			      true,   //< fail_if_exists
@@ -1046,7 +1049,7 @@ namespace libdar
 		    // open with overwriting
 		code = entr->open(get_ui(),
 				  fic,
-				  gf_read_write, // yes, no more write only as stated in the name of this method
+				  hash == hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
 				  force_perm,
 				  perm,
 				  false,    //< fail if exists
@@ -1058,7 +1061,7 @@ namespace libdar
 		if(hash == hash_none)
 		    code = entr->open(get_ui(),
 				      fic,
-				      gf_read_write, // yes, no more write only as stated in the name of this method
+				      hash == hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
 				      force_perm,
 				      perm,
 				      false, //< fail if exists
