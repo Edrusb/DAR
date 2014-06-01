@@ -197,6 +197,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 			else
 			    throw SRC_BUG;
 			dst_sar = new (nothrow) trivial_sar(dialog,
+							    gf_write_only,
 							    dst,
 							    EXTENSION,
 							    entrep,
@@ -218,6 +219,7 @@ static S_I sub_main(shell_interaction & dialog, S_I argc, char * const argv[], c
 		    else
 			throw SRC_BUG;
 		    dst_sar = new (nothrow) sar(dialog,
+						gf_write_only,
 						dst,
 						EXTENSION,
 						size,

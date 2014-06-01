@@ -191,6 +191,7 @@ namespace libdar
     }
 
     sar::sar(user_interaction & dialog,
+	     gf_mode open_mode,
 	     const string & base_name,
 	     const string & extension,
 	     const infinint & file_size,
@@ -206,8 +207,11 @@ namespace libdar
 	     hash_algo x_hash,
 	     const infinint & x_min_digits,
 	     bool format_07_compatible,
-	     const string & execute) : generic_file(gf_read_write), mem_ui(dialog)
+	     const string & execute) : generic_file(open_mode), mem_ui(dialog)
     {
+	if(open_mode == gf_read_only)
+	    throw SRC_BUG;
+
         if(file_size < header::min_size() + 1)  //< one more byte to store at least one byte of data
             throw Erange("sar::sar", gettext("File size too small"));
 	    // note that this test does not warranty that the file is large enough to hold a header structure
@@ -1421,6 +1425,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 
 
     trivial_sar::trivial_sar(user_interaction & dialog,
+			     gf_mode open_mode,
 			     const std::string & base_name,
 			     const std::string & extension,
 			     const entrepot & where,
@@ -1433,7 +1438,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 			     U_I permission,
 			     hash_algo x_hash,
 			     const infinint & x_min_digits,
-			     bool format_07_compatible) : generic_file(gf_read_write), mem_ui(dialog)
+			     bool format_07_compatible) : generic_file(open_mode), mem_ui(dialog)
     {
 
 	    // some local variables to be used
@@ -1441,6 +1446,10 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	entrepot::io_errors code;
 	fichier_global *tmp = NULL;
 	const string filename = sar_make_filename(base_name, 1, x_min_digits, extension);
+
+	    // sanity checks
+	if(open_mode == gf_read_only)
+	    throw SRC_BUG;
 
 	    // initializing object fields from constructor arguments
 

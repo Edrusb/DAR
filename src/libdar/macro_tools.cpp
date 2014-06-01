@@ -888,10 +888,14 @@ namespace libdar
 	    escape *esc = NULL;
 	    bool force_permission = (slice_permission != "");
 	    U_I permission = force_permission ? tools_octal2int(slice_permission) : 0; // 0 or anything else, this does not matter
+	    gf_mode open_mode = gf_read_write; // by default first layer is read-write except in case of hashing or encryption
 
 	    layers.clear();
 
 	    secu_string real_pass = pass;
+
+	    if(hash != hash_none || crypto != crypto_none)
+		open_mode = gf_write_only;
 
 	    try
 	    {
@@ -906,7 +910,7 @@ namespace libdar
 		    if(info_details)
 			dialog.warning(gettext("Creating low layer: Writing archive into a black hole object (equivalent to /dev/null)..."));
 
-		    tmp = new (pool) null_file(gf_read_write);
+		    tmp = new (pool) null_file(open_mode);
 		}
 		else
 		    if(file_size == 0) // one SLICE
@@ -918,7 +922,7 @@ namespace libdar
 			    tmp = sar_tools_open_archive_tuyau(dialog,
 							       pool,
 							       1,
-							       gf_write_only,
+							       gf_write_only, // always write only
 							       internal_name,
 							       data_name,
 							       false,
@@ -929,6 +933,7 @@ namespace libdar
 			    if(info_details)
 				dialog.warning(gettext("Creating low layer: Writing archive into a plain file object..."));
 			    tmp = new (pool) trivial_sar(dialog,
+							 open_mode,
 							 filename,
 							 extension,
 							 sauv_path_t, // entrepot !!
@@ -948,6 +953,7 @@ namespace libdar
 			if(info_details)
 			    dialog.warning(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
 			tmp = new (pool) sar(dialog,
+					     open_mode,
 					     filename,
 					     extension,
 					     file_size,

@@ -80,6 +80,7 @@ namespace libdar
 	    /// this constructor creates a new set of slices
 
 	    /// \param[in,out] dialog is used for user interaction
+	    /// \param[in] open_mode read_write or write_only is accepted only
 	    /// \param[in] base_name is the slice set base name
 	    /// \param[in] extension is the slices extension
 	    /// \param[in] file_size is the size of slices (in byte)
@@ -99,6 +100,7 @@ namespace libdar
 	    /// \note data_name should be equal to internal_name except when reslicing an archive as dar_xform does in which
 	    /// case internal_name is randomly, and data_name is kept from the source archive
         sar(user_interaction  & dialog,
+	    gf_mode open_mode,
 	    const std::string & base_name,
 	    const std::string & extension,
 	    const infinint & file_size,
@@ -232,6 +234,7 @@ namespace libdar
     public:
 	    /// constructor to build a new single sliced archive
 	trivial_sar(user_interaction & dialog,         //< how to interact with the user
+		    gf_mode open_mode,                 //< read_write or write_only are the only acceptable values
 		    const std::string & base_name,     //< archive basename to create
 		    const std::string & extension,     //< archive extension
  		    const entrepot & where,            //< where to store the archive
