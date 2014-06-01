@@ -2494,9 +2494,17 @@ namespace libdar
 	infinint current_repeat_count = 0;
 	infinint storage_size;
 	bool loop;
+	mirage *mir = dynamic_cast<mirage *>(e);
 	inode *ino = dynamic_cast<inode *>(e);
 	bool resave_uncompressed = false;
 	infinint rewinder = stock->get_position(); // we skip back here is data must be saved uncompressed
+
+	if(mir != NULL)
+	{
+	    ino = mir->get_inode();
+	    if(ino == NULL)
+		throw SRC_BUG;
+	}
 
 	do // loop if resave_uncompressed is set, this is the OUTER LOOP
 	{
@@ -2529,7 +2537,7 @@ namespace libdar
 		    dialog.warning(string(gettext("Adding file to archive: ")) + info_quoi);
 	    }
 
-	    file *fic = dynamic_cast<file *>(e);
+	    file *fic = dynamic_cast<file *>(ino);
 
 	    if(fic != NULL)
 	    {
@@ -2745,7 +2753,7 @@ namespace libdar
 				else
 				{
 				    if(info_details)
-					dialog.warning(info_quoi  + gettext(" : Resaving uncompressed the inode data is not possible (would cross slice boundary or archive is written to a pile)"));
+					dialog.warning(info_quoi  + gettext(" : Resaving uncompressed the inode data is not possible keeping data compressed"));
 				}
 			    }
 			    else

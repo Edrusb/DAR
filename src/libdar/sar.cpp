@@ -1470,7 +1470,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	{
 	    code = where.open(dialog,
 			      filename,
-			      gf_read_write,
+			      open_mode,
 			      force_permission,
 			      permission,
 			      true,    //< fail if exists
