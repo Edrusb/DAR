@@ -75,13 +75,17 @@ int main()
     U_I maj, med, min;
 
     get_version(maj, med, min);
-    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
+    ui = new (nothrow) shell_interaction(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
     try
     {
 	f1();
 	f2();
+    }
+    catch(Ebug & e)
+    {
+	ui->warning(e.dump_str());
     }
     catch(Egeneric & e)
     {
@@ -97,23 +101,20 @@ void f1()
     fichier_local f = fichier_local(*ui, "toto", gf_read_only, 0, false, false, false);
     cache c = cache(f,
 		    false,
-		    10,
-		    1000,
-		    10, 3, 20,
-		    10, 3, 20);
+		    20);
     char buffer[200];
 
-    c.read(buffer, 21);
-    c.read(buffer, 10);
-	//  now this should lead to buffer increase
+    c.read(buffer, 3);
+    c.read(buffer+3, 22);
 
     c.skip(0);
     c.read(buffer, 5);
     c.skip(10);
     c.read(buffer, 5);
     c.skip(20);
-    c.read(buffer, 5);
-	// now this should lead to buffer decrease
+    c.read(buffer, 30);
+    c.read(buffer+30, 5);
+    c.read(buffer+35, 50);
 }
 
 void f2()
@@ -127,10 +128,7 @@ void f2()
     fichier_local g = fichier_local(*ui, "titi", gf_read_write, 0666, false, true, false);
     cache c = cache(g,
 		    false,
-		    10,
-		    1000,
-		    10, 3, 20,
-		    10, 3, 20);
+		    20);
     const char *buf = "coucou les amis";
     c.write(buf, strlen(buf));
     c.write(" ", 1);

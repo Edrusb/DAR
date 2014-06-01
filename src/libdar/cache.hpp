@@ -36,95 +36,61 @@ namespace libdar
 	/// \ingroup Private
 	/// @}
 
-	/// the cache class implements a very basic read/write caching mechanism
+	/// the cache class implements a fixed length read/write caching mechanism
 
 	/// it is intended to reduce context switches when no compression is used
 	/// and when reading or writing catalogue through a pipe. The catalogue
 	/// read and write is done by calling dump/constructor methods of the many
-	/// objects that a catalogue can contain. This makes a lot of small read
-    	/// or write, which make very poor performances when used over the network
+	/// objects that a catalogue contains. This makes a lot of small reads or
+    	/// writes, which make very poor performances when used over the network
 	/// through a pipe to ssh. When compression is used, the problem disapears
-	/// as the compression engine gather these many small read or write into
-	/// much bigger ones. This in only when there is no compression that
+	/// as the compression engine gather these many small reads or writes into
+	/// much bigger ones. This in only when there is no compression or encryption
 	/// that this class is useful (and used).
     class cache : public generic_file
     {
     public:
 	cache(generic_file & hidden, 	          //< is the file to cache, it is never deleted by the cache object,
 	      bool shift_mode,                    //< if true, when all cached data has been read, half of the data is flushed from the cache, the other half is shifted and new data take place to fill the cache. This is necessary for sequential reading, but has some CPU overhead.
-	      U_I initial_size = 10240,           //< is the initial size of the cache for reading (read this amount of data at a time)
-	      U_I max_size = 10485760,            //< this is the maximum size the cache may have in any case, if set to zero, the cache size is not bounded
-              U_I unused_read_ratio = 10,         //< is the ratio of cached data effectively asked for reading below which the cache size is divided by two in other words, if during observation_read_number fullfilment of the cache, less than unused_read_ratio percent of data has been effectively asked for reading, then the cache size is divided by two
-	      U_I observation_read_number = 100,  //< period of cache size consideration
-	      U_I max_size_hit_read_ratio = 50,   //< is the ratio above which the cache size is doubled. In other words, if during observation_read_number times of cache fullfilment, more than max_size_hit_read_ratio percent time all the cached data has been asked for reading the cache size is doubled. To have fixed size read caching, you can set unused_read_ratio to zero and max_size_hit_read_ratio to 101 or above.
-	      U_I unused_write_ratio = 10,        //< same as unused_read_ratio but for writing operations
-	      U_I observation_write_number = 100, //< same as observation_read_number but for writing operations
-	      U_I max_size_hit_write_ratio = 50); //< same as max_size_hit_read_ratio but for writing operations
-	cache(const cache & ref) : generic_file(gf_read_only), buffer_cache(ref.get_pool()) { throw SRC_BUG; };
+	      U_I size = 102400);                 //< is the (fixed) size of the cache
+	cache(const cache & ref) : generic_file(gf_read_only) { throw SRC_BUG; };
 	const cache & operator = (const cache & ref) { throw SRC_BUG; };
-
 	~cache();
 
 
 	    // inherited from generic_file
+
 	bool skippable(skippability direction, const infinint & amount);
 	bool skip(const infinint & pos);
 	bool skip_to_eof();
 	bool skip_relative(S_I x);
-	infinint get_position() { return current_position; };
+	infinint get_position() { return buffer_offset + next; };
 
     protected:
 	    // inherited from generic_file
+
 	U_I inherited_read(char *a, U_I size);
 	void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() { flush_write(); };
 	void inherited_terminate() { flush_write(); };
+
     private:
-	struct buf
-	{
-	    char *buffer;
-	    U_I size; // allocated size
-	    U_I next; // next to read or next place to write to
-	    U_I last; // first to not read in the cache
-	    memory_pool *pool; // memory_pool to use or NULL to use default allocation
-
-	    buf(memory_pool *p) { pool = p; buffer = NULL; size = next = last = 0; };
-	    buf(const buf &ref) { throw SRC_BUG; };
-	    ~buf() { if(buffer != NULL) release(); };
-	    void alloc(size_t size);
-	    void release();
-	    void resize(size_t newsize);
-	    void shift_by_half();
-	    void clear() { next = last = 0; };
-	};
-
 	generic_file *ref;                //< underlying file, (not owned by "this', not to be delete by "this")
-
-	struct buf buffer_cache;          //< where is stored cached data
-	infinint current_position;        //< current offset in file to read from or write to
-	bool read_mode;                   //< true if in read mode, false if in write mode
+	char *buffer;                     //< data in transit
+	U_I size;                         //< allocated size
+	U_I next;                         //< next to read or next place to write to
+	U_I last;                         //< last valid data in the cache. we have: next <= last < size
+	bool need_flush_write;            //< whether buffer contains some data that need to be written down to "ref"
+	infinint buffer_offset;           //< position of the first byte in buffer
 	bool shifted_mode;                //< whether to half flush and shift or totally flush data
-	bool failed_increase;             //< whether we failed increasing the cache size
-	U_I max_alloc_size;               //< if set to non zero value, retains the maximum size not to exceed for block allocation
 
-	U_I read_obs;
-	U_I read_unused_rate;
-	U_I read_overused_rate;
-
-	U_I write_obs;
-	U_I write_unused_rate;
-	U_I write_overused_rate;
-
-	U_I stat_read_unused;
-	U_I stat_read_overused;
-	U_I stat_read_counter;
-
-	U_I stat_write_overused;
-	U_I stat_write_counter;
-
+	void alloc_buffer(size_t x_size); //< allocate x_size byte in buffer field and set size accordingly
+	void release_buffer();            //< release memory set buffer to NULL and size to zero
+	void shift_by_half();
+	void clear_buffer();
 	void flush_write();
 	void fulfill_read();
-	void clear_read() { if(read_mode) buffer_cache.clear(); ref->skip(current_position); };
+	U_I available_in_cache(skippability direction) const;
     };
 
 	/// @}

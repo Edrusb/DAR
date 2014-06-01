@@ -73,57 +73,22 @@ namespace libdar
 
     cache::cache(generic_file & hidden,
 		 bool shift_mode,
-		 U_I initial_size,
-		 U_I max_size,
-		 U_I unused_read_ratio,
-		 U_I observation_read_number,
-		 U_I max_size_hit_read_ratio,
-		 U_I unused_write_ratio,
-		 U_I observation_write_number,
-		 U_I max_size_hit_write_ratio) : generic_file(hidden.get_mode()), buffer_cache(get_pool())
+		 U_I x_size) : generic_file(hidden.get_mode())
     {
 	    // sanity checks
 	if(&hidden == NULL)
 	    throw Erange("cache::cache", "NULL given as \"hidden\" argument while initializing cache"); // not translated message, this is expected
-	if(initial_size < 1)
+	if(x_size < 10)
 	    throw Erange("cache::cache", gettext("wrong value given as initial_size argument while initializing cache"));
-	if(observation_read_number < 2)
-	    throw Erange("cache::cache", gettext("too low value (< 10) given as observation_read_number argument while initializing cache"));
-	if(observation_write_number < 2)
-	    throw Erange("cache::cache", gettext("too low value (< 10) given as observation_write_number argument while initializing cache"));
-	if(unused_read_ratio >= 50)
-	    throw Erange("cache::cache", gettext("too high value (> 50) given as unused_read_ratio argument, while initializing cache"));
-	if(unused_write_ratio >= max_size_hit_write_ratio)
-	    throw Erange("cache::cache", gettext("unused_write_ratio must be less than max_size_hit_write_ratio, while initializing cache"));
-	if(max_size < initial_size && max_size != 0)
-	    throw Erange("cache::cache", gettext("max_size must be greater or equal to initial_size, while initializing cache"));
+
 	ref = & hidden;
-
-	buffer_cache.alloc(initial_size);
-	buffer_cache.size = initial_size;
-	buffer_cache.next = 0;
-	buffer_cache.last = 0;
-	current_position = ref->get_position();
-	read_mode = false;
-
-	read_obs = observation_read_number;
-	read_unused_rate = unused_read_ratio;
-	read_overused_rate = max_size_hit_read_ratio;
-
-	write_obs = observation_write_number;
-	write_unused_rate = unused_write_ratio;
-	write_overused_rate = max_size_hit_write_ratio;
-
-	stat_read_unused = 0;
-	stat_read_overused = 0;
-	stat_read_counter = 0;
-
-	stat_write_overused = 0;
-	stat_write_counter = 0;
-
+	buffer = NULL;
+	alloc_buffer(x_size);
+	next = 0;
+	last = 0;
+	need_flush_write = false;
+	buffer_offset = ref->get_position();
 	shifted_mode = shift_mode;
-	failed_increase = false;
-	max_alloc_size = max_size;
     }
 
     cache::~cache()
@@ -142,30 +107,53 @@ namespace libdar
     {
 	infinint in_cache;
 
-	if(read_mode)
+	    // calculating the availabe data in cache
+
+	in_cache = available_in_cache(direction);
+
+	    // either available data is enough to assure skippability or we
+	    // calculate the direction and amount to ask to the lower layer (ref)
+
+	if(in_cache >= amount)
+	    return true;
+	else
 	{
 	    switch(direction)
 	    {
 	    case skip_forward:
-		in_cache = buffer_cache.last - buffer_cache.next;
-		break;
+		if(ref->get_position() <= buffer_offset)
+		    return ref->skippable(direction, buffer_offset - ref->get_position() + next + amount);
+		else
+		{
+		    infinint backw = ref->get_position() - buffer_offset;
+		    infinint forw = amount + next;
+		    if(backw >= forw)
+			return ref->skippable(skip_backward, backw - forw);
+		    else
+			return ref->skippable(skip_forward, forw - backw);
+		}
 	    case skip_backward:
-		in_cache = buffer_cache.next;
-		break;
+		if(ref->get_position() >= buffer_offset)
+		{
+		    infinint backw = ref->get_position() - buffer_offset  + amount;
+		    infinint forw = next;
+		    if(backw >= forw)
+			return ref->skippable(skip_backward, backw - forw);
+		    else
+			return ref->skippable(skip_forward, forw - backw);
+		}
+		else
+		{
+		    infinint backw = amount;
+		    infinint forw = buffer_offset - ref->get_position()  + next;
+		    if(backw >= forw)
+			return ref->skippable(skip_backward, backw - forw);
+		    else
+			return ref->skippable(skip_forward, forw - backw);
+		}
 	    default:
 		throw SRC_BUG;
 	    }
-
-	    if(in_cache < amount)
-		return true;
-	    else
-		return ref->skippable(direction, amount - in_cache);
-	}
-	else // write mode
-	{
-		// current implementation does not permit to skip back in cache
-		// in write mode
-		return ref->skippable(direction, amount - in_cache);
 	}
     }
 
@@ -174,444 +162,295 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(!read_mode)
+	if(pos >= buffer_offset && pos < buffer_offset + last)
 	{
-	    flush_write();
-	    if(pos != current_position || pos != ref->get_position())
-		if(ref->skip(pos))
-		{
-		    current_position = pos;
-		    return true;
-		}
-		else
-		{
-		    current_position = ref->get_position();
-		    return false;
-		}
-	    else
-		return true;
+		// skipping inside the buffer is possible
+
+	    infinint tmp_next = pos - buffer_offset;
+
+		// assigning to next its new value to reflect the skip() operation
+
+	    next = 0;
+	    tmp_next.unstack(next);
+	    if(tmp_next != 0)
+		throw SRC_BUG;
+	    return true;
 	}
-	else // read mode
-	    if(current_position <= pos + buffer_cache.next && pos <= current_position + buffer_cache.last - buffer_cache.next)
-		    // requested position already in the cache
-	    {
-		if(pos < current_position)
-		{
+	else // skipping would lead the current position to be outside the buffer
+	{
+	    bool ret;
 
-			// skipping backward in cache
+	    if(need_flush_write)
+		flush_write();
+	    next = last = 0;
+	    ret = ref->skip(pos);
+	    buffer_offset = ref->get_position();
 
-		    infinint delta = current_position - pos;
-		    U_I delta_ui = 0;
-
-		    current_position -= delta;
-		    delta.unstack(delta_ui);
-		    if(delta != 0)
-			throw SRC_BUG;
-
-		    if(delta_ui > buffer_cache.next)
-			throw SRC_BUG;
-		    buffer_cache.next -= delta_ui;
-		}
-		else
-		{
-
-			// skipping forward in cache
-
-
-		    infinint delta = pos - current_position;
-		    U_I delta_ui = 0;
-
-		    current_position += delta;
-		    delta.unstack(delta_ui);
-		    if(delta != 0)
-			throw SRC_BUG;
-
-		    if(delta_ui + buffer_cache.next > buffer_cache.last)
-			throw SRC_BUG;
-
-		    buffer_cache.next += delta_ui;
-		}
-		return true;
-	    }
-	    else // position out of the cache
-	    {
-		bool ret;
-
-		current_position = pos;
-		clear_read();
-		ret = ref->skip(pos);
-
-		return ret;
-	    }
+	    return ret;
+	}
     }
 
     bool cache::skip_to_eof()
     {
+	bool ret;
+
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(!read_mode)
-	{
-	    bool ret;
-
+	if(need_flush_write)
 	    flush_write();
-	    ret = ref->skip_to_eof();
-	    current_position = ref->get_position();
-	    return ret;
-	}
-	else
-	{
-	    bool ret = ref->skip_to_eof();
-	    if(ret)
-		return skip(ref->get_position());
-	    else
-		return ret;
-	}
+	next = last = 0;
+	ret = ref->skip_to_eof();
+	buffer_offset = ref->get_position();
+
+	return ret;
     }
 
     bool cache::skip_relative(S_I x)
     {
+	skippability dir = x >= 0 ? skip_forward : skip_backward;
+	U_I in_cache = available_in_cache(dir);
+	U_I abs_x = x >= 0 ? x : -x;
+
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(!read_mode)
+	if(abs_x <= in_cache) // skipping within cache
 	{
-	    bool ret;
+	    next += x; // note that x is a *signed* integer
 
-	    flush_write();
-	    ret = ref->skip_relative(x);
-	    current_position = ref->get_position();
-	    return ret;
+		// sanity checks
+
+	    if(next > last)
+		throw SRC_BUG;
+	    if(next < 0)
+		throw SRC_BUG;
+	    return true;
 	}
-	else // read mode
+	else // must replace data in cache to skip
 	{
-	    if(x >= 0)
-		return skip(current_position + x);
-	    else
+	    if(need_flush_write)
+		flush_write();
+
+	    switch(dir)
 	    {
-		if(current_position >= -x) // -x is positive (because x is negative)
-		    return skip(current_position - infinint(-x));
-		else
-		{
-		    current_position = 0;
-		    (void)skip(0);
+	    case skip_forward:
+		return skip(buffer_offset + abs_x);
+	    case skip_backward:
+		if(buffer_offset < abs_x)
 		    return false;
-		}
+		else
+		    return skip(buffer_offset - abs_x);
+	    default:
+		throw SRC_BUG;
 	    }
 	}
     }
 
-    U_I cache::inherited_read(char *a, U_I size)
+    U_I cache::inherited_read(char *a, U_I x_size)
     {
 	U_I ret = 0;
 	bool eof = false;
 
-	if(!read_mode)  // we need to swap to read mode
-	{
-	    flush_write();
-	    read_mode = true;
-	}
-
 	do
 	{
-	    if(buffer_cache.next >= buffer_cache.last) // no more data in cache
+	    if(next >= last) // no more data to read from cache
 	    {
-		fulfill_read();
-		if(buffer_cache.next >= buffer_cache.last) // could not read anymore data
-		    eof = true;
+		if(need_flush_write)
+		    flush_write();
+		if(x_size - ret < size)
+		{
+		    fulfill_read();
+		    if(next >= last) // could not read anymore data
+			eof = true;
+		}
+		else // reading the remaining directly from lower layer
+		{
+		    ret += ref->read(a + ret, x_size - ret);
+		    if(ret < x_size)
+			eof = true;
+		    clear_buffer();   // force clearing whatever is shifted_mode
+		    buffer_offset = ref->get_position();
+		}
 	    }
 
-	    if(!eof)
+	    if(!eof && ret < x_size)
 	    {
-		U_I needed = size - ret;
-		U_I avail = buffer_cache.last - buffer_cache.next;
+		U_I needed = x_size - ret;
+		U_I avail = last - next;
 		U_I min = avail > needed ? needed : avail;
 
-		(void)memcpy(a+ret, buffer_cache.buffer + buffer_cache.next, min);
-		ret += min;
-		buffer_cache.next += min;
+		if(min > 0)
+		{
+		    (void)memcpy(a+ret, buffer + next, min);
+		    ret += min;
+		    next += min;
+		}
+		else
+		    throw SRC_BUG;
 	    }
 	}
-	while(ret < size && !eof);
-	current_position += ret;
+	while(ret < x_size && !eof);
 
 	return ret;
     }
 
 
-    void cache::inherited_write(const char *a, U_I size)
+    void cache::inherited_write(const char *a, U_I x_size)
     {
 	U_I wrote = 0;
-	U_I avail, min;
+	U_I avail, remaining;
 
-	if(read_mode)
+	while(wrote < x_size)
 	{
- 	    clear_read();
-	    read_mode = false;
-	}
-
-	try
-	{
-	    while(wrote < size)
+	    avail = size - next;
+	    if(avail == 0) // we need to flush the cache
 	    {
-		avail = buffer_cache.size - buffer_cache.next;
-		if(avail == 0) // we need to flush the cache
-		{
+		if(need_flush_write)
 		    flush_write();
-		    avail = buffer_cache.size - buffer_cache.next;
-		    if(avail == 0)
-		    {
-			if(buffer_cache.size == 0) // memory allocation failure in flush_write() after atempt to increase the cache size
-			{  // We do at best. The previous failure has thrown an exception, but this cache object is not destroyed yet
-			   // so we may still receive write() requests from the an upper layer while it is flushing its data
-			    ref->write(a + wrote, size - wrote);
-			    wrote = size;
-			    continue; // ending the while loop now, as there's no data left to copy
-			}
-			else
-			    throw SRC_BUG;
-		    }
-		    else
-			if(avail < size - wrote) // less data in cache than to be wrote => not going through the cache
-			{
-			    ref->write(a + wrote, size - wrote);
-			    wrote = size;
-			    continue; // ending the while loop now, as there's no data left to copy
-			}
-		}
-		min = avail > (size-wrote) ? (size-wrote) : avail;
-
-		(void)memcpy(buffer_cache.buffer + buffer_cache.next, a + wrote, min);
-		wrote += min;
-		buffer_cache.next += min;
+		avail = size - next;
 	    }
-	    current_position += wrote;
-	}
-	catch(...)
-	{
-	    current_position = ref->get_position() + buffer_cache.next;
-	    throw;
+
+	    remaining = x_size - wrote;
+	    if(avail < remaining && !need_flush_write)
+	    {
+		    // less data in cache than to be wrote and no write pending data  in cache
+		    // we write directly to the lower layer
+
+		buffer_offset += next;
+		next = last = 0;
+		ref->skip(buffer_offset);
+		ref->write(a + wrote, remaining);
+		wrote = x_size;
+		buffer_offset += remaining;
+	    }
+	    else // filling cache with data
+	    {
+		U_I min = remaining < avail ? remaining : avail;
+		(void)memcpy(buffer + next, a + wrote, min);
+		wrote += min;
+		next += min;
+		if(last < next)
+		    last = next;
+		need_flush_write = true;
+	    }
 	}
     }
 
+    void cache::alloc_buffer(size_t x_size)
+    {
+	if(buffer != NULL)
+	    throw SRC_BUG;
+
+	if(get_pool() != NULL)
+	    buffer = (char *)get_pool()->alloc(x_size);
+	else
+	    buffer = new (nothrow) char[x_size];
+
+	if(buffer == NULL)
+	    throw Ememory("cache::alloc_buffer");
+	size = x_size;
+    }
+
+    void cache::release_buffer()
+    {
+	if(buffer == NULL)
+	    throw SRC_BUG;
+
+	if(get_pool() != NULL)
+	    get_pool()->release(buffer);
+	else
+	    delete [] buffer;
+	buffer = NULL;
+	size = 0;
+    }
+
+    void cache::shift_by_half()
+    {
+	U_I half = last / 2;
+	U_I reste = last % 2;
+
+	if(next < half)
+	    throw SRC_BUG; // current position would be out of the buffer
+	if(last > 1)
+	{
+	    (void)memmove(buffer, buffer + half, half + reste);
+	    next -= half;
+	    last -= half;
+	}
+	buffer_offset += half;
+    }
+
+    void cache::clear_buffer()
+    {
+	if(next != last)
+	    throw SRC_BUG; // current position would be out of buffer
+	buffer_offset += last;
+	next = last = 0;
+    }
 
     void cache::flush_write()
     {
-	if(get_mode() == gf_read_only || read_mode || buffer_cache.buffer == NULL)
+	if(get_mode() == gf_read_only)
 	    return; // nothing to flush
-
-	    // computing stats
-
-	stat_write_counter++;
-	if(buffer_cache.next == buffer_cache.size) // cache is full
-	    stat_write_overused++;
 
 	    // flushing the cache
 
-	if(buffer_cache.next > 0) // we have something to flush
-	    ref->write(buffer_cache.buffer, buffer_cache.next);
-	buffer_cache.next = 0;
-
-	    // write cache is now empty
-	    // eventually checking cache behavior
-
-	if(stat_write_counter >= write_obs) // must compute stats and adapt the cache size
+	if(last > 0) // we have something to flush
 	{
-	    if(stat_write_overused*100 > write_overused_rate*stat_write_counter) // need to increase the cache
-	    {
-		U_I tmp = buffer_cache.size * 2;
-		if(tmp > MAX_BUFFER_SIZE)
-		    tmp = MAX_BUFFER_SIZE;
-		if(buffer_cache.size < tmp && (max_alloc_size == 0 || tmp < max_alloc_size) )
-		{
-		    buffer_cache.release();
-		    try
-		    {
-			buffer_cache.alloc(tmp);
-			buffer_cache.size = tmp;
-		    }
-		    catch(Ememory & e)
-		    {
-			max_alloc_size = buffer_cache.size;
-			try
-			{
-			    buffer_cache.alloc(buffer_cache.size);
-			}
-			catch(Ememory & e)
-			{
-			    buffer_cache.size = 0;
-			    throw Ememory("cache::flush_write");
-			}
-		    }
-		}
-		    // else nothing is done, as we cannot get a larger buffer
-	    }
-		// we no more try to reduce the cache size
-		// the reason is to avoid unnecessary memory allocation and release
-		// as the cache size is bounded by a maximum, we are ready to pay
-		// the penalty of wasted memory to gain some CPU cycles
-
-	    stat_write_overused = 0;
-	    stat_write_counter = 0;
+	    ref->skip(buffer_offset);
+	    ref->write(buffer, last);
 	}
-	    // else this is not time for cache resizing
+	need_flush_write = false;
 
-	    // reseting counters for statistics
+	if(shifted_mode)
+	    shift_by_half();
+	else
+	    clear_buffer();
     }
 
     void cache::fulfill_read()
     {
-	if(get_mode() == gf_write_only || !read_mode)
+	U_I lu;
+
+	if(get_mode() == gf_write_only)
 	    return; // nothing to fill
 
-	    // computing stats
-
-	stat_read_counter++;
-	if(100 * buffer_cache.next < read_unused_rate * buffer_cache.last)
-	    stat_read_unused++;
-	if(buffer_cache.next == buffer_cache.last && buffer_cache.next != 0)
-	    stat_read_overused++;
-
-	    // flushing / shifting the cache contents
+	    // flushing / shifting the cache contents to make room to receive new data
 
 	if(shifted_mode)
-	    buffer_cache.shift_by_half();
+	    shift_by_half();
 	else
-	    buffer_cache.clear();
+	    clear_buffer();
 
 	    ///////
 	    // some data may remain in the cache, we need to preserve them !!!
 	    // this occurres when a shift by half of the buffer has been done just before
 	    ///////
 
-	if(stat_read_counter >= read_obs)
-	{
-	    if(stat_read_overused * 100 > read_overused_rate * stat_read_counter) // need to increase cache size
-	    {
-		if(!failed_increase)
-		{
-		    U_I tmp = buffer_cache.size * 2;
-#ifdef SSIZE_MAX
-		    if(tmp <= SSIZE_MAX && buffer_cache.size < tmp && (tmp <= max_alloc_size || max_alloc_size == 0))
-#else
-   		    if(tmp <= MAX_BUFFER_SIZE && buffer_cache.size < tmp && (tmp <= max_alloc_size || max_alloc_size == 0))
-#endif
-		    {
-			try
-			{
-			    buffer_cache.resize(tmp);
-			}
-			catch(Ememory & e)
-			{
-			    failed_increase = true;
-			}
-			catch(bad_alloc & e)
-			{
-			    failed_increase = true;
-			}
-
-			if(failed_increase)
-			    max_alloc_size = buffer_cache.size;
-		    }
-		}
-	    }
-		// we no more try to reduce the cache size
-		// the reason is to avoid unnecessary memory allocation and release
-		// as the cache size is bounded by a maximum, we are ready to pay
-		// the penalty of wasted memory to gain some CPU cycles
-	    stat_read_counter = 0;
-	    stat_read_unused = 0;
-	    stat_read_overused = 0;
-	}
-	    // else this is not time for cache resizing
-
-	    // now fulfilling the cache
-
-
-	if(buffer_cache.next != buffer_cache.last)
-	    throw SRC_BUG;
-	    // should not call fullfill_read unless all data has been read
-	else
-	{
-	    U_I lu = ref->read(buffer_cache.buffer + buffer_cache.last, buffer_cache.size - buffer_cache.last);
-	    buffer_cache.last += lu;
-	}
+	ref->skip(buffer_offset + last);
+	lu = ref->read(buffer + last, size - last);
+	last += lu;
     }
 
-///////////////////////////// cache::buf methods /////////////////////////////////
-
-    void cache::buf::alloc(size_t size)
+    U_I cache::available_in_cache(skippability direction) const
     {
-	if(buffer != NULL)
-	    throw SRC_BUG;
+	U_I ret;
 
-	if(pool != NULL)
-	    buffer = (char *)pool->alloc(size);
-	else
-	    buffer = new (nothrow) char[size];
-
-	if(buffer == NULL)
-	    throw Ememory("cache::buf::alloc");
-    }
-
-    void cache::buf::release()
-    {
-	if(buffer == NULL)
-	    throw SRC_BUG;
-
-	if(pool != NULL)
-	    pool->release(buffer);
-	else
-	    delete [] buffer;
-	buffer = NULL;
-    }
-
-    void cache::buf::resize(size_t newsize)
-    {
-	char *tmp = buffer;
-
-	if(newsize < last)
-	    throw SRC_BUG;
-
-	if(tmp == NULL)
-	    throw SRC_BUG;
-
-	buffer = NULL; // current buffer is kept alive and referred by tmp
-	try
+	switch(direction)
 	{
-	    alloc(newsize);
-	    (void)memcpy(buffer, tmp, last);
-	    size = newsize;
-	}
-	catch(...)
-	{
-		// releasing new buffer and putting back the old one in place
-	    if(buffer != NULL)
-		release();
-	    buffer = tmp;
-	    throw;
+	case skip_forward:
+	    ret = last - next;
+	    break;
+	case skip_backward:
+	    ret = next;
+	    break;
+	default:
+	    throw SRC_BUG;
 	}
 
-	    // releasing the old buffer
-	if(pool)
-	    pool->release(tmp);
-	else
-	    delete [] tmp;
+	return ret;
     }
-
-    void cache::buf::shift_by_half()
-    {
-	U_I half = last / 2;
-	U_I reste = last % 2;
-
-	if(last > 1)
-	{
-	    (void)memmove(buffer, buffer + half, half+reste);
-	    next -= half;
-	    last -= half;
-	}
-    }
-
 
 } // end of namespace
 
