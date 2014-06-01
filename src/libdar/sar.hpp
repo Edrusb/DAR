@@ -124,7 +124,7 @@ namespace libdar
         ~sar();
 
             // inherited from generic_file
-	bool skippable(skippability direction, const infinint & amount) { return true; };
+	bool skippable(skippability direction, const infinint & amount);
         bool skip(const infinint &pos);
         bool skip_to_eof();
         bool skip_relative(S_I x);
@@ -160,6 +160,12 @@ namespace libdar
 	void inherited_terminate();
 
     private :
+	struct coordinate
+	{
+	    infinint slice_num;
+	    infinint offset_in_slice;
+	};
+
 	entrepot *entr;              //< where are stored slices
         std::string base;            //< archive base name
 	std::string ext;             //< archive extension
@@ -195,6 +201,7 @@ namespace libdar
 	bool old_sar;                //< in read-mode, is true if the read sar has an old header (format <= "07"), in write mode, is true if it is requested to build old slice headers
 	bool lax;                    //< whether to try to go further reading problems
 
+	coordinate get_slice_and_offset(infinint pos) const;       //< convert absolute position (seen by the upper layer) to slice number and offset in slice
         bool skip_forward(U_I x);                                  //< skip forward in sar global contents
         bool skip_backward(U_I x);                                 //< skip backward in sar global contents
         void close_file(bool terminal);                            //< close current openned file, adding (in write mode only) a terminal mark (last slice) or not

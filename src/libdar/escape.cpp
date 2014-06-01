@@ -326,7 +326,7 @@ namespace libdar
 			U_I lu = 0;
 
 			if(!x_below->skip(pos - ESCAPE_SEQUENCE_LENGTH))
-			    throw SRC_BUG; // should succeed or throw an exception in that situation (backward skipping)
+			    return false;
 			lu = x_below->read(tmp_buffer, ESCAPE_SEQUENCE_LENGTH);
 			write_buffer_size = lu;
 		    }

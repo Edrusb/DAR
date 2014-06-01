@@ -2719,7 +2719,8 @@ namespace libdar
 				{
 				    try
 				    {
-					stock->skip(rewinder);
+					if(!stock->skip(rewinder))
+					    throw Erange("save_inode", "Start position is out of reach");
 					if(!resave_uncompressed)
 					    resave_uncompressed = true;
 					else
@@ -2740,6 +2741,11 @@ namespace libdar
 					if(stock->get_position() != current_pos_tmp)
 					    throw SRC_BUG;
 				    }
+				}
+				else
+				{
+				    if(info_details)
+					dialog.warning(info_quoi  + gettext(" : Resaving uncompressed the inode data is not possible (would cross slice boundary or archive is written to a pile)"));
 				}
 			    }
 			    else

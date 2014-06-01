@@ -292,21 +292,31 @@ namespace libdar
 	    delete entr;
     }
 
+    bool sar::skippable(skippability direction, const infinint & amount)
+    {
+	switch(direction)
+	{
+	case generic_file::skip_backward:
+	    if(of_current == 1)
+		return file_offset - first_file_offset >= amount;
+	    else
+		return file_offset - other_file_offset >= amount;
+	case generic_file::skip_forward:
+	    if(of_current == 1)
+		return file_offset + amount + (old_sar ? 0 : 1) < first_size;
+	    else
+		return file_offset + amount + (old_sar ? 0 : 1) < size;
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
     bool sar::skip(const infinint &pos)
     {
-        infinint byte_in_first_file = first_size - first_file_offset;
-        infinint byte_per_file = size - other_file_offset;
-        infinint dest_file, offset;
+	coordinate coord;
 
 	if(is_terminated())
 	    throw SRC_BUG;
-
-	if(!old_sar)
-	{
-	    --byte_in_first_file;
-	    --byte_per_file;
-		// this is due to the trailing flag (one byte length)
-	}
 
         if(get_position() == pos)
             return true; // no need to skip
@@ -314,23 +324,12 @@ namespace libdar
             ///////////////////////////
             // determination of the file to go and its offset to seek in
             //
-        if(pos < byte_in_first_file)
-        {
-            dest_file = 1;
-            offset = pos + first_file_offset;
-        }
-        else
-        {
-	    euclide(pos - byte_in_first_file, byte_per_file, dest_file, offset);
-            dest_file += 2;
-                // "+2" because file number starts to 1 and first file is already counted
-            offset += other_file_offset;
-        }
+	coord = get_slice_and_offset(pos);
 
             ///////////////////////////
             // checking whether the required position is acceptable
             //
-        if(of_last_file_known && dest_file > of_last_file_num)
+        if(of_last_file_known && coord.slice_num > of_last_file_num)
         {
                 // going to EOF
             open_file(of_last_file_num);
@@ -342,9 +341,9 @@ namespace libdar
         {
             try
             {
-                open_file(dest_file);
-                set_offset(offset);
-                file_offset = offset;
+                open_file(coord.slice_num);
+                set_offset(coord.offset_in_slice);
+                file_offset = coord.offset_in_slice;
                 return true;
             }
             catch(Erange & e)
@@ -399,6 +398,35 @@ namespace libdar
         }
         else
             return false;
+    }
+
+    sar::coordinate sar::get_slice_and_offset(infinint pos) const
+    {
+	coordinate ret;
+        infinint byte_in_first_file = first_size - first_file_offset;
+        infinint byte_per_file = size - other_file_offset;
+
+	if(!old_sar)
+	{
+	    --byte_in_first_file;
+	    --byte_per_file;
+		// this is due to the trailing flag (one byte length)
+	}
+
+        if(pos < byte_in_first_file)
+        {
+            ret.slice_num = 1;
+            ret.offset_in_slice = pos + first_file_offset;
+        }
+        else
+        {
+	    euclide(pos - byte_in_first_file, byte_per_file, ret.slice_num, ret.offset_in_slice);
+            ret.slice_num += 2;
+                // "+2" because file number starts to 1 and first file is already counted
+            ret.offset_in_slice += other_file_offset;
+        }
+
+	return ret;
     }
 
     bool sar::skip_backward(U_I x)
