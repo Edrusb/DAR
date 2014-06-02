@@ -89,7 +89,7 @@ namespace libdar
 	alloc_buffer(x_size);
 	next = 0;
 	last = 0;
-	need_flush_write = false;
+	first_to_write = size;
 	buffer_offset = ref->get_position();
 	shifted_mode = shift_mode;
     }
@@ -104,6 +104,7 @@ namespace libdar
 	{
 		// ignore all exceptions
 	}
+	release_buffer();
     }
 
     bool cache::skippable(skippability direction, const infinint & amount)
@@ -179,7 +180,7 @@ namespace libdar
 	{
 	    bool ret;
 
-	    if(need_flush_write)
+	    if(need_flush_write())
 		flush_write();
 	    next = last = 0;
 	    ret = ref->skip(pos);
@@ -196,7 +197,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(need_flush_write)
+	if(need_flush_write())
 	    flush_write();
 	next = last = 0;
 	ret = ref->skip_to_eof();
@@ -228,7 +229,7 @@ namespace libdar
 	}
 	else // must replace data in cache to skip
 	{
-	    if(need_flush_write)
+	    if(need_flush_write())
 		flush_write();
 
 	    switch(dir)
@@ -255,7 +256,7 @@ namespace libdar
 	{
 	    if(next >= last) // no more data to read from cache
 	    {
-		if(need_flush_write)
+		if(need_flush_write())
 		    flush_write();
 		if(x_size - ret < size)
 		{
@@ -305,13 +306,13 @@ namespace libdar
 	    avail = size - next;
 	    if(avail == 0) // we need to flush the cache
 	    {
-		if(need_flush_write)
+		if(need_flush_write())
 		    flush_write();    // may fail if underlying is read_only
 		avail = size - next;
 	    }
 
 	    remaining = x_size - wrote;
-	    if(avail < remaining && !need_flush_write)
+	    if(avail < remaining && !need_flush_write())
 	    {
 		    // less data in cache than to be wrote and no write pending data  in cache
 		    // we write directly to the lower layer
@@ -326,12 +327,13 @@ namespace libdar
 	    else // filling cache with data
 	    {
 		U_I min = remaining < avail ? remaining : avail;
+		if(first_to_write >= last)
+		    first_to_write = next;
 		(void)memcpy(buffer + next, a + wrote, min);
 		wrote += min;
 		next += min;
 		if(last < next)
 		    last = next;
-		need_flush_write = true;
 	    }
 	}
     }
@@ -371,9 +373,15 @@ namespace libdar
 
 	if(next < half)
 	    throw SRC_BUG; // current position would be out of the buffer
+	if(first_to_write < half)
+	    throw SRC_BUG;
 	if(last > 1)
 	{
 	    (void)memmove(buffer, buffer + half, half + reste);
+	    if(need_flush_write())
+		first_to_write -= half;
+	    else
+		first_to_write = size;
 	    next -= half;
 	    last -= half;
 	}
@@ -384,6 +392,8 @@ namespace libdar
     {
 	if(next != last)
 	    throw SRC_BUG; // current position would be out of buffer
+	if(need_flush_write())
+	    throw SRC_BUG;
 	buffer_offset += last;
 	next = last = 0;
     }
@@ -395,12 +405,12 @@ namespace libdar
 
 	    // flushing the cache
 
-	if(last > 0) // we have something to flush
+	if(need_flush_write()) // we have something to flush
 	{
-	    ref->skip(buffer_offset);
-	    ref->write(buffer, last); // may fail if underlying is read_only
+	    ref->skip(buffer_offset + first_to_write);
+	    ref->write(buffer + first_to_write, last - first_to_write); // may fail if underlying is read_only
 	}
-	need_flush_write = false;
+	first_to_write = size;
 
 	if(shifted_mode)
 	    shift_by_half();

@@ -56,7 +56,7 @@ namespace libdar
 	cache(const cache & ref) : generic_file(gf_read_only) { throw SRC_BUG; };
 	const cache & operator = (const cache & ref) { throw SRC_BUG; };
 	~cache();
-
+	void reduce_to_readonly() { set_mode(gf_read_only); };
 
 	    // inherited from generic_file
 
@@ -80,10 +80,11 @@ namespace libdar
 	U_I size;                         //< allocated size
 	U_I next;                         //< next to read or next place to write to
 	U_I last;                         //< last valid data in the cache. we have: next <= last < size
-	bool need_flush_write;            //< whether buffer contains some data that need to be written down to "ref"
+	U_I first_to_write;               //< position of the first byte that need to be written. if greater than last, no byte need writing
 	infinint buffer_offset;           //< position of the first byte in buffer
 	bool shifted_mode;                //< whether to half flush and shift or totally flush data
 
+	bool need_flush_write() const { return first_to_write < last; };
 	void alloc_buffer(size_t x_size); //< allocate x_size byte in buffer field and set size accordingly
 	void release_buffer();            //< release memory set buffer to NULL and size to zero
 	void shift_by_half();

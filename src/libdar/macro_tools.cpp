@@ -199,6 +199,7 @@ namespace libdar
 	secu_string real_pass = pass;
 	generic_file *tmp = NULL;
 	contextual *tmp_ctxt = NULL;
+	cache *tmp_cache = NULL;
 
 	stack.clear();
 
@@ -392,9 +393,10 @@ namespace libdar
 	    case crypto_none:
 		if(info_details)
 		    dialog.warning(gettext("No cyphering layer opened, adding cache layer for better performance"));
-		tmp = new (pool) cache (*(stack.top()), false);
+		tmp = tmp_cache = new (pool) cache (*(stack.top()), false);
 		if(tmp == NULL)
 		    dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
+		tmp_cache->reduce_to_readonly();
 		break;
 	    case crypto_blowfish:
 	    case crypto_aes256:
@@ -439,11 +441,11 @@ namespace libdar
 
 	    if(tmp == NULL)
 		throw Ememory("open_archive");
-	    if(crypto == crypto_none)
-		stack.push(tmp, LIBDAR_STACK_LABEL_CACHE_PIPE, true);
 	    else
+	    {
 		stack.push(tmp);
-	    tmp = NULL;
+		tmp = NULL;
+	    }
 
 	    stack.add_label(LIBDAR_STACK_LABEL_UNCYPHERED);
 
