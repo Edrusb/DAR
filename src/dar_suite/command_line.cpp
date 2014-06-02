@@ -296,7 +296,7 @@ bool get_args(shell_interaction & dialog,
     p.slice_user = "";
     p.slice_group = "";
     p.repeat_count = 3; // 3 retry by default
-    p.repeat_byte = 0;
+    p.repeat_byte = 1;  // 1 wasted byte allowed by default
     p.decremental = false;
 #if FURTIVE_READ_MODE_AVAILABLE
     p.furtive_read_mode = true;

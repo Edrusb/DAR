@@ -356,7 +356,7 @@ namespace libdar
 	    x_slice_user_ownership = "";
 	    x_slice_group_ownership = "";
 	    x_repeat_count = 3;
-	    x_repeat_byte = 0;
+	    x_repeat_byte = 1;
 	    x_sequential_marks = true;
 	    x_sparse_file_min_size = 15;  // min value to activate the feature (0 means no detection of sparse_file)
 	    x_security_check = true;
