@@ -31,7 +31,7 @@ namespace libdar
 {
 
 
-    void pile::push(generic_file *f, const string & label)
+    void pile::push(generic_file *f, const string & label, bool extend_mode)
     {
 	face to_add;
 
@@ -44,8 +44,10 @@ namespace libdar
 	    throw Erange("pile::push", "Label already used while pushing a generic_file on a stack");
 	if(stack.empty())
 	    set_mode(f->get_mode());
-	if(f->get_mode() != get_mode())
+	if(f->get_mode() != get_mode() && (!extend_mode || f->get_mode() != gf_read_write))
 	    throw Erange("pile::push", "Adding to the stack of generic_file an object using an incompatible read/write mode");
+	if(extend_mode)
+	    set_mode(f->get_mode());
 	to_add.ptr = f;
 	to_add.labels.clear();
 	if(label != "")

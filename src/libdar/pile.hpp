@@ -56,12 +56,13 @@ namespace libdar
 	    ///
 	    /// \param[in] f is the address of the object to add to the stack
 	    /// \param[in] label unique label associated to this object in the current stack, exception thrown if label already used in stack
+	    /// \param[in] extend_mode allow the new object to have more read/write permission than the already placed object, which have the effect to change the read/write permission of the stack itself, future push() will accept wider permission even if extend_mode is not set
 	    /// \note once added, the object memory allocation is managed by the pile object
 	    /// the pile is responsible of destroying this object if its destructor is called
 	    /// however, the pile object releases its responsibility about any object that
 	    /// will be poped (see pop() below) from the stack.
 	    /// \note empty label (empty string) is the only value that can be used for several objects of the stack
-	void push(generic_file *f, const std::string & label = "");
+	void push(generic_file *f, const std::string & label = "", bool extend_mode = false);
 
 	    /// remove the top generic_file from the top
 	    ///
