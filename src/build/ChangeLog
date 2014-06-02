@@ -2,11 +2,24 @@ from 2.4.13 to 2.4.14
 - limiting memory consumtion of the cache layer to stay below 10 MiB, under
   certain circumstances (very large archive), it could grow up to an insane
   value like 50% or the available RAM. reducing to 10 MiB does not impact
-  performance in a noticable manner while it avoids system to swap out when
-  the libdar cache layer becomes huge.
+  performance in a noticable manner while it avoids system to swap out due
+  to the libdar cache layer being become huge.
 - added --with-pkgconfigdir to define an alternative path for libdar
-  pkgconfig file
+  pkgconfig file (to ease portability to FreeBSD)
 - modified some Makefile.am for better FreeBSD support
+- fixed display bug in XML listing output concerning hard linked inodes
+- fixing typo in man page
+- fixing bug met while isolating a catalogue in --sequential-read mode.
+  Using such isolated catalogue lead dar report an error about inaccessible
+  EA.
+- displaying compression rate for sparse files even when they are
+  uncompressed as sparse file detection is also a way to compress files
+- fixing bug that lead libdar to fail comparing an inode having EA when
+  comparison is done in --sequential-read mode
+- fixing error configure script about ligcrypt check for minimum required
+  version
+- adding forgotten files for removal during 'make clean'
+
 
 from 2.4.12 to 2.4.13
 - adding initialization value for two variables to avoid inappropriate
