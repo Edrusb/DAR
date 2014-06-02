@@ -61,6 +61,7 @@ using namespace std;
 namespace libdar
 {
 
+    const string LIBDAR_STACK_LABEL_CACHE_PIPE = "CACHE_PIPE";
     const string LIBDAR_STACK_LABEL_UNCOMPRESSED = "UNCOMPRESSED";
     const string LIBDAR_STACK_LABEL_CLEAR =  "CLEAR";
     const string LIBDAR_STACK_LABEL_UNCYPHERED = "UNCYPHERED";
@@ -390,7 +391,7 @@ namespace libdar
 	    {
 	    case crypto_none:
 		if(info_details)
-		    dialog.warning(gettext("No cyphering layer opened, adding cache layer for performance"));
+		    dialog.warning(gettext("No cyphering layer opened, adding cache layer for better performance"));
 		tmp = new (pool) cache (*(stack.top()), false);
 		if(tmp == NULL)
 		    dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
@@ -438,7 +439,10 @@ namespace libdar
 
 	    if(tmp == NULL)
 		throw Ememory("open_archive");
-	    stack.push(tmp);
+	    if(crypto == crypto_none)
+		stack.push(tmp, LIBDAR_STACK_LABEL_CACHE_PIPE, true);
+	    else
+		stack.push(tmp);
 	    tmp = NULL;
 
 	    stack.add_label(LIBDAR_STACK_LABEL_UNCYPHERED);
@@ -899,6 +903,8 @@ namespace libdar
 
 	    try
 	    {
+		bool writing_to_pipe = false;
+
 		    // note:
 		    // the escape object if present in the stack needs read access from below it when skipping backward
 		    // is requested (bad compression ration, changed filed at the time of backup, etc.)
@@ -918,7 +924,7 @@ namespace libdar
 			{
 			    if(info_details)
 				dialog.warning(gettext("Creating low layer: Writing archive into standard output object..."));
-
+			    writing_to_pipe = true;
 			    tmp = sar_tools_open_archive_tuyau(dialog,
 							       pool,
 							       1,
@@ -979,6 +985,23 @@ namespace libdar
 		{
 		    layers.push(tmp);
 		    tmp = NULL;
+		}
+
+		    // ******** adding cache layer if writing to pipe in order to provide limited read/write mode ***** //
+
+		if(writing_to_pipe)
+		{
+		    if(info_details)
+			dialog.warning(gettext("Adding cache layer over pipe to provide limited read/write access..."));
+
+		    tmp = new (pool) cache(*(layers.top()), true);
+		    if(tmp == NULL)
+			throw Ememory("op_create_in_sub");
+		    else
+		    {
+			layers.push(tmp,LIBDAR_STACK_LABEL_CACHE_PIPE, true);
+			tmp = NULL;
+		    }
 		}
 
 		    // ******** creating and writing the archive header ******************* //
@@ -1094,20 +1117,28 @@ namespace libdar
 		    tmp = new (pool) crypto_sym(crypto_size, real_pass, *(layers.top()), false, macro_tools_supported_version, crypto);
 		    break;
 		case crypto_none:
-		    if(info_details)
-			dialog.warning(gettext("Adding a new layer on top: Caching layer for better performances..."));
-		    tmp = new (pool) cache(*(layers.top()), false);
+		    if(!writing_to_pipe)
+		    {
+			if(info_details)
+			    dialog.warning(gettext("Adding a new layer on top: Caching layer for better performances..."));
+			tmp = new (pool) cache(*(layers.top()), false);
+		    }
+		    else
+			tmp = NULL; // a cache is already present just below
 		    break;
 		default:
 		    throw SRC_BUG; // cryto value should have been checked before
 		}
 
-		if(tmp == NULL)
-		    throw Ememory("op_create_in_sub");
-		else
+		if(!writing_to_pipe || crypto != crypto_none)
 		{
-		    layers.push(tmp);
-		    tmp = NULL;
+		    if(tmp == NULL)
+			throw Ememory("op_create_in_sub");
+		    else
+		    {
+			layers.push(tmp);
+			tmp = NULL;
+		    }
 		}
 
 		if(crypto != crypto_none) // initial elastic buffer

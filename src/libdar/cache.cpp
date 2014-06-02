@@ -73,7 +73,10 @@ namespace libdar
 
     cache::cache(generic_file & hidden,
 		 bool shift_mode,
-		 U_I x_size) : generic_file(hidden.get_mode())
+		 U_I x_size) : generic_file(gf_read_write)
+				   // in any case we provide read write facility in
+				   // the cache, for what is out of the cache we check
+				   // the underlying object mode
     {
 	    // sanity checks
 	if(&hidden == NULL)
@@ -105,11 +108,7 @@ namespace libdar
 
     bool cache::skippable(skippability direction, const infinint & amount)
     {
-	infinint in_cache;
-
-	    // calculating the availabe data in cache
-
-	in_cache = available_in_cache(direction);
+	infinint in_cache = available_in_cache(direction);
 
 	    // either available data is enough to assure skippability or we
 	    // calculate the direction and amount to ask to the lower layer (ref)
@@ -162,7 +161,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(pos >= buffer_offset && pos < buffer_offset + last)
+	if(pos >= buffer_offset && pos <= buffer_offset + last)
 	{
 		// skipping inside the buffer is possible
 
@@ -260,13 +259,13 @@ namespace libdar
 		    flush_write();
 		if(x_size - ret < size)
 		{
-		    fulfill_read();
+		    fulfill_read(); // may fail if underlying is write_only (exception thrown)
 		    if(next >= last) // could not read anymore data
 			eof = true;
 		}
 		else // reading the remaining directly from lower layer
 		{
-		    ret += ref->read(a + ret, x_size - ret);
+		    ret += ref->read(a + ret, x_size - ret); // may fail if underlying is write_only
 		    if(ret < x_size)
 			eof = true;
 		    clear_buffer();   // force clearing whatever is shifted_mode
@@ -307,7 +306,7 @@ namespace libdar
 	    if(avail == 0) // we need to flush the cache
 	    {
 		if(need_flush_write)
-		    flush_write();
+		    flush_write();    // may fail if underlying is read_only
 		avail = size - next;
 	    }
 
@@ -320,7 +319,7 @@ namespace libdar
 		buffer_offset += next;
 		next = last = 0;
 		ref->skip(buffer_offset);
-		ref->write(a + wrote, remaining);
+		ref->write(a + wrote, remaining); // may fail if underlying is read_only
 		wrote = x_size;
 		buffer_offset += remaining;
 	    }
@@ -399,7 +398,7 @@ namespace libdar
 	if(last > 0) // we have something to flush
 	{
 	    ref->skip(buffer_offset);
-	    ref->write(buffer, last);
+	    ref->write(buffer, last); // may fail if underlying is read_only
 	}
 	need_flush_write = false;
 
@@ -429,7 +428,7 @@ namespace libdar
 	    ///////
 
 	ref->skip(buffer_offset + last);
-	lu = ref->read(buffer + last, size - last);
+	lu = ref->read(buffer + last, size - last); // may fail if underlying is write_only
 	last += lu;
     }
 

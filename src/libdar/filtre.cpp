@@ -2787,7 +2787,14 @@ namespace libdar
 					try
 					{
 					    if(stock->skippable(generic_file::skip_backward, storage_size))
-						stock->skip(start);
+					    {
+						if(!stock->skip(start))
+						{
+						    if(!stock->skip(current_repeat_count))
+							throw SRC_BUG;
+						    throw Erange("",""); // used locally
+						}
+					    }
 					    else
 						throw Erange("",""); // used locally, not propagated over this try / catch block
 					}
