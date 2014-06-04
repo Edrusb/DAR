@@ -1138,7 +1138,10 @@ namespace libdar
 			throw Ememory("op_create_in_sub");
 		    else
 		    {
-			layers.push(tmp);
+			if(crypto != crypto_none)
+			    layers.push(tmp);
+			else
+			    layers.push(tmp, LIBDAR_STACK_LABEL_CACHE_PIPE, true);
 			tmp = NULL;
 		    }
 		}
