@@ -69,7 +69,7 @@ namespace libdar
         {
             if(buffer != NULL)
             {
-                delete [] buffer;
+                meta_delete(buffer);
                 buffer = NULL;
             }
             meta_new(buffer, size);
