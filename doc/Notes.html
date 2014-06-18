@@ -5,6 +5,7 @@
 
 
 
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DAR/LIBDAR Internals - Notes</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
@@ -419,18 +420,36 @@ the <span style="font-weight: bold; text-decoration: underline;">version trailer
 part of the documentation because it was only located at the
 beginning of the archive in previous archive format) is composed of:<br>
       </div>
+      
       <ul style="margin-left: 40px;">
+
         <li>edition version of the archive</li>
         <li>compression algorithm used</li>
         <li>command line used for creating the archive, now known as "user comment"<br>
 </li>
-        <li>flag (telling whether the archive is encrypted, whether it has escape sequence marks, etc.)</li>
-        <li>initial offset (telling where starts the data in the archive, is only present in the trailer)<br>
-</li>
+        <li>flag, telling:</li>
+        <ul>
+          <li>&nbsp;whether the archive is encrypted, <br>
+          </li>
+          <li>whether it has escape sequence marks, <br>
+          </li>
+          <li>whether the header/trailier contains an encrypted key</li>
+          <li>whether the header/trailer contains the initial offset field<br>
+          </li>
+        </ul>
+
+        <li>initial offset (telling where starts the data in the archive, is only present in the trailer)</li>
+        <li>crypto algorithm used (present only if flag tells that the archive is encrypted)</li>
+        <li>size of the crypted key that follows (present only if the flag tells an encrypted key is present)</li>
+        <li>encrypted key (encrypted by mean of GPG asymetric algorithm, present only if flag says so)<br>
+        </li>
+
         <li>CRC (Cyclic Redundancy Check) computed on the whole version header or trailer<br>
         </li>
 
+      
       </ul>
+
       <div style="margin-left: 80px;"><code>+---------+------+---------------+------+--------+--------+</code><br>
       <code>| edition | algo | command line&nbsp; | flag | initial|&nbsp; CRC&nbsp;&nbsp; |<br>
 </code><code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -446,11 +465,16 @@ beginning of the archive in previous archive format) is composed of:<br>
       <div style="text-align: justify;">
 The trailer is used when reading an archive in direct access mode, to build
 the proper compression layer, escape layer (it is needed if mark have
-been inserted in the archive to un-escape data that could else be taken as an escape sequence mark).<br>
+been inserted in the archive to un-escape data that could else be taken as an escape sequence mark) and encryption layer.<br>
       </div>
 
       <br>
-      <span style="text-decoration: underline; font-weight: bold;">The data</span> is a suite of file contents, with EA if present<br>
+      <span style="text-decoration: underline; font-weight: bold;">The data</span>
+is a suite of file contents, with EA if present. When tape mark is
+used, a copy of the CRC is placed after's file Data and file's EA, to
+be used when reading the archive in sequential mode. This CRC is also
+dropped into the catalogue which takes place at the end of the archive
+to be used when reading the archive in direct access mode (the default).<br>
       <br>
       </div>
       <div style="margin-left: 80px;"><code>&nbsp; ....</code><code>--+---------------------+----+------------+-----------+----+---....</code><br>
@@ -468,7 +492,7 @@ compressed) |&nbsp;&nbsp;&nbsp; | (no EA)&nbsp;&nbsp;&nbsp;
       </div>
       <div style="text-align: justify; margin-left: 40px;"><span style="text-decoration: underline; font-weight: bold;">the
 catalogue</span>,
-contains all inode, directory structure and hard_links information. The
+contains all inode, directory structure and hard_links information as well as data and EA CRC. The
 directory structure is stored in a simple way: the inode of a directory
 comes, then the inode of the files it contains, then a special entry
 named "EOD" for End of Directory. Considering the following tree:<br>
@@ -507,11 +531,11 @@ file, just the filename is recorded.<br>
 the terminator</span>
 stores the position of the beginning of the catalogue,
 it is the last thing to be written. Thus dar first reads the
-terminator, then the catalogue. Well there is now two terminators, both
+terminator, then the catalogue. Well, there is now two terminators, both
 are meant to be read backward. The second terminator points to the
 beginning of the "trailer version" which is read first in direct access
 mode. The first terminator points to the start of the catalogue, which
-is read once the adhoc compression layer has been built based on the
+is read once the adhoc compression and encryption layers has been built based on the
 information found on the "trailer version"<br>
       </div>
       <br>
@@ -939,6 +963,68 @@ reading the whole archive to restore any single file.</div>
   </tbody>
 </table>
 <br>
+<hr style="width: 100%; height: 2px;"><br>
+<table style="text-align: left; width: 90%;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <h3>Asymmetrical Encryption and Signature<br>
+      </h3>
+      <br>
+      <div style="text-align: justify;">dar relies on gpgme library
+(GPG made Easy) to provide strong asymmetrical encryption and signature
+of an archive. Asymmetrical encryption is what you do when you use a
+public key to cypher data (=encrypt data) and a private key to uncypher
+it (=decrypt it). However, <span style="font-weight: bold;">dar does <span style="text-decoration: underline;">not </span>encrypt <span style="text-decoration: underline;">the whole archive</span> that way</span>, not it signs it that way, neither.<br>
+      <br>
+Instead, dar relies on the symmetrical strong encryption algorithm it
+is aware of for some time (blowfish, twofish, camellia, aes, etc.) to
+cipher the archive. The key used to cipher the archive is chosen
+randomly, encrypted and eventually signed using the provided recipient
+email of the user keyring. This encrypted key is then put in the
+archive header and trailer.<br>
+      <br>
+Well, to be more precise about the symmetrical key that is encrypted in
+the archive: its length user defined and defaults to 512 bytes (4096
+bits). A random variation of +0 to +255 bytes is added by libdar to
+this size. Then the key value itself is chosen randomly. The random
+generator used here is the one provided by libgcrypt using the
+GCRY_STRONG_RANDOM entropy level.<br>
+      <br>
+Why doing that way and not using the asymmetrical algorithm to cypher the whole archive? <br>
+      <ul>
+        <li>Because it would no more be possible to extract a single
+file from the archive or to read the archive's contents whithout
+reading the whole archive.</li>
+        <li>Because it would not be possible the quickly verify archive signatures (well, see below)<br>
+        </li>
+        <li>Because it would avoid recovering an corrupted archive after the point of corruption</li>
+        <li>Because it would cost much disk space to encrypt an archive for it be readable by more than one recipients<br>
+        </li>
+      </ul>
+Yes, you can provide several recipients from your GPG keyring giving
+their email addresses and also at the same time sign the archive with
+one of your private key. The resulting archive will be possible to
+decrypt only by those recipients. And anyone knowing your public key
+will be able to verify that the archive has been generated by you. Of
+course the verification only validates the encryption key is from an
+archive you have personnaly generated, a man in the middle could modify
+the archive data located after the key in the archive, however it would
+not be possible to uncipher the tampered data using the signed key, or
+it would mean that the man in the middle could generate encrypted data
+using the same symmetric key that is encrypted in the archive. This
+might be the possible if a recipient's private key has been
+compromised. Thus the signature of the key is not sufficient to prove
+the authenticity of the whole archive. To cope with that risks, a
+better solution is to activate the slice hashing (md5 or sha1) and to
+sign these small files to be provided beside the archive slices.<br>
+      <br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
 <hr style="width: 100%; height: 2px;"><a name="overflow"></a><br>
 <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
