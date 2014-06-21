@@ -456,10 +456,15 @@ namespace libdar
 
 	    try
 	    {
-		encrypted->skip_to_eof();
-		clear_offset = (*trailing_clear_data)(*encrypted, reading_ver);
+		memory_file tmp;
+
+		tmp.write(encrypted_buf, encrypted_buf_data);
+		clear_offset = (*trailing_clear_data)(tmp, reading_ver);
+		    // this is the offset that is written in the archive
+		    // it is thus not relative to tmp but to the real
+		    // sub layer including the initial_shift bytes
 		clear_offset -= initial_shift;
-		encrypted->skip_to_eof(); // no more data to read from the encrypted layer
+		    // now clear_offset can be compared to crypt_offset
 	    }
 	    catch(Egeneric & e)
 	    {
@@ -470,21 +475,13 @@ namespace libdar
 		throw SRC_BUG;
 	    }
 
-	    if(crypt_offset >= clear_offset)
-		    // we already read cleared byte as if they were
-		    // ciphered ones in a previous call to fill_buf
-	    {
-		    // here let the clear data that has been processed for decipherization
-		    // in a previous call to fill_buf, assuming that the upper layer will not
-		    // need and read them, or they are read, they will trigger a corruption
-		    // based on CRC at a upper layer
+	    if(crypt_offset >= clear_offset) // all data in encrypted_buf is clear data
 		encrypted_buf_data = 0;
-	    }
-	    else // some data a the tail of encrypted_buf are cleared one, and must be removed from it
+	    else
 	    {
 		U_I nouv_buf_data = 0;
 
-		clear_offset -= crypt_offset; // max number of byte we should keep in the encrypted_buf
+		clear_offset -= crypt_offset;
 		clear_offset.unstack(nouv_buf_data);
 		if(clear_offset > 0)
 		    throw SRC_BUG; // cannot handle that integer as U_32 while this number should be less than encrypted_buf_size which is a U_32
@@ -493,7 +490,6 @@ namespace libdar
 		else
 		    throw SRC_BUG; // more encrypted data than could be read so far!
 	    }
-
 	}
 	    // else, nothing can be done
     }
