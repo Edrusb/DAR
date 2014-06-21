@@ -75,6 +75,7 @@ namespace libdar
 	block_num = 0;
 	encrypted = & encrypted_side;
 	encrypted_buf = NULL; // cannot invoke pure virtual methods from constructor
+	encrypted_buf_data = 0;
 	encrypted_buf_size = 0;
 	weof = false;
 	reof = false;
@@ -114,19 +115,26 @@ namespace libdar
 
     bool tronconneuse::skip(const infinint & pos)
     {
-	bool ret;
+	bool ret = true;
 
 	if(is_terminated())
 	    throw SRC_BUG;
 
 	if(encrypted->get_mode() != gf_read_only)
 	    throw SRC_BUG;
-	current_position = pos;
-	ret = check_current_position();
-	if(!ret)
-	    skip_to_eof();
+
+	if(current_position != pos)
+	{
+	    if(pos < buf_offset)
+		reof = false;
+	    current_position = pos;
+	    ret = check_current_position();
+	    if(!ret)
+		skip_to_eof();
+	}
 	else
-	    reof = false;
+	    ret = true;
+
 	return ret;
     }
 
@@ -259,6 +267,7 @@ namespace libdar
 	}
 	buf_size = 0;
 	encrypted_buf_size = 0;
+	encrypted_buf_data = 0;
     }
 
     void tronconneuse::copy_from(const tronconneuse & ref)
@@ -287,10 +296,11 @@ namespace libdar
 		// objets share the same generic_file reference
 
 	    encrypted_buf_size = ref.encrypted_buf_size;
+	    encrypted_buf_data = ref.encrypted_buf_data;
 	    encrypted_buf = new (nothrow) char[encrypted_buf_size];
 	    if(encrypted_buf == NULL)
 		throw Ememory("tronconneuse::copy_from");
-	    (void)memcpy(encrypted_buf, ref.encrypted_buf, encrypted_buf_size);
+	    (void)memcpy(encrypted_buf, ref.encrypted_buf, encrypted_buf_data);
 	    weof = ref.weof;
 	    reof = ref.reof;
 	    reading_ver = ref.reading_ver;
@@ -314,49 +324,29 @@ namespace libdar
 	    position_clear2crypt(current_position, crypt_offset, buf_offset, tmp_ret, block_num);
 	    if(!reof && encrypted->skip(crypt_offset + initial_shift))
 	    {
-		S_I lu = encrypted->read(encrypted_buf, encrypted_buf_size);
+		encrypted_buf_data = encrypted->read(encrypted_buf, encrypted_buf_size);
 
-		if(lu < 0)
-		    throw SRC_BUG;
-
-		if((U_32)(lu) < encrypted_buf_size)
+		if(encrypted_buf_data < encrypted_buf_size)
+		{
 		    reof = true;
+		    remove_trailing_clear_data_from_encrypted_buf(crypt_offset);
+		}
 
 		try
 		{
-		    buf_byte_data = decrypt_data(block_num, encrypted_buf, lu, buf, clear_block_size);
+		    buf_byte_data = decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, clear_block_size);
 		}
 		catch(Erange & e)
 		{
-		    infinint clear_offset = check_trailing_clear_data() - initial_shift;
-
-		    if(crypt_offset >= clear_offset)
-			    // we already read cleared byte as if they were
-			    // ciphered ones in a previous call to fill_buf
+		    if(!reof)
 		    {
-			    // here let the clear data that has been processed for decipherization
-			    // in a previous call to fill_buf, assuming that the upper layer will not
-			    // need and read them, or they are read, they will trigger a corruption
-			    // based on CRC at a upper layer
-			buf_byte_data = 0;
-		    }
-		    else // all possibly read clear data are have just been read here
-		    {
-			S_I new_lu = 0;
+			remove_trailing_clear_data_from_encrypted_buf(crypt_offset);
 
-			clear_offset -= crypt_offset; // max number of byte we should keep in the current buffer
-			clear_offset.unstack(new_lu);
-			if(clear_offset > 0)
-			    throw; // the cause of the problem is not due to clear bytes
-			if(new_lu < lu)
-			{
-			    lu = new_lu;
-				// retry but without trailing cleared data
-			    buf_byte_data = decrypt_data(block_num, encrypted_buf, lu, buf, clear_block_size);
-			}
-			else
-			    throw; // the cause of the problem is not due to clear bytes
+			    // retrying but without trailing cleared data
+			buf_byte_data = decrypt_data(block_num, encrypted_buf, encrypted_buf_data, buf, clear_block_size);
 		    }
+		    else // already tried to remove clear data at end of encrypted buffer
+			throw;
 		}
 
 		if(buf_byte_data > buf_size)
@@ -389,13 +379,11 @@ namespace libdar
 
 	if(buf_byte_data > 0)
 	{
-	    U_32 encrypted_count;
-
 	    init_buf();
-	    encrypted_count = encrypt_data(block_num, buf, buf_byte_data, buf_size, encrypted_buf, encrypted_buf_size);
+	    encrypted_buf_data = encrypt_data(block_num, buf, buf_byte_data, buf_size, encrypted_buf, encrypted_buf_size);
 	    try
 	    {
-		encrypted->write(encrypted_buf, encrypted_count);
+		encrypted->write(encrypted_buf, encrypted_buf_data);
 		buf_byte_data = 0;
 		buf_offset += infinint(clear_block_size);
 	    }
@@ -411,7 +399,7 @@ namespace libdar
 		    // by the exception we just caugth here so we may retry to write the encrypted data
 		    // no new Ethread_cancel exception will be thrown this time.
 
-		encrypted->write(encrypted_buf, encrypted_count);
+		encrypted->write(encrypted_buf, encrypted_buf_data);
 		buf_byte_data = 0;
 		buf_offset += infinint(clear_block_size);
 
@@ -427,6 +415,7 @@ namespace libdar
     {
 	if(encrypted_buf == NULL)
 	{
+	    encrypted_buf_data = 0;
 	    encrypted_buf_size = encrypted_block_size_for(clear_block_size);
 	    encrypted_buf = new (nothrow) char[encrypted_buf_size];
 	    if(encrypted_buf == NULL)
@@ -465,32 +454,57 @@ namespace libdar
 	clear_pos = block * infinint(clear_block_size) + residu;
     }
 
-    infinint tronconneuse::check_trailing_clear_data()
+    void tronconneuse::remove_trailing_clear_data_from_encrypted_buf(const infinint & crypt_offset)
     {
-	infinint clear_offset = 0;
-
 	if(encrypted == NULL)
 	    throw SRC_BUG;
 
-	encrypted->skip_to_eof();
-	if(trailing_clear_data == NULL)
-	    return encrypted->get_position();
+	if(trailing_clear_data != NULL)
+	{
+	    infinint clear_offset = 0;
 
-	try
-	{
-	    clear_offset = (*trailing_clear_data)(*encrypted, reading_ver);
-	    encrypted->skip_to_eof(); // no more data to read from the encrypted layer
-	}
-	catch(Egeneric & e)
-	{
-	    throw Erange("tronconneuse::check_trailing_clear_data", gettext("Cannot determine location of the end of cyphered data: ") + e.get_message());
-	}
-	catch(...)
-	{
-	    throw SRC_BUG;
-	}
+	    try
+	    {
+		encrypted->skip_to_eof();
+		clear_offset = (*trailing_clear_data)(*encrypted, reading_ver);
+		clear_offset -= initial_shift;
+		encrypted->skip_to_eof(); // no more data to read from the encrypted layer
+	    }
+	    catch(Egeneric & e)
+	    {
+		throw Erange("tronconneuse::check_trailing_clear_data", gettext("Cannot determine location of the end of cyphered data: ") + e.get_message());
+	    }
+	    catch(...)
+	    {
+		throw SRC_BUG;
+	    }
 
-	return clear_offset;
+	    if(crypt_offset >= clear_offset)
+		    // we already read cleared byte as if they were
+		    // ciphered ones in a previous call to fill_buf
+	    {
+		    // here let the clear data that has been processed for decipherization
+		    // in a previous call to fill_buf, assuming that the upper layer will not
+		    // need and read them, or they are read, they will trigger a corruption
+		    // based on CRC at a upper layer
+		encrypted_buf_data = 0;
+	    }
+	    else // some data a the tail of encrypted_buf are cleared one, and must be removed from it
+	    {
+		U_I nouv_buf_data = 0;
+
+		clear_offset -= crypt_offset; // max number of byte we should keep in the encrypted_buf
+		clear_offset.unstack(nouv_buf_data);
+		if(clear_offset > 0)
+		    throw SRC_BUG; // cannot handle that integer as U_32 while this number should be less than encrypted_buf_size which is a U_32
+		if(nouv_buf_data <= encrypted_buf_data)
+		    encrypted_buf_data = nouv_buf_data;
+		else
+		    throw SRC_BUG; // more encrypted data than could be read so far!
+	    }
+
+	}
+	    // else, nothing can be done
     }
 
 } // end of namespace
