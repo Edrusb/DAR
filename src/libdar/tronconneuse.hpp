@@ -184,6 +184,7 @@ namespace libdar
 	generic_file *encrypted;   //< generic_file where is put / get the encrypted data
 	char *encrypted_buf;       //< buffer of encrypted data (read or to write)
 	U_32 encrypted_buf_size;   //< allocated size of encrypted_buf
+	U_32 encrypted_buf_data;   //< amount of byte of information in encrypted_buf
 	bool weof;                 //< whether write_end_of_file() has been called
 	bool reof;                 //< whether we reached eof while reading
 	archive_version reading_ver;//< archive format we currently read
@@ -214,11 +215,14 @@ namespace libdar
 	    // gives the position of the next character
 	    // of clear data that corresponds to the encrypted data which index is pos
 
-	bool check_current_position() { reof = false; return fill_buf() < buf_byte_data; };
+	bool check_current_position() { return fill_buf() < buf_byte_data; };
 	    // return true if a there is a byte of information at the given offset
 
-	infinint check_trailing_clear_data();
-	    // returns the offset of the first byte of cleared data found after all cyphered data
+	    /// remove clear data at the end of the encrypted_buf
+	    /// \param[in] crypt_offset is the offset of the first byte of encrypted_buf not
+	    /// considering initial_shift bytes before the begining of the encrypted data
+	void remove_trailing_clear_data_from_encrypted_buf(const infinint & crypt_offset);
+
     };
 
 	/// @}
