@@ -50,6 +50,7 @@ char *strchr (), *strrchr ();
 
 #include "tronconneuse.hpp"
 #include "tools.hpp"
+#include "memory_file.hpp"
 
 using namespace std;
 
@@ -456,7 +457,7 @@ namespace libdar
 
 	    try
 	    {
-		memory_file tmp;
+		memory_file tmp = gf_read_write;
 
 		tmp.write(encrypted_buf, encrypted_buf_data);
 		clear_offset = (*trailing_clear_data)(tmp, reading_ver);
