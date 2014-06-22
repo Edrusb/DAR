@@ -48,6 +48,7 @@ char *strchr (), *strrchr ();
 
 #include "tronconneuse.hpp"
 #include "tools.hpp"
+#include "memory_file.hpp"
 
 using namespace std;
 
