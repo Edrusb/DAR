@@ -174,17 +174,26 @@ namespace libdar
 
     private:
 	infinint initial_shift;    //< the initial_shift first bytes of the underlying file are not encrypted
+	    //
 	infinint buf_offset;       //< offset of the first byte in buf
 	U_32 buf_byte_data;        //< number of byte of information in buf (buf_byte_data <= buf_size)
 	U_32 buf_size;             //< size of allocated memory for clear data in buf
 	char *buf;                 //< decrypted data (or data to encrypt)
+	    //
 	U_32 clear_block_size;     //< max amount of data that will be encrypted at once (must stay less than buf_size)
-	infinint current_position; //< position of the next character to read or write
+	infinint current_position; //< position of the next character to read or write from the upper layer perspective
 	infinint block_num;        //< block number we next read or write
 	generic_file *encrypted;   //< generic_file where is put / get the encrypted data
-	char *encrypted_buf;       //< buffer of encrypted data (read or to write)
+	    //
 	U_32 encrypted_buf_size;   //< allocated size of encrypted_buf
 	U_32 encrypted_buf_data;   //< amount of byte of information in encrypted_buf
+	char *encrypted_buf;       //< buffer of encrypted data (read or to write)
+	    //
+	infinint extra_buf_offset; //< offset of the first byte of extra_buf
+	U_32 extra_buf_size;       //< allocated size of extra_buf
+	U_32 extra_buf_data;       //< amount of byte of information in extra_buf
+	char *extra_buf;           //< additional read encrypted that follow what is in encrypted_buf used to check for clear data after encrypted data
+	    //
 	bool weof;                 //< whether write_end_of_file() has been called
 	bool reof;                 //< whether we reached eof while reading
 	archive_version reading_ver;//< archive format we currently read
