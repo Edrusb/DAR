@@ -311,7 +311,8 @@ namespace libdar
 	infinint crypt_offset;
 	infinint tmp_ret;
 
-	if(current_position < buf_offset || (buf_offset + infinint(buf_byte_data)) <= current_position) // requested data not in current clear buffer
+	if(current_position < buf_offset
+	   || ((buf_offset + infinint(buf_byte_data)) <= current_position && !reof)) // requested data not in current clear buffer
 	{
 	    position_clear2crypt(current_position, crypt_offset, buf_offset, tmp_ret, block_num);
 	    if(!reof && encrypted->skip(crypt_offset + initial_shift))

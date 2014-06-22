@@ -301,7 +301,10 @@ namespace libdar
 	case ec_init:
 	case ec_eod:
 	case ec_detruits:
-	    throw SRC_BUG;
+	    if(cat_det == NULL)
+		throw SRC_BUG;
+	    cat_det->skip_read_to_parent_dir();
+	    break;
 	case ec_marks:
 	    ceci->wait_parent_depth = depth;
 	    break;
