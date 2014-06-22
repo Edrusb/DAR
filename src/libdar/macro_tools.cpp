@@ -845,16 +845,10 @@ namespace libdar
     infinint macro_tools_get_terminator_start(generic_file & f, const archive_version & reading_ver)
     {
 	terminateur term;
-	infinint width;
 
-	f.skip_to_eof();
-	width = f.get_position();
-
+        f.skip_to_eof();
 	term.read_catalogue(f, false, reading_ver);
-	if(term.get_catalogue_start() < width)
-	    width = term.get_catalogue_start();
-
-	return width;
+        return term.get_catalogue_start();
     }
 
     void macro_tools_create_layers(user_interaction & dialog,
