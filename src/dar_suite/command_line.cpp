@@ -91,7 +91,7 @@ extern "C"
 #include "fichier.hpp"
 #include "libdar_4_4.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:<:>:=:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -1042,8 +1042,6 @@ static bool get_args_recursive(recursive_param & rec,
                 show_version(*rec.dialog, argv[0]);
 		p.op = version_or_help;
                 return false;
-            case ':':
-                throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
             case 'i':
                 if(optarg == NULL)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
@@ -1537,7 +1535,7 @@ static bool get_args_recursive(recursive_param & rec,
 		    else
 			throw Erange("get_args", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
 		break;
-	    case ';':
+	    case '9':
 		if(optarg == NULL)
 		    throw Erange("get_args", tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
 		else
@@ -1582,6 +1580,8 @@ static bool get_args_recursive(recursive_param & rec,
 		tmp_pre_mask.glob_exp = rec.glob_mode;
                 rec.backup_hook_include_exclude.push_back(tmp_pre_mask);
 		break;
+            case ':':
+                throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
             case '?':
                 rec.dialog->warning(tools_printf(gettext("Ignoring unknown option -%c"),char(optopt)));
                 break;
@@ -2061,7 +2061,7 @@ const struct option *get_long_opt()
 	{"dirty-behavior", required_argument, NULL, '2'},
 	{"user-comment", required_argument, NULL, '.'},
 	{"hash", required_argument, NULL, '3'},
-	{"min-digits", required_argument, NULL, ';'},
+	{"min-digits", required_argument, NULL, '9'},
 	{"backup-hook-include", required_argument, NULL, '<'},
 	{"backup-hook-exclude", required_argument, NULL, '>'},
 	{"backup-hook-execute", required_argument, NULL, '='},

@@ -76,7 +76,7 @@ using namespace libdar;
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
 #define INVALID_ARG "Invalid argument given to -%c (requires integer)"
-#define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:"
+#define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:9:"
 
 enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, moving, interactive, check, batch };
 
@@ -459,9 +459,9 @@ static bool command_line(user_interaction & dialog,
 		case 'k':
 		    even_when_removed = true;
 		    break;
-		case ';':
+		case '9':
 		    if(op != add)
-			dialog.warning(gettext("-; option is only valid after -A option, ignoring it"));
+			dialog.warning(gettext("-9 option is only valid after -A option, ignoring it"));
 		    else
 		    {
 			try
@@ -486,6 +486,8 @@ static bool command_line(user_interaction & dialog,
 		    else
 			throw Erange("command_line", tools_printf(gettext(INVALID_ARG), char(lu)));
 		    break;
+		case ':':
+		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
 		case '?':
 		    dialog.warning(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
 		    break;
@@ -913,7 +915,7 @@ static const struct option *get_long_opt()
 	{"check", no_argument, NULL, 'c'},
  	{"batch", required_argument, NULL, '@'},
 	{"ignore-options-in-base", no_argument, NULL, 'N'},
-	{"min-digits", required_argument, NULL, ';'},
+	{"min-digits", required_argument, NULL, '9'},
 	{"ignore-when-removed", no_argument, NULL, 'k'},
 	{"alter", required_argument, NULL, 'a'},
         { NULL, 0, NULL, 0 }

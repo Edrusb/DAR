@@ -66,7 +66,7 @@ char *strchr (), *strrchr ();
 #include "line_tools.hpp"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
-#define OPT_STRING "i:o:hVE:Qj"
+#define OPT_STRING "i:o:hVE:Qj9:"
 
 using namespace libdar;
 using namespace std;
@@ -208,7 +208,7 @@ static bool command_line(user_interaction & dialog,
 	case 'Q':
 	case 'j':
 	    break;  // ignore this option already parsed during initialization (dar_suite.cpp)
-	case ';':
+	case '9':
 	    if(optarg == NULL)
 		throw Erange("command_line", tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
 	    else

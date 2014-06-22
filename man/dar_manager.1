@@ -6,7 +6,7 @@ dar_manager \- compiles several archives contents in a database to ease file res
 
 dar_manager [-v] [-j] -C [<path>/]<database>
 
-dar_manager [-v] [-j] -B [<path>/]<database> -A [<path>/]<basename> [-; <min-digits>] [[<path>/]<archive_basename>]
+dar_manager [-v] [-j] -B [<path>/]<database> -A [<path>/]<basename> [-9 <min-digits>] [[<path>/]<archive_basename>]
 
 dar_manager [-v] [-j] -B [<path>/]<database> -l
 
@@ -64,7 +64,7 @@ use a keyboard interactive text menu to do operations on the given database. So 
 -A, --add [<path>/]<basename> [ [<path>/]<archive_basename>]
 add an archive to the database. An isolated catalogue can also be used only if it has been produced by dar version 1.2.0 or above. Why ? Because, an isolated catalogue produced by older version will always tell that no files are saved in the archive of reference, in that case the solution is to provide the archive itself as argument. An optional second argument is the basename of the archive if it is different from the first argument (need for extraction of files). For example you could have an isolated catalogue in first argument and the basename of the original archive (where is stored the data) as second argument. By default,
 .TP 20
--;, --min-digits <num>
+-9, --min-digits <num>
 the slice number zeroed padding to use to get the slices filename (for more details see dar man page at this same option)
 .B dar_manager
 will look for an archive of reference in the command line used to create each archive, but in some cases, it may be necessary to specify the archive name (for example if you've changed its name).
