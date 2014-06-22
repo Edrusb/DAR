@@ -78,6 +78,9 @@ namespace libdar
 	encrypted_buf = NULL; // cannot invoke pure virtual methods from constructor
 	encrypted_buf_data = 0;
 	encrypted_buf_size = 0;
+	extra_buf_size = 0;
+	extra_buf_data = 0;
+	extra_buf = NULL;
 	weof = false;
 	reof = false;
 	reading_ver = x_reading_ver;
@@ -266,9 +269,17 @@ namespace libdar
 	    meta_delete(encrypted_buf);
 	    encrypted_buf = NULL;
 	}
+	if(extra_buf != NULL)
+	{
+	    meta_delete(extra_buf);
+	    extra_buf = NULL;
+	}
 	buf_size = 0;
+	buf_byte_data = 0;
 	encrypted_buf_size = 0;
 	encrypted_buf_data = 0;
+	extra_buf_size = 0;
+	extra_buf_data = 0;
     }
 
     void tronconneuse::copy_from(const tronconneuse & ref)
@@ -302,6 +313,13 @@ namespace libdar
 	    if(encrypted_buf == NULL)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(encrypted_buf, ref.encrypted_buf, encrypted_buf_data);
+
+	    extra_buf_size = ref.extra_buf_size;
+	    extra_buf_data = ref.extra_buf_data;
+	    meta_new(extra_buf, extra_buf_size);
+	    if(extra_buf == NULL)
+		throw Ememory("tronconneuse::copy_from");
+	    (void)memcpy(extra_buf, ref.extra_buf, extra_buf_data);
 	    weof = ref.weof;
 	    reof = ref.reof;
 	    reading_ver = ref.reading_ver;
@@ -324,9 +342,25 @@ namespace libdar
 	   || ((buf_offset + infinint(buf_byte_data)) <= current_position && !reof)) // requested data not in current clear buffer
 	{
 	    position_clear2crypt(current_position, crypt_offset, buf_offset, tmp_ret, block_num);
-	    if(!reof && encrypted->skip(crypt_offset + initial_shift))
+
+	    if(!reof)
 	    {
-		encrypted_buf_data = encrypted->read(encrypted_buf, encrypted_buf_size);
+		    // if extra_buf contains the encrypted byte we need we move them to encrypted_buf
+		if(crypt_offset >= extra_buf_offset && crypt_offset < extra_buf_offset + extra_buf_data)
+		{
+		    memcpy(encrypted_buf, extra_buf, extra_buf_data);
+		    encrypted_buf_data = extra_buf_data;
+		    extra_buf_data = 0;
+		}
+		else // else we drop empty encrypted_buf
+		    encrypted_buf_data = 0;
+
+		    // we skip at the beginning of the crypted block plus the already read bytes from extra_buf
+		if(!encrypted->skip(crypt_offset + initial_shift + encrypted_buf_data))
+		    buf_byte_data = 0;
+
+		    // we can now read the remaining data to complete the crypto block
+		encrypted_buf_data += encrypted->read(encrypted_buf, encrypted_buf_size - encrypted_buf_data);
 
 		if(encrypted_buf_data < encrypted_buf_size)
 		{
@@ -428,6 +462,7 @@ namespace libdar
 	}
 	if(buf == NULL)
 	{
+	    buf_byte_data = 0;
 	    buf_size = clear_block_allocated_size_for(clear_block_size);
 	    if(buf_size < clear_block_size)
 		throw SRC_BUG; // buf_size must be larger than or equal to clear_block_size
@@ -435,6 +470,17 @@ namespace libdar
 	    if(buf == NULL)
 	    {
 		buf_size = 0;
+		throw Ememory("tronconneuse::init_encrypte_buf_size");
+	    }
+	}
+	if(extra_buf == NULL)
+	{
+	    extra_buf_data = 0;
+	    extra_buf_size = encrypted_buf_size; // using same size as encrypted_buf
+	    meta_new(extra_buf, extra_buf_size);
+	    if(extra_buf == NULL)
+	    {
+		extra_buf_size = 0;
 		throw Ememory("tronconneuse::init_encrypte_buf_size");
 	    }
 	}
@@ -464,18 +510,33 @@ namespace libdar
 	if(trailing_clear_data != NULL)
 	{
 	    infinint clear_offset = 0;
+	    bool notfound = false;
+
+	    if(extra_buf_data > 0)
+		throw SRC_BUG;
+
+	    if(!reof)
+	    {
+		extra_buf_offset = encrypted->get_position();
+		extra_buf_data = encrypted->read(extra_buf, extra_buf_size);
+	    }
 
 	    try
 	    {
 		memory_file tmp;
 
 		tmp.write(encrypted_buf, encrypted_buf_data);
+		if(extra_buf_data > 0)
+		    tmp.write(extra_buf, extra_buf_data);
 		clear_offset = (*trailing_clear_data)(tmp, reading_ver);
 		    // this is the offset that is written in the archive
 		    // it is thus not relative to tmp but to the real
 		    // sub layer including the initial_shift bytes
-		clear_offset -= initial_shift;
+		if(clear_offset >= initial_shift)
+		    clear_offset -= initial_shift;
 		    // now clear_offset can be compared to crypt_offset
+		else
+		    notfound = true;
 	    }
 	    catch(Egeneric & e)
 	    {
@@ -486,8 +547,15 @@ namespace libdar
 		throw SRC_BUG;
 	    }
 
+	    if(notfound)
+		return;
+
 	    if(crypt_offset >= clear_offset) // all data in encrypted_buf is clear data
+	    {
 		encrypted_buf_data = 0;
+		extra_buf_data = 0;
+		reof = true;
+	    }
 	    else
 	    {
 		U_I nouv_buf_data = 0;
@@ -497,7 +565,11 @@ namespace libdar
 		if(clear_offset > 0)
 		    throw SRC_BUG; // cannot handle that integer as U_32 while this number should be less than encrypted_buf_size which is a U_32
 		if(nouv_buf_data <= encrypted_buf_data)
+		{
 		    encrypted_buf_data = nouv_buf_data;
+		    extra_buf_data = 0;
+		    reof = true;
+		}
 		else
 		    throw SRC_BUG; // more encrypted data than could be read so far!
 	    }
