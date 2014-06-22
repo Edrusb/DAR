@@ -262,7 +262,7 @@ namespace libdar
 	}
 	if(extra_buf != NULL)
 	{
-	    meta_delete(extra_buf);
+	    delete [] extra_buf;
 	    extra_buf = NULL;
 	}
 	buf_size = 0;
@@ -307,7 +307,7 @@ namespace libdar
 
 	    extra_buf_size = ref.extra_buf_size;
 	    extra_buf_data = ref.extra_buf_data;
-	    meta_new(extra_buf, extra_buf_size);
+	    extra_buf = new (nothrow) char[extra_buf_size];
 	    if(extra_buf == NULL)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(extra_buf, ref.extra_buf, extra_buf_data);
@@ -468,7 +468,7 @@ namespace libdar
 	{
 	    extra_buf_data = 0;
 	    extra_buf_size = encrypted_buf_size; // using same size as encrypted_buf
-	    meta_new(extra_buf, extra_buf_size);
+	    extra_buf = new (nothrow) char[extra_buf_size];
 	    if(extra_buf == NULL)
 	    {
 		extra_buf_size = 0;
