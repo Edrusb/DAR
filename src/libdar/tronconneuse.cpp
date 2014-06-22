@@ -258,12 +258,12 @@ namespace libdar
     {
 	if(buf != NULL)
 	{
-	    delete [] buf;
+	    meta_delete(buf);
 	    buf = NULL;
 	}
 	if(encrypted_buf != NULL)
 	{
-	    delete [] encrypted_buf;
+	    meta_delete(encrypted_buf);
 	    encrypted_buf = NULL;
 	}
 	buf_size = 0;
@@ -285,7 +285,7 @@ namespace libdar
 	    buf_offset = ref.buf_offset;
 	    buf_byte_data = ref.buf_byte_data;
 	    buf_size = ref.buf_size;
-	    buf = new (nothrow) char[buf_size];
+	    meta_new(buf, buf_size);
 	    if(buf == NULL)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(buf, ref.buf, buf_byte_data);
@@ -298,7 +298,7 @@ namespace libdar
 
 	    encrypted_buf_size = ref.encrypted_buf_size;
 	    encrypted_buf_data = ref.encrypted_buf_data;
-	    encrypted_buf = new (nothrow) char[encrypted_buf_size];
+	    meta_new(encrypted_buf, encrypted_buf_size);
 	    if(encrypted_buf == NULL)
 		throw Ememory("tronconneuse::copy_from");
 	    (void)memcpy(encrypted_buf, ref.encrypted_buf, encrypted_buf_data);
@@ -418,7 +418,7 @@ namespace libdar
 	{
 	    encrypted_buf_data = 0;
 	    encrypted_buf_size = encrypted_block_size_for(clear_block_size);
-	    encrypted_buf = new (nothrow) char[encrypted_buf_size];
+	    meta_new(encrypted_buf, encrypted_buf_size);
 	    if(encrypted_buf == NULL)
 	    {
 		encrypted_buf_size = 0;
@@ -430,7 +430,7 @@ namespace libdar
 	    buf_size = clear_block_allocated_size_for(clear_block_size);
 	    if(buf_size < clear_block_size)
 		throw SRC_BUG; // buf_size must be larger than or equal to clear_block_size
-	    buf = new (nothrow) char[buf_size];
+	    meta_new(buf, buf_size);
 	    if(buf == NULL)
 	    {
 		buf_size = 0;
