@@ -111,8 +111,7 @@ namespace libdar
 						       bool even_partial_catalogues,
 						       const label & layer1_data_name);
 
-	// the beginning of the catalogue.
-
+	// return the offset of the beginning of the catalogue.
     extern infinint macro_tools_get_terminator_start(generic_file & f, const archive_version & reading_ver);
 
 } // end of namespace
