@@ -87,10 +87,10 @@ _ + retry on change                      --retry-on-change <count[:max byte]>
 6 + define internal key lengh with gnupg --key-length <length in bytes>
 7 + define keys used to sign the archive --sign <comma separated list of emails>
 8 !
-9 !
+9 + min_digits                           --min-digits archive[,ref[,aux]];
 " + anonymous pipe descriptor to read conf from. --pipe-fd
 . + user comment                         --user-comment
-; + min_digits                           --min-digits archive[,ref[,aux]];
+; x (forbidden by getopt)
 < + backup hook mask                     --backup-hook-include
 > + backup hook mask                     --backup-hook-exclude
 = + backup hook execute                  --backup-hook-execute

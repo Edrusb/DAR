@@ -59,7 +59,7 @@ using namespace libdar;
 
 #define DAR_XFORM_VERSION "1.5.5"
 
-#define OPT_STRING  "s:S:p::wnhbVE:F:a::Qj^:3:;:"
+#define OPT_STRING  "s:S:p::wnhbVE:F:a::Qj^:3:9:"
 
 static bool command_line(shell_interaction & dialog,
 			 S_I argc, char * const argv[],
@@ -464,7 +464,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 		    else
 			throw Erange("command_line", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
 		break;
-	    case ';':
+	    case '9':
 		if(optarg == NULL)
 		    throw Erange("command_line", tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
 		else
