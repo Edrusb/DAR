@@ -543,7 +543,12 @@ namespace libdar
 	    }
 	    catch(Egeneric & e)
 	    {
-		throw Erange("tronconneuse::check_trailing_clear_data", gettext("Cannot determine location of the end of cyphered data: ") + e.get_message());
+		if(reof)
+		{
+		    encrypted_buf_data = 0;
+		    extra_buf_data = 0;
+		}
+		notfound = true;
 	    }
 	    catch(...)
 	    {
