@@ -66,6 +66,7 @@ namespace libdar
     const string LIBDAR_STACK_LABEL_CLEAR =  "CLEAR";
     const string LIBDAR_STACK_LABEL_UNCYPHERED = "UNCYPHERED";
     const string LIBDAR_STACK_LABEL_LEVEL1 = "LEVEL1";
+    const string LIBDAR_STACK_LABEL_ANONYMOUS = "WHATEVER";
 
     const archive_version macro_tools_supported_version = archive_version(9,0);
 
@@ -1133,11 +1134,19 @@ namespace libdar
 		    else
 		    {
 			if(crypto != crypto_none)
-			    layers.push(tmp);
+			    if(writing_to_pipe)
+				layers.push(tmp, LIBDAR_STACK_LABEL_ANONYMOUS, true);
+			    else
+				layers.push(tmp);
 			else
 			    layers.push(tmp, LIBDAR_STACK_LABEL_CACHE_PIPE, true);
 			tmp = NULL;
 		    }
+		}
+		else
+		{
+		    if(tmp != NULL)
+			throw SRC_BUG;
 		}
 
 		if(crypto != crypto_none) // initial elastic buffer

@@ -73,8 +73,8 @@ namespace libdar
 
     cache::cache(generic_file & hidden,
 		 bool shift_mode,
-		 U_I x_size) : generic_file(gf_read_write)
-				   // in any case we provide read write facility in
+		 U_I x_size) : generic_file(hidden.get_mode() == gf_read_only ? gf_read_only : gf_read_write)
+				   // except if hidden is read-only we provide read-write facility in
 				   // the cache, for what is out of the cache we check
 				   // the underlying object mode
     {
