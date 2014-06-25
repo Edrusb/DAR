@@ -672,12 +672,30 @@ AC_ARG_ENABLE( [dar-static],
 MEM_LDFLAGS=$LDFLAGS
 LDFLAGS="-static"
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+				    	        #if HAVE_STDIO_H
                                                 #include <stdio.h>
+						#endif
+						#if HAVE_EXECINFO_H
+						#include <execinfo.h>
+						#endif
+						#if HAVE_STDLIB_H
+						#include <stdlib.h>
+						#endif
                                              }
                                ]],
-                               [
+                               [[
+			       #if HAVE_EXECINFO_H
+			          const int buf_size = 20;
+				  void *buffer[buf_size];
+				  int size = backtrace(buffer, buf_size);
+				  char **symbols = backtrace_symbols(buffer, size);
+
+				  if(symbols != NULL)
+				    free(symbols);
+			       #endif
+
                                   printf("Hello World!");
-                               ])
+                               ]])
 	       ],
                [static_pb="no"],
                [static_pb="yes"])
