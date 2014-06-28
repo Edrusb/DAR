@@ -223,7 +223,10 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	return read_to_eof();
+	if(get_mode() != gf_write_only)
+	    return read_to_eof();
+	else
+	    return true;
     }
 
     bool tuyau::skip_relative(S_I x)
