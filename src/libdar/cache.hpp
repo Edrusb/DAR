@@ -37,7 +37,7 @@ namespace libdar
 	/// @}
 
 	/// the cache class implements a fixed length read/write caching mechanism
-
+	///
 	/// it is intended to reduce context switches when no compression is used
 	/// and when reading or writing catalogue through a pipe. The catalogue
 	/// read and write is done by calling dump/constructor methods of the many
@@ -47,16 +47,18 @@ namespace libdar
 	/// as the compression engine gather these many small reads or writes into
 	/// much bigger ones. This in only when there is no compression or encryption
 	/// that this class is useful (and used).
+	/// Another target of class cache is to provide limited skippability when
+	/// data is read of written to pipe (which do not have any skippability)
     class cache : public generic_file
     {
     public:
 	cache(generic_file & hidden, 	          //< is the file to cache, it is never deleted by the cache object,
 	      bool shift_mode,                    //< if true, when all cached data has been read, half of the data is flushed from the cache, the other half is shifted and new data take place to fill the cache. This is necessary for sequential reading, but has some CPU overhead.
 	      U_I size = 102400);                 //< is the (fixed) size of the cache
-	cache(const cache & ref) : generic_file(gf_read_only) { throw SRC_BUG; };
+	cache(const cache & ref) : generic_file(ref.get_mode()) { throw SRC_BUG; };
 	const cache & operator = (const cache & ref) { throw SRC_BUG; };
 	~cache();
-	void reduce_to_readonly() { set_mode(gf_read_only); };
+	void change_to_read_write() { if(get_mode() == gf_read_only) throw SRC_BUG; set_mode(gf_read_write); };
 
 	    // inherited from generic_file
 

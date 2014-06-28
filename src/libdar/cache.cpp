@@ -60,20 +60,9 @@ using namespace std;
 namespace libdar
 {
 
-// This implementation of cache is a bit simple
-// we do not need a read read-write caching scheme but rather a read or write caching scheme
-// to make it possible to use for reading and writing (for coherence and avoid change in the use) the
-// caching scheme works either in read caching or write caching alternatively depending on the read() or write()
-// use.
-//
-// if a real read-write caching is required, this implementation can be completely reviewed without any
-// change in its usage.  Currently we just need to gather several read or write on a single huge one.
-//
-
-
     cache::cache(generic_file & hidden,
 		 bool shift_mode,
-		 U_I x_size) : generic_file(hidden.get_mode() == gf_read_only ? gf_read_only : gf_read_write)
+		 U_I x_size) : generic_file(hidden.get_mode())
 				   // except if hidden is read-only we provide read-write facility in
 				   // the cache, for what is out of the cache we check
 				   // the underlying object mode
