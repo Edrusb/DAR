@@ -371,11 +371,47 @@ namespace libdar
 	if(of_fd == NULL)
 	    throw SRC_BUG;
         ret = of_fd->skip_to_eof();
-	if(!old_sar)
-	    of_fd->skip_relative(-1);
-        file_offset = of_fd->get_position();
-        set_offset(file_offset);
-
+	switch(get_mode())
+	{
+	case gf_read_only:
+	    if(!old_sar)
+		of_fd->skip_relative(-1);
+	    file_offset = of_fd->get_position();
+	    set_offset(file_offset);
+	    break;
+	case gf_read_write:
+	case gf_write_only:
+	    file_offset = of_fd->get_position();
+	    if(of_current == 1)
+	    {
+		if(file_offset == first_size)
+		{
+			// we point to the slice trailer, which is not sar data
+			// so we skip back one byte
+		    --file_offset;
+		    of_fd->skip(file_offset);
+		}
+		else
+		    if(file_offset > first_size)
+			throw SRC_BUG; // should not be possible to have an initial slice larger than first_size
+	    }
+	    else
+	    {
+		if(file_offset == size)
+		{
+			// we point to the slice trailer, which is not sar data
+			// so we skip back one byte
+		    --file_offset;
+		    of_fd->skip(file_offset);
+		}
+		else
+		    if(file_offset > size)
+			throw SRC_BUG; // should not be possible to have a slice larger than size
+	    }
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
         return ret;
     }
 
@@ -565,7 +601,7 @@ namespace libdar
 
         while(to_write > 0)
         {
-            max_at_once = of_current == 1 ? (first_size - file_offset) - trailer_size : (size - file_offset) - trailer_size;
+	    max_at_once = of_current == 1 ? (first_size - file_offset) - trailer_size : (size - file_offset) - trailer_size;
             tmp_wrote = max_at_once > to_write ? to_write : max_at_once;
             if(tmp_wrote > 0)
             {
@@ -1160,7 +1196,6 @@ namespace libdar
 		break;
 	    case gf_write_only:
 	    case gf_read_write:
-
 		if(num < of_current)
 		    throw Erange("sar::open_file", "Skipping backward would imply accessing/modifying previous slice");
 
@@ -1221,46 +1256,56 @@ namespace libdar
     {
         infinint num;
 
-        if(of_last_file_known)
-            open_file(of_last_file_num);
-        else // last slice number is not known
-        {
-            bool ask_user = false;
+	switch(get_mode())
+	{
+	case gf_read_only:
+	    if(of_last_file_known)
+		open_file(of_last_file_num);
+	    else // last slice number is not known
+	    {
+		bool ask_user = false;
 
-            while(of_fd == NULL || of_flag != flag_type_terminal)
-            {
-                if(sar_get_higher_number_in_dir(*entr, base, min_digits, ext, num))
-                {
-                    open_file(num);
-                    if(of_flag != flag_type_terminal)
+		while(of_fd == NULL || of_flag != flag_type_terminal)
+		{
+		    if(sar_get_higher_number_in_dir(*entr, base, min_digits, ext, num))
 		    {
-                        if(!ask_user)
-                        {
-                            close_file(false);
-                            hook_execute(0); // %n replaced by 0 means last file is about to be requested
-                            ask_user = true;
-                        }
-                        else
-                        {
-                            close_file(false);
-			    get_ui().pause(string(gettext("The last file of the set is not present in ")) + entr->get_url() + gettext(" , please provide it."));
-                        }
+			open_file(num);
+			if(of_flag != flag_type_terminal)
+			{
+			    if(!ask_user)
+			    {
+				close_file(false);
+				hook_execute(0); // %n replaced by 0 means last file is about to be requested
+				ask_user = true;
+			    }
+			    else
+			    {
+				close_file(false);
+				get_ui().pause(string(gettext("The last file of the set is not present in ")) + entr->get_url() + gettext(" , please provide it."));
+			    }
+			}
 		    }
-                }
-                else // not slice available in the directory
-                    if(!ask_user)
-                    {
-                        hook_execute(0); // %n replaced by 0 means last file is about to be requested
-                        ask_user = true;
-                    }
-                    else
-                    {
-			string chem = entr->get_url();
-                        close_file(false);
-                        get_ui().pause(tools_printf(gettext("No backup file is present in %S for archive %S, please provide the last file of the set."), &chem, &base));
-                    }
-            }
-        }
+		    else // not slice available in the directory
+			if(!ask_user)
+			{
+			    hook_execute(0); // %n replaced by 0 means last file is about to be requested
+			    ask_user = true;
+			}
+			else
+			{
+			    string chem = entr->get_url();
+			    close_file(false);
+			    get_ui().pause(tools_printf(gettext("No backup file is present in %S for archive %S, please provide the last file of the set."), &chem, &base));
+			}
+		}
+	    }
+	case gf_read_write:
+	case gf_write_only:
+	    open_file(of_max_seen);
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
     }
 
     header sar::make_write_header(const infinint & num, char flag)

@@ -2817,16 +2817,7 @@ namespace libdar
 					    fic->set_last_modif(tools_get_mtime(info_quoi));
 
 						// updating the size of the file
-					    infinint new_size = tools_get_size(info_quoi);
-					    if(new_size < fic->get_size())
-						throw SRC_BUG;
-						// current code may fail if file is smaller than previous time:
-						// the archive may not end a the end of slice if the resaved file was
-						// larger than it is now the new time we save it, the resulting
-						// archive open would fail in direct mode (it should work in
-						// sequential reading mode if not disabled by -at option.
-					    else
-						fic->change_size(new_size);
+					    fic->change_size(tools_get_size(info_quoi));
 					}
 					else
 					{

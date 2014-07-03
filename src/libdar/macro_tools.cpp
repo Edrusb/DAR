@@ -66,7 +66,6 @@ namespace libdar
     const string LIBDAR_STACK_LABEL_CLEAR =  "CLEAR";
     const string LIBDAR_STACK_LABEL_UNCYPHERED = "UNCYPHERED";
     const string LIBDAR_STACK_LABEL_LEVEL1 = "LEVEL1";
-    const string LIBDAR_STACK_LABEL_ANONYMOUS = "WHATEVER";
 
     const archive_version macro_tools_supported_version = archive_version(9,0);
 
@@ -397,7 +396,6 @@ namespace libdar
 		tmp = tmp_cache = new (pool) cache (*(stack.top()), false);
 		if(tmp == NULL)
 		    dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
-		tmp_cache->reduce_to_readonly();
 		break;
 	    case crypto_blowfish:
 	    case crypto_aes256:
@@ -890,6 +888,8 @@ namespace libdar
 	    bool force_permission = (slice_permission != "");
 	    U_I permission = force_permission ? tools_octal2int(slice_permission) : 0; // 0 or anything else, this does not matter
 	    gf_mode open_mode = gf_read_write; // by default first layer is read-write except in case of hashing or encryption
+		// read-write mode is used when skipping back due to file change, the escape layer needs to read the few
+		// bytes before the backward position to take care of tape marks
 
 	    layers.clear();
 
@@ -989,14 +989,17 @@ namespace libdar
 		if(writing_to_pipe)
 		{
 		    if(info_details)
-			dialog.warning(gettext("Adding cache layer over pipe to provide limited read/write access..."));
+			dialog.warning(gettext("Adding cache layer over pipe to provide limited skippability..."));
 
-		    tmp = new (pool) cache(*(layers.top()), true);
-		    if(tmp == NULL)
+		    cache *c_tmp = new (pool) cache(*(layers.top()), true);
+		    if(c_tmp == NULL)
 			throw Ememory("op_create_in_sub");
 		    else
 		    {
-			layers.push(tmp,LIBDAR_STACK_LABEL_CACHE_PIPE, true);
+			tmp = c_tmp; // to handle the object destruction in case of exception
+			if(open_mode == gf_read_write)
+			    c_tmp->change_to_read_write();
+			layers.push(c_tmp, LIBDAR_STACK_LABEL_CACHE_PIPE, true);
 			tmp = NULL;
 		    }
 		}
@@ -1133,13 +1136,7 @@ namespace libdar
 			throw Ememory("op_create_in_sub");
 		    else
 		    {
-			if(crypto != crypto_none)
-			    if(writing_to_pipe)
-				layers.push(tmp, LIBDAR_STACK_LABEL_ANONYMOUS, true);
-			    else
-				layers.push(tmp);
-			else
-			    layers.push(tmp, LIBDAR_STACK_LABEL_CACHE_PIPE, true);
+			layers.push(tmp);
 			tmp = NULL;
 		    }
 		}
@@ -1296,6 +1293,10 @@ namespace libdar
 
 	if(info_details)
 	    dialog.warning(gettext("Writing down the second archive terminator..."));
+	    // due to the possibility a file get shorter after being resaved because it was modified at the
+	    // time it was read for backup, we must be sure the last terminator is well positionned at end of file
+	layers.skip_to_eof();
+
 	coord.dump(layers);
 	layers.sync_write();
 

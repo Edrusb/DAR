@@ -361,7 +361,7 @@ namespace libdar
 	U_I reste = last % 2;
 
 	if(next < half)
-	    throw SRC_BUG; // current position would be out of the buffer
+	    return; // current position would be out of the buffer so we don't shift
 	if(first_to_write < half)
 	    throw SRC_BUG;
 	if(last > 1)
@@ -379,11 +379,9 @@ namespace libdar
 
     void cache::clear_buffer()
     {
-	if(next != last)
-	    throw SRC_BUG; // current position would be out of buffer
 	if(need_flush_write())
 	    throw SRC_BUG;
-	buffer_offset += last;
+	buffer_offset += next;
 	next = last = 0;
     }
 
@@ -397,7 +395,7 @@ namespace libdar
 	if(need_flush_write()) // we have something to flush
 	{
 	    ref->skip(buffer_offset + first_to_write);
-	    ref->write(buffer + first_to_write, last - first_to_write); // may fail if underlying is read_only
+	    ref->write(buffer + first_to_write, last - first_to_write);
 	}
 	first_to_write = size;
 
