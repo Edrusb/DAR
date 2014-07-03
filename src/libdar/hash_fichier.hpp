@@ -104,7 +104,7 @@ namespace libdar
 	    // inherited from generic_file
 	bool skippable(skippability direction, const infinint & amount) { return false; };
         bool skip(const infinint & pos) {if(ref == NULL || pos != ref->get_position()) throw SRC_BUG; else return true; };
-        bool skip_to_eof() { throw SRC_BUG; };
+        bool skip_to_eof() { return true; }; // we are always at end of file
         bool skip_relative(S_I x) { if(x != 0) throw SRC_BUG; else return true; };
 	infinint get_position() { if(ref == NULL) throw SRC_BUG; return ref->get_position(); };
 
