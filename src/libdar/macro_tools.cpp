@@ -247,7 +247,10 @@ namespace libdar
 			    out = NULL;
 			}
 			else
+			{
 			    in = out = NULL; // now managed by the zapette
+			    tmp->skip_to_eof(); // not sequential reading mode we must skip at eof
+			}
 		    }
 		    catch(...)
 		    {
