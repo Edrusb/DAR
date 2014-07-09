@@ -214,7 +214,11 @@ namespace libdar
         request req;
         answer ans;
         char *buffer = NULL;
-        U_16 buf_size = 0;
+        U_16 buf_size = 1024;
+
+	meta_new(buffer, buf_size);
+	if(buffer == NULL)
+	    throw Ememory("slave_zapette::action");
 
         try
         {
@@ -232,10 +236,9 @@ namespace libdar
                         if(req.size > buf_size)
                         {
                             if(buffer != NULL)
-			    {
 				meta_delete(buffer);
-				meta_new(buffer, req.size);
-			    }
+
+			    meta_new(buffer, req.size);
                             if(buffer == NULL)
                                 throw Ememory("slave_zapette::action");
                             else
