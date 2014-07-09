@@ -11,6 +11,28 @@ else
   export DAR=../dar_suite/dar
 fi
 
+if [ ! -x ../dar_suite/dar_slave ] ; then
+  echo "********************************************"
+  echo ""
+  echo "Dar_slave is not built, aborting"
+  echo ""
+  echo "********************************************"
+  exit 2
+else
+  export DAR_SLAVE=../dar_suite/dar_slave
+fi
+
+if [ ! -x ../dar_suite/dar_xform ] ; then
+  echo "********************************************"
+  echo ""
+  echo "Dar_xform is not built, aborting"
+  echo ""
+  echo "********************************************"
+  exit 2
+else
+  export DAR_XFORM=../dar_suite/dar_xform
+fi
+
 if [ ! -x ./all_features ] ; then
   echo "********************************************"
   echo ""

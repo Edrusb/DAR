@@ -29,7 +29,7 @@ hash="${11}"
 #echo "re_hole = $re_hole"
 #echo "hash = [$hash]"
 
-ALL_TESTS="A1 B1 B2 B3 B4 C1 C2 C3 C4 D1 E1 E2 E3 F1 F2 F3"
+ALL_TESTS="A1 B1 B2 B3 B4 C1 C2 C3 C4 D1 E1 E2 E3 F1 F2 F3 G1 G2 G3 H1"
 
 export OPT=tmp.file
 
@@ -54,10 +54,16 @@ if [ "$slice" != "none" ]; then
   if [ "$Slice" != "none" ]; then
     slicing="$slicing -S $Slice"
   fi
+  ALL_TESTS=`echo $ALL_TESTS | sed -r -e 's/(G1|G2|G3)//g'`
 else
   slicing=""
 fi
 
+if [ "$seq_read" = "y" ] ; then
+  ALL_TESTS=`echo $ALL_TESTS | sed -r -e 's/G2//g'`
+else
+  ALL_TESTS=`echo $ALL_TESTS | sed -r -e 's/G3//g'`
+fi
 
 if [ "$tape_mark" = "y" ]; then
   tape=""
@@ -77,8 +83,14 @@ fi
 
 if [ "$digit" != "none" ]; then
   min_digits="--min-digit $digit,$digit,$digit"
+  export xform_digits="-9 $digit,$digit"
+  export slave_digits="-9 $digit"
+  export padded_one=`./padder $digit 1`
 else
   min_digits=""
+  export xform_digits=""
+  export slave_digits=""
+  export padded_one="1"
 fi
 
 sparse="-1 $sparse"

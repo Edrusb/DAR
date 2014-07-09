@@ -20,7 +20,7 @@ endif
 endif
 
 dist_noinst_DATA = build_tree.sh main.sh modif_tree.sh routine.sh loop.sh
-noinst_PROGRAMS = all_features
+noinst_PROGRAMS = all_features padder
 check_PROGRAMS = permission
 LDADD = -L../libdar -l$(MYLIB) $(GPGME_LIBS)
 AM_LDFLAGS = @LTLIBINTL@
@@ -32,6 +32,8 @@ permission:
 all_features_SOURCES = all_features.cpp
 all_features_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 permission_SOURCES =
+
+padder_SOURCES = padder.cpp
 
 clean-local:
 	chmod u+x $(dist_noinst_DATA)

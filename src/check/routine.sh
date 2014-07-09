@@ -46,6 +46,13 @@ full2=full2
 diff2=diff2
 full3=full3
 decr=decr
+todar=todar
+toslave=toslave
+piped=piped
+piped_fly=piped_fly
+xformed1=xformed1
+xformed2=xformed2
+xformed3=xformed3
 
 hash="`sed -r -n -e 's/--hash (.*)/\1/p' tmp.file | tail -n 1`"
 if [ "$hash" = "" ] ; then
@@ -73,7 +80,7 @@ function my_diff {
 
 function GO {
   if [ "$1" == "" ] ; then
-     echo "usage: $0 <label> validexitcode[,validexitcode,...] [debug] command"
+     echo "usage: $0 <label> validexitcode[,validexitcode,...] [debug|disable|piped] command"
      exit 1
   fi
 
@@ -87,20 +94,32 @@ function GO {
     if [ "$3" = "disable" ] ; then
        local disable=yes
     else
-       local disable=no
-       shift 2
+       if [ "$3" = "piped" ] ; then
+	   local piped=yes
+	   local disabled=false
+	   shift 3
+       else
+           local disable=no
+           shift 2
+       fi
     fi
   fi
 
   if [ "$disable" = "yes" ] ; then
     echo "$label = DISABLED"
   else
-    printf "$label = "
-    if [ "$debug" != "yes" ] ;  then
+    if [ "$piped" != "yes" ] ; then
+	printf "$label = "
+    fi
+    if [ "$debug" != "yes" -a "$piped" != "yes" ] ;  then
 	$* 1>/dev/null 2> /dev/null
     else
-	echo "--- debug -----"
-	$*
+	if [ "$piped" != "yes" ] ; then
+	    echo "--- debug -----"
+	    $*
+	else
+	    $* 2> /dev/null
+	fi
     fi
 
     local ret=$?
@@ -110,10 +129,16 @@ function GO {
     done
 
     if [ $is_valid = "yes" ] ; then
-	echo "OK"
+	if [ "$piped" != "yes" ] ; then
+	    echo "OK"
+        fi
     else
-	echo "$label FAILED"
-	echo "--------> $1 FAILED : $*"
+	if [ "$piped" != "yes" ] ; then
+	    echo "$label FAILED"
+	    echo "--------> $1 FAILED : $*"
+	else
+	    echo "--------> $1 FAILED : $*" > /dev/stderr
+	fi
 	exit 1
     fi
 
@@ -166,6 +191,7 @@ function check_hash {
 function clean {
 local verbose=""
 rm -rf $verbose $src $dst $src2
+rm -f $verbose *.md5 *.sha1
 rm -f $verbose $full*.dar
 rm -f $verbose $catf*.dar
 rm -f $verbose $catf_fly*.dar
@@ -183,9 +209,14 @@ rm -f $verbose $merge_full*.dar
 rm -f $verbose $merge_diff*.dar
 rm -f $verbose $full2*.dar
 rm -f $verbose $diff2*.dar
-rm -f $verbose *.md5 *.sha1
 rm -f $verbose $full3*.dar
 rm -f $verbose $decr*.dar
+rm -f $verbose $piped*.dar
+rm -f $verbose $piped_fly*.dar
+rm -f $verbose $xformed1*.dar
+rm -f $verbose $xformed2*.dar
+rm -f $verbose $xformed3*.dar
+rm -f $todar $toslave
 }
 
 clean
@@ -405,9 +436,65 @@ GO "F3-8" 0 my_diff $src $dst
 rm -rf $src $dst
 fi
 
+#
+# G1 - using pipe to output the archive
+#
+rm -rf $src
+./build_tree.sh $src "W"
+if echo $* | grep "G1" > /dev/null ; then
+printf "G1-1 = "
+GO "G1-1" 0 piped $DAR -N -c - -R $src "-@" $piped_fly -B $OPT > $piped.$padded_one.dar
+printf "OK\n"
+GO "G1-2" 0 $DAR -N -d $piped -R $src -B $OPT
+GO "G1-3" 0 $DAR -N -d $piped -R $src -A $piped_fly -B $OPT
+mkdir $dst
+GO "G1-4" 0 $DAR -N -x $piped -R $dst -B $OPT
+GO "G1-5" 0 my_diff  $src $dst
+GO "G1-6" 0 $DAR -N -d $piped -R $dst -B $OPT
+rm -rf $dst
+fi
+
+#
+# G2 - using dar_slave for reading
+#
+if echo $* | grep "G2" > /dev/null ; then
+mkfifo $todar
+mkfifo $toslave
+$DAR_SLAVE -i $toslave -o $todar $slave_digits $piped &
+GO "G2-1" 0 debug $DAR -N -d - -R $src -B $OPT -i $todar -o $toslave
+fi
+
+#
+# G3 - using pipe to read the archive
+#
+if echo $* | grep "G3" > /dev/null ; then
+printf "G3-1 = "
+GO "G3-1" 0 piped $DAR -N -d - -R $src -B $OPT < $piped.$padded_one.dar
+printf "OK\n"
+fi
+
+#
+# H1 - modifying an archive with dar_xform
+#
+if echo $* | grep "H1" > /dev/null ; then
+GO "H1-1" 0 $DAR_XFORM -3 $hash $xform_digits -s 1G $full $xformed1
+GO "H1-2" 0 check_hash $hash $xformed1.*.dar
+GO "H1-3" 0 $DAR -N -t $xformed1 -B $OPT
+GO "H1-4" 0 $DAR -N -t $xformed1 -A $catf_fly -B $OPT
+GO "H1-5" 0 $DAR_XFORM -3 $hash $xform_digits $xformed1 $xformed2
+GO "H1-6" 0 check_hash $hash $xformed2.*.dar
+GO "H1-7" 0 $DAR -N -t $xformed2 -A $catf_fly -B $OPT
+if [ ! -z "$slicing" ] ; then
+GO "H1-8" 0 $DAR_XFORM -3 $hash $slicing $xform_digits $xformed2 $xformed3
+GO "H1-9" 0 chech_hash $hash $xformed3.*.dar
+GO "H1-A" 0 $DAR -N -t $xformed3 -A $catf_fly -B $OPT
+GO "H1-B" 0 $DAR -N -t $xformed3 -B $OPT
+fi
+fi
+
+
 ###
 # final cleanup
 #
 
 clean
-
