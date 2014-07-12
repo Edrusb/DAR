@@ -1614,7 +1614,7 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	try
 	{
 	    if(pipename == "-")
-		reference = new (get_pool()) tuyau(dialog, 0);
+		reference = new (get_pool()) tuyau(dialog, 0, gf_read_only);
 	    else
 		reference = new (get_pool()) tuyau(dialog, pipename, gf_read_only);
 
@@ -1672,6 +1672,17 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	}
 	if(reference != NULL)
 	    delete reference;
+    }
+
+    bool trivial_sar::skip(const infinint & pos)
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(reference->get_position() == end_of_slice + offset + pos)
+	    return true;
+
+	return reference->skip(pos + offset);
     }
 
     void trivial_sar::inherited_terminate()

@@ -271,8 +271,8 @@ namespace libdar
 	~trivial_sar();
 
 	const trivial_sar & operator = (const trivial_sar & ref) { throw SRC_BUG; };
-	bool skippable(skippability direction, const infinint & amount) { return true; };
-        bool skip(const infinint & pos) { if(is_terminated()) throw SRC_BUG; return reference->skip(pos + offset); };
+	bool skippable(skippability direction, const infinint & amount) { return reference->skippable(direction, amount); };
+        bool skip(const infinint & pos);
         bool skip_to_eof() { if(is_terminated()) throw SRC_BUG; return reference->skip_to_eof(); };
         bool skip_relative(S_I x);
         infinint get_position();
