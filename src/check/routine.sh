@@ -55,8 +55,10 @@ xformed2=xformed2
 xformed3=xformed3
 
 hash="`sed -r -n -e 's/--hash (.*)/\1/p' tmp.file | tail -n 1`"
+hash_xform="-3 $hash"
 if [ "$hash" = "" ] ; then
    hash="none"
+   hash_xform=""
 fi
 
 function my_diff {
@@ -477,15 +479,15 @@ fi
 # H1 - modifying an archive with dar_xform
 #
 if echo $* | grep "H1" > /dev/null ; then
-GO "H1-1" 0 $DAR_XFORM -3 $hash $xform_digits -s 1G $full $xformed1
+GO "H1-1" 0 $DAR_XFORM $hash_xform $xform_digits -s 1G $full $xformed1
 GO "H1-2" 0 check_hash $hash $xformed1.*.dar
 GO "H1-3" 0 $DAR -N -t $xformed1 -B $OPT
 GO "H1-4" 0 $DAR -N -t $xformed1 -A $catf_fly -B $OPT
-GO "H1-5" 0 $DAR_XFORM -3 $hash $xform_digits $xformed1 $xformed2
+GO "H1-5" 0 $DAR_XFORM $hash_xform $xform_digits $xformed1 $xformed2
 GO "H1-6" 0 check_hash $hash $xformed2.*.dar
 GO "H1-7" 0 $DAR -N -t $xformed2 -A $catf_fly -B $OPT
 if [ ! -z "$slicing" ] ; then
-GO "H1-8" 0 $DAR_XFORM -3 $hash $slicing $xform_digits $xformed2 $xformed3
+GO "H1-8" 0 $DAR_XFORM $hash_xform $slicing $xform_digits $xformed2 $xformed3
 GO "H1-9" 0 chech_hash $hash $xformed3.*.dar
 GO "H1-A" 0 $DAR -N -t $xformed3 -A $catf_fly -B $OPT
 GO "H1-B" 0 $DAR -N -t $xformed3 -B $OPT
