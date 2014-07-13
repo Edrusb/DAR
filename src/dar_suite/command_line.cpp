@@ -467,8 +467,8 @@ bool get_args(user_interaction & dialog,
 	    throw Erange("get_args", gettext("-@ is only available with -+ and -c options"));
 	if(p.aux_pass != "" && p.op != merging && p.op != create)
 	    throw Erange("get_args", gettext("-$ is only available with -+ option and -c options"));
-	if(p.aux_execute != "" && p.op != merging)
-	    throw Erange("get_args", gettext("-~ is only available with -+ option and -c options"));
+	if(p.aux_execute != "" && p.op != merging && p.op != create)
+	    throw Erange("get_args", gettext("-~ is only available with -+ and -c options"));
 	if(p.aux_crypto_size != DEFAULT_CRYPTO_SIZE && p.op != merging && p.op != create)
 	    throw Erange("get_args", tools_printf(gettext("-%% is only available with -+ option")));
 
