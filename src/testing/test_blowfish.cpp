@@ -66,6 +66,8 @@ int main()
     if(dialog == NULL)
 	cout << "ERREUR !" << endl;
 
+    maj = maj + med + min; // avoid warning of unused variable
+
     try
     {
 	f1(dialog);
@@ -117,4 +119,7 @@ void f2(user_interaction *dialog)
     cout << bf.get_position() << endl;
     lu = bf.read(buffer, 100);
     cout << bf.get_position() << endl;
+
+    lu = lu+1; // avoid warning of unused variable
+    ret = !ret; // avoid warning of unused variable
 }

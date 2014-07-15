@@ -85,12 +85,13 @@ void f1()
     libcrypto = libdar::compile_time::libgcrypt();
     furtive = libdar::compile_time::furtive_read();
     endy = libdar::compile_time::system_endian();
-    ui.printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\nlibz =%s\nlibbz2 = %s\nliblzo = %s\nlibcrypto = %s\nfurtive = %s\nendian = %c\n",
+    ui.printf("features:\nEA = %s\nLARGE = %s\nNODUMP = %s\nSPECIAL = %s\nbits = %u\nthread = %s\nlibz =%s\nlibbz2 = %s\nliblzo = %s\nlibcrypto = %s\nfurtive = %s\nendian = %c\n",
 	      BOOL2STR(ea),
 	      BOOL2STR(large),
 	      BOOL2STR(nodump),
 	      BOOL2STR(special),
 	      bits,
+	      BOOL2STR(thread),
 	      BOOL2STR(libz),
 	      BOOL2STR(libbz2),
 	      BOOL2STR(liblzo2),
@@ -287,6 +288,7 @@ void f4()
 	cancel_thread(tid);
 	fake.write("coucouc les amsi", 10);
 	ui.printf("this statement should never be reached\n");
+	ret = ret+1; // avoid warning of unused variable
     }
     catch(Egeneric & e)
     {

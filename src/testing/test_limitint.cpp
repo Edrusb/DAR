@@ -103,6 +103,7 @@ static void routine_limitint(user_interaction & dialog)
     infinint r1 = infinint(fic);
     infinint r2;
 
+    r1 = r1+1 ; // avoid warning of unused variable
     r2.read(fic);
 
     U_32 twopower32_1 = ~0;
@@ -116,6 +117,7 @@ static void routine_limitint(user_interaction & dialog)
         unsigned long long tmp = twopower32_1;
         tmp++;
         infinint c = tmp;
+	c = c+1; // avoid warning of unused variable
     }
     catch(Elimitint & e)
     {
@@ -125,6 +127,7 @@ static void routine_limitint(user_interaction & dialog)
     try
     {
         infinint c = (long long)(twopower32_1+1);
+	c = c+1; // avoid warning of unused variable
     }
     catch(Elimitint & e)
     {

@@ -70,6 +70,7 @@ int main()
         res = p1 == p1;
         res = p4 == p5;
         res = p5 == p5;
+	res = !res; // avoid warning of unused variable
     }
     catch(Egeneric & e)
     {

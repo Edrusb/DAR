@@ -49,4 +49,6 @@ static void f1()
     c = d1.computer() % 200;
     c = d2.computer() % 200;
     c = d3.computer() % 200;
+
+    c = c+1; // avoid warning of unused variable
 }
