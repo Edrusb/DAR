@@ -51,6 +51,7 @@ namespace libdar
                                bool fs_warn_overwrite,    //< whether to warn before overwriting (to be replaced by overwriting policy)
                                bool info_details,         //< whether to display processing messages
 			       bool display_treated,      //< whether to display treated files
+			       bool display_treated_only_dir, //< whether to only display current directory of treated file
 			       bool display_skipped,      //< whether to display skipped files
                                statistics & st,           //< statistics result about the operation
                                const mask & ea_mask,      //< defines EA to restore/not restore
@@ -75,6 +76,7 @@ namespace libdar
                                   const path & fs_racine,
                                   bool info_details,
 				  bool display_treated,
+				  bool display_treated_only_dir,
 				  bool display_skipped,
                                   statistics & st,
                                   bool make_empty_dir,
@@ -108,6 +110,7 @@ namespace libdar
                                   const path & fs_racine,
                                   bool info_details,
 				  bool display_treated,
+				  bool display_treated_only_dir,
 				  bool display_skipped,
 				  statistics & st,
 				  const mask & ea_mask,
@@ -126,6 +129,7 @@ namespace libdar
                             const catalogue & cat,
                             bool info_details,
 			    bool display_treated,
+			    bool display_treated_only_dir,
 			    bool display_skipped,
 			    bool empty,
                             statistics & st);
@@ -140,6 +144,7 @@ namespace libdar
 			     const catalogue * ref2,
 			     bool info_details,
 			     bool display_treated,
+			     bool display_treated_only_dir,
 			     bool display_skipped,
 			     statistics & st,
 			     bool make_empty_dir,

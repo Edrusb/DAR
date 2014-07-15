@@ -254,6 +254,7 @@ bool get_args(shell_interaction & dialog,
     p.warn_over = true;
     p.info_details = false;
     p.display_treated = false;
+    p.display_treated_only_dir = false;
     p.display_skipped = false;
     p.algo = none;
     p.compression_level = 9;
@@ -834,19 +835,29 @@ static bool get_args_recursive(recursive_param & rec,
 		{
 		    p.info_details = true;
 		    p.display_treated = true;
+		    p.display_treated_only_dir = false;
 		}
 		else
 		    if(strcasecmp("skipped", optarg) == 0 || strcasecmp("s", optarg) == 0)
 			p.display_skipped = true;
 		    else if(strcasecmp("treated", optarg) == 0 || strcasecmp("t", optarg) == 0)
+		    {
 			p.display_treated = true;
+			p.display_treated_only_dir = false;
+		    }
 		    else if(strcasecmp("messages", optarg) == 0 || strcasecmp("m", optarg) == 0)
 			p.info_details = true;
+		    else if(strcasecmp("dir", optarg) == 0 || strcasecmp("d", optarg) == 0)
+		    {
+			p.display_treated = true;
+			p.display_treated_only_dir = true;
+		    }
 		    else if(strcasecmp("all", optarg) == 0 || strcasecmp("a", optarg) == 0)
 		    {
 			p.info_details = true;
 			p.display_skipped = true;
 			p.display_treated = true;
+			p.display_treated_only_dir = false;
 		    }
 		    else
 			throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));

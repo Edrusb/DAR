@@ -292,7 +292,10 @@ namespace libdar
 	void set_info_details(bool info_details) { x_info_details = info_details; };
 
 	    /// defines whether to show treated files
-	void set_display_treated(bool display_treated) { x_display_treated = display_treated; };
+	    ///
+	    /// \param[in] display_treated true to display processed inodes
+	    /// \param[in] only_dir only display the current directory under processing, not its individual files
+	void set_display_treated(bool display_treated, bool only_dir) { x_display_treated = display_treated; x_display_treated_only_dir = only_dir; };
 
 	    /// whether to display files that have been excluded by filters
 	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
@@ -485,6 +488,7 @@ namespace libdar
 	bool get_warn_over() const { return x_warn_over; };
 	bool get_info_details() const { return x_info_details; };
 	bool get_display_treated() const { return x_display_treated; };
+	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
 	bool get_display_skipped() const { return x_display_skipped; };
 	const infinint & get_pause() const { return x_pause; };
 	bool get_empty_dir() const { return x_empty_dir; };
@@ -538,6 +542,7 @@ namespace libdar
 	bool x_warn_over;
 	bool x_info_details;
 	bool x_display_treated;
+	bool x_display_treated_only_dir;
 	bool x_display_skipped;
 	infinint x_pause;
 	bool x_empty_dir;
@@ -804,7 +809,10 @@ namespace libdar
 	void set_info_details(bool info_details) { x_info_details = info_details; };
 
 	    /// defines whether to show treated files
-	void set_display_treated(bool display_treated) { x_display_treated = display_treated; };
+	    ///
+	    /// \param[in] display_treated true to display processed inodes
+	    /// \param[in] only_dir only display the current directory under processing, not its individual files
+	void set_display_treated(bool display_treated, bool only_dir) { x_display_treated = display_treated; x_display_treated_only_dir = only_dir; };
 
 	    /// whether to display files that have been excluded by filters
 	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
@@ -919,6 +927,7 @@ namespace libdar
 	const crit_action & get_overwriting_rules() const { if(x_overwrite == NULL) throw SRC_BUG; return *x_overwrite; };
 	bool get_info_details() const { return x_info_details; };
 	bool get_display_treated() const { return x_display_treated; };
+	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
 	bool get_display_skipped() const { return x_display_skipped; };
 	const infinint & get_pause() const { return x_pause; };
 	bool get_empty_dir() const { return x_empty_dir; };
@@ -959,6 +968,7 @@ namespace libdar
 	crit_action * x_overwrite;
 	bool x_info_details;
 	bool x_display_treated;
+	bool x_display_treated_only_dir;
 	bool x_display_skipped;
 	infinint x_pause;
 	bool x_empty_dir;
@@ -1033,7 +1043,9 @@ namespace libdar
 	void set_info_details(bool info_details) { x_info_details = info_details; };
 
 	    /// defines whether to show treated files
-	void set_display_treated(bool display_treated) { x_display_treated = display_treated; };
+	    /// \param[in] display_treated true to display processed inodes
+	    /// \param[in] only_dir only display the current directory under processing, not its individual files
+	void set_display_treated(bool display_treated, bool only_dir) { x_display_treated = display_treated; x_display_treated_only_dir = only_dir; };
 
 	    /// whether to display files that have been excluded by filters
 	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
@@ -1091,6 +1103,7 @@ namespace libdar
 	bool get_warn_over() const { return x_warn_over; };
 	bool get_info_details() const { return x_info_details; };
 	bool get_display_treated() const { return x_display_treated; };
+	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
 	bool get_display_skipped() const { return x_display_skipped; };
 	const mask & get_ea_mask() const { if(x_ea_mask == NULL) throw SRC_BUG; return *x_ea_mask; };
 	bool get_flat() const { return x_flat; };
@@ -1110,6 +1123,7 @@ namespace libdar
 	bool x_warn_over;
 	bool x_info_details;
 	bool x_display_treated;
+	bool x_display_treated_only_dir;
 	bool x_display_skipped;
 	mask * x_ea_mask;
 	bool x_flat;
@@ -1220,7 +1234,9 @@ namespace libdar
 	void set_info_details(bool info_details) { x_info_details = info_details; };
 
 	    /// defines whether to show treated files
-	void set_display_treated(bool display_treated) { x_display_treated = display_treated; };
+	    /// \param[in] display_treated true to display processed inodes
+	    /// \param[in] only_dir only display the current directory under processing, not its individual files
+	void set_display_treated(bool display_treated, bool only_dir) { x_display_treated = display_treated; x_display_treated_only_dir = only_dir; };
 
 	    /// whether to display files that have been excluded by filters
 	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
@@ -1263,6 +1279,7 @@ namespace libdar
 	const mask & get_subtree() const { if(x_subtree == NULL) throw SRC_BUG; return *x_subtree; };
 	bool get_info_details() const { return x_info_details; };
 	bool get_display_treated() const { return x_display_treated; };
+	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
 	bool get_display_skipped() const { return x_display_skipped; };
 	const mask & get_ea_mask() const { if(x_ea_mask == NULL) throw SRC_BUG; return *x_ea_mask; };
 	inode::comparison_fields get_what_to_check() const { return x_what_to_check; };
@@ -1277,6 +1294,7 @@ namespace libdar
 	mask * x_subtree;
 	bool x_info_details;
 	bool x_display_treated;
+	bool x_display_treated_only_dir;
 	bool x_display_skipped;
 	mask * x_ea_mask;
 	inode::comparison_fields x_what_to_check;
@@ -1330,7 +1348,9 @@ namespace libdar
 	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
 
 	    /// defines whether to show treated files
-	void set_display_treated(bool display_treated) { x_display_treated = display_treated; };
+	    /// \param[in] display_treated true to display processed inodes
+	    /// \param[in] only_dir only display the current directory under processing, not its individual files
+	void set_display_treated(bool display_treated, bool only_dir) { x_display_treated = display_treated; x_display_treated_only_dir = only_dir; };
 
 	    /// dry-run exectution if set to true
 	void set_empty(bool empty) { x_empty = empty; };
@@ -1343,6 +1363,7 @@ namespace libdar
 	const mask & get_subtree() const { if(x_subtree == NULL) throw SRC_BUG; return *x_subtree; };
 	bool get_info_details() const { return x_info_details; };
 	bool get_display_treated() const { return x_display_treated; };
+	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
 	bool get_display_skipped() const { return x_display_skipped; };
 	bool get_empty() const { return x_empty; };
 
@@ -1351,6 +1372,7 @@ namespace libdar
 	mask * x_subtree;
 	bool x_info_details;
 	bool x_display_treated;
+	bool x_display_treated_only_dir;
 	bool x_display_skipped;
 	bool x_empty;
 

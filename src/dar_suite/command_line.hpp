@@ -67,6 +67,7 @@ struct line_param
     bool warn_over;               //< whether to warn before overwriting files or slices
     bool info_details;            //< whether to show processing messages
     bool display_treated;         //< whether to show treated files
+    bool display_treated_only_dir;//< whether to show treated files's current working directory
     bool display_skipped;         //< whether to display skipped files
     compression algo;             //< compression algorithm to use when generating an archive
     U_I compression_level;        //< compression level to use when generating an archive

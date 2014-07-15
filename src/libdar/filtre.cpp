@@ -144,6 +144,7 @@ namespace libdar
 			bool fs_warn_overwrite,
 			bool info_details,
 			bool display_treated,
+			bool display_treated_only_dir,
 			bool display_skipped,
 			statistics & st,
 			const mask & ea_mask,
@@ -165,12 +166,20 @@ namespace libdar
 	const crit_action * when_only_deleted = only_deleted ? make_overwriting_for_only_deleted(pool) : NULL;
 	const crit_action & overwrite = only_deleted ? *when_only_deleted : x_overwrite;
 
+	if(display_treated_only_dir && display_treated)
+	    display_treated = false;
+	    // avoid having filesystem to report action performed for each entry
+	    // specific code in this function will show instead the current directory
+	    // under which file are processed
+	else
+	    display_treated_only_dir = false; // avoid incoherence
+
 	try
 	{
 	    filesystem_restore fs = filesystem_restore(dialog,
 						       fs_racine,
 						       fs_warn_overwrite,
-						       info_details,
+						       display_treated,
 						       ea_mask,
 						       what_to_check,
 						       warn_remove_no_match,
@@ -210,6 +219,12 @@ namespace libdar
 
 		juillet.enfile(e);
 		thr_cancel.check_self_cancellation();
+		if(display_treated_only_dir)
+		{
+		    if(e_dir != NULL)
+			dialog.warning(string(gettext("Inspecting directory ")) + juillet.get_string());
+		}
+
 		if(e_nom != NULL)
 		{
 		    try
@@ -477,6 +492,7 @@ namespace libdar
                            const path & fs_racine,
                            bool info_details,
 			   bool display_treated,
+			   bool display_treated_only_dir,
 			   bool display_skipped,
                            statistics & st,
                            bool make_empty_dir,
@@ -509,6 +525,15 @@ namespace libdar
 	compressor *stockage;
         compression stock_algo;
 	semaphore sem = semaphore(dialog, backup_hook_file_execute, backup_hook_file_mask);
+
+	if(display_treated_only_dir && display_treated)
+	    display_treated = false;
+	    // avoid having save_inode/save_ea to report action performed for each entry
+	    // specific code in this function will show instead the current directory
+	    // under which file are processed
+	else
+	    display_treated_only_dir = false; // avoid incoherence
+
 
 	stack.find_first_from_top(stockage);
 	if(stockage == NULL)
@@ -552,6 +577,11 @@ namespace libdar
 
 		    juillet.enfile(e);
 		    thr_cancel.check_self_cancellation();
+		    if(display_treated_only_dir)
+		    {
+			if(dir != NULL)
+			    dialog.warning(string(gettext("Inspecting directory ")) + juillet.get_string());
+		    }
 
 		    if(e_mir != NULL)
 		    {
@@ -985,6 +1015,7 @@ namespace libdar
                            const path & fs_racine,
 			   bool info_details,
 			   bool display_treated,
+			   bool display_treated_only_dir,
 			   bool display_skipped,
 			   statistics & st,
 			   const mask & ea_mask,
@@ -1007,6 +1038,14 @@ namespace libdar
 					     furtive_read_mode,
 					     scope);
 	thread_cancellation thr_cancel;
+
+	if(display_treated_only_dir && display_treated)
+	    display_treated = false;
+	    // avoiding the report of action performed for each entry
+	    // specific code in this function will show instead the current directory
+	    // under which file are processed
+	else
+	    display_treated_only_dir = false; // avoid incoherence
 
         st.clear();
         cat.reset_read();
@@ -1033,6 +1072,12 @@ namespace libdar
 
 	    juillet.enfile(e);
 	    thr_cancel.check_self_cancellation();
+	    if(display_treated_only_dir)
+	    {
+		if(e_dir != NULL)
+		    dialog.warning(string(gettext("Inspecting directory ")) + juillet.get_string());
+	    }
+
 	    try
 	    {
 		if(e_nom != NULL)
@@ -1169,6 +1214,7 @@ namespace libdar
                      const catalogue & cat,
                      bool info_details,
 		     bool display_treated,
+		     bool display_treated_only_dir,
 		     bool display_skipped,
 		     bool empty,
                      statistics & st)
@@ -1180,6 +1226,15 @@ namespace libdar
         const eod tmp_eod;
 	thread_cancellation thr_cancel;
 	string perimeter;
+
+	if(display_treated_only_dir && display_treated)
+	    display_treated = false;
+	    // avoid having save_inode/save_ea to report action performed for each entry
+	    // specific code in this function will show instead the current directory
+	    // under which file are processed
+	else
+	    display_treated_only_dir = false; // avoid incoherence
+
 
         st.clear();
         cat.reset_read();
@@ -1193,6 +1248,12 @@ namespace libdar
 
             juillet.enfile(e);
 	    thr_cancel.check_self_cancellation();
+	    if(display_treated_only_dir)
+	    {
+		if(e_dir != NULL)
+		    dialog.warning(string(gettext("Inspecting directory ")) + juillet.get_string());
+	    }
+
 	    perimeter = "";
             try
             {
@@ -1353,6 +1414,7 @@ namespace libdar
 		      const catalogue * ref2,
 		      bool info_details,
 		      bool display_treated,
+		      bool display_treated_only_dir,
 		      bool display_skipped,
 		      statistics & st,
 		      bool make_empty_dir,
@@ -1368,6 +1430,14 @@ namespace libdar
     {
 	compressor *stockage;
 	compression stock_algo;
+
+	if(display_treated_only_dir && display_treated)
+	    display_treated = false;
+	    // avoiding the report of action performed for each entry
+	    // specific code in this function will show instead the current directory
+	    // under which file are processed
+	else
+	    display_treated_only_dir = false; // avoid incoherence
 
 	stack.find_first_from_top(stockage);
 	if(stockage == NULL)
@@ -2255,6 +2325,7 @@ namespace libdar
 		inode *e_ino = dynamic_cast<inode *>(e_var);
 		file *e_file = dynamic_cast<file *>(e_var);
 		mirage *e_mir = dynamic_cast<mirage *>(e_var);
+		directory *e_dir = dynamic_cast<directory *>(e_var);
 
 		file::get_data_mode keep_mode = keep_compressed ? file::keep_compressed : file::keep_hole;
 
@@ -2266,6 +2337,12 @@ namespace libdar
 		    }
 
 		juillet.enfile(e);
+		thr_cancel.check_self_cancellation();
+		if(display_treated_only_dir)
+		{
+		    if(e_dir != NULL)
+			dialog.warning(string(gettext("Inspecting directory ")) + juillet.get_string());
+		}
 
 		if(e_ino != NULL) // inode
 		{

@@ -216,7 +216,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.set_allow_over(param.allow_over);
 		    create_options.set_warn_over(param.warn_over);
 		    create_options.set_info_details(param.info_details);
-		    create_options.set_display_treated(param.display_treated);
+		    create_options.set_display_treated(param.display_treated,
+						       param.display_treated_only_dir);
 		    create_options.set_display_skipped(param.display_skipped);
 		    create_options.set_pause(param.pause);
 		    create_options.set_empty_dir(param.empty_dir);
@@ -278,7 +279,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    merge_options.set_overwriting_rules(*param.overwrite);
 		    merge_options.set_warn_over(param.warn_over);
 		    merge_options.set_info_details(param.info_details);
-		    merge_options.set_display_treated(param.display_treated);
+		    merge_options.set_display_treated(param.display_treated,
+						      param.display_treated_only_dir);
 		    merge_options.set_display_skipped(param.display_skipped);
 		    merge_options.set_pause(param.pause);
 		    merge_options.set_empty_dir(param.empty_dir);
@@ -532,7 +534,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		extract_options.set_subtree(*param.subtree);
 		extract_options.set_warn_over(param.warn_over);
 		extract_options.set_info_details(param.info_details);
-		extract_options.set_display_treated(param.display_treated);
+		extract_options.set_display_treated(param.display_treated,
+						    param.display_treated_only_dir);
 		extract_options.set_display_skipped(param.display_skipped);
 		extract_options.set_ea_mask(*param.ea_mask);
 		extract_options.set_flat(param.flat);
@@ -634,7 +637,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		diff_options.set_selection(*param.selection);
 		diff_options.set_subtree(*param.subtree);
 		diff_options.set_info_details(param.info_details);
-		diff_options.set_display_treated(param.display_treated);
+		diff_options.set_display_treated(param.display_treated,
+						 param.display_treated_only_dir);
 		diff_options.set_display_skipped(param.display_skipped);
 		diff_options.set_ea_mask(*param.ea_mask);
 		diff_options.set_what_to_check(param.what_to_check);
@@ -711,7 +715,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		test_options.set_selection(*param.selection);
 		test_options.set_subtree(*param.subtree);
 		test_options.set_info_details(param.info_details);
-		test_options.set_display_treated(param.display_treated);
+		test_options.set_display_treated(param.display_treated,
+						 param.display_treated_only_dir);
 		test_options.set_display_skipped(param.display_skipped);
 		test_options.set_empty(param.empty);
                 st = arch->op_test(dialog, test_options, NULL);

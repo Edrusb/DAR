@@ -1389,7 +1389,7 @@ namespace libdar
 		    // only used in sequential_read when a file has been saved several times due
 		    // to its contents being modified at backup time while dar was reading it.
 		    // here when ignore_over_restricts is true it is asked to remove the previously restored copy of
-		    // that file as a better copy has been found in the archive.
+		    // that file because a better copy has been found in the archive.
 	    {
 		ignore_over_restricts = false; // just one shot state ; exists == NULL : we are ignoring existing entry
 		supprime(get_ui(), spot_display);

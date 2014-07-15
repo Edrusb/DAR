@@ -366,6 +366,7 @@ namespace libdar
 				bool warn_over,
 				bool info_details,
 				bool display_treated,
+				bool display_treated_only_dir,
 				bool display_skipped,
 				const infinint & pause,
 				bool empty_dir,
@@ -424,7 +425,8 @@ namespace libdar
 			      const crit_action & overwrite,    //< whether and how to allow overwriting (for files inside the archive)
 			      bool warn_over,                   //< whether to warn before overwriting
 			      bool info_details,                //< whether to display detailed informations
-			      bool display_created,             //< whether to display treated files
+			      bool display_treated,             //< whether to display treated files
+			      bool display_treated_only_dir,    //< whether to only display current directory of treated files
 			      bool display_skipped,             //< display skipped files for the operation
 			      const infinint & pause,           //< whether to pause between slices
 			      bool empty_dir,                   //< whether to store excluded dir as empty directories

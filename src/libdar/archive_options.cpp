@@ -321,6 +321,7 @@ namespace libdar
 	    x_warn_over = true;
 	    x_info_details = false;
 	    x_display_treated = false;
+	    x_display_treated_only_dir = false;
 	    x_display_skipped = false;
 	    x_pause = 0;
 	    x_empty_dir = false;
@@ -552,6 +553,7 @@ namespace libdar
 	x_warn_over = ref.x_warn_over;
 	x_info_details = ref.x_info_details;
 	x_display_treated = ref.x_display_treated;
+	x_display_treated_only_dir = ref.x_display_treated_only_dir;
 	x_display_skipped = ref.x_display_skipped;
 	x_pause = ref.x_pause;
 	x_empty_dir = ref.x_empty_dir;
@@ -728,6 +730,7 @@ namespace libdar
 	    x_warn_over = true;
 	    x_info_details = false;
 	    x_display_treated = false;
+	    x_display_treated_only_dir = false;
 	    x_display_skipped = false;
 	    x_pause = 0;
 	    x_empty_dir = false;
@@ -945,6 +948,7 @@ namespace libdar
 	    x_warn_over = ref.x_warn_over;
 	    x_info_details = ref.x_info_details;
 	    x_display_treated = ref.x_display_treated;
+	    x_display_treated_only_dir = ref.x_display_treated_only_dir;
 	    x_display_skipped = ref.x_display_skipped;
 	    x_pause = ref.x_pause;
 	    x_empty_dir = ref.x_empty_dir;
@@ -997,6 +1001,7 @@ namespace libdar
 	    x_warn_over = true;
 	    x_info_details = false;
 	    x_display_treated = false;
+	    x_display_treated_only_dir = false;
 	    x_display_skipped = false;
 	    x_flat = false;
 	    x_what_to_check = default_comparison_fields;
@@ -1138,6 +1143,7 @@ namespace libdar
 	    x_warn_over = ref.x_warn_over;
 	    x_info_details = ref.x_info_details;
 	    x_display_treated = ref.x_display_treated;
+	    x_display_treated_only_dir = ref.x_display_treated_only_dir;
 	    x_display_skipped = ref.x_display_skipped;
 	    x_flat = ref.x_flat;
 	    x_what_to_check = ref.x_what_to_check;
@@ -1294,6 +1300,7 @@ namespace libdar
 	    archive_option_clean_mask(x_subtree, get_pool());
 	    x_info_details = false;
 	    x_display_treated = false;
+	    x_display_treated_only_dir = false;
 	    x_display_skipped = false;
 	    archive_option_clean_mask(x_ea_mask, get_pool());
 	    x_what_to_check = inode::cf_all;
@@ -1444,6 +1451,7 @@ namespace libdar
 
 	    x_info_details = ref.x_info_details;
 	    x_display_treated = ref.x_display_treated;
+	    x_display_treated_only_dir = ref.x_display_treated_only_dir;
 	    x_display_skipped = ref.x_display_skipped;
 	    x_what_to_check = ref.x_what_to_check;
 	    x_alter_atime = ref.x_alter_atime;
@@ -1477,6 +1485,7 @@ namespace libdar
 	    archive_option_clean_mask(x_subtree, get_pool());
 	    x_info_details = false;
 	    x_display_treated = false;
+	    x_display_treated_only_dir = false;
 	    x_display_skipped = false;
 	    x_empty = false;
 	}
@@ -1565,6 +1574,7 @@ namespace libdar
 
 	    x_info_details = ref.x_info_details;
 	    x_display_treated = ref.x_display_treated;
+	    x_display_treated_only_dir = ref.x_display_treated_only_dir;
 	    x_display_skipped = ref.x_display_skipped;
 	    x_empty = ref.x_empty;
 	}
