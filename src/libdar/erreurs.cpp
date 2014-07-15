@@ -160,6 +160,12 @@ namespace libdar
         Egeneric::stack(passage, tools_printf(gettext("in file %S line %S"), &file, &line));
     }
 
+    Esystem::Esystem(const std::string & source, S_I error_no):
+	Egeneric(source, tools_strerror_r(error_no))
+    {
+	code = error_no;
+    }
+
     static void init()
     {
         set_unexpected(inattendue);

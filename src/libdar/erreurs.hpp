@@ -308,6 +308,22 @@ namespace libdar
 	U_64 flag;
     };
 
+	/// exception used to carry system error
+
+    class Esystem : public Egeneric
+    {
+    public:
+	Esystem(const std::string & source, S_I error_no);
+
+	S_I get_errno() const { return code; };
+
+    protected:
+	virtual std::string exceptionID() const { return "SYSTEM ERROR MET"; };
+
+    private:
+	S_I code;
+    };
+
 
 	/// @}
 
