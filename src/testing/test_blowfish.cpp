@@ -61,12 +61,10 @@ int main()
 {
     user_interaction *dialog = new (nothrow) shell_interaction(&cout, &cerr, false);
     U_I maj, med, min;
-
+    get_version(maj, med, min);
 
     if(dialog == NULL)
 	cout << "ERREUR !" << endl;
-
-    maj = maj + med + min; // avoid warning of unused variable
 
     try
     {
