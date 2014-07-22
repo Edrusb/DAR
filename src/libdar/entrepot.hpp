@@ -61,12 +61,7 @@ namespace libdar
     class entrepot : public on_pool
     {
     public:
-	enum io_errors
-	{
-	    io_ok,    //< operation succeeded
-	    io_exist, //< file already exists (write mode)
-	    io_absent //< file does not exist (read mode)
-	};
+
 	    /// constructor
 	entrepot();
 
@@ -104,18 +99,16 @@ namespace libdar
 	    /// \param[in] fail_if_exists tells whether the underlying implementation have to fail throwing Erange("exists") if the file already exist when write access is required
 	    /// \param[in] erase tells whether the underlying implementation will empty an existing file before writing to it
 	    /// \param[in] algo defines the hash file to create, other value than hash_none are acceptes only in writeonly mode with erase or fail_if_exist set
-	    /// \param[out] ret points to the newly allocated object. It is the duty of the caller to delete it when no more needed. Note that this argument is meaninful only if the return code is "io_errors::io_ok".
-	    /// \return the status of the open operation, other problem have to be reported throwing an exception
+	    /// \return upon success returns an object from a class inherited from fichier_global that the caller has the duty to delete, else an exception is thrown (most of the time it should be a Esystem object)
 	    /// by the called inherited class
-	io_errors open(user_interaction & dialog,
-		       const std::string & filename,
-		       gf_mode mode,
-		       bool force_permission,
-		       U_I permission,
-		       bool fail_if_exists,
-		       bool erase,
-		       hash_algo algo,
-		       fichier_global * & ret) const;
+	fichier_global *open(user_interaction & dialog,
+			     const std::string & filename,
+			     gf_mode mode,
+			     bool force_permission,
+			     U_I permission,
+			     bool fail_if_exists,
+			     bool erase,
+			     hash_algo algo) const;
 
 	    /// routines to read existing files in the current directory (see set_location() / set_root() methods)
 	virtual void read_dir_reset() = 0;
@@ -127,15 +120,13 @@ namespace libdar
 	virtual entrepot *clone() const = 0;
 
     protected:
-	virtual io_errors inherited_open(user_interaction & dialog,     //< for user interaction
-					 const std::string & filename,  //< filename to open
-					 gf_mode mode,                  //< mode to use
-					 bool force_permission,         //< set the permission of the file to open
-					 U_I permission,                //< value of the permission to assign when force_permission is true
-					 bool fail_if_exists,           //< whether to fail if file exists (write mode)
-					 bool erase,                    //< whether to erase file if file already exists (write mode)
-					 fichier_global * & ret) const = 0; //< the created object upon successful operation
-
+	virtual fichier_global *inherited_open(user_interaction & dialog,     //< for user interaction
+					       const std::string & filename,  //< filename to open
+					       gf_mode mode,                  //< mode to use
+					       bool force_permission,         //< set the permission of the file to open
+					       U_I permission,                //< value of the permission to assign when force_permission is true
+					       bool fail_if_exists,           //< whether to fail if file exists (write mode)
+					       bool erase) const = 0;         //< whether to erase file if file already exists (write mode)
 
 	virtual void inherited_unlink(const std::string & filename) const = 0;
 

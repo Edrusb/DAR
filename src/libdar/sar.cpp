@@ -669,8 +669,6 @@ namespace libdar
 
         while(of_fd == NULL)
         {
-	    entrepot::io_errors code;
-
                 // launching user command if any
             hook_execute(num);
 
@@ -678,15 +676,19 @@ namespace libdar
                 //
 	    try
 	    {
-		code = entr->open(get_ui(),
-				  fic,
-				  gf_read_only,
-				  false, //< force permission
-				  0,     //< permission to enforce (not used here)
-				  false, //<  fail if exists
-				  false, //<  erase
-				  hash_none,
-				  of_fd);
+		of_fd = entr->open(get_ui(),
+				   fic,
+				   gf_read_only,
+				   false, //< force permission
+				   0,     //< permission to enforce (not used here)
+				   false, //<  fail if exists
+				   false, //<  erase
+				   hash_none);
+		if(of_fd == NULL)
+		    throw SRC_BUG;
+		of_fd->fadvise(fichier_global::advise_normal);
+		    // we have no advise to give to the system when reading a slice
+		size_of_current = of_fd->get_size();
 	    }
 	    catch(Euser_abort & e)
 	    {
@@ -699,26 +701,22 @@ namespace libdar
 		else
 		    throw;
 	    }
-
-	    switch(code)
+	    catch(Esystem & e)
 	    {
-	    case entrepot::io_ok:
-		if(of_fd == NULL)
+		switch(e.get_code())
+		{
+		case Esystem::io_absent:
+		    if(!lax)
+			get_ui().pause(tools_printf(gettext("%S is required for further operation, please provide the file."), &fic));
+		    else
+			get_ui().pause(tools_printf(gettext("%S is required for further operation, please provide the file if you have it."), &fic));
+		    break;
+		case Esystem::io_exist:
 		    throw SRC_BUG;
-		of_fd->fadvise(fichier_global::advise_normal);
-		    // we have no advise to give to the system when reading a slice
-		size_of_current = of_fd->get_size();
-		break;
-	    case entrepot::io_absent:
-		if(!lax)
-		    get_ui().pause(tools_printf(gettext("%S is required for further operation, please provide the file."), &fic));
-		else
-		    get_ui().pause(tools_printf(gettext("%S is required for further operation, please provide the file if you have it."), &fic));
+		default:
+		    throw SRC_BUG;
+		}
 		continue; // we restart the while loop
-	    case entrepot::io_exist:
-		throw SRC_BUG;
-	    default:
-		throw SRC_BUG;
 	    }
 
 
@@ -981,152 +979,165 @@ namespace libdar
     {
 	bool unlink_on_error = false;
 	bool do_erase = false;
-	entrepot::io_errors code;
 
 	    // open for writing but succeeds only if this file does NOT already exist
 	try
 	{
-	    code = entr->open(get_ui(),
-			      fic,
-			      hash == hash_none ? gf_read_write : gf_write_only, // yes, no more writeonly as stated in the name of this method
-			      force_perm,
-			      perm,
-			      true,   //< fail_if_exists
-			      false,  //< erase
-			      hash,
-			      of_fd);
-	}
-	catch(Erange & e)
-	{
-	    string tmp = e.get_message();
-	    get_ui().warning(tools_printf(gettext("failed openning slice %S: %S. Will try to erase it first, if allowed"), &fic, &tmp));
-	    code = entrepot::io_exist;
-	}
-
-	switch(code)
-	{
-	case entrepot::io_ok:
-	    break;
-	case entrepot::io_exist:
 	    try
 	    {
-		code = entr->open(get_ui(),
-				  fic,
-				  gf_read_only,
-				  false,  //< force permission
-				  0,      //< permission to enforce (not used here)
-				  false,  //< fail if exists
-				  false,  //< erase
-				  hash_none,
-				  of_fd);
-		switch(code)
+		of_fd = entr->open(get_ui(),
+				   fic,
+				   hash == hash_none ? gf_read_write : gf_write_only, // yes, no more writeonly as stated in the name of this method
+				   force_perm,
+				   perm,
+				   true,   //< fail_if_exists
+				   false,  //< erase
+				   hash);
+	    }
+	    catch(Erange & e)
+	    {
+		string tmp = e.get_message();
+		get_ui().warning(tools_printf(gettext("failed openning slice %S: %S. Will try to erase it first, if allowed"), &fic, &tmp));
+		throw Esystem("sar::open_writeonly", "failed openning, will try erasing first", Esystem::io_exist);
+	    }
+	}
+	catch(Esystem & e)
+	{
+	    switch(e.get_code())
+	    {
+	    case Esystem::io_exist:
+		try
 		{
-		case entrepot::io_ok:
-		    if(of_fd == NULL)
-			throw SRC_BUG;
 		    try
 		    {
-			header h;
+			    // the file does not exist, re-trying opening it without fail_if_exists
+
+			of_fd = entr->open(get_ui(),
+					   fic,
+					   gf_read_only,
+					   false,  //< force permission
+					   0,      //< permission to enforce (not used here)
+					   false,  //< fail if exists
+					   false,  //< erase
+					   hash_none);
+
+			if(of_fd == NULL)
+			    throw SRC_BUG;
 
 			try
 			{
-			    h.read(get_ui(), *of_fd);
-			}
-			catch(Erange & e)
-			{
-			    h.get_set_internal_name() = of_internal_name;
-			    h.get_set_internal_name().invert_first_byte();
-				// this way we are sure that the file is not considered as part of the current SAR
-			}
-			if(h.get_set_internal_name() != of_internal_name)
-			    do_erase = true; // this is not a slice of the current archive
-			delete of_fd;
-			of_fd = NULL;
-		    }
-		    catch(...)
-		    {
-			if(of_fd != NULL)
-			{
+			    header h;
+
+			    try
+			    {
+				h.read(get_ui(), *of_fd);
+			    }
+			    catch(Erange & e)
+			    {
+				h.get_set_internal_name() = of_internal_name;
+				h.get_set_internal_name().invert_first_byte();
+				    // this way we are sure that the file is not considered as part of the current SAR
+			    }
+			    if(h.get_set_internal_name() != of_internal_name)
+				do_erase = true; // this is not a slice of the current archive
 			    delete of_fd;
 			    of_fd = NULL;
 			}
-			throw;
+			catch(...)
+			{
+			    if(of_fd != NULL)
+			    {
+				delete of_fd;
+				of_fd = NULL;
+			    }
+			    throw;
+			}
 		    }
-		    break;
-		case entrepot::io_exist:
-		    throw SRC_BUG;
-		case entrepot::io_absent:
-		    throw SRC_BUG;
-		default:
-		    throw SRC_BUG;
+		    catch(Esystem & f)
+		    {
+			switch(f.get_code())
+			{
+			case Esystem::io_exist:
+			    throw SRC_BUG;
+			case Esystem::io_absent:
+			    throw SRC_BUG;
+			default:
+			    throw SRC_BUG;
+			}
+		    }
 		}
-	    }
-	    catch(...)
-	    {
-		do_erase = true;     // reading failed, trying overwriting (if allowed)
-	    }
-
-	    if(do_erase)
-	    {
-		if(!opt_allow_overwrite)
-		    throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
-		if(opt_warn_overwrite)
+		catch(Ebug & e)
 		{
-		    try
+		    throw;
+		}
+		catch(...)
+		{
+		    do_erase = true;     // reading failed, trying overwriting (if allowed)
+		}
+
+		try
+		{
+		    if(do_erase)
 		    {
-			get_ui().pause(fic + gettext(" is about to be overwritten."));
-			unlink_on_error = true;
+			if(!opt_allow_overwrite)
+			    throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
+			if(opt_warn_overwrite)
+			{
+			    try
+			    {
+				get_ui().pause(fic + gettext(" is about to be overwritten."));
+				unlink_on_error = true;
+			    }
+			    catch(...)
+			    {
+				natural_destruction = false;
+				throw;
+			    }
+			}
+			else
+			    unlink_on_error = true;
+
+			    // open with overwriting
+			of_fd = entr->open(get_ui(),
+					   fic,
+					   hash == hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
+					   force_perm,
+					   perm,
+					   false,    //< fail if exists
+					   true,     //< erase
+					   hash);
 		    }
-		    catch(...)
+		    else // open without overwriting
+			if(hash == hash_none)
+			    of_fd = entr->open(get_ui(),
+					       fic,
+					       hash == hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
+					       force_perm,
+					       perm,
+					       false, //< fail if exists
+					       false, //< erase
+					       hash);
+			else
+			    throw SRC_BUG; // cannot calculate a hash on a just openned file that is not empty
+		}
+		catch(Esystem & e)
+		{
+		    switch(e.get_code())
 		    {
-			natural_destruction = false;
-			throw;
+		    case Esystem::io_exist:
+			throw SRC_BUG; // not called with fail_if_exists set
+		    case Esystem::io_absent:
+			throw SRC_BUG; // not called in read mode
+		    default:
+			throw SRC_BUG;
 		    }
 		}
-		else
-		    unlink_on_error = true;
-
-		    // open with overwriting
-		code = entr->open(get_ui(),
-				  fic,
-				  hash == hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
-				  force_perm,
-				  perm,
-				  false,    //< fail if exists
-				  true,     //< erase
-				  hash,
-				  of_fd);
-	    }
-	    else // open without overwriting
-		if(hash == hash_none)
-		    code = entr->open(get_ui(),
-				      fic,
-				      hash == hash_none ? gf_read_write : gf_write_only, // yes, no more write only as stated in the name of this method
-				      force_perm,
-				      perm,
-				      false, //< fail if exists
-				      false, //< erase
-				      hash,
-				      of_fd);
-		else
-		    throw SRC_BUG; // cannot calculate a hash on a just openned file that is not empty
-
-	    switch(code)
-	    {
-	    case entrepot::io_ok:
 		break;
-	    case entrepot::io_exist:
-		throw SRC_BUG; // not called with fail_if_exists set
-	    case entrepot::io_absent:
-		throw SRC_BUG; // not called in read mode
+	    case Esystem::io_absent:
+		throw SRC_BUG;
 	    default:
 		throw SRC_BUG;
 	    }
-	    break;
-	case entrepot::io_absent:
-	    throw SRC_BUG;
-	default:
-	    throw SRC_BUG;
 	}
 
 	if(of_fd == NULL)
@@ -1488,7 +1499,6 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 
 	    // some local variables to be used
 
-	entrepot::io_errors code;
 	fichier_global *tmp = NULL;
 	const string filename = sar_make_filename(base_name, 1, x_min_digits, extension);
 
@@ -1513,60 +1523,66 @@ static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_na
 	    // creating the slice if it does not exist else failing
 	try
 	{
-	    code = where.open(dialog,
-			      filename,
-			      open_mode,
-			      force_permission,
-			      permission,
-			      true,    //< fail if exists
-			      false,   //< erase
-			      x_hash,
-			      tmp);
-
-	    switch(code)
+	    try
 	    {
-	    case entrepot::io_ok:
-		break;
-	    case entrepot::io_exist:
-		if(tmp != NULL)
-		    throw SRC_BUG;
-
-		if(!allow_over)
-		    throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("%S already exists, and overwritten is forbidden, aborting"), &filename));
-		if(warn_over)
-		    dialog.pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
-
-		code = where.open(dialog,
-				  filename,
-				  gf_read_write,
-				  force_permission,
-				  permission,
-				  false,  //< fail if exists
-				  true,   //< erase
-				  x_hash,
-				  tmp);
-		switch(code)
+		tmp = where.open(dialog,
+				 filename,
+				 open_mode,
+				 force_permission,
+				 permission,
+				 true,    //< fail if exists
+				 false,   //< erase
+				 x_hash);
+	    }
+	    catch(Esystem & e)
+	    {
+		switch(e.get_code())
 		{
-		case entrepot::io_ok:
+		case Esystem::io_exist:
+		    if(tmp != NULL)
+			throw SRC_BUG;
+
+		    if(!allow_over)
+			throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("%S already exists, and overwritten is forbidden, aborting"), &filename));
+		    if(warn_over)
+			dialog.pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
+
+		    try
+		    {
+			tmp = where.open(dialog,
+					 filename,
+					 gf_read_write,
+					 force_permission,
+					 permission,
+					 false,  //< fail if exists
+					 true,   //< erase
+					 x_hash);
+
+		    }
+		    catch(Esystem & e)
+		    {
+			switch(e.get_code())
+			{
+			case Esystem::io_exist:
+			    throw SRC_BUG;
+			case Esystem::io_absent:
+			    throw SRC_BUG;
+			default:
+			    throw SRC_BUG;
+			}
+		    }
 		    break;
-		case entrepot::io_exist:
-		    throw SRC_BUG;
-		case entrepot::io_absent:
-		    throw SRC_BUG;
+		case Esystem::io_absent:
+		    if(tmp != NULL)
+			throw SRC_BUG;
+		    else
+			throw SRC_BUG; // not for the same reason, must know that reporting the same error but on a different line
 		default:
-		    throw SRC_BUG;
+		    if(tmp != NULL)
+			throw SRC_BUG;
+		    else
+			throw SRC_BUG; // not for the same reason, must know that reporting the same error but on a different line
 		}
-		break;
-	    case entrepot::io_absent:
-		if(tmp != NULL)
-		    throw SRC_BUG;
-		else
-		    throw SRC_BUG; // not for the same reason, must know that reporting the same error but on a different line
-	    default:
-		if(tmp != NULL)
-		    throw SRC_BUG;
-		else
-		    throw SRC_BUG; // not for the same reason, must know that reporting the same error but on a different line
 	    }
 
 	    if(tmp == NULL)

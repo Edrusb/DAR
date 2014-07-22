@@ -420,14 +420,20 @@ namespace libdar
 
 		if(filedesc < 0)
 		{
-		    if(errno == ENOSPC)
+		    switch(errno)
 		    {
+		    case ENOSPC:
 			if(get_mode() == gf_read_only)
 			    throw SRC_BUG; // in read_only mode we do not need to create a new inode !!!
 			get_ui().pause(gettext("No space left for inode, you have the opportunity to make some room now. When done : can we continue ?"));
-		    }
-		    else
+			break;
+		    case EEXIST:
+			throw Esystem("fichier_local::open", tools_strerror_r(errno), Esystem::io_exist);
+		    case ENOENT:
+			throw Esystem("fichier_local::open", tools_strerror_r(errno), Esystem::io_absent);
+		    default:
 			throw Erange("fichier_local::open", string(gettext("Cannot open file : ")) + strerror(errno));
+		    }
 		}
 	    }
 	    while(filedesc < 0 && errno == ENOSPC);

@@ -98,15 +98,15 @@ namespace libdar
 	return true;
     }
 
-    entrepot::io_errors entrepot_local::inherited_open(user_interaction & dialog,
-						       const std::string & filename,
-						       gf_mode mode,
-						       bool force_permission,
-						       U_I permission,
-						       bool fail_if_exists,
-						       bool erase,
-						       fichier_global * & ret) const
+    fichier_global *entrepot_local::inherited_open(user_interaction & dialog,
+						   const std::string & filename,
+						   gf_mode mode,
+						   bool force_permission,
+						   U_I permission,
+						   bool fail_if_exists,
+						   bool erase) const
     {
+	fichier_global *ret = NULL;
 	string fullname = (get_full_path() + path(filename)).display();
 	U_I perm = force_permission ? permission : 0666;
 
@@ -149,7 +149,7 @@ namespace libdar
 	    throw;
 	}
 
-	return io_ok;
+	return ret;
     }
 
 

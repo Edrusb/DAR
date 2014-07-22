@@ -76,15 +76,13 @@ namespace libdar
 	entrepot *clone() const { return new (get_pool()) entrepot_local(*this); };
 
     protected:
-	io_errors inherited_open(user_interaction & dialog,
-				 const std::string & filename,
-				 gf_mode mode,
-				 bool force_permission,
-				 U_I permission,
-				 bool fail_if_exists,
-				 bool erase,
-				 fichier_global * & ret) const;
-
+	fichier_global *inherited_open(user_interaction & dialog,
+				       const std::string & filename,
+				       gf_mode mode,
+				       bool force_permission,
+				       U_I permission,
+				       bool fail_if_exists,
+				       bool erase) const;
 
 	void inherited_unlink(const std::string & filename) const;
 	void read_dir_flush() { detruit(); };

@@ -73,89 +73,69 @@ namespace libdar
 	    return get_location();
     }
 
-    entrepot::io_errors entrepot::open(user_interaction & dialog,
-				       const std::string & filename,
-				       gf_mode mode,
-				       bool force_permission,
-				       U_I permission,
-				       bool fail_if_exists,
-				       bool erase,
-				       hash_algo algo,
-				       fichier_global * & ret) const
+    fichier_global *entrepot::open(user_interaction & dialog,
+				   const std::string & filename,
+				   gf_mode mode,
+				   bool force_permission,
+				   U_I permission,
+				   bool fail_if_exists,
+				   bool erase,
+				   hash_algo algo) const
     {
-	io_errors code;
-	fichier_global *data = NULL;
+	fichier_global *ret = NULL;
 
 	    // sanity check
 	if(algo != hash_none && (mode != gf_write_only || !(erase || fail_if_exists)))
 	    throw SRC_BUG; // if hashing is asked, we cannot accept to open an existing file without erasing its contents
 
+
 	    // creating the file to write data to
-	code = inherited_open(dialog,
-			      filename,
-			      mode,
-			      force_permission,
-			      permission,
-			      fail_if_exists,
-			      erase,
-			      data);
+	ret = inherited_open(dialog,
+			     filename,
+			     mode,
+			     force_permission,
+			     permission,
+			     fail_if_exists,
+			     erase);
 
-	if(code == io_ok)
+	if(ret == NULL)
+	    throw SRC_BUG;
+
+	try
 	{
-	    if(data == NULL)
-		throw SRC_BUG;
-	    try
+	    if(algo != hash_none)
 	    {
-		if(algo != hash_none)
-		{
-		    fichier_global *hash_file = NULL;
+		fichier_global *hash_file = NULL;
+		fichier_global *tmp = NULL;
 
-			// creating the file to write hash to
+		    // creating the file to write hash to
+
+		try
+		{
+		    hash_file = inherited_open(dialog,
+					       filename+"."+hash_algo_to_string(algo),
+					       gf_write_only,
+					       force_permission,
+					       permission,
+					       fail_if_exists,
+					       erase);
+
+		    if(hash_file == NULL)
+			throw SRC_BUG;
 
 		    try
 		    {
-			try
+			tmp = new (get_pool()) hash_fichier(dialog,
+							    ret,
+							    filename,
+							    hash_file,
+							    algo);
+			if(tmp == NULL)
+			    throw Ememory("entrepot::entrepot");
+			else
 			{
-			    code = inherited_open(dialog,
-						  filename+"."+hash_algo_to_string(algo),
-						  gf_write_only,
-						  force_permission,
-						  permission,
-						  fail_if_exists,
-						  erase,
-						  hash_file);
-
-			    switch(code)
-			    {
-			    case io_ok:
-				if(hash_file == NULL)
-				    throw SRC_BUG;
-
-				ret = new (get_pool()) hash_fichier(dialog,
-								    data,
-								    filename,
-								    hash_file,
-								    algo);
-				if(ret == NULL)
-				    throw Ememory("entrepot::entrepot");
-				else
-				{
-				    data = NULL;
-				    hash_file = NULL;
-				}
-				break;
-			    case io_absent:
-				throw SRC_BUG; // mode is not read only or read-write
-			    case io_exist:
-				throw SRC_BUG; // fail_if_exist was set to false
-			    default:
-				throw SRC_BUG;
-			    }
-			}
-			catch(Egeneric & e)
-			{
-			    e.prepend_message(gettext("Error met while creating the hash file: "));
-			    throw;
+			    ret = tmp;
+			    hash_file = NULL;
 			}
 		    }
 		    catch(...)
@@ -164,27 +144,26 @@ namespace libdar
 			    delete hash_file;
 			throw;
 		    }
-		}
-		else
-		    ret = data;
-	    }
-	    catch(...)
-	    {
-		if(data != NULL)
-		{
-		    delete data;
-		    data = NULL;
-		}
-		throw;
-	    }
 
-	    return io_ok;
+		}
+		catch(Egeneric & e)
+		{
+		    e.prepend_message(gettext("Error met while creating the hash file: "));
+		    throw;
+		}
+	    }
 	}
-	else
+	catch(...)
 	{
-	    ret = NULL;
-	    return code;
+	    if(ret != NULL)
+	    {
+		delete ret;
+		ret = NULL;
+	    }
+	    throw;
 	}
+
+	return ret;
     }
 
 
