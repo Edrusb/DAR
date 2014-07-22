@@ -313,15 +313,21 @@ namespace libdar
     class Esystem : public Egeneric
     {
     public:
-	Esystem(const std::string & source, S_I error_no);
+	enum io_error
+	{
+	    io_exist, //< file already exists (write mode)
+	    io_absent //< file does not exist (read mode)
+	};
 
-	S_I get_errno() const { return code; };
+	Esystem(const std::string & source, const std::string & message, io_error code);
+
+	io_error get_code() const { return x_code; };
 
     protected:
 	virtual std::string exceptionID() const { return "SYSTEM ERROR MET"; };
 
     private:
-	S_I code;
+	io_error x_code;
     };
 
 
