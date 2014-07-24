@@ -2603,13 +2603,13 @@ namespace libdar
     string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size, bool compressed)
     {
 	if(storage_size == 0 || !compressed)
-	    return "[     ]";
+	    return "     ";
 	else
 	    if(file_size >= storage_size)
-		return "[" + tools_addspacebefore(deci(((file_size - storage_size)*100)/file_size).human(), 4) +"%]";
+		return tools_addspacebefore(deci(((file_size - storage_size)*100)/file_size).human(), 4) +"%";
 	    // we can divide by file_size above, because it is never null in that case: file_size >= storage_size > 0
 	    else
-		return gettext("[Worse]");
+		return gettext("Worse");
     }
 
 #define MSGSIZE 200
