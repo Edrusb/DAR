@@ -2460,15 +2460,26 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
 	    rec_c = 0;
 	}
     }
+    catch(Esystem & e)
+    {
+	switch(e.get_code())
+	{
+	case Esystem::io_absent:
+		// failed openning the file,
+		// nothing to do,
+		// we will try the other config file
+		// below
+	    break;
+	case Esystem::io_exist:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
+    }
     catch(Erange & e)
     {
 	if(e.get_source() != "make_args_from_file")
 	    throw;
-	    // else:
-	    // failed openning the file,
-	    // nothing to do,
-	    // we will try the other config file
-	    // below
     }
 
     rec_c = 0;
@@ -2520,13 +2531,24 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
 		rec_c = 0;
 	    }
 	}
+	catch(Esystem & e)
+	{
+	    switch(e.get_code())
+	    {
+	    case Esystem::io_absent:
+		    // failed openning the file,
+		    // nothing to do,
+		break;
+	    case Esystem::io_exist:
+		throw SRC_BUG;
+	    default:
+		throw SRC_BUG;
+	    }
+	}
 	catch(Erange & e)
 	{
 	    if(e.get_source() != "make_args_from_file")
 		throw;
-		// else:
-		// failed openning the file,
-		// nothing to do,
 	}
     }
 
