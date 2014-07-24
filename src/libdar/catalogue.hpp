@@ -751,12 +751,18 @@ namespace libdar
 
         entree *clone() const { return new (get_pool()) directory(*this); };
 
+	const infinint & get_size() const { recursive_update_sizes(); return x_size; };
+	const infinint & get_storage_size() const { recursive_update_sizes(); return x_storage_size; };
+
     protected:
         void inherited_dump(generic_file & f, bool small) const;
 
-    private :
+    private:
 	static const eod fin;
 
+	infinint x_size;
+	infinint x_storage_size;
+	bool updated_sizes;
         directory *parent;
 #ifdef LIBDAR_FAST_DIR
         std::map<std::string, nomme *> fils; // used for fast lookup
@@ -766,6 +772,8 @@ namespace libdar
 	bool recursive_has_changed;
 
 	void clear();
+	void recursive_update_sizes() const;
+	void recursive_flag_size_to_update() const;
     };
 
 	/// the special device root class

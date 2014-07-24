@@ -2882,6 +2882,7 @@ namespace libdar
 	it = ordered_fils.begin();
 	set_saved_status(s_saved);
 	recursive_has_changed = true;
+	updated_sizes = false;
     }
 
     directory::directory(const directory &ref) : inode(ref)
@@ -2893,6 +2894,7 @@ namespace libdar
 	ordered_fils.clear();
 	it = ordered_fils.begin();
 	recursive_has_changed = ref.recursive_has_changed;
+	updated_sizes = false;
     }
 
     const directory & directory::operator = (const directory & ref)
@@ -2902,6 +2904,7 @@ namespace libdar
 
 	*this_ino = *ref_ino; // this assigns the inode part of the object
 	    // we don't modify the existing subfiles or subdirectories nor we copy them from the reference directory
+	recursive_flag_size_to_update();
 	return *this;
     }
 
@@ -2933,6 +2936,7 @@ namespace libdar
 #endif
 	ordered_fils.clear();
 	recursive_has_changed = true; // need to call recursive_has_changed_update() first if this fields has to be used
+	updated_sizes = false;
 
 	try
 	{
@@ -3052,6 +3056,60 @@ namespace libdar
 	    // this hack avoids recurrent construction/destruction of a eod object.
     }
 
+    void directory::recursive_update_sizes() const
+    {
+	if(!updated_sizes)
+	{
+	    directory *me = const_cast<directory *>(this);
+
+	    if(me == NULL)
+		throw SRC_BUG;
+	    me->x_size = 0;
+	    me->x_storage_size = 0;
+	    list<nomme *>::const_iterator it = ordered_fils.begin();
+	    const directory *f_dir = NULL;
+	    const file *f_file = NULL;
+
+	    while(it != ordered_fils.end())
+	    {
+		if(*it == NULL)
+		    throw SRC_BUG;
+		f_dir = dynamic_cast<const directory *>(*it);
+		f_file = dynamic_cast<const file *>(*it);
+		if(f_dir != NULL)
+		{
+			// recursion occurs here
+			// by calling get_size() and get_storage_size() of child directories
+			/// which in turn will call the recursive_update_sizes() of child objects
+		    me->x_size += f_dir->get_size();
+		    me->x_storage_size += f_dir->get_storage_size();
+		}
+		else if(f_file != NULL)
+		{
+		    me->x_size += f_file->get_size();
+		    if(f_file->get_storage_size() == 0)
+			me->x_storage_size += f_file->get_size();
+			// in old archives storage_size was set to zero to mean "no compression used"
+		    else
+			me->x_storage_size += f_file->get_storage_size();
+		}
+
+		++it;
+	    }
+	    me->updated_sizes = true;
+	}
+    }
+
+    void directory::recursive_flag_size_to_update() const
+    {
+	directory *me = const_cast<directory *>(this);
+	if(me == NULL)
+	    throw SRC_BUG;
+	me->updated_sizes = false;
+	if(parent != NULL)
+	    parent->recursive_flag_size_to_update();
+    }
+
     void directory::add_children(nomme *r)
     {
 	directory *d = dynamic_cast<directory *>(r);
@@ -3110,6 +3168,8 @@ namespace libdar
 
 	if(d != NULL)
 	    d->parent = this;
+
+	recursive_flag_size_to_update();
     }
 
     void directory::reset_read_children() const
@@ -3164,6 +3224,7 @@ namespace libdar
 #endif
 	ordered_fils.erase(it, ordered_fils.end());
 	it = ordered_fils.end();
+	recursive_flag_size_to_update();
     }
 
     void directory::remove(const string & name)
@@ -3205,6 +3266,7 @@ namespace libdar
 	    // destroying the object itself
 	delete obj;
 	reset_read_children();
+	recursive_flag_size_to_update();
     }
 
     void directory::clear()
@@ -3223,6 +3285,7 @@ namespace libdar
 #endif
 	ordered_fils.clear();
 	it = ordered_fils.begin();
+	recursive_flag_size_to_update();
     }
 
     bool directory::search_children(const string &name, const nomme * & ptr) const
@@ -3517,6 +3580,8 @@ namespace libdar
 	    else
 		++curs;
 	}
+
+	recursive_flag_size_to_update();
     }
 
     void directory::set_all_mirage_s_inode_dumped_field_to(bool val)
@@ -5295,10 +5360,20 @@ namespace libdar
 
 	ret += "[" + local_fsa_fam_to_string(ref) + "]";
 	const file *fic = dynamic_cast<const file *>(&ref);
+	const directory *dir = dynamic_cast<const directory *>(&ref);
 	if(fic != NULL && fic->get_saved_status() == s_saved)
-	    ret += tools_get_compression_ratio(fic->get_storage_size(),
-					       fic->get_size(),
-					       fic->get_compression_algo_read() != none || fic->get_sparse_file_detection_read());
+	    ret += string("[")
+		+ tools_get_compression_ratio(fic->get_storage_size(),
+					      fic->get_size(),
+					      fic->get_compression_algo_read() != none || fic->get_sparse_file_detection_read())
+		+ "]";
+
+	else if(dir != NULL)
+	    ret += string("[")
+		+ tools_get_compression_ratio(dir->get_storage_size(),
+					      dir->get_size(),
+					      true)
+		+ "]";
 	else
 	    ret += "[-----]";
 
