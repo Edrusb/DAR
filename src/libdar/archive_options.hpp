@@ -294,11 +294,14 @@ namespace libdar
 	    /// defines whether to show treated files
 	    ///
 	    /// \param[in] display_treated true to display processed inodes
-	    /// \param[in] only_dir only display the current directory under processing, not its individual files
+	    /// \param[in] only_dir only display the current directory under process, not its individual files
 	void set_display_treated(bool display_treated, bool only_dir) { x_display_treated = display_treated; x_display_treated_only_dir = only_dir; };
 
 	    /// whether to display files that have been excluded by filters
 	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
+
+	    /// whether to display a summary for each completed directory with total saved data and compression ratio
+	void set_display_finished(bool display_finished) { x_display_finished = display_finished; };
 
 	    /// set a pause beteween slices. Set to zero does not pause at all, set to 1 makes libdar pauses each slice, set to 2 makes libdar pause each 2 slices and so on.
 	void set_pause(const infinint & pause) { x_pause = pause; };
@@ -490,6 +493,7 @@ namespace libdar
 	bool get_display_treated() const { return x_display_treated; };
 	bool get_display_treated_only_dir() const { return x_display_treated_only_dir; };
 	bool get_display_skipped() const { return x_display_skipped; };
+	bool get_display_finished() const { return x_display_finished; };
 	const infinint & get_pause() const { return x_pause; };
 	bool get_empty_dir() const { return x_empty_dir; };
 	compression get_compression() const { return x_compr_algo; };
@@ -544,6 +548,7 @@ namespace libdar
 	bool x_display_treated;
 	bool x_display_treated_only_dir;
 	bool x_display_skipped;
+	bool x_display_finished;
 	infinint x_pause;
 	bool x_empty_dir;
 	compression x_compr_algo;

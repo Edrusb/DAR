@@ -323,6 +323,7 @@ namespace libdar
 	    x_display_treated = false;
 	    x_display_treated_only_dir = false;
 	    x_display_skipped = false;
+	    x_display_finished = false;
 	    x_pause = 0;
 	    x_empty_dir = false;
 	    x_compr_algo = none;
@@ -555,6 +556,7 @@ namespace libdar
 	x_display_treated = ref.x_display_treated;
 	x_display_treated_only_dir = ref.x_display_treated_only_dir;
 	x_display_skipped = ref.x_display_skipped;
+	x_display_finished = ref.x_display_finished;
 	x_pause = ref.x_pause;
 	x_empty_dir = ref.x_empty_dir;
 	x_compr_algo = ref.x_compr_algo;
