@@ -125,6 +125,13 @@ namespace libdar
         /// \return the value encoded in the given string
     extern infinint tools_get_extended_size(std::string s, U_I base);
 
+	/// convert an integer to its decimal representation with the highest unit of metric system
+	/// \param[in] number is the integer to convert
+	/// \param[in] unit unit symbol (o for octet, m for meter, etc.) to apply metric system to, this may be NULL
+	/// \param[in] binary if set to true using the ki, Gi, Mi ... scale instead of the traditional k, G, M, ... prefixes
+	/// \return the string representing the number in metric system (ex: "1 ko", "200 Mio", ...)
+    extern std::string tools_display_integer_in_metric_system(infinint number, const std::string & unit, bool binary);
+
         /// extracts the basename of a file (removing path part)
 
 	/// \param[in] command_name is the full path of the file

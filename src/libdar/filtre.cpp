@@ -577,11 +577,6 @@ namespace libdar
 
 		    juillet.enfile(e);
 		    thr_cancel.check_self_cancellation();
-		    if(display_treated_only_dir)
-		    {
-			if(dir != NULL)
-			    dialog.warning(string(gettext("Inspecting directory ")) + juillet.get_string());
-		    }
 
 		    if(e_mir != NULL)
 		    {
@@ -986,7 +981,24 @@ namespace libdar
 			if(fixed_date == 0)
 			    ref.compare(e, f); // makes the comparison in the reference catalogue go to parent directory
 			cat.pre_add(e, stockage); // adding a mark and dropping EOD entry in the archive if cat is an escape_catalogue object (else, does nothing)
+			if(display_treated_only_dir)
+			{
+			    const directory & cur = cat.get_current_add_dir();
+			    string what = juillet.get_string();
+			    string size = tools_display_integer_in_metric_system(cur.get_size(), "o", true);
+			    string ratio = gettext(", compression ratio ");
+
+			    if(cur.get_storage_size() > 0)
+				ratio += tools_get_compression_ratio(cur.get_storage_size(), cur.get_size(), true);
+			    else
+				ratio = "";
+			    dialog.printf(gettext("Finished Inspecting directory %S , saved %S%S"),
+					  &what,
+					  &size,
+					  &ratio);
+			}
 			cat.add(e);
+
 		    }
 		}
 	    }

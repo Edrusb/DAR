@@ -1014,7 +1014,7 @@ namespace libdar
             // a call with NULL as first argument means to set the current dir the parent directory
 	void remove_read_entry(std::string & name);
 	    // in the currently read directory, removes the entry which name is given in argument
-	const directory & get_current_reading_dir() const { return *current_read; };
+	const directory & get_current_reading_dir() const { if(current_read == NULL) throw SRC_BUG; return *current_read; };
 	    // remove from the catalogue all the entries that have not yet been read
 	    // by read().
 	void tail_catalogue_to_current_read();
@@ -1054,6 +1054,7 @@ namespace libdar
 	void re_add_in(const std::string &subdirname); // return into an already existing subdirectory for further addition
 	void re_add_in_replace(const directory &dir); // same as re_add_in but also set the properties of the existing directory to those of the given argument
         void add_in_current_read(nomme *ref); // add in currently read directory
+	const directory & get_current_add_dir() const { if(current_add == NULL) throw SRC_BUG; return *current_add; };
 
 
 

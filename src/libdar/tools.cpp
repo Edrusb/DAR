@@ -317,6 +317,60 @@ namespace libdar
         return factor;
     }
 
+    string tools_display_integer_in_metric_system(infinint number, const string & unit, bool binary)
+    {
+	string ret = "";
+	infinint multiple = binary ? 1024 : 1000;
+	U_I power = 0;
+	    // 1 = 'k', 2 = 'M', 3 = 'G', 4 = 'T', 5 = 'P', 6 = 'E', 7 = 'Z', 8 = 'Y'
+
+	while(number >= multiple && power < 8)
+	{
+	    ++power;
+	    number /= multiple;
+	}
+
+	ret = deci(number).human();
+	if(unit.size() > 0)
+	    ret += " "; // a space is required by convention to separate the number from its unit
+
+	switch(power)
+	{
+	case 0:
+	    if(number > 0)
+		ret += unit;
+		// not displaying unit for zero for clarity in particular when octets symbol is used
+		// which would give "0 o" that is somehow not very easy to read/understand
+	    break;
+	case 1:
+	    ret += (binary ? "ki" : "k") + unit;
+	    break;
+	case 2:
+	    ret += (binary ? "Mi" : "M") + unit;
+	    break;
+	case 3:
+	    ret += (binary ? "Gi" : "G") + unit;
+	    break;
+	case 4:
+	    ret += (binary ? "Ti" : "T") + unit;
+	    break;
+	case 5:
+	    ret += (binary ? "Pi" : "P") + unit;
+	    break;
+	case 6:
+	    ret += (binary ? "Ei" : "E") + unit;
+	    break;
+	case 7:
+	    ret += (binary ? "Zi" : "Z") + unit;
+	    break;
+	default:
+	    ret += (binary ? "Yi" : "Y") + unit;
+	    break;
+	}
+
+	return ret;
+    }
+
     void tools_extract_basename(const char *command_name, string &basename)
     {
         basename = path(command_name).basename();
