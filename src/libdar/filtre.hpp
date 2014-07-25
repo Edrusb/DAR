@@ -78,6 +78,7 @@ namespace libdar
 				  bool display_treated,
 				  bool display_treated_only_dir,
 				  bool display_skipped,
+				  bool display_finished,
                                   statistics & st,
                                   bool make_empty_dir,
 				  const mask & ea_mask,

@@ -219,6 +219,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.set_display_treated(param.display_treated,
 						       param.display_treated_only_dir);
 		    create_options.set_display_skipped(param.display_skipped);
+		    create_options.set_display_finished(param.display_finished);
 		    create_options.set_pause(param.pause);
 		    create_options.set_empty_dir(param.empty_dir);
 		    create_options.set_compression(param.algo);

@@ -494,6 +494,7 @@ namespace libdar
 			   bool display_treated,
 			   bool display_treated_only_dir,
 			   bool display_skipped,
+			   bool display_finished,
                            statistics & st,
                            bool make_empty_dir,
 			   const mask & ea_mask,
@@ -577,6 +578,11 @@ namespace libdar
 
 		    juillet.enfile(e);
 		    thr_cancel.check_self_cancellation();
+		    if(display_treated_only_dir)
+		    {
+			if(dir != NULL)
+			    dialog.warning(string(gettext("Inspecting directory ")) + juillet.get_string());
+		    }
 
 		    if(e_mir != NULL)
 		    {
@@ -981,7 +987,7 @@ namespace libdar
 			if(fixed_date == 0)
 			    ref.compare(e, f); // makes the comparison in the reference catalogue go to parent directory
 			cat.pre_add(e, stockage); // adding a mark and dropping EOD entry in the archive if cat is an escape_catalogue object (else, does nothing)
-			if(display_treated_only_dir)
+			if(display_finished)
 			{
 			    const directory & cur = cat.get_current_add_dir();
 			    string what = juillet.get_string();

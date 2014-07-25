@@ -69,6 +69,7 @@ struct line_param
     bool display_treated;         //< whether to show treated files
     bool display_treated_only_dir;//< whether to show treated files's current working directory
     bool display_skipped;         //< whether to display skipped files
+    bool display_finished;        //< whether to display summary (space/compression ratio) for each completed directory
     compression algo;             //< compression algorithm to use when generating an archive
     U_I compression_level;        //< compression level to use when generating an archive
     infinint pause;               //< whether to pause between slices

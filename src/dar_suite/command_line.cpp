@@ -256,6 +256,7 @@ bool get_args(shell_interaction & dialog,
     p.display_treated = false;
     p.display_treated_only_dir = false;
     p.display_skipped = false;
+    p.display_finished = false;
     p.algo = none;
     p.compression_level = 9;
     p.pause = 0;
@@ -521,6 +522,9 @@ bool get_args(shell_interaction & dialog,
 
 	if(rec.no_inter && p.pause > 0)
 	    throw Erange("get_args", gettext("-p and -Q options are mutually exclusives"));
+
+	if(p.display_finished && p.op != create)
+	    dialog.warning(gettext("-vf is only useful with -c option"));
 
 	    //////////////////////
 	    // generating masks
@@ -852,6 +856,8 @@ static bool get_args_recursive(recursive_param & rec,
 			p.display_treated = true;
 			p.display_treated_only_dir = true;
 		    }
+		    else if(strcasecmp("finished", optarg) == 0 || strcasecmp("f", optarg) == 0)
+			p.display_finished = true;
 		    else if(strcasecmp("all", optarg) == 0 || strcasecmp("a", optarg) == 0)
 		    {
 			p.info_details = true;

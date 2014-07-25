@@ -28,7 +28,7 @@ r - do not overwrite more recent file   --recent [=date] (to implement)
 s + size of slice                       --slice
 t + test archive structure              --test
 u + exclude EA from operation (mask)    --exclude-ea
-v + verbose output                      --verbose   --verbose={skipped|treated|messages|all}
+v + verbose output                      --verbose   --verbose={skipped|treated|messages|dir|all}
 w * do not warn before overwriting      --no-warn
 x + extract archive                     --extract
 y * [DEPRECATED] bzip2 compression      --bzip2

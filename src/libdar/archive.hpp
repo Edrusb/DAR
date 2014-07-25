@@ -368,6 +368,7 @@ namespace libdar
 				bool display_treated,
 				bool display_treated_only_dir,
 				bool display_skipped,
+				bool display_finished,
 				const infinint & pause,
 				bool empty_dir,
 				compression algo,
@@ -428,6 +429,7 @@ namespace libdar
 			      bool display_treated,             //< whether to display treated files
 			      bool display_treated_only_dir,    //< whether to only display current directory of treated files
 			      bool display_skipped,             //< display skipped files for the operation
+			      bool display_finished,            //< display space and compression ratio summary for each completed directory
 			      const infinint & pause,           //< whether to pause between slices
 			      bool empty_dir,                   //< whether to store excluded dir as empty directories
 			      compression algo,                 //< compression algorithm
