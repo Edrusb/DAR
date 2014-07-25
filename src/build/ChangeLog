@@ -42,6 +42,10 @@ from 2.4.x to 2.5.0
   at creation time, only the passphrase is required at reading time.
 - Adding support for public key encryption (GnuPG) relying on gpgme
 - Adding support for public key signature of an archive
+- While listing archive contents, directory show the size and average
+  compression of the data they contain
+- added the -vd switch to only display current directory under process for
+  creation, diff, test, extraction and merging operations
 
 from 2.4.13 to 2.4.14
 - limiting memory consumption of the cache layer to stay below 10 MiB, under
