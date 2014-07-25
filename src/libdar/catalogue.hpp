@@ -754,6 +754,8 @@ namespace libdar
 	const infinint & get_size() const { recursive_update_sizes(); return x_size; };
 	const infinint & get_storage_size() const { recursive_update_sizes(); return x_storage_size; };
 
+	void recursively_set_to_unsaved_data_and_FSA();
+
     protected:
         void inherited_dump(generic_file & f, bool small) const;
 
@@ -1128,6 +1130,8 @@ namespace libdar
 
 	    /// reset all pointers to the root (a bit better than reset_add() + reset_read() + reset_compare() + reset_sub_read())
 	void reset_all();
+
+	void set_to_unsaved_data_and_FSA() { if(contenu == NULL) throw SRC_BUG; contenu->recursively_set_to_unsaved_data_and_FSA(); };
 
 
     protected:

@@ -3269,6 +3269,51 @@ namespace libdar
 	recursive_flag_size_to_update();
     }
 
+    void directory::recursively_set_to_unsaved_data_and_FSA()
+    {
+	list<nomme *>::iterator it = ordered_fils.begin();
+	directory *n_dir = NULL;
+	inode *n_ino = NULL;
+	mirage *n_mir = NULL;
+
+	    // dropping info for the current directory
+	set_saved_status(s_not_saved);
+	if(ea_get_saved_status() == inode::ea_full)
+	    ea_set_saved_status(inode::ea_partial);
+	if(fsa_get_saved_status() == inode::fsa_full)
+	    fsa_set_saved_status(inode::fsa_partial);
+
+	    // doing the same for each entry found in that directory
+	while(it != ordered_fils.end())
+	{
+	    if(*it == NULL)
+		throw SRC_BUG;
+
+	    n_dir = dynamic_cast<directory *>(*it);
+	    n_ino = dynamic_cast<inode *>(*it);
+	    n_mir = dynamic_cast<mirage *>(*it);
+
+	    if(n_mir != NULL)
+		n_ino = n_mir->get_inode();
+
+	    if(n_dir != NULL)
+		n_dir->recursively_set_to_unsaved_data_and_FSA();
+	    else // nothing to do for directory the recursive call does the job
+	    {
+		if(n_ino != NULL)
+		{
+		    n_ino->set_saved_status(s_not_saved);
+		    if(n_ino->ea_get_saved_status() == inode::ea_full)
+			n_ino->ea_set_saved_status(ea_partial);
+		    if(n_ino->fsa_get_saved_status() == inode::fsa_full)
+			n_ino->fsa_set_saved_status(inode::fsa_partial);
+		}
+	    }
+
+	    ++it;
+	}
+    }
+
     void directory::clear()
     {
 	it = ordered_fils.begin();

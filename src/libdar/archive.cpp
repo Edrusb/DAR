@@ -579,16 +579,13 @@ namespace libdar
 		    check_libgcrypt_hash_bug(dialog, options.get_hash_algo(), options.get_first_slice_size(), options.get_slice_size());
 
 		    if(ref_arch1 != NULL)
-			ref_arch1->check_against_isolation(dialog, false);
-			// this avoid to merge an archive from an isolated catalogue
-			// there is no way to know whether the corresponding merging of the real archive exists, nor to know the data_name of this
-			// hypothetical merged archive. Thus we forbid the use of isolated catalogue for merging.
-
+			if(ref_arch1->only_contains_an_isolated_catalogue())
+				// convert all data to unsaved
+			    ref_arch1->set_to_unsaved_data_and_FSA();
 
 		    if(ref_arch2 != NULL)
-			ref_arch2->check_against_isolation(dialog, false);
-			// same remark as above for ref_arch1
-
+			if(ref_arch2->only_contains_an_isolated_catalogue())
+			    ref_arch2->set_to_unsaved_data_and_FSA();
 
 			// end of sanity checks
 

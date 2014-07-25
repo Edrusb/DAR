@@ -317,6 +317,9 @@ namespace libdar
 
 	void drop_all_filedescriptors(user_interaction & dialog);
 
+	    /// change all inode as unsaved (equal to differential backup with no change met)
+	void set_to_unsaved_data_and_FSA() { if(cat == NULL) throw SRC_BUG; cat->set_to_unsaved_data_and_FSA(); };
+
 	    /// check that the internal memory_pool has all its blocks properly freeed
 	    ///
 	    /// \return an empty string in normal situation, else a status report about the
@@ -324,6 +327,7 @@ namespace libdar
 	    /// \note this must be the last call done to that object before destruction and it must
 	    /// be done only once
 	std::string free_and_check_memory() const;
+
 
     private:
 	enum operation { oper_create, oper_isolate, oper_merge };
