@@ -87,6 +87,20 @@ AC_FUNC_UTIME_NULL
 AC_HEADER_TIME
 AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror utime fdopendir])
 
+AC_MSG_CHECKING([for sed -r/-E option])
+if [ echo coucoul | sed -r -e 's/(c|o)+/\1/g' > /dev/null ] ; then
+    local_sed="gnu"
+    AC_MSG_RESULT([gnu sed using -r option for regex])
+else
+   if [ echo coucoul | sed -E -e 's/(c|o)+/\1/g' > /dev/null ] ; then
+     local_sed="bsd"
+     AC_MSG_RESULT([BSD sed using -r option for regex])
+   else
+     local_sed=unknown
+     AC_MSG_ERROR([unknown swich to use with sed to support regex])
+   fi
+fi
+
 AC_MSG_CHECKING([for getopt() in <unistd.h>])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                     #if HAVE_UNISTD_H
@@ -711,6 +725,7 @@ AM_CONDITIONAL([USE_UPX], [test "$upx" = "yes"])
 AM_CONDITIONAL([USE_DOXYGEN], [test "$doxygen" = "yes"])
 AM_CONDITIONAL([USE_GROFF], [test "$groff" = "yes"])
 AM_CONDITIONAL([PROFILING], [test "$profiling" = "yes"])
+AM_CONDITIONAL([BSD_SED], [test "$local_sed" = "bsd"])
 AC_SUBST(UPX_PROG, [upx])
 AC_SUBST(DOXYGEN_PROG, [doxygen])
 
