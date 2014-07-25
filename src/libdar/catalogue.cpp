@@ -5272,11 +5272,11 @@ namespace libdar
 	string ret;
 
 	const file *fic = dynamic_cast<const file *>(&ref);
+	const directory *dir = dynamic_cast<const directory *>(&ref);
 	if(fic != NULL)
-	{
-	    deci d = fic->get_size();
-	    ret = d.human();
-	}
+	    ret = tools_display_integer_in_metric_system(fic->get_size(), "o", true);
+	else if(dir != NULL)
+	    ret = tools_display_integer_in_metric_system(dir->get_size(), "o", true);
 	else
 	    ret = "0";
 
