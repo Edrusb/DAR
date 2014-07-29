@@ -88,16 +88,16 @@ AC_HEADER_TIME
 AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror utime fdopendir])
 
 AC_MSG_CHECKING([for sed -r/-E option])
-if [ echo coucoul | sed -r -e 's/(c|o)+/\1/g' > /dev/null ] ; then
+if sed -r -e 's/(c|o)+/\1/g' > /dev/null < /dev/null ; then
     local_sed="gnu"
-    AC_MSG_RESULT([gnu sed using -r option for regex])
+    AC_MSG_RESULT([GNU sed, using -r option for regex])
 else
-   if [ echo coucoul | sed -E -e 's/(c|o)+/\1/g' > /dev/null ] ; then
+   if sed -E -e 's/(c|o)+/\1/g' > /dev/null < /dev/null ; then
      local_sed="bsd"
-     AC_MSG_RESULT([BSD sed using -r option for regex])
+     AC_MSG_RESULT([BSD sed, using -E option for regex])
    else
      local_sed=unknown
-     AC_MSG_ERROR([unknown swich to use with sed to support regex])
+     AC_MSG_ERROR([unknown switch to use with sed to support regex])
    fi
 fi
 
