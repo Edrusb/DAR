@@ -85,8 +85,6 @@ namespace libdar
 		 U_I max_size_hit_write_ratio) : generic_file(hidden.get_mode())
     {
 	    // sanity checks
-	if(&hidden == NULL)
-	    throw Erange("cache::cache", "NULL given as \"hidden\" argument while initializing cache"); // not translated message, this is expected
 	if(initial_size < 1)
 	    throw Erange("cache::cache", gettext("wrong value given as initial_size argument while initializing cache"));
 	if(observation_read_number < 2)

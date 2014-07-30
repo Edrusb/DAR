@@ -171,10 +171,6 @@ namespace libdar
     void get_version(U_I & major, U_I & minor, bool init_libgcrypt)
     {
 	NLS_SWAP_IN;
-        if(&major == NULL)
-            throw Elibcall("get_version", gettext("Argument given to \"major\" is a NULL pointer"));
-        if(&minor == NULL)
-            throw Elibcall("get_version", gettext("Argument given to \"minor\" is a NULL pointer"));
         major = LIBDAR_COMPILE_TIME_MAJOR;
         minor = LIBDAR_COMPILE_TIME_MINOR;
 	libdar_init(init_libgcrypt);
@@ -193,12 +189,6 @@ namespace libdar
     void get_version(U_I & major, U_I & medium, U_I & minor, bool init_libgcrypt)
     {
 	NLS_SWAP_IN;
-        if(&major == NULL)
-            throw Elibcall("get_version", gettext("Argument given to \"major\" is a NULL pointer"));
-	if(&medium == NULL)
-	    throw Elibcall("get_version", gettext("Argument given to \"medium\" is a NULL pointer"));
-        if(&minor == NULL)
-            throw Elibcall("get_version", gettext("argument given to \"minor\" is a NULL pointer"));
 
         major = LIBDAR_COMPILE_TIME_MAJOR;
 	medium = LIBDAR_COMPILE_TIME_MEDIUM;

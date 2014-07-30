@@ -114,6 +114,7 @@ static void routine_limitint(user_interaction & dialog)
         {
             fichier tmp = fichier(dialog, fd);
             r2.read(tmp);
+	    r2 += r1; // avoid compiler complaining about r1 not used
         }
         catch(Elimitint & e)
         {
@@ -132,6 +133,7 @@ static void routine_limitint(user_interaction & dialog)
         unsigned long long tmp = twopower32_1;
         tmp++;
         infinint c = tmp;
+	c = c+1; // avoid compiler complaining against unused variable c
     }
     catch(Elimitint & e)
     {
@@ -141,6 +143,7 @@ static void routine_limitint(user_interaction & dialog)
     try
     {
         infinint c = (long long)(twopower32_1+1);
+	c = c+1; // avoid compiler complaining against unused variable c
     }
     catch(Elimitint & e)
     {

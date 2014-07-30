@@ -42,10 +42,8 @@ namespace libdar
 
     inline void archive_option_destroy_mask(mask * & ptr);
     inline void archive_option_clean_mask(mask * & ptr, bool all = true);
-    inline void archive_option_check_mask(const mask & m);
     inline void archive_option_destroy_crit_action(crit_action * & ptr);
     inline void archive_option_clean_crit_action(crit_action * & ptr);
-    inline void archive_option_check_crit_action(const crit_action & m);
 
 
 	/////////////////////////////////////////////////////////
@@ -70,22 +68,6 @@ namespace libdar
 	}
     }
 
-    inline void archive_option_check_mask(const mask & m)
-    {
-	NLS_SWAP_IN;
-	try
-	{
-	    if(&m == NULL)
-		throw Elibcall("archive_options_check_mask", gettext("invalid NULL argument given as mask option"));
-	}
-	catch(...)
-	{
-	    NLS_SWAP_OUT;
-	    throw;
-	}
-	NLS_SWAP_OUT;
-    }
-
     inline void archive_option_clean_crit_action(crit_action * & ptr)
     {
 	archive_option_destroy_crit_action(ptr);
@@ -101,22 +83,6 @@ namespace libdar
 	    delete ptr;
 	    ptr = NULL;
 	}
-    }
-
-    inline void archive_option_check_crit_action(const crit_action & m)
-    {
-	NLS_SWAP_IN;
-	try
-	{
-	    if(&m == NULL)
-		throw Elibcall("archive_options_check_crit_action", gettext("invalid NULL argument given as crit_action option"));
-	}
-        catch(...)
-        {
-            NLS_SWAP_OUT;
-            throw;
-        }
-        NLS_SWAP_OUT;
     }
 
 
@@ -283,7 +249,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(selection);
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == NULL)
@@ -302,7 +267,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(subtree);
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == NULL)
@@ -321,7 +285,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(ea_mask);
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
 	    if(x_ea_mask == NULL)
@@ -340,7 +303,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(compr_mask);
 	    archive_option_destroy_mask(x_compr_mask);
 	    x_compr_mask = compr_mask.clone();
 	    if(x_compr_mask == NULL)
@@ -360,7 +322,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(which_files);
 	    archive_option_destroy_mask(x_backup_hook_file_mask);
 	    x_backup_hook_file_mask = which_files.clone();
 	    if(x_backup_hook_file_mask == NULL)
@@ -560,7 +521,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(selection);
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == NULL)
@@ -579,7 +539,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(subtree);
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == NULL)
@@ -598,7 +557,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_crit_action(overwrite);
 	    archive_option_destroy_crit_action(x_overwrite);
 	    x_overwrite = overwrite.clone();
 	    if(x_overwrite == NULL)
@@ -617,7 +575,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(ea_mask);
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
 	    if(x_ea_mask == NULL)
@@ -636,7 +593,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(compr_mask);
 	    archive_option_destroy_mask(x_compr_mask);
 	    x_compr_mask = compr_mask.clone();
 	    if(x_compr_mask == NULL)
@@ -773,7 +729,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(selection);
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == NULL)
@@ -792,7 +747,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(subtree);
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == NULL)
@@ -811,7 +765,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(ea_mask);
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
 	    if(x_ea_mask == NULL)
@@ -830,7 +783,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_crit_action(over);
 	    archive_option_destroy_crit_action(x_overwrite);
 	    x_overwrite = over.clone();
 	    if(x_overwrite == NULL)
@@ -938,7 +890,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(selection);
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == NULL)
@@ -957,7 +908,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(subtree);
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == NULL)
@@ -1070,7 +1020,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(selection);
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == NULL)
@@ -1089,7 +1038,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(subtree);
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == NULL)
@@ -1108,7 +1056,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(ea_mask);
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
 	    if(x_ea_mask == NULL)
@@ -1239,7 +1186,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(selection);
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == NULL)
@@ -1258,7 +1204,6 @@ namespace libdar
 	NLS_SWAP_IN;
 	try
 	{
-	    archive_option_check_mask(subtree);
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == NULL)

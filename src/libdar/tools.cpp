@@ -321,8 +321,6 @@ namespace libdar
 
     string::iterator tools_find_last_char_of(string &s, unsigned char v)
     {
-	if(&s == NULL)
-	    throw SRC_BUG;
 	if(s.empty())
 	    return s.end();
 
@@ -344,9 +342,6 @@ namespace libdar
 
     string::iterator tools_find_first_char_of(string &s, unsigned char v)
     {
-	if(&s == NULL)
-	    throw SRC_BUG;
-
 	string::iterator it = s.begin();
 
 	while(it != s.end() && *it != v)

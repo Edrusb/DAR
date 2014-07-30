@@ -466,12 +466,6 @@ namespace libdar
 		// sanity checks as much as possible to avoid libdar crashing due to bad arguments
 		// useless arguments are not reported.
 
-	    if(&sauv_path == NULL)
-		throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"sauv_path\""));
-	    if(&filename == NULL)
-		throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"filename\""));
-	    if(&extension == NULL)
-		throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"extension\""));
 	    if(options.get_compression_level() > 9 || options.get_compression_level() < 1)
 		throw Elibcall("op_create/op_isolate", gettext("Compression_level must be between 1 and 9 included"));
 	    if(options.get_slice_size() == 0 && options.get_first_slice_size() != 0)
@@ -651,8 +645,6 @@ namespace libdar
 
             if(!exploitable)
                 throw Elibcall("op_extract", gettext("This archive is not exploitable, check documentation for more"));
-            if(&fs_root == NULL)
-                throw Elibcall("op_extract", gettext("NULL argument given to \"fs_root\""));
 
 	    check_against_isolation(dialog, lax_read_mode);
 		// this avoid to try extracting archive directly from an isolated catalogue
@@ -874,8 +866,6 @@ namespace libdar
 
             if(!exploitable)
                 throw Elibcall("op_diff", gettext("This archive is not exploitable, check documentation for more"));
-            if(&fs_root == NULL)
-                throw Elibcall("op_diff", gettext("NULL argument given to \"fs_root\""));
 
 	    check_against_isolation(dialog, lax_read_mode);
 		// this avoid to try diffing archive directly from an isolated catalogue
@@ -1341,32 +1331,12 @@ namespace libdar
             // sanity checks as much as possible to avoid libdar crashing due to bad arguments
             // useless arguments are not reported.
 
-        if(&fs_root == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"fs_root\""));
-        if(&sauv_path == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"sauv_path\""));
-        if(&selection == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"selection\""));
-        if(&subtree == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"subtree\""));
-        if(&filename == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"filename\""));
-        if(&extension == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"extension\""));
         if(compression_level > 9 || compression_level < 1)
             throw Elibcall("op_create/op_isolate", gettext("Compression_level must be between 1 and 9 included"));
         if(file_size == 0 && first_file_size != 0)
             throw Elibcall("op_create/op_isolate", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
-        if(&execute == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"execute\""));
-        if(&compr_mask == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"compr_mask\""));
-        if(&min_compr_size == NULL)
-            throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"min_compr_size\""));
         if(crypto_size < 10 && crypto != crypto_none)
             throw Elibcall("op_create/op_isolate", gettext("Crypto block size must be greater than 10 bytes"));
-	if(&ea_mask == NULL)
-	    throw Elibcall("op_create/op_isolate", gettext("NULL argument given to \"ea_mask\""));
 #ifndef	LIBDAR_NODUMP_FEATURE
 	if(nodump)
 	    throw Ecompilation(gettext("nodump flag feature has not been activated at compilation time, it is thus not available"));

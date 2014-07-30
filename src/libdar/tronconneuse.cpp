@@ -59,8 +59,6 @@ namespace libdar
 
     tronconneuse::tronconneuse(U_32 block_size, generic_file & encrypted_side, bool no_initial_shift, const archive_version & x_reading_ver) : generic_file(encrypted_side.get_mode())
     {
-	if(&encrypted_side == NULL)
-	    throw SRC_BUG;
 	if(encrypted_side.get_mode() == gf_read_write)
 	    throw SRC_BUG;
 	if(block_size == 0)

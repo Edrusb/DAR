@@ -101,7 +101,7 @@ void f1()
 
 void warning(const string &x, void *context)
 {
-    printf("[%d]%s\n", context, x.c_str());
+    printf("[%ld]%s\n", (unsigned long int)context, x.c_str());
 }
 
 bool question(const string & x, void *context)
