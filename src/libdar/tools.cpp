@@ -497,7 +497,7 @@ namespace libdar
 	    throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
 
 	tmp >> residu;
-	for(register U_I i = 0; i < residu.size(); ++i)
+	for(U_I i = 0; i < residu.size(); ++i)
 	    if(residu[i] != ' ')
 		throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
 
@@ -514,7 +514,7 @@ namespace libdar
 	    throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
 
 	tmp >> residu;
-	for(register U_I i = 0; i < residu.size(); ++i)
+	for(U_I i = 0; i < residu.size(); ++i)
 	    if(residu[i] != ' ')
 		throw Erange("tools_str2string", string(dar_gettext("Invalid number: ")) + x);
 
@@ -747,7 +747,7 @@ namespace libdar
 	    // ISO C++ forbids variable-size array
 	char **argv = new (nothrow) char * [argvector.size()+1];
 
-	for(register U_I i = 0; i <= argvector.size(); i++)
+	for(U_I i = 0; i <= argvector.size(); i++)
 	    argv[i] = NULL;
 
 	try
@@ -755,7 +755,7 @@ namespace libdar
 	    S_I status;
 	    bool loop;
 
-	    for(register U_I i = 0; i < argvector.size(); i++)
+	    for(U_I i = 0; i < argvector.size(); i++)
 		argv[i] = tools_str2charptr(argvector[i]);
 	    argv[argvector.size()] = NULL; // this is already done above but that does not hurt doing it twice :-)
 
@@ -813,14 +813,14 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    for(register U_I i = 0; i <= argvector.size(); i++)
+	    for(U_I i = 0; i <= argvector.size(); i++)
 		if(argv[i] != NULL)
 		    delete [] argv[i];
 	    delete argv;
 	    throw;
 	}
 
-	for(register U_I i = 0; i <= argvector.size(); i++)
+	for(U_I i = 0; i <= argvector.size(); i++)
 	    if(argv[i] != NULL)
 		delete [] argv[i];
 	delete argv;
@@ -2231,7 +2231,7 @@ namespace libdar
 	unsigned char *d = (unsigned char *) dest;
 	const unsigned char *s = (const unsigned char *) src;
 
-	for (register U_I i = 0; i < n; i++)
+	for(U_I i = 0; i < n; i++)
 	    *d++ ^= *s++;
     }
 

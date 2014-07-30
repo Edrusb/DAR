@@ -322,7 +322,7 @@ namespace libdar
 
 	try
 	{
-	    register U_I i = size;
+	    U_I i = size;
 
 	    while(i > 0)
 	    {

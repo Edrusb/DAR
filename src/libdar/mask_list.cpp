@@ -66,7 +66,7 @@ namespace libdar
 	    char *buffer = NULL;               //< hold the just read data
 	    static const U_I buf_size = 20480; //< size of buffer: we read at most this number of bytes at a time
 	    list <string> tmp;                 //< list of all raw lines read, without any prefix
-	    register U_I lu = 0, curs;         //< cursor used as cisors to split data in line
+	    U_I lu = 0, curs;                  //< cursor used as cisors to split data in line
 	    char *beg = NULL;                  //< points to the beginning of the next line inside buffer, when more than one line can be found in buffer
 	    string current_entry = "";         //< holds the current line converted to string between each read()
 	    path prefix = prefix_t;            //< the prefix to add to relative paths

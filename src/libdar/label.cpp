@@ -72,7 +72,7 @@ namespace libdar
 
     bool label::is_cleared() const
     {
-	register U_I i = 0;
+	U_I i = 0;
 	while(i < LABEL_SIZE && val[i] == '\0')
 	    i++;
 
@@ -88,7 +88,7 @@ namespace libdar
 	unsigned char *src = (unsigned char *)(&src1);
 	U_I s1 = sizeof(src1) < LABEL_SIZE ? sizeof(src1) : LABEL_SIZE;
 
-	for(register U_I i = 0 ; i < s1; ++i)
+	for(U_I i = 0 ; i < s1; ++i)
 	    dest[i] = src[i];
 
 	if(s1 < LABEL_SIZE)
@@ -97,7 +97,7 @@ namespace libdar
 	    s1 = s1 < sizeof(src2) ? s1 : sizeof(src2); // number of byte to copy
 	    src = (unsigned char *)(&src2);
 
-	    for(register U_I i = 0; i < s1; ++i)
+	    for(U_I i = 0; i < s1; ++i)
 		dest[sizeof(src1)+i] = src[i];
 	}
 
@@ -109,7 +109,7 @@ namespace libdar
 	    s2 = s2 < sizeof(src3) ? s2 : sizeof(src3);
 
 	    src = (unsigned char *)(&src3);
-	    for(register U_I i = 0; i < s2; ++i)
+	    for(U_I i = 0; i < s2; ++i)
 		dest[s1+i] = src[i];
 	}
 
