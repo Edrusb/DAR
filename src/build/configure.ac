@@ -645,6 +645,11 @@ AC_ARG_ENABLE(  [thread-safe],
                                                         #if HAVE_PTHREAD_H
                                                         #include <pthread.h>
                                                         #endif
+							#if MUTEX_WORKS
+							#if HAVE_PTHREAD_H
+							#include <pthread.h>
+							#endif
+							#endif
                                                      }]],
                                                     [[ pthread_mutex_t mutex;
                                                        pthread_mutex_init(&mutex, (const pthread_mutexattr_t*)0);
@@ -706,6 +711,11 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 
 				  if(symbols != NULL)
 				    free(symbols);
+			       #endif
+			       #if MUTEX_WORKS
+			         pthread_mutex_t test;
+				 pthread_mutex_lock(&test);
+				 phtread_mutex_unloc(&test);
 			       #endif
 
                                   printf("Hello World!");
