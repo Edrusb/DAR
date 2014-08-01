@@ -142,8 +142,8 @@ namespace libdar
         void stack(const std::string & passage, const std::string & file, const std::string & line);
 
     protected :
-        std::string exceptionID() const { return "BUG"; };}
-	;
+        std::string exceptionID() const { return "BUG"; };
+    };
 
 	/// exception used when arithmetic error is detected when operating on infinint
 
