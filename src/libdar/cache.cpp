@@ -210,8 +210,6 @@ namespace libdar
 
 	    if(next > last)
 		throw SRC_BUG;
-	    if(next < 0)
-		throw SRC_BUG;
 	    return true;
 	}
 	else // must replace data in cache to skip

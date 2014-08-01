@@ -115,7 +115,7 @@ static int little_main(shell_interaction & ui, int argc, char * const argv[], co
 	p.dump(fic);
 	fic.skip(0);
 	cp = infinint(fic);
-	ui.warning(string("read from file: ") + deci(cp).human());
+	ui.warning(string("read from file: ") + libdar::deci(cp).human());
     }
 
     return EXIT_OK;
