@@ -1290,7 +1290,7 @@ static void op_batch(shell_interaction & dialog, database *dat, const string & f
 	    cmdline.resize(mots.size() + 1); // +1 of pseudo_command
 	    cmdline.set_arg(pseudo_cmd, 0);
 
-	    for(register U_I i = 0; i < mots.size(); ++i)
+	    for(U_I i = 0; i < mots.size(); ++i)
 		cmdline.set_arg(mots[i], i+1);
 
 	    if(!command_line(dialog, cmdline.argc(), cmdline.argv(), sub_op, faked_base, arg, num, rest, num2, date, sub_info_details, ignore_dat_options, even_when_removed, check_order, true))

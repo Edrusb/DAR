@@ -57,8 +57,6 @@ namespace libdar
 
     tronconneuse::tronconneuse(U_32 block_size, generic_file & encrypted_side, bool no_initial_shift, const archive_version & x_reading_ver) : generic_file(encrypted_side.get_mode() == gf_read_only ? gf_read_only : gf_write_only)
     {
-	if(&encrypted_side == NULL)
-	    throw SRC_BUG;
 	if(block_size == 0)
 	    throw Erange("tronconneuse::tronconneuse", tools_printf(gettext("%d is not a valid block size"), block_size));
 	buf_offset = 0;

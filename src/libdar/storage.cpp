@@ -136,7 +136,7 @@ namespace libdar
 
     void storage::clear(unsigned char val)
     {
-        register struct cellule *cur = first;
+        struct cellule *cur = first;
 
         while(cur != NULL)
         {

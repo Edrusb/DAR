@@ -53,6 +53,8 @@ using namespace std;
 namespace libdar
 {
 
+    static bool modified_lexicalorder_a_lessthan_b(const std::string & a, const std::string & b);
+
     mask_list::mask_list(const string & filename_list_st, bool case_sensit, const path & prefix_t, bool include)
     {
 	NLS_SWAP_IN;
@@ -64,7 +66,7 @@ namespace libdar
 	    char *buffer = NULL;               //< hold the just read data
 	    static const U_I buf_size = 20480; //< size of buffer: we read at most this number of bytes at a time
 	    list <string> tmp;                 //< list of all raw lines read, without any prefix
-	    register U_I lu = 0, curs;         //< cursor used as cisors to split data in line
+	    U_I lu = 0, curs;                  //< cursor used as cisors to split data in line
 	    char *beg = NULL;                  //< points to the beginning of the next line inside buffer, when more than one line can be found in buffer
 	    string current_entry = "";         //< holds the current line converted to string between each read()
 	    path prefix = prefix_t;            //< the prefix to add to relative paths
@@ -190,14 +192,12 @@ namespace libdar
 		/////////////
 		// sorting the list of entry
 
-		// we use a temporary list of string of my_chart to use
-		// the lexicographic sorting with having the / as the lowest character
-	    list<basic_string<my_char> > my_tmp = convert_list_string_char(tmp);
-	    my_tmp.sort();   // sort the list ( using the string's < operator over "my_char" )
-	    my_tmp.unique(); // remove duplicates
+		// sorting the list with a modified lexicographical order where the / as is lowest character, other letter order unchanged
+	    tmp.sort(&modified_lexicalorder_a_lessthan_b);
+	    tmp.unique(); // remove duplicates
 
 		// converting the sorted list to vector, to get the indexing feature of this type
-	    contenu.assign(my_tmp.begin(), my_tmp.end());
+	    contenu.assign(tmp.begin(), tmp.end());
 	    taille = contenu.size();
 	    if(taille < contenu.size())
 		throw Erange("mask_list::mask_list", tools_printf(gettext("Too much line in file %S (integer overflow)"), &filename_list_st));
@@ -216,16 +216,16 @@ namespace libdar
 	    return false;
 
 	U_I min = 0, max = taille-1, tmp;
-        basic_string<my_char> target;
+        string target;
         bool ret;
 
         if(case_s)
-            target = convert_string_char(expression);
+            target = expression;
         else
         {
             string hidden = expression;
             tools_to_upper(hidden);
-            target = convert_string_char(hidden);
+            target = hidden;
         }
 
             // divide & conquer algorithm on a sorted list (aka binary search)
@@ -244,59 +244,53 @@ namespace libdar
         ret = contenu[max] == target || contenu[min] == target;
         if(including && !ret) // if including files, we must also include directories leading to a listed file
 	{
-	    string c_max = convert_string_my_char(contenu[max]);
+	    string c_max = contenu[max];
             ret = path(c_max).is_subdir_of(expression, case_s);
 	}
 
         return ret;
     }
 
-
-	//////// private routines implementation
-
-
-    list<basic_string<mask_list::my_char> > mask_list::convert_list_string_char(const list<string> & src)
+    static bool modified_lexicalorder_a_lessthan_b(const string & a, const string & b)
     {
-	list<basic_string<my_char> > ret;
-	list<string>::const_iterator it = src.begin();
+	string::const_iterator at = a.begin();
+	string::const_iterator bt = b.begin();
 
-	while(it != src.end())
+	while(at != a.end() && bt != b.end())
 	{
-	    ret.push_back(convert_string_char(*it));
-	    ++it;
-	}
-	return ret;
-    }
+	    if(*at == '/')
+	    {
+		if(*bt != '/')
+		    return true;
 
-    basic_string<mask_list::my_char> mask_list::convert_string_char(const string & src)
-    {
-	basic_string<my_char> ret;
-	my_char tmp;
+		    // else both a and b current letter are equal to '/'
+		    // reading further
+	    }
+	    else
+	    {
+		if(*bt == '/')
+		    return false;
+		else
+		{
+		    if(*at != *bt)
+			return *at < *bt;
 
-	string::const_iterator ut = src.begin();
-	while(ut != src.end())
-	{
- 	    tmp = *ut;
-	    ret += tmp;
-	    ++ut;
-	}
+			// else a and b letter are equal
+			// reading further to find a difference
+		}
+	    }
 
-	return ret;
-    }
-
-    string mask_list::convert_string_my_char(const basic_string<mask_list::my_char> & src)
-    {
-	string ret;
-
-	basic_string<my_char>::const_iterator ut = src.begin();
-	while(ut != src.end())
-	{
-	    ret += char(*ut);
-	    ++ut;
+	    ++at;
+	    ++bt;
 	}
 
-	return ret;
-    }
+	if(at == a.end())
+	    return true; // even if bt == b.end() too, we assume a < b
 
+	if(bt == b.end())
+	    return false;
+	else
+	    throw SRC_BUG; // at != a.end() and bt != b.end() how did we escaped the while loop?
+    }
 
 } // end of namespace

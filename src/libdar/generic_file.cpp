@@ -296,7 +296,7 @@ namespace libdar
 		lu2 = f.read(buffer2, BUFFER_SIZE);
 		if(lu1 == lu2)
 		{
-		    register U_I i = 0;
+		    U_I i = 0;
 		    while(i < lu1 && buffer1[i] == buffer2[i])
 			++i;
 		    if(i < lu1)

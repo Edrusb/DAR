@@ -136,7 +136,7 @@ namespace libdar
 	if(pointer == end)
 	    throw SRC_BUG;
 
-	for(register U_I cursor = 0; cursor < length; ++cursor)
+	for(U_I cursor = 0; cursor < length; ++cursor)
 	{
 	    *pointer ^= buffer[cursor];
 	    if(++pointer == end)
@@ -146,7 +146,7 @@ namespace libdar
 
     static void n_compute(const char *buffer, U_I length, unsigned char * begin, unsigned char * & pointer, unsigned char * end, U_I crc_size)
     {
-	U_I register cursor = 0; //< index of next byte to read from buffer
+	U_I cursor = 0; //< index of next byte to read from buffer
 
 	    // initial bytes
 

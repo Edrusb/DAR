@@ -47,6 +47,26 @@ from 2.4.x to 2.5.0
 - added the -vd switch to only display current directory under process for
   creation, diff, test, extraction and merging operations
 
+from 2.4.14 to 2.4.15
+- fixing bug met when reading an encrypted archive in sequential mode
+- fixing bug met when reading an encrypted archive in sequential mode from
+  an anonymous pipe
+- changed option '-;' to -9 as '-;' does not work on all systems with getopt
+  (only long option equivalent --min-digits worked) for dar, dar_cp,
+  dar_manager, dar_xform and dar_slave commands.
+- fixing bug met when restoring deleted files in sequential read mode and
+  some directory where they should be "restored" are not readable or
+  could not be restored earlier
+- adding extra buffer to handle sequential read of encrypted archive
+  when the last crypto block read some but not all clear data after
+  encrypted one (the archive trailer).
+- fixing compilation issue using clang
+- fixing bug that prevent using -~ option with on-fly catalogue isolation
+  in order to execute an user commande once on-fly isolation has completed
+- added some autoconf magic to determine the correct (BSD/GNU) flag to
+  use with sed
+- new implementation of mask_list which is compatible with libc++
+
 from 2.4.13 to 2.4.14
 - limiting memory consumption of the cache layer to stay below 10 MiB, under
   certain circumstances (very large archive), it could grow up to an insane

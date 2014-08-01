@@ -536,7 +536,7 @@ namespace libdar
 
     U_I sparse_file::count_initial_zeros(const char *a, U_I size)
     {
-	register U_I curs = 0;
+	U_I curs = 0;
 
 	while(curs < size && a[curs] == '\0')
 	    ++curs;

@@ -141,6 +141,19 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
                      )
 		   ])
 
+AC_MSG_CHECKING([for sed -r/-E option])
+if sed -r -e 's/(c|o)+/\1/g' > /dev/null < /dev/null ; then
+    local_sed="gnu"
+    AC_MSG_RESULT([GNU sed, using -r option for regex])
+else
+   if sed -E -e 's/(c|o)+/\1/g' > /dev/null < /dev/null ; then
+     local_sed="bsd"
+     AC_MSG_RESULT([BSD sed, using -E option for regex])
+   else
+     local_sed=unknown
+     AC_MSG_ERROR([unknown switch to use with sed to support regex])
+   fi
+fi
 
 AC_MSG_CHECKING([for getopt() in <unistd.h>])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
@@ -859,6 +872,11 @@ AC_ARG_ENABLE(  [thread-safe],
                                                         #if HAVE_PTHREAD_H
                                                         #include <pthread.h>
                                                         #endif
+							#if MUTEX_WORKS
+							#if HAVE_PTHREAD_H
+							#include <pthread.h>
+							#endif
+							#endif
                                                      }]],
                                                     [[ pthread_mutex_t mutex;
                                                        pthread_mutex_init(&mutex, (const pthread_mutexattr_t*)0);
@@ -962,6 +980,11 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 				  if(symbols != NULL)
 				    free(symbols);
 			       #endif
+			       #if MUTEX_WORKS
+			         pthread_mutex_t test;
+				 pthread_mutex_lock(&test);
+				 phtread_mutex_unloc(&test);
+			       #endif
 
                                   printf("Hello World!");
                                ]])
@@ -979,6 +1002,7 @@ AM_CONDITIONAL([USE_UPX], [test "$upx" = "yes"])
 AM_CONDITIONAL([USE_DOXYGEN], [test "$doxygen" = "yes"])
 AM_CONDITIONAL([USE_GROFF], [test "$groff" = "yes"])
 AM_CONDITIONAL([PROFILING], [test "$profiling" = "yes"])
+AM_CONDITIONAL([BSD_SED], [test "$local_sed" = "bsd"])
 AC_SUBST(UPX_PROG, [upx])
 AC_SUBST(DOXYGEN_PROG, [doxygen])
 

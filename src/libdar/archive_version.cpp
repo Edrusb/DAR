@@ -61,7 +61,7 @@ namespace libdar
 	tmp[2] = fix;
 	tmp[3] = '\0';
 
-	for(register U_I i = 0; i < 3; ++i)
+	for(U_I i = 0; i < 3; ++i)
 	    tmp[i] = to_char(tmp[i]);
 
 	(void)f.write((char *)tmp, sizeof(tmp));
@@ -77,7 +77,7 @@ namespace libdar
 	    throw Erange("archive_version::read", gettext("Reached End of File while reading archive version"));
 
 
-	for(register U_I i = 0; i < 2; ++i)
+	for(U_I i = 0; i < 2; ++i)
 	    tmp[i] = to_digit(tmp[i]);
 
 	version = tmp[0]*256+tmp[1]; // little endian used in file

@@ -61,7 +61,7 @@ argc_argv::argc_argv(S_I size)
 	if(x_argv == NULL)
 	    throw Ememory("argc_argv::argc_argv");
 
-	for(register S_I i = 0; i < x_argc; i++)
+	for(S_I i = 0; i < x_argc; i++)
 	    x_argv[i] = NULL;
     }
     else
@@ -73,7 +73,7 @@ argc_argv::~argc_argv()
     if(x_argv == NULL && x_argc > 0)
 	throw SRC_BUG;
 
-    for(register S_I i = 0; i < x_argc; i++)
+    for(S_I i = 0; i < x_argc; i++)
 	if(x_argv[i] != NULL)
 	{
 	    delete [] x_argv[i];
@@ -128,7 +128,7 @@ void argc_argv::resize(S_I size)
 	return;
 
     if(size < x_argc)
-	for(register S_I i = size; i < x_argc; i++)
+	for(S_I i = size; i < x_argc; i++)
 	    if(x_argv[i] != NULL)
 	    {
 		delete [] x_argv[i];
@@ -143,10 +143,10 @@ void argc_argv::resize(S_I size)
     {
 	S_I min = size < x_argc ? size : x_argc;
 
-	for(register S_I i = 0; i < min; i++)
+	for(S_I i = 0; i < min; i++)
 	    tmp[i] = x_argv[i];
 
-	for(register S_I i = min; i < size; i++)
+	for(S_I i = min; i < size; i++)
 	    tmp[i] = NULL;
 
 	if(x_argc > 0)
@@ -245,7 +245,7 @@ void line_tools_tlv_list2argv(user_interaction & dialog, tlv_list & list, argc_a
     infinint size;
 
     arg.resize(list.size());
-    for(register S_I i = 0; i < arg.argc() ; i++)
+    for(S_I i = 0; i < arg.argc() ; i++)
     {
 	if(list[i].get_type() != 0)
 		// we only use type 0 here
@@ -355,7 +355,7 @@ string line_tools_expand_user_comment(const string & user_comment, S_I argc, cha
 		{
 		case 'c':
 		    ret += string("\"") + argv[0] + "\"";
-		    for(register S_I i = 1; i < argc; ++i)
+		    for(S_I i = 1; i < argc; ++i)
 			if(strcmp(argv[i], "-K") == 0
 			   || strcmp(argv[i], "-J") == 0
 			   || strcmp(argv[i], "-$") == 0

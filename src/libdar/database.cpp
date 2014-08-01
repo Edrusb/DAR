@@ -97,8 +97,6 @@ namespace libdar
 
 	    if(db_version > database_header_get_supported_version())
 		throw SRC_BUG; // we should not get there if the database is more recent than what that software can handle. this is necessary if we do not want to destroy the database or loose data.
-	    if(&f == NULL)
-		throw SRC_BUG;
 	    coordinate.clear();
 	    infinint tmp = infinint(f); // number of archive to read
 	    while(tmp > 0)

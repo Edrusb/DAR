@@ -439,7 +439,7 @@ namespace libdar
                 // shift right by "bit" bits
             if(bit != 0)
             {
-                for(register U_I i = 0; i < 8; ++i)
+                for(U_I i = 0; i < 8; ++i)
                     bf[i] = i < shift_retenue ? 0 : 1;
                 int_tools_contract_byte(bf, mask);
 
@@ -510,7 +510,7 @@ namespace libdar
             it = field->begin();
 
                 // the mask for selecting the retenue
-            for(register U_I i = 0; i < 8; ++i)
+            for(U_I i = 0; i < 8; ++i)
                 bf[i] = i < bit ? 0 : 1;
             int_tools_contract_byte(bf, mask);
 

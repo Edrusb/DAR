@@ -50,7 +50,7 @@ namespace libdar
         U_32 index = ref->get_position() % len;
         U_I ret = ref->read(a, size);
 
-        for(register U_I i = 0; i < ret; ++i)
+        for(U_I i = 0; i < ret; ++i)
         {
             ptr[i] = ((S_I)(ptr[i]) - (unsigned char)(key[index])) % 256;
             index = (index + 1)%len;
@@ -82,7 +82,7 @@ namespace libdar
             }
         }
 
-        for(register U_I i = 0; i < size; ++i)
+        for(U_I i = 0; i < size; ++i)
         {
             buffer[i] = (ptr[i] + (unsigned char)(key[index])) % 256;
             index = (index + 1)%len;

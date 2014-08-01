@@ -2389,7 +2389,7 @@ static void make_args_from_file(user_interaction & dialog, operation op, const v
 
 static void destroy(S_I argc, char **argv)
 {
-    register S_I i = 0;
+    S_I i = 0;
     for(i = 0; i < argc; ++i)
         delete [] argv[i];
     delete [] argv;
@@ -2899,7 +2899,7 @@ static void add_non_options(S_I argc, char * const argv[], vector<string> & non_
         ;
 #endif
 
-    for(register S_I i = optind ; i < argc ; ++i)
+    for(S_I i = optind ; i < argc ; ++i)
     	if(strcmp(argv[i],"create") == 0
 	   || strcmp(argv[i], "extract") == 0
 	   || strcmp(argv[i], "listing") == 0

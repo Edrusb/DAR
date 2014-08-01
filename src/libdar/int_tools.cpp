@@ -47,7 +47,7 @@ namespace libdar
     {
         unsigned char mask = 0x80;
 
-        for(register S_I i = 0; i < 8; ++i)
+        for(S_I i = 0; i < 8; ++i)
         {
             bit[i] = (a & mask) >> (7 - i);
             mask >>= 1;
@@ -58,7 +58,7 @@ namespace libdar
     {
         a = 0;
 
-        for(register S_I i = 0; i < 8; ++i)
+        for(S_I i = 0; i < 8; ++i)
         {
             a <<= 1;
             if(b[i] > 1)

@@ -68,8 +68,6 @@ namespace libdar
 				   // the underlying object mode
     {
 	    // sanity checks
-	if(&hidden == NULL)
-	    throw Erange("cache::cache", "NULL given as \"hidden\" argument while initializing cache"); // not translated message, this is expected
 	if(x_size < 10)
 	    throw Erange("cache::cache", gettext("wrong value given as initial_size argument while initializing cache"));
 
