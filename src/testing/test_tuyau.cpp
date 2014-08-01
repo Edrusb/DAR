@@ -116,7 +116,7 @@ static void action_xmit(user_interaction & dialog, tuyau *in, tuyau *out, U_32 d
     while(xmit)
     {
             // generate data to send;
-        for(register unsigned int i = 0; i < buffer_size; i++)
+        for(unsigned int i = 0; i < buffer_size; i++)
             out_buffer[i] = rand() % 256;
 
             // sending data
@@ -130,7 +130,7 @@ static void action_xmit(user_interaction & dialog, tuyau *in, tuyau *out, U_32 d
             // compairing received data with sent one
 
         lu = 0;
-        for(register unsigned int i = 0; i < buffer_size; i++)
+        for(unsigned int i = 0; i < buffer_size; i++)
             if(out_buffer[i] != in_buffer[i])
                 lu++;
         if(lu > 0)

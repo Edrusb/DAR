@@ -2228,7 +2228,7 @@ static void skip_getopt(S_I argc, char * const argv[], S_I next_to_read)
 #ifdef DEBOGGAGE
 static void show_args(S_I argc, char *argv[])
 {
-    register S_I i;
+    S_I i;
     for(i = 0; i < argc; ++i)
         dialog.printf("[%s]\n", argv[i]);
 }
