@@ -472,6 +472,40 @@ AC_ARG_ENABLE( [liblzo2-linking],
              fi
            ])
 
+AC_ARG_ENABLE( [liblxz-linking],
+               AC_HELP_STRING(--disable-libxz-linking, [disable linking with libxz/liblzma and disable libxz compression support]),
+             [
+              AC_MSG_WARN([libxz compression support has been disabled by user])
+              local_libxz="no"
+             ],
+             [
+	       AC_CHECK_LIB(lzma, [lzma_code], [], [AC_MSG_WARN([library liblzma not found])])
+               AC_CHECK_HEADER(lzma.h, [local_libxz="yes"
+				       	AC_DEFINE(HAVE_LZMA_H, 1, [lzma.h header file is available])
+				       ],
+ 			               [AC_MSG_WARN([Cannot find lzma.h header file])
+                                        local_libxz="no"
+                                       ])
+               if test "$local_libxz" = "yes" ; then
+               AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+                                                           #if HAVE_LZMA_H
+                                                           #include <lzma.h>
+                                                           #endif
+                                              }]],
+                                              [[
+                                                         lzma_stream ptr = LZMA_STREAM_INIT;
+							 lzma_ret tmp = lzma_easy_encoder(&ptr,
+							 		          2,
+									          LZMA_CHECK_CRC32);
+                                              ]])
+    			      ],
+                              [ AC_DEFINE(LIBLZMA_AVAILABLE, 1, [header and linking is available to have liblzma functions])],
+                              [ local_libxz="no" ])
+               else
+                 AC_MSG_WARN([libxz compression support not available])
+               fi
+             ]
+             )
 
 
 AC_ARG_ENABLE( [libgcrypt-linking],
@@ -1041,6 +1075,13 @@ fi
 
 printf "   Liblzo2 compression (lzo)  : "
 if [ "$local_liblzo2" = "yes" ] ; then
+  echo "YES"
+else
+  echo "NO"
+fi
+
+printf "   Liblxz compression (xz)    : "
+if [ "$local_libxz" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"

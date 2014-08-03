@@ -1097,6 +1097,7 @@ namespace libdar
 	    dialog.printf(gettext("   Libz compression (gzip)      : %s\n"), YES_NO(compile_time::libz()));
 	    dialog.printf(gettext("   Libbz2 compression (bzip2)   : %s\n"), YES_NO(compile_time::libbz2()));
 	    dialog.printf(gettext("   Liblzo2 compression (lzo)    : %s\n"), YES_NO(compile_time::liblzo()));
+	    dialog.printf(gettext("   Liblxz compression (xz)      : %s\n"), YES_NO(compile_time::libxz()));
 	    dialog.printf(gettext("   Strong encryption (libgcrypt): %s\n"), YES_NO(compile_time::libgcrypt()));
 	    dialog.printf(gettext("   Public key ciphers (gpgme)   : %s\n"), YES_NO(compile_time::public_key_cipher()));
 	    dialog.printf(gettext("   Extended Attributes support  : %s\n"), YES_NO(compile_time::ea()));

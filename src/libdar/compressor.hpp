@@ -45,7 +45,8 @@ namespace libdar
 	none = 'n',  ///< no compression
 	gzip = 'z',  ///< gzip compression
 	bzip2 = 'y', ///< bzip2 compression
-	lzo = 'l'    ///< lzo compression
+	lzo = 'l',   ///< lzo compression
+	xz = 'x'     ///< lzma compression
     };
 
 	/// \ingroup Private

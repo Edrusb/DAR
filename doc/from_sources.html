@@ -2,6 +2,8 @@
 <html><head>
 
 
+
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation - Compiling From Source</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -44,7 +46,8 @@ for additional steps)
         <li>a C++ compiler supporting g++11 syntax (for <a href="http://gcc.gnu.org/">gcc</a>
 that means version 4.8. minimum). For version older than dar-2.5.0
 g++11 support is not required but if using gcc you need at least
-version 3.4.x.</li>
+version 3.4.x. clang++ is supported as well as libc++ as replacement of stdlibc++ standard C++ library.<br>
+</li>
         <li>a linker like "ld" the <a href="http://www.gnu.org/software/binutils/">GNU Linker</a><br>
         </li>
         <li>make (tested with <a href="http://www.gnu.org/software/make/">gnu make</a>)</li>
@@ -63,8 +66,10 @@ gzip compression support
         <li style="text-align: justify;"><a href="http://sources.redhat.com/bzip2/">libbzip2 library</a> for bzip2
 compression support</li>
         <li style="text-align: justify;"><a href="http://www.oberhumer.com/opensource/lzo/">liblzo2 library</a>
-for lzo compression support<br>
+for lzo compression support</li>
+        <li style="text-align: justify;"><a href="http://tukaani.org/xz/">liblzma5 library</a> for xz/lzma compression support<br>
         </li>
+
         <li style="text-align: justify;">gnu Getopt support (Linux has
 it for all distro thanks to
 its glibc, this is not true for FreeBSD for example)</li>
@@ -96,6 +101,9 @@ an archive using the bzip2 algorithm</li>
         <li>If you lack <span style="font-weight: bold;">liblzo2</span>
 library dar will compile but will not be able to compress or uncompress
 an archive using the lzo algorithm</li>
+        <li>if you lack <span style="font-weight: bold;">liblzma5 </span>library dar will compile but will not be able to compress or uncompress an archive using the xz algorithm<br>
+        </li>
+
         <li>If you lack <span style="font-weight: bold;">libgcrypt </span>dar
 will still compile but you will not be able to use strong encryption
 nor hash file generation for each slice</li>
@@ -339,6 +347,12 @@ option (gzip compression) will not be available<br>
       </td>
     </tr>
     <tr>
+      <td style="vertical-align: top; text-align: right;">--disable-libxz-linking<br>
+      </td>
+      <td style="vertical-align: top;">Disable linking to liblzma5 this -zxz:* option (xz compression) will not be available<br>
+      </td>
+    </tr>
+<tr>
       <td style="vertical-align: top; text-align: right; width: 33%;">--disable-libgcrypt-linking<br>
       </td>
       <td style="vertical-align: top; text-align: justify;">Disable

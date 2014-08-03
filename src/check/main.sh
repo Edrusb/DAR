@@ -44,7 +44,7 @@ else
 fi
 
 if [ "$zip" != "none" ]; then
-  zip=-z$zip
+  zip=-z$zip:1
 else
   zip=""
 fi

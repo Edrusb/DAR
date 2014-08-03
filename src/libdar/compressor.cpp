@@ -132,7 +132,12 @@ namespace libdar
             write_ptr = &compressor::none_write;
             break;
         case bzip2:
-            wr_mode = bzlib_mode;
+	case xz:
+	    if(algo == bzip2)
+		wr_mode = bzlib_mode;
+	    if(algo == xz)
+		wr_mode = xz_mode;
+
                 // NO BREAK !
         case gzip:
             read_ptr = &compressor::gzip_read;
@@ -163,7 +168,7 @@ namespace libdar
 		compr = NULL;
                 delete decompr;
 		decompr = NULL;
-                throw Erange("compressor::compressor", gettext("incompatible Zlib version"));
+                throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
             case WR_STREAM_ERROR:
             default:
                 delete compr;
@@ -191,7 +196,7 @@ namespace libdar
 		compr = NULL;
                 delete decompr;
 		decompr = NULL;
-                throw Erange("compressor::compressor", gettext("incompatible Zlib version"));
+                throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
             case WR_STREAM_ERROR:
             default:
                 compr->wrap.compressEnd();
@@ -788,6 +793,8 @@ namespace libdar
             return bzip2;
 	case 'l':
 	    return lzo;
+	case 'x':
+	    return xz;
         default :
             throw Erange("char2compression", gettext("unknown compression"));
         }
@@ -805,6 +812,8 @@ namespace libdar
             return 'y';
 	case lzo:
 	    return 'l';
+	case xz:
+	    return 'x';
         default:
             throw Erange("compression2char", gettext("unknown compression"));
         }
@@ -822,6 +831,8 @@ namespace libdar
             return "bzip2";
 	case lzo:
 	    return "lzo";
+	case xz:
+	    return "xz";
         default:
             throw Erange("compresion2string", gettext("unknown compression"));
         }
@@ -837,6 +848,9 @@ namespace libdar
 
 	if(a == "lzo" || a == "lz" || a == "l")
 	    return lzo;
+
+	if(a == "xz" || a == "lzma")
+	    return xz;
 
 	throw Erange("string2compression", tools_printf(gettext("unknown compression algorithm: %S"), &a));
     }

@@ -58,7 +58,7 @@ else
 fi
 for hash in  md5 none sha1 ; do
   for crypto in bf none scram aes twofish serpent camellia ; do
-    for zip in  gzip none bzip2 lzo ; do
+    for zip in xz gzip none bzip2 lzo; do
       for slice in 1k none ; do
         for Slice in  500 none ; do
           for tape in y n ; do

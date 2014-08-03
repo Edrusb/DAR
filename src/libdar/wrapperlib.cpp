@@ -26,6 +26,7 @@
 
 #define CHECK_Z if(z_ptr == NULL) throw SRC_BUG
 #define CHECK_BZ if(bz_ptr == NULL) throw SRC_BUG
+#define CHECK_LZMA if(lzma_ptr == NULL) throw SRC_BUG;
 
 using namespace std;
 
@@ -40,6 +41,10 @@ namespace libdar
     static S_I bzlib2wrap_code(S_I code);
     static S_I wrap2bzlib_code(S_I code);
 #endif
+#if LIBLZMA_AVAILABLE
+    static S_I lzma2wrap_code(S_I code);
+    static lzma_action wrap2lzma_code(S_I code);
+#endif
 
     wrapperlib::wrapperlib(wrapperlib_mode mode)
     {
@@ -52,6 +57,9 @@ namespace libdar
                 throw Ememory("wrapperlib::wrapperlib");
 #if LIBBZ2_AVAILABLE
             bz_ptr = NULL;
+#endif
+#if LIBLZMA_AVAILABLE
+	    lzma_ptr = NULL;
 #endif
             z_ptr->zalloc = NULL;
             z_ptr->zfree = NULL;
@@ -83,6 +91,9 @@ namespace libdar
 #if LIBZ_AVAILABLE
             z_ptr = NULL;
 #endif
+#if LIBLZMA_AVAILABLE
+	    lzma_ptr = NULL;
+#endif
             bz_ptr->bzalloc = NULL;
             bz_ptr->bzfree = NULL;
             bz_ptr->opaque = NULL;
@@ -105,6 +116,35 @@ namespace libdar
 #else
 	    throw Ecompilation("libbz2 compression support");
 #endif
+	case xz_mode:
+#if LIBZ_AVAILABLE
+            z_ptr = NULL;
+#endif
+#if LIBBZ2_AVAILABLE
+            bz_ptr = NULL;
+#endif
+#if LIBLZMA_AVAILABLE
+	    meta_new(lzma_ptr, 1);
+	    if(lzma_ptr == NULL)
+		throw Ememory("wrapperlib::wrapperlib");
+	    *lzma_ptr = LZMA_STREAM_INIT;
+            x_compressInit = & wrapperlib::lzma_compressInit;
+            x_decompressInit = & wrapperlib::lzma_decompressInit;
+            x_compressEnd = & wrapperlib::lzma_end;
+            x_decompressEnd = & wrapperlib::lzma_end;
+            x_compress = & wrapperlib::lzma_encode;
+            x_decompress = & wrapperlib::lzma_encode;
+            x_set_next_in = & wrapperlib::lzma_set_next_in;
+            x_set_avail_in = & wrapperlib::lzma_set_avail_in;
+            x_get_avail_in = & wrapperlib::lzma_get_avail_in;
+            x_get_total_in = & wrapperlib::lzma_get_total_in;
+            x_set_next_out = & wrapperlib::lzma_set_next_out;
+            x_get_next_out = & wrapperlib::lzma_get_next_out;
+            x_set_avail_out = & wrapperlib::lzma_set_avail_out;
+            x_get_avail_out = & wrapperlib::lzma_get_avail_out;
+            x_get_total_out = & wrapperlib::lzma_get_total_out;
+#endif
+	    break;
         default:
             throw SRC_BUG;
         }
@@ -130,6 +170,13 @@ namespace libdar
 #if LIBBZ2_AVAILABLE
         if(bz_ptr != NULL)
 	    meta_delete(bz_ptr);
+#endif
+#if LIBLZMA_AVAILABLE
+	if(lzma_ptr != NULL)
+	{
+	    ::lzma_end(lzma_ptr);
+	    meta_delete(lzma_ptr);
+	}
 #endif
     }
 
@@ -331,6 +378,96 @@ namespace libdar
     }
 #endif
 
+////////////// LZMA routines /////////////
+
+#if LIBLZMA_AVAILABLE
+    S_I wrapperlib::lzma_compressInit(U_I compression_level)
+    {
+        CHECK_LZMA;
+        return lzma2wrap_code(lzma_easy_encoder(lzma_ptr,
+						compression_level,
+						LZMA_CHECK_CRC32));
+	    // CR32 is large enough, even no LZMA_CHECK_NONE would
+	    // be possible as compressed data is protected by libdar
+	    // CRC which width is proportionnal to the size of the
+	    // compressed file.
+    }
+
+    S_I wrapperlib::lzma_decompressInit()
+    {
+        CHECK_LZMA;
+        return lzma2wrap_code(lzma_auto_decoder(lzma_ptr,
+						UINT64_MAX,
+						0));
+    }
+
+    S_I wrapperlib::lzma_end()
+    {
+        CHECK_LZMA;
+        return WR_OK; // nothing done
+    }
+
+    S_I wrapperlib::lzma_encode(S_I flag)
+    {
+        CHECK_LZMA;
+        return lzma2wrap_code(lzma_code(lzma_ptr, wrap2lzma_code(flag)));
+    }
+
+    void wrapperlib::lzma_set_next_in(const char *x)
+    {
+        CHECK_LZMA;
+        lzma_ptr->next_in = (Bytef *)x;
+    }
+
+    void wrapperlib::lzma_set_avail_in(U_I x)
+    {
+        CHECK_LZMA;
+        lzma_ptr->avail_in = x;
+    }
+
+    U_I wrapperlib::lzma_get_avail_in() const
+    {
+        CHECK_LZMA;
+        return lzma_ptr->avail_in;
+    }
+
+    U_64 wrapperlib::lzma_get_total_in() const
+    {
+        CHECK_LZMA;
+        return lzma_ptr->total_in;
+    }
+
+    void wrapperlib::lzma_set_next_out(char *x)
+    {
+        CHECK_LZMA;
+        lzma_ptr->next_out = (Bytef *)x;
+    }
+
+    char *wrapperlib::lzma_get_next_out() const
+    {
+        CHECK_LZMA;
+        return (char *)lzma_ptr->next_out;
+    }
+
+    void wrapperlib::lzma_set_avail_out(U_I x)
+    {
+        CHECK_LZMA;
+        lzma_ptr->avail_out = x;
+    }
+
+    U_I wrapperlib::lzma_get_avail_out() const
+    {
+        CHECK_LZMA;
+        return lzma_ptr->avail_out;
+    }
+
+    U_64 wrapperlib::lzma_get_total_out() const
+    {
+        CHECK_LZMA;
+        return lzma_ptr->total_out;
+    }
+#endif
+
     S_I wrapperlib::compressReset()
     {
         S_I ret;
@@ -438,6 +575,53 @@ namespace libdar
             throw SRC_BUG;
         }
     }
+#endif
+
+#if LIBLZMA_AVAILABLE
+    static S_I lzma2wrap_code(S_I code)
+    {
+        switch(code)
+        {
+        case LZMA_OK:
+            return WR_OK;
+        case LZMA_MEM_ERROR:
+            return WR_MEM_ERROR;
+        case LZMA_OPTIONS_ERROR:
+	case LZMA_FORMAT_ERROR: // no memory usage limit used from libdar, only file format error can generate this code
+            return WR_VERSION_ERROR;
+        case LZMA_STREAM_END:
+            return WR_STREAM_END;
+        case LZMA_DATA_ERROR:
+            return WR_DATA_ERROR;
+        case LZMA_BUF_ERROR:
+            return WR_BUF_ERROR;
+	case LZMA_NO_CHECK:
+	case LZMA_UNSUPPORTED_CHECK:
+            return WR_STREAM_ERROR;
+	case LZMA_PROG_ERROR:
+	    throw SRC_BUG; // error in libdar calling liblzma
+	case LZMA_GET_CHECK:
+	    throw SRC_BUG;
+		// can be retured by lzma_code "only if the decoder was initialized with the LZMA_TELL_ANY_CHECK flag"
+		// flag we do not use from libdar
+        default:
+            throw SRC_BUG; // unexpected error code
+        }
+    }
+
+    static lzma_action wrap2lzma_code(S_I code)
+    {
+        switch(code)
+        {
+        case WR_NO_FLUSH:
+            return LZMA_RUN;
+        case WR_FINISH:
+            return LZMA_FINISH;
+        default:
+            throw SRC_BUG;
+        }
+    }
+
 #endif
 
 } // end of namespace

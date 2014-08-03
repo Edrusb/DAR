@@ -41,6 +41,10 @@ extern "C"
 #if HAVE_BZLIB_H && LIBBZ2_AVAILABLE
 #include <bzlib.h>
 #endif
+
+#if HAVE_LZMA_H && LIBLZMA_AVAILABLE
+#include <lzma.h>
+#endif
 } // end extern "C"
 
 #include "integers.hpp"
@@ -62,7 +66,7 @@ namespace libdar
     const int WR_STREAM_END    = 7;
     const int WR_FINISH        = 8;
 
-    enum wrapperlib_mode { zlib_mode, bzlib_mode };
+    enum wrapperlib_mode { zlib_mode, bzlib_mode, xz_mode };
 
 	/// this class encapsulates calls to libz or libbz2
 
@@ -105,6 +109,10 @@ namespace libdar
 #if LIBBZ2_AVAILABLE
         bz_stream *bz_ptr;
 #endif
+#if LIBLZMA_AVAILABLE
+	lzma_stream *lzma_ptr;
+#endif
+
         S_I level;
 
         void (wrapperlib::*x_set_next_in)(const char *x);
@@ -163,6 +171,24 @@ namespace libdar
         U_I bz_get_avail_out() const;
         U_64 bz_get_total_out() const;
 #endif
+
+            // set of routines for liblzma
+#if LIBLZMA_AVAILABLE
+        S_I lzma_compressInit(U_I compression_level);
+        S_I lzma_decompressInit();
+        S_I lzma_end();
+        S_I lzma_encode(S_I flag);
+        void lzma_set_next_in(const char *x);
+        void lzma_set_avail_in(U_I x);
+        U_I lzma_get_avail_in() const;
+        U_64 lzma_get_total_in() const;
+        void lzma_set_next_out(char *x);
+        char *lzma_get_next_out() const;
+        void lzma_set_avail_out(U_I x);
+        U_I lzma_get_avail_out() const;
+        U_64 lzma_get_total_out() const;
+#endif
+
     };
 
 	/// @}

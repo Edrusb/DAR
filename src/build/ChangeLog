@@ -46,6 +46,7 @@ from 2.4.x to 2.5.0
   compression of the data they contain
 - added the -vd switch to only display current directory under process for
   creation, diff, test, extraction and merging operations
+- added xz/lzma compression algorithm
 
 from 2.4.14 to 2.4.15
 - fixing bug met when reading an encrypted archive in sequential mode

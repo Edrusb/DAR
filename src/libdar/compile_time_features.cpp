@@ -114,6 +114,14 @@ namespace libdar
 #endif
 	}
 
+	bool libxz()
+	{
+#if LIBLZMA_AVAILABLE
+	    return true;
+#else
+	    return false;
+#endif
+	}
 
 	bool libgcrypt()
 	{
