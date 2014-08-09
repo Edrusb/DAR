@@ -1465,7 +1465,7 @@ namespace libdar
 	try
 	{
 	    if(pipename == "-")
-		reference = new (nothrow) tuyau(dialog, 0);
+		reference = new (nothrow) tuyau(dialog, 0, gf_read_only);
 	    else
 		reference = new (nothrow) tuyau(dialog, pipename, gf_read_only);
 
