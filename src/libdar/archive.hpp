@@ -342,6 +342,7 @@ namespace libdar
 	bool sequential_read;    //< whether the archive is read in sequential mode
 	bool freed_and_checked;  //< whether free_and_check has been run
 	std::vector<signator> gnupg_signed; //< list of signature found in the archive (reading an existing archive)
+	tools_slice_layout slices; //< slice layout, archive is not sliced <=> first_size or other_size fields is set to zero (in practice both are set to zero, but one being set is enought to determine the archive is not sliced)
 
 	void free_except_memory_pool();
 	void free_all();

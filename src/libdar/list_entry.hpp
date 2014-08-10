@@ -28,6 +28,7 @@
 #define LIST_ENTRY_HPP
 
 #include <string>
+#include <set>
 
 #include "../my_config.h"
 #include "infinint.hpp"
@@ -109,6 +110,7 @@ namespace libdar
 	std::string get_link_target() const { return target; };
 	std::string get_major() const { return tools_int2str(major); };
 	std::string get_minor() const { return tools_int2str(minor); };
+	const std::set<infinint> & get_slices() const { return slices; };
 
 
 	    // methods for libdar to setup the object
@@ -132,6 +134,7 @@ namespace libdar
 	void set_link_target(const std::string & val) { target = val; };
 	void set_major(int val) { major = val; };
 	void set_minor(int val) { minor = val; };
+	void set_slices(const std::set<infinint> & sl) { slices = sl; };
 
     private:
 	std::string my_name;
@@ -153,6 +156,7 @@ namespace libdar
 	std::string target;
 	int major;
 	int minor;
+	std::set <infinint> slices;
 
 	static time_t datetime2time_t(const datetime & val);
     };

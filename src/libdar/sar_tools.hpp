@@ -49,6 +49,7 @@ namespace libdar
 						     bool slice_header_format_07,
 						     const std::string & execute);
 
+
 } // end of namespace
 
 #endif

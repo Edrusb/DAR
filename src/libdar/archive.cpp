@@ -38,7 +38,6 @@ extern "C"
 #include "tools.hpp"
 #include "header.hpp"
 #include "header_version.hpp"
-#include "sar_tools.hpp"
 #include "scrambler.hpp"
 #include "null_file.hpp"
 #include "crypto.hpp"
@@ -119,7 +118,8 @@ namespace libdar
 					     options.get_lax(),
 					     options.get_sequential_read(),
 					     options.get_info_details(),
-					     gnupg_signed);
+					     gnupg_signed,
+					     slices);
 		    try
 		    {
 			check_header_version();
@@ -151,6 +151,7 @@ namespace libdar
 			    try
 			    {
 				vector<signator> tmp;
+				tools_slice_layout ignored;
 
 				if(options.get_ref_basename() == "-")
 				    throw Erange("archive::archive", gettext("Reading the archive of reference from pipe or standard input is not possible"));
@@ -174,7 +175,8 @@ namespace libdar
 							 options.get_lax(),
 							 false, // sequential_read is never used to retreive the isolated catalogue (well, that's possible and easy to add this feature), see later ...
 							 options.get_info_details(),
-							 tmp);
+							 tmp,
+							 ignored);
 			    }
 			    catch(Euser_abort & e)
 			    {
@@ -494,6 +496,7 @@ namespace libdar
 
 
 	// DEPRECATED way to isolate an archive DO NOT USE IT unless you know what you are doing.
+	// RATHER use op_isolate() on an existing archive object
     archive::archive(user_interaction & dialog,
 		     const path & sauv_path,
 		     archive *ref_arch,
@@ -1203,6 +1206,7 @@ namespace libdar
 		header_version isol_ver;
 		label isol_data_name;
 		label internal_name;
+		tools_slice_layout isol_slices;
 
 		do
 		{
@@ -1215,6 +1219,7 @@ namespace libdar
 		macro_tools_create_layers(dialog,
 					  layers,
 					  isol_ver,
+					  isol_slices,
 					  get_pool(),
 					  *sauv_path_t,
 					  filename,
@@ -1345,6 +1350,7 @@ namespace libdar
 		    throw SRC_BUG;
 
 		list_entry ent;
+
 		const inode *tmp_inode = dynamic_cast<const inode *>(tmp_ptr);
 		const file *tmp_file = dynamic_cast<const file *>(tmp_ptr);
 		const lien *tmp_lien = dynamic_cast<const lien *>(tmp_ptr);
@@ -1362,6 +1368,10 @@ namespace libdar
 		{
 		    ent.set_hard_link(true);
 		    ent.set_type(get_base_signature(tmp_mir->get_inode()->signature()));
+		    tmp_inode = tmp_mir->get_inode();
+		    tmp_file = dynamic_cast<const file *>(tmp_inode);
+		    tmp_lien = dynamic_cast<const lien *>(tmp_inode);
+		    tmp_device = dynamic_cast<const device *>(tmp_inode);
 		}
 
 		if(tmp_inode != NULL)
@@ -1394,6 +1404,8 @@ namespace libdar
 		    ent.set_major(tmp_device->get_major());
 		    ent.set_minor(tmp_device->get_minor());
 		}
+
+		ent.set_slices(macro_tools_get_slices(tmp_ptr, slices));
 
 		    // fill a new entry in the table
 		ret.push_back(ent);
@@ -1901,6 +1913,7 @@ namespace libdar
 		macro_tools_create_layers(dialog,
 					  stack, // this object field is set!
 					  ver,   // this object field is set!
+					  slices,// this object field is set!
 					  pool,  // this object field
 					  sauv_path_t,
 					  filename,
@@ -2305,8 +2318,10 @@ namespace libdar
 	stack.find_first_from_bottom(real_decoupe);
         if(real_decoupe != NULL)
         {
-            sub_file_size = real_decoupe->get_sub_file_size();
-            first_file_size = real_decoupe->get_first_sub_file_size();
+	    tools_slice_layout tmp = real_decoupe->get_slicing();
+
+            sub_file_size = tmp.other_size;
+            first_file_size = tmp.first_size;
             if(real_decoupe->get_total_file_number(total_file_number)
                && real_decoupe->get_last_file_size(last_file_size))
                 return true;

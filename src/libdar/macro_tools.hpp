@@ -46,6 +46,7 @@ extern "C"
 #include "escape.hpp"
 #include "pile.hpp"
 #include "entrepot.hpp"
+#include "tools.hpp"
 
     /// \addtogroup Private
     /// @{
@@ -88,7 +89,8 @@ namespace libdar
 					 bool lax,  // whether we skip&warn the usual verifications
 					 bool sequential_read, // whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
 					 bool info_details,    // be or not verbose about the archive openning
-					 std::vector<signator> & gnupg_signed); // list of existing signature found for that archive (valid or not)
+					 std::vector<signator> & gnupg_signed, //< list of existing signature found for that archive (valid or not)
+					 tools_slice_layout & sl); //< slicing layout of the archive
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 
     extern catalogue *macro_tools_get_derivated_catalogue_from(user_interaction & dialog,
@@ -127,6 +129,7 @@ namespace libdar
 	/// \param[in]  dialog for user interaction
 	/// \param[out] layers the resulting stack of generic_file layers ready for use
 	/// \param[out] ver the archive "header" to be dropped at end of archive
+	/// \param[out] slicing slicing layout of the archive
 	/// \param[in]  pool memory pool to use for memory allocation (NULL for no pool usage)
 	/// \param[in]  sauv_path_t where to create the archive
 	/// \param[in]  filename archive base name
@@ -157,6 +160,7 @@ namespace libdar
     extern void macro_tools_create_layers(user_interaction & dialog,
 					  pile & layers,
 					  header_version & ver,
+					  tools_slice_layout & slicing,
 					  memory_pool *pool,
 					  const entrepot & sauv_path_t,
 					  const std::string & filename,
@@ -203,6 +207,15 @@ namespace libdar
 				  crypto_algo crypto,
 				  compression algo,
 				  bool empty);
+
+
+	/// gives the location of data EA and FSA (when they are saved) of the object given in argument
+	///
+	/// \param[in] obj a pointer to the object which data & EFSA is to be located
+	/// \param[in] sl slice layout of the archive
+	/// \return a set of slices which will be required to restore that particular file (over the slice(s)
+	/// containing the catalogue of course).
+    std::set<infinint> macro_tools_get_slices(const nomme *obj, tools_slice_layout sl);
 
 } // end of namespace
 

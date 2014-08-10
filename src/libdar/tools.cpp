@@ -2709,4 +2709,60 @@ namespace libdar
     }
 #endif
 
+    void tools_which_slice(const tools_slice_layout & sl,
+			   const infinint & offset,
+			   infinint & slice_num,
+			   infinint & slice_offset)
+    {
+
+	    // considering particular case of a non-sliced archive
+
+	if(sl.first_size == 0 || sl.other_size == 0)
+	{
+	    slice_num = 1;
+	    if(offset < sl.first_slice_header)
+		slice_offset = sl.first_slice_header;
+	    else
+		slice_offset = offset - sl.first_slice_header;
+	    return;
+	}
+
+	    // sanity checks
+
+	if(sl.first_size < sl.first_slice_header)
+	    throw SRC_BUG;
+	if(sl.other_size < sl.other_slice_header)
+	    throw SRC_BUG;
+	if(sl.first_slice_header == 0)
+	    throw SRC_BUG;
+	if(sl.other_slice_header == 0)
+	    throw SRC_BUG;
+
+	    // end of sanity checks
+
+        infinint byte_in_first_file = sl.first_size - sl.first_slice_header;
+        infinint byte_per_file = sl.other_size - sl.other_slice_header;
+
+	if(!sl.older_sar_than_v8)
+	{
+	    --byte_in_first_file;
+	    --byte_per_file;
+		// this is due to the trailing flag (one byte length)
+	}
+
+        if(offset < byte_in_first_file)
+        {
+            slice_num = 1;
+            slice_offset = offset + sl.first_slice_header;
+        }
+        else
+        {
+	    euclide(offset - byte_in_first_file, byte_per_file, slice_num, slice_offset);
+            slice_num += 2;
+                // "+2" because file number starts to 1 and first file is already counted
+            slice_offset += sl.other_slice_header;
+        }
+    }
+
+
 } // end of namespace

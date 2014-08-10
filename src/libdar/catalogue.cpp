@@ -1270,6 +1270,17 @@ namespace libdar
 	    *ea_offset = pos;
     }
 
+    bool inode::ea_get_offset(infinint & val) const
+    {
+	if(ea_offset != NULL)
+	{
+	    val = *ea_offset;
+	    return true;
+	}
+	else
+	    return false;
+    }
+
     void inode::ea_set_crc(const crc & val)
     {
 	if(ea_crc != NULL)
@@ -1586,6 +1597,18 @@ namespace libdar
 	else
 	    *fsa_offset = pos;
     }
+
+    bool inode::fsa_get_offset(infinint & pos) const
+    {
+	if(fsa_offset != NULL)
+	{
+	    pos = *fsa_offset;
+	    return true;
+	}
+	else
+	    return false;
+    }
+
 
     void inode::fsa_set_crc(const crc & val)
     {
@@ -2566,6 +2589,8 @@ namespace libdar
 
     const infinint & file::get_offset() const
     {
+	if(get_saved_status() != s_saved)
+	    throw SRC_BUG;
 	if(offset == NULL)
 	    throw SRC_BUG;
 	return *offset;

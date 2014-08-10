@@ -814,6 +814,28 @@ namespace libdar
     extern std::string tools_gpgme_strerror_r(gpgme_error_t err);
 #endif
 
+    struct tools_slice_layout
+    {
+	infinint first_size;         //< size of the first slice
+	infinint other_size;         //< maximum size of other slices
+	infinint first_slice_header; //< size of the slice header in the first slice
+	infinint other_slice_header; //< size of the slice header in the other slices
+	bool older_sar_than_v8;      //< true if the archive format is older than version 8
+    };
+
+
+	/// given a slice_layout and a archive offset, provides the corresponding slice and slice offset
+	///
+	/// \param[in] sl slice_layout
+	/// \param[in] offset input offset as if all slices were sticked toghether
+	/// \param[out] slice_num slice number where to find the given offset
+	/// \param[out] slice_offset offset in that slice where is the given offset
+    extern void tools_which_slice(const tools_slice_layout & sl,
+				  const infinint & offset,
+				  infinint & slice_num,
+				  infinint & slice_offset);
+
+
 } /// end of namespace
 
 #endif

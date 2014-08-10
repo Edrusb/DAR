@@ -194,7 +194,8 @@ namespace libdar
 				  bool lax,
 				  bool sequential_read,
 				  bool info_details,
-				  vector<signator> & gnupg_signed)
+				  vector<signator> & gnupg_signed,
+				  tools_slice_layout & sl)
     {
 	secu_string real_pass = pass;
 	generic_file *tmp = NULL;
@@ -202,6 +203,8 @@ namespace libdar
 	cache *tmp_cache = NULL;
 
 	stack.clear();
+	sl.first_size = 0;
+	sl.other_size = 0; // we will change that only if sar object is used
 
 	try
 	{
@@ -264,16 +267,19 @@ namespace libdar
 	    }
 	    else
 	    {
+		sar *tmp_sar = NULL;
 		if(info_details)
 		    dialog.warning(gettext("Opening the archive using the multi-slice abstraction layer..."));
-		tmp = new (pool) sar(dialog,
-				     basename,
-				     extension,
-				     where,
-				     !sequential_read, // not openned by the end in sequential read mode
-				     min_digits,
-				     lax,
-				     execute);
+		tmp = tmp_sar = new (pool) sar(dialog,
+					       basename,
+					       extension,
+					       where,
+					       !sequential_read, // not openned by the end in sequential read mode
+					       min_digits,
+					       lax,
+					       execute);
+		if(tmp_sar != NULL)
+		    sl = tmp_sar->get_slicing();
 	    }
 
 	    if(tmp == NULL)
@@ -856,6 +862,7 @@ namespace libdar
     void macro_tools_create_layers(user_interaction & dialog,
 				   pile & layers,
 				   header_version & ver,
+				   tools_slice_layout & slicing,
 				   memory_pool *pool,
 				   const entrepot & sauv_path_t,
 				   const string & filename,
@@ -893,6 +900,8 @@ namespace libdar
 	    gf_mode open_mode = gf_read_write; // by default first layer is read-write except in case of hashing or encryption
 		// read-write mode is used when skipping back due to file change, the escape layer needs to read the few
 		// bytes before the backward position to take care of tape marks
+	    slicing.other_size = file_size;
+	    slicing.first_size = first_file_size;
 
 	    layers.clear();
 
@@ -956,26 +965,30 @@ namespace libdar
 			}
 		    else
 		    {
+			sar *tmp_sar = NULL;
 			if(info_details)
 			    dialog.warning(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
-			tmp = new (pool) sar(dialog,
-					     open_mode,
-					     filename,
-					     extension,
-					     file_size,
-					     first_file_size,
-					     warn_over,
-					     allow_over,
-					     pause,
-					     sauv_path_t, // entrepot !!
-					     internal_name,
-					     data_name,
-					     force_permission,
-					     permission,
-					     hash,
-					     slice_min_digits,
-					     false,
-					     execute);
+			tmp = tmp_sar = new (pool) sar(dialog,
+						       open_mode,
+						       filename,
+						       extension,
+						       file_size,
+						       first_file_size,
+						       warn_over,
+						       allow_over,
+						       pause,
+						       sauv_path_t, // entrepot !!
+						       internal_name,
+						       data_name,
+						       force_permission,
+						       permission,
+						       hash,
+						       slice_min_digits,
+						       false,
+						       execute);
+
+			if(tmp_sar != NULL)
+			    slicing = tmp_sar->get_slicing();
 		    }
 
 
@@ -1313,6 +1326,96 @@ namespace libdar
 	if(info_details)
 	    dialog.warning(gettext("Archive is closed."));
     }
+
+    set<infinint> macro_tools_get_slices(const nomme *obj, tools_slice_layout sl)
+    {
+	set<infinint> slices;
+	infinint offset; // used temporarily to record data, EA and FSA offsets
+	infinint slice_num, slice_offset;
+	const inode *tmp_inode = dynamic_cast<const inode *>(obj);
+	const file *tmp_file = dynamic_cast<const file *>(obj);
+	const mirage *tmp_mir = dynamic_cast<const mirage *>(obj);
+
+	if(obj == NULL)
+	    throw SRC_BUG;
+
+	if(tmp_mir != NULL)
+	{
+	    tmp_inode = tmp_mir->get_inode();
+	    tmp_file = dynamic_cast<const file *>(tmp_inode);
+	}
+
+	if(tmp_inode != NULL)
+	{
+	    if(sl.first_size > 0)
+	    {
+		if(tmp_inode->ea_get_saved_status() == inode::ea_full)
+		{
+		    if(tmp_inode->ea_get_offset(offset))
+		    {
+			tools_which_slice(sl,
+					  offset,
+					  slice_num,
+					  slice_offset);
+			slices.insert(slice_num);
+
+			offset += tmp_inode->ea_get_size();
+			tools_which_slice(sl,
+					  offset,
+					  slice_num,
+					  slice_offset);
+			slices.insert(slice_num);
+		    }
+		    else
+			throw SRC_BUG; // has EA saved but no offset ?!?
+		}
+
+		if(tmp_inode->fsa_get_saved_status() == inode::fsa_full)
+		{
+		    if(tmp_inode->fsa_get_offset(offset))
+		    {
+			tools_which_slice(sl,
+					  offset,
+					  slice_num,
+					  slice_offset);
+			slices.insert(slice_num);
+
+			offset += tmp_inode->fsa_get_size();
+			tools_which_slice(sl,
+					  offset,
+					  slice_num,
+					  slice_offset);
+			slices.insert(slice_num);
+		    }
+		    else
+			throw SRC_BUG;
+		}
+	    }
+	}
+
+	if(tmp_file != NULL)
+	{
+	    if(tmp_file->get_saved_status() == s_saved)
+	    {
+		offset = tmp_file->get_offset();
+		tools_which_slice(sl,
+				  offset,
+				  slice_num,
+				  slice_offset);
+		slices.insert(slice_num);
+
+		offset += tmp_file->get_storage_size();
+		tools_which_slice(sl,
+				  offset,
+				  slice_num,
+				  slice_offset);
+		slices.insert(slice_num);
+	    }
+	}
+
+	return slices;
+    }
+
 
 
 } // end of namespace

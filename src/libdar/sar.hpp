@@ -35,6 +35,7 @@
 #include "path.hpp"
 #include "integers.hpp"
 #include "entrepot.hpp"
+#include "tools.hpp"
 
 namespace libdar
 {
@@ -133,8 +134,7 @@ namespace libdar
         infinint get_position();
 
             // informational routines
-        infinint get_sub_file_size() const { return size; };
-        infinint get_first_sub_file_size() const { return first_size; };
+	const tools_slice_layout & get_slicing() const { return slicing; };
         bool get_total_file_number(infinint &num) const { num = of_last_file_num; return of_last_file_known; };
         bool get_last_file_size(infinint &num) const { num = of_last_file_size; return of_last_file_known; };
 
@@ -145,7 +145,7 @@ namespace libdar
 	void enable_natural_destruction() { natural_destruction = true; };
 
 	    // true if sar's header is from an old archive format (<= "07")
-	bool is_an_old_start_end_archive() const { return old_sar; };
+	bool is_an_old_start_end_archive() const { return slicing.older_sar_than_v8; };
 
 	    // return the internal_name used to link slices toghether
 	const label & get_internal_name_used() const { return of_internal_name; };
@@ -162,20 +162,11 @@ namespace libdar
 	void inherited_terminate();
 
     private :
-	struct coordinate
-	{
-	    infinint slice_num;
-	    infinint offset_in_slice;
-	};
-
 	entrepot *entr;              //< where are stored slices
         std::string base;            //< archive base name
 	std::string ext;             //< archive extension
         std::string hook;            //< command line to execute between slices
-        infinint size;               //< size of slices
-        infinint first_size;         //< size of first slice
-        infinint first_file_offset;  //< where data start in the first slice
-	infinint other_file_offset;  //< where data start in the slices other than the first
+	tools_slice_layout slicing;  //< slice layout
         infinint file_offset;        //< current reading/writing position in the current slice (relative to the whole slice file, including headers)
 	hash_algo hash;              //< whether to build a hashing when creating slices, and if so, which algorithm to use
 	infinint min_digits;         //< minimum number of digits the slices number is stored with in the filename
@@ -200,10 +191,8 @@ namespace libdar
         bool opt_allow_overwrite;    //< is slice overwriting allowed
 	    //
         infinint pause;              //< do we pause between slices
-	bool old_sar;                //< in read-mode, is true if the read sar has an old header (format <= "07"), in write mode, is true if it is requested to build old slice headers
 	bool lax;                    //< whether to try to go further reading problems
 
-	coordinate get_slice_and_offset(infinint pos) const;       //< convert absolute position (seen by the upper layer) to slice number and offset in slice
         bool skip_forward(U_I x);                                  //< skip forward in sar global contents
         bool skip_backward(U_I x);                                 //< skip backward in sar global contents
         void close_file(bool terminal);                            //< close current openned file, adding (in write mode only) a terminal mark (last slice) or not
