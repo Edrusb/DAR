@@ -151,7 +151,7 @@ namespace libdar
 			    try
 			    {
 				vector<signator> tmp;
-				tools_slice_layout ignored;
+				slice_layout ignored;
 
 				if(options.get_ref_basename() == "-")
 				    throw Erange("archive::archive", gettext("Reading the archive of reference from pipe or standard input is not possible"));
@@ -1209,7 +1209,7 @@ namespace libdar
 		header_version isol_ver;
 		label isol_data_name;
 		label internal_name;
-		tools_slice_layout isol_slices;
+		slice_layout isol_slices;
 
 		do
 		{
@@ -2321,7 +2321,7 @@ namespace libdar
 	stack.find_first_from_bottom(real_decoupe);
         if(real_decoupe != NULL)
         {
-	    tools_slice_layout tmp = real_decoupe->get_slicing();
+	    slice_layout tmp = real_decoupe->get_slicing();
 
             sub_file_size = tmp.other_size;
             first_file_size = tmp.first_size;

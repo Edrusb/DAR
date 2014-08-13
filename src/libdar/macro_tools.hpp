@@ -48,6 +48,7 @@ extern "C"
 #include "entrepot.hpp"
 #include "tools.hpp"
 #include "range.hpp"
+#include "slice_layout.hpp"
 
     /// \addtogroup Private
     /// @{
@@ -91,7 +92,7 @@ namespace libdar
 					 bool sequential_read, // whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
 					 bool info_details,    // be or not verbose about the archive openning
 					 std::vector<signator> & gnupg_signed, //< list of existing signature found for that archive (valid or not)
-					 tools_slice_layout & sl); //< slicing layout of the archive
+					 slice_layout & sl); //< slicing layout of the archive
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 
     extern catalogue *macro_tools_get_derivated_catalogue_from(user_interaction & dialog,
@@ -161,7 +162,7 @@ namespace libdar
     extern void macro_tools_create_layers(user_interaction & dialog,
 					  pile & layers,
 					  header_version & ver,
-					  tools_slice_layout & slicing,
+					  slice_layout & slicing,
 					  memory_pool *pool,
 					  const entrepot & sauv_path_t,
 					  const std::string & filename,
@@ -216,7 +217,7 @@ namespace libdar
 	/// \param[in] sl slice layout of the archive
 	/// \return a set of slices which will be required to restore that particular file (over the slice(s)
 	/// containing the catalogue of course).
-    range macro_tools_get_slices(const nomme *obj, tools_slice_layout sl);
+    range macro_tools_get_slices(const nomme *obj, slice_layout sl);
 
 } // end of namespace
 

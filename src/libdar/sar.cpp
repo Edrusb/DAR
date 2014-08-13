@@ -324,9 +324,8 @@ namespace libdar
 	}
     }
 
-    bool sar::skip(const infinint &pos)
+    bool sar::skip(const infinint & pos)
     {
-	tools_slice_layout sl;
 	infinint dest_file, offset;
 
 	if(is_terminated())
@@ -338,9 +337,8 @@ namespace libdar
             ///////////////////////////
             // determination of the file to go and its offset to seek in
             //
-	tools_which_slice(slicing,
-			  pos,
-			  dest_file, offset);
+	slicing.which_slice(pos,
+			    dest_file, offset);
 
             ///////////////////////////
             // checking whether the required position is acceptable

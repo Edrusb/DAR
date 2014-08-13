@@ -51,6 +51,7 @@ extern "C"
 #include "on_pool.hpp"
 #include "filesystem_specific_attribute.hpp"
 #include "datetime.hpp"
+#include "slice_layout.hpp"
 
 namespace libdar
 {
@@ -1117,7 +1118,7 @@ namespace libdar
 	void slice_listing(bool isolated,
 			   const mask & selection,
 			   const mask & subtree,
-			   const tools_slice_layout & slicing) const;
+			   const slice_layout & slicing) const;
 
         entree_stats get_stats() const { return stats; };
 

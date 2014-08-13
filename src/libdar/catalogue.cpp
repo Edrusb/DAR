@@ -5132,7 +5132,7 @@ namespace libdar
     void catalogue::slice_listing(bool isolated,
 				  const mask & selection,
 				  const mask & subtree,
-				  const tools_slice_layout & slicing) const
+				  const slice_layout & slicing) const
     {
 	const entree *e = NULL;
 	thread_cancellation thr;

@@ -195,7 +195,7 @@ namespace libdar
 				  bool sequential_read,
 				  bool info_details,
 				  vector<signator> & gnupg_signed,
-				  tools_slice_layout & sl)
+				  slice_layout & sl)
     {
 	secu_string real_pass = pass;
 	generic_file *tmp = NULL;
@@ -862,7 +862,7 @@ namespace libdar
     void macro_tools_create_layers(user_interaction & dialog,
 				   pile & layers,
 				   header_version & ver,
-				   tools_slice_layout & slicing,
+				   slice_layout & slicing,
 				   memory_pool *pool,
 				   const entrepot & sauv_path_t,
 				   const string & filename,
@@ -1327,7 +1327,7 @@ namespace libdar
 	    dialog.warning(gettext("Archive is closed."));
     }
 
-    range macro_tools_get_slices(const nomme *obj, tools_slice_layout sl)
+    range macro_tools_get_slices(const nomme *obj, slice_layout sl)
     {
 	range slices;
 	infinint offset; // used temporarily to record data, EA and FSA offsets
@@ -1354,17 +1354,15 @@ namespace libdar
 		{
 		    if(tmp_inode->ea_get_offset(offset))
 		    {
-			tools_which_slice(sl,
-					  offset,
-					  slice_num,
-					  slice_offset);
+			sl.which_slice(offset,
+				       slice_num,
+				       slice_offset);
 			low = slice_num;
 
 			offset += tmp_inode->ea_get_size();
-			tools_which_slice(sl,
-					  offset,
-					  slice_num,
-					  slice_offset);
+			sl.which_slice(offset,
+				       slice_num,
+				       slice_offset);
 		 	slices += range(low, slice_num);
 		    }
 		    else
@@ -1375,17 +1373,15 @@ namespace libdar
 		{
 		    if(tmp_inode->fsa_get_offset(offset))
 		    {
-			tools_which_slice(sl,
-					  offset,
-					  slice_num,
-					  slice_offset);
+			sl.which_slice(offset,
+				       slice_num,
+				       slice_offset);
 			low = slice_num;
 
 			offset += tmp_inode->fsa_get_size();
-			tools_which_slice(sl,
-					  offset,
-					  slice_num,
-					  slice_offset);
+			sl.which_slice(offset,
+				       slice_num,
+				       slice_offset);
 			slices += range(low, slice_num);
 		    }
 		    else
@@ -1399,17 +1395,15 @@ namespace libdar
 	    if(tmp_file->get_saved_status() == s_saved)
 	    {
 		offset = tmp_file->get_offset();
-		tools_which_slice(sl,
-				  offset,
-				  slice_num,
-				  slice_offset);
+		sl.which_slice(offset,
+			       slice_num,
+			       slice_offset);
 		low = slice_num;
 
 		offset += tmp_file->get_storage_size();
-		tools_which_slice(sl,
-				  offset,
-				  slice_num,
-				  slice_offset);
+		sl.which_slice(offset,
+			       slice_num,
+			       slice_offset);
 		slices += range(low, slice_num);
 	    }
 	}

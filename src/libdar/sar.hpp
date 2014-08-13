@@ -36,6 +36,7 @@
 #include "integers.hpp"
 #include "entrepot.hpp"
 #include "tools.hpp"
+#include "slice_layout.hpp"
 
 namespace libdar
 {
@@ -134,7 +135,7 @@ namespace libdar
         infinint get_position();
 
             // informational routines
-	const tools_slice_layout & get_slicing() const { return slicing; };
+	const slice_layout & get_slicing() const { return slicing; };
         bool get_total_file_number(infinint &num) const { num = of_last_file_num; return of_last_file_known; };
         bool get_last_file_size(infinint &num) const { num = of_last_file_size; return of_last_file_known; };
 
@@ -166,7 +167,7 @@ namespace libdar
         std::string base;            //< archive base name
 	std::string ext;             //< archive extension
         std::string hook;            //< command line to execute between slices
-	tools_slice_layout slicing;  //< slice layout
+	slice_layout slicing;        //< slice layout
         infinint file_offset;        //< current reading/writing position in the current slice (relative to the whole slice file, including headers)
 	hash_algo hash;              //< whether to build a hashing when creating slices, and if so, which algorithm to use
 	infinint min_digits;         //< minimum number of digits the slices number is stored with in the filename
