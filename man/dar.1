@@ -823,8 +823,8 @@ Doing a difference in sequential read mode is allowed but hard linked inodes can
 .B LISTING OPTIONS (to use with -l)
 .PP
 .TP 20
--T, --list-format=<normal | tree | xml>, --tree-format
-By default, listing provides a tar-like output (the 'normal' output). You can however get a tree-like output (the 'tree' output) or an XML structured output (the 'xml' output). Providing -T without argument gives the same as providing the 'tree' argument to it. The option --tree-format is an alias to --list-format=tree (backward compatibility). Note that the files doc/dar-catalog-*.dtd define the format of the XML output listing (This file is also installed under $PREFIX/share/doc)
+-T, --list-format=<normal | tree | xml | slicing>, --tree-format
+By default, listing provides a tar-like output (the 'normal' output). You can however get a tree-like output (the 'tree' output), an XML structured output (the 'xml' output) or a output focused on slice where each file is located in. Providing -T without argument gives the same as providing the 'tree' argument to it. The option --tree-format is an alias to --list-format=tree (backward compatibility). Note that the files doc/dar-catalog-*.dtd define the format of the XML output listing (This file is also installed under $PREFIX/share/doc)
 .TP 20
 -as, --alter=saved
 list only saved files

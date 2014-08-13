@@ -47,6 +47,7 @@ extern "C"
 #include "pile.hpp"
 #include "entrepot.hpp"
 #include "tools.hpp"
+#include "range.hpp"
 
     /// \addtogroup Private
     /// @{
@@ -215,7 +216,7 @@ namespace libdar
 	/// \param[in] sl slice layout of the archive
 	/// \return a set of slices which will be required to restore that particular file (over the slice(s)
 	/// containing the catalogue of course).
-    std::set<infinint> macro_tools_get_slices(const nomme *obj, tools_slice_layout sl);
+    range macro_tools_get_slices(const nomme *obj, tools_slice_layout sl);
 
 } // end of namespace
 

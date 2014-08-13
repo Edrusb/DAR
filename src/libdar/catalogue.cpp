@@ -72,6 +72,7 @@ extern "C"
 #include "fichier_local.hpp"
 #include "macro_tools.hpp"
 #include "null_file.hpp"
+#include "range.hpp"
 
 #define INODE_FLAG_EA_MASK  0x07
 #define INODE_FLAG_EA_FULL  0x01
@@ -4606,7 +4607,7 @@ namespace libdar
 	defile juillet = FAKE_ROOT;
 	const eod tmp_eod;
 
-	get_ui().printf(gettext("access mode    | user | group | size  |          date                 | [data ][ EA  ][FSA][compr][S]|   filename\n"));
+	get_ui().printf(gettext("Access mode    | User | Group | Size  |          Date                 | [Data ][ EA  ][FSA][Compr][S]|   Filename\n"));
 	get_ui().printf(gettext("---------------+------+-------+-------+-------------------------------+------------------------------+-----------\n"));
 	if(filter_unsaved)
 	    contenu->recursive_has_changed_update();
@@ -4721,7 +4722,7 @@ namespace libdar
 
 	if(!get_ui().get_use_listing())
 	{
-	    get_ui().printf(gettext("[data ][ EA  ][FSA][compr][S]| permission | user  | group | size  |          date                 |    filename\n"));
+	    get_ui().printf(gettext("[Data ][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size  |          Date                 |    filename\n"));
 	    get_ui().printf(gettext("-----------------------------+------------+-------+-------+-------+-------------------------------+------------\n"));
 	}
 	if(filter_unsaved)
@@ -5127,6 +5128,80 @@ namespace libdar
 
 	get_ui().warning("</Catalog>");
     }
+
+    void catalogue::slice_listing(bool isolated,
+				  const mask & selection,
+				  const mask & subtree,
+				  const tools_slice_layout & slicing) const
+    {
+	const entree *e = NULL;
+	thread_cancellation thr;
+	defile juillet = FAKE_ROOT;
+	const eod tmp_eod;
+	range all_slices;
+	range file_slices;
+
+	get_ui().warning("Slice  |[Data ][ EA  ][FSA][Compr][S]|Permission| Filemane");
+	get_ui().warning("-------+-----------------------------+----------+-----------------------------");
+	reset_read();
+	while(read(e))
+	{
+	    const eod *e_eod = dynamic_cast<const eod *>(e);
+	    const directory *e_dir = dynamic_cast<const directory *>(e);
+	    const inode *e_ino = dynamic_cast<const inode *>(e);
+	    const mirage *e_hard = dynamic_cast<const mirage *>(e);
+	    const nomme *e_nom = dynamic_cast<const nomme *>(e);
+	    const detruit *e_det = dynamic_cast<const detruit *>(e);
+
+	    thr.check_self_cancellation();
+	    juillet.enfile(e);
+
+	    if(e_eod != NULL)
+		continue;
+
+	    if(e_nom == NULL)
+		throw SRC_BUG;
+	    else
+	    {
+		if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || selection.is_covered(e_nom->get_name())))
+		{
+		    file_slices = macro_tools_get_slices(e_nom, slicing);
+		    all_slices += file_slices;
+
+		    if(e_det != NULL)
+			get_ui().printf("%s\t%s%s\n", file_slices.display().c_str(), REMOVE_TAG, juillet.get_string().c_str());
+		    else
+		    {
+			if(e_hard != NULL)
+			    e_ino = e_hard->get_inode();
+
+			if(e_ino == NULL)
+			    throw SRC_BUG;
+			else
+			{
+			    bool dirty_seq = local_check_dirty_seq(get_escape_layer());
+			    string a = local_perm(*e_ino, e_hard != NULL);
+			    string f = local_flag(*e_ino, isolated, dirty_seq);
+
+			    get_ui().printf("%s\t%S%S %s\n", file_slices.display().c_str(), &f, &a, juillet.get_string().c_str());
+			}
+		    }
+		}
+		else // excluded, filtered out
+		    if(e_dir != NULL)
+		    {
+			juillet.enfile(&tmp_eod);
+			skip_read_to_parent_dir();
+		    }
+		    // else what was skipped is not a directory, nothing to do.
+	    }
+	}
+
+	get_ui().warning("-----");
+	get_ui().printf("All displayed files have their data in slice range %s\n", all_slices.display().c_str());
+	get_ui().warning("-----");
+    }
+
 
     void catalogue::reset_dump() const
     {

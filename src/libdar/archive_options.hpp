@@ -1170,7 +1170,8 @@ namespace libdar
 	{
 	    normal,   //< the tar-like listing (this is the default)
 	    tree,     //< the original dar's tree listing (for those that like forest)
-	    xml       //< the xml catalogue output
+	    xml,      //< the xml catalogue output
+	    slicing   //< the slicing output (give info about where files are located)
 	};
 
 	    /////////////////////////////////////////////////////////////////////

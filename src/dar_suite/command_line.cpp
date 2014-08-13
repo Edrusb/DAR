@@ -1122,17 +1122,16 @@ static bool get_args_recursive(recursive_param & rec,
             case 'T':
                 if(optarg == NULL)
                     p.list_mode = archive_options_listing::tree;
+		else if(strcasecmp("normal", optarg) == 0)
+		    p.list_mode = archive_options_listing::normal;
+		else if(strcasecmp("tree", optarg) == 0)
+		    p.list_mode = archive_options_listing::tree;
+		else if(strcasecmp("xml", optarg) == 0)
+		    p.list_mode = archive_options_listing::xml;
+		else if(strcasecmp("slicing", optarg) == 0 || strcasecmp("slice", optarg) == 0)
+		    p.list_mode = archive_options_listing::slicing;
 		else
-		    if(strcasecmp("normal", optarg) == 0)
-                	p.list_mode = archive_options_listing::normal;
-		    else
-			if (strcasecmp("tree", optarg) == 0)
-			    p.list_mode = archive_options_listing::tree;
-			else
-			    if (strcasecmp("xml", optarg) == 0)
-				p.list_mode = archive_options_listing::xml;
-			    else
-				throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
+		    throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;
             case 'E':
                 if(optarg == NULL)

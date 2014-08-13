@@ -1114,6 +1114,10 @@ namespace libdar
 			 bool filter_unsaved,
 			 bool list_ea,
 			 std::string beginning) const;
+	void slice_listing(bool isolated,
+			   const mask & selection,
+			   const mask & subtree,
+			   const tools_slice_layout & slicing) const;
 
         entree_stats get_stats() const { return stats; };
 

@@ -1327,11 +1327,12 @@ namespace libdar
 	    dialog.warning(gettext("Archive is closed."));
     }
 
-    set<infinint> macro_tools_get_slices(const nomme *obj, tools_slice_layout sl)
+    range macro_tools_get_slices(const nomme *obj, tools_slice_layout sl)
     {
-	set<infinint> slices;
+	range slices;
 	infinint offset; // used temporarily to record data, EA and FSA offsets
 	infinint slice_num, slice_offset;
+	infinint low;
 	const inode *tmp_inode = dynamic_cast<const inode *>(obj);
 	const file *tmp_file = dynamic_cast<const file *>(obj);
 	const mirage *tmp_mir = dynamic_cast<const mirage *>(obj);
@@ -1357,14 +1358,14 @@ namespace libdar
 					  offset,
 					  slice_num,
 					  slice_offset);
-			slices.insert(slice_num);
+			low = slice_num;
 
 			offset += tmp_inode->ea_get_size();
 			tools_which_slice(sl,
 					  offset,
 					  slice_num,
 					  slice_offset);
-			slices.insert(slice_num);
+		 	slices += range(low, slice_num);
 		    }
 		    else
 			throw SRC_BUG; // has EA saved but no offset ?!?
@@ -1378,14 +1379,14 @@ namespace libdar
 					  offset,
 					  slice_num,
 					  slice_offset);
-			slices.insert(slice_num);
+			low = slice_num;
 
 			offset += tmp_inode->fsa_get_size();
 			tools_which_slice(sl,
 					  offset,
 					  slice_num,
 					  slice_offset);
-			slices.insert(slice_num);
+			slices += range(low, slice_num);
 		    }
 		    else
 			throw SRC_BUG;
@@ -1402,14 +1403,14 @@ namespace libdar
 				  offset,
 				  slice_num,
 				  slice_offset);
-		slices.insert(slice_num);
+		low = slice_num;
 
 		offset += tmp_file->get_storage_size();
 		tools_which_slice(sl,
 				  offset,
 				  slice_num,
 				  slice_offset);
-		slices.insert(slice_num);
+		slices += range(low, slice_num);
 	    }
 	}
 

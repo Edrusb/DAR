@@ -970,6 +970,9 @@ namespace libdar
 		case archive_options_listing::xml:
 		    get_cat().xml_listing(only_contains_an_isolated_catalogue(), options.get_selection(), options.get_subtree(), options.get_filter_unsaved(), options.get_display_ea(), "");
 		    break;
+		case archive_options_listing::slicing:
+		    get_cat().slice_listing(only_contains_an_isolated_catalogue(), options.get_selection(), options.get_subtree(), slices);
+		    break;
 		default:
 		    throw SRC_BUG;
                 }
