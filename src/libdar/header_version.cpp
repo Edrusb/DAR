@@ -47,6 +47,15 @@ namespace libdar
 	initial_offset = 0;
 	sym = crypto_none;
 	crypted_key = NULL;
+	ref_layout = NULL;
+    }
+
+    header_version::~header_version()
+    {
+	if(crypted_key != NULL)
+	    delete crypted_key;
+	if(ref_layout != NULL)
+	    delete ref_layout;
     }
 
     void header_version::read(generic_file &f)
@@ -82,20 +91,42 @@ namespace libdar
 	else
 	    sym = crypto_none; // no crypto used, coherent with flag
 
-	if(crypted_key != NULL)
-	{
-	    delete crypted_key;
-	    crypted_key = NULL;
-	}
+
 	if((flag & VERSION_FLAG_HAS_CRYPTED_KEY) != 0)
 	{
 	    infinint key_size = f;
 
-	    crypted_key = new (get_pool()) memory_file();
+	    if(crypted_key == NULL)
+		crypted_key = new (get_pool()) memory_file();
 	    if(crypted_key == NULL)
 		throw Ememory("header_version::read");
 	    if(f.copy_to(*crypted_key, key_size) != key_size)
 		throw Erange("header_version::read", gettext("Missing data for encrypted symmetrical key"));
+	}
+	else
+	{
+	    if(crypted_key != NULL)
+	    {
+		delete crypted_key;
+		crypted_key = NULL;
+	    }
+	}
+
+	if((flag & VERSION_FLAG_HAS_REF_SLICING) != 0)
+	{
+	    if(ref_layout == NULL)
+		ref_layout = new (get_pool()) slice_layout();
+	    if(ref_layout == NULL)
+		throw Ememory("header_version::read");
+	    ref_layout->read(f);
+	}
+	else
+	{
+	    if(ref_layout != NULL)
+	    {
+		delete ref_layout;
+		ref_layout = NULL;
+	    }
 	}
 
 	ctrl = f.get_crc();
@@ -167,6 +198,11 @@ namespace libdar
 	else
 	    me->flag &= ~VERSION_FLAG_HAS_CRYPTED_KEY;
 
+	if(ref_layout != NULL)
+	    me->flag |= VERSION_FLAG_HAS_REF_SLICING;
+	else
+	    me->flag &= ~VERSION_FLAG_HAS_REF_SLICING;
+
 	    // writing down the data
 
 	f.reset_crc(HEADER_CRC_SIZE);
@@ -191,6 +227,9 @@ namespace libdar
 	    crypted_key->copy_to(f);
 	}
 
+	if(ref_layout != NULL)
+	    ref_layout->write(f);
+
 	ctrl = f.get_crc();
 	if(ctrl == NULL)
 	    throw SRC_BUG;
@@ -207,7 +246,6 @@ namespace libdar
 	if(ctrl != NULL)
 	    delete ctrl;
     }
-
 
     static char sym_crypto_to_char(crypto_algo a)
     {

@@ -33,6 +33,7 @@
 #include "archive_version.hpp"
 #include "on_pool.hpp"
 #include "crypto.hpp"
+#include "slice_layout.hpp"
 
 namespace libdar
 {
@@ -48,6 +49,7 @@ namespace libdar
     const U_I VERSION_FLAG_SEQUENCE_MARK = 0x10;      //< escape sequence marks present for sequential reading
     const U_I VERSION_FLAG_INITIAL_OFFSET = 0x08;     //< whether the header contains the initial offset (size of clear data before encrypted) NOTE : This value is set internally by header_version, no need to set flag with it! But that's OK to set it or not, it will be updated according to initial_offset's value.
     const U_I VERSION_FLAG_HAS_CRYPTED_KEY = 0x04;    //< the header contains a symmetrical key encrypted with asymmetrical algorithm
+    const U_I VERSION_FLAG_HAS_REF_SLICING = 0x02;    //< the header contains the slicing information of the archive of reference (used for isolated catalogue)
     const U_I VERSION_FLAG_HAS_AN_EXTENDED_SIZE = 0x01; //< reserved for future use
 
 
@@ -61,8 +63,10 @@ namespace libdar
 	infinint initial_offset; // not dropped to archive if set to zero (at dump() time, the flag is also updated with VERSION_FLAG_INITIAL_OFFSET accordingly to this value)
 	crypto_algo sym;
 	memory_file *crypted_key;
+	slice_layout *ref_layout;
 
 	header_version();
+	~header_version();
         void read(generic_file &f);
         void write(generic_file &f) const;
     };

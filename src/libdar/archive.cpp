@@ -954,6 +954,14 @@ namespace libdar
 
         try
         {
+	    slice_layout used_layout = slices;
+		// by default we use the slice layout of the current archive,
+		// this is modified if the current archive is an isolated catalogue
+		// in archive format 9 or greater, then we use the slice layout contained
+		// in the archive header/trailer which is a copy of the one of the archive of reference
+		// a warning is issued in that case
+
+
 	    if(freed_and_checked)
 		throw Erange("catalogue::op_listing", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
             enable_natural_destruction();
@@ -971,7 +979,17 @@ namespace libdar
 		    get_cat().xml_listing(only_contains_an_isolated_catalogue(), options.get_selection(), options.get_subtree(), options.get_filter_unsaved(), options.get_display_ea(), "");
 		    break;
 		case archive_options_listing::slicing:
-		    get_cat().slice_listing(only_contains_an_isolated_catalogue(), options.get_selection(), options.get_subtree(), slices);
+		    if(only_contains_an_isolated_catalogue())
+		    {
+			if(ver.ref_layout != NULL)
+			{
+			    used_layout = *ver.ref_layout;
+			    dialog.warning(gettext("Using the slice layout of the archive of reference at the time this isolated catalogue was done\n Note: if this reference has been resliced the resulting slicing information given here will be wrong"));
+			}
+			else
+			    throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
+		    }
+		    get_cat().slice_listing(only_contains_an_isolated_catalogue(), options.get_selection(), options.get_subtree(), used_layout);
 		    break;
 		default:
 		    throw SRC_BUG;
@@ -982,10 +1000,9 @@ namespace libdar
                 disable_natural_destruction();
                 throw;
             }
-            catch(Erange &e)
+            catch(Erange & e)
             {
                 string msg = string(gettext("Error while listing archive contents: ")) + e.get_message();
-                dialog.warning(msg);
                 throw Edata(msg);
             }
         }
@@ -1223,6 +1240,7 @@ namespace libdar
 					  layers,
 					  isol_ver,
 					  isol_slices,
+					  &slices, // giving our slice_layout as reference to be stored in the archive header/trailer
 					  get_pool(),
 					  *sauv_path_t,
 					  filename,
@@ -1917,6 +1935,7 @@ namespace libdar
 					  stack, // this object field is set!
 					  ver,   // this object field is set!
 					  slices,// this object field is set!
+					  NULL,  // no slicing reference stored in archive header/trailer
 					  pool,  // this object field
 					  sauv_path_t,
 					  filename,

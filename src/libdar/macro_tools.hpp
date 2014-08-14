@@ -132,6 +132,7 @@ namespace libdar
 	/// \param[out] layers the resulting stack of generic_file layers ready for use
 	/// \param[out] ver the archive "header" to be dropped at end of archive
 	/// \param[out] slicing slicing layout of the archive
+	/// \param[in]  ref_slicing if not NULL the pointed to slicing_layout will be stored in the header/trailer version of the archive
 	/// \param[in]  pool memory pool to use for memory allocation (NULL for no pool usage)
 	/// \param[in]  sauv_path_t where to create the archive
 	/// \param[in]  filename archive base name
@@ -163,6 +164,7 @@ namespace libdar
 					  pile & layers,
 					  header_version & ver,
 					  slice_layout & slicing,
+					  const slice_layout *ref_slicing,
 					  memory_pool *pool,
 					  const entrepot & sauv_path_t,
 					  const std::string & filename,

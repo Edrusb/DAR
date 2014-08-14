@@ -863,6 +863,7 @@ namespace libdar
 				   pile & layers,
 				   header_version & ver,
 				   slice_layout & slicing,
+				   const slice_layout *ref_slicing,
 				   memory_pool *pool,
 				   const entrepot & sauv_path_t,
 				   const string & filename,
@@ -1098,10 +1099,22 @@ namespace libdar
 		if(add_marks_for_sequential_reading)
 		    ver.flag |= VERSION_FLAG_SEQUENCE_MARK;
 
+		    //
+		if(ref_slicing != NULL)
+		{
+		    ver.flag |= VERSION_FLAG_HAS_REF_SLICING;
+		    ver.ref_layout = new (pool) slice_layout(*ref_slicing);
+		    if(ver.ref_layout == NULL)
+			throw Ememory("macro_tools_create_layers");
+		}
+		else
+		    if(ver.ref_layout != NULL)
+			throw SRC_BUG;
+
 		    // we drop the header at the beginning of the archive in any case (to be able to
 		    // know whether sequential reading is possible or not, and if sequential reading
 		    // is asked, be able to get the required parameter to read the archive.
-		    // It also servers of backup copy for normal reading if the end of the archive
+		    // It also serves of backup copy for normal reading if the end of the archive
 		    // is corrupted.
 
 		if(info_details)
