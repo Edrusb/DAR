@@ -73,7 +73,6 @@ namespace libdar
 	// this is also the highest version of format that can be read
 
     static void version_check(user_interaction & dialog, const header_version & ver);
-    static void read_header_version(user_interaction & dialog, bool lax, generic_file & where, header_version & ver);
 
     catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
 					      memory_pool *pool,
@@ -127,12 +126,12 @@ namespace libdar
         if(info_details)
             dialog.warning(gettext("Locating archive contents..."));
 
-	if(ver.edition > 3)
-	    term.read_catalogue(*crypto, (ver.flag & VERSION_FLAG_SCRAMBLED) != 0, ver.edition, 0);
+	if(ver.get_edition() > 3)
+	    term.read_catalogue(*crypto, ver.is_ciphered(), ver.get_edition(), 0);
 	     // terminator is encrypted since format "04"
 	     // elastic buffer present when encryption is used
 	 else
-	     term.read_catalogue(*crypto, false, ver.edition);
+	     term.read_catalogue(*crypto, false, ver.get_edition());
 	    // elastic buffer did not exist before format "04"
 
         if(info_details)
@@ -149,7 +148,7 @@ namespace libdar
 		label tmp;
 
 		tmp.clear(); // we do not want here to change the catalogue internal data name read from archive
-                ret = new (pool) catalogue(dialog, cata_stack, ver.edition, char2compression(ver.algo_zip), data_loc, efsa_loc, lax_mode, tmp);
+                ret = new (pool) catalogue(dialog, cata_stack, ver.get_edition(), ver.get_compression_algo(), data_loc, efsa_loc, lax_mode, tmp);
 		data_ctxt->set_info_status(CONTEXT_OP);
 		cata_ctxt->set_info_status(CONTEXT_OP);
             }
@@ -321,10 +320,9 @@ namespace libdar
 		}
 	    }
 
+	    ver.read(stack, dialog, lax);
 
-	    read_header_version(dialog, lax, stack, ver);
-
-	    if(second_terminateur_offset == 0 && !sequential_read && ver.edition > 7)
+	    if(second_terminateur_offset == 0 && !sequential_read && ver.get_edition() > 7)
 		dialog.pause(gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. If you have an external catalog given as reference we can continue, OK ?"));
 
 
@@ -350,10 +348,10 @@ namespace libdar
 	    if(info_details)
 		dialog.warning(gettext("Considering cyphering layer..."));
 
-	    if((ver.flag & VERSION_FLAG_SCRAMBLED) != 0 && ver.edition >= 9 && crypto == crypto_none && ver.sym != crypto_none)
-		crypto = ver.sym; // using the crypto algorithm recorded in the archive
+	    if(ver.is_ciphered() && ver.get_edition() >= 9 && crypto == crypto_none && ver.get_sym_crypto_algo() != crypto_none)
+		crypto = ver.get_sym_crypto_algo(); // using the crypto algorithm recorded in the archive
 
-	    if(((ver.flag & VERSION_FLAG_SCRAMBLED) != 0) && crypto == crypto_none)
+	    if(ver.is_ciphered() && crypto == crypto_none)
 	    {
 		if(lax)
 		{
@@ -363,14 +361,12 @@ namespace libdar
 		    throw Erange("macro_tools_open_archive", tools_printf(gettext("The archive %S is encrypted and no encryption cipher has been given, cannot open archive."), &basename));
 	    }
 
-	    if(ver.flag & VERSION_FLAG_HAS_CRYPTED_KEY) // we will find the passphrase from the header's encrypted key
+	    if(ver.get_crypted_key() != NULL) // we will find the passphrase from the header's encrypted key
 	    {
-		if(ver.crypted_key == NULL)
-		    throw SRC_BUG;
 
 		    // detemining the size of the unencrypted key
 
-		infinint i_size = ver.crypted_key->size();
+		infinint i_size = ver.get_crypted_key()->size();
 		U_I size = 0;
 		i_size.unstack(size);
 		if(i_size != 0)
@@ -380,9 +376,9 @@ namespace libdar
 
 		secu_memory_file clear_key = secu_memory_file(size, false);
 		crypto_asym engine(dialog);
-		ver.crypted_key->skip(0);
+		ver.get_crypted_key()->skip(0);
 		clear_key.skip(0);
-		engine.decrypt(*ver.crypted_key, clear_key);
+		engine.decrypt(*(ver.get_crypted_key()), clear_key);
 		gnupg_signed = engine.verify();
 
 		    // substitution of the pass by the clear_key if decrypt succeeded (else it throws an exception)
@@ -417,21 +413,21 @@ namespace libdar
 		{
 		    crypto_sym *tmp_ptr = NULL;
 
-		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size, real_pass, *(stack.top()), true, ver.edition, crypto);
+		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size, real_pass, *(stack.top()), true, ver.get_edition(), crypto);
 		    if(tmp_ptr != NULL)
-			tmp_ptr->set_initial_shift(ver.initial_offset);
+			tmp_ptr->set_initial_shift(ver.get_initial_offset());
 		}
 		else // archive openned by the beginning
 		{
 		    crypto_sym *tmp_ptr;
-		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size, real_pass, *(stack.top()), false, ver.edition, crypto);
+		    tmp = tmp_ptr = new (pool) crypto_sym(crypto_size, real_pass, *(stack.top()), false, ver.get_edition(), crypto);
 
 		    if(tmp_ptr != NULL)
 		    {
 			tmp_ptr->set_callback_trailing_clear_data(&macro_tools_get_terminator_start);
 
 			if(sequential_read)
-			    elastic(*tmp_ptr, elastic_forward, ver.edition); // this is line creates a temporary anonymous object and destroys it just afterward
+			    elastic(*tmp_ptr, elastic_forward, ver.get_edition()); // this is line creates a temporary anonymous object and destroys it just afterward
 			    // this is necessary to skip the reading of the initial elastic buffer
 			    // nothing prevents the elastic buffer from carrying what could
 			    // be considered an escape mark.
@@ -461,7 +457,7 @@ namespace libdar
 
 	    try
 	    {
-		if((ver.flag & VERSION_FLAG_SEQUENCE_MARK) != 0)
+		if(ver.get_tape_marks())
 		{
 		    if(info_details)
 			dialog.warning(gettext("Opening escape sequence abstraction layer..."));
@@ -470,7 +466,7 @@ namespace libdar
 			if(!sequential_read)
 			{
 			    dialog.pause(gettext("LAX MODE: Archive is flagged as having escape sequence (which is normal in recent archive versions). However if this is not expected, shall I assume a data corruption occurred in this field and that this flag should be ignored? (If unsure, refuse)"));
-			    ver.flag &= ~VERSION_FLAG_SEQUENCE_MARK;
+			    ver.set_tape_marks(false);
 			}
 			else
 			    throw Euser_abort("this exception triggers the creation of the escape layer");
@@ -490,12 +486,12 @@ namespace libdar
 			if(sequential_read)
 			{
 			    dialog.warning(gettext("LAX MODE: the requested sequential read mode relies on escape sequence which seem to be absent from this archive. Assuming data corruption occurred. However, if no data corruption occurred and thus no escape sequence are present in this archive, do not use sequential reading mode to explore this archive else you will just get nothing usable from it"));
-			    ver.flag |= VERSION_FLAG_SEQUENCE_MARK;
+			    ver.set_tape_marks(true);
 			    throw Euser_abort("this exception triggers the creation of the escape layer");
 			}
 			else // normal mode
-			    if(ver.edition >= 8) // most usually escape mark are present, thus we must warn
-				dialog.pause(gettext("LAX MODE: Archive is flagged to not have escape sequence. If corruption occurred and an escape sequence is present, this may lead data restoration to fail, answering no at this question will let me consider that an escape sequence layer has to be added in spite of the archive flags. Do you want to continue as suggested by the archive flag, thus without escape sequence layer?"));
+			    if(ver.get_edition() >= 8) // most usually escape mark are present, thus we must warn
+				dialog.pause(gettext("LAX MODE: Archive is flagged to not have escape sequence which is not the case by default since archive format 8 (release 2.4.x). If corruption occurred and an escape sequence is present, this may lead data restoration to fail, answering no at this question will let me consider that an escape sequence layer has to be added in spite of the archive flags. Do you want to continue as suggested by the archive flag, thus without escape sequence layer?"));
 		}
 	    }
 	    catch(Euser_abort & e)
@@ -516,39 +512,15 @@ namespace libdar
 
 	    if(info_details)
 	    {
-		if(ver.algo_zip == none)
+		if(ver.get_compression_algo() == none)
 		    dialog.warning(gettext("Opening the compression abstraction layer (compression algorithm used is none)..."));
 		else
 		    dialog.warning(gettext("Opening the compression layer..."));
 	    }
 
 	    version_check(dialog, ver);
-	    if(lax)
-	    {
-		bool ok = false;
-		do
-		{
-		    try
-		    {
-			char2compression(ver.algo_zip);
-			ok = true;
-		    }
-		    catch(Erange & e)
-		    {
-			string answ = dialog.get_string(gettext("LAX MODE: Unknown compression algorithm used, assuming data corruption occurred. Please help me, answering with one of the following words \"none\", \"gzip\", \"bzip2\" or \"lzo\" at the next prompt:"), true);
-			if(answ == gettext("none"))
-			    ver.algo_zip = compression2char(none);
-			else if(answ == gettext("gzip"))
-			    ver.algo_zip = compression2char(gzip);
-			else if(answ == gettext("bzip2"))
-			    ver.algo_zip = compression2char(bzip2);
-			else if(answ == gettext("lzo"))
-			    ver.algo_zip = compression2char(lzo);
-		    }
-		}
-		while(!ok);
-	    }
-	    tmp = new (pool) compressor(char2compression(ver.algo_zip), *(stack.top()));
+
+	    tmp = new (pool) compressor(ver.get_compression_algo(), *(stack.top()));
 
 	    if(tmp == NULL)
 		throw Ememory("open_archive");
@@ -563,7 +535,7 @@ namespace libdar
 	    if(info_details)
 		dialog.warning(gettext("All layers have been created successfully"));
 
-	    if((ver.flag & VERSION_FLAG_SCRAMBLED) != 0)
+	    if(ver.is_ciphered())
 		dialog.printf(gettext("Warning, the archive %S has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted\n"),  &basename);
 	}
 	catch(...)
@@ -759,95 +731,8 @@ namespace libdar
 
     static void version_check(user_interaction & dialog, const header_version & ver)
     {
-        if(ver.edition > macro_tools_supported_version)
+        if(ver.get_edition() > macro_tools_supported_version)
             dialog.pause(gettext("The format version of the archive is too high for that software version, try reading anyway?"));
-    }
-
-    static void read_header_version(user_interaction & dialog, bool lax, generic_file & where, header_version & ver)
-    {
-	try
-	{
- 	    ver.read(where);
-	}
-	catch(Ebug & e)
-	{
-	    throw;
-	}
-	catch(Ethread_cancel & e)
-	{
-	    throw;
-	}
-	catch(Egeneric & e)
-	{
-	    if(!lax)
-		throw;
-	    else
-	    {
-		dialog.warning(gettext("LAX MODE: Failed to read the archive header, I will need your help to know what is the missing information."));
-
-		if(ver.edition > macro_tools_supported_version)
-		{
- 		    dialog.printf(gettext("LAX MODE: Archive format revision found is [%s] but the higher version this binary can handle is [%s]. Thus, assuming the archive version is corrupted and falling back to the higher version this binary can support (%s)"), ver.edition.display().c_str(), macro_tools_supported_version.display().c_str(),  macro_tools_supported_version.display().c_str());
-		    ver.edition = macro_tools_supported_version;
-		}
-		else
-		    dialog.printf(gettext("LAX MODE: Archive format revision found is [version %s]"), ver.edition.display().c_str());
-
-		try
-		{
-		    dialog.pause(tools_printf(gettext("LAX MODE: is it correct, seen the table at the following URL: %s ?"), LIBDAR_URL_VERSION));
-		}
-		catch(Euser_abort & e)
-		{
-		    string answ;
-		    U_I equivalent;
-		    bool ok = false;
-		    do
-		    {
-			answ = dialog.get_string(tools_printf(gettext("LAX MODE: Please provide the archive format: You can use the table at %s to find the archive format depending on the release version, (for example if this archive has been created using dar release 2.3.4 to 2.3.7 answer \"6\" without the quotes here): "), LIBDAR_URL_VERSION), true);
-			if(tools_my_atoi(answ.c_str(), equivalent))
-			    ver.edition = equivalent;
-			else
-			{
-			    dialog.pause(tools_printf(gettext("LAX MODE: \"%S\" is not a valid archive format"), &answ));
-			    continue;
-			}
-
-			try
-			{
-			    dialog.pause(tools_printf(gettext("LAX MODE: Using archive format \"%d\"?"), equivalent));
-			    ok = true;
-			}
-			catch(Euser_abort & e)
-			{
-			    ok = false;
-			}
-		    }
-		    while(!ok);
-		}
-
-		ver.cmd_line = "";
-		ver.flag = VERSION_FLAG_SCRAMBLED; // this is the lax mode way to handle both ciphered and clear archives
-
-		bool has_escape = (ver.flag & VERSION_FLAG_SEQUENCE_MARK) != 0;
-
-		try
-		{
-		    if(ver.edition < 8)
-		    {
-			if(has_escape)
-			    ver.flag &= ~VERSION_FLAG_SEQUENCE_MARK; // Escape sequence marks appeared at revision 08
-		    }
-		}
-		catch(Euser_abort & e)
-		{
-		    if(has_escape)
-			ver.flag &= ~VERSION_FLAG_SEQUENCE_MARK; // setting the bit to zero
-		    else
-			ver.flag |= VERSION_FLAG_SEQUENCE_MARK; // setting the bit to one
-		}
-	    }
-	}
     }
 
     infinint macro_tools_get_terminator_start(generic_file & f, const archive_version & reading_ver)
@@ -1023,11 +908,11 @@ namespace libdar
 
 		    // ******** creating and writing the archive header ******************* //
 
-		ver.edition = macro_tools_supported_version;
-		ver.algo_zip = compression2char(algo);
-		ver.cmd_line = user_comment;
-		ver.flag = 0;
-		ver.sym = crypto;
+		ver.set_edition(macro_tools_supported_version);
+		ver.set_compression_algo(algo);
+		ver.set_command_line(user_comment);
+		ver.set_sym_crypto_algo(crypto);
+		ver.set_tape_marks(add_marks_for_sequential_reading);
 
 		if(crypto != crypto_none || !gnupg_recipients.empty())
 		{
@@ -1038,31 +923,42 @@ namespace libdar
 		if(!gnupg_recipients.empty())
 		{
 #if GPGME_SUPPORT
-		    ver.crypted_key = new (pool) memory_file();
-		    if(ver.crypted_key == NULL)
+		    memory_file *key = new (pool) memory_file();
+		    if(key == NULL)
 			throw Ememory("macro_tools_create_layers");
-		    ver.flag |= VERSION_FLAG_HAS_CRYPTED_KEY;
 
-			// generating random key for symmetric encryption
+		    try
+		    {
+			    // generating random key for symmetric encryption
 
-		    char variable_size;
-		    dialog.warning(gettext("Generating random key for symmetric encryption..."));
-		    gcry_randomize(&variable_size, 1, GCRY_STRONG_RANDOM);
-		    gnupg_key_size += variable_size; // yes we do not use constant sized key but add from +0 to +255 bytes to its specified length
-		    secu_memory_file clear(gnupg_key_size, true);
-		    dialog.warning(gettext("Key generated"));
+			char variable_size;
+			dialog.warning(gettext("Generating random key for symmetric encryption..."));
+			gcry_randomize(&variable_size, 1, GCRY_STRONG_RANDOM);
+			gnupg_key_size += variable_size; // yes we do not use constant sized key but add from +0 to +255 bytes to its specified length
+			secu_memory_file clear(gnupg_key_size, true);
+			dialog.warning(gettext("Key generated"));
 
-			// encrypting the symmetric key with asymetric algorithm
+			    // encrypting the symmetric key with asymetric algorithm
 
-		    crypto_asym engine(dialog);
-		    if(!gnupg_signatories.empty())
-			engine.set_signatories(gnupg_signatories);
-		    clear.skip(0);
-		    ver.crypted_key->skip(0);
-		    engine.encrypt(gnupg_recipients, clear, *ver.crypted_key);
-		    real_pass = clear.get_contents();
-		    if(crypto == crypto_none)
-			crypto = crypto_blowfish;
+			crypto_asym engine(dialog);
+			if(!gnupg_signatories.empty())
+			    engine.set_signatories(gnupg_signatories);
+			clear.skip(0);
+			key->skip(0);
+			engine.encrypt(gnupg_recipients, clear, *key);
+			real_pass = clear.get_contents();
+			if(crypto == crypto_none)
+			    crypto = crypto_blowfish;
+
+			ver.set_crypted_key(key);
+			key = NULL; // now the pointed to object is under the responsibility of ver object
+		    }
+		    catch(...)
+		    {
+			if(key != NULL)
+			    delete key;
+			throw;
+		    }
 #else
 		    throw Ecompilation("Strong Encryption support");
 #endif
@@ -1080,36 +976,25 @@ namespace libdar
 			throw Erange("op_create_in_sub", gettext("The two passwords are not identical. Aborting"));
 		}
 
-		switch(crypto)
-		{
-		case crypto_scrambling:
-		case crypto_blowfish:
-		case crypto_aes256:
-		case crypto_twofish256:
-		case crypto_serpent256:
-		case crypto_camellia256:
-		    ver.flag |= VERSION_FLAG_SCRAMBLED;
-		    break;
-		case crypto_none:
-		    break; // no bit to set;
-		default:
-		    throw Erange("libdar:op_create_in_sub",gettext("Current implementation does not support this (new) crypto algorithm"));
-		}
-
-		if(add_marks_for_sequential_reading)
-		    ver.flag |= VERSION_FLAG_SEQUENCE_MARK;
-
-		    //
 		if(ref_slicing != NULL)
 		{
-		    ver.flag |= VERSION_FLAG_HAS_REF_SLICING;
-		    ver.ref_layout = new (pool) slice_layout(*ref_slicing);
-		    if(ver.ref_layout == NULL)
+		    slice_layout *tmp = new (pool) slice_layout(*ref_slicing);
+		    if(tmp == NULL)
 			throw Ememory("macro_tools_create_layers");
+		    try
+		    {
+			ver.set_slice_layout(tmp);
+			tmp = NULL; // now tmp is managed by ver
+		    }
+		    catch(...)
+		    {
+			if(tmp != NULL)
+			    delete tmp;
+			throw;
+		    }
 		}
 		else
-		    if(ver.ref_layout != NULL)
-			throw SRC_BUG;
+		    ver.clear_slice_layout();
 
 		    // we drop the header at the beginning of the archive in any case (to be able to
 		    // know whether sequential reading is possible or not, and if sequential reading
@@ -1125,7 +1010,7 @@ namespace libdar
 		    // a second time, but at the end of the archive. If we start reading the archive from the end
 		    // we must know where ended the initial archive header.
 
-		ver.initial_offset = layers.get_position();
+		ver.set_initial_offset(layers.get_position());
 
 		    // ************ building the encryption layer if required ****** //
 

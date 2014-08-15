@@ -57,4 +57,51 @@ namespace libdar
 	}
     }
 
+    char crypto_algo_2_char(crypto_algo a)
+    {
+	switch(a)
+	{
+	case crypto_none:
+	    return 'n';
+	case crypto_scrambling:
+	    return 's';
+	case crypto_blowfish:
+	    return 'b';
+	case crypto_aes256:
+	    return 'a';
+	case crypto_twofish256:
+	    return 't';
+	case crypto_serpent256:
+	    return 'p';
+	case crypto_camellia256:
+	    return 'c';
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
+    crypto_algo char_2_crypto_algo(char a)
+    {
+	switch(a)
+	{
+	case 'n':
+	    return crypto_none;
+	case 's':
+	    return crypto_scrambling;
+	case 'b':
+	    return crypto_blowfish;
+	case 'a':
+	    return crypto_aes256;
+	case 't':
+	    return crypto_twofish256;
+	case 'p':
+	    return crypto_serpent256;
+	case 'c':
+	    return crypto_camellia256;
+	default:
+	    throw Erange("char_to_sym_crypto", gettext("Unknown crypto algorithm"));
+	}
+    }
+
+
 } // end of namespace

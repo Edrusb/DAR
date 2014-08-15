@@ -80,6 +80,9 @@ namespace libdar
 
     extern std::string crypto_algo_2_string(crypto_algo algo);
 
+    extern char crypto_algo_2_char(crypto_algo a);
+    extern crypto_algo char_2_crypto_algo(char a);
+
 	/// @}
 
 } // end of namespace

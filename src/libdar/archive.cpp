@@ -120,16 +120,6 @@ namespace libdar
 					     options.get_info_details(),
 					     gnupg_signed,
 					     slices);
-		    try
-		    {
-			check_header_version();
-		    }
-		    catch(...)
-		    {
-			if(!options.get_lax())
-			    throw;
-			    // ignore error in lax mode
-		    }
 
 		    stack.find_first_from_top(esc);
 			// esc may be NULL
@@ -206,7 +196,7 @@ namespace libdar
 
 			    // fetching the catalogue in the archive of reference, making it point on the main archive layers.
 
-			ref_ver.algo_zip = ver.algo_zip; // set the default encryption to use to the one of the main archive
+			ref_ver.set_compression_algo(ver.get_compression_algo()); // set the default encryption to use to the one of the main archive
 
 			if(info_details)
 			    dialog.warning(gettext("Loading isolated catalogue in memory..."));
@@ -268,8 +258,8 @@ namespace libdar
 
 					cat = new (pool) catalogue(dialog,
 								   stack,
-								   ver.edition,
-								   char2compression(ver.algo_zip),
+								   ver.get_edition(),
+								   ver.get_compression_algo(),
 								   data_loc,
 								   efsa_loc,
 								   options.get_lax(),
@@ -282,8 +272,8 @@ namespace libdar
 					    dialog.warning(gettext("The catalogue will be filled while sequentially reading the archive, preparing the data structure..."));
 
 					cat = new (pool) escape_catalogue(dialog,
-									  ver.edition,
-									  char2compression(ver.algo_zip),
+									  ver.get_edition(),
+									  ver.get_compression_algo(),
 									  data_loc,
 									  efsa_loc,
 									  esc,
@@ -331,8 +321,8 @@ namespace libdar
 					cat = macro_tools_lax_search_catalogue(dialog,
 									       pool,
 									       stack,
-									       ver.edition,
-									       char2compression(ver.algo_zip),
+									       ver.get_edition(),
+									       ver.get_compression_algo(),
 									       options.get_info_details(),
 									       false, // even partial
 									       tmp);
@@ -344,8 +334,8 @@ namespace libdar
 					cat = macro_tools_lax_search_catalogue(dialog,
 									       pool,
 									       stack,
-									       ver.edition,
-									       char2compression(ver.algo_zip),
+									       ver.get_edition(),
+									       ver.get_compression_algo(),
 									       options.get_info_details(),
 									       true,                     // even partial
 									       get_layer1_data_name());
@@ -633,7 +623,7 @@ namespace libdar
 				throw SRC_BUG;
 			    ref_cat1 = ref_arch1->cat;
 			    ref_cat2 = ref_arch2->cat;
-			    if(ref_arch1->ver.algo_zip != ref_arch2->ver.algo_zip && char2compression(ref_arch1->ver.algo_zip) != none && char2compression(ref_arch2->ver.algo_zip) != none && options.get_keep_compressed())
+			    if(ref_arch1->ver.get_compression_algo() != ref_arch2->ver.get_compression_algo() && ref_arch1->ver.get_compression_algo() != none && ref_arch2->ver.get_compression_algo() != none && options.get_keep_compressed())
 				throw Efeature(gettext("the \"Keep file compressed\" feature is not possible when merging two archives using different compression algorithms (This is for a future version of dar). You can still merge these two archives but without keeping file compressed (thus you will probably like to use compression (-z or -y options) for the resulting archive"));
 			}
 
@@ -642,13 +632,13 @@ namespace libdar
 			if(ref_arch1 == NULL)
 			    throw SRC_BUG;
 
-			algo_kept = char2compression(ref_arch1->ver.algo_zip);
+			algo_kept = ref_arch1->ver.get_compression_algo();
 			if(algo_kept == none && ref_cat2 != NULL)
 			{
 			    if(ref_arch2 == NULL)
 				throw SRC_BUG;
 			    else
-				algo_kept = char2compression(ref_arch2->ver.algo_zip);
+				algo_kept = ref_arch2->ver.get_compression_algo();
 			}
 		    }
 		    if(ref_cat1 == NULL)
@@ -855,20 +845,20 @@ namespace libdar
 	    infinint sub_file_size;
 	    infinint first_file_size;
 	    infinint last_file_size, file_number;
-	    string algo = compression2string(char2compression(get_header().algo_zip));
-	    string sym = ver.edition >= 9 ? crypto_algo_2_string(ver.sym) : ((ver.flag & VERSION_FLAG_SCRAMBLED) != 0 ? gettext("yes") : gettext("no"));
-	    string asym = ver.edition >= 9 && (ver.flag & VERSION_FLAG_HAS_CRYPTED_KEY) != 0 ? "gnupg" : gettext("none");
+	    string algo = compression2string(get_header().get_compression_algo());
+	    string sym = ver.get_edition() >= 9 ? crypto_algo_2_string(ver.get_sym_crypto_algo()) : (ver.is_ciphered() ? gettext("yes") : gettext("no"));
+	    string asym = ver.get_edition() >= 9 && (ver.get_crypted_key() != NULL) ? "gnupg" : gettext("none");
 	    infinint cat_size = get_cat_size();
 	    const header_version ver = get_header();
 
-	    dialog.printf(gettext("Archive version format               : %s\n"), ver.edition.display().c_str());
+	    dialog.printf(gettext("Archive version format               : %s\n"), ver.get_edition().display().c_str());
 	    dialog.printf(gettext("Compression algorithm used           : %S\n"), &algo);
 	    dialog.printf(gettext("Symmetric key encryption used        : %S\n"), &sym);
 	    dialog.printf(gettext("Asymmetric key encryption used       : %S\n"), &asym);
-	    dialog.printf(gettext("Sequential reading marks             : %s\n"), ((ver.flag & VERSION_FLAG_SEQUENCE_MARK) != 0 ? gettext("present") : gettext("absent")));
+	    dialog.printf(gettext("Sequential reading marks             : %s\n"), (ver.get_tape_marks() ? gettext("present") : gettext("absent")));
 	    dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
 
-	    dialog.printf(gettext("User comment                         : %S\n\n"), &(get_header().cmd_line));
+	    dialog.printf(gettext("User comment                         : %S\n\n"), &(get_header().get_command_line()));
 
 	    try
 	    {
@@ -981,9 +971,9 @@ namespace libdar
 		case archive_options_listing::slicing:
 		    if(only_contains_an_isolated_catalogue())
 		    {
-			if(ver.ref_layout != NULL)
+			if(ver.get_slice_layout() != NULL)
 			{
-			    used_layout = *ver.ref_layout;
+			    used_layout = *ver.get_slice_layout();
 			    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
 			    {
 				if(options.get_info_details())
@@ -994,7 +984,7 @@ namespace libdar
 			}
 			else // no slicing of the archive of reference stored in this isolated catalogue's header/trailer
 			{
-			    if(ver.edition >= 9)
+			    if(ver.get_edition() >= 9)
 				throw SRC_BUG; // starting revision 9 isolated catalogue should always contain
 				// the slicing of the archive of reference, even if that reference is using an archive format
 				// older than version 9.
@@ -2306,7 +2296,7 @@ namespace libdar
 
     bool archive::only_contains_an_isolated_catalogue() const
     {
-	return get_layer1_data_name() != get_catalogue_data_name() && ver.edition >= 8;
+	return get_layer1_data_name() != get_catalogue_data_name() && ver.get_edition() >= 8;
     }
 
     void archive::check_against_isolation(user_interaction & dialog, bool lax) const
@@ -2337,15 +2327,6 @@ namespace libdar
 	    throw SRC_BUG;
 	    // this method should be called once the archive object has been constructed
 	    // and this object should be totally exploitable, thus have an available catalogue
-    }
-
-    void archive::check_header_version() const
-    {
-	if((ver.flag
-	    & ! VERSION_FLAG_SAVED_EA_ROOT // since archive "05" we don't care this flag
-	    & ! VERSION_FLAG_SAVED_EA_USER // since archive "05" we don't care this flag
-	    & ! VERSION_FLAG_SCRAMBLED) != 0)
-	    throw Erange("archive::archive", gettext("Not supported flag or archive corruption"));
     }
 
     bool archive::get_sar_param(infinint & sub_file_size, infinint & first_file_size, infinint & last_file_size,
