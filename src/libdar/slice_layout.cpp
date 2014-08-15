@@ -65,7 +65,7 @@ namespace libdar
 
     void slice_layout::which_slice(const infinint & offset,
 				   infinint & slice_num,
-				   infinint & slice_offset)
+				   infinint & slice_offset) const
     {
 
 	    // considering particular case of a non-sliced archive

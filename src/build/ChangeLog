@@ -47,6 +47,14 @@ from 2.4.x to 2.5.0
 - added the -vd switch to only display current directory under process for
   creation, diff, test, extraction and merging operations
 - added xz/lzma compression algorithm
+- added -Tslicing option to list slice localization of files
+- isolated catalogues now keep a record of the slicing layout of their
+  archive of reference in order to provide -Tslicing feature when used
+  on the isolated catalogue alone.
+- added the possibility to use -s and -S options when using -Tslicing with
+  an isolated catalogue to face the case when the archive of reference has
+  been resliced after the isolated catalogue has been built.
+
 
 from 2.4.14 to 2.4.15
 - fixing bug met when reading an encrypted archive in sequential mode

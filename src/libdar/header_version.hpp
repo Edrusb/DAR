@@ -54,8 +54,9 @@ namespace libdar
 
 
 	/// manages of the archive header and trailer
-    struct header_version : public on_pool
+    class header_version : public on_pool
     {
+    public:
         archive_version edition;
         char algo_zip;
         std::string cmd_line; // used long ago to store cmd_line, then abandonned, then recycled as a user comment field
@@ -66,9 +67,15 @@ namespace libdar
 	slice_layout *ref_layout;
 
 	header_version();
-	~header_version();
+	header_version(const header_version & ref) { copy_from(ref); };
+	const header_version & operator = (const header_version & ref) { detruit(); copy_from(ref); return * this; };
+	~header_version() { detruit(); };
         void read(generic_file &f);
         void write(generic_file &f) const;
+
+    private:
+	void copy_from(const header_version & ref);
+	void detruit();
     };
 
 } // end of namespace

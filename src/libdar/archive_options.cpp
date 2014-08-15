@@ -1179,6 +1179,26 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
+    void archive_options_listing::set_user_slicing(const infinint & slicing_first, const infinint & slicing_others)
+    {
+	if(x_slicing_first == NULL)
+	{
+	    x_slicing_first = new (get_pool()) infinint(slicing_first);
+	    if(x_slicing_first == NULL)
+		throw Ememory("archive_options_listing::set_user_slicing");
+	}
+	else
+	    *x_slicing_first = slicing_first;
+
+	if(x_slicing_others == NULL)
+	{
+	    x_slicing_others = new (get_pool()) infinint(slicing_others);
+	    if(x_slicing_others == NULL)
+		throw Ememory("archive_options_listing::set_user_slicing");
+	}
+	else
+	    *x_slicing_others = slicing_others;
+    }
 
     const mask & archive_options_listing::get_selection() const
     {
@@ -1194,11 +1214,34 @@ namespace libdar
 	return *x_subtree;
     }
 
+    bool archive_options_listing::get_user_slicing(infinint & slicing_first, infinint & slicing_others) const
+    {
+	if(x_slicing_first != NULL && x_slicing_others != NULL)
+	{
+	    slicing_first = *x_slicing_first;
+	    slicing_others = *x_slicing_others;
+	    return true;
+	}
+	else
+	    return false;
+    }
+
+
     void archive_options_listing::destroy()
     {
 	NLS_SWAP_IN;
 	try
 	{
+	    if(x_slicing_first != NULL)
+	    {
+		delete x_slicing_first;
+		x_slicing_first = NULL;
+	    }
+	    if(x_slicing_others != NULL)
+	    {
+		delete x_slicing_others;
+		x_slicing_others = NULL;
+	    }
 	    archive_option_destroy_mask(x_selection);
 	    archive_option_destroy_mask(x_subtree);
 	}
@@ -1214,6 +1257,8 @@ namespace libdar
     {
 	x_selection = NULL;
 	x_subtree = NULL;
+	x_slicing_first = NULL;
+	x_slicing_others = NULL;
 
 	try
 	{
@@ -1223,6 +1268,18 @@ namespace libdar
 	    x_subtree = ref.x_subtree->clone();
 	    if(x_selection == NULL || x_subtree == NULL)
 		throw Ememory("archive_options_listing::copy_from");
+	    if(ref.x_slicing_first != NULL)
+	    {
+		x_slicing_first = new (get_pool()) infinint(*ref.x_slicing_first);
+		if(x_slicing_first == NULL)
+		    throw Ememory("archive_options_listing::copy_from");
+	    }
+	    if(ref.x_slicing_others != NULL)
+	    {
+		x_slicing_others = new (get_pool()) infinint(*ref.x_slicing_others);
+		if(x_slicing_others == NULL)
+		    throw Ememory("archive_options_listing::copy_from");
+	    }
 
 	    x_info_details = ref.x_info_details;
 	    x_list_mode = ref.x_list_mode;

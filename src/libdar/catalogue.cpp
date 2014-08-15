@@ -5141,8 +5141,8 @@ namespace libdar
 	range all_slices;
 	range file_slices;
 
-	get_ui().warning("Slice  |[Data ][ EA  ][FSA][Compr][S]|Permission| Filemane");
-	get_ui().warning("-------+-----------------------------+----------+-----------------------------");
+	get_ui().warning("Slice(s)|[Data ][ EA  ][FSA][Compr][S]|Permission| Filemane");
+	get_ui().warning("--------+-----------------------------+----------+-----------------------------");
 	reset_read();
 	while(read(e))
 	{
@@ -5169,7 +5169,7 @@ namespace libdar
 		    all_slices += file_slices;
 
 		    if(e_det != NULL)
-			get_ui().printf("%s\t%s%s\n", file_slices.display().c_str(), REMOVE_TAG, juillet.get_string().c_str());
+			get_ui().printf("%s\t %s%s\n", file_slices.display().c_str(), REMOVE_TAG, juillet.get_string().c_str());
 		    else
 		    {
 			if(e_hard != NULL)
@@ -5183,7 +5183,7 @@ namespace libdar
 			    string a = local_perm(*e_ino, e_hard != NULL);
 			    string f = local_flag(*e_ino, isolated, dirty_seq);
 
-			    get_ui().printf("%s\t%S%S %s\n", file_slices.display().c_str(), &f, &a, juillet.get_string().c_str());
+			    get_ui().printf("%s\t %S%S %s\n", file_slices.display().c_str(), &f, &a, juillet.get_string().c_str());
 			}
 		    }
 		}
@@ -5198,7 +5198,7 @@ namespace libdar
 	}
 
 	get_ui().warning("-----");
-	get_ui().printf("All displayed files have their data in slice range %s\n", all_slices.display().c_str());
+	get_ui().printf("All displayed files have their data in slice range [%s]\n", all_slices.display().c_str());
 	get_ui().warning("-----");
     }
 

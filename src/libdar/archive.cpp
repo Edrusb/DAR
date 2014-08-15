@@ -984,10 +984,26 @@ namespace libdar
 			if(ver.ref_layout != NULL)
 			{
 			    used_layout = *ver.ref_layout;
-			    dialog.warning(gettext("Using the slice layout of the archive of reference at the time this isolated catalogue was done\n Note: if this reference has been resliced the resulting slicing information given here will be wrong"));
+			    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
+			    {
+				if(options.get_info_details())
+				    dialog.printf(gettext("Using user provided modified slicing (first size = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
+			    }
+			    else
+				dialog.warning(gettext("Using the slice layout of the archive of reference recorded at the time this isolated catalogue was done\n Note: if this reference has been resliced this isolated catalogue has been created, the resulting slicing information given here will be wrong"));
 			}
-			else
-			    throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
+			else // no slicing of the archive of reference stored in this isolated catalogue's header/trailer
+			{
+			    if(ver.edition >= 9)
+				throw SRC_BUG; // starting revision 9 isolated catalogue should always contain
+				// the slicing of the archive of reference, even if that reference is using an archive format
+				// older than version 9.
+
+			    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
+				dialog.warning(gettext("Warning: No slice layout of the archive of reference has been recorded in this isolated catalogue, The user provided slicing can only lead to an approximation of the slice localization for each file (localization error is less than 20 bytes multiplied by the slice number), because some other parameters are not possible to guess, like the slice header used in the archive of reference"));
+			    else
+				throw Erange("archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
+			}
 		    }
 		    get_cat().slice_listing(only_contains_an_isolated_catalogue(), options.get_selection(), options.get_subtree(), used_layout);
 		    break;

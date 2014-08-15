@@ -41,7 +41,7 @@ namespace libdar
     {
     public:
 	    // field still exposed (slice_layout was a struct before being a class)
-	    // we keep the fields as is for now
+	    // we keep these fields as is for now
 
 	infinint first_size;         //< size of the first slice
 	infinint other_size;         //< maximum size of other slices
@@ -60,7 +60,7 @@ namespace libdar
 	/// \param[out] slice_offset offset in that slice where is the given offset
 	void which_slice(const infinint & offset,
 			 infinint & slice_num,
-			 infinint & slice_offset);
+			 infinint & slice_offset) const;
 
     private:
 	static const char OLDER_THAN_V8 = '7';

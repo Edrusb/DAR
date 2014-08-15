@@ -1157,7 +1157,7 @@ namespace libdar
     class archive_options_listing : public on_pool
     {
     public:
-	archive_options_listing() { x_selection = x_subtree = NULL;  clear(); };
+	archive_options_listing() { x_selection = x_subtree = NULL;  x_slicing_first = x_slicing_others = NULL; clear(); };
 	archive_options_listing(const archive_options_listing & ref) { copy_from(ref); };
 	const archive_options_listing & operator = (const archive_options_listing & ref) { destroy(); copy_from(ref); return *this; };
 	~archive_options_listing() { destroy(); };
@@ -1183,6 +1183,7 @@ namespace libdar
 	void set_subtree(const mask & subtree);
 	void set_filter_unsaved(bool filter_unsaved) { x_filter_unsaved = filter_unsaved; };
 	void set_display_ea(bool display_ea) { x_display_ea = display_ea; };
+	void set_user_slicing(const infinint & slicing_first, const infinint & slicing_others);
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -1193,6 +1194,7 @@ namespace libdar
 	const mask & get_subtree() const;
 	bool get_filter_unsaved() const { return x_filter_unsaved; };
 	bool get_display_ea() const { return x_display_ea; };
+	bool get_user_slicing(infinint & slicing_first, infinint & slicing_others) const;
 
     private:
 	bool x_info_details;
@@ -1201,6 +1203,8 @@ namespace libdar
 	mask * x_subtree;
 	bool x_filter_unsaved;
 	bool x_display_ea;
+	infinint *x_slicing_first;
+	infinint *x_slicing_others;
 
 	void destroy();
 	void copy_from(const archive_options_listing & ref);
