@@ -672,7 +672,7 @@ namespace libdar
 		const fsa_bool *it_bool = NULL;
 
 		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f_orig) < 0)
-		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading exiting extX family FSA: ")) + strerror(errno));
+		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading exiting extX family FSA: ")) + tools_strerror_r(errno));
 		f = f_orig;
 
 		for(it = fsa.begin() ; it != fsa.end() ; ++it)
@@ -894,7 +894,7 @@ namespace libdar
 		if(tmp_f != f_orig)
 		{
 		    if(ioctl(fd, EXT2_IOC_SETFLAGS, &tmp_f) < 0)
-			throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed set extX family FSA: ")) + strerror(errno ));
+			throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed set extX family FSA: ")) + tools_strerror_r(errno ));
 		    ret = true; // some flags have been set or cleared
 		}
 
@@ -911,7 +911,7 @@ namespace libdar
 		    case capa_unknown:
 			if(ioctl(fd, EXT2_IOC_SETFLAGS, &tmp_f) < 0)
 			{
-			    string tmp = strerror(errno);
+			    string tmp = tools_strerror_r(errno);
 			    ui.printf("Failed setting FSA extX IMMUTABLE flags for %s: %", target.c_str(), tmp.c_str());
 			}
 			else
@@ -939,7 +939,7 @@ namespace libdar
 		    case capa_unknown:
 			if(ioctl(fd, EXT2_IOC_SETFLAGS, &tmp_f) < 0)
 			{
-			    string tmp = strerror(errno);
+			    string tmp = tools_strerror_r(errno);
 			    ui.printf("Failed setting FSA extX SYSTEME RESOURCE flags for %s: %", target.c_str(), tmp.c_str());
 			}
 			else
@@ -1156,7 +1156,7 @@ namespace libdar
 	    }
 	}
 	else
-	    throw Erange("fsa_bool::fsa_bool", string(gettext("Error while reading FSA: ")) + strerror(errno));
+	    throw Erange("fsa_bool::fsa_bool", string(gettext("Error while reading FSA: ")) + tools_strerror_r(errno));
     }
 
 

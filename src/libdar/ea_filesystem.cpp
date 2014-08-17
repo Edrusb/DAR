@@ -178,8 +178,11 @@ namespace libdar
 		// now, action !
 
 	    if(my_lsetxattr(p_chemin, key.c_str(), value.c_str(), value.size(), 0) < 0)
+	    {
+		string tmp = tools_strerror_r(errno);
 		throw Erange("ea_filesystem write_ea", tools_printf(gettext("Error while adding EA %s : %s"),
-								    key.c_str(), strerror(errno)));
+								    key.c_str(), tmp.c_str()));
+	    }
 	    else
 		num++;
 	}
@@ -206,9 +209,10 @@ namespace libdar
 	    const char *k = key.c_str();
 	    if(my_lremovexattr(p_chemin, k) < 0)
 	    {
+		string tmp = tools_strerror_r(errno);
 		if(errno != ENOATTR)
 		    throw Erange("ea_filesystem write_ea", tools_printf(gettext("Error while removing %s : %s"),
-									k, strerror(errno)));
+									k, tmp.c_str()));
 	    }
 	    else
 		num++;
@@ -237,8 +241,11 @@ namespace libdar
 		    S_64 taille = my_lgetxattr(n_ptr, a_name, NULL, 0);
 		    char *value = NULL;
 		    if(taille < 0)
+		    {
+			string tmp = tools_strerror_r(errno);
 			throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
-									   a_name, n_ptr, strerror(errno)));
+									   a_name, n_ptr, tmp.c_str()));
+		    }
 
 		    if(ret == NULL)
 		    {
@@ -262,8 +269,11 @@ namespace libdar
 			    taille = my_lgetxattr(n_ptr, a_name, value, taille+MARGIN);
 				// if the previous call overflows the buffer this may need to SEGFAULT and so on.
 			    if(taille < 0)
+			    {
+				string tmp = tools_strerror_r(errno);
 				throw Erange("ea_filesystem read_ea", tools_printf(gettext("Error reading attribute %s of file %s : %s"),
-										   a_name, n_ptr, strerror(errno)));
+										   a_name, n_ptr, tmp.c_str()));
+			    }
 			    ea_ent_key = *it;
 			    ea_ent_value = string((char *)value, (char *)value+taille);
 			    ret->add(ea_ent_key, ea_ent_value);
@@ -315,9 +325,10 @@ namespace libdar
         {
             if(errno == ENOSYS || errno == ENOTSUP)
                 return ret;
+	    string tmp = tools_strerror_r(errno);
             throw Erange("ea_filesystem_get_ea_list_for",
 			 tools_printf(gettext("Error retrieving EA list for %s : %s"),
-				      filename, strerror(errno)));
+				      filename, tmp.c_str()));
         }
 
 	if(p == NULL)
@@ -331,9 +342,12 @@ namespace libdar
             S_64 cursor = 0;
             taille = my_llistxattr(filename, liste, taille+MARGIN);
             if(taille < 0)
+	    {
+		string tmp = tools_strerror_r(errno);
                 throw Erange("ea_filesystem_get_ea_list_for",
 			     tools_printf(gettext("Error retrieving EA list for %s : %s"),
-					  filename, strerror(errno)));
+					  filename, tmp.c_str()));
+	    }
             while(cursor < taille)
             {
                 ret.push_back(string(liste+cursor));

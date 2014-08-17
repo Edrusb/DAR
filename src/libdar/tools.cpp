@@ -254,7 +254,10 @@ namespace libdar
         struct stat buf;
 
 	if(lstat(p.display().c_str(), &buf) < 0)
-	    throw Erange("tools_get_filesize", tools_printf(dar_gettext("Cannot get file size: %s"), strerror(errno)));
+	{
+	    string tmp = tools_strerror_r(errno);
+	    throw Erange("tools_get_filesize", tools_printf(dar_gettext("Cannot get file size: %s"), tmp.c_str()));
+	}
 
 	return (U_32)buf.st_size;
     }
@@ -479,13 +482,13 @@ namespace libdar
     {
         S_I flags = fcntl(fd, F_GETFL, 0);
 	if(flags < 0)
-	    throw Erange("tools_blocking_read", string(dar_gettext("Cannot read \"fcntl\" file's flags : "))+strerror(errno));
+	    throw Erange("tools_blocking_read", string(dar_gettext("Cannot read \"fcntl\" file's flags : "))+tools_strerror_r(errno));
         if(!mode)
             flags |= O_NONBLOCK;
         else
             flags &= ~O_NONBLOCK;
         if(fcntl(fd, F_SETFL, flags) < 0)
-	    throw Erange("tools_blocking_read", string(dar_gettext("Cannot set \"fcntl\" file's flags : "))+strerror(errno));
+	    throw Erange("tools_blocking_read", string(dar_gettext("Cannot set \"fcntl\" file's flags : "))+tools_strerror_r(errno));
     }
 
     string tools_name_of_uid(const infinint & uid)
@@ -843,7 +846,7 @@ namespace libdar
 		switch(pid)
 		{
 		case -1:
-		    throw Erange("tools_system", string(dar_gettext("Error while calling fork() to launch dar: ")) + strerror(errno));
+		    throw Erange("tools_system", string(dar_gettext("Error while calling fork() to launch dar: ")) + tools_strerror_r(errno));
 		case 0: // fork has succeeded, we are the child process
 		    try
 		    {
@@ -857,7 +860,7 @@ namespace libdar
 		default:
 		    if(wait(&status) <= 0)
 			throw Erange("tools_system",
-				     string(dar_gettext("Unexpected error while waiting for dar to terminate: ")) + strerror(errno));
+				     string(dar_gettext("Unexpected error while waiting for dar to terminate: ")) + tools_strerror_r(errno));
 		    else // checking the way dar has exit
 			if(WIFSIGNALED(status)) // exited because of a signal
 			{
@@ -932,7 +935,7 @@ namespace libdar
 		switch(pid)
 		{
 		case -1:
-		    throw Erange("tools_system_with_pipe", string(dar_gettext("Error while calling fork() to launch dar: ")) + strerror(errno));
+		    throw Erange("tools_system_with_pipe", string(dar_gettext("Error while calling fork() to launch dar: ")) + tools_strerror_r(errno));
 		case 0: // fork has succeeded, we are the child process
 		    try
 		    {
@@ -962,7 +965,7 @@ namespace libdar
 
 		    if(wait(&status) <= 0)
 			throw Erange("tools_system",
-				     string(dar_gettext("Unexpected error while waiting for dar to terminate: ")) + strerror(errno));
+				     string(dar_gettext("Unexpected error while waiting for dar to terminate: ")) + tools_strerror_r(errno));
 		    else // checking the way dar has exit
 			if(WIFSIGNALED(status)) // exited because of a signal
 			{
@@ -1237,7 +1240,7 @@ namespace libdar
 			length += step;
 		    }
 		    else // other error
-			throw Erange("tools_getcwd", string(dar_gettext("Cannot get full path of current working directory: ")) + strerror(errno));
+			throw Erange("tools_getcwd", string(dar_gettext("Cannot get full path of current working directory: ")) + tools_strerror_r(errno));
 		}
 	    }
 	    while(ret == NULL);
@@ -1279,6 +1282,8 @@ namespace libdar
 
 		if(lu < 0) // error occured with readlink
 		{
+		    string tmp;
+
 		    switch(errno)
 		    {
 		    case EINVAL: // not a symbolic link (thus we return the given argument)
@@ -1290,7 +1295,8 @@ namespace libdar
 			length *= 2;
 			break;
 		    default: // other error
-			throw Erange("get_readlink", tools_printf(dar_gettext("Cannot read file information for %s : %s"), root, strerror(errno)));
+			tmp = tools_strerror_r(errno);
+			throw Erange("get_readlink", tools_printf(dar_gettext("Cannot read file information for %s : %s"), root, tmp.c_str()));
 		    }
 		}
 		else // got the correct real path of symlink
@@ -1388,7 +1394,7 @@ namespace libdar
 	    ret = utime(chemin.c_str() , &temps);
 #endif
 	    if(ret < 0)
-		Erange("tools_make_date", string(dar_gettext("Cannot set birth time: ")) + strerror(errno));
+		Erange("tools_make_date", string(dar_gettext("Cannot set birth time: ")) + tools_strerror_r(errno));
 	}
 
 	    // we set atime and mtime here
@@ -1418,7 +1424,7 @@ namespace libdar
 	ret = utime(chemin.c_str() , &temps);
 #endif
 	if(ret < 0)
-	    Erange("tools_make_date", string(dar_gettext("Cannot set last access and last modification time: ")) + strerror(errno));
+	    Erange("tools_make_date", string(dar_gettext("Cannot set last access and last modification time: ")) + tools_strerror_r(errno));
     }
 
     void tools_noexcept_make_date(const string & chem, bool symlink, const datetime & last_acc, const datetime & last_mod, const datetime & birth)
@@ -1491,7 +1497,10 @@ namespace libdar
     static void runson(user_interaction & dialog, char * const argv[])
     {
         if(execvp(argv[0], argv) < 0)
-	    dialog.warning(tools_printf(dar_gettext("Error trying to run %s: %s"), argv[0], strerror(errno)));
+	{
+	    string tmp = tools_strerror_r(errno);
+	    dialog.warning(tools_printf(dar_gettext("Error trying to run %s: %s"), argv[0], tmp.c_str()));
+	}
         else
 	    dialog.warning(string(dar_gettext("execvp() failed but did not returned error code")));
 #ifndef EXIT_ERROR
@@ -1696,7 +1705,10 @@ namespace libdar
 		if(info_details)
 		    dialog.warning(tools_printf(dar_gettext("Removing file %s"), c_entry.c_str()));
 		if(unlink(c_entry.c_str()) != 0)
-		    dialog.warning(tools_printf(dar_gettext("Error removing file %s: %s"), c_entry.c_str(), strerror(errno)));
+		{
+		    string tmp = tools_strerror_r(errno);
+		    dialog.warning(tools_printf(dar_gettext("Error removing file %s: %s"), c_entry.c_str(), tmp.c_str()));
+		}
 	    }
     }
 
@@ -1765,11 +1777,17 @@ namespace libdar
         struct stat sstat;
 
 	if(stat(file1.c_str(), &sstat) < 0)
-	    throw Erange("tools:tools_are_on_same_filesystem", tools_printf(dar_gettext("Cannot get inode information for %s: %s"), file1.c_str(), strerror(errno)));
+	{
+	    string tmp = tools_strerror_r(errno);
+	    throw Erange("tools:tools_are_on_same_filesystem", tools_printf(dar_gettext("Cannot get inode information for %s: %s"), file1.c_str(), tmp.c_str()));
+	}
 	id = sstat.st_dev;
 
 	if(stat(file2.c_str(), &sstat) < 0)
-	    throw Erange("tools:tools_are_on_same_filesystem", tools_printf(dar_gettext("Cannot get inode information for %s: %s"), file2.c_str(), strerror(errno)));
+	{
+	    string tmp = tools_strerror_r(errno);
+	    throw Erange("tools:tools_are_on_same_filesystem", tools_printf(dar_gettext("Cannot get inode information for %s: %s"), file2.c_str(), tmp.c_str()));
+	}
 
         return id == sstat.st_dev;
     }
@@ -1795,7 +1813,7 @@ namespace libdar
 #else
 	if(sigprocmask(SIG_BLOCK, &all, &old_mask) != 0)
 #endif
-	    throw Erange("tools_block_all_signals", string(dar_gettext("Cannot block signals: "))+strerror(errno));
+	    throw Erange("tools_block_all_signals", string(dar_gettext("Cannot block signals: "))+tools_strerror_r(errno));
     }
 
     void tools_set_back_blocked_signals(sigset_t old_mask)
@@ -1805,7 +1823,7 @@ namespace libdar
 #else
 	if(sigprocmask(SIG_SETMASK, &old_mask, NULL))
 #endif
-	    throw Erange("tools_set_back_block_all_signals", string(dar_gettext("Cannot unblock signals: "))+strerror(errno));
+	    throw Erange("tools_set_back_block_all_signals", string(dar_gettext("Cannot unblock signals: "))+tools_strerror_r(errno));
     }
 
     U_I tools_count_in_string(const string & s, const char a)
@@ -1823,7 +1841,10 @@ namespace libdar
         struct stat buf;
 
 	if(lstat(s.c_str(), &buf) < 0)
-	    throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get last modification date: %s"), strerror(errno)));
+	{
+	    string tmp = tools_strerror_r(errno);
+	    throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get last modification date: %s"), tmp.c_str()));
+	}
 
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
 	datetime val = datetime(buf.st_mtim.tv_sec, buf.st_mtim.tv_nsec, datetime::tu_nanosecond);
@@ -1841,7 +1862,10 @@ namespace libdar
         struct stat buf;
 
 	if(lstat(s.c_str(), &buf) < 0)
-	    throw Erange("tools_get_size", tools_printf(dar_gettext("Cannot get last modification date: %s"), strerror(errno)));
+	{
+	    string tmp = tools_strerror_r(errno);
+	    throw Erange("tools_get_size", tools_printf(dar_gettext("Cannot get last modification date: %s"), tmp.c_str()));
+	}
 
 	if(!S_ISREG(buf.st_mode))
 	    throw Erange("tools_get_size", tools_printf(dar_gettext("Cannot get size of %S: not a plain file"), &s));
@@ -1855,7 +1879,10 @@ namespace libdar
         struct stat buf;
 
 	if(lstat(s.c_str(), &buf) < 0)
-	    throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get mtime: %s"), strerror(errno)));
+	{
+	    string tmp = tools_strerror_r(errno);
+	    throw Erange("tools_get_mtime", tools_printf(dar_gettext("Cannot get mtime: %s"), tmp.c_str()));
+	}
 
 #ifdef LIBDAR_MICROSECOND_READ_ACCURACY
 	datetime ret = datetime(buf.st_ctim.tv_sec, buf.st_ctim.tv_nsec, datetime::tu_nanosecond);
@@ -2066,7 +2093,7 @@ namespace libdar
 		    case 127:
 			throw Erange("tools_hook_execute", gettext("execve() failed. (process table is full ?)"));
 		    case -1:
-			throw Erange("tools_hook_execute", string(gettext("system() call failed: ")) + strerror(errno));
+			throw Erange("tools_hook_execute", string(gettext("system() call failed: ")) + tools_strerror_r(errno));
 		    default:
 			throw Erange("tools_hook_execute", tools_printf(gettext("execution of [ %S ] returned error code: %d"), &cmd_line, code));
 		    }
@@ -2349,7 +2376,7 @@ namespace libdar
 	int err = fstat(fd, &buf);
 
 	if(err < 0)
-	    throw Erange("tools_get_permission", string(gettext("Cannot get effective permission given a file descriptor: ")) + strerror(errno));
+	    throw Erange("tools_get_permission", string(gettext("Cannot get effective permission given a file descriptor: ")) + tools_strerror_r(errno));
 
 	return buf.st_mode & ~(S_IFMT);
     }
@@ -2363,7 +2390,10 @@ namespace libdar
 	    if(fd < 0)
 		throw SRC_BUG;
 	    if(fchmod(fd, (mode_t) perm) < 0)
-		throw Erange("tools_set_permission", tools_printf(gettext("Error while setting file permission: %s"), strerror(errno)));
+	    {
+		string tmp = tools_strerror_r(errno);
+		throw Erange("tools_set_permission", tools_printf(gettext("Error while setting file permission: %s"), tmp.c_str()));
+	    }
 	}
 	catch(...)
 	{
@@ -2497,7 +2527,10 @@ namespace libdar
 	if(uid != (uid_t)(-1) || gid != (gid_t)(-1))
 	{
 	    if(fchown(filedesc, uid, gid) < 0)
-		throw Erange("tools_set_ownership", tools_printf(gettext("Error while setting file user ownership: %s"), strerror(errno)));
+	    {
+		string tmp = tools_strerror_r(errno);
+		throw Erange("tools_set_ownership", tools_printf(gettext("Error while setting file user ownership: %s"), tmp.c_str()));
+	    }
 	}
     }
 
@@ -2633,7 +2666,7 @@ namespace libdar
 	struct utsname uts;
 
 	if(uname(&uts) < 0)
-	    throw Erange("tools_get_hostname", string(dar_gettext("Error while fetching hostname: ")) + strerror(errno));
+	    throw Erange("tools_get_hostname", string(dar_gettext("Error while fetching hostname: ")) + tools_strerror_r(errno));
 
 	ret = string(uts.nodename);
 

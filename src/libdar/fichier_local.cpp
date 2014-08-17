@@ -148,7 +148,7 @@ namespace libdar
             throw SRC_BUG;
 
         if(fstat(filedesc, &dat) < 0)
-            throw Erange("fichier_local::get_size()", string(gettext("Error getting size of file: ")) + strerror(errno));
+            throw Erange("fichier_local::get_size()", string(gettext("Error getting size of file: ")) + tools_strerror_r(errno));
         else
             filesize = dat.st_size;
 
@@ -167,7 +167,7 @@ namespace libdar
 	if(ret == EBADF)
 	    throw SRC_BUG; // filedesc not a valid file descriptor !?!
 	if(ret != 0)
-	    throw Erange("fichier_local::fadvise", string("Set posix advise failed: ") + strerror(errno));
+	    throw Erange("fichier_local::fadvise", string("Set posix advise failed: ") + tools_strerror_r(errno));
 #endif
     }
 
@@ -181,7 +181,7 @@ namespace libdar
 	S_I st = ::fsync(filedesc);
 #endif
 	if(st < 0)
-	    throw Erange("fichier_local::fsync", string("Failed sync the slice (fdatasync): ") + strerror(errno));
+	    throw Erange("fichier_local::fsync", string("Failed sync the slice (fdatasync): ") + tools_strerror_r(errno));
     }
 
     bool fichier_local::skip(const infinint &q)
@@ -258,7 +258,7 @@ namespace libdar
         off_t ret = lseek(filedesc, 0, SEEK_CUR);
 
         if(ret == -1)
-            throw Erange("fichier_local::get_position", string(gettext("Error getting file reading position: ")) + strerror(errno));
+            throw Erange("fichier_local::get_position", string(gettext("Error getting file reading position: ")) + tools_strerror_r(errno));
 
         return ret;
     }
@@ -290,9 +290,9 @@ namespace libdar
                     throw SRC_BUG;
 			// "non blocking" read is not expected in this implementation
                 case EIO:
-                    throw Ehardware("fichier_local::inherited_read", string(gettext("Error while reading from file: ")) + strerror(errno));
+                    throw Ehardware("fichier_local::inherited_read", string(gettext("Error while reading from file: ")) + tools_strerror_r(errno));
                 default :
-                    throw Erange("fichier_local::inherited_read", string(gettext("Error while reading from file: ")) + strerror(errno));
+                    throw Erange("fichier_local::inherited_read", string(gettext("Error while reading from file: ")) + tools_strerror_r(errno));
                 }
             }
             else
@@ -341,13 +341,13 @@ namespace libdar
                 case EINTR:
                     break;
                 case EIO:
-                    throw Ehardware("fichier_local::inherited_write", string(gettext("Error while writing to file: ")) + strerror(errno));
+                    throw Ehardware("fichier_local::inherited_write", string(gettext("Error while writing to file: ")) + tools_strerror_r(errno));
                 case ENOSPC:
 		    return total; // partial writing, we stop here returning the amount of data wrote so far
 			// because there is no space left on device. The parent class manages the user interaction
 			// to allow abortion or action that frees up some storage space.
                 default :
-                    throw Erange("fichier_local::inherited_write", string(gettext("Error while writing to file: ")) + strerror(errno));
+                    throw Erange("fichier_local::inherited_write", string(gettext("Error while writing to file: ")) + tools_strerror_r(errno));
                 }
             }
             else
@@ -432,7 +432,7 @@ namespace libdar
 		    case ENOENT:
 			throw Esystem("fichier_local::open", tools_strerror_r(errno), Esystem::io_absent);
 		    default:
-			throw Erange("fichier_local::open", string(gettext("Cannot open file : ")) + strerror(errno));
+			throw Erange("fichier_local::open", string(gettext("Cannot open file : ")) + tools_strerror_r(errno));
 		    }
 		}
 	    }
@@ -453,7 +453,10 @@ namespace libdar
     {
 	filedesc = dup(ref.filedesc);
 	if(filedesc <0)
-	    throw Erange("fichier_local::copy_from", tools_printf(gettext("Cannot dup() filedescriptor while copying \"fichier_local\" object: %s"), strerror(errno)));
+	{
+	    string tmp = tools_strerror_r(errno);
+	    throw Erange("fichier_local::copy_from", tools_printf(gettext("Cannot dup() filedescriptor while copying \"fichier_local\" object: %s"), tmp.c_str()));
+	}
     }
 
     void fichier_local::copy_parent_from(const fichier_local & ref)

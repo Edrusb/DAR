@@ -35,6 +35,7 @@ extern "C"
 #include <string>
 
 #include "statistics.hpp"
+#include "tools.hpp"
 
 using namespace std;
 
@@ -77,7 +78,7 @@ namespace libdar
 #if MUTEX_WORKS
 	if(locking)
 	    if(pthread_mutex_init(&lock_mutex, NULL) < 0)
-		throw Erange("statistics::statistics", string(dar_gettext("Error while initializing \"mutex\" for class \"statistics\": ")) + strerror(errno));
+		throw Erange("statistics::statistics", string(dar_gettext("Error while initializing \"mutex\" for class \"statistics\": ")) + tools_strerror_r(errno));
 #else
 	if(locking)
 	    throw Ecompilation("Thread support not activated, cannot use statistics object with lock activated");

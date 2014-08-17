@@ -61,6 +61,8 @@ char *strchr (), *strrchr ();
 
 #include "erreurs.hpp"
 #include "secu_string.hpp"
+#include "tools.hpp"
+
 
 using namespace std;
 
@@ -85,7 +87,7 @@ namespace libdar
 	{
 	    *string_size = 0;
 	    mem[0] = '\0';
-	    throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + strerror(errno));
+	    throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + tools_strerror_r(errno));
 	}
 	else
 	    *string_size = lu;
@@ -122,7 +124,7 @@ namespace libdar
 	if(lu < 0)
 	{
 	    mem[*string_size] = '\0';
-	    throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + strerror(errno));
+	    throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + tools_strerror_r(errno));
 	}
 	if(lu + offset >= *allocated_size)
 	    throw SRC_BUG;

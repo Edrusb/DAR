@@ -160,6 +160,7 @@ namespace libdar
         const char *ptr_name = display.c_str();
         nomme *ref = NULL;
 	struct stat buf;
+	string tmp;
 
 	try
 	{
@@ -169,12 +170,13 @@ namespace libdar
 		switch(errno)
 		{
 		case EACCES:
-		    get_ui().warning(tools_printf(gettext("Error reading inode of file %s : %s"), ptr_name, strerror(errno)));
+		    tmp = tools_strerror_r(errno);
+		    get_ui().warning(tools_printf(gettext("Error reading inode of file %s : %s"), ptr_name, tmp.c_str()));
 		    break;
 		case ENOENT:
 		    break;
 		default:
-		    throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Cannot read inode for ")) + ptr_name + " : " + strerror(errno));
+		    throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Cannot read inode for ")) + ptr_name + " : " + tools_strerror_r(errno));
 		}
 
 		    // the current method returns NULL (= ref)  (meaning file does not exists)
@@ -1061,13 +1063,16 @@ namespace libdar
 			ret = link(old, name);
 			if(ret < 0)
 			{
+			    string tmp;
+
 			    switch(errno)
 			    {
 			    case EXDEV:  // crossing filesystem
 			    case EPERM:  // filesystem does not support hard link creation
 				    // can't make hard link, trying to duplicate the inode
+				tmp = tools_strerror_r(errno);
 				get_ui().warning(tools_printf(gettext("Error creating hard link %s : %s\n Trying to duplicate the inode"),
-							      name, strerror(errno)));
+							      name, tmp.c_str()));
 				create_file = true;
 				clear_corres_if_pointing_to(ref_mir->get_etiquette(), old); // always succeeds as the etiquette points to "old"
 				    // need to remove this entry to be able
@@ -1205,7 +1210,7 @@ namespace libdar
 			    strncpy(addr.sun_path, name, UNIX_PATH_MAX - 1);
 			    addr.sun_path[UNIX_PATH_MAX - 1] = '\0';
 			    if(::bind(sd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-				throw Erange("filesystem_hard_link_write::make_file (socket bind)", string(gettext("Error creating Unix socket file: ")) + name + " : " + strerror(errno));
+				throw Erange("filesystem_hard_link_write::make_file (socket bind)", string(gettext("Error creating Unix socket file: ")) + name + " : " + tools_strerror_r(errno));
 			}
 			catch(...)
 			{
@@ -1225,9 +1230,9 @@ namespace libdar
 		if(ret < 0)
 		{
 		    if(errno != ENOSPC)
-			throw Erange("filesystem_hard_link_write::make_file", string(gettext("Could not create inode: ")) + name + " : " + strerror(errno));
+			throw Erange("filesystem_hard_link_write::make_file", string(gettext("Could not create inode: ")) + name + " : " + tools_strerror_r(errno));
 		    else
-			get_ui().pause(string(gettext("Cannot create inode: ")) + strerror(errno) + gettext(" Ready to continue ?"));
+			get_ui().pause(string(gettext("Cannot create inode: ")) + tools_strerror_r(errno) + gettext(" Ready to continue ?"));
 		}
 		else // inode successfully created
 		    if(ref_mir != NULL)
@@ -2169,7 +2174,7 @@ namespace libdar
 
 	struct stat buf;
 	if(lstat(s, &buf) < 0)
-	    throw Erange("filesystem supprime", string(gettext("Cannot get inode information about file to remove ")) + s + " : " + strerror(errno));
+	    throw Erange("filesystem supprime", string(gettext("Cannot get inode information about file to remove ")) + s + " : " + tools_strerror_r(errno));
 
 	if(S_ISDIR(buf.st_mode))
 	{
@@ -2182,11 +2187,11 @@ namespace libdar
 
 		// then the directory itself
 	    if(rmdir(s) < 0)
-		throw Erange("supprime (dir)", string(gettext("Cannot remove directory ")) + s + " : " + strerror(errno));
+		throw Erange("supprime (dir)", string(gettext("Cannot remove directory ")) + s + " : " + tools_strerror_r(errno));
 	}
 	else
 	    if(unlink(s) < 0)
-		throw Erange("supprime (file)", string(gettext("Cannot remove file ")) + s + " : " + strerror(errno));
+		throw Erange("supprime (file)", string(gettext("Cannot remove file ")) + s + " : " + tools_strerror_r(errno));
     }
 
     static void make_owner_perm(user_interaction & dialog,
@@ -2243,11 +2248,11 @@ namespace libdar
 
 #if HAVE_LCHOWN
 		if(lchown(name, tmp_uid, tmp_gid) < 0)
-		    dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + strerror(errno));
+		    dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
 #else
 		if(dynamic_cast<const lien *>(&ref) == NULL) // not a symbolic link
 		    if(chown(name, tmp_uid, tmp_gid) < 0)
-			dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + strerror(errno));
+			dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
 		    //
 		    // we don't/can't restore ownership for symbolic links (no system call to do that)
 		    //
@@ -2259,7 +2264,10 @@ namespace libdar
 	    if(what_to_check == inode::cf_all || what_to_check == inode::cf_ignore_owner)
 		if(ref_lie == NULL) // not restoring permission for symbolic links, it would modify the target not the symlink itself
 		    if(chmod(name, permission) < 0)
-			dialog.warning(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, strerror(errno)));
+		    {
+			string tmp = tools_strerror_r(errno);
+			dialog.warning(tools_printf(gettext("Cannot restore permissions of %s : %s"), name, tmp.c_str()));
+		    }
 	}
 	catch(Egeneric &e)
 	{
@@ -2342,7 +2350,10 @@ namespace libdar
 	if(fd < 0)
 	{
 	    if(info)
-		dialog.warning(tools_printf(gettext("Failed to open %S while checking for nodump flag: %s"), &filename, strerror(errno)));
+	    {
+		string tmp = tools_strerror_r(errno);
+		dialog.warning(tools_printf(gettext("Failed to open %S while checking for nodump flag: %s"), &filename, tmp.c_str()));
+	    }
 	}
 	else
 	{
@@ -2353,7 +2364,10 @@ namespace libdar
 		    if(errno != ENOTTY)
 		    {
 			if(info)
-			    dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, strerror(errno)));
+			{
+			    string tmp = tools_strerror_r(errno);
+			    dialog.warning(tools_printf(gettext("Cannot get ext2 attributes (and nodump flag value) for %S : %s"), &filename, tmp.c_str()));
+			}
 		    }
 		    f = 0;
 		}
@@ -2383,7 +2397,10 @@ namespace libdar
 
 	struct stat buf;
 	if(lstat(ptr, &buf) < 0) // stat not lstat, thus we eventually get the symlink pointed to inode
-	    throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("Cannot get inode information for %s : %s"), ptr, strerror(errno)));
+	{
+	    string tmp = tools_strerror_r(errno);
+	    throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("Cannot get inode information for %s : %s"), ptr, tmp.c_str()));
+	}
 
 	if(S_ISDIR(buf.st_mode))
 	{
@@ -2427,7 +2444,10 @@ namespace libdar
 	struct stat buf;
 
 	if(lstat(path.c_str(), &buf) < 0)
-	    throw Erange("filesystem.cpp:get_file_permission", tools_printf("Cannot read file permission for %s: %s",path.c_str(), strerror(errno)));
+	{
+	    string tmp = tools_strerror_r(errno);
+	    throw Erange("filesystem.cpp:get_file_permission", tools_printf("Cannot read file permission for %s: %s",path.c_str(), tmp.c_str()));
+	}
 
 	return buf.st_mode;
     }

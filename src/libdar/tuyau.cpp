@@ -140,7 +140,7 @@ namespace libdar
 	int tube[2];
 
 	if(pipe(tube) < 0)
-	    throw Erange("tuyau::tuyau", string(gettext("Error while creating anonymous pipe: ")) + strerror(errno));
+	    throw Erange("tuyau::tuyau", string(gettext("Error while creating anonymous pipe: ")) + tools_strerror_r(errno));
 	pipe_mode = pipe_both;
 	position = 0;
 	filedesc = tube[1];
@@ -309,7 +309,7 @@ namespace libdar
                 case EIO:
                     throw Ehardware("tuyau::inherited_read", "");
                 default:
-                    throw Erange("tuyau::inherited_read", string(gettext("Error while reading from pipe: "))+strerror(errno));
+                    throw Erange("tuyau::inherited_read", string(gettext("Error while reading from pipe: "))+tools_strerror_r(errno));
                 }
             }
             else
@@ -363,12 +363,12 @@ namespace libdar
                 case EINTR:
                     break;
                 case EIO:
-                    throw Ehardware("tuyau::inherited_write", string(gettext("Error while writing data to pipe: ")) + strerror(errno));
+                    throw Ehardware("tuyau::inherited_write", string(gettext("Error while writing data to pipe: ")) + tools_strerror_r(errno));
                 case ENOSPC:
                     get_ui().pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
                     break;
                 default :
-                    throw Erange("tuyau::inherited_write", string(gettext("Error while writing data to pipe: ")) + strerror(errno));
+                    throw Erange("tuyau::inherited_write", string(gettext("Error while writing data to pipe: ")) + tools_strerror_r(errno));
                 }
             }
             else
@@ -419,7 +419,7 @@ namespace libdar
 	    }
 	    filedesc = ::open(chemin.c_str(), flag|O_BINARY);
 	    if(filedesc < 0)
-		throw Erange("tuyau::ouverture", string(gettext("Error opening pipe: "))+strerror(errno));
+		throw Erange("tuyau::ouverture", string(gettext("Error opening pipe: "))+tools_strerror_r(errno));
 	    pipe_mode = pipe_fd;
         }
     }

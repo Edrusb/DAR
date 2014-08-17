@@ -42,7 +42,7 @@ extern "C"
 }
 
 #include "capabilities.hpp"
-
+#include "tools.hpp"
 
 using namespace std;
 
@@ -86,8 +86,8 @@ namespace libdar
 		ret = capa_unknown;
 		if(verbose)
 		{
-		    string tmp = strerror(errno);
-		    ui.printf(gettext("Error met while checking for capability %S: %S"), &capa_name, &tmp);
+		    string tmp = tools_strerror_r(errno);
+		    ui.printf(gettext("Error met while checking for capability %S: %s"), &capa_name, tmp.c_str());
 		}
 	    }
 	}
