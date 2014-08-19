@@ -1043,7 +1043,7 @@ AC_SUBST(DOXYGEN_PROG, [doxygen])
 # defaults
 AC_PREFIX_DEFAULT(/usr/local)
 
-# hack from litool mailing-list to know from source point of view whether we are compiling for dynamic or static way
+# hack from libtool mailing-list to know from source point of view whether we are compiling for dynamic or static way
 
 AC_CONFIG_COMMANDS([hack-libtool], [
 				    sed 's,^pic_flag=,pic_flag=" -D__DYNAMIC__ ",' libtool > libtoolT \
