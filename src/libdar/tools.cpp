@@ -1144,6 +1144,7 @@ namespace libdar
 		time_accuracy = "1 s";
 	    dialog.printf(gettext("   Timestamp write accuracy     : %S\n"), &time_accuracy);
 	    dialog.printf(gettext("   Restores dates of symlinks   : %s\n"), YES_NO(compile_time::symlink_restore_dates()));
+	    dialog.printf(gettext("   Uses multiple threads        : %s\n"), YES_NO(compile_time::libthreadar()));
 	}
 	catch(...)
 	{

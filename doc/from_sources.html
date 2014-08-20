@@ -4,6 +4,7 @@
 
 
 
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation - Compiling From Source</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
 <center>
 <div style="text-align: center;">
@@ -85,7 +86,10 @@ for generation of source code documentation</li>
 dar_suite upx compressed binaries</li>
         <li><a href="http://www.gnu.org/software/groff/groff.html">groff</a>
 to generate html version of man pages <br>
+</li>
+        <li>libthreadar for libdar using several threads<br>
         </li>
+
       </ul>
       <div style="margin-left: 40px;"><br>
 The consequences of building dar without these optional tools are the
@@ -118,8 +122,10 @@ dar will still compile but the resulting binary will not be compressed
 after calling <span style="font-style: italic;">make install-strip</span></li>
         <li><span style="font-style: italic;"><span style="font-style: italic;"><span style="font-style: italic;"></span></span></span>If
 you lack <span style="font-weight: bold;">groff</span> dar will not
-generate man pages in html format<span style="font-style: italic;"><span style="font-style: italic;"><span style="font-style: italic;"></span></span><br>
-          </span></li>
+generate man pages in html format</li>
+        <li>if you lack <span style="font-weight: bold;">libthreadar</span> libdar will execute each action in a single thread<br>
+        </li>
+
       </ul>
       <div style="text-align: justify;"><br>
       <div style="margin-left: 40px;"> </div>
@@ -398,6 +404,12 @@ information on self diagnostic bugs even<br>
       </td>
     </tr>
     <tr>
+      <td style="vertical-align: top; text-align: right;">--disable-threadar<br>
+      </td>
+      <td style="vertical-align: top;">Avoid linking with libthreadar even if available, libdar will not create threads<br>
+      </td>
+    </tr>
+<tr>
       <td style="vertical-align: top; width: 33%;"><span style="text-decoration: underline;">Troubleshooting option:</span><br>
       </td>
       <td style="vertical-align: top;"><br>

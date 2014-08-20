@@ -120,6 +120,11 @@ namespace libdar
 
 	    /// returns whether public key cipher (relying on gpgme) are available
 	bool public_key_cipher();
+
+	    /// returns whether libthreadar linking will be done, allowing libdar to span several threads
+	bool libthreadar();
+
+
     }
 
 } // end of namespace

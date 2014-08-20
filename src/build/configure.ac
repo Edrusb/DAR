@@ -75,6 +75,7 @@ AC_CHECK_LIB(socket, [socket], [], [])
 AC_CHECK_LIB(nsl, [endnetconfig], [], [])
 AC_CHECK_LIB(cap, [cap_get_proc], [], [])
 
+
 AC_ARG_ENABLE( [libdl-linking],
                AC_HELP_STRING(--disable-libdl-linking, [ignore any libdl and avoid linking against it]),
                [],
@@ -372,6 +373,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
 		  ],
 		  [ AC_MSG_RESULT([not available])]
                 )
+
 
 
 # DAR's features
@@ -990,6 +992,42 @@ AC_ARG_ENABLE( [dar-static],
                [build_static="no"],
                [build_static="yes"])
 
+
+
+AC_ARG_ENABLE( [threadar],
+	       AC_HELP_STRING(--disable-threadar, [avoid linking with libthreadar even if available, libdar will not create threads]),
+	       [],
+	       [
+	       AC_CHECK_HEADERS(libthreadar/libthreadar.hpp, [], [], [])
+	       AC_CHECK_LIB(threadar, [for_autoconf], [], [])
+	       AC_MSG_CHECKING([for libthreadar() availability])
+	       AC_LINK_IFELSE([AC_LANG_PROGRAM(  [[
+				    #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
+				    #include <libthreadar/libthreadar.hpp>
+				    #endif
+				   ]],
+				   [[
+					class mythread: public libthreadar::thread
+					{
+					protected:
+					    virtual void inherited_run() {};
+					};
+
+					mythread toto;
+
+					toto.run();
+					toto.join();
+				   ]])
+			       ],
+			       [ AC_DEFINE(LIBTHREADAR_AVAILABLE, 1, [when libthreadar could be found and linked against])
+			         local_threadar=yes
+				 AC_MSG_RESULT(ok)
+			       ],
+			       [ AC_MSG_RESULT(missing) ]
+		             )
+	      ])
+
+
 MEM_LDFLAGS=$LDFLAGS
 LDFLAGS="-static"
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
@@ -1191,6 +1229,14 @@ if [ "$local_lutimes" = "yes" ] ; then
 else
     echo "NO"
 fi
+
+printf "   will uses multiple threads : "
+if [ "$local_threadar" = "yes" ] ; then
+    echo "YES"
+else
+    echo "NO"
+fi
+
 
 echo ""
 echo "  DAR SUITE command line programs:"
