@@ -101,7 +101,7 @@ namespace libdar
 	    /// and so on (see at the beginning of zapette.cpp file for more). Each of these order may expect a returned value
 	    /// which may be an integer (provided by the "arg" argument of this call)  a boolean value (provided by the "arg"
 	    /// argument where 0 means false and 1 means true) or a char * (first byte to put the answer to is given by 'data' and
-	    /// allocated space for the reply must be given through 'lu' which at return given the effective length of the returned
+	    /// allocated space for the reply must be given through 'lu' which at return gives the effective length of the returned
 	    /// string
 
 	void make_transfert(U_16 size, const infinint &offset, char *data, const std::string & info, S_I & lu, infinint & arg) const;

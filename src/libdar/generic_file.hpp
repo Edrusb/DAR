@@ -82,7 +82,7 @@ namespace libdar
 	gf_read_write  ///< read and write access
     };
 
-
+	/// provides a human readable string defining the gf_mode given in argument
     extern const char * generic_file_get_name(gf_mode mode);
 
 	/// this is the interface class from which all other data transfer classes inherit
@@ -313,10 +313,23 @@ namespace libdar
 	contextual() { status = ""; };
 	virtual ~contextual() {};
 
+	    /// defines the new contextual value
+	    ///
+	    /// \note inherited class may redefine this call but
+	    /// but must call the parent method to set the value
+	    /// contextual:set_info_status()
 	virtual void set_info_status(const std::string & s) { status = s; };
+
+	    /// get the current contextual value
         virtual std::string get_info_status() const { return status; };
+
+	    /// returns whether the archive is a old archive (format < 8)
 	virtual bool is_an_old_start_end_archive() const = 0;
 
+	    /// obtain the data_name of the archive (label associated with the archive's data)
+	    ///
+	    /// \note label are conserved with dar_xform and archive isolation, but are
+	    /// not with archive merging or archive creation (full or differential backup)
 	virtual const label & get_data_name() const = 0;
 
     private:
