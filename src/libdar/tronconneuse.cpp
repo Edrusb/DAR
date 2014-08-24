@@ -197,6 +197,43 @@ namespace libdar
 	return ret;
     }
 
+    void tronconneuse::inherited_read_ahead(const infinint & amount)
+    {
+	infinint new_amount = 0;
+	U_32 interim = 0;
+	infinint x_amount = amount;
+
+	if(current_position > buf_offset)
+	{
+		// byte offset in the buffer where will take place the next read opertion
+	    new_amount = current_position - buf_offset;
+
+	    if(new_amount < buf_byte_data) // some data remain to be read in buffer
+	    {
+		    // temporarily using new_amount
+		    // to store the amount of readable data in the buffer
+		new_amount = infinint(buf_byte_data) - new_amount;
+		if(x_amount <= new_amount)
+		    return; // nothing to do, the read_ahead is entirely contained in the buffer
+		else
+		    x_amount -= new_amount;
+	    }
+
+	    new_amount = 0;
+
+	} // else current position is before the buffer, ignoring data actually in the buffer
+
+
+	while(x_amount != 0)
+	{
+	    interim = 0;
+	    x_amount.unstack(interim);
+	    new_amount += encrypted_block_size_for(interim);
+	}
+
+	encrypted->read_ahead(new_amount);
+    }
+
     U_I tronconneuse::inherited_read(char *a, U_I size)
     {
 	U_I lu = 0;

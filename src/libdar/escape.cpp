@@ -420,6 +420,16 @@ namespace libdar
 	    return x_below->get_position() + write_buffer_size - escaped_data_count_since_last_skip;
     }
 
+    void escape::inherited_read_ahead(const infinint & amount)
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	check_below();
+	x_below->read_ahead(amount);
+    }
+
+
     U_I escape::inherited_read(char *a, U_I size)
     {
 	U_I returned = 0;

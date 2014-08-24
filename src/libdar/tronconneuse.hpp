@@ -114,6 +114,9 @@ namespace libdar
 	    /// inherited from generic_file
 
 	    /// this protected inherited method is now private for inherited classes of tronconneuse
+	void inherited_read_ahead(const infinint & amount);
+
+	    /// this protected inherited method is now private for inherited classes of tronconneuse
 	U_I inherited_read(char *a, U_I size);
 
 	    /// inherited from generic_file

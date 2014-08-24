@@ -157,6 +157,7 @@ namespace libdar
 	const entrepot *get_entrepot() const { return entr; };
 
     protected :
+	void inherited_read_ahead(const infinint & amount);
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() {}; // nothing to do
@@ -193,6 +194,7 @@ namespace libdar
 	    //
         infinint pause;              //< do we pause between slices
 	bool lax;                    //< whether to try to go further reading problems
+	infinint to_read_ahead;      //< amount of data to read ahead for next slices
 
         bool skip_forward(U_I x);                                  //< skip forward in sar global contents
         bool skip_backward(U_I x);                                 //< skip backward in sar global contents
@@ -272,6 +274,7 @@ namespace libdar
 	const label & get_data_name() const { return of_data_name; };
 
     protected:
+	void inherited_read_ahead(const infinint & amount) { reference->read_ahead(amount); };
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size) { reference->write(a, size); };
 	void inherited_sync_write() {};

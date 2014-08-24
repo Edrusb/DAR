@@ -76,6 +76,7 @@ namespace libdar
 	const label & get_data_name() const;
 
     protected:
+	void inherited_read_ahead(const infinint & amount) {}; // optimization will be done when zapette will use the messaging_encode/decode exchange format
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() {};

@@ -75,7 +75,10 @@ namespace libdar
 	    /// inherited from generic_file
         infinint get_position() { return current; };
 
+
     protected :
+	    /// inherited from generic_file
+	void inherited_read_ahead(const infinint & amount);
 	    /// inherited from generic_file
         U_I inherited_read(char *a, U_I size);
 	    /// inherited from generic_file

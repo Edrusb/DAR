@@ -2692,6 +2692,7 @@ namespace libdar
 
 				fic->set_offset(start);
 				source->skip(0);
+				source->read_ahead(fic->get_size());
 
 				if(keep_mode == file::keep_compressed || fic->get_compression_algo_write() == none)
 				    stock->suspend_compression();

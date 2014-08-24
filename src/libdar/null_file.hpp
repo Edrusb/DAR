@@ -58,6 +58,8 @@ namespace libdar
         infinint get_position() { return 0; };
 
     protected :
+	void inherited_read_ahead(const infinint & amount) {};
+
         U_I inherited_read(char *a, U_I size)
 	{
 #ifdef MUTEX_WORKS

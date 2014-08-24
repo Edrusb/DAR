@@ -113,6 +113,7 @@ namespace libdar
 
     protected:
 	    // inherited from fichier_global
+	void inherited_read_ahead(const infinint & amount) { ref->read_ahead(amount); };
 	U_I fichier_global_inherited_write(const char *a, U_I size);
 	bool fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message) { throw SRC_BUG; };
 

@@ -56,6 +56,7 @@ namespace libdar
         infinint get_position() { if(ref == NULL) throw SRC_BUG; return ref->get_position(); };
 
     protected:
+	void inherited_read_ahead(const infinint & amount) { ref->read_ahead(amount); };
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() {}; // nothing to do

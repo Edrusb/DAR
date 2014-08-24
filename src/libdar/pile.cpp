@@ -261,6 +261,19 @@ namespace libdar
 	    throw Erange("pile::copy_to(crc)", "Error: copy_to(crc) from empty stack");
     }
 
+    void pile::inherited_read_ahead(const infinint & amount)
+    {
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(stack.size() > 0)
+	{
+	    if(stack.back().ptr == NULL)
+		throw SRC_BUG;
+	    return stack.back().ptr->read_ahead(amount);
+	}
+    }
+
 
     U_I pile::inherited_read(char *a, U_I size)
     {

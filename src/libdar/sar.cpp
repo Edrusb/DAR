@@ -146,6 +146,7 @@ namespace libdar
 	min_digits = x_min_digits;
 	entr = NULL;
 	force_perm = false;
+	to_read_ahead = 0;
 
         open_file_init();
 	try
@@ -242,6 +243,7 @@ namespace libdar
 	of_flag = '\0';
 	slicing.older_sar_than_v8 = format_07_compatible;
 	entr = NULL;
+	to_read_ahead = 0;
 
 	try
 	{
@@ -334,6 +336,8 @@ namespace libdar
         if(get_position() == pos)
             return true; // no need to skip
 
+	to_read_ahead = 0;
+
             ///////////////////////////
             // determination of the file to go and its offset to seek in
             //
@@ -377,6 +381,7 @@ namespace libdar
         open_last_file();
 	if(of_fd == NULL)
 	    throw SRC_BUG;
+	to_read_ahead = 0;
         ret = of_fd->skip_to_eof();
 	switch(get_mode())
 	{
@@ -430,6 +435,8 @@ namespace libdar
 
 	if(is_terminated())
 	    throw SRC_BUG;
+
+	to_read_ahead = 0;
 
         while((number == 1 ? offset+delta >= slicing.first_size : offset+delta >= slicing.other_size)
               && (!of_last_file_known || number <= of_last_file_num))
@@ -512,6 +519,31 @@ namespace libdar
             return file_offset - slicing.first_slice_header;
     }
 
+    void sar::inherited_read_ahead(const infinint & amount)
+    {
+	infinint avail_in_slice;
+
+	if(of_current == 1)
+	    avail_in_slice = slicing.first_size;
+	else
+	    avail_in_slice = slicing.other_size;
+	avail_in_slice -= file_offset;
+	avail_in_slice -= (slicing.older_sar_than_v8 ? 0 : 1);
+
+	if(avail_in_slice > amount)
+	{
+	    if(of_fd != NULL)
+		of_fd->read_ahead(amount);
+	    to_read_ahead = 0;
+	}
+	else
+	{
+	    if(of_fd != NULL)
+		of_fd->read_ahead(avail_in_slice + (slicing.older_sar_than_v8 ? 0 : 1));
+	    to_read_ahead = amount - avail_in_slice;
+	}
+    }
+
     U_I sar::inherited_read(char *a, U_I sz)
     {
         U_I lu = 0;
@@ -576,6 +608,8 @@ namespace libdar
         infinint tmp_wrote;
         U_I micro_wrote;
 	U_I trailer_size = slicing.older_sar_than_v8 ? 0 : 1;
+
+	to_read_ahead = 0;
 
         while(to_write > 0)
         {
@@ -1226,10 +1260,13 @@ namespace libdar
 		close_file(false);
 		throw SRC_BUG;
 	    }
+
+	    if(of_max_seen < num)
+		of_max_seen = num;
+	    file_offset = num == 1 ? slicing.first_slice_header : slicing.other_slice_header;
+	    if(num == of_current + 1 && to_read_ahead > 0)
+		inherited_read_ahead(to_read_ahead);
 	    of_current = num;
-	    if(of_max_seen < of_current)
-		of_max_seen = of_current;
-	    file_offset = of_current == 1 ? slicing.first_slice_header : slicing.other_slice_header;
         }
     }
 

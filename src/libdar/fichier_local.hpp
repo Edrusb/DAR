@@ -103,6 +103,7 @@ namespace libdar
 
     protected :
 	    // inherited from generic_file grand-parent class
+	void inherited_read_ahead(const infinint & amount) {}; // no optimization can be done here, we rely on the OS here
 	void inherited_sync_write() { fsync(); };
 	void inherited_terminate() { if(adv == advise_dontneed) fadvise(adv); };
 

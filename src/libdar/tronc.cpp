@@ -204,6 +204,21 @@ namespace libdar
         return true;
     }
 
+    void tronc::inherited_read_ahead(const infinint & amount)
+    {
+	if(limited)
+	{
+	    infinint avail = sz - current;
+	    if(avail > amount)
+		ref->read_ahead(amount);
+	    else
+		ref->read_ahead(avail);
+	}
+	else
+	    ref->read_ahead(amount);
+    }
+
+
 
     U_I tronc::inherited_read(char *a, U_I size)
     {

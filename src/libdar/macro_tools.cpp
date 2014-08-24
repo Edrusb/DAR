@@ -148,6 +148,7 @@ namespace libdar
 		label tmp;
 
 		tmp.clear(); // we do not want here to change the catalogue internal data name read from archive
+		cata_stack.read_ahead(cat_size);
                 ret = new (pool) catalogue(dialog, cata_stack, ver.get_edition(), ver.get_compression_algo(), data_loc, efsa_loc, lax_mode, tmp);
 		data_ctxt->set_info_status(CONTEXT_OP);
 		cata_ctxt->set_info_status(CONTEXT_OP);

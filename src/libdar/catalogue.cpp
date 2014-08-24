@@ -1162,7 +1162,10 @@ namespace libdar
 			if(ea_get_size() == 0)
 			    storage->reset_crc(crc::OLD_CRC_SIZE);
 			else
+			{
 			    storage->reset_crc(tools_file_size_to_crc_size(ea_get_size()));
+			    storage->read_ahead(ea_get_size());
+			}
 
 			try
 			{
@@ -1507,6 +1510,7 @@ namespace libdar
 					throw Ememory("inode::get_fsa");
 				    try
 				    {
+					storage->read_ahead(fsa_get_size());
 					const_cast<inode *>(this)->fsal->read(*storage, edit);
 				    }
 				    catch(...)

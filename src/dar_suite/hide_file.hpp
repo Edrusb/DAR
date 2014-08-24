@@ -58,6 +58,7 @@ protected:
     vector <partie> morceau;
     generic_file *ref;
 
+    void inherited_read_ahead(const infinint & amount) { ref->read_ahead(amount); };
     U_I inherited_read(char *a, U_I size);
     void inherited_write(const char *a, size_t size);
     void inherited_sync_write() {};

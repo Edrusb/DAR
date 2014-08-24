@@ -120,6 +120,13 @@ namespace libdar
 	    /// retreive the openning mode for this object
         gf_mode get_mode() const { return rw; };
 
+	    /// read ahead information
+	    ///
+	    /// \param[in] amount is the expected amount of data the caller will read
+	    /// \note after sanity checks, the protected inherited_read_ahead() method is called
+	virtual void read_ahead(const infinint & amount);
+
+
 	    /// read data from the generic_file
 
 	    /// \param[in, out] a is where to put the data to read
@@ -230,6 +237,14 @@ namespace libdar
 
     protected :
         void set_mode(gf_mode x) { rw = x; };
+
+	    /// tells the object that several calls to read() will follow to obtain at most the given amount of data
+	    ///
+	    /// \param[in] amount is the maximum expected amount of data that is to be read
+	    /// \note this call may be implemented as a do-nothing call, its presence is only
+	    /// to allow optimization when possible
+	virtual void inherited_read_ahead(const infinint & amount) = 0;
+
 
 	    /// implementation of read() operation
 

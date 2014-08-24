@@ -90,6 +90,7 @@ namespace libdar
         infinint get_position() { return compressed->get_position(); };
 
     protected :
+	void inherited_read_ahead(const infinint & amount) { compressed->read_ahead(amount); };
         U_I inherited_read(char *a, U_I size) { return (this->*read_ptr)(a, size); };
         void inherited_write(const char *a, U_I size) { (this->*write_ptr)(a, size); };
 	void inherited_sync_write() { flush_write(); };

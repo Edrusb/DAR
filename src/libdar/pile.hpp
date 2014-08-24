@@ -138,10 +138,12 @@ namespace libdar
 	bool skip_to_eof();
 	bool skip_relative(S_I x);
 	infinint get_position();
+
 	void copy_to(generic_file & ref);
 	void copy_to(generic_file & ref, const infinint & crc_size, crc * & value);
 
     protected:
+	void inherited_read_ahead(const infinint & amount);
 	U_I inherited_read(char *a, U_I size);
 	void inherited_write(const char *a, U_I size);
 	void inherited_sync_write();

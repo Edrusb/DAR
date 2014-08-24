@@ -110,6 +110,18 @@ namespace libdar
 	ceci->terminated = true;
     }
 
+    void generic_file::read_ahead(const infinint & amount)
+    {
+	if(terminated)
+	    throw SRC_BUG;
+
+	if(rw == gf_write_only)
+	    throw Erange("generic_file::read", gettext("Reading ahead a write only generic_file"));
+	else
+	    inherited_read_ahead(amount);
+    }
+
+
     U_I generic_file::read(char *a, U_I size)
     {
 	if(terminated)
