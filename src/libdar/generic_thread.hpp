@@ -43,10 +43,12 @@ namespace libdar
     public:
 	    /// constructor
 	    ///
-	    /// \param[in] ptr is the generic_file that will be managed by a separated thread
+	    /// \param[in] ptr is the generic_file that will be managed by a separated thread and becomes property of this new object
+	    /// \param[in] block_size is the size of block used to pass information to and from the remote thread
+	    /// \param[in] num_block maximum number of blocks that can be sent without being retrieved by the other threads
 	    /// \note that the pointed to generic_file becomes property of the generic_thread object
 	    /// and will be deleted by it
-	generic_thread(generic_file *ptr);
+	generic_thread(generic_file *ptr, U_I block_size, U_I num_block);
 	generic_thread(const generic_thread & ref); //< copy constructor is disabled (throws exception)
 	const generic_thread & operator = (const generic_thread & ref) { throw SRC_BUG; };
 	virtual ~generic_thread();
@@ -91,10 +93,6 @@ namespace libdar
 	void read_answer();   //< \note ptr must be released/recycled after this call
 	void check_answer(msg_type expected);
 	void release_block_answer() { tomaster.fetch_recycle(ptr); ptr = NULL; };
-
-
-	static const U_I block_size = 10240;
-	static const U_I block_num = 100;
     };
 
 } // end of namespace

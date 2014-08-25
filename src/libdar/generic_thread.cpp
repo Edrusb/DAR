@@ -34,10 +34,10 @@ using namespace std;
 
 namespace libdar
 {
-    generic_thread::generic_thread(generic_file * ptr):
+    generic_thread::generic_thread(generic_file * ptr, U_I block_size, U_I num_block):
 	generic_file(gf_read_only),
-	toslave(libthreadar::tampon<char>(block_num, block_size)),
-	tomaster(libthreadar::tampon<char>(block_num, block_size))
+	toslave(libthreadar::tampon<char>(num_block, block_size)),
+	tomaster(libthreadar::tampon<char>(num_block, block_size))
     {
 	if(ptr == NULL)
 	    throw SRC_BUG;
@@ -60,8 +60,8 @@ namespace libdar
 
     generic_thread::generic_thread(const generic_thread & ref):
 	generic_file (gf_read_only),
-	toslave(libthreadar::tampon<char>(block_num, block_size)),
-	tomaster(libthreadar::tampon<char>(block_num, block_size))
+	toslave(libthreadar::tampon<char>(2, 10)),
+	tomaster(libthreadar::tampon<char>(2, 10))
     {
 	throw SRC_BUG;
     }
@@ -306,7 +306,6 @@ namespace libdar
 	order.clear();
 	order.set_type(msg_type::order_read);
 	order.set_U_I(size);
-	send_order();
 
 	    // order completed
 
