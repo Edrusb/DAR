@@ -64,10 +64,10 @@ namespace libdar
 	libthreadar::tampon<char> *input;
 	libthreadar::tampon<char> *output;
 
-	messaging_encode answer;
-	messaging_decode order;
-	unsigned int num;
-	char *ptr;
+	messaging_encode answer;    //< used to communicate with master thread
+	messaging_decode order;     //< used to communicate with master thread
+	unsigned int num;           //< size of the read block or to be written block
+	char *ptr;                  //< address of the block to be written or to be read
 	char data_header;           //< the one byte message to prepend data with in all data blocks
 	char data_eof_header;       //< the one byte message to prepend data with when EOF is reached
 	infinint read_ahead = 0;    //< amount of data sent for reading and not yet asked for reading
@@ -89,7 +89,7 @@ namespace libdar
 	    /// \return the effective number of byte sent in the block
 	U_I send_data_block(U_I size);
 
-	void treat_order();
+	bool treat_order(); //< \return true if answer is prepared and must be sent back to the master thread
 
 	    /// send the amount of byte equal to "immediate_read" to the master thread (counting read_ahead data)
 	void go_read();

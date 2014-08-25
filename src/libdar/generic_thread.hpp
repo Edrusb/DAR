@@ -80,9 +80,10 @@ namespace libdar
 	libthreadar::tampon<char> toslave;
 	libthreadar::tampon<char> tomaster;
 	slave_thread *remote;
+	bool reached_eof;
 
 	    // the following variables are locally in quite all methods
-	    // the do not contain valuable information outside each method call
+	    // they do not contain valuable information outside each method call
 	messaging_encode order;
 	messaging_decode answer;
 	unsigned int num;

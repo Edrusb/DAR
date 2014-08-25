@@ -76,10 +76,12 @@ namespace libdar
 
 		if(pending_order() || to_send_ahead == 0)
 		{
+		    bool need_answer;
+
 		    read_order();
 		    try
 		    {
-			treat_order();
+			need_answer = treat_order();
 		    }
 		    catch(...)
 		    {
@@ -87,6 +89,9 @@ namespace libdar
 			throw;
 		    }
 		    input->fetch_recycle(ptr);
+
+		    if(need_answer)
+			send_answer();
 
 		    if(immediate_read > 0)
 			go_read();
@@ -202,7 +207,7 @@ namespace libdar
 	return size; // note that size has been modified by the effective number of byte read from *data
     }
 
-    void slave_thread::treat_order()
+    bool slave_thread::treat_order()
     {
 	bool need_answer = false;
 	contextual *ct_data = dynamic_cast<contextual *>(data);
@@ -299,8 +304,7 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 
-	if(need_answer)
-	    send_answer();
+	return need_answer;
     }
 
 
@@ -360,6 +364,12 @@ namespace libdar
 	    output->feed(ptr, read + 1); // +1 for the data header
 	    immediate_read -= read;
 	    sent += read;
+
+	    if(eof)
+	    {
+		immediate_read = 0; // stopping the read request
+		to_send_ahead = 0;  // stopping a pending read_ahead
+	    }
 	}
 
 	if(to_send_ahead > 0)

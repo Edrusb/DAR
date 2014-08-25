@@ -13,7 +13,7 @@ AM_CPPFLAGS=-I../libdar -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" $(GPGME_
 endif
 endif
 
-noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_string_file test_escape test_hash_fichier moving_file make_sparse_file hashsum test_crypto_asym test_range
+noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_special_alloc test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_string_file test_escape test_hash_fichier moving_file make_sparse_file hashsum test_crypto_asym test_range test_generic_thread
 AM_LDFLAGS = -all-static @LTLIBINTL@
 LDADD = -L../libdar -l$(MYLIB) $(GPGME_LIBS)
 noinst_HEADERS = testtools.hpp
@@ -110,3 +110,7 @@ test_crypto_asym_DEPENDENCIES = ../libdar/lib$(MYLIB).la
 
 test_range_SOURCES = test_range.cpp ../dar_suite/shell_interaction.cpp
 test_range_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+
+test_generic_thread_SOURCES = test_generic_thread.cpp ../dar_suite/shell_interaction.cpp
+test_generic_thread_DEPENDENCIES = ../libdar/lib$(MYLIB).la
+
