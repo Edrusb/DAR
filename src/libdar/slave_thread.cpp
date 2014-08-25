@@ -69,17 +69,24 @@ namespace libdar
 		    U_I tmp = 0;
 		    to_send_ahead.unstack(tmp);
 		    U_I wrote = send_data_block(tmp);
-		    tmp -= wrote;
-		    to_send_ahead += tmp;
-		    read_ahead += wrote;
+		    if(wrote > 0)
+		    {
+			tmp -= wrote;
+			to_send_ahead += tmp;
+			read_ahead += wrote;
+		    }
+		    else
+			to_send_ahead = 0; // reached eof
 		}
 
 		if(pending_order() || to_send_ahead == 0)
 		{
+		    bool need_answer;
+
 		    read_order();
 		    try
 		    {
-			treat_order();
+			need_answer = treat_order();
 		    }
 		    catch(...)
 		    {
@@ -87,6 +94,9 @@ namespace libdar
 			throw;
 		    }
 		    input->fetch_recycle(ptr);
+
+		    if(need_answer)
+			send_answer();
 
 		    if(immediate_read > 0)
 			go_read();
@@ -202,7 +212,7 @@ namespace libdar
 	return size; // note that size has been modified by the effective number of byte read from *data
     }
 
-    void slave_thread::treat_order()
+    bool slave_thread::treat_order()
     {
 	bool need_answer = false;
 	contextual *ct_data = dynamic_cast<contextual *>(data);
@@ -225,21 +235,29 @@ namespace libdar
 	case msg_type::order_skip:
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip(order.get_infinint()));
+	    read_ahead = 0;
+	    to_send_ahead = 0;
 	    need_answer = true;
 	    break;
 	case msg_type::order_skip_to_eof:
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip_to_eof());
+	    read_ahead = 0;
+	    to_send_ahead = 0;
 	    need_answer = true;
 	    break;
 	case msg_type::order_skip_fwd:
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip_relative(order.get_U_I()));
+	    read_ahead = 0;
+	    to_send_ahead = 0;
 	    need_answer = true;
 	    break;
 	case msg_type::order_skip_bkd:
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip_relative(-order.get_U_I()));
+	    read_ahead = 0;
+	    to_send_ahead = 0;
 	    need_answer = true;
 	    break;
 	case msg_type::order_set_context:
@@ -263,7 +281,23 @@ namespace libdar
 	    break;
 	case msg_type::order_get_position:
 	    answer.set_type(msg_type::answr_position);
+	    if(read_ahead > 0)
+	    {
+		    // all read_ahead blocks are in the output pipe
+		    // and will be dropped by the master to reach the
+		    // answer to the get_position() order it just sent
+		    // so we must ignore all read_ahead block, stop further
+		    // read ahead and seek back the data to the position
+		    // of the first block in pipe that will be ignored
+		    // by the master thread.
+		if(data->get_position() >= read_ahead)
+		    data->skip(data->get_position() - read_ahead);
+		else
+		    throw SRC_BUG; // first byte of data read ahead is before offset zero !?!
+		read_ahead = 0;
+	    }
 	    answer.set_infinint(data->get_position());
+	    to_send_ahead = 0;
 	    need_answer = true;
 	    break;
 	case msg_type::order_is_oldarchive:
@@ -299,8 +333,7 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 
-	if(need_answer)
-	    send_answer();
+	return need_answer;
     }
 
 
@@ -360,6 +393,12 @@ namespace libdar
 	    output->feed(ptr, read + 1); // +1 for the data header
 	    immediate_read -= read;
 	    sent += read;
+
+	    if(eof)
+	    {
+		immediate_read = 0; // stopping the read request
+		to_send_ahead = 0;  // stopping a pending read_ahead
+	    }
 	}
 
 	if(to_send_ahead > 0)

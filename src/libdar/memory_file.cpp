@@ -107,6 +107,9 @@ namespace libdar
     {
 	U_I ret = 0;
 
+	if(size == 0)
+	    return;
+
 	while(ret < size && position < data.size())
 	{
 	    data[position] = (unsigned char)(*(a++));

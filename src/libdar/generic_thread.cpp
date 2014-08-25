@@ -42,6 +42,7 @@ namespace libdar
 	if(ptr == NULL)
 	    throw SRC_BUG;
 	set_mode(ptr->get_mode());
+	reached_eof = false;
 
 	remote = new (get_pool()) slave_thread(ptr, &toslave, &tomaster);
 	if(remote == NULL)
@@ -127,6 +128,7 @@ namespace libdar
     bool generic_thread::skip(const infinint & pos)
     {
 	bool ret;
+	reached_eof = false;
 
 	    // preparing the order message
 
@@ -161,6 +163,7 @@ namespace libdar
 	check_answer(msg_type::answr_skip_done);
 	ret = answer.get_bool();
 	release_block_answer();
+	reached_eof = ret;
 
 	return ret;
     }
@@ -179,8 +182,9 @@ namespace libdar
 	    order.set_type(msg_type::order_skip_fwd);
 	    order.set_U_I(val);
 	}
-	else
+	else // x < 0
 	{
+	    reached_eof = false;
 	    val = -x;
 	    order.set_type(msg_type::order_skip_bkd);
 	    order.set_U_I(val);
@@ -301,6 +305,9 @@ namespace libdar
 	U_I read = 0;
 	U_I min;
 
+	if(reached_eof)
+	    return 0;
+
 	    // preparing the order message
 
 	order.clear();
@@ -347,6 +354,9 @@ namespace libdar
 	    }
 	}
 	while(answer.get_type() != msg_type::answr_read_eof && read < size);
+
+	if(answer.get_type() == msg_type::answr_read_eof)
+	    reached_eof = true;
 
 	return read;
     }
@@ -443,7 +453,8 @@ namespace libdar
 
     void generic_thread::check_answer(msg_type expected)
     {
-	while(answer.get_type() == msg_type::data)
+	while(answer.get_type() == msg_type::data
+	      || answer.get_type() == msg_type::answr_read_eof)
 	{
 	    if(expected == msg_type::data)
 		break; // exiting the while loop to avoid releasing the block
