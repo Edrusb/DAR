@@ -11,30 +11,31 @@ from 2.4.x to 2.5.0
   backup time (changed at the time it was read). This avoid wasting space in
   archive but is only possible if the backward position is located in the
   current slice and no hash is used and no strong encryption is used neither.
-  Of course if the archive is written to a pile or stdout skipping back to
-  retry saving data at the same place. If skipping backward is not possible
-  and wasting byte is allowed (see --retry-on-change option) a new copy of
-  the file is added up to the maximum allowed number of retry.
-- by default dar performs up to 3 retries but do not allow for wasting bytes
+  Of course if the archive is written to a pipe or stdout, skipping back to
+  retry saving data at the same place is not possible which lead dar, if
+  wasting bytes is allowed (see --retry-on-change option) to add a new copy of
+  the files that changed up to the maximum allowed number of retry.
+- by default dar now performs up to 3 retries but do not allow for wasting bytes
   if file has changed at the time it was read for backup (see --retry-on-change
   option)
 - With the same constraints as for a changing file, if a file is saved
   compressed but its compressed data uses more space than uncompressed,
-  the compressed data is resaved as uncompressed. If skipping backward is
+  the file's data is resaved as uncompressed. If skipping backward is
   not possible, data is kept compressed.
 - if system provides it, dar uses linux capabilities to check for the ability
   to set file ownership when not run as root.
-- removing dar-help tool used to build dar -h message, tool become useless
+- removing dar-help tool used to build dar -h message. That tool became useless
   for a long time now.
 - added more specific -vm and -vt verbose options
 - added support for microsecond timestamps (atime, mtime, ctime, birthtime)
 - added support for lutime() to restore atime/mtimes of symlink on systems
   that support it.
 - removed backward compatible API with old libdar 4.4.x
-- simplified implementation of archive isolation made possible thanks to
-  archive isolation evolution features brought by release 2.4.0.
-- added feature: exclude-by-ea. Avoid saving inodes that have a particular
-  EA set.
+- simplified implementation of archive isolation thanks to
+  archive isolation evolution features brought by release 2.4.0. Memory
+  requirement is devided by two compared to previous release.
+- added feature: exclude-by-ea to avoid saving inodes that have a particular
+  user defined EA set.
 - added feature: comparison of an isolated catalogue with a filesystem,
   relying on embedded data CRC and inode metadata in absence of the saved
   data.
@@ -42,17 +43,17 @@ from 2.4.x to 2.5.0
   at creation time, only the passphrase is required at reading time.
 - Adding support for public key encryption (GnuPG) relying on gpgme
 - Adding support for public key signature of an archive
-- While listing archive contents, directory show the size and average
+- While listing archive contents, directories show the size and average
   compression of the data they contain
 - added the -vd switch to only display current directory under process for
   creation, diff, test, extraction and merging operations
-- added xz/lzma compression algorithm
+- added xz/lzma compression support
 - added -Tslicing option to list slice localization of files
 - isolated catalogues now keep a record of the slicing layout of their
   archive of reference in order to provide -Tslicing feature when used
   on the isolated catalogue alone.
 - added the possibility to use -s and -S options when using -Tslicing with
-  an isolated catalogue to face the case when the archive of reference has
+  an isolated catalogue, to face the case when the archive of reference has
   been resliced after the isolated catalogue has been built.
 
 
