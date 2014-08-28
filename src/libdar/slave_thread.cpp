@@ -222,6 +222,10 @@ namespace libdar
 	{
 	case msg_type::data:
 	    data->write(ptr + 1, num - 1);
+	    if(to_send_ahead > 0)
+		throw SRC_BUG; // read_ahead asked but no read done, received data to write instead
+	    if(read_ahead > 0)
+		throw SRC_BUG; // read_ahead started but data not read, received data to write instead
 	    break;
 	case msg_type::order_read_ahead:
 	    to_send_ahead += order.get_infinint();

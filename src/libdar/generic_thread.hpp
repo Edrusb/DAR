@@ -81,6 +81,7 @@ namespace libdar
 	libthreadar::tampon<char> tomaster;
 	slave_thread *remote;
 	bool reached_eof;
+	char data_header; // contains 1 byte header to send data
 
 	    // the following variables are locally in quite all methods
 	    // they do not contain valuable information outside each method call

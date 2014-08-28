@@ -97,6 +97,7 @@ void f1()
     delete t1;
     src = new memory_file();
     t1 = new generic_thread(src, 9, 3);
+    dst.skip(0);
     dst.copy_to(*t1);
     tmp = t1->get_position();
     ui.printf("t1 position = %i\n", &tmp);

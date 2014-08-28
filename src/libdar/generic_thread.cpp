@@ -39,10 +39,18 @@ namespace libdar
 	toslave(libthreadar::tampon<char>(num_block, block_size)),
 	tomaster(libthreadar::tampon<char>(num_block, block_size))
     {
+	unsigned int tmp = sizeof(data_header);
+
 	if(ptr == NULL)
 	    throw SRC_BUG;
 	set_mode(ptr->get_mode());
 	reached_eof = false;
+
+	order.clear();
+	order.set_type(msg_type::data);
+	order.reset_get_block();
+	if(!order.get_block(&data_header, tmp))
+	    throw SRC_BUG; // data header larger than one byte !
 
 	remote = new (get_pool()) slave_thread(ptr, &toslave, &tomaster);
 	if(remote == NULL)
@@ -72,6 +80,7 @@ namespace libdar
     {
 	if(remote != NULL)
 	{
+	    inherited_terminate();
 	    delete remote;
 	    remote = NULL;
 	}
@@ -367,28 +376,18 @@ namespace libdar
 	unsigned int bksize;
 	char *tmptr = NULL;
 	U_I min;
-	char header;
-
-	    // preparing the order message
-
-	order.clear();
-	order.set_type(msg_type::data);
-	order.reset_get_block();
-	bksize = 1;
-	if(!order.get_block(&header, bksize))
-	    throw SRC_BUG; // data header larger than one byte !
 
 	do
 	{
 	    toslave.get_block_to_feed(tmptr, bksize);
 	    if(bksize > 1)
-		tmptr[0] = header;
+		tmptr[0] = data_header;
 	    else
 		throw SRC_BUG;
 	    min = bksize - 1 > size - wrote ? size - wrote : bksize - 1;
 	    (void)memcpy(tmptr + 1, a + wrote, min);
 	    wrote += min;
-	    toslave.feed(tmptr, wrote);
+	    toslave.feed(tmptr, min + 1);
 	}
 	while(wrote < size);
     }
