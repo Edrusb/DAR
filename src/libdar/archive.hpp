@@ -415,6 +415,7 @@ namespace libdar
 				const mask & backup_hook_file_mask,
 				bool ignore_unknown,
 				const fsa_scope & scope,
+				bool multi_threaded,
 				statistics * progressive_report);
 
 	void op_create_in_sub(user_interaction & dialog,        //< interaction with user
@@ -478,6 +479,7 @@ namespace libdar
 			      const mask & backup_hook_file_mask,         //< files elected to have a command executed before and after their backup
 			      bool ignore_unknown,                        //< whether to warn when an unknown inode type is met
 			      const fsa_scope & scope,                    //< FSA scope for the operation
+			      bool multi_threaded,              //< whether libdar is allowed to spawn several thread to possibily work faster on multicore CPU
 			      statistics * st_ptr);             //< statistics must not be NULL !
 
 	void disable_natural_destruction();

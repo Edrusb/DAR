@@ -119,7 +119,8 @@ namespace libdar
 					     options.get_sequential_read(),
 					     options.get_info_details(),
 					     gnupg_signed,
-					     slices);
+					     slices,
+					     options.get_multi_threaded());
 
 		    stack.find_first_from_top(esc);
 			// esc may be NULL
@@ -166,7 +167,8 @@ namespace libdar
 							 false, // sequential_read is never used to retreive the isolated catalogue (well, that's possible and easy to add this feature), see later ...
 							 options.get_info_details(),
 							 tmp,
-							 ignored);
+							 ignored,
+							 options.get_multi_threaded());
 			    }
 			    catch(Euser_abort & e)
 			    {
@@ -457,6 +459,7 @@ namespace libdar
 				       options.get_backup_hook_file_mask(),
 				       options.get_ignore_unknown_inode_type(),
 				       options.get_fsa_scope(),
+				       options.get_multi_threaded(),
 				       progressive_report);
 		    exploitable = false;
 		    stack.terminate();
@@ -706,6 +709,7 @@ namespace libdar
 				     bool_mask(false), //backup_hook_file_mask
 				     false,
 				     options.get_fsa_scope(),
+				     options.get_multi_threaded(),
 				     st_ptr);
 		    exploitable = false;
 		    stack.terminate();
@@ -1273,7 +1277,8 @@ namespace libdar
 					  options.get_hash_algo(),
 					  options.get_slice_min_digits(),
 					  internal_name,
-					  isol_data_name);
+					  isol_data_name,
+					  options.get_multi_threaded());
 
 		if(cat == NULL)
 		    throw SRC_BUG;
@@ -1692,6 +1697,7 @@ namespace libdar
 				     const mask & backup_hook_file_mask,
 				     bool ignore_unknown,
 				     const fsa_scope & scope,
+				     bool multi_threaded,
 				     statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -1841,6 +1847,7 @@ namespace libdar
 			 backup_hook_file_mask,
 			 ignore_unknown,
 			 scope,
+			 multi_threaded,
 			 st_ptr);
 
 	return *st_ptr;
@@ -1907,6 +1914,7 @@ namespace libdar
 				   const mask & backup_hook_file_mask,
 				   bool ignore_unknown,
 				   const fsa_scope & scope,
+				   bool multi_threaded,
 				   statistics * st_ptr)
     {
 	try
@@ -1968,7 +1976,8 @@ namespace libdar
 					  hash,
 					  slice_min_digits,
 					  internal_name,
-					  internal_name); // data_name is equal to internal_name in the current situation
+					  internal_name, // data_name is equal to internal_name in the current situation
+					  multi_threaded);
 
 		stack.find_first_from_bottom(esc);
 		if(add_marks_for_sequential_reading && esc == NULL)

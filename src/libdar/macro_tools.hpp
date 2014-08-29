@@ -92,7 +92,8 @@ namespace libdar
 					 bool sequential_read, // whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
 					 bool info_details,    // be or not verbose about the archive openning
 					 std::vector<signator> & gnupg_signed, //< list of existing signature found for that archive (valid or not)
-					 slice_layout & sl); //< slicing layout of the archive
+					 slice_layout & sl,    //< slicing layout of the archive
+					 bool multi_threaded); //< true of several thread can be run concurrently by libdar
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 
     extern catalogue *macro_tools_get_derivated_catalogue_from(user_interaction & dialog,
@@ -160,6 +161,7 @@ namespace libdar
 	/// \param[in]  slice_min_digits minimum number of digits slice number must have
 	/// \param[in]  internal_name common label to all slices
 	/// \param[in]  data_name to use in slice header
+	/// \param[in]  multi_threaded true if libdar can spawn several thread to work
     extern void macro_tools_create_layers(user_interaction & dialog,
 					  pile & layers,
 					  header_version & ver,
@@ -191,7 +193,8 @@ namespace libdar
 					  hash_algo hash,
 					  const infinint & slice_min_digits,
 					  const label & internal_name,
-					  const label & data_name);
+					  const label & data_name,
+					  bool multi_threaded);
 
 	/// dumps the catalogue and close all the archive layers to terminate the archive
 	///

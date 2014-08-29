@@ -118,6 +118,7 @@ namespace libdar
 	if(x_entrepot == NULL)
 	    throw Ememory("archive_options_read::clear");
 	x_ignore_signature_check_failure = false;
+	x_multi_threaded = true;
 
 	    //
 	external_cat = false;
@@ -201,6 +202,7 @@ namespace libdar
 	if(x_entrepot == NULL)
 	    throw Ememory("archive_options_read::copy_from");
 	x_ignore_signature_check_failure = ref.x_ignore_signature_check_failure;
+	x_multi_threaded = ref.x_multi_threaded;
 	    //
 
 	external_cat = ref.external_cat;
@@ -337,6 +339,7 @@ namespace libdar
 	    if(x_entrepot == NULL)
 		throw Ememory("archive_options_create::clear");
 	    x_scope = all_fsa_families();
+	    x_multi_threaded = true;
 	}
 	catch(...)
 	{
@@ -562,6 +565,7 @@ namespace libdar
 	if(x_entrepot == NULL)
 	    throw Ememory("archive_options_create::copy_from");
 	x_scope = ref.x_scope;
+	x_multi_threaded = ref.x_multi_threaded;
     }
 
 
@@ -602,6 +606,7 @@ namespace libdar
 	    x_entrepot = new (get_pool()) entrepot_local("", "", false); // never using furtive_mode to read slices
 	    if(x_entrepot == NULL)
 		throw Ememory("archive_options_isolate::clear");
+	    x_multi_threaded = true;
 	}
 	catch(...)
 	{
@@ -668,6 +673,7 @@ namespace libdar
 	x_entrepot = ref.x_entrepot->clone();
 	if(x_entrepot == NULL)
 	    throw Ememory("archive_options_isolate::copy_from");
+	x_multi_threaded = ref.x_multi_threaded;
     }
 
 
@@ -724,6 +730,7 @@ namespace libdar
 	    if(x_entrepot == NULL)
 		throw Ememory("archive_options_merge::clear");
 	    x_scope = all_fsa_families();
+	    x_multi_threaded = true;
 	}
 	catch(...)
 	{
@@ -934,6 +941,7 @@ namespace libdar
 	    x_hash = ref.x_hash;
 	    x_slice_min_digits = ref.x_slice_min_digits;
 	    x_scope = ref.x_scope;
+	    x_multi_threaded = ref.x_multi_threaded;
 	}
 	catch(...)
 	{

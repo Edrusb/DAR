@@ -123,11 +123,33 @@ namespace libdar
 	    /// defines whether the user needs detailed output of the operation
 	void set_info_details(bool info_details) { x_info_details = info_details; };
 
+	    /// defines whether any archive coherence error, system error or media error lead to the abortion of the operation
+
+	    /// lax mode is false by default.
+	    /// setting it to true, may allow more data to be restored, but may lead the user to get corrupted data
+	    /// the user will be warned and asked upon what to do if such case arrives.
+	void set_lax(bool val) { x_lax = val; };
+
+	    /// defines whether to try reading the archive sequentially (ala tar) or using the final catalogue
+
+	    /// the sequential reading must not has been disabled at creation time and the archive must be of minimum format "08" for the operation not to fail
+
+	void set_sequential_read(bool val) { x_sequential_read = val; };
+
+	    /// defines the minimum digit a slice must have concerning its number, zeros will be prepended as much as necessary to respect this
+
+	void set_slice_min_digits(infinint val) { x_slice_min_digits = val; };
+
+
 	    /// defines the protocol to use to retrieve slices
 	void set_entrepot(const entrepot & entr) { if(x_entrepot != NULL) delete x_entrepot; x_entrepot = entr.clone(); if(x_entrepot == NULL) throw Ememory("archive_options_read::set_entrepot"); };
 
 	    /// whether to warn (true) or ignore (false) signature failure (default is true)
 	void set_ignore_signature_check_failure(bool val) { x_ignore_signature_check_failure = val; };
+
+	    /// whether libdar is allowed to create several thread to work possilbiy faster on multicore CPU (need libthreadar to be effective)
+	void set_multi_threaded(bool val) { x_multi_threaded = val; };
+
 
 	    //////// what follows concerne the use of an external catalogue instead of the archive's internal one
 
@@ -156,22 +178,6 @@ namespace libdar
 	    /// .
 	void set_ref_execute(const std::string & ref_execute) { x_ref_execute = ref_execute; };
 
-	    /// defines whether any archive coherence error, system error or media error lead to the abortion of the operation
-
-	    /// lax mode is false by default.
-	    /// setting it to true, may allow more data to be restored, but may lead the user to get corrupted data
-	    /// the user will be warned and asked upon what to do if such case arrives.
-	void set_lax(bool val) { x_lax = val; };
-
-	    /// defines whether to try reading the archive sequentially (ala tar) or using the final catalogue
-
-	    /// the sequential reading must not has been disabled at creation time and the archive must be of minimum format "08" for the operation not to fail
-
-	void set_sequential_read(bool val) { x_sequential_read = val; };
-
-	    /// defines the minimum digit a slice must have concerning its number, zeros will be prepended as much as necessary to respect this
-
-	void set_slice_min_digits(infinint val) { x_slice_min_digits = val; };
 
 	    /// defines the minim digit for slice number of the archive of reference (where the external catalogue is read from)
 
@@ -179,6 +185,7 @@ namespace libdar
 
 	    /// defines the protocol to use to retrieve slices of the reference archive (where the external catalogue resides)
 	void set_ref_entrepot(const entrepot & entr) { if(x_ref_entrepot != NULL) delete x_ref_entrepot; x_ref_entrepot = entr.clone(); if(x_ref_entrepot == NULL) throw Ememory("archive_options_read::set_entrepot"); };
+
 
 
 
@@ -198,6 +205,7 @@ namespace libdar
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
 	bool get_ignore_signature_check_failure() const { return x_ignore_signature_check_failure; };
+	bool get_multi_threaded() const { return x_multi_threaded; };
 
 	    // All methods that follow concern the archive where to fetch the (isolated) catalogue from
 	bool is_external_catalogue_set() const { return external_cat; };
@@ -224,6 +232,7 @@ namespace libdar
 	infinint x_slice_min_digits;
 	entrepot *x_entrepot;
 	bool x_ignore_signature_check_failure;
+	bool x_multi_threaded;
 
 
 	    // external catalogue relative fields
@@ -481,6 +490,10 @@ namespace libdar
 	    /// defines the FSA (Filesystem Specific Attribute) to only consider (by default all FSA activated at compilation time are considered)
 	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
 
+	    /// whether libdar is allowed to spawn several threads to possibily work faster on multicore CPU (requires libthreadar)
+	void set_multi_threaded(bool val) { x_multi_threaded = val; };
+
+
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
@@ -537,6 +550,7 @@ namespace libdar
 	bool get_ignore_unknown_inode_type() const { return x_ignore_unknown; };
 	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
+	bool get_multi_threaded() const { return x_multi_threaded; };
 
     private:
 	archive *x_ref_arch; //< just contains the address of an existing object, no local copy of object is done here
@@ -593,6 +607,7 @@ namespace libdar
 	bool x_ignore_unknown;
 	entrepot *x_entrepot;
 	fsa_scope x_scope;
+	bool x_multi_threaded;
 
 	void destroy();
 	void copy_from(const archive_options_create & ref);
@@ -707,6 +722,9 @@ namespace libdar
 	    /// defines the protocol to use for slices
 	void set_entrepot(const entrepot & entr);
 
+	    /// whether libdar is allowed to created several thread to work possibily faster on multicore CPU (require libthreadar)
+	void set_multi_threaded(bool val) { x_multi_threaded = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -735,6 +753,7 @@ namespace libdar
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	bool get_sequential_marks() const { return x_sequential_marks; };
 	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
+	bool get_multi_threaded() const { return x_multi_threaded; };
 
 
     private:
@@ -762,6 +781,7 @@ namespace libdar
 	infinint x_slice_min_digits;
 	bool x_sequential_marks;
 	entrepot *x_entrepot;
+	bool x_multi_threaded;
 
 	void copy_from(const archive_options_isolate & ref);
 	void destroy();
@@ -920,6 +940,9 @@ namespace libdar
 	    /// defines the FSA (Filesystem Specific Attribute) to only consider (by default all FSA are considered)
 	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
 
+	    /// whether libdar is allowed to spawn several threads to possibily work faster on multicore CPU (requires libthreadar)
+	void set_multi_threaded(bool val) { x_multi_threaded = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -963,6 +986,7 @@ namespace libdar
 	infinint get_slice_min_digits() const { return x_slice_min_digits; };
 	const entrepot & get_entrepot() const { if(x_entrepot == NULL) throw SRC_BUG; return *x_entrepot; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
+	bool get_multi_threaded() const { return x_multi_threaded; };
 
     private:
 	archive * x_ref;    //< points to an external existing object, must never be deleted by "this"
@@ -1004,6 +1028,7 @@ namespace libdar
 	infinint x_slice_min_digits;
 	entrepot *x_entrepot;
 	fsa_scope x_scope;
+	bool x_multi_threaded;
 
 	void destroy();
 	void copy_from(const archive_options_merge & ref);
