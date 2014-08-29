@@ -357,8 +357,11 @@ namespace libdar
 		msgt = tmp;
 	}
 
-	buffer.skip_to_eof();
-	buffer.write(x_input + 1, size - 1);
+	if(msgt != msg_type::data)
+	{
+	    buffer.skip_to_eof();
+	    buffer.write(x_input + 1, size - 1);
+	}
 
 	return !msg_continues(msgt);
     }
