@@ -42,6 +42,12 @@ else
 endif
 endif
 
+if WITH_LIBTHREADAR
+    LIBTHREADAR_DEP_MODULES=generic_thread.cpp slave_thread.cpp messaging.cpp
+else
+    LIBTHREADAR_DEP_MODULES=
+endif
+
 AM_LDFLAGS = @LTLIBINTL@  $(LD_PROF)
 LDADD = $(GPGME_LIBS)
 lib_LTLIBRARIES = $(MYLIB)
@@ -85,14 +91,14 @@ libdar.pc : libdar.pc.tmpl
 # header files that are internal to libdar and that must not be installed (make install)
 noinst_HEADERS = defile.hpp ea_filesystem.hpp filesystem.hpp filtre.hpp header.hpp macro_tools.hpp null_file.hpp sar.hpp sar_tools.hpp terminateur.hpp tronc.hpp zapette.hpp cygwin_adapt.hpp elastic.hpp database_header.hpp sparse_file.hpp semaphore.hpp memory_check.hpp slice_layout.hpp messaging.hpp slave_thread.hpp generic_thread.hpp
 
-ALL_SOURCES = catalogue.cpp catalogue.hpp compressor.cpp compressor.hpp deci.cpp deci.hpp defile.cpp defile.hpp ea.cpp ea.hpp ea_filesystem.cpp ea_filesystem.hpp erreurs.cpp erreurs.hpp etage.cpp etage.hpp filesystem.cpp filesystem.hpp filtre.cpp filtre.hpp generic_file.cpp generic_file.hpp header.cpp header_version.cpp libdar.cpp macro_tools.cpp mask.cpp path.cpp sar.cpp sar_tools.cpp scrambler.cpp storage.cpp terminateur.cpp tools.cpp tronc.cpp tuyau.cpp user_interaction.cpp wrapperlib.cpp zapette.cpp archive.cpp crypto.cpp cache.cpp cache.hpp int_tools.cpp tronconneuse.cpp elastic.cpp thread_cancellation.cpp mask_list.cpp database.cpp database_header.cpp data_tree.cpp string_file.cpp statistics.cpp criterium.cpp memory_file.cpp tlv.cpp tlv_list.cpp label.cpp trontextual.cpp archive_options.cpp user_group_bases.cpp escape.cpp escape_catalogue.cpp pile.cpp sparse_file.cpp crc.cpp archive_version.cpp mem_ui.cpp fichier_global.cpp fichier_local.cpp hash_fichier.cpp secu_string.cpp semaphore.cpp integers.cpp compile_time_features.cpp memory_check.cpp entrepot.cpp entrepot_local.cpp list_entry.cpp filesystem_specific_attribute.cpp fsa_family.cpp capabilities.cpp on_pool.cpp mem_cluster.cpp mem_sized.cpp mem_allocator.cpp memory_pool.cpp datetime.cpp crypto_asym.cpp generic_file_overlay_for_gpgme.cpp secu_memory_file.cpp crypto_sym.cpp range.cpp slice_layout.cpp slave_thread.cpp generic_thread.cpp messaging.cpp
+ALL_SOURCES = catalogue.cpp catalogue.hpp compressor.cpp compressor.hpp deci.cpp deci.hpp defile.cpp defile.hpp ea.cpp ea.hpp ea_filesystem.cpp ea_filesystem.hpp erreurs.cpp erreurs.hpp etage.cpp etage.hpp filesystem.cpp filesystem.hpp filtre.cpp filtre.hpp generic_file.cpp generic_file.hpp header.cpp header_version.cpp libdar.cpp macro_tools.cpp mask.cpp path.cpp sar.cpp sar_tools.cpp scrambler.cpp storage.cpp terminateur.cpp tools.cpp tronc.cpp tuyau.cpp user_interaction.cpp wrapperlib.cpp zapette.cpp archive.cpp crypto.cpp cache.cpp cache.hpp int_tools.cpp tronconneuse.cpp elastic.cpp thread_cancellation.cpp mask_list.cpp database.cpp database_header.cpp data_tree.cpp string_file.cpp statistics.cpp criterium.cpp memory_file.cpp tlv.cpp tlv_list.cpp label.cpp trontextual.cpp archive_options.cpp user_group_bases.cpp escape.cpp escape_catalogue.cpp pile.cpp sparse_file.cpp crc.cpp archive_version.cpp mem_ui.cpp fichier_global.cpp fichier_local.cpp hash_fichier.cpp secu_string.cpp semaphore.cpp integers.cpp compile_time_features.cpp memory_check.cpp entrepot.cpp entrepot_local.cpp list_entry.cpp filesystem_specific_attribute.cpp fsa_family.cpp capabilities.cpp on_pool.cpp mem_cluster.cpp mem_sized.cpp mem_allocator.cpp memory_pool.cpp datetime.cpp crypto_asym.cpp generic_file_overlay_for_gpgme.cpp secu_memory_file.cpp crypto_sym.cpp range.cpp slice_layout.cpp
 
 libdar_la_LDFLAGS = -version-info $(LIBDAR_VERSION_IN)
-libdar_la_SOURCES = $(ALL_SOURCES) real_infinint.cpp
+libdar_la_SOURCES = $(ALL_SOURCES) real_infinint.cpp $(LIBTHREADAR_DEP_MODULES)
 
 libdar32_la_LDFLAGS = -version-info $(LIBDAR_VERSION_IN)
-libdar32_la_SOURCES = $(ALL_SOURCES) limitint.cpp
+libdar32_la_SOURCES = $(ALL_SOURCES) limitint.cpp $(LIBTHREADAR_DEP_MODULES)
 
 libdar64_la_LDFLAGS = -version-info $(LIBDAR_VERSION_IN)
-libdar64_la_SOURCES = $(ALL_SOURCES) limitint.cpp
+libdar64_la_SOURCES = $(ALL_SOURCES) limitint.cpp $(LIBTHREADAR_DEP_MODULES)
 

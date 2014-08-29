@@ -28,6 +28,7 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include "tronconneuse.hpp"
 #include "slave_thread.hpp"
 
 using namespace std;
@@ -51,7 +52,6 @@ namespace libdar
 
     void slave_thread::inherited_run()
     {
-
 	try
 	{
 	    num = 0;
@@ -158,8 +158,6 @@ namespace libdar
 	    // note ptr and num are relative
 	    // to the last block read which
 	    // must be released/recycled calling release_answer()
-
-
     }
 
     void slave_thread::send_answer()
@@ -216,6 +214,7 @@ namespace libdar
     {
 	bool need_answer = false;
 	contextual *ct_data = dynamic_cast<contextual *>(data);
+	tronconneuse *tronco_data = dynamic_cast<tronconneuse *>(data);
 
 	answer.clear();
 	switch(order.get_type())
@@ -235,6 +234,8 @@ namespace libdar
 	    break;
 	case msg_type::order_sync_write:
 	    data->sync_write();
+	    answer.set_type(msg_type::answr_sync_write_done);
+	    need_answer = true;
 	    break;
 	case msg_type::order_skip:
 	    answer.set_type(msg_type::answr_skip_done);
@@ -327,6 +328,19 @@ namespace libdar
 	    {
 		answer.set_type(msg_type::answr_dataname);
 		answer.set_label(ct_data->get_data_name());
+		need_answer = true;
+	    }
+	    break;
+	case msg_type::order_write_eof:
+	    if(tronco_data == NULL)
+	    {
+		answer.set_type(msg_type::answr_not_tronconneuse);
+		need_answer = true;
+	    }
+	    else
+	    {
+		tronco_data->write_end_of_file();
+		answer.set_type(msg_type::answr_wrote_eof);
 		need_answer = true;
 	    }
 	    break;

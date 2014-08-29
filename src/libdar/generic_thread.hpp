@@ -68,6 +68,9 @@ namespace libdar
 	virtual bool is_an_old_start_end_archive() const;
 	virtual const label & get_data_name() const;
 
+	    // when tronconneuse is given as generic_file to manage
+	bool write_end_of_file(); //< \return true if the remote generic_file could proceed to the order (object from class tronconneuse or inherited class) else false.
+
     protected:
 	    // inherited from generic_file
 	virtual void inherited_read_ahead(const infinint & amount);
@@ -75,6 +78,7 @@ namespace libdar
 	virtual void inherited_write(const char *a, U_I size);
 	virtual void inherited_sync_write();
 	virtual void inherited_terminate();
+
 
     private:
 	libthreadar::tampon<char> toslave;

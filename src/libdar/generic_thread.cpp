@@ -290,9 +290,33 @@ namespace libdar
 	    throw Erange("generic_thread::get_data_name", gettext("Remote threaded generic_file does not inherit from contextual class"));
 	me->check_answer(msg_type::answr_dataname);
 	me->dataname = answer.get_label();
-	me-> release_block_answer();
+	me->release_block_answer();
 
 	return dataname;
+    }
+
+    bool generic_thread::write_end_of_file()
+    {
+	bool ret;
+
+	order.clear();
+	order.set_type(msg_type::order_write_eof);
+	send_order();
+	read_answer();
+	switch(answer.get_type())
+	{
+	case msg_type::answr_not_tronconneuse:
+	    ret = false;
+	    break;
+	case msg_type::answr_wrote_eof:
+	    ret = true;
+	    break;
+	default:
+	    release_block_answer();
+	    throw Erange("generic_thread::write_end_of_file", gettext("Remote threaded generic_file does not inherit from tronconneuse class"));
+	}
+
+	return ret;
     }
 
     void generic_thread::inherited_read_ahead(const infinint & amount)
@@ -402,7 +426,9 @@ namespace libdar
 	    // order completed
 
 	send_order();
-
+	read_answer();
+	check_answer(msg_type::answr_sync_write_done);
+	release_block_answer();
     }
 
     void generic_thread::inherited_terminate()
@@ -465,13 +491,17 @@ namespace libdar
 	switch(answer.get_type())
 	{
 	case msg_type::answr_exception:
+	    release_block_answer();
 	    remote->join();
 	    throw SRC_BUG; // join should rethrow the exception that has been raised in the thread "remote"
 	default:
 	    if(answer.get_type() == expected)
 		break;
 	    else
+	    {
+		release_block_answer();
 		throw SRC_BUG;
+	    }
 	}
     }
 

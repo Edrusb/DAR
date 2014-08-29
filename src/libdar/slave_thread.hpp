@@ -38,9 +38,9 @@
 #include "messaging.hpp"
 #include "erreurs.hpp"
 
-
 namespace libdar
 {
+
 
     class slave_thread : public libthreadar::thread, public on_pool
     {

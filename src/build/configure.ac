@@ -1075,6 +1075,7 @@ AM_CONDITIONAL([USE_DOXYGEN], [test "$doxygen" = "yes"])
 AM_CONDITIONAL([USE_GROFF], [test "$groff" = "yes"])
 AM_CONDITIONAL([PROFILING], [test "$profiling" = "yes"])
 AM_CONDITIONAL([BSD_SED], [test "$local_sed" = "bsd"])
+AM_CONDITIONAL([WITH_LIBTHREADAR], [test "$local_threadar" = "yes"])
 AC_SUBST(UPX_PROG, [upx])
 AC_SUBST(DOXYGEN_PROG, [doxygen])
 

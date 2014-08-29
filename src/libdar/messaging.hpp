@@ -49,6 +49,7 @@ namespace libdar
 	order_read,               //< + U_I      : message is a read order (with expected size to be read ahead)
         answr_read_eof,           //< + data     : message from slave meaning slave has finished reading and expects new order, does not mean eof
 	order_sync_write,         //< no argument: order to flush all pending writes
+	answr_sync_write_done,    //< no argument: answer from the slave that all data have been sync written
 	order_skip,               //< + infinint : message is an order to seek at given position
 	order_skip_begin,         //< + infinint : message is an order to seek but the seek info continues in the next message
 	order_skip_to_eof,        //< no argument: message requesting slave to skip to end of file
@@ -70,6 +71,9 @@ namespace libdar
 	answr_dataname,           //< + label    : slave answer containing the dataname
 	answr_not_contextual,     //< no argument: slave answer if the managed generic file is not a contextual object
 	answr_exception,          //< no argument: last operation generated an exception for at slave side, slave has probably died after that
+	order_write_eof,          //< no argument: for tronconneuse managed object only, order to drop the end of file data
+	answr_not_tronconneuse,   //< no argument: slave answer if the managed generic_file is not a tronconneuse object
+	answr_wrote_eof,          //< no argument: slave answer that eof has been written
 	order_end_of_xmit         //< no argument: message is the last message and implies freedom of the slave
     };
 
