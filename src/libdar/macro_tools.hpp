@@ -73,6 +73,34 @@ namespace libdar
     extern const std::string LIBDAR_STACK_LABEL_UNCYPHERED;
     extern const std::string LIBDAR_STACK_LABEL_LEVEL1;
 
+	/// setup the given pile object to contain a stack of generic_files suitable to read an archive
+	///
+	/// \note the stack has the following contents depending on given options
+	///
+	/// +<top>                                          LIBDAR_STACK_LABEL_
+	/// +----------------------------------------------+---------------------+
+	/// | [ generic_thread ]                           |_UNCOMPRESSED        |
+	/// | compressor                                   |v    v    v          |
+	/// +----------------------------------------------+---------------------+
+	/// | [ generic_thread ]                           |_CLEAR               |
+	/// | [ escape ]                                   |v   v   v            |
+	/// +----------------------------------------------+v---v---v------------+
+	/// | [ generic_thread ]                           |_UNCYPHERED          |
+	/// | cache  |  crypto_sym  |  scrambler           |v   v   v            |
+	/// +----------------------------------------------+---------------------+
+	/// | [ generic_thread ]                           |_LEVEL1              |
+	/// | [ tronc ]                                    |v   v   v            |
+	/// | trivial_sar  |  zapette  |  sar              |v   v   v            |
+	/// +----------------------------------------------+---------------------+
+	/// +<bottom>
+	///
+	/// \note generic_thread objects are only present in the stack if multi-thread is active
+	/// \note escape is present unless tape mark have been disabled at archive creation time
+	/// \note tronc is not present in sequential read mode
+	/// \note _UNCOMPRESSED label is associated to the top of the stack
+	/// \note _CLEAR is associated to the generic_thread below compressor else escape else
+	/// the cache or crypto_sym or scrambler which then has two Labels (_CLEAR and _UNCYPHERED)
+
     extern void macro_tools_open_archive(user_interaction & dialog,     //< for user interaction
 					 memory_pool *pool,             //< whether memory_pool allocation has to be performed
 					 const entrepot &where,         //< slices location
@@ -162,6 +190,34 @@ namespace libdar
 	/// \param[in]  internal_name common label to all slices
 	/// \param[in]  data_name to use in slice header
 	/// \param[in]  multi_threaded true if libdar can spawn several thread to work
+	///
+	/// \note the stack has the following contents depending on given options
+	///
+	/// +<top>                                          LIBDAR_STACK_LABEL_
+	/// +----------------------------------------------+---------------------+
+	/// | [ generic_thread ]                           |                     |
+	/// | compressor                                   |                     |
+	/// +----------------------------------------------+---------------------+
+	/// | [ generic_thread ]                           |                     |
+	/// | [ escape ]                                   |                     |
+	/// +----------------------------------------------+---------------------+
+	/// | [ generic_thread ]                           |                     |
+	/// | cache  |  crypto_sym  |  scrambler           |                     |
+	/// +----------------------------------------------+---------------------+
+	/// | [ generic_thread ]                           |                     |
+	/// | [ cache ]                                    |_CACHE_PIPE          |
+	/// | trivial_sar  |  null_file  |  sar            |                     |
+	/// +----------------------------------------------+---------------------+
+	/// +<bottom>
+	///
+	/// \note the bottom cache layer is only present when trivial_sar is used to write on a pipe.
+	/// trivial_sar used to write a non sliced archive does not use a cache layer above it
+	/// \note the top cache is only used in place of crypto_sym or scrambler when no encryption
+	/// is required and the cache layer labelled _CACHE_PIPE is absent.
+	/// \note escape layer is present by default unless tape marks have been disabled
+	/// \note the generic_thread are inserted in the stack if multi-threading is possible and allowed
+	///
+
     extern void macro_tools_create_layers(user_interaction & dialog,
 					  pile & layers,
 					  header_version & ver,
