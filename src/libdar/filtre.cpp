@@ -41,6 +41,9 @@ extern "C"
 #include "sparse_file.hpp"
 #include "semaphore.hpp"
 #include "deci.hpp"
+#if LIBTHREADAR_AVAILABLE
+#include "generic_thread.hpp"
+#endif
 
 using namespace std;
 
@@ -57,7 +60,8 @@ namespace libdar
 			   memory_pool *pool,        //< set to NULL or points to the memory_pool to use
 			   const string &info_quoi,  //< full path name of the file to save (including its name)
 			   entree * & e,             //< entree to save to archive
-			   compressor *stock,        //< where to write to
+			   pile & stack,             //< where to write to
+			   compressor *compr,        //< pointer to the compressor layer inside the given above stack
 			   bool info_details,        //< verbose output to user
 			   bool display_treated,     //< add an information line before treating a file
 			   bool alter_atime,         //< whether to set back atime of filesystem
@@ -74,8 +78,8 @@ namespace libdar
     static bool save_ea(user_interaction & dialog,
 			const string & info_quoi,
 			inode * & ino,
+			pile & stack,
 			compressor *stock,
-			const inode * ref,
 			bool display_treated);
 
     static void restore_atime(const string & chemin, const inode * & ptr);
@@ -83,6 +87,7 @@ namespace libdar
     static bool save_fsa(user_interaction & dialog,
 			 const string & info_quoi,
 			 inode * & ino,
+			 pile & stack,
 			 compressor *stock,
 			 bool display_treated);
 
@@ -611,7 +616,7 @@ namespace libdar
 				if(known_hard_link)
 				{
 					// no need to update the semaphore here as no data is read and no directory is expected here
-				    cat.pre_add(e, stockage); // if cat is a escape_catalogue, this adds an escape sequence and entry info in the archive
+				    cat.pre_add(e); // if cat is a escape_catalogue, this adds an escape sequence and entry info in the archive
 				    cat.add(e);
 				    e = NULL;
 				    st.incr_hard_links();
@@ -795,6 +800,7 @@ namespace libdar
 						       pool,
 						       juillet.get_string(),
 						       e,
+						       stack,
 						       stockage,
 						       info_details,
 						       display_treated,
@@ -821,20 +827,20 @@ namespace libdar
 					if(e_ino->ea_get_saved_status() != inode::ea_removed)
 					{
 					    if(e_ino->ea_get_saved_status() == inode::ea_full)
-						cat.pre_add_ea(e, stockage);
-					    if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, display_treated))
+						cat.pre_add_ea(e);
+					    if(save_ea(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
 						st.incr_ea_treated();
-					    cat.pre_add_ea_crc(e, stockage);
+					    cat.pre_add_ea_crc(e);
 					}
 
 					    // PERFORMING ACTION FOR FSA
 
 					if(e_ino->fsa_get_saved_status() == inode::fsa_full)
 					{
-					    cat.pre_add_fsa(e, stockage);
-					    if(save_fsa(dialog, juillet.get_string(), e_ino, stockage, display_treated))
+					    cat.pre_add_fsa(e);
+					    if(save_fsa(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
 						st.incr_fsa_treated();
-					    cat.pre_add_fsa_crc(e, stockage);
+					    cat.pre_add_fsa_crc(e);
 					}
 
 					    // CLEANING UP MEMORY FOR PLAIN FILES
@@ -986,7 +992,7 @@ namespace libdar
 			sem.lower();
 			if(fixed_date == 0)
 			    ref.compare(e, f); // makes the comparison in the reference catalogue go to parent directory
-			cat.pre_add(e, stockage); // adding a mark and dropping EOD entry in the archive if cat is an escape_catalogue object (else, does nothing)
+			cat.pre_add(e); // adding a mark and dropping EOD entry in the archive if cat is an escape_catalogue object (else, does nothing)
 			if(display_finished)
 			{
 			    const directory & cur = cat.get_current_add_dir();
@@ -1011,7 +1017,10 @@ namespace libdar
 	    catch(Ethread_cancel & e)
 	    {
 		if(!e.immediate_cancel())
+		{
+		    stack.sync_write_above(stockage);
 		    stockage->resume_compression();
+		}
 		throw Ethread_cancel_with_attr(e.immediate_cancel(), e.get_flag(), fs.get_last_etoile_ref());
 	    }
 	}
@@ -1022,6 +1031,7 @@ namespace libdar
 	    throw;
 	}
 
+	stack.sync_write_above(stockage);
 	stockage->resume_compression();
     }
 
@@ -2413,12 +2423,13 @@ namespace libdar
 
 			// saving inode's data
 
-		    cat.pre_add(e, stockage);
+		    cat.pre_add(e);
 
 		    if(!save_inode(dialog,
 				   pool,
 				   juillet.get_string(),
 				   e_var,
+				   stack,
 				   stockage,
 				   info_details,
 				   display_treated,
@@ -2446,29 +2457,29 @@ namespace libdar
 
 		    if(e_ino->ea_get_saved_status() == inode::ea_full)
 		    {
-			cat.pre_add_ea(e, stockage);
-			if(save_ea(dialog, juillet.get_string(), e_ino, stockage, NULL, display_treated))
+			cat.pre_add_ea(e);
+			if(save_ea(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
 			{
 			    if(e_ino->fsa_get_saved_status() != inode::fsa_full)
 				e_ino->change_efsa_location(stockage);
 				// change stockage location will be done only after copying FSA (see below)
 			}
-			cat.pre_add_ea_crc(e, stockage);
+			cat.pre_add_ea_crc(e);
 		    }
 
 			// saving inode's FSA
 		    if(e_ino->fsa_get_saved_status() == inode::fsa_full)
 		    {
-			cat.pre_add_fsa(e, stockage);
-			if(save_fsa(dialog, juillet.get_string(), e_ino, stockage, display_treated))
+			cat.pre_add_fsa(e);
+			if(save_fsa(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
 			    e_ino->change_efsa_location(stockage);
 			    // now we can change ea/fsa_location to "stockage"
-			cat.pre_add_fsa_crc(e, stockage);
+			cat.pre_add_fsa_crc(e);
 		    }
 		}
 		else // not an inode
 		{
-		    cat.pre_add(e, stockage);
+		    cat.pre_add(e);
 		    if(e_mir != NULL && (e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == inode::ea_full))
 			if(display_treated)
 			    dialog.warning(string(gettext("Adding Hard link to archive: "))+juillet.get_string());
@@ -2571,7 +2582,8 @@ namespace libdar
 			   memory_pool *pool,
 			   const string & info_quoi,
 			   entree * & e,
-			   compressor *stock,
+			   pile & stack,
+			   compressor *compr,
 			   bool info_details,
 			   bool display_treated,
 			   bool alter_atime,
@@ -2592,7 +2604,7 @@ namespace libdar
 	mirage *mir = dynamic_cast<mirage *>(e);
 	inode *ino = dynamic_cast<inode *>(e);
 	bool resave_uncompressed = false;
-	infinint rewinder = stock->get_position(); // we skip back here is data must be saved uncompressed
+	infinint rewinder = stack.get_position(); // we skip back here if data must be saved uncompressed
 
 	if(mir != NULL)
 	{
@@ -2605,13 +2617,13 @@ namespace libdar
 	{
 		// PRE RECORDING THE INODE (for sequential reading)
 
-	    cat.pre_add(e, stock);
+	    cat.pre_add(e);
 
 		// TREATING SPECIAL CASES
 
 	    if(ino == NULL)
 		return true;
-	    if(stock == NULL)
+	    if(compr == NULL)
 		throw SRC_BUG;
 	    if(ino->get_saved_status() != s_saved)
 	    {
@@ -2643,11 +2655,12 @@ namespace libdar
 		{
 		    do // while "loop" is true, this is the INNER LOOP
 		    {
-			stock->flush_write(); // sanity action
-
 			loop = false;
-			infinint start = stock->get_position();
+			infinint start = stack.get_position();
 			generic_file *source = NULL;
+
+			    //////////////////////////////
+			    // preparing the source
 
 			try
 			{
@@ -2675,15 +2688,23 @@ namespace libdar
 			}
 			catch(...)
 			{
-			    cat.pre_add_failed_mark(stock);
+			    cat.pre_add_failed_mark();
 			    throw;
 			}
+
+			    //////////////////////////////
+			    // preparing the destination
+
 
 			if(source != NULL)
 			{
 			    try
 			    {
-				generic_file *dest = stock;
+#ifdef LIBTHREADAR_AVAILABLE
+				generic_thread *gt = NULL;
+#else
+				generic_file *gt = NULL;
+#endif
 				sparse_file *dst_hole = NULL;
 				infinint crc_size = tools_file_size_to_crc_size(fic->get_size());
 				crc * val = NULL;
@@ -2694,10 +2715,11 @@ namespace libdar
 				source->skip(0);
 				source->read_ahead(fic->get_size());
 
+				stack.sync_write_above(compr);
 				if(keep_mode == file::keep_compressed || fic->get_compression_algo_write() == none)
-				    stock->suspend_compression();
+				    compr->suspend_compression();
 				else
-				    stock->resume_compression();
+				    compr->resume_compression();
 
 				try
 				{
@@ -2705,20 +2727,32 @@ namespace libdar
 				    {
 					    // creating the sparse_file to copy data to destination
 
-					dst_hole = new (pool) sparse_file(stock, hole_size);
+					dst_hole = new (pool) sparse_file(stack.top(), hole_size);
 					if(dst_hole == NULL)
 					    throw Ememory("save_inode");
-					dest = dst_hole;
+					stack.push(dst_hole);
+#ifdef LIBTHREADAR_AVAILABLE
+					gt = new (pool) generic_thread(stack.top());
+					if(gt == NULL)
+					    throw Ememory("save_inode");
+					stack.push(gt);
+#endif
 				    }
+
+					//////////////////////////////
+					// proceeding to file's data backup
 
 				    if(!compute_crc)
 					crc_available = fic->get_crc(original);
 				    else
 					crc_available = false;
 
-				    source->copy_to(*dest, crc_size, val);
+				    source->copy_to(stack, crc_size, val);
 				    if(val == NULL)
 					throw SRC_BUG;
+
+					//////////////////////////////
+					// checking crc value and storing it in catalogue
 
 				    if(compute_crc)
 					fic->set_crc(*val);
@@ -2735,8 +2769,12 @@ namespace libdar
 					}
 				    }
 
+					//////////////////////////////
+					// checking whether saved files used sparse_file datastructure
+
 				    if(dst_hole != NULL)
 				    {
+					stack.sync_write_above(dst_hole);
 					dst_hole->sync_write();
 					if(!dst_hole->has_seen_hole() && !dst_hole->has_escaped_data())
 					    fic->set_sparse_file_detection_write(false);
@@ -2752,16 +2790,26 @@ namespace libdar
 				}
 				catch(...)
 				{
-				    if(dst_hole != NULL)
-				    {
-					delete dst_hole;
-					dst_hole = NULL;
-					dest = NULL;
-				    }
 				    if(val != NULL)
 				    {
 					delete val;
 					val = NULL;
+				    }
+
+				    if(gt != NULL)
+				    {
+					if(stack.pop() != gt)
+					    throw SRC_BUG;
+					delete gt;
+					gt = NULL;
+				    }
+
+				    if(dst_hole != NULL)
+				    {
+					if(stack.pop() != dst_hole)
+					    throw SRC_BUG;
+					delete dst_hole;
+					dst_hole = NULL;
 				    }
 				    throw;
 				}
@@ -2772,19 +2820,27 @@ namespace libdar
 				    val = NULL;
 				}
 
+				if(gt != NULL)
+				{
+				    if(stack.pop() != gt)
+					throw SRC_BUG;
+				    gt->terminate();
+				    delete gt;
+				    gt = NULL;
+				}
+
 				if(dst_hole != NULL)
 				{
+				    if(stack.pop() != dst_hole)
+					throw SRC_BUG;
 				    dst_hole->terminate();
 				    delete dst_hole;
 				    dst_hole = NULL;
-				    dest = NULL;
 				}
 
-				stock->sync_write();
-
-				if(stock->get_position() >= start)
+				if(stack.get_position() >= start)
 				{
-				    storage_size = stock->get_position() - start;
+				    storage_size = stack.get_position() - start;
 				    fic->set_storage_size(storage_size);
 				}
 				else
@@ -2806,7 +2862,7 @@ namespace libdar
 				//////////////////////////////
 				// adding the data CRC if escape marks are used
 
-			    cat.pre_add_crc(ino, stock);
+			    cat.pre_add_crc(ino);
 
 				//////////////////////////////
 				// checking if compressed data is smaller than uncompressed one
@@ -2815,15 +2871,15 @@ namespace libdar
 			       && keep_mode != file::keep_compressed
 			       && fic->get_compression_algo_write() != none)
 			    {
-				infinint current_pos_tmp = stock->get_position();
+				infinint current_pos_tmp = stack.get_position();
 
 				if(current_pos_tmp <= rewinder)
 				    throw SRC_BUG; // we are positionned before the stard of the current inode dump!
-				if(stock->skippable(generic_file::skip_backward, current_pos_tmp - rewinder))
+				if(stack.skippable(generic_file::skip_backward, current_pos_tmp - rewinder))
 				{
 				    try
 				    {
-					if(!stock->skip(rewinder))
+					if(!stack.skip(rewinder))
 					    throw Erange("save_inode", "Start position is out of reach");
 					if(!resave_uncompressed)
 					    resave_uncompressed = true;
@@ -2842,7 +2898,7 @@ namespace libdar
 					    dialog.warning(info_quoi + gettext(" : Failed resaving uncompressed the inode data"));
 					    // ignoring the error and continuing
 					resave_uncompressed = false;
-					if(stock->get_position() != current_pos_tmp)
+					if(stack.get_position() != current_pos_tmp)
 					    throw SRC_BUG;
 				    }
 				}
@@ -2878,15 +2934,15 @@ namespace libdar
 				    if(current_repeat_count < repeat_count)
 				    {
 					current_repeat_count++;
-					infinint current_pos_tmp = stock->get_position();
+					infinint current_pos_tmp = stack.get_position();
 
 					try
 					{
-					    if(stock->skippable(generic_file::skip_backward, storage_size))
+					    if(stack.skippable(generic_file::skip_backward, storage_size))
 					    {
-						if(!stock->skip(start))
+						if(!stack.skip(start))
 						{
-						    if(!stock->skip(current_repeat_count))
+						    if(!stack.skip(current_repeat_count))
 							throw SRC_BUG;
 						    throw Erange("",""); // used locally
 						}
@@ -2897,7 +2953,7 @@ namespace libdar
 					catch(...)
 					{
 					    current_wasted_bytes += current_pos_tmp - start;
-					    if(stock->get_position() != current_pos_tmp)
+					    if(stack.get_position() != current_pos_tmp)
 						throw SRC_BUG;
 					}
 
@@ -2905,8 +2961,8 @@ namespace libdar
 					{
 					    if(info_details)
 						dialog.warning(tools_printf(gettext("WARNING! File modified while reading it for backup. Performing retry %i of %i"), &current_repeat_count, &repeat_count));
-					    if(stock->get_position() != start)
-						cat.pre_add_waste_mark(stock);
+					    if(stack.get_position() != start)
+						cat.pre_add_waste_mark();
 					    loop = true;
 
 						// updating the last modification date of file
@@ -2926,7 +2982,7 @@ namespace libdar
 				    {
 					dialog.warning(string(gettext("WARNING! File modified while reading it for backup, but no more retry allowed: ")) + info_quoi);
 					fic->set_dirty(true);
-					cat.pre_add_dirty(stock); // when in sequential reading
+					cat.pre_add_dirty(); // when in sequential reading
 					ret = false;
 				    }
 				}
@@ -2968,8 +3024,8 @@ namespace libdar
     static bool save_ea(user_interaction & dialog,
 			const string & info_quoi,
 			inode * & ino,
-			compressor *stock,
-			const inode * ref,
+			pile & stack,
+			compressor *compr,
 			bool display_treated)
     {
         bool ret = false;
@@ -2986,22 +3042,22 @@ namespace libdar
 		    {
 			if(display_treated)
 			    dialog.warning(string(gettext("Saving Extended Attributes for ")) + info_quoi);
-			ino->ea_set_offset(stock->get_position());
-			stock->resume_compression();  // always compress EA (no size or filename consideration)
-			stock->reset_crc(tools_file_size_to_crc_size(ino->ea_get_size())); // start computing CRC for any read/write on stock
+			ino->ea_set_offset(stack.get_position());
+			stack.sync_write_above(compr);
+			compr->resume_compression();  // always compress EA (no size or filename consideration)
+			stack.reset_crc(tools_file_size_to_crc_size(ino->ea_get_size())); // start computing CRC for any read/write on stack
 			try
 			{
-			    ino->get_ea()->dump(*stock);
+			    ino->get_ea()->dump(stack);
 			}
 			catch(...)
 			{
-			    val = stock->get_crc(); // this keeps "stock" in a coherent status
+			    val = stack.get_crc(); // this keeps "stack" in a coherent status
 			    throw;
 			}
-			val = stock->get_crc();
+			val = stack.get_crc();
 			ino->ea_set_crc(*val);
 			ino->ea_detach();
-			stock->flush_write();
 			ret = true;
 		    }
 		    catch(...)
@@ -3057,7 +3113,8 @@ namespace libdar
     static bool save_fsa(user_interaction & dialog,
 			 const string & info_quoi,
 			 inode * & ino,
-			 compressor *stock,
+			 pile & stack,
+			 compressor *compr,
 			 bool display_treated)
     {
         bool ret = false;
@@ -3074,32 +3131,34 @@ namespace libdar
 		    {
 			if(display_treated)
 			    dialog.warning(string(gettext("Saving Filesystem Specific Attributes for ")) + info_quoi);
-			ino->fsa_set_offset(stock->get_position());
-			stock->suspend_compression(); // never compress EA (no size or filename consideration)
+			ino->fsa_set_offset(stack.get_position());
+			stack.sync_write_above(compr);
+			compr->suspend_compression(); // never compress EA (no size or filename consideration)
 			try
 			{
-			    stock->reset_crc(tools_file_size_to_crc_size(ino->fsa_get_size())); // start computing CRC for any read/write on stock
+			    stack.reset_crc(tools_file_size_to_crc_size(ino->fsa_get_size())); // start computing CRC for any read/write on stack
 			    try
 			    {
-				ino->get_fsa()->write(*stock);
+				ino->get_fsa()->write(stack);
 			    }
 			    catch(...)
 			    {
-				val = stock->get_crc(); // this keeps "stock" in a coherent status
+				val = stack.get_crc(); // this keeps "" in a coherent status
 				throw;
 			    }
-			    val = stock->get_crc();
+			    val = stack.get_crc();
 			    ino->fsa_set_crc(*val);
 			    ino->fsa_detach();
-			    stock->flush_write();
 			    ret = true;
 			}
 			catch(...)
 			{
-			    stock->resume_compression();
+			    stack.sync_write_above(compr);
+			    compr->resume_compression();
 			    throw;
 			}
-			stock->resume_compression();
+			stack.sync_write_above(compr);
+			compr->resume_compression();
 		    }
 		    catch(...)
 		    {

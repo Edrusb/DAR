@@ -136,13 +136,13 @@ namespace libdar
 	bool skip_to_eof();
 	bool skip_relative(S_I x);
 	infinint get_position();
-	generic_file *get_below() const { return x_below; };
 
     protected:
 	void inherited_read_ahead(const infinint & amount);
 	U_I inherited_read(char *a, U_I size);
 	void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() { flush_write(); };
+	void inherited_flush_read() { flush_write(); clean_data(); };
 	void inherited_terminate() { flush_or_clean(); };
 
 	void change_fixed_escape_sequence(unsigned char value) { fixed_sequence[0] = value; };

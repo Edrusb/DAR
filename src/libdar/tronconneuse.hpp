@@ -128,6 +128,9 @@ namespace libdar
 	void inherited_sync_write() { flush(); };
 
 	    /// this protected inherited method is now private for inherited classes of tronconneuse
+	void inherited_flush_read() { buf_byte_data = 0; };
+
+	    /// this protected inherited method is now private for inherited classes of tronconneuse
 	void inherited_terminate() {};
 
     protected:

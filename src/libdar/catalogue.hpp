@@ -136,7 +136,6 @@ namespace libdar
 	    /// \note only used when an non NULL escape pointer is given to entree::read (reading a small dump).
 	virtual void post_constructor(generic_file & f) {};
 
-
         virtual unsigned char signature() const = 0;
         virtual entree *clone() const = 0;
 
@@ -1044,15 +1043,15 @@ namespace libdar
 
 	    /// catalogue extension routines for escape sequence
 	    // real implementation is only needed in escape_catalogue class, here there nothing to be done
-	virtual void pre_add(const entree *ref, compressor *compr) const {};
-	virtual void pre_add_ea(const entree *ref, compressor *compr) const {};
-	virtual void pre_add_crc(const entree *ref, compressor *compr) const {};
-	virtual void pre_add_dirty(compressor *compr) const {};
-	virtual void pre_add_ea_crc(const entree *ref, compressor *compr) const {};
-	virtual void pre_add_waste_mark(compressor *compr) const {};
-	virtual void pre_add_failed_mark(compressor *compr) const {};
-	virtual void pre_add_fsa(const entree *ref, compressor *compr) const {};
-	virtual void pre_add_fsa_crc(const entree *ref, compressor *compr) const {};
+	virtual void pre_add(const entree *ref) const {};
+	virtual void pre_add_ea(const entree *ref) const {};
+	virtual void pre_add_crc(const entree *ref) const {};
+	virtual void pre_add_dirty() const {};
+	virtual void pre_add_ea_crc(const entree *ref) const {};
+	virtual void pre_add_waste_mark() const {};
+	virtual void pre_add_failed_mark() const {};
+	virtual void pre_add_fsa(const entree *ref) const {};
+	virtual void pre_add_fsa_crc(const entree *ref) const {};
 	virtual escape *get_escape_layer() const { return NULL; };
 
         void add(entree *ref); // add at end of catalogue (sequential point of view)

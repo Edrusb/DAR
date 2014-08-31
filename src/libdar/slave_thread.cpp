@@ -44,12 +44,6 @@ namespace libdar
 	output = x_output;
     }
 
-    slave_thread::~slave_thread()
-    {
-	if(data != NULL)
-	    delete data;
-    }
-
     void slave_thread::inherited_run()
     {
 	try
@@ -213,8 +207,6 @@ namespace libdar
     bool slave_thread::treat_order()
     {
 	bool need_answer = false;
-	contextual *ct_data = dynamic_cast<contextual *>(data);
-	tronconneuse *tronco_data = dynamic_cast<tronconneuse *>(data);
 
 	answer.clear();
 	switch(order.get_type())
@@ -265,15 +257,6 @@ namespace libdar
 	    to_send_ahead = 0;
 	    need_answer = true;
 	    break;
-	case msg_type::order_set_context:
-	    if(ct_data == NULL)
-	    {
-		answer.set_type(msg_type::answr_not_contextual);
-		need_answer = true;
-	    }
-	    else
-		ct_data->set_info_status(order.get_string());
-	    break;
 	case msg_type::order_skippable_fwd:
 	    answer.set_type(msg_type::answr_skippable);
 	    answer.set_bool(data->skippable(generic_file::skip_forward, order.get_infinint()));
@@ -288,11 +271,11 @@ namespace libdar
 	    answer.set_type(msg_type::answr_position);
 	    if(read_ahead > 0)
 	    {
-		    // all read_ahead blocks are in the output pipe
-		    // and will be dropped by the master to reach the
+		    // a quantity of blocks equal to read_ahead has been sent in the output pipe
+		    // and have not yet been read, they will be dropped by the master to reach the
 		    // answer to the get_position() order it just sent
-		    // so we must ignore all read_ahead block, stop further
-		    // read ahead and seek back the data to the position
+		    // so we can now, stop further read_ahead operation,
+		    // and seek back the position
 		    // of the first block in pipe that will be ignored
 		    // by the master thread.
 		if(data->get_position() >= read_ahead)
@@ -304,45 +287,6 @@ namespace libdar
 	    answer.set_infinint(data->get_position());
 	    to_send_ahead = 0;
 	    need_answer = true;
-	    break;
-	case msg_type::order_is_oldarchive:
-	    if(ct_data == NULL)
-	    {
-		answer.set_type(msg_type::answr_not_contextual);
-		need_answer = true;
-	    }
-	    else
-	    {
-		answer.set_type(msg_type::answr_oldarchive);
-		answer.set_bool(ct_data->is_an_old_start_end_archive());
-		need_answer = true;
-	    }
-	    break;
-	case msg_type::order_get_dataname:
-	    if(ct_data == NULL)
-	    {
-		answer.set_type(msg_type::answr_not_contextual);
-		need_answer = true;
-	    }
-	    else
-	    {
-		answer.set_type(msg_type::answr_dataname);
-		answer.set_label(ct_data->get_data_name());
-		need_answer = true;
-	    }
-	    break;
-	case msg_type::order_write_eof:
-	    if(tronco_data == NULL)
-	    {
-		answer.set_type(msg_type::answr_not_tronconneuse);
-		need_answer = true;
-	    }
-	    else
-	    {
-		tronco_data->write_end_of_file();
-		answer.set_type(msg_type::answr_wrote_eof);
-		need_answer = true;
-	    }
 	    break;
 	case msg_type::order_end_of_xmit:
 	    stop = true;

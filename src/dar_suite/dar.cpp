@@ -147,6 +147,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    read_options.set_info_details(param.info_details);
 		    read_options.set_slice_min_digits(param.ref_num_digits);
 		    read_options.set_ignore_signature_check_failure(param.blind_signatures);
+		    read_options.set_multi_threaded(param.multi_threaded);
 		    if(param.sequential_read)
 		    {
 			if(param.op == merging)
@@ -187,6 +188,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			read_options.set_info_details(param.info_details);
 			read_options.set_slice_min_digits(param.aux_num_digits);
 			read_options.set_ignore_signature_check_failure(param.blind_signatures);
+			read_options.set_multi_threaded(param.multi_threaded);
 			if(param.sequential_read)
 			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
 			aux = new (nothrow) archive(dialog, *param.aux_root, *param.aux_filename, EXTENSION,
@@ -260,6 +262,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    create_options.set_hash_algo(param.hash);
 		    create_options.set_slice_min_digits(param.num_digits);
 		    create_options.set_fsa_scope(param.scope);
+		    create_options.set_multi_threaded(param.multi_threaded);
+
 		    if(param.backup_hook_mask != NULL)
 			create_options.set_backup_hook(param.backup_hook_execute, *param.backup_hook_mask);
 		    create_options.set_ignore_unknown_inode_type(param.ignore_unknown_inode);
@@ -312,6 +316,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    merge_options.set_hash_algo(param.hash);
 		    merge_options.set_slice_min_digits(param.num_digits);
 		    merge_options.set_fsa_scope(param.scope);
+		    merge_options.set_multi_threaded(param.multi_threaded);
+
 		    cur = new (nothrow) archive(dialog,  // user_interaction &
 				      *param.sauv_root,  //const path &
 				      arch,              // archive *
@@ -399,6 +405,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			isolate_options.set_slice_min_digits(param.aux_num_digits);
 			isolate_options.set_user_comment(param.user_comment);
 			isolate_options.set_sequential_marks(param.use_sequential_marks);
+			isolate_options.set_multi_threaded(param.multi_threaded);
+
 			cur->op_isolate(dialog,
 					*param.aux_root,
 					*param.aux_filename,
@@ -430,6 +438,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.ref_num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
+		read_options.set_multi_threaded(param.multi_threaded);
 		arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
 					     read_options);
 		if(arch == NULL)
@@ -467,6 +476,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		isolate_options.set_hash_algo(param.hash);
 		isolate_options.set_slice_min_digits(param.num_digits);
 		isolate_options.set_sequential_marks(param.use_sequential_marks);
+		isolate_options.set_multi_threaded(param.multi_threaded);
+
                 arch->op_isolate(dialog,
 				 *param.sauv_root,
 				 param.filename,
@@ -497,6 +508,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
+		read_options.set_multi_threaded(param.multi_threaded);
 
 		if(param.ref_filename != NULL && param.ref_root != NULL)
 		{
@@ -602,6 +614,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
+		read_options.set_multi_threaded(param.multi_threaded);
 
 		if(param.ref_filename != NULL && param.ref_root != NULL)
 		{
@@ -680,6 +693,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
+		read_options.set_multi_threaded(param.multi_threaded);
 
 		if(param.ref_filename != NULL && param.ref_root != NULL)
 		{
@@ -751,6 +765,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_sequential_read(param.sequential_read);
 		read_options.set_slice_min_digits(param.num_digits);
 		read_options.set_ignore_signature_check_failure(param.blind_signatures);
+		read_options.set_multi_threaded(param.multi_threaded);
 
 		arch = new (nothrow) archive(dialog,
 				   *param.sauv_root,

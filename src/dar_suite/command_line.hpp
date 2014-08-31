@@ -138,6 +138,7 @@ struct line_param
     bool ignore_unknown_inode;    //< whether to ignore unknown inode types
     bool no_compare_symlink_date; //< whether to report difference in dates of symlinks while diffing an archive with filesystem
     fsa_scope scope;              //< FSA scope to consider for the operation
+    bool multi_threaded;          //< allows libdar to use multiple threads (requires libthreadar)
 
 	// constructor for line_param
     line_param()

@@ -73,18 +73,13 @@ namespace libdar
 	case msg_type::order_read:
 	case msg_type::answr_read_eof:
 	case msg_type::order_sync_write:
+	case msg_type::answr_sync_write_done:
 	case msg_type::order_skip_to_eof:
 	case msg_type::order_skip_fwd:
 	case msg_type::order_skip_bkd:
 	case msg_type::answr_skip_done:
-	case msg_type::order_set_context:
 	case msg_type::answr_skippable:
 	case msg_type::order_get_position:
-	case msg_type::order_is_oldarchive:
-	case msg_type::answr_oldarchive:
-	case msg_type::order_get_dataname:
-	case msg_type::answr_dataname:
-	case msg_type::answr_not_contextual:
 	case msg_type::answr_exception:
 	case msg_type::order_end_of_xmit:
 	    ret = (arg1 == arg2);
@@ -112,22 +107,17 @@ namespace libdar
 	case msg_type::order_read:
 	case msg_type::answr_read_eof:
 	case msg_type::order_sync_write:
+	case msg_type::answr_sync_write_done:
 	case msg_type::order_skip:
 	case msg_type::order_skip_to_eof:
 	case msg_type::order_skip_fwd:
 	case msg_type::order_skip_bkd:
 	case msg_type::answr_skip_done:
-	case msg_type::order_set_context:
 	case msg_type::order_skippable_fwd:
 	case msg_type::order_skippable_bkd:
 	case msg_type::answr_skippable:
 	case msg_type::order_get_position:
 	case msg_type::answr_position:
-	case msg_type::order_is_oldarchive:
-	case msg_type::answr_oldarchive:
-	case msg_type::order_get_dataname:
-	case msg_type::answr_dataname:
-	case msg_type::answr_not_contextual:
 	case msg_type::answr_exception:
 	case msg_type::order_end_of_xmit:
 	    return false;
@@ -140,30 +130,26 @@ namespace libdar
     {
 	switch(x)
 	{
-	case msg_type::order_read_ahead_begin:
-	    return 'A';
-	case msg_type::order_skip_begin:
-	    return 'S';
-	case msg_type::order_skippable_fwd_begin:
-	    return 'F';
-	case msg_type::order_skippable_bkd_begin:
-	    return 'B';
-	case msg_type::answr_position_begin:
-	    return 'P';
 	case msg_type::unset:
-	    return 'x';
+	    throw SRC_BUG;
 	case msg_type::data:
 	    return 'd';
 	case msg_type::order_read_ahead:
 	    return 'a';
+	case msg_type::order_read_ahead_begin:
+	    return 'A';
 	case msg_type::order_read:
 	    return 'r';
 	case msg_type::answr_read_eof:
 	    return 'e';
 	case msg_type::order_sync_write:
 	    return 'y';
+	case msg_type::answr_sync_write_done:
+	    return 'Y';
 	case msg_type::order_skip:
 	    return 's';
+	case msg_type::order_skip_begin:
+	    return 'S';
 	case msg_type::order_skip_to_eof:
 	    return 'z';
 	case msg_type::order_skip_fwd:
@@ -172,28 +158,22 @@ namespace libdar
 	    return 'c';
 	case msg_type::answr_skip_done:
 	    return 'o';
-	case msg_type::order_set_context:
-	    return 't';
 	case msg_type::order_skippable_fwd:
 	    return 'f';
+	case msg_type::order_skippable_fwd_begin:
+	    return 'F';
 	case msg_type::order_skippable_bkd:
 	    return 'b';
+	case msg_type::order_skippable_bkd_begin:
+	    return 'B';
 	case msg_type::answr_skippable:
 	    return 'i';
 	case msg_type::order_get_position:
 	    return 'q';
 	case msg_type::answr_position:
 	    return 'p';
-	case msg_type::order_is_oldarchive:
-	    return 'l';
-	case msg_type::answr_oldarchive:
-	    return 'm';
-	case msg_type::order_get_dataname:
-	    return 'n';
-	case msg_type::answr_dataname:
-	    return 'v';
-	case msg_type::answr_not_contextual:
-	    return 'u';
+	case msg_type::answr_position_begin:
+	    return 'P';
 	case msg_type::answr_exception:
 	    return 'X';
 	case msg_type::order_end_of_xmit:
@@ -207,30 +187,24 @@ namespace libdar
     {
 	switch(x)
 	{
-	case 'A':
-	    return msg_type::order_read_ahead_begin;
-	case 'S':
-	    return msg_type::order_skip_begin;
-	case 'F':
-	    return msg_type::order_skippable_fwd_begin;
-	case 'B':
-	    return msg_type::order_skippable_bkd_begin;
-	case 'P':
-	    return msg_type::answr_position_begin;
-	case 'x':
-	    return msg_type::unset;
 	case 'd':
 	    return msg_type::data;
 	case 'a':
 	    return msg_type::order_read_ahead;
+	case 'A':
+	    return msg_type::order_read_ahead_begin;
 	case 'r':
 	    return msg_type::order_read;
 	case 'e':
 	    return msg_type::answr_read_eof;
 	case 'y':
 	    return msg_type::order_sync_write;
+	case 'Y':
+	    return msg_type::answr_sync_write_done;
 	case 's':
 	    return msg_type::order_skip;
+	case 'S':
+	    return msg_type::order_skip_begin;
 	case 'z':
 	    return msg_type::order_skip_to_eof;
 	case 'g':
@@ -239,28 +213,22 @@ namespace libdar
 	    return msg_type::order_skip_bkd;
 	case 'o':
 	    return msg_type::answr_skip_done;
-	case 't':
-	    return msg_type::order_set_context;
 	case 'f':
 	    return msg_type::order_skippable_fwd;
+	case 'F':
+	    return msg_type::order_skippable_fwd_begin;
 	case 'b':
 	    return msg_type::order_skippable_bkd;
+	case 'B':
+	    return msg_type::order_skippable_bkd_begin;
 	case 'i':
 	    return msg_type::answr_skippable;
 	case 'q':
 	    return msg_type::order_get_position;
 	case 'p':
 	    return msg_type::answr_position;
-	case 'l':
-	    return msg_type::order_is_oldarchive;
-	case 'm':
-	    return msg_type::answr_oldarchive;
-	case 'n':
-	    return msg_type::order_get_dataname;
-	case 'v':
-	    return msg_type::answr_dataname;
-	case 'u':
-	    return msg_type::answr_not_contextual;
+	case 'P':
+	    return msg_type::answr_position_begin;
 	case 'X':
 	    return msg_type::answr_exception;
 	case 'Z':
@@ -296,6 +264,8 @@ namespace libdar
 	    throw SRC_BUG;
 	case msg_type::order_sync_write:
 	    throw SRC_BUG;
+	case msg_type::answr_sync_write_done:
+	    throw SRC_BUG;
 	case msg_type::order_skip:
 	    return msg_type::order_skip_begin;
 	case msg_type::order_skip_to_eof:
@@ -305,8 +275,6 @@ namespace libdar
 	case msg_type::order_skip_bkd:
 	    throw SRC_BUG;
 	case msg_type::answr_skip_done:
-	    throw SRC_BUG;
-	case msg_type::order_set_context:
 	    throw SRC_BUG;
 	case msg_type::order_skippable_fwd:
 	    return msg_type::order_skippable_fwd_begin;
@@ -318,16 +286,6 @@ namespace libdar
 	    throw SRC_BUG;
 	case msg_type::answr_position:
 	    return msg_type::answr_position_begin;
-	case msg_type::order_is_oldarchive:
-	    throw SRC_BUG;
-	case msg_type::answr_oldarchive:
-	    throw SRC_BUG;
-	case msg_type::order_get_dataname:
-	    throw SRC_BUG;
-	case msg_type::answr_dataname:
-	    throw SRC_BUG;
-	case msg_type::answr_not_contextual:
-	    throw SRC_BUG;
 	case msg_type::answr_exception:
 	    throw SRC_BUG;
 	case msg_type::order_end_of_xmit:

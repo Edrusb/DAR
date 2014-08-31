@@ -401,18 +401,8 @@ By default slice number contained in filename do not have any padded zeros, whic
 --pipe-fd <num>
 will read further arguments from the file-descriptor <num>. The arguments read through this file-descriptor must follow a TLV (Type/Length/Value) list format. This option is not intended for human use, but for other programs launching dar like dar_manager. This feature has been added to overcome the command line length limit.
 .TP 20
--4, --fsa-family <fam>[,<fam>[,<fam>[...]]]
-Filesystem specific attributes (FSA) are those attributes like nodump flag, immutable, compressed attributes for ext2/3/4 filesystem, creation_time for HFS+ and NTFS and so on that are specific to a given filesystem. These attributes are grouped by family named. Currently the faavailable family name of FSA is:
-.RS
-.TP 5
-hfs_plus
-which contains the creation time date found on HFS+ filesystems
-.TP 5
-linux_extX
-which contains the nodump, immutable undeleted and compressed flags of linux ext2/3/4 filesystems
-.RE
-At backup time all FSA that have been activated at compilation time are saved. At comparison time, saved FSA are compared to those present on filesystem, but if the equivalent FSA cannot be read because the destination filesystem does not support an error is reported for that file. At restoration time all FSA are tried to be restored. If the destination filesystem does not support those FSA a warning is returned and file is restored as best as possible. To avoid failure at comparison time or warning at restoration time it is possible to reduce the FSA tobe considered to a give set of family thanks to this --fsa-family option. By default all FSA are taken into consideration.
-
+--single-thread, -G
+When libdar is compiled against libthreadar, it can make use of several threads. The number of thread is not parametrable but depends on the number of feature activated (compression, encryption, tape marks, sparse file, etc.) that require CPU intensive operations. The load-balancing type per thread used is called "pipeline". This is the most adapted multi threading model to dar's work which in brief is the construction of a single (eventually sliced) archive (backup operation). Other operations based on archive read (restoration, listing, testing,...) could make use of a tree-like paralellism but would stuck due to I/O performance of the disk (even with a RAID array). If you find that dar creates a too high load average on your production servers, use --single-thread option to have dar/libdar stay single threaded. This option has no effect when libdar is not compiled against libthreadar.
 .PP
 .B SAVING, ISOLATION AND MERGING OPTIONS (to use with -c, -C or -+)
 .PP

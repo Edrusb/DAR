@@ -235,14 +235,18 @@ namespace libdar
 	    /// write any pending data
 	void sync_write();
 
+	    /// be ready to read at current position, reseting all pending data for reading, cached and in compression engine for example
+	void flush_read();
+
+
     protected :
         void set_mode(gf_mode x) { rw = x; };
 
-	    /// tells the object that several calls to read() will follow to obtain at most the given amount of data
+	    /// tells the object that several calls to read() will follow to probably obtain at least the given amount of data
 	    ///
-	    /// \param[in] amount is the maximum expected amount of data that is to be read
+	    /// \param[in] amount is the maximum expected amount of data that is known to be read
 	    /// \note this call may be implemented as a do-nothing call, its presence is only
-	    /// to allow optimization when possible
+	    /// to allow optimization when possible, like in multi-threaded environment
 	virtual void inherited_read_ahead(const infinint & amount) = 0;
 
 
@@ -268,10 +272,18 @@ namespace libdar
 
 	    /// write down any pending data
 
-	    /// \note this method is called after read/write mode
-	    /// checking from sync_write() public method;
+	    /// \note called after sanity checks from generic_file::sync_write()
+	    /// this method's role is to write down any data pending for writing in the current object
+	    /// it has not to be propagated to other gneric_file object this object could rely on
 	virtual void inherited_sync_write() = 0;
 
+	    /// reset internal engine, flush caches in order to read the data at current position
+	    ///
+	    /// \note when the object relies on external object or system object to fetch the data from for reading,
+	    /// when a call to (inherited_)flush_read() occurs, the current object must not assume that any previously read
+	    /// data is still valid if it has internal buffers or the like and it should flush them asap. This call must
+	    /// not propagate the flush_read to any other gneric_file object it could rely on
+	virtual void inherited_flush_read() = 0;
 
 	    /// destructor-like call, except that it is allowed to throw exceptions
 

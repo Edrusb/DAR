@@ -90,7 +90,7 @@ extern "C"
 #include "criterium.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQG:Mg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y::nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT::E:F:K:J:Y:Z:B:fm:NH::a::eQGMg:j#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -324,6 +324,7 @@ bool get_args(shell_interaction & dialog,
     p.ignore_unknown_inode = false;
     p.no_compare_symlink_date = true;
     p.scope = all_fsa_families();
+    p.multi_threaded = true;
 
     try
     {
@@ -1395,7 +1396,10 @@ static bool get_args_recursive(recursive_param & rec,
             case 'j':
                 break;  // ignore this option already parsed during initialization (dar_suite.cpp)
             case 'G':
-		throw Erange("get_args", gettext("-G option is obsolete, use -@ option instead, see man page for details"));
+		if(optarg != NULL)
+		    throw Erange("command_line.cpp:get_arg_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
+		p.multi_threaded = false;
+		break;
             case 'M':
                 if(p.same_fs)
                     rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
@@ -2248,8 +2252,9 @@ const struct option *get_long_opt()
 	{"backup-hook-execute", required_argument, NULL, '='},
 	{"fsa-scope", required_argument, NULL, '4'},
 	{"exclude-by-ea", optional_argument, NULL, '5'},
-	{"key-length", required_argument, NULL, '6' },
-	{"sign", required_argument, NULL, '7' },
+	{"key-length", required_argument, NULL, '6'},
+	{"sign", required_argument, NULL, '7'},
+	{"single-thread", no_argument, NULL, 'G'},
         { NULL, 0, NULL, 0 }
     };
 

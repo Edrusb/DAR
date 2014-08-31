@@ -4,6 +4,7 @@ Status flags:
 - : used without arg
 + : used with argument
 * : used with optional argument
+# : obsolete
 ---------------
 letters usage:
 ---------------
@@ -39,7 +40,7 @@ C + extract catalogue in separated file --isolate
 D - store excluded dir as empty dir     --empty-dir
 E + shell command to launch with slices --execute
 F + shell command to launch with slices of archive of reference   --execute-ref
-G # [OBSOLETE] : catalogue isolation when creating an archive --on-fly-isolate
+G - forbid the use of multi threads when compiled against libthreadar --single-thread
 H * if a file for differential backup or diff differs from exactly one hour it is assumed as identical (no change).
 I + include mask                        --include
 J + key for unscrambling the reference catalogue --key-ref

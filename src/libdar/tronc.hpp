@@ -84,6 +84,7 @@ namespace libdar
 	    /// inherited from generic_file
         void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() { ref->sync_write(); }
+	void inherited_flush_read() {};
 	void inherited_terminate() {if(own_ref) ref->terminate(); };
 
     private :

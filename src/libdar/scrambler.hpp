@@ -60,6 +60,7 @@ namespace libdar
         U_I inherited_read(char *a, U_I size);
         void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() {}; // nothing to do
+	void inherited_flush_read() {}; // nothing to do
 	void inherited_terminate() {};  // nothing to do
 
     private:

@@ -76,9 +76,6 @@ namespace libdar
 	/// this is also the highest version of format that can be read
     const archive_version macro_tools_supported_version = archive_version(9,0);
 
-    const unsigned int tampon_block_size = 10240;
-    const unsigned int tampon_num_block = 30;
-
 
     static void version_check(user_interaction & dialog, const header_version & ver);
 
@@ -141,6 +138,7 @@ namespace libdar
 	 else
 	     term.read_catalogue(*crypto, false, ver.get_edition());
 	    // elastic buffer did not exist before format "04"
+	cata_stack.flush_read_above(crypto);
 
         if(info_details)
             dialog.warning(gettext("Reading archive contents..."));
@@ -295,18 +293,10 @@ namespace libdar
 		throw Ememory("open_archive");
 	    else
 	    {
-#ifdef LIBTHREADAR_AVAILABLE
-		if(multi_threaded)
-		{
-		    generic_thread *tmp2 = new (pool) generic_thread(tmp, tampon_block_size, tampon_num_block);
-		    if(tmp2 == NULL)
-			throw Ememory("op_create_in_sub");
-		    tmp = tmp2;
-		}
-#endif
 		stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
 		tmp = NULL;
 	    }
+
 
 		// ****** Reading the header version ************** //
 
@@ -361,6 +351,18 @@ namespace libdar
 		    tmp = NULL;
 		}
 	    }
+
+#ifdef LIBTHREADAR_AVAILABLE
+	    if(multi_threaded)
+	    {
+		tmp = new (pool) generic_thread(stack.top());
+		if(tmp == NULL)
+		    throw Ememory("op_create_in_sub");
+		stack.clear_label(LIBDAR_STACK_LABEL_LEVEL1);
+		stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
+		tmp = NULL;
+	    }
+#endif
 
 		// *************  building the encryption layer if necessary ************** //
 
@@ -466,18 +468,20 @@ namespace libdar
 		throw Ememory("open_archive");
 	    else
 	    {
-#ifdef LIBTHREADAR_AVAILABLE
-		if(crypto != crypto_none && multi_threaded)
-		{
-		    generic_thread *tmp2 = new (pool) generic_thread(tmp, tampon_block_size, tampon_num_block);
-		    if(tmp2 == NULL)
-			throw Ememory("op_create_in_sub");
-		    tmp = tmp2;
-		}
-#endif
 		stack.push(tmp);
 		tmp = NULL;
 	    }
+
+#ifdef LIBTHREADAR_AVAILABLE
+	    if(multi_threaded && crypto != crypto_none)
+	    {
+		tmp = new (pool) generic_thread(stack.top());
+		if(tmp == NULL)
+		    throw Ememory("op_create_in_sub");
+		stack.push(tmp);
+		tmp = NULL;
+	    }
+#endif
 
 	    stack.add_label(LIBDAR_STACK_LABEL_UNCYPHERED);
 
@@ -530,19 +534,19 @@ namespace libdar
 		tmp = new (pool) escape(stack.top(), unjump);
 		if(tmp == NULL)
 		    throw Ememory("open_archive");
+		stack.push(tmp);
+		tmp = NULL;
 
 #ifdef LIBTHREADAR_AVAILABLE
 		if(multi_threaded)
 		{
-		    generic_thread *tmp2 = new (pool) generic_thread(tmp, tampon_block_size, tampon_num_block);
-		    if(tmp2 == NULL)
+		    generic_thread *tmp = new (pool) generic_thread(stack.top());
+		    if(tmp == NULL)
 			throw Ememory("op_create_in_sub");
-		    tmp = tmp2;
+		    stack.push(tmp);
+		    tmp = NULL;
 		}
 #endif
-
-		stack.push(tmp);
-		tmp = NULL;
 	    }
 
 	    stack.add_label(LIBDAR_STACK_LABEL_CLEAR);
@@ -565,17 +569,20 @@ namespace libdar
 		throw Ememory("open_archive");
 	    else
 	    {
+		stack.push(tmp, LIBDAR_STACK_LABEL_UNCOMPRESSED);
+		tmp = NULL;
+
 #ifdef LIBTHREADAR_AVAILABLE
 		if(multi_threaded)
 		{
-		    generic_thread *tmp2 = new (pool) generic_thread(tmp, tampon_block_size, tampon_num_block);
-		    if(tmp2 == NULL)
+		    tmp = new (pool) generic_thread(stack.top());
+		    if(tmp == NULL)
 			throw Ememory("op_create_in_sub");
-		    tmp = tmp2;
+		    stack.clear_label(LIBDAR_STACK_LABEL_UNCOMPRESSED);
+		    stack.push(tmp, LIBDAR_STACK_LABEL_UNCOMPRESSED);
+		    tmp = NULL;
 		}
 #endif
-		stack.push(tmp, LIBDAR_STACK_LABEL_UNCOMPRESSED);
-		tmp = NULL;
 	    }
 
 		// ************* warning info ************************ //
@@ -616,7 +623,6 @@ namespace libdar
 	entree_stats stats;
 	infinint fraction = 101;
 	escape *esc = NULL;
-	compressor *zip = NULL;
 	compressor *efsa_loc = dynamic_cast<compressor *>(stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED));
 	generic_file *data_loc = stack.get_by_label(LIBDAR_STACK_LABEL_CLEAR);
 
@@ -645,19 +651,15 @@ namespace libdar
 	if(info_details)
 	    dialog.printf(gettext("LAX MODE: Beginning search of the catalogue (from the end toward the beginning of the archive, on %i %% of its length), this may take a while..."), &fraction);
 
-	stack.find_first_from_top(zip);
-	if(zip == NULL)
-	    throw SRC_BUG;
-
 
 	    // finding the upper limit of the search
 
-	if(zip->skip_to_eof())
-	    max_offset = zip->get_position();
+	if(stack.skip_to_eof())
+	    max_offset = stack.get_position();
 	else
 	{
 	    dialog.warning(gettext("LAX MODE: Cannot skip at the end of the archive! Using current position to start the catalogue search"));
-	    max_offset = zip->get_position();
+	    max_offset = stack.get_position();
 	}
 
 	if(max_offset == 0)
@@ -685,10 +687,10 @@ namespace libdar
 		if(esc->skip_to_next_mark(escape::seqt_catalogue, true))
 		{
 		    dialog.warning(gettext("LAX MODE: Good point! I could find the escape sequence marking the beginning of the catalogue, now trying to read it..."));
-		    zip->flush_read();
-		    if(zip->get_position() != esc->get_position())
+		    stack.flush_read_above(esc);
+		    if(stack.get_position() != esc->get_position())
 			throw SRC_BUG;
-		    offset = zip->get_position();
+		    offset = stack.get_position();
 		    min_offset = offset; // no need to read before this position, we cannot fetch the catalogue there
 		}
 		else
@@ -700,7 +702,7 @@ namespace libdar
 	    catch(Euser_abort & e)
 	    {
 		offset = min_offset;
-		zip->skip(offset);
+		stack.skip(offset);
 	    }
 	}
 
@@ -724,7 +726,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new (pool) catalogue(dialog, *zip, edition, compr_algo, data_loc, efsa_loc, even_partial_catalogue, layer1_data_name);
+		ret = new (pool) catalogue(dialog, stack, edition, compr_algo, data_loc, efsa_loc, even_partial_catalogue, layer1_data_name);
 		if(ret == NULL)
 		    throw Ememory("macro_tools_lax_search_catalogue");
 		stats = ret->get_stats();
@@ -767,7 +769,7 @@ namespace libdar
 		    ok = true;
 		}
 		else
-		    zip->skip(++offset);
+		    stack.skip(++offset);
 	    }
 	}
 
@@ -931,15 +933,6 @@ namespace libdar
 		    throw Ememory("op_create_in_sub");
 		else
 		{
-#ifdef LIBTHREADAR_AVAILABLE
-		    if(multi_threaded)
-		    {
-			generic_thread *tmp2 = new (pool) generic_thread(tmp, tampon_block_size, tampon_num_block);
-			if(tmp2 == NULL)
-			    throw Ememory("op_create_in_sub");
-			tmp = tmp2;
-		    }
-#endif
 		    layers.push(tmp);
 		    tmp = NULL;
 		}
@@ -963,6 +956,7 @@ namespace libdar
 			tmp = NULL;
 		    }
 		}
+
 
 		    // ******** creating and writing the archive header ******************* //
 
@@ -1070,6 +1064,21 @@ namespace libdar
 
 		ver.set_initial_offset(layers.get_position());
 
+#ifdef LIBTHREADAR_AVAILABLE
+
+		    // adding a generic_thread object in the stack for
+		    // a separated thread proceed to read/write to the object pushed on the stack
+
+		if(multi_threaded)
+		{
+		    tmp = new (pool) generic_thread(layers.top());
+		    if(tmp == NULL)
+			throw Ememory("op_create_in_sub");
+		    layers.push(tmp);
+		    tmp = NULL;
+		}
+#endif
+
 		    // ************ building the encryption layer if required ****** //
 
 		switch(crypto)
@@ -1108,18 +1117,23 @@ namespace libdar
 			throw Ememory("op_create_in_sub");
 		    else
 		    {
-#ifdef LIBTHREADAR_AVAILABLE
-			if(crypto != crypto_none && multi_threaded)
-			{
-			    generic_thread *tmp2 = new (pool) generic_thread(tmp, tampon_block_size, tampon_num_block);
-			    if(tmp2 == NULL)
-				throw Ememory("op_create_in_sub");
-			    tmp = tmp2;
-			}
-#endif
 			layers.push(tmp);
 			tmp = NULL;
 		    }
+#ifdef LIBTHREADAR_AVAILABLE
+
+			// adding a generic_thread object in the stack for
+			// a separated thread proceed to read/write to the object pushed on the stack
+
+		    if(multi_threaded && crypto != crypto_none)
+		    {
+			tmp = new (pool) generic_thread(layers.top());
+			if(tmp == NULL)
+			    throw Ememory("op_create_in_sub");
+			layers.push(tmp);
+			tmp = NULL;
+		    }
+#endif
 		}
 		else
 		{
@@ -1149,17 +1163,22 @@ namespace libdar
 			throw Ememory("op_create_in_sub");
 		    else
 		    {
-#ifdef LIBTHREADAR_AVAILABLE
-			if(multi_threaded)
-			{
-			    generic_thread *tmp2 = new (pool) generic_thread(tmp, tampon_block_size, tampon_num_block);
-			    if(tmp2 == NULL)
-				throw Ememory("op_create_in_sub");
-			    tmp = tmp2;
-			}
-#endif
 			layers.push(tmp);
 			tmp = NULL;
+#ifdef LIBTHREADAR_AVAILABLE
+
+			    // adding a generic_thread object in the stack for
+			    // a separated thread proceed to read/write to the object pushed on the stack
+
+			if(multi_threaded)
+			{
+			    tmp = new (pool) generic_thread(layers.top());
+			    if(tmp == NULL)
+				throw Ememory("op_create_in_sub");
+			    layers.push(tmp);
+			    tmp = NULL;
+			}
+#endif
 		    }
 		}
 
@@ -1172,18 +1191,24 @@ namespace libdar
 		    throw Ememory("op_create_in_sub");
 		else
 		{
-#ifdef LIBTHREADAR_AVAILABLE
-		    if(multi_threaded)
-		    {
-			generic_thread *tmp2 = new (pool) generic_thread(tmp, tampon_block_size, tampon_num_block);
-			if(tmp2 == NULL)
-			    throw Ememory("op_create_in_sub");
-			tmp = tmp2;
-		    }
-#endif
 		    layers.push(tmp);
 		    tmp = NULL;
 		}
+
+#ifdef LIBTHREADAR_AVAILABLE
+
+		    // adding a generic_thread object in the stack for
+		    // a separated thread proceed to read/write to the object pushed on the stack
+
+		if(multi_threaded)
+		{
+		    tmp = new (pool) generic_thread(layers.top());
+		    if(tmp == NULL)
+			throw Ememory("op_create_in_sub");
+		    layers.push(tmp);
+		    tmp = NULL;
+		}
+#endif
 
 		if(info_details)
 		    dialog.warning(gettext("All layers have been created successfully"));
@@ -1217,9 +1242,9 @@ namespace libdar
     {
 	terminateur coord;
 	escape *esc = NULL;
-	layers.find_first_from_bottom(esc);
 	compressor *compr_ptr = NULL;
 	tronconneuse *tronco_ptr = NULL;
+	scrambler *scram_ptr = NULL;
 #ifdef LIBTHREADAR_AVAILABLE
 	generic_thread *thread_ptr = NULL;
 #endif
@@ -1227,8 +1252,12 @@ namespace libdar
 
 	    // *********** writing down the catalogue of the archive *************** //
 
+	layers.find_first_from_bottom(esc);
 	if(esc != NULL)
+	{
+	    layers.sync_write_above(esc); // esc is now up to date
 	    esc->add_mark_at_current_position(escape::seqt_catalogue);
+	}
 
 	coord.set_catalogue_start(layers.get_position());
 
@@ -1236,7 +1265,6 @@ namespace libdar
 	    dialog.warning(gettext("Writing down archive contents..."));
 	cat.reset_dump();
 	cat.dump(layers);
-	layers.top()->sync_write();
 
 	    // releasing the compression layer
 
@@ -1244,10 +1272,10 @@ namespace libdar
 	    dialog.warning(gettext("Closing the compression layer..."));
 
 #ifdef LIBTHREADAR_AVAILABLE
-	if(!layers.pop_and_close_if_type_is(thread_ptr))
+	(void)layers.pop_and_close_if_type_is(thread_ptr);
 #endif
-	    if(!layers.pop_and_close_if_type_is(compr_ptr))
-		throw SRC_BUG;
+	if(!layers.pop_and_close_if_type_is(compr_ptr))
+	    throw SRC_BUG;
 
 	    // releasing the escape layer
 
@@ -1255,13 +1283,12 @@ namespace libdar
 	{
 	    if(info_details)
 		dialog.warning(gettext("Closing the escape layer..."));
-	    esc = NULL; // intentionnally set to NULL here, only the pointer type is used by pop_and_close
 #ifdef LIBTHREADAR_AVAILABLE
-	    if(!layers.pop_and_close_if_type_is(thread_ptr))
+	    (void)layers.pop_and_close_if_type_is(thread_ptr);
 #endif
-		if(!layers.pop_and_close_if_type_is(esc))
-		    throw SRC_BUG;
-
+	    esc = NULL; // intentionnally set to NULL here, only the pointer type is used by pop_and_close
+	    if(!layers.pop_and_close_if_type_is(esc))
+		throw SRC_BUG;
 	}
 
 	    // *********** writing down the first terminator at the end of the archive  *************** //
@@ -1283,38 +1310,36 @@ namespace libdar
 
 
 #ifdef LIBTHREADAR_AVAILABLE
-	thread_ptr = dynamic_cast<generic_thread *>(layers.top());
-	if(thread_ptr != NULL)
+	    // a generic_thread is only added over scrambler and crypto_sym, not when no crypto is used
+	(void)layers.pop_and_close_if_type_is(thread_ptr);
+#endif
+
+	if(info_details)
+	    dialog.warning(gettext("Closing the encryption layer..."));
+
+	tronco_ptr = dynamic_cast<tronconneuse *>(layers.top());
+	scram_ptr = dynamic_cast<scrambler *>(layers.top());
+
+	if(tronco_ptr != NULL || scram_ptr != NULL)
 	{
 	    if(info_details)
 		dialog.warning(gettext("Closing the encryption layer..."));
-	    if(!thread_ptr->write_end_of_file())
-		throw SRC_BUG; // not a tronconneuse managed by remote thread!
-
 	}
-#else
-	tronco_ptr = dynamic_cast<tronconneuse *>(layers.top());
+
+	if(tronco_ptr != NULL)
+	    tronco_ptr->write_end_of_file();
+
 	if(tronco_ptr != NULL)
 	{
-	    if(info_details)
-		dialog.warning(gettext("Closing the encryption layer..."));
-	    tronco_ptr->write_end_of_file();
-	}
-#endif
-
-
-#ifdef LIBTHREADAR_AVAILABLE
-	if(!layers.pop_and_close_if_type_is(thread_ptr))
-	{
-#endif
 	    if(!layers.pop_and_close_if_type_is(tronco_ptr))
-	    {
-		scrambler *ptr = NULL;
-		(void)layers.pop_and_close_if_type_is(ptr);
-	    }
-#ifdef LIBTHREADAR_AVAILABLE
+		throw SRC_BUG;
 	}
-#endif
+
+	if(scram_ptr != NULL)
+	{
+	    if(!layers.pop_and_close_if_type_is(scram_ptr))
+	       throw SRC_BUG;
+	}
 
 
 	    // *********** writing down the trailier_version with the second terminateur *************** //

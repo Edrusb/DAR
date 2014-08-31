@@ -58,6 +58,7 @@ namespace libdar
 	U_I inherited_read(char *a, U_I size);
 	void inherited_write(const char *a, U_I size) { throw Efeature("Writing on a string_file is not allowed"); };
 	void inherited_sync_write() {};
+	void inherited_flush_read() {};
 	void inherited_terminate() {};
 
     private:

@@ -69,13 +69,6 @@ namespace libdar
             // deleted a destructor time
         ~compressor();
 
-        void flush_write(); // flush all data to compressed_side, and reset the compressor
-            // for that additional write can be uncompresssed starting at this point.
-        void flush_read(); // reset decompression engine to be able to read the next block of compressed data
-            // if not called, furthur read return EOF
-        void clean_read(); // discard any byte buffered and not yet returned by read()
-        void clean_write(); // discard any byte buffered and not yet wrote to compressed_side;
-
         compression get_algo() const { return current_algo; };
 
 	void suspend_compression() { if(!suspended) { suspended_compr = current_algo; change_algo(none); suspended = true; } };
@@ -84,17 +77,19 @@ namespace libdar
 
             // inherited from generic file
 	bool skippable(skippability direction, const infinint & amount) { return compressed->skippable(direction, amount); };
-        bool skip(const infinint & pos) { flush_write(); flush_read(); clean_read(); return compressed->skip(pos); };
-        bool skip_to_eof()  { flush_write(); flush_read(); clean_read(); return compressed->skip_to_eof(); };
-        bool skip_relative(S_I x) { flush_write(); flush_read(); clean_read(); return compressed->skip_relative(x); };
+        bool skip(const infinint & pos) { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip(pos); };
+        bool skip_to_eof()  { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip_to_eof(); };
+        bool skip_relative(S_I x) { compr_flush_write(); compr_flush_read(); clean_read(); return compressed->skip_relative(x); };
         infinint get_position() { return compressed->get_position(); };
 
     protected :
 	void inherited_read_ahead(const infinint & amount) { compressed->read_ahead(amount); };
         U_I inherited_read(char *a, U_I size) { return (this->*read_ptr)(a, size); };
         void inherited_write(const char *a, U_I size) { (this->*write_ptr)(a, size); };
-	void inherited_sync_write() { flush_write(); };
+	void inherited_sync_write() { compr_flush_write(); };
+	void inherited_flush_read() { compr_flush_read(); clean_read(); };
 	void inherited_terminate() { local_terminate(); };
+
     private :
         struct xfer : public on_pool
         {
@@ -168,6 +163,13 @@ namespace libdar
         void change_algo(compression new_algo)
 	{ change_algo(new_algo, current_level);	};
 
+
+        void compr_flush_write(); // flush all data to compressed_side, and reset the compressor
+            // for that additional write can be uncompresssed starting at this point.
+        void compr_flush_read(); // reset decompression engine to be able to read the next block of compressed data
+            // if not called, furthur read return EOF
+        void clean_read(); // discard any byte buffered and not yet returned by read()
+        void clean_write(); // discard any byte buffered and not yet wrote to compressed_side;
     };
 
 	/// @}

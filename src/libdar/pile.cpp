@@ -299,6 +299,42 @@ namespace libdar
 	    throw Erange("pile::skip", "Error: inherited_write() on empty stack");
     }
 
+    void pile::sync_write_above(generic_file *ptr)
+    {
+	vector<face>::reverse_iterator it = stack.rbegin();
+
+	    //  we start from the top of the stack down to ptr
+	while(it != stack.rend() && it->ptr != ptr)
+	{
+	    it->ptr->sync_write();
+	    ++it;
+	}
+	if(it->ptr != ptr)
+	    throw SRC_BUG;
+    }
+
+    void pile::flush_read_above(generic_file *ptr)
+    {
+	vector<face>::iterator it = stack.begin();
+
+	    // we start from the bottom of the stack looking for ptr
+	while(it != stack.end() && it->ptr != ptr)
+	    ++it;
+	if(it == stack.end())
+	    throw SRC_BUG;
+	if(it->ptr != ptr)
+	    throw SRC_BUG;
+	++it; // skipping ptr
+
+	    // we continue above ptr and this time call flush_read()
+	while(it != stack.end())
+	{
+	    it->ptr->flush_read();
+	    ++it;
+	}
+    }
+
+
     void pile::inherited_sync_write()
     {
 	for(vector<face>::reverse_iterator it = stack.rbegin() ; it != stack.rend() ; ++it)
@@ -307,6 +343,16 @@ namespace libdar
 	    else
 		throw SRC_BUG;
     }
+
+    void pile::inherited_flush_read()
+    {
+	for(vector<face>::iterator it = stack.begin() ; it != stack.end() ; ++it)
+	    if(it->ptr != NULL)
+		it->ptr->flush_read();
+	    else
+		throw SRC_BUG;
+    }
+
 
     void pile::inherited_terminate()
     {

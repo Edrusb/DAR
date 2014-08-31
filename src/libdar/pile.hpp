@@ -129,6 +129,11 @@ namespace libdar
 	void add_label(const std::string & label);
 
 
+	    /// call the generic_file::sync_write() method of all object found above ptr in the stack
+	void sync_write_above(generic_file *ptr);
+
+	    /// call ghe generic_file::flush_read() method of all objects found above ptr in the stack
+	void flush_read_above(generic_file *ptr);
 
 	    // inherited methods from generic_file
 	    // they all apply to the top generic_file object, they fail by Erange() exception if the stack is empty
@@ -147,6 +152,7 @@ namespace libdar
 	U_I inherited_read(char *a, U_I size);
 	void inherited_write(const char *a, U_I size);
 	void inherited_sync_write();
+	void inherited_flush_read();
 	void inherited_terminate();
 
     private:
@@ -154,7 +160,9 @@ namespace libdar
 	{
 	    generic_file * ptr;
 	    std::list<std::string> labels;
-	};
+	};  // ok, had not much idea to find a name for that struct, "face" was the first idea found to be associated with "pile", which means stack
+	    // in French but also is the name of the face of a coin where its value is written. The opposite face of a coin is called "face" in French
+	    // because often a face is design there and the expression "tirer `a pile ou face" (meaning "to toss up") is very common.
 
 	std::vector<face> stack;
 
@@ -189,7 +197,7 @@ namespace libdar
     }
 
     template <class T> void pile::find_first_from_top(T * & ref)
-	{
+    {
 	ref = NULL;
 	for(std::vector<face>::reverse_iterator it = stack.rbegin(); it != stack.rend() && ref == NULL; ++it)
 	    ref = dynamic_cast<T *>(it->ptr);

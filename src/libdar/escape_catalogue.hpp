@@ -38,6 +38,7 @@
 
 #include "catalogue.hpp"
 #include "escape.hpp"
+#include "pile.hpp"
 
 namespace libdar
 {
@@ -50,28 +51,29 @@ namespace libdar
     public:
         escape_catalogue(user_interaction & dialog,
 			 const datetime & root_last_modif,
-			 const label & data_name, escape *esc_ptr);
+			 const label & data_name,
+			 pile *x_stack);
         escape_catalogue(user_interaction & dialog,        //< user interaction
 			 const archive_version & reading_ver,  //< archive format
 			 compression default_algo,         //< default compression algorithm
 			 generic_file *data_loc,           //< at which layer to read data from
 			 compressor *efsa_loc,             //< at which layer to read EA from
-			 escape *esc_ptr,                  //< the escape layer of the stack
+			 pile *x_stack,                    //< the whole stack we write to, will only use the escape layer of that stack
 			 bool lax = false);                //< whether to use lax mode
         escape_catalogue(const escape_catalogue & ref) : catalogue(ref) { copy_from(ref); };
         const escape_catalogue & operator = (const escape_catalogue &ref);
 	~escape_catalogue() { destroy(); };
 
 	    // inherited from catalogue
-	void pre_add(const entree *ref, compressor *compr) const;
-	void pre_add_ea(const entree *ref, compressor *compr) const;
-	void pre_add_crc(const entree *ref, compressor *compr) const;
-	void pre_add_dirty(compressor *compr) const;
-	void pre_add_ea_crc(const entree *ref, compressor *compr) const;
-	void pre_add_waste_mark(compressor *compr) const;
-	void pre_add_failed_mark(compressor *compr) const;
-	void pre_add_fsa(const entree *ref, compressor *compr) const;
-	void pre_add_fsa_crc(const entree *ref, compressor *compr) const;
+	void pre_add(const entree *ref) const;
+	void pre_add_ea(const entree *ref) const;
+	void pre_add_crc(const entree *ref) const;
+	void pre_add_dirty() const;
+	void pre_add_ea_crc(const entree *ref) const;
+	void pre_add_waste_mark() const;
+	void pre_add_failed_mark() const;
+	void pre_add_fsa(const entree *ref) const;
+	void pre_add_fsa_crc(const entree *ref) const;
 	escape *get_escape_layer() const { return esc; };
 
 	void reset_read() const;
@@ -92,6 +94,7 @@ namespace libdar
 	    ec_completed  //< state in which the escape_catalogue object is completed and has all information in memory as a normal catalogue
 	};
 
+	pile *stack;
 	escape *esc;
 	archive_version x_reading_ver;
 	compression x_default_algo;
@@ -105,7 +108,7 @@ namespace libdar
 	infinint depth;             //< directory depth of archive being read sequentially
 	infinint wait_parent_depth; //< ignore any further entry while depth is less than wait_parent_depth. disabled is set to zero
 
-	void set_esc(escape *esc_ptr) { if(esc_ptr != NULL) esc = esc_ptr; else throw SRC_BUG; };
+	void set_esc_and_stack(pile *ptr);
 	void copy_from(const escape_catalogue & ref);
 	void destroy();
 	void merge_cat_det();

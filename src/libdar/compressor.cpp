@@ -293,7 +293,7 @@ namespace libdar
             S_I ret;
 
                 // flushing the pending data
-	    flush_write();
+	    compr_flush_write();
             clean_write();
 
             ret = compr->wrap.compressEnd();
@@ -316,7 +316,7 @@ namespace libdar
         if(decompr != NULL)
         {
                 // flushing data
-            flush_read();
+            compr_flush_read();
             clean_read();
 
             S_I ret = decompr->wrap.decompressEnd();
@@ -334,7 +334,7 @@ namespace libdar
 
 	if(lzo_read_buffer != NULL)
 	{
-	    flush_read();
+	    compr_flush_read();
 	    clean_read();
 	    meta_delete(lzo_read_buffer);
 	    lzo_read_buffer = NULL;
@@ -342,7 +342,7 @@ namespace libdar
 
 	if(lzo_write_buffer != NULL)
 	{
-	    flush_write();
+	    compr_flush_write();
 	    clean_write();
 	    meta_delete(lzo_write_buffer);
 	    lzo_write_buffer = NULL;
@@ -564,7 +564,7 @@ namespace libdar
 #endif
     }
 
-    void compressor::flush_write()
+    void compressor::compr_flush_write()
     {
         S_I ret;
 
@@ -618,7 +618,7 @@ namespace libdar
 	}
     }
 
-    void compressor::flush_read()
+    void compressor::compr_flush_read()
     {
 	if(is_terminated())
 	    throw SRC_BUG;

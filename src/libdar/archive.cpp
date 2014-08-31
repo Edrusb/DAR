@@ -251,6 +251,7 @@ namespace libdar
 				    {
 					if(info_details)
 					    dialog.warning(gettext("No data found in that archive, sequentially reading the catalogue found at the end of the archive..."));
+					stack.flush_read_above(esc);
 
 					contextual *layer1 = NULL;
 					label lab = label_zero;
@@ -278,7 +279,7 @@ namespace libdar
 									  ver.get_compression_algo(),
 									  data_loc,
 									  efsa_loc,
-									  esc,
+									  &stack,
 									  options.get_lax());
 				    }
 				    if(cat == NULL)
@@ -1927,7 +1928,6 @@ namespace libdar
 
 	    label internal_name;
 	    generic_file *tmp = NULL;
-	    escape *esc = NULL;
 	    thread_cancellation thr_cancel;
 
 	    if(ref_cat1 == NULL && op != oper_create)
@@ -1979,10 +1979,6 @@ namespace libdar
 					  internal_name, // data_name is equal to internal_name in the current situation
 					  multi_threaded);
 
-		stack.find_first_from_bottom(esc);
-		if(add_marks_for_sequential_reading && esc == NULL)
-		    throw SRC_BUG;
-
 		    // ********** building the catalogue (empty for now) ************************* //
 		datetime root_mtime;
 
@@ -2007,12 +2003,12 @@ namespace libdar
 
 		if(op == oper_merge)
 		    if(add_marks_for_sequential_reading && !empty)
-			cat = new (pool) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), internal_name, esc);
+			cat = new (pool) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), internal_name, &stack);
 		    else
 			cat = new (pool) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), internal_name);
 		else // op == oper_create
 		    if(add_marks_for_sequential_reading && !empty)
-			cat = new (pool) escape_catalogue(dialog, root_mtime, internal_name, esc);
+			cat = new (pool) escape_catalogue(dialog, root_mtime, internal_name, &stack);
 		    else
 			cat = new (pool) catalogue(dialog, root_mtime, internal_name);
 
@@ -2380,15 +2376,11 @@ namespace libdar
     infinint archive::get_level2_size()
     {
 	generic_file *level1 = stack.get_by_label(LIBDAR_STACK_LABEL_LEVEL1);
-	compressor *level2 = NULL;
 
-	stack.find_first_from_top(level2);
-	if(level2 == NULL)
-	    throw SRC_BUG;
 	if(dynamic_cast<trivial_sar *>(level1) == NULL)
 	{
-	    level2->skip_to_eof();
-	    return level2->get_position();
+	    stack.skip_to_eof();
+	    return stack.get_position();
 	}
 	else
 	    return 0;

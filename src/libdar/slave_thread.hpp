@@ -47,14 +47,12 @@ namespace libdar
     public:
 	    /// constructor
 	    ///
-	    /// \note, the x_data pointed to object becomes the property of the slave_thread object
-	    /// which has the responsibility to delete it once it has finished using it
-	    /// but, the two other pointed to object given in arguments (the two tampon) stay under
-	    /// the responsibility of the caller
+	    /// \note none of the given pointer will be deleted by slave_thread nor a copy
+	    /// of them will be done (which for some is forbidden anyway), these pointed to
+	    /// objects must thus exist during the whole live of the slave_thread
 	slave_thread(generic_file *x_data, libthreadar::tampon<char> *x_input, libthreadar::tampon<char> *x_output);
 	slave_thread(const slave_thread & ref) { throw SRC_BUG; };
 	const slave_thread & operator = (const slave_thread & ref) { throw SRC_BUG; };
-	~slave_thread();
 
     protected:
 	virtual void inherited_run();

@@ -38,38 +38,33 @@
 namespace libdar
 {
 
-    class generic_thread : public generic_file, public contextual
+
+    class generic_thread : public generic_file
     {
     public:
+	    // default values for constuctor
+	static const unsigned int tampon_block_size = 10240;
+	static const unsigned int tampon_num_block = 30;
+
 	    /// constructor
 	    ///
-	    /// \param[in] ptr is the generic_file that will be managed by a separated thread and becomes property of this new object
+	    /// \param[in] ptr is the generic_file that will be read from/written to by a separated thread
 	    /// \param[in] block_size is the size of block used to pass information to and from the remote thread
 	    /// \param[in] num_block maximum number of blocks that can be sent without being retrieved by the other threads
-	    /// \note that the pointed to generic_file becomes property of the generic_thread object
-	    /// and will be deleted by it
-	generic_thread(generic_file *ptr, U_I block_size, U_I num_block);
+	    /// \note that the pointed to generic_file must exist during the whole life of the generic_thread. Its memory
+	    /// management after the generic_thread has died is under the responsibility of the caller of the generic_thread
+	generic_thread(generic_file *ptr, U_I block_size = tampon_block_size, U_I num_block = tampon_num_block);
 	generic_thread(const generic_thread & ref); //< copy constructor is disabled (throws exception)
 	const generic_thread & operator = (const generic_thread & ref) { throw SRC_BUG; };
 	virtual ~generic_thread();
 
 	    // inherited methods from generic_file
+
 	virtual bool skippable(skippability direction, const infinint & amount);
 	virtual bool skip(const infinint & pos);
 	virtual bool skip_to_eof();
 	virtual bool skip_relative(S_I x);
 	virtual infinint get_position();
-
-	    /// check whether the inside generic_file owned by the remote thread is a contextual or not
-	bool is_contextual() const;
-
-	    // inherited methods from contextual. The following methods do throw exception is_contextual() is false
-	virtual void set_info_status(const std::string & s);
-	virtual bool is_an_old_start_end_archive() const;
-	virtual const label & get_data_name() const;
-
-	    // when tronconneuse is given as generic_file to manage
-	bool write_end_of_file(); //< \return true if the remote generic_file could proceed to the order (object from class tronconneuse or inherited class) else false.
 
     protected:
 	    // inherited from generic_file
@@ -77,6 +72,7 @@ namespace libdar
 	virtual U_I inherited_read(char *a, U_I size);
 	virtual void inherited_write(const char *a, U_I size);
 	virtual void inherited_sync_write();
+	virtual void inherited_flush_read() { (void)get_position(); };
 	virtual void inherited_terminate();
 
 

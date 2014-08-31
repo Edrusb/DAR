@@ -56,7 +56,6 @@ namespace libdar
 	order_skip_fwd,           //< + U_I      : order to skip foward
 	order_skip_bkd,           //< + U_I      : order to skip backward
 	answr_skip_done,          //< + bool     : answer for all kind of skip orders
-	order_set_context,        //< + string   : message contains the new contextual value to be set
         order_skippable_fwd,      //< + infinint : message from master containing a skippable forward request info
         order_skippable_fwd_begin,//< + infinint : message continues on the next block
         order_skippable_bkd,      //< + infinint : message from master containing a skippable backward request info
@@ -65,15 +64,7 @@ namespace libdar
 	order_get_position,       //< no argument: order to get the current position in file
 	answr_position,           //< + infinint : answer with the current position
 	answr_position_begin,     //< + infinint : message continues with the next block
-	order_is_oldarchive,      //< no argument: master request to know whethe archive is old or not
-	answr_oldarchive,         //< + bool     : slave answer containing boolean answer
-	order_get_dataname,       //< no argument: master request of the dataname
-	answr_dataname,           //< + label    : slave answer containing the dataname
-	answr_not_contextual,     //< no argument: slave answer if the managed generic file is not a contextual object
 	answr_exception,          //< no argument: last operation generated an exception for at slave side, slave has probably died after that
-	order_write_eof,          //< no argument: for tronconneuse managed object only, order to drop the end of file data
-	answr_not_tronconneuse,   //< no argument: slave answer if the managed generic_file is not a tronconneuse object
-	answr_wrote_eof,          //< no argument: slave answer that eof has been written
 	order_end_of_xmit         //< no argument: message is the last message and implies freedom of the slave
     };
 

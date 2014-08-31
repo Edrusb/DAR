@@ -80,27 +80,11 @@ namespace libdar
     {
 	if(remote != NULL)
 	{
-	    inherited_terminate();
+	    if(!is_terminated())
+		terminate();
 	    delete remote;
 	    remote = NULL;
 	}
-    }
-
-    bool generic_thread::is_contextual() const
-    {
-	bool tmp;
-
-	try
-	{
-	    (void)is_an_old_start_end_archive();
-	    tmp = true; // successful call, this is a contextual
-	}
-	catch(Erange & e)
-	{
-	    tmp = false; // failure, this is not a contextual
-	}
-
-	return tmp;
     }
 
     bool generic_thread::skippable(skippability direction, const infinint & amount)
@@ -226,95 +210,6 @@ namespace libdar
 	check_answer(msg_type::answr_position);
 	ret = answer.get_infinint();
 	release_block_answer();
-
-	return ret;
-    }
-
-
-    void generic_thread::set_info_status(const std::string & s)
-    {
-
-	    // preparing the order message
-
-	order.clear();
-	order.set_type(msg_type::order_set_context);
-	order.set_string(s);
-
-	    // order completed
-
-	send_order();
-    }
-
-    bool generic_thread::is_an_old_start_end_archive() const
-    {
-	bool ret;
-
-	generic_thread *me = const_cast<generic_thread *>(this);
-	if(me == NULL)
-	    throw SRC_BUG;
-
-	    // preparing the order message
-
-	me->order.clear();
-	me->order.set_type(msg_type::order_is_oldarchive);
-
-	    // order completed
-
-	me->send_order();
-	me->read_answer();
-	if(answer.get_type() == msg_type::answr_not_contextual)
-	    throw Erange("generic_thread", gettext("Remote threaded generic_file does not inherit from contextual class"));
-	me->check_answer(msg_type::answr_oldarchive);
-	ret = answer.get_bool();
-	me->release_block_answer();
-
-	return ret;
-    }
-
-    const label & generic_thread::get_data_name() const
-    {
-	generic_thread *me = const_cast<generic_thread *>(this);
-	if(me == NULL)
-	    throw SRC_BUG;
-
-	    // preparing the order message
-
-	me->order.clear();
-	me->order.set_type(msg_type::order_get_dataname);
-
-	    // order completed
-
-	me->send_order();
-	me->read_answer();
-	if(answer.get_type() == msg_type::answr_not_contextual)
-	    throw Erange("generic_thread::get_data_name", gettext("Remote threaded generic_file does not inherit from contextual class"));
-	me->check_answer(msg_type::answr_dataname);
-	me->dataname = answer.get_label();
-	me->release_block_answer();
-
-	return dataname;
-    }
-
-    bool generic_thread::write_end_of_file()
-    {
-	bool ret;
-
-	order.clear();
-	order.set_type(msg_type::order_write_eof);
-	send_order();
-	read_answer();
-	switch(answer.get_type())
-	{
-	case msg_type::answr_not_tronconneuse:
-	    ret = false;
-	    break;
-	case msg_type::answr_wrote_eof:
-	    ret = true;
-	    break;
-	default:
-	    release_block_answer();
-	    throw Erange("generic_thread::write_end_of_file", gettext("Remote threaded generic_file does not inherit from tronconneuse class"));
-	}
 
 	return ret;
     }

@@ -31,9 +31,10 @@ namespace libdar
 
     escape_catalogue::escape_catalogue(user_interaction & dialog,
 				       const datetime & root_last_modif,
-				       const label & data_name, escape *esc_ptr) : catalogue(dialog, root_last_modif, data_name)
+				       const label & data_name,
+				       pile *x_stack) : catalogue(dialog, root_last_modif, data_name)
     {
-	set_esc(esc_ptr);
+	set_esc_and_stack(x_stack);
 	x_reading_ver = macro_tools_supported_version;
 	x_default_algo = none;
 	x_data_loc = NULL;
@@ -47,6 +48,7 @@ namespace libdar
 	wait_parent_depth = 0; // to disable this feature
 
 	    // dropping the data_name in the archive
+	stack->sync_write_above(esc); // esc is now up to date
 	esc->add_mark_at_current_position(escape::seqt_data_name);
 	data_name.dump(*esc);
     }
@@ -56,12 +58,12 @@ namespace libdar
 				       compression default_algo,
 				       generic_file *data_loc,
 				       compressor *efsa_loc,
-				       escape *esc_ptr,
+				       pile *x_stack,
 				       bool lax) : catalogue(dialog,
 							     datetime(0),
 							     label_zero)
     {
-	set_esc(esc_ptr);
+	set_esc_and_stack(x_stack);
 	x_reading_ver = reading_ver;
 	x_default_algo = default_algo;
 	x_data_loc = data_loc;
@@ -95,14 +97,14 @@ namespace libdar
 		    set_data_name(label_zero);
 		}
 	    }
-
 	 }
 	else
 	    if(!lax)
 		throw Erange("escape_catalogue::escape_catalogue", gettext("could not find the internal data set label escape sequence"));
 	    else
 	    {
-		contextual *cont_data = dynamic_cast<contextual *>(esc_ptr->get_below());
+		contextual *cont_data = NULL;
+		stack->find_first_from_bottom(cont_data);
 
 		get_ui().warning("LAX MODE: Could not read the internal data set label, using a fake value, this will probably avoid using isolated catalogue");
 		if(cont_data == NULL)
@@ -128,21 +130,19 @@ namespace libdar
 	return *this;
     }
 
-    void escape_catalogue::pre_add(const entree *ref, compressor *compr) const
+    void escape_catalogue::pre_add(const entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(compr == NULL)
-	    throw SRC_BUG;
-	compr->flush_write();
-
 	if(ceci->esc == NULL)
 	    throw SRC_BUG;
+
+	ceci->stack->sync_write_above(esc);
 	ceci->esc->add_mark_at_current_position(escape::seqt_file);
 	ref->dump(*(ceci->esc), true);
     }
 
-    void escape_catalogue::pre_add_ea(const entree *ref, compressor *compr) const
+    void escape_catalogue::pre_add_ea(const entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
@@ -155,21 +155,20 @@ namespace libdar
 	{
 	    if(ref_ino->ea_get_saved_status() == inode::ea_full)
 	    {
-		if(compr == NULL)
-		    throw SRC_BUG;
-		compr->flush_write();
-
 		if(ceci->esc == NULL)
 		    throw SRC_BUG;
 		else
+		{
+		    ceci->stack->sync_write_above(esc);
 		    ceci->esc->add_mark_at_current_position(escape::seqt_ea);
+		}
 	    }
 		// else, nothing to do.
 	}
 	    // else, nothing to do.
     }
 
-    void escape_catalogue::pre_add_crc(const entree *ref, compressor *compr) const
+    void escape_catalogue::pre_add_crc(const entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
@@ -186,13 +185,10 @@ namespace libdar
 
 		if(ref_file->get_crc(c))
 		{
-		    if(compr == NULL)
-			throw SRC_BUG;
-		    compr->flush_write();
-
 		    if(ceci->esc == NULL)
 			throw SRC_BUG;
 
+		    ceci->stack->sync_write_above(esc);
 		    ceci->esc->add_mark_at_current_position(escape::seqt_file_crc);
 		    c->dump(*(ceci->esc));
 		}
@@ -202,21 +198,18 @@ namespace libdar
 	}
     }
 
-    void escape_catalogue::pre_add_dirty(compressor *compr) const
+    void escape_catalogue::pre_add_dirty() const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(compr == NULL)
-	    throw SRC_BUG;
-	compr->flush_write();
-
 	if(ceci->esc == NULL)
 	    throw SRC_BUG;
+	ceci->stack->sync_write_above(esc);
 	ceci->esc->add_mark_at_current_position(escape::seqt_dirty);
     }
 
 
-    void escape_catalogue::pre_add_ea_crc(const entree *ref, compressor *compr) const
+    void escape_catalogue::pre_add_ea_crc(const entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
@@ -233,12 +226,9 @@ namespace libdar
 
 		ref_ino->ea_get_crc(c);
 
-		if(compr == NULL)
-		    throw SRC_BUG;
-		compr->flush_write();
-
 		if(ceci->esc == NULL)
 		    throw SRC_BUG;
+		ceci->stack->sync_write_above(esc);
 		ceci->esc->add_mark_at_current_position(escape::seqt_ea_crc);
 		c->dump(*(ceci->esc));
 	    }
@@ -248,33 +238,27 @@ namespace libdar
 
     }
 
-    void escape_catalogue::pre_add_waste_mark(compressor *compr) const
+    void escape_catalogue::pre_add_waste_mark() const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(compr == NULL)
-	    throw SRC_BUG;
-	compr->flush_write();
-
 	if(ceci->esc == NULL)
 	    throw SRC_BUG;
+	ceci->stack->sync_write_above(esc);
 	ceci->esc->add_mark_at_current_position(escape::seqt_changed);
     }
 
-    void escape_catalogue::pre_add_failed_mark(compressor *compr) const
+    void escape_catalogue::pre_add_failed_mark() const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
-	if(compr == NULL)
-	    throw SRC_BUG;
-	compr->flush_write();
-
 	if(ceci->esc == NULL)
 	    throw SRC_BUG;
+	ceci->stack->sync_write_above(esc);
 	ceci->esc->add_mark_at_current_position(escape::seqt_failed_backup);
     }
 
-    void escape_catalogue::pre_add_fsa(const entree *ref, compressor *compr) const
+    void escape_catalogue::pre_add_fsa(const entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
@@ -287,21 +271,20 @@ namespace libdar
 	{
 	    if(ref_ino->fsa_get_saved_status() == inode::fsa_full)
 	    {
-		if(compr == NULL)
-		    throw SRC_BUG;
-		compr->flush_write();
-
 		if(ceci->esc == NULL)
 		    throw SRC_BUG;
 		else
+		{
+		    ceci->stack->sync_write_above(esc);
 		    ceci->esc->add_mark_at_current_position(escape::seqt_fsa);
+		}
 	    }
 		// else, nothing to do.
 	}
 	    // else, nothing to do.
     }
 
-    void escape_catalogue::pre_add_fsa_crc(const entree *ref, compressor *compr) const
+    void escape_catalogue::pre_add_fsa_crc(const entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
@@ -318,12 +301,9 @@ namespace libdar
 
 		ref_ino->fsa_get_crc(c);
 
-		if(compr == NULL)
-		    throw SRC_BUG;
-		compr->flush_write();
-
 		if(ceci->esc == NULL)
 		    throw SRC_BUG;
+		ceci->stack->sync_write_above(esc);
 		ceci->esc->add_mark_at_current_position(escape::seqt_fsa_crc);
 		c->dump(*(ceci->esc));
 	    }
@@ -626,9 +606,19 @@ namespace libdar
 	catalogue::tail_catalogue_to_current_read();
     }
 
+    void escape_catalogue::set_esc_and_stack(pile *ptr)
+    {
+	if(ptr == NULL)
+	    throw SRC_BUG;
+	ptr->find_first_from_bottom(esc);
+	if(esc == NULL)
+	    throw SRC_BUG;
+	stack = ptr;
+    }
+
     void escape_catalogue::copy_from(const escape_catalogue & ref)
     {
-	set_esc(ref.esc);
+	set_esc_and_stack(ref.stack);
 	x_reading_ver = ref.x_reading_ver;
 	x_default_algo = ref.x_default_algo;
 	x_data_loc = ref.x_data_loc;
