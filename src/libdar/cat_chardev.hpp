@@ -41,10 +41,10 @@ namespace libdar
 	/// @{
 
 	/// the char device class
-    class chardev : public device
+    class cat_chardev : public device
     {
     public:
-        chardev(const infinint & uid, const infinint & gid, U_16 perm,
+        cat_chardev(const infinint & uid, const infinint & gid, U_16 perm,
                 const datetime & last_access,
                 const datetime & last_modif,
 		const datetime & last_change,
@@ -57,7 +57,7 @@ namespace libdar
 						     last_change,
 						     name,
 						     major, minor, fs_device) {};
-        chardev(user_interaction & dialog,
+        cat_chardev(user_interaction & dialog,
 		generic_file & f,
 		const archive_version & reading_ver,
 		saved_status saved,
@@ -68,7 +68,7 @@ namespace libdar
             // using method is_more_recent_than() from device class
             // using method has_changed_since() from device class
         unsigned char signature() const { return mk_signature('c', get_saved_status()); };
-        cat_entree *clone() const { return new (get_pool()) chardev(*this); };
+        cat_entree *clone() const { return new (get_pool()) cat_chardev(*this); };
     };
 
 	/// @}

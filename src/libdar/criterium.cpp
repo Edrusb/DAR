@@ -464,7 +464,7 @@ namespace libdar
 	const file * first_file = dynamic_cast<const file *>(first_i);
 	const lien * first_lien = dynamic_cast<const lien *>(first_i);
 	const cat_directory * first_dir = dynamic_cast<const cat_directory *>(first_i);
-	const chardev * first_char = dynamic_cast<const chardev *>(first_i);
+	const cat_chardev * first_char = dynamic_cast<const cat_chardev *>(first_i);
 	const blockdev * first_block = dynamic_cast<const blockdev *>(first_i);
 	const cat_tube * first_tube = dynamic_cast<const cat_tube *>(first_i);
 	const cat_prise * first_prise = dynamic_cast<const cat_prise *>(first_i);
@@ -473,7 +473,7 @@ namespace libdar
 	const file * second_file = dynamic_cast<const file *>(second_i);
 	const lien * second_lien = dynamic_cast<const lien *>(second_i);
 	const cat_directory * second_dir = dynamic_cast<const cat_directory *>(second_i);
-	const chardev * second_char = dynamic_cast<const chardev *>(second_i);
+	const cat_chardev * second_char = dynamic_cast<const cat_chardev *>(second_i);
 	const blockdev * second_block = dynamic_cast<const blockdev *>(second_i);
 	const cat_tube * second_tube = dynamic_cast<const cat_tube *>(second_i);
 	const cat_prise * second_prise = dynamic_cast<const cat_prise *>(second_i);

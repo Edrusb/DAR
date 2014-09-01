@@ -230,7 +230,7 @@ namespace libdar
 						     name,
 						     buf.st_dev);
 		else if(S_ISCHR(buf.st_mode))
-		    ref = new (get_pool()) chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (get_pool()) cat_chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						   atime,
 						   mtime,
 						   ctime,
@@ -1031,7 +1031,7 @@ namespace libdar
         const file *ref_fil = dynamic_cast<const file *>(ref);
         const lien *ref_lie = dynamic_cast<const lien *>(ref);
         const blockdev *ref_blo = dynamic_cast<const blockdev *>(ref);
-        const chardev *ref_cha = dynamic_cast<const chardev *>(ref);
+        const cat_chardev *ref_cha = dynamic_cast<const cat_chardev *>(ref);
         const cat_tube *ref_tub = dynamic_cast<const cat_tube *>(ref);
         const cat_prise *ref_pri = dynamic_cast<const cat_prise *>(ref);
         const cat_mirage *ref_mir = dynamic_cast <const cat_mirage *>(ref);
@@ -1110,7 +1110,7 @@ namespace libdar
 			ref_fil = dynamic_cast<const file *>(ref_mir->get_inode());
 			ref_lie = dynamic_cast<const lien *>(ref_mir->get_inode());
 			ref_blo = dynamic_cast<const blockdev *>(ref_mir->get_inode());
-			ref_cha = dynamic_cast<const chardev *>(ref_mir->get_inode());
+			ref_cha = dynamic_cast<const cat_chardev *>(ref_mir->get_inode());
 			ref_tub = dynamic_cast<const cat_tube *>(ref_mir->get_inode());
 			ref_pri = dynamic_cast<const cat_prise *>(ref_mir->get_inode());
 			ref_mir->get_inode()->change_name(ref_mir->get_name()); // we temporarily change the name of the attached inode (it is not used usually), by the name of the cat_mirage object

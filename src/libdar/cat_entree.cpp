@@ -92,7 +92,7 @@ namespace libdar
                     ++num_d;
                 else
                 {
-                    const chardev *c = dynamic_cast<const chardev *>(ino);
+                    const cat_chardev *c = dynamic_cast<const cat_chardev *>(ino);
                     if(c != NULL)
                         ++num_c;
                     else
@@ -207,7 +207,7 @@ namespace libdar
                 ret = new (pool) lien(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'c':
-                ret = new (pool) chardev(dialog, f, reading_ver, saved, efsa_loc, ptr);
+                ret = new (pool) cat_chardev(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'b':
                 ret = new (pool) blockdev(dialog, f, reading_ver, saved, efsa_loc, ptr);
