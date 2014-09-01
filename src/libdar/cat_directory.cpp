@@ -210,8 +210,8 @@ namespace libdar
 	    {
 		if(*x == NULL)
 		    throw SRC_BUG;
-		if(dynamic_cast<ignored *>(*x) != NULL)
-		    ++x; // "ignored" need not to be saved, they are only useful when updating_destroyed
+		if(dynamic_cast<cat_ignored *>(*x) != NULL)
+		    ++x; // "cat_ignored" need not to be saved, they are only useful when updating_destroyed
 		else
 		{
 		    (*x)->specific_dump(f, small);

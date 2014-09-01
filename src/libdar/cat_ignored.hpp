@@ -41,14 +41,14 @@ namespace libdar
 	/// @{
 
 	/// the present file to ignore (not to be recorded as deleted later)
-    class ignored : public cat_nomme
+    class cat_ignored : public cat_nomme
     {
     public :
-        ignored(const std::string & name) : cat_nomme(name) {};
-        ignored(generic_file & f) : cat_nomme(f) { throw SRC_BUG; };
+        cat_ignored(const std::string & name) : cat_nomme(name) {};
+        cat_ignored(generic_file & f) : cat_nomme(f) { throw SRC_BUG; };
 
         unsigned char signature() const { return 'i'; };
-        cat_entree *clone() const { return new (get_pool()) ignored(*this); };
+        cat_entree *clone() const { return new (get_pool()) cat_ignored(*this); };
 
     protected:
         void inherited_dump(generic_file & f, bool small) const { throw SRC_BUG; };

@@ -57,7 +57,7 @@ namespace libdar
     void entree_stats::add(const cat_entree *ref)
     {
         if(dynamic_cast<const cat_eod *>(ref) == NULL // we ignore cat_eod
-           && dynamic_cast<const ignored *>(ref) == NULL // as well we ignore "ignored"
+           && dynamic_cast<const cat_ignored *>(ref) == NULL // as well we ignore "cat_ignored"
            && dynamic_cast<const ignored_dir *>(ref) == NULL) // and "ignored_dir"
         {
             const cat_inode *ino = dynamic_cast<const cat_inode *>(ref);

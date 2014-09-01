@@ -881,7 +881,7 @@ namespace libdar
 				if(dir != NULL && make_empty_dir)
 				    ig = ignode = new (pool) ignored_dir(*dir);
 				else
-				    ig = new (pool) ignored(nom->get_name());
+				    ig = new (pool) cat_ignored(nom->get_name());
 				    // necessary to not record deleted files at comparison
 				    // time in case files are just not covered by filters
 				st.incr_ignored();
@@ -963,7 +963,7 @@ namespace libdar
 
 			    if(how != "write") // error did not occured while adding data to the archive
 			    {
-				cat_nomme *tmp = new (pool) ignored(nom->get_name());
+				cat_nomme *tmp = new (pool) cat_ignored(nom->get_name());
 				dialog.warning(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
 				st.incr_errored();
 
@@ -1653,7 +1653,7 @@ namespace libdar
 						// some different types of pointer to the "already_here" object (aka 'inplace" object)
 					    const cat_mirage *al_mir = dynamic_cast<const cat_mirage *>(already_here);
 					    const cat_detruit *al_det = dynamic_cast<const cat_detruit *>(already_here);
-					    const ignored *al_ign = dynamic_cast<const ignored *>(already_here);
+					    const cat_ignored *al_ign = dynamic_cast<const cat_ignored *>(already_here);
 					    const ignored_dir *al_igndir = dynamic_cast<const ignored_dir *>(already_here);
 					    const cat_inode *al_ino = dynamic_cast<const cat_inode *>(already_here);
 					    const cat_directory *al_dir = dynamic_cast<const cat_directory *>(already_here);
