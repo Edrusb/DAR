@@ -77,7 +77,7 @@ namespace libdar
 	///
 	/// \note the stack has the following contents depending on given options
 	///
-	/// +<top>                                          LIBDAR_STACK_LABEL_
+	/// +-top                                           LIBDAR_STACK_LABEL_
 	/// +----------------------------------------------+---------------------+
 	/// | [ generic_thread ]                           |_UNCOMPRESSED        |
 	/// | compressor                                   |v    v    v          |
@@ -92,7 +92,7 @@ namespace libdar
 	/// | [ tronc ]                                    |v   v   v            |
 	/// | trivial_sar  |  zapette  |  sar              |v   v   v            |
 	/// +----------------------------------------------+---------------------+
-	/// +<bottom>
+	/// +-bottom
 	///
 	/// \note generic_thread objects are only present in the stack if multi-thread is active
 	/// \note escape is present unless tape mark have been disabled at archive creation time
@@ -193,7 +193,7 @@ namespace libdar
 	///
 	/// \note the stack has the following contents depending on given options
 	///
-	/// +<top>                                          LIBDAR_STACK_LABEL_
+	/// +-top                                          LIBDAR_STACK_LABEL_
 	/// +----------------------------------------------+---------------------+
 	/// | [ generic_thread ]                           |                     |
 	/// | compressor                                   |                     |
@@ -208,7 +208,7 @@ namespace libdar
 	/// | [ cache ]                                    |_CACHE_PIPE          |
 	/// | trivial_sar  |  null_file  |  sar            |                     |
 	/// +----------------------------------------------+---------------------+
-	/// +<bottom>
+	/// +-bottom
 	///
 	/// \note the bottom cache layer is only present when trivial_sar is used to write on a pipe.
 	/// trivial_sar used to write a non sliced archive does not use a cache layer above it
