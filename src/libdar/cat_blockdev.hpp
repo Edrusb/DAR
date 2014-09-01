@@ -41,10 +41,10 @@ namespace libdar
 	/// @{
 
 	/// the block device class
-    class blockdev : public device
+    class cat_blockdev : public device
     {
     public:
-        blockdev(const infinint & uid, const infinint & gid, U_16 perm,
+        cat_blockdev(const infinint & uid, const infinint & gid, U_16 perm,
                  const datetime & last_access,
                  const datetime & last_modif,
 		 const datetime & last_change,
@@ -54,7 +54,7 @@ namespace libdar
 		 const infinint & fs_device) : device(uid, gid, perm, last_access,
 						      last_modif, last_change, name,
 						      major, minor, fs_device) {};
-        blockdev(user_interaction & dialog,
+        cat_blockdev(user_interaction & dialog,
 		 generic_file & f,
 		 const archive_version & reading_ver,
 		 saved_status saved,
@@ -65,7 +65,7 @@ namespace libdar
             // using method is_more_recent_than() from device class
             // using method has_changed_since() from device class
         unsigned char signature() const { return mk_signature('b', get_saved_status()); };
-        cat_entree *clone() const { return new (get_pool()) blockdev(*this); };
+        cat_entree *clone() const { return new (get_pool()) cat_blockdev(*this); };
     };
 
 	/// @}

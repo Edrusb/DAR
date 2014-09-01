@@ -97,7 +97,7 @@ namespace libdar
                         ++num_c;
                     else
                     {
-                        const blockdev *b = dynamic_cast<const blockdev *>(ino);
+                        const cat_blockdev *b = dynamic_cast<const cat_blockdev *>(ino);
                         if(b != NULL)
                             ++num_b;
                         else
@@ -210,7 +210,7 @@ namespace libdar
                 ret = new (pool) cat_chardev(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'b':
-                ret = new (pool) blockdev(dialog, f, reading_ver, saved, efsa_loc, ptr);
+                ret = new (pool) cat_blockdev(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'p':
                 ret = new (pool) cat_tube(dialog, f, reading_ver, saved, efsa_loc, ptr);
