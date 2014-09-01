@@ -85,9 +85,9 @@ namespace libdar
 	virtual void end_read() const; // set the reading cursor to the end of the catalogue
         virtual void skip_read_to_parent_dir() const;
             // skip all items of the current dir and of any subdir, the next call will return
-            // next item of the parent dir (no eod to exit from the current dir !)
+            // next item of the parent dir (no cat_eod to exit from the current dir !)
         virtual bool read(const cat_entree * & ref) const;
-            // sequential read (generates eod) and return false when all files have been read
+            // sequential read (generates cat_eod) and return false when all files have been read
         virtual bool read_if_present(std::string *name, const cat_nomme * & ref) const;
             // pseudo-sequential read (reading a directory still
             // implies that following read are located in this subdirectory up to the next EOD) but
@@ -104,7 +104,7 @@ namespace libdar
         void reset_sub_read(const path &sub); // initialise sub_read to the given directory
         bool sub_read(const cat_entree * &ref); // sequential read of the catalogue, ignoring all that
             // is not part of the subdirectory specified with reset_sub_read
-            // the read include the inode leading to the sub_tree as well as the pending eod
+            // the read include the inode leading to the sub_tree as well as the pending cat_eod
 
 	    // return true if the last read entry has already been read
 	    // and has not to be counted again. This is never the case for catalogue but may occure
@@ -222,7 +222,7 @@ namespace libdar
 	void set_data_name(const label & val) { ref_data_name = val; };
 	void copy_detruits_from(const catalogue & ref); // needed for escape_catalogue implementation only.
 
-	const eod * get_r_eod_address() const { return & r_eod; }; // eod are never stored in the catalogue
+	const cat_eod * get_r_eod_address() const { return & r_eod; }; // cat_eod are never stored in the catalogue
 	    // however it is sometimes required to return such a reference to a valid object
 	    // owned by the catalogue.
 
@@ -245,7 +245,7 @@ namespace libdar
         void partial_copy_from(const catalogue &ref);
         void detruire();
 
-        static const eod r_eod;           // needed to return eod reference, without taking risk of saturating memory
+        static const cat_eod r_eod;           // needed to return eod reference, without taking risk of saturating memory
 	static const U_I CAT_CRC_SIZE;
     };
 

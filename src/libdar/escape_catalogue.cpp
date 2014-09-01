@@ -357,7 +357,7 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_directory *ref_dir = NULL;
-	const eod *ref_eod = NULL;
+	const cat_eod *ref_eod = NULL;
 	bool stop = false;
 
 	if(esc == NULL)
@@ -420,7 +420,7 @@ namespace libdar
 			    if(ref_dir != NULL)
 				++(ceci->depth);
 
-			    ref_eod = dynamic_cast<const eod *>(ref);
+			    ref_eod = dynamic_cast<const cat_eod *>(ref);
 			    if(ref_eod != NULL)
 			    {
 				if(depth > 0)
@@ -433,7 +433,7 @@ namespace libdar
 					get_ui().warning(gettext("LAX MODE: Archive directory structure is corrupted, it would lead to place some files out of the specified root directory. Restoring different directory contents at the root not out of it, which will put files of different directories in the specified root directory"));
 					if(ref == NULL)
 					    throw SRC_BUG;
-					delete ref; // this is the EOD object
+					delete ref; // this is the CAT_EOD object
 					ref = NULL;
 					continue; // restarts the while loop
 				    }
@@ -466,7 +466,7 @@ namespace libdar
 				    if(is_eod)
 					ceci->wait_parent_depth = 0;
 				    else
-					throw SRC_BUG; // we should get out of the directory reading a EOD !
+					throw SRC_BUG; // we should get out of the directory reading a CAT_EOD !
 				}
 
 				ref = NULL; // must not release object except, they are now part of catalogue

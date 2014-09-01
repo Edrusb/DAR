@@ -41,7 +41,7 @@ extern "C"
 
 namespace libdar
 {
-    class eod;
+    class cat_eod;
 
 	/// \addtogroup Private
 	/// @{
@@ -133,7 +133,7 @@ namespace libdar
         void inherited_dump(generic_file & f, bool small) const;
 
     private:
-	static const eod fin;
+	static const cat_eod fin;
 
 	infinint x_size;
 	infinint x_storage_size;

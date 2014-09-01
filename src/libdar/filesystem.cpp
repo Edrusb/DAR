@@ -606,7 +606,7 @@ namespace libdar
 		    {
                         if(! current_dir->pop(tmp))
                             throw SRC_BUG;
-                        ref = new (get_pool()) eod();
+                        ref = new (get_pool()) cat_eod();
                     }
                 }
                 else // could read a filename in directory
@@ -1339,7 +1339,7 @@ namespace libdar
 
     void filesystem_restore::write(const cat_entree *x, action_done_for_data & data_restored, bool & ea_restored, bool & data_created, bool & hard_link, bool & fsa_restored)
     {
-	const eod *x_eod = dynamic_cast<const eod *>(x);
+	const cat_eod *x_eod = dynamic_cast<const cat_eod *>(x);
 	const cat_nomme *x_nom = dynamic_cast<const cat_nomme *>(x);
 	const cat_directory *x_dir = dynamic_cast<const cat_directory *>(x);
 	const detruit *x_det = dynamic_cast<const detruit *>(x);
@@ -1380,7 +1380,7 @@ namespace libdar
 	}
 
 	if(x_nom == NULL)
-	    throw SRC_BUG; // neither "cat_nomme" nor "eod"
+	    throw SRC_BUG; // neither "cat_nomme" nor "cat_eod"
 	else // cat_nomme
 	{
 	    bool has_data_saved = (x_ino != NULL && x_ino->get_saved_status() == s_saved) || x_det != NULL;

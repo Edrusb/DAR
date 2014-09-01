@@ -30,7 +30,7 @@ namespace libdar
 
     void defile::enfile(const cat_entree *e)
     {
-        const eod *fin = dynamic_cast<const eod *>(e);
+        const cat_eod *fin = dynamic_cast<const cat_eod *>(e);
         const cat_directory *dir = dynamic_cast<const cat_directory *>(e);
         const cat_nomme *nom = dynamic_cast<const cat_nomme *>(e);
         string s;
@@ -43,10 +43,10 @@ namespace libdar
         else // nothing to be removed
             init = false;
 
-        if(fin == NULL) // not eod
+        if(fin == NULL) // not cat_eod
 	{
             if(nom == NULL) // not a cat_nomme
-                throw SRC_BUG; // neither eod nor cat_nomme
+                throw SRC_BUG; // neither cat_eod nor cat_nomme
             else // a cat_nomme
             {
                 chemin += nom->get_name();

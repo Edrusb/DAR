@@ -168,7 +168,7 @@ namespace libdar
 			const fsa_scope & scope)
     {
 	defile juillet = fs_racine; // 'juillet' is in reference to 14th of July ;-) when takes place the "defile'" on the Champs-Elysees.
-	const eod tmp_eod;
+	const cat_eod tmp_eod;
 	const cat_entree *e;
 	thread_cancellation thr_cancel;
 	const crit_action * when_only_deleted = only_deleted ? make_overwriting_for_only_deleted(pool) : NULL;
@@ -464,18 +464,18 @@ namespace libdar
 				st.incr_errored();
 		    }
 		}
-		else // e_nom == NULL : this should be a EOD
+		else // e_nom == NULL : this should be a CAT_EOD
 		{
-		    const eod *e_eod = dynamic_cast<const eod *>(e);
+		    const cat_eod *e_eod = dynamic_cast<const cat_eod *>(e);
 
 		    if(e_eod == NULL)
-			throw SRC_BUG; // not an class eod object, nor a class cat_nomme object ???
+			throw SRC_BUG; // not an class cat_eod object, nor a class cat_nomme object ???
 
 		    if(!flat)
 		    {
 			bool notusedhere;
 			filesystem_restore::action_done_for_data tmp;
-			fs.write(e, tmp, notusedhere, notusedhere, notusedhere, notusedhere); // eod; don't care returned value
+			fs.write(e, tmp, notusedhere, notusedhere, notusedhere, notusedhere); // cat_eod; don't care returned value
 		    }
 		}
 	    }
@@ -530,7 +530,7 @@ namespace libdar
         cat_entree *e = NULL;
         const cat_entree *f = NULL;
         defile juillet = fs_racine;
-        const eod tmp_eod;
+        const cat_eod tmp_eod;
 	compressor *stockage;
         compression stock_algo;
 	semaphore sem = semaphore(dialog, backup_hook_file_execute, backup_hook_file_mask);
@@ -989,13 +989,13 @@ namespace libdar
 			    }
 			}
 		    }
-		    else // eod
+		    else // cat_eod
 		    {
 			sem.raise(juillet.get_string(), e, true);
 			sem.lower();
 			if(fixed_date == 0)
 			    ref.compare(e, f); // makes the comparison in the reference catalogue go to parent directory
-			cat.pre_add(e); // adding a mark and dropping EOD entry in the archive if cat is an escape_catalogue object (else, does nothing)
+			cat.pre_add(e); // adding a mark and dropping CAT_EOD entry in the archive if cat is an escape_catalogue object (else, does nothing)
 			if(display_finished)
 			{
 			    const cat_directory & cur = cat.get_current_add_dir();
@@ -1060,7 +1060,7 @@ namespace libdar
     {
         const cat_entree *e;
         defile juillet = fs_racine;
-        const eod tmp_eod;
+        const cat_eod tmp_eod;
         filesystem_diff fs = filesystem_diff(dialog,
 					     fs_racine,
 					     info_details,
@@ -1205,11 +1205,11 @@ namespace libdar
 			}
 		    }
 		}
-		else // eod ?
-		    if(dynamic_cast<const eod *>(e) != NULL) // yes eod
+		else // cat_eod ?
+		    if(dynamic_cast<const cat_eod *>(e) != NULL) // yes cat_eod
 			fs.skip_read_filename_in_parent_dir();
 		    else // no ?!?
-			throw SRC_BUG; // not cat_nomme neither eod ! what's that ?
+			throw SRC_BUG; // not cat_nomme neither cat_eod ! what's that ?
 	    }
 	    catch(Euser_abort &e)
 	    {
@@ -1254,7 +1254,7 @@ namespace libdar
         defile juillet = FAKE_ROOT;
         null_file black_hole = null_file(gf_write_only);
         infinint offset;
-        const eod tmp_eod;
+        const cat_eod tmp_eod;
 	thread_cancellation thr_cancel;
 	string perimeter;
 
@@ -1475,7 +1475,7 @@ namespace libdar
 	    throw SRC_BUG;
 	stock_algo = stockage->get_algo();
 	thread_cancellation thr_cancel;
-	const eod tmp_eod;
+	const cat_eod tmp_eod;
 	const catalogue *ref_tab[] = { ref1, ref2, NULL };
 	infinint etiquette_offset = 0;
 	map <infinint, etoile *> corres_copy;
@@ -2282,7 +2282,7 @@ namespace libdar
 				st.incr_errored();
 			    }
 			}
-			else  // cat_entree is not a cat_nomme object (this is an "eod")
+			else  // cat_entree is not a cat_nomme object (this is an "cat_eod")
 			{
 			    cat_entree *tmp = e->clone();
 			    try
@@ -2291,10 +2291,10 @@ namespace libdar
 
 				if(tmp == NULL)
 				    throw Ememory("filtre_merge");
-				if(dynamic_cast<eod *>(tmp) == NULL)
+				if(dynamic_cast<cat_eod *>(tmp) == NULL)
 				    throw SRC_BUG;
-				cat.add(tmp); // add eod to catalogue (add cursor)
-				cat.read_if_present(NULL, already); // equivalent to eod for the reading methods
+				cat.add(tmp); // add cat_eod to catalogue (add cursor)
+				cat.read_if_present(NULL, already); // equivalent to cat_eod for the reading methods
 			    }
 			    catch(...)
 			    {

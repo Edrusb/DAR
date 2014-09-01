@@ -56,7 +56,7 @@ namespace libdar
 
     void entree_stats::add(const cat_entree *ref)
     {
-        if(dynamic_cast<const eod *>(ref) == NULL // we ignore eod
+        if(dynamic_cast<const cat_eod *>(ref) == NULL // we ignore cat_eod
            && dynamic_cast<const ignored *>(ref) == NULL // as well we ignore "ignored"
            && dynamic_cast<const ignored_dir *>(ref) == NULL) // and "ignored_dir"
         {
@@ -238,7 +238,7 @@ namespace libdar
                     else
                         dialog.warning(gettext("LAX MODE: Unexpected saved status for end of directory entry, assuming data corruption occurred, ignoring and continuing"));
                 }
-                ret = new (pool) eod(f);
+                ret = new (pool) cat_eod(f);
                 break;
             case 'x':
                 if(saved != s_saved)

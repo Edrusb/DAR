@@ -35,7 +35,7 @@ namespace libdar
 
 	// static field of class cat_directory
 
-    const eod cat_directory::fin;
+    const cat_eod cat_directory::fin;
 
 	// methods of class cat_directory
 
@@ -99,7 +99,7 @@ namespace libdar
 	cat_directory *d;
 	detruit *x;
 	cat_mirage *m;
-	eod *fin = NULL;
+	cat_eod *fin = NULL;
 	bool lax_end = false;
 
 	parent = NULL;
@@ -140,7 +140,7 @@ namespace libdar
 		if(p != NULL)
 		{
 		    d = dynamic_cast<cat_directory *>(p);
-		    fin = dynamic_cast<eod *>(p);
+		    fin = dynamic_cast<cat_eod *>(p);
 		    t = dynamic_cast<cat_nomme *>(p);
 		    x = dynamic_cast<detruit *>(p);
 		    m = dynamic_cast<cat_mirage *>(p);
@@ -161,7 +161,7 @@ namespace libdar
 			if(d != NULL) // p is a cat_directory
 			    d->parent = this;
 			if(t == NULL && fin == NULL)
-			    throw SRC_BUG; // neither an eod nor a cat_nomme ! what's that ???
+			    throw SRC_BUG; // neither an cat_eod nor a cat_nomme ! what's that ???
 		    }
 		    else
 		    {
@@ -225,7 +225,7 @@ namespace libdar
 
 	fin.specific_dump(f, small); // end of "this" cat_directory
 	    // fin is a static constant variable of class cat_directory,
-	    // this hack avoids recurrent construction/destruction of a eod object.
+	    // this hack avoids recurrent construction/destruction of a cat_eod object.
     }
 
     void cat_directory::recursive_update_sizes() const

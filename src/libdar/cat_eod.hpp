@@ -42,14 +42,14 @@ namespace libdar
 
 
 	/// the End of Directory entry class
-    class eod : public cat_entree
+    class cat_eod : public cat_entree
     {
     public :
-        eod() {};
-        eod(generic_file & f) {};
+        cat_eod() {};
+        cat_eod(generic_file & f) {};
             // dump defined by cat_entree
         unsigned char signature() const { return 'z'; };
-        cat_entree *clone() const { return new (get_pool()) eod(); };
+        cat_entree *clone() const { return new (get_pool()) cat_eod(); };
 
     };
 

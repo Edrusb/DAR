@@ -56,11 +56,11 @@ namespace libdar
 	    throw SRC_BUG;
 	if(count > 1) // outer directory inder controlled backup (execute ran in "start" context)
 	{
-	    if(dynamic_cast<const eod *>(object) != NULL)
+	    if(dynamic_cast<const cat_eod *>(object) != NULL)
 		if(data_to_save)
 		    --count;
 		else
-		    throw SRC_BUG; // EOD should always have its data to be saved
+		    throw SRC_BUG; // CAT_EOD should always have its data to be saved
 	    else
 	    {
 		if(dynamic_cast<const cat_directory *>(object) != NULL)
@@ -72,7 +72,7 @@ namespace libdar
 	    const cat_nomme *o_nom = dynamic_cast<const cat_nomme *>(object);
 
 	    if(o_nom == NULL)
-		return; // EOD associated to an unsaved directory
+		return; // CAT_EOD associated to an unsaved directory
 
 	    if(data_to_save && match->is_covered(x_chem))
 	    {

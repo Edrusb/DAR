@@ -293,7 +293,7 @@ namespace libdar
 	    cat_directory *papa = ceci->current_read->get_parent();
 	    ref = &r_eod;
 	    if(papa == NULL)
-		return false; // we reached end of root, no eod generation
+		return false; // we reached end of root, no cat_eod generation
 	    else
 	    {
 		ceci->current_read = papa;
@@ -439,7 +439,7 @@ namespace libdar
 	    if(read(ref) && sub_count > 0)
 	    {
 		const cat_directory *dir = dynamic_cast<const cat_directory *>(ref);
-		const eod *fin = dynamic_cast<const eod *>(ref);
+		const cat_eod *fin = dynamic_cast<const cat_eod *>(ref);
 
 		if(dir != NULL)
 		    sub_count++;
@@ -463,21 +463,21 @@ namespace libdar
 	if(current_add == NULL)
 	    throw SRC_BUG;
 
-	eod *f = dynamic_cast<eod *>(ref);
+	cat_eod *f = dynamic_cast<cat_eod *>(ref);
 
-	if(f == NULL) // ref is not eod
+	if(f == NULL) // ref is not cat_eod
 	{
 	    cat_nomme *n = dynamic_cast<cat_nomme *>(ref);
 	    cat_directory *t = dynamic_cast<cat_directory *>(ref);
 
 	    if(n == NULL)
-		throw SRC_BUG; // unknown type neither "eod" nor "cat_nomme"
+		throw SRC_BUG; // unknown type neither "cat_eod" nor "cat_nomme"
 	    current_add->add_children(n);
 	    if(t != NULL) // ref is a directory
 		current_add = t;
 	    stats.add(ref);
 	}
-	else // ref is an eod
+	else // ref is an cat_eod
 	{
 	    cat_directory *parent = current_add->get_parent();
 	    if(parent == NULL)
@@ -534,7 +534,7 @@ namespace libdar
 	catalogue *me = const_cast<catalogue *>(this);
 	const cat_mirage *mir = dynamic_cast<const cat_mirage *>(target);
 	const cat_directory *dir = dynamic_cast<const cat_directory *>(target);
-	const eod *fin = dynamic_cast<const eod *>(target);
+	const cat_eod *fin = dynamic_cast<const cat_eod *>(target);
 	const cat_nomme *nom = dynamic_cast<const cat_nomme *>(target);
 
 	if(me == NULL)
@@ -577,7 +577,7 @@ namespace libdar
 	    }
 
 	    if(nom == NULL)
-		throw SRC_BUG; // ref, is neither a eod nor a cat_nomme ! what's that ???
+		throw SRC_BUG; // ref, is neither a cat_eod nor a cat_nomme ! what's that ???
 
 	    if(current_compare->search_children(nom->get_name(), found))
 	    {
@@ -645,7 +645,7 @@ namespace libdar
 	cat_directory *current = contenu;
 	const cat_nomme *ici;
 	const cat_entree *projo;
-	const eod *pro_eod;
+	const cat_eod *pro_eod;
 	const cat_directory *pro_dir;
 	const detruit *pro_det;
 	const cat_nomme *pro_nom;
@@ -655,7 +655,7 @@ namespace libdar
 	ref.reset_read();
 	while(ref.read(projo))
 	{
-	    pro_eod = dynamic_cast<const eod *>(projo);
+	    pro_eod = dynamic_cast<const cat_eod *>(projo);
 	    pro_dir = dynamic_cast<const cat_directory *>(projo);
 	    pro_det = dynamic_cast<const detruit *>(projo);
 	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
@@ -674,7 +674,7 @@ namespace libdar
 		continue;
 
 	    if(pro_nom == NULL)
-		throw SRC_BUG; // neither an eod nor a cat_nomme ! what's that ?
+		throw SRC_BUG; // neither an cat_eod nor a cat_nomme ! what's that ?
 
 	    if(!current->search_children(pro_nom->get_name(), ici))
 	    {
@@ -722,7 +722,7 @@ namespace libdar
 	cat_directory *current = contenu;
 	const cat_nomme *ici;
 	const cat_entree *projo;
-	const eod *pro_eod;
+	const cat_eod *pro_eod;
 	const cat_directory *pro_dir;
 	const detruit *pro_det;
 	const cat_nomme *pro_nom;
@@ -736,7 +736,7 @@ namespace libdar
 	ref.reset_read();
 	while(ref.read(projo))
 	{
-	    pro_eod = dynamic_cast<const eod *>(projo);
+	    pro_eod = dynamic_cast<const cat_eod *>(projo);
 	    pro_dir = dynamic_cast<const cat_directory *>(projo);
 	    pro_det = dynamic_cast<const detruit *>(projo);
 	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
@@ -756,7 +756,7 @@ namespace libdar
 		continue;
 
 	    if(pro_nom == NULL)
-		throw SRC_BUG; // neither an eod nor a cat_nomme! what's that?
+		throw SRC_BUG; // neither an cat_eod nor a cat_nomme! what's that?
 
 	    if(pro_mir != NULL)
 		pro_ino = pro_mir->get_inode();
@@ -927,7 +927,7 @@ namespace libdar
 	const string marge_plus = " |  ";
 	const U_I marge_plus_length = marge_plus.size();
 	defile juillet = FAKE_ROOT;
-	const eod tmp_eod;
+	const cat_eod tmp_eod;
 
 	get_ui().printf(gettext("Access mode    | User | Group | Size  |          Date                 | [Data ][ EA  ][FSA][Compr][S]|   Filename\n"));
 	get_ui().printf(gettext("---------------+------+-------+-------+-------------------------------+------------------------------+-----------\n"));
@@ -937,7 +937,7 @@ namespace libdar
 	reset_read();
 	while(read(e))
 	{
-	    const eod *e_eod = dynamic_cast<const eod *>(e);
+	    const cat_eod *e_eod = dynamic_cast<const cat_eod *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
@@ -959,7 +959,7 @@ namespace libdar
 	    }
 	    else
 		if(e_nom == NULL)
-		    throw SRC_BUG; // not an eod nor a cat_nomme, what's that?
+		    throw SRC_BUG; // not an cat_eod nor a cat_nomme, what's that?
 		else
 		    if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || selection.is_covered(e_nom->get_name())))
 		    {
@@ -1040,7 +1040,7 @@ namespace libdar
 	const cat_entree *e = NULL;
 	thread_cancellation thr;
 	defile juillet = FAKE_ROOT;
-	const eod tmp_eod;
+	const cat_eod tmp_eod;
 
 	if(!get_ui().get_use_listing())
 	{
@@ -1054,7 +1054,7 @@ namespace libdar
 	while(read(e))
 	{
 	    string sep = beginning == "" ? "" : "/";
-	    const eod *e_eod = dynamic_cast<const eod *>(e);
+	    const cat_eod *e_eod = dynamic_cast<const cat_eod *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
@@ -1185,7 +1185,7 @@ namespace libdar
 	reset_read();
 	while(read(e))
 	{
-	    const eod *e_eod = dynamic_cast<const eod *>(e);
+	    const cat_eod *e_eod = dynamic_cast<const cat_eod *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
@@ -1193,7 +1193,7 @@ namespace libdar
 	    const cat_lien *e_sym = dynamic_cast<const cat_lien *>(e);
 	    const cat_device *e_dev = dynamic_cast<const cat_device *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
-	    const eod tmp_eod;
+	    const cat_eod tmp_eod;
 
 	    thr.check_self_cancellation();
 	    juillet.enfile(e);
@@ -1459,7 +1459,7 @@ namespace libdar
 	const cat_entree *e = NULL;
 	thread_cancellation thr;
 	defile juillet = FAKE_ROOT;
-	const eod tmp_eod;
+	const cat_eod tmp_eod;
 	range all_slices;
 	range file_slices;
 
@@ -1468,7 +1468,7 @@ namespace libdar
 	reset_read();
 	while(read(e))
 	{
-	    const eod *e_eod = dynamic_cast<const eod *>(e);
+	    const cat_eod *e_eod = dynamic_cast<const cat_eod *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
@@ -1590,13 +1590,13 @@ namespace libdar
 	{
 	    const detruit *ent_det = dynamic_cast<const detruit *>(ent);
 	    const cat_directory *ent_dir = dynamic_cast<const cat_directory *>(ent);
-	    const eod *ent_eod = dynamic_cast<const eod *>(ent);
+	    const cat_eod *ent_eod = dynamic_cast<const cat_eod *>(ent);
 
 	    if(ent_dir != NULL)
 		re_add_in(ent_dir->get_name());
 	    if(ent_eod != NULL)
 	    {
-		eod *tmp = new (get_pool()) eod();
+		cat_eod *tmp = new (get_pool()) cat_eod();
 		if(tmp == NULL)
 		    throw Ememory("catalogue::copy_detruits_from");
 		try
@@ -1708,7 +1708,7 @@ namespace libdar
     }
 
 
-    const eod catalogue::r_eod;
+    const cat_eod catalogue::r_eod;
     const U_I catalogue::CAT_CRC_SIZE = 4;
 
 
