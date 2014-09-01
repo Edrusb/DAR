@@ -117,7 +117,7 @@ namespace libdar
                                         ++num_l;
                                     else
                                     {
-					const door *D = dynamic_cast<const door *>(ino);
+					const cat_door *D = dynamic_cast<const cat_door *>(ino);
 					if(D != NULL)
 					    ++num_D;
 					else
@@ -251,7 +251,7 @@ namespace libdar
                 ret = new (pool) cat_detruit(f, reading_ver);
                 break;
 	    case 'o':
-		ret = new (pool) door(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
+		ret = new (pool) cat_door(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
 		break;
             default :
                 if(!lax)

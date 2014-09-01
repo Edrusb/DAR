@@ -42,10 +42,10 @@ namespace libdar
 
 
 	/// the class for Door IPC (mainly for Solaris)
-    class door : public cat_file
+    class cat_door : public cat_file
     {
     public:
-        door(const infinint & xuid,
+        cat_door(const infinint & xuid,
 	     const infinint & xgid,
 	     U_16 xperm,
              const datetime & last_access,
@@ -55,7 +55,7 @@ namespace libdar
              const path & che,
              const infinint & fs_device) : cat_file(xuid, xgid, xperm, last_access, last_modif,
 						last_change, src, che, 0, fs_device, false) {};
-        door(user_interaction & dialog,
+        cat_door(user_interaction & dialog,
              generic_file & f,
              const archive_version & reading_ver,
              saved_status saved,

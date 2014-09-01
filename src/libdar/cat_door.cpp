@@ -34,7 +34,7 @@ namespace libdar
 {
 
 
-    generic_file *door::get_data(get_data_mode mode) const
+    generic_file *cat_door::get_data(get_data_mode mode) const
     {
 	generic_file *ret = NULL;
 
@@ -42,7 +42,7 @@ namespace libdar
 	{
 	    ret = new (get_pool()) null_file(gf_read_only);
 	    if(ret == NULL)
-		throw Ememory("door::get_data");
+		throw Ememory("cat_door::get_data");
 	}
 	else
 	    ret = cat_file::get_data(mode);

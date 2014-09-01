@@ -230,7 +230,7 @@ namespace libdar
     {
 	const cat_inode *first_i = get_inode(&first);
 
-	return dynamic_cast<const cat_file *>(first_i) != NULL && dynamic_cast<const door *>(first_i) == NULL;
+	return dynamic_cast<const cat_file *>(first_i) != NULL && dynamic_cast<const cat_door *>(first_i) == NULL;
     }
 
     bool crit_in_place_is_hardlinked_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
