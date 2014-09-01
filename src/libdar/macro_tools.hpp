@@ -278,7 +278,7 @@ namespace libdar
 	/// \param[in] sl slice layout of the archive
 	/// \return a set of slices which will be required to restore that particular file (over the slice(s)
 	/// containing the catalogue of course).
-    range macro_tools_get_slices(const nomme *obj, slice_layout sl);
+    range macro_tools_get_slices(const cat_nomme *obj, slice_layout sl);
 
 } // end of namespace
 

@@ -154,11 +154,11 @@ namespace libdar
 ///////////////// filesystem_hard_link_read methods ///////////////
 ///////////////////////////////////////////////////////////////////
 
-    nomme *filesystem_hard_link_read::make_read_entree(path & lieu, const string & name, bool see_hard_link, const mask & ea_mask)
+    cat_nomme *filesystem_hard_link_read::make_read_entree(path & lieu, const string & name, bool see_hard_link, const mask & ea_mask)
     {
 	const string display = name.empty() ? lieu.display() : (lieu + path(name)).display();
         const char *ptr_name = display.c_str();
-        nomme *ref = NULL;
+        cat_nomme *ref = NULL;
 	struct stat buf;
 	string tmp;
 
@@ -805,7 +805,7 @@ namespace libdar
 	    delete ref;
     }
 
-    bool filesystem_diff::read_filename(const string & name, nomme * &ref)
+    bool filesystem_diff::read_filename(const string & name, cat_nomme * &ref)
     {
         directory *ref_dir = NULL;
         if(current_dir == NULL)
@@ -908,7 +908,7 @@ namespace libdar
 ///////////////////////////////////////////////////////////////////
 
 
-    bool filesystem_hard_link_write::raw_set_ea(const nomme *e,
+    bool filesystem_hard_link_write::raw_set_ea(const cat_nomme *e,
 						const ea_attributs & list_ea,
 						const string & spot,
 						const mask & ea_mask)
@@ -958,7 +958,7 @@ namespace libdar
         return ret;
     }
 
-    bool filesystem_hard_link_write::raw_clear_ea_set(const nomme *e, const string & spot)
+    bool filesystem_hard_link_write::raw_clear_ea_set(const cat_nomme *e, const string & spot)
     {
         const mirage *e_mir = dynamic_cast<const mirage *>(e);
 
@@ -1021,7 +1021,7 @@ namespace libdar
         return corres_write.find(eti) != corres_write.end();
     }
 
-    void filesystem_hard_link_write::make_file(const nomme * ref,
+    void filesystem_hard_link_write::make_file(const cat_nomme * ref,
 					       const path & ou,
 					       bool dir_perm,
 					       inode::comparison_fields what_to_check,
@@ -1340,7 +1340,7 @@ namespace libdar
     void filesystem_restore::write(const cat_entree *x, action_done_for_data & data_restored, bool & ea_restored, bool & data_created, bool & hard_link, bool & fsa_restored)
     {
 	const eod *x_eod = dynamic_cast<const eod *>(x);
-	const nomme *x_nom = dynamic_cast<const nomme *>(x);
+	const cat_nomme *x_nom = dynamic_cast<const cat_nomme *>(x);
 	const directory *x_dir = dynamic_cast<const directory *>(x);
 	const detruit *x_det = dynamic_cast<const detruit *>(x);
 	const inode *x_ino = dynamic_cast<const inode *>(x);
@@ -1380,8 +1380,8 @@ namespace libdar
 	}
 
 	if(x_nom == NULL)
-	    throw SRC_BUG; // neither "nomme" nor "eod"
-	else // nomme
+	    throw SRC_BUG; // neither "cat_nomme" nor "eod"
+	else // cat_nomme
 	{
 	    bool has_data_saved = (x_ino != NULL && x_ino->get_saved_status() == s_saved) || x_det != NULL;
 	    bool has_ea_saved = x_ino != NULL && (x_ino->ea_get_saved_status() == inode::ea_full || x_ino->ea_get_saved_status() == inode::ea_removed);
@@ -1389,7 +1389,7 @@ namespace libdar
 	    path spot = *current_dir + x_nom->get_name();
 	    string spot_display = spot.display();
 
-	    nomme *exists = NULL;
+	    cat_nomme *exists = NULL;
 
 	    if(ignore_over_restricts)
 		    // only used in sequential_read when a file has been saved several times due
@@ -1674,7 +1674,7 @@ namespace libdar
     }
 
     void filesystem_restore::action_over_data(const inode *in_place,
-					      const nomme *to_be_added,
+					      const cat_nomme *to_be_added,
 					      const string & spot,
 					      over_action_data action,
 					      action_done_for_data & data_done)
@@ -1692,7 +1692,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(tba_det != NULL)
-	    throw SRC_BUG; // must be either a mirage or an inode, not any other nomme object
+	    throw SRC_BUG; // must be either a mirage or an inode, not any other cat_nomme object
 
 	if(action == data_ask)
 	    action = crit_ask_user_for_data_action(get_ui(), spot, in_place, to_be_added);
@@ -1852,7 +1852,7 @@ namespace libdar
 	}
     }
 
-    bool filesystem_restore::action_over_ea(const inode *in_place, const nomme *to_be_added, const string & spot, over_action_ea action)
+    bool filesystem_restore::action_over_ea(const inode *in_place, const cat_nomme *to_be_added, const string & spot, over_action_ea action)
     {
 	bool ret = false;
 	const inode *tba_ino = dynamic_cast<const inode *>(to_be_added);
@@ -2001,7 +2001,7 @@ namespace libdar
 	return ret;
     }
 
-    bool filesystem_restore::action_over_fsa(const inode *in_place, const nomme *to_be_added, const string & spot, over_action_ea action)
+    bool filesystem_restore::action_over_fsa(const inode *in_place, const cat_nomme *to_be_added, const string & spot, over_action_ea action)
     {
 	bool ret = false;
 	const inode *tba_ino = dynamic_cast<const inode *>(to_be_added);

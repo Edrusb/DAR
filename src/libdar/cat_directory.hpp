@@ -74,11 +74,11 @@ namespace libdar
 		  escape *ptr);
         ~directory(); // detruit aussi tous les fils et se supprime de son 'parent'
 
-        void add_children(nomme *r); // when r is a directory, 'parent' is set to 'this'
+        void add_children(cat_nomme *r); // when r is a directory, 'parent' is set to 'this'
 	bool has_children() const { return !ordered_fils.empty(); };
         void reset_read_children() const;
 	void end_read() const;
-        bool read_children(const nomme * &r) const; // read the direct children of the directory, returns false if no more is available
+        bool read_children(const cat_nomme * &r) const; // read the direct children of the directory, returns false if no more is available
 	    // remove all entry not yet read by read_children
 	void tail_to_read_children();
 
@@ -86,7 +86,7 @@ namespace libdar
 	    // as side effect the reset_read_children() method must be called.
 
         directory * get_parent() const { return parent; };
-        bool search_children(const std::string &name, const nomme *&ref) const;
+        bool search_children(const std::string &name, const cat_nomme *&ref) const;
 	bool callback_for_children_of(user_interaction & dialog, const std::string & sdir, bool isolated = false) const;
 
             // using is_more_recent_than() from inode class
@@ -99,7 +99,7 @@ namespace libdar
 	    /// ask recursive update for the recursive_has_changed field
 	void recursive_has_changed_update() const;
 
-	    /// get then number of "nomme" entry contained in this directory and subdirectories (recursive call)
+	    /// get then number of "cat_nomme" entry contained in this directory and subdirectories (recursive call)
 	infinint get_tree_size() const;
 
 	    /// get the number of entry having some EA set in the directory tree (recursive call)
@@ -140,10 +140,10 @@ namespace libdar
 	bool updated_sizes;
         directory *parent;
 #ifdef LIBDAR_FAST_DIR
-        std::map<std::string, nomme *> fils; // used for fast lookup
+        std::map<std::string, cat_nomme *> fils; // used for fast lookup
 #endif
-	std::list<nomme *> ordered_fils;
-        std::list<nomme *>::iterator it;
+	std::list<cat_nomme *> ordered_fils;
+        std::list<cat_nomme *>::iterator it;
 	bool recursive_has_changed;
 
 	void clear();

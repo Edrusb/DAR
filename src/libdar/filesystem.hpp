@@ -94,7 +94,7 @@ namespace libdar
 	    // create and return a libdar object corresponding to one pointed to by its path
 	    // during this operation, hard linked inode are recorded in a list to be easily pointed
 	    // to by a new reference to it.
-        nomme *make_read_entree(path & lieu,               //< path of the file to read
+        cat_nomme *make_read_entree(path & lieu,               //< path of the file to read
 				const std::string & name,  //< name of the file to read
 				bool see_hard_link,        //< whether we want to detect hard_link and eventually return a mirage object (not necessary when diffing an archive with filesystem)
 				const mask & ea_mask);    //< which EA to consider when creating the object
@@ -193,7 +193,7 @@ namespace libdar
         ~filesystem_diff() { detruire(); };
 
         void reset_read();
-        bool read_filename(const std::string & name, nomme * &ref);
+        bool read_filename(const std::string & name, cat_nomme * &ref);
             // looks for a file of name given in argument, in current reading directory
             // if this is a directory, subsequent read take place in it
 
@@ -246,7 +246,7 @@ namespace libdar
 
     protected:
         void corres_reset() { corres_write.clear(); };
-        void make_file(const nomme * ref,                       //< object to restore in filesystem
+        void make_file(const cat_nomme * ref,                       //< object to restore in filesystem
 		       const path & ou,                         //< where to restore it
 		       bool dir_perm,                           //< false for already existing directories, this makes dar set the minimum available permission to be able to restore files in that directory at a later time
 		       inode::comparison_fields what_to_check,  //< defines whether to restore permission, ownership, dates, etc.
@@ -263,7 +263,7 @@ namespace libdar
 	    /// \return true if EA could be restored, false if "e" is a hard link to an inode that has its EA already restored previously
 	    /// \note the list_ea EA are restored to spot path, the object e is only here to validate that this operation
 	    /// has not already been done through another hard linked inode to that same inode
-        bool raw_set_ea(const nomme *e,
+        bool raw_set_ea(const cat_nomme *e,
 			const ea_attributs & list_ea,
 			const std::string & spot,
 			const mask & ea_mask);
@@ -275,7 +275,7 @@ namespace libdar
 	    /// \param[in] e this object may be a hard link to or an inode
 	    /// \param[in] path the path in the filesystem where reside the object whose EA to clear
 	    /// \return true if EA could be cleared, false if "e" is a hard link to an inode that has its  EA already restored previously
-	bool raw_clear_ea_set(const nomme *e, const std::string & path);
+	bool raw_clear_ea_set(const cat_nomme *e, const std::string & path);
 
 
     private:
@@ -387,18 +387,18 @@ namespace libdar
 				over_action_data action);
 	    /// perform action for data due to the overwriting policy when the "to be added" entry is not a detruit
 	void action_over_data(const inode *in_place,
-			      const nomme *to_be_added,
+			      const cat_nomme *to_be_added,
 			      const std::string & spot,
 			      over_action_data action,
 			      action_done_for_data & data_done);
 	    /// perform action for EA due to overwriting policy
 	bool action_over_ea(const inode *in_place,
-			    const nomme *to_be_added,
+			    const cat_nomme *to_be_added,
 			    const std::string & spot,
 			    over_action_ea action);
 	    /// perform action for FSA due to overwriting policy
 	bool action_over_fsa(const inode *in_place,
-			    const nomme *to_be_added,
+			    const cat_nomme *to_be_added,
 			    const std::string & spot,
 			    over_action_ea action);
 

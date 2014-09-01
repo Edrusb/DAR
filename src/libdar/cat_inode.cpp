@@ -79,7 +79,7 @@ namespace libdar
                  const datetime & last_modif,
                  const datetime & last_change,
                  const string & xname,
-                 const infinint & fs_device) : nomme(xname)
+                 const infinint & fs_device) : cat_nomme(xname)
     {
 	nullifyptr();
         uid = xuid;
@@ -111,7 +111,7 @@ namespace libdar
                  const archive_version & reading_ver,
                  saved_status saved,
                  compressor *efsa_loc,
-                 escape *ptr) : nomme(f)
+                 escape *ptr) : cat_nomme(f)
     {
         U_16 tmp;
         unsigned char flag;
@@ -325,7 +325,7 @@ namespace libdar
         }
     }
 
-    inode::inode(const inode & ref) : nomme(ref)
+    inode::inode(const inode & ref) : cat_nomme(ref)
     {
 	nullifyptr();
 
@@ -342,10 +342,10 @@ namespace libdar
 
     const inode & inode::operator = (const inode & ref)
     {
-        nomme *me = this;
-        const nomme *nref = &ref;
+        cat_nomme *me = this;
+        const cat_nomme *nref = &ref;
 
-        *me = *nref; // copying the "nomme" part of the object
+        *me = *nref; // copying the "cat_nomme" part of the object
 
 	destroy();
 	copy_from(ref);
@@ -360,7 +360,7 @@ namespace libdar
 
     bool inode::same_as(const inode & ref) const
     {
-        return nomme::same_as(ref) && compatible_signature(ref.signature(), signature());
+        return cat_nomme::same_as(ref) && compatible_signature(ref.signature(), signature());
     }
 
     bool inode::is_more_recent_than(const inode & ref, const infinint & hourshift) const
@@ -547,7 +547,7 @@ namespace libdar
 	    throw SRC_BUG; // unknown value for fsa_saved
 	}
 
-        nomme::inherited_dump(r, small);
+        cat_nomme::inherited_dump(r, small);
 
 	    // unix inode part
 

@@ -80,7 +80,7 @@ namespace libdar
 	void end_read() const;
 	void skip_read_to_parent_dir() const;
 	bool read(const cat_entree * & ref) const;
-	bool read_if_present(std::string *name, const nomme * & ref) const;
+	bool read_if_present(std::string *name, const cat_nomme * & ref) const;
 	void tail_catalogue_to_current_read();
 	bool read_second_time_dir() const { return status == ec_detruits; };
 

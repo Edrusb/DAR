@@ -44,14 +44,14 @@ namespace libdar
 	/// the hard link implementation, mirage is the named entry owned by a directory it points to a common "etoile class"
 
 	/// well, mirage is those fake apparition of water in a desert... I guess you get the picture now... :-)
-    class mirage : public nomme
+    class mirage : public cat_nomme
     {
     public:
 	enum mirage_format {fmt_mirage,           //< new format
 			    fmt_hard_link,        //< old dual format
 			    fmt_file_etiquette }; //< old dual format
 
-	mirage(const std::string & name, etoile *ref) : nomme(name) { star_ref = ref; if(ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
+	mirage(const std::string & name, etoile *ref) : cat_nomme(name) { star_ref = ref; if(ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
 	mirage(user_interaction & dialog,
 	       generic_file & f,
 	       const archive_version & reading_ver,
@@ -75,7 +75,7 @@ namespace libdar
 	       compressor *efsa_loc,
 	       bool lax,
 	       escape *ptr);
-	mirage(const mirage & ref) : nomme (ref) { star_ref = ref.star_ref; if(star_ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
+	mirage(const mirage & ref) : cat_nomme (ref) { star_ref = ref.star_ref; if(star_ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
 	const mirage & operator = (const mirage & ref);
 	~mirage() { star_ref->drop_ref(this); };
 

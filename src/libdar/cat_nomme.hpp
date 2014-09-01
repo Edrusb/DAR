@@ -41,17 +41,17 @@ namespace libdar
 	/// @{
 
 	/// the base class for all entry that have a name
-    class nomme : public cat_entree
+    class cat_nomme : public cat_entree
     {
     public:
-        nomme(const std::string & name) { xname = name; };
-        nomme(generic_file & f);
-	virtual bool operator == (const nomme & ref) const { return xname == ref.xname; };
-	virtual bool operator < (const nomme & ref) const { return xname < ref.xname; };
+        cat_nomme(const std::string & name) { xname = name; };
+        cat_nomme(generic_file & f);
+	virtual bool operator == (const cat_nomme & ref) const { return xname == ref.xname; };
+	virtual bool operator < (const cat_nomme & ref) const { return xname < ref.xname; };
 
         const std::string & get_name() const { return xname; };
         void change_name(const std::string & x) { xname = x; };
-        bool same_as(const nomme & ref) const { return xname == ref.xname; };
+        bool same_as(const cat_nomme & ref) const { return xname == ref.xname; };
             // no need to have a virtual method, as signature will differ in inherited classes (argument type changes)
 
             // signature() is kept as an abstract method

@@ -95,7 +95,7 @@ namespace libdar
 			 escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
 	cat_entree *p;
-	nomme *t;
+	cat_nomme *t;
 	directory *d;
 	detruit *x;
 	mirage *m;
@@ -141,7 +141,7 @@ namespace libdar
 		{
 		    d = dynamic_cast<directory *>(p);
 		    fin = dynamic_cast<eod *>(p);
-		    t = dynamic_cast<nomme *>(p);
+		    t = dynamic_cast<cat_nomme *>(p);
 		    x = dynamic_cast<detruit *>(p);
 		    m = dynamic_cast<mirage *>(p);
 
@@ -151,7 +151,7 @@ namespace libdar
 			    // we will trigger an incoherent catalogue structure
 			    // as the mirages without inode cannot link to the mirage with inode
 			    // carring the same etiquette if we destroy them right now.
-			if(t != NULL) // p is a "nomme"
+			if(t != NULL) // p is a "cat_nomme"
 			{
 #ifdef LIBDAR_FAST_DIR
 			    fils[t->get_name()] = t;
@@ -161,7 +161,7 @@ namespace libdar
 			if(d != NULL) // p is a directory
 			    d->parent = this;
 			if(t == NULL && fin == NULL)
-			    throw SRC_BUG; // neither an eod nor a nomme ! what's that ???
+			    throw SRC_BUG; // neither an eod nor a cat_nomme ! what's that ???
 		    }
 		    else
 		    {
@@ -201,7 +201,7 @@ namespace libdar
 
     void directory::inherited_dump(generic_file & f, bool small) const
     {
-	list<nomme *>::const_iterator x = ordered_fils.begin();
+	list<cat_nomme *>::const_iterator x = ordered_fils.begin();
 	inode::inherited_dump(f, small);
 
 	if(!small)
@@ -238,7 +238,7 @@ namespace libdar
 		throw SRC_BUG;
 	    me->x_size = 0;
 	    me->x_storage_size = 0;
-	    list<nomme *>::const_iterator it = ordered_fils.begin();
+	    list<cat_nomme *>::const_iterator it = ordered_fils.begin();
 	    const directory *f_dir = NULL;
 	    const file *f_file = NULL;
 
@@ -282,10 +282,10 @@ namespace libdar
 	    parent->recursive_flag_size_to_update();
     }
 
-    void directory::add_children(nomme *r)
+    void directory::add_children(cat_nomme *r)
     {
 	directory *d = dynamic_cast<directory *>(r);
-	const nomme *ancien_nomme;
+	const cat_nomme *ancien_nomme;
 
 	if(r == NULL)
 	    throw SRC_BUG;
@@ -297,7 +297,7 @@ namespace libdar
 	    if(a_dir != NULL && d != NULL) // both directories : merging them
 	    {
 		a_dir = d; // updates the inode part, does not touch the directory specific part as defined in the directory::operator =
-		list<nomme *>::iterator xit = d->ordered_fils.begin();
+		list<cat_nomme *>::iterator xit = d->ordered_fils.begin();
 		while(xit != d->ordered_fils.end())
 		{
 		    const_cast<directory *>(a_dir)->add_children(*xit);
@@ -356,7 +356,7 @@ namespace libdar
 	moi->it = moi->ordered_fils.end();
     }
 
-    bool directory::read_children(const nomme *&r) const
+    bool directory::read_children(const cat_nomme *&r) const
     {
 	directory *moi = const_cast<directory *>(this);
 	if(moi->it != moi->ordered_fils.end())
@@ -372,8 +372,8 @@ namespace libdar
     void directory::tail_to_read_children()
     {
 #ifdef LIBDAR_FAST_DIR
-	map<string, nomme *>::iterator dest;
-	list<nomme *>::iterator ordered_dest = it;
+	map<string, cat_nomme *>::iterator dest;
+	list<cat_nomme *>::iterator ordered_dest = it;
 
 	while(ordered_dest != ordered_fils.end())
 	{
@@ -403,7 +403,7 @@ namespace libdar
     {
 
 	    // localizing old object in ordered_fils
-	list<nomme *>::iterator ot = ordered_fils.begin();
+	list<cat_nomme *>::iterator ot = ordered_fils.begin();
 
 	while(ot != ordered_fils.end() && *ot != NULL && (*ot)->get_name() != name)
 	    ++ot;
@@ -417,7 +417,7 @@ namespace libdar
 
 #ifdef LIBDAR_FAST_DIR
 	    // localizing old object in fils
-	map<string, nomme *>::iterator ut = fils.find(name);
+	map<string, cat_nomme *>::iterator ut = fils.find(name);
 	if(ut == fils.end())
 	    throw SRC_BUG;
 
@@ -430,7 +430,7 @@ namespace libdar
 #endif
 
 	    // recoding the address of the object to remove
-	nomme *obj = *ot;
+	cat_nomme *obj = *ot;
 
 	    // removing its reference from ordered_fils
 	ordered_fils.erase(ot);
@@ -443,7 +443,7 @@ namespace libdar
 
     void directory::recursively_set_to_unsaved_data_and_FSA()
     {
-	list<nomme *>::iterator it = ordered_fils.begin();
+	list<cat_nomme *>::iterator it = ordered_fils.begin();
 	directory *n_dir = NULL;
 	inode *n_ino = NULL;
 	mirage *n_mir = NULL;
@@ -505,10 +505,10 @@ namespace libdar
 	recursive_flag_size_to_update();
     }
 
-    bool directory::search_children(const string &name, const nomme * & ptr) const
+    bool directory::search_children(const string &name, const cat_nomme * & ptr) const
     {
 #ifdef LIBDAR_FAST_DIR
-	map<string, nomme *>::const_iterator ut = fils.find(name);
+	map<string, cat_nomme *>::const_iterator ut = fils.find(name);
 
 	if(ut != fils.end())
 	{
@@ -521,7 +521,7 @@ namespace libdar
 	else
 	    ptr = NULL;
 #else
-	list<nomme *>::const_iterator ot = ordered_fils.begin();
+	list<cat_nomme *>::const_iterator ot = ordered_fils.begin();
 
 	while(ot != ordered_fils.end() && *ot != NULL && (*ot)->get_name() != name)
 	    ++ot;
@@ -541,14 +541,14 @@ namespace libdar
     bool directory::callback_for_children_of(user_interaction & dialog, const string & sdir, bool isolated) const
     {
 	const directory *current = this;
-	const nomme *next_nom = NULL;
+	const cat_nomme *next_nom = NULL;
 	const directory *next_dir = NULL;
 	const inode *next_ino = NULL;
 	const detruit *next_detruit = NULL;
 	const mirage *next_mir = NULL;
 	string segment;
 	bool loop = true;
-	const nomme *tmp_nom;
+	const cat_nomme *tmp_nom;
 
 	if(!dialog.get_use_listing())
 	    throw Erange("directory::callback_for_children_of", gettext("listing() method must be given"));
@@ -574,7 +574,7 @@ namespace libdar
 
 		if(current->search_children(segment, tmp_nom))
 		{
-		    next_nom = const_cast<const nomme *>(tmp_nom);
+		    next_nom = const_cast<const cat_nomme *>(tmp_nom);
 		    next_mir = dynamic_cast<const mirage *>(next_nom);
 		    if(next_mir != NULL)
 			next_dir = dynamic_cast<const directory *>(next_mir->get_inode());
@@ -639,7 +639,7 @@ namespace libdar
 
     void directory::recursive_has_changed_update() const
     {
-	list<nomme *>::const_iterator it = ordered_fils.begin();
+	list<cat_nomme *>::const_iterator it = ordered_fils.begin();
 
 	const_cast<directory *>(this)->recursive_has_changed = false;
 	while(it != ordered_fils.end())
@@ -665,7 +665,7 @@ namespace libdar
 	infinint ret = ordered_fils.size();
 	const directory *fils_dir = NULL;
 
-	list<nomme *>::const_iterator ot = ordered_fils.begin();
+	list<cat_nomme *>::const_iterator ot = ordered_fils.begin();
 	while(ot != ordered_fils.end())
 	{
 	    if(*ot == NULL)
@@ -684,7 +684,7 @@ namespace libdar
     {
 	infinint ret = 0;
 
-	list<nomme *>::const_iterator it = ordered_fils.begin();
+	list<cat_nomme *>::const_iterator it = ordered_fils.begin();
 
 	while(it != ordered_fils.end())
 	{
@@ -712,7 +712,7 @@ namespace libdar
     {
 	infinint ret = 0;
 
-	list<nomme *>::const_iterator it = ordered_fils.begin();
+	list<cat_nomme *>::const_iterator it = ordered_fils.begin();
 
 	while(it != ordered_fils.end())
 	{
@@ -734,7 +734,7 @@ namespace libdar
 
     void directory::get_etiquettes_found_in_tree(map<infinint, infinint> & already_found) const
     {
-	list<nomme *>::const_iterator it = ordered_fils.begin();
+	list<cat_nomme *>::const_iterator it = ordered_fils.begin();
 
 	while(it != ordered_fils.end())
 	{
@@ -761,7 +761,7 @@ namespace libdar
 
     void directory::remove_all_mirages_and_reduce_dirs()
     {
-	list<nomme *>::iterator curs = ordered_fils.begin();
+	list<cat_nomme *>::iterator curs = ordered_fils.begin();
 
 	while(curs != ordered_fils.end())
 	{
@@ -769,7 +769,7 @@ namespace libdar
 		throw SRC_BUG;
 	    directory *d = dynamic_cast<directory *>(*curs);
 	    mirage *m = dynamic_cast<mirage *>(*curs);
-	    nomme *n = dynamic_cast<nomme *>(*curs);
+	    cat_nomme *n = dynamic_cast<cat_nomme *>(*curs);
 
 		// sanity check
 	    if((m != NULL && n == NULL) || (d != NULL && n == NULL))
@@ -782,7 +782,7 @@ namespace libdar
 	    if(m != NULL || (d != NULL && d->is_empty()))
 	    {
 #ifdef LIBDAR_FAST_DIR
-		map<string, nomme *>::iterator monfils = fils.find(n->get_name());
+		map<string, cat_nomme *>::iterator monfils = fils.find(n->get_name());
 
 		if(monfils == fils.end())
 		    throw SRC_BUG;
@@ -803,7 +803,7 @@ namespace libdar
 
     void directory::set_all_mirage_s_inode_dumped_field_to(bool val)
     {
-	list<nomme *>::iterator curs = ordered_fils.begin();
+	list<cat_nomme *>::iterator curs = ordered_fils.begin();
 
 	while(curs != ordered_fils.end())
 	{

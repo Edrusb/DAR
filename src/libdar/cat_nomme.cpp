@@ -34,12 +34,12 @@ using namespace std;
 namespace libdar
 {
 
-    nomme::nomme(generic_file & f)
+    cat_nomme::cat_nomme(generic_file & f)
     {
         tools_read_string(f, xname);
     }
 
-    void nomme::inherited_dump(generic_file & f, bool small) const
+    void cat_nomme::inherited_dump(generic_file & f, bool small) const
     {
         cat_entree::inherited_dump(f, small);
         tools_write_string(f, xname);

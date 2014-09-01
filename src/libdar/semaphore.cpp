@@ -69,7 +69,7 @@ namespace libdar
 	}
 	else // semaphore is ready for a new entry
 	{
-	    const nomme *o_nom = dynamic_cast<const nomme *>(object);
+	    const cat_nomme *o_nom = dynamic_cast<const cat_nomme *>(object);
 
 	    if(o_nom == NULL)
 		return; // EOD associated to an unsaved directory

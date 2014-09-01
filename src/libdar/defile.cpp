@@ -32,7 +32,7 @@ namespace libdar
     {
         const eod *fin = dynamic_cast<const eod *>(e);
         const directory *dir = dynamic_cast<const directory *>(e);
-        const nomme *nom = dynamic_cast<const nomme *>(e);
+        const cat_nomme *nom = dynamic_cast<const cat_nomme *>(e);
         string s;
 
         if(! init) // we must remove previous entry brought by a previous call to this method
@@ -45,9 +45,9 @@ namespace libdar
 
         if(fin == NULL) // not eod
 	{
-            if(nom == NULL) // not a nomme
-                throw SRC_BUG; // neither eod nor nomme
-            else // a nomme
+            if(nom == NULL) // not a cat_nomme
+                throw SRC_BUG; // neither eod nor cat_nomme
+            else // a cat_nomme
             {
                 chemin += nom->get_name();
                 if(dir != NULL)

@@ -122,7 +122,7 @@ namespace libdar
 
     }
 
-    void crit_chain::get_action(const nomme & first, const nomme & second, over_action_data & data, over_action_ea & ea) const
+    void crit_chain::get_action(const cat_nomme & first, const cat_nomme & second, over_action_data & data, over_action_ea & ea) const
     {
  	NLS_SWAP_IN;
 	try
@@ -207,7 +207,7 @@ namespace libdar
 	//////////// implementation of criterium classes follows ////////////
         /////////////////////////////////////////////////////////////////////
 
-    const inode *criterium::get_inode(const nomme *arg)
+    const inode *criterium::get_inode(const cat_nomme *arg)
     {
 	const inode *ret;
 	const mirage *arg_m = dynamic_cast<const mirage *>(arg);
@@ -220,31 +220,31 @@ namespace libdar
 	return ret;
     }
 
-    bool crit_in_place_is_inode::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_is_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	return dynamic_cast<const inode *>(&first) != NULL
 	    || dynamic_cast<const mirage *>(&first) != NULL;
     }
 
-    bool crit_in_place_is_file::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_is_file::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 
 	return dynamic_cast<const file *>(first_i) != NULL && dynamic_cast<const door *>(first_i) == NULL;
     }
 
-    bool crit_in_place_is_hardlinked_inode::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_is_hardlinked_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	return dynamic_cast<const mirage *>(&first) != NULL;
     }
 
-    bool crit_in_place_is_new_hardlinked_inode::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_is_new_hardlinked_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const mirage * tmp = dynamic_cast<const mirage *>(&first);
 	return tmp != NULL && tmp->is_first_mirage();
     }
 
-    bool crit_in_place_data_more_recent::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_data_more_recent::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 	const inode *second_i = get_inode(&second);
@@ -254,7 +254,7 @@ namespace libdar
 	return first_i == NULL || first_date >= second_date || tools_is_equal_with_hourshift(x_hourshift, first_date, second_date);
     }
 
-    bool crit_in_place_data_more_recent_or_equal_to::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_data_more_recent_or_equal_to::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 	datetime first_date = first_i != NULL ? first_i->get_last_modif() : datetime(0);
@@ -262,7 +262,7 @@ namespace libdar
 	return first_i == NULL || first_date >= x_date || tools_is_equal_with_hourshift(x_hourshift, first_date, x_date);
     }
 
-    bool crit_in_place_data_bigger::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_data_bigger::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 	const inode *second_i = get_inode(&second);
@@ -275,7 +275,7 @@ namespace libdar
 	    return true;
     }
 
-    bool crit_in_place_data_saved::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_data_saved::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 
@@ -285,7 +285,7 @@ namespace libdar
 	    return true;
     }
 
-    bool crit_in_place_data_dirty::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_data_dirty::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 	const file *first_f = dynamic_cast<const file *>(first_i);
@@ -296,7 +296,7 @@ namespace libdar
 	    return false;
     }
 
-    bool crit_in_place_data_sparse::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_data_sparse::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 	const file *first_f = dynamic_cast<const file *>(first_i);
@@ -307,7 +307,7 @@ namespace libdar
 	    return false;
     }
 
-    bool crit_in_place_EA_more_recent::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_EA_more_recent::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 	const inode *second_i = get_inode(&second);
@@ -349,7 +349,7 @@ namespace libdar
     }
 
 
-    bool crit_in_place_EA_more_recent_or_equal_to::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_EA_more_recent_or_equal_to::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 
@@ -375,7 +375,7 @@ namespace libdar
     }
 
 
-    bool crit_in_place_more_EA::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_more_EA::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 	const inode *second_i = get_inode(&second);
@@ -412,7 +412,7 @@ namespace libdar
 	return first_nEA >= second_nEA;
     }
 
-    bool crit_in_place_EA_bigger::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_EA_bigger::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 	const inode *second_i = get_inode(&second);
@@ -449,14 +449,14 @@ namespace libdar
 	return first_EA_size >= second_EA_size;
     }
 
-    bool crit_in_place_EA_saved::evaluate(const nomme &first, const nomme &second) const
+    bool crit_in_place_EA_saved::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 
 	return first_i != NULL && first_i->ea_get_saved_status() == inode::ea_full;
     }
 
-    bool crit_same_type::evaluate(const nomme &first, const nomme &second) const
+    bool crit_same_type::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
 	const inode *second_i = get_inode(&second);
@@ -554,7 +554,7 @@ namespace libdar
 	}
     }
 
-    bool crit_and::evaluate(const nomme & first, const nomme & second) const
+    bool crit_and::evaluate(const cat_nomme & first, const cat_nomme & second) const
     {
 	bool ret = true;
 
@@ -623,7 +623,7 @@ namespace libdar
 	operand.clear();
     }
 
-    bool crit_or::evaluate(const nomme & first, const nomme & second) const
+    bool crit_or::evaluate(const cat_nomme & first, const cat_nomme & second) const
     {
 	bool ret = false;
 

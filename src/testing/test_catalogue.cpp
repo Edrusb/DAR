@@ -208,7 +208,7 @@ void f2()
         while(cat.read(ref))
         {
             const eod *e = dynamic_cast<const eod *>(ref);
-            const nomme *n = dynamic_cast<const nomme *>(ref);
+            const cat_nomme *n = dynamic_cast<const cat_nomme *>(ref);
             const directory *d = dynamic_cast<const directory *>(ref);
             string type = "file";
 

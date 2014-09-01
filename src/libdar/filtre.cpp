@@ -108,7 +108,7 @@ namespace libdar
 	/// \param[in,out] hard_link_base is the datastructure that gather/maps hard_links information
 	/// \param[in] etiquette_offset is the offset to apply to etiquette (to not mix several hard-link sets using the same etiquette number in different archives)
 	/// \return a pointer to the new allocated clone object (to be deleted by the delete operator by the caller)
-    static cat_entree *make_clone(const nomme *ref,
+    static cat_entree *make_clone(const cat_nomme *ref,
 			      memory_pool *pool,
 			      map<infinint, etoile*> & hard_link_base,
 			      const infinint & etiquette_offset);
@@ -206,7 +206,7 @@ namespace libdar
 
 	    while(cat.read(e))
 	    {
-		const nomme *e_nom = dynamic_cast<const nomme *>(e);
+		const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 		const directory *e_dir = dynamic_cast<const directory *>(e);
 		const mirage *e_mir = dynamic_cast<const mirage *>(e);
 		const inode *e_ino = dynamic_cast<const inode *>(e);
@@ -469,7 +469,7 @@ namespace libdar
 		    const eod *e_eod = dynamic_cast<const eod *>(e);
 
 		    if(e_eod == NULL)
-			throw SRC_BUG; // not an class eod object, nor a class nomme object ???
+			throw SRC_BUG; // not an class eod object, nor a class cat_nomme object ???
 
 		    if(!flat)
 		    {
@@ -574,7 +574,7 @@ namespace libdar
 	    {
 		while(fs.read(e, fs_errors, skipped_dump))
 		{
-		    nomme *nom = dynamic_cast<nomme *>(e);
+		    cat_nomme *nom = dynamic_cast<cat_nomme *>(e);
 		    directory *dir = dynamic_cast<directory *>(e);
 		    inode *e_ino = dynamic_cast<inode *>(e);
 		    file *e_file = dynamic_cast<file *>(e);
@@ -871,7 +871,7 @@ namespace libdar
 			    }
 			    else // inode not covered
 			    {
-				nomme *ig = NULL;
+				cat_nomme *ig = NULL;
 				inode *ignode = NULL;
 				sem.raise(juillet.get_string(), e, false);
 
@@ -963,7 +963,7 @@ namespace libdar
 
 			    if(how != "write") // error did not occured while adding data to the archive
 			    {
-				nomme *tmp = new (pool) ignored(nom->get_name());
+				cat_nomme *tmp = new (pool) ignored(nom->get_name());
 				dialog.warning(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
 				st.incr_errored();
 
@@ -1084,7 +1084,7 @@ namespace libdar
 	while(cat.read(e))
 	{
 	    const directory *e_dir = dynamic_cast<const directory *>(e);
-	    const nomme *e_nom = dynamic_cast<const nomme *>(e);
+	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const mirage *e_mir = dynamic_cast<const mirage *>(e);
 
@@ -1115,7 +1115,7 @@ namespace libdar
 		{
 		    if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || filtre.is_covered(e_nom->get_name())))
 		    {
-			nomme *exists_nom = NULL;
+			cat_nomme *exists_nom = NULL;
 
 			if(e_ino != NULL)
 			{
@@ -1209,7 +1209,7 @@ namespace libdar
 		    if(dynamic_cast<const eod *>(e) != NULL) // yes eod
 			fs.skip_read_filename_in_parent_dir();
 		    else // no ?!?
-			throw SRC_BUG; // not nomme neither eod ! what's that ?
+			throw SRC_BUG; // not cat_nomme neither eod ! what's that ?
 	    }
 	    catch(Euser_abort &e)
 	    {
@@ -1274,7 +1274,7 @@ namespace libdar
 	    const file *e_file = dynamic_cast<const file *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const directory *e_dir = dynamic_cast<const directory *>(e);
-	    const nomme *e_nom = dynamic_cast<const nomme *>(e);
+	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 	    const mirage *e_mir = dynamic_cast<const mirage *>(e);
 
             juillet.enfile(e);
@@ -1615,7 +1615,7 @@ namespace libdar
 
 		    while(ref_tab[index]->read(e)) // examining the content of the current archive of reference, each entry one by one
 		    {
-			const nomme *e_nom = dynamic_cast<const nomme *>(e);
+			const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 			const mirage *e_mir = dynamic_cast<const mirage *>(e);
 			const directory *e_dir = dynamic_cast<const directory *>(e);
 			const detruit *e_detruit = dynamic_cast<const detruit *>(e);
@@ -1635,11 +1635,11 @@ namespace libdar
 				    try
 				    {
 					string the_name = e_nom->get_name();
-					const nomme *already_here = NULL;  // may receive an address when an object of that name already exists in the resultant catalogue
+					const cat_nomme *already_here = NULL;  // may receive an address when an object of that name already exists in the resultant catalogue
 
 					    // some different types of pointer to the "dolly" object
 
-					nomme *dolly_nom = dynamic_cast<nomme *>(dolly);
+					cat_nomme *dolly_nom = dynamic_cast<cat_nomme *>(dolly);
 					directory *dolly_dir = dynamic_cast<directory *>(dolly);
 					mirage *dolly_mir = dynamic_cast<mirage *>(dolly);
 					inode *dolly_ino = dynamic_cast<inode *>(dolly);
@@ -1666,7 +1666,7 @@ namespace libdar
 						al_ino = al_mir->get_inode();
 
 					    if(dolly_nom == NULL)
-						throw SRC_BUG; // dolly should be the clone of a nomme object which is not the case here
+						throw SRC_BUG; // dolly should be the clone of a cat_nomme object which is not the case here
 
 						// evaluating the overwriting policy
 
@@ -2173,7 +2173,7 @@ namespace libdar
 						dolly = new (pool) detruit(the_name, firm, ref_tab[index]->get_current_reading_dir().get_last_modif());
 						if(dolly == NULL)
 						    throw Ememory("filtre_merge");
-						dolly_nom = dynamic_cast<nomme *>(dolly);
+						dolly_nom = dynamic_cast<cat_nomme *>(dolly);
 					    }
 
 					if(dolly != NULL)
@@ -2282,12 +2282,12 @@ namespace libdar
 				st.incr_errored();
 			    }
 			}
-			else  // cat_entree is not a nomme object (this is an "eod")
+			else  // cat_entree is not a cat_nomme object (this is an "eod")
 			{
 			    cat_entree *tmp = e->clone();
 			    try
 			    {
-				const nomme *already = NULL;
+				const cat_nomme *already = NULL;
 
 				if(tmp == NULL)
 				    throw Ememory("filtre_merge");
@@ -2352,7 +2352,7 @@ namespace libdar
 	    while(cat.read(e))
 	    {
 		cat_entree *e_var = const_cast<cat_entree *>(e);
-		nomme *e_nom = dynamic_cast<nomme *>(e_var);
+		cat_nomme *e_nom = dynamic_cast<cat_nomme *>(e_var);
 		inode *e_ino = dynamic_cast<inode *>(e_var);
 		file *e_file = dynamic_cast<file *>(e_var);
 		mirage *e_mir = dynamic_cast<mirage *>(e_var);
@@ -3578,7 +3578,7 @@ namespace libdar
     }
 
 
-    static cat_entree *make_clone(const nomme *ref,
+    static cat_entree *make_clone(const cat_nomme *ref,
 			      memory_pool *pool,
 			      map<infinint, etoile*> & hard_link_base,
 			      const infinint & etiquette_offset)

@@ -593,7 +593,7 @@ namespace libdar
 	return ref != NULL;
     }
 
-    bool escape_catalogue::read_if_present(std::string *name, const nomme * & ref) const
+    bool escape_catalogue::read_if_present(std::string *name, const cat_nomme * & ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 

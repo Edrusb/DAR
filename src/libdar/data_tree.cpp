@@ -1315,7 +1315,7 @@ bool data_tree::fix_corruption()
 
     void data_tree_update_with(const directory *dir, archive_num archive, data_dir *racine)
     {
-	const nomme *entry;
+	const cat_nomme *entry;
 
 	dir->reset_read_children();
 	while(dir->read_children(entry))

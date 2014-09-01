@@ -1370,7 +1370,7 @@ namespace libdar
 	    dialog.warning(gettext("Archive is closed."));
     }
 
-    range macro_tools_get_slices(const nomme *obj, slice_layout sl)
+    range macro_tools_get_slices(const cat_nomme *obj, slice_layout sl)
     {
 	range slices;
 	infinint offset; // used temporarily to record data, EA and FSA offsets

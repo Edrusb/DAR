@@ -51,7 +51,7 @@ namespace libdar
 
 
 	/// the root class for all inode
-    class inode : public nomme
+    class inode : public cat_nomme
     {
     public:
 

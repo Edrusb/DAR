@@ -88,7 +88,7 @@ namespace libdar
             // next item of the parent dir (no eod to exit from the current dir !)
         virtual bool read(const cat_entree * & ref) const;
             // sequential read (generates eod) and return false when all files have been read
-        virtual bool read_if_present(std::string *name, const nomme * & ref) const;
+        virtual bool read_if_present(std::string *name, const cat_nomme * & ref) const;
             // pseudo-sequential read (reading a directory still
             // implies that following read are located in this subdirectory up to the next EOD) but
             // it returns false if no entry of this name are present in the current directory
@@ -134,7 +134,7 @@ namespace libdar
         void add(cat_entree *ref); // add at end of catalogue (sequential point of view)
 	void re_add_in(const std::string &subdirname); // return into an already existing subdirectory for further addition
 	void re_add_in_replace(const directory &dir); // same as re_add_in but also set the properties of the existing directory to those of the given argument
-        void add_in_current_read(nomme *ref); // add in currently read directory
+        void add_in_current_read(cat_nomme *ref); // add in currently read directory
 	const directory & get_current_add_dir() const { if(current_add == NULL) throw SRC_BUG; return *current_add; };
 
 

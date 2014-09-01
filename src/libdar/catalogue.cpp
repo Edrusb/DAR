@@ -275,7 +275,7 @@ namespace libdar
     bool catalogue::read(const cat_entree * & ref) const
     {
 	catalogue *ceci = const_cast<catalogue *>(this);
-	const nomme *tmp;
+	const cat_nomme *tmp;
 
 	if(ceci->current_read->read_children(tmp))
 	{
@@ -302,10 +302,10 @@ namespace libdar
 	}
     }
 
-    bool catalogue::read_if_present(string *name, const nomme * & ref) const
+    bool catalogue::read_if_present(string *name, const cat_nomme * & ref) const
     {
 	catalogue *ceci = const_cast<catalogue *>(this);
-	const nomme *tmp;
+	const cat_nomme *tmp;
 
 	if(current_read == NULL)
 	    throw Erange("catalogue::read_if_present", gettext("no current directory defined"));
@@ -321,7 +321,7 @@ namespace libdar
 	else // looking for a real filename
 	    if(current_read->search_children(*name, tmp))
 	    {
-		directory *d = dynamic_cast<directory *>(const_cast<nomme *>(tmp));
+		directory *d = dynamic_cast<directory *>(const_cast<cat_nomme *>(tmp));
 		if(d != NULL) // this is a directory need to chdir to it
 		    ceci->current_read = d;
 		ref = tmp;
@@ -391,7 +391,7 @@ namespace libdar
 	case -1: // providing path to sub_tree
 	    if(sub_tree->read_subdir(tmp))
 	    {
-		const nomme *xtmp;
+		const cat_nomme *xtmp;
 
 		if(const_cast<directory *>(current_read)->search_children(tmp, xtmp))
 		{
@@ -467,11 +467,11 @@ namespace libdar
 
 	if(f == NULL) // ref is not eod
 	{
-	    nomme *n = dynamic_cast<nomme *>(ref);
+	    cat_nomme *n = dynamic_cast<cat_nomme *>(ref);
 	    directory *t = dynamic_cast<directory *>(ref);
 
 	    if(n == NULL)
-		throw SRC_BUG; // unknown type neither "eod" nor "nomme"
+		throw SRC_BUG; // unknown type neither "eod" nor "cat_nomme"
 	    current_add->add_children(n);
 	    if(t != NULL) // ref is a directory
 		current_add = t;
@@ -490,7 +490,7 @@ namespace libdar
 
     void catalogue::re_add_in(const string &subdirname)
     {
-	const nomme *sub = NULL;
+	const cat_nomme *sub = NULL;
 
 	if(const_cast<const directory *>(current_add)->search_children(subdirname, sub))
 	{
@@ -513,7 +513,7 @@ namespace libdar
     }
 
 
-    void catalogue::add_in_current_read(nomme *ref)
+    void catalogue::add_in_current_read(cat_nomme *ref)
     {
 	if(current_read == NULL)
 	    throw SRC_BUG; // current read directory does not exists
@@ -535,7 +535,7 @@ namespace libdar
 	const mirage *mir = dynamic_cast<const mirage *>(target);
 	const directory *dir = dynamic_cast<const directory *>(target);
 	const eod *fin = dynamic_cast<const eod *>(target);
-	const nomme *nom = dynamic_cast<const nomme *>(target);
+	const cat_nomme *nom = dynamic_cast<const cat_nomme *>(target);
 
 	if(me == NULL)
 	    throw SRC_BUG;
@@ -564,7 +564,7 @@ namespace libdar
 	}
 	else // scanning an existing directory
 	{
-	    const nomme *found;
+	    const cat_nomme *found;
 
 	    if(fin != NULL)
 	    {
@@ -577,7 +577,7 @@ namespace libdar
 	    }
 
 	    if(nom == NULL)
-		throw SRC_BUG; // ref, is neither a eod nor a nomme ! what's that ???
+		throw SRC_BUG; // ref, is neither a eod nor a cat_nomme ! what's that ???
 
 	    if(current_compare->search_children(nom->get_name(), found))
 	    {
@@ -623,7 +623,7 @@ namespace libdar
 			else
 			    return false;
 		    else
-			throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a nomme which is neither detruit nor inode !
+			throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a cat_nomme which is neither detruit nor inode !
 
 		if(dst_mir != NULL)
 		    extracted = dst_mir->get_inode();
@@ -643,12 +643,12 @@ namespace libdar
     infinint catalogue::update_destroyed_with(const catalogue & ref)
     {
 	directory *current = contenu;
-	const nomme *ici;
+	const cat_nomme *ici;
 	const cat_entree *projo;
 	const eod *pro_eod;
 	const directory *pro_dir;
 	const detruit *pro_det;
-	const nomme *pro_nom;
+	const cat_nomme *pro_nom;
 	const mirage *pro_mir;
 	infinint count = 0;
 
@@ -658,7 +658,7 @@ namespace libdar
 	    pro_eod = dynamic_cast<const eod *>(projo);
 	    pro_dir = dynamic_cast<const directory *>(projo);
 	    pro_det = dynamic_cast<const detruit *>(projo);
-	    pro_nom = dynamic_cast<const nomme *>(projo);
+	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
 	    pro_mir = dynamic_cast<const mirage *>(projo);
 
 	    if(pro_eod != NULL)
@@ -674,7 +674,7 @@ namespace libdar
 		continue;
 
 	    if(pro_nom == NULL)
-		throw SRC_BUG; // neither an eod nor a nomme ! what's that ?
+		throw SRC_BUG; // neither an eod nor a cat_nomme ! what's that ?
 
 	    if(!current->search_children(pro_nom->get_name(), ici))
 	    {
@@ -720,12 +720,12 @@ namespace libdar
     void catalogue::update_absent_with(const catalogue & ref, infinint aborting_next_etoile)
     {
 	directory *current = contenu;
-	const nomme *ici;
+	const cat_nomme *ici;
 	const cat_entree *projo;
 	const eod *pro_eod;
 	const directory *pro_dir;
 	const detruit *pro_det;
-	const nomme *pro_nom;
+	const cat_nomme *pro_nom;
 	const inode *pro_ino;
 	const mirage *pro_mir;
 	map<infinint, etoile *> corres_clone;
@@ -739,7 +739,7 @@ namespace libdar
 	    pro_eod = dynamic_cast<const eod *>(projo);
 	    pro_dir = dynamic_cast<const directory *>(projo);
 	    pro_det = dynamic_cast<const detruit *>(projo);
-	    pro_nom = dynamic_cast<const nomme *>(projo);
+	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
 	    pro_ino = dynamic_cast<const inode *>(projo);
 	    pro_mir = dynamic_cast<const mirage *>(projo);
 
@@ -756,7 +756,7 @@ namespace libdar
 		continue;
 
 	    if(pro_nom == NULL)
-		throw SRC_BUG; // neither an eod nor a nomme! what's that?
+		throw SRC_BUG; // neither an eod nor a cat_nomme! what's that?
 
 	    if(pro_mir != NULL)
 		pro_ino = pro_mir->get_inode();
@@ -942,7 +942,7 @@ namespace libdar
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const mirage *e_hard = dynamic_cast<const mirage *>(e);
-	    const nomme *e_nom = dynamic_cast<const nomme *>(e);
+	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 
 	    thr.check_self_cancellation();
 	    juillet.enfile(e);
@@ -959,7 +959,7 @@ namespace libdar
 	    }
 	    else
 		if(e_nom == NULL)
-		    throw SRC_BUG; // not an eod nor a nomme, what's that?
+		    throw SRC_BUG; // not an eod nor a cat_nomme, what's that?
 		else
 		    if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || selection.is_covered(e_nom->get_name())))
 		    {
@@ -1059,7 +1059,7 @@ namespace libdar
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const mirage *e_hard = dynamic_cast<const mirage *>(e);
-	    const nomme *e_nom = dynamic_cast<const nomme *>(e);
+	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 
 	    thr.check_self_cancellation();
 	    juillet.enfile(e);
@@ -1192,7 +1192,7 @@ namespace libdar
 	    const mirage *e_hard = dynamic_cast<const mirage *>(e);
 	    const lien *e_sym = dynamic_cast<const lien *>(e);
 	    const device *e_dev = dynamic_cast<const device *>(e);
-	    const nomme *e_nom = dynamic_cast<const nomme *>(e);
+	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 	    const eod tmp_eod;
 
 	    thr.check_self_cancellation();
@@ -1278,7 +1278,7 @@ namespace libdar
 			    }
 
 			    if(e_ino == NULL)
-				throw SRC_BUG; // this is a nomme which is neither a detruit nor an inode
+				throw SRC_BUG; // this is a cat_nomme which is neither a detruit nor an inode
 
 			    if(!filter_unsaved
 			       || e_ino->get_saved_status() != s_not_saved
@@ -1472,7 +1472,7 @@ namespace libdar
 	    const directory *e_dir = dynamic_cast<const directory *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const mirage *e_hard = dynamic_cast<const mirage *>(e);
-	    const nomme *e_nom = dynamic_cast<const nomme *>(e);
+	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 
 	    thr.check_self_cancellation();

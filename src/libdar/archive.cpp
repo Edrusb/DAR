@@ -1370,7 +1370,7 @@ namespace libdar
         try
         {
 	    const directory * parent = get_dir_object(dir);
-	    const nomme *tmp_ptr = NULL;
+	    const cat_nomme *tmp_ptr = NULL;
 
 	    if(freed_and_checked)
 		throw Erange("catalogue::get_children_in_table", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
@@ -1464,7 +1464,7 @@ namespace libdar
         try
         {
 	    const directory *parent = get_dir_object(dir);
-	    const nomme *tmp_ptr = NULL;
+	    const cat_nomme *tmp_ptr = NULL;
 
 	    if(freed_and_checked)
 		throw Erange("catalogue::has_subdirectory", "catalogue::free_and_check_memory() method has been called, this object is no more usable");
@@ -2390,7 +2390,7 @@ namespace libdar
     const directory *archive::get_dir_object(const string & dir) const
     {
 	const directory *parent = NULL;
-	const nomme *tmp_ptr = NULL;
+	const cat_nomme *tmp_ptr = NULL;
 
 	parent = get_cat().get_contenu();
 	if(parent == NULL)

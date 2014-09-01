@@ -41,11 +41,11 @@ namespace libdar
 	/// @{
 
 	/// the present file to ignore (not to be recorded as deleted later)
-    class ignored : public nomme
+    class ignored : public cat_nomme
     {
     public :
-        ignored(const std::string & name) : nomme(name) {};
-        ignored(generic_file & f) : nomme(f) { throw SRC_BUG; };
+        ignored(const std::string & name) : cat_nomme(name) {};
+        ignored(generic_file & f) : cat_nomme(f) { throw SRC_BUG; };
 
         unsigned char signature() const { return 'i'; };
         cat_entree *clone() const { return new (get_pool()) ignored(*this); };

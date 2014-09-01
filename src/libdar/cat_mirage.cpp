@@ -50,7 +50,7 @@ namespace libdar
                    compressor *efsa_loc,
                    mirage_format fmt,
                    bool lax,
-                   escape *ptr) : nomme(f)
+                   escape *ptr) : cat_nomme(f)
     {
         init(dialog,
              f,
@@ -76,7 +76,7 @@ namespace libdar
                    generic_file *data_loc,
                    compressor *efsa_loc,
                    bool lax,
-                   escape *ptr) : nomme("TEMP")
+                   escape *ptr) : cat_nomme("TEMP")
     {
         init(dialog,
              f,
@@ -156,7 +156,7 @@ namespace libdar
 
             if(fmt == fmt_file_etiquette)
             {
-                nomme *tmp_ptr = new (get_pool()) file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
+                cat_nomme *tmp_ptr = new (get_pool()) file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
                 entree_ptr = tmp_ptr;
                 if(tmp_ptr != NULL)
                 {
@@ -236,9 +236,9 @@ namespace libdar
     const mirage & mirage::operator = (const mirage & ref)
     {
         etoile *tmp_ref;
-        const nomme * ref_nom = & ref;
-        nomme * this_nom = this;
-        *this_nom = *ref_nom; // copying the nomme part of these objects
+        const cat_nomme * ref_nom = & ref;
+        cat_nomme * this_nom = this;
+        *this_nom = *ref_nom; // copying the cat_nomme part of these objects
 
         if(ref.star_ref == NULL)
             throw SRC_BUG;
@@ -264,7 +264,7 @@ namespace libdar
         if(star_ref->get_ref_count() > 1)
         {
             char buffer[] = { MIRAGE_ALONE, MIRAGE_WITH_INODE };
-            nomme::inherited_dump(f, small);
+            cat_nomme::inherited_dump(f, small);
             star_ref->get_etiquette().dump(f);
             if((small && !is_inode_wrote())
                || (!small && !is_inode_dumped()))

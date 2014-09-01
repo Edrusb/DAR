@@ -293,7 +293,7 @@ namespace libdar
 		{
 		    if(*crc_read != *crc_calc)
 		    {
-			nomme * ret_nom = dynamic_cast<nomme *>(ret);
+			cat_nomme * ret_nom = dynamic_cast<cat_nomme *>(ret);
 			string nom = ret_nom != NULL ? ret_nom->get_name() : "";
 
 			try
