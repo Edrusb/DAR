@@ -462,7 +462,7 @@ namespace libdar
 	const cat_inode *second_i = get_inode(&second);
 
 	const file * first_file = dynamic_cast<const file *>(first_i);
-	const lien * first_lien = dynamic_cast<const lien *>(first_i);
+	const cat_lien * first_lien = dynamic_cast<const cat_lien *>(first_i);
 	const cat_directory * first_dir = dynamic_cast<const cat_directory *>(first_i);
 	const cat_chardev * first_char = dynamic_cast<const cat_chardev *>(first_i);
 	const cat_blockdev * first_block = dynamic_cast<const cat_blockdev *>(first_i);
@@ -471,7 +471,7 @@ namespace libdar
 	const detruit *first_detruit = dynamic_cast<const detruit *>(&first); // first not first_i here !
 
 	const file * second_file = dynamic_cast<const file *>(second_i);
-	const lien * second_lien = dynamic_cast<const lien *>(second_i);
+	const cat_lien * second_lien = dynamic_cast<const cat_lien *>(second_i);
 	const cat_directory * second_dir = dynamic_cast<const cat_directory *>(second_i);
 	const cat_chardev * second_char = dynamic_cast<const cat_chardev *>(second_i);
 	const cat_blockdev * second_block = dynamic_cast<const cat_blockdev *>(second_i);

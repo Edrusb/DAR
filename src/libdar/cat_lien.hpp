@@ -41,17 +41,17 @@ namespace libdar
 	/// @{
 
 	/// the symbolic link inode class
-    class lien : public cat_inode
+    class cat_lien : public cat_inode
     {
     public :
-        lien(const infinint & uid, const infinint & gid, U_16 perm,
+        cat_lien(const infinint & uid, const infinint & gid, U_16 perm,
              const datetime & last_access,
              const datetime & last_modif,
 	     const datetime & last_change,
              const std::string & name,
 	     const std::string & target,
 	     const infinint & fs_device);
-        lien(user_interaction & dialog,
+        cat_lien(user_interaction & dialog,
 	     generic_file & f,
 	     const archive_version & reading_ver,
 	     saved_status saved,
@@ -64,7 +64,7 @@ namespace libdar
             // using the method is_more_recent_than() from cat_inode
             // using method has_changed_since() from cat_inode class
         unsigned char signature() const { return mk_signature('l', get_saved_status()); };
-        cat_entree *clone() const { return new (get_pool()) lien(*this); };
+        cat_entree *clone() const { return new (get_pool()) cat_lien(*this); };
 
     protected :
         void sub_compare(const cat_inode & other, bool isolated_mode) const;

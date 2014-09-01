@@ -32,7 +32,7 @@ using namespace std;
 namespace libdar
 {
 
-    lien::lien(const infinint & uid, const infinint & gid, U_16 perm,
+    cat_lien::cat_lien(const infinint & uid, const infinint & gid, U_16 perm,
 	       const datetime & last_access,
 	       const datetime & last_modif,
 	       const datetime & last_change,
@@ -44,7 +44,7 @@ namespace libdar
 	set_saved_status(s_saved);
     }
 
-    lien::lien(user_interaction & dialog,
+    cat_lien::cat_lien(user_interaction & dialog,
 	       generic_file & f,
 	       const archive_version & reading_ver,
 	       saved_status saved,
@@ -55,32 +55,32 @@ namespace libdar
 	    tools_read_string(f, points_to);
     }
 
-    const string & lien::get_target() const
+    const string & cat_lien::get_target() const
     {
 	if(get_saved_status() != s_saved)
 	    throw SRC_BUG;
 	return points_to;
     }
 
-    void lien::set_target(string x)
+    void cat_lien::set_target(string x)
     {
 	set_saved_status(s_saved);
 	points_to = x;
     }
 
-    void lien::sub_compare(const cat_inode & other, bool isolated_mode) const
+    void cat_lien::sub_compare(const cat_inode & other, bool isolated_mode) const
     {
-	const lien *l_other = dynamic_cast<const lien *>(&other);
+	const cat_lien *l_other = dynamic_cast<const cat_lien *>(&other);
 	if(l_other == NULL)
 	    throw SRC_BUG; // bad argument cat_inode::compare has a bug
 
 	if(get_saved_status() == s_saved && l_other->get_saved_status() == s_saved)
 	    if(get_target() != l_other->get_target())
-		throw Erange("lien:sub_compare", string(gettext("symbolic link does not point to the same target: "))
+		throw Erange("cat_lien:sub_compare", string(gettext("symbolic link does not point to the same target: "))
 			     + get_target() + " <--> " + l_other->get_target());
     }
 
-    void lien::inherited_dump(generic_file & f, bool small) const
+    void cat_lien::inherited_dump(generic_file & f, bool small) const
     {
 	cat_inode::inherited_dump(f, small);
 	if(get_saved_status() == s_saved)

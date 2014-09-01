@@ -384,7 +384,7 @@ namespace libdar
 			const fsa_scope & scope,
 			bool isolated_mode) const
     {
-	bool do_mtime_test = dynamic_cast<const lien *>(&other) == NULL || symlink_date;
+	bool do_mtime_test = dynamic_cast<const cat_lien *>(&other) == NULL || symlink_date;
 
         if(!same_as(other))
             throw Erange("cat_inode::compare",gettext("different file type"));

@@ -204,7 +204,7 @@ namespace libdar
 		{
 		    string pointed = tools_readlink(ptr_name);
 
-		    ref = new (get_pool()) lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (get_pool()) cat_lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						atime,
 						mtime,
 						ctime,
@@ -1029,7 +1029,7 @@ namespace libdar
     {
         const cat_directory *ref_dir = dynamic_cast<const cat_directory *>(ref);
         const file *ref_fil = dynamic_cast<const file *>(ref);
-        const lien *ref_lie = dynamic_cast<const lien *>(ref);
+        const cat_lien *ref_lie = dynamic_cast<const cat_lien *>(ref);
         const cat_blockdev *ref_blo = dynamic_cast<const cat_blockdev *>(ref);
         const cat_chardev *ref_cha = dynamic_cast<const cat_chardev *>(ref);
         const cat_tube *ref_tub = dynamic_cast<const cat_tube *>(ref);
@@ -1108,7 +1108,7 @@ namespace libdar
 		    {
 			ref_ino = ref_mir->get_inode();
 			ref_fil = dynamic_cast<const file *>(ref_mir->get_inode());
-			ref_lie = dynamic_cast<const lien *>(ref_mir->get_inode());
+			ref_lie = dynamic_cast<const cat_lien *>(ref_mir->get_inode());
 			ref_blo = dynamic_cast<const cat_blockdev *>(ref_mir->get_inode());
 			ref_cha = dynamic_cast<const cat_chardev *>(ref_mir->get_inode());
 			ref_tub = dynamic_cast<const cat_tube *>(ref_mir->get_inode());
@@ -1683,7 +1683,7 @@ namespace libdar
 	const cat_inode *tba_ino = tba_mir == NULL ? dynamic_cast<const cat_inode *>(to_be_added) : tba_mir->get_inode();
 	const cat_directory *tba_dir = dynamic_cast<const cat_directory *>(to_be_added);
 	const detruit *tba_det = dynamic_cast<const detruit *>(to_be_added);
-	const lien *in_place_symlink = dynamic_cast<const lien *>(in_place);
+	const cat_lien *in_place_symlink = dynamic_cast<const cat_lien *>(in_place);
 
 	if(tba_ino == NULL)
 	    throw SRC_BUG;
@@ -2203,7 +2203,7 @@ namespace libdar
 				const fsa_scope & scope)
     {
         const char *name = chem.c_str();
-        const lien *ref_lie = dynamic_cast<const lien *>(&ref);
+        const cat_lien *ref_lie = dynamic_cast<const cat_lien *>(&ref);
         S_I permission;
 
 
@@ -2251,7 +2251,7 @@ namespace libdar
 		if(lchown(name, tmp_uid, tmp_gid) < 0)
 		    dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
 #else
-		if(dynamic_cast<const lien *>(&ref) == NULL) // not a symbolic link
+		if(dynamic_cast<const cat_lien *>(&ref) == NULL) // not a symbolic link
 		    if(chown(name, tmp_uid, tmp_gid) < 0)
 			dialog.warning(chem + string(gettext("Could not restore original file ownership: ")) + tools_strerror_r(errno));
 		    //
@@ -2283,7 +2283,7 @@ namespace libdar
 			  cat_inode::comparison_fields what_to_check,
 			  const fsa_scope & scope)
     {
-	const lien *ref_lie = dynamic_cast<const lien *>(&ref);
+	const cat_lien *ref_lie = dynamic_cast<const cat_lien *>(&ref);
 
 	if(what_to_check == cat_inode::cf_all || what_to_check == cat_inode::cf_ignore_owner || what_to_check == cat_inode::cf_mtime)
 	{

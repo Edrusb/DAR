@@ -112,7 +112,7 @@ namespace libdar
                                     ++num_s;
                                 else
                                 {
-                                    const lien *l = dynamic_cast<const lien *>(ino);
+                                    const cat_lien *l = dynamic_cast<const cat_lien *>(ino);
                                     if(l != NULL)
                                         ++num_l;
                                     else
@@ -204,7 +204,7 @@ namespace libdar
                 ret = new (pool) file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
                 break;
             case 'l':
-                ret = new (pool) lien(dialog, f, reading_ver, saved, efsa_loc, ptr);
+                ret = new (pool) cat_lien(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'c':
                 ret = new (pool) cat_chardev(dialog, f, reading_ver, saved, efsa_loc, ptr);
