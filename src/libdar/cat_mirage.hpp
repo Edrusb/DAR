@@ -41,7 +41,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-	/// the hard link implementation, cat_mirage is the named entry owned by a directory it points to a common "etoile class"
+	/// the hard link implementation, cat_mirage is the named entry owned by a directory it points to a common "cat_etoile class"
 
 	/// well, a mirage is this fake apparition of water in a desert... I guess you get the picture now... :-)
     class cat_mirage : public cat_nomme
@@ -51,13 +51,13 @@ namespace libdar
 			    fmt_hard_link,        //< old dual format
 			    fmt_file_etiquette }; //< old dual format
 
-	cat_mirage(const std::string & name, etoile *ref) : cat_nomme(name) { star_ref = ref; if(ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
+	cat_mirage(const std::string & name, cat_etoile *ref) : cat_nomme(name) { star_ref = ref; if(ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
 	cat_mirage(user_interaction & dialog,
 	       generic_file & f,
 	       const archive_version & reading_ver,
 	       saved_status saved,
 	       entree_stats & stats,
-	       std::map <infinint, etoile *> & corres,
+	       std::map <infinint, cat_etoile *> & corres,
 	       compression default_algo,
 	       generic_file *data_loc,
 	       compressor *efsa_loc,
@@ -69,7 +69,7 @@ namespace libdar
 	       const archive_version & reading_ver,
 	       saved_status saved,
 	       entree_stats & stats,
-	       std::map <infinint, etoile *> & corres,
+	       std::map <infinint, cat_etoile *> & corres,
 	       compression default_algo,
 	       generic_file *data_loc,
 	       compressor *efsa_loc,
@@ -85,7 +85,7 @@ namespace libdar
 	cat_inode *get_inode() const { if(star_ref == NULL) throw SRC_BUG; return star_ref->get_inode(); };
 	infinint get_etiquette() const { return star_ref->get_etiquette(); };
 	infinint get_etoile_ref_count() const { return star_ref->get_ref_count(); };
-	etoile *get_etoile() const { return star_ref; };
+	cat_etoile *get_etoile() const { return star_ref; };
 
 	bool is_inode_counted() const { return star_ref->is_counted(); };
 	bool is_inode_wrote() const { return star_ref->is_wrote(); };
@@ -104,14 +104,14 @@ namespace libdar
 	void inherited_dump(generic_file & f, bool small) const;
 
     private:
-	etoile *star_ref;
+	cat_etoile *star_ref;
 
 	void init(user_interaction & dialog,
 		  generic_file & f,
 		  const archive_version & reading_ver,
 		  saved_status saved,
 		  entree_stats & stats,
-		  std::map <infinint, etoile *> & corres,
+		  std::map <infinint, cat_etoile *> & corres,
 		  compression default_algo,
 		  generic_file *data_loc,
 		  compressor *efsa_loc,

@@ -43,7 +43,7 @@ namespace libdar
 
 
 	/// the hard link implementation (etoile means star in French, seen a star as a point from which are thrown many ray of light)
-    class etoile : public on_pool
+    class cat_etoile : public on_pool
     {
     public:
 
@@ -51,11 +51,11 @@ namespace libdar
 
 	    ///\param[in] host is an inode, it must not be a directory (this would throw an Erange exception)
 	    ///\param[in] etiquette_number is the identifier of this multiply linked structure
-	    ///\note given cat_inode is now managed by the etoile object
-	etoile(cat_inode *host, const infinint & etiquette_number);
-	etoile(const etoile & ref) { throw SRC_BUG; }; // copy constructor not allowed for this class
-	const etoile & operator = (const etoile & ref) { throw SRC_BUG; }; // assignment not allowed for this class
-	~etoile() { delete hosted; };
+	    ///\note given cat_inode is now managed by the cat_etoile object
+	cat_etoile(cat_inode *host, const infinint & etiquette_number);
+	cat_etoile(const cat_etoile & ref) { throw SRC_BUG; }; // copy constructor not allowed for this class
+	const cat_etoile & operator = (const cat_etoile & ref) { throw SRC_BUG; }; // assignment not allowed for this class
+	~cat_etoile() { delete hosted; };
 
 	void add_ref(void *ref);
 	void drop_ref(void *ref);

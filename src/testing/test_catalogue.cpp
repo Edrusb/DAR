@@ -94,7 +94,7 @@ void f1()
         fichier_local *dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, false, false);
         fichier_local *dump2 = new fichier_local(*ui, FIC2, gf_write_only, 0777, false, true, false);
 	compressor comp = compressor(none, *dump, 1);
-	std::map <infinint, etoile *> corres;
+	std::map <infinint, cat_etoile *> corres;
 
         cat_eod *v_eod = new cat_eod();
         cat_file *v_file = new cat_file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", "." , 1024, 0, false);
@@ -106,7 +106,7 @@ void f1()
         cat_prise *v_prise = new cat_prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21),  "prise", 0);
         cat_detruit *v_detruit = new cat_detruit("ancien fichier", 'f', datetime(192));
         cat_directory *v_sub_dir = new cat_directory(200,20, 0777, datetime(100), datetime(101), datetime(102), "sous-repertoire", 0);
-	cat_mirage *v_mir = new cat_mirage("Zorro mirage", new etoile(dynamic_cast<cat_inode *>(v_prise->clone()), 10));
+	cat_mirage *v_mir = new cat_mirage("Zorro mirage", new cat_etoile(dynamic_cast<cat_inode *>(v_prise->clone()), 10));
 
         cat_entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, v_mir, NULL };
 
@@ -318,7 +318,7 @@ void f4()
 
 
     cat_tube *v_tube = new cat_tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18), "tuyau", 0);
-    etoile *deneb = new etoile(v_tube, 100);
+    cat_etoile *deneb = new cat_etoile(v_tube, 100);
 
     cout << deneb->get_ref_count() << endl;
     cout << deneb->get_etiquette() << endl;
@@ -355,5 +355,4 @@ void f4()
     cout << abell->get_etiquette() << endl;
 
     delete abell;
-	// verify with debugging and break in ~etoile that the deneb is properly released
 }

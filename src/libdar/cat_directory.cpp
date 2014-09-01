@@ -86,7 +86,7 @@ namespace libdar
 			 const archive_version & reading_ver,
 			 saved_status saved,
 			 entree_stats & stats,
-			 std::map <infinint, etoile *> & corres,
+			 std::map <infinint, cat_etoile *> & corres,
 			 compression default_algo,
 			 generic_file *data_loc,
 			 compressor *efsa_loc,

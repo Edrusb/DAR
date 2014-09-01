@@ -36,18 +36,18 @@ namespace libdar
 {
 
 
-    etoile::etoile(cat_inode *host, const infinint & etiquette_number)
+    cat_etoile::cat_etoile(cat_inode *host, const infinint & etiquette_number)
     {
         if(host == NULL)
             throw SRC_BUG;
         if(dynamic_cast<cat_directory *>(host) != NULL)
-            throw Erange("etoile::etoile", gettext("Hard links of directories are not supported"));
+            throw Erange("cat_etoile::cat_etoile", gettext("Hard links of directories are not supported"));
         hosted = host;
         etiquette = etiquette_number;
 	refs.clear();
     }
 
-    void etoile::add_ref(void *ref)
+    void cat_etoile::add_ref(void *ref)
     {
 	if(find(refs.begin(), refs.end(), ref) != refs.end())
 	    throw SRC_BUG; // this reference is already known
@@ -55,7 +55,7 @@ namespace libdar
 	refs.push_back(ref);
     }
 
-    void etoile::drop_ref(void *ref)
+    void cat_etoile::drop_ref(void *ref)
     {
 	list<void *>::iterator it = find(refs.begin(), refs.end(), ref);
 

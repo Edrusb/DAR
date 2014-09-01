@@ -101,7 +101,7 @@ namespace libdar
 	generic_file *x_data_loc;
 	compressor *x_efsa_loc;
 	bool x_lax;
-	std::map <infinint, etoile *> corres;
+	std::map <infinint, cat_etoile *> corres;
         state status;
 	catalogue *cat_det; //< holds the final catalogue's detruit objects when no more file can be read from the archive
 	infinint min_read_offset;   //< next offset in archive should be greater than that to identify a mark

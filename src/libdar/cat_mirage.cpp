@@ -44,7 +44,7 @@ namespace libdar
                    const archive_version & reading_ver,
                    saved_status saved,
                    entree_stats & stats,
-                   std::map <infinint, etoile *> & corres,
+                   std::map <infinint, cat_etoile *> & corres,
                    compression default_algo,
                    generic_file *data_loc,
                    compressor *efsa_loc,
@@ -71,7 +71,7 @@ namespace libdar
                    const archive_version & reading_ver,
                    saved_status saved,
                    entree_stats & stats,
-                   std::map <infinint, etoile *> & corres,
+                   std::map <infinint, cat_etoile *> & corres,
                    compression default_algo,
                    generic_file *data_loc,
                    compressor *efsa_loc,
@@ -97,7 +97,7 @@ namespace libdar
                       const archive_version & reading_ver,
                       saved_status saved,
                       entree_stats & stats,
-                      std::map <infinint, etoile *> & corres,
+                      std::map <infinint, cat_etoile *> & corres,
                       compression default_algo,
                       generic_file *data_loc,
                       compressor *efsa_loc,
@@ -107,7 +107,7 @@ namespace libdar
     {
         infinint tmp_tiquette;
         char tmp_flag;
-        map<infinint, etoile *>::iterator etl;
+        map<infinint, cat_etoile *>::iterator etl;
         cat_inode *ino_ptr = NULL;
         cat_entree *entree_ptr = NULL;
         entree_stats fake_stats; // the call to cat_entree::read will increment counters with the inode we will read
@@ -137,7 +137,7 @@ namespace libdar
         {
         case MIRAGE_ALONE:
 
-                // we must link with the already existing etoile
+                // we must link with the already existing cat_etoile
 
             etl = corres.find(tmp_tiquette);
             if(etl == corres.end())
@@ -181,18 +181,18 @@ namespace libdar
                 throw Erange("cat_mirage::cat_mirage", gettext("Incoherent catalogue structure: hard linked data is not an inode"));
             }
 
-                // then we can bind the inode to the next to be create etoile object
+                // then we can bind the inode to the next to be create cat_etoile object
 
             try
             {
-                    // we must check that an already exiting etoile is not present
+                    // we must check that an already exiting cat_etoile is not present
 
                 etl = corres.find(tmp_tiquette);
                 if(etl == corres.end())
                 {
-                        // we can now create the etoile and add it in the corres map;
+                        // we can now create the cat_etoile and add it in the corres map;
 
-                    star_ref = new (get_pool()) etoile(ino_ptr, tmp_tiquette);
+                    star_ref = new (get_pool()) cat_etoile(ino_ptr, tmp_tiquette);
                     try
                     {
                         if(star_ref == NULL)
@@ -235,7 +235,7 @@ namespace libdar
 
     const cat_mirage & cat_mirage::operator = (const cat_mirage & ref)
     {
-        etoile *tmp_ref;
+        cat_etoile *tmp_ref;
         const cat_nomme * ref_nom = & ref;
         cat_nomme * this_nom = this;
         *this_nom = *ref_nom; // copying the cat_nomme part of these objects

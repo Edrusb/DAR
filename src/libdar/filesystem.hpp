@@ -106,10 +106,10 @@ namespace libdar
         struct couple
         {
             nlink_t count;       //< counts the number of hard link on that inode that have not yet been found in filesystem, once this count reaches zero, the "couple" structure can be dropped and the "holder" too (no more expected hard links to be found)
-            etoile *obj;         //< the address of the corresponding etoile object for that inode
+            cat_etoile *obj;         //< the address of the corresponding cat_etoile object for that inode
 	    cat_mirage holder;       //< it increments by one the obj internal counters, thus, while this object is alive, the obj will not be destroyed
 
-	    couple(etoile *ptr, nlink_t ino_count) : holder("FAKE", ptr) { count = ino_count; obj = ptr; };
+	    couple(cat_etoile *ptr, nlink_t ino_count) : holder("FAKE", ptr) { count = ino_count; obj = ptr; };
         };
 
 	struct node

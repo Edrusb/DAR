@@ -125,7 +125,7 @@ namespace libdar
 	unsigned char a;
 	saved_status st;
 	unsigned char base;
-	map <infinint, etoile *> corres;
+	map <infinint, cat_etoile *> corres;
 	crc *calc_crc = NULL;
 	crc *read_crc = NULL;
 	contenu = NULL;
@@ -728,9 +728,9 @@ namespace libdar
 	const cat_nomme *pro_nom;
 	const cat_inode *pro_ino;
 	const cat_mirage *pro_mir;
-	map<infinint, etoile *> corres_clone;
+	map<infinint, cat_etoile *> corres_clone;
 	    // for each etiquette from the reference catalogue
-	    // gives an cloned or original etoile object
+	    // gives an cloned or original cat_etoile object
 	    // in the current catalogue
 
 	ref.reset_read();
@@ -772,7 +772,7 @@ namespace libdar
 		cat_inode *clo_ino = NULL;
 		cat_directory *clo_dir = NULL;
 		cat_mirage *clo_mir = NULL;
-		etoile *clo_eto = NULL;
+		cat_etoile *clo_eto = NULL;
 
 		try
 		{
@@ -804,10 +804,10 @@ namespace libdar
 		    {
 			try
 			{
-			    map<infinint, etoile *>::iterator it = corres_clone.find(pro_mir->get_etiquette());
+			    map<infinint, cat_etoile *>::iterator it = corres_clone.find(pro_mir->get_etiquette());
 			    if(it == corres_clone.end())
 			    {
-				clo_eto = new (get_pool()) etoile(clo_ino, aborting_next_etoile++);
+				clo_eto = new (get_pool()) cat_etoile(clo_ino, aborting_next_etoile++);
 				if(clo_eto == NULL)
 				    throw Ememory("catalogue::update_absent_with");
 				else

@@ -352,14 +352,14 @@ namespace libdar
 		{
 		    map<node, couple>::iterator it = corres_read.find(node(buf.st_ino, buf.st_dev));
 
-		    if(it == corres_read.end()) // inode not yet seen, creating the etoile object
+		    if(it == corres_read.end()) // inode not yet seen, creating the cat_etoile object
 		    {
 			cat_inode *ino_ref = dynamic_cast<cat_inode *>(ref);
-			etoile *tmp_et = NULL;
+			cat_etoile *tmp_et = NULL;
 
 			if(ino_ref == NULL)
 			    throw SRC_BUG;
-			tmp_et = new (get_pool()) etoile(ino_ref, etiquette_counter++);
+			tmp_et = new (get_pool()) cat_etoile(ino_ref, etiquette_counter++);
 			if(tmp_et == NULL)
 			    throw Ememory("filesystem_hard_link_read::make_read_entree");
 			try
@@ -373,7 +373,7 @@ namespace libdar
 				throw SRC_BUG; // the addition of the entry to the map failed !!!
 			    else
 				it->second.obj->get_inode()->change_name("");
-				// name of inode attached to an etoile is not used so we don't want to waste space in this field.
+				// name of inode attached to an cat_etoile is not used so we don't want to waste space in this field.
 			}
 			catch(...)
 			{
@@ -384,21 +384,21 @@ namespace libdar
 
 			ref = new (get_pool()) cat_mirage(name, tmp_et);
 		    }
-		    else // inode already seen creating a new cat_mirage on the given etoile
+		    else // inode already seen creating a new cat_mirage on the given cat_etoile
 		    {
 			    // some sanity checks
 			if(it->second.obj == NULL)
 			    throw SRC_BUG;
 
 			if(ref != NULL)
-			    delete ref;  // we don't need this just created inode as it is already attached to the etoile object
+			    delete ref;  // we don't need this just created inode as it is already attached to the cat_etoile object
 			ref = new (get_pool()) cat_mirage(name, it->second.obj);
 			if(ref != NULL)
 			{
 			    it->second.count--;
 			    if(it->second.count == 0)
 				corres_read.erase(it);
-				// this deletes the couple entry, implying the release of memory used by the holder object, but the etoile will only be destroyed once its internal counter drops to zero
+				// this deletes the couple entry, implying the release of memory used by the holder object, but the cat_etoile will only be destroyed once its internal counter drops to zero
 			}
 		    }
 		}

@@ -110,17 +110,17 @@ namespace libdar
 	/// \return a pointer to the new allocated clone object (to be deleted by the delete operator by the caller)
     static cat_entree *make_clone(const cat_nomme *ref,
 			      memory_pool *pool,
-			      map<infinint, etoile*> & hard_link_base,
+			      map<infinint, cat_etoile*> & hard_link_base,
 			      const infinint & etiquette_offset);
 
 	/// remove an entry hardlink from a given hard_link database
 
 	/// \param[in] mir is a pointer to the cat_mirage object to delete
 	/// \param[in,out] hard_link_base is the datastructure used to gather/map hard_links information
-	/// \note if the cat_mirage object is the last one pointing to a given "etoile" object
-	/// deleting this cat_mirage will delete the "etoile" object automatically (see destructor implementation of these classes).
-	/// However, one need to remove from the database the reference to this "etoile *" that is about to me removed by the caller
-    static void clean_hard_link_base_from(const cat_mirage *mir, map<infinint, etoile *> & hard_link_base);
+	/// \note if the cat_mirage object is the last one pointing to a given "cat_etoile" object
+	/// deleting this cat_mirage will delete the "cat_etoile" object automatically (see destructor implementation of these classes).
+	/// However, one need to remove from the database the reference to this "cat_etoile *" that is about to me removed by the caller
+    static void clean_hard_link_base_from(const cat_mirage *mir, map<infinint, cat_etoile *> & hard_link_base);
 
 
 
@@ -1478,7 +1478,7 @@ namespace libdar
 	const cat_eod tmp_eod;
 	const catalogue *ref_tab[] = { ref1, ref2, NULL };
 	infinint etiquette_offset = 0;
-	map <infinint, etoile *> corres_copy;
+	map <infinint, cat_etoile *> corres_copy;
 	const cat_entree *e = NULL;
 	U_I index = 0;
 	defile juillet = FAKE_ROOT;
@@ -2034,7 +2034,7 @@ namespace libdar
 							    if(al_ptr_ino->ea_get_saved_status() == cat_inode::ea_full)
 								st.decr_ea_treated();
 
-							    // cleaning the corres_copy map from the pointed to etoile object reference if necessary
+							    // cleaning the corres_copy map from the pointed to cat_etoile object reference if necessary
 							clean_hard_link_base_from(al_mir, corres_copy);
 						    }
 
@@ -2068,18 +2068,18 @@ namespace libdar
 							ut = tiquettes.begin();
 							while(ut != tiquettes.end())
 							{
-							    map<infinint, etoile *>::iterator it = corres_copy.find(ut->first);
+							    map<infinint, cat_etoile *>::iterator it = corres_copy.find(ut->first);
 
 							    if(it == corres_copy.end())
 								throw SRC_BUG; // unknown etiquettes found in directory tree
 
 							    if(it->second->get_ref_count() < ut->second)
 								throw SRC_BUG;
-								// more reference found in directory tree toward this etoile than
-								// this etoile is aware of !
+								// more reference found in directory tree toward this cat_etoile than
+								// this cat_etoile is aware of !
 
 							    if(it->second->get_ref_count() == ut->second)
-								    // this etoile will disapear because all its reference are located
+								    // this cat_etoile will disapear because all its reference are located
 								    // in the directory tree we are about to remove, we must clean this
 								    // entry from corres_copy
 								corres_copy.erase(it);
@@ -3580,7 +3580,7 @@ namespace libdar
 
     static cat_entree *make_clone(const cat_nomme *ref,
 			      memory_pool *pool,
-			      map<infinint, etoile*> & hard_link_base,
+			      map<infinint, cat_etoile*> & hard_link_base,
 			      const infinint & etiquette_offset)
     {
 	cat_entree *dolly = NULL; // will be the address of the cloned object
@@ -3596,10 +3596,10 @@ namespace libdar
 	if(ref_mir != NULL) // this is hard linked inode
 	{
 		// check whether this is the first time we see this file (in list of file covered by the file masks)
-	    map <infinint, etoile *>::iterator it = hard_link_base.find(ref_mir->get_etiquette() + etiquette_offset);
+	    map <infinint, cat_etoile *>::iterator it = hard_link_base.find(ref_mir->get_etiquette() + etiquette_offset);
 	    if(it == hard_link_base.end()) // this inode has not been yet recorded in the resulting archive
 	    {
-		etoile *filante = NULL;
+		cat_etoile *filante = NULL;
 		dolly = ref_mir->get_inode()->clone(); // we must clone the attached inode
 		try
 		{
@@ -3609,7 +3609,7 @@ namespace libdar
 			throw Ememory("filtre:make_clone");
 
 		    infinint shift_etiquette = ref_mir->get_etiquette() + etiquette_offset;
-		    filante = new (pool) etoile(dollinode, shift_etiquette);
+		    filante = new (pool) cat_etoile(dollinode, shift_etiquette);
 		    if(filante == NULL)
 			throw Ememory("make_clone");
 		    try
@@ -3649,7 +3649,7 @@ namespace libdar
 		}
 	    }
 	    else // already added to archive
-		dolly = new (pool) cat_mirage(the_name, it->second); // we make a new cat_mirage pointing to the etoile already involved in the catalogue under construction
+		dolly = new (pool) cat_mirage(the_name, it->second); // we make a new cat_mirage pointing to the cat_etoile already involved in the catalogue under construction
 	}
 	else // not a hard_link file
 	    dolly = ref->clone();  // we just clone the entry
@@ -3661,19 +3661,19 @@ namespace libdar
     }
 
 
-    static void clean_hard_link_base_from(const cat_mirage *mir, map<infinint, etoile *> & hard_link_base)
+    static void clean_hard_link_base_from(const cat_mirage *mir, map<infinint, cat_etoile *> & hard_link_base)
     {
 	if(mir->get_etoile_ref_count() == 0)
 	    throw SRC_BUG; // count should be >= 1
 
 	if(mir->get_etoile_ref_count() == 1)
 	{
-	    map<infinint, etoile *>::iterator it = hard_link_base.find(mir->get_etiquette());
+	    map<infinint, cat_etoile *>::iterator it = hard_link_base.find(mir->get_etiquette());
 	    const cat_inode *al_ptr_ino = mir->get_inode();
 	    if(al_ptr_ino == NULL)
 		throw SRC_BUG;
 	    if(it == hard_link_base.end())
-		throw SRC_BUG; // the etoile object pointed to by dolly_mir should be known by corres_copy
+		throw SRC_BUG; // the cat_etoile object pointed to by dolly_mir should be known by corres_copy
 	    hard_link_base.erase(it);
 	}
     }
