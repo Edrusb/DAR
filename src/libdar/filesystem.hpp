@@ -382,10 +382,10 @@ namespace libdar
 
 	    /// perform action due to the overwriting policy when the "to be added" entry is a detruit object
 	void action_over_remove(const cat_inode *in_place,
-				const detruit *to_be_added,
+				const cat_detruit *to_be_added,
 				const std::string & spot,
 				over_action_data action);
-	    /// perform action for data due to the overwriting policy when the "to be added" entry is not a detruit
+	    /// perform action for data due to the overwriting policy when the "to be added" entry is not a cat_detruit
 	void action_over_data(const cat_inode *in_place,
 			      const cat_nomme *to_be_added,
 			      const std::string & spot,

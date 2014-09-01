@@ -62,7 +62,7 @@ namespace libdar
         {
             const cat_inode *ino = dynamic_cast<const cat_inode *>(ref);
             const cat_mirage *h = dynamic_cast<const cat_mirage *>(ref);
-            const detruit *x = dynamic_cast<const detruit *>(ref);
+            const cat_detruit *x = dynamic_cast<const cat_detruit *>(ref);
 
 
             if(h != NULL) // won't count twice the same inode if it is referenced with hard_link
@@ -246,9 +246,9 @@ namespace libdar
                     if(!lax)
                         throw Erange("cat_entree::read", gettext("corrupted file"));
                     else
-                        dialog.warning(gettext("LAX MODE: Unexpected saved status for class \"detruit\" object, assuming data corruption occurred, ignoring and continuing"));
+                        dialog.warning(gettext("LAX MODE: Unexpected saved status for class \"cat_detruit\" object, assuming data corruption occurred, ignoring and continuing"));
                 }
-                ret = new (pool) detruit(f, reading_ver);
+                ret = new (pool) cat_detruit(f, reading_ver);
                 break;
 	    case 'o':
 		ret = new (pool) door(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);

@@ -32,10 +32,10 @@ using namespace std;
 namespace libdar
 {
 
-    detruit::detruit(generic_file & f, const archive_version & reading_ver) : cat_nomme(f)
+    cat_detruit::cat_detruit(generic_file & f, const archive_version & reading_ver) : cat_nomme(f)
     {
 	if(f.read((char *)&signe, 1) != 1)
-	    throw Erange("detruit::detruit", gettext("missing data to build"));
+	    throw Erange("cat_detruit::cat_detruit", gettext("missing data to build"));
 
 	if(reading_ver > 7)
 	    del_date.read(f,reading_ver);
@@ -43,7 +43,7 @@ namespace libdar
 	    del_date = datetime(0);
     }
 
-    void detruit::inherited_dump(generic_file & f, bool small) const
+    void cat_detruit::inherited_dump(generic_file & f, bool small) const
     {
 	cat_nomme::inherited_dump(f, small);
 	f.write((char *)&signe, 1);

@@ -1342,7 +1342,7 @@ namespace libdar
 	const cat_eod *x_eod = dynamic_cast<const cat_eod *>(x);
 	const cat_nomme *x_nom = dynamic_cast<const cat_nomme *>(x);
 	const cat_directory *x_dir = dynamic_cast<const cat_directory *>(x);
-	const detruit *x_det = dynamic_cast<const detruit *>(x);
+	const cat_detruit *x_det = dynamic_cast<const cat_detruit *>(x);
 	const cat_inode *x_ino = dynamic_cast<const cat_inode *>(x);
 	const cat_mirage *x_mir = dynamic_cast<const cat_mirage *>(x);
 
@@ -1627,7 +1627,7 @@ namespace libdar
     }
 
 
-    void filesystem_restore::action_over_remove(const cat_inode *in_place, const detruit *to_be_added, const string & spot, over_action_data action)
+    void filesystem_restore::action_over_remove(const cat_inode *in_place, const cat_detruit *to_be_added, const string & spot, over_action_data action)
     {
 	if(in_place == NULL || to_be_added == NULL)
 	    throw SRC_BUG;
@@ -1682,7 +1682,7 @@ namespace libdar
 	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
 	const cat_inode *tba_ino = tba_mir == NULL ? dynamic_cast<const cat_inode *>(to_be_added) : tba_mir->get_inode();
 	const cat_directory *tba_dir = dynamic_cast<const cat_directory *>(to_be_added);
-	const detruit *tba_det = dynamic_cast<const detruit *>(to_be_added);
+	const cat_detruit *tba_det = dynamic_cast<const cat_detruit *>(to_be_added);
 	const cat_lien *in_place_symlink = dynamic_cast<const cat_lien *>(in_place);
 
 	if(tba_ino == NULL)

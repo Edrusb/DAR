@@ -468,7 +468,7 @@ namespace libdar
 	const cat_blockdev * first_block = dynamic_cast<const cat_blockdev *>(first_i);
 	const cat_tube * first_tube = dynamic_cast<const cat_tube *>(first_i);
 	const cat_prise * first_prise = dynamic_cast<const cat_prise *>(first_i);
-	const detruit *first_detruit = dynamic_cast<const detruit *>(&first); // first not first_i here !
+	const cat_detruit *first_detruit = dynamic_cast<const cat_detruit *>(&first); // first not first_i here !
 
 	const cat_file * second_file = dynamic_cast<const cat_file *>(second_i);
 	const cat_lien * second_lien = dynamic_cast<const cat_lien *>(second_i);
@@ -477,7 +477,7 @@ namespace libdar
 	const cat_blockdev * second_block = dynamic_cast<const cat_blockdev *>(second_i);
 	const cat_tube * second_tube = dynamic_cast<const cat_tube *>(second_i);
 	const cat_prise * second_prise = dynamic_cast<const cat_prise *>(second_i);
-	const detruit *second_detruit = dynamic_cast<const detruit *>(&second); // second not second_i here !
+	const cat_detruit *second_detruit = dynamic_cast<const cat_detruit *>(&second); // second not second_i here !
 
 	return (first_file != NULL && second_file != NULL)
 	    || (first_lien != NULL && second_lien != NULL)

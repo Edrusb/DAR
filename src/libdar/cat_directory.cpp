@@ -97,7 +97,7 @@ namespace libdar
 	cat_entree *p;
 	cat_nomme *t;
 	cat_directory *d;
-	detruit *x;
+	cat_detruit *x;
 	cat_mirage *m;
 	cat_eod *fin = NULL;
 	bool lax_end = false;
@@ -142,7 +142,7 @@ namespace libdar
 		    d = dynamic_cast<cat_directory *>(p);
 		    fin = dynamic_cast<cat_eod *>(p);
 		    t = dynamic_cast<cat_nomme *>(p);
-		    x = dynamic_cast<detruit *>(p);
+		    x = dynamic_cast<cat_detruit *>(p);
 		    m = dynamic_cast<cat_mirage *>(p);
 
 		    if(!only_detruit || d != NULL || x != NULL || fin != NULL || m != NULL)
@@ -544,7 +544,7 @@ namespace libdar
 	const cat_nomme *next_nom = NULL;
 	const cat_directory *next_dir = NULL;
 	const cat_inode *next_ino = NULL;
-	const detruit *next_detruit = NULL;
+	const cat_detruit *next_detruit = NULL;
 	const cat_mirage *next_mir = NULL;
 	string segment;
 	bool loop = true;
@@ -609,7 +609,7 @@ namespace libdar
 		next_ino = next_mir->get_inode();
 	    else
 		next_ino = dynamic_cast<const cat_inode *>(next_nom);
-	    next_detruit = dynamic_cast<const detruit *>(next_nom);
+	    next_detruit = dynamic_cast<const cat_detruit *>(next_nom);
 	    next_dir = dynamic_cast<const cat_directory *>(next_ino);
 	    if(next_ino != NULL)
 	    {

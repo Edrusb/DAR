@@ -104,7 +104,7 @@ void f1()
         cat_blockdev *v_block = new cat_blockdev(1028, 106, 0651, datetime(13), datetime(14), datetime(15),  "block device", 105, 203, 0);
         cat_tube *v_tube = new cat_tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18), "tuyau", 0);
         cat_prise *v_prise = new cat_prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21),  "prise", 0);
-        detruit *v_detruit = new detruit("ancien fichier", 'f', datetime(192));
+        cat_detruit *v_detruit = new cat_detruit("ancien fichier", 'f', datetime(192));
         cat_directory *v_sub_dir = new cat_directory(200,20, 0777, datetime(100), datetime(101), datetime(102), "sous-repertoire", 0);
 	cat_mirage *v_mir = new cat_mirage("Zorro mirage", new etoile(dynamic_cast<cat_inode *>(v_prise->clone()), 10));
 
@@ -200,7 +200,7 @@ void f2()
         cat.add(new cat_eod());
         cat.add(new cat_tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18), "tuyau", 0));
         cat.add(new cat_prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21),  "prise", 0));
-        cat.add(new detruit("ancien fichier", 'f', datetime(102)));
+        cat.add(new cat_detruit("ancien fichier", 'f', datetime(102)));
 
         cat.listing(false, tmp, tmp, false, false, "");
 
@@ -235,7 +235,7 @@ void f2()
         while(lst.read(ref))
         {
             const cat_eod *e = dynamic_cast<const cat_eod *>(ref);
-            const detruit *d = dynamic_cast<const detruit *>(ref);
+            const cat_detruit *d = dynamic_cast<const cat_detruit *>(ref);
             const cat_inode *i = dynamic_cast<const cat_inode *>(ref);
             const cat_entree *was;
 
@@ -293,14 +293,14 @@ void f3()
     cat.add(new cat_eod());
     cat.add(new cat_tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18), "tuyau", 0));
     cat.add(new cat_prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21), "prise", 0));
-    cat.add(new detruit("ancien fichier", 'f', datetime(190)));
+    cat.add(new cat_detruit("ancien fichier", 'f', datetime(190)));
 
 
     dif.add(new cat_file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".",  1024, 0, false));
     dif.add(new cat_lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6), "lien", "fichier", 0));
     dif.add(new cat_tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18),  "tuyau", 0));
     dif.add(new cat_prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21), "prise", 0));
-    dif.add(new detruit("ancien fichier", 'f', datetime(12)));
+    dif.add(new cat_detruit("ancien fichier", 'f', datetime(12)));
 
     dif.update_destroyed_with(cat);
 

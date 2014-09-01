@@ -1017,7 +1017,7 @@ bool data_tree::fix_corruption()
 	}
     }
 
-    void data_dir::add(const detruit *entry, const archive_num & archive)
+    void data_dir::add(const cat_detruit *entry, const archive_num & archive)
     {
 	data_tree * tree = find_or_addition(entry->get_name(), false, archive);
 	archive_num last_archive;
@@ -1323,7 +1323,7 @@ bool data_tree::fix_corruption()
 	    const cat_directory *entry_dir = dynamic_cast<const cat_directory *>(entry);
 	    const cat_inode *entry_ino = dynamic_cast<const cat_inode *>(entry);
 	    const cat_mirage *entry_mir = dynamic_cast<const cat_mirage *>(entry);
-	    const detruit *entry_det = dynamic_cast<const detruit *>(entry);
+	    const cat_detruit *entry_det = dynamic_cast<const cat_detruit *>(entry);
 
 	    if(entry_mir != NULL)
 	    {
@@ -1336,10 +1336,10 @@ bool data_tree::fix_corruption()
 		{
 		    if(!entry_det->get_date().is_null())
 			racine->add(entry_det, archive);
-			// else this is an old archive that does not store date with detruit objects
+			// else this is an old archive that does not store date with cat_detruit objects
 		}
 		else
-		    continue; // continue with next loop, we ignore entree objects that are neither inode nor detruit
+		    continue; // continue with next loop, we ignore entree objects that are neither inode nor cat_detruit
 	    else
 		racine->add(entry_ino, archive);
 

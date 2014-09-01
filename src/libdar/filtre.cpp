@@ -211,7 +211,7 @@ namespace libdar
 		const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 		const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 		const cat_file *e_file = dynamic_cast<const cat_file *>(e);
-		const detruit *e_det = dynamic_cast<const detruit *>(e);
+		const cat_detruit *e_det = dynamic_cast<const cat_detruit *>(e);
 
 		if(e_mir != NULL)
 		{
@@ -223,7 +223,7 @@ namespace libdar
 		}
 
 		if(e_det != NULL && not_deleted)
-		    continue; // skip this detruit object
+		    continue; // skip this cat_detruit object
 
 		juillet.enfile(e);
 		thr_cancel.check_self_cancellation();
@@ -242,7 +242,7 @@ namespace libdar
 			bool dirty_covered = e_file == NULL || !e_file->is_dirty() || dirty != archive_options_extract::dirty_ignore;  // checking against dirty files
 			bool empty_dir_covered = e_dir == NULL || empty_dir || e_dir->get_recursive_has_changed(); // checking whether this is not a directory without any file to restore in it
 			bool flat_covered = e_dir == NULL || !flat; // we do not restore directories in flat mode
-			bool only_deleted_covered = !only_deleted || e_dir != NULL || e_det != NULL; // we do not restore other thing that directories and detruits when in "only_deleted" mode
+			bool only_deleted_covered = !only_deleted || e_dir != NULL || e_det != NULL; // we do not restore other thing that directories and cat_detruits when in "only_deleted" mode
 
 			if(path_covered && name_covered && dirty_covered && empty_dir_covered && flat_covered && only_deleted_covered)
 			{
@@ -339,7 +339,7 @@ namespace libdar
 
 				if(e_nom == NULL)
 				    throw SRC_BUG;
-				detruit killer = *e_nom;
+				cat_detruit killer = *e_nom;
 				bool  tmp_ea_restored, tmp_created_retry, tmp_hard_link, tmp_fsa_restored;
 				filesystem_restore::action_done_for_data tmp_data_restored;
 
@@ -1188,7 +1188,7 @@ namespace libdar
 				    st.incr_errored();
 			    }
 			}
-			else // not an inode (for example a detruit, hard_link etc...), nothing to do
+			else // not an inode (for example a cat_detruit, hard_link etc...), nothing to do
 			    st.incr_treated();
 		    }
 		    else // not covered by filters
@@ -1618,7 +1618,7 @@ namespace libdar
 			const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 			const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 			const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
-			const detruit *e_detruit = dynamic_cast<const detruit *>(e);
+			const cat_detruit *e_detruit = dynamic_cast<const cat_detruit *>(e);
 
 			juillet.enfile(e);
 			thr_cancel.check_self_cancellation();
@@ -1652,7 +1652,7 @@ namespace libdar
 
 						// some different types of pointer to the "already_here" object (aka 'inplace" object)
 					    const cat_mirage *al_mir = dynamic_cast<const cat_mirage *>(already_here);
-					    const detruit *al_det = dynamic_cast<const detruit *>(already_here);
+					    const cat_detruit *al_det = dynamic_cast<const cat_detruit *>(already_here);
 					    const ignored *al_ign = dynamic_cast<const ignored *>(already_here);
 					    const ignored_dir *al_igndir = dynamic_cast<const ignored_dir *>(already_here);
 					    const cat_inode *al_ino = dynamic_cast<const cat_inode *>(already_here);
@@ -2137,7 +2137,7 @@ namespace libdar
 					    {
 						unsigned char firm;
 
-						    // this entry only exists in the auxilliary archive of reference, we must thus replace it by a "detruit
+						    // this entry only exists in the auxilliary archive of reference, we must thus replace it by a "cat_detruit
 						    // because it will have to be removed when restoring the decremental backup.
 
 
@@ -2170,7 +2170,7 @@ namespace libdar
 						else
 						    firm = e->signature();
 
-						dolly = new (pool) detruit(the_name, firm, ref_tab[index]->get_current_reading_dir().get_last_modif());
+						dolly = new (pool) cat_detruit(the_name, firm, ref_tab[index]->get_current_reading_dir().get_last_modif());
 						if(dolly == NULL)
 						    throw Ememory("filtre_merge");
 						dolly_nom = dynamic_cast<cat_nomme *>(dolly);

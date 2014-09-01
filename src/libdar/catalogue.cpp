@@ -581,8 +581,8 @@ namespace libdar
 
 	    if(current_compare->search_children(nom->get_name(), found))
 	    {
-		const detruit *src_det = dynamic_cast<const detruit *>(nom);
-		const detruit *dst_det = dynamic_cast<const detruit *>(found);
+		const cat_detruit *src_det = dynamic_cast<const cat_detruit *>(nom);
+		const cat_detruit *dst_det = dynamic_cast<const cat_detruit *>(found);
 		const cat_inode *src_ino = dynamic_cast<const cat_inode *>(nom);
 		const cat_inode *dst_ino = dynamic_cast<const cat_inode *>(found);
 		const cat_mirage *src_mir = dynamic_cast<const cat_mirage *>(nom);
@@ -623,7 +623,7 @@ namespace libdar
 			else
 			    return false;
 		    else
-			throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a cat_nomme which is neither detruit nor cat_inode !
+			throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a cat_nomme which is neither cat_detruit nor cat_inode !
 
 		if(dst_mir != NULL)
 		    extracted = dst_mir->get_inode();
@@ -647,7 +647,7 @@ namespace libdar
 	const cat_entree *projo;
 	const cat_eod *pro_eod;
 	const cat_directory *pro_dir;
-	const detruit *pro_det;
+	const cat_detruit *pro_det;
 	const cat_nomme *pro_nom;
 	const cat_mirage *pro_mir;
 	infinint count = 0;
@@ -657,7 +657,7 @@ namespace libdar
 	{
 	    pro_eod = dynamic_cast<const cat_eod *>(projo);
 	    pro_dir = dynamic_cast<const cat_directory *>(projo);
-	    pro_det = dynamic_cast<const detruit *>(projo);
+	    pro_det = dynamic_cast<const cat_detruit *>(projo);
 	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
 	    pro_mir = dynamic_cast<const cat_mirage *>(projo);
 
@@ -685,7 +685,7 @@ namespace libdar
 		else
 		    firm = pro_nom->signature();
 
-		detruit *det_tmp = new (get_pool()) detruit(pro_nom->get_name(), firm, current->get_last_modif());
+		cat_detruit *det_tmp = new (get_pool()) cat_detruit(pro_nom->get_name(), firm, current->get_last_modif());
 		if(det_tmp == NULL)
 		    throw Ememory("catalogue::update_destroyed_with");
 		try
@@ -724,7 +724,7 @@ namespace libdar
 	const cat_entree *projo;
 	const cat_eod *pro_eod;
 	const cat_directory *pro_dir;
-	const detruit *pro_det;
+	const cat_detruit *pro_det;
 	const cat_nomme *pro_nom;
 	const cat_inode *pro_ino;
 	const cat_mirage *pro_mir;
@@ -738,7 +738,7 @@ namespace libdar
 	{
 	    pro_eod = dynamic_cast<const cat_eod *>(projo);
 	    pro_dir = dynamic_cast<const cat_directory *>(projo);
-	    pro_det = dynamic_cast<const detruit *>(projo);
+	    pro_det = dynamic_cast<const cat_detruit *>(projo);
 	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
 	    pro_ino = dynamic_cast<const cat_inode *>(projo);
 	    pro_mir = dynamic_cast<const cat_mirage *>(projo);
@@ -764,7 +764,7 @@ namespace libdar
 		// one must use the mirage's own name
 
 	    if(pro_ino == NULL)
-		throw SRC_BUG; // a nome that is not an cat_inode nor a detruit!? What's that?
+		throw SRC_BUG; // a nome that is not an cat_inode nor a cat_detruit!? What's that?
 
 	    if(!current->search_children(pro_nom->get_name(), ici))
 	    {
@@ -939,7 +939,7 @@ namespace libdar
 	{
 	    const cat_eod *e_eod = dynamic_cast<const cat_eod *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
-	    const detruit *e_det = dynamic_cast<const detruit *>(e);
+	    const cat_detruit *e_det = dynamic_cast<const cat_detruit *>(e);
 	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
@@ -1056,7 +1056,7 @@ namespace libdar
 	    string sep = beginning == "" ? "" : "/";
 	    const cat_eod *e_eod = dynamic_cast<const cat_eod *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
-	    const detruit *e_det = dynamic_cast<const detruit *>(e);
+	    const cat_detruit *e_det = dynamic_cast<const cat_detruit *>(e);
 	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
@@ -1187,7 +1187,7 @@ namespace libdar
 	{
 	    const cat_eod *e_eod = dynamic_cast<const cat_eod *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
-	    const detruit *e_det = dynamic_cast<const detruit *>(e);
+	    const cat_detruit *e_det = dynamic_cast<const cat_detruit *>(e);
 	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const cat_lien *e_sym = dynamic_cast<const cat_lien *>(e);
@@ -1268,7 +1268,7 @@ namespace libdar
 				throw SRC_BUG;
 			    }
 			}
-			else // other than detruit object
+			else // other than cat_detruit object
 			{
 			    if(e_hard != NULL)
 			    {
@@ -1278,7 +1278,7 @@ namespace libdar
 			    }
 
 			    if(e_ino == NULL)
-				throw SRC_BUG; // this is a cat_nomme which is neither a detruit nor an cat_inode
+				throw SRC_BUG; // this is a cat_nomme which is neither a cat_detruit nor an cat_inode
 
 			    if(!filter_unsaved
 			       || e_ino->get_saved_status() != s_not_saved
@@ -1473,7 +1473,7 @@ namespace libdar
 	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
-	    const detruit *e_det = dynamic_cast<const detruit *>(e);
+	    const cat_detruit *e_det = dynamic_cast<const cat_detruit *>(e);
 
 	    thr.check_self_cancellation();
 	    juillet.enfile(e);
@@ -1588,7 +1588,7 @@ namespace libdar
 
 	while(ref.read(ent))
 	{
-	    const detruit *ent_det = dynamic_cast<const detruit *>(ent);
+	    const cat_detruit *ent_det = dynamic_cast<const cat_detruit *>(ent);
 	    const cat_directory *ent_dir = dynamic_cast<const cat_directory *>(ent);
 	    const cat_eod *ent_eod = dynamic_cast<const cat_eod *>(ent);
 
@@ -1611,7 +1611,7 @@ namespace libdar
 	    }
 	    if(ent_det != NULL)
 	    {
-		detruit *cp = new (get_pool()) detruit(*ent_det);
+		cat_detruit *cp = new (get_pool()) cat_detruit(*ent_det);
 		if(cp == NULL)
 		    throw Ememory("catalogue::copy_detruits_from");
 		try

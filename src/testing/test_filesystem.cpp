@@ -202,8 +202,8 @@ static void re_test()
     try
     {
 	const cat_entree *e;
-	detruit det1 = detruit("lien", 'l' | 0x80, datetime(129));
-	detruit det2 = detruit("dev1", 'd', datetime(192));
+	cat_detruit det1 = cat_detruit("lien", 'l' | 0x80, datetime(129));
+	cat_detruit det2 = cat_detruit("dev1", 'd', datetime(192));
 	path where = "algi";
 	bool_mask all = true;
 	crit_constant_action todo =  crit_constant_action(data_preserve, EA_preserve);
