@@ -107,7 +107,7 @@ namespace libdar
                                 ++num_p;
                             else
                             {
-                                const prise *s = dynamic_cast<const prise *>(ino);
+                                const cat_prise *s = dynamic_cast<const cat_prise *>(ino);
                                 if(s != NULL)
                                     ++num_s;
                                 else
@@ -216,7 +216,7 @@ namespace libdar
                 ret = new (pool) cat_tube(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 's':
-                ret = new (pool) prise(dialog, f, reading_ver, saved, efsa_loc, ptr);
+                ret = new (pool) cat_prise(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'd':
                 ret = new (pool) directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, ptr);

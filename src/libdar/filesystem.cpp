@@ -255,7 +255,7 @@ namespace libdar
 						name,
 						buf.st_dev);
 		else if(S_ISSOCK(buf.st_mode))
-		    ref = new (get_pool()) prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (get_pool()) cat_prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						 atime,
 						 mtime,
 						 ctime,
@@ -1033,7 +1033,7 @@ namespace libdar
         const blockdev *ref_blo = dynamic_cast<const blockdev *>(ref);
         const chardev *ref_cha = dynamic_cast<const chardev *>(ref);
         const cat_tube *ref_tub = dynamic_cast<const cat_tube *>(ref);
-        const prise *ref_pri = dynamic_cast<const prise *>(ref);
+        const cat_prise *ref_pri = dynamic_cast<const cat_prise *>(ref);
         const mirage *ref_mir = dynamic_cast <const mirage *>(ref);
         const inode *ref_ino = dynamic_cast <const inode *>(ref);
 
@@ -1112,7 +1112,7 @@ namespace libdar
 			ref_blo = dynamic_cast<const blockdev *>(ref_mir->get_inode());
 			ref_cha = dynamic_cast<const chardev *>(ref_mir->get_inode());
 			ref_tub = dynamic_cast<const cat_tube *>(ref_mir->get_inode());
-			ref_pri = dynamic_cast<const prise *>(ref_mir->get_inode());
+			ref_pri = dynamic_cast<const cat_prise *>(ref_mir->get_inode());
 			ref_mir->get_inode()->change_name(ref_mir->get_name()); // we temporarily change the name of the attached inode (it is not used usually), by the name of the mirage object
 		    }
 		    else // hard link made
