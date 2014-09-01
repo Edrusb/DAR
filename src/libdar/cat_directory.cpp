@@ -240,14 +240,14 @@ namespace libdar
 	    me->x_storage_size = 0;
 	    list<cat_nomme *>::const_iterator it = ordered_fils.begin();
 	    const cat_directory *f_dir = NULL;
-	    const file *f_file = NULL;
+	    const cat_file *f_file = NULL;
 
 	    while(it != ordered_fils.end())
 	    {
 		if(*it == NULL)
 		    throw SRC_BUG;
 		f_dir = dynamic_cast<const cat_directory *>(*it);
-		f_file = dynamic_cast<const file *>(*it);
+		f_file = dynamic_cast<const cat_file *>(*it);
 		if(f_dir != NULL)
 		{
 			// recursion occurs here

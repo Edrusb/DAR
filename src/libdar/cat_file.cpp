@@ -38,7 +38,7 @@ using namespace std;
 namespace libdar
 {
 
-    file::file(const infinint & xuid, const infinint & xgid, U_16 xperm,
+    cat_file::cat_file(const infinint & xuid, const infinint & xgid, U_16 xperm,
                const datetime & last_access,
                const datetime & last_modif,
                const datetime & last_change,
@@ -69,7 +69,7 @@ namespace libdar
             size = new (get_pool()) infinint(taille);
             storage_size = new (get_pool()) infinint(0);
             if(offset == NULL || size == NULL || storage_size == NULL)
-                throw Ememory("file::file");
+                throw Ememory("cat_file::cat_file");
         }
         catch(...)
         {
@@ -92,7 +92,7 @@ namespace libdar
         }
     }
 
-    file::file(user_interaction & dialog,
+    cat_file::cat_file(user_interaction & dialog,
                generic_file & f,
                const archive_version & reading_ver,
                saved_status saved,
@@ -118,7 +118,7 @@ namespace libdar
         {
             size = new (get_pool()) infinint(f);
             if(size == NULL)
-                throw Ememory("file::file(generic_file)");
+                throw Ememory("cat_file::cat_file(generic_file)");
 
             if(ptr == NULL) // inode not partially dumped
             {
@@ -126,12 +126,12 @@ namespace libdar
                 {
                     offset = new (get_pool()) infinint(f);
                     if(offset == NULL)
-                        throw Ememory("file::file(generic_file)");
+                        throw Ememory("cat_file::cat_file(generic_file)");
                     if(reading_ver > 1)
                     {
                         storage_size = new (get_pool()) infinint(f);
                         if(storage_size == NULL)
-                            throw Ememory("file::file(generic_file)");
+                            throw Ememory("cat_file::cat_file(generic_file)");
                         if(reading_ver > 7)
                         {
                             char tmp;
@@ -164,7 +164,7 @@ namespace libdar
                     {
                         storage_size = new (get_pool()) infinint(*size);
                         if(storage_size == NULL)
-                            throw Ememory("file::file(generic_file)");
+                            throw Ememory("cat_file::cat_file(generic_file)");
                         *storage_size *= 2;
                             // compressed file should be less larger than twice
                             // the original file
@@ -176,7 +176,7 @@ namespace libdar
                     {
 			check = create_crc_from_file(f, get_pool());
                         if(check == NULL)
-                            throw Ememory("file::file");
+                            throw Ememory("cat_file::cat_file");
                     }
                         // before version 8, crc was dump in any case, not only when data was saved
                 }
@@ -185,7 +185,7 @@ namespace libdar
                     offset = new (get_pool()) infinint(0);
                     storage_size = new (get_pool()) infinint(0);
                     if(offset == NULL || storage_size == NULL)
-                        throw Ememory("file::file(generic_file)");
+                        throw Ememory("cat_file::cat_file(generic_file)");
                 }
 
                 if(reading_ver >= 2)
@@ -199,7 +199,7 @@ namespace libdar
 
                         check = create_crc_from_file(f, get_pool(), true);
                         if(check == NULL)
-                            throw Ememory("file::file");
+                            throw Ememory("cat_file::cat_file");
                     }
                         // archive version >= 8, crc only present if  saved == s_saved (seen above)
                 }
@@ -226,11 +226,11 @@ namespace libdar
                 else
                     offset = new (get_pool()) infinint(0);
                 if(offset == NULL)
-                    throw Ememory("file::file(generic_file)");
+                    throw Ememory("cat_file::cat_file(generic_file)");
 
                 storage_size = new (get_pool()) infinint(0); // cannot known the storage_size at that time
                 if(storage_size == NULL)
-                    throw Ememory("file::file(generic_file)");
+                    throw Ememory("cat_file::cat_file(generic_file)");
 
                 check = NULL;
             }
@@ -242,7 +242,7 @@ namespace libdar
         }
     }
 
-    void file::post_constructor(generic_file & f)
+    void cat_file::post_constructor(generic_file & f)
     {
         if(offset == NULL)
             throw SRC_BUG;
@@ -250,7 +250,7 @@ namespace libdar
             *offset = f.get_position(); // data follows right after the inode+file information+CRC
     }
 
-    file::file(const file & ref) : cat_inode(ref)
+    cat_file::cat_file(const cat_file & ref) : cat_inode(ref)
     {
         status = ref.status;
         chemin = ref.chemin;
@@ -279,7 +279,7 @@ namespace libdar
 		}
 		check = ref.check->clone();
                 if(check == NULL)
-                    throw Ememory("file::file(file)");
+                    throw Ememory("cat_file::cat_file(cat_file)");
             }
             else
                 check = NULL;
@@ -287,7 +287,7 @@ namespace libdar
             size = new (get_pool()) infinint(*ref.size);
             storage_size = new (get_pool()) infinint(*ref.storage_size);
             if(offset == NULL || size == NULL || storage_size == NULL)
-                throw Ememory("file::file(file)");
+                throw Ememory("cat_file::cat_file(cat_file)");
         }
         catch(...)
         {
@@ -296,7 +296,7 @@ namespace libdar
         }
     }
 
-    void file::detruit()
+    void cat_file::detruit()
     {
         if(offset != NULL)
         {
@@ -320,7 +320,7 @@ namespace libdar
         }
     }
 
-    void file::inherited_dump(generic_file & f, bool small) const
+    void cat_file::inherited_dump(generic_file & f, bool small) const
     {
         cat_inode::inherited_dump(f, small);
         size->dump(f);
@@ -357,26 +357,26 @@ namespace libdar
         }
     }
 
-    bool file::has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const
+    bool cat_file::has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const
     {
-        const file *tmp = dynamic_cast<const file *>(&ref);
+        const cat_file *tmp = dynamic_cast<const cat_file *>(&ref);
         if(tmp != NULL)
             return cat_inode::has_changed_since(*tmp, hourshift, what_to_check) || *size != *(tmp->size);
         else
             throw SRC_BUG;
     }
 
-    generic_file *file::get_data(get_data_mode mode) const
+    generic_file *cat_file::get_data(get_data_mode mode) const
     {
         generic_file *ret = NULL;
 
 	try
 	{
 	    if(get_saved_status() != s_saved)
-		throw Erange("file::get_data", gettext("cannot provide data from a \"not saved\" file object"));
+		throw Erange("cat_file::get_data", gettext("cannot provide data from a \"not saved\" file object"));
 
 	    if(status == empty)
-		throw Erange("file::get_data", gettext("data has been cleaned, object is now empty"));
+		throw Erange("cat_file::get_data", gettext("data has been cleaned, object is now empty"));
 
 	    if(status == from_path)
 	    {
@@ -398,7 +398,7 @@ namespace libdar
 		    {
 			pile *data = new (get_pool()) pile();
 			if(data == NULL)
-			    throw Ememory("file::get_data");
+			    throw Ememory("cat_file::get_data");
 
 			try
 			{
@@ -409,7 +409,7 @@ namespace libdar
 			    else
 				tmp = new (get_pool()) tronc(get_escape_layer(), *offset, gf_read_only);
 			    if(tmp == NULL)
-				throw Ememory("file::get_data");
+				throw Ememory("cat_file::get_data");
 			    try
 			    {
 				data->push(tmp);
@@ -425,7 +425,7 @@ namespace libdar
 			    {
 				tmp = new (get_pool()) compressor(get_compression_algo_read(), *data->top());
 				if(tmp == NULL)
-				    throw Ememory("file::get_data");
+				    throw Ememory("cat_file::get_data");
 				try
 				{
 				    data->push(tmp);
@@ -441,7 +441,7 @@ namespace libdar
 			    {
 				sparse_file *stmp = new (get_pool()) sparse_file(data->top());
 				if(stmp == NULL)
-				    throw Ememory("file::get_data");
+				    throw Ememory("cat_file::get_data");
 				try
 				{
 				    data->push(stmp);
@@ -485,12 +485,12 @@ namespace libdar
 	}
 
 	if(ret == NULL)
-	    throw Ememory("file::get_data");
+	    throw Ememory("cat_file::get_data");
 	else
 	    return ret;
     }
 
-    void file::clean_data()
+    void cat_file::clean_data()
     {
 	switch(status)
 	{
@@ -510,7 +510,7 @@ namespace libdar
 	status = empty;
     }
 
-    void file::set_offset(const infinint & r)
+    void cat_file::set_offset(const infinint & r)
     {
 	if(status == empty)
 	    throw SRC_BUG;
@@ -518,7 +518,7 @@ namespace libdar
 	*offset = r;
     }
 
-    const infinint & file::get_offset() const
+    const infinint & cat_file::get_offset() const
     {
 	if(get_saved_status() != s_saved)
 	    throw SRC_BUG;
@@ -527,7 +527,7 @@ namespace libdar
 	return *offset;
     }
 
-    void file::set_crc(const crc &c)
+    void cat_file::set_crc(const crc &c)
     {
 	if(check != NULL)
 	{
@@ -536,10 +536,10 @@ namespace libdar
 	}
 	check = c.clone();
 	if(check == NULL)
-	    throw Ememory("file::set_crc");
+	    throw Ememory("cat_file::set_crc");
     }
 
-    bool file::get_crc(const crc * & c) const
+    bool cat_file::get_crc(const crc * & c) const
     {
 	if(get_escape_layer() == NULL)
 	    if(check != NULL)
@@ -578,12 +578,12 @@ namespace libdar
 				throw SRC_BUG;
 			    else
 			    {
-				const_cast<file *>(this)->check = tmp;
+				const_cast<cat_file *>(this)->check = tmp;
 				tmp = NULL; // object now owned by "this"
 			    }
 			}
 			else
-			    throw Erange("file::file", gettext("can't read data CRC: No escape mark found for that file"));
+			    throw Erange("cat_file::cat_file", gettext("can't read data CRC: No escape mark found for that file"));
 		    }
 		    catch(...)
 		    {
@@ -591,9 +591,9 @@ namespace libdar
 			    // to avoid trying reading it again later on
 			if(check == NULL)
 			{
-			    const_cast<file *>(this)->check = new (get_pool()) crc_n(1);
+			    const_cast<cat_file *>(this)->check = new (get_pool()) crc_n(1);
 			    if(check == NULL)
-				throw Ememory("file::file");
+				throw Ememory("cat_file::cat_file");
 			}
 			throw;
 		    }
@@ -610,7 +610,7 @@ namespace libdar
 	}
     }
 
-    bool file::get_crc_size(infinint & val) const
+    bool cat_file::get_crc_size(infinint & val) const
     {
 	if(check != NULL)
 	{
@@ -621,9 +621,9 @@ namespace libdar
 	    return false;
     }
 
-    void file::sub_compare(const cat_inode & other, bool isolated_mode) const
+    void cat_file::sub_compare(const cat_inode & other, bool isolated_mode) const
     {
-	const file *f_other = dynamic_cast<const file *>(&other);
+	const cat_file *f_other = dynamic_cast<const cat_file *>(&other);
 	if(f_other == NULL)
 	    throw SRC_BUG; // cat_inode::compare should have called us with a correct argument
 
@@ -631,7 +631,7 @@ namespace libdar
 	{
 	    infinint s1 = get_size();
 	    infinint s2 = f_other->get_size();
-	    throw Erange("file::sub_compare", tools_printf(gettext("not same size: %i <--> %i"), &s1, &s2));
+	    throw Erange("cat_file::sub_compare", tools_printf(gettext("not same size: %i <--> %i"), &s1, &s2));
 	}
 
 	if(get_saved_status() == s_saved && f_other->get_saved_status() == s_saved)
@@ -670,7 +670,7 @@ namespace libdar
 			{
 			    infinint err_offset;
 			    if(me->diff(*you, crc_size, value, err_offset))
-				throw Erange("file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
+				throw Erange("cat_file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
 			    // data is the same, comparing the CRC values
 
 			    if(get_crc(original))
@@ -678,9 +678,9 @@ namespace libdar
 				if(value == NULL)
 				    throw SRC_BUG;
 				if(original->get_size() != value->get_size())
-				    throw Erange("file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
+				    throw Erange("cat_file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
 				if(*original != *value)
-				    throw Erange("file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
+				    throw Erange("cat_file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
 			    }
 
 			    // else old archive without CRC
@@ -732,7 +732,7 @@ namespace libdar
 
 			if(check->get_size() != other_crc->get_size()
 			   || *check != *other_crc)
-			    throw Erange("file::compare", tools_printf(gettext("CRC difference concerning file's data (comparing with an isolated catalogue)")));
+			    throw Erange("cat_file::compare", tools_printf(gettext("CRC difference concerning file's data (comparing with an isolated catalogue)")));
 		    }
 		    catch(...)
 		    {

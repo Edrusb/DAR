@@ -160,11 +160,11 @@ static void test()
 
     while(fs.read(p, errors, skipped_dump))
     {
-        file *f = dynamic_cast<file *>(p);
+        cat_file *f = dynamic_cast<cat_file *>(p);
         cat->add(p);
         if(f != NULL)
         {
-            generic_file *entree = f->get_data(file::normal);
+            generic_file *entree = f->get_data(cat_file::normal);
 
             try
             {

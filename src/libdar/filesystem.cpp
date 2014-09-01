@@ -213,7 +213,7 @@ namespace libdar
 						buf.st_dev);
 		}
 		else if(S_ISREG(buf.st_mode))
-		    ref = new (get_pool()) file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (get_pool()) cat_file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						atime,
 						mtime,
 						ctime,
@@ -1028,7 +1028,7 @@ namespace libdar
 					       const fsa_scope & scope)
     {
         const cat_directory *ref_dir = dynamic_cast<const cat_directory *>(ref);
-        const file *ref_fil = dynamic_cast<const file *>(ref);
+        const cat_file *ref_fil = dynamic_cast<const cat_file *>(ref);
         const cat_lien *ref_lie = dynamic_cast<const cat_lien *>(ref);
         const cat_blockdev *ref_blo = dynamic_cast<const cat_blockdev *>(ref);
         const cat_chardev *ref_cha = dynamic_cast<const cat_chardev *>(ref);
@@ -1107,7 +1107,7 @@ namespace libdar
 		    if(create_file)
 		    {
 			ref_ino = ref_mir->get_inode();
-			ref_fil = dynamic_cast<const file *>(ref_mir->get_inode());
+			ref_fil = dynamic_cast<const cat_file *>(ref_mir->get_inode());
 			ref_lie = dynamic_cast<const cat_lien *>(ref_mir->get_inode());
 			ref_blo = dynamic_cast<const cat_blockdev *>(ref_mir->get_inode());
 			ref_cha = dynamic_cast<const cat_chardev *>(ref_mir->get_inode());
@@ -1138,7 +1138,7 @@ namespace libdar
 		    dest.fadvise(fichier_global::advise_dontneed);
 			// the implicit destruction of dest (exiting the block)
 			// will close the 'ret' file descriptor (see ~fichier_local())
-		    ou = ref_fil->get_data(file::normal);
+		    ou = ref_fil->get_data(cat_file::normal);
 
 		    try
 		    {

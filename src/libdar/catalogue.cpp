@@ -1289,7 +1289,7 @@ namespace libdar
 				string dirty, sparse;
 				string size = local_size(*e_ino);
 				string stored = local_storage_size(*e_ino);
-				const file *reg = dynamic_cast<const file *>(e_ino); // ino is no more it->second (if it->second was a cat_mirage)
+				const cat_file *reg = dynamic_cast<const cat_file *>(e_ino); // ino is no more it->second (if it->second was a cat_mirage)
 
 				saved_status data_st;
 				cat_inode::ea_status ea_st = isolated ? cat_inode::ea_fake : e_ino->ea_get_saved_status();
@@ -1350,7 +1350,7 @@ namespace libdar
 				    if(data_st == s_saved)
 				    {
 					const crc *tmp = NULL;
-					const file * f_ino = dynamic_cast<const file *>(e_ino);
+					const cat_file * f_ino = dynamic_cast<const cat_file *>(e_ino);
 
 					if(f_ino == NULL)
 					    throw SRC_BUG;

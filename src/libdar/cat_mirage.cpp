@@ -156,7 +156,7 @@ namespace libdar
 
             if(fmt == fmt_file_etiquette)
             {
-                cat_nomme *tmp_ptr = new (get_pool()) file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
+                cat_nomme *tmp_ptr = new (get_pool()) cat_file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
                 entree_ptr = tmp_ptr;
                 if(tmp_ptr != NULL)
                 {

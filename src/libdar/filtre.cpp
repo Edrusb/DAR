@@ -70,7 +70,7 @@ namespace libdar
 			   bool alter_atime,         //< whether to set back atime of filesystem
 			   bool check_change,        //< whether to check file change during backup
 			   bool compute_crc,         //< whether to recompute the CRC
-			   file::get_data_mode keep_mode, //< whether to copy compressed data (same compression algo), uncompress but keep hole structure (change compression algo) or uncompress and fill data holes (redetect holes in file)
+			   cat_file::get_data_mode keep_mode, //< whether to copy compressed data (same compression algo), uncompress but keep hole structure (change compression algo) or uncompress and fill data holes (redetect holes in file)
 			   const catalogue & cat,    //< catalogue to update for escape sequence mark
 			   const infinint & repeat_count, //< how much time to retry saving the file if it has changed during the backup
 			   const infinint & repeat_byte, //< how much byte remains to waste for saving again a changing file
@@ -210,7 +210,7 @@ namespace libdar
 		const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 		const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 		const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
-		const file *e_file = dynamic_cast<const file *>(e);
+		const cat_file *e_file = dynamic_cast<const cat_file *>(e);
 		const detruit *e_det = dynamic_cast<const detruit *>(e);
 
 		if(e_mir != NULL)
@@ -219,7 +219,7 @@ namespace libdar
 		    if(e_ino == NULL)
 			throw SRC_BUG; // !?! how is this possible ?
 		    e_mir->get_inode()->change_name(e_mir->get_name()); // temporarily changing the inode name to the one of the cat_mirage
-		    e_file = dynamic_cast<const file *>(e_ino);
+		    e_file = dynamic_cast<const cat_file *>(e_ino);
 		}
 
 		if(e_det != NULL && not_deleted)
@@ -273,7 +273,7 @@ namespace libdar
 			    {
 				if(!first_time) // a second time only occures in sequential read mode
 				{
-				    const file *e_file = dynamic_cast<const file *>(e_ino);
+				    const cat_file *e_file = dynamic_cast<const cat_file *>(e_ino);
 
 				    if(info_details)
 					dialog.warning(string(gettext("File had changed during backup and had been copied another time, restoring the next copy of file: ")) + juillet.get_string());
@@ -285,7 +285,7 @@ namespace libdar
 
 				    if(e_file != NULL)
 				    {
-					file *me_file = const_cast<file *>(e_file);
+					cat_file *me_file = const_cast<cat_file *>(e_file);
 
 					if(me_file == NULL)
 					    throw SRC_BUG;
@@ -577,7 +577,7 @@ namespace libdar
 		    cat_nomme *nom = dynamic_cast<cat_nomme *>(e);
 		    cat_directory *dir = dynamic_cast<cat_directory *>(e);
 		    cat_inode *e_ino = dynamic_cast<cat_inode *>(e);
-		    file *e_file = dynamic_cast<file *>(e);
+		    cat_file *e_file = dynamic_cast<cat_file *>(e);
 		    cat_mirage *e_mir = dynamic_cast<cat_mirage *>(e);
 		    bool known_hard_link = false;
 
@@ -598,7 +598,7 @@ namespace libdar
 			if(!known_hard_link)
 			{
 			    e_ino = dynamic_cast<cat_inode *>(e_mir->get_inode());
-			    e_file = dynamic_cast<file *>(e_mir->get_inode());
+			    e_file = dynamic_cast<cat_file *>(e_mir->get_inode());
 			    if(e_ino == NULL)
 				throw SRC_BUG;
 			    e_ino->change_name(e_mir->get_name());
@@ -636,7 +636,7 @@ namespace libdar
 				else // not a hard link or known hard linked inode
 				{
 				    const cat_inode *f_ino = NULL;
-				    const file *f_file = NULL;
+				    const cat_file *f_file = NULL;
 				    const cat_mirage *f_mir = NULL;
 
 				    if(e_ino == NULL)
@@ -656,13 +656,13 @@ namespace libdar
 					else // inode was already present in filesystem at the time the archive of reference was made
 					{
 					    f_ino = dynamic_cast<const cat_inode *>(f);
-					    f_file = dynamic_cast<const file *>(f);
+					    f_file = dynamic_cast<const cat_file *>(f);
 					    f_mir = dynamic_cast<const cat_mirage *>(f);
 
 					    if(f_mir != NULL)
 					    {
 						f_ino = f_mir->get_inode();
-						f_file = dynamic_cast<const file *>(f_ino);
+						f_file = dynamic_cast<const cat_file *>(f_ino);
 					    }
 
 						// Now checking for filesystem dissimulated modifications
@@ -810,7 +810,7 @@ namespace libdar
 						       alter_atime,
 						       true,   // check_change
 						       true,   // compute_crc
-						       file::normal, // keep_mode
+						       cat_file::normal, // keep_mode
 						       cat,
 						       repeat_count,
 						       repeat_byte,
@@ -1090,7 +1090,7 @@ namespace libdar
 
 	    if(e_mir != NULL)
 	    {
-		const file *e_file = dynamic_cast<const file *>(e_mir->get_inode());
+		const cat_file *e_file = dynamic_cast<const cat_file *>(e_mir->get_inode());
 
 		if(e_file == NULL || e_mir->get_etoile_ref_count() == 1 || cat.get_escape_layer() == NULL)
 		{
@@ -1271,7 +1271,7 @@ namespace libdar
         cat.reset_read();
         while(cat.read(e))
         {
-	    const file *e_file = dynamic_cast<const file *>(e);
+	    const cat_file *e_file = dynamic_cast<const cat_file *>(e);
 	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
@@ -1292,7 +1292,7 @@ namespace libdar
 		{
 		    if(!e_mir->is_inode_wrote())
 		    {
-			e_file = dynamic_cast<const file *>(e_mir->get_inode());
+			e_file = dynamic_cast<const cat_file *>(e_mir->get_inode());
 			e_ino = e_mir->get_inode();
 		    }
 		}
@@ -1307,7 +1307,7 @@ namespace libdar
 			    perimeter = gettext("Data");
 			    if(!empty)
 			    {
-				generic_file *dat = e_file->get_data(file::normal);
+				generic_file *dat = e_file->get_data(cat_file::normal);
 				if(dat == NULL)
 				    throw Erange("filtre_test", gettext("Can't read saved data."));
 				try
@@ -2354,17 +2354,17 @@ namespace libdar
 		cat_entree *e_var = const_cast<cat_entree *>(e);
 		cat_nomme *e_nom = dynamic_cast<cat_nomme *>(e_var);
 		cat_inode *e_ino = dynamic_cast<cat_inode *>(e_var);
-		file *e_file = dynamic_cast<file *>(e_var);
+		cat_file *e_file = dynamic_cast<cat_file *>(e_var);
 		cat_mirage *e_mir = dynamic_cast<cat_mirage *>(e_var);
 		cat_directory *e_dir = dynamic_cast<cat_directory *>(e_var);
 
-		file::get_data_mode keep_mode = keep_compressed ? file::keep_compressed : file::keep_hole;
+		cat_file::get_data_mode keep_mode = keep_compressed ? cat_file::keep_compressed : cat_file::keep_hole;
 
 		if(e_mir != NULL)
 		    if(!e_mir->is_inode_wrote()) // we store only once the inode pointed by a set of hard links
 		    {
 			e_ino = e_mir->get_inode();
-			e_file = dynamic_cast<file *>(e_ino);
+			e_file = dynamic_cast<cat_file *>(e_ino);
 		    }
 
 		juillet.enfile(e);
@@ -2391,7 +2391,7 @@ namespace libdar
 
 		    if(e_file != NULL)
 		    {
-			if(keep_mode != file::keep_compressed)
+			if(keep_mode != cat_file::keep_compressed)
 			    if(compr_mask.is_covered(e_nom->get_name()) && e_file->get_size() >= min_compr_size)
 				e_file->change_compression_algo_write(stock_algo);
 			    else
@@ -2406,18 +2406,18 @@ namespace libdar
 
 		    if(e_file != NULL)
 		    {
-			if(sparse_file_min_size > 0 && keep_mode != file::keep_compressed) // sparse_file detection is activated
+			if(sparse_file_min_size > 0 && keep_mode != cat_file::keep_compressed) // sparse_file detection is activated
 			{
 			    if(e_file->get_size() > sparse_file_min_size)
 			    {
 				e_file->set_sparse_file_detection_write(true);
-				keep_mode = file::normal;
+				keep_mode = cat_file::normal;
 			    }
 			    else
 				if(e_file->get_sparse_file_detection_read())
 				{
 				    e_file->set_sparse_file_detection_write(false);
-				    keep_mode = file::normal;
+				    keep_mode = cat_file::normal;
 				}
 			}
 			else // sparse file layer or absence of layer is unchanged
@@ -2521,7 +2521,7 @@ namespace libdar
 	{
 	    while(cat.read(e))
 	    {
-		const file *e_file = dynamic_cast<const file *>(e);
+		const cat_file *e_file = dynamic_cast<const cat_file *>(e);
 		const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 		const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 		const crc *check = NULL;
@@ -2533,7 +2533,7 @@ namespace libdar
 		{
 		    if(!e_mir->is_inode_dumped())
 		    {
-			e_file = dynamic_cast<const file *>(e_mir->get_inode());
+			e_file = dynamic_cast<const cat_file *>(e_mir->get_inode());
 			e_ino = e_mir->get_inode();
 		    }
 		}
@@ -2592,7 +2592,7 @@ namespace libdar
 			   bool alter_atime,
 			   bool check_change,
 			   bool compute_crc,
-			   file::get_data_mode keep_mode,
+			   cat_file::get_data_mode keep_mode,
 			   const catalogue & cat,
 			   const infinint & repeat_count,
 			   const infinint & repeat_byte,
@@ -2634,7 +2634,7 @@ namespace libdar
 		    sem->raise(info_quoi, ino, false);
 		return ret;
 	    }
-	    if(compute_crc && (keep_mode != file::normal && keep_mode != file::plain))
+	    if(compute_crc && (keep_mode != cat_file::normal && keep_mode != cat_file::plain))
 		throw SRC_BUG; // cannot compute crc if data is compressed or hole datastructure not interpreted
 
 		// TREATNG INODE THAT NEED DATA SAVING
@@ -2647,7 +2647,7 @@ namespace libdar
 		    dialog.warning(string(gettext("Adding file to archive: ")) + info_quoi);
 	    }
 
-	    file *fic = dynamic_cast<file *>(ino);
+	    cat_file *fic = dynamic_cast<cat_file *>(ino);
 
 	    if(fic != NULL)
 	    {
@@ -2669,21 +2669,21 @@ namespace libdar
 			{
 			    switch(keep_mode)
 			    {
-			    case file::keep_compressed:
+			    case cat_file::keep_compressed:
 				if(fic->get_compression_algo_read() != fic->get_compression_algo_write())
-				    keep_mode = file::keep_hole;
+				    keep_mode = cat_file::keep_hole;
 				source = fic->get_data(keep_mode);
 				break;
-			    case file::keep_hole:
+			    case cat_file::keep_hole:
 				source = fic->get_data(keep_mode);
 				break;
-			    case file::normal:
+			    case cat_file::normal:
 				if(fic->get_sparse_file_detection_read()) // source file already holds a sparse_file structure
-				    source = fic->get_data(file::plain); // we must hide the holes for it can be redetected
+				    source = fic->get_data(cat_file::plain); // we must hide the holes for it can be redetected
 				else
-				    source = fic->get_data(file::normal);
+				    source = fic->get_data(cat_file::normal);
 				break;
-			    case file::plain:
+			    case cat_file::plain:
 				throw SRC_BUG; // save_inode must never be called with this value
 			    default:
 				throw SRC_BUG; // unknown value for keep_mode
@@ -2719,14 +2719,14 @@ namespace libdar
 				source->read_ahead(fic->get_size());
 
 				stack.sync_write_above(compr);
-				if(keep_mode == file::keep_compressed || fic->get_compression_algo_write() == none)
+				if(keep_mode == cat_file::keep_compressed || fic->get_compression_algo_write() == none)
 				    compr->suspend_compression();
 				else
 				    compr->resume_compression();
 
 				try
 				{
-				    if(fic->get_sparse_file_detection_write() && keep_mode != file::keep_compressed && keep_mode != file::keep_hole)
+				    if(fic->get_sparse_file_detection_write() && keep_mode != cat_file::keep_compressed && keep_mode != cat_file::keep_hole)
 				    {
 					    // creating the sparse_file to copy data to destination
 
@@ -2761,7 +2761,7 @@ namespace libdar
 					fic->set_crc(*val);
 				    else
 				    {
-					if(keep_mode == file::normal && crc_available)
+					if(keep_mode == cat_file::normal && crc_available)
 					{
 					    if(original == NULL)
 						throw SRC_BUG;
@@ -2871,7 +2871,7 @@ namespace libdar
 				// checking if compressed data is smaller than uncompressed one
 
 			    if(fic->get_size() <= storage_size
-			       && keep_mode != file::keep_compressed
+			       && keep_mode != cat_file::keep_compressed
 			       && fic->get_compression_algo_write() != none)
 			    {
 				infinint current_pos_tmp = stack.get_position();
@@ -3108,7 +3108,7 @@ namespace libdar
 
     static void restore_atime(const string & chemin, const cat_inode * & ptr)
     {
-	const file * ptr_f = dynamic_cast<const file *>(ptr);
+	const cat_file * ptr_f = dynamic_cast<const cat_file *>(ptr);
 	if(ptr_f != NULL)
 	    tools_noexcept_make_date(chemin, false, ptr_f->get_last_access(), ptr_f->get_last_modif(), ptr_f->get_last_modif());
     }

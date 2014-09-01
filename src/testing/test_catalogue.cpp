@@ -97,7 +97,7 @@ void f1()
 	std::map <infinint, etoile *> corres;
 
         eod *v_eod = new eod();
-        file *v_file = new file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", "." , 1024, 0, false);
+        cat_file *v_file = new cat_file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", "." , 1024, 0, false);
         cat_lien *v_lien = new cat_lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6), "lien", "fichier", 0);
         cat_directory *v_dir = new cat_directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0);
         cat_chardev *v_char = new cat_chardev(1027, 105, 0647, datetime(10), datetime(11), datetime(12),  "char device", 104, 202, 0);
@@ -192,7 +192,7 @@ void f2()
         {
             cerr << e.dump_str();
         }
-        cat.add(new file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".", 1024, 0, false));
+        cat.add(new cat_file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".", 1024, 0, false));
         cat.add(new cat_lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6),  "lien", "fichier", 0));
         cat.add(new cat_directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0));
         cat.add(new cat_chardev(1027, 105, 0647, datetime(10), datetime(11), datetime(12),  "char device", 104, 202, 0));
@@ -285,7 +285,7 @@ void f3()
     cat.reset_add();
     dif.reset_add();
 
-    cat.add(new file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".", 1024, 0, false));
+    cat.add(new cat_file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".", 1024, 0, false));
     cat.add(new cat_lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6), "lien", "fichier", 0));
     cat.add(new cat_directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0));
     cat.add(new cat_chardev(1027, 105, 0647, datetime(10), datetime(11), datetime(12), "char device", 104, 202, 0));
@@ -296,7 +296,7 @@ void f3()
     cat.add(new detruit("ancien fichier", 'f', datetime(190)));
 
 
-    dif.add(new file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".",  1024, 0, false));
+    dif.add(new cat_file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".",  1024, 0, false));
     dif.add(new cat_lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6), "lien", "fichier", 0));
     dif.add(new cat_tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18),  "tuyau", 0));
     dif.add(new cat_prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21), "prise", 0));

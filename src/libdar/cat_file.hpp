@@ -42,7 +42,7 @@ namespace libdar
 
 
 	/// the plain file class
-    class file : public cat_inode
+    class cat_file : public cat_inode
     {
     public :
 	enum get_data_mode
@@ -56,7 +56,7 @@ namespace libdar
 	static const U_8 FILE_DATA_WITH_HOLE = 0x01; //< file's data contains hole datastructure
 	static const U_8 FILE_DATA_IS_DIRTY = 0x02;  //< data modified while being saved
 
-        file(const infinint & xuid, const infinint & xgid, U_16 xperm,
+        cat_file(const infinint & xuid, const infinint & xgid, U_16 xperm,
              const datetime & last_access,
              const datetime & last_modif,
 	     const datetime & last_change,
@@ -65,8 +65,8 @@ namespace libdar
              const infinint & taille,
 	     const infinint & fs_device,
 	     bool x_furtive_read_mode);
-        file(const file & ref);
-        file(user_interaction & dialog,
+        cat_file(const cat_file & ref);
+        cat_file(user_interaction & dialog,
 	     generic_file & f,
 	     const archive_version & reading_ver,
 	     saved_status saved,
@@ -74,7 +74,7 @@ namespace libdar
 	     generic_file *data_loc,
 	     compressor *efsa_loc,
 	     escape *ptr);
-        ~file() { detruit(); };
+        ~cat_file() { detruit(); };
 
         bool has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const;
         infinint get_size() const { return *size; };
@@ -88,7 +88,7 @@ namespace libdar
         unsigned char signature() const { return mk_signature('f', get_saved_status()); };
 
         void set_crc(const crc &c);
-        bool get_crc(const crc * & c) const; //< the argument is set the an allocated crc object the owned by the "file" object, its stay valid while this "file" object exists and MUST NOT be deleted by the caller in any case
+        bool get_crc(const crc * & c) const; //< the argument is set the an allocated crc object the owned by the "cat_file" object, its stay valid while this "cat_file" object exists and MUST NOT be deleted by the caller in any case
 	bool has_crc() const { return check != NULL; };
 	bool get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
 	void drop_crc() { if(check != NULL) { delete check; check = NULL; } };
@@ -102,7 +102,7 @@ namespace libdar
 	bool get_sparse_file_detection_read() const { return (file_data_status_read & FILE_DATA_WITH_HOLE) != 0; };
 	bool get_sparse_file_detection_write() const { return (file_data_status_write & FILE_DATA_WITH_HOLE) != 0; };
 
-        cat_entree *clone() const { return new (get_pool()) file(*this); };
+        cat_entree *clone() const { return new (get_pool()) cat_file(*this); };
 
         compression get_compression_algo_read() const { return algo_read; };
 

@@ -1386,7 +1386,7 @@ namespace libdar
 		list_entry ent;
 
 		const cat_inode *tmp_inode = dynamic_cast<const cat_inode *>(tmp_ptr);
-		const file *tmp_file = dynamic_cast<const file *>(tmp_ptr);
+		const cat_file *tmp_file = dynamic_cast<const cat_file *>(tmp_ptr);
 		const cat_lien *tmp_lien = dynamic_cast<const cat_lien *>(tmp_ptr);
 		const cat_device *tmp_device = dynamic_cast<const cat_device *>(tmp_ptr);
 		const cat_mirage *tmp_mir = dynamic_cast<const cat_mirage *>(tmp_ptr);
@@ -1403,7 +1403,7 @@ namespace libdar
 		    ent.set_hard_link(true);
 		    ent.set_type(get_base_signature(tmp_mir->get_inode()->signature()));
 		    tmp_inode = tmp_mir->get_inode();
-		    tmp_file = dynamic_cast<const file *>(tmp_inode);
+		    tmp_file = dynamic_cast<const cat_file *>(tmp_inode);
 		    tmp_lien = dynamic_cast<const cat_lien *>(tmp_inode);
 		    tmp_device = dynamic_cast<const cat_device *>(tmp_inode);
 		}

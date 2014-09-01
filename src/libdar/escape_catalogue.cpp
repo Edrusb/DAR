@@ -173,10 +173,10 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
-	const file *ref_file = dynamic_cast<const file *>(ref);
+	const cat_file *ref_file = dynamic_cast<const cat_file *>(ref);
 
 	if(ref_mir != NULL)
-	    ref_file = dynamic_cast<const file *>(ref_mir->get_inode());
+	    ref_file = dynamic_cast<const cat_file *>(ref_mir->get_inode());
 
 	if(ref_file != NULL)
 	{

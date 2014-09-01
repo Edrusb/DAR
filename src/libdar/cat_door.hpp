@@ -42,7 +42,7 @@ namespace libdar
 
 
 	/// the class for Door IPC (mainly for Solaris)
-    class door : public file
+    class door : public cat_file
     {
     public:
         door(const infinint & xuid,
@@ -53,7 +53,7 @@ namespace libdar
              const datetime & last_change,
              const std::string & src,
              const path & che,
-             const infinint & fs_device) : file(xuid, xgid, xperm, last_access, last_modif,
+             const infinint & fs_device) : cat_file(xuid, xgid, xperm, last_access, last_modif,
 						last_change, src, che, 0, fs_device, false) {};
         door(user_interaction & dialog,
              generic_file & f,
@@ -62,11 +62,11 @@ namespace libdar
              compression default_algo,
              generic_file *data_loc,
              compressor *efsa_loc,
-             escape *ptr) : file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr) {};
+             escape *ptr) : cat_file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr) {};
 
         unsigned char signature() const { return mk_signature('o', get_saved_status()); };
 
-        generic_file *get_data(get_data_mode mode) const; // inherited from class file
+        generic_file *get_data(get_data_mode mode) const; // inherited from class cat_file
 
     };
 

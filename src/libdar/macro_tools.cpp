@@ -1377,7 +1377,7 @@ namespace libdar
 	infinint slice_num, slice_offset;
 	infinint low;
 	const cat_inode *tmp_inode = dynamic_cast<const cat_inode *>(obj);
-	const file *tmp_file = dynamic_cast<const file *>(obj);
+	const cat_file *tmp_file = dynamic_cast<const cat_file *>(obj);
 	const cat_mirage *tmp_mir = dynamic_cast<const cat_mirage *>(obj);
 
 	if(obj == NULL)
@@ -1386,7 +1386,7 @@ namespace libdar
 	if(tmp_mir != NULL)
 	{
 	    tmp_inode = tmp_mir->get_inode();
-	    tmp_file = dynamic_cast<const file *>(tmp_inode);
+	    tmp_file = dynamic_cast<const cat_file *>(tmp_inode);
 	}
 
 	if(tmp_inode != NULL)

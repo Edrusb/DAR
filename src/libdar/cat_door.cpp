@@ -45,7 +45,7 @@ namespace libdar
 		throw Ememory("door::get_data");
 	}
 	else
-	    ret = file::get_data(mode);
+	    ret = cat_file::get_data(mode);
 
 	return ret;
     }

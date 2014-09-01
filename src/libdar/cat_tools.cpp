@@ -66,7 +66,7 @@ namespace libdar
     {
 	string ret;
 
-	const file *fic = dynamic_cast<const file *>(&ref);
+	const cat_file *fic = dynamic_cast<const cat_file *>(&ref);
 	const cat_directory *dir = dynamic_cast<const cat_directory *>(&ref);
 	if(fic != NULL)
 	    ret = tools_display_integer_in_metric_system(fic->get_size(), "o", true);
@@ -82,7 +82,7 @@ namespace libdar
     {
 	string ret;
 
-	const file *fic = dynamic_cast<const file*>(&ref);
+	const cat_file *fic = dynamic_cast<const cat_file*>(&ref);
 	if(fic != NULL)
 	{
 	    deci d = fic->get_storage_size();
@@ -102,7 +102,7 @@ namespace libdar
     string local_flag(const cat_inode & ref, bool isolated, bool dirty_seq)
     {
 	string ret;
-	const file *ref_f = dynamic_cast<const file *>(&ref);
+	const cat_file *ref_f = dynamic_cast<const cat_file *>(&ref);
 	bool dirty = dirty_seq || (ref_f != NULL ? ref_f->is_dirty() : false);
 	saved_status st = ref.get_saved_status();
 	cat_inode::ea_status ea_st = ref.ea_get_saved_status();
@@ -154,7 +154,7 @@ namespace libdar
 	}
 
 	ret += "[" + local_fsa_fam_to_string(ref) + "]";
-	const file *fic = dynamic_cast<const file *>(&ref);
+	const cat_file *fic = dynamic_cast<const cat_file *>(&ref);
 	const cat_directory *dir = dynamic_cast<const cat_directory *>(&ref);
 	if(fic != NULL && fic->get_saved_status() == s_saved)
 	    ret += string("[")

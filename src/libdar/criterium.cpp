@@ -230,7 +230,7 @@ namespace libdar
     {
 	const cat_inode *first_i = get_inode(&first);
 
-	return dynamic_cast<const file *>(first_i) != NULL && dynamic_cast<const door *>(first_i) == NULL;
+	return dynamic_cast<const cat_file *>(first_i) != NULL && dynamic_cast<const door *>(first_i) == NULL;
     }
 
     bool crit_in_place_is_hardlinked_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
@@ -266,8 +266,8 @@ namespace libdar
     {
 	const cat_inode *first_i = get_inode(&first);
 	const cat_inode *second_i = get_inode(&second);
-	const file *first_f = dynamic_cast<const file *>(first_i);
-	const file *second_f = dynamic_cast<const file *>(second_i);
+	const cat_file *first_f = dynamic_cast<const cat_file *>(first_i);
+	const cat_file *second_f = dynamic_cast<const cat_file *>(second_i);
 
 	if(first_f != NULL && second_f != NULL)
 	    return first_f->get_size() >= second_f->get_size();
@@ -288,7 +288,7 @@ namespace libdar
     bool crit_in_place_data_dirty::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const cat_inode *first_i = get_inode(&first);
-	const file *first_f = dynamic_cast<const file *>(first_i);
+	const cat_file *first_f = dynamic_cast<const cat_file *>(first_i);
 
 	if(first_f != NULL)
 	    return first_f->is_dirty();
@@ -299,7 +299,7 @@ namespace libdar
     bool crit_in_place_data_sparse::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const cat_inode *first_i = get_inode(&first);
-	const file *first_f = dynamic_cast<const file *>(first_i);
+	const cat_file *first_f = dynamic_cast<const cat_file *>(first_i);
 
 	if(first_f != NULL)
 	    return first_f->get_sparse_file_detection_read();
@@ -461,7 +461,7 @@ namespace libdar
 	const cat_inode *first_i = get_inode(&first);
 	const cat_inode *second_i = get_inode(&second);
 
-	const file * first_file = dynamic_cast<const file *>(first_i);
+	const cat_file * first_file = dynamic_cast<const cat_file *>(first_i);
 	const cat_lien * first_lien = dynamic_cast<const cat_lien *>(first_i);
 	const cat_directory * first_dir = dynamic_cast<const cat_directory *>(first_i);
 	const cat_chardev * first_char = dynamic_cast<const cat_chardev *>(first_i);
@@ -470,7 +470,7 @@ namespace libdar
 	const cat_prise * first_prise = dynamic_cast<const cat_prise *>(first_i);
 	const detruit *first_detruit = dynamic_cast<const detruit *>(&first); // first not first_i here !
 
-	const file * second_file = dynamic_cast<const file *>(second_i);
+	const cat_file * second_file = dynamic_cast<const cat_file *>(second_i);
 	const cat_lien * second_lien = dynamic_cast<const cat_lien *>(second_i);
 	const cat_directory * second_dir = dynamic_cast<const cat_directory *>(second_i);
 	const cat_chardev * second_char = dynamic_cast<const cat_chardev *>(second_i);
@@ -882,12 +882,12 @@ namespace libdar
 
 	    const cat_inode * al_inode = dynamic_cast<const cat_inode *>(already_here);
 	    const cat_directory * al_directory = dynamic_cast<const cat_directory *>(already_here);
-	    const file * al_file = dynamic_cast<const file *>(already_here);
+	    const cat_file * al_file = dynamic_cast<const cat_file *>(already_here);
 	    const cat_mirage * al_mirage = dynamic_cast<const cat_mirage *>(already_here);
 
 	    const cat_inode * do_inode = dynamic_cast<const cat_inode *>(dolly);
 	    const cat_directory * do_directory = dynamic_cast<const cat_directory *>(dolly);
-	    const file * do_file = dynamic_cast<const file *>(dolly);
+	    const cat_file * do_file = dynamic_cast<const cat_file *>(dolly);
 	    const cat_mirage * do_mirage = dynamic_cast<const cat_mirage *>(dolly);
 
 	    dialog.printf(gettext("Entry information:\t\"in place\"\t\"to be added\""));
