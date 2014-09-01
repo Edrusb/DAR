@@ -102,7 +102,7 @@ namespace libdar
                             ++num_b;
                         else
                         {
-                            const tube *p = dynamic_cast<const tube *>(ino);
+                            const cat_tube *p = dynamic_cast<const cat_tube *>(ino);
                             if(p != NULL)
                                 ++num_p;
                             else
@@ -213,7 +213,7 @@ namespace libdar
                 ret = new (pool) blockdev(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'p':
-                ret = new (pool) tube(dialog, f, reading_ver, saved, efsa_loc, ptr);
+                ret = new (pool) cat_tube(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 's':
                 ret = new (pool) prise(dialog, f, reading_ver, saved, efsa_loc, ptr);

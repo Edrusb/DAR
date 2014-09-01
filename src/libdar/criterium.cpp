@@ -466,7 +466,7 @@ namespace libdar
 	const directory * first_dir = dynamic_cast<const directory *>(first_i);
 	const chardev * first_char = dynamic_cast<const chardev *>(first_i);
 	const blockdev * first_block = dynamic_cast<const blockdev *>(first_i);
-	const tube * first_tube = dynamic_cast<const tube *>(first_i);
+	const cat_tube * first_tube = dynamic_cast<const cat_tube *>(first_i);
 	const prise * first_prise = dynamic_cast<const prise *>(first_i);
 	const detruit *first_detruit = dynamic_cast<const detruit *>(&first); // first not first_i here !
 
@@ -475,7 +475,7 @@ namespace libdar
 	const directory * second_dir = dynamic_cast<const directory *>(second_i);
 	const chardev * second_char = dynamic_cast<const chardev *>(second_i);
 	const blockdev * second_block = dynamic_cast<const blockdev *>(second_i);
-	const tube * second_tube = dynamic_cast<const tube *>(second_i);
+	const cat_tube * second_tube = dynamic_cast<const cat_tube *>(second_i);
 	const prise * second_prise = dynamic_cast<const prise *>(second_i);
 	const detruit *second_detruit = dynamic_cast<const detruit *>(&second); // second not second_i here !
 

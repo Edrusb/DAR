@@ -41,16 +41,16 @@ namespace libdar
 	/// @{
 
 	/// the named pipe class
-    class tube : public inode
+    class cat_tube : public inode
     {
     public :
-        tube(const infinint & xuid, const infinint & xgid, U_16 xperm,
+        cat_tube(const infinint & xuid, const infinint & xgid, U_16 xperm,
              const datetime & last_access,
              const datetime & last_modif,
 	     const datetime & last_change,
              const std::string & xname,
 	     const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device) { set_saved_status(s_saved); };
-        tube(user_interaction & dialog,
+        cat_tube(user_interaction & dialog,
 	     generic_file & f,
 	     const archive_version & reading_ver,
 	     saved_status saved,
@@ -61,7 +61,7 @@ namespace libdar
             // using method is_more_recent_than() from inode class
             // using method has_changed_since() from inode class
         unsigned char signature() const { return mk_signature('p', get_saved_status()); };
-        entree *clone() const { return new (get_pool()) tube(*this); };
+        entree *clone() const { return new (get_pool()) cat_tube(*this); };
     };
 
 	/// @}
