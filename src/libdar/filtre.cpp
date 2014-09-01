@@ -115,12 +115,12 @@ namespace libdar
 
 	/// remove an entry hardlink from a given hard_link database
 
-	/// \param[in] mir is a pointer to the mirage object to delte
+	/// \param[in] mir is a pointer to the cat_mirage object to delete
 	/// \param[in,out] hard_link_base is the datastructure used to gather/map hard_links information
-	/// \note if the mirage object is the last one pointing to a given "etoile" object
-	/// deleting this mirage will delete the "etoile" object automatically (see destructor implementation of these classes).
+	/// \note if the cat_mirage object is the last one pointing to a given "etoile" object
+	/// deleting this cat_mirage will delete the "etoile" object automatically (see destructor implementation of these classes).
 	/// However, one need to remove from the database the reference to this "etoile *" that is about to me removed by the caller
-    static void clean_hard_link_base_from(const mirage *mir, map<infinint, etoile *> & hard_link_base);
+    static void clean_hard_link_base_from(const cat_mirage *mir, map<infinint, etoile *> & hard_link_base);
 
 
 
@@ -208,7 +208,7 @@ namespace libdar
 	    {
 		const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 		const directory *e_dir = dynamic_cast<const directory *>(e);
-		const mirage *e_mir = dynamic_cast<const mirage *>(e);
+		const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 		const inode *e_ino = dynamic_cast<const inode *>(e);
 		const file *e_file = dynamic_cast<const file *>(e);
 		const detruit *e_det = dynamic_cast<const detruit *>(e);
@@ -218,7 +218,7 @@ namespace libdar
 		    e_ino = const_cast<const inode *>(e_mir->get_inode());
 		    if(e_ino == NULL)
 			throw SRC_BUG; // !?! how is this possible ?
-		    e_mir->get_inode()->change_name(e_mir->get_name()); // temporarily changing the inode name to the one of the mirage
+		    e_mir->get_inode()->change_name(e_mir->get_name()); // temporarily changing the inode name to the one of the cat_mirage
 		    e_file = dynamic_cast<const file *>(e_ino);
 		}
 
@@ -578,7 +578,7 @@ namespace libdar
 		    directory *dir = dynamic_cast<directory *>(e);
 		    inode *e_ino = dynamic_cast<inode *>(e);
 		    file *e_file = dynamic_cast<file *>(e);
-		    mirage *e_mir = dynamic_cast<mirage *>(e);
+		    cat_mirage *e_mir = dynamic_cast<cat_mirage *>(e);
 		    bool known_hard_link = false;
 
 		    st.add_to_ignored(skipped_dump);
@@ -637,7 +637,7 @@ namespace libdar
 				{
 				    const inode *f_ino = NULL;
 				    const file *f_file = NULL;
-				    const mirage *f_mir = NULL;
+				    const cat_mirage *f_mir = NULL;
 
 				    if(e_ino == NULL)
 					throw SRC_BUG; // if not a known hard link, e_ino should still either point to a real inode
@@ -657,7 +657,7 @@ namespace libdar
 					{
 					    f_ino = dynamic_cast<const inode*>(f);
 					    f_file = dynamic_cast<const file *>(f);
-					    f_mir = dynamic_cast<const mirage *>(f);
+					    f_mir = dynamic_cast<const cat_mirage *>(f);
 
 					    if(f_mir != NULL)
 					    {
@@ -1086,7 +1086,7 @@ namespace libdar
 	    const directory *e_dir = dynamic_cast<const directory *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
-	    const mirage *e_mir = dynamic_cast<const mirage *>(e);
+	    const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 
 	    if(e_mir != NULL)
 	    {
@@ -1275,7 +1275,7 @@ namespace libdar
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const directory *e_dir = dynamic_cast<const directory *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
-	    const mirage *e_mir = dynamic_cast<const mirage *>(e);
+	    const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 
             juillet.enfile(e);
 	    thr_cancel.check_self_cancellation();
@@ -1616,7 +1616,7 @@ namespace libdar
 		    while(ref_tab[index]->read(e)) // examining the content of the current archive of reference, each entry one by one
 		    {
 			const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
-			const mirage *e_mir = dynamic_cast<const mirage *>(e);
+			const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 			const directory *e_dir = dynamic_cast<const directory *>(e);
 			const detruit *e_detruit = dynamic_cast<const detruit *>(e);
 
@@ -1641,7 +1641,7 @@ namespace libdar
 
 					cat_nomme *dolly_nom = dynamic_cast<cat_nomme *>(dolly);
 					directory *dolly_dir = dynamic_cast<directory *>(dolly);
-					mirage *dolly_mir = dynamic_cast<mirage *>(dolly);
+					cat_mirage *dolly_mir = dynamic_cast<cat_mirage *>(dolly);
 					inode *dolly_ino = dynamic_cast<inode *>(dolly);
 
 					if(dolly_mir != NULL)
@@ -1651,7 +1651,7 @@ namespace libdar
 					{
 
 						// some different types of pointer to the "already_here" object (aka 'inplace" object)
-					    const mirage *al_mir = dynamic_cast<const mirage *>(already_here);
+					    const cat_mirage *al_mir = dynamic_cast<const cat_mirage *>(already_here);
 					    const detruit *al_det = dynamic_cast<const detruit *>(already_here);
 					    const ignored *al_ign = dynamic_cast<const ignored *>(already_here);
 					    const ignored_dir *al_igndir = dynamic_cast<const ignored_dir *>(already_here);
@@ -2355,7 +2355,7 @@ namespace libdar
 		cat_nomme *e_nom = dynamic_cast<cat_nomme *>(e_var);
 		inode *e_ino = dynamic_cast<inode *>(e_var);
 		file *e_file = dynamic_cast<file *>(e_var);
-		mirage *e_mir = dynamic_cast<mirage *>(e_var);
+		cat_mirage *e_mir = dynamic_cast<cat_mirage *>(e_var);
 		directory *e_dir = dynamic_cast<directory *>(e_var);
 
 		file::get_data_mode keep_mode = keep_compressed ? file::keep_compressed : file::keep_hole;
@@ -2523,7 +2523,7 @@ namespace libdar
 	    {
 		const file *e_file = dynamic_cast<const file *>(e);
 		const inode *e_ino = dynamic_cast<const inode *>(e);
-		const mirage *e_mir = dynamic_cast<const mirage *>(e);
+		const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 		const crc *check = NULL;
 
 		juillet.enfile(e);
@@ -2604,7 +2604,7 @@ namespace libdar
 	infinint current_repeat_count = 0;
 	infinint storage_size;
 	bool loop;
-	mirage *mir = dynamic_cast<mirage *>(e);
+	cat_mirage *mir = dynamic_cast<cat_mirage *>(e);
 	inode *ino = dynamic_cast<inode *>(e);
 	bool resave_uncompressed = false;
 	infinint rewinder = stack.get_position(); // we skip back here if data must be saved uncompressed
@@ -3585,7 +3585,7 @@ namespace libdar
     {
 	cat_entree *dolly = NULL; // will be the address of the cloned object
 	string the_name;
-	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
+	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 
 	if(ref == NULL)
 	    throw SRC_BUG;
@@ -3615,7 +3615,7 @@ namespace libdar
 		    try
 		    {
 			dolly = NULL; // the inode is now managed by filante
-			dolly = new (pool) mirage(the_name, filante);
+			dolly = new (pool) cat_mirage(the_name, filante);
 			if(dolly == NULL)
 			    throw Ememory("make_clone");
 			try
@@ -3624,7 +3624,7 @@ namespace libdar
 			}
 			catch(...)
 			{
-			    filante = NULL; // now managed by the mirage pointed to by dolly
+			    filante = NULL; // now managed by the cat_mirage pointed to by dolly
 			    throw;
 			}
 		    }
@@ -3649,7 +3649,7 @@ namespace libdar
 		}
 	    }
 	    else // already added to archive
-		dolly = new (pool) mirage(the_name, it->second); // we make a new mirage pointing to the etoile already involved in the catalogue under construction
+		dolly = new (pool) cat_mirage(the_name, it->second); // we make a new cat_mirage pointing to the etoile already involved in the catalogue under construction
 	}
 	else // not a hard_link file
 	    dolly = ref->clone();  // we just clone the entry
@@ -3661,7 +3661,7 @@ namespace libdar
     }
 
 
-    static void clean_hard_link_base_from(const mirage *mir, map<infinint, etoile *> & hard_link_base)
+    static void clean_hard_link_base_from(const cat_mirage *mir, map<infinint, etoile *> & hard_link_base)
     {
 	if(mir->get_etoile_ref_count() == 0)
 	    throw SRC_BUG; // count should be >= 1

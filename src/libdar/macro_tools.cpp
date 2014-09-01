@@ -1378,7 +1378,7 @@ namespace libdar
 	infinint low;
 	const inode *tmp_inode = dynamic_cast<const inode *>(obj);
 	const file *tmp_file = dynamic_cast<const file *>(obj);
-	const mirage *tmp_mir = dynamic_cast<const mirage *>(obj);
+	const cat_mirage *tmp_mir = dynamic_cast<const cat_mirage *>(obj);
 
 	if(obj == NULL)
 	    throw SRC_BUG;

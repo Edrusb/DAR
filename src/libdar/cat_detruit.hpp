@@ -44,12 +44,12 @@ namespace libdar
 
 
 	/// the deleted file entry
-    class detruit : public nomme
+    class detruit : public cat_nomme
     {
     public :
-        detruit(const std::string & name, unsigned char firm, const datetime & date) : nomme(name) , del_date(date) { signe = firm; };
+        detruit(const std::string & name, unsigned char firm, const datetime & date) : cat_nomme(name) , del_date(date) { signe = firm; };
         detruit(generic_file & f, const archive_version & reading_ver);
-	detruit(const nomme &ref) : nomme(ref.get_name()), del_date(0) { signe = ref.signature(); };
+	detruit(const cat_nomme &ref) : cat_nomme(ref.get_name()), del_date(0) { signe = ref.signature(); };
 
         unsigned char get_signature() const { return signe; };
         void set_signature(unsigned char x) { signe = x; };

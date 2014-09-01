@@ -1322,7 +1322,7 @@ bool data_tree::fix_corruption()
 	{
 	    const directory *entry_dir = dynamic_cast<const directory *>(entry);
 	    const inode *entry_ino = dynamic_cast<const inode *>(entry);
-	    const mirage *entry_mir = dynamic_cast<const mirage *>(entry);
+	    const cat_mirage *entry_mir = dynamic_cast<const cat_mirage *>(entry);
 	    const detruit *entry_det = dynamic_cast<const detruit *>(entry);
 
 	    if(entry_mir != NULL)

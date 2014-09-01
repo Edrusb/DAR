@@ -532,7 +532,7 @@ namespace libdar
     bool catalogue::compare(const cat_entree * target, const cat_entree * & extracted) const
     {
 	catalogue *me = const_cast<catalogue *>(this);
-	const mirage *mir = dynamic_cast<const mirage *>(target);
+	const cat_mirage *mir = dynamic_cast<const cat_mirage *>(target);
 	const directory *dir = dynamic_cast<const directory *>(target);
 	const eod *fin = dynamic_cast<const eod *>(target);
 	const cat_nomme *nom = dynamic_cast<const cat_nomme *>(target);
@@ -585,8 +585,8 @@ namespace libdar
 		const detruit *dst_det = dynamic_cast<const detruit *>(found);
 		const inode *src_ino = dynamic_cast<const inode *>(nom);
 		const inode *dst_ino = dynamic_cast<const inode *>(found);
-		const mirage *src_mir = dynamic_cast<const mirage *>(nom);
-		const mirage *dst_mir = dynamic_cast<const mirage *>(found);
+		const cat_mirage *src_mir = dynamic_cast<const cat_mirage *>(nom);
+		const cat_mirage *dst_mir = dynamic_cast<const cat_mirage *>(found);
 
 		    // extracting inode from hard links
 		if(src_mir != NULL)
@@ -649,7 +649,7 @@ namespace libdar
 	const directory *pro_dir;
 	const detruit *pro_det;
 	const cat_nomme *pro_nom;
-	const mirage *pro_mir;
+	const cat_mirage *pro_mir;
 	infinint count = 0;
 
 	ref.reset_read();
@@ -659,7 +659,7 @@ namespace libdar
 	    pro_dir = dynamic_cast<const directory *>(projo);
 	    pro_det = dynamic_cast<const detruit *>(projo);
 	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
-	    pro_mir = dynamic_cast<const mirage *>(projo);
+	    pro_mir = dynamic_cast<const cat_mirage *>(projo);
 
 	    if(pro_eod != NULL)
 	    {
@@ -727,7 +727,7 @@ namespace libdar
 	const detruit *pro_det;
 	const cat_nomme *pro_nom;
 	const inode *pro_ino;
-	const mirage *pro_mir;
+	const cat_mirage *pro_mir;
 	map<infinint, etoile *> corres_clone;
 	    // for each etiquette from the reference catalogue
 	    // gives an cloned or original etoile object
@@ -741,7 +741,7 @@ namespace libdar
 	    pro_det = dynamic_cast<const detruit *>(projo);
 	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
 	    pro_ino = dynamic_cast<const inode *>(projo);
-	    pro_mir = dynamic_cast<const mirage *>(projo);
+	    pro_mir = dynamic_cast<const cat_mirage *>(projo);
 
 	    if(pro_eod != NULL)
 	    {
@@ -771,7 +771,7 @@ namespace libdar
 		cat_entree *clo_ent = NULL;
 		inode *clo_ino = NULL;
 		directory *clo_dir = NULL;
-		mirage *clo_mir = NULL;
+		cat_mirage *clo_mir = NULL;
 		etoile *clo_eto = NULL;
 
 		try
@@ -816,7 +816,7 @@ namespace libdar
 				try
 				{
 				    corres_clone[pro_mir->get_etiquette()] = clo_eto;
-				    clo_mir = new (get_pool()) mirage(pro_mir->get_name(), clo_eto);
+				    clo_mir = new (get_pool()) cat_mirage(pro_mir->get_name(), clo_eto);
 				    if(clo_mir == NULL)
 					throw Ememory("catalogue::update_absent_with");
 				}
@@ -835,7 +835,7 @@ namespace libdar
 				clo_ent = NULL;
 
 				    // so we add a new reference to the existing hard linked structure
-				clo_mir = new (get_pool()) mirage(pro_mir->get_name(), it->second);
+				clo_mir = new (get_pool()) cat_mirage(pro_mir->get_name(), it->second);
 				if(clo_mir == NULL)
 				    throw Ememory("catalogue::update_absent_with");
 			    }
@@ -901,7 +901,7 @@ namespace libdar
 
 		if(pro_mir != NULL)
 		{
-		    const mirage *ici_mir = dynamic_cast<const mirage *>(ici);
+		    const cat_mirage *ici_mir = dynamic_cast<const cat_mirage *>(ici);
 
 		    if(ici_mir != NULL && corres_clone.find(pro_mir->get_etiquette()) == corres_clone.end())
 		    {
@@ -941,7 +941,7 @@ namespace libdar
 	    const directory *e_dir = dynamic_cast<const directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
-	    const mirage *e_hard = dynamic_cast<const mirage *>(e);
+	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 
 	    thr.check_self_cancellation();
@@ -1058,7 +1058,7 @@ namespace libdar
 	    const directory *e_dir = dynamic_cast<const directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
-	    const mirage *e_hard = dynamic_cast<const mirage *>(e);
+	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 
 	    thr.check_self_cancellation();
@@ -1189,7 +1189,7 @@ namespace libdar
 	    const directory *e_dir = dynamic_cast<const directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
-	    const mirage *e_hard = dynamic_cast<const mirage *>(e);
+	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const lien *e_sym = dynamic_cast<const lien *>(e);
 	    const device *e_dev = dynamic_cast<const device *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
@@ -1289,7 +1289,7 @@ namespace libdar
 				string dirty, sparse;
 				string size = local_size(*e_ino);
 				string stored = local_storage_size(*e_ino);
-				const file *reg = dynamic_cast<const file *>(e_ino); // ino is no more it->second (if it->second was a mirage)
+				const file *reg = dynamic_cast<const file *>(e_ino); // ino is no more it->second (if it->second was a cat_mirage)
 
 				saved_status data_st;
 				inode::ea_status ea_st = isolated ? inode::ea_fake : e_ino->ea_get_saved_status();
@@ -1471,7 +1471,7 @@ namespace libdar
 	    const eod *e_eod = dynamic_cast<const eod *>(e);
 	    const directory *e_dir = dynamic_cast<const directory *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
-	    const mirage *e_hard = dynamic_cast<const mirage *>(e);
+	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 

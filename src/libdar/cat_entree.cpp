@@ -61,7 +61,7 @@ namespace libdar
            && dynamic_cast<const ignored_dir *>(ref) == NULL) // and "ignored_dir"
         {
             const inode *ino = dynamic_cast<const inode *>(ref);
-            const mirage *h = dynamic_cast<const mirage *>(ref);
+            const cat_mirage *h = dynamic_cast<const cat_mirage *>(ref);
             const detruit *x = dynamic_cast<const detruit *>(ref);
 
 
@@ -222,13 +222,13 @@ namespace libdar
                 ret = new (pool) directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, ptr);
                 break;
             case 'm':
-                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, mirage::fmt_mirage, lax, ptr);
+                ret = new (pool) cat_mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, cat_mirage::fmt_mirage, lax, ptr);
                 break;
             case 'h': // old hard-link object
-                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, mirage::fmt_hard_link, lax, ptr);
+                ret = new (pool) cat_mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, cat_mirage::fmt_hard_link, lax, ptr);
                 break;
             case 'e': // old etiquette object
-                ret = new (pool) mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, lax, ptr);
+                ret = new (pool) cat_mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, lax, ptr);
                 break;
             case 'z':
                 if(saved != s_saved)

@@ -194,7 +194,7 @@ namespace libdar
 	string mtime;
 	string ctime;
 	const inode *e_ino = dynamic_cast<const inode *>(obj);
-	const mirage *e_hard = dynamic_cast<const mirage *>(obj);
+	const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(obj);
 
 	if(e_hard != NULL)
 	    e_ino = e_hard->get_inode();

@@ -382,9 +382,9 @@ namespace libdar
 			    throw;
 			}
 
-			ref = new (get_pool()) mirage(name, tmp_et);
+			ref = new (get_pool()) cat_mirage(name, tmp_et);
 		    }
-		    else // inode already seen creating a new mirage on the given etoile
+		    else // inode already seen creating a new cat_mirage on the given etoile
 		    {
 			    // some sanity checks
 			if(it->second.obj == NULL)
@@ -392,7 +392,7 @@ namespace libdar
 
 			if(ref != NULL)
 			    delete ref;  // we don't need this just created inode as it is already attached to the etoile object
-			ref = new (get_pool()) mirage(name, it->second.obj);
+			ref = new (get_pool()) cat_mirage(name, it->second.obj);
 			if(ref != NULL)
 			{
 			    it->second.count--;
@@ -913,7 +913,7 @@ namespace libdar
 						const string & spot,
 						const mask & ea_mask)
     {
-        const mirage *e_mir = dynamic_cast<const mirage *>(e);
+        const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 
         bool ret = false;
 
@@ -960,7 +960,7 @@ namespace libdar
 
     bool filesystem_hard_link_write::raw_clear_ea_set(const cat_nomme *e, const string & spot)
     {
-        const mirage *e_mir = dynamic_cast<const mirage *>(e);
+        const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 
         bool ret = false;
 
@@ -1005,7 +1005,7 @@ namespace libdar
     }
 
 
-    void filesystem_hard_link_write::write_hard_linked_target_if_not_set(const mirage *ref, const string & chemin)
+    void filesystem_hard_link_write::write_hard_linked_target_if_not_set(const cat_mirage *ref, const string & chemin)
     {
         if(!known_etiquette(ref->get_etiquette()))
         {
@@ -1034,7 +1034,7 @@ namespace libdar
         const chardev *ref_cha = dynamic_cast<const chardev *>(ref);
         const cat_tube *ref_tub = dynamic_cast<const cat_tube *>(ref);
         const cat_prise *ref_pri = dynamic_cast<const cat_prise *>(ref);
-        const mirage *ref_mir = dynamic_cast <const mirage *>(ref);
+        const cat_mirage *ref_mir = dynamic_cast <const cat_mirage *>(ref);
         const inode *ref_ino = dynamic_cast <const inode *>(ref);
 
         if(ref_ino == NULL && ref_mir == NULL)
@@ -1113,7 +1113,7 @@ namespace libdar
 			ref_cha = dynamic_cast<const chardev *>(ref_mir->get_inode());
 			ref_tub = dynamic_cast<const cat_tube *>(ref_mir->get_inode());
 			ref_pri = dynamic_cast<const cat_prise *>(ref_mir->get_inode());
-			ref_mir->get_inode()->change_name(ref_mir->get_name()); // we temporarily change the name of the attached inode (it is not used usually), by the name of the mirage object
+			ref_mir->get_inode()->change_name(ref_mir->get_name()); // we temporarily change the name of the attached inode (it is not used usually), by the name of the cat_mirage object
 		    }
 		    else // hard link made
 			ret = 0; // not necessary, but avoids a warning from compilator ("ret" might be used uninitialized)
@@ -1226,7 +1226,7 @@ namespace libdar
 		else
 		    if(ref_mir == NULL)
 			throw SRC_BUG; // unknown inode type
-		    // else nothing do do mirage have been handled far above
+		    // else nothing do do cat_mirage have been handled far above
 
 		if(ret < 0)
 		{
@@ -1344,7 +1344,7 @@ namespace libdar
 	const directory *x_dir = dynamic_cast<const directory *>(x);
 	const detruit *x_det = dynamic_cast<const detruit *>(x);
 	const inode *x_ino = dynamic_cast<const inode *>(x);
-	const mirage *x_mir = dynamic_cast<const mirage *>(x);
+	const cat_mirage *x_mir = dynamic_cast<const cat_mirage *>(x);
 
 	data_restored = done_no_change_no_data;
 	ea_restored = false;
@@ -1679,7 +1679,7 @@ namespace libdar
 					      over_action_data action,
 					      action_done_for_data & data_done)
     {
-	const mirage *tba_mir = dynamic_cast<const mirage *>(to_be_added);
+	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
 	const inode *tba_ino = tba_mir == NULL ? dynamic_cast<const inode *>(to_be_added) : tba_mir->get_inode();
 	const directory *tba_dir = dynamic_cast<const directory *>(to_be_added);
 	const detruit *tba_det = dynamic_cast<const detruit *>(to_be_added);
@@ -1692,7 +1692,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(tba_det != NULL)
-	    throw SRC_BUG; // must be either a mirage or an inode, not any other cat_nomme object
+	    throw SRC_BUG; // must be either a cat_mirage or an inode, not any other cat_nomme object
 
 	if(action == data_ask)
 	    action = crit_ask_user_for_data_action(get_ui(), spot, in_place, to_be_added);
@@ -1856,7 +1856,7 @@ namespace libdar
     {
 	bool ret = false;
 	const inode *tba_ino = dynamic_cast<const inode *>(to_be_added);
-	const mirage *tba_mir = dynamic_cast<const mirage *>(to_be_added);
+	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
 
 	if(tba_mir != NULL)
 	    tba_ino = tba_mir->get_inode();
@@ -2005,7 +2005,7 @@ namespace libdar
     {
 	bool ret = false;
 	const inode *tba_ino = dynamic_cast<const inode *>(to_be_added);
-	const mirage *tba_mir = dynamic_cast<const mirage *>(to_be_added);
+	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
 
 	if(tba_mir != NULL)
 	    tba_ino = tba_mir->get_inode();

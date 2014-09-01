@@ -96,7 +96,7 @@ namespace libdar
 	    // to by a new reference to it.
         cat_nomme *make_read_entree(path & lieu,               //< path of the file to read
 				const std::string & name,  //< name of the file to read
-				bool see_hard_link,        //< whether we want to detect hard_link and eventually return a mirage object (not necessary when diffing an archive with filesystem)
+				bool see_hard_link,        //< whether we want to detect hard_link and eventually return a cat_mirage object (not necessary when diffing an archive with filesystem)
 				const mask & ea_mask);    //< which EA to consider when creating the object
 
     private:
@@ -107,7 +107,7 @@ namespace libdar
         {
             nlink_t count;       //< counts the number of hard link on that inode that have not yet been found in filesystem, once this count reaches zero, the "couple" structure can be dropped and the "holder" too (no more expected hard links to be found)
             etoile *obj;         //< the address of the corresponding etoile object for that inode
-	    mirage holder;       //< it increments by one the obj internal counters, thus, while this object is alive, the obj will not be destroyed
+	    cat_mirage holder;       //< it increments by one the obj internal counters, thus, while this object is alive, the obj will not be destroyed
 
 	    couple(etoile *ptr, nlink_t ino_count) : holder("FAKE", ptr) { count = ino_count; obj = ptr; };
         };
@@ -231,7 +231,7 @@ namespace libdar
 	filesystem_hard_link_write(const filesystem_hard_link_write & ref) : mem_ui(ref) { throw SRC_BUG; };
 	const filesystem_hard_link_write & operator = (const filesystem_hard_link_write & ref) { throw SRC_BUG; };
 
-        void write_hard_linked_target_if_not_set(const mirage *ref, const std::string & chemin);
+        void write_hard_linked_target_if_not_set(const cat_mirage *ref, const std::string & chemin);
             // if a hard linked inode has not been restored (no change, or less recent than the one on filesystem)
             // it is necessary to inform filesystem, where to hard link on, any future hard_link
             // that could be necessary to restore.

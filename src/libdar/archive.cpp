@@ -1389,7 +1389,7 @@ namespace libdar
 		const file *tmp_file = dynamic_cast<const file *>(tmp_ptr);
 		const lien *tmp_lien = dynamic_cast<const lien *>(tmp_ptr);
 		const device *tmp_device = dynamic_cast<const device *>(tmp_ptr);
-		const mirage *tmp_mir = dynamic_cast<const mirage *>(tmp_ptr);
+		const cat_mirage *tmp_mir = dynamic_cast<const cat_mirage *>(tmp_ptr);
 
 		ent.set_name(tmp_ptr->get_name());
 

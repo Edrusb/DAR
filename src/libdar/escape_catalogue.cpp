@@ -146,7 +146,7 @@ namespace libdar
     void escape_catalogue::pre_add_ea(const cat_entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
-	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
+	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const inode *ref_ino = dynamic_cast<const inode *>(ref);
 
 	if(ref_mir != NULL)
@@ -172,7 +172,7 @@ namespace libdar
     void escape_catalogue::pre_add_crc(const cat_entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
-	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
+	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const file *ref_file = dynamic_cast<const file *>(ref);
 
 	if(ref_mir != NULL)
@@ -213,7 +213,7 @@ namespace libdar
     void escape_catalogue::pre_add_ea_crc(const cat_entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
-	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
+	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const inode *ref_ino = dynamic_cast<const inode *>(ref);
 
 	if(ref_mir != NULL)
@@ -262,7 +262,7 @@ namespace libdar
     void escape_catalogue::pre_add_fsa(const cat_entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
-	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
+	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const inode *ref_ino = dynamic_cast<const inode *>(ref);
 
 	if(ref_mir != NULL)
@@ -288,7 +288,7 @@ namespace libdar
     void escape_catalogue::pre_add_fsa_crc(const cat_entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
-	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
+	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
 	const inode *ref_ino = dynamic_cast<const inode *>(ref);
 
 	if(ref_mir != NULL)

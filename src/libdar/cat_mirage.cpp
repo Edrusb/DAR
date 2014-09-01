@@ -39,7 +39,7 @@ using namespace std;
 namespace libdar
 {
 
-    mirage::mirage(user_interaction & dialog,
+    cat_mirage::cat_mirage(user_interaction & dialog,
                    generic_file & f,
                    const archive_version & reading_ver,
                    saved_status saved,
@@ -66,7 +66,7 @@ namespace libdar
              ptr);
     }
 
-    mirage::mirage(user_interaction & dialog,
+    cat_mirage::cat_mirage(user_interaction & dialog,
                    generic_file & f,
                    const archive_version & reading_ver,
                    saved_status saved,
@@ -92,7 +92,7 @@ namespace libdar
              ptr);
     }
 
-    void mirage::init(user_interaction & dialog,
+    void cat_mirage::init(user_interaction & dialog,
                       generic_file & f,
                       const archive_version & reading_ver,
                       saved_status saved,
@@ -141,7 +141,7 @@ namespace libdar
 
             etl = corres.find(tmp_tiquette);
             if(etl == corres.end())
-                throw Erange("mirage::mirage", gettext("Incoherent catalogue structure: hard linked inode's data not found"));
+                throw Erange("cat_mirage::cat_mirage", gettext("Incoherent catalogue structure: hard linked inode's data not found"));
             else
             {
                 if(etl->second == NULL)
@@ -165,7 +165,7 @@ namespace libdar
                     tmp_tiquette = infinint(f);
                 }
                 else
-                    throw Ememory("mirage::init");
+                    throw Ememory("cat_mirage::init");
             }
             else
                 entree_ptr = cat_entree::read(dialog, get_pool(), f, reading_ver, fake_stats, corres, default_algo, data_loc, efsa_loc, lax, false, ptr);
@@ -178,7 +178,7 @@ namespace libdar
                     delete entree_ptr;
                     entree_ptr = NULL;
                 }
-                throw Erange("mirage::mirage", gettext("Incoherent catalogue structure: hard linked data is not an inode"));
+                throw Erange("cat_mirage::cat_mirage", gettext("Incoherent catalogue structure: hard linked data is not an inode"));
             }
 
                 // then we can bind the inode to the next to be create etoile object
@@ -196,7 +196,7 @@ namespace libdar
                     try
                     {
                         if(star_ref == NULL)
-                            throw Ememory("mirage::mirage");
+                            throw Ememory("cat_mirage::cat_mirage");
                         ino_ptr = NULL; // the object pointed to by ino_ptr is now managed by star_ref
                         star_ref->add_ref(this);
                         corres[tmp_tiquette] = star_ref;
@@ -215,7 +215,7 @@ namespace libdar
                     }
                 }
                 else
-                    throw Erange("mirage::mirage", gettext("Incoherent catalogue structure: duplicated hard linked inode's data"));
+                    throw Erange("cat_mirage::cat_mirage", gettext("Incoherent catalogue structure: duplicated hard linked inode's data"));
             }
             catch(...)
             {
@@ -229,11 +229,11 @@ namespace libdar
 
             break;
         default:
-            throw Erange("mirage::mirage", gettext("Incoherent catalogue structure: unknown status flag for hard linked inode"));
+            throw Erange("cat_mirage::cat_mirage", gettext("Incoherent catalogue structure: unknown status flag for hard linked inode"));
         }
     }
 
-    const mirage & mirage::operator = (const mirage & ref)
+    const cat_mirage & cat_mirage::operator = (const cat_mirage & ref)
     {
         etoile *tmp_ref;
         const cat_nomme * ref_nom = & ref;
@@ -250,7 +250,7 @@ namespace libdar
         return *this;
     }
 
-    void mirage::post_constructor(generic_file & f)
+    void cat_mirage::post_constructor(generic_file & f)
     {
         if(star_ref == NULL)
             throw SRC_BUG;
@@ -259,7 +259,7 @@ namespace libdar
             star_ref->get_inode()->post_constructor(f);
     }
 
-    void mirage::inherited_dump(generic_file & f, bool small) const
+    void cat_mirage::inherited_dump(generic_file & f, bool small) const
     {
         if(star_ref->get_ref_count() > 1)
         {
@@ -280,7 +280,7 @@ namespace libdar
         else // no need to record this inode with the hard link overhead
         {
             inode *real = star_ref->get_inode();
-            real->change_name(get_name()); // set the name of the mirage object to the inode
+            real->change_name(get_name()); // set the name of the cat_mirage object to the inode
             real->specific_dump(f, small);
         }
     }

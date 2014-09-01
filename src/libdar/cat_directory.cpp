@@ -98,7 +98,7 @@ namespace libdar
 	cat_nomme *t;
 	directory *d;
 	detruit *x;
-	mirage *m;
+	cat_mirage *m;
 	eod *fin = NULL;
 	bool lax_end = false;
 
@@ -143,13 +143,13 @@ namespace libdar
 		    fin = dynamic_cast<eod *>(p);
 		    t = dynamic_cast<cat_nomme *>(p);
 		    x = dynamic_cast<detruit *>(p);
-		    m = dynamic_cast<mirage *>(p);
+		    m = dynamic_cast<cat_mirage *>(p);
 
 		    if(!only_detruit || d != NULL || x != NULL || fin != NULL || m != NULL)
 		    {
-			    // we must add the mirage object, else
+			    // we must add the cat_mirage object, else
 			    // we will trigger an incoherent catalogue structure
-			    // as the mirages without inode cannot link to the mirage with inode
+			    // as the cat_mirage without inode cannot link to the cat_mirage with inode
 			    // carring the same etiquette if we destroy them right now.
 			if(t != NULL) // p is a "cat_nomme"
 			{
@@ -446,7 +446,7 @@ namespace libdar
 	list<cat_nomme *>::iterator it = ordered_fils.begin();
 	directory *n_dir = NULL;
 	inode *n_ino = NULL;
-	mirage *n_mir = NULL;
+	cat_mirage *n_mir = NULL;
 
 	    // dropping info for the current directory
 	set_saved_status(s_not_saved);
@@ -463,7 +463,7 @@ namespace libdar
 
 	    n_dir = dynamic_cast<directory *>(*it);
 	    n_ino = dynamic_cast<inode *>(*it);
-	    n_mir = dynamic_cast<mirage *>(*it);
+	    n_mir = dynamic_cast<cat_mirage *>(*it);
 
 	    if(n_mir != NULL)
 		n_ino = n_mir->get_inode();
@@ -545,7 +545,7 @@ namespace libdar
 	const directory *next_dir = NULL;
 	const inode *next_ino = NULL;
 	const detruit *next_detruit = NULL;
-	const mirage *next_mir = NULL;
+	const cat_mirage *next_mir = NULL;
 	string segment;
 	bool loop = true;
 	const cat_nomme *tmp_nom;
@@ -575,7 +575,7 @@ namespace libdar
 		if(current->search_children(segment, tmp_nom))
 		{
 		    next_nom = const_cast<const cat_nomme *>(tmp_nom);
-		    next_mir = dynamic_cast<const mirage *>(next_nom);
+		    next_mir = dynamic_cast<const cat_mirage *>(next_nom);
 		    if(next_mir != NULL)
 			next_dir = dynamic_cast<const directory *>(next_mir->get_inode());
 		    else
@@ -604,7 +604,7 @@ namespace libdar
 	current->reset_read_children();
 	while(current->read_children(next_nom))
 	{
-	    next_mir = dynamic_cast<const mirage *>(next_nom);
+	    next_mir = dynamic_cast<const cat_mirage *>(next_nom);
 	    if(next_mir != NULL)
 		next_ino = next_mir->get_inode();
 	    else
@@ -690,7 +690,7 @@ namespace libdar
 	{
 	    const directory *fils_dir = dynamic_cast<const directory *>(*it);
 	    const inode *fils_ino = dynamic_cast<const inode *>(*it);
-	    const mirage *fils_mir = dynamic_cast<const mirage *>(*it);
+	    const cat_mirage *fils_mir = dynamic_cast<const cat_mirage *>(*it);
 
 	    if(fils_mir != NULL)
 		fils_ino = fils_mir->get_inode();
@@ -717,7 +717,7 @@ namespace libdar
 	while(it != ordered_fils.end())
 	{
 	    const directory *fils_dir = dynamic_cast<const directory *>(*it);
-	    const mirage *fils_mir = dynamic_cast<const mirage *>(*it);
+	    const cat_mirage *fils_mir = dynamic_cast<const cat_mirage *>(*it);
 
 	    if(fils_mir != NULL)
 		++ret;
@@ -738,7 +738,7 @@ namespace libdar
 
 	while(it != ordered_fils.end())
 	{
-	    const mirage *fils_mir = dynamic_cast<const mirage *>(*it);
+	    const cat_mirage *fils_mir = dynamic_cast<const cat_mirage *>(*it);
 	    const directory *fils_dir = dynamic_cast<const directory *>(*it);
 
 	    if(fils_mir != NULL)
@@ -768,7 +768,7 @@ namespace libdar
 	    if(*curs == NULL)
 		throw SRC_BUG;
 	    directory *d = dynamic_cast<directory *>(*curs);
-	    mirage *m = dynamic_cast<mirage *>(*curs);
+	    cat_mirage *m = dynamic_cast<cat_mirage *>(*curs);
 	    cat_nomme *n = dynamic_cast<cat_nomme *>(*curs);
 
 		// sanity check
@@ -810,7 +810,7 @@ namespace libdar
 	    if(*curs == NULL)
 		throw SRC_BUG;
 	    directory *d = dynamic_cast<directory *>(*curs);
-	    mirage *m = dynamic_cast<mirage *>(*curs);
+	    cat_mirage *m = dynamic_cast<cat_mirage *>(*curs);
 
 		// recursive call
 	    if(d != NULL)

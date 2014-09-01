@@ -41,18 +41,18 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-	/// the hard link implementation, mirage is the named entry owned by a directory it points to a common "etoile class"
+	/// the hard link implementation, cat_mirage is the named entry owned by a directory it points to a common "etoile class"
 
-	/// well, mirage is those fake apparition of water in a desert... I guess you get the picture now... :-)
-    class mirage : public cat_nomme
+	/// well, a mirage is this fake apparition of water in a desert... I guess you get the picture now... :-)
+    class cat_mirage : public cat_nomme
     {
     public:
 	enum mirage_format {fmt_mirage,           //< new format
 			    fmt_hard_link,        //< old dual format
 			    fmt_file_etiquette }; //< old dual format
 
-	mirage(const std::string & name, etoile *ref) : cat_nomme(name) { star_ref = ref; if(ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
-	mirage(user_interaction & dialog,
+	cat_mirage(const std::string & name, etoile *ref) : cat_nomme(name) { star_ref = ref; if(ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
+	cat_mirage(user_interaction & dialog,
 	       generic_file & f,
 	       const archive_version & reading_ver,
 	       saved_status saved,
@@ -64,7 +64,7 @@ namespace libdar
 	       mirage_format fmt,
 	       bool lax,
 	       escape *ptr);
-	mirage(user_interaction & dialog,
+	cat_mirage(user_interaction & dialog,
 	       generic_file & f,
 	       const archive_version & reading_ver,
 	       saved_status saved,
@@ -75,12 +75,12 @@ namespace libdar
 	       compressor *efsa_loc,
 	       bool lax,
 	       escape *ptr);
-	mirage(const mirage & ref) : cat_nomme (ref) { star_ref = ref.star_ref; if(star_ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
-	const mirage & operator = (const mirage & ref);
-	~mirage() { star_ref->drop_ref(this); };
+	cat_mirage(const cat_mirage & ref) : cat_nomme (ref) { star_ref = ref.star_ref; if(star_ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
+	const cat_mirage & operator = (const cat_mirage & ref);
+	~cat_mirage() { star_ref->drop_ref(this); };
 
 	unsigned char signature() const { return 'm'; };
-	cat_entree *clone() const { return new (get_pool()) mirage(*this); };
+	cat_entree *clone() const { return new (get_pool()) cat_mirage(*this); };
 
 	inode *get_inode() const { if(star_ref == NULL) throw SRC_BUG; return star_ref->get_inode(); };
 	infinint get_etiquette() const { return star_ref->get_etiquette(); };

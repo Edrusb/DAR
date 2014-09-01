@@ -210,7 +210,7 @@ namespace libdar
     const inode *criterium::get_inode(const cat_nomme *arg)
     {
 	const inode *ret;
-	const mirage *arg_m = dynamic_cast<const mirage *>(arg);
+	const cat_mirage *arg_m = dynamic_cast<const cat_mirage *>(arg);
 
 	if(arg_m != NULL)
 	    ret = const_cast<const inode *>(arg_m->get_inode());
@@ -223,7 +223,7 @@ namespace libdar
     bool crit_in_place_is_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	return dynamic_cast<const inode *>(&first) != NULL
-	    || dynamic_cast<const mirage *>(&first) != NULL;
+	    || dynamic_cast<const cat_mirage *>(&first) != NULL;
     }
 
     bool crit_in_place_is_file::evaluate(const cat_nomme &first, const cat_nomme &second) const
@@ -235,12 +235,12 @@ namespace libdar
 
     bool crit_in_place_is_hardlinked_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
-	return dynamic_cast<const mirage *>(&first) != NULL;
+	return dynamic_cast<const cat_mirage *>(&first) != NULL;
     }
 
     bool crit_in_place_is_new_hardlinked_inode::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
-	const mirage * tmp = dynamic_cast<const mirage *>(&first);
+	const cat_mirage * tmp = dynamic_cast<const cat_mirage *>(&first);
 	return tmp != NULL && tmp->is_first_mirage();
     }
 
@@ -883,12 +883,12 @@ namespace libdar
 	    const inode * al_inode = dynamic_cast<const inode *>(already_here);
 	    const directory * al_directory = dynamic_cast<const directory *>(already_here);
 	    const file * al_file = dynamic_cast<const file *>(already_here);
-	    const mirage * al_mirage = dynamic_cast<const mirage *>(already_here);
+	    const cat_mirage * al_mirage = dynamic_cast<const cat_mirage *>(already_here);
 
 	    const inode * do_inode = dynamic_cast<const inode *>(dolly);
 	    const directory * do_directory = dynamic_cast<const directory *>(dolly);
 	    const file * do_file = dynamic_cast<const file *>(dolly);
-	    const mirage * do_mirage = dynamic_cast<const mirage *>(dolly);
+	    const cat_mirage * do_mirage = dynamic_cast<const cat_mirage *>(dolly);
 
 	    dialog.printf(gettext("Entry information:\t\"in place\"\t\"to be added\""));
 	    dialog.printf(gettext("Is inode         :\t  %S  \t\t  %S"), al_inode == NULL ? &no : &yes , do_inode == NULL ? &no : &yes);
