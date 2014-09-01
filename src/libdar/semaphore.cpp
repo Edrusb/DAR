@@ -24,6 +24,7 @@
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "deci.hpp"
+#include "cat_all_entrees.hpp"
 
 #include "semaphore.hpp"
 

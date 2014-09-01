@@ -53,6 +53,7 @@ extern "C"
 #include "criterium.hpp"
 #include "fsa_family.hpp"
 #include "on_pool.hpp"
+#include "cat_all_entrees.hpp"
 
 namespace libdar
 {

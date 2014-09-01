@@ -46,6 +46,7 @@ extern "C"
 #include "deci.hpp"
 #include "path.hpp"
 #include "datetime.hpp"
+#include "cat_all_entrees.hpp"
 
 using namespace std;
 using namespace libdar;

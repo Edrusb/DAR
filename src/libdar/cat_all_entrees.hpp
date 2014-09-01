@@ -19,42 +19,36 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
+    /// \file cat_all_entree.hpp
+    /// \brief include file gathering all entree found in a catalogue
+    /// \ingroup Private
+
+#ifndef CAT_ALL_ENTREE_HPP
+#define CAT_ALL_ENTREE_HPP
+
 #include "../my_config.h"
-#include "defile.hpp"
-#include "cat_all_entrees.hpp"
 
-using namespace std;
-
-namespace libdar
+extern "C"
 {
+} // end extern "C"
 
-    void defile::enfile(const entree *e)
-    {
-        const eod *fin = dynamic_cast<const eod *>(e);
-        const directory *dir = dynamic_cast<const directory *>(e);
-        const nomme *nom = dynamic_cast<const nomme *>(e);
-        string s;
+#include "cat_detruit.hpp"
+#include "cat_device.hpp"
+#include "cat_directory.hpp"
+#include "cat_door.hpp"
+#include "cat_entree.hpp"
+#include "cat_etoile.hpp"
+#include "cat_file.hpp"
+#include "cat_ignored_dir.hpp"
+#include "cat_inode.hpp"
+#include "cat_lien.hpp"
+#include "cat_mirage.hpp"
+#include "cat_nomme.hpp"
+#include "cat_eod.hpp"
+#include "cat_chardev.hpp"
+#include "cat_blockdev.hpp"
+#include "cat_tube.hpp"
+#include "cat_prise.hpp"
+#include "cat_ignored.hpp"
 
-        if(! init) // we must remove previous entry brought by a previous call to this method
-	{
-            if(! chemin.pop(s))
-		throw SRC_BUG; // no more directory to pop!
-	}
-        else // nothing to be removed
-            init = false;
-
-        if(fin == NULL) // not eod
-	{
-            if(nom == NULL) // not a nomme
-                throw SRC_BUG; // neither eod nor nomme
-            else // a nomme
-            {
-                chemin += nom->get_name();
-                if(dir != NULL)
-                    init = true;
-            }
-	}
-	cache = chemin.display();
-    }
-
-} // end of namespace
+#endif

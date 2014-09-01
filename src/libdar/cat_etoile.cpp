@@ -20,41 +20,52 @@
 /*********************************************************************/
 
 #include "../my_config.h"
-#include "defile.hpp"
-#include "cat_all_entrees.hpp"
+
+extern "C"
+{
+} // end extern "C"
+
+#include <algorithm>
+
+#include "cat_etoile.hpp"
+#include "cat_directory.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    void defile::enfile(const entree *e)
+
+    etoile::etoile(inode *host, const infinint & etiquette_number)
     {
-        const eod *fin = dynamic_cast<const eod *>(e);
-        const directory *dir = dynamic_cast<const directory *>(e);
-        const nomme *nom = dynamic_cast<const nomme *>(e);
-        string s;
+        if(host == NULL)
+            throw SRC_BUG;
+        if(dynamic_cast<directory *>(host) != NULL)
+            throw Erange("etoile::etoile", gettext("Hard links of directories are not supported"));
+        hosted = host;
+        etiquette = etiquette_number;
+	refs.clear();
+    }
 
-        if(! init) // we must remove previous entry brought by a previous call to this method
-	{
-            if(! chemin.pop(s))
-		throw SRC_BUG; // no more directory to pop!
-	}
-        else // nothing to be removed
-            init = false;
+    void etoile::add_ref(void *ref)
+    {
+	if(find(refs.begin(), refs.end(), ref) != refs.end())
+	    throw SRC_BUG; // this reference is already known
 
-        if(fin == NULL) // not eod
-	{
-            if(nom == NULL) // not a nomme
-                throw SRC_BUG; // neither eod nor nomme
-            else // a nomme
-            {
-                chemin += nom->get_name();
-                if(dir != NULL)
-                    init = true;
-            }
-	}
-	cache = chemin.display();
+	refs.push_back(ref);
+    }
+
+    void etoile::drop_ref(void *ref)
+    {
+	list<void *>::iterator it = find(refs.begin(), refs.end(), ref);
+
+	if(it == refs.end())
+	    throw SRC_BUG; // cannot drop a reference that does not exist
+
+	refs.erase(it);
+	if(refs.size() == 0)
+	    delete this;
     }
 
 } // end of namespace
+

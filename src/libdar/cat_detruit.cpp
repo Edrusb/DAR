@@ -20,41 +20,35 @@
 /*********************************************************************/
 
 #include "../my_config.h"
-#include "defile.hpp"
-#include "cat_all_entrees.hpp"
+
+extern "C"
+{
+} // end extern "C"
+
+#include "cat_detruit.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    void defile::enfile(const entree *e)
+    detruit::detruit(generic_file & f, const archive_version & reading_ver) : nomme(f)
     {
-        const eod *fin = dynamic_cast<const eod *>(e);
-        const directory *dir = dynamic_cast<const directory *>(e);
-        const nomme *nom = dynamic_cast<const nomme *>(e);
-        string s;
+	if(f.read((char *)&signe, 1) != 1)
+	    throw Erange("detruit::detruit", gettext("missing data to build"));
 
-        if(! init) // we must remove previous entry brought by a previous call to this method
-	{
-            if(! chemin.pop(s))
-		throw SRC_BUG; // no more directory to pop!
-	}
-        else // nothing to be removed
-            init = false;
+	if(reading_ver > 7)
+	    del_date.read(f,reading_ver);
+	else
+	    del_date = datetime(0);
+    }
 
-        if(fin == NULL) // not eod
-	{
-            if(nom == NULL) // not a nomme
-                throw SRC_BUG; // neither eod nor nomme
-            else // a nomme
-            {
-                chemin += nom->get_name();
-                if(dir != NULL)
-                    init = true;
-            }
-	}
-	cache = chemin.display();
+    void detruit::inherited_dump(generic_file & f, bool small) const
+    {
+	nomme::inherited_dump(f, small);
+	f.write((char *)&signe, 1);
+	del_date.dump(f);
     }
 
 } // end of namespace
+

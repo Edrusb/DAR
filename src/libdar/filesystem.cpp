@@ -111,7 +111,7 @@ char *strchr (), *strrchr ();
 #include "tools.hpp"
 #include "erreurs.hpp"
 #include "user_interaction.hpp"
-#include "catalogue.hpp"
+#include "cat_all_entrees.hpp"
 #include "ea_filesystem.hpp"
 #include "cygwin_adapt.hpp"
 #include "fichier_local.hpp"

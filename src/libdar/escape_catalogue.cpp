@@ -23,6 +23,7 @@
 
 #include "escape_catalogue.hpp"
 #include "macro_tools.hpp"
+#include "cat_all_entrees.hpp"
 
 using namespace std;
 

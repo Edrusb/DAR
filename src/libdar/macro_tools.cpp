@@ -55,6 +55,7 @@ extern "C"
 #include "secu_memory_file.hpp"
 #include "crypto_sym.hpp"
 #include "crypto_asym.hpp"
+#include "cat_all_entrees.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
 #include "generic_thread.hpp"

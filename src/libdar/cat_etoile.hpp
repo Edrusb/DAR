@@ -1,0 +1,102 @@
+/*********************************************************************/
+// dar - disk archive - a backup/restoration program
+// Copyright (C) 2002-2052 Denis Corbin
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+// to contact the author : http://dar.linux.free.fr/email.html
+/*********************************************************************/
+
+    /// \file cat_etoile.hpp
+    /// \brief class holding an inode object that get pointed by multiple mirage objects (smart pointers) to record hard links in a catalogue
+    /// \ingroup Private
+
+#ifndef CAT_ETOILE_HPP
+#define CAT_ETOILE_HPP
+
+#include "../my_config.h"
+
+extern "C"
+{
+} // end extern "C"
+
+#include <list>
+#include "on_pool.hpp"
+#include "cat_inode.hpp"
+
+namespace libdar
+{
+	/// \addtogroup Private
+	/// @{
+
+
+	/// the hard link implementation (etoile means star in French, seen a star as a point from which are thrown many ray of light)
+    class etoile : public on_pool
+    {
+    public:
+
+	    /// build a object
+
+	    ///\param[in] host is an inode, it must not be a directory (this would throw an Erange exception)
+	    ///\param[in] etiquette_number is the identifier of this multiply linked structure
+	    ///\note given inode is now managed by the etoile object
+	etoile(inode *host, const infinint & etiquette_number);
+	etoile(const etoile & ref) { throw SRC_BUG; }; // copy constructor not allowed for this class
+	const etoile & operator = (const etoile & ref) { throw SRC_BUG; }; // assignment not allowed for this class
+	~etoile() { delete hosted; };
+
+	void add_ref(void *ref);
+	void drop_ref(void *ref);
+	infinint get_ref_count() const { return refs.size(); };
+	inode *get_inode() const { return hosted; };
+	infinint get_etiquette() const { return etiquette; };
+	void change_etiquette(const infinint & new_val) { etiquette = new_val; };
+
+
+	bool is_counted() const { return tags.counted; };
+	bool is_wrote() const { return tags.wrote; };
+	bool is_dumped() const { return tags.dumped; };
+	void set_counted(bool val) { tags.counted = val ? 1 : 0; };
+	void set_wrote(bool val) { tags.wrote = val ? 1 : 0; };
+	void set_dumped(bool val) { tags.dumped = val ? 1 : 0; };
+
+	    // return the address of the first mirage that triggered the creation of this mirage
+	    // if this object is destroyed afterward this call returns NULL
+	const void *get_first_ref() const { if(refs.size() == 0) throw SRC_BUG; return refs.front(); };
+
+
+    private:
+	struct bool_tags
+	{
+	    unsigned counted : 1; //< whether the inode has been counted
+	    unsigned wrote : 1;   //< whether the inode has its data copied to archive
+	    unsigned dumped : 1;  //< whether the inode information has been dumped in the catalogue
+	    unsigned : 5;         //< padding to get byte boundary and reserved for future use.
+
+	    bool_tags() { counted = wrote = dumped = 0; };
+	};
+
+	std::list<void *> refs; //< list of pointers to the mirages objects, in the order of their creation
+	inode *hosted;
+	infinint etiquette;
+	bool_tags tags;
+    };
+
+
+	/// @}
+
+} // end of namespace
+
+#endif

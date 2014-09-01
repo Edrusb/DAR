@@ -19,42 +19,44 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-#include "../my_config.h"
-#include "defile.hpp"
-#include "cat_all_entrees.hpp"
+    /// \file cat_ignored.hpp
+    /// \brief class used to remember that an entry has been ignored and shall not be recorded as deleted using a detruit object in a catalogue
+    /// \ingroup Private
 
-using namespace std;
+#ifndef CAT_IGNORED_HPP
+#define CAT_IGNORED_HPP
+
+#include "../my_config.h"
+
+extern "C"
+{
+} // end extern "C"
+
+#include "cat_nomme.hpp"
 
 namespace libdar
 {
 
-    void defile::enfile(const entree *e)
+	/// \addtogroup Private
+	/// @{
+
+	/// the present file to ignore (not to be recorded as deleted later)
+    class ignored : public nomme
     {
-        const eod *fin = dynamic_cast<const eod *>(e);
-        const directory *dir = dynamic_cast<const directory *>(e);
-        const nomme *nom = dynamic_cast<const nomme *>(e);
-        string s;
+    public :
+        ignored(const std::string & name) : nomme(name) {};
+        ignored(generic_file & f) : nomme(f) { throw SRC_BUG; };
 
-        if(! init) // we must remove previous entry brought by a previous call to this method
-	{
-            if(! chemin.pop(s))
-		throw SRC_BUG; // no more directory to pop!
-	}
-        else // nothing to be removed
-            init = false;
+        unsigned char signature() const { return 'i'; };
+        entree *clone() const { return new (get_pool()) ignored(*this); };
 
-        if(fin == NULL) // not eod
-	{
-            if(nom == NULL) // not a nomme
-                throw SRC_BUG; // neither eod nor nomme
-            else // a nomme
-            {
-                chemin += nom->get_name();
-                if(dir != NULL)
-                    init = true;
-            }
-	}
-	cache = chemin.display();
-    }
+    protected:
+        void inherited_dump(generic_file & f, bool small) const { throw SRC_BUG; };
+
+    };
+
+	/// @}
 
 } // end of namespace
+
+#endif

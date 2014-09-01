@@ -41,9 +41,12 @@ extern "C"
 #include "sparse_file.hpp"
 #include "semaphore.hpp"
 #include "deci.hpp"
+#include "cat_all_entrees.hpp"
+
 #if LIBTHREADAR_AVAILABLE
 #include "generic_thread.hpp"
 #endif
+
 
 using namespace std;
 

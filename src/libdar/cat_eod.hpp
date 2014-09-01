@@ -19,42 +19,42 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-#include "../my_config.h"
-#include "defile.hpp"
-#include "cat_all_entrees.hpp"
+    /// \file cat_eod.hpp
+    /// \brief object exchanged with a catalogue (never stored in it) to signal the end of a directory
+    /// \ingroup Private
 
-using namespace std;
+#ifndef CAT_EOD_HPP
+#define CAT_EOD_HPP
+
+#include "../my_config.h"
+
+extern "C"
+{
+} // end extern "C"
+
+#include "cat_entree.hpp"
 
 namespace libdar
 {
 
-    void defile::enfile(const entree *e)
+	/// \addtogroup Private
+	/// @{
+
+
+	/// the End of Directory entry class
+    class eod : public entree
     {
-        const eod *fin = dynamic_cast<const eod *>(e);
-        const directory *dir = dynamic_cast<const directory *>(e);
-        const nomme *nom = dynamic_cast<const nomme *>(e);
-        string s;
+    public :
+        eod() {};
+        eod(generic_file & f) {};
+            // dump defined by entree
+        unsigned char signature() const { return 'z'; };
+        entree *clone() const { return new (get_pool()) eod(); };
 
-        if(! init) // we must remove previous entry brought by a previous call to this method
-	{
-            if(! chemin.pop(s))
-		throw SRC_BUG; // no more directory to pop!
-	}
-        else // nothing to be removed
-            init = false;
+    };
 
-        if(fin == NULL) // not eod
-	{
-            if(nom == NULL) // not a nomme
-                throw SRC_BUG; // neither eod nor nomme
-            else // a nomme
-            {
-                chemin += nom->get_name();
-                if(dir != NULL)
-                    init = true;
-            }
-	}
-	cache = chemin.display();
-    }
+	/// @}
 
 } // end of namespace
+
+#endif

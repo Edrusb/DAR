@@ -51,6 +51,7 @@ extern "C"
 #include "entrepot.hpp"
 #include "entrepot_local.hpp"
 #include "crypto_sym.hpp"
+#include "cat_all_entrees.hpp"
 
 #define ARCHIVE_NOT_EXPLOITABLE "Archive of reference given is not exploitable"
 

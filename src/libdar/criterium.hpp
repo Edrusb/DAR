@@ -28,8 +28,10 @@
 
 #include "../my_config.h"
 
-#include "catalogue.hpp"
 #include "on_pool.hpp"
+#include "cat_nomme.hpp"
+#include "cat_inode.hpp"
+#include "cat_directory.hpp"
 
 namespace libdar
 {
@@ -235,7 +237,7 @@ namespace libdar
     class crit_in_place_is_inode : public criterium
     {
     public:
-	bool evaluate(const nomme &first, const nomme &second) const { return dynamic_cast<const inode *>(&first) != NULL || dynamic_cast<const mirage *>(&first) != NULL; };
+	bool evaluate(const nomme &first, const nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_is_inode(*this); };
     };
 
@@ -266,7 +268,7 @@ namespace libdar
     class crit_in_place_is_hardlinked_inode : public criterium
     {
     public:
-	bool evaluate(const nomme &first, const nomme &second) const { return dynamic_cast<const mirage *>(&first) != NULL; };
+	bool evaluate(const nomme &first, const nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_is_hardlinked_inode(*this); };
     };
 
@@ -274,11 +276,8 @@ namespace libdar
 	/// returns true if the first entry is a inode with several hard links (whatever is the second entry) and also if this first entry is the first we meet that points to this hard linked inode
     class crit_in_place_is_new_hardlinked_inode : public criterium
     {
-	bool evaluate(const nomme &first, const nomme &second) const
-	{
-	    const mirage * tmp = dynamic_cast<const mirage *>(&first);
-	    return tmp != NULL && tmp->is_first_mirage();
-	};
+    public:
+	bool evaluate(const nomme &first, const nomme &second) const;
 	criterium *clone() const { return new (get_pool()) crit_in_place_is_new_hardlinked_inode(*this); };
     };
 

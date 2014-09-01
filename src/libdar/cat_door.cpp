@@ -20,41 +20,35 @@
 /*********************************************************************/
 
 #include "../my_config.h"
-#include "defile.hpp"
-#include "cat_all_entrees.hpp"
+
+extern "C"
+{
+} // end extern "C"
+
+#include "cat_door.hpp"
+#include "null_file.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    void defile::enfile(const entree *e)
+
+    generic_file *door::get_data(get_data_mode mode) const
     {
-        const eod *fin = dynamic_cast<const eod *>(e);
-        const directory *dir = dynamic_cast<const directory *>(e);
-        const nomme *nom = dynamic_cast<const nomme *>(e);
-        string s;
+	generic_file *ret = NULL;
 
-        if(! init) // we must remove previous entry brought by a previous call to this method
+	if(status == from_path)
 	{
-            if(! chemin.pop(s))
-		throw SRC_BUG; // no more directory to pop!
+	    ret = new (get_pool()) null_file(gf_read_only);
+	    if(ret == NULL)
+		throw Ememory("door::get_data");
 	}
-        else // nothing to be removed
-            init = false;
+	else
+	    ret = file::get_data(mode);
 
-        if(fin == NULL) // not eod
-	{
-            if(nom == NULL) // not a nomme
-                throw SRC_BUG; // neither eod nor nomme
-            else // a nomme
-            {
-                chemin += nom->get_name();
-                if(dir != NULL)
-                    init = true;
-            }
-	}
-	cache = chemin.display();
+	return ret;
     }
 
 } // end of namespace
+

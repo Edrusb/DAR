@@ -19,42 +19,49 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-#include "../my_config.h"
-#include "defile.hpp"
-#include "cat_all_entrees.hpp"
+    /// \file cat_ignored_dir.hpp
+    /// \brief class used to remember in a catalogue that a directory has been ignored
+    /// \ingroup Private
 
-using namespace std;
+#ifndef CAT_IGNORED_DIR_HPP
+#define CAT_IGNORED_DIR_HPP
+
+#include "../my_config.h"
+
+extern "C"
+{
+} // end extern "C"
+
+#include "cat_inode.hpp"
+#include "cat_directory.hpp"
 
 namespace libdar
 {
 
-    void defile::enfile(const entree *e)
+	/// \addtogroup Private
+	/// @{
+
+	/// the ignored directory class, to be promoted later as empty directory if needed
+    class ignored_dir : public inode
     {
-        const eod *fin = dynamic_cast<const eod *>(e);
-        const directory *dir = dynamic_cast<const directory *>(e);
-        const nomme *nom = dynamic_cast<const nomme *>(e);
-        string s;
+    public:
+        ignored_dir(const directory &target) : inode(target) {};
+        ignored_dir(user_interaction & dialog,
+		    generic_file & f,
+		    const archive_version & reading_ver,
+		    compressor *efsa_loc,
+		    escape *ptr) : inode(dialog, f, reading_ver, s_not_saved, efsa_loc, ptr) { throw SRC_BUG; };
 
-        if(! init) // we must remove previous entry brought by a previous call to this method
-	{
-            if(! chemin.pop(s))
-		throw SRC_BUG; // no more directory to pop!
-	}
-        else // nothing to be removed
-            init = false;
+        unsigned char signature() const { return 'j'; };
+        entree *clone() const { return new (get_pool()) ignored_dir(*this); };
 
-        if(fin == NULL) // not eod
-	{
-            if(nom == NULL) // not a nomme
-                throw SRC_BUG; // neither eod nor nomme
-            else // a nomme
-            {
-                chemin += nom->get_name();
-                if(dir != NULL)
-                    init = true;
-            }
-	}
-	cache = chemin.display();
-    }
+    protected:
+        void inherited_dump(generic_file & f, bool small) const; // behaves like an empty directory
+
+    };
+
+	/// @}
 
 } // end of namespace
+
+#endif

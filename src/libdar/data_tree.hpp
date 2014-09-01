@@ -35,10 +35,12 @@
 #include "infinint.hpp"
 #include "generic_file.hpp"
 #include "infinint.hpp"
-#include "catalogue.hpp"
 #include "user_interaction.hpp"
 #include "path.hpp"
 #include "on_pool.hpp"
+#include "cat_directory.hpp"
+#include "cat_inode.hpp"
+#include "cat_detruit.hpp"
 
 namespace libdar
 {

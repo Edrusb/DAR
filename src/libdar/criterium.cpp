@@ -23,6 +23,7 @@
 
 #include "criterium.hpp"
 #include "nls_swap.hpp"
+#include "cat_all_entrees.hpp"
 
 using namespace std;
 
@@ -219,6 +220,12 @@ namespace libdar
 	return ret;
     }
 
+    bool crit_in_place_is_inode::evaluate(const nomme &first, const nomme &second) const
+    {
+	return dynamic_cast<const inode *>(&first) != NULL
+	    || dynamic_cast<const mirage *>(&first) != NULL;
+    }
+
     bool crit_in_place_is_file::evaluate(const nomme &first, const nomme &second) const
     {
 	const inode *first_i = get_inode(&first);
@@ -226,6 +233,16 @@ namespace libdar
 	return dynamic_cast<const file *>(first_i) != NULL && dynamic_cast<const door *>(first_i) == NULL;
     }
 
+    bool crit_in_place_is_hardlinked_inode::evaluate(const nomme &first, const nomme &second) const
+    {
+	return dynamic_cast<const mirage *>(&first) != NULL;
+    }
+
+    bool crit_in_place_is_new_hardlinked_inode::evaluate(const nomme &first, const nomme &second) const
+    {
+	const mirage * tmp = dynamic_cast<const mirage *>(&first);
+	return tmp != NULL && tmp->is_first_mirage();
+    }
 
     bool crit_in_place_data_more_recent::evaluate(const nomme &first, const nomme &second) const
     {

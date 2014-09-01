@@ -20,41 +20,25 @@
 /*********************************************************************/
 
 #include "../my_config.h"
-#include "defile.hpp"
-#include "cat_all_entrees.hpp"
+
+extern "C"
+{
+
+} // end extern "C"
+
+#include "cat_ignored_dir.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    void defile::enfile(const entree *e)
+    void ignored_dir::inherited_dump(generic_file & f, bool small) const
     {
-        const eod *fin = dynamic_cast<const eod *>(e);
-        const directory *dir = dynamic_cast<const directory *>(e);
-        const nomme *nom = dynamic_cast<const nomme *>(e);
-        string s;
-
-        if(! init) // we must remove previous entry brought by a previous call to this method
-	{
-            if(! chemin.pop(s))
-		throw SRC_BUG; // no more directory to pop!
-	}
-        else // nothing to be removed
-            init = false;
-
-        if(fin == NULL) // not eod
-	{
-            if(nom == NULL) // not a nomme
-                throw SRC_BUG; // neither eod nor nomme
-            else // a nomme
-            {
-                chemin += nom->get_name();
-                if(dir != NULL)
-                    init = true;
-            }
-	}
-	cache = chemin.display();
+	directory tmp = directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_last_change(), get_name(), 0);
+	tmp.set_saved_status(get_saved_status());
+	tmp.specific_dump(f, small); // dump an empty directory
     }
 
 } // end of namespace
+

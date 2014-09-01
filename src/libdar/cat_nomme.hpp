@@ -19,46 +19,52 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file defile.hpp
-    /// \brief here is defined the defile class
+    /// \file cat_nomme.hpp
+    /// \brief base class of all objects contained in a catalogue and that can be named
     /// \ingroup Private
 
-#ifndef DEFILE_HPP
-#define DEFILE_HPP
+#ifndef CAT_NOMME_HPP
+#define CAT_NOMME_HPP
 
 #include "../my_config.h"
-#include "path.hpp"
+
+extern "C"
+{
+} // end extern "C"
+
+#include <string>
 #include "cat_entree.hpp"
-#include "on_pool.hpp"
 
 namespace libdar
 {
+	/// \addtogroup Private
+	/// @{
 
-	/// \ingroup Private
-	/// @}
-
-	/// the defile class keep trace of the real path of files while the flow in the filter routines
-
-	/// the filter routines manipulates flow of inode, where their relative order
-	/// represent the directory structure. To be able to know what is the real path
-	/// of the current inode, all previously passed inode must be known.
-	/// this class is used to display the progression of the filtering routing,
-	/// and the file on which the filtering routine operates
-	/// \ingroup Private
-    class defile : public on_pool
+	/// the base class for all entry that have a name
+    class nomme : public entree
     {
-    public :
-        defile(const path &racine) : chemin(racine) { init = true; };
+    public:
+        nomme(const std::string & name) { xname = name; };
+        nomme(generic_file & f);
+	virtual bool operator == (const nomme & ref) const { return xname == ref.xname; };
+	virtual bool operator < (const nomme & ref) const { return xname < ref.xname; };
 
-        void enfile(const entree *e);
-        const path & get_path() const { return chemin; };
-        const std::string & get_string() const { return cache; };
+        const std::string & get_name() const { return xname; };
+        void change_name(const std::string & x) { xname = x; };
+        bool same_as(const nomme & ref) const { return xname == ref.xname; };
+            // no need to have a virtual method, as signature will differ in inherited classes (argument type changes)
 
-    private :
-        path chemin; //< current path
-        bool init;   //< true if reached the "root" (all pushed arguments have been poped)
-	std::string cache; //< cache of "chemin" converted into string
+            // signature() is kept as an abstract method
+            // clone() is abstract
+
+
+    protected:
+        void inherited_dump(generic_file & f, bool small) const;
+
+    private:
+        std::string xname;
     };
+
 
 	/// @}
 
