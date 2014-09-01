@@ -63,7 +63,7 @@ namespace libdar
 		    throw SRC_BUG; // EOD should always have its data to be saved
 	    else
 	    {
-		if(dynamic_cast<const directory *>(object) != NULL)
+		if(dynamic_cast<const cat_directory *>(object) != NULL)
 		    ++count;
 	    }
 	}
@@ -76,7 +76,7 @@ namespace libdar
 
 	    if(data_to_save && match->is_covered(x_chem))
 	    {
-		const directory *o_dir = dynamic_cast<const directory *>(object);
+		const cat_directory *o_dir = dynamic_cast<const cat_directory *>(object);
 		const inode *o_ino = dynamic_cast<const inode *>(object);
 
 		if(o_dir != NULL)

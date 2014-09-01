@@ -210,7 +210,7 @@ namespace libdar
 	/// \param[out] ptr is a pointer to the looked node if found
 	/// \return true if a node could be found in the database
     extern bool data_tree_find(path chemin, const data_dir & racine, const data_tree *& ptr);
-    extern void data_tree_update_with(const directory *dir, archive_num archive, data_dir *racine);
+    extern void data_tree_update_with(const cat_directory *dir, archive_num archive, data_dir *racine);
     extern archive_num data_tree_permutation(archive_num src, archive_num dst, archive_num x);
 
 	/// @}

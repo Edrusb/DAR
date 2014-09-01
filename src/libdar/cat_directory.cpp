@@ -33,13 +33,13 @@ using namespace std;
 namespace libdar
 {
 
-	// static field of class directory
+	// static field of class cat_directory
 
-    const eod directory::fin;
+    const eod cat_directory::fin;
 
-	// methods of class directory
+	// methods of class cat_directory
 
-    directory::directory(const infinint & xuid, const infinint & xgid, U_16 xperm,
+    cat_directory::cat_directory(const infinint & xuid, const infinint & xgid, U_16 xperm,
 			 const datetime & last_access,
 			 const datetime & last_modif,
 			 const datetime & last_change,
@@ -57,7 +57,7 @@ namespace libdar
 	updated_sizes = false;
     }
 
-    directory::directory(const directory &ref) : inode(ref)
+    cat_directory::cat_directory(const cat_directory &ref) : inode(ref)
     {
 	parent = NULL;
 #ifdef LIBDAR_FAST_DIR
@@ -69,19 +69,19 @@ namespace libdar
 	updated_sizes = false;
     }
 
-    const directory & directory::operator = (const directory & ref)
+    const cat_directory & cat_directory::operator = (const cat_directory & ref)
     {
 	const inode *ref_ino = &ref;
 	inode * this_ino = this;
 
 	*this_ino = *ref_ino; // this assigns the inode part of the object
-	    // we don't modify the existing subfiles or subdirectories nor we copy them from the reference directory
+	    // we don't modify the existing subfiles or subdirectories nor we copy them from the reference cat_directory
 	recursive_flag_size_to_update();
 	return *this;
     }
 
 
-    directory::directory(user_interaction & dialog,
+    cat_directory::cat_directory(user_interaction & dialog,
 			 generic_file & f,
 			 const archive_version & reading_ver,
 			 saved_status saved,
@@ -96,7 +96,7 @@ namespace libdar
     {
 	cat_entree *p;
 	cat_nomme *t;
-	directory *d;
+	cat_directory *d;
 	detruit *x;
 	cat_mirage *m;
 	eod *fin = NULL;
@@ -139,7 +139,7 @@ namespace libdar
 
 		if(p != NULL)
 		{
-		    d = dynamic_cast<directory *>(p);
+		    d = dynamic_cast<cat_directory *>(p);
 		    fin = dynamic_cast<eod *>(p);
 		    t = dynamic_cast<cat_nomme *>(p);
 		    x = dynamic_cast<detruit *>(p);
@@ -158,7 +158,7 @@ namespace libdar
 #endif
 			    ordered_fils.push_back(t);
 			}
-			if(d != NULL) // p is a directory
+			if(d != NULL) // p is a cat_directory
 			    d->parent = this;
 			if(t == NULL && fin == NULL)
 			    throw SRC_BUG; // neither an eod nor a cat_nomme ! what's that ???
@@ -175,7 +175,7 @@ namespace libdar
 		}
 		else
 		    if(!lax)
-			throw Erange("directory::directory", gettext("missing data to build a directory"));
+			throw Erange("cat_directory::cat_directory", gettext("missing data to build a cat_directory"));
 		    else
 			lax_end = true;
 	    }
@@ -194,12 +194,12 @@ namespace libdar
 	}
     }
 
-    directory::~directory()
+    cat_directory::~cat_directory()
     {
 	clear();
     }
 
-    void directory::inherited_dump(generic_file & f, bool small) const
+    void cat_directory::inherited_dump(generic_file & f, bool small) const
     {
 	list<cat_nomme *>::const_iterator x = ordered_fils.begin();
 	inode::inherited_dump(f, small);
@@ -223,30 +223,30 @@ namespace libdar
 	    // an inode may have children while small dump is asked
 	    // when performing a merging operation
 
-	fin.specific_dump(f, small); // end of "this" directory
-	    // fin is a static constant variable of class directory,
+	fin.specific_dump(f, small); // end of "this" cat_directory
+	    // fin is a static constant variable of class cat_directory,
 	    // this hack avoids recurrent construction/destruction of a eod object.
     }
 
-    void directory::recursive_update_sizes() const
+    void cat_directory::recursive_update_sizes() const
     {
 	if(!updated_sizes)
 	{
-	    directory *me = const_cast<directory *>(this);
+	    cat_directory *me = const_cast<cat_directory *>(this);
 
 	    if(me == NULL)
 		throw SRC_BUG;
 	    me->x_size = 0;
 	    me->x_storage_size = 0;
 	    list<cat_nomme *>::const_iterator it = ordered_fils.begin();
-	    const directory *f_dir = NULL;
+	    const cat_directory *f_dir = NULL;
 	    const file *f_file = NULL;
 
 	    while(it != ordered_fils.end())
 	    {
 		if(*it == NULL)
 		    throw SRC_BUG;
-		f_dir = dynamic_cast<const directory *>(*it);
+		f_dir = dynamic_cast<const cat_directory *>(*it);
 		f_file = dynamic_cast<const file *>(*it);
 		if(f_dir != NULL)
 		{
@@ -272,9 +272,9 @@ namespace libdar
 	}
     }
 
-    void directory::recursive_flag_size_to_update() const
+    void cat_directory::recursive_flag_size_to_update() const
     {
-	directory *me = const_cast<directory *>(this);
+	cat_directory *me = const_cast<cat_directory *>(this);
 	if(me == NULL)
 	    throw SRC_BUG;
 	me->updated_sizes = false;
@@ -282,9 +282,9 @@ namespace libdar
 	    parent->recursive_flag_size_to_update();
     }
 
-    void directory::add_children(cat_nomme *r)
+    void cat_directory::add_children(cat_nomme *r)
     {
-	directory *d = dynamic_cast<directory *>(r);
+	cat_directory *d = dynamic_cast<cat_directory *>(r);
 	const cat_nomme *ancien_nomme;
 
 	if(r == NULL)
@@ -292,20 +292,20 @@ namespace libdar
 
 	if(search_children(r->get_name(), ancien_nomme))  // same entry already present
 	{
-	    const directory *a_dir = dynamic_cast<const directory *>(ancien_nomme);
+	    const cat_directory *a_dir = dynamic_cast<const cat_directory *>(ancien_nomme);
 
 	    if(a_dir != NULL && d != NULL) // both directories : merging them
 	    {
-		a_dir = d; // updates the inode part, does not touch the directory specific part as defined in the directory::operator =
+		a_dir = d; // updates the inode part, does not touch the cat_directory specific part as defined in the cat_directory::operator =
 		list<cat_nomme *>::iterator xit = d->ordered_fils.begin();
 		while(xit != d->ordered_fils.end())
 		{
-		    const_cast<directory *>(a_dir)->add_children(*xit);
+		    const_cast<cat_directory *>(a_dir)->add_children(*xit);
 		    ++xit;
 		}
 
-		    // need to clear the lists of objects before destroying the directory objects itself
-		    // to avoid the destructor destroyed the director children that have been merged to the a_dir directory
+		    // need to clear the lists of objects before destroying the cat_directory objects itself
+		    // to avoid the destructor destroyed the director children that have been merged to the a_dir cat_directory
 #ifdef LIBDAR_FAST_DIR
 		d->fils.clear();
 #endif
@@ -344,21 +344,21 @@ namespace libdar
 	recursive_flag_size_to_update();
     }
 
-    void directory::reset_read_children() const
+    void cat_directory::reset_read_children() const
     {
-	directory *moi = const_cast<directory *>(this);
+	cat_directory *moi = const_cast<cat_directory *>(this);
 	moi->it = moi->ordered_fils.begin();
     }
 
-    void directory::end_read() const
+    void cat_directory::end_read() const
     {
-	directory *moi = const_cast<directory *>(this);
+	cat_directory *moi = const_cast<cat_directory *>(this);
 	moi->it = moi->ordered_fils.end();
     }
 
-    bool directory::read_children(const cat_nomme *&r) const
+    bool cat_directory::read_children(const cat_nomme *&r) const
     {
-	directory *moi = const_cast<directory *>(this);
+	cat_directory *moi = const_cast<cat_directory *>(this);
 	if(moi->it != moi->ordered_fils.end())
 	{
 	    r = *(moi->it);
@@ -369,7 +369,7 @@ namespace libdar
 	    return false;
     }
 
-    void directory::tail_to_read_children()
+    void cat_directory::tail_to_read_children()
     {
 #ifdef LIBDAR_FAST_DIR
 	map<string, cat_nomme *>::iterator dest;
@@ -399,7 +399,7 @@ namespace libdar
 	recursive_flag_size_to_update();
     }
 
-    void directory::remove(const string & name)
+    void cat_directory::remove(const string & name)
     {
 
 	    // localizing old object in ordered_fils
@@ -409,7 +409,7 @@ namespace libdar
 	    ++ot;
 
 	if(ot == ordered_fils.end())
-	    throw Erange("directory::remove", tools_printf(gettext("Cannot remove nonexistent entry %S from catalogue"), &name));
+	    throw Erange("cat_directory::remove", tools_printf(gettext("Cannot remove nonexistent entry %S from catalogue"), &name));
 
 	if(*ot == NULL)
 	    throw SRC_BUG;
@@ -441,27 +441,27 @@ namespace libdar
 	recursive_flag_size_to_update();
     }
 
-    void directory::recursively_set_to_unsaved_data_and_FSA()
+    void cat_directory::recursively_set_to_unsaved_data_and_FSA()
     {
 	list<cat_nomme *>::iterator it = ordered_fils.begin();
-	directory *n_dir = NULL;
+	cat_directory *n_dir = NULL;
 	inode *n_ino = NULL;
 	cat_mirage *n_mir = NULL;
 
-	    // dropping info for the current directory
+	    // dropping info for the current cat_directory
 	set_saved_status(s_not_saved);
 	if(ea_get_saved_status() == inode::ea_full)
 	    ea_set_saved_status(inode::ea_partial);
 	if(fsa_get_saved_status() == inode::fsa_full)
 	    fsa_set_saved_status(inode::fsa_partial);
 
-	    // doing the same for each entry found in that directory
+	    // doing the same for each entry found in that cat_directory
 	while(it != ordered_fils.end())
 	{
 	    if(*it == NULL)
 		throw SRC_BUG;
 
-	    n_dir = dynamic_cast<directory *>(*it);
+	    n_dir = dynamic_cast<cat_directory *>(*it);
 	    n_ino = dynamic_cast<inode *>(*it);
 	    n_mir = dynamic_cast<cat_mirage *>(*it);
 
@@ -470,7 +470,7 @@ namespace libdar
 
 	    if(n_dir != NULL)
 		n_dir->recursively_set_to_unsaved_data_and_FSA();
-	    else // nothing to do for directory the recursive call does the job
+	    else // nothing to do for cat_directory the recursive call does the job
 	    {
 		if(n_ino != NULL)
 		{
@@ -486,7 +486,7 @@ namespace libdar
 	}
     }
 
-    void directory::clear()
+    void cat_directory::clear()
     {
 	it = ordered_fils.begin();
 	while(it != ordered_fils.end())
@@ -505,7 +505,7 @@ namespace libdar
 	recursive_flag_size_to_update();
     }
 
-    bool directory::search_children(const string &name, const cat_nomme * & ptr) const
+    bool cat_directory::search_children(const string &name, const cat_nomme * & ptr) const
     {
 #ifdef LIBDAR_FAST_DIR
 	map<string, cat_nomme *>::const_iterator ut = fils.find(name);
@@ -538,11 +538,11 @@ namespace libdar
 	return ptr != NULL;
     }
 
-    bool directory::callback_for_children_of(user_interaction & dialog, const string & sdir, bool isolated) const
+    bool cat_directory::callback_for_children_of(user_interaction & dialog, const string & sdir, bool isolated) const
     {
-	const directory *current = this;
+	const cat_directory *current = this;
 	const cat_nomme *next_nom = NULL;
-	const directory *next_dir = NULL;
+	const cat_directory *next_dir = NULL;
 	const inode *next_ino = NULL;
 	const detruit *next_detruit = NULL;
 	const cat_mirage *next_mir = NULL;
@@ -551,17 +551,17 @@ namespace libdar
 	const cat_nomme *tmp_nom;
 
 	if(!dialog.get_use_listing())
-	    throw Erange("directory::callback_for_children_of", gettext("listing() method must be given"));
+	    throw Erange("cat_directory::callback_for_children_of", gettext("listing() method must be given"));
 
 	if(sdir != "")
 	{
 	    path dir = sdir;
 
 	    if(!dir.is_relative())
-		throw Erange("directory::callback_for_children_of", gettext("argument must be a relative path"));
+		throw Erange("cat_directory::callback_for_children_of", gettext("argument must be a relative path"));
 
 		///////////////////////////
-		// looking for the inner most directory (basename of given path)
+		// looking for the inner most cat_directory (basename of given path)
 		//
 
 	    do
@@ -577,9 +577,9 @@ namespace libdar
 		    next_nom = const_cast<const cat_nomme *>(tmp_nom);
 		    next_mir = dynamic_cast<const cat_mirage *>(next_nom);
 		    if(next_mir != NULL)
-			next_dir = dynamic_cast<const directory *>(next_mir->get_inode());
+			next_dir = dynamic_cast<const cat_directory *>(next_mir->get_inode());
 		    else
-			next_dir = dynamic_cast<const directory *>(next_nom);
+			next_dir = dynamic_cast<const cat_directory *>(next_nom);
 
 		    if(next_dir != NULL)
 			current = next_dir;
@@ -593,7 +593,7 @@ namespace libdar
 	}
 
 	    ///////////////////////////
-	    // calling listing() for each element of the "current" directory
+	    // calling listing() for each element of the "current" cat_directory
 	    //
 
 	if(current == NULL)
@@ -610,7 +610,7 @@ namespace libdar
 	    else
 		next_ino = dynamic_cast<const inode *>(next_nom);
 	    next_detruit = dynamic_cast<const detruit *>(next_nom);
-	    next_dir = dynamic_cast<const directory *>(next_ino);
+	    next_dir = dynamic_cast<const cat_directory *>(next_ino);
 	    if(next_ino != NULL)
 	    {
 		string a = local_perm(*next_ino, next_mir != NULL);
@@ -637,22 +637,22 @@ namespace libdar
 	return loop;
     }
 
-    void directory::recursive_has_changed_update() const
+    void cat_directory::recursive_has_changed_update() const
     {
 	list<cat_nomme *>::const_iterator it = ordered_fils.begin();
 
-	const_cast<directory *>(this)->recursive_has_changed = false;
+	const_cast<cat_directory *>(this)->recursive_has_changed = false;
 	while(it != ordered_fils.end())
 	{
-	    const directory *d = dynamic_cast<directory *>(*it);
+	    const cat_directory *d = dynamic_cast<cat_directory *>(*it);
 	    const inode *ino = dynamic_cast<inode *>(*it);
 	    if(d != NULL)
 	    {
 		d->recursive_has_changed_update();
-		const_cast<directory *>(this)->recursive_has_changed |= d->get_recursive_has_changed();
+		const_cast<cat_directory *>(this)->recursive_has_changed |= d->get_recursive_has_changed();
 	    }
 	    if(ino != NULL && !recursive_has_changed)
-		const_cast<directory *>(this)->recursive_has_changed |=
+		const_cast<cat_directory *>(this)->recursive_has_changed |=
 		    ino->get_saved_status() != s_not_saved
 		    || ino->ea_get_saved_status() == ea_full
 		    || ino->ea_get_saved_status() == ea_removed;
@@ -660,17 +660,17 @@ namespace libdar
 	}
     }
 
-    infinint directory::get_tree_size() const
+    infinint cat_directory::get_tree_size() const
     {
 	infinint ret = ordered_fils.size();
-	const directory *fils_dir = NULL;
+	const cat_directory *fils_dir = NULL;
 
 	list<cat_nomme *>::const_iterator ot = ordered_fils.begin();
 	while(ot != ordered_fils.end())
 	{
 	    if(*ot == NULL)
 		throw SRC_BUG;
-	    fils_dir = dynamic_cast<const directory *>(*ot);
+	    fils_dir = dynamic_cast<const cat_directory *>(*ot);
 	    if(fils_dir != NULL)
 		ret += fils_dir->get_tree_size();
 
@@ -680,7 +680,7 @@ namespace libdar
 	return ret;
     }
 
-    infinint directory::get_tree_ea_num() const
+    infinint cat_directory::get_tree_ea_num() const
     {
 	infinint ret = 0;
 
@@ -688,7 +688,7 @@ namespace libdar
 
 	while(it != ordered_fils.end())
 	{
-	    const directory *fils_dir = dynamic_cast<const directory *>(*it);
+	    const cat_directory *fils_dir = dynamic_cast<const cat_directory *>(*it);
 	    const inode *fils_ino = dynamic_cast<const inode *>(*it);
 	    const cat_mirage *fils_mir = dynamic_cast<const cat_mirage *>(*it);
 
@@ -708,7 +708,7 @@ namespace libdar
 	return ret;
     }
 
-    infinint directory::get_tree_mirage_num() const
+    infinint cat_directory::get_tree_mirage_num() const
     {
 	infinint ret = 0;
 
@@ -716,7 +716,7 @@ namespace libdar
 
 	while(it != ordered_fils.end())
 	{
-	    const directory *fils_dir = dynamic_cast<const directory *>(*it);
+	    const cat_directory *fils_dir = dynamic_cast<const cat_directory *>(*it);
 	    const cat_mirage *fils_mir = dynamic_cast<const cat_mirage *>(*it);
 
 	    if(fils_mir != NULL)
@@ -732,14 +732,14 @@ namespace libdar
 	return ret;
     }
 
-    void directory::get_etiquettes_found_in_tree(map<infinint, infinint> & already_found) const
+    void cat_directory::get_etiquettes_found_in_tree(map<infinint, infinint> & already_found) const
     {
 	list<cat_nomme *>::const_iterator it = ordered_fils.begin();
 
 	while(it != ordered_fils.end())
 	{
 	    const cat_mirage *fils_mir = dynamic_cast<const cat_mirage *>(*it);
-	    const directory *fils_dir = dynamic_cast<const directory *>(*it);
+	    const cat_directory *fils_dir = dynamic_cast<const cat_directory *>(*it);
 
 	    if(fils_mir != NULL)
 	    {
@@ -759,7 +759,7 @@ namespace libdar
 	}
     }
 
-    void directory::remove_all_mirages_and_reduce_dirs()
+    void cat_directory::remove_all_mirages_and_reduce_dirs()
     {
 	list<cat_nomme *>::iterator curs = ordered_fils.begin();
 
@@ -767,7 +767,7 @@ namespace libdar
 	{
 	    if(*curs == NULL)
 		throw SRC_BUG;
-	    directory *d = dynamic_cast<directory *>(*curs);
+	    cat_directory *d = dynamic_cast<cat_directory *>(*curs);
 	    cat_mirage *m = dynamic_cast<cat_mirage *>(*curs);
 	    cat_nomme *n = dynamic_cast<cat_nomme *>(*curs);
 
@@ -801,7 +801,7 @@ namespace libdar
 	recursive_flag_size_to_update();
     }
 
-    void directory::set_all_mirage_s_inode_dumped_field_to(bool val)
+    void cat_directory::set_all_mirage_s_inode_dumped_field_to(bool val)
     {
 	list<cat_nomme *>::iterator curs = ordered_fils.begin();
 
@@ -809,7 +809,7 @@ namespace libdar
 	{
 	    if(*curs == NULL)
 		throw SRC_BUG;
-	    directory *d = dynamic_cast<directory *>(*curs);
+	    cat_directory *d = dynamic_cast<cat_directory *>(*curs);
 	    cat_mirage *m = dynamic_cast<cat_mirage *>(*curs);
 
 		// recursive call

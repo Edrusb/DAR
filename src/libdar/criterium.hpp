@@ -242,12 +242,12 @@ namespace libdar
     };
 
 
-	/// returns true if the first entry is a directory (whatever is the second)
+	/// returns true if the first entry is a cat_directory (whatever is the second)
 
     class crit_in_place_is_dir : public criterium
     {
     public:
-	bool evaluate(const cat_nomme &first, const cat_nomme &second) const { return dynamic_cast<const directory *>(&first) != NULL; };
+	bool evaluate(const cat_nomme &first, const cat_nomme &second) const { return dynamic_cast<const cat_directory *>(&first) != NULL; };
 	criterium *clone() const { return new (get_pool()) crit_in_place_is_dir(*this); };
     };
 

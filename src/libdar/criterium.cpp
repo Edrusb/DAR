@@ -463,7 +463,7 @@ namespace libdar
 
 	const file * first_file = dynamic_cast<const file *>(first_i);
 	const lien * first_lien = dynamic_cast<const lien *>(first_i);
-	const directory * first_dir = dynamic_cast<const directory *>(first_i);
+	const cat_directory * first_dir = dynamic_cast<const cat_directory *>(first_i);
 	const chardev * first_char = dynamic_cast<const chardev *>(first_i);
 	const blockdev * first_block = dynamic_cast<const blockdev *>(first_i);
 	const cat_tube * first_tube = dynamic_cast<const cat_tube *>(first_i);
@@ -472,7 +472,7 @@ namespace libdar
 
 	const file * second_file = dynamic_cast<const file *>(second_i);
 	const lien * second_lien = dynamic_cast<const lien *>(second_i);
-	const directory * second_dir = dynamic_cast<const directory *>(second_i);
+	const cat_directory * second_dir = dynamic_cast<const cat_directory *>(second_i);
 	const chardev * second_char = dynamic_cast<const chardev *>(second_i);
 	const blockdev * second_block = dynamic_cast<const blockdev *>(second_i);
 	const cat_tube * second_tube = dynamic_cast<const cat_tube *>(second_i);
@@ -881,12 +881,12 @@ namespace libdar
 	    const string no = gettext("NO");
 
 	    const inode * al_inode = dynamic_cast<const inode *>(already_here);
-	    const directory * al_directory = dynamic_cast<const directory *>(already_here);
+	    const cat_directory * al_directory = dynamic_cast<const cat_directory *>(already_here);
 	    const file * al_file = dynamic_cast<const file *>(already_here);
 	    const cat_mirage * al_mirage = dynamic_cast<const cat_mirage *>(already_here);
 
 	    const inode * do_inode = dynamic_cast<const inode *>(dolly);
-	    const directory * do_directory = dynamic_cast<const directory *>(dolly);
+	    const cat_directory * do_directory = dynamic_cast<const cat_directory *>(dolly);
 	    const file * do_file = dynamic_cast<const file *>(dolly);
 	    const cat_mirage * do_mirage = dynamic_cast<const cat_mirage *>(dolly);
 

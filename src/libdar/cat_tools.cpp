@@ -67,7 +67,7 @@ namespace libdar
 	string ret;
 
 	const file *fic = dynamic_cast<const file *>(&ref);
-	const directory *dir = dynamic_cast<const directory *>(&ref);
+	const cat_directory *dir = dynamic_cast<const cat_directory *>(&ref);
 	if(fic != NULL)
 	    ret = tools_display_integer_in_metric_system(fic->get_size(), "o", true);
 	else if(dir != NULL)
@@ -155,7 +155,7 @@ namespace libdar
 
 	ret += "[" + local_fsa_fam_to_string(ref) + "]";
 	const file *fic = dynamic_cast<const file *>(&ref);
-	const directory *dir = dynamic_cast<const directory *>(&ref);
+	const cat_directory *dir = dynamic_cast<const cat_directory *>(&ref);
 	if(fic != NULL && fic->get_saved_status() == s_saved)
 	    ret += string("[")
 		+ tools_get_compression_ratio(fic->get_storage_size(),

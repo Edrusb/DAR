@@ -171,7 +171,7 @@ namespace libdar
                 entree_ptr = cat_entree::read(dialog, get_pool(), f, reading_ver, fake_stats, corres, default_algo, data_loc, efsa_loc, lax, false, ptr);
 
             ino_ptr = dynamic_cast<inode *>(entree_ptr);
-            if(ino_ptr == NULL || dynamic_cast<directory *>(entree_ptr) != NULL)
+            if(ino_ptr == NULL || dynamic_cast<cat_directory *>(entree_ptr) != NULL)
             {
                 if(entree_ptr != NULL)
                 {

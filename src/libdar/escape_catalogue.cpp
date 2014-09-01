@@ -356,7 +356,7 @@ namespace libdar
     bool escape_catalogue::read(const cat_entree * & ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
-	const directory *ref_dir = NULL;
+	const cat_directory *ref_dir = NULL;
 	const eod *ref_eod = NULL;
 	bool stop = false;
 
@@ -416,7 +416,7 @@ namespace libdar
 				continue; // restarts the while loop
 			    }
 
-			    ref_dir = dynamic_cast<const directory *>(ref);
+			    ref_dir = dynamic_cast<const cat_directory *>(ref);
 			    if(ref_dir != NULL)
 				++(ceci->depth);
 

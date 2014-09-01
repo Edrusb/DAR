@@ -79,7 +79,7 @@ namespace libdar
         virtual ~catalogue() { detruire(); };
 
 
-	    // reading methods. The reading is iterative and uses the current_read directory pointer
+	    // reading methods. The reading is iterative and uses the current_read cat_directory pointer
 
         virtual void reset_read() const; // set the reading cursor to the beginning of the catalogue
 	virtual void end_read() const; // set the reading cursor to the end of the catalogue
@@ -95,7 +95,7 @@ namespace libdar
             // a call with NULL as first argument means to set the current dir the parent directory
 	void remove_read_entry(std::string & name);
 	    // in the currently read directory, removes the entry which name is given in argument
-	const directory & get_current_reading_dir() const { if(current_read == NULL) throw SRC_BUG; return *current_read; };
+	const cat_directory & get_current_reading_dir() const { if(current_read == NULL) throw SRC_BUG; return *current_read; };
 	    // remove from the catalogue all the entries that have not yet been read
 	    // by read().
 	void tail_catalogue_to_current_read();
@@ -133,9 +133,9 @@ namespace libdar
 
         void add(cat_entree *ref); // add at end of catalogue (sequential point of view)
 	void re_add_in(const std::string &subdirname); // return into an already existing subdirectory for further addition
-	void re_add_in_replace(const directory &dir); // same as re_add_in but also set the properties of the existing directory to those of the given argument
+	void re_add_in_replace(const cat_directory &dir); // same as re_add_in but also set the properties of the existing directory to those of the given argument
         void add_in_current_read(cat_nomme *ref); // add in currently read directory
-	const directory & get_current_add_dir() const { if(current_add == NULL) throw SRC_BUG; return *current_add; };
+	const cat_directory & get_current_add_dir() const { if(current_add == NULL) throw SRC_BUG; return *current_add; };
 
 
 
@@ -201,12 +201,12 @@ namespace libdar
 	    /// whether the catalogue is empty or not
 	bool is_empty() const { if(contenu == NULL) throw SRC_BUG; return contenu->is_empty(); };
 
-        const directory *get_contenu() const { return contenu; }; // used by data_tree
+        const cat_directory *get_contenu() const { return contenu; }; // used by data_tree
 
 	const label & get_data_name() const { return ref_data_name; };
 	datetime get_root_dir_last_modif() const { return contenu->get_last_modif(); };
 
-	    /// recursive evaluation of directories that have changed (make the directory::get_recurisve_has_changed() method of entry in this catalogue meaningful)
+	    /// recursive evaluation of directories that have changed (make the cat_directory::get_recurisve_has_changed() method of entry in this catalogue meaningful)
 	void launch_recursive_has_changed_update() const { contenu->recursive_has_changed_update(); };
 
 	datetime get_root_mtime() const { return contenu->get_last_modif(); };
@@ -232,11 +232,11 @@ namespace libdar
 	void swap_stuff(catalogue & ref);
 
     private :
-        directory *contenu;               ///< catalogue contents
+        cat_directory *contenu;           ///< catalogue contents
         path out_compare;                 ///< stores the missing directory structure, when extracting
-        directory *current_compare;       ///< points to the current directory when extracting
-        directory *current_add;           ///< points to the directory where to add the next file with add_file;
-        directory *current_read;          ///< points to the directory where the next item will be read
+        cat_directory *current_compare;   ///< points to the current directory when extracting
+        cat_directory *current_add;       ///< points to the directory where to add the next file with add_file;
+        cat_directory *current_read;      ///< points to the directory where the next item will be read
         path *sub_tree;                   ///< path to sub_tree
         signed int sub_count;             ///< count the depth in of read routine in the sub_tree
         entree_stats stats;               ///< statistics catalogue contents

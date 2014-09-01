@@ -46,11 +46,11 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-	/// the directory inode class
-    class directory : public inode
+	/// the cat_directory inode class
+    class cat_directory : public inode
     {
     public :
-        directory(const infinint & xuid,
+        cat_directory(const infinint & xuid,
 		  const infinint & xgid,
 		  U_16 xperm,
                   const datetime & last_access,
@@ -58,9 +58,9 @@ namespace libdar
 		  const datetime & last_change,
                   const std::string & xname,
 		  const infinint & device);
-        directory(const directory &ref); // only the inode part is build, no children is duplicated (empty dir)
-	const directory & operator = (const directory & ref); // set the inode part *only* no subdirectories/subfiles are copies or removed.
-        directory(user_interaction & dialog,
+        cat_directory(const cat_directory &ref); // only the inode part is build, no children is duplicated (empty dir)
+	const cat_directory & operator = (const cat_directory & ref); // set the inode part *only* no subdirectories/subfiles are copies or removed.
+        cat_directory(user_interaction & dialog,
 		  generic_file & f,
 		  const archive_version & reading_ver,
 		  saved_status saved,
@@ -70,22 +70,22 @@ namespace libdar
 		  generic_file *data_loc,
 		  compressor *efsa_loc,
 		  bool lax,
-		  bool only_detruit, // objects of other class than detruit and directory are not built in memory
+		  bool only_detruit, // objects of other class than detruit and cat_directory are not built in memory
 		  escape *ptr);
-        ~directory(); // detruit aussi tous les fils et se supprime de son 'parent'
+        ~cat_directory(); // detruit aussi tous les fils et se supprime de son 'parent'
 
-        void add_children(cat_nomme *r); // when r is a directory, 'parent' is set to 'this'
+        void add_children(cat_nomme *r); // when r is a cat_directory, 'parent' is set to 'this'
 	bool has_children() const { return !ordered_fils.empty(); };
         void reset_read_children() const;
 	void end_read() const;
-        bool read_children(const cat_nomme * &r) const; // read the direct children of the directory, returns false if no more is available
+        bool read_children(const cat_nomme * &r) const; // read the direct children of the cat_directory, returns false if no more is available
 	    // remove all entry not yet read by read_children
 	void tail_to_read_children();
 
 	void remove(const std::string & name); // remove the given entry from the catalogue
 	    // as side effect the reset_read_children() method must be called.
 
-        directory * get_parent() const { return parent; };
+        cat_directory * get_parent() const { return parent; };
         bool search_children(const std::string &name, const cat_nomme *&ref) const;
 	bool callback_for_children_of(user_interaction & dialog, const std::string & sdir, bool isolated = false) const;
 
@@ -93,27 +93,27 @@ namespace libdar
             // using method has_changed_since() from inode class
         unsigned char signature() const { return mk_signature('d', get_saved_status()); };
 
-	    /// detemine whether some data has changed since archive of reference in this directory or subdirectories
+	    /// detemine whether some data has changed since archive of reference in this cat_directory or subdirectories
 	bool get_recursive_has_changed() const { return recursive_has_changed; };
 
 	    /// ask recursive update for the recursive_has_changed field
 	void recursive_has_changed_update() const;
 
-	    /// get then number of "cat_nomme" entry contained in this directory and subdirectories (recursive call)
+	    /// get then number of "cat_nomme" entry contained in this cat_directory and subdirectories (recursive call)
 	infinint get_tree_size() const;
 
-	    /// get the number of entry having some EA set in the directory tree (recursive call)
+	    /// get the number of entry having some EA set in the cat_directory tree (recursive call)
 	infinint get_tree_ea_num() const;
 
 	    /// get the number of entry that are hard linked inode (aka mirage in dar implementation) (recursive call)
 	infinint get_tree_mirage_num() const;
 
-	    // for each mirage found (hard link implementation) in the directory tree, add its etiquette to the returned
+	    // for each mirage found (hard link implementation) in the cat_directory tree, add its etiquette to the returned
 	    // list with the number of reference that has been found in the tree. (map[etiquette] = number of occurence)
-	    // from outside of class directory, the given argument is expected to be an empty map.
+	    // from outside of class cat_directory, the given argument is expected to be an empty map.
 	void get_etiquettes_found_in_tree(std::map<infinint, infinint> & already_found) const;
 
-	    /// whether this directory is empty or not
+	    /// whether this cat_directory is empty or not
 	bool is_empty() const { return ordered_fils.empty(); };
 
 	    /// recursively remove all mirage entries
@@ -122,7 +122,7 @@ namespace libdar
 	    /// set the value of inode_dumped for all mirage (recusively)
 	void set_all_mirage_s_inode_dumped_field_to(bool val);
 
-        cat_entree *clone() const { return new (get_pool()) directory(*this); };
+        cat_entree *clone() const { return new (get_pool()) cat_directory(*this); };
 
 	const infinint & get_size() const { recursive_update_sizes(); return x_size; };
 	const infinint & get_storage_size() const { recursive_update_sizes(); return x_storage_size; };
@@ -138,7 +138,7 @@ namespace libdar
 	infinint x_size;
 	infinint x_storage_size;
 	bool updated_sizes;
-        directory *parent;
+        cat_directory *parent;
 #ifdef LIBDAR_FAST_DIR
         std::map<std::string, cat_nomme *> fils; // used for fast lookup
 #endif

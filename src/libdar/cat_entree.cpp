@@ -87,7 +87,7 @@ namespace libdar
                 ++num_x;
             else
             {
-                const directory *d = dynamic_cast<const directory*>(ino);
+                const cat_directory *d = dynamic_cast<const cat_directory*>(ino);
                 if(d != NULL)
                     ++num_d;
                 else
@@ -219,7 +219,7 @@ namespace libdar
                 ret = new (pool) cat_prise(dialog, f, reading_ver, saved, efsa_loc, ptr);
                 break;
             case 'd':
-                ret = new (pool) directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, ptr);
+                ret = new (pool) cat_directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, ptr);
                 break;
             case 'm':
                 ret = new (pool) cat_mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, cat_mirage::fmt_mirage, lax, ptr);

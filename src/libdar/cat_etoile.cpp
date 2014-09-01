@@ -40,7 +40,7 @@ namespace libdar
     {
         if(host == NULL)
             throw SRC_BUG;
-        if(dynamic_cast<directory *>(host) != NULL)
+        if(dynamic_cast<cat_directory *>(host) != NULL)
             throw Erange("etoile::etoile", gettext("Hard links of directories are not supported"));
         hosted = host;
         etiquette = etiquette_number;

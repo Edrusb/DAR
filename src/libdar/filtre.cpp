@@ -207,7 +207,7 @@ namespace libdar
 	    while(cat.read(e))
 	    {
 		const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
-		const directory *e_dir = dynamic_cast<const directory *>(e);
+		const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 		const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 		const inode *e_ino = dynamic_cast<const inode *>(e);
 		const file *e_file = dynamic_cast<const file *>(e);
@@ -575,7 +575,7 @@ namespace libdar
 		while(fs.read(e, fs_errors, skipped_dump))
 		{
 		    cat_nomme *nom = dynamic_cast<cat_nomme *>(e);
-		    directory *dir = dynamic_cast<directory *>(e);
+		    cat_directory *dir = dynamic_cast<cat_directory *>(e);
 		    inode *e_ino = dynamic_cast<inode *>(e);
 		    file *e_file = dynamic_cast<file *>(e);
 		    cat_mirage *e_mir = dynamic_cast<cat_mirage *>(e);
@@ -998,7 +998,7 @@ namespace libdar
 			cat.pre_add(e); // adding a mark and dropping EOD entry in the archive if cat is an escape_catalogue object (else, does nothing)
 			if(display_finished)
 			{
-			    const directory & cur = cat.get_current_add_dir();
+			    const cat_directory & cur = cat.get_current_add_dir();
 			    string what = juillet.get_string();
 			    string size = tools_display_integer_in_metric_system(cur.get_size(), "o", true);
 			    string ratio = gettext(", compression ratio ");
@@ -1083,7 +1083,7 @@ namespace libdar
 
 	while(cat.read(e))
 	{
-	    const directory *e_dir = dynamic_cast<const directory *>(e);
+	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
@@ -1126,7 +1126,7 @@ namespace libdar
 				try
 				{
 				    inode *exists = dynamic_cast<inode *>(exists_nom);
-				    directory *exists_dir = dynamic_cast<directory *>(exists_nom);
+				    cat_directory *exists_dir = dynamic_cast<cat_directory *>(exists_nom);
 
 				    if(exists != NULL)
 				    {
@@ -1273,7 +1273,7 @@ namespace libdar
         {
 	    const file *e_file = dynamic_cast<const file *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
-	    const directory *e_dir = dynamic_cast<const directory *>(e);
+	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 	    const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 
@@ -1617,7 +1617,7 @@ namespace libdar
 		    {
 			const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 			const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
-			const directory *e_dir = dynamic_cast<const directory *>(e);
+			const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 			const detruit *e_detruit = dynamic_cast<const detruit *>(e);
 
 			juillet.enfile(e);
@@ -1640,7 +1640,7 @@ namespace libdar
 					    // some different types of pointer to the "dolly" object
 
 					cat_nomme *dolly_nom = dynamic_cast<cat_nomme *>(dolly);
-					directory *dolly_dir = dynamic_cast<directory *>(dolly);
+					cat_directory *dolly_dir = dynamic_cast<cat_directory *>(dolly);
 					cat_mirage *dolly_mir = dynamic_cast<cat_mirage *>(dolly);
 					inode *dolly_ino = dynamic_cast<inode *>(dolly);
 
@@ -1656,7 +1656,7 @@ namespace libdar
 					    const ignored *al_ign = dynamic_cast<const ignored *>(already_here);
 					    const ignored_dir *al_igndir = dynamic_cast<const ignored_dir *>(already_here);
 					    const inode *al_ino = dynamic_cast<const inode *>(already_here);
-					    const directory *al_dir = dynamic_cast<const directory *>(already_here);
+					    const cat_directory *al_dir = dynamic_cast<const cat_directory *>(already_here);
 					    const string full_name = juillet.get_string();
 
 					    over_action_data act_data;
@@ -2356,7 +2356,7 @@ namespace libdar
 		inode *e_ino = dynamic_cast<inode *>(e_var);
 		file *e_file = dynamic_cast<file *>(e_var);
 		cat_mirage *e_mir = dynamic_cast<cat_mirage *>(e_var);
-		directory *e_dir = dynamic_cast<directory *>(e_var);
+		cat_directory *e_dir = dynamic_cast<cat_directory *>(e_var);
 
 		file::get_data_mode keep_mode = keep_compressed ? file::keep_compressed : file::keep_hole;
 

@@ -20,7 +20,7 @@
 /*********************************************************************/
 
     /// \file cat_ignored_dir.hpp
-    /// \brief class used to remember in a catalogue that a directory has been ignored
+    /// \brief class used to remember in a catalogue that a cat_directory has been ignored
     /// \ingroup Private
 
 #ifndef CAT_IGNORED_DIR_HPP
@@ -41,11 +41,11 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-	/// the ignored directory class, to be promoted later as empty directory if needed
+	/// the ignored cat_directory class, to be promoted later as empty cat_directory if needed
     class ignored_dir : public inode
     {
     public:
-        ignored_dir(const directory &target) : inode(target) {};
+        ignored_dir(const cat_directory &target) : inode(target) {};
         ignored_dir(user_interaction & dialog,
 		    generic_file & f,
 		    const archive_version & reading_ver,
@@ -56,7 +56,7 @@ namespace libdar
         cat_entree *clone() const { return new (get_pool()) ignored_dir(*this); };
 
     protected:
-        void inherited_dump(generic_file & f, bool small) const; // behaves like an empty directory
+        void inherited_dump(generic_file & f, bool small) const; // behaves like an empty cat_directory
 
     };
 

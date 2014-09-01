@@ -976,7 +976,7 @@ bool data_tree::fix_corruption()
 
     void data_dir::add(const inode *entry, const archive_num & archive)
     {
-	const directory *entry_dir = dynamic_cast<const directory *>(entry);
+	const cat_directory *entry_dir = dynamic_cast<const cat_directory *>(entry);
 	data_tree * tree = find_or_addition(entry->get_name(), entry_dir != NULL, archive);
 	archive_num last_archive;
 	lookup result;
@@ -1313,14 +1313,14 @@ bool data_tree::fix_corruption()
 	return ptr != NULL;
     }
 
-    void data_tree_update_with(const directory *dir, archive_num archive, data_dir *racine)
+    void data_tree_update_with(const cat_directory *dir, archive_num archive, data_dir *racine)
     {
 	const cat_nomme *entry;
 
 	dir->reset_read_children();
 	while(dir->read_children(entry))
 	{
-	    const directory *entry_dir = dynamic_cast<const directory *>(entry);
+	    const cat_directory *entry_dir = dynamic_cast<const cat_directory *>(entry);
 	    const inode *entry_ino = dynamic_cast<const inode *>(entry);
 	    const cat_mirage *entry_mir = dynamic_cast<const cat_mirage *>(entry);
 	    const detruit *entry_det = dynamic_cast<const detruit *>(entry);

@@ -350,10 +350,10 @@ namespace libdar
 
 
     private:
-	class stack_dir_t : public directory
+	class stack_dir_t : public cat_directory
 	{
 	public:
-	    stack_dir_t(const directory & ref, bool restore) : directory(ref) { restore_date = restore; };
+	    stack_dir_t(const cat_directory & ref, bool restore) : cat_directory(ref) { restore_date = restore; };
 
 	    bool get_restore_date() const { return restore_date; };
 	    void set_restore_date(bool val) { restore_date = val; };

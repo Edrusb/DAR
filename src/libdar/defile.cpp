@@ -31,14 +31,14 @@ namespace libdar
     void defile::enfile(const cat_entree *e)
     {
         const eod *fin = dynamic_cast<const eod *>(e);
-        const directory *dir = dynamic_cast<const directory *>(e);
+        const cat_directory *dir = dynamic_cast<const cat_directory *>(e);
         const cat_nomme *nom = dynamic_cast<const cat_nomme *>(e);
         string s;
 
         if(! init) // we must remove previous entry brought by a previous call to this method
 	{
             if(! chemin.pop(s))
-		throw SRC_BUG; // no more directory to pop!
+		throw SRC_BUG; // no more cat_directory to pop!
 	}
         else // nothing to be removed
             init = false;

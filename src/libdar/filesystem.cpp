@@ -223,7 +223,7 @@ namespace libdar
 						buf.st_dev,
 						furtive_read_mode);
 		else if(S_ISDIR(buf.st_mode))
-		    ref = new (get_pool()) directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+		    ref = new (get_pool()) cat_directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						     atime,
 						     mtime,
 						     ctime,
@@ -348,7 +348,7 @@ namespace libdar
 		if(ref == NULL)
 		    throw Ememory("filesystem_hard_link_read::make_read_entree");
 
-		if(buf.st_nlink > 1 && see_hard_link && dynamic_cast<directory *>(ref) == NULL)
+		if(buf.st_nlink > 1 && see_hard_link && dynamic_cast<cat_directory *>(ref) == NULL)
 		{
 		    map<node, couple>::iterator it = corres_read.find(node(buf.st_ino, buf.st_dev));
 
@@ -544,7 +544,7 @@ namespace libdar
 	const string display = current_dir->display();
 	const char* tmp = display.c_str();
 	cat_entree *ref = make_read_entree(*current_dir, "", true, *ea_mask);
-	directory *ref_dir = dynamic_cast<directory *>(ref);
+	cat_directory *ref_dir = dynamic_cast<cat_directory *>(ref);
 
 	try
 	{
@@ -621,7 +621,7 @@ namespace libdar
 
 			    try
 			    {
-				directory *ref_dir = dynamic_cast<directory *>(ref);
+				cat_directory *ref_dir = dynamic_cast<cat_directory *>(ref);
 
 				if(ref_dir != NULL)
 				{
@@ -778,7 +778,7 @@ namespace libdar
 	const char* tmp = display.c_str();
 
 	cat_entree *ref = make_read_entree(*current_dir, "", true, *ea_mask);
-	directory *ref_dir = dynamic_cast<directory *>(ref);
+	cat_directory *ref_dir = dynamic_cast<cat_directory *>(ref);
 	try
 	{
 	    if(ref_dir != NULL)
@@ -807,7 +807,7 @@ namespace libdar
 
     bool filesystem_diff::read_filename(const string & name, cat_nomme * &ref)
     {
-        directory *ref_dir = NULL;
+        cat_directory *ref_dir = NULL;
         if(current_dir == NULL)
             throw SRC_BUG;
         ref = make_read_entree(*current_dir, name, false, *ea_mask);
@@ -815,7 +815,7 @@ namespace libdar
             return false; // no file of that name
         else
         {
-            ref_dir = dynamic_cast<directory *>(ref);
+            ref_dir = dynamic_cast<cat_directory *>(ref);
             if(ref_dir != NULL)
             {
                 filename_struct rfst;
@@ -1027,7 +1027,7 @@ namespace libdar
 					       inode::comparison_fields what_to_check,
 					       const fsa_scope & scope)
     {
-        const directory *ref_dir = dynamic_cast<const directory *>(ref);
+        const cat_directory *ref_dir = dynamic_cast<const cat_directory *>(ref);
         const file *ref_fil = dynamic_cast<const file *>(ref);
         const lien *ref_lie = dynamic_cast<const lien *>(ref);
         const blockdev *ref_blo = dynamic_cast<const blockdev *>(ref);
@@ -1341,7 +1341,7 @@ namespace libdar
     {
 	const eod *x_eod = dynamic_cast<const eod *>(x);
 	const cat_nomme *x_nom = dynamic_cast<const cat_nomme *>(x);
-	const directory *x_dir = dynamic_cast<const directory *>(x);
+	const cat_directory *x_dir = dynamic_cast<const cat_directory *>(x);
 	const detruit *x_det = dynamic_cast<const detruit *>(x);
 	const inode *x_ino = dynamic_cast<const inode *>(x);
 	const cat_mirage *x_mir = dynamic_cast<const cat_mirage *>(x);
@@ -1417,7 +1417,7 @@ namespace libdar
 	    try
 	    {
 		inode *exists_ino = dynamic_cast<inode *>(exists);
-		directory *exists_dir = dynamic_cast<directory *>(exists);
+		cat_directory *exists_dir = dynamic_cast<cat_directory *>(exists);
 
 		if(exists_ino == NULL && exists != NULL)
 		    throw SRC_BUG; // an object from filesystem should always be an inode !?!
@@ -1681,7 +1681,7 @@ namespace libdar
     {
 	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
 	const inode *tba_ino = tba_mir == NULL ? dynamic_cast<const inode *>(to_be_added) : tba_mir->get_inode();
-	const directory *tba_dir = dynamic_cast<const directory *>(to_be_added);
+	const cat_directory *tba_dir = dynamic_cast<const cat_directory *>(to_be_added);
 	const detruit *tba_det = dynamic_cast<const detruit *>(to_be_added);
 	const lien *in_place_symlink = dynamic_cast<const lien *>(in_place);
 
@@ -1904,7 +1904,7 @@ namespace libdar
 		}
 		catch(Euser_abort & e)
 		{
-		    const directory *tba_dir = dynamic_cast<const directory *>(to_be_added);
+		    const cat_directory *tba_dir = dynamic_cast<const cat_directory *>(to_be_added);
 		    if(tba_dir != NULL && tba_ino->same_as(*in_place))
 			return false;
 		    else
@@ -2047,7 +2047,7 @@ namespace libdar
 		}
 		catch(Euser_abort & e)
 		{
-		    const directory *tba_dir = dynamic_cast<const directory *>(to_be_added);
+		    const cat_directory *tba_dir = dynamic_cast<const cat_directory *>(to_be_added);
 		    if(tba_dir != NULL && tba_ino->same_as(*in_place))
 			return false;
 		    else
@@ -2215,7 +2215,7 @@ namespace libdar
 	    // owner of the directory, so we will try to restore as much as our permission
 	    // allows it (maybe "group" or "other" write bits are set for us).
 
-	if(dynamic_cast<const directory *>(&ref) != NULL && !dir_perm && geteuid() != 0)
+	if(dynamic_cast<const cat_directory *>(&ref) != NULL && !dir_perm && geteuid() != 0)
 	{
 	    mode_t tmp;
 	    try

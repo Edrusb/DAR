@@ -772,7 +772,7 @@ namespace libdar
 		/// calculating and setting the " recursive_has_changed" fields of directories to their values
 	    if(options.get_empty_dir() == false)
 		get_cat().launch_recursive_has_changed_update();
-		/// we can now use the directory::get_recursive_has_changed() to avoid recursion in a directory where
+		/// we can now use the cat_directory::get_recursive_has_changed() to avoid recursion in a directory where
 		/// no file has been saved.
 
 	    try
@@ -1369,7 +1369,7 @@ namespace libdar
 	NLS_SWAP_IN;
         try
         {
-	    const directory * parent = get_dir_object(dir);
+	    const cat_directory * parent = get_dir_object(dir);
 	    const cat_nomme *tmp_ptr = NULL;
 
 	    if(freed_and_checked)
@@ -1463,7 +1463,7 @@ namespace libdar
 	NLS_SWAP_IN;
         try
         {
-	    const directory *parent = get_dir_object(dir);
+	    const cat_directory *parent = get_dir_object(dir);
 	    const cat_nomme *tmp_ptr = NULL;
 
 	    if(freed_and_checked)
@@ -1471,7 +1471,7 @@ namespace libdar
 	    parent->reset_read_children();
 	    while(parent->read_children(tmp_ptr) && !ret)
 	    {
-		if(dynamic_cast<const directory *>(tmp_ptr) != NULL)
+		if(dynamic_cast<const cat_directory *>(tmp_ptr) != NULL)
 		    ret = true;
 	    }
 	}
@@ -2387,9 +2387,9 @@ namespace libdar
 	    return 0;
     }
 
-    const directory *archive::get_dir_object(const string & dir) const
+    const cat_directory *archive::get_dir_object(const string & dir) const
     {
-	const directory *parent = NULL;
+	const cat_directory *parent = NULL;
 	const cat_nomme *tmp_ptr = NULL;
 
 	parent = get_cat().get_contenu();
@@ -2408,7 +2408,7 @@ namespace libdar
 		if(!loop) // failed because now, search is a one level path
 		    tmp = search.basename();
 		if(parent->search_children(tmp, tmp_ptr))
-		    parent = dynamic_cast<const directory *>(tmp_ptr);
+		    parent = dynamic_cast<const cat_directory *>(tmp_ptr);
 		else
 		    parent = NULL;
 

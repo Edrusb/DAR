@@ -99,13 +99,13 @@ void f1()
         eod *v_eod = new eod();
         file *v_file = new file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", "." , 1024, 0, false);
         lien *v_lien = new lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6), "lien", "fichier", 0);
-        directory *v_dir = new directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0);
+        cat_directory *v_dir = new cat_directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0);
         chardev *v_char = new chardev(1027, 105, 0647, datetime(10), datetime(11), datetime(12),  "char device", 104, 202, 0);
         blockdev *v_block = new blockdev(1028, 106, 0651, datetime(13), datetime(14), datetime(15),  "block device", 105, 203, 0);
         cat_tube *v_tube = new cat_tube(1029, 107, 0652, datetime(16), datetime(17), datetime(18), "tuyau", 0);
         cat_prise *v_prise = new cat_prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21),  "prise", 0);
         detruit *v_detruit = new detruit("ancien fichier", 'f', datetime(192));
-        directory *v_sub_dir = new directory(200,20, 0777, datetime(100), datetime(101), datetime(102), "sous-repertoire", 0);
+        cat_directory *v_sub_dir = new cat_directory(200,20, 0777, datetime(100), datetime(101), datetime(102), "sous-repertoire", 0);
 	cat_mirage *v_mir = new cat_mirage("Zorro mirage", new etoile(dynamic_cast<inode *>(v_prise->clone()), 10));
 
         cat_entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, v_mir, NULL };
@@ -154,7 +154,7 @@ void f1()
         v_dir->dump(*dump, false);
         dump->skip(0);
         ref = cat_entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, &comp, false, false, NULL);
-        v_sub_dir = dynamic_cast<directory *>(ref);
+        v_sub_dir = dynamic_cast<cat_directory *>(ref);
 
         delete ref;
         delete dump;
@@ -194,7 +194,7 @@ void f2()
         }
         cat.add(new file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".", 1024, 0, false));
         cat.add(new lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6),  "lien", "fichier", 0));
-        cat.add(new directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0));
+        cat.add(new cat_directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0));
         cat.add(new chardev(1027, 105, 0647, datetime(10), datetime(11), datetime(12),  "char device", 104, 202, 0));
         cat.add(new blockdev(1028, 106, 0651, datetime(13), datetime(14), datetime(15), "block device", 105, 203, 0));
         cat.add(new eod());
@@ -209,7 +209,7 @@ void f2()
         {
             const eod *e = dynamic_cast<const eod *>(ref);
             const cat_nomme *n = dynamic_cast<const cat_nomme *>(ref);
-            const directory *d = dynamic_cast<const directory *>(ref);
+            const cat_directory *d = dynamic_cast<const cat_directory *>(ref);
             string type = "file";
 
             if(e != NULL)
@@ -287,7 +287,7 @@ void f3()
 
     cat.add(new file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", ".", 1024, 0, false));
     cat.add(new lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6), "lien", "fichier", 0));
-    cat.add(new directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0));
+    cat.add(new cat_directory(1026, 104, 0646, datetime(7), datetime(8), datetime(9), "repertoire", 0));
     cat.add(new chardev(1027, 105, 0647, datetime(10), datetime(11), datetime(12), "char device", 104, 202, 0));
     cat.add(new blockdev(1028, 106, 0651, datetime(13), datetime(14), datetime(15), "block device", 105, 203, 0));
     cat.add(new eod());

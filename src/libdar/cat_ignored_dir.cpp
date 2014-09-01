@@ -35,7 +35,7 @@ namespace libdar
 
     void ignored_dir::inherited_dump(generic_file & f, bool small) const
     {
-	directory tmp = directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_last_change(), get_name(), 0);
+	cat_directory tmp = cat_directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_last_change(), get_name(), 0);
 	tmp.set_saved_status(get_saved_status());
 	tmp.specific_dump(f, small); // dump an empty directory
     }

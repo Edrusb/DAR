@@ -92,7 +92,7 @@ namespace libdar
 
 	try
 	{
-	    contenu = new (get_pool()) directory(0,0,0,datetime(0),root_last_modif,datetime(0),"root",0);
+	    contenu = new (get_pool()) cat_directory(0,0,0,datetime(0),root_last_modif,datetime(0),"root",0);
 	    if(contenu == NULL)
 		throw Ememory("catalogue::catalogue(path)");
 	    current_compare = contenu;
@@ -167,7 +167,7 @@ namespace libdar
 		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 
 		stats.clear();
-		contenu = new (get_pool()) directory(dialog, ff, reading_ver, st, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, NULL);
+		contenu = new (get_pool()) cat_directory(dialog, ff, reading_ver, st, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, NULL);
 		if(contenu == NULL)
 		    throw Ememory("catalogue::catalogue(path)");
 		if(only_detruit)
@@ -265,7 +265,7 @@ namespace libdar
     void catalogue::skip_read_to_parent_dir() const
     {
 	catalogue *ceci = const_cast<catalogue *>(this);
-	directory *tmp = ceci->current_read->get_parent();
+	cat_directory *tmp = ceci->current_read->get_parent();
 
 	if(tmp == NULL)
 	    throw Erange("catalogue::skip_read_to_parent_dir", gettext("root does not have a parent directory"));
@@ -279,10 +279,10 @@ namespace libdar
 
 	if(ceci->current_read->read_children(tmp))
 	{
-	    const directory *dir = dynamic_cast<const directory *>(tmp);
+	    const cat_directory *dir = dynamic_cast<const cat_directory *>(tmp);
 	    if(dir != NULL)
 	    {
-		ceci->current_read = const_cast<directory *>(dir);
+		ceci->current_read = const_cast<cat_directory *>(dir);
 		dir->reset_read_children();
 	    }
 	    ref = tmp;
@@ -290,7 +290,7 @@ namespace libdar
 	}
 	else
 	{
-	    directory *papa = ceci->current_read->get_parent();
+	    cat_directory *papa = ceci->current_read->get_parent();
 	    ref = &r_eod;
 	    if(papa == NULL)
 		return false; // we reached end of root, no eod generation
@@ -321,7 +321,7 @@ namespace libdar
 	else // looking for a real filename
 	    if(current_read->search_children(*name, tmp))
 	    {
-		directory *d = dynamic_cast<directory *>(const_cast<cat_nomme *>(tmp));
+		cat_directory *d = dynamic_cast<cat_directory *>(const_cast<cat_nomme *>(tmp));
 		if(d != NULL) // this is a directory need to chdir to it
 		    ceci->current_read = d;
 		ref = tmp;
@@ -393,14 +393,14 @@ namespace libdar
 	    {
 		const cat_nomme *xtmp;
 
-		if(const_cast<directory *>(current_read)->search_children(tmp, xtmp))
+		if(const_cast<cat_directory *>(current_read)->search_children(tmp, xtmp))
 		{
 		    ref = xtmp;
-		    const directory *dir = dynamic_cast<const directory *>(xtmp);
+		    const cat_directory *dir = dynamic_cast<const cat_directory *>(xtmp);
 
 		    if(dir != NULL)
 		    {
-			current_read = const_cast<directory *>(dir);
+			current_read = const_cast<cat_directory *>(dir);
 			return true;
 		    }
 		    else
@@ -438,7 +438,7 @@ namespace libdar
 	default:
 	    if(read(ref) && sub_count > 0)
 	    {
-		const directory *dir = dynamic_cast<const directory *>(ref);
+		const cat_directory *dir = dynamic_cast<const cat_directory *>(ref);
 		const eod *fin = dynamic_cast<const eod *>(ref);
 
 		if(dir != NULL)
@@ -468,7 +468,7 @@ namespace libdar
 	if(f == NULL) // ref is not eod
 	{
 	    cat_nomme *n = dynamic_cast<cat_nomme *>(ref);
-	    directory *t = dynamic_cast<directory *>(ref);
+	    cat_directory *t = dynamic_cast<cat_directory *>(ref);
 
 	    if(n == NULL)
 		throw SRC_BUG; // unknown type neither "eod" nor "cat_nomme"
@@ -479,7 +479,7 @@ namespace libdar
 	}
 	else // ref is an eod
 	{
-	    directory *parent = current_add->get_parent();
+	    cat_directory *parent = current_add->get_parent();
 	    if(parent == NULL)
 		throw SRC_BUG; // root has no parent directory, cannot change to it
 	    else
@@ -492,11 +492,11 @@ namespace libdar
     {
 	const cat_nomme *sub = NULL;
 
-	if(const_cast<const directory *>(current_add)->search_children(subdirname, sub))
+	if(const_cast<const cat_directory *>(current_add)->search_children(subdirname, sub))
 	{
-	    const directory *subdir = dynamic_cast<const directory *>(sub);
+	    const cat_directory *subdir = dynamic_cast<const cat_directory *>(sub);
 	    if(subdir != NULL)
-		current_add = const_cast<directory *>(subdir);
+		current_add = const_cast<cat_directory *>(subdir);
 	    else
 		throw Erange("catalogue::re_add_in", gettext("Cannot recurs in a non directory entry"));
 	}
@@ -504,7 +504,7 @@ namespace libdar
 	    throw Erange("catalogue::re_add_in", gettext("The entry to recurs in does not exist, cannot add further entry to that absent subdirectory"));
     }
 
-    void catalogue::re_add_in_replace(const directory &dir)
+    void catalogue::re_add_in_replace(const cat_directory &dir)
     {
 	if(dir.has_children())
 	    throw Erange("catalogue::re_add_in_replace", "Given argument must be an empty dir");
@@ -533,14 +533,14 @@ namespace libdar
     {
 	catalogue *me = const_cast<catalogue *>(this);
 	const cat_mirage *mir = dynamic_cast<const cat_mirage *>(target);
-	const directory *dir = dynamic_cast<const directory *>(target);
+	const cat_directory *dir = dynamic_cast<const cat_directory *>(target);
 	const eod *fin = dynamic_cast<const eod *>(target);
 	const cat_nomme *nom = dynamic_cast<const cat_nomme *>(target);
 
 	if(me == NULL)
 	    throw SRC_BUG;
 	if(mir != NULL)
-	    dir = dynamic_cast<const directory *>(mir->get_inode());
+	    dir = dynamic_cast<const cat_directory *>(mir->get_inode());
 
 	if(out_compare.degre() > 1) // actually scanning a nonexisting directory
 	{
@@ -568,7 +568,7 @@ namespace libdar
 
 	    if(fin != NULL)
 	    {
-		directory *tmp = current_compare->get_parent();
+		cat_directory *tmp = current_compare->get_parent();
 		if(tmp == NULL)
 		    throw Erange("catalogue::compare", gettext("root has no parent directory"));
 		me->current_compare = tmp;
@@ -597,9 +597,9 @@ namespace libdar
 		    // updating internal structure to follow directory tree :
 		if(dir != NULL)
 		{
-		    const directory *d_ext = dynamic_cast<const directory *>(dst_ino);
+		    const cat_directory *d_ext = dynamic_cast<const cat_directory *>(dst_ino);
 		    if(d_ext != NULL)
-			me->current_compare = const_cast<directory *>(d_ext);
+			me->current_compare = const_cast<cat_directory *>(d_ext);
 		    else
 			me->out_compare += dir->get_name();
 		}
@@ -642,11 +642,11 @@ namespace libdar
 
     infinint catalogue::update_destroyed_with(const catalogue & ref)
     {
-	directory *current = contenu;
+	cat_directory *current = contenu;
 	const cat_nomme *ici;
 	const cat_entree *projo;
 	const eod *pro_eod;
-	const directory *pro_dir;
+	const cat_directory *pro_dir;
 	const detruit *pro_det;
 	const cat_nomme *pro_nom;
 	const cat_mirage *pro_mir;
@@ -656,14 +656,14 @@ namespace libdar
 	while(ref.read(projo))
 	{
 	    pro_eod = dynamic_cast<const eod *>(projo);
-	    pro_dir = dynamic_cast<const directory *>(projo);
+	    pro_dir = dynamic_cast<const cat_directory *>(projo);
 	    pro_det = dynamic_cast<const detruit *>(projo);
 	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
 	    pro_mir = dynamic_cast<const cat_mirage *>(projo);
 
 	    if(pro_eod != NULL)
 	    {
-		directory *tmp = current->get_parent();
+		cat_directory *tmp = current->get_parent();
 		if(tmp == NULL)
 		    throw SRC_BUG; // reached root for "contenu", and not yet for "ref";
 		current = tmp;
@@ -705,10 +705,10 @@ namespace libdar
 	    else
 		if(pro_dir != NULL)
 		{
-		    const directory *ici_dir = dynamic_cast<const directory *>(ici);
+		    const cat_directory *ici_dir = dynamic_cast<const cat_directory *>(ici);
 
 		    if(ici_dir != NULL)
-			current = const_cast<directory *>(ici_dir);
+			current = const_cast<cat_directory *>(ici_dir);
 		    else
 			ref.skip_read_to_parent_dir();
 		}
@@ -719,11 +719,11 @@ namespace libdar
 
     void catalogue::update_absent_with(const catalogue & ref, infinint aborting_next_etoile)
     {
-	directory *current = contenu;
+	cat_directory *current = contenu;
 	const cat_nomme *ici;
 	const cat_entree *projo;
 	const eod *pro_eod;
-	const directory *pro_dir;
+	const cat_directory *pro_dir;
 	const detruit *pro_det;
 	const cat_nomme *pro_nom;
 	const inode *pro_ino;
@@ -737,7 +737,7 @@ namespace libdar
 	while(ref.read(projo))
 	{
 	    pro_eod = dynamic_cast<const eod *>(projo);
-	    pro_dir = dynamic_cast<const directory *>(projo);
+	    pro_dir = dynamic_cast<const cat_directory *>(projo);
 	    pro_det = dynamic_cast<const detruit *>(projo);
 	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
 	    pro_ino = dynamic_cast<const inode *>(projo);
@@ -745,7 +745,7 @@ namespace libdar
 
 	    if(pro_eod != NULL)
 	    {
-		directory *tmp = current->get_parent();
+		cat_directory *tmp = current->get_parent();
 		if(tmp == NULL)
 		    throw SRC_BUG; // reached root for "contenu", and not yet for "ref";
 		current = tmp;
@@ -770,7 +770,7 @@ namespace libdar
 	    {
 		cat_entree *clo_ent = NULL;
 		inode *clo_ino = NULL;
-		directory *clo_dir = NULL;
+		cat_directory *clo_dir = NULL;
 		cat_mirage *clo_mir = NULL;
 		etoile *clo_eto = NULL;
 
@@ -778,7 +778,7 @@ namespace libdar
 		{
 		    clo_ent = pro_ino->clone();
 		    clo_ino = dynamic_cast<inode *>(clo_ent);
-		    clo_dir = dynamic_cast<directory *>(clo_ent);
+		    clo_dir = dynamic_cast<cat_directory *>(clo_ent);
 
 			// sanity checks
 
@@ -891,10 +891,10 @@ namespace libdar
 	    {
 		if(pro_dir != NULL)
 		{
-		    const directory *ici_dir = dynamic_cast<const directory *>(ici);
+		    const cat_directory *ici_dir = dynamic_cast<const cat_directory *>(ici);
 
 		    if(ici_dir != NULL)
-			current = const_cast<directory *>(ici_dir);
+			current = const_cast<cat_directory *>(ici_dir);
 		    else
 			ref.skip_read_to_parent_dir();
 		}
@@ -938,7 +938,7 @@ namespace libdar
 	while(read(e))
 	{
 	    const eod *e_eod = dynamic_cast<const eod *>(e);
-	    const directory *e_dir = dynamic_cast<const directory *>(e);
+	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
@@ -1055,7 +1055,7 @@ namespace libdar
 	{
 	    string sep = beginning == "" ? "" : "/";
 	    const eod *e_eod = dynamic_cast<const eod *>(e);
-	    const directory *e_dir = dynamic_cast<const directory *>(e);
+	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
@@ -1186,7 +1186,7 @@ namespace libdar
 	while(read(e))
 	{
 	    const eod *e_eod = dynamic_cast<const eod *>(e);
-	    const directory *e_dir = dynamic_cast<const directory *>(e);
+	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
@@ -1469,7 +1469,7 @@ namespace libdar
 	while(read(e))
 	{
 	    const eod *e_eod = dynamic_cast<const eod *>(e);
-	    const directory *e_dir = dynamic_cast<const directory *>(e);
+	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const inode *e_ino = dynamic_cast<const inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
@@ -1527,7 +1527,7 @@ namespace libdar
 
     void catalogue::reset_dump() const
     {
-	directory * d = const_cast<directory *>(contenu);
+	cat_directory * d = const_cast<cat_directory *>(contenu);
 
 	if(d == NULL)
 	    throw SRC_BUG;
@@ -1589,7 +1589,7 @@ namespace libdar
 	while(ref.read(ent))
 	{
 	    const detruit *ent_det = dynamic_cast<const detruit *>(ent);
-	    const directory *ent_dir = dynamic_cast<const directory *>(ent);
+	    const cat_directory *ent_dir = dynamic_cast<const cat_directory *>(ent);
 	    const eod *ent_eod = dynamic_cast<const eod *>(ent);
 
 	    if(ent_dir != NULL)
@@ -1630,7 +1630,7 @@ namespace libdar
     void catalogue::swap_stuff(catalogue & ref)
     {
 	    // swapping contenu
-	directory *tmp = contenu;
+	cat_directory *tmp = contenu;
 	contenu = ref.contenu;
 	ref.contenu = tmp;
 	tmp = NULL;
@@ -1660,7 +1660,7 @@ namespace libdar
 	{
 	    if(ref.contenu == NULL)
 		throw SRC_BUG;
-	    contenu = new (get_pool()) directory(*ref.contenu);
+	    contenu = new (get_pool()) cat_directory(*ref.contenu);
 	    if(contenu == NULL)
 		throw Ememory("catalogue::catalogue(const catalogue &)");
 	    current_compare = contenu;
