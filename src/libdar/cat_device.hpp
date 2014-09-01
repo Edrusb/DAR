@@ -41,11 +41,11 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-	/// the special device root class
-    class device : public cat_inode
+	/// the special cat_device root class
+    class cat_device : public cat_inode
     {
     public :
-        device(const infinint & uid, const infinint & gid, U_16 perm,
+        cat_device(const infinint & uid, const infinint & gid, U_16 perm,
                const datetime & last_access,
                const datetime & last_modif,
 	       const datetime &last_change,
@@ -53,7 +53,7 @@ namespace libdar
                U_16 major,
                U_16 minor,
 	       const infinint & fs_device);
-        device(user_interaction & dialog,
+        cat_device(user_interaction & dialog,
 	       generic_file & f,
 	       const archive_version & reading_ver,
 	       saved_status saved,

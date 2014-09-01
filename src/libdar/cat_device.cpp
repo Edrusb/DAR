@@ -59,7 +59,7 @@ using namespace std;
 namespace libdar
 {
 
-    device::device(const infinint & uid, const infinint & gid, U_16 perm,
+    cat_device::cat_device(const infinint & uid, const infinint & gid, U_16 perm,
 		   const datetime & last_access,
 		   const datetime & last_modif,
 		   const datetime & last_change,
@@ -73,7 +73,7 @@ namespace libdar
 	set_saved_status(s_saved);
     }
 
-    device::device(user_interaction & dialog,
+    cat_device::cat_device(user_interaction & dialog,
 		   generic_file & f,
 		   const archive_version & reading_ver,
 		   saved_status saved,
@@ -93,7 +93,7 @@ namespace libdar
 	}
     }
 
-    void device::inherited_dump(generic_file & f, bool small) const
+    void cat_device::inherited_dump(generic_file & f, bool small) const
     {
 	U_16 tmp;
 
@@ -107,17 +107,17 @@ namespace libdar
 	}
     }
 
-    void device::sub_compare(const cat_inode & other, bool isolated_mode) const
+    void cat_device::sub_compare(const cat_inode & other, bool isolated_mode) const
     {
-	const device *d_other = dynamic_cast<const device *>(&other);
+	const cat_device *d_other = dynamic_cast<const cat_device *>(&other);
 	if(d_other == NULL)
 	    throw SRC_BUG; // bug in cat_inode::compare
 	if(get_saved_status() == s_saved && d_other->get_saved_status() == s_saved)
 	{
 	    if(get_major() != d_other->get_major())
-		throw Erange("device::sub_compare", tools_printf(gettext("devices have not the same major number: %d <--> %d"), get_major(), d_other->get_major()));
+		throw Erange("cat_device::sub_compare", tools_printf(gettext("devices have not the same major number: %d <--> %d"), get_major(), d_other->get_major()));
 	    if(get_minor() != d_other->get_minor())
-		throw Erange("device::sub_compare", tools_printf(gettext("devices have not the same minor number: %d <--> %d"), get_minor(), d_other->get_minor()));
+		throw Erange("cat_device::sub_compare", tools_printf(gettext("device<s have not the same minor number: %d <--> %d"), get_minor(), d_other->get_minor()));
 	}
     }
 

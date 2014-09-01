@@ -41,7 +41,7 @@ namespace libdar
 	/// @{
 
 	/// the block device class
-    class cat_blockdev : public device
+    class cat_blockdev : public cat_device
     {
     public:
         cat_blockdev(const infinint & uid, const infinint & gid, U_16 perm,
@@ -51,7 +51,7 @@ namespace libdar
                  const std::string & name,
                  U_16 major,
                  U_16 minor,
-		 const infinint & fs_device) : device(uid, gid, perm, last_access,
+		 const infinint & fs_device) : cat_device(uid, gid, perm, last_access,
 						      last_modif, last_change, name,
 						      major, minor, fs_device) {};
         cat_blockdev(user_interaction & dialog,
@@ -59,11 +59,11 @@ namespace libdar
 		 const archive_version & reading_ver,
 		 saved_status saved,
 		 compressor *efsa_loc,
-		 escape *ptr) : device(dialog, f, reading_ver, saved, efsa_loc, ptr) {};
+		 escape *ptr) : cat_device(dialog, f, reading_ver, saved, efsa_loc, ptr) {};
 
-            // using dump from device class
-            // using method is_more_recent_than() from device class
-            // using method has_changed_since() from device class
+            // using dump from cat_device class
+            // using method is_more_recent_than() from cat_device class
+            // using method has_changed_since() from cat_device class
         unsigned char signature() const { return mk_signature('b', get_saved_status()); };
         cat_entree *clone() const { return new (get_pool()) cat_blockdev(*this); };
     };

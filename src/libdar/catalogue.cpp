@@ -1191,7 +1191,7 @@ namespace libdar
 	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const lien *e_sym = dynamic_cast<const lien *>(e);
-	    const device *e_dev = dynamic_cast<const device *>(e);
+	    const cat_device *e_dev = dynamic_cast<const cat_device *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 	    const eod tmp_eod;
 
@@ -1274,7 +1274,7 @@ namespace libdar
 			    {
 				e_ino = e_hard->get_inode();
 				e_sym = dynamic_cast<const lien *>(e_ino);
-				e_dev = dynamic_cast<const device *>(e_ino);
+				e_dev = dynamic_cast<const cat_device *>(e_ino);
 			    }
 
 			    if(e_ino == NULL)
