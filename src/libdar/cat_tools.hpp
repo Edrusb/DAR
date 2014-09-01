@@ -48,21 +48,21 @@ namespace libdar
 	/// @{
 
 
-    extern std::string local_perm(const inode & ref, bool hard);
-    extern std::string local_uid(const inode & ref);
-    extern std::string local_gid(const inode & ref);
-    extern std::string local_size(const inode & ref);
-    extern std::string local_storage_size(const inode & ref);
-    extern std::string local_date(const inode & ref);
-    extern std::string local_flag(const inode & ref, bool isolated, bool dirty_seq);
+    extern std::string local_perm(const cat_inode & ref, bool hard);
+    extern std::string local_uid(const cat_inode & ref);
+    extern std::string local_gid(const cat_inode & ref);
+    extern std::string local_size(const cat_inode & ref);
+    extern std::string local_storage_size(const cat_inode & ref);
+    extern std::string local_date(const cat_inode & ref);
+    extern std::string local_flag(const cat_inode & ref, bool isolated, bool dirty_seq);
     extern void xml_listing_attributes(user_interaction & dialog, //< for user interaction
 				       const std::string & beginning,  //< character std::string to use as margin
 				       const std::string & data,       //< ("saved" | "referenced" | "deleted")
 				       const std::string & metadata,   //< ("saved" | "referenced" | "absent")
-				       const cat_entree * obj = NULL, //< the object to display inode information about
+				       const cat_entree * obj = NULL, //< the object to display cat_inode information about
 				       bool list_ea = false);     //< whether to list Extended Attributes
     extern bool extract_base_and_status(unsigned char signature, unsigned char & base, saved_status & saved);
-    extern void local_display_ea(user_interaction & dialog, const inode * ino, const std::string &prefix, const std::string &suffix, bool xml_output = false);
+    extern void local_display_ea(user_interaction & dialog, const cat_inode * ino, const std::string &prefix, const std::string &suffix, bool xml_output = false);
 
 
 	/// @}

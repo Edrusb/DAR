@@ -50,8 +50,8 @@ namespace libdar
 	/// @{
 
 
-	/// the root class for all inode
-    class inode : public cat_nomme
+	/// the root class for all cat_inode
+    class cat_inode : public cat_nomme
     {
     public:
 
@@ -65,7 +65,7 @@ namespace libdar
 	    cf_inode_type    //< only consider the file type
 	};
 
-        inode(const infinint & xuid,
+        cat_inode(const infinint & xuid,
 	      const infinint & xgid,
 	      U_16 xperm,
               const datetime & last_access,
@@ -73,15 +73,15 @@ namespace libdar
 	      const datetime & last_change,
               const std::string & xname,
 	      const infinint & device);
-        inode(user_interaction & dialog,
+        cat_inode(user_interaction & dialog,
 	      generic_file & f,
 	      const archive_version & reading_ver,
 	      saved_status saved,
 	      compressor *efsa_loc,
 	      escape *ptr);      // if ptr is not NULL, reading a partial dump(), which was done with "small" set to true
-        inode(const inode & ref);
-	const inode & operator = (const inode & ref);
-        ~inode();
+        cat_inode(const cat_inode & ref);
+	const cat_inode & operator = (const cat_inode & ref);
+        ~cat_inode();
 
         const infinint & get_uid() const { return uid; };
         const infinint & get_gid() const { return gid; };
@@ -94,14 +94,14 @@ namespace libdar
         void set_saved_status(saved_status x) { xsaved = x; };
 	infinint get_device() const { if(fs_dev == NULL) throw SRC_BUG; return *fs_dev; };
 
-        bool same_as(const inode & ref) const;
-        bool is_more_recent_than(const inode & ref, const infinint & hourshift) const;
+        bool same_as(const cat_inode & ref) const;
+        bool is_more_recent_than(const cat_inode & ref, const infinint & hourshift) const;
 	    // used for RESTORATION
-        virtual bool has_changed_since(const inode & ref, const infinint & hourshift, comparison_fields what_to_check) const;
+        virtual bool has_changed_since(const cat_inode & ref, const infinint & hourshift, comparison_fields what_to_check) const;
             // signature() left as an abstract method
             // clone is abstract too
 	    // used for INCREMENTAL BACKUP
-        void compare(const inode &other,
+        void compare(const cat_inode &other,
 		     const mask & ea_mask,
 		     comparison_fields what_to_check,
 		     const infinint & hourshift,
@@ -132,7 +132,7 @@ namespace libdar
         void ea_set_saved_status(ea_status status);
         ea_status ea_get_saved_status() const { return ea_saved; };
 
-            // II : to associate EA list to an inode object (mainly for backup operation) #EA_FULL only#
+            // II : to associate EA list to an cat_inode object (mainly for backup operation) #EA_FULL only#
         void ea_attach(ea_attributs *ref);
         const ea_attributs *get_ea() const;              //   #<-- EA_FULL *and* EA_REMOVED# for this call only
         void ea_detach() const; //discards any future call to get_ea() !
@@ -142,7 +142,7 @@ namespace libdar
         void ea_set_offset(const infinint & pos);
 	bool ea_get_offset(infinint & pos) const;
         void ea_set_crc(const crc & val);
-	void ea_get_crc(const crc * & ptr) const; //< the argument is set to point to an allocated crc object owned by this "inode" object, this reference stays valid while the "inode" object exists and MUST NOT be deleted by the caller in any case
+	void ea_get_crc(const crc * & ptr) const; //< the argument is set to point to an allocated crc object owned by this "cat_inode" object, this reference stays valid while the "cat_inode" object exists and MUST NOT be deleted by the caller in any case
 	bool ea_get_crc_size(infinint & val) const; //< returns true if crc is know and puts its width in argument
 
             // IV : to know/record if EA and FSA have been modified # any EA status# and FSA status #
@@ -151,7 +151,7 @@ namespace libdar
 	bool has_last_change() const { return last_cha != NULL; };
 	    // old format did provide last_change only when EA were present, since archive
 	    // format 8, this field is always present even in absence of EA. Thus it is
-	    // still necessary to check if the inode has a last_change() before
+	    // still necessary to check if the cat_inode has a last_change() before
 	    // using get_last_change() (depends on the version of the archive read).
 
 
@@ -162,8 +162,8 @@ namespace libdar
             //////////////////////////////////
             // FILESYSTEM SPECIFIC ATTRIBUTES Methods
             //
-	    // there is not "remove status for FSA, either the inode contains
-	    // full copy of FSA or only remembers the families of FSA found in the unchanged inode
+	    // there is not "remove status for FSA, either the cat_inode contains
+	    // full copy of FSA or only remembers the families of FSA found in the unchanged cat_inode
 	    // FSA none is used when the file has no FSA because:
 	    //  - either the underlying filesystem has no known FSA
 	    //  - or the underlying filesystem FSA support has not been activated at compilation time
@@ -178,7 +178,7 @@ namespace libdar
 
 
 
-	    // II : add or drop FSA list to the inode
+	    // II : add or drop FSA list to the cat_inode
 	void fsa_attach(filesystem_specific_attribute_list *ref);
 	const filesystem_specific_attribute_list *get_fsa() const; // #<-- FSA_FULL only
 	void fsa_detach() const; // discard any future call to get_fsa() !
@@ -192,7 +192,7 @@ namespace libdar
 	bool fsa_get_crc_size(infinint & val) const;
 
     protected:
-        virtual void sub_compare(const inode & other, bool isolated_mode) const {};
+        virtual void sub_compare(const cat_inode & other, bool isolated_mode) const {};
 
 	    /// escape generic_file relative methods
 	escape *get_escape_layer() const { return esc; };
@@ -231,7 +231,7 @@ namespace libdar
 
 	void nullifyptr();
 	void destroy();
-	void copy_from(const inode & ref);
+	void copy_from(const cat_inode & ref);
 
 	static const ea_attributs empty_ea;
     };

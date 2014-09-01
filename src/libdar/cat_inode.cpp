@@ -72,9 +72,9 @@ using namespace std;
 namespace libdar
 {
 
-    const ea_attributs inode::empty_ea;
+    const ea_attributs cat_inode::empty_ea;
 
-    inode::inode(const infinint & xuid, const infinint & xgid, U_16 xperm,
+    cat_inode::cat_inode(const infinint & xuid, const infinint & xgid, U_16 xperm,
                  const datetime & last_access,
                  const datetime & last_modif,
                  const datetime & last_change,
@@ -97,7 +97,7 @@ namespace libdar
             last_cha = new (get_pool()) datetime(last_change);
             fs_dev = new (get_pool()) infinint(fs_device);
             if(last_cha == NULL || fs_dev == NULL)
-                throw Ememory("inde::inode");
+                throw Ememory("cat_inode::cat_inode");
         }
         catch(...)
         {
@@ -106,7 +106,7 @@ namespace libdar
         }
     }
 
-    inode::inode(user_interaction & dialog,
+    cat_inode::cat_inode(user_interaction & dialog,
                  generic_file & f,
                  const archive_version & reading_ver,
                  saved_status saved,
@@ -146,7 +146,7 @@ namespace libdar
 		    ea_saved = ea_removed;
 		    break;
 		default:
-		    throw Erange("inode::inode", gettext("badly structured inode: unknown inode flag"));
+		    throw Erange("cat_inode::cat_inode", gettext("badly structured inode: unknown inode flag"));
 		}
 	    }
 	    else
@@ -157,10 +157,10 @@ namespace libdar
 		    // UID and GID were stored on 16 bits each
 
 		if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-		    throw Erange("inode::inode", gettext("missing data to build an inode"));
+		    throw Erange("cat_inode::cat_inode", gettext("missing data to build an inode"));
 		uid = ntohs(tmp);
 		if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-		    throw Erange("inode::inode", gettext("missing data to build an inode"));
+		    throw Erange("cat_inode::cat_inode", gettext("missing data to build an inode"));
 		gid = ntohs(tmp);
 	    }
 	    else // archive format >= "08"
@@ -170,7 +170,7 @@ namespace libdar
 	    }
 
 	    if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-		throw Erange("inode::inode", gettext("missing data to build an inode"));
+		throw Erange("cat_inode::cat_inode", gettext("missing data to build an inode"));
 	    perm = ntohs(tmp);
 
 	    last_acc.read(f, reading_ver);
@@ -180,13 +180,13 @@ namespace libdar
 	    {
 		last_cha = new (get_pool()) datetime(f, reading_ver);
 		if(last_cha == NULL)
-		    throw Ememory("inode::inode(file)");
+		    throw Ememory("cat_inode::cat_inode(file)");
 
 		if(ea_saved == ea_full)
 		{
 		    ea_size = new (get_pool()) infinint(f);
 		    if(ea_size == NULL)
-			throw Ememory("inode::inode(file)");
+			throw Ememory("cat_inode::cat_inode(file)");
 		}
 	    }
 	    else // archive format <= 7
@@ -201,7 +201,7 @@ namespace libdar
 		case ea_full:
 		    ea_offset = new (get_pool()) infinint(f);
 		    if(ea_offset == NULL)
-			throw Ememory("inode::inode(file)");
+			throw Ememory("cat_inode::cat_inode(file)");
 
 		    if(reading_ver <= 7)
 		    {
@@ -211,7 +211,7 @@ namespace libdar
 
 			last_cha = new (get_pool()) datetime(f, reading_ver);
 			if(last_cha == NULL)
-			    throw Ememory("inode::inode(file)");
+			    throw Ememory("cat_inode::cat_inode(file)");
 		    }
 		    else // archive format >= 8
 		    {
@@ -226,7 +226,7 @@ namespace libdar
 		    {
 			last_cha = new (get_pool()) datetime(f, reading_ver);
 			if(last_cha == NULL)
-			    throw Ememory("inode::inode(file)");
+			    throw Ememory("cat_inode::cat_inode(file)");
 		    }
 		    break;
 		case ea_none:
@@ -235,7 +235,7 @@ namespace libdar
 		    {
 			last_cha = new (get_pool()) datetime();
 			if(last_cha == NULL)
-			    throw Ememory("inode::inode(file)");
+			    throw Ememory("cat_inode::cat_inode(file)");
 		    }
 		    break;
 		default:
@@ -273,21 +273,21 @@ namespace libdar
 		    fsa_saved = fsa_full;
 		    break;
 		default:
-		    throw Erange("inode::inode", gettext("badly structured inode: unknown inode flag for FSA"));
+		    throw Erange("cat_inode::cat_inode", gettext("badly structured inode: unknown inode flag for FSA"));
 		}
 
 		if(fsa_saved != fsa_none)
 		{
 		    fsa_families = new (get_pool()) infinint(f);
 		    if(fsa_families == NULL)
-			throw Ememory("inode::inode(file)");
+			throw Ememory("cat_inode::cat_inode(file)");
 		}
 
 		if(fsa_saved == fsa_full)
 		{
 		    fsa_size = new (get_pool()) infinint(f);
 		    if(fsa_size == NULL)
-			throw Ememory("inde::inode(file)");
+			throw Ememory("cat_inode::cat_inode(file)");
 		}
 
 		if(esc == NULL)
@@ -298,7 +298,7 @@ namespace libdar
 			fsa_offset = new (get_pool()) infinint(f);
 			fsa_crc = create_crc_from_file(f, get_pool());
 			if(fsa_offset == NULL || fsa_crc == NULL)
-			    throw Ememory("inode::inode(file)");
+			    throw Ememory("cat_inode::cat_inode(file)");
 			break;
 		    case fsa_partial:
 		    case fsa_none:
@@ -325,7 +325,7 @@ namespace libdar
         }
     }
 
-    inode::inode(const inode & ref) : cat_nomme(ref)
+    cat_inode::cat_inode(const cat_inode & ref) : cat_nomme(ref)
     {
 	nullifyptr();
 
@@ -340,7 +340,7 @@ namespace libdar
 	}
     }
 
-    const inode & inode::operator = (const inode & ref)
+    const cat_inode & cat_inode::operator = (const cat_inode & ref)
     {
         cat_nomme *me = this;
         const cat_nomme *nref = &ref;
@@ -353,22 +353,22 @@ namespace libdar
         return *this;
     }
 
-    inode::~inode()
+    cat_inode::~cat_inode()
     {
 	destroy();
     }
 
-    bool inode::same_as(const inode & ref) const
+    bool cat_inode::same_as(const cat_inode & ref) const
     {
         return cat_nomme::same_as(ref) && compatible_signature(ref.signature(), signature());
     }
 
-    bool inode::is_more_recent_than(const inode & ref, const infinint & hourshift) const
+    bool cat_inode::is_more_recent_than(const cat_inode & ref, const infinint & hourshift) const
     {
         return ref.last_mod < last_mod && !tools_is_equal_with_hourshift(hourshift, ref.last_mod, last_mod);
     }
 
-    bool inode::has_changed_since(const inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
+    bool cat_inode::has_changed_since(const cat_inode & ref, const infinint & hourshift, comparison_fields what_to_check) const
     {
         return (what_to_check != cf_inode_type && (hourshift > 0 ? ! tools_is_equal_with_hourshift(hourshift, ref.last_mod, last_mod) : ref.last_mod != last_mod))
             || (what_to_check == cf_all && uid != ref.uid)
@@ -376,7 +376,7 @@ namespace libdar
             || (what_to_check != cf_mtime && what_to_check != cf_inode_type && perm != ref.perm);
     }
 
-    void inode::compare(const inode &other,
+    void cat_inode::compare(const cat_inode &other,
                         const mask & ea_mask,
                         comparison_fields what_to_check,
                         const infinint & hourshift,
@@ -387,24 +387,24 @@ namespace libdar
 	bool do_mtime_test = dynamic_cast<const lien *>(&other) == NULL || symlink_date;
 
         if(!same_as(other))
-            throw Erange("inode::compare",gettext("different file type"));
+            throw Erange("cat_inode::compare",gettext("different file type"));
         if(what_to_check == cf_all && get_uid() != other.get_uid())
 	{
 	    infinint u1 = get_uid();
 	    infinint u2 = other.get_uid();
-            throw Erange("inode.compare", tools_printf(gettext("different owner (uid): %i <--> %i"), &u1, &u2));
+            throw Erange("cat_inode.compare", tools_printf(gettext("different owner (uid): %i <--> %i"), &u1, &u2));
 	}
         if(what_to_check == cf_all && get_gid() != other.get_gid())
 	{
 	    infinint g1 = get_gid();
 	    infinint g2 = other.get_gid();
-            throw Erange("inode.compare", tools_printf(gettext("different owner group (gid): %i <--> %i"), &g1, &g2));
+            throw Erange("cat_inode.compare", tools_printf(gettext("different owner group (gid): %i <--> %i"), &g1, &g2));
 	}
         if((what_to_check == cf_all || what_to_check == cf_ignore_owner) && get_perm() != other.get_perm())
 	{
 	    string p1 = tools_int2octal(get_perm());
 	    string p2 = tools_int2octal(other.get_perm());
-            throw Erange("inode.compare", tools_printf(gettext("different permission: %S <--> %S"), &p1, &p2));
+            throw Erange("cat_inode.compare", tools_printf(gettext("different permission: %S <--> %S"), &p1, &p2));
 	}
         if(do_mtime_test
 	   && (what_to_check == cf_all || what_to_check == cf_ignore_owner || what_to_check == cf_mtime)
@@ -412,7 +412,7 @@ namespace libdar
 	{
 	    string s1 = tools_display_date(get_last_modif());
 	    string s2 = tools_display_date(other.get_last_modif());
-            throw Erange("inode.compare", tools_printf(gettext("difference of last modification date: %S <--> %S"), &s1, &s2));
+            throw Erange("cat_inode.compare", tools_printf(gettext("difference of last modification date: %S <--> %S"), &s1, &s2));
 	}
 
         sub_compare(other, isolated_mode);
@@ -427,13 +427,13 @@ namespace libdar
 		    const ea_attributs *me = get_ea(); // this pointer must not be freed
 		    const ea_attributs *you = other.get_ea(); // this pointer must not be freed neither
 		    if(me->diff(*you, ea_mask))
-			throw Erange("inode::compare", gettext("different Extended Attributes"));
+			throw Erange("cat_inode::compare", gettext("different Extended Attributes"));
 		}
             }
             else
             {
 #ifdef EA_SUPPORT
-                throw Erange("inode::compare", gettext("no Extended Attribute to compare with"));
+                throw Erange("cat_inode::compare", gettext("no Extended Attribute to compare with"));
 #else
                 throw Ecompilation(gettext("Cannot compare EA: EA support has not been activated at compilation time"));
 #endif
@@ -449,12 +449,12 @@ namespace libdar
             {
                 if(!tools_is_equal_with_hourshift(hourshift, get_last_change(), other.get_last_change())
                    && get_last_change() < other.get_last_change())
-                    throw Erange("inode::compare", gettext("inode last change date (ctime) greater, EA might be different"));
+                    throw Erange("cat_inode::compare", gettext("inode last change date (ctime) greater, EA might be different"));
             }
             else
             {
 #ifdef EA_SUPPORT
-                throw Erange("inode::compare", gettext("no Extended Attributes to compare with"));
+                throw Erange("cat_inode::compare", gettext("no Extended Attributes to compare with"));
 #else
                 throw Ecompilation(gettext("Cannot compare EA: EA support has not been activated at compilation time"));
 #endif
@@ -483,21 +483,21 @@ namespace libdar
 			throw SRC_BUG;
 
 		    if(!me->is_included_in(*you, scope))
-			throw Erange("inode::compare", gettext("different Filesystem Specific Attributes"));
+			throw Erange("cat_inode::compare", gettext("different Filesystem Specific Attributes"));
 		}
 	    }
 	    else
-		throw Erange("inode::compare", gettext("No Filesystem Specific Attribute to compare with"));
+		throw Erange("cat_inode::compare", gettext("No Filesystem Specific Attribute to compare with"));
 	    break;
 	case fsa_partial:
 	    if(other.fsa_get_saved_status() != fsa_none)
 	    {
 		if(!tools_is_equal_with_hourshift(hourshift, get_last_change(), other.get_last_change())
                    && get_last_change() < other.get_last_change())
-                    throw Erange("inode::compare", gettext("inode last change date (ctime) greater, FSA might be different"));
+                    throw Erange("cat_inode::compare", gettext("inode last change date (ctime) greater, FSA might be different"));
 	    }
 	    else
-		throw Erange("inode::compare", gettext("Filesystem Specific Attribute are missing"));
+		throw Erange("cat_inode::compare", gettext("Filesystem Specific Attribute are missing"));
 	    break;
 	case fsa_none:
 	    break; // nothing to check
@@ -506,7 +506,7 @@ namespace libdar
 	}
     }
 
-    void inode::inherited_dump(generic_file & r, bool small) const
+    void cat_inode::inherited_dump(generic_file & r, bool small) const
     {
         U_16 tmp;
         unsigned char flag = 0;
@@ -625,7 +625,7 @@ namespace libdar
 	}
     }
 
-    void inode::ea_set_saved_status(ea_status status)
+    void cat_inode::ea_set_saved_status(ea_status status)
     {
         if(status == ea_saved)
             return;
@@ -658,7 +658,7 @@ namespace libdar
         ea_saved = status;
     }
 
-    void inode::ea_attach(ea_attributs *ref)
+    void cat_inode::ea_attach(ea_attributs *ref)
     {
         if(ea_saved != ea_full)
             throw SRC_BUG;
@@ -672,14 +672,14 @@ namespace libdar
 	    }
             ea_size = new (get_pool()) infinint(ref->space_used());
 	    if(ea_size == NULL)
-		throw Ememory("inode::ea_attach");
+		throw Ememory("cat_inode::ea_attach");
             ea = ref;
         }
         else
             throw SRC_BUG;
     }
 
-    const ea_attributs *inode::get_ea() const
+    const ea_attributs *cat_inode::get_ea() const
     {
         switch(ea_saved)
         {
@@ -703,9 +703,9 @@ namespace libdar
 			else // sequential read mode
 			{
 			    if(!esc->skip_to_next_mark(escape::seqt_ea, false))
-				throw Erange("inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
+				throw Erange("cat_inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
 			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
-			    const_cast<inode *>(this)->ea_set_offset(storage->get_position());
+			    const_cast<cat_inode *>(this)->ea_set_offset(storage->get_position());
 			}
 
 			if(ea_get_size() == 0)
@@ -724,7 +724,7 @@ namespace libdar
 				    throw SRC_BUG;   // EA do not exist in that archive format
 				const_cast<ea_attributs *&>(ea) = new (get_pool()) ea_attributs(*storage, edit);
 				if(ea == NULL)
-				    throw Ememory("inode::get_ea");
+				    throw Ememory("cat_inode::get_ea");
 			    }
 			    catch(Euser_abort & e)
 			    {
@@ -740,7 +740,7 @@ namespace libdar
 			    }
 			    catch(Egeneric & e)
 			    {
-				throw Erange("inode::get_ea", string("Error while reading EA from archive: ") + e.get_message());
+				throw Erange("cat_inode::get_ea", string("Error while reading EA from archive: ") + e.get_message());
 			    }
 			}
 			catch(...)
@@ -757,7 +757,7 @@ namespace libdar
 			    throw SRC_BUG;
 
 			if(typeid(*val) != typeid(*my_crc) || *val != *my_crc)
-			    throw Erange("inode::get_ea", gettext("CRC error detected while reading EA"));
+			    throw Erange("cat_inode::get_ea", gettext("CRC error detected while reading EA"));
 		    }
 		    catch(...)
 		    {
@@ -781,7 +781,7 @@ namespace libdar
         }
     }
 
-    void inode::ea_detach() const
+    void cat_inode::ea_detach() const
     {
         if(ea != NULL)
         {
@@ -790,7 +790,7 @@ namespace libdar
         }
     }
 
-    infinint inode::ea_get_size() const
+    infinint cat_inode::ea_get_size() const
     {
         if(ea_saved == ea_full)
         {
@@ -798,9 +798,9 @@ namespace libdar
             {
                 if(ea != NULL)
 		{
-                    const_cast<inode *>(this)->ea_size = new (get_pool()) infinint (ea->space_used());
+                    const_cast<cat_inode *>(this)->ea_size = new (get_pool()) infinint (ea->space_used());
 		    if(ea_size == NULL)
-			throw Ememory("inode::ea_get_size");
+			throw Ememory("cat_inode::ea_get_size");
 		}
 		else // else we stick with value 0, meaning that we read an old archive
 		    return 0;
@@ -811,19 +811,19 @@ namespace libdar
             throw SRC_BUG;
     }
 
-    void inode::ea_set_offset(const infinint & pos)
+    void cat_inode::ea_set_offset(const infinint & pos)
     {
 	if(ea_offset == NULL)
 	{
 	    ea_offset = new (get_pool()) infinint(pos);
 	    if(ea_offset == NULL)
-		throw Ememory("inode::ea_set_offset");
+		throw Ememory("cat_inode::ea_set_offset");
 	}
 	else
 	    *ea_offset = pos;
     }
 
-    bool inode::ea_get_offset(infinint & val) const
+    bool cat_inode::ea_get_offset(infinint & val) const
     {
 	if(ea_offset != NULL)
 	{
@@ -834,7 +834,7 @@ namespace libdar
 	    return false;
     }
 
-    void inode::ea_set_crc(const crc & val)
+    void cat_inode::ea_set_crc(const crc & val)
     {
 	if(ea_crc != NULL)
 	{
@@ -843,10 +843,10 @@ namespace libdar
 	}
 	ea_crc = val.clone();
 	if(ea_crc == NULL)
-	    throw Ememory("inode::ea_set_crc");
+	    throw Ememory("cat_inode::ea_set_crc");
     }
 
-    void inode::ea_get_crc(const crc * & ptr) const
+    void cat_inode::ea_get_crc(const crc * & ptr) const
     {
 	if(ea_get_saved_status() != ea_full)
 	    throw SRC_BUG;
@@ -865,7 +865,7 @@ namespace libdar
                         tmp = create_crc_from_file(*esc, get_pool(), true);
 		    if(tmp == NULL)
 			throw SRC_BUG;
-                    const_cast<inode *>(this)->ea_crc = tmp;
+                    const_cast<cat_inode *>(this)->ea_crc = tmp;
 		    tmp = NULL; // the object is now owned by "this"
                 }
                 catch(...)
@@ -879,11 +879,11 @@ namespace libdar
             {
                 crc *tmp = new (get_pool()) crc_n(1); // creating a default CRC
                 if(tmp == NULL)
-                    throw Ememory("inode::ea_get_crc");
+                    throw Ememory("cat_inode::ea_get_crc");
                 try
                 {
                     tmp->clear();
-                    const_cast<inode *>(this)->ea_crc = tmp;
+                    const_cast<cat_inode *>(this)->ea_crc = tmp;
                         // this is to avoid trying to fetch the CRC a new time if decision
                         // has been taken to continue the operation after the exception
                         // thrown below has been caught.
@@ -894,7 +894,7 @@ namespace libdar
                     delete tmp;
                     throw;
                 }
-                throw Erange("inode::ea_get_crc", gettext("Error while reading CRC for EA from the archive: No escape mark found for that file"));
+                throw Erange("cat_inode::ea_get_crc", gettext("Error while reading CRC for EA from the archive: No escape mark found for that file"));
             }
         }
 
@@ -904,7 +904,7 @@ namespace libdar
             ptr = ea_crc;
     }
 
-    bool inode::ea_get_crc_size(infinint & val) const
+    bool cat_inode::ea_get_crc_size(infinint & val) const
     {
         if(ea_crc != NULL)
         {
@@ -915,7 +915,7 @@ namespace libdar
             return false;
     }
 
-    datetime inode::get_last_change() const
+    datetime cat_inode::get_last_change() const
     {
         if(last_cha == NULL)
             throw SRC_BUG;
@@ -923,7 +923,7 @@ namespace libdar
             return *last_cha;
     }
 
-    void inode::set_last_change(const datetime & x_time)
+    void cat_inode::set_last_change(const datetime & x_time)
     {
         if(last_cha == NULL)
             throw SRC_BUG;
@@ -931,7 +931,7 @@ namespace libdar
             *last_cha = x_time;
     }
 
-    void inode::fsa_set_saved_status(fsa_status status)
+    void cat_inode::fsa_set_saved_status(fsa_status status)
     {
 	if(status == fsa_saved)
 	    return;
@@ -963,7 +963,7 @@ namespace libdar
 	fsa_saved = status;
     }
 
-    void inode::fsa_attach(filesystem_specific_attribute_list *ref)
+    void cat_inode::fsa_attach(filesystem_specific_attribute_list *ref)
     {
         if(fsa_saved != fsa_full)
             throw SRC_BUG;
@@ -985,7 +985,7 @@ namespace libdar
 		fsa_size = new (get_pool()) infinint (ref->storage_size());
 		fsa_families = new(get_pool()) infinint(fsa_scope_to_infinint(ref->get_fsa_families()));
 		if(fsa_size == NULL || fsa_families == NULL)
-		    throw Ememory("inode::fsa_attach");
+		    throw Ememory("cat_inode::fsa_attach");
 	    }
 	    catch(...)
 	    {
@@ -1007,16 +1007,16 @@ namespace libdar
             throw SRC_BUG;
     }
 
-    void inode::fsa_detach() const
+    void cat_inode::fsa_detach() const
     {
         if(fsal != NULL)
         {
             delete fsal;
-            const_cast<inode *>(this)->fsal = NULL;
+            const_cast<cat_inode *>(this)->fsal = NULL;
         }
     }
 
-    const filesystem_specific_attribute_list *inode::get_fsa() const
+    const filesystem_specific_attribute_list *cat_inode::get_fsa() const
     {
         switch(fsa_saved)
         {
@@ -1024,7 +1024,7 @@ namespace libdar
             if(fsal != NULL)
                 return fsal;
             else
-                if(storage != NULL) // lsa_offset may be equal to zero if the first inode saved had only EA modified since archive of reference
+                if(storage != NULL) // lsa_offset may be equal to zero if the first cat_inode saved had only EA modified since archive of reference
                 {
 		    crc *val = NULL;
 		    const crc *my_crc = NULL;
@@ -1040,9 +1040,9 @@ namespace libdar
 			else
 			{
 			    if(!esc->skip_to_next_mark(escape::seqt_fsa, false))
-				throw Erange("inode::get_fsa", string("Error while fetching FSA from archive: No escape mark found for that file"));
+				throw Erange("cat_inode::get_fsa", string("Error while fetching FSA from archive: No escape mark found for that file"));
 			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
-			    const_cast<inode *>(this)->fsa_set_offset(storage->get_position());
+			    const_cast<cat_inode *>(this)->fsa_set_offset(storage->get_position());
 			}
 
 			storage->suspend_compression();
@@ -1054,18 +1054,18 @@ namespace libdar
 			    {
 				try
 				{
-				    const_cast<inode *>(this)->fsal = new (get_pool()) filesystem_specific_attribute_list();
+				    const_cast<cat_inode *>(this)->fsal = new (get_pool()) filesystem_specific_attribute_list();
 				    if(fsal == NULL)
-					throw Ememory("inode::get_fsa");
+					throw Ememory("cat_inode::get_fsa");
 				    try
 				    {
 					storage->read_ahead(fsa_get_size());
-					const_cast<inode *>(this)->fsal->read(*storage, edit);
+					const_cast<cat_inode *>(this)->fsal->read(*storage, edit);
 				    }
 				    catch(...)
 				    {
 					delete fsal;
-					const_cast<inode *>(this)->fsal = NULL;
+					const_cast<cat_inode *>(this)->fsal = NULL;
 					throw;
 				    }
 				}
@@ -1083,7 +1083,7 @@ namespace libdar
 				}
 				catch(Egeneric & e)
 				{
-				    throw Erange("inode::get_fda", string("Error while reading FSA from archive: ") + e.get_message());
+				    throw Erange("cat_inode::get_fda", string("Error while reading FSA from archive: ") + e.get_message());
 				}
 			    }
 			    catch(...)
@@ -1108,7 +1108,7 @@ namespace libdar
 			    throw SRC_BUG;
 
 			if(typeid(*val) != typeid(*my_crc) || *val != *my_crc)
-			    throw Erange("inode::get_fsa", gettext("CRC error detected while reading FSA"));
+			    throw Erange("cat_inode::get_fsa", gettext("CRC error detected while reading FSA"));
 		    }
 		    catch(...)
 		    {
@@ -1129,7 +1129,7 @@ namespace libdar
         }
     }
 
-    infinint inode::fsa_get_size() const
+    infinint cat_inode::fsa_get_size() const
     {
         if(fsa_saved == fsa_full)
 	    if(fsa_size != NULL)
@@ -1140,19 +1140,19 @@ namespace libdar
             throw SRC_BUG;
     }
 
-    void inode::fsa_set_offset(const infinint & pos)
+    void cat_inode::fsa_set_offset(const infinint & pos)
     {
 	if(fsa_offset == NULL)
 	{
 	    fsa_offset = new (get_pool()) infinint(pos);
 	    if(fsa_offset == NULL)
-		throw Ememory("inode::fsa_set_offset");
+		throw Ememory("cat_inode::fsa_set_offset");
 	}
 	else
 	    *fsa_offset = pos;
     }
 
-    bool inode::fsa_get_offset(infinint & pos) const
+    bool cat_inode::fsa_get_offset(infinint & pos) const
     {
 	if(fsa_offset != NULL)
 	{
@@ -1164,7 +1164,7 @@ namespace libdar
     }
 
 
-    void inode::fsa_set_crc(const crc & val)
+    void cat_inode::fsa_set_crc(const crc & val)
     {
 	if(fsa_crc != NULL)
 	{
@@ -1173,10 +1173,10 @@ namespace libdar
 	}
 	fsa_crc = val.clone();
 	if(fsa_crc == NULL)
-	    throw Ememory("inode::fsa_set_crc");
+	    throw Ememory("cat_inode::fsa_set_crc");
     }
 
-    void inode::fsa_get_crc(const crc * & ptr) const
+    void cat_inode::fsa_get_crc(const crc * & ptr) const
     {
 	if(fsa_get_saved_status() != fsa_full)
 	    throw SRC_BUG;
@@ -1192,7 +1192,7 @@ namespace libdar
 		    tmp = create_crc_from_file(*esc, get_pool(), false);
 		    if(tmp == NULL)
 			throw SRC_BUG;
-                    const_cast<inode *>(this)->fsa_crc = tmp;
+                    const_cast<cat_inode *>(this)->fsa_crc = tmp;
 		    tmp = NULL; // the object is now owned by "this"
                 }
                 catch(...)
@@ -1206,11 +1206,11 @@ namespace libdar
             {
                 crc *tmp = new (get_pool()) crc_n(1); // creating a default CRC
                 if(tmp == NULL)
-                    throw Ememory("inode::fsa_get_crc");
+                    throw Ememory("cat_inode::fsa_get_crc");
                 try
                 {
                     tmp->clear();
-                    const_cast<inode *>(this)->fsa_crc = tmp;
+                    const_cast<cat_inode *>(this)->fsa_crc = tmp;
                         // this is to avoid trying to fetch the CRC a new time if decision
                         // has been taken to continue the operation after the exception
                         // thrown below has been caught.
@@ -1221,7 +1221,7 @@ namespace libdar
                     delete tmp;
                     throw;
                 }
-                throw Erange("inode::fsa_get_crc", gettext("Error while reading CRC for FSA from the archive: No escape mark found for that file"));
+                throw Erange("cat_inode::fsa_get_crc", gettext("Error while reading CRC for FSA from the archive: No escape mark found for that file"));
             }
         }
 
@@ -1231,7 +1231,7 @@ namespace libdar
             ptr = fsa_crc;
     }
 
-    bool inode::fsa_get_crc_size(infinint & val) const
+    bool cat_inode::fsa_get_crc_size(infinint & val) const
     {
         if(fsa_crc != NULL)
         {
@@ -1242,7 +1242,7 @@ namespace libdar
             return false;
     }
 
-    void inode::nullifyptr()
+    void cat_inode::nullifyptr()
     {
         last_cha = NULL;
         ea_offset = NULL;
@@ -1259,7 +1259,7 @@ namespace libdar
 	esc = NULL;
     }
 
-    void inode::destroy()
+    void cat_inode::destroy()
     {
         if(last_cha != NULL)
         {
@@ -1334,7 +1334,7 @@ namespace libdar
 	}
     }
 
-    void inode::copy_from(const inode & ref)
+    void cat_inode::copy_from(const cat_inode & ref)
     {
 	try
 	{
@@ -1354,7 +1354,7 @@ namespace libdar
 	    {
 		ea_crc = (ref.ea_crc)->clone();
 		if(ea_crc == NULL)
-		    throw Ememory("inode::copy_from");
+		    throw Ememory("cat_inode::copy_from");
 	    }
 	    else
 		ea_crc = NULL;
@@ -1366,7 +1366,7 @@ namespace libdar
 	    {
 		fsa_crc = (ref.fsa_crc)->clone();
 		if(fsa_crc == NULL)
-		    throw Ememory("inode::copy_from");
+		    throw Ememory("cat_inode::copy_from");
 	    }
 	    else
 		fsa_crc = NULL;

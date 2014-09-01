@@ -167,7 +167,7 @@ namespace libdar
 
 	void dump(generic_file & f) const;
 
-	void add(const inode *entry, const archive_num & archive);
+	void add(const cat_inode *entry, const archive_num & archive);
 	void add(const detruit *entry, const archive_num & archive);
 	const data_tree *read_child(const std::string & name) const;
 	void read_all_children(std::vector<std::string> & fils) const;

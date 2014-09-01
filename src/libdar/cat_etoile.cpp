@@ -36,7 +36,7 @@ namespace libdar
 {
 
 
-    etoile::etoile(inode *host, const infinint & etiquette_number)
+    etoile::etoile(cat_inode *host, const infinint & etiquette_number)
     {
         if(host == NULL)
             throw SRC_BUG;

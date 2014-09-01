@@ -249,7 +249,7 @@ namespace libdar
         void make_file(const cat_nomme * ref,                       //< object to restore in filesystem
 		       const path & ou,                         //< where to restore it
 		       bool dir_perm,                           //< false for already existing directories, this makes dar set the minimum available permission to be able to restore files in that directory at a later time
-		       inode::comparison_fields what_to_check,  //< defines whether to restore permission, ownership, dates, etc.
+		       cat_inode::comparison_fields what_to_check,  //< defines whether to restore permission, ownership, dates, etc.
 		       const fsa_scope & scope);                //< fsa scope to use for restoration
             // generate inode or make a hard link on an already restored or existing inode.
 
@@ -300,7 +300,7 @@ namespace libdar
 			   bool x_warn_overwrite,
 			   bool x_info_details,
                            const mask & x_ea_mask,
-			   inode::comparison_fields what_to_check,
+			   cat_inode::comparison_fields what_to_check,
 			   bool x_warn_remove_no_match,
 			   bool empty,
 			   const crit_action *x_overwrite,
@@ -366,7 +366,7 @@ namespace libdar
         bool info_details;
 	mask *ea_mask;
         bool warn_overwrite;
-	inode::comparison_fields what_to_check;
+	cat_inode::comparison_fields what_to_check;
 	bool warn_remove_no_match;
         std::vector<stack_dir_t> stack_dir;
         path *current_dir;
@@ -381,23 +381,23 @@ namespace libdar
 	    // subroutines of write()
 
 	    /// perform action due to the overwriting policy when the "to be added" entry is a detruit object
-	void action_over_remove(const inode *in_place,
+	void action_over_remove(const cat_inode *in_place,
 				const detruit *to_be_added,
 				const std::string & spot,
 				over_action_data action);
 	    /// perform action for data due to the overwriting policy when the "to be added" entry is not a detruit
-	void action_over_data(const inode *in_place,
+	void action_over_data(const cat_inode *in_place,
 			      const cat_nomme *to_be_added,
 			      const std::string & spot,
 			      over_action_data action,
 			      action_done_for_data & data_done);
 	    /// perform action for EA due to overwriting policy
-	bool action_over_ea(const inode *in_place,
+	bool action_over_ea(const cat_inode *in_place,
 			    const cat_nomme *to_be_added,
 			    const std::string & spot,
 			    over_action_ea action);
 	    /// perform action for FSA due to overwriting policy
-	bool action_over_fsa(const inode *in_place,
+	bool action_over_fsa(const cat_inode *in_place,
 			    const cat_nomme *to_be_added,
 			    const std::string & spot,
 			    over_action_ea action);

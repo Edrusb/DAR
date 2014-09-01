@@ -108,7 +108,7 @@ namespace libdar
         infinint tmp_tiquette;
         char tmp_flag;
         map<infinint, etoile *>::iterator etl;
-        inode *ino_ptr = NULL;
+        cat_inode *ino_ptr = NULL;
         cat_entree *entree_ptr = NULL;
         entree_stats fake_stats; // the call to cat_entree::read will increment counters with the inode we will read
             // but this inode will also be counted from the cat_entree::read we are call from.
@@ -170,7 +170,7 @@ namespace libdar
             else
                 entree_ptr = cat_entree::read(dialog, get_pool(), f, reading_ver, fake_stats, corres, default_algo, data_loc, efsa_loc, lax, false, ptr);
 
-            ino_ptr = dynamic_cast<inode *>(entree_ptr);
+            ino_ptr = dynamic_cast<cat_inode *>(entree_ptr);
             if(ino_ptr == NULL || dynamic_cast<cat_directory *>(entree_ptr) != NULL)
             {
                 if(entree_ptr != NULL)
@@ -279,7 +279,7 @@ namespace libdar
         }
         else // no need to record this inode with the hard link overhead
         {
-            inode *real = star_ref->get_inode();
+            cat_inode *real = star_ref->get_inode();
             real->change_name(get_name()); // set the name of the cat_mirage object to the inode
             real->specific_dump(f, small);
         }

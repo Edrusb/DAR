@@ -264,7 +264,7 @@ bool get_args(shell_interaction & dialog,
     p.empty_dir = false;
     p.input_pipe = "";
     p.output_pipe = "";
-    p.what_to_check = inode::cf_all;
+    p.what_to_check = cat_inode::cf_all;
     p.execute = "";
     p.execute_ref = "";
     p.pass.clear();
@@ -417,14 +417,14 @@ bool get_args(shell_interaction & dialog,
 	    dialog.warning(gettext("-z or -y need only to be used with -c -C or -+ options"));
 	if(p.first_file_size != 0 && p.file_size == 0)
 	    throw Erange("get_args", gettext("-S option requires the use of -s"));
-	if(p.what_to_check != inode::cf_all && (p.op == isolate || (p.op == create && p.ref_root == NULL) || p.op == test || p.op == listing || p.op == merging))
+	if(p.what_to_check != cat_inode::cf_all && (p.op == isolate || (p.op == create && p.ref_root == NULL) || p.op == test || p.op == listing || p.op == merging))
 	    dialog.warning(gettext("ignoring -O option, as it is useless in this situation"));
-	if(p.what_to_check == inode::cf_all
+	if(p.what_to_check == cat_inode::cf_all
 	   && p.op == extract
 	   && capability_CHOWN(dialog, p.info_details)
 	   && getuid() != 0) // uid == 0 for root
 	{
-	    p.what_to_check = inode::cf_ignore_owner;
+	    p.what_to_check = cat_inode::cf_ignore_owner;
 	    string msg = tools_printf(gettext("File ownership will not be restored as %s has not the CHOWN capability nor is running as root. to avoid this message use -O option"), cmd.c_str());
 	    dialog.pause(msg);
 	}
@@ -1102,20 +1102,20 @@ static bool get_args_recursive(recursive_param & rec,
                     rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 break;
             case 'O':
-                if(p.what_to_check != inode::cf_all)
+                if(p.what_to_check != cat_inode::cf_all)
                     rec.dialog->warning(tools_printf(gettext(ONLY_ONCE), char(lu)));
                 else
 		    if(optarg == NULL)
-			p.what_to_check = inode::cf_ignore_owner;
+			p.what_to_check = cat_inode::cf_ignore_owner;
 		    else
 			if(strcasecmp(optarg, "ignore-owner") == 0)
-			    p.what_to_check = inode::cf_ignore_owner;
+			    p.what_to_check = cat_inode::cf_ignore_owner;
 			else
 			    if(strcasecmp(optarg, "mtime") == 0)
-				p.what_to_check = inode::cf_mtime;
+				p.what_to_check = cat_inode::cf_mtime;
 			    else
 				if(strcasecmp(optarg, "inode-type") == 0)
-				    p.what_to_check = inode::cf_inode_type;
+				    p.what_to_check = cat_inode::cf_inode_type;
 				else
 				    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
 

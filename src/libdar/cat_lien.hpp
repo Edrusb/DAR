@@ -41,7 +41,7 @@ namespace libdar
 	/// @{
 
 	/// the symbolic link inode class
-    class lien : public inode
+    class lien : public cat_inode
     {
     public :
         lien(const infinint & uid, const infinint & gid, U_16 perm,
@@ -61,13 +61,13 @@ namespace libdar
         const std::string & get_target() const;
         void set_target(std::string x);
 
-            // using the method is_more_recent_than() from inode
-            // using method has_changed_since() from inode class
+            // using the method is_more_recent_than() from cat_inode
+            // using method has_changed_since() from cat_inode class
         unsigned char signature() const { return mk_signature('l', get_saved_status()); };
         cat_entree *clone() const { return new (get_pool()) lien(*this); };
 
     protected :
-        void sub_compare(const inode & other, bool isolated_mode) const;
+        void sub_compare(const cat_inode & other, bool isolated_mode) const;
         void inherited_dump(generic_file & f, bool small) const;
 
     private :

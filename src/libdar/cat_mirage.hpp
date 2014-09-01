@@ -82,7 +82,7 @@ namespace libdar
 	unsigned char signature() const { return 'm'; };
 	cat_entree *clone() const { return new (get_pool()) cat_mirage(*this); };
 
-	inode *get_inode() const { if(star_ref == NULL) throw SRC_BUG; return star_ref->get_inode(); };
+	cat_inode *get_inode() const { if(star_ref == NULL) throw SRC_BUG; return star_ref->get_inode(); };
 	infinint get_etiquette() const { return star_ref->get_etiquette(); };
 	infinint get_etoile_ref_count() const { return star_ref->get_ref_count(); };
 	etoile *get_etoile() const { return star_ref; };

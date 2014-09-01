@@ -44,7 +44,7 @@ namespace libdar
 			 const datetime & last_modif,
 			 const datetime & last_change,
 			 const string & xname,
-			 const infinint & fs_device) : inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device)
+			 const infinint & fs_device) : cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device)
     {
 	parent = NULL;
 #ifdef LIBDAR_FAST_DIR
@@ -57,7 +57,7 @@ namespace libdar
 	updated_sizes = false;
     }
 
-    cat_directory::cat_directory(const cat_directory &ref) : inode(ref)
+    cat_directory::cat_directory(const cat_directory &ref) : cat_inode(ref)
     {
 	parent = NULL;
 #ifdef LIBDAR_FAST_DIR
@@ -71,8 +71,8 @@ namespace libdar
 
     const cat_directory & cat_directory::operator = (const cat_directory & ref)
     {
-	const inode *ref_ino = &ref;
-	inode * this_ino = this;
+	const cat_inode *ref_ino = &ref;
+	cat_inode * this_ino = this;
 
 	*this_ino = *ref_ino; // this assigns the inode part of the object
 	    // we don't modify the existing subfiles or subdirectories nor we copy them from the reference cat_directory
@@ -92,7 +92,7 @@ namespace libdar
 			 compressor *efsa_loc,
 			 bool lax,
 			 bool only_detruit,
-			 escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+			 escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
 	cat_entree *p;
 	cat_nomme *t;
@@ -202,7 +202,7 @@ namespace libdar
     void cat_directory::inherited_dump(generic_file & f, bool small) const
     {
 	list<cat_nomme *>::const_iterator x = ordered_fils.begin();
-	inode::inherited_dump(f, small);
+	cat_inode::inherited_dump(f, small);
 
 	if(!small)
 	{
@@ -445,15 +445,15 @@ namespace libdar
     {
 	list<cat_nomme *>::iterator it = ordered_fils.begin();
 	cat_directory *n_dir = NULL;
-	inode *n_ino = NULL;
+	cat_inode *n_ino = NULL;
 	cat_mirage *n_mir = NULL;
 
 	    // dropping info for the current cat_directory
 	set_saved_status(s_not_saved);
-	if(ea_get_saved_status() == inode::ea_full)
-	    ea_set_saved_status(inode::ea_partial);
-	if(fsa_get_saved_status() == inode::fsa_full)
-	    fsa_set_saved_status(inode::fsa_partial);
+	if(ea_get_saved_status() == cat_inode::ea_full)
+	    ea_set_saved_status(cat_inode::ea_partial);
+	if(fsa_get_saved_status() == cat_inode::fsa_full)
+	    fsa_set_saved_status(cat_inode::fsa_partial);
 
 	    // doing the same for each entry found in that cat_directory
 	while(it != ordered_fils.end())
@@ -462,7 +462,7 @@ namespace libdar
 		throw SRC_BUG;
 
 	    n_dir = dynamic_cast<cat_directory *>(*it);
-	    n_ino = dynamic_cast<inode *>(*it);
+	    n_ino = dynamic_cast<cat_inode *>(*it);
 	    n_mir = dynamic_cast<cat_mirage *>(*it);
 
 	    if(n_mir != NULL)
@@ -475,10 +475,10 @@ namespace libdar
 		if(n_ino != NULL)
 		{
 		    n_ino->set_saved_status(s_not_saved);
-		    if(n_ino->ea_get_saved_status() == inode::ea_full)
+		    if(n_ino->ea_get_saved_status() == cat_inode::ea_full)
 			n_ino->ea_set_saved_status(ea_partial);
-		    if(n_ino->fsa_get_saved_status() == inode::fsa_full)
-			n_ino->fsa_set_saved_status(inode::fsa_partial);
+		    if(n_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+			n_ino->fsa_set_saved_status(cat_inode::fsa_partial);
 		}
 	    }
 
@@ -543,7 +543,7 @@ namespace libdar
 	const cat_directory *current = this;
 	const cat_nomme *next_nom = NULL;
 	const cat_directory *next_dir = NULL;
-	const inode *next_ino = NULL;
+	const cat_inode *next_ino = NULL;
 	const detruit *next_detruit = NULL;
 	const cat_mirage *next_mir = NULL;
 	string segment;
@@ -608,7 +608,7 @@ namespace libdar
 	    if(next_mir != NULL)
 		next_ino = next_mir->get_inode();
 	    else
-		next_ino = dynamic_cast<const inode *>(next_nom);
+		next_ino = dynamic_cast<const cat_inode *>(next_nom);
 	    next_detruit = dynamic_cast<const detruit *>(next_nom);
 	    next_dir = dynamic_cast<const cat_directory *>(next_ino);
 	    if(next_ino != NULL)
@@ -645,7 +645,7 @@ namespace libdar
 	while(it != ordered_fils.end())
 	{
 	    const cat_directory *d = dynamic_cast<cat_directory *>(*it);
-	    const inode *ino = dynamic_cast<inode *>(*it);
+	    const cat_inode *ino = dynamic_cast<cat_inode *>(*it);
 	    if(d != NULL)
 	    {
 		d->recursive_has_changed_update();
@@ -689,7 +689,7 @@ namespace libdar
 	while(it != ordered_fils.end())
 	{
 	    const cat_directory *fils_dir = dynamic_cast<const cat_directory *>(*it);
-	    const inode *fils_ino = dynamic_cast<const inode *>(*it);
+	    const cat_inode *fils_ino = dynamic_cast<const cat_inode *>(*it);
 	    const cat_mirage *fils_mir = dynamic_cast<const cat_mirage *>(*it);
 
 	    if(fils_mir != NULL)

@@ -47,7 +47,7 @@ namespace libdar
 	/// @{
 
 	/// the cat_directory inode class
-    class cat_directory : public inode
+    class cat_directory : public cat_inode
     {
     public :
         cat_directory(const infinint & xuid,
@@ -89,8 +89,8 @@ namespace libdar
         bool search_children(const std::string &name, const cat_nomme *&ref) const;
 	bool callback_for_children_of(user_interaction & dialog, const std::string & sdir, bool isolated = false) const;
 
-            // using is_more_recent_than() from inode class
-            // using method has_changed_since() from inode class
+            // using is_more_recent_than() from cat_inode class
+            // using method has_changed_since() from cat_inode class
         unsigned char signature() const { return mk_signature('d', get_saved_status()); };
 
 	    /// detemine whether some data has changed since archive of reference in this cat_directory or subdirectories

@@ -20,7 +20,7 @@
 /*********************************************************************/
 
     /// \file cat_etoile.hpp
-    /// \brief class holding an inode object that get pointed by multiple mirage objects (smart pointers) to record hard links in a catalogue
+    /// \brief class holding an cat_inode object that get pointed by multiple mirage objects (smart pointers) to record hard links in a catalogue
     /// \ingroup Private
 
 #ifndef CAT_ETOILE_HPP
@@ -51,8 +51,8 @@ namespace libdar
 
 	    ///\param[in] host is an inode, it must not be a directory (this would throw an Erange exception)
 	    ///\param[in] etiquette_number is the identifier of this multiply linked structure
-	    ///\note given inode is now managed by the etoile object
-	etoile(inode *host, const infinint & etiquette_number);
+	    ///\note given cat_inode is now managed by the etoile object
+	etoile(cat_inode *host, const infinint & etiquette_number);
 	etoile(const etoile & ref) { throw SRC_BUG; }; // copy constructor not allowed for this class
 	const etoile & operator = (const etoile & ref) { throw SRC_BUG; }; // assignment not allowed for this class
 	~etoile() { delete hosted; };
@@ -60,7 +60,7 @@ namespace libdar
 	void add_ref(void *ref);
 	void drop_ref(void *ref);
 	infinint get_ref_count() const { return refs.size(); };
-	inode *get_inode() const { return hosted; };
+	cat_inode *get_inode() const { return hosted; };
 	infinint get_etiquette() const { return etiquette; };
 	void change_etiquette(const infinint & new_val) { etiquette = new_val; };
 
@@ -89,7 +89,7 @@ namespace libdar
 	};
 
 	std::list<void *> refs; //< list of pointers to the mirages objects, in the order of their creation
-	inode *hosted;
+	cat_inode *hosted;
 	infinint etiquette;
 	bool_tags tags;
     };

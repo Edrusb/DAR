@@ -33,7 +33,7 @@ namespace libdar
     static const U_32 default_crypto_size = 10240;
     static const path default_ref_chem = "/";
     static const U_I default_min_compr_size = 100;
-    static const inode::comparison_fields default_comparison_fields = inode::cf_all;
+    static const cat_inode::comparison_fields default_comparison_fields = cat_inode::cf_all;
     static const crit_constant_action default_crit_action = crit_constant_action(data_preserve, EA_preserve);
     static const string default_user_comment = "N/A";
     static const U_I default_gnupg_key_size = 512; // = 4096 bits
@@ -1320,7 +1320,7 @@ namespace libdar
 	    x_display_treated_only_dir = false;
 	    x_display_skipped = false;
 	    archive_option_clean_mask(x_ea_mask, get_pool());
-	    x_what_to_check = inode::cf_all;
+	    x_what_to_check = cat_inode::cf_all;
 	    x_alter_atime = true;
 	    x_old_alter_atime = true;
 #if FURTIVE_READ_MODE_AVAILABLE

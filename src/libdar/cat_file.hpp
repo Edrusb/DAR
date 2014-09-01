@@ -42,7 +42,7 @@ namespace libdar
 
 
 	/// the plain file class
-    class file : public inode
+    class file : public cat_inode
     {
     public :
 	enum get_data_mode
@@ -76,7 +76,7 @@ namespace libdar
 	     escape *ptr);
         ~file() { detruit(); };
 
-        bool has_changed_since(const inode & ref, const infinint & hourshift, inode::comparison_fields what_to_check) const;
+        bool has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const;
         infinint get_size() const { return *size; };
 	void change_size(const infinint & s) const { *size = s; };
         infinint get_storage_size() const { return *storage_size; };
@@ -118,7 +118,7 @@ namespace libdar
 	void set_dirty(bool value) { dirty = value; };
 
     protected:
-        void sub_compare(const inode & other, bool isolated_mode) const;
+        void sub_compare(const cat_inode & other, bool isolated_mode) const;
         void inherited_dump(generic_file & f, bool small) const;
 	void post_constructor(generic_file & f);
 

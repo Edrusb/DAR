@@ -127,18 +127,18 @@ namespace libdar
 
     static void supprime(user_interaction & ui, const string & ref);
     static void make_owner_perm(user_interaction & dialog,
-				const inode & ref,
+				const cat_inode & ref,
 				const string & chem,
 				bool dir_perm,
-				inode::comparison_fields what_to_check,
+				cat_inode::comparison_fields what_to_check,
 				const fsa_scope & scope);
-    static void make_date(const inode & ref,
+    static void make_date(const cat_inode & ref,
 			  const string & chem,
-			  inode::comparison_fields what_to_check,
+			  cat_inode::comparison_fields what_to_check,
 			  const fsa_scope & scope);
 
     static void attach_ea(const string &chemin,
-			  inode *ino,
+			  cat_inode *ino,
 			  const mask & ea_mask,
 			  memory_pool *pool);
     static bool is_nodump_flag_set(user_interaction & dialog,
@@ -275,7 +275,7 @@ namespace libdar
 		    throw Edata(string(gettext("Unknown file type! file name is: ")) + string(ptr_name));
 
 
-		inode *ino = dynamic_cast<inode *>(ref);
+		cat_inode *ino = dynamic_cast<cat_inode *>(ref);
 		if(ino != NULL)
 		{
 
@@ -322,13 +322,13 @@ namespace libdar
 			fsal->get_fsa_from_filesystem_for(display, sc, buf.st_mode);
 			if(!fsal->empty())
 			{
-			    ino->fsa_set_saved_status(inode::fsa_full);
+			    ino->fsa_set_saved_status(cat_inode::fsa_full);
 			    ino->fsa_attach(fsal);
 			    fsal = NULL; // now managed by *ino
 			}
 			else
 			{
-			    ino->fsa_set_saved_status(inode::fsa_none);
+			    ino->fsa_set_saved_status(cat_inode::fsa_none);
 			    delete fsal;
 			    fsal = NULL;
 			}
@@ -354,7 +354,7 @@ namespace libdar
 
 		    if(it == corres_read.end()) // inode not yet seen, creating the etoile object
 		    {
-			inode *ino_ref = dynamic_cast<inode *>(ref);
+			cat_inode *ino_ref = dynamic_cast<cat_inode *>(ref);
 			etoile *tmp_et = NULL;
 
 			if(ino_ref == NULL)
@@ -1024,7 +1024,7 @@ namespace libdar
     void filesystem_hard_link_write::make_file(const cat_nomme * ref,
 					       const path & ou,
 					       bool dir_perm,
-					       inode::comparison_fields what_to_check,
+					       cat_inode::comparison_fields what_to_check,
 					       const fsa_scope & scope)
     {
         const cat_directory *ref_dir = dynamic_cast<const cat_directory *>(ref);
@@ -1035,10 +1035,10 @@ namespace libdar
         const cat_tube *ref_tub = dynamic_cast<const cat_tube *>(ref);
         const cat_prise *ref_pri = dynamic_cast<const cat_prise *>(ref);
         const cat_mirage *ref_mir = dynamic_cast <const cat_mirage *>(ref);
-        const inode *ref_ino = dynamic_cast <const inode *>(ref);
+        const cat_inode *ref_ino = dynamic_cast <const cat_inode *>(ref);
 
         if(ref_ino == NULL && ref_mir == NULL)
-            throw SRC_BUG; // neither an inode nor a hard link
+            throw SRC_BUG; // neither an cat_inode nor a hard link
 
 	const string display = (ou + ref->get_name()).display();
 	const char *name = display.c_str();
@@ -1284,7 +1284,7 @@ namespace libdar
 					   bool x_warn_overwrite,
                                            bool x_info_details,
                                            const mask & x_ea_mask,
-					   inode::comparison_fields x_what_to_check,
+					   cat_inode::comparison_fields x_what_to_check,
 					   bool x_warn_remove_no_match,
 					   bool x_empty,
 					   const crit_action *x_overwrite,
@@ -1343,7 +1343,7 @@ namespace libdar
 	const cat_nomme *x_nom = dynamic_cast<const cat_nomme *>(x);
 	const cat_directory *x_dir = dynamic_cast<const cat_directory *>(x);
 	const detruit *x_det = dynamic_cast<const detruit *>(x);
-	const inode *x_ino = dynamic_cast<const inode *>(x);
+	const cat_inode *x_ino = dynamic_cast<const cat_inode *>(x);
 	const cat_mirage *x_mir = dynamic_cast<const cat_mirage *>(x);
 
 	data_restored = done_no_change_no_data;
@@ -1384,8 +1384,8 @@ namespace libdar
 	else // cat_nomme
 	{
 	    bool has_data_saved = (x_ino != NULL && x_ino->get_saved_status() == s_saved) || x_det != NULL;
-	    bool has_ea_saved = x_ino != NULL && (x_ino->ea_get_saved_status() == inode::ea_full || x_ino->ea_get_saved_status() == inode::ea_removed);
-	    bool has_fsa_saved = x_ino != NULL && x_ino->fsa_get_saved_status() == inode::fsa_full;
+	    bool has_ea_saved = x_ino != NULL && (x_ino->ea_get_saved_status() == cat_inode::ea_full || x_ino->ea_get_saved_status() == cat_inode::ea_removed);
+	    bool has_fsa_saved = x_ino != NULL && x_ino->fsa_get_saved_status() == cat_inode::fsa_full;
 	    path spot = *current_dir + x_nom->get_name();
 	    string spot_display = spot.display();
 
@@ -1416,11 +1416,11 @@ namespace libdar
 
 	    try
 	    {
-		inode *exists_ino = dynamic_cast<inode *>(exists);
+		cat_inode *exists_ino = dynamic_cast<cat_inode *>(exists);
 		cat_directory *exists_dir = dynamic_cast<cat_directory *>(exists);
 
 		if(exists_ino == NULL && exists != NULL)
-		    throw SRC_BUG; // an object from filesystem should always be an inode !?!
+		    throw SRC_BUG; // an object from filesystem should always be an cat_inode !?!
 
 		if(exists == NULL)
 		{
@@ -1627,7 +1627,7 @@ namespace libdar
     }
 
 
-    void filesystem_restore::action_over_remove(const inode *in_place, const detruit *to_be_added, const string & spot, over_action_data action)
+    void filesystem_restore::action_over_remove(const cat_inode *in_place, const detruit *to_be_added, const string & spot, over_action_data action)
     {
 	if(in_place == NULL || to_be_added == NULL)
 	    throw SRC_BUG;
@@ -1673,14 +1673,14 @@ namespace libdar
 	}
     }
 
-    void filesystem_restore::action_over_data(const inode *in_place,
+    void filesystem_restore::action_over_data(const cat_inode *in_place,
 					      const cat_nomme *to_be_added,
 					      const string & spot,
 					      over_action_data action,
 					      action_done_for_data & data_done)
     {
 	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
-	const inode *tba_ino = tba_mir == NULL ? dynamic_cast<const inode *>(to_be_added) : tba_mir->get_inode();
+	const cat_inode *tba_ino = tba_mir == NULL ? dynamic_cast<const cat_inode *>(to_be_added) : tba_mir->get_inode();
 	const cat_directory *tba_dir = dynamic_cast<const cat_directory *>(to_be_added);
 	const detruit *tba_det = dynamic_cast<const detruit *>(to_be_added);
 	const lien *in_place_symlink = dynamic_cast<const lien *>(in_place);
@@ -1852,10 +1852,10 @@ namespace libdar
 	}
     }
 
-    bool filesystem_restore::action_over_ea(const inode *in_place, const cat_nomme *to_be_added, const string & spot, over_action_ea action)
+    bool filesystem_restore::action_over_ea(const cat_inode *in_place, const cat_nomme *to_be_added, const string & spot, over_action_ea action)
     {
 	bool ret = false;
-	const inode *tba_ino = dynamic_cast<const inode *>(to_be_added);
+	const cat_inode *tba_ino = dynamic_cast<const cat_inode *>(to_be_added);
 	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
 
 	if(tba_mir != NULL)
@@ -1873,13 +1873,13 @@ namespace libdar
 
 	    // modifying the EA action when the in place inode has not EA
 
-	if(in_place->ea_get_saved_status() != inode::ea_full) // no EA in filesystem
+	if(in_place->ea_get_saved_status() != cat_inode::ea_full) // no EA in filesystem
 	{
 	    if(action == EA_merge_preserve || action == EA_merge_overwrite)
 		action = EA_overwrite; // merging when in_place has no EA is equivalent to overwriting
 	}
 
-	if(tba_ino->ea_get_saved_status() == inode::ea_removed) // EA have been removed since archive of reference
+	if(tba_ino->ea_get_saved_status() == cat_inode::ea_removed) // EA have been removed since archive of reference
 	{
 	    if(action == EA_merge_preserve || action == EA_merge_overwrite)
 		action = EA_clear; // we must remove EA instead of merging
@@ -1894,7 +1894,7 @@ namespace libdar
 	    break;
 	case EA_overwrite:
 	case EA_overwrite_mark_already_saved:
-	    if(tba_ino->ea_get_saved_status() != inode::ea_full && tba_ino->ea_get_saved_status() != inode::ea_removed)
+	    if(tba_ino->ea_get_saved_status() != cat_inode::ea_full && tba_ino->ea_get_saved_status() != cat_inode::ea_removed)
 		throw SRC_BUG;
 	    if(warn_overwrite)
 	    {
@@ -1958,7 +1958,7 @@ namespace libdar
 	    break;
 	case EA_merge_preserve:
 	case EA_merge_overwrite:
-	    if(in_place->ea_get_saved_status() != inode::ea_full)
+	    if(in_place->ea_get_saved_status() != cat_inode::ea_full)
 		throw SRC_BUG; // should have been redirected to EA_overwrite !
 
 	    if(warn_overwrite)
@@ -1973,7 +1973,7 @@ namespace libdar
 		}
 	    }
 
-	    if(tba_ino->ea_get_saved_status() == inode::ea_full) // Note, that inode::ea_removed is the other valid value
+	    if(tba_ino->ea_get_saved_status() == cat_inode::ea_full) // Note, that cat_inode::ea_removed is the other valid value
 	    {
 		const ea_attributs *tba_ea = tba_ino->get_ea();
 		const ea_attributs *ip_ea = in_place->get_ea();
@@ -2001,10 +2001,10 @@ namespace libdar
 	return ret;
     }
 
-    bool filesystem_restore::action_over_fsa(const inode *in_place, const cat_nomme *to_be_added, const string & spot, over_action_ea action)
+    bool filesystem_restore::action_over_fsa(const cat_inode *in_place, const cat_nomme *to_be_added, const string & spot, over_action_ea action)
     {
 	bool ret = false;
-	const inode *tba_ino = dynamic_cast<const inode *>(to_be_added);
+	const cat_inode *tba_ino = dynamic_cast<const cat_inode *>(to_be_added);
 	const cat_mirage *tba_mir = dynamic_cast<const cat_mirage *>(to_be_added);
 
 	if(tba_mir != NULL)
@@ -2022,7 +2022,7 @@ namespace libdar
 
 	    // modifying the FSA action when the in place inode has not FSA
 
-	if(in_place->fsa_get_saved_status() != inode::fsa_full) // no EA in filesystem
+	if(in_place->fsa_get_saved_status() != cat_inode::fsa_full) // no EA in filesystem
 	{
 	    if(action == EA_merge_preserve || action == EA_merge_overwrite)
 		action = EA_overwrite; // merging when in_place has no EA is equivalent to overwriting
@@ -2037,7 +2037,7 @@ namespace libdar
 	    break;
 	case EA_overwrite:
 	case EA_overwrite_mark_already_saved:
-	    if(tba_ino->fsa_get_saved_status() != inode::fsa_full)
+	    if(tba_ino->fsa_get_saved_status() != cat_inode::fsa_full)
 		throw SRC_BUG;
 	    if(warn_overwrite)
 	    {
@@ -2082,7 +2082,7 @@ namespace libdar
 	    break;
 	case EA_merge_preserve:
 	case EA_merge_overwrite:
-	    if(in_place->fsa_get_saved_status() != inode::fsa_full)
+	    if(in_place->fsa_get_saved_status() != cat_inode::fsa_full)
 		throw SRC_BUG; // should have been redirected to EA_overwrite !
 
 	    if(warn_overwrite)
@@ -2097,7 +2097,7 @@ namespace libdar
 		}
 	    }
 
-	    if(tba_ino->fsa_get_saved_status() == inode::fsa_full)
+	    if(tba_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 	    {
 		const filesystem_specific_attribute_list *tba_fsa = tba_ino->get_fsa();
 		const filesystem_specific_attribute_list *ip_fsa = in_place->get_fsa();
@@ -2196,10 +2196,10 @@ namespace libdar
     }
 
     static void make_owner_perm(user_interaction & dialog,
-				const inode & ref,
+				const cat_inode & ref,
 				const string & chem,
 				bool dir_perm,
-				inode::comparison_fields what_to_check,
+				cat_inode::comparison_fields what_to_check,
 				const fsa_scope & scope)
     {
         const char *name = chem.c_str();
@@ -2233,7 +2233,7 @@ namespace libdar
 
 	    // restoring fields that are defined by "what_to_check"
 
-	if(what_to_check == inode::cf_all)
+	if(what_to_check == cat_inode::cf_all)
 	    if(ref.get_saved_status() == s_saved)
 	    {
 		uid_t tmp_uid = 0;
@@ -2262,7 +2262,7 @@ namespace libdar
 
 	try
 	{
-	    if(what_to_check == inode::cf_all || what_to_check == inode::cf_ignore_owner)
+	    if(what_to_check == cat_inode::cf_all || what_to_check == cat_inode::cf_ignore_owner)
 		if(ref_lie == NULL) // not restoring permission for symbolic links, it would modify the target not the symlink itself
 		    if(chmod(name, permission) < 0)
 		    {
@@ -2278,19 +2278,19 @@ namespace libdar
 	}
     }
 
-    static void make_date(const inode & ref,
+    static void make_date(const cat_inode & ref,
 			  const string & chem,
-			  inode::comparison_fields what_to_check,
+			  cat_inode::comparison_fields what_to_check,
 			  const fsa_scope & scope)
     {
 	const lien *ref_lie = dynamic_cast<const lien *>(&ref);
 
-	if(what_to_check == inode::cf_all || what_to_check == inode::cf_ignore_owner || what_to_check == inode::cf_mtime)
+	if(what_to_check == cat_inode::cf_all || what_to_check == cat_inode::cf_ignore_owner || what_to_check == cat_inode::cf_mtime)
 	{
 	    datetime birthtime = ref.get_last_modif();
 	    fsa_scope::iterator it = scope.find(fsaf_hfs_plus);
 
-	    if(ref.fsa_get_saved_status() == inode::fsa_full && it != scope.end())
+	    if(ref.fsa_get_saved_status() == cat_inode::fsa_full && it != scope.end())
 	    {
 		const filesystem_specific_attribute_list * fsa = ref.get_fsa();
 		const filesystem_specific_attribute *ptr = NULL;
@@ -2309,7 +2309,7 @@ namespace libdar
 	}
     }
 
-    static void attach_ea(const string &chemin, inode *ino, const mask & ea_mask, memory_pool *pool)
+    static void attach_ea(const string &chemin, cat_inode *ino, const mask & ea_mask, memory_pool *pool)
     {
         ea_attributs *eat = NULL;
         try
@@ -2321,12 +2321,12 @@ namespace libdar
             {
 		if(eat->size() <= 0)
 		    throw SRC_BUG;
-                ino->ea_set_saved_status(inode::ea_full);
+                ino->ea_set_saved_status(cat_inode::ea_full);
                 ino->ea_attach(eat);
-                eat = NULL; // allocated memory now managed by the inode object
+                eat = NULL; // allocated memory now managed by the cat_inode object
             }
             else
-                ino->ea_set_saved_status(inode::ea_none);
+                ino->ea_set_saved_status(cat_inode::ea_none);
         }
         catch(...)
         {

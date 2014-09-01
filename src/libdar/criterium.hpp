@@ -150,7 +150,7 @@ namespace libdar
 	virtual criterium *clone() const = 0;
 
     protected:
-	static const inode *get_inode(const cat_nomme * arg);
+	static const cat_inode *get_inode(const cat_nomme * arg);
     };
 
 
@@ -370,8 +370,8 @@ namespace libdar
     public:
 	bool evaluate(const cat_nomme &first, const cat_nomme &second) const
 	{
-	    const inode *tmp = dynamic_cast<const inode *>(&first);
-	    return tmp != NULL && tmp->ea_get_saved_status() != inode::ea_none && tmp->ea_get_saved_status() != inode::ea_removed;
+	    const cat_inode *tmp = dynamic_cast<const cat_inode *>(&first);
+	    return tmp != NULL && tmp->ea_get_saved_status() != cat_inode::ea_none && tmp->ea_get_saved_status() != cat_inode::ea_removed;
 	};
 	criterium *clone() const { return new (get_pool()) crit_in_place_EA_present(*this); };
     };

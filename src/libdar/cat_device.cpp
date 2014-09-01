@@ -66,7 +66,7 @@ namespace libdar
 		   const string & name,
 		   U_16 major,
 		   U_16 minor,
-		   const infinint & fs_dev) : inode(uid, gid, perm, last_access, last_modif, last_change, name, fs_dev)
+		   const infinint & fs_dev) : cat_inode(uid, gid, perm, last_access, last_modif, last_change, name, fs_dev)
     {
 	xmajor = major;
 	xminor = minor;
@@ -78,7 +78,7 @@ namespace libdar
 		   const archive_version & reading_ver,
 		   saved_status saved,
 		   compressor *efsa_loc,
-		   escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+		   escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
 	U_16 tmp;
 
@@ -97,7 +97,7 @@ namespace libdar
     {
 	U_16 tmp;
 
-	inode::inherited_dump(f, small);
+	cat_inode::inherited_dump(f, small);
 	if(get_saved_status() == s_saved)
 	{
 	    tmp = htons(xmajor);
@@ -107,11 +107,11 @@ namespace libdar
 	}
     }
 
-    void device::sub_compare(const inode & other, bool isolated_mode) const
+    void device::sub_compare(const cat_inode & other, bool isolated_mode) const
     {
 	const device *d_other = dynamic_cast<const device *>(&other);
 	if(d_other == NULL)
-	    throw SRC_BUG; // bug in inode::compare
+	    throw SRC_BUG; // bug in cat_inode::compare
 	if(get_saved_status() == s_saved && d_other->get_saved_status() == s_saved)
 	{
 	    if(get_major() != d_other->get_major())

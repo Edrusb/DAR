@@ -46,7 +46,7 @@ namespace libdar
                const path & che,
                const infinint & taille,
                const infinint & fs_device,
-               bool x_furtive_read_mode) : inode(xuid, xgid, xperm, last_access, last_modif, last_change, src, fs_device)
+               bool x_furtive_read_mode) : cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, src, fs_device)
     {
         chemin = (che + src).display();
         status = from_path;
@@ -99,7 +99,7 @@ namespace libdar
                compression default_algo,
                generic_file *data_loc,
                compressor *efsa_loc,
-               escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+               escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
         chemin = "";
         status = from_cat;
@@ -250,7 +250,7 @@ namespace libdar
             *offset = f.get_position(); // data follows right after the inode+file information+CRC
     }
 
-    file::file(const file & ref) : inode(ref)
+    file::file(const file & ref) : cat_inode(ref)
     {
         status = ref.status;
         chemin = ref.chemin;
@@ -322,7 +322,7 @@ namespace libdar
 
     void file::inherited_dump(generic_file & f, bool small) const
     {
-        inode::inherited_dump(f, small);
+        cat_inode::inherited_dump(f, small);
         size->dump(f);
         if(!small)
         {
@@ -357,11 +357,11 @@ namespace libdar
         }
     }
 
-    bool file::has_changed_since(const inode & ref, const infinint & hourshift, inode::comparison_fields what_to_check) const
+    bool file::has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const
     {
         const file *tmp = dynamic_cast<const file *>(&ref);
         if(tmp != NULL)
-            return inode::has_changed_since(*tmp, hourshift, what_to_check) || *size != *(tmp->size);
+            return cat_inode::has_changed_since(*tmp, hourshift, what_to_check) || *size != *(tmp->size);
         else
             throw SRC_BUG;
     }
@@ -621,11 +621,11 @@ namespace libdar
 	    return false;
     }
 
-    void file::sub_compare(const inode & other, bool isolated_mode) const
+    void file::sub_compare(const cat_inode & other, bool isolated_mode) const
     {
 	const file *f_other = dynamic_cast<const file *>(&other);
 	if(f_other == NULL)
-	    throw SRC_BUG; // inode::compare should have called us with a correct argument
+	    throw SRC_BUG; // cat_inode::compare should have called us with a correct argument
 
 	if(get_size() != f_other->get_size())
 	{

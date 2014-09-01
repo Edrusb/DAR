@@ -36,11 +36,11 @@ namespace libdar
 
 	// local sub routines
 
-    static string local_fsa_fam_to_string(const inode & ref);
+    static string local_fsa_fam_to_string(const cat_inode & ref);
 
 	// exported routine implementation
 
-    string local_perm(const inode &ref, bool hard)
+    string local_perm(const cat_inode &ref, bool hard)
     {
 	saved_status st;
 	char type;
@@ -52,17 +52,17 @@ namespace libdar
 	return tools_get_permission_string(type, perm, hard);
     }
 
-    string local_uid(const inode & ref)
+    string local_uid(const cat_inode & ref)
     {
 	return tools_name_of_uid(ref.get_uid());
     }
 
-    string local_gid(const inode & ref)
+    string local_gid(const cat_inode & ref)
     {
 	return tools_name_of_gid(ref.get_gid());
     }
 
-    string local_size(const inode & ref)
+    string local_size(const cat_inode & ref)
     {
 	string ret;
 
@@ -78,7 +78,7 @@ namespace libdar
 	return ret;
     }
 
-    string local_storage_size(const inode & ref)
+    string local_storage_size(const cat_inode & ref)
     {
 	string ret;
 
@@ -94,24 +94,24 @@ namespace libdar
 	return ret;
     }
 
-    string local_date(const inode & ref)
+    string local_date(const cat_inode & ref)
     {
 	return tools_display_date(ref.get_last_modif());
     }
 
-    string local_flag(const inode & ref, bool isolated, bool dirty_seq)
+    string local_flag(const cat_inode & ref, bool isolated, bool dirty_seq)
     {
 	string ret;
 	const file *ref_f = dynamic_cast<const file *>(&ref);
 	bool dirty = dirty_seq || (ref_f != NULL ? ref_f->is_dirty() : false);
 	saved_status st = ref.get_saved_status();
-	inode::ea_status ea_st = ref.ea_get_saved_status();
+	cat_inode::ea_status ea_st = ref.ea_get_saved_status();
 
 	if(isolated && st == s_saved && !dirty)
 	    st = s_fake;
 
-	if(isolated && ea_st == inode::ea_full)
-	    ea_st = inode::ea_fake;
+	if(isolated && ea_st == cat_inode::ea_full)
+	    ea_st = cat_inode::ea_fake;
 
 	switch(st)
 	{
@@ -134,19 +134,19 @@ namespace libdar
 
 	switch(ea_st)
 	{
-	case inode::ea_full:
+	case cat_inode::ea_full:
 	    ret += gettext("[Saved]");
 	    break;
-	case inode::ea_fake:
+	case cat_inode::ea_fake:
 	    ret += gettext("[InRef]");
 	    break;
-	case inode::ea_partial:
+	case cat_inode::ea_partial:
 	    ret += "[     ]";
 	    break;
-	case inode::ea_none:
+	case cat_inode::ea_none:
 	    ret += "       ";
 	    break;
-	case inode::ea_removed:
+	case cat_inode::ea_removed:
 	    ret += "[Suppr]";
 	    break;
 	default:
@@ -193,7 +193,7 @@ namespace libdar
 	string atime;
 	string mtime;
 	string ctime;
-	const inode *e_ino = dynamic_cast<const inode *>(obj);
+	const cat_inode *e_ino = dynamic_cast<const cat_inode *>(obj);
 	const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(obj);
 
 	if(e_hard != NULL)
@@ -227,7 +227,7 @@ namespace libdar
 
 	dialog.printf("%S<Attributes data=\"%S\" metadata=\"%S\" user=\"%S\" group=\"%S\" permissions=\"%S\" atime=\"%S\" mtime=\"%S\" ctime=\"%S\" />\n",
 		      &beginning, &data, &metadata, &user, &group, &permissions, &atime, &mtime, &ctime);
-	if(list_ea && e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_full)
+	if(list_ea && e_ino != NULL && e_ino->ea_get_saved_status() == cat_inode::ea_full)
 	{
 	    string new_begin = beginning + "\t";
 	    local_display_ea(dialog, e_ino, new_begin + "<EA_entry> ea_name=\"", "\">", true);
@@ -260,7 +260,7 @@ namespace libdar
 
 
     void local_display_ea(user_interaction & dialog,
-			  const inode * ino,
+			  const cat_inode * ino,
 			  const string &prefix,
 			  const string &suffix,
 			  bool xml_output)
@@ -268,7 +268,7 @@ namespace libdar
 	if(ino == NULL)
 	    return;
 
-	if(ino->ea_get_saved_status() == inode::ea_full)
+	if(ino->ea_get_saved_status() == cat_inode::ea_full)
 	{
 	    const ea_attributs *owned = ino->get_ea();
 	    string key, val;
@@ -288,14 +288,14 @@ namespace libdar
 
 	// local routine implementation
 
-    static string local_fsa_fam_to_string(const inode & ref)
+    static string local_fsa_fam_to_string(const cat_inode & ref)
     {
 	string ret = "";
 
-	if(ref.fsa_get_saved_status() != inode::fsa_none)
+	if(ref.fsa_get_saved_status() != cat_inode::fsa_none)
 	{
 	    fsa_scope sc = ref.fsa_get_families();
-	    bool upper = ref.fsa_get_saved_status() == inode::fsa_full;
+	    bool upper = ref.fsa_get_saved_status() == cat_inode::fsa_full;
 	    ret = fsa_scope_to_string(upper, sc);
 	    if(ret.size() < 3)
 		ret += "-";

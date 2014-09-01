@@ -692,7 +692,7 @@ namespace libdar
 				     true,    // alter_atime
 				     false,   // furtive_read_mode
 				     false,   // same_fs
-				     inode::cf_all,   // what_to_check
+				     cat_inode::cf_all,   // what_to_check
 				     false,   // snapshot
 				     false,   // cache_directory_tagging
 				     options.get_keep_compressed(),
@@ -1385,7 +1385,7 @@ namespace libdar
 
 		list_entry ent;
 
-		const inode *tmp_inode = dynamic_cast<const inode *>(tmp_ptr);
+		const cat_inode *tmp_inode = dynamic_cast<const cat_inode *>(tmp_ptr);
 		const file *tmp_file = dynamic_cast<const file *>(tmp_ptr);
 		const lien *tmp_lien = dynamic_cast<const lien *>(tmp_ptr);
 		const device *tmp_device = dynamic_cast<const device *>(tmp_ptr);
@@ -1682,7 +1682,7 @@ namespace libdar
                                      bool alter_atime,
 				     bool furtive_read_mode,
                                      bool same_fs,
-				     inode::comparison_fields what_to_check,
+				     cat_inode::comparison_fields what_to_check,
                                      bool snapshot,
                                      bool cache_directory_tagging,
 				     const infinint & fixed_date,
@@ -1897,7 +1897,7 @@ namespace libdar
 				   bool alter_atime,
 				   bool furtive_read_mode,
 				   bool same_fs,
-				   inode::comparison_fields what_to_check,
+				   cat_inode::comparison_fields what_to_check,
 				   bool snapshot,
 				   bool cache_directory_tagging,
 				   bool keep_compressed,

@@ -77,7 +77,7 @@ namespace libdar
 	    if(data_to_save && match->is_covered(x_chem))
 	    {
 		const cat_directory *o_dir = dynamic_cast<const cat_directory *>(object);
-		const inode *o_ino = dynamic_cast<const inode *>(object);
+		const cat_inode *o_ino = dynamic_cast<const cat_inode *>(object);
 
 		if(o_dir != NULL)
 		    count = 2;

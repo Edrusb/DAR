@@ -147,14 +147,14 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
-	const inode *ref_ino = dynamic_cast<const inode *>(ref);
+	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
 
 	if(ref_mir != NULL)
 	    ref_ino = ref_mir->get_inode();
 
 	if(ref_ino != NULL)
 	{
-	    if(ref_ino->ea_get_saved_status() == inode::ea_full)
+	    if(ref_ino->ea_get_saved_status() == cat_inode::ea_full)
 	    {
 		if(ceci->esc == NULL)
 		    throw SRC_BUG;
@@ -214,14 +214,14 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
-	const inode *ref_ino = dynamic_cast<const inode *>(ref);
+	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
 
 	if(ref_mir != NULL)
 	    ref_ino = ref_mir->get_inode();
 
 	if(ref_ino != NULL)
 	{
-	    if(ref_ino->ea_get_saved_status() == inode::ea_full)
+	    if(ref_ino->ea_get_saved_status() == cat_inode::ea_full)
 	    {
 		const crc * c = NULL;
 
@@ -263,14 +263,14 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
-	const inode *ref_ino = dynamic_cast<const inode *>(ref);
+	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
 
 	if(ref_mir != NULL)
 	    ref_ino = ref_mir->get_inode();
 
 	if(ref_ino != NULL)
 	{
-	    if(ref_ino->fsa_get_saved_status() == inode::fsa_full)
+	    if(ref_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 	    {
 		if(ceci->esc == NULL)
 		    throw SRC_BUG;
@@ -289,14 +289,14 @@ namespace libdar
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const cat_mirage *ref_mir = dynamic_cast<const cat_mirage *>(ref);
-	const inode *ref_ino = dynamic_cast<const inode *>(ref);
+	const cat_inode *ref_ino = dynamic_cast<const cat_inode *>(ref);
 
 	if(ref_mir != NULL)
 	    ref_ino = ref_mir->get_inode();
 
 	if(ref_ino != NULL)
 	{
-	    if(ref_ino->fsa_get_saved_status() == inode::fsa_full)
+	    if(ref_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 	    {
 		const crc * c = NULL;
 

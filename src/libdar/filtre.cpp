@@ -80,16 +80,16 @@ namespace libdar
 
     static bool save_ea(user_interaction & dialog,
 			const string & info_quoi,
-			inode * & ino,
+			cat_inode * & ino,
 			pile & stack,
 			compressor *stock,
 			bool display_treated);
 
-    static void restore_atime(const string & chemin, const inode * & ptr);
+    static void restore_atime(const string & chemin, const cat_inode * & ptr);
 
     static bool save_fsa(user_interaction & dialog,
 			 const string & info_quoi,
-			 inode * & ino,
+			 cat_inode * & ino,
 			 pile & stack,
 			 compressor *stock,
 			 bool display_treated);
@@ -124,20 +124,20 @@ namespace libdar
 
 
 
-	/// transfer EA from one inode to another as defined by the given action
+	/// transfer EA from one cat_inode to another as defined by the given action
 
 	/// \param[in] dialog for user interaction
 	/// \param[in] action is the action to perform with EA and FSA
-	/// \param[in,out] in_place is the "in place" inode, the resulting EA/FSA operation is placed as EA/FSA of this object, argument may be NULL
-	/// \param[in] to_add is the "to be added" inode
+	/// \param[in,out] in_place is the "in place" cat_inode, the resulting EA/FSA operation is placed as EA/FSA of this object, argument may be NULL
+	/// \param[in] to_add is the "to be added" cat_inode
 	/// \note actions set to EA_preserve EA_preserve_mark_already_saved and EA_clear are left intentionnaly unimplemented!
-	/// \note the NULL given as argument means that the object is not an inode
+	/// \note the NULL given as argument means that the object is not an cat_inode
 
     static void do_EFSA_transfert(user_interaction &dialog,
 				  memory_pool *pool,
 				  over_action_ea action,
-				  inode *in_place,
-				  const inode *to_add);
+				  cat_inode *in_place,
+				  const cat_inode *to_add);
 
 
 	/// overwriting policy when only restoring detruit objects
@@ -157,7 +157,7 @@ namespace libdar
 			statistics & st,
 			const mask & ea_mask,
 			bool flat,
-			inode::comparison_fields what_to_check,
+			cat_inode::comparison_fields what_to_check,
 			bool warn_remove_no_match,
 			bool empty,
 			bool empty_dir,
@@ -209,13 +209,13 @@ namespace libdar
 		const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 		const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 		const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
-		const inode *e_ino = dynamic_cast<const inode *>(e);
+		const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 		const file *e_file = dynamic_cast<const file *>(e);
 		const detruit *e_det = dynamic_cast<const detruit *>(e);
 
 		if(e_mir != NULL)
 		{
-		    e_ino = const_cast<const inode *>(e_mir->get_inode());
+		    e_ino = const_cast<const cat_inode *>(e_mir->get_inode());
 		    if(e_ino == NULL)
 			throw SRC_BUG; // !?! how is this possible ?
 		    e_mir->get_inode()->change_name(e_mir->get_name()); // temporarily changing the inode name to the one of the cat_mirage
@@ -513,7 +513,7 @@ namespace libdar
 			   bool alter_atime,
 			   bool furtive_read_mode,
 			   bool same_fs,
-			   inode::comparison_fields what_to_check,
+			   cat_inode::comparison_fields what_to_check,
 			   bool snapshot,
 			   bool cache_directory_tagging,
 			   bool security_check,
@@ -576,7 +576,7 @@ namespace libdar
 		{
 		    cat_nomme *nom = dynamic_cast<cat_nomme *>(e);
 		    cat_directory *dir = dynamic_cast<cat_directory *>(e);
-		    inode *e_ino = dynamic_cast<inode *>(e);
+		    cat_inode *e_ino = dynamic_cast<cat_inode *>(e);
 		    file *e_file = dynamic_cast<file *>(e);
 		    cat_mirage *e_mir = dynamic_cast<cat_mirage *>(e);
 		    bool known_hard_link = false;
@@ -597,7 +597,7 @@ namespace libdar
 			known_hard_link = e_mir->is_inode_wrote();
 			if(!known_hard_link)
 			{
-			    e_ino = dynamic_cast<inode *>(e_mir->get_inode());
+			    e_ino = dynamic_cast<cat_inode *>(e_mir->get_inode());
 			    e_file = dynamic_cast<file *>(e_mir->get_inode());
 			    if(e_ino == NULL)
 				throw SRC_BUG;
@@ -614,7 +614,7 @@ namespace libdar
 			    if(subtree.is_covered(juillet.get_path())
 			       && (dir != NULL || filtre.is_covered(nom->get_name()))
 			       && (! same_fs || e_ino == NULL || e_ino->get_device() == root_fs_device)
-			       && (e_ino == NULL || exclude_by_ea == "" || e_ino->ea_get_saved_status() != inode::ea_full || e_ino->get_ea() == NULL || !e_ino->get_ea()->find(exclude_by_ea, tmp_val)))
+			       && (e_ino == NULL || exclude_by_ea == "" || e_ino->ea_get_saved_status() != cat_inode::ea_full || e_ino->get_ea() == NULL || !e_ino->get_ea()->find(exclude_by_ea, tmp_val)))
 			    {
 				if(known_hard_link)
 				{
@@ -626,7 +626,7 @@ namespace libdar
 				    st.incr_treated();
 				    if(e_mir != NULL)
 				    {
-					if(e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == inode::ea_full)
+					if(e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full)
 					    if(display_treated)
 						dialog.warning(string(gettext("Recording hard link into the archive: "))+juillet.get_string());
 				    }
@@ -635,13 +635,13 @@ namespace libdar
 				}
 				else // not a hard link or known hard linked inode
 				{
-				    const inode *f_ino = NULL;
+				    const cat_inode *f_ino = NULL;
 				    const file *f_file = NULL;
 				    const cat_mirage *f_mir = NULL;
 
 				    if(e_ino == NULL)
-					throw SRC_BUG; // if not a known hard link, e_ino should still either point to a real inode
-					// or to the hard linked new inode.
+					throw SRC_BUG; // if not a known hard link, e_ino should still either point to a real cat_inode
+					// or to the hard linked new cat_inode.
 
 				    if(fixed_date == 0)
 				    {
@@ -655,7 +655,7 @@ namespace libdar
 					}
 					else // inode was already present in filesystem at the time the archive of reference was made
 					{
-					    f_ino = dynamic_cast<const inode*>(f);
+					    f_ino = dynamic_cast<const cat_inode *>(f);
 					    f_file = dynamic_cast<const file *>(f);
 					    f_mir = dynamic_cast<const cat_mirage *>(f);
 
@@ -715,10 +715,10 @@ namespace libdar
 					    // EVALUATING THE ACTION TO PERFORM
 
 					bool change_to_remove_ea =
-					    e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_none
+					    e_ino != NULL && e_ino->ea_get_saved_status() == cat_inode::ea_none
 						// current inode to backup does not have any EA
-					    && f_ino != NULL && f_ino->ea_get_saved_status() != inode::ea_none
-					    && f_ino->ea_get_saved_status() != inode::ea_removed;
+					    && f_ino != NULL && f_ino->ea_get_saved_status() != cat_inode::ea_none
+					    && f_ino->ea_get_saved_status() != cat_inode::ea_removed;
 					    // and reference was an inode with EA
 
 					bool avoid_saving_inode =
@@ -735,18 +735,18 @@ namespace libdar
 					bool avoid_saving_ea =
 					    snapshot
 						// don't backup if doing a snapshot
-					    || (fixed_date > 0 && e_ino != NULL &&  e_ino->ea_get_saved_status() != inode::ea_none && e_ino->get_last_change() < fixed_date)
+					    || (fixed_date > 0 && e_ino != NULL &&  e_ino->ea_get_saved_status() != cat_inode::ea_none && e_ino->get_last_change() < fixed_date)
 						// don't backup if older than given date (if reference date given)
-					    || (fixed_date == 0 && e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_full && f_ino != NULL && f_ino->ea_get_saved_status() != inode::ea_none && e_ino->get_last_change() <= f_ino->get_last_change())
+					    || (fixed_date == 0 && e_ino != NULL && e_ino->ea_get_saved_status() == cat_inode::ea_full && f_ino != NULL && f_ino->ea_get_saved_status() != cat_inode::ea_none && e_ino->get_last_change() <= f_ino->get_last_change())
 						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
 					    ;
 
 					bool avoid_saving_fsa =
 					    snapshot
 						// don't backup if doing a snapshot
-					    || (fixed_date > 0 && e_ino != NULL && e_ino->fsa_get_saved_status() != inode::fsa_none && e_ino->get_last_change() < fixed_date)
+					    || (fixed_date > 0 && e_ino != NULL && e_ino->fsa_get_saved_status() != cat_inode::fsa_none && e_ino->get_last_change() < fixed_date)
 						// don't backup if older than given date (if reference date given)
-					    || (fixed_date == 0 && e_ino != NULL && e_ino->fsa_get_saved_status() == inode::fsa_full && f_ino != NULL && f_ino->fsa_get_saved_status() != inode::fsa_none && e_ino->get_last_change() <= f_ino->get_last_change())
+					    || (fixed_date == 0 && e_ino != NULL && e_ino->fsa_get_saved_status() == cat_inode::fsa_full && f_ino != NULL && f_ino->fsa_get_saved_status() != cat_inode::fsa_none && e_ino->get_last_change() <= f_ino->get_last_change())
 						// don't backup if doing differential backup and entry is the same as the one in the archive of reference
 					    ;
 
@@ -768,18 +768,18 @@ namespace libdar
 
 					if(avoid_saving_ea)
 					{
-					    if(e_ino->ea_get_saved_status() == inode::ea_full)
-						e_ino->ea_set_saved_status(inode::ea_partial);
+					    if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
+						e_ino->ea_set_saved_status(cat_inode::ea_partial);
 					}
 
 					if(avoid_saving_fsa)
 					{
-					    if(e_ino->fsa_get_saved_status() == inode::fsa_full)
-						e_ino->fsa_set_saved_status(inode::fsa_partial);
+					    if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+						e_ino->fsa_set_saved_status(cat_inode::fsa_partial);
 					}
 
 					if(change_to_remove_ea)
-					    e_ino->ea_set_saved_status(inode::ea_removed);
+					    e_ino->ea_set_saved_status(cat_inode::ea_removed);
 
 					if(e_file != NULL)
 					    e_file->set_sparse_file_detection_write(sparse_file_detection);
@@ -827,9 +827,9 @@ namespace libdar
 
 					    // PERFORMING ACTION FOR EA
 
-					if(e_ino->ea_get_saved_status() != inode::ea_removed)
+					if(e_ino->ea_get_saved_status() != cat_inode::ea_removed)
 					{
-					    if(e_ino->ea_get_saved_status() == inode::ea_full)
+					    if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
 						cat.pre_add_ea(e);
 					    if(save_ea(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
 						st.incr_ea_treated();
@@ -838,7 +838,7 @@ namespace libdar
 
 					    // PERFORMING ACTION FOR FSA
 
-					if(e_ino->fsa_get_saved_status() == inode::fsa_full)
+					if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 					{
 					    cat.pre_add_fsa(e);
 					    if(save_fsa(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
@@ -872,7 +872,7 @@ namespace libdar
 			    else // inode not covered
 			    {
 				cat_nomme *ig = NULL;
-				inode *ignode = NULL;
+				cat_inode *ignode = NULL;
 				sem.raise(juillet.get_string(), e, false);
 
 				if(display_skipped)
@@ -904,7 +904,7 @@ namespace libdar
 
 					try
 					{
-					    const inode *f_ino = known ? dynamic_cast<const inode *>(f) : NULL;
+					    const cat_inode *f_ino = known ? dynamic_cast<const cat_inode *>(f) : NULL;
 					    bool tosave = false;
 
 					    if(known)
@@ -1052,7 +1052,7 @@ namespace libdar
 			   const mask & ea_mask,
 			   bool alter_atime,
 			   bool furtive_read_mode,
-			   inode::comparison_fields what_to_check,
+			   cat_inode::comparison_fields what_to_check,
 			   const infinint & hourshift,
 			   bool compare_symlink_date,
 			   const fsa_scope & scope,
@@ -1085,7 +1085,7 @@ namespace libdar
 	{
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
-	    const inode *e_ino = dynamic_cast<const inode *>(e);
+	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 
 	    if(e_mir != NULL)
@@ -1125,7 +1125,7 @@ namespace libdar
 			    {
 				try
 				{
-				    inode *exists = dynamic_cast<inode *>(exists_nom);
+				    cat_inode *exists = dynamic_cast<cat_inode *>(exists_nom);
 				    cat_directory *exists_dir = dynamic_cast<cat_directory *>(exists_nom);
 
 				    if(exists != NULL)
@@ -1139,7 +1139,7 @@ namespace libdar
 						st.incr_treated();
 					    if(!alter_atime)
 					    {
-						const inode * tmp_exists = const_cast<const inode *>(exists);
+						const cat_inode * tmp_exists = const_cast<const cat_inode *>(exists);
 						restore_atime(juillet.get_string(), tmp_exists);
 					    }
 					}
@@ -1158,7 +1158,7 @@ namespace libdar
 						st.incr_errored();
 					    if(!alter_atime)
 					    {
-						const inode * tmp_exists = const_cast<const inode *>(exists);
+						const cat_inode * tmp_exists = const_cast<const cat_inode *>(exists);
 						restore_atime(juillet.get_string(), tmp_exists);
 					    }
 					}
@@ -1272,7 +1272,7 @@ namespace libdar
         while(cat.read(e))
         {
 	    const file *e_file = dynamic_cast<const file *>(e);
-	    const inode *e_ino = dynamic_cast<const inode *>(e);
+	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 	    const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
@@ -1354,7 +1354,7 @@ namespace libdar
 			    }
                         }
                             // checking inode EA if any
-                        if(e_ino != NULL && e_ino->ea_get_saved_status() == inode::ea_full)
+                        if(e_ino != NULL && e_ino->ea_get_saved_status() == cat_inode::ea_full)
                         {
 			    if(perimeter == "")
 				perimeter = "EA";
@@ -1369,7 +1369,7 @@ namespace libdar
                         }
 
 			    // checking FSA if any
-			if(e_ino != NULL && e_ino->fsa_get_saved_status() == inode::fsa_full)
+			if(e_ino != NULL && e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 			{
 			    if(perimeter == "")
 				perimeter = "FSA";
@@ -1642,7 +1642,7 @@ namespace libdar
 					cat_nomme *dolly_nom = dynamic_cast<cat_nomme *>(dolly);
 					cat_directory *dolly_dir = dynamic_cast<cat_directory *>(dolly);
 					cat_mirage *dolly_mir = dynamic_cast<cat_mirage *>(dolly);
-					inode *dolly_ino = dynamic_cast<inode *>(dolly);
+					cat_inode *dolly_ino = dynamic_cast<cat_inode *>(dolly);
 
 					if(dolly_mir != NULL)
 					    dolly_ino = dolly_mir->get_inode();
@@ -1655,7 +1655,7 @@ namespace libdar
 					    const detruit *al_det = dynamic_cast<const detruit *>(already_here);
 					    const ignored *al_ign = dynamic_cast<const ignored *>(already_here);
 					    const ignored_dir *al_igndir = dynamic_cast<const ignored_dir *>(already_here);
-					    const inode *al_ino = dynamic_cast<const inode *>(already_here);
+					    const cat_inode *al_ino = dynamic_cast<const cat_inode *>(already_here);
 					    const cat_directory *al_dir = dynamic_cast<const cat_directory *>(already_here);
 					    const string full_name = juillet.get_string();
 
@@ -1781,7 +1781,7 @@ namespace libdar
 						if(act_data == data_preserve_mark_already_saved
 						   && al_ino != NULL)
 						{
-						    inode *tmp = const_cast<inode *>(al_ino);
+						    cat_inode *tmp = const_cast<cat_inode *>(al_ino);
 						    if(tmp->get_saved_status() == s_saved)
 							tmp->set_saved_status(s_not_saved); // dropping data
 						}
@@ -1791,10 +1791,10 @@ namespace libdar
 						if(act_ea == EA_ask)
 						{
 						    if(dolly_ino != NULL && al_ino != NULL
-						       && (dolly_ino->ea_get_saved_status() != inode::ea_none
-							   || al_ino->ea_get_saved_status() != inode::ea_none
-							   || dolly_ino->fsa_get_saved_status() != inode::fsa_none
-							   || al_ino->fsa_get_saved_status() != inode::fsa_none)
+						       && (dolly_ino->ea_get_saved_status() != cat_inode::ea_none
+							   || al_ino->ea_get_saved_status() != cat_inode::ea_none
+							   || dolly_ino->fsa_get_saved_status() != cat_inode::fsa_none
+							   || al_ino->fsa_get_saved_status() != cat_inode::fsa_none)
 							)
 							act_ea = crit_ask_user_for_EA_action(dialog, full_name, already_here, dolly);
 						    else
@@ -1813,41 +1813,41 @@ namespace libdar
 						case EA_merge_overwrite:
 						    if(display_treated)
 							dialog.warning(tools_printf(gettext("EA and FSA of file %S from first archive have been updated with those of same named file of the auxiliary archive"), &full_name));
-						    do_EFSA_transfert(dialog, pool, act_ea, const_cast<inode *>(al_ino), dolly_ino);
+						    do_EFSA_transfert(dialog, pool, act_ea, const_cast<cat_inode *>(al_ino), dolly_ino);
 						    break;
 
 						case EA_preserve_mark_already_saved:
 
-						    if(al_ino != NULL && al_ino->ea_get_saved_status() == inode::ea_full)
+						    if(al_ino != NULL && al_ino->ea_get_saved_status() == cat_inode::ea_full)
 						    {
-							const_cast<inode *>(al_ino)->ea_set_saved_status(inode::ea_partial);
+							const_cast<cat_inode *>(al_ino)->ea_set_saved_status(cat_inode::ea_partial);
 							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been dropped and marked as already saved"), &full_name));
 						    }
-						    if(al_ino != NULL && al_ino->fsa_get_saved_status() == inode::fsa_full)
+						    if(al_ino != NULL && al_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 						    {
-							const_cast<inode *>(al_ino)->fsa_set_saved_status(inode::fsa_partial);
+							const_cast<cat_inode *>(al_ino)->fsa_set_saved_status(cat_inode::fsa_partial);
 							if(display_treated)
 							    dialog.warning(tools_printf(gettext("FSA of file %S from first archive have been dropped and marked as already saved"), &full_name));
 						    }
 						    break;
 
 						case EA_clear:
-						    if(al_ino != NULL && al_ino->ea_get_saved_status() != inode::ea_none)
+						    if(al_ino != NULL && al_ino->ea_get_saved_status() != cat_inode::ea_none)
 						    {
-							if(al_ino->ea_get_saved_status() == inode::ea_full)
+							if(al_ino->ea_get_saved_status() == cat_inode::ea_full)
 							    st.decr_ea_treated();
 							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
-							const_cast<inode *>(al_ino)->ea_set_saved_status(inode::ea_none);
+							const_cast<cat_inode *>(al_ino)->ea_set_saved_status(cat_inode::ea_none);
 						    }
-						    if(al_ino != NULL && al_ino->fsa_get_saved_status() != inode::fsa_none)
+						    if(al_ino != NULL && al_ino->fsa_get_saved_status() != cat_inode::fsa_none)
 						    {
-							if(al_ino->fsa_get_saved_status() == inode::fsa_full)
+							if(al_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 							    st.decr_fsa_treated();
 							if(display_treated)
 							    dialog.warning(tools_printf(gettext("FSA of file %S from first archive have been removed"), &full_name));
-							const_cast<inode *>(al_ino)->fsa_set_saved_status(inode::fsa_none);
+							const_cast<cat_inode *>(al_ino)->fsa_set_saved_status(cat_inode::fsa_none);
 						    }
 
 						    break;
@@ -1929,10 +1929,10 @@ namespace libdar
 						if(act_ea == EA_ask && act_data != data_remove)
 						{
 						    if(dolly_ino != NULL && al_ino != NULL &&
-						       (dolly_ino->ea_get_saved_status() != inode::ea_none
-							|| al_ino->ea_get_saved_status() != inode::ea_none
-							|| dolly_ino->fsa_get_saved_status() != inode::fsa_none
-							|| al_ino->fsa_get_saved_status() != inode::fsa_none))
+						       (dolly_ino->ea_get_saved_status() != cat_inode::ea_none
+							|| al_ino->ea_get_saved_status() != cat_inode::ea_none
+							|| dolly_ino->fsa_get_saved_status() != cat_inode::fsa_none
+							|| al_ino->fsa_get_saved_status() != cat_inode::fsa_none))
 							act_ea = crit_ask_user_for_EA_action(dialog, full_name, already_here, dolly);
 						    else
 							act_ea = EA_overwrite; // no need to ask here neither as both entries have no EA.
@@ -1953,8 +1953,8 @@ namespace libdar
 						    case EA_overwrite_mark_already_saved:
 							if(display_treated)
 							    dialog.warning(tools_printf(gettext("EA of file %S has been overwritten and marked as already saved"), &full_name));
-							if(dolly_ino != NULL && dolly_ino->ea_get_saved_status() == inode::ea_full)
-							    dolly_ino->ea_set_saved_status(inode::ea_partial);
+							if(dolly_ino != NULL && dolly_ino->ea_get_saved_status() == cat_inode::ea_full)
+							    dolly_ino->ea_set_saved_status(cat_inode::ea_partial);
 							break;
 						    case EA_merge_preserve:
 							if(display_treated)
@@ -1972,11 +1972,11 @@ namespace libdar
 							do_EFSA_transfert(dialog, pool, EA_overwrite_mark_already_saved, dolly_ino, al_ino);
 							break;
 						    case EA_clear:
-							if(al_ino->ea_get_saved_status() != inode::ea_none)
+							if(al_ino->ea_get_saved_status() != cat_inode::ea_none)
 							{
 							    if(display_treated)
 								dialog.warning(tools_printf(gettext("EA of file %S from first archive have been removed"), &full_name));
-							    dolly_ino->ea_set_saved_status(inode::ea_none);
+							    dolly_ino->ea_set_saved_status(cat_inode::ea_none);
 							}
 							break;
 						    default:
@@ -2015,7 +2015,7 @@ namespace libdar
 						    st.decr_treated();
 
 						    if(al_ino != NULL)
-							if(al_ino->ea_get_saved_status() == inode::ea_full)
+							if(al_ino->ea_get_saved_status() == cat_inode::ea_full)
 							    st.decr_ea_treated();
 
 							// hard link specific actions
@@ -2027,11 +2027,11 @@ namespace libdar
 
 							    // updating counter from pointed to inode
 
-							const inode*al_ptr_ino = al_mir->get_inode();
+							const cat_inode*al_ptr_ino = al_mir->get_inode();
 							if(al_ptr_ino == NULL)
 							    throw SRC_BUG;
 							else
-							    if(al_ptr_ino->ea_get_saved_status() == inode::ea_full)
+							    if(al_ptr_ino->ea_get_saved_status() == cat_inode::ea_full)
 								st.decr_ea_treated();
 
 							    // cleaning the corres_copy map from the pointed to etoile object reference if necessary
@@ -2178,7 +2178,7 @@ namespace libdar
 
 					if(dolly != NULL)
 					{
-					    const inode *e_ino = dynamic_cast<const inode *>(e);
+					    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 
 					    cat.add(dolly);
 					    st.incr_treated();
@@ -2195,10 +2195,10 @@ namespace libdar
 
 					    if(e_ino != NULL)
 					    {
-						if(e_ino->ea_get_saved_status() == inode::ea_full)
+						if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
 						    st.incr_ea_treated();
 
-						if(e_ino->fsa_get_saved_status() == inode::fsa_full)
+						if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 						    st.incr_fsa_treated();
 					    }
 
@@ -2353,7 +2353,7 @@ namespace libdar
 	    {
 		cat_entree *e_var = const_cast<cat_entree *>(e);
 		cat_nomme *e_nom = dynamic_cast<cat_nomme *>(e_var);
-		inode *e_ino = dynamic_cast<inode *>(e_var);
+		cat_inode *e_ino = dynamic_cast<cat_inode *>(e_var);
 		file *e_file = dynamic_cast<file *>(e_var);
 		cat_mirage *e_mir = dynamic_cast<cat_mirage *>(e_var);
 		cat_directory *e_dir = dynamic_cast<cat_directory *>(e_var);
@@ -2458,12 +2458,12 @@ namespace libdar
 
 			// saving inode's EA
 
-		    if(e_ino->ea_get_saved_status() == inode::ea_full)
+		    if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
 		    {
 			cat.pre_add_ea(e);
 			if(save_ea(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
 			{
-			    if(e_ino->fsa_get_saved_status() != inode::fsa_full)
+			    if(e_ino->fsa_get_saved_status() != cat_inode::fsa_full)
 				e_ino->change_efsa_location(stockage);
 				// change stockage location will be done only after copying FSA (see below)
 			}
@@ -2471,7 +2471,7 @@ namespace libdar
 		    }
 
 			// saving inode's FSA
-		    if(e_ino->fsa_get_saved_status() == inode::fsa_full)
+		    if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 		    {
 			cat.pre_add_fsa(e);
 			if(save_fsa(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
@@ -2483,7 +2483,7 @@ namespace libdar
 		else // not an inode
 		{
 		    cat.pre_add(e);
-		    if(e_mir != NULL && (e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == inode::ea_full))
+		    if(e_mir != NULL && (e_mir->get_inode()->get_saved_status() == s_saved || e_mir->get_inode()->ea_get_saved_status() == cat_inode::ea_full))
 			if(display_treated)
 			    dialog.warning(string(gettext("Adding Hard link to archive: "))+juillet.get_string());
 		}
@@ -2522,7 +2522,7 @@ namespace libdar
 	    while(cat.read(e))
 	    {
 		const file *e_file = dynamic_cast<const file *>(e);
-		const inode *e_ino = dynamic_cast<const inode *>(e);
+		const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 		const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 		const crc *check = NULL;
 
@@ -2555,12 +2555,12 @@ namespace libdar
 		{
 		    if(e_ino != NULL)
 		    {
-			if(e_ino->ea_get_saved_status() == inode::ea_full)
+			if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
 			{
 			    (void)e_ino->get_ea();
 			    e_ino->ea_get_crc(check);
 			}
-			if(e_ino->fsa_get_saved_status() == inode::fsa_full)
+			if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 			{
 			    (void)e_ino->get_fsa();
 			    e_ino->fsa_get_crc(check);
@@ -2605,7 +2605,7 @@ namespace libdar
 	infinint storage_size;
 	bool loop;
 	cat_mirage *mir = dynamic_cast<cat_mirage *>(e);
-	inode *ino = dynamic_cast<inode *>(e);
+	cat_inode *ino = dynamic_cast<cat_inode *>(e);
 	bool resave_uncompressed = false;
 	infinint rewinder = stack.get_position(); // we skip back here if data must be saved uncompressed
 
@@ -3026,7 +3026,7 @@ namespace libdar
 
     static bool save_ea(user_interaction & dialog,
 			const string & info_quoi,
-			inode * & ino,
+			cat_inode * & ino,
 			pile & stack,
 			compressor *compr,
 			bool display_treated)
@@ -3036,7 +3036,7 @@ namespace libdar
         {
             switch(ino->ea_get_saved_status())
             {
-            case inode::ea_full: // if there is something to save
+            case cat_inode::ea_full: // if there is something to save
 		if(ino->get_ea() != NULL)
 		{
 		    crc * val = NULL;
@@ -3075,12 +3075,12 @@ namespace libdar
 		else
 		    throw SRC_BUG;
 		break;
-            case inode::ea_partial:
-	    case inode::ea_none:
+            case cat_inode::ea_partial:
+	    case cat_inode::ea_none:
 		break;
-	    case inode::ea_fake:
+	    case cat_inode::ea_fake:
                 throw SRC_BUG; //filesystem, must not provide inode in such a status
-	    case inode::ea_removed:
+	    case cat_inode::ea_removed:
 		throw SRC_BUG; //filesystem, must not provide inode in such a status
             default:
                 throw SRC_BUG;
@@ -3106,7 +3106,7 @@ namespace libdar
     }
 
 
-    static void restore_atime(const string & chemin, const inode * & ptr)
+    static void restore_atime(const string & chemin, const cat_inode * & ptr)
     {
 	const file * ptr_f = dynamic_cast<const file *>(ptr);
 	if(ptr_f != NULL)
@@ -3115,7 +3115,7 @@ namespace libdar
 
     static bool save_fsa(user_interaction & dialog,
 			 const string & info_quoi,
-			 inode * & ino,
+			 cat_inode * & ino,
 			 pile & stack,
 			 compressor *compr,
 			 bool display_treated)
@@ -3125,7 +3125,7 @@ namespace libdar
         {
             switch(ino->fsa_get_saved_status())
             {
-            case inode::fsa_full: // if there is something to save
+            case cat_inode::fsa_full: // if there is something to save
 		if(ino->get_fsa() != NULL)
 		{
 		    crc * val = NULL;
@@ -3175,8 +3175,8 @@ namespace libdar
 		else
 		    throw SRC_BUG;
 		break;
-            case inode::fsa_partial:
-	    case inode::fsa_none:
+            case cat_inode::fsa_partial:
+	    case cat_inode::fsa_none:
 		break;
             default:
                 throw SRC_BUG;
@@ -3204,8 +3204,8 @@ namespace libdar
     static void do_EFSA_transfert(user_interaction &dialog,
 				  memory_pool *pool,
 				  over_action_ea action,
-				  inode *place_ino,
-				  const inode *add_ino)
+				  cat_inode *place_ino,
+				  const cat_inode *add_ino)
     {
 	ea_attributs *tmp_ea = NULL;
 	filesystem_specific_attribute_list *tmp_fsa = NULL;
@@ -3232,7 +3232,7 @@ namespace libdar
 	    return;           // nothing can be done neither here as the resulting object (in_place) cannot handle EA
 
 	    // in the following we know that both in_place and to_add are inode,
-	    //we manipulate them thanks to their inode * pointers (place_ino and add_ino)
+	    //we manipulate them thanks to their cat_inode * pointers (place_ino and add_ino)
 
 	switch(action) // action concerns both EA and FSA in spite of the name of its values
 	{
@@ -3247,24 +3247,24 @@ namespace libdar
 
 	    switch(add_ino->ea_get_saved_status())
 	    {
-	    case inode::ea_none:
-	    case inode::ea_removed:
-		place_ino->ea_set_saved_status(inode::ea_none);
+	    case cat_inode::ea_none:
+	    case cat_inode::ea_removed:
+		place_ino->ea_set_saved_status(cat_inode::ea_none);
 		break;
-	    case inode::ea_partial:
-	    case inode::ea_fake:
-		place_ino->ea_set_saved_status(inode::ea_partial);
+	    case cat_inode::ea_partial:
+	    case cat_inode::ea_fake:
+		place_ino->ea_set_saved_status(cat_inode::ea_partial);
 		break;
-	    case inode::ea_full:
+	    case cat_inode::ea_full:
 		tmp_ea = new (pool) ea_attributs(*add_ino->get_ea()); // we clone the EA of add_ino
 		if(tmp_ea == NULL)
 		    throw Ememory("filtre::do_EFSA_transfert");
 		try
 		{
-		    if(place_ino->ea_get_saved_status() == inode::ea_full) // then we must drop the old EA:
+		    if(place_ino->ea_get_saved_status() == cat_inode::ea_full) // then we must drop the old EA:
 			place_ino->ea_detach();
 		    else
-			place_ino->ea_set_saved_status(inode::ea_full);
+			place_ino->ea_set_saved_status(cat_inode::ea_full);
 		    place_ino->ea_attach(tmp_ea);
 		    tmp_ea = NULL;
 		}
@@ -3286,22 +3286,22 @@ namespace libdar
 
 	    switch(add_ino->fsa_get_saved_status())
 	    {
-	    case inode::fsa_none:
-		place_ino->fsa_set_saved_status(inode::fsa_none);
+	    case cat_inode::fsa_none:
+		place_ino->fsa_set_saved_status(cat_inode::fsa_none);
 		break;
-	    case inode::fsa_partial:
-		place_ino->fsa_set_saved_status(inode::fsa_partial);
+	    case cat_inode::fsa_partial:
+		place_ino->fsa_set_saved_status(cat_inode::fsa_partial);
 		break;
-	    case inode::fsa_full:
+	    case cat_inode::fsa_full:
 		tmp_fsa = new (pool) filesystem_specific_attribute_list(*add_ino->get_fsa()); // we clone the FSA of add_ino
 		if(tmp_fsa == NULL)
 		    throw Ememory("filtre::do_EFSA_transfer");
 		try
 		{
-		    if(place_ino->fsa_get_saved_status() == inode::fsa_full) // we must drop the old FSA
+		    if(place_ino->fsa_get_saved_status() == cat_inode::fsa_full) // we must drop the old FSA
 			place_ino->fsa_detach();
 		    else
-			place_ino->fsa_set_saved_status(inode::fsa_full);
+			place_ino->fsa_set_saved_status(cat_inode::fsa_full);
 		    place_ino->fsa_attach(tmp_fsa);
 		    tmp_fsa = NULL;
 		}
@@ -3330,14 +3330,14 @@ namespace libdar
 		// EA considerations
 
 	    place_ino->ea_set_saved_status(add_ino->ea_get_saved_status()); // at this step, ea_full may be set, it will be changed to ea_partial below.
-	    if(place_ino->ea_get_saved_status() == inode::ea_full || place_ino->ea_get_saved_status() == inode::ea_fake)
-		place_ino->ea_set_saved_status(inode::ea_partial);
+	    if(place_ino->ea_get_saved_status() == cat_inode::ea_full || place_ino->ea_get_saved_status() == cat_inode::ea_fake)
+		place_ino->ea_set_saved_status(cat_inode::ea_partial);
 
 		// FSA considerations
 
 	    place_ino->fsa_set_saved_status(add_ino->fsa_get_saved_status()); // at this step fsa_full may be set, will be changed to fsa_partial below
-	    if(place_ino->fsa_get_saved_status() == inode::fsa_full)
-		place_ino->fsa_set_saved_status(inode::fsa_partial);
+	    if(place_ino->fsa_get_saved_status() == cat_inode::fsa_full)
+		place_ino->fsa_set_saved_status(cat_inode::fsa_partial);
 
 	    break;
 
@@ -3347,7 +3347,7 @@ namespace libdar
 
 		// EA considerations
 
-	    if(place_ino->ea_get_saved_status() == inode::ea_full && add_ino->ea_get_saved_status() == inode::ea_full) // we have something to merge
+	    if(place_ino->ea_get_saved_status() == cat_inode::ea_full && add_ino->ea_get_saved_status() == cat_inode::ea_full) // we have something to merge
 	    {
 		tmp_ea = new (pool) ea_attributs();
 		if(tmp_ea == NULL)
@@ -3370,9 +3370,9 @@ namespace libdar
 		}
 	    }
 	    else
-		if(add_ino->ea_get_saved_status() == inode::ea_full)
+		if(add_ino->ea_get_saved_status() == cat_inode::ea_full)
 		{
-		    place_ino->ea_set_saved_status(inode::ea_full); // it was not the case else we would have executed the above block
+		    place_ino->ea_set_saved_status(cat_inode::ea_full); // it was not the case else we would have executed the above block
 		    tmp_ea = new (pool) ea_attributs(*add_ino->get_ea());   // we clone the EA set of to_add
 		    if(tmp_ea == NULL)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");
@@ -3397,7 +3397,7 @@ namespace libdar
 
 		// FSA considerations
 
-	    if(place_ino->fsa_get_saved_status() == inode::fsa_full && add_ino->fsa_get_saved_status() == inode::fsa_full) // we have something to merge
+	    if(place_ino->fsa_get_saved_status() == cat_inode::fsa_full && add_ino->fsa_get_saved_status() == cat_inode::fsa_full) // we have something to merge
 	    {
 		tmp_fsa = new (pool) filesystem_specific_attribute_list();
 		if(tmp_fsa == NULL)
@@ -3422,9 +3422,9 @@ namespace libdar
 	    }
 	    else
 	    {
-		if(add_ino->fsa_get_saved_status() == inode::fsa_full)
+		if(add_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 		{
-		    place_ino->fsa_set_saved_status(inode::fsa_full);
+		    place_ino->fsa_set_saved_status(cat_inode::fsa_full);
 		    tmp_fsa = new (pool) filesystem_specific_attribute_list(*add_ino->get_fsa());
 		    if(tmp_fsa == NULL)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");
@@ -3457,7 +3457,7 @@ namespace libdar
 
 		// EA considerations
 
-	    if(place_ino->ea_get_saved_status() == inode::ea_full && add_ino->ea_get_saved_status() == inode::ea_full)
+	    if(place_ino->ea_get_saved_status() == cat_inode::ea_full && add_ino->ea_get_saved_status() == cat_inode::ea_full)
 	    {
 		tmp_ea = new (pool) ea_attributs();
 		if(tmp_ea == NULL)
@@ -3480,9 +3480,9 @@ namespace libdar
 		}
 	    }
 	    else
-		if(add_ino->ea_get_saved_status() == inode::ea_full)
+		if(add_ino->ea_get_saved_status() == cat_inode::ea_full)
 		{
-		    place_ino->ea_set_saved_status(inode::ea_full); // it was not the case else we would have executed the above block
+		    place_ino->ea_set_saved_status(cat_inode::ea_full); // it was not the case else we would have executed the above block
 		    tmp_ea = new (pool) ea_attributs(*add_ino->get_ea());
 		    if(tmp_ea == NULL)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");
@@ -3506,7 +3506,7 @@ namespace libdar
 
 		// FSA considerations
 
-	    if(place_ino->fsa_get_saved_status() == inode::fsa_full && add_ino->fsa_get_saved_status() == inode::fsa_full) // we have something to merge
+	    if(place_ino->fsa_get_saved_status() == cat_inode::fsa_full && add_ino->fsa_get_saved_status() == cat_inode::fsa_full) // we have something to merge
 	    {
 		tmp_fsa = new (pool) filesystem_specific_attribute_list();
 		if(tmp_fsa == NULL)
@@ -3531,9 +3531,9 @@ namespace libdar
 	    }
 	    else
 	    {
-		if(add_ino->fsa_get_saved_status() == inode::fsa_full)
+		if(add_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 		{
-		    place_ino->fsa_set_saved_status(inode::fsa_full);
+		    place_ino->fsa_set_saved_status(cat_inode::fsa_full);
 		    tmp_fsa = new (pool) filesystem_specific_attribute_list(*add_ino->get_fsa());
 		    if(tmp_fsa == NULL)
 			throw Ememory("filtre.cpp:do_EFSA_transfert");
@@ -3603,7 +3603,7 @@ namespace libdar
 		dolly = ref_mir->get_inode()->clone(); // we must clone the attached inode
 		try
 		{
-		    inode *dollinode = dynamic_cast<inode *>(dolly);
+		    cat_inode *dollinode = dynamic_cast<cat_inode *>(dolly);
 
 		    if(dollinode == NULL)
 			throw Ememory("filtre:make_clone");
@@ -3669,7 +3669,7 @@ namespace libdar
 	if(mir->get_etoile_ref_count() == 1)
 	{
 	    map<infinint, etoile *>::iterator it = hard_link_base.find(mir->get_etiquette());
-	    const inode *al_ptr_ino = mir->get_inode();
+	    const cat_inode *al_ptr_ino = mir->get_inode();
 	    if(al_ptr_ino == NULL)
 		throw SRC_BUG;
 	    if(it == hard_link_base.end())

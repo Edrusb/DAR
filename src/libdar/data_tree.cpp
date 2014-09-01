@@ -974,7 +974,7 @@ bool data_tree::fix_corruption()
 	return ret;
     }
 
-    void data_dir::add(const inode *entry, const archive_num & archive)
+    void data_dir::add(const cat_inode *entry, const archive_num & archive)
     {
 	const cat_directory *entry_dir = dynamic_cast<const cat_directory *>(entry);
 	data_tree * tree = find_or_addition(entry->get_name(), entry_dir != NULL, archive);
@@ -997,19 +997,19 @@ bool data_tree::fix_corruption()
 
 	switch(entry->ea_get_saved_status())
 	{
-	case inode::ea_none:
+	case cat_inode::ea_none:
 	    break;
-	case inode::ea_removed:
+	case cat_inode::ea_removed:
 	    result = tree->get_EA(last_archive, datetime(0), false);
 	    if(result == found_present || result == not_restorable)
 		tree->set_EA(archive, entry->get_last_change(), et_removed);
 		// else no need to add an et_remove entry in the map
 	    break;
-	case inode::ea_partial:
+	case cat_inode::ea_partial:
 	    tree->set_EA(archive, entry->get_last_change(), et_present);
 	    break;
-	case inode::ea_fake:
-	case inode::ea_full:
+	case cat_inode::ea_fake:
+	case cat_inode::ea_full:
 	    tree->set_EA(archive, entry->get_last_change(), et_saved);
 	    break;
 	default:
@@ -1321,7 +1321,7 @@ bool data_tree::fix_corruption()
 	while(dir->read_children(entry))
 	{
 	    const cat_directory *entry_dir = dynamic_cast<const cat_directory *>(entry);
-	    const inode *entry_ino = dynamic_cast<const inode *>(entry);
+	    const cat_inode *entry_ino = dynamic_cast<const cat_inode *>(entry);
 	    const cat_mirage *entry_mir = dynamic_cast<const cat_mirage *>(entry);
 	    const detruit *entry_det = dynamic_cast<const detruit *>(entry);
 

@@ -38,7 +38,7 @@ namespace libdar
 	       const datetime & last_change,
 	       const string & name,
 	       const string & target,
-	       const infinint & fs_device) : inode(uid, gid, perm, last_access, last_modif, last_change, name, fs_device)
+	       const infinint & fs_device) : cat_inode(uid, gid, perm, last_access, last_modif, last_change, name, fs_device)
     {
 	points_to = target;
 	set_saved_status(s_saved);
@@ -49,7 +49,7 @@ namespace libdar
 	       const archive_version & reading_ver,
 	       saved_status saved,
 	       compressor *efsa_loc,
-	       escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+	       escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
 	if(saved == s_saved)
 	    tools_read_string(f, points_to);
@@ -68,11 +68,11 @@ namespace libdar
 	points_to = x;
     }
 
-    void lien::sub_compare(const inode & other, bool isolated_mode) const
+    void lien::sub_compare(const cat_inode & other, bool isolated_mode) const
     {
 	const lien *l_other = dynamic_cast<const lien *>(&other);
 	if(l_other == NULL)
-	    throw SRC_BUG; // bad argument inode::compare has a bug
+	    throw SRC_BUG; // bad argument cat_inode::compare has a bug
 
 	if(get_saved_status() == s_saved && l_other->get_saved_status() == s_saved)
 	    if(get_target() != l_other->get_target())
@@ -82,7 +82,7 @@ namespace libdar
 
     void lien::inherited_dump(generic_file & f, bool small) const
     {
-	inode::inherited_dump(f, small);
+	cat_inode::inherited_dump(f, small);
 	if(get_saved_status() == s_saved)
 	    tools_write_string(f, points_to);
     }

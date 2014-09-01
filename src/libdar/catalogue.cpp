@@ -583,12 +583,12 @@ namespace libdar
 	    {
 		const detruit *src_det = dynamic_cast<const detruit *>(nom);
 		const detruit *dst_det = dynamic_cast<const detruit *>(found);
-		const inode *src_ino = dynamic_cast<const inode *>(nom);
-		const inode *dst_ino = dynamic_cast<const inode *>(found);
+		const cat_inode *src_ino = dynamic_cast<const cat_inode *>(nom);
+		const cat_inode *dst_ino = dynamic_cast<const cat_inode *>(found);
 		const cat_mirage *src_mir = dynamic_cast<const cat_mirage *>(nom);
 		const cat_mirage *dst_mir = dynamic_cast<const cat_mirage *>(found);
 
-		    // extracting inode from hard links
+		    // extracting cat_inode from hard links
 		if(src_mir != NULL)
 		    src_ino = src_mir->get_inode();
 		if(dst_mir != NULL)
@@ -623,7 +623,7 @@ namespace libdar
 			else
 			    return false;
 		    else
-			throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a cat_nomme which is neither detruit nor inode !
+			throw SRC_BUG; // src_det == NULL && src_ino == NULL, thus a cat_nomme which is neither detruit nor cat_inode !
 
 		if(dst_mir != NULL)
 		    extracted = dst_mir->get_inode();
@@ -726,7 +726,7 @@ namespace libdar
 	const cat_directory *pro_dir;
 	const detruit *pro_det;
 	const cat_nomme *pro_nom;
-	const inode *pro_ino;
+	const cat_inode *pro_ino;
 	const cat_mirage *pro_mir;
 	map<infinint, etoile *> corres_clone;
 	    // for each etiquette from the reference catalogue
@@ -740,7 +740,7 @@ namespace libdar
 	    pro_dir = dynamic_cast<const cat_directory *>(projo);
 	    pro_det = dynamic_cast<const detruit *>(projo);
 	    pro_nom = dynamic_cast<const cat_nomme *>(projo);
-	    pro_ino = dynamic_cast<const inode *>(projo);
+	    pro_ino = dynamic_cast<const cat_inode *>(projo);
 	    pro_mir = dynamic_cast<const cat_mirage *>(projo);
 
 	    if(pro_eod != NULL)
@@ -760,16 +760,16 @@ namespace libdar
 
 	    if(pro_mir != NULL)
 		pro_ino = pro_mir->get_inode();
-		// warning: the returned inode's name is undefined
+		// warning: the returned cat_inode's name is undefined
 		// one must use the mirage's own name
 
 	    if(pro_ino == NULL)
-		throw SRC_BUG; // a nome that is not an inode nor a detruit!? What's that?
+		throw SRC_BUG; // a nome that is not an cat_inode nor a detruit!? What's that?
 
 	    if(!current->search_children(pro_nom->get_name(), ici))
 	    {
 		cat_entree *clo_ent = NULL;
-		inode *clo_ino = NULL;
+		cat_inode *clo_ino = NULL;
 		cat_directory *clo_dir = NULL;
 		cat_mirage *clo_mir = NULL;
 		etoile *clo_eto = NULL;
@@ -777,25 +777,25 @@ namespace libdar
 		try
 		{
 		    clo_ent = pro_ino->clone();
-		    clo_ino = dynamic_cast<inode *>(clo_ent);
+		    clo_ino = dynamic_cast<cat_inode *>(clo_ent);
 		    clo_dir = dynamic_cast<cat_directory *>(clo_ent);
 
 			// sanity checks
 
 		    if(clo_ino == NULL)
-			throw SRC_BUG; // clone of an inode is not an inode???
+			throw SRC_BUG; // clone of an cat_inode is not an cat_inode???
 		    if((clo_dir != NULL) ^ (pro_dir != NULL))
 			throw SRC_BUG; // both must be NULL or both must be non NULL
 
-			// converting inode to unsaved entry
+			// converting cat_inode to unsaved entry
 
 		    clo_ino->set_saved_status(s_not_saved);
-		    if(clo_ino->ea_get_saved_status() != inode::ea_none)
+		    if(clo_ino->ea_get_saved_status() != cat_inode::ea_none)
 		    {
-			if(clo_ino->ea_get_saved_status() == inode::ea_removed)
-			    clo_ino->ea_set_saved_status(inode::ea_none);
+			if(clo_ino->ea_get_saved_status() == cat_inode::ea_removed)
+			    clo_ino->ea_set_saved_status(cat_inode::ea_none);
 			else
-			    clo_ino->ea_set_saved_status(inode::ea_partial);
+			    clo_ino->ea_set_saved_status(cat_inode::ea_partial);
 		    }
 
 			// handling hard links
@@ -829,7 +829,7 @@ namespace libdar
 			    }
 			    else // mapping already exists (a star already shines)
 			    {
-				    // we have cloned the inode but we do not need it as
+				    // we have cloned the cat_inode but we do not need it as
 				    // an hard linked structure already exists
 				delete clo_ent;
 				clo_ent = NULL;
@@ -940,7 +940,7 @@ namespace libdar
 	    const eod *e_eod = dynamic_cast<const eod *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
-	    const inode *e_ino = dynamic_cast<const inode *>(e);
+	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 
@@ -986,7 +986,7 @@ namespace libdar
 			    else
 				if(!filter_unsaved
 				   || e_ino->get_saved_status() != s_not_saved
-				   || (e_ino->ea_get_saved_status() == inode::ea_full || e_ino->ea_get_saved_status() == inode::ea_fake)
+				   || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
 				   || (e_dir != NULL && e_dir->get_recursive_has_changed()))
 				{
 				    bool dirty_seq = local_check_dirty_seq(get_escape_layer());
@@ -1057,7 +1057,7 @@ namespace libdar
 	    const eod *e_eod = dynamic_cast<const eod *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
-	    const inode *e_ino = dynamic_cast<const inode *>(e);
+	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 
@@ -1116,7 +1116,7 @@ namespace libdar
 
 				if(!filter_unsaved
 				   || e_ino->get_saved_status() != s_not_saved
-				   || (e_ino->ea_get_saved_status() == inode::ea_full || e_ino->ea_get_saved_status() == inode::ea_fake)
+				   || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
 				   || (e_dir != NULL && e_dir->get_recursive_has_changed()))
 				{
 				    bool dirty_seq = local_check_dirty_seq(get_escape_layer());
@@ -1188,7 +1188,7 @@ namespace libdar
 	    const eod *e_eod = dynamic_cast<const eod *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);
-	    const inode *e_ino = dynamic_cast<const inode *>(e);
+	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const lien *e_sym = dynamic_cast<const lien *>(e);
 	    const device *e_dev = dynamic_cast<const device *>(e);
@@ -1278,11 +1278,11 @@ namespace libdar
 			    }
 
 			    if(e_ino == NULL)
-				throw SRC_BUG; // this is a cat_nomme which is neither a detruit nor an inode
+				throw SRC_BUG; // this is a cat_nomme which is neither a detruit nor an cat_inode
 
 			    if(!filter_unsaved
 			       || e_ino->get_saved_status() != s_not_saved
-			       || (e_ino->ea_get_saved_status() == inode::ea_full || e_ino->ea_get_saved_status() == inode::ea_fake)
+			       || (e_ino->ea_get_saved_status() == cat_inode::ea_full || e_ino->ea_get_saved_status() == cat_inode::ea_fake)
 			       || (e_dir != NULL && e_dir->get_recursive_has_changed()))
 			    {
 				string data, metadata, maj, min, chksum, target;
@@ -1292,11 +1292,11 @@ namespace libdar
 				const file *reg = dynamic_cast<const file *>(e_ino); // ino is no more it->second (if it->second was a cat_mirage)
 
 				saved_status data_st;
-				inode::ea_status ea_st = isolated ? inode::ea_fake : e_ino->ea_get_saved_status();
+				cat_inode::ea_status ea_st = isolated ? cat_inode::ea_fake : e_ino->ea_get_saved_status();
 				unsigned char sig;
 
 				unmk_signature(e_ino->signature(), sig, data_st, isolated);
-				data_st = isolated ? s_fake : e_ino->get_saved_status(); // the trusted source for inode status is get_saved_status, not the signature (may change in future, who knows)
+				data_st = isolated ? s_fake : e_ino->get_saved_status(); // the trusted source for cat_inode status is get_saved_status, not the signature (may change in future, who knows)
 				if(stored == "0")
 				    stored = size;
 
@@ -1319,22 +1319,22 @@ namespace libdar
 
 				switch(ea_st)
 				{
-				case inode::ea_full:
+				case cat_inode::ea_full:
 				    metadata = "saved";
 				    break;
-				case inode::ea_partial:
-				case inode::ea_fake:
+				case cat_inode::ea_partial:
+				case cat_inode::ea_fake:
 				    metadata = "referenced";
 				    break;
-				case inode::ea_none:
-				case inode::ea_removed:
+				case cat_inode::ea_none:
+				case cat_inode::ea_removed:
 				    metadata = "absent";
 				    break;
 				default:
 				    throw SRC_BUG;
 				}
 
-				    // building entry for each type of inode
+				    // building entry for each type of cat_inode
 
 				switch(sig)
 				{
@@ -1399,7 +1399,7 @@ namespace libdar
 					target = "character";
 				    else
 					target = "block";
-					// we re-used target variable which is not used for the current inode
+					// we re-used target variable which is not used for the current cat_inode
 
 				    if(data_st == s_saved)
 				    {
@@ -1470,7 +1470,7 @@ namespace libdar
 	{
 	    const eod *e_eod = dynamic_cast<const eod *>(e);
 	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
-	    const inode *e_ino = dynamic_cast<const inode *>(e);
+	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 	    const cat_mirage *e_hard = dynamic_cast<const cat_mirage *>(e);
 	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
 	    const detruit *e_det = dynamic_cast<const detruit *>(e);

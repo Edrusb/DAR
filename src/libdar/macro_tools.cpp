@@ -1376,7 +1376,7 @@ namespace libdar
 	infinint offset; // used temporarily to record data, EA and FSA offsets
 	infinint slice_num, slice_offset;
 	infinint low;
-	const inode *tmp_inode = dynamic_cast<const inode *>(obj);
+	const cat_inode *tmp_inode = dynamic_cast<const cat_inode *>(obj);
 	const file *tmp_file = dynamic_cast<const file *>(obj);
 	const cat_mirage *tmp_mir = dynamic_cast<const cat_mirage *>(obj);
 
@@ -1393,7 +1393,7 @@ namespace libdar
 	{
 	    if(sl.first_size > 0)
 	    {
-		if(tmp_inode->ea_get_saved_status() == inode::ea_full)
+		if(tmp_inode->ea_get_saved_status() == cat_inode::ea_full)
 		{
 		    if(tmp_inode->ea_get_offset(offset))
 		    {
@@ -1412,7 +1412,7 @@ namespace libdar
 			throw SRC_BUG; // has EA saved but no offset ?!?
 		}
 
-		if(tmp_inode->fsa_get_saved_status() == inode::fsa_full)
+		if(tmp_inode->fsa_get_saved_status() == cat_inode::fsa_full)
 		{
 		    if(tmp_inode->fsa_get_offset(offset))
 		    {

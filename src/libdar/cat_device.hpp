@@ -42,7 +42,7 @@ namespace libdar
 	/// @{
 
 	/// the special device root class
-    class device : public inode
+    class device : public cat_inode
     {
     public :
         device(const infinint & uid, const infinint & gid, U_16 perm,
@@ -65,12 +65,12 @@ namespace libdar
         void set_major(int x) { xmajor = x; };
         void set_minor(int x) { xminor = x; };
 
-            // using method is_more_recent_than() from inode class
-            // using method has_changed_since() from inode class
+            // using method is_more_recent_than() from cat_inode class
+            // using method has_changed_since() from cat_inode class
             // signature is left pure abstract
 
     protected :
-        void sub_compare(const inode & other, bool isolated_mode) const;
+        void sub_compare(const cat_inode & other, bool isolated_mode) const;
         void inherited_dump(generic_file & f, bool small) const;
 
     private :

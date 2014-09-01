@@ -74,8 +74,8 @@ namespace libdar
 	bool is_door_inode() const { return type == 'o'; };
 
 	bool has_data_present_in_the_archive() const { return data_status == s_saved; };
-	bool has_EA() const { return ea_status != inode::ea_none && ea_status != inode::ea_removed; };
-	bool has_EA_saved_in_the_archive() const { return ea_status == inode::ea_full; };
+	bool has_EA() const { return ea_status != cat_inode::ea_none && ea_status != cat_inode::ea_removed; };
+	bool has_EA_saved_in_the_archive() const { return ea_status == cat_inode::ea_full; };
 
 	std::string get_uid() const { return deci(uid).human(); };
 	std::string get_gid() const { return deci(gid).human(); };
@@ -125,7 +125,7 @@ namespace libdar
 	void set_last_access(const datetime & val) { last_access = val; };
 	void set_last_modif(const datetime & val) { last_modif = val; };
 	void set_saved_status(saved_status val) { data_status = val; };
-	void set_ea_status(inode::ea_status val) { ea_status = val; };
+	void set_ea_status(cat_inode::ea_status val) { ea_status = val; };
 	void set_last_change(const datetime & val) { last_change = val; };
 	void set_file_size(const infinint & val) { file_size = val; };
 	void set_storage_size(const infinint & val) { storage_size = val; };
@@ -147,7 +147,7 @@ namespace libdar
 	datetime last_access;
 	datetime last_modif;
 	saved_status data_status;
-	inode::ea_status ea_status;
+	cat_inode::ea_status ea_status;
 	datetime last_change;
 	infinint file_size;
 	infinint storage_size;

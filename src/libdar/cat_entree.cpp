@@ -60,7 +60,7 @@ namespace libdar
            && dynamic_cast<const ignored *>(ref) == NULL // as well we ignore "ignored"
            && dynamic_cast<const ignored_dir *>(ref) == NULL) // and "ignored_dir"
         {
-            const inode *ino = dynamic_cast<const inode *>(ref);
+            const cat_inode *ino = dynamic_cast<const cat_inode *>(ref);
             const cat_mirage *h = dynamic_cast<const cat_mirage *>(ref);
             const detruit *x = dynamic_cast<const detruit *>(ref);
 

@@ -398,7 +398,7 @@ namespace libdar
 				bool alter_atime,
 				bool furtive_read_mode,
 				bool same_fs,
-				inode::comparison_fields what_to_check,
+				cat_inode::comparison_fields what_to_check,
 				bool snapshot,
 				bool cache_directory_tagging,
 				const infinint & fixed_date,
@@ -460,7 +460,7 @@ namespace libdar
 			      bool alter_atime,                 //< whether to alter atime date (by opposition to ctime) when reading files
 			      bool furtive_read_mode,           //< whether to neither alter atime nor ctome (if true alter_atime is ignored)
 			      bool same_fs,                     //< confin the files consideration to a single filesystem
-			      inode::comparison_fields what_to_check,  //< fields to consider wien comparing inodes (see inode::comparison_fields enumeration)
+			      cat_inode::comparison_fields what_to_check,  //< fields to consider wien comparing inodes (see cat_inode::comparison_fields enumeration)
 			      bool snapshot,                    //< make as if all file had not changed
 			      bool cache_directory_tagging,     //< avoid saving directory which follow the cache directory tagging
 			      bool keep_compressed,             //< keep file compressed when merging
