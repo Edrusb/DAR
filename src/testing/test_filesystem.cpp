@@ -150,7 +150,7 @@ static void del()
 
 static void test()
 {
-    entree *p;
+    cat_entree *p;
     infinint root_fs_device;
     infinint errors, skipped_dump;
     bool_mask all = true;
@@ -201,7 +201,7 @@ static void re_test()
 {
     try
     {
-	const entree *e;
+	const cat_entree *e;
 	detruit det1 = detruit("lien", 'l' | 0x80, datetime(129));
 	detruit det2 = detruit("dev1", 'd', datetime(192));
 	path where = "algi";

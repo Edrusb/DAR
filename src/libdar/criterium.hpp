@@ -541,7 +541,7 @@ namespace libdar
 	/// \param[in] already_here pointer to the object 'in place'
 	/// \param[in] dolly pointer to the object 'to be added'
 	/// \return the action decided by the user. The user may also choose to abort, which will throw an Euser_abort exception
-    extern over_action_ea crit_ask_user_for_EA_action(user_interaction & dialog, const std::string & full_name, const entree *already_here, const entree *dolly);
+    extern over_action_ea crit_ask_user_for_EA_action(user_interaction & dialog, const std::string & full_name, const cat_entree *already_here, const cat_entree *dolly);
 
 	/// ask user for FSA action
 
@@ -550,7 +550,7 @@ namespace libdar
 	/// \param[in] already_here pointer to the object 'in place'
 	/// \param[in] dolly pointer to the object 'to be added'
 	/// \return the action decided by the user. The user may also choose to abort, which will throw an Euser_abort exception
-    extern over_action_ea crit_ask_user_for_FSA_action(user_interaction & dialog, const std::string & full_name, const entree *already_here, const entree *dolly);
+    extern over_action_ea crit_ask_user_for_FSA_action(user_interaction & dialog, const std::string & full_name, const cat_entree *already_here, const cat_entree *dolly);
 
 	/// ask user for Data action
 
@@ -559,7 +559,7 @@ namespace libdar
 	/// \param[in] already_here pointer to the object 'in place'
 	/// \param[in] dolly pointer to the object 'to be added'
 	/// \return the action decided by the user. The user may also choose to abort, which will throw an Euser_abort exception
-    extern over_action_data crit_ask_user_for_data_action(user_interaction & dialog, const std::string & full_name, const entree *already_here, const entree *dolly);
+    extern over_action_data crit_ask_user_for_data_action(user_interaction & dialog, const std::string & full_name, const cat_entree *already_here, const cat_entree *dolly);
 
 
 	/// show information suited for user comparison and decision for entry in conflict
@@ -568,7 +568,7 @@ namespace libdar
 	/// \param[in] full_name path to the entry of the entry to display information
 	/// \param[in] already_here pointer to the object 'in place'
 	/// \param[in] dolly pointer to the object 'to be added'
-    extern void crit_show_entry_info(user_interaction & dialog, const std::string & full_name, const entree *already_here, const entree *dolly);
+    extern void crit_show_entry_info(user_interaction & dialog, const std::string & full_name, const cat_entree *already_here, const cat_entree *dolly);
 
 	/// @}
 

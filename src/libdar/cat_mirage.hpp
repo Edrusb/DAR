@@ -80,7 +80,7 @@ namespace libdar
 	~mirage() { star_ref->drop_ref(this); };
 
 	unsigned char signature() const { return 'm'; };
-	entree *clone() const { return new (get_pool()) mirage(*this); };
+	cat_entree *clone() const { return new (get_pool()) mirage(*this); };
 
 	inode *get_inode() const { if(star_ref == NULL) throw SRC_BUG; return star_ref->get_inode(); };
 	infinint get_etiquette() const { return star_ref->get_etiquette(); };

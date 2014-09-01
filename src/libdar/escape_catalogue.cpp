@@ -131,7 +131,7 @@ namespace libdar
 	return *this;
     }
 
-    void escape_catalogue::pre_add(const entree *ref) const
+    void escape_catalogue::pre_add(const cat_entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 
@@ -143,7 +143,7 @@ namespace libdar
 	ref->dump(*(ceci->esc), true);
     }
 
-    void escape_catalogue::pre_add_ea(const entree *ref) const
+    void escape_catalogue::pre_add_ea(const cat_entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
@@ -169,7 +169,7 @@ namespace libdar
 	    // else, nothing to do.
     }
 
-    void escape_catalogue::pre_add_crc(const entree *ref) const
+    void escape_catalogue::pre_add_crc(const cat_entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
@@ -210,7 +210,7 @@ namespace libdar
     }
 
 
-    void escape_catalogue::pre_add_ea_crc(const entree *ref) const
+    void escape_catalogue::pre_add_ea_crc(const cat_entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
@@ -259,7 +259,7 @@ namespace libdar
 	ceci->esc->add_mark_at_current_position(escape::seqt_failed_backup);
     }
 
-    void escape_catalogue::pre_add_fsa(const entree *ref) const
+    void escape_catalogue::pre_add_fsa(const cat_entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
@@ -285,7 +285,7 @@ namespace libdar
 	    // else, nothing to do.
     }
 
-    void escape_catalogue::pre_add_fsa_crc(const entree *ref) const
+    void escape_catalogue::pre_add_fsa_crc(const cat_entree *ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
@@ -353,7 +353,7 @@ namespace libdar
 	}
     }
 
-    bool escape_catalogue::read(const entree * & ref) const
+    bool escape_catalogue::read(const cat_entree * & ref) const
     {
 	escape_catalogue *ceci = const_cast<escape_catalogue *>(this);
 	const directory *ref_dir = NULL;
@@ -392,7 +392,7 @@ namespace libdar
 			ceci->min_read_offset = esc->get_position();
 			try
 			{
-			    ref = entree::read(get_ui(),
+			    ref = cat_entree::read(get_ui(),
 					       get_pool(),
 					       *esc,
 					       x_reading_ver,
@@ -456,7 +456,7 @@ namespace libdar
 			else
 			{
 			    bool is_eod = ref_eod != NULL;
-			    entree *ref_nc = const_cast<entree *>(ref);
+			    cat_entree *ref_nc = const_cast<cat_entree *>(ref);
 
 			    ceci->add(ref_nc);
 			    if(wait_parent_depth > 0) // we must not return this object as it is member of a skipped dir

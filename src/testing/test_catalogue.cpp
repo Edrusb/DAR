@@ -108,7 +108,7 @@ void f1()
         directory *v_sub_dir = new directory(200,20, 0777, datetime(100), datetime(101), datetime(102), "sous-repertoire", 0);
 	mirage *v_mir = new mirage("Zorro mirage", new etoile(dynamic_cast<inode *>(v_prise->clone()), 10));
 
-        entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, v_mir, NULL };
+        cat_entree *liste[] = { v_eod, v_file, v_lien, v_dir, v_char, v_block, v_tube, v_prise, v_detruit, v_sub_dir, v_mir, NULL };
 
         for(S_I i = 0; liste[i] != NULL; ++i)
         {
@@ -122,10 +122,10 @@ void f1()
         dump->skip(0);
         entree_stats stats;
         stats.clear();
-        entree *ref = (entree *)1; // != NULL
+        cat_entree *ref = (cat_entree *)1; // != NULL
         for(S_I i = 0; ref != NULL; ++i)
         {
-            ref = entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, &comp, false, false, NULL);
+            ref = cat_entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, &comp, false, false, NULL);
             if(ref != NULL)
             {
                 ref->dump(*dump2, false);
@@ -153,7 +153,7 @@ void f1()
         dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
         v_dir->dump(*dump, false);
         dump->skip(0);
-        ref = entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, &comp, false, false, NULL);
+        ref = cat_entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, &comp, false, false, NULL);
         v_sub_dir = dynamic_cast<directory *>(ref);
 
         delete ref;
@@ -176,7 +176,7 @@ void f2()
     {
 	label data_name;
         catalogue cat = catalogue(*ui, datetime(12), data_name);
-        const entree *ref;
+        const cat_entree *ref;
 	bool_mask tmp = true;
 	label lax_label;
 
@@ -237,7 +237,7 @@ void f2()
             const eod *e = dynamic_cast<const eod *>(ref);
             const detruit *d = dynamic_cast<const detruit *>(ref);
             const inode *i = dynamic_cast<const inode *>(ref);
-            const entree *was;
+            const cat_entree *was;
 
             if(e != NULL)
                 ok = cat.compare(e, was);
@@ -333,7 +333,7 @@ void f4()
     cout << abell->is_inode_wrote() << endl;
     cout << abell->get_etiquette() << endl;
 
-    entree *tmp = abell->clone();
+    cat_entree *tmp = abell->clone();
     mirage *trefle =  dynamic_cast<mirage *>(tmp);
 
     cout << deneb->get_ref_count() << endl;

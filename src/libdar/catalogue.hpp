@@ -86,7 +86,7 @@ namespace libdar
         virtual void skip_read_to_parent_dir() const;
             // skip all items of the current dir and of any subdir, the next call will return
             // next item of the parent dir (no eod to exit from the current dir !)
-        virtual bool read(const entree * & ref) const;
+        virtual bool read(const cat_entree * & ref) const;
             // sequential read (generates eod) and return false when all files have been read
         virtual bool read_if_present(std::string *name, const nomme * & ref) const;
             // pseudo-sequential read (reading a directory still
@@ -102,7 +102,7 @@ namespace libdar
 
 
         void reset_sub_read(const path &sub); // initialise sub_read to the given directory
-        bool sub_read(const entree * &ref); // sequential read of the catalogue, ignoring all that
+        bool sub_read(const cat_entree * &ref); // sequential read of the catalogue, ignoring all that
             // is not part of the subdirectory specified with reset_sub_read
             // the read include the inode leading to the sub_tree as well as the pending eod
 
@@ -120,18 +120,18 @@ namespace libdar
 
 	    /// catalogue extension routines for escape sequence
 	    // real implementation is only needed in escape_catalogue class, here there nothing to be done
-	virtual void pre_add(const entree *ref) const {};
-	virtual void pre_add_ea(const entree *ref) const {};
-	virtual void pre_add_crc(const entree *ref) const {};
+	virtual void pre_add(const cat_entree *ref) const {};
+	virtual void pre_add_ea(const cat_entree *ref) const {};
+	virtual void pre_add_crc(const cat_entree *ref) const {};
 	virtual void pre_add_dirty() const {};
-	virtual void pre_add_ea_crc(const entree *ref) const {};
+	virtual void pre_add_ea_crc(const cat_entree *ref) const {};
 	virtual void pre_add_waste_mark() const {};
 	virtual void pre_add_failed_mark() const {};
-	virtual void pre_add_fsa(const entree *ref) const {};
-	virtual void pre_add_fsa_crc(const entree *ref) const {};
+	virtual void pre_add_fsa(const cat_entree *ref) const {};
+	virtual void pre_add_fsa_crc(const cat_entree *ref) const {};
 	virtual escape *get_escape_layer() const { return NULL; };
 
-        void add(entree *ref); // add at end of catalogue (sequential point of view)
+        void add(cat_entree *ref); // add at end of catalogue (sequential point of view)
 	void re_add_in(const std::string &subdirname); // return into an already existing subdirectory for further addition
 	void re_add_in_replace(const directory &dir); // same as re_add_in but also set the properties of the existing directory to those of the given argument
         void add_in_current_read(nomme *ref); // add in currently read directory
@@ -142,7 +142,7 @@ namespace libdar
 	    // Comparison methods. The comparision is here also iterative and uses its specific current_compare directory pointer
 
         void reset_compare() const;
-        bool compare(const entree * name, const entree * & extracted) const;
+        bool compare(const cat_entree * name, const cat_entree * & extracted) const;
             // returns true if the ref exists, and gives it back in second argument as it is in the current catalogue.
             // returns false is no entry of that nature exists in the catalogue (in the current directory)
             // if ref is a directory, the operation is normaly relative to the directory itself, but

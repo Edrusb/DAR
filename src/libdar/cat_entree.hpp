@@ -43,7 +43,7 @@ extern "C"
 namespace libdar
 {
     class etoile;
-    class entree;
+    class cat_entree;
 
 	/// \addtogroup Private
 	/// @{
@@ -75,15 +75,15 @@ namespace libdar
         void clear() { num_x = num_d = num_f = num_c = num_b = num_p
                 = num_s = num_l = num_D = num_hard_linked_inodes
                 = num_hard_link_entries = saved = total = 0; };
-        void add(const entree *ref);
+        void add(const cat_entree *ref);
         void listing(user_interaction & dialog) const;
     };
 
 	/// the root class from all other inherite for any entry in the catalogue
-    class entree : public on_pool
+    class cat_entree : public on_pool
     {
     public :
-        static entree *read(user_interaction & dialog,
+        static cat_entree *read(user_interaction & dialog,
 			    memory_pool *pool,
 			    generic_file & f, const archive_version & reading_ver,
 			    entree_stats & stats,
@@ -95,7 +95,7 @@ namespace libdar
 			    bool only_detruit,
 			    escape *ptr);
 
-        virtual ~entree() {};
+        virtual ~cat_entree() {};
 
 	    /// write down the object information to a generic_file
 
@@ -112,19 +112,19 @@ namespace libdar
 	    /// \param[in,out] f is the file where to write the data to
 	    /// \param[in] small defines whether to do a small or normal dump
 	    /// \note this method is to avoid having class mirage and class directory being
-	    /// a friend of class entree. Any other class may use it, sure, but neither
-	    /// class mirage nor class directory has not access to class entree's private
+	    /// a friend of class cat_entree. Any other class may use it, sure, but neither
+	    /// class mirage nor class directory has not access to class cat_entree's private
 	    /// data, only to what it needs.
 	void specific_dump(generic_file & f, bool small) const { inherited_dump(f, small); };
 
-	    /// called by entree::read and mirage::post_constructor, let inherited classes builds object's data after CRC has been read from file
+	    /// called by cat_entree::read and mirage::post_constructor, let inherited classes builds object's data after CRC has been read from file
 
 	    /// \param[in,out] f is the file where to write the data to
-	    /// \note only used when an non NULL escape pointer is given to entree::read (reading a small dump).
+	    /// \note only used when an non NULL escape pointer is given to cat_entree::read (reading a small dump).
 	virtual void post_constructor(generic_file & f) {};
 
         virtual unsigned char signature() const = 0;
-        virtual entree *clone() const = 0;
+        virtual cat_entree *clone() const = 0;
 
 
     protected:

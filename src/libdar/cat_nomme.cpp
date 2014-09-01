@@ -41,7 +41,7 @@ namespace libdar
 
     void nomme::inherited_dump(generic_file & f, bool small) const
     {
-        entree::inherited_dump(f, small);
+        cat_entree::inherited_dump(f, small);
         tools_write_string(f, xname);
     }
 

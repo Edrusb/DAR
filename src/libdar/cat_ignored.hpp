@@ -48,7 +48,7 @@ namespace libdar
         ignored(generic_file & f) : nomme(f) { throw SRC_BUG; };
 
         unsigned char signature() const { return 'i'; };
-        entree *clone() const { return new (get_pool()) ignored(*this); };
+        cat_entree *clone() const { return new (get_pool()) ignored(*this); };
 
     protected:
         void inherited_dump(generic_file & f, bool small) const { throw SRC_BUG; };

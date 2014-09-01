@@ -154,7 +154,7 @@ namespace libdar
         ~filesystem_backup() { detruire(); };
 
         void reset_read(infinint & root_fs_device);
-        bool read(entree * & ref, infinint & errors, infinint & skipped_dump);
+        bool read(cat_entree * & ref, infinint & errors, infinint & skipped_dump);
         void skip_read_to_parent_dir();
             //  continue reading in parent directory and
             // ignore all entry not yet read of current directory
@@ -334,7 +334,7 @@ namespace libdar
 	    /// \param[out] fsa_restored true if FSA has been restored, false if either no FSA to restore or if forbidden by overwriting policy
 	    /// \note any failure to restore data or EA that is not due to its absence in "x" nor to an interdiction from the overwriting policy is signaled
 	    /// through an exception.
-	void write(const entree *x,
+	void write(const cat_entree *x,
 		   action_done_for_data & data_restored,
 		   bool & ea_restored,
 		   bool & data_created,

@@ -102,7 +102,7 @@ namespace libdar
 	bool get_sparse_file_detection_read() const { return (file_data_status_read & FILE_DATA_WITH_HOLE) != 0; };
 	bool get_sparse_file_detection_write() const { return (file_data_status_write & FILE_DATA_WITH_HOLE) != 0; };
 
-        entree *clone() const { return new (get_pool()) file(*this); };
+        cat_entree *clone() const { return new (get_pool()) file(*this); };
 
         compression get_compression_algo_read() const { return algo_read; };
 

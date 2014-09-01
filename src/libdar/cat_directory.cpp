@@ -94,7 +94,7 @@ namespace libdar
 			 bool only_detruit,
 			 escape *ptr) : inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
-	entree *p;
+	cat_entree *p;
 	nomme *t;
 	directory *d;
 	detruit *x;
@@ -116,7 +116,7 @@ namespace libdar
 	    {
 		try
 		{
-		    p = entree::read(dialog, get_pool(), f, reading_ver, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, ptr);
+		    p = cat_entree::read(dialog, get_pool(), f, reading_ver, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, ptr);
 		}
 		catch(Euser_abort & e)
 		{

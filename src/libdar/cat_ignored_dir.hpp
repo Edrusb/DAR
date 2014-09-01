@@ -53,7 +53,7 @@ namespace libdar
 		    escape *ptr) : inode(dialog, f, reading_ver, s_not_saved, efsa_loc, ptr) { throw SRC_BUG; };
 
         unsigned char signature() const { return 'j'; };
-        entree *clone() const { return new (get_pool()) ignored_dir(*this); };
+        cat_entree *clone() const { return new (get_pool()) ignored_dir(*this); };
 
     protected:
         void inherited_dump(generic_file & f, bool small) const; // behaves like an empty directory

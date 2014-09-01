@@ -1160,7 +1160,7 @@ namespace libdar
 		{
 		    if(isolated)
 		    {
-			const entree *tmp;
+			const cat_entree *tmp;
 			if(cat == NULL)
 			    throw SRC_BUG;
 			cat->read(tmp); // should be enough to have the whole catalogue being read if using sequential read mode
@@ -1334,7 +1334,7 @@ namespace libdar
 			// this is easy... asking just an entry
 			//from the catalogue makes its whole being read
 		{
-		    const entree *tmp;
+		    const cat_entree *tmp;
 		    if(cat == NULL)
 			throw SRC_BUG;
 		    cat->read(tmp); // should be enough to have the whole catalogue being read
@@ -1498,7 +1498,7 @@ namespace libdar
 			// this is easy... asking just an entry
 			//from the catalogue makes its whole being read
 		{
-		    const entree *tmp;
+		    const cat_entree *tmp;
 		    if(cat == NULL)
 			throw SRC_BUG;
 		    cat->read(tmp); // should be enough to have the whole catalogue being read
@@ -1591,7 +1591,7 @@ namespace libdar
 	    {
 		if(only_contains_an_isolated_catalogue())
 		{
-		    const entree *tmp;
+		    const cat_entree *tmp;
 		    if(cat == NULL)
 			throw SRC_BUG;
 		    cat->read(tmp); // should be enough to have the whole catalogue being read

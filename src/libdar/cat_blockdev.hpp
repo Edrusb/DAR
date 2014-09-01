@@ -65,7 +65,7 @@ namespace libdar
             // using method is_more_recent_than() from device class
             // using method has_changed_since() from device class
         unsigned char signature() const { return mk_signature('b', get_saved_status()); };
-        entree *clone() const { return new (get_pool()) blockdev(*this); };
+        cat_entree *clone() const { return new (get_pool()) blockdev(*this); };
     };
 
 	/// @}

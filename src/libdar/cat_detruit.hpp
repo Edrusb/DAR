@@ -54,7 +54,7 @@ namespace libdar
         unsigned char get_signature() const { return signe; };
         void set_signature(unsigned char x) { signe = x; };
         unsigned char signature() const { return 'x'; };
-        entree *clone() const { return new (get_pool()) detruit(*this); };
+        cat_entree *clone() const { return new (get_pool()) detruit(*this); };
 
 	const datetime & get_date() const { return del_date; };
 	void set_date(const datetime & ref) { del_date = ref; };

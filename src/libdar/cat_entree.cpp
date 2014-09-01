@@ -52,9 +52,9 @@ namespace libdar
     }
 
 
-    const U_I entree::ENTREE_CRC_SIZE = 2;
+    const U_I cat_entree::ENTREE_CRC_SIZE = 2;
 
-    void entree_stats::add(const entree *ref)
+    void entree_stats::add(const cat_entree *ref)
     {
         if(dynamic_cast<const eod *>(ref) == NULL // we ignore eod
            && dynamic_cast<const ignored *>(ref) == NULL // as well we ignore "ignored"
@@ -160,22 +160,22 @@ namespace libdar
         dialog.printf(gettext("   %i file(s) have been record as destroyed since backup of reference\n\n"), &num_x);
     }
 
-    entree *entree::read(user_interaction & dialog,
-			 memory_pool *pool,
-                         generic_file & f,
-                         const archive_version & reading_ver,
-                         entree_stats & stats,
-                         std::map <infinint, etoile *> & corres,
-                         compression default_algo,
-                         generic_file *data_loc,
-                         compressor *efsa_loc,
-                         bool lax,
-                         bool only_detruit,
-                         escape *ptr)
+    cat_entree *cat_entree::read(user_interaction & dialog,
+				 memory_pool *pool,
+				 generic_file & f,
+				 const archive_version & reading_ver,
+				 entree_stats & stats,
+				 std::map <infinint, etoile *> & corres,
+				 compression default_algo,
+				 generic_file *data_loc,
+				 compressor *efsa_loc,
+				 bool lax,
+				 bool only_detruit,
+				 escape *ptr)
     {
         char type;
         saved_status saved;
-        entree *ret = NULL;
+        cat_entree *ret = NULL;
         map <infinint, etoile *>::iterator it;
         infinint tmp;
         bool read_crc = (ptr != NULL) && !f.crc_status();
@@ -193,7 +193,7 @@ namespace libdar
             if(!extract_base_and_status((unsigned char)type, (unsigned char &)type, saved))
             {
                 if(!lax)
-                    throw Erange("entree::read", gettext("corrupted file"));
+                    throw Erange("cat_entree::read", gettext("corrupted file"));
                 else
                     return ret;
             }
@@ -234,7 +234,7 @@ namespace libdar
                 if(saved != s_saved)
                 {
                     if(!lax)
-                        throw Erange("entree::read", gettext("corrupted file"));
+                        throw Erange("cat_entree::read", gettext("corrupted file"));
                     else
                         dialog.warning(gettext("LAX MODE: Unexpected saved status for end of directory entry, assuming data corruption occurred, ignoring and continuing"));
                 }
@@ -244,7 +244,7 @@ namespace libdar
                 if(saved != s_saved)
                 {
                     if(!lax)
-                        throw Erange("entree::read", gettext("corrupted file"));
+                        throw Erange("cat_entree::read", gettext("corrupted file"));
                     else
                         dialog.warning(gettext("LAX MODE: Unexpected saved status for class \"detruit\" object, assuming data corruption occurred, ignoring and continuing"));
                 }
@@ -255,7 +255,7 @@ namespace libdar
 		break;
             default :
                 if(!lax)
-                    throw Erange("entree::read", gettext("unknown type of data in catalogue"));
+                    throw Erange("cat_entree::read", gettext("unknown type of data in catalogue"));
                 else
                 {
                     dialog.warning(gettext("LAX MODE: found unknown catalogue entry, assuming data corruption occurred, cannot read further the catalogue as I do not know the length of this type of entry"));
@@ -263,7 +263,7 @@ namespace libdar
                 }
             }
 	    if(ret == NULL)
-		throw Ememory("entree::read");
+		throw Ememory("cat_entree::read");
         }
         catch(...)
         {
@@ -310,9 +310,9 @@ namespace libdar
 			catch(Egeneric & e) // we catch here the temporary exception and the Euser_abort thrown by dialog.pause()
 			{
 			    if(nom != "")
-				throw Erange("entree::read", tools_printf(gettext("Entry information CRC failure for %S"), &nom));
+				throw Erange("cat_entree::read", tools_printf(gettext("Entry information CRC failure for %S"), &nom));
 			    else
-				throw Erange("entree::read", gettext(gettext("Entry information CRC failure")));
+				throw Erange("cat_entree::read", gettext(gettext("Entry information CRC failure")));
 			}
 		    }
 		    ret->post_constructor(*ptr);
@@ -340,7 +340,7 @@ namespace libdar
         return ret;
     }
 
-    void entree::dump(generic_file & f, bool small) const
+    void cat_entree::dump(generic_file & f, bool small) const
     {
         if(small)
         {
@@ -378,7 +378,7 @@ namespace libdar
             inherited_dump(f, small);
     }
 
-    void entree::inherited_dump(generic_file & f, bool small) const
+    void cat_entree::inherited_dump(generic_file & f, bool small) const
     {
         char s = signature();
         f.write(&s, 1);

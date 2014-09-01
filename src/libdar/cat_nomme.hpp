@@ -41,7 +41,7 @@ namespace libdar
 	/// @{
 
 	/// the base class for all entry that have a name
-    class nomme : public entree
+    class nomme : public cat_entree
     {
     public:
         nomme(const std::string & name) { xname = name; };

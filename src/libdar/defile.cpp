@@ -28,7 +28,7 @@ using namespace std;
 namespace libdar
 {
 
-    void defile::enfile(const entree *e)
+    void defile::enfile(const cat_entree *e)
     {
         const eod *fin = dynamic_cast<const eod *>(e);
         const directory *dir = dynamic_cast<const directory *>(e);

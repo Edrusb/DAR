@@ -99,7 +99,7 @@ namespace libdar
 	    /// of the matching EOD that will trigger the hook execution in the "end" context.
 	    /// If instead data_to_save if false, no lower() call has to be done.
 	void raise(const std::string & path,
-		   const entree *object,
+		   const cat_entree *object,
 		   bool data_to_save);
 
 	    /// to tell that the backup is completed for the last "raised" entry.

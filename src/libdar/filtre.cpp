@@ -62,7 +62,7 @@ namespace libdar
     static bool save_inode(user_interaction & dialog,//< how to report to user
 			   memory_pool *pool,        //< set to NULL or points to the memory_pool to use
 			   const string &info_quoi,  //< full path name of the file to save (including its name)
-			   entree * & e,             //< entree to save to archive
+			   cat_entree * & e,             //< cat_entree to save to archive
 			   pile & stack,             //< where to write to
 			   compressor *compr,        //< pointer to the compressor layer inside the given above stack
 			   bool info_details,        //< verbose output to user
@@ -102,13 +102,13 @@ namespace libdar
 	/// \note result is the set of EA of ref1 to which those of ref2 are added if not already present in ref1
     static void merge_ea(const ea_attributs & ref1, const ea_attributs & ref2, ea_attributs  &res);
 
-	/// to clone an "entree" taking hard links into account
+	/// to clone an "cat_entree" taking hard links into account
 
 	/// \param[in] ref is the named entry to be cloned
 	/// \param[in,out] hard_link_base is the datastructure that gather/maps hard_links information
 	/// \param[in] etiquette_offset is the offset to apply to etiquette (to not mix several hard-link sets using the same etiquette number in different archives)
 	/// \return a pointer to the new allocated clone object (to be deleted by the delete operator by the caller)
-    static entree *make_clone(const nomme *ref,
+    static cat_entree *make_clone(const nomme *ref,
 			      memory_pool *pool,
 			      map<infinint, etoile*> & hard_link_base,
 			      const infinint & etiquette_offset);
@@ -169,7 +169,7 @@ namespace libdar
     {
 	defile juillet = fs_racine; // 'juillet' is in reference to 14th of July ;-) when takes place the "defile'" on the Champs-Elysees.
 	const eod tmp_eod;
-	const entree *e;
+	const cat_entree *e;
 	thread_cancellation thr_cancel;
 	const crit_action * when_only_deleted = only_deleted ? make_overwriting_for_only_deleted(pool) : NULL;
 	const crit_action & overwrite = only_deleted ? *when_only_deleted : x_overwrite;
@@ -527,8 +527,8 @@ namespace libdar
 			   const fsa_scope & scope,
 			   const string & exclude_by_ea)
     {
-        entree *e = NULL;
-        const entree *f = NULL;
+        cat_entree *e = NULL;
+        const cat_entree *f = NULL;
         defile juillet = fs_racine;
         const eod tmp_eod;
 	compressor *stockage;
@@ -758,7 +758,7 @@ namespace libdar
 					    // MODIFIYING INODE IF NECESSARY
 
 					if(e_ino->get_saved_status() != s_saved)
-					    throw SRC_BUG; // filsystem should always provide "saved" "entree"
+					    throw SRC_BUG; // filsystem should always provide "saved" "cat_entree"
 
 					if(avoid_saving_inode)
 					{
@@ -797,7 +797,7 @@ namespace libdar
 					}
 
 
-					    // PERFORMING ACTION FOR ENTRY (entree dump, eventually data dump)
+					    // PERFORMING ACTION FOR ENTRY (cat_entree dump, eventually data dump)
 
 					if(!save_inode(dialog,
 						       pool,
@@ -1058,7 +1058,7 @@ namespace libdar
 			   const fsa_scope & scope,
 			   bool isolated_mode)
     {
-        const entree *e;
+        const cat_entree *e;
         defile juillet = fs_racine;
         const eod tmp_eod;
         filesystem_diff fs = filesystem_diff(dialog,
@@ -1250,7 +1250,7 @@ namespace libdar
 		     bool empty,
                      statistics & st)
     {
-        const entree *e;
+        const cat_entree *e;
         defile juillet = FAKE_ROOT;
         null_file black_hole = null_file(gf_write_only);
         infinint offset;
@@ -1479,7 +1479,7 @@ namespace libdar
 	const catalogue *ref_tab[] = { ref1, ref2, NULL };
 	infinint etiquette_offset = 0;
 	map <infinint, etoile *> corres_copy;
-	const entree *e = NULL;
+	const cat_entree *e = NULL;
 	U_I index = 0;
 	defile juillet = FAKE_ROOT;
 	infinint fake_repeat = 0;
@@ -1628,7 +1628,7 @@ namespace libdar
 			    {
 				if(subtree.is_covered(juillet.get_path()) && (e_dir != NULL || filtre.is_covered(e_nom->get_name())))
 				{
-				    entree *dolly = make_clone(e_nom, pool, corres_copy, etiquette_offset);
+				    cat_entree *dolly = make_clone(e_nom, pool, corres_copy, etiquette_offset);
 
 					// now that we have a clone object we must add the copied object to the catalogue, respecting the overwriting constaints
 
@@ -2282,9 +2282,9 @@ namespace libdar
 				st.incr_errored();
 			    }
 			}
-			else  // entree is not a nomme object (this is an "eod")
+			else  // cat_entree is not a nomme object (this is an "eod")
 			{
-			    entree *tmp = e->clone();
+			    cat_entree *tmp = e->clone();
 			    try
 			    {
 				const nomme *already = NULL;
@@ -2351,7 +2351,7 @@ namespace libdar
 
 	    while(cat.read(e))
 	    {
-		entree *e_var = const_cast<entree *>(e);
+		cat_entree *e_var = const_cast<cat_entree *>(e);
 		nomme *e_nom = dynamic_cast<nomme *>(e_var);
 		inode *e_ino = dynamic_cast<inode *>(e_var);
 		file *e_file = dynamic_cast<file *>(e_var);
@@ -2511,7 +2511,7 @@ namespace libdar
     void filtre_sequentially_read_all_catalogue(catalogue & cat,
 						user_interaction & dialog)
     {
-	const entree *e;
+	const cat_entree *e;
 	thread_cancellation thr_cancel;
 	defile juillet = FAKE_ROOT;
 
@@ -2584,7 +2584,7 @@ namespace libdar
     static bool save_inode(user_interaction & dialog,
 			   memory_pool *pool,
 			   const string & info_quoi,
-			   entree * & e,
+			   cat_entree * & e,
 			   pile & stack,
 			   compressor *compr,
 			   bool info_details,
@@ -3578,12 +3578,12 @@ namespace libdar
     }
 
 
-    static entree *make_clone(const nomme *ref,
+    static cat_entree *make_clone(const nomme *ref,
 			      memory_pool *pool,
 			      map<infinint, etoile*> & hard_link_base,
 			      const infinint & etiquette_offset)
     {
-	entree *dolly = NULL; // will be the address of the cloned object
+	cat_entree *dolly = NULL; // will be the address of the cloned object
 	string the_name;
 	const mirage *ref_mir = dynamic_cast<const mirage *>(ref);
 

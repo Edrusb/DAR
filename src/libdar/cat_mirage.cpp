@@ -109,9 +109,9 @@ namespace libdar
         char tmp_flag;
         map<infinint, etoile *>::iterator etl;
         inode *ino_ptr = NULL;
-        entree *entree_ptr = NULL;
-        entree_stats fake_stats; // the call to entree_read will increment counters with the inode we will read
-            // but this inode will also be counted from the entree_read we are call from.
+        cat_entree *entree_ptr = NULL;
+        entree_stats fake_stats; // the call to cat_entree::read will increment counters with the inode we will read
+            // but this inode will also be counted from the cat_entree::read we are call from.
             // thus we must not increment the real entree_stats structure here
 
 
@@ -168,7 +168,7 @@ namespace libdar
                     throw Ememory("mirage::init");
             }
             else
-                entree_ptr = entree::read(dialog, get_pool(), f, reading_ver, fake_stats, corres, default_algo, data_loc, efsa_loc, lax, false, ptr);
+                entree_ptr = cat_entree::read(dialog, get_pool(), f, reading_ver, fake_stats, corres, default_algo, data_loc, efsa_loc, lax, false, ptr);
 
             ino_ptr = dynamic_cast<inode *>(entree_ptr);
             if(ino_ptr == NULL || dynamic_cast<directory *>(entree_ptr) != NULL)

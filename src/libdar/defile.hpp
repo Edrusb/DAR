@@ -50,7 +50,7 @@ namespace libdar
     public :
         defile(const path &racine) : chemin(racine) { init = true; };
 
-        void enfile(const entree *e);
+        void enfile(const cat_entree *e);
         const path & get_path() const { return chemin; };
         const std::string & get_string() const { return cache; };
 

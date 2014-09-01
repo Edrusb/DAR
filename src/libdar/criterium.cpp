@@ -651,7 +651,7 @@ namespace libdar
 	return ret;
     }
 
-    over_action_data crit_ask_user_for_data_action(user_interaction & dialog, const string & full_name, const entree *already_here, const entree *dolly)
+    over_action_data crit_ask_user_for_data_action(user_interaction & dialog, const string & full_name, const cat_entree *already_here, const cat_entree *dolly)
     {
 	over_action_data ret = data_undefined;
 
@@ -724,7 +724,7 @@ namespace libdar
 	return ret;
     }
 
-    over_action_ea crit_ask_user_for_EA_action(user_interaction & dialog, const string & full_name, const entree *already_here, const entree *dolly)
+    over_action_ea crit_ask_user_for_EA_action(user_interaction & dialog, const string & full_name, const cat_entree *already_here, const cat_entree *dolly)
     {
 	over_action_ea ret = EA_undefined;
 
@@ -804,7 +804,7 @@ namespace libdar
     }
 
 
-    over_action_ea crit_ask_user_for_FSA_action(user_interaction & dialog, const string & full_name, const entree *already_here, const entree *dolly)
+    over_action_ea crit_ask_user_for_FSA_action(user_interaction & dialog, const string & full_name, const cat_entree *already_here, const cat_entree *dolly)
     {
 	over_action_ea ret = EA_undefined;
 
@@ -872,7 +872,7 @@ namespace libdar
     }
 
 
-    void crit_show_entry_info(user_interaction & dialog, const string & full_name, const entree *already_here, const entree *dolly)
+    void crit_show_entry_info(user_interaction & dialog, const string & full_name, const cat_entree *already_here, const cat_entree *dolly)
     {
 	NLS_SWAP_IN;
 	try

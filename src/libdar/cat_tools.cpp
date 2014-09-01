@@ -184,7 +184,7 @@ namespace libdar
 				const string & beginning,
 				const string & data,
 				const string & metadata,
-				const entree * obj,
+				const cat_entree * obj,
 				bool list_ea)
     {
 	string user;

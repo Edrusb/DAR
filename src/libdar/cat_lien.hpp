@@ -64,7 +64,7 @@ namespace libdar
             // using the method is_more_recent_than() from inode
             // using method has_changed_since() from inode class
         unsigned char signature() const { return mk_signature('l', get_saved_status()); };
-        entree *clone() const { return new (get_pool()) lien(*this); };
+        cat_entree *clone() const { return new (get_pool()) lien(*this); };
 
     protected :
         void sub_compare(const inode & other, bool isolated_mode) const;

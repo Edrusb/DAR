@@ -49,7 +49,7 @@ namespace libdar
     }
 
     void semaphore::raise(const string & x_chem,
-			  const entree *object,
+			  const cat_entree *object,
 			  bool data_to_save)
     {
 	if(count == 1)

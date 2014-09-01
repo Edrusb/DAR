@@ -543,7 +543,7 @@ namespace libdar
 
 	const string display = current_dir->display();
 	const char* tmp = display.c_str();
-	entree *ref = make_read_entree(*current_dir, "", true, *ea_mask);
+	cat_entree *ref = make_read_entree(*current_dir, "", true, *ea_mask);
 	directory *ref_dir = dynamic_cast<directory *>(ref);
 
 	try
@@ -571,7 +571,7 @@ namespace libdar
     }
 
 
-    bool filesystem_backup::read(entree * & ref, infinint & errors, infinint & skipped_dump)
+    bool filesystem_backup::read(cat_entree * & ref, infinint & errors, infinint & skipped_dump)
     {
         bool once_again;
         ref = NULL;
@@ -777,7 +777,7 @@ namespace libdar
 	const string display = current_dir->display();
 	const char* tmp = display.c_str();
 
-	entree *ref = make_read_entree(*current_dir, "", true, *ea_mask);
+	cat_entree *ref = make_read_entree(*current_dir, "", true, *ea_mask);
 	directory *ref_dir = dynamic_cast<directory *>(ref);
 	try
 	{
@@ -1337,7 +1337,7 @@ namespace libdar
 	ignore_over_restricts = false;
     }
 
-    void filesystem_restore::write(const entree *x, action_done_for_data & data_restored, bool & ea_restored, bool & data_created, bool & hard_link, bool & fsa_restored)
+    void filesystem_restore::write(const cat_entree *x, action_done_for_data & data_restored, bool & ea_restored, bool & data_created, bool & hard_link, bool & fsa_restored)
     {
 	const eod *x_eod = dynamic_cast<const eod *>(x);
 	const nomme *x_nom = dynamic_cast<const nomme *>(x);

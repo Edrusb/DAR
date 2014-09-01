@@ -272,7 +272,7 @@ namespace libdar
 	ceci->current_read = tmp;
     }
 
-    bool catalogue::read(const entree * & ref) const
+    bool catalogue::read(const cat_entree * & ref) const
     {
 	catalogue *ceci = const_cast<catalogue *>(this);
 	const nomme *tmp;
@@ -363,7 +363,7 @@ namespace libdar
 	reset_read();
     }
 
-    bool catalogue::sub_read(const entree * &ref)
+    bool catalogue::sub_read(const cat_entree * &ref)
     {
 	string tmp;
 
@@ -458,7 +458,7 @@ namespace libdar
 	current_add = contenu;
     }
 
-    void catalogue::add(entree *ref)
+    void catalogue::add(cat_entree *ref)
     {
 	if(current_add == NULL)
 	    throw SRC_BUG;
@@ -529,7 +529,7 @@ namespace libdar
 	me->out_compare = "/";
     }
 
-    bool catalogue::compare(const entree * target, const entree * & extracted) const
+    bool catalogue::compare(const cat_entree * target, const cat_entree * & extracted) const
     {
 	catalogue *me = const_cast<catalogue *>(this);
 	const mirage *mir = dynamic_cast<const mirage *>(target);
@@ -644,7 +644,7 @@ namespace libdar
     {
 	directory *current = contenu;
 	const nomme *ici;
-	const entree *projo;
+	const cat_entree *projo;
 	const eod *pro_eod;
 	const directory *pro_dir;
 	const detruit *pro_det;
@@ -721,7 +721,7 @@ namespace libdar
     {
 	directory *current = contenu;
 	const nomme *ici;
-	const entree *projo;
+	const cat_entree *projo;
 	const eod *pro_eod;
 	const directory *pro_dir;
 	const detruit *pro_det;
@@ -768,7 +768,7 @@ namespace libdar
 
 	    if(!current->search_children(pro_nom->get_name(), ici))
 	    {
-		entree *clo_ent = NULL;
+		cat_entree *clo_ent = NULL;
 		inode *clo_ino = NULL;
 		directory *clo_dir = NULL;
 		mirage *clo_mir = NULL;
@@ -922,7 +922,7 @@ namespace libdar
 			    bool list_ea,
 			    string marge) const
     {
-	const entree *e = NULL;
+	const cat_entree *e = NULL;
 	thread_cancellation thr;
 	const string marge_plus = " |  ";
 	const U_I marge_plus_length = marge_plus.size();
@@ -1037,7 +1037,7 @@ namespace libdar
 				bool list_ea,
 				string beginning) const
     {
-	const entree *e = NULL;
+	const cat_entree *e = NULL;
 	thread_cancellation thr;
 	defile juillet = FAKE_ROOT;
 	const eod tmp_eod;
@@ -1172,7 +1172,7 @@ namespace libdar
 				bool list_ea,
 				string beginning) const
     {
-	const entree *e = NULL;
+	const cat_entree *e = NULL;
 	thread_cancellation thr;
 	defile juillet = FAKE_ROOT;
 
@@ -1456,7 +1456,7 @@ namespace libdar
 				  const mask & subtree,
 				  const slice_layout & slicing) const
     {
-	const entree *e = NULL;
+	const cat_entree *e = NULL;
 	thread_cancellation thr;
 	defile juillet = FAKE_ROOT;
 	const eod tmp_eod;
@@ -1581,7 +1581,7 @@ namespace libdar
 
     void catalogue::copy_detruits_from(const catalogue & ref)
     {
-	const entree *ent;
+	const cat_entree *ent;
 
 	ref.reset_read();
 	reset_add();
