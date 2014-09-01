@@ -879,7 +879,7 @@ namespace libdar
 				    dialog.warning(string(gettext(SKIPPED)) + juillet.get_string());
 
 				if(dir != NULL && make_empty_dir)
-				    ig = ignode = new (pool) ignored_dir(*dir);
+				    ig = ignode = new (pool) cat_ignored_dir(*dir);
 				else
 				    ig = new (pool) cat_ignored(nom->get_name());
 				    // necessary to not record deleted files at comparison
@@ -1654,7 +1654,7 @@ namespace libdar
 					    const cat_mirage *al_mir = dynamic_cast<const cat_mirage *>(already_here);
 					    const cat_detruit *al_det = dynamic_cast<const cat_detruit *>(already_here);
 					    const cat_ignored *al_ign = dynamic_cast<const cat_ignored *>(already_here);
-					    const ignored_dir *al_igndir = dynamic_cast<const ignored_dir *>(already_here);
+					    const cat_ignored_dir *al_igndir = dynamic_cast<const cat_ignored_dir *>(already_here);
 					    const cat_inode *al_ino = dynamic_cast<const cat_inode *>(already_here);
 					    const cat_directory *al_dir = dynamic_cast<const cat_directory *>(already_here);
 					    const string full_name = juillet.get_string();
@@ -2008,7 +2008,7 @@ namespace libdar
 
 						if(dolly_dir == NULL || al_dir == NULL || act_data == data_remove) // one or both are not directory we effectively must remove the entry from the catalogue
 						{
-						    ignored_dir *if_removed = NULL;
+						    cat_ignored_dir *if_removed = NULL;
 
 							// to known which counter to decrement
 
@@ -2090,7 +2090,7 @@ namespace libdar
 
 							if(make_empty_dir)
 							{
-							    if_removed = new (pool) ignored_dir(*al_dir);
+							    if_removed = new (pool) cat_ignored_dir(*al_dir);
 							    if(if_removed == NULL)
 								throw Ememory("filtre_merge");
 							}
@@ -2102,7 +2102,7 @@ namespace libdar
 							    // we can now remove the entry from the catalogue
 							cat.remove_read_entry(the_name);
 
-							    // now that the ancient directory has been removed we can replace it by an ignored_dir entry if required
+							    // now that the ancient directory has been removed we can replace it by an cat_ignored_dir entry if required
 							if(if_removed != NULL)
 							    cat.add(if_removed);
 
@@ -2223,7 +2223,7 @@ namespace libdar
 				{
 				    if(e_dir != NULL && make_empty_dir)
 				    {
-					ignored_dir *igndir = new (pool) ignored_dir(*e_dir);
+					cat_ignored_dir *igndir = new (pool) cat_ignored_dir(*e_dir);
 					if(igndir == NULL)
 					    throw Ememory("filtre_merge");
 					else

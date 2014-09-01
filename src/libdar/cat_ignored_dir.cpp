@@ -33,7 +33,7 @@ using namespace std;
 namespace libdar
 {
 
-    void ignored_dir::inherited_dump(generic_file & f, bool small) const
+    void cat_ignored_dir::inherited_dump(generic_file & f, bool small) const
     {
 	cat_directory tmp = cat_directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_last_change(), get_name(), 0);
 	tmp.set_saved_status(get_saved_status());

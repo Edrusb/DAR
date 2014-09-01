@@ -42,18 +42,18 @@ namespace libdar
 	/// @{
 
 	/// the ignored cat_directory class, to be promoted later as empty cat_directory if needed
-    class ignored_dir : public cat_inode
+    class cat_ignored_dir : public cat_inode
     {
     public:
-        ignored_dir(const cat_directory &target) : cat_inode(target) {};
-        ignored_dir(user_interaction & dialog,
+        cat_ignored_dir(const cat_directory &target) : cat_inode(target) {};
+        cat_ignored_dir(user_interaction & dialog,
 		    generic_file & f,
 		    const archive_version & reading_ver,
 		    compressor *efsa_loc,
 		    escape *ptr) : cat_inode(dialog, f, reading_ver, s_not_saved, efsa_loc, ptr) { throw SRC_BUG; };
 
         unsigned char signature() const { return 'j'; };
-        cat_entree *clone() const { return new (get_pool()) ignored_dir(*this); };
+        cat_entree *clone() const { return new (get_pool()) cat_ignored_dir(*this); };
 
     protected:
         void inherited_dump(generic_file & f, bool small) const; // behaves like an empty cat_directory
