@@ -76,6 +76,8 @@ from 2.4.14 to 2.4.15
 - added some autoconf magic to determine the correct (BSD/GNU) flag to
   use with sed
 - new implementation of mask_list which is compatible with libc++
+- fixed bug met on FreeBSD with dar_xform where the system provides a
+  standard input in read-write mode instead of read-only mode
 
 from 2.4.13 to 2.4.14
 - limiting memory consumption of the cache layer to stay below 10 MiB, under
