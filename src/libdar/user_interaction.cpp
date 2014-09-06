@@ -38,7 +38,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -152,8 +152,8 @@ namespace libdar
     }
 
     void user_interaction::dar_manager_contents(U_I number,
-					       const string & chemin,
-					       const string & archive_name)
+						const string & chemin,
+						const string & archive_name)
     {
 	throw Elibcall("user_interaction::dar_manager_contents", "Not overwritten dar_manager_contents() method has been called!");
     }
@@ -373,8 +373,8 @@ namespace libdar
     }
 
     void user_interaction_callback::dar_manager_contents(U_I number,
-							const std::string & chemin,
-							const std::string & archive_name)
+							 const std::string & chemin,
+							 const std::string & archive_name)
     {
 	if(dar_manager_contents_callback != NULL)
 	{
@@ -450,4 +450,3 @@ namespace libdar
     }
 
 } // end of namespace
-

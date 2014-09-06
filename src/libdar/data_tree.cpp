@@ -481,7 +481,7 @@ namespace libdar
 		    set_data(archive, last_mtime + datetime(1), et_absent);
 	    }
 	    else // the entry has been seen previously but as removed in the latest state,
-		// if we already have an et_absent entry (which is possible during a reordering archive operation within a database), we can (and must) suppress it.
+		    // if we already have an et_absent entry (which is possible during a reordering archive operation within a database), we can (and must) suppress it.
 	    {
 		map<archive_num, status>::iterator it = last_mod.find(archive);
 		if(it != last_mod.end()) // we have an entry associated to this archive
@@ -758,7 +758,7 @@ namespace libdar
     };
 
 
-bool data_tree::fix_corruption()
+    bool data_tree::fix_corruption()
     {
 	bool ret = true;
 	map<archive_num, status>::iterator it = last_mod.begin();
@@ -1089,7 +1089,7 @@ bool data_tree::fix_corruption()
 	case not_found:
 	    if(fix_corruption())
 		throw Edata("This is to signal the caller of this method that this object has to be removed from database"); // exception caugth in data_dir::finalize_except_self
-		throw Erange("data_dir::finalize", gettext("This database has been corrupted probably due to a bug in release 2.4.0 to 2.4.9, and it has not been possible to cleanup this corruption, please rebuild the database from archives or extracted \"catalogues\", if the database has never been used by one of the previously mentioned released, you are welcome to open a bug report and provide as much as possible details about the circumstances"));
+	    throw Erange("data_dir::finalize", gettext("This database has been corrupted probably due to a bug in release 2.4.0 to 2.4.9, and it has not been possible to cleanup this corruption, please rebuild the database from archives or extracted \"catalogues\", if the database has never been used by one of the previously mentioned released, you are welcome to open a bug report and provide as much as possible details about the circumstances"));
 	case not_restorable:
 	    break;  // also an acceptable result;
 	default:
@@ -1499,4 +1499,3 @@ static void display_line(user_interaction & dialog,
     else
 	dialog.printf(" \t%u\t%S  %S  %S  %S\n", num, &data_date, &data_state, &ea_date, &ea_state);
 }
-

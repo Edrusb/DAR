@@ -156,7 +156,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			    read_options.set_sequential_read(true);
 		    }
 		    arch = new (nothrow) archive(dialog, *param.ref_root, *param.ref_filename, EXTENSION,
-				       read_options);
+						 read_options);
 		    if(arch == NULL)
 			throw Ememory("little_main");
 		}
@@ -192,7 +192,7 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			if(param.sequential_read)
 			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
 			aux = new (nothrow) archive(dialog, *param.aux_root, *param.aux_filename, EXTENSION,
-					  read_options);
+						    read_options);
 			if(aux == NULL)
 			    throw Ememory("little_main");
 		    }
@@ -268,8 +268,8 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 			create_options.set_backup_hook(param.backup_hook_execute, *param.backup_hook_mask);
 		    create_options.set_ignore_unknown_inode_type(param.ignore_unknown_inode);
 		    cur = new (nothrow) archive(dialog, *param.fs_root, *param.sauv_root, param.filename, EXTENSION,
-				      create_options,
-				      &st);
+						create_options,
+						&st);
 		    if(cur == NULL)
 			throw Ememory("little_main");
 		    if(!param.quiet)
@@ -319,12 +319,12 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    merge_options.set_multi_threaded(param.multi_threaded);
 
 		    cur = new (nothrow) archive(dialog,  // user_interaction &
-				      *param.sauv_root,  //const path &
-				      arch,              // archive *
-				      param.filename,    // const string &
-				      EXTENSION,         // const string &
-				      merge_options,
-				      &st);              // statistics*
+						*param.sauv_root,  //const path &
+						arch,              // archive *
+						param.filename,    // const string &
+						EXTENSION,         // const string &
+						merge_options,
+						&st);              // statistics*
 		    if(cur == NULL)
 			throw Ememory("little_main");
 		    if(!param.quiet)
@@ -358,62 +358,62 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    ret = EXIT_SAVED_MODIFIED;
 
 		if(param.op == create)
-		if(param.aux_root != NULL && param.aux_filename != NULL)
-		{
-		    if(param.op != merging && param.op != create)
-			throw SRC_BUG;
-		    if(param.op == create)
+		    if(param.aux_root != NULL && param.aux_filename != NULL)
 		    {
-			if(!param.quiet)
-			    dialog.warning(gettext("Now performing on-fly isolation..."));
-			if(cur == NULL)
+			if(param.op != merging && param.op != create)
 			    throw SRC_BUG;
-			line_tools_crypto_split_algo_pass(param.aux_pass,
-							  aux_crypto,
-							  tmp_pass,
-							  no_cipher_given,
-							  recipients);
-			isolate_options.clear();
-			isolate_options.set_allow_over(param.allow_over);
-			isolate_options.set_warn_over(param.warn_over);
-			isolate_options.set_info_details(param.info_details);
-			isolate_options.set_pause(param.pause);
-			if(compile_time::libbz2())
-			    isolate_options.set_compression(bzip2);
-			else
-			    if(compile_time::libz())
-				isolate_options.set_compression(gzip);
+			if(param.op == create)
+			{
+			    if(!param.quiet)
+				dialog.warning(gettext("Now performing on-fly isolation..."));
+			    if(cur == NULL)
+				throw SRC_BUG;
+			    line_tools_crypto_split_algo_pass(param.aux_pass,
+							      aux_crypto,
+							      tmp_pass,
+							      no_cipher_given,
+							      recipients);
+			    isolate_options.clear();
+			    isolate_options.set_allow_over(param.allow_over);
+			    isolate_options.set_warn_over(param.warn_over);
+			    isolate_options.set_info_details(param.info_details);
+			    isolate_options.set_pause(param.pause);
+			    if(compile_time::libbz2())
+				isolate_options.set_compression(bzip2);
 			    else
-				if(compile_time::liblzo())
-				    isolate_options.set_compression(lzo);
-				else // no compression
-				    isolate_options.set_compression(none);
-			isolate_options.set_execute(param.aux_execute);
-			isolate_options.set_crypto_algo(aux_crypto);
-			isolate_options.set_crypto_pass(tmp_pass);
-			isolate_options.set_crypto_size(param.aux_crypto_size);
-			isolate_options.set_gnupg_recipients(recipients);
-			isolate_options.set_gnupg_key_size(param.gnupg_key_size);
-			if(recipients.empty() && !param.signatories.empty())
-			    throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
-			isolate_options.set_gnupg_signatories(param.signatories);
-			isolate_options.set_empty(param.empty);
-			isolate_options.set_slice_permission(param.slice_perm);
-			isolate_options.set_slice_user_ownership(param.slice_user);
-			isolate_options.set_slice_group_ownership(param.slice_group);
-			isolate_options.set_hash_algo(param.hash);
-			isolate_options.set_slice_min_digits(param.aux_num_digits);
-			isolate_options.set_user_comment(param.user_comment);
-			isolate_options.set_sequential_marks(param.use_sequential_marks);
-			isolate_options.set_multi_threaded(param.multi_threaded);
+				if(compile_time::libz())
+				    isolate_options.set_compression(gzip);
+				else
+				    if(compile_time::liblzo())
+					isolate_options.set_compression(lzo);
+				    else // no compression
+					isolate_options.set_compression(none);
+			    isolate_options.set_execute(param.aux_execute);
+			    isolate_options.set_crypto_algo(aux_crypto);
+			    isolate_options.set_crypto_pass(tmp_pass);
+			    isolate_options.set_crypto_size(param.aux_crypto_size);
+			    isolate_options.set_gnupg_recipients(recipients);
+			    isolate_options.set_gnupg_key_size(param.gnupg_key_size);
+			    if(recipients.empty() && !param.signatories.empty())
+				throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
+			    isolate_options.set_gnupg_signatories(param.signatories);
+			    isolate_options.set_empty(param.empty);
+			    isolate_options.set_slice_permission(param.slice_perm);
+			    isolate_options.set_slice_user_ownership(param.slice_user);
+			    isolate_options.set_slice_group_ownership(param.slice_group);
+			    isolate_options.set_hash_algo(param.hash);
+			    isolate_options.set_slice_min_digits(param.aux_num_digits);
+			    isolate_options.set_user_comment(param.user_comment);
+			    isolate_options.set_sequential_marks(param.use_sequential_marks);
+			    isolate_options.set_multi_threaded(param.multi_threaded);
 
-			cur->op_isolate(dialog,
-					*param.aux_root,
-					*param.aux_filename,
-					EXTENSION,
-					isolate_options);
+			    cur->op_isolate(dialog,
+					    *param.aux_root,
+					    *param.aux_filename,
+					    EXTENSION,
+					    isolate_options);
+			}
 		    }
-		}
 		break;
             case isolate:
 		line_tools_crypto_split_algo_pass(param.pass_ref,
@@ -640,10 +640,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
 		}
 		arch = new (nothrow) archive(dialog,
-				   *param.sauv_root,
-				   param.filename,
-				   EXTENSION,
-				   read_options);
+					     *param.sauv_root,
+					     param.filename,
+					     EXTENSION,
+					     read_options);
 		if(arch == NULL)
 		    throw Ememory("little_main");
 
@@ -719,10 +719,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
 		}
 		arch = new (nothrow) archive(dialog,
-				   *param.sauv_root,
-				   param.filename,
-				   EXTENSION,
-				   read_options);
+					     *param.sauv_root,
+					     param.filename,
+					     EXTENSION,
+					     read_options);
 		if(arch == NULL)
 		    throw Ememory("little_main");
 
@@ -768,10 +768,10 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 		read_options.set_multi_threaded(param.multi_threaded);
 
 		arch = new (nothrow) archive(dialog,
-				   *param.sauv_root,
-				   param.filename,
-				   EXTENSION,
-				   read_options);
+					     *param.sauv_root,
+					     param.filename,
+					     EXTENSION,
+					     read_options);
 		if(arch == NULL)
 		    throw Ememory("little_main");
 

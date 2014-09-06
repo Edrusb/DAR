@@ -79,14 +79,14 @@ static int little_main(shell_interaction & dialog, int argc, char * const argv[]
 
 int main(int argc, char * const argv[], const char **env)
 {
-     return dar_suite_global(argc,
-			     argv,
-			     env,
-			     "h",
+    return dar_suite_global(argc,
+			    argv,
+			    env,
+			    "h",
 #if HAVE_GETOPT_LONG
-			     NULL,
+			    NULL,
 #endif
-			     &little_main);
+			    &little_main);
 }
 
 static int little_main(shell_interaction & dialog, int argc, char * const argv[], const char **env)

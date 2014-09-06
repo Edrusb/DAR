@@ -841,4 +841,3 @@ namespace libdar
     }
 
 } // end of namespace
-

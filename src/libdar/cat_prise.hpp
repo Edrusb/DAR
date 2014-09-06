@@ -46,17 +46,17 @@ namespace libdar
     {
     public :
         cat_prise(const infinint & xuid, const infinint & xgid, U_16 xperm,
-              const datetime & last_access,
-              const datetime & last_modif,
-	      const datetime & last_change,
-              const std::string & xname,
-	      const infinint & fs_device) : cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device) { set_saved_status(s_saved); };
+		  const datetime & last_access,
+		  const datetime & last_modif,
+		  const datetime & last_change,
+		  const std::string & xname,
+		  const infinint & fs_device) : cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device) { set_saved_status(s_saved); };
         cat_prise(user_interaction & dialog,
-	      generic_file & f,
-	      const archive_version & reading_ver,
-	      saved_status saved,
-	      compressor *efsa_loc,
-	      escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr) {};
+		  generic_file & f,
+		  const archive_version & reading_ver,
+		  saved_status saved,
+		  compressor *efsa_loc,
+		  escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr) {};
 
             // using dump from cat_inode class
             // using method is_more_recent_than() from cat_inode class

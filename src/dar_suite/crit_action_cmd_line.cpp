@@ -355,7 +355,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 	else // well, this "else" statment is not necessary, I just found cleaner to add it to have a block in which to declare a temporary pointer
 	{
 
-	    // else looking for unary operators
+		// else looking for unary operators
 
 	    const criterium *tmp = NULL;
 
@@ -422,7 +422,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		    {
 			date = tools_convert_date(sub_arg);
 		    }
-		break;
+		    break;
 		default:
 		    throw Erange("criterium_create_from_string", string(gettext("Unknown atomic operator, or atomic not allowed with an argument: ") + argument));
 		}

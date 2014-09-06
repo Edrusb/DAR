@@ -51,27 +51,27 @@ namespace libdar
     {
     public :
         cat_directory(const infinint & xuid,
-		  const infinint & xgid,
-		  U_16 xperm,
-                  const datetime & last_access,
-                  const datetime & last_modif,
-		  const datetime & last_change,
-                  const std::string & xname,
-		  const infinint & device);
+		      const infinint & xgid,
+		      U_16 xperm,
+		      const datetime & last_access,
+		      const datetime & last_modif,
+		      const datetime & last_change,
+		      const std::string & xname,
+		      const infinint & device);
         cat_directory(const cat_directory &ref); // only the inode part is build, no children is duplicated (empty dir)
 	const cat_directory & operator = (const cat_directory & ref); // set the inode part *only* no subdirectories/subfiles are copies or removed.
         cat_directory(user_interaction & dialog,
-		  generic_file & f,
-		  const archive_version & reading_ver,
-		  saved_status saved,
-		  entree_stats & stats,
-		  std::map <infinint, cat_etoile *> & corres,
-		  compression default_algo,
-		  generic_file *data_loc,
-		  compressor *efsa_loc,
-		  bool lax,
-		  bool only_detruit, // objects of other class than detruit and cat_directory are not built in memory
-		  escape *ptr);
+		      generic_file & f,
+		      const archive_version & reading_ver,
+		      saved_status saved,
+		      entree_stats & stats,
+		      std::map <infinint, cat_etoile *> & corres,
+		      compression default_algo,
+		      generic_file *data_loc,
+		      compressor *efsa_loc,
+		      bool lax,
+		      bool only_detruit, // objects of other class than detruit and cat_directory are not built in memory
+		      escape *ptr);
         ~cat_directory(); // detruit aussi tous les fils et se supprime de son 'parent'
 
         void add_children(cat_nomme *r); // when r is a cat_directory, 'parent' is set to 'this'

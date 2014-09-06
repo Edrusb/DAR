@@ -75,11 +75,11 @@ namespace libdar
     const ea_attributs cat_inode::empty_ea;
 
     cat_inode::cat_inode(const infinint & xuid, const infinint & xgid, U_16 xperm,
-                 const datetime & last_access,
-                 const datetime & last_modif,
-                 const datetime & last_change,
-                 const string & xname,
-                 const infinint & fs_device) : cat_nomme(xname)
+			 const datetime & last_access,
+			 const datetime & last_modif,
+			 const datetime & last_change,
+			 const string & xname,
+			 const infinint & fs_device) : cat_nomme(xname)
     {
 	nullifyptr();
         uid = xuid;
@@ -107,11 +107,11 @@ namespace libdar
     }
 
     cat_inode::cat_inode(user_interaction & dialog,
-                 generic_file & f,
-                 const archive_version & reading_ver,
-                 saved_status saved,
-                 compressor *efsa_loc,
-                 escape *ptr) : cat_nomme(f)
+			 generic_file & f,
+			 const archive_version & reading_ver,
+			 saved_status saved,
+			 compressor *efsa_loc,
+			 escape *ptr) : cat_nomme(f)
     {
         U_16 tmp;
         unsigned char flag;
@@ -377,12 +377,12 @@ namespace libdar
     }
 
     void cat_inode::compare(const cat_inode &other,
-                        const mask & ea_mask,
-                        comparison_fields what_to_check,
-                        const infinint & hourshift,
-			bool symlink_date,
-			const fsa_scope & scope,
-			bool isolated_mode) const
+			    const mask & ea_mask,
+			    comparison_fields what_to_check,
+			    const infinint & hourshift,
+			    bool symlink_date,
+			    const fsa_scope & scope,
+			    bool isolated_mode) const
     {
 	bool do_mtime_test = dynamic_cast<const cat_lien *>(&other) == NULL || symlink_date;
 
@@ -1384,4 +1384,3 @@ namespace libdar
 
 
 } // end of namespace
-

@@ -249,10 +249,10 @@ namespace libdar
 	    /// \param[in] extension slices extension ("dar")
 	    /// \param[in] options optional parameters to use for the operation
 	void op_isolate(user_interaction & dialog,
-		const path &sauv_path,
-		const std::string & filename,
-		const std::string & extension,
-		const archive_options_isolate & options);
+			const path &sauv_path,
+			const std::string & filename,
+			const std::string & extension,
+			const archive_options_isolate & options);
 
 
 	    /// getting information about a given directory

@@ -36,13 +36,13 @@ extern "C"
 #include "thread_cancellation.hpp"
 #include "tools.hpp"
 
-#define CRITICAL_START                                                      \
-             sigset_t Critical_section_mask_memory;                         \
-             tools_block_all_signals(Critical_section_mask_memory);         \
-             pthread_mutex_lock(&access)
+#define CRITICAL_START						\
+    sigset_t Critical_section_mask_memory;			\
+    tools_block_all_signals(Critical_section_mask_memory);	\
+    pthread_mutex_lock(&access)
 
-#define CRITICAL_END pthread_mutex_unlock(&access);                         \
-             tools_set_back_blocked_signals(Critical_section_mask_memory)
+#define CRITICAL_END pthread_mutex_unlock(&access);			\
+    tools_set_back_blocked_signals(Critical_section_mask_memory)
 
 using namespace std;
 

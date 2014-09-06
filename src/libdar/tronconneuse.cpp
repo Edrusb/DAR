@@ -38,7 +38,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -112,7 +112,7 @@ namespace libdar
 	else
 	{
 	    if(current_position < buf_offset || buf_offset + infinint(buf_byte_data) <= current_position)
-	       return encrypted->skippable(direction, amount);
+		return encrypted->skippable(direction, amount);
 	    else
 		return true;
 	}

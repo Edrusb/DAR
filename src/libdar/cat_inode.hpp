@@ -66,19 +66,19 @@ namespace libdar
 	};
 
         cat_inode(const infinint & xuid,
-	      const infinint & xgid,
-	      U_16 xperm,
-              const datetime & last_access,
-              const datetime & last_modif,
-	      const datetime & last_change,
-              const std::string & xname,
-	      const infinint & device);
+		  const infinint & xgid,
+		  U_16 xperm,
+		  const datetime & last_access,
+		  const datetime & last_modif,
+		  const datetime & last_change,
+		  const std::string & xname,
+		  const infinint & device);
         cat_inode(user_interaction & dialog,
-	      generic_file & f,
-	      const archive_version & reading_ver,
-	      saved_status saved,
-	      compressor *efsa_loc,
-	      escape *ptr);      // if ptr is not NULL, reading a partial dump(), which was done with "small" set to true
+		  generic_file & f,
+		  const archive_version & reading_ver,
+		  saved_status saved,
+		  compressor *efsa_loc,
+		  escape *ptr);      // if ptr is not NULL, reading a partial dump(), which was done with "small" set to true
         cat_inode(const cat_inode & ref);
 	const cat_inode & operator = (const cat_inode & ref);
         ~cat_inode();

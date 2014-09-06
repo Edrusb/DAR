@@ -95,7 +95,7 @@ namespace libdar
 	    pipe_path,      //< holds a filename to be openned (named pipe)
 	    pipe_both       //< holds a pair of file descriptors
 	}
-	pipe_mode;          //< defines how the object's status (which possible values defined by the anonymous enum above)
+	    pipe_mode;          //< defines how the object's status (which possible values defined by the anonymous enum above)
 	infinint position;  //< recorded position in the stream
 	int filedesc;       //< file descriptors of the pipe
 	int other_end_fd;   //< in pipe_both mode, this holds the reading side of the anonymous pipe

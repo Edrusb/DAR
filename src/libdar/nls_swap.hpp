@@ -39,19 +39,19 @@
 
 
 #define NLS_SWAP_IN                             \
-         std::string nls_swap_tmp;              \
-         if(textdomain(NULL) != NULL)           \
-         {                                      \
-	     nls_swap_tmp = textdomain(NULL);   \
-             textdomain(PACKAGE);               \
-	 }                                      \
-         else                                   \
-             nls_swap_tmp = ""
+    std::string nls_swap_tmp;			\
+    if(textdomain(NULL) != NULL)		\
+    {						\
+	nls_swap_tmp = textdomain(NULL);	\
+	textdomain(PACKAGE);			\
+    }						\
+    else					\
+	nls_swap_tmp = ""
 
 
-#define NLS_SWAP_OUT                                             \
-        if(nls_swap_tmp != "")                                   \
-            textdomain(nls_swap_tmp.c_str())
+#define NLS_SWAP_OUT				\
+    if(nls_swap_tmp != "")			\
+	textdomain(nls_swap_tmp.c_str())
 
 #else
 
@@ -65,4 +65,3 @@
 
 
 #endif
-

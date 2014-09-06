@@ -95,9 +95,9 @@ namespace libdar
 	    // during this operation, hard linked inode are recorded in a list to be easily pointed
 	    // to by a new reference to it.
         cat_nomme *make_read_entree(path & lieu,               //< path of the file to read
-				const std::string & name,  //< name of the file to read
-				bool see_hard_link,        //< whether we want to detect hard_link and eventually return a cat_mirage object (not necessary when diffing an archive with filesystem)
-				const mask & ea_mask);    //< which EA to consider when creating the object
+				    const std::string & name,  //< name of the file to read
+				    bool see_hard_link,        //< whether we want to detect hard_link and eventually return a cat_mirage object (not necessary when diffing an archive with filesystem)
+				    const mask & ea_mask);    //< which EA to consider when creating the object
 
     private:
 
@@ -398,9 +398,9 @@ namespace libdar
 			    over_action_ea action);
 	    /// perform action for FSA due to overwriting policy
 	bool action_over_fsa(const cat_inode *in_place,
-			    const cat_nomme *to_be_added,
-			    const std::string & spot,
-			    over_action_ea action);
+			     const cat_nomme *to_be_added,
+			     const std::string & spot,
+			     over_action_ea action);
 
     };
 

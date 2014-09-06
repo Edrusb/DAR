@@ -76,89 +76,89 @@ extern "C"
 using namespace std;
 
 #define WRAPPER_IN try {  //
-#define WRAPPER_OUT(code,msg)                      \
-                       code = LIBDAR_NOEXCEPT;     \
-                    }                              \
-                    catch(Ememory & e)             \
-                    {                              \
-			code = LIBDAR_EMEMORY;     \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Ebug & e)                \
-                    {                              \
-			code = LIBDAR_EBUG;        \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Einfinint & e)           \
-                    {                              \
-			code = LIBDAR_EINFININT;   \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Elimitint & e)           \
-                    {                              \
-			code = LIBDAR_ELIMITINT;   \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Erange & e)              \
-                    {                              \
-			code = LIBDAR_ERANGE;      \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Edeci & e)               \
-                    {                              \
-			code = LIBDAR_EDECI;       \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Efeature & e)            \
-                    {                              \
-			code = LIBDAR_EFEATURE;    \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Ehardware & e)           \
-                    {                              \
-			code = LIBDAR_EHARDWARE;   \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Euser_abort & e)         \
-                    {                              \
-			code = LIBDAR_EUSER_ABORT; \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Edata & e)               \
-                    {                              \
-			code = LIBDAR_EDATA;       \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Escript & e)             \
-                    {                              \
-			code = LIBDAR_ESCRIPT;     \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Elibcall & e)            \
-                    {                              \
-			code = LIBDAR_ELIBCALL;    \
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Ecompilation & e)        \
-                    {                              \
-                        code = LIBDAR_ECOMPILATION;\
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Ethread_cancel & e)      \
-                    {                              \
-                        code = LIBDAR_THREAD_CANCEL;\
-                        msg = e.get_message();     \
-                    }                              \
-                    catch(Egeneric & e)            \
-                    {/*unknown Egeneric exception*/\
-			code = LIBDAR_EBUG;        \
-                        msg = string(gettext("Caught an unknown Egeneric exception: ")) + e.get_message();  \
-                    }                              \
-                    catch(...)                     \
-                    {/* unknown Egeneric exception*/\
-			code = LIBDAR_UNKNOWN;     \
-                        msg = gettext("Caught a none libdar exception");  \
-                    }                              //
+#define WRAPPER_OUT(code,msg)						\
+    code = LIBDAR_NOEXCEPT;						\
+    }									\
+				    catch(Ememory & e)			\
+				    {					\
+					code = LIBDAR_EMEMORY;		\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Ebug & e)			\
+				    {					\
+					code = LIBDAR_EBUG;		\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Einfinint & e)		\
+				    {					\
+					code = LIBDAR_EINFININT;	\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Elimitint & e)		\
+				    {					\
+					code = LIBDAR_ELIMITINT;	\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Erange & e)			\
+				    {					\
+					code = LIBDAR_ERANGE;		\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Edeci & e)			\
+				    {					\
+					code = LIBDAR_EDECI;		\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Efeature & e)			\
+				    {					\
+					code = LIBDAR_EFEATURE;		\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Ehardware & e)		\
+				    {					\
+					code = LIBDAR_EHARDWARE;	\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Euser_abort & e)		\
+				    {					\
+					code = LIBDAR_EUSER_ABORT;	\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Edata & e)			\
+				    {					\
+					code = LIBDAR_EDATA;		\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Escript & e)			\
+				    {					\
+					code = LIBDAR_ESCRIPT;		\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Elibcall & e)			\
+				    {					\
+					code = LIBDAR_ELIBCALL;		\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Ecompilation & e)		\
+				    {					\
+					code = LIBDAR_ECOMPILATION;	\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Ethread_cancel & e)		\
+				    {					\
+					code = LIBDAR_THREAD_CANCEL;	\
+					msg = e.get_message();		\
+				    }					\
+				    catch(Egeneric & e)			\
+				    {/*unknown Egeneric exception*/	\
+					code = LIBDAR_EBUG;		\
+					msg = string(gettext("Caught an unknown Egeneric exception: ")) + e.get_message(); \
+				    }					\
+				    catch(...)				\
+				    {/* unknown Egeneric exception*/	\
+					code = LIBDAR_UNKNOWN;		\
+					msg = gettext("Caught a none libdar exception"); \
+				    }                              //
 
 
 namespace libdar
@@ -186,7 +186,7 @@ namespace libdar
 	WRAPPER_IN
 	    get_version(major, minor, init_libgcrypt);
 	WRAPPER_OUT(exception, except_msg)
-        NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
     }
 
     void get_version(U_I & major, U_I & medium, U_I & minor, bool init_libgcrypt)
@@ -206,7 +206,7 @@ namespace libdar
 	WRAPPER_IN
 	    get_version(major, medium, minor, init_libgcrypt);
 	WRAPPER_OUT(exception, except_msg)
-        NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
     }
 
     archive* open_archive_noexcept(user_interaction & dialog,
@@ -223,7 +223,7 @@ namespace libdar
 	    ret = new archive(dialog, chem,  basename,  extension,
 			      options);
 	WRAPPER_OUT(exception, except_msg)
-        NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
 	return ret;
     }
 
@@ -248,7 +248,7 @@ namespace libdar
 				   options,
 				   progressive_report);
 	WRAPPER_OUT(exception, except_msg)
-        NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
 	return arch_ret;
     }
 
@@ -272,7 +272,7 @@ namespace libdar
 			extension,
 			options);
 	WRAPPER_OUT(exception, except_msg)
-        NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
     }
 
     archive *merge_archive_noexcept(user_interaction & dialog,
@@ -296,7 +296,7 @@ namespace libdar
 			      options,
 			      progressive_report);
 	WRAPPER_OUT(exception, except_msg)
-	NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
 	return ret;
     }
 
@@ -317,7 +317,7 @@ namespace libdar
 		ptr = NULL;
 	    }
 	WRAPPER_OUT(exception, except_msg)
-        NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
     }
 
     char *libdar_str2charptr_noexcept(const std::string & x, U_16 & exception, std::string & except_msg)
@@ -327,7 +327,7 @@ namespace libdar
         WRAPPER_IN
 	    ret = tools_str2charptr(x);
 	WRAPPER_OUT(exception, except_msg)
-	NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
 	return ret;
     }
 
@@ -403,19 +403,19 @@ namespace libdar
 #endif
 	    tools_init();
 
-		 // so now libdar is ready for use!
+		// so now libdar is ready for use!
 
-	     libdar_initialized = true;
-	 }
-     }
+	    libdar_initialized = true;
+	}
+    }
 
-     extern void close_and_clean()
-     {
+    extern void close_and_clean()
+    {
 #ifdef CRYPTO_AVAILABLE
-	 if(libdar_initialized_gcrypt)
-	     gcry_control(GCRYCTL_TERM_SECMEM, 0); // by precaution if not already done by libgcrypt itself
+	if(libdar_initialized_gcrypt)
+	    gcry_control(GCRYCTL_TERM_SECMEM, 0); // by precaution if not already done by libgcrypt itself
 #endif
-	 tools_end();
+	tools_end();
     }
 
 
@@ -438,7 +438,7 @@ namespace libdar
 			      options,
 			      progressive_report);
 	WRAPPER_OUT(exception, except_msg)
-	NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
 	return ret;
     }
 
@@ -456,7 +456,7 @@ namespace libdar
 	ptr->op_listing(dialog,
 			options);
 	WRAPPER_OUT(exception, except_msg)
-        NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
     }
 
     statistics op_diff_noexcept(user_interaction & dialog,
@@ -477,7 +477,7 @@ namespace libdar
 			   options,
 			   progressive_report);
 	WRAPPER_OUT(exception, except_msg)
-        NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
 	return ret;
     }
 
@@ -498,7 +498,7 @@ namespace libdar
 			   options,
 			   progressive_report);
 	WRAPPER_OUT(exception, except_msg)
-	NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
 	return ret;
     }
 
@@ -517,7 +517,7 @@ namespace libdar
 	ret = ptr->get_children_of(dialog,
 				   dir);
 	WRAPPER_OUT(exception, except_msg)
-	NLS_SWAP_OUT;
+	    NLS_SWAP_OUT;
 	return ret;
     }
 

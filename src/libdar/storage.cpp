@@ -38,7 +38,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -765,7 +765,7 @@ namespace libdar
 
     void storage::iterator::skip_to(const storage & st, infinint val)
     {
-       U_16 pas = 0; // relative_skip_to has S_32 as argument, cannot call it with U_32
+	U_16 pas = 0; // relative_skip_to has S_32 as argument, cannot call it with U_32
 
         *this = st.begin();
         val.unstack(pas);

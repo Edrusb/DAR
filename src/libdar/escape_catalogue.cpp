@@ -98,7 +98,7 @@ namespace libdar
 		    set_data_name(label_zero);
 		}
 	    }
-	 }
+	}
 	else
 	    if(!lax)
 		throw Erange("escape_catalogue::escape_catalogue", gettext("could not find the internal data set label escape sequence"));
@@ -393,17 +393,17 @@ namespace libdar
 			try
 			{
 			    ref = cat_entree::read(get_ui(),
-					       get_pool(),
-					       *esc,
-					       x_reading_ver,
-					       ceci->access_stats(),
-					       ceci->corres,
-					       ceci->x_default_algo,
-					       ceci->x_data_loc,
-					       ceci->x_efsa_loc,
-					       false, // lax mode
-					       false, // only_detruit
-					       ceci->esc);
+						   get_pool(),
+						   *esc,
+						   x_reading_ver,
+						   ceci->access_stats(),
+						   ceci->corres,
+						   ceci->x_default_algo,
+						   ceci->x_data_loc,
+						   ceci->x_efsa_loc,
+						   false, // lax mode
+						   false, // only_detruit
+						   ceci->esc);
 			    if(esc->next_to_read_is_mark(escape::seqt_failed_backup))
 			    {
 				if(!esc->skip_to_next_mark(escape::seqt_failed_backup, false))
@@ -490,7 +490,7 @@ namespace libdar
 			}
 			else
 			{
-			    // we no more need the hard link correspondance map so we free the memory it uses
+				// we no more need the hard link correspondance map so we free the memory it uses
 			    ceci->corres.clear();
 			    ceci->status = ec_detruits;
 			    label tmp;

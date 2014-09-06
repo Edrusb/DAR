@@ -134,10 +134,10 @@ namespace libdar
 
 	if(ver.get_edition() > 3)
 	    term.read_catalogue(*crypto, ver.is_ciphered(), ver.get_edition(), 0);
-	     // terminator is encrypted since format "04"
-	     // elastic buffer present when encryption is used
-	 else
-	     term.read_catalogue(*crypto, false, ver.get_edition());
+	    // terminator is encrypted since format "04"
+	    // elastic buffer present when encryption is used
+	else
+	    term.read_catalogue(*crypto, false, ver.get_edition());
 	    // elastic buffer did not exist before format "04"
 	cata_stack.flush_read_above(crypto);
 
@@ -1339,7 +1339,7 @@ namespace libdar
 	if(scram_ptr != NULL)
 	{
 	    if(!layers.pop_and_close_if_type_is(scram_ptr))
-	       throw SRC_BUG;
+		throw SRC_BUG;
 	}
 
 

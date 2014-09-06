@@ -293,7 +293,7 @@ namespace libdar
 	    /// inherited from the mask class
         bool is_covered(const std::string & expression) const { return t_is_covered(expression); };
         bool is_covered(const path & chemin) const { return t_is_covered(chemin); }
-;
+	;
 	    /// inherited from the mask class
         mask *clone() const { return new (get_pool()) ou_mask(*this); };
 

@@ -87,23 +87,23 @@ void f1()
     unsigned char biffir[taille];
 
     stic.dump(buffer, taille);
-	 // check the resulting buffer thanks to debugger
-     cout << stic.get_size() << endl;
+	// check the resulting buffer thanks to debugger
+    cout << stic.get_size() << endl;
 
-     elastic stoc = elastic(buffer, taille, elastic_forward, macro_tools_supported_version);
-     cout << stoc.get_size() << endl;
+    elastic stoc = elastic(buffer, taille, elastic_forward, macro_tools_supported_version);
+    cout << stoc.get_size() << endl;
 
-     stoc.dump(biffir, taille);
+    stoc.dump(biffir, taille);
 
-     elastic stuc = elastic(biffir, 10, elastic_backward, macro_tools_supported_version);
-     cout << stuc.get_size() << endl;
+    elastic stuc = elastic(biffir, 10, elastic_backward, macro_tools_supported_version);
+    cout << stuc.get_size() << endl;
 }
 
 void f2()
 {
     const unsigned int taille = 500;
     unsigned char buffer[taille];
-	 // testing the elastic of size 1 and 2
+	// testing the elastic of size 1 and 2
 
     elastic stic = 1;
     stic.dump(buffer, taille);
@@ -124,7 +124,7 @@ void f2()
     cout << stuc.get_size() << endl;
 
 
-	 // testing the elastic buffers of size larger than 255
+	// testing the elastic buffers of size larger than 255
 
     stic = 256;
     stic.dump(buffer, taille);

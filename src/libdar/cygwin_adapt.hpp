@@ -28,16 +28,16 @@
 
 #include "../my_config.h"
 
-	/// \ingroup Private
-	/// @}
+    /// \ingroup Private
+    /// @}
 
 extern "C"
 {
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-    // if fcntl.h does not define O_TEXT nor O_BINARY (which is a Cygwin
-    // speciality), we define them as neutral ORed values : zero
+	// if fcntl.h does not define O_TEXT nor O_BINARY (which is a Cygwin
+	// speciality), we define them as neutral ORed values : zero
 } // end extern "C"
 
 #ifndef O_TEXT

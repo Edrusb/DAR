@@ -104,7 +104,7 @@ namespace libdar
 	void copy_from(const header_version & ref);
 	void detruit();
 
-	// FLAG VALUES
+	    // FLAG VALUES
 
 	static const U_I FLAG_SAVED_EA_ROOT = 0x80;      //< no more used since version "05"
 	static const U_I FLAG_SAVED_EA_USER = 0x40;      //< no more used since version "05"

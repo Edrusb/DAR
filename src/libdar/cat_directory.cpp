@@ -40,11 +40,11 @@ namespace libdar
 	// methods of class cat_directory
 
     cat_directory::cat_directory(const infinint & xuid, const infinint & xgid, U_16 xperm,
-			 const datetime & last_access,
-			 const datetime & last_modif,
-			 const datetime & last_change,
-			 const string & xname,
-			 const infinint & fs_device) : cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device)
+				 const datetime & last_access,
+				 const datetime & last_modif,
+				 const datetime & last_change,
+				 const string & xname,
+				 const infinint & fs_device) : cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device)
     {
 	parent = NULL;
 #ifdef LIBDAR_FAST_DIR
@@ -82,17 +82,17 @@ namespace libdar
 
 
     cat_directory::cat_directory(user_interaction & dialog,
-			 generic_file & f,
-			 const archive_version & reading_ver,
-			 saved_status saved,
-			 entree_stats & stats,
-			 std::map <infinint, cat_etoile *> & corres,
-			 compression default_algo,
-			 generic_file *data_loc,
-			 compressor *efsa_loc,
-			 bool lax,
-			 bool only_detruit,
-			 escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+				 generic_file & f,
+				 const archive_version & reading_ver,
+				 saved_status saved,
+				 entree_stats & stats,
+				 std::map <infinint, cat_etoile *> & corres,
+				 compression default_algo,
+				 generic_file *data_loc,
+				 compressor *efsa_loc,
+				 bool lax,
+				 bool only_detruit,
+				 escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
 	cat_entree *p;
 	cat_nomme *t;
@@ -825,4 +825,3 @@ namespace libdar
 
 
 } // end of namespace
-

@@ -109,10 +109,10 @@ namespace libdar
 	    //! \exception Euser_abort If the user answer "false" or "no" to the question the method
 	    //! must throw an exception of type "Euser_abort".
 	virtual void pause(const std::string & message)
-	    {
-		if(!pause2(message))
-		    throw Euser_abort(message);
-	    };
+	{
+	    if(!pause2(message))
+		throw Euser_abort(message);
+	};
 
 	    /// alternative method to the pause() method
 
@@ -206,8 +206,8 @@ namespace libdar
 	    /// \param[in] archive_name basename of this archive
 	    /// \note this method can be set for database::show_contents() to call it
 	virtual void dar_manager_contents(U_I number,
-					 const std::string & chemin,
-					 const std::string & archive_name);
+					  const std::string & chemin,
+					  const std::string & archive_name);
 
 	    /// optional method to use if you want dar_manager statistics listing split in several fields
 	    /// if you want to use this feature, you have then to supply an implementation for this method
@@ -381,8 +381,8 @@ namespace libdar
 
 	    /// overwritting method from parent class
 	void dar_manager_contents(U_I number,
-				 const std::string & chemin,
-				 const std::string & archive_name);
+				  const std::string & chemin,
+				  const std::string & archive_name);
 
 	    /// overwritting method from parent class
 	void dar_manager_statistics(U_I number,
@@ -484,12 +484,12 @@ namespace libdar
 				     bool has_children,
 				     void *context);
 	void (*dar_manager_show_files_callback)(const std::string & filename,
-					      bool available_data,
-					      bool available_ea,
+						bool available_data,
+						bool available_ea,
 						void *context);
 	void (*dar_manager_contents_callback)(U_I number,
-					     const std::string & chemin,
-					     const std::string & archive_name,
+					      const std::string & chemin,
+					      const std::string & archive_name,
 					      void *context);
 	void (*dar_manager_statistics_callback)(U_I number,
 						const infinint & data_count,
@@ -530,4 +530,3 @@ namespace libdar
 } // end of namespace
 
 #endif
-

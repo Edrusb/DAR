@@ -988,7 +988,7 @@ namespace libdar
 #ifndef LIBDAR_BIRTHTIME
 	if(ret)
 	    ui.printf(gettext("Birth Time attribute cannot be restored for %s because no FSA familly able to carry that attribute could be activated at compilation time."),
-		       target.c_str());
+		      target.c_str());
 	    // here we just warn, the birthtime restoration will be tried (calling twice utime()), even
 	    // if dar has not been compiled with birthtime support. Birthtime support is necessary on ty
 	    // read birthtime value of an inode
@@ -1218,4 +1218,3 @@ namespace libdar
 
 
 } // end of namespace
-

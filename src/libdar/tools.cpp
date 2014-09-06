@@ -1812,9 +1812,9 @@ namespace libdar
 #if HAVE_LIBPTHREAD
 	if(pthread_sigmask(SIG_BLOCK, &all, &old_mask) != 0)
 #else
-	if(sigprocmask(SIG_BLOCK, &all, &old_mask) != 0)
+	    if(sigprocmask(SIG_BLOCK, &all, &old_mask) != 0)
 #endif
-	    throw Erange("tools_block_all_signals", string(dar_gettext("Cannot block signals: "))+tools_strerror_r(errno));
+		throw Erange("tools_block_all_signals", string(dar_gettext("Cannot block signals: "))+tools_strerror_r(errno));
     }
 
     void tools_set_back_blocked_signals(sigset_t old_mask)
@@ -1822,9 +1822,9 @@ namespace libdar
 #if HAVE_LIBPTHREAD
 	if(pthread_sigmask(SIG_SETMASK, &old_mask, NULL))
 #else
-	if(sigprocmask(SIG_SETMASK, &old_mask, NULL))
+	    if(sigprocmask(SIG_SETMASK, &old_mask, NULL))
 #endif
-	    throw Erange("tools_set_back_block_all_signals", string(dar_gettext("Cannot unblock signals: "))+tools_strerror_r(errno));
+		throw Erange("tools_set_back_block_all_signals", string(dar_gettext("Cannot unblock signals: "))+tools_strerror_r(errno));
     }
 
     U_I tools_count_in_string(const string & s, const char a)

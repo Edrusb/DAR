@@ -30,8 +30,8 @@
 #include "../my_config.h"
 #include <string>
 
-	/// \addtogroup Private
-	/// @{
+    /// \addtogroup Private
+    /// @{
 
 #ifndef OS_BITS
 

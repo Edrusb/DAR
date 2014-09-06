@@ -39,14 +39,14 @@ namespace libdar
 {
 
     cat_file::cat_file(const infinint & xuid, const infinint & xgid, U_16 xperm,
-               const datetime & last_access,
-               const datetime & last_modif,
-               const datetime & last_change,
-               const string & src,
-               const path & che,
-               const infinint & taille,
-               const infinint & fs_device,
-               bool x_furtive_read_mode) : cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, src, fs_device)
+		       const datetime & last_access,
+		       const datetime & last_modif,
+		       const datetime & last_change,
+		       const string & src,
+		       const path & che,
+		       const infinint & taille,
+		       const infinint & fs_device,
+		       bool x_furtive_read_mode) : cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, src, fs_device)
     {
         chemin = (che + src).display();
         status = from_path;
@@ -93,13 +93,13 @@ namespace libdar
     }
 
     cat_file::cat_file(user_interaction & dialog,
-               generic_file & f,
-               const archive_version & reading_ver,
-               saved_status saved,
-               compression default_algo,
-               generic_file *data_loc,
-               compressor *efsa_loc,
-               escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+		       generic_file & f,
+		       const archive_version & reading_ver,
+		       saved_status saved,
+		       compression default_algo,
+		       generic_file *data_loc,
+		       compressor *efsa_loc,
+		       escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
         chemin = "";
         status = from_cat;
@@ -671,7 +671,7 @@ namespace libdar
 			    infinint err_offset;
 			    if(me->diff(*you, crc_size, value, err_offset))
 				throw Erange("cat_file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
-			    // data is the same, comparing the CRC values
+				// data is the same, comparing the CRC values
 
 			    if(get_crc(original))
 			    {
@@ -683,7 +683,7 @@ namespace libdar
 				    throw Erange("cat_file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
 			    }
 
-			    // else old archive without CRC
+				// else old archive without CRC
 
 			}
 			catch(...)
@@ -753,4 +753,3 @@ namespace libdar
 
 
 } // end of namespace
-

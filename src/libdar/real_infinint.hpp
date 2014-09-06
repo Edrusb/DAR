@@ -172,7 +172,7 @@ namespace libdar
 
 #define OPERATOR(OP) inline bool operator OP (const infinint &a, const infinint &b) \
     {									\
-	    return a.difference(b) OP 0;				\
+	return a.difference(b) OP 0;					\
     }
 
     OPERATOR(<)

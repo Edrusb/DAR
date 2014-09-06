@@ -132,8 +132,8 @@ extern "C"
     /// libdar namespace encapsulate all libdar symbols
 namespace libdar
 {
-    /// \addtogroup API
-    /// @{
+	/// \addtogroup API
+	/// @{
 
 
 	///  libdar Major version defined at compilation time

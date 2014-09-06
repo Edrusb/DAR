@@ -83,27 +83,27 @@ static void f1()
         src2.copy_to(c2);
         src3.copy_to(c3);
 /*
-            // ajout d'un deuxieme block de donnees indentiques
-        c2.flush_write();
-        pos2 = c2.get_position();
-        src2.skip(0);
-        src2.copy_to(c2);
+    // ajout d'un deuxieme block de donnees indentiques
+    c2.flush_write();
+    pos2 = c2.get_position();
+    src2.skip(0);
+    src2.copy_to(c2);
 
-            // ajout d'un deuxieme block de donnees indentiques
+	// ajout d'un deuxieme block de donnees indentiques
         c3.flush_write();
         pos3 = c3.get_position();
         src3.skip(0);
         src3.copy_to(c3);
 
             // alteration du premier block de donnees compresses
-        c2.flush_write(); // to be sure all data is written to file
-        dst2.skip(pos2 / 2);
-        dst2.write("A", 1);
+	    c2.flush_write(); // to be sure all data is written to file
+	    dst2.skip(pos2 / 2);
+	    dst2.write("A", 1);
 
-            // alteration du premier block de donnees compresses
-        c3.flush_write(); // to be sure all data is written to file
-        dst3.skip(pos3 / 2);
-        dst3.write("A", 1);
+		// alteration du premier block de donnees compresses
+		c3.flush_write(); // to be sure all data is written to file
+		dst3.skip(pos3 / 2);
+		dst3.write("A", 1);
 */
     }
     catch(Egeneric & e)

@@ -33,23 +33,23 @@ namespace libdar
 {
 
     cat_lien::cat_lien(const infinint & uid, const infinint & gid, U_16 perm,
-	       const datetime & last_access,
-	       const datetime & last_modif,
-	       const datetime & last_change,
-	       const string & name,
-	       const string & target,
-	       const infinint & fs_device) : cat_inode(uid, gid, perm, last_access, last_modif, last_change, name, fs_device)
+		       const datetime & last_access,
+		       const datetime & last_modif,
+		       const datetime & last_change,
+		       const string & name,
+		       const string & target,
+		       const infinint & fs_device) : cat_inode(uid, gid, perm, last_access, last_modif, last_change, name, fs_device)
     {
 	points_to = target;
 	set_saved_status(s_saved);
     }
 
     cat_lien::cat_lien(user_interaction & dialog,
-	       generic_file & f,
-	       const archive_version & reading_ver,
-	       saved_status saved,
-	       compressor *efsa_loc,
-	       escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+		       generic_file & f,
+		       const archive_version & reading_ver,
+		       saved_status saved,
+		       compressor *efsa_loc,
+		       escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
 	if(saved == s_saved)
 	    tools_read_string(f, points_to);
@@ -88,4 +88,3 @@ namespace libdar
     }
 
 } // end of namespace
-

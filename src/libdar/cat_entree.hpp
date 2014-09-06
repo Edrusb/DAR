@@ -84,16 +84,16 @@ namespace libdar
     {
     public :
         static cat_entree *read(user_interaction & dialog,
-			    memory_pool *pool,
-			    generic_file & f, const archive_version & reading_ver,
-			    entree_stats & stats,
-			    std::map <infinint, cat_etoile *> & corres,
-			    compression default_algo,
-			    generic_file *data_loc,
-			    compressor *efsa_loc,
-			    bool lax,
-			    bool only_detruit,
-			    escape *ptr);
+				memory_pool *pool,
+				generic_file & f, const archive_version & reading_ver,
+				entree_stats & stats,
+				std::map <infinint, cat_etoile *> & corres,
+				compression default_algo,
+				generic_file *data_loc,
+				compressor *efsa_loc,
+				bool lax,
+				bool only_detruit,
+				escape *ptr);
 
         virtual ~cat_entree() {};
 

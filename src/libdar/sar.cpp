@@ -60,7 +60,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -1471,7 +1471,7 @@ namespace libdar
         }
     }
 
-static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_name, const infinint & min_digits, const string & ext, infinint & ret)
+    static bool sar_get_higher_number_in_dir(entrepot & entr, const string & base_name, const infinint & min_digits, const string & ext, infinint & ret)
     {
         infinint cur;
         bool somme = false;

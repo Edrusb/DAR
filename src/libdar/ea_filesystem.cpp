@@ -38,7 +38,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -73,7 +73,7 @@ namespace libdar
 {
 
 #ifdef EA_SUPPORT
-    // Wrapper functions for l*attr
+	// Wrapper functions for l*attr
     inline static ssize_t my_lgetxattr(const char *path, const char *name, void *value, size_t size);
     inline static int     my_lsetxattr(const char *path, const char *name, const void *value, size_t size, int flags);
     inline static ssize_t my_llistxattr(const char *path, char *list, size_t size);

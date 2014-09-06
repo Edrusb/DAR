@@ -50,7 +50,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -178,7 +178,7 @@ shell_interaction::shell_interaction(ostream *out, ostream *interact, bool silen
     }
 }
 
-	/// copy constructor
+    /// copy constructor
 shell_interaction::shell_interaction(const shell_interaction & ref) : user_interaction_callback(ref)
 {
     if(ref.input >= 0)
@@ -444,4 +444,3 @@ secu_string shell_interaction::interaction_secu_string(const string & message, b
 
     return ret;
 }
-

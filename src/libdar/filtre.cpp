@@ -109,9 +109,9 @@ namespace libdar
 	/// \param[in] etiquette_offset is the offset to apply to etiquette (to not mix several hard-link sets using the same etiquette number in different archives)
 	/// \return a pointer to the new allocated clone object (to be deleted by the delete operator by the caller)
     static cat_entree *make_clone(const cat_nomme *ref,
-			      memory_pool *pool,
-			      map<infinint, cat_etoile*> & hard_link_base,
-			      const infinint & etiquette_offset);
+				  memory_pool *pool,
+				  map<infinint, cat_etoile*> & hard_link_base,
+				  const infinint & etiquette_offset);
 
 	/// remove an entry hardlink from a given hard_link database
 
@@ -3579,9 +3579,9 @@ namespace libdar
 
 
     static cat_entree *make_clone(const cat_nomme *ref,
-			      memory_pool *pool,
-			      map<infinint, cat_etoile*> & hard_link_base,
-			      const infinint & etiquette_offset)
+				  memory_pool *pool,
+				  map<infinint, cat_etoile*> & hard_link_base,
+				  const infinint & etiquette_offset)
     {
 	cat_entree *dolly = NULL; // will be the address of the cloned object
 	string the_name;

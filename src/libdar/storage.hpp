@@ -67,29 +67,29 @@ namespace libdar
 
     public:
         storage(U_32 size)
-            { make_alloc(size, first, last); };
+	{ make_alloc(size, first, last); };
         storage(const infinint & size);
         storage(const storage & ref)
-            { copy_from(ref); };
+	{ copy_from(ref); };
         storage(generic_file & f, const infinint &size);
         ~storage()
-            {  detruit(first); };
+	{  detruit(first); };
 
         const storage & operator = (const storage & val)
-            {  detruit(first); copy_from(val); return *this; };
+	{  detruit(first); copy_from(val); return *this; };
 
         bool operator < (const storage & ref) const
-            { return difference(ref) < 0; }; // true if arg uses more space than this
+	{ return difference(ref) < 0; }; // true if arg uses more space than this
         bool operator == (const storage & ref) const
-            { return difference(ref) == 0; }; //true if arg have same space than this
+	{ return difference(ref) == 0; }; //true if arg have same space than this
         bool operator > (const storage & ref) const
-            { return difference(ref) > 0; };
+	{ return difference(ref) > 0; };
         bool operator <= (const storage & ref) const
-            { return difference(ref) <= 0; };
+	{ return difference(ref) <= 0; };
         bool operator >= (const storage & ref) const
-            { return difference(ref) >= 0; };
+	{ return difference(ref) >= 0; };
         bool operator != (const storage & ref) const
-            { return difference(ref) != 0; };
+	{ return difference(ref) != 0; };
         unsigned char & operator [](infinint position);
         unsigned char operator [](const infinint & position) const;
         infinint size() const;
@@ -105,17 +105,17 @@ namespace libdar
                 // default operator = is OK
 
             iterator operator ++ (S_I x)
-                { iterator ret = *this; skip_plus_one(); return ret; };
+	    { iterator ret = *this; skip_plus_one(); return ret; };
             iterator operator -- (S_I x)
-                { iterator ret = *this; skip_less_one(); return ret; };
+	    { iterator ret = *this; skip_less_one(); return ret; };
             iterator & operator ++ ()
-                { skip_plus_one(); return *this; };
+	    { skip_plus_one(); return *this; };
             iterator & operator -- ()
-                { skip_less_one(); return *this; };
+	    { skip_less_one(); return *this; };
             iterator operator + (U_32 s) const
-                { iterator ret = *this; ret += s; return ret; };
+	    { iterator ret = *this; ret += s; return ret; };
             iterator operator - (U_32 s) const
-                { iterator ret = *this; ret -= s; return ret; };
+	    { iterator ret = *this; ret -= s; return ret; };
             iterator & operator += (U_32 s);
 	    iterator & operator -= (U_32 s);
             unsigned char &operator *() const;
@@ -124,9 +124,9 @@ namespace libdar
             infinint get_position() const;
 
             bool operator == (const iterator & cmp) const
-                { return ref == cmp.ref && cell == cmp.cell && offset == cmp.offset; };
+	    { return ref == cmp.ref && cell == cmp.cell && offset == cmp.offset; };
             bool operator != (const iterator & cmp) const
-                { return ! (*this == cmp); };
+	    { return ! (*this == cmp); };
 
         private:
             static const U_32 OFF_BEGIN = 1;
@@ -138,7 +138,7 @@ namespace libdar
 
             void relative_skip_to(S_32 val);
             bool points_on_data() const
-                {  return ref != NULL && cell != NULL && offset < cell->size; };
+	    {  return ref != NULL && cell != NULL && offset < cell->size; };
 
             inline void skip_plus_one();
             inline void skip_less_one();
@@ -149,18 +149,18 @@ namespace libdar
             // public storage methode using iterator
 
         iterator begin() const
-            { iterator ret; ret.cell = first; if(ret.cell != NULL) ret.offset = 0; else ret.offset = iterator::OFF_END; ret.ref = this; return ret; };
+	{ iterator ret; ret.cell = first; if(ret.cell != NULL) ret.offset = 0; else ret.offset = iterator::OFF_END; ret.ref = this; return ret; };
         iterator end() const
-            { iterator ret; ret.cell = NULL; ret.offset = iterator::OFF_END; ret.ref = this; return ret;  };
+	{ iterator ret; ret.cell = NULL; ret.offset = iterator::OFF_END; ret.ref = this; return ret;  };
 
             // WARNING for the two following methods :
             // there is no "reverse_iterator" type, unlike the standart lib,
             // thus when going from rbegin() to rend(), you must use the -- operator
             // unlike the stdlib, that uses the ++ operator. this is the only difference in use with stdlib.
         iterator rbegin() const
-            { iterator ret; ret.cell = last; ret.offset = last != NULL ? last->size-1 : 0; ret.ref = this; return ret; };
+	{ iterator ret; ret.cell = last; ret.offset = last != NULL ? last->size-1 : 0; ret.ref = this; return ret; };
         iterator rend() const
-            { iterator ret; ret.cell = NULL, ret.offset = iterator::OFF_BEGIN; ret.ref = this; return ret; };
+	{ iterator ret; ret.cell = NULL, ret.offset = iterator::OFF_BEGIN; ret.ref = this; return ret; };
 
 	    /// write data to the storage at the location pointed to by it
 
@@ -170,9 +170,9 @@ namespace libdar
         U_I write(iterator & it, unsigned char *a, U_I size);
         U_I read(iterator & it, unsigned char *a, U_I size) const;
         bool write(iterator & it, unsigned char a)
-            { return write(it, &a, 1) == 1; };
+	{ return write(it, &a, 1) == 1; };
         bool read(iterator & it, unsigned char &a) const
-            { return read(it, &a, 1) == 1; };
+	{ return read(it, &a, 1) == 1; };
 
             // after one of these 3 calls, the iterator given in argument are undefined (they may point nowhere)
         void insert_null_bytes_at_iterator(iterator it, U_I size);

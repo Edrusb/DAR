@@ -56,13 +56,13 @@ extern "C"
 #include "memory_check.hpp"
 #include "line_tools.hpp"
 
-#define GENERAL_REPORT(msg) 	if(ui != NULL)\
-                                {\
-                                    ui->change_non_interactive_output(&cerr);\
-	                            ui->warning(msg);\
-				}\
-	                        else\
-                                    cerr << msg << endl;
+#define GENERAL_REPORT(msg) 	if(ui != NULL)		\
+    {							\
+	ui->change_non_interactive_output(&cerr);	\
+	ui->warning(msg);				\
+    }							\
+    else						\
+	cerr << msg << endl;
 
 
 
@@ -129,13 +129,13 @@ int dar_suite_global(int argc,
 	bool silent;
 	bool jog;
 	line_tools_look_for_jQ(argc,
-			      argv,
-			      getopt_string,
+			       argv,
+			       getopt_string,
 #if HAVE_GETOPT_LONG
-			      long_options,
+			       long_options,
 #endif
-			      jog,
-			      silent);
+			       jog,
+			       silent);
 	ui = new (nothrow) shell_interaction(&cerr, &cerr, silent);
 	if(ui == NULL)
 	    throw Ememory("dar_suite_global");
@@ -152,7 +152,7 @@ int dar_suite_global(int argc,
 	else
 	    ret = (*call)(*ui, argc, argv, env);
 
-	// closing libdar
+	    // closing libdar
 
 	close_and_clean();
     }

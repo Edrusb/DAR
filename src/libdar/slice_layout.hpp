@@ -52,12 +52,12 @@ namespace libdar
 	void read(generic_file & f);
 	void write(generic_file & f) const;
 
-	/// given a slice_layout and a archive offset, provides the corresponding slice and slice offset
-	///
-	/// \param[in] sl slice_layout
-	/// \param[in] offset input offset as if all slices were sticked toghether
-	/// \param[out] slice_num slice number where to find the given offset
-	/// \param[out] slice_offset offset in that slice where is the given offset
+	    /// given a slice_layout and a archive offset, provides the corresponding slice and slice offset
+	    ///
+	    /// \param[in] sl slice_layout
+	    /// \param[in] offset input offset as if all slices were sticked toghether
+	    /// \param[out] slice_num slice number where to find the given offset
+	    /// \param[out] slice_offset offset in that slice where is the given offset
 	void which_slice(const infinint & offset,
 			 infinint & slice_num,
 			 infinint & slice_offset) const;

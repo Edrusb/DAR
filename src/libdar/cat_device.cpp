@@ -60,13 +60,13 @@ namespace libdar
 {
 
     cat_device::cat_device(const infinint & uid, const infinint & gid, U_16 perm,
-		   const datetime & last_access,
-		   const datetime & last_modif,
-		   const datetime & last_change,
-		   const string & name,
-		   U_16 major,
-		   U_16 minor,
-		   const infinint & fs_dev) : cat_inode(uid, gid, perm, last_access, last_modif, last_change, name, fs_dev)
+			   const datetime & last_access,
+			   const datetime & last_modif,
+			   const datetime & last_change,
+			   const string & name,
+			   U_16 major,
+			   U_16 minor,
+			   const infinint & fs_dev) : cat_inode(uid, gid, perm, last_access, last_modif, last_change, name, fs_dev)
     {
 	xmajor = major;
 	xminor = minor;
@@ -74,11 +74,11 @@ namespace libdar
     }
 
     cat_device::cat_device(user_interaction & dialog,
-		   generic_file & f,
-		   const archive_version & reading_ver,
-		   saved_status saved,
-		   compressor *efsa_loc,
-		   escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+			   generic_file & f,
+			   const archive_version & reading_ver,
+			   saved_status saved,
+			   compressor *efsa_loc,
+			   escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
     {
 	U_16 tmp;
 
@@ -122,4 +122,3 @@ namespace libdar
     }
 
 } // end of namespace
-

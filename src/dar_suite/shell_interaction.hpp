@@ -68,7 +68,7 @@ public:
     void set_beep(bool mode) { beep = mode; };
 
 
-	    /// overwritting method from parent class.
+	/// overwritting method from parent class.
     virtual user_interaction *clone() const { user_interaction *ret = new (get_pool()) shell_interaction(*this); if(ret == NULL) throw Ememory("shell_interaction::clone"); return ret; };
 
 private:

@@ -132,7 +132,7 @@ namespace libdar
 							       bool info_details, // verbose display (throught user_interaction)
 							       infinint &cat_size, // return size of archive in file (not in memory !)
 							       const infinint & second_terminateur_offset, // location of the second terminateur (zero if none exist)
-							        bool lax_mode);         // whether to do relaxed checkings
+							       bool lax_mode);         // whether to do relaxed checkings
 
     extern catalogue *macro_tools_get_catalogue_from(user_interaction & dialog,
 						     memory_pool *pool,
@@ -282,6 +282,6 @@ namespace libdar
 
 } // end of namespace
 
-	/// @}
+    /// @}
 
 #endif

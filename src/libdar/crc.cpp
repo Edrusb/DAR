@@ -38,7 +38,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -163,7 +163,7 @@ namespace libdar
 		pointer = begin;
 	}
 
-		// block bytes
+	    // block bytes
 
 	if(pointer == begin && cursor < length) // we can now use the optimized rountine relying on operation by block of bytes
 	{
@@ -519,4 +519,3 @@ namespace libdar
     }
 
 } // end of namespace
-

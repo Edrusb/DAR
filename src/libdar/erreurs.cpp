@@ -151,7 +151,7 @@ namespace libdar
 	if(symbols != NULL)
 	    free(symbols);
 #else
-	 Egeneric::stack("stack dump", "backtrace() call absent, cannot dump the stack information at the time the exception was thrown");
+	Egeneric::stack("stack dump", "backtrace() call absent, cannot dump the stack information at the time the exception was thrown");
 #endif
     }
 

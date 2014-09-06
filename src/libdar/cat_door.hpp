@@ -46,23 +46,23 @@ namespace libdar
     {
     public:
         cat_door(const infinint & xuid,
-	     const infinint & xgid,
-	     U_16 xperm,
-             const datetime & last_access,
-             const datetime & last_modif,
-             const datetime & last_change,
-             const std::string & src,
-             const path & che,
-             const infinint & fs_device) : cat_file(xuid, xgid, xperm, last_access, last_modif,
-						last_change, src, che, 0, fs_device, false) {};
+		 const infinint & xgid,
+		 U_16 xperm,
+		 const datetime & last_access,
+		 const datetime & last_modif,
+		 const datetime & last_change,
+		 const std::string & src,
+		 const path & che,
+		 const infinint & fs_device) : cat_file(xuid, xgid, xperm, last_access, last_modif,
+							last_change, src, che, 0, fs_device, false) {};
         cat_door(user_interaction & dialog,
-             generic_file & f,
-             const archive_version & reading_ver,
-             saved_status saved,
-             compression default_algo,
-             generic_file *data_loc,
-             compressor *efsa_loc,
-             escape *ptr) : cat_file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr) {};
+		 generic_file & f,
+		 const archive_version & reading_ver,
+		 saved_status saved,
+		 compression default_algo,
+		 generic_file *data_loc,
+		 compressor *efsa_loc,
+		 escape *ptr) : cat_file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr) {};
 
         unsigned char signature() const { return mk_signature('o', get_saved_status()); };
 
@@ -75,3 +75,4 @@ namespace libdar
 } // end of namespace
 
 #endif
+

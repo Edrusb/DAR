@@ -903,5 +903,3 @@ static string build(string::iterator a, string::iterator b)
 
     return ret;
 }
-
-

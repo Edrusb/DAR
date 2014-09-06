@@ -65,8 +65,8 @@ extern "C"
 namespace libdar
 {
 
-    /// \addtogroup Private
-    /// @{
+	/// \addtogroup Private
+	/// @{
 
 
     class generic_file;
@@ -91,18 +91,18 @@ namespace libdar
 #if SIZEOF_OFF_T > SIZEOF_TIME_T
 #if SIZEOF_OFF_T > SIZEOF_SIZE_T
         limitint(off_t a = 0)
-            { limitint_from(a); };
+	{ limitint_from(a); };
 #else
         limitint(size_t a = 0)
-            { limitint_from(a); };
+	{ limitint_from(a); };
 #endif
 #else
 #if SIZEOF_TIME_T > SIZEOF_SIZE_T
         limitint(time_t a = 0)
-            { limitint_from(a); };
+	{ limitint_from(a); };
 #else
         limitint(size_t a = 0)
-            { limitint_from(a); };
+	{ limitint_from(a); };
 #endif
 #endif
 
@@ -126,13 +126,13 @@ namespace libdar
         limitint & operator <<= (U_32 bit);
         limitint & operator <<= (limitint bit);
         limitint operator ++(int a)
-            { limitint ret = *this; ++(*this); return ret; };
+	{ limitint ret = *this; ++(*this); return ret; };
         limitint operator --(int a)
-            { limitint ret = *this; --(*this); return ret; };
+	{ limitint ret = *this; --(*this); return ret; };
         limitint & operator ++()
-            { return *this += 1; };
+	{ return *this += 1; };
         limitint & operator --()
-            { return *this -= 1; };
+	{ return *this -= 1; };
 
         U_32 operator % (U_32 arg) const;
 
@@ -229,9 +229,9 @@ namespace libdar
     typedef limitint<INFININT_BASE_TYPE> infinint;
 #endif
 } // end of namespace
-	///////////////////////////////////////////////////////////////////////
-	/////////  template implementation ////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    /////////  template implementation ////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
 #include "generic_file.hpp"
 #include "user_interaction.hpp"

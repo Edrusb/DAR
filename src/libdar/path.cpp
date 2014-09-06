@@ -269,7 +269,7 @@ namespace libdar
     {
         dirs.remove(".");
         if(relative && dirs.empty())
-	   dirs.push_back(".");
+	    dirs.push_back(".");
         else
         {
             list<string>::iterator it = dirs.begin();

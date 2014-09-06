@@ -54,13 +54,13 @@ extern "C"
 using namespace std;
 
 #if MUTEX_WORKS
-#define CRITICAL_START                                                      \
-             sigset_t Critical_section_mask_memory;                         \
-             tools_block_all_signals(Critical_section_mask_memory);         \
-             pthread_mutex_lock(&lock_fill)
+#define CRITICAL_START						\
+    sigset_t Critical_section_mask_memory;			\
+    tools_block_all_signals(Critical_section_mask_memory);	\
+    pthread_mutex_lock(&lock_fill)
 
-#define CRITICAL_END pthread_mutex_unlock(&lock_fill);                         \
-             tools_set_back_blocked_signals(Critical_section_mask_memory)
+#define CRITICAL_END pthread_mutex_unlock(&lock_fill);			\
+    tools_set_back_blocked_signals(Critical_section_mask_memory)
 #else
 #define CRITICAL_START // not a thread-safe implementation
 #define CRITICAL_END   // not a thread-safe implementation

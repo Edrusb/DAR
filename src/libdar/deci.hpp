@@ -60,16 +60,16 @@ namespace libdar
 
 	    /// copy constructor
         deci(const deci & ref)
-            { copy_from(ref); };
+	{ copy_from(ref); };
 
 	    /// destructor
         ~deci()
-            { detruit(); };
+	{ detruit(); };
 
 
 	    /// copy operator
         const deci & operator = (const deci & ref)
-            { detruit(); copy_from(ref); return *this; };
+	{ detruit(); copy_from(ref); return *this; };
 
 	    /// this produce a infinint from the decimal stored in the current object
         infinint computer() const;

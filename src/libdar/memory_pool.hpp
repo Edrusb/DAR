@@ -93,8 +93,8 @@ namespace libdar
 #endif
     };
 
-	    /// @}
+	/// @}
 
-    } // end of namespace
+} // end of namespace
 
 #endif

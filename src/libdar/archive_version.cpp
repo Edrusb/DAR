@@ -110,12 +110,12 @@ namespace libdar
 	if(fix > 0)
 	{
 	    ret += "." + tools_uword2str((U_16)(fix));
-	    // this is intentional that only few values may be supported, as the fix number
-	    // should not grow very much (fix < 10) between two major releases
-	    // so far it was needed only once for more 8 major released (well it did not
-	    // this feature did not exist at that time, thus I had to shift by one the
-	    // in development code some of the revision test, which took time and was error prone).
-	    // so, never again.
+		// this is intentional that only few values may be supported, as the fix number
+		// should not grow very much (fix < 10) between two major releases
+		// so far it was needed only once for more 8 major released (well it did not
+		// this feature did not exist at that time, thus I had to shift by one the
+		// in development code some of the revision test, which took time and was error prone).
+		// so, never again.
 
 	}
 

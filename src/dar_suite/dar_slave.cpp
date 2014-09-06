@@ -38,7 +38,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -84,14 +84,14 @@ static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[]
 
 int main(S_I argc, char * const argv[], const char **env)
 {
-     return dar_suite_global(argc,
-			     argv,
-			     env,
-			     OPT_STRING,
+    return dar_suite_global(argc,
+			    argv,
+			    env,
+			    OPT_STRING,
 #if HAVE_GETOPT_LONG
-			     NULL,
+			    NULL,
 #endif
-			     &little_main);
+			    &little_main);
 }
 
 static S_I little_main(shell_interaction & dialog, S_I argc, char * const argv[], const char **env)

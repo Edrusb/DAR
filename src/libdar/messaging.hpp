@@ -47,7 +47,7 @@ namespace libdar
 	order_read_ahead,         //< + infinint : messge is an info that the given amount of data is about to be read
 	order_read_ahead_begin,   //< + infinint : message continues with the next block
 	order_read,               //< + U_I      : message is a read order (with expected size to be read ahead)
-        answr_read_eof,           //< + data     : message from slave meaning slave has finished reading and expects new order, does not mean eof
+	answr_read_eof,           //< + data     : message from slave meaning slave has finished reading and expects new order, does not mean eof
 	order_sync_write,         //< no argument: order to flush all pending writes
 	answr_sync_write_done,    //< no argument: answer from the slave that all data have been sync written
 	order_skip,               //< + infinint : message is an order to seek at given position
@@ -56,9 +56,9 @@ namespace libdar
 	order_skip_fwd,           //< + U_I      : order to skip foward
 	order_skip_bkd,           //< + U_I      : order to skip backward
 	answr_skip_done,          //< + bool     : answer for all kind of skip orders
-        order_skippable_fwd,      //< + infinint : message from master containing a skippable forward request info
-        order_skippable_fwd_begin,//< + infinint : message continues on the next block
-        order_skippable_bkd,      //< + infinint : message from master containing a skippable backward request info
+	order_skippable_fwd,      //< + infinint : message from master containing a skippable forward request info
+	order_skippable_fwd_begin,//< + infinint : message continues on the next block
+	order_skippable_bkd,      //< + infinint : message from master containing a skippable backward request info
 	order_skippable_bkd_begin,//< + infinint : message continues on the next block
 	answr_skippable,          //< + bool     : answer from slace to a skippable forward/backward request
 	order_get_position,       //< no argument: order to get the current position in file

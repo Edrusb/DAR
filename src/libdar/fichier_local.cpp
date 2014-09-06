@@ -38,7 +38,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -162,7 +162,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 #if HAVE_POSIX_FADVISE
-	 int ret = posix_fadvise(filedesc, 0, 0, advise_to_int(adv));
+	int ret = posix_fadvise(filedesc, 0, 0, advise_to_int(adv));
 
 	if(ret == EBADF)
 	    throw SRC_BUG; // filedesc not a valid file descriptor !?!
@@ -362,7 +362,7 @@ namespace libdar
 	    fadvise(adv);
 
 	return total;
-     }
+    }
 
     void fichier_local::open(const string & chemin,
 			     gf_mode m,
@@ -394,11 +394,11 @@ namespace libdar
 	{
 	    o_mode |= O_CREAT;
 
-	     if(fail_if_exists)
-		 o_mode |= O_EXCL;
+	    if(fail_if_exists)
+		o_mode |= O_EXCL;
 
-	     if(erase)
-		 o_mode |= O_TRUNC;
+	    if(erase)
+		o_mode |= O_TRUNC;
 	}
 
 
@@ -468,7 +468,7 @@ namespace libdar
 
     int fichier_local::advise_to_int(advise arg) const
     {
- #if HAVE_POSIX_FADVISE
+#if HAVE_POSIX_FADVISE
 	switch(arg)
 	{
 	case advise_normal:

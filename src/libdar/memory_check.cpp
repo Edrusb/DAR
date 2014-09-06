@@ -66,7 +66,7 @@ static void debug_mem_init()
     }
     debug_mem_output = fopen(DEBUG_MEM_OUTPUT_FILE, "w");
     if(debug_mem_output == NULL)
-	   ERROR("failed openning output file to log debug memory events");
+	ERROR("failed openning output file to log debug memory events");
     debug_mem_initialized = true;
 }
 
@@ -86,7 +86,7 @@ static long long debug_mem_find_free_slot()
     if(ret < DEBUG_MEM_SIZE)
 	debug_mem_next = ret + 1;
     else
-	 ERROR("Cannot handle that many blocks, need an increase of the table size in memory_check module");
+	ERROR("Cannot handle that many blocks, need an increase of the table size in memory_check module");
 
     return ret;
 }

@@ -132,11 +132,11 @@ namespace libdar
 			if(slice_size == NULL)
 			    throw Ememory("header::read");
 		    }
-		    // this extension was used in archives before release 2.4.0
-		    // when the first slice had the same size of the following ones
-		    // the slice size of all slices if thus the one of the first which
-		    // was learnt by getting the size of the file
-		    // this works also for single sliced archives.
+			// this extension was used in archives before release 2.4.0
+			// when the first slice had the same size of the following ones
+			// the slice size of all slices if thus the one of the first which
+			// was learnt by getting the size of the file
+			// this works also for single sliced archives.
 		}
 	    }
 	    old_header = true;
@@ -169,10 +169,10 @@ namespace libdar
 			if(first_size == NULL)
 			    throw Ememory("header::read");
 		    }
-		    // note: the "extension_size" extension was used in archives before release 2.4.0
-		    // this option was only used in the first slice and contained the size of slices (not of the first slice)
-		    // when the first slice had a different size. This way, reading the size of the current file gives
-		    // the size of the first slice while the header extension gives the size of following slices.
+			// note: the "extension_size" extension was used in archives before release 2.4.0
+			// this option was only used in the first slice and contained the size of slices (not of the first slice)
+			// when the first slice had a different size. This way, reading the size of the current file gives
+			// the size of the first slice while the header extension gives the size of following slices.
 		}
 	    }
 	    else

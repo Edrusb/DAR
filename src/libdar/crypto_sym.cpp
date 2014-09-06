@@ -38,7 +38,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -145,7 +145,7 @@ namespace libdar
 		throw;
 	    };
 
-	    // self_test();
+		// self_test();
 	}
 #else
 	throw Ecompilation(gettext("Missing strong encryption support (libgcrypt)"));
@@ -181,8 +181,8 @@ namespace libdar
     }
 
     U_32 crypto_sym::encrypt_data(const infinint & block_num,
-				const char *clear_buf, const U_32 clear_size, const U_32 clear_allocated,
-				char *crypt_buf, U_32 crypt_size)
+				  const char *clear_buf, const U_32 clear_size, const U_32 clear_allocated,
+				  char *crypt_buf, U_32 crypt_size)
     {
 #if CRYPTO_AVAILABLE
 	U_32 size_to_fill = encrypted_block_size_for(clear_size);
@@ -277,7 +277,7 @@ namespace libdar
 		ref_cp >>= 8;
 	    }
 
-	    // IV(sector) = E_salt(sector)
+		// IV(sector) = E_salt(sector)
 	    err = gcry_cipher_encrypt(essiv_clef, (unsigned char *)ivec, size, (const unsigned char *)sect, size);
 	    if(err != GPG_ERR_NO_ERROR)
 		throw Erange("crypto_sym::crypto_encrypt_data",tools_printf(gettext("Error while generating IV: %s/%s"), gcry_strsource(err), gcry_strerror(err)));

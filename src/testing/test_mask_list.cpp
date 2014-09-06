@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
 
     try
     {
-      if(argc != 2)
-	throw Erange("mask_list", tools_printf("usage: %s <filename>\n", argv[0]));
+	if(argc != 2)
+	    throw Erange("mask_list", tools_printf("usage: %s <filename>\n", argv[0]));
 	f1(dialog, argv[1]);
     }
     catch(Egeneric & e)
@@ -76,27 +76,27 @@ int main(int argc, char *argv[])
 
     if(dialog != NULL)
 	delete dialog;
- }
+}
 
 void f1(user_interaction *dialog, const char *filename)
 {
-  mask_list m = mask_list(filename, true, "/toto/tutu", true);
-  string tester;
-  U_I count = 10;
+    mask_list m = mask_list(filename, true, "/toto/tutu", true);
+    string tester;
+    U_I count = 10;
 
-  cout << "taille : " << m.size() << endl;
+    cout << "taille : " << m.size() << endl;
 
-  while(--count)
+    while(--count)
     {
-      cin >> tester;
-      cout << (m.is_covered(tester) ? string("COVERED") : string("not covered")) << endl;
+	cin >> tester;
+	cout << (m.is_covered(tester) ? string("COVERED") : string("not covered")) << endl;
     }
 
-  m = mask_list(filename, false, "/toto/tutu", false);
-  count = 10;
-  while(--count)
+    m = mask_list(filename, false, "/toto/tutu", false);
+    count = 10;
+    while(--count)
     {
-      cin >> tester;
-      cout << (m.is_covered(tester) ? string("COVERED") : string("not covered")) << endl;
+	cin >> tester;
+	cout << (m.is_covered(tester) ? string("COVERED") : string("not covered")) << endl;
     }
 }

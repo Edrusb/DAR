@@ -43,9 +43,9 @@ namespace libdar
 	bool largefile()
 	{
 #if defined( _FILE_OFFSET_BITS ) ||  defined( _LARGE_FILES )
-        return true;
+	    return true;
 #else
-        return sizeof(off_t) > 4;
+	    return sizeof(off_t) > 4;
 #endif
 	}
 
@@ -108,9 +108,9 @@ namespace libdar
 	bool liblzo()
 	{
 #if LIBLZO2_AVAILABLE
-        return true;
+	    return true;
 #else
-	return false;
+	    return false;
 #endif
 	}
 

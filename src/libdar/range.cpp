@@ -112,7 +112,7 @@ namespace libdar
 	    if(*this >= ref)
 		high = ref.high;
 	    else
-		 if(contains(ref))
+		if(contains(ref))
 		    return; // nothing to do
 		else
 		    if(ref.contains(*this))

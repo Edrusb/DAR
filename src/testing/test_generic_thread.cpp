@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 	std::string msg;
 
 	for(unsigned int i = 0; i < e.size(); ++i)
-		msg = e[i] + ": " + msg;
+	    msg = e[i] + ": " + msg;
 	ui.printf("libthreadar exception: %S", &msg);
     }
     catch(...)

@@ -2315,11 +2315,11 @@ namespace libdar
 		{
 		    if(!lax)
 			throw Erange("archive::check_against_isolation", gettext("This archive contains an isolated catalogue, it cannot be used for this operation. It can only be used as reference for a incremental/differential backup or as backup of the original archive's catalogue"));
-		    // note1: that old archives do not have any data_name neither in the catalogue nor in the layer1 of the archive
-		    // both are faked equal to a zeroed label when reading them with recent dar version. Older archives than "08" would
-		    // thus pass this test successfully if no check was done against the archive version
-		    // note2: Old isolated catalogue do not carry any data, this is safe to try to restore them because any
-		    // pointer to data and/or EA has been removed during the isolation.
+			// note1: that old archives do not have any data_name neither in the catalogue nor in the layer1 of the archive
+			// both are faked equal to a zeroed label when reading them with recent dar version. Older archives than "08" would
+			// thus pass this test successfully if no check was done against the archive version
+			// note2: Old isolated catalogue do not carry any data, this is safe to try to restore them because any
+			// pointer to data and/or EA has been removed during the isolation.
 		    else
 			dialog.pause(gettext("LAX MODE: Archive seems to be only an isolated catalogue (no data in it), Can I assume data corruption occurred and consider the archive as being a real archive?"));
 		}

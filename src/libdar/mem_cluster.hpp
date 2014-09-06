@@ -43,8 +43,8 @@ namespace libdar
     {
     public:
 	mem_cluster(U_I x_block_size,   //< block size that will be allocated from this mem_cluster
-		U_I table_size_64,      //< the total number of block in this mem_cluster is table_size_64 * 64
-		mem_manager *x_holder); //< this is the object that holds this mem_cluster object
+		    U_I table_size_64,      //< the total number of block in this mem_cluster is table_size_64 * 64
+		    mem_manager *x_holder); //< this is the object that holds this mem_cluster object
 	mem_cluster(const mem_cluster & ref): mem_allocator(ref) { throw SRC_BUG; };
 	const mem_cluster & operator = (const mem_cluster & ref) { throw SRC_BUG; };
 	~mem_cluster();

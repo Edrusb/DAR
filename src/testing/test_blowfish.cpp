@@ -82,7 +82,7 @@ int main()
 
     if(dialog != NULL)
 	delete dialog;
- }
+}
 
 void f1(user_interaction *dialog)
 {

@@ -40,17 +40,17 @@ namespace libdar
 {
 
     cat_mirage::cat_mirage(user_interaction & dialog,
-                   generic_file & f,
-                   const archive_version & reading_ver,
-                   saved_status saved,
-                   entree_stats & stats,
-                   std::map <infinint, cat_etoile *> & corres,
-                   compression default_algo,
-                   generic_file *data_loc,
-                   compressor *efsa_loc,
-                   mirage_format fmt,
-                   bool lax,
-                   escape *ptr) : cat_nomme(f)
+			   generic_file & f,
+			   const archive_version & reading_ver,
+			   saved_status saved,
+			   entree_stats & stats,
+			   std::map <infinint, cat_etoile *> & corres,
+			   compression default_algo,
+			   generic_file *data_loc,
+			   compressor *efsa_loc,
+			   mirage_format fmt,
+			   bool lax,
+			   escape *ptr) : cat_nomme(f)
     {
         init(dialog,
              f,
@@ -67,16 +67,16 @@ namespace libdar
     }
 
     cat_mirage::cat_mirage(user_interaction & dialog,
-                   generic_file & f,
-                   const archive_version & reading_ver,
-                   saved_status saved,
-                   entree_stats & stats,
-                   std::map <infinint, cat_etoile *> & corres,
-                   compression default_algo,
-                   generic_file *data_loc,
-                   compressor *efsa_loc,
-                   bool lax,
-                   escape *ptr) : cat_nomme("TEMP")
+			   generic_file & f,
+			   const archive_version & reading_ver,
+			   saved_status saved,
+			   entree_stats & stats,
+			   std::map <infinint, cat_etoile *> & corres,
+			   compression default_algo,
+			   generic_file *data_loc,
+			   compressor *efsa_loc,
+			   bool lax,
+			   escape *ptr) : cat_nomme("TEMP")
     {
         init(dialog,
              f,
@@ -93,17 +93,17 @@ namespace libdar
     }
 
     void cat_mirage::init(user_interaction & dialog,
-                      generic_file & f,
-                      const archive_version & reading_ver,
-                      saved_status saved,
-                      entree_stats & stats,
-                      std::map <infinint, cat_etoile *> & corres,
-                      compression default_algo,
-                      generic_file *data_loc,
-                      compressor *efsa_loc,
-                      mirage_format fmt,
-                      bool lax,
-                      escape *ptr)
+			  generic_file & f,
+			  const archive_version & reading_ver,
+			  saved_status saved,
+			  entree_stats & stats,
+			  std::map <infinint, cat_etoile *> & corres,
+			  compression default_algo,
+			  generic_file *data_loc,
+			  compressor *efsa_loc,
+			  mirage_format fmt,
+			  bool lax,
+			  escape *ptr)
     {
         infinint tmp_tiquette;
         char tmp_flag;
@@ -287,4 +287,3 @@ namespace libdar
 
 
 } // end of namespace
-

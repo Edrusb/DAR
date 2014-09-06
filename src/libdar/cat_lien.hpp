@@ -45,18 +45,18 @@ namespace libdar
     {
     public :
         cat_lien(const infinint & uid, const infinint & gid, U_16 perm,
-             const datetime & last_access,
-             const datetime & last_modif,
-	     const datetime & last_change,
-             const std::string & name,
-	     const std::string & target,
-	     const infinint & fs_device);
+		 const datetime & last_access,
+		 const datetime & last_modif,
+		 const datetime & last_change,
+		 const std::string & name,
+		 const std::string & target,
+		 const infinint & fs_device);
         cat_lien(user_interaction & dialog,
-	     generic_file & f,
-	     const archive_version & reading_ver,
-	     saved_status saved,
-	     compressor *efsa_loc,
-	     escape *ptr);
+		 generic_file & f,
+		 const archive_version & reading_ver,
+		 saved_status saved,
+		 compressor *efsa_loc,
+		 escape *ptr);
 
         const std::string & get_target() const;
         void set_target(std::string x);

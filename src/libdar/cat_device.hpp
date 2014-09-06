@@ -46,19 +46,19 @@ namespace libdar
     {
     public :
         cat_device(const infinint & uid, const infinint & gid, U_16 perm,
-               const datetime & last_access,
-               const datetime & last_modif,
-	       const datetime &last_change,
-               const std::string & name,
-               U_16 major,
-               U_16 minor,
-	       const infinint & fs_device);
+		   const datetime & last_access,
+		   const datetime & last_modif,
+		   const datetime &last_change,
+		   const std::string & name,
+		   U_16 major,
+		   U_16 minor,
+		   const infinint & fs_device);
         cat_device(user_interaction & dialog,
-	       generic_file & f,
-	       const archive_version & reading_ver,
-	       saved_status saved,
-	       compressor *efsa_loc,
-	       escape *ptr);
+		   generic_file & f,
+		   const archive_version & reading_ver,
+		   saved_status saved,
+		   compressor *efsa_loc,
+		   escape *ptr);
 
         int get_major() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xmajor; };
         int get_minor() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xminor; };

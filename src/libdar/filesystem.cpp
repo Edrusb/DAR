@@ -38,7 +38,7 @@ extern "C"
 #  define strchr index
 #  define strrchr rindex
 # endif
-char *strchr (), *strrchr ();
+    char *strchr (), *strrchr ();
 # if !HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
@@ -205,62 +205,62 @@ namespace libdar
 		    string pointed = tools_readlink(ptr_name);
 
 		    ref = new (get_pool()) cat_lien(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						atime,
-						mtime,
-						ctime,
-						name,
-						pointed,
-						buf.st_dev);
+						    atime,
+						    mtime,
+						    ctime,
+						    name,
+						    pointed,
+						    buf.st_dev);
 		}
 		else if(S_ISREG(buf.st_mode))
 		    ref = new (get_pool()) cat_file(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						atime,
-						mtime,
-						ctime,
-						name,
-						lieu,
-						buf.st_size,
-						buf.st_dev,
-						furtive_read_mode);
+						    atime,
+						    mtime,
+						    ctime,
+						    name,
+						    lieu,
+						    buf.st_size,
+						    buf.st_dev,
+						    furtive_read_mode);
 		else if(S_ISDIR(buf.st_mode))
 		    ref = new (get_pool()) cat_directory(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+							 atime,
+							 mtime,
+							 ctime,
+							 name,
+							 buf.st_dev);
+		else if(S_ISCHR(buf.st_mode))
+		    ref = new (get_pool()) cat_chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+						       atime,
+						       mtime,
+						       ctime,
+						       name,
+						       major(buf.st_rdev),
+						       minor(buf.st_rdev), // makedev(major, minor)
+						       buf.st_dev);
+		else if(S_ISBLK(buf.st_mode))
+		    ref = new (get_pool()) cat_blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+							atime,
+							mtime,
+							ctime,
+							name,
+							major(buf.st_rdev),
+							minor(buf.st_rdev), // makedev(major, minor)
+							buf.st_dev);
+		else if(S_ISFIFO(buf.st_mode))
+		    ref = new (get_pool()) cat_tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
+						    atime,
+						    mtime,
+						    ctime,
+						    name,
+						    buf.st_dev);
+		else if(S_ISSOCK(buf.st_mode))
+		    ref = new (get_pool()) cat_prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
 						     atime,
 						     mtime,
 						     ctime,
 						     name,
 						     buf.st_dev);
-		else if(S_ISCHR(buf.st_mode))
-		    ref = new (get_pool()) cat_chardev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						   atime,
-						   mtime,
-						   ctime,
-						   name,
-						   major(buf.st_rdev),
-						   minor(buf.st_rdev), // makedev(major, minor)
-						   buf.st_dev);
-		else if(S_ISBLK(buf.st_mode))
-		    ref = new (get_pool()) cat_blockdev(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						    atime,
-						    mtime,
-						    ctime,
-						    name,
-						    major(buf.st_rdev),
-						    minor(buf.st_rdev), // makedev(major, minor)
-						    buf.st_dev);
-		else if(S_ISFIFO(buf.st_mode))
-		    ref = new (get_pool()) cat_tube(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						atime,
-						mtime,
-						ctime,
-						name,
-						buf.st_dev);
-		else if(S_ISSOCK(buf.st_mode))
-		    ref = new (get_pool()) cat_prise(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
-						 atime,
-						 mtime,
-						 ctime,
-						 name,
-						 buf.st_dev);
 #if HAVE_DOOR
 		else if(S_ISDOOR(buf.st_mode))
 		    ref = new (get_pool()) door(buf.st_uid, buf.st_gid, buf.st_mode & 07777,
@@ -310,9 +310,9 @@ namespace libdar
 			    // we must be able to continue without EA
 		    }
 
-		    //
-		    // Filesystem Specific Attributes Considerations
-		    //
+			//
+			// Filesystem Specific Attributes Considerations
+			//
 
 		    filesystem_specific_attribute_list *fsal = new (get_pool()) filesystem_specific_attribute_list();
 		    if(fsal == NULL)

@@ -57,23 +57,23 @@ namespace libdar
 	static const U_8 FILE_DATA_IS_DIRTY = 0x02;  //< data modified while being saved
 
         cat_file(const infinint & xuid, const infinint & xgid, U_16 xperm,
-             const datetime & last_access,
-             const datetime & last_modif,
-	     const datetime & last_change,
-             const std::string & src,
-             const path & che,
-             const infinint & taille,
-	     const infinint & fs_device,
-	     bool x_furtive_read_mode);
+		 const datetime & last_access,
+		 const datetime & last_modif,
+		 const datetime & last_change,
+		 const std::string & src,
+		 const path & che,
+		 const infinint & taille,
+		 const infinint & fs_device,
+		 bool x_furtive_read_mode);
         cat_file(const cat_file & ref);
         cat_file(user_interaction & dialog,
-	     generic_file & f,
-	     const archive_version & reading_ver,
-	     saved_status saved,
-	     compression default_algo,
-	     generic_file *data_loc,
-	     compressor *efsa_loc,
-	     escape *ptr);
+		 generic_file & f,
+		 const archive_version & reading_ver,
+		 saved_status saved,
+		 compression default_algo,
+		 generic_file *data_loc,
+		 compressor *efsa_loc,
+		 escape *ptr);
         ~cat_file() { detruit(); };
 
         bool has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const;
