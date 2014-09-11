@@ -19,7 +19,7 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file cat_all_entree.hpp
+    /// \file cat_all_entrees.hpp
     /// \brief include file gathering all entree found in a catalogue
     /// \ingroup Private
 
