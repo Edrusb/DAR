@@ -34,15 +34,24 @@ using namespace std;
 namespace libdar
 {
 
-    cat_nomme::cat_nomme(generic_file & f)
+    cat_nomme::cat_nomme(const pile_descriptor & pdesc, bool small) : cat_entree(pdesc, small)
     {
-        tools_read_string(f, xname);
+	pdesc.check(small);
+	if(small)
+	    tools_read_string(*pdesc.esc, xname);
+	else
+	    tools_read_string(*pdesc.stack, xname);
     }
 
-    void cat_nomme::inherited_dump(generic_file & f, bool small) const
+    void cat_nomme::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
-        cat_entree::inherited_dump(f, small);
-        tools_write_string(f, xname);
+        cat_entree::inherited_dump(pdesc, small);
+
+	pdesc.check(small);
+	if(small)
+	    tools_write_string(*pdesc.esc, xname);
+	else
+	    tools_write_string(*pdesc.stack, xname);
     }
 
 } // end of namespace

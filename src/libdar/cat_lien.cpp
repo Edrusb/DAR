@@ -45,14 +45,21 @@ namespace libdar
     }
 
     cat_lien::cat_lien(user_interaction & dialog,
-		       generic_file & f,
+		       const pile_descriptor & pdesc,
 		       const archive_version & reading_ver,
 		       saved_status saved,
-		       compressor *efsa_loc,
-		       escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+		       bool small) : cat_inode(dialog, pdesc, reading_ver, saved, small)
     {
+	generic_file *ptr = NULL;
+
+	pdesc.check(small);
+	if(small)
+	    ptr = pdesc.esc;
+	else
+	    ptr = pdesc.stack;
+
 	if(saved == s_saved)
-	    tools_read_string(f, points_to);
+	    tools_read_string(*ptr, points_to);
     }
 
     const string & cat_lien::get_target() const
@@ -80,11 +87,20 @@ namespace libdar
 			     + get_target() + " <--> " + l_other->get_target());
     }
 
-    void cat_lien::inherited_dump(generic_file & f, bool small) const
+    void cat_lien::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
-	cat_inode::inherited_dump(f, small);
+	generic_file *ptr = NULL;
+
+	pdesc.check(small);
+	if(small)
+	    ptr = pdesc.esc;
+	else
+	    ptr = pdesc.stack;
+
+	cat_inode::inherited_dump(pdesc, small);
+
 	if(get_saved_status() == s_saved)
-	    tools_write_string(f, points_to);
+	    tools_write_string(*ptr, points_to);
     }
 
 } // end of namespace

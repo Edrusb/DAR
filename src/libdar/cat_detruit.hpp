@@ -48,19 +48,22 @@ namespace libdar
     {
     public :
         cat_detruit(const std::string & name, unsigned char firm, const datetime & date) : cat_nomme(name) , del_date(date) { signe = firm; };
-        cat_detruit(generic_file & f, const archive_version & reading_ver);
-	cat_detruit(const cat_nomme &ref) : cat_nomme(ref.get_name()), del_date(0) { signe = ref.signature(); };
+        cat_detruit(const pile_descriptor & pdesc, const archive_version & reading_ver, bool small);
+	cat_detruit(const cat_nomme & ref) : cat_nomme(ref.get_name()), del_date(0) { signe = ref.signature(); };
 
         unsigned char get_signature() const { return signe; };
         void set_signature(unsigned char x) { signe = x; };
-        unsigned char signature() const { return 'x'; };
-        cat_entree *clone() const { return new (get_pool()) cat_detruit(*this); };
 
 	const datetime & get_date() const { return del_date; };
 	void set_date(const datetime & ref) { del_date = ref; };
 
+	    /// inherited from cat_entree
+        unsigned char signature() const { return 'x'; };
+	    /// inherited from cat_entree
+        cat_entree *clone() const { return new (get_pool()) cat_detruit(*this); };
+
     protected:
-        void inherited_dump(generic_file & f, bool small) const;
+        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
 
     private :
         unsigned char signe;

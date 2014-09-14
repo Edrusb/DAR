@@ -45,13 +45,13 @@ namespace libdar
     {
     public :
         cat_ignored(const std::string & name) : cat_nomme(name) {};
-        cat_ignored(generic_file & f) : cat_nomme(f) { throw SRC_BUG; };
+        cat_ignored(const pile_descriptor & pdesc, bool small) : cat_nomme(pdesc, small) { throw SRC_BUG; };
 
         unsigned char signature() const { return 'i'; };
         cat_entree *clone() const { return new (get_pool()) cat_ignored(*this); };
 
     protected:
-        void inherited_dump(generic_file & f, bool small) const { throw SRC_BUG; };
+        void inherited_dump(const pile_descriptor & pdesc, bool small) const { throw SRC_BUG; };
 
     };
 

@@ -46,7 +46,7 @@ namespace libdar
     {
     public :
         cat_eod() {};
-        cat_eod(generic_file & f) {};
+        cat_eod(const pile_descriptor & pdesc, bool small): cat_entree(pdesc, small) {};
             // dump defined by cat_entree
         unsigned char signature() const { return 'z'; };
         cat_entree *clone() const { return new (get_pool()) cat_eod(); };

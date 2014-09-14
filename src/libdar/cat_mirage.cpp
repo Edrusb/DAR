@@ -40,70 +40,60 @@ namespace libdar
 {
 
     cat_mirage::cat_mirage(user_interaction & dialog,
-			   generic_file & f,
+			   const pile_descriptor & pdesc,
 			   const archive_version & reading_ver,
 			   saved_status saved,
 			   entree_stats & stats,
 			   std::map <infinint, cat_etoile *> & corres,
 			   compression default_algo,
-			   generic_file *data_loc,
-			   compressor *efsa_loc,
 			   mirage_format fmt,
 			   bool lax,
-			   escape *ptr) : cat_nomme(f)
+			   bool small) : cat_nomme(pdesc, small)
     {
         init(dialog,
-             f,
+             pdesc,
              reading_ver,
              saved,
              stats,
              corres,
              default_algo,
-             data_loc,
-             efsa_loc,
              fmt,
              lax,
-             ptr);
+             small);
     }
 
     cat_mirage::cat_mirage(user_interaction & dialog,
-			   generic_file & f,
+			   const pile_descriptor & pdesc,
 			   const archive_version & reading_ver,
 			   saved_status saved,
 			   entree_stats & stats,
 			   std::map <infinint, cat_etoile *> & corres,
 			   compression default_algo,
-			   generic_file *data_loc,
-			   compressor *efsa_loc,
 			   bool lax,
-			   escape *ptr) : cat_nomme("TEMP")
+			   bool small) : cat_nomme("TEMP")
     {
         init(dialog,
-             f,
+             pdesc,
              reading_ver,
              saved,
              stats,
              corres,
              default_algo,
-             data_loc,
-             efsa_loc,
              fmt_file_etiquette,
              lax,
-             ptr);
+             small);
     }
 
     void cat_mirage::init(user_interaction & dialog,
-			  generic_file & f,
+			  const pile_descriptor & pdesc,
 			  const archive_version & reading_ver,
 			  saved_status saved,
 			  entree_stats & stats,
 			  std::map <infinint, cat_etoile *> & corres,
 			  compression default_algo,
-			  generic_file *data_loc,
-			  compressor *efsa_loc,
 			  mirage_format fmt,
 			  bool lax,
-			  escape *ptr)
+			  bool small)
     {
         infinint tmp_tiquette;
         char tmp_flag;
@@ -111,17 +101,24 @@ namespace libdar
         cat_inode *ino_ptr = NULL;
         cat_entree *entree_ptr = NULL;
         entree_stats fake_stats; // the call to cat_entree::read will increment counters with the inode we will read
-            // but this inode will also be counted from the cat_entree::read we are call from.
-            // thus we must not increment the real entree_stats structure here
+            // but this inode will also be counted from the cat_entree::read we are called from.
+            // thus we must not increment the real entree_stats structure here and we use a local variable
+	generic_file *ptr = NULL;
+
+	pdesc.check(small);
+	if(small)
+	    ptr = pdesc.esc;
+	else
+	    ptr = pdesc.stack;
 
 
         if(fmt != fmt_file_etiquette)
-            tmp_tiquette = infinint(f);
+            tmp_tiquette = infinint(*ptr);
 
         switch(fmt)
         {
         case fmt_mirage:
-            f.read(&tmp_flag, 1);
+            ptr->read(&tmp_flag, 1);
             break;
         case fmt_hard_link:
             tmp_flag = MIRAGE_ALONE;
@@ -156,19 +153,19 @@ namespace libdar
 
             if(fmt == fmt_file_etiquette)
             {
-                cat_nomme *tmp_ptr = new (get_pool()) cat_file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
+                cat_nomme *tmp_ptr = new (get_pool()) cat_file(dialog, pdesc, reading_ver, saved, default_algo, small);
                 entree_ptr = tmp_ptr;
                 if(tmp_ptr != NULL)
                 {
                     change_name(tmp_ptr->get_name());
                     tmp_ptr->change_name("");
-                    tmp_tiquette = infinint(f);
+                    tmp_tiquette = infinint(*ptr);
                 }
                 else
                     throw Ememory("cat_mirage::init");
             }
             else
-                entree_ptr = cat_entree::read(dialog, get_pool(), f, reading_ver, fake_stats, corres, default_algo, data_loc, efsa_loc, lax, false, ptr);
+                entree_ptr = cat_entree::read(dialog, get_pool(), pdesc, reading_ver, fake_stats, corres, default_algo, lax, false, small);
 
             ino_ptr = dynamic_cast<cat_inode *>(entree_ptr);
             if(ino_ptr == NULL || dynamic_cast<cat_directory *>(entree_ptr) != NULL)
@@ -250,38 +247,46 @@ namespace libdar
         return *this;
     }
 
-    void cat_mirage::post_constructor(generic_file & f)
+    void cat_mirage::post_constructor(const pile_descriptor & pdesc)
     {
         if(star_ref == NULL)
             throw SRC_BUG;
 
         if(star_ref->get_ref_count() == 1) // first time this inode is seen
-            star_ref->get_inode()->post_constructor(f);
+            star_ref->get_inode()->post_constructor(pdesc);
     }
 
-    void cat_mirage::inherited_dump(generic_file & f, bool small) const
+    void cat_mirage::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
+	generic_file *ptr = NULL;
+
+	pdesc.check(small);
+	if(small)
+	    ptr = pdesc.esc;
+	else
+	    ptr = pdesc.stack;
+
         if(star_ref->get_ref_count() > 1)
         {
             char buffer[] = { MIRAGE_ALONE, MIRAGE_WITH_INODE };
-            cat_nomme::inherited_dump(f, small);
-            star_ref->get_etiquette().dump(f);
+            cat_nomme::inherited_dump(pdesc, small);
+            star_ref->get_etiquette().dump(*ptr);
             if((small && !is_inode_wrote())
                || (!small && !is_inode_dumped()))
             {
-                f.write(buffer+1, 1); // writing one char MIRAGE_WITH_INODE
-                star_ref->get_inode()->specific_dump(f, small);
+                ptr->write(buffer+1, 1); // writing one char MIRAGE_WITH_INODE
+                star_ref->get_inode()->specific_dump(pdesc, small);
                 if(!small)
                     set_inode_dumped(true);
             }
             else
-                f.write(buffer, 1); // writing one char MIRAGE_ALONE
+                ptr->write(buffer, 1); // writing one char MIRAGE_ALONE
         }
         else // no need to record this inode with the hard link overhead
         {
             cat_inode *real = star_ref->get_inode();
             real->change_name(get_name()); // set the name of the cat_mirage object to the inode
-            real->specific_dump(f, small);
+            real->specific_dump(pdesc, small);
         }
     }
 

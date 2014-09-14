@@ -49,16 +49,18 @@ namespace libdar
     class escape_catalogue : public catalogue
     {
     public:
+
+	    /// constructor to setup a escape_catalogue that will drop marks all along the archive and drop its content at end of archive
         escape_catalogue(user_interaction & dialog,
+			 const pile_descriptor & x_pdesc,
 			 const datetime & root_last_modif,
-			 const label & data_name,
-			 pile *x_stack);
+			 const label & data_name);
+
+	    /// constructor to setup a escape_catalogue that will be fed by sequentially reading the archive
         escape_catalogue(user_interaction & dialog,        //< user interaction
+			 const pile_descriptor & x_pdesc,    //< stack descriptor where to write to
 			 const archive_version & reading_ver,  //< archive format
 			 compression default_algo,         //< default compression algorithm
-			 generic_file *data_loc,           //< at which layer to read data from
-			 compressor *efsa_loc,             //< at which layer to read EA from
-			 pile *x_stack,                    //< the whole stack we write to, will only use the escape layer of that stack
 			 bool lax = false);                //< whether to use lax mode
         escape_catalogue(const escape_catalogue & ref) : catalogue(ref) { copy_from(ref); };
         const escape_catalogue & operator = (const escape_catalogue &ref);
@@ -74,7 +76,7 @@ namespace libdar
 	void pre_add_failed_mark() const;
 	void pre_add_fsa(const cat_entree *ref) const;
 	void pre_add_fsa_crc(const cat_entree *ref) const;
-	escape *get_escape_layer() const { return esc; };
+	escape *get_escape_layer() const { return pdesc.esc; };
 
 	void reset_read() const;
 	void end_read() const;
@@ -94,21 +96,18 @@ namespace libdar
 	    ec_completed  //< state in which the escape_catalogue object is completed and has all information in memory as a normal catalogue
 	};
 
-	pile *stack;
-	escape *esc;
+	pile_descriptor pdesc;
 	archive_version x_reading_ver;
 	compression x_default_algo;
-	generic_file *x_data_loc;
-	compressor *x_efsa_loc;
 	bool x_lax;
 	std::map <infinint, cat_etoile *> corres;
         state status;
-	catalogue *cat_det; //< holds the final catalogue's detruit objects when no more file can be read from the archive
+	catalogue *cat_det;         //< holds the final catalogue's detruit objects when no more file can be read from the archive
 	infinint min_read_offset;   //< next offset in archive should be greater than that to identify a mark
 	infinint depth;             //< directory depth of archive being read sequentially
 	infinint wait_parent_depth; //< ignore any further entry while depth is less than wait_parent_depth. disabled is set to zero
 
-	void set_esc_and_stack(pile *ptr);
+	void set_esc_and_stack(const pile_descriptor & x_pdesc);
 	void copy_from(const escape_catalogue & ref);
 	void destroy();
 	void merge_cat_det();

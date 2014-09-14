@@ -25,47 +25,30 @@ extern "C"
 {
 } // end extern "C"
 
-#include "cat_detruit.hpp"
+#include "pile_descriptor.hpp"
 
 using namespace std;
 
 namespace libdar
 {
 
-    cat_detruit::cat_detruit(const pile_descriptor & pdesc, const archive_version & reading_ver, bool small) : cat_nomme(pdesc, small)
+    pile_descriptor::pile_descriptor(pile *ptr)
     {
-	generic_file *ptr = NULL;
-
-	pdesc.check(small);
-	if(small)
-	    ptr = pdesc.esc;
-	else
-	    ptr = pdesc.stack;
-
-	if(ptr->read((char *)&signe, 1) != 1)
-	    throw Erange("cat_detruit::cat_detruit", gettext("missing data to build"));
-
-	if(reading_ver > 7)
-	    del_date.read(*ptr, reading_ver);
-	else
-	    del_date = datetime(0);
+	if(ptr == NULL)
+	    throw SRC_BUG;
+	stack = ptr;
+	ptr->find_first_from_top(compr);
+	ptr->find_first_from_bottom(esc);
     }
 
-    void cat_detruit::inherited_dump(const pile_descriptor & pdesc, bool small) const
+    void pile_descriptor::check(bool small) const
     {
-	generic_file * ptr = NULL;
-
-	cat_nomme::inherited_dump(pdesc, small);
-
-	pdesc.check(small);
-	if(small)
-	    ptr = pdesc.esc;
-	else
-	    ptr = pdesc.stack;
-
-	ptr->write((char *)&signe, 1);
-	del_date.dump(*ptr);
+	if(stack == NULL)
+	    throw SRC_BUG;
+	if(esc == NULL && small)
+	    throw SRC_BUG;
+	if(compr == NULL)
+	    throw SRC_BUG;
     }
 
 } // end of namespace
-

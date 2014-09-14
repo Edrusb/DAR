@@ -246,7 +246,7 @@ namespace libdar
 
     protected:
         void corres_reset() { corres_write.clear(); };
-        void make_file(const cat_nomme * ref,                       //< object to restore in filesystem
+        void make_file(const cat_nomme * ref,                   //< object to restore in filesystem
 		       const path & ou,                         //< where to restore it
 		       bool dir_perm,                           //< false for already existing directories, this makes dar set the minimum available permission to be able to restore files in that directory at a later time
 		       cat_inode::comparison_fields what_to_check,  //< defines whether to restore permission, ownership, dates, etc.

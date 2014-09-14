@@ -162,73 +162,86 @@ namespace libdar
 
     cat_entree *cat_entree::read(user_interaction & dialog,
 				 memory_pool *pool,
-				 generic_file & f,
+				 const pile_descriptor & pdesc,
 				 const archive_version & reading_ver,
 				 entree_stats & stats,
 				 std::map <infinint, cat_etoile *> & corres,
 				 compression default_algo,
-				 generic_file *data_loc,
-				 compressor *efsa_loc,
 				 bool lax,
 				 bool only_detruit,
-				 escape *ptr)
+				 bool small)
     {
         char type;
         saved_status saved;
         cat_entree *ret = NULL;
         map <infinint, cat_etoile *>::iterator it;
         infinint tmp;
-        bool read_crc = (ptr != NULL) && !f.crc_status();
+	bool read_crc;
+	generic_file *ptr = NULL;
+
+	pdesc.check(small);
+	if(small)
+	{
+	    ptr = pdesc.esc;
+	    pdesc.stack->flush_read_above(pdesc.esc);
+	}
+	else
+	    ptr = pdesc.stack;
+
+        read_crc = small && !ptr->crc_status();
+	    // crc may be activated when reading a hard link (mirage read, now reading the inode)
 
         if(read_crc)
-            f.reset_crc(ENTREE_CRC_SIZE);
+            ptr->reset_crc(ENTREE_CRC_SIZE);
 
         try
         {
-            S_I lu = f.read(&type, 1);
+            S_I lu = ptr->read(&type, 1);
 
             if(lu == 0)
-                return ret;
+		type = ' '; // used to by-pass object construction and return NULL as value of this method
 
             if(!extract_base_and_status((unsigned char)type, (unsigned char &)type, saved))
             {
                 if(!lax)
                     throw Erange("cat_entree::read", gettext("corrupted file"));
                 else
-                    return ret;
+		    type = ' '; // used to by-pass object construction and return NULL as value of this method
             }
 
             switch(type)
             {
+	    case ' ':
+		break; // returned value will be NULL
             case 'f':
-                ret = new (pool) cat_file(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
+                ret = new (pool) cat_file(dialog, pdesc, reading_ver, saved, default_algo, small);
                 break;
             case 'l':
-                ret = new (pool) cat_lien(dialog, f, reading_ver, saved, efsa_loc, ptr);
+                ret = new (pool) cat_lien(dialog, pdesc, reading_ver, saved, small);
                 break;
             case 'c':
-                ret = new (pool) cat_chardev(dialog, f, reading_ver, saved, efsa_loc, ptr);
+                ret = new (pool) cat_chardev(dialog, pdesc, reading_ver, saved, small);
                 break;
             case 'b':
-                ret = new (pool) cat_blockdev(dialog, f, reading_ver, saved, efsa_loc, ptr);
+                ret = new (pool) cat_blockdev(dialog, pdesc, reading_ver, saved, small);
                 break;
             case 'p':
-                ret = new (pool) cat_tube(dialog, f, reading_ver, saved, efsa_loc, ptr);
+                ret = new (pool) cat_tube(dialog, pdesc, reading_ver, saved, small);
                 break;
             case 's':
-                ret = new (pool) cat_prise(dialog, f, reading_ver, saved, efsa_loc, ptr);
+                ret = new (pool) cat_prise(dialog, pdesc, reading_ver, saved, small);
                 break;
             case 'd':
-                ret = new (pool) cat_directory(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, ptr);
+                ret = new (pool) cat_directory(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, lax, only_detruit, small);
                 break;
             case 'm':
-                ret = new (pool) cat_mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, cat_mirage::fmt_mirage, lax, ptr);
+                ret = new (pool) cat_mirage(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, cat_mirage::fmt_mirage, lax, small);
                 break;
             case 'h': // old hard-link object
-                ret = new (pool) cat_mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, cat_mirage::fmt_hard_link, lax, ptr);
+                ret = new (pool) cat_mirage(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, cat_mirage::fmt_hard_link, lax, small);
                 break;
             case 'e': // old etiquette object
-                ret = new (pool) cat_mirage(dialog, f, reading_ver, saved, stats, corres, default_algo, data_loc, efsa_loc, lax, ptr);
+                ret = new (pool) cat_mirage(dialog, pdesc, reading_ver, saved, stats, corres, default_algo, lax, small);
                 break;
             case 'z':
                 if(saved != s_saved)
@@ -238,7 +251,7 @@ namespace libdar
                     else
                         dialog.warning(gettext("LAX MODE: Unexpected saved status for end of directory entry, assuming data corruption occurred, ignoring and continuing"));
                 }
-                ret = new (pool) cat_eod(f);
+                ret = new (pool) cat_eod(pdesc, small);
                 break;
             case 'x':
                 if(saved != s_saved)
@@ -248,10 +261,10 @@ namespace libdar
                     else
                         dialog.warning(gettext("LAX MODE: Unexpected saved status for class \"cat_detruit\" object, assuming data corruption occurred, ignoring and continuing"));
                 }
-                ret = new (pool) cat_detruit(f, reading_ver);
+                ret = new (pool) cat_detruit(pdesc, reading_ver, small);
                 break;
 	    case 'o':
-		ret = new (pool) cat_door(dialog, f, reading_ver, saved, default_algo, data_loc, efsa_loc, ptr);
+		ret = new (pool) cat_door(dialog, pdesc, reading_ver, saved, default_algo, small);
 		break;
             default :
                 if(!lax)
@@ -262,14 +275,14 @@ namespace libdar
                     return ret;  // NULL
                 }
             }
-	    if(ret == NULL)
+	    if(ret == NULL && type != ' ')
 		throw Ememory("cat_entree::read");
         }
         catch(...)
         {
             if(read_crc)
             {
-		crc * tmp = f.get_crc(); // keep f in a coherent status
+		crc * tmp = ptr->get_crc(); // keep pdesc in a coherent status
 		if(tmp != NULL)
 		    delete tmp;
             }
@@ -278,14 +291,20 @@ namespace libdar
 
         if(read_crc)
         {
-            crc *crc_calc = f.get_crc();
+            crc *crc_calc = ptr->get_crc();
 
 	    if(crc_calc == NULL)
 		throw SRC_BUG;
 
+	    if(type == ' ') // corrupted data while in lax mode
+	    {
+		delete crc_calc;
+		return ret; // returning NULL
+	    }
+
 	    try
 	    {
-		crc *crc_read = create_crc_from_file(f, pool);
+		crc *crc_read = create_crc_from_file(*ptr, pool);
 		if(crc_read == NULL)
 		    throw SRC_BUG;
 
@@ -315,7 +334,7 @@ namespace libdar
 				throw Erange("cat_entree::read", gettext(gettext("Entry information CRC failure")));
 			}
 		    }
-		    ret->post_constructor(*ptr);
+		    ret->post_constructor(pdesc);
 		}
 		catch(...)
 		{
@@ -340,30 +359,47 @@ namespace libdar
         return ret;
     }
 
-    void cat_entree::dump(generic_file & f, bool small) const
+
+    void cat_entree::change_location(const pile_descriptor & x_pdesc, bool small)
     {
+	if(x_pdesc.stack == NULL)
+	    throw SRC_BUG;
+
+	if(small && x_pdesc.esc == NULL)
+	    throw SRC_BUG;
+
+	if(x_pdesc.compr == NULL)
+	    throw SRC_BUG;
+
+	pdesc = x_pdesc;
+    }
+
+    void cat_entree::dump(const pile_descriptor & pdesc, bool small) const
+    {
+	pdesc.check(small);
         if(small)
         {
 	    crc *tmp = NULL;
 
 	    try
 	    {
-		f.reset_crc(ENTREE_CRC_SIZE);
+		pdesc.stack->flush_read_above(pdesc.esc);
+		pdesc.esc->reset_crc(ENTREE_CRC_SIZE);
 		try
 		{
-		    inherited_dump(f, small);
+		    inherited_dump(pdesc, small);
 		}
 		catch(...)
 		{
-		    tmp = f.get_crc(); // keep f in a coherent status
+		    tmp = pdesc.esc->get_crc(); // keep f in a coherent status
 		    throw;
 		}
 
-		tmp = f.get_crc();
+		tmp = pdesc.esc->get_crc();
 		if(tmp == NULL)
 		    throw SRC_BUG;
 
-		tmp->dump(f);
+		tmp->dump(*pdesc.esc);
 	    }
 	    catch(...)
 	    {
@@ -375,13 +411,35 @@ namespace libdar
 		delete tmp;
         }
         else
-            inherited_dump(f, small);
+            inherited_dump(pdesc, small);
     }
 
-    void cat_entree::inherited_dump(generic_file & f, bool small) const
+    void cat_entree::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
         char s = signature();
-        f.write(&s, 1);
+
+	pdesc.check(small);
+	if(small)
+	    pdesc.esc->write(&s, 1);
+	else
+	    pdesc.stack->write(&s, 1);
+    }
+
+    generic_file *cat_entree::get_read_cat_layer(bool small) const
+    {
+	generic_file *ret = NULL;
+
+	pdesc.check(small);
+
+	if(small)
+	{
+	    pdesc.stack->flush_read_above(pdesc.esc);
+	    ret = pdesc.esc;
+	}
+	else
+	    ret = pdesc.stack;
+
+	return ret;
     }
 
     bool compatible_signature(unsigned char a, unsigned char b)

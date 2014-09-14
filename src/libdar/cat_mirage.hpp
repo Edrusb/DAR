@@ -53,28 +53,24 @@ namespace libdar
 
 	cat_mirage(const std::string & name, cat_etoile *ref) : cat_nomme(name) { star_ref = ref; if(ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
 	cat_mirage(user_interaction & dialog,
-		   generic_file & f,
+		   const pile_descriptor & pdesc,
 		   const archive_version & reading_ver,
 		   saved_status saved,
 		   entree_stats & stats,
 		   std::map <infinint, cat_etoile *> & corres,
 		   compression default_algo,
-		   generic_file *data_loc,
-		   compressor *efsa_loc,
 		   mirage_format fmt,
 		   bool lax,
-		   escape *ptr);
+		   bool small);
 	cat_mirage(user_interaction & dialog,
-		   generic_file & f,
+		   const pile_descriptor & pdesc,
 		   const archive_version & reading_ver,
 		   saved_status saved,
 		   entree_stats & stats,
 		   std::map <infinint, cat_etoile *> & corres,
 		   compression default_algo,
-		   generic_file *data_loc,
-		   compressor *efsa_loc,
 		   bool lax,
-		   escape *ptr);
+		   bool small);
 	cat_mirage(const cat_mirage & ref) : cat_nomme (ref) { star_ref = ref.star_ref; if(star_ref == NULL) throw SRC_BUG; star_ref->add_ref(this); };
 	const cat_mirage & operator = (const cat_mirage & ref);
 	~cat_mirage() { star_ref->drop_ref(this); };
@@ -94,30 +90,28 @@ namespace libdar
 	void set_inode_wrote(bool val) const { star_ref->set_wrote(val); };
 	void set_inode_dumped(bool val) const { star_ref->set_dumped(val); };
 
-	void post_constructor(generic_file & f);
+	void post_constructor(const pile_descriptor & pdesc);
 
 	    /// whether we are the mirage that triggered this hard link creation
 	bool is_first_mirage() const { return star_ref->get_first_ref() == this; };
 
 
     protected:
-	void inherited_dump(generic_file & f, bool small) const;
+	void inherited_dump(const pile_descriptor & pdesc, bool small) const;
 
     private:
 	cat_etoile *star_ref;
 
 	void init(user_interaction & dialog,
-		  generic_file & f,
+		  const pile_descriptor & pdesc,
 		  const archive_version & reading_ver,
 		  saved_status saved,
 		  entree_stats & stats,
 		  std::map <infinint, cat_etoile *> & corres,
 		  compression default_algo,
-		  generic_file *data_loc,
-		  compressor *efsa_loc,
 		  mirage_format fmt,
 		  bool lax,
-		  escape *ptr);
+		  bool small);
     };
 
 	/// @}

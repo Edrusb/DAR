@@ -74,11 +74,10 @@ namespace libdar
 		  const std::string & xname,
 		  const infinint & device);
         cat_inode(user_interaction & dialog,
-		  generic_file & f,
+		  const pile_descriptor & pdesc,
 		  const archive_version & reading_ver,
 		  saved_status saved,
-		  compressor *efsa_loc,
-		  escape *ptr);      // if ptr is not NULL, reading a partial dump(), which was done with "small" set to true
+		  bool small);
         cat_inode(const cat_inode & ref);
 	const cat_inode & operator = (const cat_inode & ref);
         ~cat_inode();
@@ -155,10 +154,6 @@ namespace libdar
 	    // using get_last_change() (depends on the version of the archive read).
 
 
-	    // V : for archive migration (merging) EA and FSA concerned
-        void change_efsa_location(compressor *loc) { storage = loc; };
-
-
             //////////////////////////////////
             // FILESYSTEM SPECIFIC ATTRIBUTES Methods
             //
@@ -194,10 +189,9 @@ namespace libdar
     protected:
         virtual void sub_compare(const cat_inode & other, bool isolated_mode) const {};
 
-	    /// escape generic_file relative methods
-	escape *get_escape_layer() const { return esc; };
 
-        void inherited_dump(generic_file & f, bool small) const;
+
+        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
 
     private :
         infinint uid;            //< inode owner's user ID
@@ -224,10 +218,8 @@ namespace libdar
 	crc *fsa_crc;            //< CRC computed on FSA
 	    //
 	infinint *fs_dev;        //< filesystem ID on which resides the inode (only used when read from filesystem)
-	compressor *storage;     //< where are stored EA and FSA
 	archive_version edit;    //< need to know EA and FSA format used in archive file
 
-	escape *esc;  // if not NULL, the object is partially build from archive (at archive generation, dump() was called with small set to true)
 
 	void nullifyptr();
 	void destroy();

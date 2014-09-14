@@ -52,23 +52,26 @@ namespace libdar
 		 const std::string & target,
 		 const infinint & fs_device);
         cat_lien(user_interaction & dialog,
-		 generic_file & f,
+		 const pile_descriptor & pdesc,
 		 const archive_version & reading_ver,
 		 saved_status saved,
-		 compressor *efsa_loc,
-		 escape *ptr);
+		 bool small);
 
         const std::string & get_target() const;
         void set_target(std::string x);
 
             // using the method is_more_recent_than() from cat_inode
             // using method has_changed_since() from cat_inode class
+
+	    /// inherited from cat_entree
         unsigned char signature() const { return mk_signature('l', get_saved_status()); };
+
+	    /// inherited from cat_entree
         cat_entree *clone() const { return new (get_pool()) cat_lien(*this); };
 
     protected :
         void sub_compare(const cat_inode & other, bool isolated_mode) const;
-        void inherited_dump(generic_file & f, bool small) const;
+        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
 
     private :
         std::string points_to;

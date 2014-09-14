@@ -71,8 +71,9 @@ namespace libdar
 
         compression get_algo() const { return current_algo; };
 
-	void suspend_compression() { if(!suspended) { suspended_compr = current_algo; change_algo(none); suspended = true; } };
-	void resume_compression() { if(suspended) { change_algo(suspended_compr); suspended = false; } };
+	void suspend_compression();
+	void resume_compression();
+	bool is_compression_suspended() const { return suspended; };
 
 
             // inherited from generic file

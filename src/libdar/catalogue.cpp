@@ -112,11 +112,9 @@ namespace libdar
     }
 
     catalogue::catalogue(user_interaction & dialog,
-			 generic_file & ff,
+			 const pile_descriptor &pdesc,
 			 const archive_version & reading_ver,
 			 compression default_algo,
-			 generic_file *data_loc,
-			 compressor *efsa_loc,
 			 bool lax,
 			 const label & lax_layer1_data_name,
 			 bool only_detruit) : mem_ui(dialog), out_compare("/")
@@ -130,9 +128,11 @@ namespace libdar
 	crc *read_crc = NULL;
 	contenu = NULL;
 
+	pdesc.check(false);
+
 	try
 	{
-	    ff.reset_crc(CAT_CRC_SIZE);
+	    pdesc.stack->reset_crc(CAT_CRC_SIZE);
 	    try
 	    {
 		if(reading_ver > 7)
@@ -140,7 +140,7 @@ namespace libdar
 			// we first need to read the ref_data_name
 		    try
 		    {
-			ref_data_name.read(ff);
+			ref_data_name.read(*pdesc.stack);
 		    }
 		    catch(Erange & e)
 		    {
@@ -160,14 +160,14 @@ namespace libdar
 		    }
 		}
 
-		ff.read((char *)&a, 1); // need to read the signature before constructing "contenu"
+		pdesc.stack->read((char *)&a, 1); // need to read the signature before constructing "contenu"
 		if(! extract_base_and_status(a, base, st) && !lax)
 		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 		if(base != 'd' && !lax)
 		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
 
 		stats.clear();
-		contenu = new (get_pool()) cat_directory(dialog, ff, reading_ver, st, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, NULL);
+		contenu = new (get_pool()) cat_directory(dialog, pdesc, reading_ver, st, stats, corres, default_algo, lax, only_detruit, false);
 		if(contenu == NULL)
 		    throw Ememory("catalogue::catalogue(path)");
 		if(only_detruit)
@@ -179,7 +179,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		calc_crc = ff.get_crc(); // keeping "f" in coherent status
+		calc_crc = pdesc.stack->get_crc(); // keeping "f" in coherent status
 		if(calc_crc != NULL)
 		{
 		    delete calc_crc;
@@ -187,7 +187,7 @@ namespace libdar
 		}
 		throw;
 	    }
-	    calc_crc = ff.get_crc(); // keeping "f" incoherent status in any case
+	    calc_crc = pdesc.stack->get_crc(); // keeping "f" incoherent status in any case
 	    if(calc_crc == NULL)
 		throw SRC_BUG;
 
@@ -197,7 +197,7 @@ namespace libdar
 
 		try
 		{
-		    read_crc = create_crc_from_file(ff, get_pool());
+		    read_crc = create_crc_from_file(*pdesc.stack, get_pool());
 		}
 		catch(Egeneric & e)
 		{
@@ -1534,27 +1534,39 @@ namespace libdar
 	d->set_all_mirage_s_inode_dumped_field_to(false);
     }
 
-    void catalogue::dump(generic_file & f) const
+    void catalogue::dump(const pile_descriptor & pdesc) const
     {
 	crc *tmp = NULL;
 
+	pdesc.check(false);
+	if(pdesc.compr->is_compression_suspended())
+	{
+	    pdesc.stack->sync_write_above(pdesc.compr);
+	    pdesc.compr->resume_compression();
+	}
+	else
+	{
+	    pdesc.stack->sync_write_above(pdesc.compr);
+	    pdesc.compr->sync_write(); // required to reset the compression engine and be able to uncompress from that position later on
+	}
+
 	try
 	{
-	    f.reset_crc(CAT_CRC_SIZE);
+	    pdesc.stack->reset_crc(CAT_CRC_SIZE);
 	    try
 	    {
-		ref_data_name.dump(f);
-		contenu->dump(f, false);
+		ref_data_name.dump(*pdesc.stack);
+		contenu->dump(pdesc, false);
 	    }
 	    catch(...)
 	    {
-		tmp = f.get_crc();
+		tmp = pdesc.stack->get_crc();
 		throw;
 	    }
-	    tmp = f.get_crc();
+	    tmp = pdesc.stack->get_crc();
 	    if(tmp == NULL)
 		throw SRC_BUG;
-	    tmp->dump(f);
+	    tmp->dump(*pdesc.stack);
 	}
 	catch(...)
 	{

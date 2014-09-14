@@ -33,11 +33,11 @@ using namespace std;
 namespace libdar
 {
 
-    void cat_ignored_dir::inherited_dump(generic_file & f, bool small) const
+    void cat_ignored_dir::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
 	cat_directory tmp = cat_directory(get_uid(), get_gid(), get_perm(), get_last_access(), get_last_modif(), get_last_change(), get_name(), 0);
 	tmp.set_saved_status(get_saved_status());
-	tmp.specific_dump(f, small); // dump an empty directory
+	tmp.specific_dump(pdesc, small); // dump an empty directory
     }
 
 } // end of namespace

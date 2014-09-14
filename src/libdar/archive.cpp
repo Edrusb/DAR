@@ -88,7 +88,7 @@ namespace libdar
 		infinint second_terminateur_offset = 0;
 		infinint ref_second_terminateur_offset = 0;
 		header_version ref_ver;
-		escape *esc = NULL;
+		pile_descriptor pdesc;
 		lax_read_mode = options.get_lax();
 		sequential_read = options.get_sequential_read(); // updating the archive object's field
 		where->set_location(chem);
@@ -123,8 +123,7 @@ namespace libdar
 					     slices,
 					     options.get_multi_threaded());
 
-		    stack.find_first_from_top(esc);
-			// esc may be NULL
+		    pdesc = pile_descriptor(&stack);
 
 		    if(options.is_external_catalogue_set())
 		    {
@@ -240,19 +239,13 @@ namespace libdar
 			    }
 			    else
 			    {
-				if(esc != NULL)
+				if(pdesc.esc != NULL)
 				{
-				    compressor *efsa_loc = dynamic_cast<compressor *>(stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED));
-				    generic_file *data_loc = stack.get_by_label(LIBDAR_STACK_LABEL_CLEAR);
-
-				    if(efsa_loc == NULL)
-					throw SRC_BUG;
-
-				    if(esc->skip_to_next_mark(escape::seqt_catalogue, false))
+				    if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, false))
 				    {
 					if(info_details)
 					    dialog.warning(gettext("No data found in that archive, sequentially reading the catalogue found at the end of the archive..."));
-					stack.flush_read_above(esc);
+					pdesc.stack->flush_read_above(pdesc.esc);
 
 					contextual *layer1 = NULL;
 					label lab = label_zero;
@@ -261,11 +254,9 @@ namespace libdar
 					    lab = layer1->get_data_name();
 
 					cat = new (pool) catalogue(dialog,
-								   stack,
+								   pdesc,
 								   ver.get_edition(),
 								   ver.get_compression_algo(),
-								   data_loc,
-								   efsa_loc,
 								   options.get_lax(),
 								   lab,
 								   false); // only detruit
@@ -276,11 +267,9 @@ namespace libdar
 					    dialog.warning(gettext("The catalogue will be filled while sequentially reading the archive, preparing the data structure..."));
 
 					cat = new (pool) escape_catalogue(dialog,
+									  pdesc,
 									  ver.get_edition(),
 									  ver.get_compression_algo(),
-									  data_loc,
-									  efsa_loc,
-									  &stack,
 									  options.get_lax());
 				    }
 				    if(cat == NULL)
@@ -1982,6 +1971,7 @@ namespace libdar
 
 		    // ********** building the catalogue (empty for now) ************************* //
 		datetime root_mtime;
+		pile_descriptor pdesc(&stack);
 
 		if(info_details)
 		    dialog.warning(gettext("Building the catalog object..."));
@@ -2004,12 +1994,12 @@ namespace libdar
 
 		if(op == oper_merge)
 		    if(add_marks_for_sequential_reading && !empty)
-			cat = new (pool) escape_catalogue(dialog, ref_cat1->get_root_dir_last_modif(), internal_name, &stack);
+			cat = new (pool) escape_catalogue(dialog, pdesc, ref_cat1->get_root_dir_last_modif(), internal_name);
 		    else
 			cat = new (pool) catalogue(dialog, ref_cat1->get_root_dir_last_modif(), internal_name);
 		else // op == oper_create
 		    if(add_marks_for_sequential_reading && !empty)
-			cat = new (pool) escape_catalogue(dialog, root_mtime, internal_name, &stack);
+			cat = new (pool) escape_catalogue(dialog, pdesc, root_mtime, internal_name);
 		    else
 			cat = new (pool) catalogue(dialog, root_mtime, internal_name);
 
@@ -2048,7 +2038,7 @@ namespace libdar
 					      pool,
 					      selection,
 					      subtree,
-					      stack,
+					      pdesc,
 					      *cat,
 					      *ref_cat_ptr,
 					      fs_root,
@@ -2104,7 +2094,7 @@ namespace libdar
 				     pool,
 				     selection,
 				     subtree,
-				     stack,
+				     pdesc,
 				     *cat,
 				     ref_cat1,
 				     ref_cat2,

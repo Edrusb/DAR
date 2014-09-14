@@ -38,7 +38,9 @@ using namespace std;
 namespace libdar
 {
 
-    cat_file::cat_file(const infinint & xuid, const infinint & xgid, U_16 xperm,
+    cat_file::cat_file(const infinint & xuid,
+		       const infinint & xgid,
+		       U_16 xperm,
 		       const datetime & last_access,
 		       const datetime & last_modif,
 		       const datetime & last_change,
@@ -54,7 +56,6 @@ namespace libdar
         offset = NULL;
         size = NULL;
         storage_size = NULL;
-        loc = NULL; // field not used for backup
         algo_read = none; // field not used for backup
         algo_write = none; // may be set later by change_compression_algo_write()
         furtive_read_mode = x_furtive_read_mode;
@@ -93,13 +94,11 @@ namespace libdar
     }
 
     cat_file::cat_file(user_interaction & dialog,
-		       generic_file & f,
+		       const pile_descriptor & pdesc,
 		       const archive_version & reading_ver,
 		       saved_status saved,
 		       compression default_algo,
-		       generic_file *data_loc,
-		       compressor *efsa_loc,
-		       escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+		       bool small) : cat_inode(dialog, pdesc, reading_ver, saved, small)
     {
         chemin = "";
         status = from_cat;
@@ -112,38 +111,45 @@ namespace libdar
         furtive_read_mode = false; // no used in that "status" mode
         file_data_status_read = 0;
         file_data_status_write = 0; // may be changed later using set_sparse_file_detection_write()
-        loc = data_loc;
         dirty = false;
+	generic_file *ptr = NULL;
+
+	pdesc.check(small);
+	if(small)
+	    ptr = pdesc.esc;
+	else
+	    ptr = pdesc.stack;
+
         try
         {
-            size = new (get_pool()) infinint(f);
+            size = new (get_pool()) infinint(*ptr);
             if(size == NULL)
                 throw Ememory("cat_file::cat_file(generic_file)");
 
-            if(ptr == NULL) // inode not partially dumped
+            if(!small) // inode not partially dumped
             {
                 if(saved == s_saved)
                 {
-                    offset = new (get_pool()) infinint(f);
+                    offset = new (get_pool()) infinint(*ptr);
                     if(offset == NULL)
                         throw Ememory("cat_file::cat_file(generic_file)");
                     if(reading_ver > 1)
                     {
-                        storage_size = new (get_pool()) infinint(f);
+                        storage_size = new (get_pool()) infinint(*ptr);
                         if(storage_size == NULL)
                             throw Ememory("cat_file::cat_file(generic_file)");
                         if(reading_ver > 7)
                         {
                             char tmp;
 
-                            f.read(&file_data_status_read, sizeof(file_data_status_read));
+                            ptr->read(&file_data_status_read, sizeof(file_data_status_read));
                             if((file_data_status_read & FILE_DATA_IS_DIRTY) != 0)
                             {
                                 dirty = true;
                                 file_data_status_read &= ~FILE_DATA_IS_DIRTY; // removing the flag DIRTY flag
                             }
                             file_data_status_write = file_data_status_read;
-                            f.read(&tmp, sizeof(tmp));
+                            ptr->read(&tmp, sizeof(tmp));
                             algo_read = char2compression(tmp);
 			    algo_write= algo_read;
                         }
@@ -160,7 +166,7 @@ namespace libdar
 				algo_write = algo_read;
 			    }
                     }
-                    else // version is "01"
+                    else // archive format version is "1"
                     {
                         storage_size = new (get_pool()) infinint(*size);
                         if(storage_size == NULL)
@@ -174,7 +180,7 @@ namespace libdar
 
                     if(reading_ver >= 8)
                     {
-			check = create_crc_from_file(f, get_pool());
+			check = create_crc_from_file(*ptr, get_pool());
                         if(check == NULL)
                             throw Ememory("cat_file::cat_file");
                     }
@@ -195,15 +201,15 @@ namespace libdar
                             // fixed length CRC inversion from archive format "02" to "07"
                             // present in any case, even when data is not saved
                             // for archive version >= 8, the crc is only present
-                            // if the archive does contain file data
+                            // if the archive contains file data
 
-                        check = create_crc_from_file(f, get_pool(), true);
+                        check = create_crc_from_file(*ptr, get_pool(), true);
                         if(check == NULL)
                             throw Ememory("cat_file::cat_file");
                     }
                         // archive version >= 8, crc only present if  saved == s_saved (seen above)
                 }
-                else // no CRC in version "01"
+                else // no CRC in version "1"
                     check = NULL;
             }
             else // partial dump has been done
@@ -212,9 +218,9 @@ namespace libdar
                 {
                     char tmp;
 
-                    f.read(&file_data_status_read, sizeof(file_data_status_read));
+                    ptr->read(&file_data_status_read, sizeof(file_data_status_read));
                     file_data_status_write = file_data_status_read;
-                    f.read(&tmp, sizeof(tmp));
+                    ptr->read(&tmp, sizeof(tmp));
                     algo_read = char2compression(tmp);
 		    algo_write = algo_read;
                 }
@@ -242,12 +248,16 @@ namespace libdar
         }
     }
 
-    void cat_file::post_constructor(generic_file & f)
+    void cat_file::post_constructor(const pile_descriptor & pdesc)
     {
+	cat_inode::post_constructor(pdesc);
+
+	pdesc.check(true);
+
         if(offset == NULL)
             throw SRC_BUG;
         else
-            *offset = f.get_position(); // data follows right after the inode+file information+CRC
+	    *offset = pdesc.stack->get_position(); // data follows right after the inode+file information+CRC
     }
 
     cat_file::cat_file(const cat_file & ref) : cat_inode(ref)
@@ -259,7 +269,6 @@ namespace libdar
         storage_size = NULL;
         check = NULL;
         dirty = ref.dirty;
-        loc = ref.loc;
         algo_read = ref.algo_read;
         algo_write = ref.algo_write;
         furtive_read_mode = ref.furtive_read_mode;
@@ -268,7 +277,7 @@ namespace libdar
 
         try
         {
-            if(ref.check != NULL || (get_escape_layer() != NULL && ref.get_saved_status() == s_saved))
+            if(ref.check != NULL || (ref.get_escape_layer() != NULL && ref.get_saved_status() == s_saved))
             {
 		if(ref.check == NULL)
 		{
@@ -320,10 +329,19 @@ namespace libdar
         }
     }
 
-    void cat_file::inherited_dump(generic_file & f, bool small) const
+    void cat_file::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
-        cat_inode::inherited_dump(f, small);
-        size->dump(f);
+	generic_file *ptr = NULL;
+
+	pdesc.check(small);
+	if(small)
+	    ptr = pdesc.esc;
+	else
+	    ptr = pdesc.stack;
+
+        cat_inode::inherited_dump(pdesc, small);
+
+        size->dump(*ptr);
         if(!small)
         {
             if(get_saved_status() == s_saved)
@@ -331,18 +349,18 @@ namespace libdar
                 char tmp = compression2char(algo_write);
                 char flags = file_data_status_write;
 
-                offset->dump(f);
-                storage_size->dump(f);
+                offset->dump(*ptr);
+                storage_size->dump(*ptr);
                 if(dirty)
                     flags |= FILE_DATA_IS_DIRTY;
-                (void)f.write(&flags, sizeof(flags));
-                (void)f.write(&tmp, sizeof(tmp));
+                ptr->write(&flags, sizeof(flags));
+                ptr->write(&tmp, sizeof(tmp));
 
                     // since archive version 8, crc is only present for saved inode
                 if(check == NULL)
                     throw SRC_BUG; // no CRC to dump!
                 else
-                    check->dump(f);
+                    check->dump(*ptr);
             }
         }
         else // we only know whether the file will be compressed or using sparse_file data structure
@@ -351,8 +369,8 @@ namespace libdar
             {
                 char tmp = compression2char(algo_write);
 
-                (void)f.write(&file_data_status_write, sizeof(file_data_status_write));
-                (void)f.write(&tmp, sizeof(tmp));
+                (void)ptr->write(&file_data_status_write, sizeof(file_data_status_write));
+                (void)ptr->write(&tmp, sizeof(tmp));
             }
         }
     }
@@ -389,57 +407,47 @@ namespace libdar
 		    tmp->fadvise(fichier_global::advise_dontneed);
 	    }
 	    else // inode from archive
-		if(loc == NULL)
+		if(get_pile() == NULL)
 		    throw SRC_BUG; // set_archive_localisation never called or with a bad argument
 		else
-		    if(loc->get_mode() == gf_write_only)
+		    if(get_pile()->get_mode() == gf_write_only)
 			throw SRC_BUG; // cannot get data from a write-only file !!!
 		    else
 		    {
+			    // we will return a small stack of generic_file over the catalogue stack
 			pile *data = new (get_pool()) pile();
 			if(data == NULL)
 			    throw Ememory("cat_file::get_data");
 
 			try
 			{
-			    generic_file *tmp;
-
-			    if(get_escape_layer() == NULL)
-				tmp = new (get_pool()) tronc(loc, *offset, *storage_size, gf_read_only);
-			    else
-				tmp = new (get_pool()) tronc(get_escape_layer(), *offset, gf_read_only);
-			    if(tmp == NULL)
-				throw Ememory("cat_file::get_data");
-			    try
-			    {
-				data->push(tmp);
-			    }
-			    catch(...)
-			    {
-				delete tmp;
-				throw;
-			    }
-			    data->skip(0); // set the reading cursor at the beginning
-
 			    if(*size > 0 && get_compression_algo_read() != none && mode != keep_compressed)
 			    {
-				tmp = new (get_pool()) compressor(get_compression_algo_read(), *data->top());
-				if(tmp == NULL)
-				    throw Ememory("cat_file::get_data");
-				try
+				if(get_compression_algo_read() != none)
 				{
-				    data->push(tmp);
+				    if(get_compression_algo_read() != get_compressor_layer()->get_algo())
+				    {
+					get_pile()->flush_read_above(get_compressor_layer());
+					get_compressor_layer()->resume_compression();
+					if(get_compression_algo_read() != get_compressor_layer()->get_algo())
+					    throw SRC_BUG;
+				    }
+					// else nothing to do, compressor is already properly configured
 				}
-				catch(...)
+				else
 				{
-				    delete tmp;
-				    throw;
+				    if(get_compression_algo_read() != get_compressor_layer()->get_algo())
+				    {
+					get_pile()->flush_read_above(get_compressor_layer());
+					get_compressor_layer()->suspend_compression();
+				    }
+					// else nothing to do, compressor is already set with correct compression
 				}
 			    }
 
 			    if(get_sparse_file_detection_read() && mode != keep_compressed && mode != keep_hole)
 			    {
-				sparse_file *stmp = new (get_pool()) sparse_file(data->top());
+				sparse_file *stmp = new (get_pool()) sparse_file(get_pile());
 				if(stmp == NULL)
 				    throw Ememory("cat_file::get_data");
 				try
@@ -466,6 +474,21 @@ namespace libdar
 				    throw SRC_BUG;
 				}
 			    }
+
+			    generic_file *parent = data->is_empty() ? get_pile() : data->top();
+			    generic_file *tmp = new (get_pool()) tronc(parent, *offset, *size, gf_read_only);
+			    if(tmp == NULL)
+				throw Ememory("cat_file::get_data");
+			    try
+			    {
+				data->push(tmp);
+			    }
+			    catch(...)
+			    {
+				delete tmp;
+				throw;
+			    }
+			    data->skip(0); // set the reading cursor at the beginning
 
 			    ret = data;
 			}
@@ -557,6 +580,7 @@ namespace libdar
 		{
 		    try
 		    {
+			get_pile()->flush_read_above(get_escape_layer());
 			if(get_escape_layer()->skip_to_next_mark(escape::seqt_file_crc, false))
 			{
 			    crc *tmp = NULL;

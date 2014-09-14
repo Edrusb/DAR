@@ -45,24 +45,27 @@ namespace libdar
     {
     public:
         cat_nomme(const std::string & name) { xname = name; };
-        cat_nomme(generic_file & f);
+        cat_nomme(const pile_descriptor & pdesc, bool small);
 	virtual bool operator == (const cat_nomme & ref) const { return xname == ref.xname; };
 	virtual bool operator < (const cat_nomme & ref) const { return xname < ref.xname; };
 
         const std::string & get_name() const { return xname; };
         void change_name(const std::string & x) { xname = x; };
+
+	    /// compares two objects
+	    ///
+            /// \note no need to have a virtual method, as signature will differ in inherited classes (argument type changes)
         bool same_as(const cat_nomme & ref) const { return xname == ref.xname; };
-            // no need to have a virtual method, as signature will differ in inherited classes (argument type changes)
 
             // signature() is kept as an abstract method
-            // clone() is abstract
-
+            // clone() is also ketp abstract
 
     protected:
-        void inherited_dump(generic_file & f, bool small) const;
+        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
 
     private:
         std::string xname;
+
     };
 
 

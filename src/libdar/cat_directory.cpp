@@ -82,17 +82,15 @@ namespace libdar
 
 
     cat_directory::cat_directory(user_interaction & dialog,
-				 generic_file & f,
+				 const pile_descriptor & pdesc,
 				 const archive_version & reading_ver,
 				 saved_status saved,
 				 entree_stats & stats,
 				 std::map <infinint, cat_etoile *> & corres,
 				 compression default_algo,
-				 generic_file *data_loc,
-				 compressor *efsa_loc,
 				 bool lax,
 				 bool only_detruit,
-				 escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+				 bool small) : cat_inode(dialog, pdesc, reading_ver, saved, small)
     {
 	cat_entree *p;
 	cat_nomme *t;
@@ -116,7 +114,7 @@ namespace libdar
 	    {
 		try
 		{
-		    p = cat_entree::read(dialog, get_pool(), f, reading_ver, stats, corres, default_algo, data_loc, efsa_loc, lax, only_detruit, ptr);
+		    p = cat_entree::read(dialog, get_pool(), pdesc, reading_ver, stats, corres, default_algo, lax, only_detruit, small);
 		}
 		catch(Euser_abort & e)
 		{
@@ -199,11 +197,11 @@ namespace libdar
 	clear();
     }
 
-    void cat_directory::inherited_dump(generic_file & f, bool small) const
+    void cat_directory::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
 	list<cat_nomme *>::const_iterator x = ordered_fils.begin();
-	cat_inode::inherited_dump(f, small);
 
+	cat_inode::inherited_dump(pdesc, small);
 	if(!small)
 	{
 	    while(x != ordered_fils.end())
@@ -214,7 +212,7 @@ namespace libdar
 		    ++x; // "cat_ignored" need not to be saved, they are only useful when updating_destroyed
 		else
 		{
-		    (*x)->specific_dump(f, small);
+		    (*x)->specific_dump(pdesc, small);
 		    ++x;
 		}
 	    }
@@ -223,7 +221,7 @@ namespace libdar
 	    // an inode may have children while small dump is asked
 	    // when performing a merging operation
 
-	fin.specific_dump(f, small); // end of "this" cat_directory
+	fin.specific_dump(pdesc, small); // end of "this" cat_directory
 	    // fin is a static constant variable of class cat_directory,
 	    // this hack avoids recurrent construction/destruction of a cat_eod object.
     }
@@ -483,6 +481,21 @@ namespace libdar
 	    }
 
 	    ++it;
+	}
+    }
+
+    void cat_directory::change_location(const pile_descriptor & pdesc, bool small)
+    {
+	list<cat_nomme *>::iterator tmp_it = ordered_fils.begin();
+
+	cat_nomme::change_location(pdesc, small);
+	while(tmp_it != ordered_fils.end())
+	{
+	    if(*tmp_it == NULL)
+		throw SRC_BUG;
+
+	    (*tmp_it)->change_location(pdesc, small);
+	    ++tmp_it;
 	}
     }
 

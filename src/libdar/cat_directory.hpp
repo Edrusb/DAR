@@ -61,17 +61,15 @@ namespace libdar
         cat_directory(const cat_directory &ref); // only the inode part is build, no children is duplicated (empty dir)
 	const cat_directory & operator = (const cat_directory & ref); // set the inode part *only* no subdirectories/subfiles are copies or removed.
         cat_directory(user_interaction & dialog,
-		      generic_file & f,
+		      const pile_descriptor & pdesc,
 		      const archive_version & reading_ver,
 		      saved_status saved,
 		      entree_stats & stats,
 		      std::map <infinint, cat_etoile *> & corres,
 		      compression default_algo,
-		      generic_file *data_loc,
-		      compressor *efsa_loc,
 		      bool lax,
 		      bool only_detruit, // objects of other class than detruit and cat_directory are not built in memory
-		      escape *ptr);
+		      bool small);
         ~cat_directory(); // detruit aussi tous les fils et se supprime de son 'parent'
 
         void add_children(cat_nomme *r); // when r is a cat_directory, 'parent' is set to 'this'
@@ -129,8 +127,11 @@ namespace libdar
 
 	void recursively_set_to_unsaved_data_and_FSA();
 
+	    /// overwrite virtual method of cat_entree to propagate the action to all entries of the directory tree
+	void change_location(const pile_descriptor & pdesc, bool small);
+
     protected:
-        void inherited_dump(generic_file & f, bool small) const;
+        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
 
     private:
 	static const cat_eod fin;

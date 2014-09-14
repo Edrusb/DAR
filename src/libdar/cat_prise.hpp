@@ -50,18 +50,24 @@ namespace libdar
 		  const datetime & last_modif,
 		  const datetime & last_change,
 		  const std::string & xname,
-		  const infinint & fs_device) : cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device) { set_saved_status(s_saved); };
-        cat_prise(user_interaction & dialog,
-		  generic_file & f,
+		  const infinint & fs_device):
+	    cat_inode(xuid, xgid, xperm, last_access, last_modif, last_change, xname, fs_device)
+	{ set_saved_status(s_saved); };
+
+	cat_prise(user_interaction & dialog,
+		  const pile_descriptor & pdesc,
 		  const archive_version & reading_ver,
 		  saved_status saved,
-		  compressor *efsa_loc,
-		  escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr) {};
+		  bool small): cat_inode(dialog, pdesc, reading_ver, saved, small) {};
 
             // using dump from cat_inode class
             // using method is_more_recent_than() from cat_inode class
             // using method has_changed_since() from cat_inode class
+
+	    /// inherited from cat_entree
         unsigned char signature() const { return mk_signature('s', get_saved_status()); };
+
+	    /// inherited from cat_entree
         cat_entree *clone() const { return new (get_pool()) cat_prise(*this); };
     };
 

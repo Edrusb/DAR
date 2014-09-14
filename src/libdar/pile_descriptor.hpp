@@ -19,12 +19,12 @@
 // to contact the author : http://dar.linux.free.fr/email.html
 /*********************************************************************/
 
-    /// \file cat_door.hpp
-    /// \brief class used in a catalogue to store solaris door filesystem entries
+    /// \file pile_descriptor.hpp
+    /// \brief optimization structure to quickly access some commonly used layers of a stack of generic_file
     /// \ingroup Private
 
-#ifndef CAT_DOOR_HPP
-#define CAT_DOOR_HPP
+#ifndef CAT_PILE_DESCRIPTOR_HPP
+#define CAT_PILE_DESCRIPTOR_HPP
 
 #include "../my_config.h"
 
@@ -32,7 +32,9 @@ extern "C"
 {
 } // end extern "C"
 
-#include "cat_file.hpp"
+#include "pile.hpp"
+#include "escape.hpp"
+#include "compressor.hpp"
 
 namespace libdar
 {
@@ -40,37 +42,17 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-
-	/// the class for Door IPC (mainly for Solaris)
-    class cat_door : public cat_file
+    struct pile_descriptor
     {
-    public:
-        cat_door(const infinint & xuid,
-		 const infinint & xgid,
-		 U_16 xperm,
-		 const datetime & last_access,
-		 const datetime & last_modif,
-		 const datetime & last_change,
-		 const std::string & src,
-		 const path & che,
-		 const infinint & fs_device) : cat_file(xuid, xgid, xperm, last_access, last_modif,
-							last_change, src, che, 0, fs_device, false) {};
-        cat_door(user_interaction & dialog,
-		 const pile_descriptor & pdesc,
-		 const archive_version & reading_ver,
-		 saved_status saved,
-		 compression default_algo,
-		 bool small) : cat_file(dialog, pdesc, reading_ver, saved, default_algo, small) {};
-
-        unsigned char signature() const { return mk_signature('o', get_saved_status()); };
-
-        generic_file *get_data(get_data_mode mode) const; // inherited from class cat_file
-
+	pile *stack;       //< the stack to read from or write to (should never be equal to NULL)
+	escape *esc;       //< an escape layer in stack (may be NULL)
+	compressor *compr; //< a compressor layer in stack (should never be equal to NULL)
+	pile_descriptor() { stack = NULL; esc = NULL; compr = NULL; };
+	pile_descriptor(pile *ptr);
+	void check(bool small) const; //< check structure coherence with expected read/write mode (small or normal)
     };
-
 	/// @}
 
 } // end of namespace
 
 #endif
-

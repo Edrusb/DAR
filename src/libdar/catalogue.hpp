@@ -66,11 +66,9 @@ namespace libdar
 		  const datetime & root_last_modif,
 		  const label & data_name);
         catalogue(user_interaction & dialog,
-		  generic_file & f,
+		  const pile_descriptor & pdesc,
 		  const archive_version & reading_ver,
 		  compression default_algo,
-		  generic_file *data_loc,
-		  compressor *efsa_loc,
 		  bool lax,
 		  const label & lax_layer1_data_name, //< ignored unless in lax mode, in lax mode unless it is a cleared label, forces the catalogue label to be equal to the lax_layer1_data_name for it be considered a plain internal catalogue, even in case of corruption
 		  bool only_detruit = false); //< if set to true, only directories and detruit objects are read from the archive
@@ -171,7 +169,7 @@ namespace libdar
 	void reset_dump() const;
 
 	    /// write down the whole catalogue to file
-        void dump(generic_file & f) const;
+        void dump(const pile_descriptor & pdesc) const;
 
         void listing(bool isolated,
 		     const mask &selection,
@@ -216,6 +214,8 @@ namespace libdar
 
 	void set_to_unsaved_data_and_FSA() { if(contenu == NULL) throw SRC_BUG; contenu->recursively_set_to_unsaved_data_and_FSA(); };
 
+	    /// change location where to find EA, FSA and DATA for all the objects of the catalogue
+	void change_location(const pile_descriptor & pdesc, bool small) { contenu->change_location(pdesc, false); };
 
     protected:
 	entree_stats & access_stats() { return stats; };

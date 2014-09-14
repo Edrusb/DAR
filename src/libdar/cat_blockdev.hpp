@@ -55,11 +55,10 @@ namespace libdar
 							      last_modif, last_change, name,
 							      major, minor, fs_device) {};
         cat_blockdev(user_interaction & dialog,
-		     generic_file & f,
+		     const pile_descriptor & pdesc,
 		     const archive_version & reading_ver,
 		     saved_status saved,
-		     compressor *efsa_loc,
-		     escape *ptr) : cat_device(dialog, f, reading_ver, saved, efsa_loc, ptr) {};
+		     bool small) : cat_device(dialog, pdesc, reading_ver, saved, small) {};
 
             // using dump from cat_device class
             // using method is_more_recent_than() from cat_device class

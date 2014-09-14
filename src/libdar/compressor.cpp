@@ -286,6 +286,33 @@ namespace libdar
 		delete compressed;
     }
 
+    void compressor::suspend_compression()
+    {
+	if(!suspended)
+	{
+	    if(get_mode() != gf_read_only)
+		sync_write();
+	    if(get_mode() != gf_write_only)
+		flush_read();
+	    suspended_compr = current_algo;
+	    change_algo(none);
+	    suspended = true;
+	}
+    }
+
+    void compressor::resume_compression()
+    {
+	if(suspended)
+	{
+	    if(get_mode() != gf_read_only)
+		sync_write();
+	    if(get_mode() != gf_write_only)
+		flush_read();
+	    change_algo(suspended_compr);
+	    suspended = false;
+	}
+    }
+
     void compressor::local_terminate()
     {
         if(compr != NULL)

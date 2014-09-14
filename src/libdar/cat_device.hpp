@@ -54,11 +54,10 @@ namespace libdar
 		   U_16 minor,
 		   const infinint & fs_device);
         cat_device(user_interaction & dialog,
-		   generic_file & f,
+		   const pile_descriptor & pdesc,
 		   const archive_version & reading_ver,
 		   saved_status saved,
-		   compressor *efsa_loc,
-		   escape *ptr);
+		   bool small);
 
         int get_major() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xmajor; };
         int get_minor() const { if(get_saved_status() != s_saved) throw SRC_BUG; else return xminor; };
@@ -71,7 +70,7 @@ namespace libdar
 
     protected :
         void sub_compare(const cat_inode & other, bool isolated_mode) const;
-        void inherited_dump(generic_file & f, bool small) const;
+        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
 
     private :
         U_16 xmajor, xminor;

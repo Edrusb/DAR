@@ -74,7 +74,9 @@ namespace libdar
 
     const ea_attributs cat_inode::empty_ea;
 
-    cat_inode::cat_inode(const infinint & xuid, const infinint & xgid, U_16 xperm,
+    cat_inode::cat_inode(const infinint & xuid,
+			 const infinint & xgid,
+			 U_16 xperm,
 			 const datetime & last_access,
 			 const datetime & last_modif,
 			 const datetime & last_change,
@@ -107,26 +109,30 @@ namespace libdar
     }
 
     cat_inode::cat_inode(user_interaction & dialog,
-			 generic_file & f,
+			 const pile_descriptor & pdesc,
 			 const archive_version & reading_ver,
 			 saved_status saved,
-			 compressor *efsa_loc,
-			 escape *ptr) : cat_nomme(f)
+			 bool small) : cat_nomme(pdesc, small)
     {
         U_16 tmp;
         unsigned char flag;
+	generic_file *ptr = NULL;
+
+	pdesc.check(small);
+	if(small)
+	    ptr = pdesc.esc;
+	else
+	    ptr = pdesc.stack;
 
 	nullifyptr();
-
 	try
 	{
 	    xsaved = saved;
 	    edit = reading_ver;
-	    esc = ptr;
 
 	    if(reading_ver > 1)
 	    {
-		f.read((char *)(&flag), 1);
+		ptr->read((char *)(&flag), 1);
 		unsigned char ea_flag = flag & INODE_FLAG_EA_MASK;
 		switch(ea_flag)
 		{
@@ -156,35 +162,35 @@ namespace libdar
 	    {
 		    // UID and GID were stored on 16 bits each
 
-		if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
+		if(ptr->read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
 		    throw Erange("cat_inode::cat_inode", gettext("missing data to build an inode"));
 		uid = ntohs(tmp);
-		if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
+		if(ptr->read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
 		    throw Erange("cat_inode::cat_inode", gettext("missing data to build an inode"));
 		gid = ntohs(tmp);
 	    }
 	    else // archive format >= "08"
 	    {
-		uid = infinint(f);
-		gid = infinint(f);
+		uid = infinint(*ptr);
+		gid = infinint(*ptr);
 	    }
 
-	    if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
+	    if(ptr->read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
 		throw Erange("cat_inode::cat_inode", gettext("missing data to build an inode"));
 	    perm = ntohs(tmp);
 
-	    last_acc.read(f, reading_ver);
-	    last_mod.read(f, reading_ver);
+	    last_acc.read(*ptr, reading_ver);
+	    last_mod.read(*ptr, reading_ver);
 
 	    if(reading_ver >= 8)
 	    {
-		last_cha = new (get_pool()) datetime(f, reading_ver);
+		last_cha = new (get_pool()) datetime(*ptr, reading_ver);
 		if(last_cha == NULL)
 		    throw Ememory("cat_inode::cat_inode(file)");
 
 		if(ea_saved == ea_full)
 		{
-		    ea_size = new (get_pool()) infinint(f);
+		    ea_size = new (get_pool()) infinint(*ptr);
 		    if(ea_size == NULL)
 			throw Ememory("cat_inode::cat_inode(file)");
 		}
@@ -194,28 +200,28 @@ namespace libdar
 		    // ea_size stays NULL meaning EA size unknown (old format)
 	    }
 
-	    if(esc == NULL) // reading a full entry from catalogue
+	    if(!small) // reading a full entry from catalogue
 	    {
 		switch(ea_saved)
 		{
 		case ea_full:
-		    ea_offset = new (get_pool()) infinint(f);
+		    ea_offset = new (get_pool()) infinint(*ptr);
 		    if(ea_offset == NULL)
 			throw Ememory("cat_inode::cat_inode(file)");
 
 		    if(reading_ver <= 7)
 		    {
-			ea_crc = create_crc_from_file(f, get_pool(), true);
+			ea_crc = create_crc_from_file(*ptr, get_pool(), true);
 			if(ea_crc == NULL)
 			    throw SRC_BUG;
 
-			last_cha = new (get_pool()) datetime(f, reading_ver);
+			last_cha = new (get_pool()) datetime(*ptr, reading_ver);
 			if(last_cha == NULL)
 			    throw Ememory("cat_inode::cat_inode(file)");
 		    }
 		    else // archive format >= 8
 		    {
-			ea_crc = create_crc_from_file(f, get_pool(), false);
+			ea_crc = create_crc_from_file(*ptr, get_pool(), false);
 			if(ea_crc == NULL)
 			    throw SRC_BUG;
 		    }
@@ -224,7 +230,7 @@ namespace libdar
 		case ea_fake:
 		    if(reading_ver <= 7)
 		    {
-			last_cha = new (get_pool()) datetime(f, reading_ver);
+			last_cha = new (get_pool()) datetime(*ptr, reading_ver);
 			if(last_cha == NULL)
 			    throw Ememory("cat_inode::cat_inode(file)");
 		    }
@@ -252,11 +258,6 @@ namespace libdar
 	    }
 	    ea = NULL; // in any case
 
-		// to be able later to read EA and FSA from archive file
-	    if(efsa_loc == NULL)
-		throw SRC_BUG;
-	    storage = efsa_loc;
-
 	    if(reading_ver >= 9)
 	    {
 		unsigned char fsa_flag = flag & INODE_FLAG_FSA_MASK;
@@ -278,25 +279,25 @@ namespace libdar
 
 		if(fsa_saved != fsa_none)
 		{
-		    fsa_families = new (get_pool()) infinint(f);
+		    fsa_families = new (get_pool()) infinint(*ptr);
 		    if(fsa_families == NULL)
 			throw Ememory("cat_inode::cat_inode(file)");
 		}
 
 		if(fsa_saved == fsa_full)
 		{
-		    fsa_size = new (get_pool()) infinint(f);
+		    fsa_size = new (get_pool()) infinint(*ptr);
 		    if(fsa_size == NULL)
 			throw Ememory("cat_inode::cat_inode(file)");
 		}
 
-		if(esc == NULL)
+		if(!small)
 		{
 		    switch(fsa_saved)
 		    {
 		    case fsa_full:
-			fsa_offset = new (get_pool()) infinint(f);
-			fsa_crc = create_crc_from_file(f, get_pool());
+			fsa_offset = new (get_pool()) infinint(*ptr);
+			fsa_crc = create_crc_from_file(*ptr, get_pool());
 			if(fsa_offset == NULL || fsa_crc == NULL)
 			    throw Ememory("cat_inode::cat_inode(file)");
 			break;
@@ -506,10 +507,19 @@ namespace libdar
 	}
     }
 
-    void cat_inode::inherited_dump(generic_file & r, bool small) const
+    void cat_inode::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
         U_16 tmp;
         unsigned char flag = 0;
+	generic_file *ptr = NULL;
+
+	pdesc.check(small);
+	if(small)
+	    ptr = pdesc.esc;
+	else
+	    ptr = pdesc.stack;
+
+	    // setting up the flag field
 
         switch(ea_saved)
         {
@@ -547,25 +557,27 @@ namespace libdar
 	    throw SRC_BUG; // unknown value for fsa_saved
 	}
 
-        cat_nomme::inherited_dump(r, small);
+	    // saving parent class data
 
-	    // unix inode part
+        cat_nomme::inherited_dump(pdesc, small);
 
-        r.write((char *)(&flag), 1);
-        uid.dump(r);
-        gid.dump(r);
+	    // saving unix inode specific part
+
+        ptr->write((char *)(&flag), 1);
+        uid.dump(*ptr);
+        gid.dump(*ptr);
         tmp = htons(perm);
-        r.write((char *)&tmp, sizeof(tmp));
-        last_acc.dump(r);
-        last_mod.dump(r);
+        ptr->write((char *)&tmp, sizeof(tmp));
+        last_acc.dump(*ptr);
+        last_mod.dump(*ptr);
         if(last_cha == NULL)
             throw SRC_BUG;
-        last_cha->dump(r);
+        last_cha->dump(*ptr);
 
 	    // EA part
 
         if(ea_saved == ea_full)
-            ea_get_size().dump(r);
+            ea_get_size().dump(*ptr);
 
         if(!small)
         {
@@ -574,10 +586,10 @@ namespace libdar
             case ea_full:
 		if(ea_offset == NULL)
 		    throw SRC_BUG;
-                ea_offset->dump(r);
+                ea_offset->dump(*ptr);
                 if(ea_crc == NULL)
                     throw SRC_BUG;
-                ea_crc->dump(r);
+                ea_crc->dump(*ptr);
                 break;
             case ea_partial:
             case ea_fake:
@@ -595,13 +607,13 @@ namespace libdar
 	{
 	    if(fsa_families == NULL)
 		throw SRC_BUG;
-	    fsa_families->dump(r);
+	    fsa_families->dump(*ptr);
 	}
 	if(fsa_saved == fsa_full)
 	{
 	    if(fsa_size == NULL)
 		throw SRC_BUG;
-	    fsa_size->dump(r);
+	    fsa_size->dump(*ptr);
 	}
 
 	if(!small)
@@ -611,10 +623,10 @@ namespace libdar
 	    case fsa_full:
 		if(fsa_offset == NULL)
 		    throw SRC_BUG;
-		fsa_offset->dump(r);
+		fsa_offset->dump(*ptr);
 		if(fsa_crc == NULL)
 		    throw SRC_BUG;
-		fsa_crc->dump(r);
+		fsa_crc->dump(*ptr);
 		break;
 	    case fsa_partial:
 	    case fsa_none:
@@ -687,33 +699,41 @@ namespace libdar
             if(ea != NULL)
                 return ea;
             else
-                if(storage != NULL) // reading from archive
+                if(get_pile() != NULL) // reading from archive
                 {
 		    crc *val = NULL;
 		    const crc *my_crc = NULL;
 
 		    try
 		    {
-			if(esc == NULL) // direct read mode
+			if(get_escape_layer() == NULL) // direct read mode
 			{
 			    if(ea_offset == NULL)
 				throw SRC_BUG;
-			    storage->skip(*ea_offset);
+			    get_pile()->flush_read_above(get_compressor_layer());
+			    get_compressor_layer()->resume_compression();
+			    get_pile()->skip(*ea_offset);
 			}
 			else // sequential read mode
 			{
-			    if(!esc->skip_to_next_mark(escape::seqt_ea, false))
+				// warning this section calls *esc directly while it may be managed by another thread
+				// we are reading from the stack the possible thread is not in read_ahead operation
+				// so it is pending for read request or other orders
+			    if(!get_escape_layer()->skip_to_next_mark(escape::seqt_ea, false))
 				throw Erange("cat_inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
-			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
-			    const_cast<cat_inode *>(this)->ea_set_offset(storage->get_position());
+				// we shall reset layers above esc for they do not assume nothing has changed below
+			    get_pile()->flush_read_above(get_escape_layer());
+				// now we can continue normally using get_pile()
+
+			    const_cast<cat_inode *>(this)->ea_set_offset(get_pile()->get_position());
 			}
 
 			if(ea_get_size() == 0)
-			    storage->reset_crc(crc::OLD_CRC_SIZE);
+			    get_pile()->reset_crc(crc::OLD_CRC_SIZE);
 			else
 			{
-			    storage->reset_crc(tools_file_size_to_crc_size(ea_get_size()));
-			    storage->read_ahead(ea_get_size());
+			    get_pile()->reset_crc(tools_file_size_to_crc_size(ea_get_size()));
+			    get_pile()->read_ahead(ea_get_size());
 			}
 
 			try
@@ -722,7 +742,7 @@ namespace libdar
 			    {
 				if(edit <= 1)
 				    throw SRC_BUG;   // EA do not exist in that archive format
-				const_cast<ea_attributs *&>(ea) = new (get_pool()) ea_attributs(*storage, edit);
+				const_cast<ea_attributs *&>(ea) = new (get_pool()) ea_attributs(*get_pile(), edit);
 				if(ea == NULL)
 				    throw Ememory("cat_inode::get_ea");
 			    }
@@ -745,10 +765,10 @@ namespace libdar
 			}
 			catch(...)
 			{
-			    val = storage->get_crc(); // keeps storage in coherent status
+			    val = get_pile()->get_crc(); // keeps storage in coherent status
 			    throw;
 			}
-			val = storage->get_crc();
+			val = get_pile()->get_crc();
 			if(val == NULL)
 			    throw SRC_BUG;
 
@@ -851,18 +871,18 @@ namespace libdar
 	if(ea_get_saved_status() != ea_full)
 	    throw SRC_BUG;
 
-        if(esc != NULL && ea_crc == NULL)
+        if(get_escape_layer() != NULL && ea_crc == NULL)
         {
-            if(esc->skip_to_next_mark(escape::seqt_ea_crc, false))
+            if(get_escape_layer()->skip_to_next_mark(escape::seqt_ea_crc, false))
             {
                 crc *tmp = NULL;
 
                 try
                 {
                     if(edit >= 8)
-                        tmp = create_crc_from_file(*esc, get_pool(), false);
+                        tmp = create_crc_from_file(*get_escape_layer(), get_pool(), false);
                     else // archive format <= 7
-                        tmp = create_crc_from_file(*esc, get_pool(), true);
+                        tmp = create_crc_from_file(*get_escape_layer(), get_pool(), true);
 		    if(tmp == NULL)
 			throw SRC_BUG;
                     const_cast<cat_inode *>(this)->ea_crc = tmp;
@@ -870,16 +890,20 @@ namespace libdar
                 }
                 catch(...)
                 {
+		    get_pile()->flush_read_above(get_escape_layer());
 		    if(tmp != NULL)
 			delete tmp;
                     throw;
                 }
+		get_pile()->flush_read_above(get_escape_layer());
             }
-            else
+            else // skip failed on the escape layer
             {
                 crc *tmp = new (get_pool()) crc_n(1); // creating a default CRC
                 if(tmp == NULL)
                     throw Ememory("cat_inode::ea_get_crc");
+
+		get_pile()->flush_read_above(get_escape_layer());
                 try
                 {
                     tmp->clear();
@@ -1024,31 +1048,53 @@ namespace libdar
             if(fsal != NULL)
                 return fsal;
             else
-                if(storage != NULL) // lsa_offset may be equal to zero if the first cat_inode saved had only EA modified since archive of reference
+                if(get_pile() != NULL)  // reading from archive
                 {
 		    crc *val = NULL;
 		    const crc *my_crc = NULL;
 
 		    try
 		    {
-			if(esc == NULL)
+			bool need_resume_compr = false;
+
+			if(get_escape_layer() == NULL) // direct reading mode
 			{
 			    if(fsa_offset == NULL)
 				throw SRC_BUG;
-			    storage->skip(*fsa_offset);
+			    get_pile()->skip(*fsa_offset);
 			}
 			else
 			{
-			    if(!esc->skip_to_next_mark(escape::seqt_fsa, false))
+				// warning this section calls *get_escape_layer() directly while it may be managed by another thread
+				// we are reading from the get_pile() the possible thread is not in read_ahead operation
+				// so it is pending for read request or other orders
+			    if(!get_escape_layer()->skip_to_next_mark(escape::seqt_fsa, false))
 				throw Erange("cat_inode::get_fsa", string("Error while fetching FSA from archive: No escape mark found for that file"));
-			    storage->skip(esc->get_position()); // required to eventually reset the compression engine
-			    const_cast<cat_inode *>(this)->fsa_set_offset(storage->get_position());
+				// we shall reset layers above get_escape_layer() for they do not assume nothing has changed below
+			    get_pile()->flush_read_above(get_escape_layer());
+				// now we can continue normally using get_pile()
+
+			    const_cast<cat_inode *>(this)->fsa_set_offset(get_pile()->get_position());
 			}
 
-			storage->suspend_compression();
+			    // FSA is never stored compressed, we must change the compression algo
+			    // if necessary)
+			if(get_compressor_layer()->get_algo() != none)
+			{
+			    need_resume_compr = true;
+
+				// warning manipulating compr which might be managed by another thread
+			    get_pile()->flush_read_above(get_compressor_layer());
+				// calling flush_read_above first give a change to let the other thread reach
+				// a state where it is pending for I/O operation so we can now modify the
+				// compressor object
+			    get_compressor_layer()->suspend_compression();
+				// now we can use the stack normally
+			}
+
 			try
 			{
-			    storage->reset_crc(tools_file_size_to_crc_size(fsa_get_size()));
+			    get_pile()->reset_crc(tools_file_size_to_crc_size(fsa_get_size()));
 
 			    try
 			    {
@@ -1059,8 +1105,8 @@ namespace libdar
 					throw Ememory("cat_inode::get_fsa");
 				    try
 				    {
-					storage->read_ahead(fsa_get_size());
-					const_cast<cat_inode *>(this)->fsal->read(*storage, edit);
+					get_pile()->read_ahead(fsa_get_size());
+					const_cast<cat_inode *>(this)->fsal->read(*get_pile(), edit);
 				    }
 				    catch(...)
 				    {
@@ -1088,20 +1134,29 @@ namespace libdar
 			    }
 			    catch(...)
 			    {
-				val = storage->get_crc(); // keeps storage in coherent status
+				val = get_pile()->get_crc(); // keeps storage in coherent status
 				throw;
 			    }
 
-			    val = storage->get_crc();
+			    val = get_pile()->get_crc();
 			    if(val == NULL)
 				throw SRC_BUG;
 			}
 			catch(...)
 			{
-			    storage->resume_compression();
+			    if(need_resume_compr)
+			    {
+				get_pile()->flush_read_above(get_compressor_layer()); // aborting a possibly running read_ahead in a separated thread
+				get_compressor_layer()->resume_compression();
+			    }
 			    throw;
 			}
-			storage->resume_compression();
+
+			if(need_resume_compr)
+			{
+			    get_pile()->flush_read_above(get_compressor_layer());
+			    get_compressor_layer()->resume_compression();
+			}
 
 			fsa_get_crc(my_crc); // fsa_get_crc() will eventually fetch the CRC for FSA from the archive (sequential reading)
 			if(my_crc == NULL)
@@ -1181,15 +1236,18 @@ namespace libdar
 	if(fsa_get_saved_status() != fsa_full)
 	    throw SRC_BUG;
 
-        if(esc != NULL && fsa_crc == NULL)
+        if(get_escape_layer() != NULL && fsa_crc == NULL)
         {
-            if(esc->skip_to_next_mark(escape::seqt_fsa_crc, false))
+	    if(get_pile() == NULL)
+		throw SRC_BUG;
+
+            if(get_escape_layer()->skip_to_next_mark(escape::seqt_fsa_crc, false))
             {
                 crc *tmp = NULL;
 
                 try
                 {
-		    tmp = create_crc_from_file(*esc, get_pool(), false);
+		    tmp = create_crc_from_file(*get_escape_layer(), get_pool(), false);
 		    if(tmp == NULL)
 			throw SRC_BUG;
                     const_cast<cat_inode *>(this)->fsa_crc = tmp;
@@ -1197,16 +1255,21 @@ namespace libdar
                 }
                 catch(...)
                 {
+		    get_pile()->flush_read_above(get_escape_layer());
 		    if(tmp != NULL)
 			delete tmp;
                     throw;
                 }
+
+		get_pile()->flush_read_above(get_escape_layer());
             }
             else // fsa_crc mark not found
             {
                 crc *tmp = new (get_pool()) crc_n(1); // creating a default CRC
                 if(tmp == NULL)
                     throw Ememory("cat_inode::fsa_get_crc");
+
+		get_pile()->flush_read_above(get_escape_layer());
                 try
                 {
                     tmp->clear();
@@ -1255,8 +1318,6 @@ namespace libdar
 	fsa_size = NULL;
 	fsa_crc = NULL;
         fs_dev = NULL;
-	storage = NULL;
-	esc = NULL;
     }
 
     void cat_inode::destroy()
@@ -1316,10 +1377,6 @@ namespace libdar
             delete fs_dev;
             fs_dev = NULL;
         }
-
-            // we must not release memory pointed to by storage, we do not own that object
-
-            // we must not release memory pointed to by esc, we do not own that object
     }
 
     template <class T> void copy_ptr(const T *src, T * & dst, memory_pool *p)
@@ -1371,9 +1428,7 @@ namespace libdar
 	    else
 		fsa_crc = NULL;
 	    copy_ptr(ref.fs_dev, fs_dev, get_pool());
-	    storage = ref.storage; // yes copying the value of the pointer
 	    edit = ref.edit;
-	    esc = ref.esc; // yes copying the value of the pointer
 	}
 	catch(...)
 	{

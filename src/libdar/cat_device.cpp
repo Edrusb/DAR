@@ -74,36 +74,50 @@ namespace libdar
     }
 
     cat_device::cat_device(user_interaction & dialog,
-			   generic_file & f,
+			   const pile_descriptor & pdesc,
 			   const archive_version & reading_ver,
 			   saved_status saved,
-			   compressor *efsa_loc,
-			   escape *ptr) : cat_inode(dialog, f, reading_ver, saved, efsa_loc, ptr)
+			   bool small) : cat_inode(dialog, pdesc, reading_ver, saved, small)
     {
 	U_16 tmp;
+	generic_file *ptr = NULL;
+
+	pdesc.check(small);
+	if(small)
+	    ptr = pdesc.esc;
+	else
+	    ptr = pdesc.stack;
 
 	if(saved == s_saved)
 	{
-	    if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
+	    if(ptr->read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
 		throw Erange("special::special", gettext("missing data to build a special device"));
 	    xmajor = ntohs(tmp);
-	    if(f.read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
+	    if(ptr->read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
 		throw Erange("special::special", gettext("missing data to build a special device"));
 	    xminor = ntohs(tmp);
 	}
     }
 
-    void cat_device::inherited_dump(generic_file & f, bool small) const
+    void cat_device::inherited_dump(const pile_descriptor & pdesc, bool small) const
     {
 	U_16 tmp;
+	generic_file *ptr = NULL;
 
-	cat_inode::inherited_dump(f, small);
+	pdesc.check(small);
+	if(small)
+	    ptr = pdesc.esc;
+	else
+	    ptr = pdesc.stack;
+
+	cat_inode::inherited_dump(pdesc, small);
+
 	if(get_saved_status() == s_saved)
 	{
 	    tmp = htons(xmajor);
-	    f.write((char *)&tmp, sizeof(tmp));
+	    ptr->write((char *)&tmp, sizeof(tmp));
 	    tmp = htons(xminor);
-	    f.write((char *)&tmp, sizeof(tmp));
+	    ptr->write((char *)&tmp, sizeof(tmp));
 	}
     }
 

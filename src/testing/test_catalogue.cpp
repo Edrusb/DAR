@@ -41,6 +41,7 @@ extern "C"
 #include "deci.hpp"
 #include "label.hpp"
 #include "fichier_local.hpp"
+#include "pile.hpp"
 
 using namespace libdar;
 
@@ -92,9 +93,16 @@ void f1()
     try
     {
         fichier_local *dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, false, false);
-        fichier_local *dump2 = new fichier_local(*ui, FIC2, gf_write_only, 0777, false, true, false);
-	compressor comp = compressor(none, *dump, 1);
+	compressor *comp = new compressor(none, *dump, 1);
+	pile stack;
+	pile_descriptor pdesc;
 	std::map <infinint, cat_etoile *> corres;
+
+	stack.push(dump);
+	dump = NULL;
+	stack.push(comp);
+	comp = NULL;
+	pdesc = &stack;
 
         cat_eod *v_eod = new cat_eod();
         cat_file *v_file = new cat_file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", "." , 1024, 0, false);
@@ -116,26 +124,21 @@ void f1()
 
             if(ino != NULL)
                 ino->set_saved_status(s_saved);
-            liste[i]->dump(*dump, false);
+            liste[i]->dump(pdesc, false);
         }
 
-        dump->skip(0);
+        stack.skip(0);
         entree_stats stats;
         stats.clear();
         cat_entree *ref = (cat_entree *)1; // != NULL
         for(S_I i = 0; ref != NULL; ++i)
         {
-            ref = cat_entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, &comp, false, false, NULL);
+            ref = cat_entree::read(*ui, NULL, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
             if(ref != NULL)
-            {
-                ref->dump(*dump2, false);
                 delete ref;
-            }
         }
-        delete dump;
-        delete dump2;
-        delete v_eod;
-        stats.listing(*ui);
+	stats.listing(*ui);
+	stack.clear();
 
         v_dir->add_children(v_file);
         v_dir->add_children(v_lien);
@@ -151,14 +154,19 @@ void f1()
 
         stats.clear();
         dump = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
-        v_dir->dump(*dump, false);
-        dump->skip(0);
-        ref = cat_entree::read(*ui, NULL, *dump, macro_tools_supported_version, stats, corres, none, dump, &comp, false, false, NULL);
-        v_sub_dir = dynamic_cast<cat_directory *>(ref);
+	comp = new compressor(none, *dump, 1);
+	stack.push(dump);
+	dump = NULL;
+	stack.push(comp);
+	comp = NULL;
+	pdesc = &stack;
 
+        v_dir->dump(pdesc, false);
+        stack.skip(0);
+        ref = cat_entree::read(*ui, NULL, pdesc, macro_tools_supported_version, stats, corres, none, false, false, false);
+        v_sub_dir = dynamic_cast<cat_directory *>(ref);
         delete ref;
-        delete dump;
-        delete v_dir;
+	stack.clear();
     }
     catch(Egeneric & e)
     {
@@ -221,12 +229,20 @@ void f2()
         }
 
         unlink(FIC1);
-        fichier_local f = fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
-	compressor comp = compressor(none, f, 1);
+        fichier_local *f = new fichier_local(*ui, FIC1, gf_read_write, 0644, false, true, false);
+	compressor *comp = new compressor(none, f, 1);
+	pile stack;
+	pile_descriptor pdesc;
 
-        cat.dump(f);
-        f.skip(0);
-        catalogue lst = catalogue(*ui, f, macro_tools_supported_version, none, &f, &comp, false, lax_label);
+	stack.push(f);
+	f = NULL;
+	stack.push(comp);
+	comp = NULL;
+	pdesc = & stack;
+
+        cat.dump(pdesc);
+        stack.skip(0);
+        catalogue lst = catalogue(*ui, pdesc, macro_tools_supported_version, none, false, lax_label);
         lst.listing(false, tmp, tmp, false, false, "");
         bool ok;
 

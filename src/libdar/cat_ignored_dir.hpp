@@ -47,16 +47,15 @@ namespace libdar
     public:
         cat_ignored_dir(const cat_directory &target) : cat_inode(target) {};
         cat_ignored_dir(user_interaction & dialog,
-			generic_file & f,
+			const pile_descriptor & pdesc,
 			const archive_version & reading_ver,
-			compressor *efsa_loc,
-			escape *ptr) : cat_inode(dialog, f, reading_ver, s_not_saved, efsa_loc, ptr) { throw SRC_BUG; };
+			bool small) : cat_inode(dialog, pdesc, reading_ver, s_not_saved, small) { throw SRC_BUG; };
 
         unsigned char signature() const { return 'j'; };
         cat_entree *clone() const { return new (get_pool()) cat_ignored_dir(*this); };
 
     protected:
-        void inherited_dump(generic_file & f, bool small) const; // behaves like an empty cat_directory
+        void inherited_dump(const pile_descriptor & pdesc, bool small) const; // behaves like an empty cat_directory
 
     };
 

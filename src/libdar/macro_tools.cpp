@@ -112,8 +112,8 @@ namespace libdar
     {
         terminateur term;
         catalogue *ret = NULL;
-	compressor *efsa_loc = dynamic_cast<compressor *>(data_stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED));
-	generic_file *data_loc = data_stack.get_by_label(LIBDAR_STACK_LABEL_CLEAR);
+	pile_descriptor data_pdesc(&data_stack);
+	pile_descriptor cata_pdesc(&cata_stack);
 	generic_file *crypto = cata_stack.get_by_label(LIBDAR_STACK_LABEL_UNCYPHERED);
 	contextual *data_ctxt = NULL;
 	contextual *cata_ctxt = NULL;
@@ -124,9 +124,6 @@ namespace libdar
 
 	cata_stack.find_first_from_top(cata_ctxt);
 	if(cata_ctxt == NULL)
-	    throw SRC_BUG;
-
-	if(efsa_loc == NULL)
 	    throw SRC_BUG;
 
         if(info_details)
@@ -156,9 +153,20 @@ namespace libdar
 
 		tmp.clear(); // we do not want here to change the catalogue internal data name read from archive
 		cata_stack.read_ahead(cat_size);
-                ret = new (pool) catalogue(dialog, cata_stack, ver.get_edition(), ver.get_compression_algo(), data_loc, efsa_loc, lax_mode, tmp);
-		data_ctxt->set_info_status(CONTEXT_OP);
-		cata_ctxt->set_info_status(CONTEXT_OP);
+                ret = new (pool) catalogue(dialog, cata_pdesc, ver.get_edition(), ver.get_compression_algo(), lax_mode, tmp);
+		try
+		{
+		    if(ret != NULL && &cata_stack != &data_stack)
+			ret->change_location(data_pdesc, false);
+		    data_ctxt->set_info_status(CONTEXT_OP);
+		    cata_ctxt->set_info_status(CONTEXT_OP);
+		}
+		catch(...)
+		{
+		    if(ret != NULL)
+			delete ret;
+		    throw;
+		}
             }
 	    catch(Ebug & e)
 	    {
@@ -614,6 +622,7 @@ namespace libdar
     {
 	catalogue *ret = NULL;
 	thread_cancellation thr_cancel;
+	pile_descriptor pdesc(&stack);
 	bool ok = false;
 	U_I check_abort_every = 10000;
 	U_I check_abort_count = check_abort_every;
@@ -623,12 +632,6 @@ namespace libdar
 	infinint amplitude;
 	entree_stats stats;
 	infinint fraction = 101;
-	escape *esc = NULL;
-	compressor *efsa_loc = dynamic_cast<compressor *>(stack.get_by_label(LIBDAR_STACK_LABEL_UNCOMPRESSED));
-	generic_file *data_loc = stack.get_by_label(LIBDAR_STACK_LABEL_CLEAR);
-
-	if(efsa_loc == NULL)
-	    throw SRC_BUG;
 
 	    // obtaining from the user the fraction of the archive to inspect
 
@@ -676,22 +679,21 @@ namespace libdar
 	amplitude = max_offset - min_offset;
 
 
-	stack.find_first_from_top(esc);
-	if(esc != NULL)
+	if(pdesc.esc != NULL)
 	{
 	    dialog.warning(gettext("LAX MODE: Escape sequence seems present in this archive. I have thus two different methods, either I look for the escape sequence indicating the start of the catalogue or I try each position in turn in the hope it will not be data that look like a catalogue"));
 	    try
 	    {
 		dialog.pause(gettext("LAX MODE: Trying to locate the escape sequence (safer choice) ?"));
-		if(!esc->skip(min_offset))
+		if(!pdesc.esc->skip(min_offset))
 		    throw SRC_BUG;
-		if(esc->skip_to_next_mark(escape::seqt_catalogue, true))
+		if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, true))
 		{
 		    dialog.warning(gettext("LAX MODE: Good point! I could find the escape sequence marking the beginning of the catalogue, now trying to read it..."));
-		    stack.flush_read_above(esc);
-		    if(stack.get_position() != esc->get_position())
+		    pdesc.stack->flush_read_above(pdesc.esc);
+		    if(pdesc.stack->get_position() != pdesc.esc->get_position())
 			throw SRC_BUG;
-		    offset = stack.get_position();
+		    offset = pdesc.stack->get_position();
 		    min_offset = offset; // no need to read before this position, we cannot fetch the catalogue there
 		}
 		else
@@ -703,7 +705,7 @@ namespace libdar
 	    catch(Euser_abort & e)
 	    {
 		offset = min_offset;
-		stack.skip(offset);
+		pdesc.stack->skip(offset);
 	    }
 	}
 
@@ -727,7 +729,7 @@ namespace libdar
 
 	    try
 	    {
-		ret = new (pool) catalogue(dialog, stack, edition, compr_algo, data_loc, efsa_loc, even_partial_catalogue, layer1_data_name);
+		ret = new (pool) catalogue(dialog, pdesc, edition, compr_algo, even_partial_catalogue, layer1_data_name);
 		if(ret == NULL)
 		    throw Ememory("macro_tools_lax_search_catalogue");
 		stats = ret->get_stats();
@@ -1242,22 +1244,20 @@ namespace libdar
 				  bool empty)
     {
 	terminateur coord;
-	escape *esc = NULL;
-	compressor *compr_ptr = NULL;
+	pile_descriptor pdesc(&layers);
 	tronconneuse *tronco_ptr = NULL;
 	scrambler *scram_ptr = NULL;
 #ifdef LIBTHREADAR_AVAILABLE
 	generic_thread *thread_ptr = NULL;
 #endif
-
+	pdesc.check(false);
 
 	    // *********** writing down the catalogue of the archive *************** //
 
-	layers.find_first_from_bottom(esc);
-	if(esc != NULL)
+	if(pdesc.esc != NULL)
 	{
-	    layers.sync_write_above(esc); // esc is now up to date
-	    esc->add_mark_at_current_position(escape::seqt_catalogue);
+	    layers.sync_write_above(pdesc.esc); // esc is now up to date
+	    pdesc.esc->add_mark_at_current_position(escape::seqt_catalogue);
 	}
 
 	coord.set_catalogue_start(layers.get_position());
@@ -1265,7 +1265,7 @@ namespace libdar
 	if(info_details)
 	    dialog.warning(gettext("Writing down archive contents..."));
 	cat.reset_dump();
-	cat.dump(layers);
+	cat.dump(pdesc);
 
 	    // releasing the compression layer
 
@@ -1275,21 +1275,23 @@ namespace libdar
 #ifdef LIBTHREADAR_AVAILABLE
 	(void)layers.pop_and_close_if_type_is(thread_ptr);
 #endif
-	if(!layers.pop_and_close_if_type_is(compr_ptr))
+	if(!layers.pop_and_close_if_type_is(pdesc.compr))
 	    throw SRC_BUG;
+	else
+	    pdesc.compr = NULL;
 
 	    // releasing the escape layer
 
-	if(esc != NULL)
+	if(pdesc.esc != NULL)
 	{
 	    if(info_details)
 		dialog.warning(gettext("Closing the escape layer..."));
 #ifdef LIBTHREADAR_AVAILABLE
 	    (void)layers.pop_and_close_if_type_is(thread_ptr);
 #endif
-	    esc = NULL; // intentionnally set to NULL here, only the pointer type is used by pop_and_close
-	    if(!layers.pop_and_close_if_type_is(esc))
+	    if(!layers.pop_and_close_if_type_is(pdesc.esc))
 		throw SRC_BUG;
+	    pdesc.esc = NULL;
 	}
 
 	    // *********** writing down the first terminator at the end of the archive  *************** //

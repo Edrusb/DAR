@@ -63,8 +63,7 @@ namespace libdar
 			   memory_pool *pool,        //< set to NULL or points to the memory_pool to use
 			   const string &info_quoi,  //< full path name of the file to save (including its name)
 			   cat_entree * & e,             //< cat_entree to save to archive
-			   pile & stack,             //< where to write to
-			   compressor *compr,        //< pointer to the compressor layer inside the given above stack
+			   const pile_descriptor & pdesc,//< where to write to
 			   bool info_details,        //< verbose output to user
 			   bool display_treated,     //< add an information line before treating a file
 			   bool alter_atime,         //< whether to set back atime of filesystem
@@ -81,8 +80,7 @@ namespace libdar
     static bool save_ea(user_interaction & dialog,
 			const string & info_quoi,
 			cat_inode * & ino,
-			pile & stack,
-			compressor *stock,
+			const pile_descriptor & pdesc,
 			bool display_treated);
 
     static void restore_atime(const string & chemin, const cat_inode * & ptr);
@@ -90,8 +88,7 @@ namespace libdar
     static bool save_fsa(user_interaction & dialog,
 			 const string & info_quoi,
 			 cat_inode * & ino,
-			 pile & stack,
-			 compressor *stock,
+			 const pile_descriptor & pdesc,
 			 bool display_treated);
 
 	/// merge two sets of EA
@@ -494,7 +491,7 @@ namespace libdar
 			   memory_pool *pool,
 			   const mask &filtre,
                            const mask &subtree,
-                           pile & stack,
+			   const pile_descriptor & pdesc,
                            catalogue & cat,
                            const catalogue & ref,
                            const path & fs_racine,
@@ -531,7 +528,6 @@ namespace libdar
         const cat_entree *f = NULL;
         defile juillet = fs_racine;
         const cat_eod tmp_eod;
-	compressor *stockage;
         compression stock_algo;
 	semaphore sem = semaphore(dialog, backup_hook_file_execute, backup_hook_file_mask);
 
@@ -544,10 +540,7 @@ namespace libdar
 	    display_treated_only_dir = false; // avoid incoherence
 
 
-	stack.find_first_from_top(stockage);
-	if(stockage == NULL)
-	    throw SRC_BUG;
-	stock_algo = stockage->get_algo();
+	stock_algo = pdesc.compr->get_algo();
 	infinint root_fs_device;
         filesystem_backup fs = filesystem_backup(dialog,
 						 fs_racine,
@@ -803,8 +796,7 @@ namespace libdar
 						       pool,
 						       juillet.get_string(),
 						       e,
-						       stack,
-						       stockage,
+						       pdesc,
 						       info_details,
 						       display_treated,
 						       alter_atime,
@@ -831,7 +823,7 @@ namespace libdar
 					{
 					    if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
 						cat.pre_add_ea(e);
-					    if(save_ea(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
+					    if(save_ea(dialog, juillet.get_string(), e_ino, pdesc, display_treated))
 						st.incr_ea_treated();
 					    cat.pre_add_ea_crc(e);
 					}
@@ -841,7 +833,7 @@ namespace libdar
 					if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 					{
 					    cat.pre_add_fsa(e);
-					    if(save_fsa(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
+					    if(save_fsa(dialog, juillet.get_string(), e_ino, pdesc, display_treated))
 						st.incr_fsa_treated();
 					    cat.pre_add_fsa_crc(e);
 					}
@@ -1021,8 +1013,11 @@ namespace libdar
 	    {
 		if(!e.immediate_cancel())
 		{
-		    stack.sync_write_above(stockage);
-		    stockage->resume_compression();
+		    if(pdesc.compr->is_compression_suspended())
+		    {
+			pdesc.stack->sync_write_above(pdesc.compr);
+			pdesc.compr->resume_compression();
+		    }
 		}
 		throw Ethread_cancel_with_attr(e.immediate_cancel(), e.get_flag(), fs.get_last_etoile_ref());
 	    }
@@ -1034,8 +1029,11 @@ namespace libdar
 	    throw;
 	}
 
-	stack.sync_write_above(stockage);
-	stockage->resume_compression();
+	if(pdesc.compr->is_compression_suspended())
+	{
+	    pdesc.stack->sync_write_above(pdesc.compr);
+	    pdesc.compr->resume_compression();
+	}
     }
 
     void filtre_difference(user_interaction & dialog,
@@ -1439,7 +1437,7 @@ namespace libdar
 		      memory_pool *pool,
 		      const mask & filtre,
 		      const mask & subtree,
-		      pile & stack,
+		      const pile_descriptor & pdesc,
 		      catalogue & cat,
 		      const catalogue * ref1,
 		      const catalogue * ref2,
@@ -1459,7 +1457,6 @@ namespace libdar
 		      const infinint & sparse_file_min_size,
 		      const fsa_scope & scope)
     {
-	compressor *stockage;
 	compression stock_algo;
 
 	if(display_treated_only_dir && display_treated)
@@ -1470,10 +1467,7 @@ namespace libdar
 	else
 	    display_treated_only_dir = false; // avoid incoherence
 
-	stack.find_first_from_top(stockage);
-	if(stockage == NULL)
-	    throw SRC_BUG;
-	stock_algo = stockage->get_algo();
+	stock_algo = pdesc.compr->get_algo();
 	thread_cancellation thr_cancel;
 	const cat_eod tmp_eod;
 	const catalogue *ref_tab[] = { ref1, ref2, NULL };
@@ -2358,6 +2352,9 @@ namespace libdar
 		cat_mirage *e_mir = dynamic_cast<cat_mirage *>(e_var);
 		cat_directory *e_dir = dynamic_cast<cat_directory *>(e_var);
 
+		if(e_var == NULL)
+		    throw SRC_BUG;
+
 		cat_file::get_data_mode keep_mode = keep_compressed ? cat_file::keep_compressed : cat_file::keep_hole;
 
 		if(e_mir != NULL)
@@ -2432,8 +2429,7 @@ namespace libdar
 				   pool,
 				   juillet.get_string(),
 				   e_var,
-				   stack,
-				   stockage,
+				   pdesc,
 				   info_details,
 				   display_treated,
 				   true,       // alter_atime
@@ -2449,9 +2445,6 @@ namespace libdar
 			throw SRC_BUG;
 		    else // succeeded saving
 		    {
-			if(e_file != NULL)
-			    e_file->change_location(stockage);
-
 			if(e_mir != NULL)
 			    e_mir->set_inode_wrote(true);
 		    }
@@ -2461,12 +2454,8 @@ namespace libdar
 		    if(e_ino->ea_get_saved_status() == cat_inode::ea_full)
 		    {
 			cat.pre_add_ea(e);
-			if(save_ea(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
-			{
-			    if(e_ino->fsa_get_saved_status() != cat_inode::fsa_full)
-				e_ino->change_efsa_location(stockage);
-				// change stockage location will be done only after copying FSA (see below)
-			}
+			    // ignoring the return value of save_ea, exceptions may still propagate
+			(void)save_ea(dialog, juillet.get_string(), e_ino, pdesc, display_treated);
 			cat.pre_add_ea_crc(e);
 		    }
 
@@ -2474,11 +2463,12 @@ namespace libdar
 		    if(e_ino->fsa_get_saved_status() == cat_inode::fsa_full)
 		    {
 			cat.pre_add_fsa(e);
-			if(save_fsa(dialog, juillet.get_string(), e_ino, stack, stockage, display_treated))
-			    e_ino->change_efsa_location(stockage);
-			    // now we can change ea/fsa_location to "stockage"
+			    // ignoring the return value of save_fsa, exceptions may still propagate
+			(void)save_fsa(dialog, juillet.get_string(), e_ino, pdesc, display_treated);
 			cat.pre_add_fsa_crc(e);
 		    }
+
+		    e_var->change_location(pdesc, false);
 		}
 		else // not an inode
 		{
@@ -2496,12 +2486,21 @@ namespace libdar
 	catch(Ethread_cancel & e)
 	{
 	    cat.tail_catalogue_to_current_read();
-	    stockage->resume_compression();
+	    if(pdesc.compr->is_compression_suspended())
+	    {
+		pdesc.stack->sync_write_above(pdesc.compr);
+		pdesc.compr->resume_compression();
+	    }
 	    thr_cancel.block_delayed_cancellation(false);
 	    throw;
 	}
 
-	stockage->resume_compression();
+
+	if(pdesc.compr->is_compression_suspended())
+	{
+	    pdesc.stack->sync_write_above(pdesc.compr);
+	    pdesc.compr->resume_compression();
+	}
 	thr_cancel.block_delayed_cancellation(false);
 
 	if(abort)
@@ -2585,8 +2584,7 @@ namespace libdar
 			   memory_pool *pool,
 			   const string & info_quoi,
 			   cat_entree * & e,
-			   pile & stack,
-			   compressor *compr,
+			   const pile_descriptor & pdesc,
 			   bool info_details,
 			   bool display_treated,
 			   bool alter_atime,
@@ -2607,7 +2605,7 @@ namespace libdar
 	cat_mirage *mir = dynamic_cast<cat_mirage *>(e);
 	cat_inode *ino = dynamic_cast<cat_inode *>(e);
 	bool resave_uncompressed = false;
-	infinint rewinder = stack.get_position(); // we skip back here if data must be saved uncompressed
+	infinint rewinder = pdesc.stack->get_position(); // we skip back here if data must be saved uncompressed
 
 	if(mir != NULL)
 	{
@@ -2626,7 +2624,7 @@ namespace libdar
 
 	    if(ino == NULL)
 		return true;
-	    if(compr == NULL)
+	    if(pdesc.compr == NULL)
 		throw SRC_BUG;
 	    if(ino->get_saved_status() != s_saved)
 	    {
@@ -2659,7 +2657,7 @@ namespace libdar
 		    do // while "loop" is true, this is the INNER LOOP
 		    {
 			loop = false;
-			infinint start = stack.get_position();
+			infinint start = pdesc.stack->get_position();
 			generic_file *source = NULL;
 
 			    //////////////////////////////
@@ -2695,6 +2693,8 @@ namespace libdar
 			    throw;
 			}
 
+
+
 			    //////////////////////////////
 			    // preparing the destination
 
@@ -2718,11 +2718,12 @@ namespace libdar
 				source->skip(0);
 				source->read_ahead(fic->get_size());
 
-				stack.sync_write_above(compr);
+				pdesc.stack->sync_write_above(pdesc.compr);
+				pdesc.compr->sync_write(); // necessary in any case to reset the compression engine to be able at later time to decompress starting at that position
 				if(keep_mode == cat_file::keep_compressed || fic->get_compression_algo_write() == none)
-				    compr->suspend_compression();
+				    pdesc.compr->suspend_compression();
 				else
-				    compr->resume_compression();
+				    pdesc.compr->resume_compression();
 
 				try
 				{
@@ -2730,15 +2731,15 @@ namespace libdar
 				    {
 					    // creating the sparse_file to copy data to destination
 
-					dst_hole = new (pool) sparse_file(stack.top(), hole_size);
+					dst_hole = new (pool) sparse_file(pdesc.stack->top(), hole_size);
 					if(dst_hole == NULL)
 					    throw Ememory("save_inode");
-					stack.push(dst_hole);
+					pdesc.stack->push(dst_hole);
 #ifdef LIBTHREADAR_AVAILABLE
-					gt = new (pool) generic_thread(stack.top());
+					gt = new (pool) generic_thread(pdesc.stack->top());
 					if(gt == NULL)
 					    throw Ememory("save_inode");
-					stack.push(gt);
+					pdesc.stack->push(gt);
 #endif
 				    }
 
@@ -2750,7 +2751,7 @@ namespace libdar
 				    else
 					crc_available = false;
 
-				    source->copy_to(stack, crc_size, val);
+				    source->copy_to(*pdesc.stack, crc_size, val);
 				    if(val == NULL)
 					throw SRC_BUG;
 
@@ -2777,7 +2778,7 @@ namespace libdar
 
 				    if(dst_hole != NULL)
 				    {
-					stack.sync_write_above(dst_hole);
+					pdesc.stack->sync_write_above(dst_hole);
 					dst_hole->sync_write();
 					if(!dst_hole->has_seen_hole() && !dst_hole->has_escaped_data())
 					    fic->set_sparse_file_detection_write(false);
@@ -2801,7 +2802,7 @@ namespace libdar
 
 				    if(gt != NULL)
 				    {
-					if(stack.pop() != gt)
+					if(pdesc.stack->pop() != gt)
 					    throw SRC_BUG;
 					delete gt;
 					gt = NULL;
@@ -2809,7 +2810,7 @@ namespace libdar
 
 				    if(dst_hole != NULL)
 				    {
-					if(stack.pop() != dst_hole)
+					if(pdesc.stack->pop() != dst_hole)
 					    throw SRC_BUG;
 					delete dst_hole;
 					dst_hole = NULL;
@@ -2825,25 +2826,25 @@ namespace libdar
 
 				if(gt != NULL)
 				{
-				    if(stack.pop() != gt)
-					throw SRC_BUG;
 				    gt->terminate();
+				    if(pdesc.stack->pop() != gt)
+					throw SRC_BUG;
 				    delete gt;
 				    gt = NULL;
 				}
 
 				if(dst_hole != NULL)
 				{
-				    if(stack.pop() != dst_hole)
-					throw SRC_BUG;
 				    dst_hole->terminate();
+				    if(pdesc.stack->pop() != dst_hole)
+					throw SRC_BUG;
 				    delete dst_hole;
 				    dst_hole = NULL;
 				}
 
-				if(stack.get_position() >= start)
+				if(pdesc.stack->get_position() >= start)
 				{
-				    storage_size = stack.get_position() - start;
+				    storage_size = pdesc.stack->get_position() - start;
 				    fic->set_storage_size(storage_size);
 				}
 				else
@@ -2874,16 +2875,16 @@ namespace libdar
 			       && keep_mode != cat_file::keep_compressed
 			       && fic->get_compression_algo_write() != none)
 			    {
-				infinint current_pos_tmp = stack.get_position();
+				infinint current_pos_tmp = pdesc.stack->get_position();
 
 				if(current_pos_tmp <= rewinder)
 				    throw SRC_BUG; // we are positionned before the stard of the current inode dump!
-				if(stack.skippable(generic_file::skip_backward, current_pos_tmp - rewinder))
+				if(pdesc.stack->skippable(generic_file::skip_backward, current_pos_tmp - rewinder))
 				{
 				    try
 				    {
-					if(!stack.skip(rewinder))
-					    throw Erange("save_inode", "Start position is out of reach");
+					if(!pdesc.stack->skip(rewinder))
+					    throw SRC_BUG;
 					if(!resave_uncompressed)
 					    resave_uncompressed = true;
 					else
@@ -2901,7 +2902,7 @@ namespace libdar
 					    dialog.warning(info_quoi + gettext(" : Failed resaving uncompressed the inode data"));
 					    // ignoring the error and continuing
 					resave_uncompressed = false;
-					if(stack.get_position() != current_pos_tmp)
+					if(pdesc.stack->get_position() != current_pos_tmp)
 					    throw SRC_BUG;
 				    }
 				}
@@ -2937,15 +2938,15 @@ namespace libdar
 				    if(current_repeat_count < repeat_count)
 				    {
 					current_repeat_count++;
-					infinint current_pos_tmp = stack.get_position();
+					infinint current_pos_tmp = pdesc.stack->get_position();
 
 					try
 					{
-					    if(stack.skippable(generic_file::skip_backward, storage_size))
+					    if(pdesc.stack->skippable(generic_file::skip_backward, storage_size))
 					    {
-						if(!stack.skip(start))
+						if(!pdesc.stack->skip(start))
 						{
-						    if(!stack.skip(current_repeat_count))
+						    if(!pdesc.stack->skip(current_repeat_count))
 							throw SRC_BUG;
 						    throw Erange("",""); // used locally
 						}
@@ -2956,7 +2957,7 @@ namespace libdar
 					catch(...)
 					{
 					    current_wasted_bytes += current_pos_tmp - start;
-					    if(stack.get_position() != current_pos_tmp)
+					    if(pdesc.stack->get_position() != current_pos_tmp)
 						throw SRC_BUG;
 					}
 
@@ -2964,7 +2965,7 @@ namespace libdar
 					{
 					    if(info_details)
 						dialog.warning(tools_printf(gettext("WARNING! File modified while reading it for backup. Performing retry %i of %i"), &current_repeat_count, &repeat_count));
-					    if(stack.get_position() != start)
+					    if(pdesc.stack->get_position() != start)
 						cat.pre_add_waste_mark();
 					    loop = true;
 
@@ -3027,8 +3028,7 @@ namespace libdar
     static bool save_ea(user_interaction & dialog,
 			const string & info_quoi,
 			cat_inode * & ino,
-			pile & stack,
-			compressor *compr,
+			const pile_descriptor & pdesc,
 			bool display_treated)
     {
         bool ret = false;
@@ -3045,20 +3045,29 @@ namespace libdar
 		    {
 			if(display_treated)
 			    dialog.warning(string(gettext("Saving Extended Attributes for ")) + info_quoi);
-			ino->ea_set_offset(stack.get_position());
-			stack.sync_write_above(compr);
-			compr->resume_compression();  // always compress EA (no size or filename consideration)
-			stack.reset_crc(tools_file_size_to_crc_size(ino->ea_get_size())); // start computing CRC for any read/write on stack
+			ino->ea_set_offset(pdesc.stack->get_position());
+			if(pdesc.compr->is_compression_suspended())
+			{
+			    pdesc.stack->sync_write_above(pdesc.compr);
+			    pdesc.compr->resume_compression();  // always compress EA (no size or filename consideration)
+			}
+			else
+			{
+			    pdesc.stack->sync_write_above(pdesc.compr);
+			    pdesc.compr->sync_write(); // reset the compression engine to be able to decompress from that point later
+			}
+
+			pdesc.stack->reset_crc(tools_file_size_to_crc_size(ino->ea_get_size())); // start computing CRC for any read/write on stack
 			try
 			{
-			    ino->get_ea()->dump(stack);
+			    ino->get_ea()->dump(*pdesc.stack);
 			}
 			catch(...)
 			{
-			    val = stack.get_crc(); // this keeps "stack" in a coherent status
+			    val = pdesc.stack->get_crc(); // this keeps "stack" in a coherent status
 			    throw;
 			}
-			val = stack.get_crc();
+			val = pdesc.stack->get_crc();
 			ino->ea_set_crc(*val);
 			ino->ea_detach();
 			ret = true;
@@ -3116,8 +3125,7 @@ namespace libdar
     static bool save_fsa(user_interaction & dialog,
 			 const string & info_quoi,
 			 cat_inode * & ino,
-			 pile & stack,
-			 compressor *compr,
+			 const pile_descriptor & pdesc,
 			 bool display_treated)
     {
         bool ret = false;
@@ -3134,34 +3142,30 @@ namespace libdar
 		    {
 			if(display_treated)
 			    dialog.warning(string(gettext("Saving Filesystem Specific Attributes for ")) + info_quoi);
-			ino->fsa_set_offset(stack.get_position());
-			stack.sync_write_above(compr);
-			compr->suspend_compression(); // never compress EA (no size or filename consideration)
+			ino->fsa_set_offset(pdesc.stack->get_position());
+			if(pdesc.compr->get_algo() != none)
+			{
+			    pdesc.stack->sync_write_above(pdesc.compr);
+			    pdesc.compr->sync_write();
+			    pdesc.compr->suspend_compression(); // never compress EA (no size or filename consideration)
+			}
+
+			pdesc.stack->reset_crc(tools_file_size_to_crc_size(ino->fsa_get_size())); // start computing CRC for any read/write on stack
 			try
 			{
-			    stack.reset_crc(tools_file_size_to_crc_size(ino->fsa_get_size())); // start computing CRC for any read/write on stack
-			    try
-			    {
-				ino->get_fsa()->write(stack);
-			    }
-			    catch(...)
-			    {
-				val = stack.get_crc(); // this keeps "" in a coherent status
-				throw;
-			    }
-			    val = stack.get_crc();
-			    ino->fsa_set_crc(*val);
-			    ino->fsa_detach();
-			    ret = true;
+			    ino->get_fsa()->write(*pdesc.stack);
 			}
 			catch(...)
 			{
-			    stack.sync_write_above(compr);
-			    compr->resume_compression();
+			    val = pdesc.stack->get_crc(); // this keeps "" in a coherent status
 			    throw;
 			}
-			stack.sync_write_above(compr);
-			compr->resume_compression();
+			val = pdesc.stack->get_crc();
+			ino->fsa_set_crc(*val);
+			ino->fsa_detach();
+			ret = true;
+
+			    // compression is left suspended, save_inode, save_ea, will change or catalogue dump will change it if necessary
 		    }
 		    catch(...)
 		    {

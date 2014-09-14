@@ -56,7 +56,9 @@ namespace libdar
 	static const U_8 FILE_DATA_WITH_HOLE = 0x01; //< file's data contains hole datastructure
 	static const U_8 FILE_DATA_IS_DIRTY = 0x02;  //< data modified while being saved
 
-        cat_file(const infinint & xuid, const infinint & xgid, U_16 xperm,
+        cat_file(const infinint & xuid,
+		 const infinint & xgid,
+		 U_16 xperm,
 		 const datetime & last_access,
 		 const datetime & last_modif,
 		 const datetime & last_change,
@@ -67,13 +69,11 @@ namespace libdar
 		 bool x_furtive_read_mode);
         cat_file(const cat_file & ref);
         cat_file(user_interaction & dialog,
-		 generic_file & f,
+		 const pile_descriptor & pdesc,
 		 const archive_version & reading_ver,
 		 saved_status saved,
 		 compression default_algo,
-		 generic_file *data_loc,
-		 compressor *efsa_loc,
-		 escape *ptr);
+		 bool small);
         ~cat_file() { detruit(); };
 
         bool has_changed_since(const cat_inode & ref, const infinint & hourshift, cat_inode::comparison_fields what_to_check) const;
@@ -110,7 +110,6 @@ namespace libdar
 
 	    // object migration methods (merging)
 	void change_compression_algo_write(compression x) { algo_write = x; };
-	void change_location(generic_file *x) { loc = x; };
 
 	    // dirtiness
 
@@ -119,8 +118,8 @@ namespace libdar
 
     protected:
         void sub_compare(const cat_inode & other, bool isolated_mode) const;
-        void inherited_dump(generic_file & f, bool small) const;
-	void post_constructor(generic_file & f);
+        void inherited_dump(const pile_descriptor & pdesc, bool small) const;
+	void post_constructor(const pile_descriptor & pdesc);
 
         enum { empty, from_path, from_cat } status;
 
@@ -130,9 +129,8 @@ namespace libdar
         infinint *size;         //< size of the data (uncompressed)
         infinint *storage_size; //< how much data used in archive (after compression)
         crc *check;
-	bool dirty;     //< true when a file has been modified at the time it was saved
+	bool dirty;             //< true when a file has been modified at the time it was saved
 
-        generic_file *loc;      //< where to find data (eventually compressed) at the recorded offset and for storage_size length
         compression algo_read;  //< which compression algorithm to use to read the file's data
 	compression algo_write; //< which compression algorithm to use to write down (merging) the file's data
 	bool furtive_read_mode; // used only when status equals "from_path"

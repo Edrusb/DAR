@@ -132,7 +132,7 @@ namespace libdar
 	    /// call the generic_file::sync_write() method of all object found above ptr in the stack
 	void sync_write_above(generic_file *ptr);
 
-	    /// call ghe generic_file::flush_read() method of all objects found above ptr in the stack
+	    /// call the generic_file::flush_read() method of all objects found above ptr in the stack
 	void flush_read_above(generic_file *ptr);
 
 	    // inherited methods from generic_file
