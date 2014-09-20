@@ -70,7 +70,7 @@ namespace libdar
 
     protected:
 	    // inherited from generic_file
-	void inherited_read_ahead(const infinint & amount) { ref->read_ahead(amount); };
+	void inherited_read_ahead(const infinint & amount) {}; // the cache is doing read ahead per se, no need to propagate to the underlying
 	U_I inherited_read(char *a, U_I size);
 	void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() { flush_write(); };

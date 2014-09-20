@@ -38,6 +38,7 @@ using namespace libdar;
 static shell_interaction ui = shell_interaction(&cout, &cerr, false);
 
 void f1();
+void f2(const string & src, const string & dst);
 
 
 int main(int argc, char *argv[])
@@ -48,7 +49,11 @@ int main(int argc, char *argv[])
 
     try
     {
-	f1();
+//	f1();
+	if(argc != 3)
+	    cout << "usage: " << argv[0] << " <src file> <dst file>" << endl;
+	else
+	    f2(argv[1], argv[2]);
     }
     catch(Egeneric & e)
     {
@@ -103,4 +108,12 @@ void f1()
     ui.printf("t1 position = %i\n", &tmp);
 
     delete t1;
+}
+
+void f2(const string & src, const string & dst)
+{
+    generic_file *src_f = new fichier_local(src);
+    generic_file *dst_f = new fichier_local(ui, dst, gf_write_only, 0600, false, true, false);
+    generic_thread t1 = generic_thread(dst_f, 10, 20);
+    src_f->copy_to(t1);
 }

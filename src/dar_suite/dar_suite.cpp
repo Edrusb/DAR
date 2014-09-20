@@ -55,6 +55,9 @@ extern "C"
 #include "thread_cancellation.hpp"
 #include "memory_check.hpp"
 #include "line_tools.hpp"
+#ifdef HAVE_LIBTHREADAR_LIBTHREADAR_HPP
+#include <libthreadar/libthreadar.hpp>
+#endif
 
 #define GENERAL_REPORT(msg) 	if(ui != NULL)		\
     {							\
@@ -235,6 +238,18 @@ int dar_suite_global(int argc,
 	GENERAL_REPORT(string(gettext("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER")));
 	ret = EXIT_BUG;
     }
+#ifdef LIBTHREADAR_AVAILABLE
+    catch(libthreadar::exception_base & e)
+    {
+	string msg = "";
+
+	for(unsigned int i = 0; i < e.size() ; ++i)
+	    msg += e[i];
+
+	cerr << msg << endl;
+	ret = EXIT_BUG;
+    }
+#endif
     catch(...)
     {
 	Ebug x = SRC_BUG;

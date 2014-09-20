@@ -48,9 +48,6 @@ extern "C"
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
 # endif
 #endif
-
-#define MAX_BUFFER_SIZE 10485760
-
 }
 
 #include "cache.hpp"

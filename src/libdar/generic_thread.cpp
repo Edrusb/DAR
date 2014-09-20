@@ -302,7 +302,10 @@ namespace libdar
 	    if(bksize > 1)
 		tmptr[0] = data_header;
 	    else
+	    {
+		toslave.feed_cancel_get_block(tmptr);
 		throw SRC_BUG;
+	    }
 	    min = bksize - 1 > size - wrote ? size - wrote : bksize - 1;
 	    (void)memcpy(tmptr + 1, a + wrote, min);
 	    wrote += min;

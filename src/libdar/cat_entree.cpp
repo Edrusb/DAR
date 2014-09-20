@@ -383,7 +383,7 @@ namespace libdar
 
 	    try
 	    {
-		pdesc.stack->flush_read_above(pdesc.esc);
+		pdesc.stack->sync_write_above(pdesc.esc);
 		pdesc.esc->reset_crc(ENTREE_CRC_SIZE);
 		try
 		{

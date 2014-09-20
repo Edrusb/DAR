@@ -361,18 +361,6 @@ namespace libdar
 		}
 	    }
 
-#ifdef LIBTHREADAR_AVAILABLE
-	    if(multi_threaded)
-	    {
-		tmp = new (pool) generic_thread(stack.top());
-		if(tmp == NULL)
-		    throw Ememory("op_create_in_sub");
-		stack.clear_label(LIBDAR_STACK_LABEL_LEVEL1);
-		stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
-		tmp = NULL;
-	    }
-#endif
-
 		// *************  building the encryption layer if necessary ************** //
 
 	    if(info_details)
@@ -582,7 +570,7 @@ namespace libdar
 		tmp = NULL;
 
 #ifdef LIBTHREADAR_AVAILABLE
-		if(multi_threaded)
+		if(multi_threaded && ver.get_compression_algo() != none)
 		{
 		    tmp = new (pool) generic_thread(stack.top());
 		    if(tmp == NULL)
@@ -1067,20 +1055,6 @@ namespace libdar
 
 		ver.set_initial_offset(layers.get_position());
 
-#ifdef LIBTHREADAR_AVAILABLE
-
-		    // adding a generic_thread object in the stack for
-		    // a separated thread proceed to read/write to the object pushed on the stack
-
-		if(multi_threaded)
-		{
-		    tmp = new (pool) generic_thread(layers.top());
-		    if(tmp == NULL)
-			throw Ememory("op_create_in_sub");
-		    layers.push(tmp);
-		    tmp = NULL;
-		}
-#endif
 
 		    // ************ building the encryption layer if required ****** //
 
@@ -1203,7 +1177,7 @@ namespace libdar
 		    // adding a generic_thread object in the stack for
 		    // a separated thread proceed to read/write to the object pushed on the stack
 
-		if(multi_threaded)
+		if(multi_threaded && algo != none)
 		{
 		    tmp = new (pool) generic_thread(layers.top());
 		    if(tmp == NULL)

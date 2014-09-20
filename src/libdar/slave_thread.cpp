@@ -220,6 +220,7 @@ namespace libdar
 	    break;
 	case msg_type::order_read_ahead:
 	    to_send_ahead += order.get_infinint();
+	    data->read_ahead(to_send_ahead); // propagate the read_ahead request
 	    break;
 	case msg_type::order_read:
 	    immediate_read = order.get_U_I();
@@ -353,15 +354,12 @@ namespace libdar
 	    }
 
 	    output->feed(ptr, read + 1); // +1 for the data header
-	    immediate_read -= read;
 	    sent += read;
-
-	    if(eof)
-	    {
-		immediate_read = 0; // stopping the read request
-		to_send_ahead = 0;  // stopping a pending read_ahead
-	    }
 	}
+
+	if(eof)
+	    to_send_ahead = 0;  // stopping a pending read_ahead
+	immediate_read = 0; // requested read has completed
 
 	if(to_send_ahead > 0)
 	{

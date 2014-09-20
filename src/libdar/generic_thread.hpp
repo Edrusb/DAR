@@ -43,8 +43,8 @@ namespace libdar
     {
     public:
 	    // default values for constuctor
-	static const unsigned int tampon_block_size = 10240;
-	static const unsigned int tampon_num_block = 30;
+	static const unsigned int tampon_block_size = 102401;
+	static const unsigned int tampon_num_block = 3500;
 
 	    /// constructor
 	    ///
@@ -71,8 +71,14 @@ namespace libdar
 	virtual void inherited_read_ahead(const infinint & amount);
 	virtual U_I inherited_read(char *a, U_I size);
 	virtual void inherited_write(const char *a, U_I size);
+
+	    /// generic_file inherited method to sync all pending writes
+	    ///
+	    /// \note no data in transit in this object so we should not do anything,
+	    /// however for performance propagating the order to slave_thread
 	virtual void inherited_sync_write();
-	virtual void inherited_flush_read() { (void)get_position(); };
+
+	virtual void inherited_flush_read() {}; // nothing to be done, no data in transit
 	virtual void inherited_terminate();
 
 
