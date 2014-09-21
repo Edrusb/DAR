@@ -45,6 +45,7 @@ namespace libdar
 	    throw SRC_BUG;
 	set_mode(ptr->get_mode());
 	reached_eof = false;
+	running = false;
 
 	order.clear();
 	order.set_type(msg_type::data);
@@ -57,7 +58,7 @@ namespace libdar
 	    throw Ememory("generic_thread::generic_thread");
 	try
 	{
-	    remote->run(); // launching the new thread
+	    my_run(); // launching the new thread
 	}
 	catch(...)
 	{
@@ -91,6 +92,9 @@ namespace libdar
     {
 	bool ret;
 
+	    // rerun the thread if an exception has occured previously
+	my_run();
+
 	    // preparing the order message
 
 	order.clear();
@@ -123,6 +127,9 @@ namespace libdar
 	bool ret;
 	reached_eof = false;
 
+	    // rerun the thread if an exception has occured previously
+	my_run();
+
 	    // preparing the order message
 
 	order.clear();
@@ -143,6 +150,9 @@ namespace libdar
     bool generic_thread::skip_to_eof()
     {
 	bool ret;
+
+	    // rerun the thread if an exception has occured previously
+	my_run();
 
 	    // preparing the order message
 
@@ -165,6 +175,9 @@ namespace libdar
     {
 	U_I val;
 	bool ret;
+
+	    // rerun the thread if an exception has occured previously
+	my_run();
 
 	    // preparing the order message
 
@@ -198,6 +211,9 @@ namespace libdar
     {
 	infinint ret;
 
+	    // rerun the thread if an exception has occured previously
+	my_run();
+
 	    // preparing the order message
 
 	order.clear();
@@ -217,6 +233,9 @@ namespace libdar
     void generic_thread::inherited_read_ahead(const infinint & amount)
     {
 
+	    // rerun the thread if an exception has occured previously
+	my_run();
+
 	    // preparing the order message
 
 	order.clear();
@@ -232,6 +251,9 @@ namespace libdar
     {
 	U_I read = 0;
 	U_I min;
+
+	    // rerun the thread if an exception has occured previously
+	my_run();
 
 	if(reached_eof)
 	    return 0;
@@ -275,7 +297,7 @@ namespace libdar
 		}
 		break;
 	    case msg_type::answr_exception:
-		remote->join();
+		my_join();
 		throw SRC_BUG;
 	    default:
 		throw SRC_BUG;
@@ -295,6 +317,9 @@ namespace libdar
 	unsigned int bksize;
 	char *tmptr = NULL;
 	U_I min;
+
+	    // rerun the thread if an exception has occured previously
+	my_run();
 
 	do
 	{
@@ -316,6 +341,9 @@ namespace libdar
 
     void generic_thread::inherited_sync_write()
     {
+	    // rerun the thread if an exception has occured previously
+	my_run();
+
 	    // preparing the order message
 
 	order.clear();
@@ -331,6 +359,9 @@ namespace libdar
 
     void generic_thread::inherited_terminate()
     {
+	    // rerun the thread if an exception has occured previously
+	my_run();
+
 	    // preparing the order message
 
 	order.clear();
@@ -339,7 +370,7 @@ namespace libdar
 	    // order completed
 
 	send_order();
-	remote->join();
+	my_join();
     }
 
     void generic_thread::send_order()
@@ -390,7 +421,7 @@ namespace libdar
 	{
 	case msg_type::answr_exception:
 	    release_block_answer();
-	    remote->join();
+	    my_join();
 	    throw SRC_BUG; // join should rethrow the exception that has been raised in the thread "remote"
 	default:
 	    if(answer.get_type() == expected)
@@ -403,5 +434,44 @@ namespace libdar
 	}
     }
 
+    void generic_thread::my_run()
+    {
+	if(!running)
+	{
+	    running = true;
+	    if(remote == NULL)
+		throw SRC_BUG;
+	    if(remote->is_running())
+		throw SRC_BUG;
+	    toslave.reset();
+	    tomaster.reset();
+	    remote->run(); // launching the new thread
+	    if(remote->is_running(tid))
+	    {
+		thread_cancellation::associate_tid_to_tid(pthread_self(), tid);
+		thread_cancellation::associate_tid_to_tid(tid, pthread_self());
+	    }
+	    else
+		running = false;
+	}
+    }
+
+    void generic_thread::my_join()
+    {
+	try
+	{
+	    remote->join(); // may throw exceptions
+	}
+	catch(...)
+	{
+	    if(running) // running may be false if the thread lived to shortly to obtain its tid
+		thread_cancellation::dead_thread(tid);
+	    running = false;
+	    throw;
+	}
+	if(running)
+	    thread_cancellation::dead_thread(tid);
+	running = false;
+    }
 
 } // end of generic_thread::namespace

@@ -86,8 +86,11 @@ namespace libdar
 	libthreadar::tampon<char> toslave;
 	libthreadar::tampon<char> tomaster;
 	slave_thread *remote;
-	bool reached_eof;
-	char data_header; // contains 1 byte header to send data
+	bool reached_eof;   //< whether we reached end of file
+	char data_header;   //< contains 1 byte header to send data
+	bool running;       //< whether a remote is expected to run, tid is then set
+	pthread_t tid;      //< thread id of remote
+
 
 	    // the following variables are locally in quite all methods
 	    // they do not contain valuable information outside each method call
@@ -101,6 +104,8 @@ namespace libdar
 	void read_answer();   //< \note ptr must be released/recycled after this call
 	void check_answer(msg_type expected);
 	void release_block_answer() { tomaster.fetch_recycle(ptr); ptr = NULL; };
+	void my_run();
+	void my_join();
     };
 
 } // end of namespace

@@ -199,8 +199,8 @@ namespace libdar
 	/// +----------------------------------------------+---------------------+
 	/// | [ generic_thread ]                           |                     |
 	/// | [ escape ]                                   |                     |
-	/// +----------------------------------------------+---------------------+
-	/// | [ generic_thread ]                           |                     |
+	/// +-- - - - - - - - - - - - - - - - - - - - - - -+---------------------+
+	/// | [ generic_thread (if crypt or scam is used) ]|                     |
 	/// | cache  |  crypto_sym  |  scrambler           |                     |
 	/// | [ cache ]                                    |_CACHE_PIPE          |
 	/// | trivial_sar  |  null_file  |  sar            |                     |

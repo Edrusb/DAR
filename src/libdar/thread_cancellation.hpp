@@ -46,6 +46,7 @@ extern "C"
 #endif
 }
 #include <list>
+#include <map>
 #include "integers.hpp"
 
 namespace libdar
@@ -105,6 +106,30 @@ namespace libdar
 	    /// \return true if the pending thread was still running and
 	    /// false if it has already aborted.
 	static bool clear_pending_request(pthread_t tid);
+
+	    /// define association between threads: if a cancellation is requested for src, it will also be requested for dst
+	    ///
+	    /// \param[in] src orginal target for cancellation
+	    /// \param[in] dst additional target for cancellation
+	    /// \note that the propagation of cancellation request with association is transitive
+	    /// in other word if t1 is associtated with t2 which is associated with t3,
+	    /// requesting cancellation of t1 will also lead to signal cancellation request for t2 and t3
+	    /// \note that association is not symmetrical, unless associating A to B *and* B to A
+	static void associate_tid_to_tid(pthread_t src, pthread_t dst);
+
+	    /// remove all association from a given tid to any other thread
+	    ///
+	    /// \param[in] src is the thread id that has to be removed from the
+	    /// association table (see associate_tid_to_tid() above).
+	static void remove_association_for_tid(pthread_t src);
+
+	    /// remove all association for any thread to a given targetted thread
+	    ///
+	    /// \param[in] dst all association target at dst will be removed
+	static void remove_association_targeted_at(pthread_t dst);
+
+	    /// clean class info from all related information about that thread, like associations and pending cancellations
+	static void dead_thread(pthread_t tid);
 #endif
 
 	    /// method for debugging/control purposes
@@ -137,9 +162,24 @@ namespace libdar
 
 	    // class's static variables and types
 
-	static pthread_mutex_t access;                 ///< mutex for the access to "info"
-	static std::list<thread_cancellation *> info;  ///< list of all object
-	static std::list<fields> preborn;              ///< canceled thread that still not have a thread_cancellation object to deal with cancellation
+	static pthread_mutex_t access;                 //< mutex for the access to "info"
+	static std::list<thread_cancellation *> info;  //< list of all object
+	static std::list<fields> preborn;              //< canceled thread that still not have a thread_cancellation object to deal with cancellation
+	static std::multimap<pthread_t, pthread_t> thread_asso; //< which other thread to propagate cancellation request to, given a initial tid
+
+	    // helper class routing
+	static void set_cancellation_in_info_for(pthread_t tid,
+						 bool cancel_status,
+						 bool x_immediate,
+						 U_64 x_flag,
+						 bool & found,
+						 bool & previous_val,
+						 bool & bug);
+	static void add_to_preborn(pthread_t tid, bool x_immediate, U_64 x_flag);
+	static void remove_from_preborn(pthread_t tid, bool & found, bool & prev);
+	static void find_asso_tid_with(pthread_t tid,
+				       std::multimap<pthread_t, pthread_t>::iterator & begin,
+				       std::multimap<pthread_t, pthread_t>::iterator & end);
 
 #endif
     };

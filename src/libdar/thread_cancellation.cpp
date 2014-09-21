@@ -54,6 +54,7 @@ namespace libdar
     pthread_mutex_t thread_cancellation::access = PTHREAD_MUTEX_INITIALIZER;
     list<thread_cancellation *> thread_cancellation::info;
     list<thread_cancellation::fields> thread_cancellation::preborn;
+    multimap<pthread_t, pthread_t> thread_cancellation::thread_asso;
 #endif
 
     thread_cancellation::thread_cancellation()
@@ -169,44 +170,25 @@ namespace libdar
 #if MUTEX_WORKS
     void thread_cancellation::cancel(pthread_t tid, bool x_immediate, U_64 x_flag)
     {
-	bool found = false, bug = false;
-	list<thread_cancellation *>::iterator ptr;
+	bool found = false, bug = false, notused = false;
+	multimap<pthread_t, pthread_t>::iterator debut;
+	multimap<pthread_t, pthread_t>::iterator fin;
 
 	CRITICAL_START;
-	ptr = info.begin();
-	while(ptr != info.end() && !bug)
-	{
-	    if(*ptr == NULL)
-		bug = true;
-	    else
-		if((*ptr)->status.tid == tid)
-		{
-		    found = true;
-		    (*ptr)->status.immediate = x_immediate;
-		    (*ptr)->status.cancellation = true;
-		    (*ptr)->status.flag = x_flag;
-		}
-	    ptr++;
-	}
+	set_cancellation_in_info_for(tid, true, x_immediate, x_flag, found, notused, bug);
 
 	if(!found && !bug)  // no thread_cancellation object exist for that thread
+	    add_to_preborn(tid, x_immediate, x_flag);
+
+	find_asso_tid_with(tid,
+			   debut,
+			   fin);
+	while(debut != fin && !bug)
 	{
-	    list<fields>::iterator it = preborn.begin();
-	    fields tmp;
-
-	    tmp.tid = tid;
-	    tmp.block_delayed = false;
-	    tmp.immediate = x_immediate;
-	    tmp.cancellation = true;
-	    tmp.flag = x_flag;
-
-	    while(it != preborn.end() && it->tid != tid)
-		it++;
-
-	    if(it != preborn.end())
-		*it = tmp;
-	    else
-		preborn.push_back(tmp);
+	    set_cancellation_in_info_for(debut->second, true, x_immediate, x_flag, found, notused, bug);
+	    if(!found && !bug)
+		add_to_preborn(debut->second, x_immediate, x_flag);
+	    ++debut;
 	}
 	CRITICAL_END;
 
@@ -251,37 +233,26 @@ namespace libdar
 
     bool thread_cancellation::clear_pending_request(pthread_t tid)
     {
-	bool ret = false, bug = false;
-	list<thread_cancellation *>::iterator ptr;
-	list<fields>::iterator it;
+	bool ret = false, bug = false, found = false;
+	multimap<pthread_t, pthread_t>::iterator debut;
+	multimap<pthread_t, pthread_t>::iterator fin;
 
 	CRITICAL_START;
-	ptr = info.begin();
-	while(ptr != info.end())
-	{
-	    if(*ptr == NULL)
-		bug = true;
-	    if((*ptr)->status.tid == tid)
-	    {
-		ret = (*ptr)->status.cancellation;
-		(*ptr)->status.cancellation = false;
-	    }
-	    ptr++;
-	}
+	set_cancellation_in_info_for(tid, false, false, 0, found, ret, bug);
+	if(!found && !bug)
+	    remove_from_preborn(tid, found, ret);
 
-	it = preborn.begin();
-	while(it != preborn.end())
-	{
-	    if(it->tid == tid)
-	    {
-		ret = it->cancellation;
-		preborn.erase(it);
-		it = preborn.begin();
-	    }
-	    else
-		it++;
-	}
+	find_asso_tid_with(tid,
+			   debut,
+			   fin);
 
+	while(debut != fin && !bug)
+	{
+	    set_cancellation_in_info_for(debut->second, false, false, 0, found, ret, bug);
+	    if(!found && !bug)
+		remove_from_preborn(debut->second, found, ret);
+	    ++debut;
+	}
 	CRITICAL_END;
 
 	if(bug)
@@ -289,6 +260,128 @@ namespace libdar
 
 	return ret;
     }
+
+    void thread_cancellation::associate_tid_to_tid(pthread_t src, pthread_t dst)
+    {
+	CRITICAL_START;
+	thread_asso.insert(pair<pthread_t, pthread_t>(src,dst));
+	CRITICAL_END;
+    }
+
+    void thread_cancellation::remove_association_for_tid(pthread_t src)
+    {
+	CRITICAL_START;
+	thread_asso.erase(src);
+	CRITICAL_END;
+    }
+
+    void thread_cancellation::remove_association_targeted_at(pthread_t dst)
+    {
+	CRITICAL_START;
+	multimap<pthread_t, pthread_t>::iterator it = thread_asso.begin();
+	multimap<pthread_t, pthread_t>::iterator next = it;
+
+	while(it != thread_asso.end())
+	{
+	    if(it->second == dst)
+	    {
+		next = it;
+		++next;
+		thread_asso.erase(it);
+		it = next;
+	    }
+	    else
+		++it;
+	}
+
+	CRITICAL_END;
+    }
+
+    void thread_cancellation::dead_thread(pthread_t tid)
+    {
+	bool found, prev;
+	remove_association_for_tid(tid);
+	remove_association_targeted_at(tid);
+	remove_from_preborn(tid, found, prev);
+    }
+
+    void thread_cancellation::set_cancellation_in_info_for(pthread_t tid,
+							   bool cancel_status,
+							   bool x_immediate,
+							   U_64 x_flag,
+							   bool & found,
+							   bool & previous_val,
+							   bool & bug)
+    {
+	list<thread_cancellation *>::iterator ptr = info.begin();
+
+	found = false;
+	bug = false;
+	while(ptr != info.end() && !bug)
+	{
+	    if(*ptr == NULL)
+		bug = true;
+	    else
+		if((*ptr)->status.tid == tid)
+		{
+		    found = true;
+		    (*ptr)->status.immediate = x_immediate;
+		    previous_val = (*ptr)->status.cancellation;
+		    (*ptr)->status.cancellation = cancel_status;
+		    (*ptr)->status.flag = x_flag;
+		}
+	    ptr++;
+	}
+    }
+
+    void thread_cancellation::add_to_preborn(pthread_t tid, bool x_immediate, U_64 x_flag)
+    {
+	list<fields>::iterator it = preborn.begin();
+	fields tmp;
+
+	tmp.tid = tid;
+	tmp.block_delayed = false;
+	tmp.immediate = x_immediate;
+	tmp.cancellation = true;
+	tmp.flag = x_flag;
+
+	while(it != preborn.end() && it->tid != tid)
+	    it++;
+
+	if(it != preborn.end())
+	    *it = tmp;
+	else
+	    preborn.push_back(tmp);
+    }
+
+    void thread_cancellation::remove_from_preborn(pthread_t tid, bool & found, bool & prev)
+    {
+	list<fields>::iterator it = preborn.begin();
+	found = false;
+
+	while(it != preborn.end())
+	{
+	    if(it->tid == tid)
+	    {
+		found = true;
+		prev = it->cancellation;
+		preborn.erase(it);
+		it = preborn.begin();
+	    }
+	    else
+		it++;
+	}
+    }
+
+    void thread_cancellation::find_asso_tid_with(pthread_t tid,
+						 multimap<pthread_t, pthread_t>::iterator & debut,
+						 multimap<pthread_t, pthread_t>::iterator & fin)
+    {
+	pair< multimap<pthread_t, pthread_t>::iterator, multimap<pthread_t, pthread_t>::iterator > tmp = thread_asso.equal_range(tid);
+	debut = tmp.first;
+	fin = tmp.second;
+    }
+
 #endif
 
 } // end of namespace
