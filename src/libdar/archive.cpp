@@ -2198,6 +2198,8 @@ namespace libdar
     void archive::free_except_memory_pool()
     {
 	stack.clear();
+	gnupg_signed.clear();
+	slices.clear();
 	if(cat != NULL)
 	{
 	    delete cat;

@@ -51,6 +51,7 @@ namespace libdar
 
 	void read(generic_file & f);
 	void write(generic_file & f) const;
+	void clear();
 
 	    /// given a slice_layout and a archive offset, provides the corresponding slice and slice offset
 	    ///

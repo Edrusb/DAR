@@ -62,6 +62,14 @@ namespace libdar
 	f.write(&tmp, 1);
     }
 
+    void slice_layout::clear()
+    {
+	first_size = 0;
+	other_size = 0;
+	first_slice_header = 0;
+	other_slice_header = 0;
+	older_sar_than_v8 = false;
+    }
 
     void slice_layout::which_slice(const infinint & offset,
 				   infinint & slice_num,
