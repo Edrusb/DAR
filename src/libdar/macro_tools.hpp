@@ -86,7 +86,7 @@ namespace libdar
 	/// | [ escape ]                                   |v   v   v            |
 	/// +----------------------------------------------+v---v---v------------+
 	/// | [ generic_thread ]                           |_UNCYPHERED          |
-	/// | cache  |  crypto_sym  |  scrambler           |v   v   v            |
+	/// | [ cache ]  |  crypto_sym  |  scrambler       |v   v   v            |
 	/// | [ tronc ]                                    |LEVEL 1              |
 	/// | trivial_sar  |  zapette  |  sar              |v   v   v            |
 	/// +----------------------------------------------+---------------------+
@@ -95,6 +95,7 @@ namespace libdar
 	/// \note generic_thread objects are only present in the stack if multi-thread is active
 	/// \note escape is present unless tape mark have been disabled at archive creation time
 	/// \note tronc is not present in sequential read mode
+	/// \note cache layer is present only in absence of encryption and when no escape layer is above
 	/// \note _UNCOMPRESSED label is associated to the top of the stack
 	/// \note _CLEAR is associated to the generic_thread below compressor else escape else
 	/// the cache or crypto_sym or scrambler which then has two Labels (_CLEAR and _UNCYPHERED)

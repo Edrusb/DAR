@@ -416,9 +416,14 @@ namespace libdar
 	    case crypto_none:
 		if(info_details)
 		    dialog.warning(gettext("No cyphering layer opened, adding cache layer for better performance"));
-		tmp = tmp_cache = new (pool) cache (*(stack.top()), false);
-		if(tmp == NULL)
-		    dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
+		if(ver.get_tape_marks())
+		{
+			// adding the cache layer only if no escape layer will tape place
+			// over. escape layer act a bit like a cache, making caching here useless
+		    tmp = tmp_cache = new (pool) cache (*(stack.top()), false);
+		    if(tmp == NULL)
+			dialog.warning(gettext("Failed opening the cache layer, lack of memory, archive read performances will not be optimized"));
+		}
 		break;
 	    case crypto_blowfish:
 	    case crypto_aes256:
@@ -462,7 +467,10 @@ namespace libdar
 	    }
 
 	    if(tmp == NULL)
-		throw Ememory("open_archive");
+	    {
+		if(crypto != crypto_none || !ver.get_tape_marks())
+		    throw Ememory("open_archive");
+	    }
 	    else
 	    {
 		stack.push(tmp);
