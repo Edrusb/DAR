@@ -101,31 +101,34 @@ namespace libdar
 	bool skip_relative(S_I x)  { if(x != 0) throw Efeature("skip in sparse_file"); return true; };
 	infinint get_position();
 
+	void reset(); //< reset the sparse_file detection as if "this" object was just created
+
     protected:
 
-	    // hidden methods from the escape class
+	    // methods from the escape class we hide from the (public) class interface
 
 	void add_mark_at_current_position(sequence_type t) { escape::add_mark_at_current_position(t); };
 	bool skip_to_next_mark(sequence_type t, bool jump) { return escape::skip_to_next_mark(t, jump); };
 	bool next_to_read_is_mark(sequence_type t) { return escape::next_to_read_is_mark(t); };
 	void add_unjumpable_mark(sequence_type t) { escape::add_unjumpable_mark(t); };
 
-	    // redefined protected methods from generic_file
+	    // methods from generic_file redefined as protected
 
 	U_I inherited_read(char *a, U_I size);
 	void inherited_write(const char *a, U_I size);
 	void inherited_sync_write();
-	void inherited_terminate() { escape::inherited_terminate(); };
+	    // inherited_flush_read() kept as is from the escape class
+	    // inherited_terminate() kept as is from the escape class
 
     private:
-	static bool initialized; //< whether object has been initialized
+	static bool initialized; //< whether static field "zeroed_field" has been initialized
         static unsigned char zeroed_field[SPARSE_FIXED_ZEROED_BLOCK]; //< read-only, used when the sequence of zeros is too short for a hole
 
-	enum { normal, hole } mode;
+	enum { normal, hole } mode; //< wether we are currently reading/writing a hole or normal data
 	infinint zero_count;     //< number of zeroed byte pending in the current hole
 	infinint offset;         //< current offset in file (as if it was a plain file).
 	infinint min_hole_size;  //< minimum size of hole to consider
-	U_I UI_min_hole_size;    //< if possible store min_hole_size under U_I, if not this field is set to zero which disables the hole lookup inside buffers while writing data
+	U_I UI_min_hole_size;    //< if possible store min_hole_size as U_I, if not this field is set to zero which disables the hole lookup inside buffers while writing data
 	bool escape_write;       //< whether to behave like an escape object when writing down data
 	bool escape_read;        //< whether to behave like an escape object when reading out data
 	bool copy_to_no_skip;    //< whether to hide holes by zeored bytes in the copy_to() methods

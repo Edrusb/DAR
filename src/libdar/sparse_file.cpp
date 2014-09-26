@@ -95,13 +95,8 @@ namespace libdar
 	    initialized = true;
 	}
 
-	mode = normal;
-	    // "zero_count" and "offset" have been initialized after the escape class constructor in this method's header, just above
-	escape_write = false;
-	escape_read = false;
+	reset();
 	copy_to_no_skip = false;
-	seen_hole = false;
-	data_escaped = false;
 
 	if(below == NULL)
 	    throw SRC_BUG;
@@ -130,6 +125,16 @@ namespace libdar
 	default:
 	    throw SRC_BUG;
 	}
+    }
+
+    void sparse_file::reset()
+    {
+	mode = normal;
+	zero_count = 0;
+	escape_write = false;
+	escape_read = false;
+	seen_hole = false;
+	data_escaped = false;
     }
 
 
@@ -436,7 +441,9 @@ namespace libdar
 	default:
 	    throw SRC_BUG;
 	}
+	escape::inherited_sync_write();
     }
+
 
     void sparse_file::dump_pending_zeros()
     {
