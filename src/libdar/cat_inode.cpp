@@ -91,6 +91,7 @@ namespace libdar
         ea_saved = ea_none;
 	fsa_saved = fsa_none;
         edit = 0;
+	small_read = false;
 
         try
         {
@@ -129,6 +130,7 @@ namespace libdar
 	{
 	    xsaved = saved;
 	    edit = reading_ver;
+	    small_read = small;
 
 	    if(reading_ver > 1)
 	    {
@@ -706,7 +708,7 @@ namespace libdar
 
 		    try
 		    {
-			if(get_escape_layer() == NULL) // direct read mode
+			if(!small_read) // direct read mode
 			{
 			    if(ea_offset == NULL)
 				throw SRC_BUG;
@@ -716,6 +718,9 @@ namespace libdar
 			}
 			else // sequential read mode
 			{
+			    if(get_escape_layer() == NULL)
+				throw SRC_BUG;
+
 				// warning this section calls *esc directly while it may be managed by another thread
 				// we are reading from the stack the possible thread is not in read_ahead operation
 				// so it is pending for read request or other orders
@@ -871,8 +876,11 @@ namespace libdar
 	if(ea_get_saved_status() != ea_full)
 	    throw SRC_BUG;
 
-        if(get_escape_layer() != NULL && ea_crc == NULL)
+        if(small_read && ea_crc == NULL)
         {
+	    if(get_escape_layer() == NULL)
+		throw SRC_BUG;
+
             if(get_escape_layer()->skip_to_next_mark(escape::seqt_ea_crc, false))
             {
                 crc *tmp = NULL;
@@ -1057,7 +1065,7 @@ namespace libdar
 		    {
 			bool need_resume_compr = false;
 
-			if(get_escape_layer() == NULL) // direct reading mode
+			if(!small_read) // direct reading mode
 			{
 			    if(fsa_offset == NULL)
 				throw SRC_BUG;
@@ -1065,6 +1073,9 @@ namespace libdar
 			}
 			else
 			{
+			    if(get_escape_layer() == NULL)
+				throw SRC_BUG;
+
 				// warning this section calls *get_escape_layer() directly while it may be managed by another thread
 				// we are reading from the get_pile() the possible thread is not in read_ahead operation
 				// so it is pending for read request or other orders
@@ -1236,8 +1247,11 @@ namespace libdar
 	if(fsa_get_saved_status() != fsa_full)
 	    throw SRC_BUG;
 
-        if(get_escape_layer() != NULL && fsa_crc == NULL)
+        if(small_read && fsa_crc == NULL)
         {
+	    if(get_escape_layer() == NULL)
+		throw SRC_BUG;
+
 	    if(get_pile() == NULL)
 		throw SRC_BUG;
 
@@ -1404,6 +1418,7 @@ namespace libdar
 	    xsaved = ref.xsaved;
 	    ea_saved = ref.ea_saved;
 	    fsa_saved = ref.fsa_saved;
+	    small_read = ref.small_read;
 	    copy_ptr(ref.ea_offset, ea_offset, get_pool());
 	    copy_ptr(ref.ea, ea, get_pool());
 	    copy_ptr(ref.ea_size, ea_size, get_pool());

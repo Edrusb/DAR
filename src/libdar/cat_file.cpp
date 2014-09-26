@@ -488,7 +488,7 @@ namespace libdar
 				delete tmp;
 				throw;
 			    }
-			    data->skip(0); // set the reading cursor at the beginning
+			    data->skip(0); // set the reading cursor at the beginning of file's data
 
 			    ret = data;
 			}

@@ -188,10 +188,11 @@ namespace libdar
 
     protected:
         virtual void sub_compare(const cat_inode & other, bool isolated_mode) const {};
+	bool get_small_read() const { return small_read; }; //< true if object has been created by sequential reading of an archive
 
-
-
+	    // inherited from cat_entree
         void inherited_dump(const pile_descriptor & pdesc, bool small) const;
+
 
     private :
         infinint uid;            //< inode owner's user ID
@@ -203,6 +204,8 @@ namespace libdar
         saved_status xsaved;     //< inode data status
         ea_status ea_saved;      //< inode Extended Attribute status
 	fsa_status fsa_saved;    //< inode Filesystem Specific Attribute status
+
+	bool small_read;         //< whether we the object has been built with sequential-reading
 
             //  the following is used only if ea_saved == full
         infinint *ea_offset;     //< offset in archive where to find EA
