@@ -468,7 +468,7 @@ namespace libdar
 
 	    if(tmp == NULL)
 	    {
-		if(crypto != crypto_none || !ver.get_tape_marks())
+		if(crypto != crypto_none || ver.get_tape_marks())
 		    throw Ememory("open_archive");
 	    }
 	    else
