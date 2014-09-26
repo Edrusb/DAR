@@ -118,8 +118,8 @@ namespace libdar
 	void inherited_terminate() { escape::inherited_terminate(); };
 
     private:
-	static bool initialized;
-        static unsigned char zeroed_field[SPARSE_FIXED_ZEROED_BLOCK]; // read-only, used when the sequence of zeros is too short for a hole
+	static bool initialized; //< whether object has been initialized
+        static unsigned char zeroed_field[SPARSE_FIXED_ZEROED_BLOCK]; //< read-only, used when the sequence of zeros is too short for a hole
 
 	enum { normal, hole } mode;
 	infinint zero_count;     //< number of zeroed byte pending in the current hole

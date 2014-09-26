@@ -166,7 +166,7 @@ namespace libdar
 		if(!mini_read_buffer())
 		{
 		    read_eof = true; // not enough data available, thus
-		    clean_data();
+		    clean_read();
 		}
 		else // we could get more data to determine whether we have a mark in the buffer or not
 		{
@@ -780,6 +780,13 @@ namespace libdar
 	default:
 	    throw Erange("escape::char2type", gettext("Unknown escape sequence type"));
 	}
+    }
+
+    void escape::clean_read()
+    {
+	read_buffer_size = already_read = escape_seq_offset_in_buffer = 0;
+	read_eof = false;
+	escaped_data_count_since_last_skip = 0;
     }
 
     void escape::flush_write()

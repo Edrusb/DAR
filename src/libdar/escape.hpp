@@ -126,6 +126,7 @@ namespace libdar
 	bool is_unjumpable_mark(sequence_type t) const { return unjumpable.find(t) != unjumpable.end(); };
 	void clear_all_unjumpable_marks() { unjumpable.clear(); };
 
+
 	    // generic_file inherited routines
 	    // NOTA: Nothing is done to prevent skip* operation to put the read cursor in the middle of an escape sequence and
 	    // thus incorrectly consider it as normal data. Such event should only occure upon archive corruption and will be detected
@@ -142,7 +143,7 @@ namespace libdar
 	U_I inherited_read(char *a, U_I size);
 	void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() { flush_write(); };
-	void inherited_flush_read() { flush_write(); clean_data(); };
+	void inherited_flush_read() { flush_write(); clean_read(); };
 	void inherited_terminate() { flush_or_clean(); };
 
 	void change_fixed_escape_sequence(unsigned char value) { fixed_sequence[0] = value; };
@@ -172,8 +173,8 @@ namespace libdar
 	U_I write_buffer_size;        //< amount of data in write transit not yet written to "below" (may have to be escaped)
 	char write_buffer[WRITE_BUFFER_SIZE]; //< data in write transit, all data is unescaped, up to the first real mark, after it, data is raw (may be escaped)
 	                                      //< the first real mark is pointed to by escape_seq_offset_in_buffer
-	U_I read_buffer_size;         //< amount of data in write transit, read from below, but not yet unescaped and returned to the upper layer
-	U_I already_read;             //< data in buffer that has already returned to the upper layer
+	U_I read_buffer_size;         //< amount of data in transit, read from below, but possibly not yet unescaped and returned to the upper layer
+	U_I already_read;             //< data in buffer that has already been returned to the upper layer
 	bool read_eof;                //< whether we reached a escape sequence while reading data
 	U_I escape_seq_offset_in_buffer; //< location of the first escape sequence which is not a data sequence
 	char read_buffer[READ_BUFFER_SIZE]; //< data in read transit
@@ -185,14 +186,14 @@ namespace libdar
 
 	void set_fixed_sequence_for(sequence_type t) { fixed_sequence[ESCAPE_SEQUENCE_LENGTH - 1] = type2char(t); };
 	void check_below() { if(x_below == NULL) throw SRC_BUG; };
-	void clean_data() { read_buffer_size = already_read = escape_seq_offset_in_buffer = 0; }; //< drops all in-transit data
-	void flush_write();                                                                       //< write down to "below" all in-transit data
+	void clean_read();  //< drops all in-transit data
+	void flush_write(); //< write down to "below" all in-transit data
 	void flush_or_clean()
 	{
 	    switch(get_mode())
 	    {
 	    case gf_read_only:
-		clean_data();
+		clean_read();
 		break;
 	    case gf_write_only:
 	    case gf_read_write:
