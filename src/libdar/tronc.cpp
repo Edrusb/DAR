@@ -95,6 +95,29 @@ namespace libdar
 	limited = false;
     }
 
+    void tronc::modify(const infinint & new_offset, const infinint & new_size)
+    {
+	modify(new_offset);
+	sz = new_size;
+	limited = true;
+	if(current > sz)
+	    current = sz;
+    }
+
+    void tronc::modify(const infinint & new_offset)
+    {
+	current = current + start; // current now temporarily holds the absolute position
+	start = new_offset;
+	if(current <= start)
+	    current = 0;
+	else
+	    current -= start; // now current points to the same byte but within the new scope
+	limited = false;
+    }
+
+    void tronc::modify() { modify(0); };
+
+
     bool tronc::skippable(skippability direction, const infinint & amount)
     {
 	if(is_terminated())

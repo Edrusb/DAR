@@ -64,6 +64,13 @@ namespace libdar
 		delete ref;
 	};
 
+	    /// modify the tronc object to zoom on another (size limited) portion of the underlying object
+	void modify(const infinint & new_offset, const infinint & new_size);
+	    /// modify the tronc object to zoom on another (size unlimited) portion of the underlying object
+	void modify(const infinint & new_offset);
+	    /// modify the tronc object to become transparent and allow unrestricted access to the underlyuing object
+	void modify();
+
 	    /// inherited from generic_file
 	bool skippable(skippability direction, const infinint & amount);
 	    /// inherited from generic_file
@@ -88,8 +95,8 @@ namespace libdar
 	void inherited_terminate() {if(own_ref) ref->terminate(); };
 
     private :
-        infinint start;  //< offset in the global generic file to start at
-	infinint sz;     //< length of the portion to consider
+        infinint start;    //< offset in the global generic file to start at
+	infinint sz;       //< length of the portion to consider
         generic_file *ref; //< global generic file of which to take a piece
         infinint current;  //< inside position of the next read or write
 	bool own_ref;      //< whether we own ref (and must destroy it when no more needed)
