@@ -81,6 +81,7 @@ namespace libdar
 	/// +----------------------------------------------+---------------------+
 	/// | [ generic_thread ]                           |_UNCOMPRESSED        |
 	/// | compressor                                   |v    v    v          |
+	/// | tronc                                        |ZOOM                 |
 	/// +----------------------------------------------+---------------------+
 	/// | [ generic_thread ]                           |_CLEAR               |
 	/// | [ escape ]                                   |v   v   v            |
