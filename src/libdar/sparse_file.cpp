@@ -79,7 +79,7 @@ namespace libdar
 			     const infinint & hole_size)
 	: escape(below, std::set<sequence_type>()),
 	  zero_count(0),
-	  offset(0)
+	  offset(escape::get_position())
     {
 	    // change the escape sequences fixed part to not collide with a possible underlying (the "below" object or below this "below" object) escape object
 	change_fixed_escape_sequence(ESCAPE_FIXED_SEQUENCE_SPARSE_FILE);
@@ -126,17 +126,6 @@ namespace libdar
 	    throw SRC_BUG;
 	}
     }
-
-    void sparse_file::reset()
-    {
-	mode = normal;
-	zero_count = 0;
-	escape_write = false;
-	escape_read = false;
-	seen_hole = false;
-	data_escaped = false;
-    }
-
 
     U_I sparse_file::inherited_read(char *a, U_I size)
     {
@@ -503,6 +492,16 @@ namespace libdar
 	}
 	write_as_escape(false); // back in normal writing mode
 	seen_hole = true;
+    }
+
+    void sparse_file::reset()
+    {
+	mode = normal;
+	zero_count = 0;
+	escape_write = false;
+	escape_read = false;
+	seen_hole = false;
+	data_escaped = false;
     }
 
 

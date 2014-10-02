@@ -101,8 +101,6 @@ namespace libdar
 	bool skip_relative(S_I x)  { if(x != 0) throw Efeature("skip in sparse_file"); return true; };
 	infinint get_position();
 
-	void reset(); //< reset the sparse_file detection as if "this" object was just created
-
     protected:
 
 	    // methods from the escape class we hide from the (public) class interface
@@ -141,6 +139,12 @@ namespace libdar
 
 	    /// write a hole datastructure
 	void write_hole(const infinint & length);
+
+	    /// reset the sparse_file detection as if "this" object was just created
+	    ///
+	    /// \note may lead the offset to be backward it previous position
+	void reset();
+
 
 	    /// analyse a buffer for a hole
 
