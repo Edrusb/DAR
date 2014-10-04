@@ -43,11 +43,6 @@ extern "C"
 #include "deci.hpp"
 #include "cat_all_entrees.hpp"
 
-#if LIBTHREADAR_AVAILABLE
-#include "generic_thread.hpp"
-#endif
-
-
 using namespace std;
 
 #define SKIPPED "Skipping file: "
@@ -2703,11 +2698,6 @@ namespace libdar
 			{
 			    try
 			    {
-#ifdef LIBTHREADAR_AVAILABLE
-				generic_thread *gt = NULL;
-#else
-				generic_file *gt = NULL;
-#endif
 				sparse_file *dst_hole = NULL;
 				infinint crc_size = tools_file_size_to_crc_size(fic->get_size());
 				crc * val = NULL;
@@ -2715,6 +2705,9 @@ namespace libdar
 				bool crc_available = false;
 
 				fic->set_offset(start);
+
+				    // this is done as soon as possible to benefit of the read_ahead
+				    // while finishing the setup of the destination
 				source->skip(0);
 				source->read_ahead(fic->get_size());
 
@@ -2735,12 +2728,6 @@ namespace libdar
 					if(dst_hole == NULL)
 					    throw Ememory("save_inode");
 					pdesc.stack->push(dst_hole);
-#ifdef LIBTHREADAR_AVAILABLE
-					gt = new (pool) generic_thread(pdesc.stack->top());
-					if(gt == NULL)
-					    throw Ememory("save_inode");
-					pdesc.stack->push(gt);
-#endif
 				    }
 
 					//////////////////////////////
@@ -2800,14 +2787,6 @@ namespace libdar
 					val = NULL;
 				    }
 
-				    if(gt != NULL)
-				    {
-					if(pdesc.stack->pop() != gt)
-					    throw SRC_BUG;
-					delete gt;
-					gt = NULL;
-				    }
-
 				    if(dst_hole != NULL)
 				    {
 					if(pdesc.stack->pop() != dst_hole)
@@ -2822,15 +2801,6 @@ namespace libdar
 				{
 				    delete val;
 				    val = NULL;
-				}
-
-				if(gt != NULL)
-				{
-				    gt->terminate();
-				    if(pdesc.stack->pop() != gt)
-					throw SRC_BUG;
-				    delete gt;
-				    gt = NULL;
 				}
 
 				if(dst_hole != NULL)

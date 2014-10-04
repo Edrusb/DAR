@@ -421,6 +421,9 @@ namespace libdar
 
 			try
 			{
+
+				// changing the compression algo of the archive stack
+
 			    if(*size > 0 && get_compression_algo_read() != none && mode != keep_compressed)
 			    {
 				if(get_compression_algo_read() != none)
@@ -445,9 +448,39 @@ namespace libdar
 				}
 			    }
 
+				// adding a tronc object in the local stack that will be returned by get_data() method
+
+			    generic_file *tmp = NULL;
+			    if(get_compression_algo_read() == none)
+				tmp = new (get_pool()) tronc(get_pile(), *offset, *size, gf_read_only);
+			    else
+				tmp = new (get_pool()) tronc(get_pile(), *offset, gf_read_only);
+			    if(tmp == NULL)
+				throw Ememory("cat_file::get_data");
+			    try
+			    {
+				data->push(tmp);
+			    }
+			    catch(...)
+			    {
+				delete tmp;
+				throw;
+			    }
+
+				// set the reading cursor at the beginning of file's data
+
+			    data->skip(0);
+
+
+				// adding a sparse_file object in top of the local stack
+				//
+				// if a sparse_file object is to be used, it must be placed on top of the
+				// returned stack, in order to benefit of the sparse_file::copy_to() specific methods
+				// that can restore holes
+
 			    if(get_sparse_file_detection_read() && mode != keep_compressed && mode != keep_hole)
 			    {
-				sparse_file *stmp = new (get_pool()) sparse_file(get_pile());
+				sparse_file *stmp = new (get_pool()) sparse_file(data->top());
 				if(stmp == NULL)
 				    throw Ememory("cat_file::get_data");
 				try
@@ -474,21 +507,6 @@ namespace libdar
 				    throw SRC_BUG;
 				}
 			    }
-
-			    generic_file *parent = data->is_empty() ? get_pile() : data->top();
-			    generic_file *tmp = new (get_pool()) tronc(parent, *offset, *size, gf_read_only);
-			    if(tmp == NULL)
-				throw Ememory("cat_file::get_data");
-			    try
-			    {
-				data->push(tmp);
-			    }
-			    catch(...)
-			    {
-				delete tmp;
-				throw;
-			    }
-			    data->skip(0); // set the reading cursor at the beginning of file's data
 
 			    ret = data;
 			}
