@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ "$1" = "" ] ; then
-  echo "usage $0 <crypto> <zip> <slice> <Slice> <tape mark[y|n]> <sequential read[y|n]> <min-digit> <sparse-size> <keepcompressed[y|n]> <recheck-hole[y|n]> <hash>"
+  echo "usage $0 <crypto> <zip> <slice> <Slice> <tape mark[y|n]> <sequential read[y|n]> <min-digit> <sparse-size> <keepcompressed[y|n]> <recheck-hole[y|n]> <hash> <multi-thread>"
   exit 1
 fi
 
@@ -16,6 +16,7 @@ sparse="$8"
 keep_compr="$9"
 re_hole="${10}"
 hash="${11}"
+multi_thread="${12}"
 
 #echo "crypto = $crypto"
 #echo "zip = $zip"
@@ -28,6 +29,7 @@ hash="${11}"
 #echo "keep_compr = $keep_compr"
 #echo "re_hole = $re_hole"
 #echo "hash = [$hash]"
+#echo "multi-thread = [$multi_thread]"
 
 ALL_TESTS="A1 B1 B2 B3 B4 C1 C2 C3 C4 D1 E1 E2 E3 F1 F2 F3 G1 G2 G3 H1"
 
@@ -113,11 +115,18 @@ else
   hash=""
 fi
 
+if [ "$multi_thread" != "y" ]; then
+  multi_thread="-G"
+else
+  multi_thread=""
+fi
+
 cat > $OPT <<EOF
 all:
  $sequential
  $min_digits
  $crypto_K
+ $multi_thread
 
 reference:
  $crypto_J
@@ -156,7 +165,7 @@ diffing:
 EOF
 echo "----------------------------------------------------------------"
 echo "----------------------------------------------------------------"
-echo "TESTS PARAMETERS NATURE: crypto zip slice Slice tape-mark seq-read digit sparse keepcompr re-hole hash"
+echo "TESTS PARAMETERS NATURE: crypto zip slice Slice tape-mark seq-read digit sparse keepcompr re-hole hash multi-thread"
 echo "TESTS PARAMETERS VALUE: $*"
 echo "TEST SET: $ALL_TESTS"
 echo "----------------------------------------------------------------"

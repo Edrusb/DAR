@@ -56,18 +56,20 @@ if ./all_features ; then
 else
   exit 3
 fi
-for hash in  md5 none sha1 ; do
-  for crypto in bf none scram aes twofish serpent camellia ; do
-    for zip in xz gzip none bzip2 lzo; do
-      for slice in 1k none ; do
-        for Slice in  500 none ; do
-          for tape in y n ; do
-            for seq_read in y n ; do
-              for digit in 3 none ; do
-                for sparse_size in 100 0 ; do
-                  for keep_compr in y n ; do
-                    for recheck_hole in y n ; do
-                       ./main.sh $crypto "$zip" "$slice" "$Slice" "$tape" "$seq_read" "$digit" "$sparse_size" "$keep_compr" "$recheck_hole" "$hash" || exit 1
+for multi_thread in n y ; do
+  for hash in  md5 none sha1 ; do
+    for crypto in bf none scram aes twofish serpent camellia ; do
+      for zip in xz gzip none bzip2 lzo; do
+        for slice in 1k none ; do
+          for Slice in  500 none ; do
+            for tape in y n ; do
+              for seq_read in y n ; do
+                for digit in 3 none ; do
+                  for sparse_size in 100 0 ; do
+                    for keep_compr in y n ; do
+                      for recheck_hole in y n ; do
+                         ./main.sh $crypto "$zip" "$slice" "$Slice" "$tape" "$seq_read" "$digit" "$sparse_size" "$keep_compr" "$recheck_hole" "$hash" "$multi_thread" || exit 1
+		      done
                     done
                   done
                 done
