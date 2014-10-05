@@ -23,7 +23,7 @@
     /// \brief libz and libbz2 wrapper to have identical interface to these libraries.
     /// \ingroup Private
     ///
-    /// libz and libbz2 library differ in several in the way they return values
+    /// libz and libbz2 library differ in the way they return values
     /// in certain circumpstances. This module defines the wrapperlib class
     /// that make their use homogeneous.
 
