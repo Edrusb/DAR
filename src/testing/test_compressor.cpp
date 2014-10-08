@@ -54,7 +54,7 @@ int main()
 
     get_version(maj, med, min);
 
-    user_interaction *ui = new (nothrow) shell_interaction(&cout, &cerr, false);
+    ui = new (nothrow) shell_interaction(&cout, &cerr, false);
     if(ui == NULL)
 	cout << "ERREUR !" << endl;
     f1();
@@ -82,29 +82,28 @@ static void f1()
         src1.copy_to(c1);
         src2.copy_to(c2);
         src3.copy_to(c3);
-/*
-    // ajout d'un deuxieme block de donnees indentiques
-    c2.flush_write();
-    pos2 = c2.get_position();
-    src2.skip(0);
-    src2.copy_to(c2);
 
-	// ajout d'un deuxieme block de donnees indentiques
-        c3.flush_write();
+	    // ajout d'un deuxieme block de donnees indentiques
+	c2.sync_write();
+	pos2 = c2.get_position();
+	src2.skip(0);
+	src2.copy_to(c2);
+
+	    // ajout d'un deuxieme block de donnees indentiques
+        c3.sync_write();
         pos3 = c3.get_position();
         src3.skip(0);
         src3.copy_to(c3);
 
             // alteration du premier block de donnees compresses
-	    c2.flush_write(); // to be sure all data is written to file
-	    dst2.skip(pos2 / 2);
-	    dst2.write("A", 1);
+	c2.sync_write(); // to be sure all data is written to file
+	dst2.skip(pos2 / 2);
+	dst2.write("A", 1);
 
-		// alteration du premier block de donnees compresses
-		c3.flush_write(); // to be sure all data is written to file
-		dst3.skip(pos3 / 2);
-		dst3.write("A", 1);
-*/
+	    // alteration du premier block de donnees compresses
+	c3.sync_write(); // to be sure all data is written to file
+	dst3.skip(pos3 / 2);
+	dst3.write("A", 1);
     }
     catch(Egeneric & e)
     {
@@ -125,6 +124,7 @@ static void f1()
         compressor c3 = compressor(bzip2, src3);
 
         c1.copy_to(dst1);
+
         try
         {
             c2.copy_to(dst2);
@@ -133,6 +133,8 @@ static void f1()
         {
             cerr << e.dump_str();
             c2.skip(pos2);
+	    dst2.skip(0);
+	    c2.copy_to(dst2);
         }
 
         try
@@ -143,12 +145,9 @@ static void f1()
         {
             cerr << e.dump_str();
             c3.skip(pos3);
+	    dst3.skip(0);
+	    c3.copy_to(dst3);
         }
-
-        c2.flush_read();
-        c2.copy_to(dst2);
-        c3.flush_read();
-        c3.copy_to(dst3);
     }
     catch(Egeneric & e)
     {
