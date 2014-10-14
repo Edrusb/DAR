@@ -1201,6 +1201,11 @@ static bool get_args_recursive(recursive_param & rec,
 		    {
 			make_args_from_file(*rec.dialog, p.op, rec.non_options, tmp_string, rec_c, rec_v, p.info_details);
 		    }
+		    catch(Esystem & e)
+		    {
+			Erange modif = Erange("get_args", tools_printf(gettext("Error reading included file (%s): "), optarg) + e.get_message());
+			throw modif;
+		    }
 		    catch(Erange & e)
 		    {
 			Erange modif = Erange("get_args", tools_printf(gettext("Error in included file (%s): "), optarg) + e.get_message());
