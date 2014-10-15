@@ -1572,7 +1572,7 @@ namespace libdar
 		// STEP 1:
 		// we merge catalogues (pointed to by ref_tab[]) of each archive and produce a resulting catalogue 'cat'
 		// the merging resolves overwriting conflicts following the "criterium" rule
-		// each object of the catalogue is cloned, these clones get added to the resulting catalogue in step 2
+		// each object of the catalogue is cloned and stored in 'cat', these clones get dump to archive at step 2
 
 	    try
 	    {
