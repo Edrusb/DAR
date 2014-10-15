@@ -157,7 +157,7 @@ namespace libdar
 		try
 		{
 		    if(ret != NULL && &cata_stack != &data_stack)
-			ret->change_location(data_pdesc, false);
+			ret->change_location(data_pdesc);
 		    data_ctxt->set_info_status(CONTEXT_OP);
 		    cata_ctxt->set_info_status(CONTEXT_OP);
 		}
