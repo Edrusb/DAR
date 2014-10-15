@@ -115,8 +115,6 @@ namespace libdar
 	limited = false;
     }
 
-    void tronc::modify() { modify(0); };
-
 
     bool tronc::skippable(skippability direction, const infinint & amount)
     {

@@ -69,7 +69,7 @@ namespace libdar
 	    /// modify the tronc object to zoom on another (size unlimited) portion of the underlying object
 	void modify(const infinint & new_offset);
 	    /// modify the tronc object to become transparent and allow unrestricted access to the underlyuing object
-	void modify();
+	void modify() { modify(0); };
 
 	    /// inherited from generic_file
 	bool skippable(skippability direction, const infinint & amount);
