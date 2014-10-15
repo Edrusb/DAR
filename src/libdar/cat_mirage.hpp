@@ -95,6 +95,8 @@ namespace libdar
 	    /// whether we are the mirage that triggered this hard link creation
 	bool is_first_mirage() const { return star_ref->get_first_ref() == this; };
 
+	    // overwriting virtual method from cat_entree
+	virtual void change_location(const pile_descriptor & pdesc, bool small) { get_inode()->change_location(pdesc, small); };
 
     protected:
 	void inherited_dump(const pile_descriptor & pdesc, bool small) const;

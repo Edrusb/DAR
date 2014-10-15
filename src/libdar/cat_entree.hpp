@@ -155,6 +155,7 @@ namespace libdar
 	    /// the stack of the archive under construction, so we use this call for that need,
 	    /// \note this is also used when opening a catalogue if an isolated catalogue in place of the internal catalogue of an archive
 	    /// \note this method is virtual for cat_directory to overwrite it and propagate the change to all entries of the directory tree
+	    /// as well for mirage to propagate the change to the hard linked inode
 	virtual void change_location(const pile_descriptor & pdesc, bool small);
 
 
