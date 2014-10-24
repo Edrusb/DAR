@@ -740,7 +740,10 @@ namespace libdar
 	    dialog.printf(gettext("Compression algorithm used           : %S\n"), &algo);
 	    dialog.printf(gettext("Scrambling or strong encryption used : %s\n"), ((ver.flag & VERSION_FLAG_SCRAMBLED) != 0 ? gettext("yes") : gettext("no")));
 	    dialog.printf(gettext("Sequential reading marks             : %s\n"), ((ver.flag & VERSION_FLAG_SEQUENCE_MARK) != 0 ? gettext("present") : gettext("absent")));
-	    dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
+	    if(cat_size > 0)
+		dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
+	    else
+		dialog.printf(gettext("Catalogue size in archive            : N/A\n"));
 
 	    dialog.printf(gettext("User comment                         : %S\n\n"), &(get_header().cmd_line));
 

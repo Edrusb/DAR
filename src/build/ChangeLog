@@ -1,3 +1,6 @@
+from 2.4.15 to 2.4.16
+- archive listing display fix for catalogue size in --sequential-read mode
+
 from 2.4.14 to 2.4.15
 - fixing bug met when reading an encrypted archive in sequential mode
 - fixing bug met when reading an encrypted archive in sequential mode from
