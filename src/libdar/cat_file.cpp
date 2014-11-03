@@ -448,28 +448,33 @@ namespace libdar
 				}
 			    }
 
-				// adding a tronc object in the local stack that will be returned by get_data() method
+				// adding a tronc object in the local stack object when no compression is used
 
-			    generic_file *tmp = NULL;
-			    if(get_compression_algo_read() == none)
-				tmp = new (get_pool()) tronc(get_pile(), *offset, *size, gf_read_only);
-			    else
-				tmp = new (get_pool()) tronc(get_pile(), *offset, gf_read_only);
-			    if(tmp == NULL)
-				throw Ememory("cat_file::get_data");
-			    try
+			    if(!get_small_read())
 			    {
-				data->push(tmp);
-			    }
-			    catch(...)
-			    {
-				delete tmp;
-				throw;
+				if(get_compression_algo_read() == none)
+				{
+				    generic_file *tmp = new (get_pool()) tronc(get_pile(), *offset, *storage_size, gf_read_only);
+				    if(tmp == NULL)
+					throw Ememory("cat_file::get_data");
+				    try
+				    {
+					data->push(tmp);
+					data->skip(0);
+				    }
+				    catch(...)
+				    {
+					delete tmp;
+					throw;
+				    }
+				}
+				else
+				    get_pile()->skip(*offset);
 			    }
 
-				// set the reading cursor at the beginning of file's data
+				// determining on which layer to rely on for possible the next to come sparse file
 
-			    data->skip(0);
+			    generic_file *parent = data->is_empty() ? get_pile() : data->top();
 
 
 				// adding a sparse_file object in top of the local stack
@@ -480,7 +485,7 @@ namespace libdar
 
 			    if(get_sparse_file_detection_read() && mode != keep_compressed && mode != keep_hole)
 			    {
-				sparse_file *stmp = new (get_pool()) sparse_file(data->top());
+				sparse_file *stmp = new (get_pool()) sparse_file(parent);
 				if(stmp == NULL)
 				    throw Ememory("cat_file::get_data");
 				try
@@ -505,6 +510,26 @@ namespace libdar
 				    break;
 				default:
 				    throw SRC_BUG;
+				}
+			    }
+
+				// if the stack to return is empty adding a tronc
+				// to have the proper offset zero at the beginning of the data
+
+			    if(data->is_empty())
+			    {
+				generic_file *tmp = new tronc(get_pile(), *offset, gf_read_only);
+				if(tmp == NULL)
+				    throw Ememory("cat_file::get_data");
+
+				try
+				{
+				    data->push(tmp);
+				}
+				catch(...)
+				{
+				    delete tmp;
+				    throw;
 				}
 			    }
 
