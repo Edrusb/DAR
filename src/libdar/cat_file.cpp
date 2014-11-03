@@ -424,9 +424,9 @@ namespace libdar
 
 				// changing the compression algo of the archive stack
 
-			    if(*size > 0 && get_compression_algo_read() != none && mode != keep_compressed)
+			    if(*size > 0)
 			    {
-				if(get_compression_algo_read() != none)
+				if(get_compression_algo_read() != none && mode != keep_compressed)
 				{
 				    if(get_compression_algo_read() != get_compressor_layer()->get_algo())
 				    {
@@ -437,14 +437,14 @@ namespace libdar
 				    }
 					// else nothing to do, compressor is already properly configured
 				}
-				else
+				else  // disabling de-compression
 				{
-				    if(get_compression_algo_read() != get_compressor_layer()->get_algo())
+				    if(get_compressor_layer()->get_algo() != none)
 				    {
 					get_pile()->flush_read_above(get_compressor_layer());
 					get_compressor_layer()->suspend_compression();
 				    }
-					// else nothing to do, compressor is already set with correct compression
+					// else nothing to do, de-compression is already disabled
 				}
 			    }
 

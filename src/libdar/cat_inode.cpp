@@ -726,7 +726,11 @@ namespace libdar
 				// so it is pending for read request or other orders
 			    if(!get_escape_layer()->skip_to_next_mark(escape::seqt_ea, false))
 				throw Erange("cat_inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
-				// we shall reset layers above esc for they do not assume nothing has changed below
+				// resuming compression (EA are always stored compressed)
+			    get_pile()->flush_read_above(get_compressor_layer());
+			    get_compressor_layer()->resume_compression();
+
+				// we shall reset layers above esc for they do not assume nothing has changed below them
 			    get_pile()->flush_read_above(get_escape_layer());
 				// now we can continue normally using get_pile()
 
@@ -1063,8 +1067,6 @@ namespace libdar
 
 		    try
 		    {
-			bool need_resume_compr = false;
-
 			if(!small_read) // direct reading mode
 			{
 			    if(fsa_offset == NULL)
@@ -1092,8 +1094,6 @@ namespace libdar
 			    // if necessary)
 			if(get_compressor_layer()->get_algo() != none)
 			{
-			    need_resume_compr = true;
-
 				// warning manipulating compr which might be managed by another thread
 			    get_pile()->flush_read_above(get_compressor_layer());
 				// calling flush_read_above first give a change to let the other thread reach
@@ -1103,71 +1103,53 @@ namespace libdar
 				// now we can use the stack normally
 			}
 
+			get_pile()->reset_crc(tools_file_size_to_crc_size(fsa_get_size()));
+
 			try
 			{
-			    get_pile()->reset_crc(tools_file_size_to_crc_size(fsa_get_size()));
-
 			    try
 			    {
+				const_cast<cat_inode *>(this)->fsal = new (get_pool()) filesystem_specific_attribute_list();
+				if(fsal == NULL)
+				    throw Ememory("cat_inode::get_fsa");
 				try
 				{
-				    const_cast<cat_inode *>(this)->fsal = new (get_pool()) filesystem_specific_attribute_list();
-				    if(fsal == NULL)
-					throw Ememory("cat_inode::get_fsa");
-				    try
-				    {
-					get_pile()->read_ahead(fsa_get_size());
-					const_cast<cat_inode *>(this)->fsal->read(*get_pile(), edit);
-				    }
-				    catch(...)
-				    {
-					delete fsal;
-					const_cast<cat_inode *>(this)->fsal = NULL;
-					throw;
-				    }
+				    get_pile()->read_ahead(fsa_get_size());
+				    const_cast<cat_inode *>(this)->fsal->read(*get_pile(), edit);
 				}
-				catch(Euser_abort & e)
+				catch(...)
 				{
+				    delete fsal;
+				    const_cast<cat_inode *>(this)->fsal = NULL;
 				    throw;
-				}
-				catch(Ebug & e)
-				{
-				    throw;
-				}
-				catch(Ethread_cancel & e)
-				{
-				    throw;
-				}
-				catch(Egeneric & e)
-				{
-				    throw Erange("cat_inode::get_fda", string("Error while reading FSA from archive: ") + e.get_message());
 				}
 			    }
-			    catch(...)
+			    catch(Euser_abort & e)
 			    {
-				val = get_pile()->get_crc(); // keeps storage in coherent status
 				throw;
 			    }
-
-			    val = get_pile()->get_crc();
-			    if(val == NULL)
-				throw SRC_BUG;
+			    catch(Ebug & e)
+			    {
+				throw;
+			    }
+			    catch(Ethread_cancel & e)
+			    {
+				throw;
+			    }
+			    catch(Egeneric & e)
+			    {
+				throw Erange("cat_inode::get_fda", string("Error while reading FSA from archive: ") + e.get_message());
+			    }
 			}
 			catch(...)
 			{
-			    if(need_resume_compr)
-			    {
-				get_pile()->flush_read_above(get_compressor_layer()); // aborting a possibly running read_ahead in a separated thread
-				get_compressor_layer()->resume_compression();
-			    }
+			    val = get_pile()->get_crc(); // keeps storage in coherent status
 			    throw;
 			}
 
-			if(need_resume_compr)
-			{
-			    get_pile()->flush_read_above(get_compressor_layer());
-			    get_compressor_layer()->resume_compression();
-			}
+			val = get_pile()->get_crc();
+			if(val == NULL)
+			    throw SRC_BUG;
 
 			fsa_get_crc(my_crc); // fsa_get_crc() will eventually fetch the CRC for FSA from the archive (sequential reading)
 			if(my_crc == NULL)
