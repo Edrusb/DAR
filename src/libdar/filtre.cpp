@@ -2462,8 +2462,6 @@ namespace libdar
 			(void)save_fsa(dialog, juillet.get_string(), e_ino, pdesc, display_treated);
 			cat.pre_add_fsa_crc(e);
 		    }
-
-		    e_var->change_location(pdesc, false);
 		}
 		else // not an inode
 		{
@@ -2481,6 +2479,7 @@ namespace libdar
 	catch(Ethread_cancel & e)
 	{
 	    cat.tail_catalogue_to_current_read();
+	    cat.change_location(pdesc);
 	    if(pdesc.compr->is_compression_suspended())
 	    {
 		pdesc.stack->sync_write_above(pdesc.compr);
@@ -2490,7 +2489,7 @@ namespace libdar
 	    throw;
 	}
 
-
+	cat.change_location(pdesc);
 	if(pdesc.compr->is_compression_suspended())
 	{
 	    pdesc.stack->sync_write_above(pdesc.compr);
