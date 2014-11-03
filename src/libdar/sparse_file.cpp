@@ -79,7 +79,7 @@ namespace libdar
 			     const infinint & hole_size)
 	: escape(below, std::set<sequence_type>()),
 	  zero_count(0),
-	  offset(escape::get_position())
+	  offset(0)
     {
 	    // change the escape sequences fixed part to not collide with a possible underlying (the "below" object or below this "below" object) escape object
 	change_fixed_escape_sequence(ESCAPE_FIXED_SEQUENCE_SPARSE_FILE);
