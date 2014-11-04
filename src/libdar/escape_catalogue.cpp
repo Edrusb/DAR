@@ -491,6 +491,14 @@ namespace libdar
 			    label tmp;
 			    tmp.clear();
 
+			    if(pdesc.compr == NULL)
+				throw SRC_BUG;
+			    if(pdesc.compr->is_compression_suspended())
+			    {
+				pdesc.compr->resume_compression();
+				if(pdesc.compr->get_algo() != none)
+				    pdesc.stack->flush_read_above(pdesc.compr);
+			    }
 
 				// build the catalogue to get detruit objects
 			    if(pdesc.esc->skip_to_next_mark(escape::seqt_catalogue, true))
