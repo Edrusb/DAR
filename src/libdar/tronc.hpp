@@ -82,6 +82,15 @@ namespace libdar
 	    /// inherited from generic_file
         infinint get_position() { return current; };
 
+	    /// when a tronc is used over a compressor, it becomes necessary to disable position check
+	    ///
+	    /// \note by default, before each read or write, the tronc object check that the underlying
+	    /// object is at adhoc position in regard to where the cursor is currently in the tronc. Disabling
+	    /// that check let ignore possible position mismatch (which are normal when a compressor is found below)
+	    /// while reading or writing but keep seeking the underlying object to the requested position upon any call
+	    /// to tronc::skip_* familly methods.
+	void check_underlying_position_while_reading_or_writing(bool mode) { check_pos = mode ; };
+
 
     protected :
 	    /// inherited from generic_file
@@ -101,6 +110,7 @@ namespace libdar
         infinint current;  //< inside position of the next read or write
 	bool own_ref;      //< whether we own ref (and must destroy it when no more needed)
 	bool limited;      //< whether the sz argument is to be considered
+	bool check_pos;    //< whether to check and eventually adjust (seek) the position of the underlying layer at each read or write
 
 	void set_back_current_position();
     };

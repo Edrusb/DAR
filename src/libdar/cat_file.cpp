@@ -515,15 +515,24 @@ namespace libdar
 
 				// if the stack to return is empty adding a tronc
 				// to have the proper offset zero at the beginning of the data
+				//
+				// but we must not check the offset coherence between current read
+				// position and underlying position when compression is used below
+				// because it would lead the tronc to ask the compressor to seek
+				// in the compressed data at the current position of uncompressed data
 
 			    if(data->is_empty())
 			    {
-				generic_file *tmp = new tronc(get_pile(), *offset, gf_read_only);
+				tronc *tronc_tmp;
+				generic_file *tmp = tronc_tmp = new tronc(get_pile(), *offset, gf_read_only);
 				if(tmp == NULL)
 				    throw Ememory("cat_file::get_data");
+				if(tronc_tmp == NULL)
+				    throw SRC_BUG;
 
 				try
 				{
+				    tronc_tmp->check_underlying_position_while_reading_or_writing(false);
 				    data->push(tmp);
 				}
 				catch(...)

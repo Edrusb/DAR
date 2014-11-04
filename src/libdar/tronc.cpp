@@ -63,6 +63,7 @@ namespace libdar
         current = size; // forces skipping the first time
 	own_ref = own_f;
 	limited = true;
+	check_pos = true;
     }
 
     tronc::tronc(generic_file *f, const infinint & offset, const infinint &size, gf_mode mode, bool own_f) : generic_file(mode)
@@ -73,6 +74,7 @@ namespace libdar
         current = size; // forces skipping the firt time
 	own_ref = own_f;
 	limited = true;
+	check_pos = true;
     }
 
     tronc::tronc(generic_file *f, const infinint &offset, bool own_f) : generic_file(f->get_mode())
@@ -83,6 +85,7 @@ namespace libdar
         current = 0;
 	own_ref = own_f;
 	limited = false;
+	check_pos = true;
     }
 
     tronc::tronc(generic_file *f, const infinint &offset, gf_mode mode, bool own_f) : generic_file(mode)
@@ -93,6 +96,7 @@ namespace libdar
         current = 0;
 	own_ref = own_f;
 	limited = false;
+	check_pos = true;
     }
 
     void tronc::modify(const infinint & new_offset, const infinint & new_size)
@@ -130,7 +134,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-        if(current == pos)
+        if(current == pos && check_pos) // we skip anyway when check_pos is false
             return true;
 
         if(limited && pos > sz)
@@ -246,7 +250,7 @@ namespace libdar
         U_I lu = 0;
 	infinint abso_pos = start + current;
 
-	if(ref->get_position() != abso_pos)
+	if(check_pos && ref->get_position() != abso_pos)
 	{
 	    if(!ref->skip(abso_pos))
 		throw Erange("tronc::inherited_read", gettext("Cannot skip to the current position in \"tronc\""));
@@ -288,8 +292,12 @@ namespace libdar
     {
         U_I wrote = 0;
 
-        if(!ref->skip(start + current))
-	    throw Erange("tronc::inherited_read", gettext("Cannot skip to the current position in \"tronc\""));
+	if(check_pos)
+	{
+	    if(!ref->skip(start + current))
+		throw Erange("tronc::inherited_read", gettext("Cannot skip to the current position in \"tronc\""));
+	}
+
 	if(limited)
 	{
 	    infinint avail = sz - current;
