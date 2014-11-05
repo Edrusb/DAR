@@ -229,7 +229,7 @@ namespace libdar
 			    if(!options.get_sequential_read())
 			    {
 				if(info_details)
-				    dialog.warning(gettext("Loading catalogue in memory..."));
+				    dialog.warning(gettext("Loading catalogue into memory..."));
 				cat = macro_tools_get_catalogue_from(dialog,
 								     pool,
 								     stack,

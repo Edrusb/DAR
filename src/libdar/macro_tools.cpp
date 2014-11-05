@@ -319,7 +319,7 @@ namespace libdar
 
 	    if(sequential_read
 	       || tmp_ctxt->is_an_old_start_end_archive()
-	       || stack.get_position() == 0) //< sar layer failed openning the last slice and failed back openning the first slice
+	       || stack.get_position() == 0) //< sar layer failed openning the last slice and fallen back openning the first slice
 		stack.skip(0);
 	    else
 	    {
@@ -1253,6 +1253,10 @@ namespace libdar
 	    layers.sync_write_above(pdesc.esc); // esc is now up to date
 	    pdesc.esc->add_mark_at_current_position(escape::seqt_catalogue);
 	}
+	else
+		// still need to reset the compressor
+		// in order to be able to read compressed data starting at that position
+	    pdesc.compr->sync_write();
 
 	coord.set_catalogue_start(layers.get_position());
 
