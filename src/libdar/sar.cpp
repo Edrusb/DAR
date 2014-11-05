@@ -1566,7 +1566,7 @@ namespace libdar
 		    {
 			tmp = where.open(dialog,
 					 filename,
-					 gf_read_write,
+					 open_mode,
 					 force_permission,
 					 permission,
 					 false,  //< fail if exists
