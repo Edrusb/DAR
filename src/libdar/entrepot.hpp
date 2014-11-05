@@ -98,7 +98,7 @@ namespace libdar
 	    /// \param[in] permission if force_permission is set, change the file permission to that value
 	    /// \param[in] fail_if_exists tells whether the underlying implementation have to fail throwing Erange("exists") if the file already exist when write access is required
 	    /// \param[in] erase tells whether the underlying implementation will empty an existing file before writing to it
-	    /// \param[in] algo defines the hash file to create, other value than hash_none are acceptes only in writeonly mode with erase or fail_if_exist set
+	    /// \param[in] algo defines the hash file to create, other value than hash_none are accepted only in writeonly mode with erase or fail_if_exist set
 	    /// \return upon success returns an object from a class inherited from fichier_global that the caller has the duty to delete, else an exception is thrown (most of the time it should be a Esystem object)
 	    /// by the called inherited class
 	fichier_global *open(user_interaction & dialog,
