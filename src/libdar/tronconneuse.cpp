@@ -205,7 +205,7 @@ namespace libdar
 
 	if(current_position > buf_offset)
 	{
-		// byte offset in the buffer where will take place the next read opertion
+		// byte offset in the buffer where will take place the next read operation
 	    new_amount = current_position - buf_offset;
 
 	    if(new_amount < buf_byte_data) // some data remain to be read in buffer

@@ -3115,7 +3115,6 @@ namespace libdar
 			if(pdesc.compr->get_algo() != none)
 			{
 			    pdesc.stack->sync_write_above(pdesc.compr);
-			    pdesc.compr->sync_write();
 			    pdesc.compr->suspend_compression(); // never compress EA (no size or filename consideration)
 			}
 
