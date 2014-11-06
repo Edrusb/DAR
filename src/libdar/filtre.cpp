@@ -3014,7 +3014,6 @@ namespace libdar
 		    {
 			if(display_treated)
 			    dialog.warning(string(gettext("Saving Extended Attributes for ")) + info_quoi);
-			ino->ea_set_offset(pdesc.stack->get_position());
 			if(pdesc.compr->is_compression_suspended())
 			{
 			    pdesc.stack->sync_write_above(pdesc.compr);
@@ -3025,6 +3024,9 @@ namespace libdar
 			    pdesc.stack->sync_write_above(pdesc.compr);
 			    pdesc.compr->sync_write(); // reset the compression engine to be able to decompress from that point later
 			}
+
+			ino->ea_set_offset(pdesc.stack->get_position());
+
 
 			pdesc.stack->reset_crc(tools_file_size_to_crc_size(ino->ea_get_size())); // start computing CRC for any read/write on stack
 			try
@@ -3111,12 +3113,12 @@ namespace libdar
 		    {
 			if(display_treated)
 			    dialog.warning(string(gettext("Saving Filesystem Specific Attributes for ")) + info_quoi);
-			ino->fsa_set_offset(pdesc.stack->get_position());
 			if(pdesc.compr->get_algo() != none)
 			{
 			    pdesc.stack->sync_write_above(pdesc.compr);
 			    pdesc.compr->suspend_compression(); // never compress EA (no size or filename consideration)
 			}
+			ino->fsa_set_offset(pdesc.stack->get_position());
 
 			pdesc.stack->reset_crc(tools_file_size_to_crc_size(ino->fsa_get_size())); // start computing CRC for any read/write on stack
 			try
