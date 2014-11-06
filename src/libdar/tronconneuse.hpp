@@ -189,7 +189,7 @@ namespace libdar
 	char *buf;                 //< decrypted data (or data to encrypt)
 	    //
 	U_32 clear_block_size;     //< max amount of data that will be encrypted at once (must stay less than buf_size)
-	infinint current_position; //< position of the next character to read or write from the upper layer perspective
+	infinint current_position; //< position of the next character to read or write from the upper layer perspective, offset zero is the first encrypted byte, thus the first byte after initial_shift
 	infinint block_num;        //< block number we next read or write
 	generic_file *encrypted;   //< generic_file where is put / get the encrypted data
 	    //
