@@ -2651,7 +2651,7 @@ namespace libdar
 		    do // while "loop" is true, this is the INNER LOOP
 		    {
 			loop = false;
-			infinint start = pdesc.stack->get_position();
+			infinint start;
 			generic_file *source = NULL;
 
 			    //////////////////////////////
@@ -2703,8 +2703,6 @@ namespace libdar
 				const crc * original = NULL;
 				bool crc_available = false;
 
-				fic->set_offset(start);
-
 				    // this is done as soon as possible to benefit of the read_ahead
 				    // while finishing the setup of the destination
 				source->skip(0);
@@ -2716,6 +2714,10 @@ namespace libdar
 				    pdesc.compr->suspend_compression();
 				else
 				    pdesc.compr->resume_compression();
+
+				    // now that compression has reset we can fetch the location where the data will be dropped:
+				start = pdesc.stack->get_position();
+				fic->set_offset(start);
 
 				try
 				{
