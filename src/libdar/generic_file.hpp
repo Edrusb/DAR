@@ -102,7 +102,7 @@ namespace libdar
     {
     public :
 	    /// main constructor
-        generic_file(gf_mode m) { rw = m; terminated = false; enable_crc(false); checksum = NULL; };
+        generic_file(gf_mode m) { rw = m; terminated = no_read_ahead = false; enable_crc(false); checksum = NULL; };
 
 	    /// copy constructor
 	generic_file(const generic_file &ref) { copy_from(ref); };
@@ -126,6 +126,13 @@ namespace libdar
 	    /// \note after sanity checks, the protected inherited_read_ahead() method is called
 	virtual void read_ahead(const infinint & amount);
 
+	    /// ignore read ahead requests
+	    ///
+	    /// \param [in] mode if set to true read_ahead requests are ignored: inherited_read_ahead() of the inherited class
+	    /// is not called
+	    /// \note read_ahead is useful in multi-thread environement when a slave thread can work in advanced and asynchronously
+	    /// to provide read content to reader thread. However, read_ahead is a waste of CPU cycle for in a single threading model
+	void ignore_read_ahead(bool mode) { no_read_ahead = mode; };
 
 	    /// read data from the generic_file
 
@@ -300,6 +307,7 @@ namespace libdar
         gf_mode rw;
         crc *checksum;
 	bool terminated;
+	bool no_read_ahead;
         U_I (generic_file::* active_read)(char *a, U_I size);
         void (generic_file::* active_write)(const char *a, U_I size);
 

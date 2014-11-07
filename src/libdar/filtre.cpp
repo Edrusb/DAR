@@ -2706,7 +2706,6 @@ namespace libdar
 				    // this is done as soon as possible to benefit of the read_ahead
 				    // while finishing the setup of the destination
 				source->skip(0);
-				source->read_ahead(fic->get_size());
 
 				pdesc.stack->sync_write_above(pdesc.compr);
 				pdesc.compr->sync_write(); // necessary in any case to reset the compression engine to be able at later time to decompress starting at that position

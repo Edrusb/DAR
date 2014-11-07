@@ -118,7 +118,10 @@ namespace libdar
 	if(rw == gf_write_only)
 	    throw Erange("generic_file::read", gettext("Reading ahead a write only generic_file"));
 	else
-	    inherited_read_ahead(amount);
+	    if(no_read_ahead)
+		return;
+	    else
+		inherited_read_ahead(amount);
     }
 
 
@@ -454,6 +457,7 @@ namespace libdar
 	else
 	    checksum = NULL;
 	terminated = ref.terminated;
+	no_read_ahead = ref.no_read_ahead;
 	active_read = ref.active_read;
 	active_write = ref.active_write;
     }

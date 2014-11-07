@@ -219,6 +219,14 @@ namespace libdar
 	cache *tmp_cache = NULL;
 
 	stack.clear();
+#ifdef LIBTHREADAR_AVAILABLE
+	if(!multi_threaded)
+	    stack.ignore_read_ahead(true);
+	else
+	    stack.ignore_read_ahead(false);
+#else
+	tmp->ignore_read_ahead(true);
+#endif
 	sl.first_size = 0;
 	sl.other_size = 0; // we will change that only if sar object is used
 
@@ -302,6 +310,13 @@ namespace libdar
 		throw Ememory("open_archive");
 	    else
 	    {
+#ifdef LIBTHREADAR_AVAILABLE
+		if(!multi_threaded)
+		    tmp->ignore_read_ahead(true);
+#else
+		tmp->ignore_read_ahead(true);
+#endif
+
 		stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
 		tmp = NULL;
 	    }
@@ -355,6 +370,12 @@ namespace libdar
 		    throw Ememory("macro_tools_open_archive");
 		else
 		{
+#ifdef LIBTHREADAR_AVAILABLE
+		    if(!multi_threaded)
+			tmp->ignore_read_ahead(true);
+#else
+		    tmp->ignore_read_ahead(true);
+#endif
 		    stack.clear_label(LIBDAR_STACK_LABEL_LEVEL1);
 		    stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
 		    tmp = NULL;
@@ -473,6 +494,12 @@ namespace libdar
 	    }
 	    else
 	    {
+#ifdef LIBTHREADAR_AVAILABLE
+		if(!multi_threaded)
+		    tmp->ignore_read_ahead(true);
+#else
+		tmp->ignore_read_ahead(true);
+#endif
 		stack.push(tmp);
 		tmp = NULL;
 	    }
@@ -541,6 +568,12 @@ namespace libdar
 		tmp = new (pool) escape(stack.top(), unjump);
 		if(tmp == NULL)
 		    throw Ememory("open_archive");
+#ifdef LIBTHREADAR_AVAILABLE
+		if(!multi_threaded)
+		    tmp->ignore_read_ahead(true);
+#else
+		tmp->ignore_read_ahead(true);
+#endif
 		stack.push(tmp);
 		tmp = NULL;
 
@@ -579,6 +612,12 @@ namespace libdar
 		throw Ememory("open_archive");
 	    else
 	    {
+#ifdef LIBTHREADAR_AVAILABLE
+		if(!multi_threaded)
+		    tmp->ignore_read_ahead(true);
+#else
+		tmp->ignore_read_ahead(true);
+#endif
 		stack.push(tmp, LIBDAR_STACK_LABEL_UNCOMPRESSED);
 		tmp = NULL;
 
