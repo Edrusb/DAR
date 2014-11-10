@@ -81,7 +81,7 @@ namespace libdar
 	bool has_next_to_read();
 
     protected:
-	void inherited_read_ahead(const infinint & amount) {};
+	void inherited_read_ahead(const infinint & amount) {}; // relying on the operating system
         virtual U_I inherited_read(char *a, U_I size);
         virtual void inherited_write(const char *a, U_I size);
 	void inherited_sync_write() {};
