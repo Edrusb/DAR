@@ -68,10 +68,11 @@ namespace libdar
 	char *ptr;                  //< address of the block to be written or to be read
 	char data_header;           //< the one byte message to prepend data with in all data blocks
 	char data_eof_header;       //< the one byte message to prepend data with when EOF is reached
-	infinint read_ahead = 0;    //< amount of data sent for reading and not yet asked for reading
-	infinint to_send_ahead = 0; //< remaining amount of data to send for the requested read_ahead
-	U_I immediate_read = 0; //< next action is to read this amount of data
-	bool stop;
+	infinint read_ahead;        //< amount of data sent for reading and not yet asked for reading
+	bool endless_read_ahead;    //< whether an endeless read ahead request has been asked
+	infinint to_send_ahead;     //< remaining amount of data to send for the requested read_ahead
+	U_I immediate_read;         //< next action is to read this amount of data
+	bool stop;                  //< whether thread end has been asked
 
 
 	void set_header_vars();
@@ -84,8 +85,9 @@ namespace libdar
 	    /// \param[in] size is the number of byte to send, no more than
 	    /// one block will be sent even if size is larger. If size is zero
 	    /// as much as possible data will be sent in the block
+	    /// \param[out] eof is set back to true of the operation reached end of file
 	    /// \return the effective number of byte sent in the block
-	U_I send_data_block(U_I size);
+	U_I send_data_block(U_I size, bool & eof);
 
 	bool treat_order(); //< \return true if answer is prepared and must be sent back to the master thread
 

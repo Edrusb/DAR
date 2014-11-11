@@ -157,6 +157,7 @@ namespace libdar
 	static const U_I ESCAPE_SEQUENCE_LENGTH = 6;
 	static const U_I WRITE_BUFFER_SIZE = 2*ESCAPE_SEQUENCE_LENGTH;
 	static const U_I READ_BUFFER_SIZE = MAX_BUFFER_SIZE;
+	static const infinint READ_BUFFER_SIZE_INFININT;
 
 	    /// escape sequence value
 
@@ -169,18 +170,19 @@ namespace libdar
 
 	    //-- variables
 
-	generic_file *x_below;        //< the generic_file in which we read/write escaped data from/to the object is not owned by "this"
-	U_I write_buffer_size;        //< amount of data in write transit not yet written to "below" (may have to be escaped)
+	generic_file *x_below;                //< the generic_file in which we read/write escaped data from/to the object is not owned by "this"
+	U_I write_buffer_size;                //< amount of data in write transit not yet written to "below" (may have to be escaped)
 	char write_buffer[WRITE_BUFFER_SIZE]; //< data in write transit, all data is unescaped, up to the first real mark, after it, data is raw (may be escaped)
 	                                      //< the first real mark is pointed to by escape_seq_offset_in_buffer
-	U_I read_buffer_size;         //< amount of data in transit, read from below, but possibly not yet unescaped and returned to the upper layer
-	U_I already_read;             //< data in buffer that has already been returned to the upper layer
-	bool read_eof;                //< whether we reached a escape sequence while reading data
-	U_I escape_seq_offset_in_buffer; //< location of the first escape sequence which is not a data sequence
-	char read_buffer[READ_BUFFER_SIZE]; //< data in read transit
-	std::set<sequence_type> unjumpable; //< list of mark that cannot be jumped over when searching for the next mark
-	unsigned char fixed_sequence[ESCAPE_SEQUENCE_LENGTH]; // the preambule of an escape sequence to use/search for
+	U_I read_buffer_size;                 //< amount of data in transit, read from below, but possibly not yet unescaped and returned to the upper layer
+	U_I already_read;                     //< data in buffer that has already been returned to the upper layer
+	bool read_eof;                        //< whether we reached a escape sequence while reading data
+	U_I escape_seq_offset_in_buffer;      //< location of the first escape sequence which is not a data sequence
+	char read_buffer[READ_BUFFER_SIZE];   //< data in read transit
+	std::set<sequence_type> unjumpable;   //< list of mark that cannot be jumped over when searching for the next mark
+	unsigned char fixed_sequence[ESCAPE_SEQUENCE_LENGTH]; //< the preambule of an escape sequence to use/search for
 	infinint escaped_data_count_since_last_skip;
+	infinint below_position;              //< remember the position of object pointed to by x_below
 
 	    //-- routines
 

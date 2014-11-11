@@ -257,7 +257,7 @@ namespace libdar
         if(offset == NULL)
             throw SRC_BUG;
         else
-	    *offset = pdesc.stack->get_position(); // data follows right after the inode+file information+CRC
+	    *offset = pdesc.esc->get_position(); // data follows right after the inode+file information+CRC
     }
 
     cat_file::cat_file(const cat_file & ref) : cat_inode(ref)
@@ -717,11 +717,18 @@ namespace libdar
 		generic_file *me = get_data(normal);
 		if(me == NULL)
 		    throw SRC_BUG;
+		me->read_ahead(get_storage_size());
 		try
 		{
 		    generic_file *you = f_other->get_data(normal);
 		    if(you == NULL)
 			throw SRC_BUG;
+			// requesting read_ahead for the peer object
+			// if the object is found on filesystem its
+			// storage_size is zero, which lead a endless
+			// read_ahead request, suitable for the current
+			// context:
+		    you->read_ahead(f_other->get_storage_size());
 		    try
 		    {
 			crc *value = NULL;

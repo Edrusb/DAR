@@ -72,6 +72,7 @@ namespace libdar
 	// avoid escaping of escape sequences when using two escape objects, one writing its data to a second one.
 
     const unsigned char escape::usual_fixed_sequence[ESCAPE_SEQUENCE_LENGTH] = { ESCAPE_FIXED_SEQUENCE_NORMAL, 0xFD, 0xEA, 0x77, 0x21, 0x00 };
+    const infinint escape::READ_BUFFER_SIZE_INFININT = MAX_BUFFER_SIZE;
 
 
 	//-- class routines
@@ -87,9 +88,11 @@ namespace libdar
 	already_read = 0;
 	escape_seq_offset_in_buffer = 0;
 	escaped_data_count_since_last_skip = 0;
+	below_position = x_below->get_position();
 	unjumpable = x_unjumpable;
 	for(U_I i = 0 ; i < ESCAPE_SEQUENCE_LENGTH; ++i)
 	    fixed_sequence[i] = usual_fixed_sequence[i];
+
     }
 
     escape::~escape()
@@ -137,6 +140,7 @@ namespace libdar
 	escaped_data_count_since_last_skip = 0;
 	set_fixed_sequence_for(t);
 	x_below->write((const char*)fixed_sequence, ESCAPE_SEQUENCE_LENGTH);
+	below_position += ESCAPE_SEQUENCE_LENGTH;
     }
 
     bool escape::skip_to_next_mark(sequence_type t, bool jump)
@@ -204,6 +208,7 @@ namespace libdar
 	    {
 		    // dropping all data in read_buffer, and filling it again with some new data
 		read_buffer_size = x_below->read(read_buffer, READ_BUFFER_SIZE);
+		below_position += read_buffer_size;
 		if(read_buffer_size == 0)
 		    read_eof = true;
 		already_read = 0;
@@ -246,7 +251,7 @@ namespace libdar
 
 	check_below();
 
-	if(x_below->get_mode() != gf_read_only)
+	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
 	if(escape_seq_offset_in_buffer > already_read) //no next to read mark
@@ -276,7 +281,7 @@ namespace libdar
 
     bool escape::skippable(skippability direction, const infinint & amount)
     {
-	switch(x_below->get_mode())
+	switch(get_mode())
 	{
 	case gf_read_only:
 	    return x_below->skippable(direction, amount);
@@ -293,6 +298,8 @@ namespace libdar
 
     bool escape::skip(const infinint & pos)
     {
+	bool ret = true;
+
 	if(is_terminated())
 	    throw SRC_BUG;
 
@@ -302,13 +309,23 @@ namespace libdar
 	if(get_position() == pos)
 	    return true;
 
-	switch(x_below->get_mode())
+	switch(get_mode())
 	{
 	case gf_read_only:
 	    read_eof = false;
 	    flush_or_clean();
-	    return x_below->skip(pos);
+	    ret = x_below->skip(pos);
+	    if(ret)
+		below_position = pos;
+	    else
+		below_position = x_below->get_position();
+	    break;
 	case gf_write_only:
+	    if(get_position() != pos)
+		throw Efeature("Skipping on write_only escape object");
+	    else
+		ret = true;
+	    break;
 	case gf_read_write:
 		// only backward skipping is allowed in that mode
 	    if(get_position() < pos)
@@ -316,7 +333,7 @@ namespace libdar
 	    else
 	    {
 		char tmp_buffer[WRITE_BUFFER_SIZE];
-		infinint cur_below = x_below->get_position();
+		infinint cur_below = below_position;
 		U_I trouve;
 
 		try
@@ -325,12 +342,19 @@ namespace libdar
 		    {
 			U_I lu = 0;
 
-			if(!x_below->skip(pos - ESCAPE_SEQUENCE_LENGTH))
-			    return false;
-			lu = x_below->read(tmp_buffer, ESCAPE_SEQUENCE_LENGTH);
-			write_buffer_size = lu;
+			below_position = pos - ESCAPE_SEQUENCE_LENGTH;
+			ret = x_below->skip(below_position);
+
+			if(ret)
+			{
+			    lu = x_below->read(tmp_buffer, ESCAPE_SEQUENCE_LENGTH);
+			    below_position += lu;
+			    write_buffer_size = lu;
+			}
+			else
+			    below_position = x_below->get_position();
 		    }
-		    else
+		    else // skipping very close after the start of file, no escape mark can take place there
 		    {
 			U_I width = 0;
 			U_I lu = 0;
@@ -343,11 +367,14 @@ namespace libdar
 			    throw SRC_BUG;  // should succeed or throw an exception in that situation (backward skipping)
 			lu = x_below->read(tmp_buffer, width);
 			write_buffer_size = lu;
+			below_position = lu;
+			ret = true;
 		    }
 		}
 		catch(...)
 		{
 		    x_below->skip(cur_below);
+		    below_position = cur_below;
 		    throw;
 		}
 		(void)memcpy(write_buffer, tmp_buffer, write_buffer_size);
@@ -361,18 +388,19 @@ namespace libdar
 		    (void)memmove(write_buffer, write_buffer + trouve, write_buffer_size - trouve);
 		    write_buffer_size -= trouve;
 		}
-
-		return true;
 	    }
-	    throw SRC_BUG; // that statement should never be reached
+	    break;
 	default:
 	    throw SRC_BUG; // this mode is not allowed
 	}
 
+	return ret;
     }
 
     bool escape::skip_to_eof()
     {
+	bool ret;
+
 	if(is_terminated())
 	    throw SRC_BUG;
 
@@ -386,11 +414,16 @@ namespace libdar
 	read_eof = true;
 	escaped_data_count_since_last_skip = 0;
 
-	return x_below->skip_to_eof();
+	ret = x_below->skip_to_eof();
+	below_position = x_below->get_position();
+
+	return ret;
     }
 
     bool escape::skip_relative(S_I x)
     {
+	bool ret;
+
 	if(is_terminated())
 	    throw SRC_BUG;
 
@@ -405,7 +438,23 @@ namespace libdar
 	    // if the buffer is neither empty not full, we cannot know what to do with this date
 	    // either place it asis in the below file, or escape it in the below file.
 	flush_or_clean();
-	return x_below->skip_relative(x);
+	ret = x_below->skip_relative(x);
+	if(ret) // skipping succeeded
+	{
+	    if(x >= 0)
+		below_position += x;
+	    else  // x is negative
+	    {
+		if(below_position < -x)
+		    below_position = 0;
+		else
+		    below_position -= -x; // trick used, because infinint cannot be negative
+	    }
+	}
+	else // skipping failed, need to consult x_below to know where we are now
+	    below_position = x_below->get_position();
+
+	return ret;
     }
 
     infinint escape::get_position()
@@ -415,9 +464,9 @@ namespace libdar
 
 	check_below();
 	if(get_mode() == gf_read_only)
-	    return x_below->get_position() - read_buffer_size + already_read - escaped_data_count_since_last_skip;
+	    return below_position - read_buffer_size + already_read - escaped_data_count_since_last_skip;
 	else
-	    return x_below->get_position() + write_buffer_size - escaped_data_count_since_last_skip;
+	    return below_position + write_buffer_size - escaped_data_count_since_last_skip;
     }
 
     void escape::inherited_read_ahead(const infinint & amount)
@@ -426,7 +475,8 @@ namespace libdar
 	    throw SRC_BUG;
 
 	check_below();
-	x_below->read_ahead(amount);
+	if(!read_eof)
+	    x_below->read_ahead(amount);
     }
 
 
@@ -525,6 +575,7 @@ namespace libdar
 		    // filling missing data in "a" from x_below
 
 		read = x_below->read(a + returned, needed);
+		below_position += read;
 		if(read < needed)
 		    read_eof = true;
 
@@ -615,6 +666,7 @@ namespace libdar
 	    if(trouve == write_buffer_size) // no escape sequence found
 	    {
 		x_below->write(write_buffer, write_buffer_size);
+		below_position += write_buffer_size;
 		write_buffer_size = 0;
 	    }
 	    else // start of escape sequence found
@@ -622,8 +674,10 @@ namespace libdar
 		if(trouve + ESCAPE_SEQUENCE_LENGTH - 1 <= write_buffer_size) // no doubt, we have a full escape sequence in data, we need to protect this data
 		{
 		    x_below->write(write_buffer, trouve);
+		    below_position += trouve;
 		    set_fixed_sequence_for(seqt_not_a_sequence);
 		    x_below->write((const char *)fixed_sequence, ESCAPE_SEQUENCE_LENGTH);
+		    below_position += ESCAPE_SEQUENCE_LENGTH;
 			// still remains valid data not yet written in write_buffer at offset 'trouve + ESCAPE_SEQUENCE_LENGTH - 1'
 			// however this data is also in the input write_buffer (a, size)
 		    written = (trouve + ESCAPE_SEQUENCE_LENGTH - 1) - initial_buffer_size;
@@ -646,6 +700,7 @@ namespace libdar
 			// first, we can at least write down the data up to offset "trouve - 1" (that's "trouve" bytes).
 
 		    x_below->write(write_buffer, trouve);
+		    below_position += trouve;
 
 		    if(yet_in_a >= missing_for_sequence) // sequence entirely available with remaining data in "a"
 		    {
@@ -686,6 +741,7 @@ namespace libdar
 	    if(trouve == remains)
 	    {
 		x_below->write(a + written, remains);
+		below_position += remains;
 		written = size;
 	    }
 	    else
@@ -693,6 +749,7 @@ namespace libdar
 		if(trouve > 0)
 		{
 		    x_below->write(a + written, trouve);
+		    below_position += trouve;
 		    written += trouve;
 		}
 
@@ -700,6 +757,7 @@ namespace libdar
 		{
 		    set_fixed_sequence_for(seqt_not_a_sequence);
 		    x_below->write((const char *)fixed_sequence, ESCAPE_SEQUENCE_LENGTH);
+		    below_position += ESCAPE_SEQUENCE_LENGTH;
 		    written += ESCAPE_SEQUENCE_LENGTH - 1;
 		    ++escaped_data_count_since_last_skip;
 		}
@@ -796,6 +854,7 @@ namespace libdar
 	if(write_buffer_size > 0)
 	{
 	    x_below->write(write_buffer, write_buffer_size);
+	    below_position += write_buffer_size;
 	    write_buffer_size = 0;
 	}
     }
@@ -814,6 +873,7 @@ namespace libdar
 	already_read = ref.already_read;
 	read_eof = ref.read_eof;
 	escaped_data_count_since_last_skip = ref.escaped_data_count_since_last_skip;
+	below_position = ref.below_position;
 	unjumpable = ref.unjumpable;
 	(void)memcpy(fixed_sequence, ref.fixed_sequence, ESCAPE_SEQUENCE_LENGTH);
     }
@@ -856,6 +916,7 @@ namespace libdar
 		    // adding some data at the end of the buffer
 
 		read_buffer_size += x_below->read(read_buffer + read_buffer_size, ESCAPE_SEQUENCE_LENGTH - avail);
+		below_position += read_buffer_size;
 		avail = read_buffer_size - already_read;
 
 		    // we can continue unescaping the new data

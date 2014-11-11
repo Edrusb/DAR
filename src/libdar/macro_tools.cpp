@@ -310,13 +310,8 @@ namespace libdar
 		throw Ememory("open_archive");
 	    else
 	    {
-#ifdef LIBTHREADAR_AVAILABLE
-		if(!multi_threaded)
-		    tmp->ignore_read_ahead(true);
-#else
+		// we always ignore read_ahead as no slave thread will exist for LEVEL1 layer
 		tmp->ignore_read_ahead(true);
-#endif
-
 		stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
 		tmp = NULL;
 	    }
@@ -324,7 +319,7 @@ namespace libdar
 
 		// ****** Reading the header version ************** //
 
-	    if(sequential_read)
+	    if(sequential_read && info_details)
 		dialog.warning(gettext("Reading the archive header..."));
 
 	    stack.find_first_from_top(tmp_ctxt);
@@ -370,12 +365,7 @@ namespace libdar
 		    throw Ememory("macro_tools_open_archive");
 		else
 		{
-#ifdef LIBTHREADAR_AVAILABLE
-		    if(!multi_threaded)
-			tmp->ignore_read_ahead(true);
-#else
-		    tmp->ignore_read_ahead(true);
-#endif
+		    tmp->ignore_read_ahead(true); // no slave thread used below in the stack
 		    stack.clear_label(LIBDAR_STACK_LABEL_LEVEL1);
 		    stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
 		    tmp = NULL;
@@ -494,12 +484,8 @@ namespace libdar
 	    }
 	    else
 	    {
-#ifdef LIBTHREADAR_AVAILABLE
-		if(!multi_threaded)
-		    tmp->ignore_read_ahead(true);
-#else
+		    // we always ignore read ahead as encryption layer above sar/zapette/triial_sar has no slave thread below
 		tmp->ignore_read_ahead(true);
-#endif
 		stack.push(tmp);
 		tmp = NULL;
 	    }
@@ -512,6 +498,8 @@ namespace libdar
 		tmp = new (pool) generic_thread(stack.top());
 		if(tmp == NULL)
 		    throw Ememory("op_create_in_sub");
+		if(sequential_read)
+		    tmp->read_ahead(0); // the generic_thread above encryption will read asynchronously as much data as possible
 		stack.push(tmp);
 		tmp = NULL;
 	    }
@@ -571,6 +559,13 @@ namespace libdar
 #ifdef LIBTHREADAR_AVAILABLE
 		if(!multi_threaded)
 		    tmp->ignore_read_ahead(true);
+		else
+		{
+		    if(second_terminateur_offset == 0) // archive read from the beginning (sequential read)
+			tmp->ignore_read_ahead(true);  // we avoid transmitting read_ahead request to the below thread
+			// which has been configured with an endless read ahead, new read_ahead would abort configured
+			// endlessly read_ahead.
+		}
 #else
 		tmp->ignore_read_ahead(true);
 #endif

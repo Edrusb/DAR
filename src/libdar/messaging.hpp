@@ -65,7 +65,9 @@ namespace libdar
 	answr_position,           //< + infinint : answer with the current position
 	answr_position_begin,     //< + infinint : message continues with the next block
 	answr_exception,          //< no argument: last operation generated an exception for at slave side, slave has probably died after that
-	order_end_of_xmit         //< no argument: message is the last message and implies freedom of the slave
+	order_end_of_xmit,        //< no argument: message is the last message and implies freedom of the slave
+        order_stop_readahead,     //< no argument: order to stop possibly running read_ahead
+	answr_readahead_stopped   //< no argument: answer that the readahead has ended or no read ahead was running
     };
 
     extern bool msg_equivalent(msg_type arg1, msg_type arg2);

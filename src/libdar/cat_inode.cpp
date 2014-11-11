@@ -1067,11 +1067,23 @@ namespace libdar
 
 		    try
 		    {
+			generic_file *reader = NULL;
+
+			if(get_escape_layer() == NULL)
+			    reader = get_compressor_layer();
+			else
+			    reader = get_escape_layer();
+			if(reader == NULL)
+			    throw SRC_BUG;
+
+			    // we shall reset layers above reader
+			get_pile()->flush_read_above(reader);
+
 			if(!small_read) // direct reading mode
 			{
 			    if(fsa_offset == NULL)
 				throw SRC_BUG;
-			    get_pile()->skip(*fsa_offset);
+			    reader->skip(*fsa_offset);
 			}
 			else
 			{
@@ -1083,27 +1095,18 @@ namespace libdar
 				// so it is pending for read request or other orders
 			    if(!get_escape_layer()->skip_to_next_mark(escape::seqt_fsa, false))
 				throw Erange("cat_inode::get_fsa", string("Error while fetching FSA from archive: No escape mark found for that file"));
-				// we shall reset layers above get_escape_layer() for they do not assume nothing has changed below
-			    get_pile()->flush_read_above(get_escape_layer());
-				// now we can continue normally using get_pile()
-
-			    const_cast<cat_inode *>(this)->fsa_set_offset(get_pile()->get_position());
+			    const_cast<cat_inode *>(this)->fsa_set_offset(get_escape_layer()->get_position());
 			}
 
-			    // FSA is never stored compressed, we must change the compression algo
-			    // if necessary)
-			if(get_compressor_layer()->get_algo() != none)
+			if(get_escape_layer() == NULL)
 			{
-				// warning manipulating compr which might be managed by another thread
-			    get_pile()->flush_read_above(get_compressor_layer());
-				// calling flush_read_above first give a change to let the other thread reach
-				// a state where it is pending for I/O operation so we can now modify the
-				// compressor object
-			    get_compressor_layer()->suspend_compression();
-				// now we can use the stack normally
+				// FSA is never stored compressed, we must change the compression algo
+				// but only if necessary
+			    if(get_compressor_layer()->get_algo() != none)
+				get_compressor_layer()->suspend_compression();
 			}
 
-			get_pile()->reset_crc(tools_file_size_to_crc_size(fsa_get_size()));
+			reader->reset_crc(tools_file_size_to_crc_size(fsa_get_size()));
 
 			try
 			{
@@ -1114,8 +1117,8 @@ namespace libdar
 				    throw Ememory("cat_inode::get_fsa");
 				try
 				{
-				    get_pile()->read_ahead(fsa_get_size());
-				    const_cast<cat_inode *>(this)->fsal->read(*get_pile(), edit);
+				    reader->read_ahead(fsa_get_size());
+				    const_cast<cat_inode *>(this)->fsal->read(*reader, edit);
 				}
 				catch(...)
 				{
@@ -1143,11 +1146,11 @@ namespace libdar
 			}
 			catch(...)
 			{
-			    val = get_pile()->get_crc(); // keeps storage in coherent status
+			    val = reader->get_crc(); // keeps storage in coherent status
 			    throw;
 			}
 
-			val = get_pile()->get_crc();
+			val = reader->get_crc();
 			if(val == NULL)
 			    throw SRC_BUG;
 

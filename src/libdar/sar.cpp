@@ -1265,8 +1265,12 @@ namespace libdar
 		of_max_seen = num;
 	    file_offset = num == 1 ? slicing.first_slice_header : slicing.other_slice_header;
 	    if(num == of_current + 1 && to_read_ahead > 0)
+	    {
+		of_current = num;
 		inherited_read_ahead(to_read_ahead);
-	    of_current = num;
+	    }
+	    else
+		of_current = num;
         }
     }
 

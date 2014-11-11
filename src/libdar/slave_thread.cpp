@@ -42,6 +42,7 @@ namespace libdar
 	data = x_data;
 	input = x_input;
 	output = x_output;
+	ptr = NULL;
     }
 
     void slave_thread::inherited_run()
@@ -52,28 +53,40 @@ namespace libdar
 	    ptr = NULL;
 	    set_header_vars();
 	    read_ahead = 0;
+	    endless_read_ahead = false;
 	    to_send_ahead = 0;
 	    immediate_read = 0;
 	    stop = false;
 
 	    do
 	    {
-		if(to_send_ahead > 0)
+		if((to_send_ahead > 0 || endless_read_ahead) && !output->is_quiet_full())
 		{
 		    U_I tmp = 0;
-		    to_send_ahead.unstack(tmp);
-		    U_I wrote = send_data_block(tmp);
+		    bool eof;
+
+		    if(!endless_read_ahead)
+			to_send_ahead.unstack(tmp);
+			// else tmp == 0 which lead to send a maximum sized block of data in the tampon
+
+		    U_I wrote = send_data_block(tmp, eof);
 		    if(wrote > 0)
 		    {
-			tmp -= wrote;
-			to_send_ahead += tmp;
+			if(!endless_read_ahead)
+			{
+			    tmp -= wrote;
+			    to_send_ahead += tmp;
+			}
 			read_ahead += wrote;
 		    }
-		    else
-			to_send_ahead = 0; // reached eof
+		    if(eof)
+		    {
+			endless_read_ahead = false;
+			to_send_ahead = 0;
+		    }
 		}
 
-		if(pending_order() || to_send_ahead == 0)
+		if(pending_order() || (to_send_ahead == 0 && !endless_read_ahead && !output->is_quiet_full()))
 		{
 		    bool need_answer;
 
@@ -90,7 +103,10 @@ namespace libdar
 		    input->fetch_recycle(ptr);
 
 		    if(need_answer)
+		    {
+			    // sending the answer
 			send_answer();
+		    }
 
 		    if(immediate_read > 0)
 			go_read();
@@ -168,9 +184,11 @@ namespace libdar
 	while(!completed);
     }
 
-    U_I slave_thread::send_data_block(U_I size)
+    U_I slave_thread::send_data_block(U_I size, bool & eof)
     {
 	U_I min;
+
+	eof = false;
 
 	    // preparing the new answer
 
@@ -190,8 +208,10 @@ namespace libdar
 
 	    size = data->read(ptr + 1, min);
 	    if(size < min) // reached eof
+	    {
 		ptr[0] = data_eof_header;
-
+		eof = true;
+	    }
 	}
 	catch(...)
 	{
@@ -207,20 +227,31 @@ namespace libdar
     bool slave_thread::treat_order()
     {
 	bool need_answer = false;
+	infinint tmp;
 
 	answer.clear();
 	switch(order.get_type())
 	{
 	case msg_type::data:
 	    data->write(ptr + 1, num - 1);
-	    if(to_send_ahead > 0)
+	    if(to_send_ahead > 0 || endless_read_ahead)
 		throw SRC_BUG; // read_ahead asked but no read done, received data to write instead
 	    if(read_ahead > 0)
 		throw SRC_BUG; // read_ahead started but data not read, received data to write instead
 	    break;
 	case msg_type::order_read_ahead:
-	    to_send_ahead += order.get_infinint();
-	    data->read_ahead(to_send_ahead); // propagate the read_ahead request
+	    tmp = order.get_infinint();
+	    if(tmp == 0)
+	    {
+		endless_read_ahead = true;
+		to_send_ahead = 0;
+	    }
+	    else
+	    {
+		endless_read_ahead = false;
+		to_send_ahead += tmp;
+	    }
+	    data->read_ahead(tmp); // propagate the read_ahead request
 	    break;
 	case msg_type::order_read:
 	    immediate_read = order.get_U_I();
@@ -233,64 +264,75 @@ namespace libdar
 	case msg_type::order_skip:
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip(order.get_infinint()));
-	    read_ahead = 0;
+	    read_ahead = 0; // all in transit data will be dropped by the master
 	    to_send_ahead = 0;
+	    endless_read_ahead = false;
 	    need_answer = true;
 	    break;
 	case msg_type::order_skip_to_eof:
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip_to_eof());
-	    read_ahead = 0;
+	    read_ahead = 0; // all in transit data will be dropped by the master
 	    to_send_ahead = 0;
+	    endless_read_ahead = false;
 	    need_answer = true;
 	    break;
 	case msg_type::order_skip_fwd:
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip_relative(order.get_U_I()));
-	    read_ahead = 0;
+	    read_ahead = 0; // all in transit data will be dropped by the master
 	    to_send_ahead = 0;
+	    endless_read_ahead = false;
 	    need_answer = true;
 	    break;
 	case msg_type::order_skip_bkd:
 	    answer.set_type(msg_type::answr_skip_done);
 	    answer.set_bool(data->skip_relative(-order.get_U_I()));
-	    read_ahead = 0;
+	    read_ahead = 0; // all in transit data will be dropped by the master
 	    to_send_ahead = 0;
+	    endless_read_ahead = false;
 	    need_answer = true;
 	    break;
 	case msg_type::order_skippable_fwd:
+	    if(read_ahead > 0)
+		throw SRC_BUG; // code is not adapted, it should take into consideration read_ahead data
 	    answer.set_type(msg_type::answr_skippable);
 	    answer.set_bool(data->skippable(generic_file::skip_forward, order.get_infinint()));
 	    need_answer = true;
 	    break;
 	case msg_type::order_skippable_bkd:
+	    if(read_ahead > 0)
+		throw SRC_BUG; // code is not adapted, it should take into consideration read_ahead data
 	    answer.set_type(msg_type::answr_skippable);
 	    answer.set_bool(data->skippable(generic_file::skip_backward, order.get_infinint()));
 	    need_answer = true;
 	    break;
 	case msg_type::order_get_position:
 	    answer.set_type(msg_type::answr_position);
+	    tmp = data->get_position();
 	    if(read_ahead > 0)
 	    {
-		    // a quantity of blocks equal to read_ahead has been sent in the output pipe
-		    // and have not yet been read, they will be dropped by the master to reach the
-		    // answer to the get_position() order it just sent
-		    // so we can now, stop further read_ahead operation,
-		    // and seek back the position
-		    // of the first block in pipe that will be ignored
-		    // by the master thread.
-		if(data->get_position() >= read_ahead)
-		    data->skip(data->get_position() - read_ahead);
+		    // we need to compensate the position of "data"
+		    // by the amount of bytes read ahead from it
+		    // but not yet requested for reading by the master thread
+		    // (still in transit in the tampon)
+		if(tmp < read_ahead)
+		    throw SRC_BUG; // we read ahead more data than available in the underlying generic_file!!!
 		else
-		    throw SRC_BUG; // first byte of data read ahead is before offset zero !?!
-		read_ahead = 0;
+		    tmp -= read_ahead;
 	    }
-	    answer.set_infinint(data->get_position());
-	    to_send_ahead = 0;
+	    answer.set_infinint(tmp);
 	    need_answer = true;
 	    break;
 	case msg_type::order_end_of_xmit:
 	    stop = true;
+	    break;
+	case msg_type::order_stop_readahead:
+	    answer.set_type(msg_type::answr_readahead_stopped);
+	    read_ahead = 0; // all in transit data will be dropped by the master
+	    to_send_ahead = 0;
+	    endless_read_ahead = false;
+	    need_answer = true;
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -302,8 +344,6 @@ namespace libdar
 
     void slave_thread::go_read()
     {
-	U_I read;
-	U_I amount;
 	U_I sent = 0;
 	bool eof = false;
 
@@ -313,6 +353,8 @@ namespace libdar
 	    {
 		U_I tmp = 0;
 
+		    // counting out the already sent data thanks to a previous read_ahead
+
 		read_ahead.unstack(tmp);
 		if(read_ahead != 0)
 		    throw SRC_BUG;
@@ -320,46 +362,28 @@ namespace libdar
 	    }
 	    else
 	    {
+		    // all data already sent thanks to a previous read_ahead
+
 		read_ahead -= immediate_read;
 		immediate_read = 0;
 	    }
 	}
 
+	    // after read_ahead consideration, checking what remains to send
 
 	while(sent < immediate_read && !eof)
-	{
-	    output->get_block_to_feed(ptr, num);
-
-	    try
-	    {
-		if(num == 0)
-		    throw SRC_BUG;
-		--num;
-
-		read = immediate_read - sent;      // what amount remains to sent
-		amount = read > num  ? num : read; // what amount we can sent in the next block
-		read = data->read(ptr + 1, amount);// what amount could be get from the source
-		if(read == amount)
-		    ptr[0] = data_header;
-		else
-		{
-		    ptr[0] = data_eof_header;
-		    eof = true;
-		}
-	    }
-	    catch(...)
-	    {
-		output->feed_cancel_get_block(ptr);
-		throw;
-	    }
-
-	    output->feed(ptr, read + 1); // +1 for the data header
-	    sent += read;
-	}
+	    sent += send_data_block(immediate_read - sent, eof);
 
 	if(eof)
-	    to_send_ahead = 0;  // stopping a pending read_ahead
-	immediate_read = 0; // requested read has completed
+	{
+		// stopping a pending read_ahead
+	    to_send_ahead = 0;
+	    endless_read_ahead = false;
+	}
+	immediate_read = 0; // requested read has completed (either eof or all data sent)
+
+
+	    // counting down from what remains to send due to pending read_ahead what we have just sent
 
 	if(to_send_ahead > 0)
 	{

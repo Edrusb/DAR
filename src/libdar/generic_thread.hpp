@@ -77,8 +77,7 @@ namespace libdar
 	    /// \note no data in transit in this object so we should not do anything,
 	    /// however for performance propagating the order to slave_thread
 	virtual void inherited_sync_write();
-
-	virtual void inherited_flush_read() {}; // nothing to be done, no data in transit
+	virtual void inherited_flush_read();
 	virtual void inherited_terminate();
 
 
@@ -103,7 +102,8 @@ namespace libdar
 	void send_order();
 	void read_answer();   //< \note ptr must be released/recycled after this call
 	void check_answer(msg_type expected);
-	void release_block_answer() { tomaster.fetch_recycle(ptr); ptr = NULL; };
+	void release_block_answer() { tomaster.fetch_recycle(ptr); tomaster.fetch_skip_back(); ptr = NULL; };
+	void skip_block_answer() { tomaster.fetch_push_back_and_skip(ptr, num); ptr = NULL; };
 	void my_run();
 	void my_join();
     };

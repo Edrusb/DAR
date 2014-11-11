@@ -357,6 +357,28 @@ namespace libdar
 	release_block_answer();
     }
 
+    void generic_thread::inherited_flush_read()
+    {
+	    // rerun the thread if an exception has occured previously
+	my_run();
+
+	    // preparing the order message to stop a possible read_ahead
+	    // running in the slave_thread
+
+	order.clear();
+	order.set_type(msg_type::order_stop_readahead);
+
+	    // order completed
+
+	send_order();
+	read_answer();
+	check_answer(msg_type::answr_readahead_stopped);
+	release_block_answer();
+
+	    // resetting the current object
+	reached_eof = false;
+    }
+
     void generic_thread::inherited_terminate()
     {
 	    // rerun the thread if an exception has occured previously
@@ -413,8 +435,30 @@ namespace libdar
 	    if(expected == msg_type::data)
 		break; // exiting the while loop to avoid releasing the block
 
-	    release_block_answer(); // dropping that block up to the next non data block
-	    read_answer();
+	    switch(expected)
+	    {
+	    case msg_type::unset:
+		throw SRC_BUG;
+	    case msg_type::data:
+		throw SRC_BUG; // should have been treated above
+	    case msg_type::answr_read_eof:
+		throw SRC_BUG; // should have been treated above
+	    case msg_type::answr_sync_write_done:
+	    case msg_type::answr_skippable:
+	    case msg_type::answr_position:
+	    case msg_type::answr_position_begin:
+		skip_block_answer(); // skipping to next block to read the answer
+		read_answer();
+		break;
+	    case msg_type::answr_exception:
+	    case msg_type::answr_skip_done:
+	    case msg_type::answr_readahead_stopped:
+		release_block_answer(); // destroying read ahead data block from the pipe
+		read_answer();
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
 	}
 
 	switch(answer.get_type())

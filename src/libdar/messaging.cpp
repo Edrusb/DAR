@@ -82,6 +82,8 @@ namespace libdar
 	case msg_type::order_get_position:
 	case msg_type::answr_exception:
 	case msg_type::order_end_of_xmit:
+	case msg_type::order_stop_readahead:
+	case msg_type::answr_readahead_stopped:
 	    ret = (arg1 == arg2);
 	    break;
 	default:
@@ -120,6 +122,8 @@ namespace libdar
 	case msg_type::answr_position:
 	case msg_type::answr_exception:
 	case msg_type::order_end_of_xmit:
+	case msg_type::order_stop_readahead:
+	case msg_type::answr_readahead_stopped:
 	    return false;
 	default:
 	    throw SRC_BUG;
@@ -178,6 +182,10 @@ namespace libdar
 	    return 'X';
 	case msg_type::order_end_of_xmit:
 	    return 'Z';
+	case msg_type::order_stop_readahead:
+	    return 'W';
+	case msg_type::answr_readahead_stopped:
+	    return 'w';
 	default:
 	    throw SRC_BUG;
 	}
@@ -233,6 +241,10 @@ namespace libdar
 	    return msg_type::answr_exception;
 	case 'Z':
 	    return msg_type::order_end_of_xmit;
+	case 'W':
+	    return msg_type::order_stop_readahead;
+	case 'w':
+	    return msg_type::answr_readahead_stopped;
 	default:
 	    throw SRC_BUG;
 	}
@@ -289,6 +301,10 @@ namespace libdar
 	case msg_type::answr_exception:
 	    throw SRC_BUG;
 	case msg_type::order_end_of_xmit:
+	    throw SRC_BUG;
+	case msg_type::order_stop_readahead:
+	    throw SRC_BUG;
+	case msg_type::answr_readahead_stopped:
 	    throw SRC_BUG;
 	default:
 	    throw SRC_BUG;

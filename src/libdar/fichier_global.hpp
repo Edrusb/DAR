@@ -60,12 +60,12 @@ namespace libdar
     public :
 	enum advise
 	{
-	    advise_normal,
-	    advise_sequential,
-	    advise_random,
-	    advise_noreuse,
-	    advise_willneed,
-	    advise_dontneed
+	    advise_normal,     //< no advise given by the application
+	    advise_sequential, //< application expect to read the data sequentially
+	    advise_random,     //< application expect to read the data in random order
+	    advise_noreuse,    //< application does not expect to read the data more than once
+	    advise_willneed,   //< application expect to read the data again in near future
+	    advise_dontneed    //< application will not read the data in near future
 	};
 
 	    /// constructors

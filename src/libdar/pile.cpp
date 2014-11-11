@@ -315,23 +315,16 @@ namespace libdar
 
     void pile::flush_read_above(generic_file *ptr)
     {
-	vector<face>::iterator it = stack.begin();
+	vector<face>::reverse_iterator it = stack.rbegin();
 
-	    // we start from the bottom of the stack looking for ptr
-	while(it != stack.end() && it->ptr != ptr)
-	    ++it;
-	if(it == stack.end())
-	    throw SRC_BUG;
-	if(it->ptr != ptr)
-	    throw SRC_BUG;
-	++it; // skipping ptr
-
-	    // we continue above ptr and this time call flush_read()
-	while(it != stack.end())
+	    // we start from the top of the stack down to ptr
+	while(it != stack.rend() && it->ptr != ptr)
 	{
 	    it->ptr->flush_read();
 	    ++it;
 	}
+	if(it->ptr != ptr)
+	    throw SRC_BUG;
     }
 
 

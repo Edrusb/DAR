@@ -1313,6 +1313,11 @@ namespace libdar
 					crc_size = tools_file_size_to_crc_size(e_file->get_size());
 
 				    dat->skip(0);
+					// in sequential read mode, storage_size is zero
+					// which leads to ask an endless read_ahead (up to eof)
+					// thus the read_ahaead will be bounded by the escape
+					// layer up to the next tape mark, as expected
+				    dat->read_ahead(e_file->get_storage_size());
 				    dat->copy_to(black_hole, crc_size, check);
 				    if(check == NULL)
 					throw SRC_BUG;
@@ -2703,9 +2708,8 @@ namespace libdar
 				const crc * original = NULL;
 				bool crc_available = false;
 
-				    // this is done as soon as possible to benefit of the read_ahead
-				    // while finishing the setup of the destination
 				source->skip(0);
+				source->read_ahead(0);
 
 				pdesc.stack->sync_write_above(pdesc.compr);
 				pdesc.compr->sync_write(); // necessary in any case to reset the compression engine to be able at later time to decompress starting at that position

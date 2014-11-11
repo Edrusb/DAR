@@ -1153,7 +1153,7 @@ namespace libdar
 				crc_size = tools_file_size_to_crc_size(ref_fil->get_size());
 
 			    ou->skip(0);
-			    ou->read_ahead(ref_fil->get_size());
+			    ou->read_ahead(ref_fil->get_storage_size());
 			    ou->copy_to(dest, crc_size, crc_dyn);
 
 			    if(crc_dyn == NULL)
