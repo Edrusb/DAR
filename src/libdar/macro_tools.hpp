@@ -120,7 +120,7 @@ namespace libdar
 					 bool info_details,    // be or not verbose about the archive openning
 					 std::vector<signator> & gnupg_signed, //< list of existing signature found for that archive (valid or not)
 					 slice_layout & sl,    //< slicing layout of the archive
-					 bool multi_threaded); //< true of several thread can be run concurrently by libdar
+					 bool multi_threaded); //< true if several thread shall be run concurrently by libdar
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 
     extern catalogue *macro_tools_get_derivated_catalogue_from(user_interaction & dialog,
