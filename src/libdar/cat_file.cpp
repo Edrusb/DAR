@@ -424,28 +424,25 @@ namespace libdar
 
 				// changing the compression algo of the archive stack
 
-			    if(*size > 0)
+			    if(get_compression_algo_read() != none && mode != keep_compressed)
 			    {
-				if(get_compression_algo_read() != none && mode != keep_compressed)
+				if(get_compression_algo_read() != get_compressor_layer()->get_algo())
 				{
+				    get_pile()->flush_read_above(get_compressor_layer());
+				    get_compressor_layer()->resume_compression();
 				    if(get_compression_algo_read() != get_compressor_layer()->get_algo())
-				    {
-					get_pile()->flush_read_above(get_compressor_layer());
-					get_compressor_layer()->resume_compression();
-					if(get_compression_algo_read() != get_compressor_layer()->get_algo())
-					    throw SRC_BUG;
-				    }
-					// else nothing to do, compressor is already properly configured
+					throw SRC_BUG;
 				}
-				else  // disabling de-compression
+				    // else nothing to do, compressor is already properly configured
+			    }
+			    else  // disabling de-compression
+			    {
+				if(get_compressor_layer()->get_algo() != none)
 				{
-				    if(get_compressor_layer()->get_algo() != none)
-				    {
-					get_pile()->flush_read_above(get_compressor_layer());
-					get_compressor_layer()->suspend_compression();
-				    }
-					// else nothing to do, de-compression is already disabled
+				    get_pile()->flush_read_above(get_compressor_layer());
+				    get_compressor_layer()->suspend_compression();
 				}
+				    // else nothing to do, de-compression is already disabled
 			    }
 
 				// adding a tronc object in the local stack object when no compression is used
