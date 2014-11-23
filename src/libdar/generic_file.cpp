@@ -279,13 +279,27 @@ namespace libdar
         return wrote;
     }
 
-    bool generic_file::diff(generic_file & f, const infinint & crc_size, crc * & value)
+    bool generic_file::diff(generic_file & f,
+			    const infinint & me_read_ahead,
+			    const infinint & you_read_ahead,
+			    const infinint & crc_size,
+			    crc * & value)
     {
 	infinint err_offset;
-	return diff(f, crc_size, value, err_offset);
+	return diff(f,
+		    me_read_ahead,
+		    you_read_ahead,
+		    crc_size,
+		    value,
+		    err_offset);
     }
 
-    bool generic_file::diff(generic_file & f, const infinint & crc_size, crc * & value, infinint & err_offset)
+    bool generic_file::diff(generic_file & f,
+			    const infinint & me_read_ahead,
+			    const infinint & you_read_ahead,
+			    const infinint & crc_size,
+			    crc * & value,
+			    infinint & err_offset)
     {
         char buffer1[BUFFER_SIZE];
         char buffer2[BUFFER_SIZE];
@@ -300,6 +314,8 @@ namespace libdar
             throw Erange("generic_file::diff", gettext("Cannot compare files in write only mode"));
         skip(0);
         f.skip(0);
+	read_ahead(me_read_ahead);
+	f.read_ahead(you_read_ahead);
 	value = create_crc_from_size(crc_size, get_pool());
 	if(value == NULL)
 	    throw SRC_BUG;

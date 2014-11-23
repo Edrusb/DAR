@@ -714,7 +714,6 @@ namespace libdar
 		generic_file *me = get_data(normal);
 		if(me == NULL)
 		    throw SRC_BUG;
-		me->read_ahead(get_storage_size());
 		try
 		{
 		    generic_file *you = f_other->get_data(normal);
@@ -725,7 +724,6 @@ namespace libdar
 			// storage_size is zero, which lead a endless
 			// read_ahead request, suitable for the current
 			// context:
-		    you->read_ahead(f_other->get_storage_size());
 		    try
 		    {
 			crc *value = NULL;
@@ -749,7 +747,12 @@ namespace libdar
 			try
 			{
 			    infinint err_offset;
-			    if(me->diff(*you, crc_size, value, err_offset))
+			    if(me->diff(*you,
+					get_storage_size(),
+					f_other->get_storage_size(),
+					crc_size,
+					value,
+					err_offset))
 				throw Erange("cat_file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
 				// data is the same, comparing the CRC values
 

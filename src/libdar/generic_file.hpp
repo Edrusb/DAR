@@ -205,16 +205,24 @@ namespace libdar
 	    /// compares the contents with the object in argument
 
 	    /// \param[in] f is the file to compare the current object with
+	    /// \param[in] me_read_ahead is the amount of data to read ahead from "*this" (0 for no limit, up to end of eof)
+	    /// \param[in] you_read_ahead is the amount of data to read ahead from f (0 for no limit, up to end of file
 	    /// \param[in] crc_size is the width of the CRC to use for calculation
 	    /// \param[out] value is the computed checksum, its value can be used for additional
 	    /// testing if this method returns false (no difference between files). The given checksum
 	    /// has to be set to the expected width by the caller.
 	    /// \return true if arg differ from "this"
 	    /// \note value has to be deleted by the caller when no more needed
-        bool diff(generic_file & f, const infinint & crc_size, crc * & value);
+        bool diff(generic_file & f,
+		  const infinint & me_read_ahead,
+		  const infinint & you_read_ahead,
+		  const infinint & crc_size,
+		  crc * & value);
 
 	    /// compare the contents with the object in argument, also providing the offset of the first difference met
 	    /// \param[in] f is the file to compare the current object with
+	    /// \param[in] me_read_ahead is the amount of data to read ahead from "*this" (0 for no limit, up to end of eof)
+	    /// \param[in] you_read_ahead is the amount of data to read ahead from f (0 for no limit, up to end of file
 	    /// \param[in] crc_size is the width of the CRC to use for calculation
 	    /// \param[out] value is the computed checksum, its value can be used for additional
 	    /// \param[out] err_offset in case of difference, holds the offset of the first difference met
@@ -222,7 +230,12 @@ namespace libdar
 	    /// has to be set to the expected width by the caller.
 	    /// \return true if arg differ from "this", else false is returned and err_offset is set
 	    /// \note value has to be deleted by the caller when no more needed
-	bool diff(generic_file & f, const infinint & crc_size, crc * & value, infinint & err_offset);
+	bool diff(generic_file & f,
+		  const infinint & me_read_ahead,
+		  const infinint & you_read_ahead,
+		  const infinint & crc_size,
+		  crc * & value,
+		  infinint & err_offset);
 
             /// reset CRC on read or writen data
 
