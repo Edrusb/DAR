@@ -251,6 +251,7 @@ namespace libdar
     {
 	U_I read = 0;
 	U_I min;
+	bool refilled = false;
 
 	    // rerun the thread if an exception has occured previously
 	my_run();
@@ -288,12 +289,14 @@ namespace libdar
 		    (void)memmove(ptr + 1, ptr + 1 + min, kept);
 		    tomaster.fetch_push_back(ptr, kept + 1); // counting the first message type in addition (one byte)
 		    ptr = NULL;
+		    refilled = true; // some data remain in the pipe
 		}
 		else // the whole block will be read
 		{
 		    (void)memcpy(a + read, ptr + 1, num);
 		    read += num;
 		    release_block_answer();
+		    refilled = false;
 		}
 		break;
 	    case msg_type::answr_exception:
@@ -305,7 +308,7 @@ namespace libdar
 	}
 	while(answer.get_type() != msg_type::answr_read_eof && read < size);
 
-	if(answer.get_type() == msg_type::answr_read_eof)
+	if(answer.get_type() == msg_type::answr_read_eof && !refilled)
 	    reached_eof = true;
 
 	return read;
