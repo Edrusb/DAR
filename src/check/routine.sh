@@ -141,6 +141,9 @@ function GO {
 	else
 	    echo "--------> $1 FAILED : $*" > /dev/stderr
 	fi
+	if [ -x ~denis/Scripts/send_sms ] ; then
+	    ~denis/Scripts/send_sms "make check failed..."
+	fi
 	exit 1
     fi
 

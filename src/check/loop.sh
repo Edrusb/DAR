@@ -68,7 +68,7 @@ for multi_thread in n y ; do
                   for sparse_size in 100 0 ; do
                     for keep_compr in y n ; do
                       for recheck_hole in y n ; do
-                         ./main.sh $crypto "$zip" "$slice" "$Slice" "$tape" "$seq_read" "$digit" "$sparse_size" "$keep_compr" "$recheck_hole" "$hash" "$multi_thread" || exit 1
+                         ./main.sh "$multi_thread" "$hash" "$crypto" "$zip" "$slice" "$Slice" "$tape" "$seq_read" "$digit" "$sparse_size" "$keep_compr" "$recheck_hole"  || exit 1
 		      done
                     done
                   done
@@ -85,3 +85,7 @@ done
 echo "+-------------------------------+"
 echo "| ALL TESTS PASSED SUCCESSFULLY |"
 echo "+-------------------------------+"
+
+if [ -x ~denis/Scripts/send_sms ] ; then
+    ~denis/Scripts/send_sms "make check successful !"
+fi
