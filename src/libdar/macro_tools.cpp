@@ -364,7 +364,8 @@ namespace libdar
 	    case crypto_camellia256:
 		if(info_details)
 		    dialog.warning(gettext("Opening cyphering layer..."));
-		if(second_terminateur_offset != 0) // we have openned the archive by the end
+		if(second_terminateur_offset != 0
+		   || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
 		{
 		    crypto_sym *tmp_ptr = NULL;
 
