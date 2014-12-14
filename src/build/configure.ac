@@ -897,6 +897,21 @@ if [ "$static_pb" = "yes" -a "$build_static" = "yes" ] ; then
    echo ""
 fi
 
+if [ -z "$build_mode" ] ; then
+   echo ""
+   echo "--------------------- N O T E ---------------------------------------"
+   echo "Note: You are about to build a libdar/dar binary relying on \"infinint\""
+   echo "integer type. You shall also consider using 64 bits integers (whatever"
+   echo "your CPU has 32 or 64 bits registers) for better performances and reduced"
+   echo "memory requirements, at the cost of the limitations explained here:"
+   echo "   ./doc/Limitations.html (Paragraph about Integers)"
+   echo "Document which is also available online at:"
+   echo "   http://dar.linux.free.fr/doc/Limitations.html#Integers"
+   echo "Unless you are impacted by these limitations, you can rerun ./configure"
+   echo "adding the option --enable-mode=64 for better performances"
+   echo "---------------------------------------------------------------------"
+fi
+
 if [ "$libgcrypt_hash_bug" = "yes" ] ; then
    echo ""
    echo ""
