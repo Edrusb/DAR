@@ -2,7 +2,8 @@ version 2.4.15
 --------------
 Thanks to Ryan Schmidt for feedback and typo corrections. Thanks to Jer Fort
 for bug report and again to Neil Darlow for providing access to a FreeBSD
-system. Thanks to Georg Sauthoff for clear bug report.
+system. Thanks to Georg Sauthoff for clear bug report. Thanks to "Led" at
+sourcerforge for patch against bashisms in doc/sample scripts.
 
 version 2.4.14
 --------------

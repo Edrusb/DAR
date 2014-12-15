@@ -108,7 +108,11 @@ then
    echo "Test of the archive done at: `date`."
 else
    MSG="The backup FAILED (error code $RESULT)"
-   echo -e "$MSG" "\nEnded at: `date` \n">>  "$LOG_FILE"
+   echo "$MSG" >> "$LOG_FILE"
+   echo >> "$LOG_FILE"
+   echo -n "Ended at: " >> "$LOG_FILE"
+   date >> "$LOG_FILE"
+   echo >> "$LOG_FILE"
    echo "$MSG"
    exit 1
 fi
@@ -123,7 +127,11 @@ dar_manager -v -B "$DAR_MANAGER_DB" -A "$ARCHIVE"
 echo "The catalogue created in $CATALOGUE and imported into the base $DAR_MANAGER_DB" >>  "$LOG_FILE"
 echo "The catalogue created in $CATALOGUE and imported into the base $DAR_MANAGER_DB"
 
-echo -e "$MSG" "\nEnded at: `date` \n">>  "$LOG_FILE"
+echo "$MSG" >> "$LOG_FILE"
+echo >> "$LOG_FILE"
+echo -n "Ended at: " >> "$LOG_FILE"
+date >> "$LOG_FILE"
+echo >> "$LOG_FILE"
 echo "$MSG"
 
 ### Incremental backup
