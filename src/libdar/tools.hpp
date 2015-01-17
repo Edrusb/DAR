@@ -418,6 +418,16 @@ namespace libdar
         /// \param[in,out] r to convert
     extern void tools_to_upper(std::string & r);
 
+#if HAVE_WCTYPE_H
+	/// \brief convert a wstring to upper case
+	///
+	/// \param[in,out] r to convert
+	/// \note wstring is a string of wchar_t (wide-char) type used to store
+	/// on variable lenght of byte sequence the many characters defined with UTF
+	/// like cirillic and greek letters.
+    extern void tools_to_wupper(std::wstring & r);
+#endif
+
         /// remove last character of a string is it equal to a given value
 
         /// \param[in] c the given value to compare the last char with
@@ -763,25 +773,27 @@ namespace libdar
     extern infinint tools_file_size_to_crc_size(const infinint & size);
 
 	/// return a string containing the Effective UID
-
     extern std::string tools_get_euid();
 
-
 	/// return a string containing the Effective UID
-
     extern std::string tools_get_egid();
 
 	/// return a string containing the hostname of the current host
-
     extern std::string tools_get_hostname();
 
 	/// return a string containing the current time (UTC)
-
     extern std::string tools_get_date_utc();
 
 	/// return the string about compression ratio
-
     extern std::string tools_get_compression_ratio(const infinint & storage_size, const infinint & file_size);
+
+#if HAVE_WCHAR_H
+	/// convert a std::string to std::wstring (wide-string, aka string of wchar_t)
+    extern std::wstring tools_string_to_wstring(const std::string & val);
+
+	/// convert a std::wstring to std::string
+    extern std::string tools_wstring_to_string(const std::wstring & val);
+#endif
 
 } /// end of namespace
 
