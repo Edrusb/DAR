@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2014-09-06 15:12+0200\n"
+"POT-Creation-Date: 2015-01-18 15:44+0100\n"
 "PO-Revision-Date: 2011-07-21 16:13+0200\n"
 "Last-Translator: Markus Kamp <mk_cactus@gmx.de>\n"
 "Language-Team: Deutsch\n"
@@ -495,11 +495,11 @@ msgid ""
 "permit to recover some files, at most)?"
 msgstr ""
 
-#: src/libdar/archive.cpp:470 src/libdar/archive.cpp:1335
+#: src/libdar/archive.cpp:470 src/libdar/archive.cpp:1338
 msgid "Compression_level must be between 1 and 9 included"
 msgstr "Die Kompressionsstufe muss zwischen 1 und 9 liegen"
 
-#: src/libdar/archive.cpp:472 src/libdar/archive.cpp:1337
+#: src/libdar/archive.cpp:472 src/libdar/archive.cpp:1340
 msgid ""
 "\"first_file_size\" cannot be different from zero if \"file_size\" is equal "
 "to zero"
@@ -507,7 +507,7 @@ msgstr ""
 "\"Größe der ersten Datei\" kann nicht ungleich Null sein, wenn \"Dateigröße"
 "\" gleich Null ist"
 
-#: src/libdar/archive.cpp:474 src/libdar/archive.cpp:1339
+#: src/libdar/archive.cpp:474 src/libdar/archive.cpp:1342
 msgid "Crypto block size must be greater than 10 bytes"
 msgstr "Die Größe des Verschlüsselungsblocks muss höher als 10 Bytes sein."
 
@@ -524,7 +524,7 @@ msgid ""
 "options) for the resulting archive"
 msgstr ""
 
-#: src/libdar/archive.cpp:647 src/libdar/archive.cpp:868
+#: src/libdar/archive.cpp:647 src/libdar/archive.cpp:871
 msgid "This archive is not exploitable, check documentation for more"
 msgstr "Das Archiv kann nichrt verwendet werden, bitte Dokumentation lesen"
 
@@ -532,7 +532,7 @@ msgstr "Das Archiv kann nichrt verwendet werden, bitte Dokumentation lesen"
 msgid "Error while restoring data: "
 msgstr "Fehler bei der Wiederherstellung: "
 
-#: src/libdar/archive.cpp:728 src/libdar/archive.cpp:943
+#: src/libdar/archive.cpp:728 src/libdar/archive.cpp:946
 msgid ""
 "This archive is not exploitable, check the archive class usage in the API "
 "documentation"
@@ -577,68 +577,73 @@ msgstr ""
 msgid "absent"
 msgstr ""
 
-#: src/libdar/archive.cpp:743
+#: src/libdar/archive.cpp:744
 #, c-format
 msgid "Catalogue size in archive            : %i bytes\n"
 msgstr "Größe des Katalogs im Archiv            : %i Byte\n"
 
-#: src/libdar/archive.cpp:745
+#: src/libdar/archive.cpp:746
+#, fuzzy, c-format
+msgid "Catalogue size in archive            : N/A\n"
+msgstr "Größe des Katalogs im Archiv            : %i Byte\n"
+
+#: src/libdar/archive.cpp:748
 #, fuzzy, c-format
 msgid ""
 "User comment                         : %S\n"
 "\n"
 msgstr "#                         BRECHE AB !         #"
 
-#: src/libdar/archive.cpp:751
+#: src/libdar/archive.cpp:754
 #, c-format
 msgid "Archive is composed of %i file(s)\n"
 msgstr "Das Archiv enthält  %i Datei(en)\n"
 
-#: src/libdar/archive.cpp:753
+#: src/libdar/archive.cpp:756
 #, c-format
 msgid "File size: %i bytes\n"
 msgstr "Dateigröße: %i Byte\n"
 
-#: src/libdar/archive.cpp:757
+#: src/libdar/archive.cpp:760
 #, c-format
 msgid "First file size       : %i bytes\n"
 msgstr "Größe der ersten Datei       : %i Byte\n"
 
-#: src/libdar/archive.cpp:758
+#: src/libdar/archive.cpp:761
 #, c-format
 msgid "File size             : %i bytes\n"
 msgstr "Dateigröße             : %i Byte\n"
 
-#: src/libdar/archive.cpp:759
+#: src/libdar/archive.cpp:762
 #, c-format
 msgid "Last file size        : %i bytes\n"
 msgstr "Größe der letzten Datei       : %i Byte\n"
 
-#: src/libdar/archive.cpp:764
+#: src/libdar/archive.cpp:767
 #, c-format
 msgid "Archive total size is : %i bytes\n"
 msgstr "Gesamtgröße des Archivs: %i Byte\n"
 
-#: src/libdar/archive.cpp:772
+#: src/libdar/archive.cpp:775
 #, c-format
 msgid "Archive size is: %i bytes\n"
 msgstr "Größe des Archivs: %i Byte\n"
 
-#: src/libdar/archive.cpp:773
+#: src/libdar/archive.cpp:776
 #, c-format
 msgid "Previous archive size does not include headers present in each slice\n"
 msgstr ""
 "Die angegebene Archivgröße beinhaltet nicht die Header der einzelnen "
 "Abschnitte\n"
 
-#: src/libdar/archive.cpp:776
+#: src/libdar/archive.cpp:779
 #, fuzzy, c-format
 msgid "Archive size is unknown (reading from a pipe)"
 msgstr ""
 "Diese Archiv besteht aus Abschniten und kann nicht über ein Pipe gelesen "
 "werden"
 
-#: src/libdar/archive.cpp:788
+#: src/libdar/archive.cpp:791
 #, c-format
 msgid ""
 "\n"
@@ -648,30 +653,30 @@ msgid ""
 "from this archive alone\n"
 msgstr ""
 
-#: src/libdar/archive.cpp:836
+#: src/libdar/archive.cpp:839
 msgid "Error while listing archive contents: "
 msgstr "Fehler beim Auflisten des Archivinhalts: "
 
-#: src/libdar/archive.cpp:908
+#: src/libdar/archive.cpp:911
 msgid "Error while comparing archive with filesystem: "
 msgstr "Fehler beim Vergleich des Archivs mit dem Dateisystem: "
 
-#: src/libdar/archive.cpp:955
+#: src/libdar/archive.cpp:958
 msgid ""
 "WARNING! This is an isolated catalogue, no data or EA is present in this "
 "archive, only the catalogue structure can be checked"
 msgstr ""
 
-#: src/libdar/archive.cpp:987
+#: src/libdar/archive.cpp:990
 #, fuzzy
 msgid "A problem occurred while reading this archive contents: "
 msgstr "Fehler beim Auflisten des Archivinhalts: "
 
-#: src/libdar/archive.cpp:1002
+#: src/libdar/archive.cpp:1005
 msgid "Error while testing archive: "
 msgstr "Fehler beim Überprüfen des Archivs: "
 
-#: src/libdar/archive.cpp:1342
+#: src/libdar/archive.cpp:1345
 msgid ""
 "nodump flag feature has not been activated at compilation time, it is thus "
 "not available"
@@ -679,7 +684,7 @@ msgstr ""
 "Die Funktion  \"nodump-Kennzeichnung\" ist bei der Übersetzung des Programms "
 "nicht aktiviert worden und deswegen nicht verfügbar."
 
-#: src/libdar/archive.cpp:1400
+#: src/libdar/archive.cpp:1403
 #, c-format
 msgid ""
 "WARNING! The archive is located in the directory to backup, this may create "
@@ -694,88 +699,88 @@ msgstr ""
 "Option -h für weitere Informationen). Möchten Sie die Aktion wirklich "
 "fortsetzen?"
 
-#: src/libdar/archive.cpp:1605
+#: src/libdar/archive.cpp:1608
 msgid "Ready to start writing down the archive?"
 msgstr "Soll das Archiv nun gespeichert werden?"
 
-#: src/libdar/archive.cpp:1690 src/libdar/macro_tools.cpp:347
+#: src/libdar/archive.cpp:1693 src/libdar/macro_tools.cpp:347
 msgid ""
 "WARNING: support for secure memory was not available at compilation time, in "
 "case of heavy memory load, this may lead the password you are about to "
 "provide to be wrote to disk (swap space) in clear. You have been warned!"
 msgstr ""
 
-#: src/libdar/archive.cpp:1691 src/libdar/macro_tools.cpp:348
+#: src/libdar/archive.cpp:1694 src/libdar/macro_tools.cpp:348
 #, c-format
 msgid "Archive %S requires a password: "
 msgstr "Geben die das Passwort für das Archiv %S ein: "
 
-#: src/libdar/archive.cpp:1692
+#: src/libdar/archive.cpp:1695
 msgid "Please confirm your password: "
 msgstr "Bitte das Passwort nochmals eingeben: "
 
-#: src/libdar/archive.cpp:1696
+#: src/libdar/archive.cpp:1699
 msgid "The two passwords are not identical. Aborting"
 msgstr "Die beiden Passwörter sind nicht gleich. Abbruch."
 
-#: src/libdar/archive.cpp:1712
+#: src/libdar/archive.cpp:1715
 msgid "Current implementation does not support this (new) crypto algorithm"
 msgstr ""
 
-#: src/libdar/archive.cpp:1813
+#: src/libdar/archive.cpp:1816
 #, fuzzy, c-format
 msgid "Error while fetching information for %S: "
 msgstr "Fehler beim Abruf der Indexinformation für %s : %s"
 
-#: src/libdar/archive.cpp:1941
+#: src/libdar/archive.cpp:1944
 msgid ""
 "Adding reference to files that have been destroyed since reference backup..."
 msgstr ""
 "Füge Verweis auf Dateien hinzu, die seit dem Referenzbackup gelöscht oder "
 "verschoben wurden."
 
-#: src/libdar/archive.cpp:1949
+#: src/libdar/archive.cpp:1952
 msgid "Writing archive contents..."
 msgstr "Schreibe Archivinhalt..."
 
-#: src/libdar/archive.cpp:2030
+#: src/libdar/archive.cpp:2033
 msgid "Error while saving data: "
 msgstr "Fehler beim Speichern: "
 
-#: src/libdar/archive.cpp:2076
+#: src/libdar/archive.cpp:2079
 msgid ""
 "Cannot get data name of the archive, this archive is not completely "
 "initialized"
 msgstr ""
 
-#: src/libdar/archive.cpp:2101
+#: src/libdar/archive.cpp:2104
 msgid ""
 "This archive contains an isolated catalogue, it cannot be used for this "
 "operation. It can only be used as reference for a incremental/differential "
 "backup or as backup of the original archive's catalogue"
 msgstr ""
 
-#: src/libdar/archive.cpp:2108
+#: src/libdar/archive.cpp:2111
 msgid ""
 "LAX MODE: Archive seems to be only an isolated catalogue (no data in it), "
 "Can I assume data corruption occurred and consider the archive as being a "
 "real archive?"
 msgstr ""
 
-#: src/libdar/archive.cpp:2113
+#: src/libdar/archive.cpp:2116
 #, fuzzy
 msgid "Error while fetching archive properties: "
 msgstr "Fehler beim Auflisten des Archivinhalts: "
 
-#: src/libdar/archive.cpp:2128
+#: src/libdar/archive.cpp:2131
 msgid "Not supported flag or archive corruption"
 msgstr "Nicht unterstützte Kennzeichnung oder beschädigtes Archiv"
 
-#: src/libdar/archive.cpp:2145
+#: src/libdar/archive.cpp:2148
 msgid "Sorry, file size is unknown at this step of the program.\n"
 msgstr "Die Dateigröße ist zu diesem Zeitpunkt leider noch nicht bekannt. \n"
 
-#: src/libdar/archive.cpp:2211
+#: src/libdar/archive.cpp:2214
 #, c-format
 msgid ""
 "libgcrypt version < %s. Ligcrypt used has a bug that leads md5 and sha1 hash "
@@ -787,188 +792,188 @@ msgstr ""
 msgid "Key cannot be an empty string"
 msgstr "Key kann keine leere Zeichenkette sein"
 
-#: src/libdar/tools.cpp:138 src/libdar/criterium.cpp:795
+#: src/libdar/tools.cpp:146 src/libdar/criterium.cpp:795
 #: src/dar_suite/dar_suite.cpp:277
 msgid "YES"
 msgstr "JA"
 
-#: src/libdar/tools.cpp:138 src/libdar/criterium.cpp:796
+#: src/libdar/tools.cpp:146 src/libdar/criterium.cpp:796
 #: src/dar_suite/dar_suite.cpp:279
 msgid "NO"
 msgstr "NEIN"
 
-#: src/libdar/tools.cpp:218
+#: src/libdar/tools.cpp:226
 msgid "Not a zero terminated string in file"
 msgstr "Nicht mit 0 abgeschlossene Zeichenkette in der Datei"
 
-#: src/libdar/tools.cpp:254
+#: src/libdar/tools.cpp:262
 #, c-format
 msgid "Cannot get file size: %s"
 msgstr "Dateigröße kann nicht bestimmt werden: %s"
 
-#: src/libdar/tools.cpp:305
+#: src/libdar/tools.cpp:313
 #, c-format
 msgid "Unknown suffix [%c] in string %S"
 msgstr "Unbekannte Endung [%c] in Zeichenkette %S"
 
-#: src/libdar/tools.cpp:420
+#: src/libdar/tools.cpp:428
 #, fuzzy
 msgid "Cannot read \"fcntl\" file's flags : "
 msgstr "Kann Flags der fcntl Datei nicht lesen : "
 
-#: src/libdar/tools.cpp:426
+#: src/libdar/tools.cpp:434
 #, fuzzy
 msgid "Cannot set \"fcntl\" file's flags : "
 msgstr "Kann Flags der fcntl Datei nicht setzen : "
 
-#: src/libdar/tools.cpp:497 src/libdar/tools.cpp:502 src/libdar/tools.cpp:514
-#: src/libdar/tools.cpp:519
+#: src/libdar/tools.cpp:505 src/libdar/tools.cpp:510 src/libdar/tools.cpp:522
+#: src/libdar/tools.cpp:527
 #, fuzzy
 msgid "Invalid number: "
 msgstr "Ungültige Archivnummer: "
 
-#: src/libdar/tools.cpp:594
+#: src/libdar/tools.cpp:602
 msgid "date before 1970 is not allowed"
 msgstr ""
 
-#: src/libdar/tools.cpp:599
+#: src/libdar/tools.cpp:607
 msgid "Incorrect month"
 msgstr ""
 
-#: src/libdar/tools.cpp:604
+#: src/libdar/tools.cpp:612
 msgid "Incorrect day of month"
 msgstr ""
 
-#: src/libdar/tools.cpp:609
+#: src/libdar/tools.cpp:617
 msgid "Incorrect hour"
 msgstr ""
 
-#: src/libdar/tools.cpp:614
+#: src/libdar/tools.cpp:622
 msgid "Incorrect minute"
 msgstr ""
 
-#: src/libdar/tools.cpp:619
+#: src/libdar/tools.cpp:627
 msgid "Incorrect second"
 msgstr ""
 
-#: src/libdar/tools.cpp:623
+#: src/libdar/tools.cpp:631
 #, fuzzy
 msgid "Bad formatted date expression"
 msgstr "Schlecht formatierte Datenbank"
 
-#: src/libdar/tools.cpp:736
+#: src/libdar/tools.cpp:744
 #, fuzzy
 msgid "Given date must be in the past"
 msgstr "Argument muss ein relativer Pfad sein"
 
-#: src/libdar/tools.cpp:771 src/libdar/tools.cpp:857
+#: src/libdar/tools.cpp:779 src/libdar/tools.cpp:865
 msgid "Error while calling fork() to launch dar: "
 msgstr "Fehler beim Aufruf der fork()-Funktion, um dar aufzurufen"
 
-#: src/libdar/tools.cpp:785 src/libdar/tools.cpp:887
+#: src/libdar/tools.cpp:793 src/libdar/tools.cpp:895
 msgid "Unexpected error while waiting for dar to terminate: "
 msgstr "Unerwarteter Fehler während DAR beendet werden sollte"
 
-#: src/libdar/tools.cpp:791 src/libdar/tools.cpp:893
+#: src/libdar/tools.cpp:799 src/libdar/tools.cpp:901
 msgid "DAR terminated upon signal reception: "
 msgstr "DAR wurde durch Empfang dieses Signals beendet: "
 
-#: src/libdar/tools.cpp:797 src/libdar/tools.cpp:899
+#: src/libdar/tools.cpp:805 src/libdar/tools.cpp:907
 msgid " . Retry to launch dar as previously ?"
 msgstr " . Soll versucht werden, dar wie zuvor zu starten ?"
 
-#: src/libdar/tools.cpp:802 src/libdar/tools.cpp:809 src/libdar/tools.cpp:904
-#: src/libdar/tools.cpp:911
+#: src/libdar/tools.cpp:810 src/libdar/tools.cpp:817 src/libdar/tools.cpp:912
+#: src/libdar/tools.cpp:919
 msgid " Continue anyway ?"
 msgstr "Trotzdem fortfahren?"
 
-#: src/libdar/tools.cpp:807 src/libdar/tools.cpp:909
+#: src/libdar/tools.cpp:815 src/libdar/tools.cpp:917
 msgid "DAR sub-process has terminated with exit code "
 msgstr "DAR Unterprozess wurde mit Fehlercode beendet"
 
-#: src/libdar/tools.cpp:1019
+#: src/libdar/tools.cpp:1027
 #, c-format
 msgid "   Libz compression (gzip)    : %s\n"
 msgstr "   Libz Kompression (gzip)    : %s\n"
 
-#: src/libdar/tools.cpp:1020
+#: src/libdar/tools.cpp:1028
 #, c-format
 msgid "   Libbz2 compression (bzip2) : %s\n"
 msgstr "   Libbz2 Kompression (bzip2) : %s\n"
 
-#: src/libdar/tools.cpp:1021
+#: src/libdar/tools.cpp:1029
 #, fuzzy, c-format
 msgid "   Liblzo2 compression (lzo)  : %s\n"
 msgstr "   Libz Kompression (gzip)    : %s\n"
 
-#: src/libdar/tools.cpp:1022
+#: src/libdar/tools.cpp:1030
 #, c-format
 msgid "   Strong encryption          : %s\n"
 msgstr "   Starke Verschlüsselung          : %s\n"
 
-#: src/libdar/tools.cpp:1023
+#: src/libdar/tools.cpp:1031
 #, c-format
 msgid "   Extended Attributes support: %s\n"
 msgstr "   Unterstützung erweit. Attr.: %s\n"
 
-#: src/libdar/tools.cpp:1024
+#: src/libdar/tools.cpp:1032
 #, c-format
 msgid "   Large files support (> 2GB): %s\n"
 msgstr "   Unterstützung für große Dateien (> 2GB): %s\n"
 
-#: src/libdar/tools.cpp:1025
+#: src/libdar/tools.cpp:1033
 #, c-format
 msgid "   ext2fs NODUMP flag support : %s\n"
 msgstr "   xt2fs NODUMP flags unterst.: %s\n"
 
-#: src/libdar/tools.cpp:1026
+#: src/libdar/tools.cpp:1034
 #, c-format
 msgid "   Special allocation scheme  : %s\n"
 msgstr "   Spezial Zuordnungs-Schema  : %s\n"
 
-#: src/libdar/tools.cpp:1028
+#: src/libdar/tools.cpp:1036
 #, c-format
 msgid "   Integer size used          : unlimited\n"
 msgstr "   Verwendete Integer Größe    : unbegrenzt\n"
 
-#: src/libdar/tools.cpp:1030
+#: src/libdar/tools.cpp:1038
 #, c-format
 msgid "   Integer size used          : %d bits\n"
 msgstr "   Verwendete Integer Größe    : %d Bit\n"
 
-#: src/libdar/tools.cpp:1031
+#: src/libdar/tools.cpp:1039
 #, c-format
 msgid "   Thread safe support        : %s\n"
 msgstr "   Thread-sicher              : %s\n"
 
-#: src/libdar/tools.cpp:1033
+#: src/libdar/tools.cpp:1041
 #, fuzzy, c-format
 msgid "   Furtive read mode support  : %s\n"
 msgstr "   Thread-sicher              : %s\n"
 
-#: src/libdar/tools.cpp:1062
+#: src/libdar/tools.cpp:1070
 msgid "big"
 msgstr ""
 
-#: src/libdar/tools.cpp:1065
+#: src/libdar/tools.cpp:1073
 msgid "little"
 msgstr ""
 
-#: src/libdar/tools.cpp:1068
+#: src/libdar/tools.cpp:1076
 msgid "error!"
 msgstr ""
 
-#: src/libdar/tools.cpp:1073
+#: src/libdar/tools.cpp:1081
 #, c-format
 msgid "   Detected system/CPU endian : %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:1074
+#: src/libdar/tools.cpp:1082
 #, fuzzy, c-format
 msgid "   Large dir. speed optimi.   : %s"
 msgstr "   Unterstützung für große Dateien (> 2GB): %s\n"
 
-#: src/libdar/tools.cpp:1118
+#: src/libdar/tools.cpp:1126
 #, c-format
 msgid ""
 "Warning, %S seems more to be a slice name than a base name. Do you want to "
@@ -977,64 +982,64 @@ msgstr ""
 "Achtung, %S sieht eher nach einem Abschnitts- als nach einem Grundnamen aus "
 "Wollen Sie es ersetzen durch %S ?"
 
-#: src/libdar/tools.cpp:1123
+#: src/libdar/tools.cpp:1131
 #, c-format
 msgid "OK, keeping %S as basename"
 msgstr "OK, behalte %S als Grundnamen"
 
-#: src/libdar/tools.cpp:1158
+#: src/libdar/tools.cpp:1166
 msgid "Cannot get full path of current working directory: "
 msgstr "Kann nicht den vollständigen Pfad des aktuellen Ordners bestimmen"
 
-#: src/libdar/tools.cpp:1185
+#: src/libdar/tools.cpp:1193
 #, fuzzy
 msgid "NULL argument given to tools_readlink()"
 msgstr "NULL-Argument für \"Auswahl\"angegeben"
 
-#: src/libdar/tools.cpp:1187
+#: src/libdar/tools.cpp:1195
 #, fuzzy
 msgid "Empty string given as argument to tools_readlink()"
 msgstr "Leere Zeichenkette als Argument an tools_readlink gegeben"
 
-#: src/libdar/tools.cpp:1211
+#: src/libdar/tools.cpp:1219
 #, c-format
 msgid "Cannot read file information for %s : %s"
 msgstr "Dateiinformation von %s kann nicht gelesen werden : %s"
 
-#: src/libdar/tools.cpp:1264
+#: src/libdar/tools.cpp:1272
 msgid "Cannot set last access and last modification time: "
 msgstr ""
 "Letzter Zugriffs- und letzter Änderungszeitpunkt kann nicht gesetzt werden."
 
-#: src/libdar/tools.cpp:1300
+#: src/libdar/tools.cpp:1308
 msgid "NULL given as argument"
 msgstr ""
 
-#: src/libdar/tools.cpp:1331
+#: src/libdar/tools.cpp:1358
 msgid "Aborting program: child process died unexpectedly"
 msgstr ""
 
-#: src/libdar/tools.cpp:1337
+#: src/libdar/tools.cpp:1364
 #, fuzzy, c-format
 msgid "Error trying to run %s: %s"
 msgstr "Fehler beim lesen der erweiterten Attribute für %s : %s"
 
-#: src/libdar/tools.cpp:1339
+#: src/libdar/tools.cpp:1366
 #, fuzzy
 msgid "execvp() failed but did not returned error code"
 msgstr "execvp fehlgeschlagen, aber ohne einen Fehlercode."
 
-#: src/libdar/tools.cpp:1536
+#: src/libdar/tools.cpp:1563
 #, c-format
 msgid "Removing file %s"
 msgstr "Entferne Datei %s"
 
-#: src/libdar/tools.cpp:1538
+#: src/libdar/tools.cpp:1565
 #, fuzzy, c-format
 msgid "Error removing file %s: %s"
 msgstr "Fehler beim Öffnen derr Datei %s : %s"
 
-#: src/libdar/tools.cpp:1563
+#: src/libdar/tools.cpp:1590
 #, c-format
 msgid ""
 "Overwriting not allowed while a slice of a previous archive with the same "
@@ -1044,7 +1049,7 @@ msgstr ""
 "früheren Archivs mit dem gleichen Grundnamen im Ordner %s befindet, Vorgang "
 "abgebrochen."
 
-#: src/libdar/tools.cpp:1569
+#: src/libdar/tools.cpp:1596
 #, fuzzy, c-format
 msgid ""
 "At least one slice of an old archive with the same name remains in the "
@@ -1058,54 +1063,54 @@ msgstr ""
 "des alten Archive versteckt sein könnte. Sollen alle alten Archiv-Abschnitte "
 "zuerst entfernt werden?"
 
-#: src/libdar/tools.cpp:1607 src/libdar/tools.cpp:1611
+#: src/libdar/tools.cpp:1634 src/libdar/tools.cpp:1638
 #, fuzzy, c-format
 msgid "Cannot get inode information for %s: %s"
 msgstr "iNode-Informationen sind nicht Verfügbar für %s : %s"
 
-#: src/libdar/tools.cpp:1620
+#: src/libdar/tools.cpp:1647
 #, fuzzy
 msgid "Current Working Directory cannot be a relative path"
 msgstr "Argument muss ein relativer Pfad sein"
 
-#: src/libdar/tools.cpp:1637
+#: src/libdar/tools.cpp:1664
 #, fuzzy
 msgid "Cannot block signals: "
 msgstr "Kann Datei nicht öffnen: "
 
-#: src/libdar/tools.cpp:1647
+#: src/libdar/tools.cpp:1674
 #, fuzzy
 msgid "Cannot unblock signals: "
 msgstr "Kann Datei nicht öffnen: "
 
-#: src/libdar/tools.cpp:1665 src/libdar/tools.cpp:1675
+#: src/libdar/tools.cpp:1692 src/libdar/tools.cpp:1702
 #, fuzzy, c-format
 msgid "Cannot get last modification date: %s"
 msgstr ""
 "Letzter Zugriffs- und letzter Änderungszeitpunkt kann nicht gesetzt werden."
 
-#: src/libdar/tools.cpp:1678
+#: src/libdar/tools.cpp:1705
 #, c-format
 msgid "Cannot get size of %S: not a plain file"
 msgstr ""
 
-#: src/libdar/tools.cpp:1689
+#: src/libdar/tools.cpp:1716
 #, fuzzy, c-format
 msgid "Cannot get mtime: %s"
 msgstr "Dateigröße kann nicht bestimmt werden: %s"
 
-#: src/libdar/tools.cpp:1787
+#: src/libdar/tools.cpp:1814
 #, fuzzy, c-format
 msgid "Parse error: Unmatched `%c'"
 msgstr ""
 "Auswertungsfehler beim lesen der Konfigurationsdatei %s : Nicht zugeordnet: "
 "%c"
 
-#: src/libdar/tools.cpp:1830
+#: src/libdar/tools.cpp:1857
 msgid "Unknown substitution string: %"
 msgstr "Unbekannte Ersatz-Zeichenkette: %"
 
-#: src/libdar/tools.cpp:1837
+#: src/libdar/tools.cpp:1864
 #, fuzzy
 msgid ""
 "last char of user command-line to execute is '%', (use '%%' instead to avoid "
@@ -1115,85 +1120,90 @@ msgstr ""
 "(verwenden Sie stattdessen '%%', um diese Meldung zu vermeiden). Ignorieren "
 "und fortsetzen?"
 
-#: src/libdar/tools.cpp:1891
+#: src/libdar/tools.cpp:1918
 msgid "execve() failed. (process table is full ?)"
 msgstr "Fehler bei execve(). (Prozesstabelle voll?)"
 
-#: src/libdar/tools.cpp:1893
+#: src/libdar/tools.cpp:1920
 msgid "system() call failed: "
 msgstr "system() Aufruf fehlgeschlagen"
 
-#: src/libdar/tools.cpp:1895
+#: src/libdar/tools.cpp:1922
 #, c-format
 msgid "execution of [ %S ] returned error code: %d"
 msgstr "Ausführung von [ %S ] ergab folgenden Fehlercode: %d"
 
-#: src/libdar/tools.cpp:1902
+#: src/libdar/tools.cpp:1929
 msgid "Error during user command line execution: "
 msgstr "Fehler bei der Ausführung des Benutzerkommandos"
 
-#: src/libdar/tools.cpp:1902
+#: src/libdar/tools.cpp:1929
 msgid " . Retry command-line ?"
 msgstr " . Versuche , das Kommando erneut auszuführen? "
 
-#: src/libdar/tools.cpp:1907
+#: src/libdar/tools.cpp:1934
 msgid "Ignore previous error on user command line and continue ?"
 msgstr "Letzten Fehler beim Benutzerkommando ignoroieren und fortsetzen?"
 
-#: src/libdar/tools.cpp:1947
+#: src/libdar/tools.cpp:1974
 msgid "Fatal error on user command line: "
 msgstr "Fataler Fehler beim Benutzerkommando"
 
-#: src/libdar/tools.cpp:2073 src/libdar/tools.cpp:2079
+#: src/libdar/tools.cpp:2100 src/libdar/tools.cpp:2106
 #, fuzzy
 msgid "Badly formated octal number"
 msgstr "Schlecht formatierte Datenbank"
 
-#: src/libdar/tools.cpp:2106
+#: src/libdar/tools.cpp:2133
 #, fuzzy, c-format
 msgid "Error while setting file permission: %s"
 msgstr "Fehler beim Lesen der Benutzereingabe vom Terminal"
 
-#: src/libdar/tools.cpp:2116
+#: src/libdar/tools.cpp:2143
 #, fuzzy
 msgid "Cannot get effective permission given a file descriptor: "
 msgstr "Folgende Berechtigungen konnten nicht wiederhergestellt werden: %s :%s"
 
-#: src/libdar/tools.cpp:2176
+#: src/libdar/tools.cpp:2203
 #, fuzzy, c-format
 msgid "Unknown user: %S"
 msgstr "Unbekanntes Argument für -a: %s"
 
-#: src/libdar/tools.cpp:2180
+#: src/libdar/tools.cpp:2207
 msgid ""
 "Cannot convert username to uid in statically linked binary, either directly "
 "provide the UID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:2192
+#: src/libdar/tools.cpp:2219
 #, fuzzy, c-format
 msgid "Unknown group: %S"
 msgstr "Unbekanntes Argument für -a: %s"
 
-#: src/libdar/tools.cpp:2196
+#: src/libdar/tools.cpp:2223
 msgid ""
 "Cannot convert group to gid in statically linked binary, either directly "
 "provide the GID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:2203
+#: src/libdar/tools.cpp:2230
 #, fuzzy, c-format
 msgid "Error while setting file user ownership: %s"
 msgstr "Fehler beim Lesen der Benutzereingabe vom Terminal"
 
-#: src/libdar/tools.cpp:2363
+#: src/libdar/tools.cpp:2390
 #, fuzzy
 msgid "Error while fetching hostname: "
 msgstr "Fehler beim Auflisten des Archivinhalts: "
 
-#: src/libdar/tools.cpp:2389 src/libdar/catalogue.cpp:4925
+#: src/libdar/tools.cpp:2416 src/libdar/catalogue.cpp:4925
 msgid "[Worse]"
 msgstr "[Schlechter]"
+
+#: src/libdar/tools.cpp:2438
+#, fuzzy
+msgid "Invalid wide-char found in string: "
+msgstr "Ungültige Archivnummer: "
 
 #: src/libdar/deci.cpp:46
 msgid "invalid decimal digit"
@@ -2550,21 +2560,21 @@ msgid ""
 "will not be optimized"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:366 src/libdar/macro_tools.cpp:394
+#: src/libdar/macro_tools.cpp:366 src/libdar/macro_tools.cpp:395
 #, fuzzy
 msgid "Opening cyphering layer..."
 msgstr "Komprimiere und schreibe Datenbank..."
 
-#: src/libdar/macro_tools.cpp:398
+#: src/libdar/macro_tools.cpp:399
 msgid "Unknown encryption algorithm"
 msgstr "Unbekannte Verschlüsselungsmethode"
 
-#: src/libdar/macro_tools.cpp:415
+#: src/libdar/macro_tools.cpp:416
 #, fuzzy
 msgid "Opening escape sequence abstraction layer..."
 msgstr "Komprimiere und schreibe Datenbank..."
 
-#: src/libdar/macro_tools.cpp:420
+#: src/libdar/macro_tools.cpp:421
 msgid ""
 "LAX MODE: Archive is flagged as having escape sequence (which is normal in "
 "recent archive versions). However if this is not expected, shall I assume a "
@@ -2572,13 +2582,13 @@ msgid ""
 "(If unsure, refuse)"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:435
+#: src/libdar/macro_tools.cpp:436
 msgid ""
 "Sequential read asked, but this archive is flagged to not have the necessary "
 "embedded escape sequences for that operation, aborting"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:440
+#: src/libdar/macro_tools.cpp:441
 msgid ""
 "LAX MODE: the requested sequential read mode relies on escape sequence which "
 "seem to be absent from this archive. Assuming data corruption occurred. "
@@ -2587,7 +2597,7 @@ msgid ""
 "archive else you will just get nothing usable from it"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:446
+#: src/libdar/macro_tools.cpp:447
 msgid ""
 "LAX MODE: Archive is flagged to not have escape sequence. If corruption "
 "occurred and an escape sequence is present, this may lead data restoration "
@@ -2597,46 +2607,46 @@ msgid ""
 "layer?"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:468
+#: src/libdar/macro_tools.cpp:469
 msgid ""
 "Opening the compression abstraction layer (compression algorithm used is "
 "none)..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:470
+#: src/libdar/macro_tools.cpp:471
 #, fuzzy
 msgid "Opening the compression layer..."
 msgstr "Komprimiere und schreibe Datenbank..."
 
-#: src/libdar/macro_tools.cpp:486
+#: src/libdar/macro_tools.cpp:487
 msgid ""
 "LAX MODE: Unknown compression algorithm used, assuming data corruption "
 "occurred. Please help me, answering with one of the following words \"none"
 "\", \"gzip\", \"bzip2\" or \"lzo\" at the next prompt:"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:487
+#: src/libdar/macro_tools.cpp:488
 #, fuzzy
 msgid "none"
 msgstr "nein"
 
-#: src/libdar/macro_tools.cpp:489
+#: src/libdar/macro_tools.cpp:490
 msgid "gzip"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:491
+#: src/libdar/macro_tools.cpp:492
 msgid "bzip2"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:493
+#: src/libdar/macro_tools.cpp:494
 msgid "lzo"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:512
+#: src/libdar/macro_tools.cpp:513
 msgid "All layers have been created successfully"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:515
+#: src/libdar/macro_tools.cpp:516
 #, fuzzy, c-format
 msgid ""
 "Warning, the archive %S has been encrypted. A wrong key is not possible to "
@@ -2646,47 +2656,47 @@ msgstr ""
 "falschen Schlüssel zu erkennen, in diesem Fall wird das Archiv von DAR als "
 "beschädigt gemeldet\n"
 
-#: src/libdar/macro_tools.cpp:555
+#: src/libdar/macro_tools.cpp:556
 msgid ""
 "LAX MODE: The catalogue (table of contents) usually takes a few percents of "
 "the archive at its end, which percentage do you want me to scan (answer by "
 "an *integer* number between 0 and 100)? "
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:561
+#: src/libdar/macro_tools.cpp:562
 #, c-format
 msgid "LAX MODE: %i is not a valid percent value"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:565
+#: src/libdar/macro_tools.cpp:566
 #, fuzzy, c-format
 msgid "%S is not a valid number"
 msgstr "%d ist eine ungültige Blockgrö0e"
 
-#: src/libdar/macro_tools.cpp:571
+#: src/libdar/macro_tools.cpp:572
 #, c-format
 msgid ""
 "LAX MODE: Beginning search of the catalogue (from the end toward the "
 "beginning of the archive, on %i %% of its length), this may take a while..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:584
+#: src/libdar/macro_tools.cpp:585
 msgid ""
 "LAX MODE: Cannot skip at the end of the archive! Using current position to "
 "start the catalogue search"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:589
+#: src/libdar/macro_tools.cpp:590
 msgid "LAX MODE: Failed to read the catalogue (no data to inspect)"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:592
+#: src/libdar/macro_tools.cpp:593
 msgid ""
 "LAX MODE: Failed to read the catalogue (0 bytes of the archive length asked "
 "to look for the catalogue)"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:604
+#: src/libdar/macro_tools.cpp:605
 msgid ""
 "LAX MODE: Escape sequence seems present in this archive. I have thus two "
 "different methods, either I look for the escape sequence indicating the "
@@ -2694,49 +2704,49 @@ msgid ""
 "not be data that look like a catalogue"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:607
+#: src/libdar/macro_tools.cpp:608
 msgid "LAX MODE: Trying to locate the escape sequence (safer choice) ?"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:612
+#: src/libdar/macro_tools.cpp:613
 msgid ""
 "LAX MODE: Good point! I could find the escape sequence marking the beginning "
 "of the catalogue, now trying to read it..."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:621
+#: src/libdar/macro_tools.cpp:622
 msgid ""
 "LAX MODE: Escape sequence could not be found, it may have been corrupted or "
 "out of the scanned portion of the archive, trying to find the catalogue the "
 "other way"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:644
+#: src/libdar/macro_tools.cpp:645
 #, c-format
 msgid "LAX MODE: %i %% remaining"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:656
+#: src/libdar/macro_tools.cpp:657
 #, c-format
 msgid ""
 "Could read a catalogue data structure at offset %i, it contains the "
 "following:"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:658
+#: src/libdar/macro_tools.cpp:659
 msgid "Do you want to use it for restoration?"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:690
+#: src/libdar/macro_tools.cpp:691
 msgid ""
 "LAX MODE: Reached the end of the area to scan, FAILED to find any catalogue"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:700
+#: src/libdar/macro_tools.cpp:701
 msgid "LAX MODE: Failed to read the catalogue"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:708
+#: src/libdar/macro_tools.cpp:709
 msgid ""
 "The format version of the archive is too high for that software version, try "
 "reading anyway?"
@@ -2744,13 +2754,13 @@ msgstr ""
 "Die Formatversion ist zu neu für diese Software, trotzdem versuchen, das "
 "Archiv zu lesen?"
 
-#: src/libdar/macro_tools.cpp:731
+#: src/libdar/macro_tools.cpp:732
 msgid ""
 "LAX MODE: Failed to read the archive header, I will need your help to know "
 "what is the missing information."
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:735
+#: src/libdar/macro_tools.cpp:736
 #, c-format
 msgid ""
 "LAX MODE: Archive format revision found is [%s] but the higher version this "
@@ -2758,17 +2768,17 @@ msgid ""
 "and falling back to the higher version this binary can support (%s)"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:739
+#: src/libdar/macro_tools.cpp:740
 #, c-format
 msgid "LAX MODE: Archive format revision found is [version %s]"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:743
+#: src/libdar/macro_tools.cpp:744
 #, c-format
 msgid "LAX MODE: is it correct, seen the table at the following URL: %s ?"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:752
+#: src/libdar/macro_tools.cpp:753
 #, c-format
 msgid ""
 "LAX MODE: Please provide the archive format: You can use the table at %s to "
@@ -2777,12 +2787,12 @@ msgid ""
 "without the quotes here): "
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:757
+#: src/libdar/macro_tools.cpp:758
 #, c-format
 msgid "LAX MODE: \"%S\" is not a valid archive format"
 msgstr ""
 
-#: src/libdar/macro_tools.cpp:763
+#: src/libdar/macro_tools.cpp:764
 #, c-format
 msgid "LAX MODE: Using archive format \"%d\"?"
 msgstr ""
