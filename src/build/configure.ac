@@ -89,9 +89,7 @@ AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 
-
-AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h])
-
+AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h wchar.h wctype.h])
 
 AC_SYS_LARGEFILE
 
@@ -1292,6 +1290,21 @@ if [ "$static_pb" = "yes" -a "$build_static" = "yes" ] ; then
    echo "You also might want to speed up the compilation process running ./configure"
    echo "with the --disable-static option"
    echo ""
+fi
+
+if [ -z "$build_mode" ] ; then
+   echo ""
+   echo "--------------------- N O T E ---------------------------------------"
+   echo "Note: You are about to build a libdar/dar binary relying on \"infinint\""
+   echo "integer type. You shall also consider using 64 bits integers (whatever"
+   echo "your CPU has 32 or 64 bits registers) for better performances and reduced"
+   echo "memory requirements, at the cost of the limitations explained here:"
+   echo "   ./doc/Limitations.html (Paragraph about Integers)"
+   echo "Document which is also available online at:"
+   echo "   http://dar.linux.free.fr/doc/Limitations.html#Integers"
+   echo "Unless you are impacted by these limitations, you can rerun ./configure"
+   echo "adding the option --enable-mode=64 for better performances"
+   echo "---------------------------------------------------------------------"
 fi
 
 if [ "$libgcrypt_hash_bug" = "yes" ] ; then

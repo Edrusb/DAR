@@ -118,6 +118,14 @@ extern "C"
 #if HAVE_SYS_UTSNAME_H
 #include <sys/utsname.h>
 #endif
+
+#if HAVE_WCHAR_H
+#include <wchar.h>
+#endif
+
+#if HAVE_WCTYPE_H
+#include <wctype.h>
+#endif
 } // end extern "C"
 
 #include <iostream>
@@ -1472,11 +1480,30 @@ namespace libdar
 
     void tools_to_upper(string & r)
     {
+#if HAVE_WCTYPE_H && HAVE_WCHAR_H
+	wstring tmp = tools_string_to_wstring(r);
+	tools_to_wupper(tmp);
+	r = tools_wstring_to_string(tmp);
+#else
         U_I taille = r.size();
 
         for(U_I x = 0; x < taille; ++x)
             r[x] = toupper(r[x]);
+#endif
     }
+
+#if HAVE_WCTYPE_H
+    void tools_to_wupper(wstring & r)
+    {
+	wstring::iterator it = r.begin();
+
+	while(it != r.end())
+	{
+	    *it = towupper(*it);
+	    ++it;
+	}
+    }
+#endif
 
     void tools_remove_last_char_if_equal_to(char c, string & s)
     {
@@ -2719,7 +2746,6 @@ namespace libdar
 	return ret;
     }
 
-
 #ifdef GPGME_SUPPORT
     string tools_gpgme_strerror_r(gpgme_error_t err)
     {
@@ -2738,6 +2764,87 @@ namespace libdar
 	}
 	buffer[MSGSIZE-1] = '\0';
 	ret = buffer;
+
+	return ret;
+    }
+#endif
+
+
+#if HAVE_WCHAR_H
+    wstring tools_string_to_wstring(const string & val)
+    {
+	wstring ret;
+	wchar_t *dst = new (nothrow) wchar_t[val.size() + 1];
+
+	if(dst == NULL)
+	    throw Ememory("tools_string_to_wcs");
+	try
+	{
+	    mbstate_t state_wc;
+	    const char *src = val.c_str();
+	    size_t len;
+
+	    memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
+	    len = mbsrtowcs(dst, &src, val.size(), &state_wc);
+	    if(len == (size_t)-1)
+		throw Erange("tools_string_to_wcs", string(gettext("Invalid wide-char found in string: ")) + strerror(errno));
+	    dst[len] = '\0';
+
+		// converting dst to wstring
+
+	    ret = dst;
+	}
+	catch(...)
+	{
+	    if(dst != NULL)
+		delete dst;
+	    throw;
+	}
+	if(dst != NULL)
+	    delete dst;
+
+	return ret;
+    }
+
+    string tools_wstring_to_string(const wstring & val)
+    {
+	string ret;
+	const wchar_t *src = val.c_str();
+	mbstate_t state_wc;
+	size_t len;
+
+	memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
+	len = wcsrtombs(NULL, &src, 0, &state_wc);
+	if(len == (size_t)-1)
+	    throw SRC_BUG; // all components of wstring should be valid
+
+	char *dst = new (nothrow) char[len + 1];
+	if(dst == NULL)
+	    throw Ememory("tools_wstring_to_string");
+	try
+	{
+	    size_t len2;
+	    memset(&state_wc, '\0', sizeof(state_wc)); // initializing the shift structure
+	    src = val.c_str();
+	    len2 = wcsrtombs(dst, &src, len, &state_wc);
+	    if(len != len2)
+		throw SRC_BUG;
+	    if(len2 == (size_t)-1)
+		throw SRC_BUG; // problem should have already raised above
+	    dst[len2] = '\0';
+
+		// converting dst to string
+
+	    ret = dst;
+	}
+	catch(...)
+	{
+	    if(dst != NULL)
+		delete dst;
+	    throw;
+	}
+	if(dst != NULL)
+	    delete dst;
 
 	return ret;
     }

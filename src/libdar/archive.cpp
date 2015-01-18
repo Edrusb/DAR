@@ -853,8 +853,10 @@ namespace libdar
 	    dialog.printf(gettext("Symmetric key encryption used        : %S\n"), &sym);
 	    dialog.printf(gettext("Asymmetric key encryption used       : %S\n"), &asym);
 	    dialog.printf(gettext("Sequential reading marks             : %s\n"), (ver.get_tape_marks() ? gettext("present") : gettext("absent")));
-	    dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
-
+	    if(cat_size > 0)
+		dialog.printf(gettext("Catalogue size in archive            : %i bytes\n"), &cat_size);
+	    else
+		dialog.printf(gettext("Catalogue size in archive            : N/A\n"));
 	    dialog.printf(gettext("User comment                         : %S\n\n"), &(get_header().get_command_line()));
 
 	    try

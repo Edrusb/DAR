@@ -72,8 +72,8 @@ RM="/bin/rm"
 #initial call of this script (just executes dar with the proper parameters):
 DATE=`$DATECMD -I`
 START=`$DATECMD`
-if [ "$1" != "" ] && [ "$2" == "" ] ; then
-	if [ "$1" == "full" ] ; then
+if [ -n "$1" ] && [ -z "$2" ] ; then
+	if [ "$1" = "full" ] ; then
 		echo "starting full backup"
 		$DAR_EXEC -c "$TDIR/$DATE" \
 		-X "$DATE.*.dar" -X "darswap" \
@@ -95,26 +95,26 @@ elif [ -r "$1/$2.$3.dar" ] ; then
 	echo -n "creating cdr $3 volume dir containing $2.$3.dar"
 	$MKDIR "$1/$2.$3.cdr"
 	$MV "$1/$2.$3.dar" "$1/$2.$3.cdr"
-	if [ "$3" == "1" ] ; then
+	if [ "$3" = "1" ] ; then
 		echo -n " and dar_static"
 		$CP $DAR_STATIC "$1/$2.$3.cdr"
 	fi
 	echo
-	SCANBUS=`$CDRECORD  -scanbus 2>/dev/null | $GREP $DRIVENAME`
-	DEV=${SCANBUS:1:5}
+	DEV=`$CDRECORD  -scanbus 2>/dev/null | $GREP $DRIVENAME | cut -b2-6`
 	CDBLOCKS=`$MKISOFS -R -print-size -quiet $1/$2.$3.cdr`
 	echo "writing cdr $3 (${CDBLOCKS}s)..."
 	KEEPFILE="n"
 	until $MKISOFS -R "$1/$2.$3.cdr" | \
 	$CDRECORD -eject -s dev=$DEV speed=$DRIVESPEED tsize=${CDBLOCKS}s -
 	do
-		read -p "write error, try [A]gain or [k]eep $2.$3.dar? " ERR
-		if [ "$ERR" == "k" ] ; then
+		echo -n "write error, try [A]gain or [k]eep $2.$3.dar? "
+		read ERR
+		if [ "$ERR" = "k" ] ; then
 			KEEPFILE="y"
 			break
 		fi
 	done
-	if [ "$KEEPFILE" == "y" ] ; then
+	if [ "$KEEPFILE" = "y" ] ; then
 		echo "cdr not written, keeping $2.$3.dar as file"
 		$MV "$1/$2.$3.cdr/$2.$3.dar" "$1/$2.$3.dar"
 	fi
