@@ -2276,7 +2276,7 @@ namespace libdar
 				st.incr_errored();
 			    }
 			}
-			else  // cat_entree is not a cat_nomme object (this is an "cat_eod")
+			else  // cat_entree is not a cat_nomme object (this is a "cat_eod")
 			{
 			    cat_entree *tmp = e->clone();
 			    try
