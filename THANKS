@@ -1,9 +1,13 @@
+version 2.4.16
+--------------
+Thanks to Georg Sauthoff for clear bug report and to Oleksandr Chumachenko
+for patches against bashisms in doc/sample scripts.
+
 version 2.4.15
 --------------
 Thanks to Ryan Schmidt for feedback and typo corrections. Thanks to Jer Fort
-for bug report and again to Neil Darlow for providing access to an up to date
-FreeBSD system. Thanks to Georg Sauthoff for clear bug report. Thanks to
-Oleksandr Chumachenko for patches against bashisms in doc/sample scripts.
+for bug report and again to Neil Darlow for providing access to a FreeBSD
+system.
 
 version 2.4.14
 --------------
