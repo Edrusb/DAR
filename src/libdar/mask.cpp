@@ -39,10 +39,12 @@ namespace libdar
 {
 
     simple_mask::simple_mask(const string & wilde_card_expression,
-			     bool case_sensit) : the_mask(wilde_card_expression), case_s(case_sensit)
+			     bool case_sensit) : case_s(case_sensit)
     {
 	if(!case_s)
-	    tools_to_upper(the_mask);
+	    tools_to_upper(wilde_card_expression, the_mask);
+	else
+	    the_mask = wilde_card_expression;
     }
 
     const simple_mask & simple_mask::operator = (const simple_mask & m)
@@ -58,8 +60,9 @@ namespace libdar
     {
 	if(!case_s)
 	{
-	    string upper = expression;
-	    tools_to_upper(upper);
+	    string upper;
+
+	    tools_to_upper(expression, upper);
 	    return fnmatch(the_mask.c_str(), upper.c_str(), FNM_PERIOD) == 0;
 	}
 	else

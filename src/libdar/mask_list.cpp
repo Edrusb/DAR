@@ -70,6 +70,7 @@ namespace libdar
 	    list <string> tmp;                 //< list of all raw lines read, without any prefix
 	    U_I lu = 0, curs;                  //< cursor used as cisors to split data in line
 	    char *beg = NULL;                  //< points to the beginning of the next line inside buffer, when more than one line can be found in buffer
+	    string str_beg;                    //< holds the std::string copy of beg, eventually uppercased
 	    string current_entry = "";         //< holds the current line converted to string between each read()
 	    path prefix = prefix_t;            //< the prefix to add to relative paths
 
@@ -81,8 +82,9 @@ namespace libdar
 	    if(!case_sensit)
 	    {
 		string ptp = prefix_t.display();
-		tools_to_upper(ptp);
-		prefix = path(ptp);
+		string upper;
+		tools_to_upper(ptp, upper);
+		prefix = path(upper);
 	    }
 
 
@@ -123,8 +125,10 @@ namespace libdar
 				{
 				    buffer[curs] = '\0';
 				    if(!case_s)
-					tools_to_upper(beg);
-				    current_entry += string(beg);
+					tools_to_upper(beg, str_beg);
+				    else
+					str_beg = string(beg);
+				    current_entry += str_beg;
 				    if(current_entry != "")
 					tmp.push_back(current_entry);
 				    current_entry = "";
@@ -138,8 +142,10 @@ namespace libdar
 			    {
 				buffer[lu] = '\0';
 				if(!case_s)
-				    tools_to_upper(beg);
-				current_entry += string(beg);
+				    tools_to_upper(beg, str_beg);
+				else
+				    str_beg = string(beg);
+				current_entry += str_beg;
 			    }
 			}
 			while(curs < lu);
@@ -224,11 +230,7 @@ namespace libdar
         if(case_s)
             target = expression;
         else
-        {
-            string hidden = expression;
-            tools_to_upper(hidden);
-            target = hidden;
-        }
+            tools_to_upper(expression, target);
 
             // divide & conquer algorithm on a sorted list (aka binary search)
         while(max - min > 1)
