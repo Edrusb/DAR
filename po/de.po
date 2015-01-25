@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2015-01-18 16:47+0100\n"
+"POT-Creation-Date: 2015-01-24 16:20+0100\n"
 "PO-Revision-Date: 2011-07-21 16:13+0200\n"
 "Last-Translator: Markus Kamp <mk_cactus@gmx.de>\n"
 "Language-Team: Deutsch\n"
@@ -1011,35 +1011,31 @@ msgid "Cannot set last access and last modification time: "
 msgstr ""
 "Letzter Zugriffs- und letzter Änderungszeitpunkt kann nicht gesetzt werden."
 
-#: src/libdar/tools.cpp:1308
-msgid "NULL given as argument"
-msgstr ""
-
-#: src/libdar/tools.cpp:1358
+#: src/libdar/tools.cpp:1356
 msgid "Aborting program: child process died unexpectedly"
 msgstr ""
 
-#: src/libdar/tools.cpp:1364
+#: src/libdar/tools.cpp:1362
 #, fuzzy, c-format
 msgid "Error trying to run %s: %s"
 msgstr "Fehler beim lesen der erweiterten Attribute für %s : %s"
 
-#: src/libdar/tools.cpp:1366
+#: src/libdar/tools.cpp:1364
 #, fuzzy
 msgid "execvp() failed but did not returned error code"
 msgstr "execvp fehlgeschlagen, aber ohne einen Fehlercode."
 
-#: src/libdar/tools.cpp:1563
+#: src/libdar/tools.cpp:1561
 #, c-format
 msgid "Removing file %s"
 msgstr "Entferne Datei %s"
 
-#: src/libdar/tools.cpp:1565
+#: src/libdar/tools.cpp:1563
 #, fuzzy, c-format
 msgid "Error removing file %s: %s"
 msgstr "Fehler beim Öffnen derr Datei %s : %s"
 
-#: src/libdar/tools.cpp:1590
+#: src/libdar/tools.cpp:1588
 #, c-format
 msgid ""
 "Overwriting not allowed while a slice of a previous archive with the same "
@@ -1049,7 +1045,7 @@ msgstr ""
 "früheren Archivs mit dem gleichen Grundnamen im Ordner %s befindet, Vorgang "
 "abgebrochen."
 
-#: src/libdar/tools.cpp:1596
+#: src/libdar/tools.cpp:1594
 #, fuzzy, c-format
 msgid ""
 "At least one slice of an old archive with the same name remains in the "
@@ -1063,54 +1059,54 @@ msgstr ""
 "des alten Archive versteckt sein könnte. Sollen alle alten Archiv-Abschnitte "
 "zuerst entfernt werden?"
 
-#: src/libdar/tools.cpp:1634 src/libdar/tools.cpp:1638
+#: src/libdar/tools.cpp:1632 src/libdar/tools.cpp:1636
 #, fuzzy, c-format
 msgid "Cannot get inode information for %s: %s"
 msgstr "iNode-Informationen sind nicht Verfügbar für %s : %s"
 
-#: src/libdar/tools.cpp:1647
+#: src/libdar/tools.cpp:1645
 #, fuzzy
 msgid "Current Working Directory cannot be a relative path"
 msgstr "Argument muss ein relativer Pfad sein"
 
-#: src/libdar/tools.cpp:1664
+#: src/libdar/tools.cpp:1662
 #, fuzzy
 msgid "Cannot block signals: "
 msgstr "Kann Datei nicht öffnen: "
 
-#: src/libdar/tools.cpp:1674
+#: src/libdar/tools.cpp:1672
 #, fuzzy
 msgid "Cannot unblock signals: "
 msgstr "Kann Datei nicht öffnen: "
 
-#: src/libdar/tools.cpp:1692 src/libdar/tools.cpp:1702
+#: src/libdar/tools.cpp:1690 src/libdar/tools.cpp:1700
 #, fuzzy, c-format
 msgid "Cannot get last modification date: %s"
 msgstr ""
 "Letzter Zugriffs- und letzter Änderungszeitpunkt kann nicht gesetzt werden."
 
-#: src/libdar/tools.cpp:1705
+#: src/libdar/tools.cpp:1703
 #, c-format
 msgid "Cannot get size of %S: not a plain file"
 msgstr ""
 
-#: src/libdar/tools.cpp:1716
+#: src/libdar/tools.cpp:1714
 #, fuzzy, c-format
 msgid "Cannot get mtime: %s"
 msgstr "Dateigröße kann nicht bestimmt werden: %s"
 
-#: src/libdar/tools.cpp:1814
+#: src/libdar/tools.cpp:1812
 #, fuzzy, c-format
 msgid "Parse error: Unmatched `%c'"
 msgstr ""
 "Auswertungsfehler beim lesen der Konfigurationsdatei %s : Nicht zugeordnet: "
 "%c"
 
-#: src/libdar/tools.cpp:1857
+#: src/libdar/tools.cpp:1855
 msgid "Unknown substitution string: %"
 msgstr "Unbekannte Ersatz-Zeichenkette: %"
 
-#: src/libdar/tools.cpp:1864
+#: src/libdar/tools.cpp:1862
 #, fuzzy
 msgid ""
 "last char of user command-line to execute is '%', (use '%%' instead to avoid "
@@ -1120,87 +1116,87 @@ msgstr ""
 "(verwenden Sie stattdessen '%%', um diese Meldung zu vermeiden). Ignorieren "
 "und fortsetzen?"
 
-#: src/libdar/tools.cpp:1918
+#: src/libdar/tools.cpp:1916
 msgid "execve() failed. (process table is full ?)"
 msgstr "Fehler bei execve(). (Prozesstabelle voll?)"
 
-#: src/libdar/tools.cpp:1920
+#: src/libdar/tools.cpp:1918
 msgid "system() call failed: "
 msgstr "system() Aufruf fehlgeschlagen"
 
-#: src/libdar/tools.cpp:1922
+#: src/libdar/tools.cpp:1920
 #, c-format
 msgid "execution of [ %S ] returned error code: %d"
 msgstr "Ausführung von [ %S ] ergab folgenden Fehlercode: %d"
 
-#: src/libdar/tools.cpp:1929
+#: src/libdar/tools.cpp:1927
 msgid "Error during user command line execution: "
 msgstr "Fehler bei der Ausführung des Benutzerkommandos"
 
-#: src/libdar/tools.cpp:1929
+#: src/libdar/tools.cpp:1927
 msgid " . Retry command-line ?"
 msgstr " . Versuche , das Kommando erneut auszuführen? "
 
-#: src/libdar/tools.cpp:1934
+#: src/libdar/tools.cpp:1932
 msgid "Ignore previous error on user command line and continue ?"
 msgstr "Letzten Fehler beim Benutzerkommando ignoroieren und fortsetzen?"
 
-#: src/libdar/tools.cpp:1974
+#: src/libdar/tools.cpp:1972
 msgid "Fatal error on user command line: "
 msgstr "Fataler Fehler beim Benutzerkommando"
 
-#: src/libdar/tools.cpp:2100 src/libdar/tools.cpp:2106
+#: src/libdar/tools.cpp:2098 src/libdar/tools.cpp:2104
 #, fuzzy
 msgid "Badly formated octal number"
 msgstr "Schlecht formatierte Datenbank"
 
-#: src/libdar/tools.cpp:2133
+#: src/libdar/tools.cpp:2131
 #, fuzzy, c-format
 msgid "Error while setting file permission: %s"
 msgstr "Fehler beim Lesen der Benutzereingabe vom Terminal"
 
-#: src/libdar/tools.cpp:2143
+#: src/libdar/tools.cpp:2141
 #, fuzzy
 msgid "Cannot get effective permission given a file descriptor: "
 msgstr "Folgende Berechtigungen konnten nicht wiederhergestellt werden: %s :%s"
 
-#: src/libdar/tools.cpp:2203
+#: src/libdar/tools.cpp:2201
 #, fuzzy, c-format
 msgid "Unknown user: %S"
 msgstr "Unbekanntes Argument für -a: %s"
 
-#: src/libdar/tools.cpp:2207
+#: src/libdar/tools.cpp:2205
 msgid ""
 "Cannot convert username to uid in statically linked binary, either directly "
 "provide the UID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:2219
+#: src/libdar/tools.cpp:2217
 #, fuzzy, c-format
 msgid "Unknown group: %S"
 msgstr "Unbekanntes Argument für -a: %s"
 
-#: src/libdar/tools.cpp:2223
+#: src/libdar/tools.cpp:2221
 msgid ""
 "Cannot convert group to gid in statically linked binary, either directly "
 "provide the GID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:2230
+#: src/libdar/tools.cpp:2228
 #, fuzzy, c-format
 msgid "Error while setting file user ownership: %s"
 msgstr "Fehler beim Lesen der Benutzereingabe vom Terminal"
 
-#: src/libdar/tools.cpp:2390
+#: src/libdar/tools.cpp:2388
 #, fuzzy
 msgid "Error while fetching hostname: "
 msgstr "Fehler beim Auflisten des Archivinhalts: "
 
-#: src/libdar/tools.cpp:2416 src/libdar/catalogue.cpp:4925
+#: src/libdar/tools.cpp:2414 src/libdar/catalogue.cpp:4925
 msgid "[Worse]"
 msgstr "[Schlechter]"
 
-#: src/libdar/tools.cpp:2438
+#: src/libdar/tools.cpp:2436
 #, fuzzy
 msgid "Invalid wide-char found in string: "
 msgstr "Ungültige Archivnummer: "
@@ -3104,22 +3100,22 @@ msgstr "wrapperlib Object kann nicht kopiert werden (NICHT IMPLEMENTIERT)"
 msgid "compressReset called but compressInit never called before"
 msgstr ""
 
-#: src/libdar/mask_list.cpp:95
+#: src/libdar/mask_list.cpp:97
 #, c-format
 msgid "Cannot allocate memory for buffer while reading %S"
 msgstr ""
 
-#: src/libdar/mask_list.cpp:121
+#: src/libdar/mask_list.cpp:123
 msgid "Found '"
 msgstr ""
 
-#: src/libdar/mask_list.cpp:166
+#: src/libdar/mask_list.cpp:172
 msgid ""
 "Mask_list's prefix must be an absolute path or start with \"<ROOT>\" string "
 "for archive merging"
 msgstr ""
 
-#: src/libdar/mask_list.cpp:188
+#: src/libdar/mask_list.cpp:194
 #, fuzzy, c-format
 msgid ""
 "Error met while reading line\n"
@@ -3127,7 +3123,7 @@ msgid ""
 " from file %S: %S"
 msgstr "Fehler beim Lesen der Datei: "
 
-#: src/libdar/mask_list.cpp:205
+#: src/libdar/mask_list.cpp:211
 #, c-format
 msgid "Too much line in file %S (integer overflow)"
 msgstr ""
@@ -3732,7 +3728,7 @@ msgstr "Eine leere Zeichenkette ist keine gültige Pfadangabe"
 msgid "Cannot add an absolute path"
 msgstr "Absoluter Pfad kann nicht hinzugefügt werden"
 
-#: src/libdar/path.cpp:322
+#: src/libdar/path.cpp:328
 msgid "Empty string as subdirectory does not make a valid path"
 msgstr ""
 "Eine leere Zeichenkette als Unterverzeichnis ergibt keine gültige Pfadangabe"
