@@ -414,13 +414,11 @@ namespace libdar
 
         /// \brief convert a string to upper case
         ///
-        /// \param[in,out] nts a NULL terminated string to convert
-    extern void tools_to_upper(char *nts);
-
-        /// \brief convert a string to upper case
-        ///
-        /// \param[in,out] r to convert
-    extern void tools_to_upper(std::string & r);
+        /// \param[in] r the string to convert
+	/// \param[out] uppered resulting upper cased string
+	/// \note in case of invalid wide char met in source string, the upper case convertion
+	/// is done in ASCII mode (byte by byte)
+    extern void tools_to_upper(const std::string & r, std::string & uppered);
 
 #if HAVE_WCTYPE_H
 	/// \brief convert a wstring to upper case

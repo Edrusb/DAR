@@ -56,6 +56,13 @@ from 2.4.x to 2.5.0
   an isolated catalogue, to face the case when the archive of reference has
   been resliced after the isolated catalogue has been built.
 
+from 2.4.16 to 2.4.17
+- fixing issue when case insensitive comparison was requested and invalid
+  wide char for the current local was met in a filename. In such situation
+  the corresponding file was never saved before (considering a filesystem
+  error for that file), while now the ASCII case insensitivity is used
+  as fallback.
+
 from 2.4.15 to 2.4.16
 - fixing archive listing displayed information for catalogue size when
   archive is read in --sequential-read mode

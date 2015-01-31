@@ -1464,31 +1464,29 @@ namespace libdar
         return curs >= a.size();
     }
 
-    void tools_to_upper(char *nts)
-    {
-        char *ptr = nts;
-
-        if(ptr == NULL)
-            throw Erange("tools_to_upper", dar_gettext("NULL given as argument"));
-
-        while(*ptr != '\0')
-        {
-            *ptr = (char)toupper((int)*ptr);
-            ptr++;
-        }
-    }
-
-    void tools_to_upper(string & r)
+    void tools_to_upper(const string & r, string & uppered)
     {
 #if HAVE_WCTYPE_H && HAVE_WCHAR_H
-	wstring tmp = tools_string_to_wstring(r);
-	tools_to_wupper(tmp);
-	r = tools_wstring_to_string(tmp);
+	try
+	{
+	    wstring tmp = tools_string_to_wstring(r);
+	    tools_to_wupper(tmp);
+	    uppered = tools_wstring_to_string(tmp);
+	}
+	catch(Erange & e)
+	{
+	    U_I taille = r.size();
+	    uppered = r;
+
+	    for(U_I x = 0; x < taille; ++x)
+		uppered[x] = toupper(uppered[x]);
+	}
 #else
         U_I taille = r.size();
+	uppered = r;
 
         for(U_I x = 0; x < taille; ++x)
-            r[x] = toupper(r[x]);
+            uppered[x] = toupper(uppered[x]);
 #endif
     }
 

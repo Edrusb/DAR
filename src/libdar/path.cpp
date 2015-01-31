@@ -212,14 +212,20 @@ namespace libdar
 
     bool path::is_subdir_of(const path & p, bool case_sensit) const
     {
-	string me = display();
-	string you = p.display();
+	string me;
+	string you;
 
 	if(!case_sensit)
 	{
 		// converting all string in upper case
-	    tools_to_upper(me);
-	    tools_to_upper(you);
+
+	    tools_to_upper(display(), me);
+	    tools_to_upper(p.display(), you);
+	}
+	else
+	{
+	    me = display();
+	    you = p.display();
 	}
 
 	if(me.size() >= you.size())
