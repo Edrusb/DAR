@@ -32,6 +32,7 @@
 
 #include "../my_config.h"
 #include "infinint.hpp"
+#include "generic_file.hpp"
 #include "on_pool.hpp"
 
 namespace libdar

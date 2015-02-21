@@ -36,8 +36,8 @@ namespace libdar
 {
     generic_thread::generic_thread(generic_file * ptr, U_I block_size, U_I num_block):
 	generic_file(gf_read_only),
-	toslave(libthreadar::tampon<char>(num_block, block_size)),
-	tomaster(libthreadar::tampon<char>(num_block, block_size))
+	toslave(num_block, block_size),
+	tomaster(num_block, block_size)
     {
 	unsigned int tmp = sizeof(data_header);
 
@@ -70,8 +70,8 @@ namespace libdar
 
     generic_thread::generic_thread(const generic_thread & ref):
 	generic_file (gf_read_only),
-	toslave(libthreadar::tampon<char>(2, 10)),
-	tomaster(libthreadar::tampon<char>(2, 10))
+	toslave(2, 10),
+	tomaster(2, 10)
     {
 	throw SRC_BUG;
     }
