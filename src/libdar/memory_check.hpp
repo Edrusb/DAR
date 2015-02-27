@@ -25,7 +25,7 @@
 #include "../my_config.h"
 
 // this module redefines the two global operators new and delete
-// no need to include this header anywhere as these operatore will
+// no need to include this header anywhere as these operators will
 // be used in any case as replacement of the default ones
 
     /// adds dump of currently allocated blocks to the debug_memory_output

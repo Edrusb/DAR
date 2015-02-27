@@ -59,6 +59,8 @@ static void debug_mem_error(const char *file, unsigned int line, const char *msg
 
 static void debug_mem_init()
 {
+	// here we user C i/o calls to stay independent of the new/delete C++ operator
+
     for(long long i = 0; i < DEBUG_MEM_SIZE; ++i)
     {
 	debug_mem_alloc[i].ptr = NULL;
